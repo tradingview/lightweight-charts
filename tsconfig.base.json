@@ -1,0 +1,30 @@
+{
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"declaration": true,
+		"importHelpers": true,
+		"lib": [
+			"dom",
+			"es2015.collection",
+			"es2015.core",
+			"es2015.iterable",
+			"es2015.symbol.wellknown",
+			"es2016.array.include",
+			"es5"
+		],
+		"module": "esnext",
+		"moduleResolution": "node",
+		"noEmitOnError": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"outDir": "lib",
+		"preserveConstEnums": true,
+		"resolveJsonModule": true,
+		"rootDir": "./",
+		"strict": true,
+		"stripInternal": true,
+		"target": "es5",
+		"types": []
+	}
+}

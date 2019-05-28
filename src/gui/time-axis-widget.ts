@@ -1,0 +1,473 @@
+import { ensureNotNull } from '../helpers/assertions';
+import { getContext2d } from '../helpers/canvas-wrapper';
+import { IDestroyable } from '../helpers/idestroyable';
+import { makeFont } from '../helpers/make-font';
+
+import { Coordinate } from '../model/coordinate';
+import { IDataSource } from '../model/idata-source';
+import { InvalidationLevel } from '../model/invalidate-mask';
+import { LayoutOptions } from '../model/layout-options';
+import { PriceAxisPosition } from '../model/price-scale';
+import { TextWidthCache } from '../model/text-width-cache';
+import { MarkSpanBorder, TimeMark } from '../model/time-scale';
+import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
+import { TimeAxisView } from '../views/time-axis/time-axis-view';
+
+import { addCanvasTo, clearRect, resizeCanvas, Size } from './canvas-utils';
+import { ChartWidget } from './chart-widget';
+import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
+import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
+
+const enum Constants {
+	BorderSize = 1,
+	TickLength = 3,
+}
+
+const enum CursorType {
+	Default,
+	EwResize,
+}
+
+function markWithGreaterSpan(a: TimeMark, b: TimeMark): TimeMark {
+	return a.span > b.span ? a : b;
+}
+
+export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
+	private readonly _chart: ChartWidget;
+	private readonly _options: LayoutOptions;
+	private readonly _element: HTMLElement;
+	private readonly _leftStubCell: HTMLElement;
+	private readonly _rightStubCell: HTMLElement;
+	private readonly _cell: HTMLElement;
+	private readonly _dv: HTMLElement;
+	private readonly _canvas: HTMLCanvasElement;
+	private readonly _canvasContext: CanvasRenderingContext2D;
+	private readonly _topCanvas: HTMLCanvasElement;
+	private readonly _topCanvasContext: CanvasRenderingContext2D;
+	private _stub: PriceAxisStub | null = null;
+	private _minVisibleSpan: number = MarkSpanBorder.Year;
+	private readonly _mouseEventHandler: MouseEventHandler;
+	private _rendererOptions: TimeAxisViewRendererOptions | null = null;
+	private _mouseDown: boolean = false;
+	private _size: Size = new Size(0, 0);
+	private _priceAxisPosition: PriceAxisPosition = 'none';
+
+	public constructor(chartWidget: ChartWidget) {
+		this._chart = chartWidget;
+		this._options = chartWidget.options().layout;
+
+		this._element = document.createElement('tr');
+
+		this._leftStubCell = document.createElement('td');
+		this._leftStubCell.style.padding = '0';
+
+		this._rightStubCell = document.createElement('td');
+		this._rightStubCell.style.padding = '0';
+
+		this._cell = document.createElement('td');
+		this._cell.style.height = '25px';
+		this._cell.style.padding = '0';
+
+		this._dv = document.createElement('div');
+		this._dv.style.width = '100%';
+		this._dv.style.height = '100%';
+		this._dv.style.position = 'relative';
+		this._dv.style.overflow = 'hidden';
+		this._cell.appendChild(this._dv);
+
+		this._canvas = addCanvasTo(this._dv, new Size(16, 16));
+		this._canvas.style.position = 'absolute';
+		this._canvas.style.zIndex = '1';
+		this._canvas.style.left = '0';
+		this._canvas.style.top = '0';
+
+		this._canvasContext = ensureNotNull(getContext2d(this._canvas));
+
+		this._topCanvas = addCanvasTo(this._dv, new Size(16, 16));
+		this._topCanvas.style.position = 'absolute';
+		this._topCanvas.style.zIndex = '2';
+		this._topCanvas.style.left = '0';
+		this._topCanvas.style.top = '0';
+
+		this._topCanvasContext = ensureNotNull(getContext2d(this._topCanvas));
+
+		this._element.appendChild(this._leftStubCell);
+		this._element.appendChild(this._cell);
+		this._element.appendChild(this._rightStubCell);
+
+		this._recreateStub();
+		this._chart.model().mainPriceScaleOptionsChanged().subscribe(this._recreateStub.bind(this), this);
+
+		this._mouseEventHandler = new MouseEventHandler(this._cell, this, true, false);
+	}
+
+	public destroy(): void {
+		this._mouseEventHandler.destroy();
+		if (this._stub !== null) {
+			this._stub.destroy();
+		}
+	}
+
+	public getElement(): HTMLElement {
+		return this._element;
+	}
+
+	public mouseDownEvent(event: TouchMouseEvent): void {
+		if (this._mouseDown) {
+			return;
+		}
+
+		this._mouseDown = true;
+		const model = this._chart.model();
+		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove) {
+			return;
+		}
+
+		model.startScaleTime(event.localX as Coordinate);
+	}
+
+	public mouseDownOutsideEvent(): void {
+		const model = this._chart.model();
+		if (!model.timeScale().isEmpty() && this._mouseDown) {
+			this._mouseDown = false;
+			if (this._chart.options().handleScale.axisPressedMouseMove) {
+				model.endScaleTime();
+			}
+		}
+	}
+
+	public pressedMouseMoveEvent(event: TouchMouseEvent): void {
+		const model = this._chart.model();
+		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove) {
+			return;
+		}
+
+		model.scaleTimeTo(event.localX as Coordinate);
+	}
+
+	public mouseUpEvent(event: TouchMouseEvent): void {
+		this._mouseDown = false;
+		const model = this._chart.model();
+		if (model.timeScale().isEmpty() && !this._chart.options().handleScale.axisPressedMouseMove) {
+			return;
+		}
+
+		model.endScaleTime();
+	}
+
+	public mouseDoubleClickEvent(): void {
+		this._chart.model().resetTimeScale();
+	}
+
+	public mouseEnterEvent(e: TouchMouseEvent): void {
+		const model = this._chart.model();
+		if (model.options().handleScale.axisPressedMouseMove) {
+			this._setCursor(CursorType.EwResize);
+		}
+	}
+
+	public mouseLeaveEvent(e: TouchMouseEvent): void {
+		this._setCursor(CursorType.Default);
+	}
+
+	public setSizes(timeAxisSize: Size, stubWidth: number): void {
+		if (!this._size || !this._size.equals(timeAxisSize)) {
+			this._size = timeAxisSize;
+			resizeCanvas(this._canvas, timeAxisSize);
+			resizeCanvas(this._topCanvas, timeAxisSize);
+
+			getContext2d(this._canvas); // Sync HiDpiCanvas metrics
+			getContext2d(this._topCanvas); // Sync HiDpiCanvas metrics
+
+			this._cell.style.width = timeAxisSize.w + 'px';
+			this._cell.style.height = timeAxisSize.h + 'px';
+		}
+
+		if (this._stub !== null) {
+			this._stub.setSize(new Size(stubWidth, timeAxisSize.h));
+		}
+	}
+
+	public width(): number {
+		return this._size.w;
+	}
+
+	public height(): number {
+		return this._size.h;
+	}
+
+	public optimalHeight(): number {
+		const rendererOptions = this._getRendererOptions();
+		return Math.ceil(
+			// rendererOptions.offsetSize +
+			rendererOptions.borderSize +
+			rendererOptions.tickLength +
+			rendererOptions.fontSize +
+			rendererOptions.paddingTop +
+			rendererOptions.paddingBottom
+		);
+	}
+
+	public update(): void {
+		const tickMarks = this._chart.model().timeScale().marks();
+
+		if (!tickMarks) {
+			return;
+		}
+
+		this._minVisibleSpan = MarkSpanBorder.Year;
+
+		tickMarks.forEach((tickMark: TimeMark) => {
+			this._minVisibleSpan = Math.min(tickMark.span, this._minVisibleSpan);
+		});
+	}
+
+	public paint(type: InvalidationLevel): void {
+		if (type === InvalidationLevel.None) {
+			return;
+		}
+
+		if (type === InvalidationLevel.Cursor) {
+			this._drawCrossHairLabel(this._topCanvasContext);
+			return;
+		}
+
+		const ctx = this._canvasContext;
+		this._drawBackground(ctx);
+		this._drawBorder(ctx);
+
+		this._drawTickMarks(ctx);
+		this._drawBackLabels(ctx);
+		this._chart.model().crossHairSource().updateAllViews();
+		this._drawCrossHairLabel(this._topCanvasContext);
+
+		if (this._stub !== null) {
+			this._stub.paint(type);
+		}
+	}
+
+	private _drawBackground(ctx: CanvasRenderingContext2D): void {
+		clearRect(ctx, 0, 0, this._size.w, this._size.h, this._backgroundColor());
+	}
+
+	private _drawBorder(ctx: CanvasRenderingContext2D): void {
+		clearRect(ctx, 0, 0, this._size.w, 1, this._lineColor());
+	}
+
+	private _drawTickMarks(ctx: CanvasRenderingContext2D): void {
+		const tickMarks = this._chart.model().timeScale().marks();
+
+		if (!tickMarks || tickMarks.length === 0) {
+			return;
+		}
+
+		// select max span
+		/*
+		5 * ?SEC -> 11;
+		15 * ?SEC -> 12;
+		30 * ?SEC -> 13;
+		?MIN -> 20;
+		5 * ?MIN -> 21;
+		15 * ?MIN -> 21;
+		30 * ?MIN -> 22;
+		?HOUR -> 30;
+		3 * ?HOUR -> 31;
+		6 * ?HOUR -> 32;
+		12 * ?HOUR -> 33;
+		?DAY -> 40;
+		?WEEK -> 50;
+		?MONTH -> 60;
+		?YEAR -> 70
+		*/
+
+		let maxSpan = tickMarks.reduce(markWithGreaterSpan, tickMarks[0]).span;
+
+		// special case: it looks strange if 15:00 is bold but 14:00 is not
+		// so if maxSpan > 30 and < 40 reduce it to 30
+		if (maxSpan > 30 && maxSpan < 40) {
+			maxSpan = 30;
+		}
+
+		ctx.save();
+
+		ctx.strokeStyle = this._lineColor();
+
+		const rendererOptions = this._getRendererOptions();
+		const yText = (
+			rendererOptions.borderSize +
+			rendererOptions.tickLength +
+			rendererOptions.paddingTop +
+			rendererOptions.fontSize -
+			rendererOptions.baselineOffset
+		);
+
+		ctx.textAlign = 'center';
+		ctx.translate(0.5, -0.5);
+		ctx.fillStyle = this._lineColor();
+
+		if (this._chart.model().timeScale().options().borderVisible) {
+			ctx.beginPath();
+			for (let index = tickMarks.length; index--;) {
+				ctx.rect(tickMarks[index].coord, 1, 1, rendererOptions.tickLength);
+			}
+
+			ctx.fill();
+		}
+
+		ctx.fillStyle = this._textColor();
+		// draw base marks
+		ctx.font = this._baseFont();
+		for (const tickMark of tickMarks) {
+			if (tickMark.span < maxSpan) {
+				ctx.fillText(tickMark.label, tickMark.coord, yText);
+			}
+		}
+		ctx.font = this._baseBoldFont();
+		for (const tickMark of tickMarks) {
+			if (tickMark.span >= maxSpan) {
+				ctx.fillText(tickMark.label, tickMark.coord, yText);
+			}
+		}
+
+		ctx.restore();
+	}
+
+	private _drawBackLabels(ctx: CanvasRenderingContext2D): void {
+		ctx.save();
+		const topLevelSources: Set<IDataSource> = new Set();
+
+		const model = this._chart.model();
+		const sources = model.dataSources();
+		topLevelSources.add(model.crossHairSource());
+
+		const rendererOptions = this._getRendererOptions();
+		for (const source of sources) {
+			if (topLevelSources.has(source)) {
+				continue;
+			}
+
+			const views = source.timeAxisViews();
+			for (const view of views) {
+				view.renderer().draw(ctx, rendererOptions);
+			}
+		}
+
+		ctx.restore();
+	}
+
+	private _drawCrossHairLabel(ctx: CanvasRenderingContext2D): void {
+		this._topCanvasContext.clearRect(-0.5, -0.5, this._size.w, this._size.h);
+
+		const model = this._chart.model();
+
+		const views: ReadonlyArray<TimeAxisView>[] = []; // array of arrays
+
+		const timeAxisViews = model.crossHairSource().timeAxisViews();
+		views.push(timeAxisViews);
+
+		const renderingOptions = this._getRendererOptions();
+
+		views.forEach((arr: ReadonlyArray<TimeAxisView>) => {
+			arr.forEach((view: TimeAxisView) => {
+				ctx.save();
+				view.renderer().draw(ctx, renderingOptions);
+				ctx.restore();
+			});
+		});
+	}
+
+	private _backgroundColor(): string {
+		return this._options.backgroundColor;
+	}
+
+	private _lineColor(): string {
+		return this._chart.options().timeScale.borderColor;
+	}
+
+	private _textColor(): string {
+		return this._options.textColor;
+	}
+
+	private _fontSize(): number {
+		return this._options.fontSize;
+	}
+
+	private _baseFont(): string {
+		return makeFont(this._fontSize(), this._options.fontFamily);
+	}
+
+	private _baseBoldFont(): string {
+		return makeFont(this._fontSize(), this._options.fontFamily, 'bold');
+	}
+
+	private _getRendererOptions(): TimeAxisViewRendererOptions {
+		if (this._rendererOptions === null) {
+			this._rendererOptions = {
+				borderSize: Constants.BorderSize,
+				baselineOffset: NaN,
+				paddingTop: NaN,
+				paddingBottom: NaN,
+				paddingHorizontal: NaN,
+				tickLength: Constants.TickLength,
+				fontSize: NaN,
+				font: '',
+				widthCache: new TextWidthCache(),
+			};
+		}
+
+		const rendererOptions = this._rendererOptions;
+		const newFont = this._baseFont();
+
+		if (rendererOptions.font !== newFont) {
+			const fontSize = this._fontSize();
+			rendererOptions.fontSize = fontSize;
+			rendererOptions.font = newFont;
+			rendererOptions.paddingTop = Math.ceil(fontSize / 2.5);
+			rendererOptions.paddingBottom = rendererOptions.paddingTop;
+			rendererOptions.paddingHorizontal = Math.ceil(fontSize / 2);
+			rendererOptions.baselineOffset = Math.round(this._fontSize() / 5);
+			rendererOptions.widthCache.reset();
+		}
+
+		return this._rendererOptions;
+	}
+
+	private _setCursor(type: CursorType): void {
+		this._cell.style.cursor = type === CursorType.EwResize ? 'ew-resize' : 'default';
+	}
+
+	private _recreateStub(): void {
+		const priceAxisPosition = this._chart.model().mainPriceScale().options().position;
+		if (priceAxisPosition === this._priceAxisPosition) {
+			return;
+		}
+		if (this._stub !== null) {
+			if (this._stub.isLeft()) {
+				this._leftStubCell.removeChild(this._stub.getElement());
+			} else {
+				this._rightStubCell.removeChild(this._stub.getElement());
+			}
+
+			this._stub.destroy();
+			this._stub = null;
+		}
+
+		if (priceAxisPosition !== 'none') {
+			const rendererOptionsProvider = this._chart.model().rendererOptionsProvider();
+			const params: PriceAxisStubParams = {
+				rendererOptionsProvider: rendererOptionsProvider,
+			};
+
+			const model = this._chart.model();
+			const borderVisibleGetter = () => {
+				return model.mainPriceScale().options().borderVisible && model.timeScale().options().borderVisible;
+			};
+
+			this._stub = new PriceAxisStub(priceAxisPosition, this._chart.options(), params, borderVisibleGetter);
+			const stubCell = priceAxisPosition === 'left' ? this._leftStubCell : this._rightStubCell;
+			stubCell.appendChild(this._stub.getElement());
+		}
+
+		this._priceAxisPosition = priceAxisPosition;
+	}
+}
