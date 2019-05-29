@@ -1,0 +1,71 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  branches:
+    exclude:
+    - refs/tags/*
+
+jobs:
+- job: Compilation
+  steps:
+    - script: npm install
+      displayName: "Install deps"
+    - script: npm run tsc-all
+      displayName: "Compile"
+
+- job: check_crlf
+  displayName: "No CRLF in files"
+  steps:
+    - script: scripts/no-crlf.sh
+
+- job: check_trailing_lf
+  displayName: "Trailing LF in files"
+  steps:
+    - script: scripts/trailing-newlines.sh
+
+- job: ESLint
+  steps:
+    - script: npm install
+      displayName: "Install deps"
+    - script: npm run lint:eslint
+      displayName: "ESLint"
+
+- job: TSLint
+  steps:
+  - script: npm install
+    displayName: "Install deps"
+  - script: npm run lint:tslint
+    displayName: "TSLint"
+
+- job: Unittests
+  steps:
+    - script: npm install
+      displayName: "Install deps"
+    - script: npm run test
+      displayName: "Run tests"
+
+- job: graphics_tests
+  displayName: "Graphics tests"
+  continueOnError: "true"
+  variables:
+    CMP_OUT_DIR: "./graphics-tests-out/"
+    NO_SANDBOX: "true"
+  steps:
+    - script: npm install
+      displayName: "Install deps"
+    - script: scripts/run-graphics-tests.sh
+      displayName: "Run tests"
+
+- job: memleaks_tests
+  displayName: "Memleaks tests"
+  dependsOn: compilation
+  variables:
+    NO_SANDBOX: "true"
+  steps:
+    - script: npm install
+      displayName: "Install deps"
+    - script: scripts/run-memleaks-tests.sh
+      displayName: "Run tests"
