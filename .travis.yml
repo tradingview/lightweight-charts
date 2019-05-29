@@ -1,0 +1,55 @@
+language: node_js
+
+sudo: false
+
+node_js:
+  - "8"
+
+branches:
+  only:
+  - master
+
+cache:
+  directories:
+    - "node_modules"
+    - "tests/e2e/node_modules"
+
+stages:
+  - &COMPILE_AND_VALIDATE_STAGE "Compile & validate"
+  - &TESTS_STAGE "Tests"
+
+jobs:
+  include:
+    - stage: *COMPILE_AND_VALIDATE_STAGE
+      name: "Compile"
+      script: npm run tsc-all
+
+    - stage: *COMPILE_AND_VALIDATE_STAGE
+      name: "No CRLF in files"
+      install: true
+      script: scripts/no-crlf.sh
+
+    - stage: *COMPILE_AND_VALIDATE_STAGE
+      name: "Trailing LF in files"
+      install: true
+      script: scripts/trailing-newlines.sh
+
+    - stage: *COMPILE_AND_VALIDATE_STAGE
+      name: "ESLint"
+      script: npm run lint:eslint
+
+    - stage: *COMPILE_AND_VALIDATE_STAGE
+      name: "TSLint"
+      script: npm run lint:tslint
+
+    - stage: *TESTS_STAGE
+      name: "Unittests"
+      script: npm run test
+
+    - stage: *TESTS_STAGE
+      name: "Graphics tests"
+      script: scripts/run-graphics-tests.sh
+
+    - stage: *TESTS_STAGE
+      name: "Memleaks tests"
+      script: scripts/run-memleaks-tests.sh
