@@ -1,5 +1,10 @@
 # Lightweight Charts
 
+[![npm version](https://badge.fury.io/js/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
+![npm bundle size](https://badgen.net/bundlephobia/minzip/lightweight-charts)
+![Zero dependencies](https://badgen.net/badge/dependencies/0/green)
+[![Downloads](https://img.shields.io/npm/dm/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
+
 TradingView Lightweight Chart is one of the smallest and high performative financial HTML5 charts.
 
 ## Installing
