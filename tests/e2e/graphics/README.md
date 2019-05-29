@@ -27,7 +27,7 @@ This tests runs against 2 versions of the library - "golden" and "test". Golden 
 To run this tests you need use [runner.js](./runner.js):
 
 ```bash
-./tests/graphics/runner.js ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
+./runner.js ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
 ```
 
 Each path to the standalone module might be either to a local file (relative/absolute path to a file) or remote file (via http/https).
@@ -35,13 +35,13 @@ If file is local then local server will be runner to serve that file (see [serve
 
 ## Tips
 
-1. By default for each test case golden, test and diff screenshots will be written to a `./tests/graphics/.gendata` folder (can be changed via `CMP_OUT_DIR` env variable).
+1. By default for each test case golden, test and diff screenshots will be written to a `.gendata` folder (can be changed via `CMP_OUT_DIR` env variable).
     So, you can see what's the difference between screenshots there.
 
 1. Also, together with screenshots you can find there HTML pages which was opened to generate that screenshots.
     But if you test with local files, you cannot open that HTML pages in your browser to debug because there is scripts which are loaded from webserver (which a runner up to runs tests).
     In that can you can use the following hack.
 
-    Let's say you run your tests in that way - `./tests/graphics/runner.js ./golden/standalone/module.js ./test/standalone/module.js`.
-    After that in `./tests/graphics/.gendata/test-case-name/1.golden.html` you can find a HTML page.
-    To open this page properly you can run `./tests/graphics/serve-static-files.js golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
+    Let's say you run your tests in that way - `./runner.js ./golden/standalone/module.js ./test/standalone/module.js`.
+    After that in `.gendata/test-case-name/1.golden.html` you can find a HTML page.
+    To open this page properly you can run `./tests/e2e/serve-static-files.js golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
