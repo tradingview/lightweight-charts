@@ -4,7 +4,7 @@
   "name": "lightweight-charts",
   "author": "TradingView, Inc.",
   "license": "Apache-2.0",
-  "description": "Lightweight financial HTML5 canvas charting library",
+  "description": "Financial lightweight charts built with HTML5 canvas",
   "bugs": {
     "url": "https://github.com/tradingview/lightweight-charts/issues"
   },
