@@ -38,22 +38,37 @@ export interface CrossHairMovedEventParams {
 	price: number;
 }
 
+/**
+ * Enum of possible crosshair behavior modes.
+ * Normal means that the crosshair always follows the pointer.
+ * Magnet means that the vertical line of the crosshair follows the pointer, while the horizontal line is placed on the corresponding series point.
+ */
 export const enum CrossHairMode {
 	Normal,
 	Magnet,
 }
 
+/** Structure describing a crosshair line (vertical or horizontal) */
 export interface CrossHairLineOptions {
+	/** Color of a certain crosshair line */
 	color: string;
+	/** Width of a certain crosshair line and corresponding scale label */
 	width: LineWidth;
+	/** Style of a certain crosshair line */
 	style: LineStyle;
+	/** Visibility of a certain crosshair line */
 	visible: boolean;
+	/** Visibility of corresponding scale label */
 	labelVisible: boolean;
 }
 
+/** Structure describing crosshair options  */
 export interface CrossHairOptions {
+	/** Crosshair mode */
 	mode: CrossHairMode;
+	/** Options of the crosshair vertical line */
 	vertLine: CrossHairLineOptions;
+	/** Options of the crosshair horizontal line */
 	horzLine: CrossHairLineOptions;
 }
 

@@ -5,12 +5,19 @@ import { WatermarkPaneView } from '../views/pane/watermark-pane-view';
 import { ChartModel } from './chart-model';
 import { DataSource } from './data-source';
 
+/** Structure describing watermark options */
 export interface WatermarkOptions {
+	/** Color of the watermark */
 	color: string;
+	/** Visibility of the watermark. If false, other parameters are ignored */
 	visible: boolean;
+	/** Text of the watermark. Word wrapping is not supported */
 	text: string;
+	/** Font size in pixels */
 	fontSize: number;
+	/** Horizontal alignment of the watermark inside the chart area */
 	horzAlign: HorzAlign;
+	/** Vertical alignment of the watermark inside the chart area */
 	vertAlign: VertAlign;
 }
 

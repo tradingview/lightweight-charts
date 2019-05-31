@@ -38,17 +38,31 @@ export interface HandleScaleOptions {
 
 type InvalidateHandler = (mask: InvalidateMask) => void;
 
+/**
+ * Structure describing options of the chart. Series options are to be set separately
+ */
 export interface ChartOptions {
+	/** Width of the chart */
 	width: number;
+	/** Height of the chart */
 	height: number;
+	/** Structure with watermark options */
 	watermark: WatermarkOptions;
+	/** Structure with layout options */
 	layout: LayoutOptions;
+	/** Structure with price scale options */
 	priceScale: PriceScaleOptions;
+	/** Structure with time scale options */
 	timeScale: TimeScaleOptions;
+	/** Structure with crosshair options */
 	crossHair: CrossHairOptions;
+	/** Structure with grid options */
 	grid: GridOptions;
+	/** Structure with localization options */
 	localization: LocalizationOptions;
+	/** Structure that describes scrolling behavior */
 	handleScroll: HandleScrollOptions;
+	/** Structure that describes scaling behavior */
 	handleScale: HandleScaleOptions;
 }
 

@@ -251,7 +251,9 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	private _drawBorder(ctx: CanvasRenderingContext2D): void {
-		clearRect(ctx, 0, 0, this._size.w, 1, this._lineColor());
+		if (this._chart.options().timeScale.borderVisible) {
+			clearRect(ctx, 0, 0, this._size.w, 1, this._lineColor());
+		}
 	}
 
 	private _drawTickMarks(ctx: CanvasRenderingContext2D): void {

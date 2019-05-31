@@ -34,6 +34,13 @@ import { Series } from './series';
 import { sortSources } from './sort-sources';
 import { SeriesItemsIndexesRange } from './time-data';
 
+/**
+ * Enum of possible price scale modes
+ * Normal mode displays original price values
+ * Logarithmic mode makes price scale show logarithms of series values instead of original values
+ * Percentage turns the percentage mode on.
+ * IndexedTo100 turns the "indexed to 100" mode on
+ */
 export const enum PriceScaleMode {
 	Normal,
 	Logarithmic,
@@ -57,21 +64,33 @@ export interface PricedValue {
 	y: Coordinate;
 }
 
+/** Defines margins of the price scale */
 export interface PriceScaleMargins {
+	/** Top margin in percents. Must be greater or equal to 0 and less than 100 */
 	top: number;
+	/** Bottom margin in percents. Must be greater or equal to 0 and less than 100 */
 	bottom: number;
 }
 
 export type PriceAxisPosition = 'left' | 'right' | 'none';
 
+/** Structure that describes price scale options */
 export interface PriceScaleOptions {
+	/** True makes chart calculate the price range automatically based on the visible data range */
 	autoScale: boolean;
+	/** Mode of the price scale */
 	mode: PriceScaleMode;
+	/** True inverts the scale. Makes lager values drawn lower. Affects both the price scale and the data on the chart */
 	invertScale: boolean;
+	/** True value prevents labels on the price scale from overlapping one another by aligning them one below others */
 	alignLabels: boolean;
+	/** Defines position of the price scale on the chart */
 	position: PriceAxisPosition;
+	/** Defines price margins for the price scale */
 	scaleMargins: PriceScaleMargins;
+	/** Set true to draw a border between the price scale and the chart area */
 	borderVisible: boolean;
+	/** Defines a color of the border between the price scale and the chart area. It is ignored if borderVisible is false */
 	borderColor: string;
 }
 

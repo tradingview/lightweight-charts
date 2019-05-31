@@ -27,6 +27,9 @@ export type DateFormat =
 
 export type DateFormatFn = (date: Date, locale: string) => string;
 
+/*
+ Map of date formatting functions
+ */
 export const dateFormatFunctions: Record<DateFormat, DateFormatFn> = {
 	'dd MMM \'yy': (date: Date, locale: string) => `${dd(date)} ${MMM(date, locale)} \'${yy(date)}`,
 	'yyyy-MM-dd': (date: Date, locale: string) => `${yyyy(date)}-${MM(date)}-${dd(date)}`,

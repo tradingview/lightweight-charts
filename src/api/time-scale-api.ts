@@ -38,7 +38,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._timeScale().scrollToOffsetAnimated(position, Constants.AnimationDurationMs);
 	}
 
-	public scrollToRealtime(): void {
+	public scrollToRealTime(): void {
 		this._timeScale().scrollToRealTime();
 	}
 
