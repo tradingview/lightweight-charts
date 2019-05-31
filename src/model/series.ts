@@ -5,7 +5,7 @@ import { VolumeFormatter } from '../formatters/volume-formatter';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
-import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
+import { clone, DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
 
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
@@ -32,7 +32,11 @@ import { PriceRange } from './price-range';
 import { PriceScale } from './price-scale';
 import { SeriesBarColorer } from './series-bar-colorer';
 import { Bar, barFunction, SeriesData, SeriesPlotIndex } from './series-data';
-import { SeriesOptions, SeriesType } from './series-options';
+import {
+	SeriesOptions,
+	SeriesOptionsInternal,
+	SeriesType,
+} from './series-options';
 import { TimePointIndex } from './time-data';
 
 export interface LastValueDataResult {
@@ -78,16 +82,14 @@ export class Series extends PriceDataSource implements IDestroyable {
 	private _endOfData: boolean = false;
 	private _paneView: IUpdatablePaneView | null = null;
 	private _barColorerCache: SeriesBarColorer | null = null;
-	private readonly _options: SeriesOptions;
+	private readonly _options: SeriesOptionsInternal;
 	private _barFunction: BarFunction;
 	private _palette: Palette = new Palette();
-	private _title: string;
 
-	public constructor(model: ChartModel, options: SeriesOptions, seriesType: SeriesType, title: string) {
+	public constructor(model: ChartModel, options: SeriesOptionsInternal, seriesType: SeriesType) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
-		this._title = title;
 
 		this.createPaneView();
 
@@ -229,12 +231,56 @@ export class Series extends PriceDataSource implements IDestroyable {
 		return this._barColorerCache;
 	}
 
-	public options(): SeriesOptions {
+	public internalOptions(): SeriesOptionsInternal {
 		return this._options;
 	}
 
+	public options(): SeriesOptions {
+		const result = clone(this._options) as unknown as SeriesOptions;
+
+		switch (this._seriesType) {
+			case 'Bar':
+				merge(result, this._options.barStyle);
+				break;
+			case 'Candle':
+				merge(result, this._options.candleStyle);
+				break;
+			case 'Area':
+				merge(result, this._options.areaStyle);
+				break;
+			case 'Line':
+				merge(result, this._options.lineStyle);
+				break;
+			case 'Histogram':
+				merge(result, this._options.histogramStyle);
+				break;
+		}
+
+		return result;
+	}
+
 	public applyOptions(options: DeepPartial<SeriesOptions>): void {
-		merge(this._options, options);
+		switch (this._seriesType) {
+			case 'Bar':
+				merge(this._options.barStyle, options, true);
+				break;
+			case 'Candle':
+				merge(this._options.candleStyle, options, true);
+				break;
+			case 'Area':
+				merge(this._options.areaStyle, options, true);
+				break;
+			case 'Line':
+				merge(this._options.lineStyle, options, true);
+				break;
+			case 'Histogram':
+				merge(this._options.histogramStyle, options, true);
+				break;
+		}
+
+		merge(this._options, options, true);
+		// TODO: update margins
+
 		this._recreateFormatter();
 		this.model().updateSource(this);
 	}
@@ -423,7 +469,7 @@ export class Series extends PriceDataSource implements IDestroyable {
 	}
 
 	public title(): string {
-		return this._title;
+		return this._options.title || '';
 	}
 
 	private _markerRadius(): number {

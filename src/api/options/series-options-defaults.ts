@@ -1,7 +1,8 @@
-import { SeriesOptions } from '../../model/series-options';
+import { SeriesOptionsInternal } from '../../model/series-options';
 import { LineStyle } from '../../renderers/draw-line';
 
-export const seriesOptionsDefaults: SeriesOptions = {
+export const seriesOptionsDefaults: SeriesOptionsInternal = {
+	overlay: false,
 	lastValueVisible: true,
 	priceLineVisible: true,
 	priceLineWidth: 1,

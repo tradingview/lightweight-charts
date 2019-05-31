@@ -1,4 +1,4 @@
-import { clone, DeepPartial } from '../helpers/strict-type-checks';
+import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Series } from '../model/series';
 import { CandleSeriesOptions, fillUpDownCandlesColors } from '../model/series-options';
@@ -13,13 +13,11 @@ export class CandleSeriesApi extends BarSeriesApiBase implements ICandleSeries {
 	}
 
 	public applyOptions(options: DeepPartial<CandleSeriesOptions>): void {
-		if (options.candleStyle !== undefined) {
-			fillUpDownCandlesColors(options.candleStyle);
-		}
+		fillUpDownCandlesColors(options);
 		this._series.applyOptions(options);
 	}
 
 	public options(): CandleSeriesOptions {
-		return clone(this._series.options());
+		return this._series.options();
 	}
 }

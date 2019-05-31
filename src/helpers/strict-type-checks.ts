@@ -9,16 +9,20 @@ export type DeepPartial<T> = {
 };
 
 // tslint:disable-next-line:no-any
-export function merge(object1: Record<string, any>, object2: Record<string, any>): Record<string, any> {
-	for (const i in object2) {
-		if ('object' !== typeof object2[i] || !object1.hasOwnProperty(i)) {
-			object1[i] = object2[i];
+export function merge(dst: Record<string, any>, src: Record<string, any>, checkPropertyInDst: boolean = false): Record<string, any> {
+	for (const i in src) {
+		if (checkPropertyInDst && !(i in dst)) {
+			continue;
+		}
+
+		if ('object' !== typeof src[i] || !dst.hasOwnProperty(i)) {
+			dst[i] = src[i];
 		} else {
-			merge(object1[i], object2[i]);
+			merge(dst[i], src[i], checkPropertyInDst);
 		}
 	}
 
-	return object1;
+	return dst;
 }
 
 export function isNumber(value: unknown): value is number {

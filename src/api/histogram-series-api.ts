@@ -1,8 +1,8 @@
-import { clone, DeepPartial } from '../helpers/strict-type-checks';
+import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Palette } from '../model/palette';
 import { Series } from '../model/series';
-import { HistogramSeriesOptions } from '../model/series-options';
+import { HistogramSeriesOptions, SeriesOptions } from '../model/series-options';
 
 import { HistogramData, IHistogramSeriesApi } from './ihistogram-series-api';
 import { DataUpdatesConsumer, SeriesApiBase } from './series-api-base';
@@ -25,15 +25,15 @@ export class HistogramSeriesApi extends SeriesApiBase implements IHistogramSerie
 	}
 
 	public applyOptions(options: DeepPartial<HistogramSeriesOptions>): void {
-		this._series.applyOptions(options);
+		this._series.applyOptions(options as SeriesOptions);
 	}
 
 	public options(): HistogramSeriesOptions {
-		return clone(this._series.options());
+		return this._series.options();
 	}
 
 	public setData(data: HistogramData[]): void {
-		const palette = generatePalette(data, this._series.options().histogramStyle.color);
+		const palette = generatePalette(data, this._series.internalOptions().histogramStyle.color);
 		this._dataUpdatesConsumer.applyNewData(this._series, data, palette);
 	}
 

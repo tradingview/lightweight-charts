@@ -1,4 +1,4 @@
-import { clone, DeepPartial } from '../helpers/strict-type-checks';
+import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Series } from '../model/series';
 import { BarSeriesOptions } from '../model/series-options';
@@ -17,6 +17,6 @@ export class BarSeriesApi extends BarSeriesApiBase implements IBarSeriesApi {
 	}
 
 	public options(): BarSeriesOptions {
-		return clone(this._series.options());
+		return this._series.options();
 	}
 }

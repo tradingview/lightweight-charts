@@ -2,6 +2,8 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { LineStyle, LineWidth } from '../renderers/draw-line';
 
+import { PriceScaleMargins } from './price-scale';
+
 export type SeriesType = 'Bar' | 'Candle' | 'Area' | 'Line' | 'Histogram';
 
 /** Structure describing a drawing style of the candle chart  */
@@ -147,46 +149,56 @@ export interface SeriesOptionsBase {
 	priceFormat: PriceFormat;
 	/** Color of the base line in IndexedTo100 mode */
 	baseLineColor: string;
+	overlay: boolean;
+	title?: string;
+	scaleMargins?: PriceScaleMargins; // for overlays only
 }
 
-/**
- * Structure describing candle series options. It inherits all options of the base interface
- */
-export interface CandleSeriesOptions extends SeriesOptionsBase {
-	/** style of candles drawing */
+export interface CandleSeriesOptionsInternal extends SeriesOptionsBase {
 	candleStyle: CandleStyleOptions;
 }
 
-/**
- * Structure describing bar series options. It inherits all options of the base interface
- */
-export interface BarSeriesOptions extends SeriesOptionsBase {
-	/** style of bars drawing */
+export interface BarSeriesOptionsInternal extends SeriesOptionsBase {
 	barStyle: BarStyleOptions;
 }
 
-/**
- * Structure describing line series options. It inherits all options of the base interface
- */
-export interface LineSeriesOptions extends SeriesOptionsBase {
-	/** style of line drawing */
+export interface LineSeriesOptionsInternal extends SeriesOptionsBase {
 	lineStyle: LineStyleOptions;
 }
+
+export interface AreaSeriesOptionsInternal extends SeriesOptionsBase {
+	areaStyle: AreaStyleOptions;
+}
+
+export interface HistogramSeriesOptionsInternal extends SeriesOptionsBase {
+	histogramStyle: HistogramStyleOptions;
+}
+
+export type SeriesOptionsInternal = CandleSeriesOptionsInternal & BarSeriesOptionsInternal & LineSeriesOptionsInternal & AreaSeriesOptionsInternal & HistogramSeriesOptionsInternal;
 
 /**
  * Structure describing area series options. It inherits all options of the base interface
  */
-export interface AreaSeriesOptions extends SeriesOptionsBase {
-	/** style of area drawing */
-	areaStyle: AreaStyleOptions;
-}
+export type AreaSeriesOptions = SeriesOptionsBase & AreaStyleOptions;
+
+/**
+ * Structure describing bar series options. It inherits all options of the base interface
+ */
+export type BarSeriesOptions = SeriesOptionsBase & BarStyleOptions;
+
+/**
+ * Structure describing candle series options. It inherits all options of the base interface
+ */
+export type CandleSeriesOptions = SeriesOptionsBase & CandleStyleOptions;
 
 /**
  * Structure describing histogram series options. It inherits all options of the base interface
  */
-export interface HistogramSeriesOptions extends SeriesOptionsBase {
-	/** style of histogram drawing */
-	histogramStyle: HistogramStyleOptions;
-}
+export type HistogramSeriesOptions = SeriesOptionsBase & HistogramStyleOptions;
 
-export type SeriesOptions = CandleSeriesOptions & BarSeriesOptions & LineSeriesOptions & AreaSeriesOptions & HistogramSeriesOptions;
+/**
+ * Structure describing line series options. It inherits all options of the base interface
+ */
+export type LineSeriesOptions = SeriesOptionsBase & LineStyleOptions;
+
+export type SeriesOptions = AreaSeriesOptions & BarSeriesOptions & CandleSeriesOptions & HistogramSeriesOptions & LineSeriesOptions;

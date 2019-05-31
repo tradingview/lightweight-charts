@@ -12,7 +12,7 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 	protected _updateImpl(): void {
 		this._lineRendererData.visible = false;
 
-		if (!this._series.options().priceLineVisible) {
+		if (!this._series.internalOptions().priceLineVisible) {
 			return;
 		}
 
@@ -26,6 +26,6 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 		this._lineRendererData.color = this._series.priceLineColor(data.color);
 		this._lineRendererData.width = this._model.timeScale().width();
 		this._lineRendererData.height = this._series.priceScale().height();
-		this._lineRendererData.lineWidth = this._series.options().priceLineWidth;
+		this._lineRendererData.lineWidth = this._series.internalOptions().priceLineWidth;
 	}
 }

@@ -53,12 +53,8 @@ function runTestCase(container) {
 	});
 
 	var mainSeries = chart.addCandleSeries({
-		options: {
-			candleStyle: {
-				drawBorder: true,
-				borderColor: 'blue',
-			},
-		},
+		drawBorder: true,
+		borderColor: 'blue',
 	});
 
 	mainSeries.setData(generateData());

@@ -25,6 +25,6 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 		this._lineRendererData.y = this._series.priceScale().priceToCoordinate(firstValue, firstValue);
 		this._lineRendererData.width = this._model.timeScale().width();
 		this._lineRendererData.height = this._series.priceScale().height();
-		this._lineRendererData.color = this._series.options().baseLineColor;
+		this._lineRendererData.color = this._series.internalOptions().baseLineColor;
 	}
 }

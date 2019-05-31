@@ -60,7 +60,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<TimedValue> {
 		this._paletteData.length = palette.size();
 
 		const targetIndexes = new Int32Array(palette.size());
-		const histogramStyleProps = this._series.options().histogramStyle;
+		const histogramStyleProps = this._series.internalOptions().histogramStyle;
 
 		const barValueGetter = this._series.barFunction();
 		this._colorIndexes = new Int32Array(this._series.bars().size());
@@ -108,7 +108,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<TimedValue> {
 
 		const barSpacing = timeScale.barSpacing();
 		const visibleBars = ensureNotNull(timeScale.visibleBars());
-		const histogramBase = priceScale.priceToCoordinate(this._series.options().histogramStyle.base, firstValue);
+		const histogramBase = priceScale.priceToCoordinate(this._series.internalOptions().histogramStyle.base, firstValue);
 
 		this._paletteData.forEach((data: PaneRendererHistogramData, colorIndex: number) => {
 			timeScale.indexesToCoordinates(data.items);

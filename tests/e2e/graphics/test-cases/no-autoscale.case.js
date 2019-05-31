@@ -41,7 +41,7 @@ function runTestCase(container) {
 		},
 	});
 
-	var mainSeries = chart.addAreaSeries({});
+	var mainSeries = chart.addAreaSeries();
 
 	mainSeries.setData(generateData());
 }

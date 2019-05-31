@@ -37,7 +37,7 @@ function generateData() {
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container);
 
-	var mainSeries = chart.addAreaSeries({});
+	var mainSeries = chart.addAreaSeries();
 
 	mainSeries.setData(generateData());
 	return chart;

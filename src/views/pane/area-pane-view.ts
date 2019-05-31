@@ -24,7 +24,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<LineItem> {
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();
 
-		const seriesProps = this._series.options();
+		const seriesProps = this._series.internalOptions();
 		const areaStyleProperties = seriesProps.areaStyle;
 
 		const data: PaneRendererAreaData = {

@@ -1,4 +1,4 @@
-import { clone, DeepPartial } from '../helpers/strict-type-checks';
+import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Series } from '../model/series';
 import { AreaSeriesOptions } from '../model/series-options';
@@ -17,6 +17,6 @@ export class AreaSeriesApi extends LineSeriesApiBase implements IAreaSeriesApi {
 	}
 
 	public options(): AreaSeriesOptions {
-		return clone(this._series.options());
+		return this._series.options();
 	}
 }

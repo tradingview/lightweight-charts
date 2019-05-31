@@ -4,7 +4,6 @@ import { HistogramSeriesOptions } from '../model/series-options';
 
 import { LineData } from './iline-series-api-base';
 import { ISeriesApi } from './iseries-api';
-import { SeriesParams } from './series-params-base';
 
 /** Structure describing a single item of data for histogram series */
 export interface HistogramData extends LineData {
@@ -39,5 +38,3 @@ export interface IHistogramSeriesApi extends ISeriesApi {
 	 */
 	options(): HistogramSeriesOptions;
 }
-
-export type HistogramSeriesParams = SeriesParams<HistogramSeriesOptions>;

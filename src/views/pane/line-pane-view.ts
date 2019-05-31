@@ -17,7 +17,7 @@ export class SeriesLinePaneView extends LinePaneViewBase<LineItem> {
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();
 
-		const lineStyleProps = this._series.options().lineStyle;
+		const lineStyleProps = this._series.internalOptions().lineStyle;
 
 		const data: PaneRendererLineData = {
 			items: this._items,

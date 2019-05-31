@@ -7,7 +7,17 @@ import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
 import { ChartOptions } from '../model/chart-model';
 import { Palette } from '../model/palette';
 import { Series } from '../model/series';
-import { fillUpDownCandlesColors, precisionByMinMove, PriceFormat, SeriesOptions } from '../model/series-options';
+import {
+	AreaSeriesOptions,
+	BarSeriesOptions,
+	CandleSeriesOptions,
+	fillUpDownCandlesColors,
+	HistogramSeriesOptions,
+	LineSeriesOptions,
+	precisionByMinMove,
+	PriceFormat,
+	SeriesOptionsInternal,
+} from '../model/series-options';
 import { TimePointIndex } from '../model/time-data';
 
 import { AreaSeriesApi } from './area-series-api';
@@ -15,12 +25,12 @@ import { BarSeriesApi } from './bar-series-api';
 import { CandleSeriesApi } from './candle-series-api';
 import { DataLayer, SeriesUpdatePacket, TimedData } from './data-layer';
 import { HistogramSeriesApi } from './histogram-series-api';
-import { AreaSeriesParams, IAreaSeriesApi } from './iarea-series-api';
-import { BarSeriesParams, IBarSeriesApi } from './ibar-series-api';
-import { CandleSeriesParams, ICandleSeries } from './icandle-series-api';
+import { IAreaSeriesApi } from './iarea-series-api';
+import { IBarSeriesApi } from './ibar-series-api';
+import { ICandleSeries } from './icandle-series-api';
 import { IChartApi, MouseEventHandler, MouseEventParams, TimeRangeChangeEventHandler } from './ichart-api';
-import { HistogramSeriesParams, IHistogramSeriesApi } from './ihistogram-series-api';
-import { ILineSeriesApi, LineSeriesParams } from './iline-series-api';
+import { IHistogramSeriesApi } from './ihistogram-series-api';
+import { ILineSeriesApi } from './iline-series-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi, TimeRange } from './itime-scale-api';
@@ -88,12 +98,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		this._chartWidget.resize(height, width, forceRepaint);
 	}
 
-	public addAreaSeries(areaParams?: DeepPartial<AreaSeriesParams>): IAreaSeriesApi {
+	public addAreaSeries(areaParams?: DeepPartial<AreaSeriesOptions>): IAreaSeriesApi {
 		areaParams = areaParams || {};
 		const model = this._chartWidget.model();
-		const inputOptions = areaParams.options || {};
-		patchPriceFormat(inputOptions.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), inputOptions) as SeriesOptions;
+		patchPriceFormat(areaParams.priceFormat);
+		const options = merge(clone(seriesOptionsDefaults), areaParams, true) as SeriesOptionsInternal;
+		merge(options.areaStyle, areaParams, true);
 		const series = model.createSeries('Area', options, Boolean(areaParams.overlay), areaParams.title, areaParams.scaleMargins);
 		const res = new AreaSeriesApi(series, this);
 		this._seriesMap.set(res, series);
@@ -101,12 +111,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		return res;
 	}
 
-	public addBarSeries(barParams?: DeepPartial<BarSeriesParams>): IBarSeriesApi {
+	public addBarSeries(barParams?: DeepPartial<BarSeriesOptions>): IBarSeriesApi {
 		barParams = barParams || {};
 		const model = this._chartWidget.model();
-		const inputOptions = barParams.options || {};
-		patchPriceFormat(inputOptions.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), inputOptions) as SeriesOptions;
+		patchPriceFormat(barParams.priceFormat);
+		const options = merge(clone(seriesOptionsDefaults), barParams, true) as SeriesOptionsInternal;
+		merge(options.barStyle, barParams, true);
 		const series = model.createSeries('Bar', options, Boolean(barParams.overlay), barParams.title, barParams.scaleMargins);
 		const res = new BarSeriesApi(series, this);
 		this._seriesMap.set(res, series);
@@ -114,15 +124,13 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		return res;
 	}
 
-	public addCandleSeries(candleParams?: DeepPartial<CandleSeriesParams>): ICandleSeries {
+	public addCandleSeries(candleParams?: DeepPartial<CandleSeriesOptions>): ICandleSeries {
 		candleParams = candleParams || {};
 		const model = this._chartWidget.model();
-		const inputOptions = candleParams.options || {};
-		if (inputOptions.candleStyle !== undefined) {
-			fillUpDownCandlesColors(inputOptions.candleStyle);
-		}
-		patchPriceFormat(inputOptions.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), inputOptions) as SeriesOptions;
+		fillUpDownCandlesColors(candleParams);
+		patchPriceFormat(candleParams.priceFormat);
+		const options = merge(clone(seriesOptionsDefaults), candleParams, true) as SeriesOptionsInternal;
+		merge(options.candleStyle, candleParams, true);
 		const series = model.createSeries('Candle', options, Boolean(candleParams.overlay), candleParams.title, candleParams.scaleMargins);
 		const res = new CandleSeriesApi(series, this);
 		this._seriesMap.set(res, series);
@@ -130,12 +138,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		return res;
 	}
 
-	public addHistogramSeries(histogramParams?: DeepPartial<HistogramSeriesParams>): IHistogramSeriesApi {
+	public addHistogramSeries(histogramParams?: DeepPartial<HistogramSeriesOptions>): IHistogramSeriesApi {
 		histogramParams = histogramParams || {};
 		const model = this._chartWidget.model();
-		const inputOptions = histogramParams.options || {};
-		patchPriceFormat(inputOptions.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), inputOptions) as SeriesOptions;
+		patchPriceFormat(histogramParams.priceFormat);
+		const options = merge(clone(seriesOptionsDefaults), histogramParams, true) as SeriesOptionsInternal;
+		merge(options.histogramStyle, histogramParams, true);
 		const series = model.createSeries('Histogram', options, Boolean(histogramParams.overlay), histogramParams.title, histogramParams.scaleMargins);
 		const res = new HistogramSeriesApi(series, this);
 		this._seriesMap.set(res, series);
@@ -143,12 +151,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		return res;
 	}
 
-	public addLineSeries(lineParams?: DeepPartial<LineSeriesParams>): ILineSeriesApi {
+	public addLineSeries(lineParams?: DeepPartial<LineSeriesOptions>): ILineSeriesApi {
 		lineParams = lineParams || {};
 		const model = this._chartWidget.model();
-		const inputOptions = lineParams.options || {};
-		patchPriceFormat(inputOptions.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), inputOptions) as SeriesOptions;
+		patchPriceFormat(lineParams.priceFormat);
+		const options = merge(clone(seriesOptionsDefaults), lineParams, true) as SeriesOptionsInternal;
+		merge(options.lineStyle, lineParams, true);
 		const series = model.createSeries('Line', options, Boolean(lineParams.overlay), lineParams.title, lineParams.scaleMargins);
 		const res = new LineSeriesApi(series, this);
 		this._seriesMap.set(res, series);

@@ -22,7 +22,7 @@ export class SeriesBarsPaneView extends BarsPaneViewBase<BarItem> {
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();
 
-		const barStyleProps = this._series.options().barStyle;
+		const barStyleProps = this._series.internalOptions().barStyle;
 		const data: PaneRendererBarsData = {
 			bars: this._items,
 			barSpacing: this._model.timeScale().barSpacing(),

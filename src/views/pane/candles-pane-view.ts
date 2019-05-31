@@ -22,7 +22,7 @@ export class SeriesCandlesPaneView extends BarsPaneViewBase<CandleItem> {
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();
 
-		const candleStyleProps = this._series.options().candleStyle;
+		const candleStyleProps = this._series.internalOptions().candleStyle;
 		const data: PaneRendererCandlesData = {
 			bars: this._items,
 			barSpacing: this._model.timeScale().barSpacing(),

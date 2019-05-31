@@ -56,7 +56,7 @@ export class SeriesBarColorer {
 
 	private _barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const result = { ...emptyResult };
-		const barStyle = this._series.options().barStyle;
+		const barStyle = this._series.internalOptions().barStyle;
 
 		const upColor = barStyle.upColor;
 		const downColor = barStyle.downColor;
@@ -74,7 +74,7 @@ export class SeriesBarColorer {
 
 	private _candleStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const result = { ...emptyResult };
-		const candleStyle = this._series.options().candleStyle;
+		const candleStyle = this._series.internalOptions().candleStyle;
 
 		const upColor = candleStyle.upColor;
 		const downColor = candleStyle.downColor;
@@ -96,13 +96,13 @@ export class SeriesBarColorer {
 
 	private _areaStyle(): BarColorerStyle {
 		const result = { ...emptyResult };
-		result.barColor = this._series.options().areaStyle.lineColor;
+		result.barColor = this._series.internalOptions().areaStyle.lineColor;
 		return result;
 	}
 
 	private _lineStyle(): BarColorerStyle {
 		const result = { ...emptyResult };
-		result.barColor = this._series.options().lineStyle.color;
+		result.barColor = this._series.internalOptions().lineStyle.color;
 		return result;
 	}
 
@@ -114,7 +114,7 @@ export class SeriesBarColorer {
 			const palette = ensureNotNull(this._series.palette());
 			result.barColor = palette.colorByIndex(colorValue);
 		} else {
-			result.barColor = this._series.options().histogramStyle.color;
+			result.barColor = this._series.internalOptions().histogramStyle.color;
 		}
 		return result;
 	}
