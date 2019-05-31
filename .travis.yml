@@ -42,6 +42,10 @@ jobs:
       name: "TSLint"
       script: npm run lint:tslint
 
+    - stage: *COMPILE_AND_VALIDATE_STAGE
+      name: "Markdownlint"
+      script: npm run lint:md
+
     - stage: *TESTS_STAGE
       name: "Unittests"
       script: npm run test

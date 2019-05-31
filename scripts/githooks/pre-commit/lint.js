@@ -54,30 +54,29 @@ function shellEscape(arg) {
 	}"`;
 }
 
-function runTSLintForFiles(tsFiles) {
-	if (tsFiles.length === 0) {
+function runForFiles(cmd, files) {
+	if (files.length === 0) {
 		return false;
 	}
 
-	let cmd = 'node ./node_modules/tslint/bin/tslint --config tslint.json ';
-	for (const file of tsFiles) {
+	cmd += ' ';
+	for (const file of files) {
 		cmd += `${shellEscape(file)} `;
 	}
 
 	return run(cmd);
 }
 
+function runTSLintForFiles(tsFiles) {
+	return runForFiles('node ./node_modules/tslint/bin/tslint --config tslint.json', tsFiles);
+}
+
 function runESLintForFiles(jsFiles) {
-	if (jsFiles.length === 0) {
-		return false;
-	}
+	return runForFiles('node ./node_modules/eslint/bin/eslint --quiet --format=unix', jsFiles);
+}
 
-	let cmd = 'node ./node_modules/eslint/bin/eslint --quiet --format=unix ';
-	for (const file of jsFiles) {
-		cmd += `${shellEscape(file)} `;
-	}
-
-	return run(cmd);
+function runMarkdownLintForFiles(mdFiles) {
+	return runForFiles('node ./node_modules/markdownlint-cli/markdownlint.js', mdFiles);
 }
 
 function filterByExt(files, ext) {
@@ -100,6 +99,9 @@ function lintFiles(files) {
 		// but we want to commit asap
 		hasErrors = runTSLintForFiles(tsFiles) || hasErrors;
 	}
+
+	// markdown
+	hasErrors = runMarkdownLintForFiles(filterByExt(files, '.md')) || hasErrors;
 
 	return hasErrors;
 }
