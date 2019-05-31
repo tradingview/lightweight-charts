@@ -5,7 +5,16 @@
 ![Zero dependencies](https://badgen.net/badge/dependencies/0/green)
 [![Downloads](https://img.shields.io/npm/dm/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
 
-TradingView Lightweight Chart is one of the smallest and high performative financial HTML5 charts.
+TradingView Lightweight Charts is one of the smallest and fastest financial HTML5 charts.
+
+The Lightweight Charting Library is the best choice for you if you want to display financial data as an interactive chart on your web page without affecting your web page loading speed and performance.
+
+It is the best choice for you if you want to replace static image charts with interactive ones.
+The size of the library is close to static images but if you have dozens of image charts on a web page then using this library can make the size of your web page smaller.
+
+## Documentation
+
+Getting started guide and documentation you can find in [docs](./docs) folder.
 
 ## Installing
 
@@ -40,7 +49,7 @@ You can use [unpkg](https://unpkg.com/):
 
 <https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js>
 
-The standalone version puts all exports from `esm` version to `window.LightweightCharts`:
+The standalone version creates `window.LightweightCharts` object with all exports from `esm` version:
 
 ```js
 const chart = LightweightCharts.createChart(document.body, { width: 400, height: 300 });
@@ -63,19 +72,18 @@ lineSeries.setData([
 
 ### Compiling
 
-- `npm run tsc` - compiles source code only (without tests)
-- `npm run tsc-watch` - runs the TypeScript compiler in watch mode for source code (the same as `tsc`, but in watch mode)
+- `npm run tsc` - compiles the source code only (excluding tests)
+- `npm run tsc-watch` - runs the TypeScript compiler in the watch mode for source code (same as `tsc`, but in the watch mode)
 - `npm run tsc-all` - compiles everything (source code and tests)
-- `npm run tsc-all-watch` - runs the TypeScript compiler in watch mode for source code and tests (the same as `tsc-all`, but in watch mode)
+- `npm run tsc-all-watch` - runs the TypeScript compiler in watch mode for source code and tests (same as `tsc-all`, but in watch mode)
 
 ### Bundling
 
 - `npm run rollup` - runs Rollup to bundle code
-- `npm run build` - compiles source code and bundles it (a short-hand for `npm run tsc && npm run rollup`)
+- `npm run build` - compiles source code and bundles it (as one word for `npm run tsc && npm run rollup`)
 
-Note: by default only dev version is bundled.
-To bundle a production builds (minified) too just set `NODE_ENV` variable to `production` and run bundling.
-For example: `NODE_ENV=production npm run rollup`.
+Note that only the dev version is bundled by default.
+To bundle production builds (minified) too just set the `NODE_ENV` variable to `production` and run bundling, e.g. `NODE_ENV=production npm run rollup`.
 
 ### Testing
 
@@ -84,7 +92,7 @@ For example: `NODE_ENV=production npm run rollup`.
 
 ### Tips
 
-To make sure that your local copy passed all (almost) checks, you can use a `verify` npm script: `npm run verify`.
+To make sure that your local copy passed all (almost) checks, you can use the `verify` npm script: `npm run verify`.
 
 ## License
 
