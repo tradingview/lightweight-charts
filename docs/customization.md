@@ -24,7 +24,7 @@ Default user language is the same as browser language and can be changed using t
 ### An example of chart creation
 
 ```javascript
-const chart = TradingView.createLightweightChart(document.body, {
+const chart = createChart(document.body, {
     width: 600,
     height: 380,
     localization: {
