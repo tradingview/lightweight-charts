@@ -1,3 +1,5 @@
+/// <reference types="_build-time-constants" />
+
 import { upperbound } from '../helpers/algorithms';
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { isNumber, isString } from '../helpers/strict-type-checks';
@@ -185,12 +187,26 @@ function compareTimePoints(a: TimePoint, b: TimePoint): boolean {
 	return a.timestamp < b.timestamp;
 }
 
+const validDateRegex = /^\d\d\d\d-\d\d\-\d\d$/;
+
 export function stringToBusinessDay(value: string): BusinessDay {
-	// string must be yyyy-mm-dd
+	if (process.env.NODE_ENV === 'development') {
+		// in some browsers (I look at your Chrome) the Date constructor may accept invalid date string
+		// but parses them in "implementation specific" way
+		// for example 2019-1-1 isn't the same as 2019-01-01 (for Chrome both are "valid" date strings)
+		// see https://bugs.chromium.org/p/chromium/issues/detail?id=968939
+		// so, we need to be sure that date has valid format to avoid strange behavior and hours of debugging
+		// but let's do this in development build only because of perf
+		if (!validDateRegex.test(value)) {
+			throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
+		}
+	}
+
 	const d = new Date(value);
 	if (isNaN(d.getTime())) {
 		throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
 	}
+
 	return {
 		day: d.getDate(),
 		month: d.getMonth() + 1,
