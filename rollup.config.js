@@ -35,9 +35,10 @@ function getConfig(inputFile, type, isProd) {
 		plugins: [
 			nodeResolve(),
 			replace({
-				delimiters: ['<@', '@>'],
 				values: {
-					VERSION: currentVersion,
+					// make sure that this values are synced with src/typings/globals/index.d.ts
+					'process.env.BUILD_ENV': JSON.stringify(isProd ? 'production' : 'development'),
+					'process.env.BUILD_VERSION': JSON.stringify(currentVersion),
 				},
 			}),
 			isProd && terser({

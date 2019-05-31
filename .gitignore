@@ -20,5 +20,7 @@ package-lock.json
 /src/**/*.js
 /src/**/*.d.ts
 
+!/src/typings/**/*.d.ts
+
 # graphics tests out data
 /tests/e2e/graphics/.gendata/

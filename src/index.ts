@@ -1,3 +1,5 @@
+/// <reference types="_build-time-constants" />
+
 export { LineStyle, LineType, LineWidth } from './renderers/draw-line';
 
 export { BarPrice } from './model/bar';
@@ -15,6 +17,5 @@ export { isBusinessDay, isUTCTimestamp } from './api/data-layer';
 export { createChart } from './api/create-chart';
 
 export function version(): string {
-	// note that quoted value will be replaced with the version at build time
-	return '<@VERSION@>';
+	return process.env.BUILD_VERSION;
 }

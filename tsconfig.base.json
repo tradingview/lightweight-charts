@@ -25,6 +25,10 @@
 		"strict": true,
 		"stripInternal": true,
 		"target": "es5",
+		"typeRoots": [
+			"./src/typings",
+			"node_modules/@types"
+		],
 		"types": []
 	}
 }
