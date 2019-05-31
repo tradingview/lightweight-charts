@@ -1,5 +1,6 @@
 # Lightweight Charts
 
+[![Build Status](https://travis-ci.com/tradingview/lightweight-charts.svg?branch=master)](https://travis-ci.com/tradingview/lightweight-charts)
 [![npm version](https://badge.fury.io/js/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
 ![npm bundle size](https://badgen.net/bundlephobia/minzip/lightweight-charts)
 ![Zero dependencies](https://badgen.net/badge/dependencies/0/green)
