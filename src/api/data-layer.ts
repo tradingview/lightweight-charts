@@ -59,11 +59,9 @@ function businessDayConverter(time: Time): TimePoint {
 	if (!isBusinessDay(time)) {
 		throw new Error('time must be of type BusinessDay');
 	}
-	const date = new Date();
-	date.setUTCFullYear(time.year);
-	date.setUTCMonth(time.month - 1);
-	date.setUTCDate(time.day);
-	date.setUTCHours(0, 0, 0, 0);
+
+	const date = new Date(Date.UTC(time.year, time.month - 1, time.day, 0, 0, 0, 0));
+
 	return {
 		timestamp: Math.round(date.getTime() / 1000) as UTCTimestamp,
 		businessDay: time,
