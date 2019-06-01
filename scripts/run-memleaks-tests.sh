@@ -2,7 +2,6 @@
 set -e
 echo "Preparing"
 
-npm install
 npm run build
 
 echo "Memleaks tests"
