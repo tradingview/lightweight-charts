@@ -51,8 +51,8 @@ An area series interface can be customized using the following set of options:
 |`lineColor`|`string`|`#33D778`|Line color|
 |`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
 |`lineWidth`|`number`|`3`|Line width in pixels|
-|`crossHairMarkerVisible`|`boolean`|`true`|If true, the crosshair marker is shown|
-|`crossHairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
+|`crosshairMarkerVisible`|`boolean`|`true`|If true, the crosshair marker is shown|
+|`crosshairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
 
 ### Examples
 
@@ -65,8 +65,8 @@ An area series interface can be customized using the following set of options:
         lineColor: 'rgba(21, 146, 230, 1)',
         lineStyle: 0,
         lineWidth: 3,
-        crossHairMarkerVisible: false,
-        crossHairMarkerRadius: 3,
+        crosshairMarkerVisible: false,
+        crosshairMarkerRadius: 3,
     });
     ```
 

@@ -57,7 +57,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 	private readonly _seriesMapReversed: Map<Series, SeriesApiBase> = new Map();
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
-	private readonly _crossHairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
+	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
 
 	private readonly _priceScaleApi: PriceScaleApi;
 	private readonly _timeScaleApi: TimeScaleApi;
@@ -67,7 +67,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 
 		this._chartWidget.clicked().subscribe((param: MouseEventParamsImpl) => this._clickedDelegate.fire(this._convertMouseParams(param)), this);
-		this._chartWidget.crossHairMoved().subscribe((param: MouseEventParamsImpl) => this._crossHairMovedDelegate.fire(this._convertMouseParams(param)), this);
+		this._chartWidget.crosshairMoved().subscribe((param: MouseEventParamsImpl) => this._crosshairMovedDelegate.fire(this._convertMouseParams(param)), this);
 
 		const model = this._chartWidget.model();
 		this._priceScaleApi = new PriceScaleApi(model);
@@ -77,7 +77,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 	public remove(): void {
 		this._chartWidget.model().timeScale().visibleBarsChanged().unsubscribeAll(this);
 		this._chartWidget.clicked().unsubscribeAll(this);
-		this._chartWidget.crossHairMoved().unsubscribeAll(this);
+		this._chartWidget.crosshairMoved().unsubscribeAll(this);
 		this._priceScaleApi.destroy();
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
@@ -89,7 +89,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		this._seriesMapReversed.clear();
 		this._timeRangeChanged.destroy();
 		this._clickedDelegate.destroy();
-		this._crossHairMovedDelegate.destroy();
+		this._crosshairMovedDelegate.destroy();
 		this._dataLayer.destroy();
 		delete this._dataLayer;
 	}
@@ -211,12 +211,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		this._clickedDelegate.unsubscribe(handler);
 	}
 
-	public subscribeCrossHairMove(handler: MouseEventHandler): void {
-		this._crossHairMovedDelegate.subscribe(handler);
+	public subscribeCrosshairMove(handler: MouseEventHandler): void {
+		this._crosshairMovedDelegate.subscribe(handler);
 	}
 
-	public unsubscribeCrossHairMove(handler: MouseEventHandler): void {
-		this._crossHairMovedDelegate.unsubscribe(handler);
+	public unsubscribeCrosshairMove(handler: MouseEventHandler): void {
+		this._crosshairMovedDelegate.unsubscribe(handler);
 	}
 
 	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {

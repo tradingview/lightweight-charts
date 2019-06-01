@@ -3,7 +3,7 @@ import { ensureNotNull } from '../../helpers/assertions';
 import { BarPrice } from '../../model/bar';
 import { ChartModel, ChartOptions } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
-import { CrossHair } from '../../model/cross-hair';
+import { Crosshair } from '../../model/crosshair';
 import { Series } from '../../model/series';
 import { SeriesItemsIndexesRange, TimePointIndex } from '../../model/time-data';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
@@ -29,17 +29,17 @@ function createEmptyMarkerData(chartOptions: ChartOptions): MarksRendererData {
 
 const rangeForSinglePoint: SeriesItemsIndexesRange = { from: 0, to: 1 };
 
-export class CrossHairMarksPaneView implements IUpdatablePaneView {
+export class CrosshairMarksPaneView implements IUpdatablePaneView {
 	private readonly _chartModel: ChartModel;
-	private readonly _crossHair: CrossHair;
+	private readonly _crosshair: Crosshair;
 	private readonly _compositeRenderer: CompositeRenderer = new CompositeRenderer();
 	private _markersRenderers: PaneRendererMarks[] = [];
 	private _markersData: MarksRendererData[] = [];
 	private _invalidated: boolean = true;
 
-	public constructor(chartModel: ChartModel, crossHair: CrossHair) {
+	public constructor(chartModel: ChartModel, crosshair: Crosshair) {
 		this._chartModel = chartModel;
-		this._crossHair = crossHair;
+		this._crosshair = crosshair;
 		this._compositeRenderer.setRenderers(this._markersRenderers);
 	}
 
@@ -69,7 +69,7 @@ export class CrossHairMarksPaneView implements IUpdatablePaneView {
 
 	private _updateImpl(): void {
 		const serieses = this._chartModel.serieses();
-		const timePointIndex = this._crossHair.appliedIndex();
+		const timePointIndex = this._crosshair.appliedIndex();
 		const timeScale = this._chartModel.timeScale();
 
 		serieses.forEach((s: Series, index: number) => {

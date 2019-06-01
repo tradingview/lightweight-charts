@@ -2,13 +2,13 @@ import { ensureNotNull } from '../helpers/assertions';
 import { notNull } from '../helpers/strict-type-checks';
 
 import { LineStyle, LineWidth } from '../renderers/draw-line';
-import { CrossHairMarksPaneView } from '../views/pane/cross-hair-marks-pane-view';
-import { CrossHairPaneView } from '../views/pane/cross-hair-pane-view';
+import { CrosshairMarksPaneView } from '../views/pane/crosshair-marks-pane-view';
+import { CrosshairPaneView } from '../views/pane/crosshair-pane-view';
 import { IPaneView } from '../views/pane/ipane-view';
-import { CrossHairPriceAxisView } from '../views/price-axis/cross-hair-price-axis-view';
+import { CrosshairPriceAxisView } from '../views/price-axis/crosshair-price-axis-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { PriceAxisView } from '../views/price-axis/price-axis-view';
-import { CrossHairTimeAxisView } from '../views/time-axis/cross-hair-time-axis-view';
+import { CrosshairTimeAxisView } from '../views/time-axis/crosshair-time-axis-view';
 import { TimeAxisView } from '../views/time-axis/time-axis-view';
 
 import { BarPrice } from './bar';
@@ -20,20 +20,20 @@ import { PriceScale } from './price-scale';
 import { Series } from './series';
 import { TimePoint, TimePointIndex } from './time-data';
 
-export interface CrossHairPriceAndCoordinate {
+export interface CrosshairPriceAndCoordinate {
 	price: number;
 	coordinate: number;
 }
 
-export interface CrossHairTimeAndCoordinate {
+export interface CrosshairTimeAndCoordinate {
 	time: TimePoint | null;
 	coordinate: number;
 }
 
-export type PriceAndCoordinateProvider = (priceScale: PriceScale) => CrossHairPriceAndCoordinate;
-export type TimeAndCoordinateProvider = () => CrossHairTimeAndCoordinate;
+export type PriceAndCoordinateProvider = (priceScale: PriceScale) => CrosshairPriceAndCoordinate;
+export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate;
 
-export interface CrossHairMovedEventParams {
+export interface CrosshairMovedEventParams {
 	time: TimePoint | null;
 	price: number;
 }
@@ -43,13 +43,13 @@ export interface CrossHairMovedEventParams {
  * Normal means that the crosshair always follows the pointer.
  * Magnet means that the vertical line of the crosshair follows the pointer, while the horizontal line is placed on the corresponding series point.
  */
-export const enum CrossHairMode {
+export const enum CrosshairMode {
 	Normal,
 	Magnet,
 }
 
 /** Structure describing a crosshair line (vertical or horizontal) */
-export interface CrossHairLineOptions {
+export interface CrosshairLineOptions {
 	/** Color of a certain crosshair line */
 	color: string;
 	/** Width of a certain crosshair line and corresponding scale label */
@@ -63,32 +63,32 @@ export interface CrossHairLineOptions {
 }
 
 /** Structure describing crosshair options  */
-export interface CrossHairOptions {
+export interface CrosshairOptions {
 	/** Crosshair mode */
-	mode: CrossHairMode;
+	mode: CrosshairMode;
 	/** Options of the crosshair vertical line */
-	vertLine: CrossHairLineOptions;
+	vertLine: CrosshairLineOptions;
 	/** Options of the crosshair horizontal line */
-	horzLine: CrossHairLineOptions;
+	horzLine: CrosshairLineOptions;
 }
 
 type RawPriceProvider = () => BarPrice;
 type RawCoordinateProvider = () => Coordinate;
 type RawIndexProvider = () => TimePointIndex;
 
-export class CrossHair extends DataSource {
+export class Crosshair extends DataSource {
 	private _pane: Pane | null = null;
 	private _price: number = NaN;
 	private _index: TimePointIndex = 0 as TimePointIndex;
 	private _visible: boolean = true;
 	private readonly _model: ChartModel;
-	private _priceAxisViews: Map<PriceScale, CrossHairPriceAxisView> = new Map();
-	private readonly _timeAxisView: CrossHairTimeAxisView;
-	private readonly _markersPaneView: CrossHairMarksPaneView;
+	private _priceAxisViews: Map<PriceScale, CrosshairPriceAxisView> = new Map();
+	private readonly _timeAxisView: CrosshairTimeAxisView;
+	private readonly _markersPaneView: CrosshairMarksPaneView;
 	private _subscribed: boolean = false;
 	private readonly _currentPosPriceProvider: PriceAndCoordinateProvider;
-	private readonly _options: CrossHairOptions;
-	private readonly _paneView: CrossHairPaneView;
+	private readonly _options: CrosshairOptions;
+	private readonly _paneView: CrosshairPaneView;
 
 	private _x: Coordinate = NaN as Coordinate;
 	private _y: Coordinate = NaN as Coordinate;
@@ -96,11 +96,11 @@ export class CrossHair extends DataSource {
 	private _originX: Coordinate = NaN as Coordinate;
 	private _originY: Coordinate = NaN as Coordinate;
 
-	public constructor(model: ChartModel, options: CrossHairOptions) {
+	public constructor(model: ChartModel, options: CrosshairOptions) {
 		super();
 		this._model = model;
 		this._options = options;
-		this._markersPaneView = new CrossHairMarksPaneView(model, this);
+		this._markersPaneView = new CrosshairMarksPaneView(model, this);
 
 		const valuePriceProvider = (rawPriceProvider: RawPriceProvider, rawCoordinateProvider: RawCoordinateProvider) => {
 			return (priceScale: PriceScale) => {
@@ -139,15 +139,15 @@ export class CrossHair extends DataSource {
 			() => this.appliedX()
 		);
 
-		this._timeAxisView = new CrossHairTimeAxisView(this, model, currentPosTimeProvider);
-		this._paneView = new CrossHairPaneView(this);
+		this._timeAxisView = new CrosshairTimeAxisView(this, model, currentPosTimeProvider);
+		this._paneView = new CrosshairPaneView(this);
 	}
 
 	public index(): TimePointIndex {
 		return this._index;
 	}
 
-	public options(): CrossHairOptions {
+	public options(): CrosshairOptions {
 		return this._options;
 	}
 
@@ -295,11 +295,11 @@ export class CrossHair extends DataSource {
 		this._index = lastBarIndex !== null ? lastBarIndex : NaN as TimePointIndex;
 	}
 
-	private _createPriceAxisViewOnDemand(map: Map<PriceScale, CrossHairPriceAxisView>, priceScale: PriceScale, valueProvider: PriceAndCoordinateProvider): IPriceAxisView {
+	private _createPriceAxisViewOnDemand(map: Map<PriceScale, CrosshairPriceAxisView>, priceScale: PriceScale, valueProvider: PriceAndCoordinateProvider): IPriceAxisView {
 		let view = map.get(priceScale);
 
 		if (view === undefined) {
-			view = new CrossHairPriceAxisView(this, priceScale, valueProvider);
+			view = new CrosshairPriceAxisView(this, priceScale, valueProvider);
 			map.set(priceScale, view);
 		}
 

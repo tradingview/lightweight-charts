@@ -1,7 +1,7 @@
 import { ensure } from '../helpers/assertions';
 
 import { Coordinate } from './coordinate';
-import { CrossHairMode, CrossHairOptions } from './cross-hair';
+import { CrosshairMode, CrosshairOptions } from './crosshair';
 import { IDataSource } from './idata-source';
 import { Pane } from './pane';
 import { Series } from './series';
@@ -9,15 +9,15 @@ import { SeriesPlotIndex } from './series-data';
 import { TimePointIndex } from './time-data';
 
 export class Magnet {
-	private readonly _options: CrossHairOptions;
+	private readonly _options: CrosshairOptions;
 
-	public constructor(options: CrossHairOptions) {
+	public constructor(options: CrosshairOptions) {
 		this._options = options;
 	}
 
 	public align(price: number, index: TimePointIndex, pane: Pane): number {
 		let res = price;
-		if (this._options.mode === CrossHairMode.Normal) {
+		if (this._options.mode === CrosshairMode.Normal) {
 			return res;
 		}
 

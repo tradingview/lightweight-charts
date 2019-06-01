@@ -137,7 +137,7 @@ chart.applyOptions({
 
 Crosshair shows an intersection of a price and time axis values on any hovered point of on the chart.
 
-It is presented by horizontal and vertical lines. Each of them can be either customized by setting their `color`, `width` and `style` or disabled by using the `visible` option if necessary. Note that disabling crosshair lines does not disable crosshair marker on Line and Area series. It can be disabled by using the `crossHairMarkerVisible` option of relevant series.
+It is presented by horizontal and vertical lines. Each of them can be either customized by setting their `color`, `width` and `style` or disabled by using the `visible` option if necessary. Note that disabling crosshair lines does not disable crosshair marker on Line and Area series. It can be disabled by using the `crosshairMarkerVisible` option of relevant series.
 
 Vertical and horizontal lines of the crosshair have marks on the price and time axis. Any of those marks can be disabled.
 
@@ -157,13 +157,13 @@ The following options are available for vertical and horizontal lines of a cross
 |`style`|[LineStyle](./constants.md#linestyle)|`LineStyle.Dashed`|Crosshair line style|
 |`visible`|`boolean`|`true`|If true, crosshair line is displayed on a chart|
 |`labelVisible`|`boolean`|`true`|If true, a data label is shown on a relevant scale|
-|`mode`|[CrossHairMode](./constants.md#crosshairmode)|`CrossHairMode.Magnet`|Sets the mode of crosshair moving.|
+|`mode`|[CrosshairMode](./constants.md#crosshairmode)|`CrosshairMode.Magnet`|Sets the mode of crosshair moving.|
 
 ### An example of a crosshair customization
 
 ```javascript
 chart.applyOptions({
-    crossHair: {
+    crosshair: {
         vertLine: {
             color: '#6A5ACD',
             width: 0.5,
