@@ -1,0 +1,162 @@
+# https://circleci.com/docs/2.0/configuration-reference
+
+version: 2
+
+
+aliases:
+  - &docker-node-latest
+    - image: circleci/node:latest
+
+  - &docker-node-browsers-latest
+    - image: circleci/node:latest-browsers
+
+  - &restore-node-modules-cache
+      name: Restore node_modules cache
+      keys:
+        - &cache-key v1-dependencies-{{ checksum "package.json" }}-{{ checksum "tests/e2e/package.json" }}
+
+  - &save-node-modules-cache
+      name: Save node_modules cache
+      paths:
+        - node_modules
+        - tests/e2e/node_modules
+      key: *cache-key
+
+  - &default-filters
+      tags:
+        ignore:
+          - /.*/
+
+
+jobs:
+  install-deps:
+    docker: *docker-node-latest
+    steps:
+      - checkout
+      - restore_cache: *restore-node-modules-cache
+      - run: npm install
+      - save_cache: *save-node-modules-cache
+
+  build:
+    docker: *docker-node-latest
+    steps:
+      - checkout
+      - restore_cache: *restore-node-modules-cache
+      - run: npm run tsc-all
+      - run: npm run build
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - lib
+            - dist
+
+  no-crlf:
+    docker: *docker-node-latest
+    steps:
+      - checkout
+      - run: scripts/no-crlf.sh
+
+  trailing-lf:
+    docker: *docker-node-latest
+    steps:
+      - checkout
+      - run: scripts/trailing-newlines.sh
+
+  eslint:
+    docker: *docker-node-latest
+    steps:
+      - checkout
+      - restore_cache: *restore-node-modules-cache
+      - run: npm run lint:eslint
+
+  tslint:
+    docker: *docker-node-latest
+    steps:
+      - checkout
+      - restore_cache: *restore-node-modules-cache
+      - run: npm run lint:tslint
+
+  markdownlint:
+    docker: *docker-node-latest
+    steps:
+      - checkout
+      - restore_cache: *restore-node-modules-cache
+      - run: npm run lint:md
+
+  unittests:
+    docker: *docker-node-latest
+    steps:
+      - checkout
+      - restore_cache: *restore-node-modules-cache
+      - run: npm run test
+
+  graphics-tests:
+    docker: *docker-node-browsers-latest
+    environment:
+      NO_SANDBOX: "true"
+      CMP_OUT_DIR: ./graphics-cmp-data
+    steps:
+      - checkout
+      - restore_cache: *restore-node-modules-cache
+      - run: scripts/run-graphics-tests.sh
+      - store_artifacts:
+          path: ./graphics-cmp-data
+          when: on_fail
+
+  memleaks-tests:
+    docker: *docker-node-browsers-latest
+    environment:
+      NO_SANDBOX: "true"
+    steps:
+      - checkout
+      - restore_cache: *restore-node-modules-cache
+      - attach_workspace:
+          at: ./
+      - run: scripts/run-memleaks-tests.sh
+
+
+workflows:
+  version: 2
+
+  build-lint-test:
+    jobs:
+      - install-deps:
+          filters: *default-filters
+      - no-crlf:
+          filters: *default-filters
+      - trailing-lf:
+          filters: *default-filters
+
+      - build:
+          filters: *default-filters
+          requires:
+            - install-deps
+      - eslint:
+          filters: *default-filters
+          requires:
+            - install-deps
+      - tslint:
+          filters: *default-filters
+          requires:
+            - install-deps
+      - markdownlint:
+          filters: *default-filters
+          requires:
+            - install-deps
+
+      - unittests:
+          filters: *default-filters
+          requires:
+            - build
+      - graphics-tests:
+          filters:
+            <<: *default-filters
+            branches:
+              ignore:
+                - master
+          requires:
+            - build
+      - memleaks-tests:
+          filters: *default-filters
+          requires:
+            - build
