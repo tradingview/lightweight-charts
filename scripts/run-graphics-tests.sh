@@ -3,14 +3,16 @@ set -e
 
 echo "Checkout to merge-base and build..."
 
+HEAD_SHA1=$(git rev-parse HEAD)
 git checkout $(git merge-base origin/master HEAD)
+
 npm install
 npm run build
 mv ./dist ./merge-base-dist
 
 echo "Checkout to HEAD back and build..."
 
-git checkout $CI_COMMIT_SHA
+git checkout $HEAD_SHA1
 npm install
 npm run build
 
