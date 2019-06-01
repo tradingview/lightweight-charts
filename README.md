@@ -22,7 +22,7 @@ Getting started guide and documentation you can find in [docs](./docs) folder.
 ### es6 via npm
 
 ```bash
-npm install --save lightweight-charts
+npm install lightweight-charts
 ```
 
 ```js
