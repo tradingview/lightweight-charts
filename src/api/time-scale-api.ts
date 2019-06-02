@@ -7,7 +7,8 @@ import { ChartModel } from '../model/chart-model';
 import { TimePoint, TimePointIndex, UTCTimestamp } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
-import { convertTime, Time } from './data-layer';
+import { Time } from './data-consumer';
+import { convertTime } from './data-layer';
 import { ITimeScaleApi, TimeRange } from './itime-scale-api';
 
 const enum Constants {

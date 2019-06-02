@@ -2,7 +2,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { TimeScaleOptions } from '../model/time-scale';
 
-import { Time } from './data-layer';
+import { Time } from './data-consumer';
 
 export interface TimeRange {
 	from: Time;
