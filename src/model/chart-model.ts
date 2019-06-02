@@ -20,7 +20,7 @@ import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleMargins, PriceScaleOptions } from './price-scale';
 import { Series } from './series';
-import { SeriesOptionsInternal, SeriesType } from './series-options';
+import { SeriesOptionsMap, SeriesType } from './series-options';
 import { TickMark, TimePoint, TimePointIndex } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
 import { Watermark, WatermarkOptions } from './watermark';
@@ -504,7 +504,7 @@ export class ChartModel implements IDestroyable {
 		return this._panes[0].defaultPriceScale();
 	}
 
-	public createSeries(seriesType: SeriesType, options: SeriesOptionsInternal, overlay: boolean, title?: string, scaleMargins?: Partial<PriceScaleMargins>): Series {
+	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], overlay: boolean, title?: string, scaleMargins?: Partial<PriceScaleMargins>): Series<T> {
 		const pane = this._panes[0];
 		const series = this._createSeries(options, seriesType, pane, overlay, title, scaleMargins);
 		this._serieses.push(series);
@@ -562,8 +562,8 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
-	private _createSeries(options: SeriesOptionsInternal, seriesType: SeriesType, pane: Pane, overlay: boolean, title?: string, scaleMargins?: Partial<PriceScaleMargins>): Series {
-		const series = new Series(this, options, seriesType);
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsMap[T], seriesType: T, pane: Pane, overlay: boolean, title?: string, scaleMargins?: Partial<PriceScaleMargins>): Series<T> {
+		const series = new Series<T>(this, options, seriesType);
 
 		pane.addDataSource(series, overlay, false);
 

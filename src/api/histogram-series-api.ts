@@ -1,8 +1,8 @@
-import { DeepPartial } from '../helpers/strict-type-checks';
+import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { Palette } from '../model/palette';
 import { Series } from '../model/series';
-import { HistogramSeriesOptions, SeriesOptions } from '../model/series-options';
+import { HistogramSeriesOptions } from '../model/series-options';
 
 import { HistogramData, IHistogramSeriesApi } from './ihistogram-series-api';
 import { DataUpdatesConsumer, SeriesApiBase } from './series-api-base';
@@ -19,21 +19,21 @@ function generatePalette(points: HistogramData[], defaultColor: string): Palette
 	return res;
 }
 
-export class HistogramSeriesApi extends SeriesApiBase implements IHistogramSeriesApi {
-	public constructor(series: Series, dataUpdatesConsumer: DataUpdatesConsumer) {
+export class HistogramSeriesApi extends SeriesApiBase<'Histogram'> implements IHistogramSeriesApi {
+	public constructor(series: Series<'Histogram'>, dataUpdatesConsumer: DataUpdatesConsumer<'Histogram'>) {
 		super(series, dataUpdatesConsumer);
 	}
 
 	public applyOptions(options: DeepPartial<HistogramSeriesOptions>): void {
-		this._series.applyOptions(options as SeriesOptions);
+		this._series.applyOptions(options);
 	}
 
 	public options(): HistogramSeriesOptions {
-		return this._series.options();
+		return clone(this._series.options());
 	}
 
 	public setData(data: HistogramData[]): void {
-		const palette = generatePalette(data, this._series.internalOptions().histogramStyle.color);
+		const palette = generatePalette(data, this._series.options().color);
 		this._dataUpdatesConsumer.applyNewData(this._series, data, palette);
 	}
 

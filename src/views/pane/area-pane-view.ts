@@ -11,12 +11,12 @@ import { LineItem, PaneRendererLine } from '../../renderers/line-renderer';
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesAreaPaneView extends LinePaneViewBase<LineItem> {
+export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 	private readonly _renderer: CompositeRenderer = new CompositeRenderer();
 	private readonly _areaRenderer: PaneRendererArea = new PaneRendererArea();
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 
-	public constructor(series: Series, model: ChartModel) {
+	public constructor(series: Series<'Area'>, model: ChartModel) {
 		super(series, model);
 		this._renderer.setRenderers([this._areaRenderer, this._lineRenderer]);
 	}
@@ -24,8 +24,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<LineItem> {
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();
 
-		const seriesProps = this._series.internalOptions();
-		const areaStyleProperties = seriesProps.areaStyle;
+		const areaStyleProperties = this._series.options();
 
 		const data: PaneRendererAreaData = {
 			lineType: LineType.Simple,

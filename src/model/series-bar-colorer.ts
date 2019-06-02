@@ -3,6 +3,13 @@ import { ensure, ensureNotNull } from '../helpers/assertions';
 import { PlotList } from './plot-list';
 import { Series } from './series';
 import { Bar, SeriesPlotIndex } from './series-data';
+import {
+	AreaStyleOptions,
+	BarStyleOptions,
+	CandleStyleOptions,
+	HistogramStyleOptions,
+	LineStyleOptions,
+} from './series-options';
 import { TimePoint, TimePointIndex } from './time-data';
 
 export interface PrecomputedBars {
@@ -34,29 +41,29 @@ export class SeriesBarColorer {
 		// Used to avoid binary search if bars are already known
 
 		const targetType = this._series.seriesType();
+		const seriesOptions = this._series.options();
 		switch (targetType) {
 			case 'Line':
-				return this._lineStyle();
+				return this._lineStyle(seriesOptions as LineStyleOptions);
 
 			case 'Area':
-				return this._areaStyle();
+				return this._areaStyle(seriesOptions as AreaStyleOptions);
 
 			case 'Bar':
-				return this._barStyle(barIndex, precomputedBars);
+				return this._barStyle(seriesOptions as BarStyleOptions, barIndex, precomputedBars);
 
 			case 'Candle':
-				return this._candleStyle(barIndex, precomputedBars);
+				return this._candleStyle(seriesOptions as CandleStyleOptions, barIndex, precomputedBars);
 
 			case 'Histogram':
-				return this._histogramStyle(barIndex, precomputedBars);
+				return this._histogramStyle(seriesOptions as HistogramStyleOptions, barIndex, precomputedBars);
 		}
 
 		throw new Error('Unknown chart style');
 	}
 
-	private _barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+	private _barStyle(barStyle: BarStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const result = { ...emptyResult };
-		const barStyle = this._series.internalOptions().barStyle;
 
 		const upColor = barStyle.upColor;
 		const downColor = barStyle.downColor;
@@ -72,9 +79,8 @@ export class SeriesBarColorer {
 		return result;
 	}
 
-	private _candleStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+	private _candleStyle(candleStyle: CandleStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const result = { ...emptyResult };
-		const candleStyle = this._series.internalOptions().candleStyle;
 
 		const upColor = candleStyle.upColor;
 		const downColor = candleStyle.downColor;
@@ -94,19 +100,21 @@ export class SeriesBarColorer {
 		return result;
 	}
 
-	private _areaStyle(): BarColorerStyle {
-		const result = { ...emptyResult };
-		result.barColor = this._series.internalOptions().areaStyle.lineColor;
-		return result;
+	private _areaStyle(areaStyle: AreaStyleOptions): BarColorerStyle {
+		return {
+			...emptyResult,
+			barColor: areaStyle.lineColor,
+		};
 	}
 
-	private _lineStyle(): BarColorerStyle {
-		const result = { ...emptyResult };
-		result.barColor = this._series.internalOptions().lineStyle.color;
-		return result;
+	private _lineStyle(lineStyle: LineStyleOptions): BarColorerStyle {
+		return {
+			...emptyResult,
+			barColor: lineStyle.color,
+		};
 	}
 
-	private _histogramStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+	private _histogramStyle(histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const result = { ...emptyResult };
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
 		const colorValue = currentBar.value[SeriesPlotIndex.Color];
@@ -114,7 +122,7 @@ export class SeriesBarColorer {
 			const palette = ensureNotNull(this._series.palette());
 			result.barColor = palette.colorByIndex(colorValue);
 		} else {
-			result.barColor = this._series.internalOptions().histogramStyle.color;
+			result.barColor = histogramStyle.color;
 		}
 		return result;
 	}

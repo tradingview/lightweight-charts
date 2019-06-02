@@ -12,17 +12,17 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { BarsPaneViewBase } from './bars-pane-view-base';
 
-export class SeriesBarsPaneView extends BarsPaneViewBase<BarItem> {
+export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 	private readonly _renderer: PaneRendererBars = new PaneRendererBars();
 
-	public constructor(series: Series, model: ChartModel) {
+	public constructor(series: Series<'Bar'>, model: ChartModel) {
 		super(series, model);
 	}
 
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();
 
-		const barStyleProps = this._series.internalOptions().barStyle;
+		const barStyleProps = this._series.options();
 		const data: PaneRendererBarsData = {
 			bars: this._items,
 			barSpacing: this._model.timeScale().barSpacing(),

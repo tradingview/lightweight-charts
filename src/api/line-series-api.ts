@@ -7,8 +7,8 @@ import { ILineSeriesApi } from './iline-series-api';
 import { LineSeriesApiBase } from './line-series-api-base';
 import { DataUpdatesConsumer } from './series-api-base';
 
-export class LineSeriesApi extends LineSeriesApiBase implements ILineSeriesApi {
-	public constructor(series: Series, dataUpdatesConsumer: DataUpdatesConsumer) {
+export class LineSeriesApi extends LineSeriesApiBase<'Line'> implements ILineSeriesApi {
+	public constructor(series: Series<'Line'>, dataUpdatesConsumer: DataUpdatesConsumer<'Line'>) {
 		super(series, dataUpdatesConsumer);
 	}
 

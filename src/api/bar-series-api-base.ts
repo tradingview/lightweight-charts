@@ -3,8 +3,8 @@ import { Series } from '../model/series';
 import { BarData, IBarSeriesApiBase } from './ibar-series-api-base';
 import { DataUpdatesConsumer, SeriesApiBase } from './series-api-base';
 
-export class BarSeriesApiBase extends SeriesApiBase implements IBarSeriesApiBase {
-	protected constructor(series: Series, dataUpdatesConsumer: DataUpdatesConsumer) {
+export class BarSeriesApiBase<TSeriesType extends 'Bar' | 'Candle'> extends SeriesApiBase<TSeriesType> implements IBarSeriesApiBase {
+	protected constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>) {
 		super(series, dataUpdatesConsumer);
 	}
 

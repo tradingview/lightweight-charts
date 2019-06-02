@@ -16,7 +16,7 @@ import {
 	LineSeriesOptions,
 	precisionByMinMove,
 	PriceFormat,
-	SeriesOptionsInternal,
+	SeriesType,
 } from '../model/series-options';
 import { TimePointIndex } from '../model/time-data';
 
@@ -35,7 +35,14 @@ import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi, TimeRange } from './itime-scale-api';
 import { LineSeriesApi } from './line-series-api';
-import { seriesOptionsDefaults } from './options/series-options-defaults';
+import {
+	areaStyleDefaults,
+	barStyleDefaults,
+	candleStyleDefaults,
+	histogramStyleDefaults,
+	lineStyleDefaults,
+	seriesOptionsDefaults,
+} from './options/series-options-defaults';
 import { PriceScaleApi } from './price-scale-api';
 import { DataUpdatesConsumer, SeriesApiBase } from './series-api-base';
 import { TimeScaleApi } from './time-scale-api';
@@ -49,12 +56,12 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	}
 }
 
-export class ChartApi implements IChartApi, DataUpdatesConsumer {
+export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _chartWidget: ChartWidget;
 	private _dataLayer: DataLayer = new DataLayer();
 	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
-	private readonly _seriesMap: Map<SeriesApiBase, Series> = new Map();
-	private readonly _seriesMapReversed: Map<Series, SeriesApiBase> = new Map();
+	private readonly _seriesMap: Map<SeriesApiBase<SeriesType>, Series> = new Map();
+	private readonly _seriesMapReversed: Map<Series, SeriesApiBase<SeriesType>> = new Map();
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
@@ -82,7 +89,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
 		delete this._chartWidget;
-		this._seriesMap.forEach((series: Series, api: SeriesApiBase) => {
+		this._seriesMap.forEach((series: Series, api: SeriesApiBase<SeriesType>) => {
 			api.destroy();
 		});
 		this._seriesMap.clear();
@@ -98,74 +105,74 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer {
 		this._chartWidget.resize(height, width, forceRepaint);
 	}
 
-	public addAreaSeries(areaParams?: DeepPartial<AreaSeriesOptions>): IAreaSeriesApi {
-		areaParams = areaParams || {};
-		const model = this._chartWidget.model();
-		patchPriceFormat(areaParams.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), areaParams, true) as SeriesOptionsInternal;
-		merge(options.areaStyle, areaParams, true);
-		const series = model.createSeries('Area', options, Boolean(areaParams.overlay), areaParams.title, areaParams.scaleMargins);
+	public addAreaSeries(options: DeepPartial<AreaSeriesOptions> = {}): IAreaSeriesApi {
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), areaStyleDefaults, options) as AreaSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Area', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+
 		const res = new AreaSeriesApi(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
+
 		return res;
 	}
 
-	public addBarSeries(barParams?: DeepPartial<BarSeriesOptions>): IBarSeriesApi {
-		barParams = barParams || {};
-		const model = this._chartWidget.model();
-		patchPriceFormat(barParams.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), barParams, true) as SeriesOptionsInternal;
-		merge(options.barStyle, barParams, true);
-		const series = model.createSeries('Bar', options, Boolean(barParams.overlay), barParams.title, barParams.scaleMargins);
+	public addBarSeries(options: DeepPartial<BarSeriesOptions> = {}): IBarSeriesApi {
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), barStyleDefaults, options) as BarSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Bar', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+
 		const res = new BarSeriesApi(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
+
 		return res;
 	}
 
-	public addCandleSeries(candleParams?: DeepPartial<CandleSeriesOptions>): ICandleSeries {
-		candleParams = candleParams || {};
-		const model = this._chartWidget.model();
-		fillUpDownCandlesColors(candleParams);
-		patchPriceFormat(candleParams.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), candleParams, true) as SeriesOptionsInternal;
-		merge(options.candleStyle, candleParams, true);
-		const series = model.createSeries('Candle', options, Boolean(candleParams.overlay), candleParams.title, candleParams.scaleMargins);
+	public addCandleSeries(options: DeepPartial<CandleSeriesOptions> = {}): ICandleSeries {
+		fillUpDownCandlesColors(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), candleStyleDefaults, options) as CandleSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Candle', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+
 		const res = new CandleSeriesApi(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
+
 		return res;
 	}
 
-	public addHistogramSeries(histogramParams?: DeepPartial<HistogramSeriesOptions>): IHistogramSeriesApi {
-		histogramParams = histogramParams || {};
-		const model = this._chartWidget.model();
-		patchPriceFormat(histogramParams.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), histogramParams, true) as SeriesOptionsInternal;
-		merge(options.histogramStyle, histogramParams, true);
-		const series = model.createSeries('Histogram', options, Boolean(histogramParams.overlay), histogramParams.title, histogramParams.scaleMargins);
+	public addHistogramSeries(options: DeepPartial<HistogramSeriesOptions> = {}): IHistogramSeriesApi {
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), histogramStyleDefaults, options) as HistogramSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Histogram', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+
 		const res = new HistogramSeriesApi(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
+
 		return res;
 	}
 
-	public addLineSeries(lineParams?: DeepPartial<LineSeriesOptions>): ILineSeriesApi {
-		lineParams = lineParams || {};
-		const model = this._chartWidget.model();
-		patchPriceFormat(lineParams.priceFormat);
-		const options = merge(clone(seriesOptionsDefaults), lineParams, true) as SeriesOptionsInternal;
-		merge(options.lineStyle, lineParams, true);
-		const series = model.createSeries('Line', options, Boolean(lineParams.overlay), lineParams.title, lineParams.scaleMargins);
+	public addLineSeries(options: DeepPartial<LineSeriesOptions> = {}): ILineSeriesApi {
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), lineStyleDefaults, options) as LineSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Line', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+
 		const res = new LineSeriesApi(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
+
 		return res;
 	}
 
 	public removeSeries(seriesApi: ISeriesApi): void {
-		const seriesObj = seriesApi as SeriesApiBase;
+		const seriesObj = seriesApi as SeriesApiBase<SeriesType>;
 		const series = ensureDefined(this._seriesMap.get(seriesObj));
 
 		const update = this._dataLayer.removeSeries(series);

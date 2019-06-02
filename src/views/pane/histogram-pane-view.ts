@@ -36,14 +36,14 @@ function createRawItem(time: TimePointIndex, price: BarPrice): HistogramItem {
 
 const showSpacingMinimalBarWidth = 5;
 
-export class SeriesHistogramPaneView extends SeriesPaneViewBase<TimedValue> {
+export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', TimedValue> {
 	private _compositeRenderer: CompositeRenderer = new CompositeRenderer();
 	private _paletteData: PaneRendererHistogramData[] = [];
 	private _paletteRenderers: PaneRendererHistogram[] = [];
 	private _colorIndexes: Int32Array = new Int32Array(0);
 	private _sourceIndexes: Int32Array = new Int32Array(0);
 
-	public constructor(series: Series, model: ChartModel) {
+	public constructor(series: Series<'Histogram'>, model: ChartModel) {
 		super(series, model);
 	}
 
@@ -60,7 +60,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<TimedValue> {
 		this._paletteData.length = palette.size();
 
 		const targetIndexes = new Int32Array(palette.size());
-		const histogramStyleProps = this._series.internalOptions().histogramStyle;
+		const histogramStyleProps = this._series.options();
 
 		const barValueGetter = this._series.barFunction();
 		this._colorIndexes = new Int32Array(this._series.bars().size());
@@ -108,7 +108,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<TimedValue> {
 
 		const barSpacing = timeScale.barSpacing();
 		const visibleBars = ensureNotNull(timeScale.visibleBars());
-		const histogramBase = priceScale.priceToCoordinate(this._series.internalOptions().histogramStyle.base, firstValue);
+		const histogramBase = priceScale.priceToCoordinate(this._series.options().base, firstValue);
 
 		this._paletteData.forEach((data: PaneRendererHistogramData, colorIndex: number) => {
 			timeScale.indexesToCoordinates(data.items);

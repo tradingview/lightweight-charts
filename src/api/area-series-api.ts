@@ -1,4 +1,4 @@
-import { DeepPartial } from '../helpers/strict-type-checks';
+import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { Series } from '../model/series';
 import { AreaSeriesOptions } from '../model/series-options';
@@ -7,8 +7,8 @@ import { IAreaSeriesApi } from './iarea-series-api';
 import { LineSeriesApiBase } from './line-series-api-base';
 import { DataUpdatesConsumer } from './series-api-base';
 
-export class AreaSeriesApi extends LineSeriesApiBase implements IAreaSeriesApi {
-	public constructor(series: Series, dataUpdatesConsumer: DataUpdatesConsumer) {
+export class AreaSeriesApi extends LineSeriesApiBase<'Area'> implements IAreaSeriesApi {
+	public constructor(series: Series<'Area'>, dataUpdatesConsumer: DataUpdatesConsumer<'Area'>) {
 		super(series, dataUpdatesConsumer);
 	}
 
@@ -17,6 +17,6 @@ export class AreaSeriesApi extends LineSeriesApiBase implements IAreaSeriesApi {
 	}
 
 	public options(): AreaSeriesOptions {
-		return this._series.options();
+		return clone(this._series.options());
 	}
 }

@@ -3,21 +3,22 @@ import { ensureNotNull } from '../../helpers/assertions';
 import { ChartModel } from '../../model/chart-model';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
+import { SeriesType } from '../../model/series-options';
 import { SeriesItemsIndexesRange, TimedValue, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
-export abstract class SeriesPaneViewBase<ItemType extends TimedValue> implements IUpdatablePaneView {
-	protected _series: Series;
+export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemType extends TimedValue> implements IUpdatablePaneView {
+	protected _series: Series<TSeriesType>;
 	protected _model: ChartModel;
 	protected _invalidated: boolean = true;
 	protected _dataInvalidated: boolean = true;
 	protected _items: ItemType[] = [];
 	protected _itemsVisibleRange: SeriesItemsIndexesRange | null = null;
 
-	public constructor(series: Series, model: ChartModel) {
+	public constructor(series: Series<TSeriesType>, model: ChartModel) {
 		this._series = series;
 		this._model = model;
 	}

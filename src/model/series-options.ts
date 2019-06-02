@@ -4,8 +4,6 @@ import { LineStyle, LineWidth } from '../renderers/draw-line';
 
 import { PriceScaleMargins } from './price-scale';
 
-export type SeriesType = 'Bar' | 'Candle' | 'Area' | 'Line' | 'Histogram';
-
 /** Structure describing a drawing style of the candlestick chart  */
 export interface CandleStyleOptions {
 	/** Color of rising candlesticks */
@@ -127,10 +125,20 @@ export const enum PriceAxisLastValueMode {
 	LastValueAccordingToScale,
 }
 
+export interface OverlaySeriesSpecificOptions {
+	overlay: true;
+	scaleMargins?: PriceScaleMargins;
+}
+
+export interface NonOverlaySeriesSpecificOptions {
+	overlay?: false;
+	scaleMargins?: never;
+}
+
 /**
  * Structure describing options common for all types of series
  */
-export interface SeriesOptionsBase {
+export interface SeriesOptionsCommon {
 	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
 	priceLineVisible: boolean;
 	/** Visibility of the label with the latest visible price on the price scale */
@@ -149,32 +157,12 @@ export interface SeriesOptionsBase {
 	priceFormat: PriceFormat;
 	/** Color of the base line in IndexedTo100 mode */
 	baseLineColor: string;
-	overlay: boolean;
 	title?: string;
-	scaleMargins?: PriceScaleMargins; // for overlays only
 }
 
-export interface CandleSeriesOptionsInternal extends SeriesOptionsBase {
-	candleStyle: CandleStyleOptions;
-}
-
-export interface BarSeriesOptionsInternal extends SeriesOptionsBase {
-	barStyle: BarStyleOptions;
-}
-
-export interface LineSeriesOptionsInternal extends SeriesOptionsBase {
-	lineStyle: LineStyleOptions;
-}
-
-export interface AreaSeriesOptionsInternal extends SeriesOptionsBase {
-	areaStyle: AreaStyleOptions;
-}
-
-export interface HistogramSeriesOptionsInternal extends SeriesOptionsBase {
-	histogramStyle: HistogramStyleOptions;
-}
-
-export type SeriesOptionsInternal = CandleSeriesOptionsInternal & BarSeriesOptionsInternal & LineSeriesOptionsInternal & AreaSeriesOptionsInternal & HistogramSeriesOptionsInternal;
+export type SeriesOptionsBase =
+	| (SeriesOptionsCommon & OverlaySeriesSpecificOptions)
+	| (SeriesOptionsCommon & NonOverlaySeriesSpecificOptions);
 
 /**
  * Structure describing area series options. It inherits all options of the base interface
@@ -201,4 +189,12 @@ export type HistogramSeriesOptions = SeriesOptionsBase & HistogramStyleOptions;
  */
 export type LineSeriesOptions = SeriesOptionsBase & LineStyleOptions;
 
-export type SeriesOptions = AreaSeriesOptions & BarSeriesOptions & CandleSeriesOptions & HistogramSeriesOptions & LineSeriesOptions;
+export interface SeriesOptionsMap {
+	Bar: BarSeriesOptions;
+	Candle: CandleSeriesOptions;
+	Area: AreaSeriesOptions;
+	Line: LineSeriesOptions;
+	Histogram: HistogramSeriesOptions;
+}
+
+export type SeriesType = keyof SeriesOptionsMap;

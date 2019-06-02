@@ -7,17 +7,17 @@ import { LineItem, PaneRendererLine, PaneRendererLineData } from '../../renderer
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesLinePaneView extends LinePaneViewBase<LineItem> {
+export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 
-	public constructor(series: Series, model: ChartModel) {
+	public constructor(series: Series<'Line'>, model: ChartModel) {
 		super(series, model);
 	}
 
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();
 
-		const lineStyleProps = this._series.internalOptions().lineStyle;
+		const lineStyleProps = this._series.options();
 
 		const data: PaneRendererLineData = {
 			items: this._items,

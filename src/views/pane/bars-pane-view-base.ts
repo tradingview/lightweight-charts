@@ -13,8 +13,8 @@ import { BarCandleItemBase } from '../../renderers/bars-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-export abstract class BarsPaneViewBase<ItemType extends BarCandleItemBase> extends SeriesPaneViewBase<ItemType> {
-	public constructor(series: Series, model: ChartModel) {
+export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candle', ItemType extends BarCandleItemBase> extends SeriesPaneViewBase<TSeriesType, ItemType> {
+	public constructor(series: Series<TSeriesType>, model: ChartModel) {
 		super(series, model);
 	}
 

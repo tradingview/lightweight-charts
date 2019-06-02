@@ -1,4 +1,4 @@
-import { DeepPartial } from '../helpers/strict-type-checks';
+import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { Series } from '../model/series';
 import { CandleSeriesOptions, fillUpDownCandlesColors } from '../model/series-options';
@@ -7,8 +7,8 @@ import { BarSeriesApiBase } from './bar-series-api-base';
 import { ICandleSeries } from './icandle-series-api';
 import { DataUpdatesConsumer } from './series-api-base';
 
-export class CandleSeriesApi extends BarSeriesApiBase implements ICandleSeries {
-	public constructor(series: Series, dataUpdatesConsumer: DataUpdatesConsumer) {
+export class CandleSeriesApi extends BarSeriesApiBase<'Candle'> implements ICandleSeries {
+	public constructor(series: Series<'Candle'>, dataUpdatesConsumer: DataUpdatesConsumer<'Candle'>) {
 		super(series, dataUpdatesConsumer);
 	}
 
@@ -18,6 +18,6 @@ export class CandleSeriesApi extends BarSeriesApiBase implements ICandleSeries {
 	}
 
 	public options(): CandleSeriesOptions {
-		return this._series.options();
+		return clone(this._series.options());
 	}
 }
