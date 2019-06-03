@@ -11,12 +11,12 @@ export interface TestCase {
 const testCasesDir = path.join(__dirname, '..', 'test-cases');
 
 function extractTestCaseName(fileName: string): string | null {
-	const match = fileName.match(/^(.+)\.case\.js$/);
+	const match = path.basename(fileName).match(/^(.+)\.case\.js$/);
 	return match && match[1];
 }
 
 function isTestCaseFile(filePath: string): boolean {
-	return fs.lstatSync(path.join(testCasesDir, filePath)).isFile() && extractTestCaseName(filePath) !== null;
+	return fs.lstatSync(filePath).isFile() && extractTestCaseName(filePath) !== null;
 }
 
 interface TestCasesGroupInfo {
@@ -46,14 +46,12 @@ export function getTestCases(): Record<string, TestCase[]> {
 
 	for (const group of getTestCaseGroups()) {
 		result[group.name] = fs.readdirSync(group.path)
+			.map((filePath: string) => path.join(group.path, filePath))
 			.filter(isTestCaseFile)
 			.map((testCaseFile: string) => {
 				return {
 					name: extractTestCaseName(testCaseFile) as string,
-					caseContent: fs.readFileSync(
-						path.join(testCasesDir, testCaseFile),
-						{ encoding: 'utf-8' }
-					),
+					caseContent: fs.readFileSync(testCaseFile, { encoding: 'utf-8' }),
 				};
 			});
 	}
