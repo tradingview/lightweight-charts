@@ -11,12 +11,12 @@ export interface LineData extends TimedData {
 export interface ILineSeriesApiBase extends ISeriesApi {
 	/**
 	 * Sets or replaces line series data
-	 * @param - ordered (earlier time point goes first) array of data items. Old data are fully replaced with new one
+	 * @param - ordered (earlier time point goes first) array of data items. Old data is fully replaced with new one
 	 */
 	setData(data: LineData[]): void;
 
 	/**
-	 * Appends a new point or replaces the last point of the series
+	 * adds or attaches a new point of the series
 	 * @param a single data item to be added. Time of the new item must be greater or equal to the latest existing time point.
 	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
 	 */

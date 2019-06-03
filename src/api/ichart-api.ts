@@ -39,8 +39,8 @@ export interface IChartApi {
 	remove(): void;
 
 	/**
-	 * Sets fixed size of the chart. By default chart takes 100% of its container
-	 * @param height - target heght of the chart
+	 * Sets fixed size of the chart. By default chart takes up 100% of its container
+	 * @param height - target height of the chart
 	 * @param width - target width of the chart
 	 * @param [forceRepaint=false] - true to initiate resize immediately. One could need this to get screenshot immediately after resize
 	 */
@@ -54,7 +54,7 @@ export interface IChartApi {
 	addAreaSeries(areaParams?: DeepPartial<AreaSeriesOptions>): IAreaSeriesApi;
 
 	/**
-	 * Creates a bars series with specified parameters
+	 * Creates a bar series with specified parameters
 	 * @param [barParams = undefined] - customization parameters of the series being created
 	 * @return an interface of the created series
 	 */
@@ -99,8 +99,8 @@ export interface IChartApi {
 	unsubscribeClick(handler: MouseEventHandler): void;
 
 	/**
-	 * Adds a subscription to crosshair movement to receive notifications aboute cross hair moving
-	 * @param handler - handler (function) to be called on cross hair move
+	 * Adds a subscription to crosshair movement to receive notifications on crosshair movements
+	 * @param handler - handler (function) to be called on crosshair move
 	 */
 	subscribeCrossHairMove(handler: MouseEventHandler): void;
 
@@ -148,7 +148,7 @@ export interface IChartApi {
 
 	/**
 	 * Removes branding text from the chart.
-	 * Please read the description of this method in the documentation to learn more about the conditions for remove the branding.
+	 * Please read the description of this method in the documentation to learn more about the conditions of branding removal.
 	 */
 	disableBranding(): void;
 }
