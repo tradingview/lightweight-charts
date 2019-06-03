@@ -45,7 +45,7 @@
     "rollup-plugin-terser": "~5.0.0",
     "ts-node": "~8.2.0",
     "tslib": "1.9.3",
-    "tslint": "5.16.0",
+    "tslint": "5.17.0",
     "tslint-eslint-rules": "~5.4.0",
     "tslint-microsoft-contrib": "~6.2.0",
     "typescript": "3.5.1",
