@@ -19,11 +19,44 @@ function isTestCaseFile(filePath: string): boolean {
 	return fs.lstatSync(path.join(testCasesDir, filePath)).isFile() && extractTestCaseName(filePath) !== null;
 }
 
-export function getTestCases(): TestCase[] {
-	return fs.readdirSync(testCasesDir)
-		.filter(isTestCaseFile)
-		.map((testCaseFile: string) => ({
-			name: extractTestCaseName(testCaseFile) as string,
-			caseContent: fs.readFileSync(path.join(testCasesDir, testCaseFile), { encoding: 'utf-8' }),
-		}));
+interface TestCasesGroupInfo {
+	name: string;
+	path: string;
+}
+
+function getTestCaseGroups(): TestCasesGroupInfo[] {
+	return [
+		{
+			name: '',
+			path: testCasesDir,
+		},
+		...fs.readdirSync(testCasesDir)
+			.filter((filePath: string) => fs.lstatSync(path.join(testCasesDir, filePath)).isDirectory())
+			.map((filePath: string) => {
+				return {
+					name: filePath,
+					path: path.join(testCasesDir, filePath),
+				};
+			}),
+	];
+}
+
+export function getTestCases(): Record<string, TestCase[]> {
+	const result: Record<string, TestCase[]> = {};
+
+	for (const group of getTestCaseGroups()) {
+		result[group.name] = fs.readdirSync(group.path)
+			.filter(isTestCaseFile)
+			.map((testCaseFile: string) => {
+				return {
+					name: extractTestCaseName(testCaseFile) as string,
+					caseContent: fs.readFileSync(
+						path.join(testCasesDir, testCaseFile),
+						{ encoding: 'utf-8' }
+					),
+				};
+			});
+	}
+
+	return result;
 }
