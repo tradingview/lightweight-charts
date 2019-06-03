@@ -4,7 +4,7 @@ import { IPaneView } from '../views/pane/ipane-view';
 
 import { Pane } from './pane';
 
-/** Structure describing horizontal or vertical grid lines options */
+/** Structure describing horizontal or vertical grid line options */
 export interface GridLineOptions {
 	/** Color of the lines */
 	color: string;
@@ -16,9 +16,9 @@ export interface GridLineOptions {
 
 /** Structure describing grid options */
 export interface GridOptions {
-	/** Vertical grid lines options */
+	/** Vertical grid line options */
 	vertLines: GridLineOptions;
-	/** Horizontal grid lines options */
+	/** Horizontal grid line options */
 	horzLines: GridLineOptions;
 }
 

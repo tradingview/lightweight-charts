@@ -24,7 +24,7 @@ export interface LocalizationOptions {
 	timeFormatter?: TimeFormatterFn;
 
 	/**
-	 * One of predefined variants to format time. Ignored if timeFormatter has been specified.
+	 * One of predefined options to format time. Ignored if timeFormatter has been specified.
 	 */
 	dateFormat: DateFormat;
 }

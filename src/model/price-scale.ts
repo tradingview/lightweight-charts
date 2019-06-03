@@ -66,9 +66,9 @@ export interface PricedValue {
 
 /** Defines margins of the price scale */
 export interface PriceScaleMargins {
-	/** Top margin in percents. Must be greater or equal to 0 and less than 100 */
+	/** Top margin in percentages. Must be greater or equal to 0 and less than 100 */
 	top: number;
-	/** Bottom margin in percents. Must be greater or equal to 0 and less than 100 */
+	/** Bottom margin in percentages. Must be greater or equal to 0 and less than 100 */
 	bottom: number;
 }
 
@@ -80,7 +80,7 @@ export interface PriceScaleOptions {
 	autoScale: boolean;
 	/** Mode of the price scale */
 	mode: PriceScaleMode;
-	/** True inverts the scale. Makes lager values drawn lower. Affects both the price scale and the data on the chart */
+	/** True inverts the scale. Makes larger values drawn lower. Affects both the price scale and the data on the chart */
 	invertScale: boolean;
 	/** True value prevents labels on the price scale from overlapping one another by aligning them one below others */
 	alignLabels: boolean;

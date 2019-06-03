@@ -6,34 +6,34 @@ import { PriceScaleMargins } from './price-scale';
 
 export type SeriesType = 'Bar' | 'Candle' | 'Area' | 'Line' | 'Histogram';
 
-/** Structure describing a drawing style of the candle chart  */
+/** Structure describing a drawing style of the candlestick chart  */
 export interface CandleStyleOptions {
-	/** Color of growing candles */
+	/** Color of rising candlesticks */
 	upColor: string;
-	/** Color of falling candles */
+	/** Color of falling candlesticks */
 	downColor: string;
-	/** Flag to draw/hide candles' wicks */
+	/** Flag to draw/hide candlestick wicks */
 	wickVisible: boolean;
-	/** Flag to draw/hide candles' borders around bodies */
+	/** Flag to draw/hide candlestick borders around bodies */
 	borderVisible: boolean;
 	/**
 	 * Color of borders around candles' bodies. Ignored if borderVisible == false
 	 * If specified, it overrides both borderUpColor and borderDownColor options
 	 */
 	borderColor: string;
-	/** Color of the border of growing candles. Ignored if borderVisible == false or borderColor is specified */
+	/** Color of the border of rising candlesticks. Ignored if borderVisible == false or borderColor is specified */
 	borderUpColor: string;
-	/** Color of the border of falling candles. Ignored if borderVisible == false or borderColor is specified */
+	/** Color of the border of rising candlesticks. Ignored if borderVisible == false or borderColor is specified */
 	borderDownColor: string;
 
 	/**
-	 * Color of candles' wicks. Ignored if wickVisible == false
+	 * Color of candlestick wicks. Ignored if wickVisible == false
 	 * If specified, it overrides both wickUpColor and wickDownColor options
 	 */
 	wickColor: string;
-	/** Color of growing candles' wicks. Ignored if wickVisible == false or wickColor is specified */
+	/** Color of rising candlestick wicks. Ignored if wickVisible == false or wickColor is specified */
 	wickUpColor: string;
-	/** Color of falling candles' wicks. Ignored if wickVisible == false or wickColor is specified */
+	/** Color of falling candlestick wicks. Ignored if wickVisible == false or wickColor is specified */
 	wickDownColor: string;
 }
 
@@ -187,7 +187,7 @@ export type AreaSeriesOptions = SeriesOptionsBase & AreaStyleOptions;
 export type BarSeriesOptions = SeriesOptionsBase & BarStyleOptions;
 
 /**
- * Structure describing candle series options. It inherits all options of the base interface
+ * Structure describing candlesticks series options. It inherits all options of the base interface
  */
 export type CandleSeriesOptions = SeriesOptionsBase & CandleStyleOptions;
 

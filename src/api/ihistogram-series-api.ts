@@ -15,12 +15,12 @@ export interface HistogramData extends LineData {
 export interface IHistogramSeriesApi extends ISeriesApi {
 	/**
 	 * Sets or replaces series data
-	 * @param - ordered (earlier time point goes first) array of data items. Old data are fully replaced with new one
+	 * @param - ordered (earlier time point goes first) array of data items. Old data is fully replaced with the new one.
 	 */
 	setData(data: HistogramData[]): void;
 
 	/**
-	 * Appends a new bar or replaces the last bar of the series
+	 * adds or attaches a new bar
 	 * @param a single data item to be added. Time of new item must be greater or equal to the latest time point of already existing data.
 	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
 	 */
