@@ -273,14 +273,14 @@ export class PriceAxisWidget implements IDestroyable {
 		this._topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 
 		if (type === InvalidationLevel.Cursor) {
-			this._drawCrossHairLabel(this._topCtx);
+			this._drawCrosshairLabel(this._topCtx);
 		} else {
 			this._alignLabels();
 			this._drawBackground(this._ctx);
 			this._drawBorder(this._ctx);
 			this._drawTickMarks(this._ctx);
 			this._drawBackLabels(this._ctx);
-			this._drawCrossHairLabel(this._topCtx);
+			this._drawCrosshairLabel(this._topCtx);
 		}
 	}
 
@@ -366,7 +366,7 @@ export class PriceAxisWidget implements IDestroyable {
 		};
 
 		// calculate max and min coordinates for views on selection
-		// cross-hair individually
+		// crosshair individually
 		addViewsForSources(this._pane.state().orderedSources());
 
 		return res;
@@ -505,7 +505,7 @@ export class PriceAxisWidget implements IDestroyable {
 			});
 		};
 
-		// cross-hair individually
+		// crosshair individually
 		updateForSources(orderedSources);
 
 		// split into two parts
@@ -575,7 +575,7 @@ export class PriceAxisWidget implements IDestroyable {
 		});
 	}
 
-	private _drawCrossHairLabel(ctx: CanvasRenderingContext2D): void {
+	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
@@ -586,7 +586,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const views: IPriceAxisViewArray[] = []; // array of arrays
 		const pane = this._pane.state();
 
-		const v = model.crossHairSource().priceAxisViews(pane, this._priceScale);
+		const v = model.crosshairSource().priceAxisViews(pane, this._priceScale);
 		if (v.length) {
 			views.push(v);
 		}

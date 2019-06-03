@@ -31,13 +31,13 @@ chart.unsubscribeClick(handleClick);
 
 |Name|Description|
 |-|-|
-|`subscribeCrossHairMove(handler: MouseEventHandler): void;`|Get notified when a mouse moves on a chart|
-|`unsubscribeCrossHairMove(handler: MouseEventHandler): void;`|Don’t get notified when a mouse moves on a chart|
+|`subscribeCrosshairMove(handler: MouseEventHandler): void;`|Get notified when a mouse moves on a chart|
+|`unsubscribeCrosshairMove(handler: MouseEventHandler): void;`|Don’t get notified when a mouse moves on a chart|
 
 Example:
 
 ```javascript
-function handleCrossHairMoved(param) {
+function handleCrosshairMoved(param) {
     if (!param.point) {
         return;
     }
@@ -45,11 +45,11 @@ function handleCrossHairMoved(param) {
     console.log(`A user moved the crosshair to (${param.point.x}, ${param.point.y}) point, the time is ${param.time}`);
 }
 
-chart.subscribeCrossHairMove(handleClick);
+chart.subscribeCrosshairMove(handleClick);
 
 // ... after some time
 
-chart.unsubscribeCrossHairMove(handleClick);
+chart.unsubscribeCrosshairMove(handleClick);
 ```
 
 ## Types

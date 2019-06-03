@@ -27,11 +27,12 @@ const testResultsOutDir = process.env.CMP_OUT_DIR || path.join(__dirname, '.gend
 const goldenStandalonePath = process.env[goldenStandalonePathEnvKey] || '';
 const testStandalonePath = process.env[testStandalonePathEnvKey] || '';
 
-function testCaseFolder(testCaseName: string): string {
-	return path.join(testResultsOutDir, testCaseName);
+function testCaseOutFolder(groupName: string, testCaseName: string): string {
+	return path.join(testResultsOutDir, groupName, testCaseName);
 }
 
-function writeTestData(
+function writeTestData(// tslint:disable-next-line:max-params
+	groupName: string,
 	testCaseName: string,
 	goldenScreenshot: PNG,
 	testScreenshot: PNG,
@@ -39,9 +40,9 @@ function writeTestData(
 	goldenPageContent: string,
 	testPageContent: string
 ): void {
-	const testCaseOutDir = testCaseFolder(testCaseName);
+	const testCaseOutDir = testCaseOutFolder(groupName, testCaseName);
 	if (!fs.existsSync(testCaseOutDir)) {
-		fs.mkdirSync(testCaseOutDir);
+		fs.mkdirSync(testCaseOutDir, { recursive: true });
 	}
 
 	fs.writeFileSync(path.join(testCaseOutDir, '1.golden.png'), PNG.sync.write(goldenScreenshot));
@@ -52,18 +53,25 @@ function writeTestData(
 	fs.writeFileSync(path.join(testCaseOutDir, '2.test.html'), testPageContent);
 }
 
-function removeTestCaseFolder(testCaseName: string): void {
-	const testCaseOutDir = testCaseFolder(testCaseName);
-	fs.readdirSync(testCaseOutDir).forEach((file: string) => {
-		const filePath = path.join(testCaseOutDir, file);
+function rmRf(folder: string): void {
+	if (!fs.existsSync(folder)) {
+		return;
+	}
+
+	fs.readdirSync(folder).forEach((file: string) => {
+		const filePath = path.join(folder, file);
 		if (fs.lstatSync(filePath).isDirectory()) {
-			removeTestCaseFolder(filePath);
+			rmRf(filePath);
 		} else {
 			fs.unlinkSync(filePath);
 		}
 	});
 
-	fs.rmdirSync(testCaseOutDir);
+	fs.rmdirSync(folder);
+}
+
+function removeTestCaseFolder(groupName: string, testCaseName: string): void {
+	rmRf(testCaseOutFolder(groupName, testCaseName));
 }
 
 describe('Graphics tests', function(): void {
@@ -87,37 +95,43 @@ describe('Graphics tests', function(): void {
 		screenshoter = new Screenshoter(Boolean(process.env.NO_SANDBOX));
 	});
 
-	it('number of test cases', () => {
-		// we need to have at least 1 test to check it
-		expect(testCases.length).to.be.greaterThan(0, 'there should be at least 1 test case');
-	});
+	for (const groupName of Object.keys(testCases)) {
+		const registerTestGroup = () => {
+			for (const testCase of testCases[groupName]) {
+				it(testCase.name, async () => {
+					const goldenPageContent = generatePageContent(goldenStandalonePath, testCase.caseContent);
+					const testPageContent = generatePageContent(testStandalonePath, testCase.caseContent);
 
-	for (const testCase of testCases) {
-		it(testCase.name, async () => {
-			const goldenPageContent = generatePageContent(goldenStandalonePath, testCase.caseContent);
-			const testPageContent = generatePageContent(testStandalonePath, testCase.caseContent);
+					// run in parallel to increase speed
+					const [goldenScreenshot, testScreenshot] = await Promise.all([
+						screenshoter.generateScreenshot(goldenPageContent),
+						screenshoter.generateScreenshot(testPageContent),
+					]);
 
-			// run in parallel to increase speed
-			const [goldenScreenshot, testScreenshot] = await Promise.all([
-				screenshoter.generateScreenshot(goldenPageContent),
-				screenshoter.generateScreenshot(testPageContent),
-			]);
+					const compareResult = await compareScreenshots(goldenScreenshot, testScreenshot);
 
-			const compareResult = await compareScreenshots(goldenScreenshot, testScreenshot);
+					writeTestData(
+						groupName,
+						testCase.name,
+						goldenScreenshot,
+						testScreenshot,
+						compareResult,
+						goldenPageContent,
+						testPageContent
+					);
 
-			writeTestData(
-				testCase.name,
-				goldenScreenshot,
-				testScreenshot,
-				compareResult,
-				goldenPageContent,
-				testPageContent
-			);
+					expect(compareResult.diffPixelsCount).to.be.equal(0, 'number of different pixels must be 0');
 
-			expect(compareResult.diffPixelsCount).to.be.equal(0, 'number of different pixels must be 0');
+					removeTestCaseFolder(groupName, testCase.name);
+				});
+			}
+		};
 
-			removeTestCaseFolder(testCase.name);
-		});
+		if (groupName.length === 0) {
+			registerTestGroup();
+		} else {
+			describe(groupName, registerTestGroup);
+		}
 	}
 
 	after(async () => {

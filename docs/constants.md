@@ -46,16 +46,16 @@ It has the following values:
 
     The same as percentage mode, but the first value is moved to 100.
 
-## CrossHairMode
+## CrosshairMode
 
-`CrossHairMode` enum is used to specify crosshair mode.
+`CrosshairMode` enum is used to specify crosshair mode.
 
 It has the following values:
 
-- `CrossHairMode.Magnet` - magnet mode of the crosshair.
+- `CrosshairMode.Magnet` - magnet mode of the crosshair.
 
     Crosshair horizontal line is anchored to bar close price.
 
-- `CrossHairMode.Normal` - normal mode of the crosshair.
+- `CrosshairMode.Normal` - normal mode of the crosshair.
 
     Crosshair moves freely on the chart.

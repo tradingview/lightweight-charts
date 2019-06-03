@@ -59,8 +59,8 @@ export interface LineStyleOptions {
 	color: string;
 	lineStyle: LineStyle;
 	lineWidth: LineWidth;
-	crossHairMarkerVisible: boolean;
-	crossHairMarkerRadius: number;
+	crosshairMarkerVisible: boolean;
+	crosshairMarkerRadius: number;
 }
 
 export interface AreaStyleOptions {
@@ -69,8 +69,8 @@ export interface AreaStyleOptions {
 	lineColor: string;
 	lineStyle: LineStyle;
 	lineWidth: LineWidth;
-	crossHairMarkerVisible: boolean;
-	crossHairMarkerRadius: number;
+	crosshairMarkerVisible: boolean;
+	crosshairMarkerRadius: number;
 }
 
 export interface HistogramStyleOptions {

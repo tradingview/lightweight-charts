@@ -49,8 +49,8 @@ A line series interface can be customized using the following options:
 |`color`|`string`|`#2196f3`|Line color|
 |`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
 |`lineWidth`|`number`|`3`|Line width (in pixels)|
-|`drawCrossHairMarker`|`boolean`|`true`|If `true`, the crosshair marker is shown on a chart|
-|`crossHairMarkerRadius`|`number`|`4`|Crosshair marker radius (in pixels)|
+|`drawCrosshairMarker`|`boolean`|`true`|If `true`, the crosshair marker is shown on a chart|
+|`crosshairMarkerRadius`|`number`|`4`|Crosshair marker radius (in pixels)|
 |`lineType`|[LineType](./constants.md#linetype)|`LineType.Simple`|Line type|
 
 ### Examples
@@ -62,8 +62,8 @@ A line series interface can be customized using the following options:
         color: '#f48fb1',
         lineStyle: 0,
         lineWidth: 1,
-        drawCrossHairMarker: true,
-        crossHairMarkerRadius: 6,
+        drawCrosshairMarker: true,
+        crosshairMarkerRadius: 6,
         lineType: 1,
     });
     ```

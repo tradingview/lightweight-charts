@@ -1,6 +1,6 @@
 import { ChartOptions } from '../../model/chart-model';
 
-import { crossHairOptionsDefaults } from './cross-hair-options-defaults';
+import { crosshairOptionsDefaults } from './crosshair-options-defaults';
 import { gridOptionsDefaults } from './grid-options-defaults';
 import { layoutOptionsDefaults } from './layout-options-defaults';
 import { priceScaleOptionsDefaults } from './price-scale-options-defaults';
@@ -11,7 +11,7 @@ export const chartOptionsDefaults: ChartOptions = {
 	width: 0,
 	height: 0,
 	layout: layoutOptionsDefaults,
-	crossHair: crossHairOptionsDefaults,
+	crosshair: crosshairOptionsDefaults,
 	grid: gridOptionsDefaults,
 	priceScale: priceScaleOptionsDefaults,
 	timeScale: timeScaleOptionsDefaults,

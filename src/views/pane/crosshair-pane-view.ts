@@ -1,15 +1,15 @@
 import { ensureNotNull } from '../../helpers/assertions';
 
-import { CrossHair } from '../../model/cross-hair';
-import { CrossHairRenderer, CrossHairRendererData } from '../../renderers/cross-hair-renderer';
+import { Crosshair } from '../../model/crosshair';
+import { CrosshairRenderer, CrosshairRendererData } from '../../renderers/crosshair-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IPaneView } from './ipane-view';
 
-export class CrossHairPaneView implements IPaneView {
+export class CrosshairPaneView implements IPaneView {
 	private _invalidated: boolean = true;
-	private readonly _source: CrossHair;
-	private readonly _rendererData: CrossHairRendererData = {
+	private readonly _source: Crosshair;
+	private readonly _rendererData: CrosshairRendererData = {
 		vertLine: {
 			lineWidth: 1,
 			lineStyle: 0,
@@ -27,9 +27,9 @@ export class CrossHairPaneView implements IPaneView {
 		x: 0,
 		y: 0,
 	};
-	private _renderer: CrossHairRenderer = new CrossHairRenderer(this._rendererData);
+	private _renderer: CrosshairRenderer = new CrosshairRenderer(this._rendererData);
 
-	public constructor(source: CrossHair) {
+	public constructor(source: Crosshair) {
 		this._source = source;
 	}
 
@@ -48,20 +48,20 @@ export class CrossHairPaneView implements IPaneView {
 	private _updateImpl(): void {
 		const visible = this._source.visible();
 		const pane = ensureNotNull(this._source.pane());
-		const crossHairOptions = pane.model().options().crossHair;
+		const crosshairOptions = pane.model().options().crosshair;
 
 		const data = this._rendererData;
 
 		data.horzLine.visible = visible && this._source.horzLineVisible(pane);
 		data.vertLine.visible = visible && this._source.vertLineVisible();
 
-		data.horzLine.lineWidth = crossHairOptions.horzLine.width;
-		data.horzLine.lineStyle = crossHairOptions.horzLine.style;
-		data.horzLine.color = crossHairOptions.horzLine.color;
+		data.horzLine.lineWidth = crosshairOptions.horzLine.width;
+		data.horzLine.lineStyle = crosshairOptions.horzLine.style;
+		data.horzLine.color = crosshairOptions.horzLine.color;
 
-		data.vertLine.lineWidth = crossHairOptions.vertLine.width;
-		data.vertLine.lineStyle = crossHairOptions.vertLine.style;
-		data.vertLine.color = crossHairOptions.vertLine.color;
+		data.vertLine.lineWidth = crosshairOptions.vertLine.width;
+		data.vertLine.lineStyle = crosshairOptions.vertLine.style;
+		data.vertLine.color = crosshairOptions.vertLine.color;
 
 		data.w = pane.width();
 		data.h = pane.height();

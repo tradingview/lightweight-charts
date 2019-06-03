@@ -88,7 +88,7 @@ export interface IChartApi {
 
 	/*
 	 * Adds a subscription to mouse click event
-	 * @param handler - handler (funtion) to be called on mouse click
+	 * @param handler - handler (function) to be called on mouse click
 	 */
 	subscribeClick(handler: MouseEventHandler): void;
 
@@ -102,13 +102,13 @@ export interface IChartApi {
 	 * Adds a subscription to crosshair movement to receive notifications on crosshair movements
 	 * @param handler - handler (function) to be called on crosshair move
 	 */
-	subscribeCrossHairMove(handler: MouseEventHandler): void;
+	subscribeCrosshairMove(handler: MouseEventHandler): void;
 
 	/**
 	 * Removes a subscription on crosshair movement
 	 * @param handler - previously subscribed handler
 	 */
-	unsubscribeCrossHairMove(handler: MouseEventHandler): void;
+	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
 
 	/**
 	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
