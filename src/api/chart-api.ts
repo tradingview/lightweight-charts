@@ -102,7 +102,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), areaStyleDefaults, options) as AreaSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Area', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+		const series = this._chartWidget.model().createSeries('Area', strictOptions);
 
 		const res = new SeriesApi<'Area'>(series, this);
 		this._seriesMap.set(res, series);
@@ -115,7 +115,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), barStyleDefaults, options) as BarSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Bar', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+		const series = this._chartWidget.model().createSeries('Bar', strictOptions);
 
 		const res = new SeriesApi<'Bar'>(series, this);
 		this._seriesMap.set(res, series);
@@ -129,7 +129,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), candleStyleDefaults, options) as CandleSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Candle', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+		const series = this._chartWidget.model().createSeries('Candle', strictOptions);
 
 		const res = new CandleSeriesApi(series, this);
 		this._seriesMap.set(res, series);
@@ -142,7 +142,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), histogramStyleDefaults, options) as HistogramSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Histogram', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+		const series = this._chartWidget.model().createSeries('Histogram', strictOptions);
 
 		const res = new HistogramSeriesApi(series, this);
 		this._seriesMap.set(res, series);
@@ -155,7 +155,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), lineStyleDefaults, options) as LineSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Line', strictOptions, Boolean(options.overlay), options.title, options.scaleMargins);
+		const series = this._chartWidget.model().createSeries('Line', strictOptions);
 
 		const res = new SeriesApi<'Line'>(series, this);
 		this._seriesMap.set(res, series);

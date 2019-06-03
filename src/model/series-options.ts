@@ -131,7 +131,7 @@ export interface OverlaySeriesSpecificOptions {
 }
 
 export interface NonOverlaySeriesSpecificOptions {
-	overlay?: false;
+	overlay: false;
 	scaleMargins?: never;
 }
 

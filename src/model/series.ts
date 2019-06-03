@@ -238,9 +238,15 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public applyOptions(options: DeepPartial<SeriesOptionsMap[T]>): void {
+		const overlay = this._options.overlay;
 		merge(this._options, options);
+		this._options.overlay = overlay;
 
-		// TODO: update margins
+		if (overlay && this._priceScale !== null && options.scaleMargins !== undefined) {
+			this._priceScale.applyOptions({
+				scaleMargins: this._options.scaleMargins,
+			});
+		}
 
 		this._recreateFormatter();
 		this.model().updateSource(this);
