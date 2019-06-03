@@ -1,7 +1,7 @@
-function generateBar(i, target) {
+function generateCandle(i, target) {
 	var step = (i % 20) / 5000;
 	var base = i / 5;
-	target.open = base;
+	target.open = base * (1 - step);
 	target.high = base * (1 + 2 * step);
 	target.low = base * (1 - 2 * step);
 	target.close = base * (1 + step);
@@ -16,7 +16,7 @@ function generateData() {
 		};
 		time.setUTCDate(time.getUTCDate() + 1);
 
-		generateBar(i, item);
+		generateCandle(i, item);
 		res.push(item);
 	}
 	return res;
@@ -24,16 +24,9 @@ function generateData() {
 
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container, {
-		timeScale: {
-			barSpacing: 20,
-		},
-	});
+	var chart = LightweightCharts.createChart(container);
 
-	var mainSeries = chart.addCandleSeries({
-		drawBorder: true,
-		borderColor: 'blue',
-	});
+	var mainSeries = chart.addCandleSeries();
 
 	mainSeries.setData(generateData());
 }

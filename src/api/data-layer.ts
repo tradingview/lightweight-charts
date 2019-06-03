@@ -2,7 +2,7 @@
 
 import { upperbound } from '../helpers/algorithms';
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
-import { isNumber, isString } from '../helpers/strict-type-checks';
+import { isString } from '../helpers/strict-type-checks';
 
 import { Palette } from '../model/palette';
 import { PlotRow, PlotValue } from '../model/plot-data';
@@ -10,9 +10,14 @@ import { Series } from '../model/series';
 import { Bar } from '../model/series-data';
 import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../model/time-data';
 
-import { BarData } from './ibar-series-api-base';
-import { HistogramData } from './ihistogram-series-api';
-import { LineData } from './iline-series-api-base';
+import {
+	BarData,
+	HistogramData,
+	isBusinessDay,
+	isUTCTimestamp,
+	LineData,
+	Time,
+} from './data-consumer';
 
 export interface TickMarkPacket {
 	span: number;
@@ -41,20 +46,6 @@ export interface UpdatePacket {
 	timeScaleUpdate: TimeScaleUpdatePacket;
 }
 
-export type Time = UTCTimestamp | BusinessDay | string;
-
-export function isBusinessDay(time: Time): time is BusinessDay {
-	return !isNumber(time);
-}
-
-export function isUTCTimestamp(time: Time): time is UTCTimestamp {
-	return isNumber(time);
-}
-
-export interface TimedData {
-	time: Time;
-}
-
 type TimeConverter = (time: Time) => TimePoint;
 
 function businessDayConverter(time: Time): TimePoint {
@@ -78,6 +69,8 @@ function timestampConverter(time: Time): TimePoint {
 		timestamp: time,
 	};
 }
+
+type TimedData = Pick<LineData | BarData | HistogramData, 'time'>;
 
 function selectTimeConverter(data: TimedData[]): TimeConverter | null {
 	if (data.length === 0) {

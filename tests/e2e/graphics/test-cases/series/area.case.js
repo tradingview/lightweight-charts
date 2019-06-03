@@ -14,20 +14,7 @@ function generateData() {
 
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container, {
-		crosshair: {
-			vertLine: {
-				color: '#ff0000',
-				width: 2,
-				style: LightweightCharts.LineStyle.Solid,
-			},
-			horzLine: {
-				color: '#00ff00',
-				width: 3,
-				labelVisible: false,
-			},
-		},
-	});
+	var chart = LightweightCharts.createChart(container);
 
 	var mainSeries = chart.addAreaSeries();
 

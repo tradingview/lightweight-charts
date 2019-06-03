@@ -18,9 +18,9 @@ import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
-import { PriceScale, PriceScaleMargins, PriceScaleOptions } from './price-scale';
+import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series } from './series';
-import { SeriesOptionsInternal, SeriesType } from './series-options';
+import { SeriesOptionsMap, SeriesType } from './series-options';
 import { TickMark, TimePoint, TimePointIndex } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
 import { Watermark, WatermarkOptions } from './watermark';
@@ -504,9 +504,9 @@ export class ChartModel implements IDestroyable {
 		return this._panes[0].defaultPriceScale();
 	}
 
-	public createSeries(seriesType: SeriesType, options: SeriesOptionsInternal, overlay: boolean, title?: string, scaleMargins?: Partial<PriceScaleMargins>): Series {
+	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T> {
 		const pane = this._panes[0];
-		const series = this._createSeries(options, seriesType, pane, overlay, title, scaleMargins);
+		const series = this._createSeries(options, seriesType, pane);
 		this._serieses.push(series);
 		this.lightUpdate();
 		return series;
@@ -562,16 +562,16 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
-	private _createSeries(options: SeriesOptionsInternal, seriesType: SeriesType, pane: Pane, overlay: boolean, title?: string, scaleMargins?: Partial<PriceScaleMargins>): Series {
-		const series = new Series(this, options, seriesType);
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsMap[T], seriesType: T, pane: Pane): Series<T> {
+		const series = new Series<T>(this, options, seriesType);
 
-		pane.addDataSource(series, overlay, false);
+		pane.addDataSource(series, Boolean(options.overlay), false);
 
-		if (overlay && scaleMargins !== undefined) {
-			series.priceScale().applyOptions({
-				scaleMargins,
-			});
+		if (options.overlay) {
+			// let's apply that options again to apply margins
+			series.applyOptions(options);
 		}
+
 		return series;
 	}
 }

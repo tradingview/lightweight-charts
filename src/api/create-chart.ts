@@ -14,13 +14,16 @@ export { CrosshairMode } from '../model/crosshair';
 export { PriceScaleMode } from '../model/price-scale';
 export { UTCTimestamp } from '../model/time-data';
 
-export { BarData } from './ibar-series-api-base';
 export { IChartApi, MouseEventParams } from './ichart-api';
-export { HistogramData } from './ihistogram-series-api';
-export { LineData } from './iline-series-api-base';
 export { ISeriesApi } from './iseries-api';
 
-export { isBusinessDay, isUTCTimestamp } from './data-layer';
+export {
+	BarData,
+	HistogramData,
+	isBusinessDay,
+	isUTCTimestamp,
+	LineData,
+} from './data-consumer';
 
 /**
  * This function is the main entry point of the Lightweight Charting Library

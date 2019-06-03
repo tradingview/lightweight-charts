@@ -5,7 +5,7 @@ import { VolumeFormatter } from '../formatters/volume-formatter';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
-import { clone, DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
+import { isInteger, merge } from '../helpers/strict-type-checks';
 
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
@@ -33,8 +33,11 @@ import { PriceScale } from './price-scale';
 import { SeriesBarColorer } from './series-bar-colorer';
 import { Bar, barFunction, SeriesData, SeriesPlotIndex } from './series-data';
 import {
-	SeriesOptions,
-	SeriesOptionsInternal,
+	AreaStyleOptions,
+	HistogramStyleOptions,
+	LineStyleOptions,
+	SeriesOptionsMap,
+	SeriesPartialOptionsMap,
 	SeriesType,
 } from './series-options';
 import { TimePointIndex } from './time-data';
@@ -71,8 +74,8 @@ export interface MarkerData {
 	radius: number;
 }
 
-export class Series extends PriceDataSource implements IDestroyable {
-	private readonly _seriesType: SeriesType;
+export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
+	private readonly _seriesType: T;
 	private _data: SeriesData = new SeriesData();
 	private readonly _priceAxisViews: IPriceAxisView[];
 	private readonly _panePriceAxisView: PanePriceAxisView;
@@ -82,11 +85,11 @@ export class Series extends PriceDataSource implements IDestroyable {
 	private _endOfData: boolean = false;
 	private _paneView: IUpdatablePaneView | null = null;
 	private _barColorerCache: SeriesBarColorer | null = null;
-	private readonly _options: SeriesOptionsInternal;
+	private readonly _options: SeriesOptionsMap[T];
 	private _barFunction: BarFunction;
 	private _palette: Palette = new Palette();
 
-	public constructor(model: ChartModel, options: SeriesOptionsInternal, seriesType: SeriesType) {
+	public constructor(model: ChartModel, options: SeriesOptionsMap[T], seriesType: T) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
@@ -194,27 +197,27 @@ export class Series extends PriceDataSource implements IDestroyable {
 		this._paneView = null;
 		switch (this._seriesType) {
 			case 'Bar': {
-				this._paneView = new SeriesBarsPaneView(this, this.model());
+				this._paneView = new SeriesBarsPaneView(this as Series<'Bar'>, this.model());
 				break;
 			}
 
 			case 'Candle': {
-				this._paneView = new SeriesCandlesPaneView(this, this.model());
+				this._paneView = new SeriesCandlesPaneView(this as Series<'Candle'>, this.model());
 				break;
 			}
 
 			case 'Line': {
-				this._paneView = new SeriesLinePaneView(this, this.model());
+				this._paneView = new SeriesLinePaneView(this as Series<'Line'>, this.model());
 				break;
 			}
 
 			case 'Area': {
-				this._paneView = new SeriesAreaPaneView(this, this.model());
+				this._paneView = new SeriesAreaPaneView(this as Series<'Area'>, this.model());
 				break;
 			}
 
 			case 'Histogram': {
-				this._paneView = new SeriesHistogramPaneView(this, this.model());
+				this._paneView = new SeriesHistogramPaneView(this as Series<'Histogram'>, this.model());
 				break;
 			}
 
@@ -231,55 +234,20 @@ export class Series extends PriceDataSource implements IDestroyable {
 		return this._barColorerCache;
 	}
 
-	public internalOptions(): SeriesOptionsInternal {
+	public options(): Readonly<SeriesOptionsMap[T]> {
 		return this._options;
 	}
 
-	public options(): SeriesOptions {
-		const result = clone(this._options) as unknown as SeriesOptions;
+	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
+		const overlay = this._options.overlay;
+		merge(this._options, options);
+		this._options.overlay = overlay;
 
-		switch (this._seriesType) {
-			case 'Bar':
-				merge(result, this._options.barStyle);
-				break;
-			case 'Candle':
-				merge(result, this._options.candleStyle);
-				break;
-			case 'Area':
-				merge(result, this._options.areaStyle);
-				break;
-			case 'Line':
-				merge(result, this._options.lineStyle);
-				break;
-			case 'Histogram':
-				merge(result, this._options.histogramStyle);
-				break;
+		if (overlay && this._priceScale !== null && options.scaleMargins !== undefined) {
+			this._priceScale.applyOptions({
+				scaleMargins: this._options.scaleMargins,
+			});
 		}
-
-		return result;
-	}
-
-	public applyOptions(options: DeepPartial<SeriesOptions>): void {
-		switch (this._seriesType) {
-			case 'Bar':
-				merge(this._options.barStyle, options, true);
-				break;
-			case 'Candle':
-				merge(this._options.candleStyle, options, true);
-				break;
-			case 'Area':
-				merge(this._options.areaStyle, options, true);
-				break;
-			case 'Line':
-				merge(this._options.lineStyle, options, true);
-				break;
-			case 'Histogram':
-				merge(this._options.histogramStyle, options, true);
-				break;
-		}
-
-		merge(this._options, options, true);
-		// TODO: update margins
 
 		this._recreateFormatter();
 		this.model().updateSource(this);
@@ -408,7 +376,8 @@ export class Series extends PriceDataSource implements IDestroyable {
 				new PriceRange(-0.5, 0.5);
 
 		if (this.seriesType() === 'Histogram') {
-			range = range.merge(new PriceRange(this._options.histogramStyle.base, this._options.histogramStyle.base));
+			const base = (this._options as HistogramStyleOptions).base;
+			range = range.merge(new PriceRange(base, base));
 		}
 
 		return range;
@@ -454,8 +423,9 @@ export class Series extends PriceDataSource implements IDestroyable {
 	}
 
 	public markerDataAtIndex(index: TimePointIndex): MarkerData | null {
-		const getValue = (this._seriesType === 'Line' && this._options.lineStyle.crosshairMarkerVisible) ||
-			(this._seriesType === 'Area' && this._options.areaStyle.crosshairMarkerVisible);
+		const getValue = (this._seriesType === 'Line' || this._seriesType === 'Area') &&
+			(this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerVisible;
+
 		if (!getValue) {
 			return null;
 		}
@@ -469,18 +439,16 @@ export class Series extends PriceDataSource implements IDestroyable {
 	}
 
 	public title(): string {
-		return this._options.title || '';
+		return this._options.title;
 	}
 
 	private _markerRadius(): number {
 		switch (this._seriesType) {
-			case 'Line': {
-				return this._options.lineStyle.crosshairMarkerRadius;
-			}
-			case 'Area': {
-				return this._options.areaStyle.crosshairMarkerRadius;
-			}
+			case 'Line':
+			case 'Area':
+				return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerRadius;
 		}
+
 		return 0;
 	}
 

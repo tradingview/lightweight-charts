@@ -7,13 +7,16 @@ export { CrosshairMode } from './model/crosshair';
 export { PriceScaleMode } from './model/price-scale';
 export { UTCTimestamp } from './model/time-data';
 
-export { BarData } from './api/ibar-series-api-base';
+export {
+	BarData,
+	HistogramData,
+	isBusinessDay,
+	isUTCTimestamp,
+	LineData,
+} from './api/data-consumer';
 export { IChartApi, MouseEventParams } from './api/ichart-api';
-export { HistogramData } from './api/ihistogram-series-api';
-export { LineData } from './api/iline-series-api-base';
 export { ISeriesApi } from './api/iseries-api';
 
-export { isBusinessDay, isUTCTimestamp } from './api/data-layer';
 export { createChart } from './api/create-chart';
 
 export function version(): string {
