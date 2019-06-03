@@ -565,10 +565,11 @@ export class ChartModel implements IDestroyable {
 	private _createSeries<T extends SeriesType>(options: SeriesOptionsMap[T], seriesType: T, pane: Pane): Series<T> {
 		const series = new Series<T>(this, options, seriesType);
 
-		pane.addDataSource(series, options.overlay, false);
+		pane.addDataSource(series, Boolean(options.overlay), false);
 
-		if (options.overlay && options.scaleMargins !== undefined) {
-			series.applyOptions(options as unknown as DeepPartial<SeriesOptionsMap[T]>);
+		if (options.overlay) {
+			// let's apply that options again to apply margins
+			series.applyOptions(options);
 		}
 
 		return series;

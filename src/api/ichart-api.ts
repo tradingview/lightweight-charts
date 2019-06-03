@@ -3,11 +3,11 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { ChartOptions } from '../model/chart-model';
 import { Point } from '../model/point';
 import {
-	AreaSeriesOptions,
-	BarSeriesOptions,
-	CandleSeriesOptions,
-	HistogramSeriesOptions,
-	LineSeriesOptions,
+	AreaSeriesPartialOptions,
+	BarSeriesPartialOptions,
+	CandleSeriesPartialOptions,
+	HistogramSeriesPartialOptions,
+	LineSeriesPartialOptions,
 	SeriesType,
 } from '../model/series-options';
 import { BusinessDay, UTCTimestamp } from '../model/time-data';
@@ -47,35 +47,35 @@ export interface IChartApi {
 	 * @param [areaParams = undefined] - customization parameters of the series being created
 	 * @return an interface of the created series
 	 */
-	addAreaSeries(areaParams?: DeepPartial<AreaSeriesOptions>): ISeriesApi<'Area'>;
+	addAreaSeries(areaParams?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
 
 	/**
 	 * Creates a bar series with specified parameters
 	 * @param [barParams = undefined] - customization parameters of the series being created
 	 * @return an interface of the created series
 	 */
-	addBarSeries(barParams?: DeepPartial<BarSeriesOptions>): ISeriesApi<'Bar'>;
+	addBarSeries(barParams?: BarSeriesPartialOptions): ISeriesApi<'Bar'>;
 
 	/**
 	 * Creates a candle series with specified parameters
 	 * @param [candleParams = undefined] - customization parameters of the series being created
 	 * @return an interface of the created series
 	 */
-	addCandleSeries(candleParams?: DeepPartial<CandleSeriesOptions>): ISeriesApi<'Candle'>;
+	addCandleSeries(candleParams?: CandleSeriesPartialOptions): ISeriesApi<'Candle'>;
 
 	/**
 	 * Creates a histogram series with specified parameters
 	 * @param [histogramParams=undefined] - customization parameters of the series being created
 	 * @return an interface of the created series
 	 */
-	addHistogramSeries(histogramParams?: DeepPartial<HistogramSeriesOptions>): ISeriesApi<'Histogram'>;
+	addHistogramSeries(histogramParams?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram'>;
 
 	/**
 	 * Creates a line series with specified parameters
 	 * @param [lineParams=undefined] - customization parameters of the series being created
 	 * @return an interface of the created series
 	 */
-	addLineSeries(lineParams?: DeepPartial<LineSeriesOptions>): ISeriesApi<'Line'>;
+	addLineSeries(lineParams?: LineSeriesPartialOptions): ISeriesApi<'Line'>;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it

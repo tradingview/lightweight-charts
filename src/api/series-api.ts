@@ -1,10 +1,14 @@
 import { IDestroyable } from '../helpers/idestroyable';
-import { clone, DeepPartial } from '../helpers/strict-type-checks';
+import { clone } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { Series } from '../model/series';
-import { SeriesOptionsMap, SeriesType } from '../model/series-options';
+import {
+	SeriesOptionsMap,
+	SeriesPartialOptionsMap,
+	SeriesType,
+} from '../model/series-options';
 
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceFormatter, ISeriesApi } from './iseries-api';
@@ -48,7 +52,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		this._dataUpdatesConsumer.updateData(this._series, bar);
 	}
 
-	public applyOptions(options: DeepPartial<SeriesOptionsMap[TSeriesType]>): void {
+	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {
 		this._series.applyOptions(options);
 	}
 

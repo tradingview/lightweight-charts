@@ -9,11 +9,16 @@ import { Palette } from '../model/palette';
 import { Series } from '../model/series';
 import {
 	AreaSeriesOptions,
+	AreaSeriesPartialOptions,
 	BarSeriesOptions,
+	BarSeriesPartialOptions,
 	CandleSeriesOptions,
+	CandleSeriesPartialOptions,
 	fillUpDownCandlesColors,
 	HistogramSeriesOptions,
+	HistogramSeriesPartialOptions,
 	LineSeriesOptions,
+	LineSeriesPartialOptions,
 	precisionByMinMove,
 	PriceFormat,
 	SeriesType,
@@ -98,7 +103,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.resize(height, width, forceRepaint);
 	}
 
-	public addAreaSeries(options: DeepPartial<AreaSeriesOptions> = {}): ISeriesApi<'Area'> {
+	public addAreaSeries(options: AreaSeriesPartialOptions = {}): ISeriesApi<'Area'> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), areaStyleDefaults, options) as AreaSeriesOptions;
@@ -111,7 +116,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return res;
 	}
 
-	public addBarSeries(options: DeepPartial<BarSeriesOptions> = {}): ISeriesApi<'Bar'> {
+	public addBarSeries(options: BarSeriesPartialOptions = {}): ISeriesApi<'Bar'> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), barStyleDefaults, options) as BarSeriesOptions;
@@ -124,7 +129,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return res;
 	}
 
-	public addCandleSeries(options: DeepPartial<CandleSeriesOptions> = {}): ISeriesApi<'Candle'> {
+	public addCandleSeries(options: CandleSeriesPartialOptions = {}): ISeriesApi<'Candle'> {
 		fillUpDownCandlesColors(options);
 		patchPriceFormat(options.priceFormat);
 
@@ -138,7 +143,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return res;
 	}
 
-	public addHistogramSeries(options: DeepPartial<HistogramSeriesOptions> = {}): ISeriesApi<'Histogram'> {
+	public addHistogramSeries(options: HistogramSeriesPartialOptions = {}): ISeriesApi<'Histogram'> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), histogramStyleDefaults, options) as HistogramSeriesOptions;
@@ -151,7 +156,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return res;
 	}
 
-	public addLineSeries(options: DeepPartial<LineSeriesOptions> = {}): ISeriesApi<'Line'> {
+	public addLineSeries(options: LineSeriesPartialOptions = {}): ISeriesApi<'Line'> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), lineStyleDefaults, options) as LineSeriesOptions;

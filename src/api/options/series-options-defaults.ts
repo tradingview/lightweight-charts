@@ -4,7 +4,7 @@ import {
 	CandleStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
-	SeriesOptionsBase,
+	SeriesOptionsCommon,
 } from '../../model/series-options';
 import { LineStyle } from '../../renderers/draw-line';
 
@@ -52,8 +52,8 @@ export const histogramStyleDefaults: HistogramStyleOptions = {
 	lineWidth: 2,
 };
 
-export const seriesOptionsDefaults: SeriesOptionsBase = {
-	overlay: false,
+export const seriesOptionsDefaults: SeriesOptionsCommon = {
+	title: '',
 	lastValueVisible: true,
 	priceLineVisible: true,
 	priceLineWidth: 1,

@@ -1,8 +1,10 @@
-import { DeepPartial } from '../helpers/strict-type-checks';
-
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
-import { SeriesOptionsMap, SeriesType } from '../model/series-options';
+import {
+	SeriesOptionsMap,
+	SeriesPartialOptionsMap,
+	SeriesType,
+} from '../model/series-options';
 
 import { SeriesDataItemTypeMap } from './data-consumer';
 
@@ -33,7 +35,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * Applies new options to the existing series
 	 * @param options - any subset of options
 	 */
-	applyOptions(options: DeepPartial<SeriesOptionsMap[TSeriesType]>): void;
+	applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void;
 
 	/**
 	 * Returns currently applied options

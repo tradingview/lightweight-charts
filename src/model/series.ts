@@ -5,7 +5,7 @@ import { VolumeFormatter } from '../formatters/volume-formatter';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
-import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
+import { isInteger, merge } from '../helpers/strict-type-checks';
 
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
@@ -37,6 +37,7 @@ import {
 	HistogramStyleOptions,
 	LineStyleOptions,
 	SeriesOptionsMap,
+	SeriesPartialOptionsMap,
 	SeriesType,
 } from './series-options';
 import { TimePointIndex } from './time-data';
@@ -237,7 +238,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options;
 	}
 
-	public applyOptions(options: DeepPartial<SeriesOptionsMap[T]>): void {
+	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
 		const overlay = this._options.overlay;
 		merge(this._options, options);
 		this._options.overlay = overlay;
@@ -438,7 +439,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public title(): string {
-		return this._options.title || '';
+		return this._options.title;
 	}
 
 	private _markerRadius(): number {

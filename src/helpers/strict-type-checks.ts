@@ -12,7 +12,11 @@ export type DeepPartial<T> = {
 export function merge(dst: Record<string, any>, ...sources: Record<string, any>[]): Record<string, any> {
 	for (const src of sources) {
 		for (const i in src) {
-			if ('object' !== typeof src[i] || !dst.hasOwnProperty(i)) {
+			if (src[i] === undefined) {
+				continue;
+			}
+
+			if ('object' !== typeof src[i] || dst[i] === undefined) {
 				dst[i] = src[i];
 			} else {
 				merge(dst[i], src[i]);
