@@ -1,15 +1,9 @@
 # https://circleci.com/docs/2.0/configuration-reference
 
-version: 2
+version: 2.1
 
 
 aliases:
-  - &docker-node-latest
-    - image: circleci/node:latest
-
-  - &docker-node-browsers-latest
-    - image: circleci/node:latest-browsers
-
   - &restore-node-modules-cache
       name: Restore node_modules cache
       keys:
@@ -28,20 +22,36 @@ aliases:
           - /.*/
 
 
-jobs:
-  install-deps:
-    docker: *docker-node-latest
+executors:
+  node-latest-executor:
+    docker:
+      - image: circleci/node:latest
+
+  node-browsers-latest-executor:
+    docker:
+      - image: circleci/node:latest-browsers
+
+
+commands:
+  checkout-with-deps:
+    description: "Checkout the code with restore npm dependencies"
     steps:
       - checkout
       - restore_cache: *restore-node-modules-cache
+
+
+jobs:
+  install-deps:
+    executor: node-latest-executor
+    steps:
+      - checkout-with-deps
       - run: npm install
       - save_cache: *save-node-modules-cache
 
   build:
-    docker: *docker-node-latest
+    executor: node-latest-executor
     steps:
-      - checkout
-      - restore_cache: *restore-node-modules-cache
+      - checkout-with-deps
       - run: npm run tsc-all
       - run: npm run build
       - persist_to_workspace:
@@ -51,65 +61,59 @@ jobs:
             - dist
 
   no-crlf:
-    docker: *docker-node-latest
+    executor: node-latest-executor
     steps:
       - checkout
       - run: scripts/no-crlf.sh
 
   trailing-lf:
-    docker: *docker-node-latest
+    executor: node-latest-executor
     steps:
       - checkout
       - run: scripts/trailing-newlines.sh
 
   eslint:
-    docker: *docker-node-latest
+    executor: node-latest-executor
     steps:
-      - checkout
-      - restore_cache: *restore-node-modules-cache
+      - checkout-with-deps
       - run: npm run lint:eslint
 
   tslint:
-    docker: *docker-node-latest
+    executor: node-latest-executor
     steps:
-      - checkout
-      - restore_cache: *restore-node-modules-cache
+      - checkout-with-deps
       - run: npm run lint:tslint
 
   markdownlint:
-    docker: *docker-node-latest
+    executor: node-latest-executor
     steps:
-      - checkout
-      - restore_cache: *restore-node-modules-cache
+      - checkout-with-deps
       - run: npm run lint:md
 
   unittests:
-    docker: *docker-node-latest
+    executor: node-latest-executor
     steps:
-      - checkout
-      - restore_cache: *restore-node-modules-cache
+      - checkout-with-deps
       - run: npm run test
 
   graphics-tests:
-    docker: *docker-node-browsers-latest
+    executor: node-browsers-latest-executor
     environment:
       NO_SANDBOX: "true"
       CMP_OUT_DIR: ./graphics-cmp-data
     steps:
-      - checkout
-      - restore_cache: *restore-node-modules-cache
+      - checkout-with-deps
       - run: scripts/run-graphics-tests.sh
       - store_artifacts:
           path: ./graphics-cmp-data
           when: on_fail
 
   memleaks-tests:
-    docker: *docker-node-browsers-latest
+    executor: node-browsers-latest-executor
     environment:
       NO_SANDBOX: "true"
     steps:
-      - checkout
-      - restore_cache: *restore-node-modules-cache
+      - checkout-with-deps
       - attach_workspace:
           at: ./
       - run: scripts/run-memleaks-tests.sh
