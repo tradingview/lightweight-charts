@@ -37,7 +37,7 @@ function getConfig(inputFile, type, isProd) {
 			replace({
 				values: {
 					// make sure that this values are synced with src/typings/globals/index.d.ts
-					'process.env.BUILD_ENV': JSON.stringify(isProd ? 'production' : 'development'),
+					'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
 					'process.env.BUILD_VERSION': JSON.stringify(currentVersion),
 				},
 			}),
