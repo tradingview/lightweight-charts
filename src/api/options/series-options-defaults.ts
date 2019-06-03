@@ -35,8 +35,8 @@ export const seriesOptionsDefaults: SeriesOptionsInternal = {
 		color: '#2196f3',
 		lineStyle: LineStyle.Solid,
 		lineWidth: 3,
-		crossHairMarkerVisible: true,
-		crossHairMarkerRadius: 4,
+		crosshairMarkerVisible: true,
+		crosshairMarkerRadius: 4,
 	},
 	areaStyle: {
 		topColor: 'rgba( 46, 220, 135, 0.4)',
@@ -44,8 +44,8 @@ export const seriesOptionsDefaults: SeriesOptionsInternal = {
 		lineColor: '#33D778',
 		lineStyle: LineStyle.Solid,
 		lineWidth: 3,
-		crossHairMarkerVisible: true,
-		crossHairMarkerRadius: 4,
+		crosshairMarkerVisible: true,
+		crosshairMarkerRadius: 4,
 	},
 	histogramStyle: {
 		color: '#26a69a',

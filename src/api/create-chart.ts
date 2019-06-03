@@ -10,7 +10,7 @@ import { chartOptionsDefaults } from './options/chart-options-defaults';
 export { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
 export { BarPrice } from '../model/bar';
-export { CrossHairMode } from '../model/cross-hair';
+export { CrosshairMode } from '../model/crosshair';
 export { PriceScaleMode } from '../model/price-scale';
 export { UTCTimestamp } from '../model/time-data';
 

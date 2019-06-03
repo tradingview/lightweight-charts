@@ -228,7 +228,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		if (type === InvalidationLevel.Cursor) {
-			this._drawCrossHairLabel(this._topCanvasContext);
+			this._drawCrosshairLabel(this._topCanvasContext);
 			return;
 		}
 
@@ -238,8 +238,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		this._drawTickMarks(ctx);
 		this._drawBackLabels(ctx);
-		this._chart.model().crossHairSource().updateAllViews();
-		this._drawCrossHairLabel(this._topCanvasContext);
+		this._chart.model().crosshairSource().updateAllViews();
+		this._drawCrosshairLabel(this._topCanvasContext);
 
 		if (this._stub !== null) {
 			this._stub.paint(type);
@@ -340,7 +340,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		const model = this._chart.model();
 		const sources = model.dataSources();
-		topLevelSources.add(model.crossHairSource());
+		topLevelSources.add(model.crosshairSource());
 
 		const rendererOptions = this._getRendererOptions();
 		for (const source of sources) {
@@ -357,14 +357,14 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		ctx.restore();
 	}
 
-	private _drawCrossHairLabel(ctx: CanvasRenderingContext2D): void {
+	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D): void {
 		this._topCanvasContext.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 
 		const model = this._chart.model();
 
 		const views: ReadonlyArray<TimeAxisView>[] = []; // array of arrays
 
-		const timeAxisViews = model.crossHairSource().timeAxisViews();
+		const timeAxisViews = model.crosshairSource().timeAxisViews();
 		views.push(timeAxisViews);
 
 		const renderingOptions = this._getRendererOptions();

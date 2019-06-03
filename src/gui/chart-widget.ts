@@ -38,7 +38,7 @@ export class ChartWidget implements IDestroyable {
 	private _invalidateMask: InvalidateMask | null = null;
 	private _drawPlanned: boolean = false;
 	private _clicked: Delegate<MouseEventParamsImpl> = new Delegate();
-	private _crossHairMoved: Delegate<MouseEventParamsImpl> = new Delegate();
+	private _crosshairMoved: Delegate<MouseEventParamsImpl> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
 	public constructor(container: HTMLElement, options: ChartOptions) {
@@ -60,7 +60,7 @@ export class ChartWidget implements IDestroyable {
 			this._invalidateHandler.bind(this),
 			this._options
 		);
-		this.model().crossHairMoved().subscribe(this._onPaneWidgetCrossHairMoved.bind(this), this);
+		this.model().crosshairMoved().subscribe(this._onPaneWidgetCrosshairMoved.bind(this), this);
 
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
@@ -112,7 +112,7 @@ export class ChartWidget implements IDestroyable {
 			window.cancelAnimationFrame(this._drawRafId);
 		}
 
-		this._model.crossHairMoved().unsubscribeAll(this);
+		this._model.crosshairMoved().unsubscribeAll(this);
 		this._model.timeScale().optionsApplied().unsubscribeAll(this);
 		this._model.destroy();
 
@@ -134,7 +134,7 @@ export class ChartWidget implements IDestroyable {
 			this._element.parentElement.removeChild(this._element);
 		}
 
-		this._crossHairMoved.destroy();
+		this._crosshairMoved.destroy();
 		this._clicked.destroy();
 
 		delete this._element;
@@ -196,8 +196,8 @@ export class ChartWidget implements IDestroyable {
 		return this._clicked;
 	}
 
-	public crossHairMoved(): ISubscription<MouseEventParamsImpl> {
-		return this._crossHairMoved;
+	public crosshairMoved(): ISubscription<MouseEventParamsImpl> {
+		return this._crosshairMoved;
 	}
 
 	public disableBranding(): void {
@@ -449,9 +449,9 @@ export class ChartWidget implements IDestroyable {
 		this._clicked.fire(param);
 	}
 
-	private _onPaneWidgetCrossHairMoved(time: TimePointIndex | null, point: Point | null): void {
+	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
 		const param = this._getMouseEventParamsImpl(time, point);
-		this._crossHairMoved.fire(param);
+		this._crosshairMoved.fire(param);
 	}
 
 	private _updateTimeAxisVisibility(): void {

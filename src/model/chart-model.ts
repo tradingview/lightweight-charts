@@ -8,7 +8,7 @@ import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-rend
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
 import { Coordinate } from './coordinate';
-import { CrossHair, CrossHairOptions } from './cross-hair';
+import { Crosshair, CrosshairOptions } from './crosshair';
 import { Grid, GridOptions } from './grid';
 import { IDataSource } from './idata-source';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
@@ -55,7 +55,7 @@ export interface ChartOptions {
 	/** Structure with time scale options */
 	timeScale: TimeScaleOptions;
 	/** Structure with crosshair options */
-	crossHair: CrossHairOptions;
+	crosshair: CrosshairOptions;
 	/** Structure with grid options */
 	grid: GridOptions;
 	/** Structure with localization options */
@@ -75,7 +75,7 @@ export class ChartModel implements IDestroyable {
 	private readonly _timeScale: TimeScale;
 	private readonly _panes: Pane[] = [];
 	private readonly _grid: Grid;
-	private readonly _crossHair: CrossHair;
+	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
 
@@ -85,7 +85,7 @@ export class ChartModel implements IDestroyable {
 	private _initialTimeScrollPos: number | null = null;
 	private _hoveredSource: IDataSource | null = null;
 	private readonly _mainPriceScaleOptionsChanged: Delegate = new Delegate();
-	private _crossHairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
+	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
 
 	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptions) {
 		this._invalidateHandler = invalidateHandler;
@@ -95,8 +95,8 @@ export class ChartModel implements IDestroyable {
 
 		this._timeScale = new TimeScale(this, options.timeScale, this._options.localization);
 		this._grid = new Grid();
-		this._crossHair = new CrossHair(this, options.crossHair);
-		this._magnet = new Magnet(options.crossHair);
+		this._crosshair = new Crosshair(this, options.crosshair);
+		this._magnet = new Magnet(options.crosshair);
 		this._watermark = new Watermark(this, options.watermark);
 
 		this.createPane();
@@ -174,12 +174,12 @@ export class ChartModel implements IDestroyable {
 		return this._watermark;
 	}
 
-	public crossHairSource(): CrossHair {
-		return this._crossHair;
+	public crosshairSource(): Crosshair {
+		return this._crosshair;
 	}
 
-	public crossHairMoved(): ISubscription<TimePointIndex | null, Point | null> {
-		return this._crossHairMoved;
+	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null> {
+		return this._crosshairMoved;
 	}
 
 	public width(): number {
@@ -292,7 +292,7 @@ export class ChartModel implements IDestroyable {
 
 		timeScale.zoom(pointX, scale);
 
-		this.updateCrossHair();
+		this.updateCrosshair();
 		this.recalculateAllPanes();
 		this.lightUpdate();
 	}
@@ -328,7 +328,7 @@ export class ChartModel implements IDestroyable {
 
 		this._timeScale.scrollTo(x);
 		this.recalculateAllPanes();
-		this.updateCrossHair();
+		this.updateCrosshair();
 		this.lightUpdate();
 		return res;
 	}
@@ -343,7 +343,7 @@ export class ChartModel implements IDestroyable {
 	public resetTimeScale(): void {
 		this._timeScale.restoreDefault();
 		this.recalculateAllPanes();
-		this.updateCrossHair();
+		this.updateCrosshair();
 		this.lightUpdate();
 	}
 
@@ -365,7 +365,7 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, pane: Pane): void {
-		this._crossHair.saveOriginCoord(x, y);
+		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
 		const index = this._timeScale.coordinateToIndex(x);
 
@@ -379,25 +379,25 @@ export class ChartModel implements IDestroyable {
 			price = this._magnet.align(price, index, pane);
 		}
 
-		this._crossHair.setPosition(index, price, pane);
+		this._crosshair.setPosition(index, price, pane);
 
 		this._cursorUpdate();
-		this._crossHairMoved.fire(this._crossHair.appliedIndex(), { x, y });
+		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
 	}
 
 	public clearCurrentPosition(): void {
-		const crossHair = this.crossHairSource();
-		crossHair.clearPosition();
+		const crosshair = this.crosshairSource();
+		crosshair.clearPosition();
 		this._cursorUpdate();
-		this._crossHairMoved.fire(null, null);
+		this._crosshairMoved.fire(null, null);
 	}
 
-	public updateCrossHair(): void {
+	public updateCrosshair(): void {
 		// rapply magnet
-		const pane = this._crossHair.pane();
+		const pane = this._crosshair.pane();
 		if (pane !== null) {
-			const x = this._crossHair.originCoordX();
-			const y = this._crossHair.originCoordY();
+			const x = this._crosshair.originCoordX();
+			const y = this._crosshair.originCoordY();
 			this.setAndSaveCurrentPosition(x, y, pane);
 		}
 	}
@@ -446,7 +446,7 @@ export class ChartModel implements IDestroyable {
 			timeScale.setBaseIndex(lastSeriesBarIndex);
 		}
 
-		this.updateCrossHair();
+		this.updateCrosshair();
 		this.recalculateAllPanes();
 		this.lightUpdate();
 	}

@@ -1,18 +1,18 @@
-import { CrossHair, CrossHairPriceAndCoordinate } from '../../model/cross-hair';
+import { Crosshair, CrosshairPriceAndCoordinate } from '../../model/crosshair';
 import { PriceScale } from '../../model/price-scale';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
 
 import { PriceAxisView } from './price-axis-view';
 
-export type CrossHairPriceAxisViewValueProvider = (priceScale: PriceScale) => CrossHairPriceAndCoordinate;
+export type CrosshairPriceAxisViewValueProvider = (priceScale: PriceScale) => CrosshairPriceAndCoordinate;
 
-export class CrossHairPriceAxisView extends PriceAxisView {
-	private _source: CrossHair;
+export class CrosshairPriceAxisView extends PriceAxisView {
+	private _source: Crosshair;
 	private _background: string = '#4c525e';
 	private readonly _priceScale: PriceScale;
-	private readonly _valueProvider: CrossHairPriceAxisViewValueProvider;
+	private readonly _valueProvider: CrosshairPriceAxisViewValueProvider;
 
-	public constructor(source: CrossHair, priceScale: PriceScale, valueProvider: CrossHairPriceAxisViewValueProvider) {
+	public constructor(source: Crosshair, priceScale: PriceScale, valueProvider: CrosshairPriceAxisViewValueProvider) {
 		super();
 		this._source = source;
 		this._priceScale = priceScale;

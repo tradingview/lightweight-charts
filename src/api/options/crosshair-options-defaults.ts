@@ -1,7 +1,7 @@
-import { CrossHairMode, CrossHairOptions } from '../../model/cross-hair';
+import { CrosshairMode, CrosshairOptions } from '../../model/crosshair';
 import { LineStyle } from '../../renderers/draw-line';
 
-export const crossHairOptionsDefaults: CrossHairOptions = {
+export const crosshairOptionsDefaults: CrosshairOptions = {
 	vertLine: {
 		color: '#758696',
 		width: 1,
@@ -16,5 +16,5 @@ export const crossHairOptionsDefaults: CrossHairOptions = {
 		visible: true,
 		labelVisible: true,
 	},
-	mode: CrossHairMode.Magnet,
+	mode: CrosshairMode.Magnet,
 };

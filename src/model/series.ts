@@ -297,7 +297,7 @@ export class Series extends PriceDataSource implements IDestroyable {
 		const sourcePane = this.model().paneForSource(this);
 		this.model().recalculatePane(sourcePane);
 		this.model().updateSource(this);
-		this.model().updateCrossHair();
+		this.model().updateCrosshair();
 		this.model().lightUpdate();
 	}
 
@@ -309,7 +309,7 @@ export class Series extends PriceDataSource implements IDestroyable {
 		const sourcePane = this.model().paneForSource(this);
 		this.model().recalculatePane(sourcePane);
 		this.model().updateSource(this);
-		this.model().updateCrossHair();
+		this.model().updateCrosshair();
 		this.model().lightUpdate();
 	}
 
@@ -454,8 +454,8 @@ export class Series extends PriceDataSource implements IDestroyable {
 	}
 
 	public markerDataAtIndex(index: TimePointIndex): MarkerData | null {
-		const getValue = (this._seriesType === 'Line' && this._options.lineStyle.crossHairMarkerVisible) ||
-			(this._seriesType === 'Area' && this._options.areaStyle.crossHairMarkerVisible);
+		const getValue = (this._seriesType === 'Line' && this._options.lineStyle.crosshairMarkerVisible) ||
+			(this._seriesType === 'Area' && this._options.areaStyle.crosshairMarkerVisible);
 		if (!getValue) {
 			return null;
 		}
@@ -475,10 +475,10 @@ export class Series extends PriceDataSource implements IDestroyable {
 	private _markerRadius(): number {
 		switch (this._seriesType) {
 			case 'Line': {
-				return this._options.lineStyle.crossHairMarkerRadius;
+				return this._options.lineStyle.crosshairMarkerRadius;
 			}
 			case 'Area': {
-				return this._options.areaStyle.crossHairMarkerRadius;
+				return this._options.areaStyle.crosshairMarkerRadius;
 			}
 		}
 		return 0;

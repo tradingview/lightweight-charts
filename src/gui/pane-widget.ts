@@ -244,7 +244,7 @@ export class PaneWidget implements IDestroyable {
 
 		if (this._clicked.hasListeners()) {
 			const model = this._chart.model();
-			const currentTime = model.crossHairSource().appliedIndex();
+			const currentTime = model.crosshairSource().appliedIndex();
 			this._clicked.fire(currentTime, { x, y });
 		}
 	}
@@ -455,7 +455,7 @@ export class PaneWidget implements IDestroyable {
 		this._topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 
 		if (type === InvalidationLevel.Cursor) {
-			this._drawCrossHair(this._topCtx);
+			this._drawCrosshair(this._topCtx);
 		} else {
 			this._drawBackground(this._ctx, this._backgroundColor());
 
@@ -464,7 +464,7 @@ export class PaneWidget implements IDestroyable {
 				this._drawWatermark(this._ctx);
 				this._drawSources(this._ctx);
 
-				this._drawCrossHair(this._topCtx);
+				this._drawCrosshair(this._topCtx);
 			}
 		}
 	}
@@ -545,21 +545,21 @@ export class PaneWidget implements IDestroyable {
 		}
 	}
 
-	private _drawCrossHair(ctx: CanvasRenderingContext2D): void {
-		this._drawSource(this._chart.model().crossHairSource(), ctx);
+	private _drawCrosshair(ctx: CanvasRenderingContext2D): void {
+		this._drawSource(this._chart.model().crosshairSource(), ctx);
 	}
 
 	private _drawSources(ctx: CanvasRenderingContext2D): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
-		const crossHairSource = this._chart.model().crossHairSource();
+		const crosshairSource = this._chart.model().crosshairSource();
 
 		for (const source of sources) {
 			this._drawSourceBackground(source, ctx);
 		}
 
 		for (const source of sources) {
-			if (source !== crossHairSource) {
+			if (source !== crosshairSource) {
 				this._drawSource(source, ctx);
 			}
 		}

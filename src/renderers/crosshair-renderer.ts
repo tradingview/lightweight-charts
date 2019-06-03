@@ -1,26 +1,26 @@
 import { drawLine, LineStyle, LineWidth } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
-export interface CrossHairLineStyle {
+export interface CrosshairLineStyle {
 	lineStyle: LineStyle;
 	lineWidth: LineWidth;
 	color: string;
 	visible: boolean;
 }
 
-export interface CrossHairRendererData {
-	vertLine: CrossHairLineStyle;
-	horzLine: CrossHairLineStyle;
+export interface CrosshairRendererData {
+	vertLine: CrosshairLineStyle;
+	horzLine: CrosshairLineStyle;
 	x: number;
 	y: number;
 	w: number;
 	h: number;
 }
 
-export class CrossHairRenderer implements IPaneRenderer {
-	private readonly _data: CrossHairRendererData | null;
+export class CrosshairRenderer implements IPaneRenderer {
+	private readonly _data: CrosshairRendererData | null;
 
-	public constructor(data: CrossHairRendererData | null) {
+	public constructor(data: CrosshairRendererData | null) {
 		this._data = data;
 	}
 
