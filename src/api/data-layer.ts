@@ -97,7 +97,7 @@ function getItemValues(item: TimedData, palette?: Palette): Bar['value'] {
 		if ('color' in item) {
 			const histItem = item as HistogramData;
 			if (histItem.color !== undefined) {
-				color = ensureDefined(palette).indexByColor(histItem.color);
+				color = ensureDefined(palette).addColor(histItem.color);
 			}
 		}
 		return [val, val, val, val, color];
