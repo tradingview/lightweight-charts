@@ -11,9 +11,9 @@ This tests uses [puppeteer](https://github.com/GoogleChrome/puppeteer) to genera
 
 ## Writing new test case
 
-1. Create new file in [test-cases](./test-cases) folder called `test-case-name.case.js` (`.case.js` ending is mandatory, `test-case-name` will be used as test case name).
+1. Create new file in [test-cases](./test-cases) folder called `test-case-name.js` (`test-case-name` will be used as test case name).
 
-1. Write your test case in that file (see [simple](./test-cases/simple.case.js) test case as example).
+1. Write your test case in that file.
 
     There is the only 1 requirement for your code - you need to define function called `runTestCase`, which takes a container as the first argument and creates there a widget.
     _(the definition of that function is `function runTestCase(container: HTMLElement): void {}`)_
