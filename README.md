@@ -69,6 +69,8 @@ lineSeries.setData([
 
 ## Development
 
+Note that the minimal supported version of [NodeJS](https://nodejs.org/) for development is 10.
+
 ### Compiling
 
 - `npm run tsc` - compiles the source code only (excluding tests)
