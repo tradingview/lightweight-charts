@@ -197,7 +197,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 	}
 
-	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType], palette?: Palette): void {
+	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void {
+		const palette = series.palette();
 		const update = this._dataLayer.updateSeriesData(series, data, palette);
 		const model = this._chartWidget.model();
 		const timeScaleUpdate = update.timeScaleUpdate;

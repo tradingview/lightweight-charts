@@ -5,11 +5,10 @@ import { SeriesApi } from './series-api';
 
 function generatePalette(points: HistogramData[], defaultColor: string): Palette {
 	const res = new Palette();
-	res.add(0, defaultColor);
-	let index = 1;
+	res.addColor(defaultColor);
 	points.forEach((point: HistogramData) => {
-		if (point.color !== undefined && !res.hasColor(point.color)) {
-			res.add(index++, point.color);
+		if (point.color !== undefined) {
+			res.addColor(point.color);
 		}
 	});
 	return res;

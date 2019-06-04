@@ -1,24 +1,22 @@
 import { ensureDefined } from '../helpers/assertions';
 
 export class Palette {
+	private _maxUsedIndex: number = 0;
 	private readonly _colorToIndex: Map<string, number> = new Map();
 	private readonly _indexToColor: Map<number, string> = new Map();
-
-	public add(index: number, color: string): void {
-		this._colorToIndex.set(color, index);
-		this._indexToColor.set(index, color);
-	}
 
 	public colorByIndex(index: number): string {
 		return ensureDefined(this._indexToColor.get(index));
 	}
 
-	public indexByColor(color: string): number {
-		return ensureDefined(this._colorToIndex.get(color));
-	}
-
-	public hasColor(color: string): boolean {
-		return this._colorToIndex.has(color);
+	public addColor(color: string): number {
+		let res = this._colorToIndex.get(color);
+		if (res === undefined) {
+			res = this._maxUsedIndex++;
+			this._colorToIndex.set(color, res);
+			this._indexToColor.set(res, color);
+		}
+		return res;
 	}
 
 	public size(): number {
