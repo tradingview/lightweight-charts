@@ -208,7 +208,7 @@ chart.applyOptions({
             visible: true,
         },
         horzLines: {
-            color: 'rgba(70, 130, 180, 0.5);',
+            color: 'rgba(70, 130, 180, 0.5)',
             style: 1,
             visible: true,
         },
