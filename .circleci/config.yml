@@ -96,6 +96,15 @@ jobs:
       - checkout-with-deps
       - run: npm run test
 
+  dts-changes:
+    executor: node-latest-executor
+    steps:
+      - checkout-with-deps
+      - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
+      - store_artifacts:
+          path: ./dts-changes
+          when: on_fail
+
   graphics-tests:
     executor: node-browsers-latest-executor
     environment:
@@ -149,6 +158,10 @@ workflows:
             - install-deps
 
       - unittests:
+          filters: *default-filters
+          requires:
+            - build
+      - dts-changes:
           filters: *default-filters
           requires:
             - build
