@@ -140,13 +140,14 @@ The price line is a horizontal line drawn on the last price value level.
 
 By default, its color is set by the last bar color (or by line color on Line and Area charts).
 
-You can set the width and color of this line or disable it using the following options:
+You can set the width, style and color of this line or disable it using the following options:
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
 |`priceLineVisible`|`boolean`|`true`|If true, a series' price line is displayed on a chart|
 |`priceLineWidth`|`number`|`1`|Price line's width in pixels|
 |`priceLineColor`|`string`|`''`|Price line's color|
+|`priceLineStyle`|(./constants.md#linestyle)|`LineStyle.Dotted`|Price line's style|
 
 Example:
 
@@ -155,6 +156,7 @@ series.applyOptions({
     priceLineVisible: false,
     priceLineWidth: 2,
     priceLineColor: '#4682B4',
+    priceLineStyle: 3,
 });
 ```
 
@@ -175,17 +177,26 @@ series.applyOptions({
 });
 ```
 
-#### Baseline
+#### Base line
 
-Baseline is set at `0%` price scale level of "Percentage" price scale and at `100` price scale level of "Indexed to 100" price scale and is always visible on the charts that have these price scales.
+The price line is a horizontal line drawn on the zero-level in percentage and indexedTo100 modes.
+You can set the width, style and color of this line or disable it using the following options:
 
-You can change the baseline color using the `baseLineColor` option.
+|Name|Type|Default|Description|
+|----|----|-------|-|
+|`baseLineVisible`|`boolean`|`true`|If true, a series' base line is displayed on a chart|
+|`baseLineWidth`|`number`|`1`|Base line's width in pixels|
+|`baseLineColor`|`string`|`''`|Base line's color|
+|`baseLineStyle`|(./constants.md#linestyle)|`LineStyle.Solid`|Base line's style|
 
 Example:
 
 ```javascript
 series.applyOptions({
+    baseLineVisible: true,
     baseLineColor: '#ff0000',
+    baseLineWidth: 3,
+    baseLineStyle: 1,
 });
 ```
 
