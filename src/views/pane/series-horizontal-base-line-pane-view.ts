@@ -14,6 +14,12 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 		const mode = this._series.priceScale().mode().mode;
 		if (mode !== PriceScaleMode.Percentage && mode !== PriceScaleMode.IndexedTo100) {
 			return;
+
+		}
+		const seriesOptions = this._series.options();
+
+		if (!seriesOptions.baseLineVisible) {
+			return;
 		}
 
 		const firstValue = this._series.firstValue();
@@ -25,6 +31,8 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 		this._lineRendererData.y = this._series.priceScale().priceToCoordinate(firstValue, firstValue);
 		this._lineRendererData.width = this._model.timeScale().width();
 		this._lineRendererData.height = this._series.priceScale().height();
-		this._lineRendererData.color = this._series.options().baseLineColor;
+		this._lineRendererData.color = seriesOptions.baseLineColor;
+		this._lineRendererData.lineWidth = seriesOptions.baseLineWidth;
+		this._lineRendererData.lineStyle = seriesOptions.baseLineStyle;
 	}
 }

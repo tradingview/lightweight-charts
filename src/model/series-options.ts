@@ -139,25 +139,34 @@ export interface NonOverlaySeriesSpecificOptions {
  * Structure describing options common for all types of series
  */
 export interface SeriesOptionsCommon {
-	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
-	priceLineVisible: boolean;
 	/** Visibility of the label with the latest visible price on the price scale */
 	lastValueVisible: boolean;
+	/** Title of the series. This label is placed with price axis label */
+	title: string;
 
 	/**
 	 * @internal
 	 */
 	seriesLastValueMode?: PriceAxisLastValueMode;
 
+	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
+	priceLineVisible: boolean;
 	/** Width of the price line. Ignored if priceLineVisible is false */
 	priceLineWidth: LineWidth;
 	/** Color of the price line. Ignored if priceLineVisible is false */
 	priceLineColor: string;
+	/** Price line style. Suitible for percentage and indexedTo100 scales */
+	priceLineStyle: LineStyle;
 	/** Formatting settings associated with the series */
 	priceFormat: PriceFormat;
+	/** Visibity of base line. Suitible for percentage and indexedTo100 scales */
+	baseLineVisible: boolean;
 	/** Color of the base line in IndexedTo100 mode */
 	baseLineColor: string;
-	title: string;
+	/** Base line width. Suitible for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
+	baseLineWidth: LineWidth;
+	/** Base line style. Suitible for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
+	baseLineStyle: LineStyle;
 }
 
 export type SeriesOptions<T> =
