@@ -14,8 +14,8 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 		const mode = this._series.priceScale().mode().mode;
 		if (mode !== PriceScaleMode.Percentage && mode !== PriceScaleMode.IndexedTo100) {
 			return;
-
 		}
+
 		const seriesOptions = this._series.options();
 
 		if (!seriesOptions.baseLineVisible) {

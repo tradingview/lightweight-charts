@@ -17,20 +17,15 @@ function generateData() {
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container, {
 		priceScale: {
-			mode: LightweightCharts.PriceScaleMode.Percentage
+			mode: LightweightCharts.PriceScaleMode.Percentage,
 		},
 	});
 
 	var firstSeries = chart.addLineSeries({
-		title: 'Initial title',
 		baseLineVisible: true,
 		baseLineWidth: 3,
 		baseLineColor: '#1215BE',
 		baseLineStyle: LightweightCharts.LineStyle.LargeDashed,
-		priceLineVisible: true,
-		priceLineWidth: 2,
-		priceLineColor: '#92151E',
-		priceLineStyle: LightweightCharts.LineStyle.Dashed,
 	});
 
 	firstSeries.setData(generateData());
