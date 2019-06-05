@@ -17,18 +17,13 @@ function generateData() {
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container, {
 		priceScale: {
-			mode: 2,
+			mode: LightweightCharts.PriceScaleMode.Percentage,
 		},
 	});
 
 	var firstSeries = chart.addLineSeries({
-		title: 'Initial title',
 		baseLineVisible: false,
 		priceLineVisible: false,
-	});
-
-	firstSeries.applyOptions({
-		title: 'Applied title',
 	});
 
 	firstSeries.setData(generateData());

@@ -17,7 +17,7 @@ function generateData() {
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container, {
 		priceScale: {
-			mode: 2,
+			mode: LightweightCharts.PriceScaleMode.Percentage
 		},
 	});
 
@@ -26,15 +26,11 @@ function runTestCase(container) {
 		baseLineVisible: true,
 		baseLineWidth: 3,
 		baseLineColor: '#1215BE',
-		baseLineStyle: 3,
+		baseLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceLineVisible: true,
 		priceLineWidth: 2,
 		priceLineColor: '#92151E',
-		priceLineStyle: 2,
-	});
-
-	firstSeries.applyOptions({
-		title: 'Applied title',
+		priceLineStyle: LightweightCharts.LineStyle.Dashed,
 	});
 
 	firstSeries.setData(generateData());
