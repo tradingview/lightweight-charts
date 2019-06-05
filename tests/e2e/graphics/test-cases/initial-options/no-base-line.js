@@ -23,7 +23,6 @@ function runTestCase(container) {
 
 	var firstSeries = chart.addLineSeries({
 		baseLineVisible: false,
-		priceLineVisible: false,
 	});
 
 	firstSeries.setData(generateData());
