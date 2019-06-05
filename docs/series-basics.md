@@ -186,7 +186,7 @@ You can set the width, style and color of this line or disable it using the foll
 |----|----|-------|-|
 |`baseLineVisible`|`boolean`|`true`|If true, a series' base line is displayed on a chart|
 |`baseLineWidth`|`number`|`1`|Base line's width in pixels|
-|`baseLineColor`|`string`|`''`|Base line's color|
+|`baseLineColor`|`string`|`'#B2B5BE'`|Base line's color|
 |`baseLineStyle`|(./constants.md#linestyle)|`LineStyle.Solid`|Base line's style|
 
 Example:
