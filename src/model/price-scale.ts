@@ -144,7 +144,7 @@ export class PriceScale {
 		this._markBuilder = new PriceTickMarkBuilder(this, 100, this._coordinateToLogical.bind(this), this._logicalToCoordinate.bind(this));
 	}
 
-	public options(): PriceScaleOptions {
+	public options(): Readonly<PriceScaleOptions> {
 		return this._options;
 	}
 

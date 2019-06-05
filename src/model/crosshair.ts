@@ -147,7 +147,7 @@ export class Crosshair extends DataSource {
 		return this._index;
 	}
 
-	public options(): CrosshairOptions {
+	public options(): Readonly<CrosshairOptions> {
 		return this._options;
 	}
 
@@ -207,7 +207,7 @@ export class Crosshair extends DataSource {
 		this.clearOriginCoord();
 	}
 
-	public paneViews(pane: Pane): IPaneView[] {
+	public paneViews(pane: Pane): ReadonlyArray<IPaneView> {
 		return this._pane !== null ? [this._paneView, this._markersPaneView] : [];
 	}
 

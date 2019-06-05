@@ -140,7 +140,7 @@ export interface IChartApi {
 	 * Returns currently applied options
 	 * @return - full set of currently applied options, including defaults
 	 */
-	options(): ChartOptions;
+	options(): Readonly<ChartOptions>;
 
 	/**
 	 * Removes branding text from the chart.

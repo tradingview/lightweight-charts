@@ -21,7 +21,7 @@ export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
 		this._chartModel.applyOptions({ priceScale: options });
 	}
 
-	public options(): PriceScaleOptions {
+	public options(): Readonly<PriceScaleOptions> {
 		return this._priceScale().options();
 	}
 

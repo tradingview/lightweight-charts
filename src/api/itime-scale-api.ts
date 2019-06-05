@@ -62,5 +62,5 @@ export interface ITimeScaleApi {
 	 * Returns current options
 	 * @return - currently applied options
 	 */
-	options(): TimeScaleOptions;
+	options(): Readonly<TimeScaleOptions>;
 }

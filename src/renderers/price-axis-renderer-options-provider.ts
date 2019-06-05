@@ -32,7 +32,7 @@ export class PriceAxisRendererOptionsProvider {
 		this._chartModel = chartModel;
 	}
 
-	public options(): PriceAxisViewRendererOptions {
+	public options(): Readonly<PriceAxisViewRendererOptions> {
 		const rendererOptions = this._rendererOptions;
 
 		const currentFontSize = this._fontSize();

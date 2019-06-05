@@ -14,5 +14,5 @@ export interface IPriceScaleApi {
 	 * Returns currently applied options of the price scale
 	 * @return full set of currently applied options, including defaults
 	 */
-	options(): PriceScaleOptions;
+	options(): Readonly<PriceScaleOptions>;
 }
