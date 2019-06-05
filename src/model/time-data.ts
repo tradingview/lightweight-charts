@@ -17,6 +17,11 @@ export interface TimePoint {
 	businessDay?: BusinessDay;
 }
 
+export interface TimePointsRange {
+	from: TimePoint;
+	to: TimePoint;
+}
+
 export type TimePointIndex = Nominal<number, 'TimePointIndex'>;
 
 export interface TickMark {

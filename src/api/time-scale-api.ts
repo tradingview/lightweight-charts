@@ -2,9 +2,8 @@ import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
-import { BarsRange } from '../model/bars-range';
 import { ChartModel } from '../model/chart-model';
-import { TimePoint, TimePointIndex, UTCTimestamp } from '../model/time-data';
+import { TimePoint, TimePointIndex, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
@@ -60,25 +59,11 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public setVisibleRange(range: TimeRange): void {
-		const points = this._timeScale().points();
-		const firstIndex = points.firstIndex();
-		const lastIndex = points.lastIndex();
-
-		if (firstIndex === null || lastIndex === null) {
-			return;
-		}
-
-		const firstPoint = ensureNotNull(points.valueAt(firstIndex)).timestamp;
-		const lastPoint = ensureNotNull(points.valueAt(lastIndex)).timestamp;
-
-		const from = convertTime(range.from);
-		const to = convertTime(range.to);
-
-		const barRange = new BarsRange(
-			ensureNotNull(points.indexOf(Math.max(firstPoint, from.timestamp) as UTCTimestamp, true)),
-			ensureNotNull(points.indexOf(Math.min(lastPoint, to.timestamp) as UTCTimestamp, true))
-		);
-		this._timeScale().setVisibleRange(barRange);
+		const convertedRange: TimePointsRange = {
+			from: convertTime(range.from),
+			to: convertTime(range.to),
+		};
+		this._model.setTargetTimeRange(convertedRange);
 	}
 
 	public resetTimeScale(): void {
