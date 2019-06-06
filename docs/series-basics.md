@@ -179,7 +179,7 @@ series.applyOptions({
 
 #### Base line
 
-The base line is a horizontal line drawn on the zero-level in percentage and indexedTo100 modes.
+The base line is a horizontal line drawn at the zero-level in `percentage` and `indexedTo100` modes.
 You can set the width, style and color of this line or disable it using the following options:
 
 |Name|Type|Default|Description|
