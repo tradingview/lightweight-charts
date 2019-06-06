@@ -58,7 +58,11 @@ export const seriesOptionsDefaults: SeriesOptionsCommon = {
 	priceLineVisible: true,
 	priceLineWidth: 1,
 	priceLineColor: '',
+	priceLineStyle: LineStyle.Dotted,
+	baseLineVisible: true,
+	baseLineWidth: 1,
 	baseLineColor: '#B2B5BE',
+	baseLineStyle: LineStyle.Solid,
 	priceFormat: {
 		type: 'price',
 		precision: 2,

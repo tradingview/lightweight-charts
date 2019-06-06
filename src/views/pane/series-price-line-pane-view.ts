@@ -1,12 +1,10 @@
 import { Series } from '../../model/series';
-import { LineStyle } from '../../renderers/draw-line';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';
 
 export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 	public constructor(series: Series) {
 		super(series);
-		this._lineRendererData.lineStyle = LineStyle.Dotted;
 	}
 
 	protected _updateImpl(): void {
@@ -28,5 +26,6 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 		this._lineRendererData.width = this._model.timeScale().width();
 		this._lineRendererData.height = this._series.priceScale().height();
 		this._lineRendererData.lineWidth = seriesOptions.priceLineWidth;
+		this._lineRendererData.lineStyle = seriesOptions.priceLineStyle;
 	}
 }
