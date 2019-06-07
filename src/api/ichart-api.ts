@@ -38,42 +38,42 @@ export interface IChartApi {
 	 * Sets fixed size of the chart. By default chart takes up 100% of its container
 	 * @param height - target height of the chart
 	 * @param width - target width of the chart
-	 * @param [forceRepaint=false] - true to initiate resize immediately. One could need this to get screenshot immediately after resize
+	 * @param forceRepaint - true to initiate resize immediately. One could need this to get screenshot immediately after resize
 	 */
 	resize(height: number, width: number, forceRepaint?: boolean): void;
 
 	/**
 	 * Creates an area series with specified parameters
-	 * @param [areaParams = undefined] - customization parameters of the series being created
-	 * @return an interface of the created series
+	 * @param areaParams - customization parameters of the series being created
+	 * @returns an interface of the created series
 	 */
 	addAreaSeries(areaParams?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
 
 	/**
 	 * Creates a bar series with specified parameters
-	 * @param [barParams = undefined] - customization parameters of the series being created
-	 * @return an interface of the created series
+	 * @param barParams - customization parameters of the series being created
+	 * @returns an interface of the created series
 	 */
 	addBarSeries(barParams?: BarSeriesPartialOptions): ISeriesApi<'Bar'>;
 
 	/**
 	 * Creates a candle series with specified parameters
-	 * @param [candleParams = undefined] - customization parameters of the series being created
-	 * @return an interface of the created series
+	 * @param candleParams - customization parameters of the series being created
+	 * @returns an interface of the created series
 	 */
 	addCandleSeries(candleParams?: CandleSeriesPartialOptions): ISeriesApi<'Candle'>;
 
 	/**
 	 * Creates a histogram series with specified parameters
-	 * @param [histogramParams=undefined] - customization parameters of the series being created
-	 * @return an interface of the created series
+	 * @param histogramParams - customization parameters of the series being created
+	 * @returns an interface of the created series
 	 */
 	addHistogramSeries(histogramParams?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram'>;
 
 	/**
 	 * Creates a line series with specified parameters
-	 * @param [lineParams=undefined] - customization parameters of the series being created
-	 * @return an interface of the created series
+	 * @param lineParams - customization parameters of the series being created
+	 * @returns an interface of the created series
 	 */
 	addLineSeries(lineParams?: LineSeriesPartialOptions): ISeriesApi<'Line'>;
 
@@ -126,19 +126,19 @@ export interface IChartApi {
 
 	/**
 	 * Returns API to manipulate the time scale
-	 * @return - target API
+	 * @returns - target API
 	 */
 	timeScale(): ITimeScaleApi;
 
 	/**
 	 * Applies new options to the chart
-	 * @param - options, any subset of chart options
+	 * @param options - any subset of chart options
 	 */
 	applyOptions(options: DeepPartial<ChartOptions>): void;
 
 	/**
 	 * Returns currently applied options
-	 * @return - full set of currently applied options, including defaults
+	 * @returns - full set of currently applied options, including defaults
 	 */
 	options(): Readonly<ChartOptions>;
 
