@@ -39,8 +39,8 @@ Here are common parameters for every series:
 |Name|Type|Default|Description|
 |-|----|-------|-|
 |`overlay`|`boolean`|`false`|Whether or not series should be an overlay|
-|`title`|`string` | `undefined`|`rgba(40, 221, 100, 0)`|You can name series when adding it to a chart. This name will be displayed on the label next to the last value label|
-|`scaleMargins`|`{ top, bottom }` | `undefined`|`undefined`|[Margins](#scale-margins) of the _overlay_ series|
+|`title`|`string`|`rgba(40, 221, 100, 0)`|You can name series when adding it to a chart. This name will be displayed on the label next to the last value label|
+|`scaleMargins`|`{ top, bottom }`|`undefined`|[Margins](#scale-margins) of the _overlay_ series|
 
 Example:
 
