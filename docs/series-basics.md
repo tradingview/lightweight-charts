@@ -279,7 +279,7 @@ barSeries.updateData({
 
 - [Area series](./area-series.md)
 - [Bar series](./bar-series.md)
-- [Candle series](./candle-series.md)
+- [Candlestick series](./candlestick-series.md)
 - [Histogram series](./histogram-series.md)
 - [Line series](./line-series.md)
 - [Customization](./customization.md)

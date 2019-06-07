@@ -1,4 +1,4 @@
-# Candlestick charts
+# Candlestick series
 
 A candlestick chart shows price movements in the form of candlesticks.
 
