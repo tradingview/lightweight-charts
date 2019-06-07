@@ -40,7 +40,7 @@ Here are common parameters for every series:
 |-|----|-------|-|
 |`overlay`|`boolean`|`false`|Whether or not series should be an overlay|
 |`title`|`string` | `undefined`|`rgba(40, 221, 100, 0)`|You can name series when adding it to a chart. This name will be displayed on the label next to the last value label|
-|`scaleMargins`|`{ top, bottom }` | `undefined`|`undefined`|[Margins](#margins) of the _overlay_ series|
+|`scaleMargins`|`{ top, bottom }` | `undefined`|`undefined`|[Margins](#scale-margins) of the _overlay_ series|
 
 Example:
 
@@ -147,7 +147,7 @@ You can set the width, style and color of this line or disable it using the foll
 |`priceLineVisible`|`boolean`|`true`|If true, a series' price line is displayed on a chart|
 |`priceLineWidth`|`number`|`1`|Price line's width in pixels|
 |`priceLineColor`|`string`|`''`|Price line's color|
-|`priceLineStyle`|(./constants.md#linestyle)|`LineStyle.Dotted`|Price line's style|
+|`priceLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Dotted`|Price line's style|
 
 Example:
 
@@ -187,7 +187,7 @@ You can set the width, style and color of this line or disable it using the foll
 |`baseLineVisible`|`boolean`|`true`|If true, a series' base line is displayed on a chart|
 |`baseLineWidth`|`number`|`1`|Base line's width in pixels|
 |`baseLineColor`|`string`|`'#B2B5BE'`|Base line's color|
-|`baseLineStyle`|(./constants.md#linestyle)|`LineStyle.Solid`|Base line's style|
+|`baseLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Base line's style|
 
 Example:
 
