@@ -6,7 +6,7 @@
 ![Zero dependencies](https://badgen.net/badge/dependencies/0/green)
 [![Downloads](https://img.shields.io/npm/dm/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
 
-[Demos](https://www.tradingview.com/lightweight-charts/) | [Documentation](./docs/getting-started.md)
+[Demos](https://www.tradingview.com/lightweight-charts/) | [Documentation](./docs/README.md)
 
 TradingView Lightweight Charts is one of the smallest and fastest financial HTML5 charts.
 
