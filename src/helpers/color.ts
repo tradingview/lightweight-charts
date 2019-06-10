@@ -197,16 +197,8 @@ function normalizeNumber(min: number, n: number, max: number): number {
 	);
 }
 
-function normalizeRedComponent(red: number): RedComponent {
-	return normalizeInteger(0, red, 255) as RedComponent;
-}
-
-function normalizeGreenComponent(green: number): GreenComponent {
-	return normalizeInteger(0, green, 255) as GreenComponent;
-}
-
-function normalizeBlueComponent(blue: number): BlueComponent {
-	return normalizeInteger(0, blue, 255) as BlueComponent;
+function normalizeColorComponent<T extends RedComponent | GreenComponent | BlueComponent>(component: number): T {
+	return normalizeInteger(0, component, 255) as T;
 }
 
 function normalizeAlphaComponent(alpha: number): AlphaComponent {
@@ -223,9 +215,9 @@ namespace RgbShortHexRepresentation {
 	export const re = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeRedComponent(parseInt(matches[1] + matches[1], 16)),
-			normalizeGreenComponent(parseInt(matches[2] + matches[2], 16)),
-			normalizeBlueComponent(parseInt(matches[3] + matches[3], 16)),
+			normalizeColorComponent<RedComponent>(parseInt(matches[1] + matches[1], 16)),
+			normalizeColorComponent<GreenComponent>(parseInt(matches[2] + matches[2], 16)),
+			normalizeColorComponent<BlueComponent>(parseInt(matches[3] + matches[3], 16)),
 		];
 	}
 }
@@ -245,9 +237,9 @@ namespace RgbHexRepresentation {
 	export const re = /^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeRedComponent(parseInt(matches[1], 16)),
-			normalizeGreenComponent(parseInt(matches[2], 16)),
-			normalizeBlueComponent(parseInt(matches[3], 16)),
+			normalizeColorComponent<RedComponent>(parseInt(matches[1], 16)),
+			normalizeColorComponent<GreenComponent>(parseInt(matches[2], 16)),
+			normalizeColorComponent<BlueComponent>(parseInt(matches[3], 16)),
 		];
 	}
 }
@@ -262,9 +254,9 @@ namespace RgbRepresentation {
 	export const re = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeRedComponent(parseInt(matches[1], 10)),
-			normalizeGreenComponent(parseInt(matches[2], 10)),
-			normalizeBlueComponent(parseInt(matches[3], 10)),
+			normalizeColorComponent<RedComponent>(parseInt(matches[1], 10)),
+			normalizeColorComponent<GreenComponent>(parseInt(matches[2], 10)),
+			normalizeColorComponent<BlueComponent>(parseInt(matches[3], 10)),
 		];
 	}
 }
@@ -279,9 +271,9 @@ namespace RgbaRepresentation {
 	export const re = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
 	export function parse(matches: RegExpExecArray): Rgba {
 		return [
-			normalizeRedComponent(parseInt(matches[1], 10)),
-			normalizeGreenComponent(parseInt(matches[2], 10)),
-			normalizeBlueComponent(parseInt(matches[3], 10)),
+			normalizeColorComponent<RedComponent>(parseInt(matches[1], 10)),
+			normalizeColorComponent<GreenComponent>(parseInt(matches[2], 10)),
+			normalizeColorComponent<BlueComponent>(parseInt(matches[3], 10)),
 			normalizeAlphaComponent(parseFloat(matches[4])),
 		];
 	}
@@ -383,9 +375,9 @@ function rgba(redOrRgb: number | Rgb, greenOrAlpha: number, blue?: number, alpha
 		alpha = alpha || 0;
 
 		return [
-			normalizeRedComponent(red),
-			normalizeGreenComponent(green),
-			normalizeBlueComponent(blue),
+			normalizeColorComponent<RedComponent>(red),
+			normalizeColorComponent<GreenComponent>(green),
+			normalizeColorComponent<BlueComponent>(blue),
 			normalizeAlphaComponent(alpha),
 		];
 	}
