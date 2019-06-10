@@ -353,34 +353,13 @@ export function rgbToBlackWhiteString(rgbValue: Rgb, threshold: number): 'black'
 	return rgbToGrayscale(rgbValue) >= threshold ? 'white' : 'black';
 }
 
-function rgba(red: number, green: number, blue: number, alpha: number): Rgba;
-function rgba(rgb: Rgb, alpha: number): Rgba;
-function rgba(redOrRgb: number | Rgb, greenOrAlpha: number, blue?: number, alpha?: number): Rgba {
-	if (Array.isArray(redOrRgb)) {
-		// rgba(rgb: Rgb, alpha: number)
-		const res = redOrRgb;
-		alpha = greenOrAlpha;
-
-		return [
-			res[0],
-			res[1],
-			res[2],
-			normalizeAlphaComponent(alpha),
-		];
-	} else {
-		// rgba(red: number, green: number, blue: number, alpha: number)
-		const red = redOrRgb;
-		const green = greenOrAlpha;
-		blue = blue || 0;
-		alpha = alpha || 0;
-
-		return [
-			normalizeColorComponent<RedComponent>(red),
-			normalizeColorComponent<GreenComponent>(green),
-			normalizeColorComponent<BlueComponent>(blue),
-			normalizeAlphaComponent(alpha),
-		];
-	}
+function rgba(rgb: Rgb, alpha: number): Rgba {
+	return [
+		rgb[0],
+		rgb[1],
+		rgb[2],
+		normalizeAlphaComponent(alpha),
+	];
 }
 
 function rgbaToString(rgbaValue: Rgba): string {
