@@ -35,7 +35,7 @@ export class Watermark extends DataSource {
 		return [this._paneView];
 	}
 
-	public options(): WatermarkOptions {
+	public options(): Readonly<WatermarkOptions> {
 		return this._options;
 	}
 

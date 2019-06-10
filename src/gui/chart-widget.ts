@@ -98,7 +98,7 @@ export class ChartWidget implements IDestroyable {
 		return this._model;
 	}
 
-	public options(): ChartOptions {
+	public options(): Readonly<ChartOptions> {
 		return this._options;
 	}
 

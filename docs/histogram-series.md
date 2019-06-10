@@ -4,7 +4,7 @@ A histogram series is a graphical representation of the value distribution.
 
 Histogram creates intervals (columns) and counts how many values fall into each column.
 
-![Histogram example](./images/histogram-series.png "Histogram chart example")
+![Histogram example](./assets/histogram-series.png "Histogram chart example")
 
 ## How to create histogram series
 

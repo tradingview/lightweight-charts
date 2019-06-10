@@ -78,7 +78,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._timeScale().applyOptions(options);
 	}
 
-	public options(): TimeScaleOptions {
+	public options(): Readonly<TimeScaleOptions> {
 		return clone(this._timeScale().options());
 	}
 

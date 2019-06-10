@@ -130,7 +130,7 @@ export class ChartModel implements IDestroyable {
 		this._hoveredSource = source;
 	}
 
-	public options(): ChartOptions {
+	public options(): Readonly<ChartOptions> {
 		return this._options;
 	}
 
@@ -162,7 +162,7 @@ export class ChartModel implements IDestroyable {
 		return this._timeScale;
 	}
 
-	public panes(): Pane[] {
+	public panes(): ReadonlyArray<Pane> {
 		return this._panes;
 	}
 
@@ -492,7 +492,7 @@ export class ChartModel implements IDestroyable {
 		return this._rendererOptionsProvider;
 	}
 
-	public priceAxisRendererOptions(): PriceAxisViewRendererOptions {
+	public priceAxisRendererOptions(): Readonly<PriceAxisViewRendererOptions> {
 		return this._rendererOptionsProvider.options();
 	}
 
