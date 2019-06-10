@@ -152,7 +152,7 @@ You can set the width, style and color of this line or disable it using the foll
 Example:
 
 ```javascript
-series.applyOptions({
+areaSeries.applyOptions({
     priceLineVisible: false,
     priceLineWidth: 2,
     priceLineColor: '#4682B4',
@@ -172,7 +172,7 @@ There is an option to hide it as well.
 Example:
 
 ```javascript
-series.applyOptions({
+barSeries.applyOptions({
     lastValueVisible: false,
 });
 ```
@@ -192,7 +192,7 @@ You can set the width, style and color of this line or disable it using the foll
 Example:
 
 ```javascript
-series.applyOptions({
+lineSeries.applyOptions({
     baseLineVisible: true,
     baseLineColor: '#ff0000',
     baseLineWidth: 3,
@@ -219,13 +219,37 @@ The following options are available for setting the price format displayed by an
 Example:
 
 ```javascript
-series.applyOptions({
+barSeries.applyOptions({
     priceFormat: {
         type: 'volume',
         precision: 3,
         minMove: 0.05,
     },
 });
+```
+
+### options
+
+Returns the full set of currently applied series options, including defaults.
+
+Examples:
+
+```javascript
+barSeries.options()
+```
+
+```javascript
+baseLineColor: "#B2B5BE"
+downColor: "#000"
+lastValueVisible: true
+openVisible: true
+priceFormat: Object { type: "price", precision: 2, minMove: 0.01 }
+priceLineColor: ""
+priceLineVisible: true
+priceLineWidth: 1
+thinBars: true
+title: ""
+upColor: "#000"
 ```
 
 ### setData
