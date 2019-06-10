@@ -356,8 +356,7 @@ function rgba(rgb: Rgb, alpha: number): Rgba {
 }
 
 function rgbaToString(rgbaValue: Rgba): string {
-	const [red, green, blue, alpha] = rgbaValue;
-	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+	return `rgba(${rgbaValue[0]}, ${rgbaValue[1]}, ${rgbaValue[2]}, ${rgbaValue[3]})`;
 }
 
 export function resetTransparency(color: string): string {
