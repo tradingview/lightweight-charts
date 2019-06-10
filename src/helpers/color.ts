@@ -197,19 +197,19 @@ function normalizeNumber(min: number, n: number, max: number): number {
 	);
 }
 
-export function normalizeRedComponent(red: number): RedComponent {
+function normalizeRedComponent(red: number): RedComponent {
 	return normalizeInteger(0, red, 255) as RedComponent;
 }
 
-export function normalizeGreenComponent(green: number): GreenComponent {
+function normalizeGreenComponent(green: number): GreenComponent {
 	return normalizeInteger(0, green, 255) as GreenComponent;
 }
 
-export function normalizeBlueComponent(blue: number): BlueComponent {
+function normalizeBlueComponent(blue: number): BlueComponent {
 	return normalizeInteger(0, blue, 255) as BlueComponent;
 }
 
-export function normalizeAlphaComponent(alpha: number): AlphaComponent {
+function normalizeAlphaComponent(alpha: number): AlphaComponent {
 	return normalizeNumber(0, alpha, 1) as AlphaComponent;
 }
 
@@ -302,7 +302,7 @@ function tryParseRgbaString(rgbaString: string): Rgba | null {
 	return matches !== null ? RgbaRepresentation.parse(matches) : null;
 }
 
-export function tryParseRgb(colorString: string): Rgb | null {
+function tryParseRgb(colorString: string): Rgb | null {
 	colorString = colorString.toLowerCase();
 	if (isNamedColor(namedColorRgbHexStrings, colorString)) {
 		const namedColorParseResult = tryParseRgbHexString(namedColorRgbHexStrings[colorString]);
@@ -347,7 +347,7 @@ export function parseRgb(colorString: string): Rgb {
 }
 
 const rgbGrayscaleWeights = [0.199, 0.687, 0.114];
-export function rgbToGrayscale(rgbValue: Rgb): number {
+function rgbToGrayscale(rgbValue: Rgb): number {
 	return rgbGrayscaleWeights[0] * rgbValue[0] +
 		rgbGrayscaleWeights[1] * rgbValue[1] +
 		rgbGrayscaleWeights[2] * rgbValue[2];
@@ -361,9 +361,9 @@ export function rgbToBlackWhiteString(rgbValue: Rgb, threshold: number): 'black'
 	return rgbToGrayscale(rgbValue) >= threshold ? 'white' : 'black';
 }
 
-export function rgba(red: number, green: number, blue: number, alpha: number): Rgba;
-export function rgba(rgb: Rgb, alpha: number): Rgba;
-export function rgba(redOrRgb: number | Rgb, greenOrAlpha: number, blue?: number, alpha?: number): Rgba {
+function rgba(red: number, green: number, blue: number, alpha: number): Rgba;
+function rgba(rgb: Rgb, alpha: number): Rgba;
+function rgba(redOrRgb: number | Rgb, greenOrAlpha: number, blue?: number, alpha?: number): Rgba {
 	if (Array.isArray(redOrRgb)) {
 		// rgba(rgb: Rgb, alpha: number)
 		const res = redOrRgb;
@@ -391,7 +391,7 @@ export function rgba(redOrRgb: number | Rgb, greenOrAlpha: number, blue?: number
 	}
 }
 
-export function rgbaToString(rgbaValue: Rgba): string {
+function rgbaToString(rgbaValue: Rgba): string {
 	const [red, green, blue, alpha] = rgbaValue;
 	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
