@@ -64,14 +64,14 @@ The following set of options can be used to adjust the price axis interface:
 
 |Name|Type|Default|Description|
 |--|---|-|--|
-|`position`|`string`|`right`|Sets the position to display price scale. Options available: `left`, `right`, `none`|
+|`position`|one of `left`, `right` or `none`|`right`|Sets the position to display price scale|
 |`mode`|[PriceScaleMode](./constants.md#pricescalemode) |`PriceScaleMode.Normal`|Sets the price scale mode|
 |`autoScale`|`boolean`|`true`|If true, fits series data to a chart size|
 |`invertScale`|`boolean`|`false`|If true, a chart series is reflected vertically, so that a growing trend is shown as a falling one and vise versa|
 |`alignLabels`|`boolean`|`true`|If true, labels with price data do not overlap|
 |`borderVisible`|`boolean`|`true`|If true, price scale border is visible|
 |`borderColor`|`string`|`#2b2b43`|Pricescale border color|
-|`scaleMargins`|`object`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (per cent)|
+|`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (per cent)|
 
 ### An example of a price scale customization
 
@@ -230,10 +230,10 @@ The following options are available for the watermark:
 |----------------------------|-------|---------|-|
 |`color`|`string`|`rgba(0, 0, 0, 0)`|Watermark color|
 |`visible`|`boolean`|`false`|If true, the watermark is displayed on a chart|
-|`text`|`string`|''|Contains the text to be displayed in the watermark|
+|`text`|`string`|`''`|Contains the text to be displayed in the watermark|
 |`fontSize`|`number`|`48`|Watermark's font size in pixels|
-|`horzAlign`|`string`|`center`|Watermark horizontal alignment position. Available options : 'left', 'center', 'right'|
-|`vertAlign`|`string`|`center`|Watermark vertical alignment position. Available options: 'top', 'center', 'bottom'|
+|`horzAlign`|one of `left`, `center` or `right`|`center`|Watermark horizontal alignment position|
+|`vertAlign`|one of `top`, `center` or `bottom`|`center`|Watermark vertical alignment position|
 
 ### An example of a watermark customization
 

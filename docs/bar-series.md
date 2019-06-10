@@ -6,7 +6,7 @@ Vertical line length of a bar is limited by the highest and lowest price values.
 
 Open & Close values are represented by tick marks, on the left & right hand side of the bar respectively.
 
-![Bar chart example](./images/bar-series.png "Bar chart example")
+![Bar chart example](./assets/bar-series.png "Bar chart example")
 
 ## How to create bar series
 

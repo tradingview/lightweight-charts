@@ -94,7 +94,7 @@ export class TimeScale {
 		this._updateDateTimeFormatter();
 	}
 
-	public options(): TimeScaleOptions {
+	public options(): Readonly<TimeScaleOptions> {
 		return this._options;
 	}
 

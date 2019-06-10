@@ -9,7 +9,7 @@ export type PriceFormatterFn = (priceValue: BarPrice) => string;
 export interface LocalizationOptions {
 	/**
 	 * Current locale, which will be used for formatting dates.
-	 * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation
+	 * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation}
 	 */
 	locale: string;
 

@@ -4,7 +4,7 @@ An area chart is another way of displaying quantitative data. It’s basically a
 
 An area series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the timescale.
 
-![Area chart example](./images/area-series.png "Area chart example")
+![Area chart example](./assets/area-series.png "Area chart example")
 
 ## How to create area series
 
