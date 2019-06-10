@@ -26,6 +26,12 @@ export interface HitTestResult {
 	view: IPaneView;
 }
 
+const enum LogoConstants {
+	FONT_SIZE = '7pt',
+	LEFT_MARGIN = 6,
+	BOTTOM_MARGIN = 4,
+}
+
 export class PaneWidget implements IDestroyable {
 	private readonly _chart: ChartWidget;
 	private _state: Pane | null;
@@ -435,6 +441,24 @@ export class PaneWidget implements IDestroyable {
 		}
 	}
 
+	public drawOnCanvas(ctx: CanvasRenderingContext2D): void {
+		this._drawBackground(ctx, this._backgroundColor());
+		if (this._state) {
+			this._drawGrid(ctx);
+			this._drawWatermark(ctx);
+			this._drawSources(ctx);
+		}
+	}
+
+	public drawBranding(ctx: CanvasRenderingContext2D): void {
+		if (this._brandingElement !== null) {
+			ctx.fillStyle = colorWithTransparency(this._chart.options().layout.textColor, 0.9);
+			ctx.font = `${LogoConstants.FONT_SIZE} ${defaultFontFamily}`;
+			ctx.textBaseline = 'bottom';
+			ctx.fillText('TradingView', LogoConstants.LEFT_MARGIN, this._size.h - LogoConstants.BOTTOM_MARGIN);
+		}
+	}
+
 	public paint(type: number): void {
 		if (type === 0) {
 			return;
@@ -454,19 +478,10 @@ export class PaneWidget implements IDestroyable {
 
 		this._topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 
-		if (type === InvalidationLevel.Cursor) {
-			this._drawCrosshair(this._topCtx);
-		} else {
-			this._drawBackground(this._ctx, this._backgroundColor());
-
-			if (this._state) {
-				this._drawGrid(this._ctx);
-				this._drawWatermark(this._ctx);
-				this._drawSources(this._ctx);
-
-				this._drawCrosshair(this._topCtx);
-			}
+		if (type !== InvalidationLevel.Cursor) {
+			this.drawOnCanvas(this._ctx);
 		}
+		this._drawCrosshair(this._topCtx);
 	}
 
 	public priceAxisWidget(): PriceAxisWidget | null {
@@ -663,10 +678,10 @@ export class PaneWidget implements IDestroyable {
 
 		const style = linkEl.style;
 		style.zIndex = '1000';
-		style.fontSize = '7pt';
+		style.fontSize = LogoConstants.FONT_SIZE;
 		style.position = 'absolute';
-		style.left = '6px';
-		style.bottom = '4px';
+		style.left = `${LogoConstants.LEFT_MARGIN}px`;
+		style.bottom = `${LogoConstants.BOTTOM_MARGIN}px`;
 		style.textDecoration = 'none';
 		style.userSelect = 'none';
 		this._paneCell.appendChild(linkEl);

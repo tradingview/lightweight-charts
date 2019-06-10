@@ -255,6 +255,10 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.disableBranding();
 	}
 
+	public takeScreenshot(): string {
+		return this._chartWidget.takeScreenshot();
+	}
+
 	private _onVisibleBarsChanged(): void {
 		if (this._timeRangeChanged.hasListeners()) {
 			this._timeRangeChanged.fire(this.timeScale().getVisibleRange());

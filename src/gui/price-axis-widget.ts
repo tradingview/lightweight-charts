@@ -265,6 +265,13 @@ export class PriceAxisWidget implements IDestroyable {
 		model.resetPriceScale(pane, ensureNotNull(this.priceScale()));
 	}
 
+	public drawOnCanvas(ctx: CanvasRenderingContext2D): void {
+		this._drawBackground(ctx);
+		this._drawBorder(ctx);
+		this._drawTickMarks(ctx);
+		this._drawBackLabels(ctx);
+	}
+
 	public paint(type: InvalidationLevel): void {
 		if (!this._isVisible || this._size === null) {
 			return;
@@ -276,10 +283,7 @@ export class PriceAxisWidget implements IDestroyable {
 			this._drawCrosshairLabel(this._topCtx);
 		} else {
 			this._alignLabels();
-			this._drawBackground(this._ctx);
-			this._drawBorder(this._ctx);
-			this._drawTickMarks(this._ctx);
-			this._drawBackLabels(this._ctx);
+			this.drawOnCanvas(this._ctx);
 			this._drawCrosshairLabel(this._topCtx);
 		}
 	}

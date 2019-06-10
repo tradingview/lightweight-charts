@@ -147,4 +147,10 @@ export interface IChartApi {
 	 * Please read the description of this method in the documentation to learn more about the conditions of branding removal.
 	 */
 	disableBranding(): void;
+
+	/**
+	 * Make a screenshot of the chart with all the elements excluding crosshair.
+	 * @Return - a result in format data url
+	 */
+	takeScreenshot(): string;
 }

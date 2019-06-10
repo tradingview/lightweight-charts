@@ -1,4 +1,5 @@
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
+import { getContext2d } from '../helpers/canvas-wrapper';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -11,7 +12,7 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { Size } from './canvas-utils';
+import { resizeCanvas, Size } from './canvas-utils';
 import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -202,6 +203,82 @@ export class ChartWidget implements IDestroyable {
 
 	public disableBranding(): void {
 		this._paneWidgets[0].disableBranding();
+	}
+
+	public takeScreenshot(): string {
+		// calculate target size
+		const firstPane = this._paneWidgets[0];
+		let targetWidth = firstPane.getSize().w;
+		if (this._options.priceScale.position !== 'none') {
+			targetWidth += ensureNotNull(firstPane.priceAxisWidget()).getWidth();
+		}
+		let targetHeight = 0;
+		for (const paneWidget of this._paneWidgets) {
+			targetHeight += paneWidget.getSize().h;
+		}
+		if (this._options.timeScale.visible) {
+			targetHeight += this._timeAxisWidget.height();
+		}
+		const targetCanvas = document.createElement('canvas');
+		resizeCanvas(targetCanvas, new Size(targetWidth, targetHeight));
+		const ctx = ensureNotNull(getContext2d(targetCanvas));
+		let targetX = 0;
+		let targetY = 0;
+
+		const drawPriceAxises = () => {
+			for (const paneWidget of this._paneWidgets) {
+				ctx.save();
+				ctx.translate(targetX, targetY);
+				ensureNotNull(paneWidget.priceAxisWidget()).drawOnCanvas(ctx);
+				ctx.restore();
+				targetY += paneWidget.getSize().h;
+			}
+		};
+		// draw left price scale if exists
+		if (this._options.priceScale.position === 'left') {
+			drawPriceAxises();
+			targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
+		}
+		targetY = 0;
+		for (const paneWidget of this._paneWidgets) {
+			ctx.save();
+			ctx.translate(targetX, targetY);
+			paneWidget.drawOnCanvas(ctx);
+			paneWidget.drawBranding(ctx);
+			ctx.restore();
+			targetY += paneWidget.getSize().h;
+		}
+		targetX += firstPane.getSize().w;
+		if (this._options.priceScale.position === 'right') {
+			targetY = 0;
+			drawPriceAxises();
+		}
+		const drawStub = () => {
+			ctx.save();
+			ctx.translate(targetX, targetY);
+			ensureNotNull(this._timeAxisWidget.stub()).drawOnCanvas(ctx);
+			ctx.restore();
+		};
+		// draw time scale
+		if (this._options.timeScale.visible) {
+			targetX = 0;
+			if (this._options.priceScale.position === 'left') {
+				drawStub();
+				targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
+			}
+			ctx.save();
+			ctx.translate(targetX, targetY);
+			this._timeAxisWidget.drawOnCanvas(ctx);
+			ctx.restore();
+			if (this._options.priceScale.position === 'right') {
+				targetX = firstPane.getSize().w;
+				drawStub();
+				ctx.restore();
+			}
+		}
+
+		// draw branding
+		return targetCanvas.toDataURL();
 	}
 
 	private _adjustSizeImpl(): void {
