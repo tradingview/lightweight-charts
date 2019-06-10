@@ -330,11 +330,12 @@ export function parseRgb(colorString: string): Rgb {
 	}
 }
 
-const rgbGrayscaleWeights = [0.199, 0.687, 0.114];
 function rgbToGrayscale(rgbValue: Rgb): number {
-	return rgbGrayscaleWeights[0] * rgbValue[0] +
-		rgbGrayscaleWeights[1] * rgbValue[1] +
-		rgbGrayscaleWeights[2] * rgbValue[2];
+	return (
+		0.199 * rgbValue[0] +
+		0.687 * rgbValue[1] +
+		0.114 * rgbValue[2]
+	);
 }
 
 export function rgbToBlackWhiteString(rgbValue: Rgb, threshold: number): 'black' | 'white' {
