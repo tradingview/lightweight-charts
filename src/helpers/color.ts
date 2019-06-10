@@ -28,7 +28,7 @@ export type AlphaComponent = Nominal<number, 'AlphaComponent'>;
 export type Rgb = [RedComponent, GreenComponent, BlueComponent];
 export type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
 
-const namedColorRgbHexStrings = {
+const namedColorRgbHexStrings: Record<string, string> = {
 	aliceblue: '#f0f8ff',
 	antiquewhite: '#faebd7',
 	aqua: '#00ffff',
@@ -174,10 +174,6 @@ const namedColorRgbHexStrings = {
 	yellowgreen: '#9acd32',
 };
 
-function isNamedColor<NamedColors extends object>(namedColors: NamedColors, colorString: string | number | symbol): colorString is keyof NamedColors {
-	return colorString in namedColors;
-}
-
 function normalizeInteger(min: number, n: number, max: number): number {
 	return (
 		isNaN(n) ? min :
@@ -296,13 +292,9 @@ function tryParseRgbaString(rgbaString: string): Rgba | null {
 
 function tryParseRgb(colorString: string): Rgb | null {
 	colorString = colorString.toLowerCase();
-	if (isNamedColor(namedColorRgbHexStrings, colorString)) {
-		const namedColorParseResult = tryParseRgbHexString(namedColorRgbHexStrings[colorString]);
-		if (namedColorParseResult !== null) {
-			return namedColorParseResult;
-		} else {
-			throw new Error('Invalid named color definition');
-		}
+
+	if (colorString in namedColorRgbHexStrings) {
+		colorString = namedColorRgbHexStrings[colorString];
 	}
 
 	const rgbParseResult = tryParseRgbString(colorString);
