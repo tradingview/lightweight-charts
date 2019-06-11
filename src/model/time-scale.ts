@@ -512,7 +512,7 @@ export class TimeScale {
 	}
 
 	public setVisibleRange(range: BarsRange): void {
-		const length = range.lastBar() - range.firstBar() + 1;
+		const length = range.count();
 		this._barSpacing = this._width / length;
 		this._rightOffset = range.lastBar() - this.baseIndex();
 		this._correctOffset();
