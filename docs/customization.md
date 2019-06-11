@@ -114,6 +114,7 @@ The following options are available in the time axis interface:
 |`borderColor`|`string`|`#2b2b43`|Timescale border color|
 |`visible`|`boolean`|`true`|If true, timescale is shown on a chart|
 |`timeVisible`|`boolean`|`false`|If true, time is shown on the time scale and crosshair vertical label|
+|`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of crosshair vertical line in intraday time interval|
 
 ### Example of timescale customization
 
@@ -129,6 +130,7 @@ chart.applyOptions({
         borderColor: '#fff000',
         visible: true,
         timeVisible: true,
+		secondsVisible: false,
     },
 });
 ```
@@ -291,7 +293,7 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-|
 |`axisPressedMouseMove`|`boolean`|`true`|If true axis scaling with left mouse button pressed is allowed|
-|`mouseWheel`|`boolean`|`true`|If true series scaling with mouse whee is enabled|
+|`mouseWheel`|`boolean`|`true`|If true series scaling with mouse wheel is enabled|
 |`pinch`|`boolean`|`true`|If true series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
 
 ### An example of a scrolling/scaling customization
