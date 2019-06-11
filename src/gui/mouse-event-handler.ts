@@ -279,7 +279,7 @@ export class MouseEventHandler implements IDestroyable {
 				rootElement.removeEventListener('mouseup', boundMouseUpHandler);
 			};
 
-			rootElement.addEventListener('touchmove', boundMouseMoveWithDownHandler);
+			rootElement.addEventListener('touchmove', boundMouseMoveWithDownHandler, { passive: false });
 			rootElement.addEventListener('touchend', boundMouseUpHandler);
 
 			if (!mobileTouch) {
@@ -354,17 +354,21 @@ export class MouseEventHandler implements IDestroyable {
 			this._checkPinchState(event.touches);
 		});
 
-		this._target.addEventListener('touchmove', (event: TouchEvent) => {
-			if (event.touches.length !== 2 || this._startPinchMiddlePoint === null) {
-				return;
-			}
+		this._target.addEventListener(
+			'touchmove',
+			(event: TouchEvent) => {
+				if (event.touches.length !== 2 || this._startPinchMiddlePoint === null) {
+					return;
+				}
 
-			if (this._handler.pinchEvent !== undefined) {
-				const currentDistance = getDistance(event.touches[0], event.touches[1]);
-				const scale = currentDistance / this._startPinchDistance;
-				this._handler.pinchEvent(this._startPinchMiddlePoint, scale);
-			}
-		});
+				if (this._handler.pinchEvent !== undefined) {
+					const currentDistance = getDistance(event.touches[0], event.touches[1]);
+					const scale = currentDistance / this._startPinchDistance;
+					this._handler.pinchEvent(this._startPinchMiddlePoint, scale);
+				}
+			},
+			{ passive: false }
+		);
 
 		this._target.addEventListener('touchend', (event: TouchEvent) => {
 			this._checkPinchState(event.touches);
