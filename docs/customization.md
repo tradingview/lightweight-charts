@@ -114,7 +114,7 @@ The following options are available in the time axis interface:
 |`borderColor`|`string`|`#2b2b43`|Timescale border color|
 |`visible`|`boolean`|`true`|If true, timescale is shown on a chart|
 |`timeVisible`|`boolean`|`false`|If true, time is shown on the time scale and crosshair vertical label|
-|`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of crosshair vertical line in intraday time interval|
+|`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of crosshair vertical line in intraday time interval in `hh:mm:ss` format|
 
 ### Example of timescale customization
 
