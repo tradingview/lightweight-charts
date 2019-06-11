@@ -126,7 +126,7 @@ Every series has its own data type. Please refer to series page to determine wha
 
 ### options
 
-Returns the full set of currently applied series options, including defaults.
+Returns the full set of currently applied options, including defaults.
 
 ### applyOptions
 
