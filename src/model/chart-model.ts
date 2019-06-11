@@ -21,7 +21,7 @@ import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
-import { TickMark, TimePoint, TimePointIndex } from './time-data';
+import { TickMark, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
 import { Watermark, WatermarkOptions } from './watermark';
 
@@ -528,6 +528,12 @@ export class ChartModel implements IDestroyable {
 	public fitContent(): void {
 		const mask = new InvalidateMask(InvalidationLevel.Light);
 		mask.setFitContent();
+		this._invalidate(mask);
+	}
+
+	public setTargetTimeRange(range: TimePointsRange): void {
+		const mask = new InvalidateMask(InvalidationLevel.Light);
+		mask.setTargetTimeRange(range);
 		this._invalidate(mask);
 	}
 

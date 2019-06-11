@@ -313,6 +313,10 @@ export class ChartWidget implements IDestroyable {
 			if (invalidateMask.getFitContent()) {
 				this._model.timeScale().fitContent();
 			}
+			const targetTimeRange = invalidateMask.getTargetTimeRange();
+			if (targetTimeRange !== null) {
+				this._model.timeScale().setTimePointsRange(targetTimeRange);
+			}
 
 			const panes = this._model.panes();
 			for (let i = 0; i < panes.length; i++) {
