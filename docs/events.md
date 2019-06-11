@@ -73,3 +73,14 @@ export type MouseEventHandler = (param: MouseEventParams) => void;
 `point` is not defined if an event was fired outside of the chart (for example on a mouse leave event).
 
 `seriesPrices` contains all series prices according to the event point details.
+
+### TimeRangeChangeEventHandler
+
+TimeRangeChangeEventHandler is a type of callback that is being used to get notified about chart time range changes.
+
+|Name|Description|
+|-|-|
+|`subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Adds a subscription to visible range changes to receive notification about visible range of data changes|
+|`unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Removes a subscription to visible range changes|
+
+
