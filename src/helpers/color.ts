@@ -23,10 +23,10 @@ export type BlueComponent = Nominal<number, 'BlueComponent'>;
  * Alpha component of the RGBA color value
  * The valid values are integers in range [0, 1]
  */
-export type AlphaComponent = Nominal<number, 'AlphaComponent'>;
+type AlphaComponent = Nominal<number, 'AlphaComponent'>;
 
 export type Rgb = [RedComponent, GreenComponent, BlueComponent];
-export type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
+type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
 
 const namedColorRgbHexStrings: Record<string, string> = {
 	aliceblue: '#f0f8ff',
