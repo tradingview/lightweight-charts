@@ -193,7 +193,7 @@ function normalizeNumber(min: number, n: number, max: number): number {
 	);
 }
 
-function normalizeColorComponent<T extends RedComponent | GreenComponent | BlueComponent>(component: number): T {
+function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueComponent>(component: number): T {
 	return normalizeInteger(0, component, 255) as T;
 }
 
@@ -211,9 +211,9 @@ namespace RgbShortHexRepresentation {
 	export const re = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeColorComponent<RedComponent>(parseInt(matches[1] + matches[1], 16)),
-			normalizeColorComponent<GreenComponent>(parseInt(matches[2] + matches[2], 16)),
-			normalizeColorComponent<BlueComponent>(parseInt(matches[3] + matches[3], 16)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1] + matches[1], 16)),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2] + matches[2], 16)),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3] + matches[3], 16)),
 		];
 	}
 }
@@ -233,9 +233,9 @@ namespace RgbHexRepresentation {
 	export const re = /^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeColorComponent<RedComponent>(parseInt(matches[1], 16)),
-			normalizeColorComponent<GreenComponent>(parseInt(matches[2], 16)),
-			normalizeColorComponent<BlueComponent>(parseInt(matches[3], 16)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16)),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16)),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16)),
 		];
 	}
 }
@@ -250,9 +250,9 @@ namespace RgbRepresentation {
 	export const re = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeColorComponent<RedComponent>(parseInt(matches[1], 10)),
-			normalizeColorComponent<GreenComponent>(parseInt(matches[2], 10)),
-			normalizeColorComponent<BlueComponent>(parseInt(matches[3], 10)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 10)),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 10)),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 10)),
 		];
 	}
 }
@@ -267,9 +267,9 @@ namespace RgbaRepresentation {
 	export const re = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
 	export function parse(matches: RegExpExecArray): Rgba {
 		return [
-			normalizeColorComponent<RedComponent>(parseInt(matches[1], 10)),
-			normalizeColorComponent<GreenComponent>(parseInt(matches[2], 10)),
-			normalizeColorComponent<BlueComponent>(parseInt(matches[3], 10)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 10)),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 10)),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 10)),
 			normalizeAlphaComponent(parseFloat(matches[4])),
 		];
 	}
@@ -331,10 +331,16 @@ export function parseRgb(colorString: string): Rgb {
 }
 
 function rgbToGrayscale(rgbValue: Rgb): number {
+	// Originally, the NTSC RGB to YUV formula
+	// perfected by @eugene-korobko's black magic
+	const redComponentGrayscaleWeight = 0.199;
+	const greenComponentGrayscaleWeight = 0.687;
+	const blueComponentGrayscaleWeight = 0.114;
+
 	return (
-		0.199 * rgbValue[0] +
-		0.687 * rgbValue[1] +
-		0.114 * rgbValue[2]
+		redComponentGrayscaleWeight * rgbValue[0] +
+		greenComponentGrayscaleWeight * rgbValue[1] +
+		blueComponentGrayscaleWeight * rgbValue[2]
 	);
 }
 
