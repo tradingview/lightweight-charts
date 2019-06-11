@@ -4,7 +4,7 @@ Each series has a set of common properties and methods regardless of its type.
 
 For example, to create any type of series you can pass the `title` parameter to set series title.
 
-These "common" parameters and API is described here. If you want to see an API for a specific type of series - see relevant doc page.
+These "common" parameters and API are described here. If you want to see an API for a specific type of series - see relevant doc page.
 
 ## Creating a series
 
@@ -124,6 +124,10 @@ Every series has its own data type. Please refer to series page to determine wha
 
 ## Methods
 
+### options
+
+Returns the full set of currently applied options, including defaults.
+
 ### applyOptions
 
 This method is used to apply new options to series.
@@ -212,7 +216,7 @@ The following options are available for setting the price format displayed by an
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
-|`type`|one of `price`, `volume` or `percent`|`price`|Sets a type of price displayed by series|
+|`type`|`price` &#124; `volume` &#124; `percent`|`price`|Sets a type of price displayed by series|
 |`precision`|`number`|`2`|Specifies a number of decimal places used for price value display|
 |`minMove`|`number`|`0.01`|Sets the minimum possible step size for price value movement|
 

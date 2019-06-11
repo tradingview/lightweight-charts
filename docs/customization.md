@@ -64,7 +64,7 @@ The following set of options can be used to adjust the price axis interface:
 
 |Name|Type|Default|Description|
 |--|---|-|--|
-|`position`|one of `left`, `right` or `none`|`right`|Sets the position to display price scale|
+|`position`|`left` &#124; `right` &#124; `none`|`right`|Sets the position to display price scale|
 |`mode`|[PriceScaleMode](./constants.md#pricescalemode) |`PriceScaleMode.Normal`|Sets the price scale mode|
 |`autoScale`|`boolean`|`true`|If true, fits series data to a chart size|
 |`invertScale`|`boolean`|`false`|If true, a chart series is reflected vertically, so that a growing trend is shown as a falling one and vise versa|
@@ -232,8 +232,8 @@ The following options are available for the watermark:
 |`visible`|`boolean`|`false`|If true, the watermark is displayed on a chart|
 |`text`|`string`|`''`|Contains the text to be displayed in the watermark|
 |`fontSize`|`number`|`48`|Watermark's font size in pixels|
-|`horzAlign`|one of `left`, `center` or `right`|`center`|Watermark horizontal alignment position|
-|`vertAlign`|one of `top`, `center` or `bottom`|`center`|Watermark vertical alignment position|
+|`horzAlign`|`left` &#124; `center` &#124; `right`|`center`|Watermark horizontal alignment position|
+|`vertAlign`|`top` &#124; `center` &#124; `bottom`|`center`|Watermark vertical alignment position|
 
 ### An example of a watermark customization
 
