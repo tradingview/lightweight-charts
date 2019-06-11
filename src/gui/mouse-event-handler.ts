@@ -431,7 +431,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _preventDefaultIfNeeded(event: MouseEvent | TouchEvent): void {
-		if (this._preventDefault) {
+		if (this._preventDefault && event.cancelable) {
 			event.preventDefault();
 		}
 	}
@@ -468,8 +468,10 @@ export class MouseEventHandler implements IDestroyable {
 			target: eventLike.target,
 			view: event.view,
 
-			preventDefault(): void {
-				event.preventDefault();
+			preventDefault: () => {
+				if (event.cancelable) {
+					event.preventDefault();
+				}
 			},
 		};
 	}

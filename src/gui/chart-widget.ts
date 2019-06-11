@@ -278,7 +278,9 @@ export class ChartWidget implements IDestroyable {
 			return;
 		}
 
-		event.preventDefault();
+		if (event.cancelable) {
+			event.preventDefault();
+		}
 
 		switch (event.deltaMode) {
 			case event.DOM_DELTA_PAGE:
