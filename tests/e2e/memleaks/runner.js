@@ -7,10 +7,14 @@ const Mocha = require('mocha');
 
 const serveLocalFiles = require('../serve-local-files').serveLocalFiles;
 
+const mochaConfig = require('../../../.mocharc.js');
+
 // override tsconfig
 process.env.TS_NODE_PROJECT = path.resolve(__dirname, '../tsconfig.json');
 
-require('ts-node/register');
+mochaConfig.require.forEach((module) => {
+	require(module);
+});
 
 if (process.argv.length !== 3) {
 	console.log('Usage: runner PATH_TO_GOLDEN_STANDALONE_MODULE PATH_TO_TEST_STANDALONE_MODULE');
@@ -40,10 +44,15 @@ function runMocha(closeServer) {
 	const mocha = new Mocha({
 		timeout: 20000,
 		slow: 10000,
+		reporter: mochaConfig.reporter,
+		reporterOptions: mochaConfig._reporterOptions,
 	});
 
-	mocha.checkLeaks();
-	mocha.hideDiff(false);
+	if (mochaConfig.checkLeaks) {
+		mocha.checkLeaks();
+	}
+
+	mocha.hideDiff(!mochaConfig.diff);
 	mocha.addFile(path.resolve(__dirname, './memleaks-test-cases.ts'));
 
 	mocha.run(failures => {

@@ -92,9 +92,13 @@ jobs:
 
   unittests:
     executor: node-latest-executor
+    environment:
+      TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
       - checkout-with-deps
       - run: npm run test
+      - store_test_results:
+          path: test-results/
 
   dts-changes:
     executor: node-latest-executor
@@ -110,9 +114,12 @@ jobs:
     environment:
       NO_SANDBOX: "true"
       CMP_OUT_DIR: ./graphics-cmp-data
+      TESTS_REPORT_FILE: "test-results/graphics/results.xml"
     steps:
       - checkout-with-deps
       - run: scripts/run-graphics-tests.sh
+      - store_test_results:
+          path: test-results/
       - store_artifacts:
           path: ./graphics-cmp-data
           when: on_fail
@@ -121,11 +128,14 @@ jobs:
     executor: node-browsers-latest-executor
     environment:
       NO_SANDBOX: "true"
+      TESTS_REPORT_FILE: "test-results/memleaks/results.xml"
     steps:
       - checkout-with-deps
       - attach_workspace:
           at: ./
       - run: scripts/run-memleaks-tests.sh
+      - store_test_results:
+          path: test-results/
 
 
 workflows:
