@@ -45,12 +45,19 @@ function handleCrosshairMoved(param) {
     console.log(`A user moved the crosshair to (${param.point.x}, ${param.point.y}) point, the time is ${param.time}`);
 }
 
-chart.subscribeCrosshairMove(handleClick);
+chart.subscribeCrosshairMove(handleCrosshairMoved);
 
 // ... after some time
 
-chart.unsubscribeCrosshairMove(handleClick);
+chart.unsubscribeCrosshairMove(handleCrosshairMoved);
 ```
+
+## Time range change
+
+|Name|Description|
+|-|-|
+|`subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Adds a subscription to visible range changes to receive notification about visible range of data changes|
+|`unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Removes a subscription to visible range changes|
 
 ## Types
 
@@ -78,9 +85,10 @@ export type MouseEventHandler = (param: MouseEventParams) => void;
 
 TimeRangeChangeEventHandler is a type of callback that is being used to get notified about chart time range changes.
 
-|Name|Description|
-|-|-|
-|`subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Adds a subscription to visible range changes to receive notification about visible range of data changes|
-|`unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Removes a subscription to visible range changes|
+```typescript
+export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
+```
 
+`TimeRange` is an object with two `time` fields - data of the first and the last time points of the current timerange.
 
+`null` is returned if the chart has no data at all.
