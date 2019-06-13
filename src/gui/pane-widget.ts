@@ -97,7 +97,7 @@ export class PaneWidget implements IDestroyable {
 		chart.model().mainPriceScaleOptionsChanged().subscribe(this._recreatePriceAxisWidget.bind(this), this);
 		this.updatePriceAxisWidget();
 
-		this._mouseEventHandler = new MouseEventHandler(this._topCanvas, this, true, this.chart().options().handleScroll.pressedMouseMove);
+		this._mouseEventHandler = new MouseEventHandler(this._topCanvas, this, true, !this.chart().options().handleScroll.pressedMouseMove);
 	}
 
 	public destroy(): void {

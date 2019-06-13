@@ -54,7 +54,7 @@ export class ChartWidget implements IDestroyable {
 		this._element.appendChild(this._tableElement);
 
 		this._onWheelBound = this._onMousewheel.bind(this);
-		this._element.addEventListener('wheel', this._onWheelBound);
+		this._element.addEventListener('wheel', this._onWheelBound, { passive: false });
 
 		this._model = new ChartModel(
 			this._invalidateHandler.bind(this),
@@ -278,7 +278,9 @@ export class ChartWidget implements IDestroyable {
 			return;
 		}
 
-		event.preventDefault();
+		if (event.cancelable) {
+			event.preventDefault();
+		}
 
 		switch (event.deltaMode) {
 			case event.DOM_DELTA_PAGE:
