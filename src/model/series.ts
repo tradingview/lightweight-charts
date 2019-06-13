@@ -384,7 +384,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public base(): number {
-		return 1 / this._options.priceFormat.minMove;
+		return Math.round(1 / this._options.priceFormat.minMove);
 	}
 
 	public formatter(): IFormatter {
