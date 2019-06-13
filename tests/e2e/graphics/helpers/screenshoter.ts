@@ -50,10 +50,6 @@ export class Screenshoter {
 
 			await page.setContent(pageContent, { waitUntil: 'load' });
 
-			if (errors.length !== 0) {
-				throw new Error(`Page has errors:\n${errors.join('\n')}`);
-			}
-
 			// to avoid random cursor position
 			await page.mouse.move(width / 2, height / 2);
 
@@ -66,6 +62,10 @@ export class Screenshoter {
 					});
 				});
 			});
+
+			if (errors.length !== 0) {
+				throw new Error(`Page has errors:\n${errors.join('\n')}`);
+			}
 
 			return PNG.sync.read(await page.screenshot({ encoding: 'binary' }));
 		} finally {
