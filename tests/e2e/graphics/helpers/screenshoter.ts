@@ -64,7 +64,7 @@ export class Screenshoter {
 			});
 
 			if (errors.length !== 0) {
-				throw new Error(`Page has errors:\n${errors.join('\n')}`);
+				throw new Error(errors.join('\n'));
 			}
 
 			return PNG.sync.read(await page.screenshot({ encoding: 'binary' }));

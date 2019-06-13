@@ -7,7 +7,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { PNG } from 'pngjs';
 
-import { CompareResult, compareScreenshots } from './helpers/compare-screenshots';
+import { compareScreenshots } from './helpers/compare-screenshots';
 import { getTestCases } from './helpers/get-test-cases';
 import { Screenshoter } from './helpers/screenshoter';
 
@@ -23,34 +23,12 @@ function generatePageContent(standaloneBundlePath: string, testCaseCode: string)
 const goldenStandalonePathEnvKey = 'GOLDEN_STANDALONE_PATH';
 const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 
-const testResultsOutDir = process.env.CMP_OUT_DIR || path.join(__dirname, '.gendata');
+const testResultsOutDir = path.resolve(process.env.CMP_OUT_DIR || path.join(__dirname, '.gendata'));
 const goldenStandalonePath = process.env[goldenStandalonePathEnvKey] || '';
 const testStandalonePath = process.env[testStandalonePathEnvKey] || '';
 
 function testCaseOutFolder(groupName: string, testCaseName: string): string {
 	return path.join(testResultsOutDir, groupName, testCaseName);
-}
-
-function writeTestData(// tslint:disable-next-line:max-params
-	groupName: string,
-	testCaseName: string,
-	goldenScreenshot: PNG,
-	testScreenshot: PNG,
-	compareResult: CompareResult,
-	goldenPageContent: string,
-	testPageContent: string
-): void {
-	const testCaseOutDir = testCaseOutFolder(groupName, testCaseName);
-	if (!fs.existsSync(testCaseOutDir)) {
-		fs.mkdirSync(testCaseOutDir, { recursive: true });
-	}
-
-	fs.writeFileSync(path.join(testCaseOutDir, '1.golden.png'), PNG.sync.write(goldenScreenshot));
-	fs.writeFileSync(path.join(testCaseOutDir, '2.test.png'), PNG.sync.write(testScreenshot));
-	fs.writeFileSync(path.join(testCaseOutDir, '3.diff.png'), PNG.sync.write(compareResult.diffImg));
-
-	fs.writeFileSync(path.join(testCaseOutDir, '1.golden.html'), goldenPageContent);
-	fs.writeFileSync(path.join(testCaseOutDir, '2.test.html'), testPageContent);
 }
 
 function rmRf(folder: string): void {
@@ -68,10 +46,6 @@ function rmRf(folder: string): void {
 	});
 
 	fs.rmdirSync(folder);
-}
-
-function removeTestCaseFolder(groupName: string, testCaseName: string): void {
-	rmRf(testCaseOutFolder(groupName, testCaseName));
 }
 
 describe('Graphics tests', function(): void {
@@ -99,30 +73,60 @@ describe('Graphics tests', function(): void {
 		const registerTestGroup = () => {
 			for (const testCase of testCases[groupName]) {
 				it(testCase.name, async () => {
+					const testCaseOutDir = testCaseOutFolder(groupName, testCase.name);
+					rmRf(testCaseOutDir);
+					fs.mkdirSync(testCaseOutDir, { recursive: true });
+
+					function writeTestDataItem(fileName: string, fileContent: string | Buffer): void {
+						fs.writeFileSync(path.join(testCaseOutDir, fileName), fileContent);
+					}
+
 					const goldenPageContent = generatePageContent(goldenStandalonePath, testCase.caseContent);
 					const testPageContent = generatePageContent(testStandalonePath, testCase.caseContent);
 
+					writeTestDataItem('1.golden.html', goldenPageContent);
+					writeTestDataItem('2.test.html', testPageContent);
+
 					// run in parallel to increase speed
-					const [goldenScreenshot, testScreenshot] = await Promise.all([
-						screenshoter.generateScreenshot(goldenPageContent),
-						screenshoter.generateScreenshot(testPageContent),
-					]);
+					const goldenScreenshotPromise = screenshoter.generateScreenshot(goldenPageContent);
+					const testScreenshotPromise = screenshoter.generateScreenshot(testPageContent);
 
-					const compareResult = await compareScreenshots(goldenScreenshot, testScreenshot);
+					const errors: string[] = [];
+					const failedPages: string[] = [];
 
-					writeTestData(
-						groupName,
-						testCase.name,
-						goldenScreenshot,
-						testScreenshot,
-						compareResult,
-						goldenPageContent,
-						testPageContent
-					);
+					let goldenScreenshot: PNG | null = null;
+					try {
+						goldenScreenshot = await goldenScreenshotPromise;
+						writeTestDataItem('1.golden.png', PNG.sync.write(goldenScreenshot));
+					} catch (e) {
+						errors.push(`=== Golden page ===\n${e.message}`);
+						failedPages.push('golden');
+					}
 
-					expect(compareResult.diffPixelsCount).to.be.equal(0, 'number of different pixels must be 0');
+					let testScreenshot: PNG | null = null;
+					try {
+						testScreenshot = await testScreenshotPromise;
+						writeTestDataItem('2.test.png', PNG.sync.write(testScreenshot));
+					} catch (e) {
+						errors.push(`=== Test page ===\n${e.message}`);
+						failedPages.push('test');
+					}
 
-					removeTestCaseFolder(groupName, testCase.name);
+					if (goldenScreenshot !== null && testScreenshot !== null) {
+						const compareResult = await compareScreenshots(goldenScreenshot, testScreenshot);
+
+						writeTestDataItem('3.diff.png', PNG.sync.write(compareResult.diffImg));
+
+						expect(compareResult.diffPixelsCount).to.be.equal(0, 'number of different pixels must be 0');
+					} else {
+						writeTestDataItem('3.errors.txt', errors.join('\n\n'));
+						throw new Error(
+							`The error(s) happened while generating a screenshot for the page(s): ${failedPages.join(', ')}.
+See ${testCaseOutDir} folder for an output of the test case.`
+						);
+					}
+
+					rmRf(testCaseOutDir);
 				});
 			}
 		};
