@@ -24,7 +24,10 @@ To bundle production builds (minified) too just set the `NODE_ENV` variable to `
 
 ## Tips
 
-- To make sure that your local copy passed all (almost) checks, you can use the `verify` npm script: `npm run verify`.
-- If you want to play with locally built package, you can create a `debug.html` page: `cp debug.html.example debug.html`.
+- You can use the following command to make sure that your local copy passes all (almost) available checks:
+
+    `npm run verify`
+
+- If you want to play with a locally built package, you can create a `debug.html` page: `cp debug.html.example debug.html`.
 
     This file (`debug.html`) is under gitignore, so you don't need to worry about changing it and you can modify it as you wish.
