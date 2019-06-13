@@ -227,10 +227,8 @@ export class ChartWidget implements IDestroyable {
 
 		const drawPriceAxises = () => {
 			for (const paneWidget of this._paneWidgets) {
-				ctx.save();
-				ctx.translate(targetX, targetY);
-				ensureNotNull(paneWidget.priceAxisWidget()).drawOnCanvas(ctx);
-				ctx.restore();
+				const image = ensureNotNull(paneWidget.priceAxisWidget()).getImage();
+				ctx.drawImage(image, targetX, targetY);
 				targetY += paneWidget.getSize().h;
 			}
 		};
@@ -241,11 +239,8 @@ export class ChartWidget implements IDestroyable {
 		}
 		targetY = 0;
 		for (const paneWidget of this._paneWidgets) {
-			ctx.save();
-			ctx.translate(targetX, targetY);
-			paneWidget.drawOnCanvas(ctx);
-			paneWidget.drawBranding(ctx);
-			ctx.restore();
+			const image = paneWidget.getImage();
+			ctx.drawImage(image, targetX, targetY);
 			targetY += paneWidget.getSize().h;
 		}
 		targetX += firstPane.getSize().w;
@@ -254,10 +249,8 @@ export class ChartWidget implements IDestroyable {
 			drawPriceAxises();
 		}
 		const drawStub = () => {
-			ctx.save();
-			ctx.translate(targetX, targetY);
-			ensureNotNull(this._timeAxisWidget.stub()).drawOnCanvas(ctx);
-			ctx.restore();
+			const image = ensureNotNull(this._timeAxisWidget.stub()).getImage();
+			ctx.drawImage(image, targetX, targetY);
 		};
 		// draw time scale
 		if (this._options.timeScale.visible) {
@@ -266,10 +259,8 @@ export class ChartWidget implements IDestroyable {
 				drawStub();
 				targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
 			}
-			ctx.save();
-			ctx.translate(targetX, targetY);
-			this._timeAxisWidget.drawOnCanvas(ctx);
-			ctx.restore();
+			const image = this._timeAxisWidget.getImage();
+			ctx.drawImage(image, targetX, targetY);
 			if (this._options.priceScale.position === 'right') {
 				targetX = firstPane.getSize().w;
 				drawStub();

@@ -27,7 +27,7 @@ export interface HitTestResult {
 }
 
 const enum LogoConstants {
-	FONT_SIZE = '7pt',
+	FONT_SIZE = 7,
 	LEFT_MARGIN = 6,
 	BOTTOM_MARGIN = 4,
 }
@@ -441,22 +441,22 @@ export class PaneWidget implements IDestroyable {
 		}
 	}
 
-	public drawOnCanvas(ctx: CanvasRenderingContext2D): void {
-		this._drawBackground(ctx, this._backgroundColor());
-		if (this._state) {
-			this._drawGrid(ctx);
-			this._drawWatermark(ctx);
-			this._drawSources(ctx);
-		}
-	}
-
-	public drawBranding(ctx: CanvasRenderingContext2D): void {
+	public getImage(): HTMLCanvasElement {
+		const res = document.createElement('canvas');
+		resizeCanvas(res, this._size);
+		const ctx = ensureNotNull(getContext2d(res));
+		ctx.drawImage(this._canvas, 0, 0);
 		if (this._brandingElement !== null) {
+			const dpr = window.devicePixelRatio || 1;
+			// one point is 1/72 of inch
+			// standard resolution is 96 dime per inch
+			const fontSize = (LogoConstants.FONT_SIZE / 72) * 96 * dpr;
 			ctx.fillStyle = colorWithTransparency(this._chart.options().layout.textColor, 0.9);
-			ctx.font = `${LogoConstants.FONT_SIZE} ${defaultFontFamily}`;
+			ctx.font = `${fontSize}px ${defaultFontFamily}`;
 			ctx.textBaseline = 'bottom';
 			ctx.fillText('TradingView', LogoConstants.LEFT_MARGIN, this._size.h - LogoConstants.BOTTOM_MARGIN);
 		}
+		return res;
 	}
 
 	public paint(type: number): void {
@@ -479,7 +479,12 @@ export class PaneWidget implements IDestroyable {
 		this._topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 
 		if (type !== InvalidationLevel.Cursor) {
-			this.drawOnCanvas(this._ctx);
+			this._drawBackground(this._ctx, this._backgroundColor());
+			if (this._state) {
+				this._drawGrid(this._ctx);
+				this._drawWatermark(this._ctx);
+				this._drawSources(this._ctx);
+			}
 		}
 		this._drawCrosshair(this._topCtx);
 	}
@@ -678,7 +683,7 @@ export class PaneWidget implements IDestroyable {
 
 		const style = linkEl.style;
 		style.zIndex = '1000';
-		style.fontSize = LogoConstants.FONT_SIZE;
+		style.fontSize = `${LogoConstants.FONT_SIZE}pt`;
 		style.position = 'absolute';
 		style.left = `${LogoConstants.LEFT_MARGIN}px`;
 		style.bottom = `${LogoConstants.BOTTOM_MARGIN}px`;

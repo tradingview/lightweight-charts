@@ -226,12 +226,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		});
 	}
 
-	public drawOnCanvas(ctx: CanvasRenderingContext2D): void {
-		this._drawBackground(ctx);
-		this._drawBorder(ctx);
-
-		this._drawTickMarks(ctx);
-		this._drawBackLabels(ctx);
+	public getImage(): HTMLCanvasElement {
+		return this._canvas;
 	}
 
 	public paint(type: InvalidationLevel): void {
@@ -244,8 +240,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			return;
 		}
 
-		const ctx = this._canvasContext;
-		this.drawOnCanvas(ctx);
+		this._drawBackground(this._canvasContext);
+		this._drawBorder(this._canvasContext);
+
+		this._drawTickMarks(this._canvasContext);
+		this._drawBackLabels(this._canvasContext);
+
 		if (this._stub !== null) {
 			this._stub.paint(type);
 		}

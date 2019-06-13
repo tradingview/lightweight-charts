@@ -92,12 +92,12 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
-		this.drawOnCanvas(this._ctx);
+		this._drawBackground(this._ctx);
+		this._drawBorder(this._ctx);
 	}
 
-	public drawOnCanvas(ctx: CanvasRenderingContext2D): void {
-		this._drawBackground(ctx);
-		this._drawBorder(ctx);
+	public getImage(): HTMLCanvasElement {
+		return this._canvas;
 	}
 
 	public getWidth(): number {
