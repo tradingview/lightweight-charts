@@ -2,7 +2,7 @@
 
 A candlestick chart shows price movements in the form of candlesticks.
 
-On the candlestick chart, open & close values form a solid body of a candle while wicks show high & low values for a candlestick’s time interval.
+On the candlestick chart, open & close values form a solid body of a candle while wicks show high & low values for a candlestick's time interval.
 
 ![Candlestick chart example](./assets/candlestick-series.png "Candlestick chart example")
 
