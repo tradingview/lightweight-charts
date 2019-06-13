@@ -30,7 +30,7 @@ function runTestCase(container) {
 		},
 	});
 
-	var mainSeries = chart.addCandleSeries({
+	var mainSeries = chart.addCandlestickSeries({
 		drawBorder: true,
 		borderColor: 'blue',
 	});

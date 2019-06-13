@@ -26,7 +26,7 @@ function generateData() {
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container);
 
-	var mainSeries = chart.addCandleSeries();
+	var mainSeries = chart.addCandlestickSeries();
 
 	mainSeries.setData(generateData());
 }

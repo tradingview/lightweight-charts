@@ -5,7 +5,7 @@ import { Point } from '../model/point';
 import {
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
-	CandleSeriesPartialOptions,
+	CandlestickSeriesPartialOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
 	SeriesType,
@@ -57,11 +57,11 @@ export interface IChartApi {
 	addBarSeries(barParams?: BarSeriesPartialOptions): ISeriesApi<'Bar'>;
 
 	/**
-	 * Creates a candle series with specified parameters
-	 * @param candleParams - customization parameters of the series being created
+	 * Creates a candlestick series with specified parameters
+	 * @param candlestickParams - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
-	addCandleSeries(candleParams?: CandleSeriesPartialOptions): ISeriesApi<'Candle'>;
+	addCandlestickSeries(candlestickParams?: CandlestickSeriesPartialOptions): ISeriesApi<'Candlestick'>;
 
 	/**
 	 * Creates a histogram series with specified parameters

@@ -48,7 +48,7 @@ export interface BarData {
 
 export interface SeriesDataItemTypeMap {
 	Bar: BarData;
-	Candle: BarData;
+	Candlestick: BarData;
 	Area: LineData;
 	Line: LineData;
 	Histogram: HistogramData;

@@ -21,7 +21,7 @@ function runTestCase(container) {
 		},
 	});
 
-	var mainSeries = chart.addCandleSeries();
+	var mainSeries = chart.addCandlestickSeries();
 
 	mainSeries.setData(generateData());
 }
