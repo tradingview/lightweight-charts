@@ -38,8 +38,8 @@ Each item of the candlestick series is an [OHLC](./ohlc.md) item.
 Colors for rising and falling candlesticks have to be set separately.
 
 Candlestick borders and wicks are visible by default and may be disabled.
-Note that when wicks are disabled the candlestick doesn’t show high and low price values.
-Border and wick color can be either set for all candlesticks at once or for rising and falling candlesticks separately. If the latter is your preference please make sure that you don’t use common options such as `borderColor` and `wickColor` since they have higher priority compared to the specified ones.
+Note that when wicks are disabled the candlestick doesn't show high and low price values.
+Border and wick color can be either set for all candlesticks at once or for rising and falling candlesticks separately. If the latter is your preference please make sure that you don't use common options such as `borderColor` and `wickColor` since they have higher priority compared to the specified ones.
 Candlestick series interface can be customized using the following set of options:
 
 |Name|Type|Default|Description|
