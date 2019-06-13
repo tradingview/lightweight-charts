@@ -99,7 +99,7 @@ export class ChartWidget implements IDestroyable {
 		return this._model;
 	}
 
-	public options(): ChartOptions {
+	public options(): Readonly<ChartOptions> {
 		return this._options;
 	}
 
@@ -389,6 +389,10 @@ export class ChartWidget implements IDestroyable {
 			this._updateGui();
 			if (invalidateMask.getFitContent()) {
 				this._model.timeScale().fitContent();
+			}
+			const targetTimeRange = invalidateMask.getTargetTimeRange();
+			if (targetTimeRange !== null) {
+				this._model.timeScale().setTimePointsRange(targetTimeRange);
 			}
 
 			const panes = this._model.panes();

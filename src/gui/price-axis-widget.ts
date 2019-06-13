@@ -139,7 +139,7 @@ export class PriceAxisWidget implements IDestroyable {
 		return makeFont(this.fontSize(), this._options.fontFamily);
 	}
 
-	public rendererOptions(): PriceAxisViewRendererOptions {
+	public rendererOptions(): Readonly<PriceAxisViewRendererOptions> {
 		const options = this._rendererOptionsProvider.options();
 
 		const isColorChanged = this._color !== options.color;
