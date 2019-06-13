@@ -23,7 +23,10 @@ When logging a bug, please be sure to include the following:
 
 ## Pull Requests
 
-For build instructions/suggestions see [BUILDING.md](./BUILDING.md).
+- For build instructions/suggestions see [BUILDING.md](./BUILDING.md).
+- After the review process has started, please **don't** use rebase to update the branch, use merge instead.
+
+    It's hard to track down the changes you made in previous commits if you do rebasing (and even determine if you really changed something).
 
 ### Tests
 
