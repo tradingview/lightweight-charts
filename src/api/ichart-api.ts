@@ -5,7 +5,7 @@ import { Point } from '../model/point';
 import {
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
-	CandleSeriesPartialOptions,
+	CandlestickSeriesPartialOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
 	SeriesType,
@@ -44,38 +44,38 @@ export interface IChartApi {
 
 	/**
 	 * Creates an area series with specified parameters
-	 * @param areaParams - customization parameters of the series being created
+	 * @param areaOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
-	addAreaSeries(areaParams?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
+	addAreaSeries(areaOptions?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
 
 	/**
 	 * Creates a bar series with specified parameters
-	 * @param barParams - customization parameters of the series being created
+	 * @param barOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
-	addBarSeries(barParams?: BarSeriesPartialOptions): ISeriesApi<'Bar'>;
+	addBarSeries(barOptions?: BarSeriesPartialOptions): ISeriesApi<'Bar'>;
 
 	/**
-	 * Creates a candle series with specified parameters
-	 * @param candleParams - customization parameters of the series being created
+	 * Creates a candlestick series with specified parameters
+	 * @param candlestickOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
-	addCandleSeries(candleParams?: CandleSeriesPartialOptions): ISeriesApi<'Candle'>;
+	addCandlestickSeries(candlestickOptions?: CandlestickSeriesPartialOptions): ISeriesApi<'Candlestick'>;
 
 	/**
 	 * Creates a histogram series with specified parameters
-	 * @param histogramParams - customization parameters of the series being created
+	 * @param histogramOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
-	addHistogramSeries(histogramParams?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram'>;
+	addHistogramSeries(histogramOptions?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram'>;
 
 	/**
 	 * Creates a line series with specified parameters
-	 * @param lineParams - customization parameters of the series being created
+	 * @param lineOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
-	addLineSeries(lineParams?: LineSeriesPartialOptions): ISeriesApi<'Line'>;
+	addLineSeries(lineOptions?: LineSeriesPartialOptions): ISeriesApi<'Line'>;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it

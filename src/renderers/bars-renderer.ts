@@ -4,9 +4,9 @@ import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 import { IPaneRenderer } from './ipane-renderer';
 import { optimalBarWidth } from './optimal-bar-width';
 
-export type BarCandleItemBase = TimedValue & BarPrices & BarCoordinates;
+export type BarCandlestickItemBase = TimedValue & BarPrices & BarCoordinates;
 
-export interface BarItem extends BarCandleItemBase {
+export interface BarItem extends BarCandlestickItemBase {
 	color: string;
 }
 

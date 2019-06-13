@@ -5,7 +5,7 @@ import { LineStyle, LineWidth } from '../renderers/draw-line';
 import { PriceScaleMargins } from './price-scale';
 
 /** Structure describing a drawing style of the candlestick chart  */
-export interface CandleStyleOptions {
+export interface CandlestickStyleOptions {
 	/** Color of rising candlesticks */
 	upColor: string;
 	/** Color of falling candlesticks */
@@ -35,7 +35,7 @@ export interface CandleStyleOptions {
 	wickDownColor: string;
 }
 
-export function fillUpDownCandlesColors(options: Partial<CandleStyleOptions>): void {
+export function fillUpDownCandlesticksColors(options: Partial<CandlestickStyleOptions>): void {
 	if (options.borderColor !== undefined) {
 		options.borderUpColor = options.borderColor;
 		options.borderDownColor = options.borderColor;
@@ -192,8 +192,8 @@ export type BarSeriesPartialOptions = SeriesPartialOptions<BarStyleOptions>;
 /**
  * Structure describing candlesticks series options.
  */
-export type CandleSeriesOptions = SeriesOptions<CandleStyleOptions>;
-export type CandleSeriesPartialOptions = SeriesPartialOptions<CandleStyleOptions>;
+export type CandlestickSeriesOptions = SeriesOptions<CandlestickStyleOptions>;
+export type CandlestickSeriesPartialOptions = SeriesPartialOptions<CandlestickStyleOptions>;
 
 /**
  * Structure describing histogram series options.
@@ -209,7 +209,7 @@ export type LineSeriesPartialOptions = SeriesPartialOptions<LineStyleOptions>;
 
 export interface SeriesOptionsMap {
 	Bar: BarSeriesOptions;
-	Candle: CandleSeriesOptions;
+	Candlestick: CandlestickSeriesOptions;
 	Area: AreaSeriesOptions;
 	Line: LineSeriesOptions;
 	Histogram: HistogramSeriesOptions;
@@ -217,7 +217,7 @@ export interface SeriesOptionsMap {
 
 export interface SeriesPartialOptionsMap {
 	Bar: BarSeriesPartialOptions;
-	Candle: CandleSeriesPartialOptions;
+	Candlestick: CandlestickSeriesPartialOptions;
 	Area: AreaSeriesPartialOptions;
 	Line: LineSeriesPartialOptions;
 	Histogram: HistogramSeriesPartialOptions;
