@@ -130,7 +130,7 @@ chart.applyOptions({
         borderColor: '#fff000',
         visible: true,
         timeVisible: true,
-	secondsVisible: false,
+        secondsVisible: false,
     },
 });
 ```
