@@ -32,7 +32,7 @@ chart.unsubscribeClick(handleClick);
 |Name|Description|
 |-|-|
 |`subscribeCrosshairMove(handler: MouseEventHandler): void;`|Get notified when a mouse moves on a chart|
-|`unsubscribeCrosshairMove(handler: MouseEventHandler): void;`|Don’t get notified when a mouse moves on a chart|
+|`unsubscribeCrosshairMove(handler: MouseEventHandler): void;`|Don't get notified when a mouse moves on a chart|
 
 Example:
 
