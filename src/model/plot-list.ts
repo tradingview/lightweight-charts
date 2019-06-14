@@ -491,9 +491,9 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 
 			let chunkMinMax = minMaxCache.get(chunkIndex);
 			if (chunkMinMax === undefined) {
-				const chunkStart = chunkIndex * CHUNK_SIZE;
-				const chunkEnd = Math.min((chunkIndex + 1) * CHUNK_SIZE - 1, this._items.length - 1);
-				chunkMinMax = this._plotMinMax(chunkStart as TimePointIndex, chunkEnd as TimePointIndex, plotInfo);
+				const chunkStart = this._lowerbound(chunkIndex * CHUNK_SIZE as TimePointIndex);
+				const chunkEnd = this._upperbound((chunkIndex + 1) * CHUNK_SIZE - 1 as TimePointIndex);
+				chunkMinMax = this._plotMinMax(chunkStart, chunkEnd, plotInfo);
 				minMaxCache.set(chunkIndex, chunkMinMax);
 			}
 
