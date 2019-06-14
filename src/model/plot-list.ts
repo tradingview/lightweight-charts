@@ -362,7 +362,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		}
 
 		for (let i = startIndex; i < endIndex; i++) {
-			const values = this._items[i as PlotRowIndex].value;
+			const values = this._items[i].value;
 
 			const v = func(values);
 			if (v === undefined || v === null || Number.isNaN(v)) {
