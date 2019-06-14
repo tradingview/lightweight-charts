@@ -818,7 +818,7 @@ export class PriceScale {
 
 	private _recalculateSourcesForAutoScale(): void {
 		function useSourceForAutoScale(source: IDataSource): source is IPriceDataSource {
-			if (!(source.isVisible() || source instanceof Series)) {
+			if (!(source instanceof Series)) {
 				return false;
 			}
 
@@ -839,9 +839,6 @@ export class PriceScale {
 
 		for (let i = 0; i < sources.length; i++) {
 			const source = sources[i];
-			if (!source.isVisible()) {
-				continue;
-			}
 
 			const firstValue = source.firstValue();
 			if (firstValue === null) {

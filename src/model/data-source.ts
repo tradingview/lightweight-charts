@@ -32,10 +32,6 @@ export abstract class DataSource implements IDataSource {
 		this._onPriceScaleChanged.fire();
 	}
 
-	public isVisible(): boolean {
-		return true;
-	}
-
 	public onPriceScaleChanged(): ISubscription {
 		return this._onPriceScaleChanged;
 	}
