@@ -310,17 +310,16 @@ export class ChartWidget implements IDestroyable {
 	private _drawImpl(invalidateMask: InvalidateMask): void {
 		const invalidationType = invalidateMask.fullInvalidation();
 
+		// actions for full invalidation ONLY (not shared with light)
 		if (invalidationType === InvalidationLevel.Full) {
 			this._updateGui();
-			if (invalidateMask.getFitContent()) {
-				this._model.timeScale().fitContent();
-			}
+		}
 
-			const targetTimeRange = invalidateMask.getTargetTimeRange();
-			if (targetTimeRange !== null) {
-				this._model.timeScale().setTimePointsRange(targetTimeRange);
-			}
-
+		// light or full invalidate actions
+		if (
+			invalidationType === InvalidationLevel.Full ||
+			invalidationType === InvalidationLevel.Light
+		) {
 			const panes = this._model.panes();
 			for (let i = 0; i < panes.length; i++) {
 				if (invalidateMask.invalidateForPane(i).autoScale) {
@@ -328,11 +327,6 @@ export class ChartWidget implements IDestroyable {
 				}
 			}
 
-			this._timeAxisWidget.update();
-			for (let i = 0; i < this._paneWidgets.length; i++) {
-				this._paneWidgets[i].setState(this._model.panes()[i]);
-			}
-		} else if (invalidationType === InvalidationLevel.Light) {
 			if (invalidateMask.getFitContent()) {
 				this._model.timeScale().fitContent();
 			}
