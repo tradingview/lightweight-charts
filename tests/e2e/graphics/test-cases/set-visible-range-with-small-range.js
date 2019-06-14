@@ -1,7 +1,7 @@
 function generateData() {
 	var res = [];
 	var time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (var i = 0; i < 1000; ++i) {
+	for (var i = 0; i < 5; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
 			value: i,
@@ -20,8 +20,9 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
+	// we should respect min/max bar spacing values
 	chart.timeScale().setVisibleRange({
 		from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
-		to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
+		to: (new Date(Date.UTC(2018, 0, 2, 0, 0, 0, 0))).getTime() / 1000,
 	});
 }
