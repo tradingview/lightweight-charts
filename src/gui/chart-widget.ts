@@ -205,7 +205,11 @@ export class ChartWidget implements IDestroyable {
 		this._paneWidgets[0].disableBranding();
 	}
 
-	public takeScreenshot(): string {
+	public takeScreenshot(): HTMLCanvasElement {
+		if (this._invalidateMask !== null) {
+			this._drawImpl(this._invalidateMask);
+			this._invalidateMask = null;
+		}
 		// calculate target size
 		const firstPane = this._paneWidgets[0];
 		let targetWidth = firstPane.getSize().w;
@@ -215,6 +219,9 @@ export class ChartWidget implements IDestroyable {
 		let targetHeight = 0;
 		for (const paneWidget of this._paneWidgets) {
 			targetHeight += paneWidget.getSize().h;
+		}
+		for (const paneSeparator of this._paneSeparators) {
+			targetHeight += paneSeparator.getHeight();
 		}
 		if (this._options.timeScale.visible) {
 			targetHeight += this._timeAxisWidget.height();
@@ -238,10 +245,17 @@ export class ChartWidget implements IDestroyable {
 			targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
 		}
 		targetY = 0;
-		for (const paneWidget of this._paneWidgets) {
+		for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
+			const paneWidget = this._paneWidgets[paneIndex];
 			const image = paneWidget.getImage();
 			ctx.drawImage(image, targetX, targetY);
 			targetY += paneWidget.getSize().h;
+			if (paneIndex < this._paneWidgets.length - 1) {
+				const separator = this._paneSeparators[paneIndex];
+				const separatorImage = separator.getImage();
+				ctx.drawImage(separatorImage, targetX, targetY);
+				targetY += separator.getHeight();
+			}
 		}
 		targetX += firstPane.getSize().w;
 		if (this._options.priceScale.position === 'right') {
@@ -268,8 +282,7 @@ export class ChartWidget implements IDestroyable {
 			}
 		}
 
-		// draw branding
-		return targetCanvas.toDataURL();
+		return targetCanvas;
 	}
 
 	private _adjustSizeImpl(): void {

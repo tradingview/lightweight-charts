@@ -255,7 +255,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.disableBranding();
 	}
 
-	public takeScreenshot(): string {
+	public takeScreenshot(): HTMLCanvasElement {
 		return this._chartWidget.takeScreenshot();
 	}
 

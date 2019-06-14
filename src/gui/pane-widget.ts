@@ -4,7 +4,7 @@ import { colorWithTransparency } from '../helpers/color';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { defaultFontFamily } from '../helpers/make-font';
+import { defaultFontFamily, makeFont } from '../helpers/make-font';
 
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
@@ -27,9 +27,9 @@ export interface HitTestResult {
 }
 
 const enum LogoConstants {
-	FONT_SIZE = 7,
-	LEFT_MARGIN = 6,
-	BOTTOM_MARGIN = 4,
+	FontSize = 7,
+	LeftMargin = 6,
+	BottomMargin = 4,
 }
 
 export class PaneWidget implements IDestroyable {
@@ -450,11 +450,11 @@ export class PaneWidget implements IDestroyable {
 			const dpr = window.devicePixelRatio || 1;
 			// one point is 1/72 of inch
 			// standard resolution is 96 dime per inch
-			const fontSize = (LogoConstants.FONT_SIZE / 72) * 96 * dpr;
+			const fontSize = (LogoConstants.FontSize / 72) * 96 * dpr;
 			ctx.fillStyle = colorWithTransparency(this._chart.options().layout.textColor, 0.9);
-			ctx.font = `${fontSize}px ${defaultFontFamily}`;
+			ctx.font = makeFont(fontSize, defaultFontFamily);
 			ctx.textBaseline = 'bottom';
-			ctx.fillText('TradingView', LogoConstants.LEFT_MARGIN, this._size.h - LogoConstants.BOTTOM_MARGIN);
+			ctx.fillText('TradingView', LogoConstants.LeftMargin, this._size.h - LogoConstants.BottomMargin);
 		}
 		return res;
 	}
@@ -683,10 +683,10 @@ export class PaneWidget implements IDestroyable {
 
 		const style = linkEl.style;
 		style.zIndex = '1000';
-		style.fontSize = `${LogoConstants.FONT_SIZE}pt`;
+		style.fontSize = `${LogoConstants.FontSize}pt`;
 		style.position = 'absolute';
-		style.left = `${LogoConstants.LEFT_MARGIN}px`;
-		style.bottom = `${LogoConstants.BOTTOM_MARGIN}px`;
+		style.left = `${LogoConstants.LeftMargin}px`;
+		style.bottom = `${LogoConstants.BottomMargin}px`;
 		style.textDecoration = 'none';
 		style.userSelect = 'none';
 		this._paneCell.appendChild(linkEl);

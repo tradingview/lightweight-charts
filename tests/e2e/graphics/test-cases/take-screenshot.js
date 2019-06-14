@@ -40,7 +40,7 @@ function runTestCase(container) {
 	// create canvas to draw screenshot
 	chart.resize(240, 600, true);
 
-	var screenshot = chart.takeScreenshot();
+	var screenshot = chart.takeScreenshot().toDataURL();
 
 	var parent = container.parentNode;
 	var img = document.createElement('img');

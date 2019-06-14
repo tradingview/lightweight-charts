@@ -1,6 +1,9 @@
+import { ensureNotNull } from '../helpers/assertions';
+import { getContext2d } from '../helpers/canvas-wrapper';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clamp } from '../helpers/mathex';
 
+import { resizeCanvas, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -66,8 +69,23 @@ export class PaneSeparator implements IDestroyable {
 		}
 	}
 
+	public getHeight(): number {
+		return SEPARATOR_HEIGHT;
+	}
+
 	public getElement(): HTMLElement {
 		return this._rowElement;
+	}
+
+	public getImage(): HTMLCanvasElement {
+		const res = document.createElement('canvas');
+		const width = this._paneA.getSize().w;
+		const height = this.getHeight();
+		resizeCanvas(res, new Size(width, height));
+		const ctx = ensureNotNull(getContext2d(res));
+		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;
+		ctx.fillRect(0, 0, width, height);
+		return res;
 	}
 
 	public update(): void {
