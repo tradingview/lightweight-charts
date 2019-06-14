@@ -326,14 +326,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public paneViews(): ReadonlyArray<IPaneView> {
-		if (!this.isVisible()) {
-			return [];
-		}
 		const res: IPaneView[] = [];
 
 		if (this.priceScale() === this.model().mainPriceScale()) {
 			res.push(this._baseHorizontalLineView);
 		}
+
 		res.push(ensureNotNull(this._paneView));
 		res.push(this._priceLineView);
 

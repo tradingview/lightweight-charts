@@ -215,7 +215,7 @@ export class ChartModel implements IDestroyable {
 		// if autoscale option is true, it is ok, just recalculate by invalidation mask
 		// if autoscale option is false, autoscale anyway on the first draw
 		// also there is a scenario when autoscale is true in constructor and false later on applyOptions
-		const mask = new InvalidateMask(InvalidationLevel.None);
+		const mask = new InvalidateMask(InvalidationLevel.Full);
 		mask.invalidatePane(actualIndex, {
 			level: InvalidationLevel.None,
 			autoScale: true,

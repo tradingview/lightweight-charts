@@ -1,5 +1,3 @@
-import { ensureNotNull } from '../../helpers/assertions';
-
 import { ChartModel } from '../../model/chart-model';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
@@ -52,26 +50,27 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		const priceScale = this._series.priceScale();
 		const timeScale = this._model.timeScale();
 
+		this._itemsVisibleRange = null;
+
 		if (timeScale.isEmpty() || priceScale.isEmpty()) {
-			this._itemsVisibleRange = null;
 			return;
 		}
 
 		const visibleBars = timeScale.visibleBars();
 		if (visibleBars === null) {
-			this._itemsVisibleRange = null;
 			return;
 		}
 
 		if (this._series.data().bars().size() === 0) {
-			this._itemsVisibleRange = null;
+			return;
+		}
+
+		const firstValue = this._series.firstValue();
+		if (firstValue === null) {
 			return;
 		}
 
 		this._itemsVisibleRange = visibleTimedValues(this._items, visibleBars);
-
-		const firstValue = ensureNotNull(this._series.firstValue());
-
 		this._convertToCoordinates(priceScale, timeScale, firstValue);
 	}
 }

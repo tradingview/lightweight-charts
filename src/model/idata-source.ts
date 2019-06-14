@@ -25,7 +25,6 @@ export interface IDataSource {
 	priceScale(): PriceScale | null;
 	setPriceScale(scale: PriceScale | null): void;
 
-	isVisible(): boolean;
 	updateAllViews(): void;
 
 	priceAxisViews(pane?: Pane, priceScale?: PriceScale): ReadonlyArray<IPriceAxisView>;
