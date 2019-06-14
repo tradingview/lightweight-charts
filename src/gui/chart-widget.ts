@@ -315,6 +315,7 @@ export class ChartWidget implements IDestroyable {
 			if (invalidateMask.getFitContent()) {
 				this._model.timeScale().fitContent();
 			}
+
 			const targetTimeRange = invalidateMask.getTargetTimeRange();
 			if (targetTimeRange !== null) {
 				this._model.timeScale().setTimePointsRange(targetTimeRange);
@@ -335,6 +336,12 @@ export class ChartWidget implements IDestroyable {
 			if (invalidateMask.getFitContent()) {
 				this._model.timeScale().fitContent();
 			}
+
+			const targetTimeRange = invalidateMask.getTargetTimeRange();
+			if (targetTimeRange !== null) {
+				this._model.timeScale().setTimePointsRange(targetTimeRange);
+			}
+
 			this._timeAxisWidget.update();
 		}
 
