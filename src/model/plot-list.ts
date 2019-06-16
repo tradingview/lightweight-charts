@@ -11,10 +11,7 @@ export const enum PlotRowSearchMode {
 	NearestRight = 1,
 }
 
-export type FoldingFunction<PlotValueTuple extends PlotValue[], T> = (index: TimePointIndex, value: PlotValueTuple, acc: T) => T;
 export type EnumeratingFunction<TimeType, PlotValueTuple extends PlotValue[]> = (index: TimePointIndex, bar: PlotRow<TimeType, PlotValueTuple>) => boolean;
-export type PlotRowPredicate<PlotValueTuple extends PlotValue[]> = (index: TimePointIndex, value: PlotValueTuple) => boolean;
-export type ReducingFunction<PlotValueTuple extends PlotValue[], T> = (acc: T, index: TimePointIndex, value: PlotValueTuple) => T;
 
 export interface PlotInfo {
 	name: string;

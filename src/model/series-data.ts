@@ -3,11 +3,6 @@ import { PlotRow, PlotValue } from './plot-data';
 import { EnumeratingFunction, PlotFunctionMap, PlotList, PlotRowSearchMode } from './plot-list';
 import { TimePoint, TimePointIndex } from './time-data';
 
-export const enum TimePointIndexSearchMode {
-	FromLeft = -1,
-	FromRight = 1,
-}
-
 export interface Bar {
 	time: TimePoint;
 	value: [PlotValue, PlotValue, PlotValue, PlotValue, PlotValue];
