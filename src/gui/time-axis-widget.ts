@@ -240,11 +240,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			return;
 		}
 
-		this._drawBackground(this._canvasContext);
-		this._drawBorder(this._canvasContext);
+		const ctx = this._canvasContext;
+		this._drawBackground(ctx);
+		this._drawBorder(ctx);
 
-		this._drawTickMarks(this._canvasContext);
-		this._drawBackLabels(this._canvasContext);
+		this._drawTickMarks(ctx);
+		this._drawBackLabels(ctx);
 
 		if (this._stub !== null) {
 			this._stub.paint(type);
