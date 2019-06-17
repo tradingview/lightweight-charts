@@ -16,8 +16,7 @@ function generateData() {
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container, {
 		timeScale: {
-			rightOffset: 10,
-			barSpacing: 12,
+			barSpacing: 100,
 		},
 	});
 

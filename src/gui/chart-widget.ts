@@ -55,7 +55,7 @@ export class ChartWidget implements IDestroyable {
 		this._element.appendChild(this._tableElement);
 
 		this._onWheelBound = this._onMousewheel.bind(this);
-		this._element.addEventListener('wheel', this._onWheelBound);
+		this._element.addEventListener('wheel', this._onWheelBound, { passive: false });
 
 		this._model = new ChartModel(
 			this._invalidateHandler.bind(this),
@@ -359,7 +359,9 @@ export class ChartWidget implements IDestroyable {
 			return;
 		}
 
-		event.preventDefault();
+		if (event.cancelable) {
+			event.preventDefault();
+		}
 
 		switch (event.deltaMode) {
 			case event.DOM_DELTA_PAGE:
@@ -389,16 +391,16 @@ export class ChartWidget implements IDestroyable {
 	private _drawImpl(invalidateMask: InvalidateMask): void {
 		const invalidationType = invalidateMask.fullInvalidation();
 
+		// actions for full invalidation ONLY (not shared with light)
 		if (invalidationType === InvalidationLevel.Full) {
 			this._updateGui();
-			if (invalidateMask.getFitContent()) {
-				this._model.timeScale().fitContent();
-			}
-			const targetTimeRange = invalidateMask.getTargetTimeRange();
-			if (targetTimeRange !== null) {
-				this._model.timeScale().setTimePointsRange(targetTimeRange);
-			}
+		}
 
+		// light or full invalidate actions
+		if (
+			invalidationType === InvalidationLevel.Full ||
+			invalidationType === InvalidationLevel.Light
+		) {
 			const panes = this._model.panes();
 			for (let i = 0; i < panes.length; i++) {
 				if (invalidateMask.invalidateForPane(i).autoScale) {
@@ -406,14 +408,15 @@ export class ChartWidget implements IDestroyable {
 				}
 			}
 
-			this._timeAxisWidget.update();
-			for (let i = 0; i < this._paneWidgets.length; i++) {
-				this._paneWidgets[i].setState(this._model.panes()[i]);
-			}
-		} else if (invalidationType === InvalidationLevel.Light) {
 			if (invalidateMask.getFitContent()) {
 				this._model.timeScale().fitContent();
 			}
+
+			const targetTimeRange = invalidateMask.getTargetTimeRange();
+			if (targetTimeRange !== null) {
+				this._model.timeScale().setTimePointsRange(targetTimeRange);
+			}
+
 			this._timeAxisWidget.update();
 		}
 

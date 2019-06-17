@@ -395,6 +395,31 @@ describe('PlotList', () => {
 			expect(ensureNotNull(minMax).min).to.be.equal(1);
 			expect(ensureNotNull(minMax).max).to.be.equal(123);
 		});
+
+		it('should return correct values if the data has gaps and we start search with second-to-last chunk', () => {
+			pl.clear();
+			pl.add(29 as TimePointIndex, 1 as UTCTimestamp, [1, 1, 1, 1, 0]);
+			pl.add(31 as TimePointIndex, 2 as UTCTimestamp, [2, 2, 2, 2, 0]);
+			pl.add(55 as TimePointIndex, 3 as UTCTimestamp, [3, 3, 3, 3, 0]);
+			pl.add(65 as TimePointIndex, 4 as UTCTimestamp, [4, 4, 4, 4, 0]);
+
+			const plots: PlotInfoList = [
+				{
+					name: 'plot1',
+					offset: 0,
+				},
+			];
+
+			const minMax = pl.minMaxOnRangeCached(30 as TimePointIndex, 200 as TimePointIndex, plots);
+			expect(minMax).not.to.be.equal(null);
+			expect(ensureNotNull(minMax).min).to.be.equal(2);
+			expect(ensureNotNull(minMax).max).to.be.equal(4);
+
+			const minMax2 = pl.minMaxOnRangeCached(30 as TimePointIndex, 60 as TimePointIndex, plots);
+			expect(minMax2).not.to.be.equal(null);
+			expect(ensureNotNull(minMax2).min).to.be.equal(2);
+			expect(ensureNotNull(minMax2).max).to.be.equal(3);
+		});
 	});
 
 	describe('minMaxOnRangeByPlotFunction and minMaxOnRangeByPlotFunctionCached', () => {

@@ -352,7 +352,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 	/**
 	 * @param endIndex Non-inclusive end
 	 */
-	private _plotMinMax(startIndex: number, endIndex: number, plot: PlotInfo): MinMax | null {
+	private _plotMinMax(startIndex: PlotRowIndex, endIndex: PlotRowIndex, plot: PlotInfo): MinMax | null {
 		let result: MinMax | null = null;
 
 		const func = this._plotFunctions.get(plot.name);
@@ -362,7 +362,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		}
 
 		for (let i = startIndex; i < endIndex; i++) {
-			const values = this._items[i as PlotRowIndex].value;
+			const values = this._items[i].value;
 
 			const v = func(values);
 			if (v === undefined || v === null || Number.isNaN(v)) {
@@ -474,7 +474,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		{
 			const startIndex = this._lowerbound(s as TimePointIndex);
 			const endIndex = this._upperbound(Math.min(e, cachedLow, end) as TimePointIndex); // non-inclusive end
-			const plotMinMax = this._plotMinMax(startIndex, endIndex, plotInfo);
+			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotInfo);
 			result = mergeMinMax(result, plotMinMax);
 		}
 
@@ -491,9 +491,9 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 
 			let chunkMinMax = minMaxCache.get(chunkIndex);
 			if (chunkMinMax === undefined) {
-				const chunkStart = chunkIndex * CHUNK_SIZE;
-				const chunkEnd = Math.min((chunkIndex + 1) * CHUNK_SIZE - 1, this._items.length - 1);
-				chunkMinMax = this._plotMinMax(chunkStart as TimePointIndex, chunkEnd as TimePointIndex, plotInfo);
+				const chunkStart = this._lowerbound(chunkIndex * CHUNK_SIZE as TimePointIndex);
+				const chunkEnd = this._upperbound((chunkIndex + 1) * CHUNK_SIZE - 1 as TimePointIndex);
+				chunkMinMax = this._plotMinMax(chunkStart as PlotRowIndex, chunkEnd as PlotRowIndex, plotInfo);
 				minMaxCache.set(chunkIndex, chunkMinMax);
 			}
 
@@ -504,7 +504,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		{
 			const startIndex = this._lowerbound(cachedHigh as TimePointIndex);
 			const endIndex = this._upperbound(e as TimePointIndex); // non-inclusive end
-			const plotMinMax = this._plotMinMax(startIndex, endIndex, plotInfo);
+			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotInfo);
 			result = mergeMinMax(result, plotMinMax);
 		}
 

@@ -20,8 +20,14 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	chart.timeScale().setVisibleRange({
-		from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
-		to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			chart.timeScale().setVisibleRange({
+				from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
+				to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
+			});
+
+			resolve();
+		}, 1000);
 	});
 }

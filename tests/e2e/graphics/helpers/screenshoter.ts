@@ -53,6 +53,12 @@ export class Screenshoter {
 			// to avoid random cursor position
 			await page.mouse.move(width / 2, height / 2);
 
+			// wait for test case is ready
+			await page.evaluate(() => {
+				// tslint:disable-next-line:no-any
+				return (window as any).testCaseReady;
+			});
+
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
 				return new Promise((resolve: () => void) => {
@@ -64,7 +70,7 @@ export class Screenshoter {
 			});
 
 			if (errors.length !== 0) {
-				throw new Error(`Page has errors:\n${errors.join('\n')}`);
+				throw new Error(errors.join('\n'));
 			}
 
 			return PNG.sync.read(await page.screenshot({ encoding: 'binary' }));

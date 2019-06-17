@@ -12,9 +12,9 @@ import {
 	AreaSeriesPartialOptions,
 	BarSeriesOptions,
 	BarSeriesPartialOptions,
-	CandleSeriesOptions,
-	CandleSeriesPartialOptions,
-	fillUpDownCandlesColors,
+	CandlestickSeriesOptions,
+	CandlestickSeriesPartialOptions,
+	fillUpDownCandlesticksColors,
 	HistogramSeriesOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesOptions,
@@ -25,7 +25,7 @@ import {
 } from '../model/series-options';
 import { TimePointIndex } from '../model/time-data';
 
-import { CandleSeriesApi } from './candle-series-api';
+import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, SeriesUpdatePacket } from './data-layer';
 import { HistogramSeriesApi } from './histogram-series-api';
@@ -36,7 +36,7 @@ import { ITimeScaleApi, TimeRange } from './itime-scale-api';
 import {
 	areaStyleDefaults,
 	barStyleDefaults,
-	candleStyleDefaults,
+	candlestickStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
@@ -129,14 +129,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return res;
 	}
 
-	public addCandleSeries(options: CandleSeriesPartialOptions = {}): ISeriesApi<'Candle'> {
-		fillUpDownCandlesColors(options);
+	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}): ISeriesApi<'Candlestick'> {
+		fillUpDownCandlesticksColors(options);
 		patchPriceFormat(options.priceFormat);
 
-		const strictOptions = merge(clone(seriesOptionsDefaults), candleStyleDefaults, options) as CandleSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Candle', strictOptions);
+		const strictOptions = merge(clone(seriesOptionsDefaults), candlestickStyleDefaults, options) as CandlestickSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Candlestick', strictOptions);
 
-		const res = new CandleSeriesApi(series, this);
+		const res = new CandlestickSeriesApi(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 

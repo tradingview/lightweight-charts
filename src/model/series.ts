@@ -9,7 +9,7 @@ import { isInteger, merge } from '../helpers/strict-type-checks';
 
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
-import { SeriesCandlesPaneView } from '../views/pane/candles-pane-view';
+import { SeriesCandlesticksPaneView } from '../views/pane/candlesticks-pane-view';
 import { SeriesHistogramPaneView } from '../views/pane/histogram-pane-view';
 import { IPaneView } from '../views/pane/ipane-view';
 import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
@@ -201,8 +201,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 				break;
 			}
 
-			case 'Candle': {
-				this._paneView = new SeriesCandlesPaneView(this as Series<'Candle'>, this.model());
+			case 'Candlestick': {
+				this._paneView = new SeriesCandlesticksPaneView(this as Series<'Candlestick'>, this.model());
 				break;
 			}
 
@@ -326,14 +326,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public paneViews(): ReadonlyArray<IPaneView> {
-		if (!this.isVisible()) {
-			return [];
-		}
 		const res: IPaneView[] = [];
 
 		if (this.priceScale() === this.model().mainPriceScale()) {
 			res.push(this._baseHorizontalLineView);
 		}
+
 		res.push(ensureNotNull(this._paneView));
 		res.push(this._priceLineView);
 

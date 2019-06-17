@@ -124,7 +124,7 @@ export class PriceFormatter implements IFormatter {
 
 		let fracString = '';
 		const fracLength = this._fractionalLength !== undefined ? this._fractionalLength : NaN;
-		if (base >= 1) {
+		if (base > 1) {
 			let fracPart = +(Math.round(price * base) - intPart * base).toFixed(this._fractionalLength);
 			if (fracPart >= base) {
 				fracPart -= base;

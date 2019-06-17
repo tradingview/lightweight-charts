@@ -7,7 +7,7 @@ Event subscriptions can notify you of such chart/user interactions as mouse clic
 |Name|Description|
 |-|-|
 |`subscribeClick(handler: MouseEventHandler): void;`|Get notified when a mouse clicks on a chart|
-|`unsubscribeClick(handler: MouseEventHandler): void;`|Don’t get notified when a mouse clicks on a chart|
+|`unsubscribeClick(handler: MouseEventHandler): void;`|Don't get notified when a mouse clicks on a chart|
 
 Example:
 
@@ -32,7 +32,7 @@ chart.unsubscribeClick(handleClick);
 |Name|Description|
 |-|-|
 |`subscribeCrosshairMove(handler: MouseEventHandler): void;`|Get notified when a mouse moves on a chart|
-|`unsubscribeCrosshairMove(handler: MouseEventHandler): void;`|Don’t get notified when a mouse moves on a chart|
+|`unsubscribeCrosshairMove(handler: MouseEventHandler): void;`|Don't get notified when a mouse moves on a chart|
 
 Example:
 

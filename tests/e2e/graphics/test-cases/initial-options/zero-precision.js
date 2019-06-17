@@ -14,14 +14,15 @@ function generateData() {
 
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container, {
-		timeScale: {
-			rightOffset: 10,
-			barSpacing: 12,
+	var chart = LightweightCharts.createChart(container);
+
+	// see issue#59
+	var mainSeries = chart.addLineSeries({
+		priceFormat: {
+			minMove: 1,
+			precision: 0,
 		},
 	});
-
-	var mainSeries = chart.addCandlestickSeries();
 
 	mainSeries.setData(generateData());
 }

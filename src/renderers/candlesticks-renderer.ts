@@ -1,17 +1,17 @@
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { BarCandleItemBase } from './bars-renderer';
+import { BarCandlestickItemBase } from './bars-renderer';
 import { IPaneRenderer } from './ipane-renderer';
 import { optimalBarWidth } from './optimal-bar-width';
 
-export interface CandleItem extends BarCandleItemBase {
+export interface CandlestickItem extends BarCandlestickItemBase {
 	color: string;
 	borderColor: string;
 	wickColor: string;
 }
 
-export interface PaneRendererCandlesData {
-	bars: ReadonlyArray<CandleItem>;
+export interface PaneRendererCandlesticksData {
+	bars: ReadonlyArray<CandlestickItem>;
 
 	wickColor: string;
 
@@ -27,11 +27,11 @@ const enum Constants {
 	BarBorderWidth = 1,
 }
 
-export class PaneRendererCandles implements IPaneRenderer {
-	private _data: PaneRendererCandlesData | null = null;
+export class PaneRendererCandlesticks implements IPaneRenderer {
+	private _data: PaneRendererCandlesticksData | null = null;
 	private _barWidth: number = 0;
 
-	public setData(data: PaneRendererCandlesData): void {
+	public setData(data: PaneRendererCandlesticksData): void {
 		this._data = data;
 		this._barWidth = optimalBarWidth(data.barSpacing);
 	}
@@ -62,7 +62,7 @@ export class PaneRendererCandles implements IPaneRenderer {
 		}
 	}
 
-	private _drawWicks(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandleItem>, visibleRange: SeriesItemsIndexesRange): void {
+	private _drawWicks(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange): void {
 		let prevWickColor = '';
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
@@ -76,7 +76,7 @@ export class PaneRendererCandles implements IPaneRenderer {
 		}
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandleItem>, visibleRange: SeriesItemsIndexesRange): void {
+	private _drawBorder(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange): void {
 		let prevBorderColor = '';
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
@@ -96,7 +96,7 @@ export class PaneRendererCandles implements IPaneRenderer {
 		}
 	}
 
-	private _drawCandles(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandleItem>, visibleRange: SeriesItemsIndexesRange): void {
+	private _drawCandles(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange): void {
 		if (this._data === null) {
 			return;
 		}
