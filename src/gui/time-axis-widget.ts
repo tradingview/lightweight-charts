@@ -235,21 +235,20 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			return;
 		}
 
-		if (type === InvalidationLevel.Cursor) {
-			this._drawCrosshairLabel(this._topCanvasContext);
-			return;
+		if (type !== InvalidationLevel.Cursor) {
+			const ctx = this._canvasContext;
+			this._drawBackground(ctx);
+			this._drawBorder(ctx);
+
+			this._drawTickMarks(ctx);
+			this._drawBackLabels(ctx);
+
+			if (this._stub !== null) {
+				this._stub.paint(type);
+			}
 		}
 
-		const ctx = this._canvasContext;
-		this._drawBackground(ctx);
-		this._drawBorder(ctx);
-
-		this._drawTickMarks(ctx);
-		this._drawBackLabels(ctx);
-
-		if (this._stub !== null) {
-			this._stub.paint(type);
-		}
+		this._drawCrosshairLabel(this._topCanvasContext);
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D): void {
