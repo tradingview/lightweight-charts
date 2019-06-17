@@ -92,8 +92,8 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
-		this._drawBackground(this._ctx);
-		this._drawBorder(this._ctx);
+		this._drawBackground();
+		this._drawBorder();
 	}
 
 	public getImage(): HTMLCanvasElement {
@@ -108,33 +108,33 @@ export class PriceAxisStub implements IDestroyable {
 		return this._isLeft;
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D): void {
+	private _drawBorder(): void {
 		if (!this._borderVisible()) {
 			return;
 		}
 		const width = this._size.w;
 
-		ctx.save();
+		this._ctx.save();
 
-		ctx.fillStyle = this._options.timeScale.borderColor;
+		this._ctx.fillStyle = this._options.timeScale.borderColor;
 
 		const borderSize = this._rendererOptionsProvider.options().borderSize;
 
 		let left;
 		if (this._isLeft) {
-			ctx.translate(-0.5, -0.5);
+			this._ctx.translate(-0.5, -0.5);
 			left = width - borderSize - 1;
 		} else {
-			ctx.translate(-0.5, -0.5);
+			this._ctx.translate(-0.5, -0.5);
 			left = 0;
 		}
 
 		// multiply to 2 because of we draw price scale border on the second pixel
-		ctx.fillRect(left, 0, borderSize * 2, 1);
-		ctx.restore();
+		this._ctx.fillRect(left, 0, borderSize * 2, 1);
+		this._ctx.restore();
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D): void {
-		clearRect(ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
+	private _drawBackground(): void {
+		clearRect(this._ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
 	}
 }

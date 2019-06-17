@@ -69,10 +69,6 @@ export class PaneSeparator implements IDestroyable {
 		}
 	}
 
-	public getHeight(): number {
-		return SEPARATOR_HEIGHT;
-	}
-
 	public getElement(): HTMLElement {
 		return this._rowElement;
 	}
@@ -80,7 +76,7 @@ export class PaneSeparator implements IDestroyable {
 	public getImage(): HTMLCanvasElement {
 		const res = document.createElement('canvas');
 		const width = this._paneA.getSize().w;
-		const height = this.getHeight();
+		const height = SEPARATOR_HEIGHT;
 		resizeCanvas(res, new Size(width, height));
 		const ctx = ensureNotNull(getContext2d(res));
 		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;

@@ -30,7 +30,7 @@ function runTestCase(container) {
 		},
 	});
 
-	var mainSeries = chart.addCandleSeries({
+	var mainSeries = chart.addCandlestickSeries({
 		drawBorder: true,
 		borderColor: 'blue',
 	});
@@ -40,14 +40,10 @@ function runTestCase(container) {
 	// create canvas to draw screenshot
 	chart.resize(240, 600, true);
 
-	var screenshot = chart.takeScreenshot().toDataURL();
+	var screenshot = chart.takeScreenshot();
+	screenshot.style.position = 'absolute';
+	screenshot.style.top = '260px';
 
 	var parent = container.parentNode;
-	var img = document.createElement('img');
-	img.src = screenshot;
-	img.style.position = 'absolute';
-	img.style.top = '260px';
-	img.width = 600;
-	img.height = 240;
-	parent.appendChild(img);
+	parent.appendChild(screenshot);
 }

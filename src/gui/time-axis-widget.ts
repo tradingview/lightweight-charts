@@ -249,9 +249,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		if (this._stub !== null) {
 			this._stub.paint(type);
 		}
-
-		this._chart.model().crosshairSource().updateAllViews();
-		this._drawCrosshairLabel(this._topCanvasContext);
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D): void {

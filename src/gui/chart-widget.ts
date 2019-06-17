@@ -46,6 +46,7 @@ export class ChartWidget implements IDestroyable {
 		this._options = options;
 
 		this._element = document.createElement('div');
+		this._element.classList.add('tv-lightweight-charts');
 		this._element.style.overflow = 'hidden';
 		this._element.style.width = '100%';
 		this._element.style.height = '100%';
@@ -212,20 +213,8 @@ export class ChartWidget implements IDestroyable {
 		}
 		// calculate target size
 		const firstPane = this._paneWidgets[0];
-		let targetWidth = firstPane.getSize().w;
-		if (this._options.priceScale.position !== 'none') {
-			targetWidth += ensureNotNull(firstPane.priceAxisWidget()).getWidth();
-		}
-		let targetHeight = 0;
-		for (const paneWidget of this._paneWidgets) {
-			targetHeight += paneWidget.getSize().h;
-		}
-		for (const paneSeparator of this._paneSeparators) {
-			targetHeight += paneSeparator.getHeight();
-		}
-		if (this._options.timeScale.visible) {
-			targetHeight += this._timeAxisWidget.height();
-		}
+		const targetWidth = this._width;
+		const targetHeight = this._height;
 		const targetCanvas = document.createElement('canvas');
 		resizeCanvas(targetCanvas, new Size(targetWidth, targetHeight));
 		const ctx = ensureNotNull(getContext2d(targetCanvas));
@@ -254,7 +243,7 @@ export class ChartWidget implements IDestroyable {
 				const separator = this._paneSeparators[paneIndex];
 				const separatorImage = separator.getImage();
 				ctx.drawImage(separatorImage, targetX, targetY);
-				targetY += separator.getHeight();
+				targetY += SEPARATOR_HEIGHT;
 			}
 		}
 		targetX += firstPane.getSize().w;

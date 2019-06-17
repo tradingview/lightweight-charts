@@ -447,12 +447,11 @@ export class PaneWidget implements IDestroyable {
 		const ctx = ensureNotNull(getContext2d(res));
 		ctx.drawImage(this._canvas, 0, 0);
 		if (this._brandingElement !== null) {
-			const dpr = window.devicePixelRatio || 1;
 			// one point is 1/72 of inch
 			// standard resolution is 96 dime per inch
-			const fontSize = (LogoConstants.FontSize / 72) * 96 * dpr;
+			const fontSize = (LogoConstants.FontSize / 72) * 96;
 			ctx.fillStyle = colorWithTransparency(this._chart.options().layout.textColor, 0.9);
-			ctx.font = makeFont(fontSize, defaultFontFamily);
+			ctx.font = makeFont(fontSize);
 			ctx.textBaseline = 'bottom';
 			ctx.fillText('TradingView', LogoConstants.LeftMargin, this._size.h - LogoConstants.BottomMargin);
 		}

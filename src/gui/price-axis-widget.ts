@@ -265,9 +265,6 @@ export class PriceAxisWidget implements IDestroyable {
 		model.resetPriceScale(pane, ensureNotNull(this.priceScale()));
 	}
 
-	public drawOnCanvas(ctx: CanvasRenderingContext2D): void {
-	}
-
 	public paint(type: InvalidationLevel): void {
 		if (!this._isVisible || this._size === null) {
 			return;

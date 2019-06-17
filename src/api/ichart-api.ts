@@ -150,7 +150,7 @@ export interface IChartApi {
 
 	/**
 	 * Make a screenshot of the chart with all the elements excluding crosshair.
-	 * @return a canvas with the chart drawn on
+	 * @returns a canvas with the chart drawn on
 	 */
 	takeScreenshot(): HTMLCanvasElement;
 }
