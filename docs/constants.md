@@ -14,7 +14,7 @@ It has the following values:
 
 ## LineStyle
 
-`LineStyle` enum is used to specify the line style of area and line series, crosshair and grid lines, priceline and baseline.
+`LineStyle` enum is used to specify the line style of area and line series, crosshair and grid lines, a priceline and a baseline.
 It has the following values:
 
 - `LineStyle.Solid`
