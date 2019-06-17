@@ -1,4 +1,5 @@
 import { getContext2d } from '../helpers/canvas-wrapper';
+import { tryParseRgbaString } from '../helpers/color';
 
 export class Size {
 	public h: number;
@@ -27,6 +28,10 @@ export function resizeCanvas(canvas: HTMLCanvasElement, newSize: Size): void {
 export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
 	ctx.save();
 	ctx.translate(-0.5, -0.5);
+	const color = tryParseRgbaString(clearColor);
+	if (color !== null && color[3] < 1) {
+		ctx.clearRect(x, y, w, h);
+	}
 
 	ctx.fillStyle = clearColor;
 	ctx.fillRect(x, y, w, h);
