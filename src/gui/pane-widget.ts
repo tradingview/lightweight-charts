@@ -1,10 +1,8 @@
 import { ensureNotNull } from '../helpers/assertions';
 import { getContext2d } from '../helpers/canvas-wrapper';
-import { colorWithTransparency } from '../helpers/color';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { defaultFontFamily } from '../helpers/make-font';
 
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
@@ -45,7 +43,6 @@ export class PaneWidget implements IDestroyable {
 	private _priceAxisPosition: PriceAxisPosition = 'none';
 	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
 	private _prevPinchScale: number = 0;
-	private _brandingElement: HTMLAnchorElement | null = null;
 
 	public constructor(chart: ChartWidget, state: Pane) {
 		this._chart = chart;
@@ -70,8 +67,6 @@ export class PaneWidget implements IDestroyable {
 		this._rightAxisCell.style.padding = '0';
 
 		this._paneCell.appendChild(paneWrapper);
-		this._createLogoElement();
-		this.updateBranding();
 
 		this._canvas = addCanvasTo(paneWrapper, new Size(16, 16));
 		this._canvas.style.position = 'absolute';
@@ -473,19 +468,6 @@ export class PaneWidget implements IDestroyable {
 		return this._priceAxisWidget;
 	}
 
-	public disableBranding(): void {
-		if (this._brandingElement !== null) {
-			this._paneCell.removeChild(this._brandingElement);
-			this._brandingElement = null;
-		}
-	}
-
-	public updateBranding(): void {
-		if (this._brandingElement !== null) {
-			this._brandingElement.style.color = colorWithTransparency(this._chart.options().layout.textColor, 0.9);
-		}
-	}
-
 	private _backgroundColor(): string {
 		return this._chart.options().layout.backgroundColor;
 	}
@@ -651,26 +633,5 @@ export class PaneWidget implements IDestroyable {
 			}
 		}
 		this._priceAxisPosition = axisPosition;
-	}
-
-	private _createLogoElement(): void {
-		const linkEl = document.createElement('a');
-		linkEl.href = `https://www.tradingview.com/?utm_source=${encodeURIComponent(location.href)}&utm_medium=library_new&utm_campaign=lightweight-charts`;
-		linkEl.innerText = 'TradingView';
-		linkEl.title = 'TradingView Lightweight Charts';
-		linkEl.target = '_blank';
-		linkEl.rel = 'noopener';
-
-		const style = linkEl.style;
-		style.zIndex = '1000';
-		style.fontSize = '7pt';
-		style.position = 'absolute';
-		style.left = '6px';
-		style.bottom = '4px';
-		style.textDecoration = 'none';
-		style.userSelect = 'none';
-		this._paneCell.appendChild(linkEl);
-		this._brandingElement = linkEl;
-		this._brandingElement.style.fontFamily = defaultFontFamily;
 	}
 }

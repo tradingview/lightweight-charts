@@ -309,14 +309,3 @@ chart.applyOptions({
     },
 });
 ```
-
-## Branding
-
-You may hide our branding if you feel that it harms user experience on your website.
-Note that according to our terms you should add a link leading to <https://www.tradingview.com/> somewhere on your web page.
-This link must contain the text from the NOTICE file which is a part of the product package.
-Please see `disableBranding` method below.
-
-```javascript
-chart.disableBranding();
-```

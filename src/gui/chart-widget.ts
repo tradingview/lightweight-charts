@@ -183,7 +183,6 @@ export class ChartWidget implements IDestroyable {
 
 	public applyOptions(options: DeepPartial<ChartOptions>): void {
 		this._model.applyOptions(options);
-		this._paneWidgets[0].updateBranding();
 		this._updateTimeAxisVisibility();
 
 		const width = options.width || this._width;
@@ -198,10 +197,6 @@ export class ChartWidget implements IDestroyable {
 
 	public crosshairMoved(): ISubscription<MouseEventParamsImpl> {
 		return this._crosshairMoved;
-	}
-
-	public disableBranding(): void {
-		this._paneWidgets[0].disableBranding();
 	}
 
 	private _adjustSizeImpl(): void {
