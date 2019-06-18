@@ -251,10 +251,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return this._chartWidget.options();
 	}
 
-	public disableBranding(): void {
-		this._chartWidget.disableBranding();
-	}
-
 	private _onVisibleBarsChanged(): void {
 		if (this._timeRangeChanged.hasListeners()) {
 			this._timeRangeChanged.fire(this.timeScale().getVisibleRange());

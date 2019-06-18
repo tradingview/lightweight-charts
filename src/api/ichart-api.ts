@@ -141,10 +141,4 @@ export interface IChartApi {
 	 * @returns - full set of currently applied options, including defaults
 	 */
 	options(): Readonly<ChartOptions>;
-
-	/**
-	 * Removes branding text from the chart.
-	 * Please read the description of this method in the documentation to learn more about the conditions of branding removal.
-	 */
-	disableBranding(): void;
 }
