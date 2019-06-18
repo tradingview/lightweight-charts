@@ -415,49 +415,28 @@ export class PriceAxisWidget implements IDestroyable {
 		const rendererOptions = this.rendererOptions();
 		const drawTicks = this._priceScale.options().borderVisible;
 
-		if (this._isLeft) {
-			const tickMarkLeftX = this._size.w - rendererOptions.offsetSize - rendererOptions.borderSize - rendererOptions.tickLength;
+		const tickMarkLeftX = this._isLeft ?
+			this._size.w - rendererOptions.offsetSize - rendererOptions.borderSize - rendererOptions.tickLength :
+			rendererOptions.borderSize + rendererOptions.offsetSize;
 
-			if (drawTicks) {
-				ctx.beginPath();
-				for (let i = tickMarks.length; i--;) {
-					ctx.rect(tickMarkLeftX, tickMarks[i].coord, rendererOptions.tickLength, 1);
-				}
+		const textLeftX = this._isLeft ?
+			tickMarkLeftX - rendererOptions.paddingInner :
+			tickMarkLeftX + rendererOptions.tickLength + rendererOptions.paddingInner;
 
-				ctx.fill();
+		const textAlign = this._isLeft ? 'right' : 'left';
+
+		if (drawTicks) {
+			ctx.beginPath();
+			for (const tickMark of tickMarks) {
+				ctx.rect(tickMarkLeftX, tickMark.coord, rendererOptions.tickLength, 1);
 			}
 
-			ctx.fillStyle = this.textColor();
-			for (let i = tickMarks.length; i--;) {
-				this._tickMarksCache.paintTo(
-					ctx,
-					tickMarks[i].label,
-					tickMarkLeftX - rendererOptions.paddingInner,
-					tickMarks[i].coord,
-					'right'
-				);
-			}
-		} else {
-			const x = rendererOptions.borderSize + rendererOptions.offsetSize;
+			ctx.fill();
+		}
 
-			if (drawTicks) {
-				ctx.beginPath();
-				for (let i = tickMarks.length; i--;) {
-					ctx.rect(x, tickMarks[i].coord, rendererOptions.tickLength, 1);
-				}
-
-				ctx.fill();
-			}
-
-			ctx.fillStyle = this.textColor();
-			for (let i = tickMarks.length; i--;) {
-				this._tickMarksCache.paintTo(
-					ctx, tickMarks[i].label,
-					x + rendererOptions.tickLength + rendererOptions.paddingInner,
-					tickMarks[i].coord,
-					'left'
-				);
-			}
+		ctx.fillStyle = this.textColor();
+		for (const tickMark of tickMarks) {
+			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, tickMark.coord, textAlign);
 		}
 
 		ctx.restore();
