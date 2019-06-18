@@ -285,7 +285,7 @@ function tryParseRgbString(rgbString: string): Rgb | null {
 	return matches !== null ? RgbRepresentation.parse(matches) : null;
 }
 
-export function tryParseRgbaString(rgbaString: string): Rgba | null {
+function tryParseRgbaString(rgbaString: string): Rgba | null {
 	const matches = RgbaRepresentation.re.exec(rgbaString);
 	return matches !== null ? RgbaRepresentation.parse(matches) : null;
 }
