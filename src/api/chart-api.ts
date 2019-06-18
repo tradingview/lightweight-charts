@@ -4,6 +4,7 @@ import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
 
+import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
 import { Palette } from '../model/palette';
 import { Series } from '../model/series';
@@ -266,8 +267,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
-		const seriesPrices = new Map<ISeriesApi<SeriesType>, number>();
-		param.seriesPrices.forEach((price: number, series: Series) => {
+		const seriesPrices = new Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>();
+		param.seriesPrices.forEach((price: BarPrice | BarPrices, series: Series) => {
 			seriesPrices.set(this._mapSeriesToApi(series), price);
 		});
 		return {

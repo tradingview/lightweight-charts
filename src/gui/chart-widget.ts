@@ -4,6 +4,7 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptions } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { InvalidateMask, InvalidationLevel } from '../model/invalidate-mask';
@@ -19,7 +20,7 @@ import { TimeAxisWidget } from './time-axis-widget';
 export interface MouseEventParamsImpl {
 	time?: TimePoint;
 	point?: Point;
-	seriesPrices: Map<Series, number>;
+	seriesPrices: Map<Series, BarPrice | BarPrices>;
 }
 
 export class ChartWidget implements IDestroyable {
@@ -423,18 +424,16 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _getMouseEventParamsImpl(time: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
-		const seriesPrices = new Map<Series, number>();
+		const seriesPrices = new Map<Series, BarPrice | BarPrices>();
 		if (time !== null) {
 			const serieses = this._model.serieses();
 			serieses.forEach((s: Series) => {
 				// TODO: replace with search left
-				const prices = s.data().valueAt(time);
+				const prices = s.dataAt(time);
 				if (prices !== null) {
-					const price = s.barFunction()(prices.value);
-					seriesPrices.set(s, price);
+					seriesPrices.set(s, prices);
 				}
 			});
-
 		}
 		let clientTime: TimePoint | undefined;
 		if (time !== null) {

@@ -20,7 +20,7 @@ import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-vi
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
 
-import { BarPrice } from './bar';
+import { BarPrice, BarPrices } from './bar';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { Palette } from './palette';
@@ -323,6 +323,23 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		return this.data().search(index, options);
+	}
+
+	public dataAt(time: TimePointIndex): BarPrice | BarPrices | null {
+		const prices = this.data().valueAt(time);
+		if (prices === null) {
+			return null;
+		}
+		if (this._seriesType === 'Bar' || this._seriesType === 'Candlestick') {
+			return {
+				open: prices.value[SeriesPlotIndex.Open] as BarPrice,
+				high: prices.value[SeriesPlotIndex.High] as BarPrice,
+				low: prices.value[SeriesPlotIndex.Low] as BarPrice,
+				close: prices.value[SeriesPlotIndex.Close] as BarPrice,
+			};
+		} else {
+			return this.barFunction()(prices.value);
+		}
 	}
 
 	public paneViews(): ReadonlyArray<IPaneView> {
