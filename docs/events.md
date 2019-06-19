@@ -1,13 +1,13 @@
 # Events
 
-Event subscriptions can notify you of such chart/user interactions as mouse clicks/moving of mouse cursor.
+Event subscriptions can notify you of such chart/user interactions as mouse clicks/moving of mouse cursor and changes of the chart visible time range.
 
 ## Click
 
 |Name|Description|
 |-|-|
 |`subscribeClick(handler: MouseEventHandler): void;`|Get notified when a mouse clicks on a chart|
-|`unsubscribeClick(handler: MouseEventHandler): void;`|Don’t get notified when a mouse clicks on a chart|
+|`unsubscribeClick(handler: MouseEventHandler): void;`|Not to get notified when a mouse clicks on a chart|
 
 Example:
 
@@ -32,7 +32,7 @@ chart.unsubscribeClick(handleClick);
 |Name|Description|
 |-|-|
 |`subscribeCrosshairMove(handler: MouseEventHandler): void;`|Get notified when a mouse moves on a chart|
-|`unsubscribeCrosshairMove(handler: MouseEventHandler): void;`|Don’t get notified when a mouse moves on a chart|
+|`unsubscribeCrosshairMove(handler: MouseEventHandler): void;`|Not to get notified when a mouse moves on a chart|
 
 Example:
 
@@ -57,7 +57,7 @@ chart.unsubscribeCrosshairMove(handleCrosshairMoved);
 |Name|Description|
 |-|-|
 |`subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Get notified when the visible data range changes|
-|`unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Don’t get notified when the visible data range changes|
+|`unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Not to get notified when the visible data range changes|
 
 ## Types
 
@@ -89,6 +89,6 @@ TimeRangeChangeEventHandler is a type of callback that is being used to get noti
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 ```
 
-`TimeRange` is an object with two `from` and `to` fields - which are the first and last time points of a time range.
+`TimeRange` is an object with `from` and `to` fields which are the first and last time points of a time range.
 
 `null` is returned if the chart has no data at all.
