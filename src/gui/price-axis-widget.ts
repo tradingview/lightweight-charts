@@ -340,8 +340,12 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseEnterEvent(e: TouchMouseEvent): void {
+		if (this._priceScale === null) {
+			return;
+		}
+
 		const model = this._pane.chart().model();
-		if (model.options().handleScale.axisPressedMouseMove) {
+		if (model.options().handleScale.axisPressedMouseMove && !this._priceScale.isPercentage() && !this._priceScale.isIndexedTo100()) {
 			this._setCursor(CursorType.NsResize);
 		}
 	}
