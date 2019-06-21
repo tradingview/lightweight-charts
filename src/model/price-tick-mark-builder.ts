@@ -62,6 +62,7 @@ export class PriceTickMarkBuilder {
 		return min(spans);
 	}
 
+	// tslint:disable-next-line:cyclomatic-complexity
 	public rebuildTickMarks(): void {
 		const priceScale = this._priceScale;
 
@@ -87,6 +88,10 @@ export class PriceTickMarkBuilder {
 		const bottom = this._coordinateToLogicalFunc(scaleHeight - 1, firstValue);
 		const top = this._coordinateToLogicalFunc(0, firstValue);
 
+		const extraTopBottomMargin = this._priceScale.options().entireTextOnly ? this._fontHeight() / 2 : 0;
+		const minCoord = extraTopBottomMargin;
+		const maxCoord = scaleHeight - 1 - extraTopBottomMargin;
+
 		const high = Math.max(bottom, top);
 		const low = Math.min(bottom, top);
 		if (high === low) {
@@ -106,12 +111,15 @@ export class PriceTickMarkBuilder {
 		for (let logical = high - mod; logical > low; logical -= span) {
 			const coord = this._logicalToCoordinateFunc(logical, firstValue, true);
 
-			if (prevCoord !== null) {
-				// check if there is place for it
-				// this is required for log scale
-				if (Math.abs(coord - prevCoord) < this._tickMarkHeight()) {
-					continue;
-				}
+			// check if there is place for it
+			// this is required for log scale
+			if (prevCoord !== null && Math.abs(coord - prevCoord) < this._tickMarkHeight()) {
+				continue;
+			}
+
+			// check if a tick mark is partially visible and skip it if entireTextOnly is true
+			if (coord < minCoord || coord > maxCoord) {
+				continue;
 			}
 
 			if (targetIndex < this._marks.length) {

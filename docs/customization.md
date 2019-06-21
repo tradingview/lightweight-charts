@@ -72,6 +72,7 @@ The following set of options can be used to adjust the price axis interface:
 |`borderVisible`|`boolean`|`true`|If true, price scale border is visible|
 |`borderColor`|`string`|`#2b2b43`|Pricescale border color|
 |`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (per cent)|
+|`entireTextOnly`|`boolean`|`false`|If false, top and bottom edge labels are shown even if they are partially not visible |
 
 ### An example of a price scale customization
 
