@@ -79,7 +79,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 This software incorporates several parts of tslib (<https://github.com/Microsoft/tslib>, (c) Microsoft Corporation) that are covered by the the Apache License, Version 2.0.
 
-This license requires specifying TradingView as the product creator. You can use one of the following methods to do it:
-
-- do not disable the TradingView branding displaying;
-- add the "attribution notice" from the NOTICE file and a link to our website (<https://www.tradingview.com/>) to the page of your website or mobile application that is available to your users;
+This license requires specifying TradingView as the product creator.
+You shall add the "attribution notice" from the NOTICE file and a link to <https://www.tradingview.com/> to the page of your website or mobile application that is available to your users.
+As thanks for creating this product, we'd be grateful if you add it in a prominent place.

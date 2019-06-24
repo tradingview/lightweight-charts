@@ -1,23 +1,9 @@
-import { ISubscription } from '../helpers/isubscription';
-
 import { IPaneView } from '../views/pane/ipane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { TimeAxisView } from '../views/time-axis/time-axis-view';
 
 import { Pane } from './pane';
 import { PriceScale } from './price-scale';
-
-export interface DataSourceTextIcon {
-	type: 'text';
-	text: string;
-}
-
-export interface DataSourceSvgIcon {
-	type: 'svg';
-	svgCode: string;
-}
-
-export type DataSourceIcon = DataSourceTextIcon | DataSourceSvgIcon;
 
 export interface IDataSource {
 	zorder(): number | null;
@@ -30,8 +16,6 @@ export interface IDataSource {
 	priceAxisViews(pane?: Pane, priceScale?: PriceScale): ReadonlyArray<IPriceAxisView>;
 	timeAxisViews(): ReadonlyArray<TimeAxisView>;
 	paneViews(pane: Pane): ReadonlyArray<IPaneView>;
-
-	onPriceScaleChanged(): ISubscription;
 
 	destroy?(): void;
 }

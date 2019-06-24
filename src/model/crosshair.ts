@@ -33,11 +33,6 @@ export interface CrosshairTimeAndCoordinate {
 export type PriceAndCoordinateProvider = (priceScale: PriceScale) => CrosshairPriceAndCoordinate;
 export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate;
 
-export interface CrosshairMovedEventParams {
-	time: TimePoint | null;
-	price: number;
-}
-
 /**
  * Enum of possible crosshair behavior modes.
  * Normal means that the crosshair always follows the pointer.
