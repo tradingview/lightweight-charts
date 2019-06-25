@@ -4,6 +4,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 
+import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -17,7 +18,9 @@ import { addCanvasTo, clearRect, resizeCanvas, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget } from './price-axis-widget';
-import { mobileTouch } from './support-touch';
+import { mobile, mobileTouch } from './support-touch';
+
+const trackCrosshairOnlyAfterLongTap = mobile.any;
 
 export interface HitTestResult {
 	source: IDataSource;
@@ -43,6 +46,10 @@ export class PaneWidget implements IDestroyable {
 	private _priceAxisPosition: PriceAxisPosition = 'none';
 	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
 	private _prevPinchScale: number = 0;
+	private _longTap: boolean = false;
+	private _startTrackPoint: Point | null = null;
+	private _exitTrackingModeOnNextTry: boolean = false;
+	private _initCrosshairPosition: Point | null = null;
 
 	public constructor(chart: ChartWidget, state: Pane) {
 		this._chart = chart;
@@ -142,8 +149,7 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const model = this._chart.model();
-		if (model.serieses().length === 0) {
+		if (this._model().serieses().length === 0) {
 			return;
 		}
 
@@ -166,17 +172,18 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const model = this._chart.model();
-
 		const x = event.localX as Coordinate;
 		const y = event.localY as Coordinate;
 
 		if (!mobileTouch) {
-			model.setAndSaveCurrentPosition(x, y, this._state);
+			this._setCrosshairPosition(x, y);
 		}
 	}
 
 	public mouseDownEvent(event: TouchMouseEvent): void {
+		this._longTap = false;
+		this._exitTrackingModeOnNextTry = this._startTrackPoint !== null;
+
 		if (!this._state) {
 			return;
 		}
@@ -192,7 +199,7 @@ export class PaneWidget implements IDestroyable {
 			}
 		}
 
-		const model = this._chart.model();
+		const model = this._model();
 
 		const priceScale = this._state.defaultPriceScale();
 
@@ -200,8 +207,14 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
+		if (this._startTrackPoint !== null) {
+			const crosshair = model.crosshairSource();
+			this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
+			this._startTrackPoint = { x: event.localX as Coordinate, y: event.localY as Coordinate };
+		}
+
 		if (!mobileTouch) {
-			model.setAndSaveCurrentPosition(event.localX as Coordinate, event.localY as Coordinate, this._state);
+			this._setCrosshairPosition(event.localX as Coordinate, event.localY as Coordinate);
 		}
 	}
 
@@ -210,15 +223,17 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const model = this._chart.model();
-
 		const x = event.localX as Coordinate;
 		const y = event.localY as Coordinate;
 
+		if (this._preventCrosshairMove()) {
+			this._clearCrosshairPosition();
+		}
+
 		if (!mobileTouch) {
-			model.setAndSaveCurrentPosition(x, y, this._state);
+			this._setCrosshairPosition(x, y);
 			const hitTest = this.hitTest(x, y);
-			this._state.model().setHoveredSource(hitTest && hitTest.source);
+			this._model().setHoveredSource(hitTest && hitTest.source);
 			if (hitTest !== null && hitTest.view.moveHandler !== undefined) {
 				hitTest.view.moveHandler(x, y);
 			}
@@ -238,22 +253,33 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		if (this._clicked.hasListeners()) {
-			const model = this._chart.model();
-			const currentTime = model.crosshairSource().appliedIndex();
+			const currentTime = this._model().crosshairSource().appliedIndex();
 			this._clicked.fire(currentTime, { x, y });
 		}
+
+		this._tryExitTrackingMode();
 	}
 
+	// tslint:disable-next-line:cyclomatic-complexity
 	public pressedMouseMoveEvent(event: TouchMouseEvent): void {
 		if (this._state === null) {
 			return;
 		}
 
-		const model = this._chart.model();
+		const model = this._model();
 		const x = event.localX as Coordinate;
 		const y = event.localY as Coordinate;
 
-		model.setAndSaveCurrentPosition(x, y, this._state);
+		if (this._startTrackPoint !== null) {
+			// tracking mode: move crosshair
+			this._exitTrackingModeOnNextTry = false;
+			const origPoint = ensureNotNull(this._initCrosshairPosition);
+			const newX = origPoint.x + (x - this._startTrackPoint.x) as Coordinate;
+			const newY = origPoint.y + (y - this._startTrackPoint.y) as Coordinate;
+			this._setCrosshairPosition(newX, newY);
+		} else if (!this._preventCrosshairMove()) {
+			this._setCrosshairPosition(x, y);
+		}
 
 		if (model.timeScale().isEmpty() || !this._chart.options().handleScroll.pressedMouseMove) {
 			return;
@@ -261,14 +287,15 @@ export class PaneWidget implements IDestroyable {
 
 		const priceScale = this._state.defaultPriceScale();
 
-		if (this._startScrollingPos === null) {
+		if (this._startScrollingPos === null && !this._preventScroll()) {
 			this._startScrollingPos = {
 				x: event.clientX as Coordinate,
 				y: event.clientY as Coordinate,
 			};
 		}
 
-		if (this._startScrollingPos.x !== event.clientX || this._startScrollingPos.y !== event.clientY) {
+		if (this._startScrollingPos !== null &&
+			(this._startScrollingPos.x !== event.clientX || this._startScrollingPos.y !== event.clientY)) {
 			if (!this._isScrolling) {
 				if (!priceScale.isEmpty()) {
 					model.startScrollPrice(this._state, priceScale, event.localY as Coordinate);
@@ -294,7 +321,9 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const model = this._chart.model();
+		this._longTap = false;
+
+		const model = this._model();
 
 		if (this._isScrolling) {
 			const priceScale = this._state.defaultPriceScale();
@@ -337,13 +366,25 @@ export class PaneWidget implements IDestroyable {
 		}
 	}
 
+	public longTapEvent(event: TouchMouseEvent): void {
+		this._longTap = true;
+
+		if (this._startTrackPoint === null && trackCrosshairOnlyAfterLongTap) {
+			const point = { x: event.localX as Coordinate, y: event.localY as Coordinate };
+			this._startTrackingMode(point, point);
+		}
+	}
+
 	public mouseLeaveEvent(event: TouchMouseEvent): void {
 		if (this._state === null) {
 			return;
 		}
 
 		this._state.model().setHoveredSource(null);
-		this._chart.model().clearCurrentPosition();
+
+		if (!mobile.any) {
+			this._clearCrosshairPosition();
+		}
 	}
 
 	public clicked(): ISubscription<TimePointIndex | null, Point> {
@@ -362,7 +403,7 @@ export class PaneWidget implements IDestroyable {
 		const zoomScale = (scale - this._prevPinchScale) * 5;
 		this._prevPinchScale = scale;
 
-		this._chart.model().zoomTime(middlePoint.x as Coordinate, zoomScale);
+		this._model().zoomTime(middlePoint.x as Coordinate, zoomScale);
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HitTestResult | null {
@@ -486,7 +527,7 @@ export class PaneWidget implements IDestroyable {
 
 	private _drawGrid(ctx: CanvasRenderingContext2D): void {
 		const state = ensureNotNull(this._state);
-		const source = this._chart.model().gridSource();
+		const source = this._model().gridSource();
 		// NOTE: grid source requires Pane instance for paneViews (for the nonce)
 		const paneViews = source.paneViews(state);
 		const height = state.height();
@@ -503,7 +544,7 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	private _drawWatermark(ctx: CanvasRenderingContext2D): void {
-		const source = this._chart.model().watermarkSource();
+		const source = this._model().watermarkSource();
 		if (source === null) {
 			return;
 		}
@@ -528,13 +569,13 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	private _drawCrosshair(ctx: CanvasRenderingContext2D): void {
-		this._drawSource(this._chart.model().crosshairSource(), ctx);
+		this._drawSource(this._model().crosshairSource(), ctx);
 	}
 
 	private _drawSources(ctx: CanvasRenderingContext2D): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
-		const crosshairSource = this._chart.model().crosshairSource();
+		const crosshairSource = this._model().crosshairSource();
 
 		for (const source of sources) {
 			this._drawSourceBackground(source, ctx);
@@ -633,5 +674,48 @@ export class PaneWidget implements IDestroyable {
 			}
 		}
 		this._priceAxisPosition = axisPosition;
+	}
+
+	private _preventCrosshairMove(): boolean {
+		return trackCrosshairOnlyAfterLongTap && this._startTrackPoint === null;
+	}
+
+	private _preventScroll(): boolean {
+		return trackCrosshairOnlyAfterLongTap && this._longTap || this._startTrackPoint !== null;
+	}
+
+	private _correctXCoord(x: Coordinate): Coordinate {
+		return Math.max(0, Math.min(x, this._size.w - 1)) as Coordinate;
+	}
+
+	private _correctYCoord(y: Coordinate): Coordinate {
+		return Math.max(0, Math.min(y, this._size.h - 1)) as Coordinate;
+	}
+
+	private _setCrosshairPosition(x: Coordinate, y: Coordinate): void {
+		this._model().setAndSaveCurrentPosition(this._correctXCoord(x), this._correctYCoord(y), ensureNotNull(this._state));
+	}
+
+	private _clearCrosshairPosition(): void {
+		this._model().clearCurrentPosition();
+	}
+
+	private _tryExitTrackingMode(): void {
+		if (this._exitTrackingModeOnNextTry) {
+			this._startTrackPoint = null;
+			this._clearCrosshairPosition();
+		}
+	}
+
+	private _startTrackingMode(startTrackPoint: Point, crossHairPosition: Point): void {
+		this._startTrackPoint = startTrackPoint;
+		this._exitTrackingModeOnNextTry = false;
+		this._setCrosshairPosition(crossHairPosition.x, crossHairPosition.y);
+		const crosshair = this._model().crosshairSource();
+		this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
+	}
+
+	private _model(): ChartModel {
+		return this._chart.model();
 	}
 }

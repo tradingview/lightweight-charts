@@ -20,6 +20,7 @@ export interface MouseEventHandlers {
 	mouseMoveEvent?: HandlerEventCallback;
 	mouseUpEvent?: HandlerEventCallback;
 	pressedMouseMoveEvent?: HandlerEventCallback;
+	longTapEvent?: HandlerEventCallback;
 }
 
 export interface TouchMouseEvent {
@@ -53,6 +54,7 @@ let mousePressed = false;
 // so we do not need to have it as variables
 const enum Delay {
 	ResetClick = 500,
+	LongTap = 240,
 }
 
 const enum MouseEventButton {
@@ -67,6 +69,7 @@ export class MouseEventHandler implements IDestroyable {
 	private _verticalTouchScroll: boolean;
 	private _clickCount: number = 0;
 	private _clickTimeoutId: number | null = null;
+	private _longTapTimeoutId: number | null = null;
 	private readonly _lastTouchPosition: Position = { x: 0, y: 0 };
 	private _mouseMoveStartPosition: Position | null = null;
 	private _moveExceededManhattanDistance: boolean = false;
@@ -104,6 +107,9 @@ export class MouseEventHandler implements IDestroyable {
 			this._unsubscribeRoot();
 			this._unsubscribeRoot = null;
 		}
+
+		this._clearLongTapTimeout();
+		this._resetClickTimeout();
 	}
 
 	private _mouseEnterHandler(enterEvent: MouseEvent | TouchEvent): void {
@@ -190,6 +196,10 @@ export class MouseEventHandler implements IDestroyable {
 		if (this._moveExceededManhattanDistance) {
 			// if manhattan distance is more that 5 - we should cancel click event
 			this._cancelClick = true;
+
+			if (isTouch) {
+				this._clearLongTapTimeout();
+			}
 		} else if (isTouch) {
 			preventProcess = true;
 		}
@@ -208,6 +218,11 @@ export class MouseEventHandler implements IDestroyable {
 
 		const compatEvent = this._makeCompatEvent(mouseUpEvent);
 
+		const isTouch = mobileTouch || 'touches' in mouseUpEvent;
+		if (isTouch) {
+			this._clearLongTapTimeout();
+		}
+
 		this._mouseMoveStartPosition = null;
 
 		mousePressed = false;
@@ -217,7 +232,7 @@ export class MouseEventHandler implements IDestroyable {
 			this._unsubscribeRoot = null;
 		}
 
-		if (mobileTouch || 'touches' in mouseUpEvent) {
+		if (isTouch) {
 			this._mouseLeaveHandler(mouseUpEvent);
 		}
 
@@ -237,6 +252,15 @@ export class MouseEventHandler implements IDestroyable {
 		if (mobileTouch) {
 			this._mouseLeaveHandler(mouseUpEvent);
 		}
+	}
+
+	private _clearLongTapTimeout(): void {
+		if (this._longTapTimeoutId === null) {
+			return;
+		}
+
+		clearTimeout(this._longTapTimeoutId);
+		this._longTapTimeoutId = null;
 	}
 
 	private _mouseDownHandler(downEvent: MouseEvent | TouchEvent): void {
@@ -282,7 +306,10 @@ export class MouseEventHandler implements IDestroyable {
 			rootElement.addEventListener('touchmove', boundMouseMoveWithDownHandler, { passive: false });
 			rootElement.addEventListener('touchend', boundMouseUpHandler);
 
-			if (!mobileTouch) {
+			if (mobileTouch) {
+				this._clearLongTapTimeout();
+				this._longTapTimeoutId = setTimeout(this._longTapHandler.bind(this, downEvent), Delay.LongTap);
+			} else {
 				rootElement.addEventListener('mousemove', boundMouseMoveWithDownHandler);
 				rootElement.addEventListener('mouseup', boundMouseUpHandler);
 			}
@@ -309,6 +336,8 @@ export class MouseEventHandler implements IDestroyable {
 
 	private _init(): void {
 		this._target.addEventListener('mouseenter', this._mouseEnterHandler.bind(this));
+
+		this._target.addEventListener('touchcancel', this._clearLongTapTimeout.bind(this));
 
 		{
 			const doc = this._target.ownerDocument as Document;
@@ -399,6 +428,8 @@ export class MouseEventHandler implements IDestroyable {
 		if (this._handler.pinchStartEvent !== undefined) {
 			this._handler.pinchStartEvent();
 		}
+
+		this._clearLongTapTimeout();
 	}
 
 	private _stopPinch(): void {
@@ -420,6 +451,13 @@ export class MouseEventHandler implements IDestroyable {
 		const compatEvent = this._makeCompatEvent(event);
 		this._processEvent(compatEvent, this._handler.mouseLeaveEvent);
 		this._preventDefaultIfNeeded(event);
+	}
+
+	private _longTapHandler(event: MouseEvent | TouchEvent): void {
+		const compatEvent = this._makeCompatEvent(event);
+		this._processEvent(compatEvent, this._handler.longTapEvent);
+		this._preventDefaultIfNeeded(event);
+		this._cancelClick = true;
 	}
 
 	private _processEvent(event: TouchMouseEvent, callback?: HandlerEventCallback): void {
