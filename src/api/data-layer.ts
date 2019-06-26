@@ -201,9 +201,9 @@ export function stringToBusinessDay(value: string): BusinessDay {
 	}
 
 	return {
-		day: d.getDate(),
-		month: d.getMonth() + 1,
-		year: d.getFullYear(),
+		day: d.getUTCDate(),
+		month: d.getUTCMonth() + 1,
+		year: d.getUTCFullYear(),
 	};
 }
 
