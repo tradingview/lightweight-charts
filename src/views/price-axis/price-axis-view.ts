@@ -1,7 +1,4 @@
-import {
-	parseRgb,
-	rgbToBlackWhiteString,
-} from '../../helpers/color';
+import { generateTextColor } from '../../helpers/color';
 
 import { LineStyle } from '../../renderers/draw-line';
 import {
@@ -56,12 +53,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 	}
 
 	public color(): string {
-		return this.generateTextColor(this.background());
-	}
-
-	public generateTextColor(color: string): string {
-		const backColorBW = rgbToBlackWhiteString(parseRgb(color), 160);
-		return backColorBW === 'black' ? 'white' : 'black';
+		return generateTextColor(this.background());
 	}
 
 	public coordinate(): number {
