@@ -217,10 +217,14 @@ export class ChartWidget implements IDestroyable {
 		let targetY = 0;
 
 		const drawPriceAxises = () => {
-			for (const paneWidget of this._paneWidgets) {
+			for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
+				const paneWidget = this._paneWidgets[paneIndex];
 				const image = ensureNotNull(paneWidget.priceAxisWidget()).getImage();
 				ctx.drawImage(image, targetX, targetY);
 				targetY += paneWidget.getSize().h;
+				if (paneIndex < this._paneWidgets.length - 1) {
+					targetY += SEPARATOR_HEIGHT;
+				}
 			}
 		};
 		// draw left price scale if exists
