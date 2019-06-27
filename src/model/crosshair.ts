@@ -55,6 +55,8 @@ export interface CrosshairLineOptions {
 	visible: boolean;
 	/** Visibility of corresponding scale label */
 	labelVisible: boolean;
+	/** Color of corresponding scale label */
+	labelColor: string;
 }
 
 /** Structure describing crosshair options  */
