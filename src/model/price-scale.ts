@@ -92,6 +92,8 @@ export interface PriceScaleOptions {
 	borderVisible: boolean;
 	/** Defines a color of the border between the price scale and the chart area. It is ignored if borderVisible is false */
 	borderColor: string;
+	/** Indicates whether the price scale displays only full lines of text or partial lines. */
+	entireTextOnly: boolean;
 }
 
 interface RangeCache {

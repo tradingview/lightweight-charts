@@ -9,3 +9,16 @@ function checkTouchEvents(): boolean {
 
 const touch = !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || checkTouchEvents();
 export const mobileTouch = 'onorientationchange' in window && touch;
+
+const android = /Android/i.test(navigator.userAgent);
+const blackBerry = /BlackBerry/i.test(navigator.userAgent);
+const iOS = /iPhone|iPad|iPod|AppleWebKit.+Mobile/i.test(navigator.userAgent);
+const opera = /Opera Mini/i.test(navigator.userAgent);
+
+export const mobile = {
+	android,
+	blackBerry,
+	iOS,
+	opera,
+	any: android || blackBerry || iOS || opera,
+};
