@@ -90,6 +90,7 @@
 		"no-angle-bracket-type-assertion": true,
 		"no-any": true,
 		"no-arg": true,
+		"no-async-without-await": true,
 		"no-bitwise": false,
 		"no-boolean-literal-compare": false,
 		"no-conditional-assignment": true,

@@ -8,6 +8,6 @@
     "express": "~4.17.1",
     "pixelmatch": "~5.0.2",
     "pngjs": "~3.4.0",
-    "puppeteer": "~1.17.0"
+    "puppeteer": "~1.18.1"
   }
 }
