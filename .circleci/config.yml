@@ -172,7 +172,11 @@ workflows:
           requires:
             - build
       - dts-changes:
-          filters: *default-filters
+          filters:
+            <<: *default-filters
+            branches:
+              ignore:
+                - master
           requires:
             - build
       - graphics-tests:
