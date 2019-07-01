@@ -251,6 +251,10 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return this._chartWidget.options();
 	}
 
+	public takeScreenshot(): HTMLCanvasElement {
+		return this._chartWidget.takeScreenshot();
+	}
+
 	private _onVisibleBarsChanged(): void {
 		if (this._timeRangeChanged.hasListeners()) {
 			this._timeRangeChanged.fire(this.timeScale().getVisibleRange());

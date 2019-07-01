@@ -272,16 +272,18 @@ export class PriceAxisWidget implements IDestroyable {
 
 		this._topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 
-		if (type === InvalidationLevel.Cursor) {
-			this._drawCrosshairLabel(this._topCtx);
-		} else {
+		if (type !== InvalidationLevel.Cursor) {
 			this._alignLabels();
 			this._drawBackground(this._ctx);
 			this._drawBorder(this._ctx);
 			this._drawTickMarks(this._ctx);
 			this._drawBackLabels(this._ctx);
-			this._drawCrosshairLabel(this._topCtx);
 		}
+		this._drawCrosshairLabel(this._topCtx);
+	}
+
+	public getImage(): HTMLCanvasElement {
+		return this._canvas;
 	}
 
 	public isLeft(): boolean {

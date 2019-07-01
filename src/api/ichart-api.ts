@@ -141,4 +141,10 @@ export interface IChartApi {
 	 * @returns - full set of currently applied options, including defaults
 	 */
 	options(): Readonly<ChartOptions>;
+
+	/**
+	 * Make a screenshot of the chart with all the elements excluding crosshair.
+	 * @returns a canvas with the chart drawn on
+	 */
+	takeScreenshot(): HTMLCanvasElement;
 }

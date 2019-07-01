@@ -471,6 +471,14 @@ export class PaneWidget implements IDestroyable {
 		}
 	}
 
+	public getImage(): HTMLCanvasElement {
+		const res = document.createElement('canvas');
+		resizeCanvas(res, this._size);
+		const ctx = ensureNotNull(getContext2d(res));
+		ctx.drawImage(this._canvas, 0, 0);
+		return res;
+	}
+
 	public paint(type: number): void {
 		if (type === 0) {
 			return;
@@ -490,19 +498,15 @@ export class PaneWidget implements IDestroyable {
 
 		this._topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 
-		if (type === InvalidationLevel.Cursor) {
-			this._drawCrosshair(this._topCtx);
-		} else {
+		if (type !== InvalidationLevel.Cursor) {
 			this._drawBackground(this._ctx, this._backgroundColor());
-
 			if (this._state) {
 				this._drawGrid(this._ctx);
 				this._drawWatermark(this._ctx);
 				this._drawSources(this._ctx);
-
-				this._drawCrosshair(this._topCtx);
 			}
 		}
+		this._drawCrosshair(this._topCtx);
 	}
 
 	public priceAxisWidget(): PriceAxisWidget | null {

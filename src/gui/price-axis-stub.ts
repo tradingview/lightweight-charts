@@ -96,6 +96,10 @@ export class PriceAxisStub implements IDestroyable {
 		this._drawBorder();
 	}
 
+	public getImage(): HTMLCanvasElement {
+		return this._canvas;
+	}
+
 	public getWidth(): number {
 		return this._size.w;
 	}

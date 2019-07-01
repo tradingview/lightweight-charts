@@ -112,6 +112,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		return this._element;
 	}
 
+	public stub(): PriceAxisStub | null {
+		return this._stub;
+	}
+
 	public mouseDownEvent(event: TouchMouseEvent): void {
 		if (this._mouseDown) {
 			return;
@@ -222,28 +226,29 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		});
 	}
 
+	public getImage(): HTMLCanvasElement {
+		return this._canvas;
+	}
+
 	public paint(type: InvalidationLevel): void {
 		if (type === InvalidationLevel.None) {
 			return;
 		}
 
-		if (type === InvalidationLevel.Cursor) {
-			this._drawCrosshairLabel(this._topCanvasContext);
-			return;
+		if (type !== InvalidationLevel.Cursor) {
+			const ctx = this._canvasContext;
+			this._drawBackground(ctx);
+			this._drawBorder(ctx);
+
+			this._drawTickMarks(ctx);
+			this._drawBackLabels(ctx);
+
+			if (this._stub !== null) {
+				this._stub.paint(type);
+			}
 		}
 
-		const ctx = this._canvasContext;
-		this._drawBackground(ctx);
-		this._drawBorder(ctx);
-
-		this._drawTickMarks(ctx);
-		this._drawBackLabels(ctx);
-		this._chart.model().crosshairSource().updateAllViews();
 		this._drawCrosshairLabel(this._topCanvasContext);
-
-		if (this._stub !== null) {
-			this._stub.paint(type);
-		}
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D): void {
