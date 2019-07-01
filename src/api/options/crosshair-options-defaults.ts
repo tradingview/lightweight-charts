@@ -8,7 +8,7 @@ export const crosshairOptionsDefaults: CrosshairOptions = {
 		style: LineStyle.Dashed,
 		visible: true,
 		labelVisible: true,
-		labelColor: '#4c525e',
+		labelBackgroundColor: '#4c525e',
 	},
 	horzLine: {
 		color: '#758696',
@@ -16,7 +16,7 @@ export const crosshairOptionsDefaults: CrosshairOptions = {
 		style: LineStyle.Dashed,
 		visible: true,
 		labelVisible: true,
-		labelColor: '#4c525e',
+		labelBackgroundColor: '#4c525e',
 	},
 	mode: CrosshairMode.Magnet,
 };

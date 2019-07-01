@@ -71,7 +71,7 @@ export class CrosshairTimeAxisView extends TimeAxisView {
 		data.coordinate = value.coordinate;
 		data.text = timeScale.formatDateTime(ensureNotNull(currentTime));
 		data.visible = true;
-		data.background = options.labelColor;
-		data.color = generateTextColor(options.labelColor);
+		data.background = options.labelBackgroundColor;
+		data.color = generateTextColor(options.labelBackgroundColor);
 	}
 }
