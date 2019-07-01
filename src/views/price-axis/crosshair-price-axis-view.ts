@@ -37,8 +37,8 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 			return;
 		}
 
-		commonRendererData.background = options.labelColor;
-		commonRendererData.color = generateTextColor(options.labelColor);
+		commonRendererData.background = options.labelBackgroundColor;
+		commonRendererData.color = generateTextColor(options.labelBackgroundColor);
 
 		const value = this._valueProvider(this._priceScale);
 		commonRendererData.coordinate = value.coordinate;
