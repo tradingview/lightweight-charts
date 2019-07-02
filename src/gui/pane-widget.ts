@@ -18,9 +18,11 @@ import { addCanvasTo, clearRect, resizeCanvas, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget } from './price-axis-widget';
-import { mobile, mobileTouch } from './support-touch';
+import { isMobile, mobileTouch } from './support-touch';
 
-const trackCrosshairOnlyAfterLongTap = mobile.any;
+// actually we should check what event happened (touch or mouse)
+// not check current UA to detect "mobile" device
+const trackCrosshairOnlyAfterLongTap = isMobile;
 
 export interface HitTestResult {
 	source: IDataSource;
@@ -382,7 +384,7 @@ export class PaneWidget implements IDestroyable {
 
 		this._state.model().setHoveredSource(null);
 
-		if (!mobile.any) {
+		if (!isMobile) {
 			this._clearCrosshairPosition();
 		}
 	}
