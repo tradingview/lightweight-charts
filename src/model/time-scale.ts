@@ -473,10 +473,6 @@ export class TimeScale {
 		animationFn();
 	}
 
-	public scrollStartPoint(): Coordinate | null {
-		return this._scrollStartPoint;
-	}
-
 	public update(index: TimePointIndex, values: TimePoint[], marks: TickMark[]): void {
 		this._visibleBarsInvalidated = true;
 		if (values.length > 0) {

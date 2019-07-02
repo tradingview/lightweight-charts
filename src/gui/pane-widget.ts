@@ -332,39 +332,9 @@ export class PaneWidget implements IDestroyable {
 			// this allows scrolling not default price scales
 
 			model.endScrollPrice(this._state, priceScale);
-			const finishScroll = () => {
-				model.endScrollTime();
-				this._startScrollingPos = null;
-				this._isScrolling = false;
-			};
-
-			if (mobileTouch) {
-				// animate
-				const startTimeScroll = ensureNotNull(model.timeScale().scrollStartPoint());
-				const tail = (event.localX - startTimeScroll) * 0.05;
-				let start: number | null = null;
-				const animateStep = (timestamp: number) => {
-					if (start === null) {
-						start = timestamp;
-					}
-
-					let progress = Math.min(100, (timestamp - start) * 3) * 0.01;
-					progress = Math.sqrt(progress);
-
-					// make it non-linear
-					const x = event.localX + tail * progress as Coordinate;
-					model.scrollTimeTo(x);
-					if (progress >= 1) {
-						finishScroll();
-					} else {
-						requestAnimationFrame(animateStep);
-					}
-				};
-
-				requestAnimationFrame(animateStep);
-			} else {
-				finishScroll();
-			}
+			model.endScrollTime();
+			this._startScrollingPos = null;
+			this._isScrolling = false;
 		}
 	}
 
