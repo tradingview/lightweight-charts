@@ -28,6 +28,8 @@ import { Watermark, WatermarkOptions } from './watermark';
 export interface HandleScrollOptions {
 	mouseWheel: boolean;
 	pressedMouseMove: boolean;
+	horzTouchDrag: boolean;
+	vertTouchDrag: boolean;
 }
 
 export interface HandleScaleOptions {
