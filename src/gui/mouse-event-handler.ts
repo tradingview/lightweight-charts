@@ -347,14 +347,6 @@ export class MouseEventHandler implements IDestroyable {
 			this._clickCount = 0;
 			this._clickTimeoutId = setTimeout(this._resetClickTimeout.bind(this), Delay.ResetClick);
 		}
-
-		if (this._preventDefault) {
-			try {
-				window.focus();
-			} catch (er) {
-				// empty block
-			}
-		}
 	}
 
 	private _init(): void {
