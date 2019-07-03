@@ -472,11 +472,7 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	public getImage(): HTMLCanvasElement {
-		const res = document.createElement('canvas');
-		resizeCanvas(res, this._size);
-		const ctx = ensureNotNull(getContext2d(res));
-		ctx.drawImage(this._canvas, 0, 0);
-		return res;
+		return this._canvas;
 	}
 
 	public paint(type: number): void {
