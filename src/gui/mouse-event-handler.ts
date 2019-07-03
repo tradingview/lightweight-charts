@@ -394,6 +394,13 @@ export class MouseEventHandler implements IDestroyable {
 		}
 
 		this._initPinch();
+
+		// Hey mobile Safari, what's up?
+		// If mobile Safari doesn't have any touchmove handler with passive=false
+		// it treats a touchstart and the following touchmove events as cancelable=false,
+		// so we can't prevent them (as soon we subscribe on touchmove inside touchstart's handler).
+		// And we'll get the page's scroll along with chart's one instead of only chart's scroll.
+		this._target.addEventListener('touchmove', () => {}, { passive: false });
 	}
 
 	private _initPinch(): void {
