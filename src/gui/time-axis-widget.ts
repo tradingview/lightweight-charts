@@ -98,7 +98,14 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._recreateStub();
 		this._chart.model().mainPriceScaleOptionsChanged().subscribe(this._recreateStub.bind(this), this);
 
-		this._mouseEventHandler = new MouseEventHandler(this._cell, this, true, false);
+		this._mouseEventHandler = new MouseEventHandler(
+			this._topCanvas,
+			this,
+			{
+				treatVertTouchDragAsPageScroll: true,
+				treatHorzTouchDragAsPageScroll: false,
+			}
+		);
 	}
 
 	public destroy(): void {

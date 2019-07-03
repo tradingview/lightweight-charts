@@ -95,7 +95,14 @@ export class PriceAxisWidget implements IDestroyable {
 			mouseEnterEvent: this._mouseEnterEvent.bind(this),
 			mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
 		};
-		this._mouseEventHandler = new MouseEventHandler(this._topCanvas, handler, true, false);
+		this._mouseEventHandler = new MouseEventHandler(
+			this._topCanvas,
+			handler,
+			{
+				treatVertTouchDragAsPageScroll: false,
+				treatHorzTouchDragAsPageScroll: true,
+			}
+		);
 	}
 
 	public destroy(): void {

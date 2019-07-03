@@ -287,8 +287,10 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-|
-|`mouseWheel`|`boolean`|`true`|If true, series scrolling with horizontal mouse wheel is enabled|
-|`pressedMouseMove`|`boolean`|`true`|If true, series scrolling with left mouse button pressed is allowed|
+|`mouseWheel`|`boolean`|`true`|If true, chart scrolling with horizontal mouse wheel is enabled|
+|`pressedMouseMove`|`boolean`|`true`|If true, chart scrolling with left mouse button pressed is allowed|
+|`horzTouchDrag`|`boolean`|`true`|If true, the chart handles horizontal pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger|
+|`vertTouchDrag`|`boolean`|`true`|If true, the chart handles vertical pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger.|
 
 ### Scaling options
 

@@ -59,7 +59,14 @@ export class PaneSeparator implements IDestroyable {
 				pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
 				mouseUpEvent: this._mouseUpEvent.bind(this),
 			};
-			this._mouseEventHandler = new MouseEventHandler(this._handle, handlers, true, false);
+			this._mouseEventHandler = new MouseEventHandler(
+				this._handle,
+				handlers,
+				{
+					treatVertTouchDragAsPageScroll: false,
+					treatHorzTouchDragAsPageScroll: true,
+				}
+			);
 		}
 	}
 
@@ -103,7 +110,6 @@ export class PaneSeparator implements IDestroyable {
 	}
 
 	private _pressedMouseMoveEvent(event: TouchMouseEvent): void {
-		event.preventDefault();
 		this._deltaY = (event.pageY - this._startY);
 		const upperHeight = this._paneA.getSize().h;
 		const newUpperPaneHeight = clamp(upperHeight + this._deltaY, this._minPaneHeight, this._maxPaneHeight);

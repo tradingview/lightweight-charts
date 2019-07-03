@@ -101,7 +101,15 @@ export class PaneWidget implements IDestroyable {
 		chart.model().mainPriceScaleOptionsChanged().subscribe(this._recreatePriceAxisWidget.bind(this), this);
 		this.updatePriceAxisWidget();
 
-		this._mouseEventHandler = new MouseEventHandler(this._topCanvas, this, true, !this.chart().options().handleScroll.pressedMouseMove);
+		const scrollOptions = this.chart().options().handleScroll;
+		this._mouseEventHandler = new MouseEventHandler(
+			this._topCanvas,
+			this,
+			{
+				treatVertTouchDragAsPageScroll: !scrollOptions.vertTouchDrag,
+				treatHorzTouchDragAsPageScroll: !scrollOptions.horzTouchDrag,
+			}
+		);
 	}
 
 	public destroy(): void {
@@ -283,7 +291,15 @@ export class PaneWidget implements IDestroyable {
 			this._setCrosshairPosition(x, y);
 		}
 
-		if (model.timeScale().isEmpty() || !this._chart.options().handleScroll.pressedMouseMove) {
+		if (model.timeScale().isEmpty()) {
+			return;
+		}
+
+		const scrollOptions = this._chart.options().handleScroll;
+		if (
+			(!scrollOptions.pressedMouseMove || event.type === 'touch') &&
+			(!scrollOptions.horzTouchDrag && !scrollOptions.vertTouchDrag || event.type === 'mouse')
+		) {
 			return;
 		}
 
