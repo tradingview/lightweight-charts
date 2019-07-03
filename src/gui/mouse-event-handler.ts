@@ -265,7 +265,7 @@ export class MouseEventHandler implements IDestroyable {
 			}
 		}
 
-		// prevent safari's pinch-to-zoom
+		// prevent safari's dblclick-to-zoom
 		// we handle mouseDoubleClickEvent here by ourself
 		if (mouseUpEvent.type === 'touchend') {
 			preventDefault(mouseUpEvent);
