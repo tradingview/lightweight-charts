@@ -71,7 +71,6 @@ export interface MouseEventHandlerOptions {
 export class MouseEventHandler implements IDestroyable {
 	private readonly _target: HTMLElement;
 	private _handler: MouseEventHandlers;
-	private _preventDefault!: boolean;
 
 	private readonly _options: MouseEventHandlerOptions;
 
@@ -141,7 +140,6 @@ export class MouseEventHandler implements IDestroyable {
 
 		const compatEvent = this._makeCompatEvent(enterEvent);
 		this._processEvent(compatEvent, this._handler.mouseEnterEvent);
-		this._preventDefaultIfNeeded(enterEvent);
 	}
 
 	private _resetClickTimeout(): void {
@@ -160,7 +158,6 @@ export class MouseEventHandler implements IDestroyable {
 
 		const compatEvent = this._makeCompatEvent(moveEvent);
 		this._processEvent(compatEvent, this._handler.mouseMoveEvent);
-		this._preventDefaultIfNeeded(moveEvent);
 	}
 
 	// tslint:disable-next-line:cyclomatic-complexity
@@ -189,6 +186,10 @@ export class MouseEventHandler implements IDestroyable {
 
 		const moveExceededManhattanDistance = xOffset + yOffset > 5;
 
+		if (!moveExceededManhattanDistance && isTouch) {
+			return;
+		}
+
 		if (moveExceededManhattanDistance && !this._moveExceededManhattanDistance && isTouch) {
 			// vertical drag is more important than horizontal drag
 			// because we scroll the page vertically often than horizontally
@@ -201,15 +202,11 @@ export class MouseEventHandler implements IDestroyable {
 			// if drag event happened then we should revert preventDefault state to original one
 			// and try to process the drag event
 			// else we shouldn't prevent default of the event and ignore processing the drag event
-			if (isVertDrag || isHorzDrag) {
-				this._resetPreventDefault();
-			} else {
+			if (!isVertDrag && !isHorzDrag) {
 				this._preventDragProcess = true;
-				this._preventDefault = false;
 			}
 		}
 
-		let preventProcess = this._preventDragProcess;
 		if (moveExceededManhattanDistance) {
 			this._moveExceededManhattanDistance = true;
 
@@ -219,16 +216,17 @@ export class MouseEventHandler implements IDestroyable {
 			if (isTouch) {
 				this._clearLongTapTimeout();
 			}
-		} else if (isTouch) {
-			// on touches prevent only the current event, not at all
-			preventProcess = true;
 		}
 
-		if (!preventProcess) {
+		if (!this._preventDragProcess) {
 			this._processEvent(compatEvent, this._handler.pressedMouseMoveEvent);
-		}
 
-		this._preventDefaultIfNeeded(moveEvent);
+			// we should prevent default in case of touch only
+			// to prevent scroll of the page
+			if (isTouch) {
+				preventDefault(moveEvent);
+			}
+		}
 	}
 
 	private _mouseUpHandler(mouseUpEvent: MouseEvent | TouchEvent): void {
@@ -267,7 +265,11 @@ export class MouseEventHandler implements IDestroyable {
 			}
 		}
 
-		this._preventDefaultIfNeeded(mouseUpEvent);
+		// prevent safari's pinch-to-zoom
+		// we handle mouseDoubleClickEvent here by ourself
+		if (mouseUpEvent.type === 'touchend') {
+			preventDefault(mouseUpEvent);
+		}
 
 		if (mobileTouch) {
 			this._mouseLeaveHandler(mouseUpEvent);
@@ -297,11 +299,8 @@ export class MouseEventHandler implements IDestroyable {
 		const isTouch = isTouchEvent(downEvent);
 
 		if (isTouch) {
-			this._preventDefault = false;
 			this._mouseEnterHandler(downEvent);
 		}
-
-		this._resetPreventDefault();
 
 		this._mouseMoveStartPosition = {
 			x: compatEvent.pageX,
@@ -327,7 +326,7 @@ export class MouseEventHandler implements IDestroyable {
 			};
 
 			rootElement.addEventListener('touchmove', boundMouseMoveWithDownHandler, { passive: false });
-			rootElement.addEventListener('touchend', boundMouseUpHandler);
+			rootElement.addEventListener('touchend', boundMouseUpHandler, { passive: false });
 
 			if (mobileTouch) {
 				this._clearLongTapTimeout();
@@ -349,8 +348,6 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _init(): void {
-		this._resetPreventDefault();
-
 		this._target.addEventListener('mouseenter', this._mouseEnterHandler.bind(this));
 
 		this._target.addEventListener('touchcancel', this._clearLongTapTimeout.bind(this));
@@ -390,7 +387,7 @@ export class MouseEventHandler implements IDestroyable {
 		// If mobile Safari doesn't have any touchmove handler with passive=false
 		// it treats a touchstart and the following touchmove events as cancelable=false,
 		// so we can't prevent them (as soon we subscribe on touchmove inside touchstart's handler).
-		// And we'll get the page's scroll along with chart's one instead of only chart's scroll.
+		// And we'll get scroll of the page along with chart's one instead of only chart's scroll.
 		this._target.addEventListener('touchmove', () => {}, { passive: false });
 	}
 
@@ -473,13 +470,11 @@ export class MouseEventHandler implements IDestroyable {
 		}
 		const compatEvent = this._makeCompatEvent(event);
 		this._processEvent(compatEvent, this._handler.mouseLeaveEvent);
-		this._preventDefaultIfNeeded(event);
 	}
 
 	private _longTapHandler(event: MouseEvent | TouchEvent): void {
 		const compatEvent = this._makeCompatEvent(event);
 		this._processEvent(compatEvent, this._handler.longTapEvent);
-		this._preventDefaultIfNeeded(event);
 		this._cancelClick = true;
 	}
 
@@ -489,17 +484,6 @@ export class MouseEventHandler implements IDestroyable {
 		}
 
 		callback.call(this._handler, event);
-	}
-
-	private _preventDefaultIfNeeded(event: MouseEvent | TouchEvent): void {
-		if (this._preventDefault && event.cancelable) {
-			event.preventDefault();
-		}
-	}
-
-	private _resetPreventDefault(): void {
-		// we should prevent default only in case when touch scroll is totally enabled
-		this._preventDefault = !(this._options.treatVertTouchDragAsPageScroll && this._options.treatHorzTouchDragAsPageScroll);
 	}
 
 	private _makeCompatEvent(event: MouseEvent | TouchEvent): TouchMouseEvent {
@@ -551,4 +535,10 @@ function getDistance(p1: Touch, p2: Touch): number {
 
 function isTouchEvent(event: MouseEvent | TouchEvent): boolean {
 	return mobileTouch || Boolean((event as TouchEvent).touches);
+}
+
+function preventDefault(event: Event): void {
+	if (event.cancelable) {
+		event.preventDefault();
+	}
 }
