@@ -43,7 +43,6 @@ export interface TouchMouseEvent {
 
 	target: MouseEvent['target'];
 	view: MouseEvent['view'];
-	preventDefault(): void;
 }
 
 export interface Position {
@@ -536,12 +535,6 @@ export class MouseEventHandler implements IDestroyable {
 
 			target: eventLike.target,
 			view: event.view,
-
-			preventDefault: () => {
-				if (event.cancelable) {
-					event.preventDefault();
-				}
-			},
 		};
 	}
 }
