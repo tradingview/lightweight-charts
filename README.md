@@ -7,16 +7,16 @@
 
   <h1>Lightweight Charts</h1>
 
-  [![CircleCI](https://img.shields.io/circleci/build/github/tradingview/lightweight-charts.svg)](https://circleci.com/gh/tradingview/lightweight-charts)
-  [![npm version](https://badge.fury.io/js/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
-  [![npm bundle size](https://badgen.net/bundlephobia/minzip/lightweight-charts)](https://bundlephobia.com/result?p=lightweight-charts)
-  ![Zero dependencies](https://badgen.net/badge/dependencies/0/green)
-  [![Downloads](https://img.shields.io/npm/dm/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
+  [![CircleCI][ci-img]][ci-link]
+  [![npm version][npm-version-img]][npm-link]
+  [![npm bundle size][bundle-size-img]][bundle-size-link]
+  ![Zero dependencies][zero-deps-img]
+  [![Downloads][npm-downloads-img]][npm-link]
 </div>
 
 <!-- markdownlint-enable no-inline-html -->
 
-[Demos](https://www.tradingview.com/lightweight-charts/) | [Documentation](./docs/README.md)
+[Demos][demo-url] | [Documentation](./docs/README.md)
 
 TradingView Lightweight Charts is one of the smallest and fastest financial HTML5 charts.
 
@@ -92,3 +92,17 @@ This software incorporates several parts of tslib (<https://github.com/Microsoft
 This license requires specifying TradingView as the product creator.
 You shall add the "attribution notice" from the NOTICE file and a link to <https://www.tradingview.com/> to the page of your website or mobile application that is available to your users.
 As thanks for creating this product, we'd be grateful if you add it in a prominent place.
+
+[demo-url]: https://www.tradingview.com/lightweight-charts/
+
+[ci-img]: https://img.shields.io/circleci/build/github/tradingview/lightweight-charts.svg
+[ci-link]: https://circleci.com/gh/tradingview/lightweight-charts
+
+[npm-version-img]: https://badge.fury.io/js/lightweight-charts.svg
+[npm-downloads-img]: https://img.shields.io/npm/dm/lightweight-charts.svg
+[npm-link]: https://www.npmjs.com/package/lightweight-charts
+
+[bundle-size-img]: https://badgen.net/bundlephobia/minzip/lightweight-charts
+[bundle-size-link]: https://bundlephobia.com/result?p=lightweight-charts
+
+[zero-deps-img]: https://badgen.net/badge/dependencies/0/green
