@@ -414,6 +414,7 @@ export class MouseEventHandler implements IDestroyable {
 					const currentDistance = getDistance(event.touches[0], event.touches[1]);
 					const scale = currentDistance / this._startPinchDistance;
 					this._handler.pinchEvent(this._startPinchMiddlePoint, scale);
+					preventDefault(event);
 				}
 			},
 			{ passive: false }
