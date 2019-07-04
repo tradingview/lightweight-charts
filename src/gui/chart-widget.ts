@@ -213,7 +213,7 @@ export class ChartWidget implements IDestroyable {
 		const targetCanvas = document.createElement('canvas');
 		resizeCanvas(targetCanvas, new Size(targetWidth, targetHeight));
 		const ctx = ensureNotNull(getContext2d(targetCanvas));
-		// we need this atually because of resizeCanvas does translate, but we do not need it
+		// we need this actually because of resizeCanvas does translate, but we do not need it
 		ctx.translate(-0.5, -0.5);
 		let targetX = 0;
 		let targetY = 0;
