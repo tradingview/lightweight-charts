@@ -1,10 +1,20 @@
-# Lightweight Charts
+<!-- markdownlint-disable no-inline-html first-line-h1 -->
 
-[![CircleCI](https://img.shields.io/circleci/build/github/tradingview/lightweight-charts.svg)](https://circleci.com/gh/tradingview/lightweight-charts)
-[![npm version](https://badge.fury.io/js/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
-[![npm bundle size](https://badgen.net/bundlephobia/minzip/lightweight-charts)](https://bundlephobia.com/result?p=lightweight-charts)
-![Zero dependencies](https://badgen.net/badge/dependencies/0/green)
-[![Downloads](https://img.shields.io/npm/dm/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
+<div align="center">
+  <a href="https://www.tradingview.com/lightweight-charts/" target="_blank">
+    <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true">
+  </a>
+
+  <h1>Lightweight Charts</h1>
+
+  [![CircleCI](https://img.shields.io/circleci/build/github/tradingview/lightweight-charts.svg)](https://circleci.com/gh/tradingview/lightweight-charts)
+  [![npm version](https://badge.fury.io/js/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
+  [![npm bundle size](https://badgen.net/bundlephobia/minzip/lightweight-charts)](https://bundlephobia.com/result?p=lightweight-charts)
+  ![Zero dependencies](https://badgen.net/badge/dependencies/0/green)
+  [![Downloads](https://img.shields.io/npm/dm/lightweight-charts.svg)](https://www.npmjs.com/package/lightweight-charts)
+</div>
+
+<!-- markdownlint-enable no-inline-html -->
 
 [Demos](https://www.tradingview.com/lightweight-charts/) | [Documentation](./docs/README.md)
 
