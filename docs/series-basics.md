@@ -232,6 +232,23 @@ series.applyOptions({
 });
 ```
 
+#### Price formatter
+
+By default series prices are formatted accordingly to [price format](#price-format), but there is a possibility to define a function for price formatting.
+It could be used for some specific cases, that could not be covered with [price format](#price-format).
+
+Note that `priceFormat` is ignored in case when `priceFormatter` is defined.
+
+Example:
+
+```javascript
+series.applyOptions({
+    priceFormatter: function(price) {
+        return '$' + price.toFixed(2);
+    },
+});
+```
+
 ### setData
 
 Allows to set/replace all existing data with new one.

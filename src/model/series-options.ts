@@ -2,6 +2,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { LineStyle, LineWidth } from '../renderers/draw-line';
 
+import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
 
 /** Structure describing a drawing style of the candlestick chart  */
@@ -159,6 +160,8 @@ export interface SeriesOptionsCommon {
 	priceLineStyle: LineStyle;
 	/** Formatting settings associated with the series */
 	priceFormat: PriceFormat;
+	/** User-defined function for price formatting. Could be used for some specific cases, that could not be covered with PriceFormat */
+	priceFormatter?: PriceFormatterFn;
 	/** Visibility of base line. Suitable for percentage and indexedTo100 scales */
 	baseLineVisible: boolean;
 	/** Color of the base line in IndexedTo100 mode */

@@ -1,10 +1,9 @@
 import { DateFormat } from '../formatters/date-format';
 
-import { BarPrice } from './bar';
+import { PriceFormatterFn } from './price-formatter-fn';
 import { BusinessDay, UTCTimestamp } from './time-data';
 
 export type TimeFormatterFn = (time: BusinessDay | UTCTimestamp) => string;
-export type PriceFormatterFn = (priceValue: BarPrice) => string;
 
 export interface LocalizationOptions {
 	/**
