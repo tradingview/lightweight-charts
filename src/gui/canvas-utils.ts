@@ -50,5 +50,5 @@ function disableSelection(canvas: HTMLCanvasElement): void {
 	// tslint:disable-next-line:no-any
 	(canvas as any).style.MozUserSelect = 'none';
 
-	canvas.style.webkitTapHighlightColor = 'rgba(0,0,0,0)';
+	canvas.style.webkitTapHighlightColor = 'transparent';
 }
