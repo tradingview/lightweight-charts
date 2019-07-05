@@ -38,6 +38,9 @@
     "clean-publish": "~1.1.2",
     "dts-bundle-generator": "~3.1.0",
     "eslint": "6.0.1",
+    "glob": "~7.1.4",
+    "markdown-it": "~8.4.2",
+    "markdown-it-anchor": "~5.2.4",
     "markdownlint-cli": "~0.17.0",
     "mocha": "~6.1.4",
     "npm-run-all": "~4.1.5",
@@ -67,9 +70,10 @@
     "lint:eslint": "eslint --format=unix --ext .js ./",
     "lint:tslint": "tslint --config tslint.json --project tsconfig.all-non-composite.json",
     "lint:md": "./node_modules/.bin/markdownlint -i \"**/node_modules/**\" \"**/*.md\"",
+    "check-markdown-links": "node scripts/check-markdown-links.js",
     "rollup": "rollup -c rollup.config.js",
     "build": "npm-run-all tsc rollup bundle-dts",
-    "verify": "npm-run-all clean tsc-all lint build test",
+    "verify": "npm-run-all clean tsc-all lint check-markdown-links build test",
     "test": "mocha tests/unittests/**/*.spec.ts"
   }
 }

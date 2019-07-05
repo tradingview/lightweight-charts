@@ -32,7 +32,7 @@ To run this tests you need use [runner.js](./runner.js):
 ```
 
 Each path to the standalone module might be either to a local file (relative/absolute path to a file) or remote file (via http/https).
-If file is local then local server will be runner to serve that file (see [serve-local-files.js](./serve-local-files.js) module).
+If file is local then local server will be runner to serve that file (see [serve-local-files.js](../serve-local-files.js) module).
 
 ## Tips
 

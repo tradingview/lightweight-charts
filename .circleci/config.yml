@@ -84,11 +84,12 @@ jobs:
       - checkout-with-deps
       - run: npm run lint:tslint
 
-  markdownlint:
+  markdown:
     executor: node-latest-executor
     steps:
       - checkout-with-deps
       - run: npm run lint:md
+      - run: npm run check-markdown-links
 
   unittests:
     executor: node-latest-executor
