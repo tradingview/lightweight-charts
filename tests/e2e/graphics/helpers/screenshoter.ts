@@ -8,11 +8,21 @@ import {
 	Response,
 } from 'puppeteer';
 
+const viewportWidth = 600;
+const viewportHeight = 600;
+
 export class Screenshoter {
 	private _browserPromise: Promise<Browser>;
 
-	public constructor(noSandbox: boolean) {
-		const puppeteerOptions: LaunchOptions = {};
+	public constructor(noSandbox: boolean, devicePixelRatio: number = 1) {
+		const puppeteerOptions: LaunchOptions = {
+			defaultViewport: {
+				deviceScaleFactor: devicePixelRatio,
+				width: viewportWidth,
+				height: viewportHeight,
+			},
+		};
+
 		if (noSandbox) {
 			puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
 		}
@@ -33,10 +43,6 @@ export class Screenshoter {
 			const browser = await this._browserPromise;
 			page = await browser.newPage();
 
-			const width = 600;
-			const height = 600;
-			await page.setViewport({ width, height });
-
 			const errors: string[] = [];
 			page.on('pageerror', (error: Error) => {
 				errors.push(error.message);
@@ -51,7 +57,7 @@ export class Screenshoter {
 			await page.setContent(pageContent, { waitUntil: 'load' });
 
 			// to avoid random cursor position
-			await page.mouse.move(width / 2, height / 2);
+			await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
 
 			// wait for test case is ready
 			await page.evaluate(() => {

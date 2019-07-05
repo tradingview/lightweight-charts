@@ -39,6 +39,27 @@ commands:
       - checkout
       - restore_cache: *restore-node-modules-cache
 
+  run-graphics-tests:
+    description: "Run graphics tests with specific devicePixelRatio"
+    parameters:
+      devicePixelRatio:
+        type: string
+    steps:
+      - checkout-with-deps
+      - run:
+          name: "Setup Environment Variables"
+          command: |
+            echo 'export NO_SANDBOX="true"' >> $BASH_ENV
+            echo 'export CMP_OUT_DIR="./graphics-cmp-data"' >> $BASH_ENV
+            echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
+            echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
+      - run: scripts/run-graphics-tests.sh
+      - store_test_results:
+          path: test-results/
+      - store_artifacts:
+          path: ./graphics-cmp-data
+          when: on_fail
+
 
 jobs:
   install-deps:
@@ -110,20 +131,24 @@ jobs:
           path: ./dts-changes
           when: on_fail
 
-  graphics-tests:
+  graphics-tests-dpr1_0:
     executor: node-browsers-latest-executor
-    environment:
-      NO_SANDBOX: "true"
-      CMP_OUT_DIR: ./graphics-cmp-data
-      TESTS_REPORT_FILE: "test-results/graphics/results.xml"
     steps:
-      - checkout-with-deps
-      - run: scripts/run-graphics-tests.sh
-      - store_test_results:
-          path: test-results/
-      - store_artifacts:
-          path: ./graphics-cmp-data
-          when: on_fail
+      - run-graphics-tests:
+          devicePixelRatio: "1.0"
+
+  graphics-tests-dpr1_5:
+    executor: node-browsers-latest-executor
+    steps:
+      - run-graphics-tests:
+          devicePixelRatio: "1.5"
+
+  graphics-tests-dpr2_0:
+    executor: node-browsers-latest-executor
+    steps:
+      - run-graphics-tests:
+          devicePixelRatio: "2.0"
+
 
   memleaks-tests:
     executor: node-browsers-latest-executor
@@ -180,7 +205,23 @@ workflows:
                 - master
           requires:
             - build
-      - graphics-tests:
+      - graphics-tests-dpr1_0:
+          filters:
+            <<: *default-filters
+            branches:
+              ignore:
+                - master
+          requires:
+            - build
+      - graphics-tests-dpr1_5:
+          filters:
+            <<: *default-filters
+            branches:
+              ignore:
+                - master
+          requires:
+            - build
+      - graphics-tests-dpr2_0:
           filters:
             <<: *default-filters
             branches:
