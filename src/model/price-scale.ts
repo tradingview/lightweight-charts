@@ -172,7 +172,7 @@ export class PriceScale {
 			}
 
 			if (top + bottom > 1) {
-				throw new Error(`Invalid margins - sum of margings must be less than 1, given=${top + bottom}`);
+				throw new Error(`Invalid margins - sum of margins must be less than 1, given=${top + bottom}`);
 			}
 
 			this._invalidateInternalHeightCache();

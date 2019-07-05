@@ -155,17 +155,17 @@ export interface SeriesOptionsCommon {
 	priceLineWidth: LineWidth;
 	/** Color of the price line. Ignored if priceLineVisible is false */
 	priceLineColor: string;
-	/** Price line style. Suitible for percentage and indexedTo100 scales */
+	/** Price line style. Suitable for percentage and indexedTo100 scales */
 	priceLineStyle: LineStyle;
 	/** Formatting settings associated with the series */
 	priceFormat: PriceFormat;
-	/** Visibity of base line. Suitible for percentage and indexedTo100 scales */
+	/** Visibility of base line. Suitable for percentage and indexedTo100 scales */
 	baseLineVisible: boolean;
 	/** Color of the base line in IndexedTo100 mode */
 	baseLineColor: string;
-	/** Base line width. Suitible for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
+	/** Base line width. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
 	baseLineWidth: LineWidth;
-	/** Base line style. Suitible for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
+	/** Base line style. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
 	baseLineStyle: LineStyle;
 }
 

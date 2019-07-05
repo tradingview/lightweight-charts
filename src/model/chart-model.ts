@@ -398,7 +398,7 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public updateCrosshair(): void {
-		// rapply magnet
+		// apply magnet
 		const pane = this._crosshair.pane();
 		if (pane !== null) {
 			const x = this._crosshair.originCoordX();
