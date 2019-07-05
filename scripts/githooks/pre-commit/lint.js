@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-env node */
-/* eslint-disable no-console */
-
 const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
