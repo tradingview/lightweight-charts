@@ -81,6 +81,8 @@ export type MouseEventHandler = (param: MouseEventParams) => void;
 
 `seriesPrices` contains all series prices according to the event point details. Key is a series, value is a number for single-value series types (line, area, histogram) or OHLC structure for candlestick and bar series.
 
+### TimeRangeChangeEventHandler
+
 TimeRangeChangeEventHandler is a type of callback that is being used to get notified about chart time range changes.
 
 ```typescript
