@@ -38,6 +38,15 @@ export function addCanvasTo(element: HTMLElement, size: Size): HTMLCanvasElement
 	element.appendChild(canvas);
 
 	resizeCanvas(canvas, size);
+	disableSelection(canvas);
 
 	return canvas;
+}
+
+function disableSelection(canvas: HTMLCanvasElement): void {
+	canvas.style.userSelect = 'none';
+	canvas.style.webkitUserSelect = 'none';
+	canvas.style.msUserSelect = 'none';
+	// tslint:disable-next-line:no-any
+	(canvas as any).style.MozUserSelect = 'none';
 }
