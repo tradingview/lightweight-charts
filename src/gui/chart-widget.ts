@@ -5,6 +5,7 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptions } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { InvalidateMask, InvalidationLevel } from '../model/invalidate-mask';
@@ -20,8 +21,10 @@ import { TimeAxisWidget } from './time-axis-widget';
 export interface MouseEventParamsImpl {
 	time?: TimePoint;
 	point?: Point;
-	seriesPrices: Map<Series, number>;
+	seriesPrices: Map<Series, BarPrice | BarPrices>;
 }
+
+export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
 export class ChartWidget implements IDestroyable {
 	private readonly _options: ChartOptions;
@@ -38,8 +41,8 @@ export class ChartWidget implements IDestroyable {
 	private _timeAxisWidget: TimeAxisWidget;
 	private _invalidateMask: InvalidateMask | null = null;
 	private _drawPlanned: boolean = false;
-	private _clicked: Delegate<MouseEventParamsImpl> = new Delegate();
-	private _crosshairMoved: Delegate<MouseEventParamsImpl> = new Delegate();
+	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
 	public constructor(container: HTMLElement, options: ChartOptions) {
@@ -193,11 +196,11 @@ export class ChartWidget implements IDestroyable {
 		this.resize(height, width);
 	}
 
-	public clicked(): ISubscription<MouseEventParamsImpl> {
+	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._clicked;
 	}
 
-	public crosshairMoved(): ISubscription<MouseEventParamsImpl> {
+	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._crosshairMoved;
 	}
 
@@ -494,18 +497,16 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _getMouseEventParamsImpl(time: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
-		const seriesPrices = new Map<Series, number>();
+		const seriesPrices = new Map<Series, BarPrice | BarPrices>();
 		if (time !== null) {
 			const serieses = this._model.serieses();
 			serieses.forEach((s: Series) => {
 				// TODO: replace with search left
-				const prices = s.data().valueAt(time);
+				const prices = s.dataAt(time);
 				if (prices !== null) {
-					const price = s.barFunction()(prices.value);
-					seriesPrices.set(s, price);
+					seriesPrices.set(s, prices);
 				}
 			});
-
 		}
 		let clientTime: TimePoint | undefined;
 		if (time !== null) {
@@ -523,13 +524,11 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _onPaneWidgetClicked(time: TimePointIndex | null, point: Point): void {
-		const param = this._getMouseEventParamsImpl(time, point);
-		this._clicked.fire(param);
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point));
 	}
 
 	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
-		const param = this._getMouseEventParamsImpl(time, point);
-		this._crosshairMoved.fire(param);
+		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
 	}
 
 	private _updateTimeAxisVisibility(): void {

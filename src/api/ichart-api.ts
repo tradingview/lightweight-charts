@@ -1,5 +1,6 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
 import { Point } from '../model/point';
 import {
@@ -19,7 +20,7 @@ import { ITimeScaleApi, TimeRange } from './itime-scale-api';
 export interface MouseEventParams {
 	time?: UTCTimestamp | BusinessDay;
 	point?: Point;
-	seriesPrices: Map<ISeriesApi<SeriesType>, number>;
+	seriesPrices: Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>;
 }
 
 export type MouseEventHandler = (param: MouseEventParams) => void;

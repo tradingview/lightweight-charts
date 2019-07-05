@@ -1,9 +1,10 @@
-import { ChartWidget, MouseEventParamsImpl } from '../gui/chart-widget';
+import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
 
+import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
 import { Palette } from '../model/palette';
 import { Series } from '../model/series';
@@ -71,8 +72,22 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget = new ChartWidget(container, options);
 		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 
-		this._chartWidget.clicked().subscribe((param: MouseEventParamsImpl) => this._clickedDelegate.fire(this._convertMouseParams(param)), this);
-		this._chartWidget.crosshairMoved().subscribe((param: MouseEventParamsImpl) => this._crosshairMovedDelegate.fire(this._convertMouseParams(param)), this);
+		this._chartWidget.clicked().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._clickedDelegate.hasListeners()) {
+					this._clickedDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+			this
+		);
+		this._chartWidget.crosshairMoved().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._crosshairMovedDelegate.hasListeners()) {
+					this._crosshairMovedDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+			this
+		);
 
 		const model = this._chartWidget.model();
 		this._priceScaleApi = new PriceScaleApi(model);
@@ -266,8 +281,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
-		const seriesPrices = new Map<ISeriesApi<SeriesType>, number>();
-		param.seriesPrices.forEach((price: number, series: Series) => {
+		const seriesPrices = new Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>();
+		param.seriesPrices.forEach((price: BarPrice | BarPrices, series: Series) => {
 			seriesPrices.set(this._mapSeriesToApi(series), price);
 		});
 		return {
