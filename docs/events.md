@@ -79,7 +79,7 @@ export type MouseEventHandler = (param: MouseEventParams) => void;
 
 `point` is not defined if an event was fired outside of the chart (for example on a mouse leave event).
 
-`seriesPrices` contains all series prices according to the event point details. Key is a series, value is a number for single-value series types (line, area, histogram) or OHLC structure for candlestick and bar series.
+`seriesPrices` is an object with prices of all series corresponding to the event point. The object keys are series APIs, values are prices. Each price value is a number for single-value series types (line, area, histogram) or OHLC structure for candlestick and bar series.
 
 ### TimeRangeChangeEventHandler
 
