@@ -23,6 +23,8 @@ export interface MouseEventParamsImpl {
 	seriesPrices: Map<Series, BarPrice | BarPrices>;
 }
 
+export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
+
 export class ChartWidget implements IDestroyable {
 	private readonly _options: ChartOptions;
 	private _paneWidgets: PaneWidget[] = [];
@@ -38,8 +40,8 @@ export class ChartWidget implements IDestroyable {
 	private _timeAxisWidget: TimeAxisWidget;
 	private _invalidateMask: InvalidateMask | null = null;
 	private _drawPlanned: boolean = false;
-	private _clicked: Delegate<MouseEventParamsImpl> = new Delegate();
-	private _crosshairMoved: Delegate<MouseEventParamsImpl> = new Delegate();
+	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
 	public constructor(container: HTMLElement, options: ChartOptions) {
@@ -193,11 +195,11 @@ export class ChartWidget implements IDestroyable {
 		this.resize(height, width);
 	}
 
-	public clicked(): ISubscription<MouseEventParamsImpl> {
+	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._clicked;
 	}
 
-	public crosshairMoved(): ISubscription<MouseEventParamsImpl> {
+	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._crosshairMoved;
 	}
 
@@ -451,13 +453,11 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _onPaneWidgetClicked(time: TimePointIndex | null, point: Point): void {
-		const param = this._getMouseEventParamsImpl(time, point);
-		this._clicked.fire(param);
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point));
 	}
 
 	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
-		const param = this._getMouseEventParamsImpl(time, point);
-		this._crosshairMoved.fire(param);
+		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
 	}
 
 	private _updateTimeAxisVisibility(): void {

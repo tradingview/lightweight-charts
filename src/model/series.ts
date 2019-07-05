@@ -74,6 +74,14 @@ export interface MarkerData {
 	radius: number;
 }
 
+export interface SeriesDataAtTypeMap {
+	Bar: BarPrices;
+	Candlestick: BarPrices;
+	Area: BarPrice;
+	Line: BarPrice;
+	Histogram: BarPrice;
+}
+
 export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
 	private readonly _seriesType: T;
 	private _data: SeriesData = new SeriesData();
@@ -325,7 +333,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this.data().search(index, options);
 	}
 
-	public dataAt(time: TimePointIndex): BarPrice | BarPrices | null {
+	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
 		const prices = this.data().valueAt(time);
 		if (prices === null) {
 			return null;
