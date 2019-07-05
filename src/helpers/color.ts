@@ -380,3 +380,8 @@ export function colorWithTransparency(color: string, transparency: number): stri
 function isHexColor(color: string): boolean {
 	return color.indexOf('#') === 0;
 }
+
+export function generateTextColor(color: string): string {
+	const backColorBW = rgbToBlackWhiteString(parseRgb(color), 160);
+	return backColorBW === 'black' ? 'white' : 'black';
+}

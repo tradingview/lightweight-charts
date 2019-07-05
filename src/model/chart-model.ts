@@ -28,6 +28,8 @@ import { Watermark, WatermarkOptions } from './watermark';
 export interface HandleScrollOptions {
 	mouseWheel: boolean;
 	pressedMouseMove: boolean;
+	horzTouchDrag: boolean;
+	vertTouchDrag: boolean;
 }
 
 export interface HandleScaleOptions {
@@ -231,6 +233,7 @@ export class ChartModel implements IDestroyable {
 
 	public scalePriceTo(pane: Pane, priceScale: PriceScale, x: number): void {
 		pane.scalePriceTo(priceScale, x);
+		this.updateCrosshair();
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
@@ -251,6 +254,7 @@ export class ChartModel implements IDestroyable {
 			return;
 		}
 		pane.scrollPriceTo(priceScale, x);
+		this.updateCrosshair();
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
@@ -306,6 +310,7 @@ export class ChartModel implements IDestroyable {
 	public scaleTimeTo(x: Coordinate): void {
 		this._timeScale.scaleTo(x);
 		this.recalculateAllPanes();
+		this.updateCrosshair();
 		this.lightUpdate();
 	}
 

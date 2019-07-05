@@ -1,5 +1,3 @@
-<!-- markdownlint-disable -->
-
 **Type of PR:** <!-- bugfix, enhancement, fix typo, etc -->
 
 **PR checklist:**

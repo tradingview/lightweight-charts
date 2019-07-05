@@ -72,6 +72,7 @@ The following set of options can be used to adjust the price axis interface:
 |`borderVisible`|`boolean`|`true`|If true, price scale border is visible|
 |`borderColor`|`string`|`#2b2b43`|Pricescale border color|
 |`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (per cent)|
+|`entireTextOnly`|`boolean`|`false`|If false, top and bottom edge labels are shown even if they are partially not visible |
 
 ### An example of a price scale customization
 
@@ -114,6 +115,7 @@ The following options are available in the time axis interface:
 |`borderColor`|`string`|`#2b2b43`|Timescale border color|
 |`visible`|`boolean`|`true`|If true, timescale is shown on a chart|
 |`timeVisible`|`boolean`|`false`|If true, time is shown on the time scale and crosshair vertical label|
+|`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of the crosshair vertical line in `hh:mm:ss` format on intraday intervals|
 
 ### Example of timescale customization
 
@@ -129,6 +131,7 @@ chart.applyOptions({
         borderColor: '#fff000',
         visible: true,
         timeVisible: true,
+        secondsVisible: false,
     },
 });
 ```
@@ -157,6 +160,7 @@ The following options are available for vertical and horizontal lines of a cross
 |`style`|[LineStyle](./constants.md#linestyle)|`LineStyle.Dashed`|Crosshair line style|
 |`visible`|`boolean`|`true`|If true, crosshair line is displayed on a chart|
 |`labelVisible`|`boolean`|`true`|If true, a data label is shown on a relevant scale|
+|`labelBackgroundColor`|`string`|`#4c525e`|Crosshair label background color|
 |`mode`|[CrosshairMode](./constants.md#crosshairmode)|`CrosshairMode.Magnet`|Sets the mode of crosshair moving.|
 
 ### An example of a crosshair customization
@@ -283,16 +287,18 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-|
-|`mouseWheel`|`boolean`|`true`|If true series scrolling with horizontal mouse wheel is enabled|
-|`pressedMouseMove`|`boolean`|`true`|If true series scrolling with left mouse button pressed is allowed|
+|`mouseWheel`|`boolean`|`true`|If true, chart scrolling with horizontal mouse wheel is enabled|
+|`pressedMouseMove`|`boolean`|`true`|If true, chart scrolling with left mouse button pressed is allowed|
+|`horzTouchDrag`|`boolean`|`true`|If true, the chart handles horizontal pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger|
+|`vertTouchDrag`|`boolean`|`true`|If true, the chart handles vertical pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger.|
 
 ### Scaling options
 
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-|
-|`axisPressedMouseMove`|`boolean`|`true`|If true axis scaling with left mouse button pressed is allowed|
-|`mouseWheel`|`boolean`|`true`|If true series scaling with mouse whee is enabled|
-|`pinch`|`boolean`|`true`|If true series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
+|`axisPressedMouseMove`|`boolean`|`true`|If true, axis scaling with left mouse button pressed is allowed|
+|`mouseWheel`|`boolean`|`true`|If true, series scaling with a mouse wheel is enabled|
+|`pinch`|`boolean`|`true`|If true, series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
 
 ### An example of a scrolling/scaling customization
 
@@ -308,15 +314,4 @@ chart.applyOptions({
         pinch: true,
     },
 });
-```
-
-## Branding
-
-You may hide our branding if you feel that it harms user experience on your website.
-Note that according to our terms you should add a link leading to <https://www.tradingview.com/> somewhere on your web page.
-This link must contain the text from the NOTICE file which is a part of the product package.
-Please see `disableBranding` method below.
-
-```javascript
-chart.disableBranding();
 ```

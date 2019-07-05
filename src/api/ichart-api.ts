@@ -144,8 +144,8 @@ export interface IChartApi {
 	options(): Readonly<ChartOptions>;
 
 	/**
-	 * Removes branding text from the chart.
-	 * Please read the description of this method in the documentation to learn more about the conditions of branding removal.
+	 * Make a screenshot of the chart with all the elements excluding crosshair.
+	 * @returns a canvas with the chart drawn on
 	 */
-	disableBranding(): void;
+	takeScreenshot(): HTMLCanvasElement;
 }
