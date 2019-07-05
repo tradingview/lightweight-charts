@@ -50,8 +50,6 @@ export interface Position {
 	y: number;
 }
 
-let mousePressed = false;
-
 // we can use `const name = 500;` but with `const enum` this values will be inlined into code
 // so we do not need to have it as variables
 const enum Delay {
@@ -68,6 +66,7 @@ export interface MouseEventHandlerOptions {
 	treatHorzTouchDragAsPageScroll: boolean;
 }
 
+// TODO: get rid of a lot of boolean flags, probably we should replace it with some enum
 export class MouseEventHandler implements IDestroyable {
 	private readonly _target: HTMLElement;
 	private _handler: MouseEventHandlers;
@@ -77,6 +76,7 @@ export class MouseEventHandler implements IDestroyable {
 	private _clickCount: number = 0;
 	private _clickTimeoutId: number | null = null;
 	private _longTapTimeoutId: number | null = null;
+	private _longTapActive: boolean = false;
 	private _mouseMoveStartPosition: Position | null = null;
 	private _moveExceededManhattanDistance: boolean = false;
 	private _cancelClick: boolean = false;
@@ -88,6 +88,8 @@ export class MouseEventHandler implements IDestroyable {
 	private _startPinchDistance: number = 0;
 	private _pinchPrevented: boolean = false;
 	private _preventDragProcess: boolean = false;
+
+	private _mousePressed: boolean = false;
 
 	public constructor(
 		target: HTMLElement,
@@ -134,7 +136,7 @@ export class MouseEventHandler implements IDestroyable {
 			this._target.addEventListener('mousemove', boundMouseMoveHandler);
 		}
 
-		if (mobileTouch) {
+		if (isTouchEvent(enterEvent)) {
 			this._mouseMoveHandler(enterEvent);
 		}
 
@@ -152,7 +154,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _mouseMoveHandler(moveEvent: MouseEvent | TouchEvent): void {
-		if (mousePressed && !mobileTouch) {
+		if (this._mousePressed && !isTouchEvent(moveEvent)) {
 			return;
 		}
 
@@ -236,21 +238,18 @@ export class MouseEventHandler implements IDestroyable {
 
 		const compatEvent = this._makeCompatEvent(mouseUpEvent);
 
-		const isTouch = mobileTouch || 'touches' in mouseUpEvent;
-		if (isTouch) {
-			this._clearLongTapTimeout();
-		}
+		this._clearLongTapTimeout();
 
 		this._mouseMoveStartPosition = null;
 
-		mousePressed = false;
+		this._mousePressed = false;
 
 		if (this._unsubscribeRoot) {
 			this._unsubscribeRoot();
 			this._unsubscribeRoot = null;
 		}
 
-		if (isTouch) {
+		if (isTouchEvent(mouseUpEvent)) {
 			this._mouseLeaveHandler(mouseUpEvent);
 		}
 
@@ -267,12 +266,14 @@ export class MouseEventHandler implements IDestroyable {
 
 		// prevent safari's dblclick-to-zoom
 		// we handle mouseDoubleClickEvent here by ourself
-		if (mouseUpEvent.type === 'touchend') {
+		if (isTouchEvent(mouseUpEvent)) {
 			preventDefault(mouseUpEvent);
-		}
 
-		if (mobileTouch) {
 			this._mouseLeaveHandler(mouseUpEvent);
+
+			if (mouseUpEvent.touches.length === 0) {
+				this._longTapActive = false;
+			}
 		}
 	}
 
@@ -296,9 +297,7 @@ export class MouseEventHandler implements IDestroyable {
 		this._moveExceededManhattanDistance = false;
 		this._preventDragProcess = false;
 
-		const isTouch = isTouchEvent(downEvent);
-
-		if (isTouch) {
+		if (isTouchEvent(downEvent)) {
 			this._mouseEnterHandler(downEvent);
 		}
 
@@ -328,8 +327,9 @@ export class MouseEventHandler implements IDestroyable {
 			rootElement.addEventListener('touchmove', boundMouseMoveWithDownHandler, { passive: false });
 			rootElement.addEventListener('touchend', boundMouseUpHandler, { passive: false });
 
-			if (mobileTouch) {
-				this._clearLongTapTimeout();
+			this._clearLongTapTimeout();
+
+			if (isTouchEvent(downEvent) && downEvent.touches.length === 1) {
 				this._longTapTimeoutId = setTimeout(this._longTapHandler.bind(this, downEvent), Delay.LongTap);
 			} else {
 				rootElement.addEventListener('mousemove', boundMouseMoveWithDownHandler);
@@ -337,7 +337,7 @@ export class MouseEventHandler implements IDestroyable {
 			}
 		}
 
-		mousePressed = true;
+		this._mousePressed = true;
 
 		this._processEvent(compatEvent, this._handler.mouseDownEvent);
 
@@ -430,7 +430,7 @@ export class MouseEventHandler implements IDestroyable {
 			this._pinchPrevented = false;
 		}
 
-		if (touches.length !== 2 || this._pinchPrevented) {
+		if (touches.length !== 2 || this._pinchPrevented || this._longTapActive) {
 			this._stopPinch();
 		} else {
 			this._startPinch(touches);
@@ -473,10 +473,13 @@ export class MouseEventHandler implements IDestroyable {
 		this._processEvent(compatEvent, this._handler.mouseLeaveEvent);
 	}
 
-	private _longTapHandler(event: MouseEvent | TouchEvent): void {
+	private _longTapHandler(event: TouchEvent): void {
 		const compatEvent = this._makeCompatEvent(event);
 		this._processEvent(compatEvent, this._handler.longTapEvent);
 		this._cancelClick = true;
+
+		// long tap is active untill touchend event with 0 touches occured
+		this._longTapActive = true;
 	}
 
 	private _processEvent(event: TouchMouseEvent, callback?: HandlerEventCallback): void {
@@ -534,8 +537,8 @@ function getDistance(p1: Touch, p2: Touch): number {
 	return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 }
 
-function isTouchEvent(event: MouseEvent | TouchEvent): boolean {
-	return mobileTouch || Boolean((event as TouchEvent).touches);
+function isTouchEvent(event: MouseEvent | TouchEvent): event is TouchEvent {
+	return Boolean((event as TouchEvent).touches);
 }
 
 function preventDefault(event: Event): void {
