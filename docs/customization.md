@@ -67,12 +67,12 @@ The following set of options can be used to adjust the price axis interface:
 |`position`|`left` &#124; `right` &#124; `none`|`right`|Sets the position to display price scale|
 |`mode`|[PriceScaleMode](./constants.md#pricescalemode) |`PriceScaleMode.Normal`|Sets the price scale mode|
 |`autoScale`|`boolean`|`true`|If true, fits series data to a chart size|
-|`invertScale`|`boolean`|`false`|If true, a chart series is reflected vertically, so that a growing trend is shown as a falling one and vise versa|
+|`invertScale`|`boolean`|`false`|If true, a chart series is reflected vertically, so that a growing trend is shown as a falling one and vice versa|
 |`alignLabels`|`boolean`|`true`|If true, labels with price data do not overlap|
 |`borderVisible`|`boolean`|`true`|If true, price scale border is visible|
 |`borderColor`|`string`|`#2b2b43`|Pricescale border color|
-|`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (per cent)|
-|`entireTextOnly`|`boolean`|`false`|If false, top and bottom edge labels are shown even if they are partially not visible |
+|`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (percent)|
+|`entireTextOnly`|`boolean`|`false`|If false, top and bottom corner labels are shown even if they are partially not visible |
 
 ### An example of a price scale customization
 
@@ -138,7 +138,7 @@ chart.applyOptions({
 
 ## Crosshair
 
-Crosshair shows an intersection of a price and time axis values on any hovered point of on the chart.
+Crosshair shows an intersection of a price and time axis values on any hovered point on the chart.
 
 It is presented by horizontal and vertical lines. Each of them can be either customized by setting their `color`, `width` and `style` or disabled by using the `visible` option if necessary. Note that disabling crosshair lines does not disable crosshair marker on Line and Area series. It can be disabled by using the `crosshairMarkerVisible` option of relevant series.
 

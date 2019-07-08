@@ -49,4 +49,6 @@ function disableSelection(canvas: HTMLCanvasElement): void {
 	canvas.style.msUserSelect = 'none';
 	// tslint:disable-next-line:no-any
 	(canvas as any).style.MozUserSelect = 'none';
+
+	canvas.style.webkitTapHighlightColor = 'transparent';
 }
