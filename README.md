@@ -18,7 +18,7 @@
 
 [Demos][demo-url] | [Documentation](./docs/README.md)
 
-TradingView Lightweight Charts is one of the smallest and fastest financial HTML5 charts.
+TradingView Lightweight Charts are one of the smallest and fastest financial HTML5 charts.
 
 The Lightweight Charting Library is the best choice for you if you want to display financial data as an interactive chart on your web page without affecting your web page loading speed and performance.
 
