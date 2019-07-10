@@ -22,6 +22,7 @@ import {
 	LineSeriesPartialOptions,
 	precisionByMinMove,
 	PriceFormat,
+	PriceFormatBuiltIn,
 	SeriesType,
 } from '../model/series-options';
 import { TimePointIndex } from '../model/time-data';
@@ -47,11 +48,12 @@ import { SeriesApi } from './series-api';
 import { TimeScaleApi } from './time-scale-api';
 
 function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
-	if (priceFormat === undefined) {
+	if (priceFormat === undefined || priceFormat.type === 'custom') {
 		return;
 	}
-	if (priceFormat.minMove !== undefined && priceFormat.precision === undefined) {
-		priceFormat.precision = precisionByMinMove(priceFormat.minMove);
+	const priceFormatBuiltIn = priceFormat as DeepPartial<PriceFormatBuiltIn>;
+	if (priceFormatBuiltIn.minMove !== undefined && priceFormatBuiltIn.precision === undefined) {
+		priceFormatBuiltIn.precision = precisionByMinMove(priceFormatBuiltIn.minMove);
 	}
 }
 

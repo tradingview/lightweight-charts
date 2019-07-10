@@ -86,7 +86,8 @@ export interface HistogramStyleOptions {
  * minMove = 0.01 , precision = 3. Prices will change like 1.130, 1.140, 1.150 etc.
  * minMove = 0.05 , precision is not specified. Prices will change like 1.10, 1.15, 1.20
  */
-export interface PriceFormat {
+
+export interface PriceFormatBuiltIn {
 	/**
 	 *  Enum of possible modes of price formatting
 	 * 'price' is the most common choice; it allows customization of precision and rounding of prices
@@ -104,6 +105,23 @@ export interface PriceFormat {
 	 */
 	minMove: number;
 }
+
+export interface PriceFormatCustom {
+	/**
+	 *  Always 'custom'
+	 */
+	type: 'custom';
+	/**
+	 * User-defined function for price formatting that could be used for some specific cases, that could not be covered with PriceFormatBuiltIn
+	 */
+	formatter: PriceFormatterFn;
+	/**
+	 * Minimal step of the price.
+	 */
+	minMove: number;
+}
+
+export type PriceFormat = PriceFormatBuiltIn | PriceFormatCustom;
 
 export function precisionByMinMove(minMove: number): number {
 	if (minMove >= 1) {
@@ -158,10 +176,11 @@ export interface SeriesOptionsCommon {
 	priceLineColor: string;
 	/** Price line style. Suitable for percentage and indexedTo100 scales */
 	priceLineStyle: LineStyle;
-	/** Formatting settings associated with the series */
+	/**
+	 * Formatting settings associated with the series. It can be a PriceFormat object or
+	 * user-defined function for price formatting that could be used for some specific cases, that could not be covered with PriceFormat
+	 */
 	priceFormat: PriceFormat;
-	/** User-defined function for price formatting. Could be used for some specific cases, that could not be covered with PriceFormat */
-	priceFormatter?: PriceFormatterFn;
 	/** Visibility of base line. Suitable for percentage and indexedTo100 scales */
 	baseLineVisible: boolean;
 	/** Color of the base line in IndexedTo100 mode */

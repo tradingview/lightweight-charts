@@ -257,7 +257,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			});
 		}
 
-		if (options.priceFormat !== undefined || options.priceFormatter !== undefined) {
+		if (options.priceFormat !== undefined) {
 			this._recreateFormatter();
 		}
 
@@ -479,27 +479,27 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	private _recreateFormatter(): void {
-		if (this._options.priceFormatter !== undefined) {
-			this._formatter = { format: this._options.priceFormatter };
-		} else {
-			switch (this._options.priceFormat.type) {
-				case 'volume': {
-					this._formatter = new VolumeFormatter(this._options.priceFormat.precision);
-					break;
-				}
-				case 'percent': {
-					this._formatter = new PercentageFormatter(this._options.priceFormat.precision);
-					break;
-				}
-				default: {
-					const priceScale = Math.pow(10, this._options.priceFormat.precision);
-					this._formatter = new PriceFormatter(
-						priceScale,
-						this._options.priceFormat.minMove * priceScale,
-						false,
-						undefined
-					);
-				}
+		switch (this._options.priceFormat.type) {
+			case 'custom': {
+				this._formatter = { format: this._options.priceFormat.formatter };
+				break;
+			}
+			case 'volume': {
+				this._formatter = new VolumeFormatter(this._options.priceFormat.precision);
+				break;
+			}
+			case 'percent': {
+				this._formatter = new PercentageFormatter(this._options.priceFormat.precision);
+				break;
+			}
+			default: {
+				const priceScale = Math.pow(10, this._options.priceFormat.precision);
+				this._formatter = new PriceFormatter(
+					priceScale,
+					this._options.priceFormat.minMove * priceScale,
+					false,
+					undefined
+				);
 			}
 		}
 

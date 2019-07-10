@@ -206,21 +206,23 @@ series.applyOptions({
 
 #### Price format
 
-Three price formats are provided for displaying on the price scale:
+Four price formats are provided for displaying on the price scale:
 
 - `price` format, which is set by default, displays absolute price value as it is
 - `volume` format reduces number of digits of values over 1000, replacing zeros by letters. For example, '1000' absolute price value is shown as '1K' in a volume format.
 - `percent` format replaces absolute values with their percentage change.
+- `custom` format includes a user-defined function for price formatting that could be used for some specific cases, that could not be covered in common cases
 
 The following options are available for setting the price format displayed by any type of series:
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
-|`type`|`price` &#124; `volume` &#124; `percent`|`price`|Sets a type of price displayed by series|
+|`type`|`price` &#124; `volume` &#124; `percent` &#124; `custom` |`price`|Sets a type of price displayed by series|
 |`precision`|`number`|`2`|Specifies a number of decimal places used for price value display|
 |`minMove`|`number`|`0.01`|Sets the minimum possible step size for price value movement|
+|`formatter`|`function | undefined`|`undefined`|Sets custom price formatter function in case when `type` is `custom`|
 
-Example:
+Examples:
 
 ```javascript
 series.applyOptions({
@@ -232,20 +234,15 @@ series.applyOptions({
 });
 ```
 
-#### Price formatter
-
-By default series prices are formatted accordingly to [price format](#price-format), but there is a possibility to define a function for price formatting.
-It could be used for some specific cases, that could not be covered with [price format](#price-format).
-
-Note that `priceFormat` is ignored in case when `priceFormatter` is defined.
-
-Example:
-
 ```javascript
 series.applyOptions({
-    priceFormatter: function(price) {
-        return '$' + price.toFixed(2);
-    },
+    priceFormat: {
+        type: 'custom',
+        minMove: 0.02,
+        formatter: function(price) {
+            return '$' + price.toFixed(2);
+        },
+    }
 });
 ```
 
