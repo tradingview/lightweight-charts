@@ -250,7 +250,7 @@ export class DataLayer {
 			}
 		});
 
-		return this._setNewPoints(newPoints, palette);
+		return this._setNewPoints(series, newPoints, palette);
 	}
 
 	public removeSeries(series: Series): UpdatePacket {
@@ -335,7 +335,7 @@ export class DataLayer {
 		};
 	}
 
-	private _setNewPoints(newPoints: Map<UTCTimestamp, TimePointData>, palette?: Palette): UpdatePacket {
+	private _setNewPoints(seriesBeingUpdated: Series, newPoints: Map<UTCTimestamp, TimePointData>, palette?: Palette): UpdatePacket {
 		this._pointDataByTimePoint = newPoints;
 
 		this._sortedTimePoints = Array.from(this._pointDataByTimePoint.values()).map((d: TimePointData) => d.timePoint);
@@ -348,10 +348,11 @@ export class DataLayer {
 			pointData.mapping.forEach((targetData: TimedData, targetSeries: Series) => {
 				// add point to series
 				const packet = seriesUpdates.get(targetSeries) || newSeriesUpdatePacket();
+				const seriesPalette = (seriesBeingUpdated === targetSeries) ? palette : targetSeries.palette();
 				const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
 					index: index as TimePointIndex,
 					time,
-					value: getItemValues(targetData, palette),
+					value: getItemValues(targetData, seriesPalette),
 				};
 				packet.update.push(seriesUpdate);
 				seriesUpdates.set(targetSeries, packet);
