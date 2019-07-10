@@ -3,6 +3,7 @@ import { describe, it } from 'mocha';
 
 import { convertTime, DataLayer, SeriesUpdatePacket, stringToBusinessDay } from '../../src/api/data-layer';
 import { ensureDefined } from '../../src/helpers/assertions';
+import { Palette } from '../../src/model/palette';
 import { Series } from '../../src/model/series';
 import { SeriesData } from '../../src/model/series-data';
 import { BusinessDay, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
@@ -15,6 +16,9 @@ function createSeriesMock(): Series {
 	return {
 		data: () => {
 			return data;
+		},
+		palette: () => {
+			return new Palette();
 		},
 	} as Series;
 }
