@@ -107,9 +107,6 @@ export interface PriceFormatBuiltIn {
 }
 
 export interface PriceFormatCustom {
-	/**
-	 *  Always 'custom'
-	 */
 	type: 'custom';
 	/**
 	 * User-defined function for price formatting that could be used for some specific cases, that could not be covered with PriceFormatBuiltIn
@@ -176,10 +173,7 @@ export interface SeriesOptionsCommon {
 	priceLineColor: string;
 	/** Price line style. Suitable for percentage and indexedTo100 scales */
 	priceLineStyle: LineStyle;
-	/**
-	 * Formatting settings associated with the series. It can be a PriceFormat object or
-	 * user-defined function for price formatting that could be used for some specific cases, that could not be covered with PriceFormat
-	 */
+	/** Formatting settings associated with the series */
 	priceFormat: PriceFormat;
 	/** Visibility of base line. Suitable for percentage and indexedTo100 scales */
 	baseLineVisible: boolean;
