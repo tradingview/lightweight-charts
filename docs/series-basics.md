@@ -220,7 +220,7 @@ The following options are available for setting the price format displayed by an
 |`type`|`price` &#124; `volume` &#124; `percent` &#124; `custom` |`price`|Sets a type of price displayed by series|
 |`precision`|`number`|`2`|Specifies a number of decimal places used for price value display|
 |`minMove`|`number`|`0.01`|Sets the minimum possible step size for price value movement|
-|`formatter`|`function &#124; undefined`|`undefined`|Sets custom price formatter function in case when `type` is `custom`|
+|`formatter`|`function` &#124; `undefined`|`undefined`|Sets custom price formatter function in case when `type` is `custom`|
 
 Examples:
 
