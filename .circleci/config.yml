@@ -21,6 +21,13 @@ aliases:
         ignore:
           - /.*/
 
+  - &merge-based-filters
+      <<: *default-filters
+      branches:
+        ignore:
+          - master
+          - /release\/.*/
+
 
 executors:
   node-latest-executor:
@@ -198,35 +205,19 @@ workflows:
           requires:
             - build
       - dts-changes:
-          filters:
-            <<: *default-filters
-            branches:
-              ignore:
-                - master
+          filters: *merge-based-filters
           requires:
             - build
       - graphics-tests-dpr1_0:
-          filters:
-            <<: *default-filters
-            branches:
-              ignore:
-                - master
+          filters: *merge-based-filters
           requires:
             - build
       - graphics-tests-dpr1_5:
-          filters:
-            <<: *default-filters
-            branches:
-              ignore:
-                - master
+          filters: *merge-based-filters
           requires:
             - build
       - graphics-tests-dpr2_0:
-          filters:
-            <<: *default-filters
-            branches:
-              ignore:
-                - master
+          filters: *merge-based-filters
           requires:
             - build
       - memleaks-tests:
