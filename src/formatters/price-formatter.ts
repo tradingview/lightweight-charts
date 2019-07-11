@@ -61,7 +61,9 @@ export class PriceFormatter implements IFormatter {
 	}
 
 	public format(price: number): string {
-		const sign = price < 0 ? '-' : '';
+		// \u2212 is unicode's minus sign https://www.fileformat.info/info/unicode/char/2212/index.htm
+		// we should use it because it has the same width as plus sign +
+		const sign = price < 0 ? '\u2212' : '';
 		price = Math.abs(price);
 
 		if (this._fractional) {
