@@ -266,7 +266,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			this._palette.replaceColorByIndex((this._options as HistogramStyleOptions).color, 0);
 		}
 
-		this._recreateFormatter();
 		this.model().updateSource(this);
 	}
 

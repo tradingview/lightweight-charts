@@ -17,4 +17,3 @@ function runTestCase(container) {
 		color: 'orange',
 	});
 }
-
