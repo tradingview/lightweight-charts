@@ -158,6 +158,7 @@ export class ChartModel implements IDestroyable {
 
 	public updateAllPaneViews(): void {
 		this._panes.forEach((p: Pane) => p.updateAllViews());
+		this.updateCrosshair();
 	}
 
 	public timeScale(): TimeScale {
