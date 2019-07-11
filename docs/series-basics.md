@@ -211,7 +211,7 @@ Four price formats are provided for displaying on the price scale:
 - `price` format, which is set by default, displays absolute price value as it is
 - `volume` format reduces number of digits of values over 1000, replacing zeros by letters. For example, '1000' absolute price value is shown as '1K' in a volume format.
 - `percent` format replaces absolute values with their percentage change.
-- `custom` format includes a user-defined function for price formatting that could be used for some specific cases, that could not be covered in common cases
+- `custom` format uses a user-defined function for price formatting that could be used in some specific cases, that are not covered by standard formatters
 
 The following options are available for setting the price format displayed by any type of series:
 
