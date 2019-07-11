@@ -258,7 +258,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			});
 		}
 
-		this._recreateFormatter();
+		if (options.priceFormat !== undefined) {
+			this._recreateFormatter();
+		}
+
 		this.model().updateSource(this);
 	}
 
@@ -478,6 +481,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	private _recreateFormatter(): void {
 		switch (this._options.priceFormat.type) {
+			case 'custom': {
+				this._formatter = { format: this._options.priceFormat.formatter };
+				break;
+			}
 			case 'volume': {
 				this._formatter = new VolumeFormatter(this._options.priceFormat.precision);
 				break;

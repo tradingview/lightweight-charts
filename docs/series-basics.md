@@ -206,21 +206,23 @@ series.applyOptions({
 
 #### Price format
 
-Three price formats are provided for displaying on the price scale:
+Four price formats are provided for displaying on the price scale:
 
 - `price` format, which is set by default, displays absolute price value as it is
 - `volume` format reduces number of digits of values over 1000, replacing zeros by letters. For example, '1000' absolute price value is shown as '1K' in a volume format.
 - `percent` format replaces absolute values with their percentage change.
+- `custom` format uses a user-defined function for price formatting that could be used in some specific cases, that are not covered by standard formatters
 
 The following options are available for setting the price format displayed by any type of series:
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
-|`type`|`price` &#124; `volume` &#124; `percent`|`price`|Sets a type of price displayed by series|
+|`type`|`price` &#124; `volume` &#124; `percent` &#124; `custom` |`price`|Sets a type of price displayed by series|
 |`precision`|`number`|`2`|Specifies a number of decimal places used for price value display|
 |`minMove`|`number`|`0.01`|Sets the minimum possible step size for price value movement|
+|`formatter`|`function` &#124; `undefined`|`undefined`|Sets a formatting function that is used when the `type` is `custom`|
 
-Example:
+Examples:
 
 ```javascript
 series.applyOptions({
@@ -229,6 +231,18 @@ series.applyOptions({
         precision: 3,
         minMove: 0.05,
     },
+});
+```
+
+```javascript
+series.applyOptions({
+    priceFormat: {
+        type: 'custom',
+        minMove: 0.02,
+        formatter: function(price) {
+            return '$' + price.toFixed(2);
+        },
+    }
 });
 ```
 
