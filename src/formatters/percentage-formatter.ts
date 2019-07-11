@@ -5,7 +5,7 @@ export class PercentageFormatter extends PriceFormatter {
 		super(priceScale);
 	}
 
-	public format(price: number, signPositive?: boolean, tailSize?: number, signNegative?: boolean): string {
-		return `${super.format(price, signPositive, tailSize, signNegative)}%`;
+	public format(price: number): string {
+		return `${super.format(price)}%`;
 	}
 }

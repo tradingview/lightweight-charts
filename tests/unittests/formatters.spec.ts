@@ -55,9 +55,9 @@ describe('Formatters', () => {
 			expect(res).to.be.equal('1.500');
 		}
 		{
-			const formatter = new PriceFormatter(1000);
-			const res = formatter.format(1.5, true);
-			expect(res).to.be.equal('+1.500');
+			const formatter = new PriceFormatter();
+			const res = formatter.format(-1.5);
+			expect(res).to.be.equal('\u22121.50');
 		}
 	});
 	it('time-formatter', () => {
