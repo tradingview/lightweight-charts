@@ -1,3 +1,5 @@
+/// <reference types="_non-standard-dom-features" />
+
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
@@ -46,6 +48,7 @@ export class ChartWidget implements IDestroyable {
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
+	private _observer: ResizeObserver | null = null;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
 		this._options = options;
@@ -98,6 +101,20 @@ export class ChartWidget implements IDestroyable {
 		// or after but with adjustSize to properly update time scale
 		this.resize(width, height);
 
+		if ('ResizeObserver' in window && this._options.experimentalResizeWithRO) {
+			this._observer = new window.ResizeObserver((entries: ReadonlyArray<ResizeObserverEntry>) => {
+				if (entries.length === 0 || entries[0].target !== container) {
+					return;
+				}
+
+				const newRect = entries[0].contentRect;
+
+				this.resize(newRect.height, newRect.width);
+			});
+
+			this._observer.observe(container);
+		}
+
 		this._syncGuiWithModel();
 
 		container.appendChild(this._element);
@@ -124,6 +141,11 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	public destroy(): void {
+		if (this._observer !== null) {
+			this._observer.disconnect();
+			this._observer = null;
+		}
+
 		this._element.removeEventListener('wheel', this._onWheelBound);
 		if (this._drawRafId !== 0) {
 			window.cancelAnimationFrame(this._drawRafId);

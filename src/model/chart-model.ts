@@ -77,6 +77,11 @@ export interface ChartOptions {
 	handleScroll: HandleScrollOptions | boolean;
 	/** Structure that describes scaling behavior or boolean flag that disables/enables all kinds of scales */
 	handleScale: HandleScaleOptions | boolean;
+
+	/**
+	 * If true and ResizeObserver is in the window object, the chart will use it to automatically resize.
+	 */
+	experimentalResizeWithRO?: boolean;
 }
 
 export type ChartOptionsInternal =
