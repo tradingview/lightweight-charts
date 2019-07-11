@@ -44,7 +44,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 	private _sourceIndexes: Int32Array = new Int32Array(0);
 
 	public constructor(series: Series<'Histogram'>, model: ChartModel) {
-		super(series, model);
+		super(series, model, false);
 	}
 
 	public renderer(height: number, width: number): IPaneRenderer {
@@ -114,7 +114,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 			timeScale.indexesToCoordinates(data.items);
 			priceScale.pointsArrayToCoordinates(data.items, firstValue);
 			data.histogramBase = histogramBase;
-			data.visibleRange = visibleTimedValues(data.items, visibleBars);
+			data.visibleRange = visibleTimedValues(data.items, visibleBars, false);
 			this._sourceIndexes[colorIndex] = data.visibleRange.from;
 		});
 

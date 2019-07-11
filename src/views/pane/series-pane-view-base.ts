@@ -9,16 +9,18 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
 export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemType extends TimedValue> implements IUpdatablePaneView {
-	protected _series: Series<TSeriesType>;
-	protected _model: ChartModel;
+	protected readonly _series: Series<TSeriesType>;
+	protected readonly _model: ChartModel;
 	protected _invalidated: boolean = true;
 	protected _dataInvalidated: boolean = true;
 	protected _items: ItemType[] = [];
 	protected _itemsVisibleRange: SeriesItemsIndexesRange | null = null;
+	private readonly _extendedVisibleRange: boolean;
 
-	public constructor(series: Series<TSeriesType>, model: ChartModel) {
+	public constructor(series: Series<TSeriesType>, model: ChartModel, extendedVisibleRange: boolean) {
 		this._series = series;
 		this._model = model;
+		this._extendedVisibleRange = extendedVisibleRange;
 	}
 
 	public update(updateType?: UpdateType): void {
@@ -70,7 +72,7 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 			return;
 		}
 
-		this._itemsVisibleRange = visibleTimedValues(this._items, visibleBars);
+		this._itemsVisibleRange = visibleTimedValues(this._items, visibleBars, this._extendedVisibleRange);
 		this._convertToCoordinates(priceScale, timeScale, firstValue);
 	}
 }
