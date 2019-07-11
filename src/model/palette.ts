@@ -9,6 +9,13 @@ export class Palette {
 		return ensureDefined(this._indexToColor.get(index));
 	}
 
+	public replaceColorByIndex(color: string, index: number): void {
+		const oldColor = this.colorByIndex(index);
+		this._colorToIndex.delete(oldColor);
+		this._colorToIndex.set(color, index);
+		this._indexToColor.set(index, color);
+	}
+
 	public addColor(color: string): number {
 		let res = this._colorToIndex.get(color);
 		if (res === undefined) {
