@@ -732,7 +732,7 @@ export class PriceScale {
 		const mainSource = this.mainSource();
 		let base = 100;
 		if (mainSource !== null) {
-			base = mainSource.base();
+			base = Math.round(1 / mainSource.minMove());
 		}
 
 		this._formatter = defaultPriceFormatter;
@@ -753,7 +753,8 @@ export class PriceScale {
 			this,
 			base,
 			this._coordinateToLogical.bind(this),
-			this._logicalToCoordinate.bind(this));
+			this._logicalToCoordinate.bind(this)
+		);
 
 		this._markBuilder.rebuildTickMarks();
 	}
@@ -815,6 +816,7 @@ export class PriceScale {
 		return mainSource.formatter();
 	}
 
+	// tslint:disable-next-line:cyclomatic-complexity
 	private _recalculatePriceRangeImpl(): void {
 		const visibleBars = this._invalidatedForRange.visibleBars;
 		if (visibleBars === null) {
@@ -824,9 +826,7 @@ export class PriceScale {
 		let priceRange: PriceRange | null = null;
 		const sources = this.sourcesForAutoScale();
 
-		for (let i = 0; i < sources.length; i++) {
-			const source = sources[i];
-
+		for (const source of sources) {
 			const firstValue = source.firstValue();
 			if (firstValue === null) {
 				continue;
@@ -860,7 +860,13 @@ export class PriceScale {
 		if (priceRange !== null) {
 			// keep current range is new is empty
 			if (priceRange.minValue() === priceRange.maxValue()) {
-				priceRange = new PriceRange(priceRange.minValue() - 0.5, priceRange.maxValue() + 0.5);
+				const mainSource = this.mainSource();
+				const minMove = mainSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : mainSource.minMove();
+
+				// if price range is degenerated to 1 point let's extend it by 10 min move values
+				// to avoid incorrect range and empty (blank) scale (in case of min tick much greater than 1)
+				const extendValue = 5 * minMove;
+				priceRange = new PriceRange(priceRange.minValue() - extendValue, priceRange.maxValue() + extendValue);
 			}
 
 			this.setPriceRange(priceRange);

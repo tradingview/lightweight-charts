@@ -12,6 +12,6 @@ export interface IPriceDataSource extends IDataSource {
 	formatter(): IFormatter;
 	priceLineColor(lastBarColor: string): string;
 	model(): ChartModel;
-	base(): number;
+	minMove(): number;
 	priceRange(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): PriceRange | null;
 }

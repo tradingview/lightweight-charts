@@ -406,8 +406,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return range;
 	}
 
-	public base(): number {
-		return Math.round(1 / this._options.priceFormat.minMove);
+	public minMove(): number {
+		return this._options.priceFormat.minMove;
 	}
 
 	public formatter(): IFormatter {

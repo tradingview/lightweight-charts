@@ -28,10 +28,6 @@ export class PriceTickMarkBuilder {
 		this._logicalToCoordinateFunc = logicalToCoordinateFunc;
 	}
 
-	public base(): number {
-		return this._base;
-	}
-
 	public setBase(base: number): void {
 		if (base < 0) {
 			throw new Error('base < 0');

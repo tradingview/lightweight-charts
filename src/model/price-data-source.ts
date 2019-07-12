@@ -18,7 +18,7 @@ export abstract class PriceDataSource extends DataSource implements IPriceDataSo
 		return this._model;
 	}
 
-	public base(): number {
+	public minMove(): number {
 		return 0;
 	}
 

@@ -112,9 +112,9 @@ export class PriceFormatter implements IFormatter {
 
 			fracString = formatterOptions.decimalSign + numberToStringWithLeadingZero(+fracPart.toFixed(this._fractionalLength) * this._minMove, fracLength);
 		} else {
-			// should round int part to minmov
+			// should round int part to min move
 			intPart = Math.round(intPart * base) / base;
-			// if minmov > 1, fractional part is always = 0
+			// if min move > 1, fractional part is always = 0
 			if (fracLength > 0) {
 				fracString = formatterOptions.decimalSign + numberToStringWithLeadingZero(0, fracLength);
 			}
