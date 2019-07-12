@@ -95,13 +95,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _barColorerCache: SeriesBarColorer | null = null;
 	private readonly _options: SeriesOptionsMap[T];
 	private _barFunction: BarFunction;
-	private _palette: Palette;
+	private readonly _palette: Palette = new Palette();
 
 	public constructor(model: ChartModel, options: SeriesOptionsMap[T], seriesType: T) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
-		this._palette = this._createDefaultPalette();
 
 		this.createPaneView();
 
@@ -265,12 +264,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().updateSource(this);
 	}
 
-	public setData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>, updatePalette: boolean, palette?: Palette): void {
+	public setData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
 		this._data.clear();
 		this._data.bars().merge(data);
-		if (updatePalette) {
-			this._palette = (palette === undefined) ? this._createDefaultPalette() : palette;
-		}
 		if (this._paneView !== null) {
 			this._paneView.update('data');
 		}
@@ -508,13 +504,5 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _updateBarFunction(): void {
 		const priceSource = 'close';
 		this._barFunction = barFunction(priceSource);
-	}
-
-	private _createDefaultPalette(): Palette {
-		const res = new Palette();
-		if (this._seriesType === 'Histogram') {
-			res.addColor((this._options as HistogramStyleOptions).color);
-		}
-		return res;
 	}
 }

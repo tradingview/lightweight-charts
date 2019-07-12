@@ -118,7 +118,7 @@ export class SeriesBarColorer {
 		const result = { ...emptyResult };
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
 		const colorValue = currentBar.value[SeriesPlotIndex.Color];
-		if (colorValue !== undefined && colorValue !== null) {
+		if (colorValue != null) {
 			const palette = ensureNotNull(this._series.palette());
 			result.barColor = palette.colorByIndex(colorValue);
 		} else {
