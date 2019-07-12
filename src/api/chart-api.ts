@@ -6,7 +6,6 @@ import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
-import { Palette } from '../model/palette';
 import { Series } from '../model/series';
 import {
 	AreaSeriesOptions,
@@ -30,7 +29,6 @@ import { TimePointIndex } from '../model/time-data';
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, SeriesUpdatePacket } from './data-layer';
-import { HistogramSeriesApi } from './histogram-series-api';
 import { IChartApi, MouseEventHandler, MouseEventParams, TimeRangeChangeEventHandler } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
@@ -166,7 +164,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const strictOptions = merge(clone(seriesOptionsDefaults), histogramStyleDefaults, options) as HistogramSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Histogram', strictOptions);
 
-		const res = new HistogramSeriesApi(series, this);
+		const res = new SeriesApi<'Histogram'>(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -196,27 +194,26 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.setData(value.update, false);
+			key.setData(value.update);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 		this._seriesMap.delete(seriesObj);
 		this._seriesMapReversed.delete(series);
 	}
 
-	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][], palette?: Palette): void {
-		const update = this._dataLayer.setSeriesData(series, data, palette);
+	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void {
+		const update = this._dataLayer.setSeriesData(series, data);
 		const model = this._chartWidget.model();
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.setData(value.update, series === key, palette);
+			key.setData(value.update);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 	}
 
 	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void {
-		const palette = series.palette();
-		const update = this._dataLayer.updateSeriesData(series, data, palette);
+		const update = this._dataLayer.updateSeriesData(series, data);
 		const model = this._chartWidget.model();
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, false);

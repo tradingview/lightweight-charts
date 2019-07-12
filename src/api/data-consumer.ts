@@ -1,6 +1,5 @@
 import { isNumber } from '../helpers/strict-type-checks';
 
-import { Palette } from '../model/palette';
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
 import { BusinessDay, UTCTimestamp } from '../model/time-data';
@@ -55,6 +54,6 @@ export interface SeriesDataItemTypeMap {
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {
-	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][], palette?: Palette): void;
-	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType], palette?: Palette): void;
+	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void;
+	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void;
 }
