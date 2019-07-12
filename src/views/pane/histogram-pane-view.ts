@@ -77,7 +77,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 
 			const item = createRawItem(index, value);
 			const color = paletteColorIndex != null ? palette.colorByIndex(paletteColorIndex) : defaultColor;
-			// colorIndex is the panewiev's internal palette index
+			// colorIndex is the paneview's internal palette index
 			// this internal palette stores defaultColor by 0 index and pallette colors by paletteColorIndex + 1
 			const colorIndex = paletteColorIndex == null ? 0 : paletteColorIndex + 1;
 			const data = this._paletteData[colorIndex] || createEmptyHistogramData(barSpacing, histogramStyleProps.lineWidth, color);
