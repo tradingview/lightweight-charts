@@ -59,7 +59,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._paletteRenderers.length = palette.size();
 		this._paletteData.length = palette.size();
 
-		const targetIndexes = new Int32Array(palette.size());
+		const targetIndexes = new Int32Array(palette.size() + 1);
 		const histogramStyleProps = this._series.options();
 
 		const barValueGetter = this._series.barFunction();
@@ -69,11 +69,15 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._items.length = this._series.bars().size();
 		let itemIndex = 0;
 
+		const defaultColor = this._series.options().color;
+
 		this._series.bars().each((index: TimePointIndex, bar: Bar) => {
 			const value = barValueGetter(bar.value);
-			const colorIndex = bar.value[SeriesPlotIndex.Color] as number;
+			const paletteColorIndex = bar.value[SeriesPlotIndex.Color];
+
 			const item = createRawItem(index, value);
-			const color = palette.colorByIndex(colorIndex);
+			const color = paletteColorIndex != null ? palette.colorByIndex(paletteColorIndex) : defaultColor;
+			const colorIndex = paletteColorIndex == null ? 0 : paletteColorIndex + 1;
 			const data = this._paletteData[colorIndex] || createEmptyHistogramData(barSpacing, histogramStyleProps.lineWidth, color);
 			const targetIndex = targetIndexes[colorIndex]++;
 			if (targetIndex < data.items.length) {

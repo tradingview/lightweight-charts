@@ -93,7 +93,7 @@ function getItemValues(item: TimedData, palette?: Palette): Bar['value'] {
 	if ('value' in item) {
 		const val = (item as LineData).value;
 		// default value
-		let color: PlotValue = 0;
+		let color: PlotValue = null;
 		if ('color' in item) {
 			const histItem = item as HistogramData;
 			if (histItem.color !== undefined) {
@@ -103,7 +103,7 @@ function getItemValues(item: TimedData, palette?: Palette): Bar['value'] {
 		return [val, val, val, val, color];
 	} else {
 		const bar = item as BarData;
-		return [bar.open, bar.high, bar.low, bar.close, 0];
+		return [bar.open, bar.high, bar.low, bar.close, null];
 	}
 }
 
