@@ -14,7 +14,7 @@ import { SeriesPaneViewBase } from './series-pane-view-base';
 
 export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area', ItemType extends PricedValue & TimedValue> extends SeriesPaneViewBase<TSeriesType, ItemType> {
 	protected constructor(series: Series<TSeriesType>, model: ChartModel) {
-		super(series, model);
+		super(series, model, true);
 	}
 
 	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {

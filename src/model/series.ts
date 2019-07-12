@@ -400,11 +400,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 				barsMinMax.min === barsMinMax.max ?
 					new PriceRange(barsMinMax.min - 0.5, barsMinMax.max + 0.5) : // special case: range consists of the only point
 					new PriceRange(barsMinMax.min, barsMinMax.max) :
-				new PriceRange(-0.5, 0.5);
+				null;
 
 		if (this.seriesType() === 'Histogram') {
 			const base = (this._options as HistogramStyleOptions).base;
-			range = range.merge(new PriceRange(base, base));
+			range = range !== null ? range.merge(new PriceRange(base, base)) : new PriceRange(base - 0.5, base + 0.5);
 		}
 
 		return range;

@@ -48,8 +48,27 @@ function upperBoundItemsCompare(time: TimePointIndex, item: TimedValue): boolean
 	return time < item.time;
 }
 
-export function visibleTimedValues(items: TimedValue[], range: BarsRange): SeriesItemsIndexesRange {
-	const from = lowerbound<TimedValue, TimePointIndex>(items, range.firstBar(), lowerBoundItemsCompare);
-	const to = upperbound<TimedValue, TimePointIndex>(items, range.lastBar(), upperBoundItemsCompare);
-	return { from, to };
+export function visibleTimedValues(items: TimedValue[], range: BarsRange, extendedRange: boolean): SeriesItemsIndexesRange {
+	const firstBar = range.firstBar();
+	const lastBar = range.lastBar();
+
+	const from = lowerbound<TimedValue, TimePointIndex>(items, firstBar, lowerBoundItemsCompare);
+	const to = upperbound<TimedValue, TimePointIndex>(items, lastBar, upperBoundItemsCompare);
+
+	if (!extendedRange) {
+		return { from, to };
+	}
+
+	let extendedFrom = from;
+	let extendedTo = to;
+
+	if (from > 0 && items[from].time >= firstBar) {
+		extendedFrom = from - 1;
+	}
+
+	if (to < items.length && to > 0 && items[to - 1].time <= lastBar) {
+		extendedTo = to + 1;
+	}
+
+	return { from: extendedFrom, to: extendedTo };
 }

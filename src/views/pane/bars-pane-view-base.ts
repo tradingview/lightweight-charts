@@ -15,7 +15,7 @@ import { SeriesPaneViewBase } from './series-pane-view-base';
 
 export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick', ItemType extends BarCandlestickItemBase> extends SeriesPaneViewBase<TSeriesType, ItemType> {
 	public constructor(series: Series<TSeriesType>, model: ChartModel) {
-		super(series, model);
+		super(series, model, false);
 	}
 
 	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {
