@@ -857,7 +857,7 @@ export class PriceScale {
 			}
 		}
 
-		if (priceRange) {
+		if (priceRange !== null) {
 			// keep current range is new is empty
 			if (priceRange.minValue() === priceRange.maxValue()) {
 				priceRange = new PriceRange(priceRange.minValue() - 0.5, priceRange.maxValue() + 0.5);
