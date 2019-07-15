@@ -47,6 +47,18 @@ chart.applyOptions({
 });
 ```
 
+## Time Formatter
+
+`timeFormatter` function can be used to customize the format of time data displayed by vertical crosshair line:
+
+```javascript
+chart.applyOptions({
+    localization: {
+        timeFormatter: function() { return 'Custom time format'; }
+    },
+});
+```
+
 ## Price Axis
 
 Price axis is the vertical scale used for price value data.
