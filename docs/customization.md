@@ -2,10 +2,31 @@
 
 ## Initial chart options
 
-Firstly, a preferred size needs to be set when creating a chart.
+Most of the chart settings can be set right when creating a chart. Subsequently, all of them may be changed using the `applyOptions` function.
 
-Also, the `localization` option may help you set a suitable date format and user language.
-The following date formats are available:
+### Size
+
+Firstly, a preferred chart size needs to be set when creating a chart. If at resizing web page, the chart resizing is also needed, use `applyOptions` function to set chart's width and height different from the current ones.
+
+```javascript
+const chart = createChart(document.body, {
+    width: 600,
+    height: 380,
+    },
+});
+```
+
+### Localization
+
+`localization` option may help you set a suitable user language, date format and time format.
+
+#### Locale
+
+Default user language is the same as browser language and can be changed using the `locale` property of the `localization` option.
+
+#### Date Format
+
+Preferred date format can be set by `dateFormat` property of of the `localization` option. The following date formats are available:
 
 - `dd MMM 'yy` - `25 Jun '18` _(default)_
 - `yyyy-MM-dd` - `2018-06-25`
@@ -19,7 +40,10 @@ The following date formats are available:
 - `MM/dd/yy` - `06/25/18`
 - `MM/dd/yyyy` - `06/25/2018`
 
-Default user language is the same as browser language and can be changed using the `locale` property of the  `localization` option.
+#### Time Format
+
+`timeFormatter` function can be used to customize the format of time data displayed by vertical crosshair line.
+Currently, setting desirable time format on the time scale itself is not available, yet this feature is planned for the future.
 
 ### An example of chart creation
 
@@ -28,8 +52,9 @@ const chart = createChart(document.body, {
     width: 600,
     height: 380,
     localization: {
-        dateFormat: 'yyyy/MM/dd',
         locale: 'ja-JP',
+        dateFormat: 'yyyy/MM/dd',
+        timeFormatter: function() { return 'Custom time format'; },
     },
 });
 ```
@@ -41,20 +66,9 @@ chart.applyOptions({
     width: 250,
     height: 150,
     localization: {
-        dateFormat: 'MM/dd/yy',
         locale: 'en-US',
-    },
-});
-```
-
-## Time Formatter
-
-`timeFormatter` function can be used to customize the format of time data displayed by vertical crosshair line:
-
-```javascript
-chart.applyOptions({
-    localization: {
-        timeFormatter: function() { return 'Custom time format'; }
+        dateFormat: 'MM/dd/yy',
+        timeFormatter: function() { return 'New time format'; },
     },
 });
 ```
