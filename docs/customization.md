@@ -6,7 +6,7 @@ Most of the chart settings can be set right when creating a chart. Subsequently,
 
 ### Size
 
-Firstly, a preferred chart size needs to be set when creating a chart:
+First of all, the preferred chart size should be set when creating a chart:
 
 ```javascript
 const chart = createChart(document.body, {
@@ -16,16 +16,7 @@ const chart = createChart(document.body, {
 });
 ```
 
-If at resizing a web page, the chart resizing is also needed, use `applyOptions` function to set chart's width and height different from the current ones:
-
-```javascript
-chart.applyOptions({
-    width: 250,
-    height: 150,
-});
-```
-
-Also, the `resize()` method is available for this purpose:
+If you want the chart size to be adjusted when the web page is resized, use the `resize` function to set the width and height of the chart:
 
 ```javascript
 chart.resize(250, 150);
@@ -33,11 +24,11 @@ chart.resize(250, 150);
 
 ### Localization
 
-`localization` option may help you set a suitable user language, date format and time format.
+Using the `localization` option you can set the displayed language, date and time formats.
 
 #### Locale
 
-Default user language is the same as browser language and can be changed using the `locale` property of the `localization` option:
+By default, the library uses browser language settings. Thus, the displayed date and time format may differ depending on the region of the user. To set the same language settings for all users, use the `locale` property of the `localization` option:
 
 ```javascript
 const chart = createChart(document.body, {
@@ -47,7 +38,7 @@ const chart = createChart(document.body, {
 });
 ```
 
-`applyOption` function allows to reset locale whenever after the chart creation:
+Using the `applyOptions` function you can change the locale at any time after the chart creation:
 
 ```javascript
 chart.applyOptions({
@@ -59,7 +50,7 @@ chart.applyOptions({
 
 #### Date Format
 
-Preferred date format can be set by `dateFormat` property of of the `localization` option. The following date formats are available:
+Preferred date format can be set using the `dateFormat` property of of the `localization` option. The following date formats are available:
 
 - `dd MMM 'yy` - `25 Jun '18` _(default)_
 - `yyyy-MM-dd` - `2018-06-25`
@@ -81,36 +72,16 @@ const chart = createChart(document.body, {
 });
 ```
 
-`applyOption` function allows to reset date format whenever after the chart creation:
-
-```javascript
-chart.applyOptions({
-       localization: {
-           dateFormat: 'MM/dd/yy',
-       },
-});
-```
-
 #### Time Format
 
-`timeFormatter` function can be used to customize the format of time data displayed by vertical crosshair line.
-Currently, setting desirable time format on the time scale itself is not available, yet this feature is planned for the future.
+`timeFormatter` function can be used to customize the format of the time stamp displayed on the time axis below the vertical crosshair line.
+Currently, setting desirable time format on the time scale labels itself is not available, yet this feature is planned for the future.
 
 ```javascript
 const chart = createChart(document.body, {
     localization: {
         timeFormatter: function() { return 'Custom time format'; },
     },
-});
-```
-
-`applyOption` function allows to reset date format whenever after the chart creation:
-
-```javascript
-chart.applyOptions({
-   localization: {
-       timeFormatter: function() { return 'New time format'; },
-   },
 });
 ```
 
