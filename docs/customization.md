@@ -2,10 +2,57 @@
 
 ## Initial chart options
 
-Firstly, a preferred size needs to be set when creating a chart.
+Most of the chart settings can be set right when creating a chart. Subsequently, all of them may be changed using the `applyOptions` function.
 
-Also, the `localization` option may help you set a suitable date format and user language.
-The following date formats are available:
+### Size
+
+First of all, the preferred chart size should be set when creating a chart:
+
+```javascript
+const chart = createChart(document.body, {
+        width: 600,
+        height: 380,
+    },
+});
+```
+
+If you want the chart size to be adjusted when the web page is resized, use the `resize` function to set the width and height of the chart:
+
+```javascript
+chart.resize(250, 150);
+```
+
+### Localization
+
+Using the `localization` option you can set the displayed language, date and time formats.
+
+#### Locale
+
+By default, the library uses browser language settings.
+Thus, the displayed date and time format may differ depending on the region of the user.
+To set the same language settings for all users, use the `locale` property of the `localization` option:
+
+```javascript
+const chart = createChart(document.body, {
+    localization: {
+        locale: 'ja-JP',
+    },
+});
+```
+
+Using the `applyOptions` function you can change the locale at any time after the chart creation:
+
+```javascript
+chart.applyOptions({
+   localization: {
+        locale: 'en-US',
+   },
+});
+```
+
+#### Date Format
+
+Preferred date format can be set using the `dateFormat` property of the `localization` option. The following date formats are available:
 
 - `dd MMM 'yy` - `25 Jun '18` _(default)_
 - `yyyy-MM-dd` - `2018-06-25`
@@ -19,30 +66,23 @@ The following date formats are available:
 - `MM/dd/yy` - `06/25/18`
 - `MM/dd/yyyy` - `06/25/2018`
 
-Default user language is the same as browser language and can be changed using the `locale` property of the  `localization` option.
-
-### An example of chart creation
-
 ```javascript
 const chart = createChart(document.body, {
-    width: 600,
-    height: 380,
     localization: {
         dateFormat: 'yyyy/MM/dd',
-        locale: 'ja-JP',
     },
 });
 ```
 
-Once a chart has been created, there is a possibility to resize it or customize its appearance and behavior by calling `applyOptions`:
+#### Time Format
+
+`timeFormatter` function can be used to customize the format of the time stamp displayed on the time axis below the vertical crosshair line.
+Currently, changing the time format of the time scale labels itself is not available, yet this feature is planned for the future.
 
 ```javascript
-chart.applyOptions({
-    width: 250,
-    height: 150,
+const chart = createChart(document.body, {
     localization: {
-        dateFormat: 'MM/dd/yy',
-        locale: 'en-US',
+        timeFormatter: function() { return 'Custom time format'; },
     },
 });
 ```
