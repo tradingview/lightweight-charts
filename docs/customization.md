@@ -10,8 +10,8 @@ First of all, the preferred chart size should be set when creating a chart:
 
 ```javascript
 const chart = createChart(document.body, {
-    width: 600,
-    height: 380,
+        width: 600,
+        height: 380,
     },
 });
 ```
@@ -28,7 +28,9 @@ Using the `localization` option you can set the displayed language, date and tim
 
 #### Locale
 
-By default, the library uses browser language settings. Thus, the displayed date and time format may differ depending on the region of the user. To set the same language settings for all users, use the `locale` property of the `localization` option:
+By default, the library uses browser language settings.
+Thus, the displayed date and time format may differ depending on the region of the user.
+To set the same language settings for all users, use the `locale` property of the `localization` option:
 
 ```javascript
 const chart = createChart(document.body, {
@@ -50,7 +52,7 @@ chart.applyOptions({
 
 #### Date Format
 
-Preferred date format can be set using the `dateFormat` property of of the `localization` option. The following date formats are available:
+Preferred date format can be set using the `dateFormat` property of the `localization` option. The following date formats are available:
 
 - `dd MMM 'yy` - `25 Jun '18` _(default)_
 - `yyyy-MM-dd` - `2018-06-25`
