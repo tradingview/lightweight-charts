@@ -107,6 +107,14 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._compositeRenderer.setRenderers(this._paletteRenderers);
 	}
 
+	protected _clearVisibleRange(): void {
+		super._clearVisibleRange();
+
+		this._paletteData.forEach((data: PaneRendererHistogramData, colorIndex: number) => {
+			data.visibleRange = null;
+		});
+	}
+
 	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {
 		if (this._itemsVisibleRange === null) {
 			return;
