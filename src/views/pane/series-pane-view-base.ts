@@ -48,11 +48,15 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 
 	protected abstract _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void;
 
+	protected _clearVisibleRange(): void {
+		this._itemsVisibleRange = null;
+	}
+
 	protected _updatePoints(): void {
 		const priceScale = this._series.priceScale();
 		const timeScale = this._model.timeScale();
 
-		this._itemsVisibleRange = null;
+		this._clearVisibleRange();
 
 		if (timeScale.isEmpty() || priceScale.isEmpty()) {
 			return;
