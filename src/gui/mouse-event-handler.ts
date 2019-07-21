@@ -399,7 +399,11 @@ export class MouseEventHandler implements IDestroyable {
 			return;
 		}
 
-		this._target.addEventListener('touchstart', (event: TouchEvent) => { this._checkPinchState(event.touches); }, { passive: true });
+		this._target.addEventListener(
+			'touchstart',
+			(event: TouchEvent) => this._checkPinchState(event.touches),
+			{ passive: true }
+		);
 
 		this._target.addEventListener(
 			'touchmove',
