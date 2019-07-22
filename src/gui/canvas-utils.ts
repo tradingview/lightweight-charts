@@ -60,7 +60,10 @@ export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvas
 	const canvas = createCanvas(doc);
 
 	const pixelRatio = doc.defaultView && doc.defaultView.devicePixelRatio || 1;
-	// we should multiply item size in CSS pixels to device pixel ratio
+	// we should keep the layout size...
+	canvas.style.width = `${size.w}px`;
+	canvas.style.height = `${size.h}px`;
+	// ...but multiply coordinate space dimensions to device pixel ratio
 	canvas.width = size.w * pixelRatio;
 	canvas.height = size.h * pixelRatio;
 	return canvas;
