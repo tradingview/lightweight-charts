@@ -1,5 +1,6 @@
+import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+
 import { ensureNotNull } from '../helpers/assertions';
-import { getContext2d } from '../helpers/canvas-wrapper';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -13,7 +14,7 @@ import { MarkSpanBorder, TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { TimeAxisView } from '../views/time-axis/time-axis-view';
 
-import { addCanvasTo, clearRect, resizeCanvas, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
@@ -40,10 +41,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _rightStubCell: HTMLElement;
 	private readonly _cell: HTMLElement;
 	private readonly _dv: HTMLElement;
-	private readonly _canvas: HTMLCanvasElement;
-	private readonly _canvasContext: CanvasRenderingContext2D;
-	private readonly _topCanvas: HTMLCanvasElement;
-	private readonly _topCanvasContext: CanvasRenderingContext2D;
+	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
 	private _stub: PriceAxisStub | null = null;
 	private _minVisibleSpan: number = MarkSpanBorder.Year;
 	private readonly _mouseEventHandler: MouseEventHandler;
@@ -75,21 +74,21 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._dv.style.overflow = 'hidden';
 		this._cell.appendChild(this._dv);
 
-		this._canvas = addCanvasTo(this._dv, new Size(16, 16));
-		this._canvas.style.position = 'absolute';
-		this._canvas.style.zIndex = '1';
-		this._canvas.style.left = '0';
-		this._canvas.style.top = '0';
+		this._canvasBinding = createBoundCanvas(this._dv, new Size(16, 16));
+		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
+		const canvas = this._canvasBinding.canvas;
+		canvas.style.position = 'absolute';
+		canvas.style.zIndex = '1';
+		canvas.style.left = '0';
+		canvas.style.top = '0';
 
-		this._canvasContext = ensureNotNull(getContext2d(this._canvas));
-
-		this._topCanvas = addCanvasTo(this._dv, new Size(16, 16));
-		this._topCanvas.style.position = 'absolute';
-		this._topCanvas.style.zIndex = '2';
-		this._topCanvas.style.left = '0';
-		this._topCanvas.style.top = '0';
-
-		this._topCanvasContext = ensureNotNull(getContext2d(this._topCanvas));
+		this._topCanvasBinding = createBoundCanvas(this._dv, new Size(16, 16));
+		this._topCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
+		const topCanvas = this._topCanvasBinding.canvas;
+		topCanvas.style.position = 'absolute';
+		topCanvas.style.zIndex = '2';
+		topCanvas.style.left = '0';
+		topCanvas.style.top = '0';
 
 		this._element.appendChild(this._leftStubCell);
 		this._element.appendChild(this._cell);
@@ -99,7 +98,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._chart.model().mainPriceScaleOptionsChanged().subscribe(this._recreateStub.bind(this), this);
 
 		this._mouseEventHandler = new MouseEventHandler(
-			this._topCanvas,
+			this._topCanvasBinding.canvas,
 			this,
 			{
 				treatVertTouchDragAsPageScroll: true,
@@ -113,6 +112,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		if (this._stub !== null) {
 			this._stub.destroy();
 		}
+
+		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
+		this._topCanvasBinding.destroy();
+
+		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
+		this._canvasBinding.destroy();
 	}
 
 	public getElement(): HTMLElement {
@@ -181,14 +186,17 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._setCursor(CursorType.Default);
 	}
 
+	public getSize(): Readonly<Size> {
+		return this._size;
+	}
+
 	public setSizes(timeAxisSize: Size, stubWidth: number): void {
 		if (!this._size || !this._size.equals(timeAxisSize)) {
 			this._size = timeAxisSize;
-			resizeCanvas(this._canvas, timeAxisSize);
-			resizeCanvas(this._topCanvas, timeAxisSize);
 
-			getContext2d(this._canvas); // Sync HiDpiCanvas metrics
-			getContext2d(this._topCanvas); // Sync HiDpiCanvas metrics
+			// apply new size to canvases
+			this._canvasBinding.canvasSize = { width: timeAxisSize.w, height: timeAxisSize.h };
+			this._topCanvasBinding.canvasSize = { width: timeAxisSize.w, height: timeAxisSize.h };
 
 			this._cell.style.width = timeAxisSize.w + 'px';
 			this._cell.style.height = timeAxisSize.h + 'px';
@@ -234,7 +242,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	public getImage(): HTMLCanvasElement {
-		return this._canvas;
+		return this._canvasBinding.canvas;
 	}
 
 	public paint(type: InvalidationLevel): void {
@@ -243,7 +251,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = this._canvasContext;
+			const ctx = ensureNotNull(getPretransformedContext2D(this._canvasBinding));
 			this._drawBackground(ctx);
 			this._drawBorder(ctx);
 
@@ -255,7 +263,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			}
 		}
 
-		this._drawCrosshairLabel(this._topCanvasContext);
+		const topCtx = ensureNotNull(getPretransformedContext2D(this._topCanvasBinding));
+		this._drawCrosshairLabel(topCtx);
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D): void {
@@ -374,7 +383,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D): void {
-		this._topCanvasContext.clearRect(-0.5, -0.5, this._size.w, this._size.h);
+		ctx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 
 		const model = this._chart.model();
 
@@ -488,4 +497,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		this._priceAxisPosition = priceAxisPosition;
 	}
+
+	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);
+	private readonly _topCanvasConfiguredHandler = () => this.paint(InvalidationLevel.Cursor);
 }

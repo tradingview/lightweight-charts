@@ -1,5 +1,6 @@
+import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+
 import { ensureNotNull } from '../helpers/assertions';
-import { getContext2d } from '../helpers/canvas-wrapper';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -14,7 +15,7 @@ import { PriceAxisPosition } from '../model/price-scale';
 import { TimePointIndex } from '../model/time-data';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { addCanvasTo, clearRect, resizeCanvas, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget } from './price-axis-widget';
@@ -37,10 +38,8 @@ export class PaneWidget implements IDestroyable {
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
-	private readonly _canvas: HTMLCanvasElement;
-	private _ctx: CanvasRenderingContext2D;
-	private readonly _topCanvas: HTMLCanvasElement;
-	private readonly _topCtx: CanvasRenderingContext2D;
+	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
 	private readonly _rowElement: HTMLElement;
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: Point | null = null;
@@ -77,21 +76,21 @@ export class PaneWidget implements IDestroyable {
 
 		this._paneCell.appendChild(paneWrapper);
 
-		this._canvas = addCanvasTo(paneWrapper, new Size(16, 16));
-		this._canvas.style.position = 'absolute';
-		this._canvas.style.zIndex = '1';
-		this._canvas.style.left = '0';
-		this._canvas.style.top = '0';
+		this._canvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
+		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
+		const canvas = this._canvasBinding.canvas;
+		canvas.style.position = 'absolute';
+		canvas.style.zIndex = '1';
+		canvas.style.left = '0';
+		canvas.style.top = '0';
 
-		this._ctx = ensureNotNull(getContext2d(this._canvas));
-
-		this._topCanvas = addCanvasTo(paneWrapper, new Size(16, 16));
-		this._topCanvas.style.position = 'absolute';
-		this._topCanvas.style.zIndex = '2';
-		this._topCanvas.style.left = '0';
-		this._topCanvas.style.top = '0';
-
-		this._topCtx = ensureNotNull(getContext2d(this._topCanvas));
+		this._topCanvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
+		this._topCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
+		const topCanvas = this._topCanvasBinding.canvas;
+		topCanvas.style.position = 'absolute';
+		topCanvas.style.zIndex = '2';
+		topCanvas.style.left = '0';
+		topCanvas.style.top = '0';
 
 		this._rowElement = document.createElement('tr');
 		this._rowElement.appendChild(this._leftAxisCell);
@@ -103,7 +102,7 @@ export class PaneWidget implements IDestroyable {
 
 		const scrollOptions = this.chart().options().handleScroll;
 		this._mouseEventHandler = new MouseEventHandler(
-			this._topCanvas,
+			this._topCanvasBinding.canvas,
 			this,
 			{
 				treatVertTouchDragAsPageScroll: !scrollOptions.vertTouchDrag,
@@ -116,6 +115,12 @@ export class PaneWidget implements IDestroyable {
 		if (this._priceAxisWidget !== null) {
 			this._priceAxisWidget.destroy();
 		}
+
+		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
+		this._topCanvasBinding.destroy();
+
+		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
+		this._canvasBinding.destroy();
 
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
@@ -432,11 +437,11 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		this._size = size;
-		resizeCanvas(this._canvas, size);
-		resizeCanvas(this._topCanvas, size);
 
-		// This line is here for retina canvas shim to work
-		this._ctx = ensureNotNull(getContext2d(this._canvas));
+		// apply new size to canvases
+		this._canvasBinding.canvasSize = { width: size.w, height: size.h };
+		this._topCanvasBinding.canvasSize = { width: size.w, height: size.h };
+
 		this._paneCell.style.width = size.w + 'px';
 		this._paneCell.style.height = size.h + 'px';
 	}
@@ -460,7 +465,7 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	public getImage(): HTMLCanvasElement {
-		return this._canvas;
+		return this._canvasBinding.canvas;
 	}
 
 	public paint(type: number): void {
@@ -480,17 +485,19 @@ export class PaneWidget implements IDestroyable {
 			this._priceAxisWidget.paint(type);
 		}
 
-		this._topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
-
 		if (type !== InvalidationLevel.Cursor) {
-			this._drawBackground(this._ctx, this._backgroundColor());
+			const ctx = ensureNotNull(getPretransformedContext2D(this._canvasBinding));
+			this._drawBackground(ctx, this._backgroundColor());
 			if (this._state) {
-				this._drawGrid(this._ctx);
-				this._drawWatermark(this._ctx);
-				this._drawSources(this._ctx);
+				this._drawGrid(ctx);
+				this._drawWatermark(ctx);
+				this._drawSources(ctx);
 			}
 		}
-		this._drawCrosshair(this._topCtx);
+
+		const topCtx = ensureNotNull(getPretransformedContext2D(this._topCanvasBinding));
+		topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
+		this._drawCrosshair(topCtx);
 	}
 
 	public priceAxisWidget(): PriceAxisWidget | null {
@@ -706,4 +713,7 @@ export class PaneWidget implements IDestroyable {
 	private _model(): ChartModel {
 		return this._chart.model();
 	}
+
+	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);
+	private readonly _topCanvasConfiguredHandler = () => this.paint(InvalidationLevel.Cursor);
 }

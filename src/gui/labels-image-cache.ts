@@ -1,5 +1,6 @@
+import { createPreconfiguredCanvas, getPrescaledContext2D, Size } from '../gui/canvas-utils';
+
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
-import { getContext2d } from '../helpers/canvas-wrapper';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -45,7 +46,8 @@ export class LabelsImageCache implements IDestroyable {
 
 		ctx.drawImage(
 			label.canvas,
-			x, y
+			x, y,
+			label.width, label.height
 		);
 	}
 
@@ -60,31 +62,28 @@ export class LabelsImageCache implements IDestroyable {
 				this._hash.delete(key);
 			}
 
-			// Allocate new
-			item = {
-				text: text,
-				textWidth: 0,
-				width: 0,
-				height: 0,
-				canvas: document.createElement('canvas'),
-			};
-
 			const margin = Math.ceil(this._fontSize / 4.5);
 			const baselineOffset = Math.round(this._fontSize / 10);
 			const textWidth = Math.ceil(this._textWidthCache.measureText(ctx, text));
+			const width = Math.round(textWidth + margin * 2);
+			const height = this._fontSize + margin * 2;
+			const canvas = createPreconfiguredCanvas(document, new Size(width, height));
 
-			item.textWidth = Math.round(Math.max(1, textWidth));
-			item.width = Math.round(textWidth + margin * 2);
-			item.height = this._fontSize + margin * 2;
+			// Allocate new
+			item = {
+				text: text,
+				textWidth: Math.round(Math.max(1, textWidth)),
+				width: width,
+				height: height,
+				canvas: canvas,
+			};
 
 			if (textWidth !== 0) {
 				this._keys.push(item.text);
 				this._hash.set(item.text, item);
 			}
 
-			item.canvas.width = item.width;
-			item.canvas.height = item.height;
-			ctx = ensureNotNull(getContext2d(item.canvas));
+			ctx = ensureNotNull(getPrescaledContext2D(item.canvas));
 			ctx.font = this._font;
 			ctx.fillStyle = this._color;
 			ctx.fillText(text, 0, item.height - margin - baselineOffset);
