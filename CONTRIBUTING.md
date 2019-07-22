@@ -23,6 +23,7 @@ When logging a bug, please be sure to include the following:
 
 ## Pull Requests
 
+- Outside contributors may implement enhancement/features only _after an approval_ (label "help wanted") by Lightweight Charts project maintainers.
 - For build instructions/suggestions see [BUILDING.md](./BUILDING.md).
 - After the review process has started, please **don't** use rebase to update the branch, use merge instead.
 
