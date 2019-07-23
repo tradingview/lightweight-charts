@@ -371,12 +371,12 @@ export class MouseEventHandler implements IDestroyable {
 			};
 
 			doc.addEventListener('mousedown', outsideHandler);
-			doc.addEventListener('touchstart', outsideHandler);
+			doc.addEventListener('touchstart', outsideHandler, { passive: true });
 		}
 
 		this._target.addEventListener('mouseleave', this._mouseLeaveHandler.bind(this));
 
-		this._target.addEventListener('touchstart', this._mouseDownHandler.bind(this));
+		this._target.addEventListener('touchstart', this._mouseDownHandler.bind(this), { passive: true });
 		if (!mobileTouch) {
 			this._target.addEventListener('mousedown', this._mouseDownHandler.bind(this));
 		}
@@ -399,9 +399,11 @@ export class MouseEventHandler implements IDestroyable {
 			return;
 		}
 
-		this._target.addEventListener('touchstart', (event: TouchEvent) => {
-			this._checkPinchState(event.touches);
-		});
+		this._target.addEventListener(
+			'touchstart',
+			(event: TouchEvent) => this._checkPinchState(event.touches),
+			{ passive: true }
+		);
 
 		this._target.addEventListener(
 			'touchmove',
