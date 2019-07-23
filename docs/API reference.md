@@ -15,6 +15,7 @@ chart.timeScale().scrollPosition();
 Scrolls a series to the specified position. Argumens are:
 
 `position` - number of target data position
+
 `animated` - if true, makes the series scrolling smoothly and adds animation
 
 ```javascript
