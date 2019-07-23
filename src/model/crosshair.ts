@@ -108,8 +108,7 @@ export class Crosshair extends DataSource {
 					return { price: rawPrice, coordinate: coordinate };
 				} else {
 					// always convert from coordinate
-					const mainSource = ensureNotNull(priceScale.mainSource());
-					const firstValue = ensureNotNull(mainSource.firstValue());
+					const firstValue = ensureNotNull(priceScale.firstValue());
 					const price = priceScale.coordinateToPrice(coordinate, firstValue);
 					return { price: price, coordinate: coordinate };
 				}
@@ -268,12 +267,11 @@ export class Crosshair extends DataSource {
 		this._index = newIndex;
 		this._x = isNaN(newIndex) ? NaN as Coordinate : this._model.timeScale().indexToCoordinate(newIndex);
 
-		const newPaneMainSource = newPane.mainDataSource();
-		const newPaneMainSourceFirstValue = newPaneMainSource !== null ? newPaneMainSource.firstValue() : null;
-		if (priceScale !== null && newPaneMainSourceFirstValue !== null) {
+		const firstValue = priceScale !== null ? priceScale.firstValue() : null;
+		if (priceScale !== null && firstValue !== null) {
 			this._pane = newPane;
 			this._price = newPrice;
-			this._y = priceScale.priceToCoordinate(newPrice, newPaneMainSourceFirstValue);
+			this._y = priceScale.priceToCoordinate(newPrice, firstValue);
 		} else {
 			this._pane = null;
 			this._price = NaN;

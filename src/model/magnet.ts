@@ -22,14 +22,8 @@ export class Magnet {
 		}
 
 		const defaultPriceScale = pane.defaultPriceScale();
-		// get the main source
-		const mainSource = defaultPriceScale.mainSource();
+		const firstValue = defaultPriceScale.firstValue();
 
-		if (defaultPriceScale.isEmpty() || mainSource === null) {
-			return res;
-		}
-
-		const firstValue = mainSource.firstValue();
 		if (firstValue === null) {
 			return res;
 		}

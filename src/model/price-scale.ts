@@ -541,6 +541,29 @@ export class PriceScale {
 		return this._mainSource;
 	}
 
+	public firstValue(): number | null {
+		const mainSource = this.mainSource();
+		if (mainSource === null) {
+			return null;
+		}
+
+		const mainSourceFirstValue = mainSource.firstValue();
+		if (mainSourceFirstValue !== null) {
+			return mainSourceFirstValue;
+		}
+
+		for (const source of this._dataSources) {
+			if (source !== mainSource && source instanceof PriceDataSource) {
+				const sourceFirstValue = source.firstValue();
+				if (sourceFirstValue !== null) {
+					return sourceFirstValue;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public isInverted(): boolean {
 		return this._options.invertScale;
 	}

@@ -378,8 +378,8 @@ export class ChartModel implements IDestroyable {
 		const mainSource = pane.mainDataSource();
 		if (mainSource !== null) {
 			const priceScale = pane.defaultPriceScale();
-			if (!priceScale.isEmpty()) {
-				const firstValue = ensureNotNull(mainSource.firstValue());
+			const firstValue = priceScale.firstValue();
+			if (firstValue !== null) {
 				price = priceScale.coordinateToPrice(y, firstValue);
 			}
 			price = this._magnet.align(price, index, pane);
