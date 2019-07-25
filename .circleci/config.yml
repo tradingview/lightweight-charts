@@ -81,7 +81,7 @@ jobs:
     steps:
       - checkout-with-deps
       - run: npm run tsc-all
-      - run: npm run build
+      - run: npm run build:prod
       - persist_to_workspace:
           root: ./
           paths:
@@ -170,6 +170,13 @@ jobs:
       - store_test_results:
           path: test-results/
 
+  codechecks:
+    executor: node-latest-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: npm run codechecks
 
 workflows:
   version: 2
@@ -200,6 +207,10 @@ workflows:
           requires:
             - install-deps
 
+      - codechecks:
+          filters: *default-filters
+          requires:
+            - build
       - unittests:
           filters: *default-filters
           requires:
