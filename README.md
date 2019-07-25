@@ -10,7 +10,7 @@
   [![CircleCI][ci-img]][ci-link]
   [![npm version][npm-version-img]][npm-link]
   [![npm bundle size][bundle-size-img]][bundle-size-link]
-  ![Zero dependencies][zero-deps-img]
+  [![Dependencies count][deps-count-img]][bundle-size-link]
   [![Downloads][npm-downloads-img]][npm-link]
 </div>
 
@@ -103,6 +103,5 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 [npm-link]: https://www.npmjs.com/package/lightweight-charts
 
 [bundle-size-img]: https://badgen.net/bundlephobia/minzip/lightweight-charts
+[deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependecies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
 [bundle-size-link]: https://bundlephobia.com/result?p=lightweight-charts
-
-[zero-deps-img]: https://badgen.net/badge/dependencies/0/green
