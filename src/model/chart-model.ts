@@ -373,7 +373,12 @@ export class ChartModel implements IDestroyable {
 	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, pane: Pane): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
-		const index = this._timeScale.coordinateToIndex(x);
+		let index = this._timeScale.coordinateToIndex(x);
+
+		const visibleBars = this._timeScale.visibleBars();
+		if (visibleBars !== null) {
+			index = Math.min(Math.max(visibleBars.firstBar(), index), visibleBars.lastBar()) as TimePointIndex;
+		}
 
 		const mainSource = pane.mainDataSource();
 		if (mainSource !== null) {
