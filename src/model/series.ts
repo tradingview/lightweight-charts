@@ -22,6 +22,7 @@ import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-vi
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
 
+import { AutoscaleInfo } from './autoscale-info';
 import { BarPrice, BarPrices } from './bar';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
@@ -404,17 +405,17 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._priceAxisViews;
 	}
 
-	public priceRange(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): PriceRange | null {
+	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo {
 		if (!isInteger(startTimePoint)) {
-			return null;
+			return new AutoscaleInfo(null);
 		}
 
 		if (!isInteger(endTimePoint)) {
-			return null;
+			return new AutoscaleInfo(null);
 		}
 
 		if (this.data().isEmpty()) {
-			return null;
+			return new AutoscaleInfo(null);
 		}
 
 		// TODO: refactor this
@@ -435,7 +436,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
 		}
 
-		return range;
+		return new AutoscaleInfo(range);
 	}
 
 	public minMove(): number {

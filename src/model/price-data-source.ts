@@ -1,9 +1,9 @@
 import { IFormatter } from '../formatters/iformatter';
 
+import { AutoscaleInfo } from './autoscale-info';
 import { ChartModel } from './chart-model';
 import { DataSource } from './data-source';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
-import { PriceRange } from './price-range';
 import { TimePointIndex } from './time-data';
 
 export abstract class PriceDataSource extends DataSource implements IPriceDataSource {
@@ -22,8 +22,8 @@ export abstract class PriceDataSource extends DataSource implements IPriceDataSo
 		return 0;
 	}
 
-	public priceRange(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): PriceRange | null {
-		return null;
+	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo {
+		return new AutoscaleInfo(null);
 	}
 
 	public abstract firstValue(): FirstValue | null;

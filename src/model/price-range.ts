@@ -44,7 +44,10 @@ class PriceRange {
 		return this._maxValue === this._minValue || Number.isNaN(this._maxValue) || Number.isNaN(this._minValue);
 	}
 
-	public merge(anotherRange: PriceRange): PriceRange {
+	public merge(anotherRange: PriceRange | null): PriceRange {
+		if (anotherRange === null) {
+			return this;
+		}
 		return new PriceRange(
 			Math.min(this.minValue(), anotherRange.minValue()),
 			Math.max(this.maxValue(), anotherRange.maxValue())
