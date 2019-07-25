@@ -1,12 +1,13 @@
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
 
-import { SeriesDataItemTypeMap } from './data-consumer';
+import { SeriesDataItemTypeMap, Time } from './data-consumer';
 
 /** Interface to be implemented by the object in order to be used as a price formatter */
 export interface IPriceFormatter {
@@ -55,4 +56,10 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
 	 */
 	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
+
+	/**
+	 * Sets markers for the series
+	 * @param data array of series markers. This array should be sorted by time. Several markers with same time are allowed.
+	 */
+	setMarkers(data: SeriesMarker<Time>[]): void;
 }
