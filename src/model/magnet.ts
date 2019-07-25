@@ -55,7 +55,7 @@ export class Magnet {
 
 				// convert bar to pixels
 				const firstPrice = ensure(series.firstValue());
-				return acc.concat(prices.map((barPrice: number) => ps.priceToCoordinate(barPrice, firstPrice, true)));
+				return acc.concat(prices.map((barPrice: number) => ps.priceToCoordinate(barPrice, firstPrice.value, true)));
 			},
 			[] as Coordinate[]);
 

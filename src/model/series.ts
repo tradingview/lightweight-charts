@@ -23,6 +23,7 @@ import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view'
 import { BarPrice, BarPrices } from './bar';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
+import { FirstValue } from './iprice-data-source';
 import { Palette } from './palette';
 import { Pane } from './pane';
 import { PlotRow } from './plot-data';
@@ -182,14 +183,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const price = plot !== undefined ? bar.value[plot] as number : this._barFunction(bar.value);
 		const barColorer = this.barColorer();
 		const style = barColorer.barStyle(lastIndex, { value: bar });
-		const floatCoordinate = priceScale.priceToCoordinate(price, firstValue, true);
+		const floatCoordinate = priceScale.priceToCoordinate(price, firstValue.value, true);
 
 		return {
 			noData: false,
 			price: withRawPrice ? price : undefined,
-			text: priceScale.formatPrice(price, firstValue),
+			text: priceScale.formatPrice(price, firstValue.value),
 			formattedPriceAbsolute: priceScale.formatPriceAbsolute(price),
-			formattedPricePercentage: priceScale.formatPricePercentage(price, firstValue),
+			formattedPricePercentage: priceScale.formatPricePercentage(price, firstValue.value),
 			color: style.barColor,
 			floatCoordinate: floatCoordinate,
 			coordinate: Math.round(floatCoordinate) as Coordinate,
@@ -297,13 +298,16 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._seriesType;
 	}
 
-	public firstValue(): number | null {
+	public firstValue(): FirstValue | null {
 		const bar = this.firstBar();
 		if (bar === null) {
 			return null;
 		}
 
-		return this._barFunction(bar.value);
+		return {
+			value: this._barFunction(bar.value),
+			timePoint: bar.time,
+		};
 	}
 
 	public firstBar(): Bar | null {
