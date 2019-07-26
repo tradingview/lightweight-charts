@@ -9,7 +9,8 @@ import { SeriesMarker } from '../../model/series-markers';
 import { TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
-import { calculateShapeHeight, SeriesMarkerRendererData, SeriesMarkersRenderer, shapesMargin } from '../../renderers/series-markers-renderer';
+import { SeriesMarkerRendererData, SeriesMarkersRenderer, shapesMargin } from '../../renderers/series-markers-renderer';
+import { calculateShapeHeight } from '../../renderers/series-markers-utils';
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
@@ -32,7 +33,7 @@ function calcuateY(
 	let res: Coordinate = 0 as Coordinate;
 	switch (marker.position) {
 		case 'inBar': {
-			res = priceScale.priceToCoordinate(inBarPrice, firstValue) as Coordinate;
+			res = priceScale.priceToCoordinate(inBarPrice, firstValue);
 			break;
 		}
 		case 'aboveBar': {
@@ -96,6 +97,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				shape: marker.shape,
 				color: marker.color,
 				id: marker.id,
+				externalId: marker.externalId,
 			}));
 			this._dataInvalidated = false;
 		}
@@ -115,9 +117,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			belowBar: shapesMargin,
 		};
 		this._data.visibleRange = visibleTimedValues(this._data.items, visibleBars, true);
-		if (this._data.visibleRange === null) {
-			return;
-		}
 		this._data.barSpacing = timeScale.barSpacing();
 		for (let index = this._data.visibleRange.from; index < this._data.visibleRange.to; index++) {
 			const marker = seriesMarkers[index];

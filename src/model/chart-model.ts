@@ -38,6 +38,16 @@ export interface HandleScaleOptions {
 	axisPressedMouseMove: boolean;
 }
 
+export interface HoveredObject {
+	id?: string;
+	externalId?: string;
+}
+
+export interface HoveredSource {
+	source: IDataSource;
+	object?: HoveredObject;
+}
+
 type InvalidateHandler = (mask: InvalidateMask) => void;
 
 /**
@@ -85,7 +95,7 @@ export class ChartModel implements IDestroyable {
 
 	private _width: number = 0;
 	private _initialTimeScrollPos: number | null = null;
-	private _hoveredSource: IDataSource | null = null;
+	private _hoveredSource: HoveredSource | null = null;
 	private readonly _mainPriceScaleOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
 
@@ -124,12 +134,19 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(inv);
 	}
 
-	public hoveredSource(): IDataSource | null {
+	public hoveredSource(): HoveredSource | null {
 		return this._hoveredSource;
 	}
 
-	public setHoveredSource(source: IDataSource | null): void {
+	public setHoveredSource(source: HoveredSource | null): void {
+		const prevSource = this._hoveredSource;
 		this._hoveredSource = source;
+		if (prevSource !== null) {
+			this.updateSource(prevSource.source);
+		}
+		if (source !== null) {
+			this.updateSource(source.source);
+		}
 	}
 
 	public options(): Readonly<ChartOptions> {

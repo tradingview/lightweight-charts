@@ -10,5 +10,6 @@ export interface SeriesMarker<TimeType> {
 	position: SeriesMarkerPosition;
 	shape: SeriesMarkerShape;
 	color: string;
-	id?: string;
+	id: string;
+	externalId?: string;
 }

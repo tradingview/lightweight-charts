@@ -1,30 +1,21 @@
-import { ensureDefined } from '../helpers/assertions';
+import { ensureNever } from '../helpers/assertions';
 
+import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { SeriesMarkerShape } from '../model/series-markers';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { IPaneRenderer } from './ipane-renderer';
+import { drawArrow, hitTestArrow } from './series-markers-arrow';
+import { drawCircle, hitTestCircle } from './series-markers-circle';
+import { drawSquare, hitTestSquare } from './series-markers-square';
 
 export interface SeriesMarkerRendererDataItem extends TimedValue {
 	y: Coordinate;
 	shape: SeriesMarkerShape;
 	color: string;
-	id?: string;
-}
-
-function ceilToEven(x: number): number {
-	const ceiled = Math.ceil(x);
-	return (ceiled % 2 !== 0) ? ceiled - 1 : ceiled;
-}
-
-function ceilToOdd(x: number): number {
-	const ceiled = Math.ceil(x);
-	return (ceiled % 2 === 0) ? ceiled - 1 : ceiled;
-}
-
-export function calculateShapeHeight(shape: SeriesMarkerShape, barSpacing: number): number {
-	return ceilToEven(barSpacing);
+	id: string;
+	externalId?: string;
 }
 
 export const shapesMargin = 4;
@@ -35,65 +26,6 @@ export interface SeriesMarkerRendererData {
 	barSpacing: number;
 }
 
-function circleItemRenderer(ctx: CanvasRenderingContext2D, x: Coordinate, y: Coordinate, color: string, barSpacing: number): void {
-	const size = ceilToOdd(barSpacing * 0.8);
-	const halfSize = (size - 1) / 2;
-	ctx.fillStyle = color;
-	ctx.beginPath();
-	ctx.arc(x, y, halfSize, 0, 2 * Math.PI, false);
-	ctx.fill();
-}
-
-function squareItemRenderer(ctx: CanvasRenderingContext2D, x: Coordinate, y: Coordinate, color: string, barSpacing: number): void {
-	const size = ceilToOdd(barSpacing * 0.7);
-	const halfSize = (size - 1) / 2;
-	const left = x - halfSize;
-	const top = y - halfSize;
-	ctx.fillStyle = color;
-	ctx.fillRect(left, top, size, size);
-}
-
-function arrowRenderer(up: boolean, ctx: CanvasRenderingContext2D, x: Coordinate, y: Coordinate, color: string, barSpacing: number): void {
-	ctx.fillStyle = color;
-	if (barSpacing < 3) {
-		// there is no reason to draw so small arrow
-		ctx.fillRect(x, y, 1, 1);
-		return;
-	}
-	ctx.beginPath();
-	const arrowSize = ceilToOdd(barSpacing * 0.8);
-	const halfArrowSize = (arrowSize - 1) / 2;
-	const baseSize = ceilToOdd(barSpacing * 0.4);
-	const halfBaseSize = (baseSize - 1) / 2;
-	ctx.beginPath();
-	if (up) {
-		ctx.moveTo(x - halfArrowSize, y);
-		ctx.lineTo(x, y - halfArrowSize);
-		ctx.lineTo(x + halfArrowSize, y);
-		ctx.lineTo(x + halfBaseSize, y);
-		ctx.lineTo(x + halfBaseSize, y + halfArrowSize);
-		ctx.lineTo(x - halfBaseSize, y + halfArrowSize);
-		ctx.lineTo(x - halfBaseSize, y);
-	} else {
-		ctx.moveTo(x - halfArrowSize, y);
-		ctx.lineTo(x, y + halfArrowSize);
-		ctx.lineTo(x + halfArrowSize, y);
-		ctx.lineTo(x + halfBaseSize, y);
-		ctx.lineTo(x + halfBaseSize, y - halfArrowSize);
-		ctx.lineTo(x - halfBaseSize, y - halfArrowSize);
-		ctx.lineTo(x - halfBaseSize, y);
-	}
-	ctx.fill();
-}
-
-// x, y is the center
-const shapeItemsRenderers: Map<SeriesMarkerShape, (ctx: CanvasRenderingContext2D, x: Coordinate, y: Coordinate, color: string, barSpacing: number) => void> = new Map([
-	['circle', circleItemRenderer],
-	['square', squareItemRenderer],
-	['arrowUp', arrowRenderer.bind(null, true)],
-	['arrowDown', arrowRenderer.bind(null, false)],
-]);
-
 export class SeriesMarkersRenderer implements IPaneRenderer {
 	private _data: SeriesMarkerRendererData | null = null;
 
@@ -101,7 +33,7 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, isHovered: boolean): void {
+	public draw(ctx: CanvasRenderingContext2D, isHovered: boolean, objectId?: string): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
@@ -109,12 +41,60 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 		ctx.translate(0.5, 0.5);
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
-			ensureDefined(shapeItemsRenderers.get(item.shape))(ctx, item.x, item.y, item.color, this._data.barSpacing);
+			drawItem(item, ctx, item.color, this._data.barSpacing);
 		}
 		ctx.restore();
 	}
 
-	public hitTest(x: Coordinate, y: Coordinate): boolean {
-		return false;
+	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
+		if (this._data === null || this._data.visibleRange === null) {
+			return null;
+		}
+
+		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
+			const item = this._data.items[i];
+			if (hitTestItem(item, this._data.barSpacing, x, y)) {
+				return {
+					id: item.id,
+					externalId: item.externalId,
+				};
+			}
+		}
+
+		return null;
 	}
+}
+
+function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, color: string, barSpacing: number): void {
+	switch (item.shape) {
+		case 'arrowDown':
+			drawArrow(true, ctx, item.x, item.y, color, barSpacing);
+			return;
+		case 'arrowUp':
+			drawArrow(false, ctx, item.x, item.y, color, barSpacing);
+			return;
+		case 'circle':
+			drawCircle(ctx, item.x, item.y, color, barSpacing);
+			return;
+		case 'square':
+			drawSquare(ctx, item.x, item.y, color, barSpacing);
+			return;
+	}
+
+	ensureNever(item.shape);
+}
+
+function hitTestItem(item: SeriesMarkerRendererDataItem, barSpacing: number, x: Coordinate, y: Coordinate): boolean {
+	switch (item.shape) {
+		case 'arrowDown':
+			return hitTestArrow(true, item.x, item.y, barSpacing, x, y);
+		case 'arrowUp':
+			return hitTestArrow(false, item.x, item.y, barSpacing, x, y);
+		case 'circle':
+			return hitTestCircle(item.x, item.y, barSpacing, x, y);
+		case 'square':
+			return hitTestSquare(item.x, item.y, barSpacing, x , y);
+	}
+
+	ensureNever(item.shape);
 }

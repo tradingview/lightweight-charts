@@ -4,7 +4,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 
-import { ChartModel } from '../model/chart-model';
+import { ChartModel, HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -26,7 +26,13 @@ const trackCrosshairOnlyAfterLongTap = isMobile;
 
 export interface HitTestResult {
 	source: IDataSource;
+	object?: HoveredObject;
 	view: IPaneView;
+}
+
+interface HitTestPaneViewResult {
+	view: IPaneView;
+	object?: HoveredObject;
 }
 
 export class PaneWidget implements IDestroyable {
@@ -243,7 +249,7 @@ export class PaneWidget implements IDestroyable {
 		if (!mobileTouch) {
 			this._setCrosshairPosition(x, y);
 			const hitTest = this.hitTest(x, y);
-			this._model().setHoveredSource(hitTest && hitTest.source);
+			this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 			if (hitTest !== null && hitTest.view.moveHandler !== undefined) {
 				hitTest.view.moveHandler(x, y);
 			}
@@ -406,7 +412,8 @@ export class PaneWidget implements IDestroyable {
 			if (sourceResult !== null) {
 				return {
 					source: source,
-					view: sourceResult,
+					view: sourceResult.view,
+					object: sourceResult.object,
 				};
 			}
 		}
@@ -581,13 +588,17 @@ export class PaneWidget implements IDestroyable {
 		const paneViews = source.paneViews(state);
 		const height = state.height();
 		const width = state.width();
-		const isHovered = state.model().hoveredSource() === source;
+		const hoveredSource = state.model().hoveredSource();
+		const isHovered = hoveredSource !== null && hoveredSource.source === source;
+		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
+			? hoveredSource.object.id
+			: undefined;
 
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
 				ctx.save();
-				renderer.draw(ctx, isHovered);
+				renderer.draw(ctx, isHovered, objecId);
 				ctx.restore();
 			}
 		}
@@ -598,25 +609,32 @@ export class PaneWidget implements IDestroyable {
 		const paneViews = source.paneViews(state);
 		const height = state.height();
 		const width = state.width();
-		const isHovered = state.model().hoveredSource() === source;
+		const hoveredSource = state.model().hoveredSource();
+		const isHovered = hoveredSource !== null && hoveredSource.source === source;
+		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
+			? hoveredSource.object.id
+			: undefined;
 
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null && renderer.drawBackground !== undefined) {
 				ctx.save();
-				renderer.drawBackground(ctx, isHovered);
+				renderer.drawBackground(ctx, isHovered, objecId);
 				ctx.restore();
 			}
 		}
 	}
 
-	private _hitTestPaneView(paneViews: ReadonlyArray<IPaneView>, x: Coordinate, y: Coordinate): IPaneView | null {
+	private _hitTestPaneView(paneViews: ReadonlyArray<IPaneView>, x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer(this._size.h, this._size.w);
 			if (renderer !== null && renderer.hitTest) {
 				const result = renderer.hitTest(x, y);
-				if (result) {
-					return paneView;
+				if (result !== null) {
+					return {
+						view: paneView,
+						object: result,
+					};
 				}
 			}
 		}

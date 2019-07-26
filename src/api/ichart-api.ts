@@ -21,6 +21,8 @@ export interface MouseEventParams {
 	time?: UTCTimestamp | BusinessDay;
 	point?: Point;
 	seriesPrices: Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>;
+	hoveredSeries?: ISeriesApi<SeriesType>;
+	hoveredObject?: string;
 }
 
 export type MouseEventHandler = (param: MouseEventParams) => void;

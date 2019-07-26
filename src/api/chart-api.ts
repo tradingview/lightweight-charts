@@ -284,9 +284,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		param.seriesPrices.forEach((price: BarPrice | BarPrices, series: Series) => {
 			seriesPrices.set(this._mapSeriesToApi(series), price);
 		});
+
+		const hoveredSeries = param.hoveredSeries === undefined ? undefined : this._mapSeriesToApi(param.hoveredSeries);
+
 		return {
 			time: param.time && (param.time.businessDay || param.time.timestamp),
 			point: param.point,
+			hoveredSeries,
+			hoveredObject: param.hoveredObject,
 			seriesPrices,
 		};
 	}
