@@ -18,8 +18,6 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 	externalId?: string;
 }
 
-export const shapesMargin = 4;
-
 export interface SeriesMarkerRendererData {
 	items: SeriesMarkerRendererDataItem[];
 	visibleRange: SeriesItemsIndexesRange | null;

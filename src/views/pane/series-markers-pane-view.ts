@@ -9,8 +9,11 @@ import { SeriesMarker } from '../../model/series-markers';
 import { TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
-import { SeriesMarkerRendererData, SeriesMarkersRenderer, shapesMargin } from '../../renderers/series-markers-renderer';
-import { calculateShapeHeight } from '../../renderers/series-markers-utils';
+import { SeriesMarkerRendererData, SeriesMarkersRenderer } from '../../renderers/series-markers-renderer';
+import {
+	calculateShapeHeight,
+	shapeMargin as calculateShapeMargin,
+} from '../../renderers/series-markers-utils';
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
@@ -20,12 +23,15 @@ interface Offsets {
 }
 
 function calcuateY(
+		// tslint:disable-next-line:max-params
 		marker: SeriesMarker<TimePointIndex>,
 		seriesData: BarPrices | BarPrice,
 		offsets: Offsets,
+		shapeMargin: number,
 		priceScale: PriceScale,
 		timeScale: TimeScale,
-		firstValue: number): Coordinate {
+		firstValue: number
+): Coordinate {
 	const inBarPrice = isNumber(seriesData) ? seriesData : seriesData.close;
 	const highPrice = isNumber(seriesData) ? seriesData : seriesData.high;
 	const lowPrice = isNumber(seriesData) ? seriesData : seriesData.low;
@@ -38,12 +44,12 @@ function calcuateY(
 		}
 		case 'aboveBar': {
 			res = (priceScale.priceToCoordinate(highPrice, firstValue) - shapeSize / 2 - offsets.aboveBar) as Coordinate;
-			offsets.aboveBar -= shapeSize + shapesMargin;
+			offsets.aboveBar += shapeSize + shapeMargin;
 			break;
 		}
 		case 'belowBar': {
 			res = (priceScale.priceToCoordinate(lowPrice, firstValue) + shapeSize / 2 + offsets.belowBar) as Coordinate;
-			offsets.belowBar += shapeSize + shapesMargin;
+			offsets.belowBar += shapeSize + shapeMargin;
 			break;
 		}
 	}
@@ -112,9 +118,10 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			return;
 		}
 		let prevTimeIndex = NaN;
+		const shapeMargin = calculateShapeMargin(timeScale.barSpacing());
 		const offsets: Offsets = {
-			aboveBar: shapesMargin,
-			belowBar: shapesMargin,
+			aboveBar: shapeMargin,
+			belowBar: shapeMargin,
 		};
 		this._data.visibleRange = visibleTimedValues(this._data.items, visibleBars, true);
 		this._data.barSpacing = timeScale.barSpacing();
@@ -122,8 +129,8 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			const marker = seriesMarkers[index];
 			if (marker.time !== prevTimeIndex) {
 				// new bar, reset stack counter
-				offsets.aboveBar = shapesMargin;
-				offsets.belowBar = shapesMargin;
+				offsets.aboveBar = shapeMargin;
+				offsets.belowBar = shapeMargin;
 				prevTimeIndex = marker.time;
 			}
 			this._data.items[index].x = timeScale.indexToCoordinate(marker.time);
@@ -131,7 +138,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			if (dataAt === null) {
 				continue;
 			}
-			this._data.items[index].y = calcuateY(marker, dataAt, offsets, priceScale, timeScale, firstValue.value);
+			this._data.items[index].y = calcuateY(marker, dataAt, offsets, shapeMargin, priceScale, timeScale, firstValue.value);
 		}
 		this._invalidated = false;
 	}

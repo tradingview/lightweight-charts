@@ -5,6 +5,7 @@ import { SeriesMarkerShape } from '../model/series-markers';
 const enum Constants {
 	MinShapeSize = 12,
 	MaxShapeSize = 30,
+	MinShapeMargin = 3,
 }
 
 export function size(barSpacing: number, coeff: number): number {
@@ -37,5 +38,9 @@ export function ceilToOdd(x: number): number {
 }
 
 export function calculateShapeHeight(shape: SeriesMarkerShape, barSpacing: number): number {
-	return ceilToEven(barSpacing);
+	return ceilToEven(size(barSpacing, 1));
+}
+
+export function shapeMargin(barSpacing: number): number {
+	return Math.max(size(barSpacing, 0.1), Constants.MinShapeMargin);
 }
