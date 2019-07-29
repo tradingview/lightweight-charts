@@ -1,14 +1,8 @@
 # Time Axis
 
-Time axis (timescale) is a horizontal scale at the bottom of the chart, used to display different time units.
+Time axis (time scale) is a horizontal scale at the bottom of the chart that displays the time of bars.
 
-## Timescale options
-
-Timescale options enable adjusting of series that are displayed on a chart when scaling and resizing a chart.
-
-Timescale can be hidden if needed.
-
-The following options are available in the time axis interface:
+## Time scale options
 
 |Name|Type|Default|Description|
 |----------------------------|-------|-------|--|
@@ -17,13 +11,13 @@ The following options are available in the time axis interface:
 |`fixLeftEdge`|`boolean`|`false`|If true, prevents scrolling to the left of the first historical bar|
 |`lockVisibleTimeRangeOnResize`|`boolean`|`false`|If true, prevents changing visible time area during chart resizing|
 |`rightBarStaysOnScroll`|`boolean`|`false`|If false, the hovered bar remains in the same place when scrolling|
-|`borderVisible`|`boolean`|`true`|If true, timescale border is visible|
-|`borderColor`|`string`|`#2b2b43`|Timescale border color|
-|`visible`|`boolean`|`true`|If true, timescale is shown on a chart|
-|`timeVisible`|`boolean`|`false`|If true, time is shown on the time scale and crosshair vertical label|
+|`borderVisible`|`boolean`|`true`|If true, the time scale border is visible|
+|`borderColor`|`string`|`#2b2b43`|The time scale border color|
+|`visible`|`boolean`|`true`|If true, the time scale is shown on a chart|
+|`timeVisible`|`boolean`|`false`|If true, the time is shown on the time scale and in the vertical crosshair label|
 |`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of the crosshair vertical line in `hh:mm:ss` format on intraday intervals|
 
-### Example of timescale customization
+### Example of time scale customization
 
 ```javascript
 chart.applyOptions({
@@ -42,11 +36,11 @@ chart.applyOptions({
 });
 ```
 
-## Timescale API
+## Time scale API
 
 ### scrollPosition()
 
-Returns a distance from the right edge of the timescale to the latest bar of series, measured in bars.
+Returns a distance from the right edge of the time scale to the latest bar of the series, measured in bars.
 
 ```javascript
 chart.timeScale().scrollPosition();
@@ -54,11 +48,11 @@ chart.timeScale().scrollPosition();
 
 ### scrollToPosition()
 
-Scrolls a series to the specified position. Argumens are:
+Function scrolls the chart to the specified position in time. It has the following arguments:
 
-`position` - number of target data position
+`position` - amount of time points from the latest bar
 
-`animated` - if true, makes the series scrolling smoothly and adds animation
+`animated` - if true, the series is scrolled smoothly with animation
 
 ```javascript
 chart.timeScale().scrollToPosition(2, true);
@@ -74,7 +68,7 @@ chart.timeScale().scrollToRealTime();
 
 ### getVisibleRange()
 
-Returns current visible time range of a chart in the form of an object with the first and the last time points of a timerange, or returns null if the chart has no data at all.
+Returns the current visible time range of the chart as an object with the first and last time points of the time range, or returns `null` if the chart has no data at all.
 
 ```javascript
 chart.timeScale().getVisibleRange();
@@ -82,7 +76,7 @@ chart.timeScale().getVisibleRange();
 
 ### setVisibleRange()
 
-Sets visible range of data. Argument is an object with the first and the last time points of a timerange desired.
+Sets visible time range of the chart. The argument is an object with the first and last time points of a desired time range.
 
 ```javascript
 chart.timeScale().setVisibleRange({
@@ -93,7 +87,7 @@ chart.timeScale().setVisibleRange({
 
 ### resetTimeScale()
 
-Restores default zooming and scroll position of the time scale.
+Restores default zoom and scroll position of the time scale.
 
 ```javascript
 chart.timeScale().resetTimeScale();
@@ -101,7 +95,7 @@ chart.timeScale().resetTimeScale();
 
 ### fitContent()
 
-Automatically calculates the visible range to fit all data from all series.
+Automatically calculates the visible range to fit all series data.
 
 ```javascript
 chart.timeScale().fitContent();
@@ -109,7 +103,7 @@ chart.timeScale().fitContent();
 
 ### applyOptions()
 
-Applies new options to the time scale. Argument is an object with a set of options.
+Applies new options to the time scale. The argument is an object with options that should be modified.
 
 ```javascript
 chart.timeScale().applyOptions({
@@ -120,7 +114,7 @@ chart.timeScale().applyOptions({
 
 ### options()
 
-Returns an object with the set of options currently applied to the timescale.
+Returns an object with options currently applied to the time scale.
 
 ```javascript
 chart.timeScale().options();
