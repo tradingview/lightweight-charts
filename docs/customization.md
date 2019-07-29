@@ -136,11 +136,11 @@ chart.applyOptions({
 
 ## Time Axis
 
-Time axis is a horizontal scale at the bottom of the chart, used to display different time units.
+Time axis (time scale) is a horizontal scale at the bottom of the chart, used to display different time units.
 
-[timescale.md](https://github.com/tradingview/lightweight-charts/blob/master/docs/timescale.md) contains a full description of timescale options and API methods to customize and adjust it.
+[timescale.md](https://github.com/tradingview/lightweight-charts/blob/master/docs/timescale.md) contains a full description of time scale options and API methods to customize and adjust the time axis.
 
-### Example of timescale customization
+### Example of time scale customization
 
 ```javascript
 chart.applyOptions({
