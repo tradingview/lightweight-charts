@@ -35,7 +35,7 @@ function calcuateY(
 	const inBarPrice = isNumber(seriesData) ? seriesData : seriesData.close;
 	const highPrice = isNumber(seriesData) ? seriesData : seriesData.high;
 	const lowPrice = isNumber(seriesData) ? seriesData : seriesData.low;
-	const shapeSize = calculateShapeHeight(marker.shape, timeScale.barSpacing());
+	const shapeSize = calculateShapeHeight(timeScale.barSpacing());
 	let res: Coordinate = 0 as Coordinate;
 	switch (marker.position) {
 		case 'inBar': {
@@ -64,6 +64,8 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 	private _invalidated: boolean = true;
 	private _dataInvalidated: boolean = true;
 
+	private _autoScaleMargins: number = 0;
+
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
 	public constructor(series: Series, model: ChartModel) {
@@ -91,6 +93,14 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		return this._renderer;
 	}
 
+	public autoScaleMargins(): number {
+		if (this._invalidated) {
+			this._makeValid();
+		}
+
+		return this._autoScaleMargins;
+	}
+
 	protected _makeValid(): void {
 		const priceScale = this._series.priceScale();
 		const timeScale = this._model.timeScale();
@@ -107,6 +117,12 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			}));
 			this._dataInvalidated = false;
 		}
+
+		const shapeMargin = calculateShapeMargin(timeScale.barSpacing());
+		this._autoScaleMargins = seriesMarkers.length > 0
+				? calculateShapeHeight(timeScale.barSpacing()) * 1.5 + shapeMargin * 2
+				: 0;
+
 		this._data.visibleRange = null;
 		const visibleBars = timeScale.visibleBars();
 		if (visibleBars === null) {
@@ -118,7 +134,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			return;
 		}
 		let prevTimeIndex = NaN;
-		const shapeMargin = calculateShapeMargin(timeScale.barSpacing());
 		const offsets: Offsets = {
 			aboveBar: shapeMargin,
 			belowBar: shapeMargin,

@@ -436,7 +436,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
 		}
 
-		return new AutoscaleInfo(range);
+		const margins = this._markersPaneView.autoScaleMargins() as Coordinate;
+		return new AutoscaleInfo(range, margins, margins);
 	}
 
 	public minMove(): number {

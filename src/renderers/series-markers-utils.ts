@@ -37,7 +37,7 @@ export function ceilToOdd(x: number): number {
 	return (ceiled % 2 === 0) ? ceiled - 1 : ceiled;
 }
 
-export function calculateShapeHeight(shape: SeriesMarkerShape, barSpacing: number): number {
+export function calculateShapeHeight(barSpacing: number): number {
 	return ceilToEven(size(barSpacing, 1));
 }
 
