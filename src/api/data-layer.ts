@@ -83,10 +83,16 @@ function selectTimeConverter(data: TimedData[]): TimeConverter | null {
 }
 
 export function convertTime(time: Time): TimePoint {
-	if (isBusinessDay(time)) {
-		return businessDayConverter(time);
+	if (isUTCTimestamp(time)) {
+		return timestampConverter(time);
 	}
-	return timestampConverter(time);
+
+	if (!isBusinessDay(time)) {
+		return businessDayConverter(stringToBusinessDay(time));
+	}
+
+	return businessDayConverter(time);
+
 }
 
 function getItemValues(item: TimedData, palette: Palette): Bar['value'] {

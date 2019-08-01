@@ -11,7 +11,7 @@ import { BarCoordinates, BarPrice, BarPrices } from './bar';
 import { BarsRange } from './bars-range';
 import { Coordinate } from './coordinate';
 import { IDataSource } from './idata-source';
-import { IPriceDataSource } from './iprice-data-source';
+import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { PriceDataSource } from './price-data-source';
@@ -541,6 +541,26 @@ export class PriceScale {
 		return this._mainSource;
 	}
 
+	public firstValue(): number | null {
+		// TODO: cache the result
+		let result: FirstValue | null = null;
+
+		for (const source of this._dataSources) {
+			if (source instanceof PriceDataSource) {
+				const firstValue = source.firstValue();
+				if (firstValue === null) {
+					continue;
+				}
+
+				if (result === null || firstValue.timePoint < result.timePoint) {
+					result = firstValue;
+				}
+			}
+		}
+
+		return result === null ? null : result.value;
+	}
+
 	public isInverted(): boolean {
 		return this._options.invertScale;
 	}
@@ -842,10 +862,10 @@ export class PriceScale {
 						sourceRange = convertPriceRangeToLog(sourceRange);
 						break;
 					case PriceScaleMode.Percentage:
-						sourceRange = toPercentRange(sourceRange, firstValue);
+						sourceRange = toPercentRange(sourceRange, firstValue.value);
 						break;
 					case PriceScaleMode.IndexedTo100:
-						sourceRange = toIndexedTo100Range(sourceRange, firstValue);
+						sourceRange = toIndexedTo100Range(sourceRange, firstValue.value);
 						break;
 				}
 

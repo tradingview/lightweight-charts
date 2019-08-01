@@ -31,8 +31,7 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 			return;
 		}
 
-		const mainSource = this._priceScale.mainSource();
-		const firstValue = mainSource !== null ? mainSource.firstValue() : null;
+		const firstValue = this._priceScale.firstValue();
 		if (!this._source.visible() || this._priceScale.isEmpty() || (firstValue === null)) {
 			return;
 		}
