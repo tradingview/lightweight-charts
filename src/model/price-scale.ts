@@ -552,7 +552,7 @@ export class PriceScale {
 					continue;
 				}
 
-				if (result === null || result.timePoint > firstValue.timePoint) {
+				if (result === null || firstValue.timePoint < result.timePoint) {
 					result = firstValue;
 				}
 			}
