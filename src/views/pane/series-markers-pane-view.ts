@@ -1,5 +1,6 @@
 import { isNumber } from '../../helpers/strict-type-checks';
 
+import { AutoScaleMargins } from '../../model/autoscale-info';
 import { BarPrice, BarPrices } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
@@ -23,14 +24,14 @@ interface Offsets {
 }
 
 function calcuateY(
-		// tslint:disable-next-line:max-params
-		marker: SeriesMarker<TimePointIndex>,
-		seriesData: BarPrices | BarPrice,
-		offsets: Offsets,
-		shapeMargin: number,
-		priceScale: PriceScale,
-		timeScale: TimeScale,
-		firstValue: number
+	// tslint:disable-next-line:max-params
+	marker: SeriesMarker<TimePointIndex>,
+	seriesData: BarPrices | BarPrice,
+	offsets: Offsets,
+	shapeMargin: number,
+	priceScale: PriceScale,
+	timeScale: TimeScale,
+	firstValue: number
 ): Coordinate {
 	const inBarPrice = isNumber(seriesData) ? seriesData : seriesData.close;
 	const highPrice = isNumber(seriesData) ? seriesData : seriesData.high;
@@ -64,7 +65,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 	private _invalidated: boolean = true;
 	private _dataInvalidated: boolean = true;
 
-	private _autoScaleMargins: number = 0;
+	private _autoScaleMargins: AutoScaleMargins | null = null;
 
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
@@ -93,7 +94,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		return this._renderer;
 	}
 
-	public autoScaleMargins(): number {
+	public autoScaleMargins(): AutoScaleMargins | null {
 		if (this._invalidated) {
 			this._makeValid();
 		}
@@ -119,9 +120,15 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		}
 
 		const shapeMargin = calculateShapeMargin(timeScale.barSpacing());
-		this._autoScaleMargins = seriesMarkers.length > 0
-				? calculateShapeHeight(timeScale.barSpacing()) * 1.5 + shapeMargin * 2
-				: 0;
+		if (seriesMarkers.length > 0) {
+			const marginsAboveAndBelow = calculateShapeHeight(timeScale.barSpacing()) * 1.5 + shapeMargin * 2;
+			this._autoScaleMargins = {
+				above: marginsAboveAndBelow as Coordinate,
+				below: marginsAboveAndBelow as Coordinate,
+			};
+		} else {
+			this._autoScaleMargins = null;
+		}
 
 		this._data.visibleRange = null;
 		const visibleBars = timeScale.visibleBars();

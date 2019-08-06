@@ -22,8 +22,8 @@ export abstract class PriceDataSource extends DataSource implements IPriceDataSo
 		return 0;
 	}
 
-	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo {
-		return new AutoscaleInfo(null);
+	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo | null {
+		return null;
 	}
 
 	public abstract firstValue(): FirstValue | null;

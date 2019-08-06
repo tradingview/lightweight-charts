@@ -11,12 +11,11 @@ export function drawArrow(
 	color: string,
 	barSpacing: number
 ): void {
-	ctx.fillStyle = color;
-	ctx.beginPath();
 	const arrowSize = size(barSpacing, 1);
 	const halfArrowSize = (arrowSize - 1) / 2;
 	const baseSize = size(barSpacing, 0.5);
 	const halfBaseSize = (baseSize - 1) / 2;
+	ctx.fillStyle = color;
 	ctx.beginPath();
 	if (up) {
 		ctx.moveTo(centerX - halfArrowSize, centerY);
