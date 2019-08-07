@@ -62,11 +62,11 @@ export function visibleTimedValues(items: TimedValue[], range: BarsRange, extend
 	let extendedFrom = from;
 	let extendedTo = to;
 
-	if (from > 0 && items[from].time >= firstBar) {
+	if (from > 0 && from < items.length && items[from].time >= firstBar) {
 		extendedFrom = from - 1;
 	}
 
-	if (to < items.length && to > 0 && items[to - 1].time <= lastBar) {
+	if (to > 0 && to < items.length && items[to - 1].time <= lastBar) {
 		extendedTo = to + 1;
 	}
 
