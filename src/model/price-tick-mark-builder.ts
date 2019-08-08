@@ -62,18 +62,8 @@ export class PriceTickMarkBuilder {
 	public rebuildTickMarks(): void {
 		const priceScale = this._priceScale;
 
-		if (priceScale.isEmpty()) {
-			this._marks = [];
-			return;
-		}
+		const firstValue = priceScale.firstValue();
 
-		const mainSource = priceScale.mainSource();
-		if (mainSource === null) {
-			this._marks = [];
-			return;
-		}
-
-		const firstValue = mainSource.firstValue();
 		if (firstValue === null) {
 			this._marks = [];
 			return;

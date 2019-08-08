@@ -77,6 +77,6 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		}
 
 		this._itemsVisibleRange = visibleTimedValues(this._items, visibleBars, this._extendedVisibleRange);
-		this._convertToCoordinates(priceScale, timeScale, firstValue);
+		this._convertToCoordinates(priceScale, timeScale, firstValue.value);
 	}
 }

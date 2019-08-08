@@ -11,7 +11,8 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 	protected _updateImpl(): void {
 		this._lineRendererData.visible = false;
 
-		const mode = this._series.priceScale().mode().mode;
+		const priceScale = this._series.priceScale();
+		const mode = priceScale.mode().mode;
 		if (mode !== PriceScaleMode.Percentage && mode !== PriceScaleMode.IndexedTo100) {
 			return;
 		}
@@ -28,9 +29,9 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 		}
 
 		this._lineRendererData.visible = true;
-		this._lineRendererData.y = this._series.priceScale().priceToCoordinate(firstValue, firstValue);
+		this._lineRendererData.y = priceScale.priceToCoordinate(firstValue.value, firstValue.value);
 		this._lineRendererData.width = this._model.timeScale().width();
-		this._lineRendererData.height = this._series.priceScale().height();
+		this._lineRendererData.height = priceScale.height();
 		this._lineRendererData.color = seriesOptions.baseLineColor;
 		this._lineRendererData.lineWidth = seriesOptions.baseLineWidth;
 		this._lineRendererData.lineStyle = seriesOptions.baseLineStyle;
