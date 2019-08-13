@@ -519,7 +519,14 @@ export class ChartModel implements IDestroyable {
 		const pane = this._panes[0];
 		const series = this._createSeries(options, seriesType, pane);
 		this._serieses.push(series);
-		this.lightUpdate();
+
+		if (this._serieses.length === 1) {
+			// call fullUpdate to recalculate chart's parts geometry
+			this.fullUpdate();
+		} else {
+			this.lightUpdate();
+		}
+
 		return series;
 	}
 
