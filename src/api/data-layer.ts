@@ -8,6 +8,7 @@ import { Palette } from '../model/palette';
 import { PlotRow, PlotValue } from '../model/plot-data';
 import { Series } from '../model/series';
 import { Bar } from '../model/series-data';
+import { SeriesType } from '../model/series-options';
 import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../model/time-data';
 
 import {
@@ -70,7 +71,7 @@ function timestampConverter(time: Time): TimePoint {
 	};
 }
 
-type TimedData = Pick<LineData | BarData | HistogramData, 'time'>;
+export type TimedData = Pick<LineData | BarData | HistogramData, 'time'>;
 
 function selectTimeConverter(data: TimedData[]): TimeConverter | null {
 	if (data.length === 0) {
@@ -95,22 +96,30 @@ export function convertTime(time: Time): TimePoint {
 
 }
 
-function getItemValues(item: TimedData, palette: Palette): Bar['value'] {
-	if ('value' in item) {
-		const val = (item as LineData).value;
-		// default value
-		let color: PlotValue = null;
-		if ('color' in item) {
-			const histItem = item as HistogramData;
-			if (histItem.color !== undefined) {
-				color = palette.addColor(histItem.color);
-			}
+function getLineBasedSeriesItemValue(item: TimedData, palette: Palette): Bar['value'] {
+	const val = (item as LineData).value;
+	// default value
+	let color: PlotValue = null;
+	if ('color' in item) {
+		const histItem = item as HistogramData;
+		if (histItem.color !== undefined) {
+			color = palette.addColor(histItem.color);
 		}
-		return [val, val, val, val, color];
-	} else {
-		const bar = item as BarData;
-		return [bar.open, bar.high, bar.low, bar.close, null];
 	}
+	return [val, val, val, val, color];
+}
+
+function getOHLCBasedSeriesItemValue(item: TimedData, palette: Palette): Bar['value'] {
+	const bar = item as BarData;
+	return [bar.open, bar.high, bar.low, bar.close, null];
+}
+
+type ItemValuesFn = (item: TimedData, palette: Palette) => Bar['value'];
+
+const ohlcBasedSeriesTypes = new Set<SeriesType>(['Bar', 'Candlestick']);
+
+function seriesItemValueFn(seriesType: SeriesType): ItemValuesFn {
+	return ohlcBasedSeriesTypes.has(seriesType) ? getOHLCBasedSeriesItemValue : getLineBasedSeriesItemValue;
 }
 
 function hours(count: number): number {
@@ -317,6 +326,8 @@ export class DataLayer {
 					return;
 				}
 
+				const getItemValues = seriesItemValueFn(currentSeries.seriesType());
+
 				const packet = seriesUpdates.get(currentSeries) || newSeriesUpdatePacket();
 				const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
 					index,
@@ -355,6 +366,7 @@ export class DataLayer {
 			pointData.index = index as TimePointIndex;
 			pointData.mapping.forEach((targetData: TimedData, targetSeries: Series) => {
 				// add point to series
+				const getItemValues = seriesItemValueFn(targetSeries.seriesType());
 				const packet = seriesUpdates.get(targetSeries) || newSeriesUpdatePacket();
 				const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
 					index: index as TimePointIndex,

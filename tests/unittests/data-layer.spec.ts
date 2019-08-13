@@ -1,25 +1,23 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { convertTime, DataLayer, SeriesUpdatePacket, stringToBusinessDay } from '../../src/api/data-layer';
+import { convertTime, DataLayer, SeriesUpdatePacket, stringToBusinessDay, TimedData } from '../../src/api/data-layer';
 import { ensureDefined } from '../../src/helpers/assertions';
 import { Palette } from '../../src/model/palette';
 import { Series } from '../../src/model/series';
-import { SeriesData } from '../../src/model/series-data';
+import { SeriesData, SeriesPlotIndex } from '../../src/model/series-data';
+import { SeriesType } from '../../src/model/series-options';
 import { BusinessDay, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 // TODO: add tests for marks spans
 
-function createSeriesMock(): Series {
+function createSeriesMock(seriesType: SeriesType = 'Line'): Series {
 	const data = new SeriesData();
 	// tslint:disable-next-line:no-object-literal-type-assertion
 	return {
-		data: () => {
-			return data;
-		},
-		palette: () => {
-			return new Palette();
-		},
+		data: () => data,
+		palette: () => new Palette(),
+		seriesType: () => seriesType,
 	} as Series;
 }
 
@@ -291,6 +289,7 @@ describe('DataLayer', () => {
 		expect(updateResult2.timeScaleUpdate.marks[4].time).to.be.deep.equal({ timestamp: 5000 });
 		expect(updateResult2.timeScaleUpdate.marks[5].time).to.be.deep.equal({ timestamp: 6000 });
 	});
+
 	it('allow business days', () => {
 		const dataLayer = new DataLayer();
 		const series1 = createSeriesMock();
@@ -335,12 +334,14 @@ describe('DataLayer', () => {
 		expect(updateResult1.timeScaleUpdate.marks[1].index).to.be.equal(1 as TimePointIndex);
 		expect(updateResult1.timeScaleUpdate.marks[1].time).to.be.deep.equal(timePoint2);
 	});
+
 	it('all points should have same time type', () => {
 		const dataLayer = new DataLayer();
 		const series = createSeriesMock();
 		expect(() => dataLayer.setSeriesData(series, [{ time: 5000 as UTCTimestamp }, { time: { day: 1, month: 10, year: 2019 } }]))
 			.to.throw();
 	});
+
 	it('all points should have same time type on updating', () => {
 		const dataLayer = new DataLayer();
 		const series = createSeriesMock();
@@ -350,13 +351,46 @@ describe('DataLayer', () => {
 		expect(() => dataLayer.updateSeriesData(series, { time: 5000 as UTCTimestamp }))
 			.to.throw();
 	});
+
 	it('convertTime', () => {
 		expect(convertTime(1554792010 as UTCTimestamp)).to.be.deep.equal({ timestamp: 1554792010 });
 		const bd: BusinessDay = { day: 1, month: 10, year: 2018 };
 		expect(convertTime(bd)).to.be.deep.equal({ timestamp: 1538352000, businessDay: bd });
 	});
+
 	it('stringToBusinessDay', () => {
 		expect(stringToBusinessDay('2019-05-01')).to.be.deep.equal({ day: 1, month: 5, year: 2019 });
 		expect(() => stringToBusinessDay('2019-15-01')).to.throw();
+	});
+
+	it('stringToBusinessDay', () => {
+		expect(stringToBusinessDay('2019-05-01')).to.be.deep.equal({ day: 1, month: 5, year: 2019 });
+		expect(() => stringToBusinessDay('2019-15-01')).to.throw();
+	});
+
+	it('should ignore "value" fields on OHLC-based series update', () => {
+		const ohlcBasedTypes: SeriesType[] = ['Bar', 'Candlestick'];
+
+		for (const seriesType of ohlcBasedTypes) {
+			const dataLayer = new DataLayer();
+			const series = createSeriesMock(seriesType);
+
+			const item = {
+				time: '2017-01-01',
+				open: 10,
+				high: 15,
+				low: 5,
+				close: 11,
+				value: 100,
+			};
+
+			const packet = dataLayer.setSeriesData(series, [item] as TimedData[]);
+			const update = ensureDefined(packet.timeScaleUpdate.seriesUpdates.get(series));
+
+			expect(update.update[0].value[SeriesPlotIndex.Open]).to.be.equal(item.open);
+			expect(update.update[0].value[SeriesPlotIndex.High]).to.be.equal(item.high);
+			expect(update.update[0].value[SeriesPlotIndex.Low]).to.be.equal(item.low);
+			expect(update.update[0].value[SeriesPlotIndex.Close]).to.be.equal(item.close);
+		}
 	});
 });
