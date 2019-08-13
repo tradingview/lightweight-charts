@@ -6,7 +6,7 @@ import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
-import { SeriesMarker } from '../../model/series-markers';
+import { InternalSeriesMarker, SeriesMarker } from '../../model/series-markers';
 import { TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
@@ -107,14 +107,14 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		const timeScale = this._model.timeScale();
 		const seriesMarkers = this._series.indexedMarkers();
 		if (this._dataInvalidated) {
-			this._data.items = seriesMarkers.map((marker: SeriesMarker<TimePointIndex>) => ({
+			this._data.items = seriesMarkers.map((marker: InternalSeriesMarker<TimePointIndex>) => ({
 				time: marker.time,
 				x: 0 as Coordinate,
 				y: 0 as Coordinate,
 				shape: marker.shape,
 				color: marker.color,
-				id: marker.id,
-				externalId: marker.externalId,
+				internalId: marker.id,
+				externalId: marker.internalId,
 			}));
 			this._dataInvalidated = false;
 		}
