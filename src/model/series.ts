@@ -547,7 +547,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			shape: marker.shape,
 			color: marker.color,
 			id: marker.id,
-			internalId: index.toString(),
+			internalId: index,
 		}));
 	}
 }

@@ -14,7 +14,7 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 	y: Coordinate;
 	shape: SeriesMarkerShape;
 	color: string;
-	internalId: string;
+	internalId: number;
 	externalId?: string;
 }
 
@@ -31,7 +31,7 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, isHovered: boolean, objectId?: string): void {
+	public draw(ctx: CanvasRenderingContext2D, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
@@ -53,7 +53,7 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 			const item = this._data.items[i];
 			if (hitTestItem(item, this._data.barSpacing, x, y)) {
 				return {
-					internalId: item.internalId,
+					hitTestData: item.internalId,
 					externalId: item.externalId,
 				};
 			}

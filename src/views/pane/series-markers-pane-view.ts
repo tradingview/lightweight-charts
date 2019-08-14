@@ -113,8 +113,8 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				y: 0 as Coordinate,
 				shape: marker.shape,
 				color: marker.color,
-				internalId: marker.id,
-				externalId: marker.internalId,
+				internalId: marker.internalId,
+				externalId: marker.id,
 			}));
 			this._dataInvalidated = false;
 		}

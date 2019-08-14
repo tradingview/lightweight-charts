@@ -591,7 +591,7 @@ export class PaneWidget implements IDestroyable {
 		const hoveredSource = state.model().hoveredSource();
 		const isHovered = hoveredSource !== null && hoveredSource.source === source;
 		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
-			? hoveredSource.object.internalId
+			? hoveredSource.object.hitTestData
 			: undefined;
 
 		for (const paneView of paneViews) {
@@ -612,7 +612,7 @@ export class PaneWidget implements IDestroyable {
 		const hoveredSource = state.model().hoveredSource();
 		const isHovered = hoveredSource !== null && hoveredSource.source === source;
 		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
-			? hoveredSource.object.internalId
+			? hoveredSource.object.hitTestData
 			: undefined;
 
 		for (const paneView of paneViews) {

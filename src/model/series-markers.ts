@@ -11,5 +11,5 @@ export interface SeriesMarker<TimeType> {
 }
 
 export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {
-	internalId: string;
+	internalId: number;
 }

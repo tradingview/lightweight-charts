@@ -39,7 +39,7 @@ export interface HandleScaleOptions {
 }
 
 export interface HoveredObject {
-	internalId?: string;
+	hitTestData?: unknown;
 	externalId?: string;
 }
 
