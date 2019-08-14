@@ -1,7 +1,7 @@
 import { Coordinate } from '../model/coordinate';
 
 import { hitTestSquare } from './series-markers-square';
-import { size } from './series-markers-utils';
+import { ceilToOdd, shapeSize } from './series-markers-utils';
 
 export function drawArrow(
 	up: boolean,
@@ -9,11 +9,11 @@ export function drawArrow(
 	centerX: Coordinate,
 	centerY: Coordinate,
 	color: string,
-	barSpacing: number
+	size: number
 ): void {
-	const arrowSize = size(barSpacing, 1);
+	const arrowSize = shapeSize('arrowUp', size);
 	const halfArrowSize = (arrowSize - 1) / 2;
-	const baseSize = size(barSpacing, 0.5);
+	const baseSize = ceilToOdd(size / 2);
 	const halfBaseSize = (baseSize - 1) / 2;
 	ctx.fillStyle = color;
 	ctx.beginPath();
@@ -41,10 +41,10 @@ export function hitTestArrow(
 	up: boolean,
 	centerX: Coordinate,
 	centerY: Coordinate,
-	barSpacing: number,
+	size: number,
 	x: Coordinate,
 	y: Coordinate
 ): boolean {
 	// TODO: implement arrow hit test
-	return hitTestSquare(centerX, centerY, barSpacing, x, y);
+	return hitTestSquare(centerX, centerY, size, x, y);
 }

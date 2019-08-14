@@ -12,6 +12,7 @@ import { drawSquare, hitTestSquare } from './series-markers-square';
 
 export interface SeriesMarkerRendererDataItem extends TimedValue {
 	y: Coordinate;
+	size: Coordinate;
 	shape: SeriesMarkerShape;
 	color: string;
 	internalId: number;
@@ -21,7 +22,6 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 export interface SeriesMarkerRendererData {
 	items: SeriesMarkerRendererDataItem[];
 	visibleRange: SeriesItemsIndexesRange | null;
-	barSpacing: number;
 }
 
 export class SeriesMarkersRenderer implements IPaneRenderer {
@@ -39,7 +39,7 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 		ctx.translate(0.5, 0.5);
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
-			drawItem(item, ctx, item.color, this._data.barSpacing);
+			drawItem(item, ctx);
 		}
 		ctx.restore();
 	}
@@ -51,7 +51,7 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
-			if (hitTestItem(item, this._data.barSpacing, x, y)) {
+			if (hitTestItem(item, x, y)) {
 				return {
 					hitTestData: item.internalId,
 					externalId: item.externalId,
@@ -63,35 +63,35 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 	}
 }
 
-function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, color: string, barSpacing: number): void {
+function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
 	switch (item.shape) {
 		case 'arrowDown':
-			drawArrow(true, ctx, item.x, item.y, color, barSpacing);
+			drawArrow(true, ctx, item.x, item.y, item.color, item.size);
 			return;
 		case 'arrowUp':
-			drawArrow(false, ctx, item.x, item.y, color, barSpacing);
+			drawArrow(false, ctx, item.x, item.y, item.color, item.size);
 			return;
 		case 'circle':
-			drawCircle(ctx, item.x, item.y, color, barSpacing);
+			drawCircle(ctx, item.x, item.y, item.color, item.size);
 			return;
 		case 'square':
-			drawSquare(ctx, item.x, item.y, color, barSpacing);
+			drawSquare(ctx, item.x, item.y, item.color, item.size);
 			return;
 	}
 
 	ensureNever(item.shape);
 }
 
-function hitTestItem(item: SeriesMarkerRendererDataItem, barSpacing: number, x: Coordinate, y: Coordinate): boolean {
+function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coordinate): boolean {
 	switch (item.shape) {
 		case 'arrowDown':
-			return hitTestArrow(true, item.x, item.y, barSpacing, x, y);
+			return hitTestArrow(true, item.x, item.y, item.size, x, y);
 		case 'arrowUp':
-			return hitTestArrow(false, item.x, item.y, barSpacing, x, y);
+			return hitTestArrow(false, item.x, item.y, item.size, x, y);
 		case 'circle':
-			return hitTestCircle(item.x, item.y, barSpacing, x, y);
+			return hitTestCircle(item.x, item.y, item.size, x, y);
 		case 'square':
-			return hitTestSquare(item.x, item.y, barSpacing, x , y);
+			return hitTestSquare(item.x, item.y, item.size, x , y);
 	}
 
 	ensureNever(item.shape);

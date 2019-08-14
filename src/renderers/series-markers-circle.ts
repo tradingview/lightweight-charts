@@ -7,10 +7,10 @@ export function drawCircle(
 	centerX: Coordinate,
 	centerY: Coordinate,
 	color: string,
-	barSpacing: number
+	size: number
 ): void {
-	const size = shapeSize('circle', barSpacing);
-	const halfSize = (size - 1) / 2;
+	const circleSize = shapeSize('circle', size);
+	const halfSize = (circleSize - 1) / 2;
 	ctx.fillStyle = color;
 	ctx.beginPath();
 	ctx.arc(centerX, centerY, halfSize, 0, 2 * Math.PI, false);
@@ -20,12 +20,12 @@ export function drawCircle(
 export function hitTestCircle(
 	centerX: Coordinate,
 	centerY: Coordinate,
-	barSpacing: number,
+	size: number,
 	x: Coordinate,
 	y: Coordinate
 ): boolean {
-	const diameter = shapeSize('circle', barSpacing);
-	const tolerance = 2 + diameter * 0.5;
+	const circleSize = shapeSize('circle', size);
+	const tolerance = 2 + circleSize / 2;
 
 	const xOffset = centerX - x;
 	const yOffset = centerY - y;

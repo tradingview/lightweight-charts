@@ -13,15 +13,15 @@ export function size(barSpacing: number, coeff: number): number {
 	return ceilToOdd(result);
 }
 
-export function shapeSize(shape: SeriesMarkerShape, barSpacing: number): number {
+export function shapeSize(shape: SeriesMarkerShape, originalSize: number): number {
 	switch (shape) {
 		case 'arrowDown':
 		case 'arrowUp':
-			return size(barSpacing, 1);
+			return size(originalSize, 1);
 		case 'circle':
-			return size(barSpacing, 0.8);
+			return size(originalSize, 0.8);
 		case 'square':
-			return size(barSpacing, 0.7);
+			return size(originalSize, 0.7);
 	}
 
 	ensureNever(shape);

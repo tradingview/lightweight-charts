@@ -1,3 +1,4 @@
+import { ensureNever } from '../../helpers/assertions';
 import { isNumber } from '../../helpers/strict-type-checks';
 
 import { AutoScaleMargins } from '../../model/autoscale-info';
@@ -10,7 +11,11 @@ import { InternalSeriesMarker, SeriesMarker } from '../../model/series-markers';
 import { TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
-import { SeriesMarkerRendererData, SeriesMarkersRenderer } from '../../renderers/series-markers-renderer';
+import {
+	SeriesMarkerRendererData,
+	SeriesMarkerRendererDataItem,
+	SeriesMarkersRenderer,
+} from '../../renderers/series-markers-renderer';
 import {
 	calculateShapeHeight,
 	shapeMargin as calculateShapeMargin,
@@ -23,8 +28,9 @@ interface Offsets {
 	belowBar: number;
 }
 
-function calcuateY(
+function fillSizeAndY(
 	// tslint:disable-next-line:max-params
+	rendererItem: SeriesMarkerRendererDataItem,
 	marker: SeriesMarker<TimePointIndex>,
 	seriesData: BarPrices | BarPrice,
 	offsets: Offsets,
@@ -32,29 +38,30 @@ function calcuateY(
 	priceScale: PriceScale,
 	timeScale: TimeScale,
 	firstValue: number
-): Coordinate {
+): void {
 	const inBarPrice = isNumber(seriesData) ? seriesData : seriesData.close;
 	const highPrice = isNumber(seriesData) ? seriesData : seriesData.high;
 	const lowPrice = isNumber(seriesData) ? seriesData : seriesData.low;
 	const shapeSize = calculateShapeHeight(timeScale.barSpacing());
-	let res: Coordinate = 0 as Coordinate;
+	rendererItem.size = shapeSize as Coordinate;
 	switch (marker.position) {
 		case 'inBar': {
-			res = priceScale.priceToCoordinate(inBarPrice, firstValue);
-			break;
+			rendererItem.y = priceScale.priceToCoordinate(inBarPrice, firstValue);
+			return;
 		}
 		case 'aboveBar': {
-			res = (priceScale.priceToCoordinate(highPrice, firstValue) - shapeSize / 2 - offsets.aboveBar) as Coordinate;
+			rendererItem.y = (priceScale.priceToCoordinate(highPrice, firstValue) - shapeSize / 2 - offsets.aboveBar) as Coordinate;
 			offsets.aboveBar += shapeSize + shapeMargin;
-			break;
+			return;
 		}
 		case 'belowBar': {
-			res = (priceScale.priceToCoordinate(lowPrice, firstValue) + shapeSize / 2 + offsets.belowBar) as Coordinate;
+			rendererItem.y = (priceScale.priceToCoordinate(lowPrice, firstValue) + shapeSize / 2 + offsets.belowBar) as Coordinate;
 			offsets.belowBar += shapeSize + shapeMargin;
-			break;
+			return;
 		}
 	}
-	return res;
+
+	ensureNever(marker.position);
 }
 
 export class SeriesMarkersPaneView implements IUpdatablePaneView {
@@ -75,7 +82,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		this._data = {
 			items: [],
 			visibleRange: null,
-			barSpacing: 0,
 		};
 	}
 
@@ -111,6 +117,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				time: marker.time,
 				x: 0 as Coordinate,
 				y: 0 as Coordinate,
+				size: 0 as Coordinate,
 				shape: marker.shape,
 				color: marker.color,
 				internalId: marker.internalId,
@@ -146,7 +153,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			belowBar: shapeMargin,
 		};
 		this._data.visibleRange = visibleTimedValues(this._data.items, visibleBars, true);
-		this._data.barSpacing = timeScale.barSpacing();
 		for (let index = this._data.visibleRange.from; index < this._data.visibleRange.to; index++) {
 			const marker = seriesMarkers[index];
 			if (marker.time !== prevTimeIndex) {
@@ -155,12 +161,14 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				offsets.belowBar = shapeMargin;
 				prevTimeIndex = marker.time;
 			}
-			this._data.items[index].x = timeScale.indexToCoordinate(marker.time);
+
+			const rendererItem = this._data.items[index];
+			rendererItem.x = timeScale.indexToCoordinate(marker.time);
 			const dataAt = this._series.dataAt(marker.time);
 			if (dataAt === null) {
 				continue;
 			}
-			this._data.items[index].y = calcuateY(marker, dataAt, offsets, shapeMargin, priceScale, timeScale, firstValue.value);
+			fillSizeAndY(rendererItem, marker, dataAt, offsets, shapeMargin, priceScale, timeScale, firstValue.value);
 		}
 		this._invalidated = false;
 	}

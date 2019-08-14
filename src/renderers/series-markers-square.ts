@@ -7,28 +7,28 @@ export function drawSquare(
 	centerX: Coordinate,
 	centerY: Coordinate,
 	color: string,
-	barSpacing: number
+	size: number
 ): void {
-	const size = shapeSize('square', barSpacing);
-	const halfSize = (size - 1) / 2;
+	const squareSize = shapeSize('square', size);
+	const halfSize = (squareSize - 1) / 2;
 	const left = centerX - halfSize;
 	const top = centerY - halfSize;
 	ctx.fillStyle = color;
-	ctx.fillRect(left, top, size, size);
+	ctx.fillRect(left, top, squareSize, squareSize);
 }
 
 export function hitTestSquare(
 	centerX: Coordinate,
 	centerY: Coordinate,
-	barSpacing: number,
+	size: number,
 	x: Coordinate,
 	y: Coordinate
 ): boolean {
-	const size = shapeSize('square', barSpacing);
-	const halfSize = (size - 1) / 2;
+	const squareSize = shapeSize('square', size);
+	const halfSize = (squareSize - 1) / 2;
 	const left = centerX - halfSize;
 	const top = centerY - halfSize;
 
-	return x >= left && x <= left + size &&
-		y >= top && y <= top + size;
+	return x >= left && x <= left + squareSize &&
+		y >= top && y <= top + squareSize;
 }
