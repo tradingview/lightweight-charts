@@ -294,7 +294,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._palette;
 	}
 
-	public seriesType(): SeriesType {
+	public seriesType(): T {
 		return this._seriesType;
 	}
 
