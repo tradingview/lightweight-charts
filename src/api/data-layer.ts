@@ -8,6 +8,7 @@ import { Palette } from '../model/palette';
 import { PlotRow, PlotValue } from '../model/plot-data';
 import { Series } from '../model/series';
 import { Bar } from '../model/series-data';
+import { SeriesType } from '../model/series-options';
 import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../model/time-data';
 
 import {
@@ -16,6 +17,7 @@ import {
 	isBusinessDay,
 	isUTCTimestamp,
 	LineData,
+	SeriesDataItemTypeMap,
 	Time,
 } from './data-consumer';
 
@@ -70,7 +72,8 @@ function timestampConverter(time: Time): TimePoint {
 	};
 }
 
-type TimedData = Pick<LineData | BarData | HistogramData, 'time'>;
+export type DataItemType = SeriesDataItemTypeMap[SeriesType];
+export type TimedData = Pick<DataItemType, 'time'>;
 
 function selectTimeConverter(data: TimedData[]): TimeConverter | null {
 	if (data.length === 0) {
@@ -95,22 +98,41 @@ export function convertTime(time: Time): TimePoint {
 
 }
 
-function getItemValues(item: TimedData, palette: Palette): Bar['value'] {
-	if ('value' in item) {
-		const val = (item as LineData).value;
-		// default value
-		let color: PlotValue = null;
-		if ('color' in item) {
-			const histItem = item as HistogramData;
-			if (histItem.color !== undefined) {
-				color = palette.addColor(histItem.color);
-			}
+function getLineBasedSeriesItemValue(item: LineData | HistogramData, palette: Palette): Bar['value'] {
+	const val = item.value;
+	// default value
+	let color: PlotValue = null;
+	if ('color' in item) {
+		if (item.color !== undefined) {
+			color = palette.addColor(item.color);
 		}
-		return [val, val, val, val, color];
-	} else {
-		const bar = item as BarData;
-		return [bar.open, bar.high, bar.low, bar.close, null];
 	}
+	return [val, val, val, val, color];
+}
+
+function getOHLCBasedSeriesItemValue(bar: BarData, palette: Palette): Bar['value'] {
+	return [bar.open, bar.high, bar.low, bar.close, null];
+}
+
+// we want to have compile-time checks that the type of the functions is correct
+// but due contravariance we cannot easily use type of values of the SeriesItemValueFnMap map itself
+// so let's use TimedSeriesItemValueFn for shut up the compiler in seriesItemValueFn
+// we need to be sure (and we're sure actually) that stored data has correct type for it's according series object
+type SeriesItemValueFnMap = {
+	[T in keyof SeriesDataItemTypeMap]: (item: SeriesDataItemTypeMap[T], palette: Palette) => Bar['value'];
+};
+type TimedSeriesItemValueFn = (item: TimedData, palette: Palette) => Bar['value'];
+
+const seriesItemValueFnMap: SeriesItemValueFnMap = {
+	Candlestick: getOHLCBasedSeriesItemValue,
+	Bar: getOHLCBasedSeriesItemValue,
+	Area: getLineBasedSeriesItemValue,
+	Histogram: getLineBasedSeriesItemValue,
+	Line: getLineBasedSeriesItemValue,
+};
+
+function seriesItemValueFn(seriesType: SeriesType): TimedSeriesItemValueFn {
+	return seriesItemValueFnMap[seriesType] as TimedSeriesItemValueFn;
 }
 
 function hours(count: number): number {
@@ -177,7 +199,8 @@ function spanByTime(time: TimePoint, previousTime: TimePoint | null): number {
 }
 
 interface TimePointData {
-	mapping: Map<Series, TimedData>;
+	// actually the type of the value should be related to the series' type (generic type)
+	mapping: Map<Series, DataItemType>;
 	index: TimePointIndex;
 	timePoint: TimePoint;
 }
@@ -234,17 +257,17 @@ export class DataLayer {
 		this._sortedTimePoints = [];
 	}
 
-	public setSeriesData(series: Series, data: TimedData[]): UpdatePacket {
+	public setSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): UpdatePacket {
 		// palette will be filled inside _setNewPoints
 		series.palette().clear();
 		convertStringsToBusinessDays(data);
 		this._pointDataByTimePoint.forEach((value: TimePointData) => value.mapping.delete(series));
 		const timeConverter = selectTimeConverter(data);
 		if (timeConverter !== null) {
-			data.forEach((item: TimedData) => {
+			data.forEach((item: SeriesDataItemTypeMap[TSeriesType]) => {
 				const time = timeConverter(item.time);
 				const timePointData: TimePointData = this._pointDataByTimePoint.get(time.timestamp) ||
-					{ index: 0 as TimePointIndex, mapping: new Map<Series, TimedData>(), timePoint: time };
+					{ index: 0 as TimePointIndex, mapping: new Map<Series, SeriesDataItemTypeMap[TSeriesType]>(), timePoint: time };
 				timePointData.mapping.set(series, item);
 				this._pointDataByTimePoint.set(time.timestamp, timePointData);
 			});
@@ -265,7 +288,7 @@ export class DataLayer {
 		return this.setSeriesData(series, []);
 	}
 
-	public updateSeriesData(series: Series, data: TimedData): UpdatePacket {
+	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): UpdatePacket {
 		// check types
 		convertStringToBusinessDay(data);
 		const bars = series.data().bars();
@@ -286,7 +309,7 @@ export class DataLayer {
 		const changedTimePointTime = ensureNotNull(selectTimeConverter([data]))(data.time);
 
 		const pointData: TimePointData = this._pointDataByTimePoint.get(changedTimePointTime.timestamp) ||
-			{ index: 0 as TimePointIndex, mapping: new Map<Series, TimedData>(), timePoint: changedTimePointTime };
+			{ index: 0 as TimePointIndex, mapping: new Map<Series, SeriesDataItemTypeMap[TSeriesType]>(), timePoint: changedTimePointTime };
 		const newPoint = pointData.mapping.size === 0;
 		pointData.mapping.set(series, data);
 		let updateAllSeries = false;
@@ -312,10 +335,12 @@ export class DataLayer {
 		for (let index = pointData.index; index < this._pointDataByTimePoint.size; ++index) {
 			const timePoint = ensureDefined(this._timePointsByIndex.get(index));
 			const currentIndexData = ensureDefined(this._pointDataByTimePoint.get(timePoint.timestamp));
-			currentIndexData.mapping.forEach((currentData: TimedData, currentSeries: Series) => {
+			currentIndexData.mapping.forEach((currentData: DataItemType, currentSeries: Series) => {
 				if (!updateAllSeries && currentSeries !== series) {
 					return;
 				}
+
+				const getItemValues = seriesItemValueFn(currentSeries.seriesType());
 
 				const packet = seriesUpdates.get(currentSeries) || newSeriesUpdatePacket();
 				const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
@@ -353,8 +378,9 @@ export class DataLayer {
 		this._sortedTimePoints.forEach((time: TimePoint, index: number) => {
 			const pointData = ensureDefined(this._pointDataByTimePoint.get(time.timestamp));
 			pointData.index = index as TimePointIndex;
-			pointData.mapping.forEach((targetData: TimedData, targetSeries: Series) => {
+			pointData.mapping.forEach((targetData: DataItemType, targetSeries: Series) => {
 				// add point to series
+				const getItemValues = seriesItemValueFn(targetSeries.seriesType());
 				const packet = seriesUpdates.get(targetSeries) || newSeriesUpdatePacket();
 				const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
 					index: index as TimePointIndex,

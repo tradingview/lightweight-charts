@@ -6,14 +6,14 @@
 
 [Search the existing issues](https://github.com/tradingview/lightweight-charts/search?type=Issues) before logging a new one.
 
-*Don't* restrict your search to only open issues. An issue with a title similar to yours may have been closed as a duplicate of one with a less-findable title.
+_Don't_ restrict your search to only open issues. An issue with a title similar to yours may have been closed as a duplicate of one with a less-findable title.
 
 ### Filing an Issue
 
 When logging a bug, please be sure to include the following:
 
 - What version of the library you're using.
-- If at all possible, an *isolated way* to reproduce the behavior.
+- If at all possible, an _isolated way_ to reproduce the behavior.
 - The behavior you expect to see, and the actual behavior (e.g. screenshots).
 - Make sure the issue title is understandable and searchable.
 

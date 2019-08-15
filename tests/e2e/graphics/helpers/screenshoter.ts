@@ -5,6 +5,7 @@ import {
 	Browser,
 	launch as launchPuppeteer,
 	LaunchOptions,
+	Page,
 	Response,
 } from 'puppeteer';
 
@@ -37,7 +38,7 @@ export class Screenshoter {
 	}
 
 	public async generateScreenshot(pageContent: string): Promise<PNG> {
-		let page;
+		let page: Page | undefined;
 
 		try {
 			const browser = await this._browserPromise;
