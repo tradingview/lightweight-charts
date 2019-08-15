@@ -81,6 +81,11 @@ jobs:
     steps:
       - checkout-with-deps
       - run: npm run tsc-all
+
+      # make sure that the project is compiled with non-composite project
+      # it doesn't output anything, but is used by IDE or tools
+      - run: ./node_modules/.bin/tsc -p tsconfig.json
+
       - run: npm run build:prod
       - persist_to_workspace:
           root: ./
