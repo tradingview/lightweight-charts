@@ -61,8 +61,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const xInside = alignRight ? width - horzBorder - 0.5 : 0.5;
 
 		let xOutside = xInside;
-		let xTick;
-		let xText;
+		let xTick: number;
+		let xText: number;
 
 		ctx.fillStyle = resetTransparency(this._commonData.background);
 		ctx.lineWidth = 1;

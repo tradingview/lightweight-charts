@@ -6,3 +6,13 @@ checks:
           maxSize: 44KB
         - path: "./dist/lightweight-charts.standalone.production.js"
           maxSize: 44KB
+
+  - name: type-coverage-watcher
+    options:
+      atLeast: 99.9
+      ignoreCatch: true
+      strict: true
+      ignoreFiles:
+        - "lib/**"
+        - "src/helpers/canvas-wrapper.ts"
+        - "src/helpers/strict-type-checks.ts"

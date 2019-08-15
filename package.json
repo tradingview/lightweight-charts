@@ -34,6 +34,7 @@
   "devDependencies": {
     "@codechecks/build-size-watcher": "~0.1.0",
     "@codechecks/client": "~0.1.5",
+    "@codechecks/type-coverage-watcher": "~0.1.3",
     "@types/chai": "~4.2.0",
     "@types/mocha": "~5.2.7",
     "chai": "~4.2.0",

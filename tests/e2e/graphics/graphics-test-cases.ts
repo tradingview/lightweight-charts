@@ -35,8 +35,8 @@ if (isNaN(devicePixelRatio)) {
 const devicePixelRatioStr = devicePixelRatio.toFixed(2);
 
 const testResultsOutDir = path.resolve(process.env.CMP_OUT_DIR || path.join(__dirname, '.gendata'));
-const goldenStandalonePath = process.env[goldenStandalonePathEnvKey] || '';
-const testStandalonePath = process.env[testStandalonePathEnvKey] || '';
+const goldenStandalonePath: string = process.env[goldenStandalonePathEnvKey] || '';
+const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
 function rmRf(dir: string): void {
 	if (!fs.existsSync(dir)) {

@@ -220,7 +220,7 @@ export class Crosshair extends DataSource {
 			this._priceAxisViews.clear();
 		}
 
-		const views = [];
+		const views: IPriceAxisView[] = [];
 		if (this._pane === pane) {
 			views.push(this._createPriceAxisViewOnDemand(this._priceAxisViews, priceScale, this._currentPosPriceProvider));
 		}
