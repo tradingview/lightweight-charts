@@ -183,6 +183,7 @@ export class TimeScale {
 		}
 
 		this._width = width;
+		this._visibleBarsInvalidated = true;
 		this._correctOffset();
 	}
 
@@ -314,6 +315,7 @@ export class TimeScale {
 		this._clearCommonTransitionsStartState();
 		this._tickMarks.reset();
 		this._leftEdgeIndex = null;
+		// this._rightOffset = this._options.rightOffset;;
 	}
 
 	public restoreDefault(): void {
