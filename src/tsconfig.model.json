@@ -4,8 +4,8 @@
 		"composite": true
 	},
 	"references": [
-		{ "path": "./formatters" },
-		{ "path": "./helpers" }
+		{ "path": "./formatters/tsconfig.composite.json" },
+		{ "path": "./helpers/tsconfig.composite.json" }
 	],
 	"include": [
 		"./model/**/*.ts",

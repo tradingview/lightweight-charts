@@ -29,6 +29,8 @@
 			"./src/typings",
 			"node_modules/@types"
 		],
-		"types": []
+		"types": [
+			"_global-types"
+		]
 	}
 }
