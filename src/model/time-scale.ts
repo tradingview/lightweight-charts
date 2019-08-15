@@ -178,7 +178,6 @@ export class TimeScale {
 				// reduce  _rightOffset means move right
 				// we could move more than required - this will be fixed by _correctOffset()
 				this._rightOffset -= Math.round(delta / this._barSpacing) + 1;
-				this._visibleBarsInvalidated = true;
 			}
 		}
 
@@ -315,7 +314,6 @@ export class TimeScale {
 		this._clearCommonTransitionsStartState();
 		this._tickMarks.reset();
 		this._leftEdgeIndex = null;
-		// this._rightOffset = this._options.rightOffset;;
 	}
 
 	public restoreDefault(): void {
