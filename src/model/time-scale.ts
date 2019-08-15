@@ -109,10 +109,7 @@ export class TimeScale {
 		merge(this._options, options);
 
 		if (this._options.fixLeftEdge) {
-			const firstIndex = this._points.firstIndex();
-			if (firstIndex !== null) {
-				this.setLeftEdgeFix(firstIndex);
-			}
+			this._fixLeftEdge();
 		} else {
 			this._leftEdgeIndex = null;
 		}
@@ -163,8 +160,6 @@ export class TimeScale {
 			return;
 		}
 
-		this._visibleBarsInvalidated = true;
-
 		if (this._options.lockVisibleTimeRangeOnResize && this._width) {
 			// recalculate bar spacing
 			const newBarSpacing = this._barSpacing * width / this._width;
@@ -187,6 +182,7 @@ export class TimeScale {
 		}
 
 		this._width = width;
+		this._visibleBarsInvalidated = true;
 		this._correctOffset();
 	}
 
@@ -327,15 +323,6 @@ export class TimeScale {
 		this.setRightOffset(this._options.rightOffset);
 	}
 
-	public setLeftEdgeFix(index: TimePointIndex): void {
-		this._leftEdgeIndex = index;
-		const delta = ensureNotNull(this.visibleBars()).firstBar() - index;
-		if (delta < 0) {
-			const leftEdgeOffset = this._rightOffset - delta - 1;
-			this.scrollToOffsetAnimated(leftEdgeOffset, 500);
-		}
-	}
-
 	public fixLeftEdge(): boolean {
 		return this._options.fixLeftEdge;
 	}
@@ -344,6 +331,8 @@ export class TimeScale {
 		this._visibleBarsInvalidated = true;
 		this._baseIndexOrNull = baseIndex;
 		this._correctOffset();
+
+		this._fixLeftEdge();
 	}
 
 	/**
@@ -431,6 +420,7 @@ export class TimeScale {
 
 		const shiftInLogical = (this._scrollStartPoint - x) / this.barSpacing();
 		this._rightOffset = ensureNotNull(this._commonTransitionStartState).rightOffset + shiftInLogical;
+		this._visibleBarsInvalidated = true;
 
 		// do not allow scroll out of visible bars
 		this._correctOffset();
@@ -733,6 +723,23 @@ export class TimeScale {
 			});
 		} else {
 			this._dateTimeFormatter = new DateFormatter(dateFormat, this._localizationOptions.locale);
+		}
+	}
+
+	private _fixLeftEdge(): void {
+		if (!this._options.fixLeftEdge) {
+			return;
+		}
+		const firstIndex = this._points.firstIndex();
+		if (firstIndex === null || this._leftEdgeIndex === firstIndex) {
+			return;
+		}
+
+		this._leftEdgeIndex = firstIndex;
+		const delta = ensureNotNull(this.visibleBars()).firstBar() - firstIndex;
+		if (delta < 0) {
+			const leftEdgeOffset = this._rightOffset - delta - 1;
+			this.setRightOffset(leftEdgeOffset);
 		}
 	}
 }
