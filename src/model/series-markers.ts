@@ -7,7 +7,7 @@ export interface SeriesMarker<TimeType> {
 	position: SeriesMarkerPosition;
 	shape: SeriesMarkerShape;
 	color: string;
-	id: string;
+	id?: string;
 }
 
 export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {
