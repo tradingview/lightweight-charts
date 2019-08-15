@@ -49,7 +49,7 @@ export class PriceTickMarkBuilder {
 		const spanCalculator2 = new PriceTickSpanCalculator(this._base, [2, 2, 2.5]);
 		const spanCalculator3 = new PriceTickSpanCalculator(this._base, [2.5, 2, 2]);
 
-		const spans = [];
+		const spans: number[] = [];
 
 		spans.push(spanCalculator1.tickSpan(high, low, maxTickSpan));
 		spans.push(spanCalculator2.tickSpan(high, low, maxTickSpan));
@@ -90,7 +90,7 @@ export class PriceTickMarkBuilder {
 		mod += mod < 0 ? span : 0;
 
 		const sign = (high >= low) ? 1 : -1;
-		let prevCoord = null;
+		let prevCoord: number | null = null;
 
 		let targetIndex = 0;
 

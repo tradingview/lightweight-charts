@@ -401,7 +401,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const borderSize = this.rendererOptions().borderSize;
 
-		let left;
+		let left: number;
 		if (this._isLeft) {
 			ctx.translate(-0.5, -0.5);
 			left = this._size.w - borderSize - 1;
