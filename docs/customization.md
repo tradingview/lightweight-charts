@@ -134,34 +134,9 @@ chart.applyOptions({
 });
 ```
 
-## Time Axis
-
-Time axis (time scale) is a horizontal scale at the bottom of the chart that displays the time of bars.
-
-[timescale.md](https://github.com/tradingview/lightweight-charts/blob/master/docs/timescale.md) contains a full description of time scale options and API methods to customize and adjust the time axis.
-
-### Example of time scale customization
-
-```javascript
-chart.applyOptions({
-    timeScale: {
-        rightOffset: 12,
-        barSpacing: 3,
-        fixLeftEdge: true,
-        lockVisibleTimeRangeOnResize: true,
-        rightBarStaysOnScroll: true,
-        borderVisible: false,
-        borderColor: '#fff000',
-        visible: true,
-        timeVisible: true,
-        secondsVisible: false,
-    },
-});
-```
-
 ## Crosshair
 
-Crosshair shows an intersection of a price and time axis values on any hovered point on the chart.
+The crosshair shows the intersection of the price and time scale values at any point on the chart.
 
 It is presented by horizontal and vertical lines. Each of them can be either customized by setting their `color`, `width` and `style` or disabled by using the `visible` option if necessary. Note that disabling crosshair lines does not disable crosshair marker on Line and Area series. It can be disabled by using the `crosshairMarkerVisible` option of relevant series.
 
@@ -338,3 +313,7 @@ chart.applyOptions({
     },
 });
 ```
+
+## Next reading
+
+- [Time Scale](./time-scale.md)
