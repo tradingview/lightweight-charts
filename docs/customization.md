@@ -76,7 +76,7 @@ const chart = createChart(document.body, {
 
 #### Time Format
 
-`timeFormatter` function can be used to customize the format of the time stamp displayed on the time axis below the vertical crosshair line.
+`timeFormatter` function can be used to customize the format of the time stamp displayed on the time scale below the vertical crosshair line.
 Currently, changing the time format of the time scale labels itself is not available, yet this feature is planned for the future.
 
 ```javascript
@@ -140,7 +140,7 @@ The crosshair shows the intersection of the price and time scale values at any p
 
 It is presented by horizontal and vertical lines. Each of them can be either customized by setting their `color`, `width` and `style` or disabled by using the `visible` option if necessary. Note that disabling crosshair lines does not disable crosshair marker on Line and Area series. It can be disabled by using the `crosshairMarkerVisible` option of relevant series.
 
-Vertical and horizontal lines of the crosshair have marks on the price and time axis. Any of those marks can be disabled.
+Vertical and horizontal lines of the crosshair have marks on the price and the time scale. Any of those marks can be disabled.
 
 Crosshair has two moving modes:
 
@@ -187,7 +187,7 @@ chart.applyOptions({
 
 ## Grid
 
-A grid is represented in chart background by vertical and horizontal lines drawn at the levels of visible marks of price and time axis.
+A grid is represented in chart background by vertical and horizontal lines drawn at the levels of visible marks of price and the time scale.
 It is possible to set a custom `color` and `style` for grid lines or disable their visibility if necessary.
 Note that vertical and horizontal lines of a grid have to be customized separately.
 
