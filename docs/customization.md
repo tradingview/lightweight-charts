@@ -136,28 +136,11 @@ chart.applyOptions({
 
 ## Time Axis
 
-Time axis is a horizontal scale at the bottom of the chart, used to display different time units.
+Time axis (time scale) is a horizontal scale at the bottom of the chart that displays the time of bars.
 
-Time scale options enable adjusting of series that are displayed on a chart when scaling and resizing a chart.
+[timescale.md](https://github.com/tradingview/lightweight-charts/blob/master/docs/timescale.md) contains a full description of time scale options and API methods to customize and adjust the time axis.
 
-Time scale can be hidden if needed.
-
-The following options are available in the time axis interface:
-
-|Name|Type|Default|Description|
-|----------------------------|-------|-------|--|
-|`rightOffset`|`number`|`0`|Sets the margin space in bars from the right side of the chart|
-|`barSpacing`|`number`|`6`|Sets the space between bars in pixels|
-|`fixLeftEdge`|`boolean`|`false`|If true, prevents scrolling to the left of the first historical bar|
-|`lockVisibleTimeRangeOnResize`|`boolean`|`false`|If true, prevents changing visible time area during chart resizing|
-|`rightBarStaysOnScroll`|`boolean`|`false`|If false, the hovered bar remains in the same place when scrolling|
-|`borderVisible`|`boolean`|`true`|If true, timescale border is visible|
-|`borderColor`|`string`|`#2b2b43`|Timescale border color|
-|`visible`|`boolean`|`true`|If true, timescale is shown on a chart|
-|`timeVisible`|`boolean`|`false`|If true, time is shown on the time scale and crosshair vertical label|
-|`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of the crosshair vertical line in `hh:mm:ss` format on intraday intervals|
-
-### Example of timescale customization
+### Example of time scale customization
 
 ```javascript
 chart.applyOptions({
