@@ -1,14 +1,14 @@
 import {
 	AreaStyleOptions,
 	BarStyleOptions,
-	CandleStyleOptions,
+	CandlestickStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
 	SeriesOptionsCommon,
 } from '../../model/series-options';
 import { LineStyle } from '../../renderers/draw-line';
 
-export const candleStyleDefaults: CandleStyleOptions = {
+export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	upColor: '#26a69a',
 	downColor: '#ef5350',
 	wickVisible: true,

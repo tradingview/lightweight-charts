@@ -4,11 +4,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import {
+	after,
+	describe,
+	it,
+} from 'mocha';
 import { PNG } from 'pngjs';
 
-import { CompareResult, compareScreenshots } from './helpers/compare-screenshots';
-import { getTestCases } from './helpers/get-test-cases';
+import { compareScreenshots } from './helpers/compare-screenshots';
+import { getTestCases, TestCase } from './helpers/get-test-cases';
 import { Screenshoter } from './helpers/screenshoter';
 
 const dummyContent = fs.readFileSync(path.join(__dirname, 'helpers', 'test-page-dummy.html'), { encoding: 'utf-8' });
@@ -23,43 +27,24 @@ function generatePageContent(standaloneBundlePath: string, testCaseCode: string)
 const goldenStandalonePathEnvKey = 'GOLDEN_STANDALONE_PATH';
 const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 
-const testResultsOutDir = process.env.CMP_OUT_DIR || path.join(__dirname, '.gendata');
-const goldenStandalonePath = process.env[goldenStandalonePathEnvKey] || '';
-const testStandalonePath = process.env[testStandalonePathEnvKey] || '';
-
-function testCaseOutFolder(groupName: string, testCaseName: string): string {
-	return path.join(testResultsOutDir, groupName, testCaseName);
+let devicePixelRatio = process.env.DEVICE_PIXEL_RATIO ? parseFloat(process.env.DEVICE_PIXEL_RATIO) : 1;
+if (isNaN(devicePixelRatio)) {
+	devicePixelRatio = 1;
 }
 
-function writeTestData(// tslint:disable-next-line:max-params
-	groupName: string,
-	testCaseName: string,
-	goldenScreenshot: PNG,
-	testScreenshot: PNG,
-	compareResult: CompareResult,
-	goldenPageContent: string,
-	testPageContent: string
-): void {
-	const testCaseOutDir = testCaseOutFolder(groupName, testCaseName);
-	if (!fs.existsSync(testCaseOutDir)) {
-		fs.mkdirSync(testCaseOutDir, { recursive: true });
-	}
+const devicePixelRatioStr = devicePixelRatio.toFixed(2);
 
-	fs.writeFileSync(path.join(testCaseOutDir, '1.golden.png'), PNG.sync.write(goldenScreenshot));
-	fs.writeFileSync(path.join(testCaseOutDir, '2.test.png'), PNG.sync.write(testScreenshot));
-	fs.writeFileSync(path.join(testCaseOutDir, '3.diff.png'), PNG.sync.write(compareResult.diffImg));
+const testResultsOutDir = path.resolve(process.env.CMP_OUT_DIR || path.join(__dirname, '.gendata'));
+const goldenStandalonePath: string = process.env[goldenStandalonePathEnvKey] || '';
+const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
-	fs.writeFileSync(path.join(testCaseOutDir, '1.golden.html'), goldenPageContent);
-	fs.writeFileSync(path.join(testCaseOutDir, '2.test.html'), testPageContent);
-}
-
-function rmRf(folder: string): void {
-	if (!fs.existsSync(folder)) {
+function rmRf(dir: string): void {
+	if (!fs.existsSync(dir)) {
 		return;
 	}
 
-	fs.readdirSync(folder).forEach((file: string) => {
-		const filePath = path.join(folder, file);
+	fs.readdirSync(dir).forEach((file: string) => {
+		const filePath = path.join(dir, file);
 		if (fs.lstatSync(filePath).isDirectory()) {
 			rmRf(filePath);
 		} else {
@@ -67,74 +52,122 @@ function rmRf(folder: string): void {
 		}
 	});
 
-	fs.rmdirSync(folder);
+	fs.rmdirSync(dir);
 }
 
-function removeTestCaseFolder(groupName: string, testCaseName: string): void {
-	rmRf(testCaseOutFolder(groupName, testCaseName));
+function removeEmptyDirsRecursive(rootDir: string): void {
+	if (!fs.existsSync(rootDir)) {
+		return;
+	}
+
+	fs.readdirSync(rootDir).forEach((file: string) => {
+		const filePath = path.join(rootDir, file);
+		if (fs.lstatSync(filePath).isDirectory()) {
+			removeEmptyDirsRecursive(filePath);
+		}
+	});
+
+	if (fs.readdirSync(rootDir).length === 0) {
+		fs.rmdirSync(rootDir);
+	}
 }
 
-describe('Graphics tests', function(): void {
+describe(`Graphics tests with devicePixelRatio=${devicePixelRatioStr}`, function(): void {
 	// this tests are unstable sometimes :(
 	this.retries(5);
 
 	const testCases = getTestCases();
-	let screenshoter: Screenshoter;
 
 	before(() => {
-		if (!fs.existsSync(testResultsOutDir)) {
-			fs.mkdirSync(testResultsOutDir, { recursive: true });
-		}
+		rmRf(testResultsOutDir);
+		fs.mkdirSync(testResultsOutDir, { recursive: true });
 
 		expect(goldenStandalonePath, `path to golden standalone module must be passed via ${goldenStandalonePathEnvKey} env var`)
 			.to.have.length.greaterThan(0);
 
 		expect(testStandalonePath, `path to golden standalone module must be passed via ${testStandalonePathEnvKey} env var`)
 			.to.have.length.greaterThan(0);
-
-		screenshoter = new Screenshoter(Boolean(process.env.NO_SANDBOX));
 	});
 
+	const screenshoter = new Screenshoter(Boolean(process.env.NO_SANDBOX), devicePixelRatio);
+
+	const currentDprOutDir = path.join(testResultsOutDir, `devicePixelRatio=${devicePixelRatioStr}`);
+
 	for (const groupName of Object.keys(testCases)) {
-		const registerTestGroup = () => {
-			for (const testCase of testCases[groupName]) {
-				it(testCase.name, async () => {
-					const goldenPageContent = generatePageContent(goldenStandalonePath, testCase.caseContent);
-					const testPageContent = generatePageContent(testStandalonePath, testCase.caseContent);
-
-					// run in parallel to increase speed
-					const [goldenScreenshot, testScreenshot] = await Promise.all([
-						screenshoter.generateScreenshot(goldenPageContent),
-						screenshoter.generateScreenshot(testPageContent),
-					]);
-
-					const compareResult = await compareScreenshots(goldenScreenshot, testScreenshot);
-
-					writeTestData(
-						groupName,
-						testCase.name,
-						goldenScreenshot,
-						testScreenshot,
-						compareResult,
-						goldenPageContent,
-						testPageContent
-					);
-
-					expect(compareResult.diffPixelsCount).to.be.equal(0, 'number of different pixels must be 0');
-
-					removeTestCaseFolder(groupName, testCase.name);
-				});
-			}
-		};
+		const currentGroupOutDir = path.join(currentDprOutDir, groupName);
 
 		if (groupName.length === 0) {
-			registerTestGroup();
+			registerTestCases(testCases[groupName], screenshoter, currentGroupOutDir);
 		} else {
-			describe(groupName, registerTestGroup);
+			describe(groupName, () => {
+				registerTestCases(testCases[groupName], screenshoter, currentGroupOutDir);
+			});
 		}
 	}
 
 	after(async () => {
 		await screenshoter.close();
+		removeEmptyDirsRecursive(testResultsOutDir);
 	});
 });
+
+function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, outDir: string): void {
+	for (const testCase of testCases) {
+		it(testCase.name, async () => {
+			const testCaseOutDir = path.join(outDir, testCase.name);
+			rmRf(testCaseOutDir);
+			fs.mkdirSync(testCaseOutDir, { recursive: true });
+
+			function writeTestDataItem(fileName: string, fileContent: string | Buffer): void {
+				fs.writeFileSync(path.join(testCaseOutDir, fileName), fileContent);
+			}
+
+			const goldenPageContent = generatePageContent(goldenStandalonePath, testCase.caseContent);
+			const testPageContent = generatePageContent(testStandalonePath, testCase.caseContent);
+
+			writeTestDataItem('1.golden.html', goldenPageContent);
+			writeTestDataItem('2.test.html', testPageContent);
+
+			// run in parallel to increase speed
+			const goldenScreenshotPromise = screenshoter.generateScreenshot(goldenPageContent);
+			const testScreenshotPromise = screenshoter.generateScreenshot(testPageContent);
+
+			const errors: string[] = [];
+			const failedPages: string[] = [];
+
+			let goldenScreenshot: PNG | null = null;
+			try {
+				goldenScreenshot = await goldenScreenshotPromise;
+				writeTestDataItem('1.golden.png', PNG.sync.write(goldenScreenshot));
+			} catch (e) {
+				errors.push(`=== Golden page ===\n${e.message}`);
+				failedPages.push('golden');
+			}
+
+			let testScreenshot: PNG | null = null;
+			try {
+				testScreenshot = await testScreenshotPromise;
+				writeTestDataItem('2.test.png', PNG.sync.write(testScreenshot));
+			} catch (e) {
+				errors.push(`=== Test page ===\n${e.message}`);
+				failedPages.push('test');
+			}
+
+			if (goldenScreenshot !== null && testScreenshot !== null) {
+				const compareResult = await compareScreenshots(goldenScreenshot, testScreenshot);
+
+				writeTestDataItem('3.diff.png', PNG.sync.write(compareResult.diffImg));
+
+				expect(compareResult.diffPixelsCount).to.be.equal(0, 'number of different pixels must be 0');
+			} else {
+				writeTestDataItem('3.errors.txt', errors.join('\n\n'));
+				throw new Error(
+					`The error(s) happened while generating a screenshot for the page(s): ${failedPages.join(', ')}.
+See ${testCaseOutDir} directory for an output of the test case.`
+				);
+			}
+
+			rmRf(testCaseOutDir);
+		});
+	}
+}

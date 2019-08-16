@@ -2,10 +2,57 @@
 
 ## Initial chart options
 
-Firstly, a preferred size needs to be set when creating a chart.
+Most of the chart settings can be set right when creating a chart. Subsequently, all of them may be changed using the `applyOptions` function.
 
-Also, the `localization` option may help you set a suitable date format and user language.
-The following date formats are available:
+### Size
+
+First of all, the preferred chart size should be set when creating a chart:
+
+```javascript
+const chart = createChart(document.body, {
+        width: 600,
+        height: 380,
+    },
+});
+```
+
+If you want the chart size to be adjusted when the web page is resized, use the `resize` function to set the width and height of the chart:
+
+```javascript
+chart.resize(250, 150);
+```
+
+### Localization
+
+Using the `localization` option you can set the displayed language, date and time formats.
+
+#### Locale
+
+By default, the library uses browser language settings.
+Thus, the displayed date and time format may differ depending on the region of the user.
+To set the same language settings for all users, use the `locale` property of the `localization` option:
+
+```javascript
+const chart = createChart(document.body, {
+    localization: {
+        locale: 'ja-JP',
+    },
+});
+```
+
+Using the `applyOptions` function you can change the locale at any time after the chart creation:
+
+```javascript
+chart.applyOptions({
+   localization: {
+        locale: 'en-US',
+   },
+});
+```
+
+#### Date Format
+
+Preferred date format can be set using the `dateFormat` property of the `localization` option. The following date formats are available:
 
 - `dd MMM 'yy` - `25 Jun '18` _(default)_
 - `yyyy-MM-dd` - `2018-06-25`
@@ -19,30 +66,23 @@ The following date formats are available:
 - `MM/dd/yy` - `06/25/18`
 - `MM/dd/yyyy` - `06/25/2018`
 
-Default user language is the same as browser language and can be changed using the `locale` property of the  `localization` option.
-
-### An example of chart creation
-
 ```javascript
 const chart = createChart(document.body, {
-    width: 600,
-    height: 380,
     localization: {
         dateFormat: 'yyyy/MM/dd',
-        locale: 'ja-JP',
     },
 });
 ```
 
-Once a chart has been created, there is a possibility to resize it or customize its appearance and behavior by calling `applyOptions`:
+#### Time Format
+
+`timeFormatter` function can be used to customize the format of the time stamp displayed on the time axis below the vertical crosshair line.
+Currently, changing the time format of the time scale labels itself is not available, yet this feature is planned for the future.
 
 ```javascript
-chart.applyOptions({
-    width: 250,
-    height: 150,
+const chart = createChart(document.body, {
     localization: {
-        dateFormat: 'MM/dd/yy',
-        locale: 'en-US',
+        timeFormatter: function() { return 'Custom time format'; },
     },
 });
 ```
@@ -64,14 +104,15 @@ The following set of options can be used to adjust the price axis interface:
 
 |Name|Type|Default|Description|
 |--|---|-|--|
-|`position`|`string`|`right`|Sets the position to display price scale. Options available: `left`, `right`, `none`|
+|`position`|`left` &#124; `right` &#124; `none`|`right`|Sets the position to display price scale|
 |`mode`|[PriceScaleMode](./constants.md#pricescalemode) |`PriceScaleMode.Normal`|Sets the price scale mode|
 |`autoScale`|`boolean`|`true`|If true, fits series data to a chart size|
-|`invertScale`|`boolean`|`false`|If true, a chart series is reflected vertically, so that a growing trend is shown as a falling one and vise versa|
+|`invertScale`|`boolean`|`false`|If true, a chart series is reflected vertically, so that a growing trend is shown as a falling one and vice versa|
 |`alignLabels`|`boolean`|`true`|If true, labels with price data do not overlap|
 |`borderVisible`|`boolean`|`true`|If true, price scale border is visible|
 |`borderColor`|`string`|`#2b2b43`|Pricescale border color|
-|`scaleMargins`|`object`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (per cent)|
+|`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (percent)|
+|`entireTextOnly`|`boolean`|`false`|If false, top and bottom corner labels are shown even if they are partially not visible |
 
 ### An example of a price scale customization
 
@@ -114,6 +155,7 @@ The following options are available in the time axis interface:
 |`borderColor`|`string`|`#2b2b43`|Timescale border color|
 |`visible`|`boolean`|`true`|If true, timescale is shown on a chart|
 |`timeVisible`|`boolean`|`false`|If true, time is shown on the time scale and crosshair vertical label|
+|`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of the crosshair vertical line in `hh:mm:ss` format on intraday intervals|
 
 ### Example of timescale customization
 
@@ -129,13 +171,14 @@ chart.applyOptions({
         borderColor: '#fff000',
         visible: true,
         timeVisible: true,
+        secondsVisible: false,
     },
 });
 ```
 
 ## Crosshair
 
-Crosshair shows an intersection of a price and time axis values on any hovered point of on the chart.
+Crosshair shows an intersection of a price and time axis values on any hovered point on the chart.
 
 It is presented by horizontal and vertical lines. Each of them can be either customized by setting their `color`, `width` and `style` or disabled by using the `visible` option if necessary. Note that disabling crosshair lines does not disable crosshair marker on Line and Area series. It can be disabled by using the `crosshairMarkerVisible` option of relevant series.
 
@@ -157,6 +200,7 @@ The following options are available for vertical and horizontal lines of a cross
 |`style`|[LineStyle](./constants.md#linestyle)|`LineStyle.Dashed`|Crosshair line style|
 |`visible`|`boolean`|`true`|If true, crosshair line is displayed on a chart|
 |`labelVisible`|`boolean`|`true`|If true, a data label is shown on a relevant scale|
+|`labelBackgroundColor`|`string`|`#4c525e`|Crosshair label background color|
 |`mode`|[CrosshairMode](./constants.md#crosshairmode)|`CrosshairMode.Magnet`|Sets the mode of crosshair moving.|
 
 ### An example of a crosshair customization
@@ -230,10 +274,10 @@ The following options are available for the watermark:
 |----------------------------|-------|---------|-|
 |`color`|`string`|`rgba(0, 0, 0, 0)`|Watermark color|
 |`visible`|`boolean`|`false`|If true, the watermark is displayed on a chart|
-|`text`|`string`|''|Contains the text to be displayed in the watermark|
+|`text`|`string`|`''`|Contains the text to be displayed in the watermark|
 |`fontSize`|`number`|`48`|Watermark's font size in pixels|
-|`horzAlign`|`string`|`center`|Watermark horizontal alignment position. Available options : 'left', 'center', 'right'|
-|`vertAlign`|`string`|`center`|Watermark vertical alignment position. Available options: 'top', 'center', 'bottom'|
+|`horzAlign`|`left` &#124; `center` &#124; `right`|`center`|Watermark horizontal alignment position|
+|`vertAlign`|`top` &#124; `center` &#124; `bottom`|`center`|Watermark vertical alignment position|
 
 ### An example of a watermark customization
 
@@ -283,16 +327,18 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-|
-|`mouseWheel`|`boolean`|`true`|If true series scrolling with horizontal mouse wheel is enabled|
-|`pressedMouseMove`|`boolean`|`true`|If true series scrolling with left mouse button pressed is allowed|
+|`mouseWheel`|`boolean`|`true`|If true, chart scrolling with horizontal mouse wheel is enabled|
+|`pressedMouseMove`|`boolean`|`true`|If true, chart scrolling with left mouse button pressed is allowed|
+|`horzTouchDrag`|`boolean`|`true`|If true, the chart handles horizontal pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger|
+|`vertTouchDrag`|`boolean`|`true`|If true, the chart handles vertical pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger.|
 
 ### Scaling options
 
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-|
-|`axisPressedMouseMove`|`boolean`|`true`|If true axis scaling with left mouse button pressed is allowed|
-|`mouseWheel`|`boolean`|`true`|If true series scaling with mouse whee is enabled|
-|`pinch`|`boolean`|`true`|If true series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
+|`axisPressedMouseMove`|`boolean`|`true`|If true, axis scaling with left mouse button pressed is allowed|
+|`mouseWheel`|`boolean`|`true`|If true, series scaling with a mouse wheel is enabled|
+|`pinch`|`boolean`|`true`|If true, series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
 
 ### An example of a scrolling/scaling customization
 
@@ -308,15 +354,4 @@ chart.applyOptions({
         pinch: true,
     },
 });
-```
-
-## Branding
-
-You may hide our branding if you feel that it harms user experience on your website.
-Note that according to our terms you should add a link leading to <https://www.tradingview.com/> somewhere on your web page.
-This link must contain the text from the NOTICE file which is a part of the product package.
-Please see `disableBranding` method below.
-
-```javascript
-chart.disableBranding();
 ```

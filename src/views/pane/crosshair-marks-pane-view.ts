@@ -78,17 +78,18 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 
 			if (seriesData === null) {
 				data.visibleRange = null;
-			} else {
-				const firstValue = ensureNotNull(s.firstValue());
-				data.lineColor = s.barColorer().barStyle(timePointIndex).barColor;
-				data.backColor = this._chartModel.options().layout.backgroundColor;
-				data.radius = seriesData.radius;
-				data.items[0].price = seriesData.price;
-				data.items[0].y = s.priceScale().priceToCoordinate(seriesData.price, firstValue);
-				data.items[0].time = timePointIndex;
-				data.items[0].x = timeScale.indexToCoordinate(timePointIndex);
-				data.visibleRange = rangeForSinglePoint;
+				return;
 			}
+
+			const firstValue = ensureNotNull(s.firstValue());
+			data.lineColor = s.barColorer().barStyle(timePointIndex).barColor;
+			data.backColor = this._chartModel.options().layout.backgroundColor;
+			data.radius = seriesData.radius;
+			data.items[0].price = seriesData.price;
+			data.items[0].y = s.priceScale().priceToCoordinate(seriesData.price, firstValue.value);
+			data.items[0].time = timePointIndex;
+			data.items[0].x = timeScale.indexToCoordinate(timePointIndex);
+			data.visibleRange = rangeForSinglePoint;
 		});
 	}
 }

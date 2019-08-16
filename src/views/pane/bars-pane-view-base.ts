@@ -9,13 +9,13 @@ import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { Bar, SeriesPlotIndex } from '../../model/series-data';
 import { TimePointIndex } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
-import { BarCandleItemBase } from '../../renderers/bars-renderer';
+import { BarCandlestickItemBase } from '../../renderers/bars-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candle', ItemType extends BarCandleItemBase> extends SeriesPaneViewBase<TSeriesType, ItemType> {
+export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick', ItemType extends BarCandlestickItemBase> extends SeriesPaneViewBase<TSeriesType, ItemType> {
 	public constructor(series: Series<TSeriesType>, model: ChartModel) {
-		super(series, model);
+		super(series, model, false);
 	}
 
 	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {
@@ -25,7 +25,7 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candle', Ite
 
 	protected abstract _createRawItem(time: TimePointIndex, bar: Bar, colorer: SeriesBarColorer): ItemType;
 
-	protected _createDefaultItem(time: TimePointIndex, bar: Bar, colorer: SeriesBarColorer): BarCandleItemBase {
+	protected _createDefaultItem(time: TimePointIndex, bar: Bar, colorer: SeriesBarColorer): BarCandlestickItemBase {
 		return {
 			time: time,
 			open: bar.value[SeriesPlotIndex.Open] as BarPrice,

@@ -16,7 +16,8 @@ This tests uses [puppeteer](https://github.com/GoogleChrome/puppeteer) to genera
 1. Write your test case in that file.
 
     There is the only 1 requirement for your code - you need to define function called `runTestCase`, which takes a container as the first argument and creates there a widget.
-    _(the definition of that function is `function runTestCase(container: HTMLElement): void {}`)_
+    Also `runTestCase` might return a `Promise`. In this case the runner will wait for it before continue a test.
+    _(the definition of that function is `function runTestCase(container: HTMLElement): void | Promise<void> {}`)_
 
 Note that case's file wouldn't prepared/parsed by any bundler/processor (or even by NodeJS), so please pay attention, that you **CAN'T** require other modules in a test case.
 
@@ -31,7 +32,7 @@ To run this tests you need use [runner.js](./runner.js):
 ```
 
 Each path to the standalone module might be either to a local file (relative/absolute path to a file) or remote file (via http/https).
-If file is local then local server will be runner to serve that file (see [serve-local-files.js](./serve-local-files.js) module).
+If file is local then local server will be runner to serve that file (see [serve-local-files.js](../serve-local-files.js) module).
 
 ## Tips
 

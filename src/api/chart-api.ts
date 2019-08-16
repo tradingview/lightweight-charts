@@ -1,34 +1,34 @@
-import { ChartWidget, MouseEventParamsImpl } from '../gui/chart-widget';
+import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
 
+import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
-import { Palette } from '../model/palette';
 import { Series } from '../model/series';
 import {
 	AreaSeriesOptions,
 	AreaSeriesPartialOptions,
 	BarSeriesOptions,
 	BarSeriesPartialOptions,
-	CandleSeriesOptions,
-	CandleSeriesPartialOptions,
-	fillUpDownCandlesColors,
+	CandlestickSeriesOptions,
+	CandlestickSeriesPartialOptions,
+	fillUpDownCandlesticksColors,
 	HistogramSeriesOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesOptions,
 	LineSeriesPartialOptions,
 	precisionByMinMove,
 	PriceFormat,
+	PriceFormatBuiltIn,
 	SeriesType,
 } from '../model/series-options';
 import { TimePointIndex } from '../model/time-data';
 
-import { CandleSeriesApi } from './candle-series-api';
+import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, SeriesUpdatePacket } from './data-layer';
-import { HistogramSeriesApi } from './histogram-series-api';
 import { IChartApi, MouseEventHandler, MouseEventParams, TimeRangeChangeEventHandler } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
@@ -36,7 +36,7 @@ import { ITimeScaleApi, TimeRange } from './itime-scale-api';
 import {
 	areaStyleDefaults,
 	barStyleDefaults,
-	candleStyleDefaults,
+	candlestickStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
@@ -46,11 +46,12 @@ import { SeriesApi } from './series-api';
 import { TimeScaleApi } from './time-scale-api';
 
 function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
-	if (priceFormat === undefined) {
+	if (priceFormat === undefined || priceFormat.type === 'custom') {
 		return;
 	}
-	if (priceFormat.minMove !== undefined && priceFormat.precision === undefined) {
-		priceFormat.precision = precisionByMinMove(priceFormat.minMove);
+	const priceFormatBuiltIn = priceFormat as DeepPartial<PriceFormatBuiltIn>;
+	if (priceFormatBuiltIn.minMove !== undefined && priceFormatBuiltIn.precision === undefined) {
+		priceFormatBuiltIn.precision = precisionByMinMove(priceFormatBuiltIn.minMove);
 	}
 }
 
@@ -71,8 +72,22 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget = new ChartWidget(container, options);
 		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 
-		this._chartWidget.clicked().subscribe((param: MouseEventParamsImpl) => this._clickedDelegate.fire(this._convertMouseParams(param)), this);
-		this._chartWidget.crosshairMoved().subscribe((param: MouseEventParamsImpl) => this._crosshairMovedDelegate.fire(this._convertMouseParams(param)), this);
+		this._chartWidget.clicked().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._clickedDelegate.hasListeners()) {
+					this._clickedDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+			this
+		);
+		this._chartWidget.crosshairMoved().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._crosshairMovedDelegate.hasListeners()) {
+					this._crosshairMovedDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+			this
+		);
 
 		const model = this._chartWidget.model();
 		this._priceScaleApi = new PriceScaleApi(model);
@@ -129,14 +144,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return res;
 	}
 
-	public addCandleSeries(options: CandleSeriesPartialOptions = {}): ISeriesApi<'Candle'> {
-		fillUpDownCandlesColors(options);
+	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}): ISeriesApi<'Candlestick'> {
+		fillUpDownCandlesticksColors(options);
 		patchPriceFormat(options.priceFormat);
 
-		const strictOptions = merge(clone(seriesOptionsDefaults), candleStyleDefaults, options) as CandleSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Candle', strictOptions);
+		const strictOptions = merge(clone(seriesOptionsDefaults), candlestickStyleDefaults, options) as CandlestickSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Candlestick', strictOptions);
 
-		const res = new CandleSeriesApi(series, this);
+		const res = new CandlestickSeriesApi(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -149,7 +164,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const strictOptions = merge(clone(seriesOptionsDefaults), histogramStyleDefaults, options) as HistogramSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Histogram', strictOptions);
 
-		const res = new HistogramSeriesApi(series, this);
+		const res = new SeriesApi<'Histogram'>(series, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -179,27 +194,26 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.setData(value.update, false);
+			key.setData(value.update);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 		this._seriesMap.delete(seriesObj);
 		this._seriesMapReversed.delete(series);
 	}
 
-	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][], palette?: Palette): void {
-		const update = this._dataLayer.setSeriesData(series, data, palette);
+	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void {
+		const update = this._dataLayer.setSeriesData(series, data);
 		const model = this._chartWidget.model();
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.setData(value.update, series === key, palette);
+			key.setData(value.update);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 	}
 
 	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void {
-		const palette = series.palette();
-		const update = this._dataLayer.updateSeriesData(series, data, palette);
+		const update = this._dataLayer.updateSeriesData(series, data);
 		const model = this._chartWidget.model();
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, false);
@@ -251,8 +265,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return this._chartWidget.options();
 	}
 
-	public disableBranding(): void {
-		this._chartWidget.disableBranding();
+	public takeScreenshot(): HTMLCanvasElement {
+		return this._chartWidget.takeScreenshot();
 	}
 
 	private _onVisibleBarsChanged(): void {
@@ -266,8 +280,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
-		const seriesPrices = new Map<ISeriesApi<SeriesType>, number>();
-		param.seriesPrices.forEach((price: number, series: Series) => {
+		const seriesPrices = new Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>();
+		param.seriesPrices.forEach((price: BarPrice | BarPrices, series: Series) => {
 			seriesPrices.set(this._mapSeriesToApi(series), price);
 		});
 		return {

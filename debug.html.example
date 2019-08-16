@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+	<title>Debug page</title>
+
+	<script type="text/javascript" src="./dist/lightweight-charts.standalone.development.js"></script>
+</head>
+
+<body style="padding: 0; margin: 0;">
+	<div id="container" style="position: absolute; width: 100%; height: 100%;"></div>
+
+	<script type="text/javascript">
+		function generateData() {
+			var res = [];
+			var time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+			for (var i = 0; i < 500; ++i) {
+				res.push({
+					time: time.getTime() / 1000,
+					value: i,
+				});
+
+				time.setUTCDate(time.getUTCDate() + 1);
+			}
+
+			return res;
+		}
+
+		var chart = LightweightCharts.createChart(document.getElementById('container'));
+
+		var mainSeries = chart.addLineSeries({
+			priceFormat: {
+				minMove: 1,
+				precision: 0,
+			},
+		});
+
+		mainSeries.setData(generateData());
+	</script>
+</body>
+
+</html>

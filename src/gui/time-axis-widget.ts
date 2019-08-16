@@ -98,7 +98,14 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._recreateStub();
 		this._chart.model().mainPriceScaleOptionsChanged().subscribe(this._recreateStub.bind(this), this);
 
-		this._mouseEventHandler = new MouseEventHandler(this._cell, this, true, false);
+		this._mouseEventHandler = new MouseEventHandler(
+			this._topCanvas,
+			this,
+			{
+				treatVertTouchDragAsPageScroll: true,
+				treatHorzTouchDragAsPageScroll: false,
+			}
+		);
 	}
 
 	public destroy(): void {
@@ -110,6 +117,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 	public getElement(): HTMLElement {
 		return this._element;
+	}
+
+	public stub(): PriceAxisStub | null {
+		return this._stub;
 	}
 
 	public mouseDownEvent(event: TouchMouseEvent): void {
@@ -222,28 +233,29 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		});
 	}
 
+	public getImage(): HTMLCanvasElement {
+		return this._canvas;
+	}
+
 	public paint(type: InvalidationLevel): void {
 		if (type === InvalidationLevel.None) {
 			return;
 		}
 
-		if (type === InvalidationLevel.Cursor) {
-			this._drawCrosshairLabel(this._topCanvasContext);
-			return;
+		if (type !== InvalidationLevel.Cursor) {
+			const ctx = this._canvasContext;
+			this._drawBackground(ctx);
+			this._drawBorder(ctx);
+
+			this._drawTickMarks(ctx);
+			this._drawBackLabels(ctx);
+
+			if (this._stub !== null) {
+				this._stub.paint(type);
+			}
 		}
 
-		const ctx = this._canvasContext;
-		this._drawBackground(ctx);
-		this._drawBorder(ctx);
-
-		this._drawTickMarks(ctx);
-		this._drawBackLabels(ctx);
-		this._chart.model().crosshairSource().updateAllViews();
 		this._drawCrosshairLabel(this._topCanvasContext);
-
-		if (this._stub !== null) {
-			this._stub.paint(type);
-		}
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D): void {
@@ -252,7 +264,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 	private _drawBorder(ctx: CanvasRenderingContext2D): void {
 		if (this._chart.options().timeScale.borderVisible) {
-			clearRect(ctx, 0, 0, this._size.w, 1, this._lineColor());
+			ctx.save();
+			ctx.fillStyle = this._lineColor();
+			ctx.translate(-0.5, -0.5);
+			ctx.fillRect(0, 0, this._size.w, 1);
+			ctx.restore();
 		}
 	}
 

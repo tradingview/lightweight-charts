@@ -1,0 +1,17 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"composite": true
+	},
+	"references": [
+		{ "path": "./api/tsconfig.composite.json" },
+		{ "path": "./formatters/tsconfig.composite.json" },
+		{ "path": "./gui/tsconfig.composite.json" },
+		{ "path": "./helpers/tsconfig.composite.json" },
+		{ "path": "./tsconfig.model.json" }
+	],
+	"include": [
+		"./index.ts",
+		"./standalone.ts"
+	]
+}

@@ -2,10 +2,11 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { LineStyle, LineWidth } from '../renderers/draw-line';
 
+import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
 
 /** Structure describing a drawing style of the candlestick chart  */
-export interface CandleStyleOptions {
+export interface CandlestickStyleOptions {
 	/** Color of rising candlesticks */
 	upColor: string;
 	/** Color of falling candlesticks */
@@ -35,7 +36,7 @@ export interface CandleStyleOptions {
 	wickDownColor: string;
 }
 
-export function fillUpDownCandlesColors(options: Partial<CandleStyleOptions>): void {
+export function fillUpDownCandlesticksColors(options: Partial<CandlestickStyleOptions>): void {
 	if (options.borderColor !== undefined) {
 		options.borderUpColor = options.borderColor;
 		options.borderDownColor = options.borderColor;
@@ -85,7 +86,8 @@ export interface HistogramStyleOptions {
  * minMove = 0.01 , precision = 3. Prices will change like 1.130, 1.140, 1.150 etc.
  * minMove = 0.05 , precision is not specified. Prices will change like 1.10, 1.15, 1.20
  */
-export interface PriceFormat {
+
+export interface PriceFormatBuiltIn {
 	/**
 	 *  Enum of possible modes of price formatting
 	 * 'price' is the most common choice; it allows customization of precision and rounding of prices
@@ -103,6 +105,20 @@ export interface PriceFormat {
 	 */
 	minMove: number;
 }
+
+export interface PriceFormatCustom {
+	type: 'custom';
+	/**
+	 * User-defined function for price formatting that could be used for some specific cases, that could not be covered with PriceFormatBuiltIn
+	 */
+	formatter: PriceFormatterFn;
+	/**
+	 * Minimal step of the price.
+	 */
+	minMove: number;
+}
+
+export type PriceFormat = PriceFormatBuiltIn | PriceFormatCustom;
 
 export function precisionByMinMove(minMove: number): number {
 	if (minMove >= 1) {
@@ -155,17 +171,17 @@ export interface SeriesOptionsCommon {
 	priceLineWidth: LineWidth;
 	/** Color of the price line. Ignored if priceLineVisible is false */
 	priceLineColor: string;
-	/** Price line style. Suitible for percentage and indexedTo100 scales */
+	/** Price line style. Suitable for percentage and indexedTo100 scales */
 	priceLineStyle: LineStyle;
 	/** Formatting settings associated with the series */
 	priceFormat: PriceFormat;
-	/** Visibity of base line. Suitible for percentage and indexedTo100 scales */
+	/** Visibility of base line. Suitable for percentage and indexedTo100 scales */
 	baseLineVisible: boolean;
 	/** Color of the base line in IndexedTo100 mode */
 	baseLineColor: string;
-	/** Base line width. Suitible for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
+	/** Base line width. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
 	baseLineWidth: LineWidth;
-	/** Base line style. Suitible for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
+	/** Base line style. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
 	baseLineStyle: LineStyle;
 }
 
@@ -192,8 +208,8 @@ export type BarSeriesPartialOptions = SeriesPartialOptions<BarStyleOptions>;
 /**
  * Structure describing candlesticks series options.
  */
-export type CandleSeriesOptions = SeriesOptions<CandleStyleOptions>;
-export type CandleSeriesPartialOptions = SeriesPartialOptions<CandleStyleOptions>;
+export type CandlestickSeriesOptions = SeriesOptions<CandlestickStyleOptions>;
+export type CandlestickSeriesPartialOptions = SeriesPartialOptions<CandlestickStyleOptions>;
 
 /**
  * Structure describing histogram series options.
@@ -209,7 +225,7 @@ export type LineSeriesPartialOptions = SeriesPartialOptions<LineStyleOptions>;
 
 export interface SeriesOptionsMap {
 	Bar: BarSeriesOptions;
-	Candle: CandleSeriesOptions;
+	Candlestick: CandlestickSeriesOptions;
 	Area: AreaSeriesOptions;
 	Line: LineSeriesOptions;
 	Histogram: HistogramSeriesOptions;
@@ -217,7 +233,7 @@ export interface SeriesOptionsMap {
 
 export interface SeriesPartialOptionsMap {
 	Bar: BarSeriesPartialOptions;
-	Candle: CandleSeriesPartialOptions;
+	Candlestick: CandlestickSeriesPartialOptions;
 	Area: AreaSeriesPartialOptions;
 	Line: LineSeriesPartialOptions;
 	Histogram: HistogramSeriesPartialOptions;

@@ -28,10 +28,6 @@ export class PriceTickMarkBuilder {
 		this._logicalToCoordinateFunc = logicalToCoordinateFunc;
 	}
 
-	public base(): number {
-		return this._base;
-	}
-
 	public setBase(base: number): void {
 		if (base < 0) {
 			throw new Error('base < 0');
@@ -53,7 +49,7 @@ export class PriceTickMarkBuilder {
 		const spanCalculator2 = new PriceTickSpanCalculator(this._base, [2, 2, 2.5]);
 		const spanCalculator3 = new PriceTickSpanCalculator(this._base, [2.5, 2, 2]);
 
-		const spans = [];
+		const spans: number[] = [];
 
 		spans.push(spanCalculator1.tickSpan(high, low, maxTickSpan));
 		spans.push(spanCalculator2.tickSpan(high, low, maxTickSpan));
@@ -62,21 +58,12 @@ export class PriceTickMarkBuilder {
 		return min(spans);
 	}
 
+	// tslint:disable-next-line:cyclomatic-complexity
 	public rebuildTickMarks(): void {
 		const priceScale = this._priceScale;
 
-		if (priceScale.isEmpty()) {
-			this._marks = [];
-			return;
-		}
+		const firstValue = priceScale.firstValue();
 
-		const mainSource = priceScale.mainSource();
-		if (mainSource === null) {
-			this._marks = [];
-			return;
-		}
-
-		const firstValue = mainSource.firstValue();
 		if (firstValue === null) {
 			this._marks = [];
 			return;
@@ -86,6 +73,10 @@ export class PriceTickMarkBuilder {
 
 		const bottom = this._coordinateToLogicalFunc(scaleHeight - 1, firstValue);
 		const top = this._coordinateToLogicalFunc(0, firstValue);
+
+		const extraTopBottomMargin = this._priceScale.options().entireTextOnly ? this._fontHeight() / 2 : 0;
+		const minCoord = extraTopBottomMargin;
+		const maxCoord = scaleHeight - 1 - extraTopBottomMargin;
 
 		const high = Math.max(bottom, top);
 		const low = Math.min(bottom, top);
@@ -99,19 +90,22 @@ export class PriceTickMarkBuilder {
 		mod += mod < 0 ? span : 0;
 
 		const sign = (high >= low) ? 1 : -1;
-		let prevCoord = null;
+		let prevCoord: number | null = null;
 
 		let targetIndex = 0;
 
 		for (let logical = high - mod; logical > low; logical -= span) {
 			const coord = this._logicalToCoordinateFunc(logical, firstValue, true);
 
-			if (prevCoord !== null) {
-				// check if there is place for it
-				// this is required for log scale
-				if (Math.abs(coord - prevCoord) < this._tickMarkHeight()) {
-					continue;
-				}
+			// check if there is place for it
+			// this is required for log scale
+			if (prevCoord !== null && Math.abs(coord - prevCoord) < this._tickMarkHeight()) {
+				continue;
+			}
+
+			// check if a tick mark is partially visible and skip it if entireTextOnly is true
+			if (coord < minCoord || coord > maxCoord) {
+				continue;
 			}
 
 			if (targetIndex < this._marks.length) {

@@ -6,7 +6,7 @@ import { Bar, SeriesPlotIndex } from './series-data';
 import {
 	AreaStyleOptions,
 	BarStyleOptions,
-	CandleStyleOptions,
+	CandlestickStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
 } from './series-options';
@@ -19,8 +19,8 @@ export interface PrecomputedBars {
 
 export interface BarColorerStyle {
 	barColor: string;
-	barBorderColor: string; // Used in Candles
-	barWickColor: string; // Used in Candles
+	barBorderColor: string; // Used in Candlesticks
+	barWickColor: string; // Used in Candlesticks
 }
 
 const emptyResult: BarColorerStyle = {
@@ -52,8 +52,8 @@ export class SeriesBarColorer {
 			case 'Bar':
 				return this._barStyle(seriesOptions as BarStyleOptions, barIndex, precomputedBars);
 
-			case 'Candle':
-				return this._candleStyle(seriesOptions as CandleStyleOptions, barIndex, precomputedBars);
+			case 'Candlestick':
+				return this._candleStyle(seriesOptions as CandlestickStyleOptions, barIndex, precomputedBars);
 
 			case 'Histogram':
 				return this._histogramStyle(seriesOptions as HistogramStyleOptions, barIndex, precomputedBars);
@@ -79,16 +79,16 @@ export class SeriesBarColorer {
 		return result;
 	}
 
-	private _candleStyle(candleStyle: CandleStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+	private _candleStyle(candlestickStyle: CandlestickStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const result = { ...emptyResult };
 
-		const upColor = candleStyle.upColor;
-		const downColor = candleStyle.downColor;
-		const borderUpColor = candleStyle.borderUpColor;
-		const borderDownColor = candleStyle.borderDownColor;
+		const upColor = candlestickStyle.upColor;
+		const downColor = candlestickStyle.downColor;
+		const borderUpColor = candlestickStyle.borderUpColor;
+		const borderDownColor = candlestickStyle.borderDownColor;
 
-		const wickUpColor = candleStyle.wickUpColor;
-		const wickDownColor = candleStyle.wickDownColor;
+		const wickUpColor = candlestickStyle.wickUpColor;
+		const wickDownColor = candlestickStyle.wickDownColor;
 
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
 		const isUp = ensure(currentBar.value[SeriesPlotIndex.Open]) <= ensure(currentBar.value[SeriesPlotIndex.Close]);
@@ -118,7 +118,7 @@ export class SeriesBarColorer {
 		const result = { ...emptyResult };
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
 		const colorValue = currentBar.value[SeriesPlotIndex.Color];
-		if (colorValue !== undefined && colorValue !== null) {
+		if (colorValue != null) {
 			const palette = ensureNotNull(this._series.palette());
 			result.barColor = palette.colorByIndex(colorValue);
 		} else {

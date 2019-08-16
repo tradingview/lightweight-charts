@@ -1,3 +1,5 @@
+import { generateTextColor } from '../../helpers/color';
+
 import { Crosshair, CrosshairPriceAndCoordinate } from '../../model/crosshair';
 import { PriceScale } from '../../model/price-scale';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
@@ -8,7 +10,6 @@ export type CrosshairPriceAxisViewValueProvider = (priceScale: PriceScale) => Cr
 
 export class CrosshairPriceAxisView extends PriceAxisView {
 	private _source: Crosshair;
-	private _background: string = '#4c525e';
 	private readonly _priceScale: PriceScale;
 	private readonly _valueProvider: CrosshairPriceAxisViewValueProvider;
 
@@ -25,18 +26,18 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 		commonRendererData: PriceAxisViewRendererCommonData
 	): void {
 		axisRendererData.visible = false;
-		if (!this._source.options().horzLine.labelVisible) {
+		const options = this._source.options().horzLine;
+		if (!options.labelVisible) {
 			return;
 		}
 
-		const mainSource = this._priceScale.mainSource();
-		const firstValue = mainSource !== null ? mainSource.firstValue() : null;
+		const firstValue = this._priceScale.firstValue();
 		if (!this._source.visible() || this._priceScale.isEmpty() || (firstValue === null)) {
 			return;
 		}
 
-		commonRendererData.background = this._background;
-		commonRendererData.color = this.generateTextColor(this._background);
+		commonRendererData.background = options.labelBackgroundColor;
+		commonRendererData.color = generateTextColor(options.labelBackgroundColor);
 
 		const value = this._valueProvider(this._priceScale);
 		commonRendererData.coordinate = value.coordinate;

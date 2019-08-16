@@ -1,4 +1,5 @@
 import { ensureNotNull } from '../../helpers/assertions';
+import { generateTextColor } from '../../helpers/color';
 
 import { ChartModel } from '../../model/chart-model';
 import { Crosshair, TimeAndCoordinateProvider } from '../../model/crosshair';
@@ -48,7 +49,9 @@ export class CrosshairTimeAxisView extends TimeAxisView {
 		const data = this._rendererData;
 		data.visible = false;
 
-		if (!this._crosshair.options().vertLine.labelVisible) {
+		const options = this._crosshair.options().vertLine;
+
+		if (!options.labelVisible) {
 			return;
 		}
 
@@ -68,5 +71,7 @@ export class CrosshairTimeAxisView extends TimeAxisView {
 		data.coordinate = value.coordinate;
 		data.text = timeScale.formatDateTime(ensureNotNull(currentTime));
 		data.visible = true;
+		data.background = options.labelBackgroundColor;
+		data.color = generateTextColor(options.labelBackgroundColor);
 	}
 }

@@ -1,6 +1,5 @@
-import { isNumber } from '../helpers/strict-type-checks';
+import { isNumber, isString } from '../helpers/strict-type-checks';
 
-import { Palette } from '../model/palette';
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
 import { BusinessDay, UTCTimestamp } from '../model/time-data';
@@ -8,7 +7,7 @@ import { BusinessDay, UTCTimestamp } from '../model/time-data';
 export type Time = UTCTimestamp | BusinessDay | string;
 
 export function isBusinessDay(time: Time): time is BusinessDay {
-	return !isNumber(time);
+	return !isNumber(time) && !isString(time);
 }
 
 export function isUTCTimestamp(time: Time): time is UTCTimestamp {
@@ -48,13 +47,13 @@ export interface BarData {
 
 export interface SeriesDataItemTypeMap {
 	Bar: BarData;
-	Candle: BarData;
+	Candlestick: BarData;
 	Area: LineData;
 	Line: LineData;
 	Histogram: HistogramData;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {
-	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][], palette?: Palette): void;
-	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType], palette?: Palette): void;
+	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void;
+	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void;
 }

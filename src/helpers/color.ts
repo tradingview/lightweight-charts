@@ -23,12 +23,12 @@ export type BlueComponent = Nominal<number, 'BlueComponent'>;
  * Alpha component of the RGBA color value
  * The valid values are integers in range [0, 1]
  */
-export type AlphaComponent = Nominal<number, 'AlphaComponent'>;
+type AlphaComponent = Nominal<number, 'AlphaComponent'>;
 
 export type Rgb = [RedComponent, GreenComponent, BlueComponent];
-export type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
+type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
 
-const namedColorRgbHexStrings = {
+const namedColorRgbHexStrings: Record<string, string> = {
 	aliceblue: '#f0f8ff',
 	antiquewhite: '#faebd7',
 	aqua: '#00ffff',
@@ -174,10 +174,6 @@ const namedColorRgbHexStrings = {
 	yellowgreen: '#9acd32',
 };
 
-function isNamedColor<NamedColors extends object>(namedColors: NamedColors, colorString: string | number | symbol): colorString is keyof NamedColors {
-	return colorString in namedColors;
-}
-
 function normalizeInteger(min: number, n: number, max: number): number {
 	return (
 		isNaN(n) ? min :
@@ -197,19 +193,11 @@ function normalizeNumber(min: number, n: number, max: number): number {
 	);
 }
 
-export function normalizeRedComponent(red: number): RedComponent {
-	return normalizeInteger(0, red, 255) as RedComponent;
+function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueComponent>(component: number): T {
+	return normalizeInteger(0, component, 255) as T;
 }
 
-export function normalizeGreenComponent(green: number): GreenComponent {
-	return normalizeInteger(0, green, 255) as GreenComponent;
-}
-
-export function normalizeBlueComponent(blue: number): BlueComponent {
-	return normalizeInteger(0, blue, 255) as BlueComponent;
-}
-
-export function normalizeAlphaComponent(alpha: number): AlphaComponent {
+function normalizeAlphaComponent(alpha: number): AlphaComponent {
 	return normalizeNumber(0, alpha, 1) as AlphaComponent;
 }
 
@@ -223,9 +211,9 @@ namespace RgbShortHexRepresentation {
 	export const re = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeRedComponent(parseInt(matches[1] + matches[1], 16)),
-			normalizeGreenComponent(parseInt(matches[2] + matches[2], 16)),
-			normalizeBlueComponent(parseInt(matches[3] + matches[3], 16)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1] + matches[1], 16)),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2] + matches[2], 16)),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3] + matches[3], 16)),
 		];
 	}
 }
@@ -245,9 +233,9 @@ namespace RgbHexRepresentation {
 	export const re = /^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeRedComponent(parseInt(matches[1], 16)),
-			normalizeGreenComponent(parseInt(matches[2], 16)),
-			normalizeBlueComponent(parseInt(matches[3], 16)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16)),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16)),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16)),
 		];
 	}
 }
@@ -262,9 +250,9 @@ namespace RgbRepresentation {
 	export const re = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeRedComponent(parseInt(matches[1], 10)),
-			normalizeGreenComponent(parseInt(matches[2], 10)),
-			normalizeBlueComponent(parseInt(matches[3], 10)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 10)),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 10)),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 10)),
 		];
 	}
 }
@@ -279,9 +267,9 @@ namespace RgbaRepresentation {
 	export const re = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
 	export function parse(matches: RegExpExecArray): Rgba {
 		return [
-			normalizeRedComponent(parseInt(matches[1], 10)),
-			normalizeGreenComponent(parseInt(matches[2], 10)),
-			normalizeBlueComponent(parseInt(matches[3], 10)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 10)),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 10)),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 10)),
 			normalizeAlphaComponent(parseFloat(matches[4])),
 		];
 	}
@@ -302,15 +290,11 @@ function tryParseRgbaString(rgbaString: string): Rgba | null {
 	return matches !== null ? RgbaRepresentation.parse(matches) : null;
 }
 
-export function tryParseRgb(colorString: string): Rgb | null {
+function tryParseRgb(colorString: string): Rgb | null {
 	colorString = colorString.toLowerCase();
-	if (isNamedColor(namedColorRgbHexStrings, colorString)) {
-		const namedColorParseResult = tryParseRgbHexString(namedColorRgbHexStrings[colorString]);
-		if (namedColorParseResult !== null) {
-			return namedColorParseResult;
-		} else {
-			throw new Error('Invalid named color definition');
-		}
+
+	if (colorString in namedColorRgbHexStrings) {
+		colorString = namedColorRgbHexStrings[colorString];
 	}
 
 	const rgbParseResult = tryParseRgbString(colorString);
@@ -346,11 +330,18 @@ export function parseRgb(colorString: string): Rgb {
 	}
 }
 
-const rgbGrayscaleWeights = [0.199, 0.687, 0.114];
-export function rgbToGrayscale(rgbValue: Rgb): number {
-	return rgbGrayscaleWeights[0] * rgbValue[0] +
-		rgbGrayscaleWeights[1] * rgbValue[1] +
-		rgbGrayscaleWeights[2] * rgbValue[2];
+function rgbToGrayscale(rgbValue: Rgb): number {
+	// Originally, the NTSC RGB to YUV formula
+	// perfected by @eugene-korobko's black magic
+	const redComponentGrayscaleWeight = 0.199;
+	const greenComponentGrayscaleWeight = 0.687;
+	const blueComponentGrayscaleWeight = 0.114;
+
+	return (
+		redComponentGrayscaleWeight * rgbValue[0] +
+		greenComponentGrayscaleWeight * rgbValue[1] +
+		blueComponentGrayscaleWeight * rgbValue[2]
+	);
 }
 
 export function rgbToBlackWhiteString(rgbValue: Rgb, threshold: number): 'black' | 'white' {
@@ -361,39 +352,17 @@ export function rgbToBlackWhiteString(rgbValue: Rgb, threshold: number): 'black'
 	return rgbToGrayscale(rgbValue) >= threshold ? 'white' : 'black';
 }
 
-export function rgba(red: number, green: number, blue: number, alpha: number): Rgba;
-export function rgba(rgb: Rgb, alpha: number): Rgba;
-export function rgba(redOrRgb: number | Rgb, greenOrAlpha: number, blue?: number, alpha?: number): Rgba {
-	if (Array.isArray(redOrRgb)) {
-		// rgba(rgb: Rgb, alpha: number)
-		const res = redOrRgb;
-		alpha = greenOrAlpha;
-
-		return [
-			res[0],
-			res[1],
-			res[2],
-			normalizeAlphaComponent(alpha),
-		];
-	} else {
-		// rgba(red: number, green: number, blue: number, alpha: number)
-		const red = redOrRgb;
-		const green = greenOrAlpha;
-		blue = blue || 0;
-		alpha = alpha || 0;
-
-		return [
-			normalizeRedComponent(red),
-			normalizeGreenComponent(green),
-			normalizeBlueComponent(blue),
-			normalizeAlphaComponent(alpha),
-		];
-	}
+function rgba(rgb: Rgb, alpha: number): Rgba {
+	return [
+		rgb[0],
+		rgb[1],
+		rgb[2],
+		normalizeAlphaComponent(alpha),
+	];
 }
 
-export function rgbaToString(rgbaValue: Rgba): string {
-	const [red, green, blue, alpha] = rgbaValue;
-	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+function rgbaToString(rgbaValue: Rgba): string {
+	return `rgba(${rgbaValue[0]}, ${rgbaValue[1]}, ${rgbaValue[2]}, ${rgbaValue[3]})`;
 }
 
 export function resetTransparency(color: string): string {
@@ -401,13 +370,18 @@ export function resetTransparency(color: string): string {
 		return color;
 	}
 
-	return rgbaToString(rgba(parseRgb(color), normalizeAlphaComponent(1)));
+	return rgbaToString(rgba(parseRgb(color), 1));
 }
 
 export function colorWithTransparency(color: string, transparency: number): string {
-	return rgbaToString(rgba(parseRgb(color), normalizeAlphaComponent(transparency)));
+	return rgbaToString(rgba(parseRgb(color), transparency));
 }
 
 function isHexColor(color: string): boolean {
 	return color.indexOf('#') === 0;
+}
+
+export function generateTextColor(color: string): string {
+	const backColorBW = rgbToBlackWhiteString(parseRgb(color), 160);
+	return backColorBW === 'black' ? 'white' : 'black';
 }

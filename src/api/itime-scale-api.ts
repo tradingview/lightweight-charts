@@ -13,7 +13,7 @@ export interface TimeRange {
 export interface ITimeScaleApi {
 	/**
 	 * Returns current scroll position of the chart
-	 * @return a distance from the right edge to the latest bar, measured in bars
+	 * @returns a distance from the right edge to the latest bar, measured in bars
 	 */
 	scrollPosition(): number;
 
@@ -31,7 +31,7 @@ export interface ITimeScaleApi {
 
 	/**
 	 * Returns current visible time range of the chart
-	 * @return - visible range or null if the chart has no data at all
+	 * @returns - visible range or null if the chart has no data at all
 	 */
 	getVisibleRange(): TimeRange | null;
 
@@ -60,7 +60,7 @@ export interface ITimeScaleApi {
 
 	/**
 	 * Returns current options
-	 * @return - currently applied options
+	 * @returns - currently applied options
 	 */
 	options(): Readonly<TimeScaleOptions>;
 }

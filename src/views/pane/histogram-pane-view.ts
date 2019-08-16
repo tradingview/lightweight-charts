@@ -44,7 +44,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 	private _sourceIndexes: Int32Array = new Int32Array(0);
 
 	public constructor(series: Series<'Histogram'>, model: ChartModel) {
-		super(series, model);
+		super(series, model, false);
 	}
 
 	public renderer(height: number, width: number): IPaneRenderer {
@@ -59,7 +59,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._paletteRenderers.length = palette.size();
 		this._paletteData.length = palette.size();
 
-		const targetIndexes = new Int32Array(palette.size());
+		const targetIndexes = new Int32Array(palette.size() + 1);
 		const histogramStyleProps = this._series.options();
 
 		const barValueGetter = this._series.barFunction();
@@ -69,11 +69,17 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._items.length = this._series.bars().size();
 		let itemIndex = 0;
 
+		const defaultColor = this._series.options().color;
+
 		this._series.bars().each((index: TimePointIndex, bar: Bar) => {
 			const value = barValueGetter(bar.value);
-			const colorIndex = bar.value[SeriesPlotIndex.Color] as number;
+			const paletteColorIndex = bar.value[SeriesPlotIndex.Color];
+
 			const item = createRawItem(index, value);
-			const color = palette.colorByIndex(colorIndex);
+			const color = paletteColorIndex != null ? palette.colorByIndex(paletteColorIndex) : defaultColor;
+			// colorIndex is the paneview's internal palette index
+			// this internal palette stores defaultColor by 0 index and pallette colors by paletteColorIndex + 1
+			const colorIndex = paletteColorIndex == null ? 0 : paletteColorIndex + 1;
 			const data = this._paletteData[colorIndex] || createEmptyHistogramData(barSpacing, histogramStyleProps.lineWidth, color);
 			const targetIndex = targetIndexes[colorIndex]++;
 			if (targetIndex < data.items.length) {
@@ -101,6 +107,14 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._compositeRenderer.setRenderers(this._paletteRenderers);
 	}
 
+	protected _clearVisibleRange(): void {
+		super._clearVisibleRange();
+
+		this._paletteData.forEach((data: PaneRendererHistogramData, colorIndex: number) => {
+			data.visibleRange = null;
+		});
+	}
+
 	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {
 		if (this._itemsVisibleRange === null) {
 			return;
@@ -114,7 +128,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 			timeScale.indexesToCoordinates(data.items);
 			priceScale.pointsArrayToCoordinates(data.items, firstValue);
 			data.histogramBase = histogramBase;
-			data.visibleRange = visibleTimedValues(data.items, visibleBars);
+			data.visibleRange = visibleTimedValues(data.items, visibleBars, false);
 			this._sourceIndexes[colorIndex] = data.visibleRange.from;
 		});
 

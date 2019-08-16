@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-env node */
-/* eslint-disable no-console */
-
 const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -101,7 +98,11 @@ function lintFiles(files) {
 	}
 
 	// markdown
-	hasErrors = runMarkdownLintForFiles(filterByExt(files, '.md')) || hasErrors;
+	const mdFiles = filterByExt(files, '.md');
+	if (mdFiles.length !== 0) {
+		hasErrors = runMarkdownLintForFiles(mdFiles) || hasErrors;
+		hasErrors = run('node scripts/check-markdown-links.js') || hasErrors;
+	}
 
 	return hasErrors;
 }

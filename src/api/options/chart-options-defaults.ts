@@ -23,6 +23,8 @@ export const chartOptionsDefaults: ChartOptions = {
 	handleScroll: {
 		mouseWheel: true,
 		pressedMouseMove: true,
+		horzTouchDrag: true,
+		vertTouchDrag: true,
 	},
 	handleScale: {
 		axisPressedMouseMove: true,
