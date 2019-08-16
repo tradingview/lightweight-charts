@@ -1,8 +1,8 @@
 # Area series
 
-An area chart is another way of displaying quantitative data. It's basically a colored area between the line connecting all data points and time axis.
+An area chart is another way of displaying quantitative data. It's basically a colored area between the line connecting all data points and the time scale.
 
-An area series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the time axis.
+An area series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the time scale.
 
 ![Area chart example](./assets/area-series.png "Area chart example")
 
