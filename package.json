@@ -59,7 +59,7 @@
     "tslint-eslint-rules": "~5.4.0",
     "tslint-microsoft-contrib": "~6.2.0",
     "ttypescript": "~1.5.7",
-    "typecov": "^0.2.1",
+    "typecov": "~0.2.1",
     "typescript": "3.5.3",
     "vrsource-tslint-rules": "6.0.0"
   },
