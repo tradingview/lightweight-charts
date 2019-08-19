@@ -7,7 +7,7 @@ checks:
         - path: "./dist/lightweight-charts.standalone.production.js"
           maxSize: 41.5KB
 
-  - name: type-coverage-watcher
+  - name: typecov
     options:
       atLeast: 99.9
       ignoreCatch: true
