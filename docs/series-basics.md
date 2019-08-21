@@ -268,7 +268,7 @@ barSeries.setData([
 ]);
 ```
 
-### updateData
+### update
 
 Adds new data item to the existing set (or updates the latest item if times of the passed/latest items are equal).
 
@@ -277,14 +277,14 @@ A single data item is expected.
 Examples:
 
 ```javascript
-lineSeries.updateData({
+lineSeries.update({
     time: '2018-12-12',
     value: 24.11,
 });
 ```
 
 ```javascript
-barSeries.updateData({
+barSeries.update({
     time: '2018-12-19',
     open: 141.77,
     high: 170.39,

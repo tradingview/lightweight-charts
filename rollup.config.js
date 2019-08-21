@@ -46,6 +46,12 @@ function getConfig(inputFile, type, isProd) {
 					comments: /@license/,
 					inline_script: true,
 				},
+				mangle: {
+					module: (type === 'module'),
+					properties: {
+						regex: /^_private_/,
+					},
+				},
 			}),
 		],
 	};

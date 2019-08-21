@@ -44,7 +44,7 @@ export class PriceAxisWidget implements IDestroyable {
 	private readonly _topCanvas: HTMLCanvasElement;
 	private readonly _topCtx: CanvasRenderingContext2D;
 
-	private _updateTimeout: number | null = null;
+	private _updateTimeout: TimerId | null = null;
 	private _mouseEventHandler: MouseEventHandler;
 	private _mousedown: boolean = false;
 

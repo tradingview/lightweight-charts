@@ -2,7 +2,7 @@
 
 A line chart is a type of chart that displays information as series of the data points connected by straight line segments.
 
-Line series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving along the timescale.
+Line series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving along the time scale.
 
 ![Line chart example](./assets/line-series.png "Line chart example")
 

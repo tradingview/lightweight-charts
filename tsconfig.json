@@ -1,11 +1,10 @@
 {
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
-		"composite": true
+		"noEmit": true,
 	},
-	"references": [
-		{ "path": "./src" },
-		{ "path": "./tests/unittests" }
-	],
-	"include": []
+	"include": [
+		"src/**/*.ts",
+		"tests/**/*.ts"
+	]
 }

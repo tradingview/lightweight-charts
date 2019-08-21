@@ -57,10 +57,6 @@ const enum Delay {
 	LongTap = 240,
 }
 
-const enum MouseEventButton {
-	Left = 0,
-}
-
 export interface MouseEventHandlerOptions {
 	treatVertTouchDragAsPageScroll: boolean;
 	treatHorzTouchDragAsPageScroll: boolean;
@@ -74,8 +70,8 @@ export class MouseEventHandler implements IDestroyable {
 	private readonly _options: MouseEventHandlerOptions;
 
 	private _clickCount: number = 0;
-	private _clickTimeoutId: number | null = null;
-	private _longTapTimeoutId: number | null = null;
+	private _clickTimeoutId: TimerId | null = null;
+	private _longTapTimeoutId: TimerId | null = null;
 	private _longTapActive: boolean = false;
 	private _mouseMoveStartPosition: Position | null = null;
 	private _moveExceededManhattanDistance: boolean = false;
