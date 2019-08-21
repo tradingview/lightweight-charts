@@ -66,10 +66,10 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
 	switch (item.shape) {
 		case 'arrowDown':
-			drawArrow(true, ctx, item.x, item.y, item.color, item.size);
+			drawArrow(false, ctx, item.x, item.y, item.color, item.size);
 			return;
 		case 'arrowUp':
-			drawArrow(false, ctx, item.x, item.y, item.color, item.size);
+			drawArrow(true, ctx, item.x, item.y, item.color, item.size);
 			return;
 		case 'circle':
 			drawCircle(ctx, item.x, item.y, item.color, item.size);
