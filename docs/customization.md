@@ -82,7 +82,15 @@ Currently, changing the time format of the time scale labels itself is not avail
 ```javascript
 const chart = createChart(document.body, {
     localization: {
-        timeFormatter: function() { return 'Custom time format'; },
+        timeFormatter: function(businessDayOrTimestamp) {
+            // console.log(businessDayOrTimestamp);
+
+            if (LightweightCharts.isBusinessDay(businessDayOrTimestamp)) {
+                return 'Format for business day';
+            }
+
+            return 'Format for timestamp';
+        },
     },
 });
 ```
