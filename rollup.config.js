@@ -16,13 +16,14 @@ function getCurrentVersion() {
 const currentVersion = getCurrentVersion();
 
 function getConfig(inputFile, type, isProd) {
-	const suffix = type === 'module' ? 'esm' : 'standalone';
+	const isModular = type === 'module';
+	const suffix = isModular ? 'esm' : 'standalone';
 	const mode = isProd ? 'production' : 'development';
 
 	const config = {
 		input: inputFile,
 		output: {
-			format: type === 'module' ? 'esm' : 'iife',
+			format: isModular ? 'esm' : 'iife',
 			file: `./dist/lightweight-charts.${suffix}.${mode}.js`,
 			banner: `
 /*!
@@ -54,6 +55,7 @@ function getConfig(inputFile, type, isProd) {
 				},
 			}),
 		],
+		external: id => isModular && /^fancy-canvas(\/.+)?$/.test(id),
 	};
 
 	return config;
