@@ -76,13 +76,21 @@ const chart = createChart(document.body, {
 
 #### Time Format
 
-`timeFormatter` function can be used to customize the format of the time stamp displayed on the time axis below the vertical crosshair line.
+`timeFormatter` function can be used to customize the format of the time stamp displayed on the time scale below the vertical crosshair line.
 Currently, changing the time format of the time scale labels itself is not available, yet this feature is planned for the future.
 
 ```javascript
 const chart = createChart(document.body, {
     localization: {
-        timeFormatter: function() { return 'Custom time format'; },
+        timeFormatter: function(businessDayOrTimestamp) {
+            // console.log(businessDayOrTimestamp);
+
+            if (LightweightCharts.isBusinessDay(businessDayOrTimestamp)) {
+                return 'Format for business day';
+            }
+
+            return 'Format for timestamp';
+        },
     },
 });
 ```
@@ -134,55 +142,13 @@ chart.applyOptions({
 });
 ```
 
-## Time Axis
-
-Time axis is a horizontal scale at the bottom of the chart, used to display different time units.
-
-Time scale options enable adjusting of series that are displayed on a chart when scaling and resizing a chart.
-
-Time scale can be hidden if needed.
-
-The following options are available in the time axis interface:
-
-|Name|Type|Default|Description|
-|----------------------------|-------|-------|--|
-|`rightOffset`|`number`|`0`|Sets the margin space in bars from the right side of the chart|
-|`barSpacing`|`number`|`6`|Sets the space between bars in pixels|
-|`fixLeftEdge`|`boolean`|`false`|If true, prevents scrolling to the left of the first historical bar|
-|`lockVisibleTimeRangeOnResize`|`boolean`|`false`|If true, prevents changing visible time area during chart resizing|
-|`rightBarStaysOnScroll`|`boolean`|`false`|If false, the hovered bar remains in the same place when scrolling|
-|`borderVisible`|`boolean`|`true`|If true, timescale border is visible|
-|`borderColor`|`string`|`#2b2b43`|Timescale border color|
-|`visible`|`boolean`|`true`|If true, timescale is shown on a chart|
-|`timeVisible`|`boolean`|`false`|If true, time is shown on the time scale and crosshair vertical label|
-|`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of the crosshair vertical line in `hh:mm:ss` format on intraday intervals|
-
-### Example of timescale customization
-
-```javascript
-chart.applyOptions({
-    timeScale: {
-        rightOffset: 12,
-        barSpacing: 3,
-        fixLeftEdge: true,
-        lockVisibleTimeRangeOnResize: true,
-        rightBarStaysOnScroll: true,
-        borderVisible: false,
-        borderColor: '#fff000',
-        visible: true,
-        timeVisible: true,
-        secondsVisible: false,
-    },
-});
-```
-
 ## Crosshair
 
-Crosshair shows an intersection of a price and time axis values on any hovered point on the chart.
+The crosshair shows the intersection of the price and time scale values at any point on the chart.
 
 It is presented by horizontal and vertical lines. Each of them can be either customized by setting their `color`, `width` and `style` or disabled by using the `visible` option if necessary. Note that disabling crosshair lines does not disable crosshair marker on Line and Area series. It can be disabled by using the `crosshairMarkerVisible` option of relevant series.
 
-Vertical and horizontal lines of the crosshair have marks on the price and time axis. Any of those marks can be disabled.
+Vertical and horizontal lines of the crosshair have marks on the price and the time scale. Any of those marks can be disabled.
 
 Crosshair has two moving modes:
 
@@ -229,7 +195,7 @@ chart.applyOptions({
 
 ## Grid
 
-A grid is represented in chart background by vertical and horizontal lines drawn at the levels of visible marks of price and time axis.
+A grid is represented in chart background by vertical and horizontal lines drawn at the levels of visible marks of price and the time scale.
 It is possible to set a custom `color` and `style` for grid lines or disable their visibility if necessary.
 Note that vertical and horizontal lines of a grid have to be customized separately.
 
@@ -355,3 +321,7 @@ chart.applyOptions({
     },
 });
 ```
+
+## Next reading
+
+- [Time Scale](./time-scale.md)

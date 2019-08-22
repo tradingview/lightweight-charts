@@ -3,7 +3,7 @@
 const path = require('path');
 
 // override tsconfig for tests
-process.env.TS_NODE_PROJECT = path.resolve(__dirname, './tests/unittests/tsconfig.json');
+process.env.TS_NODE_PROJECT = path.resolve(__dirname, './tests/unittests/tsconfig.composite.json');
 
 const config = {
 	require: [

@@ -4,8 +4,8 @@
 		"composite": true
 	},
 	"references": [
-		{ "path": "../formatters" },
-		{ "path": "../gui" },
+		{ "path": "../formatters/tsconfig.composite.json" },
+		{ "path": "../gui/tsconfig.composite.json" },
 		{ "path": "../tsconfig.model.json" }
 	],
 	"include": [

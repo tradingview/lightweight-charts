@@ -31,6 +31,7 @@ export class Screenshoter {
 		this._browserPromise = launchPuppeteer(puppeteerOptions);
 	}
 
+	// tslint:disable-next-line:invalid-void
 	public async close(): Promise<void> {
 		const browser = await this._browserPromise;
 		delete this._browserPromise;

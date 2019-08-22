@@ -19,6 +19,11 @@
 		"noImplicitReturns": true,
 		"noUnusedLocals": true,
 		"outDir": "lib",
+		"plugins": [
+			{
+				"transform": "ts-transformer-minify-privates"
+			}
+		],
 		"preserveConstEnums": true,
 		"resolveJsonModule": true,
 		"rootDir": "./",
@@ -29,6 +34,8 @@
 			"./src/typings",
 			"node_modules/@types"
 		],
-		"types": []
+		"types": [
+			"_global-types"
+		]
 	}
 }

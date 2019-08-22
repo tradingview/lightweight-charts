@@ -4,7 +4,7 @@
 		"composite": true
 	},
 	"references": [
-		{ "path": "../helpers" }
+		{ "path": "../helpers/tsconfig.composite.json" }
 	],
 	"include": [
 		"./**/*.ts"
