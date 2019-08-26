@@ -16,6 +16,7 @@ export interface PaneRendererAreaData {
 	topColor: string;
 	bottomColor: string;
 	bottom: Coordinate;
+	zeroLine: Coordinate;
 
 	visibleRange: SeriesItemsIndexesRange | null;
 }
@@ -32,6 +33,8 @@ export class PaneRendererArea implements IPaneRenderer {
 			return;
 		}
 
+		const baseline = Math.min(this._data.bottom, this._data.zeroLine);
+
 		ctx.save();
 
 		ctx.lineCap = 'square';
@@ -43,16 +46,16 @@ export class PaneRendererArea implements IPaneRenderer {
 		ctx.lineWidth = 1;
 
 		ctx.beginPath();
-		ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+		ctx.moveTo(this._data.items[this._data.visibleRange.from].x, baseline);
 		ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
 
 		walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
 
-		ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
-		ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+		ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, baseline);
+		ctx.lineTo(this._data.items[this._data.visibleRange.from].x, baseline);
 		ctx.closePath();
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);
+		const gradient = ctx.createLinearGradient(0, 0, 0, Math.min(baseline, this._data.zeroLine));
 		gradient.addColorStop(0, this._data.topColor);
 		gradient.addColorStop(1, this._data.bottomColor);
 

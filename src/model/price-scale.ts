@@ -349,7 +349,7 @@ export class PriceScale {
 		return this._logicalToCoordinate(price, baseValue, keepItFloat);
 	}
 
-	public pointsArrayToCoordinates<T extends PricedValue>(points: T[], baseValue: number, visibleRange?: SeriesItemsIndexesRange): void {
+	public pointsArrayToCoordinates<T extends PricedValue>(points: T[], baseValue: number, visibleRange?: SeriesItemsIndexesRange): Coordinate {
 		this._makeSureItIsValid();
 		const bh = this._bottomMarginPx();
 		const range = ensureNotNull(this.priceRange());
@@ -364,6 +364,18 @@ export class PriceScale {
 		const toIndex = (visibleRange === undefined) ? points.length : visibleRange.to;
 
 		const transformFn = this._getCoordinateTransformer();
+
+		const getPoint = (price: BarPrice): Coordinate => {
+			let logical = price;
+			if (transformFn !== null) {
+				logical = transformFn(price, baseValue) as BarPrice;
+			}
+
+			const invCoordinate = bh + hmm * (logical - min);
+			const coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
+			return Math.round(coordinate) as Coordinate;
+		};
+
 		for (let i = fromIndex; i < toIndex; i++) {
 			const point = points[i];
 			const price = point.price;
@@ -372,15 +384,10 @@ export class PriceScale {
 				continue;
 			}
 
-			let logical = price;
-			if (transformFn !== null) {
-				logical = transformFn(point.price, baseValue) as BarPrice;
-			}
-
-			const invCoordinate = bh + hmm * (logical - min);
-			const coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			point.y = Math.round(coordinate) as Coordinate;
+			point.y = getPoint(price);
 		}
+
+		return getPoint(0 as BarPrice);
 	}
 
 	public barPricesToCoordinates<T extends BarPrices & BarCoordinates>(pricesList: T[], baseValue: number, visibleRange?: SeriesItemsIndexesRange): void {

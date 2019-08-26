@@ -13,13 +13,15 @@ import { TimeScale } from '../../model/time-scale';
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
 export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area', ItemType extends PricedValue & TimedValue> extends SeriesPaneViewBase<TSeriesType, ItemType> {
+	protected _itemsZeroLine: Coordinate = NaN as Coordinate;
+
 	protected constructor(series: Series<TSeriesType>, model: ChartModel) {
 		super(series, model, true);
 	}
 
 	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {
 		timeScale.indexesToCoordinates(this._items, undefinedIfNull(this._itemsVisibleRange));
-		priceScale.pointsArrayToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
+		this._itemsZeroLine = priceScale.pointsArrayToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
 	}
 
 	protected abstract _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer): ItemType;
