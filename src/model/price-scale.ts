@@ -121,6 +121,9 @@ export class PriceScale {
 	private _priceRangeChanged: Delegate<PriceRange | null, PriceRange | null> = new Delegate();
 	private _invalidatedForRange: RangeCache = { isValid: false, visibleBars: null };
 
+	private _marginAbove: number = 0;
+	private _marginBelow: number = 0;
+
 	private _markBuilder: PriceTickMarkBuilder;
 	private _onMarksChanged: Delegate = new Delegate();
 
@@ -287,22 +290,12 @@ export class PriceScale {
 		this._marksCache = null;
 	}
 
-	public topMargin(): number {
-		return this.isInverted() ?
-			this._options.scaleMargins.bottom : this._options.scaleMargins.top;
-	}
-
-	public bottomMargin(): number {
-		return this.isInverted() ?
-			this._options.scaleMargins.top : this._options.scaleMargins.bottom;
-	}
-
 	public internalHeight(): number {
 		if (this._internalHeightCache) {
 			return this._internalHeightCache;
 		}
 
-		const res = this.height() * (1 - this.topMargin() - this.bottomMargin());
+		const res = this.height() - this._topMarginPx() - this._bottomMarginPx();
 		this._internalHeightCache = res;
 		return res;
 	}
@@ -358,7 +351,7 @@ export class PriceScale {
 
 	public pointsArrayToCoordinates<T extends PricedValue>(points: T[], baseValue: number, visibleRange?: SeriesItemsIndexesRange): void {
 		this._makeSureItIsValid();
-		const bh = this.bottomMargin() * this.height();
+		const bh = this._bottomMarginPx();
 		const range = ensureNotNull(this.priceRange());
 		const min = range.minValue();
 		const max = range.maxValue();
@@ -392,7 +385,7 @@ export class PriceScale {
 
 	public barPricesToCoordinates<T extends BarPrices & BarCoordinates>(pricesList: T[], baseValue: number, visibleRange?: SeriesItemsIndexesRange): void {
 		this._makeSureItIsValid();
-		const bh = this.bottomMargin() * this.height();
+		const bh = this._bottomMarginPx();
 		const range = ensureNotNull(this.priceRange());
 		const min = range.minValue();
 		const max = range.maxValue();
@@ -783,6 +776,18 @@ export class PriceScale {
 		this._cachedOrderedSources = null;
 	}
 
+	private _topMarginPx(): number {
+		return this.isInverted()
+			? this._options.scaleMargins.bottom * this.height() + this._marginBelow
+			: this._options.scaleMargins.top * this.height() + this._marginAbove;
+	}
+
+	private _bottomMarginPx(): number {
+		return this.isInverted()
+			? this._options.scaleMargins.top * this.height() + this._marginAbove
+			: this._options.scaleMargins.bottom * this.height() + this._marginBelow;
+	}
+
 	private _makeSureItIsValid(): void {
 		if (!this._invalidatedForRange.isValid) {
 			this._invalidatedForRange.isValid = true;
@@ -803,7 +808,7 @@ export class PriceScale {
 
 		logical = this.isLog() && logical ? toLog(logical) : logical;
 		const range = ensureNotNull(this.priceRange());
-		const invCoordinate = this.bottomMargin() * this.height() +
+		const invCoordinate = this._bottomMarginPx() +
 			(this.internalHeight() - 1) * (logical - range.minValue()) / range.length();
 		const coordinate = this.invertedCoordinate(invCoordinate);
 		if (keepItFloat) {
@@ -822,7 +827,7 @@ export class PriceScale {
 		const invCoordinate = this.invertedCoordinate(coordinate);
 		const range = ensureNotNull(this.priceRange());
 		const logical = range.minValue() + range.length() *
-			((invCoordinate - this.bottomMargin() * this.height()) / (this.internalHeight() - 1));
+			((invCoordinate - this._bottomMarginPx()) / (this.internalHeight() - 1));
 		return this.isLog() ? fromLog(logical) : logical;
 	}
 
@@ -846,15 +851,17 @@ export class PriceScale {
 		let priceRange: PriceRange | null = null;
 		const sources = this.sourcesForAutoScale();
 
+		let marginAbove = 0;
+		let marginBelow = 0;
+
 		for (const source of sources) {
 			const firstValue = source.firstValue();
 			if (firstValue === null) {
 				continue;
 			}
 
-			const startBar = visibleBars.firstBar();
-			const endBar = visibleBars.lastBar();
-			let sourceRange = source.priceRange(startBar, endBar);
+			const autoScaleInfo = source.autoscaleInfo(visibleBars.firstBar(), visibleBars.lastBar());
+			let sourceRange = autoScaleInfo && autoScaleInfo.priceRange;
 
 			if (sourceRange !== null) {
 				switch (this._options.mode) {
@@ -874,7 +881,19 @@ export class PriceScale {
 				} else {
 					priceRange = priceRange.merge(ensureNotNull(sourceRange));
 				}
+
+				if (autoScaleInfo !== null && autoScaleInfo.margins !== null) {
+					marginAbove = Math.max(marginAbove, autoScaleInfo.margins.above);
+					marginBelow = Math.max(marginAbove, autoScaleInfo.margins.below);
+				}
 			}
+		}
+
+		if (marginAbove !== this._marginAbove || marginBelow !== this._marginBelow) {
+			this._marginAbove = marginAbove;
+			this._marginBelow = marginBelow;
+			this._marksCache = null;
+			this._invalidateInternalHeightCache();
 		}
 
 		if (priceRange !== null) {
