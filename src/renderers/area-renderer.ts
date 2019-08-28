@@ -55,7 +55,7 @@ export class PaneRendererArea implements IPaneRenderer {
 		ctx.lineTo(this._data.items[this._data.visibleRange.from].x, baseline);
 		ctx.closePath();
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, Math.min(baseline, this._data.zeroLine));
+		const gradient = ctx.createLinearGradient(0, 0, 0, baseline);
 		gradient.addColorStop(0, this._data.topColor);
 		gradient.addColorStop(1, this._data.bottomColor);
 
