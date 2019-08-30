@@ -77,7 +77,8 @@ const chart = createChart(document.body, {
 #### Time Format
 
 `timeFormatter` function can be used to customize the format of the time stamp displayed on the time scale below the vertical crosshair line.
-Currently, changing the time format of the time scale labels itself is not available, yet this feature is planned for the future.
+
+Changing the time format of the time scale labels is not available currently but we intend to roll this out in the future.
 
 ```javascript
 const chart = createChart(document.body, {
