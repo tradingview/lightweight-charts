@@ -332,11 +332,11 @@ series.setMarkers([
 ]);
 
 chart.subscribeCrosshairMove(function(param) {
-    console.log(param.hoveredObject);
+    console.log(param.hoveredMarkerId);
 });
 
 chart.subscribeClick(function(param) {
-    console.log(param.hoveredObject);
+    console.log(param.hoveredMarkerId);
 });
 ```
 
