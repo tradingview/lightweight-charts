@@ -179,7 +179,7 @@ export class PriceAxisWidget implements IDestroyable {
 		let tickMarkMaxWidth = 34;
 		const rendererOptions = this.rendererOptions();
 
-		const ctx = ensureNotNull(getPretransformedContext2D(this._canvasBinding));
+		const ctx = getPretransformedContext2D(this._canvasBinding);
 		const tickMarks = this._priceScale.marks();
 
 		ctx.font = this.baseFont();
@@ -284,7 +284,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = ensureNotNull(getPretransformedContext2D(this._canvasBinding));
+			const ctx = getPretransformedContext2D(this._canvasBinding);
 			this._alignLabels();
 			this._drawBackground(ctx);
 			this._drawBorder(ctx);
@@ -292,7 +292,7 @@ export class PriceAxisWidget implements IDestroyable {
 			this._drawBackLabels(ctx);
 		}
 
-		const topCtx = ensureNotNull(getPretransformedContext2D(this._topCanvasBinding));
+		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
 		topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 		this._drawCrosshairLabel(topCtx);
 	}

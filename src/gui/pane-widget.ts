@@ -486,7 +486,7 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = ensureNotNull(getPretransformedContext2D(this._canvasBinding));
+			const ctx = getPretransformedContext2D(this._canvasBinding);
 			this._drawBackground(ctx, this._backgroundColor());
 			if (this._state) {
 				this._drawGrid(ctx);
@@ -495,7 +495,7 @@ export class PaneWidget implements IDestroyable {
 			}
 		}
 
-		const topCtx = ensureNotNull(getPretransformedContext2D(this._topCanvasBinding));
+		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
 		topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
 		this._drawCrosshair(topCtx);
 	}

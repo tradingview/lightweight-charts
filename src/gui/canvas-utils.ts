@@ -31,13 +31,11 @@ export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderin
 	return ctx;
 }
 
-export function getPretransformedContext2D(binding: CanvasCoordinateSpaceBinding): CanvasRenderingContext2D | null {
-	const ctx = binding.canvas.getContext('2d');
-	if (ctx) {
-		// scale by pixel ratio
-		ctx.setTransform(binding.pixelRatio, 0, 0, binding.pixelRatio, 0, 0);
-		ctx.translate(0.5, 0.5);
-	}
+export function getPretransformedContext2D(binding: CanvasCoordinateSpaceBinding): CanvasRenderingContext2D {
+	const ctx = ensureNotNull(binding.canvas.getContext('2d'));
+	// scale by pixel ratio
+	ctx.setTransform(binding.pixelRatio, 0, 0, binding.pixelRatio, 0, 0);
+	ctx.translate(0.5, 0.5);
 	return ctx;
 }
 

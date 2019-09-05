@@ -1,6 +1,5 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
-import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 
 import { ChartOptions } from '../model/chart-model';
@@ -98,7 +97,7 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
-		const ctx = ensureNotNull(getPretransformedContext2D(this._canvasBinding));
+		const ctx = getPretransformedContext2D(this._canvasBinding);
 		this._drawBackground(ctx);
 		this._drawBorder(ctx);
 	}

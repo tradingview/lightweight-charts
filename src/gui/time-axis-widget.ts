@@ -1,6 +1,5 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
-import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -251,7 +250,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = ensureNotNull(getPretransformedContext2D(this._canvasBinding));
+			const ctx = getPretransformedContext2D(this._canvasBinding);
 			this._drawBackground(ctx);
 			this._drawBorder(ctx);
 
@@ -263,7 +262,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			}
 		}
 
-		const topCtx = ensureNotNull(getPretransformedContext2D(this._topCanvasBinding));
+		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
 		this._drawCrosshairLabel(topCtx);
 	}
 
