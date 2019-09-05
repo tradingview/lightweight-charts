@@ -16,16 +16,18 @@ export class Size {
 	}
 }
 
-export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
-	const pixelRatio =
-		canvas.ownerDocument &&
+function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
+	return canvas.ownerDocument &&
 		canvas.ownerDocument.defaultView &&
 		canvas.ownerDocument.defaultView.devicePixelRatio
 		|| 1;
+}
 
+export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
 	const ctx = canvas.getContext('2d');
 	if (ctx) {
 		// scale by pixel ratio
+		const pixelRatio = getCanvasDevicePixelRatio(canvas);
 		ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 	}
 	return ctx;
@@ -57,7 +59,7 @@ function createCanvas(doc: Document): HTMLCanvasElement {
 export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvasElement {
 	const canvas = createCanvas(doc);
 
-	const pixelRatio = doc.defaultView && doc.defaultView.devicePixelRatio || 1;
+	const pixelRatio = getCanvasDevicePixelRatio(canvas);
 	// we should keep the layout size...
 	canvas.style.width = `${size.w}px`;
 	canvas.style.height = `${size.h}px`;
