@@ -211,7 +211,7 @@ export class ChartWidget implements IDestroyable {
 		// calculate target size
 		const firstPane = this._paneWidgets[0];
 		const targetCanvas = createPreconfiguredCanvas(document, new Size(this._width, this._height));
-		const ctx = ensureNotNull(getPrescaledContext2D(targetCanvas));
+		const ctx = getPrescaledContext2D(targetCanvas);
 		let targetX = 0;
 		let targetY = 0;
 

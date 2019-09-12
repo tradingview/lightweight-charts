@@ -1,4 +1,3 @@
-import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clamp } from '../helpers/mathex';
 
@@ -86,7 +85,7 @@ export class PaneSeparator implements IDestroyable {
 	public getImage(): HTMLCanvasElement {
 		const size = this.getSize();
 		const res = createPreconfiguredCanvas(document, size);
-		const ctx = ensureNotNull(getPrescaledContext2D(res));
+		const ctx = getPrescaledContext2D(res);
 		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;
 		ctx.fillRect(0, 0, size.w, size.h);
 		return res;

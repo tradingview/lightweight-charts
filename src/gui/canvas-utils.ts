@@ -23,13 +23,11 @@ function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 		|| 1;
 }
 
-export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
-	const ctx = canvas.getContext('2d');
-	if (ctx) {
-		// scale by pixel ratio
-		const pixelRatio = getCanvasDevicePixelRatio(canvas);
-		ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-	}
+export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+	const ctx = ensureNotNull(canvas.getContext('2d'));
+	// scale by pixel ratio
+	const pixelRatio = getCanvasDevicePixelRatio(canvas);
+	ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 	return ctx;
 }
 

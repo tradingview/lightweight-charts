@@ -1,6 +1,6 @@
 import { createPreconfiguredCanvas, getPrescaledContext2D, Size } from '../gui/canvas-utils';
 
-import { ensureDefined, ensureNotNull } from '../helpers/assertions';
+import { ensureDefined } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -83,7 +83,7 @@ export class LabelsImageCache implements IDestroyable {
 				this._hash.set(item.text, item);
 			}
 
-			ctx = ensureNotNull(getPrescaledContext2D(item.canvas));
+			ctx = getPrescaledContext2D(item.canvas);
 			ctx.font = this._font;
 			ctx.fillStyle = this._color;
 			ctx.fillText(text, 0, item.height - margin - baselineOffset);
