@@ -655,7 +655,7 @@ export class PriceScale {
 			return;
 		}
 
-		const priceUnitsPerPixel = ensureNotNull(this.priceRange()).length() / (this.height() - 1);
+		const priceUnitsPerPixel = ensureNotNull(this.priceRange()).length() / (this.internalHeight() - 1);
 		let pixelDelta = x - this._scrollStartPoint;
 
 		if (this.isInverted()) {
