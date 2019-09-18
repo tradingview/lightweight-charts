@@ -714,6 +714,6 @@ export class PaneWidget implements IDestroyable {
 		return this._chart.model();
 	}
 
-	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);
-	private readonly _topCanvasConfiguredHandler = () => this.paint(InvalidationLevel.Cursor);
+	private readonly _canvasConfiguredHandler = () => this._state && this._model().updatePane(this._state, InvalidationLevel.Full);
+	private readonly _topCanvasConfiguredHandler = () => this._state && this._model().updatePane(this._state, InvalidationLevel.Cursor);
 }

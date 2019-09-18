@@ -643,8 +643,14 @@ export class PriceAxisWidget implements IDestroyable {
 
 	private readonly _canvasConfiguredHandler = () => {
 		this._recreateTickMarksCache(this._rendererOptionsProvider.options());
-		this.paint(InvalidationLevel.Full);
+		const model = this._pane.chart().model();
+		const pane = this._pane.state();
+		model.updatePane(pane, InvalidationLevel.Full);
 	}
 
-	private readonly _topCanvasConfiguredHandler = () => this.paint(InvalidationLevel.Cursor);
+	private readonly _topCanvasConfiguredHandler = () => {
+		const model = this._pane.chart().model();
+		const pane = this._pane.state();
+		model.updatePane(pane, InvalidationLevel.Cursor);
+	}
 }

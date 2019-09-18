@@ -497,6 +497,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._priceAxisPosition = priceAxisPosition;
 	}
 
-	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);
-	private readonly _topCanvasConfiguredHandler = () => this.paint(InvalidationLevel.Cursor);
+	private readonly _canvasConfiguredHandler = () => this._chart.model().lightUpdate();
+	private readonly _topCanvasConfiguredHandler = () => this._chart.model().lightUpdate();
 }
