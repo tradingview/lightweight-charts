@@ -75,7 +75,6 @@ export class PriceAxisStub implements IDestroyable {
 		if (!this._size.equals(size)) {
 			this._size = size;
 
-			// apply new size to canvas
 			this._canvasBinding.canvasSize = { width: size.w, height: size.h };
 
 			this._cell.style.width = `${size.w}px`;

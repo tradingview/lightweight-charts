@@ -216,7 +216,6 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || !this._size.equals(size)) {
 			this._size = size;
 
-			// apply new size to canvases
 			this._canvasBinding.canvasSize = { width: size.w, height: size.h };
 			this._topCanvasBinding.canvasSize = { width: size.w, height: size.h };
 
