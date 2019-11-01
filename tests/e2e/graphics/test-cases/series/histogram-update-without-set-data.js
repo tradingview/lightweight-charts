@@ -9,7 +9,7 @@ function runTestCase(container) {
 	var volumeSeries = chart.addHistogramSeries();
 
 	volumeSeries.update(
-		{ time: '2019-05-24', value: 23714686.00 },
+		{ time: '2019-05-24', value: 23714686.00 }
 	);
 
 	areaSeries.setData([
