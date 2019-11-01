@@ -96,21 +96,19 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
 	private _endOfData: boolean = false;
-	private _paneView: IUpdatablePaneView | null = null;
+	private _paneView!: IUpdatablePaneView;
 	private _barColorerCache: SeriesBarColorer | null = null;
 	private readonly _options: SeriesOptionsMap[T];
 	private _barFunction: BarFunction;
 	private readonly _palette: Palette = new Palette();
 	private _markers: SeriesMarker<TimePoint>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
-	private _markersPaneView: SeriesMarkersPaneView;
+	private _markersPaneView!: SeriesMarkersPaneView;
 
 	public constructor(model: ChartModel, options: SeriesOptionsMap[T], seriesType: T) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
-
-		this.createPaneView();
 
 		const priceAxisView = new SeriesPriceAxisView(this, { model: model });
 		this._priceAxisViews = [priceAxisView];
@@ -121,7 +119,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._updateBarFunction();
 		this._barFunction = this.barFunction(); // redundant
 
-		this._markersPaneView = new SeriesMarkersPaneView(this, model);
+		this._recreatePaneViews();
 	}
 
 	public destroy(): void {
@@ -211,38 +209,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._data;
 	}
 
-	public createPaneView(): void {
-		this._paneView = null;
-		switch (this._seriesType) {
-			case 'Bar': {
-				this._paneView = new SeriesBarsPaneView(this as Series<'Bar'>, this.model());
-				break;
-			}
-
-			case 'Candlestick': {
-				this._paneView = new SeriesCandlesticksPaneView(this as Series<'Candlestick'>, this.model());
-				break;
-			}
-
-			case 'Line': {
-				this._paneView = new SeriesLinePaneView(this as Series<'Line'>, this.model());
-				break;
-			}
-
-			case 'Area': {
-				this._paneView = new SeriesAreaPaneView(this as Series<'Area'>, this.model());
-				break;
-			}
-
-			case 'Histogram': {
-				this._paneView = new SeriesHistogramPaneView(this as Series<'Histogram'>, this.model());
-				break;
-			}
-
-			default: throw Error('Unknown chart style assigned: ' + this._seriesType);
-		}
-	}
-
 	public barColorer(): SeriesBarColorer {
 		if (this._barColorerCache !== null) {
 			return this._barColorerCache;
@@ -278,10 +244,13 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._data.clear();
 		this._data.bars().merge(data);
 		this._recalculateMarkers();
-		if (this._paneView !== null) {
-			this._paneView.update('data');
-		}
-		this._markersPaneView.update('data');
+
+		// we must either re-create pane view on full data replacement
+		// or clear all caches inside pane view
+		// but currently we can't separate update/append last bar and full data replacement (update vs setData)
+		// so let's re-create all views
+		this._recreatePaneViews();
+
 		const sourcePane = this.model().paneForSource(this);
 		this.model().recalculatePane(sourcePane);
 		this.model().updateSource(this);
@@ -311,10 +280,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
 		this._data.bars().merge(data);
 		this._recalculateMarkers();
-		if (this._paneView !== null) {
-			this._paneView.update('data');
-		}
+
+		this._paneView.update('data');
 		this._markersPaneView.update('data');
+
 		const sourcePane = this.model().paneForSource(this);
 		this.model().recalculatePane(sourcePane);
 		this.model().updateSource(this);
@@ -393,7 +362,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			res.push(this._baseHorizontalLineView);
 		}
 
-		res.push(ensureNotNull(this._paneView));
+		res.push(this._paneView);
 		res.push(this._priceLineView);
 
 		res.push(this._panePriceAxisView);
@@ -447,10 +416,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public updateAllViews(): void {
-		if (this._paneView === null) {
-			return;
-		}
-
 		this._paneView.update();
 		this._markersPaneView.update();
 
@@ -549,5 +514,38 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			id: marker.id,
 			internalId: index,
 		}));
+	}
+
+	private _recreatePaneViews(): void {
+		this._markersPaneView = new SeriesMarkersPaneView(this, this.model());
+
+		switch (this._seriesType) {
+			case 'Bar': {
+				this._paneView = new SeriesBarsPaneView(this as Series<'Bar'>, this.model());
+				break;
+			}
+
+			case 'Candlestick': {
+				this._paneView = new SeriesCandlesticksPaneView(this as Series<'Candlestick'>, this.model());
+				break;
+			}
+
+			case 'Line': {
+				this._paneView = new SeriesLinePaneView(this as Series<'Line'>, this.model());
+				break;
+			}
+
+			case 'Area': {
+				this._paneView = new SeriesAreaPaneView(this as Series<'Area'>, this.model());
+				break;
+			}
+
+			case 'Histogram': {
+				this._paneView = new SeriesHistogramPaneView(this as Series<'Histogram'>, this.model());
+				break;
+			}
+
+			default: throw Error('Unknown chart style assigned: ' + this._seriesType);
+		}
 	}
 }
