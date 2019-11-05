@@ -16,7 +16,7 @@
 
 <!-- markdownlint-enable no-inline-html -->
 
-[Demos][demo-url] | [Documentation](./docs/README.md)
+[Demos][demo-url] | [Documentation](./docs/README.md) | [Discord community](https://discord.gg/E6UthXZ)
 
 TradingView Lightweight Charts are one of the smallest and fastest financial HTML5 charts.
 
