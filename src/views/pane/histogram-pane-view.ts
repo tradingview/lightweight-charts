@@ -142,7 +142,9 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 			const item = data.items[sourceIndex];
 			item.left = Math.floor(item.x - barSpacing * 0.5) as Coordinate;
 			item.right = Math.ceil(item.left + barSpacing) as Coordinate;
-			if (prevItem !== null) {
+
+			// we should correct borders only in case of sibling items
+			if (prevItem !== null && (item.time - prevItem.time) === 1) {
 				const itemsSpacing = item.right - item.left > showSpacingMinimalBarWidth ? 1 : 0;
 				prevItem.right = (item.left - itemsSpacing) as Coordinate;
 			}
