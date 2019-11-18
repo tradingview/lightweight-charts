@@ -350,6 +350,16 @@ chart.subscribeClick(function(param) {
 });
 ```
 
+## Taking screenshot
+
+A screenshot of the whole chart could be taken with the call
+
+```javascript
+var screenshot = chart.takeScreenshot();
+```
+
+The function returns a `canvas` element with the chart drawn on it. `toDataURL()`, `toBlob()` or any other function of the result object could be used.
+
 ## Next reading
 
 - [Area series](./area-series.md)
