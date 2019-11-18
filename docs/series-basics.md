@@ -118,6 +118,16 @@ chart.applyOptions({
 });
 ```
 
+## Removing series
+
+Any series could be removed with
+
+```javascript
+chart.removeSeries(series);
+```
+
+where `series` is an instance of any series type.
+
 ## Data
 
 Every series has its own data type. Please refer to series page to determine what type of data the series uses.
