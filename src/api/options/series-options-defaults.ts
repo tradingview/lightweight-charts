@@ -6,7 +6,7 @@ import {
 	LineStyleOptions,
 	SeriesOptionsCommon,
 } from '../../model/series-options';
-import { LineStyle } from '../../renderers/draw-line';
+import { LineStyle, LineType } from '../../renderers/draw-line';
 
 export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	upColor: '#26a69a',
@@ -32,6 +32,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 	color: '#2196f3',
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
+	lineType: LineType.Simple,
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 };
@@ -42,6 +43,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	lineColor: '#33D778',
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
+	lineType: LineType.Simple,
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 };

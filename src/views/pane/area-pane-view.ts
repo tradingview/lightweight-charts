@@ -5,7 +5,6 @@ import { Series } from '../../model/series';
 import { TimePointIndex } from '../../model/time-data';
 import { PaneRendererArea, PaneRendererAreaData } from '../../renderers/area-renderer';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
-import { LineType } from '../../renderers/draw-line';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { LineItem, PaneRendererLine } from '../../renderers/line-renderer';
 
@@ -27,7 +26,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		const areaStyleProperties = this._series.options();
 
 		const data: PaneRendererAreaData = {
-			lineType: LineType.Simple,
+			lineType: areaStyleProperties.lineType,
 			items: this._items,
 			lineColor: areaStyleProperties.lineColor,
 			lineStyle: areaStyleProperties.lineStyle,
