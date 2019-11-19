@@ -355,7 +355,7 @@ chart.subscribeClick(function(param) {
 Takes a screenshot of the whole chart.
 
 ```javascript
-var screenshot = chart.takeScreenshot();
+const screenshot = chart.takeScreenshot();
 ```
 
 The function returns a `canvas` element with the chart drawn on it. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
