@@ -28,6 +28,7 @@ export const chartOptionsDefaults: ChartOptions = {
 	},
 	handleScale: {
 		axisPressedMouseMove: true,
+		axisDoubleClickReset: true,
 		mouseWheel: true,
 		pinch: true,
 	},

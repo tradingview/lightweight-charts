@@ -345,7 +345,9 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDoubleClickEvent(e: TouchMouseEvent): void {
-		this.reset();
+		if (this._pane.chart().options().handleScale.axisDoubleClickReset) {
+			this.reset();
+		}
 	}
 
 	private _mouseEnterEvent(e: TouchMouseEvent): void {
