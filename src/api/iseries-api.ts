@@ -26,13 +26,15 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 */
 	priceFormatter(): IPriceFormatter;
 
-	/** Converts specified series price to pixel coordinate according to the series price scale
+	/**
+	 * Converts specified series price to pixel coordinate according to the series price scale
 	 * @param price - input price to be converted
 	 * @returns - pixel coordinate of the price level on the chart
 	 */
 	priceToCoordinate(price: BarPrice): Coordinate | null;
 
-	/** Converts specified coordinate to price value according to the series price scale
+	/**
+	 * Converts specified coordinate to price value according to the series price scale
 	 * @param coordinate - input coordinate to be converted
 	 * @returns - price value pf the coordinate on the chart
 	 */

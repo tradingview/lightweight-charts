@@ -358,18 +358,18 @@ There are two functions to access this price scale implicitly.
 
 ### priceToCoordinate
 
-This function accepts price value and returns corresponding coordinate or null.
+This function accepts price value and returns corresponding coordinate or `null`.
 
 ```javascript
-var coordinate = series.priceToCoordinate(100.5);
+const coordinate = series.priceToCoordinate(100.5);
 ```
 
 ### coordinateToPrice
 
-This function accepts coordinate and returns corresponding price value or null.
+This function accepts coordinate and returns corresponding price value or `null`.
 
 ```javascript
-var price = series.coordinateToPrice(324);
+const price = series.coordinateToPrice(324);
 ```
 
 ## Next reading
