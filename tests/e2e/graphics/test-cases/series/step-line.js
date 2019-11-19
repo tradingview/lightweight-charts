@@ -18,7 +18,7 @@ function runTestCase(container) {
 
 	var mainSeries = chart.addLineSeries({
 		lineWidth: 1,
-		lineType: 1,
+		lineType: LightweightCharts.LineType.WithSteps,
 		color: '#ff0000',
 	});
 

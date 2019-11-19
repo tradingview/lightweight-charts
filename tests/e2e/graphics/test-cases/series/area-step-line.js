@@ -17,7 +17,7 @@ function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container);
 
 	var mainSeries = chart.addAreaSeries({
-		lineType: 1,
+		lineType: LightweightCharts.LineType.WithSteps,
 	});
 
 	mainSeries.setData(generateData());
