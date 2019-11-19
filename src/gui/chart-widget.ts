@@ -520,8 +520,8 @@ export class ChartWidget implements IDestroyable {
 
 		const hoveredSource = this.model().hoveredSource();
 
-		const hoveredSeries = hoveredSource !== null && hoveredSource instanceof Series
-			? hoveredSource
+		const hoveredSeries = hoveredSource !== null && hoveredSource.source instanceof Series
+			? hoveredSource.source
 			: undefined;
 
 		const hoveredObject = hoveredSource !== null && hoveredSource.object !== undefined
