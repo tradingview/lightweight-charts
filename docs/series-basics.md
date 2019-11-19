@@ -350,6 +350,28 @@ chart.subscribeClick(function(param) {
 });
 ```
 
+## Coordinates and prices converting
+
+Each series has an associated price scale object. If the series has been created as overlay,
+it has an invisible price scale to convert prices to coordinates and coordinates to prices.
+There are two functions to access this price scale implicitly.
+
+### priceToCoordinate
+
+This function accepts price value and returns corresponding coordinate or `null`.
+
+```javascript
+const coordinate = series.priceToCoordinate(100.5);
+```
+
+### coordinateToPrice
+
+This function accepts coordinate and returns corresponding price value or `null`.
+
+```javascript
+const price = series.coordinateToPrice(324);
+```
+
 ## Next reading
 
 - [Area series](./area-series.md)
