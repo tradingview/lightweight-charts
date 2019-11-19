@@ -350,6 +350,16 @@ chart.subscribeClick(function(param) {
 });
 ```
 
+## Taking screenshot
+
+Takes a screenshot of the whole chart.
+
+```javascript
+const screenshot = chart.takeScreenshot();
+```
+
+The function returns a `canvas` element with the chart drawn on it. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
+
 ## Coordinates and prices converting
 
 Each series has an associated price scale object. If the series has been created as overlay,
