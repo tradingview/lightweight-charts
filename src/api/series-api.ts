@@ -46,6 +46,14 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().priceToCoordinate(price, firstValue.value);
 	}
 
+	public coordinateToPrice(coordinate: Coordinate): BarPrice | null {
+		const firstValue = this._series.firstValue();
+		if (firstValue === null) {
+			return null;
+		}
+		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
+	}
+
 	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {
 		this._dataUpdatesConsumer.applyNewData(this._series, data);
 	}
