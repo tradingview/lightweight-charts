@@ -352,13 +352,13 @@ chart.subscribeClick(function(param) {
 
 ## Taking screenshot
 
-A screenshot of the whole chart could be taken with the call
+Takes a screenshot of the whole chart.
 
 ```javascript
 var screenshot = chart.takeScreenshot();
 ```
 
-The function returns a `canvas` element with the chart drawn on it. `toDataURL()`, `toBlob()` or any other function of the result object could be used.
+The function returns a `canvas` element with the chart drawn on it. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
 
 ## Coordinates and prices converting
 
