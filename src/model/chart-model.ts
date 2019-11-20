@@ -36,6 +36,7 @@ export interface HandleScaleOptions {
 	mouseWheel: boolean;
 	pinch: boolean;
 	axisPressedMouseMove: boolean;
+	axisDoubleClickReset: boolean;
 }
 
 export interface HoveredObject {
