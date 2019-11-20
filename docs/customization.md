@@ -96,6 +96,22 @@ const chart = createChart(document.body, {
 });
 ```
 
+#### Price Format
+
+`priceFormatter` function can be used to customize the format of the price displayed on the price scale for crosshair value and labels.
+
+```javascript
+const chart = createChart(document.body, {
+    localization: {
+        priceFormatter: function(price) {
+            // add $ sign before price
+
+            return '$' + price;
+        },
+    },
+});
+```
+
 ## Price Axis
 
 Price axis is the vertical scale used for price value data.
