@@ -23,7 +23,7 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
 			items: this._items,
 			lineColor: lineStyleProps.color,
 			lineStyle: lineStyleProps.lineStyle,
-			lineType: 0,
+			lineType: lineStyleProps.lineType,
 			lineWidth: lineStyleProps.lineWidth,
 			visibleRange: this._itemsVisibleRange,
 		};
