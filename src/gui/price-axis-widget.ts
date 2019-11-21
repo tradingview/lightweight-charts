@@ -216,8 +216,8 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || !this._size.equals(size)) {
 			this._size = size;
 
-			this._canvasBinding.canvasSize = { width: size.w, height: size.h };
-			this._topCanvasBinding.canvasSize = { width: size.w, height: size.h };
+			this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
+			this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
 
 			this._cell.style.width = size.w + 'px';
 			// need this for IE11

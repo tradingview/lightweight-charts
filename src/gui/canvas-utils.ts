@@ -73,10 +73,10 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 	parentElement.appendChild(canvas);
 
 	const binding = bindToDevicePixelRatio(canvas);
-	binding.canvasSize = {
+	binding.resizeCanvas({
 		width: size.w,
 		height: size.h,
-	};
+	});
 	return binding;
 }
 

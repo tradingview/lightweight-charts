@@ -193,8 +193,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		if (!this._size || !this._size.equals(timeAxisSize)) {
 			this._size = timeAxisSize;
 
-			this._canvasBinding.canvasSize = { width: timeAxisSize.w, height: timeAxisSize.h };
-			this._topCanvasBinding.canvasSize = { width: timeAxisSize.w, height: timeAxisSize.h };
+			this._canvasBinding.resizeCanvas({ width: timeAxisSize.w, height: timeAxisSize.h });
+			this._topCanvasBinding.resizeCanvas({ width: timeAxisSize.w, height: timeAxisSize.h });
 
 			this._cell.style.width = timeAxisSize.w + 'px';
 			this._cell.style.height = timeAxisSize.h + 'px';

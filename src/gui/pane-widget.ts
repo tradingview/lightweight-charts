@@ -438,8 +438,8 @@ export class PaneWidget implements IDestroyable {
 
 		this._size = size;
 
-		this._canvasBinding.canvasSize = { width: size.w, height: size.h };
-		this._topCanvasBinding.canvasSize = { width: size.w, height: size.h };
+		this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
+		this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
 
 		this._paneCell.style.width = size.w + 'px';
 		this._paneCell.style.height = size.h + 'px';
