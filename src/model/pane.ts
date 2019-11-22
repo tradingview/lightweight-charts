@@ -6,7 +6,6 @@ import { clone } from '../helpers/strict-type-checks';
 
 import { ChartModel } from './chart-model';
 import { IDataSource } from './idata-source';
-import { InvalidationLevel } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceDataSource } from './price-data-source';
 import { PriceScale, PriceScaleState } from './price-scale';
@@ -267,7 +266,7 @@ export class Pane implements IDestroyable {
 		});
 
 		this.updateAllViews();
-		this._model.updatePane(this, InvalidationLevel.None);
+		this._model.lightUpdate();
 	}
 
 	public isEmpty(): boolean {
