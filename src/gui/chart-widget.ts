@@ -21,6 +21,8 @@ export interface MouseEventParamsImpl {
 	time?: TimePoint;
 	point?: Point;
 	seriesPrices: Map<Series, BarPrice | BarPrices>;
+	hoveredSeries?: Series;
+	hoveredObject?: string;
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
@@ -517,10 +519,22 @@ export class ChartWidget implements IDestroyable {
 			}
 		}
 
+		const hoveredSource = this.model().hoveredSource();
+
+		const hoveredSeries = hoveredSource !== null && hoveredSource.source instanceof Series
+			? hoveredSource.source
+			: undefined;
+
+		const hoveredObject = hoveredSource !== null && hoveredSource.object !== undefined
+			? hoveredSource.object.externalId
+			: undefined;
+
 		return {
 			time: clientTime,
 			point: point || undefined,
+			hoveredSeries,
 			seriesPrices,
+			hoveredObject,
 		};
 	}
 

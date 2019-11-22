@@ -69,7 +69,7 @@ const configs = [
 if (process.env.NODE_ENV === 'production') {
 	configs.push(
 		getConfig('./lib/src/index.js', 'module', true),
-		getConfig('./lib/src/standalone.js', 'standalone', true),
+		getConfig('./lib/src/standalone.js', 'standalone', true)
 	);
 }
 

@@ -4,13 +4,15 @@ import { clone } from '../helpers/strict-type-checks';
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { Series } from '../model/series';
+import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
 
-import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
+import { convertTime } from './data-layer';
 import { IPriceFormatter, ISeriesApi } from './iseries-api';
 
 export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType>, IDestroyable {
@@ -44,12 +46,28 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().priceToCoordinate(price, firstValue.value);
 	}
 
+	public coordinateToPrice(coordinate: Coordinate): BarPrice | null {
+		const firstValue = this._series.firstValue();
+		if (firstValue === null) {
+			return null;
+		}
+		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
+	}
+
 	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {
 		this._dataUpdatesConsumer.applyNewData(this._series, data);
 	}
 
 	public update(bar: SeriesDataItemTypeMap[TSeriesType]): void {
 		this._dataUpdatesConsumer.updateData(this._series, bar);
+	}
+
+	public setMarkers(data: SeriesMarker<Time>[]): void {
+		const convertedMarkers = data.map((marker: SeriesMarker<Time>) => ({
+			...marker,
+			time: convertTime(marker.time),
+		}));
+		this._series.setMarkers(convertedMarkers);
 	}
 
 	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {

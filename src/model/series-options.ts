@@ -1,6 +1,6 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { LineStyle, LineWidth } from '../renderers/draw-line';
+import { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
 import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
@@ -58,6 +58,7 @@ export interface LineStyleOptions {
 	color: string;
 	lineStyle: LineStyle;
 	lineWidth: LineWidth;
+	lineType: LineType;
 	crosshairMarkerVisible: boolean;
 	crosshairMarkerRadius: number;
 }
@@ -68,6 +69,7 @@ export interface AreaStyleOptions {
 	lineColor: string;
 	lineStyle: LineStyle;
 	lineWidth: LineWidth;
+	lineType: LineType;
 	crosshairMarkerVisible: boolean;
 	crosshairMarkerRadius: number;
 }

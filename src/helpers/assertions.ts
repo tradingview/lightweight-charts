@@ -49,3 +49,9 @@ export function ensure<T>(value: T | undefined | null): T;
 export function ensure<T>(value: T | undefined | null): T {
 	return ensureNotNull(ensureDefined(value));
 }
+
+/**
+ * Compile time check for never
+ */
+export function ensureNever(value: never): void {
+}

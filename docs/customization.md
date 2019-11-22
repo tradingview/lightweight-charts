@@ -77,7 +77,8 @@ const chart = createChart(document.body, {
 #### Time Format
 
 `timeFormatter` function can be used to customize the format of the time stamp displayed on the time scale below the vertical crosshair line.
-Currently, changing the time format of the time scale labels itself is not available, yet this feature is planned for the future.
+
+Changing the time format of the time scale labels is not available currently but we intend to roll this out in the future.
 
 ```javascript
 const chart = createChart(document.body, {
@@ -90,6 +91,22 @@ const chart = createChart(document.body, {
             }
 
             return 'Format for timestamp';
+        },
+    },
+});
+```
+
+#### Price Format
+
+`priceFormatter` function can be used to customize the format of the price displayed on the price scale for crosshair value and labels.
+
+```javascript
+const chart = createChart(document.body, {
+    localization: {
+        priceFormatter: function(price) {
+            // add $ sign before price
+
+            return '$' + price;
         },
     },
 });
@@ -303,6 +320,7 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-|
 |`axisPressedMouseMove`|`boolean`|`true`|If true, axis scaling with left mouse button pressed is allowed|
+|`axisDoubleClickReset`|`boolean`|`true`|If true, left mouse button double click axis resetting is allowed|
 |`mouseWheel`|`boolean`|`true`|If true, series scaling with a mouse wheel is enabled|
 |`pinch`|`boolean`|`true`|If true, series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
 

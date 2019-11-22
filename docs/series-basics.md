@@ -118,6 +118,16 @@ chart.applyOptions({
 });
 ```
 
+## Removing series
+
+Any series could be removed with
+
+```javascript
+chart.removeSeries(series);
+```
+
+where `series` is an instance of any series type.
+
 ## Data
 
 Every series has its own data type. Please refer to series page to determine what type of data the series uses.
@@ -291,6 +301,85 @@ barSeries.update({
     low: 120.25,
     close: 145.72,
 });
+```
+
+### setMarkers
+
+Allows to set/replace all existing series markers with new ones.
+
+An array of items is expected. Each item should contain the following fields:
+
+- `time` ([Time](./time.md)) - item time
+- `position` (`aboveBar` &#124; `belowBar` &#124; `inBar`) - item position
+- `shape` (`circle` &#124; `square` &#124; `arrowUp` &#124; `arrowDown`) - item marker type
+- `color` (`string`) - item color
+- `id` (`string` &#124; `undefined`) - item id, will be passed to click/crosshair move handlers
+
+Example:
+
+```javascript
+series.setMarkers([
+    {
+        time: '2019-04-09',
+        position: 'aboveBar',
+        color: 'black',
+        shape: 'arrowDown',
+    },
+    {
+        time: '2019-05-31',
+        position: 'belowBar',
+        color: 'red',
+        shape: 'arrowUp',
+        id: 'id3',
+    },
+    {
+        time: '2019-05-31',
+        position: 'belowBar',
+        color: 'orange',
+        shape: 'arrowUp',
+        id: 'id4',
+    },
+]);
+
+chart.subscribeCrosshairMove(function(param) {
+    console.log(param.hoveredMarkerId);
+});
+
+chart.subscribeClick(function(param) {
+    console.log(param.hoveredMarkerId);
+});
+```
+
+## Taking screenshot
+
+Takes a screenshot of the whole chart.
+
+```javascript
+const screenshot = chart.takeScreenshot();
+```
+
+The function returns a `canvas` element with the chart drawn on it. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
+
+## Coordinates and prices converting
+
+Each series has an associated price scale object. If the series has been created as overlay,
+it has an invisible price scale to convert prices to coordinates and coordinates to prices.
+There are two functions to access this price scale implicitly.
+
+### priceToCoordinate
+
+This function accepts price value and returns corresponding coordinate or `null`.
+
+```javascript
+const coordinate = series.priceToCoordinate(100.5);
+```
+
+### coordinateToPrice
+
+This function accepts coordinate and returns corresponding price value or `null`.
+
+```javascript
+const price = series.coordinateToPrice(324);
 ```
 
 ## Next reading

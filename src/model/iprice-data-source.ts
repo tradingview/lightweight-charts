@@ -2,9 +2,9 @@
 
 import { IFormatter } from '../formatters/iformatter';
 
+import { AutoscaleInfo } from './autoscale-info';
 import { ChartModel } from './chart-model';
 import { IDataSource } from './idata-source';
-import { PriceRange } from './price-range';
 import { TimePoint, TimePointIndex } from './time-data';
 
 export interface FirstValue {
@@ -18,5 +18,5 @@ export interface IPriceDataSource extends IDataSource {
 	priceLineColor(lastBarColor: string): string;
 	model(): ChartModel;
 	minMove(): number;
-	priceRange(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): PriceRange | null;
+	autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo | null;
 }
