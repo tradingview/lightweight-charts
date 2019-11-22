@@ -350,6 +350,53 @@ chart.subscribeClick(function(param) {
 });
 ```
 
+### createPriceLine
+
+Creates a horizontal price line at a specific price level. The method returns an object that has two methods:
+
+- `options()` - returns a price line options
+- `applyOptions(options)` - sets a price line options
+
+You can set the price level, width, style and color of this line using the following options:
+
+|Name|Type|Default|Description|
+|----|----|-------|-|
+|`level`| `number` | `0` | Price line's level |
+|`lineColor`|`string`|`''`|Price line's color|
+|`lineWidth`|`number`|`1`|Price line's width in pixels|
+|`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Price line's style|
+
+Example:
+
+```javascript
+var priceLine = series.createPriceLine({
+    level: 80.0
+    color: 'green',
+    lineWidth: 2,
+    lineStyle: LightweightCharts.LineStyle.Dotted,
+});
+
+priceLine.applyOptions({
+    level: 90.0
+    color: 'red',
+    lineWidth: 3,
+    lineStyle: LightweightCharts.LineStyle.Dashed,
+});
+```
+
+### removePriceLine
+
+Removes a price line that was created before.
+
+Example:
+
+```javascript
+var priceLine = series.createPriceLine({ level: 80.0 });
+series.removePriceLine(priceLine);
+```
+
+Removes a price line that was created before
+
 ## Taking screenshot
 
 Takes a screenshot of the whole chart.

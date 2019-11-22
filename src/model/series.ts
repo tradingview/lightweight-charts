@@ -26,12 +26,14 @@ import { AutoscaleInfo } from './autoscale-info';
 import { BarPrice, BarPrices } from './bar';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
+import { CustomPriceLine } from './custom-price-line';
 import { FirstValue } from './iprice-data-source';
 import { Palette } from './palette';
 import { Pane } from './pane';
 import { PlotRow } from './plot-data';
 import { MinMax, PlotList, PlotRowSearchMode } from './plot-list';
 import { PriceDataSource } from './price-data-source';
+import { PriceLineOptions } from './price-line-options';
 import { PriceRange } from './price-range';
 import { PriceScale } from './price-scale';
 import { SeriesBarColorer } from './series-bar-colorer';
@@ -94,6 +96,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private readonly _panePriceAxisView: PanePriceAxisView;
 	private _formatter!: IFormatter;
 	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
+	private readonly _customPriceLines: CustomPriceLine[] = [];
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
 	private _endOfData: boolean = false;
 	private _paneView!: IUpdatablePaneView;
@@ -277,6 +280,20 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._indexedMarkers;
 	}
 
+	public createPriceLine(options: PriceLineOptions): CustomPriceLine {
+		const result = new CustomPriceLine(this, options);
+		this._customPriceLines.push(result);
+		this.model().updateSource(this);
+		return result;
+	}
+
+	public removePriceLine(line: CustomPriceLine): void {
+		const index = this._customPriceLines.indexOf(line);
+		if (index !== -1) {
+			this._customPriceLines.splice(index, 1);
+		}
+	}
+
 	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
 		this._data.bars().merge(data);
 		this._recalculateMarkers();
@@ -362,11 +379,16 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			res.push(this._baseHorizontalLineView);
 		}
 
+		for (const customPriceLine of this._customPriceLines) {
+			res.push(customPriceLine.paneView());
+		}
+
 		res.push(this._paneView);
 		res.push(this._priceLineView);
 
 		res.push(this._panePriceAxisView);
 		res.push(this._markersPaneView);
+
 		return res;
 	}
 
@@ -419,10 +441,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._paneView.update();
 		this._markersPaneView.update();
 
-		const priceAxisViewsLength = this._priceAxisViews.length;
-		for (let i = 0; i < priceAxisViewsLength; i++) {
-			this._priceAxisViews[i].update();
+		for (const priceAxisView of this._priceAxisViews) {
+			priceAxisView.update();
 		}
+
+		for (const customPriceLine of this._customPriceLines) {
+			customPriceLine.update();
+		}
+
 		this._priceLineView.update();
 		this._baseHorizontalLineView.update();
 	}
