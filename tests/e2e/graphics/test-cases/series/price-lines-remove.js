@@ -19,8 +19,8 @@ function runTestCase(container) {
 	var series = chart.addLineSeries();
 	series.setData(generateData());
 
-	var line1 = series.createPriceLine({ level: 10 });
-	var line2 = series.createPriceLine({ level: 20 });
+	var line1 = series.createPriceLine({ price: 10 });
+	var line2 = series.createPriceLine({ price: 20 });
 	series.removePriceLine(line2);
 	series.removePriceLine(line1);
 }

@@ -361,7 +361,7 @@ You can set the price level, width, style and color of this line using the follo
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
-|`level`| `number` | `0` | Price line's level |
+|`price`| `number` | `0` | Price line's level |
 |`lineColor`|`string`|`''`|Price line's color|
 |`lineWidth`|`number`|`1`|Price line's width in pixels|
 |`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Price line's style|
@@ -370,14 +370,14 @@ Example:
 
 ```javascript
 const priceLine = series.createPriceLine({
-    level: 80.0
+    price: 80.0
     color: 'green',
     lineWidth: 2,
     lineStyle: LightweightCharts.LineStyle.Dotted,
 });
 
 priceLine.applyOptions({
-    level: 90.0
+    price: 90.0
     color: 'red',
     lineWidth: 3,
     lineStyle: LightweightCharts.LineStyle.Dashed,
@@ -391,7 +391,7 @@ Removes a price line that was created before.
 Example:
 
 ```javascript
-const priceLine = series.createPriceLine({ level: 80.0 });
+const priceLine = series.createPriceLine({ price: 80.0 });
 series.removePriceLine(priceLine);
 ```
 

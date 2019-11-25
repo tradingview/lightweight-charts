@@ -22,14 +22,14 @@ function runTestCase(container) {
 	chart.timeScale().fitContent();
 
 	var line = series.createPriceLine({
-		level: 10,
+		price: 10,
 		color: 'red',
 		lineWidth: 1,
 		lineStyle: LightweightCharts.LineStyle.Solid,
 	});
 
 	line.applyOptions({
-		level: 20,
+		price: 20,
 		color: '#00FF00',
 		lineWidth: 2,
 		lineStyle: LightweightCharts.LineStyle.Dotted,

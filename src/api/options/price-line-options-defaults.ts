@@ -4,7 +4,7 @@ import { LineStyle } from '../../renderers/draw-line';
 
 export const priceLineOptionsDefaults: PriceLineOptions = {
 	color: '#FF0000',
-	level: 0 as BarPrice,
+	price: 0 as BarPrice,
 	lineStyle: LineStyle.Solid,
 	lineWidth: 1,
 };

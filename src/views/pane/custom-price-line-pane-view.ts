@@ -30,7 +30,7 @@ export class CustomPriceLinePaneView extends SeriesHorizontalLinePaneView {
 		const lineOptions = this._priceLine.options();
 
 		data.visible = true;
-		data.y = priceScale.priceToCoordinate(lineOptions.level, firstValue.value);
+		data.y = priceScale.priceToCoordinate(lineOptions.price, firstValue.value);
 		data.color = lineOptions.color;
 		data.width = timeScale.width();
 		data.height = priceScale.height();

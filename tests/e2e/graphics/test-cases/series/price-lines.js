@@ -22,35 +22,35 @@ function runTestCase(container) {
 	chart.timeScale().fitContent();
 
 	series.createPriceLine({
-		level: 10,
+		price: 10,
 		color: 'red',
 		lineWidth: 1,
 		lineStyle: LightweightCharts.LineStyle.Solid,
 	});
 
 	series.createPriceLine({
-		level: 20,
+		price: 20,
 		color: '#00FF00',
 		lineWidth: 2,
 		lineStyle: LightweightCharts.LineStyle.Dotted,
 	});
 
 	series.createPriceLine({
-		level: 30,
+		price: 30,
 		color: 'rgb(0,0,255)',
 		lineWidth: 3,
 		lineStyle: LightweightCharts.LineStyle.Dashed,
 	});
 
 	series.createPriceLine({
-		level: 40,
+		price: 40,
 		color: 'rgba(255,0,0,0.5)',
 		lineWidth: 4,
 		lineStyle: LightweightCharts.LineStyle.LargeDashed,
 	});
 
 	series.createPriceLine({
-		level: 50,
+		price: 50,
 		color: 'rgba(0,255,0,0.5)',
 		lineWidth: 4,
 		lineStyle: LightweightCharts.LineStyle.SparseDotted,

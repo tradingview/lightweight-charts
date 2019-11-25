@@ -3,7 +3,7 @@ import { LineStyle, LineWidth } from '../renderers/draw-line';
 import { BarPrice } from './bar';
 
 export interface PriceLineOptions {
-	level: BarPrice;
+	price: BarPrice;
 	color: string;
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
