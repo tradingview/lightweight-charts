@@ -369,7 +369,7 @@ You can set the price level, width, style and color of this line using the follo
 Example:
 
 ```javascript
-var priceLine = series.createPriceLine({
+const priceLine = series.createPriceLine({
     level: 80.0
     color: 'green',
     lineWidth: 2,
@@ -391,7 +391,7 @@ Removes a price line that was created before.
 Example:
 
 ```javascript
-var priceLine = series.createPriceLine({ level: 80.0 });
+const priceLine = series.createPriceLine({ level: 80.0 });
 series.removePriceLine(priceLine);
 ```
 
