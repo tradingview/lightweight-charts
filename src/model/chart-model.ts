@@ -117,11 +117,6 @@ export class ChartModel implements IDestroyable {
 		this._panes[0].addDataSource(this._watermark, true, false);
 	}
 
-	public updatePane(pane: Pane): void {
-		const inv = this._paneInvalidationMask(pane, InvalidationLevel.None);
-		this._invalidate(inv);
-	}
-
 	public fullUpdate(): void {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Full));
 	}

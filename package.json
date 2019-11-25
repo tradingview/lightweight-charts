@@ -31,6 +31,9 @@
   "engines": {
     "node": ">=10.12.0"
   },
+  "dependencies": {
+    "fancy-canvas": "0.2.1"
+  },
   "devDependencies": {
     "@codechecks/build-size-watcher": "~0.1.0",
     "@codechecks/client": "~0.1.10",

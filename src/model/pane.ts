@@ -266,7 +266,7 @@ export class Pane implements IDestroyable {
 		});
 
 		this.updateAllViews();
-		this._model.updatePane(this);
+		this._model.lightUpdate();
 	}
 
 	public isEmpty(): boolean {
