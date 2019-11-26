@@ -71,6 +71,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 
 	private _invalidated: boolean = true;
 	private _dataInvalidated: boolean = true;
+	private _autoScaleMarginsInvalidated: boolean = true;
 
 	private _autoScaleMargins: AutoScaleMargins | null = null;
 
@@ -87,6 +88,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 
 	public update(updateType?: UpdateType): void {
 		this._invalidated = true;
+		this._autoScaleMarginsInvalidated = true;
 		if (updateType === 'data') {
 			this._dataInvalidated = true;
 		}
@@ -101,8 +103,20 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 	}
 
 	public autoScaleMargins(): AutoScaleMargins | null {
-		if (this._invalidated) {
-			this._makeValid();
+		if (this._autoScaleMarginsInvalidated) {
+			if (this._series.indexedMarkers().length > 0) {
+				const barSpacing = this._model.timeScale().barSpacing();
+				const shapeMargin = calculateShapeMargin(barSpacing);
+				const marginsAboveAndBelow = calculateShapeHeight(barSpacing) * 1.5 + shapeMargin * 2;
+				this._autoScaleMargins = {
+					above: marginsAboveAndBelow as Coordinate,
+					below: marginsAboveAndBelow as Coordinate,
+				};
+			} else {
+				this._autoScaleMargins = null;
+			}
+
+			this._autoScaleMarginsInvalidated = false;
 		}
 
 		return this._autoScaleMargins;
@@ -126,17 +140,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			this._dataInvalidated = false;
 		}
 
-		const shapeMargin = calculateShapeMargin(timeScale.barSpacing());
-		if (seriesMarkers.length > 0) {
-			const marginsAboveAndBelow = calculateShapeHeight(timeScale.barSpacing()) * 1.5 + shapeMargin * 2;
-			this._autoScaleMargins = {
-				above: marginsAboveAndBelow as Coordinate,
-				below: marginsAboveAndBelow as Coordinate,
-			};
-		} else {
-			this._autoScaleMargins = null;
-		}
-
 		this._data.visibleRange = null;
 		const visibleBars = timeScale.visibleBars();
 		if (visibleBars === null) {
@@ -148,6 +151,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			return;
 		}
 		let prevTimeIndex = NaN;
+		const shapeMargin = calculateShapeMargin(timeScale.barSpacing());
 		const offsets: Offsets = {
 			aboveBar: shapeMargin,
 			belowBar: shapeMargin,

@@ -1,5 +1,6 @@
+import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+
 import { ensureNotNull } from '../helpers/assertions';
-import { getContext2d } from '../helpers/canvas-wrapper';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -14,7 +15,7 @@ import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-rend
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
-import { addCanvasTo, clearRect, resizeCanvas, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
 import { LabelsImageCache } from './labels-image-cache';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -39,10 +40,8 @@ export class PriceAxisWidget implements IDestroyable {
 	private _size: Size | null = null;
 
 	private readonly _cell: HTMLDivElement;
-	private readonly _canvas: HTMLCanvasElement;
-	private readonly _ctx: CanvasRenderingContext2D;
-	private readonly _topCanvas: HTMLCanvasElement;
-	private readonly _topCtx: CanvasRenderingContext2D;
+	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
 
 	private _updateTimeout: TimerId | null = null;
 	private _mouseEventHandler: MouseEventHandler;
@@ -70,21 +69,21 @@ export class PriceAxisWidget implements IDestroyable {
 		this._cell.style.left = '0';
 		this._cell.style.position = 'relative';
 
-		this._canvas = addCanvasTo(this._cell, new Size(16, 16));
-		this._canvas.style.position = 'absolute';
-		this._canvas.style.zIndex = '1';
-		this._canvas.style.left = '0';
-		this._canvas.style.top = '0';
+		this._canvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
+		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
+		const canvas = this._canvasBinding.canvas;
+		canvas.style.position = 'absolute';
+		canvas.style.zIndex = '1';
+		canvas.style.left = '0';
+		canvas.style.top = '0';
 
-		this._ctx = ensureNotNull(getContext2d(this._canvas));
-
-		this._topCanvas = addCanvasTo(this._cell, new Size(16, 16));
-		this._topCanvas.style.position = 'absolute';
-		this._topCanvas.style.zIndex = '2';
-		this._topCanvas.style.left = '0';
-		this._topCanvas.style.top = '0';
-
-		this._topCtx = ensureNotNull(getContext2d(this._topCanvas));
+		this._topCanvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
+		this._topCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
+		const topCanvas = this._topCanvasBinding.canvas;
+		topCanvas.style.position = 'absolute';
+		topCanvas.style.zIndex = '2';
+		topCanvas.style.left = '0';
+		topCanvas.style.top = '0';
 
 		const handler: MouseEventHandlers = {
 			mouseDownEvent: this._mouseDownEvent.bind(this),
@@ -96,7 +95,7 @@ export class PriceAxisWidget implements IDestroyable {
 			mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
 		};
 		this._mouseEventHandler = new MouseEventHandler(
-			this._topCanvas,
+			this._topCanvasBinding.canvas,
 			handler,
 			{
 				treatVertTouchDragAsPageScroll: false,
@@ -107,6 +106,12 @@ export class PriceAxisWidget implements IDestroyable {
 
 	public destroy(): void {
 		this._mouseEventHandler.destroy();
+
+		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
+		this._topCanvasBinding.destroy();
+
+		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
+		this._canvasBinding.destroy();
 
 		if (this._priceScale !== null) {
 			this._priceScale.onMarksChanged().unsubscribeAll(this);
@@ -174,7 +179,7 @@ export class PriceAxisWidget implements IDestroyable {
 		let tickMarkMaxWidth = 34;
 		const rendererOptions = this.rendererOptions();
 
-		const ctx = this._ctx;
+		const ctx = getPretransformedContext2D(this._canvasBinding);
 		const tickMarks = this._priceScale.marks();
 
 		ctx.font = this.baseFont();
@@ -211,8 +216,8 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || !this._size.equals(size)) {
 			this._size = size;
 
-			resizeCanvas(this._canvas, size);
-			resizeCanvas(this._topCanvas, size);
+			this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
+			this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
 
 			this._cell.style.width = size.w + 'px';
 			// need this for IE11
@@ -277,20 +282,22 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		this._topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
-
 		if (type !== InvalidationLevel.Cursor) {
+			const ctx = getPretransformedContext2D(this._canvasBinding);
 			this._alignLabels();
-			this._drawBackground(this._ctx);
-			this._drawBorder(this._ctx);
-			this._drawTickMarks(this._ctx);
-			this._drawBackLabels(this._ctx);
+			this._drawBackground(ctx);
+			this._drawBorder(ctx);
+			this._drawTickMarks(ctx);
+			this._drawBackLabels(ctx);
 		}
-		this._drawCrosshairLabel(this._topCtx);
+
+		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
+		topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
+		this._drawCrosshairLabel(topCtx);
 	}
 
 	public getImage(): HTMLCanvasElement {
-		return this._canvas;
+		return this._canvasBinding.canvas;
 	}
 
 	public isLeft(): boolean {
@@ -633,5 +640,16 @@ export class PriceAxisWidget implements IDestroyable {
 			options.color,
 			options.fontFamily
 		);
+	}
+
+	private readonly _canvasConfiguredHandler = () => {
+		this._recreateTickMarksCache(this._rendererOptionsProvider.options());
+		const model = this._pane.chart().model();
+		model.lightUpdate();
+	}
+
+	private readonly _topCanvasConfiguredHandler = () => {
+		const model = this._pane.chart().model();
+		model.lightUpdate();
 	}
 }

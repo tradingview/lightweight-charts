@@ -1,4 +1,6 @@
-import { getContext2d } from '../helpers/canvas-wrapper';
+import { Binding as CanvasCoordinateSpaceBinding, bindToDevicePixelRatio } from 'fancy-canvas/coordinate-space';
+
+import { ensureNotNull } from '../helpers/assertions';
 
 export class Size {
 	public h: number;
@@ -14,14 +16,27 @@ export class Size {
 	}
 }
 
-export function resizeCanvas(canvas: HTMLCanvasElement, newSize: Size): void {
-	canvas.width = newSize.w;
-	canvas.height = newSize.h;
+function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
+	return canvas.ownerDocument &&
+		canvas.ownerDocument.defaultView &&
+		canvas.ownerDocument.defaultView.devicePixelRatio
+		|| 1;
+}
 
-	const ctx = getContext2d(canvas);
-	if (ctx) {
-		ctx.translate(0.5, 0.5);
-	}
+export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+	const ctx = ensureNotNull(canvas.getContext('2d'));
+	// scale by pixel ratio
+	const pixelRatio = getCanvasDevicePixelRatio(canvas);
+	ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+	return ctx;
+}
+
+export function getPretransformedContext2D(binding: CanvasCoordinateSpaceBinding): CanvasRenderingContext2D {
+	const ctx = ensureNotNull(binding.canvas.getContext('2d'));
+	// scale by pixel ratio
+	ctx.setTransform(binding.pixelRatio, 0, 0, binding.pixelRatio, 0, 0);
+	ctx.translate(0.5, 0.5);
+	return ctx;
 }
 
 export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
@@ -33,14 +48,36 @@ export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w
 	ctx.restore();
 }
 
-export function addCanvasTo(element: HTMLElement, size: Size): HTMLCanvasElement {
-	const canvas = document.createElement('canvas');
-	element.appendChild(canvas);
-
-	resizeCanvas(canvas, size);
+function createCanvas(doc: Document): HTMLCanvasElement {
+	const canvas = doc.createElement('canvas');
 	disableSelection(canvas);
-
 	return canvas;
+}
+
+export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvasElement {
+	const canvas = createCanvas(doc);
+
+	const pixelRatio = getCanvasDevicePixelRatio(canvas);
+	// we should keep the layout size...
+	canvas.style.width = `${size.w}px`;
+	canvas.style.height = `${size.h}px`;
+	// ...but multiply coordinate space dimensions to device pixel ratio
+	canvas.width = size.w * pixelRatio;
+	canvas.height = size.h * pixelRatio;
+	return canvas;
+}
+
+export function createBoundCanvas(parentElement: HTMLElement, size: Size): CanvasCoordinateSpaceBinding {
+	const doc = ensureNotNull(parentElement.ownerDocument);
+	const canvas = createCanvas(doc);
+	parentElement.appendChild(canvas);
+
+	const binding = bindToDevicePixelRatio(canvas);
+	binding.resizeCanvas({
+		width: size.w,
+		height: size.h,
+	});
+	return binding;
 }
 
 function disableSelection(canvas: HTMLCanvasElement): void {

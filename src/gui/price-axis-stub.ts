@@ -1,11 +1,12 @@
-import { getContext2d } from '../helpers/canvas-wrapper';
+import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+
 import { IDestroyable } from '../helpers/idestroyable';
 
 import { ChartOptions } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
-import { addCanvasTo, clearRect, resizeCanvas, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
 export interface PriceAxisStubParams {
@@ -16,9 +17,7 @@ export type BorderVisibleGetter = () => boolean;
 
 export class PriceAxisStub implements IDestroyable {
 	private readonly _cell: HTMLDivElement;
-
-	private readonly _canvas: HTMLCanvasElement;
-	private readonly _ctx: CanvasRenderingContext2D;
+	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 
@@ -47,12 +46,13 @@ export class PriceAxisStub implements IDestroyable {
 		this._cell.style.height = '100%';
 		this._cell.style.overflow = 'hidden';
 
-		this._canvas = addCanvasTo(this._cell, new Size(16, 16));
-
-		this._ctx = getContext2d(this._canvas) as CanvasRenderingContext2D;
+		this._canvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
+		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
 	}
 
 	public destroy(): void {
+		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
+		this._canvasBinding.destroy();
 	}
 
 	public update(): void {
@@ -63,6 +63,10 @@ export class PriceAxisStub implements IDestroyable {
 		return this._cell;
 	}
 
+	public getSize(): Readonly<Size> {
+		return this._size;
+	}
+
 	public setSize(size: Size): void {
 		if (size.w < 0 || size.h < 0) {
 			throw new Error('Try to set invalid size to PriceAxisStub ' + JSON.stringify(size));
@@ -71,7 +75,7 @@ export class PriceAxisStub implements IDestroyable {
 		if (!this._size.equals(size)) {
 			this._size = size;
 
-			resizeCanvas(this._canvas, size);
+			this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
 
 			this._cell.style.width = `${size.w}px`;
 			this._cell.style.minWidth = `${size.w}px`; // for right calculate position of .pane-legend
@@ -92,49 +96,48 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
-		this._drawBackground();
-		this._drawBorder();
+		const ctx = getPretransformedContext2D(this._canvasBinding);
+		this._drawBackground(ctx);
+		this._drawBorder(ctx);
 	}
 
 	public getImage(): HTMLCanvasElement {
-		return this._canvas;
-	}
-
-	public getWidth(): number {
-		return this._size.w;
+		return this._canvasBinding.canvas;
 	}
 
 	public isLeft(): boolean {
 		return this._isLeft;
 	}
 
-	private _drawBorder(): void {
+	private _drawBorder(ctx: CanvasRenderingContext2D): void {
 		if (!this._borderVisible()) {
 			return;
 		}
 		const width = this._size.w;
 
-		this._ctx.save();
+		ctx.save();
 
-		this._ctx.fillStyle = this._options.timeScale.borderColor;
+		ctx.fillStyle = this._options.timeScale.borderColor;
 
 		const borderSize = this._rendererOptionsProvider.options().borderSize;
 
 		let left: number;
 		if (this._isLeft) {
-			this._ctx.translate(-0.5, -0.5);
+			ctx.translate(-0.5, -0.5);
 			left = width - borderSize - 1;
 		} else {
-			this._ctx.translate(-0.5, -0.5);
+			ctx.translate(-0.5, -0.5);
 			left = 0;
 		}
 
 		// multiply to 2 because of we draw price scale border on the second pixel
-		this._ctx.fillRect(left, 0, borderSize * 2, 1);
-		this._ctx.restore();
+		ctx.fillRect(left, 0, borderSize * 2, 1);
+		ctx.restore();
 	}
 
-	private _drawBackground(): void {
-		clearRect(this._ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
+	private _drawBackground(ctx: CanvasRenderingContext2D): void {
+		clearRect(ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
 	}
+
+	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);
 }
