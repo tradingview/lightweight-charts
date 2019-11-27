@@ -395,7 +395,6 @@ const priceLine = series.createPriceLine({ price: 80.0 });
 series.removePriceLine(priceLine);
 ```
 
-
 ## Taking screenshot
 
 Takes a screenshot of the whole chart.
