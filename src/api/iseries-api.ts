@@ -1,5 +1,6 @@
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { PriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
@@ -8,6 +9,7 @@ import {
 } from '../model/series-options';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
+import { IPriceLine } from './iprice-line';
 
 /** Interface to be implemented by the object in order to be used as a price formatter */
 export interface IPriceFormatter {
@@ -70,4 +72,16 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * @param data array of series markers. This array should be sorted by time. Several markers with same time are allowed.
 	 */
 	setMarkers(data: SeriesMarker<Time>[]): void;
+
+	/**
+	 * Creates a new price line
+	 * @param options - any subset of options
+	 */
+	createPriceLine(options: PriceLineOptions): IPriceLine;
+
+	/**
+	 * Removes an existing price line
+	 * @param line to remove
+	 */
+	removePriceLine(line: IPriceLine): void;
 }
