@@ -397,7 +397,7 @@ series.removePriceLine(priceLine);
 
 ## Taking screenshot
 
-Takes a screenshot of the whole chart.
+Takes the whole chart screenshot.
 
 ```javascript
 const screenshot = chart.takeScreenshot();
@@ -407,8 +407,8 @@ The function returns a `canvas` element with the chart drawn on it. Any `Canvas`
 
 ## Coordinates and prices converting
 
-Each series has an associated price scale object. If the series has been created as overlay,
-it has an invisible price scale to convert prices to coordinates and coordinates to prices.
+Each series has an associated price scale object. If the series has been created as an overlay,
+it has an invisible price scale to convert prices to coordinates and vice versa.
 There are two functions to access this price scale implicitly.
 
 ### priceToCoordinate

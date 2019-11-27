@@ -98,7 +98,7 @@ const chart = createChart(document.body, {
 
 #### Price Format
 
-`priceFormatter` function can be used to customize the format of the price displayed on the price scale for crosshair value and labels.
+`priceFormatter` function can be used for the format customization of the price displayed on the price scale for crosshair value and labels.
 
 ```javascript
 const chart = createChart(document.body, {
