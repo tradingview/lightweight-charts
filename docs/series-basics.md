@@ -352,10 +352,10 @@ chart.subscribeClick(function(param) {
 
 ### createPriceLine
 
-Creates a horizontal price line at a specific price level. The method returns an object that has two methods:
+Creates a horizontal price line at a certain price level. The method returns an object that has two methods:
 
-- `options()` - returns a price line options
-- `applyOptions(options)` - sets a price line options
+- `options()` - returns the price line options
+- `applyOptions(options)` - sets the price line options
 
 You can set the price level, width, style and color of this line using the following options:
 
@@ -386,7 +386,7 @@ priceLine.applyOptions({
 
 ### removePriceLine
 
-Removes a price line that was created before.
+Removes the price line that was created before.
 
 Example:
 
