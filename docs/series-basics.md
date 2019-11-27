@@ -395,7 +395,6 @@ const priceLine = series.createPriceLine({ price: 80.0 });
 series.removePriceLine(priceLine);
 ```
 
-Removes a price line that was created before
 
 ## Taking screenshot
 
