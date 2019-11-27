@@ -258,8 +258,8 @@ export class DataLayer {
 	}
 
 	public setSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): UpdatePacket {
-		// palette will be filled inside _setNewPoints
-		series.palette().clear();
+		series.clearData();
+
 		convertStringsToBusinessDays(data);
 		this._pointDataByTimePoint.forEach((value: TimePointData) => value.mapping.delete(series));
 		const timeConverter = selectTimeConverter(data);

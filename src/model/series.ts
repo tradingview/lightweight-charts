@@ -243,16 +243,23 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().updateSource(this);
 	}
 
-	public setData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
+	public clearData(): void {
 		this._data.clear();
+		this._palette.clear();
+
+		// we must either re-create pane view on clear data
+		// or clear all caches inside pane views
+		// but currently we can't separate update/append last bar and full data replacement (update vs setData) in pane views invalidation
+		// so let's just re-create all views
+		this._recreatePaneViews();
+	}
+
+	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
 		this._data.bars().merge(data);
 		this._recalculateMarkers();
 
-		// we must either re-create pane view on full data replacement
-		// or clear all caches inside pane view
-		// but currently we can't separate update/append last bar and full data replacement (update vs setData)
-		// so let's re-create all views
-		this._recreatePaneViews();
+		this._paneView.update('data');
+		this._markersPaneView.update('data');
 
 		const sourcePane = this.model().paneForSource(this);
 		this.model().recalculatePane(sourcePane);
@@ -292,20 +299,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		if (index !== -1) {
 			this._customPriceLines.splice(index, 1);
 		}
-	}
-
-	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
-		this._data.bars().merge(data);
-		this._recalculateMarkers();
-
-		this._paneView.update('data');
-		this._markersPaneView.update('data');
-
-		const sourcePane = this.model().paneForSource(this);
-		this.model().recalculatePane(sourcePane);
-		this.model().updateSource(this);
-		this.model().updateCrosshair();
-		this.model().lightUpdate();
 	}
 
 	public palette(): Palette {
