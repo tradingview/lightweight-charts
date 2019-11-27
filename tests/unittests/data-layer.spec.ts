@@ -19,6 +19,7 @@ function createSeriesMock<T extends SeriesType = 'Line'>(seriesType?: T): Series
 		data: () => data,
 		palette: () => new Palette(),
 		seriesType: () => seriesType || 'Line',
+		clearData: () => data.clear(),
 	} as Series<T>;
 }
 

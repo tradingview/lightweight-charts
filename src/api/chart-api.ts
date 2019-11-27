@@ -194,7 +194,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.setData(value.update);
+			key.updateData(value.update);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 		this._seriesMap.delete(seriesObj);
@@ -207,7 +207,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.setData(value.update);
+			key.updateData(value.update);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 	}
