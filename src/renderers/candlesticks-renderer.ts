@@ -15,8 +15,6 @@ export interface CandlestickItem extends BarCandlestickItemBase {
 export interface PaneRendererCandlesticksData {
 	bars: ReadonlyArray<CandlestickItem>;
 
-	wickColor: string;
-
 	barSpacing: number;
 
 	wickVisible: boolean;
