@@ -76,8 +76,8 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 			const top = Math.min(bar.openY, bar.closeY);
 			const bottom = Math.max(bar.openY, bar.closeY);
 
-			ctx.fillRect(bar.x, bar.highY, 1, top - bar.highY + 1);
-			ctx.fillRect(bar.x, bottom, 1, bar.lowY - bottom + 1);
+			ctx.fillRect(bar.x, bar.highY, 1, top - bar.highY);
+			ctx.fillRect(bar.x, bottom + 1, 1, bar.lowY - bottom);
 		}
 	}
 

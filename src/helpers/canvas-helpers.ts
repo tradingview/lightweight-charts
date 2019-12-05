@@ -8,8 +8,13 @@
  * @param lineWidth line width. Must be less than width and height
  */
 export function strokeRectInnerWithFill(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, lineWidth: number): void {
+	// should not overlap on corners for semi-transparent colors
+	// left
 	ctx.fillRect(x, y, lineWidth, h);
-	ctx.fillRect(x, y, w, lineWidth);
-	ctx.fillRect(x, y + h - lineWidth, w, lineWidth);
+	// top
+	ctx.fillRect(x + lineWidth, y, w - lineWidth * 2, lineWidth);
+	// bottom
+	ctx.fillRect(x + lineWidth, y + h - lineWidth, w - lineWidth * 2, lineWidth);
+	// right
 	ctx.fillRect(x + w - lineWidth, y, lineWidth, h);
 }
