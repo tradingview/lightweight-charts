@@ -39,7 +39,7 @@ export class CrosshairRenderer implements IPaneRenderer {
 		const vertFix = this._data.vertLine.lineWidth % 2 === 0 ? 0.5 : 0;
 		const horzFix = this._data.horzLine.lineWidth % 2 === 0 ? 0.5 : 0;
 
-		const x = this._data.x + 1 + horzFix;
+		const x = this._data.x + horzFix;
 		const y = this._data.y + vertFix;
 		const w = this._data.w;
 		const h = this._data.h;

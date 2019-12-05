@@ -14,11 +14,10 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-function createEmptyHistogramData(barSpacing: number, lineWidth: number, color: string): PaneRendererHistogramData {
+function createEmptyHistogramData(barSpacing: number, color: string): PaneRendererHistogramData {
 	return {
 		items: [],
 		barSpacing,
-		lineWidth,
 		histogramBase: NaN,
 		color,
 		visibleRange: null,
@@ -60,7 +59,6 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._paletteData.length = palette.size();
 
 		const targetIndexes = new Int32Array(palette.size() + 1);
-		const histogramStyleProps = this._series.options();
 
 		const barValueGetter = this._series.barFunction();
 		this._colorIndexes = new Int32Array(this._series.bars().size());
@@ -80,7 +78,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 			// colorIndex is the paneview's internal palette index
 			// this internal palette stores defaultColor by 0 index and pallette colors by paletteColorIndex + 1
 			const colorIndex = paletteColorIndex == null ? 0 : paletteColorIndex + 1;
-			const data = this._paletteData[colorIndex] || createEmptyHistogramData(barSpacing, histogramStyleProps.lineWidth, color);
+			const data = this._paletteData[colorIndex] || createEmptyHistogramData(barSpacing, color);
 			const targetIndex = targetIndexes[colorIndex]++;
 			if (targetIndex < data.items.length) {
 				data.items[targetIndex] = item;
@@ -140,7 +138,10 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 			const data = this._paletteData[colorIndex];
 			const sourceIndex = this._sourceIndexes[colorIndex]++;
 			const item = data.items[sourceIndex];
-			item.left = Math.floor(item.x - barSpacing * 0.5) as Coordinate;
+			// round left edge to right to compensate right point correcting
+			// 5 lines below
+			// because of if barSpacing is not an integer, flooring could make bar insimmetric
+			item.left = Math.ceil(item.x - barSpacing * 0.5) as Coordinate;
 			item.right = Math.ceil(item.left + barSpacing) as Coordinate;
 
 			// we should correct borders only in case of sibling items

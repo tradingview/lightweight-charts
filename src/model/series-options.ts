@@ -77,7 +77,6 @@ export interface AreaStyleOptions {
 export interface HistogramStyleOptions {
 	color: string;
 	base: number;
-	lineWidth: number;
 }
 
 /**
