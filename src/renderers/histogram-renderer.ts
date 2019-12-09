@@ -49,7 +49,6 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		}
 
 		// TODO: remove this after removing global translate
-		ctx.translate(0.5, +0.5);
-
+		ctx.translate(0.5, 0.5);
 	}
 }
