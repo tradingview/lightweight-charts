@@ -4,7 +4,7 @@ set -e
 echo "Checkout to merge-base and build..."
 
 HEAD_SHA1=$(git rev-parse HEAD)
-git checkout $(git merge-base origin/master HEAD)
+git checkout $(git merge-base origin/274-fix-histogram-drawing HEAD)
 
 npm install
 npm run build
