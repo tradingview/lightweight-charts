@@ -44,8 +44,6 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		// TODO: remove this after removing of global translate
 		ctx.translate(-0.5, -0.5);
 
-		ctx.lineCap = 'square';
-
 		const bars = this._data.bars;
 		if (this._data.wickVisible) {
 			this._drawWicks(ctx, bars, this._data.visibleRange);
