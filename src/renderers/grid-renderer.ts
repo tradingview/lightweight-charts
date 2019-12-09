@@ -1,6 +1,6 @@
 import { PriceMark } from '../model/price-scale';
 
-import { LineStyle, setLineStyle } from './draw-line';
+import { LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
 export interface GridMarks {
@@ -21,6 +21,33 @@ export interface GridRendererData {
 	w: number;
 }
 
+// TODO: move to canvas-helpers
+// tslint:disable-next-line: max-params
+function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number, bottom: number, lineWidth: LineWidth, color: string, style: LineStyle): void {
+	const compensation = lineWidth * 0.5;
+	ctx.translate(-compensation, 0);
+	ctx.lineCap = 'butt';
+	ctx.strokeStyle = color;
+	setLineStyle(ctx, style);
+	ctx.moveTo(x, top);
+	ctx.lineTo(x, bottom);
+	ctx.stroke();
+	ctx.translate(compensation, 0);
+}
+
+// tslint:disable-next-line: max-params
+function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: number, right: number, lineWidth: LineWidth, color: string, style: LineStyle): void {
+	const compensation = lineWidth * 0.5;
+	ctx.translate(0, -compensation);
+	ctx.lineCap = 'butt';
+	ctx.strokeStyle = color;
+	setLineStyle(ctx, style);
+	ctx.moveTo(left, y);
+	ctx.lineTo(right, y);
+	ctx.stroke();
+	ctx.translate(0, compensation);
+}
+
 export class GridRenderer implements IPaneRenderer {
 	private _data: GridRendererData | null = null;
 
@@ -33,30 +60,24 @@ export class GridRenderer implements IPaneRenderer {
 			return;
 		}
 
+		// TODO: remove this after removing global translate
+		ctx.translate(-0.5, -0.5);
+
 		ctx.lineWidth = 1;
 
 		if (this._data.vertLinesVisible) {
-			ctx.strokeStyle = this._data.vertLinesColor;
-			setLineStyle(ctx, this._data.vertLineStyle);
-			ctx.beginPath();
 			for (const timeMark of this._data.timeMarks) {
-				ctx.moveTo(timeMark.coord + 1, 0);
-				ctx.lineTo(timeMark.coord + 1, this._data.h);
+				drawVerticalLine(ctx, timeMark.coord, 0, this._data.h, 1, this._data.vertLinesColor, this._data.vertLineStyle);
 			}
-
-			ctx.stroke();
 		}
 
 		if (this._data.horzLinesVisible) {
-			ctx.strokeStyle = this._data.horzLinesColor;
-			setLineStyle(ctx, this._data.horzLineStyle);
-			ctx.beginPath();
 			for (const priceMark of this._data.priceMarks) {
-				ctx.moveTo(0, priceMark.coord);
-				ctx.lineTo(this._data.w, priceMark.coord);
+				drawHorizontalLine(ctx, priceMark.coord, 0, this._data.w, 1, this._data.vertLinesColor, this._data.vertLineStyle);
 			}
-
-			ctx.stroke();
 		}
+
+		// TODO: remove this after removing global translate
+		ctx.translate(0.5, 0.5);
 	}
 }
