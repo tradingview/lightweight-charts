@@ -51,7 +51,6 @@ export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: 
 // tslint:disable-next-line: max-params
 export function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: number, right: number, lineWidth: number): void {
 	const compensation = 0.5;
-	ctx.translate(compensation, 0);
 	ctx.translate(0, compensation);
 	ctx.lineCap = 'butt';
 	ctx.beginPath();
