@@ -37,6 +37,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		ctx.translate(-0.5, -0.5);
 
 		ctx.fillStyle = this._data.color;
+		ctx.beginPath();
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
@@ -44,8 +45,10 @@ export class PaneRendererHistogram implements IPaneRenderer {
 			const y = item.y as number;
 			const left = item.left as number;
 			const right = item.right as number;
-			ctx.fillRect(left, y, right - left, histogramBase - y);
+			ctx.rect(left, y, right - left, histogramBase - y);
 		}
+
+		ctx.fill();
 
 		// TODO: remove this after removing global translate
 		ctx.translate(0.5, 0.5);
