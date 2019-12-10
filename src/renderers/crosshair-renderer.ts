@@ -1,4 +1,6 @@
-import { drawLine, LineStyle, LineWidth } from './draw-line';
+import { drawHorizontalLine, drawVerticalLine } from '../helpers/canvas-helpers';
+
+import { LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
 export interface CrosshairLineStyle {
@@ -36,26 +38,31 @@ export class CrosshairRenderer implements IPaneRenderer {
 			return;
 		}
 
+		// TODO: remove this after removing global translate
+		ctx.translate(-0.5, -0.5);
+
 		const vertFix = this._data.vertLine.lineWidth % 2 === 0 ? 0.5 : 0;
 		const horzFix = this._data.horzLine.lineWidth % 2 === 0 ? 0.5 : 0;
 
-		const x = this._data.x + 1 + horzFix;
+		const x = this._data.x + horzFix;
 		const y = this._data.y + vertFix;
 		const w = this._data.w;
 		const h = this._data.h;
 
 		if (vertLinesVisible && x >= 0) {
-			ctx.lineWidth = this._data.vertLine.lineWidth;
 			ctx.strokeStyle = this._data.vertLine.color;
-			ctx.fillStyle = this._data.vertLine.color;
-			drawLine(ctx, x, 0, x, h, this._data.vertLine.lineStyle);
+			setLineStyle(ctx, this._data.vertLine.lineStyle);
+			drawVerticalLine(ctx, x, 0, h, this._data.vertLine.lineWidth);
 		}
 
 		if (horzLinesVisible && y >= 0) {
-			ctx.lineWidth = this._data.horzLine.lineWidth;
+			setLineStyle(ctx, this._data.horzLine.lineStyle);
 			ctx.strokeStyle = this._data.horzLine.color;
-			ctx.fillStyle = this._data.horzLine.color;
-			drawLine(ctx, 0, y, w, y, this._data.horzLine.lineStyle);
+			drawHorizontalLine(ctx, y, 0, w, this._data.horzLine.lineWidth);
 		}
+
+		// TODO: remove this after removing global translate
+		ctx.translate(0.5, 0.5);
+
 	}
 }
