@@ -37,7 +37,6 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		ctx.translate(-0.5, -0.5);
 
 		ctx.fillStyle = this._data.color;
-		ctx.lineWidth = 1;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
