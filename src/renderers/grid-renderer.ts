@@ -29,6 +29,7 @@ function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number,
 	ctx.lineCap = 'butt';
 	ctx.strokeStyle = color;
 	setLineStyle(ctx, style);
+	ctx.beginPath();
 	ctx.moveTo(x, top);
 	ctx.lineTo(x, bottom);
 	ctx.stroke();
@@ -42,6 +43,7 @@ function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: numb
 	ctx.lineCap = 'butt';
 	ctx.strokeStyle = color;
 	setLineStyle(ctx, style);
+	ctx.beginPath();
 	ctx.moveTo(left, y);
 	ctx.lineTo(right, y);
 	ctx.stroke();
