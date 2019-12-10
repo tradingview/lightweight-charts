@@ -329,7 +329,9 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		);
 
 		ctx.textAlign = 'center';
-		ctx.translate(0.5, -0.5);
+
+		// TODO: Remove after removing global compensatino
+		ctx.translate(-0.5, -0.5);
 		ctx.fillStyle = this._lineColor();
 
 		if (this._chart.model().timeScale().options().borderVisible) {

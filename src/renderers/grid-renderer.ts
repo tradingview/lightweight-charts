@@ -24,8 +24,8 @@ export interface GridRendererData {
 // TODO: move to canvas-helpers
 // tslint:disable-next-line: max-params
 function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number, bottom: number, lineWidth: LineWidth, color: string, style: LineStyle): void {
-	const compensation = lineWidth * 0.5;
-	ctx.translate(-compensation, 0);
+	const compensation = 1 - lineWidth * 0.5;
+	ctx.translate(compensation, 0);
 	ctx.lineCap = 'butt';
 	ctx.strokeStyle = color;
 	setLineStyle(ctx, style);
@@ -33,13 +33,14 @@ function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number,
 	ctx.moveTo(x, top);
 	ctx.lineTo(x, bottom);
 	ctx.stroke();
-	ctx.translate(compensation, 0);
+	ctx.translate(-compensation, 0);
 }
 
 // tslint:disable-next-line: max-params
 function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: number, right: number, lineWidth: LineWidth, color: string, style: LineStyle): void {
-	const compensation = lineWidth * 0.5;
-	ctx.translate(0, -compensation);
+	const compensation = 1 - lineWidth * 0.5;
+	ctx.translate(compensation, 0);
+	ctx.translate(0, compensation);
 	ctx.lineCap = 'butt';
 	ctx.strokeStyle = color;
 	setLineStyle(ctx, style);
@@ -47,7 +48,7 @@ function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: numb
 	ctx.moveTo(left, y);
 	ctx.lineTo(right, y);
 	ctx.stroke();
-	ctx.translate(0, compensation);
+	ctx.translate(0, -compensation);
 }
 
 export class GridRenderer implements IPaneRenderer {

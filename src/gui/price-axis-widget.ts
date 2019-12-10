@@ -432,7 +432,10 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const tickMarks = this._priceScale.marks();
 		ctx.font = this.baseFont();
+
+		// TODO: Remove after global compensation
 		ctx.translate(-0.5, -0.5);
+
 		ctx.fillStyle = this.lineColor();
 		const rendererOptions = this.rendererOptions();
 		const drawTicks = this._priceScale.options().borderVisible;
