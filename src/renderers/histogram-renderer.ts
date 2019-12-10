@@ -13,7 +13,6 @@ export interface PaneRendererHistogramData {
 	items: HistogramItem[];
 
 	barSpacing: number;
-	lineWidth: number;
 	histogramBase: number;
 	color: string;
 
@@ -34,12 +33,12 @@ export class PaneRendererHistogram implements IPaneRenderer {
 
 		const histogramBase = this._data.histogramBase;
 
-		ctx.translate(0.5, 0.5);
+		// TODO: remove this after removing global translate
+		ctx.translate(-0.5, -0.5);
 
 		ctx.fillStyle = this._data.color;
-		ctx.lineWidth = 1;
-
 		ctx.beginPath();
+
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			// force cast to avoid ensureDefined call
@@ -48,6 +47,10 @@ export class PaneRendererHistogram implements IPaneRenderer {
 			const right = item.right as number;
 			ctx.rect(left, y, right - left, histogramBase - y);
 		}
+
 		ctx.fill();
+
+		// TODO: remove this after removing global translate
+		ctx.translate(0.5, 0.5);
 	}
 }
