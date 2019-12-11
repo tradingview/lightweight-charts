@@ -19,15 +19,15 @@ export function strokeRectInnerWithFill(ctx: CanvasRenderingContext2D, x: number
 }
 
 /**
- * Draw vertical line with pixel-perfect rendering on Hi-DPI
+ * Draw vertical line with pixel-perfect rendering on Hi-DPI using current canvas color and style
  * @param ctx context to draw on
  * @param x horizontal coordinate of the line
  * @param top top coordinate of the line
  * @param bottom bottom coordinate of the line
  * @param lineWidth width ot the line
  */
-// tslint:disable-next-line: max-params
 export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number, bottom: number, lineWidth: number): void {
+	// TODO: check if we relly need 0.5 * pixelRatio here
 	const compensation = 0.5;
 	ctx.translate(compensation, 0);
 	ctx.lineCap = 'butt';
@@ -39,17 +39,15 @@ export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: 
 }
 
 /**
- * Draw horizontal line with pixel-perfect rendering on Hi-DPI
+ * Draw horizontal line with pixel-perfect rendering on Hi-DPI using current canvas color and style
  * @param ctx context to draw on
  * @param y vertical coordinate of the line
  * @param left left coordinate of the line
  * @param right rigth coordinate of the line
  * @param lineWidth width ot the line
- * @param color color of the line
- * @param style style of the line
  */
-// tslint:disable-next-line: max-params
 export function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: number, right: number, lineWidth: number): void {
+	// TODO: check if we relly need 0.5 * pixelRatio here
 	const compensation = 0.5;
 	ctx.translate(0, compensation);
 	ctx.lineCap = 'butt';

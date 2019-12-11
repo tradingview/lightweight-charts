@@ -38,8 +38,6 @@ export class GridRenderer implements IPaneRenderer {
 		// TODO: remove this after removing global translate
 		ctx.translate(-0.5, -0.5);
 
-		ctx.lineWidth = 1;
-
 		if (this._data.vertLinesVisible) {
 			ctx.strokeStyle = this._data.vertLinesColor;
 			setLineStyle(ctx, this._data.vertLineStyle);
