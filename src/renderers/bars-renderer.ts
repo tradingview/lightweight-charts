@@ -36,7 +36,9 @@ export class PaneRendererBars implements IPaneRenderer {
 		}
 
 		ctx.save();
-		ctx.translate(0.5, 0.5);
+
+		// TODO: remove this after removing of global translate
+		ctx.translate(-0.5, -0.5);
 
 		const offset = this._data.thinBars ? 1 : Math.round(this._barWidth);
 		const negativeOffset = this._data.thinBars ? 1 : offset / 2;
@@ -50,8 +52,10 @@ export class PaneRendererBars implements IPaneRenderer {
 				prevColor = bar.color;
 			}
 
+			const bodyLeft = Math.round(bar.x - this._barLineWidth / 2);
+
 			ctx.fillRect(
-				Math.round(bar.x - this._barLineWidth / 2),
+				bodyLeft,
 				Math.round(bar.highY - negativeOffset),
 				Math.round(this._barLineWidth),
 				Math.round(bar.lowY - bar.highY + offset)
@@ -59,22 +63,28 @@ export class PaneRendererBars implements IPaneRenderer {
 
 			if (this._barLineWidth < (this._data.barSpacing - 1)) {
 				if (this._data.openVisible) {
+					const openLeft = Math.round(bodyLeft - this._barLineWidth);
 					ctx.fillRect(
-						Math.round(bar.x - this._barWidth * 1.5),
+						openLeft,
 						Math.floor(bar.openY - negativeOffset),
-						Math.round(this._barWidth * 1.5),
+						bodyLeft - openLeft,
 						offset
 					);
 				}
 
+				const closeLeft = bodyLeft + Math.round(this._barLineWidth);
+
 				ctx.fillRect(
-					Math.round(bar.x),
+					closeLeft,
 					Math.floor(bar.closeY - negativeOffset),
-					Math.round(this._barWidth * 1.5),
+					Math.round(this._barLineWidth),
 					offset
 				);
 			}
 		}
+
+		// TODO: remove this after removing of global translate
+		ctx.translate(0.5, 0.5);
 
 		ctx.restore();
 	}
