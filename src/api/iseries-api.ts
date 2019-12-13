@@ -38,7 +38,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Converts specified coordinate to price value according to the series price scale
 	 * @param coordinate - input coordinate to be converted
-	 * @returns - price value pf the coordinate on the chart
+	 * @returns - price value of the coordinate on the chart
 	 */
 	coordinateToPrice(coordinate: Coordinate): BarPrice | null;
 
