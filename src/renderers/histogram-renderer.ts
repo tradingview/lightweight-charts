@@ -2,7 +2,7 @@ import { Coordinate } from '../model/coordinate';
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { IPaneRenderer } from './ipane-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 
 export interface HistogramItem extends PricedValue, TimedValue {
 	left?: Coordinate;
@@ -19,14 +19,14 @@ export interface PaneRendererHistogramData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererHistogram implements IPaneRenderer {
+export class PaneRendererHistogram extends ScaledRenderer {
 	private _data: PaneRendererHistogramData | null = null;
 
 	public setData(data: PaneRendererHistogramData): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}

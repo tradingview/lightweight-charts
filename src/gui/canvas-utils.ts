@@ -16,7 +16,7 @@ export class Size {
 	}
 }
 
-function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
+export function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 	return canvas.ownerDocument &&
 		canvas.ownerDocument.defaultView &&
 		canvas.ownerDocument.defaultView.devicePixelRatio
@@ -25,16 +25,13 @@ function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 
 export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 	const ctx = ensureNotNull(canvas.getContext('2d'));
-	// scale by pixel ratio
-	const pixelRatio = getCanvasDevicePixelRatio(canvas);
-	ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+	ctx.resetTransform();
 	return ctx;
 }
 
 export function getPretransformedContext2D(binding: CanvasCoordinateSpaceBinding): CanvasRenderingContext2D {
 	const ctx = ensureNotNull(binding.canvas.getContext('2d'));
-	// scale by pixel ratio
-	ctx.setTransform(binding.pixelRatio, 0, 0, binding.pixelRatio, 0, 0);
+	ctx.resetTransform();
 	ctx.translate(0.5, 0.5);
 	return ctx;
 }

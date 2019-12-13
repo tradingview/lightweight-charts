@@ -1,5 +1,5 @@
 import { drawLine, LineStyle, LineWidth } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 
 export interface CrosshairLineStyle {
 	lineStyle: LineStyle;
@@ -17,14 +17,15 @@ export interface CrosshairRendererData {
 	h: number;
 }
 
-export class CrosshairRenderer implements IPaneRenderer {
+export class CrosshairRenderer extends ScaledRenderer {
 	private readonly _data: CrosshairRendererData | null;
 
 	public constructor(data: CrosshairRendererData | null) {
+		super();
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null) {
 			return;
 		}

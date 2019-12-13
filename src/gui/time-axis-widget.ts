@@ -13,7 +13,7 @@ import { MarkSpanBorder, TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { TimeAxisView } from '../views/time-axis/time-axis-view';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getCanvasDevicePixelRatio, getPretransformedContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
@@ -268,14 +268,21 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D): void {
-		clearRect(ctx, 0, 0, this._size.w, this._size.h, this._backgroundColor());
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+		clearRect(ctx, 0, 0, this._size.w * devicePixelRation, this._size.h * devicePixelRation, this._backgroundColor());
 	}
 
 	private _drawBorder(ctx: CanvasRenderingContext2D): void {
 		if (this._chart.options().timeScale.borderVisible) {
 			ctx.save();
+			const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+			if (Math.abs(devicePixelRation - 1) > 0.01) {
+				ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+			}
+
 			ctx.fillStyle = this._lineColor();
 			ctx.translate(-0.5, -0.5);
+
 			ctx.fillRect(0, 0, this._size.w, 1);
 			ctx.restore();
 		}
@@ -316,6 +323,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		ctx.save();
+
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+		if (Math.abs(devicePixelRation - 1) > 0.01) {
+			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+		}
 
 		ctx.strokeStyle = this._lineColor();
 
@@ -363,6 +375,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		ctx.save();
 		const topLevelSources: Set<IDataSource> = new Set();
 
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+		if (Math.abs(devicePixelRation - 1) > 0.01) {
+			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+		}
+
 		const model = this._chart.model();
 		const sources = model.dataSources();
 		topLevelSources.add(model.crosshairSource());
@@ -383,7 +400,13 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D): void {
-		ctx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
+		ctx.save();
+
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+		ctx.clearRect(-0.5, -0.5, this._size.w * devicePixelRation, this._size.h * devicePixelRation);
+		if (Math.abs(devicePixelRation - 1) > 0.01) {
+			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+		}
 
 		const model = this._chart.model();
 
@@ -401,6 +424,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				ctx.restore();
 			});
 		});
+
+		ctx.restore();
 	}
 
 	private _backgroundColor(): string {

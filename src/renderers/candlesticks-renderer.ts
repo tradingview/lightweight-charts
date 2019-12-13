@@ -3,8 +3,8 @@ import { strokeRectInnerWithFill } from '../helpers/canvas-helpers';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { BarCandlestickItemBase } from './bars-renderer';
-import { IPaneRenderer } from './ipane-renderer';
 import { optimalBarWidth } from './optimal-bar-width';
+import { ScaledRenderer } from './scaled-renderer';
 
 export interface CandlestickItem extends BarCandlestickItemBase {
 	color: string;
@@ -27,7 +27,7 @@ const enum Constants {
 	BarBorderWidth = 1,
 }
 
-export class PaneRendererCandlesticks implements IPaneRenderer {
+export class PaneRendererCandlesticks extends ScaledRenderer {
 	private _data: PaneRendererCandlesticksData | null = null;
 	private _barWidth: number = 0;
 
@@ -36,7 +36,7 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		this._barWidth = optimalBarWidth(data.barSpacing);
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}

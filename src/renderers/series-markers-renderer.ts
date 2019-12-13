@@ -5,7 +5,7 @@ import { Coordinate } from '../model/coordinate';
 import { SeriesMarkerShape } from '../model/series-markers';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { IPaneRenderer } from './ipane-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
 import { drawSquare, hitTestSquare } from './series-markers-square';
@@ -24,24 +24,11 @@ export interface SeriesMarkerRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class SeriesMarkersRenderer implements IPaneRenderer {
+export class SeriesMarkersRenderer extends ScaledRenderer {
 	private _data: SeriesMarkerRendererData | null = null;
 
 	public setData(data: SeriesMarkerRendererData): void {
 		this._data = data;
-	}
-
-	public draw(ctx: CanvasRenderingContext2D, isHovered: boolean, hitTestData?: unknown): void {
-		if (this._data === null || this._data.visibleRange === null) {
-			return;
-		}
-		ctx.save();
-		ctx.translate(0.5, 0.5);
-		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
-			const item = this._data.items[i];
-			drawItem(item, ctx);
-		}
-		ctx.restore();
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
@@ -60,6 +47,19 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 		}
 
 		return null;
+	}
+
+	protected _drawImpl(ctx: CanvasRenderingContext2D, isHovered: boolean, hitTestData?: unknown): void {
+		if (this._data === null || this._data.visibleRange === null) {
+			return;
+		}
+		ctx.save();
+		ctx.translate(0.5, 0.5);
+		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
+			const item = this._data.items[i];
+			drawItem(item, ctx);
+		}
+		ctx.restore();
 	}
 }
 
