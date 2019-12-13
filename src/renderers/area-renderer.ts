@@ -2,8 +2,8 @@ import { Coordinate } from '../model/coordinate';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
 import { LineItem } from './line-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
 
 export interface PaneRendererAreaData {
@@ -20,19 +20,17 @@ export interface PaneRendererAreaData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererArea implements IPaneRenderer {
+export class PaneRendererArea extends ScaledRenderer {
 	protected _data: PaneRendererAreaData | null = null;
 
 	public setData(data: PaneRendererAreaData): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
-
-		ctx.save();
 
 		ctx.lineCap = 'square';
 		ctx.strokeStyle = this._data.lineColor;
@@ -58,7 +56,5 @@ export class PaneRendererArea implements IPaneRenderer {
 
 		ctx.fillStyle = gradient;
 		ctx.fill();
-
-		ctx.restore();
 	}
 }

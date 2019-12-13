@@ -1,7 +1,7 @@
 import { PriceMark } from '../model/price-scale';
 
 import { LineStyle, setLineStyle } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 
 export interface GridMarks {
 	coord: number;
@@ -21,14 +21,14 @@ export interface GridRendererData {
 	w: number;
 }
 
-export class GridRenderer implements IPaneRenderer {
+export class GridRenderer extends ScaledRenderer {
 	private _data: GridRendererData | null = null;
 
 	public setData(data: GridRendererData | null): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null) {
 			return;
 		}

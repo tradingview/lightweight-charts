@@ -1,7 +1,7 @@
 import { Coordinate } from '../model/coordinate';
 
 import { drawLine, LineStyle, LineWidth } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 
 export interface HorizontalLineRendererData {
 	color: string;
@@ -14,14 +14,14 @@ export interface HorizontalLineRendererData {
 	width: number;
 }
 
-export class HorizontalLineRenderer implements IPaneRenderer {
+export class HorizontalLineRenderer extends ScaledRenderer {
 	private _data: HorizontalLineRendererData | null = null;
 
 	public setData(data: HorizontalLineRendererData): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null) {
 			return;
 		}

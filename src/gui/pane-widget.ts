@@ -15,7 +15,7 @@ import { PriceAxisPosition } from '../model/price-scale';
 import { TimePointIndex } from '../model/time-data';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getCanvasDevicePixelRatio, getPretransformedContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget } from './price-axis-widget';
@@ -491,19 +491,25 @@ export class PaneWidget implements IDestroyable {
 			this._priceAxisWidget.paint(type);
 		}
 
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+
 		if (type !== InvalidationLevel.Cursor) {
 			const ctx = getPretransformedContext2D(this._canvasBinding);
+			ctx.save();
 			this._drawBackground(ctx, this._backgroundColor());
 			if (this._state) {
 				this._drawGrid(ctx);
 				this._drawWatermark(ctx);
 				this._drawSources(ctx);
 			}
+			ctx.restore();
 		}
 
 		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
-		topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
+		topCtx.save();
+		topCtx.clearRect(-0.5, -0.5, this._size.w * devicePixelRation, this._size.h * devicePixelRation);
 		this._drawCrosshair(topCtx);
+		topCtx.restore();
 	}
 
 	public priceAxisWidget(): PriceAxisWidget | null {
@@ -533,11 +539,14 @@ export class PaneWidget implements IDestroyable {
 		const paneViews = source.paneViews(state);
 		const height = state.height();
 		const width = state.width();
+
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+
 		for (const paneView of paneViews) {
 			ctx.save();
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
-				renderer.draw(ctx, false);
+				renderer.draw(ctx, devicePixelRation, false);
 			}
 
 			ctx.restore();
@@ -558,11 +567,14 @@ export class PaneWidget implements IDestroyable {
 		const paneViews = source.paneViews();
 		const height = state.height();
 		const width = state.width();
+
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+
 		for (const paneView of paneViews) {
 			ctx.save();
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
-				renderer.draw(ctx, false);
+				renderer.draw(ctx, devicePixelRation, false);
 			}
 
 			ctx.restore();
@@ -600,11 +612,13 @@ export class PaneWidget implements IDestroyable {
 			? hoveredSource.object.hitTestData
 			: undefined;
 
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
 				ctx.save();
-				renderer.draw(ctx, isHovered, objecId);
+				renderer.draw(ctx, devicePixelRation, isHovered, objecId);
 				ctx.restore();
 			}
 		}
@@ -621,11 +635,13 @@ export class PaneWidget implements IDestroyable {
 			? hoveredSource.object.hitTestData
 			: undefined;
 
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null && renderer.drawBackground !== undefined) {
 				ctx.save();
-				renderer.drawBackground(ctx, isHovered, objecId);
+				renderer.drawBackground(ctx, devicePixelRation, isHovered, objecId);
 				ctx.restore();
 			}
 		}

@@ -15,7 +15,7 @@ import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-rend
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getCanvasDevicePixelRatio, getPretransformedContext2D, Size } from './canvas-utils';
 import { LabelsImageCache } from './labels-image-cache';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -292,7 +292,9 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
-		topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+
+		topCtx.clearRect(-0.5, -0.5, this._size.w * devicePixelRation, this._size.h * devicePixelRation);
 		this._drawCrosshairLabel(topCtx);
 	}
 
@@ -398,7 +400,10 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null) {
 			return;
 		}
-		clearRect(ctx, 0, 0, this._size.w, this._size.h, this.backgroundColor());
+
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+
+		clearRect(ctx, 0, 0, this._size.w * devicePixelRation, this._size.h * devicePixelRation, this.backgroundColor());
 	}
 
 	private _drawBorder(ctx: CanvasRenderingContext2D): void {
@@ -406,6 +411,11 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 		ctx.save();
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+		if (Math.abs(devicePixelRation - 1) > 0.01) {
+			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+		}
+
 		ctx.fillStyle = this.lineColor();
 
 		const borderSize = this.rendererOptions().borderSize;
@@ -427,10 +437,20 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
+
+		// marks could call getPretransformedContext2D to get context to measure string
+		// and this call could reset transform, so we have to do it before applying scale
+		const tickMarks = this._priceScale.marks();
+
 		ctx.save();
+
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+		if (Math.abs(devicePixelRation - 1) > 0.01) {
+			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+		}
+
 		ctx.strokeStyle = this.lineColor();
 
-		const tickMarks = this._priceScale.marks();
 		ctx.font = this.baseFont();
 		ctx.translate(-0.5, -0.5);
 		ctx.fillStyle = this.lineColor();
@@ -560,6 +580,13 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
+		ctx.save();
+
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+		if (Math.abs(devicePixelRation - 1) > 0.01) {
+			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+		}
+
 		const size = this._size;
 		const views = this._backLabels();
 
@@ -574,11 +601,20 @@ export class PriceAxisWidget implements IDestroyable {
 				ctx.restore();
 			}
 		});
+
+		ctx.restore();
 	}
 
 	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
+		}
+
+		ctx.save();
+
+		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
+		if (Math.abs(devicePixelRation - 1) > 0.01) {
+			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
 		}
 
 		const size = this._size;
@@ -602,6 +638,8 @@ export class PriceAxisWidget implements IDestroyable {
 				ctx.restore();
 			});
 		});
+
+		ctx.restore();
 	}
 
 	private _setCursor(type: CursorType): void {
