@@ -1,4 +1,4 @@
-import { createPreconfiguredCanvas, getPrescaledContext2D, Size, getCanvasDevicePixelRatio } from '../gui/canvas-utils';
+import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getPrescaledContext2D, Size } from '../gui/canvas-utils';
 
 import { ensureDefined } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
