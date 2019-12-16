@@ -1,4 +1,4 @@
-import { createPreconfiguredCanvas, getPrescaledContext2D, Size } from '../gui/canvas-utils';
+import { createPreconfiguredCanvas, getPrescaledContext2D, Size, getCanvasDevicePixelRatio } from '../gui/canvas-utils';
 
 import { ensureDefined } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -84,9 +84,14 @@ export class LabelsImageCache implements IDestroyable {
 			}
 
 			ctx = getPrescaledContext2D(item.canvas);
+			ctx.save();
+			const devicePixelRation = getCanvasDevicePixelRatio(item.canvas);
+			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+
 			ctx.font = this._font;
 			ctx.fillStyle = this._color;
 			ctx.fillText(text, 0, item.height - margin - baselineOffset);
+			ctx.restore();
 		}
 
 		return item;
