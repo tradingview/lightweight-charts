@@ -299,6 +299,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		if (index !== -1) {
 			this._customPriceLines.splice(index, 1);
 		}
+		this.model().updateSource(this);
 	}
 
 	public palette(): Palette {
