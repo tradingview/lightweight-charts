@@ -35,9 +35,6 @@ export class PaneRendererBars implements IPaneRenderer {
 			return;
 		}
 
-		const offset = this._data.thinBars ? 1 : Math.round(this._barWidth);
-		const negativeOffset = this._data.thinBars ? 1 : offset / 2;
-
 		let prevColor: string | null = null;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
@@ -47,28 +44,35 @@ export class PaneRendererBars implements IPaneRenderer {
 				prevColor = bar.color;
 			}
 
+			const bodyLeft = Math.round((bar.x - this._barLineWidth / 2) * devicePixelRation);
+			const bodyWidth = Math.round(this._barLineWidth * devicePixelRation);
+			const bodyWidthHalf = Math.round(this._barLineWidth * devicePixelRation * 0.5);
+
 			ctx.fillRect(
-				Math.round(bar.x - this._barLineWidth / 2),
-				Math.round(bar.highY - negativeOffset),
-				Math.round(this._barLineWidth),
-				Math.round(bar.lowY - bar.highY + offset)
+				bodyLeft,
+				Math.round(bar.highY * devicePixelRation),
+				bodyWidth,
+				Math.round((bar.lowY - bar.highY) * devicePixelRation)
 			);
 
 			if (this._barLineWidth < (this._data.barSpacing - 1)) {
 				if (this._data.openVisible) {
+					const openLeft = Math.round(bodyLeft - this._barLineWidth);
 					ctx.fillRect(
-						Math.round(bar.x - this._barWidth * 1.5),
-						Math.floor(bar.openY - negativeOffset),
-						Math.round(this._barWidth * 1.5),
-						offset
+						openLeft,
+						Math.round(bar.openY * devicePixelRation) - bodyWidthHalf,
+						bodyLeft - openLeft,
+						bodyWidthHalf * 2
 					);
 				}
 
+				const closeLeft = bodyLeft + bodyWidth;
+
 				ctx.fillRect(
-					Math.round(bar.x),
-					Math.floor(bar.closeY - negativeOffset),
-					Math.round(this._barWidth * 1.5),
-					offset
+					closeLeft,
+					Math.round(bar.closeY * devicePixelRation) - bodyWidthHalf,
+					bodyWidth,
+					bodyWidthHalf * 2
 				);
 			}
 		}
