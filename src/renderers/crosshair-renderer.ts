@@ -1,5 +1,5 @@
 import { drawLine, LineStyle, LineWidth } from './draw-line';
-import { ScaledRenderer } from './scaled-renderer';
+import { IPaneRenderer } from './ipane-renderer';
 
 export interface CrosshairLineStyle {
 	lineStyle: LineStyle;
@@ -17,15 +17,14 @@ export interface CrosshairRendererData {
 	h: number;
 }
 
-export class CrosshairRenderer extends ScaledRenderer {
+export class CrosshairRenderer implements IPaneRenderer {
 	private readonly _data: CrosshairRendererData | null;
 
 	public constructor(data: CrosshairRendererData | null) {
-		super();
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, devicePixelRation: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
@@ -37,26 +36,28 @@ export class CrosshairRenderer extends ScaledRenderer {
 			return;
 		}
 
-		const vertFix = this._data.vertLine.lineWidth % 2 === 0 ? 0.5 : 0;
-		const horzFix = this._data.horzLine.lineWidth % 2 === 0 ? 0.5 : 0;
+		ctx.save();
+		ctx.translate(0.5, 0.5);
 
-		const x = this._data.x + 1 + horzFix;
-		const y = this._data.y + vertFix;
-		const w = this._data.w;
-		const h = this._data.h;
+		const x = Math.round(this._data.x * devicePixelRation);
+		const y = Math.round(this._data.y * devicePixelRation);
+		const w = Math.ceil(this._data.w * devicePixelRation);
+		const h = Math.ceil(this._data.h * devicePixelRation);
 
 		if (vertLinesVisible && x >= 0) {
 			ctx.lineWidth = this._data.vertLine.lineWidth;
 			ctx.strokeStyle = this._data.vertLine.color;
 			ctx.fillStyle = this._data.vertLine.color;
-			drawLine(ctx, x, 0, x, h, this._data.vertLine.lineStyle);
+			drawLine(ctx, x, -0.5, x, h, this._data.vertLine.lineStyle);
 		}
 
 		if (horzLinesVisible && y >= 0) {
 			ctx.lineWidth = this._data.horzLine.lineWidth;
 			ctx.strokeStyle = this._data.horzLine.color;
 			ctx.fillStyle = this._data.horzLine.color;
-			drawLine(ctx, 0, y, w, y, this._data.horzLine.lineStyle);
+			drawLine(ctx, -0.5, y, w, y, this._data.horzLine.lineStyle);
 		}
+
+		ctx.restore();
 	}
 }

@@ -200,7 +200,6 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		return Math.ceil(
-			rendererOptions.offsetSize +
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
@@ -412,9 +411,6 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 		ctx.save();
 		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
-		if (Math.abs(devicePixelRation - 1) > 0.01) {
-			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
-		}
 
 		ctx.fillStyle = this.lineColor();
 
@@ -422,14 +418,12 @@ export class PriceAxisWidget implements IDestroyable {
 
 		let left: number;
 		if (this._isLeft) {
-			ctx.translate(-0.5, -0.5);
-			left = this._size.w - borderSize - 1;
+			left = Math.ceil(this._size.w * devicePixelRation - borderSize - 1);
 		} else {
-			ctx.translate(0.5, -0.5);
 			left = 0;
 		}
 
-		ctx.fillRect(left, 0, borderSize, this._size.h);
+		ctx.fillRect(left, 0, borderSize, Math.ceil(this._size.h * devicePixelRation));
 		ctx.restore();
 	}
 
@@ -445,21 +439,17 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.save();
 
 		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
-		if (Math.abs(devicePixelRation - 1) > 0.01) {
-			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
-		}
 
 		ctx.strokeStyle = this.lineColor();
 
 		ctx.font = this.baseFont();
-		ctx.translate(-0.5, -0.5);
 		ctx.fillStyle = this.lineColor();
 		const rendererOptions = this.rendererOptions();
 		const drawTicks = this._priceScale.options().borderVisible;
 
 		const tickMarkLeftX = this._isLeft ?
-			this._size.w - rendererOptions.offsetSize - rendererOptions.borderSize - rendererOptions.tickLength :
-			rendererOptions.borderSize + rendererOptions.offsetSize;
+			Math.floor(this._size.w * devicePixelRation) - rendererOptions.borderSize - rendererOptions.tickLength :
+			rendererOptions.borderSize;
 
 		const textLeftX = this._isLeft ?
 			tickMarkLeftX - rendererOptions.paddingInner :
@@ -468,9 +458,10 @@ export class PriceAxisWidget implements IDestroyable {
 		const textAlign = this._isLeft ? 'right' : 'left';
 
 		if (drawTicks) {
+			const tickLength = Math.round(rendererOptions.tickLength * devicePixelRation);
 			ctx.beginPath();
 			for (const tickMark of tickMarks) {
-				ctx.rect(tickMarkLeftX, tickMark.coord, rendererOptions.tickLength, 1);
+				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * devicePixelRation), tickLength, 1);
 			}
 
 			ctx.fill();
@@ -478,7 +469,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.fillStyle = this.textColor();
 		for (const tickMark of tickMarks) {
-			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, tickMark.coord, textAlign);
+			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, Math.round(tickMark.coord * devicePixelRation), textAlign);
 		}
 
 		ctx.restore();
@@ -583,9 +574,6 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.save();
 
 		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
-		if (Math.abs(devicePixelRation - 1) > 0.01) {
-			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
-		}
 
 		const size = this._size;
 		const views = this._backLabels();
@@ -597,7 +585,7 @@ export class PriceAxisWidget implements IDestroyable {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer();
 				ctx.save();
-				renderer.draw(ctx, rendererOptions, this._widthCache, size.w, align);
+				renderer.draw(ctx, rendererOptions, this._widthCache, size.w, align, devicePixelRation);
 				ctx.restore();
 			}
 		});
@@ -613,9 +601,6 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.save();
 
 		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
-		if (Math.abs(devicePixelRation - 1) > 0.01) {
-			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
-		}
 
 		const size = this._size;
 		const model = this._pane.chart().model();
@@ -634,7 +619,7 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((arr: IPriceAxisViewArray) => {
 			arr.forEach((view: IPriceAxisView) => {
 				ctx.save();
-				view.renderer().draw(ctx, ro, this._widthCache, size.w, align);
+				view.renderer().draw(ctx, ro, this._widthCache, size.w, align, devicePixelRation);
 				ctx.restore();
 			});
 		});

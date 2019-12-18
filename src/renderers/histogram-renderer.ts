@@ -2,7 +2,7 @@ import { Coordinate } from '../model/coordinate';
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { ScaledRenderer } from './scaled-renderer';
+import { IPaneRenderer } from './ipane-renderer';
 
 export interface HistogramItem extends PricedValue, TimedValue {
 	left?: Coordinate;
@@ -19,22 +19,19 @@ export interface PaneRendererHistogramData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererHistogram extends ScaledRenderer {
+export class PaneRendererHistogram implements IPaneRenderer {
 	private _data: PaneRendererHistogramData | null = null;
 
 	public setData(data: PaneRendererHistogramData): void {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, devicePixelRation: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 
-		const histogramBase = this._data.histogramBase;
-
-		// TODO: remove this after removing global translate
-		ctx.translate(-0.5, -0.5);
+		const histogramBase = Math.round(this._data.histogramBase * devicePixelRation);
 
 		ctx.fillStyle = this._data.color;
 		ctx.beginPath();
@@ -42,15 +39,12 @@ export class PaneRendererHistogram extends ScaledRenderer {
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			// force cast to avoid ensureDefined call
-			const y = item.y as number;
-			const left = item.left as number;
-			const right = item.right as number;
+			const y = Math.round(item.y as number * devicePixelRation);
+			const left = Math.floor((item.left as number) * devicePixelRation);
+			const right = Math.ceil((item.right as number) * devicePixelRation);
 			ctx.rect(left, y, right - left, histogramBase - y);
 		}
 
 		ctx.fill();
-
-		// TODO: remove this after removing global translate
-		ctx.translate(0.5, 0.5);
 	}
 }

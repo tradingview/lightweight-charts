@@ -76,8 +76,16 @@ export class ChartWidget implements IDestroyable {
 
 		if (width === 0 && height === 0) {
 			const containerRect = container.getBoundingClientRect();
-			width = containerRect.width;
-			height = containerRect.height;
+			// TODO: Fix it better
+			// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
+			width = Math.floor(containerRect.width);
+			if (width % 2) {
+				width -= 1;
+			}
+			height = Math.floor(containerRect.height);
+			if (height % 2) {
+				height -= 1;
+			}
 		}
 
 		width = Math.max(70, width);
@@ -301,7 +309,12 @@ export class ChartWidget implements IDestroyable {
 		const separatorCount = this._paneSeparators.length;
 		const separatorHeight = SEPARATOR_HEIGHT;
 		const separatorsHeight = separatorHeight * separatorCount;
-		const timeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
+		let timeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
+		// TODO: Fix it better
+		// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
+		if (timeAxisHeight % 2) {
+			timeAxisHeight += 1;
+		}
 		const otherWidgetHeight = separatorsHeight + timeAxisHeight;
 		const totalPaneHeight = height < otherWidgetHeight ? 0 : height - otherWidgetHeight;
 		const stretchPixels = totalPaneHeight / totalStretch;

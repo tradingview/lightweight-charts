@@ -46,6 +46,7 @@ export class LabelsImageCache implements IDestroyable {
 
 		ctx.drawImage(
 			label.canvas,
+			0, 0, label.width, label.height,
 			x, y,
 			label.width, label.height
 		);
@@ -62,11 +63,13 @@ export class LabelsImageCache implements IDestroyable {
 				this._hash.delete(key);
 			}
 
+			const devicePixelRation = getCanvasDevicePixelRatio(ctx.canvas);
+
 			const margin = Math.ceil(this._fontSize / 4.5);
 			const baselineOffset = Math.round(this._fontSize / 10);
 			const textWidth = Math.ceil(this._textWidthCache.measureText(ctx, text));
 			const width = Math.round(textWidth + margin * 2);
-			const height = this._fontSize + margin * 2;
+			const height = Math.round((this._fontSize + margin * 2));
 			const canvas = createPreconfiguredCanvas(document, new Size(width, height));
 
 			// Allocate new
@@ -85,13 +88,16 @@ export class LabelsImageCache implements IDestroyable {
 
 			ctx = getPrescaledContext2D(item.canvas);
 			ctx.save();
-			const devicePixelRation = getCanvasDevicePixelRatio(item.canvas);
 			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+			ctx.translate(0.5, 0.5);
 
 			ctx.font = this._font;
 			ctx.fillStyle = this._color;
-			ctx.fillText(text, 0, item.height - margin - baselineOffset);
+			ctx.fillText(text, 0, height - margin - baselineOffset);
 			ctx.restore();
+
+			item.width = Math.ceil(item.width * devicePixelRation);
+			item.height = Math.ceil(item.height * devicePixelRation);
 		}
 
 		return item;

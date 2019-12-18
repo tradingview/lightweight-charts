@@ -32,13 +32,11 @@ export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderin
 export function getPretransformedContext2D(binding: CanvasCoordinateSpaceBinding): CanvasRenderingContext2D {
 	const ctx = ensureNotNull(binding.canvas.getContext('2d'));
 	ctx.resetTransform();
-	ctx.translate(0.5, 0.5);
 	return ctx;
 }
 
 export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
 	ctx.save();
-	ctx.translate(-0.5, -0.5);
 	ctx.globalCompositeOperation = 'copy';
 	ctx.fillStyle = clearColor;
 	ctx.fillRect(x, y, w, h);

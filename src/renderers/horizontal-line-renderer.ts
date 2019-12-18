@@ -1,7 +1,7 @@
 import { Coordinate } from '../model/coordinate';
 
 import { drawLine, LineStyle, LineWidth } from './draw-line';
-import { ScaledRenderer } from './scaled-renderer';
+import { IPaneRenderer } from './ipane-renderer';
 
 export interface HorizontalLineRendererData {
 	color: string;
@@ -14,14 +14,14 @@ export interface HorizontalLineRendererData {
 	width: number;
 }
 
-export class HorizontalLineRenderer extends ScaledRenderer {
+export class HorizontalLineRenderer implements IPaneRenderer {
 	private _data: HorizontalLineRendererData | null = null;
 
 	public setData(data: HorizontalLineRendererData): void {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, devicePixelRation: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
@@ -30,17 +30,17 @@ export class HorizontalLineRenderer extends ScaledRenderer {
 			return;
 		}
 
-		const y = this._data.y;
+		const y = Math.round(this._data.y * devicePixelRation) + 0.5;
 
 		if (y < 0 || y > this._data.height) {
 			return;
 		}
 
-		const width = this._data.width;
+		const width = Math.ceil(this._data.width * devicePixelRation);
 		ctx.lineCap = 'square';
 		ctx.strokeStyle = this._data.color;
 		ctx.lineWidth = this._data.lineWidth;
 
-		drawLine(ctx, 0, y, width, y, this._data.lineStyle);
+		drawLine(ctx, -0.5, y, width, y, this._data.lineStyle);
 	}
 }

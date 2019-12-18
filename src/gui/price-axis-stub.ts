@@ -6,7 +6,7 @@ import { ChartOptions } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getCanvasDevicePixelRatio, getPretransformedContext2D, Size } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
 export interface PriceAxisStubParams {
@@ -120,18 +120,16 @@ export class PriceAxisStub implements IDestroyable {
 		ctx.fillStyle = this._options.timeScale.borderColor;
 
 		const borderSize = this._rendererOptionsProvider.options().borderSize;
+		const pixelRatio = getCanvasDevicePixelRatio(ctx.canvas);
 
 		let left: number;
 		if (this._isLeft) {
-			ctx.translate(-0.5, -0.5);
-			left = width - borderSize - 1;
+			left = Math.round((width - borderSize - 1) * pixelRatio);
 		} else {
-			ctx.translate(-0.5, -0.5);
 			left = 0;
 		}
 
-		// multiply to 2 because of we draw price scale border on the second pixel
-		ctx.fillRect(left, 0, borderSize * 2, 1);
+		ctx.fillRect(left, 0, borderSize, 1);
 		ctx.restore();
 	}
 
