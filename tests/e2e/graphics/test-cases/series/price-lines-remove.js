@@ -21,6 +21,12 @@ function runTestCase(container) {
 
 	var line1 = series.createPriceLine({ price: 10 });
 	var line2 = series.createPriceLine({ price: 20 });
-	series.removePriceLine(line2);
-	series.removePriceLine(line1);
+
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			series.removePriceLine(line2);
+			series.removePriceLine(line1);
+			resolve();
+		}, 1000);
+	});
 }
