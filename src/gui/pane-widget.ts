@@ -496,7 +496,7 @@ export class PaneWidget implements IDestroyable {
 		if (type !== InvalidationLevel.Cursor) {
 			const ctx = getPretransformedContext2D(this._canvasBinding);
 			ctx.save();
-			this._drawBackground(ctx, this._backgroundColor());
+			this._drawBackground(ctx, this._backgroundColor(), devicePixelRation);
 			if (this._state) {
 				this._drawGrid(ctx);
 				this._drawWatermark(ctx);
@@ -507,7 +507,7 @@ export class PaneWidget implements IDestroyable {
 
 		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
 		topCtx.save();
-		topCtx.clearRect(-0.5, -0.5, this._size.w * devicePixelRation, this._size.h * devicePixelRation);
+		topCtx.clearRect(0, 0, Math.ceil(this._size.w * devicePixelRation), Math.ceil(this._size.h * devicePixelRation));
 		this._drawCrosshair(topCtx);
 		topCtx.restore();
 	}
@@ -528,8 +528,8 @@ export class PaneWidget implements IDestroyable {
 		this._state = null;
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, color: string): void {
-		clearRect(ctx, 0, 0, this._size.w, this._size.h, color);
+	private _drawBackground(ctx: CanvasRenderingContext2D, color: string, devicePixelRation: number): void {
+		clearRect(ctx, -0.5, -0.5, Math.ceil(this._size.w * devicePixelRation), Math.ceil(this._size.h * devicePixelRation), color);
 	}
 
 	private _drawGrid(ctx: CanvasRenderingContext2D): void {

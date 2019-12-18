@@ -23,7 +23,6 @@ export interface PriceAxisViewRendererData {
 export interface PriceAxisViewRendererOptions {
 	baselineOffset: number;
 	borderSize: number;
-	offsetSize: number;
 	font: string;
 	fontFamily: string;
 	color: string;
@@ -41,7 +40,8 @@ export interface IPriceAxisViewRenderer {
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		width: number,
-		align: 'left' | 'right'
+		align: 'left' | 'right',
+		devicePixelRation: number
 	): void;
 
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number;

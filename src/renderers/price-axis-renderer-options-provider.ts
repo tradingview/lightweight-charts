@@ -7,7 +7,6 @@ import { PriceAxisViewRendererOptions } from './iprice-axis-view-renderer';
 const enum RendererConstants {
 	BorderSize = 1,
 	TickLength = 4,
-	OffsetSize = 1,
 }
 
 export class PriceAxisRendererOptionsProvider {
@@ -16,7 +15,6 @@ export class PriceAxisRendererOptionsProvider {
 	private readonly _rendererOptions: PriceAxisViewRendererOptions = {
 		borderSize: RendererConstants.BorderSize,
 		tickLength: RendererConstants.TickLength,
-		offsetSize: RendererConstants.OffsetSize,
 		fontSize: NaN,
 		font: '',
 		fontFamily: '',

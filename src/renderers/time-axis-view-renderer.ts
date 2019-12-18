@@ -22,7 +22,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions): void {
+	public draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions, devicePixelRation: number): void {
 		if (this._data === null || this._data.visible === false || this._data.text.length === 0) {
 			return;
 		}
@@ -33,6 +33,8 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		if (textWidth <= 0) {
 			return;
 		}
+
+		ctx.save();
 
 		const horzMargin = rendererOptions.paddingHorizontal;
 		const labelWidth = textWidth + 2 * horzMargin;
@@ -51,7 +53,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 
 		const x2 = x1 + labelWidth;
 
-		const y1 = -0.5;
+		const y1 = 0;
 		const y2 = (
 			y1 +
 			rendererOptions.borderSize +
@@ -61,37 +63,27 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		);
 
 		ctx.fillStyle = this._data.background;
-		ctx.lineWidth = 1;
-		drawRoundRect(ctx, x1, y1, x2 - x1, y2 - y1, 1);
-		ctx.fill();
 
-		const tickX = Math.round(this._data.coordinate + 1);
-		const tickTop = y1;
-		const tickBottom = tickTop + rendererOptions.borderSize + rendererOptions.tickLength;
+		const x1scaled = Math.round(x1 * devicePixelRation);
+		const y1scaled = Math.round(y1 * devicePixelRation);
+		const x2scaled = Math.round(x2 * devicePixelRation);
+		const y2scaled = Math.round(y2 * devicePixelRation);
+		ctx.fillRect(x1scaled, y1scaled, x2scaled - x1scaled, y2scaled - y1scaled);
 
-		ctx.strokeStyle = this._data.color;
-		ctx.beginPath();
-		ctx.moveTo(tickX, tickTop);
-		ctx.lineTo(tickX, tickBottom);
-		ctx.stroke();
+		const tickX = Math.round(this._data.coordinate * devicePixelRation);
+		const tickTop = y1scaled;
+		const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * devicePixelRation);
+
+		ctx.fillStyle = this._data.color;
+		ctx.fillRect(tickX, tickTop, 1, tickBottom - tickTop);
 
 		const yText = y2 - rendererOptions.baselineOffset - rendererOptions.paddingBottom;
 		ctx.textAlign = 'left';
 		ctx.fillStyle = this._data.color;
 
+		ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
 		ctx.fillText(this._data.text, x1 + horzMargin, yText);
-	}
-}
 
-function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, rad: number): void {
-	ctx.beginPath();
-	ctx.moveTo(x + rad, y);
-	ctx.lineTo(x + w - rad, y);
-	ctx.arcTo(x + w, y, x + w, y + rad, rad);
-	ctx.lineTo(x + w, y + h - rad);
-	ctx.arcTo(x + w, y + h, x + w - rad, y + h, rad);
-	ctx.lineTo(x + rad, y + h);
-	ctx.arcTo(x, y + h, x, y + h - rad, rad);
-	ctx.lineTo(x, y + rad);
-	ctx.arcTo(x, y, x + rad, y, rad);
+		ctx.restore();
+	}
 }

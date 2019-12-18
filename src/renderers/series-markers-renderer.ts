@@ -54,7 +54,6 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 			return;
 		}
 		ctx.save();
-		ctx.translate(0.5, 0.5);
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			drawItem(item, ctx);

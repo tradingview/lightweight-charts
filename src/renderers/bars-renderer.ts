@@ -1,8 +1,8 @@
 import { BarCoordinates, BarPrices } from '../model/bar';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
+import { IPaneRenderer } from './ipane-renderer';
 import { optimalBarWidth } from './optimal-bar-width';
-import { ScaledRenderer } from './scaled-renderer';
 
 export type BarCandlestickItemBase = TimedValue & BarPrices & BarCoordinates;
 
@@ -19,7 +19,7 @@ export interface PaneRendererBarsData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererBars extends ScaledRenderer {
+export class PaneRendererBars implements IPaneRenderer {
 	private _data: PaneRendererBarsData | null = null;
 	private _barWidth: number = 0;
 	private _barLineWidth: number = 0;
@@ -30,7 +30,7 @@ export class PaneRendererBars extends ScaledRenderer {
 		this._barLineWidth = data.thinBars ? 1 : Math.max(1, Math.round(this._barWidth));
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, devicePixelRation: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}

@@ -1,7 +1,7 @@
 import { PriceMark } from '../model/price-scale';
 
 import { LineStyle, setLineStyle } from './draw-line';
-import { ScaledRenderer } from './scaled-renderer';
+import { IPaneRenderer } from './ipane-renderer';
 
 export interface GridMarks {
 	coord: number;
@@ -21,27 +21,34 @@ export interface GridRendererData {
 	w: number;
 }
 
-export class GridRenderer extends ScaledRenderer {
+export class GridRenderer implements IPaneRenderer {
 	private _data: GridRendererData | null = null;
 
 	public setData(data: GridRendererData | null): void {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, devicePixelRation: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
 
 		ctx.lineWidth = 1;
 
+		const height = Math.ceil(this._data.h * devicePixelRation);
+		const width = Math.ceil(this._data.w * devicePixelRation);
+
+		ctx.save();
+		ctx.translate(0.5, 0.5);
+
 		if (this._data.vertLinesVisible) {
 			ctx.strokeStyle = this._data.vertLinesColor;
 			setLineStyle(ctx, this._data.vertLineStyle);
 			ctx.beginPath();
 			for (const timeMark of this._data.timeMarks) {
-				ctx.moveTo(timeMark.coord + 1, 0);
-				ctx.lineTo(timeMark.coord + 1, this._data.h);
+				const x = Math.round(timeMark.coord * devicePixelRation);
+				ctx.moveTo(x, 0);
+				ctx.lineTo(x, height);
 			}
 
 			ctx.stroke();
@@ -52,11 +59,14 @@ export class GridRenderer extends ScaledRenderer {
 			setLineStyle(ctx, this._data.horzLineStyle);
 			ctx.beginPath();
 			for (const priceMark of this._data.priceMarks) {
-				ctx.moveTo(0, priceMark.coord);
-				ctx.lineTo(this._data.w, priceMark.coord);
+				const y = Math.round(priceMark.coord * devicePixelRation);
+				ctx.moveTo(0, y);
+				ctx.lineTo(width, y);
 			}
 
 			ctx.stroke();
 		}
+
+		ctx.restore();
 	}
 }
