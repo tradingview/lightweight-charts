@@ -15,7 +15,7 @@ import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-rend
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
-import { clearRect, createBoundCanvas, getCanvasDevicePixelRatio, getPretransformedContext2D, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
 import { LabelsImageCache } from './labels-image-cache';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -284,17 +284,15 @@ export class PriceAxisWidget implements IDestroyable {
 		if (type !== InvalidationLevel.Cursor) {
 			const ctx = getPretransformedContext2D(this._canvasBinding);
 			this._alignLabels();
-			this._drawBackground(ctx);
-			this._drawBorder(ctx);
-			this._drawTickMarks(ctx);
-			this._drawBackLabels(ctx);
+			this._drawBackground(ctx, this._canvasBinding.pixelRatio);
+			this._drawBorder(ctx, this._canvasBinding.pixelRatio);
+			this._drawTickMarks(ctx, this._canvasBinding.pixelRatio);
+			this._drawBackLabels(ctx, this._canvasBinding.pixelRatio);
 		}
 
 		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
-		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
-
-		topCtx.clearRect(-0.5, -0.5, this._size.w * devicePixelRation, this._size.h * devicePixelRation);
-		this._drawCrosshairLabel(topCtx);
+		topCtx.clearRect(-0.5, -0.5, this._size.w * this._topCanvasBinding.pixelRatio, this._size.h * this._topCanvasBinding.pixelRatio);
+		this._drawCrosshairLabel(topCtx, this._topCanvasBinding.pixelRatio);
 	}
 
 	public getImage(): HTMLCanvasElement {
@@ -395,22 +393,19 @@ export class PriceAxisWidget implements IDestroyable {
 		return res;
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D): void {
+	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (this._size === null) {
 			return;
 		}
 
-		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
-
-		clearRect(ctx, 0, 0, this._size.w * devicePixelRation, this._size.h * devicePixelRation, this.backgroundColor());
+		clearRect(ctx, 0, 0, this._size.w * pixelRatio, this._size.h * pixelRatio, this.backgroundColor());
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D): void {
+	private _drawBorder(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (this._size === null || this._priceScale === null || !this._priceScale.options().borderVisible) {
 			return;
 		}
 		ctx.save();
-		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
 
 		ctx.fillStyle = this.lineColor();
 
@@ -418,16 +413,16 @@ export class PriceAxisWidget implements IDestroyable {
 
 		let left: number;
 		if (this._isLeft) {
-			left = Math.ceil(this._size.w * devicePixelRation - borderSize - 1);
+			left = Math.ceil(this._size.w * pixelRatio - borderSize - 1);
 		} else {
 			left = 0;
 		}
 
-		ctx.fillRect(left, 0, borderSize, Math.ceil(this._size.h * devicePixelRation));
+		ctx.fillRect(left, 0, borderSize, Math.ceil(this._size.h * pixelRatio));
 		ctx.restore();
 	}
 
-	private _drawTickMarks(ctx: CanvasRenderingContext2D): void {
+	private _drawTickMarks(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
@@ -438,8 +433,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.save();
 
-		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
-
 		ctx.strokeStyle = this.lineColor();
 
 		ctx.font = this.baseFont();
@@ -448,7 +441,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const drawTicks = this._priceScale.options().borderVisible;
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor(this._size.w * devicePixelRation) - rendererOptions.borderSize - rendererOptions.tickLength :
+			Math.floor(this._size.w * pixelRatio) - rendererOptions.borderSize - rendererOptions.tickLength :
 			rendererOptions.borderSize;
 
 		const textLeftX = this._isLeft ?
@@ -458,10 +451,10 @@ export class PriceAxisWidget implements IDestroyable {
 		const textAlign = this._isLeft ? 'right' : 'left';
 
 		if (drawTicks) {
-			const tickLength = Math.round(rendererOptions.tickLength * devicePixelRation);
+			const tickLength = Math.round(rendererOptions.tickLength * pixelRatio);
 			ctx.beginPath();
 			for (const tickMark of tickMarks) {
-				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * devicePixelRation), tickLength, 1);
+				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * pixelRatio), tickLength, 1);
 			}
 
 			ctx.fill();
@@ -469,7 +462,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.fillStyle = this.textColor();
 		for (const tickMark of tickMarks) {
-			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, Math.round(tickMark.coord * devicePixelRation), textAlign);
+			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, Math.round(tickMark.coord * pixelRatio), textAlign);
 		}
 
 		ctx.restore();
@@ -566,14 +559,12 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 	}
 
-	private _drawBackLabels(ctx: CanvasRenderingContext2D): void {
+	private _drawBackLabels(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (this._size === null) {
 			return;
 		}
 
 		ctx.save();
-
-		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
 
 		const size = this._size;
 		const views = this._backLabels();
@@ -585,7 +576,7 @@ export class PriceAxisWidget implements IDestroyable {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer();
 				ctx.save();
-				renderer.draw(ctx, rendererOptions, this._widthCache, size.w, align, devicePixelRation);
+				renderer.draw(ctx, rendererOptions, this._widthCache, size.w, align, pixelRatio);
 				ctx.restore();
 			}
 		});
@@ -593,14 +584,12 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.restore();
 	}
 
-	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D): void {
+	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
 
 		ctx.save();
-
-		const devicePixelRation = getCanvasDevicePixelRatio(this._canvasBinding.canvas);
 
 		const size = this._size;
 		const model = this._pane.chart().model();
@@ -619,7 +608,7 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((arr: IPriceAxisViewArray) => {
 			arr.forEach((view: IPriceAxisView) => {
 				ctx.save();
-				view.renderer().draw(ctx, ro, this._widthCache, size.w, align, devicePixelRation);
+				view.renderer().draw(ctx, ro, this._widthCache, size.w, align, pixelRatio);
 				ctx.restore();
 			});
 		});

@@ -6,7 +6,7 @@ import { ChartOptions } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
-import { clearRect, createBoundCanvas, getCanvasDevicePixelRatio, getPretransformedContext2D, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
 export interface PriceAxisStubParams {
@@ -97,8 +97,8 @@ export class PriceAxisStub implements IDestroyable {
 		this._invalidated = false;
 
 		const ctx = getPretransformedContext2D(this._canvasBinding);
-		this._drawBackground(ctx);
-		this._drawBorder(ctx);
+		this._drawBackground(ctx, this._canvasBinding.pixelRatio);
+		this._drawBorder(ctx, this._canvasBinding.pixelRatio);
 	}
 
 	public getImage(): HTMLCanvasElement {
@@ -109,7 +109,7 @@ export class PriceAxisStub implements IDestroyable {
 		return this._isLeft;
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D): void {
+	private _drawBorder(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (!this._borderVisible()) {
 			return;
 		}
@@ -120,7 +120,6 @@ export class PriceAxisStub implements IDestroyable {
 		ctx.fillStyle = this._options.timeScale.borderColor;
 
 		const borderSize = this._rendererOptionsProvider.options().borderSize;
-		const pixelRatio = getCanvasDevicePixelRatio(ctx.canvas);
 
 		let left: number;
 		if (this._isLeft) {
@@ -133,8 +132,8 @@ export class PriceAxisStub implements IDestroyable {
 		ctx.restore();
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D): void {
-		clearRect(ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
+	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+		clearRect(ctx, 0, 0, Math.ceil(this._size.w * pixelRatio), Math.ceil(this._size.h * pixelRatio), this._options.layout.backgroundColor);
 	}
 
 	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);
