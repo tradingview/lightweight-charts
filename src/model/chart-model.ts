@@ -16,7 +16,7 @@ import { IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
-import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
+import { DEFAULT_STRETCH_FACTOR, Pane, PreferredPriceScalePosition } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series } from './series';
@@ -114,7 +114,7 @@ export class ChartModel implements IDestroyable {
 
 		this.createPane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
-		this._panes[0].addDataSource(this._watermark, true, false);
+		this._panes[0].addDataSource(this._watermark, 'overlay', false);
 	}
 
 	public fullUpdate(): void {
@@ -602,9 +602,16 @@ export class ChartModel implements IDestroyable {
 	private _createSeries<T extends SeriesType>(options: SeriesOptionsMap[T], seriesType: T, pane: Pane): Series<T> {
 		const series = new Series<T>(this, options, seriesType);
 
-		pane.addDataSource(series, Boolean(options.overlay), false);
+		let targetScale: PreferredPriceScalePosition;
+		// tslint:disable-next-line: deprecation
+		if (options.overlay === true) {
+			targetScale = 'overlay';
+		} else {
+			targetScale = (options.preferredScale === undefined) ? 'right' : options.preferredScale;
+		}
+		pane.addDataSource(series, targetScale, false);
 
-		if (options.overlay) {
+		if (options.preferredScale === 'overlay') {
 			// let's apply that options again to apply margins
 			series.applyOptions(options);
 		}

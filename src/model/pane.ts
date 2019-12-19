@@ -40,12 +40,27 @@ export class Pane implements IDestroyable {
 
 	private _destroyed: Delegate = new Delegate();
 
+	private _leftPriceScale: PriceScale | null;
+	private _rightPriceScale: PriceScale | null;
+
 	public constructor(timeScale: TimeScale, model: ChartModel) {
 		this._timeScale = timeScale;
 		this._model = model;
 
 		this.model().mainPriceScaleOptionsChanged().subscribe(this.onPriceScaleOptionsChanged.bind(this), this);
 		this._defaultNonOverlayPriceScale = this._createPriceScale();
+
+		if (this._model.options().priceScale.position === 'left' || this._model.options().priceScale.position === 'both') {
+			this._leftPriceScale = this._createPriceScale();
+		} else {
+			this._leftPriceScale = null;
+		}
+
+		if (this._model.options().priceScale.position === 'right' || this._model.options().priceScale.position === 'both') {
+			this._rightPriceScale = this._createPriceScale();
+		} else {
+			this._rightPriceScale = null;
+		}
 	}
 
 	public onPriceScaleOptionsChanged(): void {
@@ -95,6 +110,14 @@ export class Pane implements IDestroyable {
 		this._height = height;
 		this._defaultNonOverlayPriceScale.setHeight(height);
 
+		if (this._leftPriceScale !== null) {
+			this._leftPriceScale.setHeight(height);
+		}
+
+		if (this._rightPriceScale !== null) {
+			this._rightPriceScale.setHeight(height);
+		}
+
 		// process overlays
 		this._dataSources.forEach((ds: IDataSource) => {
 			if (this.isOverlay(ds)) {
@@ -117,12 +140,12 @@ export class Pane implements IDestroyable {
 		if (priceScale === null) {
 			return true;
 		}
-		return this._defaultNonOverlayPriceScale !== priceScale;
+		return this._leftPriceScale !== priceScale && this._rightPriceScale !== priceScale;
 	}
 
-	public addDataSource(source: IDataSource, overlay: boolean, keepZorder: boolean): void {
+	public addDataSource(source: IDataSource, preferredScale: PreferredPriceScalePosition, keepZorder: boolean): void {
 		const zOrder = this._getZOrderMinMax().minZOrder - 1;
-		this._insertDataSource(source, overlay, zOrder);
+		this._insertDataSource(source, preferredScale, zOrder);
 	}
 
 	public removeDataSource(source: IDataSource): void {
@@ -167,9 +190,23 @@ export class Pane implements IDestroyable {
 		this._cachedOrderedSources = null;
 	}
 
-	public priceScalePosition(): PriceScalePosition {
-		const position = this._model.options().priceScale.position;
-		return position === 'none' ? 'overlay' : position;
+	public priceScalePosition(priceScale: PriceScale): PriceScalePosition {
+		if (priceScale === this._leftPriceScale) {
+			return 'left';
+		}
+		if (priceScale === this._rightPriceScale) {
+			return 'right';
+		}
+
+		return 'overlay';
+	}
+
+	public leftPriceScale(): PriceScale | null {
+		return this._leftPriceScale;
+	}
+
+	public rightPriceScale(): PriceScale | null {
+		return this._rightPriceScale;
 	}
 
 	public startScalePrice(priceScale: PriceScale, x: number): void {
@@ -290,8 +327,16 @@ export class Pane implements IDestroyable {
 	}
 
 	private _findSuitableScale(source: IPriceDataSource, preferredScale: PreferredPriceScalePosition): PriceScale {
-		if (preferredScale !== 'overlay') {
+/*		if (preferredScale !== 'overlay') {
 			return this._defaultNonOverlayPriceScale;
+		}*/
+		switch (preferredScale) {
+			case 'left': {
+				return ensureNotNull(this._leftPriceScale);
+			}
+			case 'right': {
+				return ensureNotNull(this._rightPriceScale);
+			}
 		}
 
 		return this._createPriceScale(true);
@@ -336,20 +381,22 @@ export class Pane implements IDestroyable {
 		return { minZOrder: minZOrder, maxZOrder: maxZOrder };
 	}
 
-	private _insertDataSource(source: IDataSource, overlay: boolean, zOrder: number): void {
-		let priceScalePosition: PreferredPriceScalePosition = 'overlay';
+	private _insertDataSource(source: IDataSource, preferredPosition: PreferredPriceScalePosition, zOrder: number): void {
+/*		let priceScalePosition: PreferredPriceScalePosition = 'overlay';
 		let priceScale: PriceScale | null = null;
 		if (!overlay) {
 			const optionsPosition = this.model().options().priceScale.position;
 			priceScalePosition = optionsPosition === 'none' ? 'overlay' : optionsPosition;
-		}
+		}*/
+
+		let priceScale: PriceScale | null = null;
 
 		if (source instanceof PriceDataSource) {
-			priceScale = this._findSuitableScale(source, priceScalePosition);
+			priceScale = this._findSuitableScale(source, preferredPosition);
 		}
 
 		this._dataSources.push(source);
-		if (overlay) {
+		if (preferredPosition === 'overlay') {
 			this._overlaySources.push(source);
 		}
 

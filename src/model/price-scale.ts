@@ -72,7 +72,7 @@ export interface PriceScaleMargins {
 	bottom: number;
 }
 
-export type PriceAxisPosition = 'left' | 'right' | 'none';
+export type PriceAxisPosition = 'left' | 'right' | 'none' | 'both';
 
 /** Structure that describes price scale options */
 export interface PriceScaleOptions {

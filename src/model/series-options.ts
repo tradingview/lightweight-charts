@@ -2,6 +2,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
+import { PreferredPriceScalePosition } from './pane';
 import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
 
@@ -143,14 +144,13 @@ export const enum PriceAxisLastValueMode {
 	LastValueAccordingToScale,
 }
 
-export interface OverlaySeriesSpecificOptions {
-	overlay: true;
+export interface SeriesScaleOptions {
+	/**
+	 * @deprecated Use preferredScale instead
+	 */
+	overlay?: boolean;
+	preferredScale?: PreferredPriceScalePosition;
 	scaleMargins?: PriceScaleMargins;
-}
-
-export interface NonOverlaySeriesSpecificOptions {
-	overlay?: false;
-	scaleMargins?: undefined;
 }
 
 /**
@@ -187,13 +187,9 @@ export interface SeriesOptionsCommon {
 	baseLineStyle: LineStyle;
 }
 
-export type SeriesOptions<T> =
-	| (T & SeriesOptionsCommon & OverlaySeriesSpecificOptions)
-	| (T & SeriesOptionsCommon & NonOverlaySeriesSpecificOptions);
+export type SeriesOptions<T> = T & SeriesOptionsCommon & SeriesScaleOptions;
 
-export type SeriesPartialOptions<T> =
-	| (DeepPartial<T & SeriesOptionsCommon> & OverlaySeriesSpecificOptions)
-	| (DeepPartial<T & SeriesOptionsCommon> & NonOverlaySeriesSpecificOptions);
+export type SeriesPartialOptions<T> = DeepPartial<T & SeriesOptionsCommon> & SeriesScaleOptions;
 
 /**
  * Structure describing area series options.

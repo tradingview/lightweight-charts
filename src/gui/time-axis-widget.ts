@@ -42,7 +42,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _dv: HTMLElement;
 	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
 	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
-	private _stub: PriceAxisStub | null = null;
+	private _leftStub: PriceAxisStub | null = null;
+	private _rightStub: PriceAxisStub | null = null;
 	private _minVisibleSpan: number = MarkSpanBorder.Year;
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _rendererOptions: TimeAxisViewRendererOptions | null = null;
@@ -108,8 +109,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 	public destroy(): void {
 		this._mouseEventHandler.destroy();
-		if (this._stub !== null) {
-			this._stub.destroy();
+		if (this._leftStub !== null) {
+			this._leftStub.destroy();
+		}
+		if (this._rightStub !== null) {
+			this._rightStub.destroy();
 		}
 
 		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
@@ -123,8 +127,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		return this._element;
 	}
 
-	public stub(): PriceAxisStub | null {
-		return this._stub;
+	public leftStub(): PriceAxisStub | null {
+		return this._leftStub;
+	}
+
+	public rightStub(): PriceAxisStub | null {
+		return this._rightStub;
 	}
 
 	public mouseDownEvent(event: TouchMouseEvent): void {
@@ -191,7 +199,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		return this._size;
 	}
 
-	public setSizes(timeAxisSize: Size, stubWidth: number): void {
+	public setSizes(timeAxisSize: Size, leftStubWidth: number, rightStubWidth: number): void {
 		if (!this._size || !this._size.equals(timeAxisSize)) {
 			this._size = timeAxisSize;
 
@@ -202,8 +210,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._cell.style.height = timeAxisSize.h + 'px';
 		}
 
-		if (this._stub !== null) {
-			this._stub.setSize(new Size(stubWidth, timeAxisSize.h));
+		if (this._leftStub !== null) {
+			this._leftStub.setSize(new Size(leftStubWidth, timeAxisSize.h));
+		}
+		if (this._rightStub !== null) {
+			this._rightStub.setSize(new Size(rightStubWidth, timeAxisSize.h));
 		}
 	}
 
@@ -258,8 +269,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._drawTickMarks(ctx);
 			this._drawBackLabels(ctx);
 
-			if (this._stub !== null) {
-				this._stub.paint(type);
+			if (this._leftStub !== null) {
+				this._leftStub.paint(type);
+			}
+			if (this._rightStub !== null) {
+				this._rightStub.paint(type);
 			}
 		}
 
@@ -468,15 +482,15 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		if (priceAxisPosition === this._priceAxisPosition) {
 			return;
 		}
-		if (this._stub !== null) {
-			if (this._stub.isLeft()) {
-				this._leftStubCell.removeChild(this._stub.getElement());
-			} else {
-				this._rightStubCell.removeChild(this._stub.getElement());
-			}
-
-			this._stub.destroy();
-			this._stub = null;
+		if (this._leftStub !== null) {
+			this._leftStubCell.removeChild(this._leftStub.getElement());
+			this._leftStub.destroy();
+			this._leftStub = null;
+		}
+		if (this._rightStub !== null) {
+			this._rightStubCell.removeChild(this._rightStub.getElement());
+			this._rightStub.destroy();
+			this._rightStub = null;
 		}
 
 		if (priceAxisPosition !== 'none') {
@@ -490,9 +504,14 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				return model.mainPriceScale().options().borderVisible && model.timeScale().options().borderVisible;
 			};
 
-			this._stub = new PriceAxisStub(priceAxisPosition, this._chart.options(), params, borderVisibleGetter);
-			const stubCell = priceAxisPosition === 'left' ? this._leftStubCell : this._rightStubCell;
-			stubCell.appendChild(this._stub.getElement());
+			if (priceAxisPosition === 'left' || priceAxisPosition === 'both') {
+				this._leftStub = new PriceAxisStub('left', this._chart.options(), params, borderVisibleGetter);
+				this._leftStubCell.appendChild(this._leftStub.getElement());
+			}
+			if (priceAxisPosition === 'right' || priceAxisPosition === 'both') {
+				this._rightStub = new PriceAxisStub('right', this._chart.options(), params, borderVisibleGetter);
+				this._rightStubCell.appendChild(this._rightStub.getElement());
+			}
 		}
 
 		this._priceAxisPosition = priceAxisPosition;

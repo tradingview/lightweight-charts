@@ -71,7 +71,7 @@ export class PanePriceAxisView implements IPaneView {
 			return null;
 		}
 
-		const position = pane.priceScalePosition();
+		const position = pane.priceScalePosition(priceScale);
 		if (position === 'overlay') {
 			// both source and main source are overlays
 			return null;
