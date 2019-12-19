@@ -41,7 +41,7 @@ export interface IPriceAxisViewRenderer {
 		textWidthCache: TextWidthCache,
 		width: number,
 		align: 'left' | 'right',
-		devicePixelRation: number
+		pixelRatio: number
 	): void;
 
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number;

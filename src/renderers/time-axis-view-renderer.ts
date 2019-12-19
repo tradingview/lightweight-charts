@@ -22,7 +22,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions, devicePixelRation: number): void {
+	public draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions, pixelRatio: number): void {
 		if (this._data === null || this._data.visible === false || this._data.text.length === 0) {
 			return;
 		}
@@ -64,15 +64,15 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 
 		ctx.fillStyle = this._data.background;
 
-		const x1scaled = Math.round(x1 * devicePixelRation);
-		const y1scaled = Math.round(y1 * devicePixelRation);
-		const x2scaled = Math.round(x2 * devicePixelRation);
-		const y2scaled = Math.round(y2 * devicePixelRation);
+		const x1scaled = Math.round(x1 * pixelRatio);
+		const y1scaled = Math.round(y1 * pixelRatio);
+		const x2scaled = Math.round(x2 * pixelRatio);
+		const y2scaled = Math.round(y2 * pixelRatio);
 		ctx.fillRect(x1scaled, y1scaled, x2scaled - x1scaled, y2scaled - y1scaled);
 
-		const tickX = Math.round(this._data.coordinate * devicePixelRation);
+		const tickX = Math.round(this._data.coordinate * pixelRatio);
 		const tickTop = y1scaled;
-		const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * devicePixelRation);
+		const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * pixelRatio);
 
 		ctx.fillStyle = this._data.color;
 		ctx.fillRect(tickX, tickTop, 1, tickBottom - tickTop);
@@ -81,7 +81,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		ctx.textAlign = 'left';
 		ctx.fillStyle = this._data.color;
 
-		ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+		ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 		ctx.fillText(this._data.text, x1 + horzMargin, yText);
 
 		ctx.restore();

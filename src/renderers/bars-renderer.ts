@@ -30,7 +30,7 @@ export class PaneRendererBars implements IPaneRenderer {
 		this._barLineWidth = data.thinBars ? 1 : Math.max(1, Math.round(this._barWidth));
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, devicePixelRation: number, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
@@ -44,35 +44,43 @@ export class PaneRendererBars implements IPaneRenderer {
 				prevColor = bar.color;
 			}
 
-			const bodyLeft = Math.round((bar.x - this._barLineWidth / 2) * devicePixelRation);
-			const bodyWidth = Math.round(this._barLineWidth * devicePixelRation);
-			const bodyWidthHalf = Math.round(this._barLineWidth * devicePixelRation * 0.5);
+			const bodyLeft = Math.round((bar.x - this._barLineWidth / 2) * pixelRatio);
+			const bodyWidth = Math.round(this._barLineWidth * pixelRatio);
+			const bodyWidthHalf = Math.round(this._barLineWidth * pixelRatio * 0.5);
+
+			const bodyTop = Math.round(bar.highY * pixelRatio);
+			const bodyHeight = Math.round((bar.lowY - bar.highY + 1) * pixelRatio);
+			const bodyBottom = bodyTop + bodyHeight - 1;
 
 			ctx.fillRect(
 				bodyLeft,
-				Math.round(bar.highY * devicePixelRation),
+				bodyTop,
 				bodyWidth,
-				Math.round((bar.lowY - bar.highY) * devicePixelRation)
+				bodyHeight
 			);
 
 			if (this._barLineWidth < (this._data.barSpacing - 1)) {
 				if (this._data.openVisible) {
 					const openLeft = Math.round(bodyLeft - this._barLineWidth);
+					const openTop = Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop);
+					const openBottom = Math.min(openTop + bodyWidthHalf * 2, bodyBottom);
 					ctx.fillRect(
 						openLeft,
-						Math.round(bar.openY * devicePixelRation) - bodyWidthHalf,
+						openTop,
 						bodyLeft - openLeft,
-						bodyWidthHalf * 2
+						openBottom - openTop + 1
 					);
 				}
 
 				const closeLeft = bodyLeft + bodyWidth;
+				const closeTop = Math.max(Math.round(bar.closeY * pixelRatio) - bodyWidthHalf, bodyTop);
+				const closeBottom = Math.min(closeTop + bodyWidthHalf * 2, bodyBottom);
 
 				ctx.fillRect(
 					closeLeft,
-					Math.round(bar.closeY * devicePixelRation) - bodyWidthHalf,
+					closeTop,
 					bodyWidth,
-					bodyWidthHalf * 2
+					closeBottom - closeTop + 1
 				);
 			}
 		}

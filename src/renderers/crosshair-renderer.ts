@@ -24,7 +24,7 @@ export class CrosshairRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, devicePixelRation: number, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
@@ -39,10 +39,10 @@ export class CrosshairRenderer implements IPaneRenderer {
 		ctx.save();
 		ctx.translate(0.5, 0.5);
 
-		const x = Math.round(this._data.x * devicePixelRation);
-		const y = Math.round(this._data.y * devicePixelRation);
-		const w = Math.ceil(this._data.w * devicePixelRation);
-		const h = Math.ceil(this._data.h * devicePixelRation);
+		const x = Math.round(this._data.x * pixelRatio);
+		const y = Math.round(this._data.y * pixelRatio);
+		const w = Math.ceil(this._data.w * pixelRatio);
+		const h = Math.ceil(this._data.h * pixelRatio);
 
 		if (vertLinesVisible && x >= 0) {
 			ctx.lineWidth = this._data.vertLine.lineWidth;

@@ -23,14 +23,8 @@ export function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 		|| 1;
 }
 
-export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+export function getContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 	const ctx = ensureNotNull(canvas.getContext('2d'));
-	ctx.resetTransform();
-	return ctx;
-}
-
-export function getPretransformedContext2D(binding: CanvasCoordinateSpaceBinding): CanvasRenderingContext2D {
-	const ctx = ensureNotNull(binding.canvas.getContext('2d'));
 	ctx.resetTransform();
 	return ctx;
 }
@@ -83,4 +77,11 @@ function disableSelection(canvas: HTMLCanvasElement): void {
 	(canvas as any).style.MozUserSelect = 'none';
 
 	canvas.style.webkitTapHighlightColor = 'transparent';
+}
+
+export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
+	ctx.save();
+	ctx.scale(ratio, ratio);
+	func();
+	ctx.restore();
 }

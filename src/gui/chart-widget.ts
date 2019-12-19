@@ -12,7 +12,7 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { createPreconfiguredCanvas, getPrescaledContext2D, Size } from './canvas-utils';
+import { createPreconfiguredCanvas, getContext2D, Size } from './canvas-utils';
 import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -221,7 +221,7 @@ export class ChartWidget implements IDestroyable {
 		// calculate target size
 		const firstPane = this._paneWidgets[0];
 		const targetCanvas = createPreconfiguredCanvas(document, new Size(this._width, this._height));
-		const ctx = getPrescaledContext2D(targetCanvas);
+		const ctx = getContext2D(targetCanvas);
 		let targetX = 0;
 		let targetY = 0;
 

@@ -6,7 +6,7 @@ import { ChartOptions } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, drawScaled, getContext2D, Size } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
 export interface PriceAxisStubParams {
@@ -96,7 +96,7 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
-		const ctx = getPretransformedContext2D(this._canvasBinding);
+		const ctx = getContext2D(this._canvasBinding.canvas);
 		this._drawBackground(ctx, this._canvasBinding.pixelRatio);
 		this._drawBorder(ctx, this._canvasBinding.pixelRatio);
 	}
@@ -133,7 +133,9 @@ export class PriceAxisStub implements IDestroyable {
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		clearRect(ctx, 0, 0, Math.ceil(this._size.w * pixelRatio), Math.ceil(this._size.h * pixelRatio), this._options.layout.backgroundColor);
+		drawScaled(ctx, pixelRatio, () => {
+			clearRect(ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
+		});
 	}
 
 	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);

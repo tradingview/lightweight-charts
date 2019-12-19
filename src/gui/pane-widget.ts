@@ -15,7 +15,7 @@ import { PriceAxisPosition } from '../model/price-scale';
 import { TimePointIndex } from '../model/time-data';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { clearRect, createBoundCanvas, drawScaled, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget } from './price-axis-widget';
@@ -492,7 +492,7 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getPretransformedContext2D(this._canvasBinding);
+			const ctx = getContext2D(this._canvasBinding.canvas);
 			ctx.save();
 			this._drawBackground(ctx, this._backgroundColor(), this._canvasBinding.pixelRatio);
 			if (this._state) {
@@ -503,11 +503,11 @@ export class PaneWidget implements IDestroyable {
 			ctx.restore();
 		}
 
-		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
-		topCtx.save();
-		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
+		const topCtx = getContext2D(this._topCanvasBinding.canvas);
+		drawScaled(topCtx, this._topCanvasBinding.pixelRatio, () => {
+			topCtx.clearRect(0, 0, this._size.w, this._size.h);
+		});
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
-		topCtx.restore();
 	}
 
 	public priceAxisWidget(): PriceAxisWidget | null {
@@ -527,7 +527,9 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D, color: string, pixelRatio: number): void {
-		clearRect(ctx, -0.5, -0.5, Math.ceil(this._size.w * pixelRatio), Math.ceil(this._size.h * pixelRatio), color);
+		drawScaled(ctx, pixelRatio, () => {
+			clearRect(ctx, 0, 0, this._size.w, this._size.h, color);
+		});
 	}
 
 	private _drawGrid(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
