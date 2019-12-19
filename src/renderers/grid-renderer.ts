@@ -28,15 +28,15 @@ export class GridRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, devicePixelRation: number, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
 
 		ctx.lineWidth = 1;
 
-		const height = Math.ceil(this._data.h * devicePixelRation);
-		const width = Math.ceil(this._data.w * devicePixelRation);
+		const height = Math.ceil(this._data.h * pixelRatio);
+		const width = Math.ceil(this._data.w * pixelRatio);
 
 		ctx.save();
 		ctx.translate(0.5, 0.5);
@@ -46,7 +46,7 @@ export class GridRenderer implements IPaneRenderer {
 			setLineStyle(ctx, this._data.vertLineStyle);
 			ctx.beginPath();
 			for (const timeMark of this._data.timeMarks) {
-				const x = Math.round(timeMark.coord * devicePixelRation);
+				const x = Math.round(timeMark.coord * pixelRatio);
 				ctx.moveTo(x, 0);
 				ctx.lineTo(x, height);
 			}
@@ -59,7 +59,7 @@ export class GridRenderer implements IPaneRenderer {
 			setLineStyle(ctx, this._data.horzLineStyle);
 			ctx.beginPath();
 			for (const priceMark of this._data.priceMarks) {
-				const y = Math.round(priceMark.coord * devicePixelRation);
+				const y = Math.round(priceMark.coord * pixelRatio);
 				ctx.moveTo(0, y);
 				ctx.lineTo(width, y);
 			}

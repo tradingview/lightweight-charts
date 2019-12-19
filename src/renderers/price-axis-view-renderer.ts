@@ -28,7 +28,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		textWidthCache: TextWidthCache,
 		width: number,
 		align: 'left' | 'right',
-		devicePixelRation: number
+		pixelRatio: number
 	): void {
 		if (!this._data.visible) {
 			return;
@@ -90,12 +90,12 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xText = xInside + horzBorder + tickSize + paddingInner;
 			}
 
-			const xInsideScaled = Math.round(xInside * devicePixelRation);
-			const yTopScaled = Math.round(yTop * devicePixelRation);
-			const xOutsideScaled = Math.round(xOutside * devicePixelRation);
-			const yBottomScaled = Math.round(yBottom * devicePixelRation);
-			const yMidScaled = Math.round(yMid * devicePixelRation);
-			const xTickScaled = Math.round(xTick * devicePixelRation);
+			const xInsideScaled = Math.round(xInside * pixelRatio);
+			const yTopScaled = Math.round(yTop * pixelRatio);
+			const xOutsideScaled = Math.round(xOutside * pixelRatio);
+			const yBottomScaled = Math.round(yBottom * pixelRatio);
+			const yMidScaled = Math.round(yMid * pixelRatio);
+			const xTickScaled = Math.round(xTick * pixelRatio);
 
 			ctx.beginPath();
 			ctx.moveTo(xInsideScaled, yTopScaled);
@@ -113,7 +113,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.fillStyle = this._commonData.color;
 
 			ctx.save();
-			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+			ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
 			ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
 

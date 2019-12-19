@@ -1,4 +1,4 @@
-import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getPrescaledContext2D, Size } from '../gui/canvas-utils';
+import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from '../gui/canvas-utils';
 
 import { ensureDefined } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -63,7 +63,7 @@ export class LabelsImageCache implements IDestroyable {
 				this._hash.delete(key);
 			}
 
-			const devicePixelRation = getCanvasDevicePixelRatio(ctx.canvas);
+			const pixelRatio = getCanvasDevicePixelRatio(ctx.canvas);
 
 			const margin = Math.ceil(this._fontSize / 4.5);
 			const baselineOffset = Math.round(this._fontSize / 10);
@@ -86,9 +86,9 @@ export class LabelsImageCache implements IDestroyable {
 				this._hash.set(item.text, item);
 			}
 
-			ctx = getPrescaledContext2D(item.canvas);
+			ctx = getContext2D(item.canvas);
 			ctx.save();
-			ctx.setTransform(devicePixelRation, 0, 0, devicePixelRation, 0, 0);
+			ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 			ctx.translate(0.5, 0.5);
 
 			ctx.font = this._font;
@@ -96,8 +96,8 @@ export class LabelsImageCache implements IDestroyable {
 			ctx.fillText(text, 0, height - margin - baselineOffset);
 			ctx.restore();
 
-			item.width = Math.ceil(item.width * devicePixelRation);
-			item.height = Math.ceil(item.height * devicePixelRation);
+			item.width = Math.ceil(item.width * pixelRatio);
+			item.height = Math.ceil(item.height * pixelRatio);
 		}
 
 		return item;
