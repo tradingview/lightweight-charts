@@ -37,9 +37,6 @@ export class PaneRendererBars implements IPaneRenderer {
 
 		ctx.save();
 
-		const offset = this._data.thinBars ? 1 : Math.round(this._barWidth);
-		const negativeOffset = this._data.thinBars ? 1 : offset / 2;
-
 		let prevColor: string | null = null;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
@@ -49,15 +46,6 @@ export class PaneRendererBars implements IPaneRenderer {
 				prevColor = bar.color;
 			}
 
-<<<<<<< HEAD
-			const bodyLeft = Math.round(bar.x - this._barLineWidth / 2);
-
-			ctx.fillRect(
-				bodyLeft,
-				Math.round(bar.highY - negativeOffset),
-				Math.round(this._barLineWidth),
-				Math.round(bar.lowY - bar.highY + offset)
-=======
 			const bodyLeft = Math.round((bar.x - this._barLineWidth / 2) * pixelRatio);
 			const bodyWidth = Math.round(this._barLineWidth * pixelRatio);
 			const bodyWidthHalf = Math.round(this._barLineWidth * pixelRatio * 0.5);
@@ -71,7 +59,6 @@ export class PaneRendererBars implements IPaneRenderer {
 				bodyTop,
 				bodyWidth,
 				bodyHeight
->>>>>>> 274: Fixed review issues
 			);
 
 			if (this._barLineWidth < (this._data.barSpacing - 1)) {
@@ -81,21 +68,6 @@ export class PaneRendererBars implements IPaneRenderer {
 					const openBottom = Math.min(openTop + bodyWidthHalf * 2, bodyBottom);
 					ctx.fillRect(
 						openLeft,
-<<<<<<< HEAD
-						Math.floor(bar.openY - negativeOffset),
-						bodyLeft - openLeft,
-						offset
-					);
-				}
-
-				const closeLeft = bodyLeft + Math.round(this._barLineWidth);
-
-				ctx.fillRect(
-					closeLeft,
-					Math.floor(bar.closeY - negativeOffset),
-					Math.round(this._barLineWidth),
-					offset
-=======
 						openTop,
 						bodyLeft - openLeft,
 						openBottom - openTop + 1
@@ -111,7 +83,6 @@ export class PaneRendererBars implements IPaneRenderer {
 					closeTop,
 					bodyWidth,
 					closeBottom - closeTop + 1
->>>>>>> 274: Fixed review issues
 				);
 			}
 		}
