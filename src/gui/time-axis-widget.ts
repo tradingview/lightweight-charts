@@ -1,5 +1,6 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
+import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -13,7 +14,7 @@ import { MarkSpanBorder, TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { TimeAxisView } from '../views/time-axis/time-axis-view';
 
-import { clearRect, createBoundCanvas, drawScaled, getContext2D, Size } from './canvas-utils';
+import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';

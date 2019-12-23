@@ -1,6 +1,7 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
 import { ensureNotNull } from '../helpers/assertions';
+import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -15,7 +16,7 @@ import { PriceAxisPosition } from '../model/price-scale';
 import { TimePointIndex } from '../model/time-data';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { clearRect, createBoundCanvas, drawScaled, getContext2D, Size } from './canvas-utils';
+import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget } from './price-axis-widget';

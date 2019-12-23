@@ -1,6 +1,7 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
 import { ensureNotNull } from '../helpers/assertions';
+import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -15,7 +16,7 @@ import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-rend
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
-import { clearRect, createBoundCanvas, drawScaled, getContext2D, Size } from './canvas-utils';
+import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { LabelsImageCache } from './labels-image-cache';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';

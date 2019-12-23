@@ -1,6 +1,7 @@
 import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from '../gui/canvas-utils';
 
 import { ensureDefined } from '../helpers/assertions';
+import { drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -75,8 +76,8 @@ export class LabelsImageCache implements IDestroyable {
 			item = {
 				text: text,
 				textWidth: Math.round(Math.max(1, textWidth)),
-				width: width,
-				height: height,
+				width: Math.ceil(width * pixelRatio),
+				height: Math.ceil(height * pixelRatio),
 				canvas: canvas,
 			};
 
@@ -86,17 +87,12 @@ export class LabelsImageCache implements IDestroyable {
 			}
 
 			ctx = getContext2D(item.canvas);
-			ctx.save();
-			ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-			ctx.translate(0.5, 0.5);
-
-			ctx.font = this._font;
-			ctx.fillStyle = this._color;
-			ctx.fillText(text, 0, height - margin - baselineOffset);
-			ctx.restore();
-
-			item.width = Math.ceil(item.width * pixelRatio);
-			item.height = Math.ceil(item.height * pixelRatio);
+			drawScaled(ctx, pixelRatio, () => {
+				ctx.translate(0.5, 0.5);
+				ctx.font = this._font;
+				ctx.fillStyle = this._color;
+				ctx.fillText(text, 0, height - margin - baselineOffset);
+			});
 		}
 
 		return item;

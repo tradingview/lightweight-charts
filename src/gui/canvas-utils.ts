@@ -29,14 +29,6 @@ export function getContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2
 	return ctx;
 }
 
-export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
-	ctx.save();
-	ctx.globalCompositeOperation = 'copy';
-	ctx.fillStyle = clearColor;
-	ctx.fillRect(x, y, w, h);
-	ctx.restore();
-}
-
 function createCanvas(doc: Document): HTMLCanvasElement {
 	const canvas = doc.createElement('canvas');
 	disableSelection(canvas);
@@ -77,11 +69,4 @@ function disableSelection(canvas: HTMLCanvasElement): void {
 	(canvas as any).style.MozUserSelect = 'none';
 
 	canvas.style.webkitTapHighlightColor = 'transparent';
-}
-
-export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
-	ctx.save();
-	ctx.scale(ratio, ratio);
-	func();
-	ctx.restore();
 }

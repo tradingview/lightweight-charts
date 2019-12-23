@@ -1,3 +1,4 @@
+import { drawScaled } from '../helpers/canvas-helpers';
 import { resetTransparency } from '../helpers/color';
 
 import { TextWidthCache } from '../model/text-width-cache';
@@ -112,12 +113,9 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.textAlign = 'left';
 			ctx.fillStyle = this._commonData.color;
 
-			ctx.save();
-			ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-
-			ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
-
-			ctx.restore();
+			drawScaled(ctx, pixelRatio, () => {
+				ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
+			});
 		}
 	}
 
