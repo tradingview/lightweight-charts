@@ -35,8 +35,6 @@ export class PaneRendererBars implements IPaneRenderer {
 			return;
 		}
 
-		ctx.save();
-
 		let prevColor: string | null = null;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
@@ -86,6 +84,5 @@ export class PaneRendererBars implements IPaneRenderer {
 				);
 			}
 		}
-		ctx.restore();
 	}
 }

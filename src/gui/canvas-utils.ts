@@ -70,3 +70,10 @@ function disableSelection(canvas: HTMLCanvasElement): void {
 
 	canvas.style.webkitTapHighlightColor = 'transparent';
 }
+
+export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
+	ctx.save();
+	ctx.scale(ratio, ratio);
+	func();
+	ctx.restore();
+}
