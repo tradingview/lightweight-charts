@@ -348,23 +348,21 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		ctx.fillStyle = this._textColor();
 
-		ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-
-		// draw base marks
-		ctx.font = this._baseFont();
-		for (const tickMark of tickMarks) {
-			if (tickMark.span < maxSpan) {
-				ctx.fillText(tickMark.label, tickMark.coord, yText);
+		drawScaled(ctx, pixelRatio, () => {
+			// draw base marks
+			ctx.font = this._baseFont();
+			for (const tickMark of tickMarks) {
+				if (tickMark.span < maxSpan) {
+					ctx.fillText(tickMark.label, tickMark.coord, yText);
+				}
 			}
-		}
-		ctx.font = this._baseBoldFont();
-		for (const tickMark of tickMarks) {
-			if (tickMark.span >= maxSpan) {
-				ctx.fillText(tickMark.label, tickMark.coord, yText);
+			ctx.font = this._baseBoldFont();
+			for (const tickMark of tickMarks) {
+				if (tickMark.span >= maxSpan) {
+					ctx.fillText(tickMark.label, tickMark.coord, yText);
+				}
 			}
-		}
-
-		ctx.restore();
+		});
 	}
 
 	private _drawBackLabels(ctx: CanvasRenderingContext2D, pixelRatio: number): void {

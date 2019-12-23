@@ -439,8 +439,6 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		// marks could call getPretransformedContext2D to get context to measure string
-		// and this call could reset transform, so we have to do it before applying scale
 		const tickMarks = this._priceScale.marks();
 
 		ctx.save();
