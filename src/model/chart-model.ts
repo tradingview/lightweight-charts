@@ -609,9 +609,10 @@ export class ChartModel implements IDestroyable {
 		} else {
 			targetScale = (options.preferredScale === undefined) ? 'right' : options.preferredScale;
 		}
+		options.preferredScale = targetScale;
 		pane.addDataSource(series, targetScale, false);
 
-		if (options.preferredScale === 'overlay') {
+		if (targetScale === 'overlay') {
 			// let's apply that options again to apply margins
 			series.applyOptions(options);
 		}
