@@ -65,6 +65,12 @@ export class Pane implements IDestroyable {
 
 	public onPriceScaleOptionsChanged(): void {
 		this._defaultNonOverlayPriceScale.applyOptions(this._model.options().priceScale);
+		if (this._leftPriceScale !== null) {
+			this._leftPriceScale.applyOptions(this._model.options().priceScale);
+		}
+		if (this._rightPriceScale !== null) {
+			this._rightPriceScale.applyOptions(this._model.options().priceScale);
+		}
 	}
 
 	public destroy(): void {
@@ -291,10 +297,18 @@ export class Pane implements IDestroyable {
 
 	public momentaryAutoScale(): void {
 		this._recalculatePriceScaleImpl(this._defaultNonOverlayPriceScale);
+		if (this._leftPriceScale !== null) {
+			this._recalculatePriceScaleImpl(this._leftPriceScale);
+		}
+		if (this._rightPriceScale !== null) {
+			this._recalculatePriceScaleImpl(this._rightPriceScale);
+		}
 	}
 
 	public recalculate(): void {
 		this.recalculatePriceScale(this._defaultNonOverlayPriceScale);
+		this.recalculatePriceScale(this._leftPriceScale);
+		this.recalculatePriceScale(this._rightPriceScale);
 
 		this._dataSources.forEach((ds: IDataSource) => {
 			if (this.isOverlay(ds)) {
