@@ -226,11 +226,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
-		const overlay = this._options.overlay;
+		const preferredScale = this._options.preferredScale;
 		merge(this._options, options);
-		this._options.overlay = overlay;
+		this._options.preferredScale = preferredScale;
 
-		if (overlay && this._priceScale !== null && options.scaleMargins !== undefined) {
+		if (preferredScale === 'overlay' && this._priceScale !== null && options.scaleMargins !== undefined) {
 			this._priceScale.applyOptions({
 				scaleMargins: this._options.scaleMargins,
 			});
