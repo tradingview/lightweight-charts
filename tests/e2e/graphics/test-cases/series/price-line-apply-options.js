@@ -26,6 +26,7 @@ function runTestCase(container) {
 		color: 'red',
 		lineWidth: 1,
 		lineStyle: LightweightCharts.LineStyle.Solid,
+		priceAxisLabelVisible: true,
 	});
 
 	line.applyOptions({
@@ -33,5 +34,6 @@ function runTestCase(container) {
 		color: '#00FF00',
 		lineWidth: 2,
 		lineStyle: LightweightCharts.LineStyle.Dotted,
+		priceAxisLabelVisible: false,
 	});
 }
