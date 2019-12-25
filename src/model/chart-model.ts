@@ -74,9 +74,9 @@ export interface ChartOptions {
 	/** Structure with localization options */
 	localization: LocalizationOptions;
 	/** Structure that describes scrolling behavior */
-	handleScroll: HandleScrollOptions;
+	handleScroll: HandleScrollOptions | boolean;
 	/** Structure that describes scaling behavior */
-	handleScale: HandleScaleOptions;
+	handleScale: HandleScaleOptions | boolean;
 }
 
 export class ChartModel implements IDestroyable {

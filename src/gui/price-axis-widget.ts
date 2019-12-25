@@ -3,6 +3,7 @@ import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate
 import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
+import { isBoolean } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
@@ -304,8 +305,18 @@ export class PriceAxisWidget implements IDestroyable {
 		return this._isLeft;
 	}
 
+	private _pressedMouseMoveScaleEnabled(): boolean {
+		const handleScaleOptions = this._pane.chart().options().handleScale;
+		return isBoolean(handleScaleOptions) ? handleScaleOptions : handleScaleOptions.axisPressedMouseMove;
+	}
+
+	private _doubleClickResetEnabled(): boolean {
+		const handleScaleOptions = this._pane.chart().options().handleScale;
+		return isBoolean(handleScaleOptions) ? handleScaleOptions : handleScaleOptions.axisDoubleClickReset;
+	}
+
 	private _mouseDownEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || this._priceScale.isEmpty() || !this._pane.chart().options().handleScale.axisPressedMouseMove) {
+		if (this._priceScale === null || this._priceScale.isEmpty() || !this._pressedMouseMoveScaleEnabled()) {
 			return;
 		}
 
@@ -316,7 +327,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _pressedMouseMoveEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove) {
+		if (this._priceScale === null || !this._pressedMouseMoveScaleEnabled()) {
 			return;
 		}
 
@@ -327,7 +338,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownOutsideEvent(): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove) {
+		if (this._priceScale === null || !this._pressedMouseMoveScaleEnabled()) {
 			return;
 		}
 
@@ -342,7 +353,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseUpEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove) {
+		if (this._priceScale === null || !this._pressedMouseMoveScaleEnabled()) {
 			return;
 		}
 		const model = this._pane.chart().model();
@@ -352,7 +363,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDoubleClickEvent(e: TouchMouseEvent): void {
-		if (this._pane.chart().options().handleScale.axisDoubleClickReset) {
+		if (this._doubleClickResetEnabled()) {
 			this.reset();
 		}
 	}
@@ -362,8 +373,7 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		const model = this._pane.chart().model();
-		if (model.options().handleScale.axisPressedMouseMove && !this._priceScale.isPercentage() && !this._priceScale.isIndexedTo100()) {
+		if (this._pressedMouseMoveScaleEnabled() && !this._priceScale.isPercentage() && !this._priceScale.isIndexedTo100()) {
 			this._setCursor(CursorType.NsResize);
 		}
 	}

@@ -4,6 +4,7 @@ import { ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
+import { isBoolean } from '../helpers/strict-type-checks';
 
 import { ChartModel, HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
@@ -111,8 +112,8 @@ export class PaneWidget implements IDestroyable {
 			this._topCanvasBinding.canvas,
 			this,
 			{
-				treatVertTouchDragAsPageScroll: !scrollOptions.vertTouchDrag,
-				treatHorzTouchDragAsPageScroll: !scrollOptions.horzTouchDrag,
+				treatVertTouchDragAsPageScroll: isBoolean(scrollOptions) ? !scrollOptions : !scrollOptions.vertTouchDrag,
+				treatHorzTouchDragAsPageScroll: isBoolean(scrollOptions) ? !scrollOptions : !scrollOptions.horzTouchDrag,
 			}
 		);
 	}
@@ -307,9 +308,21 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		const scrollOptions = this._chart.options().handleScroll;
+		let pressedMouseMove: boolean;
+		let horzTouchDrag: boolean;
+		let vertTouchDrag: boolean;
+
+		if (isBoolean(scrollOptions)) {
+			pressedMouseMove = horzTouchDrag = vertTouchDrag = scrollOptions;
+		} else {
+			pressedMouseMove = scrollOptions.pressedMouseMove;
+			horzTouchDrag = scrollOptions.horzTouchDrag;
+			vertTouchDrag = scrollOptions.vertTouchDrag;
+		}
+
 		if (
-			(!scrollOptions.pressedMouseMove || event.type === 'touch') &&
-			(!scrollOptions.horzTouchDrag && !scrollOptions.vertTouchDrag || event.type === 'mouse')
+			(!pressedMouseMove || event.type === 'touch') &&
+			(!horzTouchDrag && !vertTouchDrag || event.type === 'mouse')
 		) {
 			return;
 		}
@@ -395,7 +408,9 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	public pinchEvent(middlePoint: Position, scale: number): void {
-		if (!this._chart.options().handleScale.pinch) {
+		const handleScaleOptions = this._chart.options().handleScale;
+		const handlePinchScale = isBoolean(handleScaleOptions) ? handleScaleOptions : handleScaleOptions.pinch;
+		if (!handlePinchScale) {
 			return;
 		}
 
