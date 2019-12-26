@@ -1,4 +1,4 @@
-import { ensure, ensureNotNull } from '../helpers/assertions';
+import { ensureNotNull } from '../helpers/assertions';
 
 import { PlotList } from './plot-list';
 import { Series } from './series';
@@ -71,7 +71,9 @@ export class SeriesBarColorer {
 		const borderDownColor = downColor;
 
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
-		const isUp = ensure(currentBar.value[SeriesPlotIndex.Open]) <= ensure(currentBar.value[SeriesPlotIndex.Close]);
+		const open = currentBar.value[SeriesPlotIndex.Open];
+		const close = currentBar.value[SeriesPlotIndex.Close];
+		const isUp = open != null && close != null && open <= close;
 
 		result.barColor = isUp ? upColor : downColor;
 		result.barBorderColor = isUp ? borderUpColor : borderDownColor;
@@ -91,7 +93,9 @@ export class SeriesBarColorer {
 		const wickDownColor = candlestickStyle.wickDownColor;
 
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
-		const isUp = ensure(currentBar.value[SeriesPlotIndex.Open]) <= ensure(currentBar.value[SeriesPlotIndex.Close]);
+		const open = currentBar.value[SeriesPlotIndex.Open];
+		const close = currentBar.value[SeriesPlotIndex.Close];
+		const isUp = open != null && close != null && open <= close;
 
 		result.barColor = isUp ? upColor : downColor;
 		result.barBorderColor = isUp ? borderUpColor : borderDownColor;

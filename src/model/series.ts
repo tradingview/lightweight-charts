@@ -329,7 +329,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		const startTimePoint = visibleBars.firstBar();
-		return this.data().search(startTimePoint, PlotRowSearchMode.NearestRight);
+		return this.data().search(startTimePoint, PlotRowSearchMode.NearestRight, true);
 	}
 
 	public bars(): PlotList<Bar['time'], Bar['value']> {
