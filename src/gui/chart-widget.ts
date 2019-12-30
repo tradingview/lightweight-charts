@@ -233,7 +233,7 @@ export class ChartWidget implements IDestroyable {
 			}
 		};
 		// draw left price scale if exists
-		if (this._options.priceScale.position === 'left' || this._options.priceScale.position === 'both') {
+		if (this._isLeftAxisVisible()) {
 			drawPriceAxises('left');
 			targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getWidth();
 		}
@@ -253,7 +253,7 @@ export class ChartWidget implements IDestroyable {
 			}
 		}
 		targetX += firstPane.getSize().w;
-		if (this._options.priceScale.position === 'right') {
+		if (this._isRightAxisVisible()) {
 			targetY = 0;
 			drawPriceAxises('right');
 		}
@@ -266,14 +266,14 @@ export class ChartWidget implements IDestroyable {
 		// draw time scale
 		if (this._options.timeScale.visible) {
 			targetX = 0;
-			if (this._options.priceScale.position === 'left') {
+			if (this._isLeftAxisVisible()) {
 				drawStub('left');
 				targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getWidth();
 			}
 			const size = this._timeAxisWidget.getSize();
 			const image = this._timeAxisWidget.getImage();
 			ctx.drawImage(image, targetX, targetY, size.w, size.h);
-			if (this._options.priceScale.position === 'right') {
+			if (this._isRightAxisVisible()) {
 				targetX = firstPane.getSize().w;
 				drawStub('right');
 				ctx.restore();
@@ -290,10 +290,10 @@ export class ChartWidget implements IDestroyable {
 		let rightPriceAxisWidth = 0;
 
 		for (const paneWidget of this._paneWidgets) {
-			if (this._options.priceScale.position === 'left' || this._options.priceScale.position === 'both') {
+			if (this._isLeftAxisVisible()) {
 				leftPriceAxisWidth = Math.max(leftPriceAxisWidth, ensureNotNull(paneWidget.leftPriceAxisWidget()).optimalWidth());
 			}
-			if (this._options.priceScale.position === 'right' || this._options.priceScale.position === 'both') {
+			if (this._isRightAxisVisible()) {
 				rightPriceAxisWidth = Math.max(rightPriceAxisWidth, ensureNotNull(paneWidget.rightPriceAxisWidget()).optimalWidth());
 			}
 
@@ -332,10 +332,10 @@ export class ChartWidget implements IDestroyable {
 			accumulatedHeight += paneHeight;
 
 			paneWidget.setSize(new Size(paneWidth, paneHeight));
-			if (this._options.priceScale.position === 'left' || this._options.priceScale.position === 'both') {
+			if (this._isLeftAxisVisible()) {
 				paneWidget.setPriceAxisSize(leftPriceAxisWidth, 'left');
 			}
-			if (this._options.priceScale.position === 'right' || this._options.priceScale.position === 'both') {
+			if (this._isRightAxisVisible()) {
 				paneWidget.setPriceAxisSize(rightPriceAxisWidth, 'right');
 			}
 
@@ -565,4 +565,13 @@ export class ChartWidget implements IDestroyable {
 		const display = this._options.timeScale.visible ? '' : 'none';
 		this._timeAxisWidget.getElement().style.display = display;
 	}
+
+	private _isLeftAxisVisible(): boolean {
+		return this._options.priceScale.position === 'left' || this._options.priceScale.position === 'both';
+	}
+
+	private _isRightAxisVisible(): boolean {
+		return this._options.priceScale.position === 'right' || this._options.priceScale.position === 'both';
+	}
+
 }

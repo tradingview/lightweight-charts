@@ -341,9 +341,6 @@ export class Pane implements IDestroyable {
 	}
 
 	private _findSuitableScale(source: IPriceDataSource, preferredScale: PreferredPriceScalePosition): PriceScale {
-/*		if (preferredScale !== 'overlay') {
-			return this._defaultNonOverlayPriceScale;
-		}*/
 		switch (preferredScale) {
 			case 'left': {
 				return ensureNotNull(this._leftPriceScale);
@@ -396,13 +393,6 @@ export class Pane implements IDestroyable {
 	}
 
 	private _insertDataSource(source: IDataSource, preferredPosition: PreferredPriceScalePosition, zOrder: number): void {
-/*		let priceScalePosition: PreferredPriceScalePosition = 'overlay';
-		let priceScale: PriceScale | null = null;
-		if (!overlay) {
-			const optionsPosition = this.model().options().priceScale.position;
-			priceScalePosition = optionsPosition === 'none' ? 'overlay' : optionsPosition;
-		}*/
-
 		let priceScale: PriceScale | null = null;
 
 		if (source instanceof PriceDataSource) {
