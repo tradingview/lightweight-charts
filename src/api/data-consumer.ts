@@ -36,6 +36,10 @@ export interface HistogramData extends LineData {
 	color?: string;
 }
 
+export interface EmptyBarData {
+	time: Time;
+}
+
 export interface BarData {
 	time: Time;
 
@@ -45,12 +49,24 @@ export interface BarData {
 	close: number;
 }
 
+export function isBarData(data: BarData | EmptyBarData): data is BarData {
+	// tslint:disable-next-line:no-any
+	const val = data as any;
+	return val.open !== undefined;
+}
+
+export function isLineData(data: LineData | EmptyBarData): data is LineData {
+	// tslint:disable-next-line:no-any
+	const val = data as any;
+	return val.value !== undefined;
+}
+
 export interface SeriesDataItemTypeMap {
-	Bar: BarData;
-	Candlestick: BarData;
-	Area: LineData;
-	Line: LineData;
-	Histogram: HistogramData;
+	Bar: BarData | EmptyBarData;
+	Candlestick: BarData | EmptyBarData;
+	Area: LineData | EmptyBarData;
+	Line: LineData | EmptyBarData;
+	Histogram: HistogramData | EmptyBarData;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {

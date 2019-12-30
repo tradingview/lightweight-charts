@@ -256,16 +256,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
 		this._data.bars().merge(data);
-		this._recalculateMarkers();
+		this._onDataChanged();
+	}
 
-		this._paneView.update('data');
-		this._markersPaneView.update('data');
-
-		const sourcePane = this.model().paneForSource(this);
-		this.model().recalculatePane(sourcePane);
-		this.model().updateSource(this);
-		this.model().updateCrosshair();
-		this.model().lightUpdate();
+	public removeData(index: TimePointIndex): void {
+		this._data.bars().remove(index, false);
+		this._onDataChanged();
 	}
 
 	public setMarkers(data: SeriesMarker<TimePoint>[]): void {
@@ -567,5 +563,18 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 			default: throw Error('Unknown chart style assigned: ' + this._seriesType);
 		}
+	}
+
+	private _onDataChanged(): void {
+		this._recalculateMarkers();
+
+		this._paneView.update('data');
+		this._markersPaneView.update('data');
+
+		const sourcePane = this.model().paneForSource(this);
+		this.model().recalculatePane(sourcePane);
+		this.model().updateSource(this);
+		this.model().updateCrosshair();
+		this.model().lightUpdate();
 	}
 }

@@ -214,7 +214,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		return this._merge(plotRows);
 	}
 
-	public remove(start: TimePointIndex): PlotRow<TimeType, PlotValueTuple> | null {
+	public remove(start: TimePointIndex, removeTail: boolean = true): PlotRow<TimeType, PlotValueTuple> | null {
 		if (this._shareRead) {
 			return null;
 		}
@@ -224,7 +224,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 			return null;
 		}
 
-		const removedPlotRows = this._items.splice(startOffset);
+		const removedPlotRows = removeTail ? this._items.splice(startOffset) : this._items.splice(startOffset, 1);
 		// _start should never be modified in this method
 		this._end = this._items.length;
 

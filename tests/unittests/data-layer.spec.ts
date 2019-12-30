@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { BarData, HistogramData, LineData } from '../../src/api/data-consumer';
+import { BarData, EmptyBarData, HistogramData, LineData } from '../../src/api/data-consumer';
 import { convertTime, DataLayer, SeriesUpdatePacket, stringToBusinessDay, TimedData } from '../../src/api/data-layer';
 import { ensureDefined } from '../../src/helpers/assertions';
 import { Palette } from '../../src/model/palette';
@@ -399,5 +399,78 @@ describe('DataLayer', () => {
 			expect(update.update[0].value[SeriesPlotIndex.Low]).to.be.equal(item.low);
 			expect(update.update[0].value[SeriesPlotIndex.Close]).to.be.equal(item.close);
 		}
+	});
+
+	it('should support whitespaces', () => {
+		const dataLayer = new DataLayer();
+
+		const series1 = createSeriesMock('Candlestick');
+		const series1Data: (BarData | EmptyBarData)[] = [
+			{ time: 1 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+			{ time: 2 as UTCTimestamp },
+			{ time: 3 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+		];
+
+		const packet1 = dataLayer.setSeriesData(series1, series1Data);
+		expect(packet1.timeScaleUpdate.changes.length).to.be.equal(3);
+		expect(packet1.timeScaleUpdate.marks.length).to.be.equal(3);
+
+		const series1Update = ensureDefined(packet1.timeScaleUpdate.seriesUpdates.get(series1));
+		expect(series1Update.update.length).to.be.equal(2);
+
+		const series2 = createSeriesMock('Candlestick');
+		const series2Data: (BarData | EmptyBarData)[] = [
+			{ time: 1 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+			{ time: 2 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+			{ time: 3 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+		];
+
+		const packet2 = dataLayer.setSeriesData(series2, series2Data);
+		expect(packet2.timeScaleUpdate.changes.length).to.be.equal(3);
+		expect(packet2.timeScaleUpdate.marks.length).to.be.equal(3);
+
+		const series2Update = ensureDefined(packet2.timeScaleUpdate.seriesUpdates.get(series2));
+		expect(series2Update.update.length).to.be.equal(3);
+
+		const series1Update2 = ensureDefined(packet2.timeScaleUpdate.seriesUpdates.get(series1));
+		expect(series1Update2.update.length).to.be.equal(2);
+	});
+
+	it('should be able to replace item with whitespace', () => {
+		const dataLayer = new DataLayer();
+
+		const series = createSeriesMock('Candlestick');
+		const seriesData: (BarData | EmptyBarData)[] = [
+			{ time: 1 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+			{ time: 2 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+			{ time: 3 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+		];
+
+		dataLayer.setSeriesData(series, seriesData);
+		const packet = dataLayer.updateSeriesData(series, { time: 2 as UTCTimestamp });
+		expect(packet.timeScaleUpdate.changes.length).to.be.equal(0);
+
+		const seriesUpdate = ensureDefined(packet.timeScaleUpdate.seriesUpdates.get(series));
+		expect(seriesUpdate.update.length).to.be.equal(0);
+		expect(seriesUpdate.removedIndex).to.be.equal(1);
+	});
+
+	it('should be able to add new whitespaces', () => {
+		const dataLayer = new DataLayer();
+
+		const series = createSeriesMock('Candlestick');
+		const seriesData: (BarData | EmptyBarData)[] = [
+			{ time: 1 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+			{ time: 2 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+			{ time: 4 as UTCTimestamp, open: 1, high: 3, low: 0, close: 2 },
+		];
+
+		dataLayer.setSeriesData(series, seriesData);
+		const packet = dataLayer.updateSeriesData(series, { time: 3 as UTCTimestamp });
+		expect(packet.timeScaleUpdate.changes.length).to.be.equal(2);
+
+		const seriesUpdate = ensureDefined(packet.timeScaleUpdate.seriesUpdates.get(series));
+		expect(seriesUpdate.update.length).to.be.equal(1);
+		expect(seriesUpdate.removedIndex).to.be.equal(2);
 	});
 });

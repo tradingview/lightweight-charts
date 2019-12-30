@@ -13,8 +13,11 @@ import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../model/t
 
 import {
 	BarData,
+	EmptyBarData,
 	HistogramData,
+	isBarData,
 	isBusinessDay,
+	isLineData,
 	isUTCTimestamp,
 	LineData,
 	SeriesDataItemTypeMap,
@@ -29,6 +32,7 @@ export interface TickMarkPacket {
 
 export interface SeriesUpdatePacket {
 	update: PlotRow<Bar['time'], Bar['value']>[];
+	removedIndex?: TimePointIndex;
 }
 
 function newSeriesUpdatePacket(): SeriesUpdatePacket {
@@ -42,6 +46,7 @@ export interface TimeScaleUpdatePacket {
 	changes: TimePoint[];
 	index: TimePointIndex;
 	marks: TickMarkPacket[];
+
 }
 
 export interface UpdatePacket {
@@ -98,7 +103,10 @@ export function convertTime(time: Time): TimePoint {
 
 }
 
-function getLineBasedSeriesItemValue(item: LineData | HistogramData, palette: Palette): Bar['value'] {
+function getLineBasedSeriesItemValue(item: LineData | HistogramData | EmptyBarData, palette: Palette): Bar['value'] | null {
+	if (!isLineData(item)) {
+		return null;
+	}
 	const val = item.value;
 	// default value
 	let color: PlotValue = null;
@@ -110,8 +118,8 @@ function getLineBasedSeriesItemValue(item: LineData | HistogramData, palette: Pa
 	return [val, val, val, val, color];
 }
 
-function getOHLCBasedSeriesItemValue(bar: BarData, palette: Palette): Bar['value'] {
-	return [bar.open, bar.high, bar.low, bar.close, null];
+function getOHLCBasedSeriesItemValue(bar: BarData | EmptyBarData, palette: Palette): Bar['value'] | null {
+	return isBarData(bar) ? [bar.open, bar.high, bar.low, bar.close, null] : null;
 }
 
 // we want to have compile-time checks that the type of the functions is correct
@@ -119,9 +127,9 @@ function getOHLCBasedSeriesItemValue(bar: BarData, palette: Palette): Bar['value
 // so let's use TimedSeriesItemValueFn for shut up the compiler in seriesItemValueFn
 // we need to be sure (and we're sure actually) that stored data has correct type for it's according series object
 type SeriesItemValueFnMap = {
-	[T in keyof SeriesDataItemTypeMap]: (item: SeriesDataItemTypeMap[T], palette: Palette) => Bar['value'];
+	[T in keyof SeriesDataItemTypeMap]: (item: SeriesDataItemTypeMap[T], palette: Palette) => Bar['value'] | null;
 };
-type TimedSeriesItemValueFn = (item: TimedData, palette: Palette) => Bar['value'];
+type TimedSeriesItemValueFn = (item: TimedData, palette: Palette) => Bar['value'] | null;
 
 const seriesItemValueFnMap: SeriesItemValueFnMap = {
 	Candlestick: getOHLCBasedSeriesItemValue,
@@ -332,7 +340,9 @@ export class DataLayer {
 		this._pointDataByTimePoint.set(changedTimePointTime.timestamp, pointData);
 		const seriesUpdates: Map<Series, SeriesUpdatePacket> = new Map();
 
-		for (let index = pointData.index; index < this._pointDataByTimePoint.size; ++index) {
+		let pointRepacedWithWhitespace = false;
+
+		for (let index = pointData.index; index < this._pointDataByTimePoint.size && !pointRepacedWithWhitespace; ++index) {
 			const timePoint = ensureDefined(this._timePointsByIndex.get(index));
 			const currentIndexData = ensureDefined(this._pointDataByTimePoint.get(timePoint.timestamp));
 			currentIndexData.mapping.forEach((currentData: DataItemType, currentSeries: Series) => {
@@ -340,16 +350,27 @@ export class DataLayer {
 					return;
 				}
 
-				const getItemValues = seriesItemValueFn(currentSeries.seriesType());
+				if (pointRepacedWithWhitespace) {
+					return;
+				}
 
+				const getItemValues = seriesItemValueFn(currentSeries.seriesType());
+				const value = getItemValues(currentData, currentSeries.palette());
 				const packet = seriesUpdates.get(currentSeries) || newSeriesUpdatePacket();
-				const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
-					index,
-					time: timePoint,
-					value: getItemValues(currentData, currentSeries.palette()),
-				};
-				packet.update.push(seriesUpdate);
-				seriesUpdates.set(currentSeries, packet);
+
+				if (value !== null) {
+					const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
+						index,
+						time: timePoint,
+						value: value,
+					};
+					packet.update.push(seriesUpdate);
+					seriesUpdates.set(currentSeries, packet);
+				} else {
+					packet.removedIndex = index;
+					seriesUpdates.set(currentSeries, packet);
+					pointRepacedWithWhitespace = !newPoint;
+				}
 			});
 		}
 
@@ -381,14 +402,17 @@ export class DataLayer {
 			pointData.mapping.forEach((targetData: DataItemType, targetSeries: Series) => {
 				// add point to series
 				const getItemValues = seriesItemValueFn(targetSeries.seriesType());
-				const packet = seriesUpdates.get(targetSeries) || newSeriesUpdatePacket();
-				const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
-					index: index as TimePointIndex,
-					time,
-					value: getItemValues(targetData, targetSeries.palette()),
-				};
-				packet.update.push(seriesUpdate);
-				seriesUpdates.set(targetSeries, packet);
+				const value = getItemValues(targetData, targetSeries.palette());
+				if (value !== null) {
+					const packet = seriesUpdates.get(targetSeries) || newSeriesUpdatePacket();
+					const seriesUpdate: PlotRow<Bar['time'], Bar['value']> = {
+						index: index as TimePointIndex,
+						time,
+						value: value,
+					};
+					packet.update.push(seriesUpdate);
+					seriesUpdates.set(targetSeries, packet);
+				}
 			});
 		});
 
