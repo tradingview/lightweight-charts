@@ -14,7 +14,11 @@ function generateData() {
 
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	var chart = LightweightCharts.createChart(container, {
+		priceScale: {
+			position: 'right',
+		},
+	});
 
 	var mainSeries = chart.addLineSeries({
 		lineWidth: 1,
