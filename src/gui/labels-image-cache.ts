@@ -47,7 +47,6 @@ export class LabelsImageCache implements IDestroyable {
 
 		ctx.drawImage(
 			label.canvas,
-			0, 0, label.width, label.height,
 			x, y,
 			label.width, label.height
 		);
