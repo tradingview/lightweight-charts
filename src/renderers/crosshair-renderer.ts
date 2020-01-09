@@ -1,4 +1,4 @@
-import { drawLine, LineStyle, LineWidth } from './draw-line';
+import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
 export interface CrosshairLineStyle {
@@ -37,7 +37,6 @@ export class CrosshairRenderer implements IPaneRenderer {
 		}
 
 		ctx.save();
-		ctx.translate(0.5, 0.5);
 
 		const x = Math.round(this._data.x * pixelRatio);
 		const y = Math.round(this._data.y * pixelRatio);
@@ -48,14 +47,16 @@ export class CrosshairRenderer implements IPaneRenderer {
 			ctx.lineWidth = this._data.vertLine.lineWidth;
 			ctx.strokeStyle = this._data.vertLine.color;
 			ctx.fillStyle = this._data.vertLine.color;
-			drawLine(ctx, x, -0.5, x, h, this._data.vertLine.lineStyle);
+			setLineStyle(ctx, this._data.vertLine.lineStyle);
+			drawVerticalLine(ctx, x, 0, h);
 		}
 
 		if (horzLinesVisible && y >= 0) {
 			ctx.lineWidth = this._data.horzLine.lineWidth;
 			ctx.strokeStyle = this._data.horzLine.color;
 			ctx.fillStyle = this._data.horzLine.color;
-			drawLine(ctx, -0.5, y, w, y, this._data.horzLine.lineStyle);
+			setLineStyle(ctx, this._data.horzLine.lineStyle);
+			drawHorizontalLine(ctx, y, 0, w);
 		}
 
 		ctx.restore();
