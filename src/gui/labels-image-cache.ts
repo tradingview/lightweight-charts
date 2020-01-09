@@ -88,7 +88,6 @@ export class LabelsImageCache implements IDestroyable {
 
 			ctx = getContext2D(item.canvas);
 			drawScaled(ctx, pixelRatio, () => {
-				ctx.translate(0.5, 0.5);
 				ctx.font = this._font;
 				ctx.fillStyle = this._color;
 				ctx.fillText(text, 0, height - margin - baselineOffset);
