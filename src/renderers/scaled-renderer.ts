@@ -13,7 +13,6 @@ export abstract class ScaledRenderer implements IPaneRenderer {
 		ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 		this._drawBackgroundImpl(ctx, isHovered, hitTestData);
 		ctx.restore();
-
 	}
 
 	protected abstract _drawImpl(ctx: CanvasRenderingContext2D, isHovered: boolean, hitTestData?: unknown): void;
