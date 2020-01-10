@@ -5,7 +5,7 @@ checks:
         - path: "./dist/lightweight-charts.esm.production.js"
           maxSize: 41.9KB
         - path: "./dist/lightweight-charts.standalone.production.js"
-          maxSize: 42.3KB
+          maxSize: 42.4KB
 
   - name: typecov
     options:

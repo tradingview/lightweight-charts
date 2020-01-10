@@ -14,26 +14,19 @@ function generateData() {
 
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	var chart = LightweightCharts.createChart(container, {
+		priceScale: {
+			mode: LightweightCharts.PriceScaleMode.Persentage,
+			alignLabels: true,
+		},
+	});
 
 	var series = chart.addLineSeries();
 	series.setData(generateData());
 
-	chart.timeScale().fitContent();
-
-	var line = series.createPriceLine({
-		price: 10,
-		color: 'red',
-		lineWidth: 1,
-		lineStyle: LightweightCharts.LineStyle.Solid,
-		axisLabelVisible: true,
-	});
-
-	line.applyOptions({
-		price: 20,
-		color: '#00FF00',
-		lineWidth: 2,
-		lineStyle: LightweightCharts.LineStyle.Dotted,
-		axisLabelVisible: false,
-	});
+	series.createPriceLine({ price: 58 });
+	series.createPriceLine({ price: 59 });
+	series.createPriceLine({ price: 60 });
+	series.createPriceLine({ price: 61 });
+	series.createPriceLine({ price: 62 });
 }

@@ -7,4 +7,5 @@ export const priceLineOptionsDefaults: PriceLineOptions = {
 	price: 0 as BarPrice,
 	lineStyle: LineStyle.Dotted,
 	lineWidth: 1,
+	axisLabelVisible: true,
 };
