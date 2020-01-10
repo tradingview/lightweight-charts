@@ -73,26 +73,18 @@ export interface ChartOptions {
 	grid: GridOptions;
 	/** Structure with localization options */
 	localization: LocalizationOptions;
-	/** Structure that describes scrolling behavior */
+	/** Structure that describes scrolling behavior or boolean flag that disables/enables all kinds of scrolls */
 	handleScroll: HandleScrollOptions | boolean;
-	/** Structure that describes scaling behavior */
+	/** Structure that describes scaling behavior or boolean flag that disables/enables all kinds of scales */
 	handleScale: HandleScaleOptions | boolean;
 }
 
-export interface ChartOptionsInternal {
-	width: number;
-	height: number;
-	watermark: WatermarkOptions;
-	layout: LayoutOptions;
-	priceScale: PriceScaleOptions;
-	timeScale: TimeScaleOptions;
-	crosshair: CrosshairOptions;
-	grid: GridOptions;
-	localization: LocalizationOptions;
-	handleScroll: HandleScrollOptions;
-	/** Structure that describes scaling behavior */
-	handleScale: HandleScaleOptions;
-}
+export type ChartOptionsInternal =
+	Omit<ChartOptions, 'handleScroll' | 'handleScale'>
+	& {
+		handleScroll: HandleScrollOptions;
+		handleScale: HandleScaleOptions;
+	};
 
 export class ChartModel implements IDestroyable {
 	private readonly _options: ChartOptionsInternal;
