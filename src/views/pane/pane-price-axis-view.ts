@@ -30,12 +30,12 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 		this._align = align;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (this._rendererOptions === null || this._priceAxisViewRenderer === null) {
 			return;
 		}
 
-		this._priceAxisViewRenderer.draw(ctx, this._rendererOptions, this._textWidthCache, this._width, this._align);
+		this._priceAxisViewRenderer.draw(ctx, this._rendererOptions, this._textWidthCache, this._width, this._align, pixelRatio);
 	}
 }
 

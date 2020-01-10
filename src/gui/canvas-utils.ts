@@ -16,36 +16,20 @@ export class Size {
 	}
 }
 
-function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
+export function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 	return canvas.ownerDocument &&
 		canvas.ownerDocument.defaultView &&
 		canvas.ownerDocument.defaultView.devicePixelRatio
 		|| 1;
 }
 
-export function getPrescaledContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+export function getContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 	const ctx = ensureNotNull(canvas.getContext('2d'));
-	// scale by pixel ratio
-	const pixelRatio = getCanvasDevicePixelRatio(canvas);
-	ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+	// sometimes (very often) ctx getContext returns the same context every time
+	// and there might be previous transformation
+	// so let's reset it to be sure that everything is ok
+	ctx.resetTransform();
 	return ctx;
-}
-
-export function getPretransformedContext2D(binding: CanvasCoordinateSpaceBinding): CanvasRenderingContext2D {
-	const ctx = ensureNotNull(binding.canvas.getContext('2d'));
-	// scale by pixel ratio
-	ctx.setTransform(binding.pixelRatio, 0, 0, binding.pixelRatio, 0, 0);
-	ctx.translate(0.5, 0.5);
-	return ctx;
-}
-
-export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
-	ctx.save();
-	ctx.translate(-0.5, -0.5);
-	ctx.globalCompositeOperation = 'copy';
-	ctx.fillStyle = clearColor;
-	ctx.fillRect(x, y, w, h);
-	ctx.restore();
 }
 
 function createCanvas(doc: Document): HTMLCanvasElement {
@@ -88,4 +72,11 @@ function disableSelection(canvas: HTMLCanvasElement): void {
 	(canvas as any).style.MozUserSelect = 'none';
 
 	canvas.style.webkitTapHighlightColor = 'transparent';
+}
+
+export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
+	ctx.save();
+	ctx.scale(ratio, ratio);
+	func();
+	ctx.restore();
 }

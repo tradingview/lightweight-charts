@@ -36,32 +36,27 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		this._barWidth = optimalBarWidth(data.barSpacing);
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 
-		// TODO: remove this after removing of global translate
-		ctx.translate(-0.5, -0.5);
-
 		const bars = this._data.bars;
 		if (this._data.wickVisible) {
-			this._drawWicks(ctx, bars, this._data.visibleRange);
+			this._drawWicks(ctx, bars, this._data.visibleRange, pixelRatio);
 		}
 
 		if (this._data.borderVisible) {
-			this._drawBorder(ctx, bars, this._data.visibleRange, this._data.barSpacing);
+			this._drawBorder(ctx, bars, this._data.visibleRange, this._data.barSpacing, pixelRatio);
 		}
 
 		if (!this._data.borderVisible || this._data.barSpacing > 2 * Constants.BarBorderWidth) {
-			this._drawCandles(ctx, bars, this._data.visibleRange);
+			this._drawCandles(ctx, bars, this._data.visibleRange, pixelRatio);
 		}
 
-		// TODO: remove this after removing of global translate
-		ctx.translate(0.5, 0.5);
 	}
 
-	private _drawWicks(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange): void {
+	private _drawWicks(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
 		let prevWickColor = '';
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
@@ -71,15 +66,20 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 				prevWickColor = bar.wickColor;
 			}
 
-			const top = Math.min(bar.openY, bar.closeY);
-			const bottom = Math.max(bar.openY, bar.closeY);
+			const top = Math.floor(Math.min(bar.openY, bar.closeY) * pixelRatio);
+			const bottom = Math.ceil(Math.max(bar.openY, bar.closeY) * pixelRatio);
 
-			ctx.fillRect(bar.x, bar.highY, 1, top - bar.highY);
-			ctx.fillRect(bar.x, bottom + 1, 1, bar.lowY - bottom);
+			const high = Math.ceil(bar.highY * pixelRatio);
+			const low = Math.floor(bar.lowY * pixelRatio);
+
+			const scaledX = Math.round(pixelRatio * bar.x);
+
+			ctx.fillRect(scaledX, high, 1, top - high);
+			ctx.fillRect(scaledX, bottom + 1, 1, low - bottom);
 		}
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, barSpacing: number): void {
+	private _drawBorder(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, barSpacing: number, pixelRatio: number): void {
 		let prevBorderColor = '';
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
@@ -89,11 +89,11 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 				prevBorderColor = bar.borderColor;
 			}
 
-			const left = Math.round(bar.x - this._barWidth);
-			const right = Math.round(bar.x + this._barWidth);
+			const left = Math.round((bar.x - this._barWidth) * pixelRatio);
+			const right = Math.round((bar.x + this._barWidth) * pixelRatio);
 
-			const top = Math.min(bar.openY, bar.closeY);
-			const bottom = Math.max(bar.openY, bar.closeY);
+			const top = Math.floor(Math.min(bar.openY, bar.closeY) * pixelRatio);
+			const bottom = Math.ceil(Math.max(bar.openY, bar.closeY) * pixelRatio);
 
 			if (barSpacing > 2 * Constants.BarBorderWidth) {
 				strokeRectInnerWithFill(ctx, left, top, right - left + 1, bottom - top + 1, Constants.BarBorderWidth);
@@ -103,7 +103,7 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		}
 	}
 
-	private _drawCandles(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange): void {
+	private _drawCandles(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
 		if (this._data === null) {
 			return;
 		}
@@ -112,11 +112,11 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
 			const bar = bars[i];
-			let top = Math.min(bar.openY, bar.closeY);
-			let bottom = Math.max(bar.openY, bar.closeY);
+			let top = Math.floor(Math.min(bar.openY, bar.closeY) * pixelRatio);
+			let bottom = Math.ceil(Math.max(bar.openY, bar.closeY) * pixelRatio);
 
-			let left = Math.round(bar.x - this._barWidth);
-			let right = Math.round(bar.x + this._barWidth);
+			let left = Math.round((bar.x - this._barWidth) * pixelRatio);
+			let right = Math.round((bar.x + this._barWidth) * pixelRatio);
 
 			if (this._data.borderVisible) {
 				left += 1;

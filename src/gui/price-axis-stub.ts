@@ -1,12 +1,13 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
+import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 
 import { ChartOptions } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
 export interface PriceAxisStubParams {
@@ -96,9 +97,9 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
-		const ctx = getPretransformedContext2D(this._canvasBinding);
-		this._drawBackground(ctx);
-		this._drawBorder(ctx);
+		const ctx = getContext2D(this._canvasBinding.canvas);
+		this._drawBackground(ctx, this._canvasBinding.pixelRatio);
+		this._drawBorder(ctx, this._canvasBinding.pixelRatio);
 	}
 
 	public getImage(): HTMLCanvasElement {
@@ -109,7 +110,7 @@ export class PriceAxisStub implements IDestroyable {
 		return this._isLeft;
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D): void {
+	private _drawBorder(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (!this._borderVisible()) {
 			return;
 		}
@@ -121,22 +122,16 @@ export class PriceAxisStub implements IDestroyable {
 
 		const borderSize = this._rendererOptionsProvider.options().borderSize;
 
-		let left: number;
-		if (this._isLeft) {
-			ctx.translate(-0.5, -0.5);
-			left = width - borderSize - 1;
-		} else {
-			ctx.translate(-0.5, -0.5);
-			left = 0;
-		}
+		const left = (this._isLeft) ? Math.round((width - borderSize - 1) * pixelRatio) : 0;
 
-		// multiply to 2 because of we draw price scale border on the second pixel
-		ctx.fillRect(left, 0, borderSize * 2, 1);
+		ctx.fillRect(left, 0, borderSize, 1);
 		ctx.restore();
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D): void {
-		clearRect(ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
+	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+		drawScaled(ctx, pixelRatio, () => {
+			clearRect(ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
+		});
 	}
 
 	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);

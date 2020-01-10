@@ -1,7 +1,7 @@
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { IPaneRenderer } from './ipane-renderer';
 import { LineItem } from './line-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 
 export interface MarksRendererData {
 	items: LineItem[];
@@ -11,14 +11,14 @@ export interface MarksRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererMarks implements IPaneRenderer {
+export class PaneRendererMarks extends ScaledRenderer {
 	protected _data: MarksRendererData | null = null;
 
 	public setData(data: MarksRendererData): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}

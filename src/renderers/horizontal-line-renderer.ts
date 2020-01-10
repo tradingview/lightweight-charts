@@ -21,7 +21,7 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
@@ -30,17 +30,17 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 			return;
 		}
 
-		const y = this._data.y;
+		const y = Math.round(this._data.y * pixelRatio) + 0.5;
 
 		if (y < 0 || y > this._data.height) {
 			return;
 		}
 
-		const width = this._data.width;
+		const width = Math.ceil(this._data.width * pixelRatio);
 		ctx.lineCap = 'square';
 		ctx.strokeStyle = this._data.color;
 		ctx.lineWidth = this._data.lineWidth;
 
-		drawLine(ctx, 0, y, width, y, this._data.lineStyle);
+		drawLine(ctx, -0.5, y, width, y, this._data.lineStyle);
 	}
 }

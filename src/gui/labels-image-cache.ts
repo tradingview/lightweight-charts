@@ -1,6 +1,7 @@
-import { createPreconfiguredCanvas, getPrescaledContext2D, Size } from '../gui/canvas-utils';
+import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from '../gui/canvas-utils';
 
 import { ensureDefined } from '../helpers/assertions';
+import { drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -37,7 +38,7 @@ export class LabelsImageCache implements IDestroyable {
 	}
 
 	public paintTo(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, align: string): void {
-		const label = this.getLabelImage(ctx, text);
+		const label = this._getLabelImage(ctx, text);
 		if (align !== 'left') {
 			x -= label.textWidth;
 		}
@@ -51,7 +52,7 @@ export class LabelsImageCache implements IDestroyable {
 		);
 	}
 
-	public getLabelImage(ctx: CanvasRenderingContext2D, text: string): Item {
+	private _getLabelImage(ctx: CanvasRenderingContext2D, text: string): Item {
 		let item: Item;
 		if (this._hash.has(text)) {
 			// Cache hit!
@@ -61,6 +62,8 @@ export class LabelsImageCache implements IDestroyable {
 				const key = ensureDefined(this._keys.shift());
 				this._hash.delete(key);
 			}
+
+			const pixelRatio = getCanvasDevicePixelRatio(ctx.canvas);
 
 			const margin = Math.ceil(this._fontSize / 4.5);
 			const baselineOffset = Math.round(this._fontSize / 10);
@@ -73,8 +76,8 @@ export class LabelsImageCache implements IDestroyable {
 			item = {
 				text: text,
 				textWidth: Math.round(Math.max(1, textWidth)),
-				width: width,
-				height: height,
+				width: Math.ceil(width * pixelRatio),
+				height: Math.ceil(height * pixelRatio),
 				canvas: canvas,
 			};
 
@@ -83,10 +86,12 @@ export class LabelsImageCache implements IDestroyable {
 				this._hash.set(item.text, item);
 			}
 
-			ctx = getPrescaledContext2D(item.canvas);
-			ctx.font = this._font;
-			ctx.fillStyle = this._color;
-			ctx.fillText(text, 0, item.height - margin - baselineOffset);
+			ctx = getContext2D(item.canvas);
+			drawScaled(ctx, pixelRatio, () => {
+				ctx.font = this._font;
+				ctx.fillStyle = this._color;
+				ctx.fillText(text, 0, height - margin - baselineOffset);
+			});
 		}
 
 		return item;

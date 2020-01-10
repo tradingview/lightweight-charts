@@ -26,15 +26,12 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 
-		const histogramBase = this._data.histogramBase;
-
-		// TODO: remove this after removing global translate
-		ctx.translate(-0.5, -0.5);
+		const histogramBase = Math.round(this._data.histogramBase * pixelRatio);
 
 		ctx.fillStyle = this._data.color;
 		ctx.beginPath();
@@ -42,15 +39,12 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			// force cast to avoid ensureDefined call
-			const y = item.y as number;
-			const left = item.left as number;
-			const right = item.right as number;
+			const y = Math.round(item.y as number * pixelRatio);
+			const left = Math.floor((item.left as number) * pixelRatio);
+			const right = Math.ceil((item.right as number) * pixelRatio);
 			ctx.rect(left, y, right - left, histogramBase - y);
 		}
 
 		ctx.fill();
-
-		// TODO: remove this after removing global translate
-		ctx.translate(0.5, 0.5);
 	}
 }

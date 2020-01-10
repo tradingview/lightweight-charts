@@ -13,5 +13,5 @@ export interface TimeAxisViewRendererOptions {
 }
 
 export interface ITimeAxisViewRenderer {
-	draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions): void;
+	draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions, pixelRatio: number): void;
 }

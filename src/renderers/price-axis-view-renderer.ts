@@ -1,3 +1,4 @@
+import { drawScaled } from '../helpers/canvas-helpers';
 import { resetTransparency } from '../helpers/color';
 
 import { TextWidthCache } from '../model/text-width-cache';
@@ -27,7 +28,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		width: number,
-		align: 'left' | 'right'
+		align: 'left' | 'right',
+		pixelRatio: number
 	): void {
 		if (!this._data.visible) {
 			return;
@@ -89,25 +91,31 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xText = xInside + horzBorder + tickSize + paddingInner;
 			}
 
+			const xInsideScaled = Math.round(xInside * pixelRatio);
+			const yTopScaled = Math.round(yTop * pixelRatio);
+			const xOutsideScaled = Math.round(xOutside * pixelRatio);
+			const yBottomScaled = Math.round(yBottom * pixelRatio);
+			const yMidScaled = Math.round(yMid * pixelRatio);
+			const xTickScaled = Math.round(xTick * pixelRatio);
+
 			ctx.beginPath();
-			ctx.moveTo(xInside, yTop);
-			ctx.lineTo(xOutside, yTop);
-			ctx.lineTo(xOutside, yBottom);
-			ctx.lineTo(xInside, yBottom);
+			ctx.moveTo(xInsideScaled, yTopScaled);
+			ctx.lineTo(xOutsideScaled, yTopScaled);
+			ctx.lineTo(xOutsideScaled, yBottomScaled);
+			ctx.lineTo(xInsideScaled, yBottomScaled);
 			ctx.fill();
 
 			if (this._data.tickVisible) {
-				ctx.beginPath();
-				ctx.strokeStyle = this._commonData.color;
-				ctx.moveTo(xInside, yMid);
-				ctx.lineTo(xTick, yMid);
-				ctx.stroke();
+				ctx.fillStyle = this._commonData.color;
+				ctx.fillRect(xInsideScaled, yMidScaled, xTickScaled - xInsideScaled, 1);
 			}
 
 			ctx.textAlign = 'left';
 			ctx.fillStyle = this._commonData.color;
 
-			ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
+			drawScaled(ctx, pixelRatio, () => {
+				ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
+			});
 		}
 	}
 
