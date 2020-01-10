@@ -365,7 +365,7 @@ You can set the price level, width, style and color of this line using the follo
 |`lineColor`|`string`|`''`|Price line's color|
 |`lineWidth`|`number`|`1`|Price line's width in pixels|
 |`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Price line's style|
-|`priceAxisLabelVisible`|`boolean`|`true`|If true, a label with the current price value is displayed on the price scale
+|`axisLabelVisible`|`boolean`|`true`|If true, a label with the current price value is displayed on the price scale|
 
 Example:
 
@@ -375,7 +375,7 @@ const priceLine = series.createPriceLine({
     color: 'green',
     lineWidth: 2,
     lineStyle: LightweightCharts.LineStyle.Dotted,
-    priceAxisLabelVisible: true,
+    axisLabelVisible: true,
 });
 
 priceLine.applyOptions({
@@ -383,7 +383,7 @@ priceLine.applyOptions({
     color: 'red',
     lineWidth: 3,
     lineStyle: LightweightCharts.LineStyle.Dashed,
-    priceAxisLabelVisible: false,
+    axisLabelVisible: false,
 });
 ```
 

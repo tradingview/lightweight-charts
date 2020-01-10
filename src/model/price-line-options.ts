@@ -7,5 +7,5 @@ export interface PriceLineOptions {
 	color: string;
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
-	priceAxisLabelVisible: boolean;
+	axisLabelVisible: boolean;
 }
