@@ -2,10 +2,10 @@ import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { DeepPartial, isBoolean } from '../helpers/strict-type-checks';
+import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
-import { ChartModel, ChartOptions } from '../model/chart-model';
+import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { InvalidateMask, InvalidationLevel } from '../model/invalidate-mask';
 import { Point } from '../model/point';
@@ -28,7 +28,7 @@ export interface MouseEventParamsImpl {
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
 export class ChartWidget implements IDestroyable {
-	private readonly _options: ChartOptions;
+	private readonly _options: ChartOptionsInternal;
 	private _paneWidgets: PaneWidget[] = [];
 	private _paneSeparators: PaneSeparator[] = [];
 	private readonly _model: ChartModel;
@@ -46,7 +46,7 @@ export class ChartWidget implements IDestroyable {
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
-	public constructor(container: HTMLElement, options: ChartOptions) {
+	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
 		this._options = options;
 
 		this._element = document.createElement('div');
@@ -104,7 +104,7 @@ export class ChartWidget implements IDestroyable {
 		return this._model;
 	}
 
-	public options(): Readonly<ChartOptions> {
+	public options(): Readonly<ChartOptionsInternal> {
 		return this._options;
 	}
 
@@ -187,7 +187,7 @@ export class ChartWidget implements IDestroyable {
 		this._model.fullUpdate();
 	}
 
-	public applyOptions(options: DeepPartial<ChartOptions>): void {
+	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
 		this._model.applyOptions(options);
 		this._updateTimeAxisVisibility();
 
@@ -346,19 +346,12 @@ export class ChartWidget implements IDestroyable {
 		}
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
 	private _onMousewheel(event: WheelEvent): void {
 		let deltaX = event.deltaX / 100;
 		let deltaY = -(event.deltaY / 100);
 
-		const handleScrollOptions = this._options.handleScroll;
-		const handleScaleOptions = this._options.handleScale;
-
-		const handleMouseWheelScroll = isBoolean(handleScrollOptions) ? handleScrollOptions : handleScrollOptions.mouseWheel;
-		const handleMouseWheelScale = isBoolean(handleScaleOptions) ? handleScaleOptions : handleScaleOptions.mouseWheel;
-
-		if ((deltaX === 0 || !handleMouseWheelScroll) &&
-			(deltaY === 0 || !handleMouseWheelScale)) {
+		if ((deltaX === 0 || !this._options.handleScroll.mouseWheel) &&
+			(deltaY === 0 || !this._options.handleScale.mouseWheel)) {
 			return;
 		}
 
@@ -380,13 +373,13 @@ export class ChartWidget implements IDestroyable {
 				break;
 		}
 
-		if (deltaY !== 0 && handleMouseWheelScale) {
+		if (deltaY !== 0 && this._options.handleScale.mouseWheel) {
 			const zoomScale = Math.sign(deltaY) * Math.min(1, Math.abs(deltaY));
 			const scrollPosition = event.clientX - this._element.getBoundingClientRect().left;
 			this.model().zoomTime(scrollPosition as Coordinate, zoomScale);
 		}
 
-		if (deltaX !== 0 && handleMouseWheelScroll) {
+		if (deltaX !== 0 && this._options.handleScroll.mouseWheel) {
 			this.model().scrollChart(deltaX * -80 as Coordinate); // 80 is a made up coefficient, and minus is for the "natural" scroll
 		}
 	}

@@ -2,7 +2,6 @@ import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate
 
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
-import { isBoolean } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
@@ -135,7 +134,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		this._mouseDown = true;
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() || !this._pressedMouseMoveScaleEnabled()) {
+		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove) {
 			return;
 		}
 
@@ -146,7 +145,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const model = this._chart.model();
 		if (!model.timeScale().isEmpty() && this._mouseDown) {
 			this._mouseDown = false;
-			if (this._pressedMouseMoveScaleEnabled()) {
+			if (this._chart.options().handleScale.axisPressedMouseMove) {
 				model.endScaleTime();
 			}
 		}
@@ -154,7 +153,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 	public pressedMouseMoveEvent(event: TouchMouseEvent): void {
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() || !this._pressedMouseMoveScaleEnabled()) {
+		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove) {
 			return;
 		}
 
@@ -164,7 +163,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	public mouseUpEvent(event: TouchMouseEvent): void {
 		this._mouseDown = false;
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() && !this._pressedMouseMoveScaleEnabled()) {
+		if (model.timeScale().isEmpty() && !this._chart.options().handleScale.axisPressedMouseMove) {
 			return;
 		}
 
@@ -172,13 +171,13 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	public mouseDoubleClickEvent(): void {
-		if (this._doubleClickResetEnabled()) {
+		if (this._chart.options().handleScale.axisDoubleClickReset) {
 			this._chart.model().resetTimeScale();
 		}
 	}
 
 	public mouseEnterEvent(e: TouchMouseEvent): void {
-		if (this._pressedMouseMoveScaleEnabled()) {
+		if (this._chart.model().options().handleScale.axisPressedMouseMove) {
 			this._setCursor(CursorType.EwResize);
 		}
 	}
@@ -265,16 +264,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
 		this._drawCrosshairLabel(topCtx);
-	}
-
-	private _pressedMouseMoveScaleEnabled(): boolean {
-		const handleScaleOptions = this._chart.options().handleScale;
-		return isBoolean(handleScaleOptions) ? handleScaleOptions : handleScaleOptions.axisPressedMouseMove;
-	}
-
-	private _doubleClickResetEnabled(): boolean {
-		const handleScaleOptions = this._chart.options().handleScale;
-		return isBoolean(handleScaleOptions) ? handleScaleOptions : handleScaleOptions.axisDoubleClickReset;
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D): void {

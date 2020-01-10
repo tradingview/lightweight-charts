@@ -44,7 +44,7 @@ export function isNaN(value: number): boolean {
 }
 
 export function isBoolean(value: unknown): value is boolean {
-	return value === false || value === true;
+	return typeof value === 'boolean';
 }
 
 export function clone<T>(object: T): T {

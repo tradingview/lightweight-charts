@@ -79,8 +79,23 @@ export interface ChartOptions {
 	handleScale: HandleScaleOptions | boolean;
 }
 
+export interface ChartOptionsInternal {
+	width: number;
+	height: number;
+	watermark: WatermarkOptions;
+	layout: LayoutOptions;
+	priceScale: PriceScaleOptions;
+	timeScale: TimeScaleOptions;
+	crosshair: CrosshairOptions;
+	grid: GridOptions;
+	localization: LocalizationOptions;
+	handleScroll: HandleScrollOptions;
+	/** Structure that describes scaling behavior */
+	handleScale: HandleScaleOptions;
+}
+
 export class ChartModel implements IDestroyable {
-	private readonly _options: ChartOptions;
+	private readonly _options: ChartOptionsInternal;
 	private readonly _invalidateHandler: InvalidateHandler;
 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
@@ -100,7 +115,7 @@ export class ChartModel implements IDestroyable {
 	private readonly _mainPriceScaleOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
 
-	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptions) {
+	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptionsInternal) {
 		this._invalidateHandler = invalidateHandler;
 		this._options = options;
 
@@ -145,11 +160,11 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	public options(): Readonly<ChartOptions> {
+	public options(): Readonly<ChartOptionsInternal> {
 		return this._options;
 	}
 
-	public applyOptions(options: DeepPartial<ChartOptions>): void {
+	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
 		// TODO: implement this
 		merge(this._options, options);
 		if (options.priceScale !== undefined) {

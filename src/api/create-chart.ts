@@ -1,9 +1,9 @@
 import { ensureNotNull } from '../helpers/assertions';
 import { clone, DeepPartial, isString, merge } from '../helpers/strict-type-checks';
 
-import { ChartOptions } from '../model/chart-model';
+import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
 
-import { ChartApi } from './chart-api';
+import { ChartApi, toInternalOptions } from './chart-api';
 import { IChartApi } from './ichart-api';
 import { chartOptionsDefaults } from './options/chart-options-defaults';
 
@@ -35,7 +35,7 @@ export function createChart(container: string | HTMLElement, options?: DeepParti
 	const htmlElement = ensureNotNull(isString(container) ? document.getElementById(container) : container);
 	const chartOptions = (options === undefined) ?
 		clone(chartOptionsDefaults) :
-		merge(clone(chartOptionsDefaults), options) as ChartOptions;
+		merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
 
 	return new ChartApi(htmlElement, chartOptions);
 }
