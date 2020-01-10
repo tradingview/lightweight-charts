@@ -38,7 +38,7 @@ export class LabelsImageCache implements IDestroyable {
 	}
 
 	public paintTo(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, align: string): void {
-		const label = this.getLabelImage(ctx, text);
+		const label = this._getLabelImage(ctx, text);
 		if (align !== 'left') {
 			x -= label.textWidth;
 		}
@@ -52,7 +52,7 @@ export class LabelsImageCache implements IDestroyable {
 		);
 	}
 
-	public getLabelImage(ctx: CanvasRenderingContext2D, text: string): Item {
+	private _getLabelImage(ctx: CanvasRenderingContext2D, text: string): Item {
 		let item: Item;
 		if (this._hash.has(text)) {
 			// Cache hit!

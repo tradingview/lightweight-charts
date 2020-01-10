@@ -3,7 +3,7 @@ import { IPaneRenderer } from './ipane-renderer';
 export abstract class ScaledRenderer implements IPaneRenderer {
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		ctx.save();
-		ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+		ctx.scale(pixelRatio, pixelRatio);
 		this._drawImpl(ctx, isHovered, hitTestData);
 		ctx.restore();
 	}

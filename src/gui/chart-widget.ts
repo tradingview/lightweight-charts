@@ -78,6 +78,8 @@ export class ChartWidget implements IDestroyable {
 			const containerRect = container.getBoundingClientRect();
 			// TODO: Fix it better
 			// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
+			// For chart widget we decreases because we must be inside container.
+			// For time axis this is not important, since it just affects space for pane widgets
 			width = Math.floor(containerRect.width);
 			if (width % 2) {
 				width -= 1;

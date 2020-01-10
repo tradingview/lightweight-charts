@@ -53,12 +53,10 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
-		ctx.save();
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			drawItem(item, ctx);
 		}
-		ctx.restore();
 	}
 }
 
