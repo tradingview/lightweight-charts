@@ -2,10 +2,10 @@ import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from 
 
 import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
-import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
+import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
-import { ChartOptions } from '../model/chart-model';
+import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
 import { Series } from '../model/series';
 import {
 	AreaSeriesOptions,
@@ -33,6 +33,7 @@ import { IChartApi, MouseEventHandler, MouseEventParams, TimeRangeChangeEventHan
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
 	areaStyleDefaults,
 	barStyleDefaults,
@@ -55,6 +56,30 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	}
 }
 
+function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<ChartOptionsInternal> {
+	const handleScale = options.handleScale;
+	if (isBoolean(handleScale)) {
+		options.handleScale = {
+			axisDoubleClickReset: handleScale,
+			axisPressedMouseMove: handleScale,
+			mouseWheel: handleScale,
+			pinch: handleScale,
+		};
+	}
+
+	const handleScroll = options.handleScroll;
+	if (isBoolean(handleScroll)) {
+		options.handleScroll = {
+			horzTouchDrag: handleScroll,
+			vertTouchDrag: handleScroll,
+			mouseWheel: handleScroll,
+			pressedMouseMove: handleScroll,
+		};
+	}
+
+	return options as DeepPartial<ChartOptionsInternal>;
+}
+
 export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _chartWidget: ChartWidget;
 	private _dataLayer: DataLayer = new DataLayer();
@@ -68,8 +93,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private readonly _priceScaleApi: PriceScaleApi;
 	private readonly _timeScaleApi: TimeScaleApi;
 
-	public constructor(container: HTMLElement, options: ChartOptions) {
-		this._chartWidget = new ChartWidget(container, options);
+	public constructor(container: HTMLElement, options?: DeepPartial<ChartOptions>) {
+		const internalOptions = (options === undefined) ?
+			clone(chartOptionsDefaults) :
+			merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
+
+		this._chartWidget = new ChartWidget(container, internalOptions);
 		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 
 		this._chartWidget.clicked().subscribe(
@@ -258,11 +287,11 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptions>): void {
-		this._chartWidget.applyOptions(options);
+		this._chartWidget.applyOptions(toInternalOptions(options));
 	}
 
 	public options(): Readonly<ChartOptions> {
-		return this._chartWidget.options();
+		return this._chartWidget.options() as Readonly<ChartOptions>;
 	}
 
 	public takeScreenshot(): HTMLCanvasElement {

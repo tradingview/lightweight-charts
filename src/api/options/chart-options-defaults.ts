@@ -1,4 +1,4 @@
-import { ChartOptions } from '../../model/chart-model';
+import { ChartOptionsInternal } from '../../model/chart-model';
 
 import { crosshairOptionsDefaults } from './crosshair-options-defaults';
 import { gridOptionsDefaults } from './grid-options-defaults';
@@ -7,7 +7,7 @@ import { priceScaleOptionsDefaults } from './price-scale-options-defaults';
 import { timeScaleOptionsDefaults } from './time-scale-options-defaults';
 import { watermarkOptionsDefaults } from './watermark-options-defaults';
 
-export const chartOptionsDefaults: ChartOptions = {
+export const chartOptionsDefaults: ChartOptionsInternal = {
 	width: 0,
 	height: 0,
 	layout: layoutOptionsDefaults,

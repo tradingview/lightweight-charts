@@ -5,7 +5,7 @@ import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
-import { ChartModel, ChartOptions } from '../model/chart-model';
+import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { InvalidateMask, InvalidationLevel } from '../model/invalidate-mask';
 import { Point } from '../model/point';
@@ -28,7 +28,7 @@ export interface MouseEventParamsImpl {
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
 export class ChartWidget implements IDestroyable {
-	private readonly _options: ChartOptions;
+	private readonly _options: ChartOptionsInternal;
 	private _paneWidgets: PaneWidget[] = [];
 	private _paneSeparators: PaneSeparator[] = [];
 	private readonly _model: ChartModel;
@@ -46,7 +46,7 @@ export class ChartWidget implements IDestroyable {
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
-	public constructor(container: HTMLElement, options: ChartOptions) {
+	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
 		this._options = options;
 
 		this._element = document.createElement('div');
@@ -104,7 +104,7 @@ export class ChartWidget implements IDestroyable {
 		return this._model;
 	}
 
-	public options(): Readonly<ChartOptions> {
+	public options(): Readonly<ChartOptionsInternal> {
 		return this._options;
 	}
 
@@ -187,7 +187,7 @@ export class ChartWidget implements IDestroyable {
 		this._model.fullUpdate();
 	}
 
-	public applyOptions(options: DeepPartial<ChartOptions>): void {
+	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
 		this._model.applyOptions(options);
 		this._updateTimeAxisVisibility();
 
