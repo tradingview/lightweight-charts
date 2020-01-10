@@ -33,6 +33,7 @@ import { IChartApi, MouseEventHandler, MouseEventParams, TimeRangeChangeEventHan
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
 	areaStyleDefaults,
 	barStyleDefaults,
@@ -55,7 +56,7 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	}
 }
 
-export function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<ChartOptionsInternal> {
+function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<ChartOptionsInternal> {
 	const handleScale = options.handleScale;
 	if (isBoolean(handleScale)) {
 		options.handleScale = {
@@ -92,8 +93,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private readonly _priceScaleApi: PriceScaleApi;
 	private readonly _timeScaleApi: TimeScaleApi;
 
-	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
-		this._chartWidget = new ChartWidget(container, options);
+	public constructor(container: HTMLElement, options?: DeepPartial<ChartOptions>) {
+		const internalOptions = (options === undefined) ?
+		clone(chartOptionsDefaults) :
+		merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
+
+		this._chartWidget = new ChartWidget(container, internalOptions);
 		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 
 		this._chartWidget.clicked().subscribe(
