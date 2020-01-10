@@ -25,6 +25,9 @@ export function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 
 export function getContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 	const ctx = ensureNotNull(canvas.getContext('2d'));
+	// sometimes (very often) ctx getContext returns the same context every time
+	// and there might be previous transformation
+	// so let's reset it to be sure that everything is ok
 	ctx.resetTransform();
 	return ctx;
 }
