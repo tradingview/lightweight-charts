@@ -95,8 +95,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public constructor(container: HTMLElement, options?: DeepPartial<ChartOptions>) {
 		const internalOptions = (options === undefined) ?
-		clone(chartOptionsDefaults) :
-		merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
+			clone(chartOptionsDefaults) :
+			merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
 
 		this._chartWidget = new ChartWidget(container, internalOptions);
 		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
