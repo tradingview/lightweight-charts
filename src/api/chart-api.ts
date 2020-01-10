@@ -286,7 +286,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	public options(): Readonly<ChartOptions> {
-		return this._chartWidget.options() as ChartOptions;
+		return this._chartWidget.options() as Readonly<ChartOptions>;
 	}
 
 	public takeScreenshot(): HTMLCanvasElement {
