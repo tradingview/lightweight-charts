@@ -3,7 +3,7 @@ import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate
 import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 
-import { ChartOptions } from '../model/chart-model';
+import { ChartOptionsInternal } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
@@ -22,7 +22,7 @@ export class PriceAxisStub implements IDestroyable {
 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 
-	private _options: ChartOptions;
+	private _options: ChartOptionsInternal;
 
 	private _invalidated: boolean = true;
 
@@ -32,7 +32,7 @@ export class PriceAxisStub implements IDestroyable {
 
 	public constructor(
 		side: PriceAxisWidgetSide,
-		options: ChartOptions,
+		options: ChartOptionsInternal,
 		params: PriceAxisStubParams,
 		borderVisible: BorderVisibleGetter
 	) {

@@ -178,8 +178,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	public mouseEnterEvent(e: TouchMouseEvent): void {
-		const model = this._chart.model();
-		if (model.options().handleScale.axisPressedMouseMove) {
+		if (this._chart.model().options().handleScale.axisPressedMouseMove) {
 			this._setCursor(CursorType.EwResize);
 		}
 	}
