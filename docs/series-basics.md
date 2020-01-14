@@ -371,7 +371,7 @@ Example:
 
 ```javascript
 const priceLine = series.createPriceLine({
-    price: 80.0
+    price: 80.0,
     color: 'green',
     lineWidth: 2,
     lineStyle: LightweightCharts.LineStyle.Dotted,
@@ -379,7 +379,7 @@ const priceLine = series.createPriceLine({
 });
 
 priceLine.applyOptions({
-    price: 90.0
+    price: 90.0,
     color: 'red',
     lineWidth: 3,
     lineStyle: LightweightCharts.LineStyle.Dashed,
