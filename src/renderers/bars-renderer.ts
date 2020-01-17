@@ -61,9 +61,9 @@ export class PaneRendererBars implements IPaneRenderer {
 
 			if (this._barLineWidth < (this._data.barSpacing - 1)) {
 				if (this._data.openVisible) {
-					const openLeft = Math.round(bodyLeft - this._barLineWidth);
+					const openLeft = Math.round(bodyLeft - bodyWidth);
 					const openTop = Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop);
-					const openBottom = Math.min(openTop + bodyWidthHalf * 2, bodyBottom);
+					const openBottom = Math.min(openTop + bodyWidth, bodyBottom);
 					ctx.fillRect(
 						openLeft,
 						openTop,
@@ -74,7 +74,7 @@ export class PaneRendererBars implements IPaneRenderer {
 
 				const closeLeft = bodyLeft + bodyWidth;
 				const closeTop = Math.max(Math.round(bar.closeY * pixelRatio) - bodyWidthHalf, bodyTop);
-				const closeBottom = Math.min(closeTop + bodyWidthHalf * 2, bodyBottom);
+				const closeBottom = Math.min(closeTop + bodyWidth, bodyBottom);
 
 				ctx.fillRect(
 					closeLeft,

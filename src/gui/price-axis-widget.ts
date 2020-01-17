@@ -425,7 +425,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		let left: number;
 		if (this._isLeft) {
-			left = Math.ceil(this._size.w * pixelRatio - borderSize - 1);
+			left = Math.ceil(this._size.w * pixelRatio - borderSize);
 		} else {
 			left = 0;
 		}
@@ -451,7 +451,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const drawTicks = this._priceScale.options().borderVisible;
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor(this._size.w * pixelRatio) - rendererOptions.borderSize - rendererOptions.tickLength :
+			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio) - rendererOptions.borderSize :
 			rendererOptions.borderSize;
 
 		const textLeftX = this._isLeft ?

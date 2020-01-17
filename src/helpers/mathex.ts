@@ -46,3 +46,7 @@ export function min(arr: number[]): number {
 
 	return minVal;
 }
+
+export function even(x: number): number {
+	return (x % 2) ? x + 1 : x;
+}

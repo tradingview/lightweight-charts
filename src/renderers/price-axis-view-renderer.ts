@@ -60,7 +60,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const alignRight = align === 'right';
 
-		const xInside = alignRight ? width - horzBorder - 0.5 : 0.5;
+		const xInside = alignRight ? width : 0;
 
 		let xOutside = xInside;
 		let xTick: number;

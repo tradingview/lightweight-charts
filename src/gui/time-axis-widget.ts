@@ -339,7 +339,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			const tickLen = Math.round(rendererOptions.tickLength * pixelRatio);
 			for (let index = tickMarks.length; index--;) {
 				const x = Math.round(tickMarks[index].coord * pixelRatio);
-				ctx.rect(x, 0, 1, tickLen);
+				ctx.rect(x, 1, 1, tickLen);
 			}
 
 			ctx.fill();
