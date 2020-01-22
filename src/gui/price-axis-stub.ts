@@ -120,11 +120,11 @@ export class PriceAxisStub implements IDestroyable {
 
 		ctx.fillStyle = this._options.timeScale.borderColor;
 
-		const borderSize = this._rendererOptionsProvider.options().borderSize;
+		const borderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * pixelRatio);
 
 		const left = (this._isLeft) ? Math.round(width * pixelRatio) - borderSize : 0;
 
-		ctx.fillRect(left, 0, borderSize, 1);
+		ctx.fillRect(left, 0, borderSize, borderSize);
 		ctx.restore();
 	}
 
