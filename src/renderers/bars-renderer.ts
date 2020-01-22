@@ -26,8 +26,8 @@ export class PaneRendererBars implements IPaneRenderer {
 
 	public setData(data: PaneRendererBarsData): void {
 		this._data = data;
-		this._barWidth = optimalBarWidth(data.barSpacing);
-		this._barLineWidth = data.thinBars ? 1 : Math.max(1, Math.round(this._barWidth));
+		this._barWidth = Math.max(1, Math.floor(optimalBarWidth(data.barSpacing)));
+		this._barLineWidth = data.thinBars ? 1 : this._barWidth;
 	}
 
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
@@ -36,6 +36,8 @@ export class PaneRendererBars implements IPaneRenderer {
 		}
 
 		let prevColor: string | null = null;
+
+		const optimalWidth = optimalBarWidth(this._data.barSpacing);
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
 			const bar = this._data.bars[i];
@@ -59,7 +61,7 @@ export class PaneRendererBars implements IPaneRenderer {
 				bodyHeight
 			);
 
-			if (this._barLineWidth < (this._data.barSpacing - 1)) {
+			if (this._barLineWidth < optimalWidth) {
 				if (this._data.openVisible) {
 					const openLeft = Math.round(bodyLeft - bodyWidth);
 					const openTop = Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop);
