@@ -95,7 +95,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			const yTopScaled = Math.round(yTop * pixelRatio);
 			const xOutsideScaled = Math.round(xOutside * pixelRatio);
 			const yBottomScaled = Math.round(yBottom * pixelRatio);
-			const yMidScaled = Math.round(yMid * pixelRatio);
+			const yMidScaled = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
 			const xTickScaled = Math.round(xTick * pixelRatio);
 
 			ctx.beginPath();
@@ -107,7 +107,9 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 			if (this._data.tickVisible) {
 				ctx.fillStyle = this._commonData.color;
-				ctx.fillRect(xInsideScaled, yMidScaled, xTickScaled - xInsideScaled, 1);
+				const tickWidth = Math.max(1, Math.floor(pixelRatio));
+				const tickOffset = Math.floor(pixelRatio * 0.5);
+				ctx.fillRect(xInsideScaled, yMidScaled - tickOffset, xTickScaled - xInsideScaled, tickWidth);
 			}
 
 			ctx.textAlign = 'left';

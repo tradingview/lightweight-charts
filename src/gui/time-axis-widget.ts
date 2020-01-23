@@ -336,12 +336,16 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		ctx.textAlign = 'center';
 		ctx.fillStyle = this._lineColor();
 
+		const borderSize = Math.floor(this._getRendererOptions().borderSize * pixelRatio);
+		const tickWidth = Math.max(1, Math.floor(pixelRatio));
+		const tickOffset = Math.floor(pixelRatio * 0.5);
+
 		if (this._chart.model().timeScale().options().borderVisible) {
 			ctx.beginPath();
 			const tickLen = Math.round(rendererOptions.tickLength * pixelRatio);
 			for (let index = tickMarks.length; index--;) {
 				const x = Math.round(tickMarks[index].coord * pixelRatio);
-				ctx.rect(x, 1, 1, tickLen);
+				ctx.rect(x - tickOffset, borderSize, tickWidth, tickLen);
 			}
 
 			ctx.fill();

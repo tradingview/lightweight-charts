@@ -459,12 +459,14 @@ export class PriceAxisWidget implements IDestroyable {
 			Math.round(tickMarkLeftX + rendererOptions.tickLength * pixelRatio + rendererOptions.paddingInner * pixelRatio);
 
 		const textAlign = this._isLeft ? 'right' : 'left';
+		const tickHeight = Math.max(1, Math.floor(pixelRatio));
+		const tickOffset = Math.floor(pixelRatio * 0.5);
 
 		if (drawTicks) {
 			const tickLength = Math.round(rendererOptions.tickLength * pixelRatio);
 			ctx.beginPath();
 			for (const tickMark of tickMarks) {
-				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * pixelRatio), tickLength, 1);
+				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * pixelRatio) - tickOffset, tickLength, tickHeight);
 			}
 
 			ctx.fill();

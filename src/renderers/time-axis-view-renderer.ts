@@ -75,7 +75,9 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * pixelRatio);
 
 		ctx.fillStyle = this._data.color;
-		ctx.fillRect(tickX, tickTop, 1, tickBottom - tickTop);
+		const tickWidth = Math.max(1, Math.floor(pixelRatio));
+		const tickOffset = Math.floor(pixelRatio * 0.5);
+		ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
 
 		const yText = y2 - rendererOptions.baselineOffset - rendererOptions.paddingBottom;
 		ctx.textAlign = 'left';
