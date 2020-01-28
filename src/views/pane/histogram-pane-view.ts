@@ -14,36 +14,34 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-function createEmptyHistogramData(barSpacing: number, color: string): PaneRendererHistogramData {
+function createEmptyHistogramData(barSpacing: number): PaneRendererHistogramData {
 	return {
 		items: [],
 		barSpacing,
 		histogramBase: NaN,
-		color,
 		visibleRange: null,
 	};
 }
 
-function createRawItem(time: TimePointIndex, price: BarPrice): HistogramItem {
+function createRawItem(time: TimePointIndex, price: BarPrice, color: string): HistogramItem {
 	return {
 		time: time,
 		price: price,
 		x: NaN as Coordinate,
 		y: NaN as Coordinate,
+		color,
 	};
 }
 
-const showSpacingMinimalBarWidth = 5;
-
 export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', TimedValue> {
 	private _compositeRenderer: CompositeRenderer = new CompositeRenderer();
-	private _paletteData: PaneRendererHistogramData[] = [];
-	private _paletteRenderers: PaneRendererHistogram[] = [];
+	private _histogramData: PaneRendererHistogramData = createEmptyHistogramData(0);
+	private _renderer: PaneRendererHistogram;
 	private _colorIndexes: Int32Array = new Int32Array(0);
-	private _sourceIndexes: Int32Array = new Int32Array(0);
 
 	public constructor(series: Series<'Histogram'>, model: ChartModel) {
 		super(series, model, false);
+		this._renderer = new PaneRendererHistogram();
 	}
 
 	public renderer(height: number, width: number): IPaneRenderer {
@@ -54,17 +52,14 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 	protected _fillRawPoints(): void {
 		const barSpacing = this._model.timeScale().barSpacing();
 		const palette = this._series.palette();
-		// resize arrays
-		this._paletteRenderers.length = palette.size();
-		this._paletteData.length = palette.size();
 
-		const targetIndexes = new Int32Array(palette.size() + 1);
+		this._histogramData = createEmptyHistogramData(barSpacing);
 
 		const barValueGetter = this._series.barFunction();
 		this._colorIndexes = new Int32Array(this._series.bars().size());
 		let targetColorIndex = 0;
 
-		this._items.length = this._series.bars().size();
+		let targetIndex = 0;
 		let itemIndex = 0;
 
 		const defaultColor = this._series.options().color;
@@ -73,44 +68,30 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 			const value = barValueGetter(bar.value);
 			const paletteColorIndex = bar.value[SeriesPlotIndex.Color];
 
-			const item = createRawItem(index, value);
 			const color = paletteColorIndex != null ? palette.colorByIndex(paletteColorIndex) : defaultColor;
+			const item = createRawItem(index, value, color);
 			// colorIndex is the paneview's internal palette index
 			// this internal palette stores defaultColor by 0 index and pallette colors by paletteColorIndex + 1
 			const colorIndex = paletteColorIndex == null ? 0 : paletteColorIndex + 1;
-			const data = this._paletteData[colorIndex] || createEmptyHistogramData(barSpacing, color);
-			const targetIndex = targetIndexes[colorIndex]++;
-			if (targetIndex < data.items.length) {
-				data.items[targetIndex] = item;
+			targetIndex++;
+			if (targetIndex < this._histogramData.items.length) {
+				this._histogramData.items[targetIndex] = item;
 			} else {
-				data.items.push(item);
+				this._histogramData.items.push(item);
 			}
 			this._items[itemIndex++] = { time: index, x: 0 as Coordinate };
-			this._paletteData[colorIndex] = data;
 			this._colorIndexes[targetColorIndex++] = colorIndex;
 			return false;
 		});
 
-		// update renderers
-		this._paletteRenderers.length = this._paletteData.length;
-		if (this._sourceIndexes.length !== this._paletteData.length) {
-			this._sourceIndexes = new Int32Array(this._paletteData.length);
-		}
-		this._paletteData.forEach((element: PaneRendererHistogramData, index: number) => {
-			element.items.length = targetIndexes[index];
-			const renderer = this._paletteRenderers[index] || new PaneRendererHistogram();
-			renderer.setData(element);
-			this._paletteRenderers[index] = renderer;
-		});
-		this._compositeRenderer.setRenderers(this._paletteRenderers);
+		this._renderer.setData(this._histogramData);
+		this._compositeRenderer.setRenderers([this._renderer]);
 	}
 
 	protected _clearVisibleRange(): void {
 		super._clearVisibleRange();
 
-		this._paletteData.forEach((data: PaneRendererHistogramData, colorIndex: number) => {
-			data.visibleRange = null;
-		});
+		this._histogramData.visibleRange = null;
 	}
 
 	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {
@@ -122,34 +103,10 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		const visibleBars = ensureNotNull(timeScale.visibleBars());
 		const histogramBase = priceScale.priceToCoordinate(this._series.options().base, firstValue);
 
-		this._paletteData.forEach((data: PaneRendererHistogramData, colorIndex: number) => {
-			timeScale.indexesToCoordinates(data.items);
-			priceScale.pointsArrayToCoordinates(data.items, firstValue);
-			data.histogramBase = histogramBase;
-			data.visibleRange = visibleTimedValues(data.items, visibleBars, false);
-			this._sourceIndexes[colorIndex] = data.visibleRange.from;
-		});
-
-		// now calculate left and right
-
-		let prevItem: HistogramItem | null = null;
-		for (let i = this._itemsVisibleRange.from; i < this._itemsVisibleRange.to; ++i) {
-			const colorIndex = this._colorIndexes[i];
-			const data = this._paletteData[colorIndex];
-			const sourceIndex = this._sourceIndexes[colorIndex]++;
-			const item = data.items[sourceIndex];
-			// round left edge to right to compensate right point correcting
-			// 5 lines below
-			// because of if barSpacing is not an integer, flooring could make bar insimmetric
-			item.left = Math.ceil(item.x - barSpacing * 0.5) as Coordinate;
-			item.right = Math.ceil(item.left + barSpacing) as Coordinate;
-
-			// we should correct borders only in case of sibling items
-			if (prevItem !== null && (item.time - prevItem.time) === 1) {
-				const itemsSpacing = item.right - item.left > showSpacingMinimalBarWidth ? 1 : 0;
-				prevItem.right = (item.left - itemsSpacing) as Coordinate;
-			}
-			prevItem = item;
-		}
+		timeScale.indexesToCoordinates(this._histogramData.items);
+		priceScale.pointsArrayToCoordinates(this._histogramData.items, firstValue);
+		this._histogramData.histogramBase = histogramBase;
+		this._histogramData.visibleRange = visibleTimedValues(this._histogramData.items, visibleBars, false);
+		this._histogramData.barSpacing = barSpacing;
 	}
 }

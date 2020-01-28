@@ -1,12 +1,12 @@
-import { Coordinate } from '../model/coordinate';
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { IPaneRenderer } from './ipane-renderer';
 
+const showSpacingMinimalBarWidth = 5;
+
 export interface HistogramItem extends PricedValue, TimedValue {
-	left?: Coordinate;
-	right?: Coordinate;
+	color: string;
 }
 
 export interface PaneRendererHistogramData {
@@ -14,9 +14,15 @@ export interface PaneRendererHistogramData {
 
 	barSpacing: number;
 	histogramBase: number;
-	color: string;
 
 	visibleRange: SeriesItemsIndexesRange | null;
+}
+
+interface PrecalculatedItemCoordinates {
+	left: number;
+	right: number;
+	roundedCenter: number;
+	center: number;
 }
 
 export class PaneRendererHistogram implements IPaneRenderer {
@@ -32,19 +38,59 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		}
 
 		const histogramBase = Math.round(this._data.histogramBase * pixelRatio);
+		const spacing = this._data.barSpacing <= showSpacingMinimalBarWidth ? 0 : Math.max(1, Math.floor(pixelRatio));
 
-		ctx.fillStyle = this._data.color;
-		ctx.beginPath();
+		const columnWidth = Math.round(this._data.barSpacing * pixelRatio) - spacing;
+
+		const precalculated: PrecalculatedItemCoordinates[] = new Array(this._data.visibleRange.to - this._data.visibleRange.from);
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			// force cast to avoid ensureDefined call
-			const y = Math.round(item.y as number * pixelRatio);
-			const left = Math.floor((item.left as number) * pixelRatio);
-			const right = Math.ceil((item.right as number) * pixelRatio);
-			ctx.rect(left, y, right - left, histogramBase - y);
+			const x = Math.round(item.x as number * pixelRatio);
+			let left: number;
+			let right: number;
+
+			if (columnWidth % 2) {
+				const halfWidth = (columnWidth - 1) / 2;
+				left = x - halfWidth;
+				right = x + halfWidth;
+			} else {
+				// shift pixel to left
+				const halfWidth = columnWidth  / 2;
+				left = x - halfWidth;
+				right = x + halfWidth - 1;
+			}
+			precalculated[i - this._data.visibleRange.from] = {
+				left,
+				right,
+				roundedCenter: x,
+				center: (item.x as number * pixelRatio),
+			};
 		}
 
-		ctx.fill();
+		// correct positions
+		for (let i = this._data.visibleRange.from + 1; i < this._data.visibleRange.to; i++) {
+			const current = precalculated[i - this._data.visibleRange.from];
+			const prev = precalculated[i - this._data.visibleRange.from - 1];
+			if (current.left - prev.right !== (spacing + 1)) {
+				// have to align
+				if (prev.roundedCenter > prev.center) {
+					// prev wasshifted to left, so add pixel to right
+					prev.right = current.left - spacing - 1;
+				} else {
+					// extend current to left
+					current.left = prev.right + spacing + 1;
+				}
+			}
+		}
+
+		for (let i = this._data.visibleRange.from + 1; i < this._data.visibleRange.to; i++) {
+			const item = this._data.items[i];
+			const current = precalculated[i - this._data.visibleRange.from];
+			const y = Math.round(item.y as number * pixelRatio);
+			ctx.fillStyle = item.color;
+			ctx.fillRect(current.left, y, current.right - current.left + 1, histogramBase - y);
+		}
 	}
 }

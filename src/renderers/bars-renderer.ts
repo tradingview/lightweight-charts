@@ -26,8 +26,6 @@ export class PaneRendererBars implements IPaneRenderer {
 
 	public setData(data: PaneRendererBarsData): void {
 		this._data = data;
-		this._barWidth = Math.max(1, Math.floor(optimalBarWidth(data.barSpacing)));
-		this._barLineWidth = data.thinBars ? 1 : this._barWidth;
 	}
 
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
@@ -35,9 +33,18 @@ export class PaneRendererBars implements IPaneRenderer {
 			return;
 		}
 
-		let prevColor: string | null = null;
+		this._barWidth = Math.max(1, Math.floor(optimalBarWidth(this._data.barSpacing, pixelRatio)));
 
-		const optimalWidth = optimalBarWidth(this._data.barSpacing);
+		// if we have enough pixels between candles
+		if (this._barWidth >= 2) {
+			const lineWidth = Math.floor(pixelRatio);
+			if ((lineWidth % 2) !== (this._barWidth % 2)) {
+				this._barWidth--;
+			}
+		}
+
+		this._barLineWidth = this._data.thinBars ? 1 : this._barWidth;
+		let prevColor: string | null = null;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
 			const bar = this._data.bars[i];
@@ -46,9 +53,10 @@ export class PaneRendererBars implements IPaneRenderer {
 				prevColor = bar.color;
 			}
 
-			const bodyLeft = Math.round((bar.x - this._barLineWidth / 2) * pixelRatio);
-			const bodyWidth = Math.round(this._barLineWidth * pixelRatio);
-			const bodyWidthHalf = Math.round(this._barLineWidth * pixelRatio * 0.5);
+			const bodyWidthHalf = Math.floor(this._barLineWidth * 0.5);
+
+			const bodyLeft = Math.round(bar.x * pixelRatio) - bodyWidthHalf;
+			const bodyWidth = this._barLineWidth;
 
 			const bodyTop = Math.round(bar.highY * pixelRatio);
 
@@ -66,9 +74,9 @@ export class PaneRendererBars implements IPaneRenderer {
 				bodyHeight
 			);
 
-			if (this._barLineWidth < optimalWidth) {
+			if (this._barLineWidth <= this._barWidth) {
 				if (this._data.openVisible) {
-					const openLeft = Math.round(bodyLeft - this._barWidth * pixelRatio);
+					const openLeft = Math.round(bodyLeft - this._barWidth);
 					const openTop = Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop);
 					const openBottom = Math.min(openTop + bodyWidth, bodyBottom);
 					ctx.fillRect(
@@ -80,7 +88,7 @@ export class PaneRendererBars implements IPaneRenderer {
 				}
 
 				const closeLeft = bodyLeft + bodyWidth;
-				const closeWidth = Math.round(this._barWidth * pixelRatio);
+				const closeWidth = Math.round(this._barWidth);
 				const closeTop = Math.max(Math.round(bar.closeY * pixelRatio) - bodyWidthHalf, bodyTop);
 				const closeBottom = Math.min(closeTop + bodyWidth, bodyBottom);
 

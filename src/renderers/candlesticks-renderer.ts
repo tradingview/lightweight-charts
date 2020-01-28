@@ -43,13 +43,12 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		}
 
 		// now we know pixelRatio and we could calculate barWidth effectively
-		this._barWidth = Math.floor(optimalCandlestickWidth(this._data.barSpacing) * pixelRatio);
+		this._barWidth = optimalCandlestickWidth(this._data.barSpacing, pixelRatio);
 		// if we have enough pixels between candles
-		if (Math.floor(this._data.barSpacing * pixelRatio) - Math.ceil(this._barWidth) > 4) {
+		if (this._barWidth >= 2) {
 			const wickWidth = Math.floor(pixelRatio);
-			// even of wick width and bar width should match
 			if ((wickWidth % 2) !== (this._barWidth % 2)) {
-				this._barWidth++;
+				this._barWidth--;
 			}
 		}
 
@@ -62,16 +61,22 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 			this._drawBorder(ctx, bars, this._data.visibleRange, this._data.barSpacing, pixelRatio);
 		}
 
-		if (!this._data.borderVisible || this._data.barSpacing > 2 * Constants.BarBorderWidth) {
+		const borderWidth = this._calculateBorderWidth(pixelRatio);
+
+		if (!this._data.borderVisible || this._barWidth > borderWidth * 2) {
 			this._drawCandles(ctx, bars, this._data.visibleRange, pixelRatio);
 		}
 
 	}
 
 	private _drawWicks(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
+		if (this._data === null) {
+			return;
+		}
 		let prevWickColor = '';
 
-		const wickWidth = Math.floor(pixelRatio);
+		let wickWidth = Math.min(Math.floor(pixelRatio), Math.floor(this._data.barSpacing * pixelRatio));
+		wickWidth = Math.min(wickWidth, this._barWidth);
 		const wickOffset = Math.floor(wickWidth * 0.5);
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
@@ -94,10 +99,23 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		}
 	}
 
+	private _calculateBorderWidth(pixelRatio: number): number {
+		let borderWidth = Math.floor(Constants.BarBorderWidth * pixelRatio);
+		if (this._barWidth <= 2 * borderWidth) {
+			borderWidth = Math.floor((this._barWidth  - 1) * 0.5);
+		}
+		const res = Math.max(1, borderWidth);
+		if (this._barWidth <= res * 2) {
+			// do not draw bodies, restore original value
+			return Math.floor(Constants.BarBorderWidth * pixelRatio);
+		}
+		return res;
+	}
+
 	private _drawBorder(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, barSpacing: number, pixelRatio: number): void {
 		let prevBorderColor = '';
+		const borderWidth = this._calculateBorderWidth(pixelRatio);
 
-		const borderWidth = Math.floor(Constants.BarBorderWidth * pixelRatio);
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
 			const bar = bars[i];
 			if (bar.borderColor !== prevBorderColor) {
@@ -126,7 +144,7 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 
 		let prevBarColor = '';
 
-		const borderWidth = Math.floor(Constants.BarBorderWidth * pixelRatio);
+		const borderWidth = this._calculateBorderWidth(pixelRatio);
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
 			const bar = bars[i];

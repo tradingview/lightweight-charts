@@ -40,6 +40,7 @@ export class GridRenderer implements IPaneRenderer {
 		const width = Math.ceil(this._data.w * pixelRatio);
 
 		ctx.save();
+
 		if (lineWidth % 2) {
 			ctx.translate(0.5, 0.5);
 		}
@@ -55,6 +56,7 @@ export class GridRenderer implements IPaneRenderer {
 			}
 
 			ctx.stroke();
+
 		}
 
 		if (this._data.horzLinesVisible) {
@@ -70,6 +72,11 @@ export class GridRenderer implements IPaneRenderer {
 			ctx.stroke();
 		}
 
+		if (lineWidth % 2) {
+			ctx.translate(-0.5, -0.5);
+		}
+
 		ctx.restore();
+
 	}
 }

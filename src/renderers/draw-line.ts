@@ -52,14 +52,16 @@ export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): v
 
 export function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: number, right: number): void {
 	ctx.beginPath();
-	ctx.moveTo(left, y - 0.5 * ctx.lineWidth + 1);
-	ctx.lineTo(right, y - 0.5 * ctx.lineWidth + 1);
+	const correction = (ctx.lineWidth % 2) ? 0.5 : 0;
+	ctx.moveTo(left, y + correction);
+	ctx.lineTo(right, y + correction);
 	ctx.stroke();
 }
 
 export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number, bottom: number): void {
 	ctx.beginPath();
-	ctx.moveTo(x - 0.5 * ctx.lineWidth + 1, top);
-	ctx.lineTo(x - 0.5 * ctx.lineWidth + 1, bottom);
+	const correction = (ctx.lineWidth % 2) ? 0.5 : 0;
+	ctx.moveTo(x + correction, top);
+	ctx.lineTo(x + correction, bottom);
 	ctx.stroke();
 }
