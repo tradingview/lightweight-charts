@@ -55,6 +55,7 @@ export interface TimeScaleOptions {
 	visible: boolean;
 	timeVisible: boolean;
 	secondsVisible: boolean;
+	smoothZoom: boolean;
 }
 
 export class TimeScale {
@@ -88,7 +89,7 @@ export class TimeScale {
 		this._options = options;
 		this._localizationOptions = localizationOptions;
 		this._rightOffset = options.rightOffset;
-		this._barSpacing = getValidBarSpacing(options.barSpacing);
+		this._barSpacing = getValidBarSpacing(options.barSpacing, this._options.smoothZoom);
 		this._model = model;
 
 		this._updateDateTimeFormatter();
@@ -551,7 +552,7 @@ export class TimeScale {
 	}
 
 	private _setBarSpacing(newBarSpacing: number): void {
-		newBarSpacing = getValidBarSpacing(newBarSpacing);
+		newBarSpacing = getValidBarSpacing(newBarSpacing, this._options.smoothZoom);
 
 		const oldBarSpacing = this._barSpacing;
 		if (oldBarSpacing === newBarSpacing) {
@@ -740,7 +741,7 @@ export class TimeScale {
 	}
 }
 
-function getValidBarSpacing(newBarSpacing: number): number {
+function getValidBarSpacing(newBarSpacing: number, smooth: boolean): number {
 	if (newBarSpacing < Constants.MinBarSpacing) {
 		return Constants.MinBarSpacing;
 	}
@@ -749,5 +750,5 @@ function getValidBarSpacing(newBarSpacing: number): number {
 		return Constants.MaxBarSpacing;
 	}
 
-	return newBarSpacing;
+	return smooth ? newBarSpacing : Math.round(newBarSpacing);
 }
