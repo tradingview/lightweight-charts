@@ -379,7 +379,7 @@ export class PriceScale {
 
 			const invCoordinate = bh + hmm * (logical - min);
 			const coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			point.y = Math.round(coordinate) as Coordinate;
+			point.y = coordinate as Coordinate;
 		}
 	}
 
@@ -415,19 +415,19 @@ export class PriceScale {
 
 			let invCoordinate = bh + hmm * (openLogical - min);
 			let coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.openY = Math.round(coordinate) as Coordinate;
+			bar.openY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (highLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.highY = Math.round(coordinate) as Coordinate;
+			bar.highY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (lowLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.lowY = Math.round(coordinate) as Coordinate;
+			bar.lowY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (closeLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.closeY = Math.round(coordinate) as Coordinate;
+			bar.closeY = coordinate as Coordinate;
 		}
 	}
 

@@ -86,11 +86,11 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 				prevWickColor = bar.wickColor;
 			}
 
-			const top = Math.floor(Math.min(bar.openY, bar.closeY) * pixelRatio);
-			const bottom = Math.ceil(Math.max(bar.openY, bar.closeY) * pixelRatio);
+			const top = Math.round(Math.min(bar.openY, bar.closeY) * pixelRatio);
+			const bottom = Math.round(Math.max(bar.openY, bar.closeY) * pixelRatio);
 
-			const high = Math.ceil(bar.highY * pixelRatio);
-			const low = Math.floor(bar.lowY * pixelRatio);
+			const high = Math.round(bar.highY * pixelRatio);
+			const low = Math.round(bar.lowY * pixelRatio);
 
 			const scaledX = Math.round(pixelRatio * bar.x);
 
@@ -126,8 +126,8 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 			const left = Math.round(bar.x * pixelRatio) - Math.floor(this._barWidth * 0.5);
 			const right = left + this._barWidth - 1;
 
-			const top = Math.floor(Math.min(bar.openY, bar.closeY) * pixelRatio);
-			const bottom = Math.ceil(Math.max(bar.openY, bar.closeY) * pixelRatio);
+			const top = Math.round(Math.min(bar.openY, bar.closeY) * pixelRatio);
+			const bottom = Math.round(Math.max(bar.openY, bar.closeY) * pixelRatio);
 
 			if (barSpacing > 2 * borderWidth) {
 				strokeRectInnerWithFill(ctx, left, top, right - left + 1, bottom - top + 1, borderWidth);
@@ -148,8 +148,8 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
 			const bar = bars[i];
-			let top = Math.floor(Math.min(bar.openY, bar.closeY) * pixelRatio);
-			let bottom = Math.ceil(Math.max(bar.openY, bar.closeY) * pixelRatio);
+			let top = Math.round(Math.min(bar.openY, bar.closeY) * pixelRatio);
+			let bottom = Math.round(Math.max(bar.openY, bar.closeY) * pixelRatio);
 
 			let left = Math.round(bar.x * pixelRatio) - Math.floor(this._barWidth * 0.5);
 			let right = left + this._barWidth - 1;
