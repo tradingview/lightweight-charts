@@ -517,7 +517,7 @@ export class PriceAxisWidget implements IDestroyable {
 					}
 				});
 				if (mainSource === source && sourceViews.length > 0) {
-					center = sourceViews[0].floatCoordinate();
+					center = sourceViews[0].coordinate();
 				}
 			});
 		};
@@ -526,18 +526,18 @@ export class PriceAxisWidget implements IDestroyable {
 		updateForSources(orderedSources);
 
 		// split into two parts
-		const top = views.filter((view: IPriceAxisView) => view.floatCoordinate() <= center);
-		const bottom = views.filter((view: IPriceAxisView) => view.floatCoordinate() > center);
+		const top = views.filter((view: IPriceAxisView) => view.coordinate() <= center);
+		const bottom = views.filter((view: IPriceAxisView) => view.coordinate() > center);
 
 		// sort top from center to top
-		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.floatCoordinate() - l.floatCoordinate());
+		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.coordinate() - l.coordinate());
 
 		// share center label
 		if (top.length && bottom.length) {
 			bottom.push(top[0]);
 		}
 
-		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.floatCoordinate() - r.floatCoordinate());
+		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
 
 		views.forEach((view: IPriceAxisView) => view.setFixedCoordinate(view.coordinate()));
 

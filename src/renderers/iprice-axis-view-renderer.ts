@@ -7,7 +7,6 @@ export interface PriceAxisViewRendererCommonData {
 	borderColor?: string;
 	color: string;
 	coordinate: number;
-	floatCoordinate?: number;
 	fixedCoordinate?: number;
 }
 

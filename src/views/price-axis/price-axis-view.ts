@@ -61,11 +61,6 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		return this._commonRendererData.coordinate;
 	}
 
-	public floatCoordinate(): number {
-		this._updateRendererDataIfNeeded();
-		return this._commonRendererData.floatCoordinate || this._commonRendererData.coordinate;
-	}
-
 	public update(): void {
 		this._invalidated = true;
 	}
