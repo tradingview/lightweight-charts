@@ -85,12 +85,14 @@ export class PaneRendererHistogram implements IPaneRenderer {
 			}
 		}
 
-		for (let i = this._data.visibleRange.from + 1; i < this._data.visibleRange.to; i++) {
+		const lineWidth = Math.floor(pixelRatio);
+
+		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			const current = precalculated[i - this._data.visibleRange.from];
 			const y = Math.round(item.y as number * pixelRatio);
 			ctx.fillStyle = item.color;
-			ctx.fillRect(current.left, y, current.right - current.left + 1, histogramBase - y);
+			ctx.fillRect(current.left, y, current.right - current.left + 1, histogramBase - y + lineWidth);
 		}
 	}
 }
