@@ -43,7 +43,8 @@ export class PaneRendererBars implements IPaneRenderer {
 			}
 		}
 
-		this._barLineWidth = this._data.thinBars ? 1 : this._barWidth;
+		// if scale is compressed, bar could become less than 1 CSS pixel
+		this._barLineWidth = this._data.thinBars ? Math.min(this._barWidth, Math.floor(pixelRatio)) : this._barWidth;
 		let prevColor: string | null = null;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
@@ -58,14 +59,11 @@ export class PaneRendererBars implements IPaneRenderer {
 			const bodyLeft = Math.round(bar.x * pixelRatio) - bodyWidthHalf;
 			const bodyWidth = this._barLineWidth;
 
-			const bodyTop = Math.round(bar.highY * pixelRatio);
+			const bodyTop = Math.round(bar.highY * pixelRatio) - bodyWidthHalf;
 
-			// generally we have to keep height
-			// however we have to process special case here
-			const bodyHeight = (bar.lowY === bar.highY) ?
-				this._barLineWidth :
-				 Math.round((bar.lowY - bar.highY + 1) * pixelRatio);
-			const bodyBottom = bodyTop + bodyHeight - 1;
+			const bodyBottom = Math.round(bar.lowY * pixelRatio) + bodyWidthHalf;
+
+			const bodyHeight = Math.max((bodyBottom - bodyTop), this._barLineWidth);
 
 			ctx.fillRect(
 				bodyLeft,
@@ -78,25 +76,25 @@ export class PaneRendererBars implements IPaneRenderer {
 				if (this._data.openVisible) {
 					const openLeft = Math.round(bodyLeft - this._barWidth);
 					const openTop = Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop);
-					const openBottom = Math.min(openTop + bodyWidth, bodyBottom);
+					const openBottom = Math.min(openTop + bodyWidth - 1, bodyBottom);
 					ctx.fillRect(
 						openLeft,
 						openTop,
 						bodyLeft - openLeft,
-						openBottom - openTop
+						openBottom - openTop + 1
 					);
 				}
 
 				const closeLeft = bodyLeft + bodyWidth;
 				const closeWidth = Math.round(this._barWidth);
 				const closeTop = Math.max(Math.round(bar.closeY * pixelRatio) - bodyWidthHalf, bodyTop);
-				const closeBottom = Math.min(closeTop + bodyWidth, bodyBottom);
+				const closeBottom = Math.min(closeTop + bodyWidth - 1, bodyBottom);
 
 				ctx.fillRect(
 					closeLeft,
 					closeTop,
 					closeWidth,
-					closeBottom - closeTop
+					closeBottom - closeTop + 1
 				);
 			}
 		}
