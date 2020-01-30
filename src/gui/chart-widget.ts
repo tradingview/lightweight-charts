@@ -567,11 +567,11 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _isLeftAxisVisible(): boolean {
-		return this._options.priceScale.position === 'left' || this._options.priceScale.position === 'both';
+		return this._options.leftPriceScale.visible;
 	}
 
 	private _isRightAxisVisible(): boolean {
-		return this._options.priceScale.position === 'right' || this._options.priceScale.position === 'both';
+		return this._options.rightPriceScale.visible;
 	}
 
 }

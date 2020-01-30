@@ -2,7 +2,7 @@ import { assert, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { DeepPartial, merge } from '../helpers/strict-type-checks';
+import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
@@ -16,7 +16,7 @@ import { IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
-import { DEFAULT_STRETCH_FACTOR, Pane, PreferredPriceScalePosition } from './pane';
+import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series } from './series';
@@ -63,8 +63,14 @@ export interface ChartOptions {
 	watermark: WatermarkOptions;
 	/** Structure with layout options */
 	layout: LayoutOptions;
-	/** Structure with price scale options */
+	/** Structure with default price scale options for overlay */
 	priceScale: PriceScaleOptions;
+
+	/** Structure with price scale option for left price scale */
+	leftPriceScale: PriceScaleOptions;
+	/** Structure with price scale option for right price scale */
+	rightPriceScale: PriceScaleOptions;
+
 	/** Structure with time scale options */
 	timeScale: TimeScaleOptions;
 	/** Structure with crosshair options */
@@ -97,7 +103,7 @@ export class ChartModel implements IDestroyable {
 	private _width: number = 0;
 	private _initialTimeScrollPos: number | null = null;
 	private _hoveredSource: HoveredSource | null = null;
-	private readonly _mainPriceScaleOptionsChanged: Delegate = new Delegate();
+	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
 
 	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptions) {
@@ -150,12 +156,32 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptions>): void {
-		// TODO: implement this
 		merge(this._options, options);
-		if (options.priceScale !== undefined) {
-			this.mainPriceScale().applyOptions(options.priceScale);
-			this._mainPriceScaleOptionsChanged.fire();
+
+		// migrate price scale options
+		// tslint:disable-next-line: deprecation
+		options = clone(options);
+		// tslint:disable-next-line: deprecation
+		if (options.priceScale) {
+			options.leftPriceScale = options.leftPriceScale || {};
+			options.rightPriceScale = options.rightPriceScale || {};
+			// tslint:disable-next-line: deprecation
+			const position = options.priceScale.position;
+			// tslint:disable-next-line: deprecation
+			delete options.priceScale.position;
+			// tslint:disable-next-line: deprecation
+			options.leftPriceScale = merge(options.leftPriceScale, options.priceScale);
+			// tslint:disable-next-line: deprecation
+			options.rightPriceScale = merge(options.rightPriceScale, options.priceScale);
+			if (position === 'left') {
+				options.leftPriceScale.visible = true;
+			}
+			if (position === 'right') {
+				options.rightPriceScale.visible = true;
+			}
+
 		}
+		this._panes.forEach((p: Pane) => p.applyScaleOptions(options));
 
 		if (options.timeScale !== undefined) {
 			this._timeScale.applyOptions(options.timeScale);
@@ -163,10 +189,32 @@ export class ChartModel implements IDestroyable {
 
 		if (options.localization !== undefined) {
 			this._timeScale.applyLocalizationOptions(options.localization);
-			this.mainPriceScale().updateFormatter();
+		}
+
+		// tslint:disable-next-line: deprecation
+		if (options.leftPriceScale || options.rightPriceScale || options.priceScale) {
+			this._priceScalesOptionsChanged.fire();
 		}
 
 		this.fullUpdate();
+	}
+
+	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
+		const priceScale = this.priceScaleById(priceScaleId);
+		if (priceScale !== null) {
+			priceScale.applyOptions(options);
+			this._priceScalesOptionsChanged.fire();
+		}
+	}
+
+	public priceScaleById(priceScaleId: string): PriceScale | null {
+		for (const pane of this._panes) {
+			const res = pane.priceScaleById(priceScaleId);
+			if (res !== null) {
+				return res;
+			}
+		}
+		return null;
 	}
 
 	public updateAllPaneViews(): void {
@@ -520,13 +568,13 @@ export class ChartModel implements IDestroyable {
 		return this._rendererOptionsProvider.options();
 	}
 
-	public mainPriceScaleOptionsChanged(): ISubscription {
-		return this._mainPriceScaleOptionsChanged;
+	public priceScalesOptionsChanged(): ISubscription {
+		return this._priceScalesOptionsChanged;
 	}
 
-	public mainPriceScale(): PriceScale {
+/*	public mainPriceScale(): PriceScale {
 		return this._panes[0].defaultPriceScale();
-	}
+	}*/
 
 	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T> {
 		const pane = this._panes[0];
@@ -602,17 +650,19 @@ export class ChartModel implements IDestroyable {
 	private _createSeries<T extends SeriesType>(options: SeriesOptionsMap[T], seriesType: T, pane: Pane): Series<T> {
 		const series = new Series<T>(this, options, seriesType);
 
-		let targetScale: PreferredPriceScalePosition;
+		let targetScaleId: string;
+		if (options.priceScaleId) {
+			targetScaleId = options.priceScaleId;
 		// tslint:disable-next-line: deprecation
-		if (options.overlay === true) {
-			targetScale = 'overlay';
+		} else if (!options.overlay) {
+			targetScaleId = 'right';
 		} else {
-			targetScale = (options.preferredScale === undefined) ? 'right' : options.preferredScale;
+			targetScaleId = pane.generateUniquePriceScaleId();
 		}
-		options.preferredScale = targetScale;
-		pane.addDataSource(series, targetScale, false);
+		// tslint:disable-next-line: deprecation
+		pane.addDataSource(series, targetScaleId, false);
 
-		if (targetScale === 'overlay') {
+		if (targetScaleId !== 'left' && targetScaleId !== 'right') {
 			// let's apply that options again to apply margins
 			series.applyOptions(options);
 		}

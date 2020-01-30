@@ -226,11 +226,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
-		const preferredScale = this._options.preferredScale;
 		merge(this._options, options);
-		this._options.preferredScale = preferredScale;
 
-		if (preferredScale === 'overlay' && this._priceScale !== null && options.scaleMargins !== undefined) {
+		if (this._priceScale !== null && options.scaleMargins !== undefined) {
 			this._priceScale.applyOptions({
 				scaleMargins: this._options.scaleMargins,
 			});
@@ -366,10 +364,15 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 	}
 
+	public isOverlay(): boolean {
+		const pane = ensureNotNull(this.model().paneForSource(this));
+		return this.priceScale() !== pane.leftPriceScale() && this.priceScale() !== pane.rightPriceScale();
+	}
+
 	public paneViews(): ReadonlyArray<IPaneView> {
 		const res: IPaneView[] = [];
 
-		if (this.priceScale() === this.model().mainPriceScale()) {
+		if (!this.isOverlay()) {
 			res.push(this._baseHorizontalLineView);
 		}
 
@@ -387,7 +390,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public priceAxisViews(pane: Pane, priceScale: PriceScale): ReadonlyArray<IPriceAxisView> {
-		return (priceScale === this._priceScale || this._options.preferredScale === 'overlay') ? this._priceAxisViews : [];
+		return (priceScale === this._priceScale || this._isOverlay()) ? this._priceAxisViews : [];
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo | null {
@@ -477,6 +480,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public title(): string {
 		return this._options.title;
+	}
+
+	private _isOverlay(): boolean {
+		const priceScale = this.priceScale();
+		return priceScale.id() !== 'left' && priceScale.id() !== 'right';
 	}
 
 	private _markerRadius(): number {

@@ -72,7 +72,7 @@ export interface PriceScaleMargins {
 	bottom: number;
 }
 
-export type PriceAxisPosition = 'left' | 'right' | 'none' | 'both';
+export type PriceAxisPosition = 'left' | 'right' | 'none';
 
 /** Structure that describes price scale options */
 export interface PriceScaleOptions {
@@ -84,7 +84,7 @@ export interface PriceScaleOptions {
 	invertScale: boolean;
 	/** True value prevents labels on the price scale from overlapping one another by aligning them one below others */
 	alignLabels: boolean;
-	/** Defines position of the price scale on the chart */
+	/** @deprecated Defines position of the price scale on the chart */
 	position: PriceAxisPosition;
 	/** Defines price margins for the price scale */
 	scaleMargins: PriceScaleMargins;
@@ -94,6 +94,8 @@ export interface PriceScaleOptions {
 	borderColor: string;
 	/** Indicates whether the price scale displays only full lines of text or partial lines. */
 	entireTextOnly: boolean;
+	/** Indicates if this price scale visible. Could not be applied to overlay price scale */
+	visible: boolean;
 }
 
 interface RangeCache {
@@ -108,6 +110,8 @@ const percentageFormatter = new PercentageFormatter();
 const defaultPriceFormatter = new PriceFormatter(100, 1);
 
 export class PriceScale {
+	private readonly _id: string;
+
 	private readonly _layoutOptions: LayoutOptions;
 	private readonly _localizationOptions: LocalizationOptions;
 	private readonly _options: PriceScaleOptions;
@@ -141,11 +145,16 @@ export class PriceScale {
 	private _formatter: IFormatter = defaultPriceFormatter;
 	private readonly _optionsChanged: Delegate = new Delegate();
 
-	public constructor(options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
 		this._localizationOptions = localizationOptions;
 		this._markBuilder = new PriceTickMarkBuilder(this, 100, this._coordinateToLogical.bind(this), this._logicalToCoordinate.bind(this));
+	}
+
+	public id(): string {
+		return this._id;
 	}
 
 	public options(): Readonly<PriceScaleOptions> {

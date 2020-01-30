@@ -14,6 +14,14 @@ export const chartOptionsDefaults: ChartOptions = {
 	crosshair: crosshairOptionsDefaults,
 	grid: gridOptionsDefaults,
 	priceScale: priceScaleOptionsDefaults,
+	leftPriceScale: {
+		...priceScaleOptionsDefaults,
+		visible: false,
+	},
+	rightPriceScale: {
+		...priceScaleOptionsDefaults,
+		visible: true,
+	},
 	timeScale: timeScaleOptionsDefaults,
 	watermark: watermarkOptionsDefaults,
 	localization: {

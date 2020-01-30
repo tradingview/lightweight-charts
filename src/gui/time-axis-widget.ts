@@ -7,7 +7,6 @@ import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { LayoutOptions } from '../model/layout-options';
-import { PriceAxisPosition } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
 import { MarkSpanBorder, TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
@@ -49,7 +48,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private _rendererOptions: TimeAxisViewRendererOptions | null = null;
 	private _mouseDown: boolean = false;
 	private _size: Size = new Size(0, 0);
-	private _priceAxisPosition: PriceAxisPosition = 'none';
 
 	public constructor(chartWidget: ChartWidget) {
 		this._chart = chartWidget;
@@ -95,7 +93,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._element.appendChild(this._rightStubCell);
 
 		this._recreateStub();
-		this._chart.model().mainPriceScaleOptionsChanged().subscribe(this._recreateStub.bind(this), this);
+		this._chart.model().priceScalesOptionsChanged().subscribe(this._recreateStub.bind(this), this);
 
 		this._mouseEventHandler = new MouseEventHandler(
 			this._topCanvasBinding.canvas,
@@ -478,7 +476,37 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	private _recreateStub(): void {
-		const priceAxisPosition = this._chart.model().mainPriceScale().options().position;
+		const model = this._chart.model();
+		const options = model.options();
+		if (!options.leftPriceScale.visible && this._leftStub !== null) {
+			this._leftStubCell.removeChild(this._leftStub.getElement());
+			this._leftStub.destroy();
+			this._leftStub = null;
+		}
+		if (!options.rightPriceScale.visible && this._rightStub !== null) {
+			this._rightStubCell.removeChild(this._rightStub.getElement());
+			this._rightStub.destroy();
+			this._rightStub = null;
+		}
+		const rendererOptionsProvider = this._chart.model().rendererOptionsProvider();
+		const params: PriceAxisStubParams = {
+			rendererOptionsProvider: rendererOptionsProvider,
+		};
+		if (options.leftPriceScale.visible && this._leftStub === null) {
+			const borderVisibleGetter = () => {
+				return options.leftPriceScale.borderVisible && model.timeScale().options().borderVisible;
+			};
+			this._leftStub = new PriceAxisStub('left', this._chart.options(), params, borderVisibleGetter);
+			this._leftStubCell.appendChild(this._leftStub.getElement());
+		}
+		if (options.rightPriceScale.visible && this._rightStub === null) {
+			const borderVisibleGetter = () => {
+				return options.rightPriceScale.borderVisible && model.timeScale().options().borderVisible;
+			};
+			this._rightStub = new PriceAxisStub('right', this._chart.options(), params, borderVisibleGetter);
+			this._rightStubCell.appendChild(this._rightStub.getElement());
+		}
+/*		const priceAxisPosition = this._chart.model().mainPriceScale().options().position;
 		if (priceAxisPosition === this._priceAxisPosition) {
 			return;
 		}
@@ -514,7 +542,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			}
 		}
 
-		this._priceAxisPosition = priceAxisPosition;
+		this._priceAxisPosition = priceAxisPosition;*/
 	}
 
 	private readonly _canvasConfiguredHandler = () => this._chart.model().lightUpdate();

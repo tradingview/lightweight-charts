@@ -65,7 +65,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
 
-	private readonly _priceScaleApi: PriceScaleApi;
+	private readonly _priceScaleApi: Map<string, PriceScaleApi> = new Map();
 	private readonly _timeScaleApi: TimeScaleApi;
 
 	public constructor(container: HTMLElement, options: ChartOptions) {
@@ -90,7 +90,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		);
 
 		const model = this._chartWidget.model();
-		this._priceScaleApi = new PriceScaleApi(model);
 		this._timeScaleApi = new TimeScaleApi(model);
 	}
 
@@ -98,7 +97,10 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.model().timeScale().visibleBarsChanged().unsubscribeAll(this);
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
-		this._priceScaleApi.destroy();
+
+		const priceScaleApis = Array.from(this._priceScaleApi.values());
+		priceScaleApis.forEach((ps: PriceScaleApi) => ps.destroy());
+
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
 		delete this._chartWidget;
@@ -249,8 +251,15 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	// TODO: add more subscriptions
 
-	public priceScale(): IPriceScaleApi {
-		return this._priceScaleApi;
+	public priceScale(priceScaleId?: string): IPriceScaleApi {
+		// TODO: get visible scale
+		priceScaleId = priceScaleId || 'right';
+		if (this._priceScaleApi.has(priceScaleId)) {
+			return ensureDefined(this._priceScaleApi.get(priceScaleId));
+		}
+		const res = new PriceScaleApi(this._chartWidget.model(), priceScaleId);
+		this._priceScaleApi.set(priceScaleId, res);
+		return res;
 	}
 
 	public timeScale(): ITimeScaleApi {

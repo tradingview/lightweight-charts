@@ -2,7 +2,6 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
-import { PreferredPriceScalePosition } from './pane';
 import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
 
@@ -149,7 +148,7 @@ export interface SeriesScaleOptions {
 	 * @deprecated Use preferredScale instead
 	 */
 	overlay?: boolean;
-	preferredScale?: PreferredPriceScalePosition;
+	priceScaleId?: string;
 	scaleMargins?: PriceScaleMargins;
 }
 

@@ -1,3 +1,4 @@
+import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
@@ -8,9 +9,11 @@ import { IPriceScaleApi } from './iprice-scale-api';
 
 export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
 	private _chartModel: ChartModel;
+	private readonly _priceScaleId: string;
 
-	public constructor(model: ChartModel) {
+	public constructor(model: ChartModel, priceScaleId: string) {
 		this._chartModel = model;
+		this._priceScaleId =  priceScaleId;
 	}
 
 	public destroy(): void {
@@ -18,7 +21,7 @@ export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
 	}
 
 	public applyOptions(options: DeepPartial<PriceScaleOptions>): void {
-		this._chartModel.applyOptions({ priceScale: options });
+		this._chartModel.applyPriceScaleOptions(this._priceScaleId, options);
 	}
 
 	public options(): Readonly<PriceScaleOptions> {
@@ -26,6 +29,6 @@ export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
 	}
 
 	private _priceScale(): PriceScale {
-		return this._chartModel.mainPriceScale();
+		return ensureNotNull(this._chartModel.priceScaleById(this._priceScaleId));
 	}
 }
