@@ -58,6 +58,7 @@ export class PaneRendererBars implements IPaneRenderer {
 
 			const bodyLeft = Math.round(bar.x * pixelRatio) - bodyWidthHalf;
 			const bodyWidth = this._barLineWidth;
+			const bodyRight = bodyLeft + bodyWidth - 1;
 
 			const bodyTop = Math.round(bar.highY * pixelRatio) - bodyWidthHalf;
 
@@ -74,8 +75,8 @@ export class PaneRendererBars implements IPaneRenderer {
 
 			if (this._barLineWidth <= this._barWidth) {
 				if (this._data.openVisible) {
-					const openLeft = Math.round(bodyLeft - this._barWidth);
-					const openTop = Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop);
+					const openLeft = Math.round(bar.x * pixelRatio - this._barWidth * 1.5);
+					const openTop = Math.min(Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop), bodyBottom - 1);
 					const openBottom = Math.min(openTop + bodyWidth - 1, bodyBottom);
 					ctx.fillRect(
 						openLeft,
@@ -85,15 +86,14 @@ export class PaneRendererBars implements IPaneRenderer {
 					);
 				}
 
-				const closeLeft = bodyLeft + bodyWidth;
-				const closeWidth = Math.round(this._barWidth);
-				const closeTop = Math.max(Math.round(bar.closeY * pixelRatio) - bodyWidthHalf, bodyTop);
-				const closeBottom = Math.min(closeTop + bodyWidth - 1, bodyBottom);
+				const closeRight = Math.round(bar.x * pixelRatio + this._barWidth * 1.5);
+				const closeTop = Math.min(Math.max(Math.round(bar.closeY * pixelRatio) - bodyWidthHalf, bodyTop), bodyBottom - 1);
+				const closeBottom = Math.min(closeTop + bodyWidth - 1, bodyBottom - 1);
 
 				ctx.fillRect(
-					closeLeft,
+					bodyRight + 1,
 					closeTop,
-					closeWidth,
+					closeRight - bodyRight,
 					closeBottom - closeTop + 1
 				);
 			}
