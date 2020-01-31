@@ -3,7 +3,7 @@ import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { IPaneRenderer } from './ipane-renderer';
 
-const showSpacingMinimalBarWidth = 5;
+const showSpacingMinimalBarWidth = 3;
 
 export interface HistogramItem extends PricedValue, TimedValue {
 	color: string;
@@ -38,7 +38,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		}
 
 		const histogramBase = Math.round(this._data.histogramBase * pixelRatio);
-		const spacing = this._data.barSpacing <= showSpacingMinimalBarWidth ? 0 : Math.max(1, Math.floor(pixelRatio));
+		const spacing = Math.ceil(this._data.barSpacing * pixelRatio) <= showSpacingMinimalBarWidth ? 0 : Math.max(1, Math.floor(pixelRatio));
 
 		const columnWidth = Math.round(this._data.barSpacing * pixelRatio) - spacing;
 
