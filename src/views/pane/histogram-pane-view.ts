@@ -108,5 +108,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._histogramData.histogramBase = histogramBase;
 		this._histogramData.visibleRange = visibleTimedValues(this._histogramData.items, visibleBars, false);
 		this._histogramData.barSpacing = barSpacing;
+		// need this to update cache
+		this._renderer.setData(this._histogramData);
 	}
 }
