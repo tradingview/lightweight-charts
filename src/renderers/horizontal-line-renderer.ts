@@ -32,7 +32,7 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 
 		const y = Math.round(this._data.y * pixelRatio);
 
-		if (y < 0 || y > this._data.height) {
+		if (y < 0 || y > Math.ceil(this._data.height * pixelRatio)) {
 			return;
 		}
 
