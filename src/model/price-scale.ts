@@ -85,7 +85,7 @@ export interface PriceScaleOptions {
 	/** True value prevents labels on the price scale from overlapping one another by aligning them one below others */
 	alignLabels: boolean;
 	/** @deprecated Defines position of the price scale on the chart */
-	position: PriceAxisPosition;
+	position?: PriceAxisPosition;
 	/** Defines price margins for the price scale */
 	scaleMargins: PriceScaleMargins;
 	/** Set true to draw a border between the price scale and the chart area */

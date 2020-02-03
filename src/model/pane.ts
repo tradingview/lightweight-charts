@@ -2,7 +2,7 @@ import { assert, ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { DeepPartial, merge, uid } from '../helpers/strict-type-checks';
+import { DeepPartial, uid } from '../helpers/strict-type-checks';
 
 import { ChartModel, ChartOptions } from './chart-model';
 import { IDataSource } from './idata-source';
@@ -54,12 +54,12 @@ export class Pane implements IDestroyable {
 	}
 
 	public applyScaleOptions(options: DeepPartial<ChartOptions>): void {
-		// tslint:disable-next-line: deprecation
-		const leftScaleOptions = merge(options.leftPriceScale || {}, options.priceScale || {});
-		this._leftPriceScale.applyOptions(leftScaleOptions);
-		// tslint:disable-next-line: deprecation
-		const rightPriceScale = merge(options.rightPriceScale || {}, options.priceScale || {});
-		this._rightPriceScale.applyOptions(rightPriceScale);
+		if (options.leftPriceScale) {
+			this._leftPriceScale.applyOptions(options.leftPriceScale);
+		}
+		if (options.rightPriceScale) {
+			this._rightPriceScale.applyOptions(options.rightPriceScale);
+		}
 		if (options.localization) {
 			this._leftPriceScale.updateFormatter();
 			this._rightPriceScale.updateFormatter();
@@ -192,6 +192,7 @@ export class Pane implements IDestroyable {
 		this._insertDataSource(source, targetScaleId, zOrder);
 	}
 
+	// tslint:disable-next-line: cyclomatic-complexity
 	public removeDataSource(source: IDataSource): void {
 		const index = this._dataSources.indexOf(source);
 		assert(index !== -1, 'removeDataSource: invalid data source');
@@ -207,6 +208,9 @@ export class Pane implements IDestroyable {
 			const overlayIndex = overlaySources.indexOf(source);
 			if (overlayIndex !== -1) {
 				overlaySources.splice(overlayIndex, 1);
+				if (overlaySources.length === 0) {
+					this._overlaySources.delete(priceScaleId);
+				}
 			}
 		}
 

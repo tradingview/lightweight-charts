@@ -69,6 +69,18 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private readonly _timeScaleApi: TimeScaleApi;
 
 	public constructor(container: HTMLElement, options: ChartOptions) {
+		// migrate price scale options
+		// tslint:disable-next-line: deprecation
+		if (options.priceScale.position) {
+			options = clone(options);
+			// tslint:disable-next-line: deprecation
+			options.leftPriceScale.visible = options.priceScale.position === 'left';
+			// tslint:disable-next-line: deprecation
+			options.rightPriceScale.visible = options.priceScale.position === 'right';
+			// tslint:disable-next-line: deprecation
+			delete options.priceScale.position;
+		}
+
 		this._chartWidget = new ChartWidget(container, options);
 		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 

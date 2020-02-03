@@ -655,7 +655,7 @@ export class ChartModel implements IDestroyable {
 			targetScaleId = options.priceScaleId;
 		// tslint:disable-next-line: deprecation
 		} else if (!options.overlay) {
-			targetScaleId = 'right';
+			targetScaleId = this._options.rightPriceScale.visible ? 'right' : 'left';
 		} else {
 			targetScaleId = pane.generateUniquePriceScaleId();
 		}
