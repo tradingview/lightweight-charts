@@ -56,7 +56,8 @@ export class PaneRendererBars implements IPaneRenderer {
 
 			const bodyWidthHalf = Math.floor(this._barLineWidth * 0.5);
 
-			const bodyLeft = Math.round(bar.x * pixelRatio) - bodyWidthHalf;
+			const bodyCenter = Math.round(bar.x * pixelRatio);
+			const bodyLeft =  bodyCenter - bodyWidthHalf;
 			const bodyWidth = this._barLineWidth;
 			const bodyRight = bodyLeft + bodyWidth - 1;
 
@@ -73,11 +74,17 @@ export class PaneRendererBars implements IPaneRenderer {
 				bodyHeight
 			);
 
+			const sideWidth = Math.ceil(this._barWidth * 1.5);
+
 			if (this._barLineWidth <= this._barWidth) {
 				if (this._data.openVisible) {
-					const openLeft = Math.round(bar.x * pixelRatio - this._barWidth * 1.5);
-					const openTop = Math.min(Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop), bodyBottom - 1);
-					const openBottom = Math.min(openTop + bodyWidth - 1, bodyBottom);
+					const openLeft = bodyCenter - sideWidth;
+					let openTop = Math.max(bodyTop, Math.round(bar.openY * pixelRatio) - bodyWidthHalf);
+					let openBottom = openTop + bodyWidth - 1;
+					if (openBottom > bodyTop + bodyHeight - 1) {
+						openBottom = bodyTop + bodyHeight - 1;
+						openTop = openBottom - bodyWidth + 1;
+					}
 					ctx.fillRect(
 						openLeft,
 						openTop,
@@ -86,9 +93,13 @@ export class PaneRendererBars implements IPaneRenderer {
 					);
 				}
 
-				const closeRight = Math.round(bar.x * pixelRatio + this._barWidth * 1.5);
-				const closeTop = Math.min(Math.max(Math.round(bar.closeY * pixelRatio) - bodyWidthHalf, bodyTop), bodyBottom - 1);
-				const closeBottom = Math.min(closeTop + bodyWidth - 1, bodyBottom - 1);
+				const closeRight = bodyCenter + sideWidth;
+				let closeTop = Math.max(bodyTop, Math.round(bar.closeY * pixelRatio) - bodyWidthHalf);
+				let closeBottom = closeTop + bodyWidth - 1;
+				if (closeBottom > bodyTop + bodyHeight - 1) {
+					closeBottom = bodyTop + bodyHeight - 1;
+					closeTop = closeBottom - bodyWidth + 1;
+				}
 
 				ctx.fillRect(
 					bodyRight + 1,
