@@ -70,7 +70,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public constructor(container: HTMLElement, options: ChartOptions) {
 		// migrate price scale options
-		// tslint:disable-next-line: deprecation
+		// tslint:disable-next-line:deprecation
 		if (options.priceScale.position) {
 			options = clone(options);
 			// tslint:disable-next-line: deprecation
