@@ -374,22 +374,25 @@ You can set the price level, width, style and color of this line using the follo
 |`lineColor`|`string`|`''`|Price line's color|
 |`lineWidth`|`number`|`1`|Price line's width in pixels|
 |`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Price line's style|
+|`axisLabelVisible`|`boolean`|`true`|If true, a label with the current price value is displayed on the price scale|
 
 Example:
 
 ```javascript
 const priceLine = series.createPriceLine({
-    price: 80.0
+    price: 80.0,
     color: 'green',
     lineWidth: 2,
     lineStyle: LightweightCharts.LineStyle.Dotted,
+    axisLabelVisible: true,
 });
 
 priceLine.applyOptions({
-    price: 90.0
+    price: 90.0,
     color: 'red',
     lineWidth: 3,
     lineStyle: LightweightCharts.LineStyle.Dashed,
+    axisLabelVisible: false,
 });
 ```
 

@@ -79,14 +79,21 @@ export interface ChartOptions {
 	grid: GridOptions;
 	/** Structure with localization options */
 	localization: LocalizationOptions;
-	/** Structure that describes scrolling behavior */
-	handleScroll: HandleScrollOptions;
-	/** Structure that describes scaling behavior */
-	handleScale: HandleScaleOptions;
+	/** Structure that describes scrolling behavior or boolean flag that disables/enables all kinds of scrolls */
+	handleScroll: HandleScrollOptions | boolean;
+	/** Structure that describes scaling behavior or boolean flag that disables/enables all kinds of scales */
+	handleScale: HandleScaleOptions | boolean;
 }
 
+export type ChartOptionsInternal =
+	Omit<ChartOptions, 'handleScroll' | 'handleScale'>
+	& {
+		handleScroll: HandleScrollOptions;
+		handleScale: HandleScaleOptions;
+	};
+
 export class ChartModel implements IDestroyable {
-	private readonly _options: ChartOptions;
+	private readonly _options: ChartOptionsInternal;
 	private readonly _invalidateHandler: InvalidateHandler;
 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
@@ -106,7 +113,7 @@ export class ChartModel implements IDestroyable {
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
 
-	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptions) {
+	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptionsInternal) {
 		this._invalidateHandler = invalidateHandler;
 		this._options = options;
 
@@ -151,17 +158,16 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	public options(): Readonly<ChartOptions> {
+	public options(): Readonly<ChartOptionsInternal> {
 		return this._options;
 	}
 
-	public applyOptions(options: DeepPartial<ChartOptions>): void {
+	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
+		// TODO: implement this
 		merge(this._options, options);
 
 		// migrate price scale options
-		// tslint:disable-next-line: deprecation
 		options = clone(options);
-		// tslint:disable-next-line: deprecation
 		if (options.priceScale) {
 			options.leftPriceScale = options.leftPriceScale || {};
 			options.rightPriceScale = options.rightPriceScale || {};
@@ -169,9 +175,7 @@ export class ChartModel implements IDestroyable {
 			const position = options.priceScale.position;
 			// tslint:disable-next-line: deprecation
 			delete options.priceScale.position;
-			// tslint:disable-next-line: deprecation
 			options.leftPriceScale = merge(options.leftPriceScale, options.priceScale);
-			// tslint:disable-next-line: deprecation
 			options.rightPriceScale = merge(options.rightPriceScale, options.priceScale);
 			if (position === 'left') {
 				options.leftPriceScale.visible = true;

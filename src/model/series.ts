@@ -385,7 +385,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public priceAxisViews(pane: Pane, priceScale: PriceScale): ReadonlyArray<IPriceAxisView> {
-		return (priceScale === this._priceScale || this._isOverlay()) ? this._priceAxisViews : [];
+		const result = (priceScale === this._priceScale || this._isOverlay()) ? [...this._priceAxisViews] : [];
+		for (const customPriceLine of this._customPriceLines) {
+			result.push(customPriceLine.priceAxisView());
+		}
+		return result;
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo | null {

@@ -52,6 +52,10 @@ export function uid(length: number = 6): string {
 	return res;
 }
 
+export function isBoolean(value: unknown): value is boolean {
+	return typeof value === 'boolean';
+}
+
 export function clone<T>(object: T): T {
 	// tslint:disable-next-line:no-any
 	const o = object as any;

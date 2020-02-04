@@ -54,17 +54,36 @@ chart.applyOptions({
 
 Preferred date format can be set using the `dateFormat` property of the `localization` option. The following date formats are available:
 
+- `'yy MMM dd` - `'18 Jun 25`
+- `'yy MMMM dd` - `'18 June 25`
+- `yyyy MMM dd` - `2018 Jun 25`
+- `yyyy MMMM dd` - `2018 June 25`
 - `dd MMM 'yy` - `25 Jun '18` _(default)_
+- `dd MMMM 'yy` - `25 June '18`
+- `dd MMM yyyy` - `25 Jun 2018`
+- `dd MMMM yyyy` - `25 June 2018`
+- `MMM dd, 'yy` - `Jun 25, '18`
+- `MMMM dd, 'yy` - `June 25, '18`
+- `MMM dd, yyyy` - `Jun 25, 2018`
+- `MMMM dd, yyyy` - `June 25, 2018`
 - `yyyy-MM-dd` - `2018-06-25`
 - `yy-MM-dd` - `18-06-25`
 - `yy/MM/dd` - `18/06/25`
 - `yyyy/MM/dd` - `2018/06/25`
+- `yy.MM.dd` - `18.06.25`
+- `yyyy.MM.dd` - `2018.06.25`
 - `dd-MM-yyyy` - `25-06-2018`
 - `dd-MM-yy` - `25-06-18`
 - `dd/MM/yy` - `25/06/18`
 - `dd/MM/yyyy` - `25/06/2018`
+- `dd.MM.yy` - `25.06.18`
+- `dd.MM.yyyy` - `25.06.2018`
+- `MM-dd-yy` - `06-25-18`
+- `MM-dd-yyyy` - `06-25-2018`
 - `MM/dd/yy` - `06/25/18`
 - `MM/dd/yyyy` - `06/25/2018`
+- `MM.dd.yy` - `06.25.18`
+- `MM.dd.yyyy` - `06.25.2018`
 
 ```javascript
 const chart = createChart(document.body, {
@@ -315,6 +334,8 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 |`horzTouchDrag`|`boolean`|`true`|If true, the chart handles horizontal pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger|
 |`vertTouchDrag`|`boolean`|`true`|If true, the chart handles vertical pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger.|
 
+Also you can set `handleScroll` to `true` or `false` to enable or disable all options correspondingly.
+
 ### Scaling options
 
 |Name                        |Type   |Default  |Description|
@@ -323,6 +344,8 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 |`axisDoubleClickReset`|`boolean`|`true`|If true, left mouse button double click axis resetting is allowed|
 |`mouseWheel`|`boolean`|`true`|If true, series scaling with a mouse wheel is enabled|
 |`pinch`|`boolean`|`true`|If true, series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
+
+Also you can set `handleScale` to `true` or `false` to enable or disable all options correspondingly.
 
 ### An example of a scrolling/scaling customization
 
@@ -337,6 +360,11 @@ chart.applyOptions({
         mouseWheel: true,
         pinch: true,
     },
+});
+
+chart.applyOptions({
+    handleScroll: true,
+    handleScale: false,
 });
 ```
 
