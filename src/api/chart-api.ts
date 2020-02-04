@@ -73,7 +73,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		// tslint:disable-next-line:deprecation
 		if (options.priceScale.position) {
 			options = clone(options);
-			// tslint:disable-next-line: deprecation
+			// tslint:disable-next-line:deprecation
 			options.leftPriceScale.visible = options.priceScale.position === 'left';
 			// tslint:disable-next-line: deprecation
 			options.rightPriceScale.visible = options.priceScale.position === 'right';
