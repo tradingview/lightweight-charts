@@ -29,7 +29,7 @@ export class Pane implements IDestroyable {
 	private readonly _model: ChartModel;
 
 	private _dataSources: IDataSource[] = [];
-	private _overlaySources: Map<string, IDataSource[]> = new Map();
+	private _overlaySourcesByScaleId: Map<string, IDataSource[]> = new Map();
 
 	private _height: number = 0;
 	private _width: number = 0;
@@ -76,8 +76,8 @@ export class Pane implements IDestroyable {
 				return this._rightPriceScale;
 			}
 		}
-		if (this._overlaySources.has(id)) {
-			return ensureDefined(this._overlaySources.get(id))[0].priceScale();
+		if (this._overlaySourcesByScaleId.has(id)) {
+			return ensureDefined(this._overlaySourcesByScaleId.get(id))[0].priceScale();
 		}
 		return null;
 	}
@@ -125,7 +125,7 @@ export class Pane implements IDestroyable {
 	public generateUniquePriceScaleId(): string {
 		while (true) {
 			const newId = uid();
-			if (!this._overlaySources.has(newId)) {
+			if (!this._overlaySourcesByScaleId.has(newId)) {
 				return newId;
 			}
 		}
@@ -203,13 +203,13 @@ export class Pane implements IDestroyable {
 		}
 
 		const priceScaleId = ensureNotNull(source.priceScale()).id();
-		if (this._overlaySources.has(priceScaleId)) {
-			const overlaySources = ensureDefined(this._overlaySources.get(priceScaleId));
+		if (this._overlaySourcesByScaleId.has(priceScaleId)) {
+			const overlaySources = ensureDefined(this._overlaySourcesByScaleId.get(priceScaleId));
 			const overlayIndex = overlaySources.indexOf(source);
 			if (overlayIndex !== -1) {
 				overlaySources.splice(overlayIndex, 1);
 				if (overlaySources.length === 0) {
-					this._overlaySources.delete(priceScaleId);
+					this._overlaySourcesByScaleId.delete(priceScaleId);
 				}
 			}
 		}
@@ -314,7 +314,7 @@ export class Pane implements IDestroyable {
 
 		// Every Pane MUST have a price scale! This is mostly a fix of broken charts with empty panes...
 		if (res === null) {
-			res = this._rightPriceScale;
+			res = this._model.options().rightPriceScale.visible ? this._rightPriceScale : this._leftPriceScale;
 		}
 
 		return res;
@@ -433,9 +433,9 @@ export class Pane implements IDestroyable {
 
 		this._dataSources.push(source);
 		if (priceScaleId !== 'left' && priceScaleId !== 'right') {
-			const overlaySources = this._overlaySources.get('priceScaleId') || [];
+			const overlaySources = this._overlaySourcesByScaleId.get(priceScaleId) || [];
 			overlaySources.push(source);
-			this._overlaySources.set(priceScaleId, overlaySources);
+			this._overlaySourcesByScaleId.set(priceScaleId, overlaySources);
 		}
 
 		priceScale.addDataSource(source);
@@ -470,9 +470,9 @@ export class Pane implements IDestroyable {
 				}
 			}
 			// then check overlay sources
-			const values = Array.from(this._overlaySources.values());
-			for (const array of values) {
-				for (const source of array) {
+			const values = Array.from(this._overlaySourcesByScaleId.values());
+			for (const sources of values) {
+				for (const source of sources) {
 					if (source instanceof PriceDataSource) {
 						this._setMainSource(source);
 						return;

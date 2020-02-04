@@ -364,15 +364,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 	}
 
-	public isOverlay(): boolean {
-		const pane = ensureNotNull(this.model().paneForSource(this));
-		return this.priceScale() !== pane.leftPriceScale() && this.priceScale() !== pane.rightPriceScale();
-	}
-
 	public paneViews(): ReadonlyArray<IPaneView> {
 		const res: IPaneView[] = [];
 
-		if (!this.isOverlay()) {
+		if (!this._isOverlay()) {
 			res.push(this._baseHorizontalLineView);
 		}
 
