@@ -651,13 +651,15 @@ export class ChartModel implements IDestroyable {
 		const series = new Series<T>(this, options, seriesType);
 
 		let targetScaleId: string;
-		if (options.priceScaleId) {
-			targetScaleId = options.priceScaleId;
-		// tslint:disable-next-line: deprecation
-		} else if (!options.overlay) {
-			targetScaleId = this._options.rightPriceScale.visible ? 'right' : 'left';
-		} else {
+			// tslint:disable-next-line: deprecation
+		if (options.priceScaleId === '' || options.overlay) {
 			targetScaleId = pane.generateUniquePriceScaleId();
+		} else {
+			if (options.priceScaleId) {
+				targetScaleId = options.priceScaleId;
+			} else {
+				targetScaleId = this._options.rightPriceScale.visible ? 'right' : 'left';
+			}
 		}
 		// tslint:disable-next-line: deprecation
 		pane.addDataSource(series, targetScaleId, false);
