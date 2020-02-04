@@ -57,7 +57,7 @@ const lineSeries = chart.addLineSeries({
 
 ### Binding to price scale
 
-When adding any series to a chart, you can specify if you want target series to be attached to a certain price axis - left or right. 
+When adding any series to a chart, you can specify if you want target series to be attached to a certain price axis - left or right.
 By default, series are attached to the right price axis.
 This means one can scale the series with price axis. Note that price axis visible range depends on series values.
 
