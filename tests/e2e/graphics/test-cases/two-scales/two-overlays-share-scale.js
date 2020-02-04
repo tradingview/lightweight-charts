@@ -24,7 +24,7 @@ function generateData() {
 	return res;
 }
 
-function generateDataHist() {
+function generateDataLine(offset) {
 	var colors = [
 		'#013370',
 		'#3a9656',
@@ -36,7 +36,7 @@ function generateDataHist() {
 	for (var i = 0; i < 500; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
-			value: i,
+			value: (offset || 0) + i,
 			color: colors[i % colors.length],
 		});
 
@@ -48,9 +48,6 @@ function generateDataHist() {
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container, {
-		leftPriceScale: {
-			visible: 'true',
-		},
 	});
 
 	var mainSeries = chart.addBarSeries({
@@ -63,18 +60,23 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	var histSeries = chart.addHistogramSeries({
+	var lineSeires1 = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,
 		priceLineStyle: 3,
-		priceScaleId: 'left',
-		scaleMargins: {
-			top: 0.75,
-			bottom: 0,
-		},
+		priceScaleId: 'my_overlay',
 	});
 
-	histSeries.setData(generateDataHist());
-}
+	lineSeires1.setData(generateDataLine());
 
+	var lineSeires2 = chart.addLineSeries({
+		lineWidth: 1,
+		color: '#0000ff',
+		priceLineWidth: 1,
+		priceLineStyle: 3,
+		priceScaleId: 'my_overlay',
+	});
+
+	lineSeires2.setData(generateDataLine(50));
+}

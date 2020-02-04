@@ -76,5 +76,9 @@ function runTestCase(container) {
 	});
 
 	histSeries.setData(generateDataHist());
+
+	chart.priceScale('left').applyOptions({
+		mode: 2,	// percent
+	});
 }
 
