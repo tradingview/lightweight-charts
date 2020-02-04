@@ -127,9 +127,9 @@ export class MouseEventHandler implements IDestroyable {
 		{
 			const boundMouseMoveHandler = this._mouseMoveHandler.bind(this);
 			this._unsubscribeMousemove = () => {
-				this._target.removeEventListener('pointermove', boundMouseMoveHandler);
+				this._target.removeEventListener('mousemove', boundMouseMoveHandler);
 			};
-			this._target.addEventListener('pointermove', boundMouseMoveHandler);
+			this._target.addEventListener('mousemove', boundMouseMoveHandler);
 		}
 
 		if (isTouchEvent(enterEvent)) {
