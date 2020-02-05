@@ -1,5 +1,5 @@
 import { TextWidthCache } from '../model/text-width-cache';
-import { LineStyle, LineWidth } from '../renderers/draw-line';
+import { LineWidth } from '../renderers/draw-line';
 
 export interface PriceAxisViewRendererCommonData {
 	activeBackground?: string;
@@ -16,7 +16,6 @@ export interface PriceAxisViewRendererData {
 	tickVisible: boolean;
 	borderVisible: boolean;
 	lineWidth?: LineWidth;
-	lineStyle: LineStyle;
 }
 
 export interface PriceAxisViewRendererOptions {

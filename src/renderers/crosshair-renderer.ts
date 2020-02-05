@@ -43,6 +43,8 @@ export class CrosshairRenderer implements IPaneRenderer {
 		const w = Math.ceil(this._data.w * pixelRatio);
 		const h = Math.ceil(this._data.h * pixelRatio);
 
+		ctx.lineCap = 'butt';
+
 		if (vertLinesVisible && x >= 0) {
 			ctx.lineWidth = Math.floor(this._data.vertLine.lineWidth * pixelRatio);
 			ctx.strokeStyle = this._data.vertLine.color;

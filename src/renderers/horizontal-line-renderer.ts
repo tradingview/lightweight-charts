@@ -37,11 +37,10 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 		}
 
 		const width = Math.ceil(this._data.width * pixelRatio);
-		ctx.lineCap = 'square';
+		ctx.lineCap = 'butt';
 		ctx.strokeStyle = this._data.color;
 		ctx.lineWidth = Math.floor(this._data.lineWidth * pixelRatio);
 		setLineStyle(ctx, this._data.lineStyle);
-
-		drawHorizontalLine(ctx, y, -ctx.lineWidth, width + ctx.lineWidth);
+		drawHorizontalLine(ctx, y, 0, width);
 	}
 }
