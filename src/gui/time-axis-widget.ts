@@ -279,7 +279,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 			ctx.fillStyle = this._lineColor();
 
-			const borderSize = Math.floor(this._getRendererOptions().borderSize * pixelRatio);
+			const borderSize = Math.max(1, Math.floor(this._getRendererOptions().borderSize * pixelRatio));
 
 			ctx.fillRect(0, 0, Math.ceil(this._size.w * pixelRatio), borderSize);
 			ctx.restore();
