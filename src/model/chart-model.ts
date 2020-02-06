@@ -127,7 +127,7 @@ export class ChartModel implements IDestroyable {
 
 		this.createPane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
-		this._panes[0].addDataSource(this._watermark, 'overlay', false);
+		this._panes[0].addDataSource(this._watermark, '', false);
 	}
 
 	public fullUpdate(): void {

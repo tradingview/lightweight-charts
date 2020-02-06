@@ -2,7 +2,7 @@ import { assert, ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { DeepPartial, uid } from '../helpers/strict-type-checks';
+import { clone, DeepPartial, uid } from '../helpers/strict-type-checks';
 
 import { ChartModel, ChartOptions } from './chart-model';
 import { IDataSource } from './idata-source';
@@ -492,7 +492,7 @@ export class Pane implements IDestroyable {
 	private _createPriceScale(id: string, options: PriceScaleOptions): PriceScale {
 		const priceScale = new PriceScale(
 			id,
-			options,
+			clone(options),
 			this._model.options().layout,
 			this._model.options().localization
 		);
