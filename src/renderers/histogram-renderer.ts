@@ -118,7 +118,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 			minWidth = Math.min(width, minWidth);
 		}
 
-		if (minWidth < alignToMinimalWidthLimit) {
+		if (spacing > 0 && minWidth < alignToMinimalWidthLimit) {
 			for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 				const current = this._precalculatedCache[i - this._data.visibleRange.from];
 				const width = current.right - current.left + 1;
