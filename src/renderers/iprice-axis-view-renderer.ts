@@ -16,6 +16,7 @@ export interface PriceAxisViewRendererData {
 	tickVisible: boolean;
 	borderVisible: boolean;
 	lineWidth?: LineWidth;
+	offset: number;
 }
 
 export interface PriceAxisViewRendererOptions {

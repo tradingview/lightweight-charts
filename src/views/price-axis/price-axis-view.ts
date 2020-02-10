@@ -11,6 +11,10 @@ import { PriceAxisViewRenderer } from '../../renderers/price-axis-view-renderer'
 
 import { IPriceAxisView } from './iprice-axis-view';
 
+const enum Constants {
+	DefaultPanePriceAxisViewOffset = 1,
+}
+
 export abstract class PriceAxisView implements IPriceAxisView {
 	private readonly _commonRendererData: PriceAxisViewRendererCommonData = {
 		coordinate: 0,
@@ -23,6 +27,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		visible: false,
 		tickVisible: true,
 		borderVisible: true,
+		offset: 0,
 	};
 
 	private readonly _paneRendererData: PriceAxisViewRendererData = {
@@ -30,6 +35,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		visible: false,
 		tickVisible: false,
 		borderVisible: false,
+		offset: Constants.DefaultPanePriceAxisViewOffset,
 	};
 
 	private readonly _axisRenderer: IPriceAxisViewRenderer;

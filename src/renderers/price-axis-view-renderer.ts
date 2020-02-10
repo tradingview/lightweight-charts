@@ -61,6 +61,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const alignRight = align === 'right';
 
 		const xInside = alignRight ? width : 0;
+		const rightScaled = Math.round(width * pixelRatio);
 
 		let xOutside = xInside;
 		let xTick: number;
@@ -91,12 +92,20 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xText = xInside + horzBorder + tickSize + paddingInner;
 			}
 
-			const xInsideScaled = Math.round(xInside * pixelRatio);
+			const offsetScaled = Math.floor(this._data.offset * pixelRatio);
+			const xInsideScaled = alignRight ? rightScaled - offsetScaled : offsetScaled;
 			const yTopScaled = Math.round(yTop * pixelRatio);
 			const xOutsideScaled = Math.round(xOutside * pixelRatio);
 			const yBottomScaled = Math.round(yBottom * pixelRatio);
 			const yMidScaled = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
 			const xTickScaled = Math.round(xTick * pixelRatio);
+
+			ctx.save();
+/*			if (alignRight) {
+				ctx.translate(-offsetScaled, 0);
+			} else {
+				ctx.translate(offsetScaled, 0);
+			}*/
 
 			ctx.beginPath();
 			ctx.moveTo(xInsideScaled, yTopScaled);
@@ -117,6 +126,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			drawScaled(ctx, pixelRatio, () => {
 				ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
 			});
+			ctx.restore();
 		}
 	}
 
