@@ -117,7 +117,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 			if (this._data.offset > 0) {
 				// draw border
-				ctx.fillStyle = this._commonData.color;
+				ctx.fillStyle = this._commonData.paneBackground;
 				ctx.fillRect(alignRight ? rightScaled - offsetScaled : 0, yTopScaled, offsetScaled, yBottomScaled - yTopScaled + 1);
 			}
 

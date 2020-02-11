@@ -8,6 +8,7 @@ export interface PriceAxisViewRendererCommonData {
 	color: string;
 	coordinate: number;
 	fixedCoordinate?: number;
+	paneBackground: string;
 }
 
 export interface PriceAxisViewRendererData {

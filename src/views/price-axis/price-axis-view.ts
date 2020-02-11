@@ -20,6 +20,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		coordinate: 0,
 		color: '#FFF',
 		background: '#000',
+		paneBackground: '#000',
 	};
 
 	private readonly _axisRendererData: PriceAxisViewRendererData = {
