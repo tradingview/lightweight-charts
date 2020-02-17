@@ -16,6 +16,7 @@ import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consume
 import { convertTime } from './data-layer';
 import { IPriceLine } from './iprice-line';
 import { IPriceFormatter, ISeriesApi } from './iseries-api';
+import { TimeRange } from './itime-scale-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
@@ -90,5 +91,19 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public removePriceLine(line: IPriceLine): void {
 		this._series.removePriceLine((line as PriceLine).priceLine());
+	}
+
+	public getDataRange(): TimeRange | null {
+		const firstData = this._series.data().bars().first();
+		const lastData = this._series.data().bars().last();
+
+		if (firstData && lastData) {
+			return {
+				from: firstData.time.businessDay ? firstData.time.businessDay : firstData.time.timestamp,
+				to: lastData.time.businessDay ? lastData.time.businessDay : lastData.time.timestamp,
+			};
+		} else {
+			return null;
+		}
 	}
 }

@@ -10,6 +10,7 @@ import {
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
+import { TimeRange } from './itime-scale-api';
 
 /** Interface to be implemented by the object in order to be used as a price formatter */
 export interface IPriceFormatter {
@@ -84,4 +85,10 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * @param line to remove
 	 */
 	removePriceLine(line: IPriceLine): void;
+
+	/**
+	 * Returns current series data time range
+	 * @returns range from current series data or null if series has no data
+	 */
+	getDataRange(): TimeRange | null;
 }
