@@ -169,6 +169,12 @@ export interface SeriesOptionsCommon {
 
 	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
 	priceLineVisible: boolean;
+	/**
+	 *  Enum of possible modes of priceLine source
+	 * 'lastBar' use the last bar data
+	 * 'lastVisible' use the last visible bar in viewport
+	 */
+	priceLineSource: 'lastBar' | 'lastVisible';
 	/** Width of the price line. Ignored if priceLineVisible is false */
 	priceLineWidth: LineWidth;
 	/** Color of the price line. Ignored if priceLineVisible is false */
