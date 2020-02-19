@@ -143,6 +143,11 @@ export const enum PriceAxisLastValueMode {
 	LastValueAccordingToScale,
 }
 
+export const enum PriceLineSource {
+	GlobalLast,
+	LocalLast,
+}
+
 export interface OverlaySeriesSpecificOptions {
 	overlay: true;
 	scaleMargins?: PriceScaleMargins;
@@ -174,7 +179,7 @@ export interface SeriesOptionsCommon {
 	 * 'lastBar' use the last bar data
 	 * 'lastVisible' use the last visible bar in viewport
 	 */
-	priceLineSource: 'lastBar' | 'lastVisible';
+	priceLineSource: PriceLineSource;
 	/** Width of the price line. Ignored if priceLineVisible is false */
 	priceLineWidth: LineWidth;
 	/** Color of the price line. Ignored if priceLineVisible is false */
