@@ -35,7 +35,10 @@ export class PaneRendererBars implements IPaneRenderer {
 
 		this._barWidth = Math.max(1, Math.floor(optimalBarWidth(this._data.barSpacing, pixelRatio)));
 
-		// if we have enough pixels between candles
+		// grid and crosshair have line width = Math.floor(pixelRatio)
+		// if this value is odd, we have to make bars' width odd
+		// if this value is even, we have to make bars' width even
+		// in order of keeping crosshair-over-bar drawing symmetric
 		if (this._barWidth >= 2) {
 			const lineWidth = Math.floor(pixelRatio);
 			if ((lineWidth % 2) !== (this._barWidth % 2)) {

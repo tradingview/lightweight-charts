@@ -59,6 +59,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 	// tslint:disable-next-line: cyclomatic-complexity
 	private _fillPrecalculatedCache(pixelRatio: number): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
+			this._precalculatedCache = [];
 			return;
 		}
 		const spacing = Math.ceil(this._data.barSpacing * pixelRatio) <= showSpacingMinimalBarWidth ? 0 : Math.max(1, Math.floor(pixelRatio));
@@ -131,6 +132,5 @@ export class PaneRendererHistogram implements IPaneRenderer {
 				}
 			}
 		}
-
 	}
 }

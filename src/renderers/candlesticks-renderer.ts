@@ -44,7 +44,11 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 
 		// now we know pixelRatio and we could calculate barWidth effectively
 		this._barWidth = optimalCandlestickWidth(this._data.barSpacing, pixelRatio);
-		// if we have enough pixels between candles
+
+		// grid and crosshair have line width = Math.floor(pixelRatio)
+		// if this value is odd, we have to make candlesticks' width odd
+		// if this value is even, we have to make candlesticks' width even
+		// in order of keeping crosshair-over-candlesticks drawing symmetric
 		if (this._barWidth >= 2) {
 			const wickWidth = Math.floor(pixelRatio);
 			if ((wickWidth % 2) !== (this._barWidth % 2)) {

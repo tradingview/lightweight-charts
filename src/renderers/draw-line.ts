@@ -65,3 +65,12 @@ export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: 
 	ctx.lineTo(x + correction, bottom);
 	ctx.stroke();
 }
+
+export function strokeInPixel(ctx: CanvasRenderingContext2D, drawFunction: () => void): void {
+	ctx.save();
+	if (ctx.lineWidth % 2) {
+		ctx.translate(0.5, 0.5);
+	}
+	drawFunction();
+	ctx.restore();
+}

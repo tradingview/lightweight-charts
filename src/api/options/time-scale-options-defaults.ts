@@ -11,5 +11,4 @@ export const timeScaleOptionsDefaults: TimeScaleOptions = {
 	visible: true,
 	timeVisible: false,
 	secondsVisible: true,
-	smoothZoom: true,
 };

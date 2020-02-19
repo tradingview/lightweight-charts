@@ -4,7 +4,7 @@ import { ensureDefined } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
-import { even } from '../helpers/mathex';
+import { ceiledEven } from '../helpers/mathex';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
@@ -70,8 +70,8 @@ export class LabelsImageCache implements IDestroyable {
 			const margin = Math.ceil(this._fontSize / 4.5);
 			const baselineOffset = Math.round(this._fontSize / 10);
 			const textWidth = Math.ceil(this._textWidthCache.measureText(ctx, text));
-			const width = even(Math.round(textWidth + margin * 2));
-			const height = even(this._fontSize + margin * 2);
+			const width = ceiledEven(Math.round(textWidth + margin * 2));
+			const height = ceiledEven(this._fontSize + margin * 2);
 			const canvas = createPreconfiguredCanvas(document, new Size(width, height));
 
 			// Allocate new

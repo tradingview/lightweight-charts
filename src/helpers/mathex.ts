@@ -47,6 +47,12 @@ export function min(arr: number[]): number {
 	return minVal;
 }
 
-export function even(x: number): number {
-	return (x % 2) ? x + 1 : x;
+export function ceiledEven(x: number): number {
+	const ceiled = Math.ceil(x);
+	return (ceiled % 2 !== 0) ? ceiled - 1 : ceiled;
+}
+
+export function ceiledOdd(x: number): number {
+	const ceiled = Math.ceil(x);
+	return (ceiled % 2 === 0) ? ceiled - 1 : ceiled;
 }
