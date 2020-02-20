@@ -159,6 +159,7 @@ You can set the width, style and color of this line or disable it using the foll
 |Name|Type|Default|Description|
 |----|----|-------|-|
 |`priceLineVisible`|`boolean`|`true`|If true, a series' price line is displayed on a chart|
+|`priceLineSource`|[PriceLineSource](./constants.md#pricelinesource)|`PriceLineSource.LastBar`|Source used for price line value|
 |`priceLineWidth`|`number`|`1`|Price line's width in pixels|
 |`priceLineColor`|`string`|`''`|Price line's color|
 |`priceLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Dotted`|Price line's style|

@@ -4,6 +4,7 @@ import {
 	CandlestickStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
+	PriceLineSource,
 	SeriesOptionsCommon,
 } from '../../model/series-options';
 import { LineStyle, LineType } from '../../renderers/draw-line';
@@ -57,6 +58,7 @@ export const seriesOptionsDefaults: SeriesOptionsCommon = {
 	title: '',
 	lastValueVisible: true,
 	priceLineVisible: true,
+	priceLineSource: PriceLineSource.LastBar,
 	priceLineWidth: 1,
 	priceLineColor: '',
 	priceLineStyle: LineStyle.Dashed,

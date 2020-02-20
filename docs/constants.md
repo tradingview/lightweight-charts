@@ -59,3 +59,17 @@ It has the following values:
 - `CrosshairMode.Normal` - normal mode of the crosshair.
 
     Crosshair moves freely on the chart.
+
+## PriceLineSource
+
+`PriceLineSource` enum is used to specify the source used for value of series price line.
+
+It has the following values:
+
+- `LastBar`
+
+    Use last bar data.
+
+- `LastVisible`
+
+    Use last visible data in chart viewport.

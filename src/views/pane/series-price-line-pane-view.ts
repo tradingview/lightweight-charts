@@ -1,4 +1,5 @@
 import { Series } from '../../model/series';
+import { PriceLineSource } from '../../model/series-options';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';
 
@@ -16,7 +17,7 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 			return;
 		}
 
-		const lastValueData = this._series.lastValueData(undefined, true);
+		const lastValueData = this._series.lastValueData(undefined, seriesOptions.priceLineSource === PriceLineSource.LastBar);
 		if (lastValueData.noData) {
 			return;
 		}
