@@ -144,7 +144,13 @@ export const enum PriceAxisLastValueMode {
 }
 
 export const enum PriceLineSource {
+	/**
+	 * The last bar data
+	 */
 	LastBar,
+	/**
+	 * The last visible bar in viewport
+	 */
 	LastVisible,
 }
 

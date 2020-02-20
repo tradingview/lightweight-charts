@@ -20,5 +20,5 @@ function runTestCase(container) {
 
 	series.setData(generateData());
 
-	chart.timeScale().scrollToPosition(-100);
+	chart.timeScale().scrollToPosition(-10);
 }
