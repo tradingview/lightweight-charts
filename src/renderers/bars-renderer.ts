@@ -26,8 +26,6 @@ export class PaneRendererBars implements IPaneRenderer {
 
 	public setData(data: PaneRendererBarsData): void {
 		this._data = data;
-		this._barWidth = optimalBarWidth(data.barSpacing);
-		this._barLineWidth = data.thinBars ? 1 : Math.max(1, Math.round(this._barWidth));
 	}
 
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
@@ -35,6 +33,21 @@ export class PaneRendererBars implements IPaneRenderer {
 			return;
 		}
 
+		this._barWidth = Math.max(1, Math.floor(optimalBarWidth(this._data.barSpacing, pixelRatio)));
+
+		// grid and crosshair have line width = Math.floor(pixelRatio)
+		// if this value is odd, we have to make bars' width odd
+		// if this value is even, we have to make bars' width even
+		// in order of keeping crosshair-over-bar drawing symmetric
+		if (this._barWidth >= 2) {
+			const lineWidth = Math.floor(pixelRatio);
+			if ((lineWidth % 2) !== (this._barWidth % 2)) {
+				this._barWidth--;
+			}
+		}
+
+		// if scale is compressed, bar could become less than 1 CSS pixel
+		this._barLineWidth = this._data.thinBars ? Math.min(this._barWidth, Math.floor(pixelRatio)) : this._barWidth;
 		let prevColor: string | null = null;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
@@ -44,13 +57,18 @@ export class PaneRendererBars implements IPaneRenderer {
 				prevColor = bar.color;
 			}
 
-			const bodyLeft = Math.round((bar.x - this._barLineWidth / 2) * pixelRatio);
-			const bodyWidth = Math.round(this._barLineWidth * pixelRatio);
-			const bodyWidthHalf = Math.round(this._barLineWidth * pixelRatio * 0.5);
+			const bodyWidthHalf = Math.floor(this._barLineWidth * 0.5);
 
-			const bodyTop = Math.round(bar.highY * pixelRatio);
-			const bodyHeight = Math.round((bar.lowY - bar.highY + 1) * pixelRatio);
-			const bodyBottom = bodyTop + bodyHeight - 1;
+			const bodyCenter = Math.round(bar.x * pixelRatio);
+			const bodyLeft =  bodyCenter - bodyWidthHalf;
+			const bodyWidth = this._barLineWidth;
+			const bodyRight = bodyLeft + bodyWidth - 1;
+
+			const bodyTop = Math.round(bar.highY * pixelRatio) - bodyWidthHalf;
+
+			const bodyBottom = Math.round(bar.lowY * pixelRatio) + bodyWidthHalf;
+
+			const bodyHeight = Math.max((bodyBottom - bodyTop), this._barLineWidth);
 
 			ctx.fillRect(
 				bodyLeft,
@@ -59,11 +77,17 @@ export class PaneRendererBars implements IPaneRenderer {
 				bodyHeight
 			);
 
-			if (this._barLineWidth < (this._data.barSpacing - 1)) {
+			const sideWidth = Math.ceil(this._barWidth * 1.5);
+
+			if (this._barLineWidth <= this._barWidth) {
 				if (this._data.openVisible) {
-					const openLeft = Math.round(bodyLeft - this._barLineWidth);
-					const openTop = Math.max(Math.round(bar.openY * pixelRatio) - bodyWidthHalf, bodyTop);
-					const openBottom = Math.min(openTop + bodyWidthHalf * 2, bodyBottom);
+					const openLeft = bodyCenter - sideWidth;
+					let openTop = Math.max(bodyTop, Math.round(bar.openY * pixelRatio) - bodyWidthHalf);
+					let openBottom = openTop + bodyWidth - 1;
+					if (openBottom > bodyTop + bodyHeight - 1) {
+						openBottom = bodyTop + bodyHeight - 1;
+						openTop = openBottom - bodyWidth + 1;
+					}
 					ctx.fillRect(
 						openLeft,
 						openTop,
@@ -72,14 +96,18 @@ export class PaneRendererBars implements IPaneRenderer {
 					);
 				}
 
-				const closeLeft = bodyLeft + bodyWidth;
-				const closeTop = Math.max(Math.round(bar.closeY * pixelRatio) - bodyWidthHalf, bodyTop);
-				const closeBottom = Math.min(closeTop + bodyWidthHalf * 2, bodyBottom);
+				const closeRight = bodyCenter + sideWidth;
+				let closeTop = Math.max(bodyTop, Math.round(bar.closeY * pixelRatio) - bodyWidthHalf);
+				let closeBottom = closeTop + bodyWidth - 1;
+				if (closeBottom > bodyTop + bodyHeight - 1) {
+					closeBottom = bodyTop + bodyHeight - 1;
+					closeTop = closeBottom - bodyWidth + 1;
+				}
 
 				ctx.fillRect(
-					closeLeft,
+					bodyRight + 1,
 					closeTop,
-					bodyWidth,
+					closeRight - bodyRight,
 					closeBottom - closeTop + 1
 				);
 			}

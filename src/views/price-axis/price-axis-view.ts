@@ -1,6 +1,5 @@
 import { generateTextColor } from '../../helpers/color';
 
-import { LineStyle } from '../../renderers/draw-line';
 import {
 	IPriceAxisViewRenderer,
 	IPriceAxisViewRendererConstructor,
@@ -23,16 +22,14 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		text: '',
 		visible: false,
 		tickVisible: true,
-		borderVisible: true,
-		lineStyle: LineStyle.Dotted,
+		borderColor: '',
 	};
 
 	private readonly _paneRendererData: PriceAxisViewRendererData = {
 		text: '',
 		visible: false,
 		tickVisible: false,
-		borderVisible: false,
-		lineStyle: LineStyle.Dotted,
+		borderColor: '',
 	};
 
 	private readonly _axisRenderer: IPriceAxisViewRenderer;
@@ -59,11 +56,6 @@ export abstract class PriceAxisView implements IPriceAxisView {
 	public coordinate(): number {
 		this._updateRendererDataIfNeeded();
 		return this._commonRendererData.coordinate;
-	}
-
-	public floatCoordinate(): number {
-		this._updateRendererDataIfNeeded();
-		return this._commonRendererData.floatCoordinate || this._commonRendererData.coordinate;
 	}
 
 	public update(): void {

@@ -1,13 +1,11 @@
 import { TextWidthCache } from '../model/text-width-cache';
-import { LineStyle, LineWidth } from '../renderers/draw-line';
+import { LineWidth } from '../renderers/draw-line';
 
 export interface PriceAxisViewRendererCommonData {
 	activeBackground?: string;
 	background: string;
-	borderColor?: string;
 	color: string;
 	coordinate: number;
-	floatCoordinate?: number;
 	fixedCoordinate?: number;
 }
 
@@ -15,9 +13,8 @@ export interface PriceAxisViewRendererData {
 	visible: boolean;
 	text: string;
 	tickVisible: boolean;
-	borderVisible: boolean;
+	borderColor: string;
 	lineWidth?: LineWidth;
-	lineStyle: LineStyle;
 }
 
 export interface PriceAxisViewRendererOptions {

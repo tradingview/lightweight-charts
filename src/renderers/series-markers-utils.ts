@@ -1,4 +1,5 @@
 import { ensureNever } from '../helpers/assertions';
+import { ceiledEven, ceiledOdd } from '../helpers/mathex';
 
 import { SeriesMarkerShape } from '../model/series-markers';
 
@@ -10,7 +11,7 @@ const enum Constants {
 
 export function size(barSpacing: number, coeff: number): number {
 	const result = Math.min(Math.max(barSpacing, Constants.MinShapeSize), Constants.MaxShapeSize) * coeff;
-	return ceilToOdd(result);
+	return ceiledOdd(result);
 }
 
 export function shapeSize(shape: SeriesMarkerShape, originalSize: number): number {
@@ -27,18 +28,8 @@ export function shapeSize(shape: SeriesMarkerShape, originalSize: number): numbe
 	ensureNever(shape);
 }
 
-export function ceilToEven(x: number): number {
-	const ceiled = Math.ceil(x);
-	return (ceiled % 2 !== 0) ? ceiled - 1 : ceiled;
-}
-
-export function ceilToOdd(x: number): number {
-	const ceiled = Math.ceil(x);
-	return (ceiled % 2 === 0) ? ceiled - 1 : ceiled;
-}
-
 export function calculateShapeHeight(barSpacing: number): number {
-	return ceilToEven(size(barSpacing, 1));
+	return ceiledEven(size(barSpacing, 1));
 }
 
 export function shapeMargin(barSpacing: number): number {

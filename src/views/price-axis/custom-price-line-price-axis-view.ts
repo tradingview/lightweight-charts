@@ -44,7 +44,6 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 
 		commonData.background = options.color;
 		commonData.color = generateTextColor(options.color);
-		commonData.coordinate = Math.round(y);
-		commonData.floatCoordinate = y;
+		commonData.coordinate = y;
 	}
 }

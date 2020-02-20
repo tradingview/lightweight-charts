@@ -505,9 +505,7 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		const topCtx = getContext2D(this._topCanvasBinding.canvas);
-		drawScaled(topCtx, this._topCanvasBinding.pixelRatio, () => {
-			topCtx.clearRect(0, 0, this._size.w, this._size.h);
-		});
+		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
 	}
 

@@ -32,7 +32,7 @@ export class PaneRendererArea extends ScaledRenderer {
 			return;
 		}
 
-		ctx.lineCap = 'square';
+		ctx.lineCap = 'butt';
 		ctx.strokeStyle = this._data.lineColor;
 		ctx.lineWidth = this._data.lineWidth;
 		setLineStyle(ctx, this._data.lineStyle);

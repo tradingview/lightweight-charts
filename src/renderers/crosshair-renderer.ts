@@ -43,8 +43,10 @@ export class CrosshairRenderer implements IPaneRenderer {
 		const w = Math.ceil(this._data.w * pixelRatio);
 		const h = Math.ceil(this._data.h * pixelRatio);
 
+		ctx.lineCap = 'butt';
+
 		if (vertLinesVisible && x >= 0) {
-			ctx.lineWidth = this._data.vertLine.lineWidth;
+			ctx.lineWidth = Math.floor(this._data.vertLine.lineWidth * pixelRatio);
 			ctx.strokeStyle = this._data.vertLine.color;
 			ctx.fillStyle = this._data.vertLine.color;
 			setLineStyle(ctx, this._data.vertLine.lineStyle);
@@ -52,7 +54,7 @@ export class CrosshairRenderer implements IPaneRenderer {
 		}
 
 		if (horzLinesVisible && y >= 0) {
-			ctx.lineWidth = this._data.horzLine.lineWidth;
+			ctx.lineWidth = Math.floor(this._data.horzLine.lineWidth * pixelRatio);
 			ctx.strokeStyle = this._data.horzLine.color;
 			ctx.fillStyle = this._data.horzLine.color;
 			setLineStyle(ctx, this._data.horzLine.lineStyle);

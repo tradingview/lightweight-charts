@@ -109,11 +109,11 @@ export class PriceTickMarkBuilder {
 			}
 
 			if (targetIndex < this._marks.length) {
-				this._marks[targetIndex].coord = Math.round(coord) as Coordinate;
+				this._marks[targetIndex].coord = coord as Coordinate;
 				this._marks[targetIndex].label = priceScale.formatLogical(logical);
 			} else {
 				this._marks.push({
-					coord: Math.round(coord) as Coordinate,
+					coord: coord as Coordinate,
 					label: priceScale.formatLogical(logical),
 				});
 			}

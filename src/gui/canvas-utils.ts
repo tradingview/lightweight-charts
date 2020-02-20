@@ -28,7 +28,8 @@ export function getContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2
 	// sometimes (very often) ctx getContext returns the same context every time
 	// and there might be previous transformation
 	// so let's reset it to be sure that everything is ok
-	ctx.resetTransform();
+	// do no use resetTransform to respect Edge
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
 	return ctx;
 }
 

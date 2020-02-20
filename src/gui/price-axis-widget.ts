@@ -421,11 +421,11 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.fillStyle = this.lineColor();
 
-		const borderSize = this.rendererOptions().borderSize;
+		const borderSize = Math.max(1, Math.floor(this.rendererOptions().borderSize * pixelRatio));
 
 		let left: number;
 		if (this._isLeft) {
-			left = Math.ceil(this._size.w * pixelRatio - borderSize - 1);
+			left = Math.floor(this._size.w * pixelRatio) - borderSize;
 		} else {
 			left = 0;
 		}
@@ -451,20 +451,22 @@ export class PriceAxisWidget implements IDestroyable {
 		const drawTicks = this._priceScale.options().borderVisible;
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor(this._size.w * pixelRatio) - rendererOptions.borderSize - rendererOptions.tickLength :
-			rendererOptions.borderSize;
+			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
+			Math.floor(rendererOptions.borderSize * pixelRatio);
 
 		const textLeftX = this._isLeft ?
-			tickMarkLeftX - rendererOptions.paddingInner :
-			tickMarkLeftX + rendererOptions.tickLength + rendererOptions.paddingInner;
+			Math.round(tickMarkLeftX - rendererOptions.paddingInner * pixelRatio) :
+			Math.round(tickMarkLeftX + rendererOptions.tickLength * pixelRatio + rendererOptions.paddingInner * pixelRatio);
 
 		const textAlign = this._isLeft ? 'right' : 'left';
+		const tickHeight = Math.max(1, Math.floor(pixelRatio));
+		const tickOffset = Math.floor(pixelRatio * 0.5);
 
 		if (drawTicks) {
 			const tickLength = Math.round(rendererOptions.tickLength * pixelRatio);
 			ctx.beginPath();
 			for (const tickMark of tickMarks) {
-				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * pixelRatio), tickLength, 1);
+				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * pixelRatio) - tickOffset, tickLength, tickHeight);
 			}
 
 			ctx.fill();
@@ -515,7 +517,7 @@ export class PriceAxisWidget implements IDestroyable {
 					}
 				});
 				if (mainSource === source && sourceViews.length > 0) {
-					center = sourceViews[0].floatCoordinate();
+					center = sourceViews[0].coordinate();
 				}
 			});
 		};
@@ -524,18 +526,18 @@ export class PriceAxisWidget implements IDestroyable {
 		updateForSources(orderedSources);
 
 		// split into two parts
-		const top = views.filter((view: IPriceAxisView) => view.floatCoordinate() <= center);
-		const bottom = views.filter((view: IPriceAxisView) => view.floatCoordinate() > center);
+		const top = views.filter((view: IPriceAxisView) => view.coordinate() <= center);
+		const bottom = views.filter((view: IPriceAxisView) => view.coordinate() > center);
 
 		// sort top from center to top
-		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.floatCoordinate() - l.floatCoordinate());
+		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.coordinate() - l.coordinate());
 
 		// share center label
 		if (top.length && bottom.length) {
 			bottom.push(top[0]);
 		}
 
-		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.floatCoordinate() - r.floatCoordinate());
+		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
 
 		views.forEach((view: IPriceAxisView) => view.setFixedCoordinate(view.coordinate()));
 

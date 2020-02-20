@@ -186,7 +186,7 @@ export class TimeScale {
 		this._correctOffset();
 	}
 
-	public indexToCoordinate(index: TimePointIndex, keepFloat?: boolean): Coordinate {
+	public indexToCoordinate(index: TimePointIndex): Coordinate {
 		if (this.isEmpty() || !isInteger(index)) {
 			return 0 as Coordinate;
 		}
@@ -194,11 +194,7 @@ export class TimeScale {
 		const baseIndex = this.baseIndex();
 		const deltaFromRight = baseIndex + this._rightOffset - index;
 		const coordinate = this._width - (deltaFromRight + 0.5) * this._barSpacing;
-		if (keepFloat) {
-			return coordinate as Coordinate;
-		}
-
-		return Math.round(coordinate) as Coordinate;
+		return coordinate as Coordinate;
 	}
 
 	public indexesToCoordinates<T extends TimedValue>(points: T[], visibleRange?: SeriesItemsIndexesRange): void {
@@ -210,7 +206,7 @@ export class TimeScale {
 			const index = points[i].time;
 			const deltaFromRight = baseIndex + this._rightOffset - index;
 			const coordinate = this._width - (deltaFromRight + 0.5) * this._barSpacing;
-			points[i].x = Math.round(coordinate) as Coordinate;
+			points[i].x = coordinate as Coordinate;
 		}
 	}
 

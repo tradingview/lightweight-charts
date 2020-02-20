@@ -64,7 +64,6 @@ export interface LastValueDataResultWithData extends LastValueDataResult {
 	formattedPricePercentage: string;
 	color: string;
 	coordinate: Coordinate;
-	floatCoordinate: Coordinate;
 	index: TimePointIndex;
 }
 
@@ -193,7 +192,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const price = plot !== undefined ? bar.value[plot] as number : this._barFunction(bar.value);
 		const barColorer = this.barColorer();
 		const style = barColorer.barStyle(lastIndex, { value: bar });
-		const floatCoordinate = priceScale.priceToCoordinate(price, firstValue.value, true);
+		const coordinate = priceScale.priceToCoordinate(price, firstValue.value);
 
 		return {
 			noData: false,
@@ -202,8 +201,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			formattedPriceAbsolute: priceScale.formatPriceAbsolute(price),
 			formattedPricePercentage: priceScale.formatPricePercentage(price, firstValue.value),
 			color: style.barColor,
-			floatCoordinate: floatCoordinate,
-			coordinate: Math.round(floatCoordinate) as Coordinate,
+			coordinate: coordinate,
 			index: lastIndex,
 		};
 	}

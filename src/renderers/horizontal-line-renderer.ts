@@ -1,6 +1,6 @@
 import { Coordinate } from '../model/coordinate';
 
-import { drawLine, LineStyle, LineWidth } from './draw-line';
+import { drawHorizontalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
 export interface HorizontalLineRendererData {
@@ -30,17 +30,17 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 			return;
 		}
 
-		const y = Math.round(this._data.y * pixelRatio) + 0.5;
+		const y = Math.round(this._data.y * pixelRatio);
 
-		if (y < 0 || y > this._data.height) {
+		if (y < 0 || y > Math.ceil(this._data.height * pixelRatio)) {
 			return;
 		}
 
 		const width = Math.ceil(this._data.width * pixelRatio);
-		ctx.lineCap = 'square';
+		ctx.lineCap = 'butt';
 		ctx.strokeStyle = this._data.color;
-		ctx.lineWidth = this._data.lineWidth;
-
-		drawLine(ctx, -0.5, y, width, y, this._data.lineStyle);
+		ctx.lineWidth = Math.floor(this._data.lineWidth * pixelRatio);
+		setLineStyle(ctx, this._data.lineStyle);
+		drawHorizontalLine(ctx, y, 0, width);
 	}
 }

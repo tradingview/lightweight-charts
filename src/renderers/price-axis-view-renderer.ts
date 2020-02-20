@@ -35,11 +35,10 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			return;
 		}
 
-		const fontSize = rendererOptions.fontSize;
 		ctx.font = rendererOptions.font;
 
 		const tickSize = this._data.tickVisible ? rendererOptions.tickLength : 0;
-		const horzBorder = this._data.borderVisible ? rendererOptions.borderSize : 0;
+		const horzBorder = rendererOptions.borderSize;
 		const paddingTop = rendererOptions.paddingTop;
 		const paddingBottom = rendererOptions.paddingBottom;
 		const paddingInner = rendererOptions.paddingInner;
@@ -48,6 +47,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
 		const baselineOffset = rendererOptions.baselineOffset;
 		const totalHeight = rendererOptions.fontSize + paddingTop + paddingBottom;
+		const halfHeigth = Math.ceil(totalHeight * 0.5);
 		const totalWidth = horzBorder + textWidth + paddingInner + paddingOuter + tickSize;
 
 		let yMid = this._commonData.coordinate;
@@ -55,12 +55,15 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			yMid = this._commonData.fixedCoordinate;
 		}
 
-		const yTop = yMid - Math.floor(fontSize / 2) - paddingTop - 0.5;
+		yMid = Math.round(yMid);
+
+		const yTop = yMid - halfHeigth;
 		const yBottom = yTop + totalHeight;
 
 		const alignRight = align === 'right';
 
-		const xInside = alignRight ? width - horzBorder - 0.5 : 0.5;
+		const xInside = alignRight ? width : 0;
+		const rightScaled = Math.ceil(width * pixelRatio);
 
 		let xOutside = xInside;
 		let xTick: number;
@@ -91,12 +94,18 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xText = xInside + horzBorder + tickSize + paddingInner;
 			}
 
-			const xInsideScaled = Math.round(xInside * pixelRatio);
+			const tickHeight = Math.max(1, Math.floor(pixelRatio));
+
+			const horzBorderScaled = Math.max(1, Math.floor(horzBorder * pixelRatio));
+			const xInsideScaled = alignRight ? rightScaled : 0;
 			const yTopScaled = Math.round(yTop * pixelRatio);
 			const xOutsideScaled = Math.round(xOutside * pixelRatio);
-			const yBottomScaled = Math.round(yBottom * pixelRatio);
-			const yMidScaled = Math.round(yMid * pixelRatio);
+			const yMidScaled = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
+
+			const yBottomScaled = yMidScaled + tickHeight + (yMidScaled - yTopScaled);
 			const xTickScaled = Math.round(xTick * pixelRatio);
+
+			ctx.save();
 
 			ctx.beginPath();
 			ctx.moveTo(xInsideScaled, yTopScaled);
@@ -105,9 +114,13 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.lineTo(xInsideScaled, yBottomScaled);
 			ctx.fill();
 
+			// draw border
+			ctx.fillStyle = this._data.borderColor;
+			ctx.fillRect(alignRight ? rightScaled - horzBorderScaled : 0, yTopScaled, horzBorderScaled, yBottomScaled - yTopScaled);
+
 			if (this._data.tickVisible) {
 				ctx.fillStyle = this._commonData.color;
-				ctx.fillRect(xInsideScaled, yMidScaled, xTickScaled - xInsideScaled, 1);
+				ctx.fillRect(xInsideScaled, yMidScaled, xTickScaled - xInsideScaled, tickHeight);
 			}
 
 			ctx.textAlign = 'left';
@@ -116,6 +129,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			drawScaled(ctx, pixelRatio, () => {
 				ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
 			});
+
+			ctx.restore();
 		}
 	}
 

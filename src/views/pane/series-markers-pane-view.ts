@@ -150,6 +150,9 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		if (firstValue === null) {
 			return;
 		}
+		if (this._data.items.length === 0) {
+			return;
+		}
 		let prevTimeIndex = NaN;
 		const shapeMargin = calculateShapeMargin(timeScale.barSpacing());
 		const offsets: Offsets = {

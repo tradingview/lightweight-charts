@@ -40,8 +40,8 @@ export function drawLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, 
 export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): void {
 	const dashPatterns = {
 		[LineStyle.Solid]: [],
-		[LineStyle.Dotted]: [ctx.lineWidth, 2 * ctx.lineWidth],
-		[LineStyle.Dashed]: [5 * ctx.lineWidth, 6 * ctx.lineWidth],
+		[LineStyle.Dotted]: [ctx.lineWidth, ctx.lineWidth],
+		[LineStyle.Dashed]: [2 * ctx.lineWidth, 2 * ctx.lineWidth],
 		[LineStyle.LargeDashed]: [6 * ctx.lineWidth, 6 * ctx.lineWidth],
 		[LineStyle.SparseDotted]: [ctx.lineWidth, 4 * ctx.lineWidth],
 	};
@@ -52,14 +52,25 @@ export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): v
 
 export function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: number, right: number): void {
 	ctx.beginPath();
-	ctx.moveTo(left, y + 0.5);
-	ctx.lineTo(right, y + 0.5);
+	const correction = (ctx.lineWidth % 2) ? 0.5 : 0;
+	ctx.moveTo(left, y + correction);
+	ctx.lineTo(right, y + correction);
 	ctx.stroke();
 }
 
 export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number, bottom: number): void {
 	ctx.beginPath();
-	ctx.moveTo(x + 0.5, top);
-	ctx.lineTo(x + 0.5, bottom);
+	const correction = (ctx.lineWidth % 2) ? 0.5 : 0;
+	ctx.moveTo(x + correction, top);
+	ctx.lineTo(x + correction, bottom);
 	ctx.stroke();
+}
+
+export function strokeInPixel(ctx: CanvasRenderingContext2D, drawFunction: () => void): void {
+	ctx.save();
+	if (ctx.lineWidth % 2) {
+		ctx.translate(0.5, 0.5);
+	}
+	drawFunction();
+	ctx.restore();
 }
