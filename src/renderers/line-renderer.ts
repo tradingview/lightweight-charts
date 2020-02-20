@@ -2,7 +2,7 @@ import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
 
 export type LineItem = TimedValue & PricedValue & LinePoint;
@@ -19,14 +19,14 @@ export interface PaneRendererLineData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererLine implements IPaneRenderer {
+export class PaneRendererLine extends ScaledRenderer {
 	protected _data: PaneRendererLineData | null = null;
 
 	public setData(data: PaneRendererLineData): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}

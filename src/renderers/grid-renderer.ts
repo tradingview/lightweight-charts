@@ -1,6 +1,8 @@
+import { ensureNotNull } from '../helpers/assertions';
+
 import { PriceMark } from '../model/price-scale';
 
-import { LineStyle, setLineStyle } from './draw-line';
+import { LineStyle, setLineStyle, strokeInPixel } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
 export interface GridMarks {
@@ -28,35 +30,41 @@ export class GridRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
 
-		ctx.lineWidth = 1;
+		const lineWidth = Math.floor(pixelRatio);
+		ctx.lineWidth = lineWidth;
 
-		if (this._data.vertLinesVisible) {
-			ctx.strokeStyle = this._data.vertLinesColor;
-			setLineStyle(ctx, this._data.vertLineStyle);
-			ctx.beginPath();
-			for (const timeMark of this._data.timeMarks) {
-				ctx.moveTo(timeMark.coord + 1, 0);
-				ctx.lineTo(timeMark.coord + 1, this._data.h);
+		const height = Math.ceil(this._data.h * pixelRatio);
+		const width = Math.ceil(this._data.w * pixelRatio);
+
+		strokeInPixel(ctx, () => {
+			const data = ensureNotNull(this._data);
+			if (data.vertLinesVisible) {
+				ctx.strokeStyle = data.vertLinesColor;
+				setLineStyle(ctx, data.vertLineStyle);
+				ctx.beginPath();
+				for (const timeMark of data.timeMarks) {
+					const x = Math.round(timeMark.coord * pixelRatio);
+					ctx.moveTo(x, -lineWidth);
+					ctx.lineTo(x, height + lineWidth);
+				}
+				ctx.stroke();
 			}
-
-			ctx.stroke();
-		}
-
-		if (this._data.horzLinesVisible) {
-			ctx.strokeStyle = this._data.horzLinesColor;
-			setLineStyle(ctx, this._data.horzLineStyle);
-			ctx.beginPath();
-			for (const priceMark of this._data.priceMarks) {
-				ctx.moveTo(0, priceMark.coord);
-				ctx.lineTo(this._data.w, priceMark.coord);
+			if (data.horzLinesVisible) {
+				ctx.strokeStyle = data.horzLinesColor;
+				setLineStyle(ctx, data.horzLineStyle);
+				ctx.beginPath();
+				for (const priceMark of data.priceMarks) {
+					const y = Math.round(priceMark.coord * pixelRatio);
+					ctx.moveTo(-lineWidth, y);
+					ctx.lineTo(width + lineWidth, y);
+				}
+				ctx.stroke();
 			}
-
-			ctx.stroke();
-		}
+		});
 	}
 }

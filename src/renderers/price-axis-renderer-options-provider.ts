@@ -7,7 +7,6 @@ import { PriceAxisViewRendererOptions } from './iprice-axis-view-renderer';
 const enum RendererConstants {
 	BorderSize = 1,
 	TickLength = 4,
-	OffsetSize = 1,
 }
 
 export class PriceAxisRendererOptionsProvider {
@@ -16,7 +15,6 @@ export class PriceAxisRendererOptionsProvider {
 	private readonly _rendererOptions: PriceAxisViewRendererOptions = {
 		borderSize: RendererConstants.BorderSize,
 		tickLength: RendererConstants.TickLength,
-		offsetSize: RendererConstants.OffsetSize,
 		fontSize: NaN,
 		font: '',
 		fontFamily: '',
@@ -49,7 +47,7 @@ export class PriceAxisRendererOptionsProvider {
 				0
 			);
 			rendererOptions.paddingOuter = Math.ceil(currentFontSize / 2 + rendererOptions.tickLength / 2);
-			rendererOptions.baselineOffset = Math.round(currentFontSize / 5);
+			rendererOptions.baselineOffset = Math.round(currentFontSize / 10);
 		}
 
 		rendererOptions.color = this._textColor();

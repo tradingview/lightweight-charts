@@ -51,7 +51,6 @@ export const areaStyleDefaults: AreaStyleOptions = {
 export const histogramStyleDefaults: HistogramStyleOptions = {
 	color: '#26a69a',
 	base: 0,
-	lineWidth: 2,
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {
@@ -60,7 +59,7 @@ export const seriesOptionsDefaults: SeriesOptionsCommon = {
 	priceLineVisible: true,
 	priceLineWidth: 1,
 	priceLineColor: '',
-	priceLineStyle: LineStyle.Dotted,
+	priceLineStyle: LineStyle.Dashed,
 	baseLineVisible: true,
 	baseLineWidth: 1,
 	baseLineColor: '#B2B5BE',

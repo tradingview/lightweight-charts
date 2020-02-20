@@ -12,7 +12,7 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { createPreconfiguredCanvas, getPrescaledContext2D, Size } from './canvas-utils';
+import { createPreconfiguredCanvas, getContext2D, Size } from './canvas-utils';
 import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -76,8 +76,18 @@ export class ChartWidget implements IDestroyable {
 
 		if (width === 0 && height === 0) {
 			const containerRect = container.getBoundingClientRect();
-			width = containerRect.width;
-			height = containerRect.height;
+			// TODO: Fix it better
+			// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
+			// For chart widget we decreases because we must be inside container.
+			// For time axis this is not important, since it just affects space for pane widgets
+			width = Math.floor(containerRect.width);
+			if (width % 2) {
+				width -= 1;
+			}
+			height = Math.floor(containerRect.height);
+			if (height % 2) {
+				height -= 1;
+			}
 		}
 
 		width = Math.max(70, width);
@@ -213,7 +223,7 @@ export class ChartWidget implements IDestroyable {
 		// calculate target size
 		const firstPane = this._paneWidgets[0];
 		const targetCanvas = createPreconfiguredCanvas(document, new Size(this._width, this._height));
-		const ctx = getPrescaledContext2D(targetCanvas);
+		const ctx = getContext2D(targetCanvas);
 		let targetX = 0;
 		let targetY = 0;
 
@@ -301,7 +311,12 @@ export class ChartWidget implements IDestroyable {
 		const separatorCount = this._paneSeparators.length;
 		const separatorHeight = SEPARATOR_HEIGHT;
 		const separatorsHeight = separatorHeight * separatorCount;
-		const timeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
+		let timeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
+		// TODO: Fix it better
+		// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
+		if (timeAxisHeight % 2) {
+			timeAxisHeight += 1;
+		}
 		const otherWidgetHeight = separatorsHeight + timeAxisHeight;
 		const totalPaneHeight = height < otherWidgetHeight ? 0 : height - otherWidgetHeight;
 		const stretchPixels = totalPaneHeight / totalStretch;

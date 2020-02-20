@@ -1,4 +1,4 @@
-import { drawLine, LineStyle, LineWidth } from './draw-line';
+import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
 export interface CrosshairLineStyle {
@@ -24,7 +24,7 @@ export class CrosshairRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
@@ -36,26 +36,31 @@ export class CrosshairRenderer implements IPaneRenderer {
 			return;
 		}
 
-		const vertFix = this._data.vertLine.lineWidth % 2 === 0 ? 0.5 : 0;
-		const horzFix = this._data.horzLine.lineWidth % 2 === 0 ? 0.5 : 0;
+		ctx.save();
 
-		const x = this._data.x + 1 + horzFix;
-		const y = this._data.y + vertFix;
-		const w = this._data.w;
-		const h = this._data.h;
+		const x = Math.round(this._data.x * pixelRatio);
+		const y = Math.round(this._data.y * pixelRatio);
+		const w = Math.ceil(this._data.w * pixelRatio);
+		const h = Math.ceil(this._data.h * pixelRatio);
+
+		ctx.lineCap = 'butt';
 
 		if (vertLinesVisible && x >= 0) {
-			ctx.lineWidth = this._data.vertLine.lineWidth;
+			ctx.lineWidth = Math.floor(this._data.vertLine.lineWidth * pixelRatio);
 			ctx.strokeStyle = this._data.vertLine.color;
 			ctx.fillStyle = this._data.vertLine.color;
-			drawLine(ctx, x, 0, x, h, this._data.vertLine.lineStyle);
+			setLineStyle(ctx, this._data.vertLine.lineStyle);
+			drawVerticalLine(ctx, x, 0, h);
 		}
 
 		if (horzLinesVisible && y >= 0) {
-			ctx.lineWidth = this._data.horzLine.lineWidth;
+			ctx.lineWidth = Math.floor(this._data.horzLine.lineWidth * pixelRatio);
 			ctx.strokeStyle = this._data.horzLine.color;
 			ctx.fillStyle = this._data.horzLine.color;
-			drawLine(ctx, 0, y, w, y, this._data.horzLine.lineStyle);
+			setLineStyle(ctx, this._data.horzLine.lineStyle);
+			drawHorizontalLine(ctx, y, 0, w);
 		}
+
+		ctx.restore();
 	}
 }
