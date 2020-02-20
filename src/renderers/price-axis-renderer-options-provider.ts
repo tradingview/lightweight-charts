@@ -47,7 +47,7 @@ export class PriceAxisRendererOptionsProvider {
 				0
 			);
 			rendererOptions.paddingOuter = Math.ceil(currentFontSize / 2 + rendererOptions.tickLength / 2);
-			rendererOptions.baselineOffset = Math.round(currentFontSize / 5);
+			rendererOptions.baselineOffset = Math.round(currentFontSize / 10);
 		}
 
 		rendererOptions.color = this._textColor();

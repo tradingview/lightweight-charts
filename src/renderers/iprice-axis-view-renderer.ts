@@ -4,20 +4,17 @@ import { LineWidth } from '../renderers/draw-line';
 export interface PriceAxisViewRendererCommonData {
 	activeBackground?: string;
 	background: string;
-	borderColor?: string;
 	color: string;
 	coordinate: number;
 	fixedCoordinate?: number;
-	paneBackground: string;
 }
 
 export interface PriceAxisViewRendererData {
 	visible: boolean;
 	text: string;
 	tickVisible: boolean;
-	borderVisible: boolean;
+	borderColor: string;
 	lineWidth?: LineWidth;
-	offset: number;
 }
 
 export interface PriceAxisViewRendererOptions {

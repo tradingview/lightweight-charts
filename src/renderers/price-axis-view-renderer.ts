@@ -39,7 +39,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		ctx.font = rendererOptions.font;
 
 		const tickSize = this._data.tickVisible ? rendererOptions.tickLength : 0;
-		const horzBorder = this._data.borderVisible ? rendererOptions.borderSize : 0;
+		const horzBorder = rendererOptions.borderSize;
 		const paddingTop = rendererOptions.paddingTop;
 		const paddingBottom = rendererOptions.paddingBottom;
 		const paddingInner = rendererOptions.paddingInner;
@@ -92,12 +92,15 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xText = xInside + horzBorder + tickSize + paddingInner;
 			}
 
-			const offsetScaled = Math.max(1, Math.floor(this._data.offset * pixelRatio));
+			const tickHeight = Math.max(1, Math.floor(pixelRatio));
+
+			const horzBorderScaled = Math.max(1, Math.floor(horzBorder * pixelRatio));
 			const xInsideScaled = alignRight ? rightScaled : 0;
 			const yTopScaled = Math.round(yTop * pixelRatio);
 			const xOutsideScaled = Math.round(xOutside * pixelRatio);
-			const yBottomScaled = Math.round(yBottom * pixelRatio);
 			const yMidScaled = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
+
+			const yBottomScaled = yMidScaled + tickHeight + (yMidScaled - yTopScaled);
 			const xTickScaled = Math.round(xTick * pixelRatio);
 
 			ctx.save();
@@ -109,16 +112,13 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.lineTo(xInsideScaled, yBottomScaled);
 			ctx.fill();
 
+			// draw border
+			ctx.fillStyle = this._data.borderColor;
+			ctx.fillRect(alignRight ? rightScaled - horzBorderScaled : 0, yTopScaled, horzBorderScaled, yBottomScaled - yTopScaled);
+
 			if (this._data.tickVisible) {
 				ctx.fillStyle = this._commonData.color;
-				const tickWidth = Math.max(1, Math.floor(pixelRatio));
-				ctx.fillRect(xInsideScaled, yMidScaled, xTickScaled - xInsideScaled, tickWidth);
-			}
-
-			if (this._data.offset > 0) {
-				// draw border
-				ctx.fillStyle = this._commonData.paneBackground;
-				ctx.fillRect(alignRight ? rightScaled - offsetScaled : 0, yTopScaled, offsetScaled, yBottomScaled - yTopScaled + 1);
+				ctx.fillRect(xInsideScaled, yMidScaled, xTickScaled - xInsideScaled, tickHeight);
 			}
 
 			ctx.textAlign = 'left';
