@@ -182,8 +182,6 @@ export interface SeriesOptionsCommon {
 	priceLineVisible: boolean;
 	/**
 	 *  Enum of possible modes of priceLine source
-	 * 'LastBar' use the last bar data
-	 * 'LastVisible' use the last visible bar in viewport
 	 */
 	priceLineSource: PriceLineSource;
 	/** Width of the price line. Ignored if priceLineVisible is false */
