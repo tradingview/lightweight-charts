@@ -59,7 +59,7 @@ export const seriesOptionsDefaults: SeriesOptionsCommon = {
 	title: '',
 	lastValueVisible: true,
 	priceLineVisible: true,
-	priceLineSource: PriceLineSource.GlobalLast,
+	priceLineSource: PriceLineSource.LastBar,
 	priceLineWidth: 1,
 	priceLineColor: '',
 	priceLineStyle: LineStyle.Dotted,

@@ -144,8 +144,8 @@ export const enum PriceAxisLastValueMode {
 }
 
 export const enum PriceLineSource {
-	GlobalLast,
-	LocalLast,
+	LastBar,
+	LastVisible,
 }
 
 export interface OverlaySeriesSpecificOptions {
@@ -176,8 +176,8 @@ export interface SeriesOptionsCommon {
 	priceLineVisible: boolean;
 	/**
 	 *  Enum of possible modes of priceLine source
-	 * 'lastBar' use the last bar data
-	 * 'lastVisible' use the last visible bar in viewport
+	 * 'LastBar' use the last bar data
+	 * 'LastVisible' use the last visible bar in viewport
 	 */
 	priceLineSource: PriceLineSource;
 	/** Width of the price line. Ignored if priceLineVisible is false */
