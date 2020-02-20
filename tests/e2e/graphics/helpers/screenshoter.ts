@@ -58,14 +58,14 @@ export class Screenshoter {
 
 			await page.setContent(pageContent, { waitUntil: 'load' });
 
-			// to avoid random cursor position
-			await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
-
 			// wait for test case is ready
 			await page.evaluate(() => {
 				// tslint:disable-next-line:no-any
 				return (window as any).testCaseReady;
 			});
+
+			// to avoid random cursor position
+			await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
 
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
