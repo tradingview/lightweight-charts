@@ -1,4 +1,5 @@
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
+import { drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -12,7 +13,7 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { createPreconfiguredCanvas, getContext2D, Size } from './canvas-utils';
+import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from './canvas-utils';
 import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -224,70 +225,72 @@ export class ChartWidget implements IDestroyable {
 		const firstPane = this._paneWidgets[0];
 		const targetCanvas = createPreconfiguredCanvas(document, new Size(this._width, this._height));
 		const ctx = getContext2D(targetCanvas);
-		let targetX = 0;
-		let targetY = 0;
+		const pixelRatio = getCanvasDevicePixelRatio(targetCanvas);
+		drawScaled(ctx, pixelRatio, () => {
+			let targetX = 0;
+			let targetY = 0;
 
-		const drawPriceAxises = () => {
-			for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
-				const paneWidget = this._paneWidgets[paneIndex];
-				const paneWidgetHeight = paneWidget.getSize().h;
-				const priceAxisWidget = ensureNotNull(paneWidget.priceAxisWidget());
-				const image = priceAxisWidget.getImage();
-				ctx.drawImage(image, targetX, targetY, priceAxisWidget.getWidth(), paneWidgetHeight);
-				targetY += paneWidgetHeight;
-				if (paneIndex < this._paneWidgets.length - 1) {
-					targetY += SEPARATOR_HEIGHT;
+			const drawPriceAxises = () => {
+				for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
+					const paneWidget = this._paneWidgets[paneIndex];
+					const paneWidgetHeight = paneWidget.getSize().h;
+					const priceAxisWidget = ensureNotNull(paneWidget.priceAxisWidget());
+					const image = priceAxisWidget.getImage();
+					ctx.drawImage(image, targetX, targetY, priceAxisWidget.getWidth(), paneWidgetHeight);
+					targetY += paneWidgetHeight;
+					if (paneIndex < this._paneWidgets.length - 1) {
+						targetY += SEPARATOR_HEIGHT;
+					}
 				}
-			}
-		};
-		// draw left price scale if exists
-		if (this._options.priceScale.position === 'left') {
-			drawPriceAxises();
-			targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
-		}
-		targetY = 0;
-		for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
-			const paneWidget = this._paneWidgets[paneIndex];
-			const paneWidgetSize = paneWidget.getSize();
-			const image = paneWidget.getImage();
-			ctx.drawImage(image, targetX, targetY, paneWidgetSize.w, paneWidgetSize.h);
-			targetY += paneWidgetSize.h;
-			if (paneIndex < this._paneWidgets.length - 1) {
-				const separator = this._paneSeparators[paneIndex];
-				const separatorSize = separator.getSize();
-				const separatorImage = separator.getImage();
-				ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
-				targetY += separatorSize.h;
-			}
-		}
-		targetX += firstPane.getSize().w;
-		if (this._options.priceScale.position === 'right') {
-			targetY = 0;
-			drawPriceAxises();
-		}
-		const drawStub = () => {
-			const stub = ensureNotNull(this._timeAxisWidget.stub());
-			const size = stub.getSize();
-			const image = stub.getImage();
-			ctx.drawImage(image, targetX, targetY, size.w, size.h);
-		};
-		// draw time scale
-		if (this._options.timeScale.visible) {
-			targetX = 0;
+			};
+			// draw left price scale if exists
 			if (this._options.priceScale.position === 'left') {
-				drawStub();
+				drawPriceAxises();
 				targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
 			}
-			const size = this._timeAxisWidget.getSize();
-			const image = this._timeAxisWidget.getImage();
-			ctx.drawImage(image, targetX, targetY, size.w, size.h);
-			if (this._options.priceScale.position === 'right') {
-				targetX = firstPane.getSize().w;
-				drawStub();
-				ctx.restore();
+			targetY = 0;
+			for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
+				const paneWidget = this._paneWidgets[paneIndex];
+				const paneWidgetSize = paneWidget.getSize();
+				const image = paneWidget.getImage();
+				ctx.drawImage(image, targetX, targetY, paneWidgetSize.w, paneWidgetSize.h);
+				targetY += paneWidgetSize.h;
+				if (paneIndex < this._paneWidgets.length - 1) {
+					const separator = this._paneSeparators[paneIndex];
+					const separatorSize = separator.getSize();
+					const separatorImage = separator.getImage();
+					ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
+					targetY += separatorSize.h;
+				}
 			}
-		}
-
+			targetX += firstPane.getSize().w;
+			if (this._options.priceScale.position === 'right') {
+				targetY = 0;
+				drawPriceAxises();
+			}
+			const drawStub = () => {
+				const stub = ensureNotNull(this._timeAxisWidget.stub());
+				const size = stub.getSize();
+				const image = stub.getImage();
+				ctx.drawImage(image, targetX, targetY, size.w, size.h);
+			};
+			// draw time scale
+			if (this._options.timeScale.visible) {
+				targetX = 0;
+				if (this._options.priceScale.position === 'left') {
+					drawStub();
+					targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
+				}
+				const size = this._timeAxisWidget.getSize();
+				const image = this._timeAxisWidget.getImage();
+				ctx.drawImage(image, targetX, targetY, size.w, size.h);
+				if (this._options.priceScale.position === 'right') {
+					targetX = firstPane.getSize().w;
+					drawStub();
+					ctx.restore();
+				}
+			}
+		});
 		return targetCanvas;
 	}
 
