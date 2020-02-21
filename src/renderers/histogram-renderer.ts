@@ -1,5 +1,5 @@
 import { PricedValue } from '../model/price-scale';
-import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
+import { SeriesItemsIndexesRange, TimedValue, TimePointIndex } from '../model/time-data';
 
 import { IPaneRenderer } from './ipane-renderer';
 
@@ -24,6 +24,7 @@ interface PrecalculatedItemCoordinates {
 	right: number;
 	roundedCenter: number;
 	center: number;
+	time: TimePointIndex;
 }
 
 export class PaneRendererHistogram implements IPaneRenderer {
@@ -89,6 +90,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 				right,
 				roundedCenter: x,
 				center: (item.x as number * pixelRatio),
+				time: item.time,
 			};
 		}
 
@@ -96,6 +98,9 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		for (let i = this._data.visibleRange.from + 1; i < this._data.visibleRange.to; i++) {
 			const current = this._precalculatedCache[i - this._data.visibleRange.from];
 			const prev = this._precalculatedCache[i - this._data.visibleRange.from - 1];
+			if (current.time !== prev.time + 1) {
+				continue;
+			}
 			if (current.left - prev.right !== (spacing + 1)) {
 				// have to align
 				if (prev.roundedCenter > prev.center) {
