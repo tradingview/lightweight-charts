@@ -18,7 +18,7 @@ import { TimePoints } from './time-points';
 
 const enum Constants {
 	DefaultAnimationDuration = 400,
-	MaxBarSpacing = 50,
+	MaxBarSpacing = 100,
 	MinBarSpacing = 0.5,
 	MinVisibleBarsCount = 5,
 }
@@ -506,7 +506,8 @@ export class TimeScale {
 		if (first === null || last === null) {
 			return;
 		}
-		this.setVisibleRange(new BarsRange(first - 1 as TimePointIndex, last + 1 + this._options.rightOffset as TimePointIndex));
+
+		this.setVisibleRange(new BarsRange(first, last + this._options.rightOffset as TimePointIndex));
 	}
 
 	public setTimePointsRange(range: TimePointsRange): void {
