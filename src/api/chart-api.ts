@@ -143,8 +143,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		delete this._dataLayer;
 	}
 
-	public resize(height: number, width: number, forceRepaint?: boolean): void {
-		this._chartWidget.resize(height, width, forceRepaint);
+	public resize(width: number, height: number, forceRepaint?: boolean): void {
+		this._chartWidget.resize(width, height, forceRepaint);
 	}
 
 	public addAreaSeries(options: AreaSeriesPartialOptions = {}): ISeriesApi<'Area'> {

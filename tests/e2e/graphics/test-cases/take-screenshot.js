@@ -38,7 +38,7 @@ function runTestCase(container) {
 	mainSeries.setData(generateData());
 
 	// create canvas to draw screenshot
-	chart.resize(240, 600, true);
+	chart.resize(600, 240, true);
 
 	var screenshot = chart.takeScreenshot();
 	screenshot.style.position = 'absolute';

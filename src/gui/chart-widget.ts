@@ -95,7 +95,7 @@ export class ChartWidget implements IDestroyable {
 
 		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
 		// or after but with adjustSize to properly update time scale
-		this.resize(height, width);
+		this.resize(width, height);
 
 		this._syncGuiWithModel();
 
@@ -156,7 +156,7 @@ export class ChartWidget implements IDestroyable {
 		delete this._element;
 	}
 
-	public resize(height: number, width: number, forceRepaint: boolean = false): void {
+	public resize(width: number, height: number, forceRepaint: boolean = false): void {
 		if (this._height === height && this._width === width) {
 			return;
 		}
@@ -204,7 +204,7 @@ export class ChartWidget implements IDestroyable {
 		const width = options.width || this._width;
 		const height = options.height || this._height;
 
-		this.resize(height, width);
+		this.resize(width, height);
 	}
 
 	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
