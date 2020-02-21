@@ -52,7 +52,7 @@ function runMocha(closeServer) {
 		mocha.checkLeaks();
 	}
 
-	mocha.hideDiff(!mochaConfig.diff);
+	mocha.diff(mochaConfig.diff);
 	mocha.addFile(path.resolve(__dirname, './memleaks-test-cases.ts'));
 
 	mocha.run(failures => {
