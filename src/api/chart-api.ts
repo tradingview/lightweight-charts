@@ -236,7 +236,10 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.updateData(value.update);
+			// the latest arg `true` must be removed in https://github.com/tradingview/lightweight-charts/issues/270
+			// here we don't need to clear palettes because they were just filled in DataLayer
+			// see https://github.com/tradingview/lightweight-charts/pull/330#discussion_r379415805
+			key.updateData(value.update, true);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 	}
