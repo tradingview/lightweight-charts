@@ -254,7 +254,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._recreatePaneViews();
 	}
 
-	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
+	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>, clearData: boolean = false): void {
+		if (clearData) {
+			this._data.clear();
+		}
 		this._data.bars().merge(data);
 		this._recalculateMarkers();
 
