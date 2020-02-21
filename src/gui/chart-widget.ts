@@ -18,8 +18,6 @@ import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
-// tslint:disable-next-line: ordered-imports
-
 export interface MouseEventParamsImpl {
 	time?: TimePoint;
 	point?: Point;
