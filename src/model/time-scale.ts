@@ -18,7 +18,7 @@ import { TimePoints } from './time-points';
 
 const enum Constants {
 	DefaultAnimationDuration = 400,
-	MaxBarSpacing = 50,
+	MaxBarSpacing = 100,
 	MinBarSpacing = 0.5,
 	MinVisibleBarsCount = 5,
 }
