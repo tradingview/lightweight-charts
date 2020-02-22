@@ -8,14 +8,25 @@ export function drawSquare(
 	centerY: Coordinate,
 	color: string,
 	size: number,
+	belowBar: boolean,
 	text?: string
 ): void {
 	const squareSize = shapeSize('square', size);
 	const halfSize = (squareSize - 1) / 2;
 	const left = centerX - halfSize;
 	const top = centerY - halfSize;
+
 	ctx.fillStyle = color;
-	if (text) ctx.fillText(text, centerX + squareSize, centerY + halfSize);
+
+	if (text) {
+		const textWidth = ctx.measureText(text).width;
+		const textHeight = parseInt(ctx.font, 10);
+		const textLeft = centerX - (textWidth / 2);
+		const textMargin = textHeight / 2;
+		const textTop = centerY - squareSize / 2 + (belowBar ? 1 : -1) * (squareSize + textMargin);
+		ctx.fillText(text, textLeft, textTop + textHeight);
+	}
+
 	ctx.fillRect(left, top, squareSize, squareSize);
 }
 

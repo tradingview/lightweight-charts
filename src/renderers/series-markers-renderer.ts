@@ -2,7 +2,7 @@ import { ensureNever } from '../helpers/assertions';
 
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { SeriesMarkerShape } from '../model/series-markers';
+import { SeriesMarkerShape, SeriesMarkerPosition } from '../model/series-markers';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { ScaledRenderer } from './scaled-renderer';
@@ -18,6 +18,7 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 	internalId: number;
 	externalId?: string;
 	text?: string;
+	position: SeriesMarkerPosition;
 }
 
 export interface SeriesMarkerRendererData {
@@ -64,16 +65,16 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
 	switch (item.shape) {
 		case 'arrowDown':
-			drawArrow(false, ctx, item.x, item.y, item.color, item.size, item.text);
+			drawArrow(false, ctx, item.x, item.y, item.color, item.size, item.position === 'belowBar', item.text);
 			return;
 		case 'arrowUp':
-			drawArrow(true, ctx, item.x, item.y, item.color, item.size, item.text);
+			drawArrow(true, ctx, item.x, item.y, item.color, item.size, item.position === 'belowBar', item.text);
 			return;
 		case 'circle':
-			drawCircle(ctx, item.x, item.y, item.color, item.size, item.text);
+			drawCircle(ctx, item.x, item.y, item.color, item.size, item.position === 'belowBar', item.text);
 			return;
 		case 'square':
-			drawSquare(ctx, item.x, item.y, item.color, item.size, item.text);
+			drawSquare(ctx, item.x, item.y, item.color, item.size, item.position === 'belowBar', item.text);
 			return;
 	}
 
