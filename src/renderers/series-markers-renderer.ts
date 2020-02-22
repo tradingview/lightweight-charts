@@ -17,6 +17,7 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 	color: string;
 	internalId: number;
 	externalId?: string;
+	text?: string;
 }
 
 export interface SeriesMarkerRendererData {
@@ -63,16 +64,16 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
 	switch (item.shape) {
 		case 'arrowDown':
-			drawArrow(false, ctx, item.x, item.y, item.color, item.size);
+			drawArrow(false, ctx, item.x, item.y, item.color, item.size, item.text);
 			return;
 		case 'arrowUp':
-			drawArrow(true, ctx, item.x, item.y, item.color, item.size);
+			drawArrow(true, ctx, item.x, item.y, item.color, item.size, item.text);
 			return;
 		case 'circle':
-			drawCircle(ctx, item.x, item.y, item.color, item.size);
+			drawCircle(ctx, item.x, item.y, item.color, item.size, item.text);
 			return;
 		case 'square':
-			drawSquare(ctx, item.x, item.y, item.color, item.size);
+			drawSquare(ctx, item.x, item.y, item.color, item.size, item.text);
 			return;
 	}
 
@@ -88,7 +89,7 @@ function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coord
 		case 'circle':
 			return hitTestCircle(item.x, item.y, item.size, x, y);
 		case 'square':
-			return hitTestSquare(item.x, item.y, item.size, x , y);
+			return hitTestSquare(item.x, item.y, item.size, x, y);
 	}
 
 	ensureNever(item.shape);

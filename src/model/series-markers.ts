@@ -8,6 +8,7 @@ export interface SeriesMarker<TimeType> {
 	shape: SeriesMarkerShape;
 	color: string;
 	id?: string;
+	text?:string;
 }
 
 export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {

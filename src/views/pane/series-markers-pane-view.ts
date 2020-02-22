@@ -136,6 +136,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				color: marker.color,
 				internalId: marker.internalId,
 				externalId: marker.id,
+				text: marker.text
 			}));
 			this._dataInvalidated = false;
 		}

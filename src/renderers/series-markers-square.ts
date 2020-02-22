@@ -7,13 +7,15 @@ export function drawSquare(
 	centerX: Coordinate,
 	centerY: Coordinate,
 	color: string,
-	size: number
+	size: number,
+	text?: string
 ): void {
 	const squareSize = shapeSize('square', size);
 	const halfSize = (squareSize - 1) / 2;
 	const left = centerX - halfSize;
 	const top = centerY - halfSize;
 	ctx.fillStyle = color;
+	if (text) ctx.fillText(text, centerX + squareSize, centerY + halfSize);
 	ctx.fillRect(left, top, squareSize, squareSize);
 }
 

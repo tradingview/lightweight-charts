@@ -7,13 +7,15 @@ export function drawCircle(
 	centerX: Coordinate,
 	centerY: Coordinate,
 	color: string,
-	size: number
+	size: number,
+	text?: string
 ): void {
 	const circleSize = shapeSize('circle', size);
 	const halfSize = (circleSize - 1) / 2;
 	ctx.fillStyle = color;
 	ctx.beginPath();
 	ctx.arc(centerX, centerY, halfSize, 0, 2 * Math.PI, false);
+	if (text) ctx.fillText(text, centerX + circleSize, centerY + halfSize);
 	ctx.fill();
 }
 

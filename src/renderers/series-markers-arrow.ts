@@ -11,7 +11,8 @@ export function drawArrow(
 	centerX: Coordinate,
 	centerY: Coordinate,
 	color: string,
-	size: number
+	size: number,
+	text?: string
 ): void {
 	const arrowSize = shapeSize('arrowUp', size);
 	const halfArrowSize = (arrowSize - 1) / 2;
@@ -27,6 +28,7 @@ export function drawArrow(
 		ctx.lineTo(centerX + halfBaseSize, centerY + halfArrowSize);
 		ctx.lineTo(centerX - halfBaseSize, centerY + halfArrowSize);
 		ctx.lineTo(centerX - halfBaseSize, centerY);
+		if (text) ctx.fillText(text, centerX + arrowSize, centerY + halfArrowSize);
 	} else {
 		ctx.moveTo(centerX - halfArrowSize, centerY);
 		ctx.lineTo(centerX, centerY + halfArrowSize);
@@ -35,6 +37,7 @@ export function drawArrow(
 		ctx.lineTo(centerX + halfBaseSize, centerY - halfArrowSize);
 		ctx.lineTo(centerX - halfBaseSize, centerY - halfArrowSize);
 		ctx.lineTo(centerX - halfBaseSize, centerY);
+		if (text) ctx.fillText(text, centerX + arrowSize, centerY);
 	}
 	ctx.fill();
 }
