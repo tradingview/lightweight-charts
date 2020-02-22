@@ -315,6 +315,7 @@ An array of items is expected. Each item should contain the following fields:
 - `shape` (`circle` &#124; `square` &#124; `arrowUp` &#124; `arrowDown`) - item marker type
 - `color` (`string`) - item color
 - `id` (`string` &#124; `undefined`) - item id, will be passed to click/crosshair move handlers
+- `text` (`string` &#124; `undefined`) - item text to be shown
 
 Example:
 
@@ -339,6 +340,7 @@ series.setMarkers([
         color: 'orange',
         shape: 'arrowUp',
         id: 'id4',
+        text: 'example'
     },
 ]);
 
