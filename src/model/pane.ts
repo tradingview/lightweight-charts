@@ -54,7 +54,6 @@ export class Pane implements IDestroyable {
 
 	public destroy(): void {
 		this.model().mainPriceScaleOptionsChanged().unsubscribeAll(this);
-		this._timeScale.barSpacingChanged().unsubscribeAll(this);
 
 		this._defaultNonOverlayPriceScale.modeChanged().unsubscribeAll(this);
 

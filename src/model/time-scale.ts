@@ -68,7 +68,6 @@ export class TimeScale {
 	private _baseIndexOrNull: TimePointIndex | null = null;
 	private _rightOffset: number;
 	private _points: TimePoints = new TimePoints();
-	private readonly _barSpacingChanged: Delegate<number, number> = new Delegate();
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
@@ -235,10 +234,6 @@ export class TimeScale {
 
 		// do not allow scroll out of visible bars
 		this._correctOffset();
-	}
-
-	public barSpacingChanged(): ISubscription<number, number> {
-		return this._barSpacingChanged;
 	}
 
 	public rightOffset(): number {
@@ -561,7 +556,6 @@ export class TimeScale {
 
 		this._visibleBarsInvalidated = true;
 		this._barSpacing = newBarSpacing;
-		this._barSpacingChanged.fire(oldBarSpacing, newBarSpacing);
 		this._resetTimeMarksCache();
 	}
 
