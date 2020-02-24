@@ -18,9 +18,9 @@ import { TimePoints } from './time-points';
 
 const enum Constants {
 	DefaultAnimationDuration = 400,
-	MaxBarSpacing = 100,
 	MinBarSpacing = 0.5,
-	MinVisibleBarsCount = 5,
+	// make sure that this (1 / MinVisibleBarsCount) >= coeff in max bar spacing
+	MinVisibleBarsCount = 2,
 }
 
 export const enum MarkSpanBorder {
@@ -87,7 +87,7 @@ export class TimeScale {
 		this._options = options;
 		this._localizationOptions = localizationOptions;
 		this._rightOffset = options.rightOffset;
-		this._barSpacing = getValidBarSpacing(options.barSpacing);
+		this._barSpacing = options.barSpacing;
 		this._model = model;
 
 		this._updateDateTimeFormatter();
@@ -113,12 +113,14 @@ export class TimeScale {
 			this._leftEdgeIndex = null;
 		}
 
-		if (options.rightOffset !== undefined) {
-			this.setRightOffset(options.rightOffset);
-		}
-
+		// note that bar spacing should be applied before right offset
+		// because right offset depends on bar spacing
 		if (options.barSpacing !== undefined) {
 			this.setBarSpacing(options.barSpacing);
+		}
+
+		if (options.rightOffset !== undefined) {
+			this.setRightOffset(options.rightOffset);
 		}
 
 		this._invalidateTickMarks();
@@ -182,6 +184,9 @@ export class TimeScale {
 
 		this._width = width;
 		this._visibleBarsInvalidated = true;
+
+		// updating bar spacing should be first because right offset depends on it
+		this._correctBarSpacing();
 		this._correctOffset();
 	}
 
@@ -234,6 +239,9 @@ export class TimeScale {
 
 		// do not allow scroll out of visible bars
 		this._correctOffset();
+
+		this._model.recalculateAllPanes();
+		this._model.lightUpdate();
 	}
 
 	public rightOffset(): number {
@@ -547,16 +555,15 @@ export class TimeScale {
 	}
 
 	private _setBarSpacing(newBarSpacing: number): void {
-		newBarSpacing = getValidBarSpacing(newBarSpacing);
-
 		const oldBarSpacing = this._barSpacing;
-		if (oldBarSpacing === newBarSpacing) {
-			return;
-		}
-
-		this._visibleBarsInvalidated = true;
 		this._barSpacing = newBarSpacing;
-		this._resetTimeMarksCache();
+		this._correctBarSpacing();
+
+		// this._barSpacing might be changed in _correctBarSpacing
+		if (oldBarSpacing !== this._barSpacing) {
+			this._visibleBarsInvalidated = true;
+			this._resetTimeMarksCache();
+		}
 	}
 
 	private _updateVisibleBars(): void {
@@ -571,6 +578,22 @@ export class TimeScale {
 		const leftIndex = rightIndex - newBarsLength as TimePointIndex;
 
 		this._setVisibleBars(new BarsRange(leftIndex, rightIndex));
+	}
+
+	private _correctBarSpacing(): void {
+		if (this._barSpacing < Constants.MinBarSpacing) {
+			this._barSpacing = Constants.MinBarSpacing;
+			this._visibleBarsInvalidated = true;
+		}
+
+		if (this._width !== 0) {
+			// make sure that this (1 / Constants.MinVisibleBarsCount) >= coeff in max bar spacing (it's 0.5 here)
+			const maxBarSpacing = this._width * 0.5;
+			if (this._barSpacing > maxBarSpacing) {
+				this._barSpacing = maxBarSpacing;
+				this._visibleBarsInvalidated = true;
+			}
+		}
 	}
 
 	private _correctOffset(): void {
@@ -733,16 +756,4 @@ export class TimeScale {
 			this.setRightOffset(leftEdgeOffset);
 		}
 	}
-}
-
-function getValidBarSpacing(newBarSpacing: number): number {
-	if (newBarSpacing < Constants.MinBarSpacing) {
-		return Constants.MinBarSpacing;
-	}
-
-	if (newBarSpacing > Constants.MaxBarSpacing) {
-		return Constants.MaxBarSpacing;
-	}
-
-	return newBarSpacing;
 }
