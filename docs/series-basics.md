@@ -159,7 +159,7 @@ You can set the width, style and color of this line or disable it using the foll
 |Name|Type|Default|Description|
 |----|----|-------|-|
 |`priceLineVisible`|`boolean`|`true`|If true, a series' price line is displayed on a chart|
-|`priceLineSource`|[PriceLineSource](./constants.md#pricelinesource)|`PriceLineSource.LastBar`|Source used for price line value|
+|`priceLineSource`|[PriceLineSource](./constants.md#pricelinesource)|`PriceLineSource.LastBar`|Source to be used for the horizontal price line|
 |`priceLineWidth`|`number`|`1`|Price line's width in pixels|
 |`priceLineColor`|`string`|`''`|Price line's color|
 |`priceLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Dotted`|Price line's style|
@@ -182,7 +182,7 @@ There is an option to hide it as well.
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
-|`lastValueVisible`|`boolean`|`true`|If true, a label with the current price value is displayed on the price scale|
+|`lastValueVisible`|`boolean`|`true`|If true, the label with the current price is displayed on the price scale|
 
 Example:
 

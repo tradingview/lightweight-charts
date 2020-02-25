@@ -62,14 +62,9 @@ It has the following values:
 
 ## PriceLineSource
 
-`PriceLineSource` enum is used to specify the source used for value of series price line.
+`PriceLineSource` enum is used to specify the source of data to be used for the horizontal price line.
 
 It has the following values:
 
-- `LastBar`
-
-    Use last bar data.
-
-- `LastVisible`
-
-    Use last visible data in chart viewport.
+- `PriceLineSource.LastBar` - use the last bar data.
+- `PriceLineSource.LastVisible` - use the last visible data of the chart viewport.

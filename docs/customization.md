@@ -334,7 +334,7 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 |`horzTouchDrag`|`boolean`|`true`|If true, the chart handles horizontal pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger|
 |`vertTouchDrag`|`boolean`|`true`|If true, the chart handles vertical pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger.|
 
-Also you can set `handleScroll` to `true` or `false` to enable or disable all options correspondingly.
+You can also set `handleScroll` to `true` or `false` to enable or disable all the above options.
 
 ### Scaling options
 
@@ -345,7 +345,7 @@ Also you can set `handleScroll` to `true` or `false` to enable or disable all op
 |`mouseWheel`|`boolean`|`true`|If true, series scaling with a mouse wheel is enabled|
 |`pinch`|`boolean`|`true`|If true, series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
 
-Also you can set `handleScale` to `true` or `false` to enable or disable all options correspondingly.
+You can also set `handleScale` to `true` or `false` to enable or disable all the above options.
 
 ### An example of a scrolling/scaling customization
 
