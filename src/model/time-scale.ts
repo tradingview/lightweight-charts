@@ -625,11 +625,11 @@ export class TimeScale {
 			return this._leftEdgeIndex - baseIndex + barsEstimation - 1;
 		}
 
-		return firstIndex - baseIndex - 1 + Constants.MinVisibleBarsCount;
+		return firstIndex - baseIndex - 1 + Math.min(Constants.MinVisibleBarsCount, this._points.size());
 	}
 
 	private _maxRightOffset(): number {
-		return (this._width / this._barSpacing) - Constants.MinVisibleBarsCount;
+		return (this._width / this._barSpacing) - Math.min(Constants.MinVisibleBarsCount, this._points.size());
 	}
 
 	private _saveCommonTransitionsStartState(): void {
