@@ -3,8 +3,8 @@ import { ensureNever } from '../helpers/assertions';
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { SeriesMarkerShape, SeriesMarkerText } from '../model/series-markers';
-import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 import { TextWidthCache } from '../model/text-width-cache';
+import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { ScaledRenderer } from './scaled-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';

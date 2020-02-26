@@ -7,6 +7,7 @@ import { hitTestSquare } from './series-markers-square';
 import { shapeSize, textPosition } from './series-markers-utils';
 
 export function drawArrow(
+	// tslint:disable-next-line:max-params
 	up: boolean,
 	ctx: CanvasRenderingContext2D,
 	centerX: Coordinate,

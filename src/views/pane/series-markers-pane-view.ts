@@ -49,8 +49,8 @@ function fillSizeAndY(
 		rendererItem.text = {
 			content: marker.text,
 			offsetX: 0,
-			offsetY: marker.position === 'aboveBar' ? -.5 : .5
-		}
+			offsetY: marker.position === 'aboveBar' ? -0.5 : 0.5,
+		};
 	}
 
 	switch (marker.position) {
@@ -145,7 +145,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				color: marker.color,
 				internalId: marker.internalId,
 				externalId: marker.id,
-				text: undefined
+				text: undefined,
 			}));
 			this._dataInvalidated = false;
 		}
