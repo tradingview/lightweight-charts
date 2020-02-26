@@ -1,6 +1,7 @@
 import { Coordinate } from '../model/coordinate';
+import { SeriesMarkerText } from '../model/series-markers';
 
-import { shapeSize } from './series-markers-utils';
+import { shapeSize, textPosition } from './series-markers-utils';
 
 export function drawCircle(
 	ctx: CanvasRenderingContext2D,
@@ -8,8 +9,7 @@ export function drawCircle(
 	centerY: Coordinate,
 	color: string,
 	size: number,
-	belowBar: boolean,
-	text?: string
+	text?: SeriesMarkerText
 ): void {
 	const circleSize = shapeSize('circle', size);
 	const halfSize = (circleSize - 1) / 2;
@@ -17,13 +17,8 @@ export function drawCircle(
 	ctx.beginPath();
 	ctx.arc(centerX, centerY, halfSize, 0, 2 * Math.PI, false);
 
-	if (text) {
-		const textWidth = ctx.measureText(text).width;
-		const textHeight = parseInt(ctx.font, 10);
-		const textLeft = centerX - (textWidth / 2);
-		const textMargin = textHeight / 2;
-		const textTop = centerY - circleSize / 2 + (belowBar ? 1 : -1) * (circleSize + textMargin);
-		ctx.fillText(text, textLeft, textTop + textHeight);
+	if (text !== undefined) {
+		ctx.fillText(text.content, ...textPosition(centerX, centerY, text, circleSize));
 	}
 
 	ctx.fill();

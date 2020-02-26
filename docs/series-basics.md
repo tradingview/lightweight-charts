@@ -340,7 +340,7 @@ series.setMarkers([
         color: 'orange',
         shape: 'arrowUp',
         id: 'id4',
-        text: 'example'
+        text: 'example',
     },
 ]);
 

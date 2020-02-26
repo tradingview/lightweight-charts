@@ -44,6 +44,15 @@ function fillSizeAndY(
 	const lowPrice = isNumber(seriesData) ? seriesData : seriesData.low;
 	const shapeSize = calculateShapeHeight(timeScale.barSpacing());
 	rendererItem.size = shapeSize as Coordinate;
+
+	if (marker.text !== undefined && marker.text.length > 0) {
+		rendererItem.text = {
+			content: marker.text,
+			offsetX: 0,
+			offsetY: marker.position === 'aboveBar' ? -.5 : .5
+		}
+	}
+
 	switch (marker.position) {
 		case 'inBar': {
 			rendererItem.y = priceScale.priceToCoordinate(inBarPrice, firstValue);
@@ -136,8 +145,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				color: marker.color,
 				internalId: marker.internalId,
 				externalId: marker.id,
-				text: marker.text,
-				position: marker.position
+				text: undefined
 			}));
 			this._dataInvalidated = false;
 		}

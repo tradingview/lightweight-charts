@@ -1,6 +1,7 @@
 import { Coordinate } from '../model/coordinate';
+import { SeriesMarkerText } from '../model/series-markers';
 
-import { shapeSize } from './series-markers-utils';
+import { shapeSize, textPosition } from './series-markers-utils';
 
 export function drawSquare(
 	ctx: CanvasRenderingContext2D,
@@ -8,8 +9,7 @@ export function drawSquare(
 	centerY: Coordinate,
 	color: string,
 	size: number,
-	belowBar: boolean,
-	text?: string
+	text?: SeriesMarkerText
 ): void {
 	const squareSize = shapeSize('square', size);
 	const halfSize = (squareSize - 1) / 2;
@@ -18,13 +18,8 @@ export function drawSquare(
 
 	ctx.fillStyle = color;
 
-	if (text) {
-		const textWidth = ctx.measureText(text).width;
-		const textHeight = parseInt(ctx.font, 10);
-		const textLeft = centerX - (textWidth / 2);
-		const textMargin = textHeight / 2;
-		const textTop = centerY - squareSize / 2 + (belowBar ? 1 : -1) * (squareSize + textMargin);
-		ctx.fillText(text, textLeft, textTop + textHeight);
+	if (text !== undefined) {
+		ctx.fillText(text.content, ...textPosition(centerX, centerY, text, squareSize));
 	}
 
 	ctx.fillRect(left, top, squareSize, squareSize);

@@ -2,8 +2,9 @@ import { ensureNever } from '../helpers/assertions';
 
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { SeriesMarkerShape, SeriesMarkerPosition } from '../model/series-markers';
+import { SeriesMarkerShape, SeriesMarkerText } from '../model/series-markers';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
+import { TextWidthCache } from '../model/text-width-cache';
 
 import { ScaledRenderer } from './scaled-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
@@ -17,8 +18,7 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 	color: string;
 	internalId: number;
 	externalId?: string;
-	text?: string;
-	position: SeriesMarkerPosition;
+	text?: SeriesMarkerText;
 }
 
 export interface SeriesMarkerRendererData {
@@ -28,6 +28,7 @@ export interface SeriesMarkerRendererData {
 
 export class SeriesMarkersRenderer extends ScaledRenderer {
 	private _data: SeriesMarkerRendererData | null = null;
+	private _textWidthCache: TextWidthCache = new TextWidthCache();
 
 	public setData(data: SeriesMarkerRendererData): void {
 		this._data = data;
@@ -57,6 +58,11 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 		}
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
+			if (item.text !== undefined) {
+				item.text.offsetX -= this._textWidthCache.measureText(ctx, item.text.content) / 2;
+				item.text.offsetY = item.text.offsetY * parseInt(ctx.font, 10);
+			}
+
 			drawItem(item, ctx);
 		}
 	}
@@ -65,16 +71,16 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
 	switch (item.shape) {
 		case 'arrowDown':
-			drawArrow(false, ctx, item.x, item.y, item.color, item.size, item.position === 'belowBar', item.text);
+			drawArrow(false, ctx, item.x, item.y, item.color, item.size, item.text);
 			return;
 		case 'arrowUp':
-			drawArrow(true, ctx, item.x, item.y, item.color, item.size, item.position === 'belowBar', item.text);
+			drawArrow(true, ctx, item.x, item.y, item.color, item.size, item.text);
 			return;
 		case 'circle':
-			drawCircle(ctx, item.x, item.y, item.color, item.size, item.position === 'belowBar', item.text);
+			drawCircle(ctx, item.x, item.y, item.color, item.size, item.text);
 			return;
 		case 'square':
-			drawSquare(ctx, item.x, item.y, item.color, item.size, item.position === 'belowBar', item.text);
+			drawSquare(ctx, item.x, item.y, item.color, item.size, item.text);
 			return;
 	}
 

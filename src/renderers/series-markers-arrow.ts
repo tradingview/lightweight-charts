@@ -1,9 +1,10 @@
 import { ceiledOdd } from '../helpers/mathex';
 
 import { Coordinate } from '../model/coordinate';
+import { SeriesMarkerText } from '../model/series-markers';
 
 import { hitTestSquare } from './series-markers-square';
-import { shapeSize } from './series-markers-utils';
+import { shapeSize, textPosition } from './series-markers-utils';
 
 export function drawArrow(
 	up: boolean,
@@ -12,8 +13,7 @@ export function drawArrow(
 	centerY: Coordinate,
 	color: string,
 	size: number,
-	belowBar: boolean,
-	text?: string
+	text?: SeriesMarkerText
 ): void {
 	const arrowSize = shapeSize('arrowUp', size);
 	const halfArrowSize = (arrowSize - 1) / 2;
@@ -39,13 +39,8 @@ export function drawArrow(
 		ctx.lineTo(centerX - halfBaseSize, centerY);
 	}
 
-	if (text) {
-		const textWidth = ctx.measureText(text).width;
-		const textHeight = parseInt(ctx.font, 10);
-		const textLeft = centerX - (textWidth / 2);
-		const textMargin = textHeight / 2;
-		const textTop = centerY - arrowSize / 2 + (belowBar ? 1 : -1) * (arrowSize + textMargin);
-		ctx.fillText(text, textLeft, textTop + textHeight);
+	if (text !== undefined) {
+		ctx.fillText(text.content, ...textPosition(centerX, centerY, text, arrowSize));
 	}
 
 	ctx.fill();
