@@ -1,7 +1,7 @@
 import { ensureNever } from '../helpers/assertions';
 import { ceiledEven, ceiledOdd } from '../helpers/mathex';
 
-import { SeriesMarkerShape, SeriesMarkerText } from '../model/series-markers';
+import { SeriesMarkerShape } from '../model/series-markers';
 
 const enum Constants {
 	MinShapeSize = 12,
@@ -34,8 +34,4 @@ export function calculateShapeHeight(barSpacing: number): number {
 
 export function shapeMargin(barSpacing: number): number {
 	return Math.max(size(barSpacing, 0.1), Constants.MinShapeMargin);
-}
-
-export function textPosition(x: number, y: number, text: SeriesMarkerText, markerShapeSize: number): [number, number] {
-	return [x + text.offsetX, y + text.offsetY + markerShapeSize / 2 + (text.offsetY > 0 ? markerShapeSize : -markerShapeSize)];
 }

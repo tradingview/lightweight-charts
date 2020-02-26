@@ -1,7 +1,7 @@
 import { Coordinate } from '../model/coordinate';
 import { SeriesMarkerText } from '../model/series-markers';
 
-import { shapeSize, textPosition } from './series-markers-utils';
+import { shapeSize } from './series-markers-utils';
 
 export function drawSquare(
 	ctx: CanvasRenderingContext2D,
@@ -19,7 +19,7 @@ export function drawSquare(
 	ctx.fillStyle = color;
 
 	if (text !== undefined) {
-		ctx.fillText(text.content, ...textPosition(centerX, centerY, text, squareSize));
+		ctx.fillText(text.content, text.x, text.y);
 	}
 
 	ctx.fillRect(left, top, squareSize, squareSize);

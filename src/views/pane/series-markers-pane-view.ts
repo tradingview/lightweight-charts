@@ -45,26 +45,27 @@ function fillSizeAndY(
 	const shapeSize = calculateShapeHeight(timeScale.barSpacing());
 	rendererItem.size = shapeSize as Coordinate;
 
-	if (marker.text !== undefined && marker.text.length > 0) {
-		rendererItem.text = {
-			content: marker.text,
-			offsetX: 0,
-			offsetY: marker.position === 'aboveBar' ? -0.5 : 0.5,
-		};
-	}
-
 	switch (marker.position) {
 		case 'inBar': {
 			rendererItem.y = priceScale.priceToCoordinate(inBarPrice, firstValue);
+			if (rendererItem.text !== undefined) {
+				rendererItem.text.y = rendererItem.y + shapeSize + shapeMargin as Coordinate;
+			}
 			return;
 		}
 		case 'aboveBar': {
 			rendererItem.y = (priceScale.priceToCoordinate(highPrice, firstValue) - shapeSize / 2 - offsets.aboveBar) as Coordinate;
+			if (rendererItem.text !== undefined) {
+				rendererItem.text.y = rendererItem.y - shapeSize - shapeMargin as Coordinate;
+			}
 			offsets.aboveBar += shapeSize + shapeMargin;
 			return;
 		}
 		case 'belowBar': {
 			rendererItem.y = (priceScale.priceToCoordinate(lowPrice, firstValue) + shapeSize / 2 + offsets.belowBar) as Coordinate;
+			if (rendererItem.text !== undefined) {
+				rendererItem.text.y = rendererItem.y + shapeSize + shapeMargin as Coordinate;
+			}
 			offsets.belowBar += shapeSize + shapeMargin;
 			return;
 		}
@@ -181,6 +182,13 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 
 			const rendererItem = this._data.items[index];
 			rendererItem.x = timeScale.indexToCoordinate(marker.time);
+			if (marker.text !== undefined && marker.text.length > 0) {
+				rendererItem.text = {
+					content: marker.text,
+					x: rendererItem.x,
+					y: 0 as Coordinate,
+				};
+			}
 			const dataAt = this._series.dataAt(marker.time);
 			if (dataAt === null) {
 				continue;

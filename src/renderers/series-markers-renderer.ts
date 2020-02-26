@@ -59,10 +59,9 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			if (item.text !== undefined) {
-				item.text.offsetX -= this._textWidthCache.measureText(ctx, item.text.content) / 2;
-				item.text.offsetY = item.text.offsetY * parseInt(ctx.font, 10);
+				item.text.x = item.text.x - this._textWidthCache.measureText(ctx, item.text.content) / 2 as Coordinate;
+				item.text.y = item.text.y + parseInt(ctx.font, 10) / 2 as Coordinate;
 			}
-
 			drawItem(item, ctx);
 		}
 	}

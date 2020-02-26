@@ -1,7 +1,7 @@
 import { Coordinate } from '../model/coordinate';
 import { SeriesMarkerText } from '../model/series-markers';
 
-import { shapeSize, textPosition } from './series-markers-utils';
+import { shapeSize } from './series-markers-utils';
 
 export function drawCircle(
 	ctx: CanvasRenderingContext2D,
@@ -18,7 +18,7 @@ export function drawCircle(
 	ctx.arc(centerX, centerY, halfSize, 0, 2 * Math.PI, false);
 
 	if (text !== undefined) {
-		ctx.fillText(text.content, ...textPosition(centerX, centerY, text, circleSize));
+		ctx.fillText(text.content, text.x, text.y);
 	}
 
 	ctx.fill();

@@ -4,7 +4,7 @@ import { Coordinate } from '../model/coordinate';
 import { SeriesMarkerText } from '../model/series-markers';
 
 import { hitTestSquare } from './series-markers-square';
-import { shapeSize, textPosition } from './series-markers-utils';
+import { shapeSize } from './series-markers-utils';
 
 export function drawArrow(
 	// tslint:disable-next-line:max-params
@@ -41,7 +41,7 @@ export function drawArrow(
 	}
 
 	if (text !== undefined) {
-		ctx.fillText(text.content, ...textPosition(centerX, centerY, text, arrowSize));
+		ctx.fillText(text.content, text.x, text.y);
 	}
 
 	ctx.fill();
