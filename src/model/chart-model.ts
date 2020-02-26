@@ -2,7 +2,7 @@ import { assert, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
+import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
@@ -63,13 +63,16 @@ export interface ChartOptions {
 	watermark: WatermarkOptions;
 	/** Structure with layout options */
 	layout: LayoutOptions;
-	/** Structure with default price scale options for overlay */
+
+	/** @Deprecated options for price scales */
 	priceScale: PriceScaleOptions;
 
 	/** Structure with price scale option for left price scale */
 	leftPriceScale: PriceScaleOptions;
 	/** Structure with price scale option for right price scale */
 	rightPriceScale: PriceScaleOptions;
+	/** Structure describing default price scale options for overlays */
+	overlayPriceScales: PriceScaleOptions;
 
 	/** Structure with time scale options */
 	timeScale: TimeScaleOptions;
@@ -163,28 +166,8 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
-		// TODO: implement this
 		merge(this._options, options);
 
-		// migrate price scale options
-		options = clone(options);
-		if (options.priceScale) {
-			options.leftPriceScale = options.leftPriceScale || {};
-			options.rightPriceScale = options.rightPriceScale || {};
-			// tslint:disable-next-line: deprecation
-			const position = options.priceScale.position;
-			// tslint:disable-next-line: deprecation
-			delete options.priceScale.position;
-			options.leftPriceScale = merge(options.leftPriceScale, options.priceScale);
-			options.rightPriceScale = merge(options.rightPriceScale, options.priceScale);
-			if (position === 'left') {
-				options.leftPriceScale.visible = true;
-			}
-			if (position === 'right') {
-				options.rightPriceScale.visible = true;
-			}
-
-		}
 		this._panes.forEach((p: Pane) => p.applyScaleOptions(options));
 
 		if (options.timeScale !== undefined) {

@@ -56,7 +56,7 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	}
 }
 
-function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<ChartOptionsInternal> {
+function migrateHhandleScaleScrollOptions(options: DeepPartial<ChartOptions>): void {
 	const handleScale = options.handleScale;
 	if (isBoolean(handleScale)) {
 		options.handleScale = {
@@ -76,6 +76,39 @@ function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<Char
 			pressedMouseMove: handleScroll,
 		};
 	}
+}
+
+function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
+	if (options.priceScale) {
+		options.leftPriceScale = options.leftPriceScale || {};
+		options.rightPriceScale = options.rightPriceScale || {};
+		// tslint:disable-next-line: deprecation
+		const position = options.priceScale.position;
+		// tslint:disable-next-line: deprecation
+		delete options.priceScale.position;
+		options.leftPriceScale = merge(options.leftPriceScale, options.priceScale);
+		options.rightPriceScale = merge(options.rightPriceScale, options.priceScale);
+		if (position === 'left') {
+			options.leftPriceScale.visible = true;
+		}
+		if (position === 'right') {
+			options.rightPriceScale.visible = true;
+		}
+		// copy defaults for overlays
+		options.overlayPriceScales = options.overlayPriceScales || {};
+		if (options.priceScale.invertScale !== undefined) {
+			options.overlayPriceScales.invertScale = options.priceScale.invertScale;
+		}
+		// do not migrate mode for backward compatibility
+		if (options.priceScale.scaleMargins !== undefined) {
+			options.overlayPriceScales.scaleMargins = options.priceScale.scaleMargins;
+		}
+	}
+}
+
+function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<ChartOptionsInternal> {
+	migrateHhandleScaleScrollOptions(options);
+	migratePriceScaleOptions(options);
 
 	return options as DeepPartial<ChartOptionsInternal>;
 }
@@ -98,14 +131,17 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			clone(chartOptionsDefaults) :
 			merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
 
+		// tslint:disable-next-line:deprecation
+		if (internalOptions.priceScale) {
 			// tslint:disable-next-line:deprecation
-		if (internalOptions.priceScale.position) {
-			// tslint:disable-next-line:deprecation
-			internalOptions.leftPriceScale.visible = internalOptions.priceScale.position === 'left';
-			// tslint:disable-next-line:deprecation
-			internalOptions.rightPriceScale.visible = internalOptions.priceScale.position === 'right';
-			// tslint:disable-next-line:deprecation
-			delete internalOptions.priceScale.position;
+			if (internalOptions.priceScale.position) {
+				// tslint:disable-next-line:deprecation
+				internalOptions.leftPriceScale.visible = internalOptions.priceScale.position === 'left';
+				// tslint:disable-next-line:deprecation
+				internalOptions.rightPriceScale.visible = internalOptions.priceScale.position === 'right';
+				// tslint:disable-next-line:deprecation
+				delete internalOptions.priceScale.position;
+			}
 		}
 
 		this._chartWidget = new ChartWidget(container, internalOptions);

@@ -14,6 +14,9 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 	crosshair: crosshairOptionsDefaults,
 	grid: gridOptionsDefaults,
 	priceScale: priceScaleOptionsDefaults,
+	overlayPriceScales: {
+		...priceScaleOptionsDefaults,
+	},
 	leftPriceScale: {
 		...priceScaleOptionsDefaults,
 		visible: false,

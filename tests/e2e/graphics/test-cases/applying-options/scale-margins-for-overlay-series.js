@@ -17,9 +17,12 @@ function generateData(valueOffset) {
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container);
 
-	var firstSeries = chart.addLineSeries();
+	var firstSeries = chart.addLineSeries({
+		color: 'blue',
+	});
 	var secondSeries = chart.addLineSeries({
 		overlay: true,
+		color: 'green',
 		scaleMargins: {
 			top: 0.5,
 			bottom: 0,
@@ -31,6 +34,7 @@ function runTestCase(container) {
 	});
 
 	thirdSeries.applyOptions({
+		color: 'red',
 		scaleMargins: {
 			top: 0,
 			bottom: 0.5,

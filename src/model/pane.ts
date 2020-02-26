@@ -82,31 +82,6 @@ export class Pane implements IDestroyable {
 		return null;
 	}
 
-/*	public onPriceScaleOptionsChanged(): void {
-		const options = this._model.options().priceScale;
-		this._defaultNonOverlayPriceScale.applyOptions(options);
-		const needLeftScale = options.position === 'left' || options.position === 'both';
-		const needRightScale = options.position === 'right' || options.position === 'both';
-		if (!needLeftScale) {
-			this._leftPriceScale = null;
-		}
-		if (!needRightScale) {
-			this._rightPriceScale = null;
-		}
-		if (needLeftScale && this._leftPriceScale === null) {
-			this._leftPriceScale = this._createPriceScale();
-		}
-		if (needRightScale && this._rightPriceScale === null) {
-			this._rightPriceScale = this._createPriceScale();
-		}
-		if (this._leftPriceScale !== null) {
-			this._leftPriceScale.applyOptions(this._model.options().priceScale);
-		}
-		if (this._rightPriceScale !== null) {
-			this._rightPriceScale.applyOptions(this._model.options().priceScale);
-		}
-	}*/
-
 	public destroy(): void {
 		this.model().priceScalesOptionsChanged().unsubscribeAll(this);
 		this._timeScale.barSpacingChanged().unsubscribeAll(this);
@@ -427,8 +402,7 @@ export class Pane implements IDestroyable {
 		}
 
 		if (priceScale === null) {
-			priceScale = this._createPriceScale(priceScaleId, this._model.options().priceScale);
-
+			priceScale = this._createPriceScale(priceScaleId, this._model.options().overlayPriceScales);
 		}
 
 		this._dataSources.push(source);
