@@ -34,6 +34,7 @@ function fillSizeAndY(
 	marker: SeriesMarker<TimePointIndex>,
 	seriesData: BarPrices | BarPrice,
 	offsets: Offsets,
+	textHeight: number,
 	shapeMargin: number,
 	priceScale: PriceScale,
 	timeScale: TimeScale,
@@ -43,28 +44,31 @@ function fillSizeAndY(
 	const highPrice = isNumber(seriesData) ? seriesData : seriesData.high;
 	const lowPrice = isNumber(seriesData) ? seriesData : seriesData.low;
 	const shapeSize = calculateShapeHeight(timeScale.barSpacing());
+	const halfSize = shapeSize / 2;
 	rendererItem.size = shapeSize as Coordinate;
 
 	switch (marker.position) {
 		case 'inBar': {
 			rendererItem.y = priceScale.priceToCoordinate(inBarPrice, firstValue);
 			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = rendererItem.y + shapeSize + shapeMargin as Coordinate;
+				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin / 2 + textHeight * 0.6 as Coordinate;
 			}
 			return;
 		}
 		case 'aboveBar': {
-			rendererItem.y = (priceScale.priceToCoordinate(highPrice, firstValue) - shapeSize / 2 - offsets.aboveBar) as Coordinate;
+			rendererItem.y = (priceScale.priceToCoordinate(highPrice, firstValue) - halfSize - offsets.aboveBar) as Coordinate;
 			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = rendererItem.y - shapeSize - shapeMargin as Coordinate;
+				rendererItem.text.y = rendererItem.y - halfSize - textHeight * 0.6 as Coordinate;
+				offsets.aboveBar += textHeight * 1.2;
 			}
 			offsets.aboveBar += shapeSize + shapeMargin;
 			return;
 		}
 		case 'belowBar': {
-			rendererItem.y = (priceScale.priceToCoordinate(lowPrice, firstValue) + shapeSize / 2 + offsets.belowBar) as Coordinate;
+			rendererItem.y = (priceScale.priceToCoordinate(lowPrice, firstValue) + halfSize + offsets.belowBar) as Coordinate;
 			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = rendererItem.y + shapeSize + shapeMargin as Coordinate;
+				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin + textHeight * 0.6 as Coordinate;
+				offsets.belowBar += textHeight * 1.2;
 			}
 			offsets.belowBar += shapeSize + shapeMargin;
 			return;
@@ -87,6 +91,9 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
+	private _chartModel: ChartModel;
+	private _fontSize: number;
+
 	public constructor(series: Series, model: ChartModel) {
 		this._series = series;
 		this._model = model;
@@ -94,6 +101,10 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			items: [],
 			visibleRange: null,
 		};
+
+		const layout = model.options().layout;
+		this._chartModel = model;
+		this._fontSize = layout.fontSize;
 	}
 
 	public update(updateType?: UpdateType): void {
@@ -108,7 +119,13 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		if (this._invalidated) {
 			this._makeValid();
 		}
+
+		const layout = this._chartModel.options().layout;
+		this._fontSize = layout.fontSize;
+
+		this._renderer.setParams(layout.fontSize, layout.fontFamily);
 		this._renderer.setData(this._data);
+
 		return this._renderer;
 	}
 
@@ -193,7 +210,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			if (dataAt === null) {
 				continue;
 			}
-			fillSizeAndY(rendererItem, marker, dataAt, offsets, shapeMargin, priceScale, timeScale, firstValue.value);
+			fillSizeAndY(rendererItem, marker, dataAt, offsets, this._fontSize, shapeMargin, priceScale, timeScale, firstValue.value);
 		}
 		this._invalidated = false;
 	}

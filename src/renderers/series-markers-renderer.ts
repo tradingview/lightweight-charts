@@ -1,4 +1,5 @@
 import { ensureNever } from '../helpers/assertions';
+import { makeFont } from '../helpers/make-font';
 
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
@@ -29,9 +30,21 @@ export interface SeriesMarkerRendererData {
 export class SeriesMarkersRenderer extends ScaledRenderer {
 	private _data: SeriesMarkerRendererData | null = null;
 	private _textWidthCache: TextWidthCache = new TextWidthCache();
+	private _fontSize: number = -1;
+	private _fontFamily: string = '';
+	private _font: string = '';
 
 	public setData(data: SeriesMarkerRendererData): void {
 		this._data = data;
+	}
+
+	public setParams(fontSize: number, fontFamily: string) {
+		if (this._fontSize !== fontSize || this._fontFamily !== fontFamily) {
+			this._fontSize = fontSize;
+			this._fontFamily = fontFamily;
+			this._font = makeFont(fontSize, fontFamily);
+			this._textWidthCache.reset();
+		}
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
@@ -56,11 +69,14 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
+
+		ctx.textBaseline = 'middle';
+		ctx.font = this._font;
+
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			if (item.text !== undefined) {
 				item.text.x = item.text.x - this._textWidthCache.measureText(ctx, item.text.content) / 2 as Coordinate;
-				item.text.y = item.text.y + parseInt(ctx.font, 10) / 2 as Coordinate;
 			}
 			drawItem(item, ctx);
 		}
