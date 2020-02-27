@@ -38,7 +38,7 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 		this._data = data;
 	}
 
-	public setParams(fontSize: number, fontFamily: string) {
+	public setParams(fontSize: number, fontFamily: string): void {
 		if (this._fontSize !== fontSize || this._fontFamily !== fontFamily) {
 			this._fontSize = fontSize;
 			this._fontFamily = fontFamily;
