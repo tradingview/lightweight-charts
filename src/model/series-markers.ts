@@ -8,6 +8,8 @@ export interface SeriesMarkerText {
 	content: string;
 	x: Coordinate;
 	y: Coordinate;
+	width: number;
+	height: number;
 }
 
 export interface SeriesMarker<TimeType> {
@@ -17,6 +19,7 @@ export interface SeriesMarker<TimeType> {
 	color: string;
 	id?: string;
 	text?: string;
+	size?: number;
 }
 
 export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {

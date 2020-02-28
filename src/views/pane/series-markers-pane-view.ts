@@ -43,7 +43,8 @@ function fillSizeAndY(
 	const inBarPrice = isNumber(seriesData) ? seriesData : seriesData.close;
 	const highPrice = isNumber(seriesData) ? seriesData : seriesData.high;
 	const lowPrice = isNumber(seriesData) ? seriesData : seriesData.low;
-	const shapeSize = calculateShapeHeight(timeScale.barSpacing());
+	const sizeMultiplier = isNumber(marker.size) ? Math.max(marker.size, 0) : 1;
+	const shapeSize = calculateShapeHeight(timeScale.barSpacing()) * sizeMultiplier;
 	const halfSize = shapeSize / 2;
 	rendererItem.size = shapeSize as Coordinate;
 
@@ -204,6 +205,8 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 					content: marker.text,
 					x: rendererItem.x,
 					y: 0 as Coordinate,
+					width: 0,
+					height: 0,
 				};
 			}
 			const dataAt = this._series.dataAt(marker.time);
