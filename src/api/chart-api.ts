@@ -131,19 +131,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			clone(chartOptionsDefaults) :
 			merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
 
-		// tslint:disable-next-line:deprecation
-		if (internalOptions.priceScale) {
-			// tslint:disable-next-line:deprecation
-			if (internalOptions.priceScale.position) {
-				// tslint:disable-next-line:deprecation
-				internalOptions.leftPriceScale.visible = internalOptions.priceScale.position === 'left';
-				// tslint:disable-next-line:deprecation
-				internalOptions.rightPriceScale.visible = internalOptions.priceScale.position === 'right';
-				// tslint:disable-next-line:deprecation
-				delete internalOptions.priceScale.position;
-			}
-		}
-
 		this._chartWidget = new ChartWidget(container, internalOptions);
 		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 

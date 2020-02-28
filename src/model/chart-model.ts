@@ -64,7 +64,9 @@ export interface ChartOptions {
 	/** Structure with layout options */
 	layout: LayoutOptions;
 
-	/** @Deprecated options for price scales */
+	/** @Deprecated options for price scales
+	 *  @internal
+	 */
 	priceScale: PriceScaleOptions;
 
 	/** Structure with price scale option for left price scale */
@@ -89,7 +91,7 @@ export interface ChartOptions {
 }
 
 export type ChartOptionsInternal =
-	Omit<ChartOptions, 'handleScroll' | 'handleScale'>
+	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale'>
 	& {
 		handleScroll: HandleScrollOptions;
 		handleScale: HandleScaleOptions;
@@ -178,8 +180,7 @@ export class ChartModel implements IDestroyable {
 			this._timeScale.applyLocalizationOptions(options.localization);
 		}
 
-		// tslint:disable-next-line: deprecation
-		if (options.leftPriceScale || options.rightPriceScale || options.priceScale) {
+		if (options.leftPriceScale || options.rightPriceScale) {
 			this._priceScalesOptionsChanged.fire();
 		}
 
