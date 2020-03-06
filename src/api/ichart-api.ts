@@ -17,7 +17,7 @@ import { BusinessDay, UTCTimestamp } from '../model/time-data';
 import { Time } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
-import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { ITimeScaleApi, TimeRangeWithBars } from './itime-scale-api';
 
 export interface MouseEventParams {
 	time?: UTCTimestamp | BusinessDay;
@@ -28,7 +28,7 @@ export interface MouseEventParams {
 }
 
 export type MouseEventHandler = (param: MouseEventParams) => void;
-export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
+export type TimeRangeChangeEventHandler = (timeRange: TimeRangeWithBars | null) => void;
 
  /*
  * The main interface of a single chart

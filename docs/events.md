@@ -86,9 +86,9 @@ export type MouseEventHandler = (param: MouseEventParams) => void;
 TimeRangeChangeEventHandler is a type of callback that is being used to get notified about chart time range changes.
 
 ```typescript
-export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
+export type TimeRangeChangeEventHandler = (timeRange: TimeRangeWithBars | null) => void;
 ```
 
-`TimeRange` is an object with `from` and `to` fields which are the first and last time points of a time range.
+`TimeRangeWithBars` is an object with `from` and `to` fields which are the first and last time points of a time range, and `barsBefore` and `barsAfter` fields, which describe the amount of bars missing before and after the data set in order to fill the entire viewport of the chart. These fields can be used to dynamically load more data in order to fill the empty space in the charts.
 
 `null` is returned if the chart has no data at all.

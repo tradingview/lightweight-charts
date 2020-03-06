@@ -9,6 +9,11 @@ export interface TimeRange {
 	to: Time;
 }
 
+export interface TimeRangeWithBars extends TimeRange {
+	barsBefore: number;
+	barsAfter: number;
+}
+
 /** Interface to chart time scale */
 export interface ITimeScaleApi {
 	/**
@@ -33,7 +38,7 @@ export interface ITimeScaleApi {
 	 * Returns current visible time range of the chart
 	 * @returns - visible range or null if the chart has no data at all
 	 */
-	getVisibleRange(): TimeRange | null;
+	getVisibleRange(): TimeRangeWithBars | null;
 
 	/**
 	 * Sets visible range of data
