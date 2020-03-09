@@ -55,8 +55,8 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		return {
 			from: timePointToTime(ensureNotNull(points.valueAt(Math.max(firstIndex, visibleBars.firstBar()) as TimePointIndex))),
 			to: timePointToTime(ensureNotNull(points.valueAt(Math.min(lastIndex, visibleBars.lastBar()) as TimePointIndex))),
-			barsBefore: Math.abs(Math.min(0, visibleBars.firstBar())),
-			barsAfter: Math.max(0, Math.ceil(this.scrollPosition())),
+			barsBefore: visibleBars.firstBar(),
+			barsAfter: Math.ceil(this.scrollPosition()),
 		};
 	}
 

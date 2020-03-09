@@ -68,7 +68,7 @@ chart.timeScale().scrollToRealTime();
 
 ### getVisibleRange()
 
-Returns the current visible time range of the chart as an object with the first and last time points of the time range, or returns `null` if the chart has no data at all.
+Returns the current visible time range of the chart as an object with the first and last time points of the time range, or returns `null` if the chart has no data at all. The additional fields `barsBefore` and `barsAfter` denote the amount of bars outside of the viewport in the given direction. If the number is negative, it means that the given amount of bars is missing in the data set on this side in order to fill the viewport completely.
 
 ```javascript
 chart.timeScale().getVisibleRange();

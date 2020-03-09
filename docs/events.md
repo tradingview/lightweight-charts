@@ -89,6 +89,6 @@ TimeRangeChangeEventHandler is a type of callback that is being used to get noti
 export type TimeRangeChangeEventHandler = (timeRange: TimeRangeWithBars | null) => void;
 ```
 
-`TimeRangeWithBars` is an object with `from` and `to` fields which are the first and last time points of a time range, and `barsBefore` and `barsAfter` fields, which describe the amount of bars missing before and after the data set in order to fill the entire viewport of the chart. These fields can be used to dynamically load more data in order to fill the empty space in the charts.
+`TimeRangeWithBars` is an object with `from` and `to` fields which are the first and last time points of a time range, and `barsBefore` and `barsAfter` fields, which describe the amount of bars outside of the viewport to the left and to the right. If either value is negative, it means that bars are missing in the data set to fill the viewport completely on the given side. These fields can be used to dynamically load more data when the user pans or zooms.
 
 `null` is returned if the chart has no data at all.
