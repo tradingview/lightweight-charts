@@ -22,6 +22,7 @@ function generateData() {
 	return res;
 }
 
+// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(
 		container,
