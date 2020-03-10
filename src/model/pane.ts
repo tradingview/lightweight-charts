@@ -63,7 +63,16 @@ export class Pane implements IDestroyable {
 		if (options.localization) {
 			this._leftPriceScale.updateFormatter();
 			this._rightPriceScale.updateFormatter();
-			// TODO: update formatters for all overlay scales
+		}
+		if (options.overlayPriceScales) {
+			const sourceArrays = Array.from(this._overlaySourcesByScaleId.values());
+			for (const arr of sourceArrays) {
+				const priceScale = arr[0].priceScale();
+				priceScale?.applyOptions(options.overlayPriceScales);
+				if (options.localization) {
+					priceScale?.updateFormatter();
+				}
+			}
 		}
 	}
 
@@ -228,11 +237,11 @@ export class Pane implements IDestroyable {
 		return 'overlay';
 	}
 
-	public leftPriceScale(): PriceScale | null {
+	public leftPriceScale(): PriceScale {
 		return this._leftPriceScale;
 	}
 
-	public rightPriceScale(): PriceScale | null {
+	public rightPriceScale(): PriceScale {
 		return this._rightPriceScale;
 	}
 

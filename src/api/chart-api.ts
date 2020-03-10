@@ -56,7 +56,7 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	}
 }
 
-function migrateHhandleScaleScrollOptions(options: DeepPartial<ChartOptions>): void {
+function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): void {
 	const handleScale = options.handleScale;
 	if (isBoolean(handleScale)) {
 		options.handleScale = {
@@ -107,7 +107,7 @@ function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
 }
 
 function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<ChartOptionsInternal> {
-	migrateHhandleScaleScrollOptions(options);
+	migrateHandleScaleScrollOptions(options);
 	migratePriceScaleOptions(options);
 
 	return options as DeepPartial<ChartOptionsInternal>;

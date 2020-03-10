@@ -30,5 +30,5 @@ Percentage scales are always autoscaled.
 
 The reason of having logarithmic scales is comparing relative change instead of absolute change.
 On regular scale every candle with 100-points change has the same height.
-On logarithmic scale event candle with 2% change has the same height.
+On logarithmic scale every candle with 2% change has the same height.
 Logarithmic scale cannot be percentage.
