@@ -2,6 +2,7 @@ import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from 
 
 import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
+import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
@@ -80,6 +81,7 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 
 function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
 	if (options.priceScale) {
+		warn('Usage of obsolete options "priceScale" has been detected');
 		options.leftPriceScale = options.leftPriceScale || {};
 		options.rightPriceScale = options.rightPriceScale || {};
 		// tslint:disable-next-line: deprecation
@@ -113,7 +115,11 @@ function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<Char
 	return options as DeepPartial<ChartOptionsInternal>;
 }
 
-export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
+export interface IPriceScaleApiProvider {
+	priceScale(id: string): IPriceScaleApi;
+}
+
+export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesConsumer<SeriesType> {
 	private _chartWidget: ChartWidget;
 	private _dataLayer: DataLayer = new DataLayer();
 	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
@@ -123,7 +129,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
 
-	private readonly _priceScaleApi: Map<string, PriceScaleApi> = new Map();
+	private readonly _priceScaleApis: Map<string, PriceScaleApi> = new Map();
 	private readonly _timeScaleApi: TimeScaleApi;
 
 	public constructor(container: HTMLElement, options?: DeepPartial<ChartOptions>) {
@@ -160,7 +166,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
 
-		const priceScaleApis = Array.from(this._priceScaleApi.values());
+		const priceScaleApis = Array.from(this._priceScaleApis.values());
 		priceScaleApis.forEach((ps: PriceScaleApi) => ps.destroy());
 
 		this._timeScaleApi.destroy();
@@ -188,7 +194,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const strictOptions = merge(clone(seriesOptionsDefaults), areaStyleDefaults, options) as AreaSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Area', strictOptions);
 
-		const res = new SeriesApi<'Area'>(series, this);
+		const res = new SeriesApi<'Area'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -201,7 +207,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const strictOptions = merge(clone(seriesOptionsDefaults), barStyleDefaults, options) as BarSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Bar', strictOptions);
 
-		const res = new SeriesApi<'Bar'>(series, this);
+		const res = new SeriesApi<'Bar'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -215,7 +221,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const strictOptions = merge(clone(seriesOptionsDefaults), candlestickStyleDefaults, options) as CandlestickSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Candlestick', strictOptions);
 
-		const res = new CandlestickSeriesApi(series, this);
+		const res = new CandlestickSeriesApi(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -228,7 +234,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const strictOptions = merge(clone(seriesOptionsDefaults), histogramStyleDefaults, options) as HistogramSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Histogram', strictOptions);
 
-		const res = new SeriesApi<'Histogram'>(series, this);
+		const res = new SeriesApi<'Histogram'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -241,7 +247,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const strictOptions = merge(clone(seriesOptionsDefaults), lineStyleDefaults, options) as LineSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Line', strictOptions);
 
-		const res = new SeriesApi<'Line'>(series, this);
+		const res = new SeriesApi<'Line'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -311,16 +317,13 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._timeRangeChanged.unsubscribe(handler);
 	}
 
-	// TODO: add more subscriptions
-
 	public priceScale(priceScaleId?: string): IPriceScaleApi {
-		// TODO: get visible scale
-		priceScaleId = priceScaleId || 'right';
-		if (this._priceScaleApi.has(priceScaleId)) {
-			return ensureDefined(this._priceScaleApi.get(priceScaleId));
+		priceScaleId = priceScaleId || this._chartWidget.model().defaultVisiblePriceScale();
+		if (this._priceScaleApis.has(priceScaleId)) {
+			return ensureDefined(this._priceScaleApis.get(priceScaleId));
 		}
 		const res = new PriceScaleApi(this._chartWidget.model(), priceScaleId);
-		this._priceScaleApi.set(priceScaleId, res);
+		this._priceScaleApis.set(priceScaleId, res);
 		return res;
 	}
 

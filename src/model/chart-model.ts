@@ -2,7 +2,8 @@ import { assert, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { DeepPartial, merge } from '../helpers/strict-type-checks';
+import { warn } from '../helpers/logger';
+import { DeepPartial, merge, uid } from '../helpers/strict-type-checks';
 
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
@@ -192,6 +193,8 @@ export class ChartModel implements IDestroyable {
 		if (priceScale !== null) {
 			priceScale.applyOptions(options);
 			this._priceScalesOptionsChanged.fire();
+		} else {
+			warn('Trying to apply price scale options with incorrect ID');
 		}
 	}
 
@@ -560,10 +563,6 @@ export class ChartModel implements IDestroyable {
 		return this._priceScalesOptionsChanged;
 	}
 
-/*	public mainPriceScale(): PriceScale {
-		return this._panes[0].defaultPriceScale();
-	}*/
-
 	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T> {
 		const pane = this._panes[0];
 		const series = this._createSeries(options, seriesType, pane);
@@ -604,6 +603,10 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(mask);
 	}
 
+	public defaultVisiblePriceScale(): string {
+		return this._options.rightPriceScale.visible ? 'right' : 'left';
+	}
+
 	private _paneInvalidationMask(pane: Pane | null, level: InvalidationLevel): InvalidateMask {
 		const inv = new InvalidateMask(level);
 		if (pane !== null) {
@@ -635,21 +638,30 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
+	private _generateUniquePriceScaleId(): string {
+		while (true) {
+			const newId = uid();
+			if (this._panes.every((pane: Pane) => !pane.containsPriceScale(newId))) {
+				return newId;
+			}
+		}
+	}
+
 	private _createSeries<T extends SeriesType>(options: SeriesOptionsMap[T], seriesType: T, pane: Pane): Series<T> {
 		const series = new Series<T>(this, options, seriesType);
 
 		let targetScaleId: string;
-			// tslint:disable-next-line: deprecation
+			// tslint:disable-next-line:deprecation
 		if (options.priceScaleId === '' || options.overlay) {
-			targetScaleId = pane.generateUniquePriceScaleId();
+			targetScaleId = this._generateUniquePriceScaleId();
 		} else {
 			if (options.priceScaleId) {
 				targetScaleId = options.priceScaleId;
 			} else {
-				targetScaleId = this._options.rightPriceScale.visible ? 'right' : 'left';
+				targetScaleId = this.defaultVisiblePriceScale();
 			}
 		}
-		// tslint:disable-next-line: deprecation
+		// tslint:disable-next-line:deprecation
 		pane.addDataSource(series, targetScaleId, false);
 
 		if (targetScaleId !== 'left' && targetScaleId !== 'right') {

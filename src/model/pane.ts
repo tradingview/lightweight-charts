@@ -2,7 +2,7 @@ import { assert, ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { clone, DeepPartial, uid } from '../helpers/strict-type-checks';
+import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel, ChartOptions } from './chart-model';
 import { IDataSource } from './idata-source';
@@ -106,15 +106,6 @@ export class Pane implements IDestroyable {
 		this._destroyed.fire();
 	}
 
-	public generateUniquePriceScaleId(): string {
-		while (true) {
-			const newId = uid();
-			if (!this._overlaySourcesByScaleId.has(newId)) {
-				return newId;
-			}
-		}
-	}
-
 	public stretchFactor(): number {
 		return this._stretchFactor;
 	}
@@ -176,7 +167,7 @@ export class Pane implements IDestroyable {
 		this._insertDataSource(source, targetScaleId, zOrder);
 	}
 
-	// tslint:disable-next-line: cyclomatic-complexity
+	// tslint:disable-next-line:cyclomatic-complexity
 	public removeDataSource(source: IDataSource): void {
 		const index = this._dataSources.indexOf(source);
 		assert(index !== -1, 'removeDataSource: invalid data source');
@@ -243,6 +234,10 @@ export class Pane implements IDestroyable {
 
 	public rightPriceScale(): PriceScale {
 		return this._rightPriceScale;
+	}
+
+	public containsPriceScale(priceScaleId: string): boolean {
+		return priceScaleId === 'left' || priceScaleId === 'right' || this._overlaySourcesByScaleId.has(priceScaleId);
 	}
 
 	public startScalePrice(priceScale: PriceScale, x: number): void {

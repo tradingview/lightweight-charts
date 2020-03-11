@@ -149,6 +149,9 @@ export interface SeriesScaleOptions {
 	 */
 	overlay?: boolean;
 	priceScaleId?: string;
+	/**
+	 * @deprecated Use priceScale method of series instead
+	 */
 	scaleMargins?: PriceScaleMargins;
 }
 

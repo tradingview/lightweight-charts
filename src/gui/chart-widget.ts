@@ -34,7 +34,6 @@ export class ChartWidget implements IDestroyable {
 	private _paneSeparators: PaneSeparator[] = [];
 	private readonly _model: ChartModel;
 	private _drawRafId: number = 0;
-	private readonly _priceAxisWidthChanged: Delegate<number, PriceAxisPosition> = new Delegate();
 	private _height: number = 0;
 	private _width: number = 0;
 	private _leftPriceAxisWidth: number = 0;
@@ -353,11 +352,9 @@ export class ChartWidget implements IDestroyable {
 		this._model.setWidth(paneWidth);
 		if (this._leftPriceAxisWidth !== leftPriceAxisWidth) {
 			this._leftPriceAxisWidth = leftPriceAxisWidth;
-			this._priceAxisWidthChanged.fire(leftPriceAxisWidth, 'left');
 		}
 		if (this._rightPriceAxisWidth !== rightPriceAxisWidth) {
 			this._rightPriceAxisWidth = rightPriceAxisWidth;
-			this._priceAxisWidthChanged.fire(rightPriceAxisWidth, 'right');
 		}
 	}
 

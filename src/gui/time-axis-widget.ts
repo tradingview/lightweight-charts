@@ -92,8 +92,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._element.appendChild(this._cell);
 		this._element.appendChild(this._rightStubCell);
 
-		this._recreateStub();
-		this._chart.model().priceScalesOptionsChanged().subscribe(this._recreateStub.bind(this), this);
+		this._recreateStubs();
+		this._chart.model().priceScalesOptionsChanged().subscribe(this._recreateStubs.bind(this), this);
 
 		this._mouseEventHandler = new MouseEventHandler(
 			this._topCanvasBinding.canvas,
@@ -474,7 +474,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._cell.style.cursor = type === CursorType.EwResize ? 'ew-resize' : 'default';
 	}
 
-	private _recreateStub(): void {
+	private _recreateStubs(): void {
 		const model = this._chart.model();
 		const options = model.options();
 		if (!options.leftPriceScale.visible && this._leftStub !== null) {
@@ -505,43 +505,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._rightStub = new PriceAxisStub('right', this._chart.options(), params, borderVisibleGetter);
 			this._rightStubCell.appendChild(this._rightStub.getElement());
 		}
-/*		const priceAxisPosition = this._chart.model().mainPriceScale().options().position;
-		if (priceAxisPosition === this._priceAxisPosition) {
-			return;
-		}
-		if (this._leftStub !== null) {
-			this._leftStubCell.removeChild(this._leftStub.getElement());
-			this._leftStub.destroy();
-			this._leftStub = null;
-		}
-		if (this._rightStub !== null) {
-			this._rightStubCell.removeChild(this._rightStub.getElement());
-			this._rightStub.destroy();
-			this._rightStub = null;
-		}
-
-		if (priceAxisPosition !== 'none') {
-			const rendererOptionsProvider = this._chart.model().rendererOptionsProvider();
-			const params: PriceAxisStubParams = {
-				rendererOptionsProvider: rendererOptionsProvider,
-			};
-
-			const model = this._chart.model();
-			const borderVisibleGetter = () => {
-				return model.mainPriceScale().options().borderVisible && model.timeScale().options().borderVisible;
-			};
-
-			if (priceAxisPosition === 'left' || priceAxisPosition === 'both') {
-				this._leftStub = new PriceAxisStub('left', this._chart.options(), params, borderVisibleGetter);
-				this._leftStubCell.appendChild(this._leftStub.getElement());
-			}
-			if (priceAxisPosition === 'right' || priceAxisPosition === 'both') {
-				this._rightStub = new PriceAxisStub('right', this._chart.options(), params, borderVisibleGetter);
-				this._rightStubCell.appendChild(this._rightStub.getElement());
-			}
-		}
-
-		this._priceAxisPosition = priceAxisPosition;*/
 	}
 
 	private readonly _canvasConfiguredHandler = () => this._chart.model().lightUpdate();

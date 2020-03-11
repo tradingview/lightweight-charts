@@ -12,9 +12,11 @@ import {
 	SeriesType,
 } from '../model/series-options';
 
+import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
 import { IPriceLine } from './iprice-line';
+import { IPriceScaleApi } from './iprice-scale-api';
 import { IPriceFormatter, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
@@ -23,9 +25,12 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>;
 
-	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>) {
+	private readonly _priceScaleApiProvider: IPriceScaleApiProvider;
+
+	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>, priceScaleApiProvider: IPriceScaleApiProvider) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
+		this._priceScaleApiProvider = priceScaleApiProvider;
 	}
 
 	public destroy(): void {
@@ -80,6 +85,10 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public options(): Readonly<SeriesOptionsMap[TSeriesType]> {
 		return clone(this._series.options());
+	}
+
+	public priceScale(): IPriceScaleApi {
+		return this._priceScaleApiProvider.priceScale(this._series.priceScale().id());
 	}
 
 	public createPriceLine(options: PriceLineOptions): IPriceLine {
