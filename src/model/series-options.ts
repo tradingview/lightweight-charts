@@ -77,7 +77,6 @@ export interface AreaStyleOptions {
 export interface HistogramStyleOptions {
 	color: string;
 	base: number;
-	lineWidth: number;
 }
 
 /**
@@ -155,6 +154,17 @@ export interface SeriesScaleOptions {
 	scaleMargins?: PriceScaleMargins;
 }
 
+export const enum PriceLineSource {
+	/**
+	 * The last bar data
+	 */
+	LastBar,
+	/**
+	 * The last visible bar in viewport
+	 */
+	LastVisible,
+}
+
 /**
  * Structure describing options common for all types of series
  */
@@ -171,6 +181,10 @@ export interface SeriesOptionsCommon {
 
 	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
 	priceLineVisible: boolean;
+	/**
+	 *  Enum of possible modes of priceLine source
+	 */
+	priceLineSource: PriceLineSource;
 	/** Width of the price line. Ignored if priceLineVisible is false */
 	priceLineWidth: LineWidth;
 	/** Color of the price line. Ignored if priceLineVisible is false */

@@ -1,5 +1,6 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
+import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
@@ -12,7 +13,7 @@ import { MarkSpanBorder, TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { TimeAxisView } from '../views/time-axis/time-axis-view';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
@@ -259,12 +260,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getPretransformedContext2D(this._canvasBinding);
-			this._drawBackground(ctx);
-			this._drawBorder(ctx);
+			const ctx = getContext2D(this._canvasBinding.canvas);
+			this._drawBackground(ctx, this._canvasBinding.pixelRatio);
+			this._drawBorder(ctx, this._canvasBinding.pixelRatio);
 
-			this._drawTickMarks(ctx);
-			this._drawBackLabels(ctx);
+			this._drawTickMarks(ctx, this._canvasBinding.pixelRatio);
+			this._drawBackLabels(ctx, this._canvasBinding.pixelRatio);
 
 			if (this._leftStub !== null) {
 				this._leftStub.paint(type);
@@ -274,25 +275,30 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			}
 		}
 
-		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
-		this._drawCrosshairLabel(topCtx);
+		const topCtx = getContext2D(this._topCanvasBinding.canvas);
+		this._drawCrosshairLabel(topCtx, this._topCanvasBinding.pixelRatio);
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D): void {
-		clearRect(ctx, 0, 0, this._size.w, this._size.h, this._backgroundColor());
+	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+		drawScaled(ctx, pixelRatio, () => {
+			clearRect(ctx, 0, 0, this._size.w, this._size.h, this._backgroundColor());
+		});
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D): void {
+	private _drawBorder(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		if (this._chart.options().timeScale.borderVisible) {
 			ctx.save();
+
 			ctx.fillStyle = this._lineColor();
-			ctx.translate(-0.5, -0.5);
-			ctx.fillRect(0, 0, this._size.w, 1);
+
+			const borderSize = Math.max(1, Math.floor(this._getRendererOptions().borderSize * pixelRatio));
+
+			ctx.fillRect(0, 0, Math.ceil(this._size.w * pixelRatio), borderSize);
 			ctx.restore();
 		}
 	}
 
-	private _drawTickMarks(ctx: CanvasRenderingContext2D): void {
+	private _drawTickMarks(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const tickMarks = this._chart.model().timeScale().marks();
 
 		if (!tickMarks || tickMarks.length === 0) {
@@ -340,37 +346,43 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		);
 
 		ctx.textAlign = 'center';
-		ctx.translate(0.5, -0.5);
 		ctx.fillStyle = this._lineColor();
+
+		const borderSize = Math.floor(this._getRendererOptions().borderSize * pixelRatio);
+		const tickWidth = Math.max(1, Math.floor(pixelRatio));
+		const tickOffset = Math.floor(pixelRatio * 0.5);
 
 		if (this._chart.model().timeScale().options().borderVisible) {
 			ctx.beginPath();
+			const tickLen = Math.round(rendererOptions.tickLength * pixelRatio);
 			for (let index = tickMarks.length; index--;) {
-				ctx.rect(tickMarks[index].coord, 1, 1, rendererOptions.tickLength);
+				const x = Math.round(tickMarks[index].coord * pixelRatio);
+				ctx.rect(x - tickOffset, borderSize, tickWidth, tickLen);
 			}
 
 			ctx.fill();
 		}
 
 		ctx.fillStyle = this._textColor();
-		// draw base marks
-		ctx.font = this._baseFont();
-		for (const tickMark of tickMarks) {
-			if (tickMark.span < maxSpan) {
-				ctx.fillText(tickMark.label, tickMark.coord, yText);
-			}
-		}
-		ctx.font = this._baseBoldFont();
-		for (const tickMark of tickMarks) {
-			if (tickMark.span >= maxSpan) {
-				ctx.fillText(tickMark.label, tickMark.coord, yText);
-			}
-		}
 
-		ctx.restore();
+		drawScaled(ctx, pixelRatio, () => {
+			// draw base marks
+			ctx.font = this._baseFont();
+			for (const tickMark of tickMarks) {
+				if (tickMark.span < maxSpan) {
+					ctx.fillText(tickMark.label, tickMark.coord, yText);
+				}
+			}
+			ctx.font = this._baseBoldFont();
+			for (const tickMark of tickMarks) {
+				if (tickMark.span >= maxSpan) {
+					ctx.fillText(tickMark.label, tickMark.coord, yText);
+				}
+			}
+		});
 	}
 
-	private _drawBackLabels(ctx: CanvasRenderingContext2D): void {
+	private _drawBackLabels(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		ctx.save();
 		const topLevelSources: Set<IDataSource> = new Set();
 
@@ -386,16 +398,17 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 			const views = source.timeAxisViews();
 			for (const view of views) {
-				view.renderer().draw(ctx, rendererOptions);
+				view.renderer().draw(ctx, rendererOptions, pixelRatio);
 			}
 		}
 
 		ctx.restore();
 	}
 
-	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D): void {
-		ctx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
+	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+		ctx.save();
 
+		ctx.clearRect(0, 0, Math.ceil(this._size.w * pixelRatio), Math.ceil(this._size.h * pixelRatio));
 		const model = this._chart.model();
 
 		const views: ReadonlyArray<TimeAxisView>[] = []; // array of arrays
@@ -408,10 +421,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		views.forEach((arr: ReadonlyArray<TimeAxisView>) => {
 			arr.forEach((view: TimeAxisView) => {
 				ctx.save();
-				view.renderer().draw(ctx, renderingOptions);
+				view.renderer().draw(ctx, renderingOptions, pixelRatio);
 				ctx.restore();
 			});
 		});
+
+		ctx.restore();
 	}
 
 	private _backgroundColor(): string {

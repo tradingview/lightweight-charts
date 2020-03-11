@@ -1,7 +1,9 @@
+import { ceiledOdd } from '../helpers/mathex';
+
 import { Coordinate } from '../model/coordinate';
 
 import { hitTestSquare } from './series-markers-square';
-import { ceilToOdd, shapeSize } from './series-markers-utils';
+import { shapeSize } from './series-markers-utils';
 
 export function drawArrow(
 	up: boolean,
@@ -13,7 +15,7 @@ export function drawArrow(
 ): void {
 	const arrowSize = shapeSize('arrowUp', size);
 	const halfArrowSize = (arrowSize - 1) / 2;
-	const baseSize = ceilToOdd(size / 2);
+	const baseSize = ceiledOdd(size / 2);
 	const halfBaseSize = (baseSize - 1) / 2;
 	ctx.fillStyle = color;
 	ctx.beginPath();

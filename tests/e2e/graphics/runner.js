@@ -59,7 +59,7 @@ function runMocha(closeServer) {
 		mocha.checkLeaks();
 	}
 
-	mocha.hideDiff(!mochaConfig.diff);
+	mocha.diff(mochaConfig.diff);
 	mocha.addFile(path.resolve(__dirname, './graphics-test-cases.ts'));
 
 	mocha.run(failures => {

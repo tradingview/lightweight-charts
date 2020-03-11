@@ -184,8 +184,8 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		delete this._dataLayer;
 	}
 
-	public resize(height: number, width: number, forceRepaint?: boolean): void {
-		this._chartWidget.resize(height, width, forceRepaint);
+	public resize(width: number, height: number, forceRepaint?: boolean): void {
+		this._chartWidget.resize(width, height, forceRepaint);
 	}
 
 	public addAreaSeries(options: AreaSeriesPartialOptions = {}): ISeriesApi<'Area'> {
@@ -277,7 +277,10 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		const timeScaleUpdate = update.timeScaleUpdate;
 		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.updateData(value.update);
+			// the latest arg `true` must be removed in https://github.com/tradingview/lightweight-charts/issues/270
+			// here we don't need to clear palettes because they were just filled in DataLayer
+			// see https://github.com/tradingview/lightweight-charts/pull/330#discussion_r379415805
+			key.updateData(value.update, true);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
 	}

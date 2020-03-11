@@ -1,6 +1,7 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
 import { ensureNotNull } from '../helpers/assertions';
+import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -14,7 +15,7 @@ import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { clearRect, createBoundCanvas, getPretransformedContext2D, Size } from './canvas-utils';
+import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
@@ -504,18 +505,20 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getPretransformedContext2D(this._canvasBinding);
-			this._drawBackground(ctx, this._backgroundColor());
+			const ctx = getContext2D(this._canvasBinding.canvas);
+			ctx.save();
+			this._drawBackground(ctx, this._backgroundColor(), this._canvasBinding.pixelRatio);
 			if (this._state) {
-				this._drawGrid(ctx);
-				this._drawWatermark(ctx);
-				this._drawSources(ctx);
+				this._drawGrid(ctx, this._canvasBinding.pixelRatio);
+				this._drawWatermark(ctx, this._canvasBinding.pixelRatio);
+				this._drawSources(ctx, this._canvasBinding.pixelRatio);
 			}
+			ctx.restore();
 		}
 
-		const topCtx = getPretransformedContext2D(this._topCanvasBinding);
-		topCtx.clearRect(-0.5, -0.5, this._size.w, this._size.h);
-		this._drawCrosshair(topCtx);
+		const topCtx = getContext2D(this._topCanvasBinding.canvas);
+		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
+		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
@@ -538,29 +541,32 @@ export class PaneWidget implements IDestroyable {
 		this._state = null;
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, color: string): void {
-		clearRect(ctx, 0, 0, this._size.w, this._size.h, color);
+	private _drawBackground(ctx: CanvasRenderingContext2D, color: string, pixelRatio: number): void {
+		drawScaled(ctx, pixelRatio, () => {
+			clearRect(ctx, 0, 0, this._size.w, this._size.h, color);
+		});
 	}
 
-	private _drawGrid(ctx: CanvasRenderingContext2D): void {
+	private _drawGrid(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const state = ensureNotNull(this._state);
 		const source = this._model().gridSource();
 		// NOTE: grid source requires Pane instance for paneViews (for the nonce)
 		const paneViews = source.paneViews(state);
 		const height = state.height();
 		const width = state.width();
+
 		for (const paneView of paneViews) {
 			ctx.save();
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
-				renderer.draw(ctx, false);
+				renderer.draw(ctx, pixelRatio, false);
 			}
 
 			ctx.restore();
 		}
 	}
 
-	private _drawWatermark(ctx: CanvasRenderingContext2D): void {
+	private _drawWatermark(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const source = this._model().watermarkSource();
 		if (source === null) {
 			return;
@@ -574,38 +580,39 @@ export class PaneWidget implements IDestroyable {
 		const paneViews = source.paneViews();
 		const height = state.height();
 		const width = state.width();
+
 		for (const paneView of paneViews) {
 			ctx.save();
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
-				renderer.draw(ctx, false);
+				renderer.draw(ctx, pixelRatio, false);
 			}
 
 			ctx.restore();
 		}
 	}
 
-	private _drawCrosshair(ctx: CanvasRenderingContext2D): void {
-		this._drawSource(this._model().crosshairSource(), ctx);
+	private _drawCrosshair(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+		this._drawSource(this._model().crosshairSource(), ctx, pixelRatio);
 	}
 
-	private _drawSources(ctx: CanvasRenderingContext2D): void {
+	private _drawSources(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 		const crosshairSource = this._model().crosshairSource();
 
 		for (const source of sources) {
-			this._drawSourceBackground(source, ctx);
+			this._drawSourceBackground(source, ctx, pixelRatio);
 		}
 
 		for (const source of sources) {
 			if (source !== crosshairSource) {
-				this._drawSource(source, ctx);
+				this._drawSource(source, ctx, pixelRatio);
 			}
 		}
 	}
 
-	private _drawSource(source: IDataSource, ctx: CanvasRenderingContext2D): void {
+	private _drawSource(source: IDataSource, ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const state = ensureNotNull(this._state);
 		const paneViews = source.paneViews(state);
 		const height = state.height();
@@ -620,13 +627,13 @@ export class PaneWidget implements IDestroyable {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
 				ctx.save();
-				renderer.draw(ctx, isHovered, objecId);
+				renderer.draw(ctx, pixelRatio, isHovered, objecId);
 				ctx.restore();
 			}
 		}
 	}
 
-	private _drawSourceBackground(source: IDataSource, ctx: CanvasRenderingContext2D): void {
+	private _drawSourceBackground(source: IDataSource, ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const state = ensureNotNull(this._state);
 		const paneViews = source.paneViews(state);
 		const height = state.height();
@@ -641,7 +648,7 @@ export class PaneWidget implements IDestroyable {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null && renderer.drawBackground !== undefined) {
 				ctx.save();
-				renderer.drawBackground(ctx, isHovered, objecId);
+				renderer.drawBackground(ctx, pixelRatio, isHovered, objecId);
 				ctx.restore();
 			}
 		}

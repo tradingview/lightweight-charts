@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(document.body, {
+	const chart = LightweightCharts.createChart(container, {
 		width: 600,
 		height: 300,
 		priceScale: {

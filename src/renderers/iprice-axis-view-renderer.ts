@@ -1,13 +1,11 @@
 import { TextWidthCache } from '../model/text-width-cache';
-import { LineStyle, LineWidth } from '../renderers/draw-line';
+import { LineWidth } from '../renderers/draw-line';
 
 export interface PriceAxisViewRendererCommonData {
 	activeBackground?: string;
 	background: string;
-	borderColor?: string;
 	color: string;
 	coordinate: number;
-	floatCoordinate?: number;
 	fixedCoordinate?: number;
 }
 
@@ -15,15 +13,13 @@ export interface PriceAxisViewRendererData {
 	visible: boolean;
 	text: string;
 	tickVisible: boolean;
-	borderVisible: boolean;
+	borderColor: string;
 	lineWidth?: LineWidth;
-	lineStyle: LineStyle;
 }
 
 export interface PriceAxisViewRendererOptions {
 	baselineOffset: number;
 	borderSize: number;
-	offsetSize: number;
 	font: string;
 	fontFamily: string;
 	color: string;
@@ -41,7 +37,8 @@ export interface IPriceAxisViewRenderer {
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		width: number,
-		align: 'left' | 'right'
+		align: 'left' | 'right',
+		pixelRatio: number
 	): void;
 
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number;

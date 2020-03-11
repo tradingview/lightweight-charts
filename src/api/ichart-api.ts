@@ -41,11 +41,11 @@ export interface IChartApi {
 
 	/**
 	 * Sets fixed size of the chart. By default chart takes up 100% of its container
-	 * @param height - target height of the chart
 	 * @param width - target width of the chart
+	 * @param height - target height of the chart
 	 * @param forceRepaint - true to initiate resize immediately. One could need this to get screenshot immediately after resize
 	 */
-	resize(height: number, width: number, forceRepaint?: boolean): void;
+	resize(width: number, height: number, forceRepaint?: boolean): void;
 
 	/**
 	 * Creates an area series with specified parameters

@@ -350,14 +350,14 @@ export class PriceScale {
 		return this.isInverted() ? coordinate : this.height() - 1 - coordinate;
 	}
 
-	public priceToCoordinate(price: number, baseValue: number, keepItFloat?: boolean): Coordinate {
+	public priceToCoordinate(price: number, baseValue: number): Coordinate {
 		if (this.isPercentage()) {
 			price = toPercent(price, baseValue);
 		} else if (this.isIndexedTo100()) {
 			price = toIndexedTo100(price, baseValue);
 		}
 
-		return this._logicalToCoordinate(price, baseValue, keepItFloat);
+		return this._logicalToCoordinate(price, baseValue);
 	}
 
 	public pointsArrayToCoordinates<T extends PricedValue>(points: T[], baseValue: number, visibleRange?: SeriesItemsIndexesRange): void {
@@ -390,7 +390,7 @@ export class PriceScale {
 
 			const invCoordinate = bh + hmm * (logical - min);
 			const coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			point.y = Math.round(coordinate) as Coordinate;
+			point.y = coordinate as Coordinate;
 		}
 	}
 
@@ -426,19 +426,19 @@ export class PriceScale {
 
 			let invCoordinate = bh + hmm * (openLogical - min);
 			let coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.openY = Math.round(coordinate) as Coordinate;
+			bar.openY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (highLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.highY = Math.round(coordinate) as Coordinate;
+			bar.highY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (lowLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.lowY = Math.round(coordinate) as Coordinate;
+			bar.lowY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (closeLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.closeY = Math.round(coordinate) as Coordinate;
+			bar.closeY = coordinate as Coordinate;
 		}
 	}
 
@@ -811,7 +811,7 @@ export class PriceScale {
 		this._internalHeightChanged.fire();
 	}
 
-	private _logicalToCoordinate(logical: number, baseValue: number, keepItFloat?: boolean): Coordinate {
+	private _logicalToCoordinate(logical: number, baseValue: number): Coordinate {
 		this._makeSureItIsValid();
 		if (this.isEmpty()) {
 			return 0 as Coordinate;
@@ -822,11 +822,7 @@ export class PriceScale {
 		const invCoordinate = this._bottomMarginPx() +
 			(this.internalHeight() - 1) * (logical - range.minValue()) / range.length();
 		const coordinate = this.invertedCoordinate(invCoordinate);
-		if (keepItFloat) {
-			return coordinate as Coordinate;
-		}
-
-		return Math.round(coordinate) as Coordinate;
+		return coordinate as Coordinate;
 	}
 
 	private _coordinateToLogical(coordinate: number, baseValue: number): number {

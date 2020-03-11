@@ -266,14 +266,13 @@ export class Crosshair extends DataSource {
 
 		this._index = newIndex;
 		this._x = isNaN(newIndex) ? NaN as Coordinate : this._model.timeScale().indexToCoordinate(newIndex);
+		this._pane = newPane;
 
 		const firstValue = priceScale !== null ? priceScale.firstValue() : null;
 		if (priceScale !== null && firstValue !== null) {
-			this._pane = newPane;
 			this._price = newPrice;
 			this._y = priceScale.priceToCoordinate(newPrice, firstValue);
 		} else {
-			this._pane = null;
 			this._price = NaN;
 			this._y = NaN as Coordinate;
 		}
