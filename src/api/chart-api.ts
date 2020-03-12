@@ -92,9 +92,15 @@ function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
 		options.rightPriceScale = merge(options.rightPriceScale, options.priceScale);
 		if (position === 'left') {
 			options.leftPriceScale.visible = true;
+			options.rightPriceScale.visible = false;
 		}
 		if (position === 'right') {
+			options.leftPriceScale.visible = false;
 			options.rightPriceScale.visible = true;
+		}
+		if (position === 'none') {
+			options.leftPriceScale.visible = false;
+			options.rightPriceScale.visible = false;
 		}
 		// copy defaults for overlays
 		options.overlayPriceScales = options.overlayPriceScales || {};
