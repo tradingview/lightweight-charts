@@ -149,7 +149,7 @@ export interface SeriesScaleOptions {
 	overlay?: boolean;
 	priceScaleId?: string;
 	/**
-	 * @deprecated Use priceScale method of series instead
+	 * @deprecated Use priceScale method of the series to apply options instead
 	 */
 	scaleMargins?: PriceScaleMargins;
 }

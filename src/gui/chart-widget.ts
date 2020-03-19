@@ -592,5 +592,4 @@ export class ChartWidget implements IDestroyable {
 	private _isRightAxisVisible(): boolean {
 		return this._options.rightPriceScale.visible;
 	}
-
 }

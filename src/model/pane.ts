@@ -67,10 +67,10 @@ export class Pane implements IDestroyable {
 		if (options.overlayPriceScales) {
 			const sourceArrays = Array.from(this._overlaySourcesByScaleId.values());
 			for (const arr of sourceArrays) {
-				const priceScale = arr[0].priceScale();
-				priceScale?.applyOptions(options.overlayPriceScales);
+				const priceScale = ensureDefined(arr[0].priceScale());
+				priceScale.applyOptions(options.overlayPriceScales);
 				if (options.localization) {
-					priceScale?.updateFormatter();
+					priceScale.updateFormatter();
 				}
 			}
 		}

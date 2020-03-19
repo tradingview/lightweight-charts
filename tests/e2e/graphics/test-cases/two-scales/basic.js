@@ -49,7 +49,7 @@ function generateDataHist() {
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container, {
 		leftPriceScale: {
-			visible: 'true',
+			visible: true,
 		},
 	});
 
@@ -77,4 +77,3 @@ function runTestCase(container) {
 
 	histSeries.setData(generateDataHist());
 }
-

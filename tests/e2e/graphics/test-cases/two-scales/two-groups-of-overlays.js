@@ -47,8 +47,7 @@ function generateDataLine(offset) {
 
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container, {
-	});
+	var chart = LightweightCharts.createChart(container);
 
 	var mainSeries = chart.addBarSeries({
 		borderColor: 'rgba(0, 0, 255, 0.2)',

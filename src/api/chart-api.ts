@@ -81,12 +81,12 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 
 function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
 	if (options.priceScale) {
-		warn('Usage of obsolete options "priceScale" has been detected');
+		warn('"priceScale" option has been deprecated, use "leftPriceScale", "rightPriceScale" and "overlayPriceScales" instead');
 		options.leftPriceScale = options.leftPriceScale || {};
 		options.rightPriceScale = options.rightPriceScale || {};
-		// tslint:disable-next-line: deprecation
+		// tslint:disable-next-line:deprecation
 		const position = options.priceScale.position;
-		// tslint:disable-next-line: deprecation
+		// tslint:disable-next-line:deprecation
 		delete options.priceScale.position;
 		options.leftPriceScale = merge(options.leftPriceScale, options.priceScale);
 		options.rightPriceScale = merge(options.rightPriceScale, options.priceScale);
