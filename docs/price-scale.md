@@ -10,20 +10,20 @@ Left and right price scales could be visible, overlay price scales are always hi
 
 Autoscaling is a feature of automatic adjusting price scale to fit the visible range of data.
 Autoscaling is enabled by default, however you could turn it off by zooming price scale or calling corresponding API method.
-Overlay price scales are always autoscale.
+Overlay price scales are always autoscaled.
 
 ## PriceScale ID
 
-Each price scale has corresponsing ID to refer it via API. Left and right price scales have predefined Ids `left` and `right`.
-While creating a series, you could specify PriceScaleID. If this id refers to already existing price scale, new series will share
-the price scale with already existing series.
-If specified price scale does not exist, it will be implicitly created. So to create two series on the same overlay price scale
-just specify the same `priceScaleId` for them.
+Each price scale has corresponsing ID to refer it via API. Left and right price scales have predefined IDs `left` and `right`.
+While creating a series, you could specify PriceScaleID.
+If this id refers to already existing price scale, new series will share the price scale with already existing series.
+If specified price scale does not exist, it will be implicitly created.
+So to create two series on the same overlay price scale just specify the same `priceScaleId` for them.
 
 ## Percentage scales
 
-Percentage mode of price scale allows relative comparing of series. All the serieses attached to the percentage scale are placed
-to have the first visible data item on the same point.
+Percentage mode of price scale allows relative comparing of series.
+All the serieses attached to the percentage scale are placed to have the first visible data item on the same point.
 Percentage scales are always autoscaled.
 
 ## Logarithmic scales
