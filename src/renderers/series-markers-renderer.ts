@@ -97,23 +97,23 @@ function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContex
 }
 
 function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
-	if (item.size !== 0) {
-		switch (item.shape) {
-			case 'arrowDown':
-				drawArrow(false, ctx, item.x, item.y, item.size);
-				return;
-			case 'arrowUp':
-				drawArrow(true, ctx, item.x, item.y, item.size);
-				return;
-			case 'circle':
-				drawCircle(ctx, item.x, item.y, item.size);
-				return;
-			case 'square':
-				drawSquare(ctx, item.x, item.y, item.size);
-				return;
-		}
-	} else {
+	if (item.size === 0) {
 		return;
+	}
+
+	switch (item.shape) {
+		case 'arrowDown':
+			drawArrow(false, ctx, item.x, item.y, item.size);
+			return;
+		case 'arrowUp':
+			drawArrow(true, ctx, item.x, item.y, item.size);
+			return;
+		case 'circle':
+			drawCircle(ctx, item.x, item.y, item.size);
+			return;
+		case 'square':
+			drawSquare(ctx, item.x, item.y, item.size);
+			return;
 	}
 
 	ensureNever(item.shape);
@@ -128,19 +128,19 @@ function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coord
 }
 
 function hitTestShape(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coordinate): boolean {
-	if (item.size !== 0) {
-		switch (item.shape) {
-			case 'arrowDown':
-				return hitTestArrow(true, item.x, item.y, item.size, x, y);
-			case 'arrowUp':
-				return hitTestArrow(false, item.x, item.y, item.size, x, y);
-			case 'circle':
-				return hitTestCircle(item.x, item.y, item.size, x, y);
-			case 'square':
-				return hitTestSquare(item.x, item.y, item.size, x, y);
-		}
-	} else {
+	if (item.size === 0) {
 		return false;
+	}
+
+	switch (item.shape) {
+		case 'arrowDown':
+			return hitTestArrow(true, item.x, item.y, item.size, x, y);
+		case 'arrowUp':
+			return hitTestArrow(false, item.x, item.y, item.size, x, y);
+		case 'circle':
+			return hitTestCircle(item.x, item.y, item.size, x, y);
+		case 'square':
+			return hitTestSquare(item.x, item.y, item.size, x, y);
 	}
 
 	ensureNever(item.shape);

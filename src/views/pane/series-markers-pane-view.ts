@@ -92,7 +92,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
-	private _chartModel: ChartModel;
 	private _fontSize: number;
 
 	public constructor(series: Series, model: ChartModel) {
@@ -102,10 +101,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			items: [],
 			visibleRange: null,
 		};
-
-		const layout = model.options().layout;
-		this._chartModel = model;
-		this._fontSize = layout.fontSize;
 	}
 
 	public update(updateType?: UpdateType): void {
@@ -121,9 +116,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			this._makeValid();
 		}
 
-		const layout = this._chartModel.options().layout;
-		this._fontSize = layout.fontSize;
-
+		const layout = this._model.options().layout;
 		this._renderer.setParams(layout.fontSize, layout.fontFamily);
 		this._renderer.setData(this._data);
 
@@ -169,6 +162,8 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			this._dataInvalidated = false;
 		}
 
+		const layoutOptions = this._model.options().layout;
+
 		this._data.visibleRange = null;
 		const visibleBars = timeScale.visibleBars();
 		if (visibleBars === null) {
@@ -213,7 +208,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			if (dataAt === null) {
 				continue;
 			}
-			fillSizeAndY(rendererItem, marker, dataAt, offsets, this._fontSize, shapeMargin, priceScale, timeScale, firstValue.value);
+			fillSizeAndY(rendererItem, marker, dataAt, offsets, layoutOptions.fontSize, shapeMargin, priceScale, timeScale, firstValue.value);
 		}
 		this._invalidated = false;
 	}
