@@ -327,7 +327,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	}
 
 	public priceScale(priceScaleId?: string): IPriceScaleApi {
-		priceScaleId = priceScaleId || this._chartWidget.model().defaultVisiblePriceScale();
+		priceScaleId = priceScaleId || this._chartWidget.model().defaultVisiblePriceScaleId();
 		if (this._priceScaleApis.has(priceScaleId)) {
 			return ensureDefined(this._priceScaleApis.get(priceScaleId));
 		}

@@ -603,7 +603,7 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(mask);
 	}
 
-	public defaultVisiblePriceScale(): string {
+	public defaultVisiblePriceScaleId(): string {
 		return this._options.rightPriceScale.visible ? 'right' : 'left';
 	}
 
@@ -658,10 +658,9 @@ export class ChartModel implements IDestroyable {
 			if (options.priceScaleId) {
 				targetScaleId = options.priceScaleId;
 			} else {
-				targetScaleId = this.defaultVisiblePriceScale();
+				targetScaleId = this.defaultVisiblePriceScaleId();
 			}
 		}
-		// tslint:disable-next-line:deprecation
 		pane.addDataSource(series, targetScaleId, false);
 
 		if (targetScaleId !== 'left' && targetScaleId !== 'right') {

@@ -290,7 +290,6 @@ export class Pane implements IDestroyable {
 		const mainDataSource = this.mainDataSource();
 		let res = mainDataSource !== null ? mainDataSource.priceScale() : null;
 
-		// Every Pane MUST have a price scale! This is mostly a fix of broken charts with empty panes...
 		if (res === null) {
 			res = this._model.options().rightPriceScale.visible ? this._rightPriceScale : this._leftPriceScale;
 		}

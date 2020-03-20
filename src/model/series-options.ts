@@ -145,6 +145,7 @@ export const enum PriceAxisLastValueMode {
 export interface SeriesScaleOptions {
 	/**
 	 * @deprecated Use priceScaleId instead
+	 * @internal
 	 */
 	overlay?: boolean;
 	priceScaleId?: string;
