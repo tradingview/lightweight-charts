@@ -92,8 +92,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
-	private _fontSize: number;
-
 	public constructor(series: Series, model: ChartModel) {
 		this._series = series;
 		this._model = model;
