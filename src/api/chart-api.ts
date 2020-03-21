@@ -32,7 +32,7 @@ import { DataLayer, SeriesUpdatePacket } from './data-layer';
 import { IChartApi, MouseEventHandler, MouseEventParams, TimeRangeChangeEventHandler } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
-import { ITimeScaleApi, TimeRangeWithBars } from './itime-scale-api';
+import { ITimeScaleApi, TimeRange } from './itime-scale-api';
 import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
 	areaStyleDefaults,
@@ -83,7 +83,7 @@ function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<Char
 export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _chartWidget: ChartWidget;
 	private _dataLayer: DataLayer = new DataLayer();
-	private readonly _timeRangeChanged: Delegate<TimeRangeWithBars | null> = new Delegate();
+	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
 	private readonly _seriesMap: Map<SeriesApi<SeriesType>, Series> = new Map();
 	private readonly _seriesMapReversed: Map<Series, SeriesApi<SeriesType>> = new Map();
 

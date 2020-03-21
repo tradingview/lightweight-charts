@@ -8,7 +8,7 @@ import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, TimeRange, TimeRangeWithBars } from './itime-scale-api';
+import { ITimeScaleApi, TimeRange } from './itime-scale-api';
 
 const enum Constants {
 	AnimationDurationMs = 1000,
@@ -42,7 +42,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._timeScale().scrollToRealTime();
 	}
 
-	public getVisibleRange(): TimeRangeWithBars | null {
+	public getVisibleRange(): TimeRange | null {
 		const visibleBars = this._timeScale().visibleBars();
 		if (visibleBars === null) {
 			return null;
@@ -55,8 +55,6 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		return {
 			from: timePointToTime(ensureNotNull(points.valueAt(Math.max(firstIndex, visibleBars.firstBar()) as TimePointIndex))),
 			to: timePointToTime(ensureNotNull(points.valueAt(Math.min(lastIndex, visibleBars.lastBar()) as TimePointIndex))),
-			barsBefore: visibleBars.firstBar(),
-			barsAfter: -Math.ceil(this.scrollPosition()),
 		};
 	}
 
