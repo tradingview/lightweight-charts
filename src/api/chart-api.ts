@@ -29,10 +29,10 @@ import { TimePointIndex } from '../model/time-data';
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, SeriesUpdatePacket } from './data-layer';
-import { IChartApi, MouseEventHandler, MouseEventParams, TimeRangeChangeEventHandler } from './ichart-api';
+import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
-import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { ITimeScaleApi } from './itime-scale-api';
 import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
 	areaStyleDefaults,
@@ -83,7 +83,6 @@ function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<Char
 export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _chartWidget: ChartWidget;
 	private _dataLayer: DataLayer = new DataLayer();
-	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
 	private readonly _seriesMap: Map<SeriesApi<SeriesType>, Series> = new Map();
 	private readonly _seriesMapReversed: Map<Series, SeriesApi<SeriesType>> = new Map();
 
@@ -99,7 +98,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
 
 		this._chartWidget = new ChartWidget(container, internalOptions);
-		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 
 		this._chartWidget.clicked().subscribe(
 			(paramSupplier: MouseEventParamsImplSupplier) => {
@@ -124,7 +122,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	public remove(): void {
-		this._chartWidget.model().timeScale().visibleBarsChanged().unsubscribeAll(this);
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
 		this._priceScaleApi.destroy();
@@ -136,7 +133,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		});
 		this._seriesMap.clear();
 		this._seriesMapReversed.clear();
-		this._timeRangeChanged.destroy();
 		this._clickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
 		this._dataLayer.destroy();
@@ -271,14 +267,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._crosshairMovedDelegate.unsubscribe(handler);
 	}
 
-	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
-		this._timeRangeChanged.subscribe(handler);
-	}
-
-	public unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
-		this._timeRangeChanged.unsubscribe(handler);
-	}
-
 	// TODO: add more subscriptions
 
 	public priceScale(): IPriceScaleApi {
@@ -299,12 +287,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public takeScreenshot(): HTMLCanvasElement {
 		return this._chartWidget.takeScreenshot();
-	}
-
-	private _onVisibleBarsChanged(): void {
-		if (this._timeRangeChanged.hasListeners()) {
-			this._timeRangeChanged.fire(this.timeScale().getVisibleRange());
-		}
 	}
 
 	private _mapSeriesToApi(series: Series): ISeriesApi<SeriesType> {

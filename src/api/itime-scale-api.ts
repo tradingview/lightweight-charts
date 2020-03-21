@@ -9,6 +9,8 @@ export interface TimeRange {
 	to: Time;
 }
 
+export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
+
 /** Interface to chart time scale */
 export interface ITimeScaleApi {
 	/**
@@ -51,6 +53,18 @@ export interface ITimeScaleApi {
 	 * This is a momentary operation.
 	 */
 	fitContent(): void;
+
+	/**
+	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
+	 * @param handler - handler (function) to be called on changing visible data range
+	 */
+	subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
+
+	/**
+	 * Removes a subscription to visible range changes
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
 
 	/**
 	 * Applies new options to the time scale.

@@ -1,4 +1,5 @@
 import { ensureNotNull } from '../helpers/assertions';
+import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
@@ -8,7 +9,7 @@ import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { ITimeScaleApi, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
 
 const enum Constants {
 	AnimationDurationMs = 1000,
@@ -16,12 +17,16 @@ const enum Constants {
 
 export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	private _model: ChartModel;
+	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
 
 	public constructor(model: ChartModel) {
 		this._model = model;
+		this._timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 	}
 
 	public destroy(): void {
+		this._timeScale().visibleBarsChanged().unsubscribeAll(this);
+		this._timeRangeChanged.destroy();
 		delete this._model;
 	}
 
@@ -74,6 +79,14 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._model.fitContent();
 	}
 
+	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
+		this._timeRangeChanged.subscribe(handler);
+	}
+
+	public unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
+		this._timeRangeChanged.unsubscribe(handler);
+	}
+
 	public applyOptions(options: DeepPartial<TimeScaleOptions>): void {
 		this._timeScale().applyOptions(options);
 	}
@@ -84,6 +97,12 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 
 	private _timeScale(): TimeScale {
 		return this._model.timeScale();
+	}
+
+	private _onVisibleBarsChanged(): void {
+		if (this._timeRangeChanged.hasListeners()) {
+			this._timeRangeChanged.fire(this.getVisibleRange());
+		}
 	}
 }
 
