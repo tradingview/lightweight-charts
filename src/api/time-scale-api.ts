@@ -4,7 +4,7 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
-import { TimePoint, TimePointIndex, TimePointsRange } from '../model/time-data';
+import { TimePoint, TimePointIndex, TimePointIndexRange, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
@@ -69,6 +69,30 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 			to: convertTime(range.to),
 		};
 		this._model.setTargetTimeRange(convertedRange);
+	}
+
+	public getVisibleIndexRange(): TimePointIndexRange | null {
+		const ts = this._timeScale();
+		const lastIndex = ts.points().lastIndex();
+
+		if (null === lastIndex) {
+			return null;
+		}
+
+		const rightIndex = lastIndex + ts.rightOffset();
+		const leftIndex = rightIndex - (ts.width() / ts.barSpacing()) + 1;
+
+		return {
+			from: leftIndex as TimePointIndex,
+			to: rightIndex as TimePointIndex,
+		};
+	}
+
+	public setVisibleIndexRange(range: TimePointIndexRange): void {
+		if (range.from > range.to) {
+			return;
+		}
+		this._model.setTargetIndexRange(range);
 	}
 
 	public resetTimeScale(): void {

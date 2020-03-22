@@ -35,6 +35,11 @@ export interface TimedValue {
 	x: Coordinate;
 }
 
+export interface TimePointIndexRange {
+	from: TimePointIndex;
+	to: TimePointIndex;
+}
+
 export interface SeriesItemsIndexesRange {
 	from: number;
 	to: number;

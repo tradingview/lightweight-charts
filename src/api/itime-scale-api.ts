@@ -1,5 +1,6 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { TimePointIndexRange } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
@@ -42,6 +43,18 @@ export interface ITimeScaleApi {
 	 * @param range - target visible range of data
 	 */
 	setVisibleRange(range: TimeRange): void;
+
+	/**
+	 * Returns the currently visible index range of data.
+	 * @returns - visible range or null if the chart has no data at all
+	 */
+	getVisibleIndexRange(): TimePointIndexRange | null;
+
+	/**
+	 * Sets visible index range of data.
+	 * @param range - target visible index range of data.
+	 */
+	setVisibleIndexRange(range: TimePointIndexRange): void;
 
 	/**
 	 * Restores default zooming and scroll position of the time scale
