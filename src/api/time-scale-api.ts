@@ -9,7 +9,7 @@ import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
+import { ITimeScaleApi, TimePointIndexRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
 
 const enum Constants {
 	AnimationDurationMs = 1000,
@@ -18,14 +18,17 @@ const enum Constants {
 export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	private _model: ChartModel;
 	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
+	private readonly _indexRangeChanged: Delegate<TimePointIndexRange | null> = new Delegate();
 
 	public constructor(model: ChartModel) {
 		this._model = model;
 		this._timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
+		this._timeScale().indexRangeChanged().subscribe(this._onVisibleIndexesChanged.bind(this));
 	}
 
 	public destroy(): void {
 		this._timeScale().visibleBarsChanged().unsubscribeAll(this);
+		this._timeScale().indexRangeChanged().unsubscribeAll(this);
 		this._timeRangeChanged.destroy();
 		delete this._model;
 	}
@@ -72,20 +75,8 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public getVisibleIndexRange(): TimePointIndexRange | null {
-		const ts = this._timeScale();
-		const lastIndex = ts.points().lastIndex();
-
-		if (null === lastIndex) {
-			return null;
-		}
-
-		const rightIndex = lastIndex + ts.rightOffset();
-		const leftIndex = rightIndex - (ts.width() / ts.barSpacing()) + 1;
-
-		return {
-			from: leftIndex as TimePointIndex,
-			to: rightIndex as TimePointIndex,
-		};
+		const indexRange = this._timeScale().visibleIndexRange();
+		return indexRange ? clone(indexRange) : null;
 	}
 
 	public setVisibleIndexRange(range: TimePointIndexRange): void {
@@ -111,6 +102,14 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._timeRangeChanged.unsubscribe(handler);
 	}
 
+	public subscribeVisibleIndexRangeChange(handler: TimePointIndexRangeChangeEventHandler): void {
+		this._indexRangeChanged.subscribe(handler);
+	}
+
+	public unsubscribeVisibleIndexRangeChange(handler: TimePointIndexRangeChangeEventHandler): void {
+		this._indexRangeChanged.unsubscribe(handler);
+	}
+
 	public applyOptions(options: DeepPartial<TimeScaleOptions>): void {
 		this._timeScale().applyOptions(options);
 	}
@@ -126,6 +125,12 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	private _onVisibleBarsChanged(): void {
 		if (this._timeRangeChanged.hasListeners()) {
 			this._timeRangeChanged.fire(this.getVisibleRange());
+		}
+	}
+
+	private _onVisibleIndexesChanged(): void {
+		if (this._indexRangeChanged.hasListeners()) {
+			this._indexRangeChanged.fire(this.getVisibleIndexRange());
 		}
 	}
 }

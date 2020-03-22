@@ -11,6 +11,7 @@ export interface TimeRange {
 }
 
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
+export type TimePointIndexRangeChangeEventHandler = (indexRange: TimePointIndexRange | null) => void;
 
 /** Interface to chart time scale */
 export interface ITimeScaleApi {
@@ -78,6 +79,18 @@ export interface ITimeScaleApi {
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
+
+	/**
+	 * Adds a subscription to visible index range changes to receive notifications about visible indexes of the data
+	 * @param handler - handler (function) to be called when the visible indexes change
+	 */
+	subscribeVisibleIndexRangeChange(handler: TimePointIndexRangeChangeEventHandler): void;
+
+	/**
+	 * Removes a subscription to visible index range changes
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeVisibleIndexRangeChange(handler: TimePointIndexRangeChangeEventHandler): void;
 
 	/**
 	 * Applies new options to the time scale.
