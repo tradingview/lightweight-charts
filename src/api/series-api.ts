@@ -11,11 +11,12 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
+import { Time, TimePointIndex, TimePointIndexRange } from '../model/time-data';
 
-import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 import { IPriceLine } from './iprice-line';
-import { IPriceFormatter, ISeriesApi } from './iseries-api';
+import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
@@ -56,6 +57,36 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 			return null;
 		}
 		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
+	}
+
+	public barsInIndexRange(range: TimePointIndexRange): BarsInfo | null {
+		const visibleRange = this._series.model().timeScale().timeRangeForIndexRange(range);
+
+		const rangeStart = Math.round(range.from) as TimePointIndex;
+		const rangeEnd = Math.round(range.to) as TimePointIndex;
+
+		const bars = this._series.data().bars();
+
+		const firstBar = bars.search(rangeStart);
+		const lastBar = bars.search(rangeEnd);
+		const firstIndex = bars.firstIndex() || 0;
+		const lastIndex = bars.lastIndex() || 0;
+
+		const barsBefore = (null !== firstBar)
+			? firstBar.index - firstIndex
+			: Math.min(lastIndex - firstIndex + 1, rangeStart - firstIndex)
+		;
+
+		const barsAfter = (null !== lastBar)
+			? Math.min(lastIndex - firstIndex + 1, lastIndex - lastBar.index)
+			: ((rangeEnd > lastIndex) ? (lastIndex - rangeEnd) : lastIndex - firstIndex + 1)
+		;
+
+		return {
+			...visibleRange,
+			barsBefore: barsBefore as TimePointIndex,
+			barsAfter: barsAfter as TimePointIndex,
+		};
 	}
 
 	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {

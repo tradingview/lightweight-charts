@@ -13,7 +13,7 @@ import { Coordinate } from './coordinate';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
 import { TickMarks } from './tick-marks';
-import { SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointIndexRange, TimePointsRange, UTCTimestamp } from './time-data';
+import { SeriesItemsIndexesRange, TickMark, Time, TimedValue, TimePoint, TimePointIndex, TimePointIndexRange, TimePointsRange, TimeRange, UTCTimestamp } from './time-data';
 import { TimePoints } from './time-points';
 
 const enum Constants {
@@ -153,6 +153,34 @@ export class TimeScale {
 		}
 
 		return this._visibleIndexRange;
+	}
+
+	public visibleTimeRange(): TimeRange | null {
+		const visibleBars = this.visibleBars();
+		if (visibleBars === null) {
+			return null;
+		}
+
+		const range = {
+			from: visibleBars.firstBar(),
+			to: visibleBars.lastBar(),
+		};
+
+		return this.timeRangeForIndexRange(range);
+	}
+
+	public timeRangeForIndexRange(range: TimePointIndexRange): TimeRange {
+		const from = Math.round(range.from);
+		const to = Math.round(range.to);
+
+		const points = this._model.timeScale().points();
+		const firstIndex = ensureNotNull(points.firstIndex());
+		const lastIndex = ensureNotNull(points.lastIndex());
+
+		return {
+			from: timePointToTime(ensureNotNull(points.valueAt(Math.max(firstIndex, from) as TimePointIndex))),
+			to: timePointToTime(ensureNotNull(points.valueAt(Math.min(lastIndex, to) as TimePointIndex))),
+		};
 	}
 
 	public tickMarks(): TickMarks {
@@ -808,4 +836,8 @@ export class TimeScale {
 		this._visibleBarsInvalidated = true;
 		this._visibleIndexRangeInvalidated = true;
 	}
+}
+
+function timePointToTime(point: TimePoint): Time {
+	return point.businessDay || point.timestamp;
 }

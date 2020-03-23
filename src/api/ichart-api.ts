@@ -12,9 +12,8 @@ import {
 	LineSeriesPartialOptions,
 	SeriesType,
 } from '../model/series-options';
-import { BusinessDay, UTCTimestamp } from '../model/time-data';
+import { BusinessDay, Time, UTCTimestamp } from '../model/time-data';
 
-import { Time } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';

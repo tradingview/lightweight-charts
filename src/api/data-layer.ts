@@ -9,7 +9,7 @@ import { PlotRow, PlotValue } from '../model/plot-data';
 import { Series } from '../model/series';
 import { Bar } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
-import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../model/time-data';
+import { BusinessDay, Time, TimePoint, TimePointIndex, UTCTimestamp } from '../model/time-data';
 
 import {
 	BarData,
@@ -18,7 +18,6 @@ import {
 	isUTCTimestamp,
 	LineData,
 	SeriesDataItemTypeMap,
-	Time,
 } from './data-consumer';
 
 export interface TickMarkPacket {

@@ -17,6 +17,8 @@ export interface TimePoint {
 	businessDay?: BusinessDay;
 }
 
+export type Time = UTCTimestamp | BusinessDay | string;
+
 export interface TimePointsRange {
 	from: TimePoint;
 	to: TimePoint;
@@ -33,6 +35,11 @@ export interface TickMark {
 export interface TimedValue {
 	time: TimePointIndex;
 	x: Coordinate;
+}
+
+export interface TimeRange {
+	from: Time;
+	to: Time;
 }
 
 export interface TimePointIndexRange {

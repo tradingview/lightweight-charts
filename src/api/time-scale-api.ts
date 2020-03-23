@@ -1,15 +1,13 @@
-import { ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
-import { TimePoint, TimePointIndex, TimePointIndexRange, TimePointsRange } from '../model/time-data';
+import { TimePointIndexRange, TimePointsRange, TimeRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
-import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, TimePointIndexRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
+import { ITimeScaleApi, TimePointIndexRangeChangeEventHandler, TimeRangeChangeEventHandler } from './itime-scale-api';
 
 const enum Constants {
 	AnimationDurationMs = 1000,
@@ -51,19 +49,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public getVisibleRange(): TimeRange | null {
-		const visibleBars = this._timeScale().visibleBars();
-		if (visibleBars === null) {
-			return null;
-		}
-
-		const points = this._model.timeScale().points();
-		const firstIndex = ensureNotNull(points.firstIndex());
-		const lastIndex = ensureNotNull(points.lastIndex());
-
-		return {
-			from: timePointToTime(ensureNotNull(points.valueAt(Math.max(firstIndex, visibleBars.firstBar()) as TimePointIndex))),
-			to: timePointToTime(ensureNotNull(points.valueAt(Math.min(lastIndex, visibleBars.lastBar()) as TimePointIndex))),
-		};
+		return this._timeScale().visibleTimeRange();
 	}
 
 	public setVisibleRange(range: TimeRange): void {
@@ -133,8 +119,4 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 			this._indexRangeChanged.fire(this.getVisibleIndexRange());
 		}
 	}
-}
-
-function timePointToTime(point: TimePoint): Time {
-	return point.businessDay || point.timestamp;
 }
