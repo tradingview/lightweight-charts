@@ -24,7 +24,7 @@ import {
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
 const enum Constants {
-	textMargin = 0.1,
+	TextMargin = 0.1,
 }
 
 interface Offsets {
@@ -56,15 +56,15 @@ function fillSizeAndY(
 		case 'inBar': {
 			rendererItem.y = priceScale.priceToCoordinate(inBarPrice, firstValue);
 			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.textMargin) as Coordinate;
+				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin) as Coordinate;
 			}
 			return;
 		}
 		case 'aboveBar': {
 			rendererItem.y = (priceScale.priceToCoordinate(highPrice, firstValue) - halfSize - offsets.aboveBar) as Coordinate;
 			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = rendererItem.y - halfSize - textHeight * (0.5 + Constants.textMargin) as Coordinate;
-				offsets.aboveBar += textHeight * (1 + 2 * Constants.textMargin);
+				rendererItem.text.y = rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin) as Coordinate;
+				offsets.aboveBar += textHeight * (1 + 2 * Constants.TextMargin);
 			}
 			offsets.aboveBar += shapeSize + shapeMargin;
 			return;
@@ -72,8 +72,8 @@ function fillSizeAndY(
 		case 'belowBar': {
 			rendererItem.y = (priceScale.priceToCoordinate(lowPrice, firstValue) + halfSize + offsets.belowBar) as Coordinate;
 			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.textMargin) as Coordinate;
-				offsets.belowBar += textHeight * (1 + 2 * Constants.textMargin);
+				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin) as Coordinate;
+				offsets.belowBar += textHeight * (1 + 2 * Constants.TextMargin);
 			}
 			offsets.belowBar += shapeSize + shapeMargin;
 			return;
