@@ -6,14 +6,13 @@ export function drawSquare(
 	ctx: CanvasRenderingContext2D,
 	centerX: Coordinate,
 	centerY: Coordinate,
-	color: string,
 	size: number
 ): void {
 	const squareSize = shapeSize('square', size);
 	const halfSize = (squareSize - 1) / 2;
 	const left = centerX - halfSize;
 	const top = centerY - halfSize;
-	ctx.fillStyle = color;
+
 	ctx.fillRect(left, top, squareSize, squareSize);
 }
 

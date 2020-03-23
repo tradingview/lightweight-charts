@@ -538,6 +538,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			color: marker.color,
 			id: marker.id,
 			internalId: index,
+			text: marker.text,
+			size: marker.size,
 		}));
 	}
 
