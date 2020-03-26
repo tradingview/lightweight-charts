@@ -9,7 +9,7 @@ Left and right price scales could be visible, overlay price scales are always hi
 ## Autoscale
 
 Autoscaling is a feature of automatic adjusting price scale to fit the visible range of data.
-Autoscaling is enabled by default, however you could turn it off by zooming price scale or calling corresponding API method.
+Autoscaling is enabled by default, however you could turn it off by zooming price scale or calling `PriceScaleApi.setOptions` method with `autoScale` field set to false.
 Overlay price scales are always autoscaled.
 
 ## PriceScale ID

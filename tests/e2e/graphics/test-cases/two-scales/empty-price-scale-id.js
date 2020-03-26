@@ -63,9 +63,19 @@ function runTestCase(container) {
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: '',
 	});
 
 	lineSeires1.setData(generateDataLine());
+
+	var lineSeires2 = chart.addLineSeries({
+		lineWidth: 1,
+		color: '#ff0000',
+		priceLineWidth: 1,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
+		priceScaleId: '',
+	});
+
+	lineSeires2.setData(generateDataLine(10));
 }

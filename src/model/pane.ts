@@ -2,13 +2,13 @@ import { assert, ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { clone, DeepPartial } from '../helpers/strict-type-checks';
+import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { ChartModel, ChartOptions } from './chart-model';
+import { ChartModel, ChartOptions, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { IDataSource } from './idata-source';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceDataSource } from './price-data-source';
-import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
+import { PriceScale, PriceScaleState } from './price-scale';
 import { Series } from './series';
 import { sortSources } from './sort-sources';
 import { TimeScale } from './time-scale';
@@ -465,10 +465,11 @@ export class Pane implements IDestroyable {
 		this._mainDataSource = source;
 	}
 
-	private _createPriceScale(id: string, options: PriceScaleOptions): PriceScale {
+	private _createPriceScale(id: string, options: OverlayPriceScaleOptions | VisiblePriceScaleOptions): PriceScale {
+		const actualOptions = { visible: true, autoScale: true, ...options };
 		const priceScale = new PriceScale(
 			id,
-			clone(options),
+			actualOptions,
 			this._model.options().layout,
 			this._model.options().localization
 		);

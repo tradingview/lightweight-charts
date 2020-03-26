@@ -67,7 +67,7 @@ function runTestCase(container) {
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'left',
 		scaleMargins: {
 			top: 0.75,

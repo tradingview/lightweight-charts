@@ -63,7 +63,7 @@ function runTestCase(container) {
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'my_overlay',
 	});
 
@@ -73,7 +73,7 @@ function runTestCase(container) {
 		lineWidth: 1,
 		color: '#0000ff',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'my_overlay',
 	});
 
@@ -83,7 +83,7 @@ function runTestCase(container) {
 		lineWidth: 5,
 		color: '#ff00ff',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'my_overlay_2',
 	});
 
@@ -93,7 +93,7 @@ function runTestCase(container) {
 		lineWidth: 5,
 		color: '#00ffff',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'my_overlay_2',
 	});
 

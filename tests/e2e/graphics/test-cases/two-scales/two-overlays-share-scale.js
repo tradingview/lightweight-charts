@@ -63,7 +63,7 @@ function runTestCase(container) {
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'my_overlay',
 	});
 
@@ -73,7 +73,7 @@ function runTestCase(container) {
 		lineWidth: 1,
 		color: '#0000ff',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'my_overlay',
 	});
 
