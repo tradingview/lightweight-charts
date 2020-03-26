@@ -75,7 +75,6 @@ function runTestCase(container) {
 
 	histSeries.setData(generateDataHist());
 
-
 	// create canvas to draw screenshot
 	chart.resize(600, 240, true);
 
