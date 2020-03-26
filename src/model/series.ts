@@ -226,8 +226,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
 		merge(this._options, options);
 
+		// tslint:disable-next-line:deprecation
 		if (this._priceScale !== null && options.scaleMargins !== undefined) {
 			this._priceScale.applyOptions({
+				// tslint:disable-next-line:deprecation
 				scaleMargins: this._options.scaleMargins,
 			});
 		}

@@ -653,7 +653,7 @@ export class ChartModel implements IDestroyable {
 		const series = new Series<T>(this, options, seriesType);
 
 		let targetScaleId: string;
-			// tslint:disable-next-line:deprecation
+		// tslint:disable-next-line:deprecation
 		if (options.priceScaleId === '' || options.overlay) {
 			targetScaleId = this._generateUniquePriceScaleId();
 		} else {
