@@ -2,7 +2,6 @@ import { assert, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { warn } from '../helpers/logger';
 import { DeepPartial, merge, uid } from '../helpers/strict-type-checks';
 
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
@@ -196,7 +195,7 @@ export class ChartModel implements IDestroyable {
 			priceScale.applyOptions(options);
 			this._priceScalesOptionsChanged.fire();
 		} else {
-			warn('Trying to apply price scale options with incorrect ID');
+			throw new Error(`Trying to apply price scale options with incorrect ID: ${priceScaleId}`);
 		}
 	}
 
