@@ -1,3 +1,5 @@
+/// <reference types="_build-time-constants" />
+
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -191,12 +193,17 @@ export class ChartModel implements IDestroyable {
 
 	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
 		const priceScale = this.priceScaleById(priceScaleId);
-		if (priceScale !== null) {
-			priceScale.applyOptions(options);
-			this._priceScalesOptionsChanged.fire();
-		} else {
-			throw new Error(`Trying to apply price scale options with incorrect ID: ${priceScaleId}`);
+
+		if (priceScale === null) {
+			if (process.env.NODE_ENV === 'development') {
+				throw new Error(`Trying to apply price scale options with incorrect ID: ${priceScaleId}`);
+			}
+
+			return;
 		}
+
+		priceScale.applyOptions(options);
+		this._priceScalesOptionsChanged.fire();
 	}
 
 	public priceScaleById(priceScaleId: string): PriceScale | null {
