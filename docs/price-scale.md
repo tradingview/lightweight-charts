@@ -19,6 +19,7 @@ While creating a series, you could specify PriceScaleID.
 If this id refers to already existing price scale, new series will share the price scale with already existing series.
 If specified price scale does not exist, it will be implicitly created.
 So to create two series on the same overlay price scale just specify the same `priceScaleId` for them.
+You could get `id` of the scale with `PriceScaleApi.id` method.
 
 ## Percentage scales
 
@@ -32,3 +33,8 @@ The reason of having logarithmic scales is comparing relative change instead of 
 On regular scale every candle with 100-points change has the same height.
 On logarithmic scale every candle with 2% change has the same height.
 Logarithmic scale cannot be percentage.
+
+## Equality of price scales
+
+Lightweight charts library does not giarantee to return the same instance of `PriceScaleApi` object while returning the same actual price scale.
+So you should never compare objects of `PriceScaleApi`, comapre `PriceScaleApi.id()` values instead.

@@ -20,6 +20,10 @@ export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
 		delete this._chartModel;
 	}
 
+	public id(): string {
+		return this._priceScale().id();
+	}
+
 	public applyOptions(options: DeepPartial<PriceScaleOptions>): void {
 		this._chartModel.applyPriceScaleOptions(this._priceScaleId, options);
 	}

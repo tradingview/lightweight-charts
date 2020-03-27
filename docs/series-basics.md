@@ -76,6 +76,21 @@ const lineSeries = chart.addLineSeries({
 });
 ```
 
+At any moment you can get access to the price scale the series is bound to with `priceScale` method and change its options
+
+```javascript
+const lineSeries = chart.addLineSeries({
+    priceScaleId: 'my-overlay-id',
+});
+lineSeries.priceScale().applyOptions(
+    {
+        scaleMargins: {
+            top: 0.1,
+            bottom: 0.3,
+        }
+    });
+```
+
 ### Title
 
 When adding any series to a chart, you can name it by adding a string to the `title` property.

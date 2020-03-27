@@ -135,7 +135,6 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
 
-	private readonly _priceScaleApis: Map<string, PriceScaleApi> = new Map();
 	private readonly _timeScaleApi: TimeScaleApi;
 
 	public constructor(container: HTMLElement, options?: DeepPartial<ChartOptions>) {
@@ -171,9 +170,6 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		this._chartWidget.model().timeScale().visibleBarsChanged().unsubscribeAll(this);
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
-
-		const priceScaleApis = Array.from(this._priceScaleApis.values());
-		priceScaleApis.forEach((ps: PriceScaleApi) => ps.destroy());
 
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
@@ -332,12 +328,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		}
 
 		priceScaleId = priceScaleId || this._chartWidget.model().defaultVisiblePriceScaleId();
-		if (this._priceScaleApis.has(priceScaleId)) {
-			return ensureDefined(this._priceScaleApis.get(priceScaleId));
-		}
-		const res = new PriceScaleApi(this._chartWidget.model(), priceScaleId);
-		this._priceScaleApis.set(priceScaleId, res);
-		return res;
+		return new PriceScaleApi(this._chartWidget.model(), priceScaleId);
 	}
 
 	public timeScale(): ITimeScaleApi {
