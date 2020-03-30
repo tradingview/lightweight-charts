@@ -36,5 +36,5 @@ Logarithmic scale cannot be percentage.
 
 ## Equality of price scales
 
-Lightweight charts library does not giarantee to return the same instance of `PriceScaleApi` object while returning the same actual price scale.
+Lightweight charts library does not guarantee to return the same instance of `PriceScaleApi` object while returning the same actual price scale.
 So you should never compare objects of `PriceScaleApi`, comapre `PriceScaleApi.id()` values instead.

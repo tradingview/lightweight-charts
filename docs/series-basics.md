@@ -82,13 +82,12 @@ At any moment you can get access to the price scale the series is bound to with 
 const lineSeries = chart.addLineSeries({
     priceScaleId: 'my-overlay-id',
 });
-lineSeries.priceScale().applyOptions(
-    {
-        scaleMargins: {
-            top: 0.1,
-            bottom: 0.3,
-        }
-    });
+lineSeries.priceScale().applyOptions({
+    scaleMargins: {
+        top: 0.1,
+        bottom: 0.3,
+    },
+});
 ```
 
 ### Title
