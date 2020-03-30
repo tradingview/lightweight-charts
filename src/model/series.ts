@@ -230,7 +230,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		if (this._priceScale !== null && options.scaleMargins !== undefined) {
 			this._priceScale.applyOptions({
 				// tslint:disable-next-line:deprecation
-				scaleMargins: this._options.scaleMargins,
+				scaleMargins: options.scaleMargins,
 			});
 		}
 
