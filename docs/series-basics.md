@@ -336,8 +336,10 @@ An array of items is expected. Each item should contain the following fields:
 - `time` ([Time](./time.md)) - item time
 - `position` (`aboveBar` &#124; `belowBar` &#124; `inBar`) - item position
 - `shape` (`circle` &#124; `square` &#124; `arrowUp` &#124; `arrowDown`) - item marker type
+- `size` (`number` &#124; `undefined`) - size multiplier of the marker, the shape is hidden when set to `0`, default value is `1`
 - `color` (`string`) - item color
 - `id` (`string` &#124; `undefined`) - item id, will be passed to click/crosshair move handlers
+- `text` (`string` &#124; `undefined`) - item text to be shown
 
 Example:
 
@@ -362,6 +364,8 @@ series.setMarkers([
         color: 'orange',
         shape: 'arrowUp',
         id: 'id4',
+        text: 'example',
+        size: 2,
     },
 ]);
 

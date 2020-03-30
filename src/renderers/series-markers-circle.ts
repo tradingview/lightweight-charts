@@ -6,14 +6,14 @@ export function drawCircle(
 	ctx: CanvasRenderingContext2D,
 	centerX: Coordinate,
 	centerY: Coordinate,
-	color: string,
 	size: number
 ): void {
 	const circleSize = shapeSize('circle', size);
 	const halfSize = (circleSize - 1) / 2;
-	ctx.fillStyle = color;
+
 	ctx.beginPath();
 	ctx.arc(centerX, centerY, halfSize, 0, 2 * Math.PI, false);
+
 	ctx.fill();
 }
 
