@@ -142,19 +142,6 @@ export const enum PriceAxisLastValueMode {
 	LastValueAccordingToScale,
 }
 
-export interface SeriesScaleOptions {
-	/**
-	 * @deprecated Use priceScaleId instead
-	 * @internal
-	 */
-	overlay?: boolean;
-	priceScaleId?: string;
-	/**
-	 * @deprecated Use priceScale method of the series to apply options instead
-	 */
-	scaleMargins?: PriceScaleMargins;
-}
-
 export const enum PriceLineSource {
 	/**
 	 * The last bar data
@@ -175,6 +162,9 @@ export interface SeriesOptionsCommon {
 	/** Title of the series. This label is placed with price axis label */
 	title: string;
 
+	/** Target price scale to bind new series to */
+	priceScaleId?: string;
+
 	/**
 	 * @internal
 	 */
@@ -182,9 +172,7 @@ export interface SeriesOptionsCommon {
 
 	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
 	priceLineVisible: boolean;
-	/**
-	 *  Enum of possible modes of priceLine source
-	 */
+	/** Enum of possible modes of priceLine source */
 	priceLineSource: PriceLineSource;
 	/** Width of the price line. Ignored if priceLineVisible is false */
 	priceLineWidth: LineWidth;
@@ -202,11 +190,18 @@ export interface SeriesOptionsCommon {
 	baseLineWidth: LineWidth;
 	/** Base line style. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
 	baseLineStyle: LineStyle;
+
+	/**
+	 * @deprecated Use priceScaleId instead
+	 * @internal
+	 */
+	overlay?: boolean;
+	/** @deprecated Use priceScale method of the series to apply options instead */
+	scaleMargins?: PriceScaleMargins;
 }
 
-export type SeriesOptions<T> = T & SeriesOptionsCommon & SeriesScaleOptions;
-
-export type SeriesPartialOptions<T> = DeepPartial<T & SeriesOptionsCommon> & SeriesScaleOptions;
+export type SeriesOptions<T> = T & SeriesOptionsCommon;
+export type SeriesPartialOptions<T> = DeepPartial<T & SeriesOptionsCommon>;
 
 /**
  * Structure describing area series options.

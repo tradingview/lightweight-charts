@@ -38,7 +38,7 @@ Here are common parameters for every series:
 
 |Name|Type|Default|Description|
 |-|----|-------|-|
-|`priceScaleId`|`string`|`right` if right scale is visble and `left` if not|Target price scale to bind new series to|
+|`priceScaleId`|`string`|`right` if right scale is visible and `left` if not|Target price scale to bind new series to|
 |`title`|`string`|`''`|You can name series when adding it to a chart. This name will be displayed on the label next to the last value label|
 |`scaleMargins`|`{ top, bottom }`|`undefined`|[Margins](#scale-margins) of the price scale of series|
 

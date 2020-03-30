@@ -53,8 +53,8 @@ export interface HoveredSource {
 
 type InvalidateHandler = (mask: InvalidateMask) => void;
 
-export type VisiblePriceScaleOptions = Omit<PriceScaleOptions, 'position'>;
-export type OverlayPriceScaleOptions = Omit<PriceScaleOptions, 'position' | 'visible' | 'autoScale'>;
+export type VisiblePriceScaleOptions = PriceScaleOptions;
+export type OverlayPriceScaleOptions = Omit<PriceScaleOptions, 'visible' | 'autoScale'>;
 /**
  * Structure describing options of the chart. Series options are to be set separately
  */
