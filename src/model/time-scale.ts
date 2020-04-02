@@ -44,6 +44,16 @@ export interface TimeMark {
 	major: boolean;
 }
 
+export const enum TickMarkType {
+	Year,
+	Month,
+	DayOfMonth,
+	Time,
+	TimeWithSeconds,
+}
+
+export type TickMarkFormatter = (timePoint: TimePoint, tickMarkType: TickMarkType, locale: string) => string;
+
 export interface TimeScaleOptions {
 	rightOffset: number;
 	barSpacing: number;
@@ -55,6 +65,7 @@ export interface TimeScaleOptions {
 	visible: boolean;
 	timeVisible: boolean;
 	secondsVisible: boolean;
+	tickMarkFormatter: TickMarkFormatter;
 }
 
 export class TimeScale {
@@ -646,58 +657,35 @@ export class TimeScale {
 	private _formatLabel(time: TimePoint, span: number): string {
 		let formatter = this._formattedBySpan.get(span);
 		if (formatter === undefined) {
-			formatter = new FormattedLabelsCache((date: Date) => {
-				return this._formatLabelImpl(date, span);
+			formatter = new FormattedLabelsCache((timePoint: TimePoint) => {
+				return this._formatLabelImpl(timePoint, span);
 			});
 
 			this._formattedBySpan.set(span, formatter);
 		}
 
-		if (time.businessDay === undefined) {
-			return formatter.format(new Date(time.timestamp * 1000));
-		} else {
-			return formatter.format(new Date(Date.UTC(time.businessDay.year, time.businessDay.month - 1, time.businessDay.day)));
-		}
+		return formatter.format(time);
 	}
 
-	private _formatLabelImpl(d: Date, span: number): string {
-		const formatOptions: Intl.DateTimeFormatOptions = {};
+	private _formatLabelImpl(timePoint: TimePoint, span: number): string {
+		let tickMarkType: TickMarkType;
 
 		const timeVisible = this._options.timeVisible;
 		if (span < MarkSpanBorder.Minute && timeVisible) {
-			formatOptions.hour12 = false;
-			formatOptions.hour = '2-digit';
-			formatOptions.minute = '2-digit';
-			if (this._options.secondsVisible) {
-				formatOptions.second = '2-digit';
-			}
+			tickMarkType = this._options.secondsVisible ? TickMarkType.TimeWithSeconds : TickMarkType.Time;
 		} else if (span < MarkSpanBorder.Day && timeVisible) {
-			formatOptions.hour12 = false;
-			formatOptions.hour = '2-digit';
-			formatOptions.minute = '2-digit';
+			tickMarkType = TickMarkType.Time;
 		} else if (span < MarkSpanBorder.Week) {
-			formatOptions.day = 'numeric';
+			tickMarkType = TickMarkType.DayOfMonth;
 		} else if (span < MarkSpanBorder.Month) {
-			formatOptions.day = 'numeric';
+			tickMarkType = TickMarkType.DayOfMonth;
 		} else if (span < MarkSpanBorder.Year) {
-			formatOptions.month = 'short';
+			tickMarkType = TickMarkType.Month;
 		} else {
-			formatOptions.year = 'numeric';
+			tickMarkType = TickMarkType.Year;
 		}
 
-		// from given date we should use only as UTC date or timestamp
-		// but to format as locale date we can convert UTC date to local date
-		const localDateFromUtc = new Date(
-			d.getUTCFullYear(),
-			d.getUTCMonth(),
-			d.getUTCDate(),
-			d.getUTCHours(),
-			d.getUTCMinutes(),
-			d.getUTCSeconds(),
-			d.getUTCMilliseconds()
-		);
-
-		return localDateFromUtc.toLocaleString(this._localizationOptions.locale, formatOptions);
+		return this._options.tickMarkFormatter(timePoint, tickMarkType, this._localizationOptions.locale);
 	}
 
 	private _setVisibleBars(visibleBars: BarsRange | null): void {
