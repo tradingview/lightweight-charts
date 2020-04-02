@@ -1,7 +1,7 @@
 function dataItem(date, val) {
 	return {
 		value: val,
-		time: new Date(date).valueOf() / 1000,
+		time: new Date(date).getTime() / 1000,
 	};
 }
 
