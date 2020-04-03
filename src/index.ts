@@ -7,6 +7,7 @@ export { CrosshairMode } from './model/crosshair';
 export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource } from './model/series-options';
 export { UTCTimestamp } from './model/time-data';
+export { TickMarkType } from './model/time-scale';
 
 export {
 	BarData,
