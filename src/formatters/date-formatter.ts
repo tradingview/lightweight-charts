@@ -1,16 +1,16 @@
-import { DateFormat, DateFormatFn, dateFormatFunctions } from './date-format';
+import { formatDate } from './format-date';
 import { IFormatter } from './iformatter';
 
 export class DateFormatter implements IFormatter {
 	private readonly _locale: string;
-	private readonly _dateFormatFunc: DateFormatFn;
+	private readonly _dateFormat: string;
 
-	public constructor(dateFormat: DateFormat = 'yyyy-MM-dd', locale: string = 'default') {
-		this._dateFormatFunc = dateFormatFunctions[dateFormat];
+	public constructor(dateFormat: string = 'yyyy-MM-dd', locale: string = 'default') {
+		this._dateFormat = dateFormat;
 		this._locale = locale;
 	}
 
 	public format(date: Date): string {
-		return this._dateFormatFunc(date, this._locale);
+		return formatDate(date, this._dateFormat, this._locale);
 	}
 }
