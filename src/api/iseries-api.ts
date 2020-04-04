@@ -7,14 +7,14 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Time, TimePointIndexRange } from '../model/time-data';
+import { TimePoint, TimePointIndexRange } from '../model/time-data';
 
-import { SeriesDataItemTypeMap } from './data-consumer';
+import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 
 export interface BarsInfo {
-	from: Time;
-	to: Time;
+	from: TimePoint;
+	to: TimePoint;
 	barsBefore: number;
 	barsAfter: number;
 }

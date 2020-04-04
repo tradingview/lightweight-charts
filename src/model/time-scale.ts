@@ -13,7 +13,7 @@ import { Coordinate } from './coordinate';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
 import { TickMarks } from './tick-marks';
-import { SeriesItemsIndexesRange, TickMark, Time, TimedValue, TimePoint, TimePointIndex, TimePointIndexRange, TimePointsRange, TimeRange, UTCTimestamp } from './time-data';
+import { SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointIndexRange, TimePointsRange, UTCTimestamp } from './time-data';
 import { TimePoints } from './time-points';
 
 const enum Constants {
@@ -155,7 +155,7 @@ export class TimeScale {
 		return this._visibleIndexRange;
 	}
 
-	public visibleTimeRange(): TimeRange | null {
+	public visibleTimeRange(): TimePointsRange | null {
 		const visibleBars = this.visibleBars();
 		if (visibleBars === null) {
 			return null;
@@ -169,7 +169,7 @@ export class TimeScale {
 		return this.timeRangeForIndexRange(range);
 	}
 
-	public timeRangeForIndexRange(range: TimePointIndexRange): TimeRange {
+	public timeRangeForIndexRange(range: TimePointIndexRange): TimePointsRange {
 		const from = Math.round(range.from);
 		const to = Math.round(range.to);
 
@@ -178,8 +178,8 @@ export class TimeScale {
 		const lastIndex = ensureNotNull(points.lastIndex());
 
 		return {
-			from: timePointToTime(ensureNotNull(points.valueAt(Math.max(firstIndex, from) as TimePointIndex))),
-			to: timePointToTime(ensureNotNull(points.valueAt(Math.min(lastIndex, to) as TimePointIndex))),
+			from: ensureNotNull(points.valueAt(Math.max(firstIndex, from) as TimePointIndex) as TimePoint),
+			to: ensureNotNull(points.valueAt(Math.min(lastIndex, to) as TimePointIndex) as TimePoint),
 		};
 	}
 
@@ -836,8 +836,4 @@ export class TimeScale {
 		this._visibleBarsInvalidated = true;
 		this._visibleIndexRangeInvalidated = true;
 	}
-}
-
-function timePointToTime(point: TimePoint): Time {
-	return point.businessDay || point.timestamp;
 }

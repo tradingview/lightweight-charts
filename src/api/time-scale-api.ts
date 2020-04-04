@@ -3,11 +3,11 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
-import { TimePointIndexRange, TimePointsRange, TimeRange } from '../model/time-data';
+import { TimePointIndexRange, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, TimePointIndexRangeChangeEventHandler, TimeRangeChangeEventHandler } from './itime-scale-api';
+import { ITimeScaleApi, TimePointIndexRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
 
 const enum Constants {
 	AnimationDurationMs = 1000,
@@ -49,7 +49,16 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public getVisibleRange(): TimeRange | null {
-		return this._timeScale().visibleTimeRange();
+		const timeRange = this._timeScale().visibleTimeRange();
+
+		if (!timeRange) {
+			return null;
+		}
+
+		return {
+			from: timeRange.from.businessDay ?? timeRange.from.timestamp,
+			to: timeRange.from.businessDay ?? timeRange.from.timestamp,
+		};
 	}
 
 	public setVisibleRange(range: TimeRange): void {

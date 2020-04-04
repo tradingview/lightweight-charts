@@ -1,7 +1,14 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { TimePointIndexRange, TimeRange } from '../model/time-data';
+import { TimePointIndexRange } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
+
+import { Time } from './data-consumer';
+
+export interface TimeRange {
+	from: Time;
+	to: Time;
+}
 
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 export type TimePointIndexRangeChangeEventHandler = (indexRange: TimePointIndexRange | null) => void;

@@ -11,9 +11,9 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Time, TimePointIndex, TimePointIndexRange } from '../model/time-data';
+import { TimePointIndex, TimePointIndexRange } from '../model/time-data';
 
-import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
 import { IPriceLine } from './iprice-line';
 import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
