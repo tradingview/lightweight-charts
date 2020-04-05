@@ -3,6 +3,7 @@ import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
 import { Series } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
@@ -11,12 +12,13 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { TimePointIndex, TimePointIndexRange } from '../model/time-data';
+import { TimePointIndex } from '../model/time-data';
 
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
 import { IPriceLine } from './iprice-line';
 import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
+import { LogicalRange } from './itime-scale-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
@@ -59,16 +61,14 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
 	}
 
-	public barsInIndexRange(range: TimePointIndexRange): BarsInfo | null {
-		const visibleRange = this._series.model().timeScale().timeRangeForIndexRange(range);
-
+	public barsInLogicalRange(range: LogicalRange): BarsInfo | null {
 		const rangeStart = Math.round(range.from) as TimePointIndex;
 		const rangeEnd = Math.round(range.to) as TimePointIndex;
 
 		const bars = this._series.data().bars();
 
-		const firstBar = bars.search(rangeStart);
-		const lastBar = bars.search(rangeEnd);
+		const firstBar = bars.search(rangeStart, PlotRowSearchMode.NearestRight);
+		const lastBar = bars.search(rangeEnd, PlotRowSearchMode.NearestLeft);
 		const firstIndex = bars.firstIndex() || 0;
 		const lastIndex = bars.lastIndex() || 0;
 
@@ -83,7 +83,8 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		;
 
 		return {
-			...visibleRange,
+			from: (firstBar && lastBar) ? firstBar.time : undefined,
+			to: (firstBar && lastBar) ? lastBar.time : undefined,
 			barsBefore: barsBefore as TimePointIndex,
 			barsAfter: barsAfter as TimePointIndex,
 		};

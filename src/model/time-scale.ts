@@ -13,7 +13,7 @@ import { Coordinate } from './coordinate';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
 import { TickMarks } from './tick-marks';
-import { SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointIndexRange, TimePointsRange, UTCTimestamp } from './time-data';
+import { LogicalPoint, LogicalPointRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
 import { TimePoints } from './time-points';
 
 const enum Constants {
@@ -74,12 +74,12 @@ export class TimeScale {
 	private readonly _tickMarks: TickMarks = new TickMarks();
 	private _formattedBySpan: Map<number, FormattedLabelsCache> = new Map();
 	private _visibleBars: BarsRange | null = null;
-	private _visibleIndexRange: TimePointIndexRange | null = null;
-	private _prevVisibleIndexRange: TimePointIndexRange | null = null;
+	private _visibleLogicalRange: LogicalPointRange | null = null;
+	private _prevVisibleLogicalRange: LogicalPointRange | null = null;
 	private _visibleBarsInvalidated: boolean = true;
-	private _visibleIndexRangeInvalidated: boolean = true;
+	private _visibleLogicalRangeInvalidated: boolean = true;
 	private readonly _visibleBarsChanged: Delegate = new Delegate();
-	private readonly _indexRangeChanged: Delegate = new Delegate();
+	private readonly _logicalRangeChanged: Delegate = new Delegate();
 	private readonly _optionsApplied: Delegate = new Delegate();
 	private _leftEdgeIndex: TimePointIndex | null = null;
 	private _commonTransitionStartState: TransitionState | null = null;
@@ -146,13 +146,13 @@ export class TimeScale {
 		return this._visibleBars;
 	}
 
-	public visibleIndexRange(): TimePointIndexRange | null {
-		if (this._visibleIndexRangeInvalidated) {
-			this._visibleIndexRangeInvalidated = false;
-			this._updateVisibleIndexRange();
+	public visibleLogicalRange(): LogicalPointRange | null {
+		if (this._visibleLogicalRangeInvalidated) {
+			this._visibleLogicalRangeInvalidated = false;
+			this._updateVisibleLogicalRange();
 		}
 
-		return this._visibleIndexRange;
+		return this._visibleLogicalRange;
 	}
 
 	public visibleTimeRange(): TimePointsRange | null {
@@ -162,14 +162,14 @@ export class TimeScale {
 		}
 
 		const range = {
-			from: visibleBars.firstBar(),
-			to: visibleBars.lastBar(),
+			from: visibleBars.firstBar() as number as LogicalPoint,
+			to: visibleBars.lastBar() as number as LogicalPoint,
 		};
 
-		return this.timeRangeForIndexRange(range);
+		return this.timeRangeForLogicalRange(range);
 	}
 
-	public timeRangeForIndexRange(range: TimePointIndexRange): TimePointsRange {
+	public timeRangeForLogicalRange(range: LogicalPointRange): TimePointsRange {
 		const from = Math.round(range.from);
 		const to = Math.round(range.to);
 
@@ -180,6 +180,15 @@ export class TimeScale {
 		return {
 			from: ensureNotNull(points.valueAt(Math.max(firstIndex, from) as TimePointIndex) as TimePoint),
 			to: ensureNotNull(points.valueAt(Math.min(lastIndex, to) as TimePointIndex) as TimePoint),
+		};
+	}
+
+	public logicalRangeForTimeRange(range: TimePointsRange): LogicalPointRange {
+		const points = this._model.timeScale().points();
+
+		return {
+			from: ensureNotNull(points.indexOf(range.from.timestamp, true)) as number as LogicalPoint,
+			to: ensureNotNull(points.indexOf(range.to.timestamp, true)) as number as LogicalPoint,
 		};
 	}
 
@@ -453,13 +462,13 @@ export class TimeScale {
 	}
 
 	public scrollTo(x: Coordinate): void {
-		this._invalidateVisibleBars();
 		if (this._scrollStartPoint === null) {
 			return;
 		}
 
 		const shiftInLogical = (this._scrollStartPoint - x) / this.barSpacing();
 		this._rightOffset = ensureNotNull(this._commonTransitionStartState).rightOffset + shiftInLogical;
+		this._invalidateVisibleBars();
 
 		// do not allow scroll out of visible bars
 		this._correctOffset();
@@ -520,8 +529,8 @@ export class TimeScale {
 		return this._visibleBarsChanged;
 	}
 
-	public indexRangeChanged(): ISubscription {
-		return this._indexRangeChanged;
+	public logicalRangeChanged(): ISubscription {
+		return this._logicalRangeChanged;
 	}
 
 	public optionsApplied(): ISubscription {
@@ -575,10 +584,10 @@ export class TimeScale {
 		this.setVisibleRange(barRange);
 	}
 
-	public setTimeIndexRange(range: TimePointIndexRange): void {
+	public setLogicalIndexRange(range: LogicalPointRange): void {
 		const barRange = new BarsRange(
-			range.from,
-			range.to
+			range.from as number as TimePointIndex,
+			range.to as number as TimePointIndex
 		);
 		this.setVisibleRange(barRange);
 	}
@@ -631,20 +640,20 @@ export class TimeScale {
 		this._setVisibleBars(new BarsRange(leftIndex, rightIndex));
 	}
 
-	private _updateVisibleIndexRange(): void {
+	private _updateVisibleLogicalRange(): void {
 		const lastIndex = this.points().lastIndex();
 
 		if (null === lastIndex) {
-			this._visibleIndexRange = null;
+			this._visibleLogicalRange = null;
 			return;
 		}
 
 		const rightIndex = lastIndex + this.rightOffset();
 		const leftIndex = rightIndex - (this.width() / this.barSpacing()) + 1;
 
-		this._visibleIndexRange = {
-			from: leftIndex as TimePointIndex,
-			to: rightIndex as TimePointIndex,
+		this._visibleLogicalRange = {
+			from: leftIndex as LogicalPoint,
+			to: rightIndex as LogicalPoint,
 		};
 	}
 
@@ -780,11 +789,11 @@ export class TimeScale {
 			this._visibleBarsChanged.fire();
 		}
 
-		const indexRange = this.visibleIndexRange();
+		const logicalRange = this.visibleLogicalRange();
 
-		if (indexRange?.from !== this._prevVisibleIndexRange?.from || indexRange?.to !== this._prevVisibleIndexRange?.to) {
-			this._prevVisibleIndexRange = indexRange;
-			this._indexRangeChanged.fire();
+		if (logicalRange?.from !== this._prevVisibleLogicalRange?.from || logicalRange?.to !== this._prevVisibleLogicalRange?.to) {
+			this._prevVisibleLogicalRange = logicalRange;
+			this._logicalRangeChanged.fire();
 		}
 
 		// TODO: reset only coords in case when this._visibleBars has not been changed
@@ -834,6 +843,6 @@ export class TimeScale {
 
 	private _invalidateVisibleBars(): void {
 		this._visibleBarsInvalidated = true;
-		this._visibleIndexRangeInvalidated = true;
+		this._visibleLogicalRangeInvalidated = true;
 	}
 }

@@ -1,17 +1,21 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { TimePointIndexRange } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
 
-import { Time } from './data-consumer';
+import { Logical, Time } from './data-consumer';
 
 export interface TimeRange {
 	from: Time;
 	to: Time;
 }
 
+export interface LogicalRange {
+	from: Logical;
+	to: Logical;
+}
+
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
-export type TimePointIndexRangeChangeEventHandler = (indexRange: TimePointIndexRange | null) => void;
+export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null) => void;
 
 /** Interface to chart time scale */
 export interface ITimeScaleApi {
@@ -46,16 +50,16 @@ export interface ITimeScaleApi {
 	setVisibleRange(range: TimeRange): void;
 
 	/**
-	 * Returns the currently visible index range of data.
+	 * Returns the currently visible logical range of data.
 	 * @returns - visible range or null if the chart has no data at all
 	 */
-	getVisibleIndexRange(): TimePointIndexRange | null;
+	getVisibleLogicalRange(): LogicalRange | null;
 
 	/**
-	 * Sets visible index range of data.
-	 * @param range - target visible index range of data.
+	 * Sets visible logical range of data.
+	 * @param range - target visible logical range of data.
 	 */
-	setVisibleIndexRange(range: TimePointIndexRange): void;
+	setVisibleLogicalRange(range: LogicalRange): void;
 
 	/**
 	 * Restores default zooming and scroll position of the time scale
@@ -84,13 +88,13 @@ export interface ITimeScaleApi {
 	 * Adds a subscription to visible index range changes to receive notifications about visible indexes of the data
 	 * @param handler - handler (function) to be called when the visible indexes change
 	 */
-	subscribeVisibleIndexRangeChange(handler: TimePointIndexRangeChangeEventHandler): void;
+	subscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void;
 
 	/**
 	 * Removes a subscription to visible index range changes
 	 * @param handler - previously subscribed handler
 	 */
-	unsubscribeVisibleIndexRangeChange(handler: TimePointIndexRangeChangeEventHandler): void;
+	unsubscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void;
 
 	/**
 	 * Applies new options to the time scale.

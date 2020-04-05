@@ -2,9 +2,11 @@ import { isNumber, isString } from '../helpers/strict-type-checks';
 
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
-import { BusinessDay, UTCTimestamp } from '../model/time-data';
+import { BusinessDay, LogicalPoint, UTCTimestamp } from '../model/time-data';
 
 export type Time = UTCTimestamp | BusinessDay | string;
+
+export type Logical = LogicalPoint | number;
 
 export function isBusinessDay(time: Time): time is BusinessDay {
 	return !isNumber(time) && !isString(time);
