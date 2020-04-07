@@ -94,6 +94,8 @@ export interface PriceScaleOptions {
 	borderColor: string;
 	/** Indicates whether the price scale displays only full lines of text or partial lines. */
 	entireTextOnly: boolean;
+	/** True value add a small horizontal ticks on price axis labels */
+	drawTicks: boolean;
 }
 
 interface RangeCache {
