@@ -99,6 +99,8 @@ export interface PriceScaleOptions {
 	entireTextOnly: boolean;
 	/** Indicates if this price scale visible. Could not be applied to overlay price scale */
 	visible: boolean;
+	/** True value add a small horizontal ticks on price axis labels */
+	drawTicks: boolean;
 }
 
 interface RangeCache {
