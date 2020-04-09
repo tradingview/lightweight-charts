@@ -17,7 +17,7 @@ import { BusinessDay, UTCTimestamp } from '../model/time-data';
 import { Time } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
-import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { ITimeScaleApi } from './itime-scale-api';
 
 export interface MouseEventParams {
 	time?: UTCTimestamp | BusinessDay;
@@ -28,7 +28,6 @@ export interface MouseEventParams {
 }
 
 export type MouseEventHandler = (param: MouseEventParams) => void;
-export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 
  /*
  * The main interface of a single chart
@@ -110,18 +109,6 @@ export interface IChartApi {
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
-
-	/**
-	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
-	 * @param handler - handler (function) to be called on changing visible data range
-	 */
-	subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
-
-	/**
-	 * Removes a subscription to visible range changes
-	 * @param handler - previously subscribed handler
-	 */
-	unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
 
 	/**
 	 * Returns API to manipulate the price scale
