@@ -42,7 +42,7 @@
     "chai": "~4.2.0",
     "clean-publish": "~1.1.5",
     "cross-env": "~7.0.0",
-    "dts-bundle-generator": "~4.0.0",
+    "dts-bundle-generator": "~4.1.0",
     "eslint": "~6.8.0",
     "glob": "~7.1.6",
     "markdown-it": "~10.0.0",
