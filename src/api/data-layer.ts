@@ -175,11 +175,11 @@ const spanDivisors = [
 	},
 ];
 
-function spanByTime(time: TimePoint, previousTime: TimePoint | null): number {
+function spanByTime(time: UTCTimestamp, previousTime: UTCTimestamp | null): number {
 	// function days(count) { return count * 24 * 60 * 60 * 1000; }
 	if (previousTime !== null) {
-		const lastTime = new Date(previousTime.timestamp * 1000);
-		const currentTime = new Date(time.timestamp * 1000);
+		const lastTime = new Date(previousTime * 1000);
+		const currentTime = new Date(time * 1000);
 
 		if (currentTime.getUTCFullYear() !== lastTime.getUTCFullYear()) {
 			return 70;
@@ -392,16 +392,26 @@ export class DataLayer {
 			});
 		});
 
-		let prevTime: TimePoint | null = null;
+		let prevTime: UTCTimestamp | null = null;
+		let totalTimeDiff = 0;
 		const marks = this._sortedTimePoints.map((time: TimePoint, index: number) => {
-			const span = spanByTime(time, prevTime);
-			prevTime = time;
+			totalTimeDiff += time.timestamp - (prevTime || time.timestamp);
+			const span = spanByTime(time.timestamp, prevTime);
+			prevTime = time.timestamp;
 			return {
 				span: span,
 				time: time,
 				index: index as TimePointIndex,
 			};
 		});
+
+		if (marks.length > 1) {
+			// let's guess a span for the first mark
+			// let's say the previous point was average time back in the history
+			const averageTimeDiff = Math.ceil(totalTimeDiff / (marks.length - 1));
+			const approxPrevTime = (marks[0].time.timestamp - averageTimeDiff) as UTCTimestamp;
+			marks[0].span = spanByTime(marks[0].time.timestamp, approxPrevTime);
+		}
 
 		const timeScaleUpdate: TimeScaleUpdatePacket = {
 			seriesUpdates,
@@ -437,11 +447,11 @@ export class DataLayer {
 
 	private _generateMarksSinceIndex(startIndex: TimePointIndex): TickMarkPacket[] {
 		const result: TickMarkPacket[] = [];
-		let prevTime = this._timePointsByIndex.get(startIndex - 1 as TimePointIndex) || null;
+		let prevTime: UTCTimestamp | null = this._timePointsByIndex.get(startIndex - 1 as TimePointIndex)?.timestamp || null;
 		for (let index = startIndex; index < this._timePointsByIndex.size; ++index) {
 			const time = ensureDefined(this._timePointsByIndex.get(index));
-			const span = spanByTime(time, prevTime);
-			prevTime = time;
+			const span = spanByTime(time.timestamp, prevTime);
+			prevTime = time.timestamp;
 			result.push({
 				span: span,
 				time: time,

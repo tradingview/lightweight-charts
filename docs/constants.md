@@ -68,3 +68,15 @@ It has the following values:
 
 - `PriceLineSource.LastBar` - use the last bar data.
 - `PriceLineSource.LastVisible` - use the last visible data of the chart viewport.
+
+## TickMarkType
+
+`TickMarkType` enum is used to specify a type of a tick mark on the time axis.
+
+It has the following values:
+
+- `TickMarkType.Year` - the tick mark represents start of the year (e.g. it's the first tick mark in a year).
+- `TickMarkType.Month` - the tick mark represents start of the month (e.g. it's the first tick mark in a month).
+- `TickMarkType.DayOfMonth` - the tick mark represents a day of the month.
+- `TickMarkType.Time` - the tick mark represents a time without seconds.
+- `TickMarkType.TimeWithSeconds` - the tick mark represents a full time format.

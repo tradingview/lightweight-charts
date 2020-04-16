@@ -52,38 +52,16 @@ chart.applyOptions({
 
 #### Date Format
 
-Preferred date format can be set using the `dateFormat` property of the `localization` option. The following date formats are available:
+Preferred date format can be set using the `dateFormat` property of the `localization` option.
 
-- `'yy MMM dd` - `'18 Jun 25`
-- `'yy MMMM dd` - `'18 June 25`
-- `yyyy MMM dd` - `2018 Jun 25`
-- `yyyy MMMM dd` - `2018 June 25`
-- `dd MMM 'yy` - `25 Jun '18` _(default)_
-- `dd MMMM 'yy` - `25 June '18`
-- `dd MMM yyyy` - `25 Jun 2018`
-- `dd MMMM yyyy` - `25 June 2018`
-- `MMM dd, 'yy` - `Jun 25, '18`
-- `MMMM dd, 'yy` - `June 25, '18`
-- `MMM dd, yyyy` - `Jun 25, 2018`
-- `MMMM dd, yyyy` - `June 25, 2018`
-- `yyyy-MM-dd` - `2018-06-25`
-- `yy-MM-dd` - `18-06-25`
-- `yy/MM/dd` - `18/06/25`
-- `yyyy/MM/dd` - `2018/06/25`
-- `yy.MM.dd` - `18.06.25`
-- `yyyy.MM.dd` - `2018.06.25`
-- `dd-MM-yyyy` - `25-06-2018`
-- `dd-MM-yy` - `25-06-18`
-- `dd/MM/yy` - `25/06/18`
-- `dd/MM/yyyy` - `25/06/2018`
-- `dd.MM.yy` - `25.06.18`
-- `dd.MM.yyyy` - `25.06.2018`
-- `MM-dd-yy` - `06-25-18`
-- `MM-dd-yyyy` - `06-25-2018`
-- `MM/dd/yy` - `06/25/18`
-- `MM/dd/yyyy` - `06/25/2018`
-- `MM.dd.yy` - `06.25.18`
-- `MM.dd.yyyy` - `06.25.2018`
+The format string might contain "special" sequences, which will be replaced with corresponding date's value:
+
+- `yyyy` - full year value (e.g. 2020)
+- `yy` - short year value (e.g. 20)
+- `MMMM` - long month value (e.g. July)
+- `MMM` - short month value (e.g. Feb)
+- `MM` - numeric (with leading zero if needed) month value (e.g. 03)
+- `dd` - day of month (with leading zero if needed) value (e.g. 15)
 
 ```javascript
 const chart = createChart(document.body, {
