@@ -52,7 +52,7 @@ chart.applyOptions({
         secondsVisible: false,
         tickMarkFormatter: function(timePoint, tickMarkType, locale) {
             console.log(timePoint, tickMarkType, locale);
-            return String(new Date(timePoint.timestamp).getUTCFullYear());
+            return String(new Date(timePoint.timestamp * 1000).getUTCFullYear());
         },
     },
 });

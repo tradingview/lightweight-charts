@@ -11,6 +11,7 @@ const config = {
 			outFile: './dist/typings.d.ts',
 			output: {
 				sortNodes: true,
+				respectPreserveConstEnum: true,
 			},
 		},
 	],
