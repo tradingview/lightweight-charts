@@ -24,7 +24,6 @@ export class PriceAxisRendererOptionsProvider {
 		paddingOuter: 0,
 		paddingTop: 0,
 		baselineOffset: 0,
-		drawTicks: true,
 	};
 
 	public constructor(chartModel: ChartModel) {
@@ -52,7 +51,6 @@ export class PriceAxisRendererOptionsProvider {
 		}
 
 		rendererOptions.color = this._textColor();
-		rendererOptions.drawTicks = this._chartModel.options().priceScale.drawTicks;
 
 		return this._rendererOptions;
 	}

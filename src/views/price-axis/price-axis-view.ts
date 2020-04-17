@@ -1,5 +1,8 @@
+import { ensureNotNull } from '../../helpers/assertions';
 import { generateTextColor } from '../../helpers/color';
 
+import { DataSource } from '../../model/data-source';
+import { PriceScale } from '../../model/price-scale';
 import {
 	IPriceAxisViewRenderer,
 	IPriceAxisViewRendererConstructor,
@@ -54,7 +57,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 	}
 
 	public coordinate(): number {
-		this._updateRendererDataIfNeeded();
+		this._updateRendererDataIfNeeded(ensureNotNull(this._getSource().priceScale()));
 		return this._commonRendererData.coordinate;
 	}
 
@@ -78,22 +81,22 @@ export abstract class PriceAxisView implements IPriceAxisView {
 	}
 
 	public isVisible(): boolean {
-		this._updateRendererDataIfNeeded();
+		this._updateRendererDataIfNeeded(ensureNotNull(this._getSource().priceScale()));
 		return this._axisRendererData.visible || this._paneRendererData.visible;
 	}
 
 	public isAxisLabelVisible(): boolean {
-		this._updateRendererDataIfNeeded();
+		this._updateRendererDataIfNeeded(ensureNotNull(this._getSource().priceScale()));
 		return this._axisRendererData.visible;
 	}
 
 	public isPaneLabelVisible(): boolean {
-		this._updateRendererDataIfNeeded();
+		this._updateRendererDataIfNeeded(ensureNotNull(this._getSource().priceScale()));
 		return this._paneRendererData.visible;
 	}
 
-	public renderer(): IPriceAxisViewRenderer {
-		this._updateRendererDataIfNeeded();
+	public renderer(priceScale: PriceScale): IPriceAxisViewRenderer {
+		this._updateRendererDataIfNeeded(priceScale);
 		this._axisRenderer.setData(this._axisRendererData, this._commonRendererData);
 		this._paneRenderer.setData(this._paneRendererData, this._commonRendererData);
 
@@ -101,12 +104,14 @@ export abstract class PriceAxisView implements IPriceAxisView {
 	}
 
 	public paneRenderer(): IPriceAxisViewRenderer {
-		this._updateRendererDataIfNeeded();
+		this._updateRendererDataIfNeeded(ensureNotNull(this._getSource().priceScale()));
 		this._axisRenderer.setData(this._axisRendererData, this._commonRendererData);
 		this._paneRenderer.setData(this._paneRendererData, this._commonRendererData);
 
 		return this._paneRenderer;
 	}
+
+	protected abstract _getSource(): DataSource;
 
 	protected abstract _updateRendererData(
 		axisRendererData: PriceAxisViewRendererData,
@@ -114,10 +119,11 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		commonData: PriceAxisViewRendererCommonData
 	): void;
 
-	private _updateRendererDataIfNeeded(): void {
+	private _updateRendererDataIfNeeded(priceScale: PriceScale): void {
 		if (this._invalidated) {
 			this._updateRendererData(this._axisRendererData, this._paneRendererData, this._commonRendererData);
-			this._invalidated = false;
+			this._axisRendererData.tickVisible = this._axisRendererData.tickVisible && priceScale.options().drawTicks;
+			this._paneRendererData.tickVisible = this._paneRendererData.tickVisible && priceScale.options().drawTicks;
 		}
 	}
 }

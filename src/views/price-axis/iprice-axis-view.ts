@@ -1,3 +1,4 @@
+import { PriceScale } from '../../model/price-scale';
 import {
 	IPriceAxisViewRenderer,
 	PriceAxisViewRendererOptions,
@@ -9,7 +10,7 @@ export interface IPriceAxisView {
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine?: boolean): number;
 	isVisible(): boolean;
 	isAxisLabelVisible(): boolean;
-	renderer(): IPriceAxisViewRenderer;
+	renderer(priceScale: PriceScale): IPriceAxisViewRenderer;
 	paneRenderer(): IPriceAxisViewRenderer;
 	setFixedCoordinate(value: number | null): void;
 	text(): string;
