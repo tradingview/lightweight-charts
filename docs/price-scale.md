@@ -1,6 +1,6 @@
 # Price Scale
 
-Price Scale is an object that maps prices to coordinates and and vice versa.
+Price Scale is an object that maps prices to coordinates and vice versa.
 The rules of converting depend on price scale mod, visible height of chart and visible part of data.
 
 Chart always has two predefined price scales: left and right, and unlimited number of overlay scales.
