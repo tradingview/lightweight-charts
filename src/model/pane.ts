@@ -161,9 +161,9 @@ export class Pane implements IDestroyable {
 		return this._leftPriceScale !== priceScale && this._rightPriceScale !== priceScale;
 	}
 
-	public addDataSource(source: IDataSource, targetScaleId: string, keepZorder: boolean): void {
-		const zOrder = this._getZOrderMinMax().minZOrder - 1;
-		this._insertDataSource(source, targetScaleId, zOrder);
+	public addDataSource(source: IDataSource, targetScaleId: string, zOrder?: number): void {
+		const targetZOrder = (zOrder !== undefined) ? zOrder : this._getZOrderMinMax().minZOrder - 1;
+		this._insertDataSource(source, targetScaleId, targetZOrder);
 	}
 
 	// tslint:disable-next-line:cyclomatic-complexity

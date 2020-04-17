@@ -136,7 +136,7 @@ export class ChartModel implements IDestroyable {
 
 		this.createPane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
-		this._panes[0].addDataSource(this._watermark, '', false);
+		this._panes[0].addDataSource(this._watermark, '');
 	}
 
 	public fullUpdate(): void {
@@ -192,7 +192,7 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
-		const priceScale = this.priceScaleById(priceScaleId);
+		const [priceScale] = this.priceScaleById(priceScaleId);
 
 		if (priceScale === null) {
 			if (process.env.NODE_ENV === 'development') {
@@ -206,14 +206,14 @@ export class ChartModel implements IDestroyable {
 		this._priceScalesOptionsChanged.fire();
 	}
 
-	public priceScaleById(priceScaleId: string): PriceScale | null {
+	public priceScaleById(priceScaleId: string): [PriceScale | null, Pane | null] {
 		for (const pane of this._panes) {
 			const res = pane.priceScaleById(priceScaleId);
 			if (res !== null) {
-				return res;
+				return [res, pane];
 			}
 		}
-		return null;
+		return [null, null];
 	}
 
 	public updateAllPaneViews(): void {
@@ -599,6 +599,24 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
+	public moveSeriesToScale(series: Series, targetScaleId: string): void {
+		const pane = this.paneForSource(series);
+		ensureNotNull(pane).removeDataSource(series);
+
+		// check if targetScaleId exists
+		const [priceScale, targetPane] = this.priceScaleById(targetScaleId);
+		if (priceScale !== null && targetPane !== null) {
+			// kepp on the same pane
+			const zOrder = series.zorder();
+			targetPane.addDataSource(series, targetScaleId, zOrder);
+		} else {
+			// if move to the new scale of the same pane, keep zorder
+			// if move to new pane
+			const zOrder = (targetPane === pane) ? series.zorder() : undefined;
+			pane?.addDataSource(series, targetScaleId, zOrder);
+		}
+	}
+
 	public fitContent(): void {
 		const mask = new InvalidateMask(InvalidationLevel.Light);
 		mask.setFitContent();
@@ -669,7 +687,7 @@ export class ChartModel implements IDestroyable {
 				targetScaleId = this.defaultVisiblePriceScaleId();
 			}
 		}
-		pane.addDataSource(series, targetScaleId, false);
+		pane.addDataSource(series, targetScaleId);
 
 		if (targetScaleId !== 'left' && targetScaleId !== 'right') {
 			// let's apply that options again to apply margins

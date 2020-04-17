@@ -224,6 +224,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
+		if (options.priceScaleId !== undefined && options.priceScaleId !== this._options.priceScaleId) {
+			// series cannot do it itself, ask model
+			this.model().moveSeriesToScale(this, options.priceScaleId);
+		}
 		merge(this._options, options);
 
 		// tslint:disable-next-line:deprecation
