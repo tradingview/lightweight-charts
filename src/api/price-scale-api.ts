@@ -33,7 +33,6 @@ export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
 	}
 
 	private _priceScale(): PriceScale {
-		const [priceScale] = this._chartModel.priceScaleById(this._priceScaleId);
-		return ensureNotNull(priceScale);
+		return ensureNotNull(this._chartModel.findPriceScale(this._priceScaleId)).priceScale;
 	}
 }

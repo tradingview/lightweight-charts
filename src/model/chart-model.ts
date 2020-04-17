@@ -51,6 +51,11 @@ export interface HoveredSource {
 	object?: HoveredObject;
 }
 
+export interface PriceScaleOnPane {
+	priceScale: PriceScale;
+	pane: Pane;
+}
+
 type InvalidateHandler = (mask: InvalidateMask) => void;
 
 export type VisiblePriceScaleOptions = PriceScaleOptions;
@@ -192,9 +197,9 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
-		const [priceScale] = this.priceScaleById(priceScaleId);
+		const res = this.findPriceScale(priceScaleId);
 
-		if (priceScale === null) {
+		if (res === null) {
 			if (process.env.NODE_ENV === 'development') {
 				throw new Error(`Trying to apply price scale options with incorrect ID: ${priceScaleId}`);
 			}
@@ -202,18 +207,21 @@ export class ChartModel implements IDestroyable {
 			return;
 		}
 
-		priceScale.applyOptions(options);
+		res.priceScale.applyOptions(options);
 		this._priceScalesOptionsChanged.fire();
 	}
 
-	public priceScaleById(priceScaleId: string): [PriceScale | null, Pane | null] {
+	public findPriceScale(priceScaleId: string): PriceScaleOnPane | null {
 		for (const pane of this._panes) {
-			const res = pane.priceScaleById(priceScaleId);
-			if (res !== null) {
-				return [res, pane];
+			const priceScale = pane.priceScaleById(priceScaleId);
+			if (priceScale !== null) {
+				return {
+					pane,
+					priceScale,
+				};
 			}
 		}
-		return [null, null];
+		return null;
 	}
 
 	public updateAllPaneViews(): void {
@@ -600,20 +608,20 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public moveSeriesToScale(series: Series, targetScaleId: string): void {
-		const pane = this.paneForSource(series);
-		ensureNotNull(pane).removeDataSource(series);
+		const pane = ensureNotNull(this.paneForSource(series));
+		pane.removeDataSource(series);
 
 		// check if targetScaleId exists
-		const [priceScale, targetPane] = this.priceScaleById(targetScaleId);
-		if (priceScale !== null && targetPane !== null) {
-			// kepp on the same pane
+		const target = this.findPriceScale(targetScaleId);
+		if (target === null) {
+			// new scale on the same pane
 			const zOrder = series.zorder();
-			targetPane.addDataSource(series, targetScaleId, zOrder);
+			pane.addDataSource(series, targetScaleId, zOrder);
 		} else {
 			// if move to the new scale of the same pane, keep zorder
 			// if move to new pane
-			const zOrder = (targetPane === pane) ? series.zorder() : undefined;
-			pane?.addDataSource(series, targetScaleId, zOrder);
+			const zOrder = (target.pane === pane) ? series.zorder() : undefined;
+			target.pane.addDataSource(series, targetScaleId, zOrder);
 		}
 	}
 
