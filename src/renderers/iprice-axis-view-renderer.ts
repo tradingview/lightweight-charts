@@ -29,7 +29,6 @@ export interface PriceAxisViewRendererOptions {
 	paddingOuter: number;
 	paddingTop: number;
 	tickLength: number;
-	drawTicks: boolean;
 }
 
 export interface IPriceAxisViewRenderer {
