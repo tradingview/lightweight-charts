@@ -9,8 +9,30 @@ Left and right price scales could be visible, overlay price scales are always hi
 ## Autoscale
 
 Autoscaling is a feature of automatic adjusting price scale to fit the visible range of data.
-Autoscaling is enabled by default, however you could turn it off by zooming price scale or calling `PriceScaleApi.setOptions` method with `autoScale` field set to false.
+Autoscaling is enabled by default, however you could turn it off by zooming price scale or calling `PriceScaleApi.applyOptions` method with `autoScale` field set to false.
 Overlay price scales are always autoscaled.
+
+## Price Range
+
+`priceScaleApi.applyOptions` method accepts a structure with `priceRange` fields. It allows overriding claculated price range with predefined one. So every time the library will calculate visible price scale range, the specified range will be returned.
+For instance,
+
+```javascript
+    var chart = LightweightCharts.createChart(container, {
+        priceScale: {
+            priceRange: {
+                minValue: 0,
+                maxValue: 100,
+            },
+            scaleMargins: {
+                bottom: 0,
+                top: 0,
+            },
+        },
+    });
+```
+
+Creates a chart with price scale range set to 0..100.
 
 ## PriceScale ID
 

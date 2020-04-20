@@ -101,6 +101,16 @@ export interface PriceScaleOptions {
 	visible: boolean;
 }
 
+export interface VisiblePriceRange {
+	minValue: number;
+	maxValue: number;
+}
+
+export interface PriceScaleRangeOptions {
+	/** Current visible price range */
+	priceRange: VisiblePriceRange | null;
+}
+
 interface RangeCache {
 	isValid: boolean;
 	visibleBars: BarsRange | null;
@@ -148,6 +158,8 @@ export class PriceScale {
 	private _formatter: IFormatter = defaultPriceFormatter;
 	private readonly _optionsChanged: Delegate = new Delegate();
 
+	private _predefinedPriceRange: PriceRange | null = null;
+
 	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
 		this._id = id;
 		this._options = options;
@@ -160,16 +172,27 @@ export class PriceScale {
 		return this._id;
 	}
 
-	public options(): Readonly<PriceScaleOptions> {
-		return this._options;
+	public options(): Readonly<PriceScaleOptions & PriceScaleRangeOptions> {
+		const priceScaleMinMax = this._priceRange === null ? null : {
+			minValue: this._priceRange.minValue(),
+			maxValue: this._priceRange.maxValue(),
+		};
+		return {
+			...this._options,
+			priceRange: priceScaleMinMax,
+		};
 	}
 
-	public applyOptions(options: DeepPartial<PriceScaleOptions>): void {
+	public applyOptions(options: DeepPartial<PriceScaleOptions> & Partial<PriceScaleRangeOptions>): void {
 		merge(this._options, options);
 		this.updateFormatter();
 
 		if (options.mode !== undefined) {
 			this.setMode({ mode: options.mode });
+		}
+
+		if (options.priceRange !== undefined) {
+			this._predefinedPriceRange = (options.priceRange === null) ? null : new PriceRange(options.priceRange.minValue, options.priceRange.maxValue);
 		}
 
 		this._optionsChanged.fire();
@@ -851,6 +874,11 @@ export class PriceScale {
 
 	// tslint:disable-next-line:cyclomatic-complexity
 	private _recalculatePriceRangeImpl(): void {
+		if (this._predefinedPriceRange !== null) {
+			this.setPriceRange(this._predefinedPriceRange);
+			this._invalidatedForRange.isValid = true;
+			return;
+		}
 		const visibleBars = this._invalidatedForRange.visibleBars;
 		if (visibleBars === null) {
 			return;

@@ -3,7 +3,7 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
-import { PriceScale, PriceScaleOptions } from '../model/price-scale';
+import { PriceScale, PriceScaleOptions, PriceScaleRangeOptions } from '../model/price-scale';
 
 import { IPriceScaleApi } from './iprice-scale-api';
 
@@ -24,11 +24,11 @@ export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
 		return this._priceScale().id();
 	}
 
-	public applyOptions(options: DeepPartial<PriceScaleOptions>): void {
+	public applyOptions(options: DeepPartial<Exclude<PriceScaleOptions, 'autoScale'>> & Partial<PriceScaleRangeOptions>): void {
 		this._chartModel.applyPriceScaleOptions(this._priceScaleId, options);
 	}
 
-	public options(): Readonly<PriceScaleOptions> {
+	public options(): Readonly<PriceScaleOptions & PriceScaleRangeOptions> {
 		return this._priceScale().options();
 	}
 
