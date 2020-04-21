@@ -15,7 +15,7 @@ import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { PriceDataSource } from './price-data-source';
-import { PriceRange } from './price-range';
+import { PriceRangeImpl } from './price-range-impl';
 import {
 	canConvertPriceRangeFromLog,
 	convertPriceRangeFromLog,
@@ -101,14 +101,14 @@ export interface PriceScaleOptions {
 	visible: boolean;
 }
 
-export interface VisiblePriceRange {
+export interface PriceRange {
 	minValue: number;
 	maxValue: number;
 }
 
 export interface PriceScaleRangeOptions {
 	/** Current visible price range */
-	priceRange: VisiblePriceRange | null;
+	priceRange: PriceRange | null;
 }
 
 interface RangeCache {
@@ -133,9 +133,9 @@ export class PriceScale {
 	private _internalHeightCache: number | null = null;
 	private _internalHeightChanged: Delegate = new Delegate();
 
-	private _priceRange: PriceRange | null = null;
-	private _priceRangeSnapshot: PriceRange | null = null;
-	private _priceRangeChanged: Delegate<PriceRange | null, PriceRange | null> = new Delegate();
+	private _priceRange: PriceRangeImpl | null = null;
+	private _priceRangeSnapshot: PriceRangeImpl | null = null;
+	private _priceRangeChanged: Delegate<PriceRangeImpl | null, PriceRangeImpl | null> = new Delegate();
 	private _invalidatedForRange: RangeCache = { isValid: false, visibleBars: null };
 
 	private _marginAbove: number = 0;
@@ -158,7 +158,7 @@ export class PriceScale {
 	private _formatter: IFormatter = defaultPriceFormatter;
 	private readonly _optionsChanged: Delegate = new Delegate();
 
-	private _predefinedPriceRange: PriceRange | null = null;
+	private _predefinedPriceRange: PriceRangeImpl | null = null;
 
 	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
 		this._id = id;
@@ -192,7 +192,7 @@ export class PriceScale {
 		}
 
 		if (options.priceRange !== undefined) {
-			this._predefinedPriceRange = (options.priceRange === null) ? null : new PriceRange(options.priceRange.minValue, options.priceRange.maxValue);
+			this._predefinedPriceRange = (options.priceRange === null) ? null : new PriceRangeImpl(options.priceRange.minValue, options.priceRange.maxValue);
 		}
 
 		this._optionsChanged.fire();
@@ -249,7 +249,7 @@ export class PriceScale {
 	// tslint:disable-next-line:cyclomatic-complexity
 	public setMode(newMode: Partial<PriceScaleState>): void {
 		const oldMode = this.mode();
-		let priceRange: PriceRange | null = null;
+		let priceRange: PriceRangeImpl | null = null;
 
 		if (newMode.autoScale !== undefined) {
 			this._options.autoScale = newMode.autoScale;
@@ -339,16 +339,16 @@ export class PriceScale {
 		return this._internalHeightChanged;
 	}
 
-	public priceRange(): PriceRange | null {
+	public priceRange(): PriceRangeImpl | null {
 		this._makeSureItIsValid();
 		return this._priceRange;
 	}
 
-	public priceRangeChanged(): ISubscription<PriceRange | null, PriceRange | null> {
+	public priceRangeChanged(): ISubscription<PriceRangeImpl | null, PriceRangeImpl | null> {
 		return this._priceRangeChanged;
 	}
 
-	public setPriceRange(newPriceRange: PriceRange | null, isForceSetValue?: boolean, onlyPriceScaleUpdate?: boolean): void {
+	public setPriceRange(newPriceRange: PriceRangeImpl | null, isForceSetValue?: boolean, onlyPriceScaleUpdate?: boolean): void {
 		const oldPriceRange = this._priceRange;
 
 		if (!isForceSetValue &&
@@ -884,7 +884,7 @@ export class PriceScale {
 			return;
 		}
 
-		let priceRange: PriceRange | null = null;
+		let priceRange: PriceRangeImpl | null = null;
 		const sources = this.sourcesForAutoScale();
 
 		let marginAbove = 0;
@@ -941,14 +941,14 @@ export class PriceScale {
 				// if price range is degenerated to 1 point let's extend it by 10 min move values
 				// to avoid incorrect range and empty (blank) scale (in case of min tick much greater than 1)
 				const extendValue = 5 * minMove;
-				priceRange = new PriceRange(priceRange.minValue() - extendValue, priceRange.maxValue() + extendValue);
+				priceRange = new PriceRangeImpl(priceRange.minValue() - extendValue, priceRange.maxValue() + extendValue);
 			}
 
 			this.setPriceRange(priceRange);
 		} else {
 			// reset empty to default
 			if (this._priceRange === null) {
-				this.setPriceRange(new PriceRange(-0.5, 0.5));
+				this.setPriceRange(new PriceRangeImpl(-0.5, 0.5));
 			}
 		}
 
