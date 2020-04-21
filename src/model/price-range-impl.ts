@@ -92,8 +92,8 @@ export class PriceRangeImpl {
 		this._minValue += delta;
 	}
 
-	public containsStrictly(PriceRangeImpl: PriceRangeImpl): boolean {
-		return PriceRangeImpl.minValue() > this._minValue &&
-			PriceRangeImpl.maxValue() < this._maxValue;
+	public containsStrictly(range: PriceRangeImpl): boolean {
+		return range.minValue() > this._minValue &&
+		range.maxValue() < this._maxValue;
 	}
 }
