@@ -22,7 +22,7 @@ import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-vi
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
 
-import { AutoscaleInfo } from './autoscale-info';
+import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { BarPrice, BarPrices } from './bar';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
@@ -34,7 +34,7 @@ import { PlotRow } from './plot-data';
 import { MinMax, PlotList, PlotRowSearchMode } from './plot-list';
 import { PriceDataSource } from './price-data-source';
 import { PriceLineOptions } from './price-line-options';
-import { PriceRange } from './price-range';
+import { PriceRangeImpl } from './price-range-impl';
 import { PriceScale } from './price-scale';
 import { SeriesBarColorer } from './series-bar-colorer';
 import { Bar, barFunction, SeriesData, SeriesPlotIndex } from './series-data';
@@ -395,7 +395,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return result;
 	}
 
-	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo | null {
+	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
 		if (!isInteger(startTimePoint) || !isInteger(endTimePoint) || this.data().isEmpty()) {
 			return null;
 		}
@@ -410,11 +410,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: 'low', offset: 0 }, { name: 'high', offset: 0 }]);
 		}
 
-		let range = barsMinMax !== null ? new PriceRange(barsMinMax.min, barsMinMax.max) : null;
+		let range = barsMinMax !== null ? new PriceRangeImpl(barsMinMax.min, barsMinMax.max) : null;
 
 		if (this.seriesType() === 'Histogram') {
 			const base = (this._options as HistogramStyleOptions).base;
-			const rangeWithBase = new PriceRange(base, base);
+			const rangeWithBase = new PriceRangeImpl(base, base);
 			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
 		}
 

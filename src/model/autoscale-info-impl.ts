@@ -1,12 +1,12 @@
 import { Coordinate } from './coordinate';
-import { PriceRange } from './price-range';
+import { PriceRangeImpl } from './price-range-impl';
 
 export interface AutoScaleMargins {
 	below: Coordinate;
 	above: Coordinate;
 }
 
-export interface AutoscaleInfo {
-	priceRange: PriceRange | null;
+export interface AutoscaleInfoImpl {
+	priceRange: PriceRangeImpl | null;
 	margins: AutoScaleMargins | null;
 }
