@@ -52,7 +52,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	public getVisibleRange(): TimeRange | null {
 		const timeRange = this._timeScale().visibleTimeRange();
 
-		if (!timeRange) {
+		if (timeRange === null) {
 			return null;
 		}
 
