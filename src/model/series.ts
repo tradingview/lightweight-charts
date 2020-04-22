@@ -35,7 +35,7 @@ import { MinMax, PlotList, PlotRowSearchMode } from './plot-list';
 import { PriceDataSource } from './price-data-source';
 import { PriceLineOptions } from './price-line-options';
 import { PriceRange } from './price-range';
-import { PriceScale } from './price-scale';
+import { isDefaultPriceScale, PriceScale } from './price-scale';
 import { SeriesBarColorer } from './series-bar-colorer';
 import { Bar, barFunction, SeriesData, SeriesPlotIndex } from './series-data';
 import { InternalSeriesMarker, SeriesMarker } from './series-markers';
@@ -88,6 +88,14 @@ export interface SeriesDataAtTypeMap {
 	Histogram: BarPrice;
 }
 
+// TODO: uncomment following strings after fixing typescript bug
+// https://github.com/microsoft/TypeScript/issues/36981
+// export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
+// export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
+
+export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
+export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
+
 export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
 	private readonly _seriesType: T;
 	private _data: SeriesData = new SeriesData();
@@ -100,14 +108,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _endOfData: boolean = false;
 	private _paneView!: IUpdatablePaneView;
 	private _barColorerCache: SeriesBarColorer | null = null;
-	private readonly _options: SeriesOptionsMap[T];
+	private readonly _options: SeriesOptionsInternal<T>;
 	private _barFunction: BarFunction;
 	private readonly _palette: Palette = new Palette();
 	private _markers: SeriesMarker<TimePoint>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
 
-	public constructor(model: ChartModel, options: SeriesOptionsMap[T], seriesType: T) {
+	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
@@ -223,10 +231,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options;
 	}
 
-	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
-		if (options.priceScaleId !== undefined && options.priceScaleId !== this._options.priceScaleId) {
+	public applyOptions(options: SeriesPartialOptionsInternal<T>): void {
+		const targetPriceScaleId = options.priceScaleId;
+		if (targetPriceScaleId !== undefined && targetPriceScaleId !== this._options.priceScaleId) {
 			// series cannot do it itself, ask model
-			this.model().moveSeriesToScale(this, options.priceScaleId);
+			this.model().moveSeriesToScale(this, targetPriceScaleId);
 		}
 		merge(this._options, options);
 
@@ -490,7 +499,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	private _isOverlay(): boolean {
 		const priceScale = this.priceScale();
-		return priceScale.id() !== 'left' && priceScale.id() !== 'right';
+		return !isDefaultPriceScale(priceScale.id());
 	}
 
 	private _markerRadius(): number {

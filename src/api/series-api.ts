@@ -4,7 +4,7 @@ import { clone, merge } from '../helpers/strict-type-checks';
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { PriceLineOptions } from '../model/price-line-options';
-import { Series } from '../model/series';
+import { Series, SeriesPartialOptionsInternal } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
@@ -20,6 +20,14 @@ import { IPriceScaleApi } from './iprice-scale-api';
 import { IPriceFormatter, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
+
+function migrateOptions<TSeriesType extends SeriesType>(options: SeriesPartialOptionsMap[TSeriesType]): SeriesPartialOptionsInternal<TSeriesType> {
+	const { overlay, ...res } = options;
+	if (overlay) {
+		res.priceScaleId = '';
+	}
+	return res;
+}
 
 export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType>, IDestroyable {
 	protected _series: Series<TSeriesType>;
@@ -80,7 +88,8 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {
-		this._series.applyOptions(options);
+		const migratedOptions = migrateOptions(options);
+		this._series.applyOptions(migratedOptions);
 	}
 
 	public options(): Readonly<SeriesOptionsMap[TSeriesType]> {

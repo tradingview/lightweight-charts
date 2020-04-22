@@ -8,7 +8,7 @@ import { ChartModel, ChartOptions, OverlayPriceScaleOptions, VisiblePriceScaleOp
 import { IDataSource } from './idata-source';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceDataSource } from './price-data-source';
-import { PriceScale, PriceScaleState } from './price-scale';
+import { isDefaultPriceScale, PriceScale, PriceScaleState } from './price-scale';
 import { Series } from './series';
 import { sortSources } from './sort-sources';
 import { TimeScale } from './time-scale';
@@ -236,7 +236,7 @@ export class Pane implements IDestroyable {
 	}
 
 	public containsPriceScale(priceScaleId: string): boolean {
-		return priceScaleId === 'left' || priceScaleId === 'right' || this._overlaySourcesByScaleId.has(priceScaleId);
+		return isDefaultPriceScale(priceScaleId) || this._overlaySourcesByScaleId.has(priceScaleId);
 	}
 
 	public startScalePrice(priceScale: PriceScale, x: number): void {
@@ -408,7 +408,7 @@ export class Pane implements IDestroyable {
 		}
 
 		this._dataSources.push(source);
-		if (priceScaleId !== 'left' && priceScaleId !== 'right') {
+		if (!isDefaultPriceScale(priceScaleId)) {
 			const overlaySources = this._overlaySourcesByScaleId.get(priceScaleId) || [];
 			overlaySources.push(source);
 			this._overlaySourcesByScaleId.set(priceScaleId, overlaySources);

@@ -112,6 +112,10 @@ type PriceTransformer = (price: BarPrice, baseValue: number) => number;
 const percentageFormatter = new PercentageFormatter();
 const defaultPriceFormatter = new PriceFormatter(100, 1);
 
+export function isDefaultPriceScale(priceScaleId: string): boolean {
+	return priceScaleId === 'left' || priceScaleId === 'right';
+}
+
 export class PriceScale {
 	private readonly _id: string;
 

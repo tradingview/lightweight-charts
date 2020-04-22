@@ -20,8 +20,8 @@ import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
-import { PriceScale, PriceScaleOptions } from './price-scale';
-import { Series } from './series';
+import { isDefaultPriceScale, PriceScale, PriceScaleOptions } from './price-scale';
+import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { TickMark, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
@@ -681,12 +681,12 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsMap[T], seriesType: T, pane: Pane): Series<T> {
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T> {
 		const series = new Series<T>(this, options, seriesType);
 
 		let targetScaleId: string;
 		// tslint:disable-next-line:deprecation
-		if (options.priceScaleId === '' || options.overlay) {
+		if (options.priceScaleId === '') {
 			targetScaleId = this._generateUniquePriceScaleId();
 		} else {
 			if (options.priceScaleId) {
@@ -697,7 +697,7 @@ export class ChartModel implements IDestroyable {
 		}
 		pane.addDataSource(series, targetScaleId);
 
-		if (targetScaleId !== 'left' && targetScaleId !== 'right') {
+		if (!isDefaultPriceScale(targetScaleId)) {
 			// let's apply that options again to apply margins
 			series.applyOptions(options);
 		}
