@@ -880,7 +880,7 @@ export class PriceScale {
 
 				if (autoScaleInfo !== null) {
 					const margins = autoScaleInfo.margins();
-					if (margins != null) {
+					if (margins !== null) {
 						marginAbove = Math.max(marginAbove, margins.above);
 						marginBelow = Math.max(marginAbove, margins.below);
 					}

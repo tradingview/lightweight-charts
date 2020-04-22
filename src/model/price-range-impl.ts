@@ -107,7 +107,7 @@ class PriceRangeImpl {
 	}
 
 	public static fromRaw(raw: PriceRange | null): PriceRangeImpl | null {
-		return (raw == null) ? null : new PriceRangeImpl(raw.minValue, raw.maxValue);
+		return (raw === null) ? null : new PriceRangeImpl(raw.minValue, raw.maxValue);
 	}
 }
 
