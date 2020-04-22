@@ -396,32 +396,15 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
-		if (!isInteger(startTimePoint) || !isInteger(endTimePoint) || this.data().isEmpty()) {
-			return null;
+		if (this._options.autoscaleProvider) {
+			const autoscaleInfo = this._options.autoscaleProvider(() => {
+				const res = this._autoscaleInfoImpl(startTimePoint, endTimePoint);
+				return (res === null) ? null : res.toRaw();
+			});
+
+			return AutoscaleInfoImpl.fromRaw(autoscaleInfo);
 		}
-
-		// TODO: refactor this
-		// series data is strongly hardcoded to keep bars
-		const priceSource = (this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'Histogram') ? 'close' : null;
-		let barsMinMax: MinMax | null;
-		if (priceSource !== null) {
-			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: priceSource, offset: 0 }]);
-		} else {
-			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: 'low', offset: 0 }, { name: 'high', offset: 0 }]);
-		}
-
-		let range = barsMinMax !== null ? new PriceRangeImpl(barsMinMax.min, barsMinMax.max) : null;
-
-		if (this.seriesType() === 'Histogram') {
-			const base = (this._options as HistogramStyleOptions).base;
-			const rangeWithBase = new PriceRangeImpl(base, base);
-			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
-		}
-
-		return {
-			priceRange: range,
-			margins: this._markersPaneView.autoScaleMargins(),
-		};
+		return this._autoscaleInfoImpl(startTimePoint, endTimePoint);
 	}
 
 	public minMove(): number {
@@ -482,6 +465,32 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public title(): string {
 		return this._options.title;
+	}
+
+	private _autoscaleInfoImpl(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
+		if (!isInteger(startTimePoint) || !isInteger(endTimePoint) || this.data().isEmpty()) {
+			return null;
+		}
+
+		// TODO: refactor this
+		// series data is strongly hardcoded to keep bars
+		const priceSource = (this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'Histogram') ? 'close' : null;
+		let barsMinMax: MinMax | null;
+		if (priceSource !== null) {
+			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: priceSource, offset: 0 }]);
+		} else {
+			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: 'low', offset: 0 }, { name: 'high', offset: 0 }]);
+		}
+
+		let range = barsMinMax !== null ? new PriceRangeImpl(barsMinMax.min, barsMinMax.max) : null;
+
+		if (this.seriesType() === 'Histogram') {
+			const base = (this._options as HistogramStyleOptions).base;
+			const rangeWithBase = new PriceRangeImpl(base, base);
+			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
+		}
+
+		return new AutoscaleInfoImpl(range,	this._markersPaneView.autoScaleMargins());
 	}
 
 	private _markerRadius(): number {
