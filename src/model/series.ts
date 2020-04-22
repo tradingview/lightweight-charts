@@ -158,7 +158,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			return noDataRes;
 		}
 
-		const visibleBars = this.model().timeScale().visibleBars();
+		const visibleBars = this.model().timeScale().visibleStrictRange();
 		const firstValue = this.firstValue();
 		if (visibleBars === null || firstValue === null) {
 			return noDataRes;
@@ -324,7 +324,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public firstBar(): Bar | null {
-		const visibleBars = this.model().timeScale().visibleBars();
+		const visibleBars = this.model().timeScale().visibleStrictRange();
 		if (visibleBars === null) {
 			return null;
 		}

@@ -31,3 +31,11 @@ export class Range<T extends number> {
 		return this._left === other.left() && this._right === other.right();
 	}
 }
+
+export function areRangesEqual<T extends number>(first: Range<T> | null, second: Range<T> | null): boolean {
+	if (first === null || second === null) {
+		return first === second;
+	}
+
+	return first.equals(second);
+}

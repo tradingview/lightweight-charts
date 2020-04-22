@@ -395,7 +395,7 @@ export class ChartModel implements IDestroyable {
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x);
 
-		const visibleBars = this._timeScale.visibleBars();
+		const visibleBars = this._timeScale.visibleStrictRange();
 		if (visibleBars !== null) {
 			index = Math.min(Math.max(visibleBars.left(), index), visibleBars.right()) as TimePointIndex;
 		}
@@ -459,7 +459,7 @@ export class ChartModel implements IDestroyable {
 			const timeScale = this._timeScale;
 			const currentBaseIndex = timeScale.baseIndex();
 
-			const visibleBars = timeScale.visibleBars();
+			const visibleBars = timeScale.visibleStrictRange();
 
 			// if time scale cannot return current visible bars range (e.g. time scale has zero-width)
 			// then we do not need to update right offset to shift visible bars range to have the same right offset as we have before new bar

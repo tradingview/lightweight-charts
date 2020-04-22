@@ -73,7 +73,15 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public getVisibleLogicalRange(): LogicalRange | null {
-		return clone(this._timeScale().visibleLogicalRange());
+		const logicalRange = this._timeScale().visibleLogicalRange();
+		if (logicalRange === null) {
+			return null;
+		}
+
+		return {
+			from: logicalRange.left(),
+			to: logicalRange.right(),
+		};
 	}
 
 	public setVisibleLogicalRange(range: LogicalRange): void {
