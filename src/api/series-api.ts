@@ -96,8 +96,8 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 			: dataLastIndex - dataLastBarInRange.index;
 
 		return {
-			from: dataFirstBarInRange.time,
-			to: dataLastBarInRange.time,
+			from: dataFirstBarInRange.time.businessDay ?? dataFirstBarInRange.time.timestamp,
+			to: dataLastBarInRange.time.businessDay ?? dataLastBarInRange.time.timestamp,
 			barsBefore,
 			barsAfter,
 		};
