@@ -1,8 +1,8 @@
 import { lowerbound, upperbound } from '../helpers/algorithms';
 import { Nominal } from '../helpers/nominal';
 
-import { BarsRange } from './bars-range';
 import { Coordinate } from './coordinate';
+import { Range } from './range';
 
 export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
 
@@ -60,9 +60,9 @@ function upperBoundItemsCompare(time: TimePointIndex, item: TimedValue): boolean
 	return time < item.time;
 }
 
-export function visibleTimedValues(items: TimedValue[], range: BarsRange, extendedRange: boolean): SeriesItemsIndexesRange {
-	const firstBar = range.firstBar();
-	const lastBar = range.lastBar();
+export function visibleTimedValues(items: TimedValue[], range: Range<TimePointIndex>, extendedRange: boolean): SeriesItemsIndexesRange {
+	const firstBar = range.left();
+	const lastBar = range.right();
 
 	const from = lowerbound<TimedValue, TimePointIndex>(items, firstBar, lowerBoundItemsCompare);
 	const to = upperbound<TimedValue, TimePointIndex>(items, lastBar, upperBoundItemsCompare);

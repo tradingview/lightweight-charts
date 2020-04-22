@@ -397,7 +397,7 @@ export class ChartModel implements IDestroyable {
 
 		const visibleBars = this._timeScale.visibleBars();
 		if (visibleBars !== null) {
-			index = Math.min(Math.max(visibleBars.firstBar(), index), visibleBars.lastBar()) as TimePointIndex;
+			index = Math.min(Math.max(visibleBars.left(), index), visibleBars.right()) as TimePointIndex;
 		}
 
 		const mainSource = pane.mainDataSource();

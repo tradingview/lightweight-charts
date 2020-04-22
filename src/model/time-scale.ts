@@ -7,11 +7,11 @@ import { ISubscription } from '../helpers/isubscription';
 import { clamp } from '../helpers/mathex';
 import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
 
-import { BarsRange } from './bars-range';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
+import { Range } from './range';
 import { TickMarks } from './tick-marks';
 import { Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
 import { TimePoints } from './time-points';
@@ -84,7 +84,7 @@ export class TimeScale {
 	private _scaleStartPoint: Coordinate | null = null;
 	private readonly _tickMarks: TickMarks = new TickMarks();
 	private _formattedBySpan: Map<number, FormattedLabelsCache> = new Map();
-	private _visibleBars: BarsRange | null = null;
+	private _visibleBars: Range<TimePointIndex> | null = null;
 	private _visibleLogicalRange: LogicalRange | null = null;
 	private _prevVisibleLogicalRange: LogicalRange | null = null;
 	private _visibleBarsInvalidated: boolean = true;
@@ -148,7 +148,7 @@ export class TimeScale {
 		return this._width === 0 || this._points.size() === 0;
 	}
 
-	public visibleBars(): BarsRange | null {
+	public visibleBars(): Range<TimePointIndex> | null {
 		if (this._visibleBarsInvalidated) {
 			this._visibleBarsInvalidated = false;
 			this._updateVisibleBars();
@@ -173,8 +173,8 @@ export class TimeScale {
 		}
 
 		const range: LogicalRange = {
-			from: visibleBars.firstBar() as number as Logical,
-			to: visibleBars.lastBar() as number as Logical,
+			from: visibleBars.left() as number as Logical,
+			to: visibleBars.right() as number as Logical,
 		};
 
 		return this.timeRangeForLogicalRange(range);
@@ -232,7 +232,7 @@ export class TimeScale {
 		// keep left edge instead of right
 		// we need it to avoid "shaking" if the last bar visibility affects time scale width
 		if (this._leftEdgeIndex !== null) {
-			const firstVisibleBar = ensureNotNull(this.visibleBars()).firstBar();
+			const firstVisibleBar = ensureNotNull(this.visibleBars()).left();
 			// firstVisibleBar could be less than this._leftEdgeIndex
 			// since index is a center of bar
 			if (firstVisibleBar <= this._leftEdgeIndex) {
@@ -326,8 +326,8 @@ export class TimeScale {
 
 		const visibleBars = ensureNotNull(this.visibleBars());
 
-		const firstBar = Math.max(visibleBars.firstBar(), visibleBars.firstBar() - indexPerLabel);
-		const lastBar = Math.max(visibleBars.lastBar(), visibleBars.lastBar() - indexPerLabel);
+		const firstBar = Math.max(visibleBars.left(), visibleBars.left() - indexPerLabel);
+		const lastBar = Math.max(visibleBars.right(), visibleBars.right() - indexPerLabel);
 
 		const items = this._tickMarks.build(spacing, maxLabelWidth);
 
@@ -556,10 +556,10 @@ export class TimeScale {
 		return this._baseIndexOrNull || 0 as TimePointIndex;
 	}
 
-	public setVisibleRange(range: BarsRange): void {
+	public setVisibleRange(range: Range<TimePointIndex>): void {
 		const length = range.count();
 		this._setBarSpacing(this._width / length);
-		this._rightOffset = range.lastBar() - this.baseIndex();
+		this._rightOffset = range.right() - this.baseIndex();
 		this._correctOffset();
 		this._invalidateVisibleBars();
 		this._model.recalculateAllPanes();
@@ -573,7 +573,7 @@ export class TimeScale {
 			return;
 		}
 
-		this.setVisibleRange(new BarsRange(first, last + this._options.rightOffset as TimePointIndex));
+		this.setVisibleRange(new Range(first, last + this._options.rightOffset as TimePointIndex));
 	}
 
 	public setTimePointsRange(range: TimePointsRange): void {
@@ -588,7 +588,7 @@ export class TimeScale {
 		const firstPoint = ensureNotNull(points.valueAt(firstIndex)).timestamp;
 		const lastPoint = ensureNotNull(points.valueAt(lastIndex)).timestamp;
 
-		const barRange = new BarsRange(
+		const barRange = new Range(
 			ensureNotNull(points.indexOf(Math.max(firstPoint, range.from.timestamp) as UTCTimestamp, true)),
 			ensureNotNull(points.indexOf(Math.min(lastPoint, range.to.timestamp) as UTCTimestamp, true))
 		);
@@ -596,7 +596,7 @@ export class TimeScale {
 	}
 
 	public setLogicalIndexRange(range: LogicalRange): void {
-		const barRange = new BarsRange(
+		const barRange = new Range(
 			range.from as number as TimePointIndex,
 			range.to as number as TimePointIndex
 		);
@@ -648,7 +648,7 @@ export class TimeScale {
 		const rightIndex = Math.round(this._rightOffset + baseIndex) as TimePointIndex;
 		const leftIndex = rightIndex - newBarsLength as TimePointIndex;
 
-		this._setVisibleBars(new BarsRange(leftIndex, rightIndex));
+		this._setVisibleBars(new Range(leftIndex, rightIndex));
 	}
 
 	private _updateVisibleLogicalRange(): void {
@@ -765,7 +765,7 @@ export class TimeScale {
 		return this._options.tickMarkFormatter(timePoint, tickMarkType, this._localizationOptions.locale);
 	}
 
-	private _setVisibleBars(visibleBars: BarsRange | null): void {
+	private _setVisibleBars(visibleBars: Range<TimePointIndex> | null): void {
 		if (visibleBars === null && this._visibleBars === null) {
 			return;
 		}
@@ -822,7 +822,7 @@ export class TimeScale {
 		}
 
 		this._leftEdgeIndex = firstIndex;
-		const delta = ensureNotNull(this.visibleBars()).firstBar() - firstIndex;
+		const delta = ensureNotNull(this.visibleBars()).left() - firstIndex;
 		if (delta < 0) {
 			const leftEdgeOffset = this._rightOffset - delta - 1;
 			this.setRightOffset(leftEdgeOffset);

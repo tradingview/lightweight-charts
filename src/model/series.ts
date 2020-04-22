@@ -177,7 +177,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			bar = lastBar;
 			lastIndex = lastBar.index;
 		} else {
-			const endBar = this.data().bars().search(visibleBars.lastBar(), PlotRowSearchMode.NearestLeft);
+			const endBar = this.data().bars().search(visibleBars.right(), PlotRowSearchMode.NearestLeft);
 			if (endBar === null) {
 				return noDataRes;
 			}
@@ -329,7 +329,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			return null;
 		}
 
-		const startTimePoint = visibleBars.firstBar();
+		const startTimePoint = visibleBars.left();
 		return this.data().search(startTimePoint, PlotRowSearchMode.NearestRight);
 	}
 
