@@ -1,3 +1,4 @@
+import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clone, merge } from '../helpers/strict-type-checks';
 
@@ -61,31 +62,44 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public barsInLogicalRange(range: LogicalRange): BarsInfo | null {
-		const rangeStart = Math.round(range.from) as TimePointIndex;
-		const rangeEnd = Math.round(range.to) as TimePointIndex;
+		const rangeFirstIndex = Math.round(range.from) as TimePointIndex;
+		const rangeLastIndex = Math.round(range.to) as TimePointIndex;
 
 		const bars = this._series.data().bars();
 
-		const firstBar = bars.search(rangeStart, PlotRowSearchMode.NearestRight);
-		const lastBar = bars.search(rangeEnd, PlotRowSearchMode.NearestLeft);
-		const firstIndex = bars.firstIndex() || 0;
-		const lastIndex = bars.lastIndex() || 0;
+		const dataFirstBarInRange = bars.search(rangeFirstIndex, PlotRowSearchMode.NearestRight);
+		if (dataFirstBarInRange === null) {
+			return null;
+		}
 
-		const barsBefore = (null !== firstBar)
-			? firstBar.index - firstIndex
-			: Math.min(lastIndex - firstIndex + 1, rangeStart - firstIndex)
-		;
+		const dataLastBarInRange = bars.search(rangeLastIndex, PlotRowSearchMode.NearestLeft);
+		if (dataLastBarInRange === null) {
+			return null;
+		}
 
-		const barsAfter = (null !== lastBar)
-			? Math.min(lastIndex - firstIndex + 1, lastIndex - lastBar.index)
-			: ((rangeEnd > lastIndex) ? (lastIndex - rangeEnd) : lastIndex - firstIndex + 1)
-		;
+		if (dataLastBarInRange.index < dataFirstBarInRange.index) {
+			// range is between series' points
+			// so we don't have bars info there
+			return null;
+		}
+
+		const dataFirstIndex = ensureNotNull(bars.firstIndex());
+		const dataLastIndex = ensureNotNull(bars.lastIndex());
+
+		// TODO: should it be start from range.from/to or from dataFirstBarInRange/dataLastBarInRange
+		const barsBefore = dataFirstBarInRange.index === dataFirstIndex
+			? range.from - dataFirstIndex
+			: dataFirstBarInRange.index - dataFirstIndex;
+
+		const barsAfter = dataLastBarInRange.index === dataLastIndex
+			? dataLastIndex - range.to
+			: dataLastIndex - dataLastBarInRange.index;
 
 		return {
-			from: (firstBar && lastBar) ? firstBar.time : undefined,
-			to: (firstBar && lastBar) ? lastBar.time : undefined,
-			barsBefore: barsBefore as TimePointIndex,
-			barsAfter: barsAfter as TimePointIndex,
+			from: dataFirstBarInRange.time,
+			to: dataLastBarInRange.time,
+			barsBefore,
+			barsAfter,
 		};
 	}
 

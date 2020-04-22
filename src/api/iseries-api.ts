@@ -13,8 +13,8 @@ import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 
 export interface BarsInfo {
-	from?: TimePoint;
-	to?: TimePoint;
+	from: TimePoint;
+	to: TimePoint;
 	barsBefore: number;
 	barsAfter: number;
 }
