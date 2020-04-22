@@ -13,7 +13,7 @@ import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
 import { Range } from './range';
 import { TickMarks } from './tick-marks';
-import { Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
+import { Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
 import { TimePoints } from './time-points';
 
 const enum Constants {
@@ -574,25 +574,6 @@ export class TimeScale {
 		}
 
 		this.setVisibleRange(new Range(first, last + this._options.rightOffset as TimePointIndex));
-	}
-
-	public setTimePointsRange(range: TimePointsRange): void {
-		const points = this.points();
-		const firstIndex = points.firstIndex();
-		const lastIndex = points.lastIndex();
-
-		if (firstIndex === null || lastIndex === null) {
-			return;
-		}
-
-		const firstPoint = ensureNotNull(points.valueAt(firstIndex)).timestamp;
-		const lastPoint = ensureNotNull(points.valueAt(lastIndex)).timestamp;
-
-		const barRange = new Range(
-			ensureNotNull(points.indexOf(Math.max(firstPoint, range.from.timestamp) as UTCTimestamp, true)),
-			ensureNotNull(points.indexOf(Math.min(lastPoint, range.to.timestamp) as UTCTimestamp, true))
-		);
-		this.setVisibleRange(barRange);
 	}
 
 	public setLogicalIndexRange(range: LogicalRange): void {
