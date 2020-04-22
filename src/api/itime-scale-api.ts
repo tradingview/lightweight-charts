@@ -1,17 +1,13 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { LogicalRange } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
 
-import { Logical, Time } from './data-consumer';
+import { Time } from './data-consumer';
 
 export interface TimeRange {
 	from: Time;
 	to: Time;
-}
-
-export interface LogicalRange {
-	from: Logical;
-	to: Logical;
 }
 
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;

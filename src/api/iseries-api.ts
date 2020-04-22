@@ -7,11 +7,10 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { TimePoint } from '../model/time-data';
+import { LogicalRange, TimePoint } from '../model/time-data';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
-import { LogicalRange } from './itime-scale-api';
 
 export interface BarsInfo {
 	from?: TimePoint;

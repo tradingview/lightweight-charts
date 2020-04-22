@@ -21,7 +21,7 @@ import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
-import { LogicalPointRange, TickMark, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
+import { LogicalRange, TickMark, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
 import { Watermark, WatermarkOptions } from './watermark';
 
@@ -575,7 +575,7 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(mask);
 	}
 
-	public setTargetLogicalRange(range: LogicalPointRange): void {
+	public setTargetLogicalRange(range: LogicalRange): void {
 		const mask = new InvalidateMask(InvalidationLevel.Light);
 		mask.setTargetLogicalRange(range);
 		this._invalidate(mask);

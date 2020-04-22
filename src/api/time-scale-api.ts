@@ -4,11 +4,11 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
-import { LogicalPoint, TimePointsRange } from '../model/time-data';
+import { LogicalRange, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, LogicalRange, LogicalRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
+import { ITimeScaleApi, LogicalRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
 
 const enum Constants {
 	AnimationDurationMs = 1000,
@@ -73,16 +73,12 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public getVisibleLogicalRange(): LogicalRange | null {
-		const logicalRange = this._timeScale().visibleLogicalRange();
-		return logicalRange ? clone(logicalRange) : null;
+		return clone(this._timeScale().visibleLogicalRange());
 	}
 
 	public setVisibleLogicalRange(range: LogicalRange): void {
 		assert(range.from <= range.to, 'The from index cannot be after the to index.');
-		this._model.setTargetLogicalRange({
-			from: range.from as LogicalPoint,
-			to: range.to as LogicalPoint,
-		});
+		this._model.setTargetLogicalRange(range);
 	}
 
 	public resetTimeScale(): void {

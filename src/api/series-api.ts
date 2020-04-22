@@ -12,13 +12,12 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { TimePointIndex } from '../model/time-data';
+import { LogicalRange, TimePointIndex } from '../model/time-data';
 
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
 import { IPriceLine } from './iprice-line';
 import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
-import { LogicalRange } from './itime-scale-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 

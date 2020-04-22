@@ -13,7 +13,7 @@ import { Coordinate } from './coordinate';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
 import { TickMarks } from './tick-marks';
-import { LogicalPoint, LogicalPointRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
+import { Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
 import { TimePoints } from './time-points';
 
 const enum Constants {
@@ -85,8 +85,8 @@ export class TimeScale {
 	private readonly _tickMarks: TickMarks = new TickMarks();
 	private _formattedBySpan: Map<number, FormattedLabelsCache> = new Map();
 	private _visibleBars: BarsRange | null = null;
-	private _visibleLogicalRange: LogicalPointRange | null = null;
-	private _prevVisibleLogicalRange: LogicalPointRange | null = null;
+	private _visibleLogicalRange: LogicalRange | null = null;
+	private _prevVisibleLogicalRange: LogicalRange | null = null;
 	private _visibleBarsInvalidated: boolean = true;
 	private _visibleLogicalRangeInvalidated: boolean = true;
 	private readonly _visibleBarsChanged: Delegate = new Delegate();
@@ -157,7 +157,7 @@ export class TimeScale {
 		return this._visibleBars;
 	}
 
-	public visibleLogicalRange(): LogicalPointRange | null {
+	public visibleLogicalRange(): LogicalRange | null {
 		if (this._visibleLogicalRangeInvalidated) {
 			this._visibleLogicalRangeInvalidated = false;
 			this._updateVisibleLogicalRange();
@@ -172,15 +172,15 @@ export class TimeScale {
 			return null;
 		}
 
-		const range = {
-			from: visibleBars.firstBar() as number as LogicalPoint,
-			to: visibleBars.lastBar() as number as LogicalPoint,
+		const range: LogicalRange = {
+			from: visibleBars.firstBar() as number as Logical,
+			to: visibleBars.lastBar() as number as Logical,
 		};
 
 		return this.timeRangeForLogicalRange(range);
 	}
 
-	public timeRangeForLogicalRange(range: LogicalPointRange): TimePointsRange {
+	public timeRangeForLogicalRange(range: LogicalRange): TimePointsRange {
 		const from = Math.round(range.from);
 		const to = Math.round(range.to);
 
@@ -194,12 +194,12 @@ export class TimeScale {
 		};
 	}
 
-	public logicalRangeForTimeRange(range: TimePointsRange): LogicalPointRange {
+	public logicalRangeForTimeRange(range: TimePointsRange): LogicalRange {
 		const points = this._model.timeScale().points();
 
 		return {
-			from: ensureNotNull(points.indexOf(range.from.timestamp, true)) as number as LogicalPoint,
-			to: ensureNotNull(points.indexOf(range.to.timestamp, true)) as number as LogicalPoint,
+			from: ensureNotNull(points.indexOf(range.from.timestamp, true)) as number as Logical,
+			to: ensureNotNull(points.indexOf(range.to.timestamp, true)) as number as Logical,
 		};
 	}
 
@@ -595,7 +595,7 @@ export class TimeScale {
 		this.setVisibleRange(barRange);
 	}
 
-	public setLogicalIndexRange(range: LogicalPointRange): void {
+	public setLogicalIndexRange(range: LogicalRange): void {
 		const barRange = new BarsRange(
 			range.from as number as TimePointIndex,
 			range.to as number as TimePointIndex
@@ -663,8 +663,8 @@ export class TimeScale {
 		const leftIndex = rightIndex - (this.width() / this.barSpacing()) + 1;
 
 		this._visibleLogicalRange = {
-			from: leftIndex as LogicalPoint,
-			to: rightIndex as LogicalPoint,
+			from: leftIndex as Logical,
+			to: rightIndex as Logical,
 		};
 	}
 

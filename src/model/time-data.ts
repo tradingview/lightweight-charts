@@ -24,11 +24,11 @@ export interface TimePointsRange {
 
 export type TimePointIndex = Nominal<number, 'TimePointIndex'>;
 
-export type LogicalPoint = Nominal<number, 'LogicalPoint'>;
+export type Logical = Nominal<number, 'Logical'>;
 
-export interface LogicalPointRange {
-	from: LogicalPoint;
-	to: LogicalPoint;
+export interface LogicalRange {
+	from: Logical;
+	to: Logical;
 }
 
 export interface TickMark {

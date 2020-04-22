@@ -1,4 +1,4 @@
-import { LogicalPointRange } from '../model/time-data';
+import { LogicalRange } from '../model/time-data';
 
 export const enum InvalidationLevel {
 	None = 0,
@@ -26,7 +26,7 @@ export class InvalidateMask {
 	private _globalLevel: InvalidationLevel;
 	private _force: boolean = false;
 	private _fitContent: boolean = false;
-	private _targetLogicalRange: LogicalPointRange | null = null;
+	private _targetLogicalRange: LogicalRange | null = null;
 
 	public constructor(globalLevel: InvalidationLevel) {
 		this._globalLevel = globalLevel;
@@ -68,12 +68,12 @@ export class InvalidateMask {
 		return this._fitContent;
 	}
 
-	public setTargetLogicalRange(range: LogicalPointRange): void {
+	public setTargetLogicalRange(range: LogicalRange): void {
 		this._targetLogicalRange = range;
 		this._fitContent = false;
 	}
 
-	public getTargetLogicalRange(): LogicalPointRange | null {
+	public getTargetLogicalRange(): LogicalRange | null {
 		return this._targetLogicalRange;
 	}
 
