@@ -791,7 +791,7 @@ export class PriceScale {
 	private _makeSureItIsValid(): void {
 		if (!this._invalidatedForRange.isValid) {
 			this._invalidatedForRange.isValid = true;
-			this._recalculatePriceRangeImplImpl();
+			this._recalculatePriceRangeImpl();
 		}
 	}
 
@@ -838,7 +838,7 @@ export class PriceScale {
 	}
 
 	// tslint:disable-next-line:cyclomatic-complexity
-	private _recalculatePriceRangeImplImpl(): void {
+	private _recalculatePriceRangeImpl(): void {
 		const visibleBars = this._invalidatedForRange.visibleBars;
 		if (visibleBars === null) {
 			return;
