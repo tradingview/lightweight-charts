@@ -118,6 +118,62 @@ chart.applyOptions({
 });
 ```
 
+### Overriding autoscale
+
+By default, chart scales data automatically, based on visible range of data. However for some reasons one could need overriding this behavior.
+There is an options called `autoscaleProvider` that allows overriding visible price range for series
+
+```javascript
+var firstSeries = chart.addLineSeries({
+    autoscaleProvider: () => {
+        return {
+            priceRange: {
+                minValue: 0,
+                maxValue: 100,
+            },
+        };
+    },
+});
+```
+
+So, you could just add a function that returns object with `priceRange` field to make chart thinking the series always has values from 0 to 100. These values aer in prices.
+
+You could also provide additional margins in pixels. Please be careful and never mix prices and pixels.
+
+```javascript
+var firstSeries = chart.addLineSeries({
+    autoscaleProvider: () => {
+        return {
+            priceRange: {
+                minValue: 0,
+                maxValue: 100,
+            },
+            margins: {
+                above: 10,
+                below: 10,
+            },
+        };
+    },
+});
+```
+
+Actually, `autoscaleProvider` function accepts a parameter with original implementation, so you can call default and ajust the result:
+
+```javascript
+var firstSeries = chart.addLineSeries({
+    autoscaleProvider: (original) => {
+        var res = original();
+        if (res.priceRange != null) {
+            res.priceRange.minValue -= 10;
+            res.priceRange.maxValue += 10;
+        }
+        return res;
+    },
+});
+```
+
+Please pay your attention that both `priceRange` and `margins` could be null in the default result.
+
 ## Removing series
 
 Any series could be removed with
