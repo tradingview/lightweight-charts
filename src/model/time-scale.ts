@@ -576,7 +576,7 @@ export class TimeScale {
 		this.setVisibleRange(new Range(first, last + this._options.rightOffset as TimePointIndex));
 	}
 
-	public setLogicalIndexRange(range: LogicalRange): void {
+	public setLogicalRange(range: LogicalRange): void {
 		const barRange = new Range(
 			range.from as number as TimePointIndex,
 			range.to as number as TimePointIndex

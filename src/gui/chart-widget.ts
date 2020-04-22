@@ -426,9 +426,9 @@ export class ChartWidget implements IDestroyable {
 				this._model.timeScale().fitContent();
 			}
 
-			const targetIndexRange = invalidateMask.getTargetLogicalRange();
-			if (targetIndexRange !== null) {
-				this._model.timeScale().setLogicalIndexRange(targetIndexRange);
+			const logicalRange = invalidateMask.getLogicalRange();
+			if (logicalRange !== null) {
+				this._model.timeScale().setLogicalRange(logicalRange);
 			}
 
 			this._timeAxisWidget.update();

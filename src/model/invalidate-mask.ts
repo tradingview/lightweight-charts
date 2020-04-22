@@ -26,7 +26,7 @@ export class InvalidateMask {
 	private _globalLevel: InvalidationLevel;
 	private _force: boolean = false;
 	private _fitContent: boolean = false;
-	private _targetLogicalRange: LogicalRange | null = null;
+	private _logicalRange: LogicalRange | null = null;
 
 	public constructor(globalLevel: InvalidationLevel) {
 		this._globalLevel = globalLevel;
@@ -61,20 +61,20 @@ export class InvalidateMask {
 
 	public setFitContent(): void {
 		this._fitContent = true;
-		this._targetLogicalRange = null;
+		this._logicalRange = null;
 	}
 
 	public getFitContent(): boolean {
 		return this._fitContent;
 	}
 
-	public setTargetLogicalRange(range: LogicalRange): void {
-		this._targetLogicalRange = range;
+	public setLogicalRange(range: LogicalRange): void {
+		this._logicalRange = range;
 		this._fitContent = false;
 	}
 
-	public getTargetLogicalRange(): LogicalRange | null {
-		return this._targetLogicalRange;
+	public getLogicalRange(): LogicalRange | null {
+		return this._logicalRange;
 	}
 
 	public merge(other: InvalidateMask): void {
@@ -82,8 +82,8 @@ export class InvalidateMask {
 		if (other._fitContent) {
 			this.setFitContent();
 		}
-		if (other._targetLogicalRange) {
-			this.setTargetLogicalRange(other._targetLogicalRange);
+		if (other._logicalRange) {
+			this.setLogicalRange(other._logicalRange);
 		}
 		this._globalLevel = Math.max(this._globalLevel, other._globalLevel);
 		other._invalidatedPanes.forEach((invalidation: PaneInvalidation, index: number) => {

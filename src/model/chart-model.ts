@@ -571,7 +571,7 @@ export class ChartModel implements IDestroyable {
 
 	public setTargetLogicalRange(range: LogicalRange): void {
 		const mask = new InvalidateMask(InvalidationLevel.Light);
-		mask.setTargetLogicalRange(range);
+		mask.setLogicalRange(range);
 		this._invalidate(mask);
 	}
 
