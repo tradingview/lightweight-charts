@@ -733,14 +733,14 @@ export class TimeScale {
 	}
 
 	private _setVisibleRange(newVisibleRange: TimeScaleVisibleRange): void {
-		const oldVisibleBars = this._visibleRange;
+		const oldVisibleRange = this._visibleRange;
 		this._visibleRange = newVisibleRange;
 
-		if (!areRangesEqual(oldVisibleBars.strictRange(), this._visibleRange.strictRange())) {
+		if (!areRangesEqual(oldVisibleRange.strictRange(), this._visibleRange.strictRange())) {
 			this._visibleBarsChanged.fire();
 		}
 
-		if (!areRangesEqual(oldVisibleBars.logicalRange(), this._visibleRange.logicalRange())) {
+		if (!areRangesEqual(oldVisibleRange.logicalRange(), this._visibleRange.logicalRange())) {
 			this._logicalRangeChanged.fire();
 		}
 
