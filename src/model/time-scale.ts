@@ -151,20 +151,12 @@ export class TimeScale {
 
 	// strict range: integer indices of the bars in the visible range rounded in more wide direction
 	public visibleStrictRange(): Range<TimePointIndex> | null {
-		if (this._visibleRangeInvalidated) {
-			this._visibleRangeInvalidated = false;
-			this._updateVisibleRange();
-		}
-
+		this._updateVisibleRange();
 		return this._visibleRange.strictRange();
 	}
 
 	public visibleLogicalRange(): Range<Logical> | null {
-		if (this._visibleRangeInvalidated) {
-			this._visibleRangeInvalidated = false;
-			this._updateVisibleRange();
-		}
-
+		this._updateVisibleRange();
 		return this._visibleRange.logicalRange();
 	}
 
@@ -621,6 +613,12 @@ export class TimeScale {
 	}
 
 	private _updateVisibleRange(): void {
+		if (!this._visibleRangeInvalidated) {
+			return;
+		}
+
+		this._visibleRangeInvalidated = false;
+
 		if (this.isEmpty()) {
 			this._setVisibleRange(TimeScaleVisibleRange.invalid());
 			return;
