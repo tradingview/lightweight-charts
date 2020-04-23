@@ -2,7 +2,7 @@ import { isNumber } from '../helpers/strict-type-checks';
 
 import { PriceRange } from './series-options';
 
-class PriceRangeImpl {
+export class PriceRangeImpl {
 	private _minValue: number;
 	private _maxValue!: number;
 
@@ -110,5 +110,3 @@ class PriceRangeImpl {
 		return (raw === null) ? null : new PriceRangeImpl(raw.minValue, raw.maxValue);
 	}
 }
-
-export { PriceRangeImpl };
