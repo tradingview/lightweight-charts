@@ -14,8 +14,8 @@ export class TimeScaleVisibleRange {
 		}
 
 		return new Range(
-			Math.round(this._logicalRange.left()) as TimePointIndex,
-			Math.round(this._logicalRange.right()) as TimePointIndex
+			Math.floor(this._logicalRange.left()) as TimePointIndex,
+			Math.ceil(this._logicalRange.right()) as TimePointIndex
 		);
 	}
 

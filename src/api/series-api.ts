@@ -6,6 +6,7 @@ import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
+import { Range } from '../model/range';
 import { Series } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import {
@@ -14,6 +15,7 @@ import {
 	SeriesType,
 } from '../model/series-options';
 import { LogicalRange, TimePointIndex } from '../model/time-data';
+import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
@@ -62,17 +64,19 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public barsInLogicalRange(range: LogicalRange): BarsInfo | null {
-		const rangeFirstIndex = Math.round(range.from) as TimePointIndex;
-		const rangeLastIndex = Math.round(range.to) as TimePointIndex;
+		// we use TimeScaleVisibleRange here to convert LogicalRange to strict range properly
+		const correctedRange = new TimeScaleVisibleRange(
+			new Range(range.from, range.to)
+		).strictRange() as Range<TimePointIndex>;
 
 		const bars = this._series.data().bars();
 
-		const dataFirstBarInRange = bars.search(rangeFirstIndex, PlotRowSearchMode.NearestRight);
+		const dataFirstBarInRange = bars.search(correctedRange.left(), PlotRowSearchMode.NearestRight);
 		if (dataFirstBarInRange === null) {
 			return null;
 		}
 
-		const dataLastBarInRange = bars.search(rangeLastIndex, PlotRowSearchMode.NearestLeft);
+		const dataLastBarInRange = bars.search(correctedRange.right(), PlotRowSearchMode.NearestLeft);
 		if (dataLastBarInRange === null) {
 			return null;
 		}
