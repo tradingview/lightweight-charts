@@ -63,7 +63,11 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
 	}
 
-	public barsInLogicalRange(range: LogicalRange): BarsInfo | null {
+	public barsInLogicalRange(range: LogicalRange | null): BarsInfo | null {
+		if (range === null) {
+			return null;
+		}
+
 		// we use TimeScaleVisibleRange here to convert LogicalRange to strict range properly
 		const correctedRange = new TimeScaleVisibleRange(
 			new RangeImpl(range.from, range.to)
