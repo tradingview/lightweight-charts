@@ -1,25 +1,25 @@
-import { Range } from './range';
+import { RangeImpl } from './range-impl';
 import { Logical, TimePointIndex } from './time-data';
 
 export class TimeScaleVisibleRange {
-	private readonly _logicalRange: Range<Logical> | null;
+	private readonly _logicalRange: RangeImpl<Logical> | null;
 
-	public constructor(logicalRange: Range<Logical> | null) {
+	public constructor(logicalRange: RangeImpl<Logical> | null) {
 		this._logicalRange = logicalRange;
 	}
 
-	public strictRange(): Range<TimePointIndex> | null {
+	public strictRange(): RangeImpl<TimePointIndex> | null {
 		if (this._logicalRange === null) {
 			return null;
 		}
 
-		return new Range(
+		return new RangeImpl(
 			Math.floor(this._logicalRange.left()) as TimePointIndex,
 			Math.ceil(this._logicalRange.right()) as TimePointIndex
 		);
 	}
 
-	public logicalRange(): Range<Logical> | null {
+	public logicalRange(): RangeImpl<Logical> | null {
 		return this._logicalRange;
 	}
 

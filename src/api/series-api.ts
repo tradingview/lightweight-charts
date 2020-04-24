@@ -6,7 +6,7 @@ import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
-import { Range } from '../model/range';
+import { RangeImpl } from '../model/range-impl';
 import { Series } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import {
@@ -66,8 +66,8 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	public barsInLogicalRange(range: LogicalRange): BarsInfo | null {
 		// we use TimeScaleVisibleRange here to convert LogicalRange to strict range properly
 		const correctedRange = new TimeScaleVisibleRange(
-			new Range(range.from, range.to)
-		).strictRange() as Range<TimePointIndex>;
+			new RangeImpl(range.from, range.to)
+		).strictRange() as RangeImpl<TimePointIndex>;
 
 		const bars = this._series.data().bars();
 

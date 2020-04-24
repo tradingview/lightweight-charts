@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { Coordinate } from '../../src/model/coordinate';
-import { Range } from '../../src/model/range';
+import { RangeImpl } from '../../src/model/range-impl';
 import { TimePointIndex, visibleTimedValues } from '../../src/model/time-data';
 
 // TODO: add tests for marks spans
@@ -15,7 +15,7 @@ function visibleTimedValuesCase(
 	expectedTo: number,
 	times: number[]
 ): void {
-	const barsRange = new Range(rangeFrom as TimePointIndex, rangeTo as TimePointIndex);
+	const barsRange = new RangeImpl(rangeFrom as TimePointIndex, rangeTo as TimePointIndex);
 	const timedData = times.map((t: number) => {
 		return { time: t as TimePointIndex, x: 0 as Coordinate };
 	});

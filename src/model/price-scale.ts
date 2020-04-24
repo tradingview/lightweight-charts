@@ -29,7 +29,7 @@ import {
 	toPercentRange,
 } from './price-scale-conversions';
 import { PriceTickMarkBuilder } from './price-tick-mark-builder';
-import { Range } from './range';
+import { RangeImpl } from './range-impl';
 import { Series } from './series';
 import { sortSources } from './sort-sources';
 import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
@@ -98,7 +98,7 @@ export interface PriceScaleOptions {
 
 interface RangeCache {
 	isValid: boolean;
-	visibleBars: Range<TimePointIndex> | null;
+	visibleBars: RangeImpl<TimePointIndex> | null;
 }
 
 // actually price should be BarPrice
@@ -729,7 +729,7 @@ export class PriceScale {
 		return this._dataSources.filter(useSourceForAutoScale);
 	}
 
-	public recalculatePriceRange(visibleBars: Range<TimePointIndex>): void {
+	public recalculatePriceRange(visibleBars: RangeImpl<TimePointIndex>): void {
 		this._invalidatedForRange = {
 			visibleBars: visibleBars,
 			isValid: false,

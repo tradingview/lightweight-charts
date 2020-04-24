@@ -1,6 +1,6 @@
 import { assert } from '../helpers/assertions';
 
-export class Range<T extends number> {
+export class RangeImpl<T extends number> {
 	private readonly _left: T;
 	private readonly _right: T;
 
@@ -27,12 +27,12 @@ export class Range<T extends number> {
 		return this._left <= index && index <= this._right;
 	}
 
-	public equals(other: Range<T>): boolean {
+	public equals(other: RangeImpl<T>): boolean {
 		return this._left === other.left() && this._right === other.right();
 	}
 }
 
-export function areRangesEqual<T extends number>(first: Range<T> | null, second: Range<T> | null): boolean {
+export function areRangesEqual<T extends number>(first: RangeImpl<T> | null, second: RangeImpl<T> | null): boolean {
 	if (first === null || second === null) {
 		return first === second;
 	}

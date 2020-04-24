@@ -2,7 +2,7 @@ import { lowerbound, upperbound } from '../helpers/algorithms';
 import { Nominal } from '../helpers/nominal';
 
 import { Coordinate } from './coordinate';
-import { Range } from './range';
+import { RangeImpl } from './range-impl';
 
 export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
 
@@ -55,7 +55,7 @@ function upperBoundItemsCompare(time: TimePointIndex, item: TimedValue): boolean
 	return time < item.time;
 }
 
-export function visibleTimedValues(items: TimedValue[], range: Range<TimePointIndex>, extendedRange: boolean): SeriesItemsIndexesRange {
+export function visibleTimedValues(items: TimedValue[], range: RangeImpl<TimePointIndex>, extendedRange: boolean): SeriesItemsIndexesRange {
 	const firstBar = range.left();
 	const lastBar = range.right();
 

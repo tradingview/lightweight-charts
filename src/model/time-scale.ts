@@ -11,7 +11,7 @@ import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
-import { areRangesEqual, Range } from './range';
+import { areRangesEqual, RangeImpl } from './range-impl';
 import { TickMarks } from './tick-marks';
 import { Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
 import { TimePoints } from './time-points';
@@ -150,12 +150,12 @@ export class TimeScale {
 	}
 
 	// strict range: integer indices of the bars in the visible range rounded in more wide direction
-	public visibleStrictRange(): Range<TimePointIndex> | null {
+	public visibleStrictRange(): RangeImpl<TimePointIndex> | null {
 		this._updateVisibleRange();
 		return this._visibleRange.strictRange();
 	}
 
-	public visibleLogicalRange(): Range<Logical> | null {
+	public visibleLogicalRange(): RangeImpl<Logical> | null {
 		this._updateVisibleRange();
 		return this._visibleRange.logicalRange();
 	}
@@ -550,7 +550,7 @@ export class TimeScale {
 		return this._baseIndexOrNull || 0 as TimePointIndex;
 	}
 
-	public setVisibleRange(range: Range<TimePointIndex>): void {
+	public setVisibleRange(range: RangeImpl<TimePointIndex>): void {
 		const length = range.count();
 		this._setBarSpacing(this._width / length);
 		this._rightOffset = range.right() - this.baseIndex();
@@ -567,11 +567,11 @@ export class TimeScale {
 			return;
 		}
 
-		this.setVisibleRange(new Range(first, last + this._options.rightOffset as TimePointIndex));
+		this.setVisibleRange(new RangeImpl(first, last + this._options.rightOffset as TimePointIndex));
 	}
 
 	public setLogicalRange(range: LogicalRange): void {
-		const barRange = new Range(
+		const barRange = new RangeImpl(
 			range.from as number as TimePointIndex,
 			range.to as number as TimePointIndex
 		);
@@ -629,7 +629,7 @@ export class TimeScale {
 		const rightBorder = this._rightOffset + baseIndex;
 		const leftBorder = rightBorder - newBarsLength + 1;
 
-		const logicalRange = new Range(leftBorder as Logical, rightBorder as Logical);
+		const logicalRange = new RangeImpl(leftBorder as Logical, rightBorder as Logical);
 		this._setVisibleRange(new TimeScaleVisibleRange(logicalRange));
 	}
 
