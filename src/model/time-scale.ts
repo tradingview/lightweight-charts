@@ -629,7 +629,7 @@ export class TimeScale {
 		const rightBorder = this._rightOffset + baseIndex;
 		const leftBorder = rightBorder - newBarsLength + 1;
 
-		const logicalRange = new Range<Logical>(leftBorder as Logical, rightBorder as Logical);
+		const logicalRange = new Range(leftBorder as Logical, rightBorder as Logical);
 		this._setVisibleRange(new TimeScaleVisibleRange(logicalRange));
 	}
 
