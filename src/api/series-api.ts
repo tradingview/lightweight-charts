@@ -74,41 +74,33 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		).strictRange() as RangeImpl<TimePointIndex>;
 
 		const bars = this._series.data().bars();
+		if (bars.isEmpty()) {
+			return null;
+		}
 
 		const dataFirstBarInRange = bars.search(correctedRange.left(), PlotRowSearchMode.NearestRight);
-		if (dataFirstBarInRange === null) {
-			return null;
-		}
-
 		const dataLastBarInRange = bars.search(correctedRange.right(), PlotRowSearchMode.NearestLeft);
-		if (dataLastBarInRange === null) {
-			return null;
-		}
-
-		if (dataLastBarInRange.index < dataFirstBarInRange.index) {
-			// range is between series' points
-			// so we don't have bars info there
-			return null;
-		}
 
 		const dataFirstIndex = ensureNotNull(bars.firstIndex());
 		const dataLastIndex = ensureNotNull(bars.lastIndex());
 
-		// TODO: should it be start from range.from/to or from dataFirstBarInRange/dataLastBarInRange
-		const barsBefore = dataFirstBarInRange.index === dataFirstIndex
+		const barsBefore = (dataFirstBarInRange === null || dataFirstBarInRange.index === dataFirstIndex)
 			? range.from - dataFirstIndex
 			: dataFirstBarInRange.index - dataFirstIndex;
 
-		const barsAfter = dataLastBarInRange.index === dataLastIndex
+		const barsAfter = (dataLastBarInRange === null || dataLastBarInRange.index === dataLastIndex)
 			? dataLastIndex - range.to
 			: dataLastIndex - dataLastBarInRange.index;
 
-		return {
-			from: dataFirstBarInRange.time.businessDay ?? dataFirstBarInRange.time.timestamp,
-			to: dataLastBarInRange.time.businessDay ?? dataLastBarInRange.time.timestamp,
-			barsBefore,
-			barsAfter,
-		};
+		const result: BarsInfo = { barsBefore, barsAfter };
+
+		// actually they can't exist separately
+		if (dataFirstBarInRange !== null && dataLastBarInRange !== null) {
+			result.from = dataFirstBarInRange.time.businessDay || dataFirstBarInRange.time.timestamp;
+			result.to = dataLastBarInRange.time.businessDay || dataLastBarInRange.time.timestamp;
+		}
+
+		return result;
 	}
 
 	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {

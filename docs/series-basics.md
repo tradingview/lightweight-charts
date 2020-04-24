@@ -409,8 +409,8 @@ Returns bars information for the series in provided [logical range](./time-scale
 
 The returned value is an object with the following properties:
 
-- `from` - a [Time](./time.md) of the first series' bar inside passed logical range
-- `to` - a [Time](./time.md) of the last series' bar inside passed logical range
+- `from` - a [Time](./time.md) of the first series' bar inside passed logical range or `undefined` if no bars found in requested range
+- `to` - a [Time](./time.md) of the last series' bar inside passed logical range or `undefined` if no bars found in requested range
 - `barsBefore` - a number of bars between `from` index of passed logical range and the first series' bar
 - `barsAfter` - a number of bars between `to` index of passed logical range and the last series' bar
 

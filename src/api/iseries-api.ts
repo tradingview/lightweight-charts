@@ -7,17 +7,19 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { LogicalRange } from '../model/time-data';
+import { LogicalRange, Range } from '../model/time-data';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 
-export interface BarsInfo {
-	from: Time;
-	to: Time;
-	barsBefore: number;
-	barsAfter: number;
-}
+// actually range might be either exist or not
+// but to avoid hard-readable type let's say every part of range is optional
+export type BarsInfo =
+	Partial<Range<Time>>
+	& {
+		barsBefore: number;
+		barsAfter: number;
+	};
 
 /** Interface to be implemented by the object in order to be used as a price formatter */
 export interface IPriceFormatter {
