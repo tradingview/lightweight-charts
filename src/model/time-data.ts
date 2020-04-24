@@ -17,19 +17,18 @@ export interface TimePoint {
 	businessDay?: BusinessDay;
 }
 
-export interface TimePointsRange {
-	from: TimePoint;
-	to: TimePoint;
+export interface Range<T> {
+	from: T;
+	to: T;
 }
+
+export type TimePointsRange = Range<TimePoint>;
 
 export type TimePointIndex = Nominal<number, 'TimePointIndex'>;
 
 export type Logical = Nominal<number, 'Logical'>;
 
-export interface LogicalRange {
-	from: Logical;
-	to: Logical;
-}
+export type LogicalRange = Range<Logical>;
 
 export interface TickMark {
 	index: TimePointIndex;
@@ -42,10 +41,7 @@ export interface TimedValue {
 	x: Coordinate;
 }
 
-export interface SeriesItemsIndexesRange {
-	from: number;
-	to: number;
-}
+export type SeriesItemsIndexesRange = Range<number>;
 
 function lowerBoundItemsCompare(item: TimedValue, time: TimePointIndex): boolean {
 	return item.time < time;
