@@ -403,6 +403,44 @@ const priceLine = series.createPriceLine({ price: 80.0 });
 series.removePriceLine(priceLine);
 ```
 
+### barsInLogicalRange
+
+Returns bars information for the series in provided [logical range](./time-scale.md#logical-range) or `null` if no series data in the request range found.
+
+The returned value is an object with the following properties:
+
+- `from` - a [Time](./time.md) of the first series' bar inside passed logical range
+- `to` - a [Time](./time.md) of the last series' bar inside passed logical range
+- `barsBefore` - a number of bars between `from` index of passed logical range and the first series' bar
+- `barsAfter` - a number of bars between `to` index of passed logical range and the last series' bar
+
+Positive value in `barsBefore` field means that there are some bars before (out of logical range from the left) the `from` logical index in the series.
+Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the `from` logical index are some bars.
+
+Positive value in `barsAfter` field means that there are some bars after (out of logical range from the right) the `to` logical index in the series.
+Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the `to` logical index are some bars.
+
+```javascript
+// returns bars info in current visible range
+const barsInfo = series.barsInLogicalRange(chart.timeScale().getVisibleLogicalRange());
+console.log(barsInfo);
+```
+
+This method might be used to implement, for instance, downloading historical data while scrolling and avoid an user sees empty spaces.
+Thus, you can subscribe on [visible logical range changed event](./time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars before the visible range and load the additional data if needed:
+
+```javascript
+function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
+    const barsInfo = series.barsInLogicalRange(newVisibleLogicalRange);
+    // if the only 50 bars exceeded until the series' first currently loaded bar
+    if (barsInfo !== null && barsInfo.barsBefore < 50) {
+        // try to load additional historical data and prepend it to the series data
+    }
+}
+
+chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
+```
+
 ## Taking screenshot
 
 Takes the whole chart screenshot.

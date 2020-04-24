@@ -107,6 +107,26 @@ chart.timeScale().setVisibleRange({
 });
 ```
 
+### getVisibleLogicalRange
+
+Returns the current visible [logical range](#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data at all.
+
+```javascript
+chart.timeScale().getVisibleLogicalRange();
+```
+
+### setVisibleLogicalRange
+
+Sets visible [logical range](#logical-range) of the chart.
+The argument is an object with the first and last time points of a desired logical range.
+
+```javascript
+chart.timeScale().setVisibleLogicalRange({
+    from: 0,
+    to: 10,
+});
+```
+
 ### resetTimeScale()
 
 Restores default zoom and scroll position of the time scale.
@@ -141,3 +161,76 @@ Returns an object with options currently applied to the time scale.
 ```javascript
 chart.timeScale().options();
 ```
+
+### subscribeVisibleTimeRangeChange
+
+Allows you subscribe on visible time range changed events.
+The argument is a handler function, which will be called with the new visible time range.
+
+The argument passed to your handler is the new visible time range, which might be either:
+
+- an object with properties `from` and `to` of type [Time](./time.md) which means the first and last visible time point accordingly
+- `null` if nothing is visible or the chart has no data at all
+
+```javascript
+function onVisibleTimeRangeChanged(newVisibleTimeRange) {
+    console.log(newVisibleTimeRange);
+}
+
+chart.timeScale().subscribeVisibleTimeRangeChange(onVisibleTimeRangeChanged);
+```
+
+### unsubscribeVisibleTimeRangeChange
+
+Allows you unsubscribe from previously subscribed handler on visible time range changed events.
+The argument is a handler function, which you've passed to the [`subscribeVisibleTimeRangeChange`](#subscribeVisibleTimeRangeChange).
+
+```javascript
+chart.timeScale().unsubscribeVisibleTimeRangeChange(onVisibleTimeRangeChanged);
+```
+
+### subscribeVisibleLogicalRangeChange
+
+Allows you subscribe on visible [logical range](#logical-range) changed events.
+The argument is a handler function, which will be called with the new visible logical range.
+
+The argument passed to your handler is the new visible logical range, which might be either:
+
+- an object with properties `from` and `to` of type number (see [Logical range](#logical-range) section) which means the first and last visible logical index accordingly
+- `null` if the chart has no data at all
+
+```javascript
+function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
+    console.log(newVisibleLogicalRange);
+}
+
+chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
+```
+
+### unsubscribeVisibleLogicalRangeChange
+
+Allows you unsubscribe from previously subscribed handler on visible logical range changed events.
+The argument is a handler function, which you've passed to the [`subscribeVisibleLogicalRangeChange`](#subscribeVisibleLogicalRangeChange).
+
+```javascript
+chart.timeScale().unsubscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
+```
+
+## Logical range
+
+Logical range is an object with 2 properties: `from` and `to`, which are numbers and represent logical indexes on the time scale.
+
+The start point of the time scale's logical range is the data item of all series.
+Before that point all indexes are negative, starts from the point - positive.
+
+Indexes might be floating, for instance 4.2.
+
+Integer part of logical index means index of the fully visible bar (see image below).
+Thus, if we have 5.2 as the last visible logical index (`to` field), that means that the last visible bar is bar with index 5, but also we have partially visible (for 20%) 6th bar.
+Half (e.g. 1.5, 3.5, 10.5) means exactly middle of the bar.
+
+![Logical range](./assets/logical-range.png "Logical range")
+
+Red vertical lines here are borders between bars.
+
+So, in the image above visible logical range is from -4.73 and to 5.05.
