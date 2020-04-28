@@ -125,7 +125,7 @@ There is an options called `autoscaleProvider` that allows overriding visible pr
 
 ```javascript
 var firstSeries = chart.addLineSeries({
-    autoscaleProvider: () => {
+    autoscaleInfoProvider: () => {
         return {
             priceRange: {
                 minValue: 0,
@@ -136,13 +136,13 @@ var firstSeries = chart.addLineSeries({
 });
 ```
 
-So, you could just add a function that returns object with `priceRange` field to make chart thinking the series always has values from 0 to 100. These values aer in prices.
+So, you could just add a function that returns object with `priceRange` field to make chart thinking the series always has values from 0 to 100. These values are in prices.
 
 You could also provide additional margins in pixels. Please be careful and never mix prices and pixels.
 
 ```javascript
 var firstSeries = chart.addLineSeries({
-    autoscaleProvider: () => {
+    autoscaleInfoProvider: () => {
         return {
             priceRange: {
                 minValue: 0,
@@ -157,13 +157,13 @@ var firstSeries = chart.addLineSeries({
 });
 ```
 
-Actually, `autoscaleProvider` function accepts a parameter with original implementation, so you can call default and ajust the result:
+Actually, `autoscaleInfoProvider` function accepts a parameter with original implementation, so you can call default and adjust the result:
 
 ```javascript
 var firstSeries = chart.addLineSeries({
-    autoscaleProvider: (original) => {
+    autoscaleInfoProvider: (original) => {
         var res = original();
-        if (res.priceRange != null) {
+        if (res.priceRange !== null) {
             res.priceRange.minValue -= 10;
             res.priceRange.maxValue += 10;
         }
@@ -172,7 +172,7 @@ var firstSeries = chart.addLineSeries({
 });
 ```
 
-Please pay your attention that both `priceRange` and `margins` could be null in the default result.
+Please pay your attention that both `priceRange` and `margins` could be `null` in the default result.
 
 ## Removing series
 

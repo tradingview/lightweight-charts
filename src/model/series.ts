@@ -396,8 +396,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
-		if (this._options.autoscaleProvider) {
-			const autoscaleInfo = this._options.autoscaleProvider(() => {
+		if (this._options.autoscaleInfoProvider !== undefined) {
+			const autoscaleInfo = this._options.autoscaleInfoProvider(() => {
 				const res = this._autoscaleInfoImpl(startTimePoint, endTimePoint);
 				return (res === null) ? null : res.toRaw();
 			});
