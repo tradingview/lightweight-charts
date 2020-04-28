@@ -1,5 +1,7 @@
 import { isNumber } from '../helpers/strict-type-checks';
 
+import { PriceRange } from './series-options';
+
 export class PriceRangeImpl {
 	private _minValue: number;
 	private _maxValue!: number;
@@ -95,5 +97,16 @@ export class PriceRangeImpl {
 	public containsStrictly(priceRange: PriceRangeImpl): boolean {
 		return priceRange.minValue() > this._minValue &&
 			priceRange.maxValue() < this._maxValue;
+	}
+
+	public toRaw(): PriceRange {
+		return {
+			minValue: this._minValue,
+			maxValue: this._maxValue,
+		};
+	}
+
+	public static fromRaw(raw: PriceRange | null): PriceRangeImpl | null {
+		return (raw === null) ? null : new PriceRangeImpl(raw.minValue, raw.maxValue);
 	}
 }

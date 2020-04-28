@@ -857,7 +857,7 @@ export class PriceScale {
 			}
 
 			const autoScaleInfo = source.autoscaleInfo(visibleBars.firstBar(), visibleBars.lastBar());
-			let sourceRange = autoScaleInfo && autoScaleInfo.priceRange;
+			let sourceRange = autoScaleInfo && autoScaleInfo.priceRange();
 
 			if (sourceRange !== null) {
 				switch (this._options.mode) {
@@ -878,9 +878,12 @@ export class PriceScale {
 					priceRange = priceRange.merge(ensureNotNull(sourceRange));
 				}
 
-				if (autoScaleInfo !== null && autoScaleInfo.margins !== null) {
-					marginAbove = Math.max(marginAbove, autoScaleInfo.margins.above);
-					marginBelow = Math.max(marginAbove, autoScaleInfo.margins.below);
+				if (autoScaleInfo !== null) {
+					const margins = autoScaleInfo.margins();
+					if (margins !== null) {
+						marginAbove = Math.max(marginAbove, margins.above);
+						marginBelow = Math.max(marginAbove, margins.below);
+					}
 				}
 			}
 		}
