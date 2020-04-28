@@ -205,7 +205,7 @@ export class Pane implements IDestroyable {
 		});
 
 		if (this._timeScale.isEmpty()) {
-			priceScale.setPriceRangeImpl(null);
+			priceScale.setPriceRange(null);
 			return;
 		}
 
@@ -246,7 +246,7 @@ export class Pane implements IDestroyable {
 		const visibleBars = this._timeScale.visibleBars();
 		priceScale.setMode({ autoScale: true });
 		if (visibleBars !== null) {
-			priceScale.recalculatePriceRangeImpl(visibleBars);
+			priceScale.recalculatePriceRange(visibleBars);
 		}
 		this.updateAllViews();
 	}
@@ -303,7 +303,7 @@ export class Pane implements IDestroyable {
 		if (sourceForAutoScale && sourceForAutoScale.length > 0 && !this._timeScale.isEmpty()) {
 			const visibleBars = this._timeScale.visibleBars();
 			if (visibleBars !== null) {
-				priceScale.recalculatePriceRangeImpl(visibleBars);
+				priceScale.recalculatePriceRange(visibleBars);
 			}
 		}
 

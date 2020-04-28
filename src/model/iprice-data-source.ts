@@ -1,5 +1,3 @@
-// NOTE: this type definition file is incomplete. Feel free to define other entities from companion JS
-
 import { IFormatter } from '../formatters/iformatter';
 
 import { AutoscaleInfoImpl } from './autoscale-info-impl';

@@ -67,7 +67,7 @@ export function fromLog(logical: number): number {
 	return (logical < 0) ? -res : res;
 }
 
-export function convertPriceRangeImplToLog(priceRange: PriceRangeImpl | null): PriceRangeImpl | null {
+export function convertPriceRangeToLog(priceRange: PriceRangeImpl | null): PriceRangeImpl | null {
 	if (priceRange === null) {
 		return null;
 	}
@@ -78,7 +78,7 @@ export function convertPriceRangeImplToLog(priceRange: PriceRangeImpl | null): P
 	return new PriceRangeImpl(min, max);
 }
 
-export function canConvertPriceRangeImplFromLog(priceRange: PriceRangeImpl | null): boolean {
+export function canConvertPriceRangeFromLog(priceRange: PriceRangeImpl | null): boolean {
 	if (priceRange === null) {
 		return false;
 	}
@@ -89,7 +89,7 @@ export function canConvertPriceRangeImplFromLog(priceRange: PriceRangeImpl | nul
 	return isFinite(min) && isFinite(max);
 }
 
-export function convertPriceRangeImplFromLog(priceRange: PriceRangeImpl | null): PriceRangeImpl | null {
+export function convertPriceRangeFromLog(priceRange: PriceRangeImpl | null): PriceRangeImpl | null {
 	if (priceRange === null) {
 		return null;
 	}

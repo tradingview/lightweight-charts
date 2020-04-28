@@ -17,9 +17,9 @@ import { LocalizationOptions } from './localization-options';
 import { PriceDataSource } from './price-data-source';
 import { PriceRangeImpl } from './price-range-impl';
 import {
-	canConvertPriceRangeImplFromLog,
-	convertPriceRangeImplFromLog,
-	convertPriceRangeImplToLog,
+	canConvertPriceRangeFromLog,
+	convertPriceRangeFromLog,
+	convertPriceRangeToLog,
 	fromIndexedTo100,
 	fromLog,
 	fromPercent,
@@ -231,11 +231,11 @@ export class PriceScale {
 
 		// define which scale converted from
 		if (oldMode.mode === PriceScaleMode.Logarithmic && newMode.mode !== oldMode.mode) {
-			if (canConvertPriceRangeImplFromLog(this._priceRange)) {
-				priceRange = convertPriceRangeImplFromLog(this._priceRange);
+			if (canConvertPriceRangeFromLog(this._priceRange)) {
+				priceRange = convertPriceRangeFromLog(this._priceRange);
 
 				if (priceRange !== null) {
-					this.setPriceRangeImpl(priceRange);
+					this.setPriceRange(priceRange);
 				}
 			} else {
 				this._options.autoScale = true;
@@ -244,10 +244,10 @@ export class PriceScale {
 
 		// define which scale converted to
 		if (newMode.mode === PriceScaleMode.Logarithmic && newMode.mode !== oldMode.mode) {
-			priceRange = convertPriceRangeImplToLog(this._priceRange);
+			priceRange = convertPriceRangeToLog(this._priceRange);
 
 			if (priceRange !== null) {
-				this.setPriceRangeImpl(priceRange);
+				this.setPriceRange(priceRange);
 			}
 		}
 
@@ -313,20 +313,20 @@ export class PriceScale {
 		return this._priceRangeChanged;
 	}
 
-	public setPriceRangeImpl(newPriceRangeImpl: PriceRangeImpl | null, isForceSetValue?: boolean, onlyPriceScaleUpdate?: boolean): void {
-		const oldPriceRangeImpl = this._priceRange;
+	public setPriceRange(newPriceRange: PriceRangeImpl | null, isForceSetValue?: boolean, onlyPriceScaleUpdate?: boolean): void {
+		const oldPriceRange = this._priceRange;
 
 		if (!isForceSetValue &&
-			!(oldPriceRangeImpl === null && newPriceRangeImpl !== null) &&
-			(oldPriceRangeImpl === null || oldPriceRangeImpl.equals(newPriceRangeImpl))) {
+			!(oldPriceRange === null && newPriceRange !== null) &&
+			(oldPriceRange === null || oldPriceRange.equals(newPriceRange))) {
 			return;
 		}
 
 		this._marksCache = null;
-		this._priceRange = newPriceRangeImpl;
+		this._priceRange = newPriceRange;
 
 		if (!onlyPriceScaleUpdate) {
-			this._priceRangeChanged.fire(oldPriceRangeImpl, newPriceRangeImpl);
+			this._priceRangeChanged.fire(oldPriceRange, newPriceRange);
 		}
 	}
 
@@ -613,11 +613,11 @@ export class PriceScale {
 		}
 
 		let scaleCoeff = (this._scaleStartPoint + (this._height - 1) * 0.2) / (x + (this._height - 1) * 0.2);
-		const newPriceRangeImpl = ensureNotNull(this._priceRangeSnapshot).clone();
+		const newPriceRange = ensureNotNull(this._priceRangeSnapshot).clone();
 
 		scaleCoeff = Math.max(scaleCoeff, 0.1);
-		newPriceRangeImpl.scaleAroundCenter(scaleCoeff);
-		this.setPriceRangeImpl(newPriceRangeImpl);
+		newPriceRange.scaleAroundCenter(scaleCoeff);
+		this.setPriceRange(newPriceRange);
 	}
 
 	public endScale(): void {
@@ -663,10 +663,10 @@ export class PriceScale {
 		}
 
 		const priceDelta = pixelDelta * priceUnitsPerPixel;
-		const newPriceRangeImpl = ensureNotNull(this._priceRangeSnapshot).clone();
+		const newPriceRange = ensureNotNull(this._priceRangeSnapshot).clone();
 
-		newPriceRangeImpl.shift(priceDelta);
-		this.setPriceRangeImpl(newPriceRangeImpl, true);
+		newPriceRange.shift(priceDelta);
+		this.setPriceRange(newPriceRange, true);
 		this._marksCache = null;
 	}
 
@@ -729,7 +729,7 @@ export class PriceScale {
 		return this._dataSources.filter(useSourceForAutoScale);
 	}
 
-	public recalculatePriceRangeImpl(visibleBars: BarsRange): void {
+	public recalculatePriceRange(visibleBars: BarsRange): void {
 		this._invalidatedForRange = {
 			visibleBars: visibleBars,
 			isValid: false,
@@ -862,7 +862,7 @@ export class PriceScale {
 			if (sourceRange !== null) {
 				switch (this._options.mode) {
 					case PriceScaleMode.Logarithmic:
-						sourceRange = convertPriceRangeImplToLog(sourceRange);
+						sourceRange = convertPriceRangeToLog(sourceRange);
 						break;
 					case PriceScaleMode.Percentage:
 						sourceRange = toPercentRange(sourceRange, firstValue.value);
@@ -907,11 +907,11 @@ export class PriceScale {
 				priceRange = new PriceRangeImpl(priceRange.minValue() - extendValue, priceRange.maxValue() + extendValue);
 			}
 
-			this.setPriceRangeImpl(priceRange);
+			this.setPriceRange(priceRange);
 		} else {
 			// reset empty to default
 			if (this._priceRange === null) {
-				this.setPriceRangeImpl(new PriceRangeImpl(-0.5, 0.5));
+				this.setPriceRange(new PriceRangeImpl(-0.5, 0.5));
 			}
 		}
 
