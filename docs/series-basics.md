@@ -120,8 +120,8 @@ chart.applyOptions({
 
 ### Overriding autoscale
 
-By default, chart scales data automatically, based on visible range of data. However for some reasons one could need overriding this behavior.
-There is an options called `autoscaleProvider` that allows overriding visible price range for series
+By default, the chart scales data automatically based on visible data range. However, for some reasons one could need overriding this behavior.
+There is an option called `autoscaleProvider` that allows overriding visible price range for series
 
 ```javascript
 var firstSeries = chart.addLineSeries({
@@ -136,9 +136,9 @@ var firstSeries = chart.addLineSeries({
 });
 ```
 
-So, you could just add a function that returns object with `priceRange` field to make chart thinking the series always has values from 0 to 100. These values are in prices.
+So, you can just add a function that returns an object with `priceRange` field, if you want to override the original series' price range. For example, you can set the range from 0 to 100. These values are in prices.
 
-You could also provide additional margins in pixels. Please be careful and never mix prices and pixels.
+You can also provide additional margins in pixels. Please be careful and never mix prices and pixels.
 
 ```javascript
 var firstSeries = chart.addLineSeries({
@@ -157,7 +157,7 @@ var firstSeries = chart.addLineSeries({
 });
 ```
 
-Actually, `autoscaleInfoProvider` function accepts a parameter with original implementation, so you can call default and adjust the result:
+Actually, `autoscaleInfoProvider` function has an argument `original` which is the default implementation, so you can call it and adjust the result:
 
 ```javascript
 var firstSeries = chart.addLineSeries({
@@ -172,7 +172,7 @@ var firstSeries = chart.addLineSeries({
 });
 ```
 
-Please pay your attention that both `priceRange` and `margins` could be `null` in the default result.
+Note that both `priceRange` and `margins` could be `null` in the default result.
 
 ## Removing series
 
