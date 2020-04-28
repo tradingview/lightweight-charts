@@ -125,7 +125,7 @@ There is an options called `autoscaleProvider` that allows overriding visible pr
 
 ```javascript
 var firstSeries = chart.addLineSeries({
-    autoscaleProvider: () => {
+    autoscaleInfoProvider: () => {
         return {
             priceRange: {
                 minValue: 0,
@@ -142,7 +142,7 @@ You could also provide additional margins in pixels. Please be careful and never
 
 ```javascript
 var firstSeries = chart.addLineSeries({
-    autoscaleProvider: () => {
+    autoscaleInfoProvider: () => {
         return {
             priceRange: {
                 minValue: 0,
@@ -157,11 +157,11 @@ var firstSeries = chart.addLineSeries({
 });
 ```
 
-Actually, `autoscaleProvider` function accepts a parameter with original implementation, so you can call default and adjust the result:
+Actually, `autoscaleInfoProvider` function accepts a parameter with original implementation, so you can call default and adjust the result:
 
 ```javascript
 var firstSeries = chart.addLineSeries({
-    autoscaleProvider: (original) => {
+    autoscaleInfoProvider: (original) => {
         var res = original();
         if (res.priceRange !== null) {
             res.priceRange.minValue -= 10;
