@@ -174,9 +174,7 @@ export interface AutoscaleInfo {
 	margins: AutoScaleMargins | null;
 }
 
-type AutoscaleProviderImplementation = () => AutoscaleInfo | null;
-
-type AutoscaleProvider = (baseImplementation: AutoscaleProviderImplementation) => AutoscaleInfo | null;
+type AutoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null) => AutoscaleInfo | null;
 
 /**
  * Structure describing options common for all types of series
@@ -215,7 +213,7 @@ export interface SeriesOptionsCommon {
 	/** Base line style. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
 	baseLineStyle: LineStyle;
 	/** function that overrides calculating of visible prices range */
-	autoscaleProvider?: AutoscaleProvider;
+	autoscaleInfoProvider?: AutoscaleInfoProvider;
 }
 
 export type SeriesOptions<T> =
