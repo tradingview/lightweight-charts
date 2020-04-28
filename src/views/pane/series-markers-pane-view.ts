@@ -1,7 +1,7 @@
 import { ensureNever } from '../../helpers/assertions';
 import { isNumber } from '../../helpers/strict-type-checks';
 
-import { AutoScaleMargins } from '../../model/autoscale-info';
+import { AutoScaleMargins } from '../../model/autoscale-info-impl';
 import { BarPrice, BarPrices } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
