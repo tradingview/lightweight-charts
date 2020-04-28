@@ -405,14 +405,14 @@ series.removePriceLine(priceLine);
 
 ### barsInLogicalRange
 
-Returns bars information for the series in provided [logical range](./time-scale.md#logical-range) or `null` if no series data in the request range found.
+Returns bars information for the series in the provided [logical range](./time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
 
 The returned value is an object with the following properties:
 
-- `from` - a [Time](./time.md) of the first series' bar inside passed logical range or `undefined` if no bars found in requested range
-- `to` - a [Time](./time.md) of the last series' bar inside passed logical range or `undefined` if no bars found in requested range
-- `barsBefore` - a number of bars between `from` index of passed logical range and the first series' bar
-- `barsAfter` - a number of bars between `to` index of passed logical range and the last series' bar
+- `from` - a [Time](./time.md) of the first series' bar inside of the passed logical range or `undefined`, if no bars have been found in the requested range
+- `to` - a [Time](./time.md) of the last series' bar inside of the passed logical range or `undefined`, if no bars have been found in the requested range
+- `barsBefore` - a number of bars between the `from` index of the passed logical range and the first series' bar
+- `barsAfter` - a number of bars between the `to` index of the passed logical range and the last series' bar
 
 Positive value in `barsBefore` field means that there are some bars before (out of logical range from the left) the `from` logical index in the series.
 Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the `from` logical index are some bars.
@@ -426,13 +426,13 @@ const barsInfo = series.barsInLogicalRange(chart.timeScale().getVisibleLogicalRa
 console.log(barsInfo);
 ```
 
-This method might be used to implement, for instance, downloading historical data while scrolling and avoid an user sees empty spaces.
-Thus, you can subscribe on [visible logical range changed event](./time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars before the visible range and load the additional data if needed:
+This method can be used, for instance, to implement downloading historical data while scrolling to prevent a user from seeing empty space.
+Thus, you can subscribe to [visible logical range changed event](./time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
 
 ```javascript
 function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
     const barsInfo = series.barsInLogicalRange(newVisibleLogicalRange);
-    // if the only 50 bars exceeded until the series' first currently loaded bar
+    // if there less than 50 bars to the left of the visible area
     if (barsInfo !== null && barsInfo.barsBefore < 50) {
         // try to load additional historical data and prepend it to the series data
     }
