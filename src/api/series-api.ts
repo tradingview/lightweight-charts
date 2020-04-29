@@ -63,6 +63,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
 	}
 
+	// tslint:disable-next-line:cyclomatic-complexity
 	public barsInLogicalRange(range: LogicalRange | null): BarsInfo | null {
 		if (range === null) {
 			return null;
@@ -83,6 +84,17 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 		const dataFirstIndex = ensureNotNull(bars.firstIndex());
 		const dataLastIndex = ensureNotNull(bars.lastIndex());
+
+		// this means that we request data in the data gap
+		// e.g. let's say we have series with data [0..10, 30..60]
+		// and we request bars info in range [15, 25]
+		// thus, dataFirstBarInRange will be with index 30 and dataLastBarInRange with 10
+		if (dataFirstBarInRange !== null && dataLastBarInRange !== null && dataFirstBarInRange.index > dataLastBarInRange.index) {
+			return {
+				barsBefore: range.from - dataFirstIndex,
+				barsAfter: dataLastIndex - range.to,
+			};
+		}
 
 		const barsBefore = (dataFirstBarInRange === null || dataFirstBarInRange.index === dataFirstIndex)
 			? range.from - dataFirstIndex
