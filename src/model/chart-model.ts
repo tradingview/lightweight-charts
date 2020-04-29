@@ -4,7 +4,7 @@ import { assert, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { DeepPartial, merge, uid } from '../helpers/strict-type-checks';
+import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
@@ -672,29 +672,10 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
-	private _generateUniquePriceScaleId(): string {
-		while (true) {
-			const newId = uid();
-			if (this._panes.every((pane: Pane) => !pane.containsPriceScale(newId))) {
-				return newId;
-			}
-		}
-	}
-
 	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T> {
 		const series = new Series<T>(this, options, seriesType);
 
-		let targetScaleId: string;
-		// tslint:disable-next-line:deprecation
-		if (options.priceScaleId === '') {
-			targetScaleId = this._generateUniquePriceScaleId();
-		} else {
-			if (options.priceScaleId) {
-				targetScaleId = options.priceScaleId;
-			} else {
-				targetScaleId = this.defaultVisiblePriceScaleId();
-			}
-		}
+		const targetScaleId = options.priceScaleId !== undefined ? options.priceScaleId : this.defaultVisiblePriceScaleId();
 		pane.addDataSource(series, targetScaleId);
 
 		if (!isDefaultPriceScale(targetScaleId)) {

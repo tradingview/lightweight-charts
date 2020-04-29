@@ -43,15 +43,6 @@ export function isNaN(value: number): boolean {
 	return !(value <= 0) && !(value > 0);
 }
 
-export function uid(length: number = 6): string {
-	const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-	let res = '';
-	for (let i = 0; i < length; i++) {
-		res += charset.charAt(Math.floor(Math.random() * charset.length));
-	}
-	return res;
-}
-
 export function isBoolean(value: unknown): value is boolean {
 	return typeof value === 'boolean';
 }
