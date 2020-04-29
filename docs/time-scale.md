@@ -223,7 +223,7 @@ Logical range is an object with 2 properties: `from` and `to`, which are numbers
 The starting point of the time scale's logical range is the first data item among all series.
 Before that point all indexes are negative, starting from that point - positive.
 
-Indexes might be floating, for instance 4.2.
+Indexes might have fractional parts, for instance 4.2, due to the time-scale being continuous rather than discrete.
 
 Integer part of logical index means index of the fully visible bar (see image below).
 Thus, if we have 5.2 as the last visible logical index (`to` field), that means that the last visible bar has index 5, but we also have partially visible (for 20%) 6th bar.
