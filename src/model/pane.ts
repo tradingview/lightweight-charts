@@ -5,10 +5,11 @@ import { ISubscription } from '../helpers/isubscription';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel, ChartOptions, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
+import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { IDataSource } from './idata-source';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceDataSource } from './price-data-source';
-import { isDefaultPriceScale, PriceScale, PriceScaleState } from './price-scale';
+import { PriceScale, PriceScaleState } from './price-scale';
 import { sortSources } from './sort-sources';
 import { TimeScale } from './time-scale';
 
@@ -47,8 +48,8 @@ export class Pane implements IDestroyable {
 
 		const options = model.options();
 
-		this._leftPriceScale = this._createPriceScale('left', options.leftPriceScale);
-		this._rightPriceScale = this._createPriceScale('right', options.rightPriceScale);
+		this._leftPriceScale = this._createPriceScale(DefaultPriceScaleId.Left, options.leftPriceScale);
+		this._rightPriceScale = this._createPriceScale(DefaultPriceScaleId.Right, options.rightPriceScale);
 		this.applyScaleOptions(options);
 	}
 
@@ -77,10 +78,10 @@ export class Pane implements IDestroyable {
 
 	public priceScaleById(id: string): PriceScale | null {
 		switch (id) {
-			case 'left': {
+			case DefaultPriceScaleId.Left: {
 				return this._leftPriceScale;
 			}
-			case 'right': {
+			case DefaultPriceScaleId.Right: {
 				return this._rightPriceScale;
 			}
 		}
@@ -232,10 +233,6 @@ export class Pane implements IDestroyable {
 
 	public rightPriceScale(): PriceScale {
 		return this._rightPriceScale;
-	}
-
-	public containsPriceScale(priceScaleId: string): boolean {
-		return isDefaultPriceScale(priceScaleId) || this._overlaySourcesByScaleId.has(priceScaleId);
 	}
 
 	public startScalePrice(priceScale: PriceScale, x: number): void {

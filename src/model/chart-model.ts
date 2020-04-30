@@ -11,6 +11,7 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 
 import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
+import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid, GridOptions } from './grid';
 import { IDataSource } from './idata-source';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
@@ -20,7 +21,7 @@ import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
-import { isDefaultPriceScale, PriceScale, PriceScaleOptions } from './price-scale';
+import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { TickMark, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
@@ -638,7 +639,7 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public defaultVisiblePriceScaleId(): string {
-		return this._options.rightPriceScale.visible ? 'right' : 'left';
+		return this._options.rightPriceScale.visible ? DefaultPriceScaleId.Right : DefaultPriceScaleId.Left;
 	}
 
 	private _paneInvalidationMask(pane: Pane | null, level: InvalidationLevel): InvalidateMask {
