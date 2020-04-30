@@ -15,7 +15,6 @@ import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale'
 import { Grid, GridOptions } from './grid';
 import { IDataSource } from './idata-source';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
-import { IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
@@ -554,18 +553,6 @@ export class ChartModel implements IDestroyable {
 		// to avoid memleaks
 		this._options.localization.priceFormatter = undefined;
 		this._options.localization.timeFormatter = undefined;
-	}
-
-	public setPriceAutoScaleForAllMainSources(): void {
-		this._panes.map((p: Pane) => p.mainDataSource())
-			.forEach((s: IPriceDataSource | null) => {
-				if (s !== null) {
-					const priceScale = ensureNotNull(s.priceScale());
-					priceScale.setMode({
-						autoScale: true,
-					});
-				}
-			});
 	}
 
 	public rendererOptionsProvider(): PriceAxisRendererOptionsProvider {
