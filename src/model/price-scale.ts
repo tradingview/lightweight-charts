@@ -142,7 +142,6 @@ export class PriceScale {
 
 	private _dataSources: IDataSource[] = [];
 	private _cachedOrderedSources: IDataSource[] | null = null;
-	private _hasSeries: boolean = false;
 	private _mainSource: IPriceDataSource | null = null;
 
 	private _marksCache: PriceMark[] | null = null;
@@ -486,17 +485,9 @@ export class PriceScale {
 		return this._cachedOrderedSources;
 	}
 
-	public hasSeries(): boolean {
-		return this._hasSeries;
-	}
-
 	public addDataSource(source: IDataSource): void {
 		if (this._dataSources.indexOf(source) !== -1) {
 			return;
-		}
-
-		if ((source instanceof Series)) {
-			this._hasSeries = true;
 		}
 
 		this._dataSources.push(source);
@@ -512,9 +503,6 @@ export class PriceScale {
 		}
 
 		this._dataSources.splice(index, 1);
-		if (source instanceof Series) {
-			this._hasSeries = false;
-		}
 
 		if (!this.mainSource()) {
 			this.setMode({
