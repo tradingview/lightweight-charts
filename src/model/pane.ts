@@ -9,7 +9,6 @@ import { IDataSource } from './idata-source';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceDataSource } from './price-data-source';
 import { isDefaultPriceScale, PriceScale, PriceScaleState } from './price-scale';
-import { Series } from './series';
 import { sortSources } from './sort-sources';
 import { TimeScale } from './time-scale';
 
@@ -339,10 +338,6 @@ export class Pane implements IDestroyable {
 
 	public isEmpty(): boolean {
 		return this._mainDataSource === null;
-	}
-
-	public containsSeries(): boolean {
-		return this._dataSources.some((ds: IDataSource) => ds instanceof Series);
 	}
 
 	public orderedSources(): ReadonlyArray<IDataSource> {

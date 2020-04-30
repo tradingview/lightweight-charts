@@ -573,9 +573,6 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		const state = ensureNotNull(this._state);
-		if (!state.containsSeries()) {
-			return;
-		}
 
 		const paneViews = source.paneViews();
 		const height = state.height();
