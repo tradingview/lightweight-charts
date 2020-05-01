@@ -45,7 +45,7 @@ export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: Tic
 	const localDateFromUtc = new Date(
 		date.getUTCFullYear(),
 		date.getUTCMonth(),
-		date.getUTCDate(),localDateFromUtcs
+		date.getUTCDate(),
 		date.getUTCHours(),
 		date.getUTCMinutes(),
 		date.getUTCSeconds(),
