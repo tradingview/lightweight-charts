@@ -45,12 +45,16 @@ export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: Tic
 	const localDateFromUtc = new Date(
 		date.getUTCFullYear(),
 		date.getUTCMonth(),
-		date.getUTCDate(),
+		date.getUTCDate(),localDateFromUtcs
 		date.getUTCHours(),
 		date.getUTCMinutes(),
 		date.getUTCSeconds(),
 		date.getUTCMilliseconds()
 	);
+	
+	if (timePoint.businessDay === undefined) {
+		return date.toLocaleString(locale, formatOptions);
+	}
 
 	return localDateFromUtc.toLocaleString(locale, formatOptions);
 }
