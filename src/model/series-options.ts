@@ -170,7 +170,7 @@ export interface PriceRange {
 }
 
 export interface AutoscaleInfo {
-	priceRange: PriceRange | null;
+	priceRange: PriceRange;
 	margins?: AutoScaleMargins;
 }
 
