@@ -11,9 +11,9 @@ export class AutoscaleInfoImpl {
 	private readonly _priceRange: PriceRangeImpl | null;
 	private readonly _margins: AutoScaleMargins | null;
 
-	public constructor(priceRange: PriceRangeImpl | null, margins: AutoScaleMargins | null) {
+	public constructor(priceRange: PriceRangeImpl | null, margins?: AutoScaleMargins | null) {
 		this._priceRange = priceRange;
-		this._margins = margins;
+		this._margins = margins || null;
 	}
 
 	public priceRange(): PriceRangeImpl | null {
@@ -27,7 +27,7 @@ export class AutoscaleInfoImpl {
 	public toRaw(): AutoscaleInfo {
 		return {
 			priceRange: (this._priceRange === null) ? null : this._priceRange.toRaw(),
-			margins: this._margins,
+			margins: this._margins || undefined,
 		};
 	}
 

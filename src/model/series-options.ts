@@ -171,7 +171,7 @@ export interface PriceRange {
 
 export interface AutoscaleInfo {
 	priceRange: PriceRange | null;
-	margins: AutoScaleMargins | null;
+	margins?: AutoScaleMargins;
 }
 
 type AutoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null) => AutoscaleInfo | null;
