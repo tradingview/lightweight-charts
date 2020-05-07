@@ -2,6 +2,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
+import { AutoScaleMargins } from './autoscale-info-impl';
 import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
 
@@ -153,6 +154,18 @@ export const enum PriceLineSource {
 	LastVisible,
 }
 
+export interface PriceRange {
+	minValue: number;
+	maxValue: number;
+}
+
+export interface AutoscaleInfo {
+	priceRange: PriceRange;
+	margins?: AutoScaleMargins;
+}
+
+type AutoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null) => AutoscaleInfo | null;
+
 /**
  * Structure describing options common for all types of series
  */
@@ -190,7 +203,8 @@ export interface SeriesOptionsCommon {
 	baseLineWidth: LineWidth;
 	/** Base line style. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
 	baseLineStyle: LineStyle;
-
+	/** function that overrides calculating of visible prices range */
+	autoscaleInfoProvider?: AutoscaleInfoProvider;
 	/**
 	 * @deprecated Use priceScaleId instead
 	 * @internal
