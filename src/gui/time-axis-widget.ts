@@ -227,6 +227,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	public update(): void {
+		// this call has side-effect - it regenerates marks on the time scale
 		this._chart.model().timeScale().marks();
 	}
 
