@@ -84,8 +84,11 @@ export interface PriceScaleOptions {
 	invertScale: boolean;
 	/** True value prevents labels on the price scale from overlapping one another by aligning them one below others */
 	alignLabels: boolean;
-	/** Defines position of the price scale on the chart */
-	position: PriceAxisPosition;
+	/**
+	 * @deprecated Defines position of the price scale on the chart
+	 * @internal
+	 */
+	position?: PriceAxisPosition;
 	/** Defines price margins for the price scale */
 	scaleMargins: PriceScaleMargins;
 	/** Set true to draw a border between the price scale and the chart area */
@@ -94,6 +97,8 @@ export interface PriceScaleOptions {
 	borderColor: string;
 	/** Indicates whether the price scale displays only full lines of text or partial lines. */
 	entireTextOnly: boolean;
+	/** Indicates if this price scale visible. Could not be applied to overlay price scale */
+	visible: boolean;
 }
 
 interface RangeCache {
@@ -108,6 +113,8 @@ const percentageFormatter = new PercentageFormatter();
 const defaultPriceFormatter = new PriceFormatter(100, 1);
 
 export class PriceScale {
+	private readonly _id: string;
+
 	private readonly _layoutOptions: LayoutOptions;
 	private readonly _localizationOptions: LocalizationOptions;
 	private readonly _options: PriceScaleOptions;
@@ -131,7 +138,6 @@ export class PriceScale {
 
 	private _dataSources: IDataSource[] = [];
 	private _cachedOrderedSources: IDataSource[] | null = null;
-	private _hasSeries: boolean = false;
 	private _mainSource: IPriceDataSource | null = null;
 
 	private _marksCache: PriceMark[] | null = null;
@@ -141,11 +147,16 @@ export class PriceScale {
 	private _formatter: IFormatter = defaultPriceFormatter;
 	private readonly _optionsChanged: Delegate = new Delegate();
 
-	public constructor(options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
 		this._localizationOptions = localizationOptions;
 		this._markBuilder = new PriceTickMarkBuilder(this, 100, this._coordinateToLogical.bind(this), this._logicalToCoordinate.bind(this));
+	}
+
+	public id(): string {
+		return this._id;
 	}
 
 	public options(): Readonly<PriceScaleOptions> {
@@ -470,17 +481,9 @@ export class PriceScale {
 		return this._cachedOrderedSources;
 	}
 
-	public hasSeries(): boolean {
-		return this._hasSeries;
-	}
-
 	public addDataSource(source: IDataSource): void {
 		if (this._dataSources.indexOf(source) !== -1) {
 			return;
-		}
-
-		if ((source instanceof Series)) {
-			this._hasSeries = true;
 		}
 
 		this._dataSources.push(source);
@@ -496,9 +499,6 @@ export class PriceScale {
 		}
 
 		this._dataSources.splice(index, 1);
-		if (source instanceof Series) {
-			this._hasSeries = false;
-		}
 
 		if (!this.mainSource()) {
 			this.setMode({

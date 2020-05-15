@@ -10,6 +10,7 @@ import {
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
+import { IPriceScaleApi } from './iprice-scale-api';
 
 /** Interface to be implemented by the object in order to be used as a price formatter */
 export interface IPriceFormatter {
@@ -53,6 +54,12 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * @returns full set of currently applied options, including defaults
 	 */
 	options(): Readonly<SeriesOptionsMap[TSeriesType]>;
+
+	/**
+	 * Returns interface of the pri scale the series is currently attached
+	 * @returns IPriceScaleApi object to control the price scale
+	 */
+	priceScale(): IPriceScaleApi;
 
 	/**
 	 * Sets or replaces series data

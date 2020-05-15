@@ -27,6 +27,7 @@ import { BarPrice, BarPrices } from './bar';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
+import { isDefaultPriceScale } from './default-price-scale';
 import { FirstValue } from './iprice-data-source';
 import { Palette } from './palette';
 import { Pane } from './pane';
@@ -88,6 +89,14 @@ export interface SeriesDataAtTypeMap {
 	Histogram: BarPrice;
 }
 
+// TODO: uncomment following strings after fixing typescript bug
+// https://github.com/microsoft/TypeScript/issues/36981
+// export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
+// export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
+
+export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
+export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
+
 export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
 	private readonly _seriesType: T;
 	private _data: SeriesData = new SeriesData();
@@ -100,14 +109,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _endOfData: boolean = false;
 	private _paneView!: IUpdatablePaneView;
 	private _barColorerCache: SeriesBarColorer | null = null;
-	private readonly _options: SeriesOptionsMap[T];
+	private readonly _options: SeriesOptionsInternal<T>;
 	private _barFunction: BarFunction;
 	private readonly _palette: Palette = new Palette();
 	private _markers: SeriesMarker<TimePoint>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
 
-	public constructor(model: ChartModel, options: SeriesOptionsMap[T], seriesType: T) {
+	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
@@ -223,14 +232,19 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options;
 	}
 
-	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
-		const overlay = this._options.overlay;
+	public applyOptions(options: SeriesPartialOptionsInternal<T>): void {
+		const targetPriceScaleId = options.priceScaleId;
+		if (targetPriceScaleId !== undefined && targetPriceScaleId !== this._options.priceScaleId) {
+			// series cannot do it itself, ask model
+			this.model().moveSeriesToScale(this, targetPriceScaleId);
+		}
 		merge(this._options, options);
-		this._options.overlay = overlay;
 
-		if (overlay && this._priceScale !== null && options.scaleMargins !== undefined) {
+		// tslint:disable-next-line:deprecation
+		if (this._priceScale !== null && options.scaleMargins !== undefined) {
 			this._priceScale.applyOptions({
-				scaleMargins: this._options.scaleMargins,
+				// tslint:disable-next-line:deprecation
+				scaleMargins: options.scaleMargins,
 			});
 		}
 
@@ -370,7 +384,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	public paneViews(): ReadonlyArray<IPaneView> {
 		const res: IPaneView[] = [];
 
-		if (this.priceScale() === this.model().mainPriceScale()) {
+		if (!this._isOverlay()) {
 			res.push(this._baseHorizontalLineView);
 		}
 
@@ -388,7 +402,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public priceAxisViews(pane: Pane, priceScale: PriceScale): ReadonlyArray<IPriceAxisView> {
-		const result = [...this._priceAxisViews];
+		const result = (priceScale === this._priceScale || this._isOverlay()) ? [...this._priceAxisViews] : [];
 		for (const customPriceLine of this._customPriceLines) {
 			result.push(customPriceLine.priceAxisView());
 		}
@@ -465,6 +479,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public title(): string {
 		return this._options.title;
+	}
+
+	private _isOverlay(): boolean {
+		const priceScale = this.priceScale();
+		return !isDefaultPriceScale(priceScale.id());
 	}
 
 	private _autoscaleInfoImpl(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {

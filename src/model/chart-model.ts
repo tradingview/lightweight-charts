@@ -1,3 +1,5 @@
+/// <reference types="_build-time-constants" />
+
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -9,17 +11,17 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 
 import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
+import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid, GridOptions } from './grid';
 import { IDataSource } from './idata-source';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
-import { IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
-import { Series } from './series';
+import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { TickMark, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
@@ -49,8 +51,15 @@ export interface HoveredSource {
 	object?: HoveredObject;
 }
 
+export interface PriceScaleOnPane {
+	priceScale: PriceScale;
+	pane: Pane;
+}
+
 type InvalidateHandler = (mask: InvalidateMask) => void;
 
+export type VisiblePriceScaleOptions = PriceScaleOptions;
+export type OverlayPriceScaleOptions = Omit<PriceScaleOptions, 'visible' | 'autoScale'>;
 /**
  * Structure describing options of the chart. Series options are to be set separately
  */
@@ -63,8 +72,19 @@ export interface ChartOptions {
 	watermark: WatermarkOptions;
 	/** Structure with layout options */
 	layout: LayoutOptions;
-	/** Structure with price scale options */
+
+	/** @Deprecated options for price scales
+	 *  @internal
+	 */
 	priceScale: PriceScaleOptions;
+
+	/** Structure with price scale option for left price scale */
+	leftPriceScale: VisiblePriceScaleOptions;
+	/** Structure with price scale option for right price scale */
+	rightPriceScale: VisiblePriceScaleOptions;
+	/** Structure describing default price scale options for overlays */
+	overlayPriceScales: OverlayPriceScaleOptions;
+
 	/** Structure with time scale options */
 	timeScale: TimeScaleOptions;
 	/** Structure with crosshair options */
@@ -80,7 +100,7 @@ export interface ChartOptions {
 }
 
 export type ChartOptionsInternal =
-	Omit<ChartOptions, 'handleScroll' | 'handleScale'>
+	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale'>
 	& {
 		handleScroll: HandleScrollOptions;
 		handleScale: HandleScaleOptions;
@@ -104,7 +124,7 @@ export class ChartModel implements IDestroyable {
 	private _width: number = 0;
 	private _initialTimeScrollPos: number | null = null;
 	private _hoveredSource: HoveredSource | null = null;
-	private readonly _mainPriceScaleOptionsChanged: Delegate = new Delegate();
+	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
 
 	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptionsInternal) {
@@ -121,7 +141,7 @@ export class ChartModel implements IDestroyable {
 
 		this.createPane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
-		this._panes[0].addDataSource(this._watermark, true, false);
+		this._panes[0].addDataSource(this._watermark, '');
 	}
 
 	public fullUpdate(): void {
@@ -157,12 +177,9 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
-		// TODO: implement this
 		merge(this._options, options);
-		if (options.priceScale !== undefined) {
-			this.mainPriceScale().applyOptions(options.priceScale);
-			this._mainPriceScaleOptionsChanged.fire();
-		}
+
+		this._panes.forEach((p: Pane) => p.applyScaleOptions(options));
 
 		if (options.timeScale !== undefined) {
 			this._timeScale.applyOptions(options.timeScale);
@@ -170,10 +187,41 @@ export class ChartModel implements IDestroyable {
 
 		if (options.localization !== undefined) {
 			this._timeScale.applyLocalizationOptions(options.localization);
-			this.mainPriceScale().updateFormatter();
+		}
+
+		if (options.leftPriceScale || options.rightPriceScale) {
+			this._priceScalesOptionsChanged.fire();
 		}
 
 		this.fullUpdate();
+	}
+
+	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
+		const res = this.findPriceScale(priceScaleId);
+
+		if (res === null) {
+			if (process.env.NODE_ENV === 'development') {
+				throw new Error(`Trying to apply price scale options with incorrect ID: ${priceScaleId}`);
+			}
+
+			return;
+		}
+
+		res.priceScale.applyOptions(options);
+		this._priceScalesOptionsChanged.fire();
+	}
+
+	public findPriceScale(priceScaleId: string): PriceScaleOnPane | null {
+		for (const pane of this._panes) {
+			const priceScale = pane.priceScaleById(priceScaleId);
+			if (priceScale !== null) {
+				return {
+					pane,
+					priceScale,
+				};
+			}
+		}
+		return null;
 	}
 
 	public updateAllPaneViews(): void {
@@ -507,18 +555,6 @@ export class ChartModel implements IDestroyable {
 		this._options.localization.timeFormatter = undefined;
 	}
 
-	public setPriceAutoScaleForAllMainSources(): void {
-		this._panes.map((p: Pane) => p.mainDataSource())
-			.forEach((s: IPriceDataSource | null) => {
-				if (s !== null) {
-					const priceScale = ensureNotNull(s.priceScale());
-					priceScale.setMode({
-						autoScale: true,
-					});
-				}
-			});
-	}
-
 	public rendererOptionsProvider(): PriceAxisRendererOptionsProvider {
 		return this._rendererOptionsProvider;
 	}
@@ -527,12 +563,8 @@ export class ChartModel implements IDestroyable {
 		return this._rendererOptionsProvider.options();
 	}
 
-	public mainPriceScaleOptionsChanged(): ISubscription {
-		return this._mainPriceScaleOptionsChanged;
-	}
-
-	public mainPriceScale(): PriceScale {
-		return this._panes[0].defaultPriceScale();
+	public priceScalesOptionsChanged(): ISubscription {
+		return this._priceScalesOptionsChanged;
 	}
 
 	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T> {
@@ -563,6 +595,24 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
+	public moveSeriesToScale(series: Series, targetScaleId: string): void {
+		const pane = ensureNotNull(this.paneForSource(series));
+		pane.removeDataSource(series);
+
+		// check if targetScaleId exists
+		const target = this.findPriceScale(targetScaleId);
+		if (target === null) {
+			// new scale on the same pane
+			const zOrder = series.zorder();
+			pane.addDataSource(series, targetScaleId, zOrder);
+		} else {
+			// if move to the new scale of the same pane, keep zorder
+			// if move to new pane
+			const zOrder = (target.pane === pane) ? series.zorder() : undefined;
+			target.pane.addDataSource(series, targetScaleId, zOrder);
+		}
+	}
+
 	public fitContent(): void {
 		const mask = new InvalidateMask(InvalidationLevel.Light);
 		mask.setFitContent();
@@ -573,6 +623,10 @@ export class ChartModel implements IDestroyable {
 		const mask = new InvalidateMask(InvalidationLevel.Light);
 		mask.setTargetTimeRange(range);
 		this._invalidate(mask);
+	}
+
+	public defaultVisiblePriceScaleId(): string {
+		return this._options.rightPriceScale.visible ? DefaultPriceScaleId.Right : DefaultPriceScaleId.Left;
 	}
 
 	private _paneInvalidationMask(pane: Pane | null, level: InvalidationLevel): InvalidateMask {
@@ -606,12 +660,13 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsMap[T], seriesType: T, pane: Pane): Series<T> {
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T> {
 		const series = new Series<T>(this, options, seriesType);
 
-		pane.addDataSource(series, Boolean(options.overlay), false);
+		const targetScaleId = options.priceScaleId !== undefined ? options.priceScaleId : this.defaultVisiblePriceScaleId();
+		pane.addDataSource(series, targetScaleId);
 
-		if (options.overlay) {
+		if (!isDefaultPriceScale(targetScaleId)) {
 			// let's apply that options again to apply margins
 			series.applyOptions(options);
 		}

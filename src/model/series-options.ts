@@ -154,16 +154,6 @@ export const enum PriceLineSource {
 	LastVisible,
 }
 
-export interface OverlaySeriesSpecificOptions {
-	overlay: true;
-	scaleMargins?: PriceScaleMargins;
-}
-
-export interface NonOverlaySeriesSpecificOptions {
-	overlay?: false;
-	scaleMargins?: undefined;
-}
-
 export interface PriceRange {
 	minValue: number;
 	maxValue: number;
@@ -185,6 +175,9 @@ export interface SeriesOptionsCommon {
 	/** Title of the series. This label is placed with price axis label */
 	title: string;
 
+	/** Target price scale to bind new series to */
+	priceScaleId?: string;
+
 	/**
 	 * @internal
 	 */
@@ -192,9 +185,7 @@ export interface SeriesOptionsCommon {
 
 	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
 	priceLineVisible: boolean;
-	/**
-	 *  Enum of possible modes of priceLine source
-	 */
+	/** Enum of possible modes of priceLine source */
 	priceLineSource: PriceLineSource;
 	/** Width of the price line. Ignored if priceLineVisible is false */
 	priceLineWidth: LineWidth;
@@ -214,15 +205,17 @@ export interface SeriesOptionsCommon {
 	baseLineStyle: LineStyle;
 	/** function that overrides calculating of visible prices range */
 	autoscaleInfoProvider?: AutoscaleInfoProvider;
+	/**
+	 * @deprecated Use priceScaleId instead
+	 * @internal
+	 */
+	overlay?: boolean;
+	/** @deprecated Use priceScale method of the series to apply options instead */
+	scaleMargins?: PriceScaleMargins;
 }
 
-export type SeriesOptions<T> =
-	| (T & SeriesOptionsCommon & OverlaySeriesSpecificOptions)
-	| (T & SeriesOptionsCommon & NonOverlaySeriesSpecificOptions);
-
-export type SeriesPartialOptions<T> =
-	| (DeepPartial<T & SeriesOptionsCommon> & OverlaySeriesSpecificOptions)
-	| (DeepPartial<T & SeriesOptionsCommon> & NonOverlaySeriesSpecificOptions);
+export type SeriesOptions<T> = T & SeriesOptionsCommon;
+export type SeriesPartialOptions<T> = DeepPartial<T & SeriesOptionsCommon>;
 
 /**
  * Structure describing area series options.
