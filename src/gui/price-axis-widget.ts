@@ -137,7 +137,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	public lineColor(): string {
-		return this._pane.chart().options().priceScale.borderColor;
+		return ensureNotNull(this._priceScale).options().borderColor;
 	}
 
 	public textColor(): string {

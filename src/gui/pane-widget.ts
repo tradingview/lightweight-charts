@@ -12,14 +12,13 @@ import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
-import { PriceAxisPosition } from '../model/price-scale';
 import { TimePointIndex } from '../model/time-data';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
-import { PriceAxisWidget } from './price-axis-widget';
+import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 import { isMobile, mobileTouch } from './support-touch';
 
 // actually we should check what event happened (touch or mouse)
@@ -41,7 +40,8 @@ export class PaneWidget implements IDestroyable {
 	private readonly _chart: ChartWidget;
 	private _state: Pane | null;
 	private _size: Size = new Size(0, 0);
-	private _priceAxisWidget: PriceAxisWidget | null = null;
+	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
+	private _rightPriceAxisWidget: PriceAxisWidget | null = null;
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
@@ -51,7 +51,6 @@ export class PaneWidget implements IDestroyable {
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: Point | null = null;
 	private _isScrolling: boolean = false;
-	private _priceAxisPosition: PriceAxisPosition = 'none';
 	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
@@ -104,7 +103,7 @@ export class PaneWidget implements IDestroyable {
 		this._rowElement.appendChild(this._paneCell);
 		this._rowElement.appendChild(this._rightAxisCell);
 		this._recreatePriceAxisWidgetImpl();
-		chart.model().mainPriceScaleOptionsChanged().subscribe(this._recreatePriceAxisWidget.bind(this), this);
+		chart.model().priceScalesOptionsChanged().subscribe(this._recreatePriceAxisWidget.bind(this), this);
 		this.updatePriceAxisWidget();
 
 		const scrollOptions = this.chart().options().handleScroll;
@@ -119,8 +118,11 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	public destroy(): void {
-		if (this._priceAxisWidget !== null) {
-			this._priceAxisWidget.destroy();
+		if (this._leftPriceAxisWidget !== null) {
+			this._leftPriceAxisWidget.destroy();
+		}
+		if (this._rightPriceAxisWidget !== null) {
+			this._rightPriceAxisWidget.destroy();
 		}
 
 		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
@@ -167,7 +169,7 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	public updatePriceAxisWidget(): void {
-		if (this._state === null || this._priceAxisWidget === null) {
+		if (this._state === null) {
 			return;
 		}
 
@@ -175,8 +177,14 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const priceScale = this._state.defaultPriceScale();
-		this._priceAxisWidget.setPriceScale(ensureNotNull(priceScale));
+		if (this._leftPriceAxisWidget !== null) {
+			const leftPriceScale = this._state.leftPriceScale();
+			this._leftPriceAxisWidget.setPriceScale(ensureNotNull(leftPriceScale));
+		}
+		if (this._rightPriceAxisWidget !== null) {
+			const rightPriceScale = this._state.rightPriceScale();
+			this._rightPriceAxisWidget.setPriceScale(ensureNotNull(rightPriceScale));
+		}
 	}
 
 	public stretchFactor(): number {
@@ -427,8 +435,9 @@ export class PaneWidget implements IDestroyable {
 		return null;
 	}
 
-	public setPriceAxisSize(width: number): void {
-		ensureNotNull(this._priceAxisWidget).setSize(new Size(width, this._size.h));
+	public setPriceAxisSize(width: number, position: PriceAxisWidgetSide): void {
+		const priceAxisWidget = position === 'left' ? this._leftPriceAxisWidget : this._rightPriceAxisWidget;
+		ensureNotNull(priceAxisWidget).setSize(new Size(width, this._size.h));
 	}
 
 	public getSize(): Size {
@@ -488,8 +497,11 @@ export class PaneWidget implements IDestroyable {
 			this.recalculatePriceScale();
 		}
 
-		if (this._priceAxisWidget !== null) {
-			this._priceAxisWidget.paint(type);
+		if (this._leftPriceAxisWidget !== null) {
+			this._leftPriceAxisWidget.paint(type);
+		}
+		if (this._rightPriceAxisWidget !== null) {
+			this._rightPriceAxisWidget.paint(type);
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
@@ -509,8 +521,12 @@ export class PaneWidget implements IDestroyable {
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
 	}
 
-	public priceAxisWidget(): PriceAxisWidget | null {
-		return this._priceAxisWidget;
+	public leftPriceAxisWidget(): PriceAxisWidget | null {
+		return this._leftPriceAxisWidget;
+	}
+
+	public rightPriceAxisWidget(): PriceAxisWidget | null {
+		return this._rightPriceAxisWidget;
 	}
 
 	private _backgroundColor(): string {
@@ -557,9 +573,6 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		const state = ensureNotNull(this._state);
-		if (!state.containsSeries()) {
-			return;
-		}
 
 		const paneViews = source.paneViews();
 		const height = state.height();
@@ -665,34 +678,25 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 		const chart = this._chart;
-		const axisPosition = this._state.defaultPriceScale().options().position;
-		if (this._priceAxisPosition === axisPosition) {
-			return;
+		if (!chart.options().leftPriceScale.visible && this._leftPriceAxisWidget !== null) {
+			this._leftAxisCell.removeChild(this._leftPriceAxisWidget.getElement());
+			this._leftPriceAxisWidget.destroy();
+			this._leftPriceAxisWidget = null;
 		}
-		if (this._priceAxisWidget !== null) {
-			if (this._priceAxisWidget.isLeft()) {
-				this._leftAxisCell.removeChild(this._priceAxisWidget.getElement());
-			} else {
-				this._rightAxisCell.removeChild(this._priceAxisWidget.getElement());
-			}
-
-			this._priceAxisWidget.destroy();
-			this._priceAxisWidget = null;
+		if (!chart.options().rightPriceScale.visible && this._rightPriceAxisWidget !== null) {
+			this._rightAxisCell.removeChild(this._rightPriceAxisWidget.getElement());
+			this._rightPriceAxisWidget.destroy();
+			this._rightPriceAxisWidget = null;
 		}
-
-		if (axisPosition !== 'none') {
-			const rendererOptionsProvider = chart.model().rendererOptionsProvider();
-			this._priceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, axisPosition);
-
-			if (axisPosition === 'left') {
-				this._leftAxisCell.appendChild(this._priceAxisWidget.getElement());
-			}
-
-			if (axisPosition === 'right') {
-				this._rightAxisCell.appendChild(this._priceAxisWidget.getElement());
-			}
+		const rendererOptionsProvider = chart.model().rendererOptionsProvider();
+		if (chart.options().leftPriceScale.visible && this._leftPriceAxisWidget === null) {
+			this._leftPriceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'left');
+			this._leftAxisCell.appendChild(this._leftPriceAxisWidget.getElement());
 		}
-		this._priceAxisPosition = axisPosition;
+		if (chart.options().rightPriceScale.visible && this._rightPriceAxisWidget === null) {
+			this._rightPriceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'right');
+			this._rightAxisCell.appendChild(this._rightPriceAxisWidget.getElement());
+		}
 	}
 
 	private _preventCrosshairMove(): boolean {
