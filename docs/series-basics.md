@@ -38,15 +38,15 @@ Here are common parameters for every series:
 
 |Name|Type|Default|Description|
 |-|----|-------|-|
-|`overlay`|`boolean`|`false`|Whether or not series should be an overlay|
+|`priceScaleId`|`string`|`right` if right scale is visible and `left` if not|Target price scale to bind new series to|
 |`title`|`string`|`''`|You can name series when adding it to a chart. This name will be displayed on the label next to the last value label|
-|`scaleMargins`|`{ top, bottom }`|`undefined`|[Margins](#scale-margins) of the _overlay_ series|
+|`scaleMargins`|`{ top, bottom }`|`undefined`|[Margins](#scale-margins) of the price scale of series|
 
 Example:
 
 ```javascript
 const lineSeries = chart.addLineSeries({
-    overlay: true,
+    priceScaleId: 'left',
     title: 'Series title example',
     scaleMargins: {
         top: 0.1,
@@ -55,15 +55,38 @@ const lineSeries = chart.addLineSeries({
 });
 ```
 
-### Overlay
+### Binding to price scale
 
-When adding any series to a chart, you can specify if you want target series to be attached to a price axis. By default, series are attached to a price axis.
+When adding any series to a chart, you can specify if you want target series to be attached to a certain price axis - left or right.
+By default, series are attached to the right price axis.
 This means one can scale the series with price axis. Note that price axis visible range depends on series values.
-In contrast, overlay series just draws itself on a chart independent from the price axis.
 
 ```javascript
 const lineSeries = chart.addLineSeries({
-    overlay: true,
+    priceScaleId: 'left',
+});
+```
+
+In contrast, overlay series just draws itself on a chart independent from the visible price axis.
+To create overlay specify unique id as a `priceScaleId` or just keep is as empty string.
+
+```javascript
+const lineSeries = chart.addLineSeries({
+    priceScaleId: 'my-overlay-id',
+});
+```
+
+At any moment you can get access to the price scale the series is bound to with `priceScale` method and change its options
+
+```javascript
+const lineSeries = chart.addLineSeries({
+    priceScaleId: 'my-overlay-id',
+});
+lineSeries.priceScale().applyOptions({
+    scaleMargins: {
+        top: 0.1,
+        bottom: 0.3,
+    },
 });
 ```
 
@@ -84,7 +107,7 @@ Typically, we do not want series to be drawn too close to a chart border. It nee
 
 By default, the library keeps an empty space below the data (10%) and above the data (20%).
 
-These values could be adjusted for visible axis using chart options.  However, you can also define them for overlay series.
+These values could be adjusted for visible axis using chart options. However, you can also define them for series.
 
 The margins is an object with the following properties:
 
@@ -95,7 +118,7 @@ Each value of an object is a number between 0 (0%) and 1 (100%).
 
 ```javascript
 const lineSeries = chart.addLineSeries({
-    overlay: true,
+    priceScaleId: 'right,
     scaleMargins: {
         top: 0.6,
         bottom: 0.05,
@@ -105,11 +128,11 @@ const lineSeries = chart.addLineSeries({
 
 The code above places series at the bottom of a chart.
 
-You can change margins using `ChartApi.applyOptions` for the visible axis:
+You can change margins using `ChartApi.applyOptions` for the certain axis:
 
 ```javascript
 chart.applyOptions({
-    priceScale: {
+    rightPriceScale: {
         scaleMargins: {
             top: 0.6,
             bottom: 0.05,
@@ -117,6 +140,62 @@ chart.applyOptions({
     },
 });
 ```
+
+### Overriding autoscale
+
+By default, the chart scales data automatically based on visible data range. However, for some reasons one could need overriding this behavior.
+There is an option called `autoscaleProvider` that allows overriding visible price range for series
+
+```javascript
+var firstSeries = chart.addLineSeries({
+    autoscaleInfoProvider: () => {
+        return {
+            priceRange: {
+                minValue: 0,
+                maxValue: 100,
+            },
+        };
+    },
+});
+```
+
+So, you can just add a function that returns an object with `priceRange` field, if you want to override the original series' price range. For example, you can set the range from 0 to 100. These values are in prices.
+
+You can also provide additional margins in pixels. Please be careful and never mix prices and pixels.
+
+```javascript
+var firstSeries = chart.addLineSeries({
+    autoscaleInfoProvider: () => {
+        return {
+            priceRange: {
+                minValue: 0,
+                maxValue: 100,
+            },
+            margins: {
+                above: 10,
+                below: 10,
+            },
+        };
+    },
+});
+```
+
+Actually, `autoscaleInfoProvider` function has an argument `original` which is the default implementation, so you can call it and adjust the result:
+
+```javascript
+var firstSeries = chart.addLineSeries({
+    autoscaleInfoProvider: (original) => {
+        var res = original();
+        if (res.priceRange !== null) {
+            res.priceRange.minValue -= 10;
+            res.priceRange.maxValue += 10;
+        }
+        return res;
+    },
+});
+```
+
+Note that both `priceRange` and `margins` could be `null` in the default result.
 
 ## Removing series
 

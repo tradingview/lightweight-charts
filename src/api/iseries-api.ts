@@ -11,6 +11,7 @@ import { LogicalRange, Range } from '../model/time-data';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
+import { IPriceScaleApi } from './iprice-scale-api';
 
 // actually range might be either exist or not
 // but to avoid hard-readable type let's say every part of range is optional
@@ -26,7 +27,7 @@ export interface IPriceFormatter {
 	/**
 	 * Formatting function
 	 * @param price - original price to be formatted
-	 * @returns - formatted price
+	 * @returns formatted price
 	 */
 	format(price: BarPrice): string;
 }
@@ -34,21 +35,21 @@ export interface IPriceFormatter {
 export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Returns current price formatter
-	 * @returns - interface to the price formatter object that can be used to format prices in the same way as the chart does
+	 * @returns interface to the price formatter object that can be used to format prices in the same way as the chart does
 	 */
 	priceFormatter(): IPriceFormatter;
 
 	/**
 	 * Converts specified series price to pixel coordinate according to the series price scale
 	 * @param price - input price to be converted
-	 * @returns - pixel coordinate of the price level on the chart
+	 * @returns pixel coordinate of the price level on the chart
 	 */
 	priceToCoordinate(price: BarPrice): Coordinate | null;
 
 	/**
 	 * Converts specified coordinate to price value according to the series price scale
 	 * @param coordinate - input coordinate to be converted
-	 * @returns - price value of the coordinate on the chart
+	 * @returns price value of the coordinate on the chart
 	 */
 	coordinateToPrice(coordinate: Coordinate): BarPrice | null;
 
@@ -77,6 +78,12 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	options(): Readonly<SeriesOptionsMap[TSeriesType]>;
 
 	/**
+	 * Returns interface of the pri scale the series is currently attached
+	 * @returns IPriceScaleApi object to control the price scale
+	 */
+	priceScale(): IPriceScaleApi;
+
+	/**
 	 * Sets or replaces series data
 	 * @param data - ordered (earlier time point goes first) array of data items. Old data is fully replaced with the new one.
 	 */
@@ -91,7 +98,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 
 	/**
 	 * Sets markers for the series
-	 * @param data array of series markers. This array should be sorted by time. Several markers with same time are allowed.
+	 * @param data - array of series markers. This array should be sorted by time. Several markers with same time are allowed.
 	 */
 	setMarkers(data: SeriesMarker<Time>[]): void;
 
@@ -103,7 +110,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 
 	/**
 	 * Removes an existing price line
-	 * @param line to remove
+	 * @param line - to remove
 	 */
 	removePriceLine(line: IPriceLine): void;
 }

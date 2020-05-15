@@ -1,6 +1,8 @@
 import { isNumber } from '../helpers/strict-type-checks';
 
-class PriceRange {
+import { PriceRange } from './series-options';
+
+export class PriceRangeImpl {
 	private _minValue: number;
 	private _maxValue!: number;
 
@@ -9,15 +11,15 @@ class PriceRange {
 		this._maxValue = maxValue;
 	}
 
-	public equals(pr: PriceRange | null): boolean {
+	public equals(pr: PriceRangeImpl | null): boolean {
 		if (pr === null) {
 			return false;
 		}
 		return this._minValue === pr._minValue && this._maxValue === pr._maxValue;
 	}
 
-	public clone(): PriceRange {
-		return new PriceRange(this._minValue, this._maxValue);
+	public clone(): PriceRangeImpl {
+		return new PriceRangeImpl(this._minValue, this._maxValue);
 	}
 
 	public minValue(): number {
@@ -44,11 +46,11 @@ class PriceRange {
 		return this._maxValue === this._minValue || Number.isNaN(this._maxValue) || Number.isNaN(this._minValue);
 	}
 
-	public merge(anotherRange: PriceRange | null): PriceRange {
+	public merge(anotherRange: PriceRangeImpl | null): PriceRangeImpl {
 		if (anotherRange === null) {
 			return this;
 		}
-		return new PriceRange(
+		return new PriceRangeImpl(
 			Math.min(this.minValue(), anotherRange.minValue()),
 			Math.max(this.maxValue(), anotherRange.maxValue())
 		);
@@ -92,10 +94,19 @@ class PriceRange {
 		this._minValue += delta;
 	}
 
-	public containsStrictly(priceRange: PriceRange): boolean {
+	public containsStrictly(priceRange: PriceRangeImpl): boolean {
 		return priceRange.minValue() > this._minValue &&
 			priceRange.maxValue() < this._maxValue;
 	}
-}
 
-export { PriceRange };
+	public toRaw(): PriceRange {
+		return {
+			minValue: this._minValue,
+			maxValue: this._maxValue,
+		};
+	}
+
+	public static fromRaw(raw: PriceRange | null): PriceRangeImpl | null {
+		return (raw === null) ? null : new PriceRangeImpl(raw.minValue, raw.maxValue);
+	}
+}

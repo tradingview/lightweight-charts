@@ -20,15 +20,14 @@
 		"noUnusedLocals": true,
 		"outDir": "lib",
 		"plugins": [
-			{
-				"transform": "ts-transformer-minify-privates"
-			}
+			{ "transform": "ts-transformer-minify-privates" },
+			{ "transform": "ts-transformer-strip-const-enums" }
 		],
 		"preserveConstEnums": true,
 		"resolveJsonModule": true,
 		"rootDir": "./",
 		"strict": true,
-		"stripInternal": true,
+		"stripInternal": false,
 		"target": "es5",
 		"typeRoots": [
 			"./src/typings",

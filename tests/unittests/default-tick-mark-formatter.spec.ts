@@ -31,13 +31,13 @@ describe('defaultTickMarkFormatter', () => {
 	});
 
 	it('correct format time without seconds', () => {
-		expect(defaultTickMarkFormatter(time('2019-01-01T00:10:00.000Z'), TickMarkType.Time, 'en')).to.be.equal('00:10');
+		expect(defaultTickMarkFormatter(time('2019-01-01T01:10:00.000Z'), TickMarkType.Time, 'en')).to.be.equal('01:10');
 		expect(defaultTickMarkFormatter(time('2019-01-01T17:59:00.000Z'), TickMarkType.Time, 'en')).to.be.equal('17:59');
 		expect(defaultTickMarkFormatter(time('2019-01-01T18:59:59.000Z'), TickMarkType.Time, 'en')).to.be.equal('18:59');
 	});
 
 	it('correct format time with seconds', () => {
-		expect(defaultTickMarkFormatter(time('2019-01-01T00:10:10.000Z'), TickMarkType.TimeWithSeconds, 'en')).to.be.equal('00:10:10');
+		expect(defaultTickMarkFormatter(time('2019-01-01T01:10:10.000Z'), TickMarkType.TimeWithSeconds, 'en')).to.be.equal('01:10:10');
 		expect(defaultTickMarkFormatter(time('2019-01-01T17:59:44.000Z'), TickMarkType.TimeWithSeconds, 'en')).to.be.equal('17:59:44');
 	});
 });

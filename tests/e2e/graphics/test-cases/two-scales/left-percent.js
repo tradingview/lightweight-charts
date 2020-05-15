@@ -1,10 +1,12 @@
-function generateBar(i, target) {
+function generateCandle(i, target) {
 	var step = (i % 20) / 5000;
 	var base = i / 5;
-	target.open = base;
-	target.high = base * (1 + 2 * step);
-	target.low = base * (1 - 2 * step);
-	target.close = base * (1 + step);
+
+	var sign = (i % 2) ? 1 : -1;
+	target.open = base * (1 - sign * step);
+	target.high = base * (1 + 4 * step);
+	target.low = base * (1 - 4 * step);
+	target.close = base * (1 + sign * step);
 }
 
 function generateData() {
@@ -16,7 +18,7 @@ function generateData() {
 		};
 		time.setUTCDate(time.getUTCDate() + 1);
 
-		generateBar(i, item);
+		generateCandle(i, item);
 		res.push(item);
 	}
 	return res;
@@ -46,17 +48,17 @@ function generateDataHist() {
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container, {
-		timeScale: {
-			barSpacing: 20,
-		},
 		leftPriceScale: {
 			visible: true,
 		},
 	});
 
-	var mainSeries = chart.addCandlestickSeries({
-		drawBorder: true,
-		borderColor: 'blue',
+	var mainSeries = chart.addBarSeries({
+		borderColor: 'rgba(0, 0, 255, 0.2)',
+		upColor: 'rgba(0, 80, 0, 0.4)',
+		downColor: 'rgba(80, 0, 0, 0.4)',
+		thinBars: false,
+		priceScaleId: 'right',
 	});
 
 	mainSeries.setData(generateData());
@@ -65,7 +67,7 @@ function runTestCase(container) {
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,
-		priceLineStyle: 3,
+		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'left',
 		scaleMargins: {
 			top: 0.75,
@@ -75,13 +77,7 @@ function runTestCase(container) {
 
 	histSeries.setData(generateDataHist());
 
-	// create canvas to draw screenshot
-	chart.resize(600, 240, true);
-
-	var screenshot = chart.takeScreenshot();
-	screenshot.style.position = 'absolute';
-	screenshot.style.top = '260px';
-
-	var parent = container.parentNode;
-	parent.appendChild(screenshot);
+	chart.priceScale('left').applyOptions({
+		mode: LightweightCharts.PriceScaleMode.Percentage,
+	});
 }

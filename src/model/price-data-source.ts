@@ -1,6 +1,6 @@
 import { IFormatter } from '../formatters/iformatter';
 
-import { AutoscaleInfo } from './autoscale-info';
+import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { ChartModel } from './chart-model';
 import { DataSource } from './data-source';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
@@ -22,7 +22,7 @@ export abstract class PriceDataSource extends DataSource implements IPriceDataSo
 		return 0;
 	}
 
-	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo | null {
+	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
 		return null;
 	}
 
