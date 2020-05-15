@@ -448,7 +448,7 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.font = this.baseFont();
 		ctx.fillStyle = this.lineColor();
 		const rendererOptions = this.rendererOptions();
-		const drawTicks = this._priceScale.options().borderVisible;
+		const drawTicks = this._priceScale.options().borderVisible && this._priceScale.options().drawTicks;
 
 		const tickMarkLeftX = this._isLeft ?
 			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
