@@ -20,9 +20,8 @@
 		"noUnusedLocals": true,
 		"outDir": "lib",
 		"plugins": [
-			{
-				"transform": "ts-transformer-minify-privates"
-			}
+			{ "transform": "ts-transformer-minify-privates" },
+			{ "transform": "ts-transformer-strip-const-enums" }
 		],
 		"preserveConstEnums": true,
 		"resolveJsonModule": true,

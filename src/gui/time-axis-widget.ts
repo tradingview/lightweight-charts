@@ -9,7 +9,7 @@ import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { LayoutOptions } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
-import { MarkSpanBorder, TimeMark } from '../model/time-scale';
+import { TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { TimeAxisView } from '../views/time-axis/time-axis-view';
 
@@ -44,7 +44,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
 	private _leftStub: PriceAxisStub | null = null;
 	private _rightStub: PriceAxisStub | null = null;
-	private _minVisibleSpan: number = MarkSpanBorder.Year;
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _rendererOptions: TimeAxisViewRendererOptions | null = null;
 	private _mouseDown: boolean = false;
@@ -237,17 +236,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	public update(): void {
-		const tickMarks = this._chart.model().timeScale().marks();
-
-		if (!tickMarks) {
-			return;
-		}
-
-		this._minVisibleSpan = MarkSpanBorder.Year;
-
-		tickMarks.forEach((tickMark: TimeMark) => {
-			this._minVisibleSpan = Math.min(tickMark.span, this._minVisibleSpan);
-		});
+		// this call has side-effect - it regenerates marks on the time scale
+		this._chart.model().timeScale().marks();
 	}
 
 	public getImage(): HTMLCanvasElement {

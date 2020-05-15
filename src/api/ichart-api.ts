@@ -126,13 +126,13 @@ export interface IChartApi {
 	/**
 	 * Returns API to manipulate the price scale
 	 * @param priceScaleId - id of scale to access to
-	 * @returns - target API
+	 * @returns target API
 	 */
 	priceScale(priceScaleId?: string): IPriceScaleApi;
 
 	/**
 	 * Returns API to manipulate the time scale
-	 * @returns - target API
+	 * @returns target API
 	 */
 	timeScale(): ITimeScaleApi;
 
@@ -144,7 +144,7 @@ export interface IChartApi {
 
 	/**
 	 * Returns currently applied options
-	 * @returns - full set of currently applied options, including defaults
+	 * @returns full set of currently applied options, including defaults
 	 */
 	options(): Readonly<ChartOptions>;
 

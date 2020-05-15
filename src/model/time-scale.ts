@@ -23,7 +23,7 @@ const enum Constants {
 	MinVisibleBarsCount = 2,
 }
 
-export const enum MarkSpanBorder {
+const enum MarkSpanBorder {
 	Minute = 20,
 	Hour = 30,
 	Day = 40,

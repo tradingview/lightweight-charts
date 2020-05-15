@@ -310,7 +310,7 @@ export class MouseEventHandler implements IDestroyable {
 		{
 			const boundMouseMoveWithDownHandler = this._mouseMoveWithDownHandler.bind(this);
 			const boundMouseUpHandler = this._mouseUpHandler.bind(this);
-			const rootElement = (this._target.ownerDocument as Document).documentElement;
+			const rootElement = this._target.ownerDocument.documentElement;
 
 			this._unsubscribeRoot = () => {
 				rootElement.removeEventListener('touchmove', boundMouseMoveWithDownHandler);
@@ -349,7 +349,7 @@ export class MouseEventHandler implements IDestroyable {
 		this._target.addEventListener('touchcancel', this._clearLongTapTimeout.bind(this));
 
 		{
-			const doc = this._target.ownerDocument as Document;
+			const doc = this._target.ownerDocument;
 
 			const outsideHandler = (event: MouseEvent | TouchEvent) => {
 				if (!this._handler.mouseDownOutsideEvent) {
