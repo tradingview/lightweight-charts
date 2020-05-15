@@ -28,6 +28,7 @@ type AlphaComponent = Nominal<number, 'AlphaComponent'>;
 export type Rgb = [RedComponent, GreenComponent, BlueComponent];
 type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
 
+/** @public */
 const namedColorRgbHexStrings: Record<string, string> = {
 	aliceblue: '#f0f8ff',
 	antiquewhite: '#faebd7',

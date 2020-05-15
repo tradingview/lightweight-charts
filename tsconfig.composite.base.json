@@ -1,0 +1,9 @@
+{
+	"extends": "./tsconfig.options.json",
+	"compilerOptions": {
+		"composite": true,
+		"outDir": "lib/composite"
+	},
+	"references": [],
+	"include": []
+}

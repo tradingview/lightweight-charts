@@ -3,11 +3,11 @@
 /** @type import('dts-bundle-generator/config-schema').BundlerConfig */
 const config = {
 	compilationOptions: {
-		preferredConfigPath: './tsconfig.json',
+		preferredConfigPath: './tsconfig.prod.json',
 	},
 	entries: [
 		{
-			filePath: './src/index.ts',
+			filePath: './lib/prod/src/index.d.ts',
 			outFile: './dist/typings.d.ts',
 			output: {
 				sortNodes: true,

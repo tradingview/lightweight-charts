@@ -1,11 +1,7 @@
 {
-	"extends": "./tsconfig.base.json",
-	"compilerOptions": {
-		"composite": true
-	},
+	"extends": "./tsconfig.composite.base.json",
 	"references": [
 		{ "path": "./src/tsconfig.composite.json" },
 		{ "path": "./tests/unittests/tsconfig.composite.json" }
-	],
-	"include": []
+	]
 }
