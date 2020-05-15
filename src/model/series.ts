@@ -559,6 +559,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	private _recalculateMarkers(): void {
 		const timeScalePoints = this.model().timeScale().points();
+		if (timeScalePoints.size() === 0) {
+			this._indexedMarkers = [];
+			return;
+		}
+
 		this._indexedMarkers = this._markers.map((marker: SeriesMarker<TimePoint>, index: number) => ({
 			time: ensureNotNull(timeScalePoints.indexOf(marker.time.timestamp, true)),
 			position: marker.position,
