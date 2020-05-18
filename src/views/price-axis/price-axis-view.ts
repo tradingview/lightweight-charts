@@ -121,6 +121,8 @@ export abstract class PriceAxisView implements IPriceAxisView {
 
 	private _updateRendererDataIfNeeded(priceScale: PriceScale): void {
 		if (this._invalidated) {
+			this._axisRendererData.tickVisible = true;
+			this._paneRendererData.tickVisible = false;
 			this._updateRendererData(this._axisRendererData, this._paneRendererData, this._commonRendererData);
 			this._axisRendererData.tickVisible = this._axisRendererData.tickVisible && priceScale.options().drawTicks;
 			this._paneRendererData.tickVisible = this._paneRendererData.tickVisible && priceScale.options().drawTicks;
