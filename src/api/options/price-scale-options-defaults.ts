@@ -10,6 +10,7 @@ export const priceScaleOptionsDefaults: PriceScaleOptions = {
 	entireTextOnly: false,
 	drawTicks: true,
 	visible: false,
+	drawTicks: true,
 	scaleMargins: {
 		bottom: 0.1,
 		top: 0.2,
