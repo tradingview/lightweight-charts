@@ -8,6 +8,7 @@ import { makeFont } from '../helpers/make-font';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
+import { IPriceDataSource } from '../model/iprice-data-source';
 import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceScale } from '../model/price-scale';
@@ -496,14 +497,15 @@ export class PriceAxisWidget implements IDestroyable {
 		const isDefault = this._priceScale === paneState.defaultPriceScale();
 
 		if (isDefault) {
-			this._pane.state().orderedSources().forEach((source: IDataSource) => {
+			this._pane.state().orderedSources().forEach((source: IPriceDataSource) => {
 				if (paneState.isOverlay(source)) {
 					orderedSources.push(source);
 				}
 			});
 		}
 
-		const mainSource = this._priceScale.mainSource();
+		// we can use any, but let's use the first source as "center" one
+		const centerSource = this._priceScale.dataSources()[0];
 		const priceScale = this._priceScale;
 
 		const updateForSources = (sources: IDataSource[]) => {
@@ -516,7 +518,7 @@ export class PriceAxisWidget implements IDestroyable {
 						views.push(view);
 					}
 				});
-				if (mainSource === source && sourceViews.length > 0) {
+				if (centerSource === source && sourceViews.length > 0) {
 					center = sourceViews[0].coordinate();
 				}
 			});
