@@ -8,7 +8,6 @@ export const priceScaleOptionsDefaults: PriceScaleOptions = {
 	borderVisible: true,
 	borderColor: '#2B2B43',
 	entireTextOnly: false,
-	drawTicks: true,
 	visible: false,
 	drawTicks: true,
 	scaleMargins: {
