@@ -1,10 +1,11 @@
-import { Coordinate } from './coordinate';
 import { PriceRangeImpl } from './price-range-impl';
 import { AutoscaleInfo } from './series-options';
 
 export interface AutoScaleMargins {
-	below: Coordinate;
-	above: Coordinate;
+	/** The number of pixels for bottom margin */
+	below: number;
+	/** The number of pixels for top margin */
+	above: number;
 }
 
 export class AutoscaleInfoImpl {
