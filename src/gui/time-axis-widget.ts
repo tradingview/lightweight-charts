@@ -254,7 +254,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._drawBorder(ctx, this._canvasBinding.pixelRatio);
 
 			this._drawTickMarks(ctx, this._canvasBinding.pixelRatio);
-			// atm we don't have sources to be drawn on time axis except corssHair which is rendered on top level canvas
+			// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
 			// so let's don't call this code at all for now
 			// this._drawLabels(this._chart.model().dataSources(), ctx, pixelRatio);
 
