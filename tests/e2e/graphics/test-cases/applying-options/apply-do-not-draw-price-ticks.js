@@ -15,21 +15,24 @@ function generateData() {
 // eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
 	var chart = LightweightCharts.createChart(container, {
-	});
-
-	chart.applyOptions({
 		priceScale: {
 			drawTicks: false,
-		},
-	});
-
-	chart.applyOptions({
-		priceScale: {
-			drawTicks: true,
 		},
 	});
 
 	var mainSeries = chart.addLineSeries();
 
 	mainSeries.setData(generateData());
+
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			chart.applyOptions({
+				priceScale: {
+					drawTicks: true,
+				},
+			});
+
+			resolve();
+		}, 300);
+	});
 }
