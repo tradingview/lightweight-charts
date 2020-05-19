@@ -5,6 +5,7 @@ import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
+import { HandleScaleOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -313,7 +314,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || this._priceScale.isEmpty() || !this._pane.chart().options().handleScale.axisPressedMouseMove) {
+		if (this._priceScale === null || this._priceScale.isEmpty() || !(this._pane.chart().options().handleScale as HandleScaleOptionsInternal).axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -324,7 +325,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _pressedMouseMoveEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove) {
+		if (this._priceScale === null || !(this._pane.chart().options().handleScale as HandleScaleOptionsInternal).axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -335,7 +336,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownOutsideEvent(): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove) {
+		if (this._priceScale === null || !(this._pane.chart().options().handleScale as HandleScaleOptionsInternal).axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -350,7 +351,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseUpEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove) {
+		if (this._priceScale === null || !(this._pane.chart().options().handleScale as HandleScaleOptionsInternal).axisPressedMouseMove.price) {
 			return;
 		}
 		const model = this._pane.chart().model();
@@ -371,7 +372,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		const model = this._pane.chart().model();
-		if (model.options().handleScale.axisPressedMouseMove && !this._priceScale.isPercentage() && !this._priceScale.isIndexedTo100()) {
+		if ((model.options().handleScale as HandleScaleOptionsInternal).axisPressedMouseMove.price && !this._priceScale.isPercentage() && !this._priceScale.isIndexedTo100()) {
 			this._setCursor(CursorType.NsResize);
 		}
 	}
