@@ -37,8 +37,19 @@ export interface HandleScrollOptions {
 export interface HandleScaleOptions {
 	mouseWheel: boolean;
 	pinch: boolean;
-	axisPressedMouseMove: boolean;
+	axisPressedMouseMove: AxisPressedMouseMoveOptions | boolean;
 	axisDoubleClickReset: boolean;
+}
+
+export type HandleScaleOptionsInternal =
+	Omit<HandleScaleOptions, 'axisPressedMouseMove'>
+	& {
+		axisPressedMouseMove: AxisPressedMouseMoveOptions;
+	};
+
+export interface AxisPressedMouseMoveOptions {
+	time: boolean;
+	price: boolean;
 }
 
 export interface HoveredObject {
