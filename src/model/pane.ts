@@ -277,7 +277,7 @@ export class Pane implements IDestroyable {
 			priceScale = this._dataSources[0].priceScale();
 		}
 
-		if (priceScale == null) {
+		if (priceScale === null) {
 			priceScale = this._rightPriceScale;
 		}
 
