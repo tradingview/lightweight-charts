@@ -44,7 +44,7 @@ export interface ITimeScaleApi {
 
 	/**
 	 * Returns the currently visible logical range of data.
-	 * @returns - visible range or null if the chart has no data at all
+	 * @returns visible range or null if the chart has no data at all
 	 */
 	getVisibleLogicalRange(): LogicalRange | null;
 

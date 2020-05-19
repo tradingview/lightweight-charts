@@ -56,7 +56,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Retrieves information about the series' data within a given logical range.
 	 * @param range - the logical range to retrieve info for
-	 * @returns - the bars info for the given logical range: fields `from` and `to` are
+	 * @returns the bars info for the given logical range: fields `from` and `to` are
 	 *   `Logical` values for the first and last bar within the range, and `barsBefore` and
 	 *   `barsAfter` count the the available bars outside the given index range. If these
 	 *   values are negative, it means that the given range us not fully filled with bars
