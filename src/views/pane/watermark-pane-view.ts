@@ -56,7 +56,7 @@ export class WatermarkPaneView implements IUpdatablePaneView {
 		data.lines = [
 			{
 				text: options.text,
-				font: makeFont(options.fontSize),
+				font: makeFont(options.fontSize, options.fontFamily, options.fontStyle),
 				lineHeight: options.fontSize * 1.2,
 				vertOffset: 0,
 				zoom: 0,
