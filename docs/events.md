@@ -52,13 +52,6 @@ chart.subscribeCrosshairMove(handleCrosshairMoved);
 chart.unsubscribeCrosshairMove(handleCrosshairMoved);
 ```
 
-## Time range change
-
-|Name|Description|
-|-|-|
-|`subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Get notified when the visible data range changes|
-|`unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;`|Don't get notified when the visible data range changes|
-
 ## Types
 
 ### MouseEventHandler
@@ -80,15 +73,3 @@ export type MouseEventHandler = (param: MouseEventParams) => void;
 `point` is not defined if an event was fired outside of the chart (for example on a mouse leave event).
 
 `seriesPrices` is an object with prices of all series corresponding to the event point. The object keys are series APIs, values are prices. Each price value is a number for single-value series types (line, area, histogram) or OHLC structure for candlestick and bar series.
-
-### TimeRangeChangeEventHandler
-
-TimeRangeChangeEventHandler is a type of callback that is being used to get notified about chart time range changes.
-
-```typescript
-export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
-```
-
-`TimeRange` is an object with `from` and `to` fields which are the first and last time points of a time range.
-
-`null` is returned if the chart has no data at all.

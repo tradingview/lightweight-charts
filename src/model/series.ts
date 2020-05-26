@@ -167,7 +167,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			return noDataRes;
 		}
 
-		const visibleBars = this.model().timeScale().visibleBars();
+		const visibleBars = this.model().timeScale().visibleStrictRange();
 		const firstValue = this.firstValue();
 		if (visibleBars === null || firstValue === null) {
 			return noDataRes;
@@ -186,7 +186,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			bar = lastBar;
 			lastIndex = lastBar.index;
 		} else {
-			const endBar = this.data().bars().search(visibleBars.lastBar(), PlotRowSearchMode.NearestLeft);
+			const endBar = this.data().bars().search(visibleBars.right(), PlotRowSearchMode.NearestLeft);
 			if (endBar === null) {
 				return noDataRes;
 			}
@@ -338,12 +338,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public firstBar(): Bar | null {
-		const visibleBars = this.model().timeScale().visibleBars();
+		const visibleBars = this.model().timeScale().visibleStrictRange();
 		if (visibleBars === null) {
 			return null;
 		}
 
-		const startTimePoint = visibleBars.firstBar();
+		const startTimePoint = visibleBars.left();
 		return this.data().search(startTimePoint, PlotRowSearchMode.NearestRight);
 	}
 

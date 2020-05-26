@@ -23,7 +23,7 @@ import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
-import { TickMark, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
+import { LogicalRange, TickMark, TimePoint, TimePointIndex } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
 import { Watermark, WatermarkOptions } from './watermark';
 
@@ -438,9 +438,9 @@ export class ChartModel implements IDestroyable {
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x);
 
-		const visibleBars = this._timeScale.visibleBars();
+		const visibleBars = this._timeScale.visibleStrictRange();
 		if (visibleBars !== null) {
-			index = Math.min(Math.max(visibleBars.firstBar(), index), visibleBars.lastBar()) as TimePointIndex;
+			index = Math.min(Math.max(visibleBars.left(), index), visibleBars.right()) as TimePointIndex;
 		}
 
 		const priceScale = pane.defaultPriceScale();
@@ -499,7 +499,7 @@ export class ChartModel implements IDestroyable {
 			const timeScale = this._timeScale;
 			const currentBaseIndex = timeScale.baseIndex();
 
-			const visibleBars = timeScale.visibleBars();
+			const visibleBars = timeScale.visibleStrictRange();
 
 			// if time scale cannot return current visible bars range (e.g. time scale has zero-width)
 			// then we do not need to update right offset to shift visible bars range to have the same right offset as we have before new bar
@@ -611,9 +611,9 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(mask);
 	}
 
-	public setTargetTimeRange(range: TimePointsRange): void {
+	public setTargetLogicalRange(range: LogicalRange): void {
 		const mask = new InvalidateMask(InvalidationLevel.Light);
-		mask.setTargetTimeRange(range);
+		mask.setLogicalRange(range);
 		this._invalidate(mask);
 	}
 
