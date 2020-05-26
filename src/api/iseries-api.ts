@@ -7,7 +7,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { LogicalRange, Range } from '../model/time-data';
+import { Range } from '../model/time-data';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
@@ -44,14 +44,14 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * @param price - input price to be converted
 	 * @returns pixel coordinate of the price level on the chart
 	 */
-	priceToCoordinate(price: BarPrice): Coordinate | null;
+	priceToCoordinate(price: number): Coordinate | null;
 
 	/**
 	 * Converts specified coordinate to price value according to the series price scale
 	 * @param coordinate - input coordinate to be converted
 	 * @returns price value of the coordinate on the chart
 	 */
-	coordinateToPrice(coordinate: Coordinate): BarPrice | null;
+	coordinateToPrice(coordinate: number): BarPrice | null;
 
 	/**
 	 * Retrieves information about the series' data within a given logical range.
@@ -63,7 +63,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 *   on the given side, but bars are missing instead (would show up as a margin if the
 	 *   the given index range falls into the viewport).
 	 */
-	barsInLogicalRange(range: LogicalRange): BarsInfo | null;
+	barsInLogicalRange(range: Range<number>): BarsInfo | null;
 
 	/**
 	 * Applies new options to the existing series

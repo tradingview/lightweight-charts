@@ -5,7 +5,7 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { LogicalRange, TimePointsRange } from '../model/time-data';
+import { LogicalRange, Range, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
@@ -86,9 +86,9 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		};
 	}
 
-	public setVisibleLogicalRange(range: LogicalRange): void {
+	public setVisibleLogicalRange(range: Range<number>): void {
 		assert(range.from <= range.to, 'The from index cannot be after the to index.');
-		this._model.setTargetLogicalRange(range);
+		this._model.setTargetLogicalRange(range as LogicalRange);
 	}
 
 	public resetTimeScale(): void {

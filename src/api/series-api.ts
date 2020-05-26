@@ -14,7 +14,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { LogicalRange, TimePointIndex } from '../model/time-data';
+import { Logical, Range, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
@@ -60,7 +60,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series;
 	}
 
-	public priceToCoordinate(price: BarPrice): Coordinate | null {
+	public priceToCoordinate(price: number): Coordinate | null {
 		const firstValue = this._series.firstValue();
 		if (firstValue === null) {
 			return null;
@@ -69,23 +69,23 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().priceToCoordinate(price, firstValue.value);
 	}
 
-	public coordinateToPrice(coordinate: Coordinate): BarPrice | null {
+	public coordinateToPrice(coordinate: number): BarPrice | null {
 		const firstValue = this._series.firstValue();
 		if (firstValue === null) {
 			return null;
 		}
-		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
+		return this._series.priceScale().coordinateToPrice(coordinate as Coordinate, firstValue.value);
 	}
 
 	// tslint:disable-next-line:cyclomatic-complexity
-	public barsInLogicalRange(range: LogicalRange | null): BarsInfo | null {
+	public barsInLogicalRange(range: Range<number> | null): BarsInfo | null {
 		if (range === null) {
 			return null;
 		}
 
 		// we use TimeScaleVisibleRange here to convert LogicalRange to strict range properly
 		const correctedRange = new TimeScaleVisibleRange(
-			new RangeImpl(range.from, range.to)
+			new RangeImpl(range.from as Logical, range.to as Logical)
 		).strictRange() as RangeImpl<TimePointIndex>;
 
 		const bars = this._series.data().bars();

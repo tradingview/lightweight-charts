@@ -53,7 +53,7 @@ export interface ITimeScaleApi {
 	 * Sets visible logical range of data.
 	 * @param range - target visible logical range of data.
 	 */
-	setVisibleLogicalRange(range: LogicalRange): void;
+	setVisibleLogicalRange(range: Range<number>): void;
 
 	/**
 	 * Restores default zooming and scroll position of the time scale
