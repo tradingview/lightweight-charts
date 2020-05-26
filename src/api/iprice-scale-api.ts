@@ -15,4 +15,9 @@ export interface IPriceScaleApi {
 	 * @returns full set of currently applied options, including defaults
 	 */
 	options(): Readonly<PriceScaleOptions>;
+
+	/**
+	 * Returns a width of the price scale if it's visible or 0 if invisible.
+	 */
+	width(): number;
 }
