@@ -7,10 +7,20 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
+import { LogicalRange, Range } from '../model/time-data';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
+
+// actually range might be either exist or not
+// but to avoid hard-readable type let's say every part of range is optional
+export type BarsInfo =
+	Partial<Range<Time>>
+	& {
+		barsBefore: number;
+		barsAfter: number;
+	};
 
 /** Interface to be implemented by the object in order to be used as a price formatter */
 export interface IPriceFormatter {
@@ -42,6 +52,18 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * @returns price value of the coordinate on the chart
 	 */
 	coordinateToPrice(coordinate: Coordinate): BarPrice | null;
+
+	/**
+	 * Retrieves information about the series' data within a given logical range.
+	 * @param range - the logical range to retrieve info for
+	 * @returns the bars info for the given logical range: fields `from` and `to` are
+	 *   `Logical` values for the first and last bar within the range, and `barsBefore` and
+	 *   `barsAfter` count the the available bars outside the given index range. If these
+	 *   values are negative, it means that the given range us not fully filled with bars
+	 *   on the given side, but bars are missing instead (would show up as a margin if the
+	 *   the given index range falls into the viewport).
+	 */
+	barsInLogicalRange(range: LogicalRange): BarsInfo | null;
 
 	/**
 	 * Applies new options to the existing series

@@ -3,6 +3,7 @@
 import { PNG } from 'pngjs';
 import {
 	Browser,
+	ConsoleMessage,
 	launch as launchPuppeteer,
 	LaunchOptions,
 	Page,
@@ -48,6 +49,13 @@ export class Screenshoter {
 			const errors: string[] = [];
 			page.on('pageerror', (error: Error) => {
 				errors.push(error.message);
+			});
+
+			page.on('console', (message: ConsoleMessage) => {
+				const type = message.type();
+				if (type === 'error' || type === 'assert') {
+					errors.push(`Console ${type}: ${message.text()}`);
+				}
 			});
 
 			page.on('response', (response: Response) => {

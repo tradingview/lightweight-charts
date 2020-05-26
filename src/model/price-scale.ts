@@ -8,7 +8,6 @@ import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { BarCoordinates, BarPrice, BarPrices } from './bar';
-import { BarsRange } from './bars-range';
 import { Coordinate } from './coordinate';
 import { IDataSource } from './idata-source';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
@@ -30,9 +29,10 @@ import {
 	toPercentRange,
 } from './price-scale-conversions';
 import { PriceTickMarkBuilder } from './price-tick-mark-builder';
+import { RangeImpl } from './range-impl';
 import { Series } from './series';
 import { sortSources } from './sort-sources';
-import { SeriesItemsIndexesRange } from './time-data';
+import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
 
 /**
  * Enum of possible price scale modes
@@ -103,7 +103,7 @@ export interface PriceScaleOptions {
 
 interface RangeCache {
 	isValid: boolean;
-	visibleBars: BarsRange | null;
+	visibleBars: RangeImpl<TimePointIndex> | null;
 }
 
 // actually price should be BarPrice
@@ -729,7 +729,7 @@ export class PriceScale {
 		return this._dataSources.filter(useSourceForAutoScale);
 	}
 
-	public recalculatePriceRange(visibleBars: BarsRange): void {
+	public recalculatePriceRange(visibleBars: RangeImpl<TimePointIndex>): void {
 		this._invalidatedForRange = {
 			visibleBars: visibleBars,
 			isValid: false,
@@ -856,7 +856,7 @@ export class PriceScale {
 				continue;
 			}
 
-			const autoScaleInfo = source.autoscaleInfo(visibleBars.firstBar(), visibleBars.lastBar());
+			const autoScaleInfo = source.autoscaleInfo(visibleBars.left(), visibleBars.right());
 			let sourceRange = autoScaleInfo && autoScaleInfo.priceRange();
 
 			if (sourceRange !== null) {

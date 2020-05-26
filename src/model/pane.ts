@@ -306,7 +306,7 @@ export class Pane implements IDestroyable {
 	}
 
 	public resetPriceScale(priceScale: PriceScale): void {
-		const visibleBars = this._timeScale.visibleBars();
+		const visibleBars = this._timeScale.visibleStrictRange();
 		priceScale.setMode({ autoScale: true });
 		if (visibleBars !== null) {
 			priceScale.recalculatePriceRange(visibleBars);
@@ -354,7 +354,7 @@ export class Pane implements IDestroyable {
 		const sourceForAutoScale = priceScale.sourcesForAutoScale();
 
 		if (sourceForAutoScale && sourceForAutoScale.length > 0 && !this._timeScale.isEmpty()) {
-			const visibleBars = this._timeScale.visibleBars();
+			const visibleBars = this._timeScale.visibleStrictRange();
 			if (visibleBars !== null) {
 				priceScale.recalculatePriceRange(visibleBars);
 			}
