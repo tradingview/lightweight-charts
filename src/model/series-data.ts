@@ -72,15 +72,11 @@ export function barFunction(priceSource: SeriesPriceSource): BarFunction {
 	return barFunctions[priceSource];
 }
 
-function isBarEmpty(bar: Bar['value']): boolean {
-	return bar[SeriesPlotIndex.Open] === undefined;
-}
-
 export class SeriesData {
 	private _bars: PlotList<TimePoint, Bar['value']>;
 
 	public constructor() {
-		this._bars = new PlotList<TimePoint, Bar['value']>(seriesPlotFunctionMap(), isBarEmpty);
+		this._bars = new PlotList<TimePoint, Bar['value']>(seriesPlotFunctionMap());
 	}
 
 	public bars(): PlotList<TimePoint, Bar['value']> {
@@ -111,8 +107,8 @@ export class SeriesData {
 		return this._bars.last();
 	}
 
-	public search(index: TimePointIndex, options?: PlotRowSearchMode, skipEmptyValues?: boolean): PlotRow<TimePoint, Bar['value']> | null {
-		return this.bars().search(index, options, skipEmptyValues);
+	public search(index: TimePointIndex, options?: PlotRowSearchMode): PlotRow<TimePoint, Bar['value']> | null {
+		return this.bars().search(index, options);
 	}
 
 	public valueAt(index: TimePointIndex): Bar | null {
