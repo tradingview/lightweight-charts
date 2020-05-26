@@ -4,9 +4,11 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
+import { Coordinate } from '../model/coordinate';
 import { LogicalRange, Range, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
+import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
 import { ITimeScaleApi, LogicalRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
 
@@ -95,6 +97,28 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 
 	public fitContent(): void {
 		this._model.fitContent();
+	}
+
+	public timeToCoordinate(time: Time): Coordinate | null {
+		const timePoint = convertTime(time);
+		const timeScale = this._model.timeScale();
+		const timePointIndex = timeScale.points().indexOf(timePoint.timestamp, false);
+		if (timePointIndex === null) {
+			return null;
+		}
+
+		return timeScale.indexToCoordinate(timePointIndex);
+	}
+
+	public coordinateToTime(x: number): Time | null {
+		const timeScale = this._model.timeScale();
+		const timePointIndex = timeScale.coordinateToIndex(x as Coordinate);
+		const timePoint = timeScale.points().valueAt(timePointIndex);
+		if (timePoint === null) {
+			return null;
+		}
+
+		return timePoint.businessDay ?? timePoint.timestamp;
 	}
 
 	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {

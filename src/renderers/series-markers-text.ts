@@ -1,20 +1,24 @@
 import { Coordinate } from '../model/coordinate';
-import { SeriesMarkerText } from '../model/series-markers';
 
 export function drawText(
 	ctx: CanvasRenderingContext2D,
-	text: SeriesMarkerText
+	text: string,
+	x: number,
+	y: number
 ): void {
-	ctx.fillText(text.content, text.x, text.y);
+	ctx.fillText(text, x, y);
 }
 
 export function hitTestText(
-	text: SeriesMarkerText,
+	textX: number,
+	textY: number,
+	textWidth: number,
+	textHeight: number,
 	x: Coordinate,
 	y: Coordinate
 ): boolean {
-	const halfHeight = text.height / 2;
+	const halfHeight = textHeight / 2;
 
-	return x >= text.x && x <= text.x + text.width &&
-		y >= text.y - halfHeight && y <= text.y + halfHeight;
+	return x >= textX && x <= textX + textWidth &&
+		y >= textY - halfHeight && y <= textY + halfHeight;
 }

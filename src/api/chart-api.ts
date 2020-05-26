@@ -316,7 +316,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		}
 
 		priceScaleId = priceScaleId || this._chartWidget.model().defaultVisiblePriceScaleId();
-		return new PriceScaleApi(this._chartWidget.model(), priceScaleId);
+		return new PriceScaleApi(this._chartWidget, priceScaleId);
 	}
 
 	public timeScale(): ITimeScaleApi {
