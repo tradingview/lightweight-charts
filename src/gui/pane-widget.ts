@@ -103,9 +103,7 @@ export class PaneWidget implements IDestroyable {
 		this._rowElement.appendChild(this._leftAxisCell);
 		this._rowElement.appendChild(this._paneCell);
 		this._rowElement.appendChild(this._rightAxisCell);
-		this._recreatePriceAxisWidgetImpl();
-		chart.model().priceScalesOptionsChanged().subscribe(this._recreatePriceAxisWidget.bind(this), this);
-		this.updatePriceAxisWidget();
+		this.updatePriceAxisWidgets();
 
 		const scrollOptions = this.chart().options().handleScroll;
 		this._mouseEventHandler = new MouseEventHandler(
@@ -158,7 +156,7 @@ export class PaneWidget implements IDestroyable {
 			this._state.onDestroyed().subscribe(PaneWidget.prototype._onStateDestroyed.bind(this), this, true);
 		}
 
-		this.updatePriceAxisWidget();
+		this.updatePriceAxisWidgets();
 	}
 
 	public chart(): ChartWidget {
@@ -169,11 +167,12 @@ export class PaneWidget implements IDestroyable {
 		return this._rowElement;
 	}
 
-	public updatePriceAxisWidget(): void {
+	public updatePriceAxisWidgets(): void {
 		if (this._state === null) {
 			return;
 		}
 
+		this._recreatePriceAxisWidgets();
 		if (this._model().serieses().length === 0) {
 			return;
 		}
@@ -654,12 +653,7 @@ export class PaneWidget implements IDestroyable {
 		return null;
 	}
 
-	private _recreatePriceAxisWidget(): void {
-		this._recreatePriceAxisWidgetImpl();
-		this._chart.adjustSize();
-	}
-
-	private _recreatePriceAxisWidgetImpl(): void {
+	private _recreatePriceAxisWidgets(): void {
 		if (this._state === null) {
 			return;
 		}
