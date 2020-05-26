@@ -104,13 +104,7 @@ export class ChartWidget implements IDestroyable {
 
 		container.appendChild(this._element);
 		this._updateTimeAxisVisibility();
-		this._model.timeScale().optionsApplied().subscribe(
-			() => {
-				this._updateTimeAxisVisibility();
-				this.adjustSize();
-			},
-			this
-		);
+		this._model.timeScale().optionsApplied().subscribe(this._model.fullUpdate.bind(this._model), this);
 	}
 
 	public model(): ChartModel {
