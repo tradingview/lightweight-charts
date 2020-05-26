@@ -146,7 +146,7 @@ chart.timeScale().fitContent();
 ### timeToCoordinate
 
 Converts a time to local `x` coordinate.
-The argument is a [Time](./time.md) value needs to be converted to coordinate.
+The argument is [Time](./time.md) that needs to be converted to a coordinate.
 
 Returns `x` coordinate of a bar with passed time or `null` if no bar found.
 
@@ -157,9 +157,9 @@ chart.timeScale().timeToCoordinate('1990-04-24');
 ### coordinateToTime
 
 Converts `x` coordinate to [Time](./time.md).
-The argument is a `x` coordinate needs to be converted to a time.
+The argument is `x` coordinate that needs to be converted to a time.
 
-Returns the [Time](./time.md) of a bar that placed on passed coordinate or `null` if no bar found at this coordinate.
+Returns [Time](./time.md) of a bar that is located on the passed coordinate or `null` if there is no bars at that coordinate.
 
 ```javascript
 chart.timeScale().coordinateToTime(42);
