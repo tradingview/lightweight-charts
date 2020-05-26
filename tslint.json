@@ -131,7 +131,7 @@
 		"no-parameter-properties": true,
 		"no-parameter-reassignment": false,
 		"no-promise-as-boolean": false,
-		"no-redundant-jsdoc": true,
+		"no-redundant-jsdoc": false,
 		"no-reference": false,
 		"no-reference-import": true,
 		"no-require-imports": false,

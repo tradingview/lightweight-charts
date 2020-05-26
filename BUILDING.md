@@ -6,8 +6,7 @@ The minimal supported version of [NodeJS](https://nodejs.org/) for development i
 
 - `npm run tsc` - compiles the source code only (excluding tests)
 - `npm run tsc-watch` - runs the TypeScript compiler in the watch mode for source code (same as `tsc`, but in the watch mode)
-- `npm run tsc-all` - compiles everything (source code and tests)
-- `npm run tsc-all-watch` - runs the TypeScript compiler in watch mode for source code and tests (same as `tsc-all`, but in watch mode)
+- `npm run tsc-verify` - compiles everything (source code and tests) with composite projects config to ensure that no invalid imports or cyclic deps are found
 
 ## Bundling
 

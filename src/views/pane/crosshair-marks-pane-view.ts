@@ -1,7 +1,7 @@
 import { ensureNotNull } from '../../helpers/assertions';
 
 import { BarPrice } from '../../model/bar';
-import { ChartModel, ChartOptions } from '../../model/chart-model';
+import { ChartModel, ChartOptionsInternal } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { Crosshair } from '../../model/crosshair';
 import { Series } from '../../model/series';
@@ -12,7 +12,7 @@ import { MarksRendererData, PaneRendererMarks } from '../../renderers/marks-rend
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
-function createEmptyMarkerData(chartOptions: ChartOptions): MarksRendererData {
+function createEmptyMarkerData(chartOptions: ChartOptionsInternal): MarksRendererData {
 	return {
 		items: [{
 			x: 0 as Coordinate,

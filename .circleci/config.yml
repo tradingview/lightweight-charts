@@ -80,12 +80,9 @@ jobs:
     executor: node-latest-executor
     steps:
       - checkout-with-deps
-      - run: npm run tsc-all
-
-      # make sure that the project is compiled with non-composite project
-      # it doesn't output anything, but is used by IDE or tools
-      - run: ./node_modules/.bin/tsc -p tsconfig.json
-
+      # make sure that the project is compiled successfully with composite projects
+      # so we don't have cyclic deps between projects and wrong imports
+      - run: npm run tsc-verify
       - run: npm run build:prod
       - persist_to_workspace:
           root: ./

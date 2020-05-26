@@ -18,17 +18,11 @@
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitReturns": true,
 		"noUnusedLocals": true,
-		"outDir": "lib",
-		"plugins": [
-			{
-				"transform": "ts-transformer-minify-privates"
-			}
-		],
 		"preserveConstEnums": true,
 		"resolveJsonModule": true,
 		"rootDir": "./",
 		"strict": true,
-		"stripInternal": true,
+		"stripInternal": false,
 		"target": "es5",
 		"typeRoots": [
 			"./src/typings",

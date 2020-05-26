@@ -1,14 +1,25 @@
 import { ensureNever } from '../helpers/assertions';
+import { makeFont } from '../helpers/make-font';
 
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { SeriesMarkerShape } from '../model/series-markers';
+import { TextWidthCache } from '../model/text-width-cache';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { IPaneRenderer } from './ipane-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
 import { drawSquare, hitTestSquare } from './series-markers-square';
+import { drawText, hitTestText } from './series-markers-text';
+
+export interface SeriesMarkerText {
+	content: string;
+	x: Coordinate;
+	y: Coordinate;
+	width: number;
+	height: number;
+}
 
 export interface SeriesMarkerRendererDataItem extends TimedValue {
 	y: Coordinate;
@@ -17,6 +28,7 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 	color: string;
 	internalId: number;
 	externalId?: string;
+	text?: SeriesMarkerText;
 }
 
 export interface SeriesMarkerRendererData {
@@ -24,24 +36,24 @@ export interface SeriesMarkerRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class SeriesMarkersRenderer implements IPaneRenderer {
+export class SeriesMarkersRenderer extends ScaledRenderer {
 	private _data: SeriesMarkerRendererData | null = null;
+	private _textWidthCache: TextWidthCache = new TextWidthCache();
+	private _fontSize: number = -1;
+	private _fontFamily: string = '';
+	private _font: string = '';
 
 	public setData(data: SeriesMarkerRendererData): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, isHovered: boolean, hitTestData?: unknown): void {
-		if (this._data === null || this._data.visibleRange === null) {
-			return;
+	public setParams(fontSize: number, fontFamily: string): void {
+		if (this._fontSize !== fontSize || this._fontFamily !== fontFamily) {
+			this._fontSize = fontSize;
+			this._fontFamily = fontFamily;
+			this._font = makeFont(fontSize, fontFamily);
+			this._textWidthCache.reset();
 		}
-		ctx.save();
-		ctx.translate(0.5, 0.5);
-		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
-			const item = this._data.items[i];
-			drawItem(item, ctx);
-		}
-		ctx.restore();
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
@@ -61,21 +73,54 @@ export class SeriesMarkersRenderer implements IPaneRenderer {
 
 		return null;
 	}
+
+	protected _drawImpl(ctx: CanvasRenderingContext2D, isHovered: boolean, hitTestData?: unknown): void {
+		if (this._data === null || this._data.visibleRange === null) {
+			return;
+		}
+
+		ctx.textBaseline = 'middle';
+		ctx.font = this._font;
+
+		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
+			const item = this._data.items[i];
+			if (item.text !== undefined) {
+				item.text.width = this._textWidthCache.measureText(ctx, item.text.content);
+				item.text.height = this._fontSize;
+				item.text.x = item.text.x - item.text.width / 2 as Coordinate;
+			}
+			drawItem(item, ctx);
+		}
+	}
 }
 
 function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
+	ctx.fillStyle = item.color;
+
+	if (item.text !== undefined) {
+		drawText(ctx, item.text.content, item.text.x, item.text.y);
+	}
+
+	drawShape(item, ctx);
+}
+
+function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
+	if (item.size === 0) {
+		return;
+	}
+
 	switch (item.shape) {
 		case 'arrowDown':
-			drawArrow(false, ctx, item.x, item.y, item.color, item.size);
+			drawArrow(false, ctx, item.x, item.y, item.size);
 			return;
 		case 'arrowUp':
-			drawArrow(true, ctx, item.x, item.y, item.color, item.size);
+			drawArrow(true, ctx, item.x, item.y, item.size);
 			return;
 		case 'circle':
-			drawCircle(ctx, item.x, item.y, item.color, item.size);
+			drawCircle(ctx, item.x, item.y, item.size);
 			return;
 		case 'square':
-			drawSquare(ctx, item.x, item.y, item.color, item.size);
+			drawSquare(ctx, item.x, item.y, item.size);
 			return;
 	}
 
@@ -83,6 +128,18 @@ function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContex
 }
 
 function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coordinate): boolean {
+	if (item.text !== undefined && hitTestText(item.text.x, item.text.y, item.text.width, item.text.height, x, y)) {
+		return true;
+	}
+
+	return hitTestShape(item, x, y);
+}
+
+function hitTestShape(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coordinate): boolean {
+	if (item.size === 0) {
+		return false;
+	}
+
 	switch (item.shape) {
 		case 'arrowDown':
 			return hitTestArrow(true, item.x, item.y, item.size, x, y);
@@ -91,7 +148,7 @@ function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coord
 		case 'circle':
 			return hitTestCircle(item.x, item.y, item.size, x, y);
 		case 'square':
-			return hitTestSquare(item.x, item.y, item.size, x , y);
+			return hitTestSquare(item.x, item.y, item.size, x, y);
 	}
 
 	ensureNever(item.shape);

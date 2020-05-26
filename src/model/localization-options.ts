@@ -1,5 +1,3 @@
-import { DateFormat } from '../formatters/date-format';
-
 import { PriceFormatterFn } from './price-formatter-fn';
 import { BusinessDay, UTCTimestamp } from './time-data';
 
@@ -23,7 +21,9 @@ export interface LocalizationOptions {
 	timeFormatter?: TimeFormatterFn;
 
 	/**
-	 * One of predefined options to format time. Ignored if timeFormatter has been specified.
+	 * Date formatting string.
+	 * Might contains `yyyy`, `yy`, `MMMM`, `MMM`, `MM` and `dd` literals which will be replaced with corresponding date's value.
+	 * Ignored if timeFormatter has been specified.
 	 */
-	dateFormat: DateFormat;
+	dateFormat: string;
 }

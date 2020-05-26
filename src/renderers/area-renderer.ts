@@ -2,8 +2,8 @@ import { Coordinate } from '../model/coordinate';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
 import { LineItem } from './line-renderer';
+import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
 
 export interface PaneRendererAreaData {
@@ -20,21 +20,19 @@ export interface PaneRendererAreaData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererArea implements IPaneRenderer {
+export class PaneRendererArea extends ScaledRenderer {
 	protected _data: PaneRendererAreaData | null = null;
 
 	public setData(data: PaneRendererAreaData): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 
-		ctx.save();
-
-		ctx.lineCap = 'square';
+		ctx.lineCap = 'butt';
 		ctx.strokeStyle = this._data.lineColor;
 		ctx.lineWidth = this._data.lineWidth;
 		setLineStyle(ctx, this._data.lineStyle);
@@ -48,8 +46,11 @@ export class PaneRendererArea implements IPaneRenderer {
 
 		walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
 
-		ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
-		ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+		if (this._data.visibleRange.to > this._data.visibleRange.from) {
+			ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
+			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+		}
+
 		ctx.closePath();
 
 		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);
@@ -58,7 +59,5 @@ export class PaneRendererArea implements IPaneRenderer {
 
 		ctx.fillStyle = gradient;
 		ctx.fill();
-
-		ctx.restore();
 	}
 }

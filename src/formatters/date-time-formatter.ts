@@ -1,10 +1,9 @@
-import { DateFormat } from './date-format';
 import { DateFormatter } from './date-formatter';
 import { IFormatter } from './iformatter';
 import { TimeFormatter } from './time-formatter';
 
 export interface DateTimeFormatterParams {
-	dateFormat: DateFormat;
+	dateFormat: string;
 	timeFormat: string;
 	dateTimeSeparator: string;
 	locale: string;

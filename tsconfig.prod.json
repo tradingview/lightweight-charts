@@ -1,0 +1,14 @@
+{
+	"extends": "./tsconfig.options.json",
+	"compilerOptions": {
+		"outDir": "lib/prod",
+		"plugins": [
+			{ "transform": "ts-transformer-strip-const-enums", "entrySourceFiles": ["./src/index.ts"] },
+			{ "transform": "ts-transformer-properties-rename", "entrySourceFiles": ["./src/index.ts"] }
+		],
+		"stripInternal": true
+	},
+	"include": [
+		"src/**/*.ts"
+	]
+}

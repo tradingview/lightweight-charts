@@ -20,6 +20,7 @@ export const enum SeriesPlotIndex {
 	Color = 4,
 }
 
+/** @public */
 const barFunctions = {
 	open: (bar: Bar['value']) => bar[SeriesPlotIndex.Open] as BarPrice,
 

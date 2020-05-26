@@ -1,7 +1,7 @@
 /**
  * Checks an assertion. Throws if the assertion is failed.
- * @param condition Result of the assertion evaluation
- * @param message Text to include in the exception message
+ * @param condition - Result of the assertion evaluation
+ * @param message - Text to include in the exception message
  */
 export function assert(condition: boolean, message?: string): void {
 	if (!condition) {

@@ -1,7 +1,7 @@
 import { IDestroyable } from '../helpers/idestroyable';
 import { clamp } from '../helpers/mathex';
 
-import { createPreconfiguredCanvas, getPrescaledContext2D, Size } from './canvas-utils';
+import { createPreconfiguredCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -85,7 +85,7 @@ export class PaneSeparator implements IDestroyable {
 	public getImage(): HTMLCanvasElement {
 		const size = this.getSize();
 		const res = createPreconfiguredCanvas(document, size);
-		const ctx = getPrescaledContext2D(res);
+		const ctx = getContext2D(res);
 		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;
 		ctx.fillRect(0, 0, size.w, size.h);
 		return res;

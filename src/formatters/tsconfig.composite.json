@@ -1,8 +1,5 @@
 {
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"composite": true
-	},
+	"extends": "../../tsconfig.composite.base.json",
 	"references": [
 		{ "path": "../helpers/tsconfig.composite.json" }
 	],

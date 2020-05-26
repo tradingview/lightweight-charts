@@ -143,7 +143,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 	/**
 	 * Execute fun on each element.
 	 * Stops iteration if callback function returns true.
-	 * @param fun Callback function on each element function(index, value): boolean
+	 * @param fun - Callback function on each element function(index, value): boolean
 	 */
 	public each(fun: EnumeratingFunction<TimeType, PlotValueTuple>): void {
 		for (let i = this._start; i < this._end; ++i) {
@@ -347,7 +347,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 	}
 
 	/**
-	 * @param endIndex Non-inclusive end
+	 * @param endIndex - Non-inclusive end
 	 */
 	private _plotMinMax(startIndex: PlotRowIndex, endIndex: PlotRowIndex, plot: PlotInfo): MinMax | null {
 		let result: MinMax | null = null;

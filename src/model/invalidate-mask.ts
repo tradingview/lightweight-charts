@@ -1,4 +1,4 @@
-import { TimePointsRange } from '../model/time-data';
+import { LogicalRange } from '../model/time-data';
 
 export const enum InvalidationLevel {
 	None = 0,
@@ -26,7 +26,7 @@ export class InvalidateMask {
 	private _globalLevel: InvalidationLevel;
 	private _force: boolean = false;
 	private _fitContent: boolean = false;
-	private _targetTimeRange: TimePointsRange | null = null;
+	private _logicalRange: LogicalRange | null = null;
 
 	public constructor(globalLevel: InvalidationLevel) {
 		this._globalLevel = globalLevel;
@@ -61,20 +61,20 @@ export class InvalidateMask {
 
 	public setFitContent(): void {
 		this._fitContent = true;
-		this._targetTimeRange = null;
+		this._logicalRange = null;
 	}
 
 	public getFitContent(): boolean {
 		return this._fitContent;
 	}
 
-	public setTargetTimeRange(range: TimePointsRange): void {
-		this._targetTimeRange = range;
+	public setLogicalRange(range: LogicalRange): void {
+		this._logicalRange = range;
 		this._fitContent = false;
 	}
 
-	public getTargetTimeRange(): TimePointsRange | null {
-		return this._targetTimeRange;
+	public getLogicalRange(): LogicalRange | null {
+		return this._logicalRange;
 	}
 
 	public merge(other: InvalidateMask): void {
@@ -82,8 +82,8 @@ export class InvalidateMask {
 		if (other._fitContent) {
 			this.setFitContent();
 		}
-		if (other._targetTimeRange) {
-			this.setTargetTimeRange(other._targetTimeRange);
+		if (other._logicalRange) {
+			this.setLogicalRange(other._logicalRange);
 		}
 		this._globalLevel = Math.max(this._globalLevel, other._globalLevel);
 		other._invalidatedPanes.forEach((invalidation: PaneInvalidation, index: number) => {

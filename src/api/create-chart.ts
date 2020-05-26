@@ -1,17 +1,17 @@
 import { ensureNotNull } from '../helpers/assertions';
-import { clone, DeepPartial, isString, merge } from '../helpers/strict-type-checks';
+import { DeepPartial, isString } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
 
 import { ChartApi } from './chart-api';
 import { IChartApi } from './ichart-api';
-import { chartOptionsDefaults } from './options/chart-options-defaults';
 
 export { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
 export { BarPrice } from '../model/bar';
 export { CrosshairMode } from '../model/crosshair';
 export { PriceScaleMode } from '../model/price-scale';
+export { PriceLineSource } from '../model/series-options';
 export { UTCTimestamp } from '../model/time-data';
 
 export { IChartApi, MouseEventParams } from './ichart-api';
@@ -33,9 +33,5 @@ export {
  */
 export function createChart(container: string | HTMLElement, options?: DeepPartial<ChartOptions>): IChartApi {
 	const htmlElement = ensureNotNull(isString(container) ? document.getElementById(container) : container);
-	const chartOptions = (options === undefined) ?
-		clone(chartOptionsDefaults) :
-		merge(clone(chartOptionsDefaults), options) as ChartOptions;
-
-	return new ChartApi(htmlElement, chartOptions);
+	return new ChartApi(htmlElement, options);
 }

@@ -1,21 +1,22 @@
+import { ceiledOdd } from '../helpers/mathex';
+
 import { Coordinate } from '../model/coordinate';
 
 import { hitTestSquare } from './series-markers-square';
-import { ceilToOdd, shapeSize } from './series-markers-utils';
+import { shapeSize } from './series-markers-utils';
 
 export function drawArrow(
 	up: boolean,
 	ctx: CanvasRenderingContext2D,
 	centerX: Coordinate,
 	centerY: Coordinate,
-	color: string,
 	size: number
 ): void {
 	const arrowSize = shapeSize('arrowUp', size);
 	const halfArrowSize = (arrowSize - 1) / 2;
-	const baseSize = ceilToOdd(size / 2);
+	const baseSize = ceiledOdd(size / 2);
 	const halfBaseSize = (baseSize - 1) / 2;
-	ctx.fillStyle = color;
+
 	ctx.beginPath();
 	if (up) {
 		ctx.moveTo(centerX - halfArrowSize, centerY);
@@ -34,6 +35,7 @@ export function drawArrow(
 		ctx.lineTo(centerX - halfBaseSize, centerY - halfArrowSize);
 		ctx.lineTo(centerX - halfBaseSize, centerY);
 	}
+
 	ctx.fill();
 }
 

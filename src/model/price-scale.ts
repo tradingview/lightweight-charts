@@ -8,14 +8,11 @@ import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { BarCoordinates, BarPrice, BarPrices } from './bar';
-import { BarsRange } from './bars-range';
 import { Coordinate } from './coordinate';
-import { IDataSource } from './idata-source';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
-import { PriceDataSource } from './price-data-source';
-import { PriceRange } from './price-range';
+import { PriceRangeImpl } from './price-range-impl';
 import {
 	canConvertPriceRangeFromLog,
 	convertPriceRangeFromLog,
@@ -30,9 +27,9 @@ import {
 	toPercentRange,
 } from './price-scale-conversions';
 import { PriceTickMarkBuilder } from './price-tick-mark-builder';
-import { Series } from './series';
+import { RangeImpl } from './range-impl';
 import { sortSources } from './sort-sources';
-import { SeriesItemsIndexesRange } from './time-data';
+import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
 
 /**
  * Enum of possible price scale modes
@@ -84,8 +81,11 @@ export interface PriceScaleOptions {
 	invertScale: boolean;
 	/** True value prevents labels on the price scale from overlapping one another by aligning them one below others */
 	alignLabels: boolean;
-	/** Defines position of the price scale on the chart */
-	position: PriceAxisPosition;
+	/**
+	 * @deprecated Defines position of the price scale on the chart
+	 * @internal
+	 */
+	position?: PriceAxisPosition;
 	/** Defines price margins for the price scale */
 	scaleMargins: PriceScaleMargins;
 	/** Set true to draw a border between the price scale and the chart area */
@@ -94,11 +94,13 @@ export interface PriceScaleOptions {
 	borderColor: string;
 	/** Indicates whether the price scale displays only full lines of text or partial lines. */
 	entireTextOnly: boolean;
+	/** Indicates if this price scale visible. Could not be applied to overlay price scale */
+	visible: boolean;
 }
 
 interface RangeCache {
 	isValid: boolean;
-	visibleBars: BarsRange | null;
+	visibleBars: RangeImpl<TimePointIndex> | null;
 }
 
 // actually price should be BarPrice
@@ -108,6 +110,8 @@ const percentageFormatter = new PercentageFormatter();
 const defaultPriceFormatter = new PriceFormatter(100, 1);
 
 export class PriceScale {
+	private readonly _id: string;
+
 	private readonly _layoutOptions: LayoutOptions;
 	private readonly _localizationOptions: LocalizationOptions;
 	private readonly _options: PriceScaleOptions;
@@ -116,9 +120,9 @@ export class PriceScale {
 	private _internalHeightCache: number | null = null;
 	private _internalHeightChanged: Delegate = new Delegate();
 
-	private _priceRange: PriceRange | null = null;
-	private _priceRangeSnapshot: PriceRange | null = null;
-	private _priceRangeChanged: Delegate<PriceRange | null, PriceRange | null> = new Delegate();
+	private _priceRange: PriceRangeImpl | null = null;
+	private _priceRangeSnapshot: PriceRangeImpl | null = null;
+	private _priceRangeChanged: Delegate<PriceRangeImpl | null, PriceRangeImpl | null> = new Delegate();
 	private _invalidatedForRange: RangeCache = { isValid: false, visibleBars: null };
 
 	private _marginAbove: number = 0;
@@ -129,10 +133,8 @@ export class PriceScale {
 
 	private _modeChanged: Delegate<PriceScaleState, PriceScaleState> = new Delegate();
 
-	private _dataSources: IDataSource[] = [];
-	private _cachedOrderedSources: IDataSource[] | null = null;
-	private _hasSeries: boolean = false;
-	private _mainSource: IPriceDataSource | null = null;
+	private _dataSources: IPriceDataSource[] = [];
+	private _cachedOrderedSources: IPriceDataSource[] | null = null;
 
 	private _marksCache: PriceMark[] | null = null;
 
@@ -141,11 +143,16 @@ export class PriceScale {
 	private _formatter: IFormatter = defaultPriceFormatter;
 	private readonly _optionsChanged: Delegate = new Delegate();
 
-	public constructor(options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
 		this._localizationOptions = localizationOptions;
 		this._markBuilder = new PriceTickMarkBuilder(this, 100, this._coordinateToLogical.bind(this), this._logicalToCoordinate.bind(this));
+	}
+
+	public id(): string {
+		return this._id;
 	}
 
 	public options(): Readonly<PriceScaleOptions> {
@@ -214,7 +221,7 @@ export class PriceScale {
 	// tslint:disable-next-line:cyclomatic-complexity
 	public setMode(newMode: Partial<PriceScaleState>): void {
 		const oldMode = this.mode();
-		let priceRange: PriceRange | null = null;
+		let priceRange: PriceRangeImpl | null = null;
 
 		if (newMode.autoScale !== undefined) {
 			this._options.autoScale = newMode.autoScale;
@@ -304,16 +311,16 @@ export class PriceScale {
 		return this._internalHeightChanged;
 	}
 
-	public priceRange(): PriceRange | null {
+	public priceRange(): PriceRangeImpl | null {
 		this._makeSureItIsValid();
 		return this._priceRange;
 	}
 
-	public priceRangeChanged(): ISubscription<PriceRange | null, PriceRange | null> {
+	public priceRangeChanged(): ISubscription<PriceRangeImpl | null, PriceRangeImpl | null> {
 		return this._priceRangeChanged;
 	}
 
-	public setPriceRange(newPriceRange: PriceRange | null, isForceSetValue?: boolean, onlyPriceScaleUpdate?: boolean): void {
+	public setPriceRange(newPriceRange: PriceRangeImpl | null, isForceSetValue?: boolean, onlyPriceScaleUpdate?: boolean): void {
 		const oldPriceRange = this._priceRange;
 
 		if (!isForceSetValue &&
@@ -339,14 +346,14 @@ export class PriceScale {
 		return this.isInverted() ? coordinate : this.height() - 1 - coordinate;
 	}
 
-	public priceToCoordinate(price: number, baseValue: number, keepItFloat?: boolean): Coordinate {
+	public priceToCoordinate(price: number, baseValue: number): Coordinate {
 		if (this.isPercentage()) {
 			price = toPercent(price, baseValue);
 		} else if (this.isIndexedTo100()) {
 			price = toIndexedTo100(price, baseValue);
 		}
 
-		return this._logicalToCoordinate(price, baseValue, keepItFloat);
+		return this._logicalToCoordinate(price, baseValue);
 	}
 
 	public pointsArrayToCoordinates<T extends PricedValue>(points: T[], baseValue: number, visibleRange?: SeriesItemsIndexesRange): void {
@@ -379,7 +386,7 @@ export class PriceScale {
 
 			const invCoordinate = bh + hmm * (logical - min);
 			const coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			point.y = Math.round(coordinate) as Coordinate;
+			point.y = coordinate as Coordinate;
 		}
 	}
 
@@ -415,19 +422,19 @@ export class PriceScale {
 
 			let invCoordinate = bh + hmm * (openLogical - min);
 			let coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.openY = Math.round(coordinate) as Coordinate;
+			bar.openY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (highLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.highY = Math.round(coordinate) as Coordinate;
+			bar.highY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (lowLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.lowY = Math.round(coordinate) as Coordinate;
+			bar.lowY = coordinate as Coordinate;
 
 			invCoordinate = bh + hmm * (closeLogical - min);
 			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
-			bar.closeY = Math.round(coordinate) as Coordinate;
+			bar.closeY = coordinate as Coordinate;
 		}
 	}
 
@@ -446,16 +453,16 @@ export class PriceScale {
 		return value as BarPrice;
 	}
 
-	public dataSources(): ReadonlyArray<IDataSource> {
+	public dataSources(): ReadonlyArray<IPriceDataSource> {
 		return this._dataSources;
 	}
 
-	public orderedSources(): ReadonlyArray<IDataSource> {
+	public orderedSources(): ReadonlyArray<IPriceDataSource> {
 		if (this._cachedOrderedSources) {
 			return this._cachedOrderedSources;
 		}
 
-		let sources: IDataSource[] = [];
+		let sources: IPriceDataSource[] = [];
 		for (let i = 0; i < this._dataSources.length; i++) {
 			const ds = this._dataSources[i];
 			if (ds.zorder() === null) {
@@ -470,68 +477,32 @@ export class PriceScale {
 		return this._cachedOrderedSources;
 	}
 
-	public hasSeries(): boolean {
-		return this._hasSeries;
-	}
-
-	public addDataSource(source: IDataSource): void {
+	public addDataSource(source: IPriceDataSource): void {
 		if (this._dataSources.indexOf(source) !== -1) {
 			return;
 		}
 
-		if ((source instanceof Series)) {
-			this._hasSeries = true;
-		}
-
 		this._dataSources.push(source);
-		this._mainSource = null;
 		this.updateFormatter();
 		this.invalidateSourcesCache();
 	}
 
-	public removeDataSource(source: IDataSource): void {
+	public removeDataSource(source: IPriceDataSource): void {
 		const index = this._dataSources.indexOf(source);
 		if (index === -1) {
 			throw new Error('source is not attached to scale');
 		}
 
 		this._dataSources.splice(index, 1);
-		if (source instanceof Series) {
-			this._hasSeries = false;
-		}
 
-		if (!this.mainSource()) {
+		if (this.isEmpty()) {
 			this.setMode({
 				autoScale: true,
 			});
 		}
 
-		this._mainSource = null;
 		this.updateFormatter();
 		this.invalidateSourcesCache();
-	}
-
-	public mainSource(): IPriceDataSource | null {
-		if (this._mainSource !== null) {
-			return this._mainSource;
-		}
-
-		let priceSource: IPriceDataSource | null = null;
-
-		for (let i = 0; i < this._dataSources.length; i++) {
-			const source = this._dataSources[i];
-			if (source instanceof Series) {
-				priceSource = source;
-				break;
-			}
-
-			if ((priceSource === null) && (source instanceof PriceDataSource)) {
-				priceSource = source;
-			}
-		}
-
-		this._mainSource = priceSource;
-		return this._mainSource;
 	}
 
 	public firstValue(): number | null {
@@ -539,15 +510,13 @@ export class PriceScale {
 		let result: FirstValue | null = null;
 
 		for (const source of this._dataSources) {
-			if (source instanceof PriceDataSource) {
-				const firstValue = source.firstValue();
-				if (firstValue === null) {
-					continue;
-				}
+			const firstValue = source.firstValue();
+			if (firstValue === null) {
+				continue;
+			}
 
-				if (result === null || firstValue.timePoint < result.timePoint) {
-					result = firstValue;
-				}
+			if (result === null || firstValue.timePoint < result.timePoint) {
+				result = firstValue;
 			}
 		}
 
@@ -713,7 +682,7 @@ export class PriceScale {
 	}
 
 	public formatPriceAbsolute(price: number): string {
-		return this._formatPrice(price as BarPrice, this._mainSourceFormatter());
+		return this._formatPrice(price as BarPrice, ensureNotNull(this._formatterSource()).formatter());
 	}
 
 	public formatPricePercentage(price: number, baseValue: number): string {
@@ -722,14 +691,10 @@ export class PriceScale {
 	}
 
 	public sourcesForAutoScale(): ReadonlyArray<IPriceDataSource> {
-		function useSourceForAutoScale(source: IDataSource): source is IPriceDataSource {
-			return source instanceof PriceDataSource;
-		}
-
-		return this._dataSources.filter(useSourceForAutoScale);
+		return this._dataSources;
 	}
 
-	public recalculatePriceRange(visibleBars: BarsRange): void {
+	public recalculatePriceRange(visibleBars: RangeImpl<TimePointIndex>): void {
 		this._invalidatedForRange = {
 			visibleBars: visibleBars,
 			isValid: false,
@@ -737,15 +702,15 @@ export class PriceScale {
 	}
 
 	public updateAllViews(): void {
-		this._dataSources.forEach((s: IDataSource) => s.updateAllViews());
+		this._dataSources.forEach((s: IPriceDataSource) => s.updateAllViews());
 	}
 
 	public updateFormatter(): void {
 		this._marksCache = null;
-		const mainSource = this.mainSource();
+		const formatterSource = this._formatterSource();
 		let base = 100;
-		if (mainSource !== null) {
-			base = Math.round(1 / mainSource.minMove());
+		if (formatterSource !== null) {
+			base = Math.round(1 / formatterSource.minMove());
 		}
 
 		this._formatter = defaultPriceFormatter;
@@ -756,9 +721,9 @@ export class PriceScale {
 			this._formatter = new PriceFormatter(100, 1);
 			base = 100;
 		} else {
-			if (mainSource !== null) {
+			if (formatterSource !== null) {
 				// user
-				this._formatter = mainSource.formatter();
+				this._formatter = formatterSource.formatter();
 			}
 		}
 
@@ -774,6 +739,13 @@ export class PriceScale {
 
 	public invalidateSourcesCache(): void {
 		this._cachedOrderedSources = null;
+	}
+
+	/**
+	 * Returns the source which will be used as "formatter source" (take minMove for formatter)
+	 */
+	private _formatterSource(): IPriceDataSource | null {
+		return this._dataSources[0] || null;
 	}
 
 	private _topMarginPx(): number {
@@ -800,7 +772,7 @@ export class PriceScale {
 		this._internalHeightChanged.fire();
 	}
 
-	private _logicalToCoordinate(logical: number, baseValue: number, keepItFloat?: boolean): Coordinate {
+	private _logicalToCoordinate(logical: number, baseValue: number): Coordinate {
 		this._makeSureItIsValid();
 		if (this.isEmpty()) {
 			return 0 as Coordinate;
@@ -811,11 +783,7 @@ export class PriceScale {
 		const invCoordinate = this._bottomMarginPx() +
 			(this.internalHeight() - 1) * (logical - range.minValue()) / range.length();
 		const coordinate = this.invertedCoordinate(invCoordinate);
-		if (keepItFloat) {
-			return coordinate as Coordinate;
-		}
-
-		return Math.round(coordinate) as Coordinate;
+		return coordinate as Coordinate;
 	}
 
 	private _coordinateToLogical(coordinate: number, baseValue: number): number {
@@ -836,11 +804,6 @@ export class PriceScale {
 		this._markBuilder.rebuildTickMarks();
 	}
 
-	private _mainSourceFormatter(): IFormatter {
-		const mainSource = ensureNotNull(this.mainSource());
-		return mainSource.formatter();
-	}
-
 	// tslint:disable-next-line:cyclomatic-complexity
 	private _recalculatePriceRangeImpl(): void {
 		const visibleBars = this._invalidatedForRange.visibleBars;
@@ -848,7 +811,7 @@ export class PriceScale {
 			return;
 		}
 
-		let priceRange: PriceRange | null = null;
+		let priceRange: PriceRangeImpl | null = null;
 		const sources = this.sourcesForAutoScale();
 
 		let marginAbove = 0;
@@ -860,8 +823,8 @@ export class PriceScale {
 				continue;
 			}
 
-			const autoScaleInfo = source.autoscaleInfo(visibleBars.firstBar(), visibleBars.lastBar());
-			let sourceRange = autoScaleInfo && autoScaleInfo.priceRange;
+			const autoScaleInfo = source.autoscaleInfo(visibleBars.left(), visibleBars.right());
+			let sourceRange = autoScaleInfo && autoScaleInfo.priceRange();
 
 			if (sourceRange !== null) {
 				switch (this._options.mode) {
@@ -882,9 +845,12 @@ export class PriceScale {
 					priceRange = priceRange.merge(ensureNotNull(sourceRange));
 				}
 
-				if (autoScaleInfo !== null && autoScaleInfo.margins !== null) {
-					marginAbove = Math.max(marginAbove, autoScaleInfo.margins.above);
-					marginBelow = Math.max(marginAbove, autoScaleInfo.margins.below);
+				if (autoScaleInfo !== null) {
+					const margins = autoScaleInfo.margins();
+					if (margins !== null) {
+						marginAbove = Math.max(marginAbove, margins.above);
+						marginBelow = Math.max(marginAbove, margins.below);
+					}
 				}
 			}
 		}
@@ -899,20 +865,20 @@ export class PriceScale {
 		if (priceRange !== null) {
 			// keep current range is new is empty
 			if (priceRange.minValue() === priceRange.maxValue()) {
-				const mainSource = this.mainSource();
-				const minMove = mainSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : mainSource.minMove();
+				const formatterSource = this._formatterSource();
+				const minMove = formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : formatterSource.minMove();
 
 				// if price range is degenerated to 1 point let's extend it by 10 min move values
 				// to avoid incorrect range and empty (blank) scale (in case of min tick much greater than 1)
 				const extendValue = 5 * minMove;
-				priceRange = new PriceRange(priceRange.minValue() - extendValue, priceRange.maxValue() + extendValue);
+				priceRange = new PriceRangeImpl(priceRange.minValue() - extendValue, priceRange.maxValue() + extendValue);
 			}
 
 			this.setPriceRange(priceRange);
 		} else {
 			// reset empty to default
 			if (this._priceRange === null) {
-				this.setPriceRange(new PriceRange(-0.5, 0.5));
+				this.setPriceRange(new PriceRangeImpl(-0.5, 0.5));
 			}
 		}
 

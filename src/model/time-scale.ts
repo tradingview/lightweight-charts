@@ -7,23 +7,24 @@ import { ISubscription } from '../helpers/isubscription';
 import { clamp } from '../helpers/mathex';
 import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
 
-import { BarsRange } from './bars-range';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
+import { areRangesEqual, RangeImpl } from './range-impl';
 import { TickMarks } from './tick-marks';
-import { SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
+import { Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
 import { TimePoints } from './time-points';
+import { TimeScaleVisibleRange } from './time-scale-visible-range';
 
 const enum Constants {
 	DefaultAnimationDuration = 400,
-	MaxBarSpacing = 50,
 	MinBarSpacing = 0.5,
-	MinVisibleBarsCount = 5,
+	// make sure that this (1 / MinVisibleBarsCount) >= coeff in max bar spacing
+	MinVisibleBarsCount = 2,
 }
 
-export const enum MarkSpanBorder {
+const enum MarkSpanBorder {
 	Minute = 20,
 	Hour = 30,
 	Day = 40,
@@ -44,6 +45,16 @@ export interface TimeMark {
 	major: boolean;
 }
 
+export const enum TickMarkType {
+	Year,
+	Month,
+	DayOfMonth,
+	Time,
+	TimeWithSeconds,
+}
+
+export type TickMarkFormatter = (timePoint: TimePoint, tickMarkType: TickMarkType, locale: string) => string;
+
 export interface TimeScaleOptions {
 	rightOffset: number;
 	barSpacing: number;
@@ -55,6 +66,7 @@ export interface TimeScaleOptions {
 	visible: boolean;
 	timeVisible: boolean;
 	secondsVisible: boolean;
+	tickMarkFormatter: TickMarkFormatter;
 }
 
 export class TimeScale {
@@ -68,15 +80,18 @@ export class TimeScale {
 	private _baseIndexOrNull: TimePointIndex | null = null;
 	private _rightOffset: number;
 	private _points: TimePoints = new TimePoints();
-	private readonly _barSpacingChanged: Delegate<number, number> = new Delegate();
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
 	private readonly _tickMarks: TickMarks = new TickMarks();
 	private _formattedBySpan: Map<number, FormattedLabelsCache> = new Map();
-	private _visibleBars: BarsRange | null = null;
-	private _visibleBarsInvalidated: boolean = true;
+
+	private _visibleRange: TimeScaleVisibleRange = TimeScaleVisibleRange.invalid();
+	private _visibleRangeInvalidated: boolean = true;
+
 	private readonly _visibleBarsChanged: Delegate = new Delegate();
+	private readonly _logicalRangeChanged: Delegate = new Delegate();
+
 	private readonly _optionsApplied: Delegate = new Delegate();
 	private _leftEdgeIndex: TimePointIndex | null = null;
 	private _commonTransitionStartState: TransitionState | null = null;
@@ -88,7 +103,7 @@ export class TimeScale {
 		this._options = options;
 		this._localizationOptions = localizationOptions;
 		this._rightOffset = options.rightOffset;
-		this._barSpacing = getValidBarSpacing(options.barSpacing);
+		this._barSpacing = options.barSpacing;
 		this._model = model;
 
 		this._updateDateTimeFormatter();
@@ -114,12 +129,14 @@ export class TimeScale {
 			this._leftEdgeIndex = null;
 		}
 
-		if (options.rightOffset !== undefined) {
-			this.setRightOffset(options.rightOffset);
-		}
-
+		// note that bar spacing should be applied before right offset
+		// because right offset depends on bar spacing
 		if (options.barSpacing !== undefined) {
 			this.setBarSpacing(options.barSpacing);
+		}
+
+		if (options.rightOffset !== undefined) {
+			this.setRightOffset(options.rightOffset);
 		}
 
 		this._invalidateTickMarks();
@@ -132,13 +149,52 @@ export class TimeScale {
 		return this._width === 0 || this._points.size() === 0;
 	}
 
-	public visibleBars(): BarsRange | null {
-		if (this._visibleBarsInvalidated) {
-			this._visibleBarsInvalidated = false;
-			this._updateVisibleBars();
+	// strict range: integer indices of the bars in the visible range rounded in more wide direction
+	public visibleStrictRange(): RangeImpl<TimePointIndex> | null {
+		this._updateVisibleRange();
+		return this._visibleRange.strictRange();
+	}
+
+	public visibleLogicalRange(): RangeImpl<Logical> | null {
+		this._updateVisibleRange();
+		return this._visibleRange.logicalRange();
+	}
+
+	public visibleTimeRange(): TimePointsRange | null {
+		const visibleBars = this.visibleStrictRange();
+		if (visibleBars === null) {
+			return null;
 		}
 
-		return this._visibleBars;
+		const range: LogicalRange = {
+			from: visibleBars.left() as number as Logical,
+			to: visibleBars.right() as number as Logical,
+		};
+
+		return this.timeRangeForLogicalRange(range);
+	}
+
+	public timeRangeForLogicalRange(range: LogicalRange): TimePointsRange {
+		const from = Math.round(range.from);
+		const to = Math.round(range.to);
+
+		const points = this._model.timeScale().points();
+		const firstIndex = ensureNotNull(points.firstIndex());
+		const lastIndex = ensureNotNull(points.lastIndex());
+
+		return {
+			from: ensureNotNull(points.valueAt(Math.max(firstIndex, from) as TimePointIndex) as TimePoint),
+			to: ensureNotNull(points.valueAt(Math.min(lastIndex, to) as TimePointIndex) as TimePoint),
+		};
+	}
+
+	public logicalRangeForTimeRange(range: TimePointsRange): LogicalRange {
+		const points = this._model.timeScale().points();
+
+		return {
+			from: ensureNotNull(points.indexOf(range.from.timestamp, true)) as number as Logical,
+			to: ensureNotNull(points.indexOf(range.to.timestamp, true)) as number as Logical,
+		};
 	}
 
 	public tickMarks(): TickMarks {
@@ -170,7 +226,7 @@ export class TimeScale {
 		// keep left edge instead of right
 		// we need it to avoid "shaking" if the last bar visibility affects time scale width
 		if (this._leftEdgeIndex !== null) {
-			const firstVisibleBar = ensureNotNull(this.visibleBars()).firstBar();
+			const firstVisibleBar = ensureNotNull(this.visibleStrictRange()).left();
 			// firstVisibleBar could be less than this._leftEdgeIndex
 			// since index is a center of bar
 			if (firstVisibleBar <= this._leftEdgeIndex) {
@@ -182,11 +238,14 @@ export class TimeScale {
 		}
 
 		this._width = width;
-		this._visibleBarsInvalidated = true;
+		this._visibleRangeInvalidated = true;
+
+		// updating bar spacing should be first because right offset depends on it
+		this._correctBarSpacing();
 		this._correctOffset();
 	}
 
-	public indexToCoordinate(index: TimePointIndex, keepFloat?: boolean): Coordinate {
+	public indexToCoordinate(index: TimePointIndex): Coordinate {
 		if (this.isEmpty() || !isInteger(index)) {
 			return 0 as Coordinate;
 		}
@@ -194,11 +253,7 @@ export class TimeScale {
 		const baseIndex = this.baseIndex();
 		const deltaFromRight = baseIndex + this._rightOffset - index;
 		const coordinate = this._width - (deltaFromRight + 0.5) * this._barSpacing;
-		if (keepFloat) {
-			return coordinate as Coordinate;
-		}
-
-		return Math.round(coordinate) as Coordinate;
+		return coordinate as Coordinate;
 	}
 
 	public indexesToCoordinates<T extends TimedValue>(points: T[], visibleRange?: SeriesItemsIndexesRange): void {
@@ -210,7 +265,7 @@ export class TimeScale {
 			const index = points[i].time;
 			const deltaFromRight = baseIndex + this._rightOffset - index;
 			const coordinate = this._width - (deltaFromRight + 0.5) * this._barSpacing;
-			points[i].x = Math.round(coordinate) as Coordinate;
+			points[i].x = coordinate as Coordinate;
 		}
 	}
 
@@ -223,7 +278,7 @@ export class TimeScale {
 	}
 
 	public setRightOffset(offset: number): void {
-		this._visibleBarsInvalidated = true;
+		this._visibleRangeInvalidated = true;
 		this._rightOffset = offset;
 		this._correctOffset();
 		this._model.recalculateAllPanes();
@@ -239,10 +294,9 @@ export class TimeScale {
 
 		// do not allow scroll out of visible bars
 		this._correctOffset();
-	}
 
-	public barSpacingChanged(): ISubscription<number, number> {
-		return this._barSpacingChanged;
+		this._model.recalculateAllPanes();
+		this._model.lightUpdate();
 	}
 
 	public rightOffset(): number {
@@ -264,10 +318,10 @@ export class TimeScale {
 		const maxLabelWidth = (fontSize + 4) * 5;
 		const indexPerLabel = Math.round(maxLabelWidth / spacing);
 
-		const visibleBars = ensureNotNull(this.visibleBars());
+		const visibleBars = ensureNotNull(this.visibleStrictRange());
 
-		const firstBar = Math.max(visibleBars.firstBar(), visibleBars.firstBar() - indexPerLabel);
-		const lastBar = Math.max(visibleBars.lastBar(), visibleBars.lastBar() - indexPerLabel);
+		const firstBar = Math.max(visibleBars.left(), visibleBars.left() - indexPerLabel);
+		const lastBar = Math.max(visibleBars.right(), visibleBars.right() - indexPerLabel);
 
 		const items = this._tickMarks.build(spacing, maxLabelWidth);
 
@@ -307,7 +361,7 @@ export class TimeScale {
 	}
 
 	public reset(): void {
-		this._visibleBarsInvalidated = true;
+		this._visibleRangeInvalidated = true;
 		this._points = new TimePoints();
 		this._scrollStartPoint = null;
 		this._scaleStartPoint = null;
@@ -317,7 +371,7 @@ export class TimeScale {
 	}
 
 	public restoreDefault(): void {
-		this._visibleBarsInvalidated = true;
+		this._visibleRangeInvalidated = true;
 
 		this.setBarSpacing(this._options.barSpacing);
 		this.setRightOffset(this._options.rightOffset);
@@ -328,7 +382,7 @@ export class TimeScale {
 	}
 
 	public setBaseIndex(baseIndex: TimePointIndex): void {
-		this._visibleBarsInvalidated = true;
+		this._visibleRangeInvalidated = true;
 		this._baseIndexOrNull = baseIndex;
 		this._correctOffset();
 
@@ -413,14 +467,13 @@ export class TimeScale {
 	}
 
 	public scrollTo(x: Coordinate): void {
-		this._visibleBarsInvalidated = true;
 		if (this._scrollStartPoint === null) {
 			return;
 		}
 
 		const shiftInLogical = (this._scrollStartPoint - x) / this.barSpacing();
 		this._rightOffset = ensureNotNull(this._commonTransitionStartState).rightOffset + shiftInLogical;
-		this._visibleBarsInvalidated = true;
+		this._visibleRangeInvalidated = true;
 
 		// do not allow scroll out of visible bars
 		this._correctOffset();
@@ -464,14 +517,13 @@ export class TimeScale {
 	}
 
 	public update(index: TimePointIndex, values: TimePoint[], marks: TickMark[]): void {
-		this._visibleBarsInvalidated = true;
+		this._visibleRangeInvalidated = true;
 		if (values.length > 0) {
 			// we have some time points to merge
 			const oldSize = this._points.size();
 			this._points.merge(index, values);
 			if (this._rightOffset < 0 && (this._points.size() === oldSize + 1)) {
 				this._rightOffset -= 1;
-				this._visibleBarsInvalidated = true;
 			}
 		}
 		this._tickMarks.merge(marks);
@@ -480,6 +532,10 @@ export class TimeScale {
 
 	public visibleBarsChanged(): ISubscription {
 		return this._visibleBarsChanged;
+	}
+
+	public logicalRangeChanged(): ISubscription {
+		return this._logicalRangeChanged;
 	}
 
 	public optionsApplied(): ISubscription {
@@ -494,12 +550,12 @@ export class TimeScale {
 		return this._baseIndexOrNull || 0 as TimePointIndex;
 	}
 
-	public setVisibleRange(range: BarsRange): void {
+	public setVisibleRange(range: RangeImpl<TimePointIndex>): void {
 		const length = range.count();
 		this._setBarSpacing(this._width / length);
-		this._rightOffset = range.lastBar() - this.baseIndex();
+		this._rightOffset = range.right() - this.baseIndex();
 		this._correctOffset();
-		this._visibleBarsInvalidated = true;
+		this._visibleRangeInvalidated = true;
 		this._model.recalculateAllPanes();
 		this._model.lightUpdate();
 	}
@@ -510,24 +566,14 @@ export class TimeScale {
 		if (first === null || last === null) {
 			return;
 		}
-		this.setVisibleRange(new BarsRange(first - 1 as TimePointIndex, last + 1 + this._options.rightOffset as TimePointIndex));
+
+		this.setVisibleRange(new RangeImpl(first, last + this._options.rightOffset as TimePointIndex));
 	}
 
-	public setTimePointsRange(range: TimePointsRange): void {
-		const points = this.points();
-		const firstIndex = points.firstIndex();
-		const lastIndex = points.lastIndex();
-
-		if (firstIndex === null || lastIndex === null) {
-			return;
-		}
-
-		const firstPoint = ensureNotNull(points.valueAt(firstIndex)).timestamp;
-		const lastPoint = ensureNotNull(points.valueAt(lastIndex)).timestamp;
-
-		const barRange = new BarsRange(
-			ensureNotNull(points.indexOf(Math.max(firstPoint, range.from.timestamp) as UTCTimestamp, true)),
-			ensureNotNull(points.indexOf(Math.min(lastPoint, range.to.timestamp) as UTCTimestamp, true))
+	public setLogicalRange(range: LogicalRange): void {
+		const barRange = new RangeImpl(
+			range.from as number as TimePointIndex,
+			range.to as number as TimePointIndex
 		);
 		this.setVisibleRange(barRange);
 	}
@@ -555,31 +601,52 @@ export class TimeScale {
 	}
 
 	private _setBarSpacing(newBarSpacing: number): void {
-		newBarSpacing = getValidBarSpacing(newBarSpacing);
-
 		const oldBarSpacing = this._barSpacing;
-		if (oldBarSpacing === newBarSpacing) {
+		this._barSpacing = newBarSpacing;
+		this._correctBarSpacing();
+
+		// this._barSpacing might be changed in _correctBarSpacing
+		if (oldBarSpacing !== this._barSpacing) {
+			this._visibleRangeInvalidated = true;
+			this._resetTimeMarksCache();
+		}
+	}
+
+	private _updateVisibleRange(): void {
+		if (!this._visibleRangeInvalidated) {
 			return;
 		}
 
-		this._visibleBarsInvalidated = true;
-		this._barSpacing = newBarSpacing;
-		this._barSpacingChanged.fire(oldBarSpacing, newBarSpacing);
-		this._resetTimeMarksCache();
-	}
+		this._visibleRangeInvalidated = false;
 
-	private _updateVisibleBars(): void {
 		if (this.isEmpty()) {
-			this._setVisibleBars(null);
+			this._setVisibleRange(TimeScaleVisibleRange.invalid());
 			return;
 		}
 
 		const baseIndex = this.baseIndex();
-		const newBarsLength = Math.ceil(this._width / this._barSpacing) - 1;
-		const rightIndex = Math.round(this._rightOffset + baseIndex) as TimePointIndex;
-		const leftIndex = rightIndex - newBarsLength as TimePointIndex;
+		const newBarsLength = this._width / this._barSpacing;
+		const rightBorder = this._rightOffset + baseIndex;
+		const leftBorder = rightBorder - newBarsLength + 1;
 
-		this._setVisibleBars(new BarsRange(leftIndex, rightIndex));
+		const logicalRange = new RangeImpl(leftBorder as Logical, rightBorder as Logical);
+		this._setVisibleRange(new TimeScaleVisibleRange(logicalRange));
+	}
+
+	private _correctBarSpacing(): void {
+		if (this._barSpacing < Constants.MinBarSpacing) {
+			this._barSpacing = Constants.MinBarSpacing;
+			this._visibleRangeInvalidated = true;
+		}
+
+		if (this._width !== 0) {
+			// make sure that this (1 / Constants.MinVisibleBarsCount) >= coeff in max bar spacing (it's 0.5 here)
+			const maxBarSpacing = this._width * 0.5;
+			if (this._barSpacing > maxBarSpacing) {
+				this._barSpacing = maxBarSpacing;
+				this._visibleRangeInvalidated = true;
+			}
+		}
 	}
 
 	private _correctOffset(): void {
@@ -587,7 +654,7 @@ export class TimeScale {
 		const maxRightOffset = this._maxRightOffset();
 		if (this._rightOffset > maxRightOffset) {
 			this._rightOffset = maxRightOffset;
-			this._visibleBarsInvalidated = true;
+			this._visibleRangeInvalidated = true;
 		}
 
 		// block scrolling of to past
@@ -595,7 +662,7 @@ export class TimeScale {
 
 		if (minRightOffset !== null && this._rightOffset < minRightOffset) {
 			this._rightOffset = minRightOffset;
-			this._visibleBarsInvalidated = true;
+			this._visibleRangeInvalidated = true;
 		}
 	}
 
@@ -611,11 +678,11 @@ export class TimeScale {
 			return this._leftEdgeIndex - baseIndex + barsEstimation - 1;
 		}
 
-		return firstIndex - baseIndex - 1 + Constants.MinVisibleBarsCount;
+		return firstIndex - baseIndex - 1 + Math.min(Constants.MinVisibleBarsCount, this._points.size());
 	}
 
 	private _maxRightOffset(): number {
-		return (this._width / this._barSpacing) - Constants.MinVisibleBarsCount;
+		return (this._width / this._barSpacing) - Math.min(Constants.MinVisibleBarsCount, this._points.size());
 	}
 
 	private _saveCommonTransitionsStartState(): void {
@@ -632,70 +699,47 @@ export class TimeScale {
 	private _formatLabel(time: TimePoint, span: number): string {
 		let formatter = this._formattedBySpan.get(span);
 		if (formatter === undefined) {
-			formatter = new FormattedLabelsCache((date: Date) => {
-				return this._formatLabelImpl(date, span);
+			formatter = new FormattedLabelsCache((timePoint: TimePoint) => {
+				return this._formatLabelImpl(timePoint, span);
 			});
 
 			this._formattedBySpan.set(span, formatter);
 		}
 
-		if (time.businessDay === undefined) {
-			return formatter.format(new Date(time.timestamp * 1000));
-		} else {
-			return formatter.format(new Date(Date.UTC(time.businessDay.year, time.businessDay.month - 1, time.businessDay.day)));
-		}
+		return formatter.format(time);
 	}
 
-	private _formatLabelImpl(d: Date, span: number): string {
-		const formatOptions: Intl.DateTimeFormatOptions = {};
+	private _formatLabelImpl(timePoint: TimePoint, span: number): string {
+		let tickMarkType: TickMarkType;
 
 		const timeVisible = this._options.timeVisible;
 		if (span < MarkSpanBorder.Minute && timeVisible) {
-			formatOptions.hour12 = false;
-			formatOptions.hour = '2-digit';
-			formatOptions.minute = '2-digit';
-			if (this._options.secondsVisible) {
-				formatOptions.second = '2-digit';
-			}
+			tickMarkType = this._options.secondsVisible ? TickMarkType.TimeWithSeconds : TickMarkType.Time;
 		} else if (span < MarkSpanBorder.Day && timeVisible) {
-			formatOptions.hour12 = false;
-			formatOptions.hour = '2-digit';
-			formatOptions.minute = '2-digit';
+			tickMarkType = TickMarkType.Time;
 		} else if (span < MarkSpanBorder.Week) {
-			formatOptions.day = 'numeric';
+			tickMarkType = TickMarkType.DayOfMonth;
 		} else if (span < MarkSpanBorder.Month) {
-			formatOptions.day = 'numeric';
+			tickMarkType = TickMarkType.DayOfMonth;
 		} else if (span < MarkSpanBorder.Year) {
-			formatOptions.month = 'short';
+			tickMarkType = TickMarkType.Month;
 		} else {
-			formatOptions.year = 'numeric';
+			tickMarkType = TickMarkType.Year;
 		}
 
-		// from given date we should use only as UTC date or timestamp
-		// but to format as locale date we can convert UTC date to local date
-		const localDateFromUtc = new Date(
-			d.getUTCFullYear(),
-			d.getUTCMonth(),
-			d.getUTCDate(),
-			d.getUTCHours(),
-			d.getUTCMinutes(),
-			d.getUTCSeconds(),
-			d.getUTCMilliseconds()
-		);
-
-		return localDateFromUtc.toLocaleString(this._localizationOptions.locale, formatOptions);
+		return this._options.tickMarkFormatter(timePoint, tickMarkType, this._localizationOptions.locale);
 	}
 
-	private _setVisibleBars(visibleBars: BarsRange | null): void {
-		if (visibleBars === null && this._visibleBars === null) {
-			return;
+	private _setVisibleRange(newVisibleRange: TimeScaleVisibleRange): void {
+		const oldVisibleRange = this._visibleRange;
+		this._visibleRange = newVisibleRange;
+
+		if (!areRangesEqual(oldVisibleRange.strictRange(), this._visibleRange.strictRange())) {
+			this._visibleBarsChanged.fire();
 		}
 
-		const oldVisibleBars = this._visibleBars;
-		this._visibleBars = visibleBars;
-
-		if (this._visibleBars === null || oldVisibleBars !== null && !this._visibleBars.equals(oldVisibleBars)) {
-			this._visibleBarsChanged.fire();
+		if (!areRangesEqual(oldVisibleRange.logicalRange(), this._visibleRange.logicalRange())) {
+			this._logicalRangeChanged.fire();
 		}
 
 		// TODO: reset only coords in case when this._visibleBars has not been changed
@@ -736,22 +780,10 @@ export class TimeScale {
 		}
 
 		this._leftEdgeIndex = firstIndex;
-		const delta = ensureNotNull(this.visibleBars()).firstBar() - firstIndex;
+		const delta = ensureNotNull(this.visibleStrictRange()).left() - firstIndex;
 		if (delta < 0) {
 			const leftEdgeOffset = this._rightOffset - delta - 1;
 			this.setRightOffset(leftEdgeOffset);
 		}
 	}
-}
-
-function getValidBarSpacing(newBarSpacing: number): number {
-	if (newBarSpacing < Constants.MinBarSpacing) {
-		return Constants.MinBarSpacing;
-	}
-
-	if (newBarSpacing > Constants.MaxBarSpacing) {
-		return Constants.MaxBarSpacing;
-	}
-
-	return newBarSpacing;
 }

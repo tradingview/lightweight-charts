@@ -17,7 +17,7 @@ import { BusinessDay, UTCTimestamp } from '../model/time-data';
 import { Time } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
-import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { ITimeScaleApi } from './itime-scale-api';
 
 export interface MouseEventParams {
 	time?: UTCTimestamp | BusinessDay;
@@ -28,7 +28,6 @@ export interface MouseEventParams {
 }
 
 export type MouseEventHandler = (param: MouseEventParams) => void;
-export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 
  /*
  * The main interface of a single chart
@@ -41,11 +40,11 @@ export interface IChartApi {
 
 	/**
 	 * Sets fixed size of the chart. By default chart takes up 100% of its container
-	 * @param height - target height of the chart
 	 * @param width - target width of the chart
+	 * @param height - target height of the chart
 	 * @param forceRepaint - true to initiate resize immediately. One could need this to get screenshot immediately after resize
 	 */
-	resize(height: number, width: number, forceRepaint?: boolean): void;
+	resize(width: number, height: number, forceRepaint?: boolean): void;
 
 	/**
 	 * Creates an area series with specified parameters
@@ -112,26 +111,15 @@ export interface IChartApi {
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
 
 	/**
-	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
-	 * @param handler - handler (function) to be called on changing visible data range
-	 */
-	subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
-
-	/**
-	 * Removes a subscription to visible range changes
-	 * @param handler - previously subscribed handler
-	 */
-	unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
-
-	/**
 	 * Returns API to manipulate the price scale
-	 * @returns - target API
+	 * @param priceScaleId - id of scale to access to
+	 * @returns target API
 	 */
-	priceScale(): IPriceScaleApi;
+	priceScale(priceScaleId?: string): IPriceScaleApi;
 
 	/**
 	 * Returns API to manipulate the time scale
-	 * @returns - target API
+	 * @returns target API
 	 */
 	timeScale(): ITimeScaleApi;
 
@@ -143,7 +131,7 @@ export interface IChartApi {
 
 	/**
 	 * Returns currently applied options
-	 * @returns - full set of currently applied options, including defaults
+	 * @returns full set of currently applied options, including defaults
 	 */
 	options(): Readonly<ChartOptions>;
 

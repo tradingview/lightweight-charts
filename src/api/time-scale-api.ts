@@ -1,14 +1,16 @@
-import { ensureNotNull } from '../helpers/assertions';
+import { assert } from '../helpers/assertions';
+import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
-import { TimePoint, TimePointIndex, TimePointsRange } from '../model/time-data';
+import { Coordinate } from '../model/coordinate';
+import { LogicalRange, Range, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { ITimeScaleApi, LogicalRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
 
 const enum Constants {
 	AnimationDurationMs = 1000,
@@ -16,12 +18,19 @@ const enum Constants {
 
 export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	private _model: ChartModel;
+	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
+	private readonly _logicalRangeChanged: Delegate<LogicalRange | null> = new Delegate();
 
 	public constructor(model: ChartModel) {
 		this._model = model;
+		this._timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
+		this._timeScale().logicalRangeChanged().subscribe(this._onVisibleLogicalRangeChanged.bind(this));
 	}
 
 	public destroy(): void {
+		this._timeScale().visibleBarsChanged().unsubscribeAll(this);
+		this._timeScale().logicalRangeChanged().unsubscribeAll(this);
+		this._timeRangeChanged.destroy();
 		delete this._model;
 	}
 
@@ -43,18 +52,15 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public getVisibleRange(): TimeRange | null {
-		const visibleBars = this._timeScale().visibleBars();
-		if (visibleBars === null) {
+		const timeRange = this._timeScale().visibleTimeRange();
+
+		if (timeRange === null) {
 			return null;
 		}
 
-		const points = this._model.timeScale().points();
-		const firstIndex = ensureNotNull(points.firstIndex());
-		const lastIndex = ensureNotNull(points.lastIndex());
-
 		return {
-			from: timePointToTime(ensureNotNull(points.valueAt(Math.max(firstIndex, visibleBars.firstBar()) as TimePointIndex))),
-			to: timePointToTime(ensureNotNull(points.valueAt(Math.min(lastIndex, visibleBars.lastBar()) as TimePointIndex))),
+			from: timeRange.from.businessDay ?? timeRange.from.timestamp,
+			to: timeRange.to.businessDay ?? timeRange.to.timestamp,
 		};
 	}
 
@@ -63,7 +69,26 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 			from: convertTime(range.from),
 			to: convertTime(range.to),
 		};
-		this._model.setTargetTimeRange(convertedRange);
+		const logicalRange = this._timeScale().logicalRangeForTimeRange(convertedRange);
+
+		this._model.setTargetLogicalRange(logicalRange);
+	}
+
+	public getVisibleLogicalRange(): LogicalRange | null {
+		const logicalRange = this._timeScale().visibleLogicalRange();
+		if (logicalRange === null) {
+			return null;
+		}
+
+		return {
+			from: logicalRange.left(),
+			to: logicalRange.right(),
+		};
+	}
+
+	public setVisibleLogicalRange(range: Range<number>): void {
+		assert(range.from <= range.to, 'The from index cannot be after the to index.');
+		this._model.setTargetLogicalRange(range as LogicalRange);
 	}
 
 	public resetTimeScale(): void {
@@ -72,6 +97,44 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 
 	public fitContent(): void {
 		this._model.fitContent();
+	}
+
+	public timeToCoordinate(time: Time): Coordinate | null {
+		const timePoint = convertTime(time);
+		const timeScale = this._model.timeScale();
+		const timePointIndex = timeScale.points().indexOf(timePoint.timestamp, false);
+		if (timePointIndex === null) {
+			return null;
+		}
+
+		return timeScale.indexToCoordinate(timePointIndex);
+	}
+
+	public coordinateToTime(x: number): Time | null {
+		const timeScale = this._model.timeScale();
+		const timePointIndex = timeScale.coordinateToIndex(x as Coordinate);
+		const timePoint = timeScale.points().valueAt(timePointIndex);
+		if (timePoint === null) {
+			return null;
+		}
+
+		return timePoint.businessDay ?? timePoint.timestamp;
+	}
+
+	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
+		this._timeRangeChanged.subscribe(handler);
+	}
+
+	public unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
+		this._timeRangeChanged.unsubscribe(handler);
+	}
+
+	public subscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void {
+		this._logicalRangeChanged.subscribe(handler);
+	}
+
+	public unsubscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void {
+		this._logicalRangeChanged.unsubscribe(handler);
 	}
 
 	public applyOptions(options: DeepPartial<TimeScaleOptions>): void {
@@ -85,8 +148,16 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	private _timeScale(): TimeScale {
 		return this._model.timeScale();
 	}
-}
 
-function timePointToTime(point: TimePoint): Time {
-	return point.businessDay || point.timestamp;
+	private _onVisibleBarsChanged(): void {
+		if (this._timeRangeChanged.hasListeners()) {
+			this._timeRangeChanged.fire(this.getVisibleRange());
+		}
+	}
+
+	private _onVisibleLogicalRangeChanged(): void {
+		if (this._logicalRangeChanged.hasListeners()) {
+			this._logicalRangeChanged.fire(this.getVisibleLogicalRange());
+		}
+	}
 }

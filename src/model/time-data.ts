@@ -1,8 +1,8 @@
 import { lowerbound, upperbound } from '../helpers/algorithms';
 import { Nominal } from '../helpers/nominal';
 
-import { BarsRange } from './bars-range';
 import { Coordinate } from './coordinate';
+import { RangeImpl } from './range-impl';
 
 export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
 
@@ -17,12 +17,18 @@ export interface TimePoint {
 	businessDay?: BusinessDay;
 }
 
-export interface TimePointsRange {
-	from: TimePoint;
-	to: TimePoint;
+export interface Range<T> {
+	from: T;
+	to: T;
 }
 
+export type TimePointsRange = Range<TimePoint>;
+
 export type TimePointIndex = Nominal<number, 'TimePointIndex'>;
+
+export type Logical = Nominal<number, 'Logical'>;
+
+export type LogicalRange = Range<Logical>;
 
 export interface TickMark {
 	index: TimePointIndex;
@@ -35,10 +41,7 @@ export interface TimedValue {
 	x: Coordinate;
 }
 
-export interface SeriesItemsIndexesRange {
-	from: number;
-	to: number;
-}
+export type SeriesItemsIndexesRange = Range<number>;
 
 function lowerBoundItemsCompare(item: TimedValue, time: TimePointIndex): boolean {
 	return item.time < time;
@@ -48,9 +51,9 @@ function upperBoundItemsCompare(time: TimePointIndex, item: TimedValue): boolean
 	return time < item.time;
 }
 
-export function visibleTimedValues(items: TimedValue[], range: BarsRange, extendedRange: boolean): SeriesItemsIndexesRange {
-	const firstBar = range.firstBar();
-	const lastBar = range.lastBar();
+export function visibleTimedValues(items: TimedValue[], range: RangeImpl<TimePointIndex>, extendedRange: boolean): SeriesItemsIndexesRange {
+	const firstBar = range.left();
+	const lastBar = range.right();
 
 	const from = lowerbound<TimedValue, TimePointIndex>(items, firstBar, lowerBoundItemsCompare);
 	const to = upperbound<TimedValue, TimePointIndex>(items, lastBar, upperBoundItemsCompare);

@@ -5,7 +5,7 @@ export const crosshairOptionsDefaults: CrosshairOptions = {
 	vertLine: {
 		color: '#758696',
 		width: 1,
-		style: LineStyle.Dashed,
+		style: LineStyle.LargeDashed,
 		visible: true,
 		labelVisible: true,
 		labelBackgroundColor: '#4c525e',
@@ -13,7 +13,7 @@ export const crosshairOptionsDefaults: CrosshairOptions = {
 	horzLine: {
 		color: '#758696',
 		width: 1,
-		style: LineStyle.Dashed,
+		style: LineStyle.LargeDashed,
 		visible: true,
 		labelVisible: true,
 		labelBackgroundColor: '#4c525e',

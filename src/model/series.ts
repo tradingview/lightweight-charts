@@ -22,11 +22,12 @@ import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-vi
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
 
-import { AutoscaleInfo } from './autoscale-info';
+import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { BarPrice, BarPrices } from './bar';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
+import { isDefaultPriceScale } from './default-price-scale';
 import { FirstValue } from './iprice-data-source';
 import { Palette } from './palette';
 import { Pane } from './pane';
@@ -34,7 +35,7 @@ import { PlotRow } from './plot-data';
 import { MinMax, PlotList, PlotRowSearchMode } from './plot-list';
 import { PriceDataSource } from './price-data-source';
 import { PriceLineOptions } from './price-line-options';
-import { PriceRange } from './price-range';
+import { PriceRangeImpl } from './price-range-impl';
 import { PriceScale } from './price-scale';
 import { SeriesBarColorer } from './series-bar-colorer';
 import { Bar, barFunction, SeriesData, SeriesPlotIndex } from './series-data';
@@ -64,7 +65,6 @@ export interface LastValueDataResultWithData extends LastValueDataResult {
 	formattedPricePercentage: string;
 	color: string;
 	coordinate: Coordinate;
-	floatCoordinate: Coordinate;
 	index: TimePointIndex;
 }
 
@@ -89,6 +89,14 @@ export interface SeriesDataAtTypeMap {
 	Histogram: BarPrice;
 }
 
+// TODO: uncomment following strings after fixing typescript bug
+// https://github.com/microsoft/TypeScript/issues/36981
+// export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
+// export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
+
+export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
+export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
+
 export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
 	private readonly _seriesType: T;
 	private _data: SeriesData = new SeriesData();
@@ -101,14 +109,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _endOfData: boolean = false;
 	private _paneView!: IUpdatablePaneView;
 	private _barColorerCache: SeriesBarColorer | null = null;
-	private readonly _options: SeriesOptionsMap[T];
+	private readonly _options: SeriesOptionsInternal<T>;
 	private _barFunction: BarFunction;
 	private readonly _palette: Palette = new Palette();
 	private _markers: SeriesMarker<TimePoint>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
 
-	public constructor(model: ChartModel, options: SeriesOptionsMap[T], seriesType: T) {
+	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
@@ -159,7 +167,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			return noDataRes;
 		}
 
-		const visibleBars = this.model().timeScale().visibleBars();
+		const visibleBars = this.model().timeScale().visibleStrictRange();
 		const firstValue = this.firstValue();
 		if (visibleBars === null || firstValue === null) {
 			return noDataRes;
@@ -178,7 +186,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			bar = lastBar;
 			lastIndex = lastBar.index;
 		} else {
-			const endBar = this.data().bars().search(visibleBars.lastBar(), PlotRowSearchMode.NearestLeft);
+			const endBar = this.data().bars().search(visibleBars.right(), PlotRowSearchMode.NearestLeft);
 			if (endBar === null) {
 				return noDataRes;
 			}
@@ -193,7 +201,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const price = plot !== undefined ? bar.value[plot] as number : this._barFunction(bar.value);
 		const barColorer = this.barColorer();
 		const style = barColorer.barStyle(lastIndex, { value: bar });
-		const floatCoordinate = priceScale.priceToCoordinate(price, firstValue.value, true);
+		const coordinate = priceScale.priceToCoordinate(price, firstValue.value);
 
 		return {
 			noData: false,
@@ -202,8 +210,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			formattedPriceAbsolute: priceScale.formatPriceAbsolute(price),
 			formattedPricePercentage: priceScale.formatPricePercentage(price, firstValue.value),
 			color: style.barColor,
-			floatCoordinate: floatCoordinate,
-			coordinate: Math.round(floatCoordinate) as Coordinate,
+			coordinate: coordinate,
 			index: lastIndex,
 		};
 	}
@@ -225,14 +232,19 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options;
 	}
 
-	public applyOptions(options: SeriesPartialOptionsMap[T]): void {
-		const overlay = this._options.overlay;
+	public applyOptions(options: SeriesPartialOptionsInternal<T>): void {
+		const targetPriceScaleId = options.priceScaleId;
+		if (targetPriceScaleId !== undefined && targetPriceScaleId !== this._options.priceScaleId) {
+			// series cannot do it itself, ask model
+			this.model().moveSeriesToScale(this, targetPriceScaleId);
+		}
 		merge(this._options, options);
-		this._options.overlay = overlay;
 
-		if (overlay && this._priceScale !== null && options.scaleMargins !== undefined) {
+		// tslint:disable-next-line:deprecation
+		if (this._priceScale !== null && options.scaleMargins !== undefined) {
 			this._priceScale.applyOptions({
-				scaleMargins: this._options.scaleMargins,
+				// tslint:disable-next-line:deprecation
+				scaleMargins: options.scaleMargins,
 			});
 		}
 
@@ -254,7 +266,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._recreatePaneViews();
 	}
 
-	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>): void {
+	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>, clearData: boolean = false): void {
+		if (clearData) {
+			this._data.clear();
+		}
 		this._data.bars().merge(data);
 		this._onDataChanged();
 	}
@@ -265,7 +280,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public setMarkers(data: SeriesMarker<TimePoint>[]): void {
-		this._markers = data.map((item: SeriesMarker<TimePoint>) => ({ ...item }));
+		this._markers = data.map<SeriesMarker<TimePoint>>((item: SeriesMarker<TimePoint>) => ({ ...item }));
 		this._recalculateMarkers();
 		const sourcePane = this.model().paneForSource(this);
 		this._markersPaneView.update('data');
@@ -319,12 +334,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public firstBar(): Bar | null {
-		const visibleBars = this.model().timeScale().visibleBars();
+		const visibleBars = this.model().timeScale().visibleStrictRange();
 		if (visibleBars === null) {
 			return null;
 		}
 
-		const startTimePoint = visibleBars.firstBar();
+		const startTimePoint = visibleBars.left();
 		return this.data().search(startTimePoint, PlotRowSearchMode.NearestRight, true);
 	}
 
@@ -365,7 +380,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	public paneViews(): ReadonlyArray<IPaneView> {
 		const res: IPaneView[] = [];
 
-		if (this.priceScale() === this.model().mainPriceScale()) {
+		if (!this._isOverlay()) {
 			res.push(this._baseHorizontalLineView);
 		}
 
@@ -383,36 +398,23 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public priceAxisViews(pane: Pane, priceScale: PriceScale): ReadonlyArray<IPriceAxisView> {
-		return this._priceAxisViews;
+		const result = (priceScale === this._priceScale || this._isOverlay()) ? [...this._priceAxisViews] : [];
+		for (const customPriceLine of this._customPriceLines) {
+			result.push(customPriceLine.priceAxisView());
+		}
+		return result;
 	}
 
-	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfo | null {
-		if (!isInteger(startTimePoint) || !isInteger(endTimePoint) || this.data().isEmpty()) {
-			return null;
+	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
+		if (this._options.autoscaleInfoProvider !== undefined) {
+			const autoscaleInfo = this._options.autoscaleInfoProvider(() => {
+				const res = this._autoscaleInfoImpl(startTimePoint, endTimePoint);
+				return (res === null) ? null : res.toRaw();
+			});
+
+			return AutoscaleInfoImpl.fromRaw(autoscaleInfo);
 		}
-
-		// TODO: refactor this
-		// series data is strongly hardcoded to keep bars
-		const priceSource = (this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'Histogram') ? 'close' : null;
-		let barsMinMax: MinMax | null;
-		if (priceSource !== null) {
-			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: priceSource, offset: 0 }]);
-		} else {
-			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: 'low', offset: 0 }, { name: 'high', offset: 0 }]);
-		}
-
-		let range = barsMinMax !== null ? new PriceRange(barsMinMax.min, barsMinMax.max) : null;
-
-		if (this.seriesType() === 'Histogram') {
-			const base = (this._options as HistogramStyleOptions).base;
-			const rangeWithBase = new PriceRange(base, base);
-			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
-		}
-
-		return {
-			priceRange: range,
-			margins: this._markersPaneView.autoScaleMargins(),
-		};
+		return this._autoscaleInfoImpl(startTimePoint, endTimePoint);
 	}
 
 	public minMove(): number {
@@ -475,6 +477,37 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options.title;
 	}
 
+	private _isOverlay(): boolean {
+		const priceScale = this.priceScale();
+		return !isDefaultPriceScale(priceScale.id());
+	}
+
+	private _autoscaleInfoImpl(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
+		if (!isInteger(startTimePoint) || !isInteger(endTimePoint) || this.data().isEmpty()) {
+			return null;
+		}
+
+		// TODO: refactor this
+		// series data is strongly hardcoded to keep bars
+		const priceSource = (this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'Histogram') ? 'close' : null;
+		let barsMinMax: MinMax | null;
+		if (priceSource !== null) {
+			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: priceSource, offset: 0 }]);
+		} else {
+			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: 'low', offset: 0 }, { name: 'high', offset: 0 }]);
+		}
+
+		let range = barsMinMax !== null ? new PriceRangeImpl(barsMinMax.min, barsMinMax.max) : null;
+
+		if (this.seriesType() === 'Histogram') {
+			const base = (this._options as HistogramStyleOptions).base;
+			const rangeWithBase = new PriceRangeImpl(base, base);
+			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
+		}
+
+		return new AutoscaleInfoImpl(range,	this._markersPaneView.autoScaleMargins());
+	}
+
 	private _markerRadius(): number {
 		switch (this._seriesType) {
 			case 'Line':
@@ -522,13 +555,20 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	private _recalculateMarkers(): void {
 		const timeScalePoints = this.model().timeScale().points();
-		this._indexedMarkers = this._markers.map((marker: SeriesMarker<TimePoint>, index: number) => ({
+		if (timeScalePoints.size() === 0) {
+			this._indexedMarkers = [];
+			return;
+		}
+
+		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<TimePoint>, index: number) => ({
 			time: ensureNotNull(timeScalePoints.indexOf(marker.time.timestamp, true)),
 			position: marker.position,
 			shape: marker.shape,
 			color: marker.color,
 			id: marker.id,
 			internalId: index,
+			text: marker.text,
+			size: marker.size,
 		}));
 	}
 

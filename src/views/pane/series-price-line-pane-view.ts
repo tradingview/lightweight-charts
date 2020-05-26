@@ -1,4 +1,5 @@
 import { Series } from '../../model/series';
+import { PriceLineSource } from '../../model/series-options';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';
 
@@ -7,25 +8,26 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 		super(series);
 	}
 
-	protected _updateImpl(): void {
-		this._lineRendererData.visible = false;
+	protected _updateImpl(height: number, width: number): void {
+		const data = this._lineRendererData;
+		data.visible = false;
 
 		const seriesOptions = this._series.options();
 		if (!seriesOptions.priceLineVisible) {
 			return;
 		}
 
-		const data = this._series.lastValueData(undefined, true);
-		if (data.noData) {
+		const lastValueData = this._series.lastValueData(undefined, seriesOptions.priceLineSource === PriceLineSource.LastBar);
+		if (lastValueData.noData) {
 			return;
 		}
 
-		this._lineRendererData.visible = true;
-		this._lineRendererData.y = data.coordinate;
-		this._lineRendererData.color = this._series.priceLineColor(data.color);
-		this._lineRendererData.width = this._model.timeScale().width();
-		this._lineRendererData.height = this._series.priceScale().height();
-		this._lineRendererData.lineWidth = seriesOptions.priceLineWidth;
-		this._lineRendererData.lineStyle = seriesOptions.priceLineStyle;
+		data.visible = true;
+		data.y = lastValueData.coordinate;
+		data.color = this._series.priceLineColor(lastValueData.color);
+		data.width = width;
+		data.height = height;
+		data.lineWidth = seriesOptions.priceLineWidth;
+		data.lineStyle = seriesOptions.priceLineStyle;
 	}
 }
