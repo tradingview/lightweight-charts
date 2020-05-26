@@ -143,6 +143,28 @@ Automatically calculates the visible range to fit all series data.
 chart.timeScale().fitContent();
 ```
 
+### timeToCoordinate
+
+Converts a time to local `x` coordinate.
+The argument is a [Time](./time.md) value needs to be converted to coordinate.
+
+Returns `x` coordinate of a bar with passed time or `null` if no bar found.
+
+```javascript
+chart.timeScale().timeToCoordinate('1990-04-24');
+```
+
+### coordinateToTime
+
+Converts `x` coordinate to [Time](./time.md).
+The argument is a `x` coordinate needs to be converted to a time.
+
+Returns the [Time](./time.md) of a bar that placed on passed coordinate or `null` if no bar found at this coordinate.
+
+```javascript
+chart.timeScale().coordinateToTime(42);
+```
+
 ### applyOptions()
 
 Applies new options to the time scale. The argument is an object with options that should be modified.

@@ -1,5 +1,6 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { Coordinate } from '../model/coordinate';
 import { LogicalRange, Range } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
 
@@ -64,6 +65,20 @@ export interface ITimeScaleApi {
 	 * This is a momentary operation.
 	 */
 	fitContent(): void;
+
+	/**
+	 * Converts a time to local x coordinate.
+	 * @param time - time needs to be converted
+	 * @returns x coordinate of that time or `null` if no time found on time scale
+	 */
+	timeToCoordinate(time: Time): Coordinate | null;
+
+	/**
+	 * Converts a coordinate to time.
+	 * @param x - coordinate needs to be converted
+	 * @returns the time of a bar that placed on that coordinate or `null` if no bar found at this coordinate
+	 */
+	coordinateToTime(x: number): Time | null;
 
 	/**
 	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
