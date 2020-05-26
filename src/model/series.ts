@@ -284,7 +284,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public setMarkers(data: SeriesMarker<TimePoint>[]): void {
-		this._markers = data.map((item: SeriesMarker<TimePoint>) => ({ ...item }));
+		this._markers = data.map<SeriesMarker<TimePoint>>((item: SeriesMarker<TimePoint>) => ({ ...item }));
 		this._recalculateMarkers();
 		const sourcePane = this.model().paneForSource(this);
 		this._markersPaneView.update('data');
@@ -564,7 +564,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			return;
 		}
 
-		this._indexedMarkers = this._markers.map((marker: SeriesMarker<TimePoint>, index: number) => ({
+		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<TimePoint>, index: number) => ({
 			time: ensureNotNull(timeScalePoints.indexOf(marker.time.timestamp, true)),
 			position: marker.position,
 			shape: marker.shape,

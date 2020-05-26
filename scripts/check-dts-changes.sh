@@ -23,6 +23,8 @@ function generate_dts_for_rev {
   npm install
 
   print_step "Generate dts to $dts_filename"
+  npm run clean
+  npm run tsc
   npm run bundle-dts
   mv ./dist/typings.d.ts $dts_filename
 }

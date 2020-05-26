@@ -56,7 +56,7 @@
     "rollup-plugin-replace": "~2.2.0",
     "rollup-plugin-terser": "~5.3.0",
     "ts-node": "~8.10.0",
-    "ts-transformer-minify-privates": "~0.3.0",
+    "ts-transformer-properties-rename": "~0.1.0",
     "ts-transformer-strip-const-enums": "~1.0.1",
     "tslib": "1.12.0",
     "tslint": "6.1.1",
@@ -72,10 +72,9 @@
     "install-hooks": "node scripts/githooks/install.js",
     "clean": "rimraf lib/ dist/",
     "bundle-dts": "tsc --noEmit --allowJs dts-config.js && dts-bundle-generator --config dts-config.js",
-    "tsc": "ttsc -b src/tsconfig.composite.json",
+    "tsc": "ttsc -p tsconfig.prod.json",
     "tsc-watch": "npm run tsc -- --watch --preserveWatchOutput",
-    "tsc-all": "ttsc -b tsconfig.composite.json",
-    "tsc-all-watch": "npm run tsc-all -- --watch --preserveWatchOutput",
+    "tsc-verify": "tsc -b tsconfig.composite.json",
     "lint": "npm-run-all -p lint:**",
     "lint:eslint": "eslint --format=unix --ext .js ./",
     "lint:tslint": "tslint --config tslint.json --project tsconfig.json",
@@ -87,7 +86,7 @@
     "build:watch": "npm-run-all tsc -p tsc-watch rollup-watch",
     "build:prod": "cross-env NODE_ENV=production npm run build",
     "codechecks": "codechecks",
-    "verify": "npm-run-all clean -p tsc-all lint check-markdown-links -s build:prod test codechecks",
+    "verify": "npm-run-all clean -p lint check-markdown-links build:prod -p tsc-verify test codechecks",
     "test": "mocha tests/unittests/**/*.spec.ts"
   }
 }

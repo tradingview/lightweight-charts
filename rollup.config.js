@@ -50,7 +50,7 @@ function getConfig(inputFile, type, isProd) {
 				mangle: {
 					module: (type === 'module'),
 					properties: {
-						regex: /^_private_/,
+						regex: /^_(private|internal)_/,
 					},
 				},
 			}),
@@ -62,14 +62,14 @@ function getConfig(inputFile, type, isProd) {
 }
 
 const configs = [
-	getConfig('./lib/src/index.js', 'module', false),
-	getConfig('./lib/src/standalone.js', 'standalone', false),
+	getConfig('./lib/prod/src/index.js', 'module', false),
+	getConfig('./lib/prod/src/standalone.js', 'standalone', false),
 ];
 
 if (process.env.NODE_ENV === 'production') {
 	configs.push(
-		getConfig('./lib/src/index.js', 'module', true),
-		getConfig('./lib/src/standalone.js', 'standalone', true)
+		getConfig('./lib/prod/src/index.js', 'module', true),
+		getConfig('./lib/prod/src/standalone.js', 'standalone', true)
 	);
 }
 
