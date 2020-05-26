@@ -13,7 +13,17 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 	layout: layoutOptionsDefaults,
 	crosshair: crosshairOptionsDefaults,
 	grid: gridOptionsDefaults,
-	priceScale: priceScaleOptionsDefaults,
+	overlayPriceScales: {
+		...priceScaleOptionsDefaults,
+	},
+	leftPriceScale: {
+		...priceScaleOptionsDefaults,
+		visible: false,
+	},
+	rightPriceScale: {
+		...priceScaleOptionsDefaults,
+		visible: true,
+	},
 	timeScale: timeScaleOptionsDefaults,
 	watermark: watermarkOptionsDefaults,
 	localization: {

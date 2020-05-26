@@ -1,7 +1,7 @@
 import { ensureNever } from '../../helpers/assertions';
 import { isNumber } from '../../helpers/strict-type-checks';
 
-import { AutoScaleMargins } from '../../model/autoscale-info';
+import { AutoScaleMargins } from '../../model/autoscale-info-impl';
 import { BarPrice, BarPrices } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
@@ -167,7 +167,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		const layoutOptions = this._model.options().layout;
 
 		this._data.visibleRange = null;
-		const visibleBars = timeScale.visibleBars();
+		const visibleBars = timeScale.visibleStrictRange();
 		if (visibleBars === null) {
 			return;
 		}

@@ -1,7 +1,7 @@
 import { log10 } from '../helpers/mathex';
 
 import { Coordinate } from './coordinate';
-import { PriceRange } from './price-range';
+import { PriceRangeImpl } from './price-range-impl';
 
 const enum Constants {
 	LogicalOffset = 4,
@@ -21,10 +21,10 @@ export function toPercent(value: number, baseValue: number): Coordinate {
 	return (baseValue < 0 ? -result : result) as Coordinate;
 }
 
-export function toPercentRange(priceRange: PriceRange, baseValue: number): PriceRange {
+export function toPercentRange(priceRange: PriceRangeImpl, baseValue: number): PriceRangeImpl {
 	const minPercent = toPercent(priceRange.minValue(), baseValue);
 	const maxPercent = toPercent(priceRange.maxValue(), baseValue);
-	return new PriceRange(minPercent, maxPercent);
+	return new PriceRangeImpl(minPercent, maxPercent);
 }
 
 export function fromIndexedTo100(value: number, baseValue: number): number {
@@ -41,10 +41,10 @@ export function toIndexedTo100(value: number, baseValue: number): Coordinate {
 	return (baseValue < 0 ? -result : result) as Coordinate;
 }
 
-export function toIndexedTo100Range(priceRange: PriceRange, baseValue: number): PriceRange {
+export function toIndexedTo100Range(priceRange: PriceRangeImpl, baseValue: number): PriceRangeImpl {
 	const minPercent = toIndexedTo100(priceRange.minValue(), baseValue);
 	const maxPercent = toIndexedTo100(priceRange.maxValue(), baseValue);
-	return new PriceRange(minPercent, maxPercent);
+	return new PriceRangeImpl(minPercent, maxPercent);
 }
 
 export function toLog(price: number): Coordinate {
@@ -67,7 +67,7 @@ export function fromLog(logical: number): number {
 	return (logical < 0) ? -res : res;
 }
 
-export function convertPriceRangeToLog(priceRange: PriceRange | null): PriceRange | null {
+export function convertPriceRangeToLog(priceRange: PriceRangeImpl | null): PriceRangeImpl | null {
 	if (priceRange === null) {
 		return null;
 	}
@@ -75,10 +75,10 @@ export function convertPriceRangeToLog(priceRange: PriceRange | null): PriceRang
 	const min = toLog(priceRange.minValue());
 	const max = toLog(priceRange.maxValue());
 
-	return new PriceRange(min, max);
+	return new PriceRangeImpl(min, max);
 }
 
-export function canConvertPriceRangeFromLog(priceRange: PriceRange | null): boolean {
+export function canConvertPriceRangeFromLog(priceRange: PriceRangeImpl | null): boolean {
 	if (priceRange === null) {
 		return false;
 	}
@@ -89,7 +89,7 @@ export function canConvertPriceRangeFromLog(priceRange: PriceRange | null): bool
 	return isFinite(min) && isFinite(max);
 }
 
-export function convertPriceRangeFromLog(priceRange: PriceRange | null): PriceRange | null {
+export function convertPriceRangeFromLog(priceRange: PriceRangeImpl | null): PriceRangeImpl | null {
 	if (priceRange === null) {
 		return null;
 	}
@@ -97,5 +97,5 @@ export function convertPriceRangeFromLog(priceRange: PriceRange | null): PriceRa
 	const min = fromLog(priceRange.minValue());
 	const max = fromLog(priceRange.maxValue());
 
-	return new PriceRange(min, max);
+	return new PriceRangeImpl(min, max);
 }

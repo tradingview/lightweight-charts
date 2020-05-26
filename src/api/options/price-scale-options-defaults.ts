@@ -5,10 +5,10 @@ export const priceScaleOptionsDefaults: PriceScaleOptions = {
 	mode: PriceScaleMode.Normal,
 	invertScale: false,
 	alignLabels: true,
-	position: 'right',
 	borderVisible: true,
 	borderColor: '#2B2B43',
 	entireTextOnly: false,
+	visible: false,
 	scaleMargins: {
 		bottom: 0.1,
 		top: 0.2,

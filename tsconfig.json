@@ -2,6 +2,7 @@
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
 		"noEmit": true,
+		"stripInternal": true,
 	},
 	"include": [
 		"src/**/*.ts",

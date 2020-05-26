@@ -10,6 +10,7 @@ import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { InvalidateMask, InvalidationLevel } from '../model/invalidate-mask';
 import { Point } from '../model/point';
+import { PriceAxisPosition } from '../model/price-scale';
 import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
@@ -34,10 +35,10 @@ export class ChartWidget implements IDestroyable {
 	private _paneSeparators: PaneSeparator[] = [];
 	private readonly _model: ChartModel;
 	private _drawRafId: number = 0;
-	private readonly _priceAxisWidthChanged: Delegate<number> = new Delegate();
 	private _height: number = 0;
 	private _width: number = 0;
-	private _priceAxisWidth: number = 0;
+	private _leftPriceAxisWidth: number = 0;
+	private _rightPriceAxisWidth: number = 0;
 	private _element: HTMLElement;
 	private readonly _tableElement: HTMLElement;
 	private _timeAxisWidget: TimeAxisWidget;
@@ -75,19 +76,20 @@ export class ChartWidget implements IDestroyable {
 		let width = this._options.width;
 		let height = this._options.height;
 
-		if (width === 0 && height === 0) {
+		if (width === 0 || height === 0) {
 			const containerRect = container.getBoundingClientRect();
 			// TODO: Fix it better
 			// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
 			// For chart widget we decreases because we must be inside container.
 			// For time axis this is not important, since it just affects space for pane widgets
-			width = Math.floor(containerRect.width);
-			if (width % 2) {
-				width -= 1;
+			if (width === 0) {
+				width = Math.floor(containerRect.width);
+				width -= width % 2;
 			}
-			height = Math.floor(containerRect.height);
-			if (height % 2) {
-				height -= 1;
+
+			if (height === 0) {
+				height = Math.floor(containerRect.height);
+				height -= height % 2;
 			}
 		}
 
@@ -230,23 +232,27 @@ export class ChartWidget implements IDestroyable {
 			let targetX = 0;
 			let targetY = 0;
 
-			const drawPriceAxises = () => {
+			const drawPriceAxises = (position: PriceAxisPosition) => {
 				for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
 					const paneWidget = this._paneWidgets[paneIndex];
 					const paneWidgetHeight = paneWidget.getSize().h;
-					const priceAxisWidget = ensureNotNull(paneWidget.priceAxisWidget());
+					const priceAxisWidget = ensureNotNull(position === 'left' ? paneWidget.leftPriceAxisWidget() : paneWidget.rightPriceAxisWidget());
 					const image = priceAxisWidget.getImage();
 					ctx.drawImage(image, targetX, targetY, priceAxisWidget.getWidth(), paneWidgetHeight);
 					targetY += paneWidgetHeight;
 					if (paneIndex < this._paneWidgets.length - 1) {
-						targetY += SEPARATOR_HEIGHT;
+						const separator = this._paneSeparators[paneIndex];
+						const separatorSize = separator.getSize();
+						const separatorImage = separator.getImage();
+						ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
+						targetY += separatorSize.h;
 					}
 				}
 			};
 			// draw left price scale if exists
-			if (this._options.priceScale.position === 'left') {
-				drawPriceAxises();
-				targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
+			if (this._isLeftAxisVisible()) {
+				drawPriceAxises('left');
+				targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getWidth();
 			}
 			targetY = 0;
 			for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
@@ -264,12 +270,12 @@ export class ChartWidget implements IDestroyable {
 				}
 			}
 			targetX += firstPane.getSize().w;
-			if (this._options.priceScale.position === 'right') {
+			if (this._isRightAxisVisible()) {
 				targetY = 0;
-				drawPriceAxises();
+				drawPriceAxises('right');
 			}
-			const drawStub = () => {
-				const stub = ensureNotNull(this._timeAxisWidget.stub());
+			const drawStub = (position: PriceAxisPosition) => {
+				const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
 				const size = stub.getSize();
 				const image = stub.getImage();
 				ctx.drawImage(image, targetX, targetY, size.w, size.h);
@@ -277,16 +283,16 @@ export class ChartWidget implements IDestroyable {
 			// draw time scale
 			if (this._options.timeScale.visible) {
 				targetX = 0;
-				if (this._options.priceScale.position === 'left') {
-					drawStub();
-					targetX = ensureNotNull(firstPane.priceAxisWidget()).getWidth();
+				if (this._isLeftAxisVisible()) {
+					drawStub('left');
+					targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getWidth();
 				}
 				const size = this._timeAxisWidget.getSize();
 				const image = this._timeAxisWidget.getImage();
 				ctx.drawImage(image, targetX, targetY, size.w, size.h);
-				if (this._options.priceScale.position === 'right') {
+				if (this._isRightAxisVisible()) {
 					targetX = firstPane.getSize().w;
-					drawStub();
+					drawStub('right');
 					ctx.restore();
 				}
 			}
@@ -294,13 +300,18 @@ export class ChartWidget implements IDestroyable {
 		return targetCanvas;
 	}
 
+	// tslint:disable-next-line:cyclomatic-complexity
 	private _adjustSizeImpl(): void {
 		let totalStretch = 0;
-		let priceAxisWidth = 0;
+		let leftPriceAxisWidth = 0;
+		let rightPriceAxisWidth = 0;
 
 		for (const paneWidget of this._paneWidgets) {
-			if (this._options.priceScale.position !== 'none') {
-				priceAxisWidth = Math.max(priceAxisWidth, ensureNotNull(paneWidget.priceAxisWidget()).optimalWidth());
+			if (this._isLeftAxisVisible()) {
+				leftPriceAxisWidth = Math.max(leftPriceAxisWidth, ensureNotNull(paneWidget.leftPriceAxisWidget()).optimalWidth());
+			}
+			if (this._isRightAxisVisible()) {
+				rightPriceAxisWidth = Math.max(rightPriceAxisWidth, ensureNotNull(paneWidget.rightPriceAxisWidget()).optimalWidth());
 			}
 
 			totalStretch += paneWidget.stretchFactor();
@@ -309,7 +320,7 @@ export class ChartWidget implements IDestroyable {
 		const width = this._width;
 		const height = this._height;
 
-		const paneWidth = Math.max(width - priceAxisWidth, 0);
+		const paneWidth = Math.max(width - leftPriceAxisWidth - rightPriceAxisWidth, 0);
 
 		const separatorCount = this._paneSeparators.length;
 		const separatorHeight = SEPARATOR_HEIGHT;
@@ -343,8 +354,11 @@ export class ChartWidget implements IDestroyable {
 			accumulatedHeight += paneHeight;
 
 			paneWidget.setSize(new Size(paneWidth, paneHeight));
-			if (this._options.priceScale.position !== 'none') {
-				paneWidget.setPriceAxisSize(priceAxisWidth);
+			if (this._isLeftAxisVisible()) {
+				paneWidget.setPriceAxisSize(leftPriceAxisWidth, 'left');
+			}
+			if (this._isRightAxisVisible()) {
+				paneWidget.setPriceAxisSize(rightPriceAxisWidth, 'right');
 			}
 
 			if (paneWidget.state()) {
@@ -354,13 +368,16 @@ export class ChartWidget implements IDestroyable {
 
 		this._timeAxisWidget.setSizes(
 			new Size(paneWidth, timeAxisHeight),
-			priceAxisWidth
+			leftPriceAxisWidth,
+			rightPriceAxisWidth
 		);
 
 		this._model.setWidth(paneWidth);
-		if (this._priceAxisWidth !== priceAxisWidth) {
-			this._priceAxisWidth = priceAxisWidth;
-			this._priceAxisWidthChanged.fire(priceAxisWidth);
+		if (this._leftPriceAxisWidth !== leftPriceAxisWidth) {
+			this._leftPriceAxisWidth = leftPriceAxisWidth;
+		}
+		if (this._rightPriceAxisWidth !== rightPriceAxisWidth) {
+			this._rightPriceAxisWidth = rightPriceAxisWidth;
 		}
 	}
 
@@ -426,9 +443,9 @@ export class ChartWidget implements IDestroyable {
 				this._model.timeScale().fitContent();
 			}
 
-			const targetIndexRange = invalidateMask.getTargetLogicalRange();
-			if (targetIndexRange !== null) {
-				this._model.timeScale().setLogicalIndexRange(targetIndexRange);
+			const logicalRange = invalidateMask.getLogicalRange();
+			if (logicalRange !== null) {
+				this._model.timeScale().setLogicalRange(logicalRange);
 			}
 
 			this._timeAxisWidget.update();
@@ -567,5 +584,13 @@ export class ChartWidget implements IDestroyable {
 	private _updateTimeAxisVisibility(): void {
 		const display = this._options.timeScale.visible ? '' : 'none';
 		this._timeAxisWidget.getElement().style.display = display;
+	}
+
+	private _isLeftAxisVisible(): boolean {
+		return this._options.leftPriceScale.visible;
+	}
+
+	private _isRightAxisVisible(): boolean {
+		return this._options.rightPriceScale.visible;
 	}
 }

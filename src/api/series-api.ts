@@ -1,3 +1,4 @@
+import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clone, merge } from '../helpers/strict-type-checks';
 
@@ -5,30 +6,45 @@ import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
-import { Series } from '../model/series';
+import { RangeImpl } from '../model/range-impl';
+import { Series, SeriesPartialOptionsInternal } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { TimePointIndex } from '../model/time-data';
+import { LogicalRange, TimePointIndex } from '../model/time-data';
+import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
+import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
 import { IPriceLine } from './iprice-line';
+import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
-import { LogicalRange } from './itime-scale-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
+
+function migrateOptions<TSeriesType extends SeriesType>(options: SeriesPartialOptionsMap[TSeriesType]): SeriesPartialOptionsInternal<TSeriesType> {
+	// tslint:disable-next-line:deprecation
+	const { overlay, ...res } = options;
+	if (overlay) {
+		res.priceScaleId = '';
+	}
+	return res;
+}
 
 export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType>, IDestroyable {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>;
 
-	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>) {
+	private readonly _priceScaleApiProvider: IPriceScaleApiProvider;
+
+	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>, priceScaleApiProvider: IPriceScaleApiProvider) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
+		this._priceScaleApiProvider = priceScaleApiProvider;
 	}
 
 	public destroy(): void {
@@ -61,33 +77,56 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
 	}
 
-	public barsInLogicalRange(range: LogicalRange): BarsInfo | null {
-		const rangeStart = Math.round(range.from) as TimePointIndex;
-		const rangeEnd = Math.round(range.to) as TimePointIndex;
+	// tslint:disable-next-line:cyclomatic-complexity
+	public barsInLogicalRange(range: LogicalRange | null): BarsInfo | null {
+		if (range === null) {
+			return null;
+		}
+
+		// we use TimeScaleVisibleRange here to convert LogicalRange to strict range properly
+		const correctedRange = new TimeScaleVisibleRange(
+			new RangeImpl(range.from, range.to)
+		).strictRange() as RangeImpl<TimePointIndex>;
 
 		const bars = this._series.data().bars();
+		if (bars.isEmpty()) {
+			return null;
+		}
 
-		const firstBar = bars.search(rangeStart, PlotRowSearchMode.NearestRight);
-		const lastBar = bars.search(rangeEnd, PlotRowSearchMode.NearestLeft);
-		const firstIndex = bars.firstIndex() || 0;
-		const lastIndex = bars.lastIndex() || 0;
+		const dataFirstBarInRange = bars.search(correctedRange.left(), PlotRowSearchMode.NearestRight);
+		const dataLastBarInRange = bars.search(correctedRange.right(), PlotRowSearchMode.NearestLeft);
 
-		const barsBefore = (null !== firstBar)
-			? firstBar.index - firstIndex
-			: Math.min(lastIndex - firstIndex + 1, rangeStart - firstIndex)
-		;
+		const dataFirstIndex = ensureNotNull(bars.firstIndex());
+		const dataLastIndex = ensureNotNull(bars.lastIndex());
 
-		const barsAfter = (null !== lastBar)
-			? Math.min(lastIndex - firstIndex + 1, lastIndex - lastBar.index)
-			: ((rangeEnd > lastIndex) ? (lastIndex - rangeEnd) : lastIndex - firstIndex + 1)
-		;
+		// this means that we request data in the data gap
+		// e.g. let's say we have series with data [0..10, 30..60]
+		// and we request bars info in range [15, 25]
+		// thus, dataFirstBarInRange will be with index 30 and dataLastBarInRange with 10
+		if (dataFirstBarInRange !== null && dataLastBarInRange !== null && dataFirstBarInRange.index > dataLastBarInRange.index) {
+			return {
+				barsBefore: range.from - dataFirstIndex,
+				barsAfter: dataLastIndex - range.to,
+			};
+		}
 
-		return {
-			from: (firstBar && lastBar) ? firstBar.time : undefined,
-			to: (firstBar && lastBar) ? lastBar.time : undefined,
-			barsBefore: barsBefore as TimePointIndex,
-			barsAfter: barsAfter as TimePointIndex,
-		};
+		const barsBefore = (dataFirstBarInRange === null || dataFirstBarInRange.index === dataFirstIndex)
+			? range.from - dataFirstIndex
+			: dataFirstBarInRange.index - dataFirstIndex;
+
+		const barsAfter = (dataLastBarInRange === null || dataLastBarInRange.index === dataLastIndex)
+			? dataLastIndex - range.to
+			: dataLastIndex - dataLastBarInRange.index;
+
+		const result: BarsInfo = { barsBefore, barsAfter };
+
+		// actually they can't exist separately
+		if (dataFirstBarInRange !== null && dataLastBarInRange !== null) {
+			result.from = dataFirstBarInRange.time.businessDay || dataFirstBarInRange.time.timestamp;
+			result.to = dataLastBarInRange.time.businessDay || dataLastBarInRange.time.timestamp;
+		}
+
+		return result;
 	}
 
 	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {
@@ -107,11 +146,16 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {
-		this._series.applyOptions(options);
+		const migratedOptions = migrateOptions(options);
+		this._series.applyOptions(migratedOptions);
 	}
 
 	public options(): Readonly<SeriesOptionsMap[TSeriesType]> {
 		return clone(this._series.options());
+	}
+
+	public priceScale(): IPriceScaleApi {
+		return this._priceScaleApiProvider.priceScale(this._series.priceScale().id());
 	}
 
 	public createPriceLine(options: PriceLineOptions): IPriceLine {

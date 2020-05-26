@@ -46,8 +46,11 @@ export class PaneRendererArea extends ScaledRenderer {
 
 		walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
 
-		ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
-		ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+		if (this._data.visibleRange.to > this._data.visibleRange.from) {
+			ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
+			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+		}
+
 		ctx.closePath();
 
 		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);

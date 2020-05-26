@@ -1,18 +1,11 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { LogicalRange, Range } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
 
-import { Logical, Time } from './data-consumer';
+import { Time } from './data-consumer';
 
-export interface TimeRange {
-	from: Time;
-	to: Time;
-}
-
-export interface LogicalRange {
-	from: Logical;
-	to: Logical;
-}
+export type TimeRange = Range<Time>;
 
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null) => void;
@@ -39,7 +32,7 @@ export interface ITimeScaleApi {
 
 	/**
 	 * Returns current visible time range of the chart
-	 * @returns - visible range or null if the chart has no data at all
+	 * @returns visible range or null if the chart has no data at all
 	 */
 	getVisibleRange(): TimeRange | null;
 
@@ -51,7 +44,7 @@ export interface ITimeScaleApi {
 
 	/**
 	 * Returns the currently visible logical range of data.
-	 * @returns - visible range or null if the chart has no data at all
+	 * @returns visible range or null if the chart has no data at all
 	 */
 	getVisibleLogicalRange(): LogicalRange | null;
 
@@ -104,7 +97,7 @@ export interface ITimeScaleApi {
 
 	/**
 	 * Returns current options
-	 * @returns - currently applied options
+	 * @returns currently applied options
 	 */
 	options(): Readonly<TimeScaleOptions>;
 }
