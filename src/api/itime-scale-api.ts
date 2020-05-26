@@ -76,7 +76,7 @@ export interface ITimeScaleApi {
 	/**
 	 * Converts a coordinate to time.
 	 * @param x - coordinate needs to be converted
-	 * @returns the time of a bar that placed on that coordinate or `null` if no bar found at this coordinate
+	 * @returns time of a bar that is located on that coordinate or `null` if there are no bars found on that coordinate
 	 */
 	coordinateToTime(x: number): Time | null;
 
