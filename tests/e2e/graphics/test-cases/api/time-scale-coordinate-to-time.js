@@ -23,7 +23,7 @@ function runTestCase(container) {
 
 	series.setData(data);
 
-	var timeScale = window.timeScale = chart.timeScale();
+	var timeScale = chart.timeScale();
 	timeScale.setVisibleLogicalRange({ from: 0.5, to: (data.length - 1) - 0.5 });
 
 	return new Promise((resolve) => {
