@@ -11,7 +11,6 @@ import { LayoutOptions } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
-import { TimeAxisView } from '../views/time-axis/time-axis-view';
 
 import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
@@ -255,7 +254,9 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._drawBorder(ctx, this._canvasBinding.pixelRatio);
 
 			this._drawTickMarks(ctx, this._canvasBinding.pixelRatio);
-			this._drawBackLabels(ctx, this._canvasBinding.pixelRatio);
+			// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
+			// so let's don't call this code at all for now
+			// this._drawLabels(this._chart.model().dataSources(), ctx, pixelRatio);
 
 			if (this._leftStub !== null) {
 				this._leftStub.paint(type);
@@ -266,7 +267,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		const topCtx = getContext2D(this._topCanvasBinding.canvas);
-		this._drawCrosshairLabel(topCtx, this._topCanvasBinding.pixelRatio);
+		const pixelRatio = this._topCanvasBinding.pixelRatio;
+
+		topCtx.clearRect(0, 0, Math.ceil(this._size.w * pixelRatio), Math.ceil(this._size.h * pixelRatio));
+		this._drawLabels([this._chart.model().crosshairSource()], topCtx, pixelRatio);
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
@@ -372,51 +376,15 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		});
 	}
 
-	private _drawBackLabels(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		ctx.save();
-		const topLevelSources: Set<IDataSource> = new Set();
-
-		const model = this._chart.model();
-		const sources = model.dataSources();
-		topLevelSources.add(model.crosshairSource());
-
+	private _drawLabels(sources: readonly IDataSource[], ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const rendererOptions = this._getRendererOptions();
 		for (const source of sources) {
-			if (topLevelSources.has(source)) {
-				continue;
-			}
-
-			const views = source.timeAxisViews();
-			for (const view of views) {
+			for (const view of source.timeAxisViews()) {
+				ctx.save();
 				view.renderer().draw(ctx, rendererOptions, pixelRatio);
+				ctx.restore();
 			}
 		}
-
-		ctx.restore();
-	}
-
-	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		ctx.save();
-
-		ctx.clearRect(0, 0, Math.ceil(this._size.w * pixelRatio), Math.ceil(this._size.h * pixelRatio));
-		const model = this._chart.model();
-
-		const views: ReadonlyArray<TimeAxisView>[] = []; // array of arrays
-
-		const timeAxisViews = model.crosshairSource().timeAxisViews();
-		views.push(timeAxisViews);
-
-		const renderingOptions = this._getRendererOptions();
-
-		views.forEach((arr: ReadonlyArray<TimeAxisView>) => {
-			arr.forEach((view: TimeAxisView) => {
-				ctx.save();
-				view.renderer().draw(ctx, renderingOptions, pixelRatio);
-				ctx.restore();
-			});
-		});
-
-		ctx.restore();
 	}
 
 	private _backgroundColor(): string {

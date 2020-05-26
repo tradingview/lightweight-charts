@@ -10,6 +10,7 @@ import { ChartModel, HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
+import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
@@ -26,7 +27,7 @@ import { isMobile, mobileTouch } from './support-touch';
 const trackCrosshairOnlyAfterLongTap = isMobile;
 
 export interface HitTestResult {
-	source: IDataSource;
+	source: IPriceDataSource;
 	object?: HoveredObject;
 	view: IPaneView;
 }
@@ -462,9 +463,10 @@ export class PaneWidget implements IDestroyable {
 		this._paneCell.style.height = size.h + 'px';
 	}
 
-	public recalculatePriceScale(): void {
+	public recalculatePriceScales(): void {
 		const pane = ensureNotNull(this._state);
-		pane.recalculatePriceScale(pane.defaultPriceScale());
+		pane.recalculatePriceScale(pane.leftPriceScale());
+		pane.recalculatePriceScale(pane.rightPriceScale());
 
 		for (const source of pane.dataSources()) {
 			if (pane.isOverlay(source)) {
@@ -494,7 +496,7 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		if (type > InvalidationLevel.Cursor) {
-			this.recalculatePriceScale();
+			this.recalculatePriceScales();
 		}
 
 		if (this._leftPriceAxisWidget !== null) {
@@ -572,21 +574,8 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const state = ensureNotNull(this._state);
-
-		const paneViews = source.paneViews();
-		const height = state.height();
-		const width = state.width();
-
-		for (const paneView of paneViews) {
-			ctx.save();
-			const renderer = paneView.renderer(height, width);
-			if (renderer !== null) {
-				renderer.draw(ctx, pixelRatio, false);
-			}
-
-			ctx.restore();
-		}
+		this._drawSourceBackground(source, ctx, pixelRatio);
+		this._drawSource(source, ctx, pixelRatio);
 	}
 
 	private _drawCrosshair(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
@@ -596,16 +585,13 @@ export class PaneWidget implements IDestroyable {
 	private _drawSources(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
-		const crosshairSource = this._model().crosshairSource();
 
 		for (const source of sources) {
 			this._drawSourceBackground(source, ctx, pixelRatio);
 		}
 
 		for (const source of sources) {
-			if (source !== crosshairSource) {
-				this._drawSource(source, ctx, pixelRatio);
-			}
+			this._drawSource(source, ctx, pixelRatio);
 		}
 	}
 

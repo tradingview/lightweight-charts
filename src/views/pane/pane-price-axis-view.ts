@@ -1,5 +1,5 @@
 import { ChartModel } from '../../model/chart-model';
-import { IDataSource } from '../../model/idata-source';
+import { IPriceDataSource } from '../../model/iprice-data-source';
 import { TextWidthCache } from '../../model/text-width-cache';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { IPriceAxisViewRenderer, PriceAxisViewRendererOptions } from '../../renderers/iprice-axis-view-renderer';
@@ -42,12 +42,12 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 export class PanePriceAxisView implements IPaneView {
 	private _priceAxisView: IPriceAxisView;
 	private readonly _textWidthCache: TextWidthCache;
-	private readonly _dataSource: IDataSource;
+	private readonly _dataSource: IPriceDataSource;
 	private readonly _chartModel: ChartModel;
 	private readonly _renderer: PanePriceAxisViewRenderer;
 	private _fontSize: number;
 
-	public constructor(priceAxisView: IPriceAxisView, dataSource: IDataSource, chartModel: ChartModel) {
+	public constructor(priceAxisView: IPriceAxisView, dataSource: IPriceDataSource, chartModel: ChartModel) {
 		this._priceAxisView = priceAxisView;
 		this._textWidthCache = new TextWidthCache(50); // when should we clear cache?
 		this._dataSource = dataSource;

@@ -13,8 +13,8 @@ import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid, GridOptions } from './grid';
-import { IDataSource } from './idata-source';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
+import { IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
@@ -47,7 +47,7 @@ export interface HoveredObject {
 }
 
 export interface HoveredSource {
-	source: IDataSource;
+	source: IPriceDataSource;
 	object?: HoveredObject;
 }
 
@@ -141,7 +141,6 @@ export class ChartModel implements IDestroyable {
 
 		this.createPane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
-		this._panes[0].addDataSource(this._watermark, '');
 	}
 
 	public fullUpdate(): void {
@@ -152,7 +151,7 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Light));
 	}
 
-	public updateSource(source: IDataSource): void {
+	public updateSource(source: IPriceDataSource): void {
 		const inv = this._invalidationMaskForSource(source);
 		this._invalidate(inv);
 	}
@@ -430,10 +429,6 @@ export class ChartModel implements IDestroyable {
 		this.lightUpdate();
 	}
 
-	public dataSources(): ReadonlyArray<IDataSource> {
-		return this._panes.reduce((arr: IDataSource[], pane: Pane) => arr.concat(pane.dataSources()), []);
-	}
-
 	public serieses(): ReadonlyArray<Series> {
 		return this._serieses;
 	}
@@ -448,15 +443,12 @@ export class ChartModel implements IDestroyable {
 			index = Math.min(Math.max(visibleBars.left(), index), visibleBars.right()) as TimePointIndex;
 		}
 
-		const mainSource = pane.mainDataSource();
-		if (mainSource !== null) {
-			const priceScale = pane.defaultPriceScale();
-			const firstValue = priceScale.firstValue();
-			if (firstValue !== null) {
-				price = priceScale.coordinateToPrice(y, firstValue);
-			}
-			price = this._magnet.align(price, index, pane);
+		const priceScale = pane.defaultPriceScale();
+		const firstValue = priceScale.firstValue();
+		if (firstValue !== null) {
+			price = priceScale.coordinateToPrice(y, firstValue);
 		}
+		price = this._magnet.align(price, index, pane);
 
 		this._crosshair.setPosition(index, price, pane);
 
@@ -536,7 +528,7 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	public paneForSource(source: IDataSource): Pane | null {
+	public paneForSource(source: IPriceDataSource): Pane | null {
 		const pane = this._panes.find((p: Pane) => p.orderedSources().includes(source));
 		return pane === undefined ? null : pane;
 	}
@@ -640,7 +632,7 @@ export class ChartModel implements IDestroyable {
 		return inv;
 	}
 
-	private _invalidationMaskForSource(source: IDataSource, invalidateType?: InvalidationLevel): InvalidateMask {
+	private _invalidationMaskForSource(source: IPriceDataSource, invalidateType?: InvalidationLevel): InvalidateMask {
 		if (invalidateType === undefined) {
 			invalidateType = InvalidationLevel.Light;
 		}
