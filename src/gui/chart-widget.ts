@@ -300,6 +300,32 @@ export class ChartWidget implements IDestroyable {
 		return targetCanvas;
 	}
 
+	public getPriceAxisWidth(position: PriceAxisPosition): number {
+		if (position === 'none') {
+			return 0;
+		}
+
+		if (position === 'left' && !this._isLeftAxisVisible()) {
+			return 0;
+		}
+
+		if (position === 'right' && !this._isRightAxisVisible()) {
+			return 0;
+		}
+
+		if (this._paneWidgets.length === 0) {
+			return 0;
+		}
+
+		// we don't need to worry about exactly pane widget here
+		// because all pane widgets have the same width of price axis widget
+		// see _adjustSizeImpl
+		const priceAxisWidget = position === 'left'
+			? this._paneWidgets[0].leftPriceAxisWidget()
+			: this._paneWidgets[0].rightPriceAxisWidget();
+		return ensureNotNull(priceAxisWidget).getWidth();
+	}
+
 	// tslint:disable-next-line:cyclomatic-complexity
 	private _adjustSizeImpl(): void {
 		let totalStretch = 0;
