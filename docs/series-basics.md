@@ -387,7 +387,7 @@ barSeries.update({
 
 Allows to set/replace all existing series markers with new ones.
 
-An array of items is expected. Each item should contain the following fields:
+An array of items is expected. An array must be sorted ascending by `time`. Each item should contain the following fields:
 
 - `time` ([Time](./time.md)) - item time
 - `position` (`aboveBar` &#124; `belowBar` &#124; `inBar`) - item position
