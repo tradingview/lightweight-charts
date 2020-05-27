@@ -37,8 +37,19 @@ export interface HandleScrollOptions {
 export interface HandleScaleOptions {
 	mouseWheel: boolean;
 	pinch: boolean;
-	axisPressedMouseMove: boolean;
+	axisPressedMouseMove: AxisPressedMouseMoveOptions;
 	axisDoubleClickReset: boolean;
+}
+
+type HandleScaleOptionsInternal =
+	Omit<HandleScaleOptions, 'axisPressedMouseMove'>
+	& {
+		axisPressedMouseMove: AxisPressedMouseMoveOptions;
+	};
+
+export interface AxisPressedMouseMoveOptions {
+	time: boolean;
+	price: boolean;
 }
 
 export interface HoveredObject {
@@ -103,7 +114,7 @@ export type ChartOptionsInternal =
 	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale'>
 	& {
 		handleScroll: HandleScrollOptions;
-		handleScale: HandleScaleOptions;
+		handleScale: HandleScaleOptionsInternal;
 	};
 
 export class ChartModel implements IDestroyable {

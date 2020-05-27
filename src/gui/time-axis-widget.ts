@@ -139,7 +139,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		this._mouseDown = true;
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove) {
+		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -150,7 +150,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const model = this._chart.model();
 		if (!model.timeScale().isEmpty() && this._mouseDown) {
 			this._mouseDown = false;
-			if (this._chart.options().handleScale.axisPressedMouseMove) {
+			if (this._chart.options().handleScale.axisPressedMouseMove.time) {
 				model.endScaleTime();
 			}
 		}
@@ -158,7 +158,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 	public pressedMouseMoveEvent(event: TouchMouseEvent): void {
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove) {
+		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -168,7 +168,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	public mouseUpEvent(event: TouchMouseEvent): void {
 		this._mouseDown = false;
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() && !this._chart.options().handleScale.axisPressedMouseMove) {
+		if (model.timeScale().isEmpty() && !this._chart.options().handleScale.axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -182,7 +182,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	public mouseEnterEvent(e: TouchMouseEvent): void {
-		if (this._chart.model().options().handleScale.axisPressedMouseMove) {
+		if (this._chart.model().options().handleScale.axisPressedMouseMove.time) {
 			this._setCursor(CursorType.EwResize);
 		}
 	}

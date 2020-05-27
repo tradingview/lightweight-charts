@@ -318,12 +318,21 @@ You can also set `handleScroll` to `true` or `false` to enable or disable all th
 
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-|
-|`axisPressedMouseMove`|`boolean`|`true`|If true, axis scaling with left mouse button pressed is allowed|
+|`axisPressedMouseMove`|[`{ time, price }`](#axis-scaling-options)|`{ time: true, price: true }`|Sets time and price axis scaling with left mouse button pressed is allowed|
 |`axisDoubleClickReset`|`boolean`|`true`|If true, left mouse button double click axis resetting is allowed|
 |`mouseWheel`|`boolean`|`true`|If true, series scaling with a mouse wheel is enabled|
 |`pinch`|`boolean`|`true`|If true, series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
 
 You can also set `handleScale` to `true` or `false` to enable or disable all the above options.
+
+## Axis scaling options
+
+|Name                        |Type   |Default  |Description|
+|----------------------------|-------|---------|-|
+|`time`|`boolean`|`true`|If true, time axis scaling with left mouse button pressed is allowed|
+|`price`|`boolean`|`true`|If true, price axis scaling with left mouse button pressed is allowed|
+
+You can also set `axisPressedMouseMove` to `true` or `false` to enable or disable all the above options.
 
 ### An example of a scrolling/scaling customization
 

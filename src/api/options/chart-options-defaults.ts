@@ -37,7 +37,10 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 		vertTouchDrag: true,
 	},
 	handleScale: {
-		axisPressedMouseMove: true,
+		axisPressedMouseMove: {
+			time: true,
+			price: true,
+		},
 		axisDoubleClickReset: true,
 		mouseWheel: true,
 		pinch: true,
