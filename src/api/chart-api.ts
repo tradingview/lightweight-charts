@@ -6,7 +6,7 @@ import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
-import { ChartOptions, ChartOptionsInternal, HandleScaleOptions } from '../model/chart-model';
+import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
 import { Series } from '../model/series';
 import {
 	AreaSeriesOptions,
@@ -58,8 +58,8 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 }
 
 function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): void {
-	const handleScale = options.handleScale;
-	if (isBoolean(handleScale)) {
+	if (isBoolean(options.handleScale)) {
+		const handleScale = options.handleScale;
 		options.handleScale = {
 			axisDoubleClickReset: handleScale,
 			axisPressedMouseMove: {
@@ -69,16 +69,12 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 			mouseWheel: handleScale,
 			pinch: handleScale,
 		};
-	} else {
-		if (options.handleScale) {
-			const axisPressedMouseMove = (options.handleScale as HandleScaleOptions).axisPressedMouseMove;
-			if (isBoolean(axisPressedMouseMove)) {
-				(options.handleScale as HandleScaleOptions).axisPressedMouseMove = {
-					time: axisPressedMouseMove,
-					price: axisPressedMouseMove,
-				};
-			}
-		}
+	} else if (options.handleScale !== undefined && isBoolean(options.handleScale.axisPressedMouseMove)) {
+		const axisPressedMouseMove = options.handleScale.axisPressedMouseMove;
+		options.handleScale.axisPressedMouseMove = {
+			time: axisPressedMouseMove,
+			price: axisPressedMouseMove,
+		};
 	}
 
 	const handleScroll = options.handleScroll;

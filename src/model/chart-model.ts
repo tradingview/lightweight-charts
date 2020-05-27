@@ -37,7 +37,7 @@ export interface HandleScrollOptions {
 export interface HandleScaleOptions {
 	mouseWheel: boolean;
 	pinch: boolean;
-	axisPressedMouseMove: AxisPressedMouseMoveOptions;
+	axisPressedMouseMove: AxisPressedMouseMoveOptions | boolean;
 	axisDoubleClickReset: boolean;
 }
 
