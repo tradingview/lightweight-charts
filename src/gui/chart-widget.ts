@@ -104,13 +104,8 @@ export class ChartWidget implements IDestroyable {
 
 		container.appendChild(this._element);
 		this._updateTimeAxisVisibility();
-		this._model.timeScale().optionsApplied().subscribe(
-			() => {
-				this._updateTimeAxisVisibility();
-				this.adjustSize();
-			},
-			this
-		);
+		this._model.timeScale().optionsApplied().subscribe(this._model.fullUpdate.bind(this._model), this);
+		this._model.priceScalesOptionsChanged().subscribe(this._model.fullUpdate.bind(this._model), this);
 	}
 
 	public model(): ChartModel {
@@ -133,6 +128,7 @@ export class ChartWidget implements IDestroyable {
 
 		this._model.crosshairMoved().unsubscribeAll(this);
 		this._model.timeScale().optionsApplied().unsubscribeAll(this);
+		this._model.priceScalesOptionsChanged().unsubscribeAll(this);
 		this._model.destroy();
 
 		for (const paneWidget of this._paneWidgets) {
@@ -193,11 +189,6 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this._timeAxisWidget.paint(invalidateMask.fullInvalidation());
-	}
-
-	public adjustSize(): void {
-		this._adjustSizeImpl();
-		this._model.fullUpdate();
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
@@ -552,7 +543,7 @@ export class ChartWidget implements IDestroyable {
 			if (paneWidget.state() !== state) {
 				paneWidget.setState(state);
 			} else {
-				paneWidget.updatePriceAxisWidget();
+				paneWidget.updatePriceAxisWidgets();
 			}
 		}
 
