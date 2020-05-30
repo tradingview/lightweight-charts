@@ -60,7 +60,7 @@ Candlestick series interface can be customized using the following set of option
 - set initial options for candlestick series:
 
     ```javascript
-    const candlestickSeries = chart.addCandleSeries({
+    const candlestickSeries = chart.addCandlestickSeries({
         upColor: '#6495ED',
         downColor: '#FF6347',
         borderVisible: false,
