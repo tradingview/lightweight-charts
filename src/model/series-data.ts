@@ -24,28 +24,28 @@ export const enum SeriesPlotIndex {
 
 /** @public */
 const barFunctions = {
-	open: (bar: Bar['value']) => bar[SeriesPlotIndex.Open] as BarPrice,
+	open: (bar: BarValue) => bar[SeriesPlotIndex.Open] as BarPrice,
 
-	high: (bar: Bar['value']) => bar[SeriesPlotIndex.High] as BarPrice,
+	high: (bar: BarValue) => bar[SeriesPlotIndex.High] as BarPrice,
 
-	low: (bar: Bar['value']) => bar[SeriesPlotIndex.Low] as BarPrice,
+	low: (bar: BarValue) => bar[SeriesPlotIndex.Low] as BarPrice,
 
-	close: (bar: Bar['value']) => bar[SeriesPlotIndex.Close] as BarPrice,
+	close: (bar: BarValue) => bar[SeriesPlotIndex.Close] as BarPrice,
 
-	hl2: (bar: Bar['value']) =>
+	hl2: (bar: BarValue) =>
 		(
 			(bar[SeriesPlotIndex.High] as number) +
 			(bar[SeriesPlotIndex.Low] as number)
 		) / 2 as BarPrice,
 
-	hlc3: (bar: Bar['value']) =>
+	hlc3: (bar: BarValue) =>
 		(
 			(bar[SeriesPlotIndex.High] as number) +
 			(bar[SeriesPlotIndex.Low] as number) +
 			(bar[SeriesPlotIndex.Close] as number)
 		) / 3 as BarPrice,
 
-	ohlc4: (bar: Bar['value']) =>
+	ohlc4: (bar: BarValue) =>
 		(
 			(bar[SeriesPlotIndex.Open] as number) +
 			(bar[SeriesPlotIndex.High] as number) +
@@ -68,7 +68,7 @@ function seriesPlotFunctionMap(): PlotFunctionMap<BarValue> {
 	return result;
 }
 
-export type BarFunction = (bar: Bar['value']) => BarPrice;
+export type BarFunction = (bar: BarValue) => BarPrice;
 
 export function barFunction(priceSource: SeriesPriceSource): BarFunction {
 	return barFunctions[priceSource];
