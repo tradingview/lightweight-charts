@@ -291,7 +291,7 @@ export class DataLayer {
 	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): UpdatePacket {
 		// check types
 		convertStringToBusinessDay(data);
-		const bars = series.data().bars();
+		const bars = series.bars();
 		if (bars.size() > 0) {
 			const lastTime = ensureNotNull(bars.last()).time;
 			if (lastTime.businessDay !== undefined) {

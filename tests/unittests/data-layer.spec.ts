@@ -5,18 +5,19 @@ import { BarData, HistogramData, LineData } from '../../src/api/data-consumer';
 import { convertTime, DataLayer, SeriesUpdatePacket, stringToBusinessDay, TimedData } from '../../src/api/data-layer';
 import { ensureDefined } from '../../src/helpers/assertions';
 import { Palette } from '../../src/model/palette';
+import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
-import { SeriesData, SeriesPlotIndex } from '../../src/model/series-data';
+import { BarValue, SeriesPlotIndex } from '../../src/model/series-data';
 import { SeriesType } from '../../src/model/series-options';
-import { BusinessDay, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
+import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 // TODO: add tests for marks spans
 
 function createSeriesMock<T extends SeriesType = 'Line'>(seriesType?: T): Series<T> {
-	const data = new SeriesData();
+	const data = new PlotList<TimePoint, BarValue>();
 	// tslint:disable-next-line:no-object-literal-type-assertion
 	return {
-		data: () => data,
+		bars: () => data,
 		palette: () => new Palette(),
 		seriesType: () => seriesType || 'Line',
 		clearData: () => data.clear(),
@@ -354,7 +355,7 @@ describe('DataLayer', () => {
 		const series = createSeriesMock();
 		const packet = dataLayer.setSeriesData(series, [dataItemAt({ day: 1, month: 10, year: 2019 })]);
 		const update = ensureDefined(packet.timeScaleUpdate.seriesUpdates.get(series));
-		series.data().bars().merge(update.update);
+		series.bars().merge(update.update);
 		expect(() => dataLayer.updateSeriesData(series, dataItemAt(5000 as UTCTimestamp)))
 			.to.throw();
 	});

@@ -32,13 +32,13 @@ import { FirstValue } from './iprice-data-source';
 import { Palette } from './palette';
 import { Pane } from './pane';
 import { PlotRow } from './plot-data';
-import { MinMax, PlotList, PlotRowSearchMode } from './plot-list';
+import { MinMax, PlotRowSearchMode } from './plot-list';
 import { PriceDataSource } from './price-data-source';
 import { PriceLineOptions } from './price-line-options';
 import { PriceRangeImpl } from './price-range-impl';
 import { PriceScale } from './price-scale';
 import { SeriesBarColorer } from './series-bar-colorer';
-import { Bar, barFunction, SeriesData, SeriesPlotIndex } from './series-data';
+import { Bar, BarFunction, barFunction, BarValue, createSeriesPlotList, SeriesPlotIndex, SeriesPlotList } from './series-data';
 import { InternalSeriesMarker, SeriesMarker } from './series-markers';
 import {
 	AreaStyleOptions,
@@ -74,8 +74,6 @@ export interface LastValueDataResultWithRawPrice extends LastValueDataResultWith
 
 export type LastValueDataResultWithoutRawPrice = LastValueDataResultWithoutData | LastValueDataResultWithData;
 
-export type BarFunction = (bar: Bar['value']) => BarPrice;
-
 export interface MarkerData {
 	price: BarPrice;
 	radius: number;
@@ -99,7 +97,7 @@ export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Se
 
 export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
 	private readonly _seriesType: T;
-	private _data: SeriesData = new SeriesData();
+	private _data: SeriesPlotList = createSeriesPlotList();
 	private readonly _priceAxisViews: IPriceAxisView[];
 	private readonly _panePriceAxisView: PanePriceAxisView;
 	private _formatter!: IFormatter;
@@ -163,7 +161,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		const priceScale = this.priceScale();
 
-		if (this.model().timeScale().isEmpty() || priceScale.isEmpty() || this.data().isEmpty()) {
+		if (this.model().timeScale().isEmpty() || priceScale.isEmpty() || this._data.isEmpty()) {
 			return noDataRes;
 		}
 
@@ -178,7 +176,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		let bar: Bar | null;
 		let lastIndex: TimePointIndex;
 		if (globalLast) {
-			const lastBar = this.data().bars().last();
+			const lastBar = this._data.last();
 			if (lastBar === null) {
 				return noDataRes;
 			}
@@ -186,12 +184,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			bar = lastBar;
 			lastIndex = lastBar.index;
 		} else {
-			const endBar = this.data().bars().search(visibleBars.right(), PlotRowSearchMode.NearestLeft);
+			const endBar = this._data.search(visibleBars.right(), PlotRowSearchMode.NearestLeft);
 			if (endBar === null) {
 				return noDataRes;
 			}
 
-			bar = this.data().bars().valueAt(endBar.index);
+			bar = this._data.valueAt(endBar.index);
 			if (bar === null) {
 				return noDataRes;
 			}
@@ -213,10 +211,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			coordinate: coordinate,
 			index: lastIndex,
 		};
-	}
-
-	public data(): SeriesData {
-		return this._data;
 	}
 
 	public barColorer(): SeriesBarColorer {
@@ -266,11 +260,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._recreatePaneViews();
 	}
 
-	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], Bar['value']>>, clearData: boolean = false): void {
+	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], BarValue>>, clearData: boolean = false): void {
 		if (clearData) {
 			this._data.clear();
 		}
-		this._data.bars().merge(data);
+		this._data.merge(data);
 		this._recalculateMarkers();
 
 		this._paneView.update('data');
@@ -344,11 +338,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		const startTimePoint = visibleBars.left();
-		return this.data().search(startTimePoint, PlotRowSearchMode.NearestRight);
+		return this._data.search(startTimePoint, PlotRowSearchMode.NearestRight);
 	}
 
-	public bars(): PlotList<Bar['time'], Bar['value']> {
-		return this._data.bars();
+	public bars(): SeriesPlotList {
+		return this._data;
 	}
 
 	public nearestIndex(index: TimePointIndex, options?: PlotRowSearchMode): TimePointIndex | null {
@@ -356,16 +350,16 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return res ? res.index : null;
 	}
 
-	public nearestData(index: TimePointIndex, options?: PlotRowSearchMode): PlotRow<Bar['time'], Bar['value']> | null {
+	public nearestData(index: TimePointIndex, options?: PlotRowSearchMode): PlotRow<Bar['time'], BarValue> | null {
 		if (!isInteger(index)) {
 			return null;
 		}
 
-		return this.data().search(index, options);
+		return this._data.search(index, options);
 	}
 
 	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
-		const prices = this.data().valueAt(time);
+		const prices = this._data.valueAt(time);
 		if (prices === null) {
 			return null;
 		}
@@ -487,7 +481,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	private _autoscaleInfoImpl(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
-		if (!isInteger(startTimePoint) || !isInteger(endTimePoint) || this.data().isEmpty()) {
+		if (!isInteger(startTimePoint) || !isInteger(endTimePoint) || this._data.isEmpty()) {
 			return null;
 		}
 
@@ -496,9 +490,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const priceSource = (this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'Histogram') ? 'close' : null;
 		let barsMinMax: MinMax | null;
 		if (priceSource !== null) {
-			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: priceSource, offset: 0 }]);
+			barsMinMax = this._data.minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: priceSource, offset: 0 }]);
 		} else {
-			barsMinMax = this.data().bars().minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: 'low', offset: 0 }, { name: 'high', offset: 0 }]);
+			barsMinMax = this._data.minMaxOnRangeCached(startTimePoint, endTimePoint, [{ name: 'low', offset: 0 }, { name: 'high', offset: 0 }]);
 		}
 
 		let range = barsMinMax !== null ? new PriceRangeImpl(barsMinMax.min, barsMinMax.max) : null;

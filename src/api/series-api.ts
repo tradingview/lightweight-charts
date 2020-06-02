@@ -88,7 +88,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 			new RangeImpl(range.from as Logical, range.to as Logical)
 		).strictRange() as RangeImpl<TimePointIndex>;
 
-		const bars = this._series.data().bars();
+		const bars = this._series.bars();
 		if (bars.isEmpty()) {
 			return null;
 		}

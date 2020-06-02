@@ -1,11 +1,13 @@
 import { BarPrice } from './bar';
-import { PlotRow, PlotValue } from './plot-data';
-import { EnumeratingFunction, PlotFunctionMap, PlotList, PlotRowSearchMode } from './plot-list';
-import { TimePoint, TimePointIndex } from './time-data';
+import { PlotValue } from './plot-data';
+import { PlotFunctionMap, PlotList } from './plot-list';
+import { TimePoint } from './time-data';
+
+export type BarValue = [PlotValue, PlotValue, PlotValue, PlotValue, PlotValue];
 
 export interface Bar {
 	time: TimePoint;
-	value: [PlotValue, PlotValue, PlotValue, PlotValue, PlotValue];
+	value: BarValue;
 }
 
 /**
@@ -56,8 +58,8 @@ type SeriesPriceSource = keyof typeof barFunctions;
 
 const seriesSource: SeriesPriceSource[] = ['open', 'high', 'low', 'close', 'hl2', 'hlc3', 'ohlc4'];
 
-function seriesPlotFunctionMap(): PlotFunctionMap<Bar['value']> {
-	const result: PlotFunctionMap<Bar['value']> = new Map();
+function seriesPlotFunctionMap(): PlotFunctionMap<BarValue> {
+	const result: PlotFunctionMap<BarValue> = new Map();
 
 	seriesSource.forEach((plot: keyof typeof barFunctions, index: number) => {
 		result.set(plot, barFunction(plot));
@@ -72,46 +74,8 @@ export function barFunction(priceSource: SeriesPriceSource): BarFunction {
 	return barFunctions[priceSource];
 }
 
-export class SeriesData {
-	private _bars: PlotList<TimePoint, Bar['value']>;
+export type SeriesPlotList = PlotList<TimePoint, BarValue>;
 
-	public constructor() {
-		this._bars = new PlotList<TimePoint, Bar['value']>(seriesPlotFunctionMap());
-	}
-
-	public bars(): PlotList<TimePoint, Bar['value']> {
-		return this._bars;
-	}
-
-	public size(): number {
-		return this._bars.size();
-	}
-
-	public each(fun: EnumeratingFunction<TimePoint, Bar['value']>): void {
-		this._bars.each(fun);
-	}
-
-	public clear(): void {
-		this._bars.clear();
-	}
-
-	public isEmpty(): boolean {
-		return this._bars.isEmpty();
-	}
-
-	public first(): PlotRow<TimePoint, Bar['value']> | null {
-		return this._bars.first();
-	}
-
-	public last(): PlotRow<TimePoint, Bar['value']> | null {
-		return this._bars.last();
-	}
-
-	public search(index: TimePointIndex, options?: PlotRowSearchMode): PlotRow<TimePoint, Bar['value']> | null {
-		return this.bars().search(index, options);
-	}
-
-	public valueAt(index: TimePointIndex): Bar | null {
-		return this.search(index);
-	}
+export function createSeriesPlotList(): SeriesPlotList {
+	return new PlotList<TimePoint, BarValue>(seriesPlotFunctionMap());
 }
