@@ -21,10 +21,6 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		this._data = data;
 	}
 
-	protected _getSource(): Series {
-		return this._source;
-	}
-
 	protected _getData(): SeriesPriceAxisViewData {
 		return this._data;
 	}

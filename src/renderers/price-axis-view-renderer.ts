@@ -37,7 +37,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		ctx.font = rendererOptions.font;
 
-		const tickSize = this._data.tickVisible ? rendererOptions.tickLength : 0;
+		const tickSize = (this._data.tickVisible || !this._data.moveTextToInvisibleTick) ? rendererOptions.tickLength : 0;
 		const horzBorder = rendererOptions.borderSize;
 		const paddingTop = rendererOptions.paddingTop;
 		const paddingBottom = rendererOptions.paddingBottom;

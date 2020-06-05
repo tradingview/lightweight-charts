@@ -135,6 +135,7 @@ The following set of options can be used to adjust the price axis interface:
 |`borderColor`|`string`|`#2b2b43`|Pricescale border color|
 |`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (percent)|
 |`entireTextOnly`|`boolean`|`false`|If false, top and bottom corner labels are shown even if they are partially not visible |
+|`drawTicks`|`boolean`|`true`|If true, a small horizontal line is drawn on price axis labels|
 
 ### An example of a price scale customization
 
