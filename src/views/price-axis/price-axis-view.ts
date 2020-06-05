@@ -25,6 +25,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		text: '',
 		visible: false,
 		tickVisible: true,
+		moveTextToInvisibleTick: false,
 		borderColor: '',
 	};
 
@@ -32,6 +33,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		text: '',
 		visible: false,
 		tickVisible: false,
+		moveTextToInvisibleTick: true,
 		borderColor: '',
 	};
 
