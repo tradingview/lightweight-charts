@@ -1,7 +1,6 @@
 import { generateTextColor } from '../../helpers/color';
 
 import { CustomPriceLine } from '../../model/custom-price-line';
-import { DataSource } from '../../model/data-source';
 import { Series } from '../../model/series';
 import {
 	PriceAxisViewRendererCommonData,
@@ -18,10 +17,6 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 		super();
 		this._series = series;
 		this._priceLine = priceLine;
-	}
-
-	protected _getSource(): DataSource {
-		return this._series;
 	}
 
 	protected _updateRendererData(

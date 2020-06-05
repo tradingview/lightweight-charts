@@ -1,7 +1,6 @@
 import { generateTextColor } from '../../helpers/color';
 
 import { Crosshair, CrosshairPriceAndCoordinate } from '../../model/crosshair';
-import { DataSource } from '../../model/data-source';
 import { PriceScale } from '../../model/price-scale';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
 
@@ -19,10 +18,6 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 		this._source = source;
 		this._priceScale = priceScale;
 		this._valueProvider = valueProvider;
-	}
-
-	protected _getSource(): DataSource {
-		return this._source;
 	}
 
 	protected _updateRendererData(
