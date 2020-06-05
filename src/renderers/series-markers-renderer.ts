@@ -22,7 +22,7 @@ export interface SeriesMarkerText {
 
 export interface SeriesMarkerRendererDataItem extends TimedValue {
 	y: Coordinate;
-	size: Coordinate;
+	size: number;
 	shape: SeriesMarkerShape;
 	color: string;
 	internalId: number;

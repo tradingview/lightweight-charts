@@ -50,7 +50,7 @@ function fillSizeAndY(
 	const sizeMultiplier = isNumber(marker.size) ? Math.max(marker.size, 0) : 1;
 	const shapeSize = calculateShapeHeight(timeScale.barSpacing()) * sizeMultiplier;
 	const halfSize = shapeSize / 2;
-	rendererItem.size = shapeSize as Coordinate;
+	rendererItem.size = shapeSize;
 
 	switch (marker.position) {
 		case 'inBar': {
@@ -154,7 +154,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				time: marker.time,
 				x: 0 as Coordinate,
 				y: 0 as Coordinate,
-				size: 0 as Coordinate,
+				size: 0,
 				shape: marker.shape,
 				color: marker.color,
 				internalId: marker.internalId,
