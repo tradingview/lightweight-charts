@@ -2,7 +2,7 @@ import { ensure } from '../helpers/assertions';
 
 import { Coordinate } from './coordinate';
 import { CrosshairMode, CrosshairOptions } from './crosshair';
-import { IDataSource } from './idata-source';
+import { IPriceDataSource } from './iprice-data-source';
 import { Pane } from './pane';
 import { Series } from './series';
 import { SeriesPlotIndex } from './series-data';
@@ -32,7 +32,7 @@ export class Magnet {
 
 		// get all serieses from the pane
 		const serieses: ReadonlyArray<Series> = pane.dataSources().filter(
-			((ds: IDataSource) => (ds instanceof Series)) as (ds: IDataSource) => ds is Series);
+			((ds: IPriceDataSource) => (ds instanceof Series)) as (ds: IPriceDataSource) => ds is Series);
 
 		const candidates = serieses.reduce(
 			(acc: Coordinate[], series: Series) => {

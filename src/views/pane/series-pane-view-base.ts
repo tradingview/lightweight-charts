@@ -62,12 +62,12 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 			return;
 		}
 
-		const visibleBars = timeScale.visibleBars();
+		const visibleBars = timeScale.visibleStrictRange();
 		if (visibleBars === null) {
 			return;
 		}
 
-		if (this._series.data().bars().size() === 0) {
+		if (this._series.bars().size() === 0) {
 			return;
 		}
 

@@ -22,7 +22,7 @@ function isTestCaseFile(filePath: string): boolean {
 export function getTestCases(): TestCase[] {
 	return fs.readdirSync(testCasesDir)
 		.filter(isTestCaseFile)
-		.map((testCaseFile: string) => ({
+		.map<TestCase>((testCaseFile: string) => ({
 			name: extractTestCaseName(testCaseFile) as string,
 			caseContent: fs.readFileSync(path.join(testCasesDir, testCaseFile), { encoding: 'utf-8' }),
 		}));

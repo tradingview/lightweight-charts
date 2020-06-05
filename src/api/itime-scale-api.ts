@@ -1,13 +1,15 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { Coordinate } from '../model/coordinate';
+import { LogicalRange, Range } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
 
-export interface TimeRange {
-	from: Time;
-	to: Time;
-}
+export type TimeRange = Range<Time>;
+
+export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
+export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null) => void;
 
 /** Interface to chart time scale */
 export interface ITimeScaleApi {
@@ -42,6 +44,18 @@ export interface ITimeScaleApi {
 	setVisibleRange(range: TimeRange): void;
 
 	/**
+	 * Returns the currently visible logical range of data.
+	 * @returns visible range or null if the chart has no data at all
+	 */
+	getVisibleLogicalRange(): LogicalRange | null;
+
+	/**
+	 * Sets visible logical range of data.
+	 * @param range - target visible logical range of data.
+	 */
+	setVisibleLogicalRange(range: Range<number>): void;
+
+	/**
 	 * Restores default zooming and scroll position of the time scale
 	 */
 	resetTimeScale(): void;
@@ -51,6 +65,44 @@ export interface ITimeScaleApi {
 	 * This is a momentary operation.
 	 */
 	fitContent(): void;
+
+	/**
+	 * Converts a time to local x coordinate.
+	 * @param time - time needs to be converted
+	 * @returns x coordinate of that time or `null` if no time found on time scale
+	 */
+	timeToCoordinate(time: Time): Coordinate | null;
+
+	/**
+	 * Converts a coordinate to time.
+	 * @param x - coordinate needs to be converted
+	 * @returns time of a bar that is located on that coordinate or `null` if there are no bars found on that coordinate
+	 */
+	coordinateToTime(x: number): Time | null;
+
+	/**
+	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
+	 * @param handler - handler (function) to be called on changing visible data range
+	 */
+	subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
+
+	/**
+	 * Removes a subscription to visible range changes
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
+
+	/**
+	 * Adds a subscription to visible index range changes to receive notifications about visible indexes of the data
+	 * @param handler - handler (function) to be called when the visible indexes change
+	 */
+	subscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void;
+
+	/**
+	 * Removes a subscription to visible index range changes
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void;
 
 	/**
 	 * Applies new options to the time scale.

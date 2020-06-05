@@ -104,13 +104,8 @@ export class ChartWidget implements IDestroyable {
 
 		container.appendChild(this._element);
 		this._updateTimeAxisVisibility();
-		this._model.timeScale().optionsApplied().subscribe(
-			() => {
-				this._updateTimeAxisVisibility();
-				this.adjustSize();
-			},
-			this
-		);
+		this._model.timeScale().optionsApplied().subscribe(this._model.fullUpdate.bind(this._model), this);
+		this._model.priceScalesOptionsChanged().subscribe(this._model.fullUpdate.bind(this._model), this);
 	}
 
 	public model(): ChartModel {
@@ -133,6 +128,7 @@ export class ChartWidget implements IDestroyable {
 
 		this._model.crosshairMoved().unsubscribeAll(this);
 		this._model.timeScale().optionsApplied().unsubscribeAll(this);
+		this._model.priceScalesOptionsChanged().unsubscribeAll(this);
 		this._model.destroy();
 
 		for (const paneWidget of this._paneWidgets) {
@@ -193,11 +189,6 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this._timeAxisWidget.paint(invalidateMask.fullInvalidation());
-	}
-
-	public adjustSize(): void {
-		this._adjustSizeImpl();
-		this._model.fullUpdate();
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
@@ -298,6 +289,32 @@ export class ChartWidget implements IDestroyable {
 			}
 		});
 		return targetCanvas;
+	}
+
+	public getPriceAxisWidth(position: PriceAxisPosition): number {
+		if (position === 'none') {
+			return 0;
+		}
+
+		if (position === 'left' && !this._isLeftAxisVisible()) {
+			return 0;
+		}
+
+		if (position === 'right' && !this._isRightAxisVisible()) {
+			return 0;
+		}
+
+		if (this._paneWidgets.length === 0) {
+			return 0;
+		}
+
+		// we don't need to worry about exactly pane widget here
+		// because all pane widgets have the same width of price axis widget
+		// see _adjustSizeImpl
+		const priceAxisWidget = position === 'left'
+			? this._paneWidgets[0].leftPriceAxisWidget()
+			: this._paneWidgets[0].rightPriceAxisWidget();
+		return ensureNotNull(priceAxisWidget).getWidth();
 	}
 
 	// tslint:disable-next-line:cyclomatic-complexity
@@ -443,9 +460,9 @@ export class ChartWidget implements IDestroyable {
 				this._model.timeScale().fitContent();
 			}
 
-			const targetTimeRange = invalidateMask.getTargetTimeRange();
-			if (targetTimeRange !== null) {
-				this._model.timeScale().setTimePointsRange(targetTimeRange);
+			const logicalRange = invalidateMask.getLogicalRange();
+			if (logicalRange !== null) {
+				this._model.timeScale().setLogicalRange(logicalRange);
 			}
 
 			this._timeAxisWidget.update();
@@ -526,7 +543,7 @@ export class ChartWidget implements IDestroyable {
 			if (paneWidget.state() !== state) {
 				paneWidget.setState(state);
 			} else {
-				paneWidget.updatePriceAxisWidget();
+				paneWidget.updatePriceAxisWidgets();
 			}
 		}
 

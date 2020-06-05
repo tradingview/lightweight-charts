@@ -107,6 +107,26 @@ chart.timeScale().setVisibleRange({
 });
 ```
 
+### getVisibleLogicalRange
+
+Returns the current visible [logical range](#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data at all.
+
+```javascript
+chart.timeScale().getVisibleLogicalRange();
+```
+
+### setVisibleLogicalRange
+
+Sets visible [logical range](#logical-range) of the chart.
+The argument is an object with the first and last time points of a desired logical range.
+
+```javascript
+chart.timeScale().setVisibleLogicalRange({
+    from: 0,
+    to: 10,
+});
+```
+
 ### resetTimeScale()
 
 Restores default zoom and scroll position of the time scale.
@@ -121,6 +141,28 @@ Automatically calculates the visible range to fit all series data.
 
 ```javascript
 chart.timeScale().fitContent();
+```
+
+### timeToCoordinate
+
+Converts a time to local `x` coordinate.
+The argument is [Time](./time.md) that needs to be converted to a coordinate.
+
+Returns `x` coordinate of a bar with passed time or `null` if no bar found.
+
+```javascript
+chart.timeScale().timeToCoordinate('1990-04-24');
+```
+
+### coordinateToTime
+
+Converts `x` coordinate to [Time](./time.md).
+The argument is `x` coordinate that needs to be converted to a time.
+
+Returns [Time](./time.md) of a bar that is located on the passed coordinate or `null` if there are no bars on that coordinate.
+
+```javascript
+chart.timeScale().coordinateToTime(42);
 ```
 
 ### applyOptions()
@@ -141,3 +183,76 @@ Returns an object with options currently applied to the time scale.
 ```javascript
 chart.timeScale().options();
 ```
+
+### subscribeVisibleTimeRangeChange
+
+Allows to subscribe to the visible time range changed event.
+The argument is a handler function, which will be called with the new visible time range.
+
+The argument passed to your handler is the new visible time range, which might be either:
+
+- an object with properties `from` and `to` of type [Time](./time.md), that are the first and last visible time points, respectively
+- `null` if nothing is visible or the chart has no data at all
+
+```javascript
+function onVisibleTimeRangeChanged(newVisibleTimeRange) {
+    console.log(newVisibleTimeRange);
+}
+
+chart.timeScale().subscribeVisibleTimeRangeChange(onVisibleTimeRangeChanged);
+```
+
+### unsubscribeVisibleTimeRangeChange
+
+Allows to unsubscribe the previously subscribed handler from the visible time range changed event.
+The argument is a handler function, which you've passed to the [`subscribeVisibleTimeRangeChange`](#subscribeVisibleTimeRangeChange).
+
+```javascript
+chart.timeScale().unsubscribeVisibleTimeRangeChange(onVisibleTimeRangeChanged);
+```
+
+### subscribeVisibleLogicalRangeChange
+
+Allows to subscribe to the visible [logical range](#logical-range) changed event.
+The argument is a handler function, which will be called with the new visible logical range.
+
+The argument passed to your handler is the new visible logical range, which might be either:
+
+- an object with numerical properties `from` and `to` of type number (see [Logical range](#logical-range) section), that are the first and last visible logical indexes, respectively
+- `null` if the chart has no data at all
+
+```javascript
+function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
+    console.log(newVisibleLogicalRange);
+}
+
+chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
+```
+
+### unsubscribeVisibleLogicalRangeChange
+
+Allows to unsubscribe the previously subscribed handler from the visible logical range changed event.
+The argument is a handler function, which you've passed to the [`subscribeVisibleLogicalRangeChange`](#subscribeVisibleLogicalRangeChange).
+
+```javascript
+chart.timeScale().unsubscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
+```
+
+## Logical range
+
+Logical range is an object with 2 properties: `from` and `to`, which are numbers and represent logical indexes on the time scale.
+
+The starting point of the time scale's logical range is the first data item among all series.
+Before that point all indexes are negative, starting from that point - positive.
+
+Indexes might have fractional parts, for instance 4.2, due to the time-scale being continuous rather than discrete.
+
+Integer part of logical index means index of the fully visible bar (see image below).
+Thus, if we have 5.2 as the last visible logical index (`to` field), that means that the last visible bar has index 5, but we also have partially visible (for 20%) 6th bar.
+Half (e.g. 1.5, 3.5, 10.5) means exactly middle of the bar.
+
+![Logical range](./assets/logical-range.png "Logical range")
+
+Red vertical lines here are borders between bars.
+
+Thus, the visible logical range in the image above is from -4.73 to 5.05.

@@ -387,7 +387,7 @@ barSeries.update({
 
 Allows to set/replace all existing series markers with new ones.
 
-An array of items is expected. Each item should contain the following fields:
+An array of items is expected. An array must be sorted ascending by `time`. Each item should contain the following fields:
 
 - `time` ([Time](./time.md)) - item time
 - `position` (`aboveBar` &#124; `belowBar` &#124; `inBar`) - item position
@@ -480,6 +480,44 @@ Example:
 ```javascript
 const priceLine = series.createPriceLine({ price: 80.0 });
 series.removePriceLine(priceLine);
+```
+
+### barsInLogicalRange
+
+Returns bars information for the series in the provided [logical range](./time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
+
+The returned value is an object with the following properties:
+
+- `from` - a [Time](./time.md) of the first series' bar inside of the passed logical range or `undefined`, if no bars have been found in the requested range
+- `to` - a [Time](./time.md) of the last series' bar inside of the passed logical range or `undefined`, if no bars have been found in the requested range
+- `barsBefore` - a number of bars between the `from` index of the passed logical range and the first series' bar
+- `barsAfter` - a number of bars between the `to` index of the passed logical range and the last series' bar
+
+Positive value in `barsBefore` field means that there are some bars before (out of logical range from the left) the `from` logical index in the series.
+Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the `from` logical index are some bars.
+
+Positive value in `barsAfter` field means that there are some bars after (out of logical range from the right) the `to` logical index in the series.
+Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the `to` logical index are some bars.
+
+```javascript
+// returns bars info in current visible range
+const barsInfo = series.barsInLogicalRange(chart.timeScale().getVisibleLogicalRange());
+console.log(barsInfo);
+```
+
+This method can be used, for instance, to implement downloading historical data while scrolling to prevent a user from seeing empty space.
+Thus, you can subscribe to [visible logical range changed event](./time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
+
+```javascript
+function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
+    const barsInfo = series.barsInLogicalRange(newVisibleLogicalRange);
+    // if there less than 50 bars to the left of the visible area
+    if (barsInfo !== null && barsInfo.barsBefore < 50) {
+        // try to load additional historical data and prepend it to the series data
+    }
+}
+
+chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
 ```
 
 ## Taking screenshot

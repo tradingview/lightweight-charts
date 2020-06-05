@@ -1,9 +1,12 @@
+import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
+import { RangeImpl } from '../model/range-impl';
 import { Series, SeriesPartialOptionsInternal } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import {
@@ -11,13 +14,15 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
+import { Logical, Range, TimePoint, TimePointIndex } from '../model/time-data';
+import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { IPriceFormatter, ISeriesApi } from './iseries-api';
+import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
@@ -55,7 +60,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series;
 	}
 
-	public priceToCoordinate(price: BarPrice): Coordinate | null {
+	public priceToCoordinate(price: number): Coordinate | null {
 		const firstValue = this._series.firstValue();
 		if (firstValue === null) {
 			return null;
@@ -64,12 +69,64 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().priceToCoordinate(price, firstValue.value);
 	}
 
-	public coordinateToPrice(coordinate: Coordinate): BarPrice | null {
+	public coordinateToPrice(coordinate: number): BarPrice | null {
 		const firstValue = this._series.firstValue();
 		if (firstValue === null) {
 			return null;
 		}
-		return this._series.priceScale().coordinateToPrice(coordinate, firstValue.value);
+		return this._series.priceScale().coordinateToPrice(coordinate as Coordinate, firstValue.value);
+	}
+
+	// tslint:disable-next-line:cyclomatic-complexity
+	public barsInLogicalRange(range: Range<number> | null): BarsInfo | null {
+		if (range === null) {
+			return null;
+		}
+
+		// we use TimeScaleVisibleRange here to convert LogicalRange to strict range properly
+		const correctedRange = new TimeScaleVisibleRange(
+			new RangeImpl(range.from as Logical, range.to as Logical)
+		).strictRange() as RangeImpl<TimePointIndex>;
+
+		const bars = this._series.bars();
+		if (bars.isEmpty()) {
+			return null;
+		}
+
+		const dataFirstBarInRange = bars.search(correctedRange.left(), PlotRowSearchMode.NearestRight);
+		const dataLastBarInRange = bars.search(correctedRange.right(), PlotRowSearchMode.NearestLeft);
+
+		const dataFirstIndex = ensureNotNull(bars.firstIndex());
+		const dataLastIndex = ensureNotNull(bars.lastIndex());
+
+		// this means that we request data in the data gap
+		// e.g. let's say we have series with data [0..10, 30..60]
+		// and we request bars info in range [15, 25]
+		// thus, dataFirstBarInRange will be with index 30 and dataLastBarInRange with 10
+		if (dataFirstBarInRange !== null && dataLastBarInRange !== null && dataFirstBarInRange.index > dataLastBarInRange.index) {
+			return {
+				barsBefore: range.from - dataFirstIndex,
+				barsAfter: dataLastIndex - range.to,
+			};
+		}
+
+		const barsBefore = (dataFirstBarInRange === null || dataFirstBarInRange.index === dataFirstIndex)
+			? range.from - dataFirstIndex
+			: dataFirstBarInRange.index - dataFirstIndex;
+
+		const barsAfter = (dataLastBarInRange === null || dataLastBarInRange.index === dataLastIndex)
+			? dataLastIndex - range.to
+			: dataLastIndex - dataLastBarInRange.index;
+
+		const result: BarsInfo = { barsBefore, barsAfter };
+
+		// actually they can't exist separately
+		if (dataFirstBarInRange !== null && dataLastBarInRange !== null) {
+			result.from = dataFirstBarInRange.time.businessDay || dataFirstBarInRange.time.timestamp;
+			result.to = dataLastBarInRange.time.businessDay || dataLastBarInRange.time.timestamp;
+		}
+
+		return result;
 	}
 
 	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {
@@ -81,7 +138,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public setMarkers(data: SeriesMarker<Time>[]): void {
-		const convertedMarkers = data.map((marker: SeriesMarker<Time>) => ({
+		const convertedMarkers = data.map<SeriesMarker<TimePoint>>((marker: SeriesMarker<Time>) => ({
 			...marker,
 			time: convertTime(marker.time),
 		}));

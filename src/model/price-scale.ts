@@ -8,13 +8,10 @@ import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { BarCoordinates, BarPrice, BarPrices } from './bar';
-import { BarsRange } from './bars-range';
 import { Coordinate } from './coordinate';
-import { IDataSource } from './idata-source';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
-import { PriceDataSource } from './price-data-source';
 import { PriceRangeImpl } from './price-range-impl';
 import {
 	canConvertPriceRangeFromLog,
@@ -30,9 +27,9 @@ import {
 	toPercentRange,
 } from './price-scale-conversions';
 import { PriceTickMarkBuilder } from './price-tick-mark-builder';
-import { Series } from './series';
+import { RangeImpl } from './range-impl';
 import { sortSources } from './sort-sources';
-import { SeriesItemsIndexesRange } from './time-data';
+import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
 
 /**
  * Enum of possible price scale modes
@@ -105,7 +102,7 @@ export interface PriceScaleOptions {
 
 interface RangeCache {
 	isValid: boolean;
-	visibleBars: BarsRange | null;
+	visibleBars: RangeImpl<TimePointIndex> | null;
 }
 
 // actually price should be BarPrice
@@ -138,9 +135,8 @@ export class PriceScale {
 
 	private _modeChanged: Delegate<PriceScaleState, PriceScaleState> = new Delegate();
 
-	private _dataSources: IDataSource[] = [];
-	private _cachedOrderedSources: IDataSource[] | null = null;
-	private _mainSource: IPriceDataSource | null = null;
+	private _dataSources: IPriceDataSource[] = [];
+	private _cachedOrderedSources: IPriceDataSource[] | null = null;
 
 	private _marksCache: PriceMark[] | null = null;
 
@@ -459,16 +455,16 @@ export class PriceScale {
 		return value as BarPrice;
 	}
 
-	public dataSources(): ReadonlyArray<IDataSource> {
+	public dataSources(): ReadonlyArray<IPriceDataSource> {
 		return this._dataSources;
 	}
 
-	public orderedSources(): ReadonlyArray<IDataSource> {
+	public orderedSources(): ReadonlyArray<IPriceDataSource> {
 		if (this._cachedOrderedSources) {
 			return this._cachedOrderedSources;
 		}
 
-		let sources: IDataSource[] = [];
+		let sources: IPriceDataSource[] = [];
 		for (let i = 0; i < this._dataSources.length; i++) {
 			const ds = this._dataSources[i];
 			if (ds.zorder() === null) {
@@ -483,18 +479,17 @@ export class PriceScale {
 		return this._cachedOrderedSources;
 	}
 
-	public addDataSource(source: IDataSource): void {
+	public addDataSource(source: IPriceDataSource): void {
 		if (this._dataSources.indexOf(source) !== -1) {
 			return;
 		}
 
 		this._dataSources.push(source);
-		this._mainSource = null;
 		this.updateFormatter();
 		this.invalidateSourcesCache();
 	}
 
-	public removeDataSource(source: IDataSource): void {
+	public removeDataSource(source: IPriceDataSource): void {
 		const index = this._dataSources.indexOf(source);
 		if (index === -1) {
 			throw new Error('source is not attached to scale');
@@ -502,38 +497,14 @@ export class PriceScale {
 
 		this._dataSources.splice(index, 1);
 
-		if (!this.mainSource()) {
+		if (this.isEmpty()) {
 			this.setMode({
 				autoScale: true,
 			});
 		}
 
-		this._mainSource = null;
 		this.updateFormatter();
 		this.invalidateSourcesCache();
-	}
-
-	public mainSource(): IPriceDataSource | null {
-		if (this._mainSource !== null) {
-			return this._mainSource;
-		}
-
-		let priceSource: IPriceDataSource | null = null;
-
-		for (let i = 0; i < this._dataSources.length; i++) {
-			const source = this._dataSources[i];
-			if (source instanceof Series) {
-				priceSource = source;
-				break;
-			}
-
-			if ((priceSource === null) && (source instanceof PriceDataSource)) {
-				priceSource = source;
-			}
-		}
-
-		this._mainSource = priceSource;
-		return this._mainSource;
 	}
 
 	public firstValue(): number | null {
@@ -541,15 +512,13 @@ export class PriceScale {
 		let result: FirstValue | null = null;
 
 		for (const source of this._dataSources) {
-			if (source instanceof PriceDataSource) {
-				const firstValue = source.firstValue();
-				if (firstValue === null) {
-					continue;
-				}
+			const firstValue = source.firstValue();
+			if (firstValue === null) {
+				continue;
+			}
 
-				if (result === null || firstValue.timePoint < result.timePoint) {
-					result = firstValue;
-				}
+			if (result === null || firstValue.timePoint < result.timePoint) {
+				result = firstValue;
 			}
 		}
 
@@ -715,7 +684,7 @@ export class PriceScale {
 	}
 
 	public formatPriceAbsolute(price: number): string {
-		return this._formatPrice(price as BarPrice, this._mainSourceFormatter());
+		return this._formatPrice(price as BarPrice, ensureNotNull(this._formatterSource()).formatter());
 	}
 
 	public formatPricePercentage(price: number, baseValue: number): string {
@@ -724,14 +693,10 @@ export class PriceScale {
 	}
 
 	public sourcesForAutoScale(): ReadonlyArray<IPriceDataSource> {
-		function useSourceForAutoScale(source: IDataSource): source is IPriceDataSource {
-			return source instanceof PriceDataSource;
-		}
-
-		return this._dataSources.filter(useSourceForAutoScale);
+		return this._dataSources;
 	}
 
-	public recalculatePriceRange(visibleBars: BarsRange): void {
+	public recalculatePriceRange(visibleBars: RangeImpl<TimePointIndex>): void {
 		this._invalidatedForRange = {
 			visibleBars: visibleBars,
 			isValid: false,
@@ -739,15 +704,15 @@ export class PriceScale {
 	}
 
 	public updateAllViews(): void {
-		this._dataSources.forEach((s: IDataSource) => s.updateAllViews());
+		this._dataSources.forEach((s: IPriceDataSource) => s.updateAllViews());
 	}
 
 	public updateFormatter(): void {
 		this._marksCache = null;
-		const mainSource = this.mainSource();
+		const formatterSource = this._formatterSource();
 		let base = 100;
-		if (mainSource !== null) {
-			base = Math.round(1 / mainSource.minMove());
+		if (formatterSource !== null) {
+			base = Math.round(1 / formatterSource.minMove());
 		}
 
 		this._formatter = defaultPriceFormatter;
@@ -758,9 +723,9 @@ export class PriceScale {
 			this._formatter = new PriceFormatter(100, 1);
 			base = 100;
 		} else {
-			if (mainSource !== null) {
+			if (formatterSource !== null) {
 				// user
-				this._formatter = mainSource.formatter();
+				this._formatter = formatterSource.formatter();
 			}
 		}
 
@@ -776,6 +741,13 @@ export class PriceScale {
 
 	public invalidateSourcesCache(): void {
 		this._cachedOrderedSources = null;
+	}
+
+	/**
+	 * Returns the source which will be used as "formatter source" (take minMove for formatter)
+	 */
+	private _formatterSource(): IPriceDataSource | null {
+		return this._dataSources[0] || null;
 	}
 
 	private _topMarginPx(): number {
@@ -834,11 +806,6 @@ export class PriceScale {
 		this._markBuilder.rebuildTickMarks();
 	}
 
-	private _mainSourceFormatter(): IFormatter {
-		const mainSource = ensureNotNull(this.mainSource());
-		return mainSource.formatter();
-	}
-
 	// tslint:disable-next-line:cyclomatic-complexity
 	private _recalculatePriceRangeImpl(): void {
 		const visibleBars = this._invalidatedForRange.visibleBars;
@@ -858,7 +825,7 @@ export class PriceScale {
 				continue;
 			}
 
-			const autoScaleInfo = source.autoscaleInfo(visibleBars.firstBar(), visibleBars.lastBar());
+			const autoScaleInfo = source.autoscaleInfo(visibleBars.left(), visibleBars.right());
 			let sourceRange = autoScaleInfo && autoScaleInfo.priceRange();
 
 			if (sourceRange !== null) {
@@ -900,8 +867,8 @@ export class PriceScale {
 		if (priceRange !== null) {
 			// keep current range is new is empty
 			if (priceRange.minValue() === priceRange.maxValue()) {
-				const mainSource = this.mainSource();
-				const minMove = mainSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : mainSource.minMove();
+				const formatterSource = this._formatterSource();
+				const minMove = formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : formatterSource.minMove();
 
 				// if price range is degenerated to 1 point let's extend it by 10 min move values
 				// to avoid incorrect range and empty (blank) scale (in case of min tick much greater than 1)

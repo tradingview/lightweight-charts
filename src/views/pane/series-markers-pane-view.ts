@@ -150,7 +150,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		const timeScale = this._model.timeScale();
 		const seriesMarkers = this._series.indexedMarkers();
 		if (this._dataInvalidated) {
-			this._data.items = seriesMarkers.map((marker: InternalSeriesMarker<TimePointIndex>) => ({
+			this._data.items = seriesMarkers.map<SeriesMarkerRendererDataItem>((marker: InternalSeriesMarker<TimePointIndex>) => ({
 				time: marker.time,
 				x: 0 as Coordinate,
 				y: 0 as Coordinate,
@@ -167,7 +167,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		const layoutOptions = this._model.options().layout;
 
 		this._data.visibleRange = null;
-		const visibleBars = timeScale.visibleBars();
+		const visibleBars = timeScale.visibleStrictRange();
 		if (visibleBars === null) {
 			return;
 		}
@@ -200,7 +200,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			if (marker.text !== undefined && marker.text.length > 0) {
 				rendererItem.text = {
 					content: marker.text,
-					x: rendererItem.x,
 					y: 0 as Coordinate,
 					width: 0,
 					height: 0,

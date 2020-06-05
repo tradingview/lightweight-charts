@@ -89,7 +89,7 @@ function lintFiles(files) {
 	// tsc & tslint
 	const tsFiles = filterByExt(files, '.ts');
 	if (tsFiles.length !== 0) {
-		hasErrors = run('npm run tsc-all') || hasErrors;
+		hasErrors = run('npm run tsc-verify') || hasErrors;
 
 		// we won't run tslint for all files
 		// because it's slow as fuck (18s for all project)

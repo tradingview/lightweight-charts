@@ -2,7 +2,7 @@ import { ensure, ensureNotNull } from '../helpers/assertions';
 
 import { PlotList } from './plot-list';
 import { Series } from './series';
-import { Bar, SeriesPlotIndex } from './series-data';
+import { Bar, BarValue, SeriesPlotIndex } from './series-data';
 import {
 	AreaStyleOptions,
 	BarStyleOptions,
@@ -127,7 +127,7 @@ export class SeriesBarColorer {
 		return result;
 	}
 
-	private _getSeriesBars(): PlotList<TimePoint, Bar['value']> {
+	private _getSeriesBars(): PlotList<TimePoint, BarValue> {
 		return this._series.bars();
 	}
 

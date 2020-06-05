@@ -30,10 +30,10 @@ import { TimePointIndex } from '../model/time-data';
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, SeriesUpdatePacket } from './data-layer';
-import { IChartApi, MouseEventHandler, MouseEventParams, TimeRangeChangeEventHandler } from './ichart-api';
+import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
-import { ITimeScaleApi, TimeRange } from './itime-scale-api';
+import { ITimeScaleApi } from './itime-scale-api';
 import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
 	areaStyleDefaults,
@@ -58,13 +58,22 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 }
 
 function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): void {
-	const handleScale = options.handleScale;
-	if (isBoolean(handleScale)) {
+	if (isBoolean(options.handleScale)) {
+		const handleScale = options.handleScale;
 		options.handleScale = {
 			axisDoubleClickReset: handleScale,
-			axisPressedMouseMove: handleScale,
+			axisPressedMouseMove: {
+				time: handleScale,
+				price: handleScale,
+			},
 			mouseWheel: handleScale,
 			pinch: handleScale,
+		};
+	} else if (options.handleScale !== undefined && isBoolean(options.handleScale.axisPressedMouseMove)) {
+		const axisPressedMouseMove = options.handleScale.axisPressedMouseMove;
+		options.handleScale.axisPressedMouseMove = {
+			time: axisPressedMouseMove,
+			price: axisPressedMouseMove,
 		};
 	}
 
@@ -128,7 +137,6 @@ export interface IPriceScaleApiProvider {
 export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesConsumer<SeriesType> {
 	private _chartWidget: ChartWidget;
 	private _dataLayer: DataLayer = new DataLayer();
-	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
 	private readonly _seriesMap: Map<SeriesApi<SeriesType>, Series> = new Map();
 	private readonly _seriesMapReversed: Map<Series, SeriesApi<SeriesType>> = new Map();
 
@@ -143,7 +151,6 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 			merge(clone(chartOptionsDefaults), toInternalOptions(options)) as ChartOptionsInternal;
 
 		this._chartWidget = new ChartWidget(container, internalOptions);
-		this._chartWidget.model().timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 
 		this._chartWidget.clicked().subscribe(
 			(paramSupplier: MouseEventParamsImplSupplier) => {
@@ -167,7 +174,6 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	}
 
 	public remove(): void {
-		this._chartWidget.model().timeScale().visibleBarsChanged().unsubscribeAll(this);
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
 
@@ -179,7 +185,6 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		});
 		this._seriesMap.clear();
 		this._seriesMapReversed.clear();
-		this._timeRangeChanged.destroy();
 		this._clickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
 		this._dataLayer.destroy();
@@ -314,21 +319,13 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		this._crosshairMovedDelegate.unsubscribe(handler);
 	}
 
-	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
-		this._timeRangeChanged.subscribe(handler);
-	}
-
-	public unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
-		this._timeRangeChanged.unsubscribe(handler);
-	}
-
 	public priceScale(priceScaleId?: string): IPriceScaleApi {
 		if (priceScaleId === undefined) {
 			warn('Using ChartApi.priceScale() method without arguments has been deprecated, pass valid price scale id instead');
 		}
 
 		priceScaleId = priceScaleId || this._chartWidget.model().defaultVisiblePriceScaleId();
-		return new PriceScaleApi(this._chartWidget.model(), priceScaleId);
+		return new PriceScaleApi(this._chartWidget, priceScaleId);
 	}
 
 	public timeScale(): ITimeScaleApi {
@@ -345,12 +342,6 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 
 	public takeScreenshot(): HTMLCanvasElement {
 		return this._chartWidget.takeScreenshot();
-	}
-
-	private _onVisibleBarsChanged(): void {
-		if (this._timeRangeChanged.hasListeners()) {
-			this._timeRangeChanged.fire(this.timeScale().getVisibleRange());
-		}
 	}
 
 	private _mapSeriesToApi(series: Series): ISeriesApi<SeriesType> {

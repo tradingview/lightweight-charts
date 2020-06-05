@@ -100,7 +100,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		}
 
 		const barSpacing = timeScale.barSpacing();
-		const visibleBars = ensureNotNull(timeScale.visibleBars());
+		const visibleBars = ensureNotNull(timeScale.visibleStrictRange());
 		const histogramBase = priceScale.priceToCoordinate(this._series.options().base, firstValue);
 
 		timeScale.indexesToCoordinates(this._histogramData.items);

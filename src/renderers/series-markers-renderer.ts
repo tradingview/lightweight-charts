@@ -3,7 +3,7 @@ import { makeFont } from '../helpers/make-font';
 
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { SeriesMarkerShape, SeriesMarkerText } from '../model/series-markers';
+import { SeriesMarkerShape } from '../model/series-markers';
 import { TextWidthCache } from '../model/text-width-cache';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
@@ -12,6 +12,13 @@ import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
 import { drawSquare, hitTestSquare } from './series-markers-square';
 import { drawText, hitTestText } from './series-markers-text';
+
+export interface SeriesMarkerText {
+	content: string;
+	y: Coordinate;
+	width: number;
+	height: number;
+}
 
 export interface SeriesMarkerRendererDataItem extends TimedValue {
 	y: Coordinate;
@@ -79,7 +86,6 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 			if (item.text !== undefined) {
 				item.text.width = this._textWidthCache.measureText(ctx, item.text.content);
 				item.text.height = this._fontSize;
-				item.text.x = item.text.x - item.text.width / 2 as Coordinate;
 			}
 			drawItem(item, ctx);
 		}
@@ -90,7 +96,7 @@ function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContex
 	ctx.fillStyle = item.color;
 
 	if (item.text !== undefined) {
-		drawText(ctx, item.text);
+		drawText(ctx, item.text.content, item.x - item.text.width / 2, item.text.y);
 	}
 
 	drawShape(item, ctx);
@@ -120,7 +126,7 @@ function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingConte
 }
 
 function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coordinate): boolean {
-	if (item.text !== undefined && hitTestText(item.text, x, y)) {
+	if (item.text !== undefined && hitTestText(item.x, item.text.y, item.text.width, item.text.height, x, y)) {
 		return true;
 	}
 
