@@ -25,14 +25,12 @@ function runTestCase(container) {
 	const mainSeries = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
-		autoscaleInfoProvider: function() {
-			return {
-				priceRange: {
-					minValue: 0,
-					maxValue: 100,
-				},
-			};
-		},
+		autoscaleInfoProvider: () => ({
+			priceRange: {
+				minValue: 0,
+				maxValue: 100,
+			},
+		}),
 	});
 
 	mainSeries.setData(generateData());

@@ -33,9 +33,7 @@ function runTestCase(container) {
 	const secondSeries = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
-		autoscaleInfoProvider: function() {
-			return null;
-		},
+		autoscaleInfoProvider: () => null,
 	});
 
 	secondSeries.setData(generateData());

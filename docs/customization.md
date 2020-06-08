@@ -80,7 +80,7 @@ Changing the time format of the time scale labels is not available currently but
 ```javascript
 const chart = createChart(document.body, {
     localization: {
-        timeFormatter: function(businessDayOrTimestamp) {
+        timeFormatter: (businessDayOrTimestamp) => {
             // console.log(businessDayOrTimestamp);
 
             if (LightweightCharts.isBusinessDay(businessDayOrTimestamp)) {
@@ -100,7 +100,7 @@ const chart = createChart(document.body, {
 ```javascript
 const chart = createChart(document.body, {
     localization: {
-        priceFormatter: function(price) {
+        priceFormatter: (price) => {
             // add $ sign before price
 
             return '$' + price;

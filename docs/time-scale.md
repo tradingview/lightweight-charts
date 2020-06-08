@@ -50,7 +50,7 @@ chart.applyOptions({
         visible: true,
         timeVisible: true,
         secondsVisible: false,
-        tickMarkFormatter: function(time, tickMarkType, locale) {
+        tickMarkFormatter: (time, tickMarkType, locale) => {
             console.log(time, tickMarkType, locale);
             const year = LightweightCharts.isBusinessDay(time) ? time.year : new Date(time * 1000).getUTCFullYear();
             return String(year);

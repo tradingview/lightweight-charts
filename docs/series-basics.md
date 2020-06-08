@@ -329,7 +329,7 @@ series.applyOptions({
     priceFormat: {
         type: 'custom',
         minMove: 0.02,
-        formatter: function(price) {
+        formatter: (price) => {
             return '$' + price.toFixed(2);
         },
     }
@@ -425,11 +425,11 @@ series.setMarkers([
     },
 ]);
 
-chart.subscribeCrosshairMove(function(param) {
+chart.subscribeCrosshairMove((param) => {
     console.log(param.hoveredMarkerId);
 });
 
-chart.subscribeClick(function(param) {
+chart.subscribeClick((param) => {
     console.log(param.hoveredMarkerId);
 });
 ```

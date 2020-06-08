@@ -22,7 +22,7 @@ function runTestCase(container) {
 		timeScale: {
 			timeVisible: true,
 			secondsVisible: true,
-			tickMarkFormatter: function(time, tickMarkType, locale) {
+			tickMarkFormatter: (time, tickMarkType, locale) => {
 				const date = LightweightCharts.isBusinessDay(time)
 					? new Date(Date.UTC(time.year, time.month - 1, time.day))
 					: new Date(time * 1000);
