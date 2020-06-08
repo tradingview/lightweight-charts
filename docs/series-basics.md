@@ -147,7 +147,7 @@ By default, the chart scales data automatically based on visible data range. How
 There is an option called `autoscaleProvider` that allows overriding visible price range for series
 
 ```javascript
-var firstSeries = chart.addLineSeries({
+const firstSeries = chart.addLineSeries({
     autoscaleInfoProvider: () => {
         return {
             priceRange: {
@@ -164,7 +164,7 @@ So, you can just add a function that returns an object with `priceRange` field, 
 You can also provide additional margins in pixels. Please be careful and never mix prices and pixels.
 
 ```javascript
-var firstSeries = chart.addLineSeries({
+const firstSeries = chart.addLineSeries({
     autoscaleInfoProvider: () => {
         return {
             priceRange: {
@@ -183,9 +183,9 @@ var firstSeries = chart.addLineSeries({
 Actually, `autoscaleInfoProvider` function has an argument `original` which is the default implementation, so you can call it and adjust the result:
 
 ```javascript
-var firstSeries = chart.addLineSeries({
+const firstSeries = chart.addLineSeries({
     autoscaleInfoProvider: (original) => {
-        var res = original();
+        const res = original();
         if (res.priceRange !== null) {
             res.priceRange.minValue -= 10;
             res.priceRange.maxValue += 10;
