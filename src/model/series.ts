@@ -553,21 +553,31 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	private _recalculateMarkers(): void {
 		const timeScalePoints = this.model().timeScale().points();
-		if (timeScalePoints.size() === 0) {
+		if (timeScalePoints.size() === 0 || this._data.size() === 0) {
 			this._indexedMarkers = [];
 			return;
 		}
 
-		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<TimePoint>, index: number) => ({
-			time: ensureNotNull(timeScalePoints.indexOf(marker.time.timestamp, true)),
-			position: marker.position,
-			shape: marker.shape,
-			color: marker.color,
-			id: marker.id,
-			internalId: index,
-			text: marker.text,
-			size: marker.size,
-		}));
+		const firstDataIndex = ensureNotNull(this._data.firstIndex());
+
+		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<TimePoint>, index: number) => {
+			// the first find index on the time scale (across all series)
+			const timePointIndex = ensureNotNull(timeScalePoints.indexOf(marker.time.timestamp, true));
+
+			// and then search that index inside the series data
+			const searchMode = timePointIndex < firstDataIndex ? PlotRowSearchMode.NearestRight : PlotRowSearchMode.NearestLeft;
+			const seriesDataIndex = ensureNotNull(this._data.search(timePointIndex, searchMode)).index;
+			return {
+				time: seriesDataIndex,
+				position: marker.position,
+				shape: marker.shape,
+				color: marker.color,
+				id: marker.id,
+				internalId: index,
+				text: marker.text,
+				size: marker.size,
+			};
+		});
 	}
 
 	private _recreatePaneViews(): void {
