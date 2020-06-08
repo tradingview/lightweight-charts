@@ -1,4 +1,3 @@
-import { defaultTickMarkFormatter } from '../../model/default-tick-mark-formatter';
 import { TimeScaleOptions } from '../../model/time-scale';
 
 export const timeScaleOptionsDefaults: TimeScaleOptions = {
@@ -12,5 +11,4 @@ export const timeScaleOptionsDefaults: TimeScaleOptions = {
 	visible: true,
 	timeVisible: false,
 	secondsVisible: true,
-	tickMarkFormatter: defaultTickMarkFormatter,
 };

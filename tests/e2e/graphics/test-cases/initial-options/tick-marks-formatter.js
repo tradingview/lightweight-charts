@@ -23,8 +23,11 @@ function runTestCase(container) {
 		timeScale: {
 			timeVisible: true,
 			secondsVisible: true,
-			tickMarkFormatter: function(timePoint, tickMarkType, locale) {
-				var date = new Date(timePoint.timestamp * 1000);
+			tickMarkFormatter: function(time, tickMarkType, locale) {
+				var date = LightweightCharts.isBusinessDay(time)
+					? new Date(Date.UTC(time.year, time.month - 1, time.day))
+					: new Date(time * 1000);
+
 				switch (tickMarkType) {
 					case LightweightCharts.TickMarkType.Year:
 						return 'Y' + date.getUTCFullYear();

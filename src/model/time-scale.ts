@@ -9,11 +9,12 @@ import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
 
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
+import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
 import { areRangesEqual, RangeImpl } from './range-impl';
 import { TickMarks } from './tick-marks';
-import { Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange } from './time-data';
+import { BusinessDay, Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
 import { TimePoints } from './time-points';
 import { TimeScaleVisibleRange } from './time-scale-visible-range';
 
@@ -53,7 +54,7 @@ export const enum TickMarkType {
 	TimeWithSeconds,
 }
 
-export type TickMarkFormatter = (timePoint: TimePoint, tickMarkType: TickMarkType, locale: string) => string;
+export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType: TickMarkType, locale: string) => string;
 
 export interface TimeScaleOptions {
 	rightOffset: number;
@@ -66,7 +67,7 @@ export interface TimeScaleOptions {
 	visible: boolean;
 	timeVisible: boolean;
 	secondsVisible: boolean;
-	tickMarkFormatter: TickMarkFormatter;
+	tickMarkFormatter?: TickMarkFormatter;
 }
 
 export class TimeScale {
@@ -727,7 +728,18 @@ export class TimeScale {
 			tickMarkType = TickMarkType.Year;
 		}
 
-		return this._options.tickMarkFormatter(timePoint, tickMarkType, this._localizationOptions.locale);
+		if (this._options.tickMarkFormatter !== undefined) {
+			// this is temporary solution to make more consistency API
+			// it looks like that all time types in API should have the same form
+			// but for know defaultTickMarkFormatter is on model level and can't determine whether passed time is business day or UTCTimestamp
+			// because type guards are declared on API level
+			// in other hand, type guards couldn't be declared on model level so far
+			// because they are know about string representation of business day ¯\_(ツ)_/¯
+			// let's fix in for all cases for the whole API
+			return this._options.tickMarkFormatter(timePoint.businessDay ?? timePoint.timestamp, tickMarkType, this._localizationOptions.locale);
+		}
+
+		return defaultTickMarkFormatter(timePoint, tickMarkType, this._localizationOptions.locale);
 	}
 
 	private _setVisibleRange(newVisibleRange: TimeScaleVisibleRange): void {
