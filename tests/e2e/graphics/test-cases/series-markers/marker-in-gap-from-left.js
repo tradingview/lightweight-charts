@@ -32,7 +32,7 @@ function runTestCase(container) {
 			color: 'green',
 			position: 'inBar',
 			shape: 'arrowDown',
-			time: 1556877600,
+			time: 1556870600,
 		},
 	]);
 
