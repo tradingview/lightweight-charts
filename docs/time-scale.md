@@ -16,7 +16,7 @@ Time scale (or time axis) is a horizontal scale at the bottom of the chart that 
 |`visible`|`boolean`|`true`|If true, the time scale is shown on a chart|
 |`timeVisible`|`boolean`|`false`|If true, the time is shown on the time scale and in the vertical crosshair label|
 |`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of the crosshair vertical line in `hh:mm:ss` format on intraday intervals|
-|`tickMarkFormatter`|`(TimePoint, TickMarkType, locale) => string`|Default tick marks formatter|Allows to override the tick marks formatter (see below)|
+|`tickMarkFormatter`|`(TimePoint, TickMarkType, locale) => string` &#124; `undefined`|`undefined`|Allows to override the tick marks formatter (see below)|
 
 ### Tick marks formatter
 
@@ -25,12 +25,12 @@ Tick marks formatter can be used to customize tick marks labels on the time axis
 To customize it, you need to provide the `tickMarkFormatter` option. It's a function with the following declaration:
 
 ```typescript
-export type TickMarkFormatter = (timePoint: TimePoint, tickMarkType: TickMarkType, locale: string) => string;
+export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType: TickMarkType, locale: string) => string;
 ```
 
-Where `timePoint` is [Time](./time.md) object, `type` is [TickMarkType](./constants.md#TickMarkType) enum and `locale` is the currently applied locale of the string type.
+Where `time` is [Time](./time.md) object, `type` is [TickMarkType](./constants.md#TickMarkType) enum and `locale` is the currently applied locale of the string type.
 
-This function should return `timePoint` as a string formatted according to `tickMarkType` type (year, month, etc) and `locale`.
+This function should return `time` as a string formatted according to `tickMarkType` type (year, month, etc) and `locale`.
 
 Note that the returned string should be the shortest possible value and should have no more than 8 characters.
 Otherwise, the tick marks will overlap each other.
@@ -50,9 +50,10 @@ chart.applyOptions({
         visible: true,
         timeVisible: true,
         secondsVisible: false,
-        tickMarkFormatter: function(timePoint, tickMarkType, locale) {
-            console.log(timePoint, tickMarkType, locale);
-            return String(new Date(timePoint.timestamp * 1000).getUTCFullYear());
+        tickMarkFormatter: function(time, tickMarkType, locale) {
+            console.log(time, tickMarkType, locale);
+            const year = LightweightCharts.isBusinessDay(time) ? time.year : new Date(time * 1000).getUTCFullYear();
+            return String(year);
         },
     },
 });
