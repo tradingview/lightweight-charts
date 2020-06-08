@@ -1,11 +1,11 @@
-var startDate = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-var endDate = new Date(Date.UTC(2019, 0, 1, 0, 0, 0, 0));
+const startDate = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+const endDate = new Date(Date.UTC(2019, 0, 1, 0, 0, 0, 0));
 
 function generateData() {
-	var res = [];
+	const res = [];
 
-	var time = new Date(startDate);
-	for (var i = 0; time.getTime() < endDate.getTime(); ++i) {
+	const time = new Date(startDate);
+	for (let i = 0; time.getTime() < endDate.getTime(); ++i) {
 		res.push({
 			time: time.getTime() / 1000,
 			value: i / 1000 + 0.6,
@@ -17,12 +17,11 @@ function generateData() {
 	return res;
 }
 
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	const chart = LightweightCharts.createChart(container);
 
-	var firstSeries = chart.addLineSeries();
-	var secondSeries = chart.addLineSeries();
+	const firstSeries = chart.addLineSeries();
+	const secondSeries = chart.addLineSeries();
 
 	firstSeries.setData(generateData());
 	secondSeries.setData([

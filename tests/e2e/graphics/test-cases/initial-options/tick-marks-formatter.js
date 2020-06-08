@@ -17,14 +17,13 @@ function getData() {
 	];
 }
 
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container, {
+	const chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			timeVisible: true,
 			secondsVisible: true,
 			tickMarkFormatter: function(time, tickMarkType, locale) {
-				var date = LightweightCharts.isBusinessDay(time)
+				const date = LightweightCharts.isBusinessDay(time)
 					? new Date(Date.UTC(time.year, time.month - 1, time.day))
 					: new Date(time * 1000);
 
@@ -50,7 +49,7 @@ function runTestCase(container) {
 		},
 	});
 
-	var firstSeries = chart.addLineSeries();
+	const firstSeries = chart.addLineSeries();
 	firstSeries.setData(getData());
 	chart.timeScale().fitContent();
 }

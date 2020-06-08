@@ -5,7 +5,7 @@ module.exports = {
 		node: false,
 	},
 	rules: {
-		'no-var': 'off',
+		'no-unused-vars': ['error', { varsIgnorePattern: 'runTestCase', args: 'none' }],
 	},
 	globals: {
 		LightweightCharts: false,

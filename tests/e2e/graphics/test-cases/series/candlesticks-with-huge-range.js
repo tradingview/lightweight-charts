@@ -1,6 +1,6 @@
 function generateCandle(i, target) {
-	var step = (i % 20) / 5000;
-	var base = i / 5;
+	const step = (i % 20) / 5000;
+	const base = i / 5;
 	target.open = base * (1 - step);
 	target.high = base * (1 + 2 * step);
 	target.low = base * (1 - 2 * step);
@@ -8,10 +8,10 @@ function generateCandle(i, target) {
 }
 
 function generateData() {
-	var res = [];
-	var time = new Date(Date.UTC(2000, 0, 1, 0, 0, 0, 0));
-	for (var i = 0; i < 10000; ++i) {
-		var item = {
+	const res = [];
+	const time = new Date(Date.UTC(2000, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < 10000; ++i) {
+		const item = {
 			time: time.getTime() / 1000,
 		};
 		time.setUTCDate(time.getUTCDate() + 1);
@@ -22,11 +22,10 @@ function generateData() {
 	return res;
 }
 
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	const chart = LightweightCharts.createChart(container);
 
-	var mainSeries = chart.addCandlestickSeries();
+	const mainSeries = chart.addCandlestickSeries();
 
 	mainSeries.setData(generateData());
 

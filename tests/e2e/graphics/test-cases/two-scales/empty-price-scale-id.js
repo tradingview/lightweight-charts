@@ -1,8 +1,8 @@
 function generateCandle(i, target) {
-	var step = (i % 20) / 5000;
-	var base = i / 5;
+	const step = (i % 20) / 5000;
+	const base = i / 5;
 
-	var sign = (i % 2) ? 1 : -1;
+	const sign = (i % 2) ? 1 : -1;
 	target.open = base * (1 - sign * step);
 	target.high = base * (1 + 4 * step);
 	target.low = base * (1 - 4 * step);
@@ -10,10 +10,10 @@ function generateCandle(i, target) {
 }
 
 function generateData() {
-	var res = [];
-	var time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (var i = 0; i < 500; ++i) {
-		var item = {
+	const res = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < 500; ++i) {
+		const item = {
 			time: time.getTime() / 1000,
 		};
 		time.setUTCDate(time.getUTCDate() + 1);
@@ -25,15 +25,15 @@ function generateData() {
 }
 
 function generateDataLine(offset) {
-	var colors = [
+	const colors = [
 		'#013370',
 		'#3a9656',
 		undefined, // default color should be used
 	];
 
-	var res = [];
-	var time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (var i = 0; i < 500; ++i) {
+	const res = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < 500; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
 			value: (offset || 0) + i,
@@ -45,11 +45,10 @@ function generateDataLine(offset) {
 	return res;
 }
 
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	const chart = LightweightCharts.createChart(container);
 
-	var mainSeries = chart.addBarSeries({
+	const mainSeries = chart.addBarSeries({
 		borderColor: 'rgba(0, 0, 255, 0.2)',
 		upColor: 'rgba(0, 80, 0, 0.4)',
 		downColor: 'rgba(80, 0, 0, 0.4)',
@@ -59,7 +58,7 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	var lineSeires1 = chart.addLineSeries({
+	const lineSeires1 = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,
@@ -69,7 +68,7 @@ function runTestCase(container) {
 
 	lineSeires1.setData(generateDataLine());
 
-	var lineSeires2 = chart.addLineSeries({
+	const lineSeires2 = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,

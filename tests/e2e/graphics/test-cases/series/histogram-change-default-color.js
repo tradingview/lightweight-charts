@@ -1,8 +1,7 @@
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	const chart = LightweightCharts.createChart(container);
 
-	var series = chart.addHistogramSeries({
+	const series = chart.addHistogramSeries({
 		color: 'blue',
 	});
 

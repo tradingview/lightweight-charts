@@ -1,9 +1,8 @@
 // see https://github.com/tradingview/lightweight-charts/issues/133
 
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
-	var series = chart.addCandlestickSeries();
+	const chart = LightweightCharts.createChart(container);
+	const series = chart.addCandlestickSeries();
 
 	series.setData([
 		{ time: '2018-12-06', open: 141.77, high: 170.39, low: 120.25, close: 145.72 },

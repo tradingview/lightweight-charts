@@ -1,7 +1,7 @@
 function generateData(count) {
-	var res = [];
-	var time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (var i = 0; i < count; ++i) {
+	const res = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < count; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
 			value: i,
@@ -13,20 +13,19 @@ function generateData(count) {
 	return res;
 }
 
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	const chart = LightweightCharts.createChart(container);
 
-	var series = chart.addLineSeries();
+	const series = chart.addLineSeries();
 
-	var data = generateData(10);
+	const data = generateData(10);
 	series.setData(data);
 
 	return new Promise(resolve => {
 		setTimeout(() => {
-			var timeScale = chart.timeScale();
+			const timeScale = chart.timeScale();
 
-			var range = { from: 0, to: 5 };
+			const range = { from: 0, to: 5 };
 			timeScale.setVisibleLogicalRange(range);
 
 			timeScale.subscribeVisibleLogicalRangeChange(newRange => {

@@ -1,8 +1,7 @@
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	const chart = LightweightCharts.createChart(container);
 
-	var lineSeries = chart.addLineSeries();
+	const lineSeries = chart.addLineSeries();
 
 	lineSeries.setData([
 		{ time: 1556877600, value: 230.12 },
@@ -13,7 +12,7 @@ function runTestCase(container) {
 		{ time: 1556895600, value: 232.52 },
 	]);
 
-	var lineSeries1 = chart.addLineSeries({
+	const lineSeries1 = chart.addLineSeries({
 		color: 'red',
 	});
 

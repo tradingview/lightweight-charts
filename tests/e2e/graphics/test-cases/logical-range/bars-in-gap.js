@@ -1,7 +1,7 @@
 function generateData(count) {
-	var res = [];
-	var time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (var i = 0; i < count; ++i) {
+	const res = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < count; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
 			value: i,
@@ -13,12 +13,11 @@ function generateData(count) {
 	return res;
 }
 
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	const chart = LightweightCharts.createChart(container);
 
-	var mainSeries = chart.addLineSeries();
-	var series = chart.addLineSeries();
+	const mainSeries = chart.addLineSeries();
+	const series = chart.addLineSeries();
 
 	mainSeries.setData(generateData(61));
 
@@ -27,7 +26,7 @@ function runTestCase(container) {
 
 	chart.timeScale().fitContent();
 
-	var bars = series.barsInLogicalRange({ from: 15, to: 25 });
+	const bars = series.barsInLogicalRange({ from: 15, to: 25 });
 	console.assert(bars !== null, 'Bars shouldn\'t null');
 
 	console.assert(bars.from === undefined, `from date should be undefined, actual=${bars.from}`);

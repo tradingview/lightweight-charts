@@ -1,5 +1,5 @@
 function nextBusinessDay(time) {
-	var d = new Date();
+	const d = new Date();
 	d.setUTCFullYear(time.year);
 	d.setUTCMonth(time.month - 1);
 	d.setUTCDate(time.day + 1);
@@ -12,7 +12,7 @@ function nextBusinessDay(time) {
 }
 
 function businessDayToTimestamp(time) {
-	var d = new Date();
+	const d = new Date();
 	d.setUTCFullYear(time.year);
 	d.setUTCMonth(time.month - 1);
 	d.setUTCDate(time.day);
@@ -21,9 +21,9 @@ function businessDayToTimestamp(time) {
 }
 
 function generateData() {
-	var res = [];
-	var time = nextBusinessDay({ day: 1, month: 1, year: 2018 });
-	for (var i = 0; i < 500; ++i) {
+	const res = [];
+	let time = nextBusinessDay({ day: 1, month: 1, year: 2018 });
+	for (let i = 0; i < 500; ++i) {
 		time = nextBusinessDay(time);
 		res.push({
 			time: businessDayToTimestamp(time),
@@ -33,11 +33,10 @@ function generateData() {
 	return res;
 }
 
-// eslint-disable-next-line no-unused-vars
 function runTestCase(container) {
-	var chart = LightweightCharts.createChart(container);
+	const chart = LightweightCharts.createChart(container);
 
-	var mainSeries = chart.addAreaSeries();
+	const mainSeries = chart.addAreaSeries();
 
 	mainSeries.setData(generateData());
 	return chart;
