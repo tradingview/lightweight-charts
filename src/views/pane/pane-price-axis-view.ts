@@ -66,6 +66,7 @@ export class PanePriceAxisView implements IPaneView {
 			return null;
 		}
 
+		// this price scale will be used to find label placement only (left, right, none)
 		const priceScale = pane.isOverlay(this._dataSource) ? pane.defaultPriceScale() : this._dataSource.priceScale();
 		if (priceScale === null) {
 			return null;
