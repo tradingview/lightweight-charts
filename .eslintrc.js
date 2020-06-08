@@ -4,11 +4,32 @@ module.exports = {
 		es6: true,
 		node: true,
 	},
+	plugins: ['markdown'],
 	extends: 'eslint:recommended',
 	parserOptions: {
 		ecmaVersion: 2015,
 		sourceType: 'module',
 	},
+	overrides: [
+		{
+			files: ['**/*.md'],
+			processor: 'markdown/markdown',
+		},
+		{
+			files: ['**/*.md/*.js'],
+			env: {
+				browser: true,
+				node: false,
+			},
+			globals: {
+				LightweightCharts: false,
+			},
+			rules: {
+				'no-console': 'off',
+				indent: ['error', 4],
+			},
+		},
+	],
 	rules: {
 		// enforces return statements in callbacks of array's methods
 		// http://eslint.org/docs/rules/array-callback-return

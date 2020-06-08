@@ -68,8 +68,8 @@ function runTSLintForFiles(tsFiles) {
 	return runForFiles('node ./node_modules/tslint/bin/tslint --config tslint.json', tsFiles);
 }
 
-function runESLintForFiles(jsFiles) {
-	return runForFiles('node ./node_modules/eslint/bin/eslint --quiet --format=unix', jsFiles);
+function runESLintForFiles(files) {
+	return runForFiles('node ./node_modules/eslint/bin/eslint --quiet --format=unix', files);
 }
 
 function runMarkdownLintForFiles(mdFiles) {
@@ -100,6 +100,8 @@ function lintFiles(files) {
 	// markdown
 	const mdFiles = filterByExt(files, '.md');
 	if (mdFiles.length !== 0) {
+		// yeah, eslint might check code inside markdown files
+		hasErrors = runESLintForFiles(mdFiles) || hasErrors;
 		hasErrors = runMarkdownLintForFiles(mdFiles) || hasErrors;
 		hasErrors = run('node scripts/check-markdown-links.js') || hasErrors;
 	}
