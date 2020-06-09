@@ -75,8 +75,8 @@ It has the following values:
 
 It has the following values:
 
-- `TickMarkType.Year` - the tick mark represents start of the year (e.g. it's the first tick mark in a year).
-- `TickMarkType.Month` - the tick mark represents start of the month (e.g. it's the first tick mark in a month).
+- `TickMarkType.Year` - the tick mark represents the start of the year (e.g. it's the first tick mark in a year).
+- `TickMarkType.Month` - the tick mark represents the start of the month (e.g. it's the first tick mark in a month).
 - `TickMarkType.DayOfMonth` - the tick mark represents a day of the month.
 - `TickMarkType.Time` - the tick mark represents a time without seconds.
 - `TickMarkType.TimeWithSeconds` - the tick mark represents a full time format.

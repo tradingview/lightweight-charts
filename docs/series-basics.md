@@ -57,7 +57,7 @@ const lineSeries = chart.addLineSeries({
 
 ### Binding to price scale
 
-When adding any series to a chart, you can specify if you want target series to be attached to a certain price axis - left or right.
+When adding any series to a chart, you can specify if you want the target series to be attached to a certain price axis - left or right.
 By default, series are attached to the right price axis.
 This means one can scale the series with price axis. Note that price axis visible range depends on series values.
 
@@ -67,8 +67,8 @@ const lineSeries = chart.addLineSeries({
 });
 ```
 
-In contrast, overlay series just draws itself on a chart independent from the visible price axis.
-To create overlay specify unique id as a `priceScaleId` or just keep is as empty string.
+In contrast, an overlay series just draws itself on a chart independent from the visible price axis.
+To create an overlay specify a unique id as a `priceScaleId` or just keep is as an empty string.
 
 ```javascript
 const lineSeries = chart.addLineSeries({
@@ -143,7 +143,7 @@ chart.applyOptions({
 
 ### Overriding autoscale
 
-By default, the chart scales data automatically based on visible data range. However, for some reasons one could need overriding this behavior.
+By default, the chart scales data automatically based on visible data range. However, for some reasons one could require overriding this behavior.
 There is an option called `autoscaleProvider` that allows overriding visible price range for series
 
 ```javascript
@@ -493,10 +493,10 @@ The returned value is an object with the following properties:
 - `barsBefore` - a number of bars between the `from` index of the passed logical range and the first series' bar
 - `barsAfter` - a number of bars between the `to` index of the passed logical range and the last series' bar
 
-Positive value in `barsBefore` field means that there are some bars before (out of logical range from the left) the `from` logical index in the series.
+Positive value in the `barsBefore` field means that there are some bars before (out of logical range from the left) the `from` logical index in the series.
 Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the `from` logical index are some bars.
 
-Positive value in `barsAfter` field means that there are some bars after (out of logical range from the right) the `to` logical index in the series.
+Positive value in the `barsAfter` field means that there are some bars after (out of logical range from the right) the `to` logical index in the series.
 Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the `to` logical index are some bars.
 
 ```javascript

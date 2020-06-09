@@ -147,7 +147,7 @@ chart.timeScale().fitContent();
 ### timeToCoordinate
 
 Converts a time to local `x` coordinate.
-The argument is [Time](./time.md) that needs to be converted to a coordinate.
+The argument is [Time](./time.md) that needs to be converted into a coordinate.
 
 Returns `x` coordinate of a bar with passed time or `null` if no bar found.
 
@@ -158,7 +158,7 @@ chart.timeScale().timeToCoordinate('1990-04-24');
 ### coordinateToTime
 
 Converts `x` coordinate to [Time](./time.md).
-The argument is `x` coordinate that needs to be converted to a time.
+The argument is the `x` coordinate that needs to be converted into a time.
 
 Returns [Time](./time.md) of a bar that is located on the passed coordinate or `null` if there are no bars on that coordinate.
 
@@ -248,9 +248,9 @@ Before that point all indexes are negative, starting from that point - positive.
 
 Indexes might have fractional parts, for instance 4.2, due to the time-scale being continuous rather than discrete.
 
-Integer part of logical index means index of the fully visible bar (see image below).
+Integer part of the logical index means index of the fully visible bar (see image below).
 Thus, if we have 5.2 as the last visible logical index (`to` field), that means that the last visible bar has index 5, but we also have partially visible (for 20%) 6th bar.
-Half (e.g. 1.5, 3.5, 10.5) means exactly middle of the bar.
+Half (e.g. 1.5, 3.5, 10.5) means exactly a middle of the bar.
 
 ![Logical range](./assets/logical-range.png "Logical range")
 
