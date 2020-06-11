@@ -99,48 +99,6 @@ export class TimePoints {
 		return null;
 	}
 
-	public closestIndexLeft(time: TimePoint): TimePointIndex | null {
-		const items = this._items;
-		if (!items.length) {
-			return null;
-		}
-
-		if (Number.isNaN(time.timestamp)) {
-			return null;
-		}
-
-		let maxOffset = items.length - 1;
-		const maxTime = items[maxOffset];
-		if (time >= maxTime) {
-			return maxOffset as TimePointIndex;
-		}
-
-		let minOffset = 0;
-		const minTime = items[minOffset];
-		if (time < minTime) {
-			return null;
-		} else if (time === minTime) {
-			return minOffset as TimePointIndex;
-		}
-
-		// binary search
-		while (maxOffset > minOffset + 1) {
-			const testOffset = (minOffset + maxOffset) >> 1;
-			const testValue = items[testOffset];
-			if (testValue.timestamp > time.timestamp) {
-				maxOffset = testOffset;
-			} else if (testValue.timestamp < time.timestamp) {
-				minOffset = testOffset;
-			} else if (testValue.timestamp === time.timestamp) {
-				return testOffset as TimePointIndex;
-			} else {
-				return null;
-			}
-		}
-
-		return minOffset as TimePointIndex;
-	}
-
 	private _offsetToIndex(offset: number): TimePointIndex | null {
 		if (0 <= offset && offset < this.size()) {
 			return offset as TimePointIndex;
