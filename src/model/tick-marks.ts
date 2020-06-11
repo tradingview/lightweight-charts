@@ -99,29 +99,6 @@ export class TickMarks {
 		return tickMark.time;
 	}
 
-	public nearestIndex(time: number): number {
-		let left = this._minIndex;
-		let right = this._maxIndex;
-		while (right - left > 2) {
-			if (ensureDefined(this._marksByIndex.get(left)).time.timestamp * 1000 === time) {
-				return left;
-			}
-
-			if (ensureDefined(this._marksByIndex.get(right)).time.timestamp * 1000 === time) {
-				return right;
-			}
-
-			const center = Math.round((left + right) / 2);
-			if (ensureDefined(this._marksByIndex.get(center)).time.timestamp * 1000 > time) {
-				right = center;
-			} else {
-				left = center;
-			}
-		}
-
-		return left;
-	}
-
 	public build(spacing: number, maxWidth: number): TickMark[] {
 		const maxBar = Math.ceil(maxWidth / spacing);
 		if (this._maxBar === maxBar && this._cache) {
