@@ -521,11 +521,7 @@ export class TimeScale {
 		this._visibleRangeInvalidated = true;
 		if (values.length > 0) {
 			// we have some time points to merge
-			const oldSize = this._points.size();
 			this._points.merge(index, values);
-			if (this._rightOffset < 0 && (this._points.size() === oldSize + 1)) {
-				this._rightOffset -= 1;
-			}
 		}
 		this._tickMarks.merge(marks);
 		this._correctOffset();

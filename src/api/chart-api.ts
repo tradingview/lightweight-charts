@@ -25,7 +25,6 @@ import {
 	PriceFormatBuiltIn,
 	SeriesType,
 } from '../model/series-options';
-import { TimePointIndex } from '../model/time-data';
 
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
@@ -277,7 +276,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
 			key.updateData(value.update);
 		});
-		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
+		model.updateTimeScaleBaseIndex(timeScaleUpdate.index);
 		this._seriesMap.delete(seriesApi);
 		this._seriesMapReversed.delete(series);
 	}
@@ -293,7 +292,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 			// see https://github.com/tradingview/lightweight-charts/pull/330#discussion_r379415805
 			key.updateData(value.update, true);
 		});
-		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
+		model.updateTimeScaleBaseIndex(timeScaleUpdate.index);
 	}
 
 	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void {
@@ -304,7 +303,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
 			key.updateData(value.update);
 		});
-		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
+		model.updateTimeScaleBaseIndex(timeScaleUpdate.index);
 	}
 
 	public subscribeClick(handler: MouseEventHandler): void {
