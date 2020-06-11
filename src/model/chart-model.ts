@@ -234,11 +234,6 @@ export class ChartModel implements IDestroyable {
 		return null;
 	}
 
-	public updateAllPaneViews(): void {
-		this._panes.forEach((p: Pane) => p.updateAllViews());
-		this.updateCrosshair();
-	}
-
 	public timeScale(): TimeScale {
 		return this._timeScale;
 	}
@@ -546,7 +541,7 @@ export class ChartModel implements IDestroyable {
 
 	public recalculateAllPanes(): void {
 		this._panes.forEach((p: Pane) => p.recalculate());
-		this.updateAllPaneViews();
+		this.updateCrosshair();
 	}
 
 	public destroy(): void {
