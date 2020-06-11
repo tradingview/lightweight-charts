@@ -266,9 +266,8 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		return res;
 	}
 
-	public removeSeries(seriesApi: ISeriesApi<SeriesType>): void {
-		const seriesObj = seriesApi as SeriesApi<SeriesType>;
-		const series = ensureDefined(this._seriesMap.get(seriesObj));
+	public removeSeries(seriesApi: SeriesApi<SeriesType>): void {
+		const series = ensureDefined(this._seriesMap.get(seriesApi));
 
 		const update = this._dataLayer.removeSeries(series);
 		const model = this._chartWidget.model();
@@ -279,7 +278,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 			key.updateData(value.update);
 		});
 		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
-		this._seriesMap.delete(seriesObj);
+		this._seriesMap.delete(seriesApi);
 		this._seriesMapReversed.delete(series);
 	}
 
