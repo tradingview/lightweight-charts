@@ -470,13 +470,12 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	public updateTimeScale(values: TimePoint[], marks: TickMark[], clearFlag: boolean): void {
-		if (clearFlag) {
-			// refresh timescale
+	public updateTimeScale(newPoints: readonly TimePoint[], marksUpdate: TickMark[], fullUpdate: boolean): void {
+		if (fullUpdate) {
 			this._timeScale.reset();
 		}
 
-		this._timeScale.update(values, marks);
+		this._timeScale.update(newPoints, marksUpdate);
 	}
 
 	public updateTimeScaleBaseIndex(earliestRowIndex?: TimePointIndex): void {

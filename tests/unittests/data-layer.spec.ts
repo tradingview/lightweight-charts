@@ -52,10 +52,8 @@ describe('DataLayer', () => {
 		});
 		expect(updateResult1.timeScaleUpdate.marks.length).to.be.equal(2);
 		expect(updateResult1.timeScaleUpdate.marks[0].index).to.be.equal(0 as TimePointIndex);
-		expect(updateResult1.timeScaleUpdate.marks[0].time).to.be.deep.equal({ timestamp: 1000 });
 
 		expect(updateResult1.timeScaleUpdate.marks[1].index).to.be.equal(1 as TimePointIndex);
-		expect(updateResult1.timeScaleUpdate.marks[1].time).to.be.deep.equal({ timestamp: 3000 });
 
 		const updateResult2 = dataLayer.setSeriesData(series2, [dataItemAt(2000 as UTCTimestamp), dataItemAt(4000 as UTCTimestamp)]);
 		expect(updateResult2.timeScaleUpdate.index).to.be.equal(0 as TimePointIndex);
@@ -77,18 +75,12 @@ describe('DataLayer', () => {
 				expect(updatePacket.update[1].time).to.be.deep.equal({ timestamp: 4000 });
 			}
 		});
+
 		expect(updateResult2.timeScaleUpdate.marks.length).to.be.equal(4);
 		expect(updateResult2.timeScaleUpdate.marks[0].index).to.be.equal(0 as TimePointIndex);
-		expect(updateResult2.timeScaleUpdate.marks[0].time).to.be.deep.equal({ timestamp: 1000 });
-
 		expect(updateResult2.timeScaleUpdate.marks[1].index).to.be.equal(1 as TimePointIndex);
-		expect(updateResult2.timeScaleUpdate.marks[1].time).to.be.deep.equal({ timestamp: 2000 });
-
 		expect(updateResult2.timeScaleUpdate.marks[2].index).to.be.equal(2 as TimePointIndex);
-		expect(updateResult2.timeScaleUpdate.marks[2].time).to.be.deep.equal({ timestamp: 3000 });
-
 		expect(updateResult2.timeScaleUpdate.marks[3].index).to.be.equal(3 as TimePointIndex);
-		expect(updateResult2.timeScaleUpdate.marks[3].time).to.be.deep.equal({ timestamp: 4000 });
 	});
 
 	it('should be able to remove series', () => {
@@ -125,18 +117,12 @@ describe('DataLayer', () => {
 				expect(updatePacket.update[1].time).to.be.deep.equal({ timestamp: 7000 });
 			}
 		});
+
 		expect(updateResult.timeScaleUpdate.marks.length).to.be.equal(4);
 		expect(updateResult.timeScaleUpdate.marks[0].index).to.be.equal(0 as TimePointIndex);
-		expect(updateResult.timeScaleUpdate.marks[0].time).to.be.deep.equal({ timestamp: 2000 });
-
 		expect(updateResult.timeScaleUpdate.marks[1].index).to.be.equal(1 as TimePointIndex);
-		expect(updateResult.timeScaleUpdate.marks[1].time).to.be.deep.equal({ timestamp: 3000 });
-
 		expect(updateResult.timeScaleUpdate.marks[2].index).to.be.equal(2 as TimePointIndex);
-		expect(updateResult.timeScaleUpdate.marks[2].time).to.be.deep.equal({ timestamp: 5000 });
-
 		expect(updateResult.timeScaleUpdate.marks[3].index).to.be.equal(3 as TimePointIndex);
-		expect(updateResult.timeScaleUpdate.marks[3].time).to.be.deep.equal({ timestamp: 7000 });
 	});
 
 	it('should be able to add new point in the end', () => {
@@ -162,7 +148,6 @@ describe('DataLayer', () => {
 		});
 		expect(updateResult1.timeScaleUpdate.marks.length).to.be.equal(1);
 		expect(updateResult1.timeScaleUpdate.marks[0].index).to.be.equal(4 as TimePointIndex);
-		expect(updateResult1.timeScaleUpdate.marks[0].time).to.be.deep.equal({ timestamp: 5000 });
 
 		// add one more point
 		const updateResult2 = dataLayer.updateSeriesData(series2, dataItemAt(6000 as UTCTimestamp));
@@ -177,7 +162,6 @@ describe('DataLayer', () => {
 		});
 		expect(updateResult2.timeScaleUpdate.marks.length).to.be.equal(1);
 		expect(updateResult2.timeScaleUpdate.marks[0].index).to.be.equal(5 as TimePointIndex);
-		expect(updateResult2.timeScaleUpdate.marks[0].time).to.be.deep.equal({ timestamp: 6000 });
 	});
 
 	it('should be able to change last existing point', () => {
@@ -250,9 +234,6 @@ describe('DataLayer', () => {
 		expect(updateResult.timeScaleUpdate.marks[0].index).to.be.equal(2 as TimePointIndex);
 		expect(updateResult.timeScaleUpdate.marks[1].index).to.be.equal(3 as TimePointIndex);
 		expect(updateResult.timeScaleUpdate.marks[2].index).to.be.equal(4 as TimePointIndex);
-		expect(updateResult.timeScaleUpdate.marks[0].time).to.be.deep.equal({ timestamp: 4000 });
-		expect(updateResult.timeScaleUpdate.marks[1].time).to.be.deep.equal({ timestamp: 5000 });
-		expect(updateResult.timeScaleUpdate.marks[2].time).to.be.deep.equal({ timestamp: 6000 });
 
 		// add a new point before all points
 		const updateResult2 = dataLayer.updateSeriesData(series2, dataItemAt(1000 as UTCTimestamp));
@@ -290,12 +271,6 @@ describe('DataLayer', () => {
 		expect(updateResult2.timeScaleUpdate.marks[3].index).to.be.equal(3 as TimePointIndex);
 		expect(updateResult2.timeScaleUpdate.marks[4].index).to.be.equal(4 as TimePointIndex);
 		expect(updateResult2.timeScaleUpdate.marks[5].index).to.be.equal(5 as TimePointIndex);
-		expect(updateResult2.timeScaleUpdate.marks[0].time).to.be.deep.equal({ timestamp: 1000 });
-		expect(updateResult2.timeScaleUpdate.marks[1].time).to.be.deep.equal({ timestamp: 2000 });
-		expect(updateResult2.timeScaleUpdate.marks[2].time).to.be.deep.equal({ timestamp: 3000 });
-		expect(updateResult2.timeScaleUpdate.marks[3].time).to.be.deep.equal({ timestamp: 4000 });
-		expect(updateResult2.timeScaleUpdate.marks[4].time).to.be.deep.equal({ timestamp: 5000 });
-		expect(updateResult2.timeScaleUpdate.marks[5].time).to.be.deep.equal({ timestamp: 6000 });
 	});
 
 	it('allow business days', () => {
@@ -337,10 +312,8 @@ describe('DataLayer', () => {
 		});
 		expect(updateResult1.timeScaleUpdate.marks.length).to.be.equal(2);
 		expect(updateResult1.timeScaleUpdate.marks[0].index).to.be.equal(0 as TimePointIndex);
-		expect(updateResult1.timeScaleUpdate.marks[0].time).to.be.deep.equal(timePoint1);
 
 		expect(updateResult1.timeScaleUpdate.marks[1].index).to.be.equal(1 as TimePointIndex);
-		expect(updateResult1.timeScaleUpdate.marks[1].time).to.be.deep.equal(timePoint2);
 	});
 
 	it('all points should have same time type', () => {

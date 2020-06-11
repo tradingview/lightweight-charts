@@ -1,7 +1,7 @@
 import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 
-import { TickMark, TimePoint } from './time-data';
+import { TickMark } from './time-data';
 
 function sortByIndexAsc(a: TickMark, b: TickMark): number {
 	return a.index - b.index;
@@ -40,8 +40,6 @@ export class TickMarks {
 			const existingTickMark = this._marksByIndex.get(tickMark.index);
 			if (existingTickMark) {
 				if (existingTickMark.index === tickMark.index && existingTickMark.span === tickMark.span) {
-					// We don't need to do anything, just update time (if it differs)
-					existingTickMark.time = tickMark.time;
 					continue;
 				}
 
@@ -88,15 +86,6 @@ export class TickMarks {
 
 		this._cache = null;
 		this._changed.fire();
-	}
-
-	public indexToTime(index: number): TimePoint | null {
-		const tickMark = this._marksByIndex.get(index);
-		if (tickMark === undefined) {
-			return null;
-		}
-
-		return tickMark.time;
 	}
 
 	public build(spacing: number, maxWidth: number): TickMark[] {

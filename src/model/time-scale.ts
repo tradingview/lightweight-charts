@@ -294,10 +294,6 @@ export class TimeScale {
 		}
 	}
 
-	public indexToUserTime(index: TimePointIndex): TimePoint | null {
-		return this._tickMarks.indexToTime(index);
-	}
-
 	public coordinateToIndex(x: Coordinate): TimePointIndex {
 		return Math.ceil(this._coordinateToFloatIndex(x)) as TimePointIndex;
 	}
@@ -356,7 +352,7 @@ export class TimeScale {
 				continue;
 			}
 
-			const time = this._tickMarks.indexToTime(tm.index);
+			const time = this.indexToTime(tm.index);
 			if (time === null) {
 				continue;
 			}
@@ -541,11 +537,11 @@ export class TimeScale {
 		animationFn();
 	}
 
-	public update(values: readonly TimePoint[], marks: TickMark[]): void {
+	public update(newPoints: readonly TimePoint[], marksUpdate: TickMark[]): void {
 		this._visibleRangeInvalidated = true;
 
-		this._points = values;
-		this._tickMarks.merge(marks);
+		this._points = newPoints;
+		this._tickMarks.merge(marksUpdate);
 		this._correctOffset();
 	}
 

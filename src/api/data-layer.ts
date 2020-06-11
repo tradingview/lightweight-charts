@@ -23,7 +23,6 @@ import {
 
 export interface TickMarkPacket {
 	span: number;
-	time: TimePoint;
 	index: TimePointIndex;
 }
 
@@ -454,7 +453,6 @@ export class DataLayer {
 			prevTime = time.timestamp;
 			result.push({
 				span: span,
-				time: time,
 				index: index,
 			});
 		}

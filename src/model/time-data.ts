@@ -33,7 +33,6 @@ export type LogicalRange = Range<Logical>;
 export interface TickMark {
 	index: TimePointIndex;
 	span: number;
-	time: TimePoint;
 }
 
 export interface TimedValue {
