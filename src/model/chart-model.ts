@@ -265,7 +265,6 @@ export class ChartModel implements IDestroyable {
 	public setPaneHeight(pane: Pane, height: number): void {
 		pane.setHeight(height);
 		this.recalculateAllPanes();
-		this.lightUpdate();
 	}
 
 	public setWidth(width: number): void {
@@ -370,9 +369,7 @@ export class ChartModel implements IDestroyable {
 
 		timeScale.zoom(pointX, scale);
 
-		this.updateCrosshair();
 		this.recalculateAllPanes();
-		this.lightUpdate();
 	}
 
 	public scrollChart(x: Coordinate): void {
@@ -384,8 +381,6 @@ export class ChartModel implements IDestroyable {
 	public scaleTimeTo(x: Coordinate): void {
 		this._timeScale.scaleTo(x);
 		this.recalculateAllPanes();
-		this.updateCrosshair();
-		this.lightUpdate();
 	}
 
 	public endScaleTime(): void {
@@ -407,8 +402,6 @@ export class ChartModel implements IDestroyable {
 
 		this._timeScale.scrollTo(x);
 		this.recalculateAllPanes();
-		this.updateCrosshair();
-		this.lightUpdate();
 		return res;
 	}
 
@@ -422,8 +415,6 @@ export class ChartModel implements IDestroyable {
 	public resetTimeScale(): void {
 		this._timeScale.restoreDefault();
 		this.recalculateAllPanes();
-		this.updateCrosshair();
-		this.lightUpdate();
 	}
 
 	public invalidate(mask: InvalidateMask): void {
@@ -523,9 +514,7 @@ export class ChartModel implements IDestroyable {
 			timeScale.setBaseIndex(lastSeriesBarIndex);
 		}
 
-		this.updateCrosshair();
 		this.recalculateAllPanes();
-		this.lightUpdate();
 	}
 
 	public recalculatePane(pane: Pane | null): void {
