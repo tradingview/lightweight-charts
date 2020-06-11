@@ -102,7 +102,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	public timeToCoordinate(time: Time): Coordinate | null {
 		const timePoint = convertTime(time);
 		const timeScale = this._model.timeScale();
-		const timePointIndex = timeScale.points().indexOf(timePoint.timestamp, false);
+		const timePointIndex = timeScale.timeToIndex(timePoint, false);
 		if (timePointIndex === null) {
 			return null;
 		}
@@ -113,7 +113,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	public coordinateToTime(x: number): Time | null {
 		const timeScale = this._model.timeScale();
 		const timePointIndex = timeScale.coordinateToIndex(x as Coordinate);
-		const timePoint = timeScale.points().valueAt(timePointIndex);
+		const timePoint = timeScale.indexToTime(timePointIndex);
 		if (timePoint === null) {
 			return null;
 		}

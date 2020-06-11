@@ -1,4 +1,3 @@
-
 import { IFormatter } from '../formatters/iformatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
@@ -552,8 +551,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	private _recalculateMarkers(): void {
-		const timeScalePoints = this.model().timeScale().points();
-		if (timeScalePoints.size() === 0 || this._data.size() === 0) {
+		const timeScale = this.model().timeScale();
+		if (timeScale.isEmpty() || this._data.size() === 0) {
 			this._indexedMarkers = [];
 			return;
 		}
@@ -562,7 +561,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<TimePoint>, index: number) => {
 			// the first find index on the time scale (across all series)
-			const timePointIndex = ensureNotNull(timeScalePoints.indexOf(marker.time.timestamp, true));
+			const timePointIndex = ensureNotNull(timeScale.timeToIndex(marker.time, true));
 
 			// and then search that index inside the series data
 			const searchMode = timePointIndex < firstDataIndex ? PlotRowSearchMode.NearestRight : PlotRowSearchMode.NearestLeft;

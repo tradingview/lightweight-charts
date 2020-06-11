@@ -15,7 +15,6 @@ import { LocalizationOptions } from './localization-options';
 import { areRangesEqual, RangeImpl } from './range-impl';
 import { TickMarks } from './tick-marks';
 import { BusinessDay, Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
-import { TimePoints } from './time-points';
 import { TimeScaleVisibleRange } from './time-scale-visible-range';
 
 const enum Constants {
@@ -80,7 +79,7 @@ export class TimeScale {
 	private _width: number = 0;
 	private _baseIndexOrNull: TimePointIndex | null = null;
 	private _rightOffset: number;
-	private _points: TimePoints = new TimePoints();
+	private _points: readonly TimePoint[] = [];
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
@@ -146,8 +145,36 @@ export class TimeScale {
 		this._optionsApplied.fire();
 	}
 
+	public indexToTime(index: TimePointIndex): TimePoint | null {
+		return this._points[index] || null;
+	}
+
+	public timeToIndex(time: TimePoint, findNearest: boolean): TimePointIndex | null {
+		if (this._points.length < 1) {
+			// no time points available
+			return null;
+		}
+
+		if (time.timestamp > this._points[this._points.length - 1].timestamp) {
+			// special case
+			return findNearest ? this._points.length - 1 as TimePointIndex : null;
+		}
+
+		for (let i = 0; i < this._points.length; ++i) {
+			if (time.timestamp === this._points[i].timestamp) {
+				return i as TimePointIndex;
+			}
+
+			if (time.timestamp < this._points[i].timestamp) {
+				return findNearest ? i as TimePointIndex : null;
+			}
+		}
+
+		return null;
+	}
+
 	public isEmpty(): boolean {
-		return this._width === 0 || this._points.size() === 0;
+		return this._width === 0 || this._points.length === 0;
 	}
 
 	// strict range: integer indices of the bars in the visible range rounded in more wide direction
@@ -179,31 +206,28 @@ export class TimeScale {
 		const from = Math.round(range.from);
 		const to = Math.round(range.to);
 
-		const points = this._model.timeScale().points();
-		const firstIndex = ensureNotNull(points.firstIndex());
-		const lastIndex = ensureNotNull(points.lastIndex());
+		const firstIndex = ensureNotNull(this._firstIndex());
+		const lastIndex = ensureNotNull(this._lastIndex());
 
 		return {
-			from: ensureNotNull(points.valueAt(Math.max(firstIndex, from) as TimePointIndex) as TimePoint),
-			to: ensureNotNull(points.valueAt(Math.min(lastIndex, to) as TimePointIndex) as TimePoint),
+			from: ensureNotNull(this.indexToTime(Math.max(firstIndex, from) as TimePointIndex) as TimePoint),
+			to: ensureNotNull(this.indexToTime(Math.min(lastIndex, to) as TimePointIndex) as TimePoint),
 		};
 	}
 
 	public logicalRangeForTimeRange(range: TimePointsRange): LogicalRange {
-		const points = this._model.timeScale().points();
+		const timeScale = this._model.timeScale();
 
 		return {
-			from: ensureNotNull(points.indexOf(range.from.timestamp, true)) as number as Logical,
-			to: ensureNotNull(points.indexOf(range.to.timestamp, true)) as number as Logical,
+			from: ensureNotNull(timeScale.timeToIndex(range.from, true)) as number as Logical,
+			to: ensureNotNull(timeScale.timeToIndex(range.to, true)) as number as Logical,
 		};
 	}
 
 	public tickMarks(): TickMarks {
 		return this._tickMarks;
 	}
-	public points(): TimePoints {
-		return this._points;
-	}
+
 	public width(): number {
 		return this._width;
 	}
@@ -363,7 +387,7 @@ export class TimeScale {
 
 	public reset(): void {
 		this._visibleRangeInvalidated = true;
-		this._points = new TimePoints();
+		this._points = [];
 		this._scrollStartPoint = null;
 		this._scaleStartPoint = null;
 		this._clearCommonTransitionsStartState();
@@ -517,12 +541,10 @@ export class TimeScale {
 		animationFn();
 	}
 
-	public update(index: TimePointIndex, values: TimePoint[], marks: TickMark[]): void {
+	public update(values: readonly TimePoint[], marks: TickMark[]): void {
 		this._visibleRangeInvalidated = true;
-		if (values.length > 0) {
-			// we have some time points to merge
-			this._points.merge(index, values);
-		}
+
+		this._points = values;
 		this._tickMarks.merge(marks);
 		this._correctOffset();
 	}
@@ -558,8 +580,8 @@ export class TimeScale {
 	}
 
 	public fitContent(): void {
-		const first = this._points.firstIndex();
-		const last = this._points.lastIndex();
+		const first = this._firstIndex();
+		const last = this._lastIndex();
 		if (first === null || last === null) {
 			return;
 		}
@@ -581,6 +603,14 @@ export class TimeScale {
 		}
 
 		return this._dateTimeFormatter.format(new Date(time.timestamp * 1000));
+	}
+
+	private _firstIndex(): TimePointIndex | null {
+		return this._points.length === 0 ? null : 0 as TimePointIndex;
+	}
+
+	private _lastIndex(): TimePointIndex | null {
+		return this._points.length === 0 ? null : (this._points.length - 1) as TimePointIndex;
 	}
 
 	private _rightOffsetForCoordinate(x: Coordinate): number {
@@ -664,7 +694,7 @@ export class TimeScale {
 	}
 
 	private _minRightOffset(): number | null {
-		const firstIndex = this._points.firstIndex();
+		const firstIndex = this._firstIndex();
 		const baseIndex = this._baseIndexOrNull;
 		if (firstIndex === null || baseIndex === null) {
 			return null;
@@ -675,11 +705,11 @@ export class TimeScale {
 			return this._leftEdgeIndex - baseIndex + barsEstimation - 1;
 		}
 
-		return firstIndex - baseIndex - 1 + Math.min(Constants.MinVisibleBarsCount, this._points.size());
+		return firstIndex - baseIndex - 1 + Math.min(Constants.MinVisibleBarsCount, this._points.length);
 	}
 
 	private _maxRightOffset(): number {
-		return (this._width / this._barSpacing) - Math.min(Constants.MinVisibleBarsCount, this._points.size());
+		return (this._width / this._barSpacing) - Math.min(Constants.MinVisibleBarsCount, this._points.length);
 	}
 
 	private _saveCommonTransitionsStartState(): void {
@@ -782,7 +812,8 @@ export class TimeScale {
 		if (!this._options.fixLeftEdge) {
 			return;
 		}
-		const firstIndex = this._points.firstIndex();
+
+		const firstIndex = this._firstIndex();
 		if (firstIndex === null || this._leftEdgeIndex === firstIndex) {
 			return;
 		}

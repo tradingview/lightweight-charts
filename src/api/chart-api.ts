@@ -272,7 +272,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		const model = this._chartWidget.model();
 		model.removeSeries(series);
 		const timeScaleUpdate = update.timeScaleUpdate;
-		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
+		model.updateTimeScale(timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
 			key.updateData(value.update);
 		});
@@ -285,7 +285,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		const update = this._dataLayer.setSeriesData(series, data);
 		const model = this._chartWidget.model();
 		const timeScaleUpdate = update.timeScaleUpdate;
-		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
+		model.updateTimeScale(timeScaleUpdate.changes, timeScaleUpdate.marks, true);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
 			// the latest arg `true` must be removed in https://github.com/tradingview/lightweight-charts/issues/270
 			// here we don't need to clear palettes because they were just filled in DataLayer
@@ -299,7 +299,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		const update = this._dataLayer.updateSeriesData(series, data);
 		const model = this._chartWidget.model();
 		const timeScaleUpdate = update.timeScaleUpdate;
-		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, false);
+		model.updateTimeScale(timeScaleUpdate.changes, timeScaleUpdate.marks, false);
 		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
 			key.updateData(value.update);
 		});
