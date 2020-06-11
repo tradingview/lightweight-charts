@@ -22,7 +22,7 @@ export class TimePoints {
 		return this._offsetToIndex(this._items.length - 1);
 	}
 
-	public merge(index: TimePointIndex, values: TimePoint[]): void {
+	public merge(sinceIndex: TimePointIndex, values: TimePoint[]): void {
 		if (values.length === 0) {
 			return;
 		}
@@ -33,33 +33,16 @@ export class TimePoints {
 			return;
 		}
 
-		const start = index;
-		if (start < 0) {
-			const n = Math.abs(start);
-			if (values.length < n) {
-				return;
-			}
-
-			// tslint:disable-next-line:prefer-array-literal
-			this._items = new Array<TimePoint>(n).concat(this._items);
-			// tslint:disable-next-line:no-shadowed-variable
-			for (let i = 0; i < values.length; ++i) {
-				this._items[index + i] = values[i];
-			}
-
-			return;
+		let i = sinceIndex;
+		for (; i < this._items.length && (i - sinceIndex) < values.length; ++i) {
+			this._items[i] = values[i - sinceIndex];
 		}
 
-		let i = start;
-		for (; i < this._items.length && (i - start) < values.length; ++i) {
-			this._items[i] = values[i - start];
-		}
-
-		const end = start + values.length;
+		const end = sinceIndex + values.length;
 		if (end > this._items.length) {
 			const n = end - this._items.length;
 			for (let j = i; j < i + n; ++j) {
-				this._items.push(values[j - start]);
+				this._items.push(values[j - sinceIndex]);
 			}
 		}
 	}
