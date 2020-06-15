@@ -37,7 +37,6 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 	private _compositeRenderer: CompositeRenderer = new CompositeRenderer();
 	private _histogramData: PaneRendererHistogramData = createEmptyHistogramData(0);
 	private _renderer: PaneRendererHistogram;
-	private _colorIndexes: Int32Array = new Int32Array(0);
 
 	public constructor(series: Series<'Histogram'>, model: ChartModel) {
 		super(series, model, false);
@@ -56,8 +55,6 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._histogramData = createEmptyHistogramData(barSpacing);
 
 		const barValueGetter = this._series.barFunction();
-		this._colorIndexes = new Int32Array(this._series.bars().size());
-		let targetColorIndex = 0;
 
 		let targetIndex = 0;
 		let itemIndex = 0;
@@ -72,7 +69,6 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 			const item = createRawItem(index, value, color);
 			// colorIndex is the paneview's internal palette index
 			// this internal palette stores defaultColor by 0 index and pallette colors by paletteColorIndex + 1
-			const colorIndex = paletteColorIndex == null ? 0 : paletteColorIndex + 1;
 			targetIndex++;
 			if (targetIndex < this._histogramData.items.length) {
 				this._histogramData.items[targetIndex] = item;
@@ -80,7 +76,6 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 				this._histogramData.items.push(item);
 			}
 			this._items[itemIndex++] = { time: index, x: 0 as Coordinate };
-			this._colorIndexes[targetColorIndex++] = colorIndex;
 			return false;
 		});
 
