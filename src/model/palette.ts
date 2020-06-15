@@ -24,8 +24,4 @@ export class Palette {
 		this._colorToIndex.clear();
 		this._indexToColor.clear();
 	}
-
-	public size(): number {
-		return this._indexToColor.size;
-	}
 }
