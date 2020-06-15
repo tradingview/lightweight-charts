@@ -44,7 +44,7 @@ import {
 	seriesOptionsDefaults,
 } from './options/series-options-defaults';
 import { PriceScaleApi } from './price-scale-api';
-import { SeriesApi } from './series-api';
+import { migrateOptions, SeriesApi } from './series-api';
 import { TimeScaleApi } from './time-scale-api';
 
 function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
@@ -196,6 +196,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	}
 
 	public addAreaSeries(options: AreaSeriesPartialOptions = {}): ISeriesApi<'Area'> {
+		options = migrateOptions(options);
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), areaStyleDefaults, options) as AreaSeriesOptions;
@@ -209,6 +210,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	}
 
 	public addBarSeries(options: BarSeriesPartialOptions = {}): ISeriesApi<'Bar'> {
+		options = migrateOptions(options);
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), barStyleDefaults, options) as BarSeriesOptions;
@@ -222,6 +224,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	}
 
 	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}): ISeriesApi<'Candlestick'> {
+		options = migrateOptions(options);
 		fillUpDownCandlesticksColors(options);
 		patchPriceFormat(options.priceFormat);
 
@@ -236,6 +239,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	}
 
 	public addHistogramSeries(options: HistogramSeriesPartialOptions = {}): ISeriesApi<'Histogram'> {
+		options = migrateOptions(options);
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), histogramStyleDefaults, options) as HistogramSeriesOptions;
@@ -249,6 +253,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	}
 
 	public addLineSeries(options: LineSeriesPartialOptions = {}): ISeriesApi<'Line'> {
+		options = migrateOptions(options);
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), lineStyleDefaults, options) as LineSeriesOptions;
