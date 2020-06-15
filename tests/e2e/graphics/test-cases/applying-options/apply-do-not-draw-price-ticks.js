@@ -14,7 +14,7 @@ function generateData() {
 
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
-		priceScale: {
+		rightPriceScale: {
 			drawTicks: false,
 		},
 	});
@@ -26,7 +26,7 @@ function runTestCase(container) {
 	return new Promise((resolve) => {
 		setTimeout(() => {
 			chart.applyOptions({
-				priceScale: {
+				rightPriceScale: {
 					drawTicks: true,
 				},
 			});

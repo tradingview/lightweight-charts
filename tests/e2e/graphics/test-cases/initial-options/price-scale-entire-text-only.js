@@ -2,7 +2,7 @@ function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
 		width: 600,
 		height: 300,
-		priceScale: {
+		rightPriceScale: {
 			entireTextOnly: true,
 		},
 		timeScale: {

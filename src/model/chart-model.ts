@@ -84,7 +84,7 @@ export interface ChartOptions {
 	/** Structure with layout options */
 	layout: LayoutOptions;
 
-	/** @Deprecated options for price scales
+	/** @deprecated options for price scales
 	 *  @internal
 	 */
 	priceScale: PriceScaleOptions;

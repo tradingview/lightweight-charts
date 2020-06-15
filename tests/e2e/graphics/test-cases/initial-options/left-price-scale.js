@@ -15,9 +15,8 @@ function generateData() {
 
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
-		priceScale: {
-			position: 'left',
-		},
+		rightPriceScale: { visible: false },
+		leftPriceScale: { visible: true },
 	});
 
 	const firstSeries = chart.addLineSeries({

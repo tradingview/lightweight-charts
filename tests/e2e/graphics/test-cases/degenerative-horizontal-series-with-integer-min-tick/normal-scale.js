@@ -17,7 +17,7 @@ function generateData() {
 
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
-		priceScale: {
+		rightPriceScale: {
 			mode: LightweightCharts.PriceScaleMode.Normal,
 		},
 	});

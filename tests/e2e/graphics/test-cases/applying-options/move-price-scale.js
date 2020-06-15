@@ -14,21 +14,22 @@ function generateData() {
 
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
-		priceScale: {
-			position: 'right',
-		},
+		rightPriceScale: { visible: true },
+		leftPriceScale: { visible: false },
 	});
 
 	const mainSeries = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
+		priceScaleId: 'right',
 	});
 
 	mainSeries.setData(generateData());
 
 	chart.applyOptions({
-		priceScale: {
-			position: 'left',
-		},
+		rightPriceScale: { visible: false },
+		leftPriceScale: { visible: true },
 	});
+
+	mainSeries.applyOptions({ priceScaleId: 'left' });
 }
