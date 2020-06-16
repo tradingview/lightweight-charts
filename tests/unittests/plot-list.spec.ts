@@ -19,10 +19,11 @@ describe('PlotList', () => {
 
 	beforeEach(() => {
 		p.clear();
-		p.add(-3 as TimePointIndex, 1 as UTCTimestamp, [1, 2, 3]);
-		p.add(-3 as TimePointIndex, 2 as UTCTimestamp, [1, 2, 3]);
-		p.add(0 as TimePointIndex, 3 as UTCTimestamp, [10, 20, 30]);
-		p.add(3 as TimePointIndex, 4 as UTCTimestamp, [100, 200, 300]);
+		p.merge([
+			{ index: -3 as TimePointIndex, time: 2 as UTCTimestamp, value: [1, 2, 3] },
+			{ index: 0 as TimePointIndex, time: 3 as UTCTimestamp, value: [10, 20, 30] },
+			{ index: 3 as TimePointIndex, time: 4 as UTCTimestamp, value: [100, 200, 300] },
+		]);
 	});
 
 	it('should contain all plot values that was previously added', () => {
@@ -151,101 +152,16 @@ describe('PlotList', () => {
 		});
 	});
 
-	describe('remove', () => {
-		const p1 = new PlotList<UTCTimestamp, PlotValueTuple>();
-
-		beforeEach(() => {
-			p1.clear();
-			p1.add(-9 as TimePointIndex, 1 as UTCTimestamp, [1, 2, 3]);
-			p1.add(-5 as TimePointIndex, 2 as UTCTimestamp, [4, 5, 6]);
-			p1.add(0 as TimePointIndex, 3 as UTCTimestamp, [10, 20, 30]);
-			p1.add(5 as TimePointIndex, 4 as UTCTimestamp, [40, 50, 60]);
-			p1.add(9 as TimePointIndex, 5 as UTCTimestamp, [100, 200, 300]);
-		});
-
-		it('should remove all the plot rows starting from the specified index, if the index is inside the PlotList\'s range', () => {
-			// first remove
-			const earliestRow1 = p1.remove(9 as TimePointIndex);
-			expect(earliestRow1).to.deep.include({ index: 9 as TimePointIndex, value: [100, 200, 300] });
-			expect(p1.size()).to.be.equal(4);
-			expect(p1.first()).to.deep.include({ index: -9 as TimePointIndex, value: [1, 2, 3] });
-			expect(p1.firstIndex()).to.be.equal(-9 as TimePointIndex);
-			expect(p1.last()).to.deep.include({ index: 5 as TimePointIndex, value: [40, 50, 60] });
-			expect(p1.lastIndex()).to.be.equal(5 as TimePointIndex);
-			expect(ensureNotNull(p1.valueAt(-9 as TimePointIndex)).value).to.include.ordered.members([1, 2, 3]);
-			expect(ensureNotNull(p1.valueAt(-5 as TimePointIndex)).value).to.include.ordered.members([4, 5, 6]);
-			expect(ensureNotNull(p1.valueAt(0 as TimePointIndex)).value).to.include.ordered.members([10, 20, 30]);
-			expect(ensureNotNull(p1.valueAt(5 as TimePointIndex)).value).to.include.ordered.members([40, 50, 60]);
-			expect(p1.valueAt(9 as TimePointIndex)).to.be.equal(null);
-
-			// second remove
-			const earliestRow2 = p1.remove(-5 as TimePointIndex);
-			expect(earliestRow2).to.deep.include({ index: -5 as TimePointIndex, value: [4, 5, 6] });
-			expect(p1.size()).to.be.equal(1);
-			expect(p1.first()).to.deep.include({ index: -9 as TimePointIndex, value: [1, 2, 3] });
-			expect(p1.firstIndex()).to.be.equal(-9 as TimePointIndex);
-			expect(p1.last()).to.deep.include({ index: -9 as TimePointIndex, value: [1, 2, 3] });
-			expect(p1.lastIndex()).to.be.equal(-9 as TimePointIndex);
-			expect(ensureNotNull(p1.valueAt(-9 as TimePointIndex)).value).to.include.ordered.members([1, 2, 3]);
-			expect(p1.valueAt(-5 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(0 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(5 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(9 as TimePointIndex)).to.be.equal(null);
-
-			// third remove
-			const earliestRow3 = p1.remove(-9 as TimePointIndex);
-			expect(earliestRow3).to.deep.include({ index: -9 as TimePointIndex, value: [1, 2, 3] });
-			expect(p1.size()).to.be.equal(0);
-			expect(p1.first()).to.be.equal(null);
-			expect(p1.firstIndex()).to.be.equal(null);
-			expect(p1.last()).to.be.equal(null);
-			expect(p1.lastIndex()).to.be.equal(null);
-			expect(p1.valueAt(-9 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(-5 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(0 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(5 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(9 as TimePointIndex)).to.be.equal(null);
-		});
-
-		it('should be no-op if the specified index is greater than last index in PlotList', () => {
-			const earliestRow = p1.remove(11 as TimePointIndex);
-			expect(earliestRow).to.be.equal(null);
-			expect(p1.size()).to.be.equal(5);
-			expect(p1.first()).to.deep.include({ index: -9 as TimePointIndex, value: [1, 2, 3] });
-			expect(p1.firstIndex()).to.be.equal(-9 as TimePointIndex);
-			expect(p1.last()).to.deep.include({ index: 9 as TimePointIndex, value: [100, 200, 300] });
-			expect(p1.lastIndex()).to.be.equal(9 as TimePointIndex);
-			expect(ensureNotNull(p1.valueAt(-9 as TimePointIndex)).value).to.include.ordered.members([1, 2, 3]);
-			expect(ensureNotNull(p1.valueAt(-5 as TimePointIndex)).value).to.include.ordered.members([4, 5, 6]);
-			expect(ensureNotNull(p1.valueAt(0 as TimePointIndex)).value).to.include.ordered.members([10, 20, 30]);
-			expect(ensureNotNull(p1.valueAt(5 as TimePointIndex)).value).to.include.ordered.members([40, 50, 60]);
-			expect(ensureNotNull(p1.valueAt(9 as TimePointIndex)).value).to.include.ordered.members([100, 200, 300]);
-		});
-
-		it('should remove all the plot rows if the specified index is less than first index in PlotList', () => {
-			const earliestRow = p1.remove(-11 as TimePointIndex);
-			expect(earliestRow).to.deep.include({ index: -9 as TimePointIndex, value: [1, 2, 3] });
-			expect(p1.size()).to.be.equal(0);
-			expect(p1.first()).to.be.equal(null);
-			expect(p1.firstIndex()).to.be.equal(null);
-			expect(p1.last()).to.be.equal(null);
-			expect(p1.lastIndex()).to.be.equal(null);
-			expect(p1.valueAt(-9 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(-5 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(0 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(5 as TimePointIndex)).to.be.equal(null);
-			expect(p1.valueAt(9 as TimePointIndex)).to.be.equal(null);
-		});
-	});
-
 	describe('search', () => {
 		const p1 = new PlotList<UTCTimestamp, PlotValueTuple>();
 
 		beforeEach(() => {
 			p1.clear();
-			p1.add(-5 as TimePointIndex, 1 as UTCTimestamp, [1, 2, 3]);
-			p1.add(0 as TimePointIndex, 2 as UTCTimestamp, [10, 20, 30]);
-			p1.add(5 as TimePointIndex, 3 as UTCTimestamp, [100, 200, 300]);
+			p1.merge([
+				{ index: -5 as TimePointIndex, time: 1 as UTCTimestamp, value: [1, 2, 3] },
+				{ index: 0 as TimePointIndex, time: 2 as UTCTimestamp, value: [10, 20, 30] },
+				{ index: 5 as TimePointIndex, time: 3 as UTCTimestamp, value: [100, 200, 300] },
+			]);
 		});
 
 		it('should find respective values by given index and search strategy', () => {
@@ -272,9 +188,11 @@ describe('PlotList', () => {
 
 		beforeEach(() => {
 			p1.clear();
-			p1.add(-5 as TimePointIndex, 1 as UTCTimestamp, [1, undefined, 3]);
-			p1.add(0 as TimePointIndex, 2 as UTCTimestamp, [10, 20, 30]);
-			p1.add(5 as TimePointIndex, 3 as UTCTimestamp, [100, undefined, 300]);
+			p1.merge([
+				{ index: -5 as TimePointIndex, time: 1 as UTCTimestamp, value: [1, undefined, 3] },
+				{ index: 0 as TimePointIndex, time: 2 as UTCTimestamp, value: [10, 20, 30] },
+				{ index: 5 as TimePointIndex, time: 3 as UTCTimestamp, value: [100, undefined, 300] },
+			]);
 		});
 
 		it('should not check for empty values if search strategy is "exact"', () => {
@@ -319,11 +237,13 @@ describe('PlotList', () => {
 
 		beforeEach(() => {
 			pl.clear();
-			pl.add(0 as TimePointIndex, 1 as UTCTimestamp, [null, undefined, NaN, 1, NaN]);
-			pl.add(1 as TimePointIndex, 2 as UTCTimestamp, [null, undefined, NaN, 2, null]);
-			pl.add(2 as TimePointIndex, 3 as UTCTimestamp, [null, undefined, NaN, 3, undefined]);
-			pl.add(3 as TimePointIndex, 4 as UTCTimestamp, [null, undefined, NaN, 4, 123]);
-			pl.add(4 as TimePointIndex, 5 as UTCTimestamp, [null, undefined, NaN, 5, 1]);
+			pl.merge([
+				{ index: 0 as TimePointIndex, time: 1 as UTCTimestamp, value: [null, undefined, NaN, 1, NaN] },
+				{ index: 1 as TimePointIndex, time: 2 as UTCTimestamp, value: [null, undefined, NaN, 2, null] },
+				{ index: 2 as TimePointIndex, time: 3 as UTCTimestamp, value: [null, undefined, NaN, 3, undefined] },
+				{ index: 3 as TimePointIndex, time: 4 as UTCTimestamp, value: [null, undefined, NaN, 4, 123] },
+				{ index: 4 as TimePointIndex, time: 5 as UTCTimestamp, value: [null, undefined, NaN, 5, 1] },
+			]);
 		});
 
 		it('should return null if there is only null, undefined or NaN values', () => {
@@ -362,12 +282,14 @@ describe('PlotList', () => {
 
 		it('should find minMax with non subsequent indices', () => {
 			pl.clear();
-			pl.add(0 as TimePointIndex, 1 as UTCTimestamp, [null, undefined, NaN, 1, NaN]);
-			pl.add(2 as TimePointIndex, 2 as UTCTimestamp, [null, undefined, NaN, 2, null]);
-			pl.add(4 as TimePointIndex, 3 as UTCTimestamp, [null, undefined, NaN, 3, undefined]);
-			pl.add(6 as TimePointIndex, 4 as UTCTimestamp, [null, undefined, NaN, 4, 123]);
-			pl.add(20 as TimePointIndex, 5 as UTCTimestamp, [null, undefined, NaN, 10, 123]);
-			pl.add(100 as TimePointIndex, 6 as UTCTimestamp, [null, undefined, NaN, 5, 1]);
+			pl.merge([
+				{ index: 0 as TimePointIndex, time: 1 as UTCTimestamp, value: [null, undefined, NaN, 1, NaN] },
+				{ index: 2 as TimePointIndex, time: 2 as UTCTimestamp, value: [null, undefined, NaN, 2, null] },
+				{ index: 4 as TimePointIndex, time: 3 as UTCTimestamp, value: [null, undefined, NaN, 3, undefined] },
+				{ index: 6 as TimePointIndex, time: 4 as UTCTimestamp, value: [null, undefined, NaN, 4, 123] },
+				{ index: 20 as TimePointIndex, time: 5 as UTCTimestamp, value: [null, undefined, NaN, 10, 123] },
+				{ index: 100 as TimePointIndex, time: 6 as UTCTimestamp, value: [null, undefined, NaN, 5, 1] },
+			]);
 
 			const plots: PlotInfoList = [
 				{
@@ -398,10 +320,12 @@ describe('PlotList', () => {
 
 		it('should return correct values if the data has gaps and we start search with second-to-last chunk', () => {
 			pl.clear();
-			pl.add(29 as TimePointIndex, 1 as UTCTimestamp, [1, 1, 1, 1, 0]);
-			pl.add(31 as TimePointIndex, 2 as UTCTimestamp, [2, 2, 2, 2, 0]);
-			pl.add(55 as TimePointIndex, 3 as UTCTimestamp, [3, 3, 3, 3, 0]);
-			pl.add(65 as TimePointIndex, 4 as UTCTimestamp, [4, 4, 4, 4, 0]);
+			pl.merge([
+				{ index: 29 as TimePointIndex, time: 1 as UTCTimestamp, value: [1, 1, 1, 1, 0] },
+				{ index: 31 as TimePointIndex, time: 2 as UTCTimestamp, value: [2, 2, 2, 2, 0] },
+				{ index: 55 as TimePointIndex, time: 3 as UTCTimestamp, value: [3, 3, 3, 3, 0] },
+				{ index: 65 as TimePointIndex, time: 4 as UTCTimestamp, value: [4, 4, 4, 4, 0] },
+			]);
 
 			const plots: PlotInfoList = [
 				{
@@ -434,11 +358,13 @@ describe('PlotList', () => {
 
 		beforeEach(() => {
 			pl.clear();
-			pl.add(0 as TimePointIndex, 1 as UTCTimestamp, [5, 7, 3, 6]);
-			pl.add(1 as TimePointIndex, 2 as UTCTimestamp, [10, 12, 8, 11]);
-			pl.add(2 as TimePointIndex, 3 as UTCTimestamp, [15, 17, 13, 16]);
-			pl.add(3 as TimePointIndex, 4 as UTCTimestamp, [20, 22, 18, 21]);
-			pl.add(4 as TimePointIndex, 5 as UTCTimestamp, [25, 27, 23, 26]);
+			pl.merge([
+				{ index: 0 as TimePointIndex, time: 1 as UTCTimestamp, value: [5, 7, 3, 6] },
+				{ index: 1 as TimePointIndex, time: 2 as UTCTimestamp, value: [10, 12, 8, 11] },
+				{ index: 2 as TimePointIndex, time: 3 as UTCTimestamp, value: [15, 17, 13, 16] },
+				{ index: 3 as TimePointIndex, time: 4 as UTCTimestamp, value: [20, 22, 18, 21] },
+				{ index: 4 as TimePointIndex, time: 5 as UTCTimestamp, value: [25, 27, 23, 26] },
+			]);
 		});
 
 		it('should return correct min max for open', () => {
@@ -507,97 +433,6 @@ describe('PlotList', () => {
 
 			expect(pl.minMaxOnRangeCached.bind(pl, 0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'no_such_function', offset: 0 }]))
 				.to.throw('Plot "no_such_function" is not registered');
-		});
-	});
-
-	describe('range', () => {
-		it('should return correct range for existent data', () => {
-			const plotList = new PlotList<UTCTimestamp, PlotValueTuple>();
-
-			plotList.merge([
-				row(0 as TimePointIndex),
-				row(1 as TimePointIndex),
-				row(2 as TimePointIndex),
-			]);
-
-			const range1 = plotList.range(0 as TimePointIndex, 0 as TimePointIndex);
-			expect(range1.size()).to.be.equal(1);
-
-			const range2 = plotList.range(0 as TimePointIndex, 1 as TimePointIndex);
-			expect(range2.size()).to.be.equal(2);
-
-			const range3 = plotList.range(2 as TimePointIndex, 2 as TimePointIndex);
-			expect(range3.size()).to.be.equal(1);
-		});
-
-		it('should correct start index to the first existent time point', () => {
-			const plotList = new PlotList<UTCTimestamp, PlotValueTuple>();
-
-			plotList.merge([
-				row(-1 as TimePointIndex),
-				row(0 as TimePointIndex),
-				row(1 as TimePointIndex),
-			]);
-
-			const range = plotList.range(-10 as TimePointIndex, 0 as TimePointIndex);
-			expect(range.size()).to.be.equal(2);
-			expect(range.firstIndex()).to.be.equal(-1 as TimePointIndex);
-			expect(range.lastIndex()).to.be.equal(0 as TimePointIndex);
-		});
-
-		it('should correct end index to the last existent time point', () => {
-			const plotList = new PlotList<UTCTimestamp, PlotValueTuple>();
-
-			plotList.merge([
-				row(-1 as TimePointIndex),
-				row(0 as TimePointIndex),
-				row(1 as TimePointIndex),
-			]);
-
-			const range = plotList.range(0 as TimePointIndex, 10 as TimePointIndex);
-			expect(range.size()).to.be.equal(2);
-			expect(range.firstIndex()).to.be.equal(0 as TimePointIndex);
-			expect(range.lastIndex()).to.be.equal(1 as TimePointIndex);
-		});
-
-		it('should correct start and end indexes to the first/last existent time point', () => {
-			const plotList = new PlotList<UTCTimestamp, PlotValueTuple>();
-
-			plotList.merge([
-				row(-1 as TimePointIndex),
-				row(0 as TimePointIndex),
-				row(1 as TimePointIndex),
-			]);
-
-			const range = plotList.range(-10 as TimePointIndex, 10 as TimePointIndex);
-			expect(range.size()).to.be.equal(3);
-			expect(range.firstIndex()).to.be.equal(-1 as TimePointIndex);
-			expect(range.lastIndex()).to.be.equal(1 as TimePointIndex);
-		});
-
-		it('should return empty plot list if there is no data in the range', () => {
-			const plotList = new PlotList<UTCTimestamp, PlotValueTuple>();
-
-			plotList.merge([
-				row(-1 as TimePointIndex),
-				row(0 as TimePointIndex),
-				row(1 as TimePointIndex),
-				row(5 as TimePointIndex),
-				row(6 as TimePointIndex),
-				row(7 as TimePointIndex),
-			]);
-
-			function checkIsEmpty(pl: PlotList<UTCTimestamp, PlotValueTuple>): void {
-				expect(pl.size()).to.be.equal(0);
-				expect(pl.isEmpty()).to.be.equal(true);
-
-				expect(pl.firstIndex()).to.be.equal(null);
-				expect(pl.lastIndex()).to.be.equal(null);
-			}
-
-			checkIsEmpty(plotList.range(-10 as TimePointIndex, -5 as TimePointIndex));
-			checkIsEmpty(plotList.range(10 as TimePointIndex, 15 as TimePointIndex));
-			checkIsEmpty(plotList.range(2 as TimePointIndex, 4 as TimePointIndex));
 		});
 	});
 });

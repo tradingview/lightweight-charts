@@ -46,7 +46,6 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 	private _start: number = 0;
 	// end is an after-last index
 	private _end: number = 0;
-	private _shareRead: boolean = false;
 	private _minMaxCache: Map<string, Map<number, MinMax | null>> = new Map();
 	private _rowSearchCache: Map<TimePointIndex, Map<PlotRowSearchMode, PlotRow<TimeType, PlotValueTuple>>> = new Map();
 	private _rowSearchCacheWithoutEmptyValues: Map<TimePointIndex, Map<PlotRowSearchMode, PlotRow<TimeType, PlotValueTuple>>> = new Map();
@@ -62,15 +61,9 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		this._items = [];
 		this._start = 0;
 		this._end = 0;
-		this._shareRead = false;
 		this._minMaxCache.clear();
 		this._rowSearchCache.clear();
 		this._rowSearchCacheWithoutEmptyValues.clear();
-	}
-
-	// @returns First row
-	public first(): PlotRow<TimeType, PlotValueTuple> | null {
-		return this.size() > 0 ? this._items[this._start as PlotRowIndex] : null;
 	}
 
 	// @returns Last row
@@ -100,29 +93,6 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 
 	public valueAt(index: TimePointIndex): PlotRow<TimeType, PlotValueTuple> | null {
 		return this.search(index);
-	}
-
-	/**
-	 * @returns true if new index is added or false if existing index is updated
-	 */
-	public add(index: TimePointIndex, time: TimeType, value: PlotValueTuple): boolean {
-		if (this._shareRead) {
-			return false;
-		}
-
-		const row = { index: index, value: value, time: time };
-		const pos = this._search(index, PlotRowSearchMode.Exact);
-		this._rowSearchCache.clear();
-		this._rowSearchCacheWithoutEmptyValues.clear();
-		if (pos === null) {
-			this._items.splice(this._lowerbound(index), 0, row);
-			this._start = 0;
-			this._end = this._items.length;
-			return true;
-		} else {
-			this._items[pos] = row;
-			return false;
-		}
 	}
 
 	public search(index: TimePointIndex, searchMode: PlotRowSearchMode = PlotRowSearchMode.Exact, skipEmptyValues?: boolean): PlotRow<TimeType, PlotValueTuple> | null {
@@ -155,19 +125,6 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		}
 	}
 
-	/**
-	 * @returns Readonly collection of elements in range
-	 */
-	public range(start: TimePointIndex, end: TimePointIndex): PlotList<TimeType, PlotValueTuple> {
-		const copy = new PlotList<TimeType, PlotValueTuple>(this._plotFunctions, this._emptyValuePredicate);
-		copy._items = this._items;
-		copy._start = this._lowerbound(start);
-		copy._end = this._upperbound(end);
-
-		copy._shareRead = true;
-		return copy;
-	}
-
 	public minMaxOnRangeCached(start: TimePointIndex, end: TimePointIndex, plots: PlotInfoList): MinMax | null {
 		// this code works for single series only
 		// could fail after whitespaces implementation
@@ -187,10 +144,6 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 	}
 
 	public merge(plotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): PlotRow<TimeType, PlotValueTuple> | null {
-		if (this._shareRead) {
-			return null;
-		}
-
 		if (plotRows.length === 0) {
 			return null;
 		}
@@ -212,27 +165,6 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		}
 
 		return this._merge(plotRows);
-	}
-
-	public remove(start: TimePointIndex): PlotRow<TimeType, PlotValueTuple> | null {
-		if (this._shareRead) {
-			return null;
-		}
-
-		const startOffset = this._search(start, PlotRowSearchMode.NearestRight);
-		if (startOffset === null) {
-			return null;
-		}
-
-		const removedPlotRows = this._items.splice(startOffset);
-		// _start should never be modified in this method
-		this._end = this._items.length;
-
-		this._minMaxCache.clear();
-		this._rowSearchCache.clear();
-		this._rowSearchCacheWithoutEmptyValues.clear();
-
-		return removedPlotRows.length > 0 ? removedPlotRows[0] : null;
 	}
 
 	private _indexAt(offset: PlotRowIndex): TimePointIndex {
@@ -388,7 +320,6 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 	}
 
 	private _prepend(plotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): PlotRow<TimeType, PlotValueTuple> {
-		assert(!this._shareRead, 'collection should not be readonly');
 		assert(plotRows.length !== 0, 'plotRows should not be empty');
 
 		this._rowSearchCache.clear();
@@ -404,7 +335,6 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 	}
 
 	private _append(plotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): PlotRow<TimeType, PlotValueTuple> {
-		assert(!this._shareRead, 'collection should not be readonly');
 		assert(plotRows.length !== 0, 'plotRows should not be empty');
 
 		this._rowSearchCache.clear();
