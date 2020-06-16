@@ -93,7 +93,6 @@ export class TimeScale {
 	private readonly _logicalRangeChanged: Delegate = new Delegate();
 
 	private readonly _optionsApplied: Delegate = new Delegate();
-	private _leftEdgeIndex: TimePointIndex | null = null;
 	private _commonTransitionStartState: TransitionState | null = null;
 	private _timeMarksCache: TimeMark[] | null = null;
 
@@ -124,9 +123,7 @@ export class TimeScale {
 		merge(this._options, options);
 
 		if (this._options.fixLeftEdge) {
-			this._fixLeftEdge();
-		} else {
-			this._leftEdgeIndex = null;
+			this._doFixLeftEdge();
 		}
 
 		// note that bar spacing should be applied before right offset
@@ -250,15 +247,18 @@ export class TimeScale {
 		// if time scale is scrolled to the end of data and we have fixed right edge
 		// keep left edge instead of right
 		// we need it to avoid "shaking" if the last bar visibility affects time scale width
-		if (this._leftEdgeIndex !== null) {
-			const firstVisibleBar = ensureNotNull(this.visibleStrictRange()).left();
-			// firstVisibleBar could be less than this._leftEdgeIndex
-			// since index is a center of bar
-			if (firstVisibleBar <= this._leftEdgeIndex) {
-				const delta = this._width - width;
-				// reduce  _rightOffset means move right
-				// we could move more than required - this will be fixed by _correctOffset()
-				this._rightOffset -= Math.round(delta / this._barSpacing) + 1;
+		if (this._options.fixLeftEdge) {
+			const visibleRange = this.visibleStrictRange();
+			if (visibleRange !== null) {
+				const firstVisibleBar = visibleRange.left();
+				// firstVisibleBar could be less than 0
+				// since index is a center of bar
+				if (firstVisibleBar <= 0) {
+					const delta = this._width - width;
+					// reduce  _rightOffset means move right
+					// we could move more than required - this will be fixed by _correctOffset()
+					this._rightOffset -= Math.round(delta / this._barSpacing) + 1;
+				}
 			}
 		}
 
@@ -388,7 +388,6 @@ export class TimeScale {
 		this._scaleStartPoint = null;
 		this._clearCommonTransitionsStartState();
 		this._tickMarks.reset();
-		this._leftEdgeIndex = null;
 	}
 
 	public restoreDefault(): void {
@@ -398,16 +397,12 @@ export class TimeScale {
 		this.setRightOffset(this._options.rightOffset);
 	}
 
-	public fixLeftEdge(): boolean {
-		return this._options.fixLeftEdge;
-	}
-
 	public setBaseIndex(baseIndex: TimePointIndex): void {
 		this._visibleRangeInvalidated = true;
 		this._baseIndexOrNull = baseIndex;
 		this._correctOffset();
 
-		this._fixLeftEdge();
+		this._doFixLeftEdge();
 	}
 
 	/**
@@ -696,12 +691,11 @@ export class TimeScale {
 			return null;
 		}
 
-		if (this._leftEdgeIndex !== null) {
-			const barsEstimation = this._width / this._barSpacing;
-			return this._leftEdgeIndex - baseIndex + barsEstimation - 1;
-		}
+		const barsEstimation = this._options.fixLeftEdge
+			? this._width / this._barSpacing
+			: Math.min(Constants.MinVisibleBarsCount, this._points.length);
 
-		return firstIndex - baseIndex - 1 + Math.min(Constants.MinVisibleBarsCount, this._points.length);
+		return firstIndex - baseIndex - 1 + barsEstimation;
 	}
 
 	private _maxRightOffset(): number {
@@ -804,17 +798,16 @@ export class TimeScale {
 		}
 	}
 
-	private _fixLeftEdge(): void {
+	private _doFixLeftEdge(): void {
 		if (!this._options.fixLeftEdge) {
 			return;
 		}
 
 		const firstIndex = this._firstIndex();
-		if (firstIndex === null || this._leftEdgeIndex === firstIndex) {
+		if (firstIndex === null) {
 			return;
 		}
 
-		this._leftEdgeIndex = firstIndex;
 		const delta = ensureNotNull(this.visibleStrictRange()).left() - firstIndex;
 		if (delta < 0) {
 			const leftEdgeOffset = this._rightOffset - delta - 1;
