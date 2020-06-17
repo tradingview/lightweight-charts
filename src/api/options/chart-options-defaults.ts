@@ -1,3 +1,5 @@
+import { isRunningOnClientSide } from '../../helpers/assertions';
+
 import { ChartOptionsInternal } from '../../model/chart-model';
 
 import { crosshairOptionsDefaults } from './crosshair-options-defaults';
@@ -27,7 +29,7 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 	timeScale: timeScaleOptionsDefaults,
 	watermark: watermarkOptionsDefaults,
 	localization: {
-		locale: navigator.language,
+		locale: isRunningOnClientSide ? navigator.language : 'en-US',
 		dateFormat: 'dd MMM \'yy',
 	},
 	handleScroll: {
