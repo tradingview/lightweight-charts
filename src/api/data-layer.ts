@@ -22,7 +22,7 @@ import {
 } from './data-consumer';
 
 export interface TickMarkPacket {
-	span: number;
+	weight: number;
 	index: TimePointIndex;
 }
 
@@ -144,37 +144,42 @@ function seconds(count: number): number {
 	return count * 1000;
 }
 
-const spanDivisors = [
+interface WeightDivisor {
+	divisor: number;
+	weight: number;
+}
+
+const weightDivisors: WeightDivisor[] = [
 	{
-		divisor: 1, span: 20,
+		divisor: 1, weight: 20,
 	},
 	{
-		divisor: seconds(1), span: 19,
+		divisor: seconds(1), weight: 19,
 	},
 	{
-		divisor: minutes(1), span: 20,
+		divisor: minutes(1), weight: 20,
 	},
 	{
-		divisor: minutes(5), span: 21,
+		divisor: minutes(5), weight: 21,
 	},
 	{
-		divisor: minutes(30), span: 22,
+		divisor: minutes(30), weight: 22,
 	},
 	{
-		divisor: hours(1), span: 30,
+		divisor: hours(1), weight: 30,
 	},
 	{
-		divisor: hours(3), span: 31,
+		divisor: hours(3), weight: 31,
 	},
 	{
-		divisor: hours(6), span: 32,
+		divisor: hours(6), weight: 32,
 	},
 	{
-		divisor: hours(12), span: 33,
+		divisor: hours(12), weight: 33,
 	},
 ];
 
-function spanByTime(time: UTCTimestamp, previousTime: UTCTimestamp | null): number {
+function weightByTime(time: UTCTimestamp, previousTime: UTCTimestamp | null): number {
 	// function days(count) { return count * 24 * 60 * 60 * 1000; }
 	if (previousTime !== null) {
 		const lastTime = new Date(previousTime * 1000);
@@ -188,9 +193,9 @@ function spanByTime(time: UTCTimestamp, previousTime: UTCTimestamp | null): numb
 			return 50;
 		}
 
-		for (let i = spanDivisors.length - 1; i >= 0; --i) {
-			if (Math.floor(lastTime.getTime() / spanDivisors[i].divisor) !== Math.floor(currentTime.getTime() / spanDivisors[i].divisor)) {
-				return spanDivisors[i].span;
+		for (let i = weightDivisors.length - 1; i >= 0; --i) {
+			if (Math.floor(lastTime.getTime() / weightDivisors[i].divisor) !== Math.floor(currentTime.getTime() / weightDivisors[i].divisor)) {
+				return weightDivisors[i].weight;
 			}
 		}
 	}
@@ -395,21 +400,21 @@ export class DataLayer {
 		let totalTimeDiff = 0;
 		const marks = this._sortedTimePoints.map((time: TimePoint, index: number) => {
 			totalTimeDiff += time.timestamp - (prevTime || time.timestamp);
-			const span = spanByTime(time.timestamp, prevTime);
+			const weight = weightByTime(time.timestamp, prevTime);
 			prevTime = time.timestamp;
 			return {
-				span: span,
+				weight: weight,
 				time: time,
 				index: index as TimePointIndex,
 			};
 		});
 
 		if (marks.length > 1) {
-			// let's guess a span for the first mark
+			// let's guess a weight for the first mark
 			// let's say the previous point was average time back in the history
 			const averageTimeDiff = Math.ceil(totalTimeDiff / (marks.length - 1));
 			const approxPrevTime = (marks[0].time.timestamp - averageTimeDiff) as UTCTimestamp;
-			marks[0].span = spanByTime(marks[0].time.timestamp, approxPrevTime);
+			marks[0].weight = weightByTime(marks[0].time.timestamp, approxPrevTime);
 		}
 
 		const timeScaleUpdate: TimeScaleUpdatePacket = {
@@ -449,12 +454,9 @@ export class DataLayer {
 		let prevTime: UTCTimestamp | null = this._timePointsByIndex.get(startIndex - 1 as TimePointIndex)?.timestamp || null;
 		for (let index = startIndex; index < this._timePointsByIndex.size; ++index) {
 			const time = ensureDefined(this._timePointsByIndex.get(index));
-			const span = spanByTime(time.timestamp, prevTime);
+			const weight = weightByTime(time.timestamp, prevTime);
 			prevTime = time.timestamp;
-			result.push({
-				span: span,
-				index: index,
-			});
+			result.push({ weight, index });
 		}
 
 		return result;

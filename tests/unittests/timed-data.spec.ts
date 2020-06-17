@@ -5,8 +5,6 @@ import { Coordinate } from '../../src/model/coordinate';
 import { RangeImpl } from '../../src/model/range-impl';
 import { TimePointIndex, visibleTimedValues } from '../../src/model/time-data';
 
-// TODO: add tests for marks spans
-
 function visibleTimedValuesCase(
 	rangeFrom: number,
 	rangeTo: number,

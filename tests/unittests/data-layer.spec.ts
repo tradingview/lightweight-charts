@@ -11,7 +11,7 @@ import { BarValue, SeriesPlotIndex } from '../../src/model/series-data';
 import { SeriesType } from '../../src/model/series-options';
 import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
-// TODO: add tests for marks spans
+// TODO: add tests for marks weights
 
 function createSeriesMock<T extends SeriesType = 'Line'>(seriesType?: T): Series<T> {
 	const data = new PlotList<TimePoint, BarValue>();

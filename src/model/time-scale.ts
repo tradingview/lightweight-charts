@@ -24,7 +24,7 @@ const enum Constants {
 	MinVisibleBarsCount = 2,
 }
 
-const enum MarkSpanBorder {
+const enum MarkWeightBorder {
 	Minute = 20,
 	Hour = 30,
 	Day = 40,
@@ -41,8 +41,7 @@ interface TransitionState {
 export interface TimeMark {
 	coord: number;
 	label: string;
-	span: number;
-	major: boolean;
+	weight: number;
 }
 
 export const enum TickMarkType {
@@ -84,7 +83,7 @@ export class TimeScale {
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
 	private readonly _tickMarks: TickMarks = new TickMarks();
-	private _formattedBySpan: Map<number, FormattedLabelsCache> = new Map();
+	private _formattedByWeight: Map<number, FormattedLabelsCache> = new Map();
 
 	private _visibleRange: TimeScaleVisibleRange = TimeScaleVisibleRange.invalid();
 	private _visibleRangeInvalidated: boolean = true;
@@ -360,16 +359,13 @@ export class TimeScale {
 			if (targetIndex < this._labels.length) {
 				const label = this._labels[targetIndex];
 				label.coord = this.indexToCoordinate(tm.index);
-				label.label = this._formatLabel(time, tm.span);
-				label.span = tm.span;
-				label.major = false;
+				label.label = this._formatLabel(time, tm.weight);
+				label.weight = tm.weight;
 			} else {
 				this._labels.push({
 					coord: this.indexToCoordinate(tm.index),
-					label: this._formatLabel(time, tm.span),
-					span: tm.span,
-					major: false,
-					// major: tm.label >= TimeConstants.DaySpan ? 1 : 0, // ??? there is no label in tick-marks.ts
+					label: this._formatLabel(time, tm.weight),
+					weight: tm.weight,
 				});
 			}
 			targetIndex++;
@@ -713,32 +709,32 @@ export class TimeScale {
 		this._commonTransitionStartState = null;
 	}
 
-	private _formatLabel(time: TimePoint, span: number): string {
-		let formatter = this._formattedBySpan.get(span);
+	private _formatLabel(time: TimePoint, weight: number): string {
+		let formatter = this._formattedByWeight.get(weight);
 		if (formatter === undefined) {
 			formatter = new FormattedLabelsCache((timePoint: TimePoint) => {
-				return this._formatLabelImpl(timePoint, span);
+				return this._formatLabelImpl(timePoint, weight);
 			});
 
-			this._formattedBySpan.set(span, formatter);
+			this._formattedByWeight.set(weight, formatter);
 		}
 
 		return formatter.format(time);
 	}
 
-	private _formatLabelImpl(timePoint: TimePoint, span: number): string {
+	private _formatLabelImpl(timePoint: TimePoint, weight: number): string {
 		let tickMarkType: TickMarkType;
 
 		const timeVisible = this._options.timeVisible;
-		if (span < MarkSpanBorder.Minute && timeVisible) {
+		if (weight < MarkWeightBorder.Minute && timeVisible) {
 			tickMarkType = this._options.secondsVisible ? TickMarkType.TimeWithSeconds : TickMarkType.Time;
-		} else if (span < MarkSpanBorder.Day && timeVisible) {
+		} else if (weight < MarkWeightBorder.Day && timeVisible) {
 			tickMarkType = TickMarkType.Time;
-		} else if (span < MarkSpanBorder.Week) {
+		} else if (weight < MarkWeightBorder.Week) {
 			tickMarkType = TickMarkType.DayOfMonth;
-		} else if (span < MarkSpanBorder.Month) {
+		} else if (weight < MarkWeightBorder.Month) {
 			tickMarkType = TickMarkType.DayOfMonth;
-		} else if (span < MarkSpanBorder.Year) {
+		} else if (weight < MarkWeightBorder.Year) {
 			tickMarkType = TickMarkType.Month;
 		} else {
 			tickMarkType = TickMarkType.Year;
@@ -780,7 +776,7 @@ export class TimeScale {
 
 	private _invalidateTickMarks(): void {
 		this._resetTimeMarksCache();
-		this._formattedBySpan.clear();
+		this._formattedByWeight.clear();
 	}
 
 	private _updateDateTimeFormatter(): void {

@@ -14,14 +14,14 @@ export class TickMarks {
 	// Hash of tick marks
 	private _marksByIndex: Map<number, TickMark> = new Map();
 	// Sparse array with ordered arrays of tick marks
-	private _marksBySpan: (TickMark[] | undefined) [] = [];
+	private _marksByWeight: (TickMark[] | undefined) [] = [];
 	private _changed: Delegate = new Delegate();
 	private _cache: TickMark[] | null = null;
 	private _maxBar: number = NaN;
 
 	public reset(): void {
 		this._marksByIndex.clear();
-		this._marksBySpan = [];
+		this._marksByWeight = [];
 		this._minIndex = Infinity;
 		this._maxIndex = -Infinity;
 		this._cache = null;
@@ -30,16 +30,16 @@ export class TickMarks {
 
 	// tslint:disable-next-line:cyclomatic-complexity
 	public merge(tickMarks: TickMark[]): void {
-		const marksBySpan = this._marksBySpan;
-		const unsortedSpans: Record<number, boolean> = {};
+		const marksByWeight = this._marksByWeight;
+		const unsortedWeights: Record<number, boolean> = {};
 
 		for (const tickMark of tickMarks) {
 			const index = tickMark.index;
-			const span = tickMark.span;
+			const weight = tickMark.weight;
 
 			const existingTickMark = this._marksByIndex.get(tickMark.index);
 			if (existingTickMark) {
-				if (existingTickMark.index === tickMark.index && existingTickMark.span === tickMark.span) {
+				if (existingTickMark.index === tickMark.index && existingTickMark.weight === tickMark.weight) {
 					continue;
 				}
 
@@ -57,29 +57,29 @@ export class TickMarks {
 				this._maxIndex = index;
 			}
 
-			// Store it in span arrays
-			let marks = marksBySpan[span];
+			// Store it in weight arrays
+			let marks = marksByWeight[weight];
 			if (marks === undefined) {
 				marks = [];
-				marksBySpan[span] = marks;
+				marksByWeight[weight] = marks;
 			}
 
 			marks.push(tickMark);
-			unsortedSpans[span] = true;
+			unsortedWeights[weight] = true;
 		}
 
 		// Clean up and sort arrays
-		for (let span = marksBySpan.length; span--;) {
-			const marks = marksBySpan[span];
+		for (let weight = marksByWeight.length; weight--;) {
+			const marks = marksByWeight[weight];
 			if (marks === undefined) {
 				continue;
 			}
 
 			if (marks.length === 0) {
-				delete marksBySpan[span];
+				delete marksByWeight[weight];
 			}
 
-			if (unsortedSpans[span]) {
+			if (unsortedWeights[weight]) {
 				marks.sort(sortByIndexAsc);
 			}
 		}
@@ -96,8 +96,8 @@ export class TickMarks {
 
 		this._maxBar = maxBar;
 		let marks: TickMark[] = [];
-		for (let span = this._marksBySpan.length; span--;) {
-			if (!this._marksBySpan[span]) {
+		for (let weight = this._marksByWeight.length; weight--;) {
+			if (!this._marksByWeight[weight]) {
 				continue;
 			}
 
@@ -107,13 +107,13 @@ export class TickMarks {
 
 			const prevMarksLength = prevMarks.length;
 			let prevMarksPointer = 0;
-			const currentSpan = ensureDefined(this._marksBySpan[span]);
-			const currentSpanLength = currentSpan.length;
+			const currentWeight = ensureDefined(this._marksByWeight[weight]);
+			const currentWeightLength = currentWeight.length;
 
 			let rightIndex = Infinity;
 			let leftIndex = -Infinity;
-			for (let i = 0; i < currentSpanLength; i++) {
-				const mark = currentSpan[i];
+			for (let i = 0; i < currentWeightLength; i++) {
+				const mark = currentWeight[i];
 				const currentIndex = mark.index;
 
 				// Determine indexes with which current index will be compared
@@ -169,11 +169,11 @@ export class TickMarks {
 			this._maxIndex = -Infinity;
 		}
 
-		const spanArray = ensureDefined(this._marksBySpan[tickMark.span]);
-		const position = spanArray.indexOf(tickMark);
+		const weightArray = ensureDefined(this._marksByWeight[tickMark.weight]);
+		const position = weightArray.indexOf(tickMark);
 		if (position !== -1) {
 			// Keeps array sorted
-			spanArray.splice(position, 1);
+			weightArray.splice(position, 1);
 		}
 	}
 }
