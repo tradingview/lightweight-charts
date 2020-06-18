@@ -5,7 +5,6 @@ import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
-import { Bar, SeriesPlotIndex } from '../../model/series-data';
 import { TimedValue, TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
@@ -50,7 +49,6 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 
 	protected _fillRawPoints(): void {
 		const barSpacing = this._model.timeScale().barSpacing();
-		const palette = this._series.palette();
 
 		this._histogramData = createEmptyHistogramData(barSpacing);
 
@@ -61,12 +59,11 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 
 		const defaultColor = this._series.options().color;
 
-		this._series.bars().each((index: TimePointIndex, bar: Bar) => {
-			const value = barValueGetter(bar.value);
-			const paletteColorIndex = bar.value[SeriesPlotIndex.Color];
+		for (const row of this._series.bars().rows()) {
+			const value = barValueGetter(row.value);
 
-			const color = paletteColorIndex != null ? palette.colorByIndex(paletteColorIndex) : defaultColor;
-			const item = createRawItem(index, value, color);
+			const color = row.color !== undefined ? row.color : defaultColor;
+			const item = createRawItem(row.index, value, color);
 			// colorIndex is the paneview's internal palette index
 			// this internal palette stores defaultColor by 0 index and pallette colors by paletteColorIndex + 1
 			targetIndex++;
@@ -75,9 +72,8 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 			} else {
 				this._histogramData.items.push(item);
 			}
-			this._items[itemIndex++] = { time: index, x: 0 as Coordinate };
-			return false;
-		});
+			this._items[itemIndex++] = { time: row.index, x: 0 as Coordinate };
+		}
 
 		this._renderer.setData(this._histogramData);
 		this._compositeRenderer.setRenderers([this._renderer]);

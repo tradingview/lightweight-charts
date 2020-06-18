@@ -49,13 +49,10 @@ export class Magnet {
 				if (bar === null) {
 					return acc;
 				}
-				const prices = [
-					bar.value[SeriesPlotIndex.Close] as number,
-				];
 
 				// convert bar to pixels
 				const firstPrice = ensure(series.firstValue());
-				return acc.concat(prices.map((barPrice: number) => ps.priceToCoordinate(barPrice, firstPrice.value)));
+				return acc.concat([ps.priceToCoordinate(bar.value[SeriesPlotIndex.Close], firstPrice.value)]);
 			},
 			[] as Coordinate[]);
 

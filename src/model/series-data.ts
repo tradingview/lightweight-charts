@@ -1,81 +1,82 @@
 import { BarPrice } from './bar';
-import { PlotValue } from './plot-data';
+import { PlotRow, PlotRowValue } from './plot-data';
 import { PlotFunctionMap, PlotList } from './plot-list';
-import { TimePoint } from './time-data';
-
-export type BarValue = [PlotValue, PlotValue, PlotValue, PlotValue, PlotValue];
-
-export interface Bar {
-	time: TimePoint;
-	value: BarValue;
-}
+import { SeriesType } from './series-options';
 
 /**
- * Plot's index in plot list tuple for series (or overlay study)
- * @see {Bar}
+ * Plot's index in plot list tuple for series
+ * @see {PlotRowValue}
  */
 export const enum SeriesPlotIndex {
 	Open = 0,
 	High = 1,
 	Low = 2,
 	Close = 3,
-	Color = 4,
 }
 
 /** @public */
 const barFunctions = {
-	open: (bar: BarValue) => bar[SeriesPlotIndex.Open] as BarPrice,
+	open: (bar: PlotRowValue) => bar[SeriesPlotIndex.Open] as BarPrice,
 
-	high: (bar: BarValue) => bar[SeriesPlotIndex.High] as BarPrice,
+	high: (bar: PlotRowValue) => bar[SeriesPlotIndex.High] as BarPrice,
 
-	low: (bar: BarValue) => bar[SeriesPlotIndex.Low] as BarPrice,
+	low: (bar: PlotRowValue) => bar[SeriesPlotIndex.Low] as BarPrice,
 
-	close: (bar: BarValue) => bar[SeriesPlotIndex.Close] as BarPrice,
+	close: (bar: PlotRowValue) => bar[SeriesPlotIndex.Close] as BarPrice,
 
-	hl2: (bar: BarValue) =>
+	hl2: (bar: PlotRowValue) => (bar[SeriesPlotIndex.High] + bar[SeriesPlotIndex.Low]) / 2 as BarPrice,
+
+	hlc3: (bar: PlotRowValue) =>
 		(
-			(bar[SeriesPlotIndex.High] as number) +
-			(bar[SeriesPlotIndex.Low] as number)
-		) / 2 as BarPrice,
-
-	hlc3: (bar: BarValue) =>
-		(
-			(bar[SeriesPlotIndex.High] as number) +
-			(bar[SeriesPlotIndex.Low] as number) +
-			(bar[SeriesPlotIndex.Close] as number)
+			bar[SeriesPlotIndex.High] +
+			bar[SeriesPlotIndex.Low] +
+			bar[SeriesPlotIndex.Close]
 		) / 3 as BarPrice,
 
-	ohlc4: (bar: BarValue) =>
+	ohlc4: (bar: PlotRowValue) =>
 		(
-			(bar[SeriesPlotIndex.Open] as number) +
-			(bar[SeriesPlotIndex.High] as number) +
-			(bar[SeriesPlotIndex.Low] as number) +
-			(bar[SeriesPlotIndex.Close] as number)
+			bar[SeriesPlotIndex.Open] +
+			bar[SeriesPlotIndex.High] +
+			bar[SeriesPlotIndex.Low] +
+			bar[SeriesPlotIndex.Close]
 		) / 4 as BarPrice,
 };
 
 type SeriesPriceSource = keyof typeof barFunctions;
 
-const seriesSource: SeriesPriceSource[] = ['open', 'high', 'low', 'close', 'hl2', 'hlc3', 'ohlc4'];
+const seriesSource = Object.keys(barFunctions) as SeriesPriceSource[];
 
-function seriesPlotFunctionMap(): PlotFunctionMap<BarValue> {
-	const result: PlotFunctionMap<BarValue> = new Map();
+function seriesPlotFunctionMap(): PlotFunctionMap {
+	const result: PlotFunctionMap = new Map();
 
-	seriesSource.forEach((plot: keyof typeof barFunctions, index: number) => {
+	seriesSource.forEach((plot: SeriesPriceSource) => {
 		result.set(plot, barFunction(plot));
 	});
 
 	return result;
 }
 
-export type BarFunction = (bar: BarValue) => BarPrice;
+export type BarFunction = (bar: PlotRowValue) => BarPrice;
 
 export function barFunction(priceSource: SeriesPriceSource): BarFunction {
 	return barFunctions[priceSource];
 }
 
-export type SeriesPlotList = PlotList<TimePoint, BarValue>;
+export interface HistogramPlotRow extends PlotRow {
+	readonly color?: string;
+}
 
-export function createSeriesPlotList(): SeriesPlotList {
-	return new PlotList<TimePoint, BarValue>(seriesPlotFunctionMap());
+export interface SeriesPlotRowTypeAtTypeMap {
+	Bar: PlotRow;
+	Candlestick: PlotRow;
+	Area: PlotRow;
+	Line: PlotRow;
+	Histogram: HistogramPlotRow;
+}
+
+export type SeriesPlotRow<T extends SeriesType = SeriesType> = SeriesPlotRowTypeAtTypeMap[T];
+export type SeriesPlotList<T extends SeriesType = SeriesType> = PlotList<SeriesPlotRow<T>>;
+
+export function createSeriesPlotList<T extends SeriesType = SeriesType>(): SeriesPlotList<T> {
+	return new PlotList<SeriesPlotRow<T>>(seriesPlotFunctionMap());
 }

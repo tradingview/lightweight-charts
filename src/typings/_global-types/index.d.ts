@@ -16,3 +16,10 @@ declare const enum MouseEventButton {
 	Fourth = 3,
 	Fifth = 4,
 }
+
+/**
+ * Removes "readonly" from all properties
+ */
+type Mutable<T> = {
+	-readonly [P in keyof T]: T[P];
+};

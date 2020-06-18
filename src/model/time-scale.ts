@@ -14,7 +14,18 @@ import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
 import { areRangesEqual, RangeImpl } from './range-impl';
 import { TickMarks } from './tick-marks';
-import { BusinessDay, Logical, LogicalRange, SeriesItemsIndexesRange, TickMark, TimedValue, TimePoint, TimePointIndex, TimePointsRange, UTCTimestamp } from './time-data';
+import {
+	BusinessDay,
+	Logical,
+	LogicalRange,
+	SeriesItemsIndexesRange,
+	TimedValue,
+	TimePoint,
+	TimePointIndex,
+	TimePointsRange,
+	TimeScalePoint,
+	UTCTimestamp,
+} from './time-data';
 import { TimeScaleVisibleRange } from './time-scale-visible-range';
 
 const enum Constants {
@@ -78,7 +89,7 @@ export class TimeScale {
 	private _width: number = 0;
 	private _baseIndexOrNull: TimePointIndex | null = null;
 	private _rightOffset: number;
-	private _points: readonly TimePoint[] = [];
+	private _points: readonly TimeScalePoint[] = [];
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
@@ -142,7 +153,7 @@ export class TimeScale {
 	}
 
 	public indexToTime(index: TimePointIndex): TimePoint | null {
-		return this._points[index] || null;
+		return this._points[index]?.time || null;
 	}
 
 	public timeToIndex(time: TimePoint, findNearest: boolean): TimePointIndex | null {
@@ -151,17 +162,17 @@ export class TimeScale {
 			return null;
 		}
 
-		if (time.timestamp > this._points[this._points.length - 1].timestamp) {
+		if (time.timestamp > this._points[this._points.length - 1].time.timestamp) {
 			// special case
 			return findNearest ? this._points.length - 1 as TimePointIndex : null;
 		}
 
 		for (let i = 0; i < this._points.length; ++i) {
-			if (time.timestamp === this._points[i].timestamp) {
+			if (time.timestamp === this._points[i].time.timestamp) {
 				return i as TimePointIndex;
 			}
 
-			if (time.timestamp < this._points[i].timestamp) {
+			if (time.timestamp < this._points[i].time.timestamp) {
 				return findNearest ? i as TimePointIndex : null;
 			}
 		}
@@ -377,15 +388,6 @@ export class TimeScale {
 		return this._labels;
 	}
 
-	public reset(): void {
-		this._visibleRangeInvalidated = true;
-		this._points = [];
-		this._scrollStartPoint = null;
-		this._scaleStartPoint = null;
-		this._clearCommonTransitionsStartState();
-		this._tickMarks.reset();
-	}
-
 	public restoreDefault(): void {
 		this._visibleRangeInvalidated = true;
 
@@ -528,11 +530,11 @@ export class TimeScale {
 		animationFn();
 	}
 
-	public update(newPoints: readonly TimePoint[], marksUpdate: TickMark[]): void {
+	public update(newPoints: readonly TimeScalePoint[]): void {
 		this._visibleRangeInvalidated = true;
 
 		this._points = newPoints;
-		this._tickMarks.merge(marksUpdate);
+		this._tickMarks.setTimeScalePoints(newPoints);
 		this._correctOffset();
 	}
 

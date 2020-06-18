@@ -1,8 +1,14 @@
-import { TimePointIndex } from './time-data';
+import { TimePoint, TimePointIndex } from './time-data';
 
-export type PlotValue = number | null | undefined;
-export interface PlotRow<TimeType, PlotValueTuple extends PlotValue[]> {
+export type PlotRowValue = [
+	number,            // open
+	number,            // high
+	number,            // low
+	number,            // close
+];
+
+export interface PlotRow {
 	readonly index: TimePointIndex;
-	readonly time: TimeType;
-	readonly value: PlotValueTuple;
+	readonly time: TimePoint;
+	readonly value: PlotRowValue;
 }

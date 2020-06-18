@@ -17,6 +17,11 @@ export interface TimePoint {
 	businessDay?: BusinessDay;
 }
 
+export interface TimeScalePoint {
+	timeWeight: number;
+	time: TimePoint;
+}
+
 export interface Range<T> {
 	from: T;
 	to: T;
@@ -29,11 +34,6 @@ export type TimePointIndex = Nominal<number, 'TimePointIndex'>;
 export type Logical = Nominal<number, 'Logical'>;
 
 export type LogicalRange = Range<Logical>;
-
-export interface TickMark {
-	index: TimePointIndex;
-	weight: number;
-}
 
 export interface TimedValue {
 	time: TimePointIndex;

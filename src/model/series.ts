@@ -28,16 +28,14 @@ import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
 import { FirstValue } from './iprice-data-source';
-import { Palette } from './palette';
 import { Pane } from './pane';
-import { PlotRow } from './plot-data';
 import { MinMax, PlotRowSearchMode } from './plot-list';
 import { PriceDataSource } from './price-data-source';
 import { PriceLineOptions } from './price-line-options';
 import { PriceRangeImpl } from './price-range-impl';
 import { PriceScale } from './price-scale';
 import { SeriesBarColorer } from './series-bar-colorer';
-import { Bar, BarFunction, barFunction, BarValue, createSeriesPlotList, SeriesPlotIndex, SeriesPlotList } from './series-data';
+import { BarFunction, barFunction, createSeriesPlotList, SeriesPlotIndex, SeriesPlotList, SeriesPlotRow } from './series-data';
 import { InternalSeriesMarker, SeriesMarker } from './series-markers';
 import {
 	AreaStyleOptions,
@@ -96,7 +94,7 @@ export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Se
 
 export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
 	private readonly _seriesType: T;
-	private _data: SeriesPlotList = createSeriesPlotList();
+	private _data: SeriesPlotList<T> = createSeriesPlotList();
 	private readonly _priceAxisViews: IPriceAxisView[];
 	private readonly _panePriceAxisView: PanePriceAxisView;
 	private _formatter!: IFormatter;
@@ -108,7 +106,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _barColorerCache: SeriesBarColorer | null = null;
 	private readonly _options: SeriesOptionsInternal<T>;
 	private _barFunction: BarFunction;
-	private readonly _palette: Palette = new Palette();
 	private _markers: SeriesMarker<TimePoint>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
@@ -172,7 +169,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		// find range of bars inside range
 		// TODO: make it more optimal
-		let bar: Bar | null;
+		let bar: SeriesPlotRow<T> | null;
 		let lastIndex: TimePointIndex;
 		if (globalLast) {
 			const lastBar = this._data.last();
@@ -195,7 +192,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			lastIndex = endBar.index;
 		}
 
-		const price = plot !== undefined ? bar.value[plot] as number : this._barFunction(bar.value);
+		const price = plot !== undefined ? bar.value[plot] : this._barFunction(bar.value);
 		const barColorer = this.barColorer();
 		const style = barColorer.barStyle(lastIndex, { value: bar });
 		const coordinate = priceScale.priceToCoordinate(price, firstValue.value);
@@ -250,7 +247,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public clearData(): void {
 		this._data.clear();
-		this._palette.clear();
 
 		// we must either re-create pane view on clear data
 		// or clear all caches inside pane views
@@ -259,11 +255,13 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._recreatePaneViews();
 	}
 
-	public updateData(data: ReadonlyArray<PlotRow<Bar['time'], BarValue>>, clearData: boolean = false): void {
+	public updateData(data: ReadonlyArray<SeriesPlotRow<T>>, clearData: boolean): void {
 		if (clearData) {
 			this._data.clear();
 		}
+
 		this._data.merge(data);
+
 		this._recalculateMarkers();
 
 		this._paneView.update('data');
@@ -310,10 +308,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().updateSource(this);
 	}
 
-	public palette(): Palette {
-		return this._palette;
-	}
-
 	public seriesType(): T {
 		return this._seriesType;
 	}
@@ -330,7 +324,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		};
 	}
 
-	public firstBar(): Bar | null {
+	public firstBar(): SeriesPlotRow<T> | null {
 		const visibleBars = this.model().timeScale().visibleStrictRange();
 		if (visibleBars === null) {
 			return null;
@@ -340,7 +334,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._data.search(startTimePoint, PlotRowSearchMode.NearestRight);
 	}
 
-	public bars(): SeriesPlotList {
+	public bars(): SeriesPlotList<T> {
 		return this._data;
 	}
 
@@ -349,7 +343,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return res ? res.index : null;
 	}
 
-	public nearestData(index: TimePointIndex, options?: PlotRowSearchMode): PlotRow<Bar['time'], BarValue> | null {
+	public nearestData(index: TimePointIndex, options?: PlotRowSearchMode): SeriesPlotRow<T> | null {
 		if (!isInteger(index)) {
 			return null;
 		}

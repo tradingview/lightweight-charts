@@ -23,7 +23,7 @@ import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
-import { LogicalRange, TickMark, TimePoint, TimePointIndex } from './time-data';
+import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
 import { Watermark, WatermarkOptions } from './watermark';
 
@@ -470,50 +470,26 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	public updateTimeScale(newPoints: readonly TimePoint[], marksUpdate: TickMark[], fullUpdate: boolean): void {
-		if (fullUpdate) {
-			this._timeScale.reset();
-		}
+	public updateTimeScale(newPoints: readonly TimeScalePoint[], newBaseIndex: TimePointIndex): void {
+		this._timeScale.update(newPoints);
 
-		this._timeScale.update(newPoints, marksUpdate);
-	}
+		const currentBaseIndex = this._timeScale.baseIndex();
+		const visibleBars = this._timeScale.visibleStrictRange();
 
-	public updateTimeScaleBaseIndex(earliestRowIndex?: TimePointIndex): void {
-		// get the latest series bar index
-		const lastSeriesBarIndex = this._serieses.reduce(
-			(currentRes: TimePointIndex | undefined, series: Series) => {
-				const seriesBars = series.bars();
-				if (seriesBars.isEmpty()) {
-					return currentRes;
-				}
-				const currentLastIndex = ensureNotNull(seriesBars.lastIndex());
-				return (currentRes === undefined) ? currentLastIndex : Math.max(currentLastIndex, currentRes) as TimePointIndex;
-			},
-			undefined);
+		// if time scale cannot return current visible bars range (e.g. time scale has zero-width)
+		// then we do not need to update right offset to shift visible bars range to have the same right offset as we have before new bar
+		// (and actually we cannot)
+		if (visibleBars !== null) {
+			const isLastSeriesBarVisible = visibleBars.contains(currentBaseIndex);
 
-		if (lastSeriesBarIndex !== undefined) {
-			const timeScale = this._timeScale;
-			const currentBaseIndex = timeScale.baseIndex();
+			if (newBaseIndex > currentBaseIndex && !isLastSeriesBarVisible) {
+				const compensationShift = newBaseIndex - currentBaseIndex;
 
-			const visibleBars = timeScale.visibleStrictRange();
-
-			// if time scale cannot return current visible bars range (e.g. time scale has zero-width)
-			// then we do not need to update right offset to shift visible bars range to have the same right offset as we have before new bar
-			// (and actually we cannot)
-			if (visibleBars !== null) {
-				const isLastSeriesBarVisible = visibleBars.contains(currentBaseIndex);
-
-				if (earliestRowIndex !== undefined && earliestRowIndex > 0 && !isLastSeriesBarVisible) {
-					const compensationShift = lastSeriesBarIndex - currentBaseIndex;
-
-					timeScale.setRightOffset(timeScale.rightOffset() - compensationShift);
-				}
+				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
 			}
-
-			timeScale.setBaseIndex(lastSeriesBarIndex);
 		}
 
-		this.recalculateAllPanes();
+		this._timeScale.setBaseIndex(newBaseIndex);
 	}
 
 	public recalculatePane(pane: Pane | null): void {
