@@ -15,7 +15,7 @@ function generateData(amplitude) {
 
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
-		priceScale: {
+		rightPriceScale: {
 			scaleMargins: {
 				bottom: 0,
 				top: 0,

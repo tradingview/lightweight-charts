@@ -20,8 +20,11 @@ function runTestCase(container) {
 		color: 'blue',
 	});
 	const secondSeries = chart.addLineSeries({
-		overlay: true,
+		priceScaleId: 'first-overlay',
 		color: 'green',
+	});
+
+	chart.priceScale('first-overlay').applyOptions({
 		scaleMargins: {
 			top: 0.5,
 			bottom: 0,
@@ -29,11 +32,14 @@ function runTestCase(container) {
 	});
 
 	const thirdSeries = chart.addLineSeries({
-		overlay: true,
+		priceScaleId: 'second-overlay',
 	});
 
 	thirdSeries.applyOptions({
 		color: 'red',
+	});
+
+	chart.priceScale('second-overlay').applyOptions({
 		scaleMargins: {
 			top: 0,
 			bottom: 0.5,

@@ -49,6 +49,10 @@ function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
 		leftPriceScale: {
 			visible: true,
+			scaleMargins: {
+				top: 0.75,
+				bottom: 0,
+			},
 		},
 	});
 
@@ -68,10 +72,6 @@ function runTestCase(container) {
 		priceLineWidth: 1,
 		priceLineStyle: LightweightCharts.LineStyle.LargeDashed,
 		priceScaleId: 'left',
-		scaleMargins: {
-			top: 0.75,
-			bottom: 0,
-		},
 	});
 
 	histSeries.setData(generateDataHist());

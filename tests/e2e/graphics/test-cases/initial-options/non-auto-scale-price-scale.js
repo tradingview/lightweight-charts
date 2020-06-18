@@ -14,7 +14,7 @@ function generateData() {
 
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
-		priceScale: {
+		rightPriceScale: {
 			autoScale: false,
 		},
 	});
@@ -25,7 +25,7 @@ function runTestCase(container) {
 
 	// overlay price scale shouldn't inherit autoScale option
 	const histogramSeries = chart.addHistogramSeries({
-		overlay: true,
+		priceScaleId: 'overlay',
 		color: '#ff0000',
 	});
 
