@@ -569,10 +569,6 @@ export class PaneWidget implements IDestroyable {
 
 	private _drawWatermark(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const source = this._model().watermarkSource();
-		if (source === null) {
-			return;
-		}
-
 		this._drawSourceBackground(source, ctx, pixelRatio);
 		this._drawSource(source, ctx, pixelRatio);
 	}
