@@ -1,4 +1,4 @@
-import { isRunningOnClientSide } from '../../helpers/assertions';
+import { isRunningOnClientSide } from '../../helpers/is-running-on-client-side';
 
 import { ChartOptionsInternal } from '../../model/chart-model';
 
@@ -29,7 +29,7 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 	timeScale: timeScaleOptionsDefaults,
 	watermark: watermarkOptionsDefaults,
 	localization: {
-		locale: isRunningOnClientSide ? navigator.language : 'en-US',
+		locale: isRunningOnClientSide ? navigator.language : '',
 		dateFormat: 'dd MMM \'yy',
 	},
 	handleScroll: {

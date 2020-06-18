@@ -1,6 +1,10 @@
-import { isRunningOnClientSide } from '../helpers/assertions';
+import { isRunningOnClientSide } from '../helpers/is-running-on-client-side';
 
 function checkTouchEvents(): boolean {
+	if (!isRunningOnClientSide) {
+		return false;
+	}
+
 	if ('ontouchstart' in window) {
 		return true;
 	}
@@ -10,14 +14,22 @@ function checkTouchEvents(): boolean {
 }
 
 function getMobileTouch(): boolean {
+	if (!isRunningOnClientSide) {
+		return false;
+	}
+
 	const touch = !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || checkTouchEvents();
 
 	return 'onorientationchange' in window && touch;
 }
 
-export const mobileTouch = isRunningOnClientSide && getMobileTouch();
+export const mobileTouch = getMobileTouch();
 
 function getIsMobile(): boolean {
+	if (!isRunningOnClientSide) {
+		return false;
+	}
+
 	// actually we shouldn't check that values
 	// we even don't need to know what browser/UA/etc is (in almost all cases, except special ones)
 	// so, in MouseEventHandler/PaneWidget we should check what event happened (touch or mouse)
@@ -28,4 +40,4 @@ function getIsMobile(): boolean {
 	return android || iOS;
 }
 
-export const isMobile = isRunningOnClientSide && getIsMobile();
+export const isMobile = getIsMobile();
