@@ -89,16 +89,19 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 }
 
 function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
+	// tslint:disable:deprecation
 	if (options.priceScale) {
 		warn('"priceScale" option has been deprecated, use "leftPriceScale", "rightPriceScale" and "overlayPriceScales" instead');
+
 		options.leftPriceScale = options.leftPriceScale || {};
 		options.rightPriceScale = options.rightPriceScale || {};
-		// tslint:disable-next-line:deprecation
+
 		const position = options.priceScale.position;
-		// tslint:disable-next-line:deprecation
 		delete options.priceScale.position;
+
 		options.leftPriceScale = merge(options.leftPriceScale, options.priceScale);
 		options.rightPriceScale = merge(options.rightPriceScale, options.priceScale);
+
 		if (position === 'left') {
 			options.leftPriceScale.visible = true;
 			options.rightPriceScale.visible = false;
@@ -121,6 +124,7 @@ function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
 			options.overlayPriceScales.scaleMargins = options.priceScale.scaleMargins;
 		}
 	}
+	// tslint:enable:deprecation
 }
 
 function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<ChartOptionsInternal> {
