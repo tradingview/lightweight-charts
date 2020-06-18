@@ -1,138 +1,124 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { TextWidthCache } from '../../src/model/text-width-cache';
+import { CanvasCtxLike, TextMetricsLike, TextWidthCache } from '../../src/model/text-width-cache';
 
-function fakeMeasureText(str: string): { width: number } {
-	let fakeWidth = 0;
-	for (let i = 0; i < str.length; i++) {
-		fakeWidth += (1 + str.charCodeAt(i) % 64 / 64) * 10;
+const fakeCtx: CanvasCtxLike = {
+	measureText(str: string): TextMetricsLike {
+		let fakeWidth = 0;
+		for (let i = 0; i < str.length; i++) {
+			fakeWidth += (1 + str.charCodeAt(i) % 64 / 64) * 10;
+		}
+		return { width: fakeWidth };
+	},
+};
+
+class SpyingFakeCtx implements CanvasCtxLike {
+	public readonly invocations: Map<string, number> = new Map();
+	private _valueToReturn: number;
+
+	public constructor(valueToReturn: number) {
+		this._valueToReturn = valueToReturn;
 	}
-	return { width: fakeWidth };
+
+	public measureText(text: string): TextMetricsLike {
+		this.invocations.set(
+			text,
+			(this.invocations.get(text) || 0) + 1
+		);
+		return { width: this._valueToReturn };
+	}
 }
 
 describe('TextWidthCache', () => {
 	it('should return the same measureText would return', () => {
 		const textWidthCache = new TextWidthCache();
-		const fakeCtx = { measureText: fakeMeasureText } as unknown as CanvasRenderingContext2D;
 		expect(
 			textWidthCache.measureText(fakeCtx, 'test')
 		).to.be.equal(
-			fakeMeasureText('test').width
+			fakeCtx.measureText('test').width
 		);
 	});
 
 	it('should cache and purge values', () => {
-		const invocations: Record<string, number> = Object.create(null);
-		const fakeCtx = {
-			measureText(str: string): { width: number } {
-				invocations[str] = (invocations[str] || 0) + 1;
-				return { width: 42 };
-			},
-		} as unknown as CanvasRenderingContext2D;
-
+		const spyingCtx = new SpyingFakeCtx(42);
 		const textWidthCache = new TextWidthCache(3);
-		textWidthCache.measureText(fakeCtx, 'foo');
-		textWidthCache.measureText(fakeCtx, 'bar');
-		textWidthCache.measureText(fakeCtx, 'baz');
 
-		expect(invocations).to.deep.equal({
-			foo: 1,
-			bar: 1,
-			baz: 1,
-		});
+		textWidthCache.measureText(spyingCtx, 'foo');
+		textWidthCache.measureText(spyingCtx, 'bar');
+		textWidthCache.measureText(spyingCtx, 'baz');
 
-		textWidthCache.measureText(fakeCtx, 'baz');
-		textWidthCache.measureText(fakeCtx, 'bar');
-		textWidthCache.measureText(fakeCtx, 'foo');
+		expect(spyingCtx.invocations.get('foo')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('bar')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('baz')).to.be.equal(1);
 
-		expect(invocations).to.deep.equal({
-			foo: 1,
-			bar: 1,
-			baz: 1,
-		});
+		textWidthCache.measureText(spyingCtx, 'baz');
+		textWidthCache.measureText(spyingCtx, 'bar');
+		textWidthCache.measureText(spyingCtx, 'foo');
+
+		expect(spyingCtx.invocations.get('foo')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('bar')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('baz')).to.be.equal(1);
 
 		// The oldest, foo, should be removed
-		textWidthCache.measureText(fakeCtx, 'quux');
 
-		expect(invocations).to.deep.equal({
-			foo: 1,
-			bar: 1,
-			baz: 1,
-			quux: 1,
-		});
+		textWidthCache.measureText(spyingCtx, 'quux');
+		expect(spyingCtx.invocations.get('quux')).to.be.equal(1);
 
-		textWidthCache.measureText(fakeCtx, 'baz');
-		textWidthCache.measureText(fakeCtx, 'bar');
-		textWidthCache.measureText(fakeCtx, 'foo');
+		textWidthCache.measureText(spyingCtx, 'baz');
+		textWidthCache.measureText(spyingCtx, 'bar');
+		textWidthCache.measureText(spyingCtx, 'foo');
 
-		expect(invocations).to.deep.equal({
-			foo: 2,
-			bar: 1,
-			baz: 1,
-			quux: 1,
-		});
+		expect(spyingCtx.invocations.get('foo')).to.be.equal(2);
+		expect(spyingCtx.invocations.get('bar')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('baz')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('quux')).to.be.equal(1);
 	});
 
 	it('should not cache zero width of nonempty string', () => {
-		const invocations: Record<string, number> = Object.create(null);
-		const fakeCtx = {
-			measureText(str: string): { width: number } {
-				invocations[str] = (invocations[str] || 0) + 1;
-				return { width: 0 };
-			},
-		} as unknown as CanvasRenderingContext2D;
-
+		const spyingCtx = new SpyingFakeCtx(0);
 		const textWidthCache = new TextWidthCache(3);
 
-		textWidthCache.measureText(fakeCtx, '');
-		textWidthCache.measureText(fakeCtx, 'not empty');
-		textWidthCache.measureText(fakeCtx, '');
-		textWidthCache.measureText(fakeCtx, 'not empty');
-		textWidthCache.measureText(fakeCtx, '');
-		textWidthCache.measureText(fakeCtx, 'not empty');
+		textWidthCache.measureText(spyingCtx, '');
+		textWidthCache.measureText(spyingCtx, 'not empty');
+		textWidthCache.measureText(spyingCtx, '');
+		textWidthCache.measureText(spyingCtx, 'not empty');
+		textWidthCache.measureText(spyingCtx, '');
+		textWidthCache.measureText(spyingCtx, 'not empty');
 
-		expect(invocations).to.deep.equal({
-			// cache
-			'': 1,
-			// no cache
-			'not empty': 3,
-		});
+		expect(spyingCtx.invocations.get('')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('not empty')).to.be.equal(3);
 	});
 
-	it('should not treat prototype values as keys', () => {
-		const invocations: Record<string, number> = Object.create(null);
-		const fakeCtx = {
-			measureText(str: string): { width: number } {
-				invocations[str] = (invocations[str] || 0) + 1;
-				return { width: 42 };
-			},
-		} as unknown as CanvasRenderingContext2D;
+	it('should work with "special" values', () => {
+		const spyingCtx = new SpyingFakeCtx(42);
+		const textWidthCache = new TextWidthCache(5);
 
-		const textWidthCache = new TextWidthCache(3);
+		textWidthCache.measureText(spyingCtx, '__proto__');
+		textWidthCache.measureText(spyingCtx, 'prototype');
+		textWidthCache.measureText(spyingCtx, 'hasOwnProperty');
+		textWidthCache.measureText(spyingCtx, 'undefined');
 
-		textWidthCache.measureText(fakeCtx, '__proto__');
-		textWidthCache.measureText(fakeCtx, 'prototype');
-		textWidthCache.measureText(fakeCtx, 'hasOwnProperty');
-
-		expect(invocations.__proto__).to.deep.equal(1);
-		expect(invocations.prototype).to.deep.equal(1);
-		expect(invocations.hasOwnProperty).to.deep.equal(1);
+		expect(spyingCtx.invocations.get('__proto__')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('prototype')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('hasOwnProperty')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('undefined')).to.be.equal(1);
 
 		// Just checking if it still works
 
-		textWidthCache.measureText(fakeCtx, '__proto__');
-		textWidthCache.measureText(fakeCtx, 'prototype');
-		textWidthCache.measureText(fakeCtx, 'hasOwnProperty');
+		textWidthCache.measureText(spyingCtx, '__proto__');
+		textWidthCache.measureText(spyingCtx, 'prototype');
+		textWidthCache.measureText(spyingCtx, 'hasOwnProperty');
+		textWidthCache.measureText(spyingCtx, 'undefined');
 
-		expect(invocations.__proto__).to.deep.equal(1);
-		expect(invocations.prototype).to.deep.equal(1);
-		expect(invocations.hasOwnProperty).to.deep.equal(1);
+		expect(spyingCtx.invocations.get('__proto__')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('prototype')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('hasOwnProperty')).to.be.equal(1);
+		expect(spyingCtx.invocations.get('undefined')).to.be.equal(1);
 	});
 
 	it('should apply default optimization regex', () => {
 		const textWidthCache = new TextWidthCache();
-		const fakeCtx = { measureText: fakeMeasureText } as unknown as CanvasRenderingContext2D;
 		expect(
 			textWidthCache.measureText(fakeCtx, 'test2345')
 		).to.be.equal(
@@ -142,7 +128,6 @@ describe('TextWidthCache', () => {
 
 	it('should apply custom optimization regex', () => {
 		const textWidthCache = new TextWidthCache();
-		const fakeCtx = { measureText: fakeMeasureText } as unknown as CanvasRenderingContext2D;
 		const re = /[1-9]/g;
 		expect(
 			textWidthCache.measureText(fakeCtx, 'test01234', re)

@@ -1,24 +1,33 @@
 const defaultReplacementRe = /[2-9]/g;
 
+export interface TextMetricsLike {
+	width: number;
+}
+
+export interface CanvasCtxLike {
+	measureText(text: string): TextMetricsLike;
+}
+
 export class TextWidthCache {
-	private readonly _maxSize: number;
-	private _cache: Map<string, number> = new Map();
+	private _cache: Map<string | undefined, number> = new Map();
 	/** A "cyclic buffer" of cache keys */
-	private _keys: string[] = [];
+	private _keys: (string | undefined)[];
 	/** Current index in the "cyclic buffer" */
 	private _keysIndex: number = 0;
 
 	public constructor(size: number = 50) {
-		this._maxSize = size;
+		// A trick to keep array PACKED_ELEMENTS
+		this._keys = Array.from(new Array(size));
 	}
 
 	public reset(): void {
-		this._cache = new Map();
-		this._keys = [];
-		this._keysIndex = 0;
+		this._cache.clear();
+		this._keys.fill(undefined);
+		// We don't care where exactly the _keysIndex points,
+		// so there's no point in resetting it
 	}
 
-	public measureText(ctx: CanvasRenderingContext2D, text: string, optimizationReplacementRe?: RegExp): number {
+	public measureText(ctx: CanvasCtxLike, text: string, optimizationReplacementRe?: RegExp): number {
 		const re = optimizationReplacementRe || defaultReplacementRe;
 		const cacheString = String(text).replace(re, '0');
 
@@ -32,44 +41,33 @@ export class TextWidthCache {
 				return 0;
 			}
 
-			// A cyclic buffer like structure is used to keep track of all the cache keys
-			// and remove them when their time has come.
-			// This contents of an array cannot be pre-allocated with out-of-band empty values
-			// because this would deoptimize the array internal stucture.
-			// We will grow this array as we're writing values.
+			// A cyclic buffer is used to keep track of the cache keys and to delete
+			// the oldest one before a new one is inserted.
+			// ├──────┬──────┬──────┬──────┤
+			// │ foo  │ bar  │      │      │
+			// ├──────┴──────┴──────┴──────┤
+			//                 ↑ index
 
-			// The _keysIndex always points to an oldest value.
-			// The array is inititalized in "growing" phase when this index equals array length.
-			//                .length = N ↓      ↓ maxSize
-			// ├──────┬──────┬     ┬──────┐      ┊
-			// │ foo  │ bar  │ ... │ baz  │      ┊
-			// ├──────┴──────┴     ┴──────┘      ┊
-			//                  index = N ↑
+			// Eventually, the index reach the end of an array and roll-over to 0.
+			// ├──────┬──────┬──────┬──────┤
+			// │ foo  │ bar  │ baz  │ quux │
+			// ├──────┴──────┴──────┴──────┤
+			//   ↑ index = 0
 
-			// Eventually the array length reaches _maxSize and the index rolls over to the start.
-			//                                   ↓ length = maxSize
-			// ├──────┬──────┬     ┬──────┬──────┤
-			// │ foo  │ bar  │ ... │ baz  │ quux │
-			// ├──────┴──────┴     ┴──────┴──────┤
-			// ↑ index = 0
+			// After that the oldest value will be overwritten.
+			// ├──────┬──────┬──────┬──────┤
+			// │ WOOT │ bar  │ baz  │ quux │
+			// ├──────┴──────┴──────┴──────┤
+			//          ↑ index = 1
 
-			// From on now we're in the "cyclic" phase when a newest key overwrites the oldest one.
-			//                                   ↓ length = maxSize
-			// ├──────┬──────┬     ┬──────┬──────┤
-			// │ WOOT │ bar  │ ... │ baz  │ quux │
-			// ├──────┴──────┴     ┴──────┴──────┤
-			//        ↑ index = 1
-
-			// Are we in the "cyclic" phase?
-			if (this._keysIndex < this._keys.length) {
-				// Cleanup the oldest value
-				this._cache.delete(this._keys[this._keysIndex]);
+			const oldestKey = this._keys[this._keysIndex];
+			if (oldestKey !== undefined) {
+				this._cache.delete(oldestKey);
 			}
-
-			// Overwrite or create the array element
+			// Set a newest key in place of the just deleted one
 			this._keys[this._keysIndex] = cacheString;
 			// Advance the index so it always points the oldest value
-			this._keysIndex = (this._keysIndex + 1) % this._maxSize;
+			this._keysIndex = (this._keysIndex + 1) % this._keys.length;
 
 			this._cache.set(cacheString, width);
 		}
