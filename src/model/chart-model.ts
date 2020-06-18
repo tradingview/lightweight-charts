@@ -251,7 +251,7 @@ export class ChartModel implements IDestroyable {
 		return this._grid;
 	}
 
-	public watermarkSource(): Watermark | null {
+	public watermarkSource(): Watermark {
 		return this._watermark;
 	}
 
@@ -545,6 +545,7 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public recalculateAllPanes(): void {
+		this._watermark.updateAllViews();
 		this._panes.forEach((p: Pane) => p.recalculate());
 		this.updateAllPaneViews();
 	}
