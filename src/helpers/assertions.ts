@@ -55,3 +55,10 @@ export function ensure<T>(value: T | undefined | null): T {
  */
 export function ensureNever(value: never): void {
 }
+
+/**
+ * Defining a runtime environment for the correct access of objects on the client-side.
+ * Issue #446.
+ */
+// tslint:disable-next-line:no-typeof-undefined strict-type-predicates
+export const isRunningOnClientSide = typeof window !== 'undefined';
