@@ -1,15 +1,9 @@
+export type CanvasCtxLike = Pick<CanvasRenderingContext2D, 'measureText'>;
+
 const defaultReplacementRe = /[2-9]/g;
 
-export interface TextMetricsLike {
-	width: number;
-}
-
-export interface CanvasCtxLike {
-	measureText(text: string): TextMetricsLike;
-}
-
 export class TextWidthCache {
-	private _cache: Map<string | undefined, number> = new Map();
+	private _cache: Map<string, number> = new Map();
 	/** A "cyclic buffer" of cache keys */
 	private _keys: (string | undefined)[];
 	/** Current index in the "cyclic buffer" */
