@@ -40,6 +40,7 @@ function runTestCase(container) {
 					color: 'rgba(171, 71, 188, 0.5)',
 					text: 'Watermark',
 					fontFamily: 'Roboto',
+					fontStyle: 'bold',
 				},
 			});
 			resolve();

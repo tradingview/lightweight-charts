@@ -15,9 +15,12 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
 		watermark: {
+			visible: true,
+			color: 'red',
 			text: 'TradingView Watermark Example',
 			fontSize: 24,
 			fontFamily: 'Roboto',
+			fontStyle: 'italic',
 		},
 	});
 
