@@ -15,6 +15,10 @@ export interface WatermarkOptions {
 	text: string;
 	/** Font size in pixels */
 	fontSize: number;
+	/** Font family */
+	fontFamily: string;
+	/** Font style */
+	fontStyle: string;
 	/** Horizontal alignment of the watermark inside the chart area */
 	horzAlign: HorzAlign;
 	/** Vertical alignment of the watermark inside the chart area */

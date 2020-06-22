@@ -257,6 +257,8 @@ The following options are available for the watermark:
 |`visible`|`boolean`|`false`|If true, the watermark is displayed on a chart|
 |`text`|`string`|`''`|Contains the text to be displayed in the watermark|
 |`fontSize`|`number`|`48`|Watermark's font size in pixels|
+|`fontFamily`|`string`|`'Trebuchet MS', Roboto, Ubuntu, sans-serif`|Watermark's font family|
+|`fontStyle`|`string`|`''`|Watermark's font style|
 |`horzAlign`|`left` &#124; `center` &#124; `right`|`center`|Watermark horizontal alignment position|
 |`vertAlign`|`top` &#124; `center` &#124; `bottom`|`center`|Watermark vertical alignment position|
 
