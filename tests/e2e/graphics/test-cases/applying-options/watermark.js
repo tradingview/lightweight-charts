@@ -45,4 +45,4 @@ function runTestCase(container) {
 			resolve();
 		}, 300);
 	});
-};
+}
