@@ -17,4 +17,8 @@ describe('makeFont', () => {
 	it('should correct generate font with default family', () => {
 		expect(makeFont(12)).to.be.equal(`12px ${defaultFontFamily}`);
 	});
+
+	it('should generate correct font family for empty family', () => {
+		expect(makeFont(12, '')).to.be.equal(`12px ${defaultFontFamily}`);
+	});
 });

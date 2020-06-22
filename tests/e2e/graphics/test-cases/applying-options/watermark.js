@@ -39,9 +39,10 @@ function runTestCase(container) {
 					vertAlign: 'center',
 					color: 'rgba(171, 71, 188, 0.5)',
 					text: 'Watermark',
+					fontFamily: 'Roboto',
 				},
 			});
 			resolve();
 		}, 300);
 	});
-}
+};
