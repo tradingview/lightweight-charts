@@ -15,7 +15,7 @@ export function makeFont(size: number, family?: string, style?: string): string 
 		style = '';
 	}
 
-	if (family === undefined || family.trim() === '') {
+	if (family === undefined) {
 		family = defaultFontFamily;
 	}
 
