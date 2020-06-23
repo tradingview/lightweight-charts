@@ -208,8 +208,10 @@ namespace RgbShortHexRepresentation {
 	 * #fb0
 	 * @example
 	 * #f0f
+	 * @example
+	 * #f0fa
 	 */
-	export const re = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/;
+	export const re = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])?$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
 			normalizeRgbComponent<RedComponent>(parseInt(matches[1] + matches[1], 16)),
@@ -230,8 +232,10 @@ namespace RgbHexRepresentation {
 	 * #00ff00
 	 * @example
 	 * #336699
+	 * @example
+	 * #336699FA
 	 */
-	export const re = /^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/;
+	export const re = /^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})?$/;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
 			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16)),
