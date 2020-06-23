@@ -1,5 +1,3 @@
-import { generateTextColor } from '../../helpers/color';
-
 import { PriceScale } from '../../model/price-scale';
 import {
 	IPriceAxisViewRenderer,

@@ -1,4 +1,4 @@
-import { generateTextColor } from '../../helpers/color';
+import { generateTextColor, resetTransparency } from '../../helpers/color';
 
 import { Crosshair, CrosshairPriceAndCoordinate } from '../../model/crosshair';
 import { PriceScale } from '../../model/price-scale';
@@ -36,7 +36,7 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 			return;
 		}
 
-		commonRendererData.background = options.labelBackgroundColor;
+		commonRendererData.background = resetTransparency(options.labelBackgroundColor);
 		commonRendererData.color = generateTextColor(options.labelBackgroundColor);
 
 		const value = this._valueProvider(this._priceScale);

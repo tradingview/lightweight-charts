@@ -1,4 +1,4 @@
-import { generateTextColor } from '../../helpers/color';
+import { generateTextColor, resetTransparency } from '../../helpers/color';
 
 import { CustomPriceLine } from '../../model/custom-price-line';
 import { Series } from '../../model/series';
@@ -42,7 +42,7 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 		axisRendererData.text = this._series.priceScale().formatPriceAbsolute(options.price);
 		axisRendererData.visible = true;
 
-		commonData.background = options.color;
+		commonData.background = resetTransparency(options.color);
 		commonData.color = generateTextColor(options.color);
 		commonData.coordinate = y;
 	}
