@@ -41,7 +41,6 @@ export interface TouchMouseEvent {
 	// TODO: remove this after rewriting MouseEventHandler to handle touch and mouse event separately
 	readonly type: 'touch' | 'mouse';
 
-	target: MouseEvent['target'];
 	view: MouseEvent['view'];
 }
 
@@ -519,7 +518,6 @@ export class MouseEventHandler implements IDestroyable {
 
 			type: event.type.startsWith('mouse') ? 'mouse' : 'touch',
 
-			target: eventLike.target,
 			view: event.view,
 		};
 	}
