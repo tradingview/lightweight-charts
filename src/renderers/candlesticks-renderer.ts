@@ -1,5 +1,3 @@
-import { strokeRectInnerWithFill } from '../helpers/canvas-helpers';
-
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { BarCandlestickItemBase } from './bars-renderer';
@@ -119,26 +117,32 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 	private _drawBorder(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, barSpacing: number, pixelRatio: number): void {
 		let prevBorderColor = '';
 		const borderWidth = this._calculateBorderWidth(pixelRatio);
+		const fillRule = (this._barWidth > borderWidth * 2) ? 'evenodd' : 'nonzero';
 
+		ctx.beginPath();
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
 			const bar = bars[i];
 			if (bar.borderColor !== prevBorderColor) {
+				// Fill rule evenodd allows drawing holey rectangles with just two rect() calls,
+				// but it can mess up overlapping adjacent narrow bars.
+				ctx.fill(fillRule);
+				ctx.beginPath();
 				ctx.fillStyle = bar.borderColor;
 				prevBorderColor = bar.borderColor;
 			}
 
-			const left = Math.round(bar.x * pixelRatio) - Math.floor(this._barWidth * 0.5);
-			const right = left + this._barWidth - 1;
+			const width = this._barWidth;
+			const left = Math.round(bar.x * pixelRatio) - Math.floor(width * 0.5);
 
 			const top = Math.round(Math.min(bar.openY, bar.closeY) * pixelRatio);
-			const bottom = Math.round(Math.max(bar.openY, bar.closeY) * pixelRatio);
+			const height = Math.round(Math.max(bar.openY, bar.closeY) * pixelRatio) - top + 1;
 
-			if (barSpacing > 2 * borderWidth) {
-				strokeRectInnerWithFill(ctx, left, top, right - left + 1, bottom - top + 1, borderWidth);
-			} else {
-				ctx.fillRect(left, top, right - left + 1, bottom - top + 1);
+			ctx.rect(left, top, width, height);
+			if (fillRule === 'evenodd' && height > borderWidth * 2) {
+				ctx.rect(left + borderWidth, top + borderWidth, width - borderWidth * 2, height - borderWidth * 2);
 			}
 		}
+		ctx.fill(fillRule);
 	}
 
 	private _drawCandles(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
