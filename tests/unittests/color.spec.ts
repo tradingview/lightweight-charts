@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import {
-	colorWithTransparency,
 	parseRgb,
 	resetTransparency,
 	Rgb,
@@ -142,29 +141,5 @@ describe('resetTransparency', () => {
 	it('should keep hex colors as is', () => {
 		expect(resetTransparency('#0f0')).to.equal('#0f0');
 		expect(resetTransparency('#0000ff')).to.equal('#0000ff');
-	});
-});
-
-describe('colorWithTransparency', () => {
-	it('should work', () => {
-		expect(colorWithTransparency('red', 1)).to.equal('rgba(255, 0, 0, 1)');
-		expect(colorWithTransparency('red', 0.5)).to.equal('rgba(255, 0, 0, 0.5)');
-		expect(colorWithTransparency('red', 0)).to.equal('rgba(255, 0, 0, 0)');
-
-		expect(colorWithTransparency('#0f0', 0.2)).to.equal('rgba(0, 255, 0, 0.2)');
-		expect(colorWithTransparency('#00ff00', 0.7)).to.equal('rgba(0, 255, 0, 0.7)');
-
-		// That how we roll!
-		expect(colorWithTransparency('rgba(0, 0, 255, .1)', 0.6)).to.equal('rgba(0, 0, 255, 0.6)');
-		expect(colorWithTransparency('rgba(-1, -2, 123, 9001)', 0.65)).to.equal('rgba(0, 0, 123, 0.65)');
-	});
-
-	it('should normalize alpha channel', () => {
-		expect(colorWithTransparency('red', -1)).to.equal('rgba(255, 0, 0, 0)');
-		expect(colorWithTransparency('red', 2)).to.equal('rgba(255, 0, 0, 1)');
-		expect(colorWithTransparency('red', -0)).to.equal('rgba(255, 0, 0, 0)');
-		expect(colorWithTransparency('red', NaN)).to.equal('rgba(255, 0, 0, 0)');
-		expect(colorWithTransparency('red', 0.30004)).to.equal('rgba(255, 0, 0, 0.3)');
-		expect(colorWithTransparency('red', 0.30006)).to.equal('rgba(255, 0, 0, 0.3001)');
 	});
 });

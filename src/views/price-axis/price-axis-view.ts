@@ -48,14 +48,6 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		return this._axisRendererData.text;
 	}
 
-	public background(): string {
-		return this._commonRendererData.background;
-	}
-
-	public color(): string {
-		return generateTextColor(this.background());
-	}
-
 	public coordinate(): number {
 		this._updateRendererDataIfNeeded();
 		return this._commonRendererData.coordinate;

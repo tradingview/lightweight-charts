@@ -378,10 +378,6 @@ export function resetTransparency(color: string): string {
 	return rgbaToString(rgba(parseRgb(color), 1));
 }
 
-export function colorWithTransparency(color: string, transparency: number): string {
-	return rgbaToString(rgba(parseRgb(color), transparency));
-}
-
 function isHexColor(color: string): boolean {
 	return color.indexOf('#') === 0;
 }
