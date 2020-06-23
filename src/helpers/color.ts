@@ -28,7 +28,7 @@ type AlphaComponent = Nominal<number, 'AlphaComponent'>;
 export type Rgb = [RedComponent, GreenComponent, BlueComponent];
 type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
 
-/** @public */
+/** @public see https://www.w3schools.com/colors/colors_names.asp */
 const namedColorRgbHexStrings: Record<string, string> = {
 	aliceblue: '#f0f8ff',
 	antiquewhite: '#faebd7',
@@ -293,6 +293,10 @@ function tryParseRgbaString(rgbaString: string): Rgba | null {
 
 function tryParseRgb(colorString: string): Rgb | null {
 	colorString = colorString.toLowerCase();
+
+	if (colorString === 'transparent') {
+		return [0 as RedComponent, 0 as GreenComponent, 0 as BlueComponent];
+	}
 
 	if (colorString in namedColorRgbHexStrings) {
 		colorString = namedColorRgbHexStrings[colorString];
