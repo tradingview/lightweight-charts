@@ -1,4 +1,4 @@
-import { generateTextColor, resetTransparency } from '../../helpers/color';
+import { generateContrastColors } from '../../helpers/color';
 
 import { ChartModel } from '../../model/chart-model';
 import { LastValueDataResultWithData, Series } from '../../model/series';
@@ -56,8 +56,10 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		}
 
 		const lastValueColor = this._source.priceLineColor(lastValueData.color);
-		commonRendererData.background = resetTransparency(lastValueColor);
-		commonRendererData.color = generateTextColor(lastValueColor);
+		const colors = generateContrastColors(lastValueColor);
+
+		commonRendererData.background = colors.background;
+		commonRendererData.color = colors.text;
 		commonRendererData.coordinate = lastValueData.coordinate;
 		paneRendererData.borderColor = this._source.model().options().layout.backgroundColor;
 		axisRendererData.borderColor = lastValueColor;
