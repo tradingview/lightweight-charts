@@ -4,8 +4,8 @@ import { Coordinate } from './coordinate';
 import { CrosshairMode, CrosshairOptions } from './crosshair';
 import { IPriceDataSource } from './iprice-data-source';
 import { Pane } from './pane';
+import { PlotRowValueIndex } from './plot-data';
 import { Series } from './series';
-import { SeriesPlotIndex } from './series-data';
 import { TimePointIndex } from './time-data';
 
 export class Magnet {
@@ -52,7 +52,7 @@ export class Magnet {
 
 				// convert bar to pixels
 				const firstPrice = ensure(series.firstValue());
-				return acc.concat([ps.priceToCoordinate(bar.value[SeriesPlotIndex.Close], firstPrice.value)]);
+				return acc.concat([ps.priceToCoordinate(bar.value[PlotRowValueIndex.Close], firstPrice.value)]);
 			},
 			[] as Coordinate[]);
 

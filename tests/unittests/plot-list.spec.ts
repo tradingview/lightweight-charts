@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { ensure, ensureNotNull } from '../../src/helpers/assertions';
-import { PlotRow, PlotRowValue } from '../../src/model/plot-data';
-import { mergePlotRows, PlotInfoList, PlotList, PlotRowSearchMode } from '../../src/model/plot-list';
+import { ensureNotNull } from '../../src/helpers/assertions';
+import { PlotRow, PlotRowValueIndex } from '../../src/model/plot-data';
+import { mergePlotRows, PlotList, PlotRowSearchMode } from '../../src/model/plot-list';
 import { TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 function timePoint(val: number): TimePoint {
@@ -15,7 +15,7 @@ function row(i: number, val?: number): PlotRow {
 }
 
 describe('PlotList', () => {
-	const p = new PlotList(new Map());
+	const p = new PlotList();
 
 	beforeEach(() => {
 		p.clear();
@@ -158,12 +158,7 @@ describe('PlotList', () => {
 	});
 
 	describe('minMaxOnRangeCached', () => {
-		const pl = new PlotList(new Map([
-			['plot0', (plotRow: PlotRowValue) => plotRow[0]],
-			['plot1', (plotRow: PlotRowValue) => plotRow[1]],
-			['plot2', (plotRow: PlotRowValue) => plotRow[2]],
-			['plot3', (plotRow: PlotRowValue) => plotRow[3]],
-		]));
+		const pl = new PlotList();
 
 		beforeEach(() => {
 			pl.clear();
@@ -177,12 +172,7 @@ describe('PlotList', () => {
 		});
 
 		it('should find minMax in numbers', () => {
-			const plots: PlotInfoList = [
-				{
-					name: 'plot3',
-					offset: 0,
-				},
-			];
+			const plots = [PlotRowValueIndex.Close];
 
 			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, plots);
 			expect(minMax).not.to.be.equal(null);
@@ -201,12 +191,7 @@ describe('PlotList', () => {
 				{ index: 100 as TimePointIndex, time: timePoint(6), value: [0, 0, 0, 5] },
 			]);
 
-			const plots: PlotInfoList = [
-				{
-					name: 'plot3',
-					offset: 0,
-				},
-			];
+			const plots = [PlotRowValueIndex.Close];
 
 			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 100 as TimePointIndex, plots);
 			expect(minMax).not.to.be.equal(null);
@@ -223,12 +208,7 @@ describe('PlotList', () => {
 				{ index: 65 as TimePointIndex, time: timePoint(4), value: [4, 4, 4, 4] },
 			]);
 
-			const plots: PlotInfoList = [
-				{
-					name: 'plot1',
-					offset: 0,
-				},
-			];
+			const plots = [PlotRowValueIndex.High];
 
 			const minMax = pl.minMaxOnRangeCached(30 as TimePointIndex, 200 as TimePointIndex, plots);
 			expect(minMax).not.to.be.equal(null);
@@ -243,14 +223,7 @@ describe('PlotList', () => {
 	});
 
 	describe('minMaxOnRangeByPlotFunction and minMaxOnRangeByPlotFunctionCached', () => {
-		const pl = new PlotList(new Map([
-			['open', (plotListRow: PlotRowValue) => plotListRow[0]],
-			['high', (plotListRow: PlotRowValue) => plotListRow[1]],
-			['low', (plotListRow: PlotRowValue) => plotListRow[2]],
-			['close', (plotListRow: PlotRowValue) => plotListRow[3]],
-			['hl2', (plotListRow: PlotRowValue) => (ensure(plotListRow[1]) + ensure(plotListRow[2])) / 2],
-			['ohlc4', (plotListRow: PlotRowValue) => (ensure(plotListRow[0]) + ensure(plotListRow[1]) + ensure(plotListRow[2]) + ensure(plotListRow[3])) / 4],
-		]));
+		const pl = new PlotList();
 
 		beforeEach(() => {
 			pl.clear();
@@ -264,71 +237,43 @@ describe('PlotList', () => {
 		});
 
 		it('should return correct min max for open', () => {
-			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'open', offset: 0 }]);
+			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.Open]);
 			expect(ensureNotNull(minMax).min).to.be.equal(5);
 			expect(ensureNotNull(minMax).max).to.be.equal(25);
 
-			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'open', offset: 0 }]);
+			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.Open]);
 			expect(ensureNotNull(minMaxNonCached).min).to.be.equal(5);
 			expect(ensureNotNull(minMaxNonCached).max).to.be.equal(25);
 		});
 
 		it('should return correct min max for high', () => {
-			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'high', offset: 0 }]);
+			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.High]);
 			expect(ensureNotNull(minMax).min).to.be.equal(7);
 			expect(ensureNotNull(minMax).max).to.be.equal(27);
 
-			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'high', offset: 0 }]);
+			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.High]);
 			expect(ensureNotNull(minMaxNonCached).min).to.be.equal(7);
 			expect(ensureNotNull(minMaxNonCached).max).to.be.equal(27);
 		});
 
 		it('should return correct min max for low', () => {
-			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'low', offset: 0 }]);
+			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.Low]);
 			expect(ensureNotNull(minMax).min).to.be.equal(3);
 			expect(ensureNotNull(minMax).max).to.be.equal(23);
 
-			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'low', offset: 0 }]);
+			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.Low]);
 			expect(ensureNotNull(minMaxNonCached).min).to.be.equal(3);
 			expect(ensureNotNull(minMaxNonCached).max).to.be.equal(23);
 		});
 
 		it('should return correct min max for close', () => {
-			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'close', offset: 0 }]);
+			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.Close]);
 			expect(ensureNotNull(minMax).min).to.be.equal(6);
 			expect(ensureNotNull(minMax).max).to.be.equal(26);
 
-			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'close', offset: 0 }]);
+			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.Close]);
 			expect(ensureNotNull(minMaxNonCached).min).to.be.equal(6);
 			expect(ensureNotNull(minMaxNonCached).max).to.be.equal(26);
-		});
-
-		it('should return correct min max for hl/2', () => {
-			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'hl2', offset: 0 }]);
-			expect(ensureNotNull(minMax).min).to.be.equal(5);
-			expect(ensureNotNull(minMax).max).to.be.equal(25);
-
-			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'hl2', offset: 0 }]);
-			expect(ensureNotNull(minMaxNonCached).min).to.be.equal(5);
-			expect(ensureNotNull(minMaxNonCached).max).to.be.equal(25);
-		});
-
-		it('should return correct min max for ohlc/4', () => {
-			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'ohlc4', offset: 0 }]);
-			expect(ensureNotNull(minMax).min).to.be.equal(5.25);
-			expect(ensureNotNull(minMax).max).to.be.equal(25.25);
-
-			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'ohlc4', offset: 0 }]);
-			expect(ensureNotNull(minMaxNonCached).min).to.be.equal(5.25);
-			expect(ensureNotNull(minMaxNonCached).max).to.be.equal(25.25);
-		});
-
-		it('should throw specific error if there is no registered function', () => {
-			expect(pl.minMaxOnRangeCached.bind(pl, 0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'no_such_function', offset: 0 }]))
-				.to.throw('Plot "no_such_function" is not registered');
-
-			expect(pl.minMaxOnRangeCached.bind(pl, 0 as TimePointIndex, 4 as TimePointIndex, [{ name: 'no_such_function', offset: 0 }]))
-				.to.throw('Plot "no_such_function" is not registered');
 		});
 	});
 });

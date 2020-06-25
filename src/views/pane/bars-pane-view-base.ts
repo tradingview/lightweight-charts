@@ -3,10 +3,11 @@ import { undefinedIfNull } from '../../helpers/strict-type-checks';
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
+import { PlotRowValueIndex } from '../../model/plot-data';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
-import { SeriesPlotIndex, SeriesPlotRow } from '../../model/series-data';
+import { SeriesPlotRow } from '../../model/series-data';
 import { TimePointIndex } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { BarCandlestickItemBase } from '../../renderers/bars-renderer';
@@ -28,10 +29,10 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick'
 	protected _createDefaultItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer): BarCandlestickItemBase {
 		return {
 			time: time,
-			open: bar.value[SeriesPlotIndex.Open] as BarPrice,
-			high: bar.value[SeriesPlotIndex.High] as BarPrice,
-			low: bar.value[SeriesPlotIndex.Low] as BarPrice,
-			close: bar.value[SeriesPlotIndex.Close] as BarPrice,
+			open: bar.value[PlotRowValueIndex.Open] as BarPrice,
+			high: bar.value[PlotRowValueIndex.High] as BarPrice,
+			low: bar.value[PlotRowValueIndex.Low] as BarPrice,
+			close: bar.value[PlotRowValueIndex.Close] as BarPrice,
 			x: NaN as Coordinate,
 			openY: NaN as Coordinate,
 			highY: NaN as Coordinate,

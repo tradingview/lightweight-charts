@@ -3,6 +3,7 @@ import { undefinedIfNull } from '../../helpers/strict-type-checks';
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
+import { PlotRowValueIndex } from '../../model/plot-data';
 import { PricedValue, PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
@@ -34,11 +35,9 @@ export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area', Item
 	}
 
 	protected _fillRawPoints(): void {
-		const barValueGetter = this._series.barFunction();
-
 		const colorer = this._series.barColorer();
 		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => {
-			const value = barValueGetter(row.value);
+			const value = row.value[PlotRowValueIndex.Close] as BarPrice;
 			return this._createRawItem(row.index, value, colorer);
 		});
 	}

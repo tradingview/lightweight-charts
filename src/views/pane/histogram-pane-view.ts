@@ -3,6 +3,7 @@ import { ensureNotNull } from '../../helpers/assertions';
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
+import { PlotRowValueIndex } from '../../model/plot-data';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
 import { TimedValue, TimePointIndex, visibleTimedValues } from '../../model/time-data';
@@ -52,15 +53,13 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 
 		this._histogramData = createEmptyHistogramData(barSpacing);
 
-		const barValueGetter = this._series.barFunction();
-
 		let targetIndex = 0;
 		let itemIndex = 0;
 
 		const defaultColor = this._series.options().color;
 
 		for (const row of this._series.bars().rows()) {
-			const value = barValueGetter(row.value);
+			const value = row.value[PlotRowValueIndex.Close] as BarPrice;
 
 			const color = row.color !== undefined ? row.color : defaultColor;
 			const item = createRawItem(row.index, value, color);

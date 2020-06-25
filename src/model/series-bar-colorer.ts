@@ -1,7 +1,8 @@
 import { ensure, ensureNotNull } from '../helpers/assertions';
 
+import { PlotRowValueIndex } from './plot-data';
 import { Series } from './series';
-import { SeriesPlotIndex, SeriesPlotRow } from './series-data';
+import { SeriesPlotRow } from './series-data';
 import {
 	AreaStyleOptions,
 	BarStyleOptions,
@@ -70,7 +71,7 @@ export class SeriesBarColorer {
 		const borderDownColor = downColor;
 
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
-		const isUp = ensure(currentBar.value[SeriesPlotIndex.Open]) <= ensure(currentBar.value[SeriesPlotIndex.Close]);
+		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
 		result.barColor = isUp ? upColor : downColor;
 		result.barBorderColor = isUp ? borderUpColor : borderDownColor;
@@ -90,7 +91,7 @@ export class SeriesBarColorer {
 		const wickDownColor = candlestickStyle.wickDownColor;
 
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
-		const isUp = ensure(currentBar.value[SeriesPlotIndex.Open]) <= ensure(currentBar.value[SeriesPlotIndex.Close]);
+		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
 		result.barColor = isUp ? upColor : downColor;
 		result.barBorderColor = isUp ? borderUpColor : borderDownColor;

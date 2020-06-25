@@ -4,9 +4,9 @@ import { describe, it } from 'mocha';
 import { BarData, HistogramData, LineData, Time } from '../../src/api/data-consumer';
 import { convertTime, DataLayer, SeriesChanges, stringToBusinessDay } from '../../src/api/data-layer';
 import { ensureDefined } from '../../src/helpers/assertions';
+import { PlotRowValueIndex } from '../../src/model/plot-data';
 import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
-import { SeriesPlotIndex } from '../../src/model/series-data';
 import { SeriesType } from '../../src/model/series-options';
 import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
@@ -397,10 +397,10 @@ describe('DataLayer', () => {
 			const packet = dataLayer.setSeriesData(series, [item]);
 			const update = ensureDefined(packet.series.get(series));
 
-			expect(update.data[0].value[SeriesPlotIndex.Open]).to.be.equal(item.open);
-			expect(update.data[0].value[SeriesPlotIndex.High]).to.be.equal(item.high);
-			expect(update.data[0].value[SeriesPlotIndex.Low]).to.be.equal(item.low);
-			expect(update.data[0].value[SeriesPlotIndex.Close]).to.be.equal(item.close);
+			expect(update.data[0].value[PlotRowValueIndex.Open]).to.be.equal(item.open);
+			expect(update.data[0].value[PlotRowValueIndex.High]).to.be.equal(item.high);
+			expect(update.data[0].value[PlotRowValueIndex.Low]).to.be.equal(item.low);
+			expect(update.data[0].value[PlotRowValueIndex.Close]).to.be.equal(item.close);
 		}
 	});
 

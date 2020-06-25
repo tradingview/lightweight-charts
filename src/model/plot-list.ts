@@ -2,7 +2,7 @@ import { lowerbound, upperbound } from '../helpers/algorithms';
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { Nominal } from '../helpers/nominal';
 
-import { PlotRow, PlotRowValue } from '../model/plot-data';
+import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import { TimePointIndex } from '../model/time-data';
 
 export const enum PlotRowSearchMode {
@@ -10,15 +10,6 @@ export const enum PlotRowSearchMode {
 	Exact = 0,
 	NearestRight = 1,
 }
-
-export interface PlotInfo {
-	name: string;
-	offset: number;
-}
-
-export type PlotInfoList = ReadonlyArray<PlotInfo>;
-
-export type PlotFunctionMap = Map<string, (row: PlotRowValue) => PlotRowValue[number]>;
 
 export interface MinMax {
 	min: number;
@@ -36,13 +27,8 @@ const CHUNK_SIZE = 30;
  */
 export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 	private _items: PlotRowType[] = [];
-	private _minMaxCache: Map<string, Map<number, MinMax | null>> = new Map();
+	private _minMaxCache: Map<PlotRowValueIndex, Map<number, MinMax | null>> = new Map();
 	private _rowSearchCache: Map<TimePointIndex, Map<PlotRowSearchMode, PlotRowType>> = new Map();
-	private readonly _plotFunctions: PlotFunctionMap;
-
-	public constructor(plotFunctions: PlotFunctionMap | null = null) {
-		this._plotFunctions = plotFunctions || new Map();
-	}
 
 	public clear(): void {
 		this._items = [];
@@ -95,7 +81,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return this._items;
 	}
 
-	public minMaxOnRangeCached(start: TimePointIndex, end: TimePointIndex, plots: PlotInfoList): MinMax | null {
+	public minMaxOnRangeCached(start: TimePointIndex, end: TimePointIndex, plots: readonly PlotRowValueIndex[]): MinMax | null {
 		// this code works for single series only
 		// could fail after whitespaces implementation
 
@@ -206,19 +192,13 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 	/**
 	 * @param endIndex - Non-inclusive end
 	 */
-	private _plotMinMax(startIndex: PlotRowIndex, endIndex: PlotRowIndex, plot: PlotInfo): MinMax | null {
+	private _plotMinMax(startIndex: PlotRowIndex, endIndex: PlotRowIndex, plotIndex: PlotRowValueIndex): MinMax | null {
 		let result: MinMax | null = null;
-
-		const func = this._plotFunctions.get(plot.name);
-
-		if (func === undefined) {
-			throw new Error(`Plot "${plot.name}" is not registered`);
-		}
 
 		for (let i = startIndex; i < endIndex; i++) {
 			const values = this._items[i].value;
 
-			const v = func(values);
+			const v = values[plotIndex];
 			if (Number.isNaN(v)) {
 				continue;
 			}
@@ -282,7 +262,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		this._items = mergePlotRows(this._items, plotRows);
 	}
 
-	private _minMaxOnRangeCachedImpl(start: TimePointIndex, end: TimePointIndex, plotInfo: PlotInfo): MinMax | null {
+	private _minMaxOnRangeCachedImpl(start: TimePointIndex, end: TimePointIndex, plotIndex: PlotRowValueIndex): MinMax | null {
 		// this code works for single series only
 		// could fail after whitespaces implementation
 
@@ -296,10 +276,8 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		const firstIndex = ensureNotNull(this.firstIndex());
 		const lastIndex = ensureNotNull(this.lastIndex());
 
-		let s = start - plotInfo.offset;
-		let e = end - plotInfo.offset;
-		s = Math.max(s, firstIndex);
-		e = Math.min(e, lastIndex);
+		const s = Math.max(start, firstIndex);
+		const e = Math.min(end, lastIndex);
 
 		const cachedLow = Math.ceil(s / CHUNK_SIZE) * CHUNK_SIZE;
 		const cachedHigh = Math.max(cachedLow, Math.floor(e / CHUNK_SIZE) * CHUNK_SIZE);
@@ -307,15 +285,15 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		{
 			const startIndex = this._lowerbound(s as TimePointIndex);
 			const endIndex = this._upperbound(Math.min(e, cachedLow, end) as TimePointIndex); // non-inclusive end
-			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotInfo);
+			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotIndex);
 			result = mergeMinMax(result, plotMinMax);
 		}
 
-		let minMaxCache = this._minMaxCache.get(plotInfo.name);
+		let minMaxCache = this._minMaxCache.get(plotIndex);
 
 		if (minMaxCache === undefined) {
 			minMaxCache = new Map();
-			this._minMaxCache.set(plotInfo.name, minMaxCache);
+			this._minMaxCache.set(plotIndex, minMaxCache);
 		}
 
 		// now go cached
@@ -326,7 +304,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 			if (chunkMinMax === undefined) {
 				const chunkStart = this._lowerbound(chunkIndex * CHUNK_SIZE as TimePointIndex);
 				const chunkEnd = this._upperbound((chunkIndex + 1) * CHUNK_SIZE - 1 as TimePointIndex);
-				chunkMinMax = this._plotMinMax(chunkStart as PlotRowIndex, chunkEnd as PlotRowIndex, plotInfo);
+				chunkMinMax = this._plotMinMax(chunkStart as PlotRowIndex, chunkEnd as PlotRowIndex, plotIndex);
 				minMaxCache.set(chunkIndex, chunkMinMax);
 			}
 
@@ -337,7 +315,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		{
 			const startIndex = this._lowerbound(cachedHigh as TimePointIndex);
 			const endIndex = this._upperbound(e as TimePointIndex); // non-inclusive end
-			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotInfo);
+			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotIndex);
 			result = mergeMinMax(result, plotMinMax);
 		}
 
