@@ -233,6 +233,7 @@ export class Crosshair extends DataSource {
 	}
 
 	public updateAllViews(): void {
+		this._paneView.update();
 		this._priceAxisViews.forEach((value: PriceAxisView) => value.update());
 		this._timeAxisView.update();
 		this._markersPaneView.update();
