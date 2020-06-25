@@ -3,10 +3,11 @@ import { undefinedIfNull } from '../../helpers/strict-type-checks';
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
+import { PlotRowValueIndex } from '../../model/plot-data';
 import { PricedValue, PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
-import { Bar } from '../../model/series-data';
+import { SeriesPlotRow } from '../../model/series-data';
 import { TimedValue, TimePointIndex } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 
@@ -34,15 +35,10 @@ export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area', Item
 	}
 
 	protected _fillRawPoints(): void {
-		const barValueGetter = this._series.barFunction();
-		const newItems: ItemType[] = [];
 		const colorer = this._series.barColorer();
-		this._series.bars().each((index: TimePointIndex, bar: Bar) => {
-			const value = barValueGetter(bar.value);
-			const item = this._createRawItem(index, value, colorer);
-			newItems.push(item);
-			return false;
+		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => {
+			const value = row.value[PlotRowValueIndex.Close] as BarPrice;
+			return this._createRawItem(row.index, value, colorer);
 		});
-		this._items = newItems;
 	}
 }

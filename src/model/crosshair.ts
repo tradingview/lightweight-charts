@@ -118,7 +118,7 @@ export class Crosshair extends DataSource {
 		const valueTimeProvider = (rawIndexProvider: RawIndexProvider, rawCoordinateProvider: RawCoordinateProvider) => {
 			return () => {
 				return {
-					time: this._model.timeScale().indexToUserTime(rawIndexProvider()),
+					time: this._model.timeScale().indexToTime(rawIndexProvider()),
 					coordinate: rawCoordinateProvider(),
 				};
 			};

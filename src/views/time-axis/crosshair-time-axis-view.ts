@@ -60,7 +60,7 @@ export class CrosshairTimeAxisView extends TimeAxisView {
 			return;
 		}
 
-		const currentTime = timeScale.indexToUserTime(this._crosshair.appliedIndex());
+		const currentTime = timeScale.indexToTime(this._crosshair.appliedIndex());
 		data.width = timeScale.width();
 
 		const value = this._valueProvider();

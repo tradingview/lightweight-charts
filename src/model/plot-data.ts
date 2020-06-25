@@ -1,8 +1,24 @@
-import { TimePointIndex } from './time-data';
+import { TimePoint, TimePointIndex } from './time-data';
 
-export type PlotValue = number | null | undefined;
-export interface PlotRow<TimeType, PlotValueTuple extends PlotValue[]> {
+/**
+ * Plot's index in plot list tuple for series
+ */
+export const enum PlotRowValueIndex {
+	Open = 0,
+	High = 1,
+	Low = 2,
+	Close = 3,
+}
+
+export type PlotRowValue = [
+	number,            // open
+	number,            // high
+	number,            // low
+	number,            // close
+];
+
+export interface PlotRow {
 	readonly index: TimePointIndex;
-	readonly time: TimeType;
-	readonly value: PlotValueTuple;
+	readonly time: TimePoint;
+	readonly value: PlotRowValue;
 }

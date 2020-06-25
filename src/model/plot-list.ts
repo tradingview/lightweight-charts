@@ -2,7 +2,7 @@ import { lowerbound, upperbound } from '../helpers/algorithms';
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { Nominal } from '../helpers/nominal';
 
-import { PlotRow, PlotValue } from '../model/plot-data';
+import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import { TimePointIndex } from '../model/time-data';
 
 export const enum PlotRowSearchMode {
@@ -11,25 +11,12 @@ export const enum PlotRowSearchMode {
 	NearestRight = 1,
 }
 
-export type EnumeratingFunction<TimeType, PlotValueTuple extends PlotValue[]> = (index: TimePointIndex, bar: PlotRow<TimeType, PlotValueTuple>) => boolean;
-
-export interface PlotInfo {
-	name: string;
-	offset: number;
-}
-
-export type PlotInfoList = ReadonlyArray<PlotInfo>;
-
-export type PlotFunctionMap<PlotValueTuple extends PlotValue[]> = Map<string, (row: PlotValueTuple) => PlotValue>;
-
-type EmptyValuePredicate<PlotValueTuple extends PlotValue[]> = (value: PlotValueTuple) => boolean;
-
 export interface MinMax {
 	min: number;
 	max: number;
 }
 
-export type PlotRowIndex = Nominal<number, 'PlotRowIndex'>;
+type PlotRowIndex = Nominal<number, 'PlotRowIndex'>;
 
 // TODO: think about changing it dynamically
 const CHUNK_SIZE = 30;
@@ -38,56 +25,32 @@ const CHUNK_SIZE = 30;
  * PlotList is an array of plot rows
  * each plot row consists of key (index in timescale) and plot value map
  */
-export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]> {
-	// TODO: should be renamed to _rows, but the current name is frozen because of myriads of references to it
-	private _items: PlotRow<TimeType, PlotValueTuple>[] = [];
-	// some PlotList instances are just readonly views of sub-range of data stored in another PlotList
-	// _start and _end fields are used to implement such views
-	private _start: number = 0;
-	// end is an after-last index
-	private _end: number = 0;
-	private _shareRead: boolean = false;
-	private _minMaxCache: Map<string, Map<number, MinMax | null>> = new Map();
-	private _rowSearchCache: Map<TimePointIndex, Map<PlotRowSearchMode, PlotRow<TimeType, PlotValueTuple>>> = new Map();
-	private _rowSearchCacheWithoutEmptyValues: Map<TimePointIndex, Map<PlotRowSearchMode, PlotRow<TimeType, PlotValueTuple>>> = new Map();
-	private readonly _plotFunctions: PlotFunctionMap<PlotValueTuple>;
-	private readonly _emptyValuePredicate: EmptyValuePredicate<PlotValueTuple> | null;
-
-	public constructor(plotFunctions: PlotFunctionMap<PlotValueTuple> | null = null, emptyValuePredicate: EmptyValuePredicate<PlotValueTuple> | null = null) {
-		this._plotFunctions = plotFunctions || new Map();
-		this._emptyValuePredicate = emptyValuePredicate;
-	}
+export class PlotList<PlotRowType extends PlotRow = PlotRow> {
+	private _items: PlotRowType[] = [];
+	private _minMaxCache: Map<PlotRowValueIndex, Map<number, MinMax | null>> = new Map();
+	private _rowSearchCache: Map<TimePointIndex, Map<PlotRowSearchMode, PlotRowType>> = new Map();
 
 	public clear(): void {
 		this._items = [];
-		this._start = 0;
-		this._end = 0;
-		this._shareRead = false;
 		this._minMaxCache.clear();
 		this._rowSearchCache.clear();
-		this._rowSearchCacheWithoutEmptyValues.clear();
-	}
-
-	// @returns First row
-	public first(): PlotRow<TimeType, PlotValueTuple> | null {
-		return this.size() > 0 ? this._items[this._start as PlotRowIndex] : null;
 	}
 
 	// @returns Last row
-	public last(): PlotRow<TimeType, PlotValueTuple> | null {
-		return this.size() > 0 ? this._items[(this._end - 1) as PlotRowIndex] : null;
+	public last(): PlotRowType | null {
+		return this.size() > 0 ? this._items[this._items.length - 1] : null;
 	}
 
 	public firstIndex(): TimePointIndex | null {
-		return this.size() > 0 ? this._indexAt(this._start as PlotRowIndex) : null;
+		return this.size() > 0 ? this._indexAt(0 as PlotRowIndex) : null;
 	}
 
 	public lastIndex(): TimePointIndex | null {
-		return this.size() > 0 ? this._indexAt((this._end - 1) as PlotRowIndex) : null;
+		return this.size() > 0 ? this._indexAt((this._items.length - 1) as PlotRowIndex) : null;
 	}
 
 	public size(): number {
-		return this._end - this._start;
+		return this._items.length;
 	}
 
 	public isEmpty(): boolean {
@@ -98,77 +61,27 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		return this._search(index, PlotRowSearchMode.Exact) !== null;
 	}
 
-	public valueAt(index: TimePointIndex): PlotRow<TimeType, PlotValueTuple> | null {
+	public valueAt(index: TimePointIndex): PlotRowType | null {
 		return this.search(index);
 	}
 
-	/**
-	 * @returns true if new index is added or false if existing index is updated
-	 */
-	public add(index: TimePointIndex, time: TimeType, value: PlotValueTuple): boolean {
-		if (this._shareRead) {
-			return false;
-		}
-
-		const row = { index: index, value: value, time: time };
-		const pos = this._search(index, PlotRowSearchMode.Exact);
-		this._rowSearchCache.clear();
-		this._rowSearchCacheWithoutEmptyValues.clear();
-		if (pos === null) {
-			this._items.splice(this._lowerbound(index), 0, row);
-			this._start = 0;
-			this._end = this._items.length;
-			return true;
-		} else {
-			this._items[pos] = row;
-			return false;
-		}
-	}
-
-	public search(index: TimePointIndex, searchMode: PlotRowSearchMode = PlotRowSearchMode.Exact, skipEmptyValues?: boolean): PlotRow<TimeType, PlotValueTuple> | null {
-		const pos = this._search(index, searchMode, skipEmptyValues);
+	public search(index: TimePointIndex, searchMode: PlotRowSearchMode = PlotRowSearchMode.Exact): PlotRowType | null {
+		const pos = this._search(index, searchMode);
 		if (pos === null) {
 			return null;
 		}
 
-		const item = this._valueAt(pos);
-
 		return {
+			...this._valueAt(pos),
 			index: this._indexAt(pos),
-			time: item.time,
-			value: item.value,
 		};
 	}
 
-	/**
-	 * Execute fun on each element.
-	 * Stops iteration if callback function returns true.
-	 * @param fun - Callback function on each element function(index, value): boolean
-	 */
-	public each(fun: EnumeratingFunction<TimeType, PlotValueTuple>): void {
-		for (let i = this._start; i < this._end; ++i) {
-			const index = this._indexAt(i as PlotRowIndex);
-			const item = this._valueAt(i as PlotRowIndex);
-			if (fun(index, item)) {
-				break;
-			}
-		}
+	public rows(): readonly PlotRowType[] {
+		return this._items;
 	}
 
-	/**
-	 * @returns Readonly collection of elements in range
-	 */
-	public range(start: TimePointIndex, end: TimePointIndex): PlotList<TimeType, PlotValueTuple> {
-		const copy = new PlotList<TimeType, PlotValueTuple>(this._plotFunctions, this._emptyValuePredicate);
-		copy._items = this._items;
-		copy._start = this._lowerbound(start);
-		copy._end = this._upperbound(end);
-
-		copy._shareRead = true;
-		return copy;
-	}
-
-	public minMaxOnRangeCached(start: TimePointIndex, end: TimePointIndex, plots: PlotInfoList): MinMax | null {
+	public minMaxOnRangeCached(start: TimePointIndex, end: TimePointIndex, plots: readonly PlotRowValueIndex[]): MinMax | null {
 		// this code works for single series only
 		// could fail after whitespaces implementation
 
@@ -186,140 +99,74 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		return result;
 	}
 
-	public merge(plotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): PlotRow<TimeType, PlotValueTuple> | null {
-		if (this._shareRead) {
-			return null;
-		}
-
+	public merge(plotRows: ReadonlyArray<PlotRowType>): void {
 		if (plotRows.length === 0) {
-			return null;
+			return;
 		}
 
 		// if we get a bunch of history - just prepend it
 		if (this.isEmpty() || plotRows[plotRows.length - 1].index < this._items[0].index) {
-			return this._prepend(plotRows);
+			this._prepend(plotRows);
+			return;
 		}
 
 		// if we get new rows - just append it
 		if (plotRows[0].index > this._items[this._items.length - 1].index) {
-			return this._append(plotRows);
+			this._append(plotRows);
+			return;
 		}
 
 		// if we get update for the last row - just replace it
 		if (plotRows.length === 1 && plotRows[0].index === this._items[this._items.length - 1].index) {
 			this._updateLast(plotRows[0]);
-			return plotRows[0];
+			return;
 		}
 
-		return this._merge(plotRows);
-	}
-
-	public remove(start: TimePointIndex): PlotRow<TimeType, PlotValueTuple> | null {
-		if (this._shareRead) {
-			return null;
-		}
-
-		const startOffset = this._search(start, PlotRowSearchMode.NearestRight);
-		if (startOffset === null) {
-			return null;
-		}
-
-		const removedPlotRows = this._items.splice(startOffset);
-		// _start should never be modified in this method
-		this._end = this._items.length;
-
-		this._minMaxCache.clear();
-		this._rowSearchCache.clear();
-		this._rowSearchCacheWithoutEmptyValues.clear();
-
-		return removedPlotRows.length > 0 ? removedPlotRows[0] : null;
+		this._merge(plotRows);
 	}
 
 	private _indexAt(offset: PlotRowIndex): TimePointIndex {
 		return this._items[offset].index;
 	}
 
-	private _valueAt(offset: PlotRowIndex): PlotRow<TimeType, PlotValueTuple> {
+	private _valueAt(offset: PlotRowIndex): PlotRowType {
 		return this._items[offset];
 	}
 
-	private _search(index: TimePointIndex, searchMode: PlotRowSearchMode, skipEmptyValues?: boolean): PlotRowIndex | null {
+	private _search(index: TimePointIndex, searchMode: PlotRowSearchMode): PlotRowIndex | null {
 		const exactPos = this._bsearch(index);
 
 		if (exactPos === null && searchMode !== PlotRowSearchMode.Exact) {
 			switch (searchMode) {
 				case PlotRowSearchMode.NearestLeft:
-					return this._searchNearestLeft(index, skipEmptyValues);
+					return this._searchNearestLeft(index);
 				case PlotRowSearchMode.NearestRight:
-					return this._searchNearestRight(index, skipEmptyValues);
+					return this._searchNearestRight(index);
 				default:
 					throw new TypeError('Unknown search mode');
 			}
 		}
 
-		// there is a found value or search mode is Exact
-
-		if (!skipEmptyValues || exactPos === null || searchMode === PlotRowSearchMode.Exact) {
-			return exactPos;
-		}
-
-		// skipEmptyValues is true, additionally check for emptiness
-		switch (searchMode) {
-			case PlotRowSearchMode.NearestLeft:
-				return this._nonEmptyNearestLeft(exactPos);
-			case PlotRowSearchMode.NearestRight:
-				return this._nonEmptyNearestRight(exactPos);
-			default:
-				throw new TypeError('Unknown search mode');
-		}
+		return exactPos;
 	}
 
-	private _nonEmptyNearestRight(index: PlotRowIndex): PlotRowIndex | null {
-		const predicate = ensureNotNull(this._emptyValuePredicate);
-		while (index < this._end && predicate(this._valueAt(index).value)) {
-			index = index + 1 as PlotRowIndex;
-		}
-
-		return index === this._end ? null : index;
-	}
-
-	private _nonEmptyNearestLeft(index: PlotRowIndex): PlotRowIndex | null {
-		const predicate = ensureNotNull(this._emptyValuePredicate);
-		while (index >= this._start && predicate(this._valueAt(index).value)) {
-			index = index - 1 as PlotRowIndex;
-		}
-
-		return index < this._start ? null : index;
-	}
-
-	private _searchNearestLeft(index: TimePointIndex, skipEmptyValues?: boolean): PlotRowIndex | null {
+	private _searchNearestLeft(index: TimePointIndex): PlotRowIndex | null {
 		let nearestLeftPos = this._lowerbound(index);
-		if (nearestLeftPos > this._start) {
+		if (nearestLeftPos > 0) {
 			nearestLeftPos = nearestLeftPos - 1;
 		}
 
-		const result = (nearestLeftPos !== this._end && this._indexAt(nearestLeftPos as PlotRowIndex) < index) ? nearestLeftPos as PlotRowIndex : null;
-		if (skipEmptyValues && result !== null) {
-			return this._nonEmptyNearestLeft(result);
-		}
-
-		return result;
+		return (nearestLeftPos !== this._items.length && this._indexAt(nearestLeftPos as PlotRowIndex) < index) ? nearestLeftPos as PlotRowIndex : null;
 	}
 
-	private _searchNearestRight(index: TimePointIndex, skipEmptyValues?: boolean): PlotRowIndex | null {
+	private _searchNearestRight(index: TimePointIndex): PlotRowIndex | null {
 		const nearestRightPos = this._upperbound(index);
-		const result = (nearestRightPos !== this._end && index < this._indexAt(nearestRightPos as PlotRowIndex)) ? nearestRightPos as PlotRowIndex : null;
-
-		if (skipEmptyValues && result !== null) {
-			return this._nonEmptyNearestRight(result);
-		}
-
-		return result;
+		return (nearestRightPos !== this._items.length && index < this._indexAt(nearestRightPos as PlotRowIndex)) ? nearestRightPos as PlotRowIndex : null;
 	}
 
 	private _bsearch(index: TimePointIndex): PlotRowIndex | null {
 		const start = this._lowerbound(index);
-		if (start !== this._end && !(index < this._items[start as PlotRowIndex].index)) {
+		if (start !== this._items.length && !(index < this._items[start as PlotRowIndex].index)) {
 			return start as PlotRowIndex;
 		}
 
@@ -330,9 +177,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		return lowerbound(
 			this._items,
 			index,
-			(a: PlotRow<TimeType, PlotValueTuple>, b: TimePointIndex) => { return a.index < b; },
-			this._start,
-			this._end
+			(a: PlotRowType, b: TimePointIndex) => { return a.index < b; }
 		);
 	}
 
@@ -340,29 +185,21 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		return upperbound(
 			this._items,
 			index,
-			(a: TimePointIndex, b: PlotRow<TimeType, PlotValueTuple>) => { return b.index > a; },
-			this._start,
-			this._end
+			(a: TimePointIndex, b: PlotRowType) => { return b.index > a; }
 		);
 	}
 
 	/**
 	 * @param endIndex - Non-inclusive end
 	 */
-	private _plotMinMax(startIndex: PlotRowIndex, endIndex: PlotRowIndex, plot: PlotInfo): MinMax | null {
+	private _plotMinMax(startIndex: PlotRowIndex, endIndex: PlotRowIndex, plotIndex: PlotRowValueIndex): MinMax | null {
 		let result: MinMax | null = null;
-
-		const func = this._plotFunctions.get(plot.name);
-
-		if (func === undefined) {
-			throw new Error(`Plot "${plot.name}" is not registered`);
-		}
 
 		for (let i = startIndex; i < endIndex; i++) {
 			const values = this._items[i].value;
 
-			const v = func(values);
-			if (v === undefined || v === null || Number.isNaN(v)) {
+			const v = values[plotIndex];
+			if (Number.isNaN(v)) {
 				continue;
 			}
 
@@ -382,71 +219,50 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		return result;
 	}
 
-	private _invalidateCacheForRow(row: PlotRow<TimeType, PlotValueTuple>): void {
+	private _invalidateCacheForRow(row: PlotRowType): void {
 		const chunkIndex = Math.floor(row.index / CHUNK_SIZE);
 		this._minMaxCache.forEach((cacheItem: Map<number, MinMax | null>) => cacheItem.delete(chunkIndex));
 	}
 
-	private _prepend(plotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): PlotRow<TimeType, PlotValueTuple> {
-		assert(!this._shareRead, 'collection should not be readonly');
+	private _prepend(plotRows: ReadonlyArray<PlotRowType>): void {
 		assert(plotRows.length !== 0, 'plotRows should not be empty');
 
 		this._rowSearchCache.clear();
-		this._rowSearchCacheWithoutEmptyValues.clear();
 		this._minMaxCache.clear();
 
 		this._items = plotRows.concat(this._items);
-
-		this._start = 0;
-		this._end = this._items.length;
-
-		return plotRows[0];
 	}
 
-	private _append(plotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): PlotRow<TimeType, PlotValueTuple> {
-		assert(!this._shareRead, 'collection should not be readonly');
+	private _append(plotRows: ReadonlyArray<PlotRowType>): void {
 		assert(plotRows.length !== 0, 'plotRows should not be empty');
 
 		this._rowSearchCache.clear();
-		this._rowSearchCacheWithoutEmptyValues.clear();
 		this._minMaxCache.clear();
 
 		this._items = this._items.concat(plotRows);
-
-		this._start = 0;
-		this._end = this._items.length;
-
-		return plotRows[0];
 	}
 
-	private _updateLast(plotRow: PlotRow<TimeType, PlotValueTuple>): void {
+	private _updateLast(plotRow: PlotRowType): void {
 		assert(!this.isEmpty(), 'plot list should not be empty');
-		const currentLastRow = this._items[this._end - 1];
+		const currentLastRow = this._items[this._items.length - 1];
 		assert(currentLastRow.index === plotRow.index, 'last row index should match new row index');
 
 		this._invalidateCacheForRow(plotRow);
 		this._rowSearchCache.delete(plotRow.index);
-		this._rowSearchCacheWithoutEmptyValues.delete(plotRow.index);
 
-		this._items[this._end - 1] = plotRow;
+		this._items[this._items.length - 1] = plotRow;
 	}
 
-	private _merge(plotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): PlotRow<TimeType, PlotValueTuple> {
+	private _merge(plotRows: ReadonlyArray<PlotRowType>): void {
 		assert(plotRows.length !== 0, 'plot rows should not be empty');
 
 		this._rowSearchCache.clear();
-		this._rowSearchCacheWithoutEmptyValues.clear();
 		this._minMaxCache.clear();
 
 		this._items = mergePlotRows(this._items, plotRows);
-
-		this._start = 0;
-		this._end = this._items.length;
-
-		return plotRows[0];
 	}
 
-	private _minMaxOnRangeCachedImpl(start: TimePointIndex, end: TimePointIndex, plotInfo: PlotInfo): MinMax | null {
+	private _minMaxOnRangeCachedImpl(start: TimePointIndex, end: TimePointIndex, plotIndex: PlotRowValueIndex): MinMax | null {
 		// this code works for single series only
 		// could fail after whitespaces implementation
 
@@ -460,10 +276,8 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		const firstIndex = ensureNotNull(this.firstIndex());
 		const lastIndex = ensureNotNull(this.lastIndex());
 
-		let s = start - plotInfo.offset;
-		let e = end - plotInfo.offset;
-		s = Math.max(s, firstIndex);
-		e = Math.min(e, lastIndex);
+		const s = Math.max(start, firstIndex);
+		const e = Math.min(end, lastIndex);
 
 		const cachedLow = Math.ceil(s / CHUNK_SIZE) * CHUNK_SIZE;
 		const cachedHigh = Math.max(cachedLow, Math.floor(e / CHUNK_SIZE) * CHUNK_SIZE);
@@ -471,15 +285,15 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		{
 			const startIndex = this._lowerbound(s as TimePointIndex);
 			const endIndex = this._upperbound(Math.min(e, cachedLow, end) as TimePointIndex); // non-inclusive end
-			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotInfo);
+			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotIndex);
 			result = mergeMinMax(result, plotMinMax);
 		}
 
-		let minMaxCache = this._minMaxCache.get(plotInfo.name);
+		let minMaxCache = this._minMaxCache.get(plotIndex);
 
 		if (minMaxCache === undefined) {
 			minMaxCache = new Map();
-			this._minMaxCache.set(plotInfo.name, minMaxCache);
+			this._minMaxCache.set(plotIndex, minMaxCache);
 		}
 
 		// now go cached
@@ -490,7 +304,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 			if (chunkMinMax === undefined) {
 				const chunkStart = this._lowerbound(chunkIndex * CHUNK_SIZE as TimePointIndex);
 				const chunkEnd = this._upperbound((chunkIndex + 1) * CHUNK_SIZE - 1 as TimePointIndex);
-				chunkMinMax = this._plotMinMax(chunkStart as PlotRowIndex, chunkEnd as PlotRowIndex, plotInfo);
+				chunkMinMax = this._plotMinMax(chunkStart as PlotRowIndex, chunkEnd as PlotRowIndex, plotIndex);
 				minMaxCache.set(chunkIndex, chunkMinMax);
 			}
 
@@ -501,7 +315,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 		{
 			const startIndex = this._lowerbound(cachedHigh as TimePointIndex);
 			const endIndex = this._upperbound(e as TimePointIndex); // non-inclusive end
-			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotInfo);
+			const plotMinMax = this._plotMinMax(startIndex as PlotRowIndex, endIndex as PlotRowIndex, plotIndex);
 			result = mergeMinMax(result, plotMinMax);
 		}
 
@@ -509,7 +323,7 @@ export class PlotList<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]
 	}
 }
 
-export function mergeMinMax(first: MinMax | null, second: MinMax | null): MinMax | null {
+function mergeMinMax(first: MinMax | null, second: MinMax | null): MinMax | null {
 	if (first === null) {
 		return second;
 	} else {
@@ -531,11 +345,11 @@ export function mergeMinMax(first: MinMax | null, second: MinMax | null): MinMax
  *
  * NOTE: Time and memory complexity are O(N+M).
  */
-export function mergePlotRows<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]>(originalPlotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>, newPlotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): PlotRow<TimeType, PlotValueTuple>[] {
+export function mergePlotRows<PlotRowType extends PlotRow>(originalPlotRows: ReadonlyArray<PlotRowType>, newPlotRows: ReadonlyArray<PlotRowType>): PlotRowType[] {
 	const newArraySize = calcMergedArraySize(originalPlotRows, newPlotRows);
 
 	// tslint:disable-next-line:prefer-array-literal
-	const result = new Array<PlotRow<TimeType, PlotValueTuple>>(newArraySize);
+	const result = new Array<PlotRowType>(newArraySize);
 
 	let originalRowsIndex = 0;
 	let newRowsIndex = 0;
@@ -574,9 +388,9 @@ export function mergePlotRows<TimeType, PlotValueTuple extends PlotValue[] = Plo
 	return result;
 }
 
-function calcMergedArraySize<TimeType, PlotValueTuple extends PlotValue[] = PlotValue[]>(
-	firstPlotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>,
-	secondPlotRows: ReadonlyArray<PlotRow<TimeType, PlotValueTuple>>): number {
+function calcMergedArraySize<PlotRowType extends PlotRow>(
+	firstPlotRows: ReadonlyArray<PlotRowType>,
+	secondPlotRows: ReadonlyArray<PlotRowType>): number {
 	const firstPlotsSize = firstPlotRows.length;
 	const secondPlotsSize = secondPlotRows.length;
 

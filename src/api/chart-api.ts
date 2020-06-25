@@ -25,11 +25,10 @@ import {
 	PriceFormatBuiltIn,
 	SeriesType,
 } from '../model/series-options';
-import { TimePointIndex } from '../model/time-data';
 
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
-import { DataLayer, SeriesUpdatePacket } from './data-layer';
+import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
@@ -270,46 +269,25 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 		return res;
 	}
 
-	public removeSeries(seriesApi: ISeriesApi<SeriesType>): void {
-		const seriesObj = seriesApi as SeriesApi<SeriesType>;
-		const series = ensureDefined(this._seriesMap.get(seriesObj));
+	public removeSeries(seriesApi: SeriesApi<SeriesType>): void {
+		const series = ensureDefined(this._seriesMap.get(seriesApi));
 
 		const update = this._dataLayer.removeSeries(series);
 		const model = this._chartWidget.model();
 		model.removeSeries(series);
-		const timeScaleUpdate = update.timeScaleUpdate;
-		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
-		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.updateData(value.update);
-		});
-		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
-		this._seriesMap.delete(seriesObj);
+
+		this._sendUpdateToChart(update);
+
+		this._seriesMap.delete(seriesApi);
 		this._seriesMapReversed.delete(series);
 	}
 
 	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void {
-		const update = this._dataLayer.setSeriesData(series, data);
-		const model = this._chartWidget.model();
-		const timeScaleUpdate = update.timeScaleUpdate;
-		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, true);
-		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			// the latest arg `true` must be removed in https://github.com/tradingview/lightweight-charts/issues/270
-			// here we don't need to clear palettes because they were just filled in DataLayer
-			// see https://github.com/tradingview/lightweight-charts/pull/330#discussion_r379415805
-			key.updateData(value.update, true);
-		});
-		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
+		this._sendUpdateToChart(this._dataLayer.setSeriesData(series, data));
 	}
 
 	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void {
-		const update = this._dataLayer.updateSeriesData(series, data);
-		const model = this._chartWidget.model();
-		const timeScaleUpdate = update.timeScaleUpdate;
-		model.updateTimeScale(timeScaleUpdate.index, timeScaleUpdate.changes, timeScaleUpdate.marks, false);
-		timeScaleUpdate.seriesUpdates.forEach((value: SeriesUpdatePacket, key: Series) => {
-			key.updateData(value.update);
-		});
-		model.updateTimeScaleBaseIndex(0 as TimePointIndex);
+		this._sendUpdateToChart(this._dataLayer.updateSeriesData(series, data));
 	}
 
 	public subscribeClick(handler: MouseEventHandler): void {
@@ -351,6 +329,18 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 
 	public takeScreenshot(): HTMLCanvasElement {
 		return this._chartWidget.takeScreenshot();
+	}
+
+	private _sendUpdateToChart(update: DataUpdateResponse): void {
+		const model = this._chartWidget.model();
+
+		if (update.timeScale !== undefined) {
+			model.updateTimeScale(update.timeScale.points, update.timeScale.baseIndex);
+		}
+
+		update.series.forEach((value: SeriesChanges, series: Series) => series.updateData(value.data, value.fullUpdate));
+
+		model.recalculateAllPanes();
 	}
 
 	private _mapSeriesToApi(series: Series): ISeriesApi<SeriesType> {

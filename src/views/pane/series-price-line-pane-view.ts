@@ -17,7 +17,7 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 			return;
 		}
 
-		const lastValueData = this._series.lastValueData(undefined, seriesOptions.priceLineSource === PriceLineSource.LastBar);
+		const lastValueData = this._series.lastValueData(seriesOptions.priceLineSource === PriceLineSource.LastBar);
 		if (lastValueData.noData) {
 			return;
 		}

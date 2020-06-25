@@ -551,21 +551,21 @@ export class ChartWidget implements IDestroyable {
 		this._adjustSizeImpl();
 	}
 
-	private _getMouseEventParamsImpl(time: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
+	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
 		const seriesPrices = new Map<Series, BarPrice | BarPrices>();
-		if (time !== null) {
+		if (index !== null) {
 			const serieses = this._model.serieses();
 			serieses.forEach((s: Series) => {
 				// TODO: replace with search left
-				const prices = s.dataAt(time);
+				const prices = s.dataAt(index);
 				if (prices !== null) {
 					seriesPrices.set(s, prices);
 				}
 			});
 		}
 		let clientTime: TimePoint | undefined;
-		if (time !== null) {
-			const timePoint = this._model.timeScale().indexToUserTime(time);
+		if (index !== null) {
+			const timePoint = this._model.timeScale().indexToTime(index);
 			if (timePoint !== null) {
 				clientTime = timePoint;
 			}

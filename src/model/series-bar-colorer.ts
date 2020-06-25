@@ -1,8 +1,8 @@
 import { ensure, ensureNotNull } from '../helpers/assertions';
 
-import { PlotList } from './plot-list';
+import { PlotRowValueIndex } from './plot-data';
 import { Series } from './series';
-import { Bar, BarValue, SeriesPlotIndex } from './series-data';
+import { SeriesPlotRow } from './series-data';
 import {
 	AreaStyleOptions,
 	BarStyleOptions,
@@ -10,11 +10,11 @@ import {
 	HistogramStyleOptions,
 	LineStyleOptions,
 } from './series-options';
-import { TimePoint, TimePointIndex } from './time-data';
+import { TimePointIndex } from './time-data';
 
 export interface PrecomputedBars {
-	value: Bar;
-	previousValue?: Bar;
+	value: SeriesPlotRow;
+	previousValue?: SeriesPlotRow;
 }
 
 export interface BarColorerStyle {
@@ -71,7 +71,7 @@ export class SeriesBarColorer {
 		const borderDownColor = downColor;
 
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
-		const isUp = ensure(currentBar.value[SeriesPlotIndex.Open]) <= ensure(currentBar.value[SeriesPlotIndex.Close]);
+		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
 		result.barColor = isUp ? upColor : downColor;
 		result.barBorderColor = isUp ? borderUpColor : borderDownColor;
@@ -91,7 +91,7 @@ export class SeriesBarColorer {
 		const wickDownColor = candlestickStyle.wickDownColor;
 
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
-		const isUp = ensure(currentBar.value[SeriesPlotIndex.Open]) <= ensure(currentBar.value[SeriesPlotIndex.Close]);
+		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
 		result.barColor = isUp ? upColor : downColor;
 		result.barBorderColor = isUp ? borderUpColor : borderDownColor;
@@ -116,26 +116,16 @@ export class SeriesBarColorer {
 
 	private _histogramStyle(histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const result = { ...emptyResult };
-		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
-		const colorValue = currentBar.value[SeriesPlotIndex.Color];
-		if (colorValue != null) {
-			const palette = ensureNotNull(this._series.palette());
-			result.barColor = palette.colorByIndex(colorValue);
-		} else {
-			result.barColor = histogramStyle.color;
-		}
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Histogram'>;
+		result.barColor = currentBar.color !== undefined ? currentBar.color : histogramStyle.color;
 		return result;
 	}
 
-	private _getSeriesBars(): PlotList<TimePoint, BarValue> {
-		return this._series.bars();
-	}
-
-	private _findBar(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): Bar | null {
+	private _findBar(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): SeriesPlotRow | null {
 		if (precomputedBars !== undefined) {
 			return precomputedBars.value;
 		}
 
-		return this._getSeriesBars().valueAt(barIndex);
+		return this._series.bars().valueAt(barIndex);
 	}
 }
