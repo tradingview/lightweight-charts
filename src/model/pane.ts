@@ -247,19 +247,6 @@ export class Pane implements IDestroyable {
 		priceScale.endScroll();
 	}
 
-	public setPriceAutoScale(priceScale: PriceScale, autoScale: boolean): void {
-		priceScale.setMode({
-			autoScale: autoScale,
-		});
-
-		if (this._timeScale.isEmpty()) {
-			priceScale.setPriceRange(null);
-			return;
-		}
-
-		this.recalculatePriceScale(priceScale);
-	}
-
 	public updateAllSources(): void {
 		this._dataSources.forEach((source: IPriceDataSource) => {
 			source.updateAllViews();
@@ -318,10 +305,6 @@ export class Pane implements IDestroyable {
 
 		this.updateAllSources();
 		this._model.lightUpdate();
-	}
-
-	public isEmpty(): boolean {
-		return this._dataSources.length === 0;
 	}
 
 	public orderedSources(): ReadonlyArray<IPriceDataSource> {

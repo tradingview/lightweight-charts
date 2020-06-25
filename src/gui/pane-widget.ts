@@ -141,10 +141,6 @@ export class PaneWidget implements IDestroyable {
 		return ensureNotNull(this._state);
 	}
 
-	public stateOrNull(): Pane | null {
-		return this._state;
-	}
-
 	public setState(pane: Pane | null): void {
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);

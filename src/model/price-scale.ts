@@ -120,11 +120,9 @@ export class PriceScale {
 
 	private _height: number = 0;
 	private _internalHeightCache: number | null = null;
-	private _internalHeightChanged: Delegate = new Delegate();
 
 	private _priceRange: PriceRangeImpl | null = null;
 	private _priceRangeSnapshot: PriceRangeImpl | null = null;
-	private _priceRangeChanged: Delegate<PriceRangeImpl | null, PriceRangeImpl | null> = new Delegate();
 	private _invalidatedForRange: RangeCache = { isValid: false, visibleBars: null };
 
 	private _marginAbove: number = 0;
@@ -143,7 +141,6 @@ export class PriceScale {
 	private _scaleStartPoint: number | null = null;
 	private _scrollStartPoint: number | null = null;
 	private _formatter: IFormatter = defaultPriceFormatter;
-	private readonly _optionsChanged: Delegate = new Delegate();
 
 	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
 		this._id = id;
@@ -169,8 +166,6 @@ export class PriceScale {
 			this.setMode({ mode: options.mode });
 		}
 
-		this._optionsChanged.fire();
-
 		if (options.scaleMargins !== undefined) {
 			const top = ensureDefined(options.scaleMargins.top);
 			const bottom = ensureDefined(options.scaleMargins.bottom);
@@ -190,10 +185,6 @@ export class PriceScale {
 			this._invalidateInternalHeightCache();
 			this._marksCache = null;
 		}
-	}
-
-	public optionsChanged(): ISubscription {
-		return this._optionsChanged;
 	}
 
 	public isAutoScale(): boolean {
@@ -309,20 +300,12 @@ export class PriceScale {
 		return res;
 	}
 
-	public internalHeightChanged(): ISubscription {
-		return this._internalHeightChanged;
-	}
-
 	public priceRange(): PriceRangeImpl | null {
 		this._makeSureItIsValid();
 		return this._priceRange;
 	}
 
-	public priceRangeChanged(): ISubscription<PriceRangeImpl | null, PriceRangeImpl | null> {
-		return this._priceRangeChanged;
-	}
-
-	public setPriceRange(newPriceRange: PriceRangeImpl | null, isForceSetValue?: boolean, onlyPriceScaleUpdate?: boolean): void {
+	public setPriceRange(newPriceRange: PriceRangeImpl | null, isForceSetValue?: boolean): void {
 		const oldPriceRange = this._priceRange;
 
 		if (!isForceSetValue &&
@@ -333,10 +316,6 @@ export class PriceScale {
 
 		this._marksCache = null;
 		this._priceRange = newPriceRange;
-
-		if (!onlyPriceScaleUpdate) {
-			this._priceRangeChanged.fire(oldPriceRange, newPriceRange);
-		}
 	}
 
 	public isEmpty(): boolean {
@@ -771,7 +750,6 @@ export class PriceScale {
 
 	private _invalidateInternalHeightCache(): void {
 		this._internalHeightCache = null;
-		this._internalHeightChanged.fire();
 	}
 
 	private _logicalToCoordinate(logical: number, baseValue: number): Coordinate {

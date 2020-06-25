@@ -258,10 +258,6 @@ export class ChartModel implements IDestroyable {
 		return this._crosshairMoved;
 	}
 
-	public width(): number {
-		return this._width;
-	}
-
 	public setPaneHeight(pane: Pane, height: number): void {
 		pane.setHeight(height);
 		this.recalculateAllPanes();
@@ -336,11 +332,6 @@ export class ChartModel implements IDestroyable {
 			return;
 		}
 		pane.endScrollPrice(priceScale);
-		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
-	}
-
-	public setPriceAutoScale(pane: Pane, priceScale: PriceScale, autoScale: boolean): void {
-		pane.setPriceAutoScale(priceScale, autoScale);
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
