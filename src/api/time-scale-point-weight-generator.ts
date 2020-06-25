@@ -18,6 +18,7 @@ interface WeightDivisor {
 }
 
 const intradayWeightDivisors: WeightDivisor[] = [
+	// TODO: divisor=1 means 1ms and it's strange that weight for 1ms > weight for 1s
 	{ divisor: 1, weight: 20 },
 	{ divisor: seconds(1), weight: 19 },
 	{ divisor: minutes(1), weight: 20 },
