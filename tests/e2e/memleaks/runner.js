@@ -17,7 +17,7 @@ mochaConfig.require.forEach(module => {
 });
 
 if (process.argv.length !== 3) {
-	console.log('Usage: runner PATH_TO_GOLDEN_STANDALONE_MODULE PATH_TO_TEST_STANDALONE_MODULE');
+	console.log('Usage: runner PATH_TO_TEST_STANDALONE_MODULE');
 	process.exit(1);
 }
 
