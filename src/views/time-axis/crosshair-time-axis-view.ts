@@ -1,5 +1,5 @@
 import { ensureNotNull } from '../../helpers/assertions';
-import { generateTextColor } from '../../helpers/color';
+import { generateContrastColors } from '../../helpers/color';
 
 import { ChartModel } from '../../model/chart-model';
 import { Crosshair, TimeAndCoordinateProvider } from '../../model/crosshair';
@@ -69,7 +69,9 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 		data.coordinate = value.coordinate;
 		data.text = timeScale.formatDateTime(ensureNotNull(currentTime));
 		data.visible = true;
-		data.background = options.labelBackgroundColor;
-		data.color = generateTextColor(options.labelBackgroundColor);
+
+		const colors = generateContrastColors(options.labelBackgroundColor);
+		data.background = colors.background;
+		data.color = colors.foreground;
 	}
 }

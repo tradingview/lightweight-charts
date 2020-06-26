@@ -1,5 +1,4 @@
 import { drawScaled } from '../helpers/canvas-helpers';
-import { resetTransparency } from '../helpers/color';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
@@ -69,7 +68,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		let xTick: number;
 		let xText: number;
 
-		ctx.fillStyle = resetTransparency(this._commonData.background);
+		ctx.fillStyle = this._commonData.background;
 		ctx.lineWidth = 1;
 		ctx.lineCap = 'butt';
 

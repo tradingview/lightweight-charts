@@ -1,5 +1,3 @@
-import { generateTextColor } from '../../helpers/color';
-
 import { PriceScale } from '../../model/price-scale';
 import {
 	IPriceAxisViewRenderer,
@@ -46,14 +44,6 @@ export abstract class PriceAxisView implements IPriceAxisView {
 
 	public text(): string {
 		return this._axisRendererData.text;
-	}
-
-	public background(): string {
-		return this._commonRendererData.background;
-	}
-
-	public color(): string {
-		return generateTextColor(this.background());
 	}
 
 	public coordinate(): number {
