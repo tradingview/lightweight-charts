@@ -303,7 +303,7 @@ function rgbToGrayscale(rgbValue: Rgb): number {
 }
 
 export interface ContrastColors {
-	text: string;
+	foreground: string;
 	background: string;
 }
 
@@ -312,6 +312,6 @@ export function generateContrastColors(backgroundColor: string): ContrastColors 
 
 	return {
 		background: `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
-		text: rgbToGrayscale(rgb) > 160 ? 'black' : 'white',
+		foreground: rgbToGrayscale(rgb) > 160 ? 'black' : 'white',
 	};
 }

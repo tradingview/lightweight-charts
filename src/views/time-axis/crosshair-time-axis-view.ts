@@ -74,6 +74,6 @@ export class CrosshairTimeAxisView extends TimeAxisView {
 
 		const colors = generateContrastColors(options.labelBackgroundColor);
 		data.background = colors.background;
-		data.color = colors.text;
+		data.color = colors.foreground;
 	}
 }

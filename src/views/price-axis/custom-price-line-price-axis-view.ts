@@ -44,7 +44,7 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 
 		const colors = generateContrastColors(options.color);
 		commonData.background = colors.background;
-		commonData.color = colors.text;
+		commonData.color = colors.foreground;
 		commonData.coordinate = y;
 	}
 }

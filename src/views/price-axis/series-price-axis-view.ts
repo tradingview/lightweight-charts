@@ -59,7 +59,7 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		const colors = generateContrastColors(lastValueColor);
 
 		commonRendererData.background = colors.background;
-		commonRendererData.color = colors.text;
+		commonRendererData.color = colors.foreground;
 		commonRendererData.coordinate = lastValueData.coordinate;
 		paneRendererData.borderColor = this._source.model().options().layout.backgroundColor;
 		axisRendererData.borderColor = lastValueColor;
