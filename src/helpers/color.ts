@@ -259,7 +259,7 @@ function tryParseRgbString(colorString: string): Rgb | null {
 	return matches !== null ? RgbRepresentation.parse(matches) : null;
 }
 
-function parseRgbFromColor(colorString: string): Rgb {
+function colorStringToRgb(colorString: string): Rgb {
 	colorString = colorString.toLowerCase();
 
 	if (colorString === 'transparent') {
@@ -308,7 +308,7 @@ export interface ContrastColors {
 }
 
 export function generateContrastColors(backgroundColor: string): ContrastColors {
-	const rgb = parseRgbFromColor(backgroundColor);
+	const rgb = colorStringToRgb(backgroundColor);
 
 	return {
 		background: `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
