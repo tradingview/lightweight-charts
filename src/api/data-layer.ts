@@ -1,53 +1,23 @@
 /// <reference types="_build-time-constants" />
 
-import { upperbound } from '../helpers/algorithms';
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { isString } from '../helpers/strict-type-checks';
 
-import { Palette } from '../model/palette';
-import { PlotRow, PlotValue } from '../model/plot-data';
 import { Series } from '../model/series';
-import { Bar, BarValue } from '../model/series-data';
+import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
-import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../model/time-data';
+import { BusinessDay, TimePoint, TimePointIndex, TimeScalePoint, UTCTimestamp } from '../model/time-data';
 
 import {
-	BarData,
-	HistogramData,
 	isBusinessDay,
 	isUTCTimestamp,
-	LineData,
 	SeriesDataItemTypeMap,
 	Time,
 } from './data-consumer';
+import { getSeriesPlotRowCreator } from './get-series-plot-row-creator';
+import { fillWeightsForPoints } from './time-scale-point-weight-generator';
 
-export interface TickMarkPacket {
-	span: number;
-	time: TimePoint;
-	index: TimePointIndex;
-}
-
-export interface SeriesUpdatePacket {
-	update: PlotRow<Bar['time'], BarValue>[];
-}
-
-function newSeriesUpdatePacket(): SeriesUpdatePacket {
-	return {
-		update: [],
-	};
-}
-
-export interface TimeScaleUpdatePacket {
-	seriesUpdates: Map<Series, SeriesUpdatePacket>;
-	changes: TimePoint[];
-	index: TimePointIndex;
-	marks: TickMarkPacket[];
-}
-
-export interface UpdatePacket {
-	timeScaleUpdate: TimeScaleUpdatePacket;
-}
-
+type TimedData = Pick<SeriesDataItemTypeMap[SeriesType], 'time'>;
 type TimeConverter = (time: Time) => TimePoint;
 
 function businessDayConverter(time: Time): TimePoint {
@@ -72,9 +42,6 @@ function timestampConverter(time: Time): TimePoint {
 	};
 }
 
-export type DataItemType = SeriesDataItemTypeMap[SeriesType];
-export type TimedData = Pick<DataItemType, 'time'>;
-
 function selectTimeConverter(data: TimedData[]): TimeConverter | null {
 	if (data.length === 0) {
 		return null;
@@ -95,118 +62,6 @@ export function convertTime(time: Time): TimePoint {
 	}
 
 	return businessDayConverter(time);
-
-}
-
-function getLineBasedSeriesItemValue(item: LineData | HistogramData, palette: Palette): BarValue {
-	const val = item.value;
-	// default value
-	let color: PlotValue = null;
-	if ('color' in item) {
-		if (item.color !== undefined) {
-			color = palette.addColor(item.color);
-		}
-	}
-	return [val, val, val, val, color];
-}
-
-function getOHLCBasedSeriesItemValue(bar: BarData, palette: Palette): BarValue {
-	return [bar.open, bar.high, bar.low, bar.close, null];
-}
-
-// we want to have compile-time checks that the type of the functions is correct
-// but due contravariance we cannot easily use type of values of the SeriesItemValueFnMap map itself
-// so let's use TimedSeriesItemValueFn for shut up the compiler in seriesItemValueFn
-// we need to be sure (and we're sure actually) that stored data has correct type for it's according series object
-type SeriesItemValueFnMap = {
-	[T in keyof SeriesDataItemTypeMap]: (item: SeriesDataItemTypeMap[T], palette: Palette) => BarValue;
-};
-type TimedSeriesItemValueFn = (item: TimedData, palette: Palette) => BarValue;
-
-const seriesItemValueFnMap: SeriesItemValueFnMap = {
-	Candlestick: getOHLCBasedSeriesItemValue,
-	Bar: getOHLCBasedSeriesItemValue,
-	Area: getLineBasedSeriesItemValue,
-	Histogram: getLineBasedSeriesItemValue,
-	Line: getLineBasedSeriesItemValue,
-};
-
-function seriesItemValueFn(seriesType: SeriesType): TimedSeriesItemValueFn {
-	return seriesItemValueFnMap[seriesType] as TimedSeriesItemValueFn;
-}
-
-function hours(count: number): number {
-	return count * 60 * 60 * 1000;
-}
-function minutes(count: number): number {
-	return count * 60 * 1000;
-}
-function seconds(count: number): number {
-	return count * 1000;
-}
-
-const spanDivisors = [
-	{
-		divisor: 1, span: 20,
-	},
-	{
-		divisor: seconds(1), span: 19,
-	},
-	{
-		divisor: minutes(1), span: 20,
-	},
-	{
-		divisor: minutes(5), span: 21,
-	},
-	{
-		divisor: minutes(30), span: 22,
-	},
-	{
-		divisor: hours(1), span: 30,
-	},
-	{
-		divisor: hours(3), span: 31,
-	},
-	{
-		divisor: hours(6), span: 32,
-	},
-	{
-		divisor: hours(12), span: 33,
-	},
-];
-
-function spanByTime(time: UTCTimestamp, previousTime: UTCTimestamp | null): number {
-	// function days(count) { return count * 24 * 60 * 60 * 1000; }
-	if (previousTime !== null) {
-		const lastTime = new Date(previousTime * 1000);
-		const currentTime = new Date(time * 1000);
-
-		if (currentTime.getUTCFullYear() !== lastTime.getUTCFullYear()) {
-			return 70;
-		} else if (currentTime.getUTCMonth() !== lastTime.getUTCMonth()) {
-			return 60;
-		} else if (currentTime.getUTCDate() !== lastTime.getUTCDate()) {
-			return 50;
-		}
-
-		for (let i = spanDivisors.length - 1; i >= 0; --i) {
-			if (Math.floor(lastTime.getTime() / spanDivisors[i].divisor) !== Math.floor(currentTime.getTime() / spanDivisors[i].divisor)) {
-				return spanDivisors[i].span;
-			}
-		}
-	}
-	return 20;
-}
-
-interface TimePointData {
-	// actually the type of the value should be related to the series' type (generic type)
-	mapping: Map<Series, DataItemType>;
-	index: TimePointIndex;
-	timePoint: TimePoint;
-}
-
-function compareTimePoints(a: TimePoint, b: TimePoint): boolean {
-	return a.timestamp < b.timestamp;
 }
 
 const validDateRegex = /^\d\d\d\d-\d\d\-\d\d$/;
@@ -246,219 +101,289 @@ function convertStringsToBusinessDays(data: TimedData[]): void {
 	return data.forEach(convertStringToBusinessDay);
 }
 
+export interface TimeScaleChanges {
+	/**
+	 * An array of the new time scale points
+	 */
+	points: readonly TimeScalePoint[];
+
+	/**
+	 * In terms of time scale "base index" means the latest time scale point with data (there might be whitespaces)
+	 */
+	baseIndex: TimePointIndex;
+}
+
+export interface SeriesChanges {
+	/**
+	 * Data to be merged into series' plot list
+	 */
+	data: SeriesPlotRow[];
+
+	/**
+	 * Whether it needs to clear old data before apply data from this change
+	 */
+	fullUpdate: boolean;
+}
+
+export interface DataUpdateResponse {
+	/**
+	 * Contains updates for all _changed_ series (if series data doesn't changed then it will not be here)
+	 */
+	series: Map<Series, SeriesChanges>;
+
+	/**
+	 * Contains optional time scale points
+	 */
+	timeScale?: TimeScaleChanges;
+}
+
+interface TimePointData {
+	index: TimePointIndex;
+	timePoint: TimePoint;
+
+	// actually the type of the value should be related to the series' type (generic type)
+	// here, in data layer all data for us is "mutable" by default, but to the chart we provide "readonly" data, to avoid modifying it
+	mapping: Map<Series, Mutable<SeriesPlotRow>>;
+}
+
+function createEmptyTimePointData(timePoint: TimePoint): TimePointData {
+	return { index: 0 as TimePointIndex, mapping: new Map(), timePoint };
+}
+
 export class DataLayer {
+	// note that _pointDataByTimePoint and _seriesRowsBySeries shares THE SAME objects in their values between each other
+	// it's just different kind of maps to make usages/perf better
 	private _pointDataByTimePoint: Map<UTCTimestamp, TimePointData> = new Map();
-	private _timePointsByIndex: Map<TimePointIndex, TimePoint> = new Map();
-	private _sortedTimePoints: TimePoint[] = [];
+	private _seriesRowsBySeries: Map<Series, SeriesPlotRow[]> = new Map();
+	private _seriesLastTimePoint: Map<Series, TimePoint> = new Map();
+
+	// this is kind of "dest" values (in opposite to "source" ones) - we don't need to modify it manually, the only by calling _syncIndexesAndApplyChanges method
+	private _sortedTimePoints: readonly TimeScalePoint[] = [];
 
 	public destroy(): void {
 		this._pointDataByTimePoint.clear();
-		this._timePointsByIndex.clear();
+		this._seriesRowsBySeries.clear();
+		this._seriesLastTimePoint.clear();
 		this._sortedTimePoints = [];
 	}
 
-	public setSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): UpdatePacket {
-		series.clearData();
+	public setSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): DataUpdateResponse {
+		// first, remove the series from data mappings if we have any data for that series
+		// note we can't use _seriesRowsBySeries here because we might don't have the data there in case of whitespaces
+		if (this._seriesLastTimePoint.has(series)) {
+			this._pointDataByTimePoint.forEach((pointData: TimePointData) => pointData.mapping.delete(series));
+		}
 
-		convertStringsToBusinessDays(data);
-		this._pointDataByTimePoint.forEach((value: TimePointData) => value.mapping.delete(series));
-		const timeConverter = selectTimeConverter(data);
-		if (timeConverter !== null) {
-			data.forEach((item: SeriesDataItemTypeMap[TSeriesType]) => {
+		let seriesRows: SeriesPlotRow[] = [];
+
+		if (data.length !== 0) {
+			convertStringsToBusinessDays(data);
+
+			const timeConverter = ensureNotNull(selectTimeConverter(data));
+			const createPlotRow = getSeriesPlotRowCreator(series.seriesType());
+
+			seriesRows = data.map((item: SeriesDataItemTypeMap[TSeriesType]) => {
 				const time = timeConverter(item.time);
-				const timePointData: TimePointData = this._pointDataByTimePoint.get(time.timestamp) ||
-					{ index: 0 as TimePointIndex, mapping: new Map<Series, SeriesDataItemTypeMap[TSeriesType]>(), timePoint: time };
-				timePointData.mapping.set(series, item);
-				this._pointDataByTimePoint.set(time.timestamp, timePointData);
+
+				let timePointData = this._pointDataByTimePoint.get(time.timestamp);
+				if (timePointData === undefined) {
+					// the indexes will be sync later
+					timePointData = createEmptyTimePointData(time);
+					this._pointDataByTimePoint.set(time.timestamp, timePointData);
+				}
+
+				const row = createPlotRow(time, timePointData.index, item);
+				timePointData.mapping.set(series, row);
+				return row;
 			});
 		}
 
-		// remove from points items without series
-		const newPoints = new Map<UTCTimestamp, TimePointData>();
-		this._pointDataByTimePoint.forEach((pointData: TimePointData, key: UTCTimestamp) => {
-			if (pointData.mapping.size > 0) {
-				newPoints.set(key, pointData);
-			}
-		});
+		// we delete the old data from mapping and add the new ones
+		// so there might be empty points, let's remove them first
+		this._cleanupPointsData();
 
-		return this._setNewPoints(newPoints);
+		this._setRowsToSeries(series, seriesRows);
+
+		return this._syncIndexesAndApplyChanges(series);
 	}
 
-	public removeSeries(series: Series): UpdatePacket {
+	public removeSeries(series: Series): DataUpdateResponse {
 		return this.setSeriesData(series, []);
 	}
 
-	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): UpdatePacket {
-		// check types
+	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): DataUpdateResponse {
 		convertStringToBusinessDay(data);
-		const bars = series.bars();
-		if (bars.size() > 0) {
-			const lastTime = ensureNotNull(bars.last()).time;
-			if (lastTime.businessDay !== undefined) {
-				// time must be BusinessDay
-				if (!isBusinessDay(data.time)) {
-					throw new Error('time must be of type BusinessDay');
-				}
-			} else {
-				if (!isUTCTimestamp(data.time)) {
-					throw new Error('time must be of type isUTCTimestamp');
-				}
-			}
+
+		const time = ensureNotNull(selectTimeConverter([data]))(data.time);
+
+		const lastSeriesTime = this._seriesLastTimePoint.get(series);
+		if (lastSeriesTime !== undefined && time.timestamp < lastSeriesTime.timestamp) {
+			throw new Error(`Cannot update oldest data, last time=${lastSeriesTime.timestamp}, new time=${time.timestamp}`);
 		}
 
-		const changedTimePointTime = ensureNotNull(selectTimeConverter([data]))(data.time);
+		let pointDataAtTime = this._pointDataByTimePoint.get(time.timestamp);
 
-		const pointData: TimePointData = this._pointDataByTimePoint.get(changedTimePointTime.timestamp) ||
-			{ index: 0 as TimePointIndex, mapping: new Map<Series, SeriesDataItemTypeMap[TSeriesType]>(), timePoint: changedTimePointTime };
-		const newPoint = pointData.mapping.size === 0;
-		pointData.mapping.set(series, data);
-		let updateAllSeries = false;
-		if (newPoint) {
-			let index = this._pointDataByTimePoint.size as TimePointIndex;
-			if (this._sortedTimePoints.length > 0 && this._sortedTimePoints[this._sortedTimePoints.length - 1].timestamp > changedTimePointTime.timestamp) {
-				// new point in the middle
-				index = upperbound(this._sortedTimePoints, changedTimePointTime, compareTimePoints) as TimePointIndex;
-				this._sortedTimePoints.splice(index, 0, changedTimePointTime);
-				this._incrementIndicesFrom(index);
-				updateAllSeries = true;
-			} else {
-				// new point in the end
-				this._sortedTimePoints.push(changedTimePointTime);
-			}
+		// if no point data found for the new data item
+		// that means that we need to update scale
+		const affectsTimeScale = pointDataAtTime === undefined;
 
-			pointData.index = index;
-			this._timePointsByIndex.set(pointData.index, changedTimePointTime);
-		}
-		this._pointDataByTimePoint.set(changedTimePointTime.timestamp, pointData);
-		const seriesUpdates: Map<Series, SeriesUpdatePacket> = new Map();
-
-		for (let index = pointData.index; index < this._pointDataByTimePoint.size; ++index) {
-			const timePoint = ensureDefined(this._timePointsByIndex.get(index));
-			const currentIndexData = ensureDefined(this._pointDataByTimePoint.get(timePoint.timestamp));
-			currentIndexData.mapping.forEach((currentData: DataItemType, currentSeries: Series) => {
-				if (!updateAllSeries && currentSeries !== series) {
-					return;
-				}
-
-				const getItemValues = seriesItemValueFn(currentSeries.seriesType());
-
-				const packet = seriesUpdates.get(currentSeries) || newSeriesUpdatePacket();
-				const seriesUpdate: PlotRow<Bar['time'], BarValue> = {
-					index,
-					time: timePoint,
-					value: getItemValues(currentData, currentSeries.palette()),
-				};
-				packet.update.push(seriesUpdate);
-				seriesUpdates.set(currentSeries, packet);
-			});
+		if (pointDataAtTime === undefined) {
+			// the indexes will be sync later
+			pointDataAtTime = createEmptyTimePointData(time);
+			this._pointDataByTimePoint.set(time.timestamp, pointDataAtTime);
 		}
 
-		const marks: TickMarkPacket[] = newPoint ? this._generateMarksSinceIndex(pointData.index) : [];
-		const timePointChanges = newPoint ? this._sortedTimePoints.slice(pointData.index) : [];
+		const createPlotRow = getSeriesPlotRowCreator(series.seriesType());
+		const plotRow = createPlotRow(time, pointDataAtTime.index, data);
+		pointDataAtTime.mapping.set(series, plotRow);
 
-		const timeScaleUpdate: TimeScaleUpdatePacket = {
-			seriesUpdates,
-			changes: timePointChanges,
-			index: pointData.index,
-			marks,
-		};
+		this._updateLastSeriesRow(series, plotRow);
 
-		return {
-			timeScaleUpdate,
-		};
+		// if point already exist on the time scale - we don't need to make a full update and just make an incremental one
+		if (!affectsTimeScale) {
+			const seriesUpdate = new Map<Series, SeriesChanges>();
+			const seriesData = ensureDefined(this._seriesRowsBySeries.get(series));
+			seriesUpdate.set(series, { data: [seriesData[seriesData.length - 1]], fullUpdate: false });
+			return { series: seriesUpdate };
+		}
+
+		// but if we don't have such point on the time scale - we need to generate "full" update (including time scale update)
+		return this._syncIndexesAndApplyChanges(series);
 	}
 
-	private _setNewPoints(newPoints: Map<UTCTimestamp, TimePointData>): UpdatePacket {
-		this._pointDataByTimePoint = newPoints;
+	private _updateLastSeriesRow(series: Series, plotRow: SeriesPlotRow): void {
+		let seriesData = this._seriesRowsBySeries.get(series);
+		if (seriesData === undefined) {
+			seriesData = [];
+			this._seriesRowsBySeries.set(series, seriesData);
+		}
 
-		this._sortedTimePoints = Array.from(this._pointDataByTimePoint.values()).map((d: TimePointData) => d.timePoint);
-		this._sortedTimePoints.sort((t1: TimePoint, t2: TimePoint) => t1.timestamp - t2.timestamp);
+		const lastSeriesRow = seriesData.length !== 0 ? seriesData[seriesData.length - 1] : null;
 
-		const seriesUpdates: Map<Series, SeriesUpdatePacket> = new Map();
-		this._sortedTimePoints.forEach((time: TimePoint, index: number) => {
-			const pointData = ensureDefined(this._pointDataByTimePoint.get(time.timestamp));
+		if (lastSeriesRow === null || plotRow.time.timestamp > lastSeriesRow.time.timestamp) {
+			seriesData.push(plotRow);
+		} else {
+			seriesData[seriesData.length - 1] = plotRow;
+		}
+
+		this._seriesLastTimePoint.set(series, plotRow.time);
+	}
+
+	private _setRowsToSeries(series: Series, seriesRows: SeriesPlotRow[]): void {
+		if (seriesRows.length !== 0) {
+			this._seriesRowsBySeries.set(series, seriesRows);
+			this._seriesLastTimePoint.set(series, seriesRows[seriesRows.length - 1].time);
+		} else {
+			this._seriesRowsBySeries.delete(series);
+			this._seriesLastTimePoint.delete(series);
+		}
+	}
+
+	private _cleanupPointsData(): void {
+		// create a copy remove from points items without series
+		// _pointDataByTimePoint is kind of "inbound" (or "source") value
+		// which should be used to update other dest values like _sortedTimePoints
+		const newPointsData = new Map<UTCTimestamp, TimePointData>();
+		this._pointDataByTimePoint.forEach((pointData: TimePointData, key: UTCTimestamp) => {
+			if (pointData.mapping.size > 0) {
+				newPointsData.set(key, pointData);
+			}
+		});
+
+		this._pointDataByTimePoint = newPointsData;
+	}
+
+	/**
+	 * Sets new time scale and make indexes valid for all series
+	 * @returns An index of the first changed point
+	 */
+	private _updateTimeScalePoints(newTimePoints: TimeScalePoint[]): number {
+		let firstChangedPointIndex = -1;
+
+		// search the first different point and "syncing" time weight by the way
+		for (let index = 0; index < this._sortedTimePoints.length && index < newTimePoints.length; ++index) {
+			const oldPoint = this._sortedTimePoints[index];
+			const newPoint = newTimePoints[index];
+			if (oldPoint.time.timestamp !== newPoint.time.timestamp) {
+				firstChangedPointIndex = index;
+				break;
+			}
+
+			// re-assign point's time weight for points if time is the same (and all prior times was the same)
+			newPoint.timeWeight = oldPoint.timeWeight;
+		}
+
+		if (firstChangedPointIndex === -1 && this._sortedTimePoints.length !== newTimePoints.length) {
+			// the common part of the prev and the new points are the same
+			// so the first changed point is the next after the common part
+			firstChangedPointIndex = Math.min(this._sortedTimePoints.length, newTimePoints.length);
+		}
+
+		if (firstChangedPointIndex === -1) {
+			// if no time scale changed, then do nothing
+			return -1;
+		}
+
+		// if time scale points are changed that means that we need to make full update to all series (with clearing points)
+		// but first we need to synchronize indexes and re-fill time weights
+		for (let index = firstChangedPointIndex; index < newTimePoints.length; ++index) {
+			const pointData = ensureDefined(this._pointDataByTimePoint.get(newTimePoints[index].time.timestamp));
+
+			// first, nevertheless update index of point data ("make it valid")
 			pointData.index = index as TimePointIndex;
-			pointData.mapping.forEach((targetData: DataItemType, targetSeries: Series) => {
-				// add point to series
-				const getItemValues = seriesItemValueFn(targetSeries.seriesType());
-				const packet = seriesUpdates.get(targetSeries) || newSeriesUpdatePacket();
-				const seriesUpdate: PlotRow<Bar['time'], BarValue> = {
-					index: index as TimePointIndex,
-					time,
-					value: getItemValues(targetData, targetSeries.palette()),
-				};
-				packet.update.push(seriesUpdate);
-				seriesUpdates.set(targetSeries, packet);
-			});
-		});
 
-		let prevTime: UTCTimestamp | null = null;
-		let totalTimeDiff = 0;
-		const marks = this._sortedTimePoints.map((time: TimePoint, index: number) => {
-			totalTimeDiff += time.timestamp - (prevTime || time.timestamp);
-			const span = spanByTime(time.timestamp, prevTime);
-			prevTime = time.timestamp;
-			return {
-				span: span,
-				time: time,
-				index: index as TimePointIndex,
+			// and then we need to sync indexes for all series
+			pointData.mapping.forEach((seriesRow: Mutable<SeriesPlotRow>) => {
+				seriesRow.index = index as TimePointIndex;
+			});
+		}
+
+		// re-fill time weights for point after the first changed one
+		fillWeightsForPoints(newTimePoints, firstChangedPointIndex);
+
+		this._sortedTimePoints = newTimePoints;
+
+		return firstChangedPointIndex;
+	}
+
+	/**
+	 * Methods syncs indexes (recalculates them applies them to point/series data) between time scale, point data and series point
+	 * and returns generated update for applied change.
+	 */
+	private _syncIndexesAndApplyChanges<TSeriesType extends SeriesType>(series: Series<TSeriesType>): DataUpdateResponse {
+		// then generate the time scale points
+		// timeWeight will be updates in _updateTimeScalePoints later
+		const newTimeScalePoints = Array.from(this._pointDataByTimePoint.values()).map<TimeScalePoint>((d: TimePointData) => ({ timeWeight: 0, time: d.timePoint }));
+		newTimeScalePoints.sort((t1: TimeScalePoint, t2: TimeScalePoint) => t1.time.timestamp - t2.time.timestamp);
+
+		const firstChangedPointIndex = this._updateTimeScalePoints(newTimeScalePoints);
+
+		const dataUpdateResponse: DataUpdateResponse = { series: new Map() };
+
+		if (firstChangedPointIndex !== -1) {
+			let baseIndex = 0 as TimePointIndex;
+
+			// time scale is changed, so we need to make "full" update for every series
+			// TODO: it's possible to make perf improvements by checking what series has data after firstChangedPointIndex
+			// but let's skip for now
+			this._seriesRowsBySeries.forEach((data: SeriesPlotRow[], s: Series) => {
+				dataUpdateResponse.series.set(s, { data, fullUpdate: true });
+
+				if (data.length !== 0) {
+					baseIndex = Math.max(baseIndex, data[data.length - 1].index) as TimePointIndex;
+				}
+			});
+
+			dataUpdateResponse.timeScale = {
+				points: this._sortedTimePoints,
+				baseIndex,
 			};
-		});
-
-		if (marks.length > 1) {
-			// let's guess a span for the first mark
-			// let's say the previous point was average time back in the history
-			const averageTimeDiff = Math.ceil(totalTimeDiff / (marks.length - 1));
-			const approxPrevTime = (marks[0].time.timestamp - averageTimeDiff) as UTCTimestamp;
-			marks[0].span = spanByTime(marks[0].time.timestamp, approxPrevTime);
+		} else {
+			const seriesData = this._seriesRowsBySeries.get(series);
+			// if no seriesData found that means that we just removed the series
+			dataUpdateResponse.series.set(series, { data: seriesData || [], fullUpdate: true });
 		}
 
-		const timeScaleUpdate: TimeScaleUpdatePacket = {
-			seriesUpdates,
-			changes: this._sortedTimePoints.slice(),
-			index: 0 as TimePointIndex,
-			marks,
-		};
-
-		this._rebuildTimePointsByIndex();
-
-		return {
-			timeScaleUpdate,
-		};
-	}
-
-	private _incrementIndicesFrom(index: TimePointIndex): void {
-		for (let indexToUpdate: TimePointIndex = this._timePointsByIndex.size - 1 as TimePointIndex; indexToUpdate >= index; --indexToUpdate) {
-			const timePoint = ensureDefined(this._timePointsByIndex.get(indexToUpdate));
-			const updatedData = ensureDefined(this._pointDataByTimePoint.get(timePoint.timestamp));
-			const newIndex = indexToUpdate + 1 as TimePointIndex;
-			updatedData.index = newIndex;
-			this._timePointsByIndex.delete(indexToUpdate);
-			this._timePointsByIndex.set(newIndex, timePoint);
-		}
-	}
-
-	private _rebuildTimePointsByIndex(): void {
-		this._timePointsByIndex.clear();
-		this._pointDataByTimePoint.forEach((data: TimePointData, timePoint: UTCTimestamp) => {
-			this._timePointsByIndex.set(data.index, data.timePoint);
-		});
-	}
-
-	private _generateMarksSinceIndex(startIndex: TimePointIndex): TickMarkPacket[] {
-		const result: TickMarkPacket[] = [];
-		let prevTime: UTCTimestamp | null = this._timePointsByIndex.get(startIndex - 1 as TimePointIndex)?.timestamp || null;
-		for (let index = startIndex; index < this._timePointsByIndex.size; ++index) {
-			const time = ensureDefined(this._timePointsByIndex.get(index));
-			const span = spanByTime(time.timestamp, prevTime);
-			prevTime = time.timestamp;
-			result.push({
-				span: span,
-				time: time,
-				index: index,
-			});
-		}
-
-		return result;
+		return dataUpdateResponse;
 	}
 }

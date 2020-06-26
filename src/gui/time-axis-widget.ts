@@ -27,8 +27,8 @@ const enum CursorType {
 	EwResize,
 }
 
-function markWithGreaterSpan(a: TimeMark, b: TimeMark): TimeMark {
-	return a.span > b.span ? a : b;
+function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
+	return a.weight > b.weight ? a : b;
 }
 
 export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
@@ -214,14 +214,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
-	public width(): number {
-		return this._size.w;
-	}
-
-	public height(): number {
-		return this._size.h;
-	}
-
 	public optimalHeight(): number {
 		const rendererOptions = this._getRendererOptions();
 		return Math.ceil(
@@ -299,31 +291,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			return;
 		}
 
-		// select max span
-		/*
-		5 * ?SEC -> 11;
-		15 * ?SEC -> 12;
-		30 * ?SEC -> 13;
-		?MIN -> 20;
-		5 * ?MIN -> 21;
-		15 * ?MIN -> 21;
-		30 * ?MIN -> 22;
-		?HOUR -> 30;
-		3 * ?HOUR -> 31;
-		6 * ?HOUR -> 32;
-		12 * ?HOUR -> 33;
-		?DAY -> 40;
-		?WEEK -> 50;
-		?MONTH -> 60;
-		?YEAR -> 70
-		*/
-
-		let maxSpan = tickMarks.reduce(markWithGreaterSpan, tickMarks[0]).span;
+		let maxWeight = tickMarks.reduce(markWithGreaterWeight, tickMarks[0]).weight;
 
 		// special case: it looks strange if 15:00 is bold but 14:00 is not
-		// so if maxSpan > 30 and < 40 reduce it to 30
-		if (maxSpan > 30 && maxSpan < 40) {
-			maxSpan = 30;
+		// so if maxWeight > 30 and < 40 reduce it to 30
+		if (maxWeight > 30 && maxWeight < 40) {
+			maxWeight = 30;
 		}
 
 		ctx.save();
@@ -363,13 +336,13 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			// draw base marks
 			ctx.font = this._baseFont();
 			for (const tickMark of tickMarks) {
-				if (tickMark.span < maxSpan) {
+				if (tickMark.weight < maxWeight) {
 					ctx.fillText(tickMark.label, tickMark.coord, yText);
 				}
 			}
 			ctx.font = this._baseBoldFont();
 			for (const tickMark of tickMarks) {
-				if (tickMark.span >= maxSpan) {
+				if (tickMark.weight >= maxWeight) {
 					ctx.fillText(tickMark.label, tickMark.coord, yText);
 				}
 			}

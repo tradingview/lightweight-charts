@@ -23,7 +23,6 @@ function runTestCase(container) {
 		{ time: 1564618020, value: 25.46 },
 		{ time: 1564618080, value: 23.92 },
 		{ time: 1564618140, value: 22.68 },
-		{ time: 1564618140, value: 22.68 },
 		{ time: 1564618200, value: 22.67 },
 		{ time: 1564618202, value: 22.67 },
 		{ time: 1564618203, value: 20.67 },

@@ -41,7 +41,6 @@ export interface TouchMouseEvent {
 	// TODO: remove this after rewriting MouseEventHandler to handle touch and mouse event separately
 	readonly type: 'touch' | 'mouse';
 
-	target: MouseEvent['target'];
 	view: MouseEvent['view'];
 }
 
@@ -355,9 +354,15 @@ export class MouseEventHandler implements IDestroyable {
 				if (!this._handler.mouseDownOutsideEvent) {
 					return;
 				}
+
+				if (event.composed && this._target.contains(event.composedPath()[0] as Element)) {
+					return;
+				}
+
 				if (event.target && this._target.contains(event.target as Element)) {
 					return;
 				}
+
 				this._handler.mouseDownOutsideEvent();
 			};
 
@@ -519,7 +524,6 @@ export class MouseEventHandler implements IDestroyable {
 
 			type: event.type.startsWith('mouse') ? 'mouse' : 'touch',
 
-			target: eventLike.target,
 			view: event.view,
 		};
 	}

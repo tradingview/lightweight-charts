@@ -38,10 +38,6 @@ export class InvalidateMask {
 		this._invalidatedPanes.set(paneIndex, newValue);
 	}
 
-	public invalidateAll(level: InvalidationLevel): void {
-		this._globalLevel = Math.max(this._globalLevel, level);
-	}
-
 	public fullInvalidation(): InvalidationLevel {
 		return this._globalLevel;
 	}

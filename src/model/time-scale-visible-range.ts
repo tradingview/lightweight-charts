@@ -23,10 +23,6 @@ export class TimeScaleVisibleRange {
 		return this._logicalRange;
 	}
 
-	public isValid(): boolean {
-		return this._logicalRange !== null;
-	}
-
 	public static invalid(): TimeScaleVisibleRange {
 		return new TimeScaleVisibleRange(null);
 	}

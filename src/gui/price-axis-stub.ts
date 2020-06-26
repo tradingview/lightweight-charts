@@ -56,10 +56,6 @@ export class PriceAxisStub implements IDestroyable {
 		this._canvasBinding.destroy();
 	}
 
-	public update(): void {
-		this._invalidated = true;
-	}
-
 	public getElement(): HTMLElement {
 		return this._cell;
 	}
@@ -104,10 +100,6 @@ export class PriceAxisStub implements IDestroyable {
 
 	public getImage(): HTMLCanvasElement {
 		return this._canvasBinding.canvas;
-	}
-
-	public isLeft(): boolean {
-		return this._isLeft;
 	}
 
 	private _drawBorder(ctx: CanvasRenderingContext2D, pixelRatio: number): void {

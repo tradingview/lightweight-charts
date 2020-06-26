@@ -128,7 +128,7 @@ export class Pane implements IDestroyable {
 
 	public setWidth(width: number): void {
 		this._width = width;
-		this.updateAllViews();
+		this.updateAllSources();
 	}
 
 	public setHeight(height: number): void {
@@ -147,7 +147,7 @@ export class Pane implements IDestroyable {
 			}
 		});
 
-		this.updateAllViews();
+		this.updateAllSources();
 	}
 
 	public dataSources(): ReadonlyArray<IPriceDataSource> {
@@ -227,7 +227,7 @@ export class Pane implements IDestroyable {
 		priceScale.scaleTo(x);
 
 		// TODO: be more smart and update only affected views
-		this.updateAllViews();
+		this.updateAllSources();
 	}
 
 	public endScalePrice(priceScale: PriceScale): void {
@@ -240,27 +240,14 @@ export class Pane implements IDestroyable {
 
 	public scrollPriceTo(priceScale: PriceScale, x: number): void {
 		priceScale.scrollTo(x);
-		this.updateAllViews();
+		this.updateAllSources();
 	}
 
 	public endScrollPrice(priceScale: PriceScale): void {
 		priceScale.endScroll();
 	}
 
-	public setPriceAutoScale(priceScale: PriceScale, autoScale: boolean): void {
-		priceScale.setMode({
-			autoScale: autoScale,
-		});
-
-		if (this._timeScale.isEmpty()) {
-			priceScale.setPriceRange(null);
-			return;
-		}
-
-		this.recalculatePriceScale(priceScale);
-	}
-
-	public updateAllViews(): void {
+	public updateAllSources(): void {
 		this._dataSources.forEach((source: IPriceDataSource) => {
 			source.updateAllViews();
 		});
@@ -298,7 +285,7 @@ export class Pane implements IDestroyable {
 		if (visibleBars !== null) {
 			priceScale.recalculatePriceRange(visibleBars);
 		}
-		this.updateAllViews();
+		this.updateAllSources();
 	}
 
 	public momentaryAutoScale(): void {
@@ -316,12 +303,8 @@ export class Pane implements IDestroyable {
 			}
 		});
 
-		this.updateAllViews();
+		this.updateAllSources();
 		this._model.lightUpdate();
-	}
-
-	public isEmpty(): boolean {
-		return this._dataSources.length === 0;
 	}
 
 	public orderedSources(): ReadonlyArray<IPriceDataSource> {

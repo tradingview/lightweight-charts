@@ -1,28 +1,17 @@
 import { generateContrastColors } from '../../helpers/color';
 
-import { ChartModel } from '../../model/chart-model';
 import { LastValueDataResultWithData, Series } from '../../model/series';
 import { PriceAxisLastValueMode } from '../../model/series-options';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
 
 import { PriceAxisView } from './price-axis-view';
 
-export interface SeriesPriceAxisViewData {
-	model: ChartModel;
-}
-
 export class SeriesPriceAxisView extends PriceAxisView {
 	private readonly _source: Series;
-	private readonly _data: SeriesPriceAxisViewData;
 
-	public constructor(source: Series, data: SeriesPriceAxisViewData) {
+	public constructor(source: Series) {
 		super();
 		this._source = source;
-		this._data = data;
-	}
-
-	protected _getData(): SeriesPriceAxisViewData {
-		return this._data;
 	}
 
 	// tslint:disable-next-line:cyclomatic-complexity
@@ -40,7 +29,7 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		const showSymbolLabel = this._source.title() !== '';
 		const showPriceAndPercentage = seriesOptions.seriesLastValueMode === PriceAxisLastValueMode.LastPriceAndPercentageValue;
 
-		const lastValueData = this._source.lastValueData(undefined, false);
+		const lastValueData = this._source.lastValueData(false);
 		if (lastValueData.noData) {
 			return;
 		}

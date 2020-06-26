@@ -1,7 +1,7 @@
 import { ChartModel } from '../../model/chart-model';
 import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
-import { Bar } from '../../model/series-data';
+import { SeriesPlotRow } from '../../model/series-data';
 import { TimePointIndex } from '../../model/time-data';
 import {
 	BarItem,
@@ -36,7 +36,7 @@ export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 		return this._renderer;
 	}
 
-	protected _createRawItem(time: TimePointIndex, bar: Bar, colorer: SeriesBarColorer): BarItem {
+	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer): BarItem {
 		return {
 			...this._createDefaultItem(time, bar, colorer),
 			color: colorer.barStyle(time).barColor,
