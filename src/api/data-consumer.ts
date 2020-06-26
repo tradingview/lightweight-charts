@@ -15,6 +15,13 @@ export function isUTCTimestamp(time: Time): time is UTCTimestamp {
 }
 
 /**
+ * Structure describing whitespace data item (data point without series' data)
+ */
+export interface WhitespaceData {
+	time: Time;
+}
+
+/**
  * Structure describing single data item for series of type Line or Area
  */
 export interface LineData {
@@ -45,12 +52,16 @@ export interface BarData {
 	close: number;
 }
 
+export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
+	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
+}
+
 export interface SeriesDataItemTypeMap {
-	Bar: BarData;
-	Candlestick: BarData;
-	Area: LineData;
-	Line: LineData;
-	Histogram: HistogramData;
+	Bar: BarData | WhitespaceData;
+	Candlestick: BarData | WhitespaceData;
+	Area: LineData | WhitespaceData;
+	Line: LineData | WhitespaceData;
+	Histogram: HistogramData | WhitespaceData;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {

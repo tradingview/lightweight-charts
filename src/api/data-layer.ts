@@ -14,7 +14,7 @@ import {
 	SeriesDataItemTypeMap,
 	Time,
 } from './data-consumer';
-import { getSeriesPlotRowCreator } from './get-series-plot-row-creator';
+import { getSeriesPlotRowCreator, isSeriesPlotRow, WhitespacePlotRow } from './get-series-plot-row-creator';
 import { fillWeightsForPoints } from './time-scale-point-weight-generator';
 
 type TimedData = Pick<SeriesDataItemTypeMap[SeriesType], 'time'>;
@@ -105,7 +105,7 @@ export interface TimeScaleChanges {
 	/**
 	 * An array of the new time scale points
 	 */
-	points: readonly TimeScalePoint[];
+	points?: readonly TimeScalePoint[];
 
 	/**
 	 * In terms of time scale "base index" means the latest time scale point with data (there might be whitespaces)
@@ -134,7 +134,7 @@ export interface DataUpdateResponse {
 	/**
 	 * Contains optional time scale points
 	 */
-	timeScale?: TimeScaleChanges;
+	timeScale: TimeScaleChanges;
 }
 
 interface TimePointData {
@@ -143,7 +143,7 @@ interface TimePointData {
 
 	// actually the type of the value should be related to the series' type (generic type)
 	// here, in data layer all data for us is "mutable" by default, but to the chart we provide "readonly" data, to avoid modifying it
-	mapping: Map<Series, Mutable<SeriesPlotRow>>;
+	mapping: Map<Series, Mutable<SeriesPlotRow | WhitespacePlotRow>>;
 }
 
 function createEmptyTimePointData(timePoint: TimePoint): TimePointData {
@@ -174,7 +174,7 @@ export class DataLayer {
 			this._pointDataByTimePoint.forEach((pointData: TimePointData) => pointData.mapping.delete(series));
 		}
 
-		let seriesRows: SeriesPlotRow[] = [];
+		let seriesRows: (SeriesPlotRow | WhitespacePlotRow)[] = [];
 
 		if (data.length !== 0) {
 			convertStringsToBusinessDays(data);
@@ -237,21 +237,29 @@ export class DataLayer {
 		const plotRow = createPlotRow(time, pointDataAtTime.index, data);
 		pointDataAtTime.mapping.set(series, plotRow);
 
-		this._updateLastSeriesRow(series, plotRow);
+		const seriesChanges = this._updateLastSeriesRow(series, plotRow);
 
 		// if point already exist on the time scale - we don't need to make a full update and just make an incremental one
 		if (!affectsTimeScale) {
 			const seriesUpdate = new Map<Series, SeriesChanges>();
-			const seriesData = ensureDefined(this._seriesRowsBySeries.get(series));
-			seriesUpdate.set(series, { data: [seriesData[seriesData.length - 1]], fullUpdate: false });
-			return { series: seriesUpdate };
+			if (seriesChanges !== null) {
+				seriesUpdate.set(series, seriesChanges);
+			}
+
+			return {
+				series: seriesUpdate,
+				timeScale: {
+					// base index might be updated even if no time scale point is changed
+					baseIndex: this._getBaseIndex(),
+				},
+			};
 		}
 
 		// but if we don't have such point on the time scale - we need to generate "full" update (including time scale update)
 		return this._syncIndexesAndApplyChanges(series);
 	}
 
-	private _updateLastSeriesRow(series: Series, plotRow: SeriesPlotRow): void {
+	private _updateLastSeriesRow(series: Series, plotRow: SeriesPlotRow | WhitespacePlotRow): SeriesChanges | null {
 		let seriesData = this._seriesRowsBySeries.get(series);
 		if (seriesData === undefined) {
 			seriesData = [];
@@ -260,18 +268,44 @@ export class DataLayer {
 
 		const lastSeriesRow = seriesData.length !== 0 ? seriesData[seriesData.length - 1] : null;
 
+		let result: SeriesChanges | null = null;
+
 		if (lastSeriesRow === null || plotRow.time.timestamp > lastSeriesRow.time.timestamp) {
-			seriesData.push(plotRow);
+			if (isSeriesPlotRow(plotRow)) {
+				seriesData.push(plotRow);
+
+				result = {
+					fullUpdate: false,
+					data: [plotRow],
+				};
+			}
 		} else {
-			seriesData[seriesData.length - 1] = plotRow;
+			if (isSeriesPlotRow(plotRow)) {
+				seriesData[seriesData.length - 1] = plotRow;
+
+				result = {
+					fullUpdate: false,
+					data: [plotRow],
+				};
+			} else {
+				seriesData.splice(-1, 1);
+
+				// we just removed point from series - needs generate full update
+				result = {
+					fullUpdate: true,
+					data: seriesData,
+				};
+			}
 		}
 
 		this._seriesLastTimePoint.set(series, plotRow.time);
+
+		return result;
 	}
 
-	private _setRowsToSeries(series: Series, seriesRows: SeriesPlotRow[]): void {
+	private _setRowsToSeries(series: Series, seriesRows: (SeriesPlotRow | WhitespacePlotRow)[]): void {
 		if (seriesRows.length !== 0) {
-			this._seriesRowsBySeries.set(series, seriesRows);
+			this._seriesRowsBySeries.set(series, seriesRows.filter(isSeriesPlotRow));
 			this._seriesLastTimePoint.set(series, seriesRows[seriesRows.length - 1].time);
 		} else {
 			this._seriesRowsBySeries.delete(series);
@@ -333,7 +367,7 @@ export class DataLayer {
 			pointData.index = index as TimePointIndex;
 
 			// and then we need to sync indexes for all series
-			pointData.mapping.forEach((seriesRow: Mutable<SeriesPlotRow>) => {
+			pointData.mapping.forEach((seriesRow: Mutable<SeriesPlotRow | WhitespacePlotRow>) => {
 				seriesRow.index = index as TimePointIndex;
 			});
 		}
@@ -344,6 +378,18 @@ export class DataLayer {
 		this._sortedTimePoints = newTimePoints;
 
 		return firstChangedPointIndex;
+	}
+
+	private _getBaseIndex(): TimePointIndex {
+		let baseIndex = 0 as TimePointIndex;
+
+		this._seriesRowsBySeries.forEach((data: SeriesPlotRow[]) => {
+			if (data.length !== 0) {
+				baseIndex = Math.max(baseIndex, data[data.length - 1].index) as TimePointIndex;
+			}
+		});
+
+		return baseIndex;
 	}
 
 	/**
@@ -358,26 +404,22 @@ export class DataLayer {
 
 		const firstChangedPointIndex = this._updateTimeScalePoints(newTimeScalePoints);
 
-		const dataUpdateResponse: DataUpdateResponse = { series: new Map() };
+		const dataUpdateResponse: DataUpdateResponse = {
+			series: new Map(),
+			timeScale: {
+				baseIndex: this._getBaseIndex(),
+			},
+		};
 
 		if (firstChangedPointIndex !== -1) {
-			let baseIndex = 0 as TimePointIndex;
-
 			// time scale is changed, so we need to make "full" update for every series
 			// TODO: it's possible to make perf improvements by checking what series has data after firstChangedPointIndex
 			// but let's skip for now
 			this._seriesRowsBySeries.forEach((data: SeriesPlotRow[], s: Series) => {
 				dataUpdateResponse.series.set(s, { data, fullUpdate: true });
-
-				if (data.length !== 0) {
-					baseIndex = Math.max(baseIndex, data[data.length - 1].index) as TimePointIndex;
-				}
 			});
 
-			dataUpdateResponse.timeScale = {
-				points: this._sortedTimePoints,
-				baseIndex,
-			};
+			dataUpdateResponse.timeScale.points = this._sortedTimePoints;
 		} else {
 			const seriesData = this._seriesRowsBySeries.get(series);
 			// if no seriesData found that means that we just removed the series

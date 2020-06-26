@@ -334,10 +334,7 @@ export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesC
 	private _sendUpdateToChart(update: DataUpdateResponse): void {
 		const model = this._chartWidget.model();
 
-		if (update.timeScale !== undefined) {
-			model.updateTimeScale(update.timeScale.points, update.timeScale.baseIndex);
-		}
-
+		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points);
 		update.series.forEach((value: SeriesChanges, series: Series) => series.updateData(value.data, value.fullUpdate));
 
 		model.recalculateAllPanes();

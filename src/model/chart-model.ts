@@ -470,8 +470,10 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	public updateTimeScale(newPoints: readonly TimeScalePoint[], newBaseIndex: TimePointIndex): void {
-		this._timeScale.update(newPoints);
+	public updateTimeScale(newBaseIndex: TimePointIndex, newPoints?: readonly TimeScalePoint[]): void {
+		if (newPoints !== undefined) {
+			this._timeScale.update(newPoints);
+		}
 
 		const currentBaseIndex = this._timeScale.baseIndex();
 		const visibleBars = this._timeScale.visibleStrictRange();
