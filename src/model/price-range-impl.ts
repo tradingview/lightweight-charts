@@ -26,16 +26,8 @@ export class PriceRangeImpl {
 		return this._minValue;
 	}
 
-	public setMinValue(v: number): void {
-		this._minValue = v;
-	}
-
 	public maxValue(): number {
 		return this._maxValue;
-	}
-
-	public setMaxValue(v: number): void {
-		this._maxValue = v;
 	}
 
 	public length(): number {
@@ -54,16 +46,6 @@ export class PriceRangeImpl {
 			Math.min(this.minValue(), anotherRange.minValue()),
 			Math.max(this.maxValue(), anotherRange.maxValue())
 		);
-	}
-
-	public apply(min: number, max: number): void {
-		this._minValue = Math.min(this._minValue, min);
-		this._maxValue = Math.max(this._maxValue, max);
-	}
-
-	public set(min: number, max: number): void {
-		this._minValue = min;
-		this._maxValue = max;
 	}
 
 	public scaleAroundCenter(coeff: number): void {
@@ -92,11 +74,6 @@ export class PriceRangeImpl {
 
 		this._maxValue += delta;
 		this._minValue += delta;
-	}
-
-	public containsStrictly(priceRange: PriceRangeImpl): boolean {
-		return priceRange.minValue() > this._minValue &&
-			priceRange.maxValue() < this._maxValue;
 	}
 
 	public toRaw(): PriceRange {

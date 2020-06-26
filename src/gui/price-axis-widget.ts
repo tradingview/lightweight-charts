@@ -49,8 +49,6 @@ export class PriceAxisWidget implements IDestroyable {
 	private _mouseEventHandler: MouseEventHandler;
 	private _mousedown: boolean = false;
 
-	private _isVisible: boolean = true;
-
 	private readonly _widthCache: TextWidthCache = new TextWidthCache(50);
 	private _tickMarksCache: LabelsImageCache = new LabelsImageCache(11, '#000');
 
@@ -117,8 +115,8 @@ export class PriceAxisWidget implements IDestroyable {
 
 		if (this._priceScale !== null) {
 			this._priceScale.onMarksChanged().unsubscribeAll(this);
-			this._priceScale.optionsChanged().unsubscribeAll(this);
 		}
+
 		this._priceScale = null;
 
 		if (this._updateTimeout !== null) {
@@ -173,7 +171,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	public optimalWidth(): number {
-		if (!this.isVisible() || this._priceScale === null) {
+		if (this._priceScale === null) {
 			return 0;
 		}
 
@@ -241,7 +239,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 		if (this._priceScale !== null) {
 			this._priceScale.onMarksChanged().unsubscribeAll(this);
-			this._priceScale.optionsChanged().unsubscribeAll(this);
 		}
 
 		this._priceScale = priceScale;
@@ -252,29 +249,6 @@ export class PriceAxisWidget implements IDestroyable {
 		return this._priceScale;
 	}
 
-	public isVisible(): boolean {
-		return this._isVisible;
-	}
-
-	public setVisible(visible: boolean): void {
-		if (visible === this._isVisible) {
-			return;
-		}
-		if (visible) {
-			this._cell.style.display = 'table-cell';
-		} else {
-			this._cell.style.display = 'none';
-		}
-
-		this._isVisible = visible;
-	}
-
-	public setAutoScale(on: boolean): void {
-		const pane = this._pane.state();
-		const model = this._pane.chart().model();
-		model.setPriceAutoScale(pane, ensureNotNull(this.priceScale()), on);
-	}
-
 	public reset(): void {
 		const pane = this._pane.state();
 		const model = this._pane.chart().model();
@@ -282,7 +256,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	public paint(type: InvalidationLevel): void {
-		if (!this._isVisible || this._size === null) {
+		if (this._size === null) {
 			return;
 		}
 
@@ -307,10 +281,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 	public getImage(): HTMLCanvasElement {
 		return this._canvasBinding.canvas;
-	}
-
-	public isLeft(): boolean {
-		return this._isLeft;
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {

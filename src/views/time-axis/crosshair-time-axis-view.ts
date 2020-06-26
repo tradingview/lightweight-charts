@@ -5,9 +5,9 @@ import { ChartModel } from '../../model/chart-model';
 import { Crosshair, TimeAndCoordinateProvider } from '../../model/crosshair';
 import { TimeAxisViewRenderer, TimeAxisViewRendererData } from '../../renderers/time-axis-view-renderer';
 
-import { TimeAxisView } from './time-axis-view';
+import { ITimeAxisView } from './itime-axis-view';
 
-export class CrosshairTimeAxisView extends TimeAxisView {
+export class CrosshairTimeAxisView implements ITimeAxisView {
 	private _invalidated: boolean = true;
 	private readonly _crosshair: Crosshair;
 	private readonly _model: ChartModel;
@@ -23,8 +23,6 @@ export class CrosshairTimeAxisView extends TimeAxisView {
 	};
 
 	public constructor(crosshair: Crosshair, model: ChartModel, valueProvider: TimeAndCoordinateProvider) {
-		super();
-
 		this._crosshair = crosshair;
 		this._model = model;
 		this._valueProvider = valueProvider;

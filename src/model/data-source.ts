@@ -1,6 +1,6 @@
 import { IPaneView } from '../views/pane/ipane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
-import { TimeAxisView } from '../views/time-axis/time-axis-view';
+import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { IDataSource } from './idata-source';
 import { Pane } from './pane';
@@ -35,7 +35,7 @@ export abstract class DataSource implements IDataSource {
 		return [];
 	}
 
-	public timeAxisViews(): ReadonlyArray<TimeAxisView> {
+	public timeAxisViews(): ReadonlyArray<ITimeAxisView> {
 		return [];
 	}
 

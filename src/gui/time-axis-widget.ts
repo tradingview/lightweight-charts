@@ -214,14 +214,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
-	public width(): number {
-		return this._size.w;
-	}
-
-	public height(): number {
-		return this._size.h;
-	}
-
 	public optimalHeight(): number {
 		const rendererOptions = this._getRendererOptions();
 		return Math.ceil(

@@ -102,7 +102,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
 	private readonly _customPriceLines: CustomPriceLine[] = [];
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
-	private _endOfData: boolean = false;
 	private _paneView!: IUpdatablePaneView;
 	private _barColorerCache: SeriesBarColorer | null = null;
 	private readonly _options: SeriesOptionsInternal<T>;
@@ -115,7 +114,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._options = options;
 		this._seriesType = seriesType;
 
-		const priceAxisView = new SeriesPriceAxisView(this, { model: model });
+		const priceAxisView = new SeriesPriceAxisView(this);
 		this._priceAxisViews = [priceAxisView];
 
 		this._panePriceAxisView = new PanePriceAxisView(priceAxisView, this, model);
@@ -126,10 +125,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public destroy(): void {
-	}
-
-	public endOfData(): boolean {
-		return this._endOfData;
 	}
 
 	public priceLineColor(lastBarColor: string): string {
@@ -282,10 +277,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().lightUpdate();
 	}
 
-	public markers(): SeriesMarker<TimePoint>[] {
-		return this._markers;
-	}
-
 	public indexedMarkers(): InternalSeriesMarker<TimePointIndex>[] {
 		return this._indexedMarkers;
 	}
@@ -333,19 +324,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public bars(): SeriesPlotList<T> {
 		return this._data;
-	}
-
-	public nearestIndex(index: TimePointIndex, options?: PlotRowSearchMode): TimePointIndex | null {
-		const res = this.nearestData(index, options);
-		return res ? res.index : null;
-	}
-
-	public nearestData(index: TimePointIndex, options?: PlotRowSearchMode): SeriesPlotRow<T> | null {
-		if (!isInteger(index)) {
-			return null;
-		}
-
-		return this._data.search(index, options);
 	}
 
 	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
@@ -427,14 +405,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		this._priceLineView.update();
 		this._baseHorizontalLineView.update();
-	}
-
-	public setPriceScale(priceScale: PriceScale): void {
-		if (this._priceScale === priceScale) {
-			return;
-		}
-
-		this._priceScale = priceScale;
 	}
 
 	public priceScale(): PriceScale {

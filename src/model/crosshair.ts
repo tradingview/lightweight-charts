@@ -9,7 +9,7 @@ import { CrosshairPriceAxisView } from '../views/price-axis/crosshair-price-axis
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { CrosshairTimeAxisView } from '../views/time-axis/crosshair-time-axis-view';
-import { TimeAxisView } from '../views/time-axis/time-axis-view';
+import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { BarPrice } from './bar';
 import { ChartModel } from './chart-model';
@@ -139,10 +139,6 @@ export class Crosshair extends DataSource {
 		this._paneView = new CrosshairPaneView(this);
 	}
 
-	public index(): TimePointIndex {
-		return this._index;
-	}
-
 	public options(): Readonly<CrosshairOptions> {
 		return this._options;
 	}
@@ -228,7 +224,7 @@ export class Crosshair extends DataSource {
 		return views;
 	}
 
-	public timeAxisViews(): ReadonlyArray<TimeAxisView> {
+	public timeAxisViews(): ReadonlyArray<ITimeAxisView> {
 		return this._visible ? [this._timeAxisView] : [];
 	}
 
@@ -237,6 +233,7 @@ export class Crosshair extends DataSource {
 	}
 
 	public updateAllViews(): void {
+		this._paneView.update();
 		this._priceAxisViews.forEach((value: PriceAxisView) => value.update());
 		this._timeAxisView.update();
 		this._markersPaneView.update();
