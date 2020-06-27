@@ -41,7 +41,7 @@ function promisleep(ms: number): Promise<void> {
 
 describe('Memleaks tests', () => {
 	const puppeteerOptions: LaunchOptions = {};
-	if (Boolean(process.env.NO_SANDBOX)) {
+	if (process.env.NO_SANDBOX) {
 		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
 	}
 
