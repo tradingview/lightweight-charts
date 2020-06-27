@@ -6,12 +6,3 @@ checks:
           maxSize: 44.5KB
         - path: "./dist/lightweight-charts.standalone.production.js"
           maxSize: 45KB
-
-  - name: typecov
-    options:
-      atLeast: 99.9
-      ignoreCatch: true
-      strict: true
-      ignoreFiles:
-        - "lib/**"
-        - "src/helpers/strict-type-checks.ts"
