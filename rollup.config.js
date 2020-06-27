@@ -45,6 +45,7 @@ function getConfig(inputFile, type, isProd) {
 			isProd && terser({
 				output: {
 					comments: /@license/,
+					// eslint-disable-next-line camelcase
 					inline_script: true,
 				},
 				mangle: {
@@ -55,7 +56,7 @@ function getConfig(inputFile, type, isProd) {
 				},
 			}),
 		],
-		external: id => isModular && /^fancy-canvas(\/.+)?$/.test(id),
+		external: (id) => isModular && /^fancy-canvas(\/.+)?$/.test(id),
 	};
 
 	return config;

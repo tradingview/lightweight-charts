@@ -10,7 +10,7 @@ function serveLocalFiles(filesToServe, port, hostname) {
 		return Promise.resolve(null);
 	}
 
-	if (Array.from(filesToServe.values()).some(p => !fs.existsSync(p))) {
+	if (Array.from(filesToServe.values()).some((p) => !fs.existsSync(p))) {
 		return Promise.reject('Some of files does not exist');
 	}
 
@@ -24,7 +24,7 @@ function serveLocalFiles(filesToServe, port, hostname) {
 		}
 	});
 
-	return new Promise(resolve => {
+	return new Promise((resolve) => {
 		console.log(`Running a server on ${hostname}:${port} to serve ${filesToServe.size} local file(s)`);
 		const server = app.listen(port, hostname, () => {
 			resolve(() => {
@@ -75,7 +75,7 @@ function main() {
 }
 
 if (require.main === module) {
-	main().catch(e => {
+	main().catch((e) => {
 		console.error('Error:', e);
 		process.exitCode = 1;
 	});

@@ -22,7 +22,7 @@ function runTestCase(container) {
 	mainSeries.setData(generateData(61));
 
 	// series has data with indexes/values [0..10, 30..60]
-	series.setData(generateData(61).filter(item => item.value <= 10 || item.value >= 30));
+	series.setData(generateData(61).filter((item) => item.value <= 10 || item.value >= 30));
 
 	chart.timeScale().fitContent();
 

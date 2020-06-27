@@ -55,7 +55,7 @@ function runMocha(closeServer) {
 	mocha.diff(mochaConfig.diff);
 	mocha.addFile(path.resolve(__dirname, './memleaks-test-cases.ts'));
 
-	mocha.run(failures => {
+	mocha.run((failures) => {
 		if (closeServer !== null) {
 			closeServer();
 		}

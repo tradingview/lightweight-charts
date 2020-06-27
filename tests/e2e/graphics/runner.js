@@ -62,7 +62,7 @@ function runMocha(closeServer) {
 	mocha.diff(mochaConfig.diff);
 	mocha.addFile(path.resolve(__dirname, './graphics-test-cases.ts'));
 
-	mocha.run(failures => {
+	mocha.run((failures) => {
 		if (closeServer !== null) {
 			closeServer();
 		}

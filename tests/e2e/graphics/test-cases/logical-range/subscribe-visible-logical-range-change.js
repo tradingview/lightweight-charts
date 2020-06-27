@@ -21,14 +21,14 @@ function runTestCase(container) {
 	const data = generateData(10);
 	series.setData(data);
 
-	return new Promise(resolve => {
+	return new Promise((resolve) => {
 		setTimeout(() => {
 			const timeScale = chart.timeScale();
 
 			const range = { from: 0, to: 5 };
 			timeScale.setVisibleLogicalRange(range);
 
-			timeScale.subscribeVisibleLogicalRangeChange(newRange => {
+			timeScale.subscribeVisibleLogicalRangeChange((newRange) => {
 				console.assert(newRange !== null, 'newRange shouldn\'t be null');
 				console.assert(newRange.from === range.from, `from index should be the same as previously set, expected=${range.to}, actual=${newRange.from}`);
 				console.assert(newRange.to === range.to, `to index should be the same as previously set, expected=${range.to}, actual=${newRange.to}`);

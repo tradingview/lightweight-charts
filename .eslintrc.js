@@ -4,13 +4,58 @@ module.exports = {
 		es6: true,
 		node: true,
 	},
-	plugins: ['markdown'],
-	extends: 'eslint:recommended',
+	plugins: [
+		'import',
+		'jsdoc',
+		'markdown',
+		'prefer-arrow',
+		'unicorn',
+	],
+	extends: [
+		'eslint:recommended',
+	],
 	parserOptions: {
 		ecmaVersion: 2015,
 		sourceType: 'module',
 	},
 	overrides: [
+		{
+			// rules specific for js files only
+			files: ['**/*.js'],
+			rules: {
+				// enforces no braces where they can be omitted
+				// http://eslint.org/docs/rules/arrow-body-style
+				'arrow-body-style': ['error', 'as-needed'],
+
+				// enforce one true brace style
+				'brace-style': ['error', '1tbs', { allowSingleLine: true }],
+
+				// require camel case names
+				camelcase: 'error',
+
+				// encourages use of dot notation whenever possible
+				'dot-notation': ['error', { allowKeywords: true }],
+
+				// this option sets a specific tab width for your code
+				// https://github.com/eslint/eslint/blob/master/docs/rules/indent.md
+				indent: ['error', 'tab', { SwitchCase: 1, VariableDeclarator: 1 }],
+
+				// disallow use of undeclared variables unless mentioned in a /*global */ block
+				'no-undef': 'error',
+
+				// disallow usage of expressions in statement position
+				'no-unused-expressions': 'error',
+
+				// disallow declaration of variables that are not used in the code
+				'no-unused-vars': ['error', { vars: 'local', args: 'none' }],
+
+				// specify whether double or single quotes should be used
+				quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
+
+				// require or disallow use of semicolons instead of ASI
+				semi: ['error', 'always'],
+			},
+		},
 		{
 			files: ['**/*.md'],
 			processor: 'markdown/markdown',
@@ -27,6 +72,8 @@ module.exports = {
 			rules: {
 				'no-console': 'off',
 				indent: ['error', 4],
+
+				'unicorn/filename-case': 'off',
 			},
 		},
 	],
@@ -35,14 +82,20 @@ module.exports = {
 		// http://eslint.org/docs/rules/array-callback-return
 		'array-callback-return': 'error',
 
+		// enforce a maximum cyclomatic complexity allowed in a program
+		complexity: ['error', { max: 13 }],
+
 		// specify curly brace conventions for all control statements
 		curly: ['error', 'all'],
 
-		// encourages use of dot notation whenever possible
-		'dot-notation': ['error', { allowKeywords: true }],
-
 		// require the use of === and !==
 		eqeqeq: ['error', 'smart'],
+
+		// require `for-in` loops to include an `if` statement
+		'guard-for-in': 'error',
+
+		// enforce a maximum number of classes per file
+		'max-classes-per-file': ['error', 5],
 
 		// disallow the use of alert, confirm, and prompt
 		'no-alert': 'warn',
@@ -106,6 +159,9 @@ module.exports = {
 		// disallow use of assignment in return statement
 		'no-return-assign': 'error',
 
+		// disallow unnecessary `return await`
+		'no-return-await': 'error',
+
 		// disallow use of `javascript:` urls.
 		'no-script-url': 'error',
 
@@ -117,9 +173,6 @@ module.exports = {
 
 		// restrict what can be thrown as an exception
 		'no-throw-literal': 'error',
-
-		// disallow usage of expressions in statement position
-		'no-unused-expressions': 'error',
 
 		// requires to declare all vars on top of their containing scope
 		// 'vars-on-top': 2,
@@ -138,14 +191,13 @@ module.exports = {
 		// disallow unnecessary parentheses
 		'no-extra-parens': ['error', 'functions'],
 
+		// disallow template literal placeholder syntax in regular strings
+		'no-template-curly-in-string': 'error',
+
 		// Avoid code that looks like two expressions but is actually one
 		'no-unexpected-multiline': 'off',
 
 		// es6
-
-		// enforces no braces where they can be omitted
-		// http://eslint.org/docs/rules/arrow-body-style
-		'arrow-body-style': ['error', 'as-needed'],
 
 		// require space before/after arrow function's arrow
 		// https://github.com/eslint/eslint/blob/master/docs/rules/arrow-spacing.md
@@ -153,6 +205,9 @@ module.exports = {
 
 		// require trailing commas in multiline object literals
 		'comma-dangle': ['error', 'always-multiline'],
+
+		// disallow duplicate module imports
+		'no-duplicate-imports': 'error',
 
 		// require let or const instead of var
 		'no-var': 'error',
@@ -171,6 +226,12 @@ module.exports = {
 		// suggest using of const declaration for variables that are never modified after declared
 		'prefer-const': 'error',
 
+		// require rest parameters instead of `arguments`
+		'prefer-rest-params': 'error',
+
+		// require template literals instead of string concatenation
+		'prefer-template': 'off', // TODO
+
 		// enforce usage of spacing in template strings
 		// http://eslint.org/docs/rules/template-curly-spacing
 		'template-curly-spacing': 'error',
@@ -185,22 +246,17 @@ module.exports = {
 
 		// vars
 
-		// disallow use of undeclared variables unless mentioned in a /*global */ block
-		'no-undef': 'error',
+		// disallow variable declarations from shadowing variables declared in the outer scope
+		'no-shadow': 'error',
 
-		// disallow declaration of variables that are not used in the code
-		'no-unused-vars': ['error', { vars: 'local', args: 'none' }],
+		// disallow initializing variables to `undefined`
+		'no-undef-init': 'error',
 
 		// style
 
 		// enforce spacing inside array brackets
 		'array-bracket-spacing': ['error', 'never'],
 
-		// enforce one true brace style
-		'brace-style': ['error', '1tbs', { allowSingleLine: true }],
-
-		// require camel case names
-		// 'camelcase': [2, { 'properties': 'never' }],
 		// enforce spacing before and after comma
 		'comma-spacing': ['error', { before: false, after: true }],
 
@@ -212,10 +268,6 @@ module.exports = {
 
 		// enforce newline at the end of file, with no multiple empty lines
 		'eol-last': 'error',
-
-		// this option sets a specific tab width for your code
-		// https://github.com/eslint/eslint/blob/master/docs/rules/indent.md
-		indent: ['error', 'tab', { SwitchCase: 1, VariableDeclarator: 1 }],
 
 		// specify whether double or single quotes should be used in JSX attributes
 		// http://eslint.org/docs/rules/jsx-quotes
@@ -235,8 +287,14 @@ module.exports = {
 			},
 		}],
 
+		// enforce a maximum number of parameters in function definitions
+		'max-params': ['error', { max: 6 }],
+
 		// require a capital letter for constructors
 		'new-cap': ['error', { newIsCap: true, capIsNew: false }],
+
+		// enforce or disallow parentheses when invoking a constructor with no arguments
+		'new-parens': ['error', 'always'],
 
 		// disallow use of the Array constructor
 		'no-array-constructor': 'error',
@@ -251,6 +309,9 @@ module.exports = {
 		// 'no-nested-ternary': 2,
 		// disallow use of the Object constructor
 		'no-new-object': 'error',
+
+		// disallow specified syntax
+		'no-restricted-syntax': ['error', 'ForInStatement'],
 
 		// disallow space between function identifier and application
 		'no-spaced-func': 'error',
@@ -280,18 +341,15 @@ module.exports = {
 		// enforce padding within blocks
 		'padded-blocks': ['error', 'never'],
 
+		// disallow using Object.assign with an object literal as the first argument and prefer the use of object spread instead.
+		'prefer-object-spread': 'error',
+
 		// require quotes around object literal property names
 		// http://eslint.org/docs/rules/quote-props.html
 		'quote-props': ['error', 'as-needed', { keywords: false, unnecessary: true, numbers: false }],
 
-		// specify whether double or single quotes should be used
-		quotes: ['error', 'single', 'avoid-escape'],
-
 		// enforce spacing before and after semicolons
 		'semi-spacing': ['error', { before: false, after: true }],
-
-		// require or disallow use of semicolons instead of ASI
-		semi: ['error', 'always'],
 
 		// require or disallow space before blocks
 		'space-before-blocks': 'error',
@@ -311,5 +369,20 @@ module.exports = {
 			exceptions: ['-', '+'],
 			markers: ['=', '!'], // space here to support sprockets directives
 		}],
+
+		'jsdoc/check-indentation': 'error',
+		'jsdoc/newline-after-description': 'error',
+
+		'import/no-default-export': 'error',
+
+		'prefer-arrow/prefer-arrow-functions': [
+			'error',
+			{
+				singleReturnOnly: true,
+				allowStandaloneDeclarations: true,
+			},
+		],
+
+		'unicorn/filename-case': ['error', { case: 'kebabCase' }],
 	},
 };
