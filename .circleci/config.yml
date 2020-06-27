@@ -102,17 +102,17 @@ jobs:
       - checkout
       - run: scripts/trailing-newlines.sh
 
-  eslint:
+  lint-js:
     executor: node-latest-executor
     steps:
       - checkout-with-deps
-      - run: npm run lint:eslint
+      - run: npm run lint:js
 
-  tslint:
+  lint-ts:
     executor: node-latest-executor
     steps:
       - checkout-with-deps
-      - run: npm run lint:tslint
+      - run: npm run lint:ts
 
   markdown:
     executor: node-latest-executor
@@ -196,11 +196,11 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-      - eslint:
+      - lint-js:
           filters: *default-filters
           requires:
             - install-deps
-      - tslint:
+      - lint-ts:
           filters: *default-filters
           requires:
             - install-deps

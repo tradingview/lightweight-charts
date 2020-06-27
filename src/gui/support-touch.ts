@@ -9,7 +9,7 @@ function checkTouchEvents(): boolean {
 		return true;
 	}
 
-	// tslint:disable-next-line:no-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 	return Boolean((window as any).DocumentTouch && document instanceof (window as any).DocumentTouch);
 }
 

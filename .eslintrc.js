@@ -5,6 +5,9 @@ module.exports = {
 		node: true,
 	},
 	plugins: [
+		'@typescript-eslint',
+		'@typescript-eslint/tslint',
+		'deprecation',
 		'import',
 		'jsdoc',
 		'markdown',
@@ -74,6 +77,254 @@ module.exports = {
 				indent: ['error', 4],
 
 				'unicorn/filename-case': 'off',
+			},
+		},
+		{
+			files: ['**/*.ts'],
+			parser: '@typescript-eslint/parser',
+			extends: [
+				'plugin:@typescript-eslint/eslint-recommended',
+				'plugin:@typescript-eslint/recommended',
+				'plugin:@typescript-eslint/recommended-requiring-type-checking',
+				'plugin:import/typescript',
+			],
+			parserOptions: {
+				project: 'tsconfig.json',
+				sourceType: 'module',
+			},
+			rules: {
+				'@typescript-eslint/array-type': [
+					'error',
+					{
+						default: 'array',
+					},
+				],
+				'@typescript-eslint/brace-style': ['error', '1tbs', { allowSingleLine: true }],
+				'@typescript-eslint/consistent-type-assertions': [
+					'error',
+					{
+						assertionStyle: 'as',
+						objectLiteralTypeAssertions: 'never',
+					},
+				],
+				'@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
+				'@typescript-eslint/dot-notation': 'error',
+				'@typescript-eslint/explicit-member-accessibility': [
+					'error',
+					{
+						accessibility: 'explicit',
+						overrides: {
+							accessors: 'explicit',
+							constructors: 'explicit',
+						},
+					},
+				],
+				'@typescript-eslint/member-delimiter-style': 'error',
+				'@typescript-eslint/member-ordering': [
+					'error',
+					{
+						default: [
+							'signature',
+							'public-static-field',
+							'protected-static-field',
+							'private-static-field',
+							'public-instance-field',
+							'protected-instance-field',
+							'private-instance-field',
+							'constructor',
+							'public-instance-method',
+							'public-static-method',
+							'protected-instance-method',
+							'protected-static-method',
+							'private-instance-method',
+							'private-static-method',
+						],
+					},
+				],
+				'@typescript-eslint/naming-convention': [
+					'error',
+					{ selector: 'default', format: ['camelCase'], leadingUnderscore: 'forbid', trailingUnderscore: 'forbid' },
+
+					{ selector: 'variable', format: ['camelCase', 'UPPER_CASE'] },
+					// {
+					// 	selector: 'variable',
+					// 	types: ['boolean'],
+					// 	format: ['PascalCase'],
+					// 	prefix: ['is', 'should', 'has', 'can', 'did', 'will', 'show', 'enable', 'need'],
+					// },
+
+					{ selector: 'typeLike', format: ['PascalCase'] },
+					{ selector: 'enumMember', format: ['PascalCase'] },
+
+					{ selector: 'memberLike', modifiers: ['private'], leadingUnderscore: 'require', format: ['camelCase'] },
+					{ selector: 'memberLike', modifiers: ['protected'], leadingUnderscore: 'require', format: ['camelCase'] },
+
+					{
+						selector: 'property',
+						format: ['PascalCase'],
+						filter: {
+							match: true,
+							regex: '^(Area|Bar|Candlestick|Histogram|Line)$',
+						},
+					},
+
+					// { selector: 'typeParameter', format: ['PascalCase'], prefix: ['T', 'U'] },
+				],
+				'@typescript-eslint/no-empty-interface': 'off',
+				'@typescript-eslint/no-empty-function': 'off',
+				'@typescript-eslint/no-explicit-any': 'error',
+				'@typescript-eslint/no-extraneous-class': 'error',
+				'@typescript-eslint/no-inferrable-types': [
+					'error',
+					{
+						ignoreParameters: true,
+						ignoreProperties: true,
+					},
+				],
+				'@typescript-eslint/no-invalid-void-type': 'error',
+				'@typescript-eslint/no-namespace': 'off',
+				'@typescript-eslint/no-non-null-assertion': 'error',
+				'@typescript-eslint/no-parameter-properties': 'error',
+				'@typescript-eslint/no-require-imports': 'off',
+				'@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
+				'@typescript-eslint/no-unnecessary-qualifier': 'error',
+				'@typescript-eslint/no-unnecessary-type-arguments': 'off',
+				'@typescript-eslint/no-unsafe-assignment': 'off',
+				'@typescript-eslint/no-unused-expressions': 'error',
+				'@typescript-eslint/no-unused-vars': 'off',
+				'@typescript-eslint/no-use-before-define': 'off',
+				'@typescript-eslint/prefer-for-of': 'off',
+				'@typescript-eslint/prefer-function-type': 'error',
+				'@typescript-eslint/prefer-readonly': 'off', // TODO
+				'@typescript-eslint/promise-function-async': 'off',
+				'@typescript-eslint/restrict-template-expressions': 'off',
+				'@typescript-eslint/quotes': ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
+				'@typescript-eslint/restrict-plus-operands': 'off',
+				'@typescript-eslint/semi': [
+					'error',
+					'always',
+				],
+				'@typescript-eslint/strict-boolean-expressions': 'off',
+				'@typescript-eslint/triple-slash-reference': [
+					'off',
+					{
+						path: 'never',
+						types: 'prefer-import',
+						lib: 'never',
+					},
+				],
+				'@typescript-eslint/type-annotation-spacing': 'error',
+
+				'deprecation/deprecation': 'error',
+
+				// can't use at the moment - see https://github.com/typescript-eslint/typescript-eslint/issues/1824
+				// '@typescript-eslint/indent': [
+				// 	'error',
+				// 	'tab',
+				// 	{
+				// 		SwitchCase: 1,
+				// 		VariableDeclarator: 1,
+				// 	},
+				// ],
+
+				// see https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/ROADMAP.md
+				'@typescript-eslint/tslint/config': [
+					'error',
+					{
+						rulesDirectory: [
+							'node_modules/tslint-eslint-rules/dist/rules',
+							'node_modules/tslint-microsoft-contrib',
+						],
+						rules: {
+							// tslint-microsoft-contrib
+							'no-typeof-undefined': true,
+							'no-unnecessary-local-variable': true,
+							'no-unnecessary-override': true,
+
+							// tslint-eslint-rules
+							'ter-indent': [
+								true,
+								'tab',
+								{
+									SwitchCase: 1,
+									VariableDeclarator: 1,
+								},
+							],
+
+							// tslint core
+							align: [
+								true,
+								'parameters',
+								'arguments',
+								'statements',
+							],
+							'ordered-imports': [
+								true,
+								{
+									'grouped-imports': true,
+									groups: [
+										{
+											name: 'nodejs-core',
+											match: '^(fs|path)$',
+											order: 9,
+										},
+										{
+											name: 'libraries',
+											match: '^[^\\.]+',
+											order: 10,
+										},
+										{
+											name: 'api',
+											match: '\\.\\./api/',
+											order: 20,
+										},
+										{
+											name: 'formatters',
+											match: '\\.\\./formatters/',
+											order: 30,
+										},
+										{
+											name: 'gui',
+											match: '\\.\\./gui/',
+											order: 40,
+										},
+										{
+											name: 'helpers',
+											match: '\\.\\./helpers/',
+											order: 50,
+										},
+										{
+											name: 'model',
+											match: '\\.\\./(renderers|views|model)/',
+											order: 60,
+										},
+										{
+											name: 'current directory',
+											match: '^\\.',
+											order: 70,
+										},
+									],
+								},
+							],
+							'static-this': true,
+							'strict-type-predicates': true,
+
+							// we can't use @typescript-eslint/typedef in couple with @typescript-eslint/explicit-function-return-type
+							// because it isn't the same - explicit-function-return-type requires to specify return type of arrow functions
+							// which cannot be disabled or configured somehow
+							// see https://github.com/typescript-eslint/typescript-eslint/issues/1731
+							// and https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/typedef.md
+							typedef: [
+								true,
+								'call-signature',
+								'parameter',
+								'arrow-parameter',
+								'property-declaration',
+								'member-variable-declaration',
+							],
+						},
+					},
+				],
 			},
 		},
 	],
@@ -367,7 +618,7 @@ module.exports = {
 		// require or disallow a space immediately following the // or /* in a comment
 		'spaced-comment': ['error', 'always', {
 			exceptions: ['-', '+'],
-			markers: ['=', '!'], // space here to support sprockets directives
+			markers: ['=', '!', '/'], // space here to support sprockets directives
 		}],
 
 		'jsdoc/check-indentation': 'error',

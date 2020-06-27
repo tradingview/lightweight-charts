@@ -286,7 +286,7 @@ export class PaneWidget implements IDestroyable {
 		this._tryExitTrackingMode();
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	public pressedMouseMoveEvent(event: TouchMouseEvent): void {
 		if (this._state === null) {
 			return;

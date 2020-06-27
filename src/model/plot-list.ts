@@ -348,7 +348,6 @@ function mergeMinMax(first: MinMax | null, second: MinMax | null): MinMax | null
 export function mergePlotRows<PlotRowType extends PlotRow>(originalPlotRows: readonly PlotRowType[], newPlotRows: readonly PlotRowType[]): PlotRowType[] {
 	const newArraySize = calcMergedArraySize(originalPlotRows, newPlotRows);
 
-	// tslint:disable-next-line:prefer-array-literal
 	const result = new Array<PlotRowType>(newArraySize);
 
 	let originalRowsIndex = 0;

@@ -211,7 +211,7 @@ export class PriceScale {
 		};
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	public setMode(newMode: Partial<PriceScaleState>): void {
 		const oldMode = this.mode();
 		let priceRange: PriceRangeImpl | null = null;
@@ -784,7 +784,7 @@ export class PriceScale {
 		this._markBuilder.rebuildTickMarks();
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	private _recalculatePriceRangeImpl(): void {
 		const visibleBars = this._invalidatedForRange.visibleBars;
 		if (visibleBars === null) {

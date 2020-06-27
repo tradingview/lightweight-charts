@@ -27,7 +27,7 @@ import { priceLineOptionsDefaults } from './options/price-line-options-defaults'
 import { PriceLine } from './price-line-api';
 
 export function migrateOptions<TSeriesType extends SeriesType>(options: SeriesPartialOptionsMap[TSeriesType]): SeriesPartialOptionsInternal<TSeriesType> {
-	// tslint:disable-next-line:deprecation
+	// eslint-disable-next-line deprecation/deprecation
 	const { overlay, ...res } = options;
 	if (overlay) {
 		res.priceScaleId = '';
@@ -77,7 +77,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.priceScale().coordinateToPrice(coordinate as Coordinate, firstValue.value);
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	public barsInLogicalRange(range: Range<number> | null): BarsInfo | null {
 		if (range === null) {
 			return null;

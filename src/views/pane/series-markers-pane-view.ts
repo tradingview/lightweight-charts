@@ -32,8 +32,8 @@ interface Offsets {
 	belowBar: number;
 }
 
+// eslint-disable-next-line max-params
 function fillSizeAndY(
-	// tslint:disable-next-line:max-params
 	rendererItem: SeriesMarkerRendererDataItem,
 	marker: SeriesMarker<TimePointIndex>,
 	seriesData: BarPrices | BarPrice,

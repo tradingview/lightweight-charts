@@ -67,11 +67,11 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 
 function disableSelection(canvas: HTMLCanvasElement): void {
 	canvas.style.userSelect = 'none';
-	// tslint:disable-next-line:deprecation
+	// eslint-disable-next-line deprecation/deprecation
 	canvas.style.webkitUserSelect = 'none';
-	// tslint:disable-next-line:no-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 	(canvas as any).style.msUserSelect = 'none';
-	// tslint:disable-next-line:no-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 	(canvas as any).style.MozUserSelect = 'none';
 
 	canvas.style.webkitTapHighlightColor = 'transparent';

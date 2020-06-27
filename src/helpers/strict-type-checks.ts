@@ -6,9 +6,10 @@ export type DeepPartial<T> = {
 			: DeepPartial<T[P]>
 };
 
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function merge(dst: Record<string, any>, ...sources: Record<string, any>[]): Record<string, any> {
 	for (const src of sources) {
+		// eslint-disable-next-line no-restricted-syntax
 		for (const i in src) {
 			if (src[i] === undefined) {
 				continue;
@@ -46,13 +47,14 @@ export function isBoolean(value: unknown): value is boolean {
 }
 
 export function clone<T>(object: T): T {
-	// tslint:disable-next-line:no-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const o = object as any;
 	if (!o || 'object' !== typeof o) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		return o;
 	}
 
-	// tslint:disable-next-line:no-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let c: any;
 
 	if (Array.isArray(o)) {
@@ -63,17 +65,23 @@ export function clone<T>(object: T): T {
 
 	let p;
 	let v;
+	// eslint-disable-next-line no-restricted-syntax
 	for (p in o) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,no-prototype-builtins
 		if (o.hasOwnProperty(p)) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 			v = o[p];
 			if (v && 'object' === typeof v) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 				c[p] = clone(v);
 			} else {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 				c[p] = v;
 			}
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 	return c;
 }
 

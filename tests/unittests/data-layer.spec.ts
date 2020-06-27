@@ -13,7 +13,7 @@ import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/
 function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Series<T> {
 	const data = new PlotList();
 
-	// tslint:disable-next-line:no-object-literal-type-assertion
+	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	return {
 		bars: () => data,
 		seriesType: () => seriesType || 'Line',

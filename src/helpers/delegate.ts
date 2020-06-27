@@ -6,7 +6,7 @@ interface Listener<T1, T2> {
 	singleshot: boolean;
 }
 
-// tslint:disable-next-line:invalid-void
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 export class Delegate<T1 = void, T2 = void> implements ISubscription<T1, T2> {
 	private _listeners: Listener<T1, T2>[] = [];
 

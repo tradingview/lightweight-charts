@@ -222,10 +222,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 		merge(this._options, options);
 
-		// tslint:disable-next-line:deprecation
+		// eslint-disable-next-line deprecation/deprecation
 		if (this._priceScale !== null && options.scaleMargins !== undefined) {
 			this._priceScale.applyOptions({
-				// tslint:disable-next-line:deprecation
+				// eslint-disable-next-line deprecation/deprecation
 				scaleMargins: options.scaleMargins,
 			});
 		}

@@ -317,7 +317,7 @@ export class ChartWidget implements IDestroyable {
 		return ensureNotNull(priceAxisWidget).getWidth();
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	private _adjustSizeImpl(): void {
 		let totalStretch = 0;
 		let leftPriceAxisWidth = 0;

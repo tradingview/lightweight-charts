@@ -64,10 +64,6 @@ function runForFiles(cmd, files) {
 	return run(cmd);
 }
 
-function runTSLintForFiles(tsFiles) {
-	return runForFiles('node ./node_modules/tslint/bin/tslint --config tslint.json', tsFiles);
-}
-
 function runESLintForFiles(files) {
 	return runForFiles('node ./node_modules/eslint/bin/eslint --quiet --format=unix', files);
 }
@@ -86,15 +82,11 @@ function lintFiles(files) {
 	// eslint
 	hasErrors = runESLintForFiles(filterByExt(files, '.js')) || hasErrors;
 
-	// tsc & tslint
+	// tsc & eslint for ts files
 	const tsFiles = filterByExt(files, '.ts');
 	if (tsFiles.length !== 0) {
 		hasErrors = run('npm run tsc-verify') || hasErrors;
-
-		// we won't run tslint for all files
-		// because it's slow as fuck (18s for all project)
-		// but we want to commit asap
-		hasErrors = runTSLintForFiles(tsFiles) || hasErrors;
+		hasErrors = runESLintForFiles(tsFiles) || hasErrors;
 	}
 
 	// markdown

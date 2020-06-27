@@ -23,11 +23,13 @@ const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
 async function getReferencesCount(frame: Frame, prototypeReference: JSHandle): Promise<number> {
+	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const context = await frame.executionContext();
+	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const activeRefsHandle = await context.queryObjects(prototypeReference);
 	const activeRefsCount = await (await activeRefsHandle.getProperty('length')).jsonValue() as number;
 
-	activeRefsHandle.dispose();
+	await activeRefsHandle.dispose();
 
 	return activeRefsCount;
 }
@@ -62,6 +64,7 @@ describe('Memleaks tests', () => {
 	});
 
 	for (const testCase of testCases) {
+		// eslint-disable-next-line no-loop-func
 		it(testCase.name, async () => {
 			const pageContent = generatePageContent(testStandalonePath, testCase.caseContent);
 
@@ -88,6 +91,7 @@ describe('Memleaks tests', () => {
 			};
 
 			const frame = page.mainFrame();
+			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const context = await frame.executionContext();
 
 			const prototype = await context.evaluateHandle(getCanvasPrototype);
@@ -103,7 +107,7 @@ describe('Memleaks tests', () => {
 			// now remove chart
 
 			await page.evaluate(() => {
-				// tslint:disable-next-line:no-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
 				(window as any).chart.remove();
 			});
 
