@@ -40,7 +40,6 @@
     "@types/chai": "~4.2.9",
     "@types/mocha": "~7.0.1",
     "chai": "~4.2.0",
-    "clean-publish": "~1.1.5",
     "cross-env": "~7.0.0",
     "dts-bundle-generator": "~4.3.0",
     "eslint": "~7.2.0",
@@ -86,6 +85,8 @@
     "build": "npm-run-all tsc rollup bundle-dts",
     "build:watch": "npm-run-all tsc -p tsc-watch rollup-watch",
     "build:prod": "cross-env NODE_ENV=production npm run build",
+    "build:release": "cross-env BUILD_TAG=release npm run build:prod",
+    "prepare-release": "npm-run-all clean build:release && node ./scripts/clean-package-json.js",
     "codechecks": "codechecks",
     "verify": "npm-run-all clean -p lint check-markdown-links build:prod -p tsc-verify test codechecks",
     "test": "mocha tests/unittests/**/*.spec.ts"
