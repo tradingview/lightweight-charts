@@ -23,9 +23,7 @@ const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
 async function getReferencesCount(frame: Frame, prototypeReference: JSHandle): Promise<number> {
-	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const context = await frame.executionContext();
-	// eslint-disable-next-line @typescript-eslint/await-thenable
 	const activeRefsHandle = await context.queryObjects(prototypeReference);
 	const activeRefsCount = await (await activeRefsHandle.getProperty('length')).jsonValue() as number;
 
@@ -91,7 +89,6 @@ describe('Memleaks tests', () => {
 			};
 
 			const frame = page.mainFrame();
-			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const context = await frame.executionContext();
 
 			const prototype = await context.evaluateHandle(getCanvasPrototype);
