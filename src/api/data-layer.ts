@@ -64,7 +64,7 @@ export function convertTime(time: Time): TimePoint {
 	return businessDayConverter(time);
 }
 
-const validDateRegex = /^\d\d\d\d-\d\d\-\d\d$/;
+const validDateRegex = /^\d\d\d\d-\d\d-\d\d$/;
 
 export function stringToBusinessDay(value: string): BusinessDay {
 	if (process.env.NODE_ENV === 'development') {

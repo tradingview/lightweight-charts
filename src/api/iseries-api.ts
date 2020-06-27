@@ -62,11 +62,11 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 *
 	 * @param range - the logical range to retrieve info for
 	 * @returns the bars info for the given logical range: fields `from` and `to` are
-	 *   `Logical` values for the first and last bar within the range, and `barsBefore` and
-	 *   `barsAfter` count the the available bars outside the given index range. If these
-	 *   values are negative, it means that the given range us not fully filled with bars
-	 *   on the given side, but bars are missing instead (would show up as a margin if the
-	 *   the given index range falls into the viewport).
+	 * `Logical` values for the first and last bar within the range, and `barsBefore` and
+	 * `barsAfter` count the the available bars outside the given index range. If these
+	 * values are negative, it means that the given range us not fully filled with bars
+	 * on the given side, but bars are missing instead (would show up as a margin if the
+	 * the given index range falls into the viewport).
 	 */
 	barsInLogicalRange(range: Range<number>): BarsInfo | null;
 

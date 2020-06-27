@@ -177,7 +177,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return lowerbound(
 			this._items,
 			index,
-			(a: PlotRowType, b: TimePointIndex) => { return a.index < b; }
+			(a: PlotRowType, b: TimePointIndex) => a.index < b
 		);
 	}
 
@@ -185,7 +185,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return upperbound(
 			this._items,
 			index,
-			(a: TimePointIndex, b: PlotRowType) => { return b.index > a; }
+			(a: TimePointIndex, b: PlotRowType) => b.index > a
 		);
 	}
 
