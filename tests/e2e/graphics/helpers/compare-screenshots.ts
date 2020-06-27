@@ -6,7 +6,7 @@ export interface CompareResult {
 	diffImg: PNG;
 }
 
-export async function compareScreenshots(leftImg: PNG, rightImg: PNG): Promise<CompareResult> {
+export function compareScreenshots(leftImg: PNG, rightImg: PNG): CompareResult {
 	if (leftImg.width !== rightImg.width) {
 		throw new Error('image widths should be the same');
 	}

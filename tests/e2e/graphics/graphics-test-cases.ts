@@ -154,7 +154,7 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 			}
 
 			if (goldenScreenshot !== null && testScreenshot !== null) {
-				const compareResult = await compareScreenshots(goldenScreenshot, testScreenshot);
+				const compareResult = compareScreenshots(goldenScreenshot, testScreenshot);
 
 				writeTestDataItem('3.diff.png', PNG.sync.write(compareResult.diffImg));
 
