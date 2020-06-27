@@ -70,7 +70,6 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		if (!this._data.borderVisible || this._barWidth > borderWidth * 2) {
 			this._drawCandles(ctx, bars, this._data.visibleRange, pixelRatio);
 		}
-
 	}
 
 	private _drawWicks(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
@@ -106,7 +105,7 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 	private _calculateBorderWidth(pixelRatio: number): number {
 		let borderWidth = Math.floor(Constants.BarBorderWidth * pixelRatio);
 		if (this._barWidth <= 2 * borderWidth) {
-			borderWidth = Math.floor((this._barWidth  - 1) * 0.5);
+			borderWidth = Math.floor((this._barWidth - 1) * 0.5);
 		}
 		const res = Math.max(1, borderWidth);
 		if (this._barWidth <= res * 2) {

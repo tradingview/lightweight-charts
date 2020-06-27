@@ -29,7 +29,7 @@ export interface MouseEventParams {
 
 export type MouseEventHandler = (param: MouseEventParams) => void;
 
- /*
+/*
  * The main interface of a single chart
  */
 export interface IChartApi {
@@ -40,6 +40,7 @@ export interface IChartApi {
 
 	/**
 	 * Sets fixed size of the chart. By default chart takes up 100% of its container
+	 *
 	 * @param width - target width of the chart
 	 * @param height - target height of the chart
 	 * @param forceRepaint - true to initiate resize immediately. One could need this to get screenshot immediately after resize
@@ -48,6 +49,7 @@ export interface IChartApi {
 
 	/**
 	 * Creates an area series with specified parameters
+	 *
 	 * @param areaOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
@@ -55,6 +57,7 @@ export interface IChartApi {
 
 	/**
 	 * Creates a bar series with specified parameters
+	 *
 	 * @param barOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
@@ -62,6 +65,7 @@ export interface IChartApi {
 
 	/**
 	 * Creates a candlestick series with specified parameters
+	 *
 	 * @param candlestickOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
@@ -69,6 +73,7 @@ export interface IChartApi {
 
 	/**
 	 * Creates a histogram series with specified parameters
+	 *
 	 * @param histogramOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
@@ -76,6 +81,7 @@ export interface IChartApi {
 
 	/**
 	 * Creates a line series with specified parameters
+	 *
 	 * @param lineOptions - customization parameters of the series being created
 	 * @returns an interface of the created series
 	 */
@@ -94,24 +100,28 @@ export interface IChartApi {
 
 	/**
 	 * Removes mouse click subscription
+	 *
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeClick(handler: MouseEventHandler): void;
 
 	/**
 	 * Adds a subscription to crosshair movement to receive notifications on crosshair movements
+	 *
 	 * @param handler - handler (function) to be called on crosshair move
 	 */
 	subscribeCrosshairMove(handler: MouseEventHandler): void;
 
 	/**
 	 * Removes a subscription on crosshair movement
+	 *
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
 
 	/**
 	 * Returns API to manipulate the price scale
+	 *
 	 * @param priceScaleId - id of scale to access to
 	 * @returns target API
 	 */
@@ -119,24 +129,28 @@ export interface IChartApi {
 
 	/**
 	 * Returns API to manipulate the time scale
+	 *
 	 * @returns target API
 	 */
 	timeScale(): ITimeScaleApi;
 
 	/**
 	 * Applies new options to the chart
+	 *
 	 * @param options - any subset of chart options
 	 */
 	applyOptions(options: DeepPartial<ChartOptions>): void;
 
 	/**
 	 * Returns currently applied options
+	 *
 	 * @returns full set of currently applied options, including defaults
 	 */
 	options(): Readonly<ChartOptions>;
 
 	/**
 	 * Make a screenshot of the chart with all the elements excluding crosshair.
+	 *
 	 * @returns a canvas with the chart drawn on
 	 */
 	takeScreenshot(): HTMLCanvasElement;

@@ -295,6 +295,7 @@ export class DataLayer {
 
 	/**
 	 * Sets new time scale and make indexes valid for all series
+	 *
 	 * @returns An index of the first changed point
 	 */
 	private _updateTimeScalePoints(newTimePoints: TimeScalePoint[]): number {

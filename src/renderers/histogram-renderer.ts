@@ -81,7 +81,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 				right = x + halfWidth;
 			} else {
 				// shift pixel to left
-				const halfWidth = columnWidth  / 2;
+				const halfWidth = columnWidth / 2;
 				left = x - halfWidth;
 				right = x + halfWidth - 1;
 			}

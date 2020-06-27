@@ -46,5 +46,4 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick'
 
 		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => this._createRawItem(row.index, row, colorer));
 	}
-
 }

@@ -84,8 +84,9 @@ export interface ChartOptions {
 	/** Structure with layout options */
 	layout: LayoutOptions;
 
-	/** @deprecated options for price scales
-	 *  @internal
+	/**
+	 * @deprecated options for price scales
+	 * @internal
 	 */
 	priceScale: PriceScaleOptions;
 
@@ -346,6 +347,7 @@ export class ChartModel implements IDestroyable {
 
 	/**
 	 * Zoom in/out the chart (depends on scale value).
+	 *
 	 * @param pointX - X coordinate of the point to apply the zoom (the point which should stay on its place)
 	 * @param scale - Zoom value. Negative value means zoom out, positive - zoom in.
 	 */

@@ -42,5 +42,4 @@ export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 			color: colorer.barStyle(time).barColor,
 		};
 	}
-
 }

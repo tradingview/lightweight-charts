@@ -1,5 +1,6 @@
 
 /** Draw rectangle with outer border defined with parameters. FillStyle is used as color
+ *
  * @param ctx - context to draw on
  * @param x - left outer border of the target rectangle
  * @param y - top outer border of the target rectangle

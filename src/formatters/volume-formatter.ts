@@ -35,7 +35,6 @@ export class VolumeFormatter implements IFormatter {
 			res = value.toFixed(this._precision).replace(/\.?0+$/, ''); // regex removes trailing zeroes
 		} else {
 			res = String(value);
-
 		}
 		return res.replace(/(\.[1-9]*)0+$/, (e: string, p1: string): string => p1);
 	}

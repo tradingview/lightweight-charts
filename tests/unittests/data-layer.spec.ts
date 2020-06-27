@@ -342,7 +342,6 @@ describe('DataLayer', () => {
 			expect(updatePacket.data[1].index).to.be.equal(1 as TimePointIndex);
 			expect(updatePacket.data[1].time.timestamp).to.be.equal(1569974400 as UTCTimestamp);
 		});
-
 	});
 
 	it('all points should have same time type', () => {

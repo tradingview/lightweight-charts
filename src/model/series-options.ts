@@ -83,6 +83,7 @@ export interface HistogramStyleOptions {
 /**
  * Structure describing series values formatting
  * Fields precision and minMove allow wide customization of formatting
+ *
  * @example
  * minMove = 0.01 , precision is not specified. Prices will change like 1.13, 1.14, 1.15 etc.
  * minMove = 0.01 , precision = 3. Prices will change like 1.130, 1.140, 1.150 etc.
@@ -91,7 +92,7 @@ export interface HistogramStyleOptions {
 
 export interface PriceFormatBuiltIn {
 	/**
-	 *  Enum of possible modes of price formatting
+	 * Enum of possible modes of price formatting
 	 * 'price' is the most common choice; it allows customization of precision and rounding of prices
 	 * 'volume' uses abbreviation for formatting prices like '1.2K' or '12.67M'
 	 * 'percent' uses '%' sign at the end of prices.
