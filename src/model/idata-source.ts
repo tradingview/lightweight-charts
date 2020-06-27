@@ -13,9 +13,9 @@ export interface IDataSource {
 
 	updateAllViews(): void;
 
-	priceAxisViews(pane?: Pane, priceScale?: PriceScale): ReadonlyArray<IPriceAxisView>;
-	timeAxisViews(): ReadonlyArray<ITimeAxisView>;
-	paneViews(pane: Pane): ReadonlyArray<IPaneView>;
+	priceAxisViews(pane?: Pane, priceScale?: PriceScale): readonly IPriceAxisView[];
+	timeAxisViews(): readonly ITimeAxisView[];
+	paneViews(pane: Pane): readonly IPaneView[];
 
 	destroy?(): void;
 }

@@ -434,11 +434,11 @@ export class PriceScale {
 		return value as BarPrice;
 	}
 
-	public dataSources(): ReadonlyArray<IPriceDataSource> {
+	public dataSources(): readonly IPriceDataSource[] {
 		return this._dataSources;
 	}
 
-	public orderedSources(): ReadonlyArray<IPriceDataSource> {
+	public orderedSources(): readonly IPriceDataSource[] {
 		if (this._cachedOrderedSources) {
 			return this._cachedOrderedSources;
 		}
@@ -671,7 +671,7 @@ export class PriceScale {
 		return percentageFormatter.format(price);
 	}
 
-	public sourcesForAutoScale(): ReadonlyArray<IPriceDataSource> {
+	public sourcesForAutoScale(): readonly IPriceDataSource[] {
 		return this._dataSources;
 	}
 

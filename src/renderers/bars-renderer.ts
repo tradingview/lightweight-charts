@@ -11,7 +11,7 @@ export interface BarItem extends BarCandlestickItemBase {
 }
 
 export interface PaneRendererBarsData {
-	bars: ReadonlyArray<BarItem>;
+	bars: readonly BarItem[];
 	barSpacing: number;
 	openVisible: boolean;
 	thinBars: boolean;

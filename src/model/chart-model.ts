@@ -239,7 +239,7 @@ export class ChartModel implements IDestroyable {
 		return this._timeScale;
 	}
 
-	public panes(): ReadonlyArray<Pane> {
+	public panes(): readonly Pane[] {
 		return this._panes;
 	}
 
@@ -419,7 +419,7 @@ export class ChartModel implements IDestroyable {
 		this.lightUpdate();
 	}
 
-	public serieses(): ReadonlyArray<Series> {
+	public serieses(): readonly Series[] {
 		return this._serieses;
 	}
 

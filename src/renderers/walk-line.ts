@@ -7,7 +7,7 @@ import { LinePoint, LineType } from './draw-line';
  */
 export function walkLine(
 	ctx: CanvasRenderingContext2D,
-	points: ReadonlyArray<LinePoint>,
+	points: readonly LinePoint[],
 	lineType: LineType,
 	visibleRange: SeriesItemsIndexesRange
 ): void {

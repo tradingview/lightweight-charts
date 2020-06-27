@@ -27,15 +27,15 @@ export abstract class DataSource implements IDataSource {
 		this._priceScale = priceScale;
 	}
 
-	public priceAxisViews(pane?: Pane, priceScale?: PriceScale): ReadonlyArray<IPriceAxisView> {
+	public priceAxisViews(pane?: Pane, priceScale?: PriceScale): readonly IPriceAxisView[] {
 		return [];
 	}
 
-	public paneViews(pane?: Pane): ReadonlyArray<IPaneView> {
+	public paneViews(pane?: Pane): readonly IPaneView[] {
 		return [];
 	}
 
-	public timeAxisViews(): ReadonlyArray<ITimeAxisView> {
+	public timeAxisViews(): readonly ITimeAxisView[] {
 		return [];
 	}
 

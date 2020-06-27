@@ -1,9 +1,9 @@
 import { IPaneRenderer } from './ipane-renderer';
 
 export class CompositeRenderer implements IPaneRenderer {
-	private _renderers: ReadonlyArray<IPaneRenderer> = [];
+	private _renderers: readonly IPaneRenderer[] = [];
 
-	public setRenderers(renderers: ReadonlyArray<IPaneRenderer>): void {
+	public setRenderers(renderers: readonly IPaneRenderer[]): void {
 		this._renderers = renderers;
 	}
 

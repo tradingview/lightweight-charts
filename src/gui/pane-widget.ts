@@ -628,7 +628,7 @@ export class PaneWidget implements IDestroyable {
 		}
 	}
 
-	private _hitTestPaneView(paneViews: ReadonlyArray<IPaneView>, x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
+	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer(this._size.h, this._size.w);
 			if (renderer !== null && renderer.hitTest) {

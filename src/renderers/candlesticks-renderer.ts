@@ -13,7 +13,7 @@ export interface CandlestickItem extends BarCandlestickItemBase {
 }
 
 export interface PaneRendererCandlesticksData {
-	bars: ReadonlyArray<CandlestickItem>;
+	bars: readonly CandlestickItem[];
 
 	barSpacing: number;
 
@@ -72,7 +72,7 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		}
 	}
 
-	private _drawWicks(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
+	private _drawWicks(ctx: CanvasRenderingContext2D, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
 		if (this._data === null) {
 			return;
 		}
@@ -115,7 +115,7 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		return res;
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, barSpacing: number, pixelRatio: number): void {
+	private _drawBorder(ctx: CanvasRenderingContext2D, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, barSpacing: number, pixelRatio: number): void {
 		let prevBorderColor = '';
 		const borderWidth = this._calculateBorderWidth(pixelRatio);
 
@@ -140,7 +140,7 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		}
 	}
 
-	private _drawCandles(ctx: CanvasRenderingContext2D, bars: ReadonlyArray<CandlestickItem>, visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
+	private _drawCandles(ctx: CanvasRenderingContext2D, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, pixelRatio: number): void {
 		if (this._data === null) {
 			return;
 		}
