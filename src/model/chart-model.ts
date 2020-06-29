@@ -84,8 +84,9 @@ export interface ChartOptions {
 	/** Structure with layout options */
 	layout: LayoutOptions;
 
-	/** @deprecated options for price scales
-	 *  @internal
+	/**
+	 * @deprecated options for price scales
+	 * @internal
 	 */
 	priceScale: PriceScaleOptions;
 
@@ -238,7 +239,7 @@ export class ChartModel implements IDestroyable {
 		return this._timeScale;
 	}
 
-	public panes(): ReadonlyArray<Pane> {
+	public panes(): readonly Pane[] {
 		return this._panes;
 	}
 
@@ -346,6 +347,7 @@ export class ChartModel implements IDestroyable {
 
 	/**
 	 * Zoom in/out the chart (depends on scale value).
+	 *
 	 * @param pointX - X coordinate of the point to apply the zoom (the point which should stay on its place)
 	 * @param scale - Zoom value. Negative value means zoom out, positive - zoom in.
 	 */
@@ -417,7 +419,7 @@ export class ChartModel implements IDestroyable {
 		this.lightUpdate();
 	}
 
-	public serieses(): ReadonlyArray<Series> {
+	public serieses(): readonly Series[] {
 		return this._serieses;
 	}
 

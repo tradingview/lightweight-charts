@@ -99,7 +99,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return result;
 	}
 
-	public merge(plotRows: ReadonlyArray<PlotRowType>): void {
+	public merge(plotRows: readonly PlotRowType[]): void {
 		if (plotRows.length === 0) {
 			return;
 		}
@@ -177,7 +177,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return lowerbound(
 			this._items,
 			index,
-			(a: PlotRowType, b: TimePointIndex) => { return a.index < b; }
+			(a: PlotRowType, b: TimePointIndex) => a.index < b
 		);
 	}
 
@@ -185,7 +185,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return upperbound(
 			this._items,
 			index,
-			(a: TimePointIndex, b: PlotRowType) => { return b.index > a; }
+			(a: TimePointIndex, b: PlotRowType) => b.index > a
 		);
 	}
 
@@ -224,7 +224,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		this._minMaxCache.forEach((cacheItem: Map<number, MinMax | null>) => cacheItem.delete(chunkIndex));
 	}
 
-	private _prepend(plotRows: ReadonlyArray<PlotRowType>): void {
+	private _prepend(plotRows: readonly PlotRowType[]): void {
 		assert(plotRows.length !== 0, 'plotRows should not be empty');
 
 		this._rowSearchCache.clear();
@@ -233,7 +233,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		this._items = plotRows.concat(this._items);
 	}
 
-	private _append(plotRows: ReadonlyArray<PlotRowType>): void {
+	private _append(plotRows: readonly PlotRowType[]): void {
 		assert(plotRows.length !== 0, 'plotRows should not be empty');
 
 		this._rowSearchCache.clear();
@@ -253,7 +253,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		this._items[this._items.length - 1] = plotRow;
 	}
 
-	private _merge(plotRows: ReadonlyArray<PlotRowType>): void {
+	private _merge(plotRows: readonly PlotRowType[]): void {
 		assert(plotRows.length !== 0, 'plot rows should not be empty');
 
 		this._rowSearchCache.clear();
@@ -345,10 +345,9 @@ function mergeMinMax(first: MinMax | null, second: MinMax | null): MinMax | null
  *
  * NOTE: Time and memory complexity are O(N+M).
  */
-export function mergePlotRows<PlotRowType extends PlotRow>(originalPlotRows: ReadonlyArray<PlotRowType>, newPlotRows: ReadonlyArray<PlotRowType>): PlotRowType[] {
+export function mergePlotRows<PlotRowType extends PlotRow>(originalPlotRows: readonly PlotRowType[], newPlotRows: readonly PlotRowType[]): PlotRowType[] {
 	const newArraySize = calcMergedArraySize(originalPlotRows, newPlotRows);
 
-	// tslint:disable-next-line:prefer-array-literal
 	const result = new Array<PlotRowType>(newArraySize);
 
 	let originalRowsIndex = 0;
@@ -389,8 +388,8 @@ export function mergePlotRows<PlotRowType extends PlotRow>(originalPlotRows: Rea
 }
 
 function calcMergedArraySize<PlotRowType extends PlotRow>(
-	firstPlotRows: ReadonlyArray<PlotRowType>,
-	secondPlotRows: ReadonlyArray<PlotRowType>): number {
+	firstPlotRows: readonly PlotRowType[],
+	secondPlotRows: readonly PlotRowType[]): number {
 	const firstPlotsSize = firstPlotRows.length;
 	const secondPlotsSize = secondPlotRows.length;
 

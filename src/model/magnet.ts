@@ -31,7 +31,7 @@ export class Magnet {
 		const y = defaultPriceScale.priceToCoordinate(price, firstValue);
 
 		// get all serieses from the pane
-		const serieses: ReadonlyArray<Series> = pane.dataSources().filter(
+		const serieses: readonly Series[] = pane.dataSources().filter(
 			((ds: IPriceDataSource) => (ds instanceof Series)) as (ds: IPriceDataSource) => ds is Series);
 
 		const candidates = serieses.reduce(

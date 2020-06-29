@@ -11,10 +11,10 @@ export const enum PlotRowValueIndex {
 }
 
 export type PlotRowValue = [
-	number,            // open
-	number,            // high
-	number,            // low
-	number,            // close
+	number, // open
+	number, // high
+	number, // low
+	number, // close
 ];
 
 export interface PlotRow {

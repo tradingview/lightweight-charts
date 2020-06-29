@@ -4,6 +4,7 @@ import { Series } from '../../model/series';
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';
 
 export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneView {
+	// eslint-disable-next-line no-useless-constructor
 	public constructor(series: Series) {
 		super(series);
 	}

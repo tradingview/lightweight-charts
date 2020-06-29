@@ -1,4 +1,4 @@
 export interface IFormatter {
-	// tslint:disable-next-line:no-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	format(value: any): string;
 }

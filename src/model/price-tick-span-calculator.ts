@@ -43,6 +43,7 @@ export class PriceTickSpanCalculator {
 		let index = 0;
 		let c = this._integralDividers[0];
 
+		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			// the second part is actual for small with very small values like 1e-10
 			// greaterOrEqual fails for such values

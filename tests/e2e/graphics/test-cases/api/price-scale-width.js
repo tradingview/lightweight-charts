@@ -16,7 +16,7 @@ function runTestCase(container) {
 		{ time: '1990-04-28', value: 3 },
 	]);
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			const leftPriceScale = chart.priceScale('left');
 			const rightPriceScale = chart.priceScale('right');

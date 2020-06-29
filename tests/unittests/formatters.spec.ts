@@ -24,19 +24,15 @@ describe('Formatters', () => {
 		}
 	});
 	it('date-time-formatter', () => {
-		{
-			const formatter = new DateTimeFormatter();
-			const d = new Date(1538381512000);
-			const res = formatter.format(d);
-			expect(res).to.be.equal('2018-10-01 08:11:52');
-		}
+		const formatter = new DateTimeFormatter();
+		const d = new Date(1538381512000);
+		const res = formatter.format(d);
+		expect(res).to.be.equal('2018-10-01 08:11:52');
 	});
 	it('percent-formatter', () => {
-		{
-			const formatter = new PercentageFormatter();
-			const res = formatter.format(1.5);
-			expect(res).to.be.equal('1.50%');
-		}
+		const formatter = new PercentageFormatter();
+		const res = formatter.format(1.5);
+		expect(res).to.be.equal('1.50%');
 	});
 	it('price-formatter', () => {
 		{
@@ -75,14 +71,12 @@ describe('Formatters', () => {
 		}
 	});
 	it('volume-formatter', () => {
-		{
-			const formatter = new VolumeFormatter(3);
-			expect(formatter.format(1)).to.be.equal('1');
-			expect(formatter.format(10)).to.be.equal('10');
-			expect(formatter.format(100)).to.be.equal('100');
-			expect(formatter.format(1000)).to.be.equal('1K');
-			expect(formatter.format(5500)).to.be.equal('5.5K');
-			expect(formatter.format(1155000)).to.be.equal('1.155M');
-		}
+		const formatter = new VolumeFormatter(3);
+		expect(formatter.format(1)).to.be.equal('1');
+		expect(formatter.format(10)).to.be.equal('10');
+		expect(formatter.format(100)).to.be.equal('100');
+		expect(formatter.format(1000)).to.be.equal('1K');
+		expect(formatter.format(5500)).to.be.equal('5.5K');
+		expect(formatter.format(1155000)).to.be.equal('1.155M');
 	});
 });

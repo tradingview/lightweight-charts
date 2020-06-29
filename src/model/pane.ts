@@ -32,7 +32,7 @@ export class Pane implements IDestroyable {
 	private _height: number = 0;
 	private _width: number = 0;
 	private _stretchFactor: number = DEFAULT_STRETCH_FACTOR;
-	private _cachedOrderedSources: ReadonlyArray<IPriceDataSource> | null = null;
+	private _cachedOrderedSources: readonly IPriceDataSource[] | null = null;
 
 	private _destroyed: Delegate = new Delegate();
 
@@ -150,7 +150,7 @@ export class Pane implements IDestroyable {
 		this.updateAllSources();
 	}
 
-	public dataSources(): ReadonlyArray<IPriceDataSource> {
+	public dataSources(): readonly IPriceDataSource[] {
 		return this._dataSources;
 	}
 
@@ -307,7 +307,7 @@ export class Pane implements IDestroyable {
 		this._model.lightUpdate();
 	}
 
-	public orderedSources(): ReadonlyArray<IPriceDataSource> {
+	public orderedSources(): readonly IPriceDataSource[] {
 		if (this._cachedOrderedSources === null) {
 			this._cachedOrderedSources = sortSources(this._dataSources);
 		}

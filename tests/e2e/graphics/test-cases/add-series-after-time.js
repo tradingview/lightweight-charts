@@ -15,7 +15,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			const mainSeries = chart.addLineSeries();
 			mainSeries.setData(generateData());

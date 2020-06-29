@@ -222,10 +222,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 		merge(this._options, options);
 
-		// tslint:disable-next-line:deprecation
+		// eslint-disable-next-line deprecation/deprecation
 		if (this._priceScale !== null && options.scaleMargins !== undefined) {
 			this._priceScale.applyOptions({
-				// tslint:disable-next-line:deprecation
+				// eslint-disable-next-line deprecation/deprecation
 				scaleMargins: options.scaleMargins,
 			});
 		}
@@ -247,7 +247,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._recreatePaneViews();
 	}
 
-	public updateData(data: ReadonlyArray<SeriesPlotRow<T>>, clearData: boolean): void {
+	public updateData(data: readonly SeriesPlotRow<T>[], clearData: boolean): void {
 		if (clearData) {
 			this._data.clear();
 		}
@@ -343,7 +343,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 	}
 
-	public paneViews(): ReadonlyArray<IPaneView> {
+	public paneViews(): readonly IPaneView[] {
 		const res: IPaneView[] = [];
 
 		if (!this._isOverlay()) {
@@ -363,7 +363,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return res;
 	}
 
-	public priceAxisViews(pane: Pane, priceScale: PriceScale): ReadonlyArray<IPriceAxisView> {
+	public priceAxisViews(pane: Pane, priceScale: PriceScale): readonly IPriceAxisView[] {
 		const result = (priceScale === this._priceScale || this._isOverlay()) ? [...this._priceAxisViews] : [];
 		for (const customPriceLine of this._customPriceLines) {
 			result.push(customPriceLine.priceAxisView());

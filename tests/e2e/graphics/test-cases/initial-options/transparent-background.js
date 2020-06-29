@@ -26,7 +26,7 @@ function runTestCase(container) {
 
 	chart.timeScale().setVisibleRange({ from: 1545782400, to: 1559692800 });
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			chart.timeScale().setVisibleRange({ from: 1538352000, to: 1545782400 });
 			resolve();

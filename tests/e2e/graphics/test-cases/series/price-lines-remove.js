@@ -21,7 +21,7 @@ function runTestCase(container) {
 	const line1 = series.createPriceLine({ price: 10 });
 	const line2 = series.createPriceLine({ price: 20 });
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			series.removePriceLine(line2);
 			series.removePriceLine(line1);

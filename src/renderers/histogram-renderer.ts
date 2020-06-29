@@ -57,7 +57,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		}
 	}
 
-	// tslint:disable-next-line: cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	private _fillPrecalculatedCache(pixelRatio: number): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			this._precalculatedCache = [];
@@ -81,7 +81,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 				right = x + halfWidth;
 			} else {
 				// shift pixel to left
-				const halfWidth = columnWidth  / 2;
+				const halfWidth = columnWidth / 2;
 				left = x - halfWidth;
 				right = x + halfWidth - 1;
 			}

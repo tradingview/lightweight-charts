@@ -45,6 +45,7 @@ function getConfig(inputFile, type, isProd) {
 			isProd && terser({
 				output: {
 					comments: /@license/,
+					// eslint-disable-next-line camelcase
 					inline_script: true,
 				},
 				mangle: {

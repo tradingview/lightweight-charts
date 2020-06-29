@@ -10,6 +10,7 @@ import { LinePaneViewBase } from './line-pane-view-base';
 export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 
+	// eslint-disable-next-line no-useless-constructor
 	public constructor(series: Series<'Line'>, model: ChartModel) {
 		super(series, model);
 	}

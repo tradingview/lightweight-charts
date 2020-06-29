@@ -211,7 +211,7 @@ export class PriceScale {
 		};
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	public setMode(newMode: Partial<PriceScaleState>): void {
 		const oldMode = this.mode();
 		let priceRange: PriceRangeImpl | null = null;
@@ -434,11 +434,11 @@ export class PriceScale {
 		return value as BarPrice;
 	}
 
-	public dataSources(): ReadonlyArray<IPriceDataSource> {
+	public dataSources(): readonly IPriceDataSource[] {
 		return this._dataSources;
 	}
 
-	public orderedSources(): ReadonlyArray<IPriceDataSource> {
+	public orderedSources(): readonly IPriceDataSource[] {
 		if (this._cachedOrderedSources) {
 			return this._cachedOrderedSources;
 		}
@@ -671,7 +671,7 @@ export class PriceScale {
 		return percentageFormatter.format(price);
 	}
 
-	public sourcesForAutoScale(): ReadonlyArray<IPriceDataSource> {
+	public sourcesForAutoScale(): readonly IPriceDataSource[] {
 		return this._dataSources;
 	}
 
@@ -784,7 +784,7 @@ export class PriceScale {
 		this._markBuilder.rebuildTickMarks();
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	private _recalculatePriceRangeImpl(): void {
 		const visibleBars = this._invalidatedForRange.visibleBars;
 		if (visibleBars === null) {

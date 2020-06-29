@@ -405,10 +405,11 @@ export class TimeScale {
 
 	/**
 	 * Zoom in/out the scale around a `zoomPoint` on `scale` value.
+	 *
 	 * @param zoomPoint - X coordinate of the point to apply the zoom.
-	 *   If `rightBarStaysOnScroll` option is disabled, then will be used to restore right offset.
+	 * If `rightBarStaysOnScroll` option is disabled, then will be used to restore right offset.
 	 * @param scale - Zoom value (in 1/10 parts of current bar spacing).
-	 *   Negative value means zoom out, positive - zoom in.
+	 * Negative value means zoom out, positive - zoom in.
 	 */
 	public zoom(zoomPoint: Coordinate, scale: number): void {
 		const floatIndexAtZoomPoint = this._coordinateToFloatIndex(zoomPoint);

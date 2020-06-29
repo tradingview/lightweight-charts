@@ -26,7 +26,7 @@ export class Grid {
 	private _paneViews: WeakMap<Pane, GridPaneView[]> = new WeakMap();
 	private _invalidated: boolean = true;
 
-	public paneViews(pane: Pane): ReadonlyArray<IPaneView> {
+	public paneViews(pane: Pane): readonly IPaneView[] {
 		let paneViews = this._paneViews.get(pane);
 		if (paneViews === undefined) {
 			paneViews = [new GridPaneView(pane)];

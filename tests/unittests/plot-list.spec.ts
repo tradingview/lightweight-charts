@@ -353,7 +353,6 @@ describe('mergePlotRows', () => {
 
 		function generateSortedPlotRows(size: number): PlotRow[] {
 			const startIndex = (Math.random() * 1000) | 0;
-			// tslint:disable-next-line:prefer-array-literal
 			const array = new Array<PlotRow>(size);
 			for (let i = 0; i < size; ++i) {
 				array[i] = row(startIndex + i);

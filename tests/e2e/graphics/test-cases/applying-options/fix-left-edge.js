@@ -20,7 +20,7 @@ function runTestCase(container) {
 
 	chart.timeScale().applyOptions({ fixLeftEdge: true });
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => resolve(), 1000);
 	});
 }

@@ -32,7 +32,6 @@ export class Screenshoter {
 		this._browserPromise = launchPuppeteer(puppeteerOptions);
 	}
 
-	// tslint:disable-next-line:invalid-void
 	public async close(): Promise<void> {
 		const browser = await this._browserPromise;
 		delete this._browserPromise;
@@ -68,7 +67,7 @@ export class Screenshoter {
 
 			// wait for test case is ready
 			await page.evaluate(() => {
-				// tslint:disable-next-line:no-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
 				return (window as any).testCaseReady;
 			});
 

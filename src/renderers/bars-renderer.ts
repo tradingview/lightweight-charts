@@ -11,7 +11,7 @@ export interface BarItem extends BarCandlestickItemBase {
 }
 
 export interface PaneRendererBarsData {
-	bars: ReadonlyArray<BarItem>;
+	bars: readonly BarItem[];
 	barSpacing: number;
 	openVisible: boolean;
 	thinBars: boolean;
@@ -60,7 +60,7 @@ export class PaneRendererBars implements IPaneRenderer {
 			const bodyWidthHalf = Math.floor(this._barLineWidth * 0.5);
 
 			const bodyCenter = Math.round(bar.x * pixelRatio);
-			const bodyLeft =  bodyCenter - bodyWidthHalf;
+			const bodyLeft = bodyCenter - bodyWidthHalf;
 			const bodyWidth = this._barLineWidth;
 			const bodyRight = bodyLeft + bodyWidth - 1;
 

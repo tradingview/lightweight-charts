@@ -40,5 +40,4 @@ export class GridPaneView implements IUpdatablePaneView {
 
 		return this._renderer;
 	}
-
 }

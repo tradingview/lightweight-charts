@@ -27,12 +27,11 @@ async function getReferencesCount(frame: Frame, prototypeReference: JSHandle): P
 	const activeRefsHandle = await context.queryObjects(prototypeReference);
 	const activeRefsCount = await (await activeRefsHandle.getProperty('length')).jsonValue() as number;
 
-	activeRefsHandle.dispose();
+	await activeRefsHandle.dispose();
 
 	return activeRefsCount;
 }
 
-// tslint:disable-next-line:invalid-void
 function promisleep(ms: number): Promise<void> {
 	return new Promise((resolve: () => void) => {
 		setTimeout(resolve, ms);
@@ -41,7 +40,7 @@ function promisleep(ms: number): Promise<void> {
 
 describe('Memleaks tests', () => {
 	const puppeteerOptions: LaunchOptions = {};
-	if (Boolean(process.env.NO_SANDBOX)) {
+	if (process.env.NO_SANDBOX) {
 		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
 	}
 
@@ -63,6 +62,7 @@ describe('Memleaks tests', () => {
 	});
 
 	for (const testCase of testCases) {
+		// eslint-disable-next-line no-loop-func
 		it(testCase.name, async () => {
 			const pageContent = generatePageContent(testStandalonePath, testCase.caseContent);
 
@@ -104,7 +104,7 @@ describe('Memleaks tests', () => {
 			// now remove chart
 
 			await page.evaluate(() => {
-				// tslint:disable-next-line:no-any
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
 				(window as any).chart.remove();
 			});
 

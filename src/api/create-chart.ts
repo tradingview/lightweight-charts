@@ -27,6 +27,7 @@ export {
 
 /**
  * This function is the main entry point of the Lightweight Charting Library
+ *
  * @param container - id of HTML element or element itself
  * @param options - any subset of ChartOptions to be applied at start.
  * @returns an interface to the created chart

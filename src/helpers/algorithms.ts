@@ -7,7 +7,7 @@
 export type LowerBoundComparatorType<TArrayElementType, TValueType> = (a: TArrayElementType, b: TValueType) => boolean;
 
 export function lowerbound<TArrayElementType, TValueType>(
-	arr: ReadonlyArray<TArrayElementType>,
+	arr: readonly TArrayElementType[],
 	value: TValueType,
 	compare: LowerBoundComparatorType<TArrayElementType, TValueType>,
 	start: number = 0,

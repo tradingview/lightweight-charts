@@ -1,5 +1,3 @@
-import { ChartModel } from '../../model/chart-model';
-import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { SeriesPlotRow } from '../../model/series-data';
 import { TimePointIndex } from '../../model/time-data';
@@ -14,10 +12,6 @@ import { BarsPaneViewBase } from './bars-pane-view-base';
 
 export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', CandlestickItem> {
 	private readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
-
-	public constructor(series: Series<'Candlestick'>, model: ChartModel) {
-		super(series, model);
-	}
 
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();

@@ -199,7 +199,7 @@ export class Crosshair extends DataSource {
 		this.clearOriginCoord();
 	}
 
-	public paneViews(pane: Pane): ReadonlyArray<IPaneView> {
+	public paneViews(pane: Pane): readonly IPaneView[] {
 		return this._pane !== null ? [this._paneView, this._markersPaneView] : [];
 	}
 
@@ -224,7 +224,7 @@ export class Crosshair extends DataSource {
 		return views;
 	}
 
-	public timeAxisViews(): ReadonlyArray<ITimeAxisView> {
+	public timeAxisViews(): readonly ITimeAxisView[] {
 		return this._visible ? [this._timeAxisView] : [];
 	}
 

@@ -4,7 +4,10 @@
 
 declare namespace NodeJS {
 	interface ProcessEnv {
+		// eslint-disable-next-line @typescript-eslint/naming-convention
 		NODE_ENV: 'development' | 'production';
+
+		// eslint-disable-next-line @typescript-eslint/naming-convention
 		BUILD_VERSION: string;
 	}
 
@@ -13,4 +16,5 @@ declare namespace NodeJS {
 	}
 }
 
+// eslint-disable-next-line no-var
 declare var process: NodeJS.Process;

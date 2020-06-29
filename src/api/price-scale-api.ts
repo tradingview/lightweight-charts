@@ -15,7 +15,7 @@ export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
 
 	public constructor(chartWidget: ChartWidget, priceScaleId: string) {
 		this._chartWidget = chartWidget;
-		this._priceScaleId =  priceScaleId;
+		this._priceScaleId = priceScaleId;
 	}
 
 	public destroy(): void {

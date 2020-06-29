@@ -64,7 +64,7 @@ export function convertTime(time: Time): TimePoint {
 	return businessDayConverter(time);
 }
 
-const validDateRegex = /^\d\d\d\d-\d\d\-\d\d$/;
+const validDateRegex = /^\d\d\d\d-\d\d-\d\d$/;
 
 export function stringToBusinessDay(value: string): BusinessDay {
 	if (process.env.NODE_ENV === 'development') {
@@ -329,6 +329,7 @@ export class DataLayer {
 
 	/**
 	 * Sets new time scale and make indexes valid for all series
+	 *
 	 * @returns An index of the first changed point
 	 */
 	private _updateTimeScalePoints(newTimePoints: TimeScalePoint[]): number {

@@ -6,12 +6,14 @@ import { PriceScaleOptions } from '../model/price-scale';
 export interface IPriceScaleApi {
 	/**
 	 * Applies new options to the price scale
+	 *
 	 * @param options - any subset of PriceScaleOptions
 	 */
 	applyOptions(options: DeepPartial<PriceScaleOptions>): void;
 
 	/**
 	 * Returns currently applied options of the price scale
+	 *
 	 * @returns full set of currently applied options, including defaults
 	 */
 	options(): Readonly<PriceScaleOptions>;

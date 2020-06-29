@@ -35,7 +35,7 @@ export class Watermark extends DataSource {
 		this._paneView = new WatermarkPaneView(this);
 	}
 
-	public paneViews(): ReadonlyArray<IPaneView> {
+	public paneViews(): readonly IPaneView[] {
 		return [this._paneView];
 	}
 

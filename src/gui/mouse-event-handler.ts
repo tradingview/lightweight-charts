@@ -157,7 +157,7 @@ export class MouseEventHandler implements IDestroyable {
 		this._processEvent(compatEvent, this._handler.mouseMoveEvent);
 	}
 
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line complexity
 	private _mouseMoveWithDownHandler(moveEvent: MouseEvent | TouchEvent): void {
 		if ('button' in moveEvent && moveEvent.button !== MouseEventButton.Left) {
 			return;

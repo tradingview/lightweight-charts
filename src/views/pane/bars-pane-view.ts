@@ -1,5 +1,3 @@
-import { ChartModel } from '../../model/chart-model';
-import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { SeriesPlotRow } from '../../model/series-data';
 import { TimePointIndex } from '../../model/time-data';
@@ -14,10 +12,6 @@ import { BarsPaneViewBase } from './bars-pane-view-base';
 
 export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 	private readonly _renderer: PaneRendererBars = new PaneRendererBars();
-
-	public constructor(series: Series<'Bar'>, model: ChartModel) {
-		super(series, model);
-	}
 
 	public renderer(height: number, width: number): IPaneRenderer {
 		this._makeValid();
@@ -42,5 +36,4 @@ export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 			color: colorer.barStyle(time).barColor,
 		};
 	}
-
 }

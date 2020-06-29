@@ -172,8 +172,8 @@ function normalizeInteger(min: number, n: number, max: number): number {
 	return (
 		isNaN(n) ? min :
 			n < min ? min :
-			n > max ? max :
-			Math.round(n)
+				n > max ? max :
+					Math.round(n)
 	);
 }
 

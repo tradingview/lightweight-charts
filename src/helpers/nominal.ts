@@ -4,6 +4,7 @@
  * the other types declared over the same base type
  *
  * Usage:
+ *
  * @example
  * type Index = Nominal<number, 'Index'>;
  * // let i: Index = 42; // this fails to compile

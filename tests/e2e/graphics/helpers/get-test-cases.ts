@@ -11,7 +11,7 @@ export interface TestCase {
 const testCasesDir = path.join(__dirname, '..', 'test-cases');
 
 function extractTestCaseName(fileName: string): string | null {
-	const match = path.basename(fileName).match(/^([^\.].+)\.js$/);
+	const match = /^([^.].+)\.js$/.exec(path.basename(fileName));
 	return match && match[1];
 }
 

@@ -29,7 +29,7 @@ const enum CursorType {
 	NsResize,
 }
 
-type IPriceAxisViewArray = ReadonlyArray<IPriceAxisView>;
+type IPriceAxisViewArray = readonly IPriceAxisView[];
 
 export class PriceAxisWidget implements IDestroyable {
 	private readonly _pane: PaneWidget;
@@ -356,7 +356,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const priceScale = (this._priceScale === null) ? undefined : this._priceScale;
 
-		const addViewsForSources = (sources: ReadonlyArray<IDataSource>) => {
+		const addViewsForSources = (sources: readonly IDataSource[]) => {
 			for (let i = 0; i < sources.length; ++i) {
 				const source = sources[i];
 				const views = source.priceAxisViews(this._pane.state(), priceScale);
@@ -642,10 +642,10 @@ export class PriceAxisWidget implements IDestroyable {
 		this._recreateTickMarksCache(this._rendererOptionsProvider.options());
 		const model = this._pane.chart().model();
 		model.lightUpdate();
-	}
+	};
 
 	private readonly _topCanvasConfiguredHandler = () => {
 		const model = this._pane.chart().model();
 		model.lightUpdate();
-	}
+	};
 }

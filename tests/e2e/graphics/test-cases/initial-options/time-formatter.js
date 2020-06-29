@@ -16,7 +16,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
 		localization: {
-			timeFormatter: (businessDayOrTimestamp) => {
+			timeFormatter: businessDayOrTimestamp => {
 				if (LightweightCharts.isBusinessDay(businessDayOrTimestamp)) {
 					return 'bd=' + businessDayOrTimestamp.day + '-' + businessDayOrTimestamp.month + '-' + businessDayOrTimestamp.year;
 				}
