@@ -32,7 +32,7 @@ histogramSeries.setData([
 
 ## Data format
 
-Each item of the histogram series should include the following field:
+Each item of the histogram series should be a [whitespace](./whitespace-data.md) item or an object with the following fields:
 
 - `time` ([Time](./time.md)) - item time
 - `value` (`number`) - item value
