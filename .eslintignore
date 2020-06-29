@@ -1,4 +1,5 @@
 !.eslintrc.js
+!.size-limit.js
 !.mocharc.js
 
 /dist/**

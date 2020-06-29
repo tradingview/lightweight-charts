@@ -172,13 +172,16 @@ jobs:
       - store_test_results:
           path: test-results/
 
-  codechecks:
+  size-limit:
     executor: node-latest-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: npm run codechecks
+      - run:
+          name: "Comparing sizes with merge-base"
+          command: node scripts/size-limit.js
+      - run: npm run size-limit
 
 workflows:
   version: 2
@@ -209,7 +212,7 @@ workflows:
           requires:
             - install-deps
 
-      - codechecks:
+      - size-limit:
           filters: *default-filters
           requires:
             - build
