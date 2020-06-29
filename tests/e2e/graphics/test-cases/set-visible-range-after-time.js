@@ -19,7 +19,7 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			chart.timeScale().setVisibleRange({
 				from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,

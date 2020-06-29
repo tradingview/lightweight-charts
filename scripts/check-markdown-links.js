@@ -76,7 +76,7 @@ function collectFilesData(inputFiles) {
 		.use(
 			markdownAnchors,
 			{
-				slugify: (value) => {
+				slugify: value => {
 					const result = value
 						.replace(/[^\w\s-]/g, '')
 						.toLowerCase()
@@ -120,7 +120,7 @@ function collectFilesData(inputFiles) {
 			requestedLinks: requestedLinks,
 		});
 
-		filesQueue.push(...requestedLinks.map((link) => link.filePath));
+		filesQueue.push(...requestedLinks.map(link => link.filePath));
 	}
 
 	return result;
@@ -180,7 +180,7 @@ function main() {
 	const filesWithErrors = Array.from(errorsByFile.keys()).sort();
 	if (filesWithErrors.length !== 0) {
 		for (const filePath of filesWithErrors) {
-			const fileErrors = errorsByFile.get(filePath).map((errorInfo) => {
+			const fileErrors = errorsByFile.get(filePath).map(errorInfo => {
 				const errorFilePrefix = filePath + (errorInfo.lineNumber === undefined ? '' : `:${errorInfo.lineNumber}`);
 				const linkFullPath = errorInfo.linkInfo.filePath + (errorInfo.linkInfo.anchor === undefined ? '' : `#${errorInfo.linkInfo.anchor}`);
 				return `${errorFilePrefix} - cannot find ${linkFullPath}`;

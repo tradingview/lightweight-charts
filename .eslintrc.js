@@ -333,6 +333,8 @@ module.exports = {
 		// http://eslint.org/docs/rules/array-callback-return
 		'array-callback-return': 'error',
 
+		'arrow-parens': ['error', 'as-needed'],
+
 		// enforce a maximum cyclomatic complexity allowed in a program
 		complexity: ['error', { max: 13 }],
 

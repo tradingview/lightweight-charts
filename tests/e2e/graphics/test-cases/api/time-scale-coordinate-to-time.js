@@ -25,7 +25,7 @@ function runTestCase(container) {
 	const timeScale = chart.timeScale();
 	timeScale.setVisibleLogicalRange({ from: 0.5, to: (data.length - 1) - 0.5 });
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			const timeAtZeroCoordinate = timeScale.coordinateToTime(0);
 			console.assert(timeAtZeroCoordinate === data[0].time, `Time at zero coordinate must be the first bar time, got=${timeAtZeroCoordinate}`);

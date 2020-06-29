@@ -29,7 +29,7 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			chart.applyOptions({
 				watermark: {

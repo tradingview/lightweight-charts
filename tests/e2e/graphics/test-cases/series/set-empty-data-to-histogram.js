@@ -31,7 +31,7 @@ function runTestCase(container) {
 
 	volumeSeries.setData(generateColoredData());
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			volumeSeries.setData([]);
 			resolve();

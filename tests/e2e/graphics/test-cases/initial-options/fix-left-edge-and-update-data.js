@@ -16,7 +16,7 @@ function runTestCase(container) {
 		{ time: '2017-04-23', value: 91.89 },
 	]);
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			line.setData([
 				{ time: '2017-04-10', value: 85.01 },

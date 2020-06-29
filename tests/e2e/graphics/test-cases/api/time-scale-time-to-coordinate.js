@@ -29,7 +29,7 @@ function runTestCase(container) {
 	const timeScale = chart.timeScale();
 	timeScale.setVisibleLogicalRange({ from: 0.5, to: (data.length - 1) - 0.5 });
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			const firstBarCoordinate = timeScale.timeToCoordinate(data[0].time);
 			console.assert(inRange(-2, firstBarCoordinate, 2), `First bar coordinate must be around 0, got=${firstBarCoordinate}`);

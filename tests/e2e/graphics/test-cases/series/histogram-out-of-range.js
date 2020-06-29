@@ -57,7 +57,7 @@ function runTestCase(container) {
 		to: (new Date(Date.UTC(2018, 11, 31, 0, 0, 0, 0))).getTime() / 1000,
 	});
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			chart.timeScale().setVisibleRange({
 				from: (new Date(Date.UTC(2018, 11, 14, 0, 0, 0, 0))).getTime() / 1000,

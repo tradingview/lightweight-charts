@@ -23,7 +23,7 @@ function runTestCase(container) {
 		'blue',
 	]));
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		setTimeout(() => {
 			mainSeries.setData(generateData([
 				'black',

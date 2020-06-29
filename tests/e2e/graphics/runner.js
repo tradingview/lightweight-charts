@@ -12,7 +12,7 @@ const mochaConfig = require('../../../.mocharc.js');
 // override tsconfig
 process.env.TS_NODE_PROJECT = path.resolve(__dirname, '../tsconfig.json');
 
-mochaConfig.require.forEach((module) => {
+mochaConfig.require.forEach(module => {
 	require(module);
 });
 
@@ -62,7 +62,7 @@ function runMocha(closeServer) {
 	mocha.diff(mochaConfig.diff);
 	mocha.addFile(path.resolve(__dirname, './graphics-test-cases.ts'));
 
-	mocha.run((failures) => {
+	mocha.run(failures => {
 		if (closeServer !== null) {
 			closeServer();
 		}

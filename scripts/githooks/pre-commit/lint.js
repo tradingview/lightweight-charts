@@ -13,7 +13,7 @@ function getStagedFiles() {
 	return childProcess.execSync(
 		'git diff --cached --name-only --diff-filter=ACM',
 		{ encoding: 'utf-8' }
-	).split('\n').map((str) => str.trim()).filter((str) => str.length !== 0);
+	).split('\n').map(str => str.trim()).filter(str => str.length !== 0);
 }
 
 function checkGitConflicts(files) {
@@ -73,7 +73,7 @@ function runMarkdownLintForFiles(mdFiles) {
 }
 
 function filterByExt(files, ext) {
-	return files.filter((file) => path.extname(file) === ext);
+	return files.filter(file => path.extname(file) === ext);
 }
 
 function lintFiles(files) {

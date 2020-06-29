@@ -19,7 +19,7 @@ function runTestCase(container) {
 		priceFormat: {
 			type: 'custom',
 			minMove: 0.01,
-			formatter: (price) => '\u0024' + price.toFixed(2),
+			formatter: price => '\u0024' + price.toFixed(2),
 		},
 	});
 

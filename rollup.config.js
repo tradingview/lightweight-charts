@@ -56,7 +56,7 @@ function getConfig(inputFile, type, isProd) {
 				},
 			}),
 		],
-		external: (id) => isModular && /^fancy-canvas(\/.+)?$/.test(id),
+		external: id => isModular && /^fancy-canvas(\/.+)?$/.test(id),
 	};
 
 	return config;
