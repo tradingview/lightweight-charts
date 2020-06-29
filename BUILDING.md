@@ -1,6 +1,6 @@
 # Building Lightweight Charts
 
-The minimal supported version of [NodeJS](https://nodejs.org/) for development is 10.12.0.
+The minimal supported version of [NodeJS](https://nodejs.org/) for development is 12.18.1.
 
 ## Compiling
 

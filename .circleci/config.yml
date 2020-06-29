@@ -32,11 +32,11 @@ aliases:
 executors:
   node-latest-executor:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
 
   node-browsers-latest-executor:
     docker:
-      - image: circleci/node:10-browsers
+      - image: circleci/node:12-browsers
 
 
 commands:
