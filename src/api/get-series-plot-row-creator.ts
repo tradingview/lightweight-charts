@@ -23,7 +23,7 @@ function getOHLCBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item:
 export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
 
 export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is SeriesPlotRow {
-	return 'value' in row;
+	return (row as Partial<SeriesPlotRow>).value !== undefined;
 }
 
 // we want to have compile-time checks that the type of the functions is correct
