@@ -9,6 +9,9 @@ function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item:
 	const val = item.value;
 
 	const res: Mutable<SeriesPlotRow<'Histogram'>> = { index, time, value: [val, val, val, val] };
+
+	// 'color' here is public property (from API) so we can use `in` here safely
+	// eslint-disable-next-line no-restricted-syntax
 	if ('color' in item && item.color !== undefined) {
 		res.color = item.color;
 	}

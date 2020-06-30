@@ -5,6 +5,7 @@ function checkTouchEvents(): boolean {
 		return false;
 	}
 
+	// eslint-disable-next-line no-restricted-syntax
 	if ('ontouchstart' in window) {
 		return true;
 	}
@@ -20,6 +21,7 @@ function getMobileTouch(): boolean {
 
 	const touch = !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || checkTouchEvents();
 
+	// eslint-disable-next-line no-restricted-syntax
 	return 'onorientationchange' in window && touch;
 }
 

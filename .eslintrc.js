@@ -564,7 +564,7 @@ module.exports = {
 		'no-new-object': 'error',
 
 		// disallow specified syntax
-		'no-restricted-syntax': ['error', 'ForInStatement'],
+		'no-restricted-syntax': ['error', 'ForInStatement', `BinaryExpression[operator='in']`],
 
 		// disallow space between function identifier and application
 		'no-spaced-func': 'error',

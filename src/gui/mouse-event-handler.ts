@@ -159,6 +159,7 @@ export class MouseEventHandler implements IDestroyable {
 
 	// eslint-disable-next-line complexity
 	private _mouseMoveWithDownHandler(moveEvent: MouseEvent | TouchEvent): void {
+		// eslint-disable-next-line no-restricted-syntax
 		if ('button' in moveEvent && moveEvent.button !== MouseEventButton.Left) {
 			return;
 		}
@@ -227,6 +228,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _mouseUpHandler(mouseUpEvent: MouseEvent | TouchEvent): void {
+		// eslint-disable-next-line no-restricted-syntax
 		if ('button' in mouseUpEvent && mouseUpEvent.button !== MouseEventButton.Left) {
 			return;
 		}
@@ -282,6 +284,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _mouseDownHandler(downEvent: MouseEvent | TouchEvent): void {
+		// eslint-disable-next-line no-restricted-syntax
 		if ('button' in downEvent && downEvent.button !== MouseEventButton.Left) {
 			return;
 		}
@@ -497,9 +500,9 @@ export class MouseEventHandler implements IDestroyable {
 		// TouchEvent has no clientX/Y coordinates:
 		// We have to use the last Touch instead
 		let eventLike: MouseEvent | Touch;
-		if ('touches' in event && event.touches.length) {
+		if ('touches' in event && event.touches.length) { // eslint-disable-line no-restricted-syntax
 			eventLike = event.touches[0];
-		} else if ('changedTouches' in event && event.changedTouches.length) {
+		} else if ('changedTouches' in event && event.changedTouches.length) { // eslint-disable-line no-restricted-syntax
 			eventLike = event.changedTouches[0];
 		} else {
 			eventLike = event as MouseEvent;

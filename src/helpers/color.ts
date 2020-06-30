@@ -266,6 +266,7 @@ function colorStringToRgb(colorString: string): Rgb {
 		return [0 as RedComponent, 0 as GreenComponent, 0 as BlueComponent];
 	}
 
+	// eslint-disable-next-line no-restricted-syntax
 	if (colorString in namedColorRgbHexStrings) {
 		colorString = namedColorRgbHexStrings[colorString];
 	}
