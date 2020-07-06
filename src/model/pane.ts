@@ -7,7 +7,7 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 import { ChartModel, ChartOptions, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { IPriceDataSource } from './iprice-data-source';
-import { PriceScale, PriceScaleState } from './price-scale';
+import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
 import { sortSources } from './sort-sources';
 import { TimeScale } from './time-scale';
 
@@ -392,7 +392,7 @@ export class Pane implements IDestroyable {
 	}
 
 	private _createPriceScale(id: string, options: OverlayPriceScaleOptions | VisiblePriceScaleOptions): PriceScale {
-		const actualOptions = { visible: true, autoScale: true, ...clone(options) };
+		const actualOptions: PriceScaleOptions = { visible: true, autoScale: true, ...clone(options) };
 		const priceScale = new PriceScale(
 			id,
 			actualOptions,

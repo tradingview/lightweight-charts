@@ -63,7 +63,7 @@ export class SeriesBarColorer {
 	}
 
 	private _barStyle(barStyle: BarStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
-		const result = { ...emptyResult };
+		const result: BarColorerStyle = { ...emptyResult };
 
 		const upColor = barStyle.upColor;
 		const downColor = barStyle.downColor;
@@ -80,7 +80,7 @@ export class SeriesBarColorer {
 	}
 
 	private _candleStyle(candlestickStyle: CandlestickStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
-		const result = { ...emptyResult };
+		const result: BarColorerStyle = { ...emptyResult };
 
 		const upColor = candlestickStyle.upColor;
 		const downColor = candlestickStyle.downColor;
@@ -115,7 +115,7 @@ export class SeriesBarColorer {
 	}
 
 	private _histogramStyle(histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
-		const result = { ...emptyResult };
+		const result: BarColorerStyle = { ...emptyResult };
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Histogram'>;
 		result.barColor = currentBar.color !== undefined ? currentBar.color : histogramStyle.color;
 		return result;
