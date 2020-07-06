@@ -2,7 +2,7 @@ import { isInteger, isNumber } from '../helpers/strict-type-checks';
 
 import { IFormatter } from './iformatter';
 
-export const formatterOptions = {
+const formatterOptions = {
 	decimalSign: '.',
 	decimalSignFractional: '\'',
 };
