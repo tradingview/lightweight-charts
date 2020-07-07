@@ -118,7 +118,7 @@ Each value of an object is a number between 0 (0%) and 1 (100%).
 
 ```javascript
 const lineSeries = chart.addLineSeries({
-    priceScaleId: 'right,
+    priceScaleId: 'right',
     scaleMargins: {
         top: 0.6,
         bottom: 0.05,

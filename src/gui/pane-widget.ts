@@ -374,7 +374,7 @@ export class PaneWidget implements IDestroyable {
 		this._longTap = true;
 
 		if (this._startTrackPoint === null && trackCrosshairOnlyAfterLongTap) {
-			const point = { x: event.localX as Coordinate, y: event.localY as Coordinate };
+			const point: Point = { x: event.localX as Coordinate, y: event.localY as Coordinate };
 			this._startTrackingMode(point, point);
 		}
 	}
