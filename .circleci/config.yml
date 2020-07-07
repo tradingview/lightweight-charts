@@ -7,13 +7,12 @@ aliases:
   - &restore-node-modules-cache
       name: Restore node_modules cache
       keys:
-        - &cache-key v1-dependencies-{{ checksum "package.json" }}-{{ checksum "tests/e2e/package.json" }}
+        - &cache-key v1-dependencies-{{ checksum "package.json" }}
 
   - &save-node-modules-cache
       name: Save node_modules cache
       paths:
         - node_modules
-        - tests/e2e/node_modules
       key: *cache-key
 
   - &default-filters
