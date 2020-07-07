@@ -157,7 +157,6 @@ jobs:
       - run-graphics-tests:
           devicePixelRatio: "2.0"
 
-
   memleaks-tests:
     executor: node-browsers-latest-executor
     environment:
@@ -171,6 +170,19 @@ jobs:
       - store_test_results:
           path: test-results/
 
+  coverage:
+    executor: node-browsers-latest-executor
+    environment:
+      NO_SANDBOX: "true"
+      TESTS_REPORT_FILE: "test-results/coverage/results.xml"
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: scripts/run-coverage-tests.sh
+      - store_test_results:
+          path: test-results/
+
   size-limit:
     executor: node-latest-executor
     steps:
@@ -181,6 +193,7 @@ jobs:
           name: "Comparing sizes with merge-base"
           command: node scripts/compare-size-with-merge-base.js
       - run: npm run size-limit
+
 
 workflows:
   version: 2
@@ -236,6 +249,10 @@ workflows:
           requires:
             - build
       - memleaks-tests:
+          filters: *default-filters
+          requires:
+            - build
+      - coverage:
           filters: *default-filters
           requires:
             - build
