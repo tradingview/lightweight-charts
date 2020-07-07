@@ -18,7 +18,7 @@ module.exports = {
 		'eslint:recommended',
 	],
 	parserOptions: {
-		ecmaVersion: 2015,
+		ecmaVersion: 2017,
 		sourceType: 'module',
 	},
 	overrides: [
@@ -457,7 +457,13 @@ module.exports = {
 		'arrow-spacing': ['error', { before: true, after: true }],
 
 		// require trailing commas in multiline object literals
-		'comma-dangle': ['error', 'always-multiline'],
+		'comma-dangle': ['error', {
+			arrays: 'always-multiline',
+			objects: 'always-multiline',
+			imports: 'always-multiline',
+			exports: 'always-multiline',
+			functions: 'never',
+		}],
 
 		// disallow duplicate module imports
 		'no-duplicate-imports': 'error',

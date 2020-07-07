@@ -26,7 +26,7 @@ if (process.env.TESTS_REPORT_FILE) {
 	// but mocha accept with form (like from cli) of this option
 	// e.g. option=value,option2=value
 	config['reporter-options'] = Object.keys(config._reporterOptions)
-		.map((option) => `${option}=${config._reporterOptions[option]}`)
+		.map(option => `${option}=${config._reporterOptions[option]}`)
 		.join(',');
 }
 
