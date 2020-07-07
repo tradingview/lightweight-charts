@@ -1,4 +1,5 @@
 module.exports = {
+	reportUnusedDisableDirectives: true,
 	env: {
 		browser: false,
 		es6: true,
@@ -24,7 +25,7 @@ module.exports = {
 	overrides: [
 		{
 			// rules specific for js files only
-			files: ['**/*.js'],
+			files: ['**/*.js', '**/*.md/*.javascript'],
 			rules: {
 				// enforces no braces where they can be omitted
 				// http://eslint.org/docs/rules/arrow-body-style
@@ -64,16 +65,27 @@ module.exports = {
 			processor: 'markdown/markdown',
 		},
 		{
-			files: ['**/*.md/*.js'],
+			files: ['**/*.md/*.js', '**/*.md/*.javascript'],
 			env: {
 				browser: true,
 				node: false,
 			},
 			globals: {
 				LightweightCharts: false,
+
+				areaSeries: true,
+				barSeries: true,
+				candlestickSeries: true,
+				chart: true,
+				container: true,
+				histogramSeries: true,
+				lineSeries: true,
+				series: true,
 			},
 			rules: {
 				'no-console': 'off',
+				'no-undef': 'off',
+				'no-unused-vars': 'off',
 				indent: ['error', 4],
 
 				'unicorn/filename-case': 'off',
@@ -81,6 +93,7 @@ module.exports = {
 		},
 		{
 			files: ['**/*.ts'],
+			excludedFiles: ['**/*.md/*.ts'],
 			parser: '@typescript-eslint/parser',
 			extends: [
 				'plugin:@typescript-eslint/eslint-recommended',

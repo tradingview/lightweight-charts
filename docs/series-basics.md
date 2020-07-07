@@ -14,19 +14,19 @@ For example:
 
 - to create line series:
 
-    ```javascript
+    ```js
     const lineSeries = chart.addLineSeries();
     ```
 
 - to create area series:
 
-    ```javascript
+    ```js
     const areaSeries = chart.addAreaSeries();
     ```
 
 - to create bar series:
 
-    ```javascript
+    ```js
     const barSeries = chart.addBarSeries();
     ```
 
@@ -44,7 +44,7 @@ Here are common parameters for every series:
 
 Example:
 
-```javascript
+```js
 const lineSeries = chart.addLineSeries({
     priceScaleId: 'left',
     title: 'Series title example',
@@ -61,7 +61,7 @@ When adding any series to a chart, you can specify if you want the target series
 By default, series are attached to the right price axis.
 This means one can scale the series with price axis. Note that price axis visible range depends on series values.
 
-```javascript
+```js
 const lineSeries = chart.addLineSeries({
     priceScaleId: 'left',
 });
@@ -70,7 +70,7 @@ const lineSeries = chart.addLineSeries({
 In contrast, an overlay series just draws itself on a chart independent from the visible price axis.
 To create an overlay specify a unique id as a `priceScaleId` or just keep is as an empty string.
 
-```javascript
+```js
 const lineSeries = chart.addLineSeries({
     priceScaleId: 'my-overlay-id',
 });
@@ -78,7 +78,7 @@ const lineSeries = chart.addLineSeries({
 
 At any moment you can get access to the price scale the series is bound to with `priceScale` method and change its options
 
-```javascript
+```js
 const lineSeries = chart.addLineSeries({
     priceScaleId: 'my-overlay-id',
 });
@@ -95,7 +95,7 @@ lineSeries.priceScale().applyOptions({
 When adding any series to a chart, you can name it by adding a string to the `title` property.
 This name will be displayed on the label next to the last value label.
 
-```javascript
+```js
 const lineSeries = chart.addLineSeries({
     title: 'Series title example',
 });
@@ -116,7 +116,7 @@ The margins is an object with the following properties:
 
 Each value of an object is a number between 0 (0%) and 1 (100%).
 
-```javascript
+```js
 const lineSeries = chart.addLineSeries({
     priceScaleId: 'right',
     scaleMargins: {
@@ -130,7 +130,7 @@ The code above places series at the bottom of a chart.
 
 You can change margins using `ChartApi.applyOptions` for the certain axis:
 
-```javascript
+```js
 chart.applyOptions({
     rightPriceScale: {
         scaleMargins: {
@@ -146,16 +146,14 @@ chart.applyOptions({
 By default, the chart scales data automatically based on visible data range. However, for some reasons one could require overriding this behavior.
 There is an option called `autoscaleProvider` that allows overriding visible price range for series
 
-```javascript
+```js
 const firstSeries = chart.addLineSeries({
-    autoscaleInfoProvider: () => {
-        return {
-            priceRange: {
-                minValue: 0,
-                maxValue: 100,
-            },
-        };
-    },
+    autoscaleInfoProvider: () => ({
+        priceRange: {
+            minValue: 0,
+            maxValue: 100,
+        },
+    }),
 });
 ```
 
@@ -163,28 +161,26 @@ So, you can just add a function that returns an object with `priceRange` field, 
 
 You can also provide additional margins in pixels. Please be careful and never mix prices and pixels.
 
-```javascript
+```js
 const firstSeries = chart.addLineSeries({
-    autoscaleInfoProvider: () => {
-        return {
-            priceRange: {
-                minValue: 0,
-                maxValue: 100,
-            },
-            margins: {
-                above: 10,
-                below: 10,
-            },
-        };
-    },
+    autoscaleInfoProvider: () => ({
+        priceRange: {
+            minValue: 0,
+            maxValue: 100,
+        },
+        margins: {
+            above: 10,
+            below: 10,
+        },
+    }),
 });
 ```
 
 Actually, `autoscaleInfoProvider` function has an argument `original` which is the default implementation, so you can call it and adjust the result:
 
-```javascript
+```js
 const firstSeries = chart.addLineSeries({
-    autoscaleInfoProvider: (original) => {
+    autoscaleInfoProvider: original => {
         const res = original();
         if (res.priceRange !== null) {
             res.priceRange.minValue -= 10;
@@ -201,7 +197,7 @@ Note that both `priceRange` and `margins` could be `null` in the default result.
 
 Any series could be removed with
 
-```javascript
+```js
 chart.removeSeries(series);
 ```
 
@@ -245,7 +241,7 @@ You can set the width, style and color of this line or disable it using the foll
 
 Example:
 
-```javascript
+```js
 series.applyOptions({
     priceLineVisible: false,
     priceLineWidth: 2,
@@ -265,7 +261,7 @@ There is an option to hide it as well.
 
 Example:
 
-```javascript
+```js
 series.applyOptions({
     lastValueVisible: false,
 });
@@ -285,7 +281,7 @@ You can set the width, style and color of this line or disable it using the foll
 
 Example:
 
-```javascript
+```js
 series.applyOptions({
     baseLineVisible: true,
     baseLineColor: '#ff0000',
@@ -314,7 +310,7 @@ The following options are available for setting the price format displayed by an
 
 Examples:
 
-```javascript
+```js
 series.applyOptions({
     priceFormat: {
         type: 'volume',
@@ -324,15 +320,13 @@ series.applyOptions({
 });
 ```
 
-```javascript
+```js
 series.applyOptions({
     priceFormat: {
         type: 'custom',
         minMove: 0.02,
-        formatter: (price) => {
-            return '$' + price.toFixed(2);
-        },
-    }
+        formatter: price => '$' + price.toFixed(2),
+    },
 });
 ```
 
@@ -344,14 +338,14 @@ An array of items is expected.
 
 Examples:
 
-```javascript
+```js
 lineSeries.setData([
     { time: '2018-12-12', value: 24.11 },
     { time: '2018-12-13', value: 31.74 },
 ]);
 ```
 
-```javascript
+```js
 barSeries.setData([
     { time: '2018-12-19', open: 141.77, high: 170.39, low: 120.25, close: 145.72 },
     { time: '2018-12-20', open: 145.72, high: 147.99, low: 100.11, close: 108.19 },
@@ -366,14 +360,14 @@ A single data item is expected.
 
 Examples:
 
-```javascript
+```js
 lineSeries.update({
     time: '2018-12-12',
     value: 24.11,
 });
 ```
 
-```javascript
+```js
 barSeries.update({
     time: '2018-12-19',
     open: 141.77,
@@ -399,7 +393,7 @@ An array of items is expected. An array must be sorted ascending by `time`. Each
 
 Example:
 
-```javascript
+```js
 series.setMarkers([
     {
         time: '2019-04-09',
@@ -425,11 +419,11 @@ series.setMarkers([
     },
 ]);
 
-chart.subscribeCrosshairMove((param) => {
+chart.subscribeCrosshairMove(param => {
     console.log(param.hoveredMarkerId);
 });
 
-chart.subscribeClick((param) => {
+chart.subscribeClick(param => {
     console.log(param.hoveredMarkerId);
 });
 ```
@@ -453,7 +447,7 @@ You can set the price level, width, style and color of this line using the follo
 
 Example:
 
-```javascript
+```js
 const priceLine = series.createPriceLine({
     price: 80.0,
     color: 'green',
@@ -477,7 +471,7 @@ Removes the price line that was created before.
 
 Example:
 
-```javascript
+```js
 const priceLine = series.createPriceLine({ price: 80.0 });
 series.removePriceLine(priceLine);
 ```
@@ -499,7 +493,7 @@ Negative value means that the first series' bar is inside the passed logical ran
 Positive value in the `barsAfter` field means that there are some bars after (out of logical range from the right) the `to` logical index in the series.
 Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the `to` logical index are some bars.
 
-```javascript
+```js
 // returns bars info in current visible range
 const barsInfo = series.barsInLogicalRange(chart.timeScale().getVisibleLogicalRange());
 console.log(barsInfo);
@@ -508,7 +502,7 @@ console.log(barsInfo);
 This method can be used, for instance, to implement downloading historical data while scrolling to prevent a user from seeing empty space.
 Thus, you can subscribe to [visible logical range changed event](./time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
 
-```javascript
+```js
 function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
     const barsInfo = series.barsInLogicalRange(newVisibleLogicalRange);
     // if there less than 50 bars to the left of the visible area
@@ -524,7 +518,7 @@ chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChange
 
 Takes the whole chart screenshot.
 
-```javascript
+```js
 const screenshot = chart.takeScreenshot();
 ```
 
@@ -540,7 +534,7 @@ There are two functions to access this price scale implicitly.
 
 This function accepts price value and returns corresponding coordinate or `null`.
 
-```javascript
+```js
 const coordinate = series.priceToCoordinate(100.5);
 ```
 
@@ -548,7 +542,7 @@ const coordinate = series.priceToCoordinate(100.5);
 
 This function accepts coordinate and returns corresponding price value or `null`.
 
-```javascript
+```js
 const price = series.coordinateToPrice(324);
 ```
 

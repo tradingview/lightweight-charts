@@ -19,7 +19,7 @@ _Note: the package is shipped with TypeScript declarations, so `lightweight-char
 
 After installing the package just add the following code to your JavaScript file:
 
-```javascript
+```js
 import { createChart } from 'lightweight-charts';
 
 const chart = createChart(document.body, { width: 400, height: 300 });
@@ -50,7 +50,7 @@ lineSeries.setData([
 
 1. Add the following code to the web page (for example, add it to a `script` tag in the HTML code of the page):
 
-    ```javascript
+    ```js
     const chart = LightweightCharts.createChart(document.body, { width: 400, height: 300 });
     const lineSeries = chart.addLineSeries();
     lineSeries.setData([

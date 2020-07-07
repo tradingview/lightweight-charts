@@ -51,7 +51,6 @@ export class PriceTickMarkBuilder {
 		return min(spans);
 	}
 
-	// eslint-disable-next-line complexity
 	public rebuildTickMarks(): void {
 		const priceScale = this._priceScale;
 
