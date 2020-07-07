@@ -12,7 +12,7 @@ This data type is used by several series types such as bars or candlesticks.
 
 ## Example
 
-```javascript
+```js
 const ohlcItem = {
     time: '2018-06-25',
     open: 10,

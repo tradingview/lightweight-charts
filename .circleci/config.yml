@@ -7,13 +7,12 @@ aliases:
   - &restore-node-modules-cache
       name: Restore node_modules cache
       keys:
-        - &cache-key v1-dependencies-{{ checksum "package.json" }}-{{ checksum "tests/e2e/package.json" }}
+        - &cache-key v1-dependencies-{{ checksum "package.json" }}
 
   - &save-node-modules-cache
       name: Save node_modules cache
       paths:
         - node_modules
-        - tests/e2e/node_modules
       key: *cache-key
 
   - &default-filters
@@ -172,13 +171,16 @@ jobs:
       - store_test_results:
           path: test-results/
 
-  codechecks:
+  size-limit:
     executor: node-latest-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: npm run codechecks
+      - run:
+          name: "Comparing sizes with merge-base"
+          command: node scripts/compare-size-with-merge-base.js
+      - run: npm run size-limit
 
 workflows:
   version: 2
@@ -209,7 +211,7 @@ workflows:
           requires:
             - install-deps
 
-      - codechecks:
+      - size-limit:
           filters: *default-filters
           requires:
             - build

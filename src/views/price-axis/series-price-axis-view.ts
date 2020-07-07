@@ -14,7 +14,6 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		this._source = source;
 	}
 
-	// eslint-disable-next-line complexity
 	protected _updateRendererData(
 		axisRendererData: PriceAxisViewRendererData,
 		paneRendererData: PriceAxisViewRendererData,

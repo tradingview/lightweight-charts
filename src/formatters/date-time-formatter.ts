@@ -22,7 +22,7 @@ export class DateTimeFormatter implements IFormatter {
 	private readonly _separator: string;
 
 	public constructor(params: Partial<DateTimeFormatterParams> = {}) {
-		const formatterParams = { ...defaultParams, ...params };
+		const formatterParams: DateTimeFormatterParams = { ...defaultParams, ...params };
 		this._dateFormatter = new DateFormatter(formatterParams.dateFormat, formatterParams.locale);
 		this._timeFormatter = new TimeFormatter(formatterParams.timeFormat);
 		this._separator = formatterParams.dateTimeSeparator;

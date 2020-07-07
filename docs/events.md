@@ -11,7 +11,7 @@ Event subscriptions can notify you of such chart/user interactions as mouse clic
 
 Example:
 
-```javascript
+```js
 function handleClick(param) {
     if (!param.point) {
         return;
@@ -36,7 +36,7 @@ chart.unsubscribeClick(handleClick);
 
 Example:
 
-```javascript
+```js
 function handleCrosshairMoved(param) {
     if (!param.point) {
         return;
@@ -58,7 +58,7 @@ chart.unsubscribeCrosshairMove(handleCrosshairMoved);
 
 MouseEventHandler is a type of callback that is used in the subscription methods.
 
-```typescript
+```ts
 export type MouseEventHandler = (param: MouseEventParams) => void;
 ```
 

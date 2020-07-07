@@ -10,7 +10,7 @@ Note that to prevent errors, you should cast the numeric type of the time to `UT
 
 Example:
 
-```javascript
+```js
 const timestamp = 1529884800; // June 25, 2018
 ```
 
@@ -26,7 +26,7 @@ This format uses objects where year, month and day are shown as separate fields:
 
 Example:
 
-```javascript
+```js
 const day = { year: 2019, month: 6, day: 1 }; // June 1, 2019
 ```
 
@@ -36,6 +36,6 @@ This format is shorter than business day format. It allows you to specify dates 
 
 Example:
 
-```javascript
+```js
 const timestamp = '2018-06-25'; // June 25, 2018
 ```

@@ -8,17 +8,16 @@ Most of the chart settings can be set right when creating a chart. Subsequently,
 
 First of all, the preferred chart size should be set when creating a chart:
 
-```javascript
-const chart = createChart(document.body, {
-        width: 600,
-        height: 380,
-    },
+```js
+const chart = LightweightCharts.createChart(document.body, {
+    width: 600,
+    height: 380,
 });
 ```
 
 If you want the chart size to be adjusted when the web page is resized, use the `resize` function to set the width and height of the chart:
 
-```javascript
+```js
 chart.resize(250, 150);
 ```
 
@@ -32,8 +31,8 @@ By default, the library uses browser language settings.
 Thus, the displayed date and time format may differ depending on the region of the user.
 To set the same language settings for all users, use the `locale` property of the `localization` option:
 
-```javascript
-const chart = createChart(document.body, {
+```js
+const chart = LightweightCharts.createChart(document.body, {
     localization: {
         locale: 'ja-JP',
     },
@@ -42,11 +41,11 @@ const chart = createChart(document.body, {
 
 Using the `applyOptions` function you can change the locale at any time after the chart creation:
 
-```javascript
+```js
 chart.applyOptions({
-   localization: {
+    localization: {
         locale: 'en-US',
-   },
+    },
 });
 ```
 
@@ -63,8 +62,8 @@ The format string might contain "special" sequences, which will be replaced with
 - `MM` - numeric (with leading zero if needed) month value (e.g. 03)
 - `dd` - day of month (with leading zero if needed) value (e.g. 15)
 
-```javascript
-const chart = createChart(document.body, {
+```js
+const chart = LightweightCharts.createChart(document.body, {
     localization: {
         dateFormat: 'yyyy/MM/dd',
     },
@@ -77,10 +76,10 @@ const chart = createChart(document.body, {
 
 Changing the time format of the time scale labels is not available currently but we intend to roll this out in the future.
 
-```javascript
-const chart = createChart(document.body, {
+```js
+const chart = LightweightCharts.createChart(document.body, {
     localization: {
-        timeFormatter: (businessDayOrTimestamp) => {
+        timeFormatter: businessDayOrTimestamp => {
             // console.log(businessDayOrTimestamp);
 
             if (LightweightCharts.isBusinessDay(businessDayOrTimestamp)) {
@@ -97,14 +96,14 @@ const chart = createChart(document.body, {
 
 `priceFormatter` function can be used for the format customization of the price displayed on the price scale for crosshair value and labels.
 
-```javascript
-const chart = createChart(document.body, {
+```js
+const chart = LightweightCharts.createChart(document.body, {
     localization: {
-        priceFormatter: (price) => {
-            // add $ sign before price
+        priceFormatter: price =>
+        // add $ sign before price
 
-            return '$' + price;
-        },
+            '$' + price
+        ,
     },
 });
 ```
@@ -139,7 +138,7 @@ The following set of options can be used to adjust the price axis interface:
 
 ### An example of a price scale customization
 
-```javascript
+```js
 chart.applyOptions({
     priceScale: {
         position: 'left',
@@ -186,7 +185,7 @@ The following options are available for vertical and horizontal lines of a cross
 
 ### An example of a crosshair customization
 
-```javascript
+```js
 chart.applyOptions({
     crosshair: {
         vertLine: {
@@ -224,7 +223,7 @@ The following options are available for vertical and horizontal lines of a grid:
 
 ### An example of a grid customization
 
-```javascript
+```js
 chart.applyOptions({
     grid: {
         vertLines: {
@@ -264,7 +263,7 @@ The following options are available for the watermark:
 
 ### An example of a watermark customization
 
-```javascript
+```js
 chart.applyOptions({
     watermark: {
         color: 'rgba(11, 94, 29, 0.4)',
@@ -290,7 +289,7 @@ The following options can be used to customize chart design:
 
 ### An example of layout customization
 
-```javascript
+```js
 chart.applyOptions({
     layout: {
         backgroundColor: '#FAEBD7',
@@ -339,7 +338,7 @@ You can also set `axisPressedMouseMove` to `true` or `false` to enable or disabl
 
 ### An example of a scrolling/scaling customization
 
-```javascript
+```js
 chart.applyOptions({
     handleScroll: {
         mouseWheel: true,
