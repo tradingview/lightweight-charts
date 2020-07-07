@@ -488,9 +488,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 				const priceScale = Math.pow(10, this._options.priceFormat.precision);
 				this._formatter = new PriceFormatter(
 					priceScale,
-					this._options.priceFormat.minMove * priceScale,
-					false,
-					undefined
+					this._options.priceFormat.minMove * priceScale
 				);
 			}
 		}
