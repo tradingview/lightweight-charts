@@ -180,7 +180,7 @@ jobs:
           at: ./
       - run:
           name: "Comparing sizes with merge-base"
-          command: node scripts/size-limit.js
+          command: node scripts/compare-size-with-merge-base.js
       - run: npm run size-limit
 
 workflows:
