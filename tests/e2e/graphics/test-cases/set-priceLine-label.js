@@ -31,7 +31,7 @@ function runTestCase(container) {
 		lineStyle: LightweightCharts.LineStyle.Dotted,
 		axisLabelVisible: true,
 		title: 'P/L: 500',
-    };
+	};
 
 	mainSeries.createPriceLine(priceLine);
 }
