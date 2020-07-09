@@ -351,7 +351,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		for (const customPriceLine of this._customPriceLines) {
-			res.concat(customPriceLine.paneViews());
+			res.push(...customPriceLine.paneViews());
 		}
 
 		res.push(this._paneView);

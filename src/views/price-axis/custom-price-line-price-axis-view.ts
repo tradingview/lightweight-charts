@@ -29,7 +29,7 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 
 		const options = this._priceLine.options();
 		const labelVisible = options.axisLabelVisible;
-		const showPaneLabel = options.paneLabel !== '';
+		const showPaneLabel = options.title !== '';
 
 		if (!labelVisible) {
 			return;
@@ -41,8 +41,8 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 		}
 
 		if (showPaneLabel) {
-			paneRendererData.text = options.paneLabel;
-			paneRendererData.visible = paneRendererData.text.length > 0;
+			paneRendererData.text = options.title;
+			paneRendererData.visible = true;
 		}
 
 		paneRendererData.borderColor = this._series.model().options().layout.backgroundColor;

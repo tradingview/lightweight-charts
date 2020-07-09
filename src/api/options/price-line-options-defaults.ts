@@ -7,5 +7,5 @@ export const priceLineOptionsDefaults: PriceLineOptions = {
 	lineStyle: LineStyle.Dashed,
 	lineWidth: 1,
 	axisLabelVisible: true,
-	paneLabel: ""
+	title: ""
 };
