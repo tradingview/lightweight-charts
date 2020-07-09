@@ -24,13 +24,14 @@ function runTestCase(container) {
 		to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
 	});
 
-	var priceLine = {
-        price: 45,
-        color: "#be1238",
-        lineWidth: 2,
-        lineStyle: 1,
+	const priceLine = {
+		price: 980,
+		color: '#be1238',
+		lineWidth: 2,
+		lineStyle: LightweightCharts.LineStyle.Dotted,
 		axisLabelVisible: true,
-		paneLabel: "P/L: 500"
+		title: 'P/L: 500',
     };
-    mainSeries.createPriceLine(priceLine);
+
+	mainSeries.createPriceLine(priceLine);
 }

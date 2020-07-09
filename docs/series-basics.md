@@ -455,7 +455,7 @@ const priceLine = series.createPriceLine({
     lineWidth: 2,
     lineStyle: LightweightCharts.LineStyle.Dotted,
     axisLabelVisible: true,
-    title: "P/L 500"
+    title: 'P/L 500',
 });
 
 priceLine.applyOptions({
@@ -464,7 +464,7 @@ priceLine.applyOptions({
     lineWidth: 3,
     lineStyle: LightweightCharts.LineStyle.Dashed,
     axisLabelVisible: false,
-    title: "P/L 600"
+    title: 'P/L 600',
 });
 ```
 
