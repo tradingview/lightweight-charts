@@ -444,6 +444,7 @@ You can set the price level, width, style and color of this line using the follo
 |`lineWidth`|`number`|`1`|Price line's width in pixels|
 |`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Price line's style|
 |`axisLabelVisible`|`boolean`|`true`|If true, a label with the current price value is displayed on the price scale|
+|`title`|`string`|`''`|Price line's title on the chart's pane|
 
 Example:
 
@@ -454,6 +455,7 @@ const priceLine = series.createPriceLine({
     lineWidth: 2,
     lineStyle: LightweightCharts.LineStyle.Dotted,
     axisLabelVisible: true,
+    title: 'P/L 500',
 });
 
 priceLine.applyOptions({
@@ -462,6 +464,7 @@ priceLine.applyOptions({
     lineWidth: 3,
     lineStyle: LightweightCharts.LineStyle.Dashed,
     axisLabelVisible: false,
+    title: 'P/L 600',
 });
 ```
 

@@ -6,4 +6,5 @@ export interface PriceLineOptions {
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
 	axisLabelVisible: boolean;
+	title: string;
 }
