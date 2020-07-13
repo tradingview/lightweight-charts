@@ -19,11 +19,6 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	chart.timeScale().setVisibleRange({
-		from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
-		to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
-	});
-
 	const priceLine = {
 		price: 980,
 		color: '#be1238',
