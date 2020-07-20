@@ -44,6 +44,7 @@ export interface HandleScaleOptions {
 type HandleScaleOptionsInternal =
 	Omit<HandleScaleOptions, 'axisPressedMouseMove'>
 	& {
+		/** @public */
 		axisPressedMouseMove: AxisPressedMouseMoveOptions;
 	};
 
@@ -114,7 +115,9 @@ export interface ChartOptions {
 export type ChartOptionsInternal =
 	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale'>
 	& {
+		/** @public */
 		handleScroll: HandleScrollOptions;
+		/** @public */
 		handleScale: HandleScaleOptionsInternal;
 	};
 
