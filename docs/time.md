@@ -13,6 +13,7 @@ Example:
 ```js
 const timestamp = 1529884800; // June 25, 2018
 ```
+- `timestamp` (`number`) - UTC
 
 ## Business day object
 
