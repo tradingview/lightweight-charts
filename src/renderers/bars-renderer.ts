@@ -1,3 +1,5 @@
+import { ensureNotNull } from '../helpers/assertions';
+
 import { BarCoordinates, BarPrices } from '../model/bar';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
@@ -28,19 +30,20 @@ export class PaneRendererBars implements IPaneRenderer {
 		this._data = data;
 	}
 
+	// eslint-disable-next-line complexity
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 
-		this._barWidth = Math.max(1, Math.floor(optimalBarWidth(this._data.barSpacing, pixelRatio)));
+		this._barWidth = this._calcBarWidth(pixelRatio);
 
 		// grid and crosshair have line width = Math.floor(pixelRatio)
 		// if this value is odd, we have to make bars' width odd
 		// if this value is even, we have to make bars' width even
 		// in order of keeping crosshair-over-bar drawing symmetric
 		if (this._barWidth >= 2) {
-			const lineWidth = Math.floor(pixelRatio);
+			const lineWidth = Math.max(1, Math.floor(pixelRatio));
 			if ((lineWidth % 2) !== (this._barWidth % 2)) {
 				this._barWidth--;
 			}
@@ -50,6 +53,7 @@ export class PaneRendererBars implements IPaneRenderer {
 		this._barLineWidth = this._data.thinBars ? Math.min(this._barWidth, Math.floor(pixelRatio)) : this._barWidth;
 		let prevColor: string | null = null;
 
+		const drawOpenClose = this._barLineWidth <= this._barWidth && this._data.barSpacing >= Math.floor(1.5 * pixelRatio);
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
 			const bar = this._data.bars[i];
 			if (prevColor !== bar.color) {
@@ -64,9 +68,12 @@ export class PaneRendererBars implements IPaneRenderer {
 			const bodyWidth = this._barLineWidth;
 			const bodyRight = bodyLeft + bodyWidth - 1;
 
-			const bodyTop = Math.round(bar.highY * pixelRatio) - bodyWidthHalf;
+			const high = Math.min(bar.highY, bar.lowY);
+			const low = Math.max(bar.high, bar.lowY);
 
-			const bodyBottom = Math.round(bar.lowY * pixelRatio) + bodyWidthHalf;
+			const bodyTop = Math.round(high * pixelRatio) - bodyWidthHalf;
+
+			const bodyBottom = Math.round(low * pixelRatio) + bodyWidthHalf;
 
 			const bodyHeight = Math.max((bodyBottom - bodyTop), this._barLineWidth);
 
@@ -79,7 +86,7 @@ export class PaneRendererBars implements IPaneRenderer {
 
 			const sideWidth = Math.ceil(this._barWidth * 1.5);
 
-			if (this._barLineWidth <= this._barWidth) {
+			if (drawOpenClose) {
 				if (this._data.openVisible) {
 					const openLeft = bodyCenter - sideWidth;
 					let openTop = Math.max(bodyTop, Math.round(bar.openY * pixelRatio) - bodyWidthHalf);
@@ -112,5 +119,10 @@ export class PaneRendererBars implements IPaneRenderer {
 				);
 			}
 		}
+	}
+
+	private _calcBarWidth(pixelRatio: number): number {
+		const limit = Math.floor(pixelRatio);
+		return Math.max(limit, Math.floor(optimalBarWidth(ensureNotNull(this._data).barSpacing, pixelRatio)));
 	}
 }
