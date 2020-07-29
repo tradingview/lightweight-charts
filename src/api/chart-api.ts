@@ -133,11 +133,9 @@ function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<Char
 	return options as DeepPartial<ChartOptionsInternal>;
 }
 
-export interface IPriceScaleApiProvider {
-	priceScale(id: string): IPriceScaleApi;
-}
+export type IPriceScaleApiProvider = Pick<IChartApi, 'priceScale'>;
 
-export class ChartApi implements IChartApi, IPriceScaleApiProvider, DataUpdatesConsumer<SeriesType> {
+export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _chartWidget: ChartWidget;
 	private _dataLayer: DataLayer = new DataLayer();
 	private readonly _seriesMap: Map<SeriesApi<SeriesType>, Series> = new Map();
