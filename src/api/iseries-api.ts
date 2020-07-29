@@ -85,7 +85,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	options(): Readonly<SeriesOptionsMap[TSeriesType]>;
 
 	/**
-	 * Returns interface of the pri scale the series is currently attached
+	 * Returns interface of the price scale the series is currently attached
 	 *
 	 * @returns IPriceScaleApi object to control the price scale
 	 */
