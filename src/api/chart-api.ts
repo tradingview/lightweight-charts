@@ -307,9 +307,9 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	public priceScale(priceScaleId?: string): IPriceScaleApi {
 		if (priceScaleId === undefined) {
 			warn('Using ChartApi.priceScale() method without arguments has been deprecated, pass valid price scale id instead');
+			priceScaleId = this._chartWidget.model().defaultVisiblePriceScaleId();
 		}
 
-		priceScaleId = priceScaleId || this._chartWidget.model().defaultVisiblePriceScaleId();
 		return new PriceScaleApi(this._chartWidget, priceScaleId);
 	}
 
