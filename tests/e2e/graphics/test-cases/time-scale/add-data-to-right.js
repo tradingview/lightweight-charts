@@ -27,21 +27,23 @@ async function runTestCase(container) {
 	);
 
 	areaSeries = chart.addAreaSeries();
+	data = generateData(61, Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	areaSeries.setData(data);
+	const timeScale = chart.timeScale();
 
 	// left empty space in visible range
 	// --------
 	//      /\
 	//     /  \
 	// --------
-	data = generateData(61, Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	areaSeries.setData(data);
+	timeScale.setVisibleLogicalRange({ from: -10, to: 20 });
+	await whenRangeChanged(timeScale);
 
-	const timeScale = chart.timeScale();
 	const startRange = timeScale.getVisibleLogicalRange();
 	const startTimeRange = timeScale.getVisibleRange();
 
-	// add 3 bars to left
-	data = [...generateData(3, Date.UTC(2017, 11, 29, 0, 0, 0, 0)), ...data];
+	// add 3 bars to right
+	data = [...data, ...generateData(3, (data[data.length - 1].time + 24 * 60 * 60) * 1000)];
 	areaSeries.setData(data);
 
 	// visible logical range should shift to right
@@ -49,8 +51,8 @@ async function runTestCase(container) {
 	console.assert(newRange.from === startRange.from + 3, `from index should shift to right, expected=${startRange.from + 3}, actual=${newRange.from}`);
 	console.assert(newRange.to === startRange.to + 3, `to index should shift to right, expected=${startRange.to + 3}, actual=${newRange.to}`);
 	let newTimeRange = timeScale.getVisibleRange();
-	console.assert(newTimeRange.from !== startTimeRange.from, `from time shouldn't be the same as previously set, expected=${newTimeRange.from}, actual=${startTimeRange.from}`);
-	console.assert(newTimeRange.to === startTimeRange.to, `from time should be the same as previously set, expected=${startTimeRange.to}, actual=${newTimeRange.to}`);
+	console.assert(newTimeRange.from === startTimeRange.from, `from time shouldn't be the same as previously set, expected=${startTimeRange.from}, actual=${newTimeRange.from}`);
+	console.assert(newTimeRange.to !== startTimeRange.to, `to time shouldn't be the same as previously set, expected=${newTimeRange.to}, actual=${startTimeRange.to}`);
 
 	// fill visible range
 	// --------
@@ -67,14 +69,14 @@ async function runTestCase(container) {
 
 	let timeRangeBeforeSetData = timeScale.getVisibleRange();
 
-	// add 3 bars to left
-	data = [...generateData(3, Date.UTC(2017, 11, 26, 0, 0, 0, 0)), ...data];
+	// add 3 bars to right
+	data = [...data, ...generateData(3, (data[data.length - 1].time + 24 * 60 * 60) * 1000)];
 	areaSeries.setData(data);
 
-	// visible logical range should shift to right
+	// visible logical range shouldn't be changed
 	newRange = timeScale.getVisibleLogicalRange();
-	console.assert(newRange.from === 6, `from index should be changed, expected=${6}, actual=${newRange.from}`);
-	console.assert(newRange.to === 23, `to index should be changed, expected=${23}, actual=${newRange.to}`);
+	console.assert(newRange.from === 3, `from index should be changed, expected=${3}, actual=${newRange.from}`);
+	console.assert(newRange.to === 20, `to index should be changed, expected=${20}, actual=${newRange.to}`);
 	// visible time range shouldn't be changed
 	newTimeRange = timeScale.getVisibleRange();
 	console.assert(newTimeRange.from === timeRangeBeforeSetData.from, `from time should be the same as previously set, expected=${timeRangeBeforeSetData.from}, actual=${newTimeRange.from}`);
@@ -90,15 +92,15 @@ async function runTestCase(container) {
 
 	timeRangeBeforeSetData = timeScale.getVisibleRange();
 
-	// add 3 bars to left
-	data = [...generateData(3, Date.UTC(2017, 11, 23, 0, 0, 0, 0)), ...data];
+	// add 3 bars to right
+	data = [...data, ...generateData(3, (data[data.length - 1].time + 24 * 60 * 60) * 1000)];
 	areaSeries.setData(data);
 
 	newRange = timeScale.getVisibleLogicalRange();
 	console.assert(newRange.from === 53, `from index should be changed, expected=${53}, actual=${newRange.from}`);
 	console.assert(newRange.to === 83, `to index should be changed, expected=${80}, actual=${newRange.to}`);
-	// visible time range shouldn't be changed
+	// visible time range should be changed
 	newTimeRange = timeScale.getVisibleRange();
-	console.assert(newTimeRange.from === timeRangeBeforeSetData.from, `from time should be the same as previously set, expected=${timeRangeBeforeSetData.from}, actual=${newTimeRange.from}`);
-	console.assert(newTimeRange.to === timeRangeBeforeSetData.to, `from time should be the same as previously set, expected=${timeRangeBeforeSetData.to}, actual=${newTimeRange.to}`);
+	console.assert(newTimeRange.from === timeRangeBeforeSetData.from + 3 * (24 * 60 * 60), `from time should be shift by 3 days, expected=${timeRangeBeforeSetData.from + 3 * (24 * 60 * 60)}, actual=${newTimeRange.from}`);
+	console.assert(newTimeRange.to === timeRangeBeforeSetData.to + 3 * (24 * 60 * 60), `to time should be shift by 3 days, expected=${timeRangeBeforeSetData.to + 3 * (24 * 60 * 60)}, actual=${newTimeRange.to}`);
 }
