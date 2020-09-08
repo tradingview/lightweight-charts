@@ -47,9 +47,9 @@ async function runTestCase(container) {
 	areaSeries.setData(data);
 
 	// visible logical range should shift to right
-	let newRange = timeScale.getVisibleLogicalRange();
-	console.assert(newRange.from === startRange.from + 3, `from index should shift to right, expected=${startRange.from + 3}, actual=${newRange.from}`);
-	console.assert(newRange.to === startRange.to + 3, `to index should shift to right, expected=${startRange.to + 3}, actual=${newRange.to}`);
+	let newLogicalRange = timeScale.getVisibleLogicalRange();
+	console.assert(newLogicalRange.from === startRange.from + 3, `from index should shift to right, expected=${startRange.from + 3}, actual=${newLogicalRange.from}`);
+	console.assert(newLogicalRange.to === startRange.to + 3, `to index should shift to right, expected=${startRange.to + 3}, actual=${newLogicalRange.to}`);
 	let newTimeRange = timeScale.getVisibleRange();
 	console.assert(newTimeRange.from !== startTimeRange.from, `from time shouldn't be the same as previously set, expected=${newTimeRange.from}, actual=${startTimeRange.from}`);
 	console.assert(newTimeRange.to === startTimeRange.to, `from time should be the same as previously set, expected=${startTimeRange.to}, actual=${newTimeRange.to}`);
@@ -63,9 +63,9 @@ async function runTestCase(container) {
 	await whenRangeChanged(timeScale);
 
 	// visible logical range should be changed
-	newRange = timeScale.getVisibleLogicalRange();
-	console.assert(newRange.from === 3, `from index should be changed, expected=${3}, actual=${newRange.from}`);
-	console.assert(newRange.to === 20, `to index should be changed, expected=${20}, actual=${newRange.to}`);
+	newLogicalRange = timeScale.getVisibleLogicalRange();
+	console.assert(newLogicalRange.from === 3, `from index should be changed, expected=${3}, actual=${newLogicalRange.from}`);
+	console.assert(newLogicalRange.to === 20, `to index should be changed, expected=${20}, actual=${newLogicalRange.to}`);
 
 	let timeRangeBeforeSetData = timeScale.getVisibleRange();
 
@@ -74,9 +74,9 @@ async function runTestCase(container) {
 	areaSeries.setData(data);
 
 	// visible logical range should shift to right
-	newRange = timeScale.getVisibleLogicalRange();
-	console.assert(newRange.from === 6, `from index should be changed, expected=${6}, actual=${newRange.from}`);
-	console.assert(newRange.to === 23, `to index should be changed, expected=${23}, actual=${newRange.to}`);
+	newLogicalRange = timeScale.getVisibleLogicalRange();
+	console.assert(newLogicalRange.from === 6, `from index should be changed, expected=${6}, actual=${newLogicalRange.from}`);
+	console.assert(newLogicalRange.to === 23, `to index should be changed, expected=${23}, actual=${newLogicalRange.to}`);
 	// visible time range shouldn't be changed
 	newTimeRange = timeScale.getVisibleRange();
 	console.assert(newTimeRange.from === timeRangeBeforeSetData.from, `from time should be the same as previously set, expected=${timeRangeBeforeSetData.from}, actual=${newTimeRange.from}`);
@@ -96,9 +96,9 @@ async function runTestCase(container) {
 	data = [...generateData(3, Date.UTC(2017, 11, 23, 0, 0, 0, 0)), ...data];
 	areaSeries.setData(data);
 
-	newRange = timeScale.getVisibleLogicalRange();
-	console.assert(newRange.from === 53, `from index should be changed, expected=${53}, actual=${newRange.from}`);
-	console.assert(newRange.to === 83, `to index should be changed, expected=${80}, actual=${newRange.to}`);
+	newLogicalRange = timeScale.getVisibleLogicalRange();
+	console.assert(newLogicalRange.from === 53, `from index should be changed, expected=${53}, actual=${newLogicalRange.from}`);
+	console.assert(newLogicalRange.to === 83, `to index should be changed, expected=${80}, actual=${newLogicalRange.to}`);
 	// visible time range shouldn't be changed
 	newTimeRange = timeScale.getVisibleRange();
 	console.assert(newTimeRange.from === timeRangeBeforeSetData.from, `from time should be the same as previously set, expected=${timeRangeBeforeSetData.from}, actual=${newTimeRange.from}`);
