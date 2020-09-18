@@ -62,7 +62,7 @@ describe('Memleaks tests', () => {
 	});
 
 	for (const testCase of testCases) {
-		// eslint-disable-next-line no-loop-func
+		// eslint-disable-next-line @typescript-eslint/no-loop-func
 		it(testCase.name, async () => {
 			const pageContent = generatePageContent(testStandalonePath, testCase.caseContent);
 
