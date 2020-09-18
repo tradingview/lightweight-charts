@@ -93,9 +93,6 @@ export class ChartWidget implements IDestroyable {
 			}
 		}
 
-		width = Math.max(70, width);
-		height = Math.max(50, height);
-
 		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
 		// or after but with adjustSize to properly update time scale
 		this.resize(width, height);
