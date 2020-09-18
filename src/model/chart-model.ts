@@ -483,13 +483,11 @@ export class ChartModel implements IDestroyable {
 		// (and actually we cannot)
 		if (visibleBars !== null && oldFirstTime !== null && newFirstTime !== null) {
 			const isLastSeriesBarVisible = visibleBars.contains(currentBaseIndex);
-			const isFirstSeriesBarVisible = visibleBars.contains(0 as TimePointIndex);
-			const isFirstTimeChanged = oldFirstTime.timestamp > newFirstTime.timestamp;
-			const isDataAdded = newBaseIndex > currentBaseIndex;
-			const isDataAddedToRight = isDataAdded && !isFirstTimeChanged;
-			const isVisibleRangeFilled = !isLastSeriesBarVisible && !isFirstSeriesBarVisible;
+			const isLeftBarShiftToLeft = oldFirstTime.timestamp > newFirstTime.timestamp;
+			const isSeriesPointsAdded = newBaseIndex > currentBaseIndex;
+			const isSeriesPointsAddedToRight = isSeriesPointsAdded && !isLeftBarShiftToLeft;
 
-			if (isDataAddedToRight && isVisibleRangeFilled) {
+			if (isSeriesPointsAddedToRight && !isLastSeriesBarVisible) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
 			}

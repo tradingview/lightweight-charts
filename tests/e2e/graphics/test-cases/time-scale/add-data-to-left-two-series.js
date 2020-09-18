@@ -29,19 +29,29 @@ function whenRangeChanged(timeScale) {
 	);
 }
 
-let data = [];
+let data1 = [];
+let data2 = [];
 let chart = null;
-let areaSeries = null;
+let areaSeries1 = null;
+let areaSeries2 = null;
 const ONE_DAY_IN_SEC = 24 * 60 * 60;
 
 function createChart(container) {
 	chart = LightweightCharts.createChart(container);
 }
 
-function createOneSeries() {
-	areaSeries = chart.addAreaSeries();
-	data = generateData(61, Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	areaSeries.setData(data);
+function createFirstSeries() {
+	areaSeries1 = chart.addAreaSeries();
+	data1 = generateData(61, Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	areaSeries1.setData(data1);
+}
+
+function createSecondSeries() {
+	areaSeries2 = chart.addAreaSeries({
+		lineColor: 'red',
+	});
+	data2 = [...generateData(20, Date.UTC(2022, 0, 1, 0, 0, 0, 0), true), ...generateData(61, Date.UTC(2022, 1, 1, 0, 0, 0, 0))];
+	areaSeries2.setData(data2);
 }
 
 async function shiftTimeScale({ from, to }) {
@@ -50,8 +60,13 @@ async function shiftTimeScale({ from, to }) {
 	await whenRangeChanged(timeScale);
 }
 
-function addDataToLeft() {
-	data = [...generateData(3, (data[0].time - ONE_DAY_IN_SEC * 3) * 1000), ...data];
+function addDataToLeft(data, areaSeries) {
+	data.unshift(...generateData(3, (data[0].time - ONE_DAY_IN_SEC * 3) * 1000));
+	areaSeries.setData(data);
+}
+
+function addWhitespaceToLeft(data, areaSeries) {
+	data.unshift(...generateData(3, (data[0].time - ONE_DAY_IN_SEC * 3) * 1000, true));
 	areaSeries.setData(data);
 }
 
@@ -143,8 +158,11 @@ function checkVisibleRange(
 }
 
 async function runTestCase(container) {
+	// createChart
+	// create one series
 	createChart(container);
-	createOneSeries();
+	createFirstSeries();
+	createSecondSeries();
 
 	// shift timescale (right end of line out of chart, left end of line is visible)
 	// --------
@@ -153,8 +171,8 @@ async function runTestCase(container) {
 	// --------
 	await shiftTimeScale({ from: -10, to: 20 });
 	let ranges = getRanges();
-	// add data to left
-	addDataToLeft();
+	// add data to right
+	addDataToLeft(data1, areaSeries1);
 	// check viewport position
 	checkVisibleRange(ranges, "time range: {from} should shift to left and {to} shouldn't changed");
 	checkVisibleRange(ranges, 'logical range should be shift to right');
@@ -164,23 +182,31 @@ async function runTestCase(container) {
 	//  /\
 	// /  \
 	// ---------
-	await shiftTimeScale({ from: 50, to: 80 });
+	await shiftTimeScale({ from: 50, to: 200 });
 	ranges = getRanges();
 	// add data to right
-	addDataToLeft();
+	addDataToLeft(data1, areaSeries1);
 	// check viewport position
 	checkVisibleRange(ranges, 'time range shouldn`t be changed');
 	checkVisibleRange(ranges, 'logical range should be shift to right');
+	// add data whitespace to right
+	ranges = getRanges();
+	addWhitespaceToLeft(data1, areaSeries1);
+	// check viewport position
+	checkVisibleRange(ranges, 'time range shouldn`t be changed');
+	checkVisibleRange(ranges, 'logical range should be shift to right');
+	// fix range
+	addDataToLeft(data1, areaSeries1);
 
 	// shift timescale (right end of line is visible, left end of line is visible)
 	// ------------
 	//      /\  /
 	//     /  \/
 	// ------------
-	await shiftTimeScale({ from: -10, to: 100 });
+	await shiftTimeScale({ from: -10, to: 200 });
 	ranges = getRanges();
 	// add data to right
-	addDataToLeft();
+	addDataToLeft(data1, areaSeries1);
 	// check viewport position
 	checkVisibleRange(ranges, "time range: {from} should shift to left and {to} shouldn't changed");
 	checkVisibleRange(ranges, 'logical range should be shift to right');
@@ -190,11 +216,19 @@ async function runTestCase(container) {
 	//  /\  /\
 	// /  \/  \
 	// --------
-	await shiftTimeScale({ from: 3, to: 20 });
+	await shiftTimeScale({ from: 3, to: 100 });
 	ranges = getRanges();
 	// add data to right
-	addDataToLeft();
+	addDataToLeft(data1, areaSeries1);
 	// check viewport position
 	checkVisibleRange(ranges, 'time range shouldn`t be changed');
 	checkVisibleRange(ranges, 'logical range should be shift to right');
+	// add data whitespace to right
+	ranges = getRanges();
+	addWhitespaceToLeft(data1, areaSeries1);
+	// check viewport position
+	checkVisibleRange(ranges, 'time range shouldn`t be changed');
+	checkVisibleRange(ranges, 'logical range should be shift to right');
+	// fix range
+	addDataToLeft(data1, areaSeries1);
 }
