@@ -180,16 +180,13 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
-		delete this._chartWidget;
-		this._seriesMap.forEach((series: Series, api: SeriesApi<SeriesType>) => {
-			api.destroy();
-		});
+
 		this._seriesMap.clear();
 		this._seriesMapReversed.clear();
+
 		this._clickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
 		this._dataLayer.destroy();
-		delete this._dataLayer;
 	}
 
 	public resize(width: number, height: number, forceRepaint?: boolean): void {

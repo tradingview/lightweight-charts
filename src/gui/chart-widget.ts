@@ -151,8 +151,6 @@ export class ChartWidget implements IDestroyable {
 
 		this._crosshairMoved.destroy();
 		this._clicked.destroy();
-
-		delete this._element;
 	}
 
 	public resize(width: number, height: number, forceRepaint: boolean = false): void {

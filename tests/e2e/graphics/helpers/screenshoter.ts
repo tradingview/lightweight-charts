@@ -34,7 +34,6 @@ export class Screenshoter {
 
 	public async close(): Promise<void> {
 		const browser = await this._browserPromise;
-		delete this._browserPromise;
 		await browser.close();
 	}
 

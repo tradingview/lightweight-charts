@@ -31,7 +31,6 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._timeScale().visibleBarsChanged().unsubscribeAll(this);
 		this._timeScale().logicalRangeChanged().unsubscribeAll(this);
 		this._timeRangeChanged.destroy();
-		delete this._model;
 	}
 
 	public scrollPosition(): number {
