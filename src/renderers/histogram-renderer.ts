@@ -17,7 +17,6 @@ export interface PaneRendererHistogramData {
 	histogramBase: number;
 
 	visibleRange: SeriesItemsIndexesRange | null;
-	visible: boolean;
 }
 
 interface PrecalculatedItemCoordinates {
@@ -38,7 +37,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 	}
 
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
-		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null || !this._data.visible) {
+		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 		if (!this._precalculatedCache.length) {

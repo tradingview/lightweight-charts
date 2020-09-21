@@ -17,7 +17,6 @@ export interface PaneRendererLineData {
 	lineStyle: LineStyle;
 
 	visibleRange: SeriesItemsIndexesRange | null;
-	visible: boolean;
 }
 
 export class PaneRendererLine extends ScaledRenderer {
@@ -28,7 +27,7 @@ export class PaneRendererLine extends ScaledRenderer {
 	}
 
 	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
-		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null || !this._data.visible) {
+		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 

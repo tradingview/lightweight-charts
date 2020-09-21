@@ -13,17 +13,19 @@ import { BarsPaneViewBase } from './bars-pane-view-base';
 export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', CandlestickItem> {
 	private readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
 
-	public renderer(height: number, width: number): IPaneRenderer {
-		this._makeValid();
-
+	public renderer(height: number, width: number): IPaneRenderer | null {
 		const candlestickStyleProps = this._series.options();
+		if (!candlestickStyleProps.visible) {
+			return null;
+		}
+
+		this._makeValid();
 		const data: PaneRendererCandlesticksData = {
 			bars: this._items,
 			barSpacing: this._model.timeScale().barSpacing(),
 			wickVisible: candlestickStyleProps.wickVisible,
 			borderVisible: candlestickStyleProps.borderVisible,
 			visibleRange: this._itemsVisibleRange,
-			visible: candlestickStyleProps.visible,
 		};
 
 		this._renderer.setData(data);

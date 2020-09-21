@@ -19,7 +19,6 @@ export interface PaneRendererBarsData {
 	thinBars: boolean;
 
 	visibleRange: SeriesItemsIndexesRange | null;
-	visible: boolean;
 }
 
 export class PaneRendererBars implements IPaneRenderer {
@@ -33,7 +32,7 @@ export class PaneRendererBars implements IPaneRenderer {
 
 	// eslint-disable-next-line complexity
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
-		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null || !this._data.visible) {
+		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 

@@ -18,7 +18,6 @@ export interface PaneRendererAreaData {
 	bottom: Coordinate;
 
 	visibleRange: SeriesItemsIndexesRange | null;
-	visible: boolean;
 }
 
 export class PaneRendererArea extends ScaledRenderer {
@@ -29,7 +28,7 @@ export class PaneRendererArea extends ScaledRenderer {
 	}
 
 	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
-		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null || !this._data.visible) {
+		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 

@@ -31,7 +31,7 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 		const labelVisible = options.axisLabelVisible;
 		const showPaneLabel = options.title !== '';
 
-		if (!labelVisible) {
+		if (!labelVisible || !this._series.options().visible) {
 			return;
 		}
 

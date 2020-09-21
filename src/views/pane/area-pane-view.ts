@@ -20,11 +20,13 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		this._renderer.setRenderers([this._areaRenderer, this._lineRenderer]);
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer {
-		this._makeValid();
-
+	public renderer(height: number, width: number): IPaneRenderer | null {
 		const areaStyleProperties = this._series.options();
+		if (!areaStyleProperties.visible) {
+			return null;
+		}
 
+		this._makeValid();
 		const data: PaneRendererAreaData = {
 			lineType: areaStyleProperties.lineType,
 			items: this._items,
@@ -35,7 +37,6 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 			bottomColor: areaStyleProperties.bottomColor,
 			bottom: height as Coordinate,
 			visibleRange: this._itemsVisibleRange,
-			visible: areaStyleProperties.visible,
 		};
 
 		this._areaRenderer.setData(data);
