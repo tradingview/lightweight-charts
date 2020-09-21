@@ -21,10 +21,10 @@ function runTestCase(container) {
 	mainSeries.setData(data);
 
 	const markers = [
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'arrowUp' },
-		{ time: data[data.length - 20].time, position: 'inBar', color: 'red', shape: 'arrowDown' },
-		{ time: data[data.length - 30].time, position: 'inBar', color: 'red', shape: 'circle' },
 		{ time: data[data.length - 40].time, position: 'inBar', color: 'red', shape: 'square' },
+		{ time: data[data.length - 30].time, position: 'inBar', color: 'red', shape: 'circle' },
+		{ time: data[data.length - 20].time, position: 'inBar', color: 'red', shape: 'arrowDown' },
+		{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'arrowUp' },
 	];
 
 	mainSeries.setMarkers(markers);
