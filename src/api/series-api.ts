@@ -1,4 +1,4 @@
-import { assert, ensureNotNull } from '../helpers/assertions';
+import { ensureNotNull } from '../helpers/assertions';
 import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
@@ -19,7 +19,7 @@ import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { checkItemsAreOrdered, checkSeriesValuesType } from './data-validators';
+import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
@@ -161,13 +161,9 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public createPriceLine(options: PriceLineOptions): IPriceLine {
+		checkPriceLineOptions(options);
+
 		const strictOptions = merge(clone(priceLineOptionsDefaults), options) as PriceLineOptions;
-
-		if (process.env.NODE_ENV === 'development') {
-			// eslint-disable-next-line @typescript-eslint/tslint/config
-			assert(typeof strictOptions.price === 'number', `the type of 'price' price line's property should be number, got '${typeof strictOptions.price}'`);
-		}
-
 		const priceLine = this._series.createPriceLine(strictOptions);
 		return new PriceLine(priceLine);
 	}

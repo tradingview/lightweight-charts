@@ -1,10 +1,20 @@
 import { assert, ensureNever } from '../helpers/assertions';
 
+import { PriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import { SeriesType } from '../model/series-options';
 
 import { isFulfilledData, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
+
+export function checkPriceLineOptions(options: PriceLineOptions): void {
+	if (process.env.NODE_ENV === 'production') {
+		return;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/tslint/config
+	assert(typeof options.price === 'number', `the type of 'price' price line's property must be a number, got '${typeof options.price}'`);
+}
 
 export function checkItemsAreOrdered(data: readonly (SeriesMarker<Time> | SeriesDataItemTypeMap[SeriesType])[], allowDuplicates: boolean = false): void {
 	if (process.env.NODE_ENV === 'production') {
@@ -29,10 +39,7 @@ export function checkSeriesValuesType(type: SeriesType, data: readonly SeriesDat
 		return;
 	}
 
-	const checker = getChecker(type);
-	for (const item of data) {
-		checker(item);
-	}
+	data.forEach(getChecker(type));
 }
 
 type Checker = (item: SeriesDataItemTypeMap[SeriesType]) => void;
