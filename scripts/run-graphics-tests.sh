@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ "$CMP_OUT_DIR" = "" ]; then
+	echo "Env variable CMP_OUT_DIR must be set"
+	exit 1
+fi
+
 echo "Checkout to merge-base and build..."
 
 BUILD_SCRIPT="build"
@@ -25,4 +30,14 @@ npm install
 npm run $BUILD_SCRIPT
 
 echo "Graphics tests"
+set +e
 node ./tests/e2e/graphics/runner.js ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
+EXIT_CODE=$?
+set -e
+
+if [ $EXIT_CODE != 0 ]; then
+	echo "Generate archive with screenshots"
+	tar -czvf ./screenshots.tar.gz $CMP_OUT_DIR
+	mv ./screenshots.tar.gz $CMP_OUT_DIR/screenshots.tar.gz
+	exit $EXIT_CODE
+fi
