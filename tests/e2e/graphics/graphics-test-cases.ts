@@ -16,11 +16,13 @@ import { getTestCases, TestCase } from './helpers/get-test-cases';
 import { Screenshoter } from './helpers/screenshoter';
 
 const dummyContent = fs.readFileSync(path.join(__dirname, 'helpers', 'test-page-dummy.html'), { encoding: 'utf-8' });
+const buildMode = process.env.PRODUCTION_BUILD === 'true' ? 'production' : 'development';
 
 function generatePageContent(standaloneBundlePath: string, testCaseCode: string): string {
 	return dummyContent
 		.replace('PATH_TO_STANDALONE_MODULE', standaloneBundlePath)
 		.replace('TEST_CASE_SCRIPT', testCaseCode)
+		.replace('{BUILD_MODE}', buildMode)
 	;
 }
 
@@ -72,7 +74,7 @@ function removeEmptyDirsRecursive(rootDir: string): void {
 	}
 }
 
-describe(`Graphics tests with devicePixelRatio=${devicePixelRatioStr}`, function(): void {
+describe(`Graphics tests with devicePixelRatio=${devicePixelRatioStr} (${buildMode} mode)`, function(): void {
 	// this tests are unstable sometimes :(
 	this.retries(5);
 
