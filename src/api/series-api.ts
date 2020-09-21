@@ -19,6 +19,7 @@ import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
+import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
@@ -124,14 +125,21 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {
+		checkItemsAreOrdered(data);
+		checkSeriesValuesType(this._series.seriesType(), data);
+
 		this._dataUpdatesConsumer.applyNewData(this._series, data);
 	}
 
 	public update(bar: SeriesDataItemTypeMap[TSeriesType]): void {
+		checkSeriesValuesType(this._series.seriesType(), [bar]);
+
 		this._dataUpdatesConsumer.updateData(this._series, bar);
 	}
 
 	public setMarkers(data: SeriesMarker<Time>[]): void {
+		checkItemsAreOrdered(data, true);
+
 		const convertedMarkers = data.map<SeriesMarker<TimePoint>>((marker: SeriesMarker<Time>) => ({
 			...marker,
 			time: convertTime(marker.time),
@@ -153,6 +161,8 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public createPriceLine(options: PriceLineOptions): IPriceLine {
+		checkPriceLineOptions(options);
+
 		const strictOptions = merge(clone(priceLineOptionsDefaults), options) as PriceLineOptions;
 		const priceLine = this._series.createPriceLine(strictOptions);
 		return new PriceLine(priceLine);

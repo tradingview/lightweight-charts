@@ -1,4 +1,4 @@
-import { ensureNotNull } from '../helpers/assertions';
+import { assert } from '../helpers/assertions';
 import { DeepPartial, isString } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
@@ -33,6 +33,14 @@ export {
  * @returns an interface to the created chart
  */
 export function createChart(container: string | HTMLElement, options?: DeepPartial<ChartOptions>): IChartApi {
-	const htmlElement = ensureNotNull(isString(container) ? document.getElementById(container) : container);
+	let htmlElement: HTMLElement;
+	if (isString(container)) {
+		const element = document.getElementById(container);
+		assert(element !== null, `Cannot find element in DOM with id=${container}`);
+		htmlElement = element;
+	} else {
+		htmlElement = container;
+	}
+
 	return new ChartApi(htmlElement, options);
 }

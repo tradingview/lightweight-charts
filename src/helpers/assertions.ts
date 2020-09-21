@@ -4,7 +4,7 @@
  * @param condition - Result of the assertion evaluation
  * @param message - Text to include in the exception message
  */
-export function assert(condition: boolean, message?: string): void {
+export function assert(condition: boolean, message?: string): asserts condition {
 	if (!condition) {
 		throw new Error('Assertion failed' + (message ? ': ' + message : ''));
 	}
