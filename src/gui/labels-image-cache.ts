@@ -33,7 +33,7 @@ export class LabelsImageCache implements IDestroyable {
 	}
 
 	public destroy(): void {
-		delete this._textWidthCache;
+		this._textWidthCache.reset();
 		this._keys = [];
 		this._hash.clear();
 	}

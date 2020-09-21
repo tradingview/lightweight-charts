@@ -80,7 +80,7 @@
     "tslint-eslint-rules": "~5.4.0",
     "tslint-microsoft-contrib": "~6.2.0",
     "ttypescript": "~1.5.10",
-    "typescript": "3.9.6"
+    "typescript": "4.0.2"
   },
   "scripts": {
     "postinstall": "npm run install-hooks",

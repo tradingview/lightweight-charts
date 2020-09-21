@@ -1,5 +1,4 @@
 import { ensureNotNull } from '../helpers/assertions';
-import { IDestroyable } from '../helpers/idestroyable';
 import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
@@ -35,7 +34,7 @@ export function migrateOptions<TSeriesType extends SeriesType>(options: SeriesPa
 	return res;
 }
 
-export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType>, IDestroyable {
+export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType> {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>;
 
@@ -45,11 +44,6 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
 		this._priceScaleApiProvider = priceScaleApiProvider;
-	}
-
-	public destroy(): void {
-		delete this._series;
-		delete this._dataUpdatesConsumer;
 	}
 
 	public priceFormatter(): IPriceFormatter {
