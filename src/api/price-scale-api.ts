@@ -1,7 +1,6 @@
 import { ChartWidget } from '../gui/chart-widget';
 
 import { ensureNotNull } from '../helpers/assertions';
-import { IDestroyable } from '../helpers/idestroyable';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { DefaultPriceScaleId, isDefaultPriceScale } from '../model/default-price-scale';
@@ -9,17 +8,13 @@ import { PriceScale, PriceScaleOptions } from '../model/price-scale';
 
 import { IPriceScaleApi } from './iprice-scale-api';
 
-export class PriceScaleApi implements IPriceScaleApi, IDestroyable {
+export class PriceScaleApi implements IPriceScaleApi {
 	private _chartWidget: ChartWidget;
 	private readonly _priceScaleId: string;
 
 	public constructor(chartWidget: ChartWidget, priceScaleId: string) {
 		this._chartWidget = chartWidget;
 		this._priceScaleId = priceScaleId;
-	}
-
-	public destroy(): void {
-		delete this._chartWidget;
 	}
 
 	public applyOptions(options: DeepPartial<PriceScaleOptions>): void {

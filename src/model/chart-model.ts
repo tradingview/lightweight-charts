@@ -44,6 +44,7 @@ export interface HandleScaleOptions {
 type HandleScaleOptionsInternal =
 	Omit<HandleScaleOptions, 'axisPressedMouseMove'>
 	& {
+		/** @public */
 		axisPressedMouseMove: AxisPressedMouseMoveOptions;
 	};
 
@@ -114,7 +115,9 @@ export interface ChartOptions {
 export type ChartOptionsInternal =
 	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale'>
 	& {
+		/** @public */
 		handleScroll: HandleScrollOptions;
+		/** @public */
 		handleScale: HandleScaleOptionsInternal;
 	};
 
@@ -464,9 +467,13 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public updateTimeScale(newBaseIndex: TimePointIndex, newPoints?: readonly TimeScalePoint[]): void {
+		const oldFirstTime = this._timeScale.indexToTime(0 as TimePointIndex);
+
 		if (newPoints !== undefined) {
 			this._timeScale.update(newPoints);
 		}
+
+		const newFirstTime = this._timeScale.indexToTime(0 as TimePointIndex);
 
 		const currentBaseIndex = this._timeScale.baseIndex();
 		const visibleBars = this._timeScale.visibleStrictRange();
@@ -474,12 +481,14 @@ export class ChartModel implements IDestroyable {
 		// if time scale cannot return current visible bars range (e.g. time scale has zero-width)
 		// then we do not need to update right offset to shift visible bars range to have the same right offset as we have before new bar
 		// (and actually we cannot)
-		if (visibleBars !== null) {
+		if (visibleBars !== null && oldFirstTime !== null && newFirstTime !== null) {
 			const isLastSeriesBarVisible = visibleBars.contains(currentBaseIndex);
+			const isLeftBarShiftToLeft = oldFirstTime.timestamp > newFirstTime.timestamp;
+			const isSeriesPointsAdded = newBaseIndex > currentBaseIndex;
+			const isSeriesPointsAddedToRight = isSeriesPointsAdded && !isLeftBarShiftToLeft;
 
-			if (newBaseIndex > currentBaseIndex && !isLastSeriesBarVisible) {
+			if (isSeriesPointsAddedToRight && !isLastSeriesBarVisible) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
-
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
 			}
 		}

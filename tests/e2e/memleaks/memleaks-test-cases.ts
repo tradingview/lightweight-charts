@@ -62,7 +62,7 @@ describe('Memleaks tests', () => {
 	});
 
 	for (const testCase of testCases) {
-		// eslint-disable-next-line no-loop-func
+		// eslint-disable-next-line @typescript-eslint/no-loop-func
 		it(testCase.name, async () => {
 			const pageContent = generatePageContent(testStandalonePath, testCase.caseContent);
 
@@ -106,6 +106,9 @@ describe('Memleaks tests', () => {
 			await page.evaluate(() => {
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
 				(window as any).chart.remove();
+
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+				delete (window as any).chart;
 			});
 
 			// IMPORTANT: This timeout is important

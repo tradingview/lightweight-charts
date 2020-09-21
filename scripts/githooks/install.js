@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const magentaColor = '\x1b[1;35m';
+const redColor = '\x1b[1;31m';
 const noColor = '\x1b[0m';
 
 function fixPath(p) {
@@ -48,8 +49,8 @@ fi`;
 function main() {
 	const gitRoot = getGitRoot();
 	if (gitRoot === null) {
-		console.error('.git directory not found');
-		process.exit(1);
+		console.error(`${redColor}It seems that it isn't a git repo. Did you use git to clone the repo? Skip installing git-hooks${noColor}`);
+		return;
 	}
 
 	console.log(`${magentaColor}Installing githooks...${noColor}`);

@@ -32,14 +32,14 @@ function runTestCase(container) {
 	});
 
 	const thirdSeries = chart.addLineSeries({
-		priceScaleId: 'second-overlay',
+		priceScaleId: '',
 	});
 
 	thirdSeries.applyOptions({
 		color: 'red',
 	});
 
-	chart.priceScale('second-overlay').applyOptions({
+	chart.priceScale('').applyOptions({
 		scaleMargins: {
 			top: 0,
 			bottom: 0.5,

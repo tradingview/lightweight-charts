@@ -31,7 +31,7 @@ export class PaneRendererLine extends ScaledRenderer {
 			return;
 		}
 
-		ctx.lineCap = 'square';
+		ctx.lineCap = 'butt';
 		ctx.lineWidth = this._data.lineWidth;
 
 		setLineStyle(ctx, this._data.lineStyle);

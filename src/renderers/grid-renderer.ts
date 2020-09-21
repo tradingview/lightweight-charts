@@ -35,7 +35,7 @@ export class GridRenderer implements IPaneRenderer {
 			return;
 		}
 
-		const lineWidth = Math.floor(pixelRatio);
+		const lineWidth = Math.max(1, Math.floor(pixelRatio));
 		ctx.lineWidth = lineWidth;
 
 		const height = Math.ceil(this._data.h * pixelRatio);

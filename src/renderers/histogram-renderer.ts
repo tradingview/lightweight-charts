@@ -3,7 +3,7 @@ import { SeriesItemsIndexesRange, TimedValue, TimePointIndex } from '../model/ti
 
 import { IPaneRenderer } from './ipane-renderer';
 
-const showSpacingMinimalBarWidth = 3;
+const showSpacingMinimalBarWidth = 1;
 const alignToMinimalWidthLimit = 4;
 
 export interface HistogramItem extends PricedValue, TimedValue {
@@ -44,16 +44,29 @@ export class PaneRendererHistogram implements IPaneRenderer {
 			this._fillPrecalculatedCache(pixelRatio);
 		}
 
-		const histogramBase = Math.round(this._data.histogramBase * pixelRatio);
-
-		const lineWidth = Math.max(1, Math.floor(pixelRatio));
+		const tickWidth = Math.max(1, Math.floor(pixelRatio));
+		const histogramBase = Math.round((this._data.histogramBase) * pixelRatio);
+		const topHistogramBase = histogramBase - Math.floor(tickWidth / 2);
+		const bottomHistogramBase = topHistogramBase + tickWidth;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			const current = this._precalculatedCache[i - this._data.visibleRange.from];
-			const y = Math.round(item.y as number * pixelRatio);
+			const y = Math.round(item.y * pixelRatio);
 			ctx.fillStyle = item.color;
-			ctx.fillRect(current.left, y, current.right - current.left + 1, histogramBase - y + lineWidth);
+
+			let top: number;
+			let bottom: number;
+
+			if (y <= topHistogramBase) {
+				top = y;
+				bottom = bottomHistogramBase;
+			} else {
+				top = topHistogramBase;
+				bottom = y - Math.floor(tickWidth / 2) + tickWidth;
+			}
+
+			ctx.fillRect(current.left, top, current.right - current.left + 1, bottom - top);
 		}
 	}
 
@@ -71,7 +84,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			// force cast to avoid ensureDefined call
-			const x = Math.round(item.x as number * pixelRatio);
+			const x = Math.round(item.x * pixelRatio);
 			let left: number;
 			let right: number;
 
@@ -89,7 +102,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 				left,
 				right,
 				roundedCenter: x,
-				center: (item.x as number * pixelRatio),
+				center: (item.x * pixelRatio),
 				time: item.time,
 			};
 		}
