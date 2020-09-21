@@ -21,6 +21,7 @@ export interface PaneRendererCandlesticksData {
 	borderVisible: boolean;
 
 	visibleRange: SeriesItemsIndexesRange | null;
+	visible: boolean;
 }
 
 const enum Constants {
@@ -38,7 +39,7 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 	}
 
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
-		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
+		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null || !this._data.visible) {
 			return;
 		}
 

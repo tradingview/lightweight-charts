@@ -23,6 +23,7 @@ export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', 
 			wickVisible: candlestickStyleProps.wickVisible,
 			borderVisible: candlestickStyleProps.borderVisible,
 			visibleRange: this._itemsVisibleRange,
+			visible: candlestickStyleProps.visible,
 		};
 
 		this._renderer.setData(data);

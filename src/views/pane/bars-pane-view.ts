@@ -23,6 +23,7 @@ export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 			openVisible: barStyleProps.openVisible,
 			thinBars: barStyleProps.thinBars,
 			visibleRange: this._itemsVisibleRange,
+			visible: barStyleProps.visible,
 		};
 
 		this._renderer.setData(data);

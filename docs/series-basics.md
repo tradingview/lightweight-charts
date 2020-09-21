@@ -41,6 +41,7 @@ Here are common parameters for every series:
 |`priceScaleId`|`string`|`right` if right scale is visible and `left` if not|Target price scale to bind new series to|
 |`title`|`string`|`''`|You can name series when adding it to a chart. This name will be displayed on the label next to the last value label|
 |`scaleMargins`|`{ top, bottom }`|`undefined`|[Margins](#scale-margins) of the price scale of series|
+|`visible`|`boolean`|`true`|Visibility of series|
 
 Example:
 
@@ -141,6 +142,27 @@ chart.applyOptions({
 });
 ```
 
+### Visibility
+
+When adding any series to a chart, you can specify its visibility using `visible` property.
+
+By default, created series is visible. You can change its visibility using `SeriesApi.applyOptions`:
+
+```js
+series.applyOptions({
+    visible: false,
+});
+```
+
+When you hide a series - price line, base line, price labels and markers of series will also be hidden.
+Note that hiding a series is not equivalent to deleting it, you can show it again:
+
+```js
+series.applyOptions({
+    visible: true,
+});
+```
+
 ### Overriding autoscale
 
 By default, the chart scales data automatically based on visible data range. However, for some reasons one could require overriding this behavior.
@@ -233,7 +255,7 @@ You can set the width, style and color of this line or disable it using the foll
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
-|`priceLineVisible`|`boolean`|`true`|If true, a series' price line is displayed on a chart|
+|`priceLineVisible`|`boolean`|`true`|If true, a series' price line is displayed on a chart if a series is visible|
 |`priceLineSource`|[PriceLineSource](./constants.md#pricelinesource)|`PriceLineSource.LastBar`|Source to be used for the horizontal price line|
 |`priceLineWidth`|`number`|`1`|Price line's width in pixels|
 |`priceLineColor`|`string`|`''`|Price line's color|
@@ -257,7 +279,7 @@ There is an option to hide it as well.
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
-|`lastValueVisible`|`boolean`|`true`|If true, the label with the current price is displayed on the price scale|
+|`lastValueVisible`|`boolean`|`true`|If true, the label with the current price is displayed on the price scale if a series is visible|
 
 Example:
 
@@ -274,7 +296,7 @@ You can set the width, style and color of this line or disable it using the foll
 
 |Name|Type|Default|Description|
 |----|----|-------|-|
-|`baseLineVisible`|`boolean`|`true`|If true, a series' base line is displayed on a chart|
+|`baseLineVisible`|`boolean`|`true`|If true, a series' base line is displayed on a chart if a series is visible|
 |`baseLineWidth`|`number`|`1`|Base line's width in pixels|
 |`baseLineColor`|`string`|`'#B2B5BE'`|Base line's color|
 |`baseLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Base line's style|

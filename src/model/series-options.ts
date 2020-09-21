@@ -183,7 +183,8 @@ export interface SeriesOptionsCommon {
 	 * @internal
 	 */
 	seriesLastValueMode?: PriceAxisLastValueMode;
-
+	/** Visibility of series. */
+	visible: boolean;
 	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
 	priceLineVisible: boolean;
 	/** Enum of possible modes of priceLine source */

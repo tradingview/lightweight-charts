@@ -20,6 +20,7 @@ function createEmptyHistogramData(barSpacing: number): PaneRendererHistogramData
 		barSpacing,
 		histogramBase: NaN,
 		visibleRange: null,
+		visible: true,
 	};
 }
 
@@ -96,6 +97,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._histogramData.histogramBase = histogramBase;
 		this._histogramData.visibleRange = visibleTimedValues(this._histogramData.items, visibleBars, false);
 		this._histogramData.barSpacing = barSpacing;
+		this._histogramData.visible = this._series.options().visible;
 		// need this to update cache
 		this._renderer.setData(this._histogramData);
 	}

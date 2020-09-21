@@ -33,6 +33,7 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 export interface SeriesMarkerRendererData {
 	items: SeriesMarkerRendererDataItem[];
 	visibleRange: SeriesItemsIndexesRange | null;
+	visible: boolean;
 }
 
 export class SeriesMarkersRenderer extends ScaledRenderer {
@@ -56,7 +57,7 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
-		if (this._data === null || this._data.visibleRange === null) {
+		if (this._data === null || this._data.visibleRange === null || !this._data.visible) {
 			return null;
 		}
 
@@ -74,7 +75,7 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 	}
 
 	protected _drawImpl(ctx: CanvasRenderingContext2D, isHovered: boolean, hitTestData?: unknown): void {
-		if (this._data === null || this._data.visibleRange === null) {
+		if (this._data === null || this._data.visibleRange === null || !this._data.visible) {
 			return;
 		}
 

@@ -102,6 +102,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		this._data = {
 			items: [],
 			visibleRange: null,
+			visible: true,
 		};
 	}
 
@@ -167,6 +168,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		const layoutOptions = this._model.options().layout;
 
 		this._data.visibleRange = null;
+		this._data.visible = this._series.options().visible;
 		const visibleBars = timeScale.visibleStrictRange();
 		if (visibleBars === null) {
 			return;
