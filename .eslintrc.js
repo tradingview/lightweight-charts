@@ -19,7 +19,7 @@ module.exports = {
 		'eslint:recommended',
 	],
 	parserOptions: {
-		ecmaVersion: 2017,
+		ecmaVersion: 2019,
 		sourceType: 'module',
 	},
 	overrides: [
