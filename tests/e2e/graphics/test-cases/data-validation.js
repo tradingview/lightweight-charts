@@ -1,4 +1,8 @@
 function runTestCase(container) {
+	if (window.BUILD_MODE === 'production') {
+		return;
+	}
+
 	try {
 		LightweightCharts.createChart('non-existed-id');
 		console.assert(false, 'should fail if passed container id does not exist');

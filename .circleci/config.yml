@@ -50,6 +50,9 @@ commands:
     parameters:
       devicePixelRatio:
         type: string
+      productionBuild:
+        type: boolean
+        default: false
     steps:
       - checkout-with-deps
       - run:
@@ -59,6 +62,7 @@ commands:
             echo 'export CMP_OUT_DIR="./graphics-cmp-data"' >> $BASH_ENV
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
+            echo 'export PRODUCTION_BUILD=<< parameters.productionBuild >>' >> $BASH_ENV
       - run: scripts/run-graphics-tests.sh
       - store_test_results:
           path: test-results/
@@ -157,6 +161,14 @@ jobs:
       - run-graphics-tests:
           devicePixelRatio: "2.0"
 
+  graphics-tests-dpr2_0-prod:
+    executor: node-browsers-latest-executor
+    steps:
+      - run-graphics-tests:
+          devicePixelRatio: "2.0"
+          productionBuild: true
+
+
   memleaks-tests:
     executor: node-browsers-latest-executor
     environment:
@@ -245,6 +257,10 @@ workflows:
           requires:
             - build
       - graphics-tests-dpr2_0:
+          filters: *merge-based-filters
+          requires:
+            - build
+      - graphics-tests-dpr2_0-prod:
           filters: *merge-based-filters
           requires:
             - build
