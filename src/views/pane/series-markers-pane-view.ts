@@ -113,7 +113,11 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		}
 	}
 
-	public renderer(height: number, width: number, addAnchors?: boolean): IPaneRenderer {
+	public renderer(height: number, width: number, addAnchors?: boolean): IPaneRenderer | null {
+		if (!this._series.options().visible) {
+			return null;
+		}
+
 		if (this._invalidated) {
 			this._makeValid();
 		}

@@ -76,7 +76,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 			const data = this._markersData[index];
 			const seriesData = s.markerDataAtIndex(timePointIndex);
 
-			if (seriesData === null) {
+			if (seriesData === null || !s.options().visible) {
 				data.visibleRange = null;
 				return;
 			}

@@ -56,6 +56,7 @@ export const histogramStyleDefaults: HistogramStyleOptions = {
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {
 	title: '',
+	visible: true,
 	lastValueVisible: true,
 	priceLineVisible: true,
 	priceLineSource: PriceLineSource.LastBar,

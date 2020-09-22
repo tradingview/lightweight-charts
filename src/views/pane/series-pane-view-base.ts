@@ -30,7 +30,7 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		}
 	}
 
-	public abstract renderer(height: number, width: number): IPaneRenderer;
+	public abstract renderer(height: number, width: number): IPaneRenderer | null;
 
 	protected _makeValid(): void {
 		if (this._dataInvalidated) {

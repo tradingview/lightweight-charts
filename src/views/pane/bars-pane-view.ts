@@ -13,10 +13,13 @@ import { BarsPaneViewBase } from './bars-pane-view-base';
 export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 	private readonly _renderer: PaneRendererBars = new PaneRendererBars();
 
-	public renderer(height: number, width: number): IPaneRenderer {
-		this._makeValid();
-
+	public renderer(height: number, width: number): IPaneRenderer | null {
 		const barStyleProps = this._series.options();
+		if (!barStyleProps.visible) {
+			return null;
+		}
+
+		this._makeValid();
 		const data: PaneRendererBarsData = {
 			bars: this._items,
 			barSpacing: this._model.timeScale().barSpacing(),
