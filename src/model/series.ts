@@ -75,6 +75,8 @@ export type LastValueDataResultWithoutRawPrice = LastValueDataResultWithoutData 
 export interface MarkerData {
 	price: BarPrice;
 	radius: number;
+	borderColor: string;
+	backgroundColor: string;
 }
 
 export interface SeriesDataAtTypeMap {
@@ -424,7 +426,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 		const price = bar.value[PlotRowValueIndex.Close] as BarPrice;
 		const radius = this._markerRadius();
-		return { price, radius };
+		const borderColor = this._markerBorderColor();
+		const backgroundColor = this._markerBackgroundColor();
+		return { price, radius, borderColor, backgroundColor };
 	}
 
 	public title(): string {
@@ -468,6 +472,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		return 0;
+	}
+
+	private _markerBorderColor(): string {
+		return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBorderColor;
+	}
+
+	private _markerBackgroundColor(): string {
+		return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBackgroundColor;
 	}
 
 	private _recreateFormatter(): void {
