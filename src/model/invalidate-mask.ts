@@ -21,12 +21,49 @@ function mergePaneInvalidation(beforeValue: PaneInvalidation | undefined, newVal
 	return { level, autoScale };
 }
 
+export const enum TimeScaleInvalidationType {
+	FitContent,
+	ApplyRange,
+	ApplyBarSpacing,
+	ApplyRightOffset,
+	Reset,
+}
+
+export interface TimeScaleApplyRangeInvalidation {
+	type: TimeScaleInvalidationType.ApplyRange;
+	value: LogicalRange;
+}
+
+export interface TimeScaleFitContentInvalidation {
+	type: TimeScaleInvalidationType.FitContent;
+}
+
+export interface TimeScaleApplyRightOffsetInvalidation {
+	type: TimeScaleInvalidationType.ApplyRightOffset;
+	value: number;
+}
+
+export interface TimeScaleApplyBarSpacingInvalidation {
+	type: TimeScaleInvalidationType.ApplyBarSpacing;
+	value: number;
+}
+
+export interface TimeScaleResetInvalidation {
+	type: TimeScaleInvalidationType.Reset;
+}
+
+export type TimeScaleInvalidation =
+	| TimeScaleApplyRangeInvalidation
+	| TimeScaleFitContentInvalidation
+	| TimeScaleApplyRightOffsetInvalidation
+	| TimeScaleApplyBarSpacingInvalidation
+	| TimeScaleResetInvalidation;
+
 export class InvalidateMask {
 	private _invalidatedPanes: Map<number, PaneInvalidation> = new Map();
 	private _globalLevel: InvalidationLevel;
 	private _force: boolean = false;
-	private _fitContent: boolean = false;
-	private _logicalRange: LogicalRange | null = null;
+	private _timeScaleInvalidations: TimeScaleInvalidation[] = [];
 
 	public constructor(globalLevel: InvalidationLevel) {
 		this._globalLevel = globalLevel;
@@ -56,34 +93,63 @@ export class InvalidateMask {
 	}
 
 	public setFitContent(): void {
-		this._fitContent = true;
-		this._logicalRange = null;
+		// modifies both bar spacing and right offset
+		this._timeScaleInvalidations = [{ type: TimeScaleInvalidationType.FitContent }];
 	}
 
-	public getFitContent(): boolean {
-		return this._fitContent;
+	public applyRange(range: LogicalRange): void {
+		// modifies both bar spacing and right offset
+		this._timeScaleInvalidations = [{ type: TimeScaleInvalidationType.ApplyRange, value: range }];
 	}
 
-	public setLogicalRange(range: LogicalRange): void {
-		this._logicalRange = range;
-		this._fitContent = false;
+	public resetTimeScale(): void {
+		// modifies both bar spacing and right offset
+		this._timeScaleInvalidations = [{ type: TimeScaleInvalidationType.Reset }];
 	}
 
-	public getLogicalRange(): LogicalRange | null {
-		return this._logicalRange;
+	public setBarSpacing(barSpacing: number): void {
+		this._timeScaleInvalidations.push({ type: TimeScaleInvalidationType.ApplyBarSpacing, value: barSpacing });
+	}
+
+	public setRightOffset(offset: number): void {
+		this._timeScaleInvalidations.push({ type: TimeScaleInvalidationType.ApplyRightOffset, value: offset });
+	}
+
+	public timeScaleInvalidations(): readonly TimeScaleInvalidation[] {
+		return this._timeScaleInvalidations;
 	}
 
 	public merge(other: InvalidateMask): void {
 		this._force = this._force || other._force;
-		if (other._fitContent) {
-			this.setFitContent();
+
+		this._timeScaleInvalidations = this._timeScaleInvalidations.concat(other._timeScaleInvalidations);
+		for (const tsInvalidation of other._timeScaleInvalidations) {
+			this._applyTimeScaleInvalidation(tsInvalidation);
 		}
-		if (other._logicalRange) {
-			this.setLogicalRange(other._logicalRange);
-		}
+
 		this._globalLevel = Math.max(this._globalLevel, other._globalLevel);
 		other._invalidatedPanes.forEach((invalidation: PaneInvalidation, index: number) => {
 			this.invalidatePane(index, invalidation);
 		});
+	}
+
+	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {
+		switch (invalidation.type) {
+			case TimeScaleInvalidationType.FitContent:
+				this.setFitContent();
+				break;
+			case TimeScaleInvalidationType.ApplyRange:
+				this.applyRange(invalidation.value);
+				break;
+			case TimeScaleInvalidationType.ApplyBarSpacing:
+				this.setBarSpacing(invalidation.value);
+				break;
+			case TimeScaleInvalidationType.ApplyRightOffset:
+				this.setRightOffset(invalidation.value);
+				break;
+			case TimeScaleInvalidationType.Reset:
+				this.resetTimeScale();
+				break;
+		}
 	}
 }

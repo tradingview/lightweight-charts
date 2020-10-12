@@ -39,7 +39,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 
 	public scrollToPosition(position: number, animated: boolean): void {
 		if (!animated) {
-			this._timeScale().setRightOffset(position);
+			this._model.setRightOffset(position);
 			return;
 		}
 
