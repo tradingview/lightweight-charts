@@ -73,18 +73,18 @@ export interface ITimeScaleApi {
 	fitContent(): void;
 
 	/**
-	 * Converts a logical time to local x coordinate.
+	 * Converts a logical index to local x coordinate.
 	 * 
-	 * @param logical - logical time need to be converted
-	 * @returns x coordinate of that time or `null` if the chart has no data at all
+	 * @param logical - logical index needs to be converted
+	 * @returns x coordinate of that time or `null` if the chart doesn't have visible logical range
 	 */
 	logicalToCoordinate(logical: Logical): Coordinate | null;
 
 	/**
-	 * Converts a coordinate to logical time.
+	 * Converts a coordinate to logical index.
 	 * 
 	 * @param x - coordinate needs to be converted
-	 * @returns logical time that is located on that coordinate or `null` if the chart has no data at all
+	 * @returns logical index that is located on that coordinate or `null` if the chart doesn't have visible logical range
 	 */
 	coordinateToLogical(x: number): Logical | null;
 
