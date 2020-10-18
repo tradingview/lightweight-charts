@@ -75,8 +75,8 @@ export type LastValueDataResultWithoutRawPrice = LastValueDataResultWithoutData 
 export interface MarkerData {
 	price: BarPrice;
 	radius: number;
-	borderColor: string;
-	backgroundColor: string;
+	borderColor?: string;
+	backgroundColor?: string;
 }
 
 export interface SeriesDataAtTypeMap {
@@ -474,12 +474,24 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return 0;
 	}
 
-	private _markerBorderColor(): string {
-		return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBorderColor;
+	private _markerBorderColor(): string | undefined {
+		switch (this._seriesType) {
+			case 'Line':
+			case 'Area':
+				return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBorderColor;
+		}
+
+		return undefined;
 	}
 
-	private _markerBackgroundColor(): string {
-		return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBackgroundColor;
+	private _markerBackgroundColor(): string | undefined {
+		switch (this._seriesType) {
+			case 'Line':
+			case 'Area':
+				return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBackgroundColor;
+		}
+
+		return undefined;
 	}
 
 	private _recreateFormatter(): void {
