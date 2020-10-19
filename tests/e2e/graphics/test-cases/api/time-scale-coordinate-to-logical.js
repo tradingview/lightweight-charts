@@ -36,7 +36,7 @@ function runTestCase(container) {
 			console.assert(timeScale.coordinateToLogical(30) === 0, `Should align coordinate to the logical index 0, got=${timeScale.coordinateToLogical(30)}`);
 
 			series.setData([]);
-			console.assert(timeScale.coordinateToLogical(0) === null, 'Logical index when visible logical range not exist should be null');
+			console.assert(timeScale.coordinateToLogical(0) === null, 'Logical index when chart doesn\'t have data should be null');
 
 			resolve();
 		}, 1000);

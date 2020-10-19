@@ -38,7 +38,7 @@ function runTestCase(container) {
 			console.assert(inRange(width - 2, lastLogicalCoordinate, width + 2), `Last logical coordinate must be around ${width}, got=${lastLogicalCoordinate}`);
 
 			series.setData([]);
-			console.assert(timeScale.logicalToCoordinate(0) === null, 'Coordinate when visible logical range not exist should be null');
+			console.assert(timeScale.logicalToCoordinate(0) === null, 'Coordinate when chart doesn\'t have data should be null');
 
 			resolve();
 		}, 1000);
