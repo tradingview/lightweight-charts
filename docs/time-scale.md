@@ -171,7 +171,7 @@ chart.timeScale().coordinateToTime(42);
 Converts a logical index to local `x` coordinate.
 The argument is the logical index that needs to be converted into coordinate.
 
-Returns `x` coordinate of logical position or `null` if the chart doesn't have visible logical range (chart doesn't have data).
+Returns `x` coordinate of logical position or `null` if the chart doesn't have data.
 
 ```js
 chart.timeScale().logicalToCoordinate(10);
@@ -182,7 +182,7 @@ chart.timeScale().logicalToCoordinate(10);
 Converts `x` coordinate to logical index.
 The argument is the `x` coordinate that needs to be converted into a logical index.
 
-Returns logical index that is located on the passed coordinate or `null` if the chart doesn't have visible logical range (chart doesn't have data).
+Returns logical index that is located on the passed coordinate or `null` if the chart doesn't have data.
 
 ```js
 chart.timeScale().coordinateToLogical(42);
