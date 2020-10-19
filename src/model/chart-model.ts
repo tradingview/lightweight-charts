@@ -408,11 +408,6 @@ export class ChartModel implements IDestroyable {
 		this._initialTimeScrollPos = null;
 	}
 
-	public resetTimeScale(): void {
-		this._timeScale.restoreDefault();
-		this.recalculateAllPanes();
-	}
-
 	public invalidate(mask: InvalidateMask): void {
 		if (this._invalidateHandler) {
 			this._invalidateHandler(mask);
@@ -588,7 +583,25 @@ export class ChartModel implements IDestroyable {
 
 	public setTargetLogicalRange(range: LogicalRange): void {
 		const mask = new InvalidateMask(InvalidationLevel.Light);
-		mask.setLogicalRange(range);
+		mask.applyRange(range);
+		this._invalidate(mask);
+	}
+
+	public resetTimeScale(): void {
+		const mask = new InvalidateMask(InvalidationLevel.Light);
+		mask.resetTimeScale();
+		this._invalidate(mask);
+	}
+
+	public setBarSpacing(spacing: number): void {
+		const mask = new InvalidateMask(InvalidationLevel.Light);
+		mask.setBarSpacing(spacing);
+		this._invalidate(mask);
+	}
+
+	public setRightOffset(offset: number): void {
+		const mask = new InvalidateMask(InvalidationLevel.Light);
+		mask.setRightOffset(offset);
 		this._invalidate(mask);
 	}
 

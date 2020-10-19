@@ -139,11 +139,11 @@ export class TimeScale {
 		// note that bar spacing should be applied before right offset
 		// because right offset depends on bar spacing
 		if (options.barSpacing !== undefined) {
-			this.setBarSpacing(options.barSpacing);
+			this._model.setBarSpacing(options.barSpacing);
 		}
 
 		if (options.rightOffset !== undefined) {
-			this.setRightOffset(options.rightOffset);
+			this._model.setRightOffset(options.rightOffset);
 		}
 
 		this._invalidateTickMarks();
