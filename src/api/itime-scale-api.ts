@@ -1,7 +1,7 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
-import { LogicalRange, Range } from '../model/time-data';
+import { Logical, LogicalRange, Range } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
@@ -71,6 +71,22 @@ export interface ITimeScaleApi {
 	 * This is a momentary operation.
 	 */
 	fitContent(): void;
+
+	/**
+	 * Converts a logical index to local x coordinate.
+	 *
+	 * @param logical - logical index needs to be converted
+	 * @returns x coordinate of that time or `null` if the chart doesn't have data
+	 */
+	logicalToCoordinate(logical: Logical): Coordinate | null;
+
+	/**
+	 * Converts a coordinate to logical index.
+	 *
+	 * @param x - coordinate needs to be converted
+	 * @returns logical index that is located on that coordinate or `null` if the chart doesn't have data
+	 */
+	coordinateToLogical(x: number): Logical | null;
 
 	/**
 	 * Converts a time to local x coordinate.
