@@ -101,7 +101,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	public logicalToCoordinate(logical: Logical): Coordinate | null {
 		const timeScale = this._model.timeScale();
 
-		if (timeScale.visibleLogicalRange() === null) {
+		if (timeScale.isEmpty()) {
 			return null;
 		} else {
 			return timeScale.indexToCoordinate(logical as unknown as TimePointIndex);
@@ -111,7 +111,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	public coordinateToLogical(x: number): Logical | null {
 		const timeScale = this._model.timeScale();
 
-		if (timeScale.visibleLogicalRange() === null) {
+		if (timeScale.isEmpty()) {
 			return null;
 		} else {
 			return timeScale.coordinateToIndex(x as Coordinate) as unknown as Logical;
