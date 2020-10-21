@@ -182,83 +182,41 @@ function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueCom
 	return (Math.round(component) || 0) as T;
 }
 
-namespace RgbShortHexRepresentation {
-	/**
-	 * @example
-	 * #fb0
-	 * @example
-	 * #f0f
-	 * @example
-	 * #f0fa
-	 */
-	export const re = /^#([0-9a-f])([0-9a-f])([0-9a-f])([0-9a-f])?$/i;
-	export function parse(matches: RegExpExecArray): Rgb {
-		return [
-			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16) * 0x11),
-			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16) * 0x11),
-			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16) * 0x11),
-		];
-	}
-}
+/**
+ * @example
+ * #fb0
+ * @example
+ * #f0f
+ * @example
+ * #f0fa
+ */
+const shortHexRe = /^#([0-9a-f])([0-9a-f])([0-9a-f])([0-9a-f])?$/i;
 
-namespace RgbHexRepresentation {
-	/**
-	 * @example
-	 * #00ff00
-	 * @example
-	 * #336699
-	 * @example
-	 * #336699FA
-	 */
-	export const re = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})?$/i;
-	export function parse(matches: RegExpExecArray): Rgb {
-		return [
-			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16)),
-			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16)),
-			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16)),
-		];
-	}
-}
+/**
+ * @example
+ * #00ff00
+ * @example
+ * #336699
+ * @example
+ * #336699FA
+ */
+const hexRe = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})?$/i;
 
-namespace RgbRepresentation {
-	/**
-	 * @example
-	 * rgb(123, 234, 45)
-	 * @example
-	 * rgb(255,234,245)
-	 */
-	export const rgbRe = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$/;
+/**
+ * @example
+ * rgb(123, 234, 45)
+ * @example
+ * rgb(255,234,245)
+ */
+const rgbRe = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$/;
 
-	/**
-	 * @example
-	 * rgba(123, 234, 45, 1)
-	 * @example
-	 * rgba(255,234,245,0.1)
-	 */
-	export const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
-	export function parse(matches: RegExpExecArray): Rgb {
-		return [
-			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 10)),
-			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 10)),
-			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 10)),
-		];
-	}
-}
-
-function tryParseRgbShortHexString(rgbShortHexString: string): Rgb | null {
-	const matches = RgbShortHexRepresentation.re.exec(rgbShortHexString);
-	return matches !== null ? RgbShortHexRepresentation.parse(matches) : null;
-}
-
-function tryParseRgbHexString(rgbHexString: string): Rgb | null {
-	const matches = RgbHexRepresentation.re.exec(rgbHexString);
-	return matches !== null ? RgbHexRepresentation.parse(matches) : null;
-}
-
-function tryParseRgbString(colorString: string): Rgb | null {
-	const matches = RgbRepresentation.rgbaRe.exec(colorString) || RgbRepresentation.rgbRe.exec(colorString);
-	return matches !== null ? RgbRepresentation.parse(matches) : null;
-}
+/**
+ * @example
+ * rgba(123, 234, 45, 1)
+ * @example
+ * rgba(255,234,245,0.1)
+ */
+const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
 
 function colorStringToRgb(colorString: string): Rgb {
 	colorString = colorString.toLowerCase();
@@ -268,19 +226,37 @@ function colorStringToRgb(colorString: string): Rgb {
 		colorString = namedColorRgbHexStrings[colorString];
 	}
 
-	const rgbParseResult = tryParseRgbString(colorString);
-	if (rgbParseResult !== null) {
-		return rgbParseResult;
+	{
+		const matches = rgbaRe.exec(colorString) || rgbRe.exec(colorString);
+		if (matches) {
+			return [
+				normalizeRgbComponent<RedComponent>(parseInt(matches[1], 10)),
+				normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 10)),
+				normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 10)),
+			];
+		}
 	}
 
-	const rgbHexParseResult = tryParseRgbHexString(colorString);
-	if (rgbHexParseResult !== null) {
-		return rgbHexParseResult;
+	{
+		const matches = hexRe.exec(colorString);
+		if (matches) {
+			return [
+				normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16)),
+				normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16)),
+				normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16)),
+			];
+		}
 	}
 
-	const rgbShortHexParseResult = tryParseRgbShortHexString(colorString);
-	if (rgbShortHexParseResult !== null) {
-		return rgbShortHexParseResult;
+	{
+		const matches = shortHexRe.exec(colorString);
+		if (matches) {
+			return [
+				normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16) * 0x11),
+				normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16) * 0x11),
+				normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16) * 0x11),
+			];
+		}
 	}
 
 	throw new Error(`Cannot parse color: ${colorString}`);
