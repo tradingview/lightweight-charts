@@ -190,12 +190,12 @@ namespace RgbShortHexRepresentation {
 	 * @example
 	 * #f0fa
 	 */
-	export const re = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])?$/;
+	export const re = /^#([0-9a-f])([0-9a-f])([0-9a-f])([0-9a-f])?$/i;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
-			normalizeRgbComponent<RedComponent>(parseInt(matches[1] + matches[1], 16)),
-			normalizeRgbComponent<GreenComponent>(parseInt(matches[2] + matches[2], 16)),
-			normalizeRgbComponent<BlueComponent>(parseInt(matches[3] + matches[3], 16)),
+			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16) * 0x11),
+			normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16) * 0x11),
+			normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16) * 0x11),
 		];
 	}
 }
@@ -209,7 +209,7 @@ namespace RgbHexRepresentation {
 	 * @example
 	 * #336699FA
 	 */
-	export const re = /^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})?$/;
+	export const re = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})?$/i;
 	export function parse(matches: RegExpExecArray): Rgb {
 		return [
 			normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16)),
