@@ -1,5 +1,4 @@
 import { Nominal } from './nominal';
-import { isNaN } from './strict-type-checks';
 
 /**
  * Red component of the RGB color value
@@ -172,17 +171,15 @@ const namedColorRgbHexStrings: Record<string, string> = {
 	mediumspringgreen: '#00fa9a',
 };
 
-function normalizeInteger(min: number, n: number, max: number): number {
-	return (
-		isNaN(n) ? min :
-			n < min ? min :
-				n > max ? max :
-					Math.round(n)
-	);
-}
-
 function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueComponent>(component: number): T {
-	return normalizeInteger(0, component, 255) as T;
+	if (component < 0) {
+		return 0 as T;
+	}
+	if (component > 255) {
+		return 255 as T;
+	}
+	// NaN values are treated as 0
+	return (Math.round(component) || 0) as T;
 }
 
 namespace RgbShortHexRepresentation {
