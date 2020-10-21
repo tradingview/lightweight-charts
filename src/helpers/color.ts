@@ -24,6 +24,7 @@ type Rgb = [RedComponent, GreenComponent, BlueComponent];
 const namedColorRgbHexStrings: Record<string, string> = {
 	// The order of properties in this Record is not important for the internal logic.
 	// It's just GZIPped better when props follows this order.
+	// Please add new colors to the end of the record.
 
 	khaki: '#f0e68c',
 	azure: '#f0ffff',
