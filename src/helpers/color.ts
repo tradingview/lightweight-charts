@@ -166,6 +166,7 @@ const namedColorRgbHexStrings: Record<string, string> = {
 	whitesmoke: '#f5f5f5',
 	yellow: '#ff0',
 	yellowgreen: '#9acd32',
+	transparent: '#0000',
 };
 
 function normalizeInteger(min: number, n: number, max: number): number {
@@ -261,10 +262,6 @@ function tryParseRgbString(colorString: string): Rgb | null {
 
 function colorStringToRgb(colorString: string): Rgb {
 	colorString = colorString.toLowerCase();
-
-	if (colorString === 'transparent') {
-		return [0 as RedComponent, 0 as GreenComponent, 0 as BlueComponent];
-	}
 
 	// eslint-disable-next-line no-restricted-syntax
 	if (colorString in namedColorRgbHexStrings) {
