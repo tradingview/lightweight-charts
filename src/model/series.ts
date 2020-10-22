@@ -75,8 +75,8 @@ export type LastValueDataResultWithoutRawPrice = LastValueDataResultWithoutData 
 export interface MarkerData {
 	price: BarPrice;
 	radius: number;
-	borderColor?: string;
-	backgroundColor?: string;
+	borderColor: string;
+	backgroundColor: string;
 }
 
 export interface SeriesDataAtTypeMap {
@@ -427,7 +427,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const price = bar.value[PlotRowValueIndex.Close] as BarPrice;
 		const radius = this._markerRadius();
 		const borderColor = this._markerBorderColor();
-		const backgroundColor = this._markerBackgroundColor();
+		const backgroundColor = this._markerBackgroundColor(index);
 		return { price, radius, borderColor, backgroundColor };
 	}
 
@@ -474,24 +474,34 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return 0;
 	}
 
-	private _markerBorderColor(): string | undefined {
+	private _markerBorderColor(): string {
+		let borderColor = this.model().options().layout.backgroundColor;
 		switch (this._seriesType) {
 			case 'Line':
-			case 'Area':
-				return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBorderColor;
+			case 'Area': {
+				const crosshairMarkerBorderColor = (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBorderColor;
+				if (crosshairMarkerBorderColor) {
+					borderColor = crosshairMarkerBorderColor;
+				}
+			}
 		}
 
-		return undefined;
+		return borderColor;
 	}
 
-	private _markerBackgroundColor(): string | undefined {
+	private _markerBackgroundColor(index: TimePointIndex): string {
+		let backgroundColor = this.barColorer().barStyle(index).barColor;
 		switch (this._seriesType) {
 			case 'Line':
-			case 'Area':
-				return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBackgroundColor;
+			case 'Area': {
+				const crosshairMarkerBackgroundColor = (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBackgroundColor;
+				if (crosshairMarkerBackgroundColor) {
+					backgroundColor = crosshairMarkerBackgroundColor;
+				}
+			}
 		}
 
-		return undefined;
+		return backgroundColor;
 	}
 
 	private _recreateFormatter(): void {
