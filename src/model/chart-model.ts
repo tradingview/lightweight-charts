@@ -80,6 +80,11 @@ export interface ChartOptions {
 	width: number;
 	/** Height of the chart */
 	height: number;
+	/**
+	 * Use observer to resize chart to its parent client area
+	 * Calling code is responsible for providing pilyfill if native implementation is not avaibable
+	 * */
+	useObserver: boolean;
 	/** Structure with watermark options */
 	watermark: WatermarkOptions;
 	/** Structure with layout options */

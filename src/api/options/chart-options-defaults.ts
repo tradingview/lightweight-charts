@@ -12,6 +12,7 @@ import { watermarkOptionsDefaults } from './watermark-options-defaults';
 export const chartOptionsDefaults: ChartOptionsInternal = {
 	width: 0,
 	height: 0,
+	useObserver: false,
 	layout: layoutOptionsDefaults,
 	crosshair: crosshairOptionsDefaults,
 	grid: gridOptionsDefaults,

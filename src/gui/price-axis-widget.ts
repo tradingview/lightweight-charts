@@ -199,16 +199,13 @@ export class PriceAxisWidget implements IDestroyable {
 			}
 		}
 
-		let res = Math.ceil(
+		return Math.ceil(
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
 			tickMarkMaxWidth
 		);
-		// make it even
-		res += res % 2;
-		return res;
 	}
 
 	public setSize(size: Size): void {
