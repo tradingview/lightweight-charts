@@ -21,6 +21,20 @@ If you want the chart size to be adjusted when the web page is resized, use the 
 chart.resize(250, 150);
 ```
 
+If specify width or height equal to zero, the size will be canculated as parent's content rect.
+
+### Use Observer
+
+If specify `useObserver`, the chart size will be dynamically adjusted to container size on any change.
+If specified, `width` and `height` parameters will be ignored.
+This option requires `ResizeObserver` feature to be supported by the browser. If old browsers support is required, the calling code is responsible for polyfill integration.
+
+```js
+const chart = LightweightCharts.createChart(document.body, {
+    useObserver: true,
+});
+```
+
 ### Localization
 
 Using the `localization` option you can set the displayed language, date and time formats.
