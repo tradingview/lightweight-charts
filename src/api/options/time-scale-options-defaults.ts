@@ -4,6 +4,7 @@ export const timeScaleOptionsDefaults: TimeScaleOptions = {
 	rightOffset: 0,
 	barSpacing: 6,
 	fixLeftEdge: false,
+	fixRightEdge: false,
 	lockVisibleTimeRangeOnResize: false,
 	rightBarStaysOnScroll: false,
 	borderVisible: true,

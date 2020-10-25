@@ -69,6 +69,7 @@ export interface TimeScaleOptions {
 	rightOffset: number;
 	barSpacing: number;
 	fixLeftEdge: boolean;
+	fixRightEdge: boolean;
 	lockVisibleTimeRangeOnResize: boolean;
 	rightBarStaysOnScroll: boolean;
 	borderVisible: boolean;
@@ -420,6 +421,16 @@ export class TimeScale {
 		// zoom in/out bar spacing
 		this.setBarSpacing(newBarSpacing);
 
+		if (this._options.fixRightEdge) {
+			const newRightOffset = this.rightOffset();
+
+			// if we will get pushed into the future then revert the bar spacing
+			if (newRightOffset > 0) {
+				this.setBarSpacing(barSpacing);
+				return;
+			}
+		}
+
 		if (!this._options.rightBarStaysOnScroll) {
 			// and then correct right offset to move index under zoomPoint back to its coordinate
 			this.setRightOffset(this.rightOffset() + (floatIndexAtZoomPoint - this._coordinateToFloatIndex(zoomPoint)));
@@ -667,6 +678,13 @@ export class TimeScale {
 	}
 
 	private _correctOffset(): void {
+		// block scrolling past the rightmost bar
+		if (this._options.fixRightEdge && this._rightOffset > 0) {
+			this._rightOffset = 0;
+			this._visibleRangeInvalidated = true;
+			return;
+		}
+
 		// block scrolling of to future
 		const maxRightOffset = this._maxRightOffset();
 		if (this._rightOffset > maxRightOffset) {
