@@ -12,6 +12,7 @@
   [![npm bundle size][bundle-size-img]][bundle-size-link]
   [![Dependencies count][deps-count-img]][bundle-size-link]
   [![Downloads][npm-downloads-img]][npm-link]
+  [![Gitpod Ready-to-Code][gitpod-img]][gitpod-link]
 </div>
 
 <!-- markdownlint-enable no-inline-html -->
@@ -105,3 +106,5 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 [bundle-size-img]: https://badgen.net/bundlephobia/minzip/lightweight-charts
 [deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependecies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
 [bundle-size-link]: https://bundlephobia.com/result?p=lightweight-charts
+[gitpod-img]: https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod
+[gitpod-link]: https://gitpod.io/from-referrer/
