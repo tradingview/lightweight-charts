@@ -57,10 +57,13 @@ export class ChartWidget implements IDestroyable {
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 	private _observer: ResizeObserver | null = null;
-	// replace InternalLayoutSizeHintsKeepOdd with InternalLayoutSizeHintsKeepIriginal to turn "odd magic" off
+	// replace InternalLayoutSizeHintsKeepOdd with InternalLayoutSizeHintsKeepOriginal to turn "odd magic" off
 	private _sizingHints: InternalLayoutSizeHints = new InternalLayoutSizeHintsKeepOdd();
 
+	private _container: HTMLElement;
+
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
+		this._container = container;
 		this._options = options;
 
 		this._element = document.createElement('div');
@@ -85,30 +88,19 @@ export class ChartWidget implements IDestroyable {
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
 
-		if (options.useObserver) {
-			// eslint-disable-next-line no-restricted-syntax
-			if (!('ResizeObserver' in window)) {
-				warn('Options contains "useObserver" flag, but the browser does not support this');
-			} else {
-				this._observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-					const containerEntry = entries.find((entry: ResizeObserverEntry) => entry.target === container);
-					if (!containerEntry || !containerEntry.devicePixelContentBoxSize) {
-						return;
-					}
-					this.resize(containerEntry.contentRect.width, containerEntry.contentRect.height);
-				});
-				this._observer.observe(container, { box: 'border-box' });
-			}
-		} else {
-			let size = new Size(this._options.width, this._options.height);
-			if (size.w === 0 || size.h === 0) {
+		if (!options.useObserver || !this._installObserver()) {
+			// if installing observer failed, fallback to no-observer behavior
+			let width = this._options.width;
+			let height = this._options.height;
+			if (width === 0 || height === 0) {
 				const containerRect = container.getBoundingClientRect();
-				size = new Size(containerRect.width, containerRect.height);
+				width = width || containerRect.width;
+				height = height || containerRect.height;
 			}
 
 			// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
 			// or after but with adjustSize to properly update time scale
-			this.resize(size.w, size.h);
+			this.resize(width, height);
 		}
 
 		this._syncGuiWithModel();
@@ -163,9 +155,7 @@ export class ChartWidget implements IDestroyable {
 		this._crosshairMoved.destroy();
 		this._clicked.destroy();
 
-		if (this._observer !== null) {
-			this._observer.disconnect();
-		}
+		this._uninstallObserver();
 	}
 
 	public resize(width: number, height: number, forceRepaint: boolean = false): void {
@@ -214,6 +204,14 @@ export class ChartWidget implements IDestroyable {
 		const height = options.height || this._height;
 
 		this.resize(width, height);
+
+		if (options.useObserver && !this._observer) {
+			// installing observer will override resize if successfull
+			this._installObserver();
+		}
+		if (options.useObserver === false && this._observer) {
+			this._uninstallObserver();
+		}
 	}
 
 	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
@@ -644,5 +642,29 @@ export class ChartWidget implements IDestroyable {
 
 	private _isRightAxisVisible(): boolean {
 		return this._options.rightPriceScale.visible;
+	}
+
+	private _installObserver(): boolean {
+		// eslint-disable-next-line no-restricted-syntax
+		if (!('ResizeObserver' in window)) {
+			warn('Options contains "useObserver" flag, but the browser does not support this');
+			return false;
+		} else {
+			this._observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+				const containerEntry = entries.find((entry: ResizeObserverEntry) => entry.target === this._container);
+				if (!containerEntry) {
+					return;
+				}
+				this.resize(containerEntry.contentRect.width, containerEntry.contentRect.height);
+			});
+			this._observer.observe(this._container, { box: 'border-box' });
+			return true;
+		}
+	}
+
+	private _uninstallObserver(): void {
+		if (this._observer !== null) {
+			this._observer.disconnect();
+		}
 	}
 }

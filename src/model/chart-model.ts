@@ -81,8 +81,11 @@ export interface ChartOptions {
 	/** Height of the chart */
 	height: number;
 	/**
-	 * Use observer to resize chart to its parent client area
-	 * Calling code is responsible for providing pilyfill if native implementation is not avaibable
+	 * Settings this flag to true makes chart monitoring container
+	 * and changing its size on every container resize
+	 * This feature requires `ResizeObserver` class to be avaiable in the global scope
+	 * Calling code is responsibe for providing a polyfill if requried
+	 * If the global scope does not contain `ResizeObserver` object, a warning will appear the the flag will be ignored
 	 * */
 	useObserver: boolean;
 	/** Structure with watermark options */

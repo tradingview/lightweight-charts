@@ -25,9 +25,17 @@ If specify width or height equal to zero, the size will be canculated as parent'
 
 ### Use Observer
 
-If specify `useObserver`, the chart size will be dynamically adjusted to container size on any change.
-If specified, `width` and `height` parameters will be ignored.
-This option requires `ResizeObserver` feature to be supported by the browser. If old browsers support is required, the calling code is responsible for polyfill integration.
+Settings `userObserver` thig flag to true makes chart monitoring container
+and changing its size on every container resize
+This feature requires `ResizeObserver` class to be avaiable in the global scope
+Calling code is responsibe for providing a polyfill if requried
+If the global scope does not contain `ResizeObserver` object, a warning will appear the the flag will be ignored
+
+Please pay your attention that `userObserver` option and explicit sizes options `width` and `height` conflict one with others.
+If you specify `userObserver` flag, `width` and `height` options will be ignored in common case
+and could only be used as fallback if using `ResizeObserver` has failed.
+
+The flag `userObserver` could also be set with and unset with `applyOptions` function.
 
 ```js
 const chart = LightweightCharts.createChart(document.body, {

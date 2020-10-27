@@ -27,7 +27,7 @@ export class InternalLayoutSizeHintsKeepOdd implements InternalLayoutSizeHints {
 	}
 }
 
-export class InternalLayoutSizeHintsKeepIriginal implements InternalLayoutSizeHints {
+export class InternalLayoutSizeHintsKeepOriginal implements InternalLayoutSizeHints {
 	public suggestChartSize(originalSize: Size): Size {
 		return originalSize;
 	}
