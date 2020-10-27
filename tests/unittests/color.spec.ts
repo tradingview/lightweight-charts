@@ -22,6 +22,8 @@ describe('generateContrastColors', () => {
 		expect(generateContrastColors('darkmagenta')).to.deep.equal({ foreground: 'white', background: 'rgb(139, 0, 139)' });
 		expect(generateContrastColors('linen')).to.deep.equal({ foreground: 'black', background: 'rgb(250, 240, 230)' });
 		expect(generateContrastColors('whitesmoke')).to.deep.equal({ foreground: 'black', background: 'rgb(245, 245, 245)' });
+		expect(generateContrastColors('white')).to.deep.equal({ foreground: 'black', background: 'rgb(255, 255, 255)' });
+		expect(generateContrastColors('transparent')).to.deep.equal({ foreground: 'white', background: 'rgb(0, 0, 0)' });
 	});
 
 	it('should correctly parse short hex colors', () => {
