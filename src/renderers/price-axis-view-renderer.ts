@@ -106,11 +106,24 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 			ctx.save();
 
+			const radius = 2 * pixelRatio;
+
 			ctx.beginPath();
-			ctx.moveTo(xInsideScaled, yTopScaled);
-			ctx.lineTo(xOutsideScaled, yTopScaled);
-			ctx.lineTo(xOutsideScaled, yBottomScaled);
-			ctx.lineTo(xInsideScaled, yBottomScaled);
+			if (alignRight) {
+				ctx.moveTo(xInsideScaled, yTopScaled);
+				ctx.lineTo(xOutsideScaled + radius, yTopScaled);
+				ctx.arcTo(xOutsideScaled, yTopScaled, xOutsideScaled, yTopScaled + radius, radius);
+				ctx.lineTo(xOutsideScaled, yBottomScaled - radius);
+				ctx.arcTo(xOutsideScaled, yBottomScaled, xOutsideScaled + radius, yBottomScaled, radius);
+				ctx.lineTo(xInsideScaled, yBottomScaled);
+			} else {
+				ctx.moveTo(xInsideScaled, yTopScaled);
+				ctx.lineTo(xOutsideScaled - radius, yTopScaled);
+				ctx.arcTo(xOutsideScaled, yTopScaled, xOutsideScaled, yTopScaled + radius, radius);
+				ctx.lineTo(xOutsideScaled, yBottomScaled - radius);
+				ctx.arcTo(xOutsideScaled, yBottomScaled, xOutsideScaled - radius, yBottomScaled, radius);
+				ctx.lineTo(xInsideScaled, yBottomScaled);
+			}
 			ctx.fill();
 
 			// draw border

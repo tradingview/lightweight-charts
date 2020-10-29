@@ -75,7 +75,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 
 		const tickX = Math.round(this._data.coordinate * pixelRatio);
 		const tickTop = y1scaled;
-		const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * pixelRatio);
+		const tickBottom = Math.round((tickTop + rendererOptions.tickLength) * pixelRatio);
 
 		ctx.fillStyle = this._data.color;
 		const tickWidth = Math.max(1, Math.floor(pixelRatio));

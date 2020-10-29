@@ -422,8 +422,8 @@ export class PriceAxisWidget implements IDestroyable {
 		const drawTicks = this._priceScale.options().borderVisible && this._priceScale.options().drawTicks;
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
-			Math.floor(rendererOptions.borderSize * pixelRatio);
+			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio) :
+			0;
 
 		const textLeftX = this._isLeft ?
 			Math.round(tickMarkLeftX - rendererOptions.paddingInner * pixelRatio) :
