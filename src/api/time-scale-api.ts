@@ -5,7 +5,7 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { LogicalRange, Range, TimePointsRange } from '../model/time-data';
+import { Logical, LogicalRange, Range, TimePointIndex, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
@@ -39,7 +39,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 
 	public scrollToPosition(position: number, animated: boolean): void {
 		if (!animated) {
-			this._timeScale().setRightOffset(position);
+			this._model.setRightOffset(position);
 			return;
 		}
 
@@ -96,6 +96,26 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 
 	public fitContent(): void {
 		this._model.fitContent();
+	}
+
+	public logicalToCoordinate(logical: Logical): Coordinate | null {
+		const timeScale = this._model.timeScale();
+
+		if (timeScale.isEmpty()) {
+			return null;
+		} else {
+			return timeScale.indexToCoordinate(logical as unknown as TimePointIndex);
+		}
+	}
+
+	public coordinateToLogical(x: number): Logical | null {
+		const timeScale = this._model.timeScale();
+
+		if (timeScale.isEmpty()) {
+			return null;
+		} else {
+			return timeScale.coordinateToIndex(x as Coordinate) as unknown as Logical;
+		}
 	}
 
 	public timeToCoordinate(time: Time): Coordinate | null {

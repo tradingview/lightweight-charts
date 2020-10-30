@@ -8,7 +8,12 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { InvalidateMask, InvalidationLevel } from '../model/invalidate-mask';
+import {
+	InvalidateMask,
+	InvalidationLevel,
+	TimeScaleInvalidation,
+	TimeScaleInvalidationType,
+} from '../model/invalidate-mask';
 import { Point } from '../model/point';
 import { PriceAxisPosition } from '../model/price-scale';
 import { Series } from '../model/series';
@@ -451,19 +456,41 @@ export class ChartWidget implements IDestroyable {
 				}
 			}
 
-			if (invalidateMask.getFitContent()) {
-				this._model.timeScale().fitContent();
+			const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
+			for (const tsInvalidation of timeScaleInvalidations) {
+				this._applyTimeScaleInvalidation(tsInvalidation);
 			}
-
-			const logicalRange = invalidateMask.getLogicalRange();
-			if (logicalRange !== null) {
-				this._model.timeScale().setLogicalRange(logicalRange);
+			if (timeScaleInvalidations.length > 0) {
+				this._model.recalculateAllPanes();
+				this._model.updateCrosshair();
+				this._model.lightUpdate();
 			}
 
 			this._timeAxisWidget.update();
 		}
 
 		this.paint(invalidateMask);
+	}
+
+	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {
+		const timeScale = this._model.timeScale();
+		switch (invalidation.type) {
+			case TimeScaleInvalidationType.FitContent:
+				timeScale.fitContent();
+				break;
+			case TimeScaleInvalidationType.ApplyRange:
+				timeScale.setLogicalRange(invalidation.value);
+				break;
+			case TimeScaleInvalidationType.ApplyBarSpacing:
+				timeScale.setBarSpacing(invalidation.value);
+				break;
+			case TimeScaleInvalidationType.ApplyRightOffset:
+				timeScale.setRightOffset(invalidation.value);
+				break;
+			case TimeScaleInvalidationType.Reset:
+				timeScale.restoreDefault();
+				break;
+		}
 	}
 
 	private _invalidateHandler(invalidateMask: InvalidateMask): void {
