@@ -87,7 +87,7 @@
     "install-hooks": "node scripts/githooks/install.js",
     "clean": "rimraf lib/ dist/",
     "bundle-dts": "tsc --noEmit --allowJs dts-config.js && dts-bundle-generator --config dts-config.js",
-    "tsc": "ttsc -p tsconfig.prod.json",
+    "tsc": "tsc -p tsconfig.prod.json",
     "tsc-watch": "npm run tsc -- --watch --preserveWatchOutput",
     "tsc-verify": "tsc -b tsconfig.composite.json",
     "lint": "npm-run-all -p lint:**",
