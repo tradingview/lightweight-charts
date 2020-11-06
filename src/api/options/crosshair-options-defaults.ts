@@ -3,7 +3,7 @@ import { LineStyle } from '../../renderers/draw-line';
 
 export const crosshairOptionsDefaults: CrosshairOptions = {
 	vertLine: {
-		color: '#EF9A9A',
+		color: '#9598A1',
 		width: 1,
 		style: LineStyle.LargeDashed,
 		visible: true,
@@ -11,7 +11,7 @@ export const crosshairOptionsDefaults: CrosshairOptions = {
 		labelBackgroundColor: '#131722',
 	},
 	horzLine: {
-		color: '#EF9A9A',
+		color: '#9598A1',
 		width: 1,
 		style: LineStyle.LargeDashed,
 		visible: true,
