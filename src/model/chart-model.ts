@@ -87,7 +87,7 @@ export interface ChartOptions {
 	 * Calling code is responsibe for providing a polyfill if requried
 	 * If the global scope does not contain `ResizeObserver` object, a warning will appear the the flag will be ignored
 	 * */
-	useObserver: boolean;
+	autoSize: boolean;
 	/** Structure with watermark options */
 	watermark: WatermarkOptions;
 	/** Structure with layout options */

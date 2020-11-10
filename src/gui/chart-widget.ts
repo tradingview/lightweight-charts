@@ -88,20 +88,23 @@ export class ChartWidget implements IDestroyable {
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
 
-		if (!options.useObserver || !this._installObserver()) {
-			// if installing observer failed, fallback to no-observer behavior
-			let width = this._options.width;
-			let height = this._options.height;
-			if (width === 0 || height === 0) {
-				const containerRect = container.getBoundingClientRect();
-				width = width || containerRect.width;
-				height = height || containerRect.height;
-			}
+		const usedObserver = options.autoSize && this._installObserver();
 
-			// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
-			// or after but with adjustSize to properly update time scale
-			this.resize(width, height);
+		// observer could not fire event immediately for some cases
+		// so we have to set initial size manually
+		let width = this._options.width;
+		let height = this._options.height;
+		// ignore width/height options if observer has actually been used
+		// however respect options if installing resize observer failed
+		if (usedObserver || width === 0 || height === 0) {
+			const containerRect = container.getBoundingClientRect();
+			width = width || containerRect.width;
+			height = height || containerRect.height;
 		}
+
+		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
+		// or after but with adjustSize to properly update time scale
+		this.resize(width, height);
 
 		this._syncGuiWithModel();
 
@@ -205,11 +208,11 @@ export class ChartWidget implements IDestroyable {
 
 		this.resize(width, height);
 
-		if (options.useObserver && !this._observer) {
+		if (options.autoSize && !this._observer) {
 			// installing observer will override resize if successfull
 			this._installObserver();
 		}
-		if (options.useObserver === false && this._observer) {
+		if (options.autoSize === false && this._observer) {
 			this._uninstallObserver();
 		}
 	}
@@ -647,7 +650,7 @@ export class ChartWidget implements IDestroyable {
 	private _installObserver(): boolean {
 		// eslint-disable-next-line no-restricted-syntax
 		if (!('ResizeObserver' in window)) {
-			warn('Options contains "useObserver" flag, but the browser does not support this');
+			warn('Options contains "autoSize" flag, but the browser does not support ResizeObserver feature. Please provide polyfill.');
 			return false;
 		} else {
 			this._observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
