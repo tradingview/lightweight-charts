@@ -26,15 +26,3 @@ export class InternalLayoutSizeHintsKeepOdd implements InternalLayoutSizeHints {
 		return originalWidth + originalWidth % 2;
 	}
 }
-
-export class InternalLayoutSizeHintsKeepOriginal implements InternalLayoutSizeHints {
-	public suggestChartSize(originalSize: Size): Size {
-		return originalSize;
-	}
-	public suggestTimeScaleHeight(originalHeight: number): number {
-		return originalHeight;
-	}
-	public suggestPriceScaleWidth(originalWidth: number): number {
-		return originalWidth;
-	}
-}
