@@ -144,6 +144,24 @@ jobs:
       - checkout-with-deps
       - run: npm run lint:md
 
+  usable-in-nodejs:
+    executor: node16-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: npm run prepare-package-json-for-release
+      - run:
+          name: "Installing lightweight-charts package into node_modules"
+          # this is hacky way to do something like `npm link lightweight-charts`
+          # but we cannot use `npm link` in CI
+          command: |
+            cd node_modules
+            ln -s ../ lightweight-charts
+      - run:
+          name: "Check CJS could be imported in NodeJS"
+          command: node -e "import 'lightweight-charts'" --input-type=module
+
   unittests:
     executor: node16-executor
     environment:
@@ -300,6 +318,10 @@ workflows:
             - install-deps
 
       - size-limit:
+          filters: *default-filters
+          requires:
+            - build
+      - usable-in-nodejs:
           filters: *default-filters
           requires:
             - build

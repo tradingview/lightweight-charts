@@ -116,7 +116,8 @@
     "build:watch": "npm-run-all tsc -p tsc-watch rollup-watch",
     "build:prod": "cross-env NODE_ENV=production npm run build",
     "build:release": "cross-env BUILD_TAG=release npm run build:prod",
-    "prepare-release": "npm-run-all clean build:release && node ./scripts/clean-package-json.cjs",
+    "prepare-release": "npm-run-all clean build:release && npm run prepare-package-json-for-release",
+    "prepare-package-json-for-release": "node ./scripts/clean-package-json.cjs",
     "size-limit": "size-limit",
     "verify": "npm-run-all clean -p lint check-markdown-links build:prod -p check-dts-docs tsc-verify test size-limit",
     "test": "mocha tests/unittests/**/*.spec.ts"
