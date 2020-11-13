@@ -37,6 +37,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 			bottomColor: areaStyleProperties.bottomColor,
 			bottom: height as Coordinate,
 			visibleRange: this._itemsVisibleRange,
+			barWidth: this._model.timeScale().barSpacing(),
 		};
 
 		this._areaRenderer.setData(data);
