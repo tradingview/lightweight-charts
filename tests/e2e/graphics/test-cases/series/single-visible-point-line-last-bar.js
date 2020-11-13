@@ -1,11 +1,11 @@
-function generateData() {
+function generateData(priceOffset) {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
 	for (let i = 0; i < 500; ++i) {
-		if (i % 99 === 99) {
+		if (i % 100 === 99) {
 			res.push({
 				time: time.getTime() / 1000,
-				value: i,
+				value: i + priceOffset,
 			});
 		} else {
 			res.push({
@@ -26,7 +26,7 @@ function runTestCase(container) {
 		},
 	});
 
-	const mainSeries = chart.addLineSeries({
+	const firstSeries = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineVisible: false,
@@ -34,10 +34,24 @@ function runTestCase(container) {
 		autoscaleInfoProvider: () => ({
 			priceRange: {
 				minValue: 0,
-				maxValue: 200,
+				maxValue: 1000,
 			},
 		}),
 	});
 
-	mainSeries.setData(generateData());
+	const secondSeries = chart.addAreaSeries({
+		lineWidth: 1,
+		color: '#ff0000',
+		priceLineVisible: false,
+		lastValueVisible: false,
+		autoscaleInfoProvider: () => ({
+			priceRange: {
+				minValue: 0,
+				maxValue: 1000,
+			},
+		}),
+	});
+
+	firstSeries.setData(generateData(0));
+	secondSeries.setData(generateData(100));
 }
