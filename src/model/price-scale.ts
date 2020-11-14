@@ -476,10 +476,13 @@ export class PriceScale {
 
 		this._dataSources.splice(index, 1);
 
-		if (this.isEmpty()) {
+		if (this._dataSources.length === 0) {
 			this.setMode({
 				autoScale: true,
 			});
+
+			// if no sources on price scale let's clear price range cache as well as enabling auto scale
+			this.setPriceRange(null);
 		}
 
 		this.updateFormatter();

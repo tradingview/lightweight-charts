@@ -33,14 +33,8 @@ export function getContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2
 	return ctx;
 }
 
-function createCanvas(doc: Document): HTMLCanvasElement {
-	const canvas = doc.createElement('canvas');
-	disableSelection(canvas);
-	return canvas;
-}
-
 export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvasElement {
-	const canvas = createCanvas(doc);
+	const canvas = doc.createElement('canvas');
 
 	const pixelRatio = getCanvasDevicePixelRatio(canvas);
 	// we should keep the layout size...
@@ -54,7 +48,7 @@ export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvas
 
 export function createBoundCanvas(parentElement: HTMLElement, size: Size): CanvasCoordinateSpaceBinding {
 	const doc = ensureNotNull(parentElement.ownerDocument);
-	const canvas = createCanvas(doc);
+	const canvas = doc.createElement('canvas');
 	parentElement.appendChild(canvas);
 
 	const binding = bindToDevicePixelRatio(canvas);
@@ -63,18 +57,6 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 		height: size.h,
 	});
 	return binding;
-}
-
-function disableSelection(canvas: HTMLCanvasElement): void {
-	canvas.style.userSelect = 'none';
-	// eslint-disable-next-line deprecation/deprecation
-	canvas.style.webkitUserSelect = 'none';
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
-	(canvas as any).style.msUserSelect = 'none';
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
-	(canvas as any).style.MozUserSelect = 'none';
-
-	canvas.style.webkitTapHighlightColor = 'transparent';
 }
 
 export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
