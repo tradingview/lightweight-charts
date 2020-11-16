@@ -16,13 +16,13 @@ function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 	
 	const areaSeries = chart.addAreaSeries({
-        crosshairMarkerBorderColor: 'yellow',
-        crosshairMarkerBackgroundColor: 'red',
+		crosshairMarkerBorderColor: 'yellow',
+		crosshairMarkerBackgroundColor: 'red',
 	});
 
 	const lineSeries = chart.addLineSeries({
-        crosshairMarkerBorderColor: 'blue',
-        crosshairMarkerBackgroundColor: 'green',
+		crosshairMarkerBorderColor: 'blue',
+		crosshairMarkerBackgroundColor: 'green',
 	});
 
 	areaSeries.setData(generateData());
@@ -31,12 +31,12 @@ function runTestCase(container) {
 	return new Promise(resolve => {
 		setTimeout(() => {
 			areaSeries.applyOptions({
-                crosshairMarkerBorderColor: '#ffffff',
-                crosshairMarkerBackgroundColor: '#2296f3',
+				crosshairMarkerBorderColor: '#ffffff',
+				crosshairMarkerBackgroundColor: '#2296f3',
 			});
 			lineSeries.applyOptions({
-                crosshairMarkerBorderColor: '#ffffff',
-                crosshairMarkerBackgroundColor: '#2296f3',
+				crosshairMarkerBorderColor: '#ffffff',
+				crosshairMarkerBackgroundColor: '#2296f3',
 			});
 			resolve();
 		}, 300);

@@ -16,13 +16,13 @@ function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 	
 	const areaSeries = chart.addAreaSeries({
-        crosshairMarkerBorderColor: '#ffffff',
-        crosshairMarkerBackgroundColor: '#2296f3',
+		crosshairMarkerBorderColor: '#ffffff',
+		crosshairMarkerBackgroundColor: '#2296f3',
 	});
 
 	const lineSeries = chart.addLineSeries({
-        crosshairMarkerBorderColor: '#ffffff',
-        crosshairMarkerBackgroundColor: '#2296f3',
+		crosshairMarkerBorderColor: '#ffffff',
+		crosshairMarkerBackgroundColor: '#2296f3',
 	});
 
 	areaSeries.setData(generateData());
