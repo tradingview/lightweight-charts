@@ -155,7 +155,7 @@ series.applyOptions({
 ```
 
 If the series is hidden, everything including price lines, baseline, price labels and markers, will also be hidden.
-Note that hiding a series is not equivalent to deleting it, since hiding does not affect the timeline at all, unlike deleting, where the timeline can be changed (some points can be deleted).
+Please note that hiding a series is not equivalent to deleting it, since hiding does not affect the timeline at all, unlike deleting where the timeline can be changed (some points can be deleted).
 
 ### Overriding autoscale
 
