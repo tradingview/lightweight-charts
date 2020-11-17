@@ -12,6 +12,8 @@ export interface PaneRendererLineData {
 
 	items: LineItem[];
 
+	barWidth: number;
+
 	lineColor: string;
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
@@ -40,7 +42,14 @@ export class PaneRendererLine extends ScaledRenderer {
 		ctx.lineJoin = 'miter';
 
 		ctx.beginPath();
-		walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
+		if (this._data.items.length === 1) {
+			const point = this._data.items[0];
+			ctx.moveTo(point.x - this._data.barWidth / 2, point.y);
+			ctx.lineTo(point.x + this._data.barWidth / 2, point.y);
+		} else {
+			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
+		}
+
 		ctx.stroke();
 	}
 }

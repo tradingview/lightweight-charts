@@ -20,23 +20,6 @@ export const enum LineStyle {
 	SparseDotted = 4,
 }
 
-export function drawLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, lineStyle: LineStyle): void {
-	if (!isFinite(x1) || !isFinite(x2) || !isFinite(y1) || !isFinite(y2)) {
-		return;
-	}
-
-	ctx.save();
-
-	setLineStyle(ctx, lineStyle);
-
-	ctx.beginPath();
-	ctx.moveTo(x1, y1);
-	ctx.lineTo(x2, y2);
-	ctx.stroke();
-
-	ctx.restore();
-}
-
 export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): void {
 	const dashPatterns = {
 		[LineStyle.Solid]: [],
