@@ -69,7 +69,8 @@ export class LabelsImageCache implements IDestroyable {
 
 			const baselineOffset = Math.round(this._fontSize / 10);
 			const textWidth = Math.ceil(this._textWidthCache.measureText(ctx, text));
-			const width = ceiledEven(Math.round(textWidth));
+			// small reserve for antialiasing, measureText is not sharp
+			const width = ceiledEven(Math.round(textWidth) + 4);
 			const height = ceiledEven(this._fontSize);
 			const canvas = createPreconfiguredCanvas(document, new Size(width, height));
 
