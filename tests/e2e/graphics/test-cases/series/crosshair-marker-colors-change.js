@@ -1,11 +1,14 @@
-function generateData() {
+function generateData(step) {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	let value = step > 0 ? 0 : 500;
 	for (let i = 0; i < 500; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
-			value: i,
+			value: value,
 		});
+
+		value += step;
 
 		time.setUTCDate(time.getUTCDate() + 1);
 	}
@@ -15,27 +18,21 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	const areaSeries = chart.addAreaSeries({
-		crosshairMarkerBorderColor: 'yellow',
-		crosshairMarkerBackgroundColor: 'red',
-	});
+	const areaSeries = chart.addAreaSeries();
+	const lineSeries = chart.addLineSeries();
 
-	const lineSeries = chart.addLineSeries({
-		crosshairMarkerBorderColor: 'blue',
-		crosshairMarkerBackgroundColor: 'green',
-	});
-
-	areaSeries.setData(generateData());
-	lineSeries.setData(generateData());
+	areaSeries.setData(generateData(1));
+	lineSeries.setData(generateData(-1));
 
 	return new Promise(resolve => {
 		setTimeout(() => {
 			areaSeries.applyOptions({
-				crosshairMarkerBorderColor: '#ffffff',
+				crosshairMarkerBorderColor: '#ff00ff',
 				crosshairMarkerBackgroundColor: '#2296f3',
 			});
+
 			lineSeries.applyOptions({
-				crosshairMarkerBorderColor: '#ffffff',
+				crosshairMarkerBorderColor: '#00ffff',
 				crosshairMarkerBackgroundColor: '#2296f3',
 			});
 			resolve();

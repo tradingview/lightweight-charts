@@ -51,8 +51,8 @@ A line series interface can be customized using the following options:
 |`lineWidth`|`number`|`3`|Line width (in pixels)|
 |`crosshairMarkerVisible`|`boolean`|`true`|If `true`, the crosshair marker is shown on a chart|
 |`crosshairMarkerRadius`|`number`|`4`|Crosshair marker radius (in pixels)|
-|`crosshairMarkerBorderColor`|`string`|`#ffffff`|The crosshair border color|
-|`crosshairMarkerBackgroundColor`|`string`|`#2296f3`|The crosshair back color|
+|`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
+|`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
 |`lineType`|[LineType](./constants.md#linetype)|`LineType.Simple`|Line type|
 
 ### Examples

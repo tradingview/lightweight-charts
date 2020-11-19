@@ -53,8 +53,8 @@ An area series interface can be customized using the following set of options:
 |`lineWidth`|`number`|`3`|Line width in pixels|
 |`crosshairMarkerVisible`|`boolean`|`true`|If true, the crosshair marker is shown|
 |`crosshairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
-|`crosshairMarkerBorderColor`|`string`|`rgb(255, 255, 255, 1)`|The crosshair border color|
-|`crosshairMarkerBackgroundColor`|`string`|`rgb(34, 150, 243, 1)`|The crosshair back color|
+|`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
+|`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
 
 ### Examples
 

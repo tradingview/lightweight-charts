@@ -237,6 +237,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		this.model().updateSource(this);
+
+		// a series might affect crosshair by some options (like crosshair markers)
+		// that's why we need to update crosshair as well
+		this.model().updateCrosshair();
 	}
 
 	public clearData(): void {
@@ -475,33 +479,31 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	private _markerBorderColor(): string {
-		let borderColor = this.model().options().layout.backgroundColor;
 		switch (this._seriesType) {
 			case 'Line':
 			case 'Area': {
 				const crosshairMarkerBorderColor = (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBorderColor;
-				if (crosshairMarkerBorderColor) {
-					borderColor = crosshairMarkerBorderColor;
+				if (crosshairMarkerBorderColor.length !== 0) {
+					return crosshairMarkerBorderColor;
 				}
 			}
 		}
 
-		return borderColor;
+		return this.model().options().layout.backgroundColor;
 	}
 
 	private _markerBackgroundColor(index: TimePointIndex): string {
-		let backgroundColor = this.barColorer().barStyle(index).barColor;
 		switch (this._seriesType) {
 			case 'Line':
 			case 'Area': {
 				const crosshairMarkerBackgroundColor = (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBackgroundColor;
-				if (crosshairMarkerBackgroundColor) {
-					backgroundColor = crosshairMarkerBackgroundColor;
+				if (crosshairMarkerBackgroundColor.length !== 0) {
+					return crosshairMarkerBackgroundColor;
 				}
 			}
 		}
 
-		return backgroundColor;
+		return this.barColorer().barStyle(index).barColor;
 	}
 
 	private _recreateFormatter(): void {
