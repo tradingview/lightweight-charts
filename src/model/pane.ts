@@ -6,6 +6,7 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel, ChartOptions, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
+import { Grid } from './grid';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
 import { sortSources } from './sort-sources';
@@ -25,6 +26,7 @@ interface MinMaxOrderInfo {
 export class Pane implements IDestroyable {
 	private readonly _timeScale: TimeScale;
 	private readonly _model: ChartModel;
+	private readonly _grid: Grid;
 
 	private _dataSources: IPriceDataSource[] = [];
 	private _overlaySourcesByScaleId: Map<string, IPriceDataSource[]> = new Map();
@@ -42,6 +44,7 @@ export class Pane implements IDestroyable {
 	public constructor(timeScale: TimeScale, model: ChartModel) {
 		this._timeScale = timeScale;
 		this._model = model;
+		this._grid = new Grid(this);
 
 		const options = model.options();
 
@@ -317,6 +320,10 @@ export class Pane implements IDestroyable {
 
 	public onDestroyed(): ISubscription {
 		return this._destroyed;
+	}
+
+	public gridSource(): Grid {
+		return this._grid;
 	}
 
 	private _recalculatePriceScaleImpl(priceScale: PriceScale): void {

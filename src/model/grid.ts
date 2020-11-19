@@ -23,22 +23,20 @@ export interface GridOptions {
 }
 
 export class Grid {
-	private _paneViews: WeakMap<Pane, GridPaneView[]> = new WeakMap();
+	private _paneViews: GridPaneView[] = [];
 	private _invalidated: boolean = true;
 
-	public paneViews(pane: Pane): readonly IPaneView[] {
-		let paneViews = this._paneViews.get(pane);
-		if (paneViews === undefined) {
-			paneViews = [new GridPaneView(pane)];
-			this._paneViews.set(pane, paneViews);
-		}
+	public constructor(pane: Pane) {
+		this._paneViews = [new GridPaneView(pane)];
+	}
 
+	public paneViews(): readonly IPaneView[] {
 		if (this._invalidated) {
-			paneViews.forEach((view: GridPaneView) => view.update());
+			this._paneViews.forEach((view: GridPaneView) => view.update());
 			this._invalidated = false;
 		}
 
-		return paneViews;
+		return this._paneViews;
 	}
 
 	public invalidate(): void {

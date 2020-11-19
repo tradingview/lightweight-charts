@@ -546,13 +546,10 @@ export class PaneWidget implements IDestroyable {
 
 	private _drawGrid(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const state = ensureNotNull(this._state);
-		const source = this._model().gridSource();
-		// NOTE: grid source requires Pane instance for paneViews (for the nonce)
-		const paneViews = source.paneViews(state);
 		const height = state.height();
 		const width = state.width();
 
-		for (const paneView of paneViews) {
+		for (const paneView of state.gridSource().paneViews()) {
 			ctx.save();
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
