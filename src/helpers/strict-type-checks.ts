@@ -38,10 +38,6 @@ export function isString(value: unknown): value is string {
 	return typeof value === 'string';
 }
 
-export function isNaN(value: number): boolean {
-	return !(value <= 0) && !(value > 0);
-}
-
 export function isBoolean(value: unknown): value is boolean {
 	return typeof value === 'boolean';
 }
