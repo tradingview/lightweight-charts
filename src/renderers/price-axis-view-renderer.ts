@@ -1,4 +1,5 @@
 import { drawScaled } from '../helpers/canvas-helpers';
+import { fontSizeToPixels } from '../helpers/make-font';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
@@ -45,7 +46,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const text = this._data.text;
 		const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
 		const baselineOffset = rendererOptions.baselineOffset;
-		const totalHeight = rendererOptions.fontSize + paddingTop + paddingBottom;
+		const totalHeight = fontSizeToPixels(rendererOptions.fontSize) + paddingTop + paddingBottom;
 		const halfHeigth = Math.ceil(totalHeight * 0.5);
 		const totalWidth = horzBorder + textWidth + paddingInner + paddingOuter + tickSize;
 
@@ -68,8 +69,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		yMid = Math.round(yMid * pixelRatio);
 
-		const yTop = yMid - halfHeigthScaled + 1;
-		const yBottom = yTop + totalHeightScaled - 1;
+		const yTop = yMid - halfHeigthScaled;
+		const yBottom = yTop + totalHeightScaled;
 
 		const alignRight = align === 'right';
 

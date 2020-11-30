@@ -3,7 +3,7 @@ import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Siz
 import { ensureDefined } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
-import { fontSizeToPixels, makeFont } from '../helpers/make-font';
+import { makeFont } from '../helpers/make-font';
 import { ceiledEven } from '../helpers/mathex';
 
 import { TextWidthCache } from '../model/text-width-cache';
@@ -71,7 +71,7 @@ export class LabelsImageCache implements IDestroyable {
 			const textWidth = Math.ceil(this._textWidthCache.measureText(ctx, text));
 			// small reserve for antialiasing, measureText is not sharp
 			const width = ceiledEven(Math.round(textWidth) + 4);
-			const height = ceiledEven(fontSizeToPixels(this._fontSize));
+			const height = ceiledEven(this._fontSize);
 			const canvas = createPreconfiguredCanvas(document, new Size(width, height));
 
 			// Allocate new

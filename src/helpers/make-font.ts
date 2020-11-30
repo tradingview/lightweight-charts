@@ -5,7 +5,7 @@
 export const defaultFontFamily = `'Trebuchet MS', Roboto, Ubuntu, sans-serif`;
 
 export function fontSizeToPixels(size: number): number {
-	return Math.round(size * 96 / 72);
+	return Math.round(size * 72 / 96);
 }
 
 /**
@@ -13,7 +13,6 @@ export function fontSizeToPixels(size: number): number {
  * If no family provided, [defaultFontFamily] will be used.
  */
 export function makeFont(size: number, family?: string, style?: string): string {
-	const sizeInPixels = fontSizeToPixels(size);
 	if (style !== undefined) {
 		style = `${style} `;
 	} else {
@@ -24,5 +23,5 @@ export function makeFont(size: number, family?: string, style?: string): string 
 		family = defaultFontFamily;
 	}
 
-	return `${style}${sizeInPixels}px ${family}`;
+	return `${style}${size}px ${family}`;
 }
