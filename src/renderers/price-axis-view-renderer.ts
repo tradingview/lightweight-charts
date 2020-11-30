@@ -49,28 +49,38 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const halfHeigth = Math.ceil(totalHeight * 0.5);
 		const totalWidth = horzBorder + textWidth + paddingInner + paddingOuter + tickSize;
 
+		const halfHeigthScaled = Math.round(halfHeigth * pixelRatio);
+		const totalHeightScaled = Math.round(totalHeight * pixelRatio);
+		const totalWidthScaled = Math.round(totalWidth * pixelRatio);
+		// tick overlaps scale border
+		const tickSizeScaled = Math.round(tickSize * pixelRatio);
+		const widthScaled = Math.ceil(width * pixelRatio);
+		const horzBorderScaled = Math.max(1, Math.floor(horzBorder * pixelRatio));
+		const paddingOuterScaled = Math.ceil(paddingOuter * pixelRatio);
+		const paddingInnerScaled = Math.ceil(paddingInner * pixelRatio);
+		const paddingBottomScaled = Math.round(paddingBottom * pixelRatio);
+		const baselineOffsetScaled = Math.round(baselineOffset * pixelRatio);
+
 		let yMid = this._commonData.coordinate;
 		if (this._commonData.fixedCoordinate) {
 			yMid = this._commonData.fixedCoordinate;
 		}
 
-		yMid = Math.round(yMid);
+		yMid = Math.round(yMid * pixelRatio);
 
-		const yTop = yMid - halfHeigth;
-		const yBottom = yTop + totalHeight;
+		const yTop = yMid - halfHeigthScaled + 1;
+		const yBottom = yTop + totalHeightScaled - 1;
 
 		const alignRight = align === 'right';
 
-		const xInside = alignRight ? width : 0;
-		const rightScaled = Math.ceil(width * pixelRatio);
+		const xInside = alignRight ? widthScaled : 0;
+		const rightScaled = widthScaled;
 
 		let xOutside = xInside;
 		let xTick: number;
 		let xText: number;
 
 		ctx.fillStyle = this._commonData.background;
-		ctx.lineWidth = 1;
-		ctx.lineCap = 'butt';
 
 		if (text) {
 			if (alignRight) {
@@ -79,30 +89,21 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				//              6  5
 				//
 				// 3               4
-				xOutside = xInside - totalWidth;
-				xTick = xInside - tickSize;
-				xText = xOutside + paddingOuter;
+				xOutside = xInside - totalWidthScaled;
+				xTick = xInside - tickSizeScaled;
+				xText = xOutside + paddingOuterScaled;
 			} else {
 				// 1               2
 				//
 				// 6  5
 				//
 				// 4               3
-				xOutside = xInside + totalWidth;
-				xTick = xInside + tickSize;
-				xText = xInside + horzBorder + tickSize + paddingInner;
+				xOutside = xInside + totalWidthScaled;
+				xTick = xInside + tickSizeScaled;
+				xText = xInside + (tickSizeScaled || horzBorderScaled) + paddingInnerScaled;
 			}
 
 			const tickHeight = Math.max(1, Math.floor(pixelRatio));
-
-			const horzBorderScaled = Math.max(1, Math.floor(horzBorder * pixelRatio));
-			const xInsideScaled = alignRight ? rightScaled : 0;
-			const yTopScaled = Math.round(yTop * pixelRatio);
-			const xOutsideScaled = Math.round(xOutside * pixelRatio);
-			const yMidScaled = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
-
-			const yBottomScaled = yMidScaled + tickHeight + (yMidScaled - yTopScaled);
-			const xTickScaled = Math.round(xTick * pixelRatio);
 
 			ctx.save();
 
@@ -110,36 +111,37 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 			ctx.beginPath();
 			if (alignRight) {
-				ctx.moveTo(xInsideScaled, yTopScaled);
-				ctx.lineTo(xOutsideScaled + radius, yTopScaled);
-				ctx.arcTo(xOutsideScaled, yTopScaled, xOutsideScaled, yTopScaled + radius, radius);
-				ctx.lineTo(xOutsideScaled, yBottomScaled - radius);
-				ctx.arcTo(xOutsideScaled, yBottomScaled, xOutsideScaled + radius, yBottomScaled, radius);
-				ctx.lineTo(xInsideScaled, yBottomScaled);
+				ctx.moveTo(xInside, yTop);
+				ctx.lineTo(xOutside + radius, yTop);
+				ctx.arcTo(xOutside, yTop, xOutside, yTop + radius, radius);
+				ctx.lineTo(xOutside, yBottom - radius);
+				ctx.arcTo(xOutside, yBottom, xOutside + radius, yBottom, radius);
+				ctx.lineTo(xInside, yBottom);
 			} else {
-				ctx.moveTo(xInsideScaled, yTopScaled);
-				ctx.lineTo(xOutsideScaled - radius, yTopScaled);
-				ctx.arcTo(xOutsideScaled, yTopScaled, xOutsideScaled, yTopScaled + radius, radius);
-				ctx.lineTo(xOutsideScaled, yBottomScaled - radius);
-				ctx.arcTo(xOutsideScaled, yBottomScaled, xOutsideScaled - radius, yBottomScaled, radius);
-				ctx.lineTo(xInsideScaled, yBottomScaled);
+				ctx.moveTo(xInside, yTop);
+				ctx.lineTo(xOutside - radius, yTop);
+				ctx.arcTo(xOutside, yTop, xOutside, yTop + radius, radius);
+				ctx.lineTo(xOutside, yBottom - radius);
+				ctx.arcTo(xOutside, yBottom, xOutside - radius, yBottom, radius);
+				ctx.lineTo(xInside, yBottom);
 			}
 			ctx.fill();
 
 			// draw border
 			ctx.fillStyle = this._data.borderColor;
-			ctx.fillRect(alignRight ? rightScaled - horzBorderScaled : 0, yTopScaled, horzBorderScaled, yBottomScaled - yTopScaled);
+			ctx.fillRect(alignRight ? rightScaled - horzBorderScaled : 0, yTop, horzBorderScaled, yBottom - yTop);
 
 			if (this._data.tickVisible) {
 				ctx.fillStyle = this._commonData.color;
-				ctx.fillRect(xInsideScaled, yMidScaled, xTickScaled - xInsideScaled, tickHeight);
+				ctx.fillRect(xInside, yMid, xTick - xInside, tickHeight);
 			}
 
 			ctx.textAlign = 'left';
 			ctx.fillStyle = this._commonData.color;
 
+			ctx.translate(xText, yBottom - paddingBottomScaled - baselineOffsetScaled);
 			drawScaled(ctx, pixelRatio, () => {
-				ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
+				ctx.fillText(text, 0, 0);
 			});
 
 			ctx.restore();

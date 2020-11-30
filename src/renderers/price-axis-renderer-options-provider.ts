@@ -40,14 +40,11 @@ export class PriceAxisRendererOptionsProvider {
 			rendererOptions.fontSize = currentFontSize;
 			rendererOptions.fontFamily = currentFontFamily;
 			rendererOptions.font = makeFont(currentFontSize, currentFontFamily);
-			rendererOptions.paddingTop = Math.max(0, Math.floor(currentFontSize / 3.5) - 1);
-			rendererOptions.paddingBottom = rendererOptions.paddingTop + 1;
-			rendererOptions.paddingInner = Math.max(
-				Math.ceil(currentFontSize / 2 - rendererOptions.tickLength / 2),
-				0
-			);
+			rendererOptions.paddingTop = Math.max(0, Math.floor(currentFontSize / 3));
+			rendererOptions.paddingBottom = rendererOptions.paddingTop;
+			rendererOptions.paddingInner = rendererOptions.tickLength;
 			rendererOptions.paddingOuter = rendererOptions.tickLength;
-			rendererOptions.baselineOffset = Math.round(currentFontSize / 10);
+			rendererOptions.baselineOffset = 0;
 		}
 
 		rendererOptions.color = this._textColor();

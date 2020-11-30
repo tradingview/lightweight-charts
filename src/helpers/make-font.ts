@@ -4,11 +4,16 @@
  */
 export const defaultFontFamily = `'Trebuchet MS', Roboto, Ubuntu, sans-serif`;
 
+export function fontSizeToPixels(size: number): number {
+	return Math.round(size * 96 / 72);
+}
+
 /**
  * Generates a font string, which can be used to set in canvas' font property.
  * If no family provided, [defaultFontFamily] will be used.
  */
 export function makeFont(size: number, family?: string, style?: string): string {
+	const sizeInPixels = fontSizeToPixels(size);
 	if (style !== undefined) {
 		style = `${style} `;
 	} else {
@@ -19,5 +24,5 @@ export function makeFont(size: number, family?: string, style?: string): string 
 		family = defaultFontFamily;
 	}
 
-	return `${style}${size}px ${family}`;
+	return `${style}${sizeInPixels}px ${family}`;
 }
