@@ -44,11 +44,13 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const paddingInner = rendererOptions.paddingInner;
 		const paddingOuter = rendererOptions.paddingOuter;
 		const text = this._data.text;
+		const actualTextHeight = fontSizeToPixels(rendererOptions.fontSize);
 		const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
+		const correctedTextWidth = Math.max(textWidth, actualTextHeight);
 		const baselineOffset = rendererOptions.baselineOffset;
-		const totalHeight = fontSizeToPixels(rendererOptions.fontSize) + paddingTop + paddingBottom;
+		const totalHeight = actualTextHeight + paddingTop + paddingBottom;
 		const halfHeigth = Math.ceil(totalHeight * 0.5);
-		const totalWidth = horzBorder + textWidth + paddingInner + paddingOuter + tickSize;
+		const totalWidth = horzBorder + correctedTextWidth + paddingInner + paddingOuter + tickSize;
 
 		const halfHeigthScaled = Math.round(halfHeigth * pixelRatio);
 		const totalHeightScaled = Math.round(totalHeight * pixelRatio);
@@ -104,11 +106,14 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xText = xInside + (tickSizeScaled || horzBorderScaled) + paddingInnerScaled;
 			}
 
+			const textCorrectionOffset = Math.round(pixelRatio * (correctedTextWidth - textWidth) / 2);
+			xText += textCorrectionOffset;
+
 			const tickHeight = Math.max(1, Math.floor(pixelRatio));
 
 			ctx.save();
 
-			const radius = 2 * pixelRatio;
+			const radius = 5 * pixelRatio;
 
 			ctx.beginPath();
 			if (alignRight) {
