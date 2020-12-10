@@ -57,7 +57,6 @@ export class ChartWidget implements IDestroyable {
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 	private _observer: ResizeObserver | null = null;
-	// replace InternalLayoutSizeHintsKeepOdd with InternalLayoutSizeHintsKeepOriginal to turn "odd magic" off
 	private _sizingHints: InternalLayoutSizeHints = new InternalLayoutSizeHintsKeepOdd();
 
 	private _container: HTMLElement;
@@ -208,11 +207,12 @@ export class ChartWidget implements IDestroyable {
 
 		this.resize(width, height);
 
-		if (options.autoSize && !this._observer) {
-			// installing observer will override resize if successfull
+		if (options.autoSize && this._observer === null) {
+			// installing observer will override resize if successful
 			this._installObserver();
 		}
-		if (options.autoSize === false && this._observer) {
+
+		if (!options.autoSize && this._observer !== null) {
 			this._uninstallObserver();
 		}
 	}
