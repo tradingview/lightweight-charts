@@ -62,6 +62,8 @@ export interface LineStyleOptions {
 	lineType: LineType;
 	crosshairMarkerVisible: boolean;
 	crosshairMarkerRadius: number;
+	crosshairMarkerBorderColor: string;
+	crosshairMarkerBackgroundColor: string;
 }
 
 export interface AreaStyleOptions {
@@ -73,6 +75,8 @@ export interface AreaStyleOptions {
 	lineType: LineType;
 	crosshairMarkerVisible: boolean;
 	crosshairMarkerRadius: number;
+	crosshairMarkerBorderColor: string;
+	crosshairMarkerBackgroundColor: string;
 }
 
 export interface HistogramStyleOptions {

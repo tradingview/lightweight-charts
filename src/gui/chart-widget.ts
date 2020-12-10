@@ -70,6 +70,7 @@ export class ChartWidget implements IDestroyable {
 		this._element.style.overflow = 'hidden';
 		this._element.style.width = '100%';
 		this._element.style.height = '100%';
+		disableSelection(this._element);
 
 		this._tableElement = document.createElement('table');
 		this._tableElement.setAttribute('cellspacing', '0');
@@ -670,4 +671,16 @@ export class ChartWidget implements IDestroyable {
 			this._observer.disconnect();
 		}
 	}
+}
+
+function disableSelection(element: HTMLElement): void {
+	element.style.userSelect = 'none';
+	// eslint-disable-next-line deprecation/deprecation
+	element.style.webkitUserSelect = 'none';
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+	(element as any).style.msUserSelect = 'none';
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+	(element as any).style.MozUserSelect = 'none';
+
+	element.style.webkitTapHighlightColor = 'transparent';
 }

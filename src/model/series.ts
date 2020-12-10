@@ -75,6 +75,8 @@ export type LastValueDataResultWithoutRawPrice = LastValueDataResultWithoutData 
 export interface MarkerData {
 	price: BarPrice;
 	radius: number;
+	borderColor: string;
+	backgroundColor: string;
 }
 
 export interface SeriesDataAtTypeMap {
@@ -235,6 +237,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		this.model().updateSource(this);
+
+		// a series might affect crosshair by some options (like crosshair markers)
+		// that's why we need to update crosshair as well
+		this.model().updateCrosshair();
 	}
 
 	public clearData(): void {
@@ -424,7 +430,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 		const price = bar.value[PlotRowValueIndex.Close] as BarPrice;
 		const radius = this._markerRadius();
-		return { price, radius };
+		const borderColor = this._markerBorderColor();
+		const backgroundColor = this._markerBackgroundColor(index);
+		return { price, radius, borderColor, backgroundColor };
 	}
 
 	public title(): string {
@@ -468,6 +476,34 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		return 0;
+	}
+
+	private _markerBorderColor(): string {
+		switch (this._seriesType) {
+			case 'Line':
+			case 'Area': {
+				const crosshairMarkerBorderColor = (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBorderColor;
+				if (crosshairMarkerBorderColor.length !== 0) {
+					return crosshairMarkerBorderColor;
+				}
+			}
+		}
+
+		return this.model().options().layout.backgroundColor;
+	}
+
+	private _markerBackgroundColor(index: TimePointIndex): string {
+		switch (this._seriesType) {
+			case 'Line':
+			case 'Area': {
+				const crosshairMarkerBackgroundColor = (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBackgroundColor;
+				if (crosshairMarkerBackgroundColor.length !== 0) {
+					return crosshairMarkerBackgroundColor;
+				}
+			}
+		}
+
+		return this.barColorer().barStyle(index).barColor;
 	}
 
 	private _recreateFormatter(): void {

@@ -9,7 +9,7 @@ const enum Constants {
 	MinShapeMargin = 3,
 }
 
-export function size(barSpacing: number, coeff: number): number {
+function size(barSpacing: number, coeff: number): number {
 	const result = Math.min(Math.max(barSpacing, Constants.MinShapeSize), Constants.MaxShapeSize) * coeff;
 	return ceiledOdd(result);
 }
