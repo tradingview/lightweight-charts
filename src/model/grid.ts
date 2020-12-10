@@ -1,6 +1,6 @@
 import { LineStyle } from '../renderers/draw-line';
 import { GridPaneView } from '../views/pane/grid-pane-view';
-import { IPaneView } from '../views/pane/ipane-view';
+import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
 
 import { Pane } from './pane';
 
@@ -23,23 +23,13 @@ export interface GridOptions {
 }
 
 export class Grid {
-	private _paneViews: GridPaneView[] = [];
-	private _invalidated: boolean = true;
+	private _paneView: GridPaneView;
 
 	public constructor(pane: Pane) {
-		this._paneViews = [new GridPaneView(pane)];
+		this._paneView = new GridPaneView(pane);
 	}
 
-	public paneViews(): readonly IPaneView[] {
-		if (this._invalidated) {
-			this._paneViews.forEach((view: GridPaneView) => view.update());
-			this._invalidated = false;
-		}
-
-		return this._paneViews;
-	}
-
-	public invalidate(): void {
-		this._invalidated = true;
+	public paneView(): IUpdatablePaneView {
+		return this._paneView;
 	}
 }

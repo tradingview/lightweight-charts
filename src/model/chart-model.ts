@@ -620,7 +620,7 @@ export class ChartModel implements IDestroyable {
 			this._invalidateHandler(mask);
 		}
 
-		this._panes.forEach((pane: Pane) => pane.gridSource().invalidate());
+		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
 	private _cursorUpdate(): void {

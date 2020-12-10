@@ -322,7 +322,7 @@ export class Pane implements IDestroyable {
 		return this._destroyed;
 	}
 
-	public gridSource(): Grid {
+	public grid(): Grid {
 		return this._grid;
 	}
 
