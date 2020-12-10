@@ -75,7 +75,7 @@ export class Screenshoter {
 
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
-				return new Promise((resolve: () => void) => {
+				return new Promise<void>((resolve: () => void) => {
 					window.requestAnimationFrame(() => {
 						// and a little more time after af :)
 						setTimeout(resolve, 50);
