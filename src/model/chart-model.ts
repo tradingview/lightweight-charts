@@ -12,7 +12,7 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
-import { Grid, GridOptions } from './grid';
+import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
@@ -129,7 +129,6 @@ export class ChartModel implements IDestroyable {
 
 	private readonly _timeScale: TimeScale;
 	private readonly _panes: Pane[] = [];
-	private readonly _grid: Grid;
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
@@ -149,7 +148,6 @@ export class ChartModel implements IDestroyable {
 		this._rendererOptionsProvider = new PriceAxisRendererOptionsProvider(this);
 
 		this._timeScale = new TimeScale(this, options.timeScale, this._options.localization);
-		this._grid = new Grid();
 		this._crosshair = new Crosshair(this, options.crosshair);
 		this._magnet = new Magnet(options.crosshair);
 		this._watermark = new Watermark(this, options.watermark);
@@ -246,10 +244,6 @@ export class ChartModel implements IDestroyable {
 		return this._panes;
 	}
 
-	public gridSource(): Grid {
-		return this._grid;
-	}
-
 	public watermarkSource(): Watermark {
 		return this._watermark;
 	}
@@ -295,7 +289,7 @@ export class ChartModel implements IDestroyable {
 			level: InvalidationLevel.None,
 			autoScale: true,
 		});
-		this.invalidate(mask);
+		this._invalidate(mask);
 
 		return pane;
 	}
@@ -406,15 +400,6 @@ export class ChartModel implements IDestroyable {
 		this.lightUpdate();
 
 		this._initialTimeScrollPos = null;
-	}
-
-	public invalidate(mask: InvalidateMask): void {
-		if (this._invalidateHandler) {
-			this._invalidateHandler(mask);
-		}
-
-		this._grid.invalidate();
-		this.lightUpdate();
 	}
 
 	public serieses(): readonly Series[] {
@@ -635,7 +620,7 @@ export class ChartModel implements IDestroyable {
 			this._invalidateHandler(mask);
 		}
 
-		this._grid.invalidate();
+		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
 	private _cursorUpdate(): void {
