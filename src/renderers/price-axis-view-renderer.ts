@@ -113,7 +113,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 			ctx.save();
 
-			const radius = 5 * pixelRatio;
+			const radius = 2 * pixelRatio;
 
 			ctx.beginPath();
 			if (alignRight) {

@@ -2,7 +2,7 @@ import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate
 
 import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
-import { makeFont } from '../helpers/make-font';
+import { fontSizeToPixels, makeFont } from '../helpers/make-font';
 
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
@@ -220,7 +220,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			// rendererOptions.offsetSize +
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
-			rendererOptions.fontSize +
+			fontSizeToPixels(rendererOptions.fontSize) +
 			rendererOptions.paddingTop +
 			rendererOptions.paddingBottom
 		);
@@ -307,7 +307,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const yText = (
 			rendererOptions.borderSize +
 			rendererOptions.paddingTop +
-			rendererOptions.fontSize -
+			rendererOptions.tickLength +
+			fontSizeToPixels(rendererOptions.fontSize) -
 			rendererOptions.baselineOffset
 		);
 
@@ -404,10 +405,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			const fontSize = this._fontSize();
 			rendererOptions.fontSize = fontSize;
 			rendererOptions.font = newFont;
-			rendererOptions.paddingTop = Math.ceil(fontSize / 2.5) + 2;
-			rendererOptions.paddingBottom = rendererOptions.paddingTop - 1;
+			rendererOptions.paddingTop = Math.ceil(fontSize / 3);
+			rendererOptions.paddingBottom = Math.ceil(fontSize / 3) + 2;
 			rendererOptions.paddingHorizontal = Math.ceil(fontSize / 2);
-			rendererOptions.baselineOffset = Math.round(this._fontSize() / 5);
+			rendererOptions.baselineOffset = 0;
 			rendererOptions.widthCache.reset();
 		}
 
