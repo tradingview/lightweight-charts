@@ -10,6 +10,7 @@ export interface TimeAxisViewRendererOptions {
 	tickLength: number;
 	paddingHorizontal: number;
 	widthCache: TextWidthCache;
+	labelBottomOffset: number;
 }
 
 export interface ITimeAxisViewRenderer {

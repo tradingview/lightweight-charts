@@ -395,6 +395,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				fontSize: NaN,
 				font: '',
 				widthCache: new TextWidthCache(),
+				labelBottomOffset: 0,
 			};
 		}
 
@@ -405,10 +406,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			const fontSize = this._fontSize();
 			rendererOptions.fontSize = fontSize;
 			rendererOptions.font = newFont;
-			rendererOptions.paddingTop = Math.ceil(fontSize / 3);
-			rendererOptions.paddingBottom = Math.ceil(fontSize / 3) + 2;
+			rendererOptions.paddingTop = Math.ceil(fontSize / 3) - 1;
+			rendererOptions.paddingBottom = Math.ceil(fontSize / 3) + 5;
 			rendererOptions.paddingHorizontal = Math.ceil(fontSize / 2);
 			rendererOptions.baselineOffset = 0;
+			rendererOptions.labelBottomOffset = Math.ceil(fontSize / 3) - 1;
 			rendererOptions.widthCache.reset();
 		}
 
