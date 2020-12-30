@@ -6,7 +6,7 @@
   </a>
 
   <h1>Lightweight Charts</h1>
-
+https://github.com/tradingview/lightweight-charts.git
   [![CircleCI][ci-img]][ci-link]
   [![npm version][npm-version-img]][npm-link]
   [![npm bundle size][bundle-size-img]][bundle-size-link]
@@ -76,7 +76,7 @@ lineSeries.setData([
     { time: '2019-04-20', value: 74.43 },
 ]);
 ```
-
+https://help.twitter.com/en/upload?verifier=5004w000024Ca6eAAC%7C4eSZw8wKakTl3nXuM8fq0HsXOH0PNupCiMf9Zo%2FGoRLQMe3Pik0LcFkychqhhO6p%2BjbpaqT%2BGEu7bt3ncbEgPw%3D%3D&casenumber=0185951458https://crwd.in/hongtaekim3
 ## Development
 
 See [BUILDING.md](./BUILDING.md) for instructions on how to build `lightweight-charts` from source.
