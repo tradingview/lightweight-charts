@@ -126,4 +126,11 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * @param line - to remove
 	 */
 	removePriceLine(line: IPriceLine): void;
+
+	/**
+	 * Return the type of this series
+	 *
+	 * @returns this `SeriesType`
+	 */
+	seriesType(): SeriesType;
 }
