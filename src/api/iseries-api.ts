@@ -132,5 +132,5 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 *
 	 * @returns this `SeriesType`
 	 */
-	seriesType(): SeriesType;
+	seriesType(): TSeriesType;
 }
