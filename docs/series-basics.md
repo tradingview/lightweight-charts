@@ -533,6 +533,21 @@ function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
 chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
 ```
 
+### seriesType
+
+Return current series type.
+The value is based on method `chart.add<type>Series` used to create the series.
+
+For example:
+
+```js
+const lineSeries = chart.addLineSeries();
+console.log(lineSeries.seriesType()); // "Line"
+
+const candlestickSeries = chart.addCandlestickSeries();
+console.log(candlestickSeries.seriesType()); // "Candlestick"
+```
+
 ## Taking screenshot
 
 Takes the whole chart screenshot.
