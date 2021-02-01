@@ -76,6 +76,7 @@ export interface TimeScaleOptions {
 	visible: boolean;
 	timeVisible: boolean;
 	secondsVisible: boolean;
+	shiftVisibleRangeOnNewBar: boolean;
 	tickMarkFormatter?: TickMarkFormatter;
 }
 
