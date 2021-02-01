@@ -16,6 +16,7 @@ Time scale (or time axis) is a horizontal scale at the bottom of the chart that 
 |`visible`|`boolean`|`true`|If true, the time scale is shown on a chart|
 |`timeVisible`|`boolean`|`false`|If true, the time is shown on the time scale and in the vertical crosshair label|
 |`secondsVisible`|`boolean`|`true`|If true, seconds are shown on the label of the crosshair vertical line in `hh:mm:ss` format on intraday intervals|
+|`shiftVisibleRangeOnNewBar`|`boolean`|`true`|If true, the visible range is shifted by the number of new bars when new bars are added (note that this only applies when the last bar is visible)|
 |`tickMarkFormatter`|`(TimePoint, TickMarkType, locale) => string` &#124; `undefined`|`undefined`|Allows to override the tick marks formatter (see below)|
 
 ### Tick marks formatter
