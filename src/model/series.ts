@@ -126,8 +126,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._recreatePaneViews();
 	}
 
-	public destroy(): void {
-	}
+	public destroy(): void {}
 
 	public priceLineColor(lastBarColor: string): string {
 		return this._options.priceLineColor || lastBarColor;
@@ -360,11 +359,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			res.push(...customPriceLine.paneViews());
 		}
 
-		res.push(this._paneView);
-		res.push(this._priceLineView);
-
-		res.push(this._panePriceAxisView);
-		res.push(this._markersPaneView);
+		res.push(
+			this._paneView,
+			this._priceLineView,
+			this._panePriceAxisView,
+			this._markersPaneView
+		);
 
 		return res;
 	}

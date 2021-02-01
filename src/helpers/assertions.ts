@@ -57,5 +57,4 @@ export function ensure<T>(value: T | undefined | null): T {
 /**
  * Compile time check for never
  */
-export function ensureNever(value: never): void {
-}
+export function ensureNever(value: never): void {}
