@@ -14,10 +14,11 @@ export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 	private readonly _renderer: PaneRendererBars = new PaneRendererBars();
 
 	public renderer(height: number, width: number): IPaneRenderer | null {
-		const barStyleProps = this._series.options();
-		if (!barStyleProps.visible) {
+		if (!this._series.visible()) {
 			return null;
 		}
+
+		const barStyleProps = this._series.options();
 
 		this._makeValid();
 		const data: PaneRendererBarsData = {

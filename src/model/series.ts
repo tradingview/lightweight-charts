@@ -439,6 +439,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options.title;
 	}
 
+	public visible(): boolean {
+		return this._options.visible;
+	}
+
 	private _isOverlay(): boolean {
 		const priceScale = this.priceScale();
 		return !isDefaultPriceScale(priceScale.id());
