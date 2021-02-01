@@ -36,7 +36,7 @@ export class Magnet {
 
 		const candidates = serieses.reduce(
 			(acc: Coordinate[], series: Series) => {
-				if (pane.isOverlay(series) || !series.options().visible) {
+				if (pane.isOverlay(series) || !series.visible()) {
 					return acc;
 				}
 				const ps = series.priceScale();
