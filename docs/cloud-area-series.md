@@ -28,7 +28,7 @@ cloudAreaChart.setData([
 
 ## Data format
 
-Each area series item should be a [whitespace](./whitespace-data.md) item or an object with the following fields:
+Each cloud area series item should be a [whitespace](./whitespace-data.md) item or an object with the following fields:
 
 - `time` ([Time](./time.md)) - item time
 - `higherValue` (`number`) - the value of the item which is expected to be higher (default: green line)
@@ -46,14 +46,14 @@ A cloud area series interface can be customized using the following set of optio
 
 |Name|Type|Default|Description|
 |-|----|-------|-|
-|`topColor`|`string`|`rgba( 76, 175, 80, 0.1)`|Area top color|
-|`bottomColor`|`string`|`rgba( 255, 82, 82, 0.1)`|Area bottom color|
-|`higherLineColor`|`string`|`#4CAF50`|Line color|
-|`higherLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
-|`higherLineWidth`|`number`|`3`|Line width in pixels|
-|`lowerLineColor`|`string`|`#FF5252`|Line color|
-|`lowerLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
-|`lowerLineWidth`|`number`|`3`|Line width in pixels|
+|`topColor`|`string`|`rgba( 76, 175, 80, 0.1)`|Area between lines (higher line > lower line)|
+|`bottomColor`|`string`|`rgba( 255, 82, 82, 0.1)`|Area between lines (higher line < lower line)|
+|`higherLineColor`|`string`|`#4CAF50`|Higher line color|
+|`higherLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Higher line style|
+|`higherLineWidth`|`number`|`3`|Higher line width in pixels|
+|`lowerLineColor`|`string`|`#FF5252`|Lower line color|
+|`lowerLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Lower line style|
+|`lowerLineWidth`|`number`|`3`|Lower line width in pixels|
 |`crosshairMarkerVisible`|`boolean`|`true`|If true, the crosshair marker is shown|
 |`crosshairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
 |`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
@@ -64,7 +64,7 @@ A cloud area series interface can be customized using the following set of optio
 - set initial options for cloud area series:
 
     ```js
-    const areaSeries = chart.addAreaSeries({
+    const cloudAreaSeries = chart.addCloudAreaSeries({
         positiveColor: 'rgba( 76, 175, 80, 0.25)',
         negativeColor: 'rgba( 255, 82, 82, 0.25)',
         crosshairMarkerVisible: false,
@@ -78,7 +78,7 @@ A cloud area series interface can be customized using the following set of optio
 
     ```js
     // for example, let's override line width and color only
-    areaSeries.applyOptions({
+    cloudAreaSeries.applyOptions({
         higherLineColor: 'rgba(255, 44, 128, 1)',
         higherLineWidth: 1,
     });
