@@ -46,8 +46,8 @@ A cloud area series interface can be customized using the following set of optio
 
 |Name|Type|Default|Description|
 |-|----|-------|-|
-|`topColor`|`string`|`rgba( 76, 175, 80, 0.1)`|Area between lines (higher line > lower line)|
-|`bottomColor`|`string`|`rgba( 255, 82, 82, 0.1)`|Area between lines (higher line < lower line)|
+|`positiveColor`|`string`|`rgba( 76, 175, 80, 0.1)`|Area between lines (higher line > lower line)|
+|`negativeColor`|`string`|`rgba( 255, 82, 82, 0.1)`|Area between lines (higher line < lower line)|
 |`higherLineColor`|`string`|`#4CAF50`|Higher line color|
 |`higherLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Higher line style|
 |`higherLineWidth`|`number`|`3`|Higher line width in pixels|
