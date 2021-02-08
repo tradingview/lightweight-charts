@@ -46,12 +46,12 @@ A cloud area series interface can be customized using the following set of optio
 
 |Name|Type|Default|Description|
 |-|----|-------|-|
-|`topColor`|`string`|`rgba(46, 220, 135, 0.4)`|Area top color|
-|`bottomColor`|`string`|`rgba(40, 221, 100, 0)`|Area bottom color|
-|`higherLineColor`|`string`|`#33D778`|Line color|
+|`topColor`|`string`|`rgba( 76, 175, 80, 0.1)`|Area top color|
+|`bottomColor`|`string`|`rgba( 255, 82, 82, 0.1)`|Area bottom color|
+|`higherLineColor`|`string`|`#4CAF50`|Line color|
 |`higherLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
 |`higherLineWidth`|`number`|`3`|Line width in pixels|
-|`lowerLineColor`|`string`|`#33D778`|Line color|
+|`lowerLineColor`|`string`|`#FF5252`|Line color|
 |`lowerLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
 |`lowerLineWidth`|`number`|`3`|Line width in pixels|
 |`crosshairMarkerVisible`|`boolean`|`true`|If true, the crosshair marker is shown|
