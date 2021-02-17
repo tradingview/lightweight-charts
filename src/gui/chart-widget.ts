@@ -104,7 +104,9 @@ export class ChartWidget implements IDestroyable {
 
 		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
 		// or after but with adjustSize to properly update time scale
-		this.resize(width, height);
+		if (!usedObserver) {
+			this.resize(width, height);
+		}
 
 		this._syncGuiWithModel();
 
@@ -171,8 +173,8 @@ export class ChartWidget implements IDestroyable {
 		this._height = sizeHint.h;
 		this._width = sizeHint.w;
 
-		const heightStr = height + 'px';
-		const widthStr = width + 'px';
+		const heightStr = this._height + 'px';
+		const widthStr = this._width + 'px';
 
 		ensureNotNull(this._element).style.height = heightStr;
 		ensureNotNull(this._element).style.width = widthStr;
@@ -203,17 +205,19 @@ export class ChartWidget implements IDestroyable {
 		this._model.applyOptions(options);
 		this._updateTimeAxisVisibility();
 
-		const width = options.width || this._width;
-		const height = options.height || this._height;
-
-		this.resize(width, height);
-
+		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {
+			warn(`You should turn autoSize off explicitly before specifying sizes; try adding options.autoSize: false to new options`);
+			return;
+		}
 		if (options.autoSize && !this._observer) {
 			// installing observer will override resize if successfull
 			this._installObserver();
 		}
 		if (options.autoSize === false && this._observer) {
 			this._uninstallObserver();
+			if (options.width !== undefined && options.height !== undefined) {
+				this.resize(options.width, options.height);
+			}
 		}
 	}
 
@@ -397,8 +401,11 @@ export class ChartWidget implements IDestroyable {
 			}
 		}
 
+		// we need this to avoid rounding error while calculating with stretchFactor
+		const actualTimeAxisHeight = Math.max(0, height - accumulatedHeight - separatorsHeight);
+
 		this._timeAxisWidget.setSizes(
-			new Size(paneWidth, timeAxisHeight),
+			new Size(paneWidth, actualTimeAxisHeight),
 			leftPriceAxisWidth,
 			rightPriceAxisWidth
 		);
