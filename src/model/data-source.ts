@@ -39,5 +39,9 @@ export abstract class DataSource implements IDataSource {
 		return [];
 	}
 
+	public visible(): boolean {
+		return true;
+	}
+
 	public abstract updateAllViews(): void;
 }

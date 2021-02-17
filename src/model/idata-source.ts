@@ -17,5 +17,7 @@ export interface IDataSource {
 	timeAxisViews(): readonly ITimeAxisView[];
 	paneViews(pane: Pane): readonly IPaneView[];
 
+	visible(): boolean;
+
 	destroy?(): void;
 }

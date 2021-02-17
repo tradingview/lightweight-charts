@@ -76,6 +76,7 @@ export interface TimeScaleOptions {
 	visible: boolean;
 	timeVisible: boolean;
 	secondsVisible: boolean;
+	shiftVisibleRangeOnNewBar: boolean;
 	tickMarkFormatter?: TickMarkFormatter;
 }
 
@@ -517,9 +518,9 @@ export class TimeScale {
 		}
 
 		const source = this._rightOffset;
-		const animationStart = new Date().getTime();
+		const animationStart = Date.now();
 		const animationFn = () => {
-			const animationProgress = (new Date().getTime() - animationStart) / animationDuration;
+			const animationProgress = (Date.now() - animationStart) / animationDuration;
 			const finishAnimation = animationProgress >= 1;
 			const rightOffset = finishAnimation ? offset : source + (offset - source) * animationProgress;
 			this.setRightOffset(rightOffset);

@@ -16,10 +16,11 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
 	}
 
 	public renderer(height: number, width: number): IPaneRenderer | null {
-		const lineStyleProps = this._series.options();
-		if (!lineStyleProps.visible) {
+		if (!this._series.visible()) {
 			return null;
 		}
+
+		const lineStyleProps = this._series.options();
 
 		this._makeValid();
 		const data: PaneRendererLineData = {

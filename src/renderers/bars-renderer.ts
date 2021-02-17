@@ -69,7 +69,7 @@ export class PaneRendererBars implements IPaneRenderer {
 			const bodyRight = bodyLeft + bodyWidth - 1;
 
 			const high = Math.min(bar.highY, bar.lowY);
-			const low = Math.max(bar.high, bar.lowY);
+			const low = Math.max(bar.highY, bar.lowY);
 
 			const bodyTop = Math.round(high * pixelRatio) - bodyWidthHalf;
 

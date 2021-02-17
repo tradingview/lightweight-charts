@@ -20,8 +20,7 @@ export class PriceTickSpanCalculator {
 					this._fractionalDividers.push(2);
 					baseRest /= 2;
 				} else if ((baseRest % 5) === 0) {
-					this._fractionalDividers.push(2);
-					this._fractionalDividers.push(2.5);
+					this._fractionalDividers.push(2, 2.5);
 					baseRest /= 5;
 				} else {
 					throw new Error('unexpected base');

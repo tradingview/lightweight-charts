@@ -657,6 +657,9 @@ module.exports = {
 			},
 		],
 
+		'unicorn/empty-brace-spaces': ['error'],
 		'unicorn/filename-case': ['error', { case: 'kebabCase' }],
+		'unicorn/no-array-push-push': ['error'],
+		'unicorn/prefer-date-now': ['error'],
 	},
 };
