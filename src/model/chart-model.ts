@@ -12,7 +12,7 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
-import { Grid, GridOptions } from './grid';
+import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
@@ -81,11 +81,12 @@ export interface ChartOptions {
 	/** Height of the chart */
 	height: number;
 	/**
-	 * Settings this flag to true makes chart monitoring container
-	 * and changing its size on every container resize
-	 * This feature requires `ResizeObserver` class to be avaiable in the global scope
-	 * Calling code is responsibe for providing a polyfill if requried
-	 * If the global scope does not contain `ResizeObserver` object, a warning will appear the the flag will be ignored
+	 * Setting this flag to `true` makes chart monitoring container and changing its size on every container resize.
+	 * This feature requires [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) class to be available in the global scope.
+	 * Note that calling code is responsible for providing a polyfill if required. If the global scope does not have `ResizeObserver`, a warning will appear and the flag will be ignored.
+	 * Please pay your attention that `autoSize` option and explicit sizes options `width` and `height` conflict one with others.
+	 * If you specify `autoSize` flag, `width` and `height` options will be ignored in common case and could only be used as fallback if using `ResizeObserver` has failed.
+	 * The flag `autoSize` could also be set with and unset with `applyOptions` function.
 	 * */
 	autoSize: boolean;
 	/** Structure with watermark options */
@@ -137,7 +138,6 @@ export class ChartModel implements IDestroyable {
 
 	private readonly _timeScale: TimeScale;
 	private readonly _panes: Pane[] = [];
-	private readonly _grid: Grid;
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
@@ -157,7 +157,6 @@ export class ChartModel implements IDestroyable {
 		this._rendererOptionsProvider = new PriceAxisRendererOptionsProvider(this);
 
 		this._timeScale = new TimeScale(this, options.timeScale, this._options.localization);
-		this._grid = new Grid();
 		this._crosshair = new Crosshair(this, options.crosshair);
 		this._magnet = new Magnet(options.crosshair);
 		this._watermark = new Watermark(this, options.watermark);
@@ -254,10 +253,6 @@ export class ChartModel implements IDestroyable {
 		return this._panes;
 	}
 
-	public gridSource(): Grid {
-		return this._grid;
-	}
-
 	public watermarkSource(): Watermark {
 		return this._watermark;
 	}
@@ -303,7 +298,7 @@ export class ChartModel implements IDestroyable {
 			level: InvalidationLevel.None,
 			autoScale: true,
 		});
-		this.invalidate(mask);
+		this._invalidate(mask);
 
 		return pane;
 	}
@@ -416,15 +411,6 @@ export class ChartModel implements IDestroyable {
 		this._initialTimeScrollPos = null;
 	}
 
-	public invalidate(mask: InvalidateMask): void {
-		if (this._invalidateHandler) {
-			this._invalidateHandler(mask);
-		}
-
-		this._grid.invalidate();
-		this.lightUpdate();
-	}
-
 	public serieses(): readonly Series[] {
 		return this._serieses;
 	}
@@ -467,6 +453,8 @@ export class ChartModel implements IDestroyable {
 			const y = this._crosshair.originCoordY();
 			this.setAndSaveCurrentPosition(x, y, pane);
 		}
+
+		this._crosshair.updateAllViews();
 	}
 
 	public updateTimeScale(newBaseIndex: TimePointIndex, newPoints?: readonly TimeScalePoint[]): void {
@@ -641,7 +629,7 @@ export class ChartModel implements IDestroyable {
 			this._invalidateHandler(mask);
 		}
 
-		this._grid.invalidate();
+		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
 	private _cursorUpdate(): void {

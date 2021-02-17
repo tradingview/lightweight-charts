@@ -57,7 +57,6 @@ export class ChartWidget implements IDestroyable {
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 	private _observer: ResizeObserver | null = null;
-	// replace InternalLayoutSizeHintsKeepOdd with InternalLayoutSizeHintsKeepOriginal to turn "odd magic" off
 	private _sizingHints: InternalLayoutSizeHints = new InternalLayoutSizeHintsKeepOdd();
 
 	private _container: HTMLElement;
@@ -71,6 +70,7 @@ export class ChartWidget implements IDestroyable {
 		this._element.style.overflow = 'hidden';
 		this._element.style.width = '100%';
 		this._element.style.height = '100%';
+		disableSelection(this._element);
 
 		this._tableElement = document.createElement('table');
 		this._tableElement.setAttribute('cellspacing', '0');
@@ -213,7 +213,8 @@ export class ChartWidget implements IDestroyable {
 			// installing observer will override resize if successfull
 			this._installObserver();
 		}
-		if (options.autoSize === false && this._observer) {
+
+		if (!options.autoSize && this._observer !== null) {
 			this._uninstallObserver();
 			if (options.width !== undefined && options.height !== undefined) {
 				this.resize(options.width, options.height);
@@ -337,7 +338,6 @@ export class ChartWidget implements IDestroyable {
 		return ensureNotNull(priceAxisWidget).getWidth();
 	}
 
-	// eslint-disable-next-line complexity
 	private _adjustSizeImpl(): void {
 		let totalStretch = 0;
 		let leftPriceAxisWidth = 0;
@@ -677,4 +677,16 @@ export class ChartWidget implements IDestroyable {
 			this._observer.disconnect();
 		}
 	}
+}
+
+function disableSelection(element: HTMLElement): void {
+	element.style.userSelect = 'none';
+	// eslint-disable-next-line deprecation/deprecation
+	element.style.webkitUserSelect = 'none';
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+	(element as any).style.msUserSelect = 'none';
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+	(element as any).style.MozUserSelect = 'none';
+
+	element.style.webkitTapHighlightColor = 'transparent';
 }

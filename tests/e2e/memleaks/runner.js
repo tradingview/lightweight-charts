@@ -10,7 +10,7 @@ const serveLocalFiles = require('../serve-local-files').serveLocalFiles;
 const mochaConfig = require('../../../.mocharc.js');
 
 // override tsconfig
-process.env.TS_NODE_PROJECT = path.resolve(__dirname, '../tsconfig.json');
+process.env.TS_NODE_PROJECT = path.resolve(__dirname, '../tsconfig.composite.json');
 
 mochaConfig.require.forEach(module => {
 	require(module);

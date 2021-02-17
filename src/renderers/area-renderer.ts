@@ -17,6 +17,8 @@ export interface PaneRendererAreaData {
 	bottomColor: string;
 	bottom: Coordinate;
 
+	barWidth: number;
+
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
@@ -41,16 +43,25 @@ export class PaneRendererArea extends ScaledRenderer {
 		ctx.lineWidth = 1;
 
 		ctx.beginPath();
-		ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
-		ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
 
-		walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
+		if (this._data.items.length === 1) {
+			const point = this._data.items[0];
+			const halfBarWidth = this._data.barWidth / 2;
+			ctx.moveTo(point.x - halfBarWidth, this._data.bottom);
+			ctx.lineTo(point.x - halfBarWidth, point.y);
+			ctx.lineTo(point.x + halfBarWidth, point.y);
+			ctx.lineTo(point.x + halfBarWidth, this._data.bottom);
+		} else {
+			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
 
-		if (this._data.visibleRange.to > this._data.visibleRange.from) {
-			ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
-			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
+
+			if (this._data.visibleRange.to > this._data.visibleRange.from) {
+				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
+				ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+			}
 		}
-
 		ctx.closePath();
 
 		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);

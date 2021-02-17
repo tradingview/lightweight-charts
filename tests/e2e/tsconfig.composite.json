@@ -1,5 +1,5 @@
 {
-	"extends": "../../tsconfig.options.json",
+	"extends": "../../tsconfig.composite.base.json",
 	"compilerOptions": {
 		"esModuleInterop": true,
 		"lib": [
@@ -10,6 +10,7 @@
 		"module": "commonjs"
 	},
 	"include": [
+		"./coverage/**/*.ts",
 		"./graphics/graphics-test-cases.ts",
 		"./graphics/helpers/**/*.ts",
 		"./memleaks/**/*.ts"
