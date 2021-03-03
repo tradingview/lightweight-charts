@@ -18,6 +18,8 @@ export interface IPriceScaleApi {
 	 */
 	options(): Readonly<PriceScaleOptions>;
 
+	formatPrice(price: number, firstValue: number): string;
+
 	/**
 	 * Returns a width of the price scale if it's visible or 0 if invisible.
 	 */

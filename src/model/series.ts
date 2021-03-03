@@ -302,6 +302,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().updateSource(this);
 	}
 
+	public customPriceLines(): CustomPriceLine[] {
+		return this._customPriceLines;
+	}
+
 	public seriesType(): T {
 		return this._seriesType;
 	}

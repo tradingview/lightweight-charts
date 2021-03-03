@@ -8,6 +8,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
+import { CustomPriceLine } from '../model/custom-price-line';
 import {
 	InvalidateMask,
 	InvalidationLevel,
@@ -34,6 +35,13 @@ export interface MouseEventParamsImpl {
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
+export interface CustomPriceLineDraggedEventParamsImpl {
+	customPriceLine: CustomPriceLine;
+	fromPriceString: string;
+}
+
+export type CustomPriceLineDraggedEventParamsImplSupplier = () => CustomPriceLineDraggedEventParamsImpl;
+
 export class ChartWidget implements IDestroyable {
 	private readonly _options: ChartOptionsInternal;
 	private _paneWidgets: PaneWidget[] = [];
@@ -51,6 +59,7 @@ export class ChartWidget implements IDestroyable {
 	private _drawPlanned: boolean = false;
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _customPriceLineDragged: Delegate<CustomPriceLineDraggedEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
@@ -75,6 +84,7 @@ export class ChartWidget implements IDestroyable {
 			this._options
 		);
 		this.model().crosshairMoved().subscribe(this._onPaneWidgetCrosshairMoved.bind(this), this);
+		this.model().customPriceLineDragged().subscribe(this._onCustomPriceLineDragged.bind(this), this);
 
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
@@ -134,6 +144,7 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this._model.crosshairMoved().unsubscribeAll(this);
+		this._model.customPriceLineDragged().unsubscribeAll(this);
 		this._model.timeScale().optionsApplied().unsubscribeAll(this);
 		this._model.priceScalesOptionsChanged().unsubscribeAll(this);
 		this._model.destroy();
@@ -217,6 +228,10 @@ export class ChartWidget implements IDestroyable {
 
 	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._crosshairMoved;
+	}
+
+	public customPriceLineDragged(): ISubscription<CustomPriceLineDraggedEventParamsImplSupplier> {
+		return this._customPriceLineDragged;
 	}
 
 	public takeScreenshot(): HTMLCanvasElement {
@@ -645,12 +660,23 @@ export class ChartWidget implements IDestroyable {
 		};
 	}
 
+	private _getCustomPriceLineDraggedEventParamsImpl(customPriceLine: CustomPriceLine, fromPriceString: string): CustomPriceLineDraggedEventParamsImpl {
+		return {
+			customPriceLine: customPriceLine,
+			fromPriceString: fromPriceString,
+		};
+	}
+
 	private _onPaneWidgetClicked(time: TimePointIndex | null, point: Point): void {
 		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point));
 	}
 
 	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
 		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
+	}
+
+	private _onCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
+		this._customPriceLineDragged.fire(() => this._getCustomPriceLineDraggedEventParamsImpl(customPriceLine, fromPriceString));
 	}
 
 	private _updateTimeAxisVisibility(): void {
