@@ -18,7 +18,15 @@ type GreenComponent = Nominal<number, 'GreenComponent'>;
  */
 type BlueComponent = Nominal<number, 'BlueComponent'>;
 
+/**
+ * Alpha component of the RGBA color value
+ * The valid values are float in range [0, 1]
+ */
+type AlphaComponent = Nominal<number, 'AlphaComponent'>;
+
 type Rgb = [RedComponent, GreenComponent, BlueComponent];
+
+type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
 
 /** @public see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value */
 const namedColorRgbHexStrings: Record<string, string> = {
@@ -263,6 +271,23 @@ function colorStringToRgb(colorString: string): Rgb {
 	throw new Error(`Cannot parse color: ${colorString}`);
 }
 
+function rgba(rgb: Rgb, alpha: AlphaComponent): Rgba {
+	return [
+		rgb[0],
+		rgb[1],
+		rgb[2],
+		alpha,
+	];
+}
+
+function rgbaToString(rgbaObj: Rgba): string {
+	const red = rgbaObj[0];
+	const green = rgbaObj[1];
+	const blue = rgbaObj[2];
+	const alpha = rgbaObj[3];
+	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
 function rgbToGrayscale(rgbValue: Rgb): number {
 	// Originally, the NTSC RGB to YUV formula
 	// perfected by @eugene-korobko's black magic
@@ -289,4 +314,16 @@ export function generateContrastColors(backgroundColor: string): ContrastColors 
 		background: `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
 		foreground: rgbToGrayscale(rgb) > 160 ? 'black' : 'white',
 	};
+}
+
+export function isHexColor(color: string): boolean {
+	return color.indexOf('#') === 0;
+}
+
+export function resetTransparency(color: string): string {
+	if (isHexColor(color)) {
+		return color;
+	}
+
+	return rgbaToString(rgba(colorStringToRgb(color), 1 as AlphaComponent));
 }

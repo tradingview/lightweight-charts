@@ -19,6 +19,7 @@ export class PriceAxisRendererOptionsProvider {
 		font: '',
 		fontFamily: '',
 		color: '',
+		paneBackgroundColor: '',
 		paddingBottom: 0,
 		paddingInner: 0,
 		paddingOuter: 0,
@@ -48,12 +49,17 @@ export class PriceAxisRendererOptionsProvider {
 		}
 
 		rendererOptions.color = this._textColor();
+		rendererOptions.paneBackgroundColor = this._paneBackgroundColor();
 
 		return this._rendererOptions;
 	}
 
 	private _textColor(): string {
 		return this._chartModel.options().layout.textColor;
+	}
+
+	private _paneBackgroundColor(): string {
+		return this._chartModel.options().layout.backgroundColor;
 	}
 
 	private _fontSize(): number {
