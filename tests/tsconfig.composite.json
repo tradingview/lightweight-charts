@@ -1,0 +1,7 @@
+{
+	"references": [
+		{ "path": "./e2e/tsconfig.composite.json" },
+		{ "path": "./unittests/tsconfig.composite.json" }
+	],
+	"include": []
+}

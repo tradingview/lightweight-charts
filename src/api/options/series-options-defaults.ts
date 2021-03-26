@@ -36,6 +36,8 @@ export const lineStyleDefaults: LineStyleOptions = {
 	lineType: LineType.Simple,
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
+	crosshairMarkerBorderColor: '',
+	crosshairMarkerBackgroundColor: '',
 };
 
 export const areaStyleDefaults: AreaStyleOptions = {
@@ -47,6 +49,8 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	lineType: LineType.Simple,
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
+	crosshairMarkerBorderColor: '',
+	crosshairMarkerBackgroundColor: '',
 };
 
 export const histogramStyleDefaults: HistogramStyleOptions = {

@@ -20,7 +20,7 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 
 		const seriesOptions = this._series.options();
 
-		if (!seriesOptions.baseLineVisible || !seriesOptions.visible) {
+		if (!seriesOptions.baseLineVisible || !this._series.visible()) {
 			return;
 		}
 

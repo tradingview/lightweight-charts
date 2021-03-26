@@ -36,12 +36,10 @@ export class CustomPriceLine {
 	}
 
 	public paneViews(): readonly IPaneView[] {
-		const res: IPaneView[] = [];
-
-		res.push(this._priceLineView);
-		res.push(this._panePriceAxisView);
-
-		return res;
+		return [
+			this._priceLineView,
+			this._panePriceAxisView,
+		];
 	}
 
 	public priceAxisView(): IPriceAxisView {

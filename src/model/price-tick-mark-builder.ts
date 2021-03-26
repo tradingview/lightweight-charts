@@ -44,9 +44,11 @@ export class PriceTickMarkBuilder {
 
 		const spans: number[] = [];
 
-		spans.push(spanCalculator1.tickSpan(high, low, maxTickSpan));
-		spans.push(spanCalculator2.tickSpan(high, low, maxTickSpan));
-		spans.push(spanCalculator3.tickSpan(high, low, maxTickSpan));
+		spans.push(
+			spanCalculator1.tickSpan(high, low, maxTickSpan),
+			spanCalculator2.tickSpan(high, low, maxTickSpan),
+			spanCalculator3.tickSpan(high, low, maxTickSpan)
+		);
 
 		return min(spans);
 	}

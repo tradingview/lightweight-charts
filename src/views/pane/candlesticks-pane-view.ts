@@ -14,10 +14,11 @@ export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', 
 	private readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
 
 	public renderer(height: number, width: number): IPaneRenderer | null {
-		const candlestickStyleProps = this._series.options();
-		if (!candlestickStyleProps.visible) {
+		if (!this._series.visible()) {
 			return null;
 		}
+
+		const candlestickStyleProps = this._series.options();
 
 		this._makeValid();
 		const data: PaneRendererCandlesticksData = {

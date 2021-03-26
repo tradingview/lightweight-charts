@@ -76,14 +76,14 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 			const data = this._markersData[index];
 			const seriesData = s.markerDataAtIndex(timePointIndex);
 
-			if (seriesData === null || !s.options().visible) {
+			if (seriesData === null || !s.visible()) {
 				data.visibleRange = null;
 				return;
 			}
 
 			const firstValue = ensureNotNull(s.firstValue());
-			data.lineColor = s.barColorer().barStyle(timePointIndex).barColor;
-			data.backColor = this._chartModel.options().layout.backgroundColor;
+			data.lineColor = seriesData.backgroundColor;
+			data.backColor = seriesData.borderColor;
 			data.radius = seriesData.radius;
 			data.items[0].price = seriesData.price;
 			data.items[0].y = s.priceScale().priceToCoordinate(seriesData.price, firstValue.value);

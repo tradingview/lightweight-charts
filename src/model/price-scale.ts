@@ -801,6 +801,10 @@ export class PriceScale {
 		let marginBelow = 0;
 
 		for (const source of sources) {
+			if (!source.visible()) {
+				continue;
+			}
+
 			const firstValue = source.firstValue();
 			if (firstValue === null) {
 				continue;
