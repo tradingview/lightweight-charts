@@ -1,3 +1,5 @@
+import { ensureDefined } from '../helpers/assertions';
+
 export type CanvasCtxLike = Pick<CanvasRenderingContext2D, 'measureText' | 'save' | 'restore' | 'textBaseline'>;
 
 const defaultReplacementRe = /[2-9]/g;
@@ -8,7 +10,7 @@ export class TextWidthCache {
 	private _usageTick: number = 1;
 	private _oldestTick: number = 1;
 	private _tick2Labels: Record<number, string> = {};
-	private _cache: Record<string, { metrics: TextMetrics; tick: number }> = {};
+	private _cache: Map<string, { metrics: TextMetrics; tick: number }> = new Map();
 
 	public constructor(size: number = 50) {
 		this._maxSize = size;
@@ -16,7 +18,7 @@ export class TextWidthCache {
 
 	public reset(): void {
 		this._actualSize = 0;
-		this._cache = {};
+		this._cache.clear();
 		this._usageTick = 1;
 		this._oldestTick = 1;
 		this._tick2Labels = {};
@@ -36,14 +38,14 @@ export class TextWidthCache {
 		const re = optimizationReplacementRe || defaultReplacementRe;
 		const cacheString = String(text).replace(re, '0');
 
-		if (this._cache[cacheString]) {
-			return this._cache[cacheString].metrics;
+		if (this._cache.has(cacheString)) {
+			return ensureDefined(this._cache.get(cacheString)).metrics;
 		}
 
 		if (this._actualSize === this._maxSize) {
 			const oldestValue = this._tick2Labels[this._oldestTick];
 			delete this._tick2Labels[this._oldestTick];
-			delete this._cache[oldestValue];
+			this._cache.delete(oldestValue);
 			this._oldestTick++;
 			this._actualSize--;
 		}
@@ -58,7 +60,7 @@ export class TextWidthCache {
 			return metrics;
 		}
 
-		this._cache[cacheString] = { metrics: metrics, tick: this._usageTick };
+		this._cache.set(cacheString, { metrics: metrics, tick: this._usageTick });
 		this._tick2Labels[this._usageTick] = cacheString;
 		this._actualSize++;
 		this._usageTick++;

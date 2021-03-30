@@ -1,5 +1,4 @@
 import { drawRoundRectWithInnerBorder, drawScaled } from '../helpers/canvas-helpers';
-import { resetTransparency } from '../helpers/color';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
@@ -84,7 +83,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		let xTick: number;
 		let xText: number;
 
-		ctx.fillStyle = resetTransparency(this._commonData.background);
+		ctx.fillStyle = this._commonData.background;
 		const radius = 2 * pixelRatio;
 
 		ctx.textAlign = alignRight ? 'right' : 'left';
@@ -111,7 +110,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		}
 
 		const textColor = this._data.color || this._commonData.color;
-		const backgroundColor = resetTransparency(this._commonData.background);
+		const backgroundColor = (this._commonData.background);
 
 		if (text) {
 			const drawLabelBody = (labelBackgroundColor: string, labelBorderColor?: string): void => {
