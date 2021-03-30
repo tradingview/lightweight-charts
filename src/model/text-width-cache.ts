@@ -1,3 +1,5 @@
+export type CanvasCtxLike = Pick<CanvasRenderingContext2D, 'measureText' | 'save' | 'restore' | 'textBaseline'>;
+
 const defaultReplacementRe = /[2-9]/g;
 
 export class TextWidthCache {
@@ -20,17 +22,17 @@ export class TextWidthCache {
 		this._tick2Labels = {};
 	}
 
-	public measureText(ctx: CanvasRenderingContext2D, text: string, optimizationReplacementRe?: RegExp): number {
+	public measureText(ctx: CanvasCtxLike, text: string, optimizationReplacementRe?: RegExp): number {
 		return this._getMetrics(ctx, text, optimizationReplacementRe).width;
 	}
 
-	public yMidCorrection(ctx: CanvasRenderingContext2D, text: string, optimizationReplacementRe?: RegExp): number {
+	public yMidCorrection(ctx: CanvasCtxLike, text: string, optimizationReplacementRe?: RegExp): number {
 		const metrics = this._getMetrics(ctx, text, optimizationReplacementRe);
 		// if actualBoundingBoxAscent/actualBoundingBoxDescent are not supported we use 0 as a fallback
 		return ((metrics.actualBoundingBoxAscent || 0) - (metrics.actualBoundingBoxDescent || 0)) / 2;
 	}
 
-	private _getMetrics(ctx: CanvasRenderingContext2D, text: string, optimizationReplacementRe?: RegExp): TextMetrics {
+	private _getMetrics(ctx: CanvasCtxLike, text: string, optimizationReplacementRe?: RegExp): TextMetrics {
 		const re = optimizationReplacementRe || defaultReplacementRe;
 		const cacheString = String(text).replace(re, '0');
 
