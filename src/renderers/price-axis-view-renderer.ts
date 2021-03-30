@@ -48,10 +48,9 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const textMidCorrection = textWidthCache.yMidCorrection(ctx, text) * pixelRatio;
 
 		const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
-		const correctedTextWidth = Math.max(textWidth, actualTextHeight);
 		const totalHeight = actualTextHeight + paddingTop + paddingBottom;
 
-		const totalWidth = horzBorder + paddingInner + paddingOuter + correctedTextWidth + tickSize;
+		const totalWidth = horzBorder + paddingInner + paddingOuter + textWidth + tickSize;
 
 		const tickHeight = Math.max(1, Math.floor(pixelRatio));
 
@@ -78,7 +77,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const alignRight = align === 'right';
 
-		const xInside = alignRight ? widthScaled : 0;
+		const xInside = alignRight ? widthScaled - horzBorderScaled : horzBorderScaled;
 		const rightScaled = widthScaled;
 
 		let xOutside = xInside;
@@ -110,9 +109,6 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			xTick = xInside + tickSizeScaled;
 			xText = xInside + tickSizeScaled + paddingInnerScaled;
 		}
-
-		const textCorrectionOffset = Math.round(pixelRatio * (correctedTextWidth - textWidth) / 2);
-		xText += textCorrectionOffset;
 
 		const textColor = this._data.color || this._commonData.color;
 		const backgroundColor = resetTransparency(this._commonData.background);
