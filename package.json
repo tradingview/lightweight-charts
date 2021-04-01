@@ -73,7 +73,7 @@
     "rollup-plugin-terser": "~7.0.2",
     "size-limit": "~4.9.2",
     "ts-node": "~9.1.1",
-    "ts-transformer-properties-rename": "~0.9.0",
+    "ts-transformer-properties-rename": "~0.10.0",
     "ts-transformer-strip-const-enums": "~1.0.1",
     "tslib": "2.1.0",
     "tslint": "6.1.3",
