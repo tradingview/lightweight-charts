@@ -27,6 +27,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		borderColor: '',
 		color: '#FFF',
 		borderVisible: false,
+		separatorVisible: false,
 	};
 
 	private readonly _paneRendererData: PriceAxisViewRendererData = {
@@ -37,6 +38,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		borderColor: '',
 		color: '#FFF',
 		borderVisible: true,
+		separatorVisible: true,
 	};
 
 	private readonly _axisRenderer: IPriceAxisViewRenderer;

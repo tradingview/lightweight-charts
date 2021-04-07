@@ -20,6 +20,7 @@ export interface PriceAxisViewRendererData {
 	color: string;
 	lineWidth?: LineWidth;
 	borderVisible: boolean;
+	separatorVisible: boolean;
 }
 
 export interface PriceAxisViewRendererOptions {
