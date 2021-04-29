@@ -34,6 +34,16 @@ export interface LineData {
 }
 
 /**
+ * Structure describing single data item for series of type Line or Area
+ */
+export interface CloudAreaData {
+	time: Time;
+
+	higherValue: number;
+	lowerValue: number;
+}
+
+/**
  * Structure describing a single item of data for histogram series
  */
 export interface HistogramData extends LineData {
@@ -53,22 +63,24 @@ export interface BarData {
 }
 
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
-	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
+	return ((data as Partial<CloudAreaData>).lowerValue === undefined || (data as Partial<CloudAreaData>).lowerValue === undefined) && (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
 
-export function isFulfilledData(data: SeriesDataItemTypeMap[SeriesType]): data is (BarData | LineData | HistogramData) {
-	return (data as Partial<BarData>).open !== undefined || (data as Partial<LineData>).value !== undefined;
+export function isFulfilledData(data: SeriesDataItemTypeMap[SeriesType]): data is (BarData | LineData | HistogramData | CloudAreaData) {
+	return ((data as Partial<CloudAreaData>).lowerValue !== undefined && (data as Partial<CloudAreaData>).lowerValue !== undefined) || (data as Partial<BarData>).open !== undefined || (data as Partial<LineData>).value !== undefined;
 }
 
 export interface SeriesDataItemTypeMap {
 	Bar: BarData | WhitespaceData;
 	Candlestick: BarData | WhitespaceData;
 	Area: LineData | WhitespaceData;
+	CloudArea: CloudAreaData | WhitespaceData;
 	Line: LineData | WhitespaceData;
 	Histogram: HistogramData | WhitespaceData;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {
 	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void;
+
 	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void;
 }

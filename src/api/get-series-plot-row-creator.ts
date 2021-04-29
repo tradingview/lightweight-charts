@@ -3,7 +3,13 @@ import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { BarData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
+import {
+	BarData, CloudAreaData,
+	HistogramData,
+	isWhitespaceData,
+	LineData,
+	SeriesDataItemTypeMap,
+} from './data-consumer';
 
 function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;
@@ -23,6 +29,10 @@ function getOHLCBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item:
 	return { index, time, value: [item.open, item.high, item.low, item.close] };
 }
 
+function getCloudAreaBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: CloudAreaData): Mutable<SeriesPlotRow<'CloudArea'>> {
+	return { index, time, value: [item.higherValue, item.higherValue, item.lowerValue, item.lowerValue] };
+}
+
 export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
 
 export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is SeriesPlotRow {
@@ -39,7 +49,7 @@ type SeriesItemValueFnMap = {
 
 export type TimedSeriesItemValueFn = (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[SeriesType]) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
 
-function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getOHLCBasedSeriesPlotRow)): TimedSeriesItemValueFn {
+function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getOHLCBasedSeriesPlotRow) | (typeof getCloudAreaBasedSeriesPlotRow)): TimedSeriesItemValueFn {
 	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType]) => {
 		if (isWhitespaceData(bar)) {
 			return { time, index };
@@ -53,6 +63,7 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Candlestick: wrapWhitespaceData(getOHLCBasedSeriesPlotRow),
 	Bar: wrapWhitespaceData(getOHLCBasedSeriesPlotRow),
 	Area: wrapWhitespaceData(getLineBasedSeriesPlotRow),
+	CloudArea: wrapWhitespaceData(getCloudAreaBasedSeriesPlotRow),
 	Histogram: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 	Line: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 };

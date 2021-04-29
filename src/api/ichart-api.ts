@@ -7,7 +7,7 @@ import { SeriesMarker } from '../model/series-markers';
 import {
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
-	CandlestickSeriesPartialOptions,
+	CandlestickSeriesPartialOptions, CloudAreaSeriesPartialOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
 	SeriesType,
@@ -54,6 +54,14 @@ export interface IChartApi {
 	 * @returns an interface of the created series
 	 */
 	addAreaSeries(areaOptions?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
+
+	/**
+	 * Creates an cloud area series with specified parameters
+	 *
+	 * @param areaOptions - customization parameters of the series being created
+	 * @returns an interface of the created series
+	 */
+	addCloudAreaSeries(areaOptions?: CloudAreaSeriesPartialOptions): ISeriesApi<'CloudArea'>;
 
 	/**
 	 * Creates a bar series with specified parameters

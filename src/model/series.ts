@@ -10,6 +10,7 @@ import { isInteger, merge } from '../helpers/strict-type-checks';
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
 import { SeriesCandlesticksPaneView } from '../views/pane/candlesticks-pane-view';
+import { SeriesCloudAreaPaneView } from '../views/pane/cloud-area-pane-view';
 import { SeriesHistogramPaneView } from '../views/pane/histogram-pane-view';
 import { IPaneView } from '../views/pane/ipane-view';
 import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
@@ -83,6 +84,7 @@ export interface SeriesDataAtTypeMap {
 	Bar: BarPrices;
 	Candlestick: BarPrices;
 	Area: BarPrice;
+	CloudArea: BarPrice;
 	Line: BarPrice;
 	Histogram: BarPrice;
 }
@@ -469,7 +471,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
 		}
 
-		return new AutoscaleInfoImpl(range,	this._markersPaneView.autoScaleMargins());
+		return new AutoscaleInfoImpl(range, this._markersPaneView.autoScaleMargins());
 	}
 
 	private _markerRadius(): number {
@@ -591,12 +593,18 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 				break;
 			}
 
+			case 'CloudArea': {
+				this._paneView = new SeriesCloudAreaPaneView(this as Series<'CloudArea'>, this.model());
+				break;
+			}
+
 			case 'Histogram': {
 				this._paneView = new SeriesHistogramPaneView(this as Series<'Histogram'>, this.model());
 				break;
 			}
 
-			default: throw Error('Unknown chart style assigned: ' + this._seriesType);
+			default:
+				throw Error('Unknown chart style assigned: ' + this._seriesType);
 		}
 	}
 }

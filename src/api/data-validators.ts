@@ -55,6 +55,9 @@ function getChecker(type: SeriesType): Checker {
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
 
+		case 'CloudArea':
+			return checkCloudAreaItem.bind(null, type);
+
 		default:
 			ensureNever(type);
 			throw new Error(`unsupported series type ${type}`);
@@ -97,4 +100,19 @@ function checkLineItem(type: 'Area' | 'Line' | 'Histogram', lineItem: SeriesData
 		// eslint-disable-next-line @typescript-eslint/tslint/config
 		typeof lineItem.value === 'number',
 		`${type} series item data value must be a number, got=${typeof lineItem.value}, value=${lineItem.value}`);
+}
+
+function checkCloudAreaItem(type: 'CloudArea', lineItem: SeriesDataItemTypeMap[typeof type]): void {
+	if (!isFulfilledData(lineItem)) {
+		return;
+	}
+
+	assert(
+		// eslint-disable-next-line @typescript-eslint/tslint/config
+		typeof lineItem.higherValue === 'number',
+		`${type} series item data higher value must be a number, got=${typeof lineItem.higherValue}, value=${lineItem.higherValue}`);
+	assert(
+		// eslint-disable-next-line @typescript-eslint/tslint/config
+		typeof lineItem.lowerValue === 'number',
+		`${type} series item data lower value must be a number, got=${typeof lineItem.lowerValue}, value=${lineItem.lowerValue}`);
 }

@@ -61,6 +61,13 @@ export interface PricedValue {
 	y: Coordinate;
 }
 
+export interface CloudPricedValue {
+	higherPrice: BarPrice;
+	higherY: Coordinate;
+	lowerPrice: BarPrice;
+	lowerY: Coordinate;
+}
+
 /** Defines margins of the price scale */
 export interface PriceScaleMargins {
 	/** Top margin in percentages. Must be greater or equal to 0 and less than 100 */
@@ -368,6 +375,47 @@ export class PriceScale {
 			const invCoordinate = bh + hmm * (logical - min);
 			const coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
 			point.y = coordinate as Coordinate;
+		}
+	}
+
+	public cloudPointsArrayToCoordinates<T extends CloudPricedValue>(points: T[], baseValue: number, visibleRange?: SeriesItemsIndexesRange): void {
+		this._makeSureItIsValid();
+		const bh = this._bottomMarginPx();
+		const range = ensureNotNull(this.priceRange());
+		const min = range.minValue();
+		const max = range.maxValue();
+		const ih = (this.internalHeight() - 1);
+		const isInverted = this.isInverted();
+
+		const hmm = ih / (max - min);
+
+		const fromIndex = (visibleRange === undefined) ? 0 : visibleRange.from;
+		const toIndex = (visibleRange === undefined) ? points.length : visibleRange.to;
+
+		const transformFn = this._getCoordinateTransformer();
+		for (let i = fromIndex; i < toIndex; i++) {
+			const point = points[i];
+			const higherPrice = point.higherPrice;
+			const lowerPrice = point.lowerPrice;
+
+			if (isNaN(higherPrice) || isNaN(lowerPrice)) {
+				continue;
+			}
+
+			let higherLogical = higherPrice;
+			let lowerLogical = lowerPrice;
+			if (transformFn !== null) {
+				higherLogical = transformFn(point.higherPrice, baseValue) as BarPrice;
+				lowerLogical = transformFn(point.lowerPrice, baseValue) as BarPrice;
+			}
+
+			let invCoordinate = bh + hmm * (higherLogical - min);
+			let coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
+			point.higherY = coordinate as Coordinate;
+
+			invCoordinate = bh + hmm * (lowerLogical - min);
+			coordinate = isInverted ? invCoordinate : this._height - 1 - invCoordinate;
+			point.lowerY = coordinate as Coordinate;
 		}
 	}
 

@@ -14,7 +14,7 @@ import {
 	BarSeriesOptions,
 	BarSeriesPartialOptions,
 	CandlestickSeriesOptions,
-	CandlestickSeriesPartialOptions,
+	CandlestickSeriesPartialOptions, CloudAreaSeriesOptions, CloudAreaSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
 	HistogramSeriesOptions,
 	HistogramSeriesPartialOptions,
@@ -37,7 +37,7 @@ import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
 	areaStyleDefaults,
 	barStyleDefaults,
-	candlestickStyleDefaults,
+	candlestickStyleDefaults, cloudAreaStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
@@ -201,6 +201,20 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const series = this._chartWidget.model().createSeries('Area', strictOptions);
 
 		const res = new SeriesApi<'Area'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
+	public addCloudAreaSeries(options: CloudAreaSeriesPartialOptions = {}): ISeriesApi<'CloudArea'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), cloudAreaStyleDefaults, options) as CloudAreaSeriesOptions;
+		const series = this._chartWidget.model().createSeries('CloudArea', strictOptions);
+
+		const res = new SeriesApi<'CloudArea'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 

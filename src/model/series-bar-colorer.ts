@@ -6,7 +6,7 @@ import { SeriesPlotRow } from './series-data';
 import {
 	AreaStyleOptions,
 	BarStyleOptions,
-	CandlestickStyleOptions,
+	CandlestickStyleOptions, CloudAreaStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
 } from './series-options';
@@ -48,6 +48,9 @@ export class SeriesBarColorer {
 
 			case 'Area':
 				return this._areaStyle(seriesOptions as AreaStyleOptions);
+
+			case 'CloudArea':
+				return this._cloudAreaStyle(seriesOptions as CloudAreaStyleOptions);
 
 			case 'Bar':
 				return this._barStyle(seriesOptions as BarStyleOptions, barIndex, precomputedBars);
@@ -104,6 +107,13 @@ export class SeriesBarColorer {
 		return {
 			...emptyResult,
 			barColor: areaStyle.lineColor,
+		};
+	}
+
+	private _cloudAreaStyle(cloudAreaStyle: CloudAreaStyleOptions): BarColorerStyle {
+		return {
+			...emptyResult,
+			barColor: cloudAreaStyle.higherLineColor,
 		};
 	}
 

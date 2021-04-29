@@ -79,6 +79,23 @@ export interface AreaStyleOptions {
 	crosshairMarkerBackgroundColor: string;
 }
 
+export interface CloudAreaStyleOptions {
+	positiveColor: string;
+	negativeColor: string;
+	higherLineColor: string;
+	higherLineStyle: LineStyle;
+	higherLineWidth: LineWidth;
+	higherLineType: LineType;
+	lowerLineColor: string;
+	lowerLineStyle: LineStyle;
+	lowerLineWidth: LineWidth;
+	lowerLineType: LineType;
+	crosshairMarkerVisible: boolean;
+	crosshairMarkerRadius: number;
+	crosshairMarkerBorderColor: string;
+	crosshairMarkerBackgroundColor: string;
+}
+
 export interface HistogramStyleOptions {
 	color: string;
 	base: number;
@@ -230,6 +247,12 @@ export type AreaSeriesOptions = SeriesOptions<AreaStyleOptions>;
 export type AreaSeriesPartialOptions = SeriesPartialOptions<AreaStyleOptions>;
 
 /**
+ * Structure describing closed area series options.
+ */
+export type CloudAreaSeriesOptions = SeriesOptions<CloudAreaStyleOptions>;
+export type CloudAreaSeriesPartialOptions = SeriesPartialOptions<CloudAreaStyleOptions>;
+
+/**
  * Structure describing bar series options.
  */
 export type BarSeriesOptions = SeriesOptions<BarStyleOptions>;
@@ -257,6 +280,7 @@ export interface SeriesOptionsMap {
 	Bar: BarSeriesOptions;
 	Candlestick: CandlestickSeriesOptions;
 	Area: AreaSeriesOptions;
+	CloudArea: CloudAreaSeriesOptions;
 	Line: LineSeriesOptions;
 	Histogram: HistogramSeriesOptions;
 }
@@ -265,6 +289,7 @@ export interface SeriesPartialOptionsMap {
 	Bar: BarSeriesPartialOptions;
 	Candlestick: CandlestickSeriesPartialOptions;
 	Area: AreaSeriesPartialOptions;
+	CloudArea: CloudAreaSeriesPartialOptions;
 	Line: LineSeriesPartialOptions;
 	Histogram: HistogramSeriesPartialOptions;
 }
