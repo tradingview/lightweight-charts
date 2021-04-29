@@ -39,7 +39,7 @@ export class PaneRendererLine extends ScaledRenderer {
 		setLineStyle(ctx, this._data.lineStyle);
 
 		ctx.strokeStyle = this._data.lineColor;
-		ctx.lineJoin = 'miter';
+		ctx.lineJoin = 'round';
 
 		ctx.beginPath();
 		if (this._data.items.length === 1) {
