@@ -64,8 +64,8 @@ commands:
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
             echo 'export PRODUCTION_BUILD=<< parameters.productionBuild >>' >> $BASH_ENV
       - run:
-        command: scripts/run-graphics-tests.sh
-        no_output_timeout: 20m
+          command: scripts/run-graphics-tests.sh
+          no_output_timeout: 20m
 
       - store_test_results:
           path: test-results/
