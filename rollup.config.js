@@ -36,6 +36,7 @@ function getConfig(inputFile, type, isProd) {
 		plugins: [
 			nodeResolve(),
 			replace({
+				preventAssignment: true,
 				values: {
 					// make sure that this values are synced with src/typings/globals/index.d.ts
 					'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),

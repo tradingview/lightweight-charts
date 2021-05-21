@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { Browser, Frame, JSHandle, launch as launchPuppeteer, LaunchOptions, Response } from 'puppeteer';
+import { Browser, Frame, HTTPResponse, JSHandle, launch as launchPuppeteer } from 'puppeteer';
 
 import { getTestCases } from './helpers/get-test-cases';
 
@@ -25,7 +25,7 @@ const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 async function getReferencesCount(frame: Frame, prototypeReference: JSHandle): Promise<number> {
 	const context = await frame.executionContext();
 	const activeRefsHandle = await context.queryObjects(prototypeReference);
-	const activeRefsCount = await (await activeRefsHandle.getProperty('length')).jsonValue() as number;
+	const activeRefsCount = await (await activeRefsHandle?.getProperty('length'))?.jsonValue() as number;
 
 	await activeRefsHandle.dispose();
 
@@ -39,7 +39,7 @@ function promisleep(ms: number): Promise<void> {
 }
 
 describe('Memleaks tests', () => {
-	const puppeteerOptions: LaunchOptions = {};
+	const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {};
 	if (process.env.NO_SANDBOX) {
 		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
 	}
@@ -78,7 +78,7 @@ describe('Memleaks tests', () => {
 				errors.push(error.message);
 			});
 
-			page.on('response', (response: Response) => {
+			page.on('response', (response: HTTPResponse) => {
 				if (!response.ok()) {
 					errors.push(`Network error: ${response.url()} status=${response.status()}`);
 				}
