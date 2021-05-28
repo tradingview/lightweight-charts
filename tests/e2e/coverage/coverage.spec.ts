@@ -9,10 +9,9 @@ import { BoundingBox,
 	Browser,
 	ConsoleMessage,
 	ElementHandle,
+	HTTPResponse,
 	launch as launchPuppeteer,
-	LaunchOptions,
 	Page,
-	Response,
 } from 'puppeteer';
 
 import { expectedCoverage, threshold } from './coverage-config';
@@ -91,7 +90,8 @@ async function doMouseScrolls(element: ElementHandle): Promise<void> {
 }
 
 async function doZoomInZoomOut(page: Page): Promise<void> {
-	const prevViewport = page.viewport();
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const prevViewport = page.viewport()!;
 	await page.setViewport({
 		...prevViewport,
 		deviceScaleFactor: 2,
@@ -211,7 +211,7 @@ async function getCoverageResult(page: Page): Promise<Map<string, CoverageResult
 }
 
 describe('Coverage tests', () => {
-	const puppeteerOptions: LaunchOptions = {};
+	const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {};
 	if (process.env.NO_SANDBOX) {
 		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
 	}
@@ -241,7 +241,7 @@ describe('Coverage tests', () => {
 			}
 		});
 
-		page.on('response', (response: Response) => {
+		page.on('response', (response: HTTPResponse) => {
 			if (!response.ok()) {
 				onError(`Network error: ${response.url()} status=${response.status()}`);
 			}

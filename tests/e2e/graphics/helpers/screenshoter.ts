@@ -4,10 +4,9 @@ import { PNG } from 'pngjs';
 import {
 	Browser,
 	ConsoleMessage,
+	HTTPResponse,
 	launch as launchPuppeteer,
-	LaunchOptions,
 	Page,
-	Response,
 } from 'puppeteer';
 
 const viewportWidth = 600;
@@ -17,7 +16,7 @@ export class Screenshoter {
 	private _browserPromise: Promise<Browser>;
 
 	public constructor(noSandbox: boolean, devicePixelRatio: number = 1) {
-		const puppeteerOptions: LaunchOptions = {
+		const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {
 			defaultViewport: {
 				deviceScaleFactor: devicePixelRatio,
 				width: viewportWidth,
@@ -56,7 +55,7 @@ export class Screenshoter {
 				}
 			});
 
-			page.on('response', (response: Response) => {
+			page.on('response', (response: HTTPResponse) => {
 				if (!response.ok()) {
 					errors.push(`Network error: ${response.url()} status=${response.status()}`);
 				}
@@ -87,7 +86,7 @@ export class Screenshoter {
 				throw new Error(errors.join('\n'));
 			}
 
-			return PNG.sync.read(await page.screenshot({ encoding: 'binary' }));
+			return PNG.sync.read(await page.screenshot({ encoding: 'binary' }) as Buffer);
 		} finally {
 			if (page !== undefined) {
 				await page.close();
