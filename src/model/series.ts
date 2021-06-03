@@ -212,7 +212,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public options(): Readonly<SeriesOptionsMap[T]> {
-		return this._options;
+		return this._options as SeriesOptionsMap[T];
 	}
 
 	public applyOptions(options: SeriesPartialOptionsInternal<T>): void {
