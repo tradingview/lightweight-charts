@@ -335,8 +335,6 @@ export class DataLayer {
 	private _updateTimeScalePoints(newTimePoints: TimeScalePoint[]): number {
 		let firstChangedPointIndex = -1;
 
-		// if the new time points array is empty we have removed all data...?
-
 		// search the first different point and "syncing" time weight by the way
 		for (let index = 0; index < this._sortedTimePoints.length && index < newTimePoints.length; ++index) {
 			const oldPoint = this._sortedTimePoints[index];
