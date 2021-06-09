@@ -132,23 +132,30 @@ describe('DataLayer', () => {
 			{ time: { timestamp: 5000 }, timeWeight: 30 },
 			{ time: { timestamp: 7000 }, timeWeight: 22 },
 		]);
-		expect(updateResult.series.size).to.be.equal(2);
-		updateResult.series.forEach((updatePacket: SeriesChanges, series: Series) => {
-			expect(updatePacket.data.length).to.be.equal(2);
-			expect(updatePacket.fullUpdate).to.be.equal(true);
+		expect(updateResult.series.size).to.be.equal(3);
 
-			if (series === series1) {
-				expect(updatePacket.data[0].index).to.be.equal(0 as TimePointIndex);
-				expect(updatePacket.data[0].time).to.be.deep.equal({ timestamp: 2000 });
-				expect(updatePacket.data[1].index).to.be.equal(2 as TimePointIndex);
-				expect(updatePacket.data[1].time).to.be.deep.equal({ timestamp: 5000 });
-			} else {
-				expect(updatePacket.data[0].index).to.be.equal(1 as TimePointIndex);
-				expect(updatePacket.data[0].time).to.be.deep.equal({ timestamp: 3000 });
-				expect(updatePacket.data[1].index).to.be.equal(3 as TimePointIndex);
-				expect(updatePacket.data[1].time).to.be.deep.equal({ timestamp: 7000 });
-			}
-		});
+		const series1Update = updateResult.series.get(series1);
+		expect(series1Update).not.to.be.equal(undefined);
+		expect(series1Update?.data.length).to.be.equal(2);
+		expect(series1Update?.fullUpdate).to.be.equal(true);
+		expect(series1Update?.data[0].index).to.be.equal(0 as TimePointIndex);
+		expect(series1Update?.data[0].time).to.be.deep.equal({ timestamp: 2000 });
+		expect(series1Update?.data[1].index).to.be.equal(2 as TimePointIndex);
+		expect(series1Update?.data[1].time).to.be.deep.equal({ timestamp: 5000 });
+
+		const series2Update = updateResult.series.get(series2);
+		expect(series2Update).not.to.be.equal(undefined);
+		expect(series2Update?.data.length).to.be.equal(2);
+		expect(series2Update?.fullUpdate).to.be.equal(true);
+		expect(series2Update?.data[0].index).to.be.equal(1 as TimePointIndex);
+		expect(series2Update?.data[0].time).to.be.deep.equal({ timestamp: 3000 });
+		expect(series2Update?.data[1].index).to.be.equal(3 as TimePointIndex);
+		expect(series2Update?.data[1].time).to.be.deep.equal({ timestamp: 7000 });
+
+		const series3Update = updateResult.series.get(series3);
+		expect(series3Update).not.to.be.equal(undefined);
+		expect(series3Update?.data.length).to.be.equal(0);
+		expect(series3Update?.fullUpdate).to.be.equal(true);
 	});
 
 	it('should be able to remove series if time scale is NOT changed', () => {
@@ -437,7 +444,12 @@ describe('DataLayer', () => {
 			expect(updateResult.timeScale.points).not.to.be.equal(undefined);
 			expect(updateResult.timeScale.baseIndex).to.be.equal(barsCount - 1);
 
-			expect(updateResult.series.size).to.be.equal(1);
+			expect(updateResult.series.size).to.be.equal(2);
+
+			const series1Update = updateResult.series.get(series1);
+			expect(series1Update).not.to.be.equal(undefined);
+			expect(series1Update?.fullUpdate).to.be.equal(true);
+			expect(series1Update?.data.length).to.be.equal(0);
 
 			const series2Update = updateResult.series.get(series2);
 			expect(series2Update).not.to.be.equal(undefined);
@@ -458,12 +470,17 @@ describe('DataLayer', () => {
 			expect(updateResult.timeScale.points).not.to.be.equal(undefined);
 			expect(updateResult.timeScale.baseIndex).to.be.equal(barsCount - 1);
 
-			expect(updateResult.series.size).to.be.equal(1);
+			expect(updateResult.series.size).to.be.equal(2);
 
 			const series1Update = updateResult.series.get(series1);
 			expect(series1Update).not.to.be.equal(undefined);
 			expect(series1Update?.fullUpdate).to.be.equal(true);
 			expect(series1Update?.data.length).to.be.equal(barsCount);
+
+			const series2Update = updateResult.series.get(series2);
+			expect(series2Update).not.to.be.equal(undefined);
+			expect(series2Update?.fullUpdate).to.be.equal(true);
+			expect(series2Update?.data.length).to.be.equal(0);
 		});
 	});
 
@@ -693,6 +710,63 @@ describe('DataLayer', () => {
 					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(3000 as UTCTimestamp);
 				}
 			});
+		});
+	});
+
+	describe('adding and removing multiple series clears series data gh#752', () => {
+		function generateData(): LineData[] {
+			const res = [];
+			const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+
+			for (let i = 0; i < 10; ++i) {
+				const timestamp = time.getTime() / 1000;
+				res.push(dataItemAt(timestamp as UTCTimestamp));
+			}
+
+			return res;
+		}
+
+		const dataLayer = new DataLayer();
+
+		const series1 = createSeriesMock();
+		const series2 = createSeriesMock();
+
+		const data1 = generateData();
+		const data2 = generateData();
+
+		dataLayer.setSeriesData(series1, data1);
+		dataLayer.setSeriesData(series2, data2);
+
+		it('update result has empty data for series1', () => {
+			const updateResult = dataLayer.setSeriesData(series1, []);
+			expect(updateResult.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+			expect(updateResult.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
+			expect(updateResult.series.has(series1)).to.be.equal(true, 'expected to contain series1');
+			expect(updateResult.series.get(series1)?.data.length).to.be.equal(0, 'expected series1 data to be empty');
+		});
+
+		it('update result has empty data for series2', () => {
+			const updateResult = dataLayer.setSeriesData(series2, []);
+			expect(updateResult.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+			expect(updateResult.timeScale.points?.length).to.be.equal(0, 'expected updated time scale points length to equal 0');
+			expect(updateResult.series.has(series2)).to.be.equal(true, 'expected to contain series2');
+			expect(updateResult.series.get(series2)?.data.length).to.be.equal(0, 'expected series2 data to be empty');
+		});
+
+		it('update result has non-empty data for series1', () => {
+			const updateResult = dataLayer.setSeriesData(series1, data1);
+			expect(updateResult.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+			expect(updateResult.timeScale.points?.length).to.be.equal(1, 'expected updated time scale points length to equal 1');
+			expect(updateResult.series.has(series1)).to.be.equal(true, 'expected to contain series1');
+			expect(updateResult.series.get(series1)?.data.length).to.be.equal(data1.length, 'expected series1 data to be non-empty');
+		});
+
+		it('update result has non-empty data for series2', () => {
+			const updateResult = dataLayer.setSeriesData(series2, data2);
+			expect(updateResult.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+			expect(updateResult.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
+			expect(updateResult.series.has(series2)).to.be.equal(true, 'expected to contain series2');
+			expect(updateResult.series.get(series2)?.data.length).to.be.equal(data2.length, 'expected series1 data to be non-empty');
 		});
 	});
 });

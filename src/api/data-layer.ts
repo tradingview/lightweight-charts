@@ -335,6 +335,8 @@ export class DataLayer {
 	private _updateTimeScalePoints(newTimePoints: TimeScalePoint[]): number {
 		let firstChangedPointIndex = -1;
 
+		// if the new time points array is empty we have removed all data...?
+
 		// search the first different point and "syncing" time weight by the way
 		for (let index = 0; index < this._sortedTimePoints.length && index < newTimePoints.length; ++index) {
 			const oldPoint = this._sortedTimePoints[index];
@@ -419,6 +421,10 @@ export class DataLayer {
 			this._seriesRowsBySeries.forEach((data: SeriesPlotRow[], s: Series) => {
 				dataUpdateResponse.series.set(s, { data, fullUpdate: true });
 			});
+
+			if (!this._seriesRowsBySeries.has(series)) {
+				dataUpdateResponse.series.set(series, { data: [], fullUpdate: true });
+			}
 
 			dataUpdateResponse.timeScale.points = this._sortedTimePoints;
 		} else {
