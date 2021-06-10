@@ -160,6 +160,8 @@ export class DataLayer {
 	// this is kind of "dest" values (in opposite to "source" ones) - we don't need to modify it manually, the only by calling _syncIndexesAndApplyChanges method
 	private _sortedTimePoints: readonly TimeScalePoint[] = [];
 
+	private _previousBaseIndexValue: TimePointIndex = 0 as TimePointIndex;
+
 	public destroy(): void {
 		this._pointDataByTimePoint.clear();
 		this._seriesRowsBySeries.clear();
@@ -384,12 +386,19 @@ export class DataLayer {
 	private _getBaseIndex(): TimePointIndex {
 		let baseIndex = 0 as TimePointIndex;
 
-		this._seriesRowsBySeries.forEach((data: SeriesPlotRow[]) => {
-			if (data.length !== 0) {
-				baseIndex = Math.max(baseIndex, data[data.length - 1].index) as TimePointIndex;
-			}
-		});
+		if (this._seriesRowsBySeries.size === 0) {
+			// all series have been removed so use the previous base index value
+			baseIndex = this._previousBaseIndexValue;
+		} else {
+			// calculate a new base index value from series data
+			this._seriesRowsBySeries.forEach((data: SeriesPlotRow[]) => {
+				if (data.length !== 0) {
+					baseIndex = Math.max(baseIndex, data[data.length - 1].index) as TimePointIndex;
+				}
+			});
+		}
 
+		this._previousBaseIndexValue = baseIndex;
 		return baseIndex;
 	}
 
