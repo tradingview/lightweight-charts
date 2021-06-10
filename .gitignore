@@ -26,6 +26,3 @@ debug.html
 
 # graphics tests out data
 /tests/e2e/graphics/.gendata/
-
-# OS X .DS_Store files
-.DS_Store
