@@ -420,6 +420,9 @@ export class DataLayer {
 				dataUpdateResponse.series.set(s, { data, fullUpdate: true });
 			});
 
+			// if the seires data was set to [] it will have already been removed from _seriesRowBySeries
+			// meaning the forEach above won't add the series to the data update response
+			// so we handle that case here
 			if (!this._seriesRowsBySeries.has(series)) {
 				dataUpdateResponse.series.set(series, { data: [], fullUpdate: true });
 			}
