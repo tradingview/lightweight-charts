@@ -418,6 +418,56 @@ describe('DataLayer', () => {
 		}
 	});
 
+	it('should update removed series data gh#752', () => {
+		function generateData(): LineData[] {
+			const res = [];
+			const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+
+			for (let i = 0; i < 10; ++i) {
+				const timestamp = time.getTime() / 1000;
+				res.push(dataItemAt(timestamp as UTCTimestamp));
+			}
+
+			return res;
+		}
+
+		const dataLayer = new DataLayer();
+		const series1 = createSeriesMock();
+		const series2 = createSeriesMock();
+		const data1 = generateData();
+		const data2 = generateData();
+		dataLayer.setSeriesData(series1, data1);
+		dataLayer.setSeriesData(series2, data2);
+
+		const updateResult1 = dataLayer.setSeriesData(series1, []);
+
+		expect(updateResult1.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+		expect(updateResult1.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
+		expect(updateResult1.series.has(series1)).to.be.equal(true, 'expected to contain series1');
+		expect(updateResult1.series.get(series1)?.data.length).to.be.equal(0, 'expected series1 data to be empty');
+
+		const updateResult2 = dataLayer.setSeriesData(series2, []);
+
+		expect(updateResult2.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+		expect(updateResult2.timeScale.points?.length).to.be.equal(0, 'expected updated time scale points length to equal 0');
+		expect(updateResult2.series.has(series2)).to.be.equal(true, 'expected to contain series2');
+		expect(updateResult2.series.get(series2)?.data.length).to.be.equal(0, 'expected series2 data to be empty');
+
+		const updateResult3 = dataLayer.setSeriesData(series1, data1);
+
+		expect(updateResult3.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+		expect(updateResult3.timeScale.points?.length).to.be.equal(1, 'expected updated time scale points length to equal 1');
+		expect(updateResult3.series.has(series1)).to.be.equal(true, 'expected to contain series1');
+		expect(updateResult3.series.get(series1)?.data.length).to.be.equal(data1.length, 'expected series1 data to be non-empty');
+
+		const updateResult4 = dataLayer.setSeriesData(series2, data2);
+
+		expect(updateResult4.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+		expect(updateResult4.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
+		expect(updateResult4.series.has(series2)).to.be.equal(true, 'expected to contain series2');
+		expect(updateResult4.series.get(series2)?.data.length).to.be.equal(data2.length, 'expected series1 data to be non-empty');
+	});
+
 	describe('should be able to remove series and generate full update to other series if time scale is changed gh#355', () => {
 		const barsCount = 10;
 		function generateData(startTime: number, step: number): LineData[] {
@@ -710,63 +760,6 @@ describe('DataLayer', () => {
 					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(3000 as UTCTimestamp);
 				}
 			});
-		});
-	});
-
-	describe('adding and removing multiple series clears series data gh#752', () => {
-		function generateData(): LineData[] {
-			const res = [];
-			const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-
-			for (let i = 0; i < 10; ++i) {
-				const timestamp = time.getTime() / 1000;
-				res.push(dataItemAt(timestamp as UTCTimestamp));
-			}
-
-			return res;
-		}
-
-		const dataLayer = new DataLayer();
-
-		const series1 = createSeriesMock();
-		const series2 = createSeriesMock();
-
-		const data1 = generateData();
-		const data2 = generateData();
-
-		dataLayer.setSeriesData(series1, data1);
-		dataLayer.setSeriesData(series2, data2);
-
-		it('update result has empty data for series1', () => {
-			const updateResult = dataLayer.setSeriesData(series1, []);
-			expect(updateResult.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
-			expect(updateResult.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
-			expect(updateResult.series.has(series1)).to.be.equal(true, 'expected to contain series1');
-			expect(updateResult.series.get(series1)?.data.length).to.be.equal(0, 'expected series1 data to be empty');
-		});
-
-		it('update result has empty data for series2', () => {
-			const updateResult = dataLayer.setSeriesData(series2, []);
-			expect(updateResult.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
-			expect(updateResult.timeScale.points?.length).to.be.equal(0, 'expected updated time scale points length to equal 0');
-			expect(updateResult.series.has(series2)).to.be.equal(true, 'expected to contain series2');
-			expect(updateResult.series.get(series2)?.data.length).to.be.equal(0, 'expected series2 data to be empty');
-		});
-
-		it('update result has non-empty data for series1', () => {
-			const updateResult = dataLayer.setSeriesData(series1, data1);
-			expect(updateResult.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
-			expect(updateResult.timeScale.points?.length).to.be.equal(1, 'expected updated time scale points length to equal 1');
-			expect(updateResult.series.has(series1)).to.be.equal(true, 'expected to contain series1');
-			expect(updateResult.series.get(series1)?.data.length).to.be.equal(data1.length, 'expected series1 data to be non-empty');
-		});
-
-		it('update result has non-empty data for series2', () => {
-			const updateResult = dataLayer.setSeriesData(series2, data2);
-			expect(updateResult.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
-			expect(updateResult.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
-			expect(updateResult.series.has(series2)).to.be.equal(true, 'expected to contain series2');
-			expect(updateResult.series.get(series2)?.data.length).to.be.equal(data2.length, 'expected series1 data to be non-empty');
 		});
 	});
 });
