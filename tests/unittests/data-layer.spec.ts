@@ -449,7 +449,7 @@ describe('DataLayer', () => {
 
 		const updateResult2 = dataLayer.setSeriesData(series2, []);
 
-		expect(updateResult2.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+		expect(updateResult2.timeScale.baseIndex).to.be.equal(null, 'expected base index to be null');
 		expect(updateResult2.timeScale.points?.length).to.be.equal(0, 'expected updated time scale points length to equal 0');
 		expect(updateResult2.series.has(series2)).to.be.equal(true, 'expected to contain series2');
 		expect(updateResult2.series.get(series2)?.data.length).to.be.equal(0, 'expected series2 data to be empty');
@@ -467,6 +467,85 @@ describe('DataLayer', () => {
 		expect(updateResult4.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
 		expect(updateResult4.series.has(series2)).to.be.equal(true, 'expected to contain series2');
 		expect(updateResult4.series.get(series2)?.data.length).to.be.equal(data2.length, 'expected series1 data to be non-empty');
+	});
+
+	describe('should update base index to null when all series data is cleared gh#757', () => {
+		const data: LineData[] = [
+			{
+				time: 1609459200 as UTCTimestamp,
+				value: 31.533026412262345,
+			},
+			{
+				time: 1609545600 as UTCTimestamp,
+				value: 6.568118452269189,
+			},
+			{
+				time: 1609632000 as UTCTimestamp,
+				value: 98.62539451897008,
+			},
+			{
+				time: 1609718400 as UTCTimestamp,
+				value: 46.767718860541606,
+			},
+			{
+				time: 1609804800 as UTCTimestamp,
+				value: 36.955748002496655,
+			},
+			{
+				time: 1609891200 as UTCTimestamp,
+				value: 85.96192548047124,
+			},
+			{
+				time: 1609977600 as UTCTimestamp,
+				value: 72.75990512152876,
+			},
+			{
+				time: 1610064000 as UTCTimestamp,
+				value: 2.993469032310503,
+			},
+			{
+				time: 1610150400 as UTCTimestamp,
+				value: 4.258319318756176,
+			},
+			{
+				time: 1610236800 as UTCTimestamp,
+				value: 60.0150296893859,
+			},
+		];
+
+		it('single series', () => {
+			const dataLayer = new DataLayer();
+			const series = createSeriesMock();
+
+			dataLayer.setSeriesData(series, data);
+
+			const updateResult = dataLayer.setSeriesData(series, []);
+
+			expect(updateResult.timeScale.baseIndex).to.be.equal(null);
+		});
+
+		it('multiple series', () => {
+			const seriesCount = 5;
+			const dataLayer = new DataLayer();
+			const series = [];
+
+			for (let i = 0; i < seriesCount; i++) {
+				series[i] = createSeriesMock();
+				dataLayer.setSeriesData(series[i], data);
+			}
+
+			for (let i = 0; i < series.length; i++) {
+				const updateResult = dataLayer.setSeriesData(series[i], []);
+
+				if (i === series.length - 1) {
+					// the last series was cleared so we expect a null base index
+					expect(updateResult.timeScale.baseIndex).to.be.equal(null);
+				} else {
+					// some series still have data so we expected a non-null base index
+					expect(updateResult.timeScale.baseIndex).not.to.be.equal(null);
+				}
+			}
+		});
 	});
 
 	describe('should be able to remove series and generate full update to other series if time scale is changed gh#355', () => {

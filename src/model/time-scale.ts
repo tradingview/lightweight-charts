@@ -396,7 +396,7 @@ export class TimeScale {
 		this.setRightOffset(this._options.rightOffset);
 	}
 
-	public setBaseIndex(baseIndex: TimePointIndex): void {
+	public setBaseIndex(baseIndex: TimePointIndex | null): void {
 		this._visibleRangeInvalidated = true;
 		this._baseIndexOrNull = baseIndex;
 		this._correctOffset();
