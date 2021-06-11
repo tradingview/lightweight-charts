@@ -1,19 +1,34 @@
-function generateData() {
-	const res = [];
-	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (let i = 0; i < 3; ++i) {
-		res.push({
-			time: time.getTime() / 1000,
-			value: i * Math.random(),
-		});
-
-		time.setUTCDate(time.getUTCDate() + 1);
-	}
-
-	return res;
-}
-
 function runTestCase(container) {
+	const data1 = [
+		{
+			time: 1514764800,
+			value: 0,
+		},
+		{
+			time: 1514851200,
+			value: 0.29081914410775955,
+		},
+		{
+			time: 1514937600,
+			value: 1.6789955502713652,
+		},
+	];
+
+	const data2 = [
+		{
+			time: 1514764800,
+			value: 0,
+		},
+		{
+			time: 1514851200,
+			value: 0.7242371327593901,
+		},
+		{
+			time: 1514937600,
+			value: 0.3558113114519652,
+		},
+	];
+
 	const chart = LightweightCharts.createChart(container, {
 		width: 600,
 		height: 300,
@@ -23,8 +38,6 @@ function runTestCase(container) {
 		},
 	});
 
-	const data1 = generateData();
-	const data2 = generateData();
 	const series1 = chart.addLineSeries({ title: 'Series 1' });
 	const series2 = chart.addLineSeries({ title: 'Series 2' });
 
