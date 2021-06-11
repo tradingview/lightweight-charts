@@ -470,23 +470,51 @@ describe('DataLayer', () => {
 	});
 
 	describe('should update base index to null when all series data is cleared gh#757', () => {
-		function generateData(): LineData[] {
-			const res = [];
-			const time = new Date(Date.UTC(2021, 0, 1, 0, 0, 0, 0));
-
-			for (let i = 0; i < 10; i++) {
-				res.push({
-					time: time.getTime() / 1000 as UTCTimestamp,
-					value: Math.random() * 100,
-				});
-			}
-
-			return res;
-		}
+		const data: LineData[] = [
+			{
+				time: 1609459200 as UTCTimestamp,
+				value: 31.533026412262345,
+			},
+			{
+				time: 1609545600 as UTCTimestamp,
+				value: 6.568118452269189,
+			},
+			{
+				time: 1609632000 as UTCTimestamp,
+				value: 98.62539451897008,
+			},
+			{
+				time: 1609718400 as UTCTimestamp,
+				value: 46.767718860541606,
+			},
+			{
+				time: 1609804800 as UTCTimestamp,
+				value: 36.955748002496655,
+			},
+			{
+				time: 1609891200 as UTCTimestamp,
+				value: 85.96192548047124,
+			},
+			{
+				time: 1609977600 as UTCTimestamp,
+				value: 72.75990512152876,
+			},
+			{
+				time: 1610064000 as UTCTimestamp,
+				value: 2.993469032310503,
+			},
+			{
+				time: 1610150400 as UTCTimestamp,
+				value: 4.258319318756176,
+			},
+			{
+				time: 1610236800 as UTCTimestamp,
+				value: 60.0150296893859,
+			},
+		];
 
 		it('single series', () => {
 			const dataLayer = new DataLayer();
-			const data = generateData();
 			const series = createSeriesMock();
 
 			dataLayer.setSeriesData(series, data);
@@ -502,7 +530,6 @@ describe('DataLayer', () => {
 			const series = [];
 
 			for (let i = 0; i < seriesCount; i++) {
-				const data = generateData();
 				series[i] = createSeriesMock();
 				dataLayer.setSeriesData(series[i], data);
 			}
