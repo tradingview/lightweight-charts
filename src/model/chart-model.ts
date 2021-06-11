@@ -448,7 +448,7 @@ export class ChartModel implements IDestroyable {
 		this._crosshair.updateAllViews();
 	}
 
-	public updateTimeScale(newBaseIndex: TimePointIndex, newPoints?: readonly TimeScalePoint[]): void {
+	public updateTimeScale(newBaseIndex: TimePointIndex | null, newPoints?: readonly TimeScalePoint[]): void {
 		const oldFirstTime = this._timeScale.indexToTime(0 as TimePointIndex);
 
 		if (newPoints !== undefined) {
@@ -466,11 +466,11 @@ export class ChartModel implements IDestroyable {
 		if (visibleBars !== null && oldFirstTime !== null && newFirstTime !== null) {
 			const isLastSeriesBarVisible = visibleBars.contains(currentBaseIndex);
 			const isLeftBarShiftToLeft = oldFirstTime.timestamp > newFirstTime.timestamp;
-			const isSeriesPointsAdded = newBaseIndex > currentBaseIndex;
+			const isSeriesPointsAdded = newBaseIndex !== null && newBaseIndex > currentBaseIndex;
 			const isSeriesPointsAddedToRight = isSeriesPointsAdded && !isLeftBarShiftToLeft;
 
 			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && this._timeScale.options().shiftVisibleRangeOnNewBar;
-			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
+			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar && newBaseIndex !== null) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
 			}

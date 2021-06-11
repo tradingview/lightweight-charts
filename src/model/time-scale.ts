@@ -396,7 +396,7 @@ export class TimeScale {
 		this.setRightOffset(this._options.rightOffset);
 	}
 
-	public setBaseIndex(baseIndex: TimePointIndex): void {
+	public setBaseIndex(baseIndex: TimePointIndex | null): void {
 		this._visibleRangeInvalidated = true;
 		this._baseIndexOrNull = baseIndex;
 		this._correctOffset();
@@ -682,6 +682,8 @@ export class TimeScale {
 			this._rightOffset = minRightOffset;
 			this._visibleRangeInvalidated = true;
 		}
+
+		// console.log('min/max/actual right offset, base index: %o %o %o %o', minRightOffset, maxRightOffset, this._rightOffset, this._baseIndexOrNull);
 	}
 
 	private _minRightOffset(): number | null {
