@@ -426,6 +426,7 @@ describe('DataLayer', () => {
 			for (let i = 0; i < 10; ++i) {
 				const timestamp = time.getTime() / 1000;
 				res.push(dataItemAt(timestamp as UTCTimestamp));
+				time.setUTCDate(time.getUTCDate() + 1);
 			}
 
 			return res;
@@ -441,7 +442,7 @@ describe('DataLayer', () => {
 
 		const updateResult1 = dataLayer.setSeriesData(series1, []);
 
-		expect(updateResult1.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+		expect(updateResult1.timeScale.baseIndex).to.be.equal(9, 'expected base index to be 9');
 		expect(updateResult1.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
 		expect(updateResult1.series.has(series1)).to.be.equal(true, 'expected to contain series1');
 		expect(updateResult1.series.get(series1)?.data.length).to.be.equal(0, 'expected series1 data to be empty');
@@ -455,14 +456,14 @@ describe('DataLayer', () => {
 
 		const updateResult3 = dataLayer.setSeriesData(series1, data1);
 
-		expect(updateResult3.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
-		expect(updateResult3.timeScale.points?.length).to.be.equal(1, 'expected updated time scale points length to equal 1');
+		expect(updateResult3.timeScale.baseIndex).to.be.equal(9, 'expected base index to be 9');
+		expect(updateResult3.timeScale.points?.length).to.be.equal(10, 'expected updated time scale points length to equal 10');
 		expect(updateResult3.series.has(series1)).to.be.equal(true, 'expected to contain series1');
 		expect(updateResult3.series.get(series1)?.data.length).to.be.equal(data1.length, 'expected series1 data to be non-empty');
 
 		const updateResult4 = dataLayer.setSeriesData(series2, data2);
 
-		expect(updateResult4.timeScale.baseIndex).to.be.equal(0, 'expected base index to be 0');
+		expect(updateResult4.timeScale.baseIndex).to.be.equal(9, 'expected base index to be 9');
 		expect(updateResult4.timeScale.points).to.be.equal(undefined, 'expected updated time scale points to be undefined');
 		expect(updateResult4.series.has(series2)).to.be.equal(true, 'expected to contain series2');
 		expect(updateResult4.series.get(series2)?.data.length).to.be.equal(data2.length, 'expected series1 data to be non-empty');
