@@ -9,6 +9,7 @@ import {
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { BarsPaneViewBase } from './bars-pane-view-base';
+import { UpdateType } from './iupdatable-pane-view';
 
 export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', CandlestickItem> {
 	private readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
@@ -34,8 +35,12 @@ export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', 
 		return this._renderer;
 	}
 
-	protected _updatePoints(): void {
-		super._updatePoints();
+	public update(updateType: UpdateType): void {
+		super.update(updateType);
+
+		if (updateType !== 'options') {
+			return;
+		}
 
 		if (this._itemsVisibleRange === null) {
 			return;
