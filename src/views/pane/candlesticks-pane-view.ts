@@ -42,11 +42,11 @@ export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', 
 		}
 
 		for (let i = this._itemsVisibleRange.from; i < this._itemsVisibleRange.to; i++) {
-			const x = this._items[i];
-			const style = this._series.barColorer().barStyle(x.time);
-			x.color = style.barColor;
-			x.wickColor = style.barWickColor;
-			x.borderColor = style.barBorderColor;
+			const item = this._items[i];
+			const style = this._series.barColorer().barStyle(item.time);
+			item.color = style.barColor;
+			item.wickColor = style.barWickColor;
+			item.borderColor = style.barBorderColor;
 		}
 	}
 
