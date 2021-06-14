@@ -481,7 +481,7 @@ export class PaneWidget implements IDestroyable {
 		return this._canvasBinding.canvas;
 	}
 
-	public paint(type: number): void {
+	public paint(type: InvalidationLevel): void {
 		if (type === 0) {
 			return;
 		}

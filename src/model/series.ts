@@ -240,9 +240,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		// a series might affect crosshair by some options (like crosshair markers)
 		// that's why we need to update crosshair as well
 		this.model().updateCrosshair();
-
-		// we might be able to optimise this to only run if colors have changed?
-		this._paneView.update('data');
 	}
 
 	public clearData(): void {
