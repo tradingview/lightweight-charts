@@ -42,17 +42,12 @@ export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', 
 			return;
 		}
 
-		if (this._itemsVisibleRange === null) {
-			return;
-		}
-
-		for (let i = this._itemsVisibleRange.from; i < this._itemsVisibleRange.to; i++) {
-			const item = this._items[i];
+		this._items.forEach((item: CandlestickItem) => {
 			const style = this._series.barColorer().barStyle(item.time);
 			item.color = style.barColor;
 			item.wickColor = style.barWickColor;
 			item.borderColor = style.barBorderColor;
-		}
+		});
 	}
 
 	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer): CandlestickItem {
