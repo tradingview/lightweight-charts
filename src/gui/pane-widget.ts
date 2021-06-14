@@ -482,7 +482,7 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	public paint(type: InvalidationLevel): void {
-		if (type === 0) {
+		if (type === InvalidationLevel.None) {
 			return;
 		}
 
