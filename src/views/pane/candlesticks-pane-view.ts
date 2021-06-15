@@ -9,7 +9,6 @@ import {
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { BarsPaneViewBase } from './bars-pane-view-base';
-import { UpdateType } from './iupdatable-pane-view';
 
 export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', CandlestickItem> {
 	private readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
@@ -35,13 +34,7 @@ export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', 
 		return this._renderer;
 	}
 
-	public update(updateType: UpdateType): void {
-		super.update(updateType);
-
-		if (updateType !== 'options') {
-			return;
-		}
-
+	protected _updateOptions(): void {
 		this._items.forEach((item: CandlestickItem) => {
 			const style = this._series.barColorer().barStyle(item.time);
 			item.color = style.barColor;
