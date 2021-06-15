@@ -34,6 +34,8 @@ export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area', Item
 		};
 	}
 
+	protected _updateOptions(): void {}
+
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
 		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => {

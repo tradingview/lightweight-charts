@@ -80,6 +80,8 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._compositeRenderer.setRenderers([this._renderer]);
 	}
 
+	protected _updateOptions(): void {}
+
 	protected _clearVisibleRange(): void {
 		super._clearVisibleRange();
 
