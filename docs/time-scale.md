@@ -8,6 +8,7 @@ Time scale (or time axis) is a horizontal scale at the bottom of the chart that 
 |----------------------------|-------|-------|--|
 |`rightOffset`|`number`|`0`|Sets the margin space in bars from the right side of the chart|
 |`barSpacing`|`number`|`6`|Sets the space between bars in pixels|
+|`minBarSpacing`|`number`|`0.5`|Sets the min space between bars in pixels|
 |`fixLeftEdge`|`boolean`|`false`|If true, prevents scrolling to the left of the first historical bar|
 |`lockVisibleTimeRangeOnResize`|`boolean`|`false`|If true, prevents changing visible time area during chart resizing|
 |`rightBarStaysOnScroll`|`boolean`|`false`|If false, the hovered bar remains in the same place when scrolling|

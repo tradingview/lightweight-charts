@@ -30,7 +30,6 @@ import { TimeScaleVisibleRange } from './time-scale-visible-range';
 
 const enum Constants {
 	DefaultAnimationDuration = 400,
-	MinBarSpacing = 0.5,
 	// make sure that this (1 / MinVisibleBarsCount) >= coeff in max bar spacing
 	MinVisibleBarsCount = 2,
 }
@@ -68,6 +67,7 @@ export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType:
 export interface TimeScaleOptions {
 	rightOffset: number;
 	barSpacing: number;
+	minBarSpacing: number;
 	fixLeftEdge: boolean;
 	lockVisibleTimeRangeOnResize: boolean;
 	rightBarStaysOnScroll: boolean;
@@ -145,6 +145,12 @@ export class TimeScale {
 
 		if (options.rightOffset !== undefined) {
 			this._model.setRightOffset(options.rightOffset);
+		}
+
+		if (options.minBarSpacing !== undefined) {
+			// yes, if we apply min bar spacing then we need to correct bar spacing
+			// the easiest way is to apply it once again
+			this._model.setBarSpacing(options.barSpacing ?? this._barSpacing);
 		}
 
 		this._invalidateTickMarks();
@@ -652,8 +658,8 @@ export class TimeScale {
 	}
 
 	private _correctBarSpacing(): void {
-		if (this._barSpacing < Constants.MinBarSpacing) {
-			this._barSpacing = Constants.MinBarSpacing;
+		if (this._barSpacing < this._options.minBarSpacing) {
+			this._barSpacing = this._options.minBarSpacing;
 			this._visibleRangeInvalidated = true;
 		}
 
