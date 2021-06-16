@@ -681,6 +681,8 @@ export class TimeScale {
 	}
 
 	private _minBarSpacing(): number {
+		// if both options are enabled then limit bar spacing so that zooming-out is not possible
+		// if it would cause either the first or last points to move too far from an edge
 		if (this._options.fixLeftEdge && this._options.fixRightEdge) {
 			return this._width / this._points.length;
 		}
