@@ -230,11 +230,9 @@ export class TimeScale {
 	}
 
 	public logicalRangeForTimeRange(range: TimePointsRange): LogicalRange {
-		const timeScale = this._model.timeScale();
-
 		return {
-			from: ensureNotNull(timeScale.timeToIndex(range.from, true)) as number as Logical,
-			to: ensureNotNull(timeScale.timeToIndex(range.to, true)) as number as Logical,
+			from: ensureNotNull(this.timeToIndex(range.from, true)) as number as Logical,
+			to: ensureNotNull(this.timeToIndex(range.to, true)) as number as Logical,
 		};
 	}
 
@@ -294,7 +292,7 @@ export class TimeScale {
 
 		const baseIndex = this.baseIndex();
 		const deltaFromRight = baseIndex + this._rightOffset - index;
-		const coordinate = this._width - (deltaFromRight + 0.5) * this._barSpacing;
+		const coordinate = this._width - (deltaFromRight + 0.5) * this._barSpacing - 1;
 		return coordinate as Coordinate;
 	}
 
@@ -306,7 +304,7 @@ export class TimeScale {
 		for (let i = indexFrom; i < indexTo; i++) {
 			const index = points[i].time;
 			const deltaFromRight = baseIndex + this._rightOffset - index;
-			const coordinate = this._width - (deltaFromRight + 0.5) * this._barSpacing;
+			const coordinate = this._width - (deltaFromRight + 0.5) * this._barSpacing - 1;
 			points[i].x = coordinate as Coordinate;
 		}
 	}
@@ -611,7 +609,7 @@ export class TimeScale {
 	}
 
 	private _rightOffsetForCoordinate(x: Coordinate): number {
-		return (this._width + 1 - x) / this._barSpacing;
+		return (this._width - 1 - x) / this._barSpacing;
 	}
 
 	private _coordinateToFloatIndex(x: Coordinate): number {
