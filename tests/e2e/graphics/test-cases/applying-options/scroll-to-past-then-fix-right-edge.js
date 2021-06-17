@@ -17,12 +17,18 @@ function runTestCase(container) {
 
 	const mainSeries = chart.addLineSeries();
 	mainSeries.setData(generateData());
-	chart.timeScale().scrollToPosition(-5, false);
+	chart.timeScale().setVisibleLogicalRange({
+		from: -10,
+		to: 19,
+	});
 
 	return new Promise(resolve => {
 		setTimeout(() => {
-			chart.timeScale().applyOptions({ fixRightEdge: true });
+			chart.timeScale().applyOptions({
+				fixRightEdge: true,
+			});
+
 			resolve();
-		}, 500);
+		}, 100);
 	});
 }

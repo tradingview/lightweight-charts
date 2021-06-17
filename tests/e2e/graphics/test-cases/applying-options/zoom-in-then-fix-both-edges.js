@@ -30,6 +30,6 @@ function runTestCase(container) {
 				fixLeftEdge: true,
 			});
 			resolve();
-		}, 500);
+		}, 100);
 	});
 }

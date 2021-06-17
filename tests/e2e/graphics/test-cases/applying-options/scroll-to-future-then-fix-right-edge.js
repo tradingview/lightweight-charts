@@ -17,16 +17,22 @@ function runTestCase(container) {
 
 	const mainSeries = chart.addLineSeries();
 	mainSeries.setData(generateData());
-	chart.timeScale().scrollToPosition(10, false);
+	chart.timeScale().setVisibleLogicalRange({
+		from: 0,
+		to: 30,
+	});
 
 	return new Promise(resolve => {
 		setTimeout(() => {
 			chart.timeScale().applyOptions({ fixRightEdge: true });
 
 			setTimeout(() => {
-				chart.timeScale().scrollToPosition(10, false);
+				chart.timeScale().setVisibleLogicalRange({
+					from: 0,
+					to: 30,
+				});
 				resolve();
-			}, 500);
-		}, 500);
+			}, 100);
+		}, 100);
 	});
 }
