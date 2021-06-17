@@ -17,13 +17,12 @@ function runTestCase(container) {
 
 	const mainSeries = chart.addLineSeries();
 	mainSeries.setData(generateData());
-
-	chart.timeScale().applyOptions({
-		fixLeftEdge: true,
-		fixRightEdge: true,
-	});
+	chart.timeScale().scrollToPosition(-5, false);
 
 	return new Promise(resolve => {
-		setTimeout(() => resolve(), 1000);
+		setTimeout(() => {
+			chart.timeScale().applyOptions({ fixRightEdge: true });
+			resolve();
+		}, 500);
 	});
 }

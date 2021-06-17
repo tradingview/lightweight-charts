@@ -13,19 +13,23 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(
-		container,
-		{ timeScale: { rightOffset: 2, barSpacing: 40 } }
-	);
+	const chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addLineSeries();
 	mainSeries.setData(generateData());
 
-	chart.timeScale().applyOptions({
-		fixRightEdge: true,
+	chart.timeScale().setVisibleLogicalRange({
+		from: 9,
+		to: 11,
 	});
 
 	return new Promise(resolve => {
-		setTimeout(() => resolve(), 1000);
+		setTimeout(() => {
+			chart.timeScale().applyOptions({
+				fixRightEdge: true,
+				fixLeftEdge: true,
+			});
+			resolve();
+		}, 500);
 	});
 }
