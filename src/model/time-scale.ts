@@ -69,6 +69,7 @@ export interface TimeScaleOptions {
 	barSpacing: number;
 	minBarSpacing: number;
 	fixLeftEdge: boolean;
+	fixRightEdge: boolean;
 	lockVisibleTimeRangeOnResize: boolean;
 	rightBarStaysOnScroll: boolean;
 	borderVisible: boolean;
@@ -135,6 +136,10 @@ export class TimeScale {
 
 		if (this._options.fixLeftEdge) {
 			this._doFixLeftEdge();
+		}
+
+		if (this._options.fixRightEdge) {
+			this._doFixRightEdge();
 		}
 
 		// note that bar spacing should be applied before right offset
@@ -656,8 +661,10 @@ export class TimeScale {
 	}
 
 	private _correctBarSpacing(): void {
-		if (this._barSpacing < this._options.minBarSpacing) {
-			this._barSpacing = this._options.minBarSpacing;
+		const minBarSpacing = this._minBarSpacing();
+
+		if (this._barSpacing < minBarSpacing) {
+			this._barSpacing = minBarSpacing;
 			this._visibleRangeInvalidated = true;
 		}
 
@@ -669,6 +676,16 @@ export class TimeScale {
 				this._visibleRangeInvalidated = true;
 			}
 		}
+	}
+
+	private _minBarSpacing(): number {
+		// if both options are enabled then limit bar spacing so that zooming-out is not possible
+		// if it would cause either the first or last points to move too far from an edge
+		if (this._options.fixLeftEdge && this._options.fixRightEdge) {
+			return this._width / this._points.length;
+		}
+
+		return this._options.minBarSpacing;
 	}
 
 	private _correctOffset(): void {
@@ -703,7 +720,9 @@ export class TimeScale {
 	}
 
 	private _maxRightOffset(): number {
-		return (this._width / this._barSpacing) - Math.min(Constants.MinVisibleBarsCount, this._points.length);
+		return this._options.fixRightEdge
+			? 0
+			: (this._width / this._barSpacing) - Math.min(Constants.MinVisibleBarsCount, this._points.length);
 	}
 
 	private _saveCommonTransitionsStartState(): void {
@@ -817,5 +836,13 @@ export class TimeScale {
 			const leftEdgeOffset = this._rightOffset - delta - 1;
 			this.setRightOffset(leftEdgeOffset);
 		}
+
+		this._correctBarSpacing();
+	}
+
+	private _doFixRightEdge(): void {
+		this._correctOffset();
+
+		this._correctBarSpacing();
 	}
 }
