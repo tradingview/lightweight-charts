@@ -843,9 +843,7 @@ export class TimeScale {
 	}
 
 	private _doFixRightEdge(): void {
-		if (this._rightOffset > 0) {
-			this.setRightOffset(0);
-		}
+		this._correctOffset();
 
 		this._correctBarSpacing();
 	}
