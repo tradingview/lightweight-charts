@@ -51,10 +51,6 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.formatter();
 	}
 
-	public series(): Series<TSeriesType> {
-		return this._series;
-	}
-
 	public priceToCoordinate(price: number): Coordinate | null {
 		const firstValue = this._series.firstValue();
 		if (firstValue === null) {
