@@ -1,8 +1,11 @@
+/// <reference types="_resize-observer" />
+
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
+import { warn } from '../helpers/logger';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
@@ -20,6 +23,7 @@ import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
 import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from './canvas-utils';
+import { InternalLayoutSizeHints, InternalLayoutSizeHintsKeepOdd } from './internal-layout-sizes-hints';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -52,8 +56,13 @@ export class ChartWidget implements IDestroyable {
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
+	private _observer: ResizeObserver | null = null;
+	private _sizingHints: InternalLayoutSizeHints = new InternalLayoutSizeHintsKeepOdd();
+
+	private _container: HTMLElement;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
+		this._container = container;
 		this._options = options;
 
 		this._element = document.createElement('div');
@@ -79,29 +88,25 @@ export class ChartWidget implements IDestroyable {
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
 
+		const usedObserver = options.autoSize && this._installObserver();
+
+		// observer could not fire event immediately for some cases
+		// so we have to set initial size manually
 		let width = this._options.width;
 		let height = this._options.height;
-
-		if (width === 0 || height === 0) {
+		// ignore width/height options if observer has actually been used
+		// however respect options if installing resize observer failed
+		if (usedObserver || width === 0 || height === 0) {
 			const containerRect = container.getBoundingClientRect();
-			// TODO: Fix it better
-			// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
-			// For chart widget we decreases because we must be inside container.
-			// For time axis this is not important, since it just affects space for pane widgets
-			if (width === 0) {
-				width = Math.floor(containerRect.width);
-				width -= width % 2;
-			}
-
-			if (height === 0) {
-				height = Math.floor(containerRect.height);
-				height -= height % 2;
-			}
+			width = width || containerRect.width;
+			height = height || containerRect.height;
 		}
 
 		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
 		// or after but with adjustSize to properly update time scale
-		this.resize(width, height);
+		if (!usedObserver) {
+			this.resize(width, height);
+		}
 
 		this._syncGuiWithModel();
 
@@ -154,6 +159,8 @@ export class ChartWidget implements IDestroyable {
 
 		this._crosshairMoved.destroy();
 		this._clicked.destroy();
+
+		this._uninstallObserver();
 	}
 
 	public resize(width: number, height: number, forceRepaint: boolean = false): void {
@@ -161,11 +168,13 @@ export class ChartWidget implements IDestroyable {
 			return;
 		}
 
-		this._height = height;
-		this._width = width;
+		const sizeHint = this._sizingHints.suggestChartSize(new Size(width, height));
 
-		const heightStr = height + 'px';
-		const widthStr = width + 'px';
+		this._height = sizeHint.h;
+		this._width = sizeHint.w;
+
+		const heightStr = this._height + 'px';
+		const widthStr = this._width + 'px';
 
 		ensureNotNull(this._element).style.height = heightStr;
 		ensureNotNull(this._element).style.width = widthStr;
@@ -196,10 +205,21 @@ export class ChartWidget implements IDestroyable {
 		this._model.applyOptions(options);
 		this._updateTimeAxisVisibility();
 
-		const width = options.width || this._width;
-		const height = options.height || this._height;
+		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {
+			warn(`You should turn autoSize off explicitly before specifying sizes; try adding options.autoSize: false to new options`);
+			return;
+		}
+		if (options.autoSize && !this._observer) {
+			// installing observer will override resize if successfull
+			this._installObserver();
+		}
 
-		this.resize(width, height);
+		if (!options.autoSize && this._observer !== null) {
+			this._uninstallObserver();
+			if (options.width !== undefined && options.height !== undefined) {
+				this.resize(options.width, options.height);
+			}
+		}
 	}
 
 	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
@@ -318,7 +338,6 @@ export class ChartWidget implements IDestroyable {
 		return ensureNotNull(priceAxisWidget).getWidth();
 	}
 
-	// eslint-disable-next-line complexity
 	private _adjustSizeImpl(): void {
 		let totalStretch = 0;
 		let leftPriceAxisWidth = 0;
@@ -331,9 +350,11 @@ export class ChartWidget implements IDestroyable {
 			if (this._isRightAxisVisible()) {
 				rightPriceAxisWidth = Math.max(rightPriceAxisWidth, ensureNotNull(paneWidget.rightPriceAxisWidget()).optimalWidth());
 			}
-
 			totalStretch += paneWidget.stretchFactor();
 		}
+
+		leftPriceAxisWidth = this._sizingHints.suggestPriceScaleWidth(leftPriceAxisWidth);
+		rightPriceAxisWidth = this._sizingHints.suggestPriceScaleWidth(rightPriceAxisWidth);
 
 		const width = this._width;
 		const height = this._height;
@@ -343,12 +364,8 @@ export class ChartWidget implements IDestroyable {
 		// const separatorCount = this._paneSeparators.length;
 		// const separatorHeight = SEPARATOR_HEIGHT;
 		const separatorsHeight = 0; // separatorHeight * separatorCount;
-		let timeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
-		// TODO: Fix it better
-		// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
-		if (timeAxisHeight % 2) {
-			timeAxisHeight += 1;
-		}
+		const originalTimeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
+		const timeAxisHeight = this._sizingHints.suggestTimeScaleHeight(originalTimeAxisHeight);
 		const otherWidgetHeight = separatorsHeight + timeAxisHeight;
 		const totalPaneHeight = height < otherWidgetHeight ? 0 : height - otherWidgetHeight;
 		const stretchPixels = totalPaneHeight / totalStretch;
@@ -384,8 +401,11 @@ export class ChartWidget implements IDestroyable {
 			}
 		}
 
+		// we need this to avoid rounding error while calculating with stretchFactor
+		const actualTimeAxisHeight = Math.max(0, height - accumulatedHeight - separatorsHeight);
+
 		this._timeAxisWidget.setSizes(
-			new Size(paneWidth, timeAxisHeight),
+			new Size(paneWidth, actualTimeAxisHeight),
 			leftPriceAxisWidth,
 			rightPriceAxisWidth
 		);
@@ -632,6 +652,30 @@ export class ChartWidget implements IDestroyable {
 
 	private _isRightAxisVisible(): boolean {
 		return this._options.rightPriceScale.visible;
+	}
+
+	private _installObserver(): boolean {
+		// eslint-disable-next-line no-restricted-syntax
+		if (!('ResizeObserver' in window)) {
+			warn('Options contains "autoSize" flag, but the browser does not support ResizeObserver feature. Please provide polyfill.');
+			return false;
+		} else {
+			this._observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+				const containerEntry = entries.find((entry: ResizeObserverEntry) => entry.target === this._container);
+				if (!containerEntry) {
+					return;
+				}
+				this.resize(containerEntry.contentRect.width, containerEntry.contentRect.height);
+			});
+			this._observer.observe(this._container, { box: 'border-box' });
+			return true;
+		}
+	}
+
+	private _uninstallObserver(): void {
+		if (this._observer !== null) {
+			this._observer.disconnect();
+		}
 	}
 }
 
