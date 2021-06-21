@@ -6,10 +6,16 @@ import { CanvasCtxLike, TextWidthCache } from '../../src/model/text-width-cache'
 class FakeCtx implements CanvasCtxLike {
 	public readonly invocations: string[] = [];
 
+	public textBaseline: CanvasTextBaseline = 'alphabetic';
+
 	public measureText(text: string): TextMetrics {
 		this.invocations.push(text);
 		return { width: this._impl(text) } as unknown as TextMetrics;
 	}
+
+	public save(): void {}
+
+	public restore(): void {}
 
 	protected _impl(text: string): number {
 		let fakeWidth = 0;

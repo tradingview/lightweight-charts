@@ -2,7 +2,7 @@ import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate
 
 import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
-import { makeFont } from '../helpers/make-font';
+import { fontSizeToPixels, makeFont } from '../helpers/make-font';
 
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
@@ -19,7 +19,7 @@ import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
 
 const enum Constants {
 	BorderSize = 1,
-	TickLength = 3,
+	TickLength = 5,
 }
 
 const enum CursorType {
@@ -220,7 +220,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			// rendererOptions.offsetSize +
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
-			rendererOptions.fontSize +
+			fontSizeToPixels(rendererOptions.fontSize) +
 			rendererOptions.paddingTop +
 			rendererOptions.paddingBottom
 		);
@@ -306,16 +306,15 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const rendererOptions = this._getRendererOptions();
 		const yText = (
 			rendererOptions.borderSize +
-			rendererOptions.tickLength +
 			rendererOptions.paddingTop +
-			rendererOptions.fontSize -
+			rendererOptions.tickLength +
+			fontSizeToPixels(rendererOptions.fontSize) -
 			rendererOptions.baselineOffset
 		);
 
 		ctx.textAlign = 'center';
 		ctx.fillStyle = this._lineColor();
 
-		const borderSize = Math.floor(this._getRendererOptions().borderSize * pixelRatio);
 		const tickWidth = Math.max(1, Math.floor(pixelRatio));
 		const tickOffset = Math.floor(pixelRatio * 0.5);
 
@@ -324,7 +323,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			const tickLen = Math.round(rendererOptions.tickLength * pixelRatio);
 			for (let index = tickMarks.length; index--;) {
 				const x = Math.round(tickMarks[index].coord * pixelRatio);
-				ctx.rect(x - tickOffset, borderSize, tickWidth, tickLen);
+				ctx.rect(x - tickOffset, 0, tickWidth, tickLen);
 			}
 
 			ctx.fill();
@@ -396,6 +395,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				fontSize: NaN,
 				font: '',
 				widthCache: new TextWidthCache(),
+				labelBottomOffset: 0,
 			};
 		}
 
@@ -406,10 +406,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			const fontSize = this._fontSize();
 			rendererOptions.fontSize = fontSize;
 			rendererOptions.font = newFont;
-			rendererOptions.paddingTop = Math.ceil(fontSize / 2.5);
-			rendererOptions.paddingBottom = rendererOptions.paddingTop;
+			rendererOptions.paddingTop = Math.ceil(fontSize / 3) - 1;
+			rendererOptions.paddingBottom = Math.ceil(fontSize / 3) + 5;
 			rendererOptions.paddingHorizontal = Math.ceil(fontSize / 2);
-			rendererOptions.baselineOffset = Math.round(this._fontSize() / 5);
+			rendererOptions.baselineOffset = 0;
+			rendererOptions.labelBottomOffset = Math.ceil(fontSize / 3) - 1;
 			rendererOptions.widthCache.reset();
 		}
 

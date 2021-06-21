@@ -31,6 +31,10 @@ const enum CursorType {
 
 type IPriceAxisViewArray = readonly IPriceAxisView[];
 
+const enum Constants {
+	LabelOffset = 4,
+}
+
 export class PriceAxisWidget implements IDestroyable {
 	private readonly _pane: PaneWidget;
 	private readonly _options: LayoutOptions;
@@ -204,7 +208,8 @@ export class PriceAxisWidget implements IDestroyable {
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
-			tickMarkMaxWidth
+			tickMarkMaxWidth +
+			Constants.LabelOffset
 		);
 		// make it even
 		res += res % 2;
@@ -422,8 +427,8 @@ export class PriceAxisWidget implements IDestroyable {
 		const drawTicks = this._priceScale.options().borderVisible && this._priceScale.options().drawTicks;
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
-			Math.floor(rendererOptions.borderSize * pixelRatio);
+			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio) :
+			0;
 
 		const textLeftX = this._isLeft ?
 			Math.round(tickMarkLeftX - rendererOptions.paddingInner * pixelRatio) :

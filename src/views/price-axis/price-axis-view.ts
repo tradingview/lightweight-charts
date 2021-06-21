@@ -15,6 +15,8 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		coordinate: 0,
 		color: '#FFF',
 		background: '#000',
+		additionalPaddingBottom: 0,
+		additionalPaddingTop: 0,
 	};
 
 	private readonly _axisRendererData: PriceAxisViewRendererData = {
@@ -23,6 +25,9 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		tickVisible: true,
 		moveTextToInvisibleTick: false,
 		borderColor: '',
+		color: '#FFF',
+		borderVisible: false,
+		separatorVisible: false,
 	};
 
 	private readonly _paneRendererData: PriceAxisViewRendererData = {
@@ -31,6 +36,9 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		tickVisible: false,
 		moveTextToInvisibleTick: true,
 		borderColor: '',
+		color: '#FFF',
+		borderVisible: true,
+		separatorVisible: true,
 	};
 
 	private readonly _axisRenderer: IPriceAxisViewRenderer;

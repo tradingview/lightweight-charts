@@ -67,11 +67,11 @@ export class LabelsImageCache implements IDestroyable {
 
 			const pixelRatio = getCanvasDevicePixelRatio(ctx.canvas);
 
-			const margin = Math.ceil(this._fontSize / 4.5);
 			const baselineOffset = Math.round(this._fontSize / 10);
 			const textWidth = Math.ceil(this._textWidthCache.measureText(ctx, text));
-			const width = ceiledEven(Math.round(textWidth + margin * 2));
-			const height = ceiledEven(this._fontSize + margin * 2);
+			// small reserve for antialiasing, measureText is not sharp
+			const width = ceiledEven(Math.round(textWidth) + 4);
+			const height = ceiledEven(this._fontSize);
 			const canvas = createPreconfiguredCanvas(document, new Size(width, height));
 
 			// Allocate new
@@ -92,7 +92,7 @@ export class LabelsImageCache implements IDestroyable {
 			drawScaled(ctx, pixelRatio, () => {
 				ctx.font = this._font;
 				ctx.fillStyle = this._color;
-				ctx.fillText(text, 0, height - margin - baselineOffset);
+				ctx.fillText(text, 0, height - baselineOffset);
 			});
 		}
 

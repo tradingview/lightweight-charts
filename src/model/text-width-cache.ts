@@ -1,71 +1,69 @@
-export type CanvasCtxLike = Pick<CanvasRenderingContext2D, 'measureText'>;
+import { ensureDefined } from '../helpers/assertions';
+
+export type CanvasCtxLike = Pick<CanvasRenderingContext2D, 'measureText' | 'save' | 'restore' | 'textBaseline'>;
 
 const defaultReplacementRe = /[2-9]/g;
 
 export class TextWidthCache {
-	private _cache: Map<string, number> = new Map();
-	/** A "cyclic buffer" of cache keys */
-	private _keys: (string | undefined)[];
-	/** Current index in the "cyclic buffer" */
-	private _keysIndex: number = 0;
+	private readonly _maxSize: number;
+	private _actualSize: number = 0;
+	private _usageTick: number = 1;
+	private _oldestTick: number = 1;
+	private _tick2Labels: Record<number, string> = {};
+	private _cache: Map<string, { metrics: TextMetrics; tick: number }> = new Map();
 
 	public constructor(size: number = 50) {
-		// A trick to keep array PACKED_ELEMENTS
-		this._keys = Array.from(new Array(size));
+		this._maxSize = size;
 	}
 
 	public reset(): void {
+		this._actualSize = 0;
 		this._cache.clear();
-		this._keys.fill(undefined);
-		// We don't care where exactly the _keysIndex points,
-		// so there's no point in resetting it
+		this._usageTick = 1;
+		this._oldestTick = 1;
+		this._tick2Labels = {};
 	}
 
 	public measureText(ctx: CanvasCtxLike, text: string, optimizationReplacementRe?: RegExp): number {
+		return this._getMetrics(ctx, text, optimizationReplacementRe).width;
+	}
+
+	public yMidCorrection(ctx: CanvasCtxLike, text: string, optimizationReplacementRe?: RegExp): number {
+		const metrics = this._getMetrics(ctx, text, optimizationReplacementRe);
+		// if actualBoundingBoxAscent/actualBoundingBoxDescent are not supported we use 0 as a fallback
+		return ((metrics.actualBoundingBoxAscent || 0) - (metrics.actualBoundingBoxDescent || 0)) / 2;
+	}
+
+	private _getMetrics(ctx: CanvasCtxLike, text: string, optimizationReplacementRe?: RegExp): TextMetrics {
 		const re = optimizationReplacementRe || defaultReplacementRe;
 		const cacheString = String(text).replace(re, '0');
 
-		let width = this._cache.get(cacheString);
-
-		if (width === undefined) {
-			width = ctx.measureText(cacheString).width;
-
-			if (width === 0 && text.length !== 0) {
-				// measureText can return 0 in FF depending on a canvas size, don't cache it
-				return 0;
-			}
-
-			// A cyclic buffer is used to keep track of the cache keys and to delete
-			// the oldest one before a new one is inserted.
-			// ├──────┬──────┬──────┬──────┤
-			// │ foo  │ bar  │      │      │
-			// ├──────┴──────┴──────┴──────┤
-			//                 ↑ index
-
-			// Eventually, the index reach the end of an array and roll-over to 0.
-			// ├──────┬──────┬──────┬──────┤
-			// │ foo  │ bar  │ baz  │ quux │
-			// ├──────┴──────┴──────┴──────┤
-			//   ↑ index = 0
-
-			// After that the oldest value will be overwritten.
-			// ├──────┬──────┬──────┬──────┤
-			// │ WOOT │ bar  │ baz  │ quux │
-			// ├──────┴──────┴──────┴──────┤
-			//          ↑ index = 1
-
-			const oldestKey = this._keys[this._keysIndex];
-			if (oldestKey !== undefined) {
-				this._cache.delete(oldestKey);
-			}
-			// Set a newest key in place of the just deleted one
-			this._keys[this._keysIndex] = cacheString;
-			// Advance the index so it always points the oldest value
-			this._keysIndex = (this._keysIndex + 1) % this._keys.length;
-
-			this._cache.set(cacheString, width);
+		if (this._cache.has(cacheString)) {
+			return ensureDefined(this._cache.get(cacheString)).metrics;
 		}
 
-		return width;
+		if (this._actualSize === this._maxSize) {
+			const oldestValue = this._tick2Labels[this._oldestTick];
+			delete this._tick2Labels[this._oldestTick];
+			this._cache.delete(oldestValue);
+			this._oldestTick++;
+			this._actualSize--;
+		}
+
+		ctx.save();
+		ctx.textBaseline = 'middle';
+		const metrics = ctx.measureText(cacheString);
+		ctx.restore();
+
+		if (metrics.width === 0 && !!text.length) {
+			// measureText can return 0 in FF depending on a canvas size, don't cache it
+			return metrics;
+		}
+
+		this._cache.set(cacheString, { metrics: metrics, tick: this._usageTick });
+		this._tick2Labels[this._usageTick] = cacheString;
+		this._actualSize++;
+		this._usageTick++;
+		return metrics;
 	}
 }
