@@ -15,15 +15,15 @@ function getCurrentVersion() {
 
 const currentVersion = getCurrentVersion();
 
-function getConfig(inputFile, type, isProd) {
-	const isModular = type === 'module';
-	const suffix = isModular ? 'esm' : 'standalone';
+function getConfig(inputFile, format, isProd) {
+	const isStandalone = format === 'iife';
+	const suffix = isStandalone ? 'standalone' : format;
 	const mode = isProd ? 'production' : 'development';
 
 	const config = {
 		input: inputFile,
 		output: {
-			format: isModular ? 'esm' : 'iife',
+			format: format,
 			file: `./dist/lightweight-charts.${suffix}.${mode}.js`,
 			banner: `
 /*!
@@ -50,28 +50,30 @@ function getConfig(inputFile, type, isProd) {
 					inline_script: true,
 				},
 				mangle: {
-					module: (type === 'module'),
+					module: !isStandalone,
 					properties: {
 						regex: /^_(private|internal)_/,
 					},
 				},
 			}),
 		],
-		external: id => isModular && /^fancy-canvas(\/.+)?$/.test(id),
+		external: id => !isStandalone && /^fancy-canvas(\/.+)?$/.test(id),
 	};
 
 	return config;
 }
 
 const configs = [
-	getConfig('./lib/prod/src/index.js', 'module', false),
-	getConfig('./lib/prod/src/standalone.js', 'standalone', false),
+	getConfig('./lib/prod/src/index.js', 'esm', false),
+	getConfig('./lib/prod/src/index.js', 'cjs', false),
+	getConfig('./lib/prod/src/standalone.js', 'iife', false),
 ];
 
 if (process.env.NODE_ENV === 'production') {
 	configs.push(
-		getConfig('./lib/prod/src/index.js', 'module', true),
-		getConfig('./lib/prod/src/standalone.js', 'standalone', true)
+		getConfig('./lib/prod/src/index.js', 'esm', true),
+		getConfig('./lib/prod/src/index.js', 'cjs', true),
+		getConfig('./lib/prod/src/standalone.js', 'iife', true)
 	);
 }
 

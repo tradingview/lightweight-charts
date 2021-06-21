@@ -27,6 +27,12 @@ The size of the library is close to static images but if you have dozens of imag
 
 ## Installing
 
+### Development builds
+
+By default [`package.json`](./package.json) file has "production" build in `main` and `module` fields.
+
+If you'd like to use debug builds instead (suitable while debugging), see [this doc](./docs/debug-mode.md).
+
 ### es6 via npm
 
 ```bash

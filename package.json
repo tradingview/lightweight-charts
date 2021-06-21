@@ -13,11 +13,10 @@
     "url": "https://github.com/tradingview/lightweight-charts.git"
   },
   "module": "dist/lightweight-charts.esm.production.js",
-  "main": "index.js",
+  "main": "dist/lightweight-charts.cjs.production.js",
   "typings": "dist/typings.d.ts",
   "files": [
-    "dist/**",
-    "index.js"
+    "dist/**"
   ],
   "keywords": [
     "financial-charting-library",

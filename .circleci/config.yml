@@ -124,6 +124,16 @@ jobs:
       - run: npm run lint:md
       - run: npm run check-markdown-links
 
+  usable-in-nodejs:
+    executor: node-latest-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run:
+          name: "Check CJS could be imported in NodeJS"
+          command: node -e "require('.')"
+
   unittests:
     executor: node-latest-executor
     environment:
@@ -237,6 +247,10 @@ workflows:
             - install-deps
 
       - size-limit:
+          filters: *default-filters
+          requires:
+            - build
+      - usable-in-nodejs:
           filters: *default-filters
           requires:
             - build
