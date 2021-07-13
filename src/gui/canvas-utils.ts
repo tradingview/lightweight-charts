@@ -1,4 +1,4 @@
-import { Binding as CanvasCoordinateSpaceBinding, bindToDevicePixelRatio } from 'fancy-canvas/coordinate-space';
+import { bindCanvasElementBitmapSizeTo, CanvasElementBitmapSizeBinding } from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
 
@@ -46,13 +46,13 @@ export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvas
 	return canvas;
 }
 
-export function createBoundCanvas(parentElement: HTMLElement, size: Size): CanvasCoordinateSpaceBinding {
+export function createBoundCanvas(parentElement: HTMLElement, size: Size): CanvasElementBitmapSizeBinding {
 	const doc = ensureNotNull(parentElement.ownerDocument);
 	const canvas = doc.createElement('canvas');
 	parentElement.appendChild(canvas);
 
-	const binding = bindToDevicePixelRatio(canvas);
-	binding.resizeCanvas({
+	const binding = bindCanvasElementBitmapSizeTo(canvas, { type: 'device-pixel-content-box' });
+	binding.resizeCanvasElement({
 		width: size.w,
 		height: size.h,
 	});

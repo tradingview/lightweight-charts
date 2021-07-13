@@ -1,4 +1,4 @@
-import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+import { CanvasElementBitmapSizeBinding } from 'fancy-canvas';
 
 import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
@@ -41,8 +41,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _rightStubCell: HTMLElement;
 	private readonly _cell: HTMLElement;
 	private readonly _dv: HTMLElement;
-	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
-	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
+	private readonly _topCanvasBinding: CanvasElementBitmapSizeBinding;
 	private _leftStub: PriceAxisStub | null = null;
 	private _rightStub: PriceAxisStub | null = null;
 	private readonly _mouseEventHandler: MouseEventHandler;
@@ -76,16 +76,16 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._cell.appendChild(this._dv);
 
 		this._canvasBinding = createBoundCanvas(this._dv, new Size(16, 16));
-		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
-		const canvas = this._canvasBinding.canvas;
+		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		const canvas = this._canvasBinding.canvasElement;
 		canvas.style.position = 'absolute';
 		canvas.style.zIndex = '1';
 		canvas.style.left = '0';
 		canvas.style.top = '0';
 
 		this._topCanvasBinding = createBoundCanvas(this._dv, new Size(16, 16));
-		this._topCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
-		const topCanvas = this._topCanvasBinding.canvas;
+		this._topCanvasBinding.subscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
 		topCanvas.style.zIndex = '2';
 		topCanvas.style.left = '0';
@@ -99,7 +99,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._chart.model().priceScalesOptionsChanged().subscribe(this._recreateStubs.bind(this), this);
 
 		this._mouseEventHandler = new MouseEventHandler(
-			this._topCanvasBinding.canvas,
+			this._topCanvasBinding.canvasElement,
 			this,
 			{
 				treatVertTouchDragAsPageScroll: true,
@@ -117,11 +117,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._rightStub.destroy();
 		}
 
-		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
-		this._topCanvasBinding.destroy();
+		this._topCanvasBinding.unsubscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		this._topCanvasBinding.dispose();
 
-		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
-		this._canvasBinding.destroy();
+		this._canvasBinding.unsubscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.dispose();
 	}
 
 	public getElement(): HTMLElement {
@@ -207,8 +207,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		if (!this._size || !this._size.equals(timeAxisSize)) {
 			this._size = timeAxisSize;
 
-			this._canvasBinding.resizeCanvas({ width: timeAxisSize.w, height: timeAxisSize.h });
-			this._topCanvasBinding.resizeCanvas({ width: timeAxisSize.w, height: timeAxisSize.h });
+			this._canvasBinding.resizeCanvasElement({ width: timeAxisSize.w, height: timeAxisSize.h });
+			this._topCanvasBinding.resizeCanvasElement({ width: timeAxisSize.w, height: timeAxisSize.h });
 
 			this._cell.style.width = timeAxisSize.w + 'px';
 			this._cell.style.height = timeAxisSize.h + 'px';
@@ -242,7 +242,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	public getImage(): HTMLCanvasElement {
-		return this._canvasBinding.canvas;
+		return this._canvasBinding.canvasElement;
 	}
 
 	public paint(type: InvalidationLevel): void {
@@ -251,11 +251,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getContext2D(this._canvasBinding.canvas);
-			this._drawBackground(ctx, this._canvasBinding.pixelRatio);
-			this._drawBorder(ctx, this._canvasBinding.pixelRatio);
+			const ctx = getContext2D(this._canvasBinding.canvasElement);
+			const canvasPixelRatio = this._canvasBinding.bitmapSize.width / this._canvasBinding.canvasElementClientSize.width;
+			this._drawBackground(ctx, canvasPixelRatio);
+			this._drawBorder(ctx, canvasPixelRatio);
 
-			this._drawTickMarks(ctx, this._canvasBinding.pixelRatio);
+			this._drawTickMarks(ctx, canvasPixelRatio);
 			// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
 			// so let's don't call this code at all for now
 			// this._drawLabels(this._chart.model().dataSources(), ctx, pixelRatio);
@@ -268,11 +269,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			}
 		}
 
-		const topCtx = getContext2D(this._topCanvasBinding.canvas);
-		const pixelRatio = this._topCanvasBinding.pixelRatio;
+		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
+		const topCanvasPixelRatio = this._topCanvasBinding.bitmapSize.width / this._topCanvasBinding.canvasElementClientSize.width;
 
-		topCtx.clearRect(0, 0, Math.ceil(this._size.w * pixelRatio), Math.ceil(this._size.h * pixelRatio));
-		this._drawLabels([this._chart.model().crosshairSource()], topCtx, pixelRatio);
+		topCtx.clearRect(0, 0, Math.ceil(this._size.w * topCanvasPixelRatio), Math.ceil(this._size.h * topCanvasPixelRatio));
+		this._drawLabels([this._chart.model().crosshairSource()], topCtx, topCanvasPixelRatio);
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
@@ -476,6 +477,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
-	private readonly _canvasConfiguredHandler = () => this._chart.model().lightUpdate();
-	private readonly _topCanvasConfiguredHandler = () => this._chart.model().lightUpdate();
+	private readonly _canvasBitmapSizeChangedHandler = () => this._chart.model().lightUpdate();
+	private readonly _topCanvasBitmapSizeChangedHandler = () => this._chart.model().lightUpdate();
 }

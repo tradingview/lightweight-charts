@@ -1,4 +1,4 @@
-import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+import { CanvasElementBitmapSizeBinding } from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-helpers';
@@ -42,8 +42,8 @@ export class PriceAxisWidget implements IDestroyable {
 	private _size: Size | null = null;
 
 	private readonly _cell: HTMLDivElement;
-	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
-	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
+	private readonly _topCanvasBinding: CanvasElementBitmapSizeBinding;
 
 	private _updateTimeout: TimerId | null = null;
 	private _mouseEventHandler: MouseEventHandler;
@@ -70,16 +70,16 @@ export class PriceAxisWidget implements IDestroyable {
 		this._cell.style.position = 'relative';
 
 		this._canvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
-		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
-		const canvas = this._canvasBinding.canvas;
+		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		const canvas = this._canvasBinding.canvasElement;
 		canvas.style.position = 'absolute';
 		canvas.style.zIndex = '1';
 		canvas.style.left = '0';
 		canvas.style.top = '0';
 
 		this._topCanvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
-		this._topCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
-		const topCanvas = this._topCanvasBinding.canvas;
+		this._topCanvasBinding.subscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
 		topCanvas.style.zIndex = '2';
 		topCanvas.style.left = '0';
@@ -95,7 +95,7 @@ export class PriceAxisWidget implements IDestroyable {
 			mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
 		};
 		this._mouseEventHandler = new MouseEventHandler(
-			this._topCanvasBinding.canvas,
+			this._topCanvasBinding.canvasElement,
 			handler,
 			{
 				treatVertTouchDragAsPageScroll: false,
@@ -107,11 +107,11 @@ export class PriceAxisWidget implements IDestroyable {
 	public destroy(): void {
 		this._mouseEventHandler.destroy();
 
-		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
-		this._topCanvasBinding.destroy();
+		this._topCanvasBinding.unsubscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		this._topCanvasBinding.dispose();
 
-		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
-		this._canvasBinding.destroy();
+		this._canvasBinding.unsubscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.dispose();
 
 		if (this._priceScale !== null) {
 			this._priceScale.onMarksChanged().unsubscribeAll(this);
@@ -175,7 +175,7 @@ export class PriceAxisWidget implements IDestroyable {
 		let tickMarkMaxWidth = 34;
 		const rendererOptions = this.rendererOptions();
 
-		const ctx = getContext2D(this._canvasBinding.canvas);
+		const ctx = getContext2D(this._canvasBinding.canvasElement);
 		const tickMarks = this._priceScale.marks();
 
 		ctx.font = this.baseFont();
@@ -226,8 +226,8 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || !this._size.equals(size)) {
 			this._size = size;
 
-			this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
-			this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
+			this._canvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
+			this._topCanvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
 
 			this._cell.style.width = size.w + 'px';
 			// need this for IE11
@@ -269,26 +269,28 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getContext2D(this._canvasBinding.canvas);
+			const ctx = getContext2D(this._canvasBinding.canvasElement);
 			this._alignLabels();
-			this._drawBackground(ctx, this._canvasBinding.pixelRatio);
-			this._drawBorder(ctx, this._canvasBinding.pixelRatio);
-			this._drawTickMarks(ctx, this._canvasBinding.pixelRatio);
-			this._drawBackLabels(ctx, this._canvasBinding.pixelRatio);
+			const canvasPixelRatio = this._canvasBinding.bitmapSize.width / this._canvasBinding.canvasElementClientSize.width;
+			this._drawBackground(ctx, canvasPixelRatio);
+			this._drawBorder(ctx, canvasPixelRatio);
+			this._drawTickMarks(ctx, canvasPixelRatio);
+			this._drawBackLabels(ctx, canvasPixelRatio);
 		}
 
-		const topCtx = getContext2D(this._topCanvasBinding.canvas);
+		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
 		const width = this._size.w;
 		const height = this._size.h;
-		drawScaled(topCtx, this._topCanvasBinding.pixelRatio, () => {
+		const topCanvasPixelRatio = this._topCanvasBinding.bitmapSize.width / this._topCanvasBinding.canvasElementClientSize.width;
+		drawScaled(topCtx, topCanvasPixelRatio, () => {
 			topCtx.clearRect(0, 0, width, height);
 		});
 
-		this._drawCrosshairLabel(topCtx, this._topCanvasBinding.pixelRatio);
+		this._drawCrosshairLabel(topCtx, topCanvasPixelRatio);
 	}
 
 	public getImage(): HTMLCanvasElement {
-		return this._canvasBinding.canvas;
+		return this._canvasBinding.canvasElement;
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {
@@ -654,13 +656,13 @@ export class PriceAxisWidget implements IDestroyable {
 		);
 	}
 
-	private readonly _canvasConfiguredHandler = () => {
+	private readonly _canvasBitmapSizeChangedHandler = () => {
 		this._recreateTickMarksCache(this._rendererOptionsProvider.options());
 		const model = this._pane.chart().model();
 		model.lightUpdate();
 	};
 
-	private readonly _topCanvasConfiguredHandler = () => {
+	private readonly _topCanvasBitmapSizeChangedHandler = () => {
 		const model = this._pane.chart().model();
 		model.lightUpdate();
 	};

@@ -1,4 +1,4 @@
-import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+import { CanvasElementBitmapSizeBinding } from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-helpers';
@@ -83,8 +83,8 @@ export class PaneWidget implements IDestroyable {
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
-	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
-	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
+	private readonly _topCanvasBinding: CanvasElementBitmapSizeBinding;
 	private readonly _rowElement: HTMLElement;
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
@@ -122,16 +122,16 @@ export class PaneWidget implements IDestroyable {
 		this._paneCell.appendChild(paneWrapper);
 
 		this._canvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
-		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
-		const canvas = this._canvasBinding.canvas;
+		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		const canvas = this._canvasBinding.canvasElement;
 		canvas.style.position = 'absolute';
 		canvas.style.zIndex = '1';
 		canvas.style.left = '0';
 		canvas.style.top = '0';
 
 		this._topCanvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
-		this._topCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
-		const topCanvas = this._topCanvasBinding.canvas;
+		this._topCanvasBinding.subscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
 		topCanvas.style.zIndex = '2';
 		topCanvas.style.left = '0';
@@ -145,7 +145,7 @@ export class PaneWidget implements IDestroyable {
 
 		const scrollOptions = this.chart().options().handleScroll;
 		this._mouseEventHandler = new MouseEventHandler(
-			this._topCanvasBinding.canvas,
+			this._topCanvasBinding.canvasElement,
 			this,
 			{
 				treatVertTouchDragAsPageScroll: !scrollOptions.vertTouchDrag,
@@ -162,11 +162,11 @@ export class PaneWidget implements IDestroyable {
 			this._rightPriceAxisWidget.destroy();
 		}
 
-		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
-		this._topCanvasBinding.destroy();
+		this._topCanvasBinding.unsubscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		this._topCanvasBinding.dispose();
 
-		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
-		this._canvasBinding.destroy();
+		this._canvasBinding.unsubscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.dispose();
 
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
@@ -503,8 +503,8 @@ export class PaneWidget implements IDestroyable {
 
 		this._size = size;
 
-		this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
-		this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
+		this._canvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
+		this._topCanvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
 
 		this._paneCell.style.width = size.w + 'px';
 		this._paneCell.style.height = size.h + 'px';
@@ -530,7 +530,7 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	public getImage(): HTMLCanvasElement {
-		return this._canvasBinding.canvas;
+		return this._canvasBinding.canvasElement;
 	}
 
 	public paint(type: InvalidationLevel): void {
@@ -554,21 +554,23 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getContext2D(this._canvasBinding.canvas);
+			const ctx = getContext2D(this._canvasBinding.canvasElement);
 			ctx.save();
-			this._drawBackground(ctx, this._canvasBinding.pixelRatio);
+			const canvasPixelRatio = this._canvasBinding.bitmapSize.width / this._canvasBinding.canvasElementClientSize.width;
+			this._drawBackground(ctx, canvasPixelRatio);
 			if (this._state) {
-				this._drawGrid(ctx, this._canvasBinding.pixelRatio);
-				this._drawWatermark(ctx, this._canvasBinding.pixelRatio);
-				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourcePaneViews);
+				this._drawGrid(ctx, canvasPixelRatio);
+				this._drawWatermark(ctx, canvasPixelRatio);
+				this._drawSources(ctx, canvasPixelRatio, sourcePaneViews);
 			}
 			ctx.restore();
 		}
 
-		const topCtx = getContext2D(this._topCanvasBinding.canvas);
-		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
-		this._drawSources(topCtx, this._canvasBinding.pixelRatio, sourceTopPaneViews);
-		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
+		const topCanvasPixelRatio = this._topCanvasBinding.bitmapSize.width / this._topCanvasBinding.canvasElementClientSize.width;
+		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
+		topCtx.clearRect(0, 0, Math.ceil(this._size.w * topCanvasPixelRatio), Math.ceil(this._size.h * topCanvasPixelRatio));
+		this._drawSources(topCtx, topCanvasPixelRatio, sourceTopPaneViews);
+		this._drawCrosshair(topCtx, topCanvasPixelRatio);
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
@@ -828,6 +830,6 @@ export class PaneWidget implements IDestroyable {
 		}
 	}
 
-	private readonly _canvasConfiguredHandler = () => this._state && this._model().lightUpdate();
-	private readonly _topCanvasConfiguredHandler = () => this._state && this._model().lightUpdate();
+	private readonly _canvasBitmapSizeChangedHandler = () => this._state && this._model().lightUpdate();
+	private readonly _topCanvasBitmapSizeChangedHandler = () => this._state && this._model().lightUpdate();
 }

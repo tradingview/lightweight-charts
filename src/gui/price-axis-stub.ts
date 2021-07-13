@@ -1,4 +1,4 @@
-import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+import { CanvasElementBitmapSizeBinding } from 'fancy-canvas';
 
 import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -19,7 +19,7 @@ export type ColorGetter = () => string;
 
 export class PriceAxisStub implements IDestroyable {
 	private readonly _cell: HTMLDivElement;
-	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 
@@ -52,12 +52,12 @@ export class PriceAxisStub implements IDestroyable {
 		this._cell.style.overflow = 'hidden';
 
 		this._canvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
-		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
+		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
 	}
 
 	public destroy(): void {
-		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
-		this._canvasBinding.destroy();
+		this._canvasBinding.unsubscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.dispose();
 	}
 
 	public getElement(): HTMLElement {
@@ -76,7 +76,7 @@ export class PriceAxisStub implements IDestroyable {
 		if (!this._size.equals(size)) {
 			this._size = size;
 
-			this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
+			this._canvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
 
 			this._cell.style.width = `${size.w}px`;
 			this._cell.style.minWidth = `${size.w}px`; // for right calculate position of .pane-legend
@@ -97,13 +97,16 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
-		const ctx = getContext2D(this._canvasBinding.canvas);
-		this._drawBackground(ctx, this._canvasBinding.pixelRatio);
-		this._drawBorder(ctx, this._canvasBinding.pixelRatio);
+		const ctx = getContext2D(this._canvasBinding.canvasElement);
+		const canvasPixelRatio =
+			this._canvasBinding.bitmapSize.width /
+			this._canvasBinding.canvasElementClientSize.width;
+		this._drawBackground(ctx, canvasPixelRatio);
+		this._drawBorder(ctx, canvasPixelRatio);
 	}
 
 	public getImage(): HTMLCanvasElement {
-		return this._canvasBinding.canvas;
+		return this._canvasBinding.canvasElement;
 	}
 
 	private _drawBorder(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
@@ -130,5 +133,5 @@ export class PriceAxisStub implements IDestroyable {
 		});
 	}
 
-	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);
+	private readonly _canvasBitmapSizeChangedHandler = () => this.paint(InvalidationLevel.Full);
 }
