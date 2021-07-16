@@ -659,7 +659,7 @@ export class PriceScale {
 		switch (this._options.mode) {
 			case PriceScaleMode.Percentage:
 			case PriceScaleMode.IndexedTo100:
-				return this.formatter().format(logical as BarPrice);
+				return this.formatter().format(logical);
 			default:
 				return this._formatPrice(logical as BarPrice);
 		}

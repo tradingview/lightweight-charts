@@ -1,5 +1,6 @@
+import { IPriceFormatter } from './iprice-formatter';
 
-export class VolumeFormatter {
+export class VolumeFormatter implements IPriceFormatter {
 	private readonly _precision: number;
 
 	public constructor(precision: number) {
