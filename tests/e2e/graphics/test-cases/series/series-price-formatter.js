@@ -1,22 +1,54 @@
+function generateData() {
+	const res = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < 60; ++i) {
+		res.push({
+			time: time.getTime() / 1000,
+			value: i,
+		});
+
+		time.setUTCDate(time.getUTCDate() + 1);
+	}
+	return res;
+}
+
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	const lineSeries = chart.addLineSeries();
-
-	lineSeries.priceFormatter().format(12.1);
+	const lineSeries = chart.addLineSeries({
+		priceFormat: {
+			type: 'price',
+			precision: 4,
+			minMove: 0.005,
+		},
+	});
+	lineSeries.setData(generateData());
+	console.assert(lineSeries.priceFormatter().format(12.1) === '12.1000', 'Wrong format');
 
 	lineSeries.applyOptions({
-		priceFormat: LightweightCharts.PriceScaleMode.Logarithmic,
+		priceFormat: {
+			type: 'volume',
+			precision: 5,
+			minMove: 0.05,
+		},
 	});
-	lineSeries.priceFormatter().format(12.1);
+	console.assert(lineSeries.priceFormatter().format(1000) === '1K', 'Wrong format');
 
 	lineSeries.applyOptions({
-		priceFormat: LightweightCharts.PriceScaleMode.Percentage,
+		priceFormat: {
+			type: 'percent',
+			precision: 3,
+			minMove: 0.05,
+		},
 	});
-	lineSeries.priceFormatter().format(12.1);
+	console.assert(lineSeries.priceFormatter().format(12.1) === '12.0%', 'Wrong format');
 
 	lineSeries.applyOptions({
-		priceFormat: LightweightCharts.PriceScaleMode.IndexedTo100,
+		priceFormat: {
+			type: 'custom',
+			minMove: 0.02,
+			formatter: price => 'price=' + price.toFixed(2),
+		},
 	});
-	lineSeries.priceFormatter().format(12.1);
+	console.assert(lineSeries.priceFormatter().format(12.1) === 'price=12.10', 'Wrong format');
 }
