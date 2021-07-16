@@ -198,7 +198,7 @@ Actually, `autoscaleInfoProvider` function has an argument `original` which is t
 const firstSeries = chart.addLineSeries({
     autoscaleInfoProvider: original => {
         const res = original();
-        if (res.priceRange !== null) {
+        if (res !== null) {
             res.priceRange.minValue -= 10;
             res.priceRange.maxValue += 10;
         }
