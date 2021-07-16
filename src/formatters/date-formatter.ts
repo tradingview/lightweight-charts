@@ -1,7 +1,6 @@
 import { formatDate } from './format-date';
-import { IFormatter } from './iformatter';
 
-export class DateFormatter implements IFormatter {
+export class DateFormatter {
 	private readonly _locale: string;
 	private readonly _dateFormat: string;
 

@@ -1,3 +1,5 @@
+import { IPriceFormatter } from '../formatters/iprice-formatter';
+
 import { ensureNotNull } from '../helpers/assertions';
 import { clone, merge } from '../helpers/strict-type-checks';
 
@@ -22,7 +24,7 @@ import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
+import { BarsInfo, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 

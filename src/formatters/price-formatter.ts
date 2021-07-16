@@ -1,7 +1,5 @@
 import { isInteger, isNumber } from '../helpers/strict-type-checks';
 
-import { IFormatter } from './iformatter';
-
 const formatterOptions = {
 	decimalSign: '.',
 	decimalSignFractional: '\'',
@@ -29,7 +27,7 @@ export function numberToStringWithLeadingZero(value: number, length: number): st
 	return (dummyString + value.toString()).slice(-length);
 }
 
-export class PriceFormatter implements IFormatter {
+export class PriceFormatter {
 	protected _fractionalLength: number | undefined;
 	private readonly _priceScale: number;
 	private readonly _minMove: number;

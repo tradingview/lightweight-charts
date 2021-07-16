@@ -1,3 +1,5 @@
+import { IPriceFormatter } from '../formatters/iprice-formatter';
+
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { PriceLineOptions } from '../model/price-line-options';
@@ -21,17 +23,6 @@ export type BarsInfo =
 		barsBefore: number;
 		barsAfter: number;
 	};
-
-/** Interface to be implemented by the object in order to be used as a price formatter */
-export interface IPriceFormatter {
-	/**
-	 * Formatting function
-	 *
-	 * @param price - original price to be formatted
-	 * @returns formatted price
-	 */
-	format(price: BarPrice): string;
-}
 
 export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
