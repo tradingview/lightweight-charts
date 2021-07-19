@@ -1,4 +1,4 @@
-import { IFormatter } from '../formatters/iformatter';
+import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
 import { VolumeFormatter } from '../formatters/volume-formatter';
@@ -100,7 +100,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _data: SeriesPlotList<T> = createSeriesPlotList();
 	private readonly _priceAxisViews: IPriceAxisView[];
 	private readonly _panePriceAxisView: PanePriceAxisView;
-	private _formatter!: IFormatter;
+	private _formatter!: IPriceFormatter;
 	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
 	private readonly _customPriceLines: CustomPriceLine[] = [];
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
@@ -395,7 +395,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options.priceFormat.minMove;
 	}
 
-	public formatter(): IFormatter {
+	public formatter(): IPriceFormatter {
 		return this._formatter;
 	}
 

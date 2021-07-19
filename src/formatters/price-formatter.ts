@@ -1,6 +1,6 @@
 import { isInteger, isNumber } from '../helpers/strict-type-checks';
 
-import { IFormatter } from './iformatter';
+import { IPriceFormatter } from './iprice-formatter';
 
 const formatterOptions = {
 	decimalSign: '.',
@@ -29,7 +29,7 @@ export function numberToStringWithLeadingZero(value: number, length: number): st
 	return (dummyString + value.toString()).slice(-length);
 }
 
-export class PriceFormatter implements IFormatter {
+export class PriceFormatter implements IPriceFormatter {
 	protected _fractionalLength: number | undefined;
 	private readonly _priceScale: number;
 	private readonly _minMove: number;

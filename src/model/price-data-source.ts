@@ -1,4 +1,4 @@
-import { IFormatter } from '../formatters/iformatter';
+import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { ChartModel } from './chart-model';
@@ -23,6 +23,6 @@ export abstract class PriceDataSource extends DataSource implements IPriceDataSo
 	public abstract autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null;
 
 	public abstract firstValue(): FirstValue | null;
-	public abstract formatter(): IFormatter;
+	public abstract formatter(): IPriceFormatter;
 	public abstract priceLineColor(lastBarColor: string): string;
 }

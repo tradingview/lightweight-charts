@@ -1,4 +1,4 @@
-import { IFormatter } from '../formatters/iformatter';
+import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
 
@@ -140,7 +140,7 @@ export class PriceScale {
 
 	private _scaleStartPoint: number | null = null;
 	private _scrollStartPoint: number | null = null;
-	private _formatter: IFormatter = defaultPriceFormatter;
+	private _formatter: IPriceFormatter = defaultPriceFormatter;
 
 	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
 		this._id = id;
@@ -636,7 +636,7 @@ export class PriceScale {
 		this._priceRangeSnapshot = null;
 	}
 
-	public formatter(): IFormatter {
+	public formatter(): IPriceFormatter {
 		if (!this._formatter) {
 			this.updateFormatter();
 		}
@@ -884,7 +884,7 @@ export class PriceScale {
 		return null;
 	}
 
-	private _formatPrice(price: BarPrice, fallbackFormatter?: IFormatter): string {
+	private _formatPrice(price: BarPrice, fallbackFormatter?: IPriceFormatter): string {
 		if (this._localizationOptions.priceFormatter === undefined) {
 			if (fallbackFormatter === undefined) {
 				fallbackFormatter = this.formatter();

@@ -1,6 +1,5 @@
 import { log10 } from '../helpers/mathex';
 
-import { Coordinate } from './coordinate';
 import { PriceRangeImpl } from './price-range-impl';
 
 const enum Constants {
@@ -16,9 +15,9 @@ export function fromPercent(value: number, baseValue: number): number {
 	return (value / 100) * baseValue + baseValue;
 }
 
-export function toPercent(value: number, baseValue: number): Coordinate {
+export function toPercent(value: number, baseValue: number): number {
 	const result = 100 * (value - baseValue) / baseValue;
-	return (baseValue < 0 ? -result : result) as Coordinate;
+	return (baseValue < 0 ? -result : result);
 }
 
 export function toPercentRange(priceRange: PriceRangeImpl, baseValue: number): PriceRangeImpl {
@@ -36,9 +35,9 @@ export function fromIndexedTo100(value: number, baseValue: number): number {
 	return (value / 100) * baseValue + baseValue;
 }
 
-export function toIndexedTo100(value: number, baseValue: number): Coordinate {
+export function toIndexedTo100(value: number, baseValue: number): number {
 	const result = 100 * (value - baseValue) / baseValue + 100;
-	return (baseValue < 0 ? -result : result) as Coordinate;
+	return (baseValue < 0 ? -result : result);
 }
 
 export function toIndexedTo100Range(priceRange: PriceRangeImpl, baseValue: number): PriceRangeImpl {
@@ -47,14 +46,14 @@ export function toIndexedTo100Range(priceRange: PriceRangeImpl, baseValue: numbe
 	return new PriceRangeImpl(minPercent, maxPercent);
 }
 
-export function toLog(price: number): Coordinate {
+export function toLog(price: number): number {
 	const m = Math.abs(price);
 	if (m < 1e-8) {
-		return 0 as Coordinate;
+		return 0;
 	}
 
 	const res = log10(m + Constants.CoordOffset) + Constants.LogicalOffset;
-	return ((price < 0) ? -res : res) as Coordinate;
+	return ((price < 0) ? -res : res);
 }
 
 export function fromLog(logical: number): number {
