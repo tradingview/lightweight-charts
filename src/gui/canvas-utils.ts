@@ -1,20 +1,10 @@
-import { bindCanvasElementBitmapSizeTo, CanvasElementBitmapSizeBinding } from 'fancy-canvas';
+import {
+	bindCanvasElementBitmapSizeTo,
+	CanvasElementBitmapSizeBinding,
+	Size,
+} from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
-
-export class Size {
-	public h: number;
-	public w: number;
-
-	public constructor(w: number, h: number) {
-		this.w = w;
-		this.h = h;
-	}
-
-	public equals(size: Size): boolean {
-		return (this.w === size.w) && (this.h === size.h);
-	}
-}
 
 export function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 	return canvas.ownerDocument &&
@@ -38,11 +28,11 @@ export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvas
 
 	const pixelRatio = getCanvasDevicePixelRatio(canvas);
 	// we should keep the layout size...
-	canvas.style.width = `${size.w}px`;
-	canvas.style.height = `${size.h}px`;
+	canvas.style.width = `${size.width}px`;
+	canvas.style.height = `${size.height}px`;
 	// ...but multiply coordinate space dimensions to device pixel ratio
-	canvas.width = size.w * pixelRatio;
-	canvas.height = size.h * pixelRatio;
+	canvas.width = size.width * pixelRatio;
+	canvas.height = size.height * pixelRatio;
 	return canvas;
 }
 
@@ -52,10 +42,7 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 	parentElement.appendChild(canvas);
 
 	const binding = bindCanvasElementBitmapSizeTo(canvas, { type: 'device-pixel-content-box' });
-	binding.resizeCanvasElement({
-		width: size.w,
-		height: size.h,
-	});
+	binding.resizeCanvasElement(size);
 	return binding;
 }
 

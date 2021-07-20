@@ -1,4 +1,4 @@
-import { CanvasElementBitmapSizeBinding } from 'fancy-canvas';
+import { CanvasElementBitmapSizeBinding, equalSizes, Size, size } from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-helpers';
@@ -17,7 +17,7 @@ import { TimePointIndex } from '../model/time-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
+import { createBoundCanvas, getContext2D } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { KineticAnimation } from './kinetic-animation';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
@@ -77,7 +77,7 @@ interface StartScrollPosition extends Point {
 export class PaneWidget implements IDestroyable {
 	private readonly _chart: ChartWidget;
 	private _state: Pane | null;
-	private _size: Size = new Size(0, 0);
+	private _size: Size = size({ width: 0, height: 0 });
 	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
 	private _rightPriceAxisWidget: PriceAxisWidget | null = null;
 	private readonly _paneCell: HTMLElement;
@@ -121,7 +121,7 @@ export class PaneWidget implements IDestroyable {
 
 		this._paneCell.appendChild(paneWrapper);
 
-		this._canvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
+		this._canvasBinding = createBoundCanvas(paneWrapper, size({ width: 16, height: 16 }));
 		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
 		const canvas = this._canvasBinding.canvasElement;
 		canvas.style.position = 'absolute';
@@ -129,7 +129,7 @@ export class PaneWidget implements IDestroyable {
 		canvas.style.left = '0';
 		canvas.style.top = '0';
 
-		this._topCanvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
+		this._topCanvasBinding = createBoundCanvas(paneWrapper, size({ width: 16, height: 16 }));
 		this._topCanvasBinding.subscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
 		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
@@ -485,29 +485,25 @@ export class PaneWidget implements IDestroyable {
 
 	public setPriceAxisSize(width: number, position: PriceAxisWidgetSide): void {
 		const priceAxisWidget = position === 'left' ? this._leftPriceAxisWidget : this._rightPriceAxisWidget;
-		ensureNotNull(priceAxisWidget).setSize(new Size(width, this._size.h));
+		ensureNotNull(priceAxisWidget).setSize(size({ width, height: this._size.height }));
 	}
 
 	public getSize(): Size {
 		return this._size;
 	}
 
-	public setSize(size: Size): void {
-		if (size.w < 0 || size.h < 0) {
-			throw new Error('Try to set invalid size to PaneWidget ' + JSON.stringify(size));
-		}
-
-		if (this._size.equals(size)) {
+	public setSize(newSize: Size): void {
+		if (equalSizes(this._size, newSize)) {
 			return;
 		}
 
-		this._size = size;
+		this._size = newSize;
 
-		this._canvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
-		this._topCanvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
+		this._canvasBinding.resizeCanvasElement(newSize);
+		this._topCanvasBinding.resizeCanvasElement(newSize);
 
-		this._paneCell.style.width = size.w + 'px';
-		this._paneCell.style.height = size.h + 'px';
+		this._paneCell.style.width = newSize.width + 'px';
+		this._paneCell.style.height = newSize.height + 'px';
 	}
 
 	public recalculatePriceScales(): void {
@@ -568,7 +564,7 @@ export class PaneWidget implements IDestroyable {
 
 		const topCanvasPixelRatio = this._topCanvasBinding.bitmapSize.width / this._topCanvasBinding.canvasElementClientSize.width;
 		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
-		topCtx.clearRect(0, 0, Math.ceil(this._size.w * topCanvasPixelRatio), Math.ceil(this._size.h * topCanvasPixelRatio));
+		topCtx.clearRect(0, 0, Math.ceil(this._size.width * topCanvasPixelRatio), Math.ceil(this._size.height * topCanvasPixelRatio));
 		this._drawSources(topCtx, topCanvasPixelRatio, sourceTopPaneViews);
 		this._drawCrosshair(topCtx, topCanvasPixelRatio);
 	}
@@ -596,9 +592,9 @@ export class PaneWidget implements IDestroyable {
 			const bottomColor = model.backgroundBottomColor();
 
 			if (topColor === bottomColor) {
-				clearRect(ctx, 0, 0, this._size.w, this._size.h, bottomColor);
+				clearRect(ctx, 0, 0, this._size.width, this._size.height, bottomColor);
 			} else {
-				clearRectWithGradient(ctx, 0, 0, this._size.w, this._size.h, topColor, bottomColor);
+				clearRectWithGradient(ctx, 0, 0, this._size.width, this._size.height, topColor, bottomColor);
 			}
 		});
 	}
@@ -667,7 +663,7 @@ export class PaneWidget implements IDestroyable {
 
 	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
 		for (const paneView of paneViews) {
-			const renderer = paneView.renderer(this._size.h, this._size.w);
+			const renderer = paneView.renderer(this._size.height, this._size.width);
 			if (renderer !== null && renderer.hitTest) {
 				const result = renderer.hitTest(x, y);
 				if (result !== null) {
@@ -719,11 +715,11 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	private _correctXCoord(x: Coordinate): Coordinate {
-		return Math.max(0, Math.min(x, this._size.w - 1)) as Coordinate;
+		return Math.max(0, Math.min(x, this._size.width - 1)) as Coordinate;
 	}
 
 	private _correctYCoord(y: Coordinate): Coordinate {
-		return Math.max(0, Math.min(y, this._size.h - 1)) as Coordinate;
+		return Math.max(0, Math.min(y, this._size.height - 1)) as Coordinate;
 	}
 
 	private _setCrosshairPosition(x: Coordinate, y: Coordinate): void {

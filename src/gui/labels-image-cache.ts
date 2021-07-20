@@ -1,4 +1,6 @@
-import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from '../gui/canvas-utils';
+import { size } from 'fancy-canvas';
+
+import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D } from '../gui/canvas-utils';
 
 import { ensureDefined } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
@@ -72,7 +74,7 @@ export class LabelsImageCache implements IDestroyable {
 			const textWidth = Math.ceil(this._textWidthCache.measureText(ctx, text));
 			const width = ceiledEven(Math.round(textWidth + margin * 2));
 			const height = ceiledEven(this._fontSize + margin * 2);
-			const canvas = createPreconfiguredCanvas(document, new Size(width, height));
+			const canvas = createPreconfiguredCanvas(document, size({ width, height }));
 
 			// Allocate new
 			item = {

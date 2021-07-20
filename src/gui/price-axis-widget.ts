@@ -1,4 +1,4 @@
-import { CanvasElementBitmapSizeBinding } from 'fancy-canvas';
+import { CanvasElementBitmapSizeBinding, equalSizes, Size, size } from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-helpers';
@@ -17,7 +17,7 @@ import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-rend
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
-import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
+import { createBoundCanvas, getContext2D } from './canvas-utils';
 import { LabelsImageCache } from './labels-image-cache';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -69,7 +69,7 @@ export class PriceAxisWidget implements IDestroyable {
 		this._cell.style.left = '0';
 		this._cell.style.position = 'relative';
 
-		this._canvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
+		this._canvasBinding = createBoundCanvas(this._cell, size({ width: 16, height: 16 }));
 		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
 		const canvas = this._canvasBinding.canvasElement;
 		canvas.style.position = 'absolute';
@@ -77,7 +77,7 @@ export class PriceAxisWidget implements IDestroyable {
 		canvas.style.left = '0';
 		canvas.style.top = '0';
 
-		this._topCanvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
+		this._topCanvasBinding = createBoundCanvas(this._cell, size({ width: 16, height: 16 }));
 		this._topCanvasBinding.subscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
 		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
@@ -198,7 +198,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const firstValue = this._priceScale.firstValue();
 		if (firstValue !== null && this._size !== null) {
 			const topValue = this._priceScale.coordinateToPrice(1 as Coordinate, firstValue);
-			const bottomValue = this._priceScale.coordinateToPrice(this._size.h - 2 as Coordinate, firstValue);
+			const bottomValue = this._priceScale.coordinateToPrice(this._size.height - 2 as Coordinate, firstValue);
 
 			tickMarkMaxWidth = Math.max(
 				tickMarkMaxWidth,
@@ -219,25 +219,22 @@ export class PriceAxisWidget implements IDestroyable {
 		return res;
 	}
 
-	public setSize(size: Size): void {
-		if (size.w < 0 || size.h < 0) {
-			throw new Error('Try to set invalid size to PriceAxisWidget ' + JSON.stringify(size));
-		}
-		if (this._size === null || !this._size.equals(size)) {
-			this._size = size;
+	public setSize(newSize: Size): void {
+		if (this._size === null || !equalSizes(this._size, newSize)) {
+			this._size = newSize;
 
-			this._canvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
-			this._topCanvasBinding.resizeCanvasElement({ width: size.w, height: size.h });
+			this._canvasBinding.resizeCanvasElement(newSize);
+			this._topCanvasBinding.resizeCanvasElement(newSize);
 
-			this._cell.style.width = size.w + 'px';
+			this._cell.style.width = `${newSize.width}px`;
 			// need this for IE11
-			this._cell.style.height = size.h + 'px';
-			this._cell.style.minWidth = size.w + 'px'; // for right calculate position of .pane-legend
+			this._cell.style.height = `${newSize.height}px`;
+			this._cell.style.minWidth = `${newSize.width}px`; // for right calculate position of .pane-legend
 		}
 	}
 
 	public getWidth(): number {
-		return ensureNotNull(this._size).w;
+		return ensureNotNull(this._size).width;
 	}
 
 	public setPriceScale(priceScale: PriceScale): void {
@@ -279,8 +276,8 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
-		const width = this._size.w;
-		const height = this._size.h;
+		const width = this._size.width;
+		const height = this._size.height;
 		const topCanvasPixelRatio = this._topCanvasBinding.bitmapSize.width / this._topCanvasBinding.canvasElementClientSize.width;
 		drawScaled(topCtx, topCanvasPixelRatio, () => {
 			topCtx.clearRect(0, 0, width, height);
@@ -387,8 +384,8 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null) {
 			return;
 		}
-		const width = this._size.w;
-		const height = this._size.h;
+		const width = this._size.width;
+		const height = this._size.height;
 		drawScaled(ctx, pixelRatio, () => {
 			const model = this._pane.state().model();
 			const topColor = model.backgroundTopColor();
@@ -414,12 +411,12 @@ export class PriceAxisWidget implements IDestroyable {
 
 		let left: number;
 		if (this._isLeft) {
-			left = Math.floor(this._size.w * pixelRatio) - borderSize;
+			left = Math.floor(this._size.width * pixelRatio) - borderSize;
 		} else {
 			left = 0;
 		}
 
-		ctx.fillRect(left, 0, borderSize, Math.ceil(this._size.h * pixelRatio));
+		ctx.fillRect(left, 0, borderSize, Math.ceil(this._size.height * pixelRatio));
 		ctx.restore();
 	}
 
@@ -440,7 +437,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const drawTicks = this._priceScale.options().borderVisible && this._priceScale.options().drawTicks;
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
+			Math.floor((this._size.width - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
 			Math.floor(rendererOptions.borderSize * pixelRatio);
 
 		const textLeftX = this._isLeft ?
@@ -473,7 +470,7 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
-		let center = this._size.h / 2;
+		let center = this._size.height / 2;
 
 		const views: IPriceAxisView[] = [];
 		const orderedSources = this._priceScale.orderedSources().slice(); // Copy of array
@@ -568,7 +565,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.save();
 
-		const size = this._size;
+		const currentSize = this._size;
 		const views = this._backLabels();
 
 		const rendererOptions = this.rendererOptions();
@@ -578,7 +575,7 @@ export class PriceAxisWidget implements IDestroyable {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer(ensureNotNull(this._priceScale));
 				ctx.save();
-				renderer.draw(ctx, rendererOptions, this._widthCache, size.w, align, pixelRatio);
+				renderer.draw(ctx, rendererOptions, this._widthCache, currentSize.width, align, pixelRatio);
 				ctx.restore();
 			}
 		});
@@ -593,7 +590,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.save();
 
-		const size = this._size;
+		const currentSize = this._size;
 		const model = this._pane.chart().model();
 
 		const views: IPriceAxisViewArray[] = []; // array of arrays
@@ -610,7 +607,7 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((arr: IPriceAxisViewArray) => {
 			arr.forEach((view: IPriceAxisView) => {
 				ctx.save();
-				view.renderer(ensureNotNull(this._priceScale)).draw(ctx, ro, this._widthCache, size.w, align, pixelRatio);
+				view.renderer(ensureNotNull(this._priceScale)).draw(ctx, ro, this._widthCache, currentSize.width, align, pixelRatio);
 				ctx.restore();
 			});
 		});

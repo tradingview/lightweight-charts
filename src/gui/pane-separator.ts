@@ -1,7 +1,9 @@
+import { Size, size } from 'fancy-canvas';
+
 import { IDestroyable } from '../helpers/idestroyable';
 import { clamp } from '../helpers/mathex';
 
-import { createPreconfiguredCanvas, getContext2D, Size } from './canvas-utils';
+import { createPreconfiguredCanvas, getContext2D } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -78,16 +80,19 @@ export class PaneSeparator implements IDestroyable {
 		return this._rowElement;
 	}
 
-	public getSize(): Readonly<Size> {
-		return new Size(this._paneA.getSize().w, SEPARATOR_HEIGHT);
+	public getSize(): Size {
+		return size({
+			width: this._paneA.getSize().width,
+			height: SEPARATOR_HEIGHT,
+		});
 	}
 
 	public getImage(): HTMLCanvasElement {
-		const size = this.getSize();
-		const res = createPreconfiguredCanvas(document, size);
+		const imageSize = this.getSize();
+		const res = createPreconfiguredCanvas(document, imageSize);
 		const ctx = getContext2D(res);
 		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;
-		ctx.fillRect(0, 0, size.w, size.h);
+		ctx.fillRect(0, 0, imageSize.width, imageSize.height);
 		return res;
 	}
 
@@ -102,7 +107,7 @@ export class PaneSeparator implements IDestroyable {
 	private _mouseDownEvent(event: TouchMouseEvent): void {
 		this._startY = event.pageY;
 		this._deltaY = 0;
-		this._totalHeight = this._paneA.getSize().h + this._paneB.getSize().h;
+		this._totalHeight = this._paneA.getSize().height + this._paneB.getSize().height;
 		this._totalStretch = this._paneA.stretchFactor() + this._paneB.stretchFactor();
 		this._minPaneHeight = 30;
 		this._maxPaneHeight = this._totalHeight - this._minPaneHeight;
@@ -111,7 +116,7 @@ export class PaneSeparator implements IDestroyable {
 
 	private _pressedMouseMoveEvent(event: TouchMouseEvent): void {
 		this._deltaY = (event.pageY - this._startY);
-		const upperHeight = this._paneA.getSize().h;
+		const upperHeight = this._paneA.getSize().height;
 		const newUpperPaneHeight = clamp(upperHeight + this._deltaY, this._minPaneHeight, this._maxPaneHeight);
 
 		const newUpperPaneStretch = newUpperPaneHeight * this._pixelStretchFactor;
@@ -121,7 +126,7 @@ export class PaneSeparator implements IDestroyable {
 
 		this._chartWidget.model().fullUpdate();
 
-		if (this._paneA.getSize().h !== upperHeight) {
+		if (this._paneA.getSize().height !== upperHeight) {
 			this._startY = event.pageY;
 		}
 	}
