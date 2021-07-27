@@ -372,12 +372,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public priceAxisViews(pane: Pane, priceScale: PriceScale): readonly IPriceAxisView[] {
-		const result = (priceScale === this._priceScale || this._isOverlay()) ? [...this._priceAxisViews] : [];
+		if (priceScale !== this._priceScale && !this._isOverlay()) {
+			return [];
+		}
+		const result = [...this._priceAxisViews];
 		for (const customPriceLine of this._customPriceLines) {
-			if (customPriceLine.priceScale() === priceScale) {
-				// Only show price on its series axis
-				result.push(customPriceLine.priceAxisView());
-			}
+			result.push(customPriceLine.priceAxisView());
 		}
 		return result;
 	}

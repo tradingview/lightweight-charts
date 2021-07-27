@@ -8,7 +8,6 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { Coordinate } from './coordinate';
 import { PriceLineOptions } from './price-line-options';
-import { PriceScale } from './price-scale';
 import { Series } from './series';
 
 export class CustomPriceLine {
@@ -45,10 +44,6 @@ export class CustomPriceLine {
 
 	public priceAxisView(): IPriceAxisView {
 		return this._priceAxisView;
-	}
-
-	public priceScale(): PriceScale {
-		return this._series.priceScale();
 	}
 
 	public update(): void {
