@@ -45,7 +45,7 @@ Also, the crosshair marker, which is enabled by default, can either be disabled 
 An area series interface can be customized using the following set of options:
 
 |Name|Type|Default|Description|
-|-|----|-------|-|
+|----|----|-------|-----------|
 |`topColor`|`string`|`rgba(46, 220, 135, 0.4)`|Area top color|
 |`bottomColor`|`string`|`rgba(40, 221, 100, 0)`|Area bottom color|
 |`lineColor`|`string`|`#33D778`|Line color|
@@ -55,6 +55,7 @@ An area series interface can be customized using the following set of options:
 |`crosshairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
 |`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
 |`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
+|`lastPriceAnimation`|[LasPriceAnimationMode](./constants.md#laspriceanimationmode)|`'LasPriceAnimationMode.Disabled'`|The mode of the last price animation|
 
 ### Examples
 
@@ -71,6 +72,7 @@ An area series interface can be customized using the following set of options:
         crosshairMarkerRadius: 3,
         crosshairMarkerBorderColor: 'rgb(255, 255, 255, 1)',
         crosshairMarkerBackgroundColor: 'rgb(34, 150, 243, 1)',
+        lastPriceAnimation: 1,
     });
     ```
 

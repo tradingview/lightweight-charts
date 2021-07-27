@@ -164,6 +164,10 @@ export class ChartModel implements IDestroyable {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Light));
 	}
 
+	public cursorUpdate(): void {
+		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
+	}
+
 	public updateSource(source: IPriceDataSource): void {
 		const inv = this._invalidationMaskForSource(source);
 		this._invalidate(inv);
@@ -425,14 +429,14 @@ export class ChartModel implements IDestroyable {
 
 		this._crosshair.setPosition(index, price, pane);
 
-		this._cursorUpdate();
+		this.cursorUpdate();
 		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
 	}
 
 	public clearCurrentPosition(): void {
 		const crosshair = this.crosshairSource();
 		crosshair.clearPosition();
-		this._cursorUpdate();
+		this.cursorUpdate();
 		this._crosshairMoved.fire(null, null);
 	}
 
@@ -622,10 +626,6 @@ export class ChartModel implements IDestroyable {
 		}
 
 		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
-	}
-
-	private _cursorUpdate(): void {
-		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
 	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T> {

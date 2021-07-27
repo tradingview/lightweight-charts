@@ -14,6 +14,7 @@ import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
+import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
@@ -25,6 +26,28 @@ import { isMobile, mobileTouch } from './support-touch';
 // actually we should check what event happened (touch or mouse)
 // not check current UA to detect "mobile" device
 const trackCrosshairOnlyAfterLongTap = isMobile;
+
+type DrawFunction = (renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown) => void;
+
+function drawBackground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	if (renderer.drawBackground) {
+		renderer.drawBackground(ctx, pixelRatio, isHovered, hitTestData);
+	}
+}
+
+function drawForeground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	renderer.draw(ctx, pixelRatio, isHovered, hitTestData);
+}
+
+type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
+
+function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+	return source.paneViews(pane);
+}
+
+function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
+}
 
 export interface HitTestResult {
 	source: IPriceDataSource;
@@ -508,7 +531,7 @@ export class PaneWidget implements IDestroyable {
 			if (this._state) {
 				this._drawGrid(ctx, this._canvasBinding.pixelRatio);
 				this._drawWatermark(ctx, this._canvasBinding.pixelRatio);
-				this._drawSources(ctx, this._canvasBinding.pixelRatio);
+				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourcePaneViews);
 			}
 			ctx.restore();
 		}
@@ -516,6 +539,7 @@ export class PaneWidget implements IDestroyable {
 		const topCtx = getContext2D(this._topCanvasBinding.canvas);
 		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
+		this._drawSources(topCtx, this._canvasBinding.pixelRatio, sourceTopPaneViews);
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
@@ -558,30 +582,36 @@ export class PaneWidget implements IDestroyable {
 
 	private _drawWatermark(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const source = this._model().watermarkSource();
-		this._drawSourceBackground(source, ctx, pixelRatio);
-		this._drawSource(source, ctx, pixelRatio);
+		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawBackground, source);
+		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawForeground, source);
 	}
 
 	private _drawCrosshair(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		this._drawSource(this._model().crosshairSource(), ctx, pixelRatio);
+		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+	private _drawSources(ctx: CanvasRenderingContext2D, pixelRatio: number, paneViewsGetter: PaneViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
 		for (const source of sources) {
-			this._drawSourceBackground(source, ctx, pixelRatio);
+			this._drawSourceImpl(ctx, pixelRatio, paneViewsGetter, drawBackground, source);
 		}
 
 		for (const source of sources) {
-			this._drawSource(source, ctx, pixelRatio);
+			this._drawSourceImpl(ctx, pixelRatio, paneViewsGetter, drawForeground, source);
 		}
 	}
 
-	private _drawSource(source: IDataSource, ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+	private _drawSourceImpl(
+		ctx: CanvasRenderingContext2D,
+		pixelRatio: number,
+		paneViewsGetter: PaneViewsGetter,
+		drawFn: DrawFunction,
+		source: IDataSource
+	): void {
 		const state = ensureNotNull(this._state);
-		const paneViews = source.paneViews(state);
+		const paneViews = paneViewsGetter(source, state);
 		const height = state.height();
 		const width = state.width();
 		const hoveredSource = state.model().hoveredSource();
@@ -594,28 +624,7 @@ export class PaneWidget implements IDestroyable {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
 				ctx.save();
-				renderer.draw(ctx, pixelRatio, isHovered, objecId);
-				ctx.restore();
-			}
-		}
-	}
-
-	private _drawSourceBackground(source: IDataSource, ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		const state = ensureNotNull(this._state);
-		const paneViews = source.paneViews(state);
-		const height = state.height();
-		const width = state.width();
-		const hoveredSource = state.model().hoveredSource();
-		const isHovered = hoveredSource !== null && hoveredSource.source === source;
-		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
-			? hoveredSource.object.hitTestData
-			: undefined;
-
-		for (const paneView of paneViews) {
-			const renderer = paneView.renderer(height, width);
-			if (renderer !== null && renderer.drawBackground !== undefined) {
-				ctx.save();
-				renderer.drawBackground(ctx, pixelRatio, isHovered, objecId);
+				drawFn(renderer, ctx, pixelRatio, isHovered, objecId);
 				ctx.restore();
 			}
 		}
