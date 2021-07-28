@@ -289,6 +289,11 @@ export class ChartWidget implements IDestroyable {
 				}
 			}
 		});
+		// Set chart background
+		ctx.globalCompositeOperation = 'destination-over';
+		ctx.fillStyle = this._options.layout.backgroundColor;
+		ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
+		ctx.globalCompositeOperation = 'source-over';
 		return targetCanvas;
 	}
 
