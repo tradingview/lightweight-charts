@@ -4,6 +4,6 @@ import { IDataSource } from './idata-source';
 
 export function sortSources<T extends IDataSource>(sources: readonly T[]): T[] {
 	return sources.slice().sort((s1: IDataSource, s2: IDataSource) => {
-		return (ensureNotNull(ensureNotNull(s2.zorder())) - ensureNotNull(s1.zorder()));
+		return (ensureNotNull(s1.zorder()) - ensureNotNull(s2.zorder()));
 	});
 }
