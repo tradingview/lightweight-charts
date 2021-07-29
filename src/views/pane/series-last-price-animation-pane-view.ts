@@ -9,12 +9,11 @@ import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-pr
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
 const enum Constants {
-	AnimationPeriod = 2800,
+	AnimationPeriod = 2600,
 
-	Stage1Period = 0.5,
-	Stage2Period = 0.1,
-	Stage3Period = 0.15,
-	Stage4Period = 0.25,
+	Stage1Period = 0.25,
+	Stage2Period = 0.275,
+	Stage3Period = 0.475,
 
 	Stage1StartCircleRadius = 4,
 	Stage1EndCircleRadius = 10,
@@ -24,25 +23,18 @@ const enum Constants {
 	Stage1EndStrokeAlpha = 0.8,
 
 	Stage2StartCircleRadius = Stage1EndCircleRadius,
-	Stage2EndCircleRadius = Stage1EndCircleRadius,
+	Stage2EndCircleRadius = 14,
 	Stage2StartFillAlpha = Stage1EndFillAlpha,
-	Stage2EndFillAlpha = Stage1EndFillAlpha,
+	Stage2EndFillAlpha = 0,
 	Stage2StartStrokeAlpha = Stage1EndStrokeAlpha,
-	Stage2EndStrokeAlpha = Stage1EndStrokeAlpha,
+	Stage2EndStrokeAlpha = 0,
 
 	Stage3StartCircleRadius = Stage2EndCircleRadius,
-	Stage3EndCircleRadius = 14,
+	Stage3EndCircleRadius = Stage2EndCircleRadius,
 	Stage3StartFillAlpha = Stage2EndFillAlpha,
-	Stage3EndFillAlpha = 0,
+	Stage3EndFillAlpha = Stage2EndFillAlpha,
 	Stage3StartStrokeAlpha = Stage2EndStrokeAlpha,
-	Stage3EndStrokeAlpha = 0,
-
-	Stage4StartCircleRadius = Stage3EndCircleRadius,
-	Stage4EndCircleRadius = Stage3EndCircleRadius,
-	Stage4StartFillAlpha = Stage3EndFillAlpha,
-	Stage4EndFillAlpha = Stage3EndFillAlpha,
-	Stage4StartStrokeAlpha = Stage3EndStrokeAlpha,
-	Stage4EndStrokeAlpha = Stage3EndStrokeAlpha,
+	Stage3EndStrokeAlpha = Stage2EndStrokeAlpha,
 }
 
 interface AnimationStageData {
@@ -54,15 +46,6 @@ interface AnimationStageData {
 	endFillAlpha: number;
 	startStrokeAlpha: number;
 	endStrokeAlpha: number;
-	easing: (x: number) => number;
-}
-
-function easeOutCubic(x: number): number {
-	return 1 - Math.pow(1 - x, 3);
-}
-
-function easeLinear(x: number): number {
-	return x;
 }
 
 const animationStagesData: AnimationStageData[] = [
@@ -75,7 +58,6 @@ const animationStagesData: AnimationStageData[] = [
 		endFillAlpha: Constants.Stage1EndFillAlpha,
 		startStrokeAlpha: Constants.Stage1StartStrokeAlpha,
 		endStrokeAlpha: Constants.Stage1EndStrokeAlpha,
-		easing: easeOutCubic,
 	},
 	{
 		start: Constants.Stage1Period,
@@ -86,7 +68,6 @@ const animationStagesData: AnimationStageData[] = [
 		endFillAlpha: Constants.Stage2EndFillAlpha,
 		startStrokeAlpha: Constants.Stage2StartStrokeAlpha,
 		endStrokeAlpha: Constants.Stage2EndStrokeAlpha,
-		easing: easeLinear,
 	},
 	{
 		start: Constants.Stage1Period + Constants.Stage2Period,
@@ -97,18 +78,6 @@ const animationStagesData: AnimationStageData[] = [
 		endFillAlpha: Constants.Stage3EndFillAlpha,
 		startStrokeAlpha: Constants.Stage3StartStrokeAlpha,
 		endStrokeAlpha: Constants.Stage3EndStrokeAlpha,
-		easing: easeLinear,
-	},
-	{
-		start: Constants.Stage1Period + Constants.Stage2Period + Constants.Stage3Period,
-		end: Constants.Stage1Period + Constants.Stage2Period + Constants.Stage3Period + Constants.Stage4Period,
-		startRadius: Constants.Stage4StartCircleRadius,
-		endRadius: Constants.Stage4EndCircleRadius,
-		startFillAlpha: Constants.Stage4StartFillAlpha,
-		endFillAlpha: Constants.Stage4EndFillAlpha,
-		startStrokeAlpha: Constants.Stage4StartStrokeAlpha,
-		endStrokeAlpha: Constants.Stage4EndStrokeAlpha,
-		easing: easeLinear,
 	},
 ];
 
@@ -143,7 +112,7 @@ function animationData(durationSinceStart: number, lineColor: string): Animation
 		throw new Error('Last price animation internal logic error');
 	}
 
-	const subStage = currentStageData.easing((globalStage - currentStageData.start) / (currentStageData.end - currentStageData.start));
+	const subStage = (globalStage - currentStageData.start) / (currentStageData.end - currentStageData.start);
 	return {
 		fillColor: color(lineColor, subStage, currentStageData.startFillAlpha, currentStageData.endFillAlpha),
 		strokeColor: color(lineColor, subStage, currentStageData.startStrokeAlpha, currentStageData.endStrokeAlpha),
