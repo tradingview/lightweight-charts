@@ -283,17 +283,12 @@ export class ChartWidget implements IDestroyable {
 				const image = this._timeAxisWidget.getImage();
 				ctx.drawImage(image, targetX, targetY, size.w, size.h);
 				if (this._isRightAxisVisible()) {
-					targetX = firstPane.getSize().w;
+					targetX += firstPane.getSize().w;
 					drawStub('right');
 					ctx.restore();
 				}
 			}
 		});
-		// Set chart background
-		ctx.globalCompositeOperation = 'destination-over';
-		ctx.fillStyle = this._options.layout.backgroundColor;
-		ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
-		ctx.globalCompositeOperation = 'source-over';
 		return targetCanvas;
 	}
 
