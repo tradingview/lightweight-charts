@@ -48,6 +48,9 @@ function runTestCase(container) {
 		timeScale: {
 			barSpacing: 20,
 		},
+		layout: {
+			backgroundColor: '#fff',
+		},
 		leftPriceScale: {
 			visible: true,
 			scaleMargins: {
@@ -55,14 +58,26 @@ function runTestCase(container) {
 				bottom: 0,
 			},
 		},
+		rightPriceScale: {
+			visible: true,
+		},
 	});
 
 	const mainSeries = chart.addCandlestickSeries({
 		drawBorder: true,
 		borderColor: 'blue',
+		priceScaleId: 'left',
 	});
 
 	mainSeries.setData(generateData());
+
+	const secondarySeries = chart.addCandlestickSeries({
+		drawBorder: true,
+		borderColor: 'blue',
+		priceScaleId: 'right',
+	});
+
+	secondarySeries.setData(generateData());
 
 	const histSeries = chart.addHistogramSeries({
 		lineWidth: 1,
@@ -82,5 +97,6 @@ function runTestCase(container) {
 	screenshot.style.top = '260px';
 
 	const parent = container.parentNode;
+	parent.style.backgroundColor = 'yellow';
 	parent.appendChild(screenshot);
 }

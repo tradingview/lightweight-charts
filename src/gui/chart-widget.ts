@@ -283,7 +283,7 @@ export class ChartWidget implements IDestroyable {
 				const image = this._timeAxisWidget.getImage();
 				ctx.drawImage(image, targetX, targetY, size.w, size.h);
 				if (this._isRightAxisVisible()) {
-					targetX = firstPane.getSize().w;
+					targetX += firstPane.getSize().w;
 					drawStub('right');
 					ctx.restore();
 				}
