@@ -46,11 +46,15 @@ An area series interface can be customized using the following set of options:
 
 |Name|Type|Default|Description|
 |-|----|-------|-|
-|`topColor`|`string`|`rgba(46, 220, 135, 0.4)`|Area top color|
-|`bottomColor`|`string`|`rgba(40, 221, 100, 0)`|Area bottom color|
-|`lineColor`|`string`|`#33D778`|Line color|
+|`topFillColor1`|`string`|`rgba(46, 220, 135, 0.4)`|Area top fill color 1|
+|`topFillColor2`|`string`|`rgba(40, 221, 100, 0)`|Area top color 2|
+|`bottomFillColor1`|`string`|`rgba(255, 18, 18, 0)`|Area bottom color 1|
+|`bottomFillColor2`|`string`|`rgba(255, 18, 18, 0.4)`|Area bottom color 2|
+|`topLineColor`|`string`|`#33D778`|Top Line color|
+|`bottomLineColor`|`string`|`#FF1212`|Bottom Line color|
 |`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
 |`lineWidth`|`number`|`3`|Line width in pixels|
+|`baselinePrice`|`number`|`0`|Price as base line|
 |`crosshairMarkerVisible`|`boolean`|`true`|If true, the crosshair marker is shown|
 |`crosshairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
 |`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
@@ -62,9 +66,9 @@ An area series interface can be customized using the following set of options:
 
     ```js
     const areaSeries = chart.addAreaSeries({
-        topColor: 'rgba(21, 146, 230, 0.4)',
-        bottomColor: 'rgba(21, 146, 230, 0)',
-        lineColor: 'rgba(21, 146, 230, 1)',
+        topFillColor1: 'rgba(21, 146, 230, 0.4)',
+        topFillColor2: 'rgba(21, 146, 230, 0)',
+        topLineColor: 'rgba(21, 146, 230, 1)',
         lineStyle: 0,
         lineWidth: 3,
         crosshairMarkerVisible: false,
@@ -79,7 +83,7 @@ An area series interface can be customized using the following set of options:
     ```js
     // for example, let's override line width and color only
     areaSeries.applyOptions({
-        lineColor: 'rgba(255, 44, 128, 1)',
+        topLineColor: 'rgba(255, 44, 128, 1)',
         lineWidth: 1,
     });
     ```

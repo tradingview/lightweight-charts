@@ -41,9 +41,13 @@ export const lineStyleDefaults: LineStyleOptions = {
 };
 
 export const areaStyleDefaults: AreaStyleOptions = {
-	topColor: 'rgba( 46, 220, 135, 0.4)',
-	bottomColor: 'rgba( 40, 221, 100, 0)',
-	lineColor: '#33D778',
+	topFillColor1: 'rgba( 46, 220, 135, 0.4)',
+	topFillColor2: 'rgba( 40, 221, 100, 0)',
+	bottomFillColor1: 'rgba(255, 18, 18, 0)',
+	bottomFillColor2: 'rgba(255, 18, 18, 0.4)',
+	topLineColor: '#33D778',
+	bottomLineColor: '#FF1212',
+	baselinePrice: 0,
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
 	lineType: LineType.Simple,

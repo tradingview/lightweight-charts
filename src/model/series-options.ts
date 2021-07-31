@@ -67,9 +67,13 @@ export interface LineStyleOptions {
 }
 
 export interface AreaStyleOptions {
-	topColor: string;
-	bottomColor: string;
-	lineColor: string;
+	topFillColor1: string;
+	topFillColor2: string;
+	bottomFillColor1: string;
+	bottomFillColor2: string;
+	topLineColor: string;
+	bottomLineColor: string;
+	baselinePrice: number;
 	lineStyle: LineStyle;
 	lineWidth: LineWidth;
 	lineType: LineType;
