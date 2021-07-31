@@ -102,7 +102,7 @@ export class SeriesBarColorer {
 
 	private _areaStyle(areaStyle: AreaStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Area'>;
-		const isAboveBaseLine = currentBar.value[0] > areaStyle.baselinePrice;
+		const isAboveBaseLine = currentBar.value[0] >= areaStyle.baselinePrice;
 		return {
 			...emptyResult,
 			barColor: isAboveBaseLine ? areaStyle.topLineColor : areaStyle.bottomLineColor,

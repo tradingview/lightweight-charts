@@ -48,7 +48,7 @@ function createFirstSeries() {
 
 function createSecondSeries() {
 	areaSeries2 = chart.addAreaSeries({
-		lineColor: 'red',
+		topLineColor: 'red',
 	});
 	data2 = [...generateData(20, Date.UTC(2022, 0, 1, 0, 0, 0, 0), true), ...generateData(61, Date.UTC(2022, 1, 1, 0, 0, 0, 0))];
 	areaSeries2.setData(data2);

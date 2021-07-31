@@ -49,7 +49,7 @@ export class PaneRendererArea extends ScaledRenderer {
 		const baseLinePercent = this._baseLine / this._data.bottom;
 		gradient.addColorStop(0, this._data.topFillColor1);
 		gradient.addColorStop(baseLinePercent, this._data.topFillColor2);
-		gradient.addColorStop(baseLinePercent, this._data.bottomFillColor1); // Add small size?
+		gradient.addColorStop(baseLinePercent + 0.01, this._data.bottomFillColor1); // Add small size
 		gradient.addColorStop(1, this._data.bottomFillColor2);
 
 		ctx.lineCap = 'butt';
@@ -98,7 +98,7 @@ export class PaneRendererArea extends ScaledRenderer {
 		const baseLinePercent = this._baseLine / this._data.bottom;
 		gradient.addColorStop(0, this._data.topLineColor);
 		gradient.addColorStop(baseLinePercent, this._data.topLineColor);
-		gradient.addColorStop(baseLinePercent, this._data.bottomLineColor); // Add small size?
+		gradient.addColorStop(baseLinePercent + 0.01, this._data.bottomLineColor); // Add small size
 		gradient.addColorStop(1, this._data.bottomLineColor);
 		setLineStyle(ctx, this._data.lineStyle);
 
