@@ -133,7 +133,6 @@ The following set of options can be used to adjust the price axis interface:
 |`borderVisible`|`boolean`|`true`|If true, price scale border is visible|
 |`borderColor`|`string`|`#2b2b43`|Pricescale border color|
 |`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (percent)|
-|`entireTextOnly`|`boolean`|`false`|If false, top and bottom corner labels are shown even if they are partially not visible |
 |`drawTicks`|`boolean`|`true`|If true, a small horizontal line is drawn on price axis labels|
 
 ### An example of a price scale customization
@@ -286,6 +285,7 @@ The following options can be used to customize chart design:
 |`textColor`|`string`|`#191919`|Scale value text color|
 |`fontSize`|`number`|`11`|Scales values' font size|
 |`fontFamily`|`string`|`'Trebuchet MS', Roboto, Ubuntu, sans-serif`|Font family to be used on scales|
+|`croppedTickMarks`|`boolean`|`true`|If disabled, partially visible price labels on price axis will be hidden |
 
 ### An example of layout customization
 

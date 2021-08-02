@@ -8,4 +8,6 @@ export interface LayoutOptions {
 	fontSize: number;
 	/** Font family of a text on the scales */
 	fontFamily: string;
+	/** If disabled, partially visible price labels on price axis will be hidden */
+	croppedTickMarks: boolean;
 }

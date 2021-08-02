@@ -7,4 +7,5 @@ export const layoutOptionsDefaults: LayoutOptions = {
 	textColor: '#191919',
 	fontSize: 11,
 	fontFamily: defaultFontFamily,
+	croppedTickMarks: true,
 };
