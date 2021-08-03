@@ -140,7 +140,7 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 				const now = performance.now();
 				const timeToAnimationEnd = this._endTime - now;
 				if (timeToAnimationEnd > 0) {
-					if (timeToAnimationEnd < LasPriceAnimationMode.OnDataUpdate / 4) {
+					if (timeToAnimationEnd < Constants.AnimationPeriod / 4) {
 						this._endTime += Constants.AnimationPeriod;
 					}
 					return;
