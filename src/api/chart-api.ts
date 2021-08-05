@@ -9,6 +9,8 @@ import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
 import { Series } from '../model/series';
 import {
+	AreaBaselineSeriesOptions,
+	AreaBaselineSeriesPartialOptions,
 	AreaSeriesOptions,
 	AreaSeriesPartialOptions,
 	BarSeriesOptions,
@@ -35,6 +37,7 @@ import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
 import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
+	areaBaselineStyleDefaults,
 	areaStyleDefaults,
 	barStyleDefaults,
 	candlestickStyleDefaults,
@@ -201,6 +204,20 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const series = this._chartWidget.model().createSeries('Area', strictOptions);
 
 		const res = new SeriesApi<'Area'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
+	public addAreaBaselineSeries(options: AreaBaselineSeriesPartialOptions = {}): ISeriesApi<'AreaBaseline'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), areaBaselineStyleDefaults, options) as AreaBaselineSeriesOptions;
+		const series = this._chartWidget.model().createSeries('AreaBaseline', strictOptions);
+
+		const res = new SeriesApi<'AreaBaseline'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 

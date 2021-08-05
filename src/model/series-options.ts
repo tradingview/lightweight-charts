@@ -79,6 +79,29 @@ export interface AreaStyleOptions {
 	crosshairMarkerBackgroundColor: string;
 }
 
+export interface BaseValuePrice {
+	type: 'price';
+	price: number;
+}
+
+export type BaseValueType = BaseValuePrice;
+export interface AreaBaselineStyleOptions {
+	topFillColor1: string;
+	topFillColor2: string;
+	bottomFillColor1: string;
+	bottomFillColor2: string;
+	topLineColor: string;
+	bottomLineColor: string;
+	baseValue: BaseValueType;
+	lineStyle: LineStyle;
+	lineWidth: LineWidth;
+	lineType: LineType;
+	crosshairMarkerVisible: boolean;
+	crosshairMarkerRadius: number;
+	crosshairMarkerBorderColor: string;
+	crosshairMarkerBackgroundColor: string;
+}
+
 export interface HistogramStyleOptions {
 	color: string;
 	base: number;
@@ -253,10 +276,17 @@ export type HistogramSeriesPartialOptions = SeriesPartialOptions<HistogramStyleO
 export type LineSeriesOptions = SeriesOptions<LineStyleOptions>;
 export type LineSeriesPartialOptions = SeriesPartialOptions<LineStyleOptions>;
 
+/**
+ * Structure describing area base line series options.
+ */
+export type AreaBaselineSeriesOptions = SeriesOptions<AreaBaselineStyleOptions>;
+export type AreaBaselineSeriesPartialOptions = SeriesPartialOptions<AreaBaselineStyleOptions>;
+
 export interface SeriesOptionsMap {
 	Bar: BarSeriesOptions;
 	Candlestick: CandlestickSeriesOptions;
 	Area: AreaSeriesOptions;
+	AreaBaseline: AreaBaselineSeriesOptions;
 	Line: LineSeriesOptions;
 	Histogram: HistogramSeriesOptions;
 }
@@ -265,6 +295,7 @@ export interface SeriesPartialOptionsMap {
 	Bar: BarSeriesPartialOptions;
 	Candlestick: CandlestickSeriesPartialOptions;
 	Area: AreaSeriesPartialOptions;
+	AreaBaseline: AreaBaselineSeriesPartialOptions;
 	Line: LineSeriesPartialOptions;
 	Histogram: HistogramSeriesPartialOptions;
 }

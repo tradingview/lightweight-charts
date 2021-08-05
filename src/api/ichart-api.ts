@@ -5,6 +5,7 @@ import { ChartOptions } from '../model/chart-model';
 import { Point } from '../model/point';
 import { SeriesMarker } from '../model/series-markers';
 import {
+	AreaBaselineSeriesPartialOptions,
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
@@ -54,6 +55,14 @@ export interface IChartApi {
 	 * @returns an interface of the created series
 	 */
 	addAreaSeries(areaOptions?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
+
+		/**
+	 * Creates an area series with base line and specified parameters
+	 *
+	 * @param areaBaselineOptions - customization parameters of the series being created
+	 * @returns an interface of the created series
+	 */
+	addAreaBaselineSeries(areaBaselineOptions?: AreaBaselineSeriesPartialOptions): ISeriesApi<'AreaBaseline'>;
 
 	/**
 	 * Creates a bar series with specified parameters

@@ -4,6 +4,7 @@ import { PlotRowValueIndex } from './plot-data';
 import { Series } from './series';
 import { SeriesPlotRow } from './series-data';
 import {
+	AreaBaselineStyleOptions,
 	AreaStyleOptions,
 	BarStyleOptions,
 	CandlestickStyleOptions,
@@ -48,6 +49,9 @@ export class SeriesBarColorer {
 
 			case 'Area':
 				return this._areaStyle(seriesOptions as AreaStyleOptions);
+
+			case 'AreaBaseline':
+				return this._areaBaselineStyle(seriesOptions as AreaBaselineStyleOptions, barIndex, precomputedBars);
 
 			case 'Bar':
 				return this._barStyle(seriesOptions as BarStyleOptions, barIndex, precomputedBars);
@@ -104,6 +108,15 @@ export class SeriesBarColorer {
 		return {
 			...emptyResult,
 			barColor: areaStyle.lineColor,
+		};
+	}
+
+	private _areaBaselineStyle(areaBaselineStyle: AreaBaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'AreaBaseline'>;
+		const isAboveBaseline = currentBar.value[0] >= areaBaselineStyle.baseValue.price;
+		return {
+			...emptyResult,
+			barColor: isAboveBaseline ? areaBaselineStyle.topLineColor : areaBaselineStyle.bottomLineColor,
 		};
 	}
 

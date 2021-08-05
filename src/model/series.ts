@@ -7,6 +7,7 @@ import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { isInteger, merge } from '../helpers/strict-type-checks';
 
+import { SeriesAreaBaselinePaneView } from '../views/pane/area-baseline-pane-view';
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
 import { SeriesCandlesticksPaneView } from '../views/pane/candlesticks-pane-view';
@@ -39,6 +40,7 @@ import { SeriesBarColorer } from './series-bar-colorer';
 import { createSeriesPlotList, SeriesPlotList, SeriesPlotRow } from './series-data';
 import { InternalSeriesMarker, SeriesMarker } from './series-markers';
 import {
+	AreaBaselineStyleOptions,
 	AreaStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
@@ -83,6 +85,7 @@ export interface SeriesDataAtTypeMap {
 	Bar: BarPrices;
 	Candlestick: BarPrices;
 	Area: BarPrice;
+	AreaBaseline: BarPrice;
 	Line: BarPrice;
 	Histogram: BarPrice;
 }
@@ -423,8 +426,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public markerDataAtIndex(index: TimePointIndex): MarkerData | null {
-		const getValue = (this._seriesType === 'Line' || this._seriesType === 'Area') &&
-			(this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerVisible;
+		const getValue = (this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'AreaBaseline') &&
+			(this._options as (LineStyleOptions | AreaStyleOptions | AreaBaselineStyleOptions)).crosshairMarkerVisible;
 
 		if (!getValue) {
 			return null;
@@ -460,7 +463,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		// TODO: refactor this
 		// series data is strongly hardcoded to keep bars
-		const plots = this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'Histogram'
+		const plots = this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'AreaBaseline' || this._seriesType === 'Histogram'
 			? [PlotRowValueIndex.Close]
 			: [PlotRowValueIndex.Low, PlotRowValueIndex.High];
 
@@ -481,7 +484,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		switch (this._seriesType) {
 			case 'Line':
 			case 'Area':
-				return (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerRadius;
+			case 'AreaBaseline':
+				return (this._options as (LineStyleOptions | AreaStyleOptions | AreaBaselineStyleOptions)).crosshairMarkerRadius;
 		}
 
 		return 0;
@@ -490,8 +494,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _markerBorderColor(): string {
 		switch (this._seriesType) {
 			case 'Line':
-			case 'Area': {
-				const crosshairMarkerBorderColor = (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBorderColor;
+			case 'Area':
+			case 'AreaBaseline': {
+				const crosshairMarkerBorderColor = (this._options as (LineStyleOptions | AreaStyleOptions | AreaBaselineStyleOptions)).crosshairMarkerBorderColor;
 				if (crosshairMarkerBorderColor.length !== 0) {
 					return crosshairMarkerBorderColor;
 				}
@@ -504,8 +509,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _markerBackgroundColor(index: TimePointIndex): string {
 		switch (this._seriesType) {
 			case 'Line':
-			case 'Area': {
-				const crosshairMarkerBackgroundColor = (this._options as (LineStyleOptions | AreaStyleOptions)).crosshairMarkerBackgroundColor;
+			case 'Area':
+			case 'AreaBaseline': {
+				const crosshairMarkerBackgroundColor = (this._options as (LineStyleOptions | AreaStyleOptions | AreaBaselineStyleOptions)).crosshairMarkerBackgroundColor;
 				if (crosshairMarkerBackgroundColor.length !== 0) {
 					return crosshairMarkerBackgroundColor;
 				}
@@ -593,6 +599,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 			case 'Area': {
 				this._paneView = new SeriesAreaPaneView(this as Series<'Area'>, this.model());
+				break;
+			}
+
+			case 'AreaBaseline': {
+				this._paneView = new SeriesAreaBaselinePaneView(this as Series<'AreaBaseline'>, this.model());
 				break;
 			}
 
