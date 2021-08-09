@@ -1,3 +1,5 @@
+import { clamp } from '../helpers/mathex';
+
 import { Coordinate } from '../model/coordinate';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
@@ -48,8 +50,8 @@ export class PaneRendererAreaBaseline extends ScaledRenderer {
 		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);
 		const baseLinePercent = this._baseLine / this._data.bottom;
 		gradient.addColorStop(0, this._data.topFillColor1);
-		gradient.addColorStop(baseLinePercent, this._data.topFillColor2);
-		gradient.addColorStop(Math.min(baseLinePercent + 0.01, 1), this._data.bottomFillColor1); // Add small size
+		gradient.addColorStop(clamp(baseLinePercent, 0, 1), this._data.topFillColor2);
+		gradient.addColorStop(clamp(baseLinePercent + 0.01, 0, 1), this._data.bottomFillColor1); // Add small size
 		gradient.addColorStop(1, this._data.bottomFillColor2);
 
 		ctx.lineCap = 'butt';
@@ -97,8 +99,8 @@ export class PaneRendererAreaBaseline extends ScaledRenderer {
 		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);
 		const baseLinePercent = this._baseLine / this._data.bottom;
 		gradient.addColorStop(0, this._data.topLineColor);
-		gradient.addColorStop(baseLinePercent, this._data.topLineColor);
-		gradient.addColorStop(Math.min(baseLinePercent + 0.01, 1), this._data.bottomLineColor); // Add small size
+		gradient.addColorStop(clamp(baseLinePercent, 0, 1), this._data.topLineColor);
+		gradient.addColorStop(clamp(baseLinePercent + 0.01, 0, 1), this._data.bottomLineColor); // Add small size
 		gradient.addColorStop(1, this._data.bottomLineColor);
 		setLineStyle(ctx, this._data.lineStyle);
 
