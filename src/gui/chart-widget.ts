@@ -21,7 +21,7 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D } from './canvas-utils';
+import { createPreconfiguredCanvas, getContext2D } from './canvas-utils';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -223,17 +223,22 @@ export class ChartWidget implements IDestroyable {
 			this._drawImpl(this._invalidateMask);
 			this._invalidateMask = null;
 		}
-		// calculate target size
-		const firstPane = this._paneWidgets[0];
+
+		const pixelRatio = window.devicePixelRatio;
 		const targetCanvas = createPreconfiguredCanvas(
 			document,
-			size({ width: this._width, height: this._height })
+			// calculate target size
+			size({
+				width: this._width * pixelRatio,
+				height: this._height * pixelRatio,
+			})
 		);
 		const ctx = getContext2D(targetCanvas);
-		const pixelRatio = getCanvasDevicePixelRatio(targetCanvas);
-		drawScaled(ctx, pixelRatio, () => {
+		drawScaled(ctx, pixelRatio, pixelRatio, () => {
 			let targetX = 0;
 			let targetY = 0;
+
+			const firstPane = this._paneWidgets[0];
 
 			const drawPriceAxises = (position: 'left' | 'right') => {
 				for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {

@@ -88,7 +88,11 @@ export class PaneSeparator implements IDestroyable {
 	}
 
 	public getImage(): HTMLCanvasElement {
-		const imageSize = this.getSize();
+		const currentSize = this.getSize();
+		const imageSize = size({
+			width: currentSize.width * window.devicePixelRatio,
+			height: currentSize.height * window.devicePixelRatio,
+		});
 		const res = createPreconfiguredCanvas(document, imageSize);
 		const ctx = getContext2D(res);
 		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;

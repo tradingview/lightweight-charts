@@ -1,8 +1,10 @@
+
 import { ChartModel } from '../../model/chart-model';
 import { IPriceDataSource } from '../../model/iprice-data-source';
 import { TextWidthCache } from '../../model/text-width-cache';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { IPriceAxisViewRenderer, PriceAxisViewRendererOptions } from '../../renderers/iprice-axis-view-renderer';
+import { CanvasRenderingParams } from '../../renderers/render-params';
 
 import { IPriceAxisView } from '../price-axis/iprice-axis-view';
 import { IPaneView } from './ipane-view';
@@ -30,12 +32,12 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 		this._align = align;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
 		if (this._rendererOptions === null || this._priceAxisViewRenderer === null) {
 			return;
 		}
 
-		this._priceAxisViewRenderer.draw(ctx, this._rendererOptions, this._textWidthCache, this._width, this._align, pixelRatio);
+		this._priceAxisViewRenderer.draw(ctx, this._rendererOptions, this._textWidthCache, this._width, this._align, renderParams);
 	}
 }
 

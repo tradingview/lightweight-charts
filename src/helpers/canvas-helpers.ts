@@ -36,9 +36,9 @@ export function fillRectInnerBorder(ctx: CanvasRenderingContext2D, x: number, y:
 	ctx.fillRect(x + width - borderWidth, y, borderWidth, height);
 }
 
-export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
+export function drawScaled(ctx: CanvasRenderingContext2D, xScale: number, yScale: number, func: () => void): void {
 	ctx.save();
-	ctx.scale(ratio, ratio);
+	ctx.scale(xScale, yScale);
 	func();
 	ctx.restore();
 }

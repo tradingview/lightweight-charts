@@ -4,6 +4,7 @@ import { PriceMark } from '../model/price-scale';
 
 import { LineStyle, setLineStyle, strokeInPixel } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
+import { CanvasRenderingParams } from './render-params';
 
 export interface GridMarks {
 	coord: number;
@@ -30,16 +31,18 @@ export class GridRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const lineWidth = Math.max(1, Math.floor(pixelRatio));
+		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+
+		const lineWidth = Math.max(1, Math.floor(horizontalPixelRatio));
 		ctx.lineWidth = lineWidth;
 
-		const height = Math.ceil(this._data.h * pixelRatio);
-		const width = Math.ceil(this._data.w * pixelRatio);
+		const height = Math.ceil(this._data.h * verticalPixelRatio);
+		const width = Math.ceil(this._data.w * horizontalPixelRatio);
 
 		strokeInPixel(ctx, () => {
 			const data = ensureNotNull(this._data);
@@ -48,7 +51,7 @@ export class GridRenderer implements IPaneRenderer {
 				setLineStyle(ctx, data.vertLineStyle);
 				ctx.beginPath();
 				for (const timeMark of data.timeMarks) {
-					const x = Math.round(timeMark.coord * pixelRatio);
+					const x = Math.round(timeMark.coord * horizontalPixelRatio);
 					ctx.moveTo(x, -lineWidth);
 					ctx.lineTo(x, height + lineWidth);
 				}
@@ -59,7 +62,7 @@ export class GridRenderer implements IPaneRenderer {
 				setLineStyle(ctx, data.horzLineStyle);
 				ctx.beginPath();
 				for (const priceMark of data.priceMarks) {
-					const y = Math.round(priceMark.coord * pixelRatio);
+					const y = Math.round(priceMark.coord * verticalPixelRatio);
 					ctx.moveTo(-lineWidth, y);
 					ctx.lineTo(width + lineWidth, y);
 				}

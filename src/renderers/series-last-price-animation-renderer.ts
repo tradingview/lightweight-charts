@@ -1,6 +1,7 @@
 import { Point } from '../model/point';
 
 import { IPaneRenderer } from './ipane-renderer';
+import { CanvasRenderingParams } from './render-params';
 
 export interface LastPriceCircleRendererData {
 	radius: number;
@@ -22,7 +23,7 @@ export class SeriesLastPriceAnimationRenderer implements IPaneRenderer {
 		return this._data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
 		const data = this._data;
 		if (data === null) {
 			return;
@@ -30,27 +31,30 @@ export class SeriesLastPriceAnimationRenderer implements IPaneRenderer {
 
 		ctx.save();
 
-		const tickWidth = Math.max(1, Math.floor(pixelRatio));
+		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+
+		const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
 
 		const correction = (tickWidth % 2) / 2;
-		const centerX = Math.round(data.center.x * pixelRatio) + correction; // correct x coordinate only
-		const centerY = data.center.y * pixelRatio;
+		const centerX = Math.round(data.center.x * horizontalPixelRatio) + correction; // correct x coordinate only
+		const centerY = data.center.y * verticalPixelRatio;
 
 		ctx.fillStyle = data.seriesLineColor;
 		ctx.beginPath();
-		const centerPointRadius = Math.max(2, data.seriesLineWidth * 1.5) * pixelRatio;
+		// TODO: it is better to have different horizontal and vertical radii
+		const centerPointRadius = Math.max(2, data.seriesLineWidth * 1.5) * horizontalPixelRatio;
 		ctx.arc(centerX, centerY, centerPointRadius, 0, 2 * Math.PI, false);
 		ctx.fill();
 
 		ctx.fillStyle = data.fillColor;
 		ctx.beginPath();
-		ctx.arc(centerX, centerY, data.radius * pixelRatio, 0, 2 * Math.PI, false);
+		ctx.arc(centerX, centerY, data.radius * horizontalPixelRatio, 0, 2 * Math.PI, false);
 		ctx.fill();
 
 		ctx.lineWidth = tickWidth;
 		ctx.strokeStyle = data.strokeColor;
 		ctx.beginPath();
-		ctx.arc(centerX, centerY, data.radius * pixelRatio + tickWidth / 2, 0, 2 * Math.PI, false);
+		ctx.arc(centerX, centerY, data.radius * horizontalPixelRatio + tickWidth / 2, 0, 2 * Math.PI, false);
 		ctx.stroke();
 		ctx.restore();
 	}

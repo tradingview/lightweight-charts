@@ -1,5 +1,7 @@
 import { TextWidthCache } from '../model/text-width-cache';
 
+import { CanvasRenderingParams } from './render-params';
+
 export interface TimeAxisViewRendererOptions {
 	baselineOffset: number;
 	borderSize: number;
@@ -13,5 +15,5 @@ export interface TimeAxisViewRendererOptions {
 }
 
 export interface ITimeAxisViewRenderer {
-	draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions, pixelRatio: number): void;
+	draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions, renderParams: CanvasRenderingParams): void;
 }

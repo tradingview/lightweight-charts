@@ -8,6 +8,7 @@ import {
 	PriceAxisViewRendererData,
 	PriceAxisViewRendererOptions,
 } from './iprice-axis-view-renderer';
+import { CanvasRenderingParams } from './render-params';
 
 export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	private _data!: PriceAxisViewRendererData;
@@ -28,7 +29,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		textWidthCache: TextWidthCache,
 		width: number,
 		align: 'left' | 'right',
-		pixelRatio: number
+		renderParams: CanvasRenderingParams
 	): void {
 		if (!this._data.visible) {
 			return;
@@ -62,7 +63,6 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const alignRight = align === 'right';
 
 		const xInside = alignRight ? width : 0;
-		const rightScaled = Math.ceil(width * pixelRatio);
 
 		let xOutside = xInside;
 		let xTick: number;
@@ -93,16 +93,19 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xText = xInside + horzBorder + tickSize + paddingInner;
 			}
 
-			const tickHeight = Math.max(1, Math.floor(pixelRatio));
+			const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
 
-			const horzBorderScaled = Math.max(1, Math.floor(horzBorder * pixelRatio));
+			const tickHeight = Math.max(1, Math.floor(verticalPixelRatio));
+
+			const horzBorderScaled = Math.max(1, Math.floor(horzBorder * horizontalPixelRatio));
+			const rightScaled = Math.ceil(width * horizontalPixelRatio);
 			const xInsideScaled = alignRight ? rightScaled : 0;
-			const yTopScaled = Math.round(yTop * pixelRatio);
-			const xOutsideScaled = Math.round(xOutside * pixelRatio);
-			const yMidScaled = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
+			const yTopScaled = Math.round(yTop * verticalPixelRatio);
+			const xOutsideScaled = Math.round(xOutside * horizontalPixelRatio);
+			const yMidScaled = Math.round(yMid * verticalPixelRatio) - Math.floor(verticalPixelRatio * 0.5);
 
 			const yBottomScaled = yMidScaled + tickHeight + (yMidScaled - yTopScaled);
-			const xTickScaled = Math.round(xTick * pixelRatio);
+			const xTickScaled = Math.round(xTick * horizontalPixelRatio);
 
 			ctx.save();
 
@@ -125,7 +128,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.textAlign = 'left';
 			ctx.fillStyle = this._commonData.color;
 
-			drawScaled(ctx, pixelRatio, () => {
+			drawScaled(ctx, horizontalPixelRatio, verticalPixelRatio, () => {
 				ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
 			});
 

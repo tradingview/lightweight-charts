@@ -1,5 +1,6 @@
 import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
+import { CanvasRenderingParams } from './render-params';
 
 export interface CrosshairLineStyle {
 	lineStyle: LineStyle;
@@ -24,7 +25,7 @@ export class CrosshairRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
@@ -38,15 +39,17 @@ export class CrosshairRenderer implements IPaneRenderer {
 
 		ctx.save();
 
-		const x = Math.round(this._data.x * pixelRatio);
-		const y = Math.round(this._data.y * pixelRatio);
-		const w = Math.ceil(this._data.w * pixelRatio);
-		const h = Math.ceil(this._data.h * pixelRatio);
+		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+
+		const x = Math.round(this._data.x * horizontalPixelRatio);
+		const y = Math.round(this._data.y * verticalPixelRatio);
+		const w = Math.ceil(this._data.w * horizontalPixelRatio);
+		const h = Math.ceil(this._data.h * verticalPixelRatio);
 
 		ctx.lineCap = 'butt';
 
 		if (vertLinesVisible && x >= 0) {
-			ctx.lineWidth = Math.floor(this._data.vertLine.lineWidth * pixelRatio);
+			ctx.lineWidth = Math.floor(this._data.vertLine.lineWidth * horizontalPixelRatio);
 			ctx.strokeStyle = this._data.vertLine.color;
 			ctx.fillStyle = this._data.vertLine.color;
 			setLineStyle(ctx, this._data.vertLine.lineStyle);
@@ -54,7 +57,7 @@ export class CrosshairRenderer implements IPaneRenderer {
 		}
 
 		if (horzLinesVisible && y >= 0) {
-			ctx.lineWidth = Math.floor(this._data.horzLine.lineWidth * pixelRatio);
+			ctx.lineWidth = Math.floor(this._data.horzLine.lineWidth * verticalPixelRatio);
 			ctx.strokeStyle = this._data.horzLine.color;
 			ctx.fillStyle = this._data.horzLine.color;
 			setLineStyle(ctx, this._data.horzLine.lineStyle);
