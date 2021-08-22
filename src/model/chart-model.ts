@@ -553,7 +553,11 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T> {
-		const pane = this._panes[0];
+		const paneIndex = options.pane || 0;
+		if (this._panes.length - 1 < paneIndex) {
+			this.createPane(paneIndex);
+		}
+		const pane = this._panes[paneIndex];
 		const series = this._createSeries(options, seriesType, pane);
 		this._serieses.push(series);
 

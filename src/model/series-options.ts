@@ -230,6 +230,8 @@ export interface SeriesOptionsCommon {
 	overlay?: boolean;
 	/** @deprecated Use priceScale method of the series to apply options instead */
 	scaleMargins?: PriceScaleMargins;
+	/** Panel this series to be added */
+	pane?: number;
 }
 
 export type SeriesOptions<T> = T & SeriesOptionsCommon;
