@@ -34,6 +34,19 @@ export interface MouseEventParamsImpl {
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
+export interface PaneEventParamsImpl {
+	readonly top: {
+		index: number;
+		height: number;
+	};
+	bottom: {
+		index: number;
+		height: number;
+	};
+}
+
+export type PaneEventParamsImplSupplier = () => PaneEventParamsImpl;
+
 export class ChartWidget implements IDestroyable {
 	private readonly _options: ChartOptionsInternal;
 	private _paneWidgets: PaneWidget[] = [];
@@ -51,6 +64,7 @@ export class ChartWidget implements IDestroyable {
 	private _drawPlanned: boolean = false;
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _paneResized: Delegate<PaneEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
@@ -208,6 +222,10 @@ export class ChartWidget implements IDestroyable {
 
 	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._crosshairMoved;
+	}
+
+	public paneResized(): ISubscription<PaneEventParamsImplSupplier> {
+		return this._paneResized;
 	}
 
 	public takeScreenshot(): HTMLCanvasElement {
@@ -557,7 +575,7 @@ export class ChartWidget implements IDestroyable {
 
 			// create and insert separator
 			if (i > 0) {
-				const paneSeparator = new PaneSeparator(this, i - 1, i, false);
+				const paneSeparator = new PaneSeparator(this, i - 1, i, false, this._paneResized);
 				this._paneSeparators.push(paneSeparator);
 				this._tableElement.insertBefore(paneSeparator.getElement(), this._timeAxisWidget.getElement());
 			}
