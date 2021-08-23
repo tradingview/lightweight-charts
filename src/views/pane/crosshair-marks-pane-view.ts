@@ -4,6 +4,8 @@ import { BarPrice } from '../../model/bar';
 import { ChartModel, ChartOptionsInternal } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { Crosshair } from '../../model/crosshair';
+import { IPriceDataSource } from '../../model/iprice-data-source';
+import { Pane } from '../../model/pane';
 import { Series } from '../../model/series';
 import { SeriesItemsIndexesRange, TimePointIndex } from '../../model/time-data';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
@@ -35,7 +37,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 	private readonly _compositeRenderer: CompositeRenderer = new CompositeRenderer();
 	private _markersRenderers: PaneRendererMarks[] = [];
 	private _markersData: MarksRendererData[] = [];
-	private _invalidated: boolean = true;
+	private _validated: Map<Pane, PaneRendererMarks[]> = new Map();
 
 	public constructor(chartModel: ChartModel, crosshair: Crosshair) {
 		this._chartModel = chartModel;
@@ -55,41 +57,51 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 			this._compositeRenderer.setRenderers(this._markersRenderers);
 		}
 
-		this._invalidated = true;
+		this._validated.clear();
 	}
 
-	public renderer(height: number, width: number, addAnchors?: boolean): IPaneRenderer | null {
-		if (this._invalidated) {
-			this._updateImpl();
-			this._invalidated = false;
+	public renderer(height: number, width: number, pane: Pane, addAnchors?: boolean): IPaneRenderer | null {
+		let renderers = this._validated.get(pane);
+		if (!renderers) {
+			renderers = this._updateImpl(pane);
+			this._validated.set(pane, renderers);
+			const compositeRenderer = new CompositeRenderer();
+			compositeRenderer.setRenderers(renderers);
+			return compositeRenderer;
 		}
 
-		return this._compositeRenderer;
+		const compositeRenderer = new CompositeRenderer();
+		compositeRenderer.setRenderers(renderers);
+		return compositeRenderer;
+		// return this._compositeRenderer;
 	}
 
-	private _updateImpl(): void {
-		const serieses = this._chartModel.serieses();
+	private _updateImpl(pane: Pane): PaneRendererMarks[] {
+		const serieses = this._chartModel.serieses()
+			.map((datasource: IPriceDataSource, index: number): [Series, number] => [datasource as Series, index])
+			.filter((entry: [IPriceDataSource, number]) => pane.dataSources().includes(entry[0]));
+
 		const timePointIndex = this._crosshair.appliedIndex();
 		const timeScale = this._chartModel.timeScale();
 
-		serieses.forEach((s: Series, index: number) => {
+		return serieses.map(([s, index]: [Series, number]) => {
 			const data = this._markersData[index];
 			const seriesData = s.markerDataAtIndex(timePointIndex);
 
 			if (seriesData === null || !s.visible()) {
 				data.visibleRange = null;
-				return;
+			} else {
+				const firstValue = ensureNotNull(s.firstValue());
+				data.lineColor = seriesData.backgroundColor;
+				data.backColor = seriesData.borderColor;
+				data.radius = seriesData.radius;
+				data.items[0].price = seriesData.price;
+				data.items[0].y = s.priceScale().priceToCoordinate(seriesData.price, firstValue.value);
+				data.items[0].time = timePointIndex;
+				data.items[0].x = timeScale.indexToCoordinate(timePointIndex);
+				data.visibleRange = rangeForSinglePoint;
 			}
-
-			const firstValue = ensureNotNull(s.firstValue());
-			data.lineColor = seriesData.backgroundColor;
-			data.backColor = seriesData.borderColor;
-			data.radius = seriesData.radius;
-			data.items[0].price = seriesData.price;
-			data.items[0].y = s.priceScale().priceToCoordinate(seriesData.price, firstValue.value);
-			data.items[0].time = timePointIndex;
-			data.items[0].x = timeScale.indexToCoordinate(timePointIndex);
-			data.visibleRange = rangeForSinglePoint;
+			return this._markersRenderers[index];
 		});
 	}
 }
