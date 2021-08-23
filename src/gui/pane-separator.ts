@@ -1,8 +1,9 @@
+import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clamp } from '../helpers/mathex';
 
 import { createPreconfiguredCanvas, getContext2D, Size } from './canvas-utils';
-import { ChartWidget } from './chart-widget';
+import { ChartWidget, PaneEventParamsImplSupplier } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
 
@@ -17,6 +18,11 @@ export class PaneSeparator implements IDestroyable {
 	private readonly _paneA: PaneWidget;
 	private readonly _paneB: PaneWidget;
 
+	private readonly _topPaneIndex: number;
+	private readonly _bottomPaneIndex: number;
+
+	private readonly _resizeDelegate: Delegate<PaneEventParamsImplSupplier>;
+
 	private _startY: number = 0;
 	private _deltaY: number = 0;
 	private _totalHeight: number = 0;
@@ -26,14 +32,16 @@ export class PaneSeparator implements IDestroyable {
 	private _pixelStretchFactor: number = 0;
 	private _mouseActive: boolean = false;
 
-	public constructor(chartWidget: ChartWidget, topPaneIndex: number, bottomPaneIndex: number, disableResize: boolean) {
+	public constructor(chartWidget: ChartWidget, topPaneIndex: number, bottomPaneIndex: number, disableResize: boolean, resizeDelegate: Delegate<PaneEventParamsImplSupplier>) {
 		this._chartWidget = chartWidget;
 		this._paneA = chartWidget.paneWidgets()[topPaneIndex];
 		this._paneB = chartWidget.paneWidgets()[bottomPaneIndex];
 
 		this._rowElement = document.createElement('tr');
 		this._rowElement.style.height = SEPARATOR_HEIGHT + 'px';
-
+		this._topPaneIndex = topPaneIndex;
+		this._bottomPaneIndex = bottomPaneIndex;
+		this._resizeDelegate = resizeDelegate;
 		this._cell = document.createElement('td');
 		this._cell.style.position = 'relative';
 		this._cell.style.padding = '0';
@@ -116,6 +124,7 @@ export class PaneSeparator implements IDestroyable {
 			this._handle.style.backgroundColor = '';
 		}
 	}
+
 	private _mouseDownEvent(event: TouchMouseEvent): void {
 		this._startY = event.pageY;
 		this._deltaY = 0;
@@ -141,6 +150,16 @@ export class PaneSeparator implements IDestroyable {
 			this._startY = event.pageY;
 		}
 		this._chartWidget.model().fullUpdate();
+		this._resizeDelegate.fire(() => ({
+			top: {
+				index: this._topPaneIndex,
+				height: this._paneA.getSize().h,
+			},
+			bottom: {
+				index: this._bottomPaneIndex,
+				height: this._paneB.getSize().h,
+			},
+		}));
 	}
 
 	private _mouseUpEvent(event: TouchMouseEvent): void {
