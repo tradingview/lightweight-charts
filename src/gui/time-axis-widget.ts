@@ -4,7 +4,6 @@ import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
-import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { LayoutOptions } from '../model/layout-options';
@@ -143,7 +142,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			return;
 		}
 
-		model.startScaleTime(event.localX as Coordinate);
+		model.startScaleTime(event.localX);
 	}
 
 	public mouseDownOutsideEvent(): void {
@@ -162,7 +161,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			return;
 		}
 
-		model.scaleTimeTo(event.localX as Coordinate);
+		model.scaleTimeTo(event.localX);
 	}
 
 	public mouseUpEvent(event: TouchMouseEvent): void {

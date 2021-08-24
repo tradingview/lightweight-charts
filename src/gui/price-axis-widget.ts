@@ -5,7 +5,6 @@ import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
-import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
@@ -291,7 +290,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const model = this._pane.chart().model();
 		const pane = this._pane.state();
 		this._mousedown = true;
-		model.startScalePrice(pane, this._priceScale, e.localY as Coordinate);
+		model.startScalePrice(pane, this._priceScale, e.localY);
 	}
 
 	private _pressedMouseMoveEvent(e: TouchMouseEvent): void {
@@ -302,7 +301,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const model = this._pane.chart().model();
 		const pane = this._pane.state();
 		const priceScale = this._priceScale;
-		model.scalePriceTo(pane, priceScale, e.localY as Coordinate);
+		model.scalePriceTo(pane, priceScale, e.localY);
 	}
 
 	private _mouseDownOutsideEvent(): void {
