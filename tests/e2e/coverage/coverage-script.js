@@ -93,6 +93,7 @@ function runTestCase(container) {
 		priceFormat: {
 			type: 'volume',
 		},
+		lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.Continuous,
 	});
 	seriesToRemove.setData(generateLineData());
 
@@ -121,6 +122,7 @@ function runTestCase(container) {
 		priceFormat: {
 			type: 'volume',
 		},
+		lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.OnDataUpdate,
 	});
 
 	lineSeries.setData(generateLineData());
