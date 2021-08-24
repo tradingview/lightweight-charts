@@ -112,6 +112,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _markers: SeriesMarker<TimePoint>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
+	private _animationTimeoutId: TimerId | null = null;
 
 	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T) {
 		super(model);
@@ -132,7 +133,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._recreatePaneViews();
 	}
 
-	public destroy(): void {}
+	public destroy(): void {
+		if (this._animationTimeoutId !== null) {
+			clearTimeout(this._animationTimeoutId);
+		}
+	}
 
 	public priceLineColor(lastBarColor: string): string {
 		return this._options.priceLineColor || lastBarColor;
@@ -363,8 +368,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			return [];
 		}
 
-		if (animationPaneView.animationActive()) {
-			setTimeout(() => this.model().cursorUpdate(), 0);
+		if (this._animationTimeoutId === null && animationPaneView.animationActive()) {
+			this._animationTimeoutId = setTimeout(
+				() => {
+					this._animationTimeoutId = null;
+					this.model().cursorUpdate();
+				},
+				0
+			);
 		}
 
 		animationPaneView.invalidateStage();
