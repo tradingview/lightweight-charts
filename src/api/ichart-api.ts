@@ -181,4 +181,20 @@ export interface IChartApi {
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribePaneResize(handler: PaneEventHandler): void;
+
+	/**
+	 * Removes a pane with index
+	 *
+	 * @param index the pane to be removed
+	 */
+	removePane(index: number): void;
+
+	/**
+	 * swap the position of two panes.
+	 *
+	 * @param first the first index
+	 * @param second the second index
+	 */
+	swapPane(first: number, second: number): void;
+
 }
