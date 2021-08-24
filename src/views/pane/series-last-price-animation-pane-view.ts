@@ -1,3 +1,4 @@
+import { assert } from '../../helpers/assertions';
 import { applyAlpha } from '../../helpers/color';
 
 import { Point } from '../../model/point';
@@ -108,9 +109,7 @@ function animationData(durationSinceStart: number, lineColor: string): Animation
 		}
 	}
 
-	if (currentStageData === undefined) {
-		throw new Error('Last price animation internal logic error');
-	}
+	assert(currentStageData !== undefined, 'Last price animation internal logic error');
 
 	const subStage = (globalStage - currentStageData.start) / (currentStageData.end - currentStageData.start);
 	return {
