@@ -362,6 +362,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._paneResizeDelegate.unsubscribe(handler);
 	}
 
+	public removePane(index: number): void {
+		this._chartWidget.model().removePane(index);
+	}
+
+	public swapPane(first: number, second: number): void {
+		this._chartWidget.model().swapPane(first, second);
+	}
+
 	private _sendUpdateToChart(update: DataUpdateResponse): void {
 		const model = this._chartWidget.model();
 
