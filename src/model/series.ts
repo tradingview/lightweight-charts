@@ -5,7 +5,7 @@ import { VolumeFormatter } from '../formatters/volume-formatter';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
-import { isInteger, merge } from '../helpers/strict-type-checks';
+import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
 
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
@@ -42,6 +42,7 @@ import {
 	AreaStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
+	SeriesOptionsCommon,
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
@@ -215,12 +216,13 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options as SeriesOptionsMap[T];
 	}
 
-	public applyOptions(options: SeriesPartialOptionsInternal<T>): void {
+	public applyOptions(options: SeriesPartialOptionsInternal<T> | DeepPartial<SeriesOptionsCommon>): void {
 		const targetPriceScaleId = options.priceScaleId;
 		if (targetPriceScaleId !== undefined && targetPriceScaleId !== this._options.priceScaleId) {
 			// series cannot do it itself, ask model
 			this.model().moveSeriesToScale(this, targetPriceScaleId);
 		}
+		const previousPaneIndex = this._options.pane ?? 0;
 		merge(this._options, options);
 
 		// eslint-disable-next-line deprecation/deprecation
@@ -233,6 +235,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		if (options.priceFormat !== undefined) {
 			this._recreateFormatter();
+		}
+
+		if (options.pane && previousPaneIndex !== options.pane) {
+			this.model().moveSeriesToPane(this, previousPaneIndex, options.pane);
 		}
 
 		this.model().updateSource(this);
