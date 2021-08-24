@@ -70,7 +70,7 @@ A line series interface can be customized using the following options:
         crosshairMarkerBorderColor: '#ffffff',
         crosshairMarkerBackgroundColor: '#2296f3',
         lineType: 1,
-        lastPriceAnimation: 1,
+        lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.Continuous,
     });
     ```
 

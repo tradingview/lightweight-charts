@@ -72,7 +72,7 @@ An area series interface can be customized using the following set of options:
         crosshairMarkerRadius: 3,
         crosshairMarkerBorderColor: 'rgb(255, 255, 255, 1)',
         crosshairMarkerBackgroundColor: 'rgb(34, 150, 243, 1)',
-        lastPriceAnimation: 1,
+        lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.Continuous,
     });
     ```
 
