@@ -831,7 +831,12 @@ export class TimeScale {
 			return;
 		}
 
-		const delta = ensureNotNull(this.visibleStrictRange()).left() - firstIndex;
+		const visibleRange = this.visibleStrictRange();
+		if (visibleRange === null) {
+			return;
+		}
+
+		const delta = visibleRange.left() - firstIndex;
 		if (delta < 0) {
 			const leftEdgeOffset = this._rightOffset - delta - 1;
 			this.setRightOffset(leftEdgeOffset);
