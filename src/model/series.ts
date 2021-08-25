@@ -75,7 +75,7 @@ export type LastValueDataResultWithoutRawPrice = LastValueDataResultWithoutData 
 export interface MarkerData {
 	price: BarPrice;
 	radius: number;
-	borderColor: string;
+	borderColor: string | null;
 	backgroundColor: string;
 }
 
@@ -487,7 +487,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return 0;
 	}
 
-	private _markerBorderColor(): string {
+	private _markerBorderColor(): string | null {
 		switch (this._seriesType) {
 			case 'Line':
 			case 'Area': {
@@ -498,7 +498,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			}
 		}
 
-		return this.model().options().layout.backgroundColor;
+		return null;
 	}
 
 	private _markerBackgroundColor(index: TimePointIndex): string {

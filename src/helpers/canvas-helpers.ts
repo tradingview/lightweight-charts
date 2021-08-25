@@ -49,3 +49,17 @@ export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w
 	ctx.fillRect(x, y, w, h);
 	ctx.restore();
 }
+
+// eslint-disable-next-line max-params
+export function clearRectWithGradient(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, topColor: string, bottomColor: string): void {
+	ctx.save();
+
+	ctx.globalCompositeOperation = 'copy';
+	const gradient = ctx.createLinearGradient(0, 0, 0, h);
+	gradient.addColorStop(0, topColor);
+	gradient.addColorStop(1, bottomColor);
+	ctx.fillStyle = gradient;
+	ctx.fillRect(x, y, w, h);
+
+	ctx.restore();
+}

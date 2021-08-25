@@ -267,7 +267,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		drawScaled(ctx, pixelRatio, () => {
-			clearRect(ctx, 0, 0, this._size.w, this._size.h, this._backgroundColor());
+			clearRect(ctx, 0, 0, this._size.w, this._size.h, this._chart.model().backgroundBottomColor());
 		});
 	}
 
@@ -360,10 +360,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
-	private _backgroundColor(): string {
-		return this._options.backgroundColor;
-	}
-
 	private _lineColor(): string {
 		return this._chart.options().timeScale.borderColor;
 	}
@@ -437,18 +433,19 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const params: PriceAxisStubParams = {
 			rendererOptionsProvider: rendererOptionsProvider,
 		};
+
+		const borderVisibleGetter = () => {
+			return options.leftPriceScale.borderVisible && model.timeScale().options().borderVisible;
+		};
+
+		const bottomColorGetter = () => model.backgroundBottomColor();
+
 		if (options.leftPriceScale.visible && this._leftStub === null) {
-			const borderVisibleGetter = () => {
-				return options.leftPriceScale.borderVisible && model.timeScale().options().borderVisible;
-			};
-			this._leftStub = new PriceAxisStub('left', this._chart.options(), params, borderVisibleGetter);
+			this._leftStub = new PriceAxisStub('left', options, params, borderVisibleGetter, bottomColorGetter);
 			this._leftStubCell.appendChild(this._leftStub.getElement());
 		}
 		if (options.rightPriceScale.visible && this._rightStub === null) {
-			const borderVisibleGetter = () => {
-				return options.rightPriceScale.borderVisible && model.timeScale().options().borderVisible;
-			};
-			this._rightStub = new PriceAxisStub('right', this._chart.options(), params, borderVisibleGetter);
+			this._rightStub = new PriceAxisStub('right', options, params, borderVisibleGetter, bottomColorGetter);
 			this._rightStubCell.appendChild(this._rightStub.getElement());
 		}
 	}
