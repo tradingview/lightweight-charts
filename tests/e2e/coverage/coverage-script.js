@@ -72,6 +72,11 @@ function runTestCase(container) {
 			fontFamily: 'Roboto',
 			fontStyle: 'italic',
 		},
+		layout: {
+			backgroundType: LightweightCharts.ColorType.Gradient,
+			backgroundGradientStartColor: '#FFFFFF',
+			backgroundGradientEndColor: '#AAFFAA',
+		},
 	});
 
 	const data = generateLineData();
