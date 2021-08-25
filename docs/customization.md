@@ -281,8 +281,11 @@ chart.applyOptions({
 The following options can be used to customize chart design:
 
 |Name                        |Type   |Default  |Description|
-|----------------------------|-------|---------|-|
-|`backgroundColor`|`string`|`#ffffff`|Chart and scale background color|
+|----------------------------|-------|---------|-----------|
+|`backgroundType`|[ColorType](./constants.md#colortype)|`ColorType.Solid`| Chart and scales background color background color type|
+|`backgroundColor`|`string`|`#ffffff`|Chart and scales background color if background color is solid|
+|`backgroundGradientStartColor`|`string`|`#ffffff`|Chart and scales background top color if background type is gradient|
+|`backgroundGradientEndColor`|`string`|`#ffffff`|Chart and scales background bottom color if background type is gradient|
 |`textColor`|`string`|`#191919`|Scale value text color|
 |`fontSize`|`number`|`11`|Scales values' font size|
 |`fontFamily`|`string`|`'Trebuchet MS', Roboto, Ubuntu, sans-serif`|Font family to be used on scales|
@@ -292,7 +295,9 @@ The following options can be used to customize chart design:
 ```js
 chart.applyOptions({
     layout: {
-        backgroundColor: '#FAEBD7',
+        backgroundType: LightweightCharts.ColorType.Gradient,
+        backgroundGradientStartColor: '#FFFFFF',
+        backgroundGradientEndColor: '#AAFFAA',
         textColor: '#696969',
         fontSize: 12,
         fontFamily: 'Calibri',

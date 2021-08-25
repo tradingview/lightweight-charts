@@ -80,3 +80,10 @@ It has the following values:
 - `TickMarkType.DayOfMonth` - the tick mark represents a day of the month.
 - `TickMarkType.Time` - the tick mark represents a time without seconds.
 - `TickMarkType.TimeWithSeconds` - the tick mark represents a full time format.
+
+## ColorType
+
+`ColorType` enum is used to specify a type of color.
+
+- `ColorType.Solid` - solid color.
+- `ColorType.Gradient` - gradient color.
