@@ -69,6 +69,11 @@ export interface PriceScaleOnPane {
 	pane: Pane;
 }
 
+const enum BackgroundColorSide {
+	Top,
+	Bottom,
+}
+
 type InvalidateHandler = (mask: InvalidateMask) => void;
 
 export type VisiblePriceScaleOptions = PriceScaleOptions;
@@ -166,8 +171,8 @@ export class ChartModel implements IDestroyable {
 		this.createPane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
 
-		this._backgroundTopColor = this._getBackgroundColor(true);
-		this._backgroundBottomColor = this._getBackgroundColor(false);
+		this._backgroundTopColor = this._getBackgroundColor(BackgroundColorSide.Top);
+		this._backgroundBottomColor = this._getBackgroundColor(BackgroundColorSide.Bottom);
 	}
 
 	public fullUpdate(): void {
@@ -219,8 +224,8 @@ export class ChartModel implements IDestroyable {
 			this._priceScalesOptionsChanged.fire();
 		}
 
-		this._backgroundTopColor = this._getBackgroundColor(true);
-		this._backgroundBottomColor = this._getBackgroundColor(false);
+		this._backgroundTopColor = this._getBackgroundColor(BackgroundColorSide.Top);
+		this._backgroundBottomColor = this._getBackgroundColor(BackgroundColorSide.Bottom);
 
 		this.fullUpdate();
 	}
@@ -700,11 +705,13 @@ export class ChartModel implements IDestroyable {
 		return series;
 	}
 
-	private _getBackgroundColor(top: boolean): string {
+	private _getBackgroundColor(side: BackgroundColorSide): string {
 		const layoutOptions = this._options.layout;
 
 		if (layoutOptions.backgroundType === ColorType.Gradient) {
-			return top ? layoutOptions.backgroundGradientStartColor : layoutOptions.backgroundGradientEndColor;
+			return side === BackgroundColorSide.Top ?
+				layoutOptions.backgroundGradientStartColor :
+				layoutOptions.backgroundGradientEndColor;
 		}
 
 		return layoutOptions.backgroundColor;
