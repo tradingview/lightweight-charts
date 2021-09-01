@@ -10,7 +10,13 @@ import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, LogicalRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
+import {
+	ITimeScaleApi,
+	LogicalRangeChangeEventHandler,
+	SetVisibleRangeOptions,
+	TimeRange,
+	TimeRangeChangeEventHandler,
+} from './itime-scale-api';
 
 const enum Constants {
 	AnimationDurationMs = 1000,
@@ -63,14 +69,13 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		};
 	}
 
-	public setVisibleRange(range: TimeRange): void {
+	public setVisibleRange(range: TimeRange, options?: Partial<SetVisibleRangeOptions>): void {
 		const convertedRange: TimePointsRange = {
 			from: convertTime(range.from),
 			to: convertTime(range.to),
 		};
 		const logicalRange = this._timeScale().logicalRangeForTimeRange(convertedRange);
-
-		this._model.setTargetLogicalRange(logicalRange);
+		this.setVisibleLogicalRange(logicalRange, options);
 	}
 
 	public getVisibleLogicalRange(): LogicalRange | null {
@@ -85,8 +90,19 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		};
 	}
 
-	public setVisibleLogicalRange(range: Range<number>): void {
+	public setVisibleLogicalRange(range: Range<number>, options?: Partial<SetVisibleRangeOptions>): void {
 		assert(range.from <= range.to, 'The from index cannot be after the to index.');
+
+		if (options?.percentRightMargin) {
+			const lastIndex = this._timeScale().lastIndex();
+			if (lastIndex !== null && range.to >= lastIndex) {
+				const length = range.to - range.from + 1;
+				const percent = Math.max(0, (Math.min(0.99, options.percentRightMargin / 100)));
+				const additionalMargin = percent * length / (1 - percent);
+				range.to += additionalMargin;
+			}
+		}
+
 		this._model.setTargetLogicalRange(range as LogicalRange);
 	}
 

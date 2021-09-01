@@ -8,6 +8,10 @@ import { Time } from './data-consumer';
 
 export type TimeRange = Range<Time>;
 
+export interface SetVisibleRangeOptions {
+	percentRightMargin: number;
+}
+
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null) => void;
 
@@ -44,8 +48,9 @@ export interface ITimeScaleApi {
 	 * Sets visible range of data
 	 *
 	 * @param range - target visible range of data
+	 * @param options
 	 */
-	setVisibleRange(range: TimeRange): void;
+	setVisibleRange(range: TimeRange, options?: Partial<SetVisibleRangeOptions>): void;
 
 	/**
 	 * Returns the currently visible logical range of data.
@@ -58,8 +63,9 @@ export interface ITimeScaleApi {
 	 * Sets visible logical range of data.
 	 *
 	 * @param range - target visible logical range of data.
+	 * @param options
 	 */
-	setVisibleLogicalRange(range: Range<number>): void;
+	setVisibleLogicalRange(range: Range<number>, options?: Partial<SetVisibleRangeOptions>): void;
 
 	/**
 	 * Restores default zooming and scroll position of the time scale

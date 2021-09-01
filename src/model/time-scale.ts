@@ -225,8 +225,8 @@ export class TimeScale {
 		const from = Math.round(range.from);
 		const to = Math.round(range.to);
 
-		const firstIndex = ensureNotNull(this._firstIndex());
-		const lastIndex = ensureNotNull(this._lastIndex());
+		const firstIndex = ensureNotNull(this.firstIndex());
+		const lastIndex = ensureNotNull(this.lastIndex());
 
 		return {
 			from: ensureNotNull(this.indexToTime(Math.max(firstIndex, from) as TimePointIndex) as TimePoint),
@@ -580,8 +580,8 @@ export class TimeScale {
 	}
 
 	public fitContent(): void {
-		const first = this._firstIndex();
-		const last = this._lastIndex();
+		const first = this.firstIndex();
+		const last = this.lastIndex();
 		if (first === null || last === null) {
 			return;
 		}
@@ -605,11 +605,11 @@ export class TimeScale {
 		return this._dateTimeFormatter.format(new Date(time.timestamp * 1000));
 	}
 
-	private _firstIndex(): TimePointIndex | null {
+	public firstIndex(): TimePointIndex | null {
 		return this._points.length === 0 ? null : 0 as TimePointIndex;
 	}
 
-	private _lastIndex(): TimePointIndex | null {
+	public lastIndex(): TimePointIndex | null {
 		return this._points.length === 0 ? null : (this._points.length - 1) as TimePointIndex;
 	}
 
@@ -706,7 +706,7 @@ export class TimeScale {
 	}
 
 	private _minRightOffset(): number | null {
-		const firstIndex = this._firstIndex();
+		const firstIndex = this.firstIndex();
 		const baseIndex = this._baseIndexOrNull;
 		if (firstIndex === null || baseIndex === null) {
 			return null;
@@ -826,7 +826,7 @@ export class TimeScale {
 			return;
 		}
 
-		const firstIndex = this._firstIndex();
+		const firstIndex = this.firstIndex();
 		if (firstIndex === null) {
 			return;
 		}

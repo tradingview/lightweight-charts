@@ -102,13 +102,24 @@ chart.timeScale().getVisibleRange();
 
 ### setVisibleRange()
 
-Sets visible time range of the chart. The argument is an object with the first and last time points of a desired time range.
+Sets visible time range of the chart. It has the following arguments:
+
+`range` - an object with the first and last time points of a desired time range.
+
+`options` - an optional object that for now has only one field:
+
+* `percentRightMargin`: indicates whether the library should apply the percent right margin to the right border if it points on the last bar.
 
 ```js
-chart.timeScale().setVisibleRange({
-    from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
-    to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
-});
+chart.timeScale().setVisibleRange(
+    {
+        from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
+        to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
+    },
+    {
+        percentRightMargin: 10,
+    }
+);
 ```
 
 ### getVisibleLogicalRange
@@ -121,14 +132,24 @@ chart.timeScale().getVisibleLogicalRange();
 
 ### setVisibleLogicalRange
 
-Sets visible [logical range](#logical-range) of the chart.
-The argument is an object with the first and last time points of a desired logical range.
+Sets visible [logical range](#logical-range) of the chart. It has the following arguments:
+
+`range` - an object with the first and last time points of a desired logical range.
+
+`options` - an optional object that for now has only one field:
+
+* `percentRightMargin`: indicates whether the library should apply the percent right margin to the right border if it points on the last bar.
 
 ```js
-chart.timeScale().setVisibleLogicalRange({
-    from: 0,
-    to: 10,
-});
+chart.timeScale().setVisibleLogicalRange(
+    {
+        from: 0,
+        to: 10,
+    },
+    {
+        percentRightMargin: 10,
+    }
+);
 ```
 
 ### resetTimeScale()
@@ -217,8 +238,8 @@ The argument is a handler function, which will be called with the new visible ti
 
 The argument passed to your handler is the new visible time range, which might be either:
 
-- an object with properties `from` and `to` of type [Time](./time.md), that are the first and last visible time points, respectively
-- `null` if nothing is visible or the chart has no data at all
+* an object with properties `from` and `to` of type [Time](./time.md), that are the first and last visible time points, respectively
+* `null` if nothing is visible or the chart has no data at all
 
 ```js
 function onVisibleTimeRangeChanged(newVisibleTimeRange) {
@@ -244,8 +265,8 @@ The argument is a handler function, which will be called with the new visible lo
 
 The argument passed to your handler is the new visible logical range, which might be either:
 
-- an object with numerical properties `from` and `to` of type number (see [Logical range](#logical-range) section), that are the first and last visible logical indexes, respectively
-- `null` if the chart has no data at all
+* an object with numerical properties `from` and `to` of type number (see [Logical range](#logical-range) section), that are the first and last visible logical indexes, respectively
+*`null` if the chart has no data at all
 
 ```js
 function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
