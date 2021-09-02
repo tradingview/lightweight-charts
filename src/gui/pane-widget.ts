@@ -340,7 +340,7 @@ export class PaneWidget implements IDestroyable {
 
 		const priceScale = this._state.defaultPriceScale();
 
-		const now = Date.now();
+		const now = performance.now();
 
 		if (this._startScrollingPos === null && !this._preventScroll()) {
 			this._startScrollingPos = {
@@ -759,7 +759,7 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const startAnimationTime = Date.now();
+		const startAnimationTime = performance.now();
 
 		if (this._scrollXAnimation !== null) {
 			this._scrollXAnimation.start(event.localX, startAnimationTime);
@@ -782,7 +782,7 @@ export class PaneWidget implements IDestroyable {
 				return;
 			}
 
-			const now = Date.now();
+			const now = performance.now();
 
 			let xAnimationFinished = scrollXAnimation.finished(now);
 			if (!scrollXAnimation.terminated()) {
@@ -806,7 +806,7 @@ export class PaneWidget implements IDestroyable {
 	}
 
 	private _terminateKineticAnimation(): void {
-		const now = Date.now();
+		const now = performance.now();
 		const xAnimationFinished = this._scrollXAnimation === null || this._scrollXAnimation.finished(now);
 		if (this._scrollXAnimation !== null) {
 			if (!xAnimationFinished) {
