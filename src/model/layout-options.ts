@@ -22,7 +22,7 @@ export type Background = SolidColor | VerticalGradientColor;
 
 /** Structure describing layout options */
 export interface LayoutOptions {
-	/** Background */
+	/** Chart and scales background */
 	background: Background;
 	/**
 	 * @deprecated Use background instead
