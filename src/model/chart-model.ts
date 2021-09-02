@@ -710,7 +710,7 @@ export class ChartModel implements IDestroyable {
 	private _getBackgroundColor(side: BackgroundColorSide): string {
 		const layoutOptions = this._options.layout;
 
-		if (layoutOptions.background.type === ColorType.Gradient) {
+		if (layoutOptions.background.type === ColorType.VerticalGradient) {
 			return side === BackgroundColorSide.Top ?
 				layoutOptions.background.topColor :
 				layoutOptions.background.bottomColor;

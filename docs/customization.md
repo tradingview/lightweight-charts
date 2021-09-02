@@ -292,16 +292,16 @@ The following options can be used to customize chart design:
 
 ### Background
 
-Background can be either solid or gradient.
+Background can be either solid or vertical gradient.
 
 Solid background has two fields:
 
 - `type` - always `ColorType.Solid`.
 - `color` - solid color.
 
-Gradient background has three fields:
+Vertical gradient background has three fields:
 
-- `type` - always `ColorType.Gradient`.
+- `type` - always `ColorType.VerticalGradient`.
 - `topColor` - gradient top color.
 - `bottomColor` - gradient bottom color.
 

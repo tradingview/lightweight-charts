@@ -1,24 +1,24 @@
 export const enum ColorType {
 	Solid = 'solid',
-	Gradient = 'gradient',
+	VerticalGradient = 'gradient',
 }
 /** Solid color */
 export interface SolidColor {
 	type: ColorType.Solid;
-	/** Background color of the chart area and the scales */
+	/** Color */
 	color: string;
 }
 
-/** Gradient color */
-export interface GradientColor {
-	type: ColorType.Gradient;
-	/** Background top color of the chart area and the scales */
+/** Vertical gradient color */
+export interface VerticalGradientColor {
+	type: ColorType.VerticalGradient;
+	/** Top color */
 	topColor: string;
-	/** Background bottom color of the chart area and the scales */
+	/** Bottom color */
 	bottomColor: string;
 }
 
-export type Background = SolidColor | GradientColor;
+export type Background = SolidColor | VerticalGradientColor;
 
 /** Structure describing layout options */
 export interface LayoutOptions {
