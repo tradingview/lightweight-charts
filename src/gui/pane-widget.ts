@@ -574,8 +574,8 @@ export class PaneWidget implements IDestroyable {
 
 		const topCtx = getContext2D(this._topCanvasBinding.canvas);
 		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
-		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
 		this._drawSources(topCtx, this._canvasBinding.pixelRatio, sourceTopPaneViews);
+		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
