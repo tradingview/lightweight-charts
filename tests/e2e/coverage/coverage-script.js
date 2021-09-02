@@ -76,9 +76,11 @@ function runTestCase(container) {
 			mouse: true,
 		},
 		layout: {
-			backgroundType: LightweightCharts.ColorType.Gradient,
-			backgroundGradientStartColor: '#FFFFFF',
-			backgroundGradientEndColor: '#AAFFAA',
+			background: {
+				type: LightweightCharts.ColorType.VerticalGradient,
+				topColor: '#FFFFFF',
+				bottomColor: '#AAFFAA',
+			},
 		},
 	});
 

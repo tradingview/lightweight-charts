@@ -282,10 +282,7 @@ The following options can be used to customize chart design:
 
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-----------|
-|`backgroundType`|[ColorType](./constants.md#colortype)|`ColorType.Solid`| Chart and scales background color background color type|
-|`background`|[Background](./#background)| `{ type: ColorType.Gradient, color: '#ffffff' }` |Chart and scales background|
-|`backgroundGradientStartColor`|`string`|`#ffffff`|Chart and scales background top color if background type is gradient|
-|`backgroundGradientEndColor`|`string`|`#ffffff`|Chart and scales background bottom color if background type is gradient|
+|`background`|[Background](./#background)| `{ type: ColorType.Solid, color: '#ffffff' }` |Chart and scales background|
 |`textColor`|`string`|`#191919`|Scale value text color|
 |`fontSize`|`number`|`11`|Scales values' font size|
 |`fontFamily`|`string`|`'Trebuchet MS', Roboto, Ubuntu, sans-serif`|Font family to be used on scales|

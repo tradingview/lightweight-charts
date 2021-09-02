@@ -26,7 +26,6 @@ export interface LayoutOptions {
 	background: Background;
 	/**
 	 * @deprecated Use background instead
-	 * @internal
 	 */
 	backgroundColor: string;
 	/** Color of a text on the scales */
