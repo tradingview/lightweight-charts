@@ -532,7 +532,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 }
 
-function getBoundingClientRect(element: HTMLElement): ClientRect | DOMRect {
+function getBoundingClientRect(element: HTMLElement): DOMRect {
 	return element.getBoundingClientRect() || { left: 0, top: 0 };
 }
 
