@@ -80,3 +80,12 @@ It has the following values:
 - `TickMarkType.DayOfMonth` - the tick mark represents a day of the month.
 - `TickMarkType.Time` - the tick mark represents a time without seconds.
 - `TickMarkType.TimeWithSeconds` - the tick mark represents a full time format.
+
+## LasPriceAnimationMode
+
+`LasPriceAnimationMode` enum is used to specify the type of the last price animation for series such as area or line.
+It has the following values:
+
+- `LasPriceAnimationMode.Disabled` - animation is always disabled.
+- `LasPriceAnimationMode.Continuous` - animation is always enabled.
+- `LasPriceAnimationMode.OnDataUpdate` - animation is active some time after data update.
