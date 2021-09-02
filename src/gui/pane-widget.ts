@@ -45,11 +45,11 @@ interface HitTestPaneViewResult {
 	object?: HoveredObject;
 }
 
-type StartScrollPosition = Point & {
+interface StartScrollPosition extends Point {
 	timestamp: number;
 	localX: Coordinate;
 	localY: Coordinate;
-};
+}
 
 export class PaneWidget implements IDestroyable {
 	private readonly _chart: ChartWidget;
