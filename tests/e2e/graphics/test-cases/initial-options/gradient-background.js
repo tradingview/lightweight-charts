@@ -16,9 +16,11 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
 		layout: {
-			backgroundType: LightweightCharts.ColorType.Gradient,
-			backgroundGradientStartColor: '#b1ff73',
-			backgroundGradientEndColor: '#1106b1',
+			background: {
+				type: LightweightCharts.ColorType.VerticalGradient,
+				topColor: '#b1ff73',
+				bottomColor: '#1106b1',
+			},
 		},
 	});
 
