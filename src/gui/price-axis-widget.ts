@@ -1,14 +1,14 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
 import { ensureNotNull } from '../helpers/assertions';
-import { clearRect, drawScaled } from '../helpers/canvas-helpers';
+import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
-import { LayoutOptions } from '../model/layout-options';
+import { LayoutOptionsInternal } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
@@ -32,7 +32,7 @@ type IPriceAxisViewArray = readonly IPriceAxisView[];
 
 export class PriceAxisWidget implements IDestroyable {
 	private readonly _pane: PaneWidget;
-	private readonly _options: LayoutOptions;
+	private readonly _options: LayoutOptionsInternal;
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 	private readonly _isLeft: boolean;
 
@@ -55,7 +55,7 @@ export class PriceAxisWidget implements IDestroyable {
 	private _font: string | null = null;
 	private _prevOptimalWidth: number = 0;
 
-	public constructor(pane: PaneWidget, options: LayoutOptions, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
+	public constructor(pane: PaneWidget, options: LayoutOptionsInternal, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
 		this._options = options;
 		this._rendererOptionsProvider = rendererOptionsProvider;
@@ -128,10 +128,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 	public getElement(): HTMLElement {
 		return this._cell;
-	}
-
-	public backgroundColor(): string {
-		return this._options.backgroundColor;
 	}
 
 	public lineColor(): string {
@@ -379,7 +375,15 @@ export class PriceAxisWidget implements IDestroyable {
 		const width = this._size.w;
 		const height = this._size.h;
 		drawScaled(ctx, pixelRatio, () => {
-			clearRect(ctx, 0, 0, width, height, this.backgroundColor());
+			const model = this._pane.state().model();
+			const topColor = model.backgroundTopColor();
+			const bottomColor = model.backgroundBottomColor();
+
+			if (topColor === bottomColor) {
+				clearRect(ctx, 0, 0, width, height, topColor);
+			} else {
+				clearRectWithGradient(ctx, 0, 0, width, height, topColor, bottomColor);
+			}
 		});
 	}
 

@@ -89,3 +89,10 @@ It has the following values:
 - `LasPriceAnimationMode.Disabled` - animation is always disabled.
 - `LasPriceAnimationMode.Continuous` - animation is always enabled.
 - `LasPriceAnimationMode.OnDataUpdate` - animation is active some time after data update.
+
+## ColorType
+
+`ColorType` enum is used to specify a type of color.
+
+- `ColorType.Solid` - solid color.
+- `ColorType.Gradient` - gradient color.

@@ -6,6 +6,7 @@ export { CrosshairMode } from './model/crosshair';
 export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource, LasPriceAnimationMode } from './model/series-options';
 export { TickMarkType } from './model/time-scale';
+export { ColorType } from './model/layout-options';
 
 export {
 	isBusinessDay,

@@ -1,7 +1,7 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
 import { ensureNotNull } from '../helpers/assertions';
-import { clearRect, drawScaled } from '../helpers/canvas-helpers';
+import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -563,7 +563,7 @@ export class PaneWidget implements IDestroyable {
 		if (type !== InvalidationLevel.Cursor) {
 			const ctx = getContext2D(this._canvasBinding.canvas);
 			ctx.save();
-			this._drawBackground(ctx, this._backgroundColor(), this._canvasBinding.pixelRatio);
+			this._drawBackground(ctx, this._canvasBinding.pixelRatio);
 			if (this._state) {
 				this._drawGrid(ctx, this._canvasBinding.pixelRatio);
 				this._drawWatermark(ctx, this._canvasBinding.pixelRatio);
@@ -586,10 +586,6 @@ export class PaneWidget implements IDestroyable {
 		return this._rightPriceAxisWidget;
 	}
 
-	private _backgroundColor(): string {
-		return this._chart.options().layout.backgroundColor;
-	}
-
 	private _onStateDestroyed(): void {
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
@@ -598,9 +594,17 @@ export class PaneWidget implements IDestroyable {
 		this._state = null;
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, color: string, pixelRatio: number): void {
+	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		drawScaled(ctx, pixelRatio, () => {
-			clearRect(ctx, 0, 0, this._size.w, this._size.h, color);
+			const model = this._model();
+			const topColor = model.backgroundTopColor();
+			const bottomColor = model.backgroundBottomColor();
+
+			if (topColor === bottomColor) {
+				clearRect(ctx, 0, 0, this._size.w, this._size.h, bottomColor);
+			} else {
+				clearRectWithGradient(ctx, 0, 0, this._size.w, this._size.h, topColor, bottomColor);
+			}
 		});
 	}
 

@@ -318,3 +318,17 @@ export function generateContrastColors(backgroundColor: string): ContrastColors 
 		foreground: rgbaToGrayscale(rgb) > 160 ? 'black' : 'white',
 	};
 }
+
+export function gradientColorAtPercent(topColor: string, bottomColor: string, percent: number): string {
+	const [topR, topG, topB, topA] = colorStringToRgba(topColor);
+	const [bottomR, bottomG, bottomB, bottomA] = colorStringToRgba(bottomColor);
+
+	const resultRgba: Rgba = [
+		normalizeRgbComponent(topR + percent * (bottomR - topR) as RedComponent),
+		normalizeRgbComponent(topG + percent * (bottomG - topG) as GreenComponent),
+		normalizeRgbComponent(topB + percent * (bottomB - topB) as BlueComponent),
+		normalizeAlphaComponent(topA + percent * (bottomA - topA) as AlphaComponent),
+	];
+
+	return `rgba(${resultRgba[0]}, ${resultRgba[1]}, ${resultRgba[2]}, ${resultRgba[3]})`;
+}

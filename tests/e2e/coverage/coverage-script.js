@@ -75,6 +75,13 @@ function runTestCase(container) {
 		kineticScroll: {
 			mouse: true,
 		},
+		layout: {
+			background: {
+				type: LightweightCharts.ColorType.VerticalGradient,
+				topColor: '#FFFFFF',
+				bottomColor: '#AAFFAA',
+			},
+		},
 	});
 
 	const data = generateLineData();

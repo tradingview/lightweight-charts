@@ -1,6 +1,7 @@
 /// <reference types="_build-time-constants" />
 
 import { assert, ensureNotNull } from '../helpers/assertions';
+import { gradientColorAtPercent } from '../helpers/color';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -15,7 +16,7 @@ import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale'
 import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
-import { LayoutOptions } from './layout-options';
+import { ColorType, LayoutOptions, LayoutOptionsInternal } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
@@ -73,6 +74,11 @@ export interface PriceScaleOnPane {
 	pane: Pane;
 }
 
+const enum BackgroundColorSide {
+	Top,
+	Bottom,
+}
+
 type InvalidateHandler = (mask: InvalidateMask) => void;
 
 export type VisiblePriceScaleOptions = PriceScaleOptions;
@@ -120,13 +126,21 @@ export interface ChartOptions {
 }
 
 export type ChartOptionsInternal =
-	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale'>
+	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale' | 'layout'>
 	& {
 		/** @public */
 		handleScroll: HandleScrollOptions;
 		/** @public */
 		handleScale: HandleScaleOptionsInternal;
+		/** @public */
+		layout: LayoutOptionsInternal;
 	};
+
+interface GradientColorsCache {
+	topColor: string;
+	bottomColor: string;
+	colors: Map<number, string>;
+}
 
 export class ChartModel implements IDestroyable {
 	private readonly _options: ChartOptionsInternal;
@@ -148,6 +162,10 @@ export class ChartModel implements IDestroyable {
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
 
+	private _backgroundTopColor: string;
+	private _backgroundBottomColor: string;
+	private _gradientColorsCache: GradientColorsCache | null = null;
+
 	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptionsInternal) {
 		this._invalidateHandler = invalidateHandler;
 		this._options = options;
@@ -161,6 +179,9 @@ export class ChartModel implements IDestroyable {
 
 		this.createPane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
+
+		this._backgroundTopColor = this._getBackgroundColor(BackgroundColorSide.Top);
+		this._backgroundBottomColor = this._getBackgroundColor(BackgroundColorSide.Bottom);
 	}
 
 	public fullUpdate(): void {
@@ -215,6 +236,9 @@ export class ChartModel implements IDestroyable {
 		if (options.leftPriceScale || options.rightPriceScale) {
 			this._priceScalesOptionsChanged.fire();
 		}
+
+		this._backgroundTopColor = this._getBackgroundColor(BackgroundColorSide.Top);
+		this._backgroundBottomColor = this._getBackgroundColor(BackgroundColorSide.Bottom);
 
 		this.fullUpdate();
 	}
@@ -608,6 +632,47 @@ export class ChartModel implements IDestroyable {
 		return this._options.rightPriceScale.visible ? DefaultPriceScaleId.Right : DefaultPriceScaleId.Left;
 	}
 
+	public backgroundBottomColor(): string {
+		return this._backgroundBottomColor;
+	}
+
+	public backgroundTopColor(): string {
+		return this._backgroundTopColor;
+	}
+
+	public backgroundColorAtYPercentFromTop(percent: number): string {
+		const bottomColor = this._backgroundBottomColor;
+		const topColor = this._backgroundTopColor;
+
+		if (bottomColor === topColor) {
+			// solid background
+			return bottomColor;
+		}
+
+		// gradient background
+
+		// percent should be from 0 to 100 (we're using only integer values to make cache more efficient)
+		percent = Math.max(0, Math.min(100, Math.round(percent * 100)));
+
+		if (this._gradientColorsCache === null ||
+			this._gradientColorsCache.topColor !== topColor || this._gradientColorsCache.bottomColor !== bottomColor) {
+			this._gradientColorsCache = {
+				topColor: topColor,
+				bottomColor: bottomColor,
+				colors: new Map(),
+			};
+		} else {
+			const cachedValue = this._gradientColorsCache.colors.get(percent);
+			if (cachedValue !== undefined) {
+				return cachedValue;
+			}
+		}
+
+		const result = gradientColorAtPercent(topColor, bottomColor, percent / 100);
+		this._gradientColorsCache.colors.set(percent, result);
+		return result;
+	}
+
 	private _paneInvalidationMask(pane: Pane | null, level: InvalidationLevel): InvalidateMask {
 		const inv = new InvalidateMask(level);
 		if (pane !== null) {
@@ -647,5 +712,17 @@ export class ChartModel implements IDestroyable {
 		}
 
 		return series;
+	}
+
+	private _getBackgroundColor(side: BackgroundColorSide): string {
+		const layoutOptions = this._options.layout;
+
+		if (layoutOptions.background.type === ColorType.VerticalGradient) {
+			return side === BackgroundColorSide.Top ?
+				layoutOptions.background.topColor :
+				layoutOptions.background.bottomColor;
+		}
+
+		return layoutOptions.background.color;
 	}
 }
