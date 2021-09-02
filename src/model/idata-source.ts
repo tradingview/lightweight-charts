@@ -16,6 +16,12 @@ export interface IDataSource {
 	priceAxisViews(pane?: Pane, priceScale?: PriceScale): readonly IPriceAxisView[];
 	timeAxisViews(): readonly ITimeAxisView[];
 	paneViews(pane: Pane): readonly IPaneView[];
+
+	/**
+	 * Pane views that are painted on the most top layer
+	 *
+	 * @param pane
+	 */
 	topPaneViews?(pane: Pane): readonly IPaneView[];
 
 	visible(): boolean;
