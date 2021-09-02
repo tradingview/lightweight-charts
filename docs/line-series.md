@@ -54,6 +54,7 @@ A line series interface can be customized using the following options:
 |`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
 |`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
 |`lineType`|[LineType](./constants.md#linetype)|`LineType.Simple`|Line type|
+|`lastPriceAnimation`|[LasPriceAnimationMode](./constants.md#laspriceanimationmode)|`'LasPriceAnimationMode.Disabled'`|The mode of the last price animation|
 
 ### Examples
 
@@ -69,6 +70,7 @@ A line series interface can be customized using the following options:
         crosshairMarkerBorderColor: '#ffffff',
         crosshairMarkerBackgroundColor: '#2296f3',
         lineType: 1,
+        lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.Continuous,
     });
     ```
 

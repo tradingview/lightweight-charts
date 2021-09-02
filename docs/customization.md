@@ -338,6 +338,15 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 
 You can also set `handleScroll` to `true` or `false` to enable or disable all the above options.
 
+### Kinetic scroll options
+
+You can disable or enable kinetic scroll via mouse or via touch gestures separately using `kineticScroll` options.
+
+| Name    | Type      | Default | Description |
+|---------|-----------|---------|-------------|
+| `mouse` | `boolean` | `false` | If true, kinetic scroll is enabled via mouse |
+| `touch` | `boolean` | `true` | If true, kinetic scroll is enabled via touch gestures |
+
 ### Scaling options
 
 |Name                        |Type   |Default  |Description|

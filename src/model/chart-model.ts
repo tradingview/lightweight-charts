@@ -42,6 +42,11 @@ export interface HandleScaleOptions {
 	axisDoubleClickReset: boolean;
 }
 
+export interface KineticScrollOptions {
+	touch: boolean;
+	mouse: boolean;
+}
+
 type HandleScaleOptionsInternal =
 	Omit<HandleScaleOptions, 'axisPressedMouseMove'>
 	& {
@@ -116,6 +121,8 @@ export interface ChartOptions {
 	handleScroll: HandleScrollOptions | boolean;
 	/** Structure that describes scaling behavior or boolean flag that disables/enables all kinds of scales */
 	handleScale: HandleScaleOptions | boolean;
+	/** Structure that describes kinetic scroll behavior */
+	kineticScroll: KineticScrollOptions;
 }
 
 export type ChartOptionsInternal =
@@ -183,6 +190,10 @@ export class ChartModel implements IDestroyable {
 
 	public lightUpdate(): void {
 		this._invalidate(new InvalidateMask(InvalidationLevel.Light));
+	}
+
+	public cursorUpdate(): void {
+		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
 	public updateSource(source: IPriceDataSource): void {
@@ -449,14 +460,14 @@ export class ChartModel implements IDestroyable {
 
 		this._crosshair.setPosition(index, price, pane);
 
-		this._cursorUpdate();
+		this.cursorUpdate();
 		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
 	}
 
 	public clearCurrentPosition(): void {
 		const crosshair = this.crosshairSource();
 		crosshair.clearPosition();
-		this._cursorUpdate();
+		this.cursorUpdate();
 		this._crosshairMoved.fire(null, null);
 	}
 
@@ -494,7 +505,7 @@ export class ChartModel implements IDestroyable {
 			const isSeriesPointsAddedToRight = isSeriesPointsAdded && !isLeftBarShiftToLeft;
 
 			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && this._timeScale.options().shiftVisibleRangeOnNewBar;
-			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar && newBaseIndex !== null) {
+			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
 			}
@@ -687,10 +698,6 @@ export class ChartModel implements IDestroyable {
 		}
 
 		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
-	}
-
-	private _cursorUpdate(): void {
-		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
 	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T> {

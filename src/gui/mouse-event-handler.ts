@@ -1,6 +1,8 @@
 import { ensure } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 
+import { Coordinate } from '../model/coordinate';
+
 import { mobileTouch } from './support-touch';
 
 export type HandlerEventCallback = (event: TouchMouseEvent) => void;
@@ -24,14 +26,14 @@ export interface MouseEventHandlers {
 }
 
 export interface TouchMouseEvent {
-	readonly clientX: number;
-	readonly clientY: number;
-	readonly pageX: number;
-	readonly pageY: number;
-	readonly screenX: number;
-	readonly screenY: number;
-	readonly localX: number;
-	readonly localY: number;
+	readonly clientX: Coordinate;
+	readonly clientY: Coordinate;
+	readonly pageX: Coordinate;
+	readonly pageY: Coordinate;
+	readonly screenX: Coordinate;
+	readonly screenY: Coordinate;
+	readonly localX: Coordinate;
+	readonly localY: Coordinate;
 
 	readonly ctrlKey: boolean;
 	readonly altKey: boolean;
@@ -511,14 +513,14 @@ export class MouseEventHandler implements IDestroyable {
 		const box = getBoundingClientRect(this._target);
 
 		return {
-			clientX: eventLike.clientX,
-			clientY: eventLike.clientY,
-			pageX: eventLike.pageX,
-			pageY: eventLike.pageY,
-			screenX: eventLike.screenX,
-			screenY: eventLike.screenY,
-			localX: eventLike.clientX - box.left,
-			localY: eventLike.clientY - box.top,
+			clientX: eventLike.clientX as Coordinate,
+			clientY: eventLike.clientY as Coordinate,
+			pageX: eventLike.pageX as Coordinate,
+			pageY: eventLike.pageY as Coordinate,
+			screenX: eventLike.screenX as Coordinate,
+			screenY: eventLike.screenY as Coordinate,
+			localX: eventLike.clientX - box.left as Coordinate,
+			localY: eventLike.clientY - box.top as Coordinate,
 
 			ctrlKey: event.ctrlKey,
 			altKey: event.altKey,
@@ -532,7 +534,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 }
 
-function getBoundingClientRect(element: HTMLElement): ClientRect | DOMRect {
+function getBoundingClientRect(element: HTMLElement): DOMRect {
 	return element.getBoundingClientRect() || { left: 0, top: 0 };
 }
 

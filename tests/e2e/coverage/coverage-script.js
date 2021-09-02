@@ -72,6 +72,9 @@ function runTestCase(container) {
 			fontFamily: 'Roboto',
 			fontStyle: 'italic',
 		},
+		kineticScroll: {
+			mouse: true,
+		},
 		layout: {
 			backgroundType: LightweightCharts.ColorType.Gradient,
 			backgroundGradientStartColor: '#FFFFFF',
@@ -98,6 +101,7 @@ function runTestCase(container) {
 		priceFormat: {
 			type: 'volume',
 		},
+		lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.Continuous,
 	});
 	seriesToRemove.setData(generateLineData());
 
@@ -126,6 +130,7 @@ function runTestCase(container) {
 		priceFormat: {
 			type: 'volume',
 		},
+		lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.OnDataUpdate,
 	});
 
 	lineSeries.setData(generateLineData());

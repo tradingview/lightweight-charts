@@ -294,6 +294,17 @@ function rgbaToGrayscale(rgbValue: Rgba): number {
 	);
 }
 
+export function applyAlpha(color: string, alpha: number): string {
+	// special case optimization
+	if (color === 'transparent') {
+		return color;
+	}
+
+	const originRgba = colorStringToRgba(color);
+	const originAlpha = originRgba[3];
+	return `rgba(${originRgba[0]}, ${originRgba[1]}, ${originRgba[2]}, ${alpha * originAlpha})`;
+}
+
 export interface ContrastColors {
 	foreground: string;
 	background: string;

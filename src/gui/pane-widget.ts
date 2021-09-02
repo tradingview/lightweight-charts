@@ -14,10 +14,12 @@ import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
+import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
+import { KineticAnimation } from './kinetic-animation';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 import { isMobile, mobileTouch } from './support-touch';
@@ -25,6 +27,35 @@ import { isMobile, mobileTouch } from './support-touch';
 // actually we should check what event happened (touch or mouse)
 // not check current UA to detect "mobile" device
 const trackCrosshairOnlyAfterLongTap = isMobile;
+
+const enum Constants {
+	MinScrollSpeed = 0.2,
+	MaxScrollSpeed = 7,
+	DumpingCoeff = 0.997,
+	ScrollMinMove = 15,
+}
+
+type DrawFunction = (renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown) => void;
+
+function drawBackground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	if (renderer.drawBackground) {
+		renderer.drawBackground(ctx, pixelRatio, isHovered, hitTestData);
+	}
+}
+
+function drawForeground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	renderer.draw(ctx, pixelRatio, isHovered, hitTestData);
+}
+
+type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
+
+function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+	return source.paneViews(pane);
+}
+
+function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
+}
 
 export interface HitTestResult {
 	source: IPriceDataSource;
@@ -35,6 +66,12 @@ export interface HitTestResult {
 interface HitTestPaneViewResult {
 	view: IPaneView;
 	object?: HoveredObject;
+}
+
+interface StartScrollPosition extends Point {
+	timestamp: number;
+	localX: Coordinate;
+	localY: Coordinate;
 }
 
 export class PaneWidget implements IDestroyable {
@@ -50,7 +87,7 @@ export class PaneWidget implements IDestroyable {
 	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
 	private readonly _rowElement: HTMLElement;
 	private readonly _mouseEventHandler: MouseEventHandler;
-	private _startScrollingPos: Point | null = null;
+	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
 	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
 	private _prevPinchScale: number = 0;
@@ -58,6 +95,7 @@ export class PaneWidget implements IDestroyable {
 	private _startTrackPoint: Point | null = null;
 	private _exitTrackingModeOnNextTry: boolean = false;
 	private _initCrosshairPosition: Point | null = null;
+	private _scrollXAnimation: KineticAnimation | null = null;
 
 	public constructor(chart: ChartWidget, state: Pane) {
 		this._chart = chart;
@@ -198,8 +236,8 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const x = event.localX as Coordinate;
-		const y = event.localY as Coordinate;
+		const x = event.localX;
+		const y = event.localY;
 
 		if (!mobileTouch) {
 			this._setCrosshairPosition(x, y);
@@ -213,6 +251,8 @@ export class PaneWidget implements IDestroyable {
 		if (!this._state) {
 			return;
 		}
+
+		this._terminateKineticAnimation();
 
 		if (document.activeElement !== document.body && document.activeElement !== document.documentElement) {
 			// If any focusable element except the page itself is focused, remove the focus
@@ -236,11 +276,11 @@ export class PaneWidget implements IDestroyable {
 		if (this._startTrackPoint !== null) {
 			const crosshair = model.crosshairSource();
 			this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
-			this._startTrackPoint = { x: event.localX as Coordinate, y: event.localY as Coordinate };
+			this._startTrackPoint = { x: event.localX, y: event.localY };
 		}
 
 		if (!mobileTouch) {
-			this._setCrosshairPosition(event.localX as Coordinate, event.localY as Coordinate);
+			this._setCrosshairPosition(event.localX, event.localY);
 		}
 	}
 
@@ -249,8 +289,8 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const x = event.localX as Coordinate;
-		const y = event.localY as Coordinate;
+		const x = event.localX;
+		const y = event.localY;
 
 		if (this._preventCrosshairMove()) {
 			this._clearCrosshairPosition();
@@ -271,8 +311,8 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const x = event.localX as Coordinate;
-		const y = event.localY as Coordinate;
+		const x = event.localX;
+		const y = event.localY;
 		const hitTest = this.hitTest(x, y);
 		if (hitTest !== null && hitTest.view.clickHandler !== undefined) {
 			hitTest.view.clickHandler(x, y);
@@ -293,8 +333,8 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		const model = this._model();
-		const x = event.localX as Coordinate;
-		const y = event.localY as Coordinate;
+		const x = event.localX;
+		const y = event.localY;
 
 		if (this._startTrackPoint !== null) {
 			// tracking mode: move crosshair
@@ -311,7 +351,9 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		const scrollOptions = this._chart.options().handleScroll;
+		const chartOptions = this._chart.options();
+		const scrollOptions = chartOptions.handleScroll;
+		const kineticScrollOptions = chartOptions.kineticScroll;
 		if (
 			(!scrollOptions.pressedMouseMove || event.type === 'touch') &&
 			(!scrollOptions.horzTouchDrag && !scrollOptions.vertTouchDrag || event.type === 'mouse')
@@ -321,32 +363,58 @@ export class PaneWidget implements IDestroyable {
 
 		const priceScale = this._state.defaultPriceScale();
 
+		const now = performance.now();
+
 		if (this._startScrollingPos === null && !this._preventScroll()) {
 			this._startScrollingPos = {
-				x: event.clientX as Coordinate,
-				y: event.clientY as Coordinate,
+				x: event.clientX,
+				y: event.clientY,
+				timestamp: now,
+				localX: event.localX,
+				localY: event.localY,
 			};
 		}
 
-		if (this._startScrollingPos !== null &&
-			(this._startScrollingPos.x !== event.clientX || this._startScrollingPos.y !== event.clientY)) {
-			if (!this._isScrolling) {
-				if (!priceScale.isEmpty()) {
-					model.startScrollPrice(this._state, priceScale, event.localY as Coordinate);
-				}
+		if (this._scrollXAnimation !== null) {
+			this._scrollXAnimation.addPosition(event.localX, now);
+		}
 
-				model.startScrollTime(event.localX as Coordinate);
-				this._isScrolling = true;
+		if (
+			this._startScrollingPos !== null &&
+			!this._isScrolling &&
+			(this._startScrollingPos.x !== event.clientX || this._startScrollingPos.y !== event.clientY)
+		) {
+			if (
+				this._scrollXAnimation === null && (
+					event.type === 'touch' && kineticScrollOptions.touch ||
+					event.type === 'mouse' && kineticScrollOptions.mouse
+				)
+			) {
+				this._scrollXAnimation = new KineticAnimation(
+					Constants.MinScrollSpeed,
+					Constants.MaxScrollSpeed,
+					Constants.DumpingCoeff,
+					Constants.ScrollMinMove
+				);
+				this._scrollXAnimation.addPosition(this._startScrollingPos.localX, this._startScrollingPos.timestamp);
+				this._scrollXAnimation.addPosition(event.localX, now);
 			}
+
+			if (!priceScale.isEmpty()) {
+				model.startScrollPrice(this._state, priceScale, event.localY);
+			}
+
+			model.startScrollTime(event.localX);
+			this._isScrolling = true;
 		}
 
 		if (this._isScrolling) {
 			// this allows scrolling not default price scales
 			if (!priceScale.isEmpty()) {
-				model.scrollPriceTo(this._state, priceScale, event.localY as Coordinate);
+				model.scrollPriceTo(this._state, priceScale, event.localY);
 			}
 
-			model.scrollTimeTo(event.localX as Coordinate);
+			model.scrollTimeTo(event.localX);
 		}
 	}
 
@@ -357,24 +425,14 @@ export class PaneWidget implements IDestroyable {
 
 		this._longTap = false;
 
-		const model = this._model();
-
-		if (this._isScrolling) {
-			const priceScale = this._state.defaultPriceScale();
-			// this allows scrolling not default price scales
-
-			model.endScrollPrice(this._state, priceScale);
-			model.endScrollTime();
-			this._startScrollingPos = null;
-			this._isScrolling = false;
-		}
+		this._endScroll(event);
 	}
 
 	public longTapEvent(event: TouchMouseEvent): void {
 		this._longTap = true;
 
 		if (this._startTrackPoint === null && trackCrosshairOnlyAfterLongTap) {
-			const point: Point = { x: event.localX as Coordinate, y: event.localY as Coordinate };
+			const point: Point = { x: event.localX, y: event.localY };
 			this._startTrackingMode(point, point);
 		}
 	}
@@ -397,6 +455,7 @@ export class PaneWidget implements IDestroyable {
 
 	public pinchStartEvent(): void {
 		this._prevPinchScale = 1;
+		this._terminateKineticAnimation();
 	}
 
 	public pinchEvent(middlePoint: Position, scale: number): void {
@@ -508,13 +567,14 @@ export class PaneWidget implements IDestroyable {
 			if (this._state) {
 				this._drawGrid(ctx, this._canvasBinding.pixelRatio);
 				this._drawWatermark(ctx, this._canvasBinding.pixelRatio);
-				this._drawSources(ctx, this._canvasBinding.pixelRatio);
+				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourcePaneViews);
 			}
 			ctx.restore();
 		}
 
 		const topCtx = getContext2D(this._topCanvasBinding.canvas);
 		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
+		this._drawSources(topCtx, this._canvasBinding.pixelRatio, sourceTopPaneViews);
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
 	}
 
@@ -562,30 +622,36 @@ export class PaneWidget implements IDestroyable {
 
 	private _drawWatermark(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const source = this._model().watermarkSource();
-		this._drawSourceBackground(source, ctx, pixelRatio);
-		this._drawSource(source, ctx, pixelRatio);
+		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawBackground, source);
+		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawForeground, source);
 	}
 
 	private _drawCrosshair(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		this._drawSource(this._model().crosshairSource(), ctx, pixelRatio);
+		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+	private _drawSources(ctx: CanvasRenderingContext2D, pixelRatio: number, paneViewsGetter: PaneViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
 		for (const source of sources) {
-			this._drawSourceBackground(source, ctx, pixelRatio);
+			this._drawSourceImpl(ctx, pixelRatio, paneViewsGetter, drawBackground, source);
 		}
 
 		for (const source of sources) {
-			this._drawSource(source, ctx, pixelRatio);
+			this._drawSourceImpl(ctx, pixelRatio, paneViewsGetter, drawForeground, source);
 		}
 	}
 
-	private _drawSource(source: IDataSource, ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+	private _drawSourceImpl(
+		ctx: CanvasRenderingContext2D,
+		pixelRatio: number,
+		paneViewsGetter: PaneViewsGetter,
+		drawFn: DrawFunction,
+		source: IDataSource
+	): void {
 		const state = ensureNotNull(this._state);
-		const paneViews = source.paneViews(state);
+		const paneViews = paneViewsGetter(source, state);
 		const height = state.height();
 		const width = state.width();
 		const hoveredSource = state.model().hoveredSource();
@@ -598,28 +664,7 @@ export class PaneWidget implements IDestroyable {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
 				ctx.save();
-				renderer.draw(ctx, pixelRatio, isHovered, objecId);
-				ctx.restore();
-			}
-		}
-	}
-
-	private _drawSourceBackground(source: IDataSource, ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		const state = ensureNotNull(this._state);
-		const paneViews = source.paneViews(state);
-		const height = state.height();
-		const width = state.width();
-		const hoveredSource = state.model().hoveredSource();
-		const isHovered = hoveredSource !== null && hoveredSource.source === source;
-		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
-			? hoveredSource.object.hitTestData
-			: undefined;
-
-		for (const paneView of paneViews) {
-			const renderer = paneView.renderer(height, width);
-			if (renderer !== null && renderer.drawBackground !== undefined) {
-				ctx.save();
-				renderer.drawBackground(ctx, pixelRatio, isHovered, objecId);
+				drawFn(renderer, ctx, pixelRatio, isHovered, objecId);
 				ctx.restore();
 			}
 		}
@@ -709,6 +754,83 @@ export class PaneWidget implements IDestroyable {
 
 	private _model(): ChartModel {
 		return this._chart.model();
+	}
+
+	private _finishScroll(): void {
+		const model = this._model();
+		const state = this.state();
+		const priceScale = state.defaultPriceScale();
+
+		model.endScrollPrice(state, priceScale);
+		model.endScrollTime();
+		this._startScrollingPos = null;
+		this._isScrolling = false;
+	}
+
+	private _endScroll(event: TouchMouseEvent): void {
+		if (!this._isScrolling) {
+			return;
+		}
+
+		const startAnimationTime = performance.now();
+
+		if (this._scrollXAnimation !== null) {
+			this._scrollXAnimation.start(event.localX, startAnimationTime);
+		}
+
+		if ((this._scrollXAnimation === null || this._scrollXAnimation.finished(startAnimationTime))) {
+			// animation is not needed
+			this._finishScroll();
+			return;
+		}
+
+		const model = this._model();
+		const timeScale = model.timeScale();
+
+		const scrollXAnimation = this._scrollXAnimation;
+
+		const animationFn = () => {
+			if ((scrollXAnimation.terminated())) {
+				// animation terminated, see _terminateKineticAnimation
+				return;
+			}
+
+			const now = performance.now();
+
+			let xAnimationFinished = scrollXAnimation.finished(now);
+			if (!scrollXAnimation.terminated()) {
+				const prevRightOffset = timeScale.rightOffset();
+				model.scrollTimeTo(scrollXAnimation.getPosition(now));
+				if (prevRightOffset === timeScale.rightOffset()) {
+					xAnimationFinished = true;
+					this._scrollXAnimation = null;
+				}
+			}
+
+			if (xAnimationFinished) {
+				this._finishScroll();
+				return;
+			}
+
+			requestAnimationFrame(animationFn);
+		};
+
+		requestAnimationFrame(animationFn);
+	}
+
+	private _terminateKineticAnimation(): void {
+		const now = performance.now();
+		const xAnimationFinished = this._scrollXAnimation === null || this._scrollXAnimation.finished(now);
+		if (this._scrollXAnimation !== null) {
+			if (!xAnimationFinished) {
+				this._finishScroll();
+			}
+		}
+
+		if (this._scrollXAnimation !== null) {
+			this._scrollXAnimation.terminate();
+			this._scrollXAnimation = null;
+		}
 	}
 
 	private readonly _canvasConfiguredHandler = () => this._state && this._model().lightUpdate();

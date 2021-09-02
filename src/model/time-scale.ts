@@ -527,9 +527,9 @@ export class TimeScale {
 		}
 
 		const source = this._rightOffset;
-		const animationStart = Date.now();
+		const animationStart = performance.now();
 		const animationFn = () => {
-			const animationProgress = (Date.now() - animationStart) / animationDuration;
+			const animationProgress = (performance.now() - animationStart) / animationDuration;
 			const finishAnimation = animationProgress >= 1;
 			const rightOffset = finishAnimation ? offset : source + (offset - source) * animationProgress;
 			this.setRightOffset(rightOffset);
