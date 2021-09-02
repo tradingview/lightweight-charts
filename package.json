@@ -43,7 +43,6 @@
     "@types/node": "~12.12.47",
     "@types/pixelmatch": "~5.2.1",
     "@types/pngjs": "~6.0.0",
-    "@types/puppeteer": "~5.4.0",
     "@typescript-eslint/eslint-plugin": "~4.30.0",
     "@typescript-eslint/eslint-plugin-tslint": "~4.30.0",
     "@typescript-eslint/parser": "~4.30.0",

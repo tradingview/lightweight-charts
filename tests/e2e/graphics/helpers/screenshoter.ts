@@ -1,7 +1,7 @@
 /// <reference types="node" />
 
 import { PNG } from 'pngjs';
-import {
+import puppeteer, {
 	Browser,
 	ConsoleMessage,
 	HTTPResponse,
@@ -28,7 +28,9 @@ export class Screenshoter {
 			puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
 		}
 
-		this._browserPromise = launchPuppeteer(puppeteerOptions);
+		// note that we cannot use launchPuppeteer here as soon it wrong typing in puppeteer
+		// see https://github.com/puppeteer/puppeteer/issues/7529
+		this._browserPromise = puppeteer.launch(puppeteerOptions);
 	}
 
 	public async close(): Promise<void> {

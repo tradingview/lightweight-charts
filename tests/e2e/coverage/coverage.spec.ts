@@ -5,7 +5,8 @@ import * as path from 'path';
 
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { BoundingBox,
+import puppeteer, {
+	BoundingBox,
 	Browser,
 	ConsoleMessage,
 	ElementHandle,
@@ -222,7 +223,9 @@ describe('Coverage tests', () => {
 		expect(testStandalonePath, `path to test standalone module must be passed via ${testStandalonePathEnvKey} env var`)
 			.to.have.length.greaterThan(0);
 
-		const browserPromise = launchPuppeteer(puppeteerOptions);
+		// note that we cannot use launchPuppeteer here as soon it wrong typing in puppeteer
+		// see https://github.com/puppeteer/puppeteer/issues/7529
+		const browserPromise = puppeteer.launch(puppeteerOptions);
 		browser = await browserPromise;
 	});
 
