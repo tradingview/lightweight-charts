@@ -19,7 +19,8 @@ function getMobileTouch(): boolean {
 		return false;
 	}
 
-	const touch = !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || checkTouchEvents();
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+	const touch = !!navigator.maxTouchPoints || !!(navigator as any).msMaxTouchPoints || checkTouchEvents();
 
 	// eslint-disable-next-line no-restricted-syntax
 	return 'onorientationchange' in window && touch;

@@ -283,7 +283,7 @@ export class ChartWidget implements IDestroyable {
 				const image = this._timeAxisWidget.getImage();
 				ctx.drawImage(image, targetX, targetY, size.w, size.h);
 				if (this._isRightAxisVisible()) {
-					targetX = firstPane.getSize().w;
+					targetX += firstPane.getSize().w;
 					drawStub('right');
 					ctx.restore();
 				}
@@ -640,9 +640,10 @@ function disableSelection(element: HTMLElement): void {
 	// eslint-disable-next-line deprecation/deprecation
 	element.style.webkitUserSelect = 'none';
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
-	(element as any).style.msUserSelect = 'none';
+	(element.style as any).msUserSelect = 'none';
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
-	(element as any).style.MozUserSelect = 'none';
+	(element.style as any).MozUserSelect = 'none';
 
-	element.style.webkitTapHighlightColor = 'transparent';
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+	(element.style as any).webkitTapHighlightColor = 'transparent';
 }

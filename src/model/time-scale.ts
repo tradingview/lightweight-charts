@@ -527,9 +527,9 @@ export class TimeScale {
 		}
 
 		const source = this._rightOffset;
-		const animationStart = Date.now();
+		const animationStart = performance.now();
 		const animationFn = () => {
-			const animationProgress = (Date.now() - animationStart) / animationDuration;
+			const animationProgress = (performance.now() - animationStart) / animationDuration;
 			const finishAnimation = animationProgress >= 1;
 			const rightOffset = finishAnimation ? offset : source + (offset - source) * animationProgress;
 			this.setRightOffset(rightOffset);
@@ -831,7 +831,12 @@ export class TimeScale {
 			return;
 		}
 
-		const delta = ensureNotNull(this.visibleStrictRange()).left() - firstIndex;
+		const visibleRange = this.visibleStrictRange();
+		if (visibleRange === null) {
+			return;
+		}
+
+		const delta = visibleRange.left() - firstIndex;
 		if (delta < 0) {
 			const leftEdgeOffset = this._rightOffset - delta - 1;
 			this.setRightOffset(leftEdgeOffset);

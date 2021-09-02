@@ -72,6 +72,9 @@ function runTestCase(container) {
 			fontFamily: 'Roboto',
 			fontStyle: 'italic',
 		},
+		kineticScroll: {
+			mouse: true,
+		},
 	});
 
 	const data = generateLineData();

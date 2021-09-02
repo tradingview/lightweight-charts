@@ -166,7 +166,7 @@ export class Pane implements IDestroyable {
 	}
 
 	public addDataSource(source: IPriceDataSource, targetScaleId: string, zOrder?: number): void {
-		const targetZOrder = (zOrder !== undefined) ? zOrder : this._getZOrderMinMax().minZOrder - 1;
+		const targetZOrder = (zOrder !== undefined) ? zOrder : this._getZOrderMinMax().maxZOrder + 1;
 		this._insertDataSource(source, targetScaleId, targetZOrder);
 	}
 

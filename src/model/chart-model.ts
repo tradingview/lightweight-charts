@@ -41,6 +41,11 @@ export interface HandleScaleOptions {
 	axisDoubleClickReset: boolean;
 }
 
+export interface KineticScrollOptions {
+	touch: boolean;
+	mouse: boolean;
+}
+
 type HandleScaleOptionsInternal =
 	Omit<HandleScaleOptions, 'axisPressedMouseMove'>
 	& {
@@ -110,6 +115,8 @@ export interface ChartOptions {
 	handleScroll: HandleScrollOptions | boolean;
 	/** Structure that describes scaling behavior or boolean flag that disables/enables all kinds of scales */
 	handleScale: HandleScaleOptions | boolean;
+	/** Structure that describes kinetic scroll behavior */
+	kineticScroll: KineticScrollOptions;
 }
 
 export type ChartOptionsInternal =
@@ -474,7 +481,7 @@ export class ChartModel implements IDestroyable {
 			const isSeriesPointsAddedToRight = isSeriesPointsAdded && !isLeftBarShiftToLeft;
 
 			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && this._timeScale.options().shiftVisibleRangeOnNewBar;
-			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar && newBaseIndex !== null) {
+			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
 			}
