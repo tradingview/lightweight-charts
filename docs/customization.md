@@ -283,21 +283,38 @@ The following options can be used to customize chart design:
 |Name                        |Type   |Default  |Description|
 |----------------------------|-------|---------|-----------|
 |`backgroundType`|[ColorType](./constants.md#colortype)|`ColorType.Solid`| Chart and scales background color background color type|
-|`backgroundColor`|`string`|`#ffffff`|Chart and scales background color if background color is solid|
+|`background`|[Background](./#background)| `{ type: ColorType.Gradient, color: '#ffffff' }` |Chart and scales background|
 |`backgroundGradientStartColor`|`string`|`#ffffff`|Chart and scales background top color if background type is gradient|
 |`backgroundGradientEndColor`|`string`|`#ffffff`|Chart and scales background bottom color if background type is gradient|
 |`textColor`|`string`|`#191919`|Scale value text color|
 |`fontSize`|`number`|`11`|Scales values' font size|
 |`fontFamily`|`string`|`'Trebuchet MS', Roboto, Ubuntu, sans-serif`|Font family to be used on scales|
 
+### Background
+
+Background can be either solid or gradient.
+
+Solid background has two fields:
+
+- `type` - always `ColorType.Solid`.
+- `color` - solid color.
+
+Gradient background has three fields:
+
+- `type` - always `ColorType.Gradient`.
+- `topColor` - gradient top color.
+- `bottomColor` - gradient bottom color.
+
 ### An example of layout customization
 
 ```js
 chart.applyOptions({
     layout: {
-        backgroundType: LightweightCharts.ColorType.Gradient,
-        backgroundGradientStartColor: '#FFFFFF',
-        backgroundGradientEndColor: '#AAFFAA',
+        background: {
+            type: LightweightCharts.ColorType.Gradient,
+            topColor: '#FFFFFF',
+            bottomColor: '#AAFFAA',
+        },
         textColor: '#696969',
         fontSize: 12,
         fontFamily: 'Calibri',

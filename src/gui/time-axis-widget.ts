@@ -7,7 +7,7 @@ import { makeFont } from '../helpers/make-font';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { LayoutOptions } from '../model/layout-options';
+import { LayoutOptionsInternal } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
@@ -33,7 +33,7 @@ function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
 
 export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _chart: ChartWidget;
-	private readonly _options: LayoutOptions;
+	private readonly _options: LayoutOptionsInternal;
 	private readonly _element: HTMLElement;
 	private readonly _leftStubCell: HTMLElement;
 	private readonly _rightStubCell: HTMLElement;

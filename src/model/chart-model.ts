@@ -16,7 +16,7 @@ import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale'
 import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
-import { ColorType, LayoutOptions } from './layout-options';
+import { ColorType, LayoutOptions, LayoutOptionsInternal } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
@@ -119,12 +119,14 @@ export interface ChartOptions {
 }
 
 export type ChartOptionsInternal =
-	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale'>
+	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale' | 'layout'>
 	& {
 		/** @public */
 		handleScroll: HandleScrollOptions;
 		/** @public */
 		handleScale: HandleScaleOptionsInternal;
+		/** @public */
+		layout: LayoutOptionsInternal;
 	};
 
 interface GradientColorsCache {
@@ -708,12 +710,12 @@ export class ChartModel implements IDestroyable {
 	private _getBackgroundColor(side: BackgroundColorSide): string {
 		const layoutOptions = this._options.layout;
 
-		if (layoutOptions.backgroundType === ColorType.Gradient) {
+		if (layoutOptions.background.type === ColorType.Gradient) {
 			return side === BackgroundColorSide.Top ?
-				layoutOptions.backgroundGradientStartColor :
-				layoutOptions.backgroundGradientEndColor;
+				layoutOptions.background.topColor :
+				layoutOptions.background.bottomColor;
 		}
 
-		return layoutOptions.backgroundColor;
+		return layoutOptions.background.color;
 	}
 }

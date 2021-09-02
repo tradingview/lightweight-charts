@@ -10,7 +10,7 @@ import { DeepPartial, merge } from '../helpers/strict-type-checks';
 import { BarCoordinates, BarPrice, BarPrices } from './bar';
 import { Coordinate } from './coordinate';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
-import { LayoutOptions } from './layout-options';
+import { LayoutOptionsInternal } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { PriceRangeImpl } from './price-range-impl';
 import {
@@ -114,7 +114,7 @@ const defaultPriceFormatter = new PriceFormatter(100, 1);
 export class PriceScale {
 	private readonly _id: string;
 
-	private readonly _layoutOptions: LayoutOptions;
+	private readonly _layoutOptions: LayoutOptionsInternal;
 	private readonly _localizationOptions: LocalizationOptions;
 	private readonly _options: PriceScaleOptions;
 
@@ -142,7 +142,7 @@ export class PriceScale {
 	private _scrollStartPoint: number | null = null;
 	private _formatter: IPriceFormatter = defaultPriceFormatter;
 
-	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptionsInternal, localizationOptions: LocalizationOptions) {
 		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
