@@ -261,7 +261,7 @@ export class TimeScale {
 		if (this._options.lockVisibleTimeRangeOnResize && this._width) {
 			// recalculate bar spacing
 			const newBarSpacing = this._barSpacing * width / this._width;
-			this._setBarSpacing(newBarSpacing);
+			this._barSpacing = newBarSpacing;
 		}
 
 		// if time scale is scrolled to the end of data and we have fixed right edge
