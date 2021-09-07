@@ -46,6 +46,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private _rendererOptions: TimeAxisViewRendererOptions | null = null;
 	private _mouseDown: boolean = false;
 	private _size: Size = new Size(0, 0);
+	private readonly _widthCache: TextWidthCache = new TextWidthCache(5);
 
 	public constructor(chartWidget: ChartWidget) {
 		this._chart = chartWidget;
@@ -336,16 +337,32 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			ctx.font = this._baseFont();
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight < maxWeight) {
-					ctx.fillText(tickMark.label, tickMark.coord, yText);
+					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
+					ctx.fillText(tickMark.label, coordinate, yText);
 				}
 			}
 			ctx.font = this._baseBoldFont();
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight >= maxWeight) {
-					ctx.fillText(tickMark.label, tickMark.coord, yText);
+					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
+					ctx.fillText(tickMark.label, coordinate, yText);
 				}
 			}
 		});
+	}
+
+	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D, coordinate: number, labelText: string): number {
+		const labelWidth = this._widthCache.measureText(ctx, labelText);
+		const labelWidthHalf = labelWidth / 2;
+		const leftTextCoordinate = Math.floor(coordinate - labelWidthHalf) + 0.5;
+
+		if (leftTextCoordinate < 0) {
+			coordinate = coordinate + Math.abs(0 - leftTextCoordinate);
+		} else if (leftTextCoordinate + labelWidth > this._size.w) {
+			coordinate = coordinate - Math.abs(this._size.w - (leftTextCoordinate + labelWidth));
+		}
+
+		return coordinate;
 	}
 
 	private _drawLabels(sources: readonly IDataSource[], ctx: CanvasRenderingContext2D, pixelRatio: number): void {
