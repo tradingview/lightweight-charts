@@ -5,6 +5,7 @@ import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
+import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
@@ -192,6 +193,18 @@ export class PriceAxisWidget implements IDestroyable {
 			if (width > tickMarkMaxWidth) {
 				tickMarkMaxWidth = width;
 			}
+		}
+
+		const firstValue = this._priceScale.firstValue();
+		if (firstValue !== null && this._size !== null) {
+			const topValue = this._priceScale.coordinateToPrice(1 as Coordinate, firstValue);
+			const bottomValue = this._priceScale.coordinateToPrice(this._size.h - 2 as Coordinate, firstValue);
+
+			tickMarkMaxWidth = Math.max(
+				tickMarkMaxWidth,
+				this._widthCache.measureText(ctx, this._priceScale.formatPrice(Math.floor(Math.min(topValue, bottomValue)) + 0.11111111111111, firstValue)),
+				this._widthCache.measureText(ctx, this._priceScale.formatPrice(Math.ceil(Math.max(topValue, bottomValue)) - 0.11111111111111, firstValue))
+			);
 		}
 
 		let res = Math.ceil(
