@@ -47,4 +47,8 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 		mouseWheel: true,
 		pinch: true,
 	},
+	kineticScroll: {
+		mouse: false,
+		touch: true,
+	},
 };

@@ -48,6 +48,12 @@ export function fillUpDownCandlesticksColors(options: Partial<CandlestickStyleOp
 	}
 }
 
+export const enum LasPriceAnimationMode {
+	Disabled,
+	Continuous,
+	OnDataUpdate,
+}
+
 export interface BarStyleOptions {
 	upColor: string;
 	downColor: string;
@@ -64,6 +70,7 @@ export interface LineStyleOptions {
 	crosshairMarkerRadius: number;
 	crosshairMarkerBorderColor: string;
 	crosshairMarkerBackgroundColor: string;
+	lastPriceAnimation: LasPriceAnimationMode;
 }
 
 export interface AreaStyleOptions {
@@ -77,6 +84,7 @@ export interface AreaStyleOptions {
 	crosshairMarkerRadius: number;
 	crosshairMarkerBorderColor: string;
 	crosshairMarkerBackgroundColor: string;
+	lastPriceAnimation: LasPriceAnimationMode;
 }
 
 export interface BaseValuePrice {

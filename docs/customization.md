@@ -281,18 +281,37 @@ chart.applyOptions({
 The following options can be used to customize chart design:
 
 |Name                        |Type   |Default  |Description|
-|----------------------------|-------|---------|-|
-|`backgroundColor`|`string`|`#ffffff`|Chart and scale background color|
+|----------------------------|-------|---------|-----------|
+|`background`|[Background](./#background)| `{ type: ColorType.Solid, color: '#ffffff' }` |Chart and scales background|
 |`textColor`|`string`|`#191919`|Scale value text color|
 |`fontSize`|`number`|`11`|Scales values' font size|
 |`fontFamily`|`string`|`'Trebuchet MS', Roboto, Ubuntu, sans-serif`|Font family to be used on scales|
+
+### Background
+
+Background can be either solid or vertical gradient.
+
+Solid background has two fields:
+
+- `type` - always `ColorType.Solid`.
+- `color` - solid color.
+
+Vertical gradient background has three fields:
+
+- `type` - always `ColorType.VerticalGradient`.
+- `topColor` - gradient top color.
+- `bottomColor` - gradient bottom color.
 
 ### An example of layout customization
 
 ```js
 chart.applyOptions({
     layout: {
-        backgroundColor: '#FAEBD7',
+        background: {
+            type: LightweightCharts.ColorType.Gradient,
+            topColor: '#FFFFFF',
+            bottomColor: '#AAFFAA',
+        },
         textColor: '#696969',
         fontSize: 12,
         fontFamily: 'Calibri',
@@ -315,6 +334,15 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 |`vertTouchDrag`|`boolean`|`true`|If true, the chart handles vertical pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger.|
 
 You can also set `handleScroll` to `true` or `false` to enable or disable all the above options.
+
+### Kinetic scroll options
+
+You can disable or enable kinetic scroll via mouse or via touch gestures separately using `kineticScroll` options.
+
+| Name    | Type      | Default | Description |
+|---------|-----------|---------|-------------|
+| `mouse` | `boolean` | `false` | If true, kinetic scroll is enabled via mouse |
+| `touch` | `boolean` | `true` | If true, kinetic scroll is enabled via touch gestures |
 
 ### Scaling options
 

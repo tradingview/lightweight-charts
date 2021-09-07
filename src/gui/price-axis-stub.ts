@@ -15,6 +15,7 @@ export interface PriceAxisStubParams {
 }
 
 export type BorderVisibleGetter = () => boolean;
+export type ColorGetter = () => string;
 
 export class PriceAxisStub implements IDestroyable {
 	private readonly _cell: HTMLDivElement;
@@ -29,18 +30,21 @@ export class PriceAxisStub implements IDestroyable {
 	private readonly _isLeft: boolean;
 	private _size: Size = new Size(0, 0);
 	private readonly _borderVisible: BorderVisibleGetter;
+	private readonly _bottomColor: ColorGetter;
 
 	public constructor(
 		side: PriceAxisWidgetSide,
 		options: ChartOptionsInternal,
 		params: PriceAxisStubParams,
-		borderVisible: BorderVisibleGetter
+		borderVisible: BorderVisibleGetter,
+		bottomColor: ColorGetter
 	) {
 		this._isLeft = side === 'left';
 		this._rendererOptionsProvider = params.rendererOptionsProvider;
 
 		this._options = options;
 		this._borderVisible = borderVisible;
+		this._bottomColor = bottomColor;
 
 		this._cell = document.createElement('div');
 		this._cell.style.width = '25px';
@@ -122,7 +126,7 @@ export class PriceAxisStub implements IDestroyable {
 
 	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		drawScaled(ctx, pixelRatio, () => {
-			clearRect(ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
+			clearRect(ctx, 0, 0, this._size.w, this._size.h, this._bottomColor());
 		});
 	}
 

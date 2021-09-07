@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { generateContrastColors } from '../../src/helpers/color';
+import { generateContrastColors, gradientColorAtPercent } from '../../src/helpers/color';
 
 describe('generateContrastColors', () => {
 	it('should work', () => {
@@ -120,5 +120,28 @@ describe('generateContrastColors', () => {
 
 		// too much values in the tuple
 		expect(generateContrastColors.bind(null, 'rgba(10, 20, 30, 1.0, 1.0)')).to.throw();
+	});
+});
+
+describe('gradientColorAtPercent', () => {
+	it('0%', () => {
+		expect(gradientColorAtPercent('rgb(255, 255, 255)', 'rgb(0, 0, 0)', 0)).to.be.equal('rgba(255, 255, 255, 1)');
+		expect(gradientColorAtPercent('rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0)', 0)).to.be.equal('rgba(255, 255, 255, 1)');
+		expect(gradientColorAtPercent('#ffffff', '#000000', 0)).to.be.equal('rgba(255, 255, 255, 1)');
+		expect(gradientColorAtPercent('#fff', '#000', 0)).to.be.equal('rgba(255, 255, 255, 1)');
+	});
+
+	it('50%', () => {
+		expect(gradientColorAtPercent('rgb(255, 255, 255)', 'rgb(0, 0, 0)', 0.5)).to.be.equal('rgba(128, 128, 128, 1)');
+		expect(gradientColorAtPercent('rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0)', 0.5)).to.be.equal('rgba(128, 128, 128, 0.5)');
+		expect(gradientColorAtPercent('#ffffff', '#000000', 0.5)).to.be.equal('rgba(128, 128, 128, 1)');
+		expect(gradientColorAtPercent('#fff', '#000', 0.5)).to.be.equal('rgba(128, 128, 128, 1)');
+	});
+
+	it('100%', () => {
+		expect(gradientColorAtPercent('rgb(255, 255, 255)', 'rgb(0, 0, 0)', 1)).to.be.equal('rgba(0, 0, 0, 1)');
+		expect(gradientColorAtPercent('rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0)', 1)).to.be.equal('rgba(0, 0, 0, 0)');
+		expect(gradientColorAtPercent('#ffffff', '#000000', 1)).to.be.equal('rgba(0, 0, 0, 1)');
+		expect(gradientColorAtPercent('#fff', '#000', 1)).to.be.equal('rgba(0, 0, 0, 1)');
 	});
 });
