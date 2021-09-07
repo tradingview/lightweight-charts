@@ -49,6 +49,7 @@ interface TransitionState {
 }
 
 export interface TimeMark {
+	needAlignCoordinate: boolean;
 	coord: number;
 	label: string;
 	weight: number;
@@ -366,6 +367,12 @@ export class TimeScale {
 
 		const items = this._tickMarks.build(spacing, maxLabelWidth);
 
+		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second label on time scale"
+		const earliestIndexOfSecondLabel = (this._firstIndex() as number) + indexPerLabel;
+
+		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second last label on time scale"
+		const indexOfSecondLastLabel = (this._lastIndex() as number) - indexPerLabel;
+
 		let targetIndex = 0;
 		for (const tm of items) {
 			if (!(firstBar <= tm.index && tm.index <= lastBar)) {
@@ -377,18 +384,32 @@ export class TimeScale {
 				continue;
 			}
 
+			let label: TimeMark;
 			if (targetIndex < this._labels.length) {
-				const label = this._labels[targetIndex];
+				label = this._labels[targetIndex];
 				label.coord = this.indexToCoordinate(tm.index);
 				label.label = this._formatLabel(time, tm.weight);
 				label.weight = tm.weight;
 			} else {
-				this._labels.push({
+				label = {
+					needAlignCoordinate: false,
 					coord: this.indexToCoordinate(tm.index),
 					label: this._formatLabel(time, tm.weight),
 					weight: tm.weight,
-				});
+				};
+
+				this._labels.push(label);
 			}
+
+			if (this._barSpacing > (maxLabelWidth / 2)) {
+				// if there is enough space then let's show all tick marks as usual
+				label.needAlignCoordinate = false;
+			} else {
+				// if a user is able to scroll after a tick mark then show it as usual, otherwise the coordinate might be aligned
+				// if the index is for the second (last) label or later (earlier) then most likely this label might be displayed without correcting the coordinate
+				label.needAlignCoordinate = this._options.fixLeftEdge && tm.index <= earliestIndexOfSecondLabel || this._options.fixRightEdge && tm.index >= indexOfSecondLastLabel;
+			}
+
 			targetIndex++;
 		}
 		this._labels.length = targetIndex;
