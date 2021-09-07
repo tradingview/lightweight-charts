@@ -64,7 +64,7 @@ export interface SeriesDataItemTypeMap {
 	Bar: BarData | WhitespaceData;
 	Candlestick: BarData | WhitespaceData;
 	Area: LineData | WhitespaceData;
-	AreaBaseline: LineData | WhitespaceData;
+	Baseline: LineData | WhitespaceData;
 	Line: LineData | WhitespaceData;
 	Histogram: HistogramData | WhitespaceData;
 }

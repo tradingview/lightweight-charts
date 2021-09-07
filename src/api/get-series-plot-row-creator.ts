@@ -53,7 +53,7 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Candlestick: wrapWhitespaceData(getOHLCBasedSeriesPlotRow),
 	Bar: wrapWhitespaceData(getOHLCBasedSeriesPlotRow),
 	Area: wrapWhitespaceData(getLineBasedSeriesPlotRow),
-	AreaBaseline: wrapWhitespaceData(getLineBasedSeriesPlotRow),
+	Baseline: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 	Histogram: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 	Line: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 };

@@ -4,9 +4,9 @@ import { PlotRowValueIndex } from './plot-data';
 import { Series } from './series';
 import { SeriesPlotRow } from './series-data';
 import {
-	AreaBaselineStyleOptions,
 	AreaStyleOptions,
 	BarStyleOptions,
+	BaselineStyleOptions,
 	CandlestickStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
@@ -50,8 +50,8 @@ export class SeriesBarColorer {
 			case 'Area':
 				return this._areaStyle(seriesOptions as AreaStyleOptions);
 
-			case 'AreaBaseline':
-				return this._areaBaselineStyle(seriesOptions as AreaBaselineStyleOptions, barIndex, precomputedBars);
+			case 'Baseline':
+				return this._baselineStyle(seriesOptions as BaselineStyleOptions, barIndex, precomputedBars);
 
 			case 'Bar':
 				return this._barStyle(seriesOptions as BarStyleOptions, barIndex, precomputedBars);
@@ -111,12 +111,12 @@ export class SeriesBarColorer {
 		};
 	}
 
-	private _areaBaselineStyle(areaBaselineStyle: AreaBaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
-		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'AreaBaseline'>;
-		const isAboveBaseline = currentBar.value[0] >= areaBaselineStyle.baseValue.price;
+	private _baselineStyle(baselineStyle: BaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Baseline'>;
+		const isAboveBaseline = currentBar.value[0] >= baselineStyle.baseValue.price;
 		return {
 			...emptyResult,
-			barColor: isAboveBaseline ? areaBaselineStyle.topLineColor : areaBaselineStyle.bottomLineColor,
+			barColor: isAboveBaseline ? baselineStyle.topLineColor : baselineStyle.bottomLineColor,
 		};
 	}
 

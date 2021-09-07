@@ -8,7 +8,7 @@ import { LineItem } from './line-renderer';
 import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
 
-export interface PaneRendererAreaBaselineData {
+export interface PaneRendererBaselineData {
 	items: LineItem[];
 	lineType: LineType;
 	lineWidth: LineWidth;
@@ -29,11 +29,11 @@ export interface PaneRendererAreaBaselineData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererAreaBaseline extends ScaledRenderer {
-	protected _data: PaneRendererAreaBaselineData | null = null;
+export class PaneRendererBaseline extends ScaledRenderer {
+	protected _data: PaneRendererBaselineData | null = null;
 	protected _baseLine: Coordinate | null = null;
 
-	public setData(data: PaneRendererAreaBaselineData): void {
+	public setData(data: PaneRendererBaselineData): void {
 		this._data = data;
 		this._baseLine = Math.min(this._data.bottom, this._data.baseLine) as Coordinate;
 	}

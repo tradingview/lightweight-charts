@@ -93,7 +93,7 @@ export interface BaseValuePrice {
 }
 
 export type BaseValueType = BaseValuePrice;
-export interface AreaBaselineStyleOptions {
+export interface BaselineStyleOptions {
 	topFillColor1: string;
 	topFillColor2: string;
 	bottomFillColor1: string;
@@ -285,16 +285,16 @@ export type LineSeriesOptions = SeriesOptions<LineStyleOptions>;
 export type LineSeriesPartialOptions = SeriesPartialOptions<LineStyleOptions>;
 
 /**
- * Structure describing area base line series options.
+ * Structure describing baseline series options.
  */
-export type AreaBaselineSeriesOptions = SeriesOptions<AreaBaselineStyleOptions>;
-export type AreaBaselineSeriesPartialOptions = SeriesPartialOptions<AreaBaselineStyleOptions>;
+export type BaselineSeriesOptions = SeriesOptions<BaselineStyleOptions>;
+export type BaselineSeriesPartialOptions = SeriesPartialOptions<BaselineStyleOptions>;
 
 export interface SeriesOptionsMap {
 	Bar: BarSeriesOptions;
 	Candlestick: CandlestickSeriesOptions;
 	Area: AreaSeriesOptions;
-	AreaBaseline: AreaBaselineSeriesOptions;
+	Baseline: BaselineSeriesOptions;
 	Line: LineSeriesOptions;
 	Histogram: HistogramSeriesOptions;
 }
@@ -303,7 +303,7 @@ export interface SeriesPartialOptionsMap {
 	Bar: BarSeriesPartialOptions;
 	Candlestick: CandlestickSeriesPartialOptions;
 	Area: AreaSeriesPartialOptions;
-	AreaBaseline: AreaBaselineSeriesPartialOptions;
+	Baseline: BaselineSeriesPartialOptions;
 	Line: LineSeriesPartialOptions;
 	Histogram: HistogramSeriesPartialOptions;
 }

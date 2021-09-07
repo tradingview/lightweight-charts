@@ -1,18 +1,18 @@
-# Area series
+# Baseline series
 
 An area chart is another way of displaying quantitative data. It's basically a colored area between the line connecting all data points and the time scale.
 
 An area series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the time scale.
 
-![Area baseline chart example](./assets/area-baseline-series.png)"Area baseline chart example")
+![Baseline chart example](./assets/baseline-series.png)"Baseline chart example")
 
 ## How to create area series
 
 ```js
-const areaBaselineSeries = chart.addAreaBaselineSeries();
+const baselineSeries = chart.addBaselineSeries();
 
 // set the data
-areaBaselineSeries.setData([
+baselineSeries.setData([
     { time: '2018-12-22', value: -32.51 },
     { time: '2018-12-23', value: -31.11 },
     { time: '2018-12-24', value: -27.02 },
@@ -65,7 +65,7 @@ An area series interface can be customized using the following set of options:
 - set initial options for area series:
 
     ```js
-    const areaBaselineSeries = chart.addAreaBaselineSeries({
+    const baselineSeries = chart.addBaselineSeries({
         topFillColor1: 'rgba(21, 146, 230, 0.4)',
         topFillColor2: 'rgba(21, 146, 230, 0)',
         bottomFillColor1: 'rgba(21, 146, 230, 0)',
@@ -84,7 +84,7 @@ An area series interface can be customized using the following set of options:
 
     ```js
     // for example, let's override line width and color only
-    areaBaselineSeries.applyOptions({
+    baselineSeries.applyOptions({
         topLineColor: 'rgba(255, 44, 128, 1)',
         lineWidth: 1,
     });

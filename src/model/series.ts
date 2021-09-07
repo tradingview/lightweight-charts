@@ -7,9 +7,9 @@ import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { isInteger, merge } from '../helpers/strict-type-checks';
 
-import { SeriesAreaBaselinePaneView } from '../views/pane/area-baseline-pane-view';
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
+import { SeriesBaselinePaneView } from '../views/pane/baseline-pane-view';
 import { SeriesCandlesticksPaneView } from '../views/pane/candlesticks-pane-view';
 import { SeriesHistogramPaneView } from '../views/pane/histogram-pane-view';
 import { IPaneView } from '../views/pane/ipane-view';
@@ -41,8 +41,8 @@ import { SeriesBarColorer } from './series-bar-colorer';
 import { createSeriesPlotList, SeriesPlotList, SeriesPlotRow } from './series-data';
 import { InternalSeriesMarker, SeriesMarker } from './series-markers';
 import {
-	AreaBaselineStyleOptions,
 	AreaStyleOptions,
+	BaselineStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
 	SeriesOptionsMap,
@@ -86,7 +86,7 @@ export interface SeriesDataAtTypeMap {
 	Bar: BarPrices;
 	Candlestick: BarPrices;
 	Area: BarPrice;
-	AreaBaseline: BarPrice;
+	Baseline: BarPrice;
 	Line: BarPrice;
 	Histogram: BarPrice;
 }
@@ -459,8 +459,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public markerDataAtIndex(index: TimePointIndex): MarkerData | null {
-		const getValue = (this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'AreaBaseline') &&
-			(this._options as (LineStyleOptions | AreaStyleOptions | AreaBaselineStyleOptions)).crosshairMarkerVisible;
+		const getValue = (this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'Baseline') &&
+			(this._options as (LineStyleOptions | AreaStyleOptions | BaselineStyleOptions)).crosshairMarkerVisible;
 
 		if (!getValue) {
 			return null;
@@ -496,7 +496,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		// TODO: refactor this
 		// series data is strongly hardcoded to keep bars
-		const plots = this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'AreaBaseline' || this._seriesType === 'Histogram'
+		const plots = this._seriesType === 'Line' || this._seriesType === 'Area' || this._seriesType === 'Baseline' || this._seriesType === 'Histogram'
 			? [PlotRowValueIndex.Close]
 			: [PlotRowValueIndex.Low, PlotRowValueIndex.High];
 
@@ -517,8 +517,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		switch (this._seriesType) {
 			case 'Line':
 			case 'Area':
-			case 'AreaBaseline':
-				return (this._options as (LineStyleOptions | AreaStyleOptions | AreaBaselineStyleOptions)).crosshairMarkerRadius;
+			case 'Baseline':
+				return (this._options as (LineStyleOptions | AreaStyleOptions | BaselineStyleOptions)).crosshairMarkerRadius;
 		}
 
 		return 0;
@@ -528,8 +528,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		switch (this._seriesType) {
 			case 'Line':
 			case 'Area':
-			case 'AreaBaseline': {
-				const crosshairMarkerBorderColor = (this._options as (LineStyleOptions | AreaStyleOptions | AreaBaselineStyleOptions)).crosshairMarkerBorderColor;
+			case 'Baseline': {
+				const crosshairMarkerBorderColor = (this._options as (LineStyleOptions | AreaStyleOptions | BaselineStyleOptions)).crosshairMarkerBorderColor;
 				if (crosshairMarkerBorderColor.length !== 0) {
 					return crosshairMarkerBorderColor;
 				}
@@ -543,8 +543,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		switch (this._seriesType) {
 			case 'Line':
 			case 'Area':
-			case 'AreaBaseline': {
-				const crosshairMarkerBackgroundColor = (this._options as (LineStyleOptions | AreaStyleOptions | AreaBaselineStyleOptions)).crosshairMarkerBackgroundColor;
+			case 'Baseline': {
+				const crosshairMarkerBackgroundColor = (this._options as (LineStyleOptions | AreaStyleOptions | BaselineStyleOptions)).crosshairMarkerBackgroundColor;
 				if (crosshairMarkerBackgroundColor.length !== 0) {
 					return crosshairMarkerBackgroundColor;
 				}
@@ -635,8 +635,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 				break;
 			}
 
-			case 'AreaBaseline': {
-				this._paneView = new SeriesAreaBaselinePaneView(this as Series<'AreaBaseline'>, this.model());
+			case 'Baseline': {
+				this._paneView = new SeriesBaselinePaneView(this as Series<'Baseline'>, this.model());
 				break;
 			}
 

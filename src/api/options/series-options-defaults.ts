@@ -1,7 +1,7 @@
 import {
-	AreaBaselineStyleOptions,
 	AreaStyleOptions,
 	BarStyleOptions,
+	BaselineStyleOptions,
 	CandlestickStyleOptions,
 	HistogramStyleOptions,
 	LasPriceAnimationMode,
@@ -57,7 +57,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	lastPriceAnimation: LasPriceAnimationMode.Disabled,
 };
 
-export const areaBaselineStyleDefaults: AreaBaselineStyleOptions = {
+export const baselineStyleDefaults: BaselineStyleOptions = {
 	topFillColor1: 'rgba(46, 220, 135, 0.4)',
 	topFillColor2: 'rgba(40, 221, 100, 0)',
 	bottomFillColor1: 'rgba(255, 18, 18, 0)',

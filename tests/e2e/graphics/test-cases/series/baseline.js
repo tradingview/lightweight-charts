@@ -44,16 +44,16 @@ function runTestCase(container) {
 
 	window.chart = chart;
 
-	const mainSeries = chart.addAreaBaselineSeries({
+	const mainSeries = chart.addBaselineSeries({
 		lineWidth: 1,
 		baseValue: {
 			type: 'price',
-			price: 5,
+			price: 0,
 		},
 	});
 
 	mainSeries.createPriceLine({
-		price: 5,
+		price: 0,
 	});
 
 	mainSeries.setData(generateData());

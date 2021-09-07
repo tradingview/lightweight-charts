@@ -10,7 +10,7 @@ export interface SeriesPlotRowTypeAtTypeMap {
 	Bar: PlotRow;
 	Candlestick: PlotRow;
 	Area: PlotRow;
-	AreaBaseline: PlotRow;
+	Baseline: PlotRow;
 	Line: PlotRow;
 	Histogram: HistogramPlotRow;
 }
