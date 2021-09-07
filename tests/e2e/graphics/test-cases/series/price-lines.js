@@ -12,7 +12,7 @@ function generateData() {
 	return res;
 }
 
-export function runTestCase(container) {
+function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 
 	const series = chart.addLineSeries();
