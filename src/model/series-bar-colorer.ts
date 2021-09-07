@@ -113,7 +113,8 @@ export class SeriesBarColorer {
 
 	private _baselineStyle(baselineStyle: BaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
 		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Baseline'>;
-		const isAboveBaseline = currentBar.value[0] >= baselineStyle.baseValue.price;
+		const isAboveBaseline = currentBar.value[PlotRowValueIndex.Close] >= baselineStyle.baseValue.price;
+
 		return {
 			...emptyResult,
 			barColor: isAboveBaseline ? baselineStyle.topLineColor : baselineStyle.bottomLineColor,
