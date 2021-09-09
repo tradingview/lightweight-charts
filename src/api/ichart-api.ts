@@ -29,18 +29,6 @@ export interface MouseEventParams {
 
 export type MouseEventHandler = (param: MouseEventParams) => void;
 
-export interface PaneEventParams {
-	top: {
-		index: number;
-		height: number;
-	};
-	bottom: {
-		index: number;
-		height: number;
-	};
-}
-
-export type PaneEventHandler = (param: PaneEventParams) => void;
 /*
  * The main interface of a single chart
  */
@@ -169,20 +157,6 @@ export interface IChartApi {
 	takeScreenshot(): HTMLCanvasElement;
 
 	/**
-	 * Adds a subscription to pane resize event
-	 *
-	 * @param handler - handler (function) to be called on pane resize
-	 */
-	subscribePaneResize(handler: PaneEventHandler): void;
-
-	/**
-	 * Removes pane resize subscription
-	 *
-	 * @param handler - previously subscribed handler
-	 */
-	unsubscribePaneResize(handler: PaneEventHandler): void;
-
-	/**
 	 * Removes a pane with index
 	 *
 	 * @param index the pane to be removed
@@ -197,4 +171,5 @@ export interface IChartApi {
 	 */
 	swapPane(first: number, second: number): void;
 
+	getPaneElements(): HTMLElement[];
 }

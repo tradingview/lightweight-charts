@@ -1,9 +1,5 @@
-import {
-	ChartWidget,
-	MouseEventParamsImpl,
-	MouseEventParamsImplSupplier, PaneEventParamsImpl,
-	PaneEventParamsImplSupplier,
-} from '../gui/chart-widget';
+import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
+import { PaneWidget } from '../gui/pane-widget';
 
 import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
@@ -34,7 +30,7 @@ import {
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
-import { IChartApi, MouseEventHandler, MouseEventParams, PaneEventHandler, PaneEventParams } from './ichart-api';
+import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -148,7 +144,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
-	private readonly _paneResizeDelegate: Delegate<PaneEventParams> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi;
 
@@ -171,15 +166,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			(paramSupplier: MouseEventParamsImplSupplier) => {
 				if (this._crosshairMovedDelegate.hasListeners()) {
 					this._crosshairMovedDelegate.fire(this._convertMouseParams(paramSupplier()));
-				}
-			},
-			this
-		);
-
-		this._chartWidget.paneResized().subscribe(
-			(paramSupplier: PaneEventParamsImplSupplier) => {
-				if (this._paneResizeDelegate.hasListeners()) {
-					this._paneResizeDelegate.fire(this._convertPaneResizeParams(paramSupplier()));
 				}
 			},
 			this
@@ -341,20 +327,16 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return this._chartWidget.takeScreenshot();
 	}
 
-	public subscribePaneResize(handler: PaneEventHandler): void {
-		this._paneResizeDelegate.subscribe(handler);
-	}
-
-	public unsubscribePaneResize(handler: PaneEventHandler): void {
-		this._paneResizeDelegate.unsubscribe(handler);
-	}
-
 	public removePane(index: number): void {
 		this._chartWidget.model().removePane(index);
 	}
 
 	public swapPane(first: number, second: number): void {
 		this._chartWidget.model().swapPane(first, second);
+	}
+
+	public getPaneElements(): HTMLElement[] {
+		return this._chartWidget.paneWidgets().map((paneWidget: PaneWidget) => paneWidget.getPaneCell());
 	}
 
 	private _sendUpdateToChart(update: DataUpdateResponse): void {
@@ -384,20 +366,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			hoveredSeries,
 			hoveredMarkerId: param.hoveredObject,
 			seriesPrices,
-		};
-	}
-
-	// noinspection JSMethodCanBeStatic
-	private _convertPaneResizeParams(param: PaneEventParamsImpl): PaneEventParams {
-		return {
-			top: {
-				index: param.top.index,
-				height: param.top.height,
-			},
-			bottom: {
-				index: param.bottom.index,
-				height: param.bottom.height,
-			},
 		};
 	}
 }
