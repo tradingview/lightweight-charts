@@ -308,7 +308,7 @@ Vertical gradient background has three fields:
 chart.applyOptions({
     layout: {
         background: {
-            type: LightweightCharts.ColorType.Gradient,
+            type: LightweightCharts.ColorType.VerticalGradient,
             topColor: '#FFFFFF',
             bottomColor: '#AAFFAA',
         },
