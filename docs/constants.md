@@ -95,4 +95,4 @@ It has the following values:
 `ColorType` enum is used to specify a type of color.
 
 - `ColorType.Solid` - solid color.
-- `ColorType.Gradient` - gradient color.
+- `ColorType.VerticalGradient` - gradient color.
