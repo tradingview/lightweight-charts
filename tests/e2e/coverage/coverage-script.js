@@ -103,7 +103,7 @@ function runTestCase(container) {
 		priceFormat: {
 			type: 'volume',
 		},
-		lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.Continuous,
+		lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.Continuous,
 	});
 	seriesToRemove.setData(generateLineData());
 
@@ -132,7 +132,7 @@ function runTestCase(container) {
 		priceFormat: {
 			type: 'volume',
 		},
-		lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.OnDataUpdate,
+		lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.OnDataUpdate,
 	});
 
 	lineSeries.setData(generateLineData());

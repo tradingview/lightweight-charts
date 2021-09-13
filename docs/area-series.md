@@ -55,7 +55,7 @@ An area series interface can be customized using the following set of options:
 |`crosshairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
 |`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
 |`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
-|`lastPriceAnimation`|[LasPriceAnimationMode](./constants.md#laspriceanimationmode)|`'LasPriceAnimationMode.Disabled'`|The mode of the last price animation|
+|`lastPriceAnimation`|[LastPriceAnimationMode](./constants.md#lastpriceanimationmode)|`'LastPriceAnimationMode.Disabled'`|The mode of the last price animation|
 
 ### Examples
 
@@ -72,7 +72,7 @@ An area series interface can be customized using the following set of options:
         crosshairMarkerRadius: 3,
         crosshairMarkerBorderColor: 'rgb(255, 255, 255, 1)',
         crosshairMarkerBackgroundColor: 'rgb(34, 150, 243, 1)',
-        lastPriceAnimation: LightweightCharts.LasPriceAnimationMode.Continuous,
+        lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.Continuous,
     });
     ```
 
