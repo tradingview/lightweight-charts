@@ -142,6 +142,16 @@ interface GradientColorsCache {
 	colors: Map<number, string>;
 }
 
+interface ResetAllScalesAvailableData {
+	leftScale: boolean;
+	rightScale: boolean;
+	timeScale: boolean;
+}
+
+function resetAllScalesAvailable(data: ResetAllScalesAvailableData): boolean {
+	return data.leftScale || data.rightScale || data.timeScale;
+}
+
 export class ChartModel implements IDestroyable {
 	private readonly _options: ChartOptionsInternal;
 	private readonly _invalidateHandler: InvalidateHandler;
@@ -166,8 +176,14 @@ export class ChartModel implements IDestroyable {
 	private _backgroundBottomColor: string;
 	private _gradientColorsCache: GradientColorsCache | null = null;
 
-	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptionsInternal) {
+	private _resetAllScalesAvailableData: ResetAllScalesAvailableData = { leftScale: false, rightScale: false, timeScale: false };
+	private readonly _resetAllScalesAvailableChanged: Delegate<boolean> = new Delegate();
+
+	private readonly _terminateAnimations: () => void;
+
+	public constructor(invalidateHandler: InvalidateHandler, terminateAnimations: () => void, options: ChartOptionsInternal) {
 		this._invalidateHandler = invalidateHandler;
+		this._terminateAnimations = terminateAnimations;
 		this._options = options;
 
 		this._rendererOptionsProvider = new PriceAxisRendererOptionsProvider(this);
@@ -291,6 +307,26 @@ export class ChartModel implements IDestroyable {
 		return this._crosshairMoved;
 	}
 
+	public resetAllScalesAvailable(): boolean {
+		return resetAllScalesAvailable(this._resetAllScalesAvailableData);
+	}
+
+	public resetAllScalesAvailableChanged(): ISubscription<boolean> {
+		return this._resetAllScalesAvailableChanged;
+	}
+
+	public resetAllScales(): void {
+		this.resetTimeScale();
+		const leftPriceScale = this.findPriceScale('left');
+		const rightPriceScale = this.findPriceScale('right');
+		if (leftPriceScale) {
+			this.resetPriceScale(leftPriceScale.pane, leftPriceScale.priceScale);
+		}
+		if (rightPriceScale) {
+			this.resetPriceScale(rightPriceScale.pane, rightPriceScale.priceScale);
+		}
+	}
+
 	public setPaneHeight(pane: Pane, height: number): void {
 		pane.setHeight(height);
 		this.recalculateAllPanes();
@@ -337,6 +373,7 @@ export class ChartModel implements IDestroyable {
 		pane.scalePriceTo(priceScale, x);
 		this.updateCrosshair();
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
+		this._updatePriceScaleResetAvailable(priceScale, true);
 	}
 
 	public endScalePrice(pane: Pane, priceScale: PriceScale): void {
@@ -371,6 +408,7 @@ export class ChartModel implements IDestroyable {
 	public resetPriceScale(pane: Pane, priceScale: PriceScale): void {
 		pane.resetPriceScale(priceScale);
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
+		this._updatePriceScaleResetAvailable(priceScale, false);
 	}
 
 	public startScaleTime(position: Coordinate): void {
@@ -382,8 +420,9 @@ export class ChartModel implements IDestroyable {
 	 *
 	 * @param pointX - X coordinate of the point to apply the zoom (the point which should stay on its place)
 	 * @param scale - Zoom value. Negative value means zoom out, positive - zoom in.
+	 * @param animationDuration - Animation duration.
 	 */
-	public zoomTime(pointX: Coordinate, scale: number): void {
+	public zoomTime(pointX: Coordinate, scale: number, animationDuration: number = 0): void {
 		const timeScale = this.timeScale();
 		if (timeScale.isEmpty() || scale === 0) {
 			return;
@@ -392,9 +431,9 @@ export class ChartModel implements IDestroyable {
 		const timeScaleWidth = timeScale.width();
 		pointX = Math.max(1, Math.min(pointX, timeScaleWidth)) as Coordinate;
 
-		timeScale.zoom(pointX, scale);
-
-		this.recalculateAllPanes();
+		this._terminateAnimations();
+		timeScale.zoom(pointX, scale, animationDuration);
+		this._updateResetAllScalesAvailable({ timeScale: true });
 	}
 
 	public scrollChart(x: Coordinate): void {
@@ -405,7 +444,7 @@ export class ChartModel implements IDestroyable {
 
 	public scaleTimeTo(x: Coordinate): void {
 		this._timeScale.scaleTo(x);
-		this.recalculateAllPanes();
+		this._updateResetAllScalesAvailable({ timeScale: true });
 	}
 
 	public endScaleTime(): void {
@@ -426,8 +465,18 @@ export class ChartModel implements IDestroyable {
 		}
 
 		this._timeScale.scrollTo(x);
-		this.recalculateAllPanes();
+		this._updateResetAllScalesAvailable({ timeScale: true });
 		return res;
+	}
+
+	public scrollToOffsetAnimated(offset: number, animationDuration?: number): void {
+		this._timeScale.scrollToOffsetAnimated(offset, animationDuration);
+		this._updateResetAllScalesAvailable({ timeScale: true });
+	}
+
+	public scrollToRealTime(): void {
+		this._timeScale.scrollToRealTime();
+		this._updateResetAllScalesAvailable({ timeScale: true });
 	}
 
 	public endScrollTime(): void {
@@ -611,9 +660,11 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public resetTimeScale(): void {
+		this._terminateAnimations();
 		const mask = new InvalidateMask(InvalidationLevel.Light);
 		mask.resetTimeScale();
 		this._invalidate(mask);
+		this._updateResetAllScalesAvailable({ timeScale: false });
 	}
 
 	public setBarSpacing(spacing: number): void {
@@ -724,5 +775,25 @@ export class ChartModel implements IDestroyable {
 		}
 
 		return layoutOptions.background.color;
+	}
+
+	private _updateResetAllScalesAvailable(changes: Partial<ResetAllScalesAvailableData>): void {
+		const oldValue = resetAllScalesAvailable(this._resetAllScalesAvailableData);
+		Object.assign(this._resetAllScalesAvailableData, changes);
+		if (resetAllScalesAvailable(this._resetAllScalesAvailableData) !== oldValue) {
+			this._resetAllScalesAvailableChanged.fire(!oldValue);
+		}
+	}
+
+	private _updatePriceScaleResetAvailable(priceScale: PriceScale, available: boolean): void {
+		const id = priceScale.id();
+		const changes: Partial<ResetAllScalesAvailableData> = {};
+		if (id === 'left') {
+			changes.leftScale = available;
+		} else if (id === 'right') {
+			changes.rightScale = available;
+		}
+
+		this._updateResetAllScalesAvailable(changes);
 	}
 }

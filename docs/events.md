@@ -52,6 +52,31 @@ chart.subscribeCrosshairMove(handleCrosshairMoved);
 chart.unsubscribeCrosshairMove(handleCrosshairMoved);
 ```
 
+## Reset all scales availability
+
+|Name|Description|
+|----|-----------|
+|`subscribeResetAllScalesAvailable(handler: ResetAllScalesAvailableHandler): void;`|Get notified when the chart has at leas one scale that can be reset|
+|`unsubscribeResetAllScalesAvailable(handler: ResetAllScalesAvailableHandler): void;`|Don't get notified when the chart has at leas one scale that can be reset|
+
+Example:
+
+```js
+function handleResetAllScalesAvailable(available) {
+    if (available) {
+        showResetAllScalesControl();
+    } else {
+        hideResetAllScalesControl();
+    }
+}
+
+chart.subscribeResetAllScalesAvailable(handleResetAllScalesAvailable);
+
+// ... after some time
+
+chart.unsubscribeResetAllScalesAvailable(handleResetAllScalesAvailable);
+```
+
 ## Types
 
 ### MouseEventHandler

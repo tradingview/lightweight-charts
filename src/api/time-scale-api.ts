@@ -61,15 +61,15 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 			return;
 		}
 
-		this._timeScale.scrollToOffsetAnimated(position, Constants.AnimationDurationMs);
+		this._model.scrollToOffsetAnimated(position, Constants.AnimationDurationMs);
 	}
 
 	public scrollToRealTime(): void {
-		this._timeScale.scrollToRealTime();
+		this._model.scrollToRealTime();
 	}
 
 	public zoom(zoomPoint: Coordinate, scale: number, animationDuration: number): void {
-		this._timeScale.zoom(zoomPoint, scale, animationDuration);
+		this._model.zoomTime(zoomPoint, scale, animationDuration);
 	}
 
 	public getVisibleRange(): TimeRange | null {

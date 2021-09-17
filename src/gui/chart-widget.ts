@@ -72,6 +72,7 @@ export class ChartWidget implements IDestroyable {
 
 		this._model = new ChartModel(
 			this._invalidateHandler.bind(this),
+			this._terminateAnimations.bind(this),
 			this._options
 		);
 		this.model().crosshairMoved().subscribe(this._onPaneWidgetCrosshairMoved.bind(this), this);
@@ -475,6 +476,11 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this.paint(invalidateMask);
+	}
+
+	private _terminateAnimations(): void {
+		this._model.timeScale().terminateAnimations();
+		this._paneWidgets.forEach((p: PaneWidget) => p.terminateAnimations());
 	}
 
 	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {

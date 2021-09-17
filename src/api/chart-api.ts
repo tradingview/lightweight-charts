@@ -30,7 +30,7 @@ import {
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
-import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
+import { IChartApi, MouseEventHandler, MouseEventParams, ResetAllScalesAvailableHandler } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -156,6 +156,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
+	private readonly _resetAllScalesAvailableDelegate: Delegate<boolean> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi;
 
@@ -185,11 +186,13 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 		const model = this._chartWidget.model();
 		this._timeScaleApi = new TimeScaleApi(model, this._chartWidget.timeAxisWidget());
+		model.resetAllScalesAvailableChanged().subscribe((available: boolean) => this._resetAllScalesAvailableDelegate.fire(available), this);
 	}
 
 	public remove(): void {
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
+		this._chartWidget.model().resetAllScalesAvailableChanged().unsubscribeAll(this);
 
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
@@ -199,6 +202,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 		this._clickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
+		this._resetAllScalesAvailableDelegate.destroy();
 		this._dataLayer.destroy();
 	}
 
@@ -312,6 +316,22 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public unsubscribeCrosshairMove(handler: MouseEventHandler): void {
 		this._crosshairMovedDelegate.unsubscribe(handler);
+	}
+
+	public resetAllScales(): void {
+		this._chartWidget.model().resetAllScales();
+	}
+
+	public resetAllScalesAvailable(): boolean {
+		return this._chartWidget.model().resetAllScalesAvailable();
+	}
+
+	public subscribeResetAllScalesAvailable(handler: ResetAllScalesAvailableHandler): void {
+		this._resetAllScalesAvailableDelegate.subscribe(handler);
+	}
+
+	public unsubscribeResetAllScalesAvailable(handler: ResetAllScalesAvailableHandler): void {
+		this._resetAllScalesAvailableDelegate.unsubscribe(handler);
 	}
 
 	public priceScale(priceScaleId?: string): IPriceScaleApi {

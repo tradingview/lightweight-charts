@@ -558,6 +558,22 @@ const screenshot = chart.takeScreenshot();
 
 The function returns a `canvas` element with the chart drawn on it. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
 
+## Reset all scales
+
+Resets all scales on the chart.
+
+```js
+chart.resetAllScales();
+```
+
+## Reset all scales availability
+
+Returns true if the chart has at least one scale that can be reset.
+
+```js
+const resetAvailable = chart.resetAllScalesAvailable();
+```
+
 ## Coordinates and prices converting
 
 Each series has an associated price scale object. If the series has been created as an overlay,

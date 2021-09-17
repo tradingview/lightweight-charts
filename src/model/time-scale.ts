@@ -111,6 +111,8 @@ export class TimeScale {
 
 	private _labels: TimeMark[] = [];
 
+	private _terminateCurrentAnimation: (() => void) | null = null;
+
 	public constructor(model: ChartModel, options: TimeScaleOptions, localizationOptions: LocalizationOptions) {
 		this._options = options;
 		this._localizationOptions = localizationOptions;
@@ -434,6 +436,11 @@ export class TimeScale {
 		this._doFixLeftEdge();
 	}
 
+	public terminateAnimations(): void {
+		this._terminateCurrentAnimation?.();
+		this._terminateCurrentAnimation = null;
+	}
+
 	/**
 	 * Zoom in/out the scale around a `zoomPoint` on `scale` value.
 	 *
@@ -450,7 +457,11 @@ export class TimeScale {
 		const barSpacingChange = scale * (barSpacing / 10);
 
 		const animationStart = performance.now();
+		let terminated = false;
 		const animationFn = () => {
+			if (terminated) {
+				return;
+			}
 			const animationProgress = animationDuration === 0 ? 1 : Math.min(1, (performance.now() - animationStart) / animationDuration);
 			const currentBarSpacing = barSpacing + barSpacingChange * animationProgress;
 			// zoom in/out bar spacing
@@ -463,8 +474,13 @@ export class TimeScale {
 
 			if (animationProgress !== 1) {
 				requestAnimationFrame(animationFn);
+			} else {
+				this.terminateAnimations();
 			}
 		};
+		this.terminateAnimations();
+		// eslint-disable-next-line no-return-assign
+		this._terminateCurrentAnimation = () => terminated = true;
 		animationFn();
 	}
 
@@ -534,6 +550,8 @@ export class TimeScale {
 
 		// do not allow scroll out of visible bars
 		this._correctOffset();
+		this._model.recalculateAllPanes();
+		this._model.lightUpdate();
 	}
 
 	public endScroll(): void {
@@ -560,16 +578,26 @@ export class TimeScale {
 
 		const source = this._rightOffset;
 		const animationStart = performance.now();
+		let terminated = false;
 		const animationFn = () => {
+			if (terminated) {
+				return;
+			}
+
 			const animationProgress = (performance.now() - animationStart) / animationDuration;
 			const finishAnimation = animationProgress >= 1;
 			const rightOffset = finishAnimation ? offset : source + (offset - source) * animationProgress;
 			this.setRightOffset(rightOffset);
 			if (!finishAnimation) {
 				requestAnimationFrame(animationFn);
+			} else {
+				this.terminateAnimations();
 			}
 		};
 
+		this.terminateAnimations();
+		// eslint-disable-next-line no-return-assign
+		this._terminateCurrentAnimation = () => terminated = true;
 		animationFn();
 	}
 

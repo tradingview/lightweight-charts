@@ -252,7 +252,7 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 
-		this._terminateKineticAnimation();
+		this.terminateAnimations();
 
 		if (document.activeElement !== document.body && document.activeElement !== document.documentElement) {
 			// If any focusable element except the page itself is focused, remove the focus
@@ -455,7 +455,7 @@ export class PaneWidget implements IDestroyable {
 
 	public pinchStartEvent(): void {
 		this._prevPinchScale = 1;
-		this._terminateKineticAnimation();
+		this.terminateAnimations();
 	}
 
 	public pinchEvent(middlePoint: Position, scale: number): void {
@@ -584,6 +584,21 @@ export class PaneWidget implements IDestroyable {
 
 	public rightPriceAxisWidget(): PriceAxisWidget | null {
 		return this._rightPriceAxisWidget;
+	}
+
+	public terminateAnimations(): void {
+		const now = performance.now();
+		const xAnimationFinished = this._scrollXAnimation === null || this._scrollXAnimation.finished(now);
+		if (this._scrollXAnimation !== null) {
+			if (!xAnimationFinished) {
+				this._finishScroll();
+			}
+		}
+
+		if (this._scrollXAnimation !== null) {
+			this._scrollXAnimation.terminate();
+			this._scrollXAnimation = null;
+		}
 	}
 
 	private _onStateDestroyed(): void {
@@ -791,7 +806,7 @@ export class PaneWidget implements IDestroyable {
 
 		const animationFn = () => {
 			if ((scrollXAnimation.terminated())) {
-				// animation terminated, see _terminateKineticAnimation
+				// animation terminated, see terminateAnimations
 				return;
 			}
 
@@ -816,21 +831,6 @@ export class PaneWidget implements IDestroyable {
 		};
 
 		requestAnimationFrame(animationFn);
-	}
-
-	private _terminateKineticAnimation(): void {
-		const now = performance.now();
-		const xAnimationFinished = this._scrollXAnimation === null || this._scrollXAnimation.finished(now);
-		if (this._scrollXAnimation !== null) {
-			if (!xAnimationFinished) {
-				this._finishScroll();
-			}
-		}
-
-		if (this._scrollXAnimation !== null) {
-			this._scrollXAnimation.terminate();
-			this._scrollXAnimation = null;
-		}
 	}
 
 	private readonly _canvasConfiguredHandler = () => this._state && this._model().lightUpdate();

@@ -28,6 +28,7 @@ export interface MouseEventParams {
 }
 
 export type MouseEventHandler = (param: MouseEventParams) => void;
+export type ResetAllScalesAvailableHandler = (available: boolean) => void;
 
 /*
  * The main interface of a single chart
@@ -118,6 +119,30 @@ export interface IChartApi {
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
+
+	/**
+	 * Resets all chart scales
+	 */
+	resetAllScales(): void;
+
+	/**
+	 * Returns true if there are some scales on the chart that can be reset
+	 */
+	resetAllScalesAvailable(): boolean;
+
+	/**
+	 * Adds a subscription to reset scales availability change
+	 *
+	 * @param handler - handler (function) to be called on reset scales availability change
+	 */
+	subscribeResetAllScalesAvailable(handler: ResetAllScalesAvailableHandler): void;
+
+	/**
+	 * Removes a subscription on reset scales availability change
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeResetAllScalesAvailable(handler: ResetAllScalesAvailableHandler): void;
 
 	/**
 	 * Returns API to manipulate the price scale
