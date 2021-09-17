@@ -1,15 +1,11 @@
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 
-import { BarPrice } from '../model/bar';
+import { BarPrice, BarPriceInfoAtTypeMap } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { PriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
-import {
-	SeriesOptionsMap,
-	SeriesPartialOptionsMap,
-	SeriesType,
-} from '../model/series-options';
-import { Range } from '../model/time-data';
+import { SeriesOptionsMap, SeriesPartialOptionsMap, SeriesType } from '../model/series-options';
+import { Logical, Range } from '../model/time-data';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
@@ -60,6 +56,13 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * the given index range falls into the viewport).
 	 */
 	barsInLogicalRange(range: Range<number>): BarsInfo | null;
+
+	/**
+	 * Get bar price info
+	 *
+	 * @param logicalIndex - the logical index to retrieve bar info
+	 */
+	getBarInfoByLogicalIndex(logicalIndex: Logical): BarPriceInfoAtTypeMap[TSeriesType] | null;
 
 	/**
 	 * Applies new options to the existing series

@@ -12,7 +12,7 @@ import {
 	LineSeriesPartialOptions,
 	SeriesType,
 } from '../model/series-options';
-import { BusinessDay, UTCTimestamp } from '../model/time-data';
+import { BusinessDay, Logical, UTCTimestamp } from '../model/time-data';
 
 import { Time } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -25,6 +25,7 @@ export interface MouseEventParams {
 	seriesPrices: Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>;
 	hoveredSeries?: ISeriesApi<SeriesType>;
 	hoveredMarkerId?: SeriesMarker<Time>['id'];
+	logicalIndex?: Logical;
 }
 
 export type MouseEventHandler = (param: MouseEventParams) => void;
@@ -92,8 +93,9 @@ export interface IChartApi {
 	 */
 	removeSeries(seriesApi: ISeriesApi<SeriesType>): void;
 
-	/*
+	/**
 	 * Adds a subscription to mouse click event
+	 *
 	 * @param handler - handler (function) to be called on mouse click
 	 */
 	subscribeClick(handler: MouseEventHandler): void;

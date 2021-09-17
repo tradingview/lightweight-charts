@@ -17,7 +17,7 @@ import {
 import { Point } from '../model/point';
 import { PriceAxisPosition } from '../model/price-scale';
 import { Series } from '../model/series';
-import { TimePoint, TimePointIndex } from '../model/time-data';
+import { Logical, TimePoint, TimePointIndex } from '../model/time-data';
 
 import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from './canvas-utils';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
@@ -30,6 +30,7 @@ export interface MouseEventParamsImpl {
 	seriesPrices: Map<Series, BarPrice | BarPrices>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
+	logicalIndex?: Logical;
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
@@ -604,12 +605,17 @@ export class ChartWidget implements IDestroyable {
 			? hoveredSource.object.externalId
 			: undefined;
 
+		const logicalIndex = point !== null
+			? this._model.timeScale().coordinateToIndex(point?.x) as unknown as Logical
+			: undefined;
+
 		return {
 			time: clientTime,
 			point: point || undefined,
 			hoveredSeries,
 			seriesPrices,
 			hoveredObject,
+			logicalIndex,
 		};
 	}
 

@@ -3,18 +3,15 @@ import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { ensureNotNull } from '../helpers/assertions';
 import { clone, merge } from '../helpers/strict-type-checks';
 
-import { BarPrice } from '../model/bar';
+import { BarPrice, BarPriceInfoAtTypeMap } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { PlotRowValueIndex } from '../model/plot-data';
 import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
-import { Series, SeriesPartialOptionsInternal } from '../model/series';
+import { Series, SeriesDataAtTypeMap, SeriesPartialOptionsInternal } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
-import {
-	SeriesOptionsMap,
-	SeriesPartialOptionsMap,
-	SeriesType,
-} from '../model/series-options';
+import { SeriesOptionsMap, SeriesPartialOptionsMap, SeriesType } from '../model/series-options';
 import { Logical, Range, TimePoint, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
@@ -172,5 +169,35 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public seriesType(): TSeriesType {
 		return this._series.seriesType();
+	}
+
+	public getBarInfoByLogicalIndex(logicalIndex: Logical): BarPriceInfoAtTypeMap[TSeriesType] | null {
+		const series = this._series;
+		const bar = series.dataAt(logicalIndex as unknown as TimePointIndex) as SeriesDataAtTypeMap[TSeriesType];
+		let result = null;
+
+		if (!bar) {
+			return result;
+		}
+
+		const prevBar = series.bars().search(
+			(logicalIndex - 1) as unknown as TimePointIndex,
+			PlotRowSearchMode.NearestLeft
+		);
+
+		// eslint-disable-next-line @typescript-eslint/tslint/config
+		if (typeof bar === 'number') {
+			result = {
+				value: bar,
+				change: prevBar ? (bar as number) - prevBar.value[PlotRowValueIndex.Close] : undefined,
+			};
+		} else {
+			result = {
+				...bar,
+				change: prevBar ? bar.close - prevBar.value[PlotRowValueIndex.Close] : undefined,
+			};
+		}
+
+		return result as BarPriceInfoAtTypeMap[TSeriesType];
 	}
 }

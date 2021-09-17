@@ -17,3 +17,20 @@ export interface BarCoordinates {
 	lowY: Coordinate;
 	closeY: Coordinate;
 }
+
+interface BarPriceInfo {
+	value: BarPrice;
+	change: number | undefined;
+}
+
+interface BarPricesInfo extends BarPrices {
+	change: number | undefined;
+}
+
+export interface BarPriceInfoAtTypeMap {
+	Bar: BarPricesInfo;
+	Candlestick: BarPricesInfo;
+	Area: BarPriceInfo;
+	Line: BarPriceInfo;
+	Histogram: BarPriceInfo;
+}
