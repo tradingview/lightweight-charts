@@ -10,6 +10,7 @@ export type TimeRange = Range<Time>;
 
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null) => void;
+export type SizeChangeEventHandler = (width: number, height: number) => void;
 
 /** Interface to chart time scale */
 export interface ITimeScaleApi {
@@ -32,6 +33,17 @@ export interface ITimeScaleApi {
 	 * Restores default scroll position of the chart. This process is always animated.
 	 */
 	scrollToRealTime(): void;
+
+	/**
+	 * Zoom in/out the scale around a `zoomPoint` on `scale` value.
+	 *
+	 * @param zoomPoint - X coordinate of the point to apply the zoom.
+	 * If `rightBarStaysOnScroll` option is disabled, then will be used to restore right offset.
+	 * @param scale - Zoom value (in 1/10 parts of current bar spacing).
+	 * Negative value means zoom out, positive - zoom in.
+	 * @param animationDuration animation duration
+	 */
+	zoom(zoomPoint: Coordinate, scale: number, animationDuration: number): void;
 
 	/**
 	 * Returns current visible time range of the chart
@@ -105,6 +117,16 @@ export interface ITimeScaleApi {
 	coordinateToTime(x: number): Time | null;
 
 	/**
+	 * Returns a width of the time scale.
+	 */
+	width(): number;
+
+	/**
+	 * Returns a height of the time scale.
+	 */
+	height(): number;
+
+	/**
 	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
 	 *
 	 * @param handler - handler (function) to be called on changing visible data range
@@ -131,6 +153,20 @@ export interface ITimeScaleApi {
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void;
+
+	/**
+	 * Adds a subscription to time scale size changes
+	 *
+	 * @param handler - handler (function) to be called when the time scale size changes
+	 */
+	subscribeSizeChange(handler: SizeChangeEventHandler): void;
+
+	/**
+	 * Removes a subscription to time scale size changes
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeSizeChange(handler: SizeChangeEventHandler): void;
 
 	/**
 	 * Applies new options to the time scale.

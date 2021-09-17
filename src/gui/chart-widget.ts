@@ -123,6 +123,10 @@ export class ChartWidget implements IDestroyable {
 		return this._paneWidgets;
 	}
 
+	public timeAxisWidget(): TimeAxisWidget {
+		return this._timeAxisWidget;
+	}
+
 	public destroy(): void {
 		this._element.removeEventListener('wheel', this._onWheelBound);
 		if (this._drawRafId !== 0) {

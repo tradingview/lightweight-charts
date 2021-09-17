@@ -441,20 +441,31 @@ export class TimeScale {
 	 * If `rightBarStaysOnScroll` option is disabled, then will be used to restore right offset.
 	 * @param scale - Zoom value (in 1/10 parts of current bar spacing).
 	 * Negative value means zoom out, positive - zoom in.
+	 * @param animationDuration animation duration
 	 */
-	public zoom(zoomPoint: Coordinate, scale: number): void {
+	public zoom(zoomPoint: Coordinate, scale: number, animationDuration: number = 0): void {
 		const floatIndexAtZoomPoint = this._coordinateToFloatIndex(zoomPoint);
 
 		const barSpacing = this.barSpacing();
-		const newBarSpacing = barSpacing + scale * (barSpacing / 10);
+		const barSpacingChange = scale * (barSpacing / 10);
 
-		// zoom in/out bar spacing
-		this.setBarSpacing(newBarSpacing);
+		const animationStart = performance.now();
+		const animationFn = () => {
+			const animationProgress = animationDuration === 0 ? 1 : Math.min(1, (performance.now() - animationStart) / animationDuration);
+			const currentBarSpacing = barSpacing + barSpacingChange * animationProgress;
+			// zoom in/out bar spacing
+			this.setBarSpacing(currentBarSpacing);
 
-		if (!this._options.rightBarStaysOnScroll) {
-			// and then correct right offset to move index under zoomPoint back to its coordinate
-			this.setRightOffset(this.rightOffset() + (floatIndexAtZoomPoint - this._coordinateToFloatIndex(zoomPoint)));
-		}
+			if (!this._options.rightBarStaysOnScroll) {
+				// and then correct right offset to move index under zoomPoint back to its coordinate
+				this.setRightOffset(this.rightOffset() + (floatIndexAtZoomPoint - this._coordinateToFloatIndex(zoomPoint)));
+			}
+
+			if (animationProgress !== 1) {
+				requestAnimationFrame(animationFn);
+			}
+		};
+		animationFn();
 	}
 
 	public startScale(x: Coordinate): void {
@@ -555,7 +566,7 @@ export class TimeScale {
 			const rightOffset = finishAnimation ? offset : source + (offset - source) * animationProgress;
 			this.setRightOffset(rightOffset);
 			if (!finishAnimation) {
-				setTimeout(animationFn, 20);
+				requestAnimationFrame(animationFn);
 			}
 		};
 
