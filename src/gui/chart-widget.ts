@@ -30,7 +30,7 @@ export interface MouseEventParamsImpl {
 	seriesPrices: Map<Series, BarPrice | BarPrices>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
-	logicalIndex?: Logical;
+	index?: Logical;
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
@@ -615,7 +615,7 @@ export class ChartWidget implements IDestroyable {
 			hoveredSeries,
 			seriesPrices,
 			hoveredObject,
-			logicalIndex,
+			index: logicalIndex,
 		};
 	}
 

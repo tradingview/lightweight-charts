@@ -67,7 +67,7 @@ export type MouseEventHandler = (param: MouseEventParams) => void;
 - `time` (`Time`, optional) - time
 - `point`: (`{ x: number, y: number }`, optional) - coordinate
 - `seriesPrices`: (`Map<ISeriesApi, number | OHLC>`) - series prices
-- `logicalIndex`: (`Logical`, optional) - logical index
+- `index`: (`Logical`, optional) - logical index
 
 `time` is not defined if an event was fired outside of data range (e.g. right/left of all data points).
 
