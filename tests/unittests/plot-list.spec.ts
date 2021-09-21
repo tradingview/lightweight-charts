@@ -4,6 +4,7 @@ import { describe, it } from 'mocha';
 import { ensureNotNull } from '../../src/helpers/assertions';
 import { PlotRow, PlotRowValueIndex } from '../../src/model/plot-data';
 import { mergePlotRows, PlotList, PlotRowSearchMode } from '../../src/model/plot-list';
+import { plotToBarPrices } from '../../src/model/series';
 import { TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 function timePoint(val: number): TimePoint {
@@ -382,6 +383,27 @@ describe('mergePlotRows', () => {
 			expect(total2MTime).to.be.greaterThan((total6MTime / 3) - total2MTime * 0.3);
 
 			expect(isSorted(merged6MArray)).to.be.true('Merged array must be sorted');
+		});
+	});
+});
+
+describe('plotToBarPrices', () => {
+	const plot: PlotRow = row(0, 5);
+	it('should returns a correct bar price for the provided plot and series type', () => {
+		expect(plotToBarPrices(plot, 'Line')).to.equal(5);
+		expect(plotToBarPrices(plot, 'Area')).to.equal(5);
+		expect(plotToBarPrices(plot, 'Histogram')).to.equal(5);
+		expect(plotToBarPrices(plot, 'Candlestick')).to.include({
+			open: 5,
+			high: 5,
+			low: 5,
+			close: 5,
+		});
+		expect(plotToBarPrices(plot, 'Bar')).to.include({
+			open: 5,
+			high: 5,
+			low: 5,
+			close: 5,
 		});
 	});
 });
