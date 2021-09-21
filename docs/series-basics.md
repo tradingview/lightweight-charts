@@ -533,6 +533,29 @@ function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
 chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
 ```
 
+### barByIndex
+
+Returns a bar price for the series by the provided logical index. If no one bar satisfy the index, `null` is returned.
+
+The returned value can be a `number` or an `object` with the following properties:
+
+- `open`(`BarPrice`) - an item open
+- `high`(`BarPrice`) - an item high
+- `low`(`BarPrice`) - an item low
+- `close`(`BarPrice`) - an item close
+
+The method takes the following arguments:
+
+- `index`(`Logical`) - a logical index to retrieve bar price
+- `searchMode`(`PlotRowSearchMode`) - a search mode
+
+Example:
+
+```javascript
+const lineSeriesApi = chartApi.addLineSeries();
+const barPrice = lineSeriesApi.barByIndex(logicalIndex, PlotRowSearch.NearestLeft);
+```
+
 ### seriesType
 
 Return current series type.
