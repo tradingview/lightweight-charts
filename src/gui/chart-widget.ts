@@ -606,7 +606,7 @@ export class ChartWidget implements IDestroyable {
 			: undefined;
 
 		const logicalIndex = point !== null
-			? this._model.timeScale().coordinateToIndex(point?.x) as unknown as Logical
+			? this._model.timeScale().coordinateToIndex(point.x) as unknown as Logical
 			: undefined;
 
 		return {
