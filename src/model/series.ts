@@ -96,6 +96,19 @@ export interface SeriesDataAtTypeMap {
 export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
 export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
 
+export function plotToBarPrices<T extends SeriesType>(plot: SeriesPlotRow<T>, seriesType: T): SeriesDataAtTypeMap[T] {
+	if (seriesType === 'Bar' || seriesType === 'Candlestick') {
+		return {
+			open: plot.value[PlotRowValueIndex.Open] as BarPrice,
+			high: plot.value[PlotRowValueIndex.High] as BarPrice,
+			low: plot.value[PlotRowValueIndex.Low] as BarPrice,
+			close: plot.value[PlotRowValueIndex.Close] as BarPrice,
+		} as unknown as SeriesDataAtTypeMap[T];
+	} else {
+		return plot.value[PlotRowValueIndex.Close] as SeriesDataAtTypeMap[T];
+	}
+}
+
 export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
 	private readonly _seriesType: T;
 	private _data: SeriesPlotList<T> = createSeriesPlotList();
@@ -630,21 +643,4 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			default: throw Error('Unknown chart style assigned: ' + this._seriesType);
 		}
 	}
-}
-
-export function plotToBarPrices<T extends SeriesType>(plot: SeriesPlotRow<T>, seriesType: T): SeriesDataAtTypeMap[T] {
-	let result;
-
-	if (seriesType === 'Bar' || seriesType === 'Candlestick') {
-		result = {
-			open: plot.value[PlotRowValueIndex.Open] as BarPrice,
-			high: plot.value[PlotRowValueIndex.High] as BarPrice,
-			low: plot.value[PlotRowValueIndex.Low] as BarPrice,
-			close: plot.value[PlotRowValueIndex.Close] as BarPrice,
-		};
-	} else {
-		result = plot.value[PlotRowValueIndex.Close] as BarPrice;
-	}
-
-	return result as SeriesDataAtTypeMap[T];
 }
