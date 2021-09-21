@@ -547,13 +547,16 @@ The returned value can be a `number` or an `object` with the following propertie
 The method takes the following arguments:
 
 - `index`(`Logical`) - a logical index to retrieve bar price
-- `searchMode`(`PlotRowSearchMode`) - a search mode
+- `searchMode`([PlotRowSearchMode](./constants.md#PlotRowSearchMode)) - a search mode
 
 Example:
 
-```javascript
-const lineSeriesApi = chartApi.addLineSeries();
-const barPrice = lineSeriesApi.barByIndex(logicalIndex, PlotRowSearch.NearestLeft);
+```typescript
+const lineSeriesApi: ISeriesApi<'Line'> = chartApi.addLineSeries();
+const barPrice: number | null = lineSeriesApi.barByIndex(logicalIndex, PlotRowSearch.NearestLeft);
+
+const barSeriesApi: ISeriesApi<'Bar'> = chartApi.addBarSeries();
+const barPrices: object | null = barSeriesApi.barByIndex(logicalIndex, PlotRowSearch.NearestRight);
 ```
 
 ### seriesType

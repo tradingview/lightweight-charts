@@ -96,3 +96,11 @@ It has the following values:
 
 - `ColorType.Solid` - solid color.
 - `ColorType.VerticalGradient` - gradient color.
+
+## PlotRowSearchMode
+
+`PlotRowSearchMode` enums is used to specify plot by index searching mode
+
+- `PlotRowSearchMode.Exact` - search a plot exact at index
+- `PlotRowSearchMode.NearestLeft` - search the nearest plot from left side
+- `PlotRowSearchMode.NearestRight` - search the nearest plot from right side
