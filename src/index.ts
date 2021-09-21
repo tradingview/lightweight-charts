@@ -7,7 +7,7 @@ export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource, LastPriceAnimationMode, LasPriceAnimationMode } from './model/series-options';
 export { TickMarkType } from './model/time-scale';
 export { ColorType } from './model/layout-options';
-export { Logical } from './model/time-data';
+export { PlotRowSearchMode } from './model/plot-list';
 
 export {
 	isBusinessDay,

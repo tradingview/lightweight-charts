@@ -346,20 +346,13 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
-		const prices = this._data.valueAt(time);
-		if (prices === null) {
+		const plotRow = this._data.valueAt(time);
+
+		if (plotRow === null) {
 			return null;
 		}
-		if (this._seriesType === 'Bar' || this._seriesType === 'Candlestick') {
-			return {
-				open: prices.value[PlotRowValueIndex.Open] as BarPrice,
-				high: prices.value[PlotRowValueIndex.High] as BarPrice,
-				low: prices.value[PlotRowValueIndex.Low] as BarPrice,
-				close: prices.value[PlotRowValueIndex.Close] as BarPrice,
-			};
-		} else {
-			return prices.value[PlotRowValueIndex.Close] as BarPrice;
-		}
+
+		return plotToBarPrices(plotRow, this._seriesType);
 	}
 
 	public topPaneViews(pane: Pane): readonly IPaneView[] {
@@ -637,4 +630,21 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			default: throw Error('Unknown chart style assigned: ' + this._seriesType);
 		}
 	}
+}
+
+export function plotToBarPrices<T extends SeriesType>(plot: SeriesPlotRow<T>, seriesType: T): SeriesDataAtTypeMap[T] {
+	let result;
+
+	if (seriesType === 'Bar' || seriesType === 'Candlestick') {
+		result = {
+			open: plot.value[PlotRowValueIndex.Open] as BarPrice,
+			high: plot.value[PlotRowValueIndex.High] as BarPrice,
+			low: plot.value[PlotRowValueIndex.Low] as BarPrice,
+			close: plot.value[PlotRowValueIndex.Close] as BarPrice,
+		};
+	} else {
+		result = plot.value[PlotRowValueIndex.Close] as BarPrice;
+	}
+
+	return result as SeriesDataAtTypeMap[T];
 }
