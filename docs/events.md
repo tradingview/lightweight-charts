@@ -66,11 +66,11 @@ export type MouseEventHandler = (param: MouseEventParams) => void;
 
 - `time` (`Time`, optional) - time
 - `point`: (`{ x: number, y: number }`, optional) - coordinate
-- `seriesPrices`: (`Map<ISeriesApi, number | OHLC>`) - series prices
+- `seriesPrices`: (`Map<ISeriesApi, number | BarPrices>`) - series prices
 - `index`: (`Logical`, optional) - logical index
 
 `time` is not defined if an event was fired outside of data range (e.g. right/left of all data points).
 
 `point` is not defined if an event was fired outside of the chart (for example on a mouse leave event).
 
-`seriesPrices` is an object with prices of all series corresponding to the event point. The object keys are series APIs, values are prices. Each price value is a number for single-value series types (line, area, histogram) or OHLC structure for candlestick and bar series.
+`seriesPrices` is an object with prices of all series corresponding to the event point. The object keys are series APIs, values are prices. Each price value is a number for single-value series types (line, area, histogram) or [BarPrices](./types.md#BarPrices) structure for candlestick and bar series.

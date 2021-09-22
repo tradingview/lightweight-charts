@@ -1,4 +1,6 @@
-# OHLC
+# Types
+
+## OHLC
 
 OHLC is a type of data item. It includes the following fields:
 
@@ -10,11 +12,31 @@ OHLC is a type of data item. It includes the following fields:
 
 This data type is used by several series types such as bars or candlesticks.
 
-## Example
+### Example
 
 ```js
 const ohlcItem = {
     time: '2018-06-25',
+    open: 10,
+    high: 12,
+    low: 9,
+    close: 11,
+};
+```
+
+## BarPrices
+
+BarPrices is a type of data item. It includes the following fields:
+
+- `open`(`number`) - an item open price
+- `high`(`number`) - an item high price
+- `low`(`number`) - an item low price
+- `close`(`number`) - an item close price
+
+### Example
+
+```js
+const barPricesItem = {
     open: 10,
     high: 12,
     low: 9,

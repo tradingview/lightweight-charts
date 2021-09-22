@@ -35,7 +35,7 @@ barSeries.setData([
 
 ## Data format
 
-Each item of the bar series is either an [OHLC](./ohlc.md) or a [whitespace](./whitespace-data.md) item.
+Each item of the bar series is either an [OHLC](./types.md#OHLC) or a [whitespace](./whitespace-data.md) item.
 
 ## Customization
 
@@ -79,5 +79,5 @@ A bar series series interface can be customized using the following set of optio
 ## What's next
 
 - [Customization](./customization.md)
-- [OHLC](./ohlc.md)
+- [OHLC](./types.md#OHLC)
 - [Time](./time.md)

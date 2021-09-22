@@ -537,12 +537,7 @@ chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChange
 
 Returns a bar price for the series by the provided logical index. If no one bar satisfy the index, `null` is returned.
 
-The returned value can be a `number` or an `object` with the following properties:
-
-- `open`(`BarPrice`) - an item open
-- `high`(`BarPrice`) - an item high
-- `low`(`BarPrice`) - an item low
-- `close`(`BarPrice`) - an item close
+The returned value can be a `number` or an [BarPrices](./types.md#BarPrices):
 
 The method takes the following arguments:
 
@@ -553,7 +548,7 @@ Example:
 
 ```javascript
 const lineSeriesApi = chartApi.addLineSeries();
-const barPrice = lineSeriesApi.barByIndex(logicalIndex, PlotRowSearch.NearestLeft);
+const barPrice = lineSeriesApi.barByIndex(logicalIndex, LightweightCharts.PlotRowSearch.NearestLeft);
 ```
 
 ### seriesType
