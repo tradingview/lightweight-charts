@@ -101,6 +101,6 @@ It has the following values:
 
 `PlotRowSearchMode` enums is used to specify plot by index searching mode
 
-- `PlotRowSearchMode.Exact` - search a plot exact at index
-- `PlotRowSearchMode.NearestLeft` - search the nearest plot from left side
-- `PlotRowSearchMode.NearestRight` - search the nearest plot from right side
+- `PlotRowSearchMode.Exact` - search a plot at the index
+- `PlotRowSearchMode.NearestLeft` - search a plot at the index, if it is not exist search for the nearest plot from left side from the index
+- `PlotRowSearchMode.NearestRight` - search a plot at the index, if it is not exist search for the nearest plot from right side from the index
