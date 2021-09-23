@@ -12,7 +12,7 @@ OHLC is a type of data item. It includes the following fields:
 
 This data type is used by several series types such as bars or candlesticks.
 
-### Example
+Example:
 
 ```js
 const ohlcItem = {
@@ -33,7 +33,7 @@ BarPrices is a type of data item. It includes the following fields:
 - `low`(`number`) - an item low price
 - `close`(`number`) - an item close price
 
-### Example
+Example:
 
 ```js
 const barPricesItem = {
