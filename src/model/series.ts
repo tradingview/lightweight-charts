@@ -98,12 +98,13 @@ export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Se
 
 export function plotToBarPrices<T extends SeriesType>(plot: SeriesPlotRow<T>, seriesType: T): SeriesDataAtTypeMap[T] {
 	if (seriesType === 'Bar' || seriesType === 'Candlestick') {
+		// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 		return {
-			open: plot.value[PlotRowValueIndex.Open] as BarPrice,
-			high: plot.value[PlotRowValueIndex.High] as BarPrice,
-			low: plot.value[PlotRowValueIndex.Low] as BarPrice,
-			close: plot.value[PlotRowValueIndex.Close] as BarPrice,
-		} as unknown as SeriesDataAtTypeMap[T];
+			['open']: plot.value[PlotRowValueIndex.Open] as BarPrice,
+			['high']: plot.value[PlotRowValueIndex.High] as BarPrice,
+			['low']: plot.value[PlotRowValueIndex.Low] as BarPrice,
+			['close']: plot.value[PlotRowValueIndex.Close] as BarPrice,
+		} as SeriesDataAtTypeMap[T];
 	} else {
 		return plot.value[PlotRowValueIndex.Close] as SeriesDataAtTypeMap[T];
 	}
@@ -358,7 +359,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._data;
 	}
 
-	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
+	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[T] | null {
 		const plotRow = this._data.valueAt(time);
 
 		return plotRow && plotToBarPrices(plotRow, this._seriesType);
