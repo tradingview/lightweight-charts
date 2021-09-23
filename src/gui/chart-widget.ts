@@ -30,7 +30,7 @@ export interface MouseEventParamsImpl {
 	seriesPrices: Map<Series, BarPrice | BarPrices>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
-	index?: Logical;
+	index: Logical | null;
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
@@ -577,19 +577,21 @@ export class ChartWidget implements IDestroyable {
 
 	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
 		const seriesPrices = new Map<Series, BarPrice | BarPrices>();
-		if (index !== null) {
-			const serieses = this._model.serieses();
-			serieses.forEach((s: Series) => {
-				// TODO: replace with search left
-				const prices = s.dataAt(index);
-				if (prices !== null) {
-					seriesPrices.set(s, prices);
-				}
-			});
-		}
 		let clientTime: TimePoint | undefined;
+
 		if (index !== null) {
+			this._model.serieses()
+				.forEach((series: Series) => {
+					// TODO: replace with search left
+					const prices = series.dataAt(index);
+
+					if (prices !== null) {
+						seriesPrices.set(series, prices);
+					}
+				});
+
 			const timePoint = this._model.timeScale().indexToTime(index);
+
 			if (timePoint !== null) {
 				clientTime = timePoint;
 			}
@@ -597,17 +599,18 @@ export class ChartWidget implements IDestroyable {
 
 		const hoveredSource = this.model().hoveredSource();
 
-		const hoveredSeries = hoveredSource !== null && hoveredSource.source instanceof Series
-			? hoveredSource.source
-			: undefined;
+		let hoveredSeries: MouseEventParamsImpl['hoveredSeries'];
+		let hoveredObject: MouseEventParamsImpl['hoveredObject'];
 
-		const hoveredObject = hoveredSource !== null && hoveredSource.object !== undefined
-			? hoveredSource.object.externalId
-			: undefined;
+		if (hoveredSource) {
+			hoveredSeries = hoveredSource.source instanceof Series
+				? hoveredSource.source
+				: void 0;
 
-		const logicalIndex = point !== null
-			? this._model.timeScale().coordinateToIndex(point.x) as unknown as Logical
-			: undefined;
+			hoveredObject = hoveredSource.object
+				? hoveredSource.object.externalId
+				: void 0;
+		}
 
 		return {
 			time: clientTime,
@@ -615,7 +618,7 @@ export class ChartWidget implements IDestroyable {
 			hoveredSeries,
 			seriesPrices,
 			hoveredObject,
-			index: logicalIndex,
+			index: point && this._model.timeScale().coordinateToIndex(point.x) as unknown as Logical,
 		};
 	}
 

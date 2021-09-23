@@ -25,7 +25,7 @@ export interface MouseEventParams {
 	seriesPrices: Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>;
 	hoveredSeries?: ISeriesApi<SeriesType>;
 	hoveredMarkerId?: SeriesMarker<Time>['id'];
-	index?: Logical;
+	index: Logical | null;
 }
 
 export type MouseEventHandler = (param: MouseEventParams) => void;

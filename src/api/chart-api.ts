@@ -354,16 +354,13 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
 		const seriesPrices = new Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>();
-		param.seriesPrices.forEach((price: BarPrice | BarPrices, series: Series) => {
-			seriesPrices.set(this._mapSeriesToApi(series), price);
-		});
-
-		const hoveredSeries = param.hoveredSeries === undefined ? undefined : this._mapSeriesToApi(param.hoveredSeries);
+		param.seriesPrices
+			.forEach((price: BarPrice | BarPrices, series: Series) => seriesPrices.set(this._mapSeriesToApi(series), price));
 
 		return {
 			time: param.time && (param.time.businessDay || param.time.timestamp),
 			point: param.point,
-			hoveredSeries,
+			hoveredSeries: param.hoveredSeries && this._mapSeriesToApi(param.hoveredSeries),
 			hoveredMarkerId: param.hoveredObject,
 			seriesPrices,
 			index: param.index,

@@ -361,11 +361,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
 		const plotRow = this._data.valueAt(time);
 
-		if (plotRow === null) {
-			return null;
-		}
-
-		return plotToBarPrices(plotRow, this._seriesType);
+		return plotRow && plotToBarPrices(plotRow, this._seriesType);
 	}
 
 	public topPaneViews(pane: Pane): readonly IPaneView[] {
