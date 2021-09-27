@@ -5,17 +5,23 @@ import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { PlotRowValueIndex } from '../model/plot-data';
 import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
-import { plotToBarPrices, Series, SeriesDataAtTypeMap, SeriesPartialOptionsInternal } from '../model/series';
+import { Series, SeriesPartialOptionsInternal } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import { SeriesOptionsMap, SeriesPartialOptionsMap, SeriesType } from '../model/series-options';
 import { Logical, Range, TimePoint, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
-import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
+import {
+	DataUpdatesConsumer,
+	SeriesDataItemTypeMap,
+	SeriesDatItemWithoutWhitespaceTypeMap,
+	Time,
+} from './data-consumer';
 import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { IPriceLine } from './iprice-line';
@@ -170,12 +176,55 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.seriesType();
 	}
 
-	public barByIndex(
+	public seriesDataByIndex(
 		logicalIndex: Logical,
 		searchMode: PlotRowSearchMode = PlotRowSearchMode.Exact
-	): SeriesDataAtTypeMap[TSeriesType] | null {
+	): SeriesDatItemWithoutWhitespaceTypeMap[TSeriesType] | null {
 		const plotRow = this._series.bars().search(logicalIndex as unknown as TimePointIndex, searchMode);
 
-		return plotRow ? plotToBarPrices(plotRow, this.seriesType()) : null;
+		let result;
+
+		if (!plotRow) {
+			return plotRow;
+		}
+
+		switch (this.seriesType()) {
+			case 'Bar':
+			case 'Candlestick': {
+				result = {
+					['time']: plotRow.time.timestamp,
+					['open']: plotRow.value[PlotRowValueIndex.Open],
+					['high']: plotRow.value[PlotRowValueIndex.High],
+					['low']: plotRow.value[PlotRowValueIndex.Low],
+					['close']: plotRow.value[PlotRowValueIndex.Close],
+				};
+
+				break;
+			}
+			case 'Line':
+			case 'Area': {
+				result = {
+					['time']: plotRow.time.timestamp,
+					['value']: plotRow.value[PlotRowValueIndex.Close],
+				};
+
+				break;
+			}
+			case 'Histogram': {
+				result = {
+					['time']: plotRow.time.timestamp,
+					['value']: plotRow.value[PlotRowValueIndex.Close],
+					// eslint-disable-next-line no-restricted-syntax
+					['color']: 'color' in plotRow ? plotRow.color : void 0,
+				};
+
+				break;
+			}
+			default: {
+				result = null as never;
+			}
+		}
+
+		return result as SeriesDatItemWithoutWhitespaceTypeMap[TSeriesType];
 	}
 }

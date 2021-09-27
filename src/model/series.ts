@@ -96,20 +96,6 @@ export interface SeriesDataAtTypeMap {
 export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
 export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
 
-export function plotToBarPrices<T extends SeriesType>(plot: SeriesPlotRow<T>, seriesType: T): SeriesDataAtTypeMap[T] {
-	if (seriesType === 'Bar' || seriesType === 'Candlestick') {
-		// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-		return {
-			['open']: plot.value[PlotRowValueIndex.Open] as BarPrice,
-			['high']: plot.value[PlotRowValueIndex.High] as BarPrice,
-			['low']: plot.value[PlotRowValueIndex.Low] as BarPrice,
-			['close']: plot.value[PlotRowValueIndex.Close] as BarPrice,
-		} as SeriesDataAtTypeMap[T];
-	} else {
-		return plot.value[PlotRowValueIndex.Close] as SeriesDataAtTypeMap[T];
-	}
-}
-
 export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
 	private readonly _seriesType: T;
 	private _data: SeriesPlotList<T> = createSeriesPlotList();
@@ -359,10 +345,21 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._data;
 	}
 
-	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[T] | null {
-		const plotRow = this._data.valueAt(time);
-
-		return plotRow && plotToBarPrices(plotRow, this._seriesType);
+	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
+		const prices = this._data.valueAt(time);
+		if (prices === null) {
+			return null;
+		}
+		if (this._seriesType === 'Bar' || this._seriesType === 'Candlestick') {
+			return {
+				open: prices.value[PlotRowValueIndex.Open] as BarPrice,
+				high: prices.value[PlotRowValueIndex.High] as BarPrice,
+				low: prices.value[PlotRowValueIndex.Low] as BarPrice,
+				close: prices.value[PlotRowValueIndex.Close] as BarPrice,
+			};
+		} else {
+			return prices.value[PlotRowValueIndex.Close] as BarPrice;
+		}
 	}
 
 	public topPaneViews(pane: Pane): readonly IPaneView[] {

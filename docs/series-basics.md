@@ -533,11 +533,11 @@ function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
 chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
 ```
 
-### barByIndex
+### seriesDataByIndex
 
-Returns a bar price for the series by the provided logical index. If no one bar satisfy the index, `null` is returned.
+Returns a series data for the series by the provided logical index. If no one bar satisfy the index, `null` is returned.
 
-The returned value can be a `number` or an [BarPrices](./types.md#BarPrices):
+The returned value can be a [LineData](./types.md#LineData) or an [OHLC](./types.md#OHLC):
 
 The method takes the following arguments:
 
@@ -548,7 +548,7 @@ Example:
 
 ```javascript
 const lineSeriesApi = chartApi.addLineSeries();
-const barPrice = lineSeriesApi.barByIndex(logicalIndex, LightweightCharts.PlotRowSearch.NearestLeft);
+const barPrice = lineSeriesApi.seriesDataByIndex(logicalIndex, LightweightCharts.PlotRowSearch.NearestLeft);
 ```
 
 ### seriesType

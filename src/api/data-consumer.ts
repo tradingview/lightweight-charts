@@ -68,6 +68,14 @@ export interface SeriesDataItemTypeMap {
 	Histogram: HistogramData | WhitespaceData;
 }
 
+export interface SeriesDatItemWithoutWhitespaceTypeMap {
+	Bar: BarData;
+	Candlestick: BarData;
+	Area: LineData;
+	Line: LineData;
+	Histogram: HistogramData;
+}
+
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {
 	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void;
 	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): void;

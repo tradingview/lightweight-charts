@@ -4,12 +4,11 @@ import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
-import { SeriesDataAtTypeMap } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import { SeriesOptionsMap, SeriesPartialOptionsMap, SeriesType } from '../model/series-options';
 import { Logical, Range } from '../model/time-data';
 
-import { SeriesDataItemTypeMap, Time } from './data-consumer';
+import { SeriesDataItemTypeMap, SeriesDatItemWithoutWhitespaceTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 
@@ -60,12 +59,12 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	barsInLogicalRange(range: Range<number>): BarsInfo | null;
 
 	/**
-	 * Get bar prices by logical index
+	 * Get series data by logical index
 	 *
-	 * @param index - the logical index to retrieve bar price
+	 * @param index - the logical index to retrieve series data
 	 * @param searchMode - search mode
 	 */
-	barByIndex(index: Logical, searchMode?: PlotRowSearchMode): SeriesDataAtTypeMap[TSeriesType] | null;
+	seriesDataByIndex(index: Logical, searchMode?: PlotRowSearchMode): SeriesDatItemWithoutWhitespaceTypeMap[TSeriesType] | null;
 
 	/**
 	 * Applies new options to the existing series

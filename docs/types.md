@@ -24,22 +24,18 @@ const ohlcItem = {
 };
 ```
 
-## BarPrices
+## LineData
 
-BarPrices is a type of data item. It includes the following fields:
+LineData is a type of data item. It includes the following fields:
 
-- `open`(`number`) - an item open price
-- `high`(`number`) - an item high price
-- `low`(`number`) - an item low price
-- `close`(`number`) - an item close price
+- `time` (`Time`) - item time
+- `value` (`number`) - price value of data item
 
 Example:
 
 ```js
-const barPricesItem = {
-    open: 10,
-    high: 12,
-    low: 9,
-    close: 11,
+const lineData = {
+    time: '2018-06-25',
+    value: 300,
 };
 ```
