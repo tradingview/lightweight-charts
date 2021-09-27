@@ -169,6 +169,22 @@ Returns [Time](./time.md) of a bar that is located on the passed coordinate or `
 chart.timeScale().coordinateToTime(42);
 ```
 
+### width
+
+Returns a current width of the time scale.
+
+```js
+console.log(chart.timeScale().width());
+```
+
+### height
+
+Returns a current height of the time scale.
+
+```js
+console.log(chart.timeScale().height());
+```
+
 ### logicalToCoordinate
 
 Converts a logical index to the local `x` coordinate.
@@ -262,6 +278,28 @@ The argument is a handler function, which you've passed to the [`subscribeVisibl
 
 ```js
 chart.timeScale().unsubscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
+```
+
+### subscribeSizeChange
+
+Allows to subscribe to the size change event.
+The argument is a handler function, which will be called with the new width and height.
+
+```js
+function onSizeChanged(width, height) {
+    console.log(width, height);
+}
+
+chart.timeScale().subscribeSizeChange(onSizeChanged);
+```
+
+### unsubscribeSizeChange
+
+Allows to unsubscribe the previously subscribed handler from the size change event.
+The argument is a handler function, which you've passed to the [`subscribeSizeChange`](#subscribeSizeChange).
+
+```js
+chart.timeScale().unsubscribeSizeChange(onSizeChanged);
 ```
 
 ## Logical range
