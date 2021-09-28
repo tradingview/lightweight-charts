@@ -179,7 +179,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	public seriesDataByIndex(
 		logicalIndex: Logical,
 		searchMode: PlotRowSearchMode = PlotRowSearchMode.Exact
-	): SeriesDatItemWithoutWhitespaceTypeMap[TSeriesType] | null {
+	): SeriesDatItemWithoutWhitespaceTypeMap<TSeriesType> | null {
 		const plotRow = this._series.bars().search(logicalIndex as unknown as TimePointIndex, searchMode);
 
 		let result;
@@ -225,6 +225,6 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 			}
 		}
 
-		return result as SeriesDatItemWithoutWhitespaceTypeMap[TSeriesType];
+		return result as SeriesDatItemWithoutWhitespaceTypeMap<TSeriesType>;
 	}
 }

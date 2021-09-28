@@ -64,7 +64,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * @param index - the logical index to retrieve series data
 	 * @param searchMode - search mode
 	 */
-	seriesDataByIndex(index: Logical, searchMode?: PlotRowSearchMode): SeriesDatItemWithoutWhitespaceTypeMap[TSeriesType] | null;
+	seriesDataByIndex(index: Logical, searchMode?: PlotRowSearchMode): SeriesDatItemWithoutWhitespaceTypeMap<TSeriesType> | null;
 
 	/**
 	 * Applies new options to the existing series
