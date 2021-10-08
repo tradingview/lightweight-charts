@@ -109,7 +109,8 @@ export interface ChartOptions {
 	rightPriceScale: VisiblePriceScaleOptions;
 	/** Structure describing default price scale options for overlays */
 	overlayPriceScales: OverlayPriceScaleOptions;
-
+	/** Structure describing price scale options for non-primary pane */
+	nonPrimaryPriceScale: VisiblePriceScaleOptions;
 	/** Structure with time scale options */
 	timeScale: TimeScaleOptions;
 	/** Structure with crosshair options */
@@ -318,7 +319,9 @@ export class ChartModel implements IDestroyable {
 			}
 		}
 
-		const pane = new Pane(this._timeScale, this);
+		const actualIndex = (index === undefined) ? (this._panes.length - 1) + 1 : index;
+
+		const pane = new Pane(this._timeScale, this, actualIndex);
 
 		if (index !== undefined) {
 			this._panes.splice(index, 0, pane);
@@ -326,8 +329,6 @@ export class ChartModel implements IDestroyable {
 			// adding to the end - common case
 			this._panes.push(pane);
 		}
-
-		const actualIndex = (index === undefined) ? this._panes.length - 1 : index;
 
 		this._buildPaneIndexMapping();
 		// we always do autoscaling on the creation

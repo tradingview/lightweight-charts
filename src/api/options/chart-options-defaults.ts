@@ -26,6 +26,10 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 		...priceScaleOptionsDefaults,
 		visible: true,
 	},
+	nonPrimaryPriceScale: {
+		...priceScaleOptionsDefaults,
+		visible: true,
+	},
 	timeScale: timeScaleOptionsDefaults,
 	watermark: watermarkOptionsDefaults,
 	localization: {
