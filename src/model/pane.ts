@@ -23,6 +23,10 @@ interface MinMaxOrderInfo {
 	maxZOrder: number;
 }
 
+export interface PaneInfo {
+	paneIndex?: number;
+}
+
 export class Pane implements IDestroyable {
 	private readonly _timeScale: TimeScale;
 	private readonly _model: ChartModel;

@@ -19,7 +19,7 @@ import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions, LayoutOptionsInternal } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
-import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
+import { DEFAULT_STRETCH_FACTOR, Pane, PaneInfo } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series, SeriesOptionsInternal } from './series';
@@ -151,6 +151,7 @@ export class ChartModel implements IDestroyable {
 
 	private readonly _timeScale: TimeScale;
 	private readonly _panes: Pane[] = [];
+	private readonly _panesToIndex: Map<Pane, number> = new Map<Pane, number>();
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
@@ -161,7 +162,7 @@ export class ChartModel implements IDestroyable {
 	private _initialTimeScrollPos: number | null = null;
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
-	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
+	private _crosshairMoved: Delegate<TimePointIndex | null, Point & PaneInfo | null> = new Delegate();
 
 	private _suppressSeriesMoving: boolean = false;
 
@@ -290,7 +291,7 @@ export class ChartModel implements IDestroyable {
 		return this._crosshair;
 	}
 
-	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null> {
+	public crosshairMoved(): ISubscription<TimePointIndex | null, (Point & PaneInfo) | null> {
 		return this._crosshairMoved;
 	}
 
@@ -328,6 +329,7 @@ export class ChartModel implements IDestroyable {
 
 		const actualIndex = (index === undefined) ? this._panes.length - 1 : index;
 
+		this._buildPaneIndexMapping();
 		// we always do autoscaling on the creation
 		// if autoscale option is true, it is ok, just recalculate by invalidation mask
 		// if autoscale option is false, autoscale anyway on the first draw
@@ -338,7 +340,6 @@ export class ChartModel implements IDestroyable {
 			autoScale: true,
 		});
 		this._invalidate(mask);
-
 		return pane;
 	}
 
@@ -370,7 +371,7 @@ export class ChartModel implements IDestroyable {
 
 		this._panes.splice(index, 1);
 		this._suppressSeriesMoving = false;
-
+		this._buildPaneIndexMapping();
 		const mask = new InvalidateMask(InvalidationLevel.Full);
 		this._invalidate(mask);
 	}
@@ -395,6 +396,7 @@ export class ChartModel implements IDestroyable {
 		this._panes[second] = firstPane;
 
 		this._suppressSeriesMoving = false;
+		this._buildPaneIndexMapping();
 		this._invalidate(new InvalidateMask(InvalidationLevel.Full));
 	}
 
@@ -530,7 +532,8 @@ export class ChartModel implements IDestroyable {
 		this._crosshair.setPosition(index, price, pane);
 
 		this.cursorUpdate();
-		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
+		const paneIndex = this.getPaneIndex(pane);
+		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y, paneIndex });
 	}
 
 	public clearCurrentPosition(): void {
@@ -762,6 +765,10 @@ export class ChartModel implements IDestroyable {
 		return result;
 	}
 
+	public getPaneIndex(pane: Pane): number {
+		return this._panesToIndex.get(pane) ?? 0;
+	}
+
 	private _paneInvalidationMask(pane: Pane | null, level: InvalidationLevel): InvalidateMask {
 		const inv = new InvalidateMask(level);
 		if (pane !== null) {
@@ -817,5 +824,12 @@ export class ChartModel implements IDestroyable {
 		}
 
 		return layoutOptions.background.color;
+	}
+
+	private _buildPaneIndexMapping(): void {
+		this._panesToIndex.clear();
+		for (let i = 0; i < this._panes.length; i++) {
+			this._panesToIndex.set(this._panes[i], i);
+		}
 	}
 }
