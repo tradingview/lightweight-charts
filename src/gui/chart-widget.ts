@@ -631,11 +631,11 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _isLeftAxisVisible(): boolean {
-		return this._options.leftPriceScale.visible;
+		return this._paneWidgets[0].state().leftPriceScale().options().visible;
 	}
 
 	private _isRightAxisVisible(): boolean {
-		return this._options.rightPriceScale.visible;
+		return this._paneWidgets[0].state().rightPriceScale().options().visible;
 	}
 }
 
