@@ -50,7 +50,7 @@ function weightByTime(currentDate: Date, prevDate: Date | null): number {
 	return 20;
 }
 
-export function fillWeightsForPoints(sortedTimePoints: readonly TimeScalePoint[], startIndex: number = 0): void {
+export function fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint>[], startIndex: number = 0): void {
 	let prevTime: UTCTimestamp | null = (startIndex === 0 || sortedTimePoints.length === 0)
 		? null
 		: sortedTimePoints[startIndex - 1].time.timestamp;

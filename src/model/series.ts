@@ -255,12 +255,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._paneView.update('options');
 	}
 
-	public updateData(data: readonly SeriesPlotRow<T>[], clearData: boolean): void {
-		if (clearData) {
-			this._data.clear();
-		}
-
-		this._data.merge(data);
+	public setData(data: readonly SeriesPlotRow<T>[]): void {
+		this._data.setData(data);
 
 		this._recalculateMarkers();
 

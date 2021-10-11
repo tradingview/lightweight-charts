@@ -48,6 +48,7 @@
     "@typescript-eslint/parser": "~4.32.0",
     "bytes": "~3.1.0",
     "chai": "~4.3.4",
+    "chai-exclude": "~2.1.0",
     "cross-env": "~7.0.0",
     "dts-bundle-generator": "~5.9.0",
     "eslint": "~7.32.0",
