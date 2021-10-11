@@ -155,11 +155,11 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public width(): number {
-		return this._timeScale.options().visible ? this._timeAxisWidget.getSize().w : 0;
+		return this._timeAxisWidget.getSize().w;
 	}
 
 	public height(): number {
-		return this._timeScale.options().visible ? this._timeAxisWidget.getSize().h : 0;
+		return this._timeAxisWidget.getSize().h;
 	}
 
 	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
