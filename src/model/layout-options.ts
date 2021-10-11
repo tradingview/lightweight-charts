@@ -1,15 +1,19 @@
+/**
+ * The `ColorType` enum is used to specify a type of color.
+ */
 export const enum ColorType {
+	/** Solid color */
 	Solid = 'solid',
+	/** Vertical gradient color */
 	VerticalGradient = 'gradient',
 }
-/** Solid color */
+
 export interface SolidColor {
 	type: ColorType.Solid;
 	/** Color */
 	color: string;
 }
 
-/** Vertical gradient color */
 export interface VerticalGradientColor {
 	type: ColorType.VerticalGradient;
 	/** Top color */

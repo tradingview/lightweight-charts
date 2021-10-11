@@ -55,11 +55,29 @@ export interface TimeMark {
 	weight: number;
 }
 
+/**
+ * The `TickMarkType` enum is used to specify the type of a tick mark on the time axis.
+ */
 export const enum TickMarkType {
+	/**
+	 * The start of the year (e.g. it's the first tick mark in a year).
+	 */
 	Year,
+	/**
+	 * The start of the month (e.g. it's the first tick mark in a month).
+	 */
 	Month,
+	/**
+	 * A day of the month.
+	 */
 	DayOfMonth,
+	/**
+	 * A time without seconds.
+	 */
 	Time,
+	/**
+	 * A time with seconds.
+	 */
 	TimeWithSeconds,
 }
 

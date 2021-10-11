@@ -48,9 +48,21 @@ export function fillUpDownCandlesticksColors(options: Partial<CandlestickStyleOp
 	}
 }
 
+/**
+ * The `LastPriceAnimationMode` enum is used to specify the type of the last price animation for series such as area or line.
+ */
 export const enum LastPriceAnimationMode {
+	/**
+	 * Animation is always disabled
+	 */
 	Disabled,
+	/**
+	 * Animation is always enabled.
+	 */
 	Continuous,
+	/**
+	 * Animation is active after new data.
+	 */
 	OnDataUpdate,
 }
 
@@ -160,13 +172,17 @@ export const enum PriceAxisLastValueMode {
 	LastValueAccordingToScale,
 }
 
+/**
+ * The `PriceLineSource` enum is used to specify the source of data to be
+ * used for the horizontal price line.
+ */
 export const enum PriceLineSource {
 	/**
-	 * The last bar data
+	 * Use the last bar data.
 	 */
 	LastBar,
 	/**
-	 * The last visible bar in viewport
+	 * Use the last visible data of the chart viewport.
 	 */
 	LastVisible,
 }

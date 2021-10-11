@@ -32,16 +32,25 @@ import { sortSources } from './sort-sources';
 import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
 
 /**
- * Enum of possible price scale modes
- * Normal mode displays original price values
- * Logarithmic mode makes price scale show logarithms of series values instead of original values
- * Percentage turns the percentage mode on.
- * IndexedTo100 turns the "indexed to 100" mode on
+ * The `PriceScaleMode` enum is used to specify the price scale mode.
  */
 export const enum PriceScaleMode {
+	/**
+	 * Price scale shows prices. Price range changes linearly.
+	 */
 	Normal,
+	/**
+	 * Price scale shows prices. Price range changes logarithmically.
+	 */
 	Logarithmic,
+	/**
+	 * Price scale shows percentage values according the first visible value of the price scale.
+	 * The first visible value is 0% in this mode.
+	 */
 	Percentage,
+	/**
+	 * The same as percentage mode, but the first value is moved to 100.
+	 */
 	IndexedTo100,
 }
 

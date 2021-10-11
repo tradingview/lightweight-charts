@@ -34,12 +34,16 @@ export type PriceAndCoordinateProvider = (priceScale: PriceScale) => CrosshairPr
 export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate;
 
 /**
- * Enum of possible crosshair behavior modes.
- * Normal means that the crosshair always follows the pointer.
- * Magnet means that the vertical line of the crosshair follows the pointer, while the horizontal line is placed on the corresponding series point.
+ * The `CrosshairMode` enum is used to specify the crosshair mode.
  */
 export const enum CrosshairMode {
+	/**
+ 	 * Crosshair's horizontal line is anchored to the closest data point's close price.
+	 */
 	Normal,
+	/**
+ 	 * Crosshair moves freely on the chart.
+	 */
 	Magnet,
 }
 
