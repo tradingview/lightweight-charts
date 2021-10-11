@@ -4,8 +4,26 @@ import { Nominal } from '../helpers/nominal';
 import { Coordinate } from './coordinate';
 import { RangeImpl } from './range-impl';
 
+/**
+ * If your chart displays an intraday interval you should use a UNIX Timestamp.
+ *
+ * Note that JavaScript Date APIs like `Date.now` return a number of milliseconds but UTCTimestamp expects a number of seconds.
+ *
+ * Note that to prevent errors, you should cast the numeric type of the time to `UTCTimestamp` type from the package (`value as UTCTimestamp`) in TypeScript code.
+ * ```ts
+ * const timestamp = 1529899200 as UTCTimestamp; // Literal timestamp representing 2018-06-25T04:00:00.000Z
+ * const timestamp2 = (Date.now() / 1000) as UTCTimestamp;
+ * ```
+ */
 export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
 
+/**
+ * This type is used to specify time for day/week/month (DWM) data.
+
+ * ```js
+ * const day = { year: 2019, month: 6, day: 1 }; // June 1, 2019
+ * ```
+ */
 export interface BusinessDay {
 	year: number;
 	month: number;
