@@ -347,7 +347,8 @@ export class ChartWidget implements IDestroyable {
 		// const separatorCount = this._paneSeparators.length;
 		// const separatorHeight = SEPARATOR_HEIGHT;
 		const separatorsHeight = 0; // separatorHeight * separatorCount;
-		let timeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
+		const timeAxisVisible = this._options.timeScale.visible;
+		let timeAxisHeight = timeAxisVisible ? this._timeAxisWidget.optimalHeight() : 0;
 		// TODO: Fix it better
 		// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
 		if (timeAxisHeight % 2) {
@@ -389,7 +390,7 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this._timeAxisWidget.setSizes(
-			new Size(paneWidth, timeAxisHeight),
+			new Size(timeAxisVisible ? paneWidth : 0, timeAxisHeight),
 			leftPriceAxisWidth,
 			rightPriceAxisWidth
 		);

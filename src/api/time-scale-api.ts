@@ -1,3 +1,4 @@
+import { Size } from '../gui/canvas-utils';
 import { TimeAxisWidget } from '../gui/time-axis-widget';
 
 import { assert } from '../helpers/assertions';
@@ -19,7 +20,6 @@ import {
 	TimeRange,
 	TimeRangeChangeEventHandler,
 } from './itime-scale-api';
-
 const enum Constants {
 	AnimationDurationMs = 1000,
 }
@@ -206,7 +206,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		}
 	}
 
-	private _onSizeChanged(): void {
-		this._sizeChanged.fire(this.width(), this.height());
+	private _onSizeChanged(size: Size): void {
+		this._sizeChanged.fire(size.w, size.h);
 	}
 }
