@@ -123,6 +123,10 @@ export class ChartWidget implements IDestroyable {
 		return this._paneWidgets;
 	}
 
+	public timeAxisWidget(): TimeAxisWidget {
+		return this._timeAxisWidget;
+	}
+
 	public destroy(): void {
 		this._element.removeEventListener('wheel', this._onWheelBound);
 		if (this._drawRafId !== 0) {
@@ -343,7 +347,8 @@ export class ChartWidget implements IDestroyable {
 		// const separatorCount = this._paneSeparators.length;
 		// const separatorHeight = SEPARATOR_HEIGHT;
 		const separatorsHeight = 0; // separatorHeight * separatorCount;
-		let timeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
+		const timeAxisVisible = this._options.timeScale.visible;
+		let timeAxisHeight = timeAxisVisible ? this._timeAxisWidget.optimalHeight() : 0;
 		// TODO: Fix it better
 		// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
 		if (timeAxisHeight % 2) {
@@ -385,7 +390,7 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this._timeAxisWidget.setSizes(
-			new Size(paneWidth, timeAxisHeight),
+			new Size(timeAxisVisible ? paneWidth : 0, timeAxisHeight),
 			leftPriceAxisWidth,
 			rightPriceAxisWidth
 		);
@@ -627,11 +632,11 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _isLeftAxisVisible(): boolean {
-		return this._options.leftPriceScale.visible;
+		return this._paneWidgets[0].state().leftPriceScale().options().visible;
 	}
 
 	private _isRightAxisVisible(): boolean {
-		return this._options.rightPriceScale.visible;
+		return this._paneWidgets[0].state().rightPriceScale().options().visible;
 	}
 }
 

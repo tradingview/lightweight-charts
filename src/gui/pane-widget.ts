@@ -692,22 +692,24 @@ export class PaneWidget implements IDestroyable {
 			return;
 		}
 		const chart = this._chart;
-		if (!chart.options().leftPriceScale.visible && this._leftPriceAxisWidget !== null) {
+		const leftAxisVisible = this._state.leftPriceScale().options().visible;
+		const rightAxisVisible = this._state.rightPriceScale().options().visible;
+		if (!leftAxisVisible && this._leftPriceAxisWidget !== null) {
 			this._leftAxisCell.removeChild(this._leftPriceAxisWidget.getElement());
 			this._leftPriceAxisWidget.destroy();
 			this._leftPriceAxisWidget = null;
 		}
-		if (!chart.options().rightPriceScale.visible && this._rightPriceAxisWidget !== null) {
+		if (!rightAxisVisible && this._rightPriceAxisWidget !== null) {
 			this._rightAxisCell.removeChild(this._rightPriceAxisWidget.getElement());
 			this._rightPriceAxisWidget.destroy();
 			this._rightPriceAxisWidget = null;
 		}
 		const rendererOptionsProvider = chart.model().rendererOptionsProvider();
-		if (chart.options().leftPriceScale.visible && this._leftPriceAxisWidget === null) {
+		if (leftAxisVisible && this._leftPriceAxisWidget === null) {
 			this._leftPriceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'left');
 			this._leftAxisCell.appendChild(this._leftPriceAxisWidget.getElement());
 		}
-		if (chart.options().rightPriceScale.visible && this._rightPriceAxisWidget === null) {
+		if (rightAxisVisible && this._rightPriceAxisWidget === null) {
 			this._rightPriceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'right');
 			this._rightAxisCell.appendChild(this._rightPriceAxisWidget.getElement());
 		}

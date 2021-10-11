@@ -10,6 +10,7 @@ export type TimeRange = Range<Time>;
 
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null) => void;
+export type SizeChangeEventHandler = (width: number, height: number) => void;
 
 /** Interface to chart time scale */
 export interface ITimeScaleApi {
@@ -105,6 +106,16 @@ export interface ITimeScaleApi {
 	coordinateToTime(x: number): Time | null;
 
 	/**
+	 * Returns a width of the time scale.
+	 */
+	width(): number;
+
+	/**
+	 * Returns a height of the time scale.
+	 */
+	height(): number;
+
+	/**
 	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
 	 *
 	 * @param handler - handler (function) to be called on changing visible data range
@@ -131,6 +142,20 @@ export interface ITimeScaleApi {
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void;
+
+	/**
+	 * Adds a subscription to time scale size changes
+	 *
+	 * @param handler - handler (function) to be called when the time scale size changes
+	 */
+	subscribeSizeChange(handler: SizeChangeEventHandler): void;
+
+	/**
+	 * Removes a subscription to time scale size changes
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeSizeChange(handler: SizeChangeEventHandler): void;
 
 	/**
 	 * Applies new options to the time scale.
