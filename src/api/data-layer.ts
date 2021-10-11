@@ -175,9 +175,12 @@ export class DataLayer {
 	public setSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): DataUpdateResponse {
 		let needCleanupPoints = this._pointDataByTimePoint.size !== 0;
 
+		let isTimeScaleAffected = false;
+
 		if (this._seriesRowsBySeries.has(series)) {
 			if (this._seriesRowsBySeries.size === 1) {
 				needCleanupPoints = false;
+				isTimeScaleAffected = true;
 
 				// perf optimization - if there is only 1 series, then we can just clear and fill everything from scratch
 				this._pointDataByTimePoint.clear();
@@ -185,7 +188,9 @@ export class DataLayer {
 				// perf optimization - actually we have to use this._pointDataByTimePoint for going through here
 				// but as soon as this._sortedTimePoints is just a different form of _pointDataByTimePoint we can use it as well
 				for (const point of this._sortedTimePoints) {
-					point.pointData.mapping.delete(series);
+					if (point.pointData.mapping.delete(series)) {
+						isTimeScaleAffected = true;
+					}
 				}
 			}
 		}
@@ -206,6 +211,7 @@ export class DataLayer {
 					// the indexes will be sync later
 					timePointData = createEmptyTimePointData(time);
 					this._pointDataByTimePoint.set(time.timestamp, timePointData);
+					isTimeScaleAffected = true;
 				}
 
 				const row = createPlotRow(time, timePointData.index, item);
@@ -222,16 +228,19 @@ export class DataLayer {
 
 		this._setRowsToSeries(series, seriesRows);
 
-		// then generate the time scale points
-		// timeWeight will be updates in _updateTimeScalePoints later
-		const newTimeScalePoints: InternalTimeScalePoint[] = [];
-		this._pointDataByTimePoint.forEach((pointData: TimePointData) => {
-			newTimeScalePoints.push({ timeWeight: 0, time: pointData.timePoint, pointData });
-		});
+		let firstChangedPointIndex = -1;
+		if (isTimeScaleAffected) {
+			// then generate the time scale points
+			// timeWeight will be updates in _updateTimeScalePoints later
+			const newTimeScalePoints: InternalTimeScalePoint[] = [];
+			this._pointDataByTimePoint.forEach((pointData: TimePointData) => {
+				newTimeScalePoints.push({ timeWeight: 0, time: pointData.timePoint, pointData });
+			});
 
-		newTimeScalePoints.sort((t1: InternalTimeScalePoint, t2: InternalTimeScalePoint) => t1.time.timestamp - t2.time.timestamp);
+			newTimeScalePoints.sort((t1: InternalTimeScalePoint, t2: InternalTimeScalePoint) => t1.time.timestamp - t2.time.timestamp);
 
-		const firstChangedPointIndex = this._replaceTimeScalePoints(newTimeScalePoints);
+			firstChangedPointIndex = this._replaceTimeScalePoints(newTimeScalePoints);
+		}
 
 		return this._getUpdateResponse(series, firstChangedPointIndex);
 	}
