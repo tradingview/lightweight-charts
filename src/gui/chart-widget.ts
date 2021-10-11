@@ -193,7 +193,9 @@ export class ChartWidget implements IDestroyable {
 			this._paneWidgets[i].paint(invalidateMask.invalidateForPane(i).level);
 		}
 
-		this._timeAxisWidget.paint(invalidateMask.fullInvalidation());
+		if (this._options.timeScale.visible) {
+			this._timeAxisWidget.paint(invalidateMask.fullInvalidation());
+		}
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
@@ -391,8 +393,8 @@ export class ChartWidget implements IDestroyable {
 
 		this._timeAxisWidget.setSizes(
 			new Size(timeAxisVisible ? paneWidth : 0, timeAxisHeight),
-			leftPriceAxisWidth,
-			rightPriceAxisWidth
+			timeAxisVisible ? leftPriceAxisWidth : 0,
+			timeAxisVisible ? rightPriceAxisWidth : 0
 		);
 
 		this._model.setWidth(paneWidth);
