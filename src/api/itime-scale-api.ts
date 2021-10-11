@@ -14,14 +14,14 @@ export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null)
 /** Interface to chart time scale */
 export interface ITimeScaleApi {
 	/**
-	 * Returns current scroll position of the chart
+	 * Return the distance from the right edge of the time scale to the lastest bar of the series measured in bars.
 	 *
-	 * @returns a distance from the right edge to the latest bar, measured in bars
+	 * @returns {number} a distance from the right edge to the latest bar, measured in bars.
 	 */
 	scrollPosition(): number;
 
 	/**
-	 * Scrolls the chart to the specified position
+	 * Scrolls the chart to the specified position.
 	 *
 	 * @param position - target data position
 	 * @param animated - setting this to true makes the chart scrolling smooth and adds animation
@@ -34,23 +34,31 @@ export interface ITimeScaleApi {
 	scrollToRealTime(): void;
 
 	/**
-	 * Returns current visible time range of the chart
+	 * Returns current visible time range of the chart.
 	 *
-	 * @returns visible range or null if the chart has no data at all
+	 * @returns visible range or null if the chart has no data at all.
 	 */
 	getVisibleRange(): TimeRange | null;
 
 	/**
-	 * Sets visible range of data
+	 * Sets visible range of data.
 	 *
-	 * @param range - target visible range of data
+	 * @param range - target visible range of data.
+	 *
+	 * @example
+	 * ```ts
+	 * chart.timeScale().setVisibleRange({
+     * . from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
+     * . to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
+	 * });
+ 	 * ```
 	 */
 	setVisibleRange(range: TimeRange): void;
 
 	/**
-	 * Returns the currently visible logical range of data.
+	 * Returns the current visible [logical range](#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data.
 	 *
-	 * @returns visible range or null if the chart has no data at all
+	 * @returns visible range or null if the chart has no data at all.
 	 */
 	getVisibleLogicalRange(): LogicalRange | null;
 
@@ -58,17 +66,21 @@ export interface ITimeScaleApi {
 	 * Sets visible logical range of data.
 	 *
 	 * @param range - target visible logical range of data.
+	 *
+	 * @example
+	 * ```ts
+	 * chart.timeScale().setVisibleLogicalRange({ from: 0, to: Date.now() / 1000 })
+	 * ```
 	 */
 	setVisibleLogicalRange(range: Range<number>): void;
 
 	/**
-	 * Restores default zooming and scroll position of the time scale
+	 * Restores default zoom level and scroll position of the time scale.
 	 */
 	resetTimeScale(): void;
 
 	/**
-	 * Automatically calculates the visible range to fit all data from all series
-	 * This is a momentary operation.
+	 * Automatically calculates the visible range to fit all data from all series.
 	 */
 	fitContent(): void;
 
@@ -99,36 +111,76 @@ export interface ITimeScaleApi {
 	/**
 	 * Converts a coordinate to time.
 	 *
-	 * @param x - coordinate needs to be converted
-	 * @returns time of a bar that is located on that coordinate or `null` if there are no bars found on that coordinate
+	 * @param x - coordinate needs to be converted.
+	 * @returns time of a bar that is located on that coordinate or `null` if there are no bars found on that coordinate.
 	 */
 	coordinateToTime(x: number): Time | null;
 
 	/**
-	 * Adds a subscription to visible range changes to receive notification about visible range of data changes
+	 * Subscribe to the visible time range change events.
 	 *
-	 * @param handler - handler (function) to be called on changing visible data range
+	 * The argument passed to the handler function is an object with `from` and `to` properties of type {@link Time}, or `null` if there is no visible data.
+	 *
+	 * @param handler - handler (function) to be called when the visible indexes change.
+	 *
+	 * @example
+	 * ```ts
+	 * function myVisibleTimeRangeChangeHandler(newVisibleTimeRange) {
+	 *   if (newVisibleTimeRange === null) {
+	 *     // handle null
+	 *   }
+	 *
+	 *   // handle new logical range
+	 * }
+	 *
+	 * chart.timeScale().subscribeVisibleTimeRangeChange(myVisibleTimeRangeChangeHandler);
+	 * ```
 	 */
 	subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
 
 	/**
-	 * Removes a subscription to visible range changes
+	 * Unsubscribe a handler that was previously subscribed using {@link subscribeVisibleTimeRangeChange}.
 	 *
 	 * @param handler - previously subscribed handler
+	 *
+	 * @example
+	 * ```ts
+	 * chart.timeScale().unsubscribeVisibleTimeRangeChange(myVisibleTimeRangeChangeHandler);
+	 * ```
 	 */
 	unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
 
 	/**
-	 * Adds a subscription to visible index range changes to receive notifications about visible indexes of the data
+	 * Subscribe to the visible logical range change events.
 	 *
-	 * @param handler - handler (function) to be called when the visible indexes change
+	 * The argument passed to the handler function is an object with `from` and `to` properties of type `number`, or `null` if there is no visible data.
+	 *
+	 * @param handler - handler (function) to be called when the visible indexes change.
+	 *
+	 * @example
+	 * ```ts
+	 * function myVisibleLogicalRangeChangeHandler(newVisibleLogicalRange) {
+	 *   if (newVisibleLogicalRange === null) {
+	 *     // handle null
+	 *   }
+	 *
+	 *   // handle new logical range
+	 * }
+	 *
+	 * chart.timeScale().subscribeVisibleLogicalRangeChange(myVisibleLogicalRangeChangeHandler);
+	 * ```
 	 */
 	subscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void;
 
 	/**
-	 * Removes a subscription to visible index range changes
+	 * Unsubscribe a handler that was previously subscribed using {@link subscribeVisibleLogicalRangeChange}.
 	 *
 	 * @param handler - previously subscribed handler
+	 *
+	 * @example
+	 * ```ts
+	 * chart.timeScale().unsubscribeVisibleLogicalRangeChange(myVisibleLogicalRangeChangeHandler);
+	 * ```
 	 */
 	unsubscribeVisibleLogicalRangeChange(handler: LogicalRangeChangeEventHandler): void;
 
