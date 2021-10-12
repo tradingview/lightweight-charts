@@ -78,14 +78,59 @@ export interface BarStyleOptions {
 }
 
 export interface LineStyleOptions {
+	/**
+	 * Line color.
+	 *
+	 * @default '#2196f3'
+	 */
 	color: string;
+	/**
+	 * Line style.
+	 *
+	 * @default LineStyle.Solid
+	 */
 	lineStyle: LineStyle;
+	/**
+	 * Line width in pixels.
+	 *
+	 * @default 3
+	 */
 	lineWidth: LineWidth;
+	/**
+	 * Line type.
+	 *
+	 * @default LineType.Simple
+	 */
 	lineType: LineType;
+	/**
+	 * Show the crosshair marker.
+	 *
+	 * @default
+	 */
 	crosshairMarkerVisible: boolean;
+	/**
+	 * Crosshair marker radius in pixels.
+	 *
+	 * @default
+	 */
 	crosshairMarkerRadius: number;
+	/**
+	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @default ''
+	 */
 	crosshairMarkerBorderColor: string;
+	/**
+	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @default ''
+	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Last price animation mode.
+	 *
+	 * @default LastPriceAnimationMode.Disabled
+	 */
 	lastPriceAnimation: LastPriceAnimationMode;
 }
 
