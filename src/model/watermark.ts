@@ -5,23 +5,55 @@ import { WatermarkPaneView } from '../views/pane/watermark-pane-view';
 import { ChartModel } from './chart-model';
 import { DataSource } from './data-source';
 
-/** Structure describing watermark options */
+/** Watermark options. */
 export interface WatermarkOptions {
-	/** Color of the watermark */
+	/**
+	 * Watermark color.
+	 *
+	 * @default 'rgba(0, 0, 0)'
+	 */
 	color: string;
-	/** Visibility of the watermark. If false, other parameters are ignored */
+	/**
+	 * Display the watermark.
+	 *
+	 * @default false
+	 */
 	visible: boolean;
-	/** Text of the watermark. Word wrapping is not supported */
+	/**
+	 * Text of the watermark. Word wrapping is not supported.
+	 *
+	 * @default ''
+	 */
 	text: string;
-	/** Font size in pixels */
+	/**
+	 * Font size in pixels.
+	 *
+	 * @default 48
+	 */
 	fontSize: number;
-	/** Font family */
+	/**
+	 * Font family.
+	 *
+	 * @default "'Trebuchet MS', Roboto, Ubuntu, sans-serif"
+	 */
 	fontFamily: string;
-	/** Font style */
+	/**
+	 * Font style.
+	 *
+	 * @default ''
+	 */
 	fontStyle: string;
-	/** Horizontal alignment of the watermark inside the chart area */
+	/**
+	 * Horizontal alignment inside the chart area.
+	 *
+	 * @default 'center'
+	 */
 	horzAlign: HorzAlign;
-	/** Vertical alignment of the watermark inside the chart area */
+	/**
+	 * Vertical alignment inside the chart area.
+	 *
+	 * @default 'center'
+	 */
 	vertAlign: VertAlign;
 }
 

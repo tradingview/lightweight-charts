@@ -26,17 +26,33 @@ export type Background = SolidColor | VerticalGradientColor;
 
 /** Structure describing layout options */
 export interface LayoutOptions {
-	/** Chart and scales background */
+	/**
+	 * Chart and scales background color.
+	 *
+	 * @default { type: ColorType.Solid, color: '#ffffff' }
+	 */
 	background: Background;
 	/**
-	 * @deprecated Use background instead
+	 * @deprecated Use background instead.
 	 */
 	backgroundColor: string;
-	/** Color of a text on the scales */
+	/**
+	 * Color of text on the scales.
+	 *
+	 * @default '#191919'
+	 */
 	textColor: string;
-	/** Font size of a text on the scales in pixels  */
+	/**
+	 * Font size of text on scales in pixels.
+	 *
+	 * @default 11
+	 */
 	fontSize: number;
-	/** Font family of a text on the scales */
+	/**
+	 * Font family of text on the scales.
+	 *
+	 * @default "'Trebuchet MS', Roboto, Ubuntu, sans-serif"
+	 */
 	fontFamily: string;
 }
 

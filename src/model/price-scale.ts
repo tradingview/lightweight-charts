@@ -70,11 +70,11 @@ export interface PricedValue {
 	y: Coordinate;
 }
 
-/** Defines margins of the price scale */
+/** Defines margins of the price scale. */
 export interface PriceScaleMargins {
-	/** Top margin in percentages. Must be greater or equal to 0 and less than 100 */
+	/** Top margin in percentages. Must be greater or equal to 0 and less than 100. */
 	top: number;
-	/** Bottom margin in percentages. Must be greater or equal to 0 and less than 100 */
+	/** Bottom margin in percentages. Must be greater or equal to 0 and less than 100. */
 	bottom: number;
 }
 
@@ -82,30 +82,54 @@ export type PriceAxisPosition = 'left' | 'right' | 'none';
 
 /** Structure that describes price scale options */
 export interface PriceScaleOptions {
-	/** True makes chart calculate the price range automatically based on the visible data range */
+	/**
+	 * Automatically set price range based on visible data range.
+	 */
 	autoScale: boolean;
-	/** Mode of the price scale */
+	/** Price scale mode. */
 	mode: PriceScaleMode;
-	/** True inverts the scale. Makes larger values drawn lower. Affects both the price scale and the data on the chart */
+	/** Invert the price scale, so that a upwards trend is shown as a downwards trend and vice versa.
+	 * Affects both the price scale and the data on the chart.
+	 */
 	invertScale: boolean;
-	/** True value prevents labels on the price scale from overlapping one another by aligning them one below others */
+	/**
+	 * Align price scale labels to prevent them from overlapping.
+	 */
 	alignLabels: boolean;
 	/**
-	 * @deprecated Defines position of the price scale on the chart
+	 * Price scale's position on the chart.
+	 *
+	 * @deprecated
 	 * @internal
 	 */
 	position?: PriceAxisPosition;
-	/** Defines price margins for the price scale */
+	/**
+	 * Price scale margins.
+	 *
+	 * @default { bottom: 0.1, top: 0.2 }
+	 */
 	scaleMargins: PriceScaleMargins;
-	/** Set true to draw a border between the price scale and the chart area */
+	/**
+	 * Set true to draw a border between the price scale and the chart area.
+	 *
+	 * @default true
+	 */
 	borderVisible: boolean;
-	/** Defines a color of the border between the price scale and the chart area. It is ignored if borderVisible is false */
+	/**
+	 * Price scale border color.
+	 *
+	 * @default '#2b2b43'
+	 */
 	borderColor: string;
-	/** Indicates whether the price scale displays only full lines of text or partial lines. */
+	/**
+	 * Show top and bottom corner labels only if entire text is visible.
+	 *
+	 * @default false
+	 */
 	entireTextOnly: boolean;
-	/** Indicates if this price scale visible. Could not be applied to overlay price scale */
+	/** Indicates if this price scale visible. Ignored by overlay price scales. */
 	visible: boolean;
-	/** True value add a small horizontal ticks on price axis labels */
+	/** Draw small horizontal line on price axis labels. */
 	drawTicks: boolean;
 }
 

@@ -29,21 +29,75 @@ import { TimeScale, TimeScaleOptions } from './time-scale';
 import { Watermark, WatermarkOptions } from './watermark';
 
 export interface HandleScrollOptions {
+	/**
+	 * Enable scrolling with the mouse wheel.
+	 *
+	 * @default true
+	 */
 	mouseWheel: boolean;
+	/**
+	 * Enable scrolling by holding down the left mouse button and moving the mouse.
+	 *
+	 * @default true
+	 */
 	pressedMouseMove: boolean;
+	/**
+	 * Enable horizontal touch scrolling.
+	 *
+	 * When enabled the chart handles touch gestures that would normally scroll the webpage horizontally.
+	 *
+	 * @default true
+	 */
 	horzTouchDrag: boolean;
+	/**
+	 * Enable vertical touch scrolling.
+	 *
+	 * When enabled the chart handles touch gestures that would normally scroll the webpage vertically.
+	 *
+	 * @default true
+	 */
 	vertTouchDrag: boolean;
 }
 
 export interface HandleScaleOptions {
+	/**
+	 * Enable scaling with the mouse wheel.
+	 *
+	 * @default true
+	 */
 	mouseWheel: boolean;
+	/**
+	 * Enable scling with pinch/zoom gestures.
+	 *
+	 * @default true
+	 */
 	pinch: boolean;
+	/**
+	 * Enable scaling the price and/or time scales by holding down the left mouse button and moving the mouse.
+	 *
+	 * @default { price: true, time: true }
+	 */
 	axisPressedMouseMove: AxisPressedMouseMoveOptions | boolean;
+	/**
+	 * Enable resetting scaling by double-clicking the left mouse button.
+	 *
+	 * @default true
+	 */
 	axisDoubleClickReset: boolean;
 }
 
 export interface KineticScrollOptions {
+	/**
+	 * Enable kinetic scroll with touch gestures.
+	 *
+	 * @default false
+	 */
 	touch: boolean;
+	/**
+	 * Enable kinetic scroll with the mouse.
+	 *
+	 * @default true
+	 */
 	mouse: boolean;
 }
 
@@ -55,7 +109,13 @@ type HandleScaleOptionsInternal =
 	};
 
 export interface AxisPressedMouseMoveOptions {
+	/**
+	 * Enable scaling the time axis by holding down the left mouse button and moving the mouse.
+	 */
 	time: boolean;
+	/**
+	 * Enable scaling the price axis by holding down the left mouse button and moving the mouse.
+	 */
 	price: boolean;
 }
 
@@ -87,41 +147,53 @@ export type OverlayPriceScaleOptions = Omit<PriceScaleOptions, 'visible' | 'auto
  * Structure describing options of the chart. Series options are to be set separately
  */
 export interface ChartOptions {
-	/** Width of the chart */
+	/** Width of the chart in pixels. */
 	width: number;
-	/** Height of the chart */
+
+	/** Height of the chart in pixels. */
 	height: number;
-	/** Structure with watermark options */
+
+	/**
+	 * Watermark options.
+	 *
+     * A watermark is a background label that includes a brief description of the drawn data. Any text can be added to it.
+     *
+     * Please make sure you enable it and set an appropriate font color and size to make your watermark visible in the background of the chart.
+     * We recommend a semi-transparent color and a large font. Also note that watermark position can be aligned vertically and horizontally.
+	 */
 	watermark: WatermarkOptions;
-	/** Structure with layout options */
+
+	/** Layout options. */
 	layout: LayoutOptions;
 
 	/**
-	 * @deprecated options for price scales
+	 * Price scale options.
+	 *
+	 * @deprecated
 	 * @internal
 	 */
 	priceScale: PriceScaleOptions;
 
-	/** Structure with price scale option for left price scale */
+	/** Left price scale options. */
 	leftPriceScale: VisiblePriceScaleOptions;
-	/** Structure with price scale option for right price scale */
+	/** Right price scale options. */
 	rightPriceScale: VisiblePriceScaleOptions;
-	/** Structure describing default price scale options for overlays */
+	/** Overlay price scale options. */
 	overlayPriceScales: OverlayPriceScaleOptions;
 
-	/** Structure with time scale options */
+	/** Time scale options. */
 	timeScale: TimeScaleOptions;
-	/** Structure with crosshair options */
+	/** Crosshair options. */
 	crosshair: CrosshairOptions;
-	/** Structure with grid options */
+	/** Grid options. */
 	grid: GridOptions;
-	/** Structure with localization options */
+	/** Localization options. */
 	localization: LocalizationOptions;
-	/** Structure that describes scrolling behavior or boolean flag that disables/enables all kinds of scrolls */
+	/** Scroll options, or a boolean flag that enables/disables scrolling. */
 	handleScroll: HandleScrollOptions | boolean;
-	/** Structure that describes scaling behavior or boolean flag that disables/enables all kinds of scales */
+	/** Scale options, or a boolean flag that enables/disables scaling. */
 	handleScale: HandleScaleOptions | boolean;
-	/** Structure that describes kinetic scroll behavior */
+	/** Kinetic scroll options. */
 	kineticScroll: KineticScrollOptions;
 }
 

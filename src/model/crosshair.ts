@@ -49,17 +49,40 @@ export const enum CrosshairMode {
 
 /** Structure describing a crosshair line (vertical or horizontal) */
 export interface CrosshairLineOptions {
-	/** Color of a certain crosshair line */
+	/**
+	 * Crosshair line color.
+	 *
+	 * @default '#758696'
+	 */
 	color: string;
-	/** Width of a certain crosshair line and corresponding scale label */
+	/**
+	 * Crosshair line width.
+	 *
+	 * @default 1
+	 */
 	width: LineWidth;
-	/** Style of a certain crosshair line */
+	/**
+	 * Crosshair line style.
+	 *
+	 * @default LineStyle.Dashed
+	 */
 	style: LineStyle;
-	/** Visibility of a certain crosshair line */
+	/** Display the corosshair line.
+	 *
+	 * @default true
+	 */
 	visible: boolean;
-	/** Visibility of corresponding scale label */
+	/**
+	 * Display the crosshair label on the relevant scale.
+	 *
+	 * @default true
+	 */
 	labelVisible: boolean;
-	/** Background color of corresponding scale label */
+	/**
+	 * Crosshair label background color.
+	 *
+	 * @default '#4c525e'
+	 */
 	labelBackgroundColor: string;
 }
 
@@ -67,9 +90,9 @@ export interface CrosshairLineOptions {
 export interface CrosshairOptions {
 	/** Crosshair mode */
 	mode: CrosshairMode;
-	/** Options of the crosshair vertical line */
+	/** Vertical line options. */
 	vertLine: CrosshairLineOptions;
-	/** Options of the crosshair horizontal line */
+	/** Horizontal line options. */
 	horzLine: CrosshairLineOptions;
 }
 

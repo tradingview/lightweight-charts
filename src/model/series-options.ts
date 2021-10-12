@@ -201,7 +201,7 @@ export interface PriceFormatBuiltIn {
 export interface PriceFormatCustom {
 	type: 'custom';
 	/**
-	 * User-defined function for price formatting that could be used for some specific cases, that could not be covered with PriceFormatBuiltIn
+	 * Override price fomatting behaviour. Can be used for cases that can't be covered with built-in price formats.
 	 */
 	formatter: PriceFormatterFn;
 	/**
