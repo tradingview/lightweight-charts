@@ -120,19 +120,25 @@ export interface HistogramStyleOptions {
 
 export interface PriceFormatBuiltIn {
 	/**
-	 * Enum of possible modes of price formatting
-	 * 'price' is the most common choice; it allows customization of precision and rounding of prices
-	 * 'volume' uses abbreviation for formatting prices like '1.2K' or '12.67M'
+	 * Built-in price formats.
+	 * 'price' is the most common choice; it allows customization of precision and rounding of prices.
+	 * 'volume' uses abbreviation for formatting prices like '1.2K' or '12.67M'.
 	 * 'percent' uses '%' sign at the end of prices.
+	 *
+	 * @default 'price'
 	 */
 	type: 'price' | 'volume' | 'percent';
 	/**
 	 * Number of digits after the decimal point.
-	 * If it is not set, then its value is calculated automatically based on minMove
+	 * If it is not set, then its value is calculated automatically based on minMove.
+	 *
+	 * @default 2
 	 */
 	precision: number;
 	/**
-	 * Minimal step of the price. This value shouldn't have more decimal digits than the precision
+	 * Minimal step of the price. This value shouldn't have more decimal digits than the precision.
+	 *
+	 * @default 0.01
 	 */
 	minMove: number;
 }
@@ -145,6 +151,8 @@ export interface PriceFormatCustom {
 	formatter: PriceFormatterFn;
 	/**
 	 * Minimal step of the price.
+	 *
+	 * @default 0.01
 	 */
 	minMove: number;
 }
@@ -203,7 +211,11 @@ type AutoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null) =>
  * Structure describing options common for all types of series
  */
 export interface SeriesOptionsCommon {
-	/** Visibility of the label with the latest visible price on the price scale */
+	/**
+	 * Visibility of the label with the latest visible price on the price scale.
+	 *
+	 * @default true
+	 */
 	lastValueVisible: boolean;
 	/** Title of the series. This label is placed with price axis label */
 	title: string;
@@ -215,36 +227,71 @@ export interface SeriesOptionsCommon {
 	 * @internal
 	 */
 	seriesLastValueMode?: PriceAxisLastValueMode;
-	/** Visibility of series. */
+	/** Show the series. */
 	visible: boolean;
-	/** Visibility of the price line. Price line is a horizontal line indicating the last price of the series */
+	/**
+	 * Show the price line. Price line is a horizontal line indicating the last price of the series.
+	 *
+	 * @default true
+	 * */
 	priceLineVisible: boolean;
-	/** Enum of possible modes of priceLine source */
+	/** The source to use for the value of the price line.
+	 *
+	 * @default PriceLineSource.LastBar
+	*/
 	priceLineSource: PriceLineSource;
-	/** Width of the price line. Ignored if priceLineVisible is false */
+	/**
+	 * Width of the price line.
+	 *
+	 * @default 1
+	 */
 	priceLineWidth: LineWidth;
-	/** Color of the price line. Ignored if priceLineVisible is false */
+	/**
+	 * Color of the price line.
+	 *
+	 * @default ''
+	 */
 	priceLineColor: string;
-	/** Price line style. Suitable for percentage and indexedTo100 scales */
+	/**
+	 * Price line style.
+	 *
+	 * @default LineStyle.Dotted
+	 */
 	priceLineStyle: LineStyle;
-	/** Formatting settings associated with the series */
+	/** Price format. */
 	priceFormat: PriceFormat;
-	/** Visibility of base line. Suitable for percentage and indexedTo100 scales */
+	/**
+	 * Visibility of base line. Suitable for percentage and `IndexedTo100` scales.
+	 *
+	 * @default true
+	 */
 	baseLineVisible: boolean;
-	/** Color of the base line in IndexedTo100 mode */
+	/**
+	 * Color of the base line in `IndexedTo100` mode.
+	 *
+	 * @default '#B2B5BE'
+	 */
 	baseLineColor: string;
-	/** Base line width. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
+	/**
+	 * Base line width. Suitable for percentage and `IndexedTo10` scales.
+	 *
+	 * @default 1
+	 */
 	baseLineWidth: LineWidth;
-	/** Base line style. Suitable for percentage and indexedTo100 scales. Ignored if baseLineVisible is not set */
+	/**
+	 * Base line style. Suitable for percentage and indexedTo100 scales.
+	 *
+	 * @default LineStyle.Solid
+	 */
 	baseLineStyle: LineStyle;
-	/** function that overrides calculating of visible prices range */
+	/** Override the default {@link AutoscaleInfo} provider. */
 	autoscaleInfoProvider?: AutoscaleInfoProvider;
 	/**
-	 * @deprecated Use priceScaleId instead
+	 * @deprecated Use priceScaleId instead.
 	 * @internal
 	 */
 	overlay?: boolean;
-	/** @deprecated Use priceScale method of the series to apply options instead */
+	/** @deprecated Use priceScale method of the series to apply options instead. */
 	scaleMargins?: PriceScaleMargins;
 }
 
