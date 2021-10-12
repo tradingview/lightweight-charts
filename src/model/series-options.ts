@@ -9,7 +9,7 @@ import { PriceScaleMargins } from './price-scale';
 /** Candlestick style options. */
 export interface CandlestickStyleOptions {
 	/**
-	 * Color of growing candles.
+	 * Color of rising candles.
 	 *
 	 * @default '#26a69a'
 	 */
@@ -39,7 +39,7 @@ export interface CandlestickStyleOptions {
 	 */
 	borderColor: string;
 	/**
-	 * Border color of growing candles.
+	 * Border color of rising candles.
 	 *
 	 * @default '#26a69a'
 	 */
@@ -57,7 +57,7 @@ export interface CandlestickStyleOptions {
 	 */
 	wickColor: string;
 	/**
-	 * Wick color of growing candles.
+	 * Wick color of rising candles.
 	 *
 	 * @default '#26a69a'
 	 */
@@ -104,9 +104,29 @@ export const enum LastPriceAnimationMode {
 export { LastPriceAnimationMode as LasPriceAnimationMode };
 
 export interface BarStyleOptions {
+	/**
+	 * Color of rising bars.
+	 *
+	 * @default '#26a69a'
+	 */
 	upColor: string;
+	/**
+	 * Color of falling bars.
+	 *
+	 * @default '#ef5350'
+	 */
 	downColor: string;
+	/**
+	 * Show open lines on bars.
+	 *
+	 * @default true
+	 */
 	openVisible: boolean;
+	/**
+	 * Show bars as sticks.
+	 *
+	 * @default true
+	 */
 	thinBars: boolean;
 }
 
