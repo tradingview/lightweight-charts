@@ -6,34 +6,67 @@ import { AutoScaleMargins } from './autoscale-info-impl';
 import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
 
-/** Structure describing a drawing style of the candlestick chart  */
+/** Candlestick style options. */
 export interface CandlestickStyleOptions {
-	/** Color of rising candlesticks */
+	/**
+	 * Color of growing candles.
+	 *
+	 * @default '#26a69a'
+	 */
 	upColor: string;
-	/** Color of falling candlesticks */
+	/**
+	 * Color of falling candles.
+	 *
+	 * @default '#ef5350'
+	 */
 	downColor: string;
-	/** Flag to draw/hide candlestick wicks */
+	/**
+	 * Enable high and low prices candle wicks.
+	 *
+	 * @default true
+	 */
 	wickVisible: boolean;
-	/** Flag to draw/hide candlestick borders around bodies */
+	/**
+	 * Enable candle borders.
+	 *
+	 * @default true
+	 */
 	borderVisible: boolean;
 	/**
-	 * Color of borders around candles' bodies. Ignored if borderVisible == false
-	 * If specified, it overrides both borderUpColor and borderDownColor options
+	 * Border color.
+	 *
+	 * @default '#378658'
 	 */
 	borderColor: string;
-	/** Color of the border of rising candlesticks. Ignored if borderVisible == false or borderColor is specified */
-	borderUpColor: string;
-	/** Color of the border of rising candlesticks. Ignored if borderVisible == false or borderColor is specified */
-	borderDownColor: string;
-
 	/**
-	 * Color of candlestick wicks. Ignored if wickVisible == false
-	 * If specified, it overrides both wickUpColor and wickDownColor options
+	 * Border color of growing candles.
+	 *
+	 * @default '#26a69a'
+	 */
+	borderUpColor: string;
+	/**
+	 * Border color of falling candles.
+	 *
+	 * @default '#ef5350'
+	 */
+	borderDownColor: string;
+	/**
+	 * Wick color.
+	 *
+	 * @default '#737375'
 	 */
 	wickColor: string;
-	/** Color of rising candlestick wicks. Ignored if wickVisible == false or wickColor is specified */
+	/**
+	 * Wick color of growing candles.
+	 *
+	 * @default '#26a69a'
+	 */
 	wickUpColor: string;
-	/** Color of falling candlestick wicks. Ignored if wickVisible == false or wickColor is specified */
+	/**
+	 * Wick color of falling candles.
+	 *
+	 * @default '#ef5350'
+	 */
 	wickDownColor: string;
 }
 
