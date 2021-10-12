@@ -149,7 +149,17 @@ export interface AreaStyleOptions {
 }
 
 export interface HistogramStyleOptions {
+	/**
+	 * Column color.
+	 *
+	 * @default '#26a69a'
+	 */
 	color: string;
+	/**
+	 * Initial level of histogram columns.
+	 *
+	 * @default 0
+	 */
 	base: number;
 }
 
