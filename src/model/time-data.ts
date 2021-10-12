@@ -18,8 +18,8 @@ export interface TimePoint {
 }
 
 export interface TimeScalePoint {
-	timeWeight: number;
-	time: TimePoint;
+	readonly timeWeight: number;
+	readonly time: TimePoint;
 }
 
 export interface Range<T> {

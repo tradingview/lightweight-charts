@@ -1,5 +1,5 @@
 import { lowerbound, upperbound } from '../helpers/algorithms';
-import { assert, ensureNotNull } from '../helpers/assertions';
+import { ensureNotNull } from '../helpers/assertions';
 import { Nominal } from '../helpers/nominal';
 
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
@@ -26,15 +26,9 @@ const CHUNK_SIZE = 30;
  * each plot row consists of key (index in timescale) and plot value map
  */
 export class PlotList<PlotRowType extends PlotRow = PlotRow> {
-	private _items: PlotRowType[] = [];
+	private _items: readonly PlotRowType[] = [];
 	private _minMaxCache: Map<PlotRowValueIndex, Map<number, MinMax | null>> = new Map();
 	private _rowSearchCache: Map<TimePointIndex, Map<PlotRowSearchMode, PlotRowType>> = new Map();
-
-	public clear(): void {
-		this._items = [];
-		this._minMaxCache.clear();
-		this._rowSearchCache.clear();
-	}
 
 	// @returns Last row
 	public last(): PlotRowType | null {
@@ -99,30 +93,11 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return result;
 	}
 
-	public merge(plotRows: readonly PlotRowType[]): void {
-		if (plotRows.length === 0) {
-			return;
-		}
+	public setData(plotRows: readonly PlotRowType[]): void {
+		this._rowSearchCache.clear();
+		this._minMaxCache.clear();
 
-		// if we get a bunch of history - just prepend it
-		if (this.isEmpty() || plotRows[plotRows.length - 1].index < this._items[0].index) {
-			this._prepend(plotRows);
-			return;
-		}
-
-		// if we get new rows - just append it
-		if (plotRows[0].index > this._items[this._items.length - 1].index) {
-			this._append(plotRows);
-			return;
-		}
-
-		// if we get update for the last row - just replace it
-		if (plotRows.length === 1 && plotRows[0].index === this._items[this._items.length - 1].index) {
-			this._updateLast(plotRows[0]);
-			return;
-		}
-
-		this._merge(plotRows);
+		this._items = plotRows;
 	}
 
 	private _indexAt(offset: PlotRowIndex): TimePointIndex {
@@ -219,49 +194,6 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return result;
 	}
 
-	private _invalidateCacheForRow(row: PlotRowType): void {
-		const chunkIndex = Math.floor(row.index / CHUNK_SIZE);
-		this._minMaxCache.forEach((cacheItem: Map<number, MinMax | null>) => cacheItem.delete(chunkIndex));
-	}
-
-	private _prepend(plotRows: readonly PlotRowType[]): void {
-		assert(plotRows.length !== 0, 'plotRows should not be empty');
-
-		this._rowSearchCache.clear();
-		this._minMaxCache.clear();
-
-		this._items = plotRows.concat(this._items);
-	}
-
-	private _append(plotRows: readonly PlotRowType[]): void {
-		assert(plotRows.length !== 0, 'plotRows should not be empty');
-
-		this._rowSearchCache.clear();
-		this._minMaxCache.clear();
-
-		this._items = this._items.concat(plotRows);
-	}
-
-	private _updateLast(plotRow: PlotRowType): void {
-		assert(!this.isEmpty(), 'plot list should not be empty');
-		const currentLastRow = this._items[this._items.length - 1];
-		assert(currentLastRow.index === plotRow.index, 'last row index should match new row index');
-
-		this._invalidateCacheForRow(plotRow);
-		this._rowSearchCache.delete(plotRow.index);
-
-		this._items[this._items.length - 1] = plotRow;
-	}
-
-	private _merge(plotRows: readonly PlotRowType[]): void {
-		assert(plotRows.length !== 0, 'plot rows should not be empty');
-
-		this._rowSearchCache.clear();
-		this._minMaxCache.clear();
-
-		this._items = mergePlotRows(this._items, plotRows);
-	}
-
 	private _minMaxOnRangeCachedImpl(start: TimePointIndex, end: TimePointIndex, plotIndex: PlotRowValueIndex): MinMax | null {
 		// this code works for single series only
 		// could fail after whitespaces implementation
@@ -336,83 +268,4 @@ function mergeMinMax(first: MinMax | null, second: MinMax | null): MinMax | null
 			return { min: min, max: max };
 		}
 	}
-}
-
-/**
- * Merges two ordered plot row arrays and returns result (ordered plot row array).
- *
- * BEWARE: If row indexes from plot rows are equal, the new plot row is used.
- *
- * NOTE: Time and memory complexity are O(N+M).
- */
-export function mergePlotRows<PlotRowType extends PlotRow>(originalPlotRows: readonly PlotRowType[], newPlotRows: readonly PlotRowType[]): PlotRowType[] {
-	const newArraySize = calcMergedArraySize(originalPlotRows, newPlotRows);
-
-	const result = new Array<PlotRowType>(newArraySize);
-
-	let originalRowsIndex = 0;
-	let newRowsIndex = 0;
-	const originalRowsSize = originalPlotRows.length;
-	const newRowsSize = newPlotRows.length;
-	let resultRowsIndex = 0;
-
-	while (originalRowsIndex < originalRowsSize && newRowsIndex < newRowsSize) {
-		if (originalPlotRows[originalRowsIndex].index < newPlotRows[newRowsIndex].index) {
-			result[resultRowsIndex] = originalPlotRows[originalRowsIndex];
-			originalRowsIndex++;
-		} else if (originalPlotRows[originalRowsIndex].index > newPlotRows[newRowsIndex].index) {
-			result[resultRowsIndex] = newPlotRows[newRowsIndex];
-			newRowsIndex++;
-		} else {
-			result[resultRowsIndex] = newPlotRows[newRowsIndex];
-			originalRowsIndex++;
-			newRowsIndex++;
-		}
-
-		resultRowsIndex++;
-	}
-
-	while (originalRowsIndex < originalRowsSize) {
-		result[resultRowsIndex] = originalPlotRows[originalRowsIndex];
-		originalRowsIndex++;
-		resultRowsIndex++;
-	}
-
-	while (newRowsIndex < newRowsSize) {
-		result[resultRowsIndex] = newPlotRows[newRowsIndex];
-		newRowsIndex++;
-		resultRowsIndex++;
-	}
-
-	return result;
-}
-
-function calcMergedArraySize<PlotRowType extends PlotRow>(
-	firstPlotRows: readonly PlotRowType[],
-	secondPlotRows: readonly PlotRowType[]): number {
-	const firstPlotsSize = firstPlotRows.length;
-	const secondPlotsSize = secondPlotRows.length;
-
-	// new plot rows size is (first plot rows size) + (second plot rows size) - common part size
-	// in this case we can just calculate common part size
-	let result = firstPlotsSize + secondPlotsSize;
-
-	// TODO: we can move first/second indexes to the right and first/second size to lower/upper bound of opposite array
-	// to skip checking uncommon parts
-	let firstIndex = 0;
-	let secondIndex = 0;
-
-	while (firstIndex < firstPlotsSize && secondIndex < secondPlotsSize) {
-		if (firstPlotRows[firstIndex].index < secondPlotRows[secondIndex].index) {
-			firstIndex++;
-		} else if (firstPlotRows[firstIndex].index > secondPlotRows[secondIndex].index) {
-			secondIndex++;
-		} else {
-			firstIndex++;
-			secondIndex++;
-			result--;
-		}
-	}
-
-	return result;
 }

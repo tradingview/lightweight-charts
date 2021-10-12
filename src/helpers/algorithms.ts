@@ -36,7 +36,7 @@ export function lowerbound<TArrayElementType, TValueType>(
 export type UpperBoundComparatorType<TValueType, TArrayElementType> = (a: TValueType, b: TArrayElementType) => boolean;
 
 export function upperbound<TArrayElementType, TValueType>(
-	arr: TArrayElementType[],
+	arr: readonly TArrayElementType[],
 	value: TValueType,
 	compare: UpperBoundComparatorType<TValueType, TArrayElementType>,
 	start: number = 0,
