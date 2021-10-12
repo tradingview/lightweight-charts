@@ -164,7 +164,7 @@ export interface LineStyleOptions {
 	/**
 	 * Crosshair marker radius in pixels.
 	 *
-	 * @default
+	 * @default 4
 	 */
 	crosshairMarkerRadius: number;
 	/**
@@ -188,16 +188,71 @@ export interface LineStyleOptions {
 }
 
 export interface AreaStyleOptions {
+	/**
+	 * Color of the top part of the area.
+	 *
+	 * @default 'rgba(46, 220, 135, 0.4)'
+	 */
 	topColor: string;
+	/**
+	 * Color of the bottom part of the area.
+	 *
+	 * @default 'rgba(40, 221, 100, 0)'
+	 */
 	bottomColor: string;
+	/**
+	 * Line color.
+	 *
+	 * @default '#33D778'
+	 */
 	lineColor: string;
+	/**
+	 * Line style.
+	 *
+	 * @default LineStyle.Solid
+	 */
 	lineStyle: LineStyle;
+	/**
+	 * Line width in pixels.
+	 *
+	 * @default 3
+	 */
 	lineWidth: LineWidth;
+	/**
+	 * Line type.
+	 *
+	 * @default LineType.Simple
+	 */
 	lineType: LineType;
+	/**
+	 * Show the crosshair marker.
+	 *
+	 * @default
+	 */
 	crosshairMarkerVisible: boolean;
+	/**
+	 * Crosshair marker radius in pixels.
+	 *
+	 * @default 4
+	 */
 	crosshairMarkerRadius: number;
+	/**
+	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @default ''
+	 */
 	crosshairMarkerBorderColor: string;
+	/**
+	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @default ''
+	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Last price animation mode.
+	 *
+	 * @default LastPriceAnimationMode.Disabled
+	 */
 	lastPriceAnimation: LastPriceAnimationMode;
 }
 
