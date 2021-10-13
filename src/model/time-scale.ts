@@ -667,11 +667,11 @@ export class TimeScale {
 		animationFn();
 	}
 
-	public update(newPoints: readonly TimeScalePoint[]): void {
+	public update(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
 		this._visibleRangeInvalidated = true;
 
 		this._points = newPoints;
-		this._tickMarks.setTimeScalePoints(newPoints);
+		this._tickMarks.setTimeScalePoints(newPoints, firstChangedPointIndex);
 		this._correctOffset();
 	}
 

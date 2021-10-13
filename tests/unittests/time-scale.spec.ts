@@ -28,7 +28,7 @@ function tsUpdate(to: number): Parameters<TimeScale['update']> {
 		points.push({ time: { timestamp: i as UTCTimestamp }, timeWeight: 20 });
 	}
 
-	return [points];
+	return [points, 0];
 }
 
 describe('TimeScale', () => {
