@@ -92,8 +92,6 @@ export interface PriceScaleOptions {
 	borderVisible: boolean;
 	/** Defines a color of the border between the price scale and the chart area. It is ignored if borderVisible is false */
 	borderColor: string;
-	/** Indicates whether the price scale displays only full lines of text or partial lines. */
-	entireTextOnly: boolean;
 	/** Indicates if this price scale visible. Could not be applied to overlay price scale */
 	visible: boolean;
 	/** True value add a small horizontal ticks on price axis labels */

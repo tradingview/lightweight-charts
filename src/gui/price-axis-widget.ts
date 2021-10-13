@@ -11,7 +11,7 @@ import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
 import { LayoutOptionsInternal } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
-import { PriceScale } from '../model/price-scale';
+import { PriceMark, PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
@@ -422,7 +422,8 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _drawTickMarks(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		if (this._size === null || this._priceScale === null) {
+		const size = this._size;
+		if (size === null || this._priceScale === null) {
 			return;
 		}
 
@@ -438,7 +439,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const drawTicks = this._priceScale.options().borderVisible && this._priceScale.options().drawTicks;
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
+			Math.floor((size.w - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
 			Math.floor(rendererOptions.borderSize * pixelRatio);
 
 		const textLeftX = this._isLeft ?
@@ -449,19 +450,38 @@ export class PriceAxisWidget implements IDestroyable {
 		const tickHeight = Math.max(1, Math.floor(pixelRatio));
 		const tickOffset = Math.floor(pixelRatio * 0.5);
 
+		const labelHeight = this.fontSize();
+		const tickMarksVisibility = tickMarks.map((tickMark: PriceMark) => {
+			if (this._options.croppedTickMarks) {
+				return true;
+			}
+
+			const labelTop = tickMark.coord - (labelHeight / 2);
+			const labelBottom = tickMark.coord + (labelHeight / 2);
+			return labelTop >= 0 && labelBottom <= size.h;
+		});
+
 		if (drawTicks) {
 			const tickLength = Math.round(rendererOptions.tickLength * pixelRatio);
 			ctx.beginPath();
-			for (const tickMark of tickMarks) {
-				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * pixelRatio) - tickOffset, tickLength, tickHeight);
+			for (let i = 0; i < tickMarks.length; i++) {
+				if (!tickMarksVisibility[i]) {
+					continue;
+				}
+
+				ctx.rect(tickMarkLeftX, Math.round(tickMarks[i].coord * pixelRatio) - tickOffset, tickLength, tickHeight);
 			}
 
 			ctx.fill();
 		}
 
 		ctx.fillStyle = this.textColor();
-		for (const tickMark of tickMarks) {
-			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, Math.round(tickMark.coord * pixelRatio), textAlign);
+		for (let i = 0; i < tickMarks.length; i++) {
+			if (!tickMarksVisibility[i]) {
+				continue;
+			}
+
+			this._tickMarksCache.paintTo(ctx, tickMarks[i].label, textLeftX, Math.round(tickMarks[i].coord * pixelRatio), textAlign);
 		}
 
 		ctx.restore();
