@@ -4,5 +4,5 @@
         "lib/**": true,
         "tests/e2e/graphics/.gendata/**": true
     },
-    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }
