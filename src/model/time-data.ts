@@ -10,7 +10,9 @@ import { RangeImpl } from './range-impl';
  * Note that JavaScript Date APIs like `Date.now` return a number of milliseconds but UTCTimestamp expects a number of seconds.
  *
  * Note that to prevent errors, you should cast the numeric type of the time to `UTCTimestamp` type from the package (`value as UTCTimestamp`) in TypeScript code.
- * ```js
+ *
+ * @example
+ * ```ts
  * const timestamp = 1529899200 as UTCTimestamp; // Literal timestamp representing 2018-06-25T04:00:00.000Z
  * const timestamp2 = (Date.now() / 1000) as UTCTimestamp;
  * ```
