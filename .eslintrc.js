@@ -352,7 +352,6 @@ module.exports = {
 		{
 			files: ['src/**/*.ts'],
 			excludedFiles: ['tests/'],
-			// parser: '@typescript-eslint/parser',
 			extends: [
 				'plugin:jsdoc/recommended',
 			],
