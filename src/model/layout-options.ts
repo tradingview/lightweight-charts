@@ -28,8 +28,6 @@ export type Background = SolidColor | VerticalGradientColor;
 export interface LayoutOptions {
 	/**
 	 * Chart and scales background color.
-	 *
-	 * @default { type: ColorType.Solid, color: '#ffffff' }
 	 */
 	background: Background;
 	/**
@@ -38,20 +36,14 @@ export interface LayoutOptions {
 	backgroundColor: string;
 	/**
 	 * Color of text on the scales.
-	 *
-	 * @default '#191919'
 	 */
 	textColor: string;
 	/**
 	 * Font size of text on scales in pixels.
-	 *
-	 * @default 11
 	 */
 	fontSize: number;
 	/**
 	 * Font family of text on the scales.
-	 *
-	 * @default "'Trebuchet MS', Roboto, Ubuntu, sans-serif"
 	 */
 	fontFamily: string;
 }

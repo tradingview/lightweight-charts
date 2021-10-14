@@ -106,26 +106,18 @@ export interface PriceScaleOptions {
 	position?: PriceAxisPosition;
 	/**
 	 * Price scale margins.
-	 *
-	 * @default { bottom: 0.1, top: 0.2 }
 	 */
 	scaleMargins: PriceScaleMargins;
 	/**
 	 * Set true to draw a border between the price scale and the chart area.
-	 *
-	 * @default true
 	 */
 	borderVisible: boolean;
 	/**
 	 * Price scale border color.
-	 *
-	 * @default '#2b2b43'
 	 */
 	borderColor: string;
 	/**
 	 * Show top and bottom corner labels only if entire text is visible.
-	 *
-	 * @default false
 	 */
 	entireTextOnly: boolean;
 	/** Indicates if this price scale visible. Ignored by overlay price scales. */

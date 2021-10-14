@@ -101,88 +101,60 @@ export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType:
 export interface TimeScaleOptions {
 	/**
 	 * The margin space in bars from the right side of the chart.
-	 *
-	 * @default 0
 	 */
 	rightOffset: number;
 	/**
 	 * The space between bars in pixels.
-	 *
-	 * @default 6
 	 */
 	barSpacing: number;
 	/**
 	 * The minimum space between bars in pixels.
-	 *
-	 * @default 0.5
 	 */
 	minBarSpacing: number;
 	/**
 	 * Prevent scrolling to the left of the first bar.
-	 *
-	 * @default false
 	 */
 	fixLeftEdge: boolean;
 	/**
 	 * Prevent scrolling to the right of the most recent bar.
-	 *
-	 * @default false
 	 */
 	fixRightEdge: boolean;
 	/**
 	 * Prevent changing the visible time range during chart resizing.
-	 *
-	 * @default false
 	 */
 	lockVisibleTimeRangeOnResize: boolean;
 	/**
 	 * Prevent the hovered bar from moving when scrolling.
-	 *
-	 * @default false
 	 */
 	rightBarStaysOnScroll: boolean;
 	/**
 	 * Show the time scale border.
-	 *
-	 * @default true
 	 */
 	borderVisible: boolean;
 	/**
 	 * The time scale border color.
-	 *
-	 * @default '#2b2b43'
 	 */
 	borderColor: string;
 	/**
 	 * Show the time scale.
-	 *
-	 * @default true
 	 */
 	visible: boolean;
 	/**
 	 * Show the time, not just the date, in the time scale and vertical crosshair label.
-	 *
-	 * @default false
 	 */
 	timeVisible: boolean;
 	/**
 	 * Show seconds in the time scale and vertical crosshair label in `hh:mm:ss` format for intraday data.
-	 *
-	 * @default true
 	 */
 	secondsVisible: boolean;
 	/**
 	 * Shift the visible range to the right (into the future) by the number of new bars when new data is added.
 	 *
 	 * Note that this only applies when the last bar is visible.
-	 *
-	 * @default true
 	 */
 	shiftVisibleRangeOnNewBar: boolean;
 	/**
 	 * Override the default tick marks formatter.
-	 *
-	 * @default undefined
 	 */
 	tickMarkFormatter?: TickMarkFormatter;
 }

@@ -31,30 +31,22 @@ import { Watermark, WatermarkOptions } from './watermark';
 export interface HandleScrollOptions {
 	/**
 	 * Enable scrolling with the mouse wheel.
-	 *
-	 * @default true
 	 */
 	mouseWheel: boolean;
 	/**
 	 * Enable scrolling by holding down the left mouse button and moving the mouse.
-	 *
-	 * @default true
 	 */
 	pressedMouseMove: boolean;
 	/**
 	 * Enable horizontal touch scrolling.
 	 *
 	 * When enabled the chart handles touch gestures that would normally scroll the webpage horizontally.
-	 *
-	 * @default true
 	 */
 	horzTouchDrag: boolean;
 	/**
 	 * Enable vertical touch scrolling.
 	 *
 	 * When enabled the chart handles touch gestures that would normally scroll the webpage vertically.
-	 *
-	 * @default true
 	 */
 	vertTouchDrag: boolean;
 }
@@ -62,26 +54,18 @@ export interface HandleScrollOptions {
 export interface HandleScaleOptions {
 	/**
 	 * Enable scaling with the mouse wheel.
-	 *
-	 * @default true
 	 */
 	mouseWheel: boolean;
 	/**
 	 * Enable scling with pinch/zoom gestures.
-	 *
-	 * @default true
 	 */
 	pinch: boolean;
 	/**
 	 * Enable scaling the price and/or time scales by holding down the left mouse button and moving the mouse.
-	 *
-	 * @default { price: true, time: true }
 	 */
 	axisPressedMouseMove: AxisPressedMouseMoveOptions | boolean;
 	/**
 	 * Enable resetting scaling by double-clicking the left mouse button.
-	 *
-	 * @default true
 	 */
 	axisDoubleClickReset: boolean;
 }
@@ -89,14 +73,10 @@ export interface HandleScaleOptions {
 export interface KineticScrollOptions {
 	/**
 	 * Enable kinetic scroll with touch gestures.
-	 *
-	 * @default false
 	 */
 	touch: boolean;
 	/**
 	 * Enable kinetic scroll with the mouse.
-	 *
-	 * @default true
 	 */
 	mouse: boolean;
 }

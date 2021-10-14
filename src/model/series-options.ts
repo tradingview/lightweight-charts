@@ -10,62 +10,42 @@ import { PriceScaleMargins } from './price-scale';
 export interface CandlestickStyleOptions {
 	/**
 	 * Color of rising candles.
-	 *
-	 * @default '#26a69a'
 	 */
 	upColor: string;
 	/**
 	 * Color of falling candles.
-	 *
-	 * @default '#ef5350'
 	 */
 	downColor: string;
 	/**
 	 * Enable high and low prices candle wicks.
-	 *
-	 * @default true
 	 */
 	wickVisible: boolean;
 	/**
 	 * Enable candle borders.
-	 *
-	 * @default true
 	 */
 	borderVisible: boolean;
 	/**
 	 * Border color.
-	 *
-	 * @default '#378658'
 	 */
 	borderColor: string;
 	/**
 	 * Border color of rising candles.
-	 *
-	 * @default '#26a69a'
 	 */
 	borderUpColor: string;
 	/**
 	 * Border color of falling candles.
-	 *
-	 * @default '#ef5350'
 	 */
 	borderDownColor: string;
 	/**
 	 * Wick color.
-	 *
-	 * @default '#737375'
 	 */
 	wickColor: string;
 	/**
 	 * Wick color of rising candles.
-	 *
-	 * @default '#26a69a'
 	 */
 	wickUpColor: string;
 	/**
 	 * Wick color of falling candles.
-	 *
-	 * @default '#ef5350'
 	 */
 	wickDownColor: string;
 }
@@ -109,26 +89,18 @@ export { LastPriceAnimationMode as LasPriceAnimationMode };
 export interface BarStyleOptions {
 	/**
 	 * Color of rising bars.
-	 *
-	 * @default '#26a69a'
 	 */
 	upColor: string;
 	/**
 	 * Color of falling bars.
-	 *
-	 * @default '#ef5350'
 	 */
 	downColor: string;
 	/**
 	 * Show open lines on bars.
-	 *
-	 * @default true
 	 */
 	openVisible: boolean;
 	/**
 	 * Show bars as sticks.
-	 *
-	 * @default true
 	 */
 	thinBars: boolean;
 }
@@ -136,26 +108,18 @@ export interface BarStyleOptions {
 export interface LineStyleOptions {
 	/**
 	 * Line color.
-	 *
-	 * @default '#2196f3'
 	 */
 	color: string;
 	/**
 	 * Line style.
-	 *
-	 * @default LineStyle.Solid
 	 */
 	lineStyle: LineStyle;
 	/**
 	 * Line width in pixels.
-	 *
-	 * @default 3
 	 */
 	lineWidth: LineWidth;
 	/**
 	 * Line type.
-	 *
-	 * @default LineType.Simple
 	 */
 	lineType: LineType;
 	/**
@@ -166,26 +130,18 @@ export interface LineStyleOptions {
 	crosshairMarkerVisible: boolean;
 	/**
 	 * Crosshair marker radius in pixels.
-	 *
-	 * @default 4
 	 */
 	crosshairMarkerRadius: number;
 	/**
 	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
-	 *
-	 * @default ''
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
 	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
-	 *
-	 * @default ''
 	 */
 	crosshairMarkerBackgroundColor: string;
 	/**
 	 * Last price animation mode.
-	 *
-	 * @default LastPriceAnimationMode.Disabled
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
 }
@@ -193,38 +149,26 @@ export interface LineStyleOptions {
 export interface AreaStyleOptions {
 	/**
 	 * Color of the top part of the area.
-	 *
-	 * @default 'rgba(46, 220, 135, 0.4)'
 	 */
 	topColor: string;
 	/**
 	 * Color of the bottom part of the area.
-	 *
-	 * @default 'rgba(40, 221, 100, 0)'
 	 */
 	bottomColor: string;
 	/**
 	 * Line color.
-	 *
-	 * @default '#33D778'
 	 */
 	lineColor: string;
 	/**
 	 * Line style.
-	 *
-	 * @default LineStyle.Solid
 	 */
 	lineStyle: LineStyle;
 	/**
 	 * Line width in pixels.
-	 *
-	 * @default 3
 	 */
 	lineWidth: LineWidth;
 	/**
 	 * Line type.
-	 *
-	 * @default LineType.Simple
 	 */
 	lineType: LineType;
 	/**
@@ -235,26 +179,18 @@ export interface AreaStyleOptions {
 	crosshairMarkerVisible: boolean;
 	/**
 	 * Crosshair marker radius in pixels.
-	 *
-	 * @default 4
 	 */
 	crosshairMarkerRadius: number;
 	/**
 	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
-	 *
-	 * @default ''
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
 	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
-	 *
-	 * @default ''
 	 */
 	crosshairMarkerBackgroundColor: string;
 	/**
 	 * Last price animation mode.
-	 *
-	 * @default LastPriceAnimationMode.Disabled
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
 }
@@ -262,14 +198,10 @@ export interface AreaStyleOptions {
 export interface HistogramStyleOptions {
 	/**
 	 * Column color.
-	 *
-	 * @default '#26a69a'
 	 */
 	color: string;
 	/**
 	 * Initial level of histogram columns.
-	 *
-	 * @default 0
 	 */
 	base: number;
 }
@@ -290,21 +222,15 @@ export interface PriceFormatBuiltIn {
 	 * 'price' is the most common choice; it allows customization of precision and rounding of prices.
 	 * 'volume' uses abbreviation for formatting prices like '1.2K' or '12.67M'.
 	 * 'percent' uses '%' sign at the end of prices.
-	 *
-	 * @default 'price'
 	 */
 	type: 'price' | 'volume' | 'percent';
 	/**
 	 * Number of digits after the decimal point.
 	 * If it is not set, then its value is calculated automatically based on minMove.
-	 *
-	 * @default 2
 	 */
 	precision: number;
 	/**
 	 * Minimal step of the price. This value shouldn't have more decimal digits than the precision.
-	 *
-	 * @default 0.01
 	 */
 	minMove: number;
 }
@@ -317,8 +243,6 @@ export interface PriceFormatCustom {
 	formatter: PriceFormatterFn;
 	/**
 	 * Minimal step of the price.
-	 *
-	 * @default 0.01
 	 */
 	minMove: number;
 }
@@ -382,8 +306,6 @@ type AutoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null) =>
 export interface SeriesOptionsCommon {
 	/**
 	 * Visibility of the label with the latest visible price on the price scale.
-	 *
-	 * @default true
 	 */
 	lastValueVisible: boolean;
 	/** Title of the series. This label is placed with price axis label */
@@ -400,58 +322,40 @@ export interface SeriesOptionsCommon {
 	visible: boolean;
 	/**
 	 * Show the price line. Price line is a horizontal line indicating the last price of the series.
-	 *
-	 * @default true
 	 */
 	priceLineVisible: boolean;
 	/**
 	 * The source to use for the value of the price line.
-	 *
-	 * @default PriceLineSource.LastBar
 	 */
 	priceLineSource: PriceLineSource;
 	/**
 	 * Width of the price line.
-	 *
-	 * @default 1
 	 */
 	priceLineWidth: LineWidth;
 	/**
 	 * Color of the price line.
-	 *
-	 * @default ''
 	 */
 	priceLineColor: string;
 	/**
 	 * Price line style.
-	 *
-	 * @default LineStyle.Dotted
 	 */
 	priceLineStyle: LineStyle;
 	/** Price format. */
 	priceFormat: PriceFormat;
 	/**
 	 * Visibility of base line. Suitable for percentage and `IndexedTo100` scales.
-	 *
-	 * @default true
 	 */
 	baseLineVisible: boolean;
 	/**
 	 * Color of the base line in `IndexedTo100` mode.
-	 *
-	 * @default '#B2B5BE'
 	 */
 	baseLineColor: string;
 	/**
 	 * Base line width. Suitable for percentage and `IndexedTo10` scales.
-	 *
-	 * @default 1
 	 */
 	baseLineWidth: LineWidth;
 	/**
 	 * Base line style. Suitable for percentage and indexedTo100 scales.
-	 *
-	 * @default LineStyle.Solid
 	 */
 	baseLineStyle: LineStyle;
 	/** Override the default {@link AutoscaleInfo} provider. */

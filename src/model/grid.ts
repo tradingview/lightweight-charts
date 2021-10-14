@@ -8,20 +8,14 @@ import { Pane } from './pane';
 export interface GridLineOptions {
 	/**
 	 * Line color.
-	 *
-	 * @default '#d6dcde'
 	 */
 	color: string;
 	/**
 	 * Line style.
-	 *
-	 * @default LineStyle.Solid
 	 */
 	style: LineStyle;
 	/**
 	 * Display the lines.
-	 *
-	 * @default true
 	 */
 	visible: boolean;
 }
