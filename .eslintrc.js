@@ -18,7 +18,6 @@ module.exports = {
 	],
 	extends: [
 		'eslint:recommended',
-		// 'plugin:jsdoc/recommended',
 	],
 	parserOptions: {
 		ecmaVersion: 2019,
