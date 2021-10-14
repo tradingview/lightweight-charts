@@ -10,7 +10,7 @@ import { RangeImpl } from './range-impl';
  * Note that JavaScript Date APIs like `Date.now` return a number of milliseconds but UTCTimestamp expects a number of seconds.
  *
  * Note that to prevent errors, you should cast the numeric type of the time to `UTCTimestamp` type from the package (`value as UTCTimestamp`) in TypeScript code.
- * ```ts
+ * ```js
  * const timestamp = 1529899200 as UTCTimestamp; // Literal timestamp representing 2018-06-25T04:00:00.000Z
  * const timestamp2 = (Date.now() / 1000) as UTCTimestamp;
  * ```
@@ -19,7 +19,7 @@ export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
 
 /**
  * This type is used to specify time for day/week/month (DWM) data.
-
+ *
  * ```js
  * const day = { year: 2019, month: 6, day: 1 }; // June 1, 2019
  * ```
@@ -72,14 +72,23 @@ export interface TimedValue {
 
 export type SeriesItemsIndexesRange = Range<number>;
 
+/**
+ * @private
+ */
 function lowerBoundItemsCompare(item: TimedValue, time: TimePointIndex): boolean {
 	return item.time < time;
 }
 
+/**
+ * @private
+ */
 function upperBoundItemsCompare(time: TimePointIndex, item: TimedValue): boolean {
 	return time < item.time;
 }
 
+/**
+ * @private
+ */
 export function visibleTimedValues(items: TimedValue[], range: RangeImpl<TimePointIndex>, extendedRange: boolean): SeriesItemsIndexesRange {
 	const firstBar = range.left();
 	const lastBar = range.right();

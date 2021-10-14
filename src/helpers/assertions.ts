@@ -14,10 +14,15 @@ export function assert(condition: boolean, message?: string): asserts condition 
  * Ensures that value is defined.
  * Throws if the value is undefined, returns the original value otherwise.
  *
+ * @param value The value, or undefined.
+ * @private
  * @returns the passed value, if it is not undefined
  */
 export function ensureDefined(value: undefined): never;
 export function ensureDefined<T>(value: T | undefined): T;
+/**
+ * @private
+ */
 export function ensureDefined<T>(value: T | undefined): T {
 	if (value === undefined) {
 		throw new Error('Value is undefined');
@@ -30,10 +35,15 @@ export function ensureDefined<T>(value: T | undefined): T {
  * Ensures that value is not null.
  * Throws if the value is null, returns the original value otherwise.
  *
+ * @param value The value, or null.
+ * @private
  * @returns the passed value, if it is not null
  */
 export function ensureNotNull(value: null): never;
 export function ensureNotNull<T>(value: T | null): T;
+/**
+ * @private
+ */
 export function ensureNotNull<T>(value: T | null): T {
 	if (value === null) {
 		throw new Error('Value is null');
@@ -46,15 +56,22 @@ export function ensureNotNull<T>(value: T | null): T {
  * Ensures that value is defined and not null.
  * Throws if the value is undefined or null, returns the original value otherwise.
  *
+ * @param value The value, or undefined, or null.
+ * @private
  * @returns the passed value, if it is not undefined and not null
  */
 export function ensure(value: undefined | null): never;
 export function ensure<T>(value: T | undefined | null): T;
+/**
+ * @private
+ */
 export function ensure<T>(value: T | undefined | null): T {
 	return ensureNotNull(ensureDefined(value));
 }
 
 /**
  * Compile time check for never
+ *
+ * @param value The value to check.
  */
 export function ensureNever(value: never): void {}

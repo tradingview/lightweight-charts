@@ -21,6 +21,9 @@ import { fillWeightsForPoints } from './time-scale-point-weight-generator';
 type TimedData = Pick<SeriesDataItemTypeMap[SeriesType], 'time'>;
 type TimeConverter = (time: Time) => TimePoint;
 
+/**
+ * @private
+ */
 function businessDayConverter(time: Time): TimePoint {
 	if (!isBusinessDay(time)) {
 		throw new Error('time must be of type BusinessDay');
@@ -34,6 +37,9 @@ function businessDayConverter(time: Time): TimePoint {
 	};
 }
 
+/**
+ * @private
+ */
 function timestampConverter(time: Time): TimePoint {
 	if (!isUTCTimestamp(time)) {
 		throw new Error('time must be of type isUTCTimestamp');
@@ -43,6 +49,9 @@ function timestampConverter(time: Time): TimePoint {
 	};
 }
 
+/**
+ * @private
+ */
 function selectTimeConverter(data: TimedData[]): TimeConverter | null {
 	if (data.length === 0) {
 		return null;
@@ -53,6 +62,9 @@ function selectTimeConverter(data: TimedData[]): TimeConverter | null {
 	return timestampConverter;
 }
 
+/**
+ * @private
+ */
 export function convertTime(time: Time): TimePoint {
 	if (isUTCTimestamp(time)) {
 		return timestampConverter(time);
@@ -67,6 +79,9 @@ export function convertTime(time: Time): TimePoint {
 
 const validDateRegex = /^\d\d\d\d-\d\d-\d\d$/;
 
+/**
+ * @private
+ */
 export function stringToBusinessDay(value: string): BusinessDay {
 	if (process.env.NODE_ENV === 'development') {
 		// in some browsers (I look at your Chrome) the Date constructor may accept invalid date string
@@ -92,12 +107,18 @@ export function stringToBusinessDay(value: string): BusinessDay {
 	};
 }
 
+/**
+ * @private
+ */
 function convertStringToBusinessDay(value: TimedData): void {
 	if (isString(value.time)) {
 		value.time = stringToBusinessDay(value.time);
 	}
 }
 
+/**
+ * @private
+ */
 function convertStringsToBusinessDays(data: TimedData[]): void {
 	return data.forEach(convertStringToBusinessDay);
 }
@@ -151,6 +172,9 @@ interface InternalTimeScalePoint extends Mutable<TimeScalePoint> {
 	pointData: TimePointData;
 }
 
+/**
+ * @private
+ */
 function createEmptyTimePointData(timePoint: TimePoint): TimePointData {
 	return { index: 0 as TimePointIndex, mapping: new Map(), timePoint };
 }
@@ -349,7 +373,8 @@ export class DataLayer {
 	/**
 	 * Sets new time scale and make indexes valid for all series
 	 *
-	 * @returns An index of the first changed point
+	 * @private
+	 * @returns The index of the first changed point or `-1` if there is no change.
 	 */
 	private _replaceTimeScalePoints(newTimePoints: InternalTimeScalePoint[]): number {
 		let firstChangedPointIndex = -1;
@@ -445,6 +470,9 @@ export class DataLayer {
 	}
 }
 
+/**
+ * @private
+ */
 function assignIndexToPointData(pointData: TimePointData, index: TimePointIndex): void {
 	// first, nevertheless update index of point data ("make it valid")
 	pointData.index = index;

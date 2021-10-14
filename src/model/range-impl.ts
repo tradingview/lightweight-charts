@@ -32,6 +32,9 @@ export class RangeImpl<T extends number> {
 	}
 }
 
+/**
+ * @private
+ */
 export function areRangesEqual<T extends number>(first: RangeImpl<T> | null, second: RangeImpl<T> | null): boolean {
 	if (first === null || second === null) {
 		return first === second;

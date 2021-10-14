@@ -9,11 +9,17 @@ const enum Constants {
 	MinShapeMargin = 3,
 }
 
+/**
+ * @private
+ */
 function size(barSpacing: number, coeff: number): number {
 	const result = Math.min(Math.max(barSpacing, Constants.MinShapeSize), Constants.MaxShapeSize) * coeff;
 	return ceiledOdd(result);
 }
 
+/**
+ * @private
+ */
 export function shapeSize(shape: SeriesMarkerShape, originalSize: number): number {
 	switch (shape) {
 		case 'arrowDown':
@@ -28,10 +34,16 @@ export function shapeSize(shape: SeriesMarkerShape, originalSize: number): numbe
 	ensureNever(shape);
 }
 
+/**
+ * @private
+ */
 export function calculateShapeHeight(barSpacing: number): number {
 	return ceiledEven(size(barSpacing, 1));
 }
 
+/**
+ * @private
+ */
 export function shapeMargin(barSpacing: number): number {
 	return Math.max(size(barSpacing, 0.1), Constants.MinShapeMargin);
 }

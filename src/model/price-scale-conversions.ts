@@ -7,6 +7,9 @@ const enum Constants {
 	CoordOffset = 0.0001,
 }
 
+/**
+ * @private
+ */
 export function fromPercent(value: number, baseValue: number): number {
 	if (baseValue < 0) {
 		value = -value;
@@ -15,17 +18,26 @@ export function fromPercent(value: number, baseValue: number): number {
 	return (value / 100) * baseValue + baseValue;
 }
 
+/**
+ * @private
+ */
 export function toPercent(value: number, baseValue: number): number {
 	const result = 100 * (value - baseValue) / baseValue;
 	return (baseValue < 0 ? -result : result);
 }
 
+/**
+ * @private
+ */
 export function toPercentRange(priceRange: PriceRangeImpl, baseValue: number): PriceRangeImpl {
 	const minPercent = toPercent(priceRange.minValue(), baseValue);
 	const maxPercent = toPercent(priceRange.maxValue(), baseValue);
 	return new PriceRangeImpl(minPercent, maxPercent);
 }
 
+/**
+ * @private
+ */
 export function fromIndexedTo100(value: number, baseValue: number): number {
 	value -= 100;
 	if (baseValue < 0) {
@@ -35,17 +47,26 @@ export function fromIndexedTo100(value: number, baseValue: number): number {
 	return (value / 100) * baseValue + baseValue;
 }
 
+/**
+ * @private
+ */
 export function toIndexedTo100(value: number, baseValue: number): number {
 	const result = 100 * (value - baseValue) / baseValue + 100;
 	return (baseValue < 0 ? -result : result);
 }
 
+/**
+ * @private
+ */
 export function toIndexedTo100Range(priceRange: PriceRangeImpl, baseValue: number): PriceRangeImpl {
 	const minPercent = toIndexedTo100(priceRange.minValue(), baseValue);
 	const maxPercent = toIndexedTo100(priceRange.maxValue(), baseValue);
 	return new PriceRangeImpl(minPercent, maxPercent);
 }
 
+/**
+ * @private
+ */
 export function toLog(price: number): number {
 	const m = Math.abs(price);
 	if (m < 1e-8) {
@@ -56,6 +77,9 @@ export function toLog(price: number): number {
 	return ((price < 0) ? -res : res);
 }
 
+/**
+ * @private
+ */
 export function fromLog(logical: number): number {
 	const m = Math.abs(logical);
 	if (m < 1e-8) {
@@ -66,6 +90,9 @@ export function fromLog(logical: number): number {
 	return (logical < 0) ? -res : res;
 }
 
+/**
+ * @private
+ */
 export function convertPriceRangeToLog(priceRange: PriceRangeImpl | null): PriceRangeImpl | null {
 	if (priceRange === null) {
 		return null;
@@ -77,6 +104,9 @@ export function convertPriceRangeToLog(priceRange: PriceRangeImpl | null): Price
 	return new PriceRangeImpl(min, max);
 }
 
+/**
+ * @private
+ */
 export function canConvertPriceRangeFromLog(priceRange: PriceRangeImpl | null): boolean {
 	if (priceRange === null) {
 		return false;
@@ -88,6 +118,9 @@ export function canConvertPriceRangeFromLog(priceRange: PriceRangeImpl | null): 
 	return isFinite(min) && isFinite(max);
 }
 
+/**
+ * @private
+ */
 export function convertPriceRangeFromLog(priceRange: PriceRangeImpl | null): PriceRangeImpl | null {
 	if (priceRange === null) {
 		return null;

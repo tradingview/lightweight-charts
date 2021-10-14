@@ -4,6 +4,8 @@ import { LinePoint, LineType } from './draw-line';
 
 /**
  * BEWARE: The method must be called after beginPath and before stroke/fill/closePath/etc
+ *
+ * @private
  */
 export function walkLine(
 	ctx: CanvasRenderingContext2D,

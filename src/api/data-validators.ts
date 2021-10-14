@@ -7,6 +7,9 @@ import { SeriesType } from '../model/series-options';
 import { isFulfilledData, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
 
+/**
+ * @private
+ */
 export function checkPriceLineOptions(options: PriceLineOptions): void {
 	if (process.env.NODE_ENV === 'production') {
 		return;
@@ -16,6 +19,9 @@ export function checkPriceLineOptions(options: PriceLineOptions): void {
 	assert(typeof options.price === 'number', `the type of 'price' price line's property must be a number, got '${typeof options.price}'`);
 }
 
+/**
+ * @private
+ */
 export function checkItemsAreOrdered(data: readonly (SeriesMarker<Time> | SeriesDataItemTypeMap[SeriesType])[], allowDuplicates: boolean = false): void {
 	if (process.env.NODE_ENV === 'production') {
 		return;
@@ -34,6 +40,9 @@ export function checkItemsAreOrdered(data: readonly (SeriesMarker<Time> | Series
 	}
 }
 
+/**
+ * @private
+ */
 export function checkSeriesValuesType(type: SeriesType, data: readonly SeriesDataItemTypeMap[SeriesType][]): void {
 	if (process.env.NODE_ENV === 'production') {
 		return;
@@ -44,6 +53,9 @@ export function checkSeriesValuesType(type: SeriesType, data: readonly SeriesDat
 
 type Checker = (item: SeriesDataItemTypeMap[SeriesType]) => void;
 
+/**
+ * @private
+ */
 function getChecker(type: SeriesType): Checker {
 	switch (type) {
 		case 'Bar':
@@ -61,6 +73,9 @@ function getChecker(type: SeriesType): Checker {
 	}
 }
 
+/**
+ * @private
+ */
 function checkBarItem(type: 'Bar' | 'Candlestick', barItem: SeriesDataItemTypeMap[typeof type]): void {
 	if (!isFulfilledData(barItem)) {
 		return;
@@ -88,6 +103,9 @@ function checkBarItem(type: 'Bar' | 'Candlestick', barItem: SeriesDataItemTypeMa
 	);
 }
 
+/**
+ * @private
+ */
 function checkLineItem(type: 'Area' | 'Line' | 'Histogram', lineItem: SeriesDataItemTypeMap[typeof type]): void {
 	if (!isFulfilledData(lineItem)) {
 		return;

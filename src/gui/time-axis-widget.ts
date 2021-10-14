@@ -28,6 +28,9 @@ const enum CursorType {
 	EwResize,
 }
 
+/**
+ * @private
+ */
 function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
 	return a.weight > b.weight ? a : b;
 }

@@ -15,6 +15,11 @@ export {
 
 export { createChart } from './api/create-chart';
 
+/**
+ * Returns the current version as a string. For example `'3.3.0'`.
+ *
+ * @returns {string} The version string.
+ */
 export function version(): string {
 	return process.env.BUILD_VERSION;
 }

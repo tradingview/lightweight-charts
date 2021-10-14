@@ -38,11 +38,11 @@ export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate;
  */
 export const enum CrosshairMode {
 	/**
- 	 * Crosshair's horizontal line is anchored to the closest data point's close price.
+	 * Crosshair's horizontal line is anchored to the closest data point's close price.
 	 */
 	Normal,
 	/**
- 	 * Crosshair moves freely on the chart.
+	 * Crosshair moves freely on the chart.
 	 */
 	Magnet,
 }
@@ -67,7 +67,8 @@ export interface CrosshairLineOptions {
 	 * @default LineStyle.Dashed
 	 */
 	style: LineStyle;
-	/** Display the corosshair line.
+	/**
+	 * Display the corosshair line.
 	 *
 	 * @default true
 	 */

@@ -45,14 +45,13 @@ export interface ITimeScaleApi {
 	 * Sets visible range of data.
 	 *
 	 * @param range - target visible range of data.
-	 *
 	 * @example
-	 * ```ts
+	 * ```js
 	 * chart.timeScale().setVisibleRange({
-     * . from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
-     * . to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
+	 *     from: (new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0))).getTime() / 1000,
+	 *     to: (new Date(Date.UTC(2018, 1, 1, 0, 0, 0, 0))).getTime() / 1000,
 	 * });
- 	 * ```
+	 * ```
 	 */
 	setVisibleRange(range: TimeRange): void;
 
@@ -67,10 +66,9 @@ export interface ITimeScaleApi {
 	 * Sets visible logical range of data.
 	 *
 	 * @param range - target visible logical range of data.
-	 *
 	 * @example
-	 * ```ts
-	 * chart.timeScale().setVisibleLogicalRange({ from: 0, to: Date.now() / 1000 })
+	 * ```js
+	 * chart.timeScale().setVisibleLogicalRange({ from: 0, to: Date.now() / 1000 });
 	 * ```
 	 */
 	setVisibleLogicalRange(range: Range<number>): void;
@@ -133,15 +131,14 @@ export interface ITimeScaleApi {
 	 * The argument passed to the handler function is an object with `from` and `to` properties of type {@link Time}, or `null` if there is no visible data.
 	 *
 	 * @param handler - handler (function) to be called when the visible indexes change.
-	 *
 	 * @example
-	 * ```ts
+	 * ```js
 	 * function myVisibleTimeRangeChangeHandler(newVisibleTimeRange) {
-	 *   if (newVisibleTimeRange === null) {
-	 *     // handle null
-	 *   }
+	 *     if (newVisibleTimeRange === null) {
+	 *         // handle null
+	 *     }
 	 *
-	 *   // handle new logical range
+	 *     // handle new logical range
 	 * }
 	 *
 	 * chart.timeScale().subscribeVisibleTimeRangeChange(myVisibleTimeRangeChangeHandler);
@@ -153,9 +150,8 @@ export interface ITimeScaleApi {
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeVisibleTimeRangeChange}.
 	 *
 	 * @param handler - previously subscribed handler
-	 *
 	 * @example
-	 * ```ts
+	 * ```js
 	 * chart.timeScale().unsubscribeVisibleTimeRangeChange(myVisibleTimeRangeChangeHandler);
 	 * ```
 	 */
@@ -167,15 +163,14 @@ export interface ITimeScaleApi {
 	 * The argument passed to the handler function is an object with `from` and `to` properties of type `number`, or `null` if there is no visible data.
 	 *
 	 * @param handler - handler (function) to be called when the visible indexes change.
-	 *
 	 * @example
-	 * ```ts
+	 * ```js
 	 * function myVisibleLogicalRangeChangeHandler(newVisibleLogicalRange) {
-	 *   if (newVisibleLogicalRange === null) {
-	 *     // handle null
-	 *   }
+	 *     if (newVisibleLogicalRange === null) {
+	 *         // handle null
+	 *     }
 	 *
-	 *   // handle new logical range
+	 *     // handle new logical range
 	 * }
 	 *
 	 * chart.timeScale().subscribeVisibleLogicalRangeChange(myVisibleLogicalRangeChangeHandler);
@@ -187,9 +182,8 @@ export interface ITimeScaleApi {
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeVisibleLogicalRangeChange}.
 	 *
 	 * @param handler - previously subscribed handler
-	 *
 	 * @example
-	 * ```ts
+	 * ```js
 	 * chart.timeScale().unsubscribeVisibleLogicalRangeChange(myVisibleLogicalRangeChangeHandler);
 	 * ```
 	 */

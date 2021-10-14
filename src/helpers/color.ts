@@ -26,7 +26,7 @@ type AlphaComponent = Nominal<number, 'AlphaComponent'>;
 
 type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
 
-/** @public see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value */
+/** @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value */
 const namedColorRgbHexStrings: Record<string, string> = {
 	// The order of properties in this Record is not important for the internal logic.
 	// It's just GZIPped better when props follows this order.
@@ -178,6 +178,9 @@ const namedColorRgbHexStrings: Record<string, string> = {
 	mediumspringgreen: '#00fa9a',
 };
 
+/**
+ * @private
+ */
 function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueComponent>(component: number): T {
 	if (component < 0) {
 		return 0 as T;
@@ -189,6 +192,9 @@ function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueCom
 	return (Math.round(component) || 0) as T;
 }
 
+/**
+ * @private
+ */
 function normalizeAlphaComponent(component: AlphaComponent): AlphaComponent {
 	return (!(component <= 0) && !(component > 0) ? 0 as AlphaComponent :
 		component < 0 ? 0 as AlphaComponent :
@@ -233,6 +239,9 @@ const rgbRe = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$
  */
 const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
 
+/**
+ * @private
+ */
 function colorStringToRgba(colorString: string): Rgba {
 	colorString = colorString.toLowerCase();
 
@@ -280,6 +289,9 @@ function colorStringToRgba(colorString: string): Rgba {
 	throw new Error(`Cannot parse color: ${colorString}`);
 }
 
+/**
+ * @private
+ */
 function rgbaToGrayscale(rgbValue: Rgba): number {
 	// Originally, the NTSC RGB to YUV formula
 	// perfected by @eugene-korobko's black magic
@@ -294,6 +306,9 @@ function rgbaToGrayscale(rgbValue: Rgba): number {
 	);
 }
 
+/**
+ * @private
+ */
 export function applyAlpha(color: string, alpha: number): string {
 	// special case optimization
 	if (color === 'transparent') {
@@ -310,6 +325,9 @@ export interface ContrastColors {
 	background: string;
 }
 
+/**
+ * @private
+ */
 export function generateContrastColors(backgroundColor: string): ContrastColors {
 	const rgb = colorStringToRgba(backgroundColor);
 
@@ -319,6 +337,9 @@ export function generateContrastColors(backgroundColor: string): ContrastColors 
 	};
 }
 
+/**
+ * @private
+ */
 export function gradientColorAtPercent(topColor: string, bottomColor: string, percent: number): string {
 	const [topR, topG, topB, topA] = colorStringToRgba(topColor);
 	const [bottomR, bottomG, bottomB, bottomA] = colorStringToRgba(bottomColor);

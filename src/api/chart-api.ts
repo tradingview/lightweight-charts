@@ -47,6 +47,9 @@ import { PriceScaleApi } from './price-scale-api';
 import { migrateOptions, SeriesApi } from './series-api';
 import { TimeScaleApi } from './time-scale-api';
 
+/**
+ * @private
+ */
 function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	if (priceFormat === undefined || priceFormat.type === 'custom') {
 		return;
@@ -57,6 +60,9 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	}
 }
 
+/**
+ * @private
+ */
 function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): void {
 	if (isBoolean(options.handleScale)) {
 		const handleScale = options.handleScale;
@@ -88,6 +94,9 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 	}
 }
 
+/**
+ * @private
+ */
 function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
 	/* eslint-disable deprecation/deprecation */
 	if (options.priceScale) {
@@ -127,6 +136,9 @@ function migratePriceScaleOptions(options: DeepPartial<ChartOptions>): void {
 	/* eslint-enable deprecation/deprecation */
 }
 
+/**
+ * @private
+ */
 export function migrateLayoutOptions(options: DeepPartial<ChartOptions>): void {
 	/* eslint-disable deprecation/deprecation */
 	if (!options.layout) {
@@ -138,6 +150,9 @@ export function migrateLayoutOptions(options: DeepPartial<ChartOptions>): void {
 	/* eslint-enable deprecation/deprecation */
 }
 
+/**
+ * @private
+ */
 function toInternalOptions(options: DeepPartial<ChartOptions>): DeepPartial<ChartOptionsInternal> {
 	migrateHandleScaleScrollOptions(options);
 	migratePriceScaleOptions(options);

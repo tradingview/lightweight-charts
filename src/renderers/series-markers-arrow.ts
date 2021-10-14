@@ -5,6 +5,9 @@ import { Coordinate } from '../model/coordinate';
 import { hitTestSquare } from './series-markers-square';
 import { shapeSize } from './series-markers-utils';
 
+/**
+ * @private
+ */
 export function drawArrow(
 	up: boolean,
 	ctx: CanvasRenderingContext2D,
@@ -39,6 +42,9 @@ export function drawArrow(
 	ctx.fill();
 }
 
+/**
+ * @private
+ */
 export function hitTestArrow(
 	up: boolean,
 	centerX: Coordinate,

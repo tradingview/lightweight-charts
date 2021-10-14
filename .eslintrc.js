@@ -14,9 +14,11 @@ module.exports = {
 		'markdown',
 		'prefer-arrow',
 		'unicorn',
+		'jsdoc',
 	],
 	extends: [
 		'eslint:recommended',
+		// 'plugin:jsdoc/recommended',
 	],
 	parserOptions: {
 		ecmaVersion: 2019,
@@ -344,6 +346,32 @@ module.exports = {
 								'member-variable-declaration',
 							],
 						},
+					},
+				],
+			},
+		},
+		{
+			files: ['src/**/*.ts'],
+			excludedFiles: ['tests/'],
+			// parser: '@typescript-eslint/parser',
+			extends: [
+				'plugin:jsdoc/recommended',
+			],
+			settings: {
+				jsdoc: {
+					ignorePrivate: true,
+					ignoreInternal: true,
+				},
+			},
+			rules: {
+				// Because we writing TypeScript & using TypeDoc we don't need duplicate types in JSDoc comments.
+				'jsdoc/require-param-type': 0,
+				'jsdoc/require-returns-type': 0,
+				// Lint embedded example code as JavaScript.
+				'jsdoc/check-examples': [
+					'error',
+					{
+						exampleCodeRegex: '/```js\\s+(.*)\\s+```/su',
 					},
 				],
 			},

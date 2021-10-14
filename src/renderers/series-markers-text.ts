@@ -1,5 +1,8 @@
 import { Coordinate } from '../model/coordinate';
 
+/**
+ * @private
+ */
 export function drawText(
 	ctx: CanvasRenderingContext2D,
 	text: string,
@@ -9,6 +12,9 @@ export function drawText(
 	ctx.fillText(text, x, y);
 }
 
+/**
+ * @private
+ */
 export function hitTestText(
 	textX: number,
 	textY: number,

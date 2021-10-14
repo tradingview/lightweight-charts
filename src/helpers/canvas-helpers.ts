@@ -35,6 +35,9 @@ export function fillRectInnerBorder(ctx: CanvasRenderingContext2D, x: number, y:
 	ctx.fillRect(x + width - borderWidth, y, borderWidth, height);
 }
 
+/**
+ * @private
+ */
 export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
 	ctx.save();
 	ctx.scale(ratio, ratio);
@@ -42,6 +45,9 @@ export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: (
 	ctx.restore();
 }
 
+/**
+ * @private
+ */
 export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
 	ctx.save();
 	ctx.globalCompositeOperation = 'copy';
@@ -50,6 +56,9 @@ export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w
 	ctx.restore();
 }
 
+/**
+ * @private
+ */
 // eslint-disable-next-line max-params
 export function clearRectWithGradient(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, topColor: string, bottomColor: string): void {
 	ctx.save();

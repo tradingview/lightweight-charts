@@ -534,20 +534,32 @@ export class MouseEventHandler implements IDestroyable {
 	}
 }
 
+/**
+ * @private
+ */
 function getBoundingClientRect(element: HTMLElement): DOMRect {
 	return element.getBoundingClientRect() || { left: 0, top: 0 };
 }
 
+/**
+ * @private
+ */
 function getDistance(p1: Touch, p2: Touch): number {
 	const xDiff = p1.clientX - p2.clientX;
 	const yDiff = p1.clientY - p2.clientY;
 	return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 }
 
+/**
+ * @private
+ */
 function isTouchEvent(event: MouseEvent | TouchEvent): event is TouchEvent {
 	return Boolean((event as TouchEvent).touches);
 }
 
+/**
+ * @private
+ */
 function preventDefault(event: Event): void {
 	if (event.cancelable) {
 		event.preventDefault();

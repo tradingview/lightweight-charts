@@ -28,6 +28,9 @@ import { BarsInfo, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
+/**
+ * @private
+ */
 export function migrateOptions<TSeriesType extends SeriesType>(options: SeriesPartialOptionsMap[TSeriesType]): SeriesPartialOptionsInternal<TSeriesType> {
 	// eslint-disable-next-line deprecation/deprecation
 	const { overlay, ...res } = options;

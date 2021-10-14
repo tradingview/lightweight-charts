@@ -1,13 +1,22 @@
 import { TimeScalePoint, UTCTimestamp } from '../model/time-data';
 
+/**
+ * @private
+ */
 function hours(count: number): number {
 	return count * 60 * 60 * 1000;
 }
 
+/**
+ * @private
+ */
 function minutes(count: number): number {
 	return count * 60 * 1000;
 }
 
+/**
+ * @private
+ */
 function seconds(count: number): number {
 	return count * 1000;
 }
@@ -30,6 +39,9 @@ const intradayWeightDivisors: WeightDivisor[] = [
 	{ divisor: hours(12), weight: 33 },
 ];
 
+/**
+ * @private
+ */
 function weightByTime(currentDate: Date, prevDate: Date | null): number {
 	if (prevDate !== null) {
 		if (currentDate.getUTCFullYear() !== prevDate.getUTCFullYear()) {
@@ -50,6 +62,9 @@ function weightByTime(currentDate: Date, prevDate: Date | null): number {
 	return 20;
 }
 
+/**
+ * @private
+ */
 export function fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint>[], startIndex: number = 0): void {
 	let prevTime: UTCTimestamp | null = (startIndex === 0 || sortedTimePoints.length === 0)
 		? null

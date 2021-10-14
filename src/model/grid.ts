@@ -12,12 +12,14 @@ export interface GridLineOptions {
 	 * @default '#d6dcde'
 	 */
 	color: string;
-	/** Line style.
+	/**
+	 * Line style.
 	 *
 	 * @default LineStyle.Solid
 	 */
 	style: LineStyle;
-	/** Display the lines.
+	/**
+	 * Display the lines.
 	 *
 	 * @default true
 	 */

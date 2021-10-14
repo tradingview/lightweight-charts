@@ -112,18 +112,17 @@ export interface IChartApi {
 	 * Subscribe to the chart click event.
 	 *
 	 * @param handler - handler to be called on mouse click.
-	 *
 	 * @example
-	 * ```ts
-	 * function myClickHandler(param: MouseEventParams) {
-	 *   if (!param.point) {
-	 *     return;
-	 *   }
+	 * ```js
+	 * function myClickHandler(param) {
+	 *     if (!param.point) {
+	 *         return;
+	 *     }
 	 *
-	 *   console.log(`Click at ${param.point.x}, ${param.point.y}. The time is ${param.time}.`)
+	 *     console.log(`Click at ${param.point.x}, ${param.point.y}. The time is ${param.time}.`);
 	 * }
 	 *
-	 * chart.subscribeClick(myClickHandler)
+	 * chart.subscribeClick(myClickHandler);
 	 * ```
 	 */
 	subscribeClick(handler: MouseEventHandler): void;
@@ -132,9 +131,8 @@ export interface IChartApi {
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeClick}.
 	 *
 	 * @param handler - previously subscribed handler
-	 *
 	 * @example
-	 * ```ts
+	 * ```js
 	 * chart.unsubscribeClick(myClickHandler);
 	 * ```
 	 */
@@ -144,18 +142,17 @@ export interface IChartApi {
 	 * Subscribe to the crosshair move event.
 	 *
 	 * @param handler - handler to be called on crosshair move.
-	 *
 	 * @example
-	 * ```ts
-	 * function myCrosshairMoveHandler(param: MouseEventParams) {
-	 *   if (!param.point) {
-	 *     return;
-	 *   }
+	 * ```js
+	 * function myCrosshairMoveHandler(param) {
+	 *     if (!param.point) {
+	 *         return;
+	 *     }
 	 *
-	 *   console.log(`Crosshair moved to ${param.point.x}, ${param.point.y}. The time is ${param.time}.`)
+	 *     console.log(`Crosshair moved to ${param.point.x}, ${param.point.y}. The time is ${param.time}.`);
 	 * }
 	 *
-	 * chart.subscribeClick(myCrosshairMoveHandler)
+	 * chart.subscribeClick(myCrosshairMoveHandler);
 	 * ```
 	 */
 	subscribeCrosshairMove(handler: MouseEventHandler): void;
@@ -164,9 +161,8 @@ export interface IChartApi {
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeCrosshairMove}.
 	 *
 	 * @param handler - previously subscribed handler
-	 *
 	 * @example
-	 * ```ts
+	 * ```js
 	 * chart.unsubscribeCrosshairMove(myCrosshairMoveHandler);
 	 * ```
 	 */

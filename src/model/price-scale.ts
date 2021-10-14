@@ -88,7 +88,8 @@ export interface PriceScaleOptions {
 	autoScale: boolean;
 	/** Price scale mode. */
 	mode: PriceScaleMode;
-	/** Invert the price scale, so that a upwards trend is shown as a downwards trend and vice versa.
+	/**
+	 * Invert the price scale, so that a upwards trend is shown as a downwards trend and vice versa.
 	 * Affects both the price scale and the data on the chart.
 	 */
 	invertScale: boolean;
@@ -758,9 +759,7 @@ export class PriceScale {
 		this._cachedOrderedSources = null;
 	}
 
-	/**
-	 * Returns the source which will be used as "formatter source" (take minMove for formatter)
-	 */
+	// Returns the source which will be used as "formatter source" (take minMove for formatter)
 	private _formatterSource(): IPriceDataSource | null {
 		return this._dataSources[0] || null;
 	}

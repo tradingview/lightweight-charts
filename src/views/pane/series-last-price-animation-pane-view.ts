@@ -88,15 +88,24 @@ interface AnimationData {
 	strokeColor: string;
 }
 
+/**
+ * @private
+ */
 function color(seriesLineColor: string, stage: number, startAlpha: number, endAlpha: number): string {
 	const alpha = startAlpha + (endAlpha - startAlpha) * stage;
 	return applyAlpha(seriesLineColor, alpha);
 }
 
+/**
+ * @private
+ */
 function radius(stage: number, startRadius: number, endRadius: number): number {
 	return startRadius + (endRadius - startRadius) * stage;
 }
 
+/**
+ * @private
+ */
 function animationData(durationSinceStart: number, lineColor: string): AnimationData {
 	const globalStage = (durationSinceStart % Constants.AnimationPeriod) / Constants.AnimationPeriod;
 

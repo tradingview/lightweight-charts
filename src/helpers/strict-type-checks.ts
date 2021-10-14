@@ -6,6 +6,9 @@ export type DeepPartial<T> = {
 			: DeepPartial<T[P]>
 };
 
+/**
+ * @private
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function merge(dst: Record<string, any>, ...sources: Record<string, any>[]): Record<string, any> {
 	for (const src of sources) {
@@ -26,22 +29,37 @@ export function merge(dst: Record<string, any>, ...sources: Record<string, any>[
 	return dst;
 }
 
+/**
+ * @private
+ */
 export function isNumber(value: unknown): value is number {
 	return (typeof value === 'number') && (isFinite(value));
 }
 
+/**
+ * @private
+ */
 export function isInteger(value: unknown): boolean {
 	return (typeof value === 'number') && ((value % 1) === 0);
 }
 
+/**
+ * @private
+ */
 export function isString(value: unknown): value is string {
 	return typeof value === 'string';
 }
 
+/**
+ * @private
+ */
 export function isBoolean(value: unknown): value is boolean {
 	return typeof value === 'boolean';
 }
 
+/**
+ * @private
+ */
 export function clone<T>(object: T): T {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const o = object as any;
@@ -81,10 +99,16 @@ export function clone<T>(object: T): T {
 	return c;
 }
 
+/**
+ * @private
+ */
 export function notNull<T>(t: T | null): t is T {
 	return t !== null;
 }
 
+/**
+ * @private
+ */
 export function undefinedIfNull<T>(t: T | null): T | undefined {
 	return (t === null) ? undefined : t;
 }

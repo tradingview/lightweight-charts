@@ -12,6 +12,9 @@ import { MarksRendererData, PaneRendererMarks } from '../../renderers/marks-rend
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
+/**
+ * @private
+ */
 function createEmptyMarkerData(): MarksRendererData {
 	return {
 		items: [{
