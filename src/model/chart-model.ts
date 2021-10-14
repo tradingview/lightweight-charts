@@ -150,7 +150,7 @@ export interface ChartOptions {
 	 * Price scale options.
 	 *
 	 * @deprecated
-	 * @internal
+	 * @private
 	 */
 	priceScale: PriceScaleOptions;
 

@@ -11,7 +11,7 @@ import { IChartApi } from './ichart-api';
  *
  * @param container - id of HTML element or element itself
  * @param options - any subset of ChartOptions to be applied at start.
- * @returns {IChartApi} an interface to the created chart
+ * @returns An interface to the created chart
  */
 export function createChart(container: string | HTMLElement, options?: DeepPartial<ChartOptions>): IChartApi {
 	let htmlElement: HTMLElement;

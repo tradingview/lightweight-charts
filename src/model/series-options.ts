@@ -315,7 +315,7 @@ export interface SeriesOptionsCommon {
 	priceScaleId?: string;
 
 	/**
-	 * @internal
+	 * @private
 	 */
 	seriesLastValueMode?: PriceAxisLastValueMode;
 	/** Show the series. */
@@ -362,7 +362,7 @@ export interface SeriesOptionsCommon {
 	autoscaleInfoProvider?: AutoscaleInfoProvider;
 	/**
 	 * @deprecated Use priceScaleId instead.
-	 * @internal
+	 * @private
 	 */
 	overlay?: boolean;
 	/** @deprecated Use priceScale method of the series to apply options instead. */
