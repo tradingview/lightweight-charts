@@ -56,7 +56,7 @@ export interface TimeMark {
 }
 
 /**
- * The `TickMarkType` enum is used to specify the type of a tick mark on the time axis.
+ * This enum is used to specify the type of a tick mark on the time axis.
  */
 export const enum TickMarkType {
 	/**

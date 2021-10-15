@@ -3,7 +3,7 @@ import { Coordinate } from '../model/coordinate';
 export type LineWidth = 1 | 2 | 3 | 4;
 
 /**
- * The `LineType` enum is used to specify the type of the line for series such as area or line.
+ * This enum is used to specify the type of the line for series such as area or line.
  */
 export const enum LineType {
 	Simple,

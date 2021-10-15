@@ -32,7 +32,7 @@ import { sortSources } from './sort-sources';
 import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
 
 /**
- * The `PriceScaleMode` enum is used to specify the price scale mode.
+ * This enum is used to specify the price scale mode.
  */
 export const enum PriceScaleMode {
 	/**

@@ -1,5 +1,5 @@
 /**
- * The `ColorType` enum is used to specify a type of color.
+ * This enum is used to specify a type of color.
  */
 export const enum ColorType {
 	/** Solid color */
