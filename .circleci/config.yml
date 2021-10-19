@@ -121,6 +121,9 @@ jobs:
     executor: node-latest-executor
     steps:
       - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: npm run bundle-dts
       - run: npm run lint:dts
 
   markdown:
