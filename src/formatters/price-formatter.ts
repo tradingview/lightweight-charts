@@ -9,7 +9,6 @@ const formatterOptions = {
 
 /**
  * @param length The length. Must be between 0 and 16 inclusive.
- * @private
  */
 export function numberToStringWithLeadingZero(value: number, length: number): string {
 	if (!isNumber(value)) {

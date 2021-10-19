@@ -1,0 +1,4 @@
+{
+	"extends": "./tsconfig.options.json",
+	"files": ["./dist/typings.d.ts"]
+}

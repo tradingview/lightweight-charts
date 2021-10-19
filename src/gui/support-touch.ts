@@ -1,8 +1,5 @@
 import { isRunningOnClientSide } from '../helpers/is-running-on-client-side';
 
-/**
- * @private
- */
 function checkTouchEvents(): boolean {
 	if (!isRunningOnClientSide) {
 		return false;
@@ -17,9 +14,6 @@ function checkTouchEvents(): boolean {
 	return Boolean((window as any).DocumentTouch && document instanceof (window as any).DocumentTouch);
 }
 
-/**
- * @private
- */
 function getMobileTouch(): boolean {
 	if (!isRunningOnClientSide) {
 		return false;
@@ -34,9 +28,6 @@ function getMobileTouch(): boolean {
 
 export const mobileTouch = getMobileTouch();
 
-/**
- * @private
- */
 function getIsMobile(): boolean {
 	if (!isRunningOnClientSide) {
 		return false;

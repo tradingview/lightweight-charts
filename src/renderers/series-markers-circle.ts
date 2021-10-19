@@ -2,9 +2,6 @@ import { Coordinate } from '../model/coordinate';
 
 import { shapeSize } from './series-markers-utils';
 
-/**
- * @private
- */
 export function drawCircle(
 	ctx: CanvasRenderingContext2D,
 	centerX: Coordinate,
@@ -20,9 +17,6 @@ export function drawCircle(
 	ctx.fill();
 }
 
-/**
- * @private
- */
 export function hitTestCircle(
 	centerX: Coordinate,
 	centerY: Coordinate,

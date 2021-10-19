@@ -642,9 +642,6 @@ export class ChartWidget implements IDestroyable {
 	}
 }
 
-/**
- * @private
- */
 function disableSelection(element: HTMLElement): void {
 	element.style.userSelect = 'none';
 	// eslint-disable-next-line deprecation/deprecation

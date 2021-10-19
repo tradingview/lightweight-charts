@@ -76,16 +76,10 @@ export interface BarData {
 	close: number;
 }
 
-/**
- * @private
- */
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
 
-/**
- * @private
- */
 export function isFulfilledData(data: SeriesDataItemTypeMap[SeriesType]): data is (BarData | LineData | HistogramData) {
 	return (data as Partial<BarData>).open !== undefined || (data as Partial<LineData>).value !== undefined;
 }

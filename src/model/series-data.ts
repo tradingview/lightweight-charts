@@ -17,9 +17,6 @@ export interface SeriesPlotRowTypeAtTypeMap {
 export type SeriesPlotRow<T extends SeriesType = SeriesType> = SeriesPlotRowTypeAtTypeMap[T];
 export type SeriesPlotList<T extends SeriesType = SeriesType> = PlotList<SeriesPlotRow<T>>;
 
-/**
- * @private
- */
 export function createSeriesPlotList<T extends SeriesType = SeriesType>(): SeriesPlotList<T> {
 	return new PlotList<SeriesPlotRow<T>>();
 }

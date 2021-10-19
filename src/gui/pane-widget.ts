@@ -37,34 +37,22 @@ const enum Constants {
 
 type DrawFunction = (renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown) => void;
 
-/**
- * @private
- */
 function drawBackground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 	if (renderer.drawBackground) {
 		renderer.drawBackground(ctx, pixelRatio, isHovered, hitTestData);
 	}
 }
 
-/**
- * @private
- */
 function drawForeground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
 	renderer.draw(ctx, pixelRatio, isHovered, hitTestData);
 }
 
 type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
 
-/**
- * @private
- */
 function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
 	return source.paneViews(pane);
 }
 
-/**
- * @private
- */
 function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
 	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
 }

@@ -92,9 +92,6 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 	}
 }
 
-/**
- * @private
- */
 function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
 	ctx.fillStyle = item.color;
 
@@ -105,9 +102,6 @@ function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContex
 	drawShape(item, ctx);
 }
 
-/**
- * @private
- */
 function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
 	if (item.size === 0) {
 		return;
@@ -131,9 +125,6 @@ function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingConte
 	ensureNever(item.shape);
 }
 
-/**
- * @private
- */
 function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coordinate): boolean {
 	if (item.text !== undefined && hitTestText(item.x, item.text.y, item.text.width, item.text.height, x, y)) {
 		return true;
@@ -142,9 +133,6 @@ function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coord
 	return hitTestShape(item, x, y);
 }
 
-/**
- * @private
- */
 function hitTestShape(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coordinate): boolean {
 	if (item.size === 0) {
 		return false;

@@ -2,9 +2,6 @@ import { Coordinate } from '../model/coordinate';
 
 import { shapeSize } from './series-markers-utils';
 
-/**
- * @private
- */
 export function drawSquare(
 	ctx: CanvasRenderingContext2D,
 	centerX: Coordinate,
@@ -19,9 +16,6 @@ export function drawSquare(
 	ctx.fillRect(left, top, squareSize, squareSize);
 }
 
-/**
- * @private
- */
 export function hitTestSquare(
 	centerX: Coordinate,
 	centerY: Coordinate,

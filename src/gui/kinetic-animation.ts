@@ -12,24 +12,15 @@ const enum Constants {
 	EpsilonDistance = 1, // distance to the end position where we stop animation
 }
 
-/**
- * @private
- */
 function distanceBetweenPoints(pos1: TimeAndPosition, pos2: TimeAndPosition): number {
 	return pos1.position - pos2.position;
 }
 
-/**
- * @private
- */
 function speedPxPerMSec(pos1: TimeAndPosition, pos2: TimeAndPosition, maxSpeed: number): number {
 	const speed = (pos1.position - pos2.position) / (pos1.time - pos2.time);
 	return Math.sign(speed) * Math.min(Math.abs(speed), maxSpeed);
 }
 
-/**
- * @private
- */
 function durationMSec(speed: number, dumpingCoeff: number): number {
 	const lnDumpingCoeff = Math.log(dumpingCoeff);
 	return Math.log((Constants.EpsilonDistance * lnDumpingCoeff) / -speed) / (lnDumpingCoeff);

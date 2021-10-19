@@ -1,13 +1,7 @@
-/**
- * @private
- */
 export function optimalBarWidth(barSpacing: number, pixelRatio: number): number {
 	return Math.floor(barSpacing * 0.3 * pixelRatio);
 }
 
-/**
- * @private
- */
 export function optimalCandlestickWidth(barSpacing: number, pixelRatio: number): number {
 	const barSpacingSpecialCaseFrom = 2.5;
 	const barSpacingSpecialCaseTo = 4;

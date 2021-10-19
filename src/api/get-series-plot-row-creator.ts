@@ -5,9 +5,6 @@ import { TimePoint, TimePointIndex } from '../model/time-data';
 
 import { BarData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 
-/**
- * @private
- */
 function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;
 
@@ -22,18 +19,12 @@ function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item:
 	return res;
 }
 
-/**
- * @private
- */
 function getOHLCBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BarData): Mutable<SeriesPlotRow> {
 	return { index, time, value: [item.open, item.high, item.low, item.close] };
 }
 
 export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
 
-/**
- * @private
- */
 export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is SeriesPlotRow {
 	return (row as Partial<SeriesPlotRow>).value !== undefined;
 }
@@ -48,9 +39,6 @@ type SeriesItemValueFnMap = {
 
 export type TimedSeriesItemValueFn = (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[SeriesType]) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
 
-/**
- * @private
- */
 function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getOHLCBasedSeriesPlotRow)): TimedSeriesItemValueFn {
 	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType]) => {
 		if (isWhitespaceData(bar)) {
@@ -69,9 +57,6 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Line: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 };
 
-/**
- * @private
- */
 export function getSeriesPlotRowCreator(seriesType: SeriesType): TimedSeriesItemValueFn {
 	return seriesPlotRowFnMap[seriesType] as TimedSeriesItemValueFn;
 }

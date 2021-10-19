@@ -12,9 +12,6 @@ export interface PaneInvalidation {
 	autoScale?: boolean;
 }
 
-/**
- * @private
- */
 function mergePaneInvalidation(beforeValue: PaneInvalidation | undefined, newValue: PaneInvalidation): PaneInvalidation {
 	if (beforeValue === undefined) {
 		return newValue;

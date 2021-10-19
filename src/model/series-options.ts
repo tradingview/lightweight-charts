@@ -50,9 +50,6 @@ export interface CandlestickStyleOptions {
 	wickDownColor: string;
 }
 
-/**
- * @private
- */
 export function fillUpDownCandlesticksColors(options: Partial<CandlestickStyleOptions>): void {
 	if (options.borderColor !== undefined) {
 		options.borderUpColor = options.borderColor;
@@ -249,9 +246,6 @@ export interface PriceFormatCustom {
 
 export type PriceFormat = PriceFormatBuiltIn | PriceFormatCustom;
 
-/**
- * @private
- */
 export function precisionByMinMove(minMove: number): number {
 	if (minMove >= 1) {
 		return 0;

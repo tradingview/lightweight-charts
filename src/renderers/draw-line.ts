@@ -23,9 +23,6 @@ export const enum LineStyle {
 	SparseDotted = 4,
 }
 
-/**
- * @private
- */
 export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): void {
 	const dashPatterns = {
 		[LineStyle.Solid]: [],
@@ -39,9 +36,6 @@ export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): v
 	ctx.setLineDash(dashPattern);
 }
 
-/**
- * @private
- */
 export function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: number, right: number): void {
 	ctx.beginPath();
 	const correction = (ctx.lineWidth % 2) ? 0.5 : 0;
@@ -50,9 +44,6 @@ export function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, lef
 	ctx.stroke();
 }
 
-/**
- * @private
- */
 export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number, bottom: number): void {
 	ctx.beginPath();
 	const correction = (ctx.lineWidth % 2) ? 0.5 : 0;
@@ -61,9 +52,6 @@ export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: 
 	ctx.stroke();
 }
 
-/**
- * @private
- */
 export function strokeInPixel(ctx: CanvasRenderingContext2D, drawFunction: () => void): void {
 	ctx.save();
 	if (ctx.lineWidth % 2) {

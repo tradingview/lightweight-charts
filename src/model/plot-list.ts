@@ -252,9 +252,6 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 	}
 }
 
-/**
- * @private
- */
 function mergeMinMax(first: MinMax | null, second: MinMax | null): MinMax | null {
 	if (first === null) {
 		return second;

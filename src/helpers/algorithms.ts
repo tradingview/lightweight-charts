@@ -6,9 +6,6 @@
 
 export type LowerBoundComparatorType<TArrayElementType, TValueType> = (a: TArrayElementType, b: TValueType) => boolean;
 
-/**
- * @private
- */
 export function lowerbound<TArrayElementType, TValueType>(
 	arr: readonly TArrayElementType[],
 	value: TValueType,
@@ -38,9 +35,6 @@ export function lowerbound<TArrayElementType, TValueType>(
 
 export type UpperBoundComparatorType<TValueType, TArrayElementType> = (a: TValueType, b: TArrayElementType) => boolean;
 
-/**
- * @private
- */
 export function upperbound<TArrayElementType, TValueType>(
 	arr: readonly TArrayElementType[],
 	value: TValueType,

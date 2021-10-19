@@ -13,9 +13,6 @@ const MM = (date: Date) => numToStr(getMonth(date), 2);
 const yy = (date: Date) => numToStr(getYear(date) % 100, 2);
 const yyyy = (date: Date) => numToStr(getYear(date), 4);
 
-/**
- * @private
- */
 export function formatDate(date: Date, format: string, locale: string): string {
 	return format
 		.replace(/yyyy/g, yyyy(date))

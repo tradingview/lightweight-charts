@@ -32,9 +32,6 @@ interface Offsets {
 	belowBar: number;
 }
 
-/**
- * @private
- */
 // eslint-disable-next-line max-params
 function fillSizeAndY(
 	rendererItem: SeriesMarkerRendererDataItem,

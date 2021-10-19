@@ -74,23 +74,14 @@ export interface TimedValue {
 
 export type SeriesItemsIndexesRange = Range<number>;
 
-/**
- * @private
- */
 function lowerBoundItemsCompare(item: TimedValue, time: TimePointIndex): boolean {
 	return item.time < time;
 }
 
-/**
- * @private
- */
 function upperBoundItemsCompare(time: TimePointIndex, item: TimedValue): boolean {
 	return time < item.time;
 }
 
-/**
- * @private
- */
 export function visibleTimedValues(items: TimedValue[], range: RangeImpl<TimePointIndex>, extendedRange: boolean): SeriesItemsIndexesRange {
 	const firstBar = range.left();
 	const lastBar = range.right();

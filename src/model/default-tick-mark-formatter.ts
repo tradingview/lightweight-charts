@@ -3,9 +3,6 @@ import { ensureNever } from '../helpers/assertions';
 import { TimePoint } from './time-data';
 import { TickMarkType } from './time-scale';
 
-/**
- * @private
- */
 export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: TickMarkType, locale: string): string {
 	const formatOptions: Intl.DateTimeFormatOptions = {};
 

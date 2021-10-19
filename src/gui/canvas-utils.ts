@@ -16,9 +16,6 @@ export class Size {
 	}
 }
 
-/**
- * @private
- */
 export function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 	return canvas.ownerDocument &&
 		canvas.ownerDocument.defaultView &&
@@ -26,9 +23,6 @@ export function getCanvasDevicePixelRatio(canvas: HTMLCanvasElement): number {
 		|| 1;
 }
 
-/**
- * @private
- */
 export function getContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 	const ctx = ensureNotNull(canvas.getContext('2d'));
 	// sometimes (very often) ctx getContext returns the same context every time
@@ -39,9 +33,6 @@ export function getContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2
 	return ctx;
 }
 
-/**
- * @private
- */
 export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvasElement {
 	const canvas = doc.createElement('canvas');
 
@@ -55,9 +46,6 @@ export function createPreconfiguredCanvas(doc: Document, size: Size): HTMLCanvas
 	return canvas;
 }
 
-/**
- * @private
- */
 export function createBoundCanvas(parentElement: HTMLElement, size: Size): CanvasCoordinateSpaceBinding {
 	const doc = ensureNotNull(parentElement.ownerDocument);
 	const canvas = doc.createElement('canvas');
@@ -71,9 +59,6 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 	return binding;
 }
 
-/**
- * @private
- */
 export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
 	ctx.save();
 	ctx.scale(ratio, ratio);

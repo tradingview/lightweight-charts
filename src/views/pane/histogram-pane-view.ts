@@ -14,9 +14,6 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-/**
- * @private
- */
 function createEmptyHistogramData(barSpacing: number): PaneRendererHistogramData {
 	return {
 		items: [],
@@ -26,9 +23,6 @@ function createEmptyHistogramData(barSpacing: number): PaneRendererHistogramData
 	};
 }
 
-/**
- * @private
- */
 function createRawItem(time: TimePointIndex, price: BarPrice, color: string): HistogramItem {
 	return {
 		time: time,
