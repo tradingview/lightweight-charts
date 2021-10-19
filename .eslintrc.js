@@ -358,11 +358,11 @@ module.exports = {
 				project: 'tsconfig.dts.json',
 			},
 			rules: {
-				'jsdoc/require-jsdoc': 1,
-				'jsdoc/require-param': 1,
+				'jsdoc/require-jsdoc': 'error',
+				'jsdoc/require-param': 'error',
 				// d.ts files are mostly read by computers (to generate docs, provide intellisense, etc.)
 				// so consistent quote characaters aren't important.
-				'@typescript-eslint/quotes': 0,
+				'@typescript-eslint/quotes': 'off',
 			},
 		},
 		{
@@ -373,13 +373,13 @@ module.exports = {
 			],
 			rules: {
 				// We are writing TypeScript and using TypeDoc so we don't need duplicate types in JSDoc comments.
-				'jsdoc/require-param-type': 0,
-				'jsdoc/require-returns-type': 0,
+				'jsdoc/require-param-type': 'off',
+				'jsdoc/require-returns-type': 'off',
 				// We check that the public API is all documented when we lint dist/typings.d.ts so we don't need
 				// to require all source code is covered by JSDoc.
-				'jsdoc/require-jsdoc': 0,
-				'jsdoc/require-param': 0,
-				'jsdoc/require-returns': 0,
+				'jsdoc/require-jsdoc': 'off',
+				'jsdoc/require-param': 'off',
+				'jsdoc/require-returns': 'off',
 				// Lint embedded example code as JavaScript.
 				'jsdoc/check-examples': [
 					'error',
