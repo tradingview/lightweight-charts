@@ -237,10 +237,6 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-      - lint-dts:
-          filters: *default-filters
-          requires:
-            - install-deps
       - markdown:
           filters: *default-filters
           requires:
@@ -279,6 +275,10 @@ workflows:
           requires:
             - build
       - coverage:
+          filters: *default-filters
+          requires:
+            - build
+      - lint-dts:
           filters: *default-filters
           requires:
             - build
