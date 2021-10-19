@@ -751,7 +751,9 @@ export class PriceScale {
 		this._cachedOrderedSources = null;
 	}
 
-	// Returns the source which will be used as "formatter source" (take minMove for formatter)
+	/**
+	 * @returns The {@link IPriceDataSource} that will be used as the "formatter source" (take minMove for formatter).
+	 */
 	private _formatterSource(): IPriceDataSource | null {
 		return this._dataSources[0] || null;
 	}
