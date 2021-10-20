@@ -28,6 +28,9 @@ import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
 import { Watermark, WatermarkOptions } from './watermark';
 
+/**
+ * Represents options for how the chart is scrolled by the mouse and touch gestures.
+ */
 export interface HandleScrollOptions {
 	/**
 	 * Enable scrolling with the mouse wheel.
@@ -51,6 +54,9 @@ export interface HandleScrollOptions {
 	vertTouchDrag: boolean;
 }
 
+/**
+ * Represents options for how the chart is scaled by the mouse and touch gestures.
+ */
 export interface HandleScaleOptions {
 	/**
 	 * Enable scaling with the mouse wheel.
@@ -70,6 +76,9 @@ export interface HandleScaleOptions {
 	axisDoubleClickReset: boolean;
 }
 
+/**
+ * Represents options for enabling or disabling kinetic scrolling with mouse and touch gestures.
+ */
 export interface KineticScrollOptions {
 	/**
 	 * Enable kinetic scroll with touch gestures.
@@ -88,6 +97,9 @@ type HandleScaleOptionsInternal =
 		axisPressedMouseMove: AxisPressedMouseMoveOptions;
 	};
 
+/**
+ * Represents options for how the time and price axes react to mouse movements.
+ */
 export interface AxisPressedMouseMoveOptions {
 	/**
 	 * Enable scaling the time axis by holding down the left mouse button and moving the mouse.
@@ -121,8 +133,18 @@ const enum BackgroundColorSide {
 
 type InvalidateHandler = (mask: InvalidateMask) => void;
 
+/**
+ * Represents a visible price scale's options.
+ *
+ * @see {@link PriceScaleOptions}
+ */
 export type VisiblePriceScaleOptions = PriceScaleOptions;
+
+/**
+ * Represents overlay price scale options.
+ */
 export type OverlayPriceScaleOptions = Omit<PriceScaleOptions, 'visible' | 'autoScale'>;
+
 /**
  * Structure describing options of the chart. Series options are to be set separately
  */

@@ -1,8 +1,14 @@
 import { PriceFormatterFn } from './price-formatter-fn';
 import { BusinessDay, UTCTimestamp } from './time-data';
 
+/**
+ * A custom function used to override formatting of a time to a string.
+ */
 export type TimeFormatterFn = (time: BusinessDay | UTCTimestamp) => string;
 
+/**
+ * Represents options for formattings dates, times, and prices according to a locale.
+ */
 export interface LocalizationOptions {
 	/**
 	 * Current locale used to format dates. Uses the browser's language settings by default.

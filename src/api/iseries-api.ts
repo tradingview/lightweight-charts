@@ -15,15 +15,27 @@ import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 
+/**
+ * Represents a range of bars and the number of bars outside the range.
+ */
 // actually range might be either exist or not
 // but to avoid hard-readable type let's say every part of range is optional
 export type BarsInfo =
 	Partial<Range<Time>>
 	& {
+		/**
+		 * The number of bars before the start of the range.
+		 */
 		barsBefore: number;
+		/**
+		 * The number of bars after the end of the range.
+		 */
 		barsAfter: number;
 	};
 
+/**
+ * Represents the interface for interacting with series.
+ */
 export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Returns current price formatter

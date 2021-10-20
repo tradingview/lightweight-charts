@@ -6,7 +6,9 @@ import { AutoScaleMargins } from './autoscale-info-impl';
 import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
 
-/** Candlestick style options. */
+/**
+ * Represents style options for a candlestick series.
+ */
 export interface CandlestickStyleOptions {
 	/**
 	 * Color of rising candles.
@@ -62,7 +64,7 @@ export function fillUpDownCandlesticksColors(options: Partial<CandlestickStyleOp
 }
 
 /**
- * This enum is used to specify the type of the last price animation for series such as area or line.
+ * Represents the type of the last price animation for series such as area or line.
  */
 export const enum LastPriceAnimationMode {
 	/**
@@ -83,6 +85,9 @@ export const enum LastPriceAnimationMode {
 /** @deprecated it doesn't really matter what we write here, because it doesn't work properly, but just to mark the thing we have to delete in the next major update */
 export { LastPriceAnimationMode as LasPriceAnimationMode };
 
+/**
+ * Represents style options for a bar series.
+ */
 export interface BarStyleOptions {
 	/**
 	 * Color of rising bars.
@@ -102,6 +107,9 @@ export interface BarStyleOptions {
 	thinBars: boolean;
 }
 
+/**
+ * Represents style options for a line series.
+ */
 export interface LineStyleOptions {
 	/**
 	 * Line color.
@@ -143,6 +151,9 @@ export interface LineStyleOptions {
 	lastPriceAnimation: LastPriceAnimationMode;
 }
 
+/**
+ * Represents style options for an area series.
+ */
 export interface AreaStyleOptions {
 	/**
 	 * Color of the top part of the area.
@@ -192,6 +203,9 @@ export interface AreaStyleOptions {
 	lastPriceAnimation: LastPriceAnimationMode;
 }
 
+/**
+ * Represents style options for a histogram series.
+ */
 export interface HistogramStyleOptions {
 	/**
 	 * Column color.
@@ -204,8 +218,8 @@ export interface HistogramStyleOptions {
 }
 
 /**
- * Structure describing series values formatting
- * Fields precision and minMove allow wide customization of formatting
+ * Represents series value formatting options.
+ * The precision and minMove properties allow wide customization of formatting.
  *
  * @example
  * minMove = 0.01 , precision is not specified. Prices will change like 1.13, 1.14, 1.15 etc.
@@ -232,7 +246,13 @@ export interface PriceFormatBuiltIn {
 	minMove: number;
 }
 
+/**
+ * Represents series value formatting options.
+ */
 export interface PriceFormatCustom {
+	/**
+	 * The custom price format.
+	 */
 	type: 'custom';
 	/**
 	 * Override price fomatting behaviour. Can be used for cases that can't be covered with built-in price formats.
@@ -244,6 +264,9 @@ export interface PriceFormatCustom {
 	minMove: number;
 }
 
+/**
+ * Represents information used to format prices.
+ */
 export type PriceFormat = PriceFormatBuiltIn | PriceFormatCustom;
 
 export function precisionByMinMove(minMove: number): number {
@@ -268,8 +291,7 @@ export const enum PriceAxisLastValueMode {
 }
 
 /**
- * This enum is used to specify the source of data to be
- * used for the horizontal price line.
+ * Represents the source of data to be used for the horizontal price line.
  */
 export const enum PriceLineSource {
 	/**
@@ -282,20 +304,41 @@ export const enum PriceLineSource {
 	LastVisible,
 }
 
+/**
+ * Represents a price range.
+ */
 export interface PriceRange {
+	/**
+	 * Maximum value in the range.
+	 */
 	minValue: number;
+	/**
+	 * Minimum value in the range.
+	 */
 	maxValue: number;
 }
 
+/**
+ * Represents information used to update a price scale.
+ */
 export interface AutoscaleInfo {
+	/**
+	 * Price range.
+	 */
 	priceRange: PriceRange;
+	/**
+	 * Scale margins.
+	 */
 	margins?: AutoScaleMargins;
 }
 
+/**
+ * A custom function used to get autoscale information.
+ */
 type AutoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null) => AutoscaleInfo | null;
 
 /**
- * Structure describing options common for all types of series
+ * Represents options common for all types of series
  */
 export interface SeriesOptionsCommon {
 	/**
@@ -367,53 +410,121 @@ export interface SeriesOptionsCommon {
 	scaleMargins?: PriceScaleMargins;
 }
 
+/**
+ * Represents the intersection of a series type `T`'s options and common series options.
+ *
+ * @see {@link SeriesOptionsCommon} for common options.
+ */
 export type SeriesOptions<T> = T & SeriesOptionsCommon;
+/**
+ * Represents a {@link SeriesOptions} where every property is optional.
+ */
 export type SeriesPartialOptions<T> = DeepPartial<T & SeriesOptionsCommon>;
 
 /**
- * Structure describing area series options.
+ * Represents area series options.
  */
 export type AreaSeriesOptions = SeriesOptions<AreaStyleOptions>;
+/**
+ * Represents area series options where all properties are optional.
+ */
 export type AreaSeriesPartialOptions = SeriesPartialOptions<AreaStyleOptions>;
 
 /**
- * Structure describing bar series options.
+ * Represents bar series options.
  */
 export type BarSeriesOptions = SeriesOptions<BarStyleOptions>;
+/**
+ * Represents bar series options where all properties are optiona.
+ */
 export type BarSeriesPartialOptions = SeriesPartialOptions<BarStyleOptions>;
 
 /**
- * Structure describing candlesticks series options.
+ * Represents candlestick series options.
  */
 export type CandlestickSeriesOptions = SeriesOptions<CandlestickStyleOptions>;
+/**
+ * Represents candlestick series options where all properties are optional.
+ */
 export type CandlestickSeriesPartialOptions = SeriesPartialOptions<CandlestickStyleOptions>;
 
 /**
- * Structure describing histogram series options.
+ * Represents histogram series options.
  */
 export type HistogramSeriesOptions = SeriesOptions<HistogramStyleOptions>;
+/**
+ * Represents histogram series options where all properties are optional.
+ */
 export type HistogramSeriesPartialOptions = SeriesPartialOptions<HistogramStyleOptions>;
 
 /**
- * Structure describing line series options.
+ * Represents line series options.
  */
 export type LineSeriesOptions = SeriesOptions<LineStyleOptions>;
+/**
+ * Represents line series options where all properties are optional.
+ */
 export type LineSeriesPartialOptions = SeriesPartialOptions<LineStyleOptions>;
 
+/**
+ * Represents the type of options for each series type.
+ *
+ * For example a bar series has options represented by {@link BarSeriesOptions}.
+ */
 export interface SeriesOptionsMap {
+	/**
+	 * The type of bar series options.
+	 */
 	Bar: BarSeriesOptions;
+	/**
+	 * The type of candlestick series options.
+	 */
 	Candlestick: CandlestickSeriesOptions;
+	/**
+	 * The type of area series options.
+	 */
 	Area: AreaSeriesOptions;
+	/**
+	 * The type of line series options.
+	 */
 	Line: LineSeriesOptions;
+	/**
+	 * The type of histogram series options.
+	 */
 	Histogram: HistogramSeriesOptions;
 }
 
+/**
+ * Represents the type of partial options for each series type.
+ *
+ * For example a bar series has options represented by {@link BarSeriesPartialOptions}.
+ */
 export interface SeriesPartialOptionsMap {
+	/**
+	 * The type of bar series partial options.
+	 */
 	Bar: BarSeriesPartialOptions;
+	/**
+	 * The type of candlestick series partial options.
+	 */
 	Candlestick: CandlestickSeriesPartialOptions;
+	/**
+	 * The type of area series partial options.
+	 */
 	Area: AreaSeriesPartialOptions;
+	/**
+	 * The type of line series partial options.
+	 */
 	Line: LineSeriesPartialOptions;
+	/**
+	 * The type of histogram series partial options.
+	 */
 	Histogram: HistogramSeriesPartialOptions;
 }
 
+/**
+ * Represents a type of series.
+ *
+ * @see {@link SeriesOptionsMap}
+ */
 export type SeriesType = keyof SeriesOptionsMap;

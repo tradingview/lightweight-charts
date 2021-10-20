@@ -100,7 +100,7 @@ module.exports = {
 		},
 		{
 			files: ['**/*.ts'],
-			excludedFiles: ['**/*.md/*.ts'],
+			excludedFiles: ['**/*.md/*.ts', 'dist/**'],
 			parser: '@typescript-eslint/parser',
 			extends: [
 				'plugin:@typescript-eslint/eslint-recommended',
@@ -354,11 +354,26 @@ module.exports = {
 			extends: [
 				'plugin:jsdoc/recommended',
 			],
-			parserOptions: {
-				project: 'tsconfig.dts.json',
+			parser: '@typescript-eslint/parser',
+			env: {
+				browser: true,
+				node: false,
 			},
 			rules: {
-				'jsdoc/require-jsdoc': 'error',
+				'no-unused-vars': 'off',
+				'jsdoc/require-jsdoc': [
+					'error',
+					{
+						contexts: [
+							'TSEnumDeclaration',
+							'TSEnumMember',
+							'TSInterfaceDeclaration',
+							'TSMethodSignature',
+							'TSPropertySignature',
+							'TSTypeAliasDeclaration',
+						],
+					},
+				],
 				'jsdoc/require-param': 'error',
 				// d.ts files are mostly read by computers (to generate docs, provide intellisense, etc.)
 				// so consistent quote characaters aren't important.

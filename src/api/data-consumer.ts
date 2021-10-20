@@ -39,20 +39,26 @@ export function isUTCTimestamp(time: Time): time is UTCTimestamp {
 }
 
 /**
- * Structure describing whitespace data item (data point without series' data)
+ * Represents a whitespace data item, which is a data point without a value.
  */
 export interface WhitespaceData {
+	/**
+	 * The time of the data.
+	 */
 	time: Time;
 }
 
 /**
- * Structure describing single data item for series of type Line or Area
+ * Represents a data point for a line or area series.
  */
 export interface LineData {
+	/**
+	 * The time of the data.
+	 */
 	time: Time;
 
 	/**
-	 * Price value of data item
+	 * Price value of the data.
 	 */
 	value: number;
 }
@@ -67,12 +73,30 @@ export interface HistogramData extends LineData {
 	color?: string;
 }
 
+/**
+ * Represents a bar with a {@link Time} and open, high, low, and close prices.
+ */
 export interface BarData {
+	/**
+	 * The bar time.
+	 */
 	time: Time;
 
+	/**
+	 * The open price.
+	 */
 	open: number;
+	/**
+	 * The high price.
+	 */
 	high: number;
+	/**
+	 * The low price.
+	 */
 	low: number;
+	/**
+	 * The close price.
+	 */
 	close: number;
 }
 
@@ -84,11 +108,31 @@ export function isFulfilledData(data: SeriesDataItemTypeMap[SeriesType]): data i
 	return (data as Partial<BarData>).open !== undefined || (data as Partial<LineData>).value !== undefined;
 }
 
+/**
+ * Represents the type of data that a series contains.
+ *
+ * For example a bar series contains {@link BarData} or {@link WhitespaceData}.
+ */
 export interface SeriesDataItemTypeMap {
+	/**
+	 * The types of bar series data.
+	 */
 	Bar: BarData | WhitespaceData;
+	/**
+	 * The types of candlestick series data.
+	 */
 	Candlestick: BarData | WhitespaceData;
+	/**
+	 * The types of area series data.
+	 */
 	Area: LineData | WhitespaceData;
+	/**
+	 * The types of line series data.
+	 */
 	Line: LineData | WhitespaceData;
+	/**
+	 * The types of histogram series data.
+	 */
 	Histogram: HistogramData | WhitespaceData;
 }
 

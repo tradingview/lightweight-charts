@@ -1,5 +1,5 @@
 /**
- * This enum is used to specify a type of color.
+ * Represents a type of color.
  */
 export const enum ColorType {
 	/** Solid color */
@@ -8,13 +8,25 @@ export const enum ColorType {
 	VerticalGradient = 'gradient',
 }
 
+/**
+ * Represents a solid color.
+ */
 export interface SolidColor {
+	/**
+	 * Type of color.
+	 */
 	type: ColorType.Solid;
 	/** Color */
 	color: string;
 }
 
+/**
+ * Represents a vertical gradient of two colors.
+ */
 export interface VerticalGradientColor {
+	/**
+	 * Type of color.
+	 */
 	type: ColorType.VerticalGradient;
 	/** Top color */
 	topColor: string;
@@ -22,9 +34,12 @@ export interface VerticalGradientColor {
 	bottomColor: string;
 }
 
+/**
+ * Represents the background color of the chart.
+ */
 export type Background = SolidColor | VerticalGradientColor;
 
-/** Structure describing layout options */
+/** Represents layout options */
 export interface LayoutOptions {
 	/**
 	 * Chart and scales background color.

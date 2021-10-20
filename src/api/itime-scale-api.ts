@@ -6,10 +6,22 @@ import { TimeScaleOptions } from '../model/time-scale';
 
 import { Time } from './data-consumer';
 
+/**
+ * Represents a {@link Time} range.
+ */
 export type TimeRange = Range<Time>;
 
+/**
+ * A custom function used to handle changes to the time scale's time range.
+ */
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
+/**
+ * A custom function used to handle changes to the time scale's logical range.
+ */
 export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null) => void;
+/**
+ * A custom function used to handle changes to the time scale's size.
+ */
 export type SizeChangeEventHandler = (width: number, height: number) => void;
 
 /** Interface to chart time scale */

@@ -19,6 +19,9 @@ import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
 
+/**
+ * Represents a mouse event.
+ */
 export interface MouseEventParams {
 	/**
 	 * Time of the data at the location of the mouse event.
@@ -39,14 +42,23 @@ export interface MouseEventParams {
 	 * Each price is a number for line, area, and histogram series or a OHLC object for candlestick and bar series.
 	 */
 	seriesPrices: Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>;
+	/**
+	 * The {@link ISeriesApi} for the series at the point of the mouse event.
+	 */
 	hoveredSeries?: ISeriesApi<SeriesType>;
+	/**
+	 * The ID of the marker at the point of the mouse event.
+	 */
 	hoveredMarkerId?: SeriesMarker<Time>['id'];
 }
 
+/**
+ * A custom function use to handle mouse events.
+ */
 export type MouseEventHandler = (param: MouseEventParams) => void;
 
-/*
- * The main interface of a single chart
+/**
+ * The main interface of a single chart.
  */
 export interface IChartApi {
 	/**

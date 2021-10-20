@@ -5,6 +5,8 @@ import { Coordinate } from './coordinate';
 import { RangeImpl } from './range-impl';
 
 /**
+ * Represents a time a a UNIX timestamp.
+ *
  * If your chart displays an intraday interval you should use a UNIX Timestamp.
  *
  * Note that JavaScript Date APIs like `Date.now` return a number of milliseconds but UTCTimestamp expects a number of seconds.
@@ -20,15 +22,24 @@ import { RangeImpl } from './range-impl';
 export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
 
 /**
- * This type is used to specify time for day/week/month (DWM) data.
+ * Represents a time as a day/week/month.
  *
  * ```js
  * const day = { year: 2019, month: 6, day: 1 }; // June 1, 2019
  * ```
  */
 export interface BusinessDay {
+	/**
+	 * The year.
+	 */
 	year: number;
+	/**
+	 * The month.
+	 */
 	month: number;
+	/**
+	 * The day.
+	 */
 	day: number;
 }
 
@@ -42,8 +53,17 @@ export interface TimeScalePoint {
 	readonly time: TimePoint;
 }
 
+/**
+ * Represents a generic range `from` one value `to` another.
+ */
 export interface Range<T> {
+	/**
+	 * The from value. The start of the range.
+	 */
 	from: T;
+	/**
+	 * The to value. The end of the range.
+	 */
 	to: T;
 }
 
@@ -51,6 +71,9 @@ export type TimePointsRange = Range<TimePoint>;
 
 export type TimePointIndex = Nominal<number, 'TimePointIndex'>;
 
+/**
+ * Represents the to or from `number` in a logical range.
+ */
 export type Logical = Nominal<number, 'Logical'>;
 
 /**

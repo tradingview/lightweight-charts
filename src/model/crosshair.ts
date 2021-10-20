@@ -34,7 +34,7 @@ export type PriceAndCoordinateProvider = (priceScale: PriceScale) => CrosshairPr
 export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate;
 
 /**
- * This enum is used to specify the crosshair mode.
+ * Represents the crosshair mode.
  */
 export const enum CrosshairMode {
 	/**

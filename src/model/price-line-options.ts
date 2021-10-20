@@ -1,5 +1,8 @@
 import { LineStyle, LineWidth } from '../renderers/draw-line';
 
+/**
+ * Represents a price line.
+ */
 export interface PriceLineOptions {
 	/**
 	 * Price line's value.

@@ -32,7 +32,7 @@ import { sortSources } from './sort-sources';
 import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
 
 /**
- * This enum is used to specify the price scale mode.
+ * Represents the price scale mode.
  */
 export const enum PriceScaleMode {
 	/**
@@ -78,6 +78,9 @@ export interface PriceScaleMargins {
 	bottom: number;
 }
 
+/**
+ * Represents the position of a price axis relative to the chart.
+ */
 export type PriceAxisPosition = 'left' | 'right' | 'none';
 
 /** Structure that describes price scale options */
