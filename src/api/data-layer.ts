@@ -349,7 +349,7 @@ export class DataLayer {
 	/**
 	 * Sets new time scale and make indexes valid for all series
 	 *
-	 * @returns An index of the first changed point
+	 * @returns The index of the first changed point or `-1` if there is no change.
 	 */
 	private _replaceTimeScalePoints(newTimePoints: InternalTimeScalePoint[]): number {
 		let firstChangedPointIndex = -1;

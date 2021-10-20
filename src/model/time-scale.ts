@@ -55,30 +55,107 @@ export interface TimeMark {
 	weight: number;
 }
 
+/**
+ * Represents the type of a tick mark on the time axis.
+ */
 export const enum TickMarkType {
+	/**
+	 * The start of the year (e.g. it's the first tick mark in a year).
+	 */
 	Year,
+	/**
+	 * The start of the month (e.g. it's the first tick mark in a month).
+	 */
 	Month,
+	/**
+	 * A day of the month.
+	 */
 	DayOfMonth,
+	/**
+	 * A time without seconds.
+	 */
 	Time,
+	/**
+	 * A time with seconds.
+	 */
 	TimeWithSeconds,
 }
 
+/**
+ * The `TickMarkFormatter` is used to customize tick mark labels on the time scale.
+ *
+ * This function should return `time` as a string formatted according to `tickMarkType` type (year, month, etc) and `locale`.
+ *
+ * Note that the returned string should be the shortest possible value and should have no more than 8 characters.
+ * Otherwise, the tick marks will overlap each other.
+ *
+ * ```js
+ * const customFormatter = (time, tickMarkType, locale) => { ... }
+ * ```
+ */
 export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType: TickMarkType, locale: string) => string;
 
+/**
+ * Options for the time scale; the horizontal scale at the bottom of the chart that displays the time of data.
+ */
 export interface TimeScaleOptions {
+	/**
+	 * The margin space in bars from the right side of the chart.
+	 */
 	rightOffset: number;
+	/**
+	 * The space between bars in pixels.
+	 */
 	barSpacing: number;
+	/**
+	 * The minimum space between bars in pixels.
+	 */
 	minBarSpacing: number;
+	/**
+	 * Prevent scrolling to the left of the first bar.
+	 */
 	fixLeftEdge: boolean;
+	/**
+	 * Prevent scrolling to the right of the most recent bar.
+	 */
 	fixRightEdge: boolean;
+	/**
+	 * Prevent changing the visible time range during chart resizing.
+	 */
 	lockVisibleTimeRangeOnResize: boolean;
+	/**
+	 * Prevent the hovered bar from moving when scrolling.
+	 */
 	rightBarStaysOnScroll: boolean;
+	/**
+	 * Show the time scale border.
+	 */
 	borderVisible: boolean;
+	/**
+	 * The time scale border color.
+	 */
 	borderColor: string;
+	/**
+	 * Show the time scale.
+	 */
 	visible: boolean;
+	/**
+	 * Show the time, not just the date, in the time scale and vertical crosshair label.
+	 */
 	timeVisible: boolean;
+	/**
+	 * Show seconds in the time scale and vertical crosshair label in `hh:mm:ss` format for intraday data.
+	 */
 	secondsVisible: boolean;
+	/**
+	 * Shift the visible range to the right (into the future) by the number of new bars when new data is added.
+	 *
+	 * Note that this only applies when the last bar is visible.
+	 */
 	shiftVisibleRangeOnNewBar: boolean;
+	/**
+	 * Override the default tick marks formatter.
+	 */
 	tickMarkFormatter?: TickMarkFormatter;
 }
 

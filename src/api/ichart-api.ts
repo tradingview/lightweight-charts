@@ -19,18 +19,46 @@ import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
 
+/**
+ * Represents a mouse event.
+ */
 export interface MouseEventParams {
+	/**
+	 * Time of the data at the location of the mouse event.
+	 *
+	 * The value will be `undefined` if the location of the event in the chart is outside the range of available data.
+	 */
 	time?: UTCTimestamp | BusinessDay;
+	/**
+	 * Location of the event in the chart.
+	 *
+	 * The value will be `undefined` if the event is fired outside the chart, for example a mouse leave event.
+	 */
 	point?: Point;
+	/**
+	 * Prices of all series at the location of the event in the chart.
+	 *
+	 * Keys of the map are {@link ISeriesApi} instances. Values are prices.
+	 * Each price is a number for line, area, and histogram series or a OHLC object for candlestick and bar series.
+	 */
 	seriesPrices: Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>;
+	/**
+	 * The {@link ISeriesApi} for the series at the point of the mouse event.
+	 */
 	hoveredSeries?: ISeriesApi<SeriesType>;
+	/**
+	 * The ID of the marker at the point of the mouse event.
+	 */
 	hoveredMarkerId?: SeriesMarker<Time>['id'];
 }
 
+/**
+ * A custom function use to handle mouse events.
+ */
 export type MouseEventHandler = (param: MouseEventParams) => void;
 
-/*
- * The main interface of a single chart
+/**
+ * The main interface of a single chart.
  */
 export interface IChartApi {
 	/**
@@ -39,51 +67,51 @@ export interface IChartApi {
 	remove(): void;
 
 	/**
-	 * Sets fixed size of the chart. By default chart takes up 100% of its container
+	 * Sets fixed size of the chart. By default chart takes up 100% of its container.
 	 *
-	 * @param width - target width of the chart
-	 * @param height - target height of the chart
-	 * @param forceRepaint - true to initiate resize immediately. One could need this to get screenshot immediately after resize
+	 * @param width - target width of the chart.
+	 * @param height - target height of the chart.
+	 * @param forceRepaint - true to initiate resize immediately. One could need this to get screenshot immediately after resize.
 	 */
 	resize(width: number, height: number, forceRepaint?: boolean): void;
 
 	/**
-	 * Creates an area series with specified parameters
+	 * Creates an area series with specified parameters.
 	 *
-	 * @param areaOptions - customization parameters of the series being created
-	 * @returns an interface of the created series
+	 * @param areaOptions - customization parameters of the series being created.
+	 * @returns an interface of the created series.
 	 */
 	addAreaSeries(areaOptions?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
 
 	/**
-	 * Creates a bar series with specified parameters
+	 * Creates a bar series with specified parameters.
 	 *
-	 * @param barOptions - customization parameters of the series being created
-	 * @returns an interface of the created series
+	 * @param barOptions - customization parameters of the series being created.
+	 * @returns an interface of the created series.
 	 */
 	addBarSeries(barOptions?: BarSeriesPartialOptions): ISeriesApi<'Bar'>;
 
 	/**
-	 * Creates a candlestick series with specified parameters
+	 * Creates a candlestick series with specified parameters.
 	 *
-	 * @param candlestickOptions - customization parameters of the series being created
-	 * @returns an interface of the created series
+	 * @param candlestickOptions - customization parameters of the series being created.
+	 * @returns an interface of the created series.
 	 */
 	addCandlestickSeries(candlestickOptions?: CandlestickSeriesPartialOptions): ISeriesApi<'Candlestick'>;
 
 	/**
-	 * Creates a histogram series with specified parameters
+	 * Creates a histogram series with specified parameters.
 	 *
-	 * @param histogramOptions - customization parameters of the series being created
-	 * @returns an interface of the created series
+	 * @param histogramOptions - customization parameters of the series being created.
+	 * @returns an interface of the created series.
 	 */
 	addHistogramSeries(histogramOptions?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram'>;
 
 	/**
-	 * Creates a line series with specified parameters
+	 * Creates a line series with specified parameters.
 	 *
-	 * @param lineOptions - customization parameters of the series being created
-	 * @returns an interface of the created series
+	 * @param lineOptions - customization parameters of the series being created.
+	 * @returns an interface of the created series.
 	 */
 	addLineSeries(lineOptions?: LineSeriesPartialOptions): ISeriesApi<'Line'>;
 
@@ -92,38 +120,71 @@ export interface IChartApi {
 	 */
 	removeSeries(seriesApi: ISeriesApi<SeriesType>): void;
 
-	/*
-	 * Adds a subscription to mouse click event
-	 * @param handler - handler (function) to be called on mouse click
+	/**
+	 * Subscribe to the chart click event.
+	 *
+	 * @param handler - handler to be called on mouse click.
+	 * @example
+	 * ```js
+	 * function myClickHandler(param) {
+	 *     if (!param.point) {
+	 *         return;
+	 *     }
+	 *
+	 *     console.log(`Click at ${param.point.x}, ${param.point.y}. The time is ${param.time}.`);
+	 * }
+	 *
+	 * chart.subscribeClick(myClickHandler);
+	 * ```
 	 */
 	subscribeClick(handler: MouseEventHandler): void;
 
 	/**
-	 * Removes mouse click subscription
+	 * Unsubscribe a handler that was previously subscribed using {@link subscribeClick}.
 	 *
 	 * @param handler - previously subscribed handler
+	 * @example
+	 * ```js
+	 * chart.unsubscribeClick(myClickHandler);
+	 * ```
 	 */
 	unsubscribeClick(handler: MouseEventHandler): void;
 
 	/**
-	 * Adds a subscription to crosshair movement to receive notifications on crosshair movements
+	 * Subscribe to the crosshair move event.
 	 *
-	 * @param handler - handler (function) to be called on crosshair move
+	 * @param handler - handler to be called on crosshair move.
+	 * @example
+	 * ```js
+	 * function myCrosshairMoveHandler(param) {
+	 *     if (!param.point) {
+	 *         return;
+	 *     }
+	 *
+	 *     console.log(`Crosshair moved to ${param.point.x}, ${param.point.y}. The time is ${param.time}.`);
+	 * }
+	 *
+	 * chart.subscribeClick(myCrosshairMoveHandler);
+	 * ```
 	 */
 	subscribeCrosshairMove(handler: MouseEventHandler): void;
 
 	/**
-	 * Removes a subscription on crosshair movement
+	 * Unsubscribe a handler that was previously subscribed using {@link subscribeCrosshairMove}.
 	 *
 	 * @param handler - previously subscribed handler
+	 * @example
+	 * ```js
+	 * chart.unsubscribeCrosshairMove(myCrosshairMoveHandler);
+	 * ```
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
 
 	/**
-	 * Returns API to manipulate the price scale
+	 * Returns API to manipulate a price scale.
 	 *
-	 * @param priceScaleId - id of scale to access to
-	 * @returns target API
+	 * @param priceScaleId - id of the price scale.
+	 * @returns Price scale API.
 	 */
 	priceScale(priceScaleId?: string): IPriceScaleApi;
 

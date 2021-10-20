@@ -26,7 +26,12 @@ type AlphaComponent = Nominal<number, 'AlphaComponent'>;
 
 type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
 
-/** @public see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value */
+/**
+ * Note this object should be explicitly marked as public so that dts-bundle-generator does not mangle the property names.
+ *
+ * @public
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+ */
 const namedColorRgbHexStrings: Record<string, string> = {
 	// The order of properties in this Record is not important for the internal logic.
 	// It's just GZIPped better when props follows this order.

@@ -164,13 +164,10 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		);
 	}
 
-	/**
-	 * @param endIndex - Non-inclusive end
-	 */
-	private _plotMinMax(startIndex: PlotRowIndex, endIndex: PlotRowIndex, plotIndex: PlotRowValueIndex): MinMax | null {
+	private _plotMinMax(startIndex: PlotRowIndex, endIndexExclusive: PlotRowIndex, plotIndex: PlotRowValueIndex): MinMax | null {
 		let result: MinMax | null = null;
 
-		for (let i = startIndex; i < endIndex; i++) {
+		for (let i = startIndex; i < endIndexExclusive; i++) {
 			const values = this._items[i].value;
 
 			const v = values[plotIndex];

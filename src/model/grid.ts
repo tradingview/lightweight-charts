@@ -4,21 +4,27 @@ import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
 
 import { Pane } from './pane';
 
-/** Structure describing horizontal or vertical grid line options */
+/** Grid line options. */
 export interface GridLineOptions {
-	/** Color of the lines */
+	/**
+	 * Line color.
+	 */
 	color: string;
-	/** Style of the lines */
+	/**
+	 * Line style.
+	 */
 	style: LineStyle;
-	/** Visibility of the lines */
+	/**
+	 * Display the lines.
+	 */
 	visible: boolean;
 }
 
-/** Structure describing grid options */
+/** Structure describing grid options. */
 export interface GridOptions {
-	/** Vertical grid line options */
+	/** Vertical grid line options. */
 	vertLines: GridLineOptions;
-	/** Horizontal grid line options */
+	/** Horizontal grid line options. */
 	horzLines: GridLineOptions;
 }
 
