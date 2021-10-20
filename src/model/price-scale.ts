@@ -104,7 +104,7 @@ export interface PriceScaleOptions {
 	 * Price scale's position on the chart.
 	 *
 	 * @deprecated
-	 * @private
+	 * @internal
 	 */
 	position?: PriceAxisPosition;
 	/**
