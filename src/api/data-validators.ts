@@ -1,4 +1,4 @@
-import { assert, ensureNever } from '../helpers/assertions';
+import { assert } from '../helpers/assertions';
 
 import { PriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
@@ -54,10 +54,6 @@ function getChecker(type: SeriesType): Checker {
 		case 'Line':
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
-
-		default:
-			ensureNever(type);
-			throw new Error(`unsupported series type ${type}`);
 	}
 }
 
