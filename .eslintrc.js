@@ -16,6 +16,11 @@ module.exports = {
 		'unicorn',
 		'jsdoc',
 	],
+	settings: {
+		jsdoc: {
+			ignoreInternal: true,
+		},
+	},
 	extends: [
 		'eslint:recommended',
 	],

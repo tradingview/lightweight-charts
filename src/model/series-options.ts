@@ -351,11 +351,9 @@ export interface SeriesOptionsCommon {
 	/** Target price scale to bind new series to */
 	priceScaleId?: string;
 
-	/* eslint-disable jsdoc/check-tag-names */
 	/**
 	 * @internal
 	 */
-	/* eslint-enable jsdoc/check-tag-names */
 	seriesLastValueMode?: PriceAxisLastValueMode;
 	/** Show the series. */
 	visible: boolean;
@@ -399,12 +397,10 @@ export interface SeriesOptionsCommon {
 	baseLineStyle: LineStyle;
 	/** Override the default {@link AutoscaleInfo} provider. */
 	autoscaleInfoProvider?: AutoscaleInfoProvider;
-	/* eslint-disable jsdoc/check-tag-names */
 	/**
 	 * @deprecated Use priceScaleId instead.
 	 * @internal
 	 */
-	/* eslint-enable jsdoc/check-tag-names */
 	overlay?: boolean;
 	/** @deprecated Use priceScale method of the series to apply options instead. */
 	scaleMargins?: PriceScaleMargins;
