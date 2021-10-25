@@ -124,7 +124,7 @@ jobs:
       - attach_workspace:
           at: ./
       - run: npm run bundle-dts
-      - run: npm run lint:dts
+      - run: npm run check-dts-docs
 
   markdown:
     executor: node-latest-executor
