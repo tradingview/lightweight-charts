@@ -93,7 +93,7 @@
     "lint": "npm-run-all -p lint:**",
     "lint:js": "eslint --format=unix --ext .js,.md,.javascript ./",
     "lint:ts": "eslint --format=unix --ext .ts,.typescript ./",
-    "lint:md": "./node_modules/.bin/markdownlint -i \"**/node_modules/**\" \"**/*.md\"",
+    "lint:md": "./node_modules/.bin/markdownlint -i \"**/node_modules/**\" -i \"**/docs/docs/api/**\" \"**/*.md\"",
     "check-dts-docs": "eslint --format=unix ./dist/typings.d.ts",
     "check-markdown-links": "node scripts/check-markdown-links.js",
     "rollup": "rollup -c rollup.config.js",
@@ -104,7 +104,7 @@
     "build:release": "cross-env BUILD_TAG=release npm run build:prod",
     "prepare-release": "npm-run-all clean build:release && node ./scripts/clean-package-json.js",
     "size-limit": "size-limit",
-    "verify": "npm-run-all clean -p lint check-markdown-links build:prod -p check-dts-docs tsc-verify test size-limit",
+    "verify": "npm-run-all clean -p lint build:prod -p check-dts-docs tsc-verify test size-limit",
     "test": "mocha tests/unittests/**/*.spec.ts"
   }
 }

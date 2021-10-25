@@ -7,3 +7,6 @@
 /lib/**
 
 **/node_modules
+
+/docs/docs/**
+/docs/build/**
