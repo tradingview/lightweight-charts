@@ -4,7 +4,7 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
-const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'edew';
+const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
 const projectName = 'lightweight-charts';
 const projectUrl = `https://github.com/${organizationName}/${projectName}`;
 const githubPagesUrl = `https://${organizationName}.github.io/`;
@@ -42,9 +42,9 @@ const config = {
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			navbar: {
-				title: 'My Site',
+				title: 'Lightweight Charts',
 				logo: {
-					alt: 'My Site Logo',
+					alt: 'Lightweight Charts Logo',
 					src: 'img/logo.svg',
 				},
 				items: [
