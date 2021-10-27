@@ -1,12 +1,12 @@
 import { lowerbound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
-import { TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
+import { TickMarkWeight, TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
 
 export interface TickMark {
 	index: TimePointIndex;
 	time: TimePoint;
-	weight: number;
+	weight: TickMarkWeight;
 }
 
 interface MarksCache {
@@ -15,7 +15,7 @@ interface MarksCache {
 }
 
 export class TickMarks {
-	private _marksByWeight: Map<number, TickMark[]> = new Map();
+	private _marksByWeight: Map<TickMarkWeight, TickMark[]> = new Map();
 	private _cache: MarksCache | null = null;
 
 	public setTimeScalePoints(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
@@ -57,7 +57,7 @@ export class TickMarks {
 			return;
 		}
 
-		const weightsToClear: number[] = [];
+		const weightsToClear: TickMarkWeight[] = [];
 
 		this._marksByWeight.forEach((marks: TickMark[], timeWeight: number) => {
 			if (sinceIndex <= marks[0].index) {

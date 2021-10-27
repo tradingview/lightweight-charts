@@ -48,8 +48,30 @@ export interface TimePoint {
 	businessDay?: BusinessDay;
 }
 
+/**
+ * Describes a weight of tick mark, i.e. a part of a time that changed since previous time.
+ * Note that you can use any timezone to calculate this value, it is unnecessary to use UTC.
+ *
+ * @example Between 2020-01-01 and 2020-01-02 there is a day of difference, i.e. for 2020-01-02 weight would be a day.
+ * @example Between 2020-01-01 and 2020-02-02 there is a month of difference, i.e. for 2020-02-02 weight would be a month.
+ */
+export const enum TickMarkWeight {
+	LessThanSecond = 0,
+	Second = 10,
+	Minute1 = 20,
+	Minute5 = 21,
+	Minute30 = 22,
+	Hour1 = 30,
+	Hour3 = 31,
+	Hour6 = 32,
+	Hour12 = 33,
+	Day = 50,
+	Month = 60,
+	Year = 70,
+}
+
 export interface TimeScalePoint {
-	readonly timeWeight: number;
+	readonly timeWeight: TickMarkWeight;
 	readonly time: TimePoint;
 }
 
