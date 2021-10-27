@@ -129,8 +129,6 @@ export interface LineStyleOptions {
 	lineType: LineType;
 	/**
 	 * Show the crosshair marker.
-	 *
-	 * @default
 	 */
 	crosshairMarkerVisible: boolean;
 	/**
@@ -181,8 +179,6 @@ export interface AreaStyleOptions {
 	lineType: LineType;
 	/**
 	 * Show the crosshair marker.
-	 *
-	 * @default
 	 */
 	crosshairMarkerVisible: boolean;
 	/**
