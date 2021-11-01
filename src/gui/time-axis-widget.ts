@@ -1,7 +1,9 @@
 import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
 
 import { clearRect, drawScaled } from '../helpers/canvas-helpers';
+import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
+import { ISubscription } from '../helpers/isubscription';
 import { makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
@@ -46,6 +48,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private _rendererOptions: TimeAxisViewRendererOptions | null = null;
 	private _mouseDown: boolean = false;
 	private _size: Size = new Size(0, 0);
+	private readonly _sizeChanged: Delegate<Size> = new Delegate();
+	private readonly _widthCache: TextWidthCache = new TextWidthCache(5);
 
 	public constructor(chartWidget: ChartWidget) {
 		this._chart = chartWidget;
@@ -194,6 +198,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		return this._size;
 	}
 
+	public sizeChanged(): ISubscription<Size> {
+		return this._sizeChanged;
+	}
+
 	public setSizes(timeAxisSize: Size, leftStubWidth: number, rightStubWidth: number): void {
 		if (!this._size || !this._size.equals(timeAxisSize)) {
 			this._size = timeAxisSize;
@@ -203,6 +211,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 			this._cell.style.width = timeAxisSize.w + 'px';
 			this._cell.style.height = timeAxisSize.h + 'px';
+
+			this._sizeChanged.fire(timeAxisSize);
 		}
 
 		if (this._leftStub !== null) {
@@ -336,16 +346,32 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			ctx.font = this._baseFont();
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight < maxWeight) {
-					ctx.fillText(tickMark.label, tickMark.coord, yText);
+					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
+					ctx.fillText(tickMark.label, coordinate, yText);
 				}
 			}
 			ctx.font = this._baseBoldFont();
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight >= maxWeight) {
-					ctx.fillText(tickMark.label, tickMark.coord, yText);
+					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
+					ctx.fillText(tickMark.label, coordinate, yText);
 				}
 			}
 		});
+	}
+
+	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D, coordinate: number, labelText: string): number {
+		const labelWidth = this._widthCache.measureText(ctx, labelText);
+		const labelWidthHalf = labelWidth / 2;
+		const leftTextCoordinate = Math.floor(coordinate - labelWidthHalf) + 0.5;
+
+		if (leftTextCoordinate < 0) {
+			coordinate = coordinate + Math.abs(0 - leftTextCoordinate);
+		} else if (leftTextCoordinate + labelWidth > this._size.w) {
+			coordinate = coordinate - Math.abs(this._size.w - (leftTextCoordinate + labelWidth));
+		}
+
+		return coordinate;
 	}
 
 	private _drawLabels(sources: readonly IDataSource[], ctx: CanvasRenderingContext2D, pixelRatio: number): void {

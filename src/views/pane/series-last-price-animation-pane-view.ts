@@ -3,7 +3,7 @@ import { applyAlpha } from '../../helpers/color';
 
 import { Point } from '../../model/point';
 import { Series } from '../../model/series';
-import { LasPriceAnimationMode } from '../../model/series-options';
+import { LastPriceAnimationMode } from '../../model/series-options';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-price-animation-renderer';
 
@@ -135,7 +135,7 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 	public update(updateType?: UpdateType): void {
 		this._invalidated = true;
 		if (updateType === 'data') {
-			if (this._series.options().lastPriceAnimation === LasPriceAnimationMode.OnDataUpdate) {
+			if (this._series.options().lastPriceAnimation === LastPriceAnimationMode.OnDataUpdate) {
 				const now = performance.now();
 				const timeToAnimationEnd = this._endTime - now;
 				if (timeToAnimationEnd > 0) {
@@ -155,17 +155,17 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 	}
 
 	public visible(): boolean {
-		// center point is always visible if lastPriceAnimation is not LasPriceAnimationMode.Disabled
-		return this._series.options().lastPriceAnimation !== LasPriceAnimationMode.Disabled;
+		// center point is always visible if lastPriceAnimation is not LastPriceAnimationMode.Disabled
+		return this._series.options().lastPriceAnimation !== LastPriceAnimationMode.Disabled;
 	}
 
 	public animationActive(): boolean {
 		switch (this._series.options().lastPriceAnimation) {
-			case LasPriceAnimationMode.Disabled:
+			case LastPriceAnimationMode.Disabled:
 				return false;
-			case LasPriceAnimationMode.Continuous:
+			case LastPriceAnimationMode.Continuous:
 				return true;
-			case LasPriceAnimationMode.OnDataUpdate:
+			case LastPriceAnimationMode.OnDataUpdate:
 				return performance.now() <= this._endTime;
 		}
 	}

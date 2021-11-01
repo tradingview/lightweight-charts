@@ -49,35 +49,113 @@ interface TransitionState {
 }
 
 export interface TimeMark {
+	needAlignCoordinate: boolean;
 	coord: number;
 	label: string;
 	weight: number;
 }
 
+/**
+ * Represents the type of a tick mark on the time axis.
+ */
 export const enum TickMarkType {
+	/**
+	 * The start of the year (e.g. it's the first tick mark in a year).
+	 */
 	Year,
+	/**
+	 * The start of the month (e.g. it's the first tick mark in a month).
+	 */
 	Month,
+	/**
+	 * A day of the month.
+	 */
 	DayOfMonth,
+	/**
+	 * A time without seconds.
+	 */
 	Time,
+	/**
+	 * A time with seconds.
+	 */
 	TimeWithSeconds,
 }
 
+/**
+ * The `TickMarkFormatter` is used to customize tick mark labels on the time scale.
+ *
+ * This function should return `time` as a string formatted according to `tickMarkType` type (year, month, etc) and `locale`.
+ *
+ * Note that the returned string should be the shortest possible value and should have no more than 8 characters.
+ * Otherwise, the tick marks will overlap each other.
+ *
+ * ```js
+ * const customFormatter = (time, tickMarkType, locale) => { ... }
+ * ```
+ */
 export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType: TickMarkType, locale: string) => string;
 
+/**
+ * Options for the time scale; the horizontal scale at the bottom of the chart that displays the time of data.
+ */
 export interface TimeScaleOptions {
+	/**
+	 * The margin space in bars from the right side of the chart.
+	 */
 	rightOffset: number;
+	/**
+	 * The space between bars in pixels.
+	 */
 	barSpacing: number;
+	/**
+	 * The minimum space between bars in pixels.
+	 */
 	minBarSpacing: number;
+	/**
+	 * Prevent scrolling to the left of the first bar.
+	 */
 	fixLeftEdge: boolean;
+	/**
+	 * Prevent scrolling to the right of the most recent bar.
+	 */
 	fixRightEdge: boolean;
+	/**
+	 * Prevent changing the visible time range during chart resizing.
+	 */
 	lockVisibleTimeRangeOnResize: boolean;
+	/**
+	 * Prevent the hovered bar from moving when scrolling.
+	 */
 	rightBarStaysOnScroll: boolean;
+	/**
+	 * Show the time scale border.
+	 */
 	borderVisible: boolean;
+	/**
+	 * The time scale border color.
+	 */
 	borderColor: string;
+	/**
+	 * Show the time scale.
+	 */
 	visible: boolean;
+	/**
+	 * Show the time, not just the date, in the time scale and vertical crosshair label.
+	 */
 	timeVisible: boolean;
+	/**
+	 * Show seconds in the time scale and vertical crosshair label in `hh:mm:ss` format for intraday data.
+	 */
 	secondsVisible: boolean;
+	/**
+	 * Shift the visible range to the right (into the future) by the number of new bars when new data is added.
+	 *
+	 * Note that this only applies when the last bar is visible.
+	 */
 	shiftVisibleRangeOnNewBar: boolean;
+	/**
+	 * Override the default tick marks formatter.
+	 */
 	tickMarkFormatter?: TickMarkFormatter;
 }
 
@@ -366,6 +444,12 @@ export class TimeScale {
 
 		const items = this._tickMarks.build(spacing, maxLabelWidth);
 
+		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second label on time scale"
+		const earliestIndexOfSecondLabel = (this._firstIndex() as number) + indexPerLabel;
+
+		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second last label on time scale"
+		const indexOfSecondLastLabel = (this._lastIndex() as number) - indexPerLabel;
+
 		let targetIndex = 0;
 		for (const tm of items) {
 			if (!(firstBar <= tm.index && tm.index <= lastBar)) {
@@ -377,18 +461,32 @@ export class TimeScale {
 				continue;
 			}
 
+			let label: TimeMark;
 			if (targetIndex < this._labels.length) {
-				const label = this._labels[targetIndex];
+				label = this._labels[targetIndex];
 				label.coord = this.indexToCoordinate(tm.index);
 				label.label = this._formatLabel(time, tm.weight);
 				label.weight = tm.weight;
 			} else {
-				this._labels.push({
+				label = {
+					needAlignCoordinate: false,
 					coord: this.indexToCoordinate(tm.index),
 					label: this._formatLabel(time, tm.weight),
 					weight: tm.weight,
-				});
+				};
+
+				this._labels.push(label);
 			}
+
+			if (this._barSpacing > (maxLabelWidth / 2)) {
+				// if there is enough space then let's show all tick marks as usual
+				label.needAlignCoordinate = false;
+			} else {
+				// if a user is able to scroll after a tick mark then show it as usual, otherwise the coordinate might be aligned
+				// if the index is for the second (last) label or later (earlier) then most likely this label might be displayed without correcting the coordinate
+				label.needAlignCoordinate = this._options.fixLeftEdge && tm.index <= earliestIndexOfSecondLabel || this._options.fixRightEdge && tm.index >= indexOfSecondLastLabel;
+			}
+
 			targetIndex++;
 		}
 		this._labels.length = targetIndex;
@@ -541,11 +639,11 @@ export class TimeScale {
 		animationFn();
 	}
 
-	public update(newPoints: readonly TimeScalePoint[]): void {
+	public update(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
 		this._visibleRangeInvalidated = true;
 
 		this._points = newPoints;
-		this._tickMarks.setTimeScalePoints(newPoints);
+		this._tickMarks.setTimeScalePoints(newPoints, firstChangedPointIndex);
 		this._correctOffset();
 	}
 
@@ -681,7 +779,7 @@ export class TimeScale {
 	private _minBarSpacing(): number {
 		// if both options are enabled then limit bar spacing so that zooming-out is not possible
 		// if it would cause either the first or last points to move too far from an edge
-		if (this._options.fixLeftEdge && this._options.fixRightEdge) {
+		if (this._options.fixLeftEdge && this._options.fixRightEdge && this._points.length !== 0) {
 			return this._width / this._points.length;
 		}
 

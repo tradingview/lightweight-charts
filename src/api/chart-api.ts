@@ -187,7 +187,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		);
 
 		const model = this._chartWidget.model();
-		this._timeScaleApi = new TimeScaleApi(model);
+		this._timeScaleApi = new TimeScaleApi(model, this._chartWidget.timeAxisWidget());
 	}
 
 	public remove(): void {
@@ -359,8 +359,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _sendUpdateToChart(update: DataUpdateResponse): void {
 		const model = this._chartWidget.model();
 
-		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points);
-		update.series.forEach((value: SeriesChanges, series: Series) => series.updateData(value.data, value.fullUpdate));
+		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
+		update.series.forEach((value: SeriesChanges, series: Series) => series.setData(value.data));
 
 		model.recalculateAllPanes();
 	}

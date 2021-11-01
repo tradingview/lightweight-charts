@@ -14,7 +14,13 @@ module.exports = {
 		'markdown',
 		'prefer-arrow',
 		'unicorn',
+		'jsdoc',
 	],
+	settings: {
+		jsdoc: {
+			ignoreInternal: true,
+		},
+	},
 	extends: [
 		'eslint:recommended',
 	],
@@ -99,7 +105,7 @@ module.exports = {
 		},
 		{
 			files: ['**/*.ts'],
-			excludedFiles: ['**/*.md/*.ts'],
+			excludedFiles: ['**/*.md/*.ts', 'dist/**'],
 			parser: '@typescript-eslint/parser',
 			extends: [
 				'plugin:@typescript-eslint/eslint-recommended',
@@ -344,6 +350,61 @@ module.exports = {
 								'member-variable-declaration',
 							],
 						},
+					},
+				],
+			},
+		},
+		{
+			files: ['dist/typings.d.ts'],
+			extends: [
+				'plugin:jsdoc/recommended',
+			],
+			parser: '@typescript-eslint/parser',
+			env: {
+				browser: true,
+				node: false,
+			},
+			rules: {
+				'no-unused-vars': 'off',
+				'jsdoc/require-jsdoc': [
+					'error',
+					{
+						contexts: [
+							'TSEnumDeclaration',
+							'TSEnumMember',
+							'TSInterfaceDeclaration',
+							'TSMethodSignature',
+							'TSPropertySignature',
+							'TSTypeAliasDeclaration',
+						],
+					},
+				],
+				'jsdoc/require-param': 'error',
+				// d.ts files are mostly read by computers (to generate docs, provide intellisense, etc.)
+				// so consistent quote characaters aren't important.
+				'@typescript-eslint/quotes': 'off',
+			},
+		},
+		{
+			files: ['src/**/*.ts'],
+			excludedFiles: ['tests/'],
+			extends: [
+				'plugin:jsdoc/recommended',
+			],
+			rules: {
+				// We are writing TypeScript and using TypeDoc so we don't need duplicate types in JSDoc comments.
+				'jsdoc/require-param-type': 'off',
+				'jsdoc/require-returns-type': 'off',
+				// We check that the public API is all documented when we lint dist/typings.d.ts so we don't need
+				// to require all source code is covered by JSDoc.
+				'jsdoc/require-jsdoc': 'off',
+				'jsdoc/require-param': 'off',
+				'jsdoc/require-returns': 'off',
+				// Lint embedded example code as JavaScript.
+				'jsdoc/check-examples': [
+					'error',
+					{
+						exampleCodeRegex: '/```js\\s+(.*)\\s+```/su',
 					},
 				],
 			},

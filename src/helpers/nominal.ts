@@ -12,4 +12,7 @@
  * @example
  * type TagName = Nominal<string, 'TagName'>;
  */
-export type Nominal<T, Name extends string> = T & { [Symbol.species]: Name };
+export type Nominal<T, Name extends string> = T & {
+	/** The 'name' or species of the nominal. */
+	[Symbol.species]: Name;
+};

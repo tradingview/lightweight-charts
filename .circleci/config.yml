@@ -117,6 +117,15 @@ jobs:
       - checkout-with-deps
       - run: npm run lint:ts
 
+  lint-dts:
+    executor: node-latest-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: npm run bundle-dts
+      - run: npm run check-dts-docs
+
   markdown:
     executor: node-latest-executor
     steps:
@@ -269,6 +278,10 @@ workflows:
           requires:
             - build
       - coverage:
+          filters: *default-filters
+          requires:
+            - build
+      - lint-dts:
           filters: *default-filters
           requires:
             - build

@@ -30,11 +30,8 @@ const intradayWeightDivisors: WeightDivisor[] = [
 	{ divisor: hours(12), weight: 33 },
 ];
 
-function weightByTime(time: UTCTimestamp, prevTime: UTCTimestamp | null): number {
-	if (prevTime !== null) {
-		const prevDate = new Date(prevTime * 1000);
-		const currentDate = new Date(time * 1000);
-
+function weightByTime(currentDate: Date, prevDate: Date | null): number {
+	if (prevDate !== null) {
 		if (currentDate.getUTCFullYear() !== prevDate.getUTCFullYear()) {
 			return 70;
 		} else if (currentDate.getUTCMonth() !== prevDate.getUTCMonth()) {
@@ -53,26 +50,30 @@ function weightByTime(time: UTCTimestamp, prevTime: UTCTimestamp | null): number
 	return 20;
 }
 
-export function fillWeightsForPoints(sortedTimePoints: TimeScalePoint[], startIndex: number = 0): void {
+export function fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint>[], startIndex: number = 0): void {
 	let prevTime: UTCTimestamp | null = (startIndex === 0 || sortedTimePoints.length === 0)
 		? null
 		: sortedTimePoints[startIndex - 1].time.timestamp;
+	let prevDate: Date | null = prevTime !== null ? new Date(prevTime * 1000) : null;
 
 	let totalTimeDiff = 0;
 
 	for (let index = startIndex; index < sortedTimePoints.length; ++index) {
 		const currentPoint = sortedTimePoints[index];
-		currentPoint.timeWeight = weightByTime(currentPoint.time.timestamp, prevTime);
+		const currentDate = new Date(currentPoint.time.timestamp * 1000);
+		currentPoint.timeWeight = weightByTime(currentDate, prevDate);
 
 		totalTimeDiff += currentPoint.time.timestamp - (prevTime || currentPoint.time.timestamp);
+
 		prevTime = currentPoint.time.timestamp;
+		prevDate = currentDate;
 	}
 
 	if (startIndex === 0 && sortedTimePoints.length > 1) {
 		// let's guess a weight for the first point
 		// let's say the previous point was average time back in the history
 		const averageTimeDiff = Math.ceil(totalTimeDiff / (sortedTimePoints.length - 1));
-		const approxPrevTime = (sortedTimePoints[0].time.timestamp - averageTimeDiff) as UTCTimestamp;
-		sortedTimePoints[0].timeWeight = weightByTime(sortedTimePoints[0].time.timestamp, approxPrevTime);
+		const approxPrevDate = new Date((sortedTimePoints[0].time.timestamp - averageTimeDiff) * 1000);
+		sortedTimePoints[0].timeWeight = weightByTime(new Date(sortedTimePoints[0].time.timestamp * 1000), approxPrevDate);
 	}
 }
