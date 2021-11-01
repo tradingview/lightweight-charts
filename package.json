@@ -95,6 +95,7 @@
     "lint:ts": "eslint --format=unix --ext .ts,.typescript ./",
     "lint:md": "./node_modules/.bin/markdownlint -i \"**/node_modules/**\" -i \"**/docs/docs/api/**\" \"**/*.md\"",
     "check-dts-docs": "eslint --format=unix ./dist/typings.d.ts",
+    "check-markdown-links": "node scripts/check-markdown-links.js",
     "rollup": "rollup -c rollup.config.js",
     "rollup-watch": "npm run rollup -- --watch",
     "build": "npm-run-all tsc rollup bundle-dts",
