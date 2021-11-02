@@ -576,17 +576,16 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			return;
 		}
 
-		let startIndex = this._indexedMarkers.findIndex((m: InternalSeriesMarker<TimePointIndex>) => m.time >= firstChangedPointIndex);
-
-		if (startIndex === -1) {
-			startIndex = 0;
-		}
+		const firstChangedMarkerIndex = Math.max(0, this._indexedMarkers.findIndex((m: InternalSeriesMarker<TimePointIndex>) => m.time >= firstChangedPointIndex));
+		const firstDataIndex = ensureNotNull(this._data.firstIndex());
+		const indexedMarkers = new Array(this._markers.length);
 
 		// We can copy marks with a time point index < firstChangedPointIndex because we know they have not changed.
-		const indexedMarkers = this._indexedMarkers.slice(0, startIndex);
-		const firstDataIndex = ensureNotNull(this._data.firstIndex());
+		for (let index = 0; index < firstChangedMarkerIndex; index++) {
+			indexedMarkers[index] = this._indexedMarkers[index];
+		}
 
-		for (let index = startIndex; index < this._markers.length; index++) {
+		for (let index = firstChangedMarkerIndex; index < this._markers.length; index++) {
 			const marker = this._markers[index];
 			// the first find index on the time scale (across all series)
 			const timePointIndex = ensureNotNull(timeScale.timeToIndex(marker.time, true));
