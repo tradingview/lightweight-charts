@@ -199,27 +199,91 @@ export interface AreaStyleOptions {
 	lastPriceAnimation: LastPriceAnimationMode;
 }
 
+/**
+ * Represents a type of priced base value of baseline series type.
+ */
 export interface BaseValuePrice {
+	/**
+	 * Distinguished type value.
+	 */
 	type: 'price';
+
+	/**
+	 * Price value.
+	 */
 	price: number;
 }
 
+/**
+ * Represents a type of a base value of baseline series type.
+ */
 export type BaseValueType = BaseValuePrice;
+
+/**
+ * Represents style options for a baseline series.
+ */
 export interface BaselineStyleOptions {
-	topFillColor1: string;
-	topFillColor2: string;
-	bottomFillColor1: string;
-	bottomFillColor2: string;
-	topLineColor: string;
-	bottomLineColor: string;
+	/**
+	 * Base value of the series.
+	 */
 	baseValue: BaseValueType;
-	lineStyle: LineStyle;
+
+	/**
+	 * The first color of the top area.
+	 */
+	topFillColor1: string;
+	/**
+	 * The second color of the top area.
+	 */
+	topFillColor2: string;
+	/**
+	 * The line color of the top area.
+	 */
+	topLineColor: string;
+
+	/**
+	 * The first color of the bottom area.
+	 */
+	bottomFillColor1: string;
+	/**
+	 * The second color of the bottom area.
+	 */
+	bottomFillColor2: string;
+	/**
+	 * The line color of the bottom area.
+	 */
+	bottomLineColor: string;
+
+	/**
+	 * Line width.
+	 */
 	lineWidth: LineWidth;
-	lineType: LineType;
+	/**
+	 * Line style.
+	 */
+	lineStyle: LineStyle;
+
+	/**
+	 * Show the crosshair marker.
+	 */
 	crosshairMarkerVisible: boolean;
+	/**
+	 * Crosshair marker radius in pixels.
+	 */
 	crosshairMarkerRadius: number;
+	/**
+	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 */
 	crosshairMarkerBorderColor: string;
+	/**
+	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 */
 	crosshairMarkerBackgroundColor: string;
+
+	/**
+	 * Last price animation mode.
+	 */
+	lastPriceAnimation: LastPriceAnimationMode;
 }
 
 /**
@@ -274,7 +338,7 @@ export interface PriceFormatCustom {
 	 */
 	type: 'custom';
 	/**
-	 * Override price fomatting behaviour. Can be used for cases that can't be covered with built-in price formats.
+	 * Override price formatting behaviour. Can be used for cases that can't be covered with built-in price formats.
 	 */
 	formatter: PriceFormatterFn;
 	/**
@@ -449,6 +513,9 @@ export type AreaSeriesPartialOptions = SeriesPartialOptions<AreaStyleOptions>;
  * Structure describing baseline series options.
  */
 export type BaselineSeriesOptions = SeriesOptions<BaselineStyleOptions>;
+/**
+ * Represents baseline series options where all properties are options.
+ */
 export type BaselineSeriesPartialOptions = SeriesPartialOptions<BaselineStyleOptions>;
 
 /**
@@ -456,7 +523,7 @@ export type BaselineSeriesPartialOptions = SeriesPartialOptions<BaselineStyleOpt
  */
 export type BarSeriesOptions = SeriesOptions<BarStyleOptions>;
 /**
- * Represents bar series options where all properties are optiona.
+ * Represents bar series options where all properties are options.
  */
 export type BarSeriesPartialOptions = SeriesPartialOptions<BarStyleOptions>;
 
@@ -505,6 +572,9 @@ export interface SeriesOptionsMap {
 	 * The type of area series options.
 	 */
 	Area: AreaSeriesOptions;
+	/**
+	 * The type of baseline series options.
+	 */
 	Baseline: BaselineSeriesOptions;
 	/**
 	 * The type of line series options.
@@ -534,6 +604,9 @@ export interface SeriesPartialOptionsMap {
 	 * The type of area series partial options.
 	 */
 	Area: AreaSeriesPartialOptions;
+	/**
+	 * The type of baseline series partial options.
+	 */
 	Baseline: BaselineSeriesPartialOptions;
 	/**
 	 * The type of line series partial options.

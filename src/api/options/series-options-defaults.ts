@@ -58,23 +58,28 @@ export const areaStyleDefaults: AreaStyleOptions = {
 };
 
 export const baselineStyleDefaults: BaselineStyleOptions = {
-	topFillColor1: 'rgba(46, 220, 135, 0.4)',
-	topFillColor2: 'rgba(40, 221, 100, 0)',
-	bottomFillColor1: 'rgba(255, 18, 18, 0)',
-	bottomFillColor2: 'rgba(255, 18, 18, 0.4)',
-	topLineColor: '#33D778',
-	bottomLineColor: '#FF1212',
 	baseValue: {
 		type: 'price',
 		price: 0,
 	},
-	lineStyle: LineStyle.Solid,
+
+	topFillColor1: 'rgba(38, 166, 154, 0.28)',
+	topFillColor2: 'rgba(38, 166, 154, 0.05)',
+	topLineColor: 'rgba(38, 166, 154, 1)',
+
+	bottomFillColor1: 'rgba(239, 83, 80, 0.05)',
+	bottomFillColor2: 'rgba(239, 83, 80, 0.28)',
+	bottomLineColor: 'rgba(239, 83, 80, 1)',
+
 	lineWidth: 3,
-	lineType: LineType.Simple,
+	lineStyle: LineStyle.Solid,
+
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
 	crosshairMarkerBackgroundColor: '',
+
+	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 };
 
 export const histogramStyleDefaults: HistogramStyleOptions = {

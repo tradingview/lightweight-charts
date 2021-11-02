@@ -1,15 +1,20 @@
 # Baseline series
 
-An area chart is another way of displaying quantitative data. It's basically a colored area between the line connecting all data points and the time scale.
+A baseline chart is another way of displaying quantitative data. It's basically two colored areas (top and bottom) between the line connecting all data points and the baseline line.
 
-An area series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the time scale.
+A baseline series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the time scale.
 
 ![Baseline chart example](./assets/baseline-series.png)"Baseline chart example")
 
-## How to create area series
+## How to create baseline series
 
 ```js
-const baselineSeries = chart.addBaselineSeries();
+const baselineSeries = chart.addBaselineSeries({
+    baseValue: {
+        type: 'price',
+        price: 10,
+    },
+});
 
 // set the data
 baselineSeries.setData([
@@ -35,30 +40,29 @@ Each area series item should be a [whitespace](./whitespace-data.md) item or an 
 
 ## Customization
 
-Color, style and width setting options are provided for the upper line of an area series.
-
-Different colors may be set for the upper and bottom parts of an area.
+Different colors may be set for the upper and bottom parts of the series.
 These colors blend into one another in the middle of the area.
 
 Also, the crosshair marker, which is enabled by default, can either be disabled or have its radius adjusted.
 
-An area series interface can be customized using the following set of options:
+A baseline series interface can be customized using the following set of options:
 
 |Name|Type|Default|Description|
 |-|----|-------|-|
-|`topFillColor1`|`string`|`rgba(46, 220, 135, 0.4)`|Area top fill color 1|
-|`topFillColor2`|`string`|`rgba(40, 221, 100, 0)`|Area top color 2|
-|`bottomFillColor1`|`string`|`rgba(255, 18, 18, 0)`|Area bottom color 1|
-|`bottomFillColor2`|`string`|`rgba(255, 18, 18, 0.4)`|Area bottom color 2|
-|`topLineColor`|`string`|`#33D778`|Top Line color|
-|`bottomLineColor`|`string`|`#FF1212`|Bottom Line color|
-|`baseValue`|`BaseValueType`|`{type: 'price', price: 0,}`|BaseValue settings|
+|`baseValue`|`BaseValueType`|`{type: 'price', price: 0}`|Base value of the series|
+|`topFillColor1`|`string`|`rgba(38, 166, 154, 0.28)`|The first color of the top area|
+|`topFillColor2`|`string`|`rgba(38, 166, 154, 0.05)`|The second color of the top area.|
+|`topLineColor`|`string`|`rgba(38, 166, 154, 1)`|The line color of the top area|
+|`bottomFillColor1`|`string`|`rgba(239, 83, 80, 0.05)`|The first color of the bottom area|
+|`bottomFillColor2`|`string`|`rgba(239, 83, 80, 0.28)`|The second color of the bottom area|
+|`bottomLineColor`|`string`|`rgba(239, 83, 80, 1)`|The line color of the bottom area|
+|`lineWidth`|`number`|`3`|Line width|
 |`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
-|`lineWidth`|`number`|`3`|Line width in pixels|
-|`crosshairMarkerVisible`|`boolean`|`true`|If true, the crosshair marker is shown|
-|`crosshairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
-|`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
-|`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
+|`crosshairMarkerVisible`|`boolean`|`true`|Show the crosshair marker|
+|`crosshairMarkerRadius`|`number`|`4`|Crosshair marker radius in pixels|
+|`crosshairMarkerBorderColor`|`string`|`''`|Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair|
+|`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair|
+|`lastPriceAnimation`|[LastPriceAnimationMode](./constants.md#lastpriceanimationmode)|`'LastPriceAnimationMode.Disabled'`|Last price animation mode|
 
 ### Examples
 

@@ -7,24 +7,23 @@ import { walkLine } from './walk-line';
 
 export type LineItem = TimedValue & PricedValue & LinePoint;
 
-export interface PaneRendererLineData {
+export interface PaneRendererLineDataBase {
 	lineType: LineType;
 
 	items: LineItem[];
 
 	barWidth: number;
 
-	lineColor: string;
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
 
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererLine extends ScaledRenderer {
-	protected _data: PaneRendererLineData | null = null;
+export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBase> extends ScaledRenderer {
+	protected _data: TData | null = null;
 
-	public setData(data: PaneRendererLineData): void {
+	public setData(data: TData): void {
 		this._data = data;
 	}
 
@@ -38,7 +37,7 @@ export class PaneRendererLine extends ScaledRenderer {
 
 		setLineStyle(ctx, this._data.lineStyle);
 
-		ctx.strokeStyle = this._data.lineColor;
+		ctx.strokeStyle = this._strokeStyle(ctx);
 		ctx.lineJoin = 'round';
 
 		ctx.beginPath();
@@ -51,5 +50,18 @@ export class PaneRendererLine extends ScaledRenderer {
 		}
 
 		ctx.stroke();
+	}
+
+	protected abstract _strokeStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['strokeStyle'];
+}
+
+export interface PaneRendererLineData extends PaneRendererLineDataBase {
+	lineColor: string;
+}
+
+export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData> {
+	protected override _strokeStyle(): CanvasRenderingContext2D['strokeStyle'] {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		return this._data!.lineColor;
 	}
 }

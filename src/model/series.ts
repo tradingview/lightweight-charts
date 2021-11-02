@@ -51,16 +51,14 @@ import {
 } from './series-options';
 import { TimePoint, TimePointIndex } from './time-data';
 
-export interface LastValueDataResult {
-	noData: boolean;
-}
-
-export interface LastValueDataResultWithoutData extends LastValueDataResult {
+export interface LastValueDataResultWithoutData {
 	noData: true;
 }
 
-export interface LastValueDataResultWithData extends LastValueDataResult {
+export interface LastValueDataResultWithData {
 	noData: false;
+
+	price: number;
 	text: string;
 	formattedPriceAbsolute: string;
 	formattedPricePercentage: string;
@@ -69,11 +67,7 @@ export interface LastValueDataResultWithData extends LastValueDataResult {
 	index: TimePointIndex;
 }
 
-export interface LastValueDataResultWithRawPrice extends LastValueDataResultWithData {
-	price: number;
-}
-
-export type LastValueDataResultWithoutRawPrice = LastValueDataResultWithoutData | LastValueDataResultWithData;
+export type LastValueDataResult = LastValueDataResultWithoutData | LastValueDataResultWithData;
 
 export interface MarkerData {
 	price: BarPrice;
@@ -127,8 +121,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		this._panePriceAxisView = new PanePriceAxisView(priceAxisView, this, model);
 
-		if (seriesType === 'Area' || seriesType === 'Line') {
-			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'>);
+		if (seriesType === 'Area' || seriesType === 'Line' || seriesType === 'Baseline') {
+			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'> | Series<'Baseline'>);
 		}
 
 		this._recreateFormatter();
@@ -146,20 +140,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options.priceLineColor || lastBarColor;
 	}
 
-	public lastValueData(globalLast: boolean, withRawPrice?: false): LastValueDataResultWithoutRawPrice;
-	public lastValueData(globalLast: boolean, withRawPrice: true): LastValueDataResultWithRawPrice;
-
-	// returns object with:
-	// formatted price
-	// raw price (if withRawPrice)
-	// coordinate
-	// color
-	// or { "noData":true } if last value could not be found
-	// NOTE: should NEVER return null or undefined!
-	public lastValueData(
-		globalLast: boolean,
-		withRawPrice?: boolean
-	): LastValueDataResultWithoutRawPrice | LastValueDataResultWithRawPrice {
+	public lastValueData(globalLast: boolean): LastValueDataResult {
 		const noDataRes: LastValueDataResultWithoutData = { noData: true };
 
 		const priceScale = this.priceScale();
@@ -206,7 +187,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		return {
 			noData: false,
-			price: withRawPrice ? price : undefined,
+			price,
 			text: priceScale.formatPrice(price, firstValue.value),
 			formattedPriceAbsolute: priceScale.formatPriceAbsolute(price),
 			formattedPricePercentage: priceScale.formatPricePercentage(price, firstValue.value),

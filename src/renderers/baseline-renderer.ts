@@ -1,121 +1,56 @@
 import { clamp } from '../helpers/mathex';
 
 import { Coordinate } from '../model/coordinate';
-import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { LineItem } from './line-renderer';
-import { ScaledRenderer } from './scaled-renderer';
-import { walkLine } from './walk-line';
+import { PaneRendererAreaBase, PaneRendererAreaDataBase } from './area-renderer';
+import { PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer';
 
-export interface PaneRendererBaselineData {
-	items: LineItem[];
-	lineType: LineType;
-	lineWidth: LineWidth;
-	lineStyle: LineStyle;
-
-	topLineColor: string;
-	bottomLineColor: string;
+export interface PaneRendererBaselineData extends PaneRendererAreaDataBase {
 	topFillColor1: string;
 	topFillColor2: string;
+
 	bottomFillColor1: string;
 	bottomFillColor2: string;
-
-	bottom: Coordinate;
-	baseLine: Coordinate;
-
-	barWidth: number;
-
-	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererBaseline extends ScaledRenderer {
-	protected _data: PaneRendererBaselineData | null = null;
-	protected _baseLine: Coordinate | null = null;
+export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererBaselineData> {
+	protected override _fillStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['fillStyle'] {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const data = this._data!;
 
-	public setData(data: PaneRendererBaselineData): void {
-		this._data = data;
-		this._baseLine = Math.min(this._data.bottom, this._data.baseLine) as Coordinate;
+		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
+		const baselinePercent = clamp(data.baseLevelCoordinate / data.bottom, 0, 1);
+
+		gradient.addColorStop(0, data.topFillColor1);
+		gradient.addColorStop(baselinePercent, data.topFillColor2);
+		gradient.addColorStop(baselinePercent, data.bottomFillColor1);
+		gradient.addColorStop(1, data.bottomFillColor2);
+
+		return gradient;
 	}
+}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
-		this._drawArea(ctx);
-		this._drawLine(ctx);
-	}
+export interface PaneRendererBaselineLineData extends PaneRendererLineDataBase {
+	topColor: string;
+	bottomColor: string;
 
-	private _drawArea(ctx: CanvasRenderingContext2D): void {
-		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null || this._baseLine === null) {
-			return;
-		}
-		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);
-		const baseLinePercent = this._baseLine / this._data.bottom;
-		gradient.addColorStop(0, this._data.topFillColor1);
-		gradient.addColorStop(clamp(baseLinePercent, 0, 1), this._data.topFillColor2);
-		gradient.addColorStop(clamp(baseLinePercent + 0.01, 0, 1), this._data.bottomFillColor1); // Add small size
-		gradient.addColorStop(1, this._data.bottomFillColor2);
+	baseLevelCoordinate: Coordinate;
+	bottom: Coordinate;
+}
 
-		ctx.lineCap = 'butt';
-		ctx.lineJoin = 'round';
-		ctx.strokeStyle = gradient;
-		ctx.lineWidth = this._data.lineWidth;
-		setLineStyle(ctx, this._data.lineStyle);
+export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererBaselineLineData> {
+	protected override _strokeStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['strokeStyle'] {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const data = this._data!;
 
-		// walk lines with width=1 to have more accurate gradient's filling
-		ctx.lineWidth = 1;
+		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
+		const baselinePercent = clamp(data.baseLevelCoordinate / data.bottom, 0, 1);
 
-		ctx.beginPath();
+		gradient.addColorStop(0, data.topColor);
+		gradient.addColorStop(baselinePercent, data.topColor);
+		gradient.addColorStop(baselinePercent, data.bottomColor);
+		gradient.addColorStop(1, data.bottomColor);
 
-		if (this._data.items.length === 1) {
-			const point = this._data.items[0];
-			const halfBarWidth = this._data.barWidth / 2;
-			ctx.moveTo(point.x - halfBarWidth, this._baseLine);
-			ctx.lineTo(point.x - halfBarWidth, point.y);
-			ctx.lineTo(point.x + halfBarWidth, point.y);
-			ctx.lineTo(point.x + halfBarWidth, this._baseLine);
-		} else {
-			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._baseLine);
-			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
-
-			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
-
-			if (this._data.visibleRange.to > this._data.visibleRange.from) {
-				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._baseLine);
-				ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._baseLine);
-			}
-		}
-		ctx.closePath();
-
-		ctx.fillStyle = gradient;
-		ctx.fill();
-	}
-
-	private _drawLine(ctx: CanvasRenderingContext2D): void {
-		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null || this._baseLine === null) {
-			return;
-		}
-		ctx.lineCap = 'butt';
-		ctx.lineWidth = this._data.lineWidth;
-
-		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);
-		const baseLinePercent = this._baseLine / this._data.bottom;
-		gradient.addColorStop(0, this._data.topLineColor);
-		gradient.addColorStop(clamp(baseLinePercent, 0, 1), this._data.topLineColor);
-		gradient.addColorStop(clamp(baseLinePercent + 0.01, 0, 1), this._data.bottomLineColor); // Add small size
-		gradient.addColorStop(1, this._data.bottomLineColor);
-		setLineStyle(ctx, this._data.lineStyle);
-
-		ctx.strokeStyle = gradient;
-		ctx.lineJoin = 'round';
-
-		ctx.beginPath();
-		if (this._data.items.length === 1) {
-			const point = this._data.items[0];
-			ctx.moveTo(point.x - this._data.barWidth / 2, point.y);
-			ctx.lineTo(point.x + this._data.barWidth / 2, point.y);
-		} else {
-			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
-		}
-
-		ctx.stroke();
+		return gradient;
 	}
 }

@@ -2,22 +2,23 @@ import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
-import { BaseValueType } from '../../model/series-options';
 import { TimePointIndex } from '../../model/time-data';
-import { PaneRendererBaseline, PaneRendererBaselineData } from '../../renderers/baseline-renderer';
+import { PaneRendererBaselineArea, PaneRendererBaselineLine } from '../../renderers/baseline-renderer';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
+import { LineType } from '../../renderers/draw-line';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { LineItem } from '../../renderers/line-renderer';
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
 export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineItem> {
-	private readonly _renderer: CompositeRenderer = new CompositeRenderer();
-	private readonly _areaRenderer: PaneRendererBaseline = new PaneRendererBaseline();
+	private readonly _baselineAreaRenderer: PaneRendererBaselineArea = new PaneRendererBaselineArea();
+	private readonly _baselineLineRenderer: PaneRendererBaselineLine = new PaneRendererBaselineLine();
+	private readonly _compositeRenderer: CompositeRenderer = new CompositeRenderer();
 
 	public constructor(series: Series<'Baseline'>, model: ChartModel) {
 		super(series, model);
-		this._renderer.setRenderers([this._areaRenderer]);
+		this._compositeRenderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
 	}
 
 	public renderer(height: number, width: number): IPaneRenderer | null {
@@ -25,33 +26,55 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 			return null;
 		}
 
+		const firstValue = this._series.firstValue();
+		if (firstValue === null) {
+			return null;
+		}
+
 		const baselineProps = this._series.options();
 
 		this._makeValid();
-		const data: PaneRendererBaselineData = {
-			lineType: baselineProps.lineType,
+
+		const baseLevelCoordinate = this._series.priceScale().priceToCoordinate(baselineProps.baseValue.price, firstValue.value);
+		const barWidth = this._model.timeScale().barSpacing();
+
+		this._baselineAreaRenderer.setData({
 			items: this._items,
-			topLineColor: baselineProps.topLineColor,
-			bottomLineColor: baselineProps.bottomLineColor,
-			lineStyle: baselineProps.lineStyle,
-			lineWidth: baselineProps.lineWidth,
+
 			topFillColor1: baselineProps.topFillColor1,
 			topFillColor2: baselineProps.topFillColor2,
 			bottomFillColor1: baselineProps.bottomFillColor1,
 			bottomFillColor2: baselineProps.bottomFillColor2,
+
+			lineWidth: baselineProps.lineWidth,
+			lineStyle: baselineProps.lineStyle,
+			lineType: LineType.Simple,
+
+			baseLevelCoordinate,
 			bottom: height as Coordinate,
-			baseLine: this._series.priceScale().priceToCoordinate(baselineProps.baseValue.price, 0),
+
 			visibleRange: this._itemsVisibleRange,
-			barWidth: this._model.timeScale().barSpacing(),
-		};
+			barWidth,
+		});
 
-		this._areaRenderer.setData(data);
+		this._baselineLineRenderer.setData({
+			items: this._items,
 
-		return this._renderer;
-	}
+			topColor: baselineProps.topLineColor,
+			bottomColor: baselineProps.bottomLineColor,
 
-	protected _getBaselineCoordinate(baseValue: BaseValueType): Coordinate {
-		return this._series.priceScale().priceToCoordinate(baseValue.price, 0);
+			lineWidth: baselineProps.lineWidth,
+			lineStyle: baselineProps.lineStyle,
+			lineType: LineType.Simple,
+
+			baseLevelCoordinate,
+			bottom: height as Coordinate,
+
+			visibleRange: this._itemsVisibleRange,
+			barWidth,
+		});
+
+		return this._compositeRenderer;
 	}
 
 	protected _createRawItem(time: TimePointIndex, price: BarPrice): LineItem {
