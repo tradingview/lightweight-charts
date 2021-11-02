@@ -51,6 +51,7 @@ function getChecker(type: SeriesType): Checker {
 			return checkBarItem.bind(null, type);
 
 		case 'Area':
+		case 'Baseline':
 		case 'Line':
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
@@ -84,7 +85,7 @@ function checkBarItem(type: 'Bar' | 'Candlestick', barItem: SeriesDataItemTypeMa
 	);
 }
 
-function checkLineItem(type: 'Area' | 'Line' | 'Histogram', lineItem: SeriesDataItemTypeMap[typeof type]): void {
+function checkLineItem(type: 'Area' | 'Baseline' | 'Line' | 'Histogram', lineItem: SeriesDataItemTypeMap[typeof type]): void {
 	if (!isFulfilledData(lineItem)) {
 		return;
 	}

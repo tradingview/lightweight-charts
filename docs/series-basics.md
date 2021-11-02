@@ -583,6 +583,7 @@ const price = series.coordinateToPrice(324);
 ## Next reading
 
 - [Area series](./area-series.md)
+- [Baseline series](./baseline-series.md)
 - [Bar series](./bar-series.md)
 - [Candlestick series](./candlestick-series.md)
 - [Histogram series](./histogram-series.md)

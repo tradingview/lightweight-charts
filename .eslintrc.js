@@ -189,7 +189,7 @@ module.exports = {
 						format: ['PascalCase'],
 						filter: {
 							match: true,
-							regex: '^(Area|Bar|Candlestick|Histogram|Line)$',
+							regex: '^(Area|Baseline|Bar|Candlestick|Histogram|Line)$',
 						},
 					},
 

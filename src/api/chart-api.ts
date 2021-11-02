@@ -14,6 +14,8 @@ import {
 	AreaSeriesPartialOptions,
 	BarSeriesOptions,
 	BarSeriesPartialOptions,
+	BaselineSeriesOptions,
+	BaselineSeriesPartialOptions,
 	CandlestickSeriesOptions,
 	CandlestickSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
@@ -38,6 +40,7 @@ import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
 	areaStyleDefaults,
 	barStyleDefaults,
+	baselineStyleDefaults,
 	candlestickStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
@@ -214,6 +217,20 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const series = this._chartWidget.model().createSeries('Area', strictOptions);
 
 		const res = new SeriesApi<'Area'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
+	public addBaselineSeries(options: BaselineSeriesPartialOptions = {}): ISeriesApi<'Baseline'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), baselineStyleDefaults, options) as BaselineSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Baseline', strictOptions);
+
+		const res = new SeriesApi<'Baseline'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
