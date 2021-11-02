@@ -4,7 +4,7 @@ This doc describes what do you need to do if you want to add a time zone support
 
 ## Background
 
-By default, `lightweight-charts` doesn't support time zones in any kind, just because JavaScript doesn't an API to do that.
+By default, `lightweight-charts` doesn't support time zones in any kind, just because JavaScript doesn't have an API to do that.
 Things that the library uses internally includes an API to:
 
 - Format a date
