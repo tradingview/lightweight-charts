@@ -42,8 +42,6 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	window.chart = chart;
-
 	const mainSeries = chart.addBaselineSeries({
 		lineWidth: 1,
 		baseValue: {
@@ -51,6 +49,8 @@ function runTestCase(container) {
 			price: 0,
 		},
 	});
+
+	chart.timeScale().fitContent();
 
 	mainSeries.setData(generateData());
 }
