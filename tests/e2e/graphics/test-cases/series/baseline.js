@@ -52,9 +52,5 @@ function runTestCase(container) {
 		},
 	});
 
-	mainSeries.createPriceLine({
-		price: 0,
-	});
-
 	mainSeries.setData(generateData());
 }

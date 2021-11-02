@@ -48,13 +48,21 @@ function runTestCase(container) {
 		lineWidth: 1,
 		baseValue: {
 			type: 'price',
-			price: 5,
+			price: 0,
 		},
 	});
 
-	mainSeries.createPriceLine({
-		price: 5,
-	});
-
 	mainSeries.setData(generateData());
+
+	return new Promise(resolve => {
+		setTimeout(() => {
+			mainSeries.applyOptions({
+				baseValue: {
+					type: 'price',
+					price: 10,
+				},
+			});
+			resolve();
+		}, 200);
+	});
 }
