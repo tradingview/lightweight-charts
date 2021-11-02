@@ -16,7 +16,7 @@ Out of the box we could rely on 2 APIs:
 - [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl)
 
 And even if to format a date we could (and we do) use `Date` object with its `toLocaleString` method (and we could even pass a `timeZone` field as an option),
-but what's about getting a date/time fields?
+but how about date/time field?
 
 All to solve this it seems that the only solution we have is `Date`'s getters, e.g. `getHours`. Here we could use 2 APIs:
 
