@@ -76,3 +76,4 @@ That's it! Your first chart is ready and we can now proceed.
 - [Series basics](./series-basics.md)
 - [Customization](./customization.md)
 - [Time Scale](./time-scale.md)
+- [Time zones support](./time-zones.md)

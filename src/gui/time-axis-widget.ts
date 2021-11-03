@@ -10,6 +10,7 @@ import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { LayoutOptionsInternal } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
+import { TickMarkWeight } from '../model/time-data';
 import { TimeMark } from '../model/time-scale';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 
@@ -303,9 +304,9 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		let maxWeight = tickMarks.reduce(markWithGreaterWeight, tickMarks[0]).weight;
 
 		// special case: it looks strange if 15:00 is bold but 14:00 is not
-		// so if maxWeight > 30 and < 40 reduce it to 30
-		if (maxWeight > 30 && maxWeight < 40) {
-			maxWeight = 30;
+		// so if maxWeight > TickMarkWeight.Hour1 and < TickMarkWeight.Day reduce it to TickMarkWeight.Hour1
+		if (maxWeight > TickMarkWeight.Hour1 && maxWeight < TickMarkWeight.Day) {
+			maxWeight = TickMarkWeight.Hour1;
 		}
 
 		ctx.save();

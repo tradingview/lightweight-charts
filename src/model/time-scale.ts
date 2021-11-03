@@ -19,6 +19,7 @@ import {
 	Logical,
 	LogicalRange,
 	SeriesItemsIndexesRange,
+	TickMarkWeight,
 	TimedValue,
 	TimePoint,
 	TimePointIndex,
@@ -34,15 +35,6 @@ const enum Constants {
 	MinVisibleBarsCount = 2,
 }
 
-const enum MarkWeightBorder {
-	Minute = 20,
-	Hour = 30,
-	Day = 40,
-	Week = 50,
-	Month = 60,
-	Year = 70,
-}
-
 interface TransitionState {
 	barSpacing: number;
 	rightOffset: number;
@@ -52,7 +44,7 @@ export interface TimeMark {
 	needAlignCoordinate: boolean;
 	coord: number;
 	label: string;
-	weight: number;
+	weight: TickMarkWeight;
 }
 
 /**
@@ -456,22 +448,17 @@ export class TimeScale {
 				continue;
 			}
 
-			const time = this.indexToTime(tm.index);
-			if (time === null) {
-				continue;
-			}
-
 			let label: TimeMark;
 			if (targetIndex < this._labels.length) {
 				label = this._labels[targetIndex];
 				label.coord = this.indexToCoordinate(tm.index);
-				label.label = this._formatLabel(time, tm.weight);
+				label.label = this._formatLabel(tm.time, tm.weight);
 				label.weight = tm.weight;
 			} else {
 				label = {
 					needAlignCoordinate: false,
 					coord: this.indexToCoordinate(tm.index),
-					label: this._formatLabel(time, tm.weight),
+					label: this._formatLabel(tm.time, tm.weight),
 					weight: tm.weight,
 				};
 
@@ -847,23 +834,8 @@ export class TimeScale {
 		return formatter.format(time);
 	}
 
-	private _formatLabelImpl(timePoint: TimePoint, weight: number): string {
-		let tickMarkType: TickMarkType;
-
-		const timeVisible = this._options.timeVisible;
-		if (weight < MarkWeightBorder.Minute && timeVisible) {
-			tickMarkType = this._options.secondsVisible ? TickMarkType.TimeWithSeconds : TickMarkType.Time;
-		} else if (weight < MarkWeightBorder.Day && timeVisible) {
-			tickMarkType = TickMarkType.Time;
-		} else if (weight < MarkWeightBorder.Week) {
-			tickMarkType = TickMarkType.DayOfMonth;
-		} else if (weight < MarkWeightBorder.Month) {
-			tickMarkType = TickMarkType.DayOfMonth;
-		} else if (weight < MarkWeightBorder.Year) {
-			tickMarkType = TickMarkType.Month;
-		} else {
-			tickMarkType = TickMarkType.Year;
-		}
+	private _formatLabelImpl(timePoint: TimePoint, weight: TickMarkWeight): string {
+		const tickMarkType = weightToTickMarkType(weight, this._options.timeVisible, this._options.secondsVisible);
 
 		if (this._options.tickMarkFormatter !== undefined) {
 			// this is temporary solution to make more consistency API
@@ -947,5 +919,34 @@ export class TimeScale {
 		this._correctOffset();
 
 		this._correctBarSpacing();
+	}
+}
+
+// eslint-disable-next-line complexity
+function weightToTickMarkType(weight: TickMarkWeight, timeVisible: boolean, secondsVisible: boolean): TickMarkType {
+	switch (weight) {
+		case TickMarkWeight.LessThanSecond:
+		case TickMarkWeight.Second:
+			return timeVisible
+				? (secondsVisible ? TickMarkType.TimeWithSeconds : TickMarkType.Time)
+				: TickMarkType.DayOfMonth;
+
+		case TickMarkWeight.Minute1:
+		case TickMarkWeight.Minute5:
+		case TickMarkWeight.Minute30:
+		case TickMarkWeight.Hour1:
+		case TickMarkWeight.Hour3:
+		case TickMarkWeight.Hour6:
+		case TickMarkWeight.Hour12:
+			return timeVisible ? TickMarkType.Time : TickMarkType.DayOfMonth;
+
+		case TickMarkWeight.Day:
+			return TickMarkType.DayOfMonth;
+
+		case TickMarkWeight.Month:
+			return TickMarkType.Month;
+
+		case TickMarkWeight.Year:
+			return TickMarkType.Year;
 	}
 }
