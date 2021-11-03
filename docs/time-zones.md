@@ -1,10 +1,10 @@
 # Working with time zones
 
-This doc describes what do you need to do if you want to add a time zone support to your chart.
+This doc describes what do you need to do if you want to add time zone support to your chart.
 
 ## Background
 
-By default, `lightweight-charts` doesn't support time zones in any kind, just because JavaScript doesn't have an API to do that.
+By default, `lightweight-charts` doesn't support time zones of any kind, just because JavaScript doesn't have an API to do that.
 Things that the library uses internally includes an API to:
 
 - Format a date
@@ -25,9 +25,9 @@ All to solve this it seems that the only solution we have is `Date`'s getters, e
 
 As you can see we just unable to get date/time parts in desired time zone without using custom libraries (like `date-fns`) out of the box.
 
-That's why we have decided to not support time zones in any kind and we do use UTC-based methods internally all the way (you can rely on this knowledge if you wish).
+Because of this we decided not to handle time zones in the library. The library treats all dates and times as UTC internally.
 
-But for fairness' sake, it could be done from your side!
+But don't worry - it's easy to add time-zone support in your own code!
 
 ## How to add time zone support to your chart
 
@@ -37,7 +37,7 @@ The only way to do this is to change a time in your data.
 
 As soon as the library relies on UTC-based methods, you could change a time of your data item so in UTC it could be as it is in desired time zone.
 
-Lets consider the example.
+Let's consider an example.
 
 Lets say you have a bar with time `2021-01-01T10:00:00.000Z` (a string representation is just for better readability).
 And you want to display your chart in `Europe/Moscow` time zone.
@@ -46,7 +46,7 @@ According to tz database, for `Europe/Moscow` time zone a time offset at this ti
 
 By this means, the time for `Europe/Moscow` is `2021-01-01 13:00:00.000` (so basically you want to display this time over the UTC one).
 
-So to display your chart in `Europe/Moscow` time zone you need to correct the time of your bar by time zone offset, i.e. by +3 hours, so it will be `2021-01-01T13:00:00.000Z` (keep in mind that the library will use it as UTC time, but it is not correct time actually).
+To display your chart in the `Europe/Moscow` time zone you would need to adjust the time of your data by +3 hours. So `2021-01-01T10:00:00.000Z` would become `2021-01-01T13:00:00.000Z`.
 
 Note that due a time zone offset the date could be changed as well (not only time part).
 
