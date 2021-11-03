@@ -94,7 +94,7 @@ If you have lots of data items and the performance of other solutions doesn't fi
 
 The better performance could be achieved with this approach because:
 
-- you don't need to parse dates every time you want to get an offset so you could use lowerbound algorithm (which is `O(log N)`) to find an offset of very first data point quickly
+- you don't need to parse dates every time you want to get an offset so you could use [lowerbound algorithm](https://en.wikipedia.org/wiki/Upper_and_lower_bounds) (which is `O(log N)`) to find an offset of very first data point quickly
 - after you found an offset, you go through all data items and check whether an offset should be changed or not to the next one (based on a time of the next time shift)
 
 ## Why we didn't implement it in the library
