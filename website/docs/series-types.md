@@ -70,7 +70,7 @@ A baseline is basically two colored areas (top and bottom) between the line conn
 ## Candlestick
 
 - **Method to create**: [`IChartApi.addCandlestickSeries`](/api/interfaces/IChartApi.md#addcandlestickseries)
-- **Data format**: [`BarData`](/api/interfaces/BarData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`CandlestickData`](/api/interfaces/CandlestickData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`CandlestickStyleOptions`](/api/interfaces/CandlestickStyleOptions.md)
 
 A candlestick chart shows price movements in the form of candlesticks.

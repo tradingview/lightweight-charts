@@ -89,7 +89,7 @@ export interface HistogramData extends LineData {
 /**
  * Represents a bar with a {@link Time} and open, high, low, and close prices.
  */
-export interface BarData {
+export interface OhlcData {
 	/**
 	 * The bar time.
 	 */
@@ -113,6 +113,34 @@ export interface BarData {
 	close: number;
 }
 
+/**
+ * Structure describing a single item of data for bar series
+ */
+export interface BarData extends OhlcData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+}
+
+/**
+ * Structure describing a single item of data for candlestick series
+ */
+export interface CandlestickData extends OhlcData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+	/**
+	 * Optional border color value for certain data item. If missed, color from options is used
+	 */
+	borderColor?: string;
+	/**
+	 * Optional wick color value for certain data item. If missed, color from options is used
+	 */
+	wickColor?: string;
+}
+
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
@@ -134,7 +162,7 @@ export interface SeriesDataItemTypeMap {
 	/**
 	 * The types of candlestick series data.
 	 */
-	Candlestick: BarData | WhitespaceData;
+	Candlestick: CandlestickData | WhitespaceData;
 	/**
 	 * The types of area series data.
 	 */

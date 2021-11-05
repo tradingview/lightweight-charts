@@ -6,9 +6,19 @@ export interface HistogramPlotRow extends PlotRow {
 	readonly color?: string;
 }
 
+export interface BarPlotRow extends PlotRow {
+	readonly color?: string;
+}
+
+export interface CandlestickPlotRow extends PlotRow {
+	readonly color?: string;
+	readonly borderColor?: string;
+	readonly wickColor?: string;
+}
+
 export interface SeriesPlotRowTypeAtTypeMap {
-	Bar: PlotRow;
-	Candlestick: PlotRow;
+	Bar: BarPlotRow;
+	Candlestick: CandlestickPlotRow;
 	Area: PlotRow;
 	Baseline: PlotRow;
 	Line: PlotRow;
