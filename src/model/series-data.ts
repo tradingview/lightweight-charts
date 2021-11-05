@@ -2,6 +2,10 @@ import { PlotRow } from './plot-data';
 import { PlotList } from './plot-list';
 import { SeriesType } from './series-options';
 
+export interface LinePlotRow extends PlotRow {
+	readonly color?: string;
+}
+
 export interface HistogramPlotRow extends PlotRow {
 	readonly color?: string;
 }
@@ -21,7 +25,7 @@ export interface SeriesPlotRowTypeAtTypeMap {
 	Candlestick: CandlestickPlotRow;
 	Area: PlotRow;
 	Baseline: PlotRow;
-	Line: PlotRow;
+	Line: LinePlotRow;
 	Histogram: HistogramPlotRow;
 }
 

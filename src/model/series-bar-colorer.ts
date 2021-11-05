@@ -45,7 +45,7 @@ export class SeriesBarColorer {
 		const seriesOptions = this._series.options();
 		switch (targetType) {
 			case 'Line':
-				return this._lineStyle(seriesOptions as LineStyleOptions);
+				return this._lineStyle(seriesOptions as LineStyleOptions, barIndex, precomputedBars);
 
 			case 'Area':
 				return this._areaStyle(seriesOptions as AreaStyleOptions);
@@ -126,10 +126,12 @@ export class SeriesBarColorer {
 		};
 	}
 
-	private _lineStyle(lineStyle: LineStyleOptions): BarColorerStyle {
+	private _lineStyle(lineStyle: LineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
+
 		return {
 			...emptyResult,
-			barColor: lineStyle.color,
+			barColor: currentBar.color ?? lineStyle.color,
 		};
 	}
 

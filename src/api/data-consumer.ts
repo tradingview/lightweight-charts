@@ -62,9 +62,9 @@ export interface WhitespaceData {
 }
 
 /**
- * Represents a data point for a line or area series.
+ * A base interface for a data point of single-value series.
  */
-export interface LineData {
+export interface SingleValueData {
 	/**
 	 * The time of the data.
 	 */
@@ -77,11 +77,21 @@ export interface LineData {
 }
 
 /**
+ * Structure describing a single item of data for line series
+ */
+export interface LineData extends SingleValueData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+}
+
+/**
  * Structure describing a single item of data for histogram series
  */
-export interface HistogramData extends LineData {
+export interface HistogramData extends SingleValueData {
 	/**
-	 * Optional color value for certain data item. If missed, color from HistogramSeriesOptions is used
+	 * Optional color value for certain data item. If missed, color from options is used
 	 */
 	color?: string;
 }
@@ -166,11 +176,11 @@ export interface SeriesDataItemTypeMap {
 	/**
 	 * The types of area series data.
 	 */
-	Area: LineData | WhitespaceData;
+	Area: SingleValueData | WhitespaceData;
 	/**
 	 * The types of baseline series data.
 	 */
-	Baseline: LineData | WhitespaceData;
+	Baseline: SingleValueData | WhitespaceData;
 	/**
 	 * The types of line series data.
 	 */

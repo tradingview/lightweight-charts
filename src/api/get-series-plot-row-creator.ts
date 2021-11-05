@@ -8,7 +8,7 @@ import { BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, Se
 function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData): Mutable<SeriesPlotRow<'Line' | 'Histogram' | 'Area' | 'Baseline'>> {
 	const val = item.value;
 
-	const res: Mutable<SeriesPlotRow<'Histogram'>> = { index, time, value: [val, val, val, val] };
+	const res: Mutable<SeriesPlotRow<'Histogram' | 'Line'>> = { index, time, value: [val, val, val, val] };
 
 	// 'color' here is public property (from API) so we can use `in` here safely
 	// eslint-disable-next-line no-restricted-syntax
