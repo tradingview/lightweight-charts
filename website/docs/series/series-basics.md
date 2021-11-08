@@ -501,7 +501,7 @@ series.removePriceLine(priceLine);
 
 ### barsInLogicalRange
 
-Returns bars information for the series in the provided [logical range](./time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
+Returns bars information for the series in the provided [logical range](../time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
 
 The returned value is an object with the following properties:
 
@@ -523,7 +523,7 @@ console.log(barsInfo);
 ```
 
 This method can be used, for instance, to implement downloading historical data while scrolling to prevent a user from seeing empty space.
-Thus, you can subscribe to [visible logical range changed event](./time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
+Thus, you can subscribe to [visible logical range changed event](../time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
 
 ```js
 function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
