@@ -422,7 +422,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public override priceScale(): PriceScale {
-		return ensureNotNull(this._priceScale);
+		return ensureNotNull(super.priceScale());
 	}
 
 	public markerDataAtIndex(index: TimePointIndex): MarkerData | null {

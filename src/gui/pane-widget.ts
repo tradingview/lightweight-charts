@@ -300,9 +300,6 @@ export class PaneWidget implements IDestroyable {
 			this._setCrosshairPosition(x, y);
 			const hitTest = this.hitTest(x, y);
 			this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
-			if (hitTest !== null && hitTest.view.moveHandler !== undefined) {
-				hitTest.view.moveHandler(x, y);
-			}
 		}
 	}
 
@@ -313,10 +310,6 @@ export class PaneWidget implements IDestroyable {
 
 		const x = event.localX;
 		const y = event.localY;
-		const hitTest = this.hitTest(x, y);
-		if (hitTest !== null && hitTest.view.clickHandler !== undefined) {
-			hitTest.view.clickHandler(x, y);
-		}
 
 		if (this._clicked.hasListeners()) {
 			const currentTime = this._model().crosshairSource().appliedIndex();
