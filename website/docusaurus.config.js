@@ -15,7 +15,7 @@ const config = {
 	tagline: 'Small and fast financial charts',
 	onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
-	favicon: 'img/favicon.ico',
+	favicon: '/favicon.ico',
 	noIndex: true,
 	url: githubPagesUrl,
 	baseUrl: `/${projectName}/`,
@@ -45,7 +45,7 @@ const config = {
 				title: 'Lightweight Charts',
 				logo: {
 					alt: 'Lightweight Charts Logo',
-					src: 'img/logo.svg',
+					src: 'https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true',
 				},
 				items: [
 					{
