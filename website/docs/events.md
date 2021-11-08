@@ -1,3 +1,7 @@
+---
+sidebar_position: 5
+---
+
 # Events
 
 Event subscriptions can notify you of such chart/user interactions as mouse clicks/moving of mouse cursor and changes of the chart visible time range.

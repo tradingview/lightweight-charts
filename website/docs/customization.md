@@ -1,3 +1,7 @@
+---
+sidebar_position: 6
+---
+
 # Customization
 
 ## Initial chart options

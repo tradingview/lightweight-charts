@@ -1,3 +1,7 @@
+---
+sidebar_position: 4
+---
+
 # Time Scale
 
 Time scale (or time axis) is a horizontal scale at the bottom of the chart that displays the time of bars.
