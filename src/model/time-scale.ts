@@ -311,10 +311,6 @@ export class TimeScale {
 		};
 	}
 
-	public tickMarks(): TickMarks {
-		return this._tickMarks;
-	}
-
 	public width(): number {
 		return this._width;
 	}
