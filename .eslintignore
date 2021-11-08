@@ -8,5 +8,5 @@
 
 **/node_modules
 
-/docs/docs/**
-/docs/build/**
+/website/docs/**
+/website/build/**
