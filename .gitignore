@@ -21,6 +21,7 @@ debug.html
 /dist/
 /src/**/*.js
 /src/**/*.d.ts
+/website/docs/api/
 
 !/src/typings/**/*.d.ts
 
