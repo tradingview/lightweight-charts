@@ -82,7 +82,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 
 	protected _updateOptions(): void {}
 
-	protected _clearVisibleRange(): void {
+	protected override _clearVisibleRange(): void {
 		super._clearVisibleRange();
 
 		this._histogramData.visibleRange = null;

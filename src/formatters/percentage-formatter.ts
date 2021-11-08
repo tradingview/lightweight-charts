@@ -5,7 +5,7 @@ export class PercentageFormatter extends PriceFormatter {
 		super(priceScale);
 	}
 
-	public format(price: number): string {
+	public override format(price: number): string {
 		return `${super.format(price)}%`;
 	}
 }

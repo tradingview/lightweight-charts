@@ -373,7 +373,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return res;
 	}
 
-	public priceAxisViews(pane: Pane, priceScale: PriceScale): readonly IPriceAxisView[] {
+	public override priceAxisViews(pane: Pane, priceScale: PriceScale): readonly IPriceAxisView[] {
 		if (priceScale !== this._priceScale && !this._isOverlay()) {
 			return [];
 		}
@@ -421,7 +421,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._lastPriceAnimationPaneView?.update();
 	}
 
-	public priceScale(): PriceScale {
+	public override priceScale(): PriceScale {
 		return ensureNotNull(this._priceScale);
 	}
 
@@ -447,7 +447,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options.title;
 	}
 
-	public visible(): boolean {
+	public override visible(): boolean {
 		return this._options.visible;
 	}
 

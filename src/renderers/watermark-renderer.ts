@@ -38,7 +38,7 @@ export class WatermarkRenderer extends ScaledRenderer {
 
 	protected _drawImpl(ctx: CanvasRenderingContext2D): void {}
 
-	protected _drawBackgroundImpl(ctx: CanvasRenderingContext2D): void {
+	protected override _drawBackgroundImpl(ctx: CanvasRenderingContext2D): void {
 		if (!this._data.visible) {
 			return;
 		}

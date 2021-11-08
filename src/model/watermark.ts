@@ -1,6 +1,7 @@
 import { HorzAlign, VertAlign } from '../renderers/watermark-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 import { WatermarkPaneView } from '../views/pane/watermark-pane-view';
+import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { ChartModel } from './chart-model';
 import { DataSource } from './data-source';
@@ -49,6 +50,10 @@ export class Watermark extends DataSource {
 		super();
 		this._options = options;
 		this._paneView = new WatermarkPaneView(this);
+	}
+
+	public override priceAxisViews(): readonly IPriceAxisView[] {
+		return [];
 	}
 
 	public paneViews(): readonly IPaneView[] {
