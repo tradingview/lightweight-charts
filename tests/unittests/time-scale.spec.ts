@@ -65,4 +65,63 @@ describe('TimeScale', () => {
 			expect(indexes[0].x).to.be.equal(expectedValue, 'indexesToCoordinates');
 		}
 	});
+
+	describe('timeToIndex', () => {
+		it('should return index for time on scale', () => {
+			const ts = new TimeScale(chartModelMock(), timeScaleOptionsDefaults, fakeLocalizationOptions);
+
+			ts.update(...tsUpdate(2));
+
+			expect(ts.timeToIndex({ timestamp: 0 as UTCTimestamp }, false)).to.be.equal(0);
+			expect(ts.timeToIndex({ timestamp: 1 as UTCTimestamp }, false)).to.be.equal(1);
+			expect(ts.timeToIndex({ timestamp: 2 as UTCTimestamp }, false)).to.be.equal(2);
+		});
+
+		it('should return null for time not on scale', () => {
+			const ts = new TimeScale(chartModelMock(), timeScaleOptionsDefaults, fakeLocalizationOptions);
+
+			ts.update(...tsUpdate(2));
+
+			expect(ts.timeToIndex({ timestamp: -1 as UTCTimestamp }, false)).to.be.equal(null);
+			expect(ts.timeToIndex({ timestamp: 3 as UTCTimestamp }, false)).to.be.equal(null);
+		});
+
+		it('should return null if time scale is empty', () => {
+			const ts = new TimeScale(chartModelMock(), timeScaleOptionsDefaults, fakeLocalizationOptions);
+
+			expect(ts.timeToIndex({ timestamp: 123 as UTCTimestamp }, false)).to.be.equal(null);
+		});
+
+		it('should return null if timestamp is between two values on the scale', () => {
+			const ts = new TimeScale(chartModelMock(), timeScaleOptionsDefaults, fakeLocalizationOptions);
+
+			ts.update(...tsUpdate(1));
+
+			expect(ts.timeToIndex({ timestamp: 0.5 as UTCTimestamp }, false)).to.be.equal(null);
+		});
+
+		it('should return last index if timestamp is greater than last timestamp and findNearest is parameter is true', () => {
+			const ts = new TimeScale(chartModelMock(), timeScaleOptionsDefaults, fakeLocalizationOptions);
+
+			ts.update(...tsUpdate(2));
+
+			expect(ts.timeToIndex({ timestamp: 3 as UTCTimestamp }, true)).to.be.equal(2);
+		});
+
+		it('should return first index if timestamp is less than first timestamp and findNearest is parameter is true', () => {
+			const ts = new TimeScale(chartModelMock(), timeScaleOptionsDefaults, fakeLocalizationOptions);
+
+			ts.update(...tsUpdate(2));
+
+			expect(ts.timeToIndex({ timestamp: -1 as UTCTimestamp }, true)).to.be.equal(0);
+		});
+
+		it('should return next index if timestamp is between two values on the scale and findNearest parameter is true', () => {
+			const ts = new TimeScale(chartModelMock(), timeScaleOptionsDefaults, fakeLocalizationOptions);
+
+			ts.update(...tsUpdate(1));
+
+			expect(ts.timeToIndex({ timestamp: 0.5 as UTCTimestamp }, true)).to.be.equal(1);
+		});
+	});
 });

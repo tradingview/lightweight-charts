@@ -1,6 +1,7 @@
 import { DateFormatter } from '../formatters/date-formatter';
 import { DateTimeFormatter } from '../formatters/date-time-formatter';
 
+import { lowerbound } from '../helpers/algorithms';
 import { ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { ISubscription } from '../helpers/isubscription';
@@ -249,17 +250,13 @@ export class TimeScale {
 			return findNearest ? this._points.length - 1 as TimePointIndex : null;
 		}
 
-		for (let i = 0; i < this._points.length; ++i) {
-			if (time.timestamp === this._points[i].time.timestamp) {
-				return i as TimePointIndex;
-			}
+		const index = lowerbound(this._points, time.timestamp, (a: TimeScalePoint, b: UTCTimestamp) => a.time.timestamp < b);
 
-			if (time.timestamp < this._points[i].time.timestamp) {
-				return findNearest ? i as TimePointIndex : null;
-			}
+		if (time.timestamp < this._points[index].time.timestamp) {
+			return findNearest ? index as TimePointIndex : null;
 		}
 
-		return null;
+		return index as TimePointIndex;
 	}
 
 	public isEmpty(): boolean {
