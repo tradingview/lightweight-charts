@@ -40,7 +40,6 @@ Here are common parameters for every series:
 |-|----|-------|-|
 |`priceScaleId`|`string`|`right` if right scale is visible and `left` if not|Target price scale to bind new series to|
 |`title`|`string`|`''`|You can name series when adding it to a chart. This name will be displayed on the label next to the last value label|
-|`scaleMargins`|`{ top, bottom }`|`undefined`|[Margins](#scale-margins) of the price scale of series|
 |`visible`|`boolean`|`true`|Visibility of series|
 
 Example:
@@ -49,10 +48,6 @@ Example:
 const lineSeries = chart.addLineSeries({
     priceScaleId: 'left',
     title: 'Series title example',
-    scaleMargins: {
-        top: 0.1,
-        bottom: 0.3,
-    },
 });
 ```
 
@@ -120,10 +115,6 @@ Each value of an object is a number between 0 (0%) and 1 (100%).
 ```js
 const lineSeries = chart.addLineSeries({
     priceScaleId: 'right',
-    scaleMargins: {
-        top: 0.6,
-        bottom: 0.05,
-    },
 });
 ```
 

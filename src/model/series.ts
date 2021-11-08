@@ -85,11 +85,7 @@ export interface SeriesDataAtTypeMap {
 	Histogram: BarPrice;
 }
 
-// TODO: uncomment following strings after fixing typescript bug
-// https://github.com/microsoft/TypeScript/issues/36981
-// export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
-// export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
-
+// note that if would like to use `Omit` here - you can't due https://github.com/microsoft/TypeScript/issues/36981
 export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
 export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
 
@@ -217,14 +213,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			this.model().moveSeriesToScale(this, targetPriceScaleId);
 		}
 		merge(this._options, options);
-
-		// eslint-disable-next-line deprecation/deprecation
-		if (this._priceScale !== null && options.scaleMargins !== undefined) {
-			this._priceScale.applyOptions({
-				// eslint-disable-next-line deprecation/deprecation
-				scaleMargins: options.scaleMargins,
-			});
-		}
 
 		if (options.priceFormat !== undefined) {
 			this._recreateFormatter();

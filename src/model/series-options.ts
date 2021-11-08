@@ -4,7 +4,6 @@ import { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
 import { AutoScaleMargins } from './autoscale-info-impl';
 import { PriceFormatterFn } from './price-formatter-fn';
-import { PriceScaleMargins } from './price-scale';
 
 /**
  * Represents style options for a candlestick series.
@@ -80,10 +79,6 @@ export const enum LastPriceAnimationMode {
 	 */
 	OnDataUpdate,
 }
-
-// we cannot create re-export of const enum because of TypeScript bug https://github.com/microsoft/TypeScript/issues/45850
-/** @deprecated it doesn't really matter what we write here, because it doesn't work properly, but just to mark the thing we have to delete in the next major update */
-export { LastPriceAnimationMode as LasPriceAnimationMode };
 
 /**
  * Represents style options for a bar series.
@@ -480,13 +475,6 @@ export interface SeriesOptionsCommon {
 	baseLineStyle: LineStyle;
 	/** Override the default {@link AutoscaleInfo} provider. */
 	autoscaleInfoProvider?: AutoscaleInfoProvider;
-	/**
-	 * @deprecated Use priceScaleId instead.
-	 * @internal
-	 */
-	overlay?: boolean;
-	/** @deprecated Use priceScale method of the series to apply options instead. */
-	scaleMargins?: PriceScaleMargins;
 }
 
 /**

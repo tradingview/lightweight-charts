@@ -140,8 +140,7 @@ The following set of options can be used to adjust the price axis interface:
 
 ```js
 chart.applyOptions({
-    priceScale: {
-        position: 'left',
+    rightPriceScale: {
         mode: 2,
         autoScale: false,
         invertScale: true,

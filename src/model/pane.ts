@@ -16,8 +16,6 @@ export const DEFAULT_STRETCH_FACTOR = 1000;
 
 export type PriceScalePosition = 'left' | 'right' | 'overlay';
 
-export type PreferredPriceScalePosition = 'left' | 'right' | 'overlay';
-
 interface MinMaxOrderInfo {
 	minZOrder: number;
 	maxZOrder: number;

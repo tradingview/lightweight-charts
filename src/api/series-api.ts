@@ -8,7 +8,7 @@ import { Coordinate } from '../model/coordinate';
 import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
-import { Series, SeriesPartialOptionsInternal } from '../model/series';
+import { Series } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
@@ -27,15 +27,6 @@ import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
-
-export function migrateOptions<TSeriesType extends SeriesType>(options: SeriesPartialOptionsMap[TSeriesType]): SeriesPartialOptionsInternal<TSeriesType> {
-	// eslint-disable-next-line deprecation/deprecation
-	const { overlay, ...res } = options;
-	if (overlay) {
-		res.priceScaleId = '';
-	}
-	return res;
-}
 
 export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType> {
 	protected _series: Series<TSeriesType>;
@@ -146,8 +137,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {
-		const migratedOptions = migrateOptions(options);
-		this._series.applyOptions(migratedOptions);
+		this._series.applyOptions(options);
 	}
 
 	public options(): Readonly<SeriesOptionsMap[TSeriesType]> {

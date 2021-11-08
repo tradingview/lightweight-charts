@@ -195,7 +195,7 @@ export interface IChartApi {
 	 * @param priceScaleId - id of the price scale.
 	 * @returns Price scale API.
 	 */
-	priceScale(priceScaleId?: string): IPriceScaleApi;
+	priceScale(priceScaleId: string): IPriceScaleApi;
 
 	/**
 	 * Returns API to manipulate the time scale

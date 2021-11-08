@@ -8,6 +8,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
+import { DefaultPriceScaleId } from '../model/default-price-scale';
 import {
 	InvalidateMask,
 	InvalidationLevel,
@@ -15,7 +16,6 @@ import {
 	TimeScaleInvalidationType,
 } from '../model/invalidate-mask';
 import { Point } from '../model/point';
-import { PriceAxisPosition } from '../model/price-scale';
 import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
@@ -230,7 +230,7 @@ export class ChartWidget implements IDestroyable {
 			let targetX = 0;
 			let targetY = 0;
 
-			const drawPriceAxises = (position: PriceAxisPosition) => {
+			const drawPriceAxises = (position: 'left' | 'right') => {
 				for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
 					const paneWidget = this._paneWidgets[paneIndex];
 					const paneWidgetHeight = paneWidget.getSize().h;
@@ -272,7 +272,7 @@ export class ChartWidget implements IDestroyable {
 				targetY = 0;
 				drawPriceAxises('right');
 			}
-			const drawStub = (position: PriceAxisPosition) => {
+			const drawStub = (position: 'left' | 'right') => {
 				const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
 				const size = stub.getSize();
 				const image = stub.getImage();
@@ -298,11 +298,7 @@ export class ChartWidget implements IDestroyable {
 		return targetCanvas;
 	}
 
-	public getPriceAxisWidth(position: PriceAxisPosition): number {
-		if (position === 'none') {
-			return 0;
-		}
-
+	public getPriceAxisWidth(position: DefaultPriceScaleId): number {
 		if (position === 'left' && !this._isLeftAxisVisible()) {
 			return 0;
 		}
