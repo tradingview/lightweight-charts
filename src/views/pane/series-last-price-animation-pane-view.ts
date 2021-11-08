@@ -120,7 +120,7 @@ function animationData(durationSinceStart: number, lineColor: string): Animation
 }
 
 export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
-	private readonly _series: Series<'Area'> | Series<'Line'>;
+	private readonly _series: Series<'Area'> | Series<'Line'> | Series<'Baseline'>;
 	private readonly _renderer: SeriesLastPriceAnimationRenderer = new SeriesLastPriceAnimationRenderer();
 	private _invalidated: boolean = true;
 	private _stageInvalidated: boolean = true;
@@ -128,7 +128,7 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 	private _startTime: number = performance.now();
 	private _endTime: number = this._startTime - 1;
 
-	public constructor(series: Series<'Area'> | Series<'Line'>) {
+	public constructor(series: Series<'Area'> | Series<'Line'> | Series<'Baseline'>) {
 		this._series = series;
 	}
 
@@ -193,8 +193,8 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 			return;
 		}
 
-		const lastValue = this._series.lastValueData(true, true);
-		if (!visibleRange.contains(lastValue.index)) {
+		const lastValue = this._series.lastValueData(true);
+		if (lastValue.noData || !visibleRange.contains(lastValue.index)) {
 			return;
 		}
 
@@ -209,8 +209,8 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 		const data = animationData(this._duration(), seriesLineColor);
 
 		this._renderer.setData({
-			seriesLineColor: seriesLineColor,
-			seriesLineWidth: seriesLineWidth,
+			seriesLineColor,
+			seriesLineWidth,
 			fillColor: data.fillColor,
 			strokeColor: data.strokeColor,
 			radius: data.radius,

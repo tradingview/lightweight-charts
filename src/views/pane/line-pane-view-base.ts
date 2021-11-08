@@ -13,7 +13,7 @@ import { TimeScale } from '../../model/time-scale';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area', ItemType extends PricedValue & TimedValue> extends SeriesPaneViewBase<TSeriesType, ItemType> {
+export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area' | 'Baseline', ItemType extends PricedValue & TimedValue> extends SeriesPaneViewBase<TSeriesType, ItemType> {
 	protected constructor(series: Series<TSeriesType>, model: ChartModel) {
 		super(series, model, true);
 	}

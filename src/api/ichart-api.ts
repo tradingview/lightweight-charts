@@ -7,6 +7,7 @@ import { SeriesMarker } from '../model/series-markers';
 import {
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
+	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
@@ -82,6 +83,14 @@ export interface IChartApi {
 	 * @returns an interface of the created series.
 	 */
 	addAreaSeries(areaOptions?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
+
+	/**
+	 * Creates a baseline series with specified parameters.
+	 *
+	 * @param baselineOptions - customization parameters of the series being created.
+	 * @returns an interface of the created series.
+	 */
+	addBaselineSeries(baselineOptions?: BaselineSeriesPartialOptions): ISeriesApi<'Baseline'>;
 
 	/**
 	 * Creates a bar series with specified parameters.

@@ -63,7 +63,7 @@ describe('TextWidthCache', () => {
 
 	it('should not cache zero width of nonempty string', () => {
 		class ZeroReturningFakeCtx extends FakeCtx {
-			protected _impl(): number {
+			protected override _impl(): number {
 				return 0;
 			}
 		}

@@ -7,7 +7,7 @@ import { BusinessDay, UTCTimestamp } from './time-data';
 export type TimeFormatterFn = (time: BusinessDay | UTCTimestamp) => string;
 
 /**
- * Represents options for formattings dates, times, and prices according to a locale.
+ * Represents options for formatting dates, times, and prices according to a locale.
  */
 export interface LocalizationOptions {
 	/**
@@ -19,7 +19,7 @@ export interface LocalizationOptions {
 	locale: string;
 
 	/**
-	 * Override fomatting of the price scale crosshair label. Can be used for cases that can't be covered with built-in price formats.
+	 * Override formatting of the price scale crosshair label. Can be used for cases that can't be covered with built-in price formats.
 	 *
 	 * See also {@link PriceFormatCustom}.
 	 */

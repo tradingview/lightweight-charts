@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "3.7.0",
+  "version": "3.8.0",
   "name": "lightweight-charts",
   "author": "TradingView, Inc.",
   "license": "Apache-2.0",
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "~13.0.6",
     "@rollup/plugin-replace": "~3.0.0",
-    "@size-limit/file": "~6.0.3",
+    "@size-limit/file": "~6.0.4",
     "@types/chai": "~4.2.22",
     "@types/mocha": "~9.0.0",
     "@types/node": "~12.12.47",
@@ -54,7 +54,7 @@
     "eslint": "~7.32.0",
     "eslint-plugin-deprecation": "~1.2.0",
     "eslint-plugin-import": "~2.25.2",
-    "eslint-plugin-jsdoc": "~37.0.0",
+    "eslint-plugin-jsdoc": "~37.0.3",
     "eslint-plugin-markdown": "~2.2.1",
     "eslint-plugin-prefer-arrow": "~1.2.1",
     "eslint-plugin-unicorn": "~37.0.1",
@@ -67,11 +67,11 @@
     "npm-run-all": "~4.1.5",
     "pixelmatch": "~5.2.1",
     "pngjs": "~6.0.0",
-    "puppeteer": "~10.4.0",
+    "puppeteer": "~11.0.0",
     "rimraf": "~3.0.2",
-    "rollup": "~2.57.0",
+    "rollup": "~2.59.0",
     "rollup-plugin-terser": "~7.0.2",
-    "size-limit": "~6.0.3",
+    "size-limit": "~6.0.4",
     "ts-node": "~10.4.0",
     "ts-transformer-properties-rename": "~0.13.0",
     "ts-transformer-strip-const-enums": "~1.0.1",
@@ -80,7 +80,7 @@
     "tslint-eslint-rules": "~5.4.0",
     "tslint-microsoft-contrib": "~6.2.0",
     "ttypescript": "~1.5.10",
-    "typescript": "4.4.3"
+    "typescript": "4.4.4"
   },
   "scripts": {
     "postinstall": "npm run install-hooks",

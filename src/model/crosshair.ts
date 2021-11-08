@@ -199,7 +199,7 @@ export class Crosshair extends DataSource {
 		return this._y;
 	}
 
-	public visible(): boolean {
+	public override visible(): boolean {
 		return this._visible;
 	}
 
@@ -227,7 +227,7 @@ export class Crosshair extends DataSource {
 		return this._options.vertLine.visible;
 	}
 
-	public priceAxisViews(pane: Pane, priceScale: PriceScale): IPriceAxisView[] {
+	public override priceAxisViews(pane: Pane, priceScale: PriceScale): IPriceAxisView[] {
 		if (!this._visible || this._pane !== pane) {
 			this._priceAxisViews.clear();
 		}
@@ -240,7 +240,7 @@ export class Crosshair extends DataSource {
 		return views;
 	}
 
-	public timeAxisViews(): readonly ITimeAxisView[] {
+	public override timeAxisViews(): readonly ITimeAxisView[] {
 		return this._visible ? [this._timeAxisView] : [];
 	}
 

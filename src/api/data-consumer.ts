@@ -127,6 +127,10 @@ export interface SeriesDataItemTypeMap {
 	 */
 	Area: LineData | WhitespaceData;
 	/**
+	 * The types of baseline series data.
+	 */
+	Baseline: LineData | WhitespaceData;
+	/**
 	 * The types of line series data.
 	 */
 	Line: LineData | WhitespaceData;
