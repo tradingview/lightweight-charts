@@ -137,6 +137,9 @@ function runTestCase(container) {
 
 	lineSeries.setData(generateLineData());
 
+	const baselineSeries = chart.addBaselineSeries();
+	baselineSeries.setData(generateLineData());
+
 	areaSeries.createPriceLine({
 		price: 10,
 		color: 'red',
