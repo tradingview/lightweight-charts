@@ -37,23 +37,11 @@ Each item of the candlestick series is either an [OHLC](../data/ohlc.md) or a [w
 
 Colors for rising and falling candlesticks have to be set separately.
 
-Candlestick borders and wicks are visible by default and may be disabled.
-Note that when wicks are disabled the candlestick doesn't show high and low price values.
-Border and wick color can be either set for all candlesticks at once or for rising and falling candlesticks separately. If the latter is your preference please make sure that you don't use common options such as `borderColor` and `wickColor` since they have higher priority compared to the specified ones.
-Candlestick series interface can be customized using the following set of options:
+Candlestick borders and wicks are visible by default and may be disabled. Note that when wicks are disabled the candlestick doesn't show high and low price values.
 
-|Name|Type|Default|Description|
-|----|----|-------|-----------|
-|`upColor`|`string`|`#26a69a`|Growing candles' color|
-|`downColor`|`string`|`#ef5350`|Falling candles' color|
-|`borderVisible`|`boolean`|`true`|If true, the borders of a candle are drawn|
-|`wickVisible`|`boolean`|`true`|If true, the high and low prices are shown as wicks of a candle|
-|`borderColor`|`string`|`#378658`|Border color of all candles in series|
-|`wickColor`|`string`|`#737375`|Wicks' color of all candles in series|
-|`borderUpColor`|`string`|`#26a69a`|Growing candle's border color.|
-|`borderDownColor`|`string`|`#ef5350`|Falling candle's border color.|
-|`wickUpColor`|`string`|`#26a69a`|Growing candle's wicks color.|
-|`wickDownColor`|`string`|`#ef5350`|Falling candle's wicks.|
+Border and wick color can be either set for all candlesticks at once or for rising and falling candlesticks separately. If the latter is your preference please make sure that you don't use common options such as `borderColor` and `wickColor` since they have higher priority compared to the specific ones.
+
+Candlestick series interface can be customized using the following set of options: [CandlestickStyleOptions](/api/interfaces/CandlestickStyleOptions).
 
 ### Examples
 

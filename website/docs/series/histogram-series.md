@@ -42,12 +42,7 @@ Note: if `color` is not set then an item will be colored according to series opt
 
 ## Customization
 
-A histogram series interface can be customized using the following options:
-
-|Name|Type|Default|Description|
-|----|----|-------|-|
-|`color`|`string`|`#26a69a`|Column color|
-|`base`|`number`|`0`|Defines initial level for histogram columns|
+A histogram series interface can be customized using the following options: [HistogramStyleOptions](/api/interfaces/HistogramStyleOptions).
 
 ### Examples
 

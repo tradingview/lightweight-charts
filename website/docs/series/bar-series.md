@@ -44,14 +44,7 @@ Bar width can be increased to 2 px by disabling the `thinBars` option.
 
 Colors for rising & falling bars have to be set separately.
 
-A bar series series interface can be customized using the following set of options:
-
-|Name|Type|Default|Description|
-|----|----|-------|-----------|
-|`thinBars`|`boolean`|`true`|If true, bars are represented as sticks|
-|`upColor`|`string`|`#26a69a`|Growing bar color|
-|`downColor`|`string`|`#ef5350`|Falling bar color|
-|`openVisible`|`boolean`|`true`|If true, then the open line of a bar is shown|
+A bar series series interface can be customized using the following set of options: [BarStyleOptions](/api/interfaces/BarStyleOptions).
 
 ### Examples
 

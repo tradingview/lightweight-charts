@@ -1,12 +1,20 @@
 # Lightweight Charts Documentation Website
 
-The source of the documentation website for Lightweight Charts. This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
+The source of the documentation website for Lightweight Charts. This website is built using [Docusaurus 2](https://v2.docusaurus.io/).
+
+The aim of this documentation is to make using the library frictionless.
+
+API documentation is automatically generated from the `typings.d.ts` file, which itself is generated as part of the library build process.
+
+Handwritten documentation should focus on explaining concepts, tutorials, interactive examples, or in general anything that can't be automatically generated.
 
 ## Local Development
 
 ```console
 npm start
 ```
+
+_Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
 
 This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
 
@@ -16,6 +24,8 @@ This command starts a local development server and open up a browser window. Mos
 npm build
 ```
 
+_Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
+
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
 ## Deployment
@@ -23,6 +33,8 @@ This command generates static content into the `build` directory and can be serv
 ```console
 GIT_USER=<Your GitHub username> GITHUB_ORGANIZATION_NAME=<Your Github username or organisation name> USE_SSH=true npm deploy
 ```
+
+_Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
 
 This will build the website into static files and push the files to the `gh-pages` branch.
 

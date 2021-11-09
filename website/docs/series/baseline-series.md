@@ -4,7 +4,7 @@ A baseline chart is another way of displaying quantitative data. It's basically 
 
 A baseline series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the time scale.
 
-![Baseline chart example](/img/baseline-series.png)"Baseline chart example")
+![Baseline chart example](/img/baseline-series.png)
 
 ## How to create baseline series
 
@@ -45,7 +45,7 @@ These colors blend into one another in the middle of the area.
 
 Also, the crosshair marker, which is enabled by default, can either be disabled or have its radius adjusted.
 
-A baseline series interface can be customized using the following set of options:
+A baseline series interface can be customized using the following set of options: [BaselineStyleOptions](/api/interfaces/BaselineStyleOptions).
 
 ### Examples
 

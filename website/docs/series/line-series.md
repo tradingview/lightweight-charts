@@ -42,19 +42,7 @@ A line itself can be customized by setting its color, width and style.
 
 Also, the crosshair marker which is enabled by default, can be either disabled or have its radius adjusted.
 
-A line series interface can be customized using the following options:
-
-|Name|Type|Default|Description|
-|----|----|-------|-----------|
-|`color`|`string`|`#2196f3`|Line color|
-|`lineStyle`|[LineStyle](../api/enums/LineStyle)|`LineStyle.Solid`|Line style|
-|`lineWidth`|`number`|`3`|Line width (in pixels)|
-|`crosshairMarkerVisible`|`boolean`|`true`|If `true`, the crosshair marker is shown on a chart|
-|`crosshairMarkerRadius`|`number`|`4`|Crosshair marker radius (in pixels)|
-|`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
-|`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
-|`lineType`|[LineType](../api/enums/LineType)|`LineType.Simple`|Line type|
-|`lastPriceAnimation`|[LastPriceAnimationMode](../api/enums/LastPriceAnimationMode)|`'LastPriceAnimationMode.Disabled'`|The mode of the last price animation|
+A line series interface can be customized using the following options: [LineStyleOptions](/api/interfaces/LineStyleOptions).
 
 ### Examples
 
