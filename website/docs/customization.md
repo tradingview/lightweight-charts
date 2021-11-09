@@ -125,20 +125,7 @@ Price scale has 4 data display modes:
 
 The scale itself can be positioned either on the right/left side of a series. Use `position: none` if you don't want it to be visible on the chart.
 
-The following set of options can be used to adjust the price axis interface:
-
-|Name|Type|Default|Description|
-|--|---|-|--|
-|`position`|`left` &#124; `right` &#124; `none`|`right`|Sets the position to display price scale|
-|`mode`|[PriceScaleMode](./api/enums/PriceScaleMode) |`PriceScaleMode.Normal`|Sets the price scale mode|
-|`autoScale`|`boolean`|`true`|If true, fits series data to a chart size|
-|`invertScale`|`boolean`|`false`|If true, a chart series is reflected vertically, so that a growing trend is shown as a falling one and vice versa|
-|`alignLabels`|`boolean`|`true`|If true, labels with price data do not overlap|
-|`borderVisible`|`boolean`|`true`|If true, price scale border is visible|
-|`borderColor`|`string`|`#2b2b43`|Pricescale border color|
-|`scaleMargins`|`{ bottom, top }`|`{ bottom: 0.1, top: 0.2 }`|Sets the series margins from the top and bottom chart borders (percent)|
-|`entireTextOnly`|`boolean`|`false`|If false, top and bottom corner labels are shown even if they are partially not visible |
-|`drawTicks`|`boolean`|`true`|If true, a small horizontal line is drawn on price axis labels|
+The following set of options can be used to adjust the price axis interface: [PriceScaleOptions](/api/interfaces/PriceScaleOptions).
 
 ### An example of a price scale customization
 
@@ -175,17 +162,7 @@ Crosshair has two moving modes:
 
 Note that crosshair lines have to be customized separately.
 
-The following options are available for vertical and horizontal lines of a crosshair:
-
-|Name                        |Type   |Default |Description|
-|----------------------------|-------|--------|-|
-|`color`|`string`|`#758696`|Crosshair line color|
-|`width`|`number`|`1`|Crosshair line width in pixels|
-|`style`|[LineStyle](./api/enums/LineStyle)|`LineStyle.Dashed`|Crosshair line style|
-|`visible`|`boolean`|`true`|If true, crosshair line is displayed on a chart|
-|`labelVisible`|`boolean`|`true`|If true, a data label is shown on a relevant scale|
-|`labelBackgroundColor`|`string`|`#4c525e`|Crosshair label background color|
-|`mode`|[CrosshairMode](./api/enums/CrosshairMode)|`CrosshairMode.Magnet`|Sets the mode of crosshair moving.|
+The following options are available for vertical and horizontal lines of a crosshair: [CrosshairOptions](/api/interfaces/CrosshairOptions).
 
 ### An example of a crosshair customization
 
@@ -217,13 +194,7 @@ A grid is represented in chart background by vertical and horizontal lines drawn
 It is possible to set a custom `color` and `style` for grid lines or disable their visibility if necessary.
 Note that vertical and horizontal lines of a grid have to be customized separately.
 
-The following options are available for vertical and horizontal lines of a grid:
-
-|Name|Type|Default  |Description|
-|-|-|-|-|
-|`color`|`string`|`#d6dcde`|Grid lines color|
-|`style`|[LineStyle](./api/enums/LineStyle)|`LineStyle.Solid`|Grid lines style|
-|`visible`|`boolean`|`true`|If true, grid lines are displayed on a chart|
+The following options are available for vertical and horizontal lines of a grid: [GridOptions](/api/interfaces/GridOptions).
 
 ### An example of a grid customization
 
@@ -252,18 +223,7 @@ Please make sure you enable it and set an appropriate font color and size to mak
 We recommend a semi-transparent color and a large font.
 Also note that watermark position can be aligned vertically and horizontally.
 
-The following options are available for the watermark:
-
-|Name                        |Type   |Default  |Description|
-|----------------------------|-------|---------|-|
-|`color`|`string`|`rgba(0, 0, 0, 0)`|Watermark color|
-|`visible`|`boolean`|`false`|If true, the watermark is displayed on a chart|
-|`text`|`string`|`''`|Contains the text to be displayed in the watermark|
-|`fontSize`|`number`|`48`|Watermark's font size in pixels|
-|`fontFamily`|`string`|`'Trebuchet MS', Roboto, Ubuntu, sans-serif`|Watermark's font family|
-|`fontStyle`|`string`|`''`|Watermark's font style|
-|`horzAlign`|`left` &#124; `center` &#124; `right`|`center`|Watermark horizontal alignment position|
-|`vertAlign`|`top` &#124; `center` &#124; `bottom`|`center`|Watermark vertical alignment position|
+The following options are available for the watermark: [WatermarkOptions](/api/interfaces/WatermarkOptions).
 
 ### An example of a watermark customization
 
@@ -282,14 +242,7 @@ chart.applyOptions({
 
 ## Chart layout options
 
-The following options can be used to customize chart design:
-
-|Name                        |Type   |Default  |Description|
-|----------------------------|-------|---------|-----------|
-|`background`|[Background](./#background)| `{ type: ColorType.Solid, color: '#ffffff' }` |Chart and scales background|
-|`textColor`|`string`|`#191919`|Scale value text color|
-|`fontSize`|`number`|`11`|Scales values' font size|
-|`fontFamily`|`string`|`'Trebuchet MS', Roboto, Ubuntu, sans-serif`|Font family to be used on scales|
+The following options can be used to customize chart design: [LayoutOptions](/api/interfaces/LayoutOptions).
 
 ### Background
 
@@ -330,45 +283,23 @@ You can disable any of them using `handleScroll` and `handleScale` options.
 
 ### Scrolling options
 
-|Name                        |Type   |Default  |Description|
-|----------------------------|-------|---------|-|
-|`mouseWheel`|`boolean`|`true`|If true, chart scrolling with horizontal mouse wheel is enabled|
-|`pressedMouseMove`|`boolean`|`true`|If true, chart scrolling with left mouse button pressed is allowed|
-|`horzTouchDrag`|`boolean`|`true`|If true, the chart handles horizontal pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger|
-|`vertTouchDrag`|`boolean`|`true`|If true, the chart handles vertical pointer movements on touch screens. In this case the webpage is not scrolled. If you set it to false, the webpage is scrolled instead. Keep in mind that if the user starts scrolling the chart vertically or horizontally, scrolling is continued in any direction until the user releases the finger.|
-
-You can also set `handleScroll` to `true` or `false` to enable or disable all the above options.
+See [HandleScrollOptions](/api/interfaces/HandleScrollOptions).
 
 ### Kinetic scroll options
 
 You can disable or enable kinetic scroll via mouse or via touch gestures separately using `kineticScroll` options.
 
-| Name    | Type      | Default | Description |
-|---------|-----------|---------|-------------|
-| `mouse` | `boolean` | `false` | If true, kinetic scroll is enabled via mouse |
-| `touch` | `boolean` | `true` | If true, kinetic scroll is enabled via touch gestures |
+See [KineticScrollOptions](/api/interfaces/KineticScrollOptions).
 
 ### Scaling options
 
-|Name                        |Type   |Default  |Description|
-|----------------------------|-------|---------|-|
-|`axisPressedMouseMove`|[`{ time, price }`](#axis-scaling-options)|`{ time: true, price: true }`|Sets time and price axis scaling with left mouse button pressed is allowed|
-|`axisDoubleClickReset`|`boolean`|`true`|If true, left mouse button double click axis resetting is allowed|
-|`mouseWheel`|`boolean`|`true`|If true, series scaling with a mouse wheel is enabled|
-|`pinch`|`boolean`|`true`|If true, series scaling with pinch/zoom gestures (this option is supported on touch devices) is enabled|
-
-You can also set `handleScale` to `true` or `false` to enable or disable all the above options.
+See [HandleScaleOptions](/api/interfaces/HandleScaleOptions).
 
 ## Axis scaling options
 
-|Name                        |Type   |Default  |Description|
-|----------------------------|-------|---------|-|
-|`time`|`boolean`|`true`|If true, time axis scaling with left mouse button pressed is allowed|
-|`price`|`boolean`|`true`|If true, price axis scaling with left mouse button pressed is allowed|
+See [AxisPressedMouseMoveOptions](/api/interfaces/AxisPressedMouseMoveOptions).
 
-You can also set `axisPressedMouseMove` to `true` or `false` to enable or disable all the above options.
-
-### An example of a scrolling/scaling customization
+## An example of a scrolling/scaling customization
 
 ```js
 chart.applyOptions({
@@ -388,7 +319,3 @@ chart.applyOptions({
     handleScale: false,
 });
 ```
-
-## Next reading
-
-- [Time Scale](./time-scale.md)

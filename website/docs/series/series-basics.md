@@ -523,7 +523,7 @@ console.log(barsInfo);
 ```
 
 This method can be used, for instance, to implement downloading historical data while scrolling to prevent a user from seeing empty space.
-Thus, you can subscribe to [visible logical range changed event](../time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
+Thus, you can subscribe to [visible logical range changed event](/api/interfaces/ITimeScaleApi#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
 
 ```js
 function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
