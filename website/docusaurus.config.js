@@ -21,6 +21,8 @@ const config = {
 	baseUrl: `/${projectName}/`,
 	organizationName,
 	projectName: 'lightweight-charts',
+	// Docusaurus recommend that this is false when using GitHub pages https://github.com/facebook/docusaurus/issues/5026#issuecomment-865166200
+	trailingSlash: false,
 
 	presets: [
 		[
