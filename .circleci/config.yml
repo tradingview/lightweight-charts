@@ -221,9 +221,12 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: cd website
-      - run: npm install
-      - run: npm run build
+      - run: 
+          name: "Install dependencies and build website"
+          command: |
+            cd website
+            npm install
+            npm run build
       - persist_to_workspace:
           root: ./
           paths:
