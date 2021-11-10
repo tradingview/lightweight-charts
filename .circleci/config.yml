@@ -215,6 +215,25 @@ jobs:
           command: node scripts/compare-size-with-merge-base.js
       - run: npm run size-limit
 
+  build-docusaurus-website:
+    executor: node-latest-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: cd website && npm run build
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - website/build
+
+  deploy-docusaurus-website:
+    executor: node-latest-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: cd website && npm run deploy -- --skip-build
 
 workflows:
   version: 2
@@ -285,3 +304,14 @@ workflows:
           filters: *default-filters
           requires:
             - build
+      - build-docusaurus-website:
+          filters: *default-filters
+          requires:
+            - build
+      - deploy-docusaurus-website:
+          filters:
+            <<: *default-filters
+            branches:
+              only: master
+          requires:
+            - build-docusaurus-website

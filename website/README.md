@@ -16,7 +16,7 @@ npm start
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
 
-This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
+This command starts a local development server and opens a browser window. Most changes are reflected live without having to restart the server.
 
 ## Build
 
@@ -26,7 +26,7 @@ npm build
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+This command generates static content in the `build` directory.
 
 ## Deployment
 
@@ -38,6 +38,16 @@ _Note_: API documentation will not be generated unless you have already built th
 
 This will build the website into static files and push the files to the `gh-pages` branch.
 
+## CircleCI
+
+We use CircleCI to build, test, publish the library, and to deploy this website.
+
+The `build-docusaurus-website` and `deploy-docusaurus-website` jobs defined in `.circleci/config.yml` build and deploy the website.
+
+The `build-docusaurus-website` job is run for all branches (so that, for example, we can get feedback about any changes that might break the website build before merging).
+
+The `deploy-docusaurus-website` job is only run on the master branch.
+
 ## Docusaurus CLI
 
-You can read more about these commands, and more, in the [Docusaurus CLI documentation.](https://docusaurus.io/docs/cli)
+You can read more about the commands used to build, deploy, and more in the [Docusaurus CLI documentation.](https://docusaurus.io/docs/cli)
