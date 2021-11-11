@@ -248,8 +248,8 @@ jobs:
       - run:
           name: "Setting up git user"
           command: |
-            git config user.name "TradingView"
-            git config user.email "noreply@tradingview.com"
+            git config --global user.name "TradingView"
+            git config --global user.email "noreply@tradingview.com"
       - add_ssh_keys:
           fingerprints:
             - "cb:bc:16:a1:03:fb:b5:fb:69:4b:68:4d:33:a9:54:8c"
