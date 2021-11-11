@@ -318,7 +318,6 @@ workflows:
             - build
       - deploy-docusaurus-website:
           filters:
-            <<: *default-filters
             branches:
               only: master
           requires:
