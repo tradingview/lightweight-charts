@@ -239,6 +239,8 @@ jobs:
     executor: node14-executor
     environment:
       USE_SSH: "true"
+      # We should be able to remove GIT_USER when we have upgraded to a Docusaurus version > 2.0.0-beta.9
+      GIT_USER: "tvrobot"
     steps:
       - checkout-with-deps
       - attach_workspace:
