@@ -222,8 +222,8 @@ jobs:
     executor: node14-executor
     steps:
       - checkout-with-deps
-      - attach_workspace:
-          at: ./
+      - run: npm run tsc
+      - run: npm run bundle-dts
       - run:
           name: "Install dependencies and build website"
           command: |
@@ -328,10 +328,11 @@ workflows:
           filters: *default-filters
           requires:
             - build
+
+  website:
+    jobs:
       - build-docusaurus-website:
           filters: *default-filters
-          requires:
-            - build
       - deploy-docusaurus-website:
           filters:
             branches:
