@@ -103,12 +103,12 @@ function collectFilesData(inputFiles) {
 			continue;
 		}
 
-		if (!fs.existsSync(filePath)) {
-			throw new Error(`File or directory "${filePath}" doesn't exist`);
-		}
-
 		if (path.extname(filePath) !== '.md') {
 			continue;
+		}
+
+		if (!fs.existsSync(filePath)) {
+			throw new Error(`File or directory "${filePath}" doesn't exist`);
 		}
 
 		const fileContent = fs.readFileSync(filePath, { encoding: 'utf-8' });
@@ -163,7 +163,10 @@ function main() {
 	const files = glob.sync('**/*.md', {
 		dot: true,
 		nodir: true,
-		ignore: '**/node_modules/**',
+		ignore: [
+			'**/node_modules/**',
+			'**/docs/api/**',
+		],
 	});
 
 	let filesData;

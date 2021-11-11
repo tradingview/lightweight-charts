@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Whitespace Data
 
 A whitespace - an empty space on the chart, which extends timescale, but doesn't have a value for the series.

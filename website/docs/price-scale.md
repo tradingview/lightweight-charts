@@ -1,3 +1,7 @@
+---
+sidebar_position: 3
+---
+
 # Price Scale
 
 Price Scale is an object that maps prices to coordinates and vice versa.

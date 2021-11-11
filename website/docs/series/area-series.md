@@ -1,10 +1,10 @@
-# Area series
+# Area Series
 
 An area chart is another way of displaying quantitative data. It's basically a colored area between the line connecting all data points and the time scale.
 
 An area series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the time scale.
 
-![Area chart example](./assets/area-series.png "Area chart example")
+![Area chart example](/img/area-series.png "Area chart example")
 
 ## How to create area series
 
@@ -28,9 +28,9 @@ areaSeries.setData([
 
 ## Data format
 
-Each area series item should be a [whitespace](./whitespace-data.md) item or an object with the following fields:
+Each area series item should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
 
-- `time` ([Time](./time.md)) - item time
+- `time` ([Time](/api/#time)) - item time
 - `value` (`number`) - item value
 
 ## Customization
@@ -42,20 +42,7 @@ These colors blend into one another in the middle of the area.
 
 Also, the crosshair marker, which is enabled by default, can either be disabled or have its radius adjusted.
 
-An area series interface can be customized using the following set of options:
-
-|Name|Type|Default|Description|
-|----|----|-------|-----------|
-|`topColor`|`string`|`rgba(46, 220, 135, 0.4)`|Area top color|
-|`bottomColor`|`string`|`rgba(40, 221, 100, 0)`|Area bottom color|
-|`lineColor`|`string`|`#33D778`|Line color|
-|`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
-|`lineWidth`|`number`|`3`|Line width in pixels|
-|`crosshairMarkerVisible`|`boolean`|`true`|If true, the crosshair marker is shown|
-|`crosshairMarkerRadius`|`number`|`4`|The radius of the crosshair marker in pixels|
-|`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
-|`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
-|`lastPriceAnimation`|[LastPriceAnimationMode](./constants.md#lastpriceanimationmode)|`'LastPriceAnimationMode.Disabled'`|The mode of the last price animation|
+An area series interface can be customized using the following set of options: [AreaStyleOptions](/api/interfaces/AreaStyleOptions).
 
 ### Examples
 
@@ -85,9 +72,3 @@ An area series interface can be customized using the following set of options:
         lineWidth: 1,
     });
     ```
-
-## What's next
-
-- [Customization](./customization.md)
-- [Constants](./constants.md)
-- [Time](./time.md)

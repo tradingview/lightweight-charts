@@ -1,10 +1,10 @@
-# Line
+# Line Series
 
 A line chart is a type of chart that displays information as series of the data points connected by straight line segments.
 
 Line series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving along the time scale.
 
-![Line chart example](./assets/line-series.png "Line chart example")
+![Line chart example](/img/line-series.png "Line chart example")
 
 ## How to create line series
 
@@ -31,9 +31,9 @@ lineSeries.setData([
 
 ## Data format
 
-Each item of the line series should be a [whitespace](./whitespace-data.md) item or an object with the following fields:
+Each item of the line series should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
 
-- `time` ([Time](./time.md)) - a time of the item
+- `time` ([Time](/api/#time)) - a time of the item
 - `value` (`number`) - a value of the item
 
 ## Customization
@@ -42,19 +42,7 @@ A line itself can be customized by setting its color, width and style.
 
 Also, the crosshair marker which is enabled by default, can be either disabled or have its radius adjusted.
 
-A line series interface can be customized using the following options:
-
-|Name|Type|Default|Description|
-|----|----|-------|-----------|
-|`color`|`string`|`#2196f3`|Line color|
-|`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
-|`lineWidth`|`number`|`3`|Line width (in pixels)|
-|`crosshairMarkerVisible`|`boolean`|`true`|If `true`, the crosshair marker is shown on a chart|
-|`crosshairMarkerRadius`|`number`|`4`|Crosshair marker radius (in pixels)|
-|`crosshairMarkerBorderColor`|`string`|`''`|The crosshair border color (an empty string fallbacks the color to series' color under the crosshair)|
-|`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair back color (an empty string fallbacks the color to series' color under the crosshair)|
-|`lineType`|[LineType](./constants.md#linetype)|`LineType.Simple`|Line type|
-|`lastPriceAnimation`|[LastPriceAnimationMode](./constants.md#lastpriceanimationmode)|`'LastPriceAnimationMode.Disabled'`|The mode of the last price animation|
+A line series interface can be customized using the following options: [LineStyleOptions](/api/interfaces/LineStyleOptions).
 
 ### Examples
 
@@ -83,9 +71,3 @@ A line series interface can be customized using the following options:
         lineWidth: 3,
     });
     ```
-
-## What's next
-
-- [Customization](./customization.md)
-- [Constants](./constants.md)
-- [Time](./time.md)

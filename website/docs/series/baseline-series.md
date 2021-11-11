@@ -4,7 +4,7 @@ A baseline chart is another way of displaying quantitative data. It's basically 
 
 A baseline series has a crosshair marker - a round mark which is moving along the series' line while the cursor is moving on a chart along the time scale.
 
-![Baseline chart example](./assets/baseline-series.png)"Baseline chart example")
+![Baseline chart example](/img/baseline-series.png)
 
 ## How to create baseline series
 
@@ -33,9 +33,9 @@ baselineSeries.setData([
 
 ## Data format
 
-Each area series item should be a [whitespace](./whitespace-data.md) item or an object with the following fields:
+Each area series item should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
 
-- `time` ([Time](./time.md)) - item time
+- `time` ([Time](../data/time.md)) - item time
 - `value` (`number`) - item value
 
 ## Customization
@@ -45,24 +45,7 @@ These colors blend into one another in the middle of the area.
 
 Also, the crosshair marker, which is enabled by default, can either be disabled or have its radius adjusted.
 
-A baseline series interface can be customized using the following set of options:
-
-|Name|Type|Default|Description|
-|-|----|-------|-|
-|`baseValue`|`BaseValueType`|`{type: 'price', price: 0}`|Base value of the series|
-|`topFillColor1`|`string`|`rgba(38, 166, 154, 0.28)`|The first color of the top area|
-|`topFillColor2`|`string`|`rgba(38, 166, 154, 0.05)`|The second color of the top area.|
-|`topLineColor`|`string`|`rgba(38, 166, 154, 1)`|The line color of the top area|
-|`bottomFillColor1`|`string`|`rgba(239, 83, 80, 0.05)`|The first color of the bottom area|
-|`bottomFillColor2`|`string`|`rgba(239, 83, 80, 0.28)`|The second color of the bottom area|
-|`bottomLineColor`|`string`|`rgba(239, 83, 80, 1)`|The line color of the bottom area|
-|`lineWidth`|`number`|`3`|Line width|
-|`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Line style|
-|`crosshairMarkerVisible`|`boolean`|`true`|Show the crosshair marker|
-|`crosshairMarkerRadius`|`number`|`4`|Crosshair marker radius in pixels|
-|`crosshairMarkerBorderColor`|`string`|`''`|Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair|
-|`crosshairMarkerBackgroundColor`|`string`|`''`|The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair|
-|`lastPriceAnimation`|[LastPriceAnimationMode](./constants.md#lastpriceanimationmode)|`'LastPriceAnimationMode.Disabled'`|Last price animation mode|
+A baseline series interface can be customized using the following set of options: [BaselineStyleOptions](/api/interfaces/BaselineStyleOptions).
 
 ### Examples
 
@@ -93,9 +76,3 @@ A baseline series interface can be customized using the following set of options
         lineWidth: 1,
     });
     ```
-
-## What's next
-
-- [Customization](./customization.md)
-- [Constants](./constants.md)
-- [Time](./time.md)

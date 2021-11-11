@@ -29,14 +29,17 @@ aliases:
 
 
 executors:
-  node-latest-executor:
+  node12-executor:
     docker:
       - image: circleci/node:12
 
-  node-browsers-latest-executor:
+  node12-browsers-executor:
     docker:
       - image: circleci/node:12-browsers
 
+  node14-executor:
+    docker:
+      - image: cimg/node:14.18
 
 commands:
   checkout-with-deps:
@@ -73,14 +76,14 @@ commands:
 
 jobs:
   install-deps:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout-with-deps
       - run: npm install
       - save_cache: *save-node-modules-cache
 
   build:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout-with-deps
       # make sure that the project is compiled successfully with composite projects
@@ -94,31 +97,31 @@ jobs:
             - dist
 
   no-crlf:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout
       - run: scripts/no-crlf.sh
 
   trailing-lf:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout
       - run: scripts/trailing-newlines.sh
 
   lint-js:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout-with-deps
       - run: npm run lint:js
 
   lint-ts:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout-with-deps
       - run: npm run lint:ts
 
   lint-dts:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
@@ -127,14 +130,14 @@ jobs:
       - run: npm run check-dts-docs
 
   markdown:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout-with-deps
       - run: npm run lint:md
       - run: npm run check-markdown-links
 
   unittests:
-    executor: node-latest-executor
+    executor: node12-executor
     environment:
       TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
@@ -144,7 +147,7 @@ jobs:
           path: test-results/
 
   dts-changes:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout-with-deps
       - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
@@ -153,25 +156,25 @@ jobs:
           when: on_fail
 
   graphics-tests-dpr1_0:
-    executor: node-browsers-latest-executor
+    executor: node12-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "1.0"
 
   graphics-tests-dpr1_5:
-    executor: node-browsers-latest-executor
+    executor: node12-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "1.5"
 
   graphics-tests-dpr2_0:
-    executor: node-browsers-latest-executor
+    executor: node12-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "2.0"
 
   graphics-tests-dpr2_0-prod:
-    executor: node-browsers-latest-executor
+    executor: node12-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "2.0"
@@ -179,7 +182,7 @@ jobs:
 
 
   memleaks-tests:
-    executor: node-browsers-latest-executor
+    executor: node12-browsers-executor
     environment:
       NO_SANDBOX: "true"
       TESTS_REPORT_FILE: "test-results/memleaks/results.xml"
@@ -192,7 +195,7 @@ jobs:
           path: test-results/
 
   coverage:
-    executor: node-browsers-latest-executor
+    executor: node12-browsers-executor
     environment:
       NO_SANDBOX: "true"
       TESTS_REPORT_FILE: "test-results/coverage/results.xml"
@@ -205,7 +208,7 @@ jobs:
           path: test-results/
 
   size-limit:
-    executor: node-latest-executor
+    executor: node12-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
@@ -215,6 +218,39 @@ jobs:
           command: node scripts/compare-size-with-merge-base.js
       - run: npm run size-limit
 
+  build-docusaurus-website:
+    executor: node14-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: 
+          name: "Install dependencies and build website"
+          command: |
+            cd website
+            npm install
+            npm run build
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - website
+
+  deploy-docusaurus-website:
+    executor: node14-executor
+    environment:
+      USE_SSH: "true"
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - add_ssh_keys:
+          fingerprints:
+            - "cb:bc:16:a1:03:fb:b5:fb:69:4b:68:4d:33:a9:54:8c"
+      - run:
+          name: "Deploy website"
+          command: |
+            cd website
+            npm run deploy -- --skip-build
 
 workflows:
   version: 2
@@ -285,3 +321,13 @@ workflows:
           filters: *default-filters
           requires:
             - build
+      - build-docusaurus-website:
+          filters: *default-filters
+          requires:
+            - build
+      - deploy-docusaurus-website:
+          filters:
+            branches:
+              only: master
+          requires:
+            - build-docusaurus-website
