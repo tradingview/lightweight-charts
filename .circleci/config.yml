@@ -224,7 +224,7 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: 
+      - run:
           name: "Install dependencies and build website"
           command: |
             cd website
@@ -245,6 +245,11 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
+      - run:
+          name: "Setting up git user"
+          command: |
+            git config user.name "TradingView"
+            git config user.email "noreply@tradingview.com"
       - add_ssh_keys:
           fingerprints:
             - "cb:bc:16:a1:03:fb:b5:fb:69:4b:68:4d:33:a9:54:8c"
