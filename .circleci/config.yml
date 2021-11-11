@@ -237,11 +237,20 @@ jobs:
 
   deploy-docusaurus-website:
     executor: node14-executor
+    environment:
+      USE_SSH: "true"
     steps:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: cd website && npm run deploy -- --skip-build
+      - add_ssh_keys:
+          fingerprints:
+            - "cb:bc:16:a1:03:fb:b5:fb:69:4b:68:4d:33:a9:54:8c"
+      - run:
+          name: "Deploy website"
+          command: |
+            cd website
+            npm run deploy -- --skip-build
 
 workflows:
   version: 2
