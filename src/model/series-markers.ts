@@ -2,11 +2,12 @@
  * Represents the position of a series marker relative to a bar.
  */
 export type SeriesMarkerPosition = 'aboveBar' | 'belowBar' | 'inBar';
+import { LineStyle } from '../renderers/draw-line';
 
 /**
  * Represents the shape of a series marker.
  */
-export type SeriesMarkerShape = 'circle' | 'square' | 'arrowUp' | 'arrowDown';
+export type SeriesMarkerShape =	'circle' | 'square'	| 'arrowUp'	| 'arrowDown'	| 'line';
 
 /**
  * Represents a series marker.
@@ -40,6 +41,10 @@ export interface SeriesMarker<TimeType> {
 	 * The optional size of the marker.
 	 */
 	size?: number;
+	/**
+	 * Style of the vertical line, if shape is line
+	 */
+	lineStyle?: LineStyle;
 }
 
 export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {

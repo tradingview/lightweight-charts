@@ -54,9 +54,13 @@ function runTestCase(container) {
 		{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 1 },
 		{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 2 },
 		{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 3 },
-		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 0 },
-		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 1 },
-		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 2 },
-		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 3 },
+		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'circle', text: '', size: 0 },
+		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'circle', text: '', size: 1 },
+		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'circle', text: '', size: 2 },
+		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'circle', text: '', size: 3 },
+		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'line', text: '', size: 0 },
+		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'line', text: '', size: 1 },
+		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'line', text: '', size: 2 },
+		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'line', text: '', size: 3 },
 	]);
 }

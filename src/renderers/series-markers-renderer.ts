@@ -7,9 +7,11 @@ import { SeriesMarkerShape } from '../model/series-markers';
 import { TextWidthCache } from '../model/text-width-cache';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
+import { LineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
+import { drawLine, hitTestLine } from './series-markers-line';
 import { drawSquare, hitTestSquare } from './series-markers-square';
 import { drawText, hitTestText } from './series-markers-text';
 
@@ -28,6 +30,7 @@ export interface SeriesMarkerRendererDataItem extends TimedValue {
 	internalId: number;
 	externalId?: string;
 	text?: SeriesMarkerText;
+	lineStyle?: LineStyle;
 }
 
 export interface SeriesMarkerRendererData {
@@ -41,15 +44,17 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 	private _fontSize: number = -1;
 	private _fontFamily: string = '';
 	private _font: string = '';
+	private _height: number = 0;
 
 	public setData(data: SeriesMarkerRendererData): void {
 		this._data = data;
 	}
 
-	public setParams(fontSize: number, fontFamily: string): void {
+	public setParams(fontSize: number, fontFamily: string, height: number): void {
 		if (this._fontSize !== fontSize || this._fontFamily !== fontFamily) {
 			this._fontSize = fontSize;
 			this._fontFamily = fontFamily;
+			this._height = height;
 			this._font = makeFont(fontSize, fontFamily);
 			this._textWidthCache.reset();
 		}
@@ -87,22 +92,22 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 				item.text.width = this._textWidthCache.measureText(ctx, item.text.content);
 				item.text.height = this._fontSize;
 			}
-			drawItem(item, ctx);
+			drawItem(item, ctx, this._height);
 		}
 	}
 }
 
-function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
+function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, height: number): void {
 	ctx.fillStyle = item.color;
 
 	if (item.text !== undefined) {
-		drawText(ctx, item.text.content, item.x - item.text.width / 2, item.text.y);
+		drawText(ctx, item.text.content, item.x - item.text.width / 2, item.shape === 'line' ? height - 10 : item.text.y);
 	}
 
-	drawShape(item, ctx);
+	drawShape(item, ctx, height);
 }
 
-function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
+function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, height: number): void {
 	if (item.size === 0) {
 		return;
 	}
@@ -119,6 +124,10 @@ function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingConte
 			return;
 		case 'square':
 			drawSquare(ctx, item.x, item.y, item.size);
+			return;
+		case 'line':
+			ctx.strokeStyle = item.color;
+			drawLine(ctx, item.x, item.lineStyle ?? LineStyle.SparseDotted, height);
 			return;
 	}
 
@@ -147,5 +156,7 @@ function hitTestShape(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coor
 			return hitTestCircle(item.x, item.y, item.size, x, y);
 		case 'square':
 			return hitTestSquare(item.x, item.y, item.size, x, y);
+		case 'line':
+			return hitTestLine(item.x, x);
 	}
 }

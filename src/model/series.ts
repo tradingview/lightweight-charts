@@ -566,14 +566,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			const searchMode = timePointIndex < firstDataIndex ? PlotRowSearchMode.NearestRight : PlotRowSearchMode.NearestLeft;
 			const seriesDataIndex = ensureNotNull(this._data.search(timePointIndex, searchMode)).index;
 			return {
+				...marker,
 				time: seriesDataIndex,
-				position: marker.position,
-				shape: marker.shape,
-				color: marker.color,
-				id: marker.id,
 				internalId: index,
-				text: marker.text,
-				size: marker.size,
 			};
 		});
 	}

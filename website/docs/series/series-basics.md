@@ -405,7 +405,7 @@ An array of items is expected. An array must be sorted ascending by `time`. Each
 
 - `time` ([Time](/api/#time)) - item time
 - `position` (`aboveBar` &#124; `belowBar` &#124; `inBar`) - item position
-- `shape` (`circle` &#124; `square` &#124; `arrowUp` &#124; `arrowDown`) - item marker type
+- `shape` (`circle` &#124; `square` &#124; `arrowUp` &#124; `arrowDown` &#124; `line`) - item marker type
 - `size` (`number` &#124; `undefined`) - size multiplier of the marker, the shape is hidden when set to `0`, default value is `1`
 - `color` (`string`) - item color
 - `id` (`string` &#124; `undefined`) - item id, will be passed to click/crosshair move handlers

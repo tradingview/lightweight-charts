@@ -123,7 +123,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		}
 
 		const layout = this._model.options().layout;
-		this._renderer.setParams(layout.fontSize, layout.fontFamily);
+		this._renderer.setParams(layout.fontSize, layout.fontFamily, height);
 		this._renderer.setData(this._data);
 
 		return this._renderer;
