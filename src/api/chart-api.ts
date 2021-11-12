@@ -360,7 +360,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const model = this._chartWidget.model();
 
 		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
-		update.series.forEach((value: SeriesChanges, series: Series) => series.setData(value.data));
+		update.series.forEach((value: SeriesChanges, series: Series) => series.setData(value.data, value.info));
 
 		model.recalculateAllPanes();
 	}

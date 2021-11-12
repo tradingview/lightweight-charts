@@ -85,6 +85,10 @@ export interface SeriesDataAtTypeMap {
 	Histogram: BarPrice;
 }
 
+export interface SeriesUpdateInfo {
+	lastBarUpdatedOrNewBarsAddedToTheRight: boolean;
+}
+
 // TODO: uncomment following strings after fixing typescript bug
 // https://github.com/microsoft/TypeScript/issues/36981
 // export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
@@ -239,10 +243,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._paneView.update('options');
 	}
 
-	public setData(data: readonly SeriesPlotRow<T>[]): void {
-		const lastIndex = this._data.lastIndex();
-		const newRealtimeDataReceived = lastIndex !== null && data.length > 0 && data[data.length - 1].index >= lastIndex;
-
+	public setData(data: readonly SeriesPlotRow<T>[], updateInfo?: SeriesUpdateInfo): void {
 		this._data.setData(data);
 
 		this._recalculateMarkers();
@@ -250,12 +251,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._paneView.update('data');
 		this._markersPaneView.update('data');
 
-		const lastPriceAnimationPaneView = this._lastPriceAnimationPaneView;
-		if (lastPriceAnimationPaneView !== null) {
-			if (newRealtimeDataReceived) {
-				lastPriceAnimationPaneView.onNewRealtimeDataReceived();
+		if (this._lastPriceAnimationPaneView !== null) {
+			if (updateInfo && updateInfo.lastBarUpdatedOrNewBarsAddedToTheRight) {
+				this._lastPriceAnimationPaneView.onNewRealtimeDataReceived();
 			} else if (data.length === 0) {
-				lastPriceAnimationPaneView.onDataCleared();
+				this._lastPriceAnimationPaneView.onDataCleared();
 			}
 		}
 
