@@ -240,13 +240,24 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public setData(data: readonly SeriesPlotRow<T>[]): void {
+		const lastIndex = this._data.lastIndex();
+		const newRealtimeDataReceived = lastIndex !== null && data.length > 0 && data[data.length - 1].index >= lastIndex;
+
 		this._data.setData(data);
 
 		this._recalculateMarkers();
 
 		this._paneView.update('data');
 		this._markersPaneView.update('data');
-		this._lastPriceAnimationPaneView?.update('data');
+
+		const lastPriceAnimationPaneView = this._lastPriceAnimationPaneView;
+		if (lastPriceAnimationPaneView !== null) {
+			if (newRealtimeDataReceived) {
+				lastPriceAnimationPaneView.onNewRealtimeDataReceived();
+			} else if (data.length === 0) {
+				lastPriceAnimationPaneView.onDataCleared();
+			}
+		}
 
 		const sourcePane = this.model().paneForSource(this);
 		this.model().recalculatePane(sourcePane);
