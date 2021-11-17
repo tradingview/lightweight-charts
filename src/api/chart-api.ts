@@ -227,7 +227,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		options = migrateOptions(options);
 		patchPriceFormat(options.priceFormat);
 
-		// baseline style defaults has an object in it so we have to clone it as well to avoid assigning fields to defaults
+		// to avoid assigning fields to defaults we have to clone them
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(baselineStyleDefaults), options) as BaselineSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Baseline', strictOptions);
 
