@@ -159,21 +159,31 @@ function createEmptyTimePointData(timePoint: TimePoint): TimePointData {
 	return { index: 0 as TimePointIndex, mapping: new Map(), timePoint };
 }
 
-function seriesRowsLastTime(seriesRows: SeriesPlotRow[] | undefined): UTCTimestamp | undefined {
-	if (seriesRows === undefined) {
+interface SeriesRowsFirstAndLastTime {
+	firstTime: UTCTimestamp;
+	lastTime: UTCTimestamp;
+}
+
+function seriesRowsFirsAndLastTime(seriesRows: SeriesPlotRow[] | undefined): SeriesRowsFirstAndLastTime | undefined {
+	if (seriesRows === undefined || seriesRows.length === 0) {
 		return undefined;
 	}
 
-	return seriesRows.length > 0 ? seriesRows[seriesRows.length - 1].time.timestamp : undefined;
+	return {
+		firstTime: seriesRows[0].time.timestamp,
+		lastTime: seriesRows[seriesRows.length - 1].time.timestamp,
+	};
 }
 
 function seriesUpdateInfo(seriesRows: SeriesPlotRow[] | undefined, prevSeriesRows: SeriesPlotRow[] | undefined): SeriesUpdateInfo | undefined {
-	const lastTime = seriesRowsLastTime(seriesRows);
-	if (lastTime !== undefined) {
-		const prevLastTime = seriesRowsLastTime(prevSeriesRows);
-		if (prevLastTime !== undefined && lastTime >= prevLastTime) {
-			return { lastBarUpdatedOrNewBarsAddedToTheRight: true };
-		}
+	const firstAndLastTime = seriesRowsFirsAndLastTime(seriesRows);
+	const prevFirstAndLastTime = seriesRowsFirsAndLastTime(prevSeriesRows);
+	if (firstAndLastTime !== undefined && prevFirstAndLastTime !== undefined) {
+		return {
+			lastBarUpdatedOrNewBarsAddedToTheRight:
+				firstAndLastTime.lastTime >= prevFirstAndLastTime.lastTime &&
+				firstAndLastTime.firstTime >= prevFirstAndLastTime.firstTime,
+		};
 	}
 
 	return undefined;
@@ -307,7 +317,7 @@ export class DataLayer {
 
 		this._updateLastSeriesRow(series, plotRow);
 
-		const info: SeriesUpdateInfo = { lastBarUpdatedOrNewBarsAddedToTheRight: true };
+		const info: SeriesUpdateInfo = { lastBarUpdatedOrNewBarsAddedToTheRight: isSeriesPlotRow(plotRow) };
 
 		// if point already exist on the time scale - we don't need to make a full update and just make an incremental one
 		if (!affectsTimeScale) {
