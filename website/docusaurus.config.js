@@ -116,6 +116,13 @@ const config = {
 				theme: lightCodeTheme,
 				darkTheme: darkCodeTheme,
 			},
+			algolia: {
+				appId: 'BH4D9OD16A',
+				// Public API key: it is safe to commit it
+				apiKey: 'bd84607b54c71800365e661f500cad8e',
+				indexName: 'lightweight-charts',
+				contextualSearch: true,
+			},
 		}),
 
 	plugins: [
