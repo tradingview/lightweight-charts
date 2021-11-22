@@ -1,10 +1,7 @@
 /**
  * Represents the position of a series marker relative to a bar.
- *
- * If type of position is number, position is exact "value" of Item Series.
- *
  */
-export type SeriesMarkerPosition = 'aboveBar' | 'belowBar' | 'inBar' | number;
+export type SeriesMarkerPosition = 'aboveBar' | 'belowBar' | 'inBar';
 
 /**
  * Represents the shape of a series marker.
