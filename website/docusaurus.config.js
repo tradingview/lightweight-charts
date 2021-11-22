@@ -27,6 +27,8 @@ const config = {
 			'@docusaurus/preset-classic',
 			/** @type {import('@docusaurus/preset-classic').Options} */
 			({
+				blog: false,
+				pages: false,
 				docs: {
 					sidebarPath: require.resolve('./sidebars.js'),
 					routeBasePath: '/',
