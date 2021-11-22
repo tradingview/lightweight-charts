@@ -27,6 +27,8 @@ const config = {
 			'@docusaurus/preset-classic',
 			/** @type {import('@docusaurus/preset-classic').Options} */
 			({
+				blog: false,
+				pages: false,
 				docs: {
 					sidebarPath: require.resolve('./sidebars.js'),
 					routeBasePath: '/',
@@ -115,6 +117,13 @@ const config = {
 			prism: {
 				theme: lightCodeTheme,
 				darkTheme: darkCodeTheme,
+			},
+			algolia: {
+				appId: 'BH4D9OD16A',
+				// Public API key: it is safe to commit it
+				apiKey: 'bd84607b54c71800365e661f500cad8e',
+				indexName: 'lightweight-charts',
+				contextualSearch: true,
 			},
 		}),
 
