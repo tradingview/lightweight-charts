@@ -222,6 +222,9 @@ jobs:
     executor: node14-executor
     steps:
       - checkout-with-deps
+      # since deploying website and building/tests are running in parallel it is possible that there is no cached deps yet
+      # so let's install them to be sure that everything is fine
+      - run: npm install
       - run: npm run tsc
       - run: npm run bundle-dts
       - run:
