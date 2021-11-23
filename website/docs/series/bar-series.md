@@ -1,4 +1,4 @@
-# Bar series
+# Bar Series
 
 A bar chart shows price movements in the form of bars.
 
@@ -6,7 +6,7 @@ Vertical line length of a bar is limited by the highest and lowest price values.
 
 Open & Close values are represented by tick marks, on the left & right hand side of the bar respectively.
 
-![Bar chart example](./assets/bar-series.png "Bar chart example")
+![Bar chart example](/img/bar-series.png "Bar chart example")
 
 ## How to create bar series
 
@@ -35,7 +35,7 @@ barSeries.setData([
 
 ## Data format
 
-Each item of the bar series is either an [OHLC](./ohlc.md) or a [whitespace](./whitespace-data.md) item.
+Each item of the bar series is either an [OHLC](../data/ohlc.md) or a [whitespace](../data/whitespace-data.md) item.
 
 ## Customization
 
@@ -44,14 +44,7 @@ Bar width can be increased to 2 px by disabling the `thinBars` option.
 
 Colors for rising & falling bars have to be set separately.
 
-A bar series series interface can be customized using the following set of options:
-
-|Name|Type|Default|Description|
-|----|----|-------|-----------|
-|`thinBars`|`boolean`|`true`|If true, bars are represented as sticks|
-|`upColor`|`string`|`#26a69a`|Growing bar color|
-|`downColor`|`string`|`#ef5350`|Falling bar color|
-|`openVisible`|`boolean`|`true`|If true, then the open line of a bar is shown|
+A bar series series interface can be customized using the following set of options: [BarStyleOptions](/api/interfaces/BarStyleOptions).
 
 ### Examples
 
@@ -75,9 +68,3 @@ A bar series series interface can be customized using the following set of optio
         openVisible: false,
     });
     ```
-
-## What's next
-
-- [Customization](./customization.md)
-- [OHLC](./ohlc.md)
-- [Time](./time.md)

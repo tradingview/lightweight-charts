@@ -260,7 +260,7 @@ export class TimeScale {
 	}
 
 	public isEmpty(): boolean {
-		return this._width === 0 || this._points.length === 0;
+		return this._width === 0 || this._points.length === 0 || this._baseIndexOrNull === null;
 	}
 
 	// strict range: integer indices of the bars in the visible range rounded in more wide direction

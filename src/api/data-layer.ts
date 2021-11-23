@@ -4,7 +4,7 @@ import { lowerbound } from '../helpers/algorithms';
 import { ensureNotNull } from '../helpers/assertions';
 import { isString } from '../helpers/strict-type-checks';
 
-import { Series } from '../model/series';
+import { Series, SeriesUpdateInfo } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { BusinessDay, TimePoint, TimePointIndex, TimeScalePoint, UTCTimestamp } from '../model/time-data';
@@ -124,6 +124,10 @@ export interface SeriesChanges {
 	 * Data to be merged into series' plot list
 	 */
 	data: readonly SeriesPlotRow[];
+	/**
+	 * Additional info about this change
+	 */
+	info?: SeriesUpdateInfo;
 }
 
 export interface DataUpdateResponse {
@@ -155,6 +159,36 @@ function createEmptyTimePointData(timePoint: TimePoint): TimePointData {
 	return { index: 0 as TimePointIndex, mapping: new Map(), timePoint };
 }
 
+interface SeriesRowsFirstAndLastTime {
+	firstTime: UTCTimestamp;
+	lastTime: UTCTimestamp;
+}
+
+function seriesRowsFirsAndLastTime(seriesRows: SeriesPlotRow[] | undefined): SeriesRowsFirstAndLastTime | undefined {
+	if (seriesRows === undefined || seriesRows.length === 0) {
+		return undefined;
+	}
+
+	return {
+		firstTime: seriesRows[0].time.timestamp,
+		lastTime: seriesRows[seriesRows.length - 1].time.timestamp,
+	};
+}
+
+function seriesUpdateInfo(seriesRows: SeriesPlotRow[] | undefined, prevSeriesRows: SeriesPlotRow[] | undefined): SeriesUpdateInfo | undefined {
+	const firstAndLastTime = seriesRowsFirsAndLastTime(seriesRows);
+	const prevFirstAndLastTime = seriesRowsFirsAndLastTime(prevSeriesRows);
+	if (firstAndLastTime !== undefined && prevFirstAndLastTime !== undefined) {
+		return {
+			lastBarUpdatedOrNewBarsAddedToTheRight:
+				firstAndLastTime.lastTime >= prevFirstAndLastTime.lastTime &&
+				firstAndLastTime.firstTime >= prevFirstAndLastTime.firstTime,
+		};
+	}
+
+	return undefined;
+}
+
 export class DataLayer {
 	// note that _pointDataByTimePoint and _seriesRowsBySeries shares THE SAME objects in their values between each other
 	// it's just different kind of maps to make usages/perf better
@@ -177,7 +211,9 @@ export class DataLayer {
 
 		let isTimeScaleAffected = false;
 
-		if (this._seriesRowsBySeries.has(series)) {
+		// save previous series rows data before it's replaced inside this._setRowsToSeries
+		const prevSeriesRows = this._seriesRowsBySeries.get(series);
+		if (prevSeriesRows !== undefined) {
 			if (this._seriesRowsBySeries.size === 1) {
 				needCleanupPoints = false;
 				isTimeScaleAffected = true;
@@ -242,7 +278,11 @@ export class DataLayer {
 			firstChangedPointIndex = this._replaceTimeScalePoints(newTimeScalePoints);
 		}
 
-		return this._getUpdateResponse(series, firstChangedPointIndex);
+		return this._getUpdateResponse(
+			series,
+			firstChangedPointIndex,
+			seriesUpdateInfo(this._seriesRowsBySeries.get(series), prevSeriesRows)
+		);
 	}
 
 	public removeSeries(series: Series): DataUpdateResponse {
@@ -277,9 +317,11 @@ export class DataLayer {
 
 		this._updateLastSeriesRow(series, plotRow);
 
+		const info: SeriesUpdateInfo = { lastBarUpdatedOrNewBarsAddedToTheRight: isSeriesPlotRow(plotRow) };
+
 		// if point already exist on the time scale - we don't need to make a full update and just make an incremental one
 		if (!affectsTimeScale) {
-			return this._getUpdateResponse(series, -1);
+			return this._getUpdateResponse(series, -1, info);
 		}
 
 		const newPoint: InternalTimeScalePoint = { timeWeight: 0, time: pointDataAtTime.timePoint, pointData: pointDataAtTime };
@@ -297,7 +339,7 @@ export class DataLayer {
 
 		fillWeightsForPoints(this._sortedTimePoints, insertIndex);
 
-		return this._getUpdateResponse(series, insertIndex);
+		return this._getUpdateResponse(series, insertIndex, info);
 	}
 
 	private _updateLastSeriesRow(series: Series, plotRow: SeriesPlotRow | WhitespacePlotRow): void {
@@ -411,7 +453,7 @@ export class DataLayer {
 		return baseIndex;
 	}
 
-	private _getUpdateResponse(updatedSeries: Series, firstChangedPointIndex: number): DataUpdateResponse {
+	private _getUpdateResponse(updatedSeries: Series, firstChangedPointIndex: number, info?: SeriesUpdateInfo): DataUpdateResponse {
 		const dataUpdateResponse: DataUpdateResponse = {
 			series: new Map(),
 			timeScale: {
@@ -423,14 +465,20 @@ export class DataLayer {
 			// TODO: it's possible to make perf improvements by checking what series has data after firstChangedPointIndex
 			// but let's skip for now
 			this._seriesRowsBySeries.forEach((data: SeriesPlotRow[], s: Series) => {
-				dataUpdateResponse.series.set(s, { data });
+				dataUpdateResponse.series.set(
+					s,
+					{
+						data,
+						info: s === updatedSeries ? info : undefined,
+					}
+				);
 			});
 
 			// if the series data was set to [] it will have already been removed from _seriesRowBySeries
 			// meaning the forEach above won't add the series to the data update response
 			// so we handle that case here
 			if (!this._seriesRowsBySeries.has(updatedSeries)) {
-				dataUpdateResponse.series.set(updatedSeries, { data: [] });
+				dataUpdateResponse.series.set(updatedSeries, { data: [], info });
 			}
 
 			dataUpdateResponse.timeScale.points = this._sortedTimePoints;
@@ -438,7 +486,7 @@ export class DataLayer {
 		} else {
 			const seriesData = this._seriesRowsBySeries.get(updatedSeries);
 			// if no seriesData found that means that we just removed the series
-			dataUpdateResponse.series.set(updatedSeries, { data: seriesData || [] });
+			dataUpdateResponse.series.set(updatedSeries, { data: seriesData || [], info });
 		}
 
 		return dataUpdateResponse;

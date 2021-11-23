@@ -7,7 +7,7 @@ import { LastPriceAnimationMode } from '../../model/series-options';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-price-animation-renderer';
 
-import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
+import { IUpdatablePaneView } from './iupdatable-pane-view';
 
 const enum Constants {
 	AnimationPeriod = 2600,
@@ -132,22 +132,29 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 		this._series = series;
 	}
 
-	public update(updateType?: UpdateType): void {
-		this._invalidated = true;
-		if (updateType === 'data') {
-			if (this._series.options().lastPriceAnimation === LastPriceAnimationMode.OnDataUpdate) {
-				const now = performance.now();
-				const timeToAnimationEnd = this._endTime - now;
-				if (timeToAnimationEnd > 0) {
-					if (timeToAnimationEnd < Constants.AnimationPeriod / 4) {
-						this._endTime += Constants.AnimationPeriod;
-					}
-					return;
+	public onDataCleared(): void {
+		this._endTime = this._startTime - 1;
+		this.update();
+	}
+
+	public onNewRealtimeDataReceived(): void {
+		this.update();
+		if (this._series.options().lastPriceAnimation === LastPriceAnimationMode.OnDataUpdate) {
+			const now = performance.now();
+			const timeToAnimationEnd = this._endTime - now;
+			if (timeToAnimationEnd > 0) {
+				if (timeToAnimationEnd < Constants.AnimationPeriod / 4) {
+					this._endTime += Constants.AnimationPeriod;
 				}
-				this._startTime = now;
-				this._endTime = now + Constants.AnimationPeriod;
+				return;
 			}
+			this._startTime = now;
+			this._endTime = now + Constants.AnimationPeriod;
 		}
+	}
+
+	public update(): void {
+		this._invalidated = true;
 	}
 
 	public invalidateStage(): void {

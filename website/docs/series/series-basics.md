@@ -1,4 +1,8 @@
-# Series basics
+---
+sidebar_position: 0
+---
+
+# Series Basics
 
 Each series has a set of common properties and methods regardless of its type.
 
@@ -241,10 +245,10 @@ You can set the width, style and color of this line or disable it using the foll
 |Name|Type|Default|Description|
 |----|----|-------|-|
 |`priceLineVisible`|`boolean`|`true`|If true, the series' price line is displayed on a chart if the series is visible|
-|`priceLineSource`|[PriceLineSource](./constants.md#pricelinesource)|`PriceLineSource.LastBar`|Source to be used for the horizontal price line|
+|`priceLineSource`|[PriceLineSource](../api/enums/PriceLineSource)|`PriceLineSource.LastBar`|Source to be used for the horizontal price line|
 |`priceLineWidth`|`number`|`1`|Price line's width in pixels|
 |`priceLineColor`|`string`|`''`|Price line's color|
-|`priceLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Dotted`|Price line's style|
+|`priceLineStyle`|[LineStyle](../api/enums/LineStyle)|`LineStyle.Dotted`|Price line's style|
 
 Example:
 
@@ -284,7 +288,7 @@ You can set the width, style and color of this line or disable it using the foll
 |`baseLineVisible`|`boolean`|`true`|If true, the series' base line is displayed on a chart if the series is visible|
 |`baseLineWidth`|`number`|`1`|Base line's width in pixels|
 |`baseLineColor`|`string`|`'#B2B5BE'`|Base line's color|
-|`baseLineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Base line's style|
+|`baseLineStyle`|[LineStyle](../api/enums/LineStyle)|`LineStyle.Solid`|Base line's style|
 
 Example:
 
@@ -390,7 +394,7 @@ Allows to set/replace all existing series markers with new ones.
 
 An array of items is expected. An array must be sorted ascending by `time`. Each item should contain the following fields:
 
-- `time` ([Time](./time.md)) - item time
+- `time` ([Time](/api/#time)) - item time
 - `position` (`aboveBar` &#124; `belowBar` &#124; `inBar`) - item position
 - `shape` (`circle` &#124; `square` &#124; `arrowUp` &#124; `arrowDown`) - item marker type
 - `size` (`number` &#124; `undefined`) - size multiplier of the marker, the shape is hidden when set to `0`, default value is `1`
@@ -449,7 +453,7 @@ You can set the price level, width, style and color of this line using the follo
 |`price`| `number` | `0` | Price line's level |
 |`lineColor`|`string`|`''`|Price line's color|
 |`lineWidth`|`number`|`1`|Price line's width in pixels|
-|`lineStyle`|[LineStyle](./constants.md#linestyle)|`LineStyle.Solid`|Price line's style|
+|`lineStyle`|[LineStyle](../api/enums/LineStyle)|`LineStyle.Solid`|Price line's style|
 |`axisLabelVisible`|`boolean`|`true`|If true, a label with the current price value is displayed on the price scale|
 |`title`|`string`|`''`|Price line's title on the chart's pane|
 
@@ -488,12 +492,12 @@ series.removePriceLine(priceLine);
 
 ### barsInLogicalRange
 
-Returns bars information for the series in the provided [logical range](./time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
+Returns bars information for the series in the provided [logical range](../time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
 
 The returned value is an object with the following properties:
 
-- `from` - a [Time](./time.md) of the first series' bar inside of the passed logical range or `undefined`, if no bars have been found in the requested range
-- `to` - a [Time](./time.md) of the last series' bar inside of the passed logical range or `undefined`, if no bars have been found in the requested range
+- `from` - a [Time](/api/#time) of the first series' bar inside of the passed logical range or `undefined`, if no bars have been found in the requested range
+- `to` - a [Time](/api/#time) of the last series' bar inside of the passed logical range or `undefined`, if no bars have been found in the requested range
 - `barsBefore` - a number of bars between the `from` index of the passed logical range and the first series' bar
 - `barsAfter` - a number of bars between the `to` index of the passed logical range and the last series' bar
 
@@ -510,7 +514,7 @@ console.log(barsInfo);
 ```
 
 This method can be used, for instance, to implement downloading historical data while scrolling to prevent a user from seeing empty space.
-Thus, you can subscribe to [visible logical range changed event](./time-scale.md#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
+Thus, you can subscribe to [visible logical range changed event](/api/interfaces/ITimeScaleApi#subscribeVisibleLogicalRangeChange), get count of bars in front of the visible range and load additional data if it is needed:
 
 ```js
 function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
@@ -570,13 +574,3 @@ This function accepts coordinate and returns corresponding price value or `null`
 ```js
 const price = series.coordinateToPrice(324);
 ```
-
-## Next reading
-
-- [Area series](./area-series.md)
-- [Baseline series](./baseline-series.md)
-- [Bar series](./bar-series.md)
-- [Candlestick series](./candlestick-series.md)
-- [Histogram series](./histogram-series.md)
-- [Line series](./line-series.md)
-- [Customization](./customization.md)

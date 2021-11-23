@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Time
 
 This article contains descriptions of types to represent the time of data items.

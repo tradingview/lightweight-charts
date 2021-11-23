@@ -1,10 +1,10 @@
-# Histogram series
+# Histogram Series
 
 A histogram series is a graphical representation of the value distribution.
 
 Histogram creates intervals (columns) and counts how many values fall into each column.
 
-![Histogram example](./assets/histogram-series.png "Histogram chart example")
+![Histogram example](/img/histogram-series.png "Histogram chart example")
 
 ## How to create histogram series
 
@@ -32,9 +32,9 @@ histogramSeries.setData([
 
 ## Data format
 
-Each item of the histogram series should be a [whitespace](./whitespace-data.md) item or an object with the following fields:
+Each item of the histogram series should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
 
-- `time` ([Time](./time.md)) - item time
+- `time` ([Time](/api/#time)) - item time
 - `value` (`number`) - item value
 - `color` (`string`, optional) - optional color of an item
 
@@ -42,12 +42,7 @@ Note: if `color` is not set then an item will be colored according to series opt
 
 ## Customization
 
-A histogram series interface can be customized using the following options:
-
-|Name|Type|Default|Description|
-|----|----|-------|-|
-|`color`|`string`|`#26a69a`|Column color|
-|`base`|`number`|`0`|Defines initial level for histogram columns|
+A histogram series interface can be customized using the following options: [HistogramStyleOptions](/api/interfaces/HistogramStyleOptions).
 
 ### Examples
 
@@ -68,9 +63,3 @@ A histogram series interface can be customized using the following options:
         base: -10,
     });
     ```
-
-## What's next
-
-- [Customization](./customization.md)
-- [Constants](./constants.md)
-- [Time](./time.md)

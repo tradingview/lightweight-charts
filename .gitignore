@@ -21,6 +21,10 @@ debug.html
 /dist/
 /src/**/*.js
 /src/**/*.d.ts
+/website/docs/api/
+/website/build
+/website/.docusaurus
+/website/.cache-loader
 
 !/src/typings/**/*.d.ts
 

@@ -1,4 +1,8 @@
-# OHLC
+---
+sidebar_position: 0
+---
+
+# OHLC Data
 
 OHLC is a type of data item. It includes the following fields:
 

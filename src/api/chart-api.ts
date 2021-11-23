@@ -171,7 +171,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	public addBaselineSeries(options: BaselineSeriesPartialOptions = {}): ISeriesApi<'Baseline'> {
 		patchPriceFormat(options.priceFormat);
 
-		const strictOptions = merge(clone(seriesOptionsDefaults), baselineStyleDefaults, options) as BaselineSeriesOptions;
+		// to avoid assigning fields to defaults we have to clone them
+		const strictOptions = merge(clone(seriesOptionsDefaults), clone(baselineStyleDefaults), options) as BaselineSeriesOptions;
 		const series = this._chartWidget.model().createSeries('Baseline', strictOptions);
 
 		const res = new SeriesApi<'Baseline'>(series, this, this);
@@ -295,7 +296,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const model = this._chartWidget.model();
 
 		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
-		update.series.forEach((value: SeriesChanges, series: Series) => series.setData(value.data));
+		update.series.forEach((value: SeriesChanges, series: Series) => series.setData(value.data, value.info));
 
 		model.recalculateAllPanes();
 	}
