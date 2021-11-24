@@ -32,13 +32,7 @@ histogramSeries.setData([
 
 ## Data format
 
-Each item of the histogram series should be a [whitespace](/api/interfaces/WhitespaceData.md) item or an object with the following fields:
-
-- `time` ([Time](/api/#time)) - item time
-- `value` (`number`) - item value
-- `color` (`string`, optional) - optional color of an item
-
-Note: if `color` is not set then an item will be colored according to series options.
+Each item of the histogram series should be a [HistogramData](/api/interfaces/HistogramData.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
 
 ## Customization
 

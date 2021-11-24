@@ -35,7 +35,7 @@ barSeries.setData([
 
 ## Data format
 
-Each item of the bar series is either an [OHLC](../data/ohlc.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
+Each item of the bar series is either an [OHLC](/api/interfaces/BarData.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
 
 ## Customization
 
