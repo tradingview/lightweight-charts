@@ -31,7 +31,7 @@ candlestickSeries.setData([
 
 ## Data format
 
-Each item of the candlestick series is either an [OHLC](../data/ohlc.md) or a [whitespace](../data/whitespace-data.md) item.
+Each item of the candlestick series is either an [OHLC](../data/ohlc.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
 
 ## Customization
 

@@ -31,7 +31,7 @@ lineSeries.setData([
 
 ## Data format
 
-Each item of the line series should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
+Each item of the line series should be a [whitespace](/api/interfaces/WhitespaceData.md) item or an object with the following fields:
 
 - `time` ([Time](/api/#time)) - a time of the item
 - `value` (`number`) - a value of the item

@@ -40,6 +40,19 @@ export function isUTCTimestamp(time: Time): time is UTCTimestamp {
 
 /**
  * Represents a whitespace data item, which is a data point without a value.
+ *
+ * @example
+ * ```js
+ * const data = [
+ *     { time: '2018-12-03', value: 27.02 },
+ *     { time: '2018-12-04' }, // whitespace
+ *     { time: '2018-12-05' }, // whitespace
+ *     { time: '2018-12-06' }, // whitespace
+ *     { time: '2018-12-07' }, // whitespace
+ *     { time: '2018-12-08', value: 23.92 },
+ *     { time: '2018-12-13', value: 30.74 },
+ * ];
+ * ```
  */
 export interface WhitespaceData {
 	/**

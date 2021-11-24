@@ -28,7 +28,7 @@ areaSeries.setData([
 
 ## Data format
 
-Each area series item should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
+Each area series item should be a [whitespace](/api/interfaces/WhitespaceData.md) item or an object with the following fields:
 
 - `time` ([Time](/api/#time)) - item time
 - `value` (`number`) - item value
