@@ -82,8 +82,11 @@ export const enum TickMarkType {
  * Note that the returned string should be the shortest possible value and should have no more than 8 characters.
  * Otherwise, the tick marks will overlap each other.
  *
+ * @example
  * ```js
- * const customFormatter = (time, tickMarkType, locale) => { ... }
+ * const customFormatter = (time, tickMarkType, locale) => {
+ *     // your code here
+ * };
  * ```
  */
 export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType: TickMarkType, locale: string) => string;

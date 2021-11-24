@@ -305,11 +305,12 @@ export interface HistogramStyleOptions {
  * The precision and minMove properties allow wide customization of formatting.
  *
  * @example
- * minMove = 0.01 , precision is not specified. Prices will change like 1.13, 1.14, 1.15 etc.
- * minMove = 0.01 , precision = 3. Prices will change like 1.130, 1.140, 1.150 etc.
- * minMove = 0.05 , precision is not specified. Prices will change like 1.10, 1.15, 1.20
+ * `minMove=0.01`, `precision` is not specified - prices will change like 1.13, 1.14, 1.15 etc.
+ * @example
+ * `minMove=0.01`, `precision=3` - prices will change like 1.130, 1.140, 1.150 etc.
+ * @example
+ * `minMove=0.05`, `precision` is not specified - prices will change like 1.10, 1.15, 1.20 etc.
  */
-
 export interface PriceFormatBuiltIn {
 	/**
 	 * Built-in price formats.

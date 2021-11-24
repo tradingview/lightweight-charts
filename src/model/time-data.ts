@@ -24,6 +24,7 @@ export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
 /**
  * Represents a time as a day/month/year.
  *
+ * @example
  * ```js
  * const day = { year: 2019, month: 6, day: 1 }; // June 1, 2019
  * ```
