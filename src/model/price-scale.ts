@@ -118,6 +118,16 @@ export interface PriceScaleOptions {
 
 	/**
 	 * Price scale margins.
+	 *
+	 * @example
+	 * ```js
+	 * chart.priceScale('right').applyOptions({
+	 *     scaleMargins: {
+	 *         top: 0.8,
+	 *         bottom: 0,
+	 *     },
+	 * });
+	 * ```
 	 */
 	scaleMargins: PriceScaleMargins;
 
