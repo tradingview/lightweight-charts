@@ -448,57 +448,6 @@ chart.subscribeClick(param => {
 });
 ```
 
-### createPriceLine
-
-Creates a horizontal price line at a certain price level. The method returns an object that has two methods:
-
-- `options()` - returns the price line options
-- `applyOptions(options)` - sets the price line options
-
-You can set the price level, width, style and color of this line using the following options:
-
-|Name|Type|Default|Description|
-|----|----|-------|-|
-|`price`| `number` | `0` | Price line's level |
-|`lineColor`|`string`|`''`|Price line's color|
-|`lineWidth`|`number`|`1`|Price line's width in pixels|
-|`lineStyle`|[LineStyle](../api/enums/LineStyle)|`LineStyle.Solid`|Price line's style|
-|`axisLabelVisible`|`boolean`|`true`|If true, a label with the current price value is displayed on the price scale|
-|`title`|`string`|`''`|Price line's title on the chart's pane|
-
-Example:
-
-```js
-const priceLine = series.createPriceLine({
-    price: 80.0,
-    color: 'green',
-    lineWidth: 2,
-    lineStyle: LightweightCharts.LineStyle.Dotted,
-    axisLabelVisible: true,
-    title: 'P/L 500',
-});
-
-priceLine.applyOptions({
-    price: 90.0,
-    color: 'red',
-    lineWidth: 3,
-    lineStyle: LightweightCharts.LineStyle.Dashed,
-    axisLabelVisible: false,
-    title: 'P/L 600',
-});
-```
-
-### removePriceLine
-
-Removes the price line that was created before.
-
-Example:
-
-```js
-const priceLine = series.createPriceLine({ price: 80.0 });
-series.removePriceLine(priceLine);
-```
-
 ### barsInLogicalRange
 
 Returns bars information for the series in the provided [logical range](../time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
