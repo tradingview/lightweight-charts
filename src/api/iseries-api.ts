@@ -61,15 +61,28 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	coordinateToPrice(coordinate: number): BarPrice | null;
 
 	/**
-	 * Retrieves information about the series' data within a given logical range.
+	 * Returns bars information for the series in the provided [logical range](/time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
+	 * This method can be used, for instance, to implement downloading historical data while scrolling to prevent a user from seeing empty space.
 	 *
-	 * @param range - the logical range to retrieve info for
-	 * @returns the bars info for the given logical range: fields `from` and `to` are
-	 * `Logical` values for the first and last bar within the range, and `barsBefore` and
-	 * `barsAfter` count the the available bars outside the given index range. If these
-	 * values are negative, it means that the given range us not fully filled with bars
-	 * on the given side, but bars are missing instead (would show up as a margin if the
-	 * the given index range falls into the viewport).
+	 * @param range - The [logical range](/time-scale.md#logical-range) to retrieve info for.
+	 * @returns The bars info for the given logical range.
+	 * @example Getting bars info for current visible range
+	 * ```js
+	 * const barsInfo = series.barsInLogicalRange(chart.timeScale().getVisibleLogicalRange());
+	 * console.log(barsInfo);
+	 * ```
+	 * @example Implementing downloading historical data while scrolling
+	 * ```js
+	 * function onVisibleLogicalRangeChanged(newVisibleLogicalRange) {
+	 *     const barsInfo = series.barsInLogicalRange(newVisibleLogicalRange);
+	 *     // if there less than 50 bars to the left of the visible area
+	 *     if (barsInfo !== null && barsInfo.barsBefore < 50) {
+	 *         // try to load additional historical data and prepend it to the series data
+	 *     }
+	 * }
+	 *
+	 * chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
+	 * ```
 	 */
 	barsInLogicalRange(range: Range<number>): BarsInfo | null;
 
