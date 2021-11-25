@@ -171,7 +171,7 @@ export interface ChartOptions {
 	/**
 	 * Price scale options.
 	 *
-	 * @deprecated
+	 * @deprecated Use {@link leftPriceScale}, {@link rightPriceScale} or {@link overlayPriceScales} instead.
 	 * @internal
 	 */
 	priceScale: PriceScaleOptions;

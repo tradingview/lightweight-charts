@@ -111,7 +111,7 @@ export interface PriceScaleOptions {
 	/**
 	 * Price scale's position on the chart.
 	 *
-	 * @deprecated
+	 * @deprecated Use options for different price scales instead
 	 * @internal
 	 */
 	position?: PriceAxisPosition;
