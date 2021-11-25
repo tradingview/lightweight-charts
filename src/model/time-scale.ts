@@ -97,60 +97,101 @@ export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType:
 export interface TimeScaleOptions {
 	/**
 	 * The margin space in bars from the right side of the chart.
+	 *
+	 * @defaultValue `0`
 	 */
 	rightOffset: number;
+
 	/**
 	 * The space between bars in pixels.
+	 *
+	 * @defaultValue `6`
 	 */
 	barSpacing: number;
+
 	/**
 	 * The minimum space between bars in pixels.
+	 *
+	 * @defaultValue `0.5`
 	 */
 	minBarSpacing: number;
+
 	/**
 	 * Prevent scrolling to the left of the first bar.
+	 *
+	 * @defaultValue `false`
 	 */
 	fixLeftEdge: boolean;
+
 	/**
 	 * Prevent scrolling to the right of the most recent bar.
+	 *
+	 * @defaultValue `false`
 	 */
 	fixRightEdge: boolean;
+
 	/**
 	 * Prevent changing the visible time range during chart resizing.
+	 *
+	 * @defaultValue `false`
 	 */
 	lockVisibleTimeRangeOnResize: boolean;
+
 	/**
 	 * Prevent the hovered bar from moving when scrolling.
+	 *
+	 * @defaultValue `false`
 	 */
 	rightBarStaysOnScroll: boolean;
+
 	/**
 	 * Show the time scale border.
+	 *
+	 * @defaultValue `true`
 	 */
 	borderVisible: boolean;
+
 	/**
 	 * The time scale border color.
+	 *
+	 * @defaultValue `'#2B2B43'`
 	 */
 	borderColor: string;
+
 	/**
 	 * Show the time scale.
+	 *
+	 * @defaultValue `true`
 	 */
 	visible: boolean;
+
 	/**
 	 * Show the time, not just the date, in the time scale and vertical crosshair label.
+	 *
+	 * @defaultValue `false`
 	 */
 	timeVisible: boolean;
+
 	/**
 	 * Show seconds in the time scale and vertical crosshair label in `hh:mm:ss` format for intraday data.
+	 *
+	 * @defaultValue `true`
 	 */
 	secondsVisible: boolean;
+
 	/**
 	 * Shift the visible range to the right (into the future) by the number of new bars when new data is added.
 	 *
 	 * Note that this only applies when the last bar is visible.
+	 *
+	 * @defaultValue `true`
 	 */
 	shiftVisibleRangeOnNewBar: boolean;
+
 	/**
 	 * Override the default tick marks formatter.
+	 *
+	 * @defaultValue `undefined`
 	 */
 	tickMarkFormatter?: TickMarkFormatter;
 }
