@@ -137,6 +137,7 @@ const config = {
 				disableSources: true,
 				watch: true,
 				preserveWatchOutput: true,
+				sort: ['source-order'],
 			}),
 		],
 	],
