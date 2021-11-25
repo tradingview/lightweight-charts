@@ -40,31 +40,3 @@ A line itself can be customized by setting its color, width and style.
 Also, the crosshair marker which is enabled by default, can be either disabled or have its radius adjusted.
 
 A line series interface can be customized using the following options: [LineStyleOptions](/api/interfaces/LineStyleOptions).
-
-### Examples
-
-- set initial options for line series:
-
-    ```js
-    const lineSeries = chart.addLineSeries({
-        color: '#f48fb1',
-        lineStyle: 0,
-        lineWidth: 1,
-        crosshairMarkerVisible: true,
-        crosshairMarkerRadius: 6,
-        crosshairMarkerBorderColor: '#ffffff',
-        crosshairMarkerBackgroundColor: '#2296f3',
-        lineType: 1,
-        lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.Continuous,
-    });
-    ```
-
-- change options after series is created:
-
-    ```js
-    // for example, let's override line width and color only
-    lineSeries.applyOptions({
-        color: 'rgba(255, 44, 128, 1)',
-        lineWidth: 3,
-    });
-    ```

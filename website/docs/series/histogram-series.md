@@ -37,23 +37,3 @@ Each item of the histogram series should be a [HistogramData](/api/interfaces/Hi
 ## Customization
 
 A histogram series interface can be customized using the following options: [HistogramStyleOptions](/api/interfaces/HistogramStyleOptions).
-
-### Examples
-
-- set initial options for histogram series:
-
-    ```js
-    const histogramSeries = chart.addHistogramSeries({
-        color: '#FFF5EE',
-        base: 5,
-    });
-    ```
-
-- change options after series is created:
-
-    ```js
-    // for example, let's override default initial level:
-    histogramSeries.applyOptions({
-        base: -10,
-    });
-    ```
