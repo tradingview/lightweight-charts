@@ -100,6 +100,20 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * Sets or replaces series data.
 	 *
 	 * @param data - Ordered (earlier time point goes first) array of data items. Old data is fully replaced with the new one.
+	 * @example Setting data to a line series
+	 * ```js
+	 * lineSeries.setData([
+	 *     { time: '2018-12-12', value: 24.11 },
+	 *     { time: '2018-12-13', value: 31.74 },
+	 * ]);
+	 * ```
+	 * @example Setting data to a bars (or candlestick) series
+	 * ```js
+	 * barSeries.setData([
+	 *     { time: '2018-12-19', open: 141.77, high: 170.39, low: 120.25, close: 145.72 },
+	 *     { time: '2018-12-20', open: 145.72, high: 147.99, low: 100.11, close: 108.19 },
+	 * ]);
+	 * ```
 	 */
 	setData(data: SeriesDataItemTypeMap[TSeriesType][]): void;
 
@@ -108,6 +122,23 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 *
 	 * @param bar - A single data item to be added. Time of the new item must be greater or equal to the latest existing time point.
 	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
+	 * @example Updating line series data
+	 * ```js
+	 * lineSeries.update({
+	 *     time: '2018-12-12',
+	 *     value: 24.11,
+	 * });
+	 * ```
+	 * @example Updating bar (or candlestick) series data
+	 * ```js
+	 * barSeries.update({
+	 *     time: '2018-12-19',
+	 *     open: 141.77,
+	 *     high: 170.39,
+	 *     low: 120.25,
+	 *     close: 145.72,
+	 * });
+	 * ```
 	 */
 	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
 

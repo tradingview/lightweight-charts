@@ -350,53 +350,6 @@ series.applyOptions({
 });
 ```
 
-### setData
-
-Allows to set/replace all existing data with new one.
-
-An array of items is expected.
-
-Examples:
-
-```js
-lineSeries.setData([
-    { time: '2018-12-12', value: 24.11 },
-    { time: '2018-12-13', value: 31.74 },
-]);
-```
-
-```js
-barSeries.setData([
-    { time: '2018-12-19', open: 141.77, high: 170.39, low: 120.25, close: 145.72 },
-    { time: '2018-12-20', open: 145.72, high: 147.99, low: 100.11, close: 108.19 },
-]);
-```
-
-### update
-
-Adds new data item to the existing set (or updates the latest item if times of the passed/latest items are equal).
-
-A single data item is expected.
-
-Examples:
-
-```js
-lineSeries.update({
-    time: '2018-12-12',
-    value: 24.11,
-});
-```
-
-```js
-barSeries.update({
-    time: '2018-12-19',
-    open: 141.77,
-    high: 170.39,
-    low: 120.25,
-    close: 145.72,
-});
-```
-
 ### barsInLogicalRange
 
 Returns bars information for the series in the provided [logical range](../time-scale.md#logical-range) or `null`, if no series data has been found in the requested range.
