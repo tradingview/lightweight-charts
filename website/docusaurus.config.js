@@ -135,6 +135,8 @@ const config = {
 				entryPoints: ['../dist/typings.d.ts'],
 				readme: 'none',
 				disableSources: true,
+				watch: true,
+				preserveWatchOutput: true,
 			}),
 		],
 	],
