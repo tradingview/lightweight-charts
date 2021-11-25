@@ -15,7 +15,7 @@ export function assert(condition: boolean, message?: string): asserts condition 
  * Throws if the value is undefined, returns the original value otherwise.
  *
  * @param value - The value, or undefined.
- * @returns the passed value, if it is not undefined
+ * @returns The passed value, if it is not undefined
  */
 export function ensureDefined(value: undefined): never;
 export function ensureDefined<T>(value: T | undefined): T;
@@ -32,7 +32,7 @@ export function ensureDefined<T>(value: T | undefined): T {
  * Throws if the value is null, returns the original value otherwise.
  *
  * @param value - The value, or null.
- * @returns the passed value, if it is not null
+ * @returns The passed value, if it is not null
  */
 export function ensureNotNull(value: null): never;
 export function ensureNotNull<T>(value: T | null): T;
@@ -49,7 +49,7 @@ export function ensureNotNull<T>(value: T | null): T {
  * Throws if the value is undefined or null, returns the original value otherwise.
  *
  * @param value - The value, or undefined, or null.
- * @returns the passed value, if it is not undefined and not null
+ * @returns The passed value, if it is not undefined and not null
  */
 export function ensure(value: undefined | null): never;
 export function ensure<T>(value: T | undefined | null): T;

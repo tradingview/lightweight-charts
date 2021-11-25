@@ -34,8 +34,8 @@ export interface ITimeScaleApi {
 	/**
 	 * Scrolls the chart to the specified position.
 	 *
-	 * @param position - target data position
-	 * @param animated - setting this to true makes the chart scrolling smooth and adds animation
+	 * @param position - Target data position
+	 * @param animated - Setting this to true makes the chart scrolling smooth and adds animation
 	 */
 	scrollToPosition(position: number, animated: boolean): void;
 
@@ -47,14 +47,14 @@ export interface ITimeScaleApi {
 	/**
 	 * Returns current visible time range of the chart.
 	 *
-	 * @returns visible range or null if the chart has no data at all.
+	 * @returns Visible range or null if the chart has no data at all.
 	 */
 	getVisibleRange(): TimeRange | null;
 
 	/**
 	 * Sets visible range of data.
 	 *
-	 * @param range - target visible range of data.
+	 * @param range - Target visible range of data.
 	 * @example
 	 * ```js
 	 * chart.timeScale().setVisibleRange({
@@ -68,14 +68,14 @@ export interface ITimeScaleApi {
 	/**
 	 * Returns the current visible [logical range](#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data.
 	 *
-	 * @returns visible range or null if the chart has no data at all.
+	 * @returns Visible range or null if the chart has no data at all.
 	 */
 	getVisibleLogicalRange(): LogicalRange | null;
 
 	/**
 	 * Sets visible logical range of data.
 	 *
-	 * @param range - target visible logical range of data.
+	 * @param range - Target visible logical range of data.
 	 * @example
 	 * ```js
 	 * chart.timeScale().setVisibleLogicalRange({ from: 0, to: Date.now() / 1000 });
@@ -96,7 +96,7 @@ export interface ITimeScaleApi {
 	/**
 	 * Converts a logical index to local x coordinate.
 	 *
-	 * @param logical - logical index needs to be converted
+	 * @param logical - Logical index needs to be converted
 	 * @returns x coordinate of that time or `null` if the chart doesn't have data
 	 */
 	logicalToCoordinate(logical: Logical): Coordinate | null;
@@ -104,24 +104,24 @@ export interface ITimeScaleApi {
 	/**
 	 * Converts a coordinate to logical index.
 	 *
-	 * @param x - coordinate needs to be converted
-	 * @returns logical index that is located on that coordinate or `null` if the chart doesn't have data
+	 * @param x - Coordinate needs to be converted
+	 * @returns Logical index that is located on that coordinate or `null` if the chart doesn't have data
 	 */
 	coordinateToLogical(x: number): Logical | null;
 
 	/**
 	 * Converts a time to local x coordinate.
 	 *
-	 * @param time - time needs to be converted
-	 * @returns x coordinate of that time or `null` if no time found on time scale
+	 * @param time - Time needs to be converted
+	 * @returns X coordinate of that time or `null` if no time found on time scale
 	 */
 	timeToCoordinate(time: Time): Coordinate | null;
 
 	/**
 	 * Converts a coordinate to time.
 	 *
-	 * @param x - coordinate needs to be converted.
-	 * @returns time of a bar that is located on that coordinate or `null` if there are no bars found on that coordinate.
+	 * @param x - Coordinate needs to be converted.
+	 * @returns Time of a bar that is located on that coordinate or `null` if there are no bars found on that coordinate.
 	 */
 	coordinateToTime(x: number): Time | null;
 
@@ -140,7 +140,7 @@ export interface ITimeScaleApi {
 	 *
 	 * The argument passed to the handler function is an object with `from` and `to` properties of type {@link Time}, or `null` if there is no visible data.
 	 *
-	 * @param handler - handler (function) to be called when the visible indexes change.
+	 * @param handler - Handler (function) to be called when the visible indexes change.
 	 * @example
 	 * ```js
 	 * function myVisibleTimeRangeChangeHandler(newVisibleTimeRange) {
@@ -159,7 +159,7 @@ export interface ITimeScaleApi {
 	/**
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeVisibleTimeRangeChange}.
 	 *
-	 * @param handler - previously subscribed handler
+	 * @param handler - Previously subscribed handler
 	 * @example
 	 * ```js
 	 * chart.timeScale().unsubscribeVisibleTimeRangeChange(myVisibleTimeRangeChangeHandler);
@@ -172,7 +172,7 @@ export interface ITimeScaleApi {
 	 *
 	 * The argument passed to the handler function is an object with `from` and `to` properties of type `number`, or `null` if there is no visible data.
 	 *
-	 * @param handler - handler (function) to be called when the visible indexes change.
+	 * @param handler - Handler (function) to be called when the visible indexes change.
 	 * @example
 	 * ```js
 	 * function myVisibleLogicalRangeChangeHandler(newVisibleLogicalRange) {
@@ -191,7 +191,7 @@ export interface ITimeScaleApi {
 	/**
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeVisibleLogicalRangeChange}.
 	 *
-	 * @param handler - previously subscribed handler
+	 * @param handler - Previously subscribed handler
 	 * @example
 	 * ```js
 	 * chart.timeScale().unsubscribeVisibleLogicalRangeChange(myVisibleLogicalRangeChangeHandler);
@@ -202,28 +202,28 @@ export interface ITimeScaleApi {
 	/**
 	 * Adds a subscription to time scale size changes
 	 *
-	 * @param handler - handler (function) to be called when the time scale size changes
+	 * @param handler - Handler (function) to be called when the time scale size changes
 	 */
 	subscribeSizeChange(handler: SizeChangeEventHandler): void;
 
 	/**
 	 * Removes a subscription to time scale size changes
 	 *
-	 * @param handler - previously subscribed handler
+	 * @param handler - Previously subscribed handler
 	 */
 	unsubscribeSizeChange(handler: SizeChangeEventHandler): void;
 
 	/**
 	 * Applies new options to the time scale.
 	 *
-	 * @param options - any subset of options
+	 * @param options - Any subset of options
 	 */
 	applyOptions(options: DeepPartial<TimeScaleOptions>): void;
 
 	/**
 	 * Returns current options
 	 *
-	 * @returns currently applied options
+	 * @returns Currently applied options
 	 */
 	options(): Readonly<TimeScaleOptions>;
 }

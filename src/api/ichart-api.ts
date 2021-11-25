@@ -70,17 +70,17 @@ export interface IChartApi {
 	/**
 	 * Sets fixed size of the chart. By default chart takes up 100% of its container.
 	 *
-	 * @param width - target width of the chart.
-	 * @param height - target height of the chart.
-	 * @param forceRepaint - true to initiate resize immediately. One could need this to get screenshot immediately after resize.
+	 * @param width - Target width of the chart.
+	 * @param height - Target height of the chart.
+	 * @param forceRepaint - True to initiate resize immediately. One could need this to get screenshot immediately after resize.
 	 */
 	resize(width: number, height: number, forceRepaint?: boolean): void;
 
 	/**
 	 * Creates an area series with specified parameters.
 	 *
-	 * @param areaOptions - customization parameters of the series being created.
-	 * @returns an interface of the created series.
+	 * @param areaOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
 	 * const series = chart.addAreaSeries();
@@ -91,8 +91,8 @@ export interface IChartApi {
 	/**
 	 * Creates a baseline series with specified parameters.
 	 *
-	 * @param baselineOptions - customization parameters of the series being created.
-	 * @returns an interface of the created series.
+	 * @param baselineOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
 	 * const series = chart.addBaselineSeries();
@@ -103,8 +103,8 @@ export interface IChartApi {
 	/**
 	 * Creates a bar series with specified parameters.
 	 *
-	 * @param barOptions - customization parameters of the series being created.
-	 * @returns an interface of the created series.
+	 * @param barOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
 	 * const series = chart.addBarSeries();
@@ -115,8 +115,8 @@ export interface IChartApi {
 	/**
 	 * Creates a candlestick series with specified parameters.
 	 *
-	 * @param candlestickOptions - customization parameters of the series being created.
-	 * @returns an interface of the created series.
+	 * @param candlestickOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
 	 * const series = chart.addCandlestickSeries();
@@ -127,8 +127,8 @@ export interface IChartApi {
 	/**
 	 * Creates a histogram series with specified parameters.
 	 *
-	 * @param histogramOptions - customization parameters of the series being created.
-	 * @returns an interface of the created series.
+	 * @param histogramOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
 	 * const series = chart.addHistogramSeries();
@@ -139,8 +139,8 @@ export interface IChartApi {
 	/**
 	 * Creates a line series with specified parameters.
 	 *
-	 * @param lineOptions - customization parameters of the series being created.
-	 * @returns an interface of the created series.
+	 * @param lineOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
 	 * const series = chart.addLineSeries();
@@ -161,7 +161,7 @@ export interface IChartApi {
 	/**
 	 * Subscribe to the chart click event.
 	 *
-	 * @param handler - handler to be called on mouse click.
+	 * @param handler - Handler to be called on mouse click.
 	 * @example
 	 * ```js
 	 * function myClickHandler(param) {
@@ -180,7 +180,7 @@ export interface IChartApi {
 	/**
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeClick}.
 	 *
-	 * @param handler - previously subscribed handler
+	 * @param handler - Previously subscribed handler
 	 * @example
 	 * ```js
 	 * chart.unsubscribeClick(myClickHandler);
@@ -191,7 +191,7 @@ export interface IChartApi {
 	/**
 	 * Subscribe to the crosshair move event.
 	 *
-	 * @param handler - handler to be called on crosshair move.
+	 * @param handler - Handler to be called on crosshair move.
 	 * @example
 	 * ```js
 	 * function myCrosshairMoveHandler(param) {
@@ -210,7 +210,7 @@ export interface IChartApi {
 	/**
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeCrosshairMove}.
 	 *
-	 * @param handler - previously subscribed handler
+	 * @param handler - Previously subscribed handler
 	 * @example
 	 * ```js
 	 * chart.unsubscribeCrosshairMove(myCrosshairMoveHandler);
@@ -221,7 +221,7 @@ export interface IChartApi {
 	/**
 	 * Returns API to manipulate a price scale.
 	 *
-	 * @param priceScaleId - id of the price scale.
+	 * @param priceScaleId - ID of the price scale.
 	 * @returns Price scale API.
 	 */
 	priceScale(priceScaleId?: string): IPriceScaleApi;
@@ -229,14 +229,14 @@ export interface IChartApi {
 	/**
 	 * Returns API to manipulate the time scale
 	 *
-	 * @returns target API
+	 * @returns Target API
 	 */
 	timeScale(): ITimeScaleApi;
 
 	/**
 	 * Applies new options to the chart
 	 *
-	 * @param options - any subset of chart options
+	 * @param options - Any subset of chart options
 	 */
 	applyOptions(options: DeepPartial<ChartOptions>): void;
 

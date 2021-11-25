@@ -40,23 +40,23 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Returns current price formatter
 	 *
-	 * @returns interface to the price formatter object that can be used to format prices in the same way as the chart does
+	 * @returns Interface to the price formatter object that can be used to format prices in the same way as the chart does
 	 */
 	priceFormatter(): IPriceFormatter;
 
 	/**
 	 * Converts specified series price to pixel coordinate according to the series price scale
 	 *
-	 * @param price - input price to be converted
-	 * @returns pixel coordinate of the price level on the chart
+	 * @param price - Input price to be converted
+	 * @returns Pixel coordinate of the price level on the chart
 	 */
 	priceToCoordinate(price: number): Coordinate | null;
 
 	/**
 	 * Converts specified coordinate to price value according to the series price scale
 	 *
-	 * @param coordinate - input coordinate to be converted
-	 * @returns price value of the coordinate on the chart
+	 * @param coordinate - Input coordinate to be converted
+	 * @returns Price value of the coordinate on the chart
 	 */
 	coordinateToPrice(coordinate: number): BarPrice | null;
 
@@ -78,14 +78,14 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * You can set options initially when you create series or use the `applyOptions` method of the series to change the existing options.
 	 * Note that you can only pass options you want to change.
 	 *
-	 * @param options - any subset of options
+	 * @param options - Any subset of options.
 	 */
 	applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void;
 
 	/**
 	 * Returns currently applied options
 	 *
-	 * @returns full set of currently applied options, including defaults
+	 * @returns Full set of currently applied options, including defaults
 	 */
 	options(): Readonly<SeriesOptionsMap[TSeriesType]>;
 
@@ -99,7 +99,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Sets or replaces series data.
 	 *
-	 * @param data - ordered (earlier time point goes first) array of data items. Old data is fully replaced with the new one.
+	 * @param data - Ordered (earlier time point goes first) array of data items. Old data is fully replaced with the new one.
 	 */
 	setData(data: SeriesDataItemTypeMap[TSeriesType][]): void;
 
@@ -121,7 +121,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Creates a new price line
 	 *
-	 * @param options - any subset of options
+	 * @param options - Any subset of options.
 	 * @example
 	 * ```js
 	 * const priceLine = series.createPriceLine({
@@ -139,7 +139,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Removes the price line that was created before.
 	 *
-	 * @param line - to remove
+	 * @param line - A line to remove.
 	 * @example
 	 * ```js
 	 * const priceLine = series.createPriceLine({ price: 80.0 });
@@ -151,7 +151,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Return current series type.
 	 *
-	 * @returns this `SeriesType`
+	 * @returns Type of the series.
 	 * @example
 	 * ```js
 	 * const lineSeries = chart.addLineSeries();

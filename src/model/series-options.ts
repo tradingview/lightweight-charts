@@ -91,7 +91,7 @@ export const enum LastPriceAnimationMode {
 }
 
 // we cannot create re-export of const enum because of TypeScript bug https://github.com/microsoft/TypeScript/issues/45850
-/** @deprecated it doesn't really matter what we write here, because it doesn't work properly, but just to mark the thing we have to delete in the next major update */
+/** @deprecated It doesn't really matter what we write here, because it doesn't work properly, but just to mark the thing we have to delete in the next major update */
 export { LastPriceAnimationMode as LasPriceAnimationMode };
 
 /**
