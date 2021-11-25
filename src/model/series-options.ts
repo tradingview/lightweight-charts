@@ -12,51 +12,71 @@ import { PriceScaleMargins } from './price-scale';
 export interface CandlestickStyleOptions {
 	/**
 	 * Color of rising candles.
+	 *
+	 * @defaultValue `'#26a69a'`
 	 */
 	upColor: string;
 
 	/**
 	 * Color of falling candles.
+	 *
+	 * @defaultValue `1`
 	 */
 	downColor: string;
 
 	/**
 	 * Enable high and low prices candle wicks.
+	 *
+	 * @defaultValue `true`
 	 */
 	wickVisible: boolean;
 
 	/**
 	 * Enable candle borders.
+	 *
+	 * @defaultValue `true`
 	 */
 	borderVisible: boolean;
 
 	/**
 	 * Border color.
+	 *
+	 * @defaultValue `'#378658'`
 	 */
 	borderColor: string;
 
 	/**
 	 * Border color of rising candles.
+	 *
+	 * @defaultValue `'#26a69a'`
 	 */
 	borderUpColor: string;
 
 	/**
 	 * Border color of falling candles.
+	 *
+	 * @defaultValue `'#ef5350'`
 	 */
 	borderDownColor: string;
 
 	/**
 	 * Wick color.
+	 *
+	 * @defaultValue `'#737375'`
 	 */
 	wickColor: string;
 
 	/**
 	 * Wick color of rising candles.
+	 *
+	 * @defaultValue `'#26a69a'`
 	 */
 	wickUpColor: string;
 
 	/**
 	 * Wick color of falling candles.
+	 *
+	 * @defaultValue `'#ef5350'`
 	 */
 	wickDownColor: string;
 }
@@ -100,21 +120,29 @@ export { LastPriceAnimationMode as LasPriceAnimationMode };
 export interface BarStyleOptions {
 	/**
 	 * Color of rising bars.
+	 *
+	 * @defaultValue `'#26a69a'`
 	 */
 	upColor: string;
 
 	/**
 	 * Color of falling bars.
+	 *
+	 * @defaultValue `'#ef5350'`
 	 */
 	downColor: string;
 
 	/**
 	 * Show open lines on bars.
+	 *
+	 * @defaultValue `true`
 	 */
 	openVisible: boolean;
 
 	/**
 	 * Show bars as sticks.
+	 *
+	 * @defaultValue `true`
 	 */
 	thinBars: boolean;
 }
@@ -125,46 +153,61 @@ export interface BarStyleOptions {
 export interface LineStyleOptions {
 	/**
 	 * Line color.
+	 *
+	 * @defaultValue `'#2196f3'`
 	 */
 	color: string;
 
 	/**
 	 * Line style.
+	 *
+	 * @defaultValue {@link LineStyle.Solid}
 	 */
 	lineStyle: LineStyle;
 
 	/**
 	 * Line width in pixels.
+	 *
+	 * @defaultValue `3`
 	 */
 	lineWidth: LineWidth;
 
 	/**
 	 * Line type.
+	 *
+	 * @defaultValue {@link LineType.Simple}
 	 */
 	lineType: LineType;
 
 	/**
 	 * Show the crosshair marker.
+	 *
+	 * @defaultValue `true`
 	 */
 	crosshairMarkerVisible: boolean;
-
 	/**
 	 * Crosshair marker radius in pixels.
+	 *
+	 * @defaultValue `4`
 	 */
 	crosshairMarkerRadius: number;
-
 	/**
 	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
-
 	/**
 	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
 
 	/**
 	 * Last price animation mode.
+	 *
+	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
 }
@@ -175,56 +218,75 @@ export interface LineStyleOptions {
 export interface AreaStyleOptions {
 	/**
 	 * Color of the top part of the area.
+	 *
+	 * @defaultValue `'rgba( 46, 220, 135, 0.4)'`
 	 */
 	topColor: string;
 
 	/**
 	 * Color of the bottom part of the area.
+	 *
+	 * * @defaultValue `'rgba( 40, 221, 100, 0)'`
 	 */
 	bottomColor: string;
 
 	/**
 	 * Line color.
+	 *
+	 * * @defaultValue `'#33D778'`
 	 */
 	lineColor: string;
 
 	/**
 	 * Line style.
+	 *
+	 * @defaultValue {@link LineStyle.Solid}
 	 */
 	lineStyle: LineStyle;
 
 	/**
 	 * Line width in pixels.
+	 *
+	 * @defaultValue `3`
 	 */
 	lineWidth: LineWidth;
 
 	/**
 	 * Line type.
+	 *
+	 * @defaultValue {@link LineType.Simple}
 	 */
 	lineType: LineType;
 
 	/**
 	 * Show the crosshair marker.
+	 *
+	 * @defaultValue `true`
 	 */
 	crosshairMarkerVisible: boolean;
-
 	/**
 	 * Crosshair marker radius in pixels.
+	 *
+	 * @defaultValue `4`
 	 */
 	crosshairMarkerRadius: number;
-
 	/**
 	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
-
 	/**
 	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
 
 	/**
 	 * Last price animation mode.
+	 *
+	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
 }
@@ -255,63 +317,91 @@ export type BaseValueType = BaseValuePrice;
 export interface BaselineStyleOptions {
 	/**
 	 * Base value of the series.
+	 *
+	 * @defaultValue `{ type: 'price', price: 0 }`
 	 */
 	baseValue: BaseValueType;
 
 	/**
 	 * The first color of the top area.
+	 *
+	 * @defaultValue `'rgba(38, 166, 154, 0.28)'`
 	 */
 	topFillColor1: string;
 	/**
 	 * The second color of the top area.
+	 *
+	 * @defaultValue `'rgba(38, 166, 154, 0.05)'`
 	 */
 	topFillColor2: string;
 	/**
 	 * The line color of the top area.
+	 *
+	 * @defaultValue `'rgba(38, 166, 154, 1)'`
 	 */
 	topLineColor: string;
 
 	/**
 	 * The first color of the bottom area.
+	 *
+	 * @defaultValue `'rgba(239, 83, 80, 0.05)'`
 	 */
 	bottomFillColor1: string;
 	/**
 	 * The second color of the bottom area.
+	 *
+	 * @defaultValue `'rgba(239, 83, 80, 0.28)'`
 	 */
 	bottomFillColor2: string;
 	/**
 	 * The line color of the bottom area.
+	 *
+	 * @defaultValue `'rgba(239, 83, 80, 1)'`
 	 */
 	bottomLineColor: string;
 
 	/**
 	 * Line width.
+	 *
+	 * @defaultValue `3`
 	 */
 	lineWidth: LineWidth;
 	/**
 	 * Line style.
+	 *
+	 * @defaultValue {@link LineStyle.Solid}
 	 */
 	lineStyle: LineStyle;
 
 	/**
 	 * Show the crosshair marker.
+	 *
+	 * @defaultValue `true`
 	 */
 	crosshairMarkerVisible: boolean;
 	/**
 	 * Crosshair marker radius in pixels.
+	 *
+	 * @defaultValue `4`
 	 */
 	crosshairMarkerRadius: number;
 	/**
 	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
 	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 *
+	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
 
 	/**
 	 * Last price animation mode.
+	 *
+	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
 }
@@ -322,11 +412,15 @@ export interface BaselineStyleOptions {
 export interface HistogramStyleOptions {
 	/**
 	 * Column color.
+	 *
+	 * @defaultValue `'#26a69a'`
 	 */
 	color: string;
 
 	/**
 	 * Initial level of histogram columns.
+	 *
+	 * @defaultValue `0`
 	 */
 	base: number;
 }
@@ -354,11 +448,15 @@ export interface PriceFormatBuiltIn {
 	/**
 	 * Number of digits after the decimal point.
 	 * If it is not set, then its value is calculated automatically based on minMove.
+	 *
+	 * @defaultValue `2` if both {@link minMove} and {@link precision} are not provided, calculated automatically based on {@link minMove} otherwise.
 	 */
 	precision: number;
 
 	/**
 	 * The minimum possible step size for price value movement. This value shouldn't have more decimal digits than the precision.
+	 *
+	 * @defaultValue `0.01`
 	 */
 	minMove: number;
 }
@@ -379,6 +477,8 @@ export interface PriceFormatCustom {
 
 	/**
 	 * The minimum possible step size for price value movement.
+	 *
+	 * @defaultValue `0.01`
 	 */
 	minMove: number;
 }
@@ -466,16 +566,22 @@ type AutoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null) =>
 export interface SeriesOptionsCommon {
 	/**
 	 * Visibility of the label with the latest visible price on the price scale.
+	 *
+	 * @defaultValue `true`
 	 */
 	lastValueVisible: boolean;
 
 	/**
 	 * You can name series when adding it to a chart. This name will be displayed on the label next to the last value label.
+	 *
+	 * @defaultValue `''`
 	 */
 	title: string;
 
 	/**
 	 * Target price scale to bind new series to.
+	 *
+	 * @defaultValue `'right'` if right scale is visible and `'left'` otherwise
 	 */
 	priceScaleId?: string;
 
@@ -488,56 +594,79 @@ export interface SeriesOptionsCommon {
 	 * Visibility of the series.
 	 * If the series is hidden, everything including price lines, baseline, price labels and markers, will also be hidden.
 	 * Please note that hiding a series is not equivalent to deleting it, since hiding does not affect the timeline at all, unlike deleting where the timeline can be changed (some points can be deleted).
+	 *
+	 * @defaultValue `true`
 	 */
 	visible: boolean;
 
 	/**
 	 * Show the price line. Price line is a horizontal line indicating the last price of the series.
+	 *
+	 * @defaultValue `true`
 	 */
 	priceLineVisible: boolean;
 
 	/**
 	 * The source to use for the value of the price line.
+	 *
+	 * @defaultValue {@link PriceLineSource.LastBar}
 	 */
 	priceLineSource: PriceLineSource;
 
 	/**
 	 * Width of the price line.
+	 *
+	 * @defaultValue `1`
 	 */
 	priceLineWidth: LineWidth;
 
 	/**
 	 * Color of the price line.
 	 * By default, its color is set by the last bar color (or by line color on Line and Area charts).
+	 *
+	 * @defaultValue `''`
 	 */
 	priceLineColor: string;
 
 	/**
 	 * Price line style.
+	 *
+	 * @defaultValue {@link LineStyle.Dashed}
 	 */
 	priceLineStyle: LineStyle;
 
 	/**
 	 * Price format.
+	 *
+	 * @defaultValue `{ type: 'price', precision: 2, minMove: 0.01 }`
+	 */
 	priceFormat: PriceFormat;
 
 	/**
 	 * Visibility of base line. Suitable for percentage and `IndexedTo100` scales.
+	 *
+	 * @defaultValue `true`
 	 */
 	baseLineVisible: boolean;
 
 	/**
 	 * Color of the base line in `IndexedTo100` mode.
+	 *
+	 * @defaultValue `'#B2B5BE'`
 	 */
 	baseLineColor: string;
 
 	/**
 	 * Base line width. Suitable for percentage and `IndexedTo10` scales.
+	 *
+	 * @defaultValue `1`
 	 */
 	baseLineWidth: LineWidth;
 
 	/**
 	 * Base line style. Suitable for percentage and indexedTo100 scales.
+	 *
+	 * @defaultValue {@link LineStyle.Solid}
 	 */
 	baseLineStyle: LineStyle;
 
@@ -545,6 +674,47 @@ export interface SeriesOptionsCommon {
 	 * Override the default {@link AutoscaleInfo} provider.
 	 * By default, the chart scales data automatically based on visible data range.
 	 * However, for some reasons one could require overriding this behavior.
+	 *
+	 * @defaultValue `undefined`
+	 * @example Use price range from 0 to 100 regardless the current visible range
+	 * ```js
+	 * const firstSeries = chart.addLineSeries({
+	 *     autoscaleInfoProvider: () => ({
+	 *         priceRange: {
+	 *             minValue: 0,
+	 *             maxValue: 100,
+	 *         },
+	 *     }),
+	 * });
+	 * ```
+	 * @example Adding a small pixel margins to the price range
+	 * ```js
+	 * const firstSeries = chart.addLineSeries({
+	 *     autoscaleInfoProvider: () => ({
+	 *         priceRange: {
+	 *             minValue: 0,
+	 *             maxValue: 100,
+	 *         },
+	 *         margins: {
+	 *             above: 10,
+	 *             below: 10,
+	 *         },
+	 *     }),
+	 * });
+	 * ```
+	 * @example Using the default implementation to adjust the result
+	 * ```js
+	 * const firstSeries = chart.addLineSeries({
+	 *     autoscaleInfoProvider: original => {
+	 *         const res = original();
+	 *         if (res !== null) {
+	 *             res.priceRange.minValue -= 10;
+	 *             res.priceRange.maxValue += 10;
+	 *         }
+	 *         return res;
+	 *     },
+	 * });
+	 * ```
 	 */
 	autoscaleInfoProvider?: AutoscaleInfoProvider;
 
