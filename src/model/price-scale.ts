@@ -91,20 +91,30 @@ export type PriceAxisPosition = 'left' | 'right' | 'none';
 export interface PriceScaleOptions {
 	/**
 	 * Automatically set price range based on visible data range.
+	 *
+	 * @defaultValue `true`
 	 */
 	autoScale: boolean;
 
-	/** Price scale mode. */
+	/**
+	 * Price scale mode.
+	 *
+	 * @defaultValue {@link PriceScaleMode.Normal}
+	 */
 	mode: PriceScaleMode;
 
 	/**
 	 * Invert the price scale, so that a upwards trend is shown as a downwards trend and vice versa.
 	 * Affects both the price scale and the data on the chart.
+	 *
+	 * @defaultValue `false`
 	 */
 	invertScale: boolean;
 
 	/**
 	 * Align price scale labels to prevent them from overlapping.
+	 *
+	 * @defaultValue `true`
 	 */
 	alignLabels: boolean;
 
@@ -119,6 +129,7 @@ export interface PriceScaleOptions {
 	/**
 	 * Price scale margins.
 	 *
+	 * @defaultValue `{ bottom: 0.1, top: 0.2 }`
 	 * @example
 	 * ```js
 	 * chart.priceScale('right').applyOptions({
@@ -133,23 +144,37 @@ export interface PriceScaleOptions {
 
 	/**
 	 * Set true to draw a border between the price scale and the chart area.
+	 *
+	 * @defaultValue `true`
 	 */
 	borderVisible: boolean;
 
 	/**
 	 * Price scale border color.
+	 *
+	 * @defaultValue `'#2B2B43'`
 	 */
 	borderColor: string;
 
 	/**
 	 * Show top and bottom corner labels only if entire text is visible.
+	 *
+	 * @defaultValue `false`
 	 */
 	entireTextOnly: boolean;
 
-	/** Indicates if this price scale visible. Ignored by overlay price scales. */
+	/**
+	 * Indicates if this price scale visible. Ignored by overlay price scales.
+	 *
+	 * @defaultValue `true` for the right price scale and `false` for the left
+	 */
 	visible: boolean;
 
-	/** Draw small horizontal line on price axis labels. */
+	/**
+	 * Draw small horizontal line on price axis labels.
+	 *
+	 * @defaultValue `true`
+	 */
 	drawTicks: boolean;
 }
 
