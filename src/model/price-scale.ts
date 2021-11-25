@@ -72,9 +72,13 @@ export interface PricedValue {
 
 /** Defines margins of the price scale. */
 export interface PriceScaleMargins {
-	/** Top margin in percentages. Must be greater or equal to 0 and less than 100. */
+	/**
+	 * Top margin in percentages. Must be greater or equal to 0 and less than 1.
+	 */
 	top: number;
-	/** Bottom margin in percentages. Must be greater or equal to 0 and less than 100. */
+	/**
+	 * Bottom margin in percentages. Must be greater or equal to 0 and less than 1.
+	 */
 	bottom: number;
 }
 
@@ -89,17 +93,21 @@ export interface PriceScaleOptions {
 	 * Automatically set price range based on visible data range.
 	 */
 	autoScale: boolean;
+
 	/** Price scale mode. */
 	mode: PriceScaleMode;
+
 	/**
 	 * Invert the price scale, so that a upwards trend is shown as a downwards trend and vice versa.
 	 * Affects both the price scale and the data on the chart.
 	 */
 	invertScale: boolean;
+
 	/**
 	 * Align price scale labels to prevent them from overlapping.
 	 */
 	alignLabels: boolean;
+
 	/**
 	 * Price scale's position on the chart.
 	 *
@@ -107,24 +115,30 @@ export interface PriceScaleOptions {
 	 * @internal
 	 */
 	position?: PriceAxisPosition;
+
 	/**
 	 * Price scale margins.
 	 */
 	scaleMargins: PriceScaleMargins;
+
 	/**
 	 * Set true to draw a border between the price scale and the chart area.
 	 */
 	borderVisible: boolean;
+
 	/**
 	 * Price scale border color.
 	 */
 	borderColor: string;
+
 	/**
 	 * Show top and bottom corner labels only if entire text is visible.
 	 */
 	entireTextOnly: boolean;
+
 	/** Indicates if this price scale visible. Ignored by overlay price scales. */
 	visible: boolean;
+
 	/** Draw small horizontal line on price axis labels. */
 	drawTicks: boolean;
 }

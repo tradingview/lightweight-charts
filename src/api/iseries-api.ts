@@ -75,6 +75,8 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 
 	/**
 	 * Applies new options to the existing series
+	 * You can set options initially when you create series or use the `applyOptions` method of the series to change the existing options.
+	 * Note that you can only pass options you want to change.
 	 *
 	 * @param options - any subset of options
 	 */
@@ -95,24 +97,24 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	priceScale(): IPriceScaleApi;
 
 	/**
-	 * Sets or replaces series data
+	 * Sets or replaces series data.
 	 *
 	 * @param data - ordered (earlier time point goes first) array of data items. Old data is fully replaced with the new one.
 	 */
 	setData(data: SeriesDataItemTypeMap[TSeriesType][]): void;
 
 	/**
-	 * Adds or replaces a new bar
+	 * Adds new data item to the existing set (or updates the latest item if times of the passed/latest items are equal).
 	 *
-	 * @param bar - a single data item to be added. Time of the new item must be greater or equal to the latest existing time point.
+	 * @param bar - A single data item to be added. Time of the new item must be greater or equal to the latest existing time point.
 	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
 	 */
 	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
 
 	/**
-	 * Sets markers for the series
+	 * Allows to set/replace all existing series markers with new ones.
 	 *
-	 * @param data - array of series markers. This array should be sorted by time. Several markers with same time are allowed.
+	 * @param data - An array of series markers. This array should be sorted by time. Several markers with same time are allowed.
 	 */
 	setMarkers(data: SeriesMarker<Time>[]): void;
 
@@ -120,20 +122,44 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * Creates a new price line
 	 *
 	 * @param options - any subset of options
+	 * @example
+	 * ```js
+	 * const priceLine = series.createPriceLine({
+	 *     price: 80.0,
+	 *     color: 'green',
+	 *     lineWidth: 2,
+	 *     lineStyle: LightweightCharts.LineStyle.Dotted,
+	 *     axisLabelVisible: true,
+	 *     title: 'P/L 500',
+	 * });
+	 * ```
 	 */
 	createPriceLine(options: PriceLineOptions): IPriceLine;
 
 	/**
-	 * Removes an existing price line
+	 * Removes the price line that was created before.
 	 *
 	 * @param line - to remove
+	 * @example
+	 * ```js
+	 * const priceLine = series.createPriceLine({ price: 80.0 });
+	 * series.removePriceLine(priceLine);
+	 * ```
 	 */
 	removePriceLine(line: IPriceLine): void;
 
 	/**
-	 * Return the type of this series
+	 * Return current series type.
 	 *
 	 * @returns this `SeriesType`
+	 * @example
+	 * ```js
+	 * const lineSeries = chart.addLineSeries();
+	 * console.log(lineSeries.seriesType()); // "Line"
+	 *
+	 * const candlestickSeries = chart.addCandlestickSeries();
+	 * console.log(candlestickSeries.seriesType()); // "Candlestick"
+	 * ```
 	 */
 	seriesType(): TSeriesType;
 }

@@ -19,8 +19,6 @@ export interface IDataSource {
 
 	/**
 	 * Pane views that are painted on the most top layer
-	 *
-	 * @param pane
 	 */
 	topPaneViews?(pane: Pane): readonly IPaneView[];
 

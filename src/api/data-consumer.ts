@@ -21,7 +21,7 @@ export type Time = UTCTimestamp | BusinessDay | string;
 /**
  * Check if a time value is a business day object.
  *
- * @param time The time to check.
+ * @param time - The time to check.
  * @returns `true` if `time` is a {@link BusinessDay} object, false otherwise.
  */
 export function isBusinessDay(time: Time): time is BusinessDay {
@@ -31,7 +31,7 @@ export function isBusinessDay(time: Time): time is BusinessDay {
 /**
  * Check if a time value is a UTC timestamp number.
  *
- * @param time The time to check.
+ * @param time - The time to check.
  * @returns `true` if `time` is a {@link UTCTimestamp} number, false otherwise.
  */
 export function isUTCTimestamp(time: Time): time is UTCTimestamp {

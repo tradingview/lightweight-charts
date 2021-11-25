@@ -28,8 +28,6 @@ export type SizeChangeEventHandler = (width: number, height: number) => void;
 export interface ITimeScaleApi {
 	/**
 	 * Return the distance from the right edge of the time scale to the lastest bar of the series measured in bars.
-	 *
-	 * @returns {number} a distance from the right edge to the latest bar, measured in bars.
 	 */
 	scrollPosition(): number;
 

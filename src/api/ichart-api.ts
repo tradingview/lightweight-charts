@@ -81,6 +81,10 @@ export interface IChartApi {
 	 *
 	 * @param areaOptions - customization parameters of the series being created.
 	 * @returns an interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addAreaSeries();
+	 * ```
 	 */
 	addAreaSeries(areaOptions?: AreaSeriesPartialOptions): ISeriesApi<'Area'>;
 
@@ -89,6 +93,10 @@ export interface IChartApi {
 	 *
 	 * @param baselineOptions - customization parameters of the series being created.
 	 * @returns an interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addBaselineSeries();
+	 * ```
 	 */
 	addBaselineSeries(baselineOptions?: BaselineSeriesPartialOptions): ISeriesApi<'Baseline'>;
 
@@ -97,6 +105,10 @@ export interface IChartApi {
 	 *
 	 * @param barOptions - customization parameters of the series being created.
 	 * @returns an interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addBarSeries();
+	 * ```
 	 */
 	addBarSeries(barOptions?: BarSeriesPartialOptions): ISeriesApi<'Bar'>;
 
@@ -105,6 +117,10 @@ export interface IChartApi {
 	 *
 	 * @param candlestickOptions - customization parameters of the series being created.
 	 * @returns an interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addCandlestickSeries();
+	 * ```
 	 */
 	addCandlestickSeries(candlestickOptions?: CandlestickSeriesPartialOptions): ISeriesApi<'Candlestick'>;
 
@@ -113,6 +129,10 @@ export interface IChartApi {
 	 *
 	 * @param histogramOptions - customization parameters of the series being created.
 	 * @returns an interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addHistogramSeries();
+	 * ```
 	 */
 	addHistogramSeries(histogramOptions?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram'>;
 
@@ -121,11 +141,20 @@ export interface IChartApi {
 	 *
 	 * @param lineOptions - customization parameters of the series being created.
 	 * @returns an interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addLineSeries();
+	 * ```
 	 */
 	addLineSeries(lineOptions?: LineSeriesPartialOptions): ISeriesApi<'Line'>;
 
 	/**
-	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it
+	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
+	 *
+	 * @example
+	 * ```js
+	 * chart.removeSeries(series);
+	 * ```
 	 */
 	removeSeries(seriesApi: ISeriesApi<SeriesType>): void;
 
@@ -214,14 +243,14 @@ export interface IChartApi {
 	/**
 	 * Returns currently applied options
 	 *
-	 * @returns full set of currently applied options, including defaults
+	 * @returns Full set of currently applied options, including defaults
 	 */
 	options(): Readonly<ChartOptions>;
 
 	/**
 	 * Make a screenshot of the chart with all the elements excluding crosshair.
 	 *
-	 * @returns a canvas with the chart drawn on
+	 * @returns A canvas with the chart drawn on. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
 	 */
 	takeScreenshot(): HTMLCanvasElement;
 }
