@@ -7,7 +7,7 @@ export interface IPriceLine {
 	/**
 	 * Apply options to the price line.
 	 *
-	 * @param options - The options to apply.
+	 * @param options - Any subset of options.
 	 * @example
 	 * ```js
 	 * priceLine.applyOptions({

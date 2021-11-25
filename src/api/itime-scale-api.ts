@@ -216,7 +216,7 @@ export interface ITimeScaleApi {
 	/**
 	 * Applies new options to the time scale.
 	 *
-	 * @param options - Any subset of options
+	 * @param options - Any subset of options.
 	 */
 	applyOptions(options: DeepPartial<TimeScaleOptions>): void;
 

@@ -236,7 +236,7 @@ export interface IChartApi {
 	/**
 	 * Applies new options to the chart
 	 *
-	 * @param options - Any subset of chart options
+	 * @param options - Any subset of options.
 	 */
 	applyOptions(options: DeepPartial<ChartOptions>): void;
 
