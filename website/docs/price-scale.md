@@ -4,41 +4,37 @@ sidebar_position: 3
 
 # Price Scale
 
-Price Scale is an object that maps prices to coordinates and vice versa.
-The rules of converting depend on price scale mod, visible height of chart and visible part of data.
+Price Scale (or price axis) is a vertical scale that mostly maps prices to coordinates and vice versa.
+The rules of converting depend on a price scale mode, a height of the chart and visible part of the data.
 
-Chart always has two predefined price scales: left and right, and an unlimited number of overlay scales.
-Left and right price scales could be visible, overlay price scales are always hidden, so the user cannot interact with them directly.
+![Price scales](/img/price-scales.png "Price scales")
 
-## Autoscale
+By default, chart has 2 predefined price scales: `left` and `right`, and an unlimited number of overlay scales.
 
-Autoscaling is a feature of automatic adjusting price scale to fit the visible range of data.
-Autoscaling is enabled by default, however you could turn it off by zooming price scale or calling `PriceScaleApi.setOptions` method with `autoScale` field set to false.
-Overlay price scales are always autoscaled.
+Only `left` and `right` price scales could be displayed on the chart, all overlay scales are hidden.
 
-## PriceScale ID
+If you want to change `left` price scale, you need to use [`leftPriceScale`](/api/interfaces/ChartOptions#leftpricescale) option, to change `right` price scale use [`rightPriceScale`](/api/interfaces/ChartOptions#rightrricescale), to change default options for an overlay price scale use [`overlayPriceScales`](/api/interfaces/ChartOptions#overlaypricescales) option.
 
-Each price scale has a corresponding ID to refer to it via API. Left and right price scales have predefined IDs `left` and `right`.
-While creating a series, you could specify PriceScaleID.
-If this id refers to an already existing price scale, the new series will share the price scale with the already existing series.
-If the specified price scale does not exist, it will be implicitly created.
-So to create two series on the same overlay price scale just specify the same `priceScaleId` for them.
-You could get the `id` of the scale with `PriceScaleApi.id` method.
+Alternatively, you can use [`IChartApi.priceScale`](/api/interfaces/IChartApi#pricescale) method to get an API object of any price scale or [`ISeriesApi.priceScale`](/api/interfaces/ISeriesApi#pricescale) to get an API object of series' price scale (a price scale where the series is attached to).
 
-## Percentage scales
+## Creating a price scale
 
-Percentage mode of price scale allows relative comparison of series.
-All the serieses attached to the percentage scale are placed to have the first visible data item on the same point.
-Percentage scales are always autoscaled.
+By default a chart has only 2 price scales: `left` and `right`.
 
-## Logarithmic scales
+If you want to create an overlay price scale, you can simply assign [`priceScaleId`](/api/interfaces/SeriesOptionsCommon#pricescaleid) option to a series (note that a value should be differ from `left` and `right`) and a chart will automatically create an overlay price scale with provided ID.
+If a price scale with such ID already exists then a series will be attached to this existing price scale.
+Further you can use provided price scale ID to get its corresponding API object via [`IChartApi.priceScale`](/api/interfaces/IChartApi#pricescale) method.
 
-The reason for having logarithmic scales is comparing relative change instead of absolute change.
-On a regular scale every candle with 100-points change has the same height.
-On a logarithmic scale every candle with 2% change has the same height.
-Logarithmic scale cannot be displayed as a percentage.
+## Removing a price scale
 
-## Equality of price scales
+The default price scales (`left` and `right`) cannot be removed, you can only hide them by setting [`visible`](/api/interfaces/PriceScaleOptions#visible) option to `false`.
 
-Lightweight charts library does not guarantee to return the same instance of `PriceScaleApi` object while returning the same actual price scale.
-So you should never compare objects of `PriceScaleApi`, compare `PriceScaleApi.id()` values instead.
+An overlay price scale exists while there is at least 1 series attached to this price scale.
+Thus, to remove an overlay price scale remove all series attached to this price scale.
+
+<!-- Note that this method is not implemented yet :(
+## Equality of price scale API objects
+
+`lightweight-charts` library does not guarantee to return the same reference of [`IPriceScaleApi`](/api/interfaces/IPriceScaleApi) object for the same price scale ID.
+So you should never compare these objects by a reference, use the result from [`IPriceScaleApi.id`](/api/interfaces/IPriceScaleApi#id) method instead.
+-->

@@ -90,7 +90,8 @@ export type PriceAxisPosition = 'left' | 'right' | 'none';
 /** Structure that describes price scale options */
 export interface PriceScaleOptions {
 	/**
-	 * Automatically set price range based on visible data range.
+	 * Autoscaling is a feature of automatic adjusting a price scale to fit the visible range of data.
+	 * Note that overlay price scales are always auto-scaled.
 	 *
 	 * @defaultValue `true`
 	 */
