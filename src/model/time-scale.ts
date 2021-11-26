@@ -189,7 +189,7 @@ export interface TimeScaleOptions {
 	shiftVisibleRangeOnNewBar: boolean;
 
 	/**
-	 * Override the default tick marks formatter.
+	 * Tick marks formatter can be used to customize tick marks labels on the time axis.
 	 *
 	 * @defaultValue `undefined`
 	 */

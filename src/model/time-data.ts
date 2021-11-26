@@ -95,7 +95,7 @@ export type TimePointsRange = Range<TimePoint>;
 export type TimePointIndex = Nominal<number, 'TimePointIndex'>;
 
 /**
- * Represents the to or from `number` in a logical range.
+ * Represents the `to` or `from` number in a logical range.
  */
 export type Logical = Nominal<number, 'Logical'>;
 
