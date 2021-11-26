@@ -133,6 +133,7 @@ const config = {
 			/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
 			({
 				entryPoints: ['../dist/typings.d.ts'],
+				publicPath: '/api/',
 				readme: 'none',
 				disableSources: true,
 				watch: true,
