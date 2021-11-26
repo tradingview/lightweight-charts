@@ -16,7 +16,6 @@ const config = {
 	onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
 	favicon: '/favicon.ico',
-	noIndex: true,
 	url: githubPagesUrl,
 	baseUrl: `/${projectName}/`,
 	organizationName,
