@@ -119,9 +119,9 @@ const config = {
 				darkTheme: darkCodeTheme,
 			},
 			algolia: {
-				appId: 'BH4D9OD16A',
+				appId: '7Q5A441YPA',
 				// Public API key: it is safe to commit it
-				apiKey: 'bd84607b54c71800365e661f500cad8e',
+				apiKey: 'b6417716804e66012544fd5904e208c8',
 				indexName: 'lightweight-charts',
 				contextualSearch: true,
 			},
