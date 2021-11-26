@@ -235,12 +235,13 @@ export interface ChartOptions {
 	timeScale: TimeScaleOptions;
 
 	/**
-	 * Crosshair options
+	 * The crosshair shows the intersection of the price and time scale values at any point on the chart.
+	 *
 	 */
 	crosshair: CrosshairOptions;
 
 	/**
-	 * Grid options.
+	 * A grid is represented in the chart background as a vertical and horizontal lines drawn at the levels of visible marks of price and the time scales.
 	 */
 	grid: GridOptions;
 
