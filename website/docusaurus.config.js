@@ -20,6 +20,7 @@ const config = {
 	baseUrl: `/${projectName}/`,
 	organizationName,
 	projectName: 'lightweight-charts',
+	trailingSlash: false,
 
 	presets: [
 		[
