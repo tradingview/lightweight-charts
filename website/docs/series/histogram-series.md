@@ -32,34 +32,8 @@ histogramSeries.setData([
 
 ## Data format
 
-Each item of the histogram series should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
-
-- `time` ([Time](/api/#time)) - item time
-- `value` (`number`) - item value
-- `color` (`string`, optional) - optional color of an item
-
-Note: if `color` is not set then an item will be colored according to series options.
+Each item of the histogram series should be a [HistogramData](/api/interfaces/HistogramData.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
 
 ## Customization
 
 A histogram series interface can be customized using the following options: [HistogramStyleOptions](/api/interfaces/HistogramStyleOptions).
-
-### Examples
-
-- set initial options for histogram series:
-
-    ```js
-    const histogramSeries = chart.addHistogramSeries({
-        color: '#FFF5EE',
-        base: 5,
-    });
-    ```
-
-- change options after series is created:
-
-    ```js
-    // for example, let's override default initial level:
-    histogramSeries.applyOptions({
-        base: -10,
-    });
-    ```

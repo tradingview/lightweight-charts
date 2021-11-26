@@ -72,9 +72,13 @@ export interface PricedValue {
 
 /** Defines margins of the price scale. */
 export interface PriceScaleMargins {
-	/** Top margin in percentages. Must be greater or equal to 0 and less than 100. */
+	/**
+	 * Top margin in percentages. Must be greater or equal to 0 and less than 1.
+	 */
 	top: number;
-	/** Bottom margin in percentages. Must be greater or equal to 0 and less than 100. */
+	/**
+	 * Bottom margin in percentages. Must be greater or equal to 0 and less than 1.
+	 */
 	bottom: number;
 }
 
@@ -87,45 +91,90 @@ export type PriceAxisPosition = 'left' | 'right' | 'none';
 export interface PriceScaleOptions {
 	/**
 	 * Automatically set price range based on visible data range.
+	 *
+	 * @defaultValue `true`
 	 */
 	autoScale: boolean;
-	/** Price scale mode. */
+
+	/**
+	 * Price scale mode.
+	 *
+	 * @defaultValue {@link PriceScaleMode.Normal}
+	 */
 	mode: PriceScaleMode;
+
 	/**
 	 * Invert the price scale, so that a upwards trend is shown as a downwards trend and vice versa.
 	 * Affects both the price scale and the data on the chart.
+	 *
+	 * @defaultValue `false`
 	 */
 	invertScale: boolean;
+
 	/**
 	 * Align price scale labels to prevent them from overlapping.
+	 *
+	 * @defaultValue `true`
 	 */
 	alignLabels: boolean;
+
 	/**
 	 * Price scale's position on the chart.
 	 *
-	 * @deprecated
+	 * @deprecated Use options for different price scales instead
 	 * @internal
 	 */
 	position?: PriceAxisPosition;
+
 	/**
 	 * Price scale margins.
+	 *
+	 * @defaultValue `{ bottom: 0.1, top: 0.2 }`
+	 * @example
+	 * ```js
+	 * chart.priceScale('right').applyOptions({
+	 *     scaleMargins: {
+	 *         top: 0.8,
+	 *         bottom: 0,
+	 *     },
+	 * });
+	 * ```
 	 */
 	scaleMargins: PriceScaleMargins;
+
 	/**
 	 * Set true to draw a border between the price scale and the chart area.
+	 *
+	 * @defaultValue `true`
 	 */
 	borderVisible: boolean;
+
 	/**
 	 * Price scale border color.
+	 *
+	 * @defaultValue `'#2B2B43'`
 	 */
 	borderColor: string;
+
 	/**
 	 * Show top and bottom corner labels only if entire text is visible.
+	 *
+	 * @defaultValue `false`
 	 */
 	entireTextOnly: boolean;
-	/** Indicates if this price scale visible. Ignored by overlay price scales. */
+
+	/**
+	 * Indicates if this price scale visible. Ignored by overlay price scales.
+	 *
+	 * @defaultValue `true` for the right price scale and `false` for the left
+	 */
 	visible: boolean;
-	/** Draw small horizontal line on price axis labels. */
+
+	/**
+	 * Draw small horizontal line on price axis labels.
+	 *
+	 * @defaultValue `true`
+	 */
 	drawTicks: boolean;
 }
 

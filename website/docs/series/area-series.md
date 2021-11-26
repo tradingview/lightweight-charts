@@ -28,10 +28,7 @@ areaSeries.setData([
 
 ## Data format
 
-Each area series item should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
-
-- `time` ([Time](/api/#time)) - item time
-- `value` (`number`) - item value
+Each area series item should be a [LineData](/api/interfaces/LineData.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
 
 ## Customization
 
@@ -43,32 +40,3 @@ These colors blend into one another in the middle of the area.
 Also, the crosshair marker, which is enabled by default, can either be disabled or have its radius adjusted.
 
 An area series interface can be customized using the following set of options: [AreaStyleOptions](/api/interfaces/AreaStyleOptions).
-
-### Examples
-
-- set initial options for area series:
-
-    ```js
-    const areaSeries = chart.addAreaSeries({
-        topColor: 'rgba(21, 146, 230, 0.4)',
-        bottomColor: 'rgba(21, 146, 230, 0)',
-        lineColor: 'rgba(21, 146, 230, 1)',
-        lineStyle: 0,
-        lineWidth: 3,
-        crosshairMarkerVisible: false,
-        crosshairMarkerRadius: 3,
-        crosshairMarkerBorderColor: 'rgb(255, 255, 255, 1)',
-        crosshairMarkerBackgroundColor: 'rgb(34, 150, 243, 1)',
-        lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.Continuous,
-    });
-    ```
-
-- change options after series is created:
-
-    ```js
-    // for example, let's override line width and color only
-    areaSeries.applyOptions({
-        lineColor: 'rgba(255, 44, 128, 1)',
-        lineWidth: 1,
-    });
-    ```

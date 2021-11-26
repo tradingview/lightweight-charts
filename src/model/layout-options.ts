@@ -16,7 +16,10 @@ export interface SolidColor {
 	 * Type of color.
 	 */
 	type: ColorType.Solid;
-	/** Color */
+
+	/**
+	 * Color.
+	 */
 	color: string;
 }
 
@@ -28,9 +31,15 @@ export interface VerticalGradientColor {
 	 * Type of color.
 	 */
 	type: ColorType.VerticalGradient;
-	/** Top color */
+
+	/**
+	 * Top color
+	 */
 	topColor: string;
-	/** Bottom color */
+
+	/**
+	 * Bottom color
+	 */
 	bottomColor: string;
 }
 
@@ -43,22 +52,34 @@ export type Background = SolidColor | VerticalGradientColor;
 export interface LayoutOptions {
 	/**
 	 * Chart and scales background color.
+	 *
+	 * @defaultValue `{ type: ColorType.Solid, color: '#FFFFFF' }`
 	 */
 	background: Background;
+
 	/**
 	 * @deprecated Use background instead.
 	 */
 	backgroundColor: string;
+
 	/**
 	 * Color of text on the scales.
+	 *
+	 * @defaultValue `'#191919'`
 	 */
 	textColor: string;
+
 	/**
 	 * Font size of text on scales in pixels.
+	 *
+	 * @defaultValue `11`
 	 */
 	fontSize: number;
+
 	/**
 	 * Font family of text on the scales.
+	 *
+	 * @defaultValue `'Trebuchet MS', Roboto, Ubuntu, sans-serif`
 	 */
 	fontFamily: string;
 }

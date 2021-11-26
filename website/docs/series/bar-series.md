@@ -35,7 +35,7 @@ barSeries.setData([
 
 ## Data format
 
-Each item of the bar series is either an [OHLC](../data/ohlc.md) or a [whitespace](../data/whitespace-data.md) item.
+Each item of the bar series is either an [OHLC](/api/interfaces/BarData.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
 
 ## Customization
 
@@ -45,26 +45,3 @@ Bar width can be increased to 2 px by disabling the `thinBars` option.
 Colors for rising & falling bars have to be set separately.
 
 A bar series series interface can be customized using the following set of options: [BarStyleOptions](/api/interfaces/BarStyleOptions).
-
-### Examples
-
-- set initial options for bar series:
-
-    ```js
-    const barSeries = chart.addBarSeries({
-        thinBars: false,
-        upColor: 'rgba(37, 148, 51, 0.2)',
-        downColor: 'rgba(191, 55, 48, 0.2)',
-        openVisible: true,
-    });
-    ```
-
-- change options after series is created:
-
-    ```js
-    // for example, let's disable thin bars and open price visibility
-    barSeries.applyOptions({
-        thinBars: false,
-        openVisible: false,
-    });
-    ```

@@ -3,8 +3,8 @@ export interface IPriceFormatter {
 	/**
 	 * Formatting function
 	 *
-	 * @param price - original price to be formatted
-	 * @returns formatted price
+	 * @param price - Original price to be formatted
+	 * @returns Formatted price
 	 */
 	format(price: number): string;
 }

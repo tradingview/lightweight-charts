@@ -33,10 +33,7 @@ baselineSeries.setData([
 
 ## Data format
 
-Each area series item should be a [whitespace](../data/whitespace-data.md) item or an object with the following fields:
-
-- `time` ([Time](../data/time.md)) - item time
-- `value` (`number`) - item value
+Each area series item should be a [LineData](/api/interfaces/LineData.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
 
 ## Customization
 
@@ -46,33 +43,3 @@ These colors blend into one another in the middle of the area.
 Also, the crosshair marker, which is enabled by default, can either be disabled or have its radius adjusted.
 
 A baseline series interface can be customized using the following set of options: [BaselineStyleOptions](/api/interfaces/BaselineStyleOptions).
-
-### Examples
-
-- set initial options for area series:
-
-    ```js
-    const baselineSeries = chart.addBaselineSeries({
-        topFillColor1: 'rgba(21, 146, 230, 0.4)',
-        topFillColor2: 'rgba(21, 146, 230, 0)',
-        bottomFillColor1: 'rgba(21, 146, 230, 0)',
-        bottomFillColor2: 'rgba(21, 146, 230, 0.4)',
-        topLineColor: 'rgba(21, 146, 230, 1)',
-        lineStyle: 0,
-        lineWidth: 3,
-        crosshairMarkerVisible: false,
-        crosshairMarkerRadius: 3,
-        crosshairMarkerBorderColor: 'rgb(255, 255, 255, 1)',
-        crosshairMarkerBackgroundColor: 'rgb(34, 150, 243, 1)',
-    });
-    ```
-
-- change options after series is created:
-
-    ```js
-    // for example, let's override line width and color only
-    baselineSeries.applyOptions({
-        topLineColor: 'rgba(255, 44, 128, 1)',
-        lineWidth: 1,
-    });
-    ```

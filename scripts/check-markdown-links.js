@@ -107,6 +107,12 @@ function collectFilesData(inputFiles) {
 			continue;
 		}
 
+		// if this is a link to generated API then let's skip it for now
+		// since a website might not be generated yet
+		if (filePath.includes('/api/')) {
+			continue;
+		}
+
 		if (!fs.existsSync(filePath)) {
 			throw new Error(`File or directory "${filePath}" doesn't exist`);
 		}

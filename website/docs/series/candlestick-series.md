@@ -31,7 +31,7 @@ candlestickSeries.setData([
 
 ## Data format
 
-Each item of the candlestick series is either an [OHLC](../data/ohlc.md) or a [whitespace](../data/whitespace-data.md) item.
+Each item of the candlestick series is either an [OHLC](/api/interfaces/BarData.md) or a [whitespace](/api/interfaces/WhitespaceData.md) item.
 
 ## Customization
 
@@ -42,32 +42,3 @@ Candlestick borders and wicks are visible by default and may be disabled. Note t
 Border and wick color can be either set for all candlesticks at once or for rising and falling candlesticks separately. If the latter is your preference please make sure that you don't use common options such as `borderColor` and `wickColor` since they have higher priority compared to the specific ones.
 
 Candlestick series interface can be customized using the following set of options: [CandlestickStyleOptions](/api/interfaces/CandlestickStyleOptions).
-
-### Examples
-
-- set initial options for candlestick series:
-
-    ```js
-    const candlestickSeries = chart.addCandlestickSeries({
-        upColor: '#6495ED',
-        downColor: '#FF6347',
-        borderVisible: false,
-        wickVisible: true,
-        borderColor: '#000000',
-        wickColor: '#000000',
-        borderUpColor: '#4682B4',
-        borderDownColor: '#A52A2A',
-        wickUpColor: '#4682B4',
-        wickDownColor: '#A52A2A',
-    });
-    ```
-
-- change options after series is created:
-
-    ```js
-    // for example, let's override up and down color of the candle
-    candlestickSeries.applyOptions({
-        upColor: 'rgba(255, 0, 0, 1)',
-        downColor: 'rgba(0, 255, 0, 1)',
-    });
-    ```
