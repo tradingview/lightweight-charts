@@ -1,7 +1,4 @@
----
-sidebar_position: 5
----
-# Version 3.0 breaking changes
+# From v2 to v3
 
 Lightweight charts library 3.0 announces the major improvements: supporting two price scales and improving the time scale API.
 In order of keep the API clear and consistent, we decided to allow breaking change of the API.
@@ -13,8 +10,8 @@ In this document you can find the migration guide from the previous version to 3
 Previously, to handle changing visible time range you needed to use `subscribeVisibleTimeRangeChange` and `unsubscribeVisibleTimeRangeChange` to subscribe and unsubscribe from visible range events.
 These methods were available in the chart object  (e.g. you call it like `chart.subscribeVisibleTimeRangeChange(func)`).
 
-In 3.0 in order to make API more consistent with the new API we decided to move these methods to [time scale API](/api/interfaces/ITimeScaleApi)
-(along with the new subscription methods [`subscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange) and [`unsubscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi#unsubscribevisiblelogicalrangechange)).
+In 3.0 in order to make API more consistent with the new API we decided to move these methods to [ITimeScaleApi](/api/interfaces/ITimeScaleApi)
+(along with the new subscription methods [`ITimeScaleApi.subscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange) and [`ITimeScaleApi.unsubscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi#unsubscribevisiblelogicalrangechange)).
 
 So, to migrate your code to 3.0 you just need to replace:
 
@@ -146,10 +143,10 @@ const mainSeries = chart.addLineSeries();
 
 chart.applyOptions({
     leftPriceScale: {
-        visible: 'true',
+        visible: true,
     },
     rightPriceScale: {
-        visible: 'false',
+        visible: false,
     },
 });
 
