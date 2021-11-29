@@ -10,69 +10,151 @@ sidebar_position: 0
 
 The first thing you need to do to use `lightweight-charts` is to install it from [npm](https://www.npmjs.com/):
 
-`npm install --save lightweight-charts`
+```console
+npm install --save lightweight-charts
+```
 
-### Using a standalone version
+_Note that the package is shipped with TypeScript declarations, so you can easily use it within TypeScript code._
 
-The npm package is shipped with [a standalone version](https://unpkg.com/lightweight-charts@latest/dist/lightweight-charts.standalone.production.js).
-It puts all exports from `esm` version to `window.LightweightCharts` object and can be used, for example, in [JSFiddle](https://jsfiddle.net/) or in similar services.
+## Creating a first chart
 
-## Create your first chart
+Since the library has been installed in your repo you're ready to create your first chart.
 
-### In modules environment
+First of all, you need to create a source file where you will create a chart if you don't have it yet.
+Then in this file you need to import the library:
 
-_Note: the package is shipped with TypeScript declarations, so `lightweight-charts` can be easily used in TypeScript code._
+```js
+import { createChart } from 'lightweight-charts';
+```
 
-After installing the package just add the following code to your JavaScript file:
+[`createChart`](/api#createchart) is an entry-point for creating charts and you can use it as many times as many charts you need to create:
 
 ```js
 import { createChart } from 'lightweight-charts';
 
-const chart = createChart(document.body, { width: 400, height: 300 });
-const lineSeries = chart.addLineSeries();
-lineSeries.setData([
-    { time: '2019-04-11', value: 80.01 },
-    { time: '2019-04-12', value: 96.63 },
-    { time: '2019-04-13', value: 76.64 },
-    { time: '2019-04-14', value: 81.89 },
-    { time: '2019-04-15', value: 74.43 },
-    { time: '2019-04-16', value: 80.01 },
-    { time: '2019-04-17', value: 96.63 },
-    { time: '2019-04-18', value: 76.64 },
-    { time: '2019-04-19', value: 81.89 },
-    { time: '2019-04-20', value: 74.43 },
+// ...
+
+// somewhere in your code
+const firstChart = createChart(firstContainer);
+const secondChart = createChart(secondContainer);
+```
+
+The result of this function is an instance of [`IChartApi`](/api/interfaces/IChartApi) object, which you need to use to work with a chart instance.
+
+## Creating a series
+
+Since your chart is created it is ready to display a data.
+
+The basic primitive to display a data is [a series](/api/interfaces/ISeriesApi).
+It could be one of possible series types:
+
+- Area
+- Bar
+- Baseline
+- Candlestick
+- Histogram
+- Line
+
+To create a series with desired type you need to use appropriate method from [`IChartApi`](/api/interfaces/IChartApi).
+All of them have the same naming `add<type>Series`, where `<type>` is a type of a series you'd like to create:
+
+```js
+import { createChart } from 'lightweight-charts';
+
+const chart = createChart(container);
+
+const areaSeries = chart.addAreaSeries();
+const barSeries = chart.addBarSeries();
+const baselineSeries = chart.addBaselineSeries();
+// ... and so on
+```
+
+Please look at [this page](/series-types.md) for more information about different series types.
+
+Note that **a series cannot be transferred from one type to another one** since different series types have different data and options types.
+
+## Setting and updating a data
+
+Once your chart and series are created it's time to set a data to the series.
+
+Note that regardless of a series type, the API calls are the same for all series types (the type of the data might be different though).
+
+### Setting the data to a series
+
+To set the data (or to replace all data items) to a series you need to use [`ISeriesApi.setData`](/api/interfaces/ISeriesApi#setdata) method:
+
+```js
+import { createChart } from 'lightweight-charts';
+
+const chart = createChart(container);
+
+const areaSeries = chart.addAreaSeries();
+areaSeries.setData([
+    { time: '2018-12-22', value: 32.51 },
+    { time: '2018-12-23', value: 31.11 },
+    { time: '2018-12-24', value: 27.02 },
+    { time: '2018-12-25', value: 27.32 },
+    { time: '2018-12-26', value: 25.17 },
+    { time: '2018-12-27', value: 28.89 },
+    { time: '2018-12-28', value: 25.46 },
+    { time: '2018-12-29', value: 23.92 },
+    { time: '2018-12-30', value: 22.68 },
+    { time: '2018-12-31', value: 22.67 },
+]);
+
+const candlestickSeries = chart.addCandlestickSeries();
+candlestickSeries.setData([
+    { time: '2018-12-22', open: 75.16, high: 82.84, low: 36.16, close: 45.72 },
+    { time: '2018-12-23', open: 45.12, high: 53.90, low: 45.12, close: 48.09 },
+    { time: '2018-12-24', open: 60.71, high: 60.71, low: 53.39, close: 59.29 },
+    { time: '2018-12-25', open: 68.26, high: 68.26, low: 59.04, close: 60.50 },
+    { time: '2018-12-26', open: 67.71, high: 105.85, low: 66.67, close: 91.04 },
+    { time: '2018-12-27', open: 91.04, high: 121.40, low: 82.70, close: 111.40 },
+    { time: '2018-12-28', open: 111.51, high: 142.83, low: 103.34, close: 131.25 },
+    { time: '2018-12-29', open: 131.33, high: 151.17, low: 77.68, close: 96.43 },
+    { time: '2018-12-30', open: 106.33, high: 110.20, low: 90.39, close: 98.10 },
+    { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
 ]);
 ```
 
-### In non-modules environment
+It's pretty easy, isn't it? That's it, your chart is ready to be displayed on the page:
 
-1. You need to be sure that a standalone version has been added to the page where you want to use `lightweight-charts`.
+![First simple chart](/img/first-chart.png "First simple chart")
 
-    Simply add a `script` tag to your page:
+### Updating the data in a series
 
-    ```html
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-    ```
+In a case when your data is updated (e.g. real-time updates) you might want to update the chart as well.
 
-1. Add the following code to the web page (for example, add it to a `script` tag in the HTML code of the page):
+But using [`ISeriesApi.setData`](/api/interfaces/ISeriesApi#setdata) very often might affect the performance and we do not recommend to do this.
+Also it replaces all series data with the new one, and probably this is not what you're looking for.
 
-    ```js
-    const chart = LightweightCharts.createChart(document.body, { width: 400, height: 300 });
-    const lineSeries = chart.addLineSeries();
-    lineSeries.setData([
-        { time: '2019-04-11', value: 80.01 },
-        { time: '2019-04-12', value: 96.63 },
-        { time: '2019-04-13', value: 76.64 },
-        { time: '2019-04-14', value: 81.89 },
-        { time: '2019-04-15', value: 74.43 },
-        { time: '2019-04-16', value: 80.01 },
-        { time: '2019-04-17', value: 96.63 },
-        { time: '2019-04-18', value: 76.64 },
-        { time: '2019-04-19', value: 81.89 },
-        { time: '2019-04-20', value: 74.43 },
-    ]);
-    ```
+Thus, to update the data you can use a method [`ISeriesApi.update`](/api/interfaces/ISeriesApi#update).
+It allows you to update the last data item or add a new one much faster without affecting the performance:
 
-    [JSFiddle](https://jsfiddle.net/TradingView/gemn0ud6/)
+```js
+import { createChart } from 'lightweight-charts';
 
-That's it! Your first chart is ready and we can now proceed.
+const chart = createChart(container);
+
+const areaSeries = chart.addAreaSeries();
+areaSeries.setData([
+    // ... other data items
+    { time: '2018-12-31', value: 22.67 },
+]);
+
+const candlestickSeries = chart.addCandlestickSeries();
+candlestickSeries.setData([
+    // ... other data items
+    { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
+]);
+
+// sometime later
+
+// update the most recent bar
+areaSeries.update({ time: '2018-12-31', value: 25 });
+candlestickSeries.update({ time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 112 });
+
+// creating the new bar
+areaSeries.update({ time: '2019-01-01', value: 20 });
+candlestickSeries.update({ time: '2019-01-01', open: 112, high: 112, low: 100, close: 101 });
+```
