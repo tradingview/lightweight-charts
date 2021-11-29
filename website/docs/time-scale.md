@@ -8,14 +8,14 @@ Time scale (or time axis) is a horizontal scale at the bottom of the chart that 
 
 ![Time scale](/img/time-scale.png "Time scale")
 
-Time scale controls a current visible range, allows you to affect or change it, could convert a time point or [an index](/api#logical) to a coordinate and vice versa (basically everything related to a x-scale of a chart).
+Time scale controls a current visible range, allows you to affect or change it, and can convert a time point or [an index](/api#logical) to a coordinate and vice versa (basically everything related to a x-scale of a chart).
 
 Also, it has a couple of events you can subscribe to to be notified when anything is happened.
 
 To work with time scale you can either change its options or use methods [ITimeScaleApi](/api/interfaces/ITimeScaleApi) which could be retrieved by using [`IChartApi.timeScale`](/api/interfaces/IChartApi#timescale) method.
 All available options are declared in [TimeScaleOptions](/api/interfaces/TimeScaleOptions) interface.
 
-Note that you can apply options either via [`ITimeScaleApi.applyOptions`](/api/interfaces/ITimeScaleApi#applyoptions) or [`IChartApi.applyOptions`](/api/interfaces/IChartApi#applyoptions) with `timeScale` sub-object in passed options - these 2 approached both have the same effect.
+Note that you can apply options either via [`ITimeScaleApi.applyOptions`](/api/interfaces/ITimeScaleApi#applyoptions) or [`IChartApi.applyOptions`](/api/interfaces/IChartApi#applyoptions) with `timeScale` sub-object in passed options - these 2 approaches both have the same effect.
 
 ## Logical range
 

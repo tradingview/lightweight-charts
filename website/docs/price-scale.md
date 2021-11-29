@@ -15,7 +15,7 @@ Only `left` and `right` price scales could be displayed on the chart, all overla
 
 If you want to change `left` price scale, you need to use [`leftPriceScale`](/api/interfaces/ChartOptions#leftpricescale) option, to change `right` price scale use [`rightPriceScale`](/api/interfaces/ChartOptions#rightrricescale), to change default options for an overlay price scale use [`overlayPriceScales`](/api/interfaces/ChartOptions#overlaypricescales) option.
 
-Alternatively, you can use [`IChartApi.priceScale`](/api/interfaces/IChartApi#pricescale) method to get an API object of any price scale or [`ISeriesApi.priceScale`](/api/interfaces/ISeriesApi#pricescale) to get an API object of series' price scale (a price scale where the series is attached to).
+Alternatively, you can use [`IChartApi.priceScale`](/api/interfaces/IChartApi#pricescale) method to get an API object of any price scale or [`ISeriesApi.priceScale`](/api/interfaces/ISeriesApi#pricescale) to get an API object of series' price scale (the price scale that the series is attached to).
 
 ## Creating a price scale
 

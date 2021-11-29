@@ -8,7 +8,7 @@ In this article you can read a brief overview of all supported series types.
 
 ## A series customizations
 
-Any type of series could be customized and a set of available options that you could apply depends on a type of a series (see docs for each series type below).
+Any type of series can be customized and the set of available options that you can apply depends on a type of a series (see docs for each series type below).
 
 If you'd like to change any option of a series, you could do this in different ways:
 

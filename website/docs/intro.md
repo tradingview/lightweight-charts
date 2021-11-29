@@ -16,9 +16,9 @@ npm install --save lightweight-charts
 
 _Note that the package is shipped with TypeScript declarations, so you can easily use it within TypeScript code._
 
-## Creating a first chart
+## Creating a chart
 
-Since the library has been installed in your repo you're ready to create your first chart.
+Once the library has been installed in your repo you're ready to create your first chart.
 
 First of all, you need to create a source file where you will create a chart if you don't have it yet.
 Then in this file you need to import the library:
@@ -27,7 +27,7 @@ Then in this file you need to import the library:
 import { createChart } from 'lightweight-charts';
 ```
 
-[`createChart`](/api#createchart) is an entry-point for creating charts and you can use it as many times as many charts you need to create:
+[`createChart`](/api#createchart) is the entry-point for creating charts. You can use it to create as many charts as you need:
 
 ```js
 import { createChart } from 'lightweight-charts';
@@ -39,14 +39,14 @@ const firstChart = createChart(firstContainer);
 const secondChart = createChart(secondContainer);
 ```
 
-The result of this function is an instance of [`IChartApi`](/api/interfaces/IChartApi) object, which you need to use to work with a chart instance.
+The result of this function is a [`IChartApi`](/api/interfaces/IChartApi) object, which you need to use to work with a chart instance.
 
 ## Creating a series
 
-Since your chart is created it is ready to display a data.
+Once your chart is created it is ready to display data.
 
 The basic primitive to display a data is [a series](/api/interfaces/ISeriesApi).
-It could be one of possible series types:
+There are different types of series:
 
 - Area
 - Bar
@@ -75,9 +75,9 @@ Note that **a series cannot be transferred from one type to another one** since 
 
 ## Setting and updating a data
 
-Once your chart and series are created it's time to set a data to the series.
+Once your chart and series are created it's time to set data to the series.
 
-Note that regardless of a series type, the API calls are the same for all series types (the type of the data might be different though).
+Note that regardless of the series type, the API calls are the same (the type of the data might be different though).
 
 ### Setting the data to a series
 
