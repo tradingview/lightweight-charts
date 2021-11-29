@@ -226,14 +226,14 @@ export interface AreaStyleOptions {
 	/**
 	 * Color of the bottom part of the area.
 	 *
-	 * * @defaultValue `'rgba( 40, 221, 100, 0)'`
+	 * @defaultValue `'rgba( 40, 221, 100, 0)'`
 	 */
 	bottomColor: string;
 
 	/**
 	 * Line color.
 	 *
-	 * * @defaultValue `'#33D778'`
+	 * @defaultValue `'#33D778'`
 	 */
 	lineColor: string;
 
