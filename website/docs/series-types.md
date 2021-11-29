@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Series Types
+# Series types
 
 In this article you can read a brief overview of all supported series types.
 
@@ -37,7 +37,7 @@ If you'd like to change any option of a series, you could do this in different w
 ## Area
 
 - **Method to create**: [`IChartApi.addAreaSeries`](/api/interfaces/IChartApi#addareaseries)
-- **Data format**: [`LineData`](/api/interfaces/LineData.md) or a [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`LineData`](/api/interfaces/LineData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon) and [`AreaStyleOptions`](/api/interfaces/AreaStyleOptions)
 
 An area chart is basically a colored area between the line connecting all data points and [the time scale](./time-scale.md):
@@ -47,7 +47,7 @@ An area chart is basically a colored area between the line connecting all data p
 ## Bar
 
 - **Method to create**: [`IChartApi.addBarSeries`](/api/interfaces/IChartApi#addbarseries)
-- **Data format**: [`BarData`](/api/interfaces/BarData.md) or a [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`BarData`](/api/interfaces/BarData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon) and [`BarStyleOptions`](/api/interfaces/BarStyleOptions)
 
 A bar chart shows price movements in the form of bars.
@@ -60,7 +60,7 @@ Open & Close values are represented by tick marks, on the left & right hand side
 ## Baseline
 
 - **Method to create**: [`IChartApi.addBaselineSeries`](/api/interfaces/IChartApi#addbaselineseries)
-- **Data format**: [`LineData`](/api/interfaces/LineData.md) or a [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`LineData`](/api/interfaces/LineData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon) and [`BaselineStyleOptions`](/api/interfaces/BaselineStyleOptions)
 
 A baseline is basically two colored areas (top and bottom) between the line connecting all data points and [the base value line](/api/interfaces/BaselineStyleOptions#basevalue):
@@ -70,7 +70,7 @@ A baseline is basically two colored areas (top and bottom) between the line conn
 ## Candlestick
 
 - **Method to create**: [`IChartApi.addCandlestickSeries`](/api/interfaces/IChartApi#addcandlestickseries)
-- **Data format**: [`BarData`](/api/interfaces/BarData.md) or a [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`BarData`](/api/interfaces/BarData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon) and [`CandlestickStyleOptions`](/api/interfaces/CandlestickStyleOptions)
 
 A candlestick chart shows price movements in the form of candlesticks.
@@ -81,7 +81,7 @@ On the candlestick chart, open & close values form a solid body of a candle whil
 ## Histogram
 
 - **Method to create**: [`IChartApi.addHistogramSeries`](/api/interfaces/IChartApi#addhistogramseries)
-- **Data format**: [`HistogramData`](/api/interfaces/HistogramData.md) or a [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`HistogramData`](/api/interfaces/HistogramData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon) and [`HistogramStyleOptions`](/api/interfaces/HistogramStyleOptions)
 
 A histogram series is a graphical representation of the value distribution.
@@ -92,7 +92,7 @@ Histogram creates intervals (columns) and counts how many values fall into each 
 ## Line
 
 - **Method to create**: [`IChartApi.addLineSeries`](/api/interfaces/IChartApi#addlineseries)
-- **Data format**: [`LineData`](/api/interfaces/LineData.md) or a [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`LineData`](/api/interfaces/LineData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon) and [`LineStyleOptions`](/api/interfaces/LineStyleOptions)
 
 A line chart is a type of chart that displays information as series of the data points connected by straight line segments:

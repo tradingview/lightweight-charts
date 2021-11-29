@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Price Scale
+# Price scale
 
 Price Scale (or price axis) is a vertical scale that mostly maps prices to coordinates and vice versa.
 The rules of converting depend on a price scale mode, a height of the chart and visible part of the data.
