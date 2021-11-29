@@ -22,7 +22,7 @@ So, to migrate your code to 3.0 you just need to replace:
 
 We understand disadvantages of breaking changes in the API, so we have not removed support of the current API at all, but have deprecated it, so the most common cases will continue to work.
 
-You could refer to the new API [here](./price-scale.md).
+You could refer to the new API [here](../price-scale.md).
 
 Following are migration rules.
 
