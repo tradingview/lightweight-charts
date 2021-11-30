@@ -38,6 +38,22 @@ _Note_: API documentation will not be generated unless you have already built th
 
 This will build the website into static files and push the files to the `gh-pages` branch.
 
+## Adding a new version
+
+Run the following command replacing $VERSION with the name of a version you would like to create. $VERSION should match one of the available versions of the package on [unpkg.com](unpkg.com)
+
+See [the Docusaurus versioning docs](https://docusaurus.io/docs/versioning#tagging-a-new-version) for an explanation of the Docusaurus versioning behaviour.
+
+```bash
+npm run docusaurus docs:version $VERSION
+```
+
+For example:
+
+```bash
+npm run docusaurus docs:version 3.7.0
+```
+
 ## CircleCI
 
 We use CircleCI to build, test, publish the library, and to deploy this website.

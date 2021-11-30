@@ -14,6 +14,33 @@ const githubPagesUrl = `https://${organizationName}.github.io/`;
 
 const latestVersion = versions[0];
 
+/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
+const commonDocusaurusPluginTypedocConfig = {
+	readme: 'none',
+	disableSources: true,
+	// The trailing slash is required.
+	// @ts-ignore
+	publicPath: '/api/',
+	// This needs to be here because TypeDoc fails to auto-detect the project name
+	// which would result in the title of our generated index page being 'undefined'.
+	name: 'lightweight-charts',
+	sort: ['source-order'],
+};
+
+/** @type {(version: string) => [string, Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions]} */
+function docusaurusPluginTypedocConfigForVersion(version) {
+	return [
+		'docusaurus-plugin-typedoc',
+		({
+			...commonDocusaurusPluginTypedocConfig,
+			id: `${version}-api`,
+			entryPoints: [`./.cache/typings-${version}.d.ts`],
+			tsconfig: `./.cache/tsconfig-${version}.json`,
+			docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
+		}),
+	];
+}
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
 	title: 'Lightweight Charts',
@@ -145,33 +172,14 @@ const config = {
 			// @ts-ignore
 			/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
 			({
+				...commonDocusaurusPluginTypedocConfig,
 				id: 'current-api',
 				entryPoints: ['../dist/typings.d.ts'],
-				publicPath: '/api/',
-				readme: 'none',
-				disableSources: true,
 				watch: true,
 				preserveWatchOutput: true,
-				sort: ['source-order'],
 			}),
 		],
-		[
-			'docusaurus-plugin-typedoc',
-			// @ts-ignore
-			/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
-			({
-				id: '3.7.0-api',
-				entryPoints: ['./.cache/typings-3.7.0.d.ts'],
-				tsconfig: './.cache/tsconfig-3.7.0.json',
-				readme: 'none',
-				disableSources: true,
-				// Trailing slash required!
-				publicPath: '/api/',
-				docsRoot: path.resolve(__dirname, './versioned_docs/version-3.7.0'),
-				// This needs to be here because TypeDoc fails to auto-detect the project name
-				name: 'lightweight-charts',
-			}),
-		],
+		...versions.map(docusaurusPluginTypedocConfigForVersion),
 	],
 };
 
