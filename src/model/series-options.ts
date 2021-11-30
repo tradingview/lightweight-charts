@@ -20,7 +20,7 @@ export interface CandlestickStyleOptions {
 	/**
 	 * Color of falling candles.
 	 *
-	 * @defaultValue `1`
+	 * @defaultValue `'#ef5350'`
 	 */
 	downColor: string;
 

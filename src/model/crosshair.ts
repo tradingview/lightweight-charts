@@ -38,11 +38,11 @@ export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate;
  */
 export const enum CrosshairMode {
 	/**
-	 * Crosshair's horizontal line is anchored to the closest data point's close price.
+	 * This mode allows crosshair to move freely on the chart.
 	 */
 	Normal,
 	/**
-	 * Crosshair moves freely on the chart.
+	 * This mode sticks crosshair's horizontal line to the price value of a single-value series or to the close price of OHLC-based series.
 	 */
 	Magnet,
 }
@@ -73,6 +73,12 @@ export interface CrosshairLineOptions {
 	/**
 	 * Display the crosshair line.
 	 *
+	 * Note that disabling crosshair lines does not disable crosshair marker on Line and Area series.
+	 * It can be disabled by using `crosshairMarkerVisible` option of a relevant series.
+	 *
+	 * @see {@link LineStyleOptions.crosshairMarkerVisible}
+	 * @see {@link AreaStyleOptions.crosshairMarkerVisible}
+	 * @see {@link BaselineStyleOptions.crosshairMarkerVisible}
 	 * @defaultValue `true`
 	 */
 	visible: boolean;

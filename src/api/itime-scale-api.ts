@@ -47,12 +47,20 @@ export interface ITimeScaleApi {
 	/**
 	 * Returns current visible time range of the chart.
 	 *
+	 * Note that this method cannot extrapolate time and will use the only currently existent data.
+	 * To get complete information about current visible range, please use {@link getVisibleLogicalRange} and {@link ISeriesApi.barsInLogicalRange}.
+	 *
 	 * @returns Visible range or null if the chart has no data at all.
 	 */
 	getVisibleRange(): TimeRange | null;
 
 	/**
 	 * Sets visible range of data.
+	 *
+	 * Note that this method cannot extrapolate time and will use the only currently existent data.
+	 * Thus, for example, if currently a chart doesn't have data prior `2018-01-01` date and you set visible range with `from` date `2016-01-01`, it will be automatically adjusted to `2018-01-01` (and the same for `to` date).
+	 *
+	 * But if you can approximate indexes on your own - you could use {@link setVisibleLogicalRange} instead.
 	 *
 	 * @param range - Target visible range of data.
 	 * @example
@@ -73,7 +81,7 @@ export interface ITimeScaleApi {
 	getVisibleLogicalRange(): LogicalRange | null;
 
 	/**
-	 * Sets visible logical range of data.
+	 * Sets visible [logical range](#logical-range) of data.
 	 *
 	 * @param range - Target visible logical range of data.
 	 * @example
