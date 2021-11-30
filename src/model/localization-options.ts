@@ -38,7 +38,7 @@ export interface LocalizationOptions {
 	 *
 	 * Can contain `yyyy`, `yy`, `MMMM`, `MMM`, `MM` and `dd` literals which will be replaced with corresponding date's value.
 	 *
-	 * Ignored if timeFormatter has been specified.
+	 * Ignored if {@link timeFormatter} has been specified.
 	 *
 	 * @defaultValue `'dd MMM \'yy'`
 	 */
