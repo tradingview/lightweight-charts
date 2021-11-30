@@ -21,7 +21,7 @@ export type Time = UTCTimestamp | BusinessDay | string;
 /**
  * Check if a time value is a business day object.
  *
- * @param time The time to check.
+ * @param time - The time to check.
  * @returns `true` if `time` is a {@link BusinessDay} object, false otherwise.
  */
 export function isBusinessDay(time: Time): time is BusinessDay {
@@ -31,7 +31,7 @@ export function isBusinessDay(time: Time): time is BusinessDay {
 /**
  * Check if a time value is a UTC timestamp number.
  *
- * @param time The time to check.
+ * @param time - The time to check.
  * @returns `true` if `time` is a {@link UTCTimestamp} number, false otherwise.
  */
 export function isUTCTimestamp(time: Time): time is UTCTimestamp {
@@ -40,6 +40,19 @@ export function isUTCTimestamp(time: Time): time is UTCTimestamp {
 
 /**
  * Represents a whitespace data item, which is a data point without a value.
+ *
+ * @example
+ * ```js
+ * const data = [
+ *     { time: '2018-12-03', value: 27.02 },
+ *     { time: '2018-12-04' }, // whitespace
+ *     { time: '2018-12-05' }, // whitespace
+ *     { time: '2018-12-06' }, // whitespace
+ *     { time: '2018-12-07' }, // whitespace
+ *     { time: '2018-12-08', value: 23.92 },
+ *     { time: '2018-12-13', value: 30.74 },
+ * ];
+ * ```
  */
 export interface WhitespaceData {
 	/**

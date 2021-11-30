@@ -1,10 +1,10 @@
-# Version 4.0 breaking changes
+# From v3 to v4
 
 In this document you can find the migration guide from the previous version v3 to v4.
 
 ## Exported enum `LasPriceAnimationMode` has been removed
 
-Please use `LastPriceAnimationMode` instead.
+Please use [`LastPriceAnimationMode`](/api/enums/LastPriceAnimationMode) instead.
 
 ## `scaleMargins` option has been removed from series options
 
@@ -32,7 +32,7 @@ series.priceScale().applyOptions({
 
 ## `backgroundColor` from `layout` options has been removed
 
-If you want to have solid background color you need to use `background` property instead, e.g. instead of:
+If you want to have solid background color you need to use [`background`](/api/interfaces/LayoutOptions#background) property instead, e.g. instead of:
 
 ```js
 const chart = createChart({
@@ -57,11 +57,11 @@ const chart = createChart({
 
 ## `overlay` property of series options has been removed
 
-Please follow [the guide from v3.0 breaking changes](./3.0-breaking-changes.md#creating-overlay) where this option was deprecated.
+Please follow [the guide for migrating from v2 to v3](./from-v2-to-v3.md#creating-overlay) where this option was deprecated.
 
 ## `priceScale` option has been removed
 
-Please follow [the guide from v3.0 breaking changes](./3.0-breaking-changes.md#two-price-scales).
+Please follow [the guide for migrating from v2 to v3](./from-v2-to-v3.md#two-price-scales).
 
 ## `priceScale()` method of chart API now requires to provide price scale id
 

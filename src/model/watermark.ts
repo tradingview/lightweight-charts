@@ -10,34 +10,57 @@ import { DataSource } from './data-source';
 export interface WatermarkOptions {
 	/**
 	 * Watermark color.
+	 *
+	 * @defaultValue `'rgba(0, 0, 0, 0)'`
 	 */
 	color: string;
+
 	/**
 	 * Display the watermark.
+	 *
+	 * @defaultValue `false`
 	 */
 	visible: boolean;
+
 	/**
 	 * Text of the watermark. Word wrapping is not supported.
+	 *
+	 * @defaultValue `''`
 	 */
 	text: string;
+
 	/**
 	 * Font size in pixels.
+	 *
+	 * @defaultValue `48`
 	 */
 	fontSize: number;
+
 	/**
 	 * Font family.
+	 *
+	 * @defaultValue `'Trebuchet MS', Roboto, Ubuntu, sans-serif`
 	 */
 	fontFamily: string;
+
 	/**
 	 * Font style.
+	 *
+	 * @defaultValue `''`
 	 */
 	fontStyle: string;
+
 	/**
 	 * Horizontal alignment inside the chart area.
+	 *
+	 * @defaultValue `'center'`
 	 */
 	horzAlign: HorzAlign;
+
 	/**
 	 * Vertical alignment inside the chart area.
+	 *
+	 * @defaultValue `'center'`
 	 */
 	vertAlign: VertAlign;
 }

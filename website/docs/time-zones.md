@@ -1,5 +1,5 @@
 ---
-sidebar_position: 7
+sidebar_position: 4
 ---
 # Working with time zones
 
@@ -110,5 +110,5 @@ Keep in mind that time zones feature is not an issue for everybody so this is up
 
 ## Note about converting business days
 
-If you're using a business day for your time (either [object](./data/time.md#business-day-object) or [string](./data/time.md#business-day-string) representation), for example because of DWM nature of your data,
+If you're using a business day for your time (either [object](/api/interfaces/BusinessDay.md) or [string](api/#time) representation), for example because of DWM nature of your data,
 most likely you **shouldn't** convert that time to a zoned one, because this time represents a day.

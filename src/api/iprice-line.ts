@@ -7,7 +7,18 @@ export interface IPriceLine {
 	/**
 	 * Apply options to the price line.
 	 *
-	 * @param options The options to apply.
+	 * @param options - Any subset of options.
+	 * @example
+	 * ```js
+	 * priceLine.applyOptions({
+	 *     price: 90.0,
+	 *     color: 'red',
+	 *     lineWidth: 3,
+	 *     lineStyle: LightweightCharts.LineStyle.Dashed,
+	 *     axisLabelVisible: false,
+	 *     title: 'P/L 600',
+	 * });
+	 * ```
 	 */
 	applyOptions(options: Partial<PriceLineOptions>): void;
 	/**
