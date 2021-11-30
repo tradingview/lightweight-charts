@@ -62,11 +62,7 @@ const config = {
 				blog: false,
 				docs: {
 					sidebarPath: require.resolve('./sidebars.js'),
-					versions: {
-						'3.7.0': {
-							path: '3.7.0',
-						},
-					},
+					versions: versions.reduce((opts, v) => ({ ...opts, [v]: { path: v } }), {}),
 				},
 				theme: {
 					customCss: require.resolve('./src/css/custom.css'),
