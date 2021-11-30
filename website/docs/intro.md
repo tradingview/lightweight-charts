@@ -20,8 +20,7 @@ _Note that the package is shipped with TypeScript declarations, so you can easil
 
 Once the library has been installed in your repo you're ready to create your first chart.
 
-First of all, you need to create a source file where you will create a chart if you don't have it yet.
-Then in this file you need to import the library:
+First of all, in a file where you would like to create a chart you need to import the library:
 
 ```js
 import { createChart } from 'lightweight-charts';
