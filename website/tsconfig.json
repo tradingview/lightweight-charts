@@ -1,5 +1,10 @@
 {
+	"extends": "@tsconfig/docusaurus/tsconfig.json",
 	"files": [
-		"../dist/typings.d.ts"
-	]
+		"../dist/typings.d.ts",
+		"./src/pages/index.tsx"
+	],
+	"compilerOptions": {
+		"resolveJsonModule": true
+	}
 }

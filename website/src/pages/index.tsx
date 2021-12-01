@@ -1,17 +1,14 @@
-/// <reference types="@docusaurus/theme-classic" />
-
-import React from 'react';
-import Layout from '@theme/Layout';
+import React, { ReactElement } from 'react';
+import Layout from "@theme/Layout";
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Link from '@docusaurus/Link';
 import useResizeObserver from 'use-resize-observer'
 
-// wow, meta!
-import { createChart } from 'lightweight-charts'
+import { createChart, LineData, UTCTimestamp } from 'lightweight-charts'
 
 import versions from '../../versions.json'
 
-const latestVersion = versions[0];
+const latestVersion = (versions as string[])[0];
 
 interface HeroProps {
 	title: string;
@@ -49,7 +46,7 @@ function ExampleChart() {
 				height,
 			})
 
-			const data = []
+			const data: LineData[] = []
 			const time = new Date(Date.now())
 			const days = 100
 			time.setUTCDate(time.getUTCDate() - days)
@@ -57,20 +54,21 @@ function ExampleChart() {
 			for (let i = 0; i < days; i++) {
 				data.push({
 					value: Math.random() * 100,
-					time: time.getTime() / 1000,
+					time: time.getTime() / 1000 as UTCTimestamp,
 				})
 				time.setUTCDate(time.getUTCDate() + 1)
 			}
 
 			const l = c.addLineSeries()
 			l.setData(data)
+
 			l.createPriceLine({
 				price: data[Math.floor(data.length / 2)].value,
 				axisLabelVisible: true,
 				color: 'red',
 				lineStyle: 0, // Solid
 				lineWidth: 1,
-				title: ''
+				title: '',
 			})
 
 			c.timeScale().fitContent()
@@ -90,14 +88,15 @@ function ExampleChart() {
 		<div className="container">
 			<div className="row margin-top--md">
 				<div className="col">
-					<div ref={containerRef} style={{ width: '100%', height: '100%' }}/>
+					<div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 				</div>
 			</div>
 		</div>
 	)
 }
 
-export default function Home() {
+// eslint-disable-next-line import/no-default-export
+export default function Home(): ReactElement {
 	const { siteConfig } = useDocusaurusContext();
 	return (
 		<Layout title={`${siteConfig.title} Documentation`}>

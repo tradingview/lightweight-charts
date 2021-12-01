@@ -105,8 +105,22 @@ module.exports = {
 			},
 		},
 		{
+			files: ['**/*.tsx'],
+			excludedFiles: ['dist/**'],
+			parser: '@typescript-eslint/parser',
+			parserOptions: {
+				project: 'website/tsconfig.json',
+			},
+			extends: [
+				'plugin:@typescript-eslint/eslint-recommended',
+				'plugin:@typescript-eslint/recommended',
+				'plugin:@typescript-eslint/recommended-requiring-type-checking',
+				'plugin:import/typescript',
+			],
+		},
+		{
 			files: ['**/*.ts'],
-			excludedFiles: ['**/*.md/*.ts', 'dist/**'],
+			excludedFiles: ['**/*.md/*.ts', 'dist/**', '**/*.tsx'],
 			parser: '@typescript-eslint/parser',
 			extends: [
 				'plugin:@typescript-eslint/eslint-recommended',
