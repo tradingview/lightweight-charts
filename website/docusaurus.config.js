@@ -2,9 +2,13 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const path = require('path');
+const fs = require('fs');
+const fsp = require('fs/promises');
+const https = require('https');
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const { default: pluginDocusaurus } = require('docusaurus-plugin-typedoc');
 
 const versions = require('./versions.json');
 
@@ -15,11 +19,47 @@ const githubPagesUrl = `https://${organizationName}.github.io/`;
 
 const latestVersion = versions[0];
 
+const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
+
+function downloadTypingsToFile(typingsFilePath, version) {
+	return new Promise((resolve, reject) => {
+		const file = fs.createWriteStream(typingsFilePath);
+		const versionTypingsUrl = `https://unpkg.com/lightweight-charts@${version}/dist/typings.d.ts`;
+		const request = https.get(versionTypingsUrl, response => {
+			response.pipe(file);
+		});
+
+		file.on('finish', () => {
+			file.close(resolve);
+		});
+
+		request.on('error', error => {
+			reject(error);
+		});
+	});
+}
+
+async function downloadTypingsFromUnpkg(version) {
+	const typingsFilePath = path.resolve(cacheDir, `./v${version}.d.ts`);
+
+	try {
+		await fsp.stat(typingsFilePath);
+	} catch (e) {
+		if (e.code !== 'ENOENT') {
+			throw e;
+		}
+
+		await downloadTypingsToFile(typingsFilePath, version);
+	}
+
+	return typingsFilePath;
+}
+
 /** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
 const commonDocusaurusPluginTypedocConfig = {
 	readme: 'none',
 	disableSources: true,
-	tsconfig: './tsconfig.typedoc.json',
+	tsconfig: path.resolve(cacheDir, './tsconfig.json'),
 	// The trailing slash is required.
 	// @ts-ignore
 	publicPath: '/api/',
@@ -29,17 +69,23 @@ const commonDocusaurusPluginTypedocConfig = {
 	sort: ['source-order'],
 };
 
-/** @type {(version: string) => [string, Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions]} */
-function docusaurusPluginTypedocConfigForVersion(version) {
-	return [
-		'docusaurus-plugin-typedoc',
-		({
-			...commonDocusaurusPluginTypedocConfig,
-			id: `${version}-api`,
-			entryPoints: [`./.cache/typings-${version}.d.ts`],
-			docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
-		}),
-	];
+/** @type {(version: string) => import('@docusaurus/types').PluginModule} */
+function typedocPluginForVersion(version) {
+	return context => ({
+		name: `typedoc-for-v${version}`,
+
+		/** @type {() => Promise<any>} */
+		loadContent: async () => {
+			const typingsFilePath = await downloadTypingsFromUnpkg(version);
+
+			await pluginDocusaurus(context, {
+				...commonDocusaurusPluginTypedocConfig,
+				id: `${version}-api`,
+				entryPoints: [typingsFilePath],
+				docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
+			});
+		},
+	});
 }
 
 /** @type {import('@docusaurus/types').Config} */
@@ -176,7 +222,7 @@ const config = {
 				preserveWatchOutput: true,
 			}),
 		],
-		...versions.map(docusaurusPluginTypedocConfigForVersion),
+		...versions.map(typedocPluginForVersion),
 	],
 };
 

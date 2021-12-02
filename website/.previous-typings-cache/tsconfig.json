@@ -1,0 +1,6 @@
+{
+	"include": [
+		"./*.d.ts",
+		"../../dist/typings.d.ts"
+	]
+}

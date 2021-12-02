@@ -1,6 +1,0 @@
-{
-	"include": [
-		"../dist/typings.d.ts",
-		"./.cache/*.d.ts"
-	]
-}

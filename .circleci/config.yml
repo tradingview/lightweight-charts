@@ -230,7 +230,6 @@ jobs:
       - run:
           name: "Install dependencies and build website"
           command: |
-            node ./scripts/cache-typings-from-unpkg.js
             cd website
             npm install
             npm run build
