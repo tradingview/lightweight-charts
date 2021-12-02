@@ -1,10 +1,10 @@
 {
 	"extends": "@tsconfig/docusaurus/tsconfig.json",
-	"files": [
-		"../dist/typings.d.ts",
-		"./src/pages/index.tsx"
-	],
 	"compilerOptions": {
+		"strict": true,
 		"resolveJsonModule": true
-	}
+	},
+	"include": [
+		"./src/**/*.tsx"
+	]
 }

@@ -1,21 +1,20 @@
-import React, { ReactElement } from 'react';
-import Layout from "@theme/Layout";
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Link from '@docusaurus/Link';
-import useResizeObserver from 'use-resize-observer'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import Layout from '@theme/Layout';
+import { createChart, LineData, UTCTimestamp } from 'lightweight-charts';
+import React, { ReactElement } from 'react';
+import useResizeObserver from 'use-resize-observer';
 
-import { createChart, LineData, UTCTimestamp } from 'lightweight-charts'
+import versions from '../../versions.json';
 
-import versions from '../../versions.json'
-
-const latestVersion = (versions as string[])[0];
+const latestVersion = versions[0];
 
 interface HeroProps {
 	title: string;
 	subTitle: string;
 }
 
-function Hero(props: HeroProps) {
+function Hero(props: HeroProps): JSX.Element {
 	return (
 		<div className="hero shadow--lw">
 			<div className="container">
@@ -32,57 +31,60 @@ function Hero(props: HeroProps) {
 				</div>
 			</div>
 		</div>
-	)
+	);
 }
 
-function ExampleChart() {
-	const containerRef = React.useRef()
-	const { width, height = 500 } = useResizeObserver({ ref: containerRef })
+function ExampleChart(): JSX.Element {
+	const containerRef = React.useRef();
+	const { width, height = 500 } = useResizeObserver({ ref: containerRef });
 
-	React.useEffect(() => {
-		if (containerRef.current) {
-			const c = createChart(containerRef.current, {
-				width,
-				height,
-			})
+	React.useEffect(
+		() => {
+			if (containerRef.current) {
+				const c = createChart(containerRef.current, {
+					width,
+					height,
+				});
 
-			const data: LineData[] = []
-			const time = new Date(Date.now())
-			const days = 100
-			time.setUTCDate(time.getUTCDate() - days)
+				const data: LineData[] = [];
+				const time = new Date(Date.now());
+				const days = 100;
+				time.setUTCDate(time.getUTCDate() - days);
 
-			for (let i = 0; i < days; i++) {
-				data.push({
-					value: Math.random() * 100,
-					time: time.getTime() / 1000 as UTCTimestamp,
-				})
-				time.setUTCDate(time.getUTCDate() + 1)
+				for (let i = 0; i < days; i++) {
+					data.push({
+						value: Math.random() * 100,
+						time: time.getTime() / 1000 as UTCTimestamp,
+					});
+					time.setUTCDate(time.getUTCDate() + 1);
+				}
+
+				const l = c.addLineSeries();
+				l.setData(data);
+
+				l.createPriceLine({
+					price: data[Math.floor(data.length / 2)].value,
+					axisLabelVisible: true,
+					color: 'red',
+					lineStyle: 0, // Solid
+					lineWidth: 1,
+					title: '',
+				});
+
+				c.timeScale().fitContent();
+
+				c.timeScale().applyOptions({
+					fixLeftEdge: true,
+					fixRightEdge: true,
+				});
+
+				return () => {
+					c.remove();
+				};
 			}
-
-			const l = c.addLineSeries()
-			l.setData(data)
-
-			l.createPriceLine({
-				price: data[Math.floor(data.length / 2)].value,
-				axisLabelVisible: true,
-				color: 'red',
-				lineStyle: 0, // Solid
-				lineWidth: 1,
-				title: '',
-			})
-
-			c.timeScale().fitContent()
-
-			c.timeScale().applyOptions({
-				fixLeftEdge: true,
-				fixRightEdge: true,
-			})
-
-			return () => {
-				c.remove()
-			}
-		}
-	}, [width, height])
+		},
+		[width, height]
+	);
 
 	return (
 		<div className="container">
@@ -91,8 +93,8 @@ function ExampleChart() {
 					<div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 				</div>
 			</div>
-		</div>
-	)
+			</div>
+	);
 }
 
 // eslint-disable-next-line import/no-default-export

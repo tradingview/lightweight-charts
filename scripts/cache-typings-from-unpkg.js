@@ -10,14 +10,6 @@ const versions = require('../website/versions.json');
 const websiteDir = path.resolve(__dirname, '../website');
 const cacheDir = path.resolve(websiteDir, './.cache/');
 
-function createTsconfigForTypingsVersion(version) {
-	return fsp.writeFile(
-		path.resolve(cacheDir, `./tsconfig-${version}.json`),
-		JSON.stringify({ files: [`./typings-${version}.d.ts`] }),
-		{ encoding: 'utf8' }
-	);
-}
-
 function downloadTypingsToFile(typingsFilePath, version) {
 	return new Promise((resolve, reject) => {
 		const file = fs.createWriteStream(typingsFilePath);
@@ -52,7 +44,6 @@ async function downloadTypingsFromUnpkg(version) {
 
 async function main() {
 	await Promise.all(versions.map(downloadTypingsFromUnpkg));
-	await Promise.all(versions.map(createTsconfigForTypingsVersion));
 }
 
 try {

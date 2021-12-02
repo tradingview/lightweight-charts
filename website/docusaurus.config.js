@@ -19,6 +19,7 @@ const latestVersion = versions[0];
 const commonDocusaurusPluginTypedocConfig = {
 	readme: 'none',
 	disableSources: true,
+	tsconfig: './tsconfig.typedoc.json',
 	// The trailing slash is required.
 	// @ts-ignore
 	publicPath: '/api/',
@@ -36,7 +37,6 @@ function docusaurusPluginTypedocConfigForVersion(version) {
 			...commonDocusaurusPluginTypedocConfig,
 			id: `${version}-api`,
 			entryPoints: [`./.cache/typings-${version}.d.ts`],
-			tsconfig: `./.cache/tsconfig-${version}.json`,
 			docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
 		}),
 	];
