@@ -5,7 +5,7 @@ import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
-import { PlotRowSearchMode } from '../model/plot-list';
+import { MismatchDirection } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
 import { Series } from '../model/series';
@@ -77,8 +77,8 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 			return null;
 		}
 
-		const dataFirstBarInRange = bars.search(correctedRange.left(), PlotRowSearchMode.NearestRight);
-		const dataLastBarInRange = bars.search(correctedRange.right(), PlotRowSearchMode.NearestLeft);
+		const dataFirstBarInRange = bars.search(correctedRange.left(), MismatchDirection.NearestRight);
+		const dataLastBarInRange = bars.search(correctedRange.right(), MismatchDirection.NearestLeft);
 
 		const dataFirstIndex = ensureNotNull(bars.firstIndex());
 		const dataLastIndex = ensureNotNull(bars.lastIndex());
@@ -124,6 +124,16 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		checkSeriesValuesType(this._series.seriesType(), [bar]);
 
 		this._dataUpdatesConsumer.updateData(this._series, bar);
+	}
+
+	public dataByIndex(index: Logical, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null {
+		const data = this._series.bars().search(index as unknown as TimePointIndex, mismatchDirection);
+		if (data === null) {
+			// actually it can be a whitespace
+			return null;
+		}
+
+		return data.original as SeriesDataItemTypeMap[TSeriesType];
 	}
 
 	public setMarkers(data: SeriesMarker<Time>[]): void {

@@ -2,6 +2,7 @@ import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { MismatchDirection } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import {
@@ -9,7 +10,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Range } from '../model/time-data';
+import { Logical, Range } from '../model/time-data';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
@@ -157,6 +158,19 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
+
+	/**
+	 * Gets a bar data by provided index.
+	 *
+	 * @param index - Logical index
+	 * @param mismatchDirection - Search direction if no data found at provided logical index.
+	 * @returns Original data item provided via setData or update methods.
+	 * @example
+	 * ```js
+	 * const originalData = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
+	 * ```
+	 */
+	dataByIndex(index: Logical, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null;
 
 	/**
 	 * Allows to set/replace all existing series markers with new ones.

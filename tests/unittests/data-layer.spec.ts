@@ -254,7 +254,7 @@ describe('DataLayer', () => {
 		expect(updateResult1.series.size).to.be.equal(1);
 		updateResult1.series.forEach((updatePacket: SeriesChanges, series: Series) => {
 			expect(series).to.be.equal(series1);
-			expect(updatePacket.data).excludingEvery('value').to.have.deep.members([
+			expect(updatePacket.data).excludingEvery(['value', 'original']).to.have.deep.members([
 				{ index: 0, time: { timestamp: 1000 } },
 				{ index: 2, time: { timestamp: 4000 } },
 			]);
@@ -268,7 +268,7 @@ describe('DataLayer', () => {
 		expect(updateResult2.series.size).to.be.equal(1);
 		updateResult2.series.forEach((updatePacket: SeriesChanges, series: Series) => {
 			expect(series).to.be.equal(series2);
-			expect(updatePacket.data).excludingEvery('value').to.have.deep.members([
+			expect(updatePacket.data).excludingEvery(['value', 'original']).to.have.deep.members([
 				{ index: 1, time: { timestamp: 2000 } },
 				{ index: 2, time: { timestamp: 4000 } },
 			]);
@@ -491,7 +491,7 @@ describe('DataLayer', () => {
 		const seriesUpdate = updateResult.series.get(series);
 		expect(seriesUpdate).not.to.be.equal(undefined);
 
-		expect(seriesUpdate?.data).excludingEvery('value').to.have.deep.members([
+		expect(seriesUpdate?.data).excludingEvery(['value', 'original']).to.have.deep.members([
 			{ index: 0, time: { timestamp: 1000 } },
 			{ index: 1, time: { timestamp: 3000 } },
 		]);
@@ -730,7 +730,7 @@ describe('DataLayer', () => {
 			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 
-			expect(seriesUpdate.data).excludingEvery('value').to.have.deep.members([
+			expect(seriesUpdate.data).excludingEvery(['value', 'original']).to.have.deep.members([
 				{ index: 0, time: { timestamp: 1000 } },
 				{ index: 1, time: { timestamp: 4000 } },
 				{ index: 2, time: { timestamp: 5000 } },

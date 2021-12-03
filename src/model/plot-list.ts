@@ -5,9 +5,12 @@ import { Nominal } from '../helpers/nominal';
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import { TimePointIndex } from '../model/time-data';
 
-export const enum PlotRowSearchMode {
+/**
+ * Search direction if no data found at provided index
+ */
+export const enum MismatchDirection {
 	NearestLeft = -1,
-	Exact = 0,
+	None = 0,
 	NearestRight = 1,
 }
 
@@ -28,7 +31,7 @@ const CHUNK_SIZE = 30;
 export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 	private _items: readonly PlotRowType[] = [];
 	private _minMaxCache: Map<PlotRowValueIndex, Map<number, MinMax | null>> = new Map();
-	private _rowSearchCache: Map<TimePointIndex, Map<PlotRowSearchMode, PlotRowType>> = new Map();
+	private _rowSearchCache: Map<TimePointIndex, Map<MismatchDirection, PlotRowType>> = new Map();
 
 	// @returns Last row
 	public last(): PlotRowType | null {
@@ -52,14 +55,14 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 	}
 
 	public contains(index: TimePointIndex): boolean {
-		return this._search(index, PlotRowSearchMode.Exact) !== null;
+		return this._search(index, MismatchDirection.None) !== null;
 	}
 
 	public valueAt(index: TimePointIndex): PlotRowType | null {
 		return this.search(index);
 	}
 
-	public search(index: TimePointIndex, searchMode: PlotRowSearchMode = PlotRowSearchMode.Exact): PlotRowType | null {
+	public search(index: TimePointIndex, searchMode: MismatchDirection = MismatchDirection.None): PlotRowType | null {
 		const pos = this._search(index, searchMode);
 		if (pos === null) {
 			return null;
@@ -108,14 +111,14 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 		return this._items[offset];
 	}
 
-	private _search(index: TimePointIndex, searchMode: PlotRowSearchMode): PlotRowIndex | null {
+	private _search(index: TimePointIndex, searchMode: MismatchDirection): PlotRowIndex | null {
 		const exactPos = this._bsearch(index);
 
-		if (exactPos === null && searchMode !== PlotRowSearchMode.Exact) {
+		if (exactPos === null && searchMode !== MismatchDirection.None) {
 			switch (searchMode) {
-				case PlotRowSearchMode.NearestLeft:
+				case MismatchDirection.NearestLeft:
 					return this._searchNearestLeft(index);
-				case PlotRowSearchMode.NearestRight:
+				case MismatchDirection.NearestRight:
 					return this._searchNearestRight(index);
 				default:
 					throw new TypeError('Unknown search mode');

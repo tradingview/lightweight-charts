@@ -2,8 +2,9 @@
 
 import { lowerbound } from '../helpers/algorithms';
 import { ensureNotNull } from '../helpers/assertions';
-import { isString } from '../helpers/strict-type-checks';
+import { clone, isString } from '../helpers/strict-type-checks';
 
+import { WhitespacePlotRow } from '../model/plot-data';
 import { Series, SeriesUpdateInfo } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
@@ -15,7 +16,7 @@ import {
 	SeriesDataItemTypeMap,
 	Time,
 } from './data-consumer';
-import { getSeriesPlotRowCreator, isSeriesPlotRow, WhitespacePlotRow } from './get-series-plot-row-creator';
+import { getSeriesPlotRowCreator, isSeriesPlotRow } from './get-series-plot-row-creator';
 import { fillWeightsForPoints } from './time-scale-point-weight-generator';
 
 type TimedData = Pick<SeriesDataItemTypeMap[SeriesType], 'time'>;
@@ -189,6 +190,10 @@ function seriesUpdateInfo(seriesRows: SeriesPlotRow[] | undefined, prevSeriesRow
 	return undefined;
 }
 
+type SeriesDataItemWithOriginalData<TSeriesType extends SeriesType> = SeriesDataItemTypeMap[TSeriesType] & {
+	original: SeriesDataItemTypeMap[TSeriesType];
+};
+
 export class DataLayer {
 	// note that _pointDataByTimePoint and _seriesRowsBySeries shares THE SAME objects in their values between each other
 	// it's just different kind of maps to make usages/perf better
@@ -234,12 +239,17 @@ export class DataLayer {
 		let seriesRows: (SeriesPlotRow | WhitespacePlotRow)[] = [];
 
 		if (data.length !== 0) {
+			const extendedData = data as SeriesDataItemWithOriginalData<TSeriesType>[];
+			extendedData.forEach((i: SeriesDataItemWithOriginalData<TSeriesType>) => {
+				i.original = clone(i);
+			});
+
 			convertStringsToBusinessDays(data);
 
 			const timeConverter = ensureNotNull(selectTimeConverter(data));
 			const createPlotRow = getSeriesPlotRowCreator(series.seriesType());
 
-			seriesRows = data.map((item: SeriesDataItemTypeMap[TSeriesType]) => {
+			seriesRows = extendedData.map((item: SeriesDataItemWithOriginalData<TSeriesType>) => {
 				const time = timeConverter(item.time);
 
 				let timePointData = this._pointDataByTimePoint.get(time.timestamp);
@@ -250,7 +260,7 @@ export class DataLayer {
 					isTimeScaleAffected = true;
 				}
 
-				const row = createPlotRow(time, timePointData.index, item);
+				const row = createPlotRow(time, timePointData.index, item, item.original);
 				timePointData.mapping.set(series, row);
 				return row;
 			});
@@ -290,6 +300,7 @@ export class DataLayer {
 	}
 
 	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): DataUpdateResponse {
+		const extendedData = data as SeriesDataItemWithOriginalData<TSeriesType>;
 		convertStringToBusinessDay(data);
 
 		const time = ensureNotNull(selectTimeConverter([data]))(data.time);
@@ -312,7 +323,7 @@ export class DataLayer {
 		}
 
 		const createPlotRow = getSeriesPlotRowCreator(series.seriesType());
-		const plotRow = createPlotRow(time, pointDataAtTime.index, data);
+		const plotRow = createPlotRow(time, pointDataAtTime.index, data, extendedData.original);
 		pointDataAtTime.mapping.set(series, plotRow);
 
 		this._updateLastSeriesRow(series, plotRow);

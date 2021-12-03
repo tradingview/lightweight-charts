@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 
 import { ensureNotNull } from '../../src/helpers/assertions';
 import { PlotRowValueIndex } from '../../src/model/plot-data';
-import { PlotList, PlotRowSearchMode } from '../../src/model/plot-list';
+import { MismatchDirection, PlotList } from '../../src/model/plot-list';
 import { TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 function timePoint(val: number): TimePoint {
@@ -48,19 +48,19 @@ describe('PlotList', () => {
 				{ index: 5 as TimePointIndex, time: timePoint(3), value: [100, 200, 300, 400] },
 			]);
 
-			expect(p1.search(-10 as TimePointIndex, PlotRowSearchMode.NearestLeft)).to.be.equal(null);
-			expect(p1.search(-5 as TimePointIndex, PlotRowSearchMode.NearestLeft)).to.deep.include({ index: -5 as TimePointIndex, value: [1, 2, 3, 4] });
-			expect(p1.search(3 as TimePointIndex, PlotRowSearchMode.NearestLeft)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
-			expect(p1.search(1 as TimePointIndex, PlotRowSearchMode.NearestLeft)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
-			expect(p1.search(-6 as TimePointIndex, PlotRowSearchMode.Exact)).to.be.equal(null);
+			expect(p1.search(-10 as TimePointIndex, MismatchDirection.NearestLeft)).to.be.equal(null);
+			expect(p1.search(-5 as TimePointIndex, MismatchDirection.NearestLeft)).to.deep.include({ index: -5 as TimePointIndex, value: [1, 2, 3, 4] });
+			expect(p1.search(3 as TimePointIndex, MismatchDirection.NearestLeft)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
+			expect(p1.search(1 as TimePointIndex, MismatchDirection.NearestLeft)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
+			expect(p1.search(-6 as TimePointIndex, MismatchDirection.None)).to.be.equal(null);
 			expect(p1.search(-5 as TimePointIndex)).to.deep.include({ index: -5 as TimePointIndex, value: [1, 2, 3, 4] });
 			expect(p1.search(0 as TimePointIndex)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
 			expect(p1.search(5 as TimePointIndex)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
 			expect(p1.search(6 as TimePointIndex)).to.be.equal(null);
-			expect(p1.search(-3 as TimePointIndex, PlotRowSearchMode.NearestRight)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
-			expect(p1.search(3 as TimePointIndex, PlotRowSearchMode.NearestRight)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
-			expect(p1.search(5 as TimePointIndex, PlotRowSearchMode.NearestRight)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
-			expect(p1.search(6 as TimePointIndex, PlotRowSearchMode.NearestRight)).to.be.equal(null);
+			expect(p1.search(-3 as TimePointIndex, MismatchDirection.NearestRight)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
+			expect(p1.search(3 as TimePointIndex, MismatchDirection.NearestRight)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
+			expect(p1.search(5 as TimePointIndex, MismatchDirection.NearestRight)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
+			expect(p1.search(6 as TimePointIndex, MismatchDirection.NearestRight)).to.be.equal(null);
 		});
 	});
 

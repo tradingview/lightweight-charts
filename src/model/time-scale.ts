@@ -280,7 +280,7 @@ export class TimeScale {
 	}
 
 	public indexToTime(index: TimePointIndex): TimePoint | null {
-		return this._points[index]?.time || null;
+		return this._points[index]?.time ?? null;
 	}
 
 	public timeToIndex(time: TimePoint, findNearest: boolean): TimePointIndex | null {

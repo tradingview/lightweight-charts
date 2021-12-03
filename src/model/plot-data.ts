@@ -21,4 +21,6 @@ export interface PlotRow {
 	readonly index: TimePointIndex;
 	readonly time: TimePoint;
 	readonly value: PlotRowValue;
+	readonly original?: unknown;
 }
+export type WhitespacePlotRow = Omit<PlotRow, 'value'>;

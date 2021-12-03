@@ -32,7 +32,7 @@ import { isDefaultPriceScale } from './default-price-scale';
 import { FirstValue } from './iprice-data-source';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
-import { PlotRowSearchMode } from './plot-list';
+import { MismatchDirection } from './plot-list';
 import { PriceDataSource } from './price-data-source';
 import { PriceLineOptions } from './price-line-options';
 import { PriceRangeImpl } from './price-range-impl';
@@ -168,7 +168,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			bar = lastBar;
 			lastIndex = lastBar.index;
 		} else {
-			const endBar = this._data.search(visibleBars.right(), PlotRowSearchMode.NearestLeft);
+			const endBar = this._data.search(visibleBars.right(), MismatchDirection.NearestLeft);
 			if (endBar === null) {
 				return noDataRes;
 			}
@@ -307,7 +307,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		const startTimePoint = visibleBars.left();
-		return this._data.search(startTimePoint, PlotRowSearchMode.NearestRight);
+		return this._data.search(startTimePoint, MismatchDirection.NearestRight);
 	}
 
 	public bars(): SeriesPlotList<T> {
@@ -562,7 +562,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			const timePointIndex = ensureNotNull(timeScale.timeToIndex(marker.time, true));
 
 			// and then search that index inside the series data
-			const searchMode = timePointIndex < firstDataIndex ? PlotRowSearchMode.NearestRight : PlotRowSearchMode.NearestLeft;
+			const searchMode = timePointIndex < firstDataIndex ? MismatchDirection.NearestRight : MismatchDirection.NearestLeft;
 			const seriesDataIndex = ensureNotNull(this._data.search(timePointIndex, searchMode)).index;
 			return {
 				time: seriesDataIndex,

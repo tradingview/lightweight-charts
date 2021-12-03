@@ -44,9 +44,12 @@ export interface BusinessDay {
 	day: number;
 }
 
+export type OriginalTime = Nominal<unknown, 'OriginalTime'>;
+
 export interface TimePoint {
 	timestamp: UTCTimestamp;
 	businessDay?: BusinessDay;
+	// originalTime: OriginalTime; // actually it's Time but we shouldn't use it inside our internal ("chart model" level) logic
 }
 
 /**

@@ -1,4 +1,4 @@
-import { PlotRow } from './plot-data';
+import { PlotRow, WhitespacePlotRow } from './plot-data';
 import { PlotList } from './plot-list';
 import { SeriesType } from './series-options';
 
@@ -16,6 +16,7 @@ export interface SeriesPlotRowTypeAtTypeMap {
 }
 
 export type SeriesPlotRow<T extends SeriesType = SeriesType> = SeriesPlotRowTypeAtTypeMap[T];
+export type SeriesPlotRowWithWhitespaces<T extends SeriesType = SeriesType> = SeriesPlotRowTypeAtTypeMap[T] | WhitespacePlotRow;
 export type SeriesPlotList<T extends SeriesType = SeriesType> = PlotList<SeriesPlotRow<T>>;
 
 export function createSeriesPlotList<T extends SeriesType = SeriesType>(): SeriesPlotList<T> {
