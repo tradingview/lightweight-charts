@@ -23,17 +23,27 @@ const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
 
 function downloadTypingsToFile(typingsFilePath, version) {
 	return new Promise((resolve, reject) => {
-		const file = fs.createWriteStream(typingsFilePath);
+		let file;
 		const versionTypingsUrl = `https://unpkg.com/lightweight-charts@${version}/dist/typings.d.ts`;
 		const request = https.get(versionTypingsUrl, response => {
+			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
+				reject(new Error(`Cannot download typings "${versionTypingsUrl}", error code=${response.statusCode}`));
+				return;
+			}
+
+			file = fs.createWriteStream(typingsFilePath);
+			file.on('finish', () => {
+				file.close(resolve);
+			});
+
 			response.pipe(file);
 		});
 
-		file.on('finish', () => {
-			file.close(resolve);
-		});
-
 		request.on('error', error => {
+			if (file !== undefined) {
+				file.close();
+			}
+
 			reject(error);
 		});
 	});
