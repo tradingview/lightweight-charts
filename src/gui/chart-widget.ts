@@ -246,13 +246,17 @@ export class ChartWidget implements IDestroyable {
 					const paneWidgetHeight = paneWidget.getSize().height;
 					const priceAxisWidget = ensureNotNull(position === 'left' ? paneWidget.leftPriceAxisWidget() : paneWidget.rightPriceAxisWidget());
 					const image = priceAxisWidget.getImage();
-					ctx.drawImage(image, targetX, targetY, priceAxisWidget.getWidth(), paneWidgetHeight);
+					if (image.width > 0 && image.height > 0) {
+						ctx.drawImage(image, targetX, targetY, priceAxisWidget.getWidth(), paneWidgetHeight);
+					}
 					targetY += paneWidgetHeight;
 					// if (paneIndex < this._paneWidgets.length - 1) {
 					// 	const separator = this._paneSeparators[paneIndex];
 					// 	const separatorSize = separator.getSize();
 					// 	const separatorImage = separator.getImage();
-					// 	ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
+					// if (separatorImage.width > 0 && separatorImage.height > 0) {
+					// 		ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
+					// }
 					// 	targetY += separatorSize.h;
 					// }
 				}
@@ -267,13 +271,17 @@ export class ChartWidget implements IDestroyable {
 				const paneWidget = this._paneWidgets[paneIndex];
 				const paneWidgetSize = paneWidget.getSize();
 				const image = paneWidget.getImage();
-				ctx.drawImage(image, targetX, targetY, paneWidgetSize.width, paneWidgetSize.height);
+				if (image.width > 0 && image.height > 0) {
+					ctx.drawImage(image, targetX, targetY, paneWidgetSize.width, paneWidgetSize.height);
+				}
 				targetY += paneWidgetSize.height;
 				// if (paneIndex < this._paneWidgets.length - 1) {
 				// 	const separator = this._paneSeparators[paneIndex];
 				// 	const separatorSize = separator.getSize();
 				// 	const separatorImage = separator.getImage();
-				// 	ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
+				// if (separatorImage.width > 0 && separatorImage.height > 0) {
+				// 		ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
+				// }
 				// 	targetY += separatorSize.h;
 				// }
 			}
@@ -286,7 +294,9 @@ export class ChartWidget implements IDestroyable {
 				const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
 				const stubSize = stub.getSize();
 				const stubImage = stub.getImage();
-				ctx.drawImage(stubImage, targetX, targetY, stubSize.width, stubSize.height);
+				if (stubImage.width > 0 && stubImage.height > 0) {
+					ctx.drawImage(stubImage, targetX, targetY, stubSize.width, stubSize.height);
+				}
 			};
 			// draw time scale
 			if (this._options.timeScale.visible) {
@@ -297,7 +307,9 @@ export class ChartWidget implements IDestroyable {
 				}
 				const timeAxisSize = this._timeAxisWidget.getSize();
 				const timeAxisImage = this._timeAxisWidget.getImage();
-				ctx.drawImage(timeAxisImage, targetX, targetY, timeAxisSize.width, timeAxisSize.height);
+				if (timeAxisImage.width > 0 && timeAxisImage.height > 0) {
+					ctx.drawImage(timeAxisImage, targetX, targetY, timeAxisSize.width, timeAxisSize.height);
+				}
 				if (this._isRightAxisVisible()) {
 					targetX += firstPane.getSize().width;
 					drawStub('right');
