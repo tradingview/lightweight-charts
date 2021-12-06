@@ -151,6 +151,12 @@ const config = {
 						type: 'docsVersionDropdown',
 						position: 'right',
 						dropdownActiveClassDisabled: true,
+						dropdownItemsAfter: [
+							{
+								href: 'https://github.com/tradingview/lightweight-charts/tree/v3.7.0/docs',
+								label: '3.7.0',
+							},
+						],
 					},
 					{
 						href: projectUrl,
