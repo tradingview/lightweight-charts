@@ -19,6 +19,8 @@ const githubPagesUrl = `https://${organizationName}.github.io/`;
 
 const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
 
+const typedocWatch = process.env.TYPEDOC_WATCH === 'true';
+
 function downloadTypingsToFile(typingsFilePath, version) {
 	return new Promise((resolve, reject) => {
 		let file;
@@ -232,8 +234,8 @@ const config = {
 				...commonDocusaurusPluginTypedocConfig,
 				id: 'current-api',
 				entryPoints: ['../dist/typings.d.ts'],
-				watch: true,
-				preserveWatchOutput: true,
+				watch: typedocWatch,
+				preserveWatchOutput: typedocWatch,
 			}),
 		],
 		...versions.map(typedocPluginForVersion),
