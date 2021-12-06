@@ -17,8 +17,6 @@ const projectName = 'lightweight-charts';
 const projectUrl = `https://github.com/${organizationName}/${projectName}`;
 const githubPagesUrl = `https://${organizationName}.github.io/`;
 
-const latestVersion = versions[0];
-
 const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
 
 function downloadTypingsToFile(typingsFilePath, version) {
@@ -119,7 +117,6 @@ const config = {
 				blog: false,
 				docs: {
 					sidebarPath: require.resolve('./sidebars.js'),
-					versions: versions.reduce((opts, v) => ({ ...opts, [v]: { path: v } }), {}),
 				},
 				theme: {
 					customCss: require.resolve('./src/css/custom.css'),
@@ -169,11 +166,11 @@ const config = {
 						items: [
 							{
 								label: 'Getting Started',
-								to: `/docs/${latestVersion}`,
+								to: '/docs',
 							},
 							{
 								label: 'API Reference',
-								to: `/docs/${latestVersion}/api`,
+								to: '/docs/api',
 							},
 						],
 					},

@@ -5,10 +5,6 @@ import { createChart, LineData, UTCTimestamp } from 'lightweight-charts';
 import React, { ReactElement } from 'react';
 import useResizeObserver from 'use-resize-observer';
 
-import versions from '../../versions.json';
-
-const latestVersion = versions[0];
-
 interface HeroProps {
 	title: string;
 	subTitle: string;
@@ -23,7 +19,7 @@ function Hero(props: HeroProps): JSX.Element {
 						<h1 className="hero__title">{props.title}</h1>
 						<p className="hero__subtitle">{props.subTitle}</p>
 						<div>
-							<Link to={`/docs/${latestVersion}`} className="button button--secondary button--outline button--lg">
+							<Link to={'/docs'} className="button button--secondary button--outline button--lg">
 								Get Started
 							</Link>
 						</div>
