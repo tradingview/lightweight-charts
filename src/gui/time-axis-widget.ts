@@ -254,13 +254,15 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		if (type !== InvalidationLevel.Cursor) {
 			const ctx = getContext2D(this._canvasBinding.canvasElement);
 			const canvasRenderingParams = getCanvasRenderingParams(this._canvasBinding);
-			this._drawBackground(ctx, canvasRenderingParams);
-			this._drawBorder(ctx, canvasRenderingParams);
+			if (canvasRenderingParams !== null) {
+				this._drawBackground(ctx, canvasRenderingParams);
+				this._drawBorder(ctx, canvasRenderingParams);
 
-			this._drawTickMarks(ctx, canvasRenderingParams);
-			// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
-			// so let's don't call this code at all for now
-			// this._drawLabels(this._chart.model().dataSources(), ctx, pixelRatio);
+				this._drawTickMarks(ctx, canvasRenderingParams);
+				// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
+				// so let's don't call this code at all for now
+				// this._drawLabels(this._chart.model().dataSources(), ctx, canvasRenderingParams);
+			}
 
 			if (this._leftStub !== null) {
 				this._leftStub.paint(type);
@@ -272,9 +274,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
 		const topCanvasRenderingParams = getCanvasRenderingParams(this._topCanvasBinding);
-
-		topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
-		this._drawLabels([this._chart.model().crosshairSource()], topCtx, topCanvasRenderingParams);
+		if (topCanvasRenderingParams !== null) {
+			topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
+			this._drawLabels([this._chart.model().crosshairSource()], topCtx, topCanvasRenderingParams);
+		}
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {

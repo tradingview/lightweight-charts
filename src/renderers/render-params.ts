@@ -18,6 +18,16 @@ export class CanvasRenderingParams {
 	}
 }
 
-export function getCanvasRenderingParams(binding: CanvasElementBitmapSizeBinding): CanvasRenderingParams {
+export function getCanvasRenderingParams(binding: CanvasElementBitmapSizeBinding): CanvasRenderingParams | null {
+	const canvasSize = binding.canvasElementClientSize;
+	if (canvasSize.width === 0 || canvasSize.height === 0) {
+		return null;
+	}
+
+	const bitmapSize = binding.bitmapSize;
+	if (bitmapSize.width === 0 || bitmapSize.height === 0) {
+		return null;
+	}
+
 	return new CanvasRenderingParams(binding.canvasElementClientSize, binding.bitmapSize);
 }

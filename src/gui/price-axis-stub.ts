@@ -96,8 +96,10 @@ export class PriceAxisStub implements IDestroyable {
 
 		const ctx = getContext2D(this._canvasBinding.canvasElement);
 		const canvasRenderingParams = getCanvasRenderingParams(this._canvasBinding);
-		this._drawBackground(ctx, canvasRenderingParams);
-		this._drawBorder(ctx, canvasRenderingParams);
+		if (canvasRenderingParams !== null) {
+			this._drawBackground(ctx, canvasRenderingParams);
+			this._drawBorder(ctx, canvasRenderingParams);
+		}
 	}
 
 	public getImage(): HTMLCanvasElement {

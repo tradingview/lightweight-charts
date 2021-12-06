@@ -270,17 +270,20 @@ export class PriceAxisWidget implements IDestroyable {
 			const ctx = getContext2D(this._canvasBinding.canvasElement);
 			this._alignLabels();
 			const canvasRenderingParams = getCanvasRenderingParams(this._canvasBinding);
-			this._drawBackground(ctx, canvasRenderingParams);
-			this._drawBorder(ctx, canvasRenderingParams);
-			this._drawTickMarks(ctx, canvasRenderingParams);
-			this._drawBackLabels(ctx, canvasRenderingParams);
+			if (canvasRenderingParams !== null) {
+				this._drawBackground(ctx, canvasRenderingParams);
+				this._drawBorder(ctx, canvasRenderingParams);
+				this._drawTickMarks(ctx, canvasRenderingParams);
+				this._drawBackLabels(ctx, canvasRenderingParams);
+			}
 		}
 
 		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
 		const topCanvasRenderingParams = getCanvasRenderingParams(this._topCanvasBinding);
-		topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
-
-		this._drawCrosshairLabel(topCtx, topCanvasRenderingParams);
+		if (topCanvasRenderingParams !== null) {
+			topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
+			this._drawCrosshairLabel(topCtx, topCanvasRenderingParams);
+		}
 	}
 
 	public getImage(): HTMLCanvasElement {

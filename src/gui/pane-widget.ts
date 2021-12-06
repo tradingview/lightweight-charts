@@ -552,22 +552,26 @@ export class PaneWidget implements IDestroyable {
 
 		if (type !== InvalidationLevel.Cursor) {
 			const ctx = getContext2D(this._canvasBinding.canvasElement);
-			ctx.save();
 			const canvasRenderingParams = getCanvasRenderingParams(this._canvasBinding);
-			this._drawBackground(ctx, canvasRenderingParams);
-			if (this._state) {
-				this._drawGrid(ctx, canvasRenderingParams);
-				this._drawWatermark(ctx, canvasRenderingParams);
-				this._drawSources(ctx, canvasRenderingParams, sourcePaneViews);
+			if (canvasRenderingParams !== null) {
+				ctx.save();
+				this._drawBackground(ctx, canvasRenderingParams);
+				if (this._state) {
+					this._drawGrid(ctx, canvasRenderingParams);
+					this._drawWatermark(ctx, canvasRenderingParams);
+					this._drawSources(ctx, canvasRenderingParams, sourcePaneViews);
+				}
+				ctx.restore();
 			}
-			ctx.restore();
 		}
 
-		const topCanvasRenderingParams = getCanvasRenderingParams(this._topCanvasBinding);
 		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
-		topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
-		this._drawSources(topCtx, topCanvasRenderingParams, sourceTopPaneViews);
-		this._drawCrosshair(topCtx, topCanvasRenderingParams);
+		const topCanvasRenderingParams = getCanvasRenderingParams(this._topCanvasBinding);
+		if (topCanvasRenderingParams !== null) {
+			topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
+			this._drawSources(topCtx, topCanvasRenderingParams, sourceTopPaneViews);
+			this._drawCrosshair(topCtx, topCanvasRenderingParams);
+		}
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
