@@ -394,9 +394,18 @@ export class ChartModel implements IDestroyable {
 
 			return;
 		}
-
-		res.priceScale.applyOptions(options);
-		this._priceScalesOptionsChanged.fire();
+		if (priceScaleId === 'left') {
+			this.applyOptions({
+				leftPriceScale: options,
+			});
+		} else if (priceScaleId === 'right') {
+			this.applyOptions({
+				rightPriceScale: options,
+			});
+		} else {
+			res.priceScale.applyOptions(options);
+			this._priceScalesOptionsChanged.fire();
+		}
 	}
 
 	public findPriceScale(priceScaleId: string): PriceScaleOnPane | null {

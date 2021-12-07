@@ -69,9 +69,8 @@ export class PanePriceAxisView implements IPaneView {
 		}
 
 		const position = pane.priceScalePosition(priceScale);
-		if (position === 'overlay') {
-			return null;
-		}
+		// with no left and right price scale, overlay will be align to the right
+		const align = position === 'overlay' ? 'right' : position;
 
 		const options = this._chartModel.priceAxisRendererOptions();
 		if (options.fontSize !== this._fontSize) {
@@ -79,7 +78,7 @@ export class PanePriceAxisView implements IPaneView {
 			this._textWidthCache.reset();
 		}
 
-		this._renderer.setParams(this._priceAxisView.paneRenderer(), options, width, position);
+		this._renderer.setParams(this._priceAxisView.paneRenderer(), options, width, align);
 		return this._renderer;
 	}
 }
