@@ -77,6 +77,7 @@ export const enum TickMarkWeight {
 export interface TimeScalePoint {
 	readonly timeWeight: TickMarkWeight;
 	readonly time: TimePoint;
+	readonly originalTime: OriginalTime;
 }
 
 /**

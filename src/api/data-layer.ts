@@ -1,18 +1,21 @@
 /// <reference types="_build-time-constants" />
 
 import { lowerbound } from '../helpers/algorithms';
-import { ensureNotNull } from '../helpers/assertions';
+import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { clone, isString } from '../helpers/strict-type-checks';
 
 import { WhitespacePlotRow } from '../model/plot-data';
 import { Series, SeriesUpdateInfo } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
-import { BusinessDay, TimePoint, TimePointIndex, TimeScalePoint, UTCTimestamp } from '../model/time-data';
+import { BusinessDay, OriginalTime, TimePoint, TimePointIndex, TimeScalePoint, UTCTimestamp } from '../model/time-data';
 
 import {
+	BarData,
+	HistogramData,
 	isBusinessDay,
 	isUTCTimestamp,
+	LineData,
 	SeriesDataItemTypeMap,
 	Time,
 } from './data-consumer';
@@ -190,6 +193,24 @@ function seriesUpdateInfo(seriesRows: SeriesPlotRow[] | undefined, prevSeriesRow
 	return undefined;
 }
 
+function timeScalePointTime(mergedPointData: Map<Series, SeriesPlotRow | WhitespacePlotRow>): OriginalTime {
+	let result: Time | undefined;
+	mergedPointData.forEach((v: SeriesPlotRow | WhitespacePlotRow) => {
+		if (result === undefined) {
+			result = (v.original as (BarData | HistogramData | LineData)).time;
+		}
+	});
+
+	return ensureDefined(result) as unknown as OriginalTime;
+}
+
+function saveOriginal<TSeriesType extends SeriesType>(data: SeriesDataItemWithOriginalData<TSeriesType>): void {
+	// eslint-disable-next-line @typescript-eslint/tslint/config
+	if (data.original === undefined) {
+		data.original = clone(data);
+	}
+}
+
 type SeriesDataItemWithOriginalData<TSeriesType extends SeriesType> = SeriesDataItemTypeMap[TSeriesType] & {
 	original: SeriesDataItemTypeMap[TSeriesType];
 };
@@ -240,9 +261,7 @@ export class DataLayer {
 
 		if (data.length !== 0) {
 			const extendedData = data as SeriesDataItemWithOriginalData<TSeriesType>[];
-			extendedData.forEach((i: SeriesDataItemWithOriginalData<TSeriesType>) => {
-				i.original = clone(i);
-			});
+			extendedData.forEach((i: SeriesDataItemWithOriginalData<TSeriesType>) => saveOriginal(i));
 
 			convertStringsToBusinessDays(data);
 
@@ -280,7 +299,12 @@ export class DataLayer {
 			// timeWeight will be updates in _updateTimeScalePoints later
 			const newTimeScalePoints: InternalTimeScalePoint[] = [];
 			this._pointDataByTimePoint.forEach((pointData: TimePointData) => {
-				newTimeScalePoints.push({ timeWeight: 0, time: pointData.timePoint, pointData });
+				newTimeScalePoints.push({
+					timeWeight: 0,
+					time: pointData.timePoint,
+					pointData,
+					originalTime: timeScalePointTime(pointData.mapping),
+				});
 			});
 
 			newTimeScalePoints.sort((t1: InternalTimeScalePoint, t2: InternalTimeScalePoint) => t1.time.timestamp - t2.time.timestamp);
@@ -301,6 +325,7 @@ export class DataLayer {
 
 	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType]): DataUpdateResponse {
 		const extendedData = data as SeriesDataItemWithOriginalData<TSeriesType>;
+		saveOriginal(extendedData);
 		convertStringToBusinessDay(data);
 
 		const time = ensureNotNull(selectTimeConverter([data]))(data.time);
@@ -335,7 +360,12 @@ export class DataLayer {
 			return this._getUpdateResponse(series, -1, info);
 		}
 
-		const newPoint: InternalTimeScalePoint = { timeWeight: 0, time: pointDataAtTime.timePoint, pointData: pointDataAtTime };
+		const newPoint: InternalTimeScalePoint = {
+			timeWeight: 0,
+			time: pointDataAtTime.timePoint,
+			pointData: pointDataAtTime,
+			originalTime: timeScalePointTime(pointDataAtTime.mapping),
+		};
 
 		const insertIndex = lowerbound(this._sortedTimePoints, newPoint.time.timestamp, (a: InternalTimeScalePoint, b: number) => a.time.timestamp < b);
 

@@ -283,6 +283,10 @@ export class TimeScale {
 		return this._points[index]?.time ?? null;
 	}
 
+	public indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint | null {
+		return this._points[index] ?? null;
+	}
+
 	public timeToIndex(time: TimePoint, findNearest: boolean): TimePointIndex | null {
 		if (this._points.length < 1) {
 			// no time points available

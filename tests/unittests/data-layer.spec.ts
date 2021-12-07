@@ -44,8 +44,8 @@ describe('DataLayer', () => {
 		const updateResult1 = dataLayer.setSeriesData(series1, [dataItemAt(1000 as UTCTimestamp), dataItemAt(3000 as UTCTimestamp)]);
 		expect(updateResult1.timeScale.baseIndex).to.be.equal(1 as TimePointIndex);
 		expect(updateResult1.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-			{ time: { timestamp: 1000 }, timeWeight: 70 },
-			{ time: { timestamp: 3000 }, timeWeight: 22 },
+			{ time: { timestamp: 1000 }, timeWeight: 70, originalTime: 1000 },
+			{ time: { timestamp: 3000 }, timeWeight: 22, originalTime: 3000 },
 		]);
 		expect(updateResult1.timeScale.firstChangedPointIndex).to.be.equal(0);
 		expect(updateResult1.series.size).to.be.equal(1);
@@ -62,10 +62,10 @@ describe('DataLayer', () => {
 		const updateResult2 = dataLayer.setSeriesData(series2, [dataItemAt(2000 as UTCTimestamp), dataItemAt(4000 as UTCTimestamp)]);
 		expect(updateResult2.timeScale.baseIndex).to.be.equal(3 as TimePointIndex);
 		expect(updateResult2.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-			{ time: { timestamp: 1000 }, timeWeight: 70 },
-			{ time: { timestamp: 2000 }, timeWeight: 22 },
-			{ time: { timestamp: 3000 }, timeWeight: 21 },
-			{ time: { timestamp: 4000 }, timeWeight: 30 },
+			{ time: { timestamp: 1000 }, timeWeight: 70, originalTime: 1000 },
+			{ time: { timestamp: 2000 }, timeWeight: 22, originalTime: 2000 },
+			{ time: { timestamp: 3000 }, timeWeight: 21, originalTime: 3000 },
+			{ time: { timestamp: 4000 }, timeWeight: 30, originalTime: 4000 },
 		]);
 		expect(updateResult2.timeScale.firstChangedPointIndex).to.be.equal(1);
 		expect(updateResult2.series.size).to.be.equal(2);
@@ -127,10 +127,10 @@ describe('DataLayer', () => {
 
 		expect(updateResult.timeScale.baseIndex).to.be.equal(3 as TimePointIndex);
 		expect(updateResult.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-			{ time: { timestamp: 2000 }, timeWeight: 70 },
-			{ time: { timestamp: 3000 }, timeWeight: 21 },
-			{ time: { timestamp: 5000 }, timeWeight: 30 },
-			{ time: { timestamp: 7000 }, timeWeight: 22 },
+			{ time: { timestamp: 2000 }, timeWeight: 70, originalTime: 2000 },
+			{ time: { timestamp: 3000 }, timeWeight: 21, originalTime: 3000 },
+			{ time: { timestamp: 5000 }, timeWeight: 30, originalTime: 5000 },
+			{ time: { timestamp: 7000 }, timeWeight: 22, originalTime: 7000 },
 		]);
 		expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(2);
 		expect(updateResult.series.size).to.be.equal(3);
@@ -194,11 +194,11 @@ describe('DataLayer', () => {
 		const updateResult1 = dataLayer.updateSeriesData(series1, dataItemAt(5000 as UTCTimestamp));
 		expect(updateResult1.timeScale.baseIndex).to.be.equal(4 as TimePointIndex);
 		expect(updateResult1.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-			{ time: { timestamp: 1000 }, timeWeight: 70 },
-			{ time: { timestamp: 2000 }, timeWeight: 22 },
-			{ time: { timestamp: 3000 }, timeWeight: 21 },
-			{ time: { timestamp: 4000 }, timeWeight: 30 },
-			{ time: { timestamp: 5000 }, timeWeight: 21 },
+			{ time: { timestamp: 1000 }, timeWeight: 70, originalTime: 1000 },
+			{ time: { timestamp: 2000 }, timeWeight: 22, originalTime: 2000 },
+			{ time: { timestamp: 3000 }, timeWeight: 21, originalTime: 3000 },
+			{ time: { timestamp: 4000 }, timeWeight: 30, originalTime: 4000 },
+			{ time: { timestamp: 5000 }, timeWeight: 21, originalTime: 5000 },
 		]);
 		expect(updateResult1.timeScale.firstChangedPointIndex).to.be.equal(4);
 
@@ -216,12 +216,12 @@ describe('DataLayer', () => {
 		const updateResult2 = dataLayer.updateSeriesData(series2, dataItemAt(6000 as UTCTimestamp));
 		expect(updateResult2.timeScale.baseIndex).to.be.equal(5 as TimePointIndex);
 		expect(updateResult2.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-			{ time: { timestamp: 1000 }, timeWeight: 70 },
-			{ time: { timestamp: 2000 }, timeWeight: 22 },
-			{ time: { timestamp: 3000 }, timeWeight: 21 },
-			{ time: { timestamp: 4000 }, timeWeight: 30 },
-			{ time: { timestamp: 5000 }, timeWeight: 21 },
-			{ time: { timestamp: 6000 }, timeWeight: 22 },
+			{ time: { timestamp: 1000 }, timeWeight: 70, originalTime: 1000 },
+			{ time: { timestamp: 2000 }, timeWeight: 22, originalTime: 2000 },
+			{ time: { timestamp: 3000 }, timeWeight: 21, originalTime: 3000 },
+			{ time: { timestamp: 4000 }, timeWeight: 30, originalTime: 4000 },
+			{ time: { timestamp: 5000 }, timeWeight: 21, originalTime: 5000 },
+			{ time: { timestamp: 6000 }, timeWeight: 22, originalTime: 6000 },
 		]);
 		expect(updateResult2.timeScale.firstChangedPointIndex).to.be.equal(5);
 
@@ -289,11 +289,11 @@ describe('DataLayer', () => {
 		const updateResult = dataLayer.updateSeriesData(series2, dataItemAt(4000 as UTCTimestamp));
 		expect(updateResult.timeScale.baseIndex).to.be.equal(4 as TimePointIndex);
 		expect(updateResult.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-			{ time: { timestamp: 2000 }, timeWeight: 22 },
-			{ time: { timestamp: 3000 }, timeWeight: 21 },
-			{ time: { timestamp: 4000 }, timeWeight: 30 },
-			{ time: { timestamp: 5000 }, timeWeight: 21 },
-			{ time: { timestamp: 6000 }, timeWeight: 22 },
+			{ time: { timestamp: 2000 }, timeWeight: 22, originalTime: 2000 },
+			{ time: { timestamp: 3000 }, timeWeight: 21, originalTime: 3000 },
+			{ time: { timestamp: 4000 }, timeWeight: 30, originalTime: 4000 },
+			{ time: { timestamp: 5000 }, timeWeight: 21, originalTime: 5000 },
+			{ time: { timestamp: 6000 }, timeWeight: 22, originalTime: 6000 },
 		]);
 		expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(2);
 		expect(updateResult.series.size).to.be.equal(2);
@@ -348,8 +348,8 @@ describe('DataLayer', () => {
 		};
 
 		expect(updateResult1.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-			{ time: timePoint1, timeWeight: 60 },
-			{ time: timePoint2, timeWeight: 50 },
+			{ time: timePoint1, timeWeight: 60, originalTime: { day: 1, month: 10, year: 2019 } },
+			{ time: timePoint2, timeWeight: 50, originalTime: { day: 2, month: 10, year: 2019 } },
 		]);
 		expect(updateResult1.series.size).to.be.equal(1);
 		updateResult1.series.forEach((updatePacket: SeriesChanges, series: Series) => {
@@ -655,10 +655,10 @@ describe('DataLayer', () => {
 
 			expect(updateResult.timeScale.baseIndex).to.be.equal(3 as TimePointIndex);
 			expect(updateResult.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-				{ time: { timestamp: 1000 }, timeWeight: 21 },
-				{ time: { timestamp: 2000 }, timeWeight: 22 },
-				{ time: { timestamp: 3000 }, timeWeight: 21 },
-				{ time: { timestamp: 4000 }, timeWeight: 30 },
+				{ time: { timestamp: 1000 }, timeWeight: 21, originalTime: 1000 },
+				{ time: { timestamp: 2000 }, timeWeight: 22, originalTime: 2000 },
+				{ time: { timestamp: 3000 }, timeWeight: 21, originalTime: 3000 },
+				{ time: { timestamp: 4000 }, timeWeight: 30, originalTime: 4000 },
 			]);
 			expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(0);
 
@@ -689,9 +689,9 @@ describe('DataLayer', () => {
 
 			expect(updateResult.timeScale.baseIndex).to.be.equal(1 as TimePointIndex);
 			expect(updateResult.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-				{ time: { timestamp: 1000 }, timeWeight: 70 },
-				{ time: { timestamp: 4000 }, timeWeight: 30 },
-				{ time: { timestamp: 5000 }, timeWeight: 21 },
+				{ time: { timestamp: 1000 }, timeWeight: 70, originalTime: 1000 },
+				{ time: { timestamp: 4000 }, timeWeight: 30, originalTime: 4000 },
+				{ time: { timestamp: 5000 }, timeWeight: 21, originalTime: 5000 },
 			]);
 			expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(2);
 
@@ -787,11 +787,11 @@ describe('DataLayer', () => {
 
 			expect(updateResult.timeScale.baseIndex).to.be.equal(4 as TimePointIndex);
 			expect(updateResult.timeScale.points).excludingEvery('pointData').to.have.deep.members([
-				{ time: { timestamp: 1000 }, timeWeight: 70 },
-				{ time: { timestamp: 2000 }, timeWeight: 22 },
-				{ time: { timestamp: 3000 }, timeWeight: 21 },
-				{ time: { timestamp: 4000 }, timeWeight: 30 },
-				{ time: { timestamp: 5000 }, timeWeight: 21 },
+				{ time: { timestamp: 1000 }, timeWeight: 70, originalTime: 1000 },
+				{ time: { timestamp: 2000 }, timeWeight: 22, originalTime: 2000 },
+				{ time: { timestamp: 3000 }, timeWeight: 21, originalTime: 3000 },
+				{ time: { timestamp: 4000 }, timeWeight: 30, originalTime: 4000 },
+				{ time: { timestamp: 5000 }, timeWeight: 21, originalTime: 5000 },
 			]);
 			expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(3);
 
@@ -840,7 +840,7 @@ describe('DataLayer', () => {
 			]);
 
 			expect(updateResult.timeScale.baseIndex).to.be.equal(3 as TimePointIndex);
-			expect(updateResult.timeScale.points).excludingEvery('pointData').to.have.deep.members([
+			expect(updateResult.timeScale.points).excludingEvery(['pointData', 'originalTime']).to.have.deep.members([
 				{ time: { timestamp: 1000 }, timeWeight: 70 },
 				{ time: { timestamp: 2000 }, timeWeight: 22 },
 				{ time: { timestamp: 3000 }, timeWeight: 21 },
