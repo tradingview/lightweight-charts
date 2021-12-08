@@ -475,7 +475,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const rendererOptions = this.rendererOptions();
 
 		// if we are default price scale, append labels from no-scale
-		const isDefault = this._priceScale === paneState.defaultPriceScale();
+		const isDefault = this._priceScale === paneState.defaultVisiblePriceScale();
 
 		if (isDefault) {
 			this._pane.state().orderedSources().forEach((source: IPriceDataSource) => {

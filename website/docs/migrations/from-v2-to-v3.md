@@ -10,8 +10,8 @@ In this document you can find the migration guide from the previous version to 3
 Previously, to handle changing visible time range you needed to use `subscribeVisibleTimeRangeChange` and `unsubscribeVisibleTimeRangeChange` to subscribe and unsubscribe from visible range events.
 These methods were available in the chart object  (e.g. you call it like `chart.subscribeVisibleTimeRangeChange(func)`).
 
-In 3.0 in order to make API more consistent with the new API we decided to move these methods to [ITimeScaleApi](/api/interfaces/ITimeScaleApi)
-(along with the new subscription methods [`ITimeScaleApi.subscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange) and [`ITimeScaleApi.unsubscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi#unsubscribevisiblelogicalrangechange)).
+In 3.0 in order to make API more consistent with the new API we decided to move these methods to [ITimeScaleApi](/api/interfaces/ITimeScaleApi.md)
+(along with the new subscription methods [`ITimeScaleApi.subscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi.md#subscribevisiblelogicalrangechange) and [`ITimeScaleApi.unsubscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi.md#unsubscribevisiblelogicalrangechange)).
 
 So, to migrate your code to 3.0 you just need to replace:
 
