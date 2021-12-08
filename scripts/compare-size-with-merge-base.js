@@ -67,7 +67,7 @@ async function main() {
 		headRev = runForOutput('git rev-parse HEAD');
 	}
 
-	const revToCheck = runForOutput(`git merge-base origin/master "${headRev}"`);
+	const revToCheck = runForOutput(`git merge-base origin/next "${headRev}"`);
 
 	console.log(`Using "${revToCheck}" as base\n`);
 

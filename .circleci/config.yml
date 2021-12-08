@@ -25,6 +25,7 @@ aliases:
       branches:
         ignore:
           - master
+          - next
           - /release\/.*/
 
 
@@ -150,7 +151,7 @@ jobs:
     executor: node12-executor
     steps:
       - checkout-with-deps
-      - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
+      - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/next HEAD) $(git rev-parse HEAD)
       - store_artifacts:
           path: ./dts-changes
           when: on_fail
