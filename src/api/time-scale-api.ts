@@ -1,4 +1,5 @@
 import { Size } from 'fancy-canvas';
+
 import { TimeAxisWidget } from '../gui/time-axis-widget';
 
 import { assert } from '../helpers/assertions';
