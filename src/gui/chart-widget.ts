@@ -235,8 +235,8 @@ export class ChartWidget implements IDestroyable {
 					const paneWidget = this._paneWidgets[paneIndex];
 					const paneWidgetHeight = paneWidget.getSize().h;
 					const priceAxisWidget = ensureNotNull(position === 'left' ? paneWidget.leftPriceAxisWidget() : paneWidget.rightPriceAxisWidget());
-					const image = priceAxisWidget.getImage();
-					ctx.drawImage(image, targetX, targetY, priceAxisWidget.getWidth(), paneWidgetHeight);
+					const image = priceAxisWidget[0].getImage();
+					ctx.drawImage(image, targetX, targetY, priceAxisWidget[0].getWidth(), paneWidgetHeight);
 					targetY += paneWidgetHeight;
 					// if (paneIndex < this._paneWidgets.length - 1) {
 					// 	const separator = this._paneSeparators[paneIndex];
@@ -250,7 +250,7 @@ export class ChartWidget implements IDestroyable {
 			// draw left price scale if exists
 			if (this._isLeftAxisVisible()) {
 				drawPriceAxises('left');
-				targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getWidth();
+				targetX = ensureNotNull(firstPane.leftPriceAxisWidget())[0].getWidth();
 			}
 			targetY = 0;
 			for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
@@ -283,7 +283,7 @@ export class ChartWidget implements IDestroyable {
 				targetX = 0;
 				if (this._isLeftAxisVisible()) {
 					drawStub('left');
-					targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getWidth();
+					targetX = ensureNotNull(firstPane.leftPriceAxisWidget())[0].getWidth() + ensureNotNull(firstPane.leftPriceAxisWidget())[1].getWidth();
 				}
 				const size = this._timeAxisWidget.getSize();
 				const image = this._timeAxisWidget.getImage();
@@ -321,7 +321,7 @@ export class ChartWidget implements IDestroyable {
 		const priceAxisWidget = position === 'left'
 			? this._paneWidgets[0].leftPriceAxisWidget()
 			: this._paneWidgets[0].rightPriceAxisWidget();
-		return ensureNotNull(priceAxisWidget).getWidth();
+		return ensureNotNull(priceAxisWidget)[0].getWidth();
 	}
 
 	// eslint-disable-next-line complexity
@@ -332,10 +332,10 @@ export class ChartWidget implements IDestroyable {
 
 		for (const paneWidget of this._paneWidgets) {
 			if (this._isLeftAxisVisible()) {
-				leftPriceAxisWidth = Math.max(leftPriceAxisWidth, ensureNotNull(paneWidget.leftPriceAxisWidget()).optimalWidth());
+				leftPriceAxisWidth = Math.max(leftPriceAxisWidth, ensureNotNull(paneWidget.leftPriceAxisWidget())[0].optimalWidth());
 			}
 			if (this._isRightAxisVisible()) {
-				rightPriceAxisWidth = Math.max(rightPriceAxisWidth, ensureNotNull(paneWidget.rightPriceAxisWidget()).optimalWidth());
+				rightPriceAxisWidth = Math.max(rightPriceAxisWidth, ensureNotNull(paneWidget.rightPriceAxisWidget())[0].optimalWidth());
 			}
 
 			totalStretch += paneWidget.stretchFactor();

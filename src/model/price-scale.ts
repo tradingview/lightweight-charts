@@ -177,6 +177,7 @@ export interface PriceScaleOptions {
 	 * @defaultValue `true`
 	 */
 	drawTicks: boolean;
+	num: number;
 }
 
 interface RangeCache {

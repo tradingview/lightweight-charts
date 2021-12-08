@@ -21,10 +21,12 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 	leftPriceScale: {
 		...priceScaleOptionsDefaults,
 		visible: false,
+		num: 1,
 	},
 	rightPriceScale: {
 		...priceScaleOptionsDefaults,
 		visible: true,
+		num: 1,
 	},
 	timeScale: timeScaleOptionsDefaults,
 	watermark: watermarkOptionsDefaults,

@@ -78,8 +78,8 @@ export class PaneWidget implements IDestroyable {
 	private readonly _chart: ChartWidget;
 	private _state: Pane | null;
 	private _size: Size = new Size(0, 0);
-	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
-	private _rightPriceAxisWidget: PriceAxisWidget | null = null;
+	private _leftPriceAxisWidget: PriceAxisWidget[] | null = null;
+	private _rightPriceAxisWidget: PriceAxisWidget[] | null = null;
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
@@ -156,10 +156,14 @@ export class PaneWidget implements IDestroyable {
 
 	public destroy(): void {
 		if (this._leftPriceAxisWidget !== null) {
-			this._leftPriceAxisWidget.destroy();
+			this._leftPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				item.destroy();
+			});
 		}
 		if (this._rightPriceAxisWidget !== null) {
-			this._rightPriceAxisWidget.destroy();
+			this._rightPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				item.destroy();
+			});
 		}
 
 		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
@@ -213,11 +217,15 @@ export class PaneWidget implements IDestroyable {
 
 		if (this._leftPriceAxisWidget !== null) {
 			const leftPriceScale = this._state.leftPriceScale();
-			this._leftPriceAxisWidget.setPriceScale(ensureNotNull(leftPriceScale));
+			this._leftPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				item.setPriceScale(ensureNotNull(leftPriceScale));
+			});
 		}
 		if (this._rightPriceAxisWidget !== null) {
 			const rightPriceScale = this._state.rightPriceScale();
-			this._rightPriceAxisWidget.setPriceScale(ensureNotNull(rightPriceScale));
+			this._rightPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				item.setPriceScale(ensureNotNull(rightPriceScale));
+			});
 		}
 	}
 
@@ -485,7 +493,9 @@ export class PaneWidget implements IDestroyable {
 
 	public setPriceAxisSize(width: number, position: PriceAxisWidgetSide): void {
 		const priceAxisWidget = position === 'left' ? this._leftPriceAxisWidget : this._rightPriceAxisWidget;
-		ensureNotNull(priceAxisWidget).setSize(new Size(width, this._size.h));
+		priceAxisWidget?.forEach((item: PriceAxisWidget) => {
+			ensureNotNull(item).setSize(new Size(width, this._size.h));
+		});
 	}
 
 	public getSize(): Size {
@@ -547,10 +557,14 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		if (this._leftPriceAxisWidget !== null) {
-			this._leftPriceAxisWidget.paint(type);
+			this._leftPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				item.paint(type);
+			});
 		}
 		if (this._rightPriceAxisWidget !== null) {
-			this._rightPriceAxisWidget.paint(type);
+			this._rightPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				item.paint(type);
+			});
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
@@ -571,11 +585,11 @@ export class PaneWidget implements IDestroyable {
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
 	}
 
-	public leftPriceAxisWidget(): PriceAxisWidget | null {
+	public leftPriceAxisWidget(): PriceAxisWidget[] | null {
 		return this._leftPriceAxisWidget;
 	}
 
-	public rightPriceAxisWidget(): PriceAxisWidget | null {
+	public rightPriceAxisWidget(): PriceAxisWidget[] | null {
 		return this._rightPriceAxisWidget;
 	}
 
@@ -688,23 +702,43 @@ export class PaneWidget implements IDestroyable {
 		const leftAxisVisible = this._state.leftPriceScale().options().visible;
 		const rightAxisVisible = this._state.rightPriceScale().options().visible;
 		if (!leftAxisVisible && this._leftPriceAxisWidget !== null) {
-			this._leftAxisCell.removeChild(this._leftPriceAxisWidget.getElement());
-			this._leftPriceAxisWidget.destroy();
+			this._leftPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				this._leftAxisCell.removeChild(item.getElement());
+				item.destroy();
+			});
 			this._leftPriceAxisWidget = null;
 		}
 		if (!rightAxisVisible && this._rightPriceAxisWidget !== null) {
-			this._rightAxisCell.removeChild(this._rightPriceAxisWidget.getElement());
-			this._rightPriceAxisWidget.destroy();
+			this._rightPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				this._rightAxisCell.removeChild(item.getElement());
+				item.destroy();
+			});
 			this._rightPriceAxisWidget = null;
 		}
 		const rendererOptionsProvider = chart.model().rendererOptionsProvider();
 		if (leftAxisVisible && this._leftPriceAxisWidget === null) {
-			this._leftPriceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'left');
-			this._leftAxisCell.appendChild(this._leftPriceAxisWidget.getElement());
+			// this is a wrapper,where you can put multiple div blocks with canvas
+			const divWrapper = document.createElement('div');
+			divWrapper.style.display = 'flex';
+			this._leftPriceAxisWidget = new Array(chart.options().leftPriceScale.num).fill('').map((item: PriceAxisWidget) => {
+				return new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'left');
+			});
+			this._leftPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				divWrapper.appendChild(item.getElement());
+			});
+
+			this._leftAxisCell.appendChild(divWrapper);
 		}
 		if (rightAxisVisible && this._rightPriceAxisWidget === null) {
-			this._rightPriceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'right');
-			this._rightAxisCell.appendChild(this._rightPriceAxisWidget.getElement());
+			const divWrapper = document.createElement('div');
+			divWrapper.style.display = 'flex';
+			this._rightPriceAxisWidget = new Array(chart.options().rightPriceScale.num).fill('').map((item: PriceAxisWidget) => {
+				return new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'right')
+			});
+			this._rightPriceAxisWidget.forEach((item: PriceAxisWidget) => {
+				divWrapper.appendChild(item.getElement());
+			});
+			this._rightAxisCell.appendChild(divWrapper);
 		}
 	}
 
