@@ -69,8 +69,11 @@ export class PanePriceAxisView implements IPaneView {
 		}
 
 		const position = pane.priceScalePosition(priceScale);
-		// with no left and right price scale, overlay will be align to the right
-		const align = position === 'overlay' ? 'right' : position;
+		// with no left and right price scale, overlay will be align with the visible one
+		const align = position === 'overlay' ? pane.defaultVisiblePriceScalePosition() : position;
+		if (align === null) {
+			return null;
+		}
 
 		const options = this._chartModel.priceAxisRendererOptions();
 		if (options.fontSize !== this._fontSize) {

@@ -385,6 +385,18 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
+		if (priceScaleId === DefaultPriceScaleId.Left) {
+			this.applyOptions({
+				leftPriceScale: options,
+			});
+			return;
+		} else if (priceScaleId === DefaultPriceScaleId.Right) {
+			this.applyOptions({
+				rightPriceScale: options,
+			});
+			return;
+		}
+
 		const res = this.findPriceScale(priceScaleId);
 
 		if (res === null) {
@@ -394,18 +406,9 @@ export class ChartModel implements IDestroyable {
 
 			return;
 		}
-		if (priceScaleId === 'left') {
-			this.applyOptions({
-				leftPriceScale: options,
-			});
-		} else if (priceScaleId === 'right') {
-			this.applyOptions({
-				rightPriceScale: options,
-			});
-		} else {
-			res.priceScale.applyOptions(options);
-			this._priceScalesOptionsChanged.fire();
-		}
+
+		res.priceScale.applyOptions(options);
+		this._priceScalesOptionsChanged.fire();
 	}
 
 	public findPriceScale(priceScaleId: string): PriceScaleOnPane | null {

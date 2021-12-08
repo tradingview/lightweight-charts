@@ -274,6 +274,17 @@ export class Pane implements IDestroyable {
 		return priceScale;
 	}
 
+	public defaultVisiblePriceScalePosition(): Exclude<PriceScalePosition, 'overlay'> | null {
+		let priceScalePosition: Exclude<PriceScalePosition, 'overlay'> | null = null;
+
+		if (this._model.options().rightPriceScale.visible) {
+			priceScalePosition = 'right';
+		} else if (this._model.options().leftPriceScale.visible) {
+			priceScalePosition = 'left';
+		}
+		return priceScalePosition;
+	}
+
 	public recalculatePriceScale(priceScale: PriceScale | null): void {
 		if (priceScale === null || !priceScale.isAutoScale()) {
 			return;
