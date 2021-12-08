@@ -274,6 +274,17 @@ export class Pane implements IDestroyable {
 		return priceScale;
 	}
 
+	public defaultVisiblePriceScale(): PriceScale | null {
+		let priceScale: PriceScale | null = null;
+
+		if (this._model.options().rightPriceScale.visible) {
+			priceScale = this._rightPriceScale;
+		} else if (this._model.options().leftPriceScale.visible) {
+			priceScale = this._leftPriceScale;
+		}
+		return priceScale;
+	}
+
 	public recalculatePriceScale(priceScale: PriceScale | null): void {
 		if (priceScale === null || !priceScale.isAutoScale()) {
 			return;

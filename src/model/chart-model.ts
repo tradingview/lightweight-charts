@@ -385,6 +385,18 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
+		if (priceScaleId === DefaultPriceScaleId.Left) {
+			this.applyOptions({
+				leftPriceScale: options,
+			});
+			return;
+		} else if (priceScaleId === DefaultPriceScaleId.Right) {
+			this.applyOptions({
+				rightPriceScale: options,
+			});
+			return;
+		}
+
 		const res = this.findPriceScale(priceScaleId);
 
 		if (res === null) {
