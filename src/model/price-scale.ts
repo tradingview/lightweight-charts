@@ -20,6 +20,9 @@ import {
 	fromIndexedTo100,
 	fromLog,
 	fromPercent,
+	LogFormula,
+	logFormulaForPriceRange,
+	logFormulasAreSame,
 	toIndexedTo100,
 	toIndexedTo100Range,
 	toLog,
@@ -221,6 +224,8 @@ export class PriceScale {
 	private _scrollStartPoint: number | null = null;
 	private _formatter: IPriceFormatter = defaultPriceFormatter;
 
+	private _logFormula: LogFormula = logFormulaForPriceRange(null);
+
 	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptionsInternal, localizationOptions: LocalizationOptions) {
 		this._id = id;
 		this._options = options;
@@ -310,8 +315,8 @@ export class PriceScale {
 
 		// define which scale converted from
 		if (oldMode.mode === PriceScaleMode.Logarithmic && newMode.mode !== oldMode.mode) {
-			if (canConvertPriceRangeFromLog(this._priceRange)) {
-				priceRange = convertPriceRangeFromLog(this._priceRange);
+			if (canConvertPriceRangeFromLog(this._priceRange, this._logFormula)) {
+				priceRange = convertPriceRangeFromLog(this._priceRange, this._logFormula);
 
 				if (priceRange !== null) {
 					this.setPriceRange(priceRange);
@@ -323,7 +328,7 @@ export class PriceScale {
 
 		// define which scale converted to
 		if (newMode.mode === PriceScaleMode.Logarithmic && newMode.mode !== oldMode.mode) {
-			priceRange = convertPriceRangeToLog(this._priceRange);
+			priceRange = convertPriceRangeToLog(this._priceRange, this._logFormula);
 
 			if (priceRange !== null) {
 				this.setPriceRange(priceRange);
@@ -840,7 +845,7 @@ export class PriceScale {
 			return 0 as Coordinate;
 		}
 
-		logical = this.isLog() && logical ? toLog(logical) : logical;
+		logical = this.isLog() && logical ? toLog(logical, this._logFormula) : logical;
 		const range = ensureNotNull(this.priceRange());
 		const invCoordinate = this._bottomMarginPx() +
 			(this.internalHeight() - 1) * (logical - range.minValue()) / range.length();
@@ -858,7 +863,7 @@ export class PriceScale {
 		const range = ensureNotNull(this.priceRange());
 		const logical = range.minValue() + range.length() *
 			((invCoordinate - this._bottomMarginPx()) / (this.internalHeight() - 1));
-		return this.isLog() ? fromLog(logical) : logical;
+		return this.isLog() ? fromLog(logical, this._logFormula) : logical;
 	}
 
 	private _onIsInvertedChanged(): void {
@@ -895,7 +900,7 @@ export class PriceScale {
 			if (sourceRange !== null) {
 				switch (this._options.mode) {
 					case PriceScaleMode.Logarithmic:
-						sourceRange = convertPriceRangeToLog(sourceRange);
+						sourceRange = convertPriceRangeToLog(sourceRange, this._logFormula);
 						break;
 					case PriceScaleMode.Percentage:
 						sourceRange = toPercentRange(sourceRange, firstValue.value);
@@ -940,11 +945,25 @@ export class PriceScale {
 				priceRange = new PriceRangeImpl(priceRange.minValue() - extendValue, priceRange.maxValue() + extendValue);
 			}
 
+			if (this.isLog()) {
+				const rawRange = convertPriceRangeFromLog(priceRange, this._logFormula);
+				const newLogFormula = logFormulaForPriceRange(rawRange);
+				if (!logFormulasAreSame(newLogFormula, this._logFormula)) {
+					const rawSnapshot = this._priceRangeSnapshot !== null ? convertPriceRangeFromLog(this._priceRangeSnapshot, this._logFormula) : null;
+					this._logFormula = newLogFormula;
+					priceRange = convertPriceRangeToLog(rawRange, newLogFormula);
+					if (rawSnapshot !== null) {
+						this._priceRangeSnapshot = convertPriceRangeToLog(rawSnapshot, newLogFormula);
+					}
+				}
+			}
+
 			this.setPriceRange(priceRange);
 		} else {
 			// reset empty to default
 			if (this._priceRange === null) {
 				this.setPriceRange(new PriceRangeImpl(-0.5, 0.5));
+				this._logFormula = logFormulaForPriceRange(null);
 			}
 		}
 
@@ -957,7 +976,7 @@ export class PriceScale {
 		} else if (this.isIndexedTo100()) {
 			return toIndexedTo100;
 		} else if (this.isLog()) {
-			return toLog;
+			return (price: number) => toLog(price, this._logFormula);
 		}
 
 		return null;
