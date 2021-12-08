@@ -733,7 +733,7 @@ export class PaneWidget implements IDestroyable {
 			const divWrapper = document.createElement('div');
 			divWrapper.style.display = 'flex';
 			this._rightPriceAxisWidget = new Array(chart.options().rightPriceScale.num).fill('').map((item: PriceAxisWidget) => {
-				return new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'right')
+				return new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'right');
 			});
 			this._rightPriceAxisWidget.forEach((item: PriceAxisWidget) => {
 				divWrapper.appendChild(item.getElement());
