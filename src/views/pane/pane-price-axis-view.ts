@@ -63,15 +63,13 @@ export class PanePriceAxisView implements IPaneView {
 		}
 
 		// this price scale will be used to find label placement only (left, right, none)
-		const priceScale = pane.isOverlay(this._dataSource) ? pane.defaultPriceScale() : this._dataSource.priceScale();
+		const priceScale = pane.isOverlay(this._dataSource) ? pane.defaultVisiblePriceScale() : this._dataSource.priceScale();
 		if (priceScale === null) {
 			return null;
 		}
 
 		const position = pane.priceScalePosition(priceScale);
-		// with no left and right price scale, overlay will be align with the visible one
-		const align = position === 'overlay' ? pane.defaultVisiblePriceScalePosition() : position;
-		if (align === null) {
+		if (position === 'overlay') {
 			return null;
 		}
 
@@ -81,7 +79,7 @@ export class PanePriceAxisView implements IPaneView {
 			this._textWidthCache.reset();
 		}
 
-		this._renderer.setParams(this._priceAxisView.paneRenderer(), options, width, align);
+		this._renderer.setParams(this._priceAxisView.paneRenderer(), options, width, position);
 		return this._renderer;
 	}
 }
