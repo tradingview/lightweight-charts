@@ -26,7 +26,7 @@ First of all, in a file where you would like to create a chart you need to impor
 import { createChart } from 'lightweight-charts';
 ```
 
-[`createChart`](/api#createchart) is the entry-point for creating charts. You can use it to create as many charts as you need:
+[`createChart`](/api/index.md#createchart) is the entry-point for creating charts. You can use it to create as many charts as you need:
 
 ```js
 import { createChart } from 'lightweight-charts';
@@ -38,13 +38,13 @@ const firstChart = createChart(firstContainer);
 const secondChart = createChart(secondContainer);
 ```
 
-The result of this function is a [`IChartApi`](/api/interfaces/IChartApi) object, which you need to use to work with a chart instance.
+The result of this function is a [`IChartApi`](/api/interfaces/IChartApi.md) object, which you need to use to work with a chart instance.
 
 ## Creating a series
 
 Once your chart is created it is ready to display data.
 
-The basic primitive to display a data is [a series](/api/interfaces/ISeriesApi).
+The basic primitive to display a data is [a series](/api/interfaces/ISeriesApi.md).
 There are different types of series:
 
 - Area
@@ -54,7 +54,7 @@ There are different types of series:
 - Histogram
 - Line
 
-To create a series with desired type you need to use appropriate method from [`IChartApi`](/api/interfaces/IChartApi).
+To create a series with desired type you need to use appropriate method from [`IChartApi`](/api/interfaces/IChartApi.md).
 All of them have the same naming `add<type>Series`, where `<type>` is a type of a series you'd like to create:
 
 ```js
@@ -80,7 +80,7 @@ Note that regardless of the series type, the API calls are the same (the type of
 
 ### Setting the data to a series
 
-To set the data (or to replace all data items) to a series you need to use [`ISeriesApi.setData`](/api/interfaces/ISeriesApi#setdata) method:
+To set the data (or to replace all data items) to a series you need to use [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) method:
 
 ```js
 import { createChart } from 'lightweight-charts';
@@ -124,10 +124,10 @@ It's pretty easy, isn't it? That's it, your chart is ready to be displayed on th
 
 In a case when your data is updated (e.g. real-time updates) you might want to update the chart as well.
 
-But using [`ISeriesApi.setData`](/api/interfaces/ISeriesApi#setdata) very often might affect the performance and we do not recommend to do this.
+But using [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) very often might affect the performance and we do not recommend to do this.
 Also it replaces all series data with the new one, and probably this is not what you're looking for.
 
-Thus, to update the data you can use a method [`ISeriesApi.update`](/api/interfaces/ISeriesApi#update).
+Thus, to update the data you can use a method [`ISeriesApi.update`](/api/interfaces/ISeriesApi.md#update).
 It allows you to update the last data item or add a new one much faster without affecting the performance:
 
 ```js

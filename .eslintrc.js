@@ -1,3 +1,35 @@
+function getNamingConventionRules(additionalDefaultFormats = []) {
+	return [
+		{ selector: 'default', format: ['camelCase', ...additionalDefaultFormats], leadingUnderscore: 'forbid', trailingUnderscore: 'forbid' },
+
+		{ selector: 'variable', format: ['camelCase', 'UPPER_CASE'] },
+		// {
+		// 	selector: 'variable',
+		// 	types: ['boolean'],
+		// 	format: ['PascalCase'],
+		// 	prefix: ['is', 'should', 'has', 'can', 'did', 'will', 'show', 'enable', 'need'],
+		// },
+
+		{ selector: 'typeLike', format: ['PascalCase'] },
+		{ selector: 'enumMember', format: ['PascalCase'] },
+
+		{ selector: 'memberLike', modifiers: ['private'], leadingUnderscore: 'require', format: ['camelCase'] },
+		{ selector: 'memberLike', modifiers: ['protected'], leadingUnderscore: 'require', format: ['camelCase'] },
+
+		{
+			selector: 'property',
+			format: ['PascalCase'],
+			filter: {
+				match: true,
+				regex: '^(Area|Baseline|Bar|Candlestick|Histogram|Line)$',
+			},
+		},
+
+		// { selector: 'typeParameter', format: ['PascalCase'], prefix: ['T', 'U'] },
+	];
+}
+
+/** @type {import('eslint').Linter.Config} */
 module.exports = {
 	reportUnusedDisableDirectives: true,
 	env: {
@@ -105,7 +137,7 @@ module.exports = {
 			},
 		},
 		{
-			files: ['**/*.ts'],
+			files: ['**/*.ts', '**/*.tsx'],
 			excludedFiles: ['**/*.md/*.ts', 'dist/**'],
 			parser: '@typescript-eslint/parser',
 			extends: [
@@ -118,6 +150,23 @@ module.exports = {
 				project: 'tsconfig.json',
 				sourceType: 'module',
 			},
+			overrides: [
+				{
+					files: ['website/**/*.tsx'],
+					parserOptions: {
+						project: 'website/tsconfig.json',
+						sourceType: 'module',
+					},
+					rules: {
+						'@typescript-eslint/naming-convention': [
+							'error',
+
+							// allow PascalCase for react components
+							...getNamingConventionRules(['PascalCase']),
+						],
+					},
+				},
+			],
 			rules: {
 				'@typescript-eslint/array-type': [
 					'error',
@@ -169,32 +218,7 @@ module.exports = {
 				],
 				'@typescript-eslint/naming-convention': [
 					'error',
-					{ selector: 'default', format: ['camelCase'], leadingUnderscore: 'forbid', trailingUnderscore: 'forbid' },
-
-					{ selector: 'variable', format: ['camelCase', 'UPPER_CASE'] },
-					// {
-					// 	selector: 'variable',
-					// 	types: ['boolean'],
-					// 	format: ['PascalCase'],
-					// 	prefix: ['is', 'should', 'has', 'can', 'did', 'will', 'show', 'enable', 'need'],
-					// },
-
-					{ selector: 'typeLike', format: ['PascalCase'] },
-					{ selector: 'enumMember', format: ['PascalCase'] },
-
-					{ selector: 'memberLike', modifiers: ['private'], leadingUnderscore: 'require', format: ['camelCase'] },
-					{ selector: 'memberLike', modifiers: ['protected'], leadingUnderscore: 'require', format: ['camelCase'] },
-
-					{
-						selector: 'property',
-						format: ['PascalCase'],
-						filter: {
-							match: true,
-							regex: '^(Area|Baseline|Bar|Candlestick|Histogram|Line)$',
-						},
-					},
-
-					// { selector: 'typeParameter', format: ['PascalCase'], prefix: ['T', 'U'] },
+					...getNamingConventionRules(),
 				],
 				'@typescript-eslint/no-empty-interface': 'off',
 				'@typescript-eslint/no-empty-function': 'off',
