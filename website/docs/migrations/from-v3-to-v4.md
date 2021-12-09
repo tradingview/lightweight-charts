@@ -79,3 +79,36 @@ Since v4 you have to provide an ID of price scale explicitly, e.g. if you want t
 const rightPriceScale = chart.priceScale('right');
 const leftPriceScale = chart.priceScale('left');
 ```
+
+## subscribeCrosshairMove callback parameter type has been changed
+
+[`MouseEventParams.time`](/api/interfaces/MouseEventParams#time) since this version is a [`Time`](/api#time) object.
+
+`MouseEventParams.seriesPrices` has been removed, [`MouseEventParams.seriesData`](/api/interfaces/MouseEventParams#seriesdata) should be used instead.
+[`MouseEventParams.seriesData`](/api/interfaces/MouseEventParams#seriesdata) values are [`BarData`](/api/interfaces/BarData) or [`LineData`](/api/interfaces/LineData) or [`HistogramData`](/api/interfaces/HistogramData) objects.
+These values are originally provided data items passed to [`ISeriesApi.setData`](/api/interfaces/ISeriesApi#setdata) or [`ISeriesApi.update`](/api/interfaces/ISeriesApi#update).
+
+```js
+
+series.setData([{ time: '2001-01-01', value: 1 }]);
+
+series.subscribeCrosshairMove(param => {
+    console.log(param.time); // '2001-01-01' or undefined
+    console.log(param.seriesData.get(series)); // { time: '2001-01-01', value: 1 } or undefined
+});
+```
+
+## tickMarkFormatter option type has been changed
+
+[`TickMarkFormatter`](/api#tickmarkformatter) `time` argument type has been changed.
+Now its type is [`Time`](/api#time).
+Its value is originally provided time in data items passed to [`ISeriesApi.setData`](/api/interfaces/ISeriesApi#setdata) or [`ISeriesApi.update`](/api/interfaces/ISeriesApi#update).
+
+```js
+
+series.setData([{ time: '2001-01-01', value: 1 }]);
+
+chart.timeScale().applyOptions({
+    tickMarkFormatter: (time, tickMarkType, locale) => time, // '2001-01-01'
+});
+```
