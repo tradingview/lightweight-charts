@@ -99,7 +99,7 @@ function typedocPluginForVersion(version) {
 				id: `${version}-api`,
 				entryPoints: [typingsFilePath],
 				docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
-			});
+			}).loadContent();
 		},
 	});
 }
