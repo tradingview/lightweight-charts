@@ -160,7 +160,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
 
 	/**
-	 * Gets a bar data by provided index.
+	 * Returns a bar data by provided index.
 	 *
 	 * @param index - Logical index
 	 * @param mismatchDirection - Search direction if no data found at provided logical index.
@@ -213,6 +213,11 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	setMarkers(data: SeriesMarker<Time>[]): void;
+
+	/**
+	 * Returns an array of series markers.
+	 */
+	markers(): readonly SeriesMarker<Time>[];
 
 	/**
 	 * Creates a new price line

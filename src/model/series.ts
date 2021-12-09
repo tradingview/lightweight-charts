@@ -265,6 +265,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().lightUpdate();
 	}
 
+	public markers(): readonly SeriesMarker<TimePoint>[] {
+		return this._markers;
+	}
+
 	public indexedMarkers(): InternalSeriesMarker<TimePointIndex>[] {
 		return this._indexedMarkers;
 	}

@@ -15,7 +15,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Logical, Range, Time, TimePoint, TimePointIndex } from '../model/time-data';
+import { Logical, OriginalTime, Range, Time, TimePoint, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
@@ -141,9 +141,19 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 		const convertedMarkers = data.map<SeriesMarker<TimePoint>>((marker: SeriesMarker<Time>) => ({
 			...marker,
+			originalTime: marker.time as unknown as OriginalTime,
 			time: convertTime(marker.time),
 		}));
 		this._series.setMarkers(convertedMarkers);
+	}
+
+	public markers(): readonly SeriesMarker<Time>[] {
+		return this._series.markers().map((item: SeriesMarker<TimePoint>) => {
+			return {
+				...item,
+				time: item.originalTime as unknown as Time,
+			};
+		});
 	}
 
 	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {

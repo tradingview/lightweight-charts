@@ -1,3 +1,5 @@
+import { OriginalTime } from './time-data';
+
 /**
  * Represents the position of a series marker relative to a bar.
  */
@@ -42,8 +44,13 @@ export interface SeriesMarker<TimeType> {
 	 * @defaultValue `1`
 	 */
 	size?: number;
+
+	/**
+	 * @internal
+	 */
+	originalTime: OriginalTime;
 }
 
-export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {
+export interface InternalSeriesMarker<TimeType> extends Omit<SeriesMarker<TimeType>, 'originalTime'> {
 	internalId: number;
 }
