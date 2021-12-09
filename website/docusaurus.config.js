@@ -15,7 +15,7 @@ const versions = require('./versions.json');
 const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
 const projectName = 'lightweight-charts';
 const projectUrl = `https://github.com/${organizationName}/${projectName}`;
-const githubPagesUrl = `https://${organizationName}.github.io/`;
+const githubPagesUrl = `https://${organizationName}.github.io`;
 
 const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
 
