@@ -4,7 +4,7 @@ In this document you can find the migration guide from the previous version v3 t
 
 ## Exported enum `LasPriceAnimationMode` has been removed
 
-Please use [`LastPriceAnimationMode`](/api/enums/LastPriceAnimationMode) instead.
+Please use [`LastPriceAnimationMode`](/api/enums/LastPriceAnimationMode.md) instead.
 
 ## `scaleMargins` option has been removed from series options
 
@@ -32,7 +32,7 @@ series.priceScale().applyOptions({
 
 ## `backgroundColor` from `layout` options has been removed
 
-If you want to have solid background color you need to use [`background`](/api/interfaces/LayoutOptions#background) property instead, e.g. instead of:
+If you want to have solid background color you need to use [`background`](/api/interfaces/LayoutOptions.md#background) property instead, e.g. instead of:
 
 ```js
 const chart = createChart({
