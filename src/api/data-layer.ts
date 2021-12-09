@@ -8,7 +8,15 @@ import { WhitespacePlotRow } from '../model/plot-data';
 import { Series, SeriesUpdateInfo } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
-import { BusinessDay, OriginalTime, TimePoint, TimePointIndex, TimeScalePoint, UTCTimestamp } from '../model/time-data';
+import {
+	BusinessDay,
+	OriginalTime,
+	Time,
+	TimePoint,
+	TimePointIndex,
+	TimeScalePoint,
+	UTCTimestamp,
+} from '../model/time-data';
 
 import {
 	BarData,
@@ -17,7 +25,6 @@ import {
 	isUTCTimestamp,
 	LineData,
 	SeriesDataItemTypeMap,
-	Time,
 } from './data-consumer';
 import { getSeriesPlotRowCreator, isSeriesPlotRow } from './get-series-plot-row-creator';
 import { fillWeightsForPoints } from './time-scale-point-weight-generator';

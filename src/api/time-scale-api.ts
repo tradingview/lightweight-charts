@@ -8,10 +8,9 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { Logical, LogicalRange, Range, TimePointIndex, TimePointsRange } from '../model/time-data';
+import { Logical, LogicalRange, Range, Time, TimePointIndex, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
-import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
 import {
 	ITimeScaleApi,

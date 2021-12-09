@@ -26,10 +26,10 @@ import {
 	PriceFormatBuiltIn,
 	SeriesType,
 } from '../model/series-options';
-import { Logical } from '../model/time-data';
+import { Logical, Time } from '../model/time-data';
 
 import { CandlestickSeriesApi } from './candlestick-series-api';
-import { BarData, DataUpdatesConsumer, HistogramData, LineData, SeriesDataItemTypeMap, Time } from './data-consumer';
+import { BarData, DataUpdatesConsumer, HistogramData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';

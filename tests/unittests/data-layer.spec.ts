@@ -3,14 +3,14 @@ import { expect } from 'chai';
 import chaiExclude from 'chai-exclude';
 import { describe, it } from 'mocha';
 
-import { BarData, HistogramData, LineData, Time, WhitespaceData } from '../../src/api/data-consumer';
+import { BarData, HistogramData, LineData, WhitespaceData } from '../../src/api/data-consumer';
 import { convertTime, DataLayer, SeriesChanges, stringToBusinessDay } from '../../src/api/data-layer';
 import { ensureDefined } from '../../src/helpers/assertions';
 import { PlotRowValueIndex } from '../../src/model/plot-data';
 import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
 import { SeriesType } from '../../src/model/series-options';
-import { BusinessDay, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
+import { BusinessDay, Time, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 chai.use(chaiExclude);
 

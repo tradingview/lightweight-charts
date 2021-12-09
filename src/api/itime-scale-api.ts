@@ -1,10 +1,8 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
-import { Logical, LogicalRange, Range } from '../model/time-data';
+import { Logical, LogicalRange, Range, Time } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
-
-import { Time } from './data-consumer';
 
 /**
  * Represents a {@link Time} range.

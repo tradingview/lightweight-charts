@@ -44,12 +44,25 @@ export interface BusinessDay {
 	day: number;
 }
 
+/**
+ * The Time type is used to represent the time of data items.
+ *
+ * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in ISO format.
+ *
+ * @example
+ * ```js
+ * const timestamp = 1529899200; // Literal timestamp representing 2018-06-25T04:00:00.000Z
+ * const businessDay = { year: 2019, month: 6, day: 1 }; // June 1, 2019
+ * const businessDayString = '2021-02-03'; // Business day string literal
+ * ```
+ */
+export type Time = UTCTimestamp | BusinessDay | string;
+
 export type OriginalTime = Nominal<unknown, 'OriginalTime'>;
 
 export interface TimePoint {
 	timestamp: UTCTimestamp;
 	businessDay?: BusinessDay;
-	// originalTime: OriginalTime; // actually it's Time but we shouldn't use it inside our internal ("chart model" level) logic
 }
 
 /**

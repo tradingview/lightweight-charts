@@ -12,9 +12,9 @@ import {
 	LineSeriesPartialOptions,
 	SeriesType,
 } from '../model/series-options';
-import { Logical } from '../model/time-data';
+import { Logical, Time } from '../model/time-data';
 
-import { BarData, HistogramData, LineData, Time } from './data-consumer';
+import { BarData, HistogramData, LineData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';

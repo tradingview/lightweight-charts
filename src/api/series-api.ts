@@ -15,11 +15,11 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Logical, Range, TimePoint, TimePointIndex } from '../model/time-data';
+import { Logical, Range, Time, TimePoint, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
-import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { IPriceLine } from './iprice-line';
