@@ -146,6 +146,8 @@ const config = {
 					// and at the same time to avoid loading files from other domains (like github)
 					// (loading from other domains might take some time and the page might blink especially while loading images)
 					src: 'img/lightweight-charts-logo.svg',
+					width: 48,
+					height: 32,
 				},
 				items: [
 					{
