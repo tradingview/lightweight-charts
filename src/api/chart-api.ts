@@ -1,6 +1,6 @@
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
-import { ensureDefined } from '../helpers/assertions';
+import { assert, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
@@ -29,8 +29,9 @@ import {
 import { Logical, Time } from '../model/time-data';
 
 import { CandlestickSeriesApi } from './candlestick-series-api';
-import { BarData, DataUpdatesConsumer, HistogramData, LineData, SeriesDataItemTypeMap } from './data-consumer';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
+import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
@@ -307,10 +308,11 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
-		type OriginalData = LineData | BarData | HistogramData;
-		const seriesData = new Map<ISeriesApi<SeriesType>, OriginalData>();
+		const seriesData: MouseEventParams['seriesData'] = new Map();
 		param.seriesData.forEach((plotRow: SeriesPlotRow, series: Series) => {
-			seriesData.set(this._mapSeriesToApi(series), plotRow.original as OriginalData);
+			const data = getSeriesDataCreator(series.seriesType())(plotRow);
+			assert(isFulfilledData(data));
+			seriesData.set(this._mapSeriesToApi(series), data);
 		});
 
 		const hoveredSeries = param.hoveredSeries === undefined ? undefined : this._mapSeriesToApi(param.hoveredSeries);

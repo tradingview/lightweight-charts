@@ -2,12 +2,16 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { ensureNotNull } from '../../src/helpers/assertions';
-import { PlotRowValueIndex } from '../../src/model/plot-data';
+import { PlotRow, PlotRowValue, PlotRowValueIndex } from '../../src/model/plot-data';
 import { MismatchDirection, PlotList } from '../../src/model/plot-list';
-import { TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
+import { OriginalTime, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 function timePoint(val: number): TimePoint {
 	return { timestamp: val as UTCTimestamp };
+}
+
+function plotRow(index: TimePointIndex, time: TimePoint, value: PlotRowValue): PlotRow {
+	return { index, time, value, originalTime: time as unknown as OriginalTime };
 }
 
 describe('PlotList', () => {
@@ -16,9 +20,9 @@ describe('PlotList', () => {
 	beforeEach(() => {
 		p = new PlotList();
 		p.setData([
-			{ index: -3 as TimePointIndex, time: timePoint(2), value: [1, 2, 3, 4] },
-			{ index: 0 as TimePointIndex, time: timePoint(3), value: [10, 20, 30, 40] },
-			{ index: 3 as TimePointIndex, time: timePoint(4), value: [100, 200, 300, 500] },
+			plotRow(-3 as TimePointIndex, timePoint(2), [1, 2, 3, 4]),
+			plotRow(0 as TimePointIndex, timePoint(3), [10, 20, 30, 40]),
+			plotRow(3 as TimePointIndex, timePoint(4), [100, 200, 300, 500]),
 		]);
 	});
 
@@ -43,9 +47,9 @@ describe('PlotList', () => {
 		it('should find respective values by given index and search strategy', () => {
 			const p1 = new PlotList();
 			p1.setData([
-				{ index: -5 as TimePointIndex, time: timePoint(1), value: [1, 2, 3, 4] },
-				{ index: 0 as TimePointIndex, time: timePoint(2), value: [10, 20, 30, 40] },
-				{ index: 5 as TimePointIndex, time: timePoint(3), value: [100, 200, 300, 400] },
+				plotRow(-5 as TimePointIndex, timePoint(1), [1, 2, 3, 4]),
+				plotRow(0 as TimePointIndex, timePoint(2), [10, 20, 30, 40]),
+				plotRow(5 as TimePointIndex, timePoint(3), [100, 200, 300, 400]),
 			]);
 
 			expect(p1.search(-10 as TimePointIndex, MismatchDirection.NearestLeft)).to.be.equal(null);
@@ -68,11 +72,11 @@ describe('PlotList', () => {
 		it('should find minMax in numbers', () => {
 			const pl = new PlotList();
 			pl.setData([
-				{ index: 0 as TimePointIndex, time: timePoint(1), value: [0, 0, 0, 1] },
-				{ index: 1 as TimePointIndex, time: timePoint(2), value: [0, 0, 0, 2] },
-				{ index: 2 as TimePointIndex, time: timePoint(3), value: [0, 0, 0, 3] },
-				{ index: 3 as TimePointIndex, time: timePoint(4), value: [0, 0, 0, 4] },
-				{ index: 4 as TimePointIndex, time: timePoint(5), value: [0, 0, 0, 5] },
+				plotRow(0 as TimePointIndex, timePoint(1), [0, 0, 0, 1]),
+				plotRow(1 as TimePointIndex, timePoint(2), [0, 0, 0, 2]),
+				plotRow(2 as TimePointIndex, timePoint(3), [0, 0, 0, 3]),
+				plotRow(3 as TimePointIndex, timePoint(4), [0, 0, 0, 4]),
+				plotRow(4 as TimePointIndex, timePoint(5), [0, 0, 0, 5]),
 			]);
 
 			const plots = [PlotRowValueIndex.Close];
@@ -86,12 +90,12 @@ describe('PlotList', () => {
 		it('should find minMax with non subsequent indices', () => {
 			const pl = new PlotList();
 			pl.setData([
-				{ index: 0 as TimePointIndex, time: timePoint(1), value: [0, 0, 0, 1] },
-				{ index: 2 as TimePointIndex, time: timePoint(2), value: [0, 0, 0, 2] },
-				{ index: 4 as TimePointIndex, time: timePoint(3), value: [0, 0, 0, 3] },
-				{ index: 6 as TimePointIndex, time: timePoint(4), value: [0, 0, 0, 4] },
-				{ index: 20 as TimePointIndex, time: timePoint(5), value: [0, 0, 0, 10] },
-				{ index: 100 as TimePointIndex, time: timePoint(6), value: [0, 0, 0, 5] },
+				plotRow(0 as TimePointIndex, timePoint(1), [0, 0, 0, 1]),
+				plotRow(2 as TimePointIndex, timePoint(2), [0, 0, 0, 2]),
+				plotRow(4 as TimePointIndex, timePoint(3), [0, 0, 0, 3]),
+				plotRow(6 as TimePointIndex, timePoint(4), [0, 0, 0, 4]),
+				plotRow(20 as TimePointIndex, timePoint(5), [0, 0, 0, 10]),
+				plotRow(100 as TimePointIndex, timePoint(6), [0, 0, 0, 5]),
 			]);
 
 			const plots = [PlotRowValueIndex.Close];
@@ -105,10 +109,10 @@ describe('PlotList', () => {
 		it('should return correct values if the data has gaps and we start search with second-to-last chunk', () => {
 			const pl = new PlotList();
 			pl.setData([
-				{ index: 29 as TimePointIndex, time: timePoint(1), value: [1, 1, 1, 1] },
-				{ index: 31 as TimePointIndex, time: timePoint(2), value: [2, 2, 2, 2] },
-				{ index: 55 as TimePointIndex, time: timePoint(3), value: [3, 3, 3, 3] },
-				{ index: 65 as TimePointIndex, time: timePoint(4), value: [4, 4, 4, 4] },
+				plotRow(29 as TimePointIndex, timePoint(1), [1, 1, 1, 1]),
+				plotRow(31 as TimePointIndex, timePoint(2), [2, 2, 2, 2]),
+				plotRow(55 as TimePointIndex, timePoint(3), [3, 3, 3, 3]),
+				plotRow(65 as TimePointIndex, timePoint(4), [4, 4, 4, 4]),
 			]);
 
 			const plots = [PlotRowValueIndex.High];
@@ -131,11 +135,11 @@ describe('PlotList', () => {
 		beforeEach(() => {
 			pl = new PlotList();
 			pl.setData([
-				{ index: 0 as TimePointIndex, time: timePoint(1), value: [5, 7, 3, 6] },
-				{ index: 1 as TimePointIndex, time: timePoint(2), value: [10, 12, 8, 11] },
-				{ index: 2 as TimePointIndex, time: timePoint(3), value: [15, 17, 13, 16] },
-				{ index: 3 as TimePointIndex, time: timePoint(4), value: [20, 22, 18, 21] },
-				{ index: 4 as TimePointIndex, time: timePoint(5), value: [25, 27, 23, 26] },
+				plotRow(0 as TimePointIndex, timePoint(1), [5, 7, 3, 6]),
+				plotRow(1 as TimePointIndex, timePoint(2), [10, 12, 8, 11]),
+				plotRow(2 as TimePointIndex, timePoint(3), [15, 17, 13, 16]),
+				plotRow(3 as TimePointIndex, timePoint(4), [20, 22, 18, 21]),
+				plotRow(4 as TimePointIndex, timePoint(5), [25, 27, 23, 26]),
 			]);
 		});
 

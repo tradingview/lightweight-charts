@@ -22,6 +22,7 @@ import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
+import { getSeriesDataCreator } from './get-series-data-creator';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, ISeriesApi } from './iseries-api';
@@ -133,7 +134,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 			return null;
 		}
 
-		return data.original as SeriesDataItemTypeMap[TSeriesType];
+		return getSeriesDataCreator(this.seriesType())(data);
 	}
 
 	public setMarkers(data: SeriesMarker<Time>[]): void {
