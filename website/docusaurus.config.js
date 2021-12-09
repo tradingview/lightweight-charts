@@ -21,6 +21,12 @@ const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
 
 const typedocWatch = process.env.TYPEDOC_WATCH === 'true';
 
+// copy logo file to static folder so we can refer to it in the config
+fs.copyFileSync(
+	path.resolve(__dirname, '../.github/logo.svg'),
+	path.resolve(__dirname, 'static/img/lightweight-charts-logo.svg')
+);
+
 function downloadTypingsToFile(typingsFilePath, version) {
 	return new Promise((resolve, reject) => {
 		let file;
@@ -134,7 +140,12 @@ const config = {
 				title: 'Lightweight Charts',
 				logo: {
 					alt: 'Lightweight Charts Logo',
-					src: 'https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true',
+					// please note that there is no such file in static/img folder in git
+					// but this file will be copied by this config (see above fs.copyFileSync call)
+					// this is just to avoid duplicating the same files in the repo
+					// and at the same time to avoid loading files from other domains (like github)
+					// (loading from other domains might take some time and the page might blink especially while loading images)
+					src: 'img/lightweight-charts-logo.svg',
 				},
 				items: [
 					{
