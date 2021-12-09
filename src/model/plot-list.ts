@@ -9,8 +9,17 @@ import { TimePointIndex } from '../model/time-data';
  * Search direction if no data found at provided index
  */
 export const enum MismatchDirection {
+	/**
+	 * Search the nearest left item
+	 */
 	NearestLeft = -1,
+	/**
+	 * Do not search
+	 */
 	None = 0,
+	/**
+	 * Search the nearest right item
+	 */
 	NearestRight = 1,
 }
 
