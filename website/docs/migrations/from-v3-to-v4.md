@@ -80,35 +80,90 @@ const rightPriceScale = chart.priceScale('right');
 const leftPriceScale = chart.priceScale('left');
 ```
 
-## subscribeCrosshairMove callback parameter type has been changed
+## The type of outbound time values has been changed
 
-[`MouseEventParams.time`](/api/interfaces/MouseEventParams#time) since this version is a [`Time`](/api#time) object.
+Affected API:
 
-`MouseEventParams.seriesPrices` has been removed, [`MouseEventParams.seriesData`](/api/interfaces/MouseEventParams#seriesdata) should be used instead.
-[`MouseEventParams.seriesData`](/api/interfaces/MouseEventParams#seriesdata) values are [`BarData`](/api/interfaces/BarData) or [`LineData`](/api/interfaces/LineData) or [`HistogramData`](/api/interfaces/HistogramData) objects.
-These values are originally provided data items passed to [`ISeriesApi.setData`](/api/interfaces/ISeriesApi#setdata) or [`ISeriesApi.update`](/api/interfaces/ISeriesApi#update).
+- [`IChartApi.subscribeClick`](/api/interfaces/IChartApi.md#subscribeclick) (via [`MouseEventParams.time`](/api/interfaces/MouseEventParams.md#time))
+- [`IChartApi.subscribeCrosshairMove`](/api/interfaces/IChartApi.md#subscribecrosshairmove) (via [`MouseEventParams.time`](/api/interfaces/MouseEventParams.md#time))
+- [`LocalizationOptions.timeFormatter`](/api/interfaces/LocalizationOptions.md#timeformatter) (via argument of [`TimeFormatterFn`](/api/index.md#timeformatterfn))
+- [`TimeScaleOptions.tickMarkFormatter`](/api/interfaces/TimeScaleOptions.md#tickmarkformatter) (via argument of [`TickMarkFormatter`](/api/index.md#tickmarkformatter))
+
+Previously the type of an inbound time (a values you provide to the library, e.g. in [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata)) was different from an outbound one (a values the library provides to your code, e.g. an argument of [`LocalizationOptions.timeFormatter`](/api/interfaces/LocalizationOptions.md#timeformatter)).
+So the difference between types was that outbound time couldn't be a business day string.
+
+Since v4 we improved our API in this matter and now the library will return exactly the same values back for all time-related properties.
+
+Thus, if you provide a string to your series in [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata), you'll receive exactly the same value back:
 
 ```js
+series.setData([
+    { time: '2001-01-01', value: 1 },
+]);
 
-series.setData([{ time: '2001-01-01', value: 1 }]);
+chart.applyOptions({
+    localization: {
+        timeFormatter: time => time, // will be '2001-01-01' for the bar above
+    },
+    timeScale: {
+        tickMarkFormatter: time => time, // will be '2001-01-01' for the bar above
+    },
+});
 
-series.subscribeCrosshairMove(param => {
-    console.log(param.time); // '2001-01-01' or undefined
-    console.log(param.seriesData.get(series)); // { time: '2001-01-01', value: 1 } or undefined
+chart.subscribeCrosshairMove(param => {
+    console.log(param.time); // will be '2001-01-01' if you hover the bar above
+});
+
+chart.subscribeClick(param => {
+    console.log(param.time); // will be '2001-01-01' if you click on the bar above
 });
 ```
 
-## tickMarkFormatter option type has been changed
-
-[`TickMarkFormatter`](/api#tickmarkformatter) `time` argument type has been changed.
-Now its type is [`Time`](/api#time).
-Its value is originally provided time in data items passed to [`ISeriesApi.setData`](/api/interfaces/ISeriesApi#setdata) or [`ISeriesApi.update`](/api/interfaces/ISeriesApi#update).
+Handling this breaking change depends on your needs and your handlers, but generally speaking you need to convert provided time to a desired format manually if it is required.
+For example, you could use provided helpers to check the type of a time:
 
 ```js
+import {
+    createChart,
+    isUTCTimestamp,
+    isBusinessDay,
+} from 'lightweight-charts';
 
-series.setData([{ time: '2001-01-01', value: 1 }]);
+const chart = createChart(document.body);
 
-chart.timeScale().applyOptions({
-    tickMarkFormatter: (time, tickMarkType, locale) => time, // '2001-01-01'
+chart.subscribeClick(param => {
+    if (param.time === undefined) {
+        // the time is undefined, i.e. there is no any data point where a time could be received from
+        return;
+    }
+
+    if (isUTCTimestamp(param.time)) {
+        // param.time is UTCTimestamp
+    } else if (isBusinessDay(param.time)) {
+        // param.time is a BusinessDay object
+    } else {
+        // param.time is a business day string in ISO format, e.g. `'2010-01-01'`
+    }
+});
+```
+
+## `seriesPrices` property from `MouseEventParams` has been removed
+
+Affected API:
+
+- [`IChartApi.subscribeClick`](/api/interfaces/IChartApi.md#subscribeclick)
+- [`IChartApi.subscribeCrosshairMove`](/api/interfaces/IChartApi.md#subscribecrosshairmove)
+
+The property `seriesPrices` of [`MouseEventParams`](/api/interfaces/MouseEventParams.md) has been removed.
+
+Instead, you can use [`MouseEventParams.seriesData`](/api/interfaces/MouseEventParams.md#seriesdata) - it is pretty similar to the old `seriesPrices`, but it contains series' data items instead of just prices:
+
+```js
+lineSeries.setData([{ time: '2001-01-01', value: 1 }]);
+barSeries.setData([{ time: '2001-01-01', open: 5, high: 10, low: 1, close: 7 }]);
+
+chart.subscribeCrosshairMove(param => {
+    console.log(param.seriesData.get(lineSeries)); // { time: '2001-01-01', value: 1 } or undefined
+    console.log(param.seriesData.get(barSeries)); // { time: '2001-01-01', open: 5, high: 10, low: 1, close: 7 } or undefined
 });
 ```
