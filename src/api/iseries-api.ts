@@ -10,7 +10,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Logical, Range, Time } from '../model/time-data';
+import { Range, Time } from '../model/time-data';
 
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceLine } from './iprice-line';
@@ -160,9 +160,9 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
 
 	/**
-	 * Returns a bar data by provided index.
+	 * Returns a bar data by provided logical index.
 	 *
-	 * @param index - Logical index
+	 * @param logicalIndex - Logical index
 	 * @param mismatchDirection - Search direction if no data found at provided logical index.
 	 * @returns Original data item provided via setData or update methods.
 	 * @example
@@ -170,7 +170,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * const originalData = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
 	 * ```
 	 */
-	dataByIndex(index: Logical, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null;
+	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null;
 
 	/**
 	 * Allows to set/replace all existing series markers with new ones.

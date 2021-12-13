@@ -127,8 +127,8 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		this._dataUpdatesConsumer.updateData(this._series, bar);
 	}
 
-	public dataByIndex(index: Logical, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null {
-		const data = this._series.bars().search(index as unknown as TimePointIndex, mismatchDirection);
+	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null {
+		const data = this._series.bars().search(logicalIndex as unknown as TimePointIndex, mismatchDirection);
 		if (data === null) {
 			// actually it can be a whitespace
 			return null;
