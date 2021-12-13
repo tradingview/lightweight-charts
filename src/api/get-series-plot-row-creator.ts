@@ -1,4 +1,4 @@
-import { WhitespacePlotRow } from '../model/plot-data';
+import { PlotRow } from '../model/plot-data';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { OriginalTime, TimePoint, TimePointIndex } from '../model/time-data';
@@ -22,6 +22,8 @@ function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item:
 function getOHLCBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BarData, originalTime: OriginalTime): Mutable<SeriesPlotRow> {
 	return { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
 }
+
+export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
 
 export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is SeriesPlotRow {
 	return (row as Partial<SeriesPlotRow>).value !== undefined;

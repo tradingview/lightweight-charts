@@ -149,17 +149,14 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public markers(): readonly SeriesMarker<Time>[] {
-		return this._series.markers().map((internalItem: SeriesMarker<TimePoint>) => {
+		return this._series.markers().map<SeriesMarker<Time>>((internalItem: SeriesMarker<TimePoint>) => {
 			// this doesn't work because of ts-transformer-properties-rename
 			// const { originalTime, ...item } = internalItem;
 
-			// we should use here local variable, otherwise ts-transformer-properties-rename renames the field time to _internal_time
-			// eslint-disable-next-line @typescript-eslint/tslint/config
-			const result: SeriesMarker<Time> = {
+			return {
 				...internalItem,
 				time: internalItem.originalTime as unknown as Time,
 			};
-			return result;
 		});
 	}
 

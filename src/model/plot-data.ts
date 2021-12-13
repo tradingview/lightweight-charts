@@ -23,4 +23,3 @@ export interface PlotRow {
 	readonly value: PlotRowValue;
 	readonly originalTime: OriginalTime;
 }
-export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
