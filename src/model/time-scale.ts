@@ -723,12 +723,12 @@ export class TimeScale {
 		this.setVisibleRange(barRange);
 	}
 
-	public formatDateTime(time: TimePoint): string {
+	public formatDateTime(timeScalePoint: TimeScalePoint): string {
 		if (this._localizationOptions.timeFormatter !== undefined) {
-			return this._localizationOptions.timeFormatter(time.businessDay || time.timestamp);
+			return this._localizationOptions.timeFormatter(timeScalePoint.originalTime as unknown as Time);
 		}
 
-		return this._dateTimeFormatter.format(new Date(time.timestamp * 1000));
+		return this._dateTimeFormatter.format(new Date(timeScalePoint.time.timestamp * 1000));
 	}
 
 	private _firstIndex(): TimePointIndex | null {
