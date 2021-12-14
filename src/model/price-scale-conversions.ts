@@ -93,6 +93,9 @@ export function canConvertPriceRangeFromLog(priceRange: PriceRangeImpl | null, l
 	return isFinite(min) && isFinite(max);
 }
 
+export function convertPriceRangeFromLog(priceRange: PriceRangeImpl, logFormula: LogFormula): PriceRangeImpl;
+export function convertPriceRangeFromLog(priceRange: null, logFormula: LogFormula): null;
+export function convertPriceRangeFromLog(priceRange: PriceRangeImpl | null, logFormula: LogFormula): PriceRangeImpl | null;
 export function convertPriceRangeFromLog(priceRange: PriceRangeImpl | null, logFormula: LogFormula): PriceRangeImpl | null {
 	if (priceRange === null) {
 		return null;
