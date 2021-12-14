@@ -1,7 +1,4 @@
 function compare(markers, seriesApiMarkers) {
-	// see SeriesApi.markers
-	seriesApiMarkers.forEach(i => delete i.originalTime);
-
 	return JSON.stringify(markers) === JSON.stringify(seriesApiMarkers);
 }
 

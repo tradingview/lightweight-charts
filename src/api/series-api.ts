@@ -150,12 +150,10 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public markers(): readonly SeriesMarker<Time>[] {
 		return this._series.markers().map<SeriesMarker<Time>>((internalItem: SeriesMarker<TimePoint>) => {
-			// this doesn't work because of ts-transformer-properties-rename
-			// const { originalTime, ...item } = internalItem;
-
+			const { originalTime, time, ...item } = internalItem;
 			return {
-				...internalItem,
-				time: internalItem.originalTime as unknown as Time,
+				time: originalTime as unknown as Time,
+				...item as Omit<SeriesMarker<TimePoint>, 'time' | 'originalTIme'>,
 			};
 		});
 	}
