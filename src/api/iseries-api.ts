@@ -217,7 +217,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Returns an array of series markers.
 	 */
-	markers(): readonly SeriesMarker<Time>[];
+	markers(): SeriesMarker<Time>[];
 
 	/**
 	 * Creates a new price line

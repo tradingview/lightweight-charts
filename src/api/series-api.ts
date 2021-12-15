@@ -148,7 +148,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		this._series.setMarkers(convertedMarkers);
 	}
 
-	public markers(): readonly SeriesMarker<Time>[] {
+	public markers(): SeriesMarker<Time>[] {
 		return this._series.markers().map<SeriesMarker<Time>>((internalItem: SeriesMarker<TimePoint>) => {
 			const { originalTime, time, ...item } = internalItem;
 			return {

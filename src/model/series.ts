@@ -106,7 +106,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView | null = null;
 	private _barColorerCache: SeriesBarColorer | null = null;
 	private readonly _options: SeriesOptionsInternal<T>;
-	private _markers: SeriesMarker<TimePoint>[] = [];
+	private _markers: readonly SeriesMarker<TimePoint>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
 	private _animationTimeoutId: TimerId | null = null;
@@ -254,8 +254,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().lightUpdate();
 	}
 
-	public setMarkers(data: SeriesMarker<TimePoint>[]): void {
-		this._markers = data.map<SeriesMarker<TimePoint>>((item: SeriesMarker<TimePoint>) => ({ ...item }));
+	public setMarkers(data: readonly SeriesMarker<TimePoint>[]): void {
+		this._markers = data;
 		this._recalculateMarkers();
 		const sourcePane = this.model().paneForSource(this);
 		this._markersPaneView.update('data');
