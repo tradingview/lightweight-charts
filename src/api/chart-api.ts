@@ -1,12 +1,12 @@
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
-import { ensureDefined } from '../helpers/assertions';
+import { assert, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
-import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
 import { Series } from '../model/series';
+import { SeriesPlotRow } from '../model/series-data';
 import {
 	AreaSeriesOptions,
 	AreaSeriesPartialOptions,
@@ -26,10 +26,12 @@ import {
 	PriceFormatBuiltIn,
 	SeriesType,
 } from '../model/series-options';
+import { Logical, Time } from '../model/time-data';
 
 import { CandlestickSeriesApi } from './candlestick-series-api';
-import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
+import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
@@ -306,19 +308,22 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
-		const seriesPrices = new Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>();
-		param.seriesPrices.forEach((price: BarPrice | BarPrices, series: Series) => {
-			seriesPrices.set(this._mapSeriesToApi(series), price);
+		const seriesData: MouseEventParams['seriesData'] = new Map();
+		param.seriesData.forEach((plotRow: SeriesPlotRow, series: Series) => {
+			const data = getSeriesDataCreator(series.seriesType())(plotRow);
+			assert(isFulfilledData(data));
+			seriesData.set(this._mapSeriesToApi(series), data);
 		});
 
 		const hoveredSeries = param.hoveredSeries === undefined ? undefined : this._mapSeriesToApi(param.hoveredSeries);
 
 		return {
-			time: param.time && (param.time.businessDay || param.time.timestamp),
+			time: param.time as Time | undefined,
+			logical: param.index as Logical | undefined,
 			point: param.point,
 			hoveredSeries,
 			hoveredMarkerId: param.hoveredObject,
-			seriesPrices,
+			seriesData,
 		};
 	}
 }

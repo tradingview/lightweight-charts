@@ -14,13 +14,13 @@ import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { LocalizationOptions } from './localization-options';
 import { areRangesEqual, RangeImpl } from './range-impl';
-import { TickMarks } from './tick-marks';
+import { TickMark, TickMarks } from './tick-marks';
 import {
-	BusinessDay,
 	Logical,
 	LogicalRange,
 	SeriesItemsIndexesRange,
 	TickMarkWeight,
+	Time,
 	TimedValue,
 	TimePoint,
 	TimePointIndex,
@@ -67,6 +67,7 @@ export const enum TickMarkType {
 	/**
 	 * A time without seconds.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-shadow
 	Time,
 	/**
 	 * A time with seconds.
@@ -89,7 +90,7 @@ export const enum TickMarkType {
  * };
  * ```
  */
-export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType: TickMarkType, locale: string) => string;
+export type TickMarkFormatter = (time: Time, tickMarkType: TickMarkType, locale: string) => string;
 
 /**
  * Options for the time scale; the horizontal scale at the bottom of the chart that displays the time of data.
@@ -280,7 +281,11 @@ export class TimeScale {
 	}
 
 	public indexToTime(index: TimePointIndex): TimePoint | null {
-		return this._points[index]?.time || null;
+		return this._points[index]?.time ?? null;
+	}
+
+	public indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint | null {
+		return this._points[index] ?? null;
 	}
 
 	public timeToIndex(time: TimePoint, findNearest: boolean): TimePointIndex | null {
@@ -489,13 +494,13 @@ export class TimeScale {
 			if (targetIndex < this._labels.length) {
 				label = this._labels[targetIndex];
 				label.coord = this.indexToCoordinate(tm.index);
-				label.label = this._formatLabel(tm.time, tm.weight);
+				label.label = this._formatLabel(tm);
 				label.weight = tm.weight;
 			} else {
 				label = {
 					needAlignCoordinate: false,
 					coord: this.indexToCoordinate(tm.index),
-					label: this._formatLabel(tm.time, tm.weight),
+					label: this._formatLabel(tm),
 					weight: tm.weight,
 				};
 
@@ -719,12 +724,12 @@ export class TimeScale {
 		this.setVisibleRange(barRange);
 	}
 
-	public formatDateTime(time: TimePoint): string {
+	public formatDateTime(timeScalePoint: TimeScalePoint): string {
 		if (this._localizationOptions.timeFormatter !== undefined) {
-			return this._localizationOptions.timeFormatter(time.businessDay || time.timestamp);
+			return this._localizationOptions.timeFormatter(timeScalePoint.originalTime as unknown as Time);
 		}
 
-		return this._dateTimeFormatter.format(new Date(time.timestamp * 1000));
+		return this._dateTimeFormatter.format(new Date(timeScalePoint.time.timestamp * 1000));
 	}
 
 	private _firstIndex(): TimePointIndex | null {
@@ -858,34 +863,27 @@ export class TimeScale {
 		this._commonTransitionStartState = null;
 	}
 
-	private _formatLabel(time: TimePoint, weight: number): string {
-		let formatter = this._formattedByWeight.get(weight);
+	private _formatLabel(tickMark: TickMark): string {
+		let formatter = this._formattedByWeight.get(tickMark.weight);
 		if (formatter === undefined) {
-			formatter = new FormattedLabelsCache((timePoint: TimePoint) => {
-				return this._formatLabelImpl(timePoint, weight);
+			formatter = new FormattedLabelsCache((mark: TickMark) => {
+				return this._formatLabelImpl(mark);
 			});
 
-			this._formattedByWeight.set(weight, formatter);
+			this._formattedByWeight.set(tickMark.weight, formatter);
 		}
 
-		return formatter.format(time);
+		return formatter.format(tickMark);
 	}
 
-	private _formatLabelImpl(timePoint: TimePoint, weight: TickMarkWeight): string {
-		const tickMarkType = weightToTickMarkType(weight, this._options.timeVisible, this._options.secondsVisible);
+	private _formatLabelImpl(tickMark: TickMark): string {
+		const tickMarkType = weightToTickMarkType(tickMark.weight, this._options.timeVisible, this._options.secondsVisible);
 
 		if (this._options.tickMarkFormatter !== undefined) {
-			// this is temporary solution to make more consistency API
-			// it looks like that all time types in API should have the same form
-			// but for know defaultTickMarkFormatter is on model level and can't determine whether passed time is business day or UTCTimestamp
-			// because type guards are declared on API level
-			// in other hand, type guards couldn't be declared on model level so far
-			// because they are know about string representation of business day ¯\_(ツ)_/¯
-			// let's fix in for all cases for the whole API
-			return this._options.tickMarkFormatter(timePoint.businessDay ?? timePoint.timestamp, tickMarkType, this._localizationOptions.locale);
+			return this._options.tickMarkFormatter(tickMark.originalTime as unknown as Time, tickMarkType, this._localizationOptions.locale);
 		}
 
-		return defaultTickMarkFormatter(timePoint, tickMarkType, this._localizationOptions.locale);
+		return defaultTickMarkFormatter(tickMark.time, tickMarkType, this._localizationOptions.locale);
 	}
 
 	private _setVisibleRange(newVisibleRange: TimeScaleVisibleRange): void {

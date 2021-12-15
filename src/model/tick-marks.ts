@@ -1,12 +1,13 @@
 import { lowerbound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
-import { TickMarkWeight, TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
+import { OriginalTime, TickMarkWeight, TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
 
 export interface TickMark {
 	index: TimePointIndex;
 	time: TimePoint;
 	weight: TickMarkWeight;
+	originalTime: OriginalTime;
 }
 
 interface MarksCache {
@@ -35,6 +36,7 @@ export class TickMarks {
 				index: index as TimePointIndex,
 				time: point.time,
 				weight: point.timeWeight,
+				originalTime: point.originalTime,
 			});
 		}
 	}
