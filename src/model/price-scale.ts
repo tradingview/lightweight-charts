@@ -193,6 +193,11 @@ type PriceTransformer = (price: BarPrice, baseValue: number) => number;
 const percentageFormatter = new PercentageFormatter();
 const defaultPriceFormatter = new PriceFormatter(100, 1);
 
+interface MarksCache {
+	marks: PriceMark[];
+	firstValueIsNull: boolean;
+}
+
 export class PriceScale {
 	private readonly _id: string;
 
@@ -218,7 +223,7 @@ export class PriceScale {
 	private _dataSources: IPriceDataSource[] = [];
 	private _cachedOrderedSources: IPriceDataSource[] | null = null;
 
-	private _marksCache: PriceMark[] | null = null;
+	private _marksCache: MarksCache | null = null;
 
 	private _scaleStartPoint: number | null = null;
 	private _scrollStartPoint: number | null = null;
@@ -596,15 +601,19 @@ export class PriceScale {
 	}
 
 	public marks(): PriceMark[] {
-		if (this._marksCache) {
-			return this._marksCache;
+		const firstValueIsNull = this.firstValue() === null;
+
+		// do not recalculate marks if firstValueIsNull is true because in this case we'll always get empty result
+		if (this._marksCache !== null && (firstValueIsNull || this._marksCache.firstValueIsNull === firstValueIsNull)) {
+			return this._marksCache.marks;
 		}
 
 		this._markBuilder.rebuildTickMarks();
-		this._marksCache = this._markBuilder.marks();
+		const marks = this._markBuilder.marks();
+		this._marksCache = { marks, firstValueIsNull };
 		this._onMarksChanged.fire();
 
-		return this._marksCache;
+		return marks;
 	}
 
 	public onMarksChanged(): ISubscription {
