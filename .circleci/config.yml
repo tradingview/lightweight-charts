@@ -233,6 +233,10 @@ jobs:
             cd website
             npm install
             npm run build
+      - run:
+          # we need to run this check here because only here we have generated md files of the website
+          name: "Check website markdown links"
+          command: npm run check-markdown-links -- --check-website-links
       - persist_to_workspace:
           root: ./
           paths:
