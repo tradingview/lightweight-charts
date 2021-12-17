@@ -13,7 +13,7 @@ By default, chart has 2 predefined price scales: `left` and `right`, and an unli
 
 Only `left` and `right` price scales could be displayed on the chart, all overlay scales are hidden.
 
-If you want to change `left` price scale, you need to use [`leftPriceScale`](/api/interfaces/ChartOptions.md#leftpricescale) option, to change `right` price scale use [`rightPriceScale`](/api/interfaces/ChartOptions.md#rightrricescale), to change default options for an overlay price scale use [`overlayPriceScales`](/api/interfaces/ChartOptions.md#overlaypricescales) option.
+If you want to change `left` price scale, you need to use [`leftPriceScale`](/api/interfaces/ChartOptions.md#leftpricescale) option, to change `right` price scale use [`rightPriceScale`](/api/interfaces/ChartOptions.md#rightpricescale), to change default options for an overlay price scale use [`overlayPriceScales`](/api/interfaces/ChartOptions.md#overlaypricescales) option.
 
 Alternatively, you can use [`IChartApi.priceScale`](/api/interfaces/IChartApi.md#pricescale) method to get an API object of any price scale or [`ISeriesApi.priceScale`](/api/interfaces/ISeriesApi.md#pricescale) to get an API object of series' price scale (the price scale that the series is attached to).
 
