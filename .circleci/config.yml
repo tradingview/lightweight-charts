@@ -162,11 +162,11 @@ jobs:
       - run-graphics-tests:
           devicePixelRatio: "1.0"
 
-  graphics-tests-dpr1_33:
+  graphics-tests-dpr1_25:
     executor: node12-browsers-executor
     steps:
       - run-graphics-tests:
-          devicePixelRatio: "1.33"
+          devicePixelRatio: "1.25"
 
   graphics-tests-dpr1_5:
     executor: node12-browsers-executor
@@ -315,7 +315,7 @@ workflows:
           filters: *merge-based-filters
           requires:
             - build
-      - graphics-tests-dpr1_33:
+      - graphics-tests-dpr1_25:
           filters: *merge-based-filters
           requires:
             - build
