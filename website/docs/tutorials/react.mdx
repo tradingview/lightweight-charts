@@ -1,0 +1,101 @@
+---
+id: react
+title: How to with React
+---
+
+On this page you will learn how to easily integrate Lightweight Charts into your React project.
+
+The below procedure will use [Parcel](https://github.com/brandiqa/react-parcel-starter) but the dependencies used in package.json will also be provided to start from scratch an empty project.
+
+
+### Setup your React project - using Parcel
+
+Feel free to reuse the setup details provided by Parcel or to just copy/paste the following
+
+```
+git clone git@github.com:brandiqa/react-parcel-starter.git lwc-react
+cd lwc-react
+npm install
+```
+
+### Run your React project
+
+```
+// The following will create a web page accessible by default on http://localhost:1234/
+npm start
+```
+
+### Setup your React project - without a project builder
+If for any reason you don't want to rely on a specific builder to construct your project and are only interested in doing things manually you will only need a few dependencies.
+```
+// package.json
+...
+"dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+},
+"devDependencies": {
+	"@babel/core": "^7.10.2",
+	"@babel/preset-env": "^7.10.2",
+	"@babel/preset-react": "^7.10.1",
+}
+```
+and then
+```
+npm install
+```
+
+### How to integrate LWC
+
+Whatever the means to setup your project, install the library by:
+
+```
+// This will add a line to your package.json dependencies section
+npm install --save lightweight-charts
+```
+
+Once installed, open your `index.html` and add a new _div_ inside the `<body>` tag
+```
+// This indicates that the 'container' for the chart will have for size the entirely of the screen
+<div id="container" style="position: absolute; width: 100%; height: 100%;"></div>
+```
+
+Then modify your main entry point file, like `App.jsx (or .tsx)` and add at the top of the file
+```
+import { createChart } from 'lightweight-charts';
+```
+
+Then declare some data that the chart will use to plot
+```
+const data = [
+	{ time: '2018-12-22', value: 32.51 },
+	{ time: '2018-12-23', value: 31.11 },
+	{ time: '2018-12-24', value: 27.02 },
+	{ time: '2018-12-25', value: 27.32 },
+	{ time: '2018-12-26', value: 25.17 },
+	{ time: '2018-12-27', value: 28.89 },
+	{ time: '2018-12-28', value: 25.46 },
+	{ time: '2018-12-29', value: 23.92 },
+	{ time: '2018-12-30', value: 22.68 },
+	{ time: '2018-12-31', value: 22.67 },
+];
+```
+
+Finally, inside the main function simply create a chart that will be associated with the container added in the html file.
+```
+const container = document.getElementById('container');
+const chart = createChart(container);
+```
+
+By just following the previous steps you won't see much. To actually render a chart you need to add data to some [series](http://localhost:4000/lightweight-charts/docs/series-types)
+```
+const areaSeries = chart.addAreaSeries();
+areaSeries.setData(data);
+```
+
+If you've successfully followed all the steps you should see something similar to
+
+
+import { SetupComponent } from "../../src/pages/react/setup-component.tsx"
+
+<SetupComponent/>
