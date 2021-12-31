@@ -2,7 +2,7 @@ function getNamingConventionRules(additionalDefaultFormats = []) {
 	return [
 		{ selector: 'default', format: ['camelCase', ...additionalDefaultFormats], leadingUnderscore: 'forbid', trailingUnderscore: 'forbid' },
 
-		{ selector: 'variable', format: ['camelCase', 'UPPER_CASE'] },
+		{ selector: 'variable', format: ['camelCase', 'UPPER_CASE', ...additionalDefaultFormats] },
 		// {
 		// 	selector: 'variable',
 		// 	types: ['boolean'],
@@ -155,7 +155,8 @@ module.exports = {
 				{
 					files: ['website/**/*.tsx'],
 					parserOptions: {
-						project: 'website/tsconfig.json',
+						project: 'tsconfig.json',
+						tsconfigRootDir: 'website',
 						sourceType: 'module',
 					},
 					rules: {
