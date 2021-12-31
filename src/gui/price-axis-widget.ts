@@ -29,6 +29,10 @@ const enum CursorType {
 	NsResize,
 }
 
+const enum Constants {
+	DefaultOptimalWidth = 34,
+}
+
 type IPriceAxisViewArray = readonly IPriceAxisView[];
 
 export class PriceAxisWidget implements IDestroyable {
@@ -171,8 +175,7 @@ export class PriceAxisWidget implements IDestroyable {
 			return 0;
 		}
 
-		// need some reasonable value for scale while initialization
-		let tickMarkMaxWidth = 34;
+		let tickMarkMaxWidth = 0;
 		const rendererOptions = this.rendererOptions();
 
 		const ctx = getContext2D(this._canvasBinding.canvas);
@@ -207,12 +210,14 @@ export class PriceAxisWidget implements IDestroyable {
 			);
 		}
 
+		const resultTickMarksMaxWidth = tickMarkMaxWidth || Constants.DefaultOptimalWidth;
+
 		let res = Math.ceil(
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
-			tickMarkMaxWidth
+			resultTickMarksMaxWidth
 		);
 		// make it even
 		res += res % 2;
