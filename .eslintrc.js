@@ -149,14 +149,15 @@ module.exports = {
 			],
 			parserOptions: {
 				project: 'tsconfig.json',
+				tsconfigRootDir: __dirname,
 				sourceType: 'module',
 			},
 			overrides: [
 				{
 					files: ['website/**/*.tsx'],
 					parserOptions: {
-						project: 'tsconfig.json',
-						tsconfigRootDir: 'website',
+						project: 'website/tsconfig.json',
+						tsconfigRootDir: __dirname,
 						sourceType: 'module',
 					},
 					rules: {
