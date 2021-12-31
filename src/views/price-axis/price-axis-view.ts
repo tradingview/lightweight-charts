@@ -43,6 +43,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 	}
 
 	public text(): string {
+		this._updateRendererDataIfNeeded();
 		return this._axisRendererData.text;
 	}
 
