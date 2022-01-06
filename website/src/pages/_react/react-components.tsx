@@ -70,9 +70,13 @@ export const CodeComponent = (options: { typeOfChart: SeriesType; seriesType: st
 	);
 };
 
-export const ChartComponent = (options: { typeOfChart: SeriesType; data: ChartDataType[] }): JSX.Element => {
-	const { typeOfChart, data } = options;
+export interface ChartProperties {
+	typeOfChart: SeriesType;
+	data: ChartDataType[];
+}
 
+export const ChartComponent = (props: ChartProperties): JSX.Element => {
+	const { typeOfChart, data } = props;
 	const chartContainerRef = useRef() as React.MutableRefObject<HTMLInputElement>;
 
 	const [seriesType, setSeriesType] = useState<string|null>(typeOfChart);
@@ -104,7 +108,7 @@ export const ChartComponent = (options: { typeOfChart: SeriesType; data: ChartDa
 			// tslint:disable-next-line: strict-type-predicates
 			if (chartContainerRef.current !== undefined && seriesType === null) {
 				const mainChart = createChart(chartContainerRef.current, {
-					width: 400,
+					width: 600,
 					height: 300,
 					rightPriceScale: {
 						visible: true,
@@ -126,7 +130,7 @@ export const ChartComponent = (options: { typeOfChart: SeriesType; data: ChartDa
 						break;
 
 					case 'Baseline':
-						series = mainChart.addBaselineSeries();
+						series = mainChart.addBaselineSeries({ baseValue: { price: 57.5 } });
 						setSeriesType('addBaselineSeries');
 						break;
 
@@ -136,7 +140,7 @@ export const ChartComponent = (options: { typeOfChart: SeriesType; data: ChartDa
 						break;
 
 					case 'Histogram':
-						series = mainChart.addHistogramSeries();
+						series = mainChart.addHistogramSeries({ priceFormat: { type: 'volume' } });
 						setSeriesType('addHistogramSeries');
 						break;
 
@@ -149,6 +153,7 @@ export const ChartComponent = (options: { typeOfChart: SeriesType; data: ChartDa
 				}
 
 				if (series !== undefined) {
+					mainChart.timeScale().fitContent();
 					series.setData(data);
 				}
 			}
@@ -157,38 +162,8 @@ export const ChartComponent = (options: { typeOfChart: SeriesType; data: ChartDa
 	);
 
 	return (
-		<>
-			<div className="chart" style={{
-				display: 'flex',
-				flexDirection: 'column',
-				flexWrap: 'nowrap',
-				justifyContent: 'space-around',
-				alignItems: 'flex-start',
-			}}>
-				<div style={{
-					display: 'flex',
-					flexDirection: 'column',
-					flexWrap: 'nowrap',
-					justifyContent: 'space-around',
-					alignItems: 'center',
-				}}>
-					<label htmlFor="chartType-select">This is the generated {typeOfChart} chart</label>
-					<div
-						ref={chartContainerRef}
-						className="chart-container"
-						style={{
-							margin: '20px',
-						}}
-					/>
-				</div>
-				<div className="details" style={{
-					display: 'flex',
-					flexDirection: 'row',
-					alignItems: 'flex-start',
-				}}>
-					<CodeComponent typeOfChart={typeOfChart} seriesType={seriesType} />
-				</div>
-			</div>
-		</>
+		<div
+			ref={chartContainerRef}
+		/>
 	);
 };
