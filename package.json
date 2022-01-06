@@ -85,9 +85,8 @@
     "typescript": "4.5.5"
   },
   "scripts": {
-    "postinstall": "npm run install-hooks && npm run install-website",
+    "postinstall": "npm run install-hooks",
     "install-hooks": "node scripts/githooks/install.js",
-    "install-website": "cd website && npm i",
     "clean": "rimraf lib/ dist/",
     "bundle-dts": "tsc --noEmit --allowJs dts-config.js && dts-bundle-generator --config dts-config.js",
     "tsc": "ttsc -p tsconfig.prod.json",

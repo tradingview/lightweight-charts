@@ -91,6 +91,7 @@ jobs:
     executor: node12-executor
     steps:
       - checkout-with-deps
+      - run: cd website && npm install && cd -
       - run: npm install
       - save_cache: *save-node-modules-cache
 
