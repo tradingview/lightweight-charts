@@ -1,0 +1,152 @@
+---
+id: howTo
+title: How to use Lightweight Charts with React
+---
+
+On this page you will learn how to easily use Lightweight Charts with React.
+
+The below procedure will use [Parcel](https://github.com/brandiqa/react-parcel-starter) but the dependencies used in package.json will also be provided to start from scratch an empty project.
+
+
+### Setup your React project - using Parcel
+
+Feel free to reuse the setup details provided by Parcel or to just copy/paste the following
+
+```
+git clone git@github.com:brandiqa/react-parcel-starter.git lwc-react
+cd lwc-react
+npm install
+```
+
+### Run your React project
+
+```
+// The following will create a web page accessible by default on http://localhost:1234/
+npm start
+```
+
+### Setup your React project - without a project builder
+If for any reason you don't want to rely on a specific builder to construct your project and are only interested in doing things manually you will only need a few dependencies.
+```
+// package.json
+...
+"dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+},
+"devDependencies": {
+	"@babel/core": "^7.10.2",
+	"@babel/preset-env": "^7.10.2",
+	"@babel/preset-react": "^7.10.1",
+}
+```
+and then
+```
+npm install
+```
+
+### How to create your own Charting React component
+
+One of the advantages of React is its ability to decompose code complexity in reusable components.
+The following piece of code will show you how to create a dedicated chart component that could then be reused by other components.
+
+The simplest component could be defined as follow. Let's defined a file that would be named `ChartComponent.tsx`
+
+```
+import { IChartApi, createChart } from "lightweight-charts";
+import { useEffect, useRef } from "react";
+
+export interface NonOHLCDataType {
+	time: string;
+	value: number;
+}
+
+export interface OHLCDataType {
+	time: string;
+	open: number;
+	high: number;
+	low: number;
+	close: number;
+}
+
+export type ChartDataType = NonOHLCDataType | OHLCDataType;
+
+export interface ChartProperties {
+	data: ChartDataType[];
+}
+
+export const ChartComponent = (props: ChartProperties): JSX.Element => {
+	const { data } = props;
+	const chartContainerRef = useRef() as React.MutableRefObject<HTMLInputElement>;
+
+	let mainChart: IChartApi;
+
+	useEffect(
+		() => {
+			const handleResize = () => {
+				mainChart?.resize(chartContainerRef.current.clientWidth, chartContainerRef.current.clientHeight);
+			};
+
+			window.addEventListener('resize', handleResize);
+
+			return () => window.removeEventListener('resize', handleResize);
+		},
+		[mainChart]
+	);
+
+	useEffect(
+		() => {
+			mainChart = createChart(chartContainerRef.current, {
+				width: 400,
+				height: 300
+			});
+
+			let series = mainChart.addAreaSeries();
+			series.setData(data);
+		},
+		[data]
+	);
+
+	return (
+		<div
+			ref={chartContainerRef}
+		/>
+	);
+};
+```
+
+In another component, let's say the classical `App.tsx` you could then simply do
+
+```
+import * as React from 'react'
+import { ChartComponent } from "./ChartComponent";
+
+const data = [
+	{ time: '2018-12-22', value: 32.51 },
+	{ time: '2018-12-23', value: 31.11 },
+	{ time: '2018-12-24', value: 27.02 },
+	{ time: '2018-12-25', value: 27.32 },
+	{ time: '2018-12-26', value: 25.17 },
+	{ time: '2018-12-27', value: 28.89 },
+	{ time: '2018-12-28', value: 25.46 },
+	{ time: '2018-12-29', value: 23.92 },
+	{ time: '2018-12-30', value: 22.68 },
+	{ time: '2018-12-31', value: 22.67 },
+];
+
+
+export default function App() {
+	return (
+		<ChartComponent data={data}></ChartComponent>
+	);
+}
+
+```
+
+and you'll have a reusable component that could then enhance, tweak to meet your needs, adding properties and even functionalities.
+
+If you've successfully followed all the steps you should see something similar to
+
+import { SetupComponent } from "../../src/pages/_react/setup-component.tsx"
+
+<SetupComponent/>

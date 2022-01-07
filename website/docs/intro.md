@@ -68,7 +68,7 @@ const baselineSeries = chart.addBaselineSeries();
 // ... and so on
 ```
 
-Please look at [this page](/series-types.mdx) for more information about different series types.
+Please look at [this page](/series-types.md) for more information about different series types.
 
 Note that **a series cannot be transferred from one type to another one** since different series types have different data and options types.
 

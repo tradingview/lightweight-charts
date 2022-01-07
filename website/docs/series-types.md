@@ -4,9 +4,6 @@ sidebar_position: 1
 
 # Series types
 
-import { ChartComponent } from "../src/pages/_react/react-components.tsx"
-import { coloredTimedValueData, ohlcData, timedValueData } from "../src/pages/_react/data.tsx"
-
 In this article you can read a brief overview of all supported series types.
 
 ## A series customizations
@@ -45,9 +42,7 @@ If you'd like to change any option of a series, you could do this in different w
 
 An area chart is basically a colored area between the line connecting all data points and [the time scale](./time-scale.md):
 
-<ChartComponent typeOfChart={'Area'} data={timedValueData}></ChartComponent>
-
-using the following [data](#area-baseline--line-data).
+![Area chart example](/img/area-series.png "Area chart example")
 
 ## Bar
 
@@ -60,9 +55,7 @@ A bar chart shows price movements in the form of bars.
 Vertical line length of a bar is limited by the highest and lowest price values.
 Open & Close values are represented by tick marks, on the left & right hand side of the bar respectively:
 
-<ChartComponent typeOfChart={'Bar'} data={ohlcData}></ChartComponent>
-
-using the following [data](#bar--candlestick-data).
+![Bar chart example](/img/bar-series.png "Bar chart example")
 
 ## Baseline
 
@@ -72,9 +65,7 @@ using the following [data](#bar--candlestick-data).
 
 A baseline is basically two colored areas (top and bottom) between the line connecting all data points and [the base value line](/api/interfaces/BaselineStyleOptions.md#basevalue):
 
-<ChartComponent typeOfChart={'Baseline'} data={timedValueData}></ChartComponent>
-
-using the following [data](#area-baseline--line-data).
+![Baseline chart example](/img/baseline-series.png)
 
 ## Candlestick
 
@@ -85,9 +76,7 @@ using the following [data](#area-baseline--line-data).
 A candlestick chart shows price movements in the form of candlesticks.
 On the candlestick chart, open & close values form a solid body of a candle while wicks show high & low values for a candlestick's time interval:
 
-<ChartComponent typeOfChart={'Candlestick'} data={ohlcData}></ChartComponent>
-
-using the following [data](#bar--candlestick-data).
+![Candlestick chart example](/img/candlestick-series.png "Candlestick chart example")
 
 ## Histogram
 
@@ -98,9 +87,7 @@ using the following [data](#bar--candlestick-data).
 A histogram series is a graphical representation of the value distribution.
 Histogram creates intervals (columns) and counts how many values fall into each column:
 
-<ChartComponent typeOfChart={'Histogram'} data={coloredTimedValueData}></ChartComponent>
-
-using the following [data](#histogram-data).
+![Histogram example](/img/histogram-series.png "Histogram chart example")
 
 ## Line
 
@@ -110,24 +97,7 @@ using the following [data](#histogram-data).
 
 A line chart is a type of chart that displays information as series of the data points connected by straight line segments:
 
-<ChartComponent typeOfChart={'Line'} data={timedValueData}></ChartComponent>
-
-using the following [data](#area-baseline--line-data).
-
-## Data used to render those charts
-
-### Area, Baseline & Line data
-
-<code>{`const data = "${JSON.stringify(timedValueData, undefined, 4)}"`}</code>
-
-### Bar & Candlestick data
-
-<code>{`const data = "${JSON.stringify(ohlcData, undefined, 4)}"`}</code>
-
-### Histogram data
-
-<code>{`const data = "${JSON.stringify(coloredTimedValueData, undefined, 4)}"`}</code>
-
+![Line chart example](/img/line-series.png "Line chart example")
 
 <!--
 Please use the following snippet to update the screenshots below (make sure that DPR=2):
