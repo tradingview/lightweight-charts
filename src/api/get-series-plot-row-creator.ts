@@ -5,10 +5,15 @@ import { TimePoint, TimePointIndex } from '../model/time-data';
 
 import { BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 
-function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData): Mutable<SeriesPlotRow<'Line' | 'Histogram' | 'Area' | 'Baseline'>> {
+function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData): Mutable<SeriesPlotRow<'Area' | 'Baseline'>> {
+	const val = item.value;
+	return { index, time, value: [val, val, val, val] };
+}
+
+function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;
 
-	const res: Mutable<SeriesPlotRow<'Histogram' | 'Line'>> = { index, time, value: [val, val, val, val] };
+	const res: Mutable<SeriesPlotRow<'Line' | 'Histogram'>> = { index, time, value: [val, val, val, val] };
 
 	// 'color' here is public property (from API) so we can use `in` here safely
 	// eslint-disable-next-line no-restricted-syntax
@@ -86,8 +91,8 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Bar: wrapWhitespaceData(getBarSeriesPlotRow),
 	Area: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 	Baseline: wrapWhitespaceData(getLineBasedSeriesPlotRow),
-	Histogram: wrapWhitespaceData(getLineBasedSeriesPlotRow),
-	Line: wrapWhitespaceData(getLineBasedSeriesPlotRow),
+	Histogram: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
+	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 };
 
 export function getSeriesPlotRowCreator(seriesType: SeriesType): TimedSeriesItemValueFn {
