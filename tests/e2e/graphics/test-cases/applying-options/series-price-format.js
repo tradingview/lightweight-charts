@@ -32,6 +32,7 @@ function runTestCase(container) {
 					precision: 2,
 				},
 			});
+			resolve();
 		}, 100);
 	});
 }
