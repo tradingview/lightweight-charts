@@ -232,6 +232,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		if (options.priceFormat !== undefined) {
 			this._recreateFormatter();
+
+			// updated formatter might affect rendering  and as a consequence of this the width of price axis might be changed
+			// thus we need to force the chart to do a full update to apply changes correctly
+			// full update is quite heavy operation in terms of performance
+			// but updating formatter looks like quite rare so forcing a full update here shouldn't affect the performance a lot
+			this.model().fullUpdate();
 		}
 
 		this.model().updateSource(this);
