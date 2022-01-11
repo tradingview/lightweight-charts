@@ -65,13 +65,16 @@ export interface HandleScrollOptions {
 	vertTouchDrag: boolean;
 
 	/**
-	 * Enable quick tracking mode
+	 * Activate scroll on touch end event.
 	 *
-	 * When enabled, the chart will exit the tracking mode once the touch ends.
+	 * By default, mobile users will long press to deactivate the scroll and have the ability to check values and dates.
+	 * Another press is required to activate the scroll, be able to move left/right, zoom, etc.
+	 *
+	 * When enabled, the chart will activate the scroll on touch end event.
 	 *
 	 * @defaultValue `false`
 	 */
-	quickTrackingMode: boolean;
+	activateScrollOnTouchEnd: boolean;
 }
 
 /**

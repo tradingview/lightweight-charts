@@ -37,7 +37,7 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 		pressedMouseMove: true,
 		horzTouchDrag: true,
 		vertTouchDrag: true,
-		quickTrackingMode: false,
+		activateScrollOnTouchEnd: false,
 	},
 	handleScale: {
 		axisPressedMouseMove: {

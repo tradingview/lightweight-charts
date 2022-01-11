@@ -358,7 +358,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public touchEndEvent(event: MouseEventHandlerTouchEvent): void {
-		if (this.chart().options().handleScroll.quickTrackingMode) {
+		if (this.chart().options().handleScroll.activateScrollOnTouchEnd) {
 			this._exitTrackingModeOnNextTry = true;
 			this._tryExitTrackingMode();
 			return;
