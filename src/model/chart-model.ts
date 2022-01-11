@@ -63,6 +63,15 @@ export interface HandleScrollOptions {
 	 * @defaultValue `true`
 	 */
 	vertTouchDrag: boolean;
+
+	/**
+	 * Enable quick tracking mode
+	 *
+	 * When enabled, the chart will exit the tracking mode once the touch ends.
+	 *
+	 * @defaultValue `false`
+	 */
+	quickTrackingMode: boolean;
 }
 
 /**
