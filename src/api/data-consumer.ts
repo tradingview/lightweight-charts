@@ -62,9 +62,9 @@ export interface WhitespaceData {
 }
 
 /**
- * Represents a data point for a line or area series.
+ * A base interface for a data point of single-value series.
  */
-export interface LineData {
+export interface SingleValueData {
 	/**
 	 * The time of the data.
 	 */
@@ -77,11 +77,21 @@ export interface LineData {
 }
 
 /**
+ * Structure describing a single item of data for line series
+ */
+export interface LineData extends SingleValueData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+}
+
+/**
  * Structure describing a single item of data for histogram series
  */
-export interface HistogramData extends LineData {
+export interface HistogramData extends SingleValueData {
 	/**
-	 * Optional color value for certain data item. If missed, color from HistogramSeriesOptions is used
+	 * Optional color value for certain data item. If missed, color from options is used
 	 */
 	color?: string;
 }
@@ -89,7 +99,7 @@ export interface HistogramData extends LineData {
 /**
  * Represents a bar with a {@link Time} and open, high, low, and close prices.
  */
-export interface BarData {
+export interface OhlcData {
 	/**
 	 * The bar time.
 	 */
@@ -113,6 +123,34 @@ export interface BarData {
 	close: number;
 }
 
+/**
+ * Structure describing a single item of data for bar series
+ */
+export interface BarData extends OhlcData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+}
+
+/**
+ * Structure describing a single item of data for candlestick series
+ */
+export interface CandlestickData extends OhlcData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+	/**
+	 * Optional border color value for certain data item. If missed, color from options is used
+	 */
+	borderColor?: string;
+	/**
+	 * Optional wick color value for certain data item. If missed, color from options is used
+	 */
+	wickColor?: string;
+}
+
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
@@ -134,15 +172,15 @@ export interface SeriesDataItemTypeMap {
 	/**
 	 * The types of candlestick series data.
 	 */
-	Candlestick: BarData | WhitespaceData;
+	Candlestick: CandlestickData | WhitespaceData;
 	/**
 	 * The types of area series data.
 	 */
-	Area: LineData | WhitespaceData;
+	Area: SingleValueData | WhitespaceData;
 	/**
 	 * The types of baseline series data.
 	 */
-	Baseline: LineData | WhitespaceData;
+	Baseline: SingleValueData | WhitespaceData;
 	/**
 	 * The types of line series data.
 	 */

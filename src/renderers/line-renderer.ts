@@ -5,7 +5,7 @@ import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-
 import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
 
-export type LineItem = TimedValue & PricedValue & LinePoint;
+export type LineItem = TimedValue & PricedValue & LinePoint & { color?: string };
 
 export interface PaneRendererLineDataBase {
 	lineType: LineType;
@@ -40,15 +40,26 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 		ctx.strokeStyle = this._strokeStyle(ctx);
 		ctx.lineJoin = 'round';
 
-		ctx.beginPath();
 		if (this._data.items.length === 1) {
+			ctx.beginPath();
+
 			const point = this._data.items[0];
 			ctx.moveTo(point.x - this._data.barWidth / 2, point.y);
 			ctx.lineTo(point.x + this._data.barWidth / 2, point.y);
-		} else {
-			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
-		}
 
+			if (point.color !== undefined) {
+				ctx.strokeStyle = point.color;
+			}
+
+			ctx.stroke();
+		} else {
+			this._drawLine(ctx, this._data);
+		}
+	}
+
+	protected _drawLine(ctx: CanvasRenderingContext2D, data: TData): void {
+		ctx.beginPath();
+		walkLine(ctx, data.items, data.lineType, data.visibleRange as SeriesItemsIndexesRange);
 		ctx.stroke();
 	}
 
@@ -60,6 +71,56 @@ export interface PaneRendererLineData extends PaneRendererLineDataBase {
 }
 
 export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData> {
+	/**
+	 * Similar to {@link walkLine}, but supports color changes
+	 */
+	protected override _drawLine(ctx: CanvasRenderingContext2D, data: PaneRendererLineData): void {
+		const { items, visibleRange, lineType, lineColor } = data;
+		if (items.length === 0 || visibleRange === null) {
+			return;
+		}
+
+		ctx.beginPath();
+
+		const firstItem = items[visibleRange.from];
+		ctx.moveTo(firstItem.x, firstItem.y);
+
+		let prevStrokeStyle = firstItem.color ?? lineColor;
+		ctx.strokeStyle = prevStrokeStyle;
+
+		const changeColor = (color: string) => {
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.strokeStyle = color;
+			prevStrokeStyle = color;
+		};
+
+		for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
+			const currItem = items[i];
+			const prevItem = items[i - 1];
+
+			const currentStrokeStyle = currItem.color ?? lineColor;
+
+			if (lineType === LineType.WithSteps) {
+				ctx.lineTo(currItem.x, prevItem.y);
+
+				if (currentStrokeStyle !== prevStrokeStyle) {
+					changeColor(currentStrokeStyle);
+					ctx.moveTo(currItem.x, prevItem.y);
+				}
+			}
+
+			ctx.lineTo(currItem.x, currItem.y);
+
+			if (lineType !== LineType.WithSteps && currentStrokeStyle !== prevStrokeStyle) {
+				changeColor(currentStrokeStyle);
+				ctx.moveTo(currItem.x, currItem.y);
+			}
+		}
+
+		ctx.stroke();
+	}
+
 	protected override _strokeStyle(): CanvasRenderingContext2D['strokeStyle'] {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		return this._data!.lineColor;
