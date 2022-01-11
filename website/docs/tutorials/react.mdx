@@ -1,5 +1,5 @@
 ---
-id: howTo
+id: react
 title: How to use Lightweight Charts with React
 ---
 
@@ -50,61 +50,48 @@ npm install
 One of the advantages of React is its ability to decompose code complexity in reusable components.
 The following piece of code will show you how to create a dedicated chart component that could then be reused by other components.
 
-The simplest component could be defined as follow. Let's defined a file that would be named `ChartComponent.tsx`
+The simplest component could be defined as follow.
 
-```
-import { IChartApi, createChart } from "lightweight-charts";
-import { useEffect, useRef } from "react";
+```javascript
+// Let's defined a file that would be named `ChartComponent.jsx`
+import { createChart } from "lightweight-charts";
+import { useEffect, useRef, useState } from "react";
 
-export interface NonOHLCDataType {
-	time: string;
-	value: number;
-}
-
-export interface OHLCDataType {
-	time: string;
-	open: number;
-	high: number;
-	low: number;
-	close: number;
-}
-
-export type ChartDataType = NonOHLCDataType | OHLCDataType;
-
-export interface ChartProperties {
-	data: ChartDataType[];
-}
-
-export const ChartComponent = (props: ChartProperties): JSX.Element => {
+export const ChartComponent = (props) => {
 	const { data } = props;
-	const chartContainerRef = useRef() as React.MutableRefObject<HTMLInputElement>;
 
-	let mainChart: IChartApi;
+	const chart = useRef();
+	const chartContainerRef = useRef();
+
+	const [series, setSeries] = useState();
+
+	const handleResize = () => {
+		chart.current.resize(400, 300);
+	};
 
 	useEffect(
 		() => {
-			const handleResize = () => {
-				mainChart?.resize(chartContainerRef.current.clientWidth, chartContainerRef.current.clientHeight);
-			};
-
-			window.addEventListener('resize', handleResize);
-
-			return () => window.removeEventListener('resize', handleResize);
+			if (chart.current !== undefined && series !== undefined) {
+				series.setData(data);
+			}
 		},
-		[mainChart]
+		[data, series]
 	);
 
 	useEffect(
 		() => {
-			mainChart = createChart(chartContainerRef.current, {
+			chart.current = createChart(chartContainerRef.current, {
 				width: 400,
 				height: 300
 			});
 
-			let series = mainChart.addAreaSeries();
-			series.setData(data);
+			const newSeries = chart.current.addAreaSeries();
+			setSeries(newSeries);
+
+			window.addEventListener('resize', handleResize);
+			return () => window.removeEventListener('resize', handleResize);
 		},
-		[data]
+		[]
 	);
 
 	return (
@@ -113,11 +100,8 @@ export const ChartComponent = (props: ChartProperties): JSX.Element => {
 		/>
 	);
 };
-```
 
-In another component, let's say the classical `App.tsx` you could then simply do
-
-```
+// In another component, let's say the classical `App.jsx` you could then simply do
 import * as React from 'react'
 import { ChartComponent } from "./ChartComponent";
 
@@ -143,7 +127,7 @@ export default function App() {
 
 ```
 
-and you'll have a reusable component that could then enhance, tweak to meet your needs, adding properties and even functionalities.
+and you'll have a reusable component that could then be enhanced, tweaked to meet your needs, adding properties and even functionalities.
 
 If you've successfully followed all the steps you should see something similar to
 
