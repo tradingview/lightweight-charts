@@ -3,9 +3,9 @@ import { ensureNotNull } from '../helpers/assertions';
 import { BarCoordinates, BarPrices } from '../model/bar';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
 import { optimalBarWidth } from './optimal-bar-width';
-import { CanvasRenderingParams } from './render-params';
 
 export type BarCandlestickItemBase = TimedValue & BarPrices & BarCoordinates;
 

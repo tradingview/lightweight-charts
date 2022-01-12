@@ -1,5 +1,5 @@
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 export class CompositeRenderer implements IPaneRenderer {
 	private _renderers: readonly IPaneRenderer[] = [];

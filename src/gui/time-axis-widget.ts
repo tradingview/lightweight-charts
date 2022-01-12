@@ -12,8 +12,8 @@ import { LayoutOptions } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TickMarkWeight } from '../model/time-data';
 import { TimeMark } from '../model/time-scale';
+import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/canvas-rendering-target';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
-import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/render-params';
 
 import { createBoundCanvas, getContext2D } from './canvas-utils';
 import { ChartWidget } from './chart-widget';

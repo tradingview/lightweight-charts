@@ -2,13 +2,13 @@ import { drawScaled } from '../helpers/canvas-helpers';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import {
 	IPriceAxisViewRenderer,
 	PriceAxisViewRendererCommonData,
 	PriceAxisViewRendererData,
 	PriceAxisViewRendererOptions,
 } from './iprice-axis-view-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	private _data!: PriceAxisViewRendererData;

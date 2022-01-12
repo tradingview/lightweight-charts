@@ -3,9 +3,9 @@ import { fillRectInnerBorder } from '../helpers/canvas-helpers';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { BarCandlestickItemBase } from './bars-renderer';
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
 import { optimalCandlestickWidth } from './optimal-bar-width';
-import { CanvasRenderingParams } from './render-params';
 
 export interface CandlestickItem extends BarCandlestickItemBase {
 	color: string;

@@ -2,9 +2,9 @@ import { ensureNotNull } from '../helpers/assertions';
 
 import { PriceMark } from '../model/price-scale';
 
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { LineStyle, setLineStyle, strokeInPixel } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 export interface GridMarks {
 	coord: number;

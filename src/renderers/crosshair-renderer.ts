@@ -1,6 +1,6 @@
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 export interface CrosshairLineStyle {
 	lineStyle: LineStyle;

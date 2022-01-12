@@ -13,9 +13,9 @@ import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
+import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/canvas-rendering-target';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
-import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/render-params';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { createBoundCanvas, getContext2D } from './canvas-utils';

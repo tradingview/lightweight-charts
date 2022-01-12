@@ -1,8 +1,8 @@
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue, TimePointIndex } from '../model/time-data';
 
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 const showSpacingMinimalBarWidth = 1;
 const alignToMinimalWidthLimit = 4;

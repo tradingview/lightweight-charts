@@ -14,8 +14,8 @@ import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
+import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/canvas-rendering-target';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
-import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/render-params';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas, getContext2D } from './canvas-utils';

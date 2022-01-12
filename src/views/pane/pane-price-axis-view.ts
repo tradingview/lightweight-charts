@@ -2,9 +2,9 @@
 import { ChartModel } from '../../model/chart-model';
 import { IPriceDataSource } from '../../model/iprice-data-source';
 import { TextWidthCache } from '../../model/text-width-cache';
+import { CanvasRenderingParams } from '../../renderers/canvas-rendering-target';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { IPriceAxisViewRenderer, PriceAxisViewRendererOptions } from '../../renderers/iprice-axis-view-renderer';
-import { CanvasRenderingParams } from '../../renderers/render-params';
 
 import { IPriceAxisView } from '../price-axis/iprice-axis-view';
 import { IPaneView } from './ipane-view';

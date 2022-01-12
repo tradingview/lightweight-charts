@@ -1,5 +1,5 @@
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 export abstract class ScaledRenderer implements IPaneRenderer {
 	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {

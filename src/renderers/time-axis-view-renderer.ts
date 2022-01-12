@@ -1,8 +1,8 @@
 import { ensureNotNull } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
 
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { ITimeAxisViewRenderer, TimeAxisViewRendererOptions } from './itime-axis-view-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 export interface TimeAxisViewRendererData {
 	width: number;

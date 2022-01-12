@@ -1,7 +1,7 @@
 import { Point } from '../model/point';
 
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 export interface LastPriceCircleRendererData {
 	radius: number;

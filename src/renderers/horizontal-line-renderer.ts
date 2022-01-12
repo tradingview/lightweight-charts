@@ -1,8 +1,8 @@
 import { Coordinate } from '../model/coordinate';
 
+import { CanvasRenderingParams } from './canvas-rendering-target';
 import { drawHorizontalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
-import { CanvasRenderingParams } from './render-params';
 
 export interface HorizontalLineRendererData {
 	color: string;

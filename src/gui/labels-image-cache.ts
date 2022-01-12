@@ -9,7 +9,7 @@ import { makeFont } from '../helpers/make-font';
 import { ceiledEven } from '../helpers/mathex';
 
 import { TextWidthCache } from '../model/text-width-cache';
-import { CanvasRenderingParams } from '../renderers/render-params';
+import { CanvasRenderingParams } from '../renderers/canvas-rendering-target';
 
 const MAX_COUNT = 200;
 
