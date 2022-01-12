@@ -354,10 +354,10 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	/**
-		* In Firefox mouse events dont't fire if the mouse position is outside of the browser's border.
-		* To prevent the mouse from hanging while pressed we're subscribing on the mouseleave event of the document element.
-		* We're subscribing on mouseleave, but this event is actually fired on mouseup outside of the browser's border.
-		*/
+	 * In Firefox mouse events dont't fire if the mouse position is outside of the browser's border.
+	 * To prevent the mouse from hanging while pressed we're subscribing on the mouseleave event of the document element.
+	 * We're subscribing on mouseleave, but this event is actually fired on mouseup outside of the browser's border.
+	 */
 	private _onFirefoxOutsideMouseUp = (mouseUpEvent: MouseEvent) => {
 		this._mouseUpHandler(mouseUpEvent);
 	};
