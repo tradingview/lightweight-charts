@@ -11,7 +11,7 @@ export function isIOS(): boolean {
 	if (!isRunningOnClientSide) {
 		return false;
 	}
-    // eslint-disable-next-line deprecation/deprecation
+	// eslint-disable-next-line deprecation/deprecation
 	return /iPhone|iPad|iPod/.test(window.navigator.platform);
 }
 
