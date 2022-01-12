@@ -37,7 +37,7 @@ If you'd like to change any option of a series, you could do this in different w
 ## Area
 
 - **Method to create**: [`IChartApi.addAreaSeries`](/api/interfaces/IChartApi.md#addareaseries)
-- **Data format**: [`LineData`](/api/interfaces/LineData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`SingleValueData`](/api/interfaces/SingleValueData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`AreaStyleOptions`](/api/interfaces/AreaStyleOptions.md)
 
 An area chart is basically a colored area between the line connecting all data points and [the time scale](./time-scale.md):
@@ -60,7 +60,7 @@ Open & Close values are represented by tick marks, on the left & right hand side
 ## Baseline
 
 - **Method to create**: [`IChartApi.addBaselineSeries`](/api/interfaces/IChartApi.md#addbaselineseries)
-- **Data format**: [`LineData`](/api/interfaces/LineData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`SingleValueData`](/api/interfaces/SingleValueData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`BaselineStyleOptions`](/api/interfaces/BaselineStyleOptions.md)
 
 A baseline is basically two colored areas (top and bottom) between the line connecting all data points and [the base value line](/api/interfaces/BaselineStyleOptions.md#basevalue):
@@ -70,7 +70,7 @@ A baseline is basically two colored areas (top and bottom) between the line conn
 ## Candlestick
 
 - **Method to create**: [`IChartApi.addCandlestickSeries`](/api/interfaces/IChartApi.md#addcandlestickseries)
-- **Data format**: [`BarData`](/api/interfaces/BarData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Data format**: [`CandlestickData`](/api/interfaces/CandlestickData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`CandlestickStyleOptions`](/api/interfaces/CandlestickStyleOptions.md)
 
 A candlestick chart shows price movements in the form of candlesticks.

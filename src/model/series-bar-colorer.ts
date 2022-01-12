@@ -45,7 +45,7 @@ export class SeriesBarColorer {
 		const seriesOptions = this._series.options();
 		switch (targetType) {
 			case 'Line':
-				return this._lineStyle(seriesOptions as LineStyleOptions);
+				return this._lineStyle(seriesOptions as LineStyleOptions, barIndex, precomputedBars);
 
 			case 'Area':
 				return this._areaStyle(seriesOptions as AreaStyleOptions);
@@ -74,11 +74,16 @@ export class SeriesBarColorer {
 		const borderUpColor = upColor;
 		const borderDownColor = downColor;
 
-		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Bar'>;
 		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
-		result.barColor = isUp ? upColor : downColor;
-		result.barBorderColor = isUp ? borderUpColor : borderDownColor;
+		if (currentBar.color !== undefined) {
+			result.barColor = currentBar.color;
+			result.barBorderColor = currentBar.color;
+		} else {
+			result.barColor = isUp ? upColor : downColor;
+			result.barBorderColor = isUp ? borderUpColor : borderDownColor;
+		}
 
 		return result;
 	}
@@ -94,12 +99,12 @@ export class SeriesBarColorer {
 		const wickUpColor = candlestickStyle.wickUpColor;
 		const wickDownColor = candlestickStyle.wickDownColor;
 
-		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars));
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Candlestick'>;
 		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
-		result.barColor = isUp ? upColor : downColor;
-		result.barBorderColor = isUp ? borderUpColor : borderDownColor;
-		result.barWickColor = isUp ? wickUpColor : wickDownColor;
+		result.barColor = currentBar.color ?? (isUp ? upColor : downColor);
+		result.barBorderColor = currentBar.borderColor ?? (isUp ? borderUpColor : borderDownColor);
+		result.barWickColor = currentBar.wickColor ?? (isUp ? wickUpColor : wickDownColor);
 
 		return result;
 	}
@@ -121,10 +126,12 @@ export class SeriesBarColorer {
 		};
 	}
 
-	private _lineStyle(lineStyle: LineStyleOptions): BarColorerStyle {
+	private _lineStyle(lineStyle: LineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
+
 		return {
 			...emptyResult,
-			barColor: lineStyle.color,
+			barColor: currentBar.color ?? lineStyle.color,
 		};
 	}
 
