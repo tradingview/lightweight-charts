@@ -6,7 +6,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 
-import { ChartModel, HoveredObject } from '../model/chart-model';
+import { ChartModel, HoveredObject, TrackingExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -22,7 +22,6 @@ import { ChartWidget } from './chart-widget';
 import { KineticAnimation } from './kinetic-animation';
 import { MouseEventHandler, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
-import { mobileTouch } from './support-touch';
 
 const enum Constants {
 	MinScrollSpeed = 0.2,
@@ -235,9 +234,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const x = event.localX;
 		const y = event.localY;
 
-		if (!mobileTouch) {
-			this._setCrosshairPosition(x, y);
-		}
+		this._setCrosshairPosition(x, y);
 	}
 
 	public mouseDownEvent(event: MouseEventHandlerMouseEvent): void {
@@ -358,10 +355,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public touchEndEvent(event: MouseEventHandlerTouchEvent): void {
-		if (this.chart().options().handleScroll.activateScrollOnTouchEnd) {
+		if (this.chart().options().trackingMode.exitMode === TrackingExitMode.OnTouchEnd) {
 			this._exitTrackingModeOnNextTry = true;
 		}
 		this._tryExitTrackingMode();
+		this._endScroll(event);
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HitTestResult | null {

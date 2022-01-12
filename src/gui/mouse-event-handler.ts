@@ -5,8 +5,6 @@ import { IDestroyable } from '../helpers/idestroyable';
 
 import { Coordinate } from '../model/coordinate';
 
-import { setLastEventIsTouch } from './last-touch-or-mouse-event';
-
 export type HandlerMouseEventCallback = (event: MouseEventHandlerMouseEvent) => void;
 export type HandlerTouchEventCallback = (event: MouseEventHandlerTouchEvent) => void;
 export type EmptyCallback = () => void;
@@ -777,19 +775,12 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _processTouchEvent(event: MouseEventHandlerTouchEvent, callback?: HandlerTouchEventCallback): void {
-		setLastEventIsTouch(true);
 		if (callback) {
 			callback.call(this._handler, event);
 		}
 	}
 
 	private _processMouseEvent(event: MouseEventHandlerMouseEvent, callback?: HandlerMouseEventCallback): void {
-		if (event.srcType !== 'mouseleave') {
-			// some browsers like mobile Safari emit mouse leave events on touch devices
-			// on taping outside of the source element
-			// There is no way to detect if it's really mouse event or not
-			setLastEventIsTouch(false);
-		}
 		if (!callback) {
 			return;
 		}
