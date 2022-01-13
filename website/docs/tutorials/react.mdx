@@ -47,13 +47,9 @@ npm install
 
 ### How to create your own Charting React component
 
-One of the advantages of React is its ability to decompose code complexity in reusable components.
-The following piece of code will show you how to create a dedicated chart component that could then be reused by other components.
-
-The simplest component could be defined as follow.
+The example _React component_ on this page may not fit your requirements completely. Creating a general purpose declarative wrapper for Lightweight Chart's imperative API is a challenge, but hopefully you can adapt this example to your use case.
 
 ```javascript
-// Let's defined a file that would be named `ChartComponent.jsx`
 import { createChart } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
 
@@ -89,7 +85,12 @@ export const ChartComponent = (props) => {
 			setSeries(newSeries);
 
 			window.addEventListener('resize', handleResize);
-			return () => window.removeEventListener('resize', handleResize);
+			return () => {
+				window.removeEventListener('resize', handleResize);
+
+				chart.current.remove();
+				chart.current = undefined;
+			}
 		},
 		[]
 	);
@@ -100,10 +101,6 @@ export const ChartComponent = (props) => {
 		/>
 	);
 };
-
-// In another component, let's say the classical `App.jsx` you could then simply do
-import * as React from 'react'
-import { ChartComponent } from "./ChartComponent";
 
 const data = [
 	{ time: '2018-12-22', value: 32.51 },
@@ -131,6 +128,6 @@ and you'll have a reusable component that could then be enhanced, tweaked to mee
 
 If you've successfully followed all the steps you should see something similar to
 
-import { SetupComponent } from "../../src/pages/_react/setup-component.tsx"
+import { ChartComponent } from "../../src/pages/_react/chart-component"
 
-<SetupComponent/>
+<ChartComponent/>
