@@ -19,6 +19,6 @@ export function isChrome(): boolean {
 	if (!isRunningOnClientSide) {
 		return false;
 	}
-	return window.chrome?.runtime !== undefined;
+	return window.chrome !== undefined;
 }
 

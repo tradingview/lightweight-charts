@@ -8,7 +8,5 @@ interface UIEvent {
 }
 
 interface Window {
-	chrome?: {
-		runtime: unknown;
-	};
+	chrome: unknown;
 }
