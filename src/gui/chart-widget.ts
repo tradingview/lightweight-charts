@@ -483,9 +483,28 @@ export class ChartWidget implements IDestroyable {
 	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {
 		const timeScale = this._model.timeScale();
 		switch (invalidation.type) {
-			case TimeScaleInvalidationType.FitContent:
+			case TimeScaleInvalidationType.FitContent: {
+				const priceAxisWidth = {
+					left: this.getPriceAxisWidth('left'),
+					right: this.getPriceAxisWidth('right'),
+				};
 				timeScale.fitContent();
+				// Invalidation and drawing is set to happen on animation frame. We need to adjust
+				// the size immediately here to get the new width set, to be used for the next
+				// fitContent()
+				this._adjustSizeImpl();
+				const newPriceAxisWidth = {
+					left: this.getPriceAxisWidth('left'),
+					right: this.getPriceAxisWidth('right'),
+				};
+				// fitContent() might cause the data of the price axis to change, causing optimal
+				// width of the price axis widget to change, causing time scale to adjust its
+				// width. It will make the bar spacing previously set to fit the content incorrect
+				if (priceAxisWidth.left !== newPriceAxisWidth.left || priceAxisWidth.right !== newPriceAxisWidth.right) {
+					timeScale.fitContent();
+				}
 				break;
+			}
 			case TimeScaleInvalidationType.ApplyRange:
 				timeScale.setLogicalRange(invalidation.value);
 				break;
