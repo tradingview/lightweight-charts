@@ -230,6 +230,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (!this._state) {
 			return;
 		}
+		this._onMouseEvent();
 
 		const x = event.localX;
 		const y = event.localY;
@@ -238,6 +239,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public mouseDownEvent(event: MouseEventHandlerMouseEvent): void {
+		this._onMouseEvent();
 		this._mouseTouchDownEvent();
 		this._setCrosshairPosition(event.localX, event.localY);
 	}
@@ -246,6 +248,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (!this._state) {
 			return;
 		}
+		this._onMouseEvent();
 
 		const x = event.localX;
 		const y = event.localY;
@@ -259,6 +262,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._state === null) {
 			return;
 		}
+		this._onMouseEvent();
 
 		const x = event.localX;
 		const y = event.localY;
@@ -270,7 +274,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
-		this._startTrackPoint = null;
+		this._onMouseEvent();
 		this._pressedMouseTouchMoveEvent(event);
 	}
 
@@ -278,6 +282,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._state === null) {
 			return;
 		}
+		this._onMouseEvent();
 
 		this._longTap = false;
 
@@ -297,6 +302,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._state === null) {
 			return;
 		}
+		this._onMouseEvent();
 
 		this._state.model().setHoveredSource(null);
 		this._clearCrosshairPosition();
@@ -708,6 +714,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		};
 
 		requestAnimationFrame(animationFn);
+	}
+
+	private _onMouseEvent(): void {
+		this._startTrackPoint = null;
 	}
 
 	private _mouseTouchDownEvent(): void {
