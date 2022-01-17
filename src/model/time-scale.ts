@@ -732,15 +732,15 @@ export class TimeScale {
 	}
 
 	private _isAllScalingAndScrollingDisabled(): boolean {
-		return !this._model.options().handleScroll.horzTouchDrag
-			&& !this._model.options().handleScroll.mouseWheel
-			&& !this._model.options().handleScroll.pressedMouseMove
-			&& !this._model.options().handleScroll.vertTouchDrag
-			&& !this._model.options().handleScale.axisDoubleClickReset
-			&& !this._model.options().handleScale.axisPressedMouseMove.price
-			&& !this._model.options().handleScale.axisPressedMouseMove.time
-			&& !this._model.options().handleScale.mouseWheel
-			&& !this._model.options().handleScale.pinch;
+		const { handleScroll, handleScale } = this._model.options();
+		return !handleScroll.horzTouchDrag
+			&& !handleScroll.mouseWheel
+			&& !handleScroll.pressedMouseMove
+			&& !handleScroll.vertTouchDrag
+			&& !handleScale.axisDoubleClickReset
+			&& !handleScale.axisPressedMouseMove.time
+			&& !handleScale.mouseWheel
+			&& !handleScale.pinch;
 	}
 
 	private _firstIndex(): TimePointIndex | null {
