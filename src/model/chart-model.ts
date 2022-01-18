@@ -185,11 +185,11 @@ export const enum TrackingExitMode {
 	/**
 	 * Tracking Mode will be deactivated on touch end event.
 	 */
-    OnTouchEnd,
+	OnTouchEnd,
 	/**
 	 * Tracking Mode will be deactivated on the next tap event.
 	 */
-    OnNextTap,
+	OnNextTap,
 }
 
 /**
