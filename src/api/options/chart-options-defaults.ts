@@ -1,6 +1,6 @@
 import { isRunningOnClientSide } from '../../helpers/is-running-on-client-side';
 
-import { ChartOptionsInternal, TrackingExitMode } from '../../model/chart-model';
+import { ChartOptionsInternal, TrackingModeExitMode } from '../../model/chart-model';
 
 import { crosshairOptionsDefaults } from './crosshair-options-defaults';
 import { gridOptionsDefaults } from './grid-options-defaults';
@@ -52,6 +52,6 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 		touch: true,
 	},
 	trackingMode: {
-		exitMode: TrackingExitMode.OnNextTap,
+		exitMode: TrackingModeExitMode.OnNextTap,
 	},
 };

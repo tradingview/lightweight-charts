@@ -181,7 +181,7 @@ export type OverlayPriceScaleOptions = Omit<PriceScaleOptions, 'visible' | 'auto
  * By default, mobile users will long press to deactivate the scroll and have the ability to check values and dates.
  * Another press is required to activate the scroll, be able to move left/right, zoom, etc.
  */
-export const enum TrackingExitMode {
+export const enum TrackingModeExitMode {
 	/**
 	 * Tracking Mode will be deactivated on touch end event.
 	 */
@@ -201,11 +201,11 @@ export const enum TrackingExitMode {
  */
 export interface TrackingModeOptions {
 	// eslint-disable-next-line tsdoc/syntax
-	/** @inheritdoc TrackingExitMode
+	/** @inheritdoc TrackingModeExitMode
 	 *
-	 * @defaultValue `TrackingExitMode.OnNextTap`
+	 * @defaultValue {@link TrackingModeExitMode.OnNextTap}
 	 */
-	exitMode: TrackingExitMode;
+	exitMode: TrackingModeExitMode;
 }
 
 /**

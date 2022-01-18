@@ -6,7 +6,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 
-import { ChartModel, HoveredObject, TrackingExitMode } from '../model/chart-model';
+import { ChartModel, HoveredObject, TrackingModeExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -362,7 +362,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public touchEndEvent(event: MouseEventHandlerTouchEvent): void {
-		if (this.chart().options().trackingMode.exitMode === TrackingExitMode.OnTouchEnd) {
+		if (this.chart().options().trackingMode.exitMode === TrackingModeExitMode.OnTouchEnd) {
 			this._exitTrackingModeOnNextTry = true;
 		}
 		this._tryExitTrackingMode();
