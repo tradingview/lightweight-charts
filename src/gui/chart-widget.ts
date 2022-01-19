@@ -468,11 +468,7 @@ export class ChartWidget implements IDestroyable {
 			for (const tsInvalidation of timeScaleInvalidations) {
 				this._applyTimeScaleInvalidation(tsInvalidation);
 			}
-			if (timeScaleInvalidations.length > 0) {
-				this._model.recalculateAllPanes();
-				this._model.updateCrosshair();
-				this._model.lightUpdate();
-			}
+			this._reapplyTimeScaleInvalidations(timeScaleInvalidations);
 
 			this._timeAxisWidget.update();
 		}
@@ -484,25 +480,7 @@ export class ChartWidget implements IDestroyable {
 		const timeScale = this._model.timeScale();
 		switch (invalidation.type) {
 			case TimeScaleInvalidationType.FitContent: {
-				const priceAxisWidth = {
-					left: this.getPriceAxisWidth('left'),
-					right: this.getPriceAxisWidth('right'),
-				};
 				timeScale.fitContent();
-				// Invalidation and drawing is set to happen on animation frame. We need to adjust
-				// the size immediately here to get the new width set, to be used for the next
-				// fitContent()
-				this._adjustSizeImpl();
-				const newPriceAxisWidth = {
-					left: this.getPriceAxisWidth('left'),
-					right: this.getPriceAxisWidth('right'),
-				};
-				// fitContent() might cause the data of the price axis to change, causing optimal
-				// width of the price axis widget to change, causing time scale to adjust its
-				// width. It will make the bar spacing previously set to fit the content incorrect
-				if (priceAxisWidth.left !== newPriceAxisWidth.left || priceAxisWidth.right !== newPriceAxisWidth.right) {
-					timeScale.fitContent();
-				}
 				break;
 			}
 			case TimeScaleInvalidationType.ApplyRange:
@@ -526,7 +504,6 @@ export class ChartWidget implements IDestroyable {
 		} else {
 			this._invalidateMask = invalidateMask;
 		}
-
 		if (!this._drawPlanned) {
 			this._drawPlanned = true;
 			this._drawRafId = window.requestAnimationFrame(() => {
@@ -534,8 +511,9 @@ export class ChartWidget implements IDestroyable {
 				this._drawRafId = 0;
 
 				if (this._invalidateMask !== null) {
-					this._drawImpl(this._invalidateMask);
+					const mask = this._invalidateMask;
 					this._invalidateMask = null;
+					this._drawImpl(mask);
 				}
 			});
 		}
@@ -658,6 +636,32 @@ export class ChartWidget implements IDestroyable {
 
 	private _isRightAxisVisible(): boolean {
 		return this._paneWidgets[0].state().rightPriceScale().options().visible;
+	}
+
+	/**
+	 * Used to apply the invalidation (draw), and reapply the time scale invalidations
+	 * if they cause a change to the visible range. Need to reapply all
+	 * timescale invalidations in order in case we have change of the range then
+	 * offset for example
+	 *
+	 * @param timeScaleInvalidations - time scale invalidations
+	 */
+	private _reapplyTimeScaleInvalidations(timeScaleInvalidations: Readonly<TimeScaleInvalidation[]>): void {
+		const rangeTimeScaleInvalidations = timeScaleInvalidations
+			.filter((timeScaleInvalidation: TimeScaleInvalidation) => {
+				return timeScaleInvalidation.type === TimeScaleInvalidationType.ApplyRange
+				|| timeScaleInvalidation.type === TimeScaleInvalidationType.FitContent;
+			});
+		if (rangeTimeScaleInvalidations.length > 0) {
+			const newMask = this._invalidateMask;
+			this._invalidateMask = null;
+			if (newMask) {
+				this._drawImpl(newMask);
+			}
+			timeScaleInvalidations.forEach((timeScaleInvalidation: TimeScaleInvalidation) => {
+				this._applyTimeScaleInvalidation(timeScaleInvalidation);
+			});
+		}
 	}
 }
 

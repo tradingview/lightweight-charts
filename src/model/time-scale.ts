@@ -698,7 +698,7 @@ export class TimeScale {
 		this._correctOffset();
 		this._visibleRangeInvalidated = true;
 		this._model.recalculateAllPanes();
-		this._model.lightUpdate();
+		this._model.fullUpdate();
 	}
 
 	public fitContent(): void {
