@@ -26,3 +26,22 @@
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+
+html[data-theme='dark'] {
+  --ifm-navbar-background-color: #000000;
+  --ifm-background-color: #000000;
+}
+
+.footer--dark {
+  --ifm-footer-background-color: #000000;
+}
+
+.navbar__title {
+  font-size: 1.5rem;
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+}

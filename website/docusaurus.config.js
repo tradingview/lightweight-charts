@@ -138,17 +138,6 @@ const config = {
 		({
 			navbar: {
 				title: 'Lightweight Charts',
-				logo: {
-					alt: 'Lightweight Charts Logo',
-					// please note that there is no such file in static/img folder in git
-					// but this file will be copied by this config (see above fs.copyFileSync call)
-					// this is just to avoid duplicating the same files in the repo
-					// and at the same time to avoid loading files from other domains (like github)
-					// (loading from other domains might take some time and the page might blink especially while loading images)
-					src: 'img/lightweight-charts-logo.svg',
-					width: 48,
-					height: 32,
-				},
 				items: [
 					{
 						type: 'doc',

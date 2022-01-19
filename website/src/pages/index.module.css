@@ -1,0 +1,108 @@
+.HeroContainer {
+	height: 30rem;
+	position: relative;
+}
+
+.HeroChartContainer {
+	width: 100%;
+	height: 100%;
+}
+
+.HeroTextContainer {
+	position: absolute;
+	z-index: 2;
+	max-height: 25rem;
+	max-width: 40rem;
+	top: 5%;
+	left: 10%;
+	background: rgba(12, 14, 21, 1);
+	padding: 4rem;
+	border-radius: 1rem;
+}
+
+.HeroTextContainer h1 {
+	padding-top: 1rem;
+	font-size: 2.5rem;
+}
+
+.HeroButtonPrimary {
+	background: rgba(41, 98, 255, 1);
+	border-radius: 2rem;
+	padding: 0.75rem;
+	color: white;
+	margin-right: 1rem;
+	display: inline-block;
+}
+
+.HeroButton {
+	border: 1px solid #434651;
+	border-radius: 2rem;
+	padding: 0.75rem;
+	color: #D1D4DC;
+	display: inline-block;
+}
+
+.LargeCardContainer {
+	display: flex;
+	flex-direction: row;
+	gap: 3rem;
+	padding-top: 2rem;
+	padding-bottom: 2rem;
+	justify-content: center;
+	flex-wrap: wrap;
+	min-width: 100%;
+}
+
+.LargeCard {
+	width: 23rem;
+	height: 23rem;
+	background: rgba(19, 23, 34, 1);
+	padding: 2rem 2rem;
+	border-radius: 2rem;
+}
+
+.LargeCard p {
+	font-size: 0.8rem;
+	color: rgba(178, 181, 190, 1);
+}
+
+.SmallCardContainer {
+	display: flex;
+	flex-direction: row;
+	padding-top: 2rem;
+	padding-bottom: 2rem;
+	justify-content: center;
+	flex-wrap: wrap;
+	min-width: 100%;
+}
+
+.SmallCard {
+	max-width: 20rem;
+	padding-top: 1rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	border: 1px solid #1E222D;
+}
+
+.SmallCard p {
+	font-size: 0.8rem;
+	color: rgba(178, 181, 190, 1);
+}
+
+.LargeTextContainer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 100%;
+	text-align: center;
+}
+
+.LargeTextContainer h1 {
+	font-size: 3rem;
+	max-width: 50%;
+}
+
+.LargeTextContainer p {
+	font-size: 1.5rem;
+	max-width: 50%;
+}

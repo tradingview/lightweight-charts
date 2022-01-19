@@ -18,6 +18,7 @@
     "@tsconfig/docusaurus": "~1.0.4",
     "cross-env": "~7.0.3",
     "docusaurus-plugin-typedoc": "0.16.6",
+    "lightweight-charts": "^3.7.0",
     "prism-react-renderer": "~1.2.1",
     "react": "~17.0.1",
     "react-dom": "~17.0.1",
