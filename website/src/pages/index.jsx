@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '@theme/Layout';
+import useThemeContext from '@theme/hooks/useThemeContext';
 
 import { createChart } from 'lightweight-charts';
 
@@ -10,31 +11,35 @@ const data = { orangeData: [{ value: 33, time: 1628005368 }, { value: 33.4977407
 function HeroChart(props) {
 	const ref = React.useRef();
 
+	const { isDarkTheme } = useThemeContext();
+
+	const [chart, setChart] = React.useState(null);
+
 	React.useLayoutEffect(() => {
 		const container = ref.current;
-		const chart = createChart(container, {
+
+		const layout = isDarkTheme
+			? { background: { color: '#000000' }, textColor: '#FFFFFF' }
+			: { background: { color: '#FFFFFF' }, textColor: '#000000' };
+
+		const c = createChart(container, {
 			grid: {
 				horzLines: false,
 				vertLines: false,
 			},
-			layout: {
-				background: {
-					color: '#000000',
-				},
-				textColor: '#ffffff',
-			},
+			layout,
 			timeScale: {
 				fixLeftEdge: true,
 				fixRightEdge: true,
 			},
 		});
 
-		const orangeSeries = chart.addAreaSeries({
+		const orangeSeries = c.addAreaSeries({
 			lineColor: '#FFE902',
 			topColor: 'rgba(251, 140, 0, 0.6)',
 			bottomColor: 'rgba(251, 140, 0, 0.2)',
 		});
-		const blueSeries = chart.addAreaSeries({
+		const blueSeries = c.addAreaSeries({
 			lineColor: 'rgba(15, 28, 249, 1)',
 			topColor: 'rgba(15, 28, 249, 1)',
 			bottomColor: 'rgba(15, 28, 249, 0.2)',
@@ -43,13 +48,15 @@ function HeroChart(props) {
 		orangeSeries.setData(data.orangeData);
 		blueSeries.setData(data.blueData);
 
-		chart.timeScale().fitContent();
+		c.timeScale().fitContent();
 
 		const resizeListener = () => {
 			const { width, height } = container.getBoundingClientRect();
-			chart.resize(width, height);
-			chart.timeScale().fitContent();
+			c.resize(width, height);
+			c.timeScale().fitContent();
 		};
+
+		setChart(c);
 
 		// eslint-disable-next-line no-undef
 		window.addEventListener('resize', resizeListener);
@@ -57,9 +64,22 @@ function HeroChart(props) {
 		return () => {
 			// eslint-disable-next-line no-undef
 			window.removeEventListener('resize', resizeListener);
-			chart.remove();
+			c.remove();
+			setChart(null);
 		};
-	});
+	}, []);
+
+	React.useLayoutEffect(() => {
+		if (!chart) {
+			return;
+		}
+
+		const layout = isDarkTheme
+			? { background: { color: '#000000' }, textColor: '#FFFFFF' }
+			: { background: { color: '#FFFFFF' }, textColor: '#000000' };
+
+		chart.applyOptions({ layout });
+	}, [isDarkTheme]);
 
 	return (
 		<div className={styles.HeroChartContainer} ref={ref}></div>
@@ -79,7 +99,7 @@ function Index() {
 					<h1>Lightweight Charts</h1>
 					<p>Free, open-source and feature-rich. At just 40 kilobytes, the dream of lightweight interactive charts is now a reality.</p>
 
-					<p><a className={styles.HeroButtonPrimary} href="docs">Getting Started</a> <a className={styles.HeroButton} href="docs/api">API Reference</a></p>
+					<p><a className={styles.HeroButtonPrimary} href="docs">Get Started</a> <a className={styles.HeroButton} href="docs/api">API Reference</a></p>
 				</div>
 			</div>
 			<div className={styles.LargeCardContainer}>

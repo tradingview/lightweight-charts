@@ -1,3 +1,26 @@
+:root {
+	--PrimaryButtonColor: rgba(41, 98, 255, 1);
+	--SmallCardBorderColor: #E0E3EB;
+	--CardBackgroundColor:  #F0F3FA;
+	--CardParagraphColor: rgba(120, 123, 134, 1);
+	--SvgFillColor: #000000;
+}
+
+html[data-theme=dark] {
+	--SmallCardBorderColor: #1E222D;
+	--CardBackgroundColor: rgba(12, 14, 21, 1);
+	--CardParagraphColor: rgba(178, 181, 190, 1);
+	--SvgFillColor: rgba(255, 255, 255, 1);
+}
+
+html svg path {
+	fill: var(--SvgFillColor);
+}
+
+html[data-theme=dark] svg path {
+	fill: rgba(255, 255, 255, 1);
+}
+
 .HeroContainer {
 	height: 30rem;
 	position: relative;
@@ -15,7 +38,7 @@
 	max-width: 40rem;
 	top: 5%;
 	left: 10%;
-	background: rgba(12, 14, 21, 1);
+	background: var(--CardBackgroundColor);
 	padding: 4rem;
 	border-radius: 1rem;
 }
@@ -26,9 +49,12 @@
 }
 
 .HeroButtonPrimary {
-	background: rgba(41, 98, 255, 1);
+	background: var(--PrimaryButtonColor);
 	border-radius: 2rem;
-	padding: 0.75rem;
+	padding-top: 0.75rem;
+	padding-bottom: 0.75rem;
+	padding-left: 1.5rem;
+	padding-right: 1.5rem;
 	color: white;
 	margin-right: 1rem;
 	display: inline-block;
@@ -37,7 +63,10 @@
 .HeroButton {
 	border: 1px solid #434651;
 	border-radius: 2rem;
-	padding: 0.75rem;
+	padding-top: 0.75rem;
+	padding-bottom: 0.75rem;
+	padding-left: 1.5rem;
+	padding-right: 1.5rem;
 	color: #D1D4DC;
 	display: inline-block;
 }
@@ -56,14 +85,14 @@
 .LargeCard {
 	width: 23rem;
 	height: 23rem;
-	background: rgba(19, 23, 34, 1);
+	background: var(--CardBackgroundColor);
 	padding: 2rem 2rem;
-	border-radius: 2rem;
+	border-radius: 1rem;
 }
 
 .LargeCard p {
 	font-size: 0.8rem;
-	color: rgba(178, 181, 190, 1);
+	color: var(--CardParagraphColor);
 }
 
 .SmallCardContainer {
@@ -81,12 +110,25 @@
 	padding-top: 1rem;
 	padding-left: 1rem;
 	padding-right: 1rem;
-	border: 1px solid #1E222D;
+	border: 1px solid var(--SmallCardBorderColor);
+	border-left: none;
+}
+
+.SmallCard:first-of-type {
+	border-left: 1px solid var(--SmallCardBorderColor);
+	border-top-left-radius: 1rem;
+	border-bottom-left-radius: 1rem;
+}
+
+.SmallCard:last-of-type {
+	border-right: 1px solid var(--SmallCardBorderColor);
+	border-top-right-radius: 1rem;
+	border-bottom-right-radius: 1rem;
 }
 
 .SmallCard p {
 	font-size: 0.8rem;
-	color: rgba(178, 181, 190, 1);
+	color: var(--CardParagraphColor);
 }
 
 .LargeTextContainer {

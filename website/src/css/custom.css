@@ -14,6 +14,7 @@
   --ifm-color-primary-lighter: #5B9CF6;
   --ifm-color-primary-lightest: #90BFF9;
   --ifm-code-font-size: 95%;
+  --ifm-footer-background-color: #FFFFFF;
 }
 
 .docusaurus-highlight-code-line {
@@ -30,11 +31,8 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 html[data-theme='dark'] {
   --ifm-navbar-background-color: #000000;
-  --ifm-background-color: #000000;
-}
-
-.footer--dark {
   --ifm-footer-background-color: #000000;
+  --ifm-background-color: #000000;
 }
 
 .navbar__title {
