@@ -12,10 +12,10 @@ import { LayoutOptions } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TickMarkWeight } from '../model/time-data';
 import { TimeMark } from '../model/time-scale';
-import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/canvas-rendering-target';
+import { CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 
-import { createBoundCanvas, getContext2D } from './canvas-utils';
+import { createBoundCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
@@ -252,17 +252,17 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getContext2D(this._canvasBinding.canvasElement);
-			const canvasRenderingParams = getCanvasRenderingParams(this._canvasBinding);
-			if (canvasRenderingParams !== null) {
-				this._drawBackground(ctx, canvasRenderingParams);
-				this._drawBorder(ctx, canvasRenderingParams);
+			const target = createCanvasRenderingTarget(this._canvasBinding);
+			if (target !== null) {
+				this._drawBackground(target);
+				this._drawBorder(target);
 
-				this._drawTickMarks(ctx, canvasRenderingParams);
+				this._drawTickMarks(target);
 				// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
 				// so let's don't call this code at all for now
-				// this._drawLabels(this._chart.model().dataSources(), ctx, canvasRenderingParams);
+				// this._drawLabels(this._chart.model().dataSources(), target);
 			}
+			target?.destroy();
 
 			if (this._leftStub !== null) {
 				this._leftStub.paint(type);
@@ -272,32 +272,33 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			}
 		}
 
-		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
-		const topCanvasRenderingParams = getCanvasRenderingParams(this._topCanvasBinding);
-		if (topCanvasRenderingParams !== null) {
-			topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
-			this._drawLabels([this._chart.model().crosshairSource()], topCtx, topCanvasRenderingParams);
+		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
+		if (topTarget !== null) {
+			topTarget.context.clearRect(0, 0, topTarget.bitmapSize.width, topTarget.bitmapSize.height);
+			this._drawLabels([this._chart.model().crosshairSource()], topTarget);
 		}
+		topTarget?.destroy();
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
-		clearRect(ctx, 0, 0, renderParams.bitmapSize.width, renderParams.bitmapSize.height, this._chart.model().backgroundBottomColor());
+	private _drawBackground(target: CanvasRenderingTarget): void {
+		clearRect(target.context, 0, 0, target.bitmapSize.width, target.bitmapSize.height, this._chart.model().backgroundBottomColor());
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
+	private _drawBorder(target: CanvasRenderingTarget): void {
 		if (this._chart.options().timeScale.borderVisible) {
+			const ctx = target.context;
 			ctx.save();
 
 			ctx.fillStyle = this._lineColor();
 
-			const borderSize = Math.max(1, Math.floor(this._getRendererOptions().borderSize * renderParams.verticalPixelRatio));
+			const borderSize = Math.max(1, Math.floor(this._getRendererOptions().borderSize * target.verticalPixelRatio));
 
-			ctx.fillRect(0, 0, renderParams.bitmapSize.width, borderSize);
+			ctx.fillRect(0, 0, target.bitmapSize.width, borderSize);
 			ctx.restore();
 		}
 	}
 
-	private _drawTickMarks(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
+	private _drawTickMarks(target: CanvasRenderingTarget): void {
 		const tickMarks = this._chart.model().timeScale().marks();
 
 		if (!tickMarks || tickMarks.length === 0) {
@@ -312,6 +313,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			maxWeight = TickMarkWeight.Hour1;
 		}
 
+		const ctx = target.context;
 		ctx.save();
 
 		ctx.strokeStyle = this._lineColor();
@@ -328,7 +330,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		ctx.textAlign = 'center';
 		ctx.fillStyle = this._lineColor();
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { horizontalPixelRatio, verticalPixelRatio } = target;
 
 		const borderSize = Math.floor(this._getRendererOptions().borderSize * verticalPixelRatio);
 		const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
@@ -380,13 +382,13 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		return coordinate;
 	}
 
-	private _drawLabels(sources: readonly IDataSource[], ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
+	private _drawLabels(sources: readonly IDataSource[], target: CanvasRenderingTarget): void {
 		const rendererOptions = this._getRendererOptions();
 		for (const source of sources) {
 			for (const view of source.timeAxisViews()) {
-				ctx.save();
-				view.renderer().draw(ctx, rendererOptions, renderParams);
-				ctx.restore();
+				target.context.save();
+				view.renderer().draw(target, rendererOptions);
+				target.context.restore();
 			}
 		}
 	}

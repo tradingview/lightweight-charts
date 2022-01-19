@@ -13,12 +13,12 @@ import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
-import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/canvas-rendering-target';
+import { CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
-import { createBoundCanvas, getContext2D } from './canvas-utils';
+import { createBoundCanvas } from './canvas-utils';
 import { LabelsImageCache } from './labels-image-cache';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -176,7 +176,11 @@ export class PriceAxisWidget implements IDestroyable {
 		let tickMarkMaxWidth = 34;
 		const rendererOptions = this.rendererOptions();
 
-		const ctx = getContext2D(this._canvasBinding.canvasElement);
+		const ctx = ensureNotNull(this._canvasBinding.canvasElement.getContext('2d'));
+		ctx.save();
+		// do no use resetTransform to respect Edge
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+
 		const tickMarks = this._priceScale.marks();
 
 		ctx.font = this.baseFont();
@@ -207,6 +211,8 @@ export class PriceAxisWidget implements IDestroyable {
 				this._widthCache.measureText(ctx, this._priceScale.formatPrice(Math.ceil(Math.max(topValue, bottomValue)) - 0.11111111111111, firstValue))
 			);
 		}
+
+		ctx.restore();
 
 		let res = Math.ceil(
 			rendererOptions.borderSize +
@@ -267,23 +273,23 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getContext2D(this._canvasBinding.canvasElement);
 			this._alignLabels();
-			const canvasRenderingParams = getCanvasRenderingParams(this._canvasBinding);
-			if (canvasRenderingParams !== null) {
-				this._drawBackground(ctx, canvasRenderingParams);
-				this._drawBorder(ctx, canvasRenderingParams);
-				this._drawTickMarks(ctx, canvasRenderingParams);
-				this._drawBackLabels(ctx, canvasRenderingParams);
+			const target = createCanvasRenderingTarget(this._canvasBinding);
+			if (target !== null) {
+				this._drawBackground(target);
+				this._drawBorder(target);
+				this._drawTickMarks(target);
+				this._drawBackLabels(target);
 			}
+			target?.destroy();
 		}
 
-		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
-		const topCanvasRenderingParams = getCanvasRenderingParams(this._topCanvasBinding);
-		if (topCanvasRenderingParams !== null) {
-			topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
-			this._drawCrosshairLabel(topCtx, topCanvasRenderingParams);
+		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
+		if (topTarget !== null) {
+			topTarget.context.clearRect(0, 0, topTarget.bitmapSize.width, topTarget.bitmapSize.height);
+			this._drawCrosshairLabel(topTarget);
 		}
+		topTarget?.destroy();
 	}
 
 	public getImage(): HTMLCanvasElement {
@@ -380,47 +386,50 @@ export class PriceAxisWidget implements IDestroyable {
 		return res;
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
-		const { width, height } = renderParams.bitmapSize;
+	private _drawBackground(target: CanvasRenderingTarget): void {
+		const { width, height } = target.bitmapSize;
 		const model = this._pane.state().model();
 		const topColor = model.backgroundTopColor();
 		const bottomColor = model.backgroundBottomColor();
 
 		if (topColor === bottomColor) {
-			clearRect(ctx, 0, 0, width, height, topColor);
+			clearRect(target.context, 0, 0, width, height, topColor);
 		} else {
-			clearRectWithGradient(ctx, 0, 0, width, height, topColor, bottomColor);
+			clearRectWithGradient(target.context, 0, 0, width, height, topColor, bottomColor);
 		}
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
+	private _drawBorder(target: CanvasRenderingTarget): void {
 		if (this._size === null || this._priceScale === null || !this._priceScale.options().borderVisible) {
 			return;
 		}
+
+		const ctx = target.context;
 		ctx.save();
 
 		ctx.fillStyle = this.lineColor();
 
-		const borderSize = Math.max(1, Math.floor(this.rendererOptions().borderSize * renderParams.horizontalPixelRatio));
+		const borderSize = Math.max(1, Math.floor(this.rendererOptions().borderSize * target.horizontalPixelRatio));
 
 		let left: number;
 		if (this._isLeft) {
-			left = renderParams.bitmapSize.width - borderSize;
+			left = target.bitmapSize.width - borderSize;
 		} else {
 			left = 0;
 		}
 
-		ctx.fillRect(left, 0, borderSize, renderParams.bitmapSize.height);
+		ctx.fillRect(left, 0, borderSize, target.bitmapSize.height);
 		ctx.restore();
 	}
 
-	private _drawTickMarks(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
+	private _drawTickMarks(target: CanvasRenderingTarget): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
 
 		const tickMarks = this._priceScale.marks();
 
+		const ctx = target.context;
 		ctx.save();
 
 		ctx.strokeStyle = this.lineColor();
@@ -430,7 +439,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const rendererOptions = this.rendererOptions();
 		const drawTicks = this._priceScale.options().borderVisible && this._priceScale.options().drawTicks;
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { horizontalPixelRatio, verticalPixelRatio } = target;
 
 		const tickMarkLeftX = this._isLeft ?
 			Math.floor((this._size.width - rendererOptions.tickLength) * horizontalPixelRatio - rendererOptions.borderSize * horizontalPixelRatio) :
@@ -456,7 +465,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.fillStyle = this.textColor();
 		for (const tickMark of tickMarks) {
-			this._tickMarksCache.paintTo(ctx, renderParams, tickMark.label, textLeftX, Math.round(tickMark.coord * verticalPixelRatio), textAlign);
+			this._tickMarksCache.paintTo(target, tickMark.label, textLeftX, Math.round(tickMark.coord * verticalPixelRatio), textAlign);
 		}
 
 		ctx.restore();
@@ -554,12 +563,12 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 	}
 
-	private _drawBackLabels(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
+	private _drawBackLabels(target: CanvasRenderingTarget): void {
 		if (this._size === null) {
 			return;
 		}
 
-		ctx.save();
+		target.context.save();
 
 		const currentSize = this._size;
 		const views = this._backLabels();
@@ -570,20 +579,21 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((view: IPriceAxisView) => {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer(ensureNotNull(this._priceScale));
-				ctx.save();
-				renderer.draw(ctx, rendererOptions, this._widthCache, currentSize.width, align, renderParams);
-				ctx.restore();
+				target.context.save();
+				renderer.draw(target, rendererOptions, this._widthCache, currentSize.width, align);
+				target.context.restore();
 			}
 		});
 
-		ctx.restore();
+		target.context.restore();
 	}
 
-	private _drawCrosshairLabel(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
+	private _drawCrosshairLabel(target: CanvasRenderingTarget): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
 
+		const ctx = target.context;
 		ctx.save();
 
 		const currentSize = this._size;
@@ -603,7 +613,7 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((arr: IPriceAxisViewArray) => {
 			arr.forEach((view: IPriceAxisView) => {
 				ctx.save();
-				view.renderer(ensureNotNull(this._priceScale)).draw(ctx, ro, this._widthCache, currentSize.width, align, renderParams);
+				view.renderer(ensureNotNull(this._priceScale)).draw(target, ro, this._widthCache, currentSize.width, align);
 				ctx.restore();
 			});
 		});

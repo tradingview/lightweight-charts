@@ -5,10 +5,10 @@ import { IDestroyable } from '../helpers/idestroyable';
 
 import { ChartOptionsInternal } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/canvas-rendering-target';
+import { CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
-import { createBoundCanvas, getContext2D } from './canvas-utils';
+import { createBoundCanvas } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
 export interface PriceAxisStubParams {
@@ -94,39 +94,40 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
-		const ctx = getContext2D(this._canvasBinding.canvasElement);
-		const canvasRenderingParams = getCanvasRenderingParams(this._canvasBinding);
-		if (canvasRenderingParams !== null) {
-			this._drawBackground(ctx, canvasRenderingParams);
-			this._drawBorder(ctx, canvasRenderingParams);
+		const target = createCanvasRenderingTarget(this._canvasBinding);
+		if (target !== null) {
+			this._drawBackground(target);
+			this._drawBorder(target);
 		}
+		target?.destroy();
 	}
 
 	public getImage(): HTMLCanvasElement {
 		return this._canvasBinding.canvasElement;
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
+	private _drawBorder(target: CanvasRenderingTarget): void {
 		if (!this._borderVisible()) {
 			return;
 		}
 		const width = this._size.width;
 
+		const ctx = target.context;
 		ctx.save();
 
 		ctx.fillStyle = this._options.timeScale.borderColor;
 
 		// TODO: we need different size for x and y
-		const borderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * renderParams.horizontalPixelRatio);
+		const borderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * target.horizontalPixelRatio);
 
-		const left = (this._isLeft) ? Math.round(width * renderParams.horizontalPixelRatio) - borderSize : 0;
+		const left = (this._isLeft) ? Math.round(width * target.horizontalPixelRatio) - borderSize : 0;
 
 		ctx.fillRect(left, 0, borderSize, borderSize);
 		ctx.restore();
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams): void {
-		clearRect(ctx, 0, 0, renderParams.bitmapSize.width, renderParams.bitmapSize.height, this._bottomColor());
+	private _drawBackground(target: CanvasRenderingTarget): void {
+		clearRect(target.context, 0, 0, target.bitmapSize.width, target.bitmapSize.height, this._bottomColor());
 	}
 
 	private readonly _canvasBitmapSizeChangedHandler = () => this.paint(InvalidationLevel.Full);

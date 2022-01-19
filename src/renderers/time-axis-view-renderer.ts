@@ -1,7 +1,7 @@
 import { ensureNotNull } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
 
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { ITimeAxisViewRenderer, TimeAxisViewRendererOptions } from './itime-axis-view-renderer';
 
 export interface TimeAxisViewRendererData {
@@ -26,11 +26,12 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions, renderParams: CanvasRenderingParams): void {
+	public draw(target: CanvasRenderingTarget, rendererOptions: TimeAxisViewRendererOptions): void {
 		if (this._data === null || this._data.visible === false || this._data.text.length === 0) {
 			return;
 		}
 
+		const ctx = target.context;
 		ctx.font = rendererOptions.font;
 
 		const textWidth = Math.round(rendererOptions.widthCache.measureText(ctx, this._data.text, optimizationReplacementRe));
@@ -68,7 +69,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 
 		ctx.fillStyle = this._data.background;
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { horizontalPixelRatio, verticalPixelRatio } = target;
 		const x1scaled = Math.round(x1 * horizontalPixelRatio);
 		const y1scaled = Math.round(y1 * verticalPixelRatio);
 		const x2scaled = Math.round(x2 * horizontalPixelRatio);

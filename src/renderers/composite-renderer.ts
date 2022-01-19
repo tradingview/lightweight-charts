@@ -1,4 +1,4 @@
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
 
 export class CompositeRenderer implements IPaneRenderer {
@@ -8,11 +8,11 @@ export class CompositeRenderer implements IPaneRenderer {
 		this._renderers = renderers;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		this._renderers.forEach((r: IPaneRenderer) => {
-			ctx.save();
-			r.draw(ctx, renderParams, isHovered, hitTestData);
-			ctx.restore();
+			target.context.save();
+			r.draw(target, isHovered, hitTestData);
+			target.context.restore();
 		});
 	}
 }

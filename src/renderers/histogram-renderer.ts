@@ -1,7 +1,7 @@
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue, TimePointIndex } from '../model/time-data';
 
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
 
 const showSpacingMinimalBarWidth = 1;
@@ -37,23 +37,25 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		this._precalculatedCache = [];
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 		if (!this._precalculatedCache.length) {
-			this._fillPrecalculatedCache(renderParams.horizontalPixelRatio);
+			this._fillPrecalculatedCache(target.horizontalPixelRatio);
 		}
 
-		const tickWidth = Math.max(1, Math.floor(renderParams.verticalPixelRatio));
-		const histogramBase = Math.round((this._data.histogramBase) * renderParams.verticalPixelRatio);
+		const { context: ctx, verticalPixelRatio } = target;
+
+		const tickWidth = Math.max(1, Math.floor(verticalPixelRatio));
+		const histogramBase = Math.round((this._data.histogramBase) * verticalPixelRatio);
 		const topHistogramBase = histogramBase - Math.floor(tickWidth / 2);
 		const bottomHistogramBase = topHistogramBase + tickWidth;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			const current = this._precalculatedCache[i - this._data.visibleRange.from];
-			const y = Math.round(item.y * renderParams.verticalPixelRatio);
+			const y = Math.round(item.y * verticalPixelRatio);
 			ctx.fillStyle = item.color;
 
 			let top: number;

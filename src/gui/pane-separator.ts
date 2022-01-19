@@ -1,9 +1,10 @@
 import { Size, size } from 'fancy-canvas';
 
+import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clamp } from '../helpers/mathex';
 
-import { createPreconfiguredCanvas, getContext2D } from './canvas-utils';
+import { createPreconfiguredCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -94,7 +95,7 @@ export class PaneSeparator implements IDestroyable {
 			height: currentSize.height * window.devicePixelRatio,
 		});
 		const res = createPreconfiguredCanvas(document, imageSize);
-		const ctx = getContext2D(res);
+		const ctx = ensureNotNull(res.getContext('2d'));
 		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;
 		ctx.fillRect(0, 0, imageSize.width, imageSize.height);
 		return res;

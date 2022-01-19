@@ -14,11 +14,11 @@ import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
-import { CanvasRenderingParams, getCanvasRenderingParams } from '../renderers/canvas-rendering-target';
+import { CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { createBoundCanvas, getContext2D } from './canvas-utils';
+import { createBoundCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { KineticAnimation } from './kinetic-animation';
 import { MouseEventHandler, Position, TouchMouseEvent } from './mouse-event-handler';
@@ -36,16 +36,16 @@ const enum Constants {
 	ScrollMinMove = 15,
 }
 
-type DrawFunction = (renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, renderingParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown) => void;
+type DrawFunction = (renderer: IPaneRenderer, target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown) => void;
 
-function drawBackground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, renderingParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+function drawBackground(renderer: IPaneRenderer, target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 	if (renderer.drawBackground) {
-		renderer.drawBackground(ctx, renderingParams, isHovered, hitTestData);
+		renderer.drawBackground(target, isHovered, hitTestData);
 	}
 }
 
-function drawForeground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, renderingParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
-	renderer.draw(ctx, renderingParams, isHovered, hitTestData);
+function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+	renderer.draw(target, isHovered, hitTestData);
 }
 
 type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
@@ -551,27 +551,25 @@ export class PaneWidget implements IDestroyable {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getContext2D(this._canvasBinding.canvasElement);
-			const canvasRenderingParams = getCanvasRenderingParams(this._canvasBinding);
-			if (canvasRenderingParams !== null) {
-				ctx.save();
-				this._drawBackground(ctx, canvasRenderingParams);
+			const target = createCanvasRenderingTarget(this._canvasBinding);
+			if (target !== null) {
+				this._drawBackground(target);
 				if (this._state) {
-					this._drawGrid(ctx, canvasRenderingParams);
-					this._drawWatermark(ctx, canvasRenderingParams);
-					this._drawSources(ctx, canvasRenderingParams, sourcePaneViews);
+					this._drawGrid(target);
+					this._drawWatermark(target);
+					this._drawSources(target, sourcePaneViews);
 				}
-				ctx.restore();
 			}
+			target?.destroy();
 		}
 
-		const topCtx = getContext2D(this._topCanvasBinding.canvasElement);
-		const topCanvasRenderingParams = getCanvasRenderingParams(this._topCanvasBinding);
-		if (topCanvasRenderingParams !== null) {
-			topCtx.clearRect(0, 0, topCanvasRenderingParams.bitmapSize.width, topCanvasRenderingParams.bitmapSize.height);
-			this._drawSources(topCtx, topCanvasRenderingParams, sourceTopPaneViews);
-			this._drawCrosshair(topCtx, topCanvasRenderingParams);
+		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
+		if (topTarget !== null) {
+			topTarget.context.clearRect(0, 0, topTarget.bitmapSize.width, topTarget.bitmapSize.height);
+			this._drawSources(topTarget, sourceTopPaneViews);
+			this._drawCrosshair(topTarget);
 		}
+		topTarget?.destroy();
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
@@ -590,57 +588,56 @@ export class PaneWidget implements IDestroyable {
 		this._state = null;
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, renderingParams: CanvasRenderingParams): void {
-		const { width, height } = renderingParams.bitmapSize;
+	private _drawBackground(target: CanvasRenderingTarget): void {
+		const { width, height } = target.bitmapSize;
 		const model = this._model();
 		const topColor = model.backgroundTopColor();
 		const bottomColor = model.backgroundBottomColor();
 
 		if (topColor === bottomColor) {
-			clearRect(ctx, 0, 0, width, height, bottomColor);
+			clearRect(target.context, 0, 0, width, height, bottomColor);
 		} else {
-			clearRectWithGradient(ctx, 0, 0, width, height, topColor, bottomColor);
+			clearRectWithGradient(target.context, 0, 0, width, height, topColor, bottomColor);
 		}
 	}
 
-	private _drawGrid(ctx: CanvasRenderingContext2D, renderingParams: CanvasRenderingParams): void {
+	private _drawGrid(target: CanvasRenderingTarget): void {
 		const state = ensureNotNull(this._state);
 		const paneView = state.grid().paneView();
 		const renderer = paneView.renderer(state.height(), state.width());
 
 		if (renderer !== null) {
-			ctx.save();
-			renderer.draw(ctx, renderingParams, false);
-			ctx.restore();
+			target.context.save();
+			renderer.draw(target, false);
+			target.context.restore();
 		}
 	}
 
-	private _drawWatermark(ctx: CanvasRenderingContext2D, renderingParams: CanvasRenderingParams): void {
+	private _drawWatermark(target: CanvasRenderingTarget): void {
 		const source = this._model().watermarkSource();
-		this._drawSourceImpl(ctx, renderingParams, sourcePaneViews, drawBackground, source);
-		this._drawSourceImpl(ctx, renderingParams, sourcePaneViews, drawForeground, source);
+		this._drawSourceImpl(target, sourcePaneViews, drawBackground, source);
+		this._drawSourceImpl(target, sourcePaneViews, drawForeground, source);
 	}
 
-	private _drawCrosshair(ctx: CanvasRenderingContext2D, renderingParams: CanvasRenderingParams): void {
-		this._drawSourceImpl(ctx, renderingParams, sourcePaneViews, drawForeground, this._model().crosshairSource());
+	private _drawCrosshair(target: CanvasRenderingTarget): void {
+		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(ctx: CanvasRenderingContext2D, renderingParams: CanvasRenderingParams, paneViewsGetter: PaneViewsGetter): void {
+	private _drawSources(target: CanvasRenderingTarget, paneViewsGetter: PaneViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
 		for (const source of sources) {
-			this._drawSourceImpl(ctx, renderingParams, paneViewsGetter, drawBackground, source);
+			this._drawSourceImpl(target, paneViewsGetter, drawBackground, source);
 		}
 
 		for (const source of sources) {
-			this._drawSourceImpl(ctx, renderingParams, paneViewsGetter, drawForeground, source);
+			this._drawSourceImpl(target, paneViewsGetter, drawForeground, source);
 		}
 	}
 
 	private _drawSourceImpl(
-		ctx: CanvasRenderingContext2D,
-		renderingParams: CanvasRenderingParams,
+		target: CanvasRenderingTarget,
 		paneViewsGetter: PaneViewsGetter,
 		drawFn: DrawFunction,
 		source: IDataSource
@@ -658,9 +655,9 @@ export class PaneWidget implements IDestroyable {
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer(height, width);
 			if (renderer !== null) {
-				ctx.save();
-				drawFn(renderer, ctx, renderingParams, isHovered, objecId);
-				ctx.restore();
+				target.context.save();
+				drawFn(renderer, target, isHovered, objecId);
+				target.context.restore();
 			}
 		}
 	}

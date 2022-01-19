@@ -20,7 +20,7 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { createPreconfiguredCanvas, getContext2D } from './canvas-utils';
+import { createPreconfiguredCanvas } from './canvas-utils';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -232,7 +232,7 @@ export class ChartWidget implements IDestroyable {
 				height: this._height * pixelRatio,
 			})
 		);
-		const ctx = getContext2D(targetCanvas);
+		const ctx = ensureNotNull(targetCanvas.getContext('2d'));
 
 		let targetX = 0;
 		let targetY = 0;

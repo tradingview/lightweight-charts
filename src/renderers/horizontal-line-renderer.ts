@@ -1,6 +1,6 @@
 import { Coordinate } from '../model/coordinate';
 
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { drawHorizontalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
@@ -22,7 +22,7 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
@@ -31,10 +31,10 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 			return;
 		}
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
 		const y = Math.round(this._data.y * verticalPixelRatio);
-		if (y < 0 || y > renderParams.bitmapSize.height) {
+		if (y < 0 || y > target.bitmapSize.height) {
 			return;
 		}
 

@@ -1,15 +1,15 @@
 import { size } from 'fancy-canvas';
 
-import { createPreconfiguredCanvas, getContext2D } from '../gui/canvas-utils';
+import { createPreconfiguredCanvas } from '../gui/canvas-utils';
 
-import { ensureDefined } from '../helpers/assertions';
+import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 import { ceiledEven } from '../helpers/mathex';
 
 import { TextWidthCache } from '../model/text-width-cache';
-import { CanvasRenderingParams } from '../renderers/canvas-rendering-target';
+import { CanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 
 const MAX_COUNT = 200;
 
@@ -39,22 +39,22 @@ export class LabelsImageCache implements IDestroyable {
 		this._hash.clear();
 	}
 
-	public paintTo(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, text: string, x: number, y: number, align: string): void {
-		const label = this._getLabelImage(ctx, renderParams, text);
+	public paintTo(target: CanvasRenderingTarget, text: string, x: number, y: number, align: string): void {
+		const label = this._getLabelImage(target, text);
 		if (align !== 'left') {
-			x -= Math.floor(label.textWidth * renderParams.horizontalPixelRatio);
+			x -= Math.floor(label.textWidth * target.horizontalPixelRatio);
 		}
 
 		y -= Math.floor(label.canvas.height / 2);
 
-		ctx.drawImage(
+		target.context.drawImage(
 			label.canvas,
 			x, y,
 			label.canvas.width, label.canvas.height
 		);
 	}
 
-	private _getLabelImage(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, text: string): Item {
+	private _getLabelImage(target: CanvasRenderingTarget, text: string): Item {
 		let item: Item;
 		if (this._hash.has(text)) {
 			// Cache hit!
@@ -67,14 +67,14 @@ export class LabelsImageCache implements IDestroyable {
 
 			const margin = Math.ceil(this._fontSize / 4.5);
 			const baselineOffset = Math.round(this._fontSize / 10);
-			const textWidth = Math.ceil(this._textWidthCache.measureText(ctx, text));
+			const textWidth = Math.ceil(this._textWidthCache.measureText(target.context, text));
 			const boxWidth = ceiledEven(Math.round(textWidth + margin * 2));
 			const boxHeight = ceiledEven(this._fontSize + margin * 2);
 			const canvas = createPreconfiguredCanvas(
 				document,
 				size({
-					width: Math.ceil(boxWidth * renderParams.horizontalPixelRatio),
-					height: Math.ceil(boxHeight * renderParams.verticalPixelRatio),
+					width: Math.ceil(boxWidth * target.horizontalPixelRatio),
+					height: Math.ceil(boxHeight * target.verticalPixelRatio),
 				})
 			);
 
@@ -90,10 +90,10 @@ export class LabelsImageCache implements IDestroyable {
 				this._hash.set(item.text, item);
 			}
 
-			ctx = getContext2D(item.canvas);
+			const ctx = ensureNotNull(item.canvas.getContext('2d'));
 			ctx.font = this._font;
 			ctx.fillStyle = this._color;
-			drawScaled(ctx, renderParams.horizontalPixelRatio, renderParams.verticalPixelRatio, () => {
+			drawScaled(ctx, target.horizontalPixelRatio, target.verticalPixelRatio, () => {
 				ctx.fillText(text, 0, boxHeight - margin - baselineOffset);
 			});
 		}

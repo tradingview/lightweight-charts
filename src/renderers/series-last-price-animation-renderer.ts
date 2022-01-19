@@ -1,6 +1,6 @@
 import { Point } from '../model/point';
 
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
 
 export interface LastPriceCircleRendererData {
@@ -23,15 +23,15 @@ export class SeriesLastPriceAnimationRenderer implements IPaneRenderer {
 		return this._data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		const data = this._data;
 		if (data === null) {
 			return;
 		}
 
-		ctx.save();
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		ctx.save();
 
 		const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
 

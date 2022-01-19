@@ -3,7 +3,7 @@ import { ensureNotNull } from '../helpers/assertions';
 import { BarCoordinates, BarPrices } from '../model/bar';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
 import { optimalBarWidth } from './optimal-bar-width';
 
@@ -32,12 +32,12 @@ export class PaneRendererBars implements IPaneRenderer {
 	}
 
 	// eslint-disable-next-line complexity
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { horizontalPixelRatio, verticalPixelRatio } = target;
 
 		this._barWidth = this._calcBarWidth(horizontalPixelRatio);
 
@@ -58,6 +58,7 @@ export class PaneRendererBars implements IPaneRenderer {
 
 		const drawOpenClose = this._barLineWidth <= this._barWidth && this._data.barSpacing >= Math.floor(1.5 * horizontalPixelRatio);
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
+			const ctx = target.context;
 			const bar = this._data.bars[i];
 			if (prevColor !== bar.color) {
 				ctx.fillStyle = bar.color;

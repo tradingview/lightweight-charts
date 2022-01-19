@@ -3,7 +3,7 @@ import { fillRectInnerBorder } from '../helpers/canvas-helpers';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { BarCandlestickItemBase } from './bars-renderer';
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
 import { optimalCandlestickWidth } from './optimal-bar-width';
 
@@ -38,12 +38,12 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 
-		const { horizontalPixelRatio } = renderParams;
+		const { horizontalPixelRatio } = target;
 
 		// now we know pixelRatio and we could calculate barWidth effectively
 		this._barWidth = optimalCandlestickWidth(this._data.barSpacing, horizontalPixelRatio);
@@ -61,26 +61,26 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 
 		const bars = this._data.bars;
 		if (this._data.wickVisible) {
-			this._drawWicks(ctx, bars, this._data.visibleRange, renderParams);
+			this._drawWicks(target, bars, this._data.visibleRange);
 		}
 
 		if (this._data.borderVisible) {
-			this._drawBorder(ctx, bars, this._data.visibleRange, this._data.barSpacing, renderParams);
+			this._drawBorder(target, bars, this._data.visibleRange, this._data.barSpacing);
 		}
 
 		const borderWidth = this._calculateBorderWidth(horizontalPixelRatio);
 
 		if (!this._data.borderVisible || this._barWidth > borderWidth * 2) {
-			this._drawCandles(ctx, bars, this._data.visibleRange, renderParams);
+			this._drawCandles(target, bars, this._data.visibleRange);
 		}
 	}
 
-	private _drawWicks(ctx: CanvasRenderingContext2D, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, renderParams: CanvasRenderingParams): void {
+	private _drawWicks(target: CanvasRenderingTarget, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
 		let prevWickColor = '';
 		let wickWidth = Math.min(
@@ -138,12 +138,12 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		return res;
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, barSpacing: number, renderParams: CanvasRenderingParams): void {
+	private _drawBorder(target: CanvasRenderingTarget, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, barSpacing: number): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
 		let prevBorderColor: string | undefined = '';
 		const borderWidth = this._calculateBorderWidth(horizontalPixelRatio);
@@ -178,12 +178,12 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		}
 	}
 
-	private _drawCandles(ctx: CanvasRenderingContext2D, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, renderParams: CanvasRenderingParams): void {
+	private _drawCandles(target: CanvasRenderingTarget, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
 		let prevBarColor = '';
 		const borderWidth = this._calculateBorderWidth(horizontalPixelRatio);

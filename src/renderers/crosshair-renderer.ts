@@ -1,4 +1,4 @@
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
@@ -25,7 +25,7 @@ export class CrosshairRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
@@ -37,9 +37,9 @@ export class CrosshairRenderer implements IPaneRenderer {
 			return;
 		}
 
-		ctx.save();
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		ctx.save();
 
 		const x = Math.round(this._data.x * horizontalPixelRatio);
 		const y = Math.round(this._data.y * verticalPixelRatio);

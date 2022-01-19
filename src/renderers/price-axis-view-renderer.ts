@@ -2,7 +2,7 @@ import { drawScaled } from '../helpers/canvas-helpers';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import {
 	IPriceAxisViewRenderer,
 	PriceAxisViewRendererCommonData,
@@ -24,16 +24,17 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	}
 
 	public draw(
-		ctx: CanvasRenderingContext2D,
+		target: CanvasRenderingTarget,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		width: number,
-		align: 'left' | 'right',
-		renderParams: CanvasRenderingParams
+		align: 'left' | 'right'
 	): void {
 		if (!this._data.visible) {
 			return;
 		}
+
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
 		ctx.font = rendererOptions.font;
 
@@ -92,8 +93,6 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xTick = xInside + tickSize;
 				xText = xInside + horzBorder + tickSize + paddingInner;
 			}
-
-			const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
 
 			const tickHeight = Math.max(1, Math.floor(verticalPixelRatio));
 

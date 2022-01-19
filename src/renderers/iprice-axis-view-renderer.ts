@@ -1,6 +1,6 @@
 import { TextWidthCache } from '../model/text-width-cache';
 
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { LineWidth } from './draw-line';
 
 export interface PriceAxisViewRendererCommonData {
@@ -36,12 +36,11 @@ export interface PriceAxisViewRendererOptions {
 
 export interface IPriceAxisViewRenderer {
 	draw(
-		ctx: CanvasRenderingContext2D,
+		target: CanvasRenderingTarget,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		width: number,
-		align: 'left' | 'right',
-		renderParams: CanvasRenderingParams
+		align: 'left' | 'right'
 	): void;
 
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number;

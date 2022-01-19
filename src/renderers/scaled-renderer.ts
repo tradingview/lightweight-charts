@@ -1,24 +1,24 @@
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { IPaneRenderer } from './ipane-renderer';
 
 export abstract class ScaledRenderer implements IPaneRenderer {
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 		ctx.save();
 		// actually we must be sure that this scaling applied only once at the same time
 		// currently ScaledRenderer could be only nodes renderer (not top-level renderers like CompositeRenderer or something)
 		// so this "constraint" is fulfilled for now
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
 		ctx.scale(horizontalPixelRatio, verticalPixelRatio);
 		this._drawImpl(ctx, isHovered, hitTestData);
 		ctx.restore();
 	}
 
-	public drawBackground(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public drawBackground(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 		ctx.save();
 		// actually we must be sure that this scaling applied only once at the same time
 		// currently ScaledRenderer could be only nodes renderer (not top-level renderers like CompositeRenderer or something)
 		// so this "constraint" is fulfilled for now
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
 		ctx.scale(horizontalPixelRatio, verticalPixelRatio);
 		this._drawBackgroundImpl(ctx, isHovered, hitTestData);
 		ctx.restore();

@@ -2,7 +2,7 @@ import { ensureNotNull } from '../helpers/assertions';
 
 import { PriceMark } from '../model/price-scale';
 
-import { CanvasRenderingParams } from './canvas-rendering-target';
+import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { LineStyle, setLineStyle, strokeInPixel } from './draw-line';
 import { IPaneRenderer } from './ipane-renderer';
 
@@ -31,12 +31,12 @@ export class GridRenderer implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, renderParams: CanvasRenderingParams, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const { horizontalPixelRatio, verticalPixelRatio } = renderParams;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
 		const lineWidth = Math.max(1, Math.floor(horizontalPixelRatio));
 		ctx.lineWidth = lineWidth;
