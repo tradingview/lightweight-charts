@@ -106,8 +106,8 @@ export class PriceAxisWidget implements IDestroyable {
 			this._topCanvasBinding.canvas,
 			handler,
 			{
-				treatVertTouchDragAsPageScroll: false,
-				treatHorzTouchDragAsPageScroll: true,
+				treatVertTouchDragAsPageScroll: () => false,
+				treatHorzTouchDragAsPageScroll: () => true,
 			}
 		);
 	}
