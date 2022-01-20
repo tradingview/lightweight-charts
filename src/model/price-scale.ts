@@ -604,6 +604,12 @@ export class PriceScale {
 		const firstValueIsNull = this.firstValue() === null;
 
 		// do not recalculate marks if firstValueIsNull is true because in this case we'll always get empty result
+		// this could happen in case when a series had some data and then you set empty data to it (in a simplified case)
+		// we could display an empty price scale, but this is not good from UX
+		// so in this case we need to keep an previous marks to display them on the scale
+		// as one of possible examples for this situation could be the following:
+		// let's say you have a study/indicator attached to a price scale and then you decide to stop it, i.e. remove its data because of its visibility
+		// a user will see the previous marks on the scale until you turn on your study back or remove it from the chart completely
 		if (this._marksCache !== null && (firstValueIsNull || this._marksCache.firstValueIsNull === firstValueIsNull)) {
 			return this._marksCache.marks;
 		}
