@@ -2,45 +2,66 @@
 	--PrimaryButtonColor: rgba(41, 98, 255, 1);
 	--SmallCardBorderColor: #E0E3EB;
 	--CardBackgroundColor:  #F0F3FA;
+	--CardBackgroundColor: rgba(240, 243, 250, 1);
 	--CardParagraphColor: rgba(120, 123, 134, 1);
-	--SvgFillColor: #000000;
+	--LargeIconSvgFillColor: #000000;
+	--HeroButtonTextColor: rgba(0, 0, 0, 1);
+	--HeroTextBackgroundColor: #FFFFFF;
 }
 
 html[data-theme=dark] {
 	--SmallCardBorderColor: #1E222D;
 	--CardBackgroundColor: rgba(12, 14, 21, 1);
 	--CardParagraphColor: rgba(178, 181, 190, 1);
-	--SvgFillColor: rgba(255, 255, 255, 1);
-}
-
-html svg path {
-	fill: var(--SvgFillColor);
-}
-
-html[data-theme=dark] svg path {
-	fill: rgba(255, 255, 255, 1);
+	--LargeIconSvgFillColor: rgba(255, 255, 255, 1);
+	--HeroButtonTextColor: rgba(209, 212, 220, 1);
+	--HeroTextBackgroundColor: rgba(12, 14, 21, 1);
 }
 
 .HeroContainer {
-	height: 30rem;
-	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 .HeroChartContainer {
-	width: 100%;
-	height: 100%;
+	display: none;
+}
+
+
+.HeroContainer svg path {
+	fill: var(--LargeIconSvgFillColor);
 }
 
 .HeroTextContainer {
-	position: absolute;
-	z-index: 2;
-	max-height: 25rem;
-	max-width: 40rem;
-	top: 5%;
-	left: 10%;
-	background: var(--CardBackgroundColor);
-	padding: 4rem;
-	border-radius: 1rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding-top: 2rem;
+}
+
+.HeroButtonsContainer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	min-width: 90%;
+}
+
+.HeroButton {
+	flex: 1 0 100%;
+	text-align: center;
+	border-radius: 56px;
+	padding: 1rem;
+	font-weight: 600;
+	border: 1px solid var(--SmallCardBorderColor);
+	white-space: nowrap;
+	color: var(--HeroButtonTextColor);
+}
+
+.HeroButtonPrimary {
+	color: #FFFFFF;
+	background: #2962FF;
 }
 
 .HeroTextContainer h1 {
@@ -48,103 +69,227 @@ html[data-theme=dark] svg path {
 	font-size: 2.5rem;
 }
 
-.HeroButtonPrimary {
-	background: var(--PrimaryButtonColor);
-	border-radius: 2rem;
-	padding-top: 0.75rem;
-	padding-bottom: 0.75rem;
-	padding-left: 1.5rem;
-	padding-right: 1.5rem;
-	color: white;
-	margin-right: 1rem;
-	display: inline-block;
-}
-
-.HeroButton {
-	border: 1px solid #434651;
-	border-radius: 2rem;
-	padding-top: 0.75rem;
-	padding-bottom: 0.75rem;
-	padding-left: 1.5rem;
-	padding-right: 1.5rem;
-	color: #D1D4DC;
-	display: inline-block;
+.HeroTextContainer p {
+	font-size: 1.5rem;
 }
 
 .LargeCardContainer {
 	display: flex;
-	flex-direction: row;
-	gap: 3rem;
-	padding-top: 2rem;
-	padding-bottom: 2rem;
-	justify-content: center;
 	flex-wrap: wrap;
-	min-width: 100%;
+	justify-content: center;
+	gap: 1rem;
 }
 
 .LargeCard {
-	width: 23rem;
-	height: 23rem;
+	max-width: 95%;
 	background: var(--CardBackgroundColor);
 	padding: 2rem 2rem;
 	border-radius: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
 }
 
-.LargeCard p {
-	font-size: 0.8rem;
-	color: var(--CardParagraphColor);
+.LargeCard h2 {
+	margin: 0;
+}
+
+.LargeCard svg path {
+	fill: var(--LargeIconSvgFillColor);
 }
 
 .SmallCardContainer {
 	display: flex;
-	flex-direction: row;
-	padding-top: 2rem;
-	padding-bottom: 2rem;
 	justify-content: center;
 	flex-wrap: wrap;
-	min-width: 100%;
 }
 
 .SmallCard {
-	max-width: 20rem;
-	padding-top: 1rem;
-	padding-left: 1rem;
-	padding-right: 1rem;
+	max-width: 95%;
+	padding: 2rem 1rem;
 	border: 1px solid var(--SmallCardBorderColor);
-	border-left: none;
+	border-bottom: none;
 }
 
 .SmallCard:first-of-type {
-	border-left: 1px solid var(--SmallCardBorderColor);
 	border-top-left-radius: 1rem;
-	border-bottom-left-radius: 1rem;
+	border-top-right-radius: 1rem;
 }
 
 .SmallCard:last-of-type {
-	border-right: 1px solid var(--SmallCardBorderColor);
-	border-top-right-radius: 1rem;
+	border-bottom: 1px solid var(--SmallCardBorderColor);
+	border-bottom-left-radius: 1rem;
 	border-bottom-right-radius: 1rem;
 }
 
 .SmallCard p {
-	font-size: 0.8rem;
 	color: var(--CardParagraphColor);
 }
 
 .LargeTextContainer {
 	display: flex;
-	flex-direction: column;
-	align-items: center;
-	min-width: 100%;
-	text-align: center;
+	flex-wrap: wrap;
+	padding-top: 2rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	font-weight: 400;
 }
 
 .LargeTextContainer h1 {
-	font-size: 3rem;
-	max-width: 50%;
+	text-align: center;
+	font-size: 2.5rem;
 }
 
 .LargeTextContainer p {
 	font-size: 1.5rem;
-	max-width: 50%;
+	text-align: center;
+}
+
+.RootContainer {
+	max-width: 98%;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	align-items: center;
+}
+
+@media (min-width: 768px) {
+	.HeroButtonsContainer {
+		min-width: unset;
+		flex-wrap: unset;
+	}
+
+	.HeroButton {
+		flex: 1 1 50%;
+		padding-left: 2rem;
+		padding-right: 2rem;
+	}
+
+	.LargeCard {
+		flex: 0 1 47%;
+	}
+
+	.LargeCard:last-of-type {
+		flex: 1 0 100%;
+	}
+
+	.SmallCard {
+		flex: 0 1 47%;
+	}
+
+	.SmallCard:nth-of-type(1) {
+		border-top-right-radius: unset;
+	}
+
+	.SmallCard:nth-of-type(2) {
+		border-top-right-radius: 1rem;
+		border-left: unset;
+	}
+
+	.SmallCard:nth-of-type(3) {
+		border-bottom-left-radius: 1rem;
+		border-bottom: 1px solid var(--SmallCardBorderColor);
+	}
+
+	.SmallCard:nth-of-type(4) {
+		border-bottom-left-radius: unset;
+		border-left: unset;
+	}
+}
+
+@media (min-width: 1280px) {
+	.HeroContainer {
+		position: relative;
+		align-self: stretch;
+	}
+
+	.HeroChartContainer {
+		display: unset;
+		width: 100%;
+		height: 70vh;
+	}
+
+	.HeroTextContainer {
+		position: absolute;
+		z-index: 2;
+		background: var(--HeroTextBackgroundColor);
+		max-width: 65%;
+		top: 10%;
+		left: 10%;
+		border-radius: 2rem;
+		align-items: flex-start;
+		text-align: left;
+		padding: 3rem;
+	}
+
+	.LargeTextContainer {
+		max-width: 75%;
+		justify-content: center;
+	}
+
+	.LargeCardContainer {
+		flex-wrap: nowrap;
+	}
+	
+	.LargeCard {
+		flex: 0 1 30%;
+	}
+
+	.LargeCard:last-of-type {
+		flex: 0 1 30%;
+	}
+
+	.SmallCardContainer {
+		flex-wrap: nowrap;
+	}
+	
+	.SmallCard {
+		flex: 0 1 23%;
+	}
+
+	.SmallCard:nth-of-type(1) {
+		border-top-right-radius: unset;
+		border-bottom-left-radius: 1rem;
+		border-bottom: 1px solid var(--SmallCardBorderColor);
+	}
+
+	.SmallCard:nth-of-type(2) {
+		border-top-right-radius: unset;
+		border-left: unset;
+		border-bottom: 1px solid var(--SmallCardBorderColor);
+	}
+
+	.SmallCard:nth-of-type(3) {
+		border-bottom-left-radius: unset;
+		border-left: unset;
+		border-bottom: 1px solid var(--SmallCardBorderColor);
+	}
+
+	.SmallCard:nth-of-type(4) {
+		border-top-right-radius: 1rem;
+		border-bottom-left-radius: unset;
+		border-left: unset;
+	}
+}
+
+@media (min-width: 1920px) {
+	.HeroTextContainer {
+		max-width: 43%;
+	}
+
+	.HeroChartContainer {
+		height: 50vh;
+	}
+
+	.LargeTextContainer {
+		max-width: 77%;
+	}
+
+	.LargeCardContainer {
+		max-width: 77%;
+	}
+	
+	.SmallCardContainer {
+		max-width: 77%;
+	}
 }

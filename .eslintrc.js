@@ -107,6 +107,12 @@ module.exports = {
 			},
 		},
 		{
+			files: ['**/*.jsx'],
+			env: {
+				browser: true,
+			},
+		},
+		{
 			files: ['**/*.md'],
 			processor: 'markdown/markdown',
 		},
