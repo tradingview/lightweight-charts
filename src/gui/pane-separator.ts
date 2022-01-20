@@ -64,8 +64,8 @@ export class PaneSeparator implements IDestroyable {
 				this._handle,
 				handlers,
 				{
-					treatVertTouchDragAsPageScroll: false,
-					treatHorzTouchDragAsPageScroll: true,
+					treatVertTouchDragAsPageScroll: () => false,
+					treatHorzTouchDragAsPageScroll: () => true,
 				}
 			);
 		}

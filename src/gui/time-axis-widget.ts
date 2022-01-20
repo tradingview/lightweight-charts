@@ -102,8 +102,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._topCanvasBinding.canvas,
 			this,
 			{
-				treatVertTouchDragAsPageScroll: true,
-				treatHorzTouchDragAsPageScroll: false,
+				treatVertTouchDragAsPageScroll: () => true,
+				treatHorzTouchDragAsPageScroll: () => false,
 			}
 		);
 	}

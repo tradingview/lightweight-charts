@@ -93,8 +93,8 @@ const enum Constants {
 }
 
 export interface MouseEventHandlerOptions {
-	treatVertTouchDragAsPageScroll: boolean;
-	treatHorzTouchDragAsPageScroll: boolean;
+	treatVertTouchDragAsPageScroll: () => boolean;
+	treatHorzTouchDragAsPageScroll: () => boolean;
 }
 
 interface TouchMouseMoveWithDownInfo {
@@ -290,8 +290,8 @@ export class MouseEventHandler implements IDestroyable {
 			const correctedXOffset = xOffset * 0.5;
 
 			// a drag can be only if touch page scroll isn't allowed
-			const isVertDrag = yOffset >= correctedXOffset && !this._options.treatVertTouchDragAsPageScroll;
-			const isHorzDrag = correctedXOffset > yOffset && !this._options.treatHorzTouchDragAsPageScroll;
+			const isVertDrag = yOffset >= correctedXOffset && !this._options.treatVertTouchDragAsPageScroll();
+			const isHorzDrag = correctedXOffset > yOffset && !this._options.treatHorzTouchDragAsPageScroll();
 
 			// if drag event happened then we should revert preventDefault state to original one
 			// and try to process the drag event
