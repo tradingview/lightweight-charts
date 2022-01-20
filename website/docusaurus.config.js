@@ -138,6 +138,13 @@ const config = {
 		({
 			navbar: {
 				title: 'Lightweight Charts',
+				logo: {
+					alt: 'Lightweight Charts Logo',
+					src: 'img/logo-dark.png',
+					srcDark: 'img/logo-light.png',
+					// width: 48,
+					// height: 32,
+				},
 				items: [
 					{
 						type: 'doc',
