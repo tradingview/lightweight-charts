@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-beta.13",
+    "@docusaurus/module-type-aliases": "^2.0.0-beta.14",
     "@docusaurus/preset-classic": "2.0.0-beta.13",
     "@docusaurus/theme-search-algolia": "2.0.0-beta.13",
     "@tsconfig/docusaurus": "~1.0.4",
