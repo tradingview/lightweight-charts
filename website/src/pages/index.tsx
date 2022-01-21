@@ -31,6 +31,14 @@ function HeroChart(): JSX.Element {
 
 			const c = createChart(container, {
 				layout,
+				grid: {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					horzLines: false,
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					vertLines: false,
+				},
 				timeScale: {
 					fixLeftEdge: true,
 					fixRightEdge: true,
