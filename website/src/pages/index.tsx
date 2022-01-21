@@ -43,6 +43,8 @@ function HeroChart(): JSX.Element {
 					fixLeftEdge: true,
 					fixRightEdge: true,
 				},
+				handleScroll: false,
+				handleScale: false,
 			});
 
 			const orangeSeries = c.addAreaSeries({
