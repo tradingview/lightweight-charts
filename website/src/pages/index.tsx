@@ -59,7 +59,7 @@ function HeroChart(): JSX.Element {
 			orangeSeries.setData(data.orangeData);
 			blueSeries.setData(data.blueData);
 
-			c.timeScale().fitContent();
+			c.timeScale().setVisibleLogicalRange({ from: 1, to: data.orangeData.length - 2 });
 
 			const resizeListener = () => {
 				const { width, height } = container.getBoundingClientRect();
