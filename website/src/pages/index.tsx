@@ -32,12 +32,12 @@ function HeroChart(): JSX.Element {
 			const c = createChart(container, {
 				layout,
 				grid: {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					horzLines: false,
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					vertLines: false,
+					horzLines: {
+						visible: false,
+					},
+					vertLines: {
+						visible: false,
+					},
 				},
 				timeScale: {
 					fixLeftEdge: true,
