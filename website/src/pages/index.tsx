@@ -1,14 +1,11 @@
 import useThemeContext from '@theme/hooks/useThemeContext';
 import Layout from '@theme/Layout';
-import { createChart, IChartApi, UTCTimestamp } from 'lightweight-charts';
+import { createChart, IChartApi, LineData } from 'lightweight-charts';
 import React from 'react';
 
 import Logo from '../../static/img/logo.svg';
-import _styles from './index.module.css';
-
-const styles = _styles as { [style: string]: string };
-
-const data = { orangeData: [{ value: 33, time: 1628005368 as UTCTimestamp }, { value: 33.49774076716826, time: 1628610168 as UTCTimestamp }, { value: 33.00544183567645, time: 1629214968 as UTCTimestamp }, { value: 33.7026637942526, time: 1629819768 as UTCTimestamp }, { value: 33.21936886405405, time: 1630424568 as UTCTimestamp }, { value: 33.900609590144896, time: 1631029368 as UTCTimestamp }, { value: 33.17765657755362, time: 1631634168 as UTCTimestamp }, { value: 33.42924174402081, time: 1632238968 as UTCTimestamp }, { value: 33.11836183231501, time: 1632843768 as UTCTimestamp }, { value: 33.370546260351574, time: 1633448568 as UTCTimestamp }, { value: 32.37624709371832, time: 1634053368 as UTCTimestamp }, { value: 32.51457619610796, time: 1634658168 as UTCTimestamp }, { value: 32.289844763651196, time: 1635262968 as UTCTimestamp }, { value: 32.30345180071158, time: 1635867768 as UTCTimestamp }, { value: 31.338699866068282, time: 1636472568 as UTCTimestamp }, { value: 31.599431171640674, time: 1637077368 as UTCTimestamp }, { value: 31.19599059792039, time: 1637682168 as UTCTimestamp }, { value: 31.425624659001333, time: 1638286968 as UTCTimestamp }, { value: 30.687366192207392, time: 1638891768 as UTCTimestamp }, { value: 31.37955209658077, time: 1639496568 as UTCTimestamp }, { value: 30.44272814637675, time: 1640101368 as UTCTimestamp }, { value: 30.443425326447485, time: 1640706168 as UTCTimestamp }, { value: 30.402280371726427, time: 1641310968 as UTCTimestamp }, { value: 31.323860910479432, time: 1641915768 as UTCTimestamp }], blueData: [{ value: 31, time: 1628005368 as UTCTimestamp }, { value: 31.78679751621187, time: 1628610168 as UTCTimestamp }, { value: 31.73307428969506, time: 1629214968 as UTCTimestamp }, { value: 32.645659569228435, time: 1629819768 as UTCTimestamp }, { value: 32.18589215966293, time: 1630424568 as UTCTimestamp }, { value: 32.36649658122607, time: 1631029368 as UTCTimestamp }, { value: 32.13494929971301, time: 1631634168 as UTCTimestamp }, { value: 32.24176261787218, time: 1632238968 as UTCTimestamp }, { value: 32.23416002963385, time: 1632843768 as UTCTimestamp }, { value: 33.155464487194166, time: 1633448568 as UTCTimestamp }, { value: 32.30858974959849, time: 1634053368 as UTCTimestamp }, { value: 33.240351713622175, time: 1634658168 as UTCTimestamp }, { value: 32.476820033756304, time: 1635262968 as UTCTimestamp }, { value: 33.38322664774607, time: 1635867768 as UTCTimestamp }, { value: 33.112040840762795, time: 1636472568 as UTCTimestamp }, { value: 33.21270434841732, time: 1637077368 as UTCTimestamp }, { value: 32.34952853888793, time: 1637682168 as UTCTimestamp }, { value: 33.309373031504336, time: 1638286968 as UTCTimestamp }, { value: 32.68788509068168, time: 1638891768 as UTCTimestamp }, { value: 32.991148534675084, time: 1639496568 as UTCTimestamp }, { value: 32.019560141931144, time: 1640101368 as UTCTimestamp }, { value: 32.6775781486036, time: 1640706168 as UTCTimestamp }, { value: 31.739487272423506, time: 1641310968 as UTCTimestamp }, { value: 31.957098637385883, time: 1641915768 as UTCTimestamp }] };
+import data from './data.json';
+import styles from './index.module.css';
 
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
@@ -58,8 +55,8 @@ function HeroChart(): JSX.Element {
 				bottomColor: 'rgba(15, 28, 249, 0.2)',
 			});
 
-			orangeSeries.setData(data.orangeData);
-			blueSeries.setData(data.blueData);
+			orangeSeries.setData(data.orangeData as LineData[]);
+			blueSeries.setData(data.blueData as LineData[]);
 
 			c.timeScale().setVisibleLogicalRange({ from: 1, to: data.orangeData.length - 2 });
 
