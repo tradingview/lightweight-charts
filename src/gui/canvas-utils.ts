@@ -18,7 +18,13 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 	const canvas = doc.createElement('canvas');
 	parentElement.appendChild(canvas);
 
-	const binding = bindCanvasElementBitmapSizeTo(canvas, { type: 'device-pixel-content-box' });
+	const binding = bindCanvasElementBitmapSizeTo(canvas, {
+		type: 'device-pixel-content-box',
+		transform: (bitmapSize: Size, canvasElementClientSize: Size) => ({
+			width: Math.max(bitmapSize.width, canvasElementClientSize.width),
+			height: Math.max(bitmapSize.height, canvasElementClientSize.height),
+		}),
+	});
 	binding.resizeCanvasElement(size);
 	return binding;
 }
