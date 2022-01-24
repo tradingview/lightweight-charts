@@ -395,6 +395,12 @@ module.exports = {
 			},
 		},
 		{
+			files: ['website/src/pages/**/*.tsx'],
+			rules: {
+				'import/no-default-export': 'off',
+			},
+		},
+		{
 			files: ['dist/typings.d.ts'],
 			parser: '@typescript-eslint/parser',
 			env: {

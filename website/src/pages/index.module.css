@@ -8,20 +8,17 @@
 	display: none;
 }
 
-.HeroContainer svg path {
-	stroke: var(--LargeIconSvgFillColor);
-}
-
-.HeroContainer svg circle {
-	stroke: var(--LargeIconSvgFillColor);
-}
-
 .HeroTextContainer {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
 	padding-top: 2rem;
+	background: var(--HeroTextBackgroundColor);
+}
+
+.HeroTextContainer svg {
+	color: var(--LogoColor);
 }
 
 .HeroButtonsContainer {
@@ -98,8 +95,12 @@
 	margin: 0;
 }
 
-.LargeCard svg path {
-	fill: var(--LargeIconSvgFillColor);
+.LargeCard p {
+	color: var(--LargeCardParagraphTextColor);
+}
+
+.LargeCard svg {
+	color: var(--IconColor);
 }
 
 .SmallCardContainer {
@@ -109,18 +110,19 @@
 }
 
 .SmallCard {
+	flex: 1 0 auto;
 	max-width: 95%;
 	padding: 2rem 1rem;
 	border: 1px solid var(--SmallCardBorderColor);
 	border-bottom: none;
 }
 
-.SmallCard:first-of-type {
+.SmallCard1 {
 	border-top-left-radius: 1rem;
 	border-top-right-radius: 1rem;
 }
 
-.SmallCard:last-of-type {
+.SmallCard4 {
 	border-bottom: 1px solid var(--SmallCardBorderColor);
 	border-bottom-left-radius: 1rem;
 	border-bottom-right-radius: 1rem;
@@ -173,7 +175,7 @@
 		flex: 0 1 47%;
 	}
 
-	.LargeCard:last-of-type {
+	.LargeCard3 {
 		flex: 1 0 100%;
 	}
 
@@ -181,27 +183,27 @@
 		flex: 0 1 47%;
 	}
 
-	.SmallCard:nth-of-type(1) {
+	.SmallCard1 {
 		border-top-right-radius: unset;
 	}
 
-	.SmallCard:nth-of-type(2) {
+	.SmallCard2 {
 		border-top-right-radius: 1rem;
 		border-left: unset;
 	}
 
-	.SmallCard:nth-of-type(3) {
+	.SmallCard3 {
 		border-bottom-left-radius: 1rem;
 		border-bottom: 1px solid var(--SmallCardBorderColor);
 	}
 
-	.SmallCard:nth-of-type(4) {
+	.SmallCard4 {
 		border-bottom-left-radius: unset;
 		border-left: unset;
 	}
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1279.5px) {
 	.HeroContainer {
 		position: relative;
 		align-self: stretch;
@@ -217,7 +219,6 @@
 	.HeroTextContainer {
 		position: absolute;
 		z-index: 2;
-		background: var(--HeroTextBackgroundColor);
 		max-width: 65%;
 		top: 10%;
 		left: 10%;
@@ -236,11 +237,7 @@
 		flex-wrap: nowrap;
 	}
 	
-	.LargeCard {
-		flex: 0 1 30%;
-	}
-
-	.LargeCard:last-of-type {
+	.LargeCard, LargeCard3 {
 		flex: 0 1 30%;
 	}
 
@@ -252,25 +249,25 @@
 		flex: 0 1 23%;
 	}
 
-	.SmallCard:nth-of-type(1) {
+	.SmallCard1 {
 		border-top-right-radius: unset;
 		border-bottom-left-radius: 1rem;
 		border-bottom: 1px solid var(--SmallCardBorderColor);
 	}
 
-	.SmallCard:nth-of-type(2) {
+	.SmallCard2 {
 		border-top-right-radius: unset;
 		border-left: unset;
 		border-bottom: 1px solid var(--SmallCardBorderColor);
 	}
 
-	.SmallCard:nth-of-type(3) {
+	.SmallCard3 {
 		border-bottom-left-radius: unset;
 		border-left: unset;
 		border-bottom: 1px solid var(--SmallCardBorderColor);
 	}
 
-	.SmallCard:nth-of-type(4) {
+	.SmallCard4 {
 		border-top-right-radius: 1rem;
 		border-bottom-left-radius: unset;
 		border-left: unset;
