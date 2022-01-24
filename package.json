@@ -58,6 +58,7 @@
     "eslint-plugin-markdown": "~2.2.1",
     "eslint-plugin-mdx": "~1.16.0",
     "eslint-plugin-prefer-arrow": "~1.2.1",
+    "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-tsdoc": "~0.2.14",
     "eslint-plugin-unicorn": "~41.0.0",
     "eslint-plugin-react": "~7.28.0",

@@ -59,6 +59,7 @@ module.exports = {
 		'prefer-arrow',
 		'unicorn',
 		'jsdoc',
+		'eslint-plugin-react',
 	],
 	settings: {
 		jsdoc: {
@@ -138,6 +139,12 @@ module.exports = {
 			},
 		},
 		{
+			files: ['**/*.jsx'],
+			rules: {
+				'react/prop-types': 'off',
+			},
+		},
+		{
 			files: ['**/*.md'],
 			processor: 'markdown/markdown',
 		},
@@ -174,13 +181,12 @@ module.exports = {
 				histogramSeries: true,
 				lineSeries: true,
 				series: true,
+				createChart: true,
 			},
 			rules: {
 				'no-console': 'off',
-				'no-undef': 'off',
 				'no-unused-vars': 'off',
 				indent: ['error', 4],
-
 				'unicorn/filename-case': 'off',
 			},
 		},
