@@ -457,23 +457,43 @@ export class ChartWidget implements IDestroyable {
 			invalidationType === InvalidationLevel.Full ||
 			invalidationType === InvalidationLevel.Light
 		) {
-			const panes = this._model.panes();
-			for (let i = 0; i < panes.length; i++) {
-				if (invalidateMask.invalidateForPane(i).autoScale) {
-					panes[i].momentaryAutoScale();
-				}
-			}
-
-			const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
-			for (const tsInvalidation of timeScaleInvalidations) {
-				this._applyTimeScaleInvalidation(tsInvalidation);
-			}
-			this._reapplyTimeScaleInvalidations(timeScaleInvalidations);
+			this._applyMomentaryAutoScale(invalidateMask);
+			this._applyTimeScaleInvalidations(invalidateMask);
 
 			this._timeAxisWidget.update();
+			this._paneWidgets.forEach((pane: PaneWidget) => {
+				pane.updatePriceAxisWidgets();
+			});
+
+			// In the case a full invalidation has been postponed during the draw, reapply
+			// the timescale invalidations. A full invalidation would mean there is a change
+			// in the timescale width (caused by price scale changes) that needs to be drawn
+			// right away to avoid flickering.
+			if (this._invalidateMask?.fullInvalidation() === InvalidationLevel.Full) {
+				this._invalidateMask.merge(invalidateMask);
+				this._updateGui();
+				this._applyMomentaryAutoScale(this._invalidateMask);
+				this._applyTimeScaleInvalidations(this._invalidateMask);
+				invalidateMask = this._invalidateMask;
+				this._invalidateMask = null;
+			}
 		}
 
 		this.paint(invalidateMask);
+	}
+	private _applyTimeScaleInvalidations(invalidateMask: InvalidateMask): void {
+		const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
+		for (const tsInvalidation of timeScaleInvalidations) {
+			this._applyTimeScaleInvalidation(tsInvalidation);
+		}
+	}
+	private _applyMomentaryAutoScale(invalidateMask: InvalidateMask): void {
+		const panes = this._model.panes();
+		for (let i = 0; i < panes.length; i++) {
+			if (invalidateMask.invalidateForPane(i).autoScale) {
+				panes[i].momentaryAutoScale();
+			}
+		}
 	}
 
 	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {
@@ -570,7 +590,7 @@ export class ChartWidget implements IDestroyable {
 			if (paneWidget.state() !== state) {
 				paneWidget.setState(state);
 			} else {
-				paneWidget.updatePriceAxisWidgets();
+				paneWidget.updatePriceAxisWidgetsStates();
 			}
 		}
 
@@ -636,32 +656,6 @@ export class ChartWidget implements IDestroyable {
 
 	private _isRightAxisVisible(): boolean {
 		return this._paneWidgets[0].state().rightPriceScale().options().visible;
-	}
-
-	/**
-	 * Used to apply the invalidation (draw), and reapply the time scale invalidations
-	 * if they cause a change to the visible range. Need to reapply all
-	 * timescale invalidations in order in case we have change of the range then
-	 * offset for example
-	 *
-	 * @param timeScaleInvalidations - time scale invalidations
-	 */
-	private _reapplyTimeScaleInvalidations(timeScaleInvalidations: Readonly<TimeScaleInvalidation[]>): void {
-		const rangeTimeScaleInvalidations = timeScaleInvalidations
-			.filter((timeScaleInvalidation: TimeScaleInvalidation) => {
-				return timeScaleInvalidation.type === TimeScaleInvalidationType.ApplyRange
-				|| timeScaleInvalidation.type === TimeScaleInvalidationType.FitContent;
-			});
-		if (rangeTimeScaleInvalidations.length > 0) {
-			const newMask = this._invalidateMask;
-			this._invalidateMask = null;
-			if (newMask) {
-				this._drawImpl(newMask);
-			}
-			timeScaleInvalidations.forEach((timeScaleInvalidation: TimeScaleInvalidation) => {
-				this._applyTimeScaleInvalidation(timeScaleInvalidation);
-			});
-		}
 	}
 }
 

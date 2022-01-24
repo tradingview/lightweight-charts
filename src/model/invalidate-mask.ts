@@ -62,7 +62,6 @@ export type TimeScaleInvalidation =
 export class InvalidateMask {
 	private _invalidatedPanes: Map<number, PaneInvalidation> = new Map();
 	private _globalLevel: InvalidationLevel;
-	private _force: boolean = false;
 	private _timeScaleInvalidations: TimeScaleInvalidation[] = [];
 
 	public constructor(globalLevel: InvalidationLevel) {
@@ -119,14 +118,14 @@ export class InvalidateMask {
 		return this._timeScaleInvalidations;
 	}
 
-	public merge(other: InvalidateMask): void {
-		this._force = this._force || other._force;
-
-		this._timeScaleInvalidations = this._timeScaleInvalidations.concat(other._timeScaleInvalidations);
-		for (const tsInvalidation of other._timeScaleInvalidations) {
+	public mergeTimeScaleInvalidations(timeScaleInvalidations: Readonly<TimeScaleInvalidation[]>): void {
+		for (const tsInvalidation of timeScaleInvalidations) {
 			this._applyTimeScaleInvalidation(tsInvalidation);
 		}
+	}
 
+	public merge(other: InvalidateMask): void {
+		this.mergeTimeScaleInvalidations(other._timeScaleInvalidations);
 		this._globalLevel = Math.max(this._globalLevel, other._globalLevel);
 		other._invalidatedPanes.forEach((invalidation: PaneInvalidation, index: number) => {
 			this.invalidatePane(index, invalidation);
