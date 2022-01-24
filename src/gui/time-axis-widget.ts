@@ -375,6 +375,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				}
 			}
 		});
+
+		ctx.restore();
 	}
 
 	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D, coordinate: number, labelText: string): number {
