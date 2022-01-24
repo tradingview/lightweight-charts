@@ -71,3 +71,11 @@ html[data-theme='dark'] {
   justify-content: center;
   gap: 2rem;
 }
+
+.logo-svg path {
+	stroke: var(--LogoColor);
+}
+
+.logo-svg-stem-path {
+	fill: var(--LogoColor);
+}
