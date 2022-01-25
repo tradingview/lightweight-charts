@@ -5,42 +5,61 @@ import { createChart } from 'lightweight-charts';
 
 import styles from './styles.module.css';
 
-function getSrcDocWithScript(script) {
+function getSrcDocWithScript(script, parentOrigin) {
 	return `
-		<style>html, body, #container { width: 100%; height: 100%; }</style>
+		<style>html, body, #container { width: 100%; height: 100%; overflow: hidden; }</style>
 		<div id="container"></div>
 		<script>
-			${script}
+			window.run = () => {
+				${script}
+			};
+
+			window.parent.postMessage('ready', '${parentOrigin}');
 		</script>
 	`;
 }
 
 const Chart = props => {
 	const { script } = props;
-	const srcDoc = getSrcDocWithScript(script);
+	const { origin } = window;
+
+	const srcDoc = getSrcDocWithScript(script, origin);
 
 	const ref = React.useRef();
 
 	React.useEffect(() => {
-		const contentWindow = ref.current.contentWindow;
+		const readyMessageListener = (event) => {
+			if (event.origin !== origin || event.source !== ref.current.contentWindow) {
+				return;
+			}
 
-		contentWindow.createChart = (container, options) => {
-			const chart = createChart(container, options);
-			const onResize = () => {
-				const boundingClientRect = container.getBoundingClientRect();
-				chart.resize(boundingClientRect.width, boundingClientRect.height);
-			};
+			if (event.data === 'ready') {
+				const contentWindow = event.source;
 
-			contentWindow.onresize = onResize;
+				contentWindow.createChart = (container, options) => {
+					const chart = createChart(container, options);
+					const resizeListener = () => {
+						const boundingClientRect = container.getBoundingClientRect();
+						chart.resize(boundingClientRect.width, boundingClientRect.height);
+					};
 
-			return chart;
+					contentWindow.addEventListener('resize', resizeListener, true);
+
+					return chart;
+				};
+
+				event.source.run();
+
+				window.removeEventListener('message', readyMessageListener, false);
+			}
 		};
-	}, []);
+
+		window.addEventListener('message', readyMessageListener, false);
+	}, [origin])
 
 	return (
 		<iframe
 			ref={ref}
-			key={srcDoc}
 			srcDoc={srcDoc}
 			className={styles.iframe}
 		/>
@@ -52,7 +71,8 @@ const ChartCodeBlock = props => {
 		return (
 			<>
 				<CodeBlock {...props} />
-				<BrowserOnly>{() => <Chart script={props.children} />}</BrowserOnly>
+				{/* <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <div className={styles.iframe}>&nbsp;</div>}</BrowserOnly> */}
+				<BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={props.children} />}</BrowserOnly>
 			</>
 	);
 	}
@@ -60,5 +80,4 @@ const ChartCodeBlock = props => {
 	return <CodeBlock {...props} />;
 };
 
-// eslint-disable-next-line import/no-default-export
 export default ChartCodeBlock;

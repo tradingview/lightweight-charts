@@ -140,8 +140,12 @@ module.exports = {
 		},
 		{
 			files: ['**/*.jsx'],
+			env: {
+				browser: true,
+			},
 			rules: {
 				'react/prop-types': 'off',
+				'import/no-default-export': 'off',
 			},
 		},
 		{
