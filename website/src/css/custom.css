@@ -6,15 +6,15 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: rgb(41, 98, 255);
-  --ifm-color-primary-dark: rgb(30, 83, 229);
-  --ifm-color-primary-darker: rgb(24, 72, 204);
-  --ifm-color-primary-darkest: rgb(20, 62, 179);
-  --ifm-color-primary-light: rgb(49, 121, 245);
-  --ifm-color-primary-lighter: rgb(91, 156, 246);
-  --ifm-color-primary-lightest: rgb(144, 191, 249);
-  --ifm-code-font-size: 95%;
-  --ifm-footer-background-color: rgb(255, 255, 255);
+	--ifm-color-primary: rgb(41, 98, 255);
+	--ifm-color-primary-dark: rgb(30, 83, 229);
+	--ifm-color-primary-darker: rgb(24, 72, 204);
+	--ifm-color-primary-darkest: rgb(20, 62, 179);
+	--ifm-color-primary-light: rgb(49, 121, 245);
+	--ifm-color-primary-lighter: rgb(91, 156, 246);
+	--ifm-color-primary-lightest: rgb(144, 191, 249);
+	--ifm-code-font-size: 95%;
+	--ifm-footer-background-color: rgb(255, 255, 255);
 	--PrimaryButtonColor: rgba(41, 98, 255, 1);
 	--SmallCardBorderColor: rgb(224, 227, 235);
 	--CardBackgroundColor:  rgb(240, 243, 250);
@@ -25,8 +25,8 @@
 	--HeroButtonBackgroundColorHover: rgba(240, 243, 250, 1);
 	--HeroButtonBackgroundColorActive: rgba(224, 227, 235, 1);
 	--HeroTextBackgroundColor: rgb(255, 255, 255);
-  --LogoColor: rgb(0, 0, 0);
-  --LargeCardParagraphTextColor: rgba(120, 123, 134, 1);
+	--LogoColor: rgb(0, 0, 0);
+	--LargeCardParagraphTextColor: rgba(120, 123, 134, 1);
 }
 
 html[data-theme=dark] {
@@ -38,46 +38,38 @@ html[data-theme=dark] {
 	--HeroButtonBackgroundColorHover: rgba(42, 46, 57, 1);
 	--HeroButtonBackgroundColorActive: rgba(54, 58, 69, 1);
 	--HeroTextBackgroundColor: rgba(12, 14, 21, 1);
-  --LogoColor: rgb(255, 255, 255);
-  --LargeCardParagraphTextColor: rgba(178, 181, 190, 1);
+	--LogoColor: rgb(255, 255, 255);
+	--LargeCardParagraphTextColor: rgba(178, 181, 190, 1);
 }
 
 .docusaurus-highlight-code-line {
-  background-color: rgba(0, 0, 0, 0.1);
-  display: block;
-  margin: 0 calc(-1 * var(--ifm-pre-padding));
-  padding: 0 var(--ifm-pre-padding);
+	background-color: rgba(0, 0, 0, 0.1);
+	display: block;
+	margin: 0 calc(-1 * var(--ifm-pre-padding));
+	padding: 0 var(--ifm-pre-padding);
 }
 
 html[data-theme='dark'] .docusaurus-highlight-code-line {
-  background-color: rgba(0, 0, 0, 0.3);
+	background-color: rgba(0, 0, 0, 0.3);
 }
 
 
 html[data-theme='dark'] {
-  --ifm-navbar-background-color: #000000;
-  --ifm-footer-background-color: #000000;
-  --ifm-background-color: #000000;
+	--ifm-navbar-background-color: #000000;
+	--ifm-footer-background-color: #000000;
+	--ifm-background-color: #000000;
 }
 
 .navbar__title {
-  font-size: 1.5rem;
+	font-size: 1.5rem;
 }
 
 .navbar__logo img {
-  fill-rule: evenodd;
+	fill-rule: evenodd;
 }
 
 .main-wrapper {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-}
-
-.logo-svg path {
-	stroke: var(--LogoColor);
-}
-
-.logo-svg-stem-path {
-	fill: var(--LogoColor);
+	display: flex;
+	justify-content: center;
+	gap: 2rem;
 }
