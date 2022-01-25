@@ -28,7 +28,7 @@ const Chart = props => {
 	const ref = React.useRef();
 
 	React.useEffect(() => {
-		const readyMessageListener = (event) => {
+		const readyMessageListener = event => {
 			if (event.origin !== origin || event.source !== ref.current.contentWindow) {
 				return;
 			}
