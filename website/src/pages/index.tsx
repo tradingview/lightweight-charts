@@ -1,6 +1,6 @@
 import useThemeContext from '@theme/hooks/useThemeContext';
 import Layout from '@theme/Layout';
-import { createChart, IChartApi, LineData } from 'lightweight-charts';
+import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
 
 import Cog from './cog.svg';
@@ -14,10 +14,31 @@ import Shapes from './shapes.svg';
 import Speedometer from './speedometer.svg';
 import TradingviewHeart from './tradingview-heart.svg';
 
+function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptions> {
+	return isDarkTheme
+		? { background: { color: '#000000' }, textColor: 'rgba(248, 249, 253, 1)' }
+		: { background: { color: 'rgba(248, 249, 253, 1)' }, textColor: '#000000' };
+}
+
+function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
+	const { isDarkTheme } = useThemeContext();
+
+	const [layoutOptions, setLayoutOptions] = React.useState<DeepPartial<LayoutOptions>>(getLayoutOptionsForTheme(isDarkTheme));
+
+	React.useEffect(
+		() => {
+			setLayoutOptions(getLayoutOptionsForTheme(isDarkTheme));
+		},
+		[isDarkTheme]
+	);
+
+	return layoutOptions;
+}
+
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
 
-	const { isDarkTheme } = useThemeContext();
+	const layout = useThemeAwareLayoutOptions();
 
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
@@ -28,10 +49,6 @@ function HeroChart(): JSX.Element {
 			if (!container) {
 				return;
 			}
-
-			const layout = isDarkTheme
-				? { background: { color: '#000000' }, textColor: 'rgba(248, 249, 253, 1)' }
-				: { background: { color: 'rgba(248, 249, 253, 1)' }, textColor: '#000000' };
 
 			const c = createChart(container, {
 				layout,
@@ -92,13 +109,9 @@ function HeroChart(): JSX.Element {
 				return;
 			}
 
-			const layout = isDarkTheme
-				? { background: { color: '#000000' }, textColor: 'rgba(248, 249, 253, 1)' }
-				: { background: { color: 'rgba(248, 249, 253, 1)' }, textColor: '#000000' };
-
 			chart.applyOptions({ layout });
 		},
-		[isDarkTheme]
+		[layout]
 	);
 
 	return (
