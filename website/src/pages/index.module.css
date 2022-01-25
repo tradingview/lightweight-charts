@@ -158,7 +158,7 @@
 	align-items: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 767.5px) {
 	.HeroButtonsContainer {
 		min-width: unset;
 		flex-wrap: unset;
@@ -274,7 +274,7 @@
 	}
 }
 
-@media (min-width: 1920px) {
+@media (min-width: 1919.5px) {
 	.HeroTextContainer {
 		max-width: 43%;
 	}
