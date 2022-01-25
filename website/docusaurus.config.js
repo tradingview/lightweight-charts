@@ -21,12 +21,6 @@ const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
 
 const typedocWatch = process.env.TYPEDOC_WATCH === 'true';
 
-// copy logo file to static folder so we can refer to it in the config
-fs.copyFileSync(
-	path.resolve(__dirname, '../.github/logo.svg'),
-	path.resolve(__dirname, 'static/img/lightweight-charts-logo.svg')
-);
-
 function downloadTypingsToFile(typingsFilePath, version) {
 	return new Promise((resolve, reject) => {
 		let file;
