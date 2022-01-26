@@ -97,7 +97,7 @@ jobs:
   install-deps-website:
     executor: node12-executor
     steps:
-      - checkout-with-deps-website
+      - checkout-with-deps
       - run: cd website && npm install
       - save_cache: *save-node-modules-cache-website
 
@@ -137,7 +137,6 @@ jobs:
     executor: node12-executor
     steps:
       - checkout-with-deps
-      - checkout-with-deps-website
       - run: npm run lint:ts
 
   lint-dts:
