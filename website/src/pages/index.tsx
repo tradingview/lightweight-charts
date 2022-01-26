@@ -4,7 +4,7 @@ import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'li
 import React from 'react';
 
 import Cog from './cog.svg';
-import data from './data.json';
+import data from './hero-chart-data.json';
 import styles from './index.module.css';
 import InputSliders from './input-sliders.svg';
 import Logo from './logo.svg';
