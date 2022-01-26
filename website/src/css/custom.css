@@ -40,6 +40,9 @@ html[data-theme=dark] {
 	--HeroTextBackgroundColor: rgba(12, 14, 21, 1);
 	--LogoColor: rgb(255, 255, 255);
 	--LargeCardParagraphTextColor: rgba(178, 181, 190, 1);
+	--ifm-navbar-background-color: #000000;
+	--ifm-footer-background-color: #000000;
+	--ifm-background-color: #000000;
 }
 
 .docusaurus-highlight-code-line {
@@ -53,19 +56,8 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	background-color: rgba(0, 0, 0, 0.3);
 }
 
-
-html[data-theme='dark'] {
-	--ifm-navbar-background-color: #000000;
-	--ifm-footer-background-color: #000000;
-	--ifm-background-color: #000000;
-}
-
 .navbar__title {
 	font-size: 1.5rem;
-}
-
-.navbar__logo img {
-	fill-rule: evenodd;
 }
 
 .main-wrapper {
