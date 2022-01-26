@@ -16,7 +16,7 @@ import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-render
 
 import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
-import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
+import { MouseEventHandler, MouseEventHandlers, MouseEventHandlerTouchEvent, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
 
 const enum Constants {
@@ -102,8 +102,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._topCanvasBinding.canvas,
 			this,
 			{
-				treatVertTouchDragAsPageScroll: true,
-				treatHorzTouchDragAsPageScroll: false,
+				treatVertTouchDragAsPageScroll: () => true,
+				treatHorzTouchDragAsPageScroll: () => false,
 			}
 		);
 	}
@@ -150,6 +150,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		model.startScaleTime(event.localX);
 	}
 
+	public touchStartEvent(event: MouseEventHandlerTouchEvent): void {
+		this.mouseDownEvent(event);
+	}
+
 	public mouseDownOutsideEvent(): void {
 		const model = this._chart.model();
 		if (!model.timeScale().isEmpty() && this._mouseDown) {
@@ -169,7 +173,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		model.scaleTimeTo(event.localX);
 	}
 
-	public mouseUpEvent(event: TouchMouseEvent): void {
+	public touchMoveEvent(event: MouseEventHandlerTouchEvent): void {
+		this.pressedMouseMoveEvent(event);
+	}
+
+	public mouseUpEvent(): void {
 		this._mouseDown = false;
 		const model = this._chart.model();
 		if (model.timeScale().isEmpty() && !this._chart.options().handleScale.axisPressedMouseMove.time) {
@@ -179,19 +187,27 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		model.endScaleTime();
 	}
 
+	public touchEndEvent(): void {
+		this.mouseUpEvent();
+	}
+
 	public mouseDoubleClickEvent(): void {
 		if (this._chart.options().handleScale.axisDoubleClickReset) {
 			this._chart.model().resetTimeScale();
 		}
 	}
 
-	public mouseEnterEvent(e: TouchMouseEvent): void {
+	public doubleTapEvent(): void {
+		this.mouseDoubleClickEvent();
+	}
+
+	public mouseEnterEvent(): void {
 		if (this._chart.model().options().handleScale.axisPressedMouseMove.time) {
 			this._setCursor(CursorType.EwResize);
 		}
 	}
 
-	public mouseLeaveEvent(e: TouchMouseEvent): void {
+	public mouseLeaveEvent(): void {
 		this._setCursor(CursorType.Default);
 	}
 
@@ -359,6 +375,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				}
 			}
 		});
+
+		ctx.restore();
 	}
 
 	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D, coordinate: number, labelText: string): number {
