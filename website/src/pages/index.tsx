@@ -3,16 +3,16 @@ import Layout from '@theme/Layout';
 import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
 
-import Cog from './cog.svg';
+import Cog from '../img/cog.svg';
+import InputSliders from '../img/input-sliders.svg';
+import Logo from '../img/logo.svg';
+import Paperplane from '../img/paperplane.svg';
+import Screens from '../img/screens.svg';
+import Shapes from '../img/shapes.svg';
+import Speedometer from '../img/speedometer.svg';
+import TradingviewHeart from '../img/tradingview-heart.svg';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
-import InputSliders from './input-sliders.svg';
-import Logo from './logo.svg';
-import Paperplane from './paperplane.svg';
-import Screens from './screens.svg';
-import Shapes from './shapes.svg';
-import Speedometer from './speedometer.svg';
-import TradingviewHeart from './tradingview-heart.svg';
 
 function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptions> {
 	return isDarkTheme
