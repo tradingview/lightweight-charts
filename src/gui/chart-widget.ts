@@ -471,9 +471,12 @@ export class ChartWidget implements IDestroyable {
 			// right away to avoid flickering.
 			if (this._invalidateMask?.fullInvalidation() === InvalidationLevel.Full) {
 				this._invalidateMask.merge(invalidateMask);
+
 				this._updateGui();
+
 				this._applyMomentaryAutoScale(this._invalidateMask);
 				this._applyTimeScaleInvalidations(this._invalidateMask);
+
 				invalidateMask = this._invalidateMask;
 				this._invalidateMask = null;
 			}
@@ -481,12 +484,14 @@ export class ChartWidget implements IDestroyable {
 
 		this.paint(invalidateMask);
 	}
+
 	private _applyTimeScaleInvalidations(invalidateMask: InvalidateMask): void {
 		const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
 		for (const tsInvalidation of timeScaleInvalidations) {
 			this._applyTimeScaleInvalidation(tsInvalidation);
 		}
 	}
+
 	private _applyMomentaryAutoScale(invalidateMask: InvalidateMask): void {
 		const panes = this._model.panes();
 		for (let i = 0; i < panes.length; i++) {
@@ -499,10 +504,9 @@ export class ChartWidget implements IDestroyable {
 	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {
 		const timeScale = this._model.timeScale();
 		switch (invalidation.type) {
-			case TimeScaleInvalidationType.FitContent: {
+			case TimeScaleInvalidationType.FitContent:
 				timeScale.fitContent();
 				break;
-			}
 			case TimeScaleInvalidationType.ApplyRange:
 				timeScale.setLogicalRange(invalidation.value);
 				break;
@@ -524,6 +528,7 @@ export class ChartWidget implements IDestroyable {
 		} else {
 			this._invalidateMask = invalidateMask;
 		}
+
 		if (!this._drawPlanned) {
 			this._drawPlanned = true;
 			this._drawRafId = window.requestAnimationFrame(() => {

@@ -42,4 +42,3 @@ function runTestCase(container) {
 	chart.addAreaSeries().setData(data2);
 	chart.timeScale().fitContent();
 }
-

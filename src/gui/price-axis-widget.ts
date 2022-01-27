@@ -660,6 +660,7 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._isSettingSize) {
 			return;
 		}
+
 		this._pane.chart().model().lightUpdate();
 	};
 }

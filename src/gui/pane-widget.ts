@@ -842,6 +842,7 @@ export class PaneWidget implements IDestroyable {
 		if (this._isSettingSize || !this.state) {
 			return;
 		}
+
 		this._model().lightUpdate();
 	};
 
@@ -849,6 +850,7 @@ export class PaneWidget implements IDestroyable {
 		if (this._isSettingSize || !this.state) {
 			return;
 		}
+
 		this._model().lightUpdate();
 	};
 }

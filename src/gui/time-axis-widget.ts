@@ -479,6 +479,15 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
-	private readonly _canvasConfiguredHandler = () => !this._isSettingSize && this._chart.model().lightUpdate();
-	private readonly _topCanvasConfiguredHandler = () => !this._isSettingSize && this._chart.model().lightUpdate();
+	private readonly _canvasConfiguredHandler = () => {
+		if (!this._isSettingSize) {
+			this._chart.model().lightUpdate();
+		}
+	};
+
+	private readonly _topCanvasConfiguredHandler = () => {
+		if (!this._isSettingSize) {
+			this._chart.model().lightUpdate();
+		}
+	};
 }
