@@ -30,7 +30,8 @@
 			"node_modules/@types"
 		],
 		"types": [
-			"_global-types"
+			"_global-types",
+			"dom-not-standarted"
 		]
 	}
 }

@@ -199,6 +199,9 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
+		// we don't need to merge options here because it's done in chart model
+		// and since both model and widget share the same object it will be done automatically for widget as well
+		// not ideal solution for sure, but it work's for now ¯\_(ツ)_/¯
 		this._model.applyOptions(options);
 		this._updateTimeAxisVisibility();
 

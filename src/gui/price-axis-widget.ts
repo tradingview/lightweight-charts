@@ -91,10 +91,14 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const handler: MouseEventHandlers = {
 			mouseDownEvent: this._mouseDownEvent.bind(this),
+			touchStartEvent: this._mouseDownEvent.bind(this),
 			pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
+			touchMoveEvent: this._pressedMouseMoveEvent.bind(this),
 			mouseDownOutsideEvent: this._mouseDownOutsideEvent.bind(this),
 			mouseUpEvent: this._mouseUpEvent.bind(this),
+			touchEndEvent: this._mouseUpEvent.bind(this),
 			mouseDoubleClickEvent: this._mouseDoubleClickEvent.bind(this),
+			doubleTapEvent: this._mouseDoubleClickEvent.bind(this),
 			mouseEnterEvent: this._mouseEnterEvent.bind(this),
 			mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
 		};
@@ -102,8 +106,8 @@ export class PriceAxisWidget implements IDestroyable {
 			this._topCanvasBinding.canvas,
 			handler,
 			{
-				treatVertTouchDragAsPageScroll: false,
-				treatHorzTouchDragAsPageScroll: true,
+				treatVertTouchDragAsPageScroll: () => false,
+				treatHorzTouchDragAsPageScroll: () => true,
 			}
 		);
 	}
