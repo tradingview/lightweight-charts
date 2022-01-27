@@ -118,14 +118,11 @@ export class InvalidateMask {
 		return this._timeScaleInvalidations;
 	}
 
-	public mergeTimeScaleInvalidations(timeScaleInvalidations: Readonly<TimeScaleInvalidation[]>): void {
-		for (const tsInvalidation of timeScaleInvalidations) {
+	public merge(other: InvalidateMask): void {
+		for (const tsInvalidation of other._timeScaleInvalidations) {
 			this._applyTimeScaleInvalidation(tsInvalidation);
 		}
-	}
 
-	public merge(other: InvalidateMask): void {
-		this.mergeTimeScaleInvalidations(other._timeScaleInvalidations);
 		this._globalLevel = Math.max(this._globalLevel, other._globalLevel);
 		other._invalidatedPanes.forEach((invalidation: PaneInvalidation, index: number) => {
 			this.invalidatePane(index, invalidation);
