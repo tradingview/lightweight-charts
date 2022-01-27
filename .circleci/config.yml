@@ -15,6 +15,17 @@ aliases:
         - node_modules
       key: *cache-key
 
+  - &restore-node-modules-cache-website
+      name: Restore node_modules cache for /website
+      keys:
+        - &cache-key-website v1-dependencies-website-{{ checksum "website/package.json" }}
+
+  - &save-node-modules-cache-website
+      name: Save node_modules cache for /website
+      paths:
+        - website/node_modules
+      key: *cache-key-website
+
   - &default-filters
       tags:
         ignore:
@@ -47,6 +58,7 @@ commands:
     steps:
       - checkout
       - restore_cache: *restore-node-modules-cache
+      - restore_cache: *restore-node-modules-cache-website
 
   run-graphics-tests:
     description: "Run graphics tests with specific devicePixelRatio"
@@ -81,6 +93,13 @@ jobs:
       - checkout-with-deps
       - run: npm install
       - save_cache: *save-node-modules-cache
+
+  install-deps-website:
+    executor: node12-executor
+    steps:
+      - checkout-with-deps
+      - run: cd website && npm install
+      - save_cache: *save-node-modules-cache-website
 
   build:
     executor: node12-executor
@@ -222,9 +241,6 @@ jobs:
     executor: node14-executor
     steps:
       - checkout-with-deps
-      # since deploying website and building/tests are running in parallel it is possible that there is no cached deps yet
-      # so let's install them to be sure that everything is fine
-      - run: npm install
       - run: npm run tsc
       - run: npm run bundle-dts
       - run:
@@ -274,6 +290,8 @@ workflows:
     jobs:
       - install-deps:
           filters: *default-filters
+      - install-deps-website:
+          filters: *default-filters
       - no-crlf:
           filters: *default-filters
       - trailing-lf:
@@ -291,6 +309,7 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
+            - install-deps-website
       - markdown:
           filters: *default-filters
           requires:
@@ -339,8 +358,15 @@ workflows:
 
   website:
     jobs:
+      - install-deps:
+          filters: *default-filters
+      - install-deps-website:
+          filters: *default-filters
       - build-docusaurus-website:
           filters: *default-filters
+          requires:
+            - install-deps
+            - install-deps-website
       - deploy-docusaurus-website:
           filters:
             branches:

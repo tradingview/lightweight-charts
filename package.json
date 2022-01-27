@@ -59,6 +59,7 @@
     "eslint-plugin-prefer-arrow": "~1.2.1",
     "eslint-plugin-tsdoc": "~0.2.14",
     "eslint-plugin-unicorn": "~39.0.0",
+    "eslint-plugin-react": "~7.28.0",
     "express": "~4.17.1",
     "glob": "~7.2.0",
     "markdown-it": "~12.3.0",

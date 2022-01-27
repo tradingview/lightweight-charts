@@ -1,0 +1,297 @@
+.HeroContainer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.HeroChartContainer {
+	display: none;
+}
+
+.HeroTextContainer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding-top: 2rem;
+}
+
+.HeroTextContainer svg {
+	color: var(--icon-color);
+}
+
+.HeroButtonsContainer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	min-width: 90%;
+}
+
+.HeroButton {
+	flex: 1 0 100%;
+	text-align: center;
+	border-radius: 56px;
+	padding: 1rem;
+	font-weight: 600;
+	border: 1px solid var(--small-card-border-color);
+	white-space: nowrap;
+	color: var(--hero-button-text-color);
+}
+
+.HeroButton:hover {
+	background: var(--hero-button-hackground-color-hover);
+	color: var(--hero-button-text-color);
+	text-decoration: none;
+}
+
+.HeroButton:active {
+	background: rgba(224, 227, 235, 1);
+}
+
+.HeroButtonPrimary {
+	color: #FFFFFF;
+	background: #2962FF;
+}
+
+.HeroButtonPrimary:hover {
+	color: #FFFFFF;
+	background: rgba(30, 83, 229, 1);
+	text-decoration: none;
+}
+
+.HeroButtonPrimary:active {
+	color: #FFFFFF;
+	background: rgba(24, 72, 204, 1);
+}
+
+.HeroTextContainer h1 {
+	padding-top: 1rem;
+	font-size: 2.5rem;
+}
+
+.HeroTextContainer p {
+	font-size: 1.5rem;
+}
+
+.LargeCardContainer {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 1rem;
+}
+
+.LargeCard {
+	max-width: 95%;
+	background: var(--card-background-color);
+	padding: 2rem 2rem;
+	border-radius: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.LargeCard h2 {
+	margin: 0;
+}
+
+.LargeCard p {
+	color: var(--large-card-paragraph-text-color);
+}
+
+.LargeCard svg {
+	color: var(--icon-color);
+}
+
+.SmallCardContainer {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.SmallCard {
+	flex: 1 0 auto;
+	max-width: 95%;
+	padding: 2rem 1rem;
+	border: 1px solid var(--small-card-border-color);
+	border-bottom: none;
+}
+
+.SmallCard1 {
+	border-top-left-radius: 1rem;
+	border-top-right-radius: 1rem;
+}
+
+.SmallCard4 {
+	border-bottom: 1px solid var(--small-card-border-color);
+	border-bottom-left-radius: 1rem;
+	border-bottom-right-radius: 1rem;
+}
+
+.SmallCard p {
+	color: var(--card-paragraph-color);
+}
+
+.LargeTextContainer {
+	display: flex;
+	flex-wrap: wrap;
+	padding-top: 2rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	font-weight: 400;
+}
+
+.LargeTextContainer h1 {
+	text-align: center;
+	font-size: 2.5rem;
+}
+
+.LargeTextContainer p {
+	font-size: 1.5rem;
+	text-align: center;
+}
+
+.RootContainer {
+	max-width: 98%;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	align-items: center;
+}
+
+@media (min-width: 767.5px) {
+	.HeroButtonsContainer {
+		min-width: unset;
+		flex-wrap: unset;
+	}
+
+	.HeroButton {
+		flex: 1 1 50%;
+		padding-left: 2rem;
+		padding-right: 2rem;
+	}
+
+	.LargeCard {
+		flex: 0 1 47%;
+	}
+
+	.LargeCard3 {
+		flex: 1 0 100%;
+	}
+
+	.SmallCard {
+		flex: 0 1 47%;
+	}
+
+	.SmallCard1 {
+		border-top-right-radius: unset;
+	}
+
+	.SmallCard2 {
+		border-top-right-radius: 1rem;
+		border-left: unset;
+	}
+
+	.SmallCard3 {
+		border-bottom-left-radius: 1rem;
+		border-bottom: 1px solid var(--small-card-border-color);
+	}
+
+	.SmallCard4 {
+		border-bottom-left-radius: unset;
+		border-left: unset;
+	}
+}
+
+@media (min-width: 1279.5px) {
+	.HeroContainer {
+		position: relative;
+		align-self: stretch;
+	}
+
+	.HeroChartContainer {
+		display: unset;
+		/* width: 100%; */
+		height: 40vh;
+		width: 100vw;
+	}
+
+	.HeroTextContainer {
+		position: absolute;
+		z-index: 2;
+		max-width: 65%;
+		top: 10%;
+		left: 10%;
+		border-radius: 2rem;
+		align-items: flex-start;
+		text-align: left;
+		padding: 3rem;
+		background: var(--hero-text-background-color);
+	}
+
+	.LargeTextContainer {
+		max-width: 75%;
+		justify-content: center;
+	}
+
+	.LargeCardContainer {
+		flex-wrap: nowrap;
+	}
+	
+	.LargeCard, LargeCard3 {
+		flex: 0 1 30%;
+	}
+
+	.SmallCardContainer {
+		flex-wrap: nowrap;
+	}
+	
+	.SmallCard {
+		flex: 0 1 23%;
+	}
+
+	.SmallCard1 {
+		border-top-right-radius: unset;
+		border-bottom-left-radius: 1rem;
+		border-bottom: 1px solid var(--small-card-border-color);
+	}
+
+	.SmallCard2 {
+		border-top-right-radius: unset;
+		border-left: unset;
+		border-bottom: 1px solid var(--small-card-border-color);
+	}
+
+	.SmallCard3 {
+		border-bottom-left-radius: unset;
+		border-left: unset;
+		border-bottom: 1px solid var(--small-card-border-color);
+	}
+
+	.SmallCard4 {
+		border-top-right-radius: 1rem;
+		border-bottom-left-radius: unset;
+		border-left: unset;
+	}
+}
+
+@media (min-width: 1919.5px) {
+	.HeroTextContainer {
+		max-width: 43%;
+	}
+
+	.HeroChartContainer {
+		height: 50vh;
+	}
+
+	.LargeTextContainer {
+		max-width: 77%;
+	}
+
+	.LargeCardContainer {
+		max-width: 77%;
+	}
+	
+	.SmallCardContainer {
+		max-width: 77%;
+	}
+}

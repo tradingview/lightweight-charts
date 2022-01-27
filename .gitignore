@@ -27,7 +27,6 @@ debug.html
 /website/.docusaurus
 /website/.cache-loader
 /website/.previous-typings-cache/*.d.ts
-/website/static/img/lightweight-charts-logo.svg
 
 !/src/typings/**/*.d.ts
 
