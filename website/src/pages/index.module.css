@@ -17,7 +17,7 @@
 }
 
 .HeroTextContainer svg {
-	color: var(--LogoColor);
+	color: var(--icon-color);
 }
 
 .HeroButtonsContainer {
@@ -33,14 +33,14 @@
 	border-radius: 56px;
 	padding: 1rem;
 	font-weight: 600;
-	border: 1px solid var(--SmallCardBorderColor);
+	border: 1px solid var(--small-card-border-color);
 	white-space: nowrap;
-	color: var(--HeroButtonTextColor);
+	color: var(--hero-button-text-color);
 }
 
 .HeroButton:hover {
-	background: var(--HeroButtonBackgroundColorHover);
-	color: var(--HeroButtonTextColor);
+	background: var(--hero-button-hackground-color-hover);
+	color: var(--hero-button-text-color);
 	text-decoration: none;
 }
 
@@ -82,7 +82,7 @@
 
 .LargeCard {
 	max-width: 95%;
-	background: var(--CardBackgroundColor);
+	background: var(--card-background-color);
 	padding: 2rem 2rem;
 	border-radius: 1rem;
 	display: flex;
@@ -95,11 +95,11 @@
 }
 
 .LargeCard p {
-	color: var(--LargeCardParagraphTextColor);
+	color: var(--large-card-paragraph-text-color);
 }
 
 .LargeCard svg {
-	color: var(--IconColor);
+	color: var(--icon-color);
 }
 
 .SmallCardContainer {
@@ -112,7 +112,7 @@
 	flex: 1 0 auto;
 	max-width: 95%;
 	padding: 2rem 1rem;
-	border: 1px solid var(--SmallCardBorderColor);
+	border: 1px solid var(--small-card-border-color);
 	border-bottom: none;
 }
 
@@ -122,13 +122,13 @@
 }
 
 .SmallCard4 {
-	border-bottom: 1px solid var(--SmallCardBorderColor);
+	border-bottom: 1px solid var(--small-card-border-color);
 	border-bottom-left-radius: 1rem;
 	border-bottom-right-radius: 1rem;
 }
 
 .SmallCard p {
-	color: var(--CardParagraphColor);
+	color: var(--card-paragraph-color);
 }
 
 .LargeTextContainer {
@@ -193,7 +193,7 @@
 
 	.SmallCard3 {
 		border-bottom-left-radius: 1rem;
-		border-bottom: 1px solid var(--SmallCardBorderColor);
+		border-bottom: 1px solid var(--small-card-border-color);
 	}
 
 	.SmallCard4 {
@@ -225,7 +225,7 @@
 		align-items: flex-start;
 		text-align: left;
 		padding: 3rem;
-		background: var(--HeroTextBackgroundColor);
+		background: var(--hero-text-background-color);
 	}
 
 	.LargeTextContainer {
@@ -252,19 +252,19 @@
 	.SmallCard1 {
 		border-top-right-radius: unset;
 		border-bottom-left-radius: 1rem;
-		border-bottom: 1px solid var(--SmallCardBorderColor);
+		border-bottom: 1px solid var(--small-card-border-color);
 	}
 
 	.SmallCard2 {
 		border-top-right-radius: unset;
 		border-left: unset;
-		border-bottom: 1px solid var(--SmallCardBorderColor);
+		border-bottom: 1px solid var(--small-card-border-color);
 	}
 
 	.SmallCard3 {
 		border-bottom-left-radius: unset;
 		border-left: unset;
-		border-bottom: 1px solid var(--SmallCardBorderColor);
+		border-bottom: 1px solid var(--small-card-border-color);
 	}
 
 	.SmallCard4 {

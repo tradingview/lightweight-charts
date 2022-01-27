@@ -36,31 +36,27 @@
 	--ifm-code-font-size: 95%;
 	--ifm-footer-background-color: var(--color-white);
 
-	--PrimaryButtonColor: var(--color-tv-blue-500);
-	--SmallCardBorderColor: var(--color-cold-gray-150);
-	--CardBackgroundColor:  var(--color-cold-gray-100);
-	--CardBackgroundColor: var(--color-cold-gray-100);
-	--CardParagraphColor: var(--color-cold-gray-500);
-	--IconColor: var(--color-black);
-	--HeroButtonTextColor: var(--color-black);
-	--HeroButtonBackgroundColorHover: var(--color-cold-gray-100);
-	--HeroButtonBackgroundColorActive: var(--color-cold-gray-150);
-	--HeroTextBackgroundColor: #ffffff;
-	--LogoColor: var(--color-black);
-	--LargeCardParagraphTextColor: var(--color-cold-gray-500);
+	--small-card-border-color: var(--color-cold-gray-150);
+	--card-background-color: var(--color-cold-gray-100);
+	--card-paragraph-color: var(--color-cold-gray-500);
+	--icon-color: var(--color-black);
+	--hero-button-text-color: var(--color-black);
+	--hero-button-hackground-color-hover: var(--color-cold-gray-100);
+	--hero-text-background-color: #ffffff;
+	--icon-color: var(--color-black);
+	--large-card-paragraph-text-color: var(--color-cold-gray-500);
 }
 
 html[data-theme=dark] {
-	--SmallCardBorderColor: var(--color-cold-gray-850);
-	--CardBackgroundColor: var(--color-cold-gray-950);
-	--CardParagraphColor: var(--color-cold-gray-300);
-	--IconColor: var(--color-cold-gray-200);
-	--HeroButtonTextColor: var(--color-cold-gray-200);
-	--HeroButtonBackgroundColorHover: var(--color-cold-gray-800);
-	--HeroButtonBackgroundColorActive: var(--color-cold-gray-750);
-	--HeroTextBackgroundColor: var(--color-cold-gray-950);
-	--LogoColor: var(--color-white);
-	--LargeCardParagraphTextColor: var(--color-cold-gray-300);
+	--small-card-border-color: var(--color-cold-gray-850);
+	--card-background-color: var(--color-cold-gray-950);
+	--card-paragraph-color: var(--color-cold-gray-300);
+	--icon-color: var(--color-cold-gray-200);
+	--hero-button-text-color: var(--color-cold-gray-200);
+	--hero-button-hackground-color-hover: var(--color-cold-gray-800);
+	--hero-text-background-color: var(--color-cold-gray-950);
+	--icon-color: var(--color-white);
+	--large-card-paragraph-text-color: var(--color-cold-gray-300);
 	--ifm-navbar-background-color: var(--color-black);
 	--ifm-footer-background-color: var(--color-black);
 	--ifm-background-color: var(--color-black);
@@ -79,6 +75,10 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 .navbar__title {
 	font-size: 1.5rem;
+}
+
+.navbar__brand svg {
+	--color: var(--icon-color);
 }
 
 .main-wrapper {
