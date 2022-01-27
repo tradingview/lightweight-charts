@@ -850,7 +850,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	private readonly _canvasConfiguredHandler = () => {
-		if (this._isSettingSize || !this.state) {
+		if (this._isSettingSize || this._state === null) {
 			return;
 		}
 
@@ -858,7 +858,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	};
 
 	private readonly _topCanvasConfiguredHandler = () => {
-		if (this._isSettingSize || !this.state) {
+		if (this._isSettingSize || this._state === null) {
 			return;
 		}
 
