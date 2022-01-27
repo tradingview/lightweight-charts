@@ -389,7 +389,7 @@ module.exports = {
 			},
 		},
 		{
-			files: ['website/src/pages/**/*.tsx'],
+			files: ['website/src/**/*.tsx'],
 			rules: {
 				'import/no-default-export': 'off',
 			},
