@@ -63,6 +63,7 @@ function HeroChart(): JSX.Element {
 				timeScale: {
 					fixLeftEdge: true,
 					fixRightEdge: true,
+					lockVisibleTimeRangeOnResize: true,
 				},
 				handleScroll: false,
 				handleScale: false,
@@ -87,7 +88,6 @@ function HeroChart(): JSX.Element {
 			const resizeListener = () => {
 				const { width, height } = container.getBoundingClientRect();
 				c.resize(width, height);
-				c.timeScale().setVisibleLogicalRange({ from: 1, to: data.orangeData.length - 2 });
 			};
 
 			setChart(c);
