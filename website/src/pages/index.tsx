@@ -1,4 +1,4 @@
-import useThemeContext from '@theme/hooks/useThemeContext';
+import { useColorMode } from '@docusaurus/theme-common';
 import Layout from '@theme/Layout';
 import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
@@ -21,7 +21,7 @@ function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptio
 }
 
 function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
-	const { isDarkTheme } = useThemeContext();
+	const { isDarkTheme } = useColorMode();
 
 	const [layoutOptions, setLayoutOptions] = React.useState<DeepPartial<LayoutOptions>>(getLayoutOptionsForTheme(isDarkTheme));
 
