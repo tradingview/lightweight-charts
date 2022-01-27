@@ -133,9 +133,7 @@ const config = {
 			navbar: {
 				title: 'Lightweight Charts',
 				logo: {
-					alt: 'Lightweight Charts Logo',
-					src: 'img/logo-light.svg',
-					srcDark: 'img/logo-dark.svg',
+					src: 'this value is not used because we swizzled the Logo component - see src/theme/Logo',
 				},
 				items: [
 					{
