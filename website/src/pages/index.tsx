@@ -42,7 +42,7 @@ function HeroChart(): JSX.Element {
 
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
-	React.useLayoutEffect(
+	React.useEffect(
 		() => {
 			const container = ref.current;
 
@@ -52,6 +52,9 @@ function HeroChart(): JSX.Element {
 
 			const c = createChart(container, {
 				layout,
+				rightPriceScale: {
+					borderVisible: false,
+				},
 				grid: {
 					horzLines: {
 						visible: false,
@@ -61,6 +64,7 @@ function HeroChart(): JSX.Element {
 					},
 				},
 				timeScale: {
+					borderVisible: false,
 					fixLeftEdge: true,
 					fixRightEdge: true,
 					lockVisibleTimeRangeOnResize: true,
@@ -83,7 +87,7 @@ function HeroChart(): JSX.Element {
 			orangeSeries.setData(data.orangeData as LineData[]);
 			blueSeries.setData(data.blueData as LineData[]);
 
-			c.timeScale().setVisibleLogicalRange({ from: 1, to: data.orangeData.length - 2 });
+			c.timeScale().setVisibleLogicalRange({ from: 0.5, to: data.orangeData.length - 1.5 });
 
 			const resizeListener = () => {
 				const { width, height } = container.getBoundingClientRect();
