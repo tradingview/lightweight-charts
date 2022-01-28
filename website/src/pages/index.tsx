@@ -52,6 +52,9 @@ function HeroChart(): JSX.Element {
 
 			const c = createChart(container, {
 				layout,
+				rightPriceScale: {
+					borderVisible: false,
+				},
 				grid: {
 					horzLines: {
 						visible: false,
@@ -61,6 +64,7 @@ function HeroChart(): JSX.Element {
 					},
 				},
 				timeScale: {
+					borderVisible: false,
 					fixLeftEdge: true,
 					fixRightEdge: true,
 					lockVisibleTimeRangeOnResize: true,
