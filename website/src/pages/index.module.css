@@ -12,6 +12,11 @@
 	overflow: hidden;
 }
 
+.HeroChartContainer table td,
+.HeroChartContainer table tr {
+	border: none;
+}
+
 .HeroTextContainer {
 	display: flex;
 	flex-direction: column;
@@ -243,7 +248,7 @@
 	.LargeCardContainer {
 		flex-wrap: nowrap;
 	}
-	
+
 	.LargeCard, LargeCard3 {
 		flex: 0 1 30%;
 	}
@@ -251,7 +256,7 @@
 	.SmallCardContainer {
 		flex-wrap: nowrap;
 	}
-	
+
 	.SmallCard {
 		flex: 0 1 23%;
 	}
@@ -297,7 +302,7 @@
 	.LargeCardContainer {
 		max-width: 77%;
 	}
-	
+
 	.SmallCardContainer {
 		max-width: 77%;
 	}
