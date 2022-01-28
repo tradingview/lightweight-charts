@@ -8,6 +8,10 @@
 	display: none;
 }
 
+.HeroChartContainer * {
+	overflow: hidden;
+}
+
 .HeroTextContainer {
 	display: flex;
 	flex-direction: column;
@@ -159,6 +163,10 @@
 }
 
 @media (min-width: 767.5px) {
+	.RootContainer {
+		max-width: unset;
+	}
+
 	.HeroButtonsContainer {
 		min-width: unset;
 		flex-wrap: unset;
@@ -210,9 +218,8 @@
 
 	.HeroChartContainer {
 		display: unset;
-		/* width: 100%; */
-		height: 40vh;
-		width: 100vw;
+		min-height: 500px;
+		width: 100%;
 	}
 
 	.HeroTextContainer {

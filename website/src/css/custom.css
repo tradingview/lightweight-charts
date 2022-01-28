@@ -81,8 +81,3 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	--color: var(--icon-color);
 }
 
-.main-wrapper {
-	display: flex;
-	justify-content: center;
-	gap: 2rem;
-}

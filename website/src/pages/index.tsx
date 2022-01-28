@@ -42,7 +42,7 @@ function HeroChart(): JSX.Element {
 
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
-	React.useLayoutEffect(
+	React.useEffect(
 		() => {
 			const container = ref.current;
 
