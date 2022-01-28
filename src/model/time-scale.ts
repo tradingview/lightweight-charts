@@ -451,6 +451,7 @@ export class TimeScale {
 		return this._rightOffset;
 	}
 
+	// eslint-disable-next-line complexity
 	public marks(): TimeMark[] | null {
 		if (this.isEmpty()) {
 			return null;
@@ -506,7 +507,7 @@ export class TimeScale {
 				this._labels.push(label);
 			}
 
-			if (this._barSpacing > (maxLabelWidth / 2)) {
+			if (this._barSpacing > (maxLabelWidth / 2) && !isAllScalingAndScrollingDisabled) {
 				// if there is enough space then let's show all tick marks as usual
 				label.needAlignCoordinate = false;
 			} else {
