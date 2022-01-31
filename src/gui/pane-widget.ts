@@ -91,6 +91,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _exitTrackingModeOnNextTry: boolean = false;
 	private _initCrosshairPosition: Point | null = null;
 	private _scrollXAnimation: KineticAnimation | null = null;
+	private _isSettingSize: boolean = false;
 
 	public constructor(chart: ChartWidget, state: Pane) {
 		this._chart = chart;
@@ -136,7 +137,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._rowElement.appendChild(this._leftAxisCell);
 		this._rowElement.appendChild(this._paneCell);
 		this._rowElement.appendChild(this._rightAxisCell);
-		this.updatePriceAxisWidgets();
+		this.updatePriceAxisWidgetsStates();
 
 		this._mouseEventHandler = new MouseEventHandler(
 			this._topCanvasBinding.canvas,
@@ -184,7 +185,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			this._state.onDestroyed().subscribe(PaneWidget.prototype._onStateDestroyed.bind(this), this, true);
 		}
 
-		this.updatePriceAxisWidgets();
+		this.updatePriceAxisWidgetsStates();
 	}
 
 	public chart(): ChartWidget {
@@ -195,7 +196,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._rowElement;
 	}
 
-	public updatePriceAxisWidgets(): void {
+	public updatePriceAxisWidgetsStates(): void {
 		if (this._state === null) {
 			return;
 		}
@@ -212,6 +213,15 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._rightPriceAxisWidget !== null) {
 			const rightPriceScale = this._state.rightPriceScale();
 			this._rightPriceAxisWidget.setPriceScale(ensureNotNull(rightPriceScale));
+		}
+	}
+
+	public updatePriceAxisWidgets(): void {
+		if (this._leftPriceAxisWidget !== null) {
+			this._leftPriceAxisWidget.update();
+		}
+		if (this._rightPriceAxisWidget !== null) {
+			this._rightPriceAxisWidget.update();
 		}
 	}
 
@@ -409,10 +419,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		this._size = size;
-
+		this._isSettingSize = true;
 		this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
 		this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
-
+		this._isSettingSize = false;
 		this._paneCell.style.width = size.w + 'px';
 		this._paneCell.style.height = size.h + 'px';
 	}
@@ -839,6 +849,19 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private readonly _canvasConfiguredHandler = () => this._state && this._model().lightUpdate();
-	private readonly _topCanvasConfiguredHandler = () => this._state && this._model().lightUpdate();
+	private readonly _canvasConfiguredHandler = () => {
+		if (this._isSettingSize || this._state === null) {
+			return;
+		}
+
+		this._model().lightUpdate();
+	};
+
+	private readonly _topCanvasConfiguredHandler = () => {
+		if (this._isSettingSize || this._state === null) {
+			return;
+		}
+
+		this._model().lightUpdate();
+	};
 }

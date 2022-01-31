@@ -460,27 +460,48 @@ export class ChartWidget implements IDestroyable {
 			invalidationType === InvalidationLevel.Full ||
 			invalidationType === InvalidationLevel.Light
 		) {
-			const panes = this._model.panes();
-			for (let i = 0; i < panes.length; i++) {
-				if (invalidateMask.invalidateForPane(i).autoScale) {
-					panes[i].momentaryAutoScale();
-				}
-			}
-
-			const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
-			for (const tsInvalidation of timeScaleInvalidations) {
-				this._applyTimeScaleInvalidation(tsInvalidation);
-			}
-			if (timeScaleInvalidations.length > 0) {
-				this._model.recalculateAllPanes();
-				this._model.updateCrosshair();
-				this._model.lightUpdate();
-			}
+			this._applyMomentaryAutoScale(invalidateMask);
+			this._applyTimeScaleInvalidations(invalidateMask);
 
 			this._timeAxisWidget.update();
+			this._paneWidgets.forEach((pane: PaneWidget) => {
+				pane.updatePriceAxisWidgets();
+			});
+
+			// In the case a full invalidation has been postponed during the draw, reapply
+			// the timescale invalidations. A full invalidation would mean there is a change
+			// in the timescale width (caused by price scale changes) that needs to be drawn
+			// right away to avoid flickering.
+			if (this._invalidateMask?.fullInvalidation() === InvalidationLevel.Full) {
+				this._invalidateMask.merge(invalidateMask);
+
+				this._updateGui();
+
+				this._applyMomentaryAutoScale(this._invalidateMask);
+				this._applyTimeScaleInvalidations(this._invalidateMask);
+
+				invalidateMask = this._invalidateMask;
+				this._invalidateMask = null;
+			}
 		}
 
 		this.paint(invalidateMask);
+	}
+
+	private _applyTimeScaleInvalidations(invalidateMask: InvalidateMask): void {
+		const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
+		for (const tsInvalidation of timeScaleInvalidations) {
+			this._applyTimeScaleInvalidation(tsInvalidation);
+		}
+	}
+
+	private _applyMomentaryAutoScale(invalidateMask: InvalidateMask): void {
+		const panes = this._model.panes();
+		for (let i = 0; i < panes.length; i++) {
+			if (invalidateMask.invalidateForPane(i).autoScale) {
+				panes[i].momentaryAutoScale();
+			}
+		}
 	}
 
 	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {
@@ -518,8 +539,9 @@ export class ChartWidget implements IDestroyable {
 				this._drawRafId = 0;
 
 				if (this._invalidateMask !== null) {
-					this._drawImpl(this._invalidateMask);
+					const mask = this._invalidateMask;
 					this._invalidateMask = null;
+					this._drawImpl(mask);
 				}
 			});
 		}
@@ -576,7 +598,7 @@ export class ChartWidget implements IDestroyable {
 			if (paneWidget.state() !== state) {
 				paneWidget.setState(state);
 			} else {
-				paneWidget.updatePriceAxisWidgets();
+				paneWidget.updatePriceAxisWidgetsStates();
 			}
 		}
 

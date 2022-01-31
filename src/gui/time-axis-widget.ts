@@ -51,6 +51,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private _size: Size = new Size(0, 0);
 	private readonly _sizeChanged: Delegate<Size> = new Delegate();
 	private readonly _widthCache: TextWidthCache = new TextWidthCache(5);
+	private _isSettingSize: boolean = false;
 
 	public constructor(chartWidget: ChartWidget) {
 		this._chart = chartWidget;
@@ -223,8 +224,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		if (!this._size || !this._size.equals(timeAxisSize)) {
 			this._size = timeAxisSize;
 
+			this._isSettingSize = true;
 			this._canvasBinding.resizeCanvas({ width: timeAxisSize.w, height: timeAxisSize.h });
 			this._topCanvasBinding.resizeCanvas({ width: timeAxisSize.w, height: timeAxisSize.h });
+			this._isSettingSize = false;
 
 			this._cell.style.width = timeAxisSize.w + 'px';
 			this._cell.style.height = timeAxisSize.h + 'px';
@@ -494,6 +497,15 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
-	private readonly _canvasConfiguredHandler = () => this._chart.model().lightUpdate();
-	private readonly _topCanvasConfiguredHandler = () => this._chart.model().lightUpdate();
+	private readonly _canvasConfiguredHandler = () => {
+		if (!this._isSettingSize) {
+			this._chart.model().lightUpdate();
+		}
+	};
+
+	private readonly _topCanvasConfiguredHandler = () => {
+		if (!this._isSettingSize) {
+			this._chart.model().lightUpdate();
+		}
+	};
 }
