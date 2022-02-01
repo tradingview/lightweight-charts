@@ -56,6 +56,7 @@
     "eslint-plugin-import": "~2.25.4",
     "eslint-plugin-jsdoc": "~37.7.0",
     "eslint-plugin-markdown": "~2.2.1",
+    "eslint-plugin-mdx": "~1.16.0",
     "eslint-plugin-prefer-arrow": "~1.2.1",
     "eslint-plugin-tsdoc": "~0.2.14",
     "eslint-plugin-unicorn": "~40.1.0",

@@ -5,7 +5,7 @@ const path = require('path');
 
 const Mocha = require('mocha');
 
-const serveLocalFiles = require('../serve-local-files').serveLocalFiles;
+const { serveLocalFiles } = require('../serve-local-files');
 
 const mochaConfig = require('../../../.mocharc.js');
 

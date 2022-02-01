@@ -24,7 +24,7 @@ export const ChartComponent = () => {
 		() => {
 			chart.current = createChart(chartContainerRef.current, {
 				width: 400,
-				height: 300
+				height: 300,
 			});
 
 			const newSeries = chart.current.addAreaSeries();
@@ -37,7 +37,7 @@ export const ChartComponent = () => {
 
 				chart.current.remove();
 				chart.current = undefined;
-			}
+			};
 		},
 		[data]
 	);
@@ -62,8 +62,7 @@ const data = [
 	{ time: '2018-12-31', value: 22.67 },
 ];
 
-
-export default function App() {
+export function App() {
 	return (
 		<ChartComponent data={data}></ChartComponent>
 	);

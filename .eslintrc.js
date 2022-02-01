@@ -53,10 +53,13 @@ module.exports = {
 		jsdoc: {
 			ignoreInternal: true,
 		},
+		// The following line raises an error in nominal.ts & time-data.ts with ```ts. ```js works though.
+		// 'mdx/code-blocks': true,
 	},
 	extends: [
 		'eslint:recommended',
 		'plugin:react/recommended',
+		'plugin:mdx/recommended',
 	],
 	parserOptions: {
 		ecmaVersion: 2019,
@@ -66,6 +69,10 @@ module.exports = {
 		{
 			// rules specific for js files only
 			files: ['**/*.js', '**/*.md/*.javascript', '**/*.jsx'],
+			env: {
+				// This is used in chart-component.jsx with `window.addEventListener`
+				browser: true,
+			},
 			rules: {
 				// enforces no braces where they can be omitted
 				// http://eslint.org/docs/rules/arrow-body-style
@@ -104,6 +111,18 @@ module.exports = {
 
 				// require or disallow use of semicolons instead of ASI
 				semi: ['error', 'always'],
+
+				// requires destructuring from arrays and/or objects.
+				'prefer-destructuring': ['error', {
+					VariableDeclarator: {
+						array: false,
+						object: true,
+					},
+				}, {
+					enforceForRenamedProperties: false,
+				}],
+
+				'react/prop-types': 'off',
 			},
 		},
 		{
@@ -155,8 +174,7 @@ module.exports = {
 				{
 					files: ['website/**/*.tsx'],
 					parserOptions: {
-						project: 'tsconfig.json',
-						tsconfigRootDir: 'website',
+						project: 'website/tsconfig.json',
 						sourceType: 'module',
 					},
 					rules: {
