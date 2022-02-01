@@ -3,17 +3,16 @@ import Layout from '@theme/Layout';
 import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
 
-import { ResponsiveLogo } from '../ResponsiveLogo';
-
 import Cog from '../img/cog.svg';
+import HeroLogoDesktopLaptopTablet from '../img/hero-logo-desktop-laptop-tablet.svg';
+import HeroLogoMobile from '../img/hero-logo-mobile.svg';
 import InputSliders from '../img/input-sliders.svg';
 import Paperplane from '../img/paperplane.svg';
 import Screens from '../img/screens.svg';
 import Shapes from '../img/shapes.svg';
-import HeroLogoDesktopLaptopTablet from '../img/hero-logo-desktop-laptop-tablet.svg';
-import HeroLogoMobile from '../img/hero-logo-mobile.svg';
 import Speedometer from '../img/speedometer.svg';
 import TradingviewHeart from '../img/tradingview-heart.svg';
+import { ResponsiveLogo } from '../ResponsiveLogo';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
 
@@ -38,9 +37,12 @@ function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
 	return layoutOptions;
 }
 
+const visibleLogicalRange = { from: 0.5, to: data.orangeData.length - 1.5 };
+
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const layout = useThemeAwareLayoutOptions();
+	const [isContainerVisible, setIsContainerVisible] = React.useState<boolean>(false);
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
 	React.useEffect(
@@ -50,6 +52,14 @@ function HeroChart(): JSX.Element {
 			if (!container) {
 				return;
 			}
+
+			const observer = new IntersectionObserver(
+				([entry]: IntersectionObserverEntry[]) => {
+					return setIsContainerVisible(entry.isIntersecting);
+				}
+			);
+
+			observer.observe(container);
 
 			const c = createChart(container, {
 				layout,
@@ -87,25 +97,45 @@ function HeroChart(): JSX.Element {
 			orangeSeries.setData(data.orangeData as LineData[]);
 			blueSeries.setData(data.blueData as LineData[]);
 
-			c.timeScale().setVisibleLogicalRange({ from: 0.5, to: data.orangeData.length - 1.5 });
-
-			const resizeListener = () => {
-				const { width, height } = container.getBoundingClientRect();
-				c.resize(width, height);
-				c.timeScale().setVisibleLogicalRange({ from: 0.5, to: data.orangeData.length - 1.5 });
-			};
+			c.timeScale().setVisibleLogicalRange(visibleLogicalRange);
 
 			setChart(c);
 
-			window.addEventListener('resize', resizeListener);
-
 			return () => {
-				window.removeEventListener('resize', resizeListener);
+				observer.disconnect();
 				c.remove();
 				setChart(null);
 			};
 		},
 		[]
+	);
+
+	React.useEffect(
+		() => {
+			if (!chart || !ref.current) {
+				return;
+			}
+
+			const container = ref.current;
+
+			const resizeListener = () => {
+				const isDisplayNone = getComputedStyle(container).display === 'none';
+				if (isDisplayNone) {
+					return;
+				}
+
+				const { width, height } = container.getBoundingClientRect();
+				chart.resize(width, height);
+				chart.timeScale().setVisibleLogicalRange(visibleLogicalRange);
+			};
+
+			window.addEventListener('resize', resizeListener);
+
+			return () => {
+				window.removeEventListener('resize', resizeListener);
+			};
+		},
+		[chart, isContainerVisible]
 	);
 
 	React.useEffect(
@@ -116,7 +146,7 @@ function HeroChart(): JSX.Element {
 
 			chart.applyOptions({ layout });
 		},
-		[layout]
+		[layout, chart]
 	);
 
 	return (
