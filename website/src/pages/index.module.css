@@ -23,8 +23,13 @@
 	align-items: center;
 	text-align: center;
 	background: var(--hero-text-background-color);
-	gap: 16px;
 	padding: 56px 20px;
+}
+
+.HeroTextContainer p {
+	font-size: 18px;
+	margin: 0;
+	padding-top: 20px;
 }
 
 .HeroTextContainer svg {
@@ -34,8 +39,8 @@
 .HeroButtonsContainer {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 1rem;
-	min-width: 90%;
+	gap: 24px;
+	padding-top: 24px;
 }
 
 .HeroButton {
@@ -74,11 +79,6 @@
 .HeroButtonPrimary:active {
 	color: #FFFFFF;
 	background: rgba(24, 72, 204, 1);
-}
-
-.HeroTextContainer p {
-	font-size: 18px;
-	margin: 0;
 }
 
 .LargeCardContainer {
@@ -178,8 +178,6 @@
 
 	.HeroButton {
 		flex: 1 1 50%;
-		/* padding-left: 2rem;
-		padding-right: 2rem; */
 		padding: 16px 32px;
 	}
 
@@ -191,8 +189,12 @@
 		flex: 1 0 100%;
 	}
 
+	.SmallCardContainer {
+		padding-bottom: 64px;
+	}
+
 	.SmallCard {
-		flex: 0 1 47%;
+		flex: 0 1 50%;
 	}
 
 	.SmallCard1 {
@@ -200,12 +202,12 @@
 	}
 
 	.SmallCard2 {
-		border-top-right-radius: 1rem;
+		border-top-right-radius: 16px;
 		border-left: unset;
 	}
 
 	.SmallCard3 {
-		border-bottom-left-radius: 1rem;
+		border-bottom-left-radius: 16px;
 		border-bottom: 1px solid var(--small-card-border-color);
 	}
 
@@ -223,7 +225,7 @@
 
 	.HeroChartContainer {
 		display: unset;
-		min-height: 500px;
+		height: 600px;
 		width: 100%;
 	}
 
@@ -231,9 +233,10 @@
 		position: absolute;
 		z-index: 2;
 		top: 77px;
-		border-radius: 2rem;
-		padding: 3rem;
-
+		border-radius: 32px;
+		padding: 56px;
+		width: 840px;
+		height: 446px;
 	}
 
 	.LargeTextContainer {
@@ -283,25 +286,36 @@
 }
 
 @media (min-width: 1919.5px) {
-	.HeroTextContainer {
-		width: 840px;
-		max-width: 840px;
-		height: 446px;
-	}
-
-	.HeroChartContainer {
-		height: 600px;
-	}
-
 	.LargeTextContainer {
-		max-width: 77%;
+		max-width: 960px;
+	}
+
+	.LargeTextContainer h1 {
+		font-size: 48px;
+		font-weight: 600;
+		line-height: 48px;
+	}
+
+	.LargeTextContainer p {
+		font-size: 24px;
+		line-height: 36px;
 	}
 
 	.LargeCardContainer {
-		max-width: 77%;
+		max-width: 1480px;
+		justify-content: unset;
+	}
+	
+	.LargeCard {
+		flex: 0 1 472px;
 	}
 
 	.SmallCardContainer {
-		max-width: 77%;
+		max-width: 1480px;
+		justify-content: unset;
+	}
+
+	.SmallCard {
+		flex: 0 1 369px;
 	}
 }

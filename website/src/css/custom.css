@@ -35,6 +35,7 @@
 	--ifm-color-primary-lighter: var(--color-tv-blue-300);
 	--ifm-color-primary-lightest: var(--color-tv-blue-200);
 	--ifm-code-font-size: 95%;
+	--ifm-navbar-padding-horizontal: 32px;
 	--ifm-footer-background-color: var(--color-white);
 	--ifm-footer-link-color: var(--color-black);
 
@@ -85,6 +86,7 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 .navbar {
 	box-shadow: none;
 	border-bottom: 1px solid var(--navbar-border-color);
+	height: 65px;
 }
 
 .navbar__brand svg {
