@@ -3,6 +3,7 @@ import Layout from '@theme/Layout';
 import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
 
+import sizeLimits from '../../../.size-limit.js';
 import Cog from '../img/cog.svg';
 import HeroLogoDesktopLaptopTablet from '../img/hero-logo-desktop-laptop-tablet.svg';
 import HeroLogoMobile from '../img/hero-logo-mobile.svg';
@@ -15,6 +16,19 @@ import TradingviewHeart from '../img/tradingview-heart.svg';
 import { ResponsiveLogo } from '../ResponsiveLogo';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
+
+interface SizeLimitDefinition {
+	name: string;
+	path: string;
+	limit: string;
+}
+
+const size = sizeLimits
+	.map((limit: SizeLimitDefinition) => parseFloat(limit.limit.split(' ')[0]))
+	.reduce((a: number, b: number) => Math.max(a, b))
+	.toFixed(1);
+
+const visibleLogicalRange = { from: 0.5, to: data.orangeData.length - 1.5 };
 
 function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptions> {
 	return isDarkTheme
@@ -36,8 +50,6 @@ function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
 
 	return layoutOptions;
 }
-
-const visibleLogicalRange = { from: 0.5, to: data.orangeData.length - 1.5 };
 
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
@@ -160,7 +172,7 @@ function Index(): JSX.Element {
 			<HeroChart />
 			<div className={styles.HeroTextContainer}>
 				<ResponsiveLogo mobile={HeroLogoMobile} desktopLaptopTablet={HeroLogoDesktopLaptopTablet} />
-				<p>Free, open-source and feature-rich. At just 40 kilobytes, the dream of lightweight interactive charts is now a reality.</p>
+				<p>Free, open-source and feature-rich. At just {size} kilobytes, the dream of lightweight interactive charts is now a reality.</p>
 				<div className={styles.HeroButtonsContainer}>
 					<a className={[styles.HeroButton, styles.HeroButtonPrimary].join(' ')} href="docs">Get Started</a>
 					<a className={styles.HeroButton} href="docs/api">API Reference</a>
@@ -196,7 +208,7 @@ function Index(): JSX.Element {
 			</div>
 			<div className={[styles.SmallCard, styles.SmallCard2].join(' ')}>
 				<Paperplane />
-				<h3>Ultra lightweight - just 40 Kb</h3>
+				<h3>Ultra lightweight - just {size} Kb</h3>
 				<p>HTML5 Canvas technology no larger than a standard GIF file.</p>
 			</div>
 			<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
