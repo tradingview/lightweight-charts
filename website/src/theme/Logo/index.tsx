@@ -3,7 +3,11 @@ import { useThemeConfig } from '@docusaurus/theme-common';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import React, { ComponentPropsWithoutRef } from 'react';
 
-import LogoSvg from '../../img/navbar-logo.svg';
+import { ResponsiveLogo } from '../../ResponsiveLogo';
+
+import NavbarLogoMobile from '../../img/navbar-logo-mobile.svg';
+import NavbarLogoDesktopLaptopTablet from '../../img/navbar-logo-desktop-laptop-tablet.svg';
+
 
 export interface LogoProps extends ComponentPropsWithoutRef<'a'> {
 	readonly imageClassName?: string;
@@ -22,7 +26,7 @@ function Logo(props: LogoProps): JSX.Element {
 	const logoLink = useBaseUrl(logo.href || '/');
 	return (
 		<Link to={logoLink} {...propsRest}>
-			<LogoSvg />
+			<ResponsiveLogo mobile={NavbarLogoMobile} desktopLaptopTablet={NavbarLogoDesktopLaptopTablet} />
 		</Link>
 	);
 }

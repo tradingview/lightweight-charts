@@ -3,12 +3,15 @@ import Layout from '@theme/Layout';
 import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
 
+import { ResponsiveLogo } from '../ResponsiveLogo';
+
 import Cog from '../img/cog.svg';
 import InputSliders from '../img/input-sliders.svg';
-import Logo from '../img/logo.svg';
 import Paperplane from '../img/paperplane.svg';
 import Screens from '../img/screens.svg';
 import Shapes from '../img/shapes.svg';
+import HeroLogoDesktopLaptopTablet from '../img/hero-logo-desktop-laptop-tablet.svg';
+import HeroLogoMobile from '../img/hero-logo-mobile.svg';
 import Speedometer from '../img/speedometer.svg';
 import TradingviewHeart from '../img/tradingview-heart.svg';
 import data from './hero-chart-data.json';
@@ -37,9 +40,7 @@ function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
 
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
-
 	const layout = useThemeAwareLayoutOptions();
-
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
 	React.useEffect(
@@ -128,8 +129,7 @@ function Index(): JSX.Element {
 		<div className={styles.HeroContainer}>
 			<HeroChart />
 			<div className={styles.HeroTextContainer}>
-				<Logo />
-				<h1>Lightweight Charts</h1>
+				<ResponsiveLogo mobile={HeroLogoMobile} desktopLaptopTablet={HeroLogoDesktopLaptopTablet} />
 				<p>Free, open-source and feature-rich. At just 40 kilobytes, the dream of lightweight interactive charts is now a reality.</p>
 				<div className={styles.HeroButtonsContainer}>
 					<a className={[styles.HeroButton, styles.HeroButtonPrimary].join(' ')} href="docs">Get Started</a>

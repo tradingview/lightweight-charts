@@ -22,7 +22,9 @@
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
-	padding-top: 2rem;
+	background: var(--hero-text-background-color);
+	gap: 16px;
+	padding: 56px 20px;
 }
 
 .HeroTextContainer svg {
@@ -42,7 +44,7 @@
 	border-radius: 56px;
 	padding: 1rem;
 	font-weight: 600;
-	border: 1px solid var(--small-card-border-color);
+	border: 1px solid var(--hero-button-border-color);
 	white-space: nowrap;
 	color: var(--hero-button-text-color);
 }
@@ -60,6 +62,7 @@
 .HeroButtonPrimary {
 	color: #FFFFFF;
 	background: #2962FF;
+	border: none;
 }
 
 .HeroButtonPrimary:hover {
@@ -73,30 +76,26 @@
 	background: rgba(24, 72, 204, 1);
 }
 
-.HeroTextContainer h1 {
-	padding-top: 1rem;
-	font-size: 2.5rem;
-}
-
 .HeroTextContainer p {
-	font-size: 1.5rem;
+	font-size: 18px;
+	margin: 0;
 }
 
 .LargeCardContainer {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 1rem;
+	gap: 16px;
+	padding: 0px 20px;
 }
 
 .LargeCard {
-	max-width: 95%;
 	background: var(--card-background-color);
-	padding: 2rem 2rem;
-	border-radius: 1rem;
+	padding: 20px;
+	border-radius: 16px;
 	display: flex;
 	flex-direction: column;
-	gap: 1.5rem;
+	gap: 20px;
 }
 
 .LargeCard h2 {
@@ -115,56 +114,56 @@
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
+	padding: 48px 20px;
 }
 
 .SmallCard {
-	flex: 1 0 auto;
-	max-width: 95%;
-	padding: 2rem 1rem;
+	padding: 24px;
 	border: 1px solid var(--small-card-border-color);
 	border-bottom: none;
 }
 
 .SmallCard1 {
-	border-top-left-radius: 1rem;
-	border-top-right-radius: 1rem;
+	border-top-left-radius: 16px;
+	border-top-right-radius: 16px;
 }
 
 .SmallCard4 {
 	border-bottom: 1px solid var(--small-card-border-color);
-	border-bottom-left-radius: 1rem;
-	border-bottom-right-radius: 1rem;
+	border-bottom-left-radius: 16px;
+	border-bottom-right-radius: 16px;
+}
+
+.SmallCard h3 {
+	font-size: 18px;
 }
 
 .SmallCard p {
+	font-size: 14px;
 	color: var(--card-paragraph-color);
 }
 
 .LargeTextContainer {
 	display: flex;
 	flex-wrap: wrap;
-	padding-top: 2rem;
-	padding-left: 1rem;
-	padding-right: 1rem;
-	font-weight: 400;
+	padding: 56px 20px;
 }
 
 .LargeTextContainer h1 {
 	text-align: center;
-	font-size: 2.5rem;
+	font-size: 32px;
 }
 
 .LargeTextContainer p {
-	font-size: 1.5rem;
-	text-align: center;
+	font-size: 18px;
+	text-align: left;
 }
 
 .RootContainer {
-	max-width: 98%;
 	display: flex;
 	flex-direction: column;
-	gap: 2rem;
 	align-items: center;
+	margin: 0;
 }
 
 @media (min-width: 767.5px) {
@@ -179,12 +178,13 @@
 
 	.HeroButton {
 		flex: 1 1 50%;
-		padding-left: 2rem;
-		padding-right: 2rem;
+		/* padding-left: 2rem;
+		padding-right: 2rem; */
+		padding: 16px 32px;
 	}
 
 	.LargeCard {
-		flex: 0 1 47%;
+		flex: 0 1 48.9%;
 	}
 
 	.LargeCard3 {
@@ -230,14 +230,10 @@
 	.HeroTextContainer {
 		position: absolute;
 		z-index: 2;
-		max-width: 65%;
-		top: 10%;
-		left: 10%;
+		top: 77px;
 		border-radius: 2rem;
-		align-items: flex-start;
-		text-align: left;
 		padding: 3rem;
-		background: var(--hero-text-background-color);
+
 	}
 
 	.LargeTextContainer {
@@ -288,11 +284,13 @@
 
 @media (min-width: 1919.5px) {
 	.HeroTextContainer {
-		max-width: 43%;
+		width: 840px;
+		max-width: 840px;
+		height: 446px;
 	}
 
 	.HeroChartContainer {
-		height: 50vh;
+		height: 600px;
 	}
 
 	.LargeTextContainer {
