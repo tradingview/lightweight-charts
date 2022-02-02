@@ -18,7 +18,7 @@
 	--color-cold-gray-750: #363A45;
 	--color-cold-gray-800: #2A2E39;
 	--color-cold-gray-850: #1E222D;
-	--color-gold-gray-900: #131722;
+	--color-cold-gray-900: #131722;
 	--color-cold-gray-950: #0C0E15;
 	--color-tv-blue-200: #90BFF9;
 	--color-tv-blue-300: #5B9CF6;
@@ -65,7 +65,7 @@
 
 html[data-theme=dark] {
 	--small-card-border-color: var(--color-cold-gray-850);
-	--card-background-color: var(--color-cold-gray-950);
+	--card-background-color: var(--color-cold-gray-900);
 	--card-paragraph-color: var(--color-cold-gray-300);
 	--icon-color: var(--color-cold-gray-200);
 	--hero-button-text-color: var(--color-cold-gray-200);
