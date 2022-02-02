@@ -46,11 +46,16 @@
 	--hero-button-text-color: var(--color-black);
 	--hero-button-hackground-color-hover: var(--color-cold-gray-100);
 	--hero-text-background-color: #ffffff;
-	--icon-color: var(--color-black);
 	--large-card-paragraph-text-color: var(--color-cold-gray-500);
 	--hero-button-border-color: var(--color-cold-gray-150);
 	--footer-border-color: var(--color-cold-gray-150);
 	--navbar-border-color: var(--color-cold-gray-150);
+
+	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-light.svg');
+	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-light.svg');
+
+	--hero-logo-url-desktop-laptop-tablet: url('../../static/img/hero-logo-desktop-laptop-tablet-light.svg');
+	--hero-logo-url-mobile: url('../../static/img/hero-logo-mobile-light.svg');
 }
 
 html[data-theme=dark] {
@@ -70,6 +75,12 @@ html[data-theme=dark] {
 	--ifm-footer-background-color: var(--color-black);
 	--ifm-background-color: var(--color-black);
 	--ifm-footer-link-color: var(--color-cold-gray-200);
+
+	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-dark.svg');
+	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
+
+	--hero-logo-url-desktop-laptop-tablet: url('../../static/img/hero-logo-desktop-laptop-tablet-dark.svg');
+	--hero-logo-url-mobile: url('../../static/img/hero-logo-mobile-dark.svg');
 }
 
 .docusaurus-highlight-code-line {

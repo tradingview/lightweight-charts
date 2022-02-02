@@ -81,6 +81,12 @@
 	background: rgba(24, 72, 204, 1);
 }
 
+.HeroLogo {
+	background-image: var(--hero-logo-url-mobile);
+	width: 292px;
+ 	height: 128px;
+}
+
 .LargeCardContainer {
 	display: flex;
 	flex-wrap: wrap;
@@ -145,7 +151,6 @@
 }
 
 .LargeTextContainer {
-	display: flex;
 	flex-wrap: wrap;
 	padding: 56px 20px;
 }
@@ -180,6 +185,12 @@
 	.HeroButton {
 		flex: 1 1 50%;
 		padding: 16px 32px;
+	}
+
+	.HeroLogo {
+		background-image: var(--hero-logo-url-desktop-laptop-tablet);
+		width: 432px;
+		height: 162px;
 	}
 
 	.LargeCard {
@@ -228,6 +239,13 @@
 		display: unset;
 		height: 600px;
 		width: 100%;
+
+		animation: fadein 3s;
+	}
+
+	@keyframes fadein {
+		from { opacity: 0;}
+		to { opacity: 1; }
 	}
 
 	.HeroTextContainer {

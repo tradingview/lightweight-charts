@@ -5,15 +5,12 @@ import React from 'react';
 
 import sizeLimits from '../../../.size-limit.js';
 import Cog from '../img/cog.svg';
-import HeroLogoDesktopLaptopTablet from '../img/hero-logo-desktop-laptop-tablet.svg';
-import HeroLogoMobile from '../img/hero-logo-mobile.svg';
 import InputSliders from '../img/input-sliders.svg';
 import Paperplane from '../img/paperplane.svg';
 import Screens from '../img/screens.svg';
 import Shapes from '../img/shapes.svg';
 import Speedometer from '../img/speedometer.svg';
 import TradingviewHeart from '../img/tradingview-heart.svg';
-import { ResponsiveLogo } from '../responsive-logo';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
 
@@ -171,7 +168,7 @@ function Index(): JSX.Element {
 		<div className={styles.HeroContainer}>
 			<HeroChart />
 			<div className={styles.HeroTextContainer}>
-				<ResponsiveLogo mobile={HeroLogoMobile} desktopLaptopTablet={HeroLogoDesktopLaptopTablet} />
+				<div className={styles.HeroLogo} />
 				<p>Free, open-source and feature-rich. At just {size} kilobytes, the dream of lightweight interactive charts is now a reality.</p>
 				<div className={styles.HeroButtonsContainer}>
 					<a className={[styles.HeroButton, styles.HeroButtonPrimary].join(' ')} href="docs">Get Started</a>
