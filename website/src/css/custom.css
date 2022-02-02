@@ -112,20 +112,20 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	--color: var(--icon-color);
 }
 
-.menu {
+.navbar .menu {
 	color: var(--menu-item-text-color);
 }
 
-.menu__list-item {
-	padding: 24px 24px;
-}
-
-.menu__list-item:hover {
+.navbar .menu__list-item:hover {
 	background-color: var(--menu-item-background-hover);
 }
 
-.menu__list-item:not(:first-child) {
+.navbar .menu__list-item:not(:first-child) {
 	margin: none;
+}
+
+.menu__list-item-collapsible:hover {
+	background: inherit;
 }
 
 .menu__link {
