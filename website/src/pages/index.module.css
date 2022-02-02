@@ -2,6 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	width: 100%;
 }
 
 .HeroChartContainer {
@@ -24,6 +25,7 @@
 	text-align: center;
 	background: var(--hero-text-background-color);
 	padding: 56px 20px;
+	width: 100%;
 }
 
 .HeroTextContainer p {
