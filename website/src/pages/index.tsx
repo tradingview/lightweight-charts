@@ -13,7 +13,7 @@ import Screens from '../img/screens.svg';
 import Shapes from '../img/shapes.svg';
 import Speedometer from '../img/speedometer.svg';
 import TradingviewHeart from '../img/tradingview-heart.svg';
-import { ResponsiveLogo } from '../ResponsiveLogo';
+import { ResponsiveLogo } from '../responsive-logo';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
 

@@ -3,11 +3,9 @@ import { useThemeConfig } from '@docusaurus/theme-common';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import React, { ComponentPropsWithoutRef } from 'react';
 
-import { ResponsiveLogo } from '../../ResponsiveLogo';
-
-import NavbarLogoMobile from '../../img/navbar-logo-mobile.svg';
 import NavbarLogoDesktopLaptopTablet from '../../img/navbar-logo-desktop-laptop-tablet.svg';
-
+import NavbarLogoMobile from '../../img/navbar-logo-mobile.svg';
+import { ResponsiveLogo } from '../../responsive-logo';
 
 export interface LogoProps extends ComponentPropsWithoutRef<'a'> {
 	readonly imageClassName?: string;
