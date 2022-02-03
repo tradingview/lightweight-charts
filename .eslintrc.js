@@ -53,13 +53,10 @@ module.exports = {
 		jsdoc: {
 			ignoreInternal: true,
 		},
-		// The following line raises an error in nominal.ts & time-data.ts with ```ts. ```js works though.
-		// 'mdx/code-blocks': true,
 	},
 	extends: [
 		'eslint:recommended',
 		'plugin:react/recommended',
-		'plugin:mdx/recommended',
 	],
 	parserOptions: {
 		ecmaVersion: 2019,
@@ -128,6 +125,16 @@ module.exports = {
 		{
 			files: ['**/*.md'],
 			processor: 'markdown/markdown',
+		},
+		{
+			files: ['**/*.mdx'],
+			processor: 'mdx/remark',
+			settings: {
+				'mdx/code-blocks': true,
+			},
+			extends: [
+				'plugin:mdx/recommended',
+			],
 		},
 		{
 			files: ['**/*.md/*.js', '**/*.md/*.javascript'],
