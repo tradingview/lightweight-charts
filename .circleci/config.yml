@@ -60,12 +60,6 @@ commands:
       - restore_cache: *restore-node-modules-cache
       - restore_cache: *restore-node-modules-cache-website
 
-  checkout-with-deps-website:
-    description: "Checkout the code with restore npm dependencies for /website"
-    steps:
-      - checkout
-      - restore_cache: *restore-node-modules-cache-website
-
   run-graphics-tests:
     description: "Run graphics tests with specific devicePixelRatio"
     parameters:
