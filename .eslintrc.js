@@ -29,6 +29,17 @@ function getNamingConventionRules(additionalDefaultFormats = []) {
 	];
 }
 
+const tsRulesExtendsWithoutTypeCheck = [
+	'plugin:@typescript-eslint/eslint-recommended',
+	'plugin:@typescript-eslint/recommended',
+	'plugin:import/typescript',
+];
+
+const tsRulesExtendsWithTypeCheck = [
+	...tsRulesExtendsWithoutTypeCheck,
+	'plugin:@typescript-eslint/recommended-requiring-type-checking',
+];
+
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
 	reportUnusedDisableDirectives: true,
@@ -182,14 +193,9 @@ module.exports = {
 		},
 		{
 			files: ['**/*.ts', '**/*.tsx'],
-			excludedFiles: ['**/*.md/*.ts', 'dist/**'],
+			excludedFiles: ['dist/**'],
 			parser: '@typescript-eslint/parser',
-			extends: [
-				'plugin:@typescript-eslint/eslint-recommended',
-				'plugin:@typescript-eslint/recommended',
-				'plugin:@typescript-eslint/recommended-requiring-type-checking',
-				'plugin:import/typescript',
-			],
+			extends: tsRulesExtendsWithTypeCheck,
 			parserOptions: {
 				project: 'tsconfig.json',
 				sourceType: 'module',
@@ -214,6 +220,46 @@ module.exports = {
 					files: ['website/src/**/*.tsx'],
 					rules: {
 						'import/no-default-export': 'off',
+					},
+				},
+
+				// note this rule MUST be the last in this overrides list
+				// because it should be applied last and override parserOptions correctly
+				// otherwise typescript-eslint will raise an error that it cannot
+				{
+					// well, for code blocks from md/mdx we shouldn't (and cannot) do type check
+					// so let's just disable such rules from their linting
+					files: [
+						'**/*.md/*.ts',
+						'**/*.md/*.tsx',
+						'**/*.md/*.typescript',
+
+						'**/*.mdx/*.ts',
+						'**/*.mdx/*.tsx',
+						'**/*.mdx/*.typescript',
+					],
+					extends: tsRulesExtendsWithoutTypeCheck,
+					parserOptions: {
+						project: null,
+						sourceType: 'module',
+					},
+					rules: {
+						'@typescript-eslint/await-thenable': 'off',
+						'@typescript-eslint/dot-notation': 'off',
+						'@typescript-eslint/no-floating-promises': 'off',
+						'@typescript-eslint/no-implied-eval': 'off',
+						'@typescript-eslint/no-misused-promises': 'off',
+						'@typescript-eslint/no-unnecessary-qualifier': 'off',
+						'@typescript-eslint/no-unnecessary-type-assertion': 'off',
+						'@typescript-eslint/no-unsafe-call': 'off',
+						'@typescript-eslint/no-unsafe-member-access': 'off',
+						'@typescript-eslint/no-unsafe-return': 'off',
+						'@typescript-eslint/no-unused-vars': 'off',
+						'@typescript-eslint/prefer-regexp-exec': 'off',
+						'@typescript-eslint/require-await': 'off',
+						'@typescript-eslint/tslint/config': 'off',
+						'@typescript-eslint/unbound-method': 'off',
+						'deprecation/deprecation': 'off',
 					},
 				},
 			],
