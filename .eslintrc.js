@@ -132,16 +132,6 @@ module.exports = {
 
 				// require or disallow use of semicolons instead of ASI
 				semi: ['error', 'always'],
-
-				// requires destructuring from arrays and/or objects.
-				'prefer-destructuring': ['error', {
-					VariableDeclarator: {
-						array: false,
-						object: true,
-					},
-				}, {
-					enforceForRenamedProperties: false,
-				}],
 			},
 		},
 		{
