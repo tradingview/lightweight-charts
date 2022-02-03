@@ -115,4 +115,4 @@ histogramSeries.setData(data)
 ## How to run the provided example
 
 The [GitHub repository](https://github.com/tradingview/lightweight-charts-android) for lightweight-charts-android contains an example of the library in action.
-You can run the example (LighweightCharts.app) by cloning the repository and opening it in Android Studio. You will need to have NodeJS/NPM installed.
+You can run the example (LighweightCharts.app) by cloning the repository and opening it in Android Studio. You will need to have [NodeJS/NPM](https://nodejs.org/) installed.
