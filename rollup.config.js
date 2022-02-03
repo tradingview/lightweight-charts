@@ -1,4 +1,4 @@
-const { terser } = require('rollup-plugin-terser');
+const terser = require('rollup-plugin-terser').terser;
 const nodeResolve = require('@rollup/plugin-node-resolve').default;
 const replace = require('@rollup/plugin-replace');
 const packageJson = require('./package.json');
