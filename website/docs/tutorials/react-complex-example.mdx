@@ -45,7 +45,7 @@ However, one drawback with the way React and its hooks like _useEffect_ [work](h
 
 The following skeleton illustrates the mechanism.
 
-```javascript
+```js
 ParentComponent = () => {
 	useEffect(() => {
 		// this effect will be triggered in position 3
@@ -112,7 +112,7 @@ Moreover those 2 "main" components will "expose" whatever functions the user wan
 
 Here's a squeleton of what the final structure would be like:
 
-```javascript
+```js
 MainComponent = (props) => {
 	// Creates the first reference and instanciate a ParentComponent
 	return (
