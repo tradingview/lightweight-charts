@@ -65,11 +65,24 @@ module.exports = {
 	overrides: [
 		{
 			// rules specific for js files only
-			files: ['**/*.js', '**/*.md/*.javascript', '**/*.jsx'],
-			env: {
-				// This is used in chart-component.jsx with `window.addEventListener`
-				browser: true,
-			},
+			files: [
+				'**/*.js',
+				'**/*.jsx',
+
+				// that's for md/mdx files
+				'**/*.javascript',
+			],
+			overrides: [
+				{
+					files: '**/*.jsx',
+					env: {
+						browser: true,
+					},
+					rules: {
+						'react/prop-types': 'off',
+					},
+				},
+			],
 			rules: {
 				// enforces no braces where they can be omitted
 				// http://eslint.org/docs/rules/arrow-body-style
@@ -118,8 +131,6 @@ module.exports = {
 				}, {
 					enforceForRenamedProperties: false,
 				}],
-
-				'react/prop-types': 'off',
 			},
 		},
 		{
@@ -137,7 +148,13 @@ module.exports = {
 			],
 		},
 		{
-			files: ['**/*.md/*.js', '**/*.md/*.javascript'],
+			files: [
+				'**/*.md/*.js',
+				'**/*.md/*.javascript',
+
+				'**/*.mdx/*.js',
+				'**/*.mdx/*.javascript',
+			],
 			env: {
 				browser: true,
 				node: false,
