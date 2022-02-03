@@ -64,6 +64,9 @@ module.exports = {
 		jsdoc: {
 			ignoreInternal: true,
 		},
+		react: {
+			version: require('./website/package.json').dependencies.react.slice(1),
+		},
 	},
 	extends: [
 		'eslint:recommended',
