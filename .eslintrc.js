@@ -210,6 +210,12 @@ module.exports = {
 						],
 					},
 				},
+				{
+					files: ['website/src/**/*.tsx'],
+					rules: {
+						'import/no-default-export': 'off',
+					},
+				},
 			],
 			rules: {
 				'@typescript-eslint/array-type': [
@@ -429,12 +435,6 @@ module.exports = {
 						},
 					},
 				],
-			},
-		},
-		{
-			files: ['website/src/**/*.tsx'],
-			rules: {
-				'import/no-default-export': 'off',
 			},
 		},
 		{
