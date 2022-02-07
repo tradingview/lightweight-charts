@@ -129,8 +129,8 @@ function HeroChart(): JSX.Element {
 			const container = ref.current;
 
 			const resizeListener = () => {
-				const isDisplayNone = getComputedStyle(container).display === 'none';
-				if (isDisplayNone) {
+				const matchList = window.matchMedia('screen and (min-width: 1279.5px)');
+				if (!matchList.matches) {
 					return;
 				}
 
