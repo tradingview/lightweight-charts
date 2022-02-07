@@ -41,6 +41,8 @@
 	--ifm-footer-background-color: var(--color-white);
 	--ifm-footer-link-color: var(--color-black);
 	--ifm-menu-color: var(--color-cold-gray-200);
+	--ifm-menu-color-background-active: var(--color-cold-gray-100);
+	--ifm-menu-color-background-hover: var(--color-cold-gray-150);
 
 	--small-card-border-color: var(--color-cold-gray-150);
 	--card-background-color: var(--color-cold-gray-100);
@@ -58,9 +60,6 @@
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-light.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-light.svg');
-
-	--hero-logo-url-desktop-laptop-tablet: url('../../static/img/hero-logo-desktop-laptop-tablet-light.svg');
-	--hero-logo-url-mobile: url('../../static/img/hero-logo-mobile-light.svg');
 }
 
 html[data-theme=dark] {
@@ -83,12 +82,10 @@ html[data-theme=dark] {
 	--ifm-background-color: var(--color-black);
 	--ifm-footer-link-color: var(--color-cold-gray-200);
 	--ifm-menu-color: var(--color-cold-gray-900);
+	--ifm-menu-color: var(--color-cold-gray-900);
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-dark.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
-
-	--hero-logo-url-desktop-laptop-tablet: url('../../static/img/hero-logo-desktop-laptop-tablet-dark.svg');
-	--hero-logo-url-mobile: url('../../static/img/hero-logo-mobile-dark.svg');
 }
 
 .docusaurus-highlight-code-line {
@@ -112,29 +109,29 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	--color: var(--icon-color);
 }
 
-.navbar .menu {
+.menu {
 	color: var(--menu-item-text-color);
 }
 
-.navbar .menu__list-item:hover {
-	background-color: var(--menu-item-background-hover);
+.theme-doc-sidebar-container .menu {
+	padding: 0;
 }
 
-.navbar .menu__list-item:not(:first-child) {
-	margin: none;
+.menu__list .menu__list {
+	margin: 0;
 }
 
-.menu__list-item-collapsible:hover {
-	background: inherit;
+.menu__list-item:not(:first-child) {
+	margin: 0;
 }
 
 .menu__link {
 	color: var(--menu-item-text-color);
+	padding: 12px 24px;
 }
 
 .menu__link:hover {
 	color: inherit;
-	background: none;
 }
 
 .footer {

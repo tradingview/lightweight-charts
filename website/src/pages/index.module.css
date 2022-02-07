@@ -1,8 +1,25 @@
+.RootContainer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0;
+}
+
 .HeroContainer {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	width: 100%;
+}
+
+.RootSpacerInner {
+	width: 100%;
+	height: 48px;
+}
+
+.RootSpacerOuter {
+	width: 100%;
+	height: 48px;
 }
 
 .HeroChartContainer {
@@ -30,8 +47,13 @@
 
 .HeroTextContainer p {
 	font-size: 18px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 28px;
+	letter-spacing: 0em;
+	text-align: center;
 	margin: 0;
-	padding-top: 20px;
+	padding-top: 16px;
 }
 
 .HeroTextContainer svg {
@@ -42,15 +64,19 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 24px;
-	padding-top: 24px;
+	padding-top: 16px;
 }
 
 .HeroButton {
-	flex: 1 0 100%;
+	font-size: 18px;
+	font-style: normal;
+	font-weight: 600;
+	line-height: 24px;
+	letter-spacing: 0em;
 	text-align: center;
+	flex: 1 0 100%;
 	border-radius: 56px;
 	padding: 1rem;
-	font-weight: 600;
 	border: 1px solid var(--hero-button-border-color);
 	white-space: nowrap;
 	color: var(--hero-button-text-color);
@@ -83,18 +109,45 @@
 	background: rgba(24, 72, 204, 1);
 }
 
-.HeroLogo {
-	background-image: var(--hero-logo-url-mobile);
-	width: 292px;
- 	height: 128px;
+.LargeTextContainer {
+	flex-wrap: wrap;
+	width: 100%;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.LargeTextContainer h1 {
+	font-size: 32px;
+	font-style: normal;
+	font-weight: 600;
+	line-height: 40px;
+	letter-spacing: -0.02em;
+	text-align: center;
+	margin-bottom: 24px;
+}
+
+.LargeTextContainer p {
+	font-size: 18px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 28px;
+	letter-spacing: 0em;
+	text-align: left;
+	margin: 0;
 }
 
 .LargeCardContainer {
 	display: flex;
-	flex-wrap: wrap;
 	justify-content: center;
-	gap: 16px;
-	padding: 0px 20px;
+	flex-wrap: wrap;
+	width: 100%;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.LargeCardSpacer {
+	height: 20px;
+	width: 100%;
 }
 
 .LargeCard {
@@ -104,14 +157,25 @@
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
+	width: 100%;
 }
 
 .LargeCard h2 {
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 32px;
 	margin: 0;
 }
 
 .LargeCard p {
 	color: var(--large-card-paragraph-text-color);
+	font-size: 18px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 28px;
+	letter-spacing: 0em;
+	text-align: left;
+	margin: 0;
 }
 
 .LargeCard svg {
@@ -122,7 +186,8 @@
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	padding: 48px 20px;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 .SmallCard {
@@ -144,39 +209,38 @@
 }
 
 .SmallCard h3 {
+	margin-bottom: 0;
 	font-size: 18px;
+	font-style: normal;
+	font-weight: 600;
+	line-height: 24px;
+	letter-spacing: 0em;
+	text-align: left;
 }
 
 .SmallCard p {
 	font-size: 14px;
+	font-weight: 400;
 	color: var(--card-paragraph-color);
-}
-
-.LargeTextContainer {
-	flex-wrap: wrap;
-	padding: 56px 20px;
-}
-
-.LargeTextContainer h1 {
-	text-align: center;
-	font-size: 32px;
-}
-
-.LargeTextContainer p {
-	font-size: 18px;
-	text-align: left;
-}
-
-.RootContainer {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
 	margin: 0;
+}
+
+.SmallCardInnerSpacer1 {
+	height: 12px;
+}
+
+.SmallCardInnerSpacer2 {
+	height: 8px;
 }
 
 @media (min-width: 767.5px) {
 	.RootContainer {
 		max-width: unset;
+	}
+
+	.RootSpacerOuter {
+		width: 100%;
+		height: 64px;
 	}
 
 	.HeroButtonsContainer {
@@ -189,22 +253,51 @@
 		padding: 16px 32px;
 	}
 
-	.HeroLogo {
-		background-image: var(--hero-logo-url-desktop-laptop-tablet);
-		width: 432px;
-		height: 162px;
+	.LargeTextContainer h1 {
+		font-size: 40px;
+		font-style: normal;
+		font-weight: 600;
+		line-height: 40px;
+		letter-spacing: -0.02em;
+		text-align: center;
+	}
+
+	.LargeTextContainer p {
+		text-align: center;
+		font-size: 24px;
+		font-weight: 400;
+		line-height: 36px;
+	}
+
+	.LargeCardContainer {
+		width: 100%;
+		justify-content: unset;
 	}
 
 	.LargeCard {
-		flex: 0 1 48.9%;
+		flex: 1 0 354px;
 	}
 
 	.LargeCard3 {
 		flex: 1 0 100%;
 	}
+	
+	.LargeCard h2 {
+		font-size: 28px;
+		font-style: normal;
+		font-weight: 600;
+		line-height: 36px;
+		letter-spacing: 0px;
+		text-align: left;
+	}
 
-	.SmallCardContainer {
-		padding-bottom: 64px;
+	.LargeCardSpacer {
+		width: 20px;
+	}
+
+	.LargeCardSpacer2 {
+		width: 100%;
+		height: 20px;
 	}
 
 	.SmallCard {
@@ -232,6 +325,16 @@
 }
 
 @media (min-width: 1279.5px) {
+	.RootSpacerInner {
+		width: 100%;
+		height: 64px;
+	}
+
+	.RootSpacerOuter {
+		width: 100%;
+		height: 88px;
+	}
+
 	.HeroContainer {
 		position: relative;
 		align-self: stretch;
@@ -242,7 +345,7 @@
 		height: 600px;
 		width: 100%;
 
-		animation: fadein 3s;
+		animation: fadein 1s;
 	}
 
 	@keyframes fadein {
@@ -257,33 +360,64 @@
 		border-radius: 32px;
 		padding: 56px;
 		width: 840px;
-		height: 446px;
+		height: 412px;
+		font-size: 24px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: 36px;
+		letter-spacing: 0em;
+		text-align: center;
 	}
 
 	.LargeTextContainer {
-		max-width: 75%;
+		width: 960px;
 		justify-content: center;
+	}
+
+	.LargeTextContainer h1 {
+		font-size: 48px;
+		line-height: 48px;
+		font-weight: 600;
 	}
 
 	.LargeCardContainer {
 		flex-wrap: nowrap;
+		height: 436px;
+		padding-left: 40px;
+		padding-right: 40px;
+	}
+
+	.LargeCardSpacer {
+		width: 20px;
 	}
 
 	.LargeCard, LargeCard3 {
-		flex: 0 1 30%;
+		flex: 1 1 387px;
 	}
 
 	.SmallCardContainer {
 		flex-wrap: nowrap;
+		padding-left: 40px;
+		padding-right: 40px;
 	}
 
 	.SmallCard {
-		flex: 0 1 23%;
+		flex: 1 1 299.25px;
+		padding: 24px;
+	}
+
+	.SmallCard p {
+		font-size: 14px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: 18px;
+		letter-spacing: 0em;
+		text-align: left;
 	}
 
 	.SmallCard1 {
 		border-top-right-radius: unset;
-		border-bottom-left-radius: 1rem;
+		border-bottom-left-radius: 16px;
 		border-bottom: 1px solid var(--small-card-border-color);
 	}
 
@@ -300,14 +434,25 @@
 	}
 
 	.SmallCard4 {
-		border-top-right-radius: 1rem;
+		border-top-right-radius: 16px;
 		border-bottom-left-radius: unset;
 		border-left: unset;
 	}
 }
 
 @media (min-width: 1919.5px) {
+	.RootSpacerInner {
+		width: 100%;
+		height: 80px;
+	}
+
+	.RootSpacerOuter {
+		width: 100%;
+		height: 120px;
+	}
+
 	.LargeTextContainer {
+		padding: 0;
 		max-width: 960px;
 	}
 
@@ -322,21 +467,32 @@
 		line-height: 36px;
 	}
 
+	.LargeCardSpacer {
+		width: 32px;
+		height: 496px;
+	}
+
 	.LargeCardContainer {
-		max-width: 1480px;
-		justify-content: unset;
+		padding-left: 220px;
+		padding-right: 220px;
+		height: 496px;
+		max-width: 1916px;
 	}
 	
 	.LargeCard {
-		flex: 0 1 472px;
+		flex: 1 1 472px;
+		padding: 48px 56px;
 	}
 
 	.SmallCardContainer {
-		max-width: 1480px;
 		justify-content: unset;
+		padding-left: 220px;
+		padding-right: 220px;
 	}
 
 	.SmallCard {
 		flex: 0 1 369px;
+		height: 214px;
+		width: 369px;
 	}
 }

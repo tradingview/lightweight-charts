@@ -182,7 +182,7 @@ const config = {
 						],
 					},
 					{
-						title: 'Community',
+						title: 'Lightweight Charts Community',
 						items: [
 							{
 								label: 'Stack Overflow',
