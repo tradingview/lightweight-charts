@@ -1,5 +1,5 @@
 ---
-id: react-complex-example
+id: advanced-react-example
 title: How to wrap Lightweight Charts into parent/children components
 sidebar_position: 1
 ---
@@ -8,20 +8,20 @@ sidebar_position: 1
 
 The following describes a more complex scenario where a user could imagine splitting the responsibilities of the chart between components.
 
-If you want to consult a simpler approach please consult this [example](./react).
+If you want to consult a simpler approach please consult this [example](simple-react-example).
 
 :::
 
 :::warning
 
-By following the steps below we assume you're familiar with Lightweight Chart, how to set up a project using it and how to render a chart.
+By following the steps below we assume you're familiar with Lightweight Charts, how to set up a project using it and how to render a chart.
 
-If not, please follow this [guide](./react).
+If not, please follow this [guide](./simple-react-example).
 
 :::
 
-If you're familiar with Lightweight Chart you probably already know that a _Chart_ is a container that can contain one or more [_Series_](../series-types.md).
-Each _Series_ has its own options (for instance [AreaStyleOptions](/api/interfaces/AreaStyleOptions.md), [LineStyleOptions](/api/interfaces/LineStyleOptions.md), etc) in addition to [Price](../price-scale.md) and/or [Time](../time-scale.md) scale.
+If you're familiar with Lightweight Charts you probably already know that a _Chart_ is a container that can contain one or more [_Series_](../series-types.md).
+Each _Series_ has its own options (for instance [AreaStyleOptions](/api/interfaces/AreaStyleOptions.md), [LineStyleOptions](/api/interfaces/LineStyleOptions.md), etc) in addition to [price](../price-scale.md) and/or [time](../time-scale.md) scale.
 
 Based on this principle, one could easily imagine having a main component _Chart_ that could have some _Series_ children that could themselves have other children and so on.
 Therefore the structure could become something like
@@ -45,7 +45,7 @@ However, one drawback with the way React and its hooks like _useEffect_ [work](h
 
 The following skeleton illustrates the mechanism.
 
-```js
+```
 ParentComponent = () => {
 	useEffect(() => {
 		// this effect will be triggered in position 3
@@ -62,6 +62,11 @@ ParentComponent = () => {
 			// this clean up will be triggered in position 2
 		};
 	}, []);
+
+	// The parent will then return Following bit is to propagate all props & internalRef object down to children
+	return (
+		<ChildComponent />
+	);
 }
 
 ChildComponent = () => {
@@ -80,10 +85,14 @@ ChildComponent = () => {
 			// this clean up will be triggered in position 4
 		};
 	}, []);
+
+	return (
+		<div />
+	);
 }
 ```
 
-In essence, taking the example above, it means that a ChildComponent (aka Series) would be created first whilst requiring a ParentComponent (aka Chart).
+In essence, taking the example above, it means that a `ChildComponent` (aka Series) would be created first whilst requiring a `ParentComponent` (aka Chart).
 
 To achieve that, we will have to rely on a few hooks and take advantage of the way they work in addition to use [ref/forwardRef](https://reactjs.org/docs/forwarding-refs.html) which is a technique to pass down properties from one component to its children.
 
@@ -103,7 +112,7 @@ In the end the "visible" structure and usage will be alike but internally it wil
 ```
 
 where the ChartContainer's role would be needed to attach a DOMElement on which the chart will render.
-ChartContainer will be responsible for creating a **ref**[erence] that will hold functions to handle the lifecycle of the chart. 
+ChartContainer will be responsible for creating a **ref**erence that will hold functions to handle the lifecycle of the chart.
 That reference will then be propagated down to the Series.
 
 The same technique will be used within the Series component to handle this time the lifecycle of any Series along with adding data to be plotted.
@@ -112,7 +121,7 @@ Moreover those 2 "main" components will "expose" whatever functions the user wan
 
 Here's a squeleton of what the final structure would be like:
 
-```js
+```
 MainComponent = (props) => {
 	// Creates the first reference and instanciate a ParentComponent
 	return (
@@ -124,10 +133,10 @@ MainComponent = (props) => {
 
 ParentComponent = forwardRef(props, ref) => {
 	const internalRef = useRef({
-		method_1() {
+		method1() {
 			// This function would be responsible for creating the chart for instance
 		},
-		method_n() {
+		methodn() {
 			// This function would be responsible for cleaning up the chart
 		}
 	});
@@ -162,10 +171,10 @@ ParentComponent = forwardRef(props, ref) => {
 
 ChildComponent = forwardRef(props, ref) => {
 	const internalRef = useRef({
-		method_1() {
+		method1() {
 			// This function would be responsible for creating a series
 		},
-		method_n() {
+		methodn() {
 			// This function would be responsible for removing it
 		}
 	});
@@ -202,13 +211,15 @@ ChildComponent = forwardRef(props, ref) => {
 By considering all the above you could end up with Chart/Series components looking like the following
 
 import CodeBlock from '@theme/CodeBlock';
-import Code from '!!raw-loader!./../../src/pages/_react/complex-example.jsx';
+import Code from '!!raw-loader!./../../src/pages/_react/advanced-react-example';
 
 <CodeBlock className="language-jsx">{Code}</CodeBlock>
 
 The code above will produce a Series of type `line` in a 600x400 Chart.
-Given a `series1` reference is created to be passed to the Series component you could reuse that object via `series1.context.[any function applicable on Series]`, for instance `series1.context.update(new data)`.
+Given a `series1` reference is created to be passed to the Series component you could reuse that object via `series1.current.[any function applicable on Series]`.
 
-import { App } from "../../src/pages/_react/complex-example"
+For instance and as shown below `series1.current.update(new data)` is used upon clicking on the button.
+
+import { App } from "../../src/pages/_react/advanced-react-example"
 
 <App/>

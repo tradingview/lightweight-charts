@@ -1,45 +1,32 @@
 import { createChart } from 'lightweight-charts';
-import React, { useEffect, useRef, useState } from 'react';
+// eslint-disable-next-line no-unused-vars
+import React, { useEffect, useRef } from 'react';
 
-export const ChartComponent = () => {
-	const chart = useRef();
+export const ChartComponent = props => {
 	const chartContainerRef = useRef();
 
-	const [series, setSeries] = useState();
-
-	const handleResize = () => {
-		chart.current.resize(400, 300);
-	};
-
 	useEffect(
 		() => {
-			if (chart.current !== undefined && chartContainerRef.current !== undefined && series !== undefined) {
-				series.setData(data);
-			}
-		},
-		[data, series]
-	);
+			const handleResize = () => {
+				chart.resize(400, 300);
+			};
 
-	useEffect(
-		() => {
-			chart.current = createChart(chartContainerRef.current, {
+			const chart = createChart(chartContainerRef.current, {
 				width: 400,
 				height: 300,
 			});
 
-			const newSeries = chart.current.addAreaSeries();
+			const newSeries = chart.addAreaSeries();
 			newSeries.setData(data);
-			setSeries(newSeries);
 
 			window.addEventListener('resize', handleResize);
 			return () => {
 				window.removeEventListener('resize', handleResize);
 
-				chart.current.remove();
-				chart.current = undefined;
+				chart.remove();
 			};
 		},
-		[data]
+		[props.data]
 	);
 
 	return (
