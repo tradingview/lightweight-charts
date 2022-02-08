@@ -56,7 +56,6 @@ function isScreenMinimumWidthForDisplayingChart(): boolean {
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const layout = useThemeAwareLayoutOptions();
-	const [isContainerVisible, setIsContainerVisible] = React.useState<boolean>(false);
 	const [chartContainerClassName, setChartContainerClassName] = React.useState<string>(styles.HeroChartContainer);
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
@@ -67,14 +66,6 @@ function HeroChart(): JSX.Element {
 			if (!container) {
 				return;
 			}
-
-			const observer = new IntersectionObserver(
-				([entry]: IntersectionObserverEntry[]) => {
-					return setIsContainerVisible(entry.isIntersecting);
-				}
-			);
-
-			observer.observe(container);
 
 			const c = createChart(container, {
 				layout,
@@ -121,7 +112,6 @@ function HeroChart(): JSX.Element {
 			setChart(c);
 
 			return () => {
-				observer.disconnect();
 				c.remove();
 				setChart(null);
 			};
@@ -153,7 +143,7 @@ function HeroChart(): JSX.Element {
 				window.removeEventListener('resize', resizeListener);
 			};
 		},
-		[chart, isContainerVisible]
+		[chart]
 	);
 
 	React.useEffect(
