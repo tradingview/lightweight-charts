@@ -38,6 +38,8 @@
 	--ifm-color-primary-lightest: var(--color-tv-blue-200);
 	--ifm-code-font-size: 95%;
 	--ifm-navbar-padding-horizontal: 32px;
+	--ifm-footer-padding-horizontal: 20px;
+	--ifm-footer-padding-vertical: 48px;
 	--ifm-footer-background-color: var(--color-white);
 	--ifm-footer-link-color: var(--color-black);
 	--ifm-menu-color: var(--color-cold-gray-200);
@@ -54,6 +56,9 @@
 	--large-card-paragraph-text-color: var(--color-cold-gray-500);
 	--hero-button-border-color: var(--color-cold-gray-150);
 	--footer-border-color: var(--color-cold-gray-150);
+	--footer-copyright-color: var(--color-cold-gray-500);
+	/* --footer-padding-horizontal: 20px; */
+	--footer-links-padding-horizontal: 0px;
 	--navbar-border-color: var(--color-cold-gray-150);
 	--menu-item-background-hover: var(--color-cold-gray-50);
 	--menu-item-text-color: var(--color-gold-gray-900);
@@ -150,4 +155,73 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 .footer {
 	border-top: 1px solid var(--footer-border-color);
+}
+
+.footer .container {
+	margin: 0;
+	max-width: unset;
+	padding: 0;
+}
+
+.footer__links {
+	justify-content: space-between;
+	padding: 0 var(--footer-links-padding-horizontal);
+	margin: 0;
+}
+
+.footer__title {
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 600;
+	line-height: 24px;
+	letter-spacing: 0em;
+	text-align: left;
+}
+
+.footer__items {
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 18px;
+	letter-spacing: 0em;
+	text-align: left;
+}
+
+.col.footer__col {
+	--ifm-col-width: unset;
+	flex: 0 1 auto;
+	width: unset;
+	max-width: unset;
+}
+
+.footer__copyright {
+	padding-top: 24px;
+	color: var(--footer-copyright-color)
+}
+
+@media (min-width: 767.5px) {
+	.footer {
+		/* --footer-links-padding-horizontal: 0px; */
+		--ifm-footer-padding-horizontal: 40px;
+	}
+
+	.footer__links {
+		flex-wrap: nowrap;
+	}
+
+	.row .col.col.col {
+		--ifm-col-width: unset;
+	}
+}
+
+@media (min-width: 1279.5px) {
+	.footer {
+		--footer-links-padding-horizontal: 80px;
+	}
+}
+
+@media (min-width: 1919.5px) {
+	.footer {
+		--footer-links-padding-horizontal: 240px;
+	}
 }
