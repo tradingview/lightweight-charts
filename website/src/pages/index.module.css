@@ -344,8 +344,11 @@
 		display: unset;
 		height: 600px;
 		width: 100%;
+	}
 
-		animation: fadein 1s;
+	.HeroChartAnimation {
+		animation: fadein 1s ease-in-out;
+		animation-iteration-count: 1;
 	}
 
 	@keyframes fadein {

@@ -49,10 +49,15 @@ function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
 	return layoutOptions;
 }
 
+function isScreenMinimumWidthForDisplayingChart(): boolean {
+	return window.matchMedia('screen and (min-width: 1279.5px)').matches;
+}
+
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const layout = useThemeAwareLayoutOptions();
 	const [isContainerVisible, setIsContainerVisible] = React.useState<boolean>(false);
+	const [chartContainerClassName, setChartContainerClassName] = React.useState<string>(styles.HeroChartContainer);
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
 	React.useEffect(
@@ -109,6 +114,10 @@ function HeroChart(): JSX.Element {
 
 			c.timeScale().setVisibleLogicalRange(visibleLogicalRange);
 
+			if (isScreenMinimumWidthForDisplayingChart()) {
+				setChartContainerClassName(`${styles.HeroChartContainer} ${styles.HeroChartAnimation}`);
+			}
+
 			setChart(c);
 
 			return () => {
@@ -129,8 +138,7 @@ function HeroChart(): JSX.Element {
 			const container = ref.current;
 
 			const resizeListener = () => {
-				const matchList = window.matchMedia('screen and (min-width: 1279.5px)');
-				if (!matchList.matches) {
+				if (!isScreenMinimumWidthForDisplayingChart()) {
 					return;
 				}
 
@@ -160,7 +168,7 @@ function HeroChart(): JSX.Element {
 	);
 
 	return (
-		<div className={styles.HeroChartContainer} ref={ref}></div>
+		<div className={chartContainerClassName} ref={ref}></div>
 	);
 }
 
