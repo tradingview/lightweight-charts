@@ -184,19 +184,25 @@ function Index(): JSX.Element {
 		<div className={styles.LargeCardContainer}>
 			<div className={[styles.LargeCard, styles.LargeCard1].join(' ')}>
 				<Speedometer />
-				<h2>High Performance</h2>
+				<div className={styles.LargeCardInnerSpacer1} />
+				<h2>High-performance</h2>
+				<div className={styles.LargeCardInnerSpacer2} />
 				<p>Our charting solutions were engineered from the start to work with huge data arrays. Charts stay responsive and nimble even with thousands of bars even with updates multiple times per second with new ticks.</p>
 			</div>
 			<div className={styles.LargeCardSpacer} />
 			<div className={[styles.LargeCard, styles.LargeCard2].join(' ')}>
 				<Screens />
+				<div className={styles.LargeCardInnerSpacer1} />
 				<h2>Interactive, responsive and mobile-friendly</h2>
+				<div className={styles.LargeCardInnerSpacer2} />
 				<p>Intelligently adapts to any device. Charts are carefully engineered for best interactivity, both for powerful desktops with a mouse, and touch-optimized for tablets and phones.</p>
 			</div>
 			<div className={[styles.LargeCardSpacer, styles.LargeCardSpacer2].join(' ')} />
 			<div className={[styles.LargeCard, styles.LargeCard3].join(' ')}>
 				<TradingviewHeart />
+				<div className={styles.LargeCardInnerSpacer1} />
 				<h2>Finance is at the heart</h2>
+				<div className={styles.LargeCardInnerSpacer2} />
 				<p>Charting is our core. TradingView charts are used by tens of thousands of websites, apps and financial portals, as well as millions of traders around the world. You can be sure that we&apos;ve included everything you need, starting from popular chart types to advanced price scaling.</p>
 			</div>
 		</div>

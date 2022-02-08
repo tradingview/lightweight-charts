@@ -57,7 +57,6 @@
 	--hero-button-border-color: var(--color-cold-gray-150);
 	--footer-border-color: var(--color-cold-gray-150);
 	--footer-copyright-color: var(--color-cold-gray-500);
-	/* --footer-padding-horizontal: 20px; */
 	--footer-links-padding-horizontal: 0px;
 	--navbar-border-color: var(--color-cold-gray-150);
 	--menu-item-background-hover: var(--color-cold-gray-50);
@@ -183,7 +182,7 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	font-style: normal;
 	font-weight: 400;
 	line-height: 18px;
-	letter-spacing: 0em;
+	letter-spacing: -0.03em;
 	text-align: left;
 }
 
@@ -201,7 +200,6 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 @media (min-width: 767.5px) {
 	.footer {
-		/* --footer-links-padding-horizontal: 0px; */
 		--ifm-footer-padding-horizontal: 40px;
 	}
 
