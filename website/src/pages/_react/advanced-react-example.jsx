@@ -149,7 +149,7 @@ export const Series = forwardRef((props, ref) => {
 		// eslint-disable-next-line no-unused-vars
 		const { chilren, data, ...rest } = props;
 		currentRef.api().applyOptions(rest);
-	}, []);
+	});
 
 	useImperativeHandle(ref, () => context.current.api(), []);
 
