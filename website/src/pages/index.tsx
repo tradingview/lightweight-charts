@@ -177,7 +177,7 @@ function Index(): JSX.Element {
 				</div>
 			</div>
 		</div>
-		<div className={styles.RootSpacerInner} />
+		<div className={styles.RootSpacerOuter} />
 		<div className={styles.LargeTextContainer}>
 			<h1>Fully customizable & free charts that don&apos;t contain hidden ads</h1>
 			<p>Millions of websites still use static pictures for showing financial charts. The old way is not interactive and doesn&apos;t scale with various devices. Pictures always had a huge advantage of their small size and fast loading — but no more!</p>
