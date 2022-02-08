@@ -88,6 +88,16 @@ html[data-theme=dark] {
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
 }
 
+html[data-theme=light] .DocSearch {
+	--docsearch-searchbox-background: var(--color-cold-gray-100);
+	--docsearch-searchbox-focus-background: var(--color-cold-gray-50);
+}
+
+html[data-theme=dark] .DocSearch {
+	--docsearch-searchbox-background: var(--color-cold-gray-800);
+	--docsearch-searchbox-focus-background: var(--color-cold-gray-850);
+}
+
 .docusaurus-highlight-code-line {
 	background-color: var(--color-black);
 	display: block;
@@ -132,6 +142,10 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 .menu__link:hover {
 	color: inherit;
+}
+
+.DocSearch-Button {
+	background: var(--docsearch-searchbox-background);
 }
 
 .footer {
