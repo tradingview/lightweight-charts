@@ -1,5 +1,3 @@
-import { drawScaled } from '../helpers/canvas-helpers';
-
 import { TextWidthCache } from '../model/text-width-cache';
 
 import { CanvasRenderingTarget } from './canvas-rendering-target';
@@ -124,11 +122,10 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				ctx.fillRect(xInsideScaled, yMidScaled, xTickScaled - xInsideScaled, tickHeight);
 			}
 
-			ctx.textAlign = 'left';
-			ctx.fillStyle = this._commonData.color;
-
-			drawScaled(ctx, horizontalPixelRatio, verticalPixelRatio, () => {
-				ctx.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
+			target.useCanvasElementCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
+				context.textAlign = 'left';
+				context.fillStyle = this._commonData.color;
+				context.fillText(text, xText, yBottom - paddingBottom - baselineOffset);
 			});
 
 			ctx.restore();

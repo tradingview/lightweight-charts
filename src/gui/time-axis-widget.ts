@@ -1,6 +1,6 @@
 import { CanvasElementBitmapSizeBinding, equalSizes, Size, size } from 'fancy-canvas';
 
-import { clearRect, drawScaled } from '../helpers/canvas-helpers';
+import { clearRect } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -347,22 +347,22 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			ctx.fill();
 		}
 
-		ctx.fillStyle = this._textColor();
+		target.useCanvasElementCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
+			context.fillStyle = this._textColor();
 
-		drawScaled(ctx, horizontalPixelRatio, verticalPixelRatio, () => {
 			// draw base marks
-			ctx.font = this._baseFont();
+			context.font = this._baseFont();
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight < maxWeight) {
-					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
-					ctx.fillText(tickMark.label, coordinate, yText);
+					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(context, tickMark.coord, tickMark.label) : tickMark.coord;
+					context.fillText(tickMark.label, coordinate, yText);
 				}
 			}
-			ctx.font = this._baseBoldFont();
+			context.font = this._baseBoldFont();
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight >= maxWeight) {
-					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
-					ctx.fillText(tickMark.label, coordinate, yText);
+					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(context, tickMark.coord, tickMark.label) : tickMark.coord;
+					context.fillText(tickMark.label, coordinate, yText);
 				}
 			}
 		});

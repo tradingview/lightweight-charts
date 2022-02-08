@@ -3,6 +3,11 @@ import { CanvasElementBitmapSizeBinding, Size } from 'fancy-canvas';
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 
+export interface CanvasElementCoordsRenderingScope {
+	context: CanvasRenderingContext2D;
+	canvasElementClientSize: Size;
+}
+
 export class CanvasRenderingTarget implements IDestroyable {
 	public readonly canvasElementClientSize: Size;
 	public readonly bitmapSize: Size;
@@ -45,6 +50,17 @@ export class CanvasRenderingTarget implements IDestroyable {
 
 	public get verticalPixelRatio(): number {
 		return this.bitmapSize.height / this.canvasElementClientSize.height;
+	}
+
+	public useCanvasElementCoordinates<T>(f: (scope: CanvasElementCoordsRenderingScope) => T): T {
+		if (this._context === null) {
+			throw new Error('Object is disposed');
+		}
+		this._context.save();
+		this._context.scale(this.horizontalPixelRatio, this.verticalPixelRatio);
+		const result = f({ context: this._context, canvasElementClientSize: this.canvasElementClientSize });
+		this._context.restore();
+		return result;
 	}
 }
 

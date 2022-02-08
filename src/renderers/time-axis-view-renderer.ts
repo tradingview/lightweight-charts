@@ -1,5 +1,4 @@
 import { ensureNotNull } from '../helpers/assertions';
-import { drawScaled } from '../helpers/canvas-helpers';
 
 import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { ITimeAxisViewRenderer, TimeAxisViewRendererOptions } from './itime-axis-view-renderer';
@@ -85,12 +84,12 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
 		ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
 
-		const yText = y2 - rendererOptions.baselineOffset - rendererOptions.paddingBottom;
-		ctx.textAlign = 'left';
-		ctx.fillStyle = this._data.color;
-
-		drawScaled(ctx, horizontalPixelRatio, verticalPixelRatio, () => {
-			ctx.fillText(ensureNotNull(this._data).text, x1 + horzMargin, yText);
+		target.useCanvasElementCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
+			const data = ensureNotNull(this._data);
+			const yText = y2 - rendererOptions.baselineOffset - rendererOptions.paddingBottom;
+			context.textAlign = 'left';
+			context.fillStyle = data.color;
+			context.fillText(data.text, x1 + horzMargin, yText);
 		});
 
 		ctx.restore();

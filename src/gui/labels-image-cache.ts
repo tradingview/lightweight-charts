@@ -3,7 +3,6 @@ import { size } from 'fancy-canvas';
 import { createPreconfiguredCanvas } from '../gui/canvas-utils';
 
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
-import { drawScaled } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 import { ceiledEven } from '../helpers/mathex';
@@ -93,9 +92,9 @@ export class LabelsImageCache implements IDestroyable {
 			const ctx = ensureNotNull(item.canvas.getContext('2d'));
 			ctx.font = this._font;
 			ctx.fillStyle = this._color;
-			drawScaled(ctx, target.horizontalPixelRatio, target.verticalPixelRatio, () => {
-				ctx.fillText(text, 0, boxHeight - margin - baselineOffset);
-			});
+			ctx.scale(target.horizontalPixelRatio, target.verticalPixelRatio);
+			ctx.fillText(text, 0, boxHeight - margin - baselineOffset);
+			ctx.setTransform(1, 0, 0, 1, 0, 0);
 		}
 
 		return item;
