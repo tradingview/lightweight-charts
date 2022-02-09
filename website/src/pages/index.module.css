@@ -90,7 +90,7 @@
 }
 
 .HeroButton:active {
-	background: rgba(224, 227, 235, 1);
+	background: var(--hero-button-hackground-color-active);
 }
 
 .HeroButtonPrimary {
