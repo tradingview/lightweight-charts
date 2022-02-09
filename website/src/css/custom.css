@@ -170,7 +170,6 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 }
 
 .col.footer__col {
-	--ifm-col-width: unset;
 	flex: 0 1 auto;
 	width: unset;
 	max-width: unset;
@@ -187,13 +186,20 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	}
 }
 
+@media (max-width: 767.5px) {
+	.row .col.col.col {
+		flex-basis: 100%;
+	}
+}
+
+/* Required to properly override docusaurus styles */ 
 @media (max-width: 996px) {
 	.footer {
 		--ifm-footer-padding-horizontal: 40px;
 	}
 
 	.row .col.col.col {
-		--ifm-col-width: unset;
+		flex-basis: auto;
 	}
 }
 
