@@ -124,6 +124,11 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 .menu__link--active:hover {
 	background: var(--ifm-menu-color-background-hover);
+	color: inherit;
+}
+
+.menu__link--active {
+	color: inherit;
 }
 
 .DocSearch-Button {
