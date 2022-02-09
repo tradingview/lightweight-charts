@@ -44,7 +44,7 @@
 	--ifm-footer-link-color: var(--color-black);
 	--ifm-menu-color: var(--color-cold-gray-900);
 	--ifm-menu-color-background-active: var(--color-cold-gray-100);
-	--ifm-menu-color-background-hover: var(--color-cold-gray-200);
+	--ifm-menu-color-background-hover: var(--color-cold-gray-150);
 	--ifm-menu-link-padding-horizontal: 24px;
 
 	--small-card-border-color: var(--color-cold-gray-150);
@@ -60,8 +60,6 @@
 	--footer-copyright-color: var(--color-cold-gray-500);
 	--footer-links-padding-horizontal: 0px;
 	--navbar-border-color: var(--color-cold-gray-150);
-	--menu-item-background-hover: var(--color-cold-gray-50);
-	--menu-item-text-color: var(--color-gold-gray-900);
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-light.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-light.svg');
@@ -73,8 +71,8 @@ html[data-theme=dark] {
 	--ifm-background-color: var(--color-black);	
 	--ifm-footer-link-color: var(--color-cold-gray-200);
 	--ifm-menu-color: var(--color-cold-gray-200);
-	--ifm-menu-color-background-active: var(--color-cold-gray-800);
-	--ifm-menu-color-background-hover: var(--color-cold-gray-700);
+	--ifm-menu-color-background-active: var(--color-cold-gray-900);
+	--ifm-menu-color-background-hover: var(--color-cold-gray-800);
 
 	--small-card-border-color: var(--color-cold-gray-850);
 	--card-background-color: var(--color-cold-gray-900);
@@ -87,8 +85,7 @@ html[data-theme=dark] {
 	--hero-button-border-color: var(--color-cold-gray-700);
 	--footer-border-color: var(--color-cold-gray-700);
 	--navbar-border-color: var(--color-cold-gray-700);
-	--menu-item-background-hover: var(--color-cold-gray-850);
-	--menu-item-text-color: var(--color-gold-gray-200);
+	--menu-item-background-hover: var(--color-cold-gray-800);
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-dark.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
@@ -125,20 +122,7 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	--color: var(--icon-color);
 }
 
-.menu {
-	color: var(--menu-item-text-color);
-}
-
-.menu__link {
-	color: var(--menu-item-text-color);
-}
-
-.menu__link--active {
-	color: var(--menu-item-text-color);
-}
-
 .menu__link--active:hover {
-	color: var(--menu-item-text-color);
 	background: var(--ifm-menu-color-background-hover);
 }
 
@@ -196,15 +180,15 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	.footer__links {
 		flex-wrap: nowrap;
 	}
-
-	.row .col.col.col {
-		--ifm-col-width: unset;
-	}
 }
 
 @media (max-width: 996px) {
 	.footer {
 		--ifm-footer-padding-horizontal: 40px;
+	}
+
+	.row .col.col.col {
+		--ifm-col-width: unset;
 	}
 }
 
