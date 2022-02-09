@@ -71,7 +71,7 @@ html[data-theme=dark] {
 	--ifm-background-color: var(--color-black);	
 	--ifm-footer-link-color: var(--color-cold-gray-200);
 	--ifm-menu-color: var(--color-cold-gray-200);
-	--ifm-menu-color-background-active: var(--color-cold-gray-900);
+	--ifm-menu-color-background-active: var(--color-cold-gray-850);
 	--ifm-menu-color-background-hover: var(--color-cold-gray-800);
 
 	--small-card-border-color: var(--color-cold-gray-850);
