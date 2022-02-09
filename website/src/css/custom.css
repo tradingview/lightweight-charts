@@ -193,16 +193,18 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 }
 
 @media (min-width: 767.5px) {
-	.footer {
-		--ifm-footer-padding-horizontal: 40px;
-	}
-
 	.footer__links {
 		flex-wrap: nowrap;
 	}
 
 	.row .col.col.col {
 		--ifm-col-width: unset;
+	}
+}
+
+@media (max-width: 996px) {
+	.footer {
+		--ifm-footer-padding-horizontal: 40px;
 	}
 }
 
