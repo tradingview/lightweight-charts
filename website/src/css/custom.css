@@ -42,9 +42,10 @@
 	--ifm-footer-padding-vertical: 48px;
 	--ifm-footer-background-color: var(--color-white);
 	--ifm-footer-link-color: var(--color-black);
-	--ifm-menu-color: var(--color-cold-gray-200);
+	--ifm-menu-color: var(--color-cold-gray-900);
 	--ifm-menu-color-background-active: var(--color-cold-gray-100);
-	--ifm-menu-color-background-hover: var(--color-cold-gray-150);
+	--ifm-menu-color-background-hover: var(--color-cold-gray-200);
+	--ifm-menu-link-padding-horizontal: 24px;
 
 	--small-card-border-color: var(--color-cold-gray-150);
 	--card-background-color: var(--color-cold-gray-100);
@@ -67,6 +68,14 @@
 }
 
 html[data-theme=dark] {
+	--ifm-navbar-background-color: var(--color-black);
+	--ifm-footer-background-color: var(--color-black);
+	--ifm-background-color: var(--color-black);	
+	--ifm-footer-link-color: var(--color-cold-gray-200);
+	--ifm-menu-color: var(--color-cold-gray-200);
+	--ifm-menu-color-background-active: var(--color-cold-gray-800);
+	--ifm-menu-color-background-hover: var(--color-cold-gray-700);
+
 	--small-card-border-color: var(--color-cold-gray-850);
 	--card-background-color: var(--color-cold-gray-900);
 	--card-paragraph-color: var(--color-cold-gray-300);
@@ -80,13 +89,6 @@ html[data-theme=dark] {
 	--navbar-border-color: var(--color-cold-gray-700);
 	--menu-item-background-hover: var(--color-cold-gray-850);
 	--menu-item-text-color: var(--color-gold-gray-200);
-
-	--ifm-navbar-background-color: var(--color-black);
-	--ifm-footer-background-color: var(--color-black);
-	--ifm-background-color: var(--color-black);
-	--ifm-footer-link-color: var(--color-cold-gray-200);
-	--ifm-menu-color: var(--color-cold-gray-900);
-	--ifm-menu-color: var(--color-cold-gray-900);
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-dark.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
@@ -127,25 +129,17 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	color: var(--menu-item-text-color);
 }
 
-.theme-doc-sidebar-container .menu {
-	padding: 0;
-}
-
-.menu__list .menu__list {
-	margin: 0;
-}
-
-.menu__list-item:not(:first-child) {
-	margin: 0;
-}
-
 .menu__link {
 	color: var(--menu-item-text-color);
-	padding: 12px 24px;
 }
 
-.menu__link:hover {
-	color: inherit;
+.menu__link--active {
+	color: var(--menu-item-text-color);
+}
+
+.menu__link--active:hover {
+	color: var(--menu-item-text-color);
+	background: var(--ifm-menu-color-background-hover);
 }
 
 .DocSearch-Button {
