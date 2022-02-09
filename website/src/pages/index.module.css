@@ -382,7 +382,6 @@
 
 	.HeroChartAnimation {
 		animation: fadein 1s ease-in-out;
-		animation-iteration-count: 1;
 	}
 
 	@keyframes fadein {

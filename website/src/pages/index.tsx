@@ -129,6 +129,7 @@ function HeroChart(): JSX.Element {
 
 			const resizeListener = () => {
 				if (!isScreenMinimumWidthForDisplayingChart()) {
+					setChartContainerClassName(styles.HeroChartContainer);
 					return;
 				}
 
