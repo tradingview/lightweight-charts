@@ -144,6 +144,12 @@ const config = {
 					},
 					{
 						type: 'doc',
+						docId: 'tutorials/index',
+						position: 'left',
+						label: 'Tutorials',
+					},
+					{
+						type: 'doc',
 						docId: 'api/index',
 						position: 'left',
 						label: 'API Reference',
@@ -174,6 +180,10 @@ const config = {
 							{
 								label: 'Getting Started',
 								to: '/docs',
+							},
+							{
+								label: 'Tutorials',
+								to: '/docs/tutorials',
 							},
 							{
 								label: 'API Reference',

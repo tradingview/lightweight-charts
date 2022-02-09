@@ -1,5 +1,4 @@
 import { createChart } from 'lightweight-charts';
-// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useRef } from 'react';
 
 export const ChartComponent = props => {
@@ -8,13 +7,14 @@ export const ChartComponent = props => {
 	useEffect(
 		() => {
 			const handleResize = () => {
-				chart.resize(400, 300);
+				chart.applyOptions({ width: chartContainerRef.current.clientWidth });
 			};
 
 			const chart = createChart(chartContainerRef.current, {
-				width: 400,
+				width: chartContainerRef.current.clientWidth,
 				height: 300,
 			});
+			chart.timeScale().fitContent();
 
 			const newSeries = chart.addAreaSeries();
 			newSeries.setData(data);

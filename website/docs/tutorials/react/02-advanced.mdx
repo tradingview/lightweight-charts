@@ -1,14 +1,15 @@
 ---
-id: advanced-react-example
-title: How to wrap Lightweight Charts into parent/children components
-sidebar_position: 1
+sidebar_label: 'Advanced example'
+hide_table_of_contents: true
 ---
+
+# React - Advanced example
 
 :::info
 
 The following describes a more complex scenario where a user could imagine splitting the responsibilities of the chart between components.
 
-If you want to consult a simpler approach please consult this [example](simple-react-example).
+If you want to consult a simpler approach please consult this [example](./simple).
 
 :::
 
@@ -16,12 +17,12 @@ If you want to consult a simpler approach please consult this [example](simple-r
 
 By following the steps below we assume you're familiar with Lightweight Charts, how to set up a project using it and how to render a chart.
 
-If not, please follow this [guide](./simple-react-example).
+If not, please follow this [guide](./simple).
 
 :::
 
-If you're familiar with Lightweight Charts you probably already know that a _Chart_ is a container that can contain one or more [_Series_](../series-types.md).
-Each _Series_ has its own options (for instance [AreaStyleOptions](/api/interfaces/AreaStyleOptions.md), [LineStyleOptions](/api/interfaces/LineStyleOptions.md), etc) in addition to [price](../price-scale.md) and/or [time](../time-scale.md) scale.
+If you're familiar with Lightweight Charts you probably already know that a _Chart_ is a container that can contain one or more [_Series_](../../series-types.md).
+Each _Series_ has its own options (for instance [AreaStyleOptions](/api/interfaces/AreaStyleOptions.md), [LineStyleOptions](/api/interfaces/LineStyleOptions.md), etc) in addition to [price](../../price-scale.md) and/or [time](../../time-scale.md) scale.
 
 Based on this principle, one could easily imagine having a main component _Chart_ that could have some _Series_ children that could themselves have other children and so on.
 Therefore the structure could become something like
@@ -211,7 +212,7 @@ ChildComponent = forwardRef(props, ref) => {
 By considering all the above you could end up with Chart/Series components looking like the following
 
 import CodeBlock from '@theme/CodeBlock';
-import Code from '!!raw-loader!./../../src/pages/_react/advanced-react-example';
+import Code from '!!raw-loader!@site/src/pages/_react/advanced-react-example';
 
 <CodeBlock className="language-jsx">{Code}</CodeBlock>
 
@@ -220,6 +221,6 @@ Given a `series1` reference is created to be passed to the Series component you 
 
 For instance and as shown below `series1.current.update(new data)` is used upon clicking on the button.
 
-import { App } from "../../src/pages/_react/advanced-react-example"
+import { App } from "@site/src/pages/_react/advanced-react-example"
 
 <App/>

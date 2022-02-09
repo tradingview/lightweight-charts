@@ -128,7 +128,7 @@ module.exports = {
 				'no-unused-expressions': 'error',
 
 				// disallow declaration of variables that are not used in the code
-				'no-unused-vars': ['error', { vars: 'local', args: 'none' }],
+				'no-unused-vars': ['error', { vars: 'local', args: 'none', ignoreRestSiblings: true }],
 
 				// specify whether double or single quotes should be used
 				quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
