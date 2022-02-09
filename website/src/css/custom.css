@@ -46,6 +46,7 @@
 	--ifm-menu-color-background-active: var(--color-cold-gray-100);
 	--ifm-menu-color-background-hover: var(--color-cold-gray-150);
 	--ifm-menu-link-padding-horizontal: 24px;
+	--ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, SegoeUI, Ubuntu, sans-serif;
 
 	--small-card-border-color: var(--color-cold-gray-150);
 	--card-background-color: var(--color-cold-gray-100);
