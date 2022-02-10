@@ -53,7 +53,7 @@ export const App = () => {
 			<button type="button" onClick={() => setStarted(current => !current)}>
 				{started ? 'Stop updating' : 'Start updating series'}
 			</button>
-			<Chart width={600} height={400}>
+			<Chart>
 				<Series
 					ref={series1}
 					type={'line'}
@@ -79,7 +79,11 @@ export const ChartContainer = forwardRef((props, ref) => {
 		api() {
 			if (!this._api) {
 				const { children, container, ...rest } = props;
-				this._api = createChart(container, rest);
+				this._api = createChart(container, {
+					...rest,
+					width: container.clientWidth,
+					height: 300,
+				});
 				this._api.timeScale().fitContent();
 			}
 			return this._api;
@@ -90,6 +94,26 @@ export const ChartContainer = forwardRef((props, ref) => {
 			}
 		},
 	});
+
+	useLayoutEffect(() => {
+		const { children, container, ...rest } = props;
+
+		const currentRef = context.current;
+		const chart = currentRef.api();
+
+		const handleResize = () => {
+			chart.applyOptions({
+				...rest,
+				width: container.clientWidth,
+			});
+		};
+
+		window.addEventListener('resize', handleResize);
+		return () => {
+			window.removeEventListener('resize', handleResize);
+			chart.remove();
+		};
+	}, []);
 
 	useLayoutEffect(() => {
 		const currentRef = context.current;
