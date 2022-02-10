@@ -5,6 +5,10 @@ import React, { ComponentPropsWithoutRef } from 'react';
 
 import styles from './index.module.css';
 
+function isScreenMobile(): boolean {
+	return window.matchMedia('screen and (min-width: 1279.5px)').matches;
+}
+
 export interface LogoProps extends ComponentPropsWithoutRef<'a'> {
 	readonly imageClassName?: string;
 	readonly titleClassName?: string;
@@ -20,6 +24,7 @@ function Logo(props: LogoProps): JSX.Element {
 		},
 	} = useThemeConfig();
 	const logoLink = useBaseUrl(logo.href || '/');
+
 	return (
 		<Link to={logoLink} {...propsRest}>
 			<div className={styles.Logo} />

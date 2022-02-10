@@ -176,69 +176,56 @@ function Index(): JSX.Element {
 				</div>
 			</div>
 		</div>
-		<div className={styles.RootSpacerOuter} />
-		<div className={styles.LargeTextContainer}>
-			<h1>Fully customizable & free charts that don&apos;t contain hidden ads</h1>
-			<p>Millions of websites still use static pictures for showing financial charts. The old way is not interactive and doesn&apos;t scale with various devices. Pictures always had a huge advantage of their small size and fast loading — but no more!</p>
-		</div>
-		<div className={styles.RootSpacerInner} />
-		<div className={styles.LargeCardContainer}>
-			<div className={[styles.LargeCard, styles.LargeCard1].join(' ')}>
-				<Speedometer />
-				<div className={styles.LargeCardInnerSpacer1} />
-				<h2>High-performance</h2>
-				<div className={styles.LargeCardInnerSpacer2} />
-				<p>Our charting solutions were engineered from the start to work with huge data arrays. Charts stay responsive and nimble even with thousands of bars even with updates multiple times per second with new ticks.</p>
+		<div className={styles.BelowChartContainer}>
+			<div className={styles.LargeTextContainer}>
+				<h1>Fully customizable & free charts that don&apos;t contain hidden ads</h1>
+				<div>Millions of websites still use static pictures for showing financial charts. The old way is not interactive and doesn&apos;t scale with various devices. Pictures always had a huge advantage of their small size and fast loading&nbsp;—&nbsp;but no more!</div>
 			</div>
-			<div className={styles.LargeCardSpacer} />
-			<div className={[styles.LargeCard, styles.LargeCard2].join(' ')}>
-				<Screens />
-				<div className={styles.LargeCardInnerSpacer1} />
-				<h2>Interactive, responsive and mobile-friendly</h2>
-				<div className={styles.LargeCardInnerSpacer2} />
-				<p>Intelligently adapts to any device. Charts are carefully engineered for best interactivity, both for powerful desktops with a mouse, and touch-optimized for tablets and phones.</p>
+			<div className={styles.LargeCardContainer}>
+				<div className={[styles.LargeCard, styles.LargeCard1].join(' ')}>
+					<Speedometer />
+					<div className={styles.LargeCardInnerSpacer1} />
+					<h2>High-performance</h2>
+					<div className={styles.LargeCardInnerSpacer2} />
+					<p>Our charting solutions were engineered from the start to work with huge data arrays. Charts stay responsive and nimble even with thousands of bars even with updates multiple times per second with new ticks.</p>
+				</div>
+				<div className={[styles.LargeCard, styles.LargeCard2].join(' ')}>
+					<Screens />
+					<h2>Interactive, responsive and mobile-friendly</h2>
+					<div className={styles.LargeCardInnerSpacer2} />
+					<p>Intelligently adapts to any device. Charts are carefully engineered for best interactivity, both for powerful desktops with a mouse, and touch-optimized for tablets and phones.</p>
+				</div>
+				<div className={[styles.LargeCard, styles.LargeCard3].join(' ')}>
+					<TradingviewHeart />
+					<div className={styles.LargeCardInnerSpacer1} />
+					<h2>Finance is at the heart</h2>
+					<div className={styles.LargeCardInnerSpacer2} />
+					<p>Charting is our core. TradingView charts are used by tens of thousands of websites, apps and financial portals, as well as millions of traders around the world. You can be sure that we&apos;ve included everything you need, starting from popular chart types to advanced price scaling.</p>
+				</div>
 			</div>
-			<div className={[styles.LargeCardSpacer, styles.LargeCardSpacer2].join(' ')} />
-			<div className={[styles.LargeCard, styles.LargeCard3].join(' ')}>
-				<TradingviewHeart />
-				<div className={styles.LargeCardInnerSpacer1} />
-				<h2>Finance is at the heart</h2>
-				<div className={styles.LargeCardInnerSpacer2} />
-				<p>Charting is our core. TradingView charts are used by tens of thousands of websites, apps and financial portals, as well as millions of traders around the world. You can be sure that we&apos;ve included everything you need, starting from popular chart types to advanced price scaling.</p>
-			</div>
-		</div>
-		<div className={styles.RootSpacerInner} />
-		<div className={styles.SmallCardContainer}>
-			<div className={[styles.SmallCard, styles.SmallCard1].join(' ')}>
-				<Cog />
-				<div className={styles.SmallCardInnerSpacer1} />
-				<h3>Integrating & connecting any data is quick and easy</h3>
-				<div className={styles.SmallCardInnerSpacer2} />
-				<p>Built for developers, by developers. Charts are rich in features and easy to integrate — so you can integrate with a breeze.</p>
-			</div>
-			<div className={[styles.SmallCard, styles.SmallCard2].join(' ')}>
-				<Paperplane />
-				<div className={styles.SmallCardInnerSpacer1} />
-				<h3>Ultra lightweight - just {size} Kb</h3>
-				<div className={styles.SmallCardInnerSpacer2} />
-				<p>HTML5 Canvas technology no larger than a standard GIF file.</p>
-			</div>
-			<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
-				<InputSliders />
-				<div className={styles.SmallCardInnerSpacer1} />
-				<h3>Open-source </h3>
-				<div className={styles.SmallCardInnerSpacer2} />
-				<p>Fully customizable & free charts that don&apos;t contain hidden ads. Contributions are welcome!</p>
-			</div>
-			<div className={[styles.SmallCard, styles.SmallCard4].join(' ')}>
-				<Shapes />
-				<div className={styles.SmallCardInnerSpacer1} />
-				<h3>Flexible styling</h3>
-				<div className={styles.SmallCardInnerSpacer2} />
-				<p>Change the standard look & feel to match your style with perfection. There are many premade examples that you can copy & paste.</p>
+			<div className={styles.SmallCardContainer}>
+				<div className={[styles.SmallCard, styles.SmallCard1].join(' ')}>
+					<Cog />
+					<h3>Integrating & connecting any data is quick and easy</h3>
+					<p>Built for developers, by developers. Charts are rich in features and easy to integrate — so you can integrate with a breeze.</p>
+				</div>
+				<div className={[styles.SmallCard, styles.SmallCard2].join(' ')}>
+					<Paperplane />
+					<h3>Ultra lightweight - just 40 Kb</h3>
+					<p>HTML5 Canvas technology no larger than a standard GIF file.</p>
+				</div>
+				<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
+					<InputSliders />
+					<h3>Open-source </h3>
+					<p>Fully customizable & free charts that don&apos;t contain hidden ads. Contributions are welcome!</p>
+				</div>
+				<div className={[styles.SmallCard, styles.SmallCard4].join(' ')}>
+					<Shapes />
+					<h3>Flexible styling</h3>
+					<p>Change the standard look & feel to match your style with perfection. There are many premade examples that you can copy & paste.</p>
+				</div>
 			</div>
 		</div>
-		<div className={styles.RootSpacerOuter} />
 	</div>;
 }
 

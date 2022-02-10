@@ -36,32 +36,38 @@
 	--ifm-color-primary-light: var(--color-tv-blue-400);
 	--ifm-color-primary-lighter: var(--color-tv-blue-300);
 	--ifm-color-primary-lightest: var(--color-tv-blue-200);
-	--ifm-code-font-size: 95%;
 	--ifm-navbar-padding-horizontal: 32px;
 	--ifm-footer-padding-horizontal: 20px;
 	--ifm-footer-padding-vertical: 48px;
 	--ifm-footer-background-color: var(--color-white);
 	--ifm-footer-link-color: var(--color-black);
 	--ifm-menu-color: var(--color-cold-gray-900);
-	--ifm-menu-color-background-active: var(--color-cold-gray-100);
-	--ifm-menu-color-background-hover: var(--color-cold-gray-150);
+	--ifm-menu-color-background-active: unset;
+	--ifm-menu-color-background-hover: var(--color-cold-gray-100);
 	--ifm-menu-link-padding-horizontal: 24px;
 	--ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, SegoeUI, Ubuntu, sans-serif;
 
 	--small-card-border-color: var(--color-cold-gray-150);
-	--card-background-color: var(--color-cold-gray-100);
-	--card-paragraph-color: var(--color-cold-gray-500);
+	--small-card-paragraph-color: var(--color-cold-gray-500);
+
+	--large-card-background-color: var(--color-cold-gray-100);
+	--large-card-paragraph-text-color: var(--color-cold-gray-500);
+
 	--icon-color: var(--color-black);
+
 	--hero-button-text-color: var(--color-black);
 	--hero-button-hackground-color-hover: var(--color-cold-gray-100);
 	--hero-button-hackground-color-active: var(--color-cold-gray-150);
 	--hero-text-background-color: #ffffff;
-	--large-card-paragraph-text-color: var(--color-cold-gray-500);
 	--hero-button-border-color: var(--color-cold-gray-150);
+
 	--footer-border-color: var(--color-cold-gray-150);
 	--footer-copyright-color: var(--color-cold-gray-500);
 	--footer-links-padding-horizontal: 0px;
+
+	--sidebar-back-button-border-color: var(--color-cold-gray-100);
 	--navbar-border-color: var(--color-cold-gray-150);
+	--below-chart-container-margin-horizontal: 20px;
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-light.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-light.svg');
@@ -73,12 +79,11 @@ html[data-theme=dark] {
 	--ifm-background-color: var(--color-black);	
 	--ifm-footer-link-color: var(--color-cold-gray-200);
 	--ifm-menu-color: var(--color-cold-gray-200);
-	--ifm-menu-color-background-active: var(--color-cold-gray-850);
 	--ifm-menu-color-background-hover: var(--color-cold-gray-800);
 
 	--small-card-border-color: var(--color-cold-gray-850);
-	--card-background-color: var(--color-cold-gray-900);
-	--card-paragraph-color: var(--color-cold-gray-300);
+	--large-card-background-color: var(--color-cold-gray-900);
+	--small-card-paragraph-color: var(--color-cold-gray-300);
 	--icon-color: var(--color-cold-gray-200);
 	--hero-button-text-color: var(--color-cold-gray-200);
 	--hero-button-hackground-color-hover: var(--color-cold-gray-800);
@@ -89,6 +94,7 @@ html[data-theme=dark] {
 	--footer-border-color: var(--color-cold-gray-700);
 	--navbar-border-color: var(--color-cold-gray-700);
 	--menu-item-background-hover: var(--color-cold-gray-800);
+	--sidebar-back-button-border-color: var(--color-cold-gray-800);
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-dark.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
@@ -111,7 +117,7 @@ html[data-theme=dark] .DocSearch {
 	padding: 0 var(--ifm-pre-padding);
 }
 
-html[data-theme='dark'] .docusaurus-highlight-code-line {
+html[data-theme=dark] .docusaurus-highlight-code-line {
 	background-color: rgba(0, 0, 0, 0.3);
 }
 
@@ -125,13 +131,18 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	--color: var(--icon-color);
 }
 
-.menu__link--active:hover {
-	background: var(--ifm-menu-color-background-hover);
-	color: inherit;
+.navbar-sidebar__back {
+	border-bottom: 1px solid var(--sidebar-back-button-border-color);
+	padding-left: calc(0.5rem + var(--ifm-menu-link-padding-horizontal));
 }
 
-.menu__link--active {
-	color: inherit;
+.menu__link, .navbar-sidebar__back {
+	padding-top: 16px;
+	padding-bottom: 16px;
+}
+
+.menu__link--active:hover {
+	background: var(--ifm-menu-color-background-hover);
 }
 
 .DocSearch-Button {
@@ -159,7 +170,6 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	font-style: normal;
 	font-weight: 600;
 	line-height: 24px;
-	letter-spacing: 0em;
 	text-align: left;
 }
 
@@ -168,7 +178,6 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	font-style: normal;
 	font-weight: 400;
 	line-height: 18px;
-	letter-spacing: -0.03em;
 	text-align: left;
 }
 
@@ -189,18 +198,15 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	}
 }
 
-@media (max-width: 767.5px) {
-	.row .col.col.col {
-		flex-basis: 100%;
-	}
-}
-
-/* Required to properly override docusaurus styles */ 
 @media (max-width: 996px) {
 	.footer {
 		--ifm-footer-padding-horizontal: 40px;
 	}
 
+	/** 
+	 * Required to properly override docusaurus styles.
+	 * https://github.com/facebookincubator/infima/blob/c270e2cbdaf0659093ae7f6fbc8899430a0e9147/packages/core/styles/layout/grid.pcss#L51-L55
+	 */ 
 	.row .col.col.col {
 		flex-basis: auto;
 	}
