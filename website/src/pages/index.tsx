@@ -211,7 +211,7 @@ function Index(): JSX.Element {
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard2].join(' ')}>
 					<Paperplane />
-					<h3>Ultra lightweight - just 40 Kb</h3>
+					<h3>Ultra lightweight - just {size} Kb</h3>
 					<p>HTML5 Canvas technology no larger than a standard GIF file.</p>
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
