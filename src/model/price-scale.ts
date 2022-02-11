@@ -20,6 +20,9 @@ import {
 	fromIndexedTo100,
 	fromLog,
 	fromPercent,
+	LogFormula,
+	logFormulaForPriceRange,
+	logFormulasAreSame,
 	toIndexedTo100,
 	toIndexedTo100Range,
 	toLog,
@@ -177,6 +180,11 @@ type PriceTransformer = (price: BarPrice, baseValue: number) => number;
 const percentageFormatter = new PercentageFormatter();
 const defaultPriceFormatter = new PriceFormatter(100, 1);
 
+interface MarksCache {
+	marks: PriceMark[];
+	firstValueIsNull: boolean;
+}
+
 export class PriceScale {
 	private readonly _id: string;
 
@@ -202,11 +210,13 @@ export class PriceScale {
 	private _dataSources: IPriceDataSource[] = [];
 	private _cachedOrderedSources: IPriceDataSource[] | null = null;
 
-	private _marksCache: PriceMark[] | null = null;
+	private _marksCache: MarksCache | null = null;
 
 	private _scaleStartPoint: number | null = null;
 	private _scrollStartPoint: number | null = null;
 	private _formatter: IPriceFormatter = defaultPriceFormatter;
+
+	private _logFormula: LogFormula = logFormulaForPriceRange(null);
 
 	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
 		this._id = id;
@@ -297,8 +307,8 @@ export class PriceScale {
 
 		// define which scale converted from
 		if (oldMode.mode === PriceScaleMode.Logarithmic && newMode.mode !== oldMode.mode) {
-			if (canConvertPriceRangeFromLog(this._priceRange)) {
-				priceRange = convertPriceRangeFromLog(this._priceRange);
+			if (canConvertPriceRangeFromLog(this._priceRange, this._logFormula)) {
+				priceRange = convertPriceRangeFromLog(this._priceRange, this._logFormula);
 
 				if (priceRange !== null) {
 					this.setPriceRange(priceRange);
@@ -310,7 +320,7 @@ export class PriceScale {
 
 		// define which scale converted to
 		if (newMode.mode === PriceScaleMode.Logarithmic && newMode.mode !== oldMode.mode) {
-			priceRange = convertPriceRangeToLog(this._priceRange);
+			priceRange = convertPriceRangeToLog(this._priceRange, this._logFormula);
 
 			if (priceRange !== null) {
 				this.setPriceRange(priceRange);
@@ -578,15 +588,25 @@ export class PriceScale {
 	}
 
 	public marks(): PriceMark[] {
-		if (this._marksCache) {
-			return this._marksCache;
+		const firstValueIsNull = this.firstValue() === null;
+
+		// do not recalculate marks if firstValueIsNull is true because in this case we'll always get empty result
+		// this could happen in case when a series had some data and then you set empty data to it (in a simplified case)
+		// we could display an empty price scale, but this is not good from UX
+		// so in this case we need to keep an previous marks to display them on the scale
+		// as one of possible examples for this situation could be the following:
+		// let's say you have a study/indicator attached to a price scale and then you decide to stop it, i.e. remove its data because of its visibility
+		// a user will see the previous marks on the scale until you turn on your study back or remove it from the chart completely
+		if (this._marksCache !== null && (firstValueIsNull || this._marksCache.firstValueIsNull === firstValueIsNull)) {
+			return this._marksCache.marks;
 		}
 
 		this._markBuilder.rebuildTickMarks();
-		this._marksCache = this._markBuilder.marks();
+		const marks = this._markBuilder.marks();
+		this._marksCache = { marks, firstValueIsNull };
 		this._onMarksChanged.fire();
 
-		return this._marksCache;
+		return marks;
 	}
 
 	public onMarksChanged(): ISubscription {
@@ -827,7 +847,7 @@ export class PriceScale {
 			return 0 as Coordinate;
 		}
 
-		logical = this.isLog() && logical ? toLog(logical) : logical;
+		logical = this.isLog() && logical ? toLog(logical, this._logFormula) : logical;
 		const range = ensureNotNull(this.priceRange());
 		const invCoordinate = this._bottomMarginPx() +
 			(this.internalHeight() - 1) * (logical - range.minValue()) / range.length();
@@ -845,7 +865,7 @@ export class PriceScale {
 		const range = ensureNotNull(this.priceRange());
 		const logical = range.minValue() + range.length() *
 			((invCoordinate - this._bottomMarginPx()) / (this.internalHeight() - 1));
-		return this.isLog() ? fromLog(logical) : logical;
+		return this.isLog() ? fromLog(logical, this._logFormula) : logical;
 	}
 
 	private _onIsInvertedChanged(): void {
@@ -882,7 +902,7 @@ export class PriceScale {
 			if (sourceRange !== null) {
 				switch (this._options.mode) {
 					case PriceScaleMode.Logarithmic:
-						sourceRange = convertPriceRangeToLog(sourceRange);
+						sourceRange = convertPriceRangeToLog(sourceRange, this._logFormula);
 						break;
 					case PriceScaleMode.Percentage:
 						sourceRange = toPercentRange(sourceRange, firstValue.value);
@@ -924,7 +944,29 @@ export class PriceScale {
 				// if price range is degenerated to 1 point let's extend it by 10 min move values
 				// to avoid incorrect range and empty (blank) scale (in case of min tick much greater than 1)
 				const extendValue = 5 * minMove;
+
+				if (this.isLog()) {
+					priceRange = convertPriceRangeFromLog(priceRange, this._logFormula);
+				}
+
 				priceRange = new PriceRangeImpl(priceRange.minValue() - extendValue, priceRange.maxValue() + extendValue);
+
+				if (this.isLog()) {
+					priceRange = convertPriceRangeToLog(priceRange, this._logFormula);
+				}
+			}
+
+			if (this.isLog()) {
+				const rawRange = convertPriceRangeFromLog(priceRange, this._logFormula);
+				const newLogFormula = logFormulaForPriceRange(rawRange);
+				if (!logFormulasAreSame(newLogFormula, this._logFormula)) {
+					const rawSnapshot = this._priceRangeSnapshot !== null ? convertPriceRangeFromLog(this._priceRangeSnapshot, this._logFormula) : null;
+					this._logFormula = newLogFormula;
+					priceRange = convertPriceRangeToLog(rawRange, newLogFormula);
+					if (rawSnapshot !== null) {
+						this._priceRangeSnapshot = convertPriceRangeToLog(rawSnapshot, newLogFormula);
+					}
+				}
 			}
 
 			this.setPriceRange(priceRange);
@@ -932,6 +974,7 @@ export class PriceScale {
 			// reset empty to default
 			if (this._priceRange === null) {
 				this.setPriceRange(new PriceRangeImpl(-0.5, 0.5));
+				this._logFormula = logFormulaForPriceRange(null);
 			}
 		}
 
@@ -944,7 +987,7 @@ export class PriceScale {
 		} else if (this.isIndexedTo100()) {
 			return toIndexedTo100;
 		} else if (this.isLog()) {
-			return toLog;
+			return (price: number) => toLog(price, this._logFormula);
 		}
 
 		return null;

@@ -56,6 +56,7 @@ module.exports = {
 	},
 	extends: [
 		'eslint:recommended',
+		'plugin:react/recommended',
 	],
 	parserOptions: {
 		ecmaVersion: 2019,
@@ -64,7 +65,7 @@ module.exports = {
 	overrides: [
 		{
 			// rules specific for js files only
-			files: ['**/*.js', '**/*.md/*.javascript'],
+			files: ['**/*.js', '**/*.md/*.javascript', '**/*.jsx'],
 			rules: {
 				// enforces no braces where they can be omitted
 				// http://eslint.org/docs/rules/arrow-body-style
@@ -385,6 +386,12 @@ module.exports = {
 						},
 					},
 				],
+			},
+		},
+		{
+			files: ['website/src/**/*.tsx'],
+			rules: {
+				'import/no-default-export': 'off',
 			},
 		},
 		{

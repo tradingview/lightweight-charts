@@ -3,12 +3,17 @@ import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { OriginalTime, TimePoint, TimePointIndex } from '../model/time-data';
 
-import { BarData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
+import { BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 
-function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
+function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Area' | 'Baseline'>> {
+	const val = item.value;
+	return { index, time, value: [val, val, val, val], originalTime };
+}
+
+function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;
 
-	const res: Mutable<SeriesPlotRow<'Histogram'>> = { index, time, value: [val, val, val, val], originalTime };
+	const res: Mutable<SeriesPlotRow<'Line' | 'Histogram'>> = { index, time, value: [val, val, val, val], originalTime };
 
 	// 'color' here is public property (from API) so we can use `in` here safely
 	// eslint-disable-next-line no-restricted-syntax
@@ -19,8 +24,40 @@ function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item:
 	return res;
 }
 
-function getOHLCBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BarData, originalTime: OriginalTime): Mutable<SeriesPlotRow> {
-	return { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
+function getBarSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BarData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Bar'>> {
+	const res: Mutable<SeriesPlotRow<'Bar'>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
+
+	// 'color' here is public property (from API) so we can use `in` here safely
+	// eslint-disable-next-line no-restricted-syntax
+	if ('color' in item && item.color !== undefined) {
+		res.color = item.color;
+	}
+
+	return res;
+}
+
+function getCandlestickSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: CandlestickData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Candlestick'>> {
+	const res: Mutable<SeriesPlotRow<'Candlestick'>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
+
+	// 'color' here is public property (from API) so we can use `in` here safely
+	// eslint-disable-next-line no-restricted-syntax
+	if ('color' in item && item.color !== undefined) {
+		res.color = item.color;
+	}
+
+	// 'borderColor' here is public property (from API) so we can use `in` here safely
+	// eslint-disable-next-line no-restricted-syntax
+	if ('borderColor' in item && item.borderColor !== undefined) {
+		res.borderColor = item.borderColor;
+	}
+
+	// 'wickColor' here is public property (from API) so we can use `in` here safely
+	// eslint-disable-next-line no-restricted-syntax
+	if ('wickColor' in item && item.wickColor !== undefined) {
+		res.wickColor = item.wickColor;
+	}
+
+	return res;
 }
 
 export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
@@ -39,7 +76,7 @@ type SeriesItemValueFnMap = {
 
 export type TimedSeriesItemValueFn = (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
 
-function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getOHLCBasedSeriesPlotRow)): TimedSeriesItemValueFn {
+function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): TimedSeriesItemValueFn {
 	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime) => {
 		if (isWhitespaceData(bar)) {
 			return { time, index, originalTime };
@@ -50,12 +87,12 @@ function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) 
 }
 
 const seriesPlotRowFnMap: SeriesItemValueFnMap = {
-	Candlestick: wrapWhitespaceData(getOHLCBasedSeriesPlotRow),
-	Bar: wrapWhitespaceData(getOHLCBasedSeriesPlotRow),
+	Candlestick: wrapWhitespaceData(getCandlestickSeriesPlotRow),
+	Bar: wrapWhitespaceData(getBarSeriesPlotRow),
 	Area: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 	Baseline: wrapWhitespaceData(getLineBasedSeriesPlotRow),
-	Histogram: wrapWhitespaceData(getLineBasedSeriesPlotRow),
-	Line: wrapWhitespaceData(getLineBasedSeriesPlotRow),
+	Histogram: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
+	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 };
 
 export function getSeriesPlotRowCreator(seriesType: SeriesType): TimedSeriesItemValueFn {

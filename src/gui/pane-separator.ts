@@ -54,15 +54,18 @@ export class PaneSeparator implements IDestroyable {
 			this._cell.appendChild(this._handle);
 			const handlers: MouseEventHandlers = {
 				mouseDownEvent: this._mouseDownEvent.bind(this),
+				touchStartEvent: this._mouseDownEvent.bind(this),
 				pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
+				touchMoveEvent: this._pressedMouseMoveEvent.bind(this),
 				mouseUpEvent: this._mouseUpEvent.bind(this),
+				touchEndEvent: this._mouseUpEvent.bind(this),
 			};
 			this._mouseEventHandler = new MouseEventHandler(
 				this._handle,
 				handlers,
 				{
-					treatVertTouchDragAsPageScroll: false,
-					treatHorzTouchDragAsPageScroll: true,
+					treatVertTouchDragAsPageScroll: () => false,
+					treatHorzTouchDragAsPageScroll: () => true,
 				}
 			);
 		}

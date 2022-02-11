@@ -51,7 +51,7 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 	const canvas = doc.createElement('canvas');
 	parentElement.appendChild(canvas);
 
-	const binding = bindToDevicePixelRatio(canvas);
+	const binding = bindToDevicePixelRatio(canvas, { allowDownsampling: false });
 	binding.resizeCanvas({
 		width: size.w,
 		height: size.h,

@@ -15,7 +15,7 @@ const versions = require('./versions.json');
 const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
 const projectName = 'lightweight-charts';
 const projectUrl = `https://github.com/${organizationName}/${projectName}`;
-const githubPagesUrl = `https://${organizationName}.github.io/`;
+const githubPagesUrl = `https://${organizationName}.github.io`;
 
 const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
 
@@ -93,7 +93,7 @@ function typedocPluginForVersion(version) {
 				id: `${version}-api`,
 				entryPoints: [typingsFilePath],
 				docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
-			});
+			}).loadContent();
 		},
 	});
 }
@@ -133,8 +133,7 @@ const config = {
 			navbar: {
 				title: 'Lightweight Charts',
 				logo: {
-					alt: 'Lightweight Charts Logo',
-					src: 'https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true',
+					src: 'this value is not used because we swizzled the Logo component - see src/theme/Logo',
 				},
 				items: [
 					{
@@ -168,7 +167,6 @@ const config = {
 				],
 			},
 			footer: {
-				style: 'dark',
 				links: [
 					{
 						title: 'Docs',
@@ -184,7 +182,7 @@ const config = {
 						],
 					},
 					{
-						title: 'Community',
+						title: 'Lightweight Charts Community',
 						items: [
 							{
 								label: 'Stack Overflow',
@@ -192,7 +190,7 @@ const config = {
 							},
 							{
 								label: 'Discord',
-								href: 'https://discord.gg/E6UthXZ',
+								href: 'https://discord.gg/UC7cGkvn4U',
 							},
 							{
 								label: 'Twitter',
@@ -215,6 +213,7 @@ const config = {
 			prism: {
 				theme: lightCodeTheme,
 				darkTheme: darkCodeTheme,
+				additionalLanguages: ['ruby', 'swift', 'kotlin', 'groovy'],
 			},
 			algolia: {
 				appId: '7Q5A441YPA',

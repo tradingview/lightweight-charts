@@ -456,6 +456,7 @@ export class TimeScale {
 		return this._rightOffset;
 	}
 
+	// eslint-disable-next-line complexity
 	public marks(): TimeMark[] | null {
 		if (this.isEmpty()) {
 			return null;
@@ -484,6 +485,10 @@ export class TimeScale {
 		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second last label on time scale"
 		const indexOfSecondLastLabel = (this._lastIndex() as number) - indexPerLabel;
 
+		const isAllScalingAndScrollingDisabled = this._isAllScalingAndScrollingDisabled();
+		const isLeftEdgeFixed = this._options.fixLeftEdge || isAllScalingAndScrollingDisabled;
+		const isRightEdgeFixed = this._options.fixRightEdge || isAllScalingAndScrollingDisabled;
+
 		let targetIndex = 0;
 		for (const tm of items) {
 			if (!(firstBar <= tm.index && tm.index <= lastBar)) {
@@ -507,13 +512,13 @@ export class TimeScale {
 				this._labels.push(label);
 			}
 
-			if (this._barSpacing > (maxLabelWidth / 2)) {
+			if (this._barSpacing > (maxLabelWidth / 2) && !isAllScalingAndScrollingDisabled) {
 				// if there is enough space then let's show all tick marks as usual
 				label.needAlignCoordinate = false;
 			} else {
 				// if a user is able to scroll after a tick mark then show it as usual, otherwise the coordinate might be aligned
 				// if the index is for the second (last) label or later (earlier) then most likely this label might be displayed without correcting the coordinate
-				label.needAlignCoordinate = this._options.fixLeftEdge && tm.index <= earliestIndexOfSecondLabel || this._options.fixRightEdge && tm.index >= indexOfSecondLastLabel;
+				label.needAlignCoordinate = (isLeftEdgeFixed && tm.index <= earliestIndexOfSecondLabel) || (isRightEdgeFixed && tm.index >= indexOfSecondLastLabel);
 			}
 
 			targetIndex++;
@@ -730,6 +735,18 @@ export class TimeScale {
 		}
 
 		return this._dateTimeFormatter.format(new Date(timeScalePoint.time.timestamp * 1000));
+	}
+
+	private _isAllScalingAndScrollingDisabled(): boolean {
+		const { handleScroll, handleScale } = this._model.options();
+		return !handleScroll.horzTouchDrag
+			&& !handleScroll.mouseWheel
+			&& !handleScroll.pressedMouseMove
+			&& !handleScroll.vertTouchDrag
+			&& !handleScale.axisDoubleClickReset
+			&& !handleScale.axisPressedMouseMove.time
+			&& !handleScale.mouseWheel
+			&& !handleScale.pinch;
 	}
 
 	private _firstIndex(): TimePointIndex | null {

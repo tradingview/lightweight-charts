@@ -29,6 +29,10 @@ const enum CursorType {
 	NsResize,
 }
 
+const enum Constants {
+	DefaultOptimalWidth = 34,
+}
+
 type IPriceAxisViewArray = readonly IPriceAxisView[];
 
 export class PriceAxisWidget implements IDestroyable {
@@ -45,7 +49,6 @@ export class PriceAxisWidget implements IDestroyable {
 	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
 	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
 
-	private _updateTimeout: TimerId | null = null;
 	private _mouseEventHandler: MouseEventHandler;
 	private _mousedown: boolean = false;
 
@@ -55,6 +58,7 @@ export class PriceAxisWidget implements IDestroyable {
 	private _color: string | null = null;
 	private _font: string | null = null;
 	private _prevOptimalWidth: number = 0;
+	private _isSettingSize: boolean = false;
 
 	public constructor(pane: PaneWidget, options: LayoutOptions, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
@@ -87,10 +91,14 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const handler: MouseEventHandlers = {
 			mouseDownEvent: this._mouseDownEvent.bind(this),
+			touchStartEvent: this._mouseDownEvent.bind(this),
 			pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
+			touchMoveEvent: this._pressedMouseMoveEvent.bind(this),
 			mouseDownOutsideEvent: this._mouseDownOutsideEvent.bind(this),
 			mouseUpEvent: this._mouseUpEvent.bind(this),
+			touchEndEvent: this._mouseUpEvent.bind(this),
 			mouseDoubleClickEvent: this._mouseDoubleClickEvent.bind(this),
+			doubleTapEvent: this._mouseDoubleClickEvent.bind(this),
 			mouseEnterEvent: this._mouseEnterEvent.bind(this),
 			mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
 		};
@@ -98,8 +106,8 @@ export class PriceAxisWidget implements IDestroyable {
 			this._topCanvasBinding.canvas,
 			handler,
 			{
-				treatVertTouchDragAsPageScroll: false,
-				treatHorzTouchDragAsPageScroll: true,
+				treatVertTouchDragAsPageScroll: () => false,
+				treatHorzTouchDragAsPageScroll: () => true,
 			}
 		);
 	}
@@ -118,11 +126,6 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		this._priceScale = null;
-
-		if (this._updateTimeout !== null) {
-			clearTimeout(this._updateTimeout);
-			this._updateTimeout = null;
-		}
 
 		this._tickMarksCache.destroy();
 	}
@@ -171,8 +174,7 @@ export class PriceAxisWidget implements IDestroyable {
 			return 0;
 		}
 
-		// need some reasonable value for scale while initialization
-		let tickMarkMaxWidth = 34;
+		let tickMarkMaxWidth = 0;
 		const rendererOptions = this.rendererOptions();
 
 		const ctx = getContext2D(this._canvasBinding.canvas);
@@ -207,12 +209,14 @@ export class PriceAxisWidget implements IDestroyable {
 			);
 		}
 
+		const resultTickMarksMaxWidth = tickMarkMaxWidth || Constants.DefaultOptimalWidth;
+
 		let res = Math.ceil(
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
-			tickMarkMaxWidth
+			resultTickMarksMaxWidth
 		);
 		// make it even
 		res += res % 2;
@@ -226,8 +230,10 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || !this._size.equals(size)) {
 			this._size = size;
 
+			this._isSettingSize = true;
 			this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
 			this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
+			this._isSettingSize = false;
 
 			this._cell.style.width = size.w + 'px';
 			// need this for IE11
@@ -289,6 +295,11 @@ export class PriceAxisWidget implements IDestroyable {
 
 	public getImage(): HTMLCanvasElement {
 		return this._canvasBinding.canvas;
+	}
+
+	public update(): void {
+		// this call has side-effect - it regenerates marks on the price scale
+		this._priceScale?.marks();
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {
@@ -623,22 +634,10 @@ export class PriceAxisWidget implements IDestroyable {
 	private _onMarksChanged(): void {
 		const width = this.optimalWidth();
 
+		// avoid price scale is shrunk
+		// using < instead !== to avoid infinite changes
 		if (this._prevOptimalWidth < width) {
-			// avoid price scale is shrunk
-			// using < instead !== to avoid infinite changes
-
-			const chart = this._pane.chart();
-
-			if (this._updateTimeout === null) {
-				this._updateTimeout = setTimeout(
-					() => {
-						if (chart) {
-							chart.model().fullUpdate();
-						}
-						this._updateTimeout = null;
-					},
-					100);
-			}
+			this._pane.chart().model().fullUpdate();
 		}
 
 		this._prevOptimalWidth = width;
@@ -656,12 +655,16 @@ export class PriceAxisWidget implements IDestroyable {
 
 	private readonly _canvasConfiguredHandler = () => {
 		this._recreateTickMarksCache(this._rendererOptionsProvider.options());
-		const model = this._pane.chart().model();
-		model.lightUpdate();
+		if (!this._isSettingSize) {
+			this._pane.chart().model().lightUpdate();
+		}
 	};
 
 	private readonly _topCanvasConfiguredHandler = () => {
-		const model = this._pane.chart().model();
-		model.lightUpdate();
+		if (this._isSettingSize) {
+			return;
+		}
+
+		this._pane.chart().model().lightUpdate();
 	};
 }
