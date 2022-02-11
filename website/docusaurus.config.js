@@ -144,7 +144,7 @@ const config = {
 					},
 					{
 						type: 'doc',
-						docId: 'tutorials/index',
+						docId: 'tutorials/react/simple', // this is a temporary setting as there's only 1 tutorial at the moment. Should be changed when more tutorials get added.
 						position: 'left',
 						label: 'Tutorials',
 					},
