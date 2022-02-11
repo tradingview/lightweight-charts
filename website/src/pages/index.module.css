@@ -49,7 +49,7 @@
 }
 
 .HeroTextContainer svg {
-	color: var(--icon-color);
+	color: var(--hero-icon-color);
 }
 
 .HeroButtonsContainer {

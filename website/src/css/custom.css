@@ -54,6 +54,7 @@
 	--large-card-paragraph-text-color: var(--color-cold-gray-500);
 
 	--icon-color: var(--color-black);
+	--hero-icon-color: var(--color-black);
 
 	--hero-button-text-color: var(--color-black);
 	--hero-button-hackground-color-hover: var(--color-cold-gray-100);
@@ -76,7 +77,7 @@
 html[data-theme=dark] {
 	--ifm-navbar-background-color: var(--color-black);
 	--ifm-footer-background-color: var(--color-black);
-	--ifm-background-color: var(--color-black);	
+	--ifm-background-color: var(--color-black);
 	--ifm-footer-link-color: var(--color-cold-gray-200);
 	--ifm-menu-color: var(--color-cold-gray-200);
 	--ifm-menu-color-background-hover: var(--color-cold-gray-800);
@@ -85,6 +86,7 @@ html[data-theme=dark] {
 	--large-card-background-color: var(--color-cold-gray-900);
 	--small-card-paragraph-color: var(--color-cold-gray-300);
 	--icon-color: var(--color-cold-gray-200);
+	--hero-icon-color: var(--color-white);
 	--hero-button-text-color: var(--color-cold-gray-200);
 	--hero-button-hackground-color-hover: var(--color-cold-gray-800);
 	--hero-button-hackground-color-active: var(--color-cold-gray-750);
