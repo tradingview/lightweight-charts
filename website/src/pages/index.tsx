@@ -30,7 +30,7 @@ const visibleLogicalRange = { from: 0.5, to: data.orangeData.length - 1.5 };
 
 function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptions> {
 	return isDarkTheme
-		? { background: { color: '#0C0E15' }, textColor: 'rgba(248, 249, 253, 1)' }
+		? { background: { color: '#131722' }, textColor: 'rgba(248, 249, 253, 1)' }
 		: { background: { color: 'rgba(248, 249, 253, 1)' }, textColor: '#000000' };
 }
 

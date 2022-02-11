@@ -347,6 +347,7 @@
 	}
 
 	.HeroTextContainer {
+		background: var(--hero-text-large-background-color);
 		position: absolute;
 		z-index: 100;
 		top: 94px;
