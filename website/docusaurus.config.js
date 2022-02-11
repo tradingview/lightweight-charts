@@ -183,7 +183,7 @@ const config = {
 							},
 							{
 								label: 'Tutorials',
-								to: '/docs/tutorials',
+								to: '/docs/tutorials/react/simple',
 							},
 							{
 								label: 'API Reference',
