@@ -178,7 +178,7 @@ function Index(): JSX.Element {
 		</div>
 		<div className={styles.BelowChartContainer}>
 			<div className={styles.LargeTextContainer}>
-				<h1>Fully customizable & free charts that don&apos;t contain hidden ads</h1>
+				<h1>Less is more</h1>
 				<div>Millions of websites still use static pictures for showing financial charts. The old way is not interactive and doesn&apos;t scale with various devices. Pictures always had a huge advantage of their small size and fast loading&nbsp;—&nbsp;but no more!</div>
 			</div>
 			<div className={styles.LargeCardContainer}>
@@ -217,7 +217,7 @@ function Index(): JSX.Element {
 				<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
 					<InputSliders />
 					<h3>Open-source </h3>
-					<p>Fully customizable & free charts that don&apos;t contain hidden ads. Contributions are welcome!</p>
+					<p>Maintained by TradingView. Hosted on GitHub. Licensed under the Apache License, Version 2.0. Contributions welcome!</p>
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard4].join(' ')}>
 					<Shapes />
