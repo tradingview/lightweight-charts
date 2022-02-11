@@ -74,11 +74,13 @@
 }
 
 .HeroButton:hover {
+	color: var(--hero-button-text-color-hover-active);
 	background: var(--hero-button-background-color-hover);
 	text-decoration: none;
 }
 
 .HeroButton:active {
+	color: var(--hero-button-text-color-hover-active);
 	background: var(--hero-button-background-color-active);
 }
 
