@@ -36,7 +36,7 @@
 	align-items: center;
 	text-align: center;
 	background: var(--hero-text-background-color);
-	padding: 56px 20px;
+	padding: 36px 14px;
 	width: 100%;
 }
 
@@ -56,7 +56,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 24px;
-	margin-top: 24px;
+	margin-top: 32px;
 }
 
 .HeroButton {
@@ -353,8 +353,8 @@
 		top: 94px;
 		border-radius: 32px;
 		padding: 56px;
-		width: 840px;
-		height: 412px;
+		width: 724px;
+		height: 384px;
 	}
 
 	.HeroTextContainer p {

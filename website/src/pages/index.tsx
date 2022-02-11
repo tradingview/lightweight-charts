@@ -169,7 +169,7 @@ function Index(): JSX.Element {
 			<HeroChart />
 			<div className={styles.HeroTextContainer}>
 				<HeroLogo />
-				<p>Free, open-source and feature-rich. At just {size} kilobytes, the dream of lightweight interactive charts is now a reality.</p>
+				<p>Free, open-source and feature-rich interactive charts</p>
 				<div className={styles.HeroButtonsContainer}>
 					<a className={[styles.HeroButton, styles.HeroButtonPrimary].join(' ')} href="docs">Get Started</a>
 					<a className={styles.HeroButton} href="docs/api">API Reference</a>
