@@ -57,8 +57,8 @@
 	--hero-icon-color: var(--color-black);
 
 	--hero-button-text-color: var(--color-black);
-	--hero-button-hackground-color-hover: var(--color-cold-gray-100);
-	--hero-button-hackground-color-active: var(--color-cold-gray-150);
+	--hero-button-background-color-hover: var(--color-cold-gray-100);
+	--hero-button-background-color-active: var(--color-cold-gray-150);
 	--hero-text-background-color: #ffffff;
 	--hero-button-border-color: var(--color-cold-gray-150);
 
@@ -88,8 +88,8 @@ html[data-theme=dark] {
 	--icon-color: var(--color-cold-gray-200);
 	--hero-icon-color: var(--color-white);
 	--hero-button-text-color: var(--color-cold-gray-200);
-	--hero-button-hackground-color-hover: var(--color-cold-gray-800);
-	--hero-button-hackground-color-active: var(--color-cold-gray-750);
+	--hero-button-background-color-hover: var(--color-cold-gray-800);
+	--hero-button-background-color-active: var(--color-cold-gray-750);
 	--hero-text-background-color: var(--color-cold-gray-950);
 	--large-card-paragraph-text-color: var(--color-cold-gray-300);
 	--hero-button-border-color: var(--color-cold-gray-700);
@@ -205,10 +205,10 @@ html[data-theme=dark] .docusaurus-highlight-code-line {
 		--ifm-footer-padding-horizontal: 40px;
 	}
 
-	/** 
+	/**
 	 * Required to properly override docusaurus styles.
 	 * https://github.com/facebookincubator/infima/blob/c270e2cbdaf0659093ae7f6fbc8899430a0e9147/packages/core/styles/layout/grid.pcss#L51-L55
-	 */ 
+	 */
 	.row .col.col.col {
 		flex-basis: auto;
 	}
