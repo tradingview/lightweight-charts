@@ -94,7 +94,7 @@ html[data-theme=dark] {
 	--hero-button-text-color-hover-active: var(--color-white);
 	--hero-button-background-color-hover: var(--color-cold-gray-800);
 	--hero-button-background-color-active: var(--color-cold-gray-750);
-	--hero-text-background-color: var(--color-cold-gray-950);
+	--hero-text-background-color: var(--color-cold-gray-900);
 	--hero-text-large-background-color: var(--color-black);
 	--hero-text-shadow-color: rgba(0, 0, 0, 0.4);
 	--large-card-paragraph-text-color: var(--color-cold-gray-300);
