@@ -30,7 +30,7 @@ const visibleLogicalRange = { from: 0.5, to: data.orangeData.length - 1.5 };
 
 function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptions> {
 	return isDarkTheme
-		? { background: { color: '#0C0E15' }, textColor: 'rgba(248, 249, 253, 1)' }
+		? { background: { color: '#131722' }, textColor: 'rgba(248, 249, 253, 1)' }
 		: { background: { color: 'rgba(248, 249, 253, 1)' }, textColor: '#000000' };
 }
 
@@ -169,7 +169,7 @@ function Index(): JSX.Element {
 			<HeroChart />
 			<div className={styles.HeroTextContainer}>
 				<HeroLogo />
-				<p>Free, open-source and feature-rich. At just {size} kilobytes, the dream of lightweight interactive charts is now a reality.</p>
+				<p>Free, open-source and feature-rich interactive charts</p>
 				<div className={styles.HeroButtonsContainer}>
 					<a className={[styles.HeroButton, styles.HeroButtonPrimary].join(' ')} href="docs">Get Started</a>
 					<a className={styles.HeroButton} href="docs/api">API Reference</a>
@@ -178,7 +178,7 @@ function Index(): JSX.Element {
 		</div>
 		<div className={styles.BelowChartContainer}>
 			<div className={styles.LargeTextContainer}>
-				<h1>Fully customizable & free charts that don&apos;t contain hidden ads</h1>
+				<h1>Less is more</h1>
 				<div>Millions of websites still use static pictures for showing financial charts. The old way is not interactive and doesn&apos;t scale with various devices. Pictures always had a huge advantage of their small size and fast loading&nbsp;—&nbsp;but no more!</div>
 			</div>
 			<div className={styles.LargeCardContainer}>
@@ -217,7 +217,7 @@ function Index(): JSX.Element {
 				<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
 					<InputSliders />
 					<h3>Open-source </h3>
-					<p>Fully customizable & free charts that don&apos;t contain hidden ads. Contributions are welcome!</p>
+					<p>Maintained by TradingView. Hosted on GitHub. Licensed under the Apache License, Version 2.0. Contributions welcome!</p>
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard4].join(' ')}>
 					<Shapes />

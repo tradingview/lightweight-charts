@@ -36,7 +36,7 @@
 	align-items: center;
 	text-align: center;
 	background: var(--hero-text-background-color);
-	padding: 56px 20px;
+	padding: 56px 14px;
 	width: 100%;
 }
 
@@ -45,11 +45,11 @@
 	line-height: 28px;
 	text-align: center;
 	margin: 0;
-	margin-top: 20px;
+	margin-top: 24px;
 }
 
 .HeroTextContainer svg {
-	color: var(--icon-color);
+	color: var(--hero-icon-color);
 }
 
 .HeroButtonsContainer {
@@ -74,12 +74,14 @@
 }
 
 .HeroButton:hover {
-	background: var(--hero-button-hackground-color-hover);
+	color: var(--hero-button-text-color-hover-active);
+	background: var(--hero-button-background-color-hover);
 	text-decoration: none;
 }
 
 .HeroButton:active {
-	background: var(--hero-button-hackground-color-active);
+	color: var(--hero-button-text-color-hover-active);
+	background: var(--hero-button-background-color-active);
 }
 
 .HeroButtonPrimary {
@@ -282,7 +284,7 @@
 		flex: 1 0 100%;
 		min-height: unset;
 	}
-	
+
 	.LargeCard h2 {
 		font-size: 28px;
 		font-style: normal;
@@ -347,13 +349,15 @@
 	}
 
 	.HeroTextContainer {
+		background: var(--hero-text-large-background-color);
 		position: absolute;
-		z-index: 1000;
+		z-index: 100;
 		top: 94px;
 		border-radius: 32px;
 		padding: 56px;
-		width: 840px;
-		height: 412px;
+		width: 724px;
+		height: 384px;
+		box-shadow: 0px 1px 4px var(--hero-text-shadow-color);
 	}
 
 	.HeroTextContainer p {
@@ -479,7 +483,7 @@
 		margin: auto;
 		margin-top: 80px;
 	}
-	
+
 	.LargeCard {
 		flex: 1 1 472px;
 		width: 472px;
