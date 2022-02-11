@@ -54,7 +54,6 @@
 	--large-card-paragraph-text-color: var(--color-cold-gray-500);
 
 	--icon-color: var(--color-black);
-	--hero-icon-color: var(--color-black);
 
 	--hero-button-text-color: var(--color-cold-gray-900);
 	--hero-button-text-color-hover-active: var(--hero-button-text-color);
@@ -88,8 +87,7 @@ html[data-theme=dark] {
 	--small-card-border-color: var(--color-cold-gray-850);
 	--large-card-background-color: var(--color-cold-gray-900);
 	--small-card-paragraph-color: var(--color-cold-gray-300);
-	--icon-color: var(--color-cold-gray-200);
-	--hero-icon-color: var(--color-white);
+	--icon-color: var(--color-white);
 	--hero-button-text-color: var(--color-cold-gray-200);
 	--hero-button-text-color-hover-active: var(--color-white);
 	--hero-button-background-color-hover: var(--color-cold-gray-800);
@@ -133,10 +131,6 @@ html[data-theme=dark] .docusaurus-highlight-code-line {
 	box-shadow: none;
 	border-bottom: 1px solid var(--navbar-border-color);
 	height: 65px;
-}
-
-.navbar__brand svg {
-	--color: var(--icon-color);
 }
 
 .navbar-sidebar__back {

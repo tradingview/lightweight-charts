@@ -5,10 +5,6 @@ import React, { ComponentPropsWithoutRef } from 'react';
 
 import styles from './index.module.css';
 
-function isScreenMobile(): boolean {
-	return window.matchMedia('screen and (min-width: 1279.5px)').matches;
-}
-
 export interface LogoProps extends ComponentPropsWithoutRef<'a'> {
 	readonly imageClassName?: string;
 	readonly titleClassName?: string;
