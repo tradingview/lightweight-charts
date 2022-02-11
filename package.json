@@ -95,7 +95,7 @@
     "lint": "npm-run-all -p lint:**",
     "lint:js": "eslint --format=unix --ext .js,.md,.javascript ./",
     "lint:ts": "eslint --format=unix --ext .ts,.typescript,.tsx ./",
-    "lint:md": "./node_modules/.bin/markdownlint -i \"**/node_modules/**\" -i \"**/website/docs/api/**\" -i \"**/website/versioned_docs/**/api/**\" \"**/*.md\"",
+    "lint:md": "markdownlint -i \"**/node_modules/**\" -i \"**/website/docs/api/**\" -i \"**/website/versioned_docs/**/api/**\" \"**/*.md\"",
     "check-dts-docs": "eslint --format=unix ./dist/typings.d.ts",
     "check-markdown-links": "node scripts/check-markdown-links.js",
     "rollup": "rollup -c rollup.config.js",
