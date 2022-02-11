@@ -282,7 +282,7 @@
 		flex: 1 0 100%;
 		min-height: unset;
 	}
-	
+
 	.LargeCard h2 {
 		font-size: 28px;
 		font-style: normal;
@@ -348,7 +348,7 @@
 
 	.HeroTextContainer {
 		position: absolute;
-		z-index: 1000;
+		z-index: 100;
 		top: 94px;
 		border-radius: 32px;
 		padding: 56px;
@@ -479,7 +479,7 @@
 		margin: auto;
 		margin-top: 80px;
 	}
-	
+
 	.LargeCard {
 		flex: 1 1 472px;
 		width: 472px;
