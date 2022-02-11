@@ -355,6 +355,7 @@
 		padding: 56px;
 		width: 724px;
 		height: 384px;
+		box-shadow: 0px 1px 4px var(--hero-text-shadow-color);
 	}
 
 	.HeroTextContainer p {

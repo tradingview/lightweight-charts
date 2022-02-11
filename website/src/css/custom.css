@@ -62,6 +62,7 @@
 	--hero-text-background-color: var(--color-white);
 	--hero-text-large-background-color: var(--hero-text-background-color);
 	--hero-button-border-color: var(--color-cold-gray-150);
+	--hero-text-shadow-color: rgba(0, 0, 0, 0.2);
 
 	--footer-border-color: var(--color-cold-gray-150);
 	--footer-copyright-color: var(--color-cold-gray-500);
@@ -93,6 +94,7 @@ html[data-theme=dark] {
 	--hero-button-background-color-active: var(--color-cold-gray-750);
 	--hero-text-background-color: var(--color-cold-gray-950);
 	--hero-text-large-background-color: var(--color-black);
+	--hero-text-shadow-color: rgba(0, 0, 0, 0.4);
 	--large-card-paragraph-text-color: var(--color-cold-gray-300);
 	--hero-button-border-color: var(--color-cold-gray-700);
 	--footer-border-color: var(--color-cold-gray-700);
