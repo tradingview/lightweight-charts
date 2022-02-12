@@ -32,11 +32,15 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 		}
 
 		const baselineProps = this._series.options();
+		const priceScaleProps = this._series.priceScale().options();
 
 		this._makeValid();
 
 		const baseLevelCoordinate = this._series.priceScale().priceToCoordinate(baselineProps.baseValue.price, firstValue.value);
 		const barWidth = this._model.timeScale().barSpacing();
+
+		const bottom = priceScaleProps.scaleMargins ? (1 - priceScaleProps.scaleMargins.bottom) * height : height;
+		const top = priceScaleProps.scaleMargins ? priceScaleProps.scaleMargins.top * height : 0;
 
 		this._baselineAreaRenderer.setData({
 			items: this._items,
@@ -51,7 +55,8 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 			lineType: LineType.Simple,
 
 			baseLevelCoordinate,
-			bottom: height as Coordinate,
+			top: top as Coordinate,
+			bottom: bottom as Coordinate,
 
 			visibleRange: this._itemsVisibleRange,
 			barWidth,

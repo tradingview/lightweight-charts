@@ -12,6 +12,7 @@ export interface PaneRendererAreaDataBase {
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
 
+	top: Coordinate;
 	bottom: Coordinate;
 	baseLevelCoordinate: Coordinate;
 
@@ -79,7 +80,7 @@ export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData>
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
+		const gradient = ctx.createLinearGradient(0, data.top, 0, data.bottom);
 		gradient.addColorStop(0, data.topColor);
 		gradient.addColorStop(1, data.bottomColor);
 		return gradient;
