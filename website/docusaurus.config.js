@@ -11,6 +11,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const { default: pluginDocusaurus } = require('docusaurus-plugin-typedoc');
 
 const versions = require('./versions.json');
+const sizeLimits = require('../.size-limit');
 
 const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
 const projectName = 'lightweight-charts';
@@ -20,6 +21,11 @@ const githubPagesUrl = `https://${organizationName}.github.io`;
 const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
 
 const typedocWatch = process.env.TYPEDOC_WATCH === 'true';
+
+const size = sizeLimits
+	.map(limit => parseFloat(limit.limit.split(' ')[0]))
+	.reduce((a, b) => Math.max(a, b))
+	.toFixed(1);
 
 function downloadTypingsToFile(typingsFilePath, version) {
 	return new Promise((resolve, reject) => {
@@ -126,6 +132,10 @@ const config = {
 			}),
 		],
 	],
+
+	customFields: {
+		bundleSize: size,
+	},
 
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */

@@ -1,9 +1,9 @@
 import { useColorMode } from '@docusaurus/theme-common';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
 
-import sizeLimits from '../../../.size-limit.js';
 import Cog from '../img/cog.svg';
 import HeroLogo from '../img/hero-logo.svg';
 import InputSliders from '../img/input-sliders.svg';
@@ -14,17 +14,6 @@ import Speedometer from '../img/speedometer.svg';
 import TradingviewHeart from '../img/tradingview-heart.svg';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
-
-interface SizeLimitDefinition {
-	name: string;
-	path: string;
-	limit: string;
-}
-
-const size = sizeLimits
-	.map((limit: SizeLimitDefinition) => parseFloat(limit.limit.split(' ')[0]))
-	.reduce((a: number, b: number) => Math.max(a, b))
-	.toFixed(1);
 
 const visibleLogicalRange = { from: 0.5, to: data.orangeData.length - 1.5 };
 
@@ -164,6 +153,8 @@ function HeroChart(): JSX.Element {
 }
 
 function Index(): JSX.Element {
+	const { siteConfig } = useDocusaurusContext();
+
 	return <div className={styles.RootContainer}>
 		<div className={styles.HeroContainer}>
 			<HeroChart />
@@ -211,7 +202,7 @@ function Index(): JSX.Element {
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard2].join(' ')}>
 					<Paperplane />
-					<h3>Ultra lightweight - just {size} Kb</h3>
+					<h3>Ultra lightweight - just {siteConfig.customFields?.bundleSize} Kb</h3>
 					<p>HTML5 Canvas technology no larger than a standard GIF file.</p>
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
