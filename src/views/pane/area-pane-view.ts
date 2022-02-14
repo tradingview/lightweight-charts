@@ -26,10 +26,17 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		}
 
 		const areaStyleProperties = this._series.options();
-		const priceScaleProps = this._series.priceScale().options();
+		const priceScale = this._series.priceScale();
+		const priceScaleProps = priceScale.options();
+		const isCustomScale = priceScale.id() !== 'right' && priceScale.id() !== 'left';
 
-		const bottom = height;
-		const top = priceScaleProps.scaleMargins ? priceScaleProps.scaleMargins.top * height : 0;
+		let top = 0;
+		let bottom = height;
+
+		if (isCustomScale && priceScaleProps.scaleMargins) {
+			bottom = height;
+			top = priceScaleProps.scaleMargins.top * height;
+		}
 
 		this._makeValid();
 
