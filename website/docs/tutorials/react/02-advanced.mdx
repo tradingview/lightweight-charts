@@ -222,5 +222,10 @@ Given a `series1` reference is created to be passed to the Series component you 
 For instance and as shown below `series1.current.update(new data)` is used upon clicking on the button.
 
 import { App } from "@site/src/pages/_react/advanced-react-example"
+import styles from '../chart.module.css';
 
-<App/>
+<div
+    className={styles.ChartContainer}
+>
+    <App />
+</div>

@@ -10,7 +10,6 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import styles from '../chart.module.css';
 
 const Context = createContext();
 
@@ -69,7 +68,7 @@ export function Chart(props) {
 	const [container, setContainer] = useState(false);
 	const handleRef = useCallback(ref => setContainer(ref), []);
 	return (
-		<div className={styles.ChartContainer} ref={handleRef}>
+		<div ref={handleRef}>
 			{container && <ChartContainer {...props} container={container} />}
 		</div>
 	);

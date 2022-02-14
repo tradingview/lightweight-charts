@@ -46,6 +46,11 @@ and you'll have a reusable component that could then be enhanced, tweaked to mee
 
 If you've successfully followed all the steps you should see something similar to
 
-import { ChartComponent } from "@site/src/pages/_react/simple-react-example"
+import { App } from "@site/src/pages/_react/simple-react-example"
+import styles from '../chart.module.css';
 
-<ChartComponent/>
+<div
+    className={styles.ChartContainer}
+>
+    <App />
+</div>
