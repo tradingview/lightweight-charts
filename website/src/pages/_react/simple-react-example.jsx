@@ -1,5 +1,6 @@
 import { createChart } from 'lightweight-charts';
 import React, { useEffect, useRef } from 'react';
+import styles from '../chart.module.css';
 
 export const ChartComponent = props => {
 	const chartContainerRef = useRef();
@@ -31,6 +32,7 @@ export const ChartComponent = props => {
 
 	return (
 		<div
+			className={styles.ChartContainer}
 			ref={chartContainerRef}
 		/>
 	);
