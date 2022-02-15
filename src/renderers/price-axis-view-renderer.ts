@@ -12,6 +12,7 @@ import {
 export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	private _data!: PriceAxisViewRendererData;
 	private _commonData!: PriceAxisViewRendererCommonData;
+	private _maxLengthText: string | null = null;
 
 	public constructor(data: PriceAxisViewRendererData, commonData: PriceAxisViewRendererCommonData) {
 		this.setData(data, commonData);
@@ -20,6 +21,10 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	public setData(data: PriceAxisViewRendererData, commonData: PriceAxisViewRendererCommonData): void {
 		this._data = data;
 		this._commonData = commonData;
+	}
+
+	public setMaxLengthText(maxLengthText: string | null): void {
+		this._maxLengthText = maxLengthText;
 	}
 
 	public draw(
@@ -91,6 +96,10 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				xOutside = xInside + totalWidth;
 				xTick = xInside + tickSize;
 				xText = xInside + horzBorder + tickSize + paddingInner;
+			}
+
+			if (this._maxLengthText !== null) {
+				xText += Math.ceil(textWidthCache.measureText(ctx, this._maxLengthText)) - textWidth;
 			}
 
 			const tickHeight = Math.max(1, Math.floor(pixelRatio));

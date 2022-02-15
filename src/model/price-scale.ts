@@ -161,6 +161,13 @@ export interface PriceScaleOptions {
 	borderColor: string;
 
 	/**
+	 * Align price labels to the right when using `rightPriceScale`
+	 *
+	 * @defaultValue `false`
+	 */
+	textAlignRight: boolean;
+
+	/**
 	 * Show top and bottom corner labels only if entire text is visible.
 	 *
 	 * @defaultValue `false`

@@ -44,6 +44,7 @@ export interface IPriceAxisViewRenderer {
 
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number;
 	setData(data: PriceAxisViewRendererData, commonData: PriceAxisViewRendererCommonData): void;
+	setMaxLengthText(maxLengthText: string | null): void;
 }
 
 export type IPriceAxisViewRendererConstructor = new(data: PriceAxisViewRendererData, commonData: PriceAxisViewRendererCommonData) => IPriceAxisViewRenderer;

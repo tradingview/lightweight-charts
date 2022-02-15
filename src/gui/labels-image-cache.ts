@@ -38,6 +38,14 @@ export class LabelsImageCache implements IDestroyable {
 		this._hash.clear();
 	}
 
+	public calculateAlignRightOffset(ctx: CanvasRenderingContext2D, text: string, maxLengthText: string): number {
+		const pixelRatio = getCanvasDevicePixelRatio(ctx.canvas);
+		const label = this._getLabelImage(ctx, text);
+		const maxLengthLabel = this._getLabelImage(ctx, maxLengthText);
+
+		return Math.floor(maxLengthLabel.textWidth * pixelRatio) - Math.floor(label.textWidth * pixelRatio);
+	}
+
 	public paintTo(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, align: string): void {
 		const label = this._getLabelImage(ctx, text);
 		if (align !== 'left') {

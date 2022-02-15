@@ -11,7 +11,7 @@ import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
 import { LayoutOptionsInternal } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
-import { PriceScale } from '../model/price-scale';
+import { PriceMark, PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
@@ -59,6 +59,8 @@ export class PriceAxisWidget implements IDestroyable {
 	private _font: string | null = null;
 	private _prevOptimalWidth: number = 0;
 	private _isSettingSize: boolean = false;
+
+	private _maxLengthLabel: string | null = null;
 
 	public constructor(pane: PaneWidget, options: LayoutOptionsInternal, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
@@ -136,6 +138,10 @@ export class PriceAxisWidget implements IDestroyable {
 
 	public lineColor(): string {
 		return ensureNotNull(this._priceScale).options().borderColor;
+	}
+
+	public textAlignRight(): boolean {
+		return ensureNotNull(this._priceScale).options().textAlignRight;
 	}
 
 	public textColor(): string {
@@ -460,6 +466,8 @@ export class PriceAxisWidget implements IDestroyable {
 		const tickHeight = Math.max(1, Math.floor(pixelRatio));
 		const tickOffset = Math.floor(pixelRatio * 0.5);
 
+		this._maxLengthLabel = null;
+
 		if (drawTicks) {
 			const tickLength = Math.round(rendererOptions.tickLength * pixelRatio);
 			ctx.beginPath();
@@ -472,7 +480,19 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.fillStyle = this.textColor();
 		for (const tickMark of tickMarks) {
-			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, Math.round(tickMark.coord * pixelRatio), textAlign);
+			let textOffset = 0;
+
+			if (!this._isLeft && this.textAlignRight()) {
+				if (!this._maxLengthLabel) {
+					this._maxLengthLabel = tickMarks.slice()
+						.map((m: PriceMark) => m.label)
+						.sort((a: string, b: string) => b.length - a.length)[0];
+				}
+
+				textOffset = this._tickMarksCache.calculateAlignRightOffset(ctx, tickMark.label, this._maxLengthLabel);
+			}
+
+			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX + textOffset, Math.round(tickMark.coord * pixelRatio), textAlign);
 		}
 
 		ctx.restore();
@@ -587,6 +607,7 @@ export class PriceAxisWidget implements IDestroyable {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer(ensureNotNull(this._priceScale));
 				ctx.save();
+				renderer.setMaxLengthText(this._maxLengthLabel);
 				renderer.draw(ctx, rendererOptions, this._widthCache, size.w, align, pixelRatio);
 				ctx.restore();
 			}
@@ -619,7 +640,9 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((arr: IPriceAxisViewArray) => {
 			arr.forEach((view: IPriceAxisView) => {
 				ctx.save();
-				view.renderer(ensureNotNull(this._priceScale)).draw(ctx, ro, this._widthCache, size.w, align, pixelRatio);
+				const renderer = view.renderer(ensureNotNull(this._priceScale));
+				renderer.setMaxLengthText(this._maxLengthLabel);
+				renderer.draw(ctx, ro, this._widthCache, size.w, align, pixelRatio);
 				ctx.restore();
 			});
 		});
