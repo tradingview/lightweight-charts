@@ -30,6 +30,7 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
 			lineStyle: lineStyleProps.lineStyle,
 			lineType: lineStyleProps.lineType,
 			lineWidth: lineStyleProps.lineWidth,
+			lineTension: lineStyleProps.lineTension,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		};

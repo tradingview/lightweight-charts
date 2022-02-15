@@ -1,6 +1,7 @@
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { LinePoint, LineType } from './draw-line';
+import { walkCurve } from './walk-curve';
 
 /**
  * BEWARE: The method must be called after beginPath and before stroke/fill/closePath/etc
@@ -9,9 +10,15 @@ export function walkLine(
 	ctx: CanvasRenderingContext2D,
 	points: readonly LinePoint[],
 	lineType: LineType,
+	lineTension: number,
 	visibleRange: SeriesItemsIndexesRange
 ): void {
 	if (points.length === 0) {
+		return;
+	}
+
+	if (lineTension > 0 && visibleRange.to - visibleRange.from > 2) {
+		walkCurve(ctx, points, lineTension, visibleRange);
 		return;
 	}
 

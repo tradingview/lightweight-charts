@@ -175,6 +175,11 @@ export interface LineStyleOptions {
 	lineType: LineType;
 
 	/**
+	 * Line tension. A tension of 0 draws a straight line, a tension of 1 draws a very curvy line. Should be a value between 0 and 1 inclusive.
+	 */
+	lineTension: number;
+
+	/**
 	 * Show the crosshair marker.
 	 *
 	 * @defaultValue `true`
@@ -252,6 +257,11 @@ export interface AreaStyleOptions {
 	 * @defaultValue {@link LineType.Simple}
 	 */
 	lineType: LineType;
+
+	/**
+	 * Line tension. A tension of 0 draws a straight line, a tension of 1 draws a very curvy line. Should be a value between 0 and 1 inclusive.
+	 */
+	lineTension: number;
 
 	/**
 	 * Show the crosshair marker.
@@ -367,6 +377,11 @@ export interface BaselineStyleOptions {
 	 * @defaultValue {@link LineStyle.Solid}
 	 */
 	lineStyle: LineStyle;
+
+	/**
+	 * Line tension. A tension of 0 draws a straight line, a tension of 1 draws a very curvy line. Should be a value between 0 and 1 inclusive.
+	 */
+	lineTension: number;
 
 	/**
 	 * Show the crosshair marker.

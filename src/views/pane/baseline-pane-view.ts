@@ -49,6 +49,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 			lineWidth: baselineProps.lineWidth,
 			lineStyle: baselineProps.lineStyle,
 			lineType: LineType.Simple,
+			lineTension: baselineProps.lineTension,
 
 			baseLevelCoordinate,
 			bottom: height as Coordinate,
@@ -66,6 +67,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 			lineWidth: baselineProps.lineWidth,
 			lineStyle: baselineProps.lineStyle,
 			lineType: LineType.Simple,
+			lineTension: baselineProps.lineTension,
 
 			baseLevelCoordinate,
 			bottom: height as Coordinate,

@@ -34,6 +34,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 			items: this._items,
 			lineStyle: areaStyleProperties.lineStyle,
 			lineWidth: areaStyleProperties.lineWidth,
+			lineTension: areaStyleProperties.lineTension,
 			topColor: areaStyleProperties.topColor,
 			bottomColor: areaStyleProperties.bottomColor,
 			baseLevelCoordinate: height as Coordinate,
@@ -48,6 +49,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 			lineColor: areaStyleProperties.lineColor,
 			lineStyle: areaStyleProperties.lineStyle,
 			lineWidth: areaStyleProperties.lineWidth,
+			lineTension: areaStyleProperties.lineTension,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		});
