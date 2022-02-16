@@ -191,6 +191,12 @@ async function getConfig() {
 						},
 						{
 							type: 'doc',
+							docId: 'tutorials/react/simple', // this is a temporary setting as there's only 1 tutorial at the moment. Should be changed when more tutorials get added.
+							position: 'left',
+							label: 'Tutorials',
+						},
+						{
+							type: 'doc',
 							docId: 'api/index',
 							position: 'left',
 							label: 'API Reference',
@@ -221,6 +227,10 @@ async function getConfig() {
 								{
 									label: 'Getting Started',
 									to: '/docs',
+								},
+								{
+									label: 'Tutorials',
+									to: '/docs/tutorials/react/simple',
 								},
 								{
 									label: 'API Reference',

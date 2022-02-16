@@ -127,17 +127,11 @@ jobs:
       - checkout
       - run: scripts/trailing-newlines.sh
 
-  lint-js:
+  lint-eslint:
     executor: node12-executor
     steps:
       - checkout-with-deps
-      - run: npm run lint:js
-
-  lint-ts:
-    executor: node12-executor
-    steps:
-      - checkout-with-deps
-      - run: npm run lint:ts
+      - run: npm run lint:eslint
 
   lint-dts:
     executor: node12-executor
@@ -148,12 +142,11 @@ jobs:
       - run: npm run bundle-dts
       - run: npm run check-dts-docs
 
-  markdown:
+  lint-markdown:
     executor: node12-executor
     steps:
       - checkout-with-deps
       - run: npm run lint:md
-      - run: npm run check-markdown-links
 
   unittests:
     executor: node12-executor
@@ -301,16 +294,11 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-      - lint-js:
+      - lint-eslint:
           filters: *default-filters
           requires:
             - install-deps
-      - lint-ts:
-          filters: *default-filters
-          requires:
-            - install-deps
-            - install-deps-website
-      - markdown:
+      - lint-markdown:
           filters: *default-filters
           requires:
             - install-deps
