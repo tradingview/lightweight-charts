@@ -46,7 +46,7 @@ function isScreenMinimumWidthForDisplayingChart(): boolean {
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const layout = useThemeAwareLayoutOptions();
-	const [chartContainerClassName, setChartContainerClassName] = React.useState<string>(`${styles.HeroChartContainer} ${chartStyle.ChartContainer}`);
+	const [chartContainerClassName, setChartContainerClassName] = React.useState<string>(`${styles.HeroChartContainer}`);
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
 	React.useEffect(
@@ -149,7 +149,7 @@ function HeroChart(): JSX.Element {
 	);
 
 	return (
-		<div className={chartContainerClassName} ref={ref}></div>
+		<div className={[chartContainerClassName, chartStyle.ChartContainer].join(' ')} ref={ref}></div>
 	);
 }
 
