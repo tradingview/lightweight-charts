@@ -217,13 +217,13 @@ import Code from '!!raw-loader!@site/src/pages/_react/advanced-react-example';
 
 <CodeBlock className="language-jsx">{Code}</CodeBlock>
 
-The code above will produce a Series of type `line` Chart.
+The code above will produce a line series.
 Given a `series1` reference is created to be passed to the Series component you could reuse that object via `series1.current.[any function applicable on Series]`.
 
 For instance and as shown below `series1.current.update(new data)` is used upon clicking on the button.
 
-import { App } from '@site/src/pages/_react/advanced-react-example'
-import styles from '../../../src/pages/chart.module.css';
+import { App } from '@site/src/pages/_react/advanced-react-example';
+import styles from '@site/src/pages/chart.module.css';
 
 <div className={styles.ChartContainer}>
     <App />
