@@ -29,12 +29,12 @@ Therefore the structure could become something like
 
 ```
 <Chart component>
-	<Series component 1>
-		<child component />
-	</Series component 1>
-	<Series component n>
-		<child component />
-	</Series component n>
+    <Series component 1>
+        <child component />
+    </Series component 1>
+    <Series component n>
+        <child component />
+    </Series component n>
 </Chart component>
 ```
 
@@ -46,51 +46,51 @@ However, one drawback with the way React and its hooks like _useEffect_ [work](h
 
 The following skeleton illustrates the mechanism.
 
-```
-ParentComponent = () => {
-	useEffect(() => {
-		// this effect will be triggered in position 3
+```js
+import React, { useEffect } from 'react';
 
-		return () => {
-			// this clean up will be triggered in position 1
-		};
-	}, []);
+export const ParentComponent = () => {
+    // this effect will be triggered in position 3
+    useEffect(() =>
+        () => {
+            // this clean up will be triggered in position 1
+        }
+    , []);
 
-	useEffect(() => {
-		// this effect will be triggered in position 4
+    // this effect will be triggered in position 4
+    useEffect(() =>
+        () => {
+            // this clean up will be triggered in position 2
+        }
+    , []);
 
-		return () => {
-			// this clean up will be triggered in position 2
-		};
-	}, []);
+    // The parent will then return Following bit is to propagate all props & internalRef object down to children
+    return (
+        <ChildComponent />
+    );
+};
+ParentComponent.displayName = 'ParentComponent';
 
-	// The parent will then return Following bit is to propagate all props & internalRef object down to children
-	return (
-		<ChildComponent />
-	);
-}
+export const ChildComponent = () => {
+    // this effect will be triggered in position 1
+    useEffect(() =>
+        () => {
+            // this clean up will be triggered in position 3
+        }
+    , []);
 
-ChildComponent = () => {
-	useEffect(() => {
-		// this effect will be triggered in position 1
+    // this effect will be triggered in position 2
+    useEffect(() =>
+        () => {
+            // this clean up will be triggered in position 4
+        }
+    , []);
 
-		return () => {
-			// this clean up will be triggered in position 3
-		};
-	}, []);
-
-	useEffect(() => {
-		// this effect will be triggered in position 2
-
-		return () => {
-			// this clean up will be triggered in position 4
-		};
-	}, []);
-
-	return (
-		<div />
-	);
-}
+    return (
+        <div />
+    );
+};
+ChildComponent.displayName = 'ChildComponent';
 ```
 
 In essence, taking the example above, it means that a `ChildComponent` (aka Series) would be created first whilst requiring a `ParentComponent` (aka Chart).
@@ -101,14 +101,14 @@ In the end the "visible" structure and usage will be alike but internally it wil
 
 ```
 <Chart component>
-	<ChartContainer>
-		<Series component 1>
-			<child component />
-		</Series component 1>
-		<Series component n>
-			<child component />
-		</Series component n>
-	</ChartContainer>
+    <ChartContainer>
+        <Series component 1>
+            <child component />
+        </Series component 1>
+        <Series component n>
+            <child component />
+        </Series component n>
+    </ChartContainer>
 </Chart component>
 ```
 
@@ -122,91 +122,92 @@ Moreover those 2 "main" components will "expose" whatever functions the user wan
 
 Here's a squeleton of what the final structure would be like:
 
-```
-MainComponent = (props) => {
-	// Creates the first reference and instanciate a ParentComponent
-	return (
-		<div ref={chartReference}>
-			<ChartContainer {...props} container={container} />
-		</div>
-	);
-}
+```js
+import React, { useEffect, useImperativeHandle, useRef } from 'react';
 
-ParentComponent = forwardRef(props, ref) => {
-	const internalRef = useRef({
-		method1() {
-			// This function would be responsible for creating the chart for instance
-		},
-		methodn() {
-			// This function would be responsible for cleaning up the chart
-		}
-	});
+const Context = createContext();
 
-	useEffect(() => {
-		// this effect will be triggered in position 3
+export const MainComponent = props =>
+    // Creates the first reference and instanciate a ParentComponent
+    (
+        <div ref={chartReference}>
+            <ParentComponent {...props} container={container} />
+        </div>
+    );
 
-		return () => {
-			// this clean up will be triggered in position 1
-		};
-	}, []);
+export const ParentComponent = forwardRef((props, ref) => {
+    const internalRef = useRef({
+        method1() {
+            // This function would be responsible for creating the chart for instance
+        },
+        methodn() {
+            // This function would be responsible for cleaning up the chart
+        },
+    });
 
-	useEffect(() => {
-		// this effect will be triggered in position 4
+    // this effect will be triggered in position 3
+    useEffect(() =>
+        () => {
+            // this clean up will be triggered in position 1
+        }
+    , []);
 
-		return () => {
-			// this clean up will be triggered in position 2
-		};
-	}, []);
+    // this effect will be triggered in position 4
+    useEffect(() =>
+        () => {
+            // this clean up will be triggered in position 2
+        }
+    , []);
 
-	useImperativeHandle(ref, () => {
-		// That's the hook responsible for exposing part of/entirety of internalRef
-	}, []);
+    useImperativeHandle(ref, () => {
+        // That's the hook responsible for exposing part of/entirety of internalRef
+    }, []);
 
-	// Following bit is to propagate all props & internalRef object down to children
-	return (
-		<Context.Provider value={internalRef.current}>
-			{props.children}
-		</Context.Provider>
-	);
-}
+    // Following bit is to propagate all props & internalRef object down to children
+    return (
+        <Context.Provider value={internalRef.current}>
+            {props.children}
+        </Context.Provider>
+    );
+});
+ParentComponent.displayName = 'ParentComponent';
 
-ChildComponent = forwardRef(props, ref) => {
-	const internalRef = useRef({
-		method1() {
-			// This function would be responsible for creating a series
-		},
-		methodn() {
-			// This function would be responsible for removing it
-		}
-	});
+export const ChildComponent = forwardRef((props, ref) => {
+    const internalRef = useRef({
+        method1() {
+            // This function would be responsible for creating a series
+        },
+        methodn() {
+            // This function would be responsible for removing it
+        },
+    });
 
-	useEffect(() => {
-		// this effect will be triggered in position 1
+    // this effect will be triggered in position 1
+    useEffect(() =>
+        () => {
+            // this clean up will be triggered in position 3
+        }
+    , []);
 
-		return () => {
-			// this clean up will be triggered in position 3
-		};
-	}, []);
+    // this effect will be triggered in position 2
+    useEffect(() =>
+        () => {
+            // this clean up will be triggered in position 4
+        }
+    , []);
 
-	useEffect(() => {
-		// this effect will be triggered in position 2
+    useImperativeHandle(ref, () => {
+        // That's the hook responsible for exposing part of/entirety of internalRef
+    }, []);
 
-		return () => {
-			// this clean up will be triggered in position 4
-		};
-	}, []);
-
-	useImperativeHandle(ref, () => {
-		// That's the hook responsible for exposing part of/entirety of internalRef
-	}, []);
-
-	// Following bit is to propagate all props & internalRef object down to children
-	return (
-		<Context.Provider value={internalRef.current}>
-			{props.children}
-		</Context.Provider>
-	);
-}
+    // Following bit is to propagate all props & internalRef object down to children
+    return (
+        <Context.Provider value={internalRef.current}>
+            {props.children}
+        </Context.Provider>
+    );
+});
+ChildComponent.displayName = 'ChildComponent';
 ```
 
 By considering all the above you could end up with Chart/Series components looking like the following
@@ -216,16 +217,14 @@ import Code from '!!raw-loader!@site/src/pages/_react/advanced-react-example';
 
 <CodeBlock className="language-jsx">{Code}</CodeBlock>
 
-The code above will produce a Series of type `line` in a 600x400 Chart.
+The code above will produce a Series of type `line` Chart.
 Given a `series1` reference is created to be passed to the Series component you could reuse that object via `series1.current.[any function applicable on Series]`.
 
 For instance and as shown below `series1.current.update(new data)` is used upon clicking on the button.
 
-import { App } from "@site/src/pages/_react/advanced-react-example"
-import styles from '../chart.module.css';
+import { App } from '@site/src/pages/_react/advanced-react-example'
+import styles from '../../../src/pages/chart.module.css';
 
-<div
-    className={styles.ChartContainer}
->
+<div className={styles.ChartContainer}>
     <App />
 </div>

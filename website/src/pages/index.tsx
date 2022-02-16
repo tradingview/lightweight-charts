@@ -12,6 +12,7 @@ import Screens from '../img/screens.svg';
 import Shapes from '../img/shapes.svg';
 import Speedometer from '../img/speedometer.svg';
 import TradingviewHeart from '../img/tradingview-heart.svg';
+import chartStyle from './chart.module.css';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
 
@@ -45,7 +46,7 @@ function isScreenMinimumWidthForDisplayingChart(): boolean {
 function HeroChart(): JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const layout = useThemeAwareLayoutOptions();
-	const [chartContainerClassName, setChartContainerClassName] = React.useState<string>(styles.HeroChartContainer);
+	const [chartContainerClassName, setChartContainerClassName] = React.useState<string>(`${styles.HeroChartContainer} ${chartStyle.ChartContainer}`);
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
 
 	React.useEffect(
