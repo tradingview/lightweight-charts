@@ -11,11 +11,13 @@ const glob = require('glob');
 const markdown = require('markdown-it');
 const markdownAnchors = require('markdown-it-anchor');
 
+const versions = require('../website/versions.json');
+
 const websiteRoot = normalizePath(path.join(__dirname, '../website/'));
 
 const websiteDocsFolders = [
 	normalizePath(path.join(websiteRoot, '/docs/')),
-	normalizePath(path.join(websiteRoot, '/versioned_docs/')),
+	...versions.map(version => normalizePath(path.join(websiteRoot, `/versioned_docs/version-${version}/`))),
 	websiteRoot,
 ];
 
@@ -218,7 +220,7 @@ function main() {
 	try {
 		filesData = collectFilesData(files, checkWebsiteLinks);
 	} catch (e) {
-		console.error(e.message);
+		console.error(e.stack || e.message);
 		process.exitCode = 1;
 		return;
 	}
