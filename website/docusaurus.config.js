@@ -48,17 +48,26 @@ function httpGetJson(url) {
 	});
 }
 
-function downloadTypingsToFile(typingsFilePath, version) {
+function downloadFile(urlString, filePath) {
 	return new Promise((resolve, reject) => {
 		let file;
-		const versionTypingsUrl = `https://unpkg.com/lightweight-charts@${version}/dist/typings.d.ts`;
-		const request = https.get(versionTypingsUrl, response => {
-			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
-				reject(new Error(`Cannot download typings "${versionTypingsUrl}", error code=${response.statusCode}`));
+
+		const url = new URL(urlString);
+
+		const request = https.get(url, response => {
+			if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location !== undefined) {
+				// handling redirect
+				url.pathname = response.headers.location;
+				downloadFile(url.toString(), filePath).then(resolve, reject);
 				return;
 			}
 
-			file = fs.createWriteStream(typingsFilePath);
+			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
+				reject(new Error(`Cannot download file "${urlString}", error code=${response.statusCode}`));
+				return;
+			}
+
+			file = fs.createWriteStream(filePath);
 			file.on('finish', () => {
 				file.close(resolve);
 			});
@@ -74,6 +83,13 @@ function downloadTypingsToFile(typingsFilePath, version) {
 			reject(error);
 		});
 	});
+}
+
+function downloadTypingsToFile(typingsFilePath, version) {
+	return downloadFile(
+		`https://unpkg.com/lightweight-charts@${version}/dist/typings.d.ts`,
+		typingsFilePath
+	);
 }
 
 async function downloadTypingsFromUnpkg(version) {
