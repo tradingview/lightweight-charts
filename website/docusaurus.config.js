@@ -229,7 +229,7 @@ async function getConfig() {
 								},
 								{
 									label: 'Tutorials',
-									to: '/docs/tutorials/react/simple',
+									to: '/tutorials',
 								},
 								{
 									label: 'API Reference',
