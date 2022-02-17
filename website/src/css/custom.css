@@ -55,11 +55,14 @@
 
 	--icon-color: var(--color-black);
 
-	--hero-button-text-color: var(--color-black);
-	--hero-button-hackground-color-hover: var(--color-cold-gray-100);
-	--hero-button-hackground-color-active: var(--color-cold-gray-150);
-	--hero-text-background-color: #ffffff;
+	--hero-button-text-color: var(--color-cold-gray-900);
+	--hero-button-text-color-hover-active: var(--hero-button-text-color);
+	--hero-button-background-color-hover: var(--color-cold-gray-100);
+	--hero-button-background-color-active: var(--color-cold-gray-150);
+	--hero-text-background-color: var(--color-white);
+	--hero-text-large-background-color: var(--hero-text-background-color);
 	--hero-button-border-color: var(--color-cold-gray-150);
+	--hero-text-shadow-color: rgba(0, 0, 0, 0.2);
 
 	--footer-border-color: var(--color-cold-gray-150);
 	--footer-copyright-color: var(--color-cold-gray-500);
@@ -76,7 +79,7 @@
 html[data-theme=dark] {
 	--ifm-navbar-background-color: var(--color-black);
 	--ifm-footer-background-color: var(--color-black);
-	--ifm-background-color: var(--color-black);	
+	--ifm-background-color: var(--color-black);
 	--ifm-footer-link-color: var(--color-cold-gray-200);
 	--ifm-menu-color: var(--color-cold-gray-200);
 	--ifm-menu-color-background-hover: var(--color-cold-gray-800);
@@ -84,11 +87,14 @@ html[data-theme=dark] {
 	--small-card-border-color: var(--color-cold-gray-850);
 	--large-card-background-color: var(--color-cold-gray-900);
 	--small-card-paragraph-color: var(--color-cold-gray-300);
-	--icon-color: var(--color-cold-gray-200);
+	--icon-color: var(--color-white);
 	--hero-button-text-color: var(--color-cold-gray-200);
-	--hero-button-hackground-color-hover: var(--color-cold-gray-800);
-	--hero-button-hackground-color-active: var(--color-cold-gray-750);
-	--hero-text-background-color: var(--color-cold-gray-950);
+	--hero-button-text-color-hover-active: var(--color-white);
+	--hero-button-background-color-hover: var(--color-cold-gray-800);
+	--hero-button-background-color-active: var(--color-cold-gray-750);
+	--hero-text-background-color: var(--color-cold-gray-900);
+	--hero-text-large-background-color: var(--color-black);
+	--hero-text-shadow-color: rgba(0, 0, 0, 0.4);
 	--large-card-paragraph-text-color: var(--color-cold-gray-300);
 	--hero-button-border-color: var(--color-cold-gray-700);
 	--footer-border-color: var(--color-cold-gray-700);
@@ -127,16 +133,14 @@ html[data-theme=dark] .docusaurus-highlight-code-line {
 	height: 65px;
 }
 
-.navbar__brand svg {
-	--color: var(--icon-color);
-}
-
 .navbar-sidebar__back {
 	border-bottom: 1px solid var(--sidebar-back-button-border-color);
 	padding-left: calc(0.5rem + var(--ifm-menu-link-padding-horizontal));
 }
 
-.menu__link, .navbar-sidebar__back {
+.menu__caret,
+.menu__link,
+.navbar-sidebar__back {
 	padding-top: 16px;
 	padding-bottom: 16px;
 }
@@ -203,10 +207,10 @@ html[data-theme=dark] .docusaurus-highlight-code-line {
 		--ifm-footer-padding-horizontal: 40px;
 	}
 
-	/** 
+	/**
 	 * Required to properly override docusaurus styles.
 	 * https://github.com/facebookincubator/infima/blob/c270e2cbdaf0659093ae7f6fbc8899430a0e9147/packages/core/styles/layout/grid.pcss#L51-L55
-	 */ 
+	 */
 	.row .col.col.col {
 		flex-basis: auto;
 	}

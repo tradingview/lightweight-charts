@@ -1,9 +1,9 @@
 import { useColorMode } from '@docusaurus/theme-common';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
 
-import sizeLimits from '../../../.size-limit.js';
 import Cog from '../img/cog.svg';
 import HeroLogo from '../img/hero-logo.svg';
 import InputSliders from '../img/input-sliders.svg';
@@ -12,25 +12,15 @@ import Screens from '../img/screens.svg';
 import Shapes from '../img/shapes.svg';
 import Speedometer from '../img/speedometer.svg';
 import TradingviewHeart from '../img/tradingview-heart.svg';
+import chartStyle from './chart.module.css';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
-
-interface SizeLimitDefinition {
-	name: string;
-	path: string;
-	limit: string;
-}
-
-const size = sizeLimits
-	.map((limit: SizeLimitDefinition) => parseFloat(limit.limit.split(' ')[0]))
-	.reduce((a: number, b: number) => Math.max(a, b))
-	.toFixed(1);
 
 const visibleLogicalRange = { from: 0.5, to: data.orangeData.length - 1.5 };
 
 function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptions> {
 	return isDarkTheme
-		? { background: { color: '#0C0E15' }, textColor: 'rgba(248, 249, 253, 1)' }
+		? { background: { color: '#131722' }, textColor: 'rgba(248, 249, 253, 1)' }
 		: { background: { color: 'rgba(248, 249, 253, 1)' }, textColor: '#000000' };
 }
 
@@ -159,17 +149,19 @@ function HeroChart(): JSX.Element {
 	);
 
 	return (
-		<div className={chartContainerClassName} ref={ref}></div>
+		<div className={[chartContainerClassName, chartStyle.ChartContainer].join(' ')} ref={ref}></div>
 	);
 }
 
 function Index(): JSX.Element {
+	const { siteConfig } = useDocusaurusContext();
+
 	return <div className={styles.RootContainer}>
 		<div className={styles.HeroContainer}>
 			<HeroChart />
 			<div className={styles.HeroTextContainer}>
 				<HeroLogo />
-				<p>Free, open-source and feature-rich. At just {size} kilobytes, the dream of lightweight interactive charts is now a reality.</p>
+				<p>Free, open-source and feature-rich interactive charts</p>
 				<div className={styles.HeroButtonsContainer}>
 					<a className={[styles.HeroButton, styles.HeroButtonPrimary].join(' ')} href="docs">Get Started</a>
 					<a className={styles.HeroButton} href="docs/api">API Reference</a>
@@ -178,7 +170,7 @@ function Index(): JSX.Element {
 		</div>
 		<div className={styles.BelowChartContainer}>
 			<div className={styles.LargeTextContainer}>
-				<h1>Fully customizable & free charts that don&apos;t contain hidden ads</h1>
+				<h1>Less is more</h1>
 				<div>Millions of websites still use static pictures for showing financial charts. The old way is not interactive and doesn&apos;t scale with various devices. Pictures always had a huge advantage of their small size and fast loading&nbsp;—&nbsp;but no more!</div>
 			</div>
 			<div className={styles.LargeCardContainer}>
@@ -211,13 +203,13 @@ function Index(): JSX.Element {
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard2].join(' ')}>
 					<Paperplane />
-					<h3>Ultra lightweight - just {size} Kb</h3>
+					<h3>Ultra lightweight - just {siteConfig.customFields?.bundleSize} Kb</h3>
 					<p>HTML5 Canvas technology no larger than a standard GIF file.</p>
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
 					<InputSliders />
 					<h3>Open-source </h3>
-					<p>Fully customizable & free charts that don&apos;t contain hidden ads. Contributions are welcome!</p>
+					<p>Maintained by TradingView. Hosted on GitHub. Licensed under the Apache License, Version 2.0. Contributions welcome!</p>
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard4].join(' ')}>
 					<Shapes />
