@@ -7,7 +7,7 @@ hide_table_of_contents: true
 
 :::info
 
-The following only describes a relatively simple example that only renders an [area series](../../series-types.md#area) that could be tweaked to render any other type of [series](../../series-types.md).
+The following only describes a relatively simple example that only renders an [area series](/docs/series-types#area) that could be tweaked to render any other type of [series](/docs/series-types).
 
 For a more complete scenario where you could wrap Lightweight Charts into a component having sub components, please consult this [example](./advanced).
 
@@ -38,7 +38,7 @@ This will create a web page accessible by default on <http://localhost:1234/>.
 The example _React component_ on this page may not fit your requirements completely. Creating a general purpose declarative wrapper for Lightweight Charts' imperative API is a challenge, but hopefully you can adapt this example to your use case.
 
 import CodeBlock from '@theme/CodeBlock';
-import code from '!!raw-loader!@site/src/pages/_react/simple-react-example';
+import code from '!!raw-loader!./_simple-react-example';
 
 <CodeBlock className="language-jsx">{code}</CodeBlock>
 
@@ -46,7 +46,7 @@ and you'll have a reusable component that could then be enhanced, tweaked to mee
 
 If you've successfully followed all the steps you should see something similar to
 
-import { App } from '@site/src/pages/_react/simple-react-example';
+import { App } from './_simple-react-example';
 import styles from '@site/src/pages/chart.module.css';
 
 <div className={styles.ChartContainer}>

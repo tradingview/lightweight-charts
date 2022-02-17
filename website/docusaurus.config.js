@@ -190,8 +190,7 @@ async function getConfig() {
 							label: 'Getting Started',
 						},
 						{
-							type: 'doc',
-							docId: 'tutorials/react/simple', // this is a temporary setting as there's only 1 tutorial at the moment. Should be changed when more tutorials get added.
+							to: '/tutorials',
 							position: 'left',
 							label: 'Tutorials',
 						},
@@ -282,6 +281,16 @@ async function getConfig() {
 			}),
 
 		plugins: [
+			[
+				'content-docs',
+				/** @type {import('@docusaurus/plugin-content-docs').Options} */
+				({
+					id: 'tutorials',
+					path: 'tutorials',
+					routeBasePath: 'tutorials',
+					sidebarPath: require.resolve('./sidebars-tutorials.js'),
+				}),
+			],
 			[
 				'docusaurus-plugin-typedoc',
 				// @ts-ignore
