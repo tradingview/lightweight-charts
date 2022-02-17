@@ -92,8 +92,12 @@ function downloadTypingsToFile(typingsFilePath, version) {
 	);
 }
 
+function getTypingsCacheFilePath(version) {
+	return path.resolve(cacheDir, `./v${version}.d.ts`);
+}
+
 async function downloadTypingsFromUnpkg(version) {
-	const typingsFilePath = path.resolve(cacheDir, `./v${version}.d.ts`);
+	const typingsFilePath = getTypingsCacheFilePath(version);
 
 	try {
 		await fsp.stat(typingsFilePath);
@@ -129,12 +133,10 @@ function typedocPluginForVersion(version) {
 
 		/** @type {() => Promise<any>} */
 		loadContent: async () => {
-			const typingsFilePath = await downloadTypingsFromUnpkg(version);
-
 			await pluginDocusaurus(context, {
 				...commonDocusaurusPluginTypedocConfig,
 				id: `${version}-api`,
-				entryPoints: [typingsFilePath],
+				entryPoints: [getTypingsCacheFilePath(version)],
 				docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
 			}).loadContent();
 		},
@@ -156,6 +158,9 @@ async function getConfig() {
 	} catch (e) {
 		logger.warn(`Cannot use size from bundlephobia, use size from size-limit instead, error=${e.toString()}`);
 	}
+
+	// pre-download required typings files before run docusaurus
+	await Promise.all(versions.map(downloadTypingsFromUnpkg));
 
 	/** @type {import('@docusaurus/types').Config} */
 	const config = {
