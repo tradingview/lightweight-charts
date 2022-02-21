@@ -17,15 +17,13 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	const baselineSeries = chart.addBaselineSeries({
+	const areaSeries = chart.addAreaSeries({
+		lineType: LightweightCharts.LineType.WithSteps,
 		lineTension: 0.5,
-		baseValue: {
-			price: 0,
-		},
 	});
 
 	const data = generateData();
-	baselineSeries.setData(data);
+	areaSeries.setData(data);
 
 	chart.timeScale().fitContent();
 }

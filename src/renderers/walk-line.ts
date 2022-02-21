@@ -17,7 +17,7 @@ export function walkLine(
 		return;
 	}
 
-	if (lineTension > 0 && visibleRange.to - visibleRange.from > 2) {
+	if (lineTension > 0 && lineType === LineType.Simple) {
 		walkCurve(ctx, points, lineTension, visibleRange);
 		return;
 	}

@@ -84,7 +84,7 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 
 		ctx.beginPath();
 
-		if (lineTension > 0) {
+		if (lineTension > 0 && lineType === LineType.Simple) {
 			this._walkCurveWithColorChange(ctx, data.items, lineTension, visibleRange, lineColor);
 		} else {
 			this._walkLineWithColorChange(ctx, items, lineType, lineColor, visibleRange);
