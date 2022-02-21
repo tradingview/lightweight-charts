@@ -370,6 +370,12 @@ export class TimeScale {
 			return;
 		}
 
+		// when we change the width and we need to correct visible range because of fixing left edge
+		// we need to check the previous visible range rather than the new one
+		// because it might be updated by changing width, bar spacing, etc
+		// but we need to try to keep the same range
+		const previousVisibleRange = this.visibleLogicalRange();
+
 		const oldWidth = this._width;
 		this._width = newWidth;
 		this._visibleRangeInvalidated = true;
@@ -384,10 +390,8 @@ export class TimeScale {
 		// keep left edge instead of right
 		// we need it to avoid "shaking" if the last bar visibility affects time scale width
 		if (this._options.fixLeftEdge) {
-			const visibleRange = this.visibleLogicalRange();
-
 			// note that logical left range means not the middle of a bar (it's the left border)
-			if (visibleRange !== null && visibleRange.left() <= 0) {
+			if (previousVisibleRange !== null && previousVisibleRange.left() <= 0) {
 				const delta = oldWidth - newWidth;
 				// reduce  _rightOffset means move right
 				// we could move more than required - this will be fixed by _correctOffset()
