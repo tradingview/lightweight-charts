@@ -125,6 +125,9 @@ function HeroChart(): JSX.Element {
 
 				const { width, height } = container.getBoundingClientRect();
 				chart.resize(width, height);
+
+				// TODO: remove this after releasing the new version (fixed in v4.0.0)
+				// and use lockVisibleTimeRangeOnResize time scale option instead
 				chart.timeScale().setVisibleLogicalRange(visibleLogicalRange);
 			};
 
