@@ -361,18 +361,22 @@ export class TimeScale {
 		return this._width;
 	}
 
-	public setWidth(width: number): void {
-		if (!isFinite(width) || width <= 0) {
+	public setWidth(newWidth: number): void {
+		if (!isFinite(newWidth) || newWidth <= 0) {
 			return;
 		}
 
-		if (this._width === width) {
+		if (this._width === newWidth) {
 			return;
 		}
 
-		if (this._options.lockVisibleTimeRangeOnResize && this._width) {
+		const oldWidth = this._width;
+		this._width = newWidth;
+		this._visibleRangeInvalidated = true;
+
+		if (this._options.lockVisibleTimeRangeOnResize && oldWidth !== 0) {
 			// recalculate bar spacing
-			const newBarSpacing = this._barSpacing * width / this._width;
+			const newBarSpacing = this._barSpacing * newWidth / oldWidth;
 			this._barSpacing = newBarSpacing;
 		}
 
@@ -380,22 +384,17 @@ export class TimeScale {
 		// keep left edge instead of right
 		// we need it to avoid "shaking" if the last bar visibility affects time scale width
 		if (this._options.fixLeftEdge) {
-			const visibleRange = this.visibleStrictRange();
-			if (visibleRange !== null) {
-				const firstVisibleBar = visibleRange.left();
-				// firstVisibleBar could be less than 0
-				// since index is a center of bar
-				if (firstVisibleBar <= 0) {
-					const delta = this._width - width;
-					// reduce  _rightOffset means move right
-					// we could move more than required - this will be fixed by _correctOffset()
-					this._rightOffset -= Math.round(delta / this._barSpacing) + 1;
-				}
+			const visibleRange = this.visibleLogicalRange();
+
+			// note that logical left range means not the middle of a bar (it's the left border)
+			if (visibleRange !== null && visibleRange.left() <= 0) {
+				const delta = oldWidth - newWidth;
+				// reduce  _rightOffset means move right
+				// we could move more than required - this will be fixed by _correctOffset()
+				this._rightOffset -= Math.round(delta / this._barSpacing) + 1;
+				this._visibleRangeInvalidated = true;
 			}
 		}
-
-		this._width = width;
-		this._visibleRangeInvalidated = true;
 
 		// updating bar spacing should be first because right offset depends on it
 		this._correctBarSpacing();
