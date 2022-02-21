@@ -124,6 +124,14 @@ const commonDocusaurusPluginTypedocConfig = {
 	// which would result in the title of our generated index page being 'undefined'.
 	name: 'lightweight-charts',
 	sort: ['source-order'],
+
+	// let's disable pagination for API Reference pages since it makes almost no sense there
+	frontmatter: {
+		// eslint-disable-next-line camelcase
+		pagination_next: null,
+		// eslint-disable-next-line camelcase
+		pagination_prev: null,
+	},
 };
 
 /** @type {(version: string) => import('@docusaurus/types').PluginModule} */
