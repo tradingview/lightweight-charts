@@ -2,7 +2,6 @@ import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from 
 
 import { assert, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
-import { clamp } from '../helpers/mathex';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
@@ -162,7 +161,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), areaStyleDefaults, options) as AreaSeriesOptions;
-		strictOptions.lineTension = clamp(strictOptions.lineTension, 0, 1);
 		const series = this._chartWidget.model().createSeries('Area', strictOptions);
 
 		const res = new SeriesApi<'Area'>(series, this, this);
@@ -177,7 +175,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 		// to avoid assigning fields to defaults we have to clone them
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(baselineStyleDefaults), options) as BaselineSeriesOptions;
-		strictOptions.lineTension = clamp(strictOptions.lineTension, 0, 1);
 		const series = this._chartWidget.model().createSeries('Baseline', strictOptions);
 
 		const res = new SeriesApi<'Baseline'>(series, this, this);
@@ -231,7 +228,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), lineStyleDefaults, options) as LineSeriesOptions;
-		strictOptions.lineTension = clamp(strictOptions.lineTension, 0, 1);
 		const series = this._chartWidget.model().createSeries('Line', strictOptions);
 
 		const res = new SeriesApi<'Line'>(series, this, this);

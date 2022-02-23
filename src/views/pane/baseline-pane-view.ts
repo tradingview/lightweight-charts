@@ -5,7 +5,6 @@ import { Series } from '../../model/series';
 import { TimePointIndex } from '../../model/time-data';
 import { PaneRendererBaselineArea, PaneRendererBaselineLine } from '../../renderers/baseline-renderer';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
-import { LineType } from '../../renderers/draw-line';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { LineItem } from '../../renderers/line-renderer';
 
@@ -48,8 +47,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 
 			lineWidth: baselineProps.lineWidth,
 			lineStyle: baselineProps.lineStyle,
-			lineType: LineType.Simple,
-			lineTension: baselineProps.lineTension,
+			lineType: baselineProps.lineType,
 
 			baseLevelCoordinate,
 			bottom: height as Coordinate,
@@ -66,8 +64,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 
 			lineWidth: baselineProps.lineWidth,
 			lineStyle: baselineProps.lineStyle,
-			lineType: LineType.Simple,
-			lineTension: baselineProps.lineTension,
+			lineType: baselineProps.lineType,
 
 			baseLevelCoordinate,
 			bottom: height as Coordinate,

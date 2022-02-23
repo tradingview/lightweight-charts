@@ -21,7 +21,7 @@ function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 
 	const lineSeries = chart.addLineSeries({
-		lineTension: 1,
+		lineType: LightweightCharts.LineType.Curved,
 	});
 
 	const data = generateData();

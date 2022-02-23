@@ -11,7 +11,6 @@ export interface PaneRendererAreaDataBase {
 	lineType: LineType;
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
-	lineTension: number;
 
 	bottom: Coordinate;
 	baseLevelCoordinate: Coordinate;
@@ -54,7 +53,7 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.baseLevelCoordinate);
 			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
 
-			walkLine(ctx, this._data.items, this._data.lineType, this._data.lineTension, this._data.visibleRange);
+			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
 
 			if (this._data.visibleRange.to > this._data.visibleRange.from) {
 				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.baseLevelCoordinate);
