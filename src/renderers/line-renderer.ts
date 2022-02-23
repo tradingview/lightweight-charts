@@ -3,7 +3,7 @@ import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
-import { walkLine, walkLineSegment } from './walk-line';
+import { getControlPoints, walkLine } from './walk-line';
 
 export type LineItem = TimedValue & PricedValue & LinePoint & { color?: string };
 
@@ -106,7 +106,20 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 				ctx.moveTo(prevItem.x, prevItem.y);
 			}
 
-			walkLineSegment(ctx, items, i, lineType);
+			switch (lineType) {
+				case LineType.Simple:
+					ctx.lineTo(currItem.x, currItem.y);
+					break;
+				case LineType.WithSteps:
+					ctx.lineTo(currItem.x, prevItem.y);
+					ctx.lineTo(currItem.x, currItem.y);
+					break;
+				case LineType.Curved: {
+					const [cp1, cp2] = getControlPoints(items, i - 1);
+					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
+					break;
+				}
+			}
 		}
 
 		ctx.stroke();
