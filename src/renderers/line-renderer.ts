@@ -74,7 +74,6 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 	/**
 	 * Similar to {@link walkLine}, but supports color changes
 	 */
-	// eslint-disable-next-line complexity
 	protected override _drawLine(ctx: CanvasRenderingContext2D, data: PaneRendererLineData): void {
 		const { items, visibleRange, lineType, lineColor } = data;
 		if (items.length === 0 || visibleRange === null) {
@@ -102,37 +101,24 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 
 			const currentStrokeStyle = currItem.color ?? lineColor;
 
-			if (lineType === LineType.WithSteps) {
-				ctx.lineTo(currItem.x, prevItem.y);
-
-				if (currentStrokeStyle !== prevStrokeStyle) {
-					changeColor(currentStrokeStyle);
-					ctx.moveTo(currItem.x, prevItem.y);
-				}
-
-				ctx.lineTo(currItem.x, currItem.y);
-			} else if (lineType === LineType.Curved) {
-				const [cp1, cp2] = getControlPoints(items, i - 1);
-
-				if (currentStrokeStyle !== prevStrokeStyle) {
-					changeColor(currentStrokeStyle);
-					ctx.moveTo(prevItem.x, prevItem.y);
-				}
-
-				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
-			} else {
-				ctx.lineTo(currItem.x, currItem.y);
-			}
-
-			if (lineType === LineType.Simple && currentStrokeStyle !== prevStrokeStyle) {
-				changeColor(currentStrokeStyle);
-				ctx.moveTo(currItem.x, currItem.y);
-			} else if (lineType === LineType.Curved && currentStrokeStyle !== prevStrokeStyle) {
-				const nextItem = items[i + 1];
-				const [cp1, cp2] = getControlPoints(items, i);
+			if (currentStrokeStyle !== prevStrokeStyle) {
 				changeColor(currentStrokeStyle);
 				ctx.moveTo(prevItem.x, prevItem.y);
-				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, nextItem.x, nextItem.y);
+			}
+
+			switch (lineType) {
+				case LineType.Simple:
+					ctx.lineTo(currItem.x, currItem.y);
+					break;
+				case LineType.WithSteps:
+					ctx.lineTo(currItem.x, prevItem.y);
+					ctx.lineTo(currItem.x, currItem.y);
+					break;
+				case LineType.Curved: {
+					const [cp1, cp2] = getControlPoints(items, i - 1);
+					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
+					break;
+				}
 			}
 		}
 

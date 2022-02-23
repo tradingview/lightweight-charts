@@ -23,17 +23,20 @@ export function walkLine(
 	for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
 		const currItem = points[i];
 
-		//  x---x---x   or   x---x   o   or   start
-		if (lineType === LineType.WithSteps) {
-			const prevY = points[i - 1].y;
-			const currX = currItem.x;
-			ctx.lineTo(currX, prevY);
-			ctx.lineTo(currItem.x, currItem.y);
-		} else if (lineType === LineType.Curved) {
-			const [cp1, cp2] = getControlPoints(points, i - 1);
-			ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
-		} else {
-			ctx.lineTo(currItem.x, currItem.y);
+		switch (lineType) {
+			case LineType.Simple:
+				ctx.lineTo(currItem.x, currItem.y);
+				break;
+			case LineType.WithSteps: {
+				ctx.lineTo(currItem.x, points[i - 1].y);
+				ctx.lineTo(currItem.x, currItem.y);
+				break;
+			}
+			case LineType.Curved: {
+				const [cp1, cp2] = getControlPoints(points, i - 1);
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
+				break;
+			}
 		}
 	}
 }
