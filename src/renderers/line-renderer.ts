@@ -97,21 +97,20 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 
 		for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
 			const currItem = items[i];
-			const prevItem = items[i - 1];
-
 			const currentStrokeStyle = currItem.color ?? lineColor;
-
-			if (currentStrokeStyle !== prevStrokeStyle) {
-				changeColor(currentStrokeStyle);
-				ctx.moveTo(prevItem.x, prevItem.y);
-			}
 
 			switch (lineType) {
 				case LineType.Simple:
 					ctx.lineTo(currItem.x, currItem.y);
 					break;
 				case LineType.WithSteps:
-					ctx.lineTo(currItem.x, prevItem.y);
+					ctx.lineTo(currItem.x, items[i - 1].y);
+
+					if (currentStrokeStyle !== prevStrokeStyle) {
+						changeColor(currentStrokeStyle);
+						ctx.lineTo(currItem.x, items[i - 1].y);
+					}
+
 					ctx.lineTo(currItem.x, currItem.y);
 					break;
 				case LineType.Curved: {
@@ -119,6 +118,11 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
 					break;
 				}
+			}
+
+			if (lineType !== LineType.WithSteps && currentStrokeStyle !== prevStrokeStyle) {
+				changeColor(currentStrokeStyle);
+				ctx.moveTo(currItem.x, currItem.y);
 			}
 		}
 
