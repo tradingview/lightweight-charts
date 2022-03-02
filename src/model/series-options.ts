@@ -367,6 +367,12 @@ export interface BaselineStyleOptions {
 	 * @defaultValue {@link LineStyle.Solid}
 	 */
 	lineStyle: LineStyle;
+	/**
+	 * Line type.
+	 *
+	 * @defaultValue {@link LineType.Simple}
+	 */
+	lineType: LineType;
 
 	/**
 	 * Show the crosshair marker.
