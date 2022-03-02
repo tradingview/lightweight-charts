@@ -114,7 +114,7 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 					ctx.lineTo(currItem.x, currItem.y);
 					break;
 				case LineType.Curved: {
-					const [cp1, cp2] = getControlPoints(items, i - 1);
+					const [cp1, cp2] = getControlPoints(items, i - 1, i);
 					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
 					break;
 				}
