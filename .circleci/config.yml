@@ -223,7 +223,7 @@ jobs:
           at: ./
       - run:
           name: "Comparing sizes with merge-base"
-          command: node scripts/compare-size-with-merge-base.js
+          command: node scripts/compare-size-with-merge-base.cjs
       - run: npm run size-limit
 
   build-docusaurus-website:

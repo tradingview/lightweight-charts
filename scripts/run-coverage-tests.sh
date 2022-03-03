@@ -5,4 +5,4 @@ echo "Preparing"
 npm run build
 
 echo "Coverage tests"
-node ./tests/e2e/coverage/runner.js ./dist/lightweight-charts.standalone.development.js
+node ./tests/e2e/coverage/runner.cjs ./dist/lightweight-charts.standalone.development.js

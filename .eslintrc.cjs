@@ -82,6 +82,7 @@ module.exports = {
 			files: [
 				'**/*.js',
 				'**/*.jsx',
+				'**/*.cjs',
 
 				// that's for md/mdx files
 				'**/*.javascript',

@@ -5,9 +5,9 @@ const path = require('path');
 
 const Mocha = require('mocha');
 
-const serveLocalFiles = require('../serve-local-files').serveLocalFiles;
+const serveLocalFiles = require('../serve-local-files.cjs').serveLocalFiles;
 
-const mochaConfig = require('../../../.mocharc.js');
+const mochaConfig = require('../../../.mocharc.cjs');
 
 // override tsconfig
 process.env.TS_NODE_PROJECT = path.resolve(__dirname, '../tsconfig.composite.json');

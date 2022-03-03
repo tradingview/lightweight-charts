@@ -12,7 +12,7 @@ const { default: pluginDocusaurus } = require('docusaurus-plugin-typedoc');
 const { default: logger } = require('@docusaurus/logger');
 
 const versions = require('./versions.json');
-const sizeLimits = require('../.size-limit');
+const sizeLimits = require('../.size-limit.cjs');
 
 const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
 const projectName = 'lightweight-charts';

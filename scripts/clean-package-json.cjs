@@ -20,6 +20,12 @@ function main() {
 	delete packageJson.devDependencies;
 	delete packageJson.scripts;
 
+	// unfortunately, it seems that for now it is impossible to put this line to package.json directly
+	// because for some reason tests don't work with that flag
+	// either mocha, ts-node or typescript does't want to work
+	// so let's add this setting on pre-publish phase
+	packageJson.type = 'module';
+
 	fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', { encoding: 'utf-8' });
 }
 

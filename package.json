@@ -13,11 +13,23 @@
     "url": "https://github.com/tradingview/lightweight-charts.git"
   },
   "module": "dist/lightweight-charts.esm.production.js",
-  "main": "index.js",
   "typings": "dist/typings.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": {
+        "import": "./dist/lightweight-charts.esm.development.js"
+      },
+      "production": {
+        "import": "./dist/lightweight-charts.esm.production.js"
+      },
+      "default": {
+        "import": "./dist/lightweight-charts.esm.production.js"
+      }
+    }
+  },
   "files": [
-    "dist/**",
-    "index.js"
+    "dist/**"
   ],
   "keywords": [
     "financial-charting-library",
@@ -87,9 +99,9 @@
   },
   "scripts": {
     "postinstall": "npm run install-hooks",
-    "install-hooks": "node scripts/githooks/install.js",
+    "install-hooks": "node scripts/githooks/install.cjs",
     "clean": "rimraf lib/ dist/",
-    "bundle-dts": "tsc --noEmit --allowJs dts-config.js && dts-bundle-generator --config dts-config.js",
+    "bundle-dts": "tsc --noEmit --allowJs dts-config.cjs && dts-bundle-generator --config dts-config.cjs",
     "tsc": "ttsc -p tsconfig.prod.json",
     "tsc-watch": "npm run tsc -- --watch --preserveWatchOutput",
     "tsc-verify": "tsc -b tsconfig.composite.json",
@@ -97,14 +109,14 @@
     "lint:eslint": "eslint --format=unix ./",
     "lint:md": "markdownlint -i \"**/node_modules/**\" -i \"**/website/docs/api/**\" -i \"**/website/versioned_docs/**/api/**\" \"**/*.md\"",
     "check-dts-docs": "eslint --format=unix ./dist/typings.d.ts",
-    "check-markdown-links": "node scripts/check-markdown-links.js",
+    "check-markdown-links": "node scripts/check-markdown-links.cjs",
     "rollup": "rollup -c rollup.config.js",
     "rollup-watch": "npm run rollup -- --watch",
     "build": "npm-run-all tsc rollup bundle-dts",
     "build:watch": "npm-run-all tsc -p tsc-watch rollup-watch",
     "build:prod": "cross-env NODE_ENV=production npm run build",
     "build:release": "cross-env BUILD_TAG=release npm run build:prod",
-    "prepare-release": "npm-run-all clean build:release && node ./scripts/clean-package-json.js",
+    "prepare-release": "npm-run-all clean build:release && node ./scripts/clean-package-json.cjs",
     "size-limit": "size-limit",
     "verify": "npm-run-all clean -p lint check-markdown-links build:prod -p check-dts-docs tsc-verify test size-limit",
     "test": "mocha tests/unittests/**/*.spec.ts"
