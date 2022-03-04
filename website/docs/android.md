@@ -42,7 +42,7 @@ In `/gradle_module/build.gradle`
 ```groovy
 dependencies {
     //...
-    implementation 'com.tradingview:lightweightcharts:3.7.0'
+    implementation 'com.tradingview:lightweightcharts:3.8.0'
 }
 ```
 
@@ -72,7 +72,7 @@ Configure the chart layout.
 ```kotlin
 charts_view.api.applyOptions {
     layout = layoutOptions {
-        backgroundColor = Color.LTGRAY.toIntColor()
+        background = SolidColor(Color.LTGRAY)
         textColor = Color.BLACK.toIntColor()
     }
     localization = localizationOptions {
