@@ -163,7 +163,7 @@ export const Series = forwardRef((props, ref) => {
 
 	useLayoutEffect(() => {
 		const currentRef = context.current;
-		const { chilren, data, ...rest } = props;
+		const { children, data, ...rest } = props;
 		currentRef.api().applyOptions(rest);
 	});
 
