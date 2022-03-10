@@ -80,6 +80,21 @@ const rightPriceScale = chart.priceScale('right');
 const leftPriceScale = chart.priceScale('left');
 ```
 
+## `drawTicks` from `leftPriceScale` and `rightPriceScale` options has been renamed to `ticksVisible`
+
+Since v4 you have to use `ticksVisible` instead of `drawTicks`.
+
+```js
+const chart = createChart({
+    leftPriceScale: {
+        ticksVisible: false,
+    },
+    rightPriceScale: {
+        ticksVisible: false,
+    },
+});
+```
+
 ## The type of outbound time values has been changed
 
 Affected API:
