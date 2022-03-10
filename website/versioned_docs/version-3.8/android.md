@@ -72,7 +72,7 @@ Configure the chart layout.
 ```kotlin
 charts_view.api.applyOptions {
     layout = layoutOptions {
-        backgroundColor = Color.LTGRAY.toIntColor()
+        background = SolidColor(Color.LTGRAY)
         textColor = Color.BLACK.toIntColor()
     }
     localization = localizationOptions {
