@@ -314,7 +314,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	private _drawTickMarks(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		const tickMarks = this._chart.model().timeScale().marks();
+		const timeScale = this._chart.model().timeScale();
+		const tickMarks = timeScale.marks();
 
 		if (!tickMarks || tickMarks.length === 0) {
 			return;
@@ -348,7 +349,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const tickWidth = Math.max(1, Math.floor(pixelRatio));
 		const tickOffset = Math.floor(pixelRatio * 0.5);
 
-		if (this._chart.model().timeScale().options().borderVisible) {
+		const options = timeScale.options();
+		if (options.borderVisible && options.ticksVisible) {
 			ctx.beginPath();
 			const tickLen = Math.round(rendererOptions.tickLength * pixelRatio);
 			for (let index = tickMarks.length; index--;) {

@@ -20,6 +20,7 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 		text: '',
 		width: 0,
 		coordinate: NaN,
+		tickVisible: true,
 	};
 
 	public constructor(crosshair: Crosshair, model: ChartModel, valueProvider: TimeAndCoordinateProvider) {
@@ -73,5 +74,6 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 		const colors = generateContrastColors(options.labelBackgroundColor);
 		data.background = colors.background;
 		data.color = colors.foreground;
+		data.tickVisible = timeScale.options().ticksVisible;
 	}
 }
