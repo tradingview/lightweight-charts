@@ -11,9 +11,10 @@ sidebar_position: 0
 First of all, Lightweight Charts is _a client-side_ library.
 This means that it does not and cannot work on the server-side (i.e. NodeJS), at least out of the box.
 
-The code of `lightweight-charts` package is targeted to _es2016_ language specification.
-Thus, all the browsers you need to work with should support this language revision (see [this compatibility table](https://kangax.github.io/compat-table/es2016plus/)).
+The code of `lightweight-charts` package is targeted to [_es2016_ language specification](https://262.ecma-international.org/7.0/).
+Thus, all the browsers you will have to work with should support this language revision (see [this compatibility table](https://kangax.github.io/compat-table/es2016plus/)).
 If you need to support the previous revisions, you could try to setup a transpilation of the package to the target you need to support in your build system (e.g. by using Babel).
+If you'll have any issues with that, please raise an issue on github with the details and we'll investigate possible ways to solve it.
 
 ## Installation
 
