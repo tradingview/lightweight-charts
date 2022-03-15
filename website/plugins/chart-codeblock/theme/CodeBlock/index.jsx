@@ -55,7 +55,7 @@ const Chart = props => {
 		};
 
 		window.addEventListener('message', readyMessageListener, false);
-	}, [origin])
+	}, [origin]);
 
 	return (
 		<iframe
@@ -74,7 +74,7 @@ const ChartCodeBlock = props => {
 				{/* <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <div className={styles.iframe}>&nbsp;</div>}</BrowserOnly> */}
 				<BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={props.children} />}</BrowserOnly>
 			</>
-	);
+		);
 	}
 
 	return <CodeBlock {...props} />;

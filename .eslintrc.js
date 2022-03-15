@@ -186,12 +186,15 @@ module.exports = {
 				lineSeries: true,
 				series: true,
 				createChart: true,
+				ColorType: true,
+				chartReference: true,
 			},
 			rules: {
 				'no-console': 'off',
 				'no-unused-vars': 'off',
 				indent: ['error', 4],
 				'unicorn/filename-case': 'off',
+				'react/prop-types': 'off',
 			},
 		},
 		{

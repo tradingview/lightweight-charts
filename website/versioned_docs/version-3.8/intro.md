@@ -34,8 +34,8 @@ import { createChart } from 'lightweight-charts';
 // ...
 
 // somewhere in your code
-const firstChart = createChart(firstContainer);
-const secondChart = createChart(secondContainer);
+const firstChart = createChart(document.getElementById('firstContainer'));
+const secondChart = createChart(document.getElementById('secondContainer'));
 ```
 
 The result of this function is a [`IChartApi`](/api/interfaces/IChartApi.md) object, which you need to use to work with a chart instance.

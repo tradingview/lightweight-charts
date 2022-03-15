@@ -120,10 +120,10 @@ The same technique will be used within the Series component to handle this time 
 
 Moreover those 2 "main" components will "expose" whatever functions the user wants from the internal reference object at a higher level, meaning once those references are accessible any other component would then be able to act on either the Chart or any Series.
 
-Here's a squeleton of what the final structure would be like:
+Here's a skeleton of what the final structure would be like:
 
 ```js
-import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, createContext, forwardRef } from 'react';
 
 const Context = createContext();
 
