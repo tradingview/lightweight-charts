@@ -42,7 +42,7 @@ const Chart = props => {
 	const ref = React.useRef();
 
 	/**
-	 * iOS Safari seems to run scripts iwthin the iframe in a differnet order
+	 * iOS Safari seems to run scripts within the iframe in a different order
 	 * compared to desktop Chrome, Safari, etc.
 	 *
 	 * On the desktop browsers the React effect will run first, so the 'ready'
