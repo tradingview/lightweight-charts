@@ -290,10 +290,6 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-      - lint-eslint:
-          filters: *default-filters
-          requires:
-            - install-deps
       - lint-markdown:
           filters: *default-filters
           requires:
@@ -336,6 +332,10 @@ workflows:
           requires:
             - build
       - lint-dts:
+          filters: *default-filters
+          requires:
+            - build
+      - lint-eslint:
           filters: *default-filters
           requires:
             - build
