@@ -127,6 +127,8 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
+      - attach_workspace:
+          at: ./
       - run: npm run lint:eslint
 
   lint-dts:
