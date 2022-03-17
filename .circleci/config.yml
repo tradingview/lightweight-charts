@@ -232,8 +232,7 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm run tsc
-      - run: npm run bundle-dts
+      - run: npm run build
       - run:
           name: "Install dependencies and build website"
           command: |
