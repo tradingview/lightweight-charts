@@ -232,7 +232,7 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm run build
+      - run: npm run build:prod
       - run:
           name: "Install dependencies and build website"
           command: |
