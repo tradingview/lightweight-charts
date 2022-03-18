@@ -21,7 +21,16 @@ function importLightweightChartsVersion(version) {
 
 function getSrcDocWithScript(script, parentOrigin) {
 	return `
-		<style>html, body, #container { width: 100%; height: 100%; overflow: hidden; }</style>
+		<style>
+			html,
+			body,
+			#container {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+				margin: 0;
+			}
+		</style>
 		<div id="container"></div>
 		<script>
 			window.run = () => {
