@@ -1,6 +1,7 @@
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Series } from '../../model/series';
+import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { LineItem, PaneRendererLine, PaneRendererLineData } from '../../renderers/line-renderer';
@@ -38,7 +39,15 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
 		return this._lineRenderer;
 	}
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice): LineItem {
-		return this._createRawItemBase(time, price);
+	protected override _updateOptions(): void {
+		this._items.forEach((item: LineItem) => {
+			item.color = this._series.barColorer().barStyle(item.time).barColor;
+		});
+	}
+
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer): LineItem {
+		const item = this._createRawItemBase(time, price) as LineItem;
+		item.color = colorer.barStyle(time).barColor;
+		return item;
 	}
 }

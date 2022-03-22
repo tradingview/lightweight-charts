@@ -8,7 +8,7 @@ import { Coordinate } from '../../model/coordinate';
 import { Pane } from '../../model/pane';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
-import { InternalSeriesMarker, SeriesMarker } from '../../model/series-markers';
+import { InternalSeriesMarker } from '../../model/series-markers';
 import { TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
@@ -36,7 +36,7 @@ interface Offsets {
 // eslint-disable-next-line max-params
 function fillSizeAndY(
 	rendererItem: SeriesMarkerRendererDataItem,
-	marker: SeriesMarker<TimePointIndex>,
+	marker: InternalSeriesMarker<TimePointIndex>,
 	seriesData: BarPrices | BarPrice,
 	offsets: Offsets,
 	textHeight: number,

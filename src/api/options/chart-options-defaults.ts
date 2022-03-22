@@ -1,6 +1,6 @@
 import { isRunningOnClientSide } from '../../helpers/is-running-on-client-side';
 
-import { ChartOptionsInternal } from '../../model/chart-model';
+import { ChartOptionsInternal, TrackingModeExitMode } from '../../model/chart-model';
 
 import { crosshairOptionsDefaults } from './crosshair-options-defaults';
 import { gridOptionsDefaults } from './grid-options-defaults';
@@ -54,5 +54,8 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 	kineticScroll: {
 		mouse: false,
 		touch: true,
+	},
+	trackingMode: {
+		exitMode: TrackingModeExitMode.OnNextTap,
 	},
 };

@@ -7,11 +7,11 @@ import { ChartApi } from './chart-api';
 import { IChartApi } from './ichart-api';
 
 /**
- * This function is the main entry point of the Lightweight Charting Library
+ * This function is the main entry point of the Lightweight Charting Library.
  *
- * @param container - id of HTML element or element itself
- * @param options - any subset of ChartOptions to be applied at start.
- * @returns an interface to the created chart
+ * @param container - ID of HTML element or element itself
+ * @param options - Any subset of options to be applied at start.
+ * @returns An interface to the created chart
  */
 export function createChart(container: string | HTMLElement, options?: DeepPartial<ChartOptions>): IChartApi {
 	let htmlElement: HTMLElement;

@@ -25,7 +25,7 @@ const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 async function getReferencesCount(frame: Frame, prototypeReference: JSHandle): Promise<number> {
 	const context = await frame.executionContext();
 	const activeRefsHandle = await context.queryObjects(prototypeReference);
-	const activeRefsCount = await (await activeRefsHandle?.getProperty('length'))?.jsonValue() as number;
+	const activeRefsCount = await (await activeRefsHandle?.getProperty('length'))?.jsonValue<number>();
 
 	await activeRefsHandle.dispose();
 

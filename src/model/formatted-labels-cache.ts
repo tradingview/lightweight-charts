@@ -1,13 +1,13 @@
 import { ensureDefined } from '../helpers/assertions';
 
-import { TimePoint } from './time-data';
+import { TickMark } from './tick-marks';
 
 interface CachedTick {
 	string: string;
 	tick: number;
 }
 
-export type FormatFunction = (timePoint: TimePoint) => string;
+export type FormatFunction = (tickMark: TickMark) => string;
 
 export class FormattedLabelsCache {
 	private readonly _format: FormatFunction;
@@ -23,10 +23,11 @@ export class FormattedLabelsCache {
 		this._maxSize = size;
 	}
 
-	public format(value: TimePoint): string {
-		const cacheKey = value.businessDay === undefined
-			? new Date(value.timestamp * 1000).getTime()
-			: new Date(Date.UTC(value.businessDay.year, value.businessDay.month - 1, value.businessDay.day)).getTime();
+	public format(tickMark: TickMark): string {
+		const time = tickMark.time;
+		const cacheKey = time.businessDay === undefined
+			? new Date(time.timestamp * 1000).getTime()
+			: new Date(Date.UTC(time.businessDay.year, time.businessDay.month - 1, time.businessDay.day)).getTime();
 
 		const tick = this._cache.get(cacheKey);
 		if (tick !== undefined) {
@@ -41,7 +42,7 @@ export class FormattedLabelsCache {
 			this._actualSize--;
 		}
 
-		const str = this._format(value);
+		const str = this._format(tickMark);
 		this._cache.set(cacheKey, { string: str, tick: this._usageTick });
 		this._tick2Labels.set(this._usageTick, cacheKey);
 		this._actualSize++;

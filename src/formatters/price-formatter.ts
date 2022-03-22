@@ -7,7 +7,10 @@ const formatterOptions = {
 	decimalSignFractional: '\'',
 };
 
-// length mustn't be more then 16
+/**
+ * @param value - The number of convert.
+ * @param length - The length. Must be between 0 and 16 inclusive.
+ */
 export function numberToStringWithLeadingZero(value: number, length: number): string {
 	if (!isNumber(value)) {
 		return 'n/a';

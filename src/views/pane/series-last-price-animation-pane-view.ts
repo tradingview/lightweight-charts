@@ -7,7 +7,7 @@ import { LastPriceAnimationMode } from '../../model/series-options';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-price-animation-renderer';
 
-import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
+import { IUpdatablePaneView } from './iupdatable-pane-view';
 
 const enum Constants {
 	AnimationPeriod = 2600,
@@ -120,7 +120,7 @@ function animationData(durationSinceStart: number, lineColor: string): Animation
 }
 
 export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
-	private readonly _series: Series<'Area'> | Series<'Line'>;
+	private readonly _series: Series<'Area'> | Series<'Line'> | Series<'Baseline'>;
 	private readonly _renderer: SeriesLastPriceAnimationRenderer = new SeriesLastPriceAnimationRenderer();
 	private _invalidated: boolean = true;
 	private _stageInvalidated: boolean = true;
@@ -128,26 +128,33 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 	private _startTime: number = performance.now();
 	private _endTime: number = this._startTime - 1;
 
-	public constructor(series: Series<'Area'> | Series<'Line'>) {
+	public constructor(series: Series<'Area'> | Series<'Line'> | Series<'Baseline'>) {
 		this._series = series;
 	}
 
-	public update(updateType?: UpdateType): void {
-		this._invalidated = true;
-		if (updateType === 'data') {
-			if (this._series.options().lastPriceAnimation === LastPriceAnimationMode.OnDataUpdate) {
-				const now = performance.now();
-				const timeToAnimationEnd = this._endTime - now;
-				if (timeToAnimationEnd > 0) {
-					if (timeToAnimationEnd < Constants.AnimationPeriod / 4) {
-						this._endTime += Constants.AnimationPeriod;
-					}
-					return;
+	public onDataCleared(): void {
+		this._endTime = this._startTime - 1;
+		this.update();
+	}
+
+	public onNewRealtimeDataReceived(): void {
+		this.update();
+		if (this._series.options().lastPriceAnimation === LastPriceAnimationMode.OnDataUpdate) {
+			const now = performance.now();
+			const timeToAnimationEnd = this._endTime - now;
+			if (timeToAnimationEnd > 0) {
+				if (timeToAnimationEnd < Constants.AnimationPeriod / 4) {
+					this._endTime += Constants.AnimationPeriod;
 				}
-				this._startTime = now;
-				this._endTime = now + Constants.AnimationPeriod;
+				return;
 			}
+			this._startTime = now;
+			this._endTime = now + Constants.AnimationPeriod;
 		}
+	}
+
+	public update(): void {
+		this._invalidated = true;
 	}
 
 	public invalidateStage(): void {
@@ -193,8 +200,8 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 			return;
 		}
 
-		const lastValue = this._series.lastValueData(true, true);
-		if (!visibleRange.contains(lastValue.index)) {
+		const lastValue = this._series.lastValueData(true);
+		if (lastValue.noData || !visibleRange.contains(lastValue.index)) {
 			return;
 		}
 
@@ -209,8 +216,8 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 		const data = animationData(this._duration(), seriesLineColor);
 
 		this._renderer.setData({
-			seriesLineColor: seriesLineColor,
-			seriesLineWidth: seriesLineWidth,
+			seriesLineColor,
+			seriesLineWidth,
 			fillColor: data.fillColor,
 			strokeColor: data.strokeColor,
 			radius: data.radius,

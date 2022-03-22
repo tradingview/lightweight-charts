@@ -1,11 +1,13 @@
+import { lowerbound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
-import { TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
+import { OriginalTime, TickMarkWeight, TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
 
 export interface TickMark {
 	index: TimePointIndex;
 	time: TimePoint;
-	weight: number;
+	weight: TickMarkWeight;
+	originalTime: OriginalTime;
 }
 
 interface MarksCache {
@@ -14,16 +16,16 @@ interface MarksCache {
 }
 
 export class TickMarks {
-	private _marksByWeight: Map<number, TickMark[]> = new Map();
+	private _marksByWeight: Map<TickMarkWeight, TickMark[]> = new Map();
 	private _cache: MarksCache | null = null;
 
-	public setTimeScalePoints(newPoints: readonly TimeScalePoint[]): void {
-		this._cache = null;
-		this._marksByWeight.clear();
+	public setTimeScalePoints(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
+		this._removeMarksSinceIndex(firstChangedPointIndex);
 
-		// TODO: it looks like this is quite fast even with thousands of points
-		// but there might be point of improvements by providing the only changed points
-		newPoints.forEach((point: TimeScalePoint, index: number) => {
+		this._cache = null;
+
+		for (let index = firstChangedPointIndex; index < newPoints.length; ++index) {
+			const point = newPoints[index];
 			let marksForWeight = this._marksByWeight.get(point.timeWeight);
 			if (marksForWeight === undefined) {
 				marksForWeight = [];
@@ -34,8 +36,9 @@ export class TickMarks {
 				index: index as TimePointIndex,
 				time: point.time,
 				weight: point.timeWeight,
+				originalTime: point.originalTime,
 			});
-		});
+		}
 	}
 
 	public build(spacing: number, maxWidth: number): readonly TickMark[] {
@@ -48,6 +51,30 @@ export class TickMarks {
 		}
 
 		return this._cache.marks;
+	}
+
+	private _removeMarksSinceIndex(sinceIndex: number): void {
+		if (sinceIndex === 0) {
+			this._marksByWeight.clear();
+			return;
+		}
+
+		const weightsToClear: TickMarkWeight[] = [];
+
+		this._marksByWeight.forEach((marks: TickMark[], timeWeight: number) => {
+			if (sinceIndex <= marks[0].index) {
+				weightsToClear.push(timeWeight);
+			} else {
+				marks.splice(
+					lowerbound(marks, sinceIndex, (tm: TickMark) => tm.index < sinceIndex),
+					Infinity
+				);
+			}
+		});
+
+		for (const weight of weightsToClear) {
+			this._marksByWeight.delete(weight);
+		}
 	}
 
 	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark[] {

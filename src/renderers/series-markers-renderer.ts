@@ -148,6 +148,4 @@ function hitTestShape(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coor
 		case 'square':
 			return hitTestSquare(item.x, item.y, item.size, x, y);
 	}
-
-	ensureNever(item.shape);
 }

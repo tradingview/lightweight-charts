@@ -1,4 +1,6 @@
 /**
+ * Fills rectangle's inner border (so, all the filled area is limited by the [x, x + width]*[y, y + height] region)
+ * ```
  * (x, y)
  * O***********************|*****
  * |        border         |  ^
@@ -16,15 +18,14 @@
  * |***********************|*****
  * |                       |
  * |<------- width ------->|
+ * ```
  *
- * Fills rectangle's inner border (so, all the filled area is limited by the [x, x + width]*[y, y + height] region)
- *
- * @param ctx context to draw on
- * @param x left side of the target rectangle
- * @param y top side of the target rectangle
- * @param width width of the target rectangle
- * @param height height of the target rectangle
- * @param borderWidth width of border to fill, must be less than width and height of the target rectangle
+ * @param ctx - Context to draw on
+ * @param x - Left side of the target rectangle
+ * @param y - Top side of the target rectangle
+ * @param width - Width of the target rectangle
+ * @param height - Height of the target rectangle
+ * @param borderWidth - Width of border to fill, must be less than width and height of the target rectangle
  */
 export function fillRectInnerBorder(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, borderWidth: number): void {
 	// horizontal (top and bottom) edges

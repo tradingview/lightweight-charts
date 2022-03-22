@@ -10,6 +10,7 @@ export interface TimeAxisViewRendererData {
 	color: string;
 	background: string;
 	visible: boolean;
+	tickVisible: boolean;
 }
 
 const optimizationReplacementRe = /[1-9]/g;
@@ -73,14 +74,16 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		const y2scaled = Math.round(y2 * pixelRatio);
 		ctx.fillRect(x1scaled, y1scaled, x2scaled - x1scaled, y2scaled - y1scaled);
 
-		const tickX = Math.round(this._data.coordinate * pixelRatio);
-		const tickTop = y1scaled;
-		const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * pixelRatio);
+		if (this._data.tickVisible) {
+			const tickX = Math.round(this._data.coordinate * pixelRatio);
+			const tickTop = y1scaled;
+			const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * pixelRatio);
 
-		ctx.fillStyle = this._data.color;
-		const tickWidth = Math.max(1, Math.floor(pixelRatio));
-		const tickOffset = Math.floor(pixelRatio * 0.5);
-		ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
+			ctx.fillStyle = this._data.color;
+			const tickWidth = Math.max(1, Math.floor(pixelRatio));
+			const tickOffset = Math.floor(pixelRatio * 0.5);
+			ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
+		}
 
 		const yText = y2 - rendererOptions.baselineOffset - rendererOptions.paddingBottom;
 		ctx.textAlign = 'left';

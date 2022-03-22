@@ -1,3 +1,6 @@
+/**
+ * Represents a type `T` where every property is optional.
+ */
 export type DeepPartial<T> = {
 	[P in keyof T]?: T[P] extends (infer U)[]
 		? DeepPartial<U>[]
