@@ -376,6 +376,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return {
 			time: param.time && (param.time.businessDay || param.time.timestamp),
 			point: param.point,
+			paneIndex: param.paneIndex,
 			hoveredSeries,
 			hoveredMarkerId: param.hoveredObject,
 			seriesPrices,

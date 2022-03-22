@@ -11,7 +11,7 @@ import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
-import { Pane } from '../model/pane';
+import { Pane, PaneInfo } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
@@ -89,7 +89,7 @@ export class PaneWidget implements IDestroyable {
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
-	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
+	private _clicked: Delegate<TimePointIndex | null, Point & PaneInfo> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
 	private _startTrackPoint: Point | null = null;
@@ -320,7 +320,8 @@ export class PaneWidget implements IDestroyable {
 
 		if (this._clicked.hasListeners()) {
 			const currentTime = this._model().crosshairSource().appliedIndex();
-			this._clicked.fire(currentTime, { x, y });
+			const paneIndex = this._model().getPaneIndex(ensureNotNull(this._state));
+			this._clicked.fire(currentTime, { x, y, paneIndex });
 		}
 
 		this._tryExitTrackingMode();

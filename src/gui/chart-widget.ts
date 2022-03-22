@@ -14,6 +14,7 @@ import {
 	TimeScaleInvalidation,
 	TimeScaleInvalidationType,
 } from '../model/invalidate-mask';
+import { PaneInfo } from '../model/pane';
 import { Point } from '../model/point';
 import { PriceAxisPosition } from '../model/price-scale';
 import { Series } from '../model/series';
@@ -24,9 +25,10 @@ import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
-export interface MouseEventParamsImpl {
+export interface MouseEventParamsImpl extends PaneInfo {
 	time?: TimePoint;
 	point?: Point;
+	paneIndex?: number;
 	seriesPrices: Map<Series, BarPrice | BarPrices>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
@@ -580,7 +582,7 @@ export class ChartWidget implements IDestroyable {
 		this._adjustSizeImpl();
 	}
 
-	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
+	private _getMouseEventParamsImpl(index: TimePointIndex | null, details: Point & PaneInfo | null): MouseEventParamsImpl {
 		const seriesPrices = new Map<Series, BarPrice | BarPrices>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
@@ -612,19 +614,20 @@ export class ChartWidget implements IDestroyable {
 
 		return {
 			time: clientTime,
-			point: point || undefined,
+			point: details && { x: details.x, y: details.y } || undefined,
+			paneIndex: details?.paneIndex,
 			hoveredSeries,
 			seriesPrices,
 			hoveredObject,
 		};
 	}
 
-	private _onPaneWidgetClicked(time: TimePointIndex | null, point: Point): void {
-		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point));
+	private _onPaneWidgetClicked(time: TimePointIndex | null, details: Point & PaneInfo): void {
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, details));
 	}
 
-	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
-		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
+	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, details: Point & PaneInfo | null): void {
+		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, details));
 	}
 
 	private _updateTimeAxisVisibility(): void {

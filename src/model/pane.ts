@@ -23,6 +23,10 @@ interface MinMaxOrderInfo {
 	maxZOrder: number;
 }
 
+export interface PaneInfo {
+	paneIndex?: number;
+}
+
 export class Pane implements IDestroyable {
 	private readonly _timeScale: TimeScale;
 	private readonly _model: ChartModel;
@@ -41,7 +45,7 @@ export class Pane implements IDestroyable {
 	private _leftPriceScale: PriceScale;
 	private _rightPriceScale: PriceScale;
 
-	public constructor(timeScale: TimeScale, model: ChartModel) {
+	public constructor(timeScale: TimeScale, model: ChartModel, initialPaneIndex: number = 0) {
 		this._timeScale = timeScale;
 		this._model = model;
 		this._grid = new Grid(this);
@@ -49,10 +53,14 @@ export class Pane implements IDestroyable {
 		const options = model.options();
 
 		this._leftPriceScale = this._createPriceScale(DefaultPriceScaleId.Left, options.leftPriceScale);
-		this._rightPriceScale = this._createPriceScale(DefaultPriceScaleId.Right, options.rightPriceScale);
+		if (initialPaneIndex === 0) {
+			this._rightPriceScale = this._createPriceScale(DefaultPriceScaleId.Right, options.rightPriceScale);
+		} else {
+			this._rightPriceScale = this._createPriceScale(DefaultPriceScaleId.NonPrimary, options.nonPrimaryPriceScale);
+		}
 
 		this._leftPriceScale.modeChanged().subscribe(this._onPriceScaleModeChanged.bind(this, this._leftPriceScale), this);
-		this._rightPriceScale.modeChanged().subscribe(this._onPriceScaleModeChanged.bind(this, this._leftPriceScale), this);
+		this._rightPriceScale.modeChanged().subscribe(this._onPriceScaleModeChanged.bind(this, this._rightPriceScale), this);
 
 		this.applyScaleOptions(options);
 	}
@@ -61,9 +69,15 @@ export class Pane implements IDestroyable {
 		if (options.leftPriceScale) {
 			this._leftPriceScale.applyOptions(options.leftPriceScale);
 		}
-		if (options.rightPriceScale) {
+
+		if (this._rightPriceScale.id() === DefaultPriceScaleId.Right && options.rightPriceScale) {
 			this._rightPriceScale.applyOptions(options.rightPriceScale);
 		}
+
+		if (this._rightPriceScale.id() === DefaultPriceScaleId.NonPrimary && options.nonPrimaryPriceScale) {
+			this._rightPriceScale.applyOptions(options.nonPrimaryPriceScale);
+		}
+
 		if (options.localization) {
 			this._leftPriceScale.updateFormatter();
 			this._rightPriceScale.updateFormatter();
