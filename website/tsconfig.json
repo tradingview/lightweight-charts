@@ -1,0 +1,10 @@
+{
+	"extends": "@tsconfig/docusaurus/tsconfig.json",
+	"compilerOptions": {
+		"strict": true,
+		"resolveJsonModule": true
+	},
+	"include": [
+		"./src/**/*.tsx"
+	]
+}

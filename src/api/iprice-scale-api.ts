@@ -7,14 +7,14 @@ export interface IPriceScaleApi {
 	/**
 	 * Applies new options to the price scale
 	 *
-	 * @param options - any subset of PriceScaleOptions
+	 * @param options - Any subset of options.
 	 */
 	applyOptions(options: DeepPartial<PriceScaleOptions>): void;
 
 	/**
 	 * Returns currently applied options of the price scale
 	 *
-	 * @returns full set of currently applied options, including defaults
+	 * @returns Full set of currently applied options, including defaults
 	 */
 	options(): Readonly<PriceScaleOptions>;
 

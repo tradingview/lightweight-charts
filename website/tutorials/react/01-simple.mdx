@@ -1,0 +1,54 @@
+---
+sidebar_label: 'Simple example'
+hide_table_of_contents: true
+---
+
+# React - Simple example
+
+:::info
+
+The following only describes a relatively simple example that only renders an [area series](/docs/series-types#area) that could be tweaked to render any other type of [series](/docs/series-types).
+
+For a more complete scenario where you could wrap Lightweight Charts into a component having sub components, please consult this [example](./advanced).
+
+:::
+
+On this page you will learn how to easily use Lightweight Charts with React.
+
+## Preparing your project
+
+For the example purpose we are using [Parcel starter kit](https://github.com/brandiqa/react-parcel-starter) but feel free to use any other tool or starter kit.
+
+```console
+git clone git@github.com:brandiqa/react-parcel-starter.git lwc-react
+cd lwc-react
+npm install
+```
+
+To run your project simply
+
+```console
+npm start
+```
+
+This will create a web page accessible by default on <http://localhost:1234/>.
+
+## Creating a charting component
+
+The example _React component_ on this page may not fit your requirements completely. Creating a general purpose declarative wrapper for Lightweight Charts' imperative API is a challenge, but hopefully you can adapt this example to your use case.
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./_simple-react-example';
+
+<CodeBlock className="language-jsx">{code}</CodeBlock>
+
+and you'll have a reusable component that could then be enhanced, tweaked to meet your needs, adding properties and even functionalities.
+
+If you've successfully followed all the steps you should see something similar to
+
+import { App } from './_simple-react-example';
+import styles from '@site/src/pages/chart.module.css';
+
+<div className={styles.ChartContainer}>
+    <App />
+</div>

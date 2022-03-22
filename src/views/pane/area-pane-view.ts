@@ -3,7 +3,7 @@ import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
 import { TimePointIndex } from '../../model/time-data';
-import { PaneRendererArea, PaneRendererAreaData } from '../../renderers/area-renderer';
+import { PaneRendererArea } from '../../renderers/area-renderer';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { LineItem, PaneRendererLine } from '../../renderers/line-renderer';
@@ -28,21 +28,29 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		const areaStyleProperties = this._series.options();
 
 		this._makeValid();
-		const data: PaneRendererAreaData = {
+
+		this._areaRenderer.setData({
+			lineType: areaStyleProperties.lineType,
+			items: this._items,
+			lineStyle: areaStyleProperties.lineStyle,
+			lineWidth: areaStyleProperties.lineWidth,
+			topColor: areaStyleProperties.topColor,
+			bottomColor: areaStyleProperties.bottomColor,
+			baseLevelCoordinate: height as Coordinate,
+			bottom: height as Coordinate,
+			visibleRange: this._itemsVisibleRange,
+			barWidth: this._model.timeScale().barSpacing(),
+		});
+
+		this._lineRenderer.setData({
 			lineType: areaStyleProperties.lineType,
 			items: this._items,
 			lineColor: areaStyleProperties.lineColor,
 			lineStyle: areaStyleProperties.lineStyle,
 			lineWidth: areaStyleProperties.lineWidth,
-			topColor: areaStyleProperties.topColor,
-			bottomColor: areaStyleProperties.bottomColor,
-			bottom: height as Coordinate,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
-		};
-
-		this._areaRenderer.setData(data);
-		this._lineRenderer.setData(data);
+		});
 
 		return this._renderer;
 	}

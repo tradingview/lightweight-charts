@@ -41,7 +41,8 @@ function runTestCase(container) {
 			lineSeries.applyOptions({
 				visible: true,
 			});
-			resolve();
+
+			setTimeout(resolve, 300);
 		}, 300);
 	});
 }

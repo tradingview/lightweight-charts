@@ -1,10 +1,11 @@
-import { assert, ensureNever } from '../helpers/assertions';
+import { assert } from '../helpers/assertions';
 
 import { PriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import { SeriesType } from '../model/series-options';
+import { Time } from '../model/time-data';
 
-import { isFulfilledData, SeriesDataItemTypeMap, Time } from './data-consumer';
+import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 
 export function checkPriceLineOptions(options: PriceLineOptions): void {
@@ -51,13 +52,10 @@ function getChecker(type: SeriesType): Checker {
 			return checkBarItem.bind(null, type);
 
 		case 'Area':
+		case 'Baseline':
 		case 'Line':
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
-
-		default:
-			ensureNever(type);
-			throw new Error(`unsupported series type ${type}`);
 	}
 }
 
@@ -88,7 +86,7 @@ function checkBarItem(type: 'Bar' | 'Candlestick', barItem: SeriesDataItemTypeMa
 	);
 }
 
-function checkLineItem(type: 'Area' | 'Line' | 'Histogram', lineItem: SeriesDataItemTypeMap[typeof type]): void {
+function checkLineItem(type: 'Area' | 'Baseline' | 'Line' | 'Histogram', lineItem: SeriesDataItemTypeMap[typeof type]): void {
 	if (!isFulfilledData(lineItem)) {
 		return;
 	}

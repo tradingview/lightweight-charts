@@ -1,8 +1,8 @@
 import { defaultFontFamily } from '../../helpers/make-font';
 
-import { ColorType, LayoutOptionsInternal } from '../../model/layout-options';
+import { ColorType, LayoutOptions } from '../../model/layout-options';
 
-export const layoutOptionsDefaults: LayoutOptionsInternal = {
+export const layoutOptionsDefaults: LayoutOptions = {
 	background: {
 		type: ColorType.Solid,
 		color: '#FFFFFF',

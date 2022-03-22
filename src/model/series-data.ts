@@ -2,15 +2,30 @@ import { PlotRow } from './plot-data';
 import { PlotList } from './plot-list';
 import { SeriesType } from './series-options';
 
+export interface LinePlotRow extends PlotRow {
+	readonly color?: string;
+}
+
 export interface HistogramPlotRow extends PlotRow {
 	readonly color?: string;
 }
 
+export interface BarPlotRow extends PlotRow {
+	readonly color?: string;
+}
+
+export interface CandlestickPlotRow extends PlotRow {
+	readonly color?: string;
+	readonly borderColor?: string;
+	readonly wickColor?: string;
+}
+
 export interface SeriesPlotRowTypeAtTypeMap {
-	Bar: PlotRow;
-	Candlestick: PlotRow;
+	Bar: BarPlotRow;
+	Candlestick: CandlestickPlotRow;
 	Area: PlotRow;
-	Line: PlotRow;
+	Baseline: PlotRow;
+	Line: LinePlotRow;
 	Histogram: HistogramPlotRow;
 }
 

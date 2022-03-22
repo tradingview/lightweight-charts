@@ -2,27 +2,27 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { ensureNotNull } from '../../src/helpers/assertions';
-import { PlotRow, PlotRowValueIndex } from '../../src/model/plot-data';
-import { mergePlotRows, PlotList, PlotRowSearchMode } from '../../src/model/plot-list';
-import { TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
+import { PlotRow, PlotRowValue, PlotRowValueIndex } from '../../src/model/plot-data';
+import { MismatchDirection, PlotList } from '../../src/model/plot-list';
+import { OriginalTime, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 function timePoint(val: number): TimePoint {
 	return { timestamp: val as UTCTimestamp };
 }
 
-function row(i: number, val?: number): PlotRow {
-	return { index: i as TimePointIndex, value: val !== undefined ? [val, val, val, val] : [i * 3, i * 3 + 1, i * 3 + 2, i * 3 + 3], time: timePoint(0) };
+function plotRow(index: TimePointIndex, time: TimePoint, value: PlotRowValue): PlotRow {
+	return { index, time, value, originalTime: time as unknown as OriginalTime };
 }
 
 describe('PlotList', () => {
-	const p = new PlotList();
+	let p: PlotList;
 
 	beforeEach(() => {
-		p.clear();
-		p.merge([
-			{ index: -3 as TimePointIndex, time: timePoint(2), value: [1, 2, 3, 4] },
-			{ index: 0 as TimePointIndex, time: timePoint(3), value: [10, 20, 30, 40] },
-			{ index: 3 as TimePointIndex, time: timePoint(4), value: [100, 200, 300, 500] },
+		p = new PlotList();
+		p.setData([
+			plotRow(-3 as TimePointIndex, timePoint(2), [1, 2, 3, 4]),
+			plotRow(0 as TimePointIndex, timePoint(3), [10, 20, 30, 40]),
+			plotRow(3 as TimePointIndex, timePoint(4), [100, 200, 300, 500]),
 		]);
 	});
 
@@ -43,135 +43,42 @@ describe('PlotList', () => {
 		expect(p.contains(1 as TimePointIndex)).to.be.equal(false);
 	});
 
-	it('should remove all plot values after calling \'clear\'', () => {
-		p.clear();
-
-		expect(p.isEmpty()).to.be.equal(true);
-		expect(p.size()).to.be.equal(0);
-	});
-
-	describe('merge', () => {
-		it('should correctly insert new and update existing plot values', () => {
-			const plotList = new PlotList();
-
-			// first merge
-			plotList.merge([
-				row(0 as TimePointIndex),
-				row(1 as TimePointIndex),
-				row(2 as TimePointIndex),
-			]);
-
-			// second merge
-			plotList.merge([
-				row(2 as TimePointIndex),
-			]);
-
-			// third merge
-			plotList.merge([
-				row(-5 as TimePointIndex),
-				row(0 as TimePointIndex),
-				row(25 as TimePointIndex),
-			]);
-
-			// final result
-			const items = plotList.rows();
-			expect(items.length).to.be.equal(5);
-			expect(items[0].value).to.include.ordered.members([-15, -14, -13]);
-			expect(items[1].value).to.include.ordered.members([0, 1, 2]);
-			expect(items[2].value).to.include.ordered.members([3, 4, 5]);
-			expect(items[3].value).to.include.ordered.members([6, 7, 8]);
-			expect(items[4].value).to.include.ordered.members([75, 76, 77]);
-		});
-
-		it('should correctly prepend new plot values', () => {
-			const plotList = new PlotList();
-
-			plotList.merge([
-				row(0 as TimePointIndex),
-				row(1 as TimePointIndex),
-				row(2 as TimePointIndex),
-			]);
-
-			plotList.merge([
-				row(-2 as TimePointIndex),
-				row(-1 as TimePointIndex),
-			]);
-
-			expect(plotList.size()).to.be.equal(5);
-			expect(ensureNotNull(plotList.valueAt(-2 as TimePointIndex)).value).to.include.ordered.members(row(-2 as TimePointIndex).value);
-			expect(ensureNotNull(plotList.valueAt(-1 as TimePointIndex)).value).to.include.ordered.members(row(-1 as TimePointIndex).value);
-			expect(ensureNotNull(plotList.valueAt(0 as TimePointIndex)).value).to.include.ordered.members(row(0 as TimePointIndex).value);
-			expect(ensureNotNull(plotList.valueAt(1 as TimePointIndex)).value).to.include.ordered.members(row(1 as TimePointIndex).value);
-			expect(ensureNotNull(plotList.valueAt(2 as TimePointIndex)).value).to.include.ordered.members(row(2 as TimePointIndex).value);
-		});
-
-		it('should correctly append new plot values', () => {
-			const plotList = new PlotList();
-
-			plotList.merge([
-				row(0 as TimePointIndex),
-				row(1 as TimePointIndex),
-				row(2 as TimePointIndex),
-			]);
-
-			plotList.merge([
-				row(3 as TimePointIndex),
-				row(4 as TimePointIndex),
-			]);
-
-			expect(plotList.size()).to.be.equal(5);
-			expect(ensureNotNull(plotList.valueAt(0 as TimePointIndex)).value).to.include.ordered.members(row(0 as TimePointIndex).value);
-			expect(ensureNotNull(plotList.valueAt(1 as TimePointIndex)).value).to.include.ordered.members(row(1 as TimePointIndex).value);
-			expect(ensureNotNull(plotList.valueAt(2 as TimePointIndex)).value).to.include.ordered.members(row(2 as TimePointIndex).value);
-			expect(ensureNotNull(plotList.valueAt(3 as TimePointIndex)).value).to.include.ordered.members(row(3 as TimePointIndex).value);
-			expect(ensureNotNull(plotList.valueAt(4 as TimePointIndex)).value).to.include.ordered.members(row(4 as TimePointIndex).value);
-		});
-	});
-
 	describe('search', () => {
-		const p1 = new PlotList();
-
-		beforeEach(() => {
-			p1.clear();
-			p1.merge([
-				{ index: -5 as TimePointIndex, time: timePoint(1), value: [1, 2, 3, 4] },
-				{ index: 0 as TimePointIndex, time: timePoint(2), value: [10, 20, 30, 40] },
-				{ index: 5 as TimePointIndex, time: timePoint(3), value: [100, 200, 300, 400] },
-			]);
-		});
-
 		it('should find respective values by given index and search strategy', () => {
-			expect(p1.search(-10 as TimePointIndex, PlotRowSearchMode.NearestLeft)).to.be.equal(null);
-			expect(p1.search(-5 as TimePointIndex, PlotRowSearchMode.NearestLeft)).to.deep.include({ index: -5 as TimePointIndex, value: [1, 2, 3, 4] });
-			expect(p1.search(3 as TimePointIndex, PlotRowSearchMode.NearestLeft)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
-			expect(p1.search(1 as TimePointIndex, PlotRowSearchMode.NearestLeft)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
-			expect(p1.search(-6 as TimePointIndex, PlotRowSearchMode.Exact)).to.be.equal(null);
+			const p1 = new PlotList();
+			p1.setData([
+				plotRow(-5 as TimePointIndex, timePoint(1), [1, 2, 3, 4]),
+				plotRow(0 as TimePointIndex, timePoint(2), [10, 20, 30, 40]),
+				plotRow(5 as TimePointIndex, timePoint(3), [100, 200, 300, 400]),
+			]);
+
+			expect(p1.search(-10 as TimePointIndex, MismatchDirection.NearestLeft)).to.be.equal(null);
+			expect(p1.search(-5 as TimePointIndex, MismatchDirection.NearestLeft)).to.deep.include({ index: -5 as TimePointIndex, value: [1, 2, 3, 4] });
+			expect(p1.search(3 as TimePointIndex, MismatchDirection.NearestLeft)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
+			expect(p1.search(1 as TimePointIndex, MismatchDirection.NearestLeft)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
+			expect(p1.search(-6 as TimePointIndex, MismatchDirection.None)).to.be.equal(null);
 			expect(p1.search(-5 as TimePointIndex)).to.deep.include({ index: -5 as TimePointIndex, value: [1, 2, 3, 4] });
 			expect(p1.search(0 as TimePointIndex)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
 			expect(p1.search(5 as TimePointIndex)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
 			expect(p1.search(6 as TimePointIndex)).to.be.equal(null);
-			expect(p1.search(-3 as TimePointIndex, PlotRowSearchMode.NearestRight)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
-			expect(p1.search(3 as TimePointIndex, PlotRowSearchMode.NearestRight)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
-			expect(p1.search(5 as TimePointIndex, PlotRowSearchMode.NearestRight)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
-			expect(p1.search(6 as TimePointIndex, PlotRowSearchMode.NearestRight)).to.be.equal(null);
+			expect(p1.search(-3 as TimePointIndex, MismatchDirection.NearestRight)).to.deep.include({ index: 0 as TimePointIndex, value: [10, 20, 30, 40] });
+			expect(p1.search(3 as TimePointIndex, MismatchDirection.NearestRight)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
+			expect(p1.search(5 as TimePointIndex, MismatchDirection.NearestRight)).to.deep.include({ index: 5 as TimePointIndex, value: [100, 200, 300, 400] });
+			expect(p1.search(6 as TimePointIndex, MismatchDirection.NearestRight)).to.be.equal(null);
 		});
 	});
 
 	describe('minMaxOnRangeCached', () => {
-		const pl = new PlotList();
-
-		beforeEach(() => {
-			pl.clear();
-			pl.merge([
-				{ index: 0 as TimePointIndex, time: timePoint(1), value: [0, 0, 0, 1] },
-				{ index: 1 as TimePointIndex, time: timePoint(2), value: [0, 0, 0, 2] },
-				{ index: 2 as TimePointIndex, time: timePoint(3), value: [0, 0, 0, 3] },
-				{ index: 3 as TimePointIndex, time: timePoint(4), value: [0, 0, 0, 4] },
-				{ index: 4 as TimePointIndex, time: timePoint(5), value: [0, 0, 0, 5] },
-			]);
-		});
-
 		it('should find minMax in numbers', () => {
+			const pl = new PlotList();
+			pl.setData([
+				plotRow(0 as TimePointIndex, timePoint(1), [0, 0, 0, 1]),
+				plotRow(1 as TimePointIndex, timePoint(2), [0, 0, 0, 2]),
+				plotRow(2 as TimePointIndex, timePoint(3), [0, 0, 0, 3]),
+				plotRow(3 as TimePointIndex, timePoint(4), [0, 0, 0, 4]),
+				plotRow(4 as TimePointIndex, timePoint(5), [0, 0, 0, 5]),
+			]);
+
 			const plots = [PlotRowValueIndex.Close];
 
 			const minMax = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, plots);
@@ -181,14 +88,14 @@ describe('PlotList', () => {
 		});
 
 		it('should find minMax with non subsequent indices', () => {
-			pl.clear();
-			pl.merge([
-				{ index: 0 as TimePointIndex, time: timePoint(1), value: [0, 0, 0, 1] },
-				{ index: 2 as TimePointIndex, time: timePoint(2), value: [0, 0, 0, 2] },
-				{ index: 4 as TimePointIndex, time: timePoint(3), value: [0, 0, 0, 3] },
-				{ index: 6 as TimePointIndex, time: timePoint(4), value: [0, 0, 0, 4] },
-				{ index: 20 as TimePointIndex, time: timePoint(5), value: [0, 0, 0, 10] },
-				{ index: 100 as TimePointIndex, time: timePoint(6), value: [0, 0, 0, 5] },
+			const pl = new PlotList();
+			pl.setData([
+				plotRow(0 as TimePointIndex, timePoint(1), [0, 0, 0, 1]),
+				plotRow(2 as TimePointIndex, timePoint(2), [0, 0, 0, 2]),
+				plotRow(4 as TimePointIndex, timePoint(3), [0, 0, 0, 3]),
+				plotRow(6 as TimePointIndex, timePoint(4), [0, 0, 0, 4]),
+				plotRow(20 as TimePointIndex, timePoint(5), [0, 0, 0, 10]),
+				plotRow(100 as TimePointIndex, timePoint(6), [0, 0, 0, 5]),
 			]);
 
 			const plots = [PlotRowValueIndex.Close];
@@ -200,12 +107,12 @@ describe('PlotList', () => {
 		});
 
 		it('should return correct values if the data has gaps and we start search with second-to-last chunk', () => {
-			pl.clear();
-			pl.merge([
-				{ index: 29 as TimePointIndex, time: timePoint(1), value: [1, 1, 1, 1] },
-				{ index: 31 as TimePointIndex, time: timePoint(2), value: [2, 2, 2, 2] },
-				{ index: 55 as TimePointIndex, time: timePoint(3), value: [3, 3, 3, 3] },
-				{ index: 65 as TimePointIndex, time: timePoint(4), value: [4, 4, 4, 4] },
+			const pl = new PlotList();
+			pl.setData([
+				plotRow(29 as TimePointIndex, timePoint(1), [1, 1, 1, 1]),
+				plotRow(31 as TimePointIndex, timePoint(2), [2, 2, 2, 2]),
+				plotRow(55 as TimePointIndex, timePoint(3), [3, 3, 3, 3]),
+				plotRow(65 as TimePointIndex, timePoint(4), [4, 4, 4, 4]),
 			]);
 
 			const plots = [PlotRowValueIndex.High];
@@ -223,16 +130,16 @@ describe('PlotList', () => {
 	});
 
 	describe('minMaxOnRangeByPlotFunction and minMaxOnRangeByPlotFunctionCached', () => {
-		const pl = new PlotList();
+		let pl: PlotList;
 
 		beforeEach(() => {
-			pl.clear();
-			pl.merge([
-				{ index: 0 as TimePointIndex, time: timePoint(1), value: [5, 7, 3, 6] },
-				{ index: 1 as TimePointIndex, time: timePoint(2), value: [10, 12, 8, 11] },
-				{ index: 2 as TimePointIndex, time: timePoint(3), value: [15, 17, 13, 16] },
-				{ index: 3 as TimePointIndex, time: timePoint(4), value: [20, 22, 18, 21] },
-				{ index: 4 as TimePointIndex, time: timePoint(5), value: [25, 27, 23, 26] },
+			pl = new PlotList();
+			pl.setData([
+				plotRow(0 as TimePointIndex, timePoint(1), [5, 7, 3, 6]),
+				plotRow(1 as TimePointIndex, timePoint(2), [10, 12, 8, 11]),
+				plotRow(2 as TimePointIndex, timePoint(3), [15, 17, 13, 16]),
+				plotRow(3 as TimePointIndex, timePoint(4), [20, 22, 18, 21]),
+				plotRow(4 as TimePointIndex, timePoint(5), [25, 27, 23, 26]),
 			]);
 		});
 
@@ -274,114 +181,6 @@ describe('PlotList', () => {
 			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.Close]);
 			expect(ensureNotNull(minMaxNonCached).min).to.be.equal(6);
 			expect(ensureNotNull(minMaxNonCached).max).to.be.equal(26);
-		});
-	});
-});
-
-describe('mergePlotRows', () => {
-	describe('(correctness)', () => {
-		it('should merge disjoint arrays', () => {
-			const firstArray = [row(1), row(3), row(5)];
-			const secondArray = [row(2), row(4)];
-			const merged = mergePlotRows(firstArray, secondArray);
-			expect(merged).to.eql([row(1), row(2), row(3), row(4), row(5)]);
-		});
-
-		it('should merge arrays with one overlapped item', () => {
-			const firstArray = [row(3), row(4), row(5)];
-			const secondArray = [row(1), row(2), row(3)];
-			const merged = mergePlotRows(firstArray, secondArray);
-			expect(merged).to.eql([row(1), row(2), row(3), row(4), row(5)]);
-		});
-
-		it('should merge array with sub-array', () => {
-			const array = [row(1), row(2), row(3), row(4), row(5)];
-			const merged = mergePlotRows(array, array.slice(1, 3));
-			expect(merged).to.eql(array, 'Merged array must be equals superset\'s array');
-		});
-
-		it('should merge fully overlapped arrays', () => {
-			const array = [row(1), row(2), row(3), row(4), row(5)];
-			const merged = mergePlotRows(array, array);
-			expect(merged).to.eql(array, 'Merged array must be equals to one of overlapped array');
-		});
-
-		it('should merge arrays with primitive types regardless of arrays\' order in args', () => {
-			const firstArray = [row(0), row(2), row(4), row(6)];
-			const secondArray = [row(1), row(3), row(5)];
-			const firstSecondMerged = mergePlotRows(firstArray, secondArray);
-			const secondFirstMerged = mergePlotRows(secondArray, firstArray);
-			expect(firstSecondMerged).to.eql(secondFirstMerged);
-		});
-
-		it('should merge arrays with non-primitive types dependent of order in args', () => {
-			const firstArray = [
-				row(0, 1000),
-				row(1, 2000),
-				row(2, 3000),
-			];
-
-			const secondArray = [
-				row(1, 4000),
-				row(2, 5000),
-				row(3, 6000),
-			];
-
-			const firstSecondMerged = mergePlotRows(firstArray, secondArray);
-			const secondFirstMerged = mergePlotRows(secondArray, firstArray);
-
-			expect(firstSecondMerged).not.to.be.equal(secondFirstMerged);
-
-			expect(firstSecondMerged.length).to.be.equal(4);
-			expect(firstSecondMerged).to.include.ordered.members([firstArray[0], ...secondArray]);
-
-			expect(secondFirstMerged.length).to.be.equal(4);
-			expect(secondFirstMerged).to.include.ordered.members([...firstArray, secondArray[2]]);
-		});
-	});
-
-	xdescribe('(perf)', () => {
-		function isSorted(array: readonly PlotRow[]): boolean {
-			for (let i = 1; i < array.length; ++i) {
-				if (array[i - 1].index > array[i].index) {
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		function generateSortedPlotRows(size: number): PlotRow[] {
-			const startIndex = (Math.random() * 1000) | 0;
-			const array = new Array<PlotRow>(size);
-			for (let i = 0; i < size; ++i) {
-				array[i] = row(startIndex + i);
-			}
-
-			return array;
-		}
-
-		function measure<T>(func: () => T): [number, T] {
-			const startTime = Date.now();
-			const res = func();
-			return [Date.now() - startTime, res];
-		}
-
-		it('should have linear complexity', () => {
-			const first1MArray = generateSortedPlotRows(1000000);
-			const second1MArray = generateSortedPlotRows(1000000);
-			const [total2MTime] = measure(() => mergePlotRows(first1MArray, second1MArray));
-
-			const first3MArray = generateSortedPlotRows(3000000);
-			const second3MArray = generateSortedPlotRows(3000000);
-			const [total6MTime, merged6MArray] = measure(() => mergePlotRows(first3MArray, second3MArray));
-
-			// we need to check that execution time for `N + M = 2 Millions` is more than
-			// execution time for `N + M = 6 Millions` divided by 3 (and minus some delay to decrease false positive)
-			// and if it is so - we have get linear complexity (approx.)
-			expect(total2MTime).to.be.greaterThan((total6MTime / 3) - total2MTime * 0.3);
-
-			expect(isSorted(merged6MArray)).to.be.true('Merged array must be sorted');
 		});
 	});
 });

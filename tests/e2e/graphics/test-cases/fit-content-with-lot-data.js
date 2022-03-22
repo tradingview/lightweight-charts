@@ -17,7 +17,7 @@ function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
 		leftPriceScale: {
 			visible: true,
-			drawTicks: false,
+			ticksVisible: false,
 		},
 		timeScale: {
 			borderVisible: false,

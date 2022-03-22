@@ -6,26 +6,24 @@ import { LineItem } from './line-renderer';
 import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
 
-export interface PaneRendererAreaData {
+export interface PaneRendererAreaDataBase {
 	items: LineItem[];
 	lineType: LineType;
-	lineColor: string;
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
 
-	topColor: string;
-	bottomColor: string;
 	bottom: Coordinate;
+	baseLevelCoordinate: Coordinate;
 
 	barWidth: number;
 
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererArea extends ScaledRenderer {
-	protected _data: PaneRendererAreaData | null = null;
+export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBase> extends ScaledRenderer {
+	protected _data: TData | null = null;
 
-	public setData(data: PaneRendererAreaData): void {
+	public setData(data: TData): void {
 		this._data = data;
 	}
 
@@ -36,7 +34,6 @@ export class PaneRendererArea extends ScaledRenderer {
 
 		ctx.lineCap = 'butt';
 		ctx.lineJoin = 'round';
-		ctx.strokeStyle = this._data.lineColor;
 		ctx.lineWidth = this._data.lineWidth;
 		setLineStyle(ctx, this._data.lineStyle);
 
@@ -48,28 +45,43 @@ export class PaneRendererArea extends ScaledRenderer {
 		if (this._data.items.length === 1) {
 			const point = this._data.items[0];
 			const halfBarWidth = this._data.barWidth / 2;
-			ctx.moveTo(point.x - halfBarWidth, this._data.bottom);
+			ctx.moveTo(point.x - halfBarWidth, this._data.baseLevelCoordinate);
 			ctx.lineTo(point.x - halfBarWidth, point.y);
 			ctx.lineTo(point.x + halfBarWidth, point.y);
-			ctx.lineTo(point.x + halfBarWidth, this._data.bottom);
+			ctx.lineTo(point.x + halfBarWidth, this._data.baseLevelCoordinate);
 		} else {
-			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.baseLevelCoordinate);
 			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
 
 			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
 
 			if (this._data.visibleRange.to > this._data.visibleRange.from) {
-				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
-				ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
+				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.baseLevelCoordinate);
+				ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.baseLevelCoordinate);
 			}
 		}
 		ctx.closePath();
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);
-		gradient.addColorStop(0, this._data.topColor);
-		gradient.addColorStop(1, this._data.bottomColor);
-
-		ctx.fillStyle = gradient;
+		ctx.fillStyle = this._fillStyle(ctx);
 		ctx.fill();
+	}
+
+	protected abstract _fillStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['fillStyle'];
+}
+
+export interface PaneRendererAreaData extends PaneRendererAreaDataBase {
+	topColor: string;
+	bottomColor: string;
+}
+
+export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData> {
+	protected override _fillStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['fillStyle'] {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const data = this._data!;
+
+		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
+		gradient.addColorStop(0, data.topColor);
+		gradient.addColorStop(1, data.bottomColor);
+		return gradient;
 	}
 }

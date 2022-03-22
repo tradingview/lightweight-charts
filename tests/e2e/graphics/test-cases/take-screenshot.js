@@ -49,7 +49,10 @@ function runTestCase(container) {
 			barSpacing: 20,
 		},
 		layout: {
-			backgroundColor: '#fff',
+			background: {
+				type: LightweightCharts.ColorType.Solid,
+				color: '#fff',
+			},
 		},
 		leftPriceScale: {
 			visible: true,

@@ -3,6 +3,11 @@
 !.mocharc.js
 
 /dist/**
+!/dist/typings.d.ts
 /lib/**
 
 **/node_modules
+
+/website/docs/api/**
+/website/versioned_docs/**/api/**
+/website/build/**

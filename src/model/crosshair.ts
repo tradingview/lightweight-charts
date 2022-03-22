@@ -34,38 +34,87 @@ export type PriceAndCoordinateProvider = (priceScale: PriceScale) => CrosshairPr
 export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate;
 
 /**
- * Enum of possible crosshair behavior modes.
- * Normal means that the crosshair always follows the pointer.
- * Magnet means that the vertical line of the crosshair follows the pointer, while the horizontal line is placed on the corresponding series point.
+ * Represents the crosshair mode.
  */
 export const enum CrosshairMode {
+	/**
+	 * This mode allows crosshair to move freely on the chart.
+	 */
 	Normal,
+	/**
+	 * This mode sticks crosshair's horizontal line to the price value of a single-value series or to the close price of OHLC-based series.
+	 */
 	Magnet,
 }
 
 /** Structure describing a crosshair line (vertical or horizontal) */
 export interface CrosshairLineOptions {
-	/** Color of a certain crosshair line */
+	/**
+	 * Crosshair line color.
+	 *
+	 * @defaultValue `'#758696'`
+	 */
 	color: string;
-	/** Width of a certain crosshair line and corresponding scale label */
+
+	/**
+	 * Crosshair line width.
+	 *
+	 * @defaultValue `1`
+	 */
 	width: LineWidth;
-	/** Style of a certain crosshair line */
+
+	/**
+	 * Crosshair line style.
+	 *
+	 * @defaultValue {@link LineStyle.LargeDashed}
+	 */
 	style: LineStyle;
-	/** Visibility of a certain crosshair line */
+
+	/**
+	 * Display the crosshair line.
+	 *
+	 * Note that disabling crosshair lines does not disable crosshair marker on Line and Area series.
+	 * It can be disabled by using `crosshairMarkerVisible` option of a relevant series.
+	 *
+	 * @see {@link LineStyleOptions.crosshairMarkerVisible}
+	 * @see {@link AreaStyleOptions.crosshairMarkerVisible}
+	 * @see {@link BaselineStyleOptions.crosshairMarkerVisible}
+	 * @defaultValue `true`
+	 */
 	visible: boolean;
-	/** Visibility of corresponding scale label */
+
+	/**
+	 * Display the crosshair label on the relevant scale.
+	 *
+	 * @defaultValue `true`
+	 */
 	labelVisible: boolean;
-	/** Background color of corresponding scale label */
+
+	/**
+	 * Crosshair label background color.
+	 *
+	 * @defaultValue `'#4c525e'`
+	 */
 	labelBackgroundColor: string;
 }
 
 /** Structure describing crosshair options  */
 export interface CrosshairOptions {
-	/** Crosshair mode */
+	/**
+	 * Crosshair mode
+	 *
+	 * @defaultValue {@link CrosshairMode.Magnet}
+	 */
 	mode: CrosshairMode;
-	/** Options of the crosshair vertical line */
+
+	/**
+	 * Vertical line options.
+	 */
 	vertLine: CrosshairLineOptions;
-	/** Options of the crosshair horizontal line */
+
+	/**
+	 * Horizontal line options.
+	 */
 	horzLine: CrosshairLineOptions;
 }
 
@@ -183,7 +232,7 @@ export class Crosshair extends DataSource {
 		return this._y;
 	}
 
-	public visible(): boolean {
+	public override visible(): boolean {
 		return this._visible;
 	}
 
@@ -211,7 +260,7 @@ export class Crosshair extends DataSource {
 		return this._options.vertLine.visible;
 	}
 
-	public priceAxisViews(pane: Pane, priceScale: PriceScale): IPriceAxisView[] {
+	public override priceAxisViews(pane: Pane, priceScale: PriceScale): IPriceAxisView[] {
 		if (!this._visible || this._pane !== pane) {
 			this._priceAxisViews.clear();
 		}
@@ -224,7 +273,7 @@ export class Crosshair extends DataSource {
 		return views;
 	}
 
-	public timeAxisViews(): readonly ITimeAxisView[] {
+	public override timeAxisViews(): readonly ITimeAxisView[] {
 		return this._visible ? [this._timeAxisView] : [];
 	}
 

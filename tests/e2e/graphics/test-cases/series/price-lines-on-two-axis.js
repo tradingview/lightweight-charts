@@ -17,12 +17,12 @@ function runTestCase(container) {
 		leftPriceScale: {
 			visible: true,
 			borderColor: '#EFF2F5',
-			drawTicks: false,
+			ticksVisible: false,
 		},
 		rightPriceScale: {
 			visible: true,
 			borderColor: '#EFF2F5',
-			drawTicks: false,
+			ticksVisible: false,
 		},
 	});
 

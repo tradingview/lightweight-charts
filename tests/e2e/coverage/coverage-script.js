@@ -96,10 +96,6 @@ function runTestCase(container) {
 
 	const seriesToRemove = chart.addAreaSeries({
 		priceScaleId: 'overlay-id',
-		scaleMargins: {
-			top: 0.3,
-			bottom: 0.3,
-		},
 		priceFormat: {
 			type: 'volume',
 		},
@@ -136,6 +132,9 @@ function runTestCase(container) {
 	});
 
 	lineSeries.setData(generateLineData());
+
+	const baselineSeries = chart.addBaselineSeries();
+	baselineSeries.setData(generateLineData());
 
 	areaSeries.createPriceLine({
 		price: 10,
