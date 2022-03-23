@@ -3,8 +3,8 @@ import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate
 import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
-import { fontSizeToPixels, makeFont } from '../helpers/make-font';
 import { ISubscription } from '../helpers/isubscription';
+import { fontSizeToPixels, makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
