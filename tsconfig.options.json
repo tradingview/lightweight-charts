@@ -5,17 +5,13 @@
 		"importHelpers": true,
 		"lib": [
 			"dom",
-			"es2015.collection",
-			"es2015.core",
-			"es2015.iterable",
-			"es2015.symbol.wellknown",
-			"es2016.array.include",
-			"es5"
+			"es2016"
 		],
 		"module": "esnext",
 		"moduleResolution": "node",
 		"noEmitOnError": true,
 		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
 		"noImplicitReturns": true,
 		"noUnusedLocals": true,
 		"preserveConstEnums": true,
@@ -23,13 +19,14 @@
 		"rootDir": "./",
 		"strict": true,
 		"stripInternal": false,
-		"target": "es5",
+		"target": "es2016",
 		"typeRoots": [
 			"./src/typings",
 			"node_modules/@types"
 		],
 		"types": [
-			"_global-types"
+			"_global-types",
+			"dom-not-standarted"
 		]
 	}
 }

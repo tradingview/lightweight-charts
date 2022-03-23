@@ -18,9 +18,20 @@ type GreenComponent = Nominal<number, 'GreenComponent'>;
  */
 type BlueComponent = Nominal<number, 'BlueComponent'>;
 
-type Rgb = [RedComponent, GreenComponent, BlueComponent];
+/**
+ * Alpha component of the RGBA color value
+ * The valid values are integers in range [0, 1]
+ */
+type AlphaComponent = Nominal<number, 'AlphaComponent'>;
 
-/** @public see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value */
+type Rgba = [RedComponent, GreenComponent, BlueComponent, AlphaComponent];
+
+/**
+ * Note this object should be explicitly marked as public so that dts-bundle-generator does not mangle the property names.
+ *
+ * @public
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+ */
 const namedColorRgbHexStrings: Record<string, string> = {
 	// The order of properties in this Record is not important for the internal logic.
 	// It's just GZIPped better when props follows this order.
@@ -183,6 +194,14 @@ function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueCom
 	return (Math.round(component) || 0) as T;
 }
 
+function normalizeAlphaComponent(component: AlphaComponent): AlphaComponent {
+	return (!(component <= 0) && !(component > 0) ? 0 as AlphaComponent :
+		component < 0 ? 0 as AlphaComponent :
+			component > 1 ? 1 as AlphaComponent :
+				// limit the precision of all numbers to at most 4 digits in fractional part
+				Math.round(component * 10000) / 10000) as AlphaComponent;
+}
+
 /**
  * @example
  * #fb0
@@ -219,7 +238,7 @@ const rgbRe = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$
  */
 const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
 
-function colorStringToRgb(colorString: string): Rgb {
+function colorStringToRgba(colorString: string): Rgba {
 	colorString = colorString.toLowerCase();
 
 	// eslint-disable-next-line no-restricted-syntax
@@ -234,6 +253,7 @@ function colorStringToRgb(colorString: string): Rgb {
 				normalizeRgbComponent<RedComponent>(parseInt(matches[1], 10)),
 				normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 10)),
 				normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 10)),
+				normalizeAlphaComponent((matches.length < 5 ? 1 : parseFloat(matches[4])) as AlphaComponent),
 			];
 		}
 	}
@@ -245,6 +265,7 @@ function colorStringToRgb(colorString: string): Rgb {
 				normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16)),
 				normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16)),
 				normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16)),
+				1 as AlphaComponent,
 			];
 		}
 	}
@@ -256,6 +277,7 @@ function colorStringToRgb(colorString: string): Rgb {
 				normalizeRgbComponent<RedComponent>(parseInt(matches[1], 16) * 0x11),
 				normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 16) * 0x11),
 				normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 16) * 0x11),
+				1 as AlphaComponent,
 			];
 		}
 	}
@@ -263,7 +285,7 @@ function colorStringToRgb(colorString: string): Rgb {
 	throw new Error(`Cannot parse color: ${colorString}`);
 }
 
-function rgbToGrayscale(rgbValue: Rgb): number {
+function rgbaToGrayscale(rgbValue: Rgba): number {
 	// Originally, the NTSC RGB to YUV formula
 	// perfected by @eugene-korobko's black magic
 	const redComponentGrayscaleWeight = 0.199;
@@ -277,16 +299,41 @@ function rgbToGrayscale(rgbValue: Rgb): number {
 	);
 }
 
+export function applyAlpha(color: string, alpha: number): string {
+	// special case optimization
+	if (color === 'transparent') {
+		return color;
+	}
+
+	const originRgba = colorStringToRgba(color);
+	const originAlpha = originRgba[3];
+	return `rgba(${originRgba[0]}, ${originRgba[1]}, ${originRgba[2]}, ${alpha * originAlpha})`;
+}
+
 export interface ContrastColors {
 	foreground: string;
 	background: string;
 }
 
 export function generateContrastColors(backgroundColor: string): ContrastColors {
-	const rgb = colorStringToRgb(backgroundColor);
+	const rgb = colorStringToRgba(backgroundColor);
 
 	return {
 		background: `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
-		foreground: rgbToGrayscale(rgb) > 160 ? 'black' : 'white',
+		foreground: rgbaToGrayscale(rgb) > 160 ? 'black' : 'white',
 	};
+}
+
+export function gradientColorAtPercent(topColor: string, bottomColor: string, percent: number): string {
+	const [topR, topG, topB, topA] = colorStringToRgba(topColor);
+	const [bottomR, bottomG, bottomB, bottomA] = colorStringToRgba(bottomColor);
+
+	const resultRgba: Rgba = [
+		normalizeRgbComponent(topR + percent * (bottomR - topR) as RedComponent),
+		normalizeRgbComponent(topG + percent * (bottomG - topG) as GreenComponent),
+		normalizeRgbComponent(topB + percent * (bottomB - topB) as BlueComponent),
+		normalizeAlphaComponent(topA + percent * (bottomA - topA) as AlphaComponent),
+	];
+
+	return `rgba(${resultRgba[0]}, ${resultRgba[1]}, ${resultRgba[2]}, ${resultRgba[3]})`;
 }

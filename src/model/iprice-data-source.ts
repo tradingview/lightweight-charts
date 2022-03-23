@@ -1,4 +1,4 @@
-import { IFormatter } from '../formatters/iformatter';
+import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { ChartModel } from './chart-model';
@@ -12,7 +12,7 @@ export interface FirstValue {
 
 export interface IPriceDataSource extends IDataSource {
 	firstValue(): FirstValue | null;
-	formatter(): IFormatter;
+	formatter(): IPriceFormatter;
 	priceLineColor(lastBarColor: string): string;
 	model(): ChartModel;
 	minMove(): number;

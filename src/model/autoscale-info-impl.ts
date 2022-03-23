@@ -1,6 +1,9 @@
 import { PriceRangeImpl } from './price-range-impl';
 import { AutoscaleInfo } from './series-options';
 
+/**
+ * Represents the margin used when updating a price scale.
+ */
 export interface AutoScaleMargins {
 	/** The number of pixels for bottom margin */
 	below: number;

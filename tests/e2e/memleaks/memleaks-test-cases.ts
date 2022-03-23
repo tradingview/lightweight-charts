@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { Browser, Frame, HTTPResponse, JSHandle, launch as launchPuppeteer } from 'puppeteer';
+import puppeteer, { Browser, Frame, HTTPResponse, JSHandle, launch as launchPuppeteer } from 'puppeteer';
 
 import { getTestCases } from './helpers/get-test-cases';
 
@@ -25,7 +25,7 @@ const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 async function getReferencesCount(frame: Frame, prototypeReference: JSHandle): Promise<number> {
 	const context = await frame.executionContext();
 	const activeRefsHandle = await context.queryObjects(prototypeReference);
-	const activeRefsCount = await (await activeRefsHandle?.getProperty('length'))?.jsonValue() as number;
+	const activeRefsCount = await (await activeRefsHandle?.getProperty('length'))?.jsonValue<number>();
 
 	await activeRefsHandle.dispose();
 
@@ -50,7 +50,9 @@ describe('Memleaks tests', () => {
 		expect(testStandalonePath, `path to test standalone module must be passed via ${testStandalonePathEnvKey} env var`)
 			.to.have.length.greaterThan(0);
 
-		const browserPromise = launchPuppeteer(puppeteerOptions);
+		// note that we cannot use launchPuppeteer here as soon it wrong typing in puppeteer
+		// see https://github.com/puppeteer/puppeteer/issues/7529
+		const browserPromise = puppeteer.launch(puppeteerOptions);
 		browser = await browserPromise;
 	});
 

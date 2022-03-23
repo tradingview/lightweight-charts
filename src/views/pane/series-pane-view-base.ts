@@ -13,6 +13,7 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 	protected readonly _model: ChartModel;
 	protected _invalidated: boolean = true;
 	protected _dataInvalidated: boolean = true;
+	protected _optionsInvalidated: boolean = true;
 	protected _items: ItemType[] = [];
 	protected _itemsVisibleRange: SeriesItemsIndexesRange | null = null;
 	private readonly _extendedVisibleRange: boolean;
@@ -28,6 +29,9 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		if (updateType === 'data') {
 			this._dataInvalidated = true;
 		}
+		if (updateType === 'options') {
+			this._optionsInvalidated = true;
+		}
 	}
 
 	public abstract renderer(height: number, width: number): IPaneRenderer | null;
@@ -42,9 +46,16 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 			this._updatePoints();
 			this._invalidated = false;
 		}
+
+		if (this._optionsInvalidated) {
+			this._updateOptions();
+			this._optionsInvalidated = false;
+		}
 	}
 
 	protected abstract _fillRawPoints(): void;
+
+	protected abstract _updateOptions(): void;
 
 	protected abstract _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void;
 

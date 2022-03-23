@@ -5,7 +5,8 @@ import * as path from 'path';
 
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { BoundingBox,
+import puppeteer, {
+	BoundingBox,
 	Browser,
 	ConsoleMessage,
 	ElementHandle,
@@ -130,6 +131,32 @@ async function doHorizontalDrag(page: Page, element: ElementHandle): Promise<voi
 	await page.mouse.up({ button: 'left' });
 }
 
+async function doKineticAnimation(page: Page, element: ElementHandle): Promise<void> {
+	const elBox = await element.boundingBox() as BoundingBox;
+
+	const elMiddleX = elBox.x + elBox.width / 2;
+	const elMiddleY = elBox.y + elBox.height / 2;
+
+	// move mouse to the middle of element
+	await page.mouse.move(elMiddleX, elMiddleY);
+
+	await page.mouse.down({ button: 'left' });
+	await page.waitForTimeout(50);
+	await page.mouse.move(elMiddleX - 40, elMiddleY);
+	await page.mouse.move(elMiddleX - 55, elMiddleY);
+	await page.mouse.move(elMiddleX - 105, elMiddleY);
+	await page.mouse.move(elMiddleX - 155, elMiddleY);
+	await page.mouse.move(elMiddleX - 205, elMiddleY);
+	await page.mouse.move(elMiddleX - 255, elMiddleY);
+	await page.mouse.up({ button: 'left' });
+
+	await page.waitForTimeout(200);
+
+	// stop animation
+	await page.mouse.down({ button: 'left' });
+	await page.mouse.up({ button: 'left' });
+}
+
 async function doUserInteractions(page: Page): Promise<void> {
 	const chartContainer = await page.$('#container') as ElementHandle<Element>;
 	const chartBox = await chartContainer.boundingBox() as BoundingBox;
@@ -171,6 +198,8 @@ async function doUserInteractions(page: Page): Promise<void> {
 
 	await timeAxis.click({ button: 'left' });
 	await timeAxis.click({ button: 'left', clickCount: 2 });
+
+	await doKineticAnimation(page, timeAxis);
 }
 
 interface CoverageResult {
@@ -222,7 +251,9 @@ describe('Coverage tests', () => {
 		expect(testStandalonePath, `path to test standalone module must be passed via ${testStandalonePathEnvKey} env var`)
 			.to.have.length.greaterThan(0);
 
-		const browserPromise = launchPuppeteer(puppeteerOptions);
+		// note that we cannot use launchPuppeteer here as soon it wrong typing in puppeteer
+		// see https://github.com/puppeteer/puppeteer/issues/7529
+		const browserPromise = puppeteer.launch(puppeteerOptions);
 		browser = await browserPromise;
 	});
 

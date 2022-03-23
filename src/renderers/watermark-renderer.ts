@@ -8,7 +8,13 @@ export interface WatermarkRendererLineData {
 	zoom: number;
 }
 
+/**
+ * Represents a horizontal alignment.
+ */
 export type HorzAlign = 'left' | 'center' | 'right';
+/**
+ * Represents a vertical alignment.
+ */
 export type VertAlign = 'top' | 'center' | 'bottom';
 
 export interface WatermarkRendererData {
@@ -32,7 +38,7 @@ export class WatermarkRenderer extends ScaledRenderer {
 
 	protected _drawImpl(ctx: CanvasRenderingContext2D): void {}
 
-	protected _drawBackgroundImpl(ctx: CanvasRenderingContext2D): void {
+	protected override _drawBackgroundImpl(ctx: CanvasRenderingContext2D): void {
 		if (!this._data.visible) {
 			return;
 		}

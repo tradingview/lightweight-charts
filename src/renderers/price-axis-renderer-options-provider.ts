@@ -59,7 +59,7 @@ export class PriceAxisRendererOptionsProvider {
 	}
 
 	private _paneBackgroundColor(): string {
-		return this._chartModel.options().layout.backgroundColor;
+		return this._chartModel.backgroundTopColor();
 	}
 
 	private _fontSize(): number {

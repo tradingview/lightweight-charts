@@ -16,8 +16,6 @@ export const DEFAULT_STRETCH_FACTOR = 1000;
 
 export type PriceScalePosition = 'left' | 'right' | 'overlay';
 
-export type PreferredPriceScalePosition = 'left' | 'right' | 'overlay';
-
 interface MinMaxOrderInfo {
 	minZOrder: number;
 	maxZOrder: number;
@@ -52,7 +50,7 @@ export class Pane implements IDestroyable {
 		this._rightPriceScale = this._createPriceScale(DefaultPriceScaleId.Right, options.rightPriceScale);
 
 		this._leftPriceScale.modeChanged().subscribe(this._onPriceScaleModeChanged.bind(this, this._leftPriceScale), this);
-		this._rightPriceScale.modeChanged().subscribe(this._onPriceScaleModeChanged.bind(this, this._leftPriceScale), this);
+		this._rightPriceScale.modeChanged().subscribe(this._onPriceScaleModeChanged.bind(this, this._rightPriceScale), this);
 
 		this.applyScaleOptions(options);
 	}
@@ -166,7 +164,7 @@ export class Pane implements IDestroyable {
 	}
 
 	public addDataSource(source: IPriceDataSource, targetScaleId: string, zOrder?: number): void {
-		const targetZOrder = (zOrder !== undefined) ? zOrder : this._getZOrderMinMax().minZOrder - 1;
+		const targetZOrder = (zOrder !== undefined) ? zOrder : this._getZOrderMinMax().maxZOrder + 1;
 		this._insertDataSource(source, targetScaleId, targetZOrder);
 	}
 
@@ -271,6 +269,17 @@ export class Pane implements IDestroyable {
 			priceScale = this._rightPriceScale;
 		}
 
+		return priceScale;
+	}
+
+	public defaultVisiblePriceScale(): PriceScale | null {
+		let priceScale: PriceScale | null = null;
+
+		if (this._model.options().rightPriceScale.visible) {
+			priceScale = this._rightPriceScale;
+		} else if (this._model.options().leftPriceScale.visible) {
+			priceScale = this._leftPriceScale;
+		}
 		return priceScale;
 	}
 

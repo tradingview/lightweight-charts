@@ -5,9 +5,9 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
+import { DefaultPriceScaleId } from '../model/default-price-scale';
 import {
 	InvalidateMask,
 	InvalidationLevel,
@@ -15,9 +15,9 @@ import {
 	TimeScaleInvalidationType,
 } from '../model/invalidate-mask';
 import { Point } from '../model/point';
-import { PriceAxisPosition } from '../model/price-scale';
 import { Series } from '../model/series';
-import { TimePoint, TimePointIndex } from '../model/time-data';
+import { SeriesPlotRow } from '../model/series-data';
+import { OriginalTime, TimePointIndex } from '../model/time-data';
 
 import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from './canvas-utils';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
@@ -25,9 +25,10 @@ import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
 export interface MouseEventParamsImpl {
-	time?: TimePoint;
+	time?: OriginalTime;
+	index?: TimePointIndex;
 	point?: Point;
-	seriesPrices: Map<Series, BarPrice | BarPrices>;
+	seriesData: Map<Series, SeriesPlotRow>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
 }
@@ -123,6 +124,10 @@ export class ChartWidget implements IDestroyable {
 		return this._paneWidgets;
 	}
 
+	public timeAxisWidget(): TimeAxisWidget {
+		return this._timeAxisWidget;
+	}
+
 	public destroy(): void {
 		this._element.removeEventListener('wheel', this._onWheelBound);
 		if (this._drawRafId !== 0) {
@@ -189,10 +194,15 @@ export class ChartWidget implements IDestroyable {
 			this._paneWidgets[i].paint(invalidateMask.invalidateForPane(i).level);
 		}
 
-		this._timeAxisWidget.paint(invalidateMask.fullInvalidation());
+		if (this._options.timeScale.visible) {
+			this._timeAxisWidget.paint(invalidateMask.fullInvalidation());
+		}
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
+		// we don't need to merge options here because it's done in chart model
+		// and since both model and widget share the same object it will be done automatically for widget as well
+		// not ideal solution for sure, but it work's for now ¯\_(ツ)_/¯
 		this._model.applyOptions(options);
 		this._updateTimeAxisVisibility();
 
@@ -224,7 +234,7 @@ export class ChartWidget implements IDestroyable {
 			let targetX = 0;
 			let targetY = 0;
 
-			const drawPriceAxises = (position: PriceAxisPosition) => {
+			const drawPriceAxises = (position: 'left' | 'right') => {
 				for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
 					const paneWidget = this._paneWidgets[paneIndex];
 					const paneWidgetHeight = paneWidget.getSize().h;
@@ -266,7 +276,7 @@ export class ChartWidget implements IDestroyable {
 				targetY = 0;
 				drawPriceAxises('right');
 			}
-			const drawStub = (position: PriceAxisPosition) => {
+			const drawStub = (position: 'left' | 'right') => {
 				const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
 				const size = stub.getSize();
 				const image = stub.getImage();
@@ -283,7 +293,7 @@ export class ChartWidget implements IDestroyable {
 				const image = this._timeAxisWidget.getImage();
 				ctx.drawImage(image, targetX, targetY, size.w, size.h);
 				if (this._isRightAxisVisible()) {
-					targetX = firstPane.getSize().w;
+					targetX += firstPane.getSize().w;
 					drawStub('right');
 					ctx.restore();
 				}
@@ -292,11 +302,7 @@ export class ChartWidget implements IDestroyable {
 		return targetCanvas;
 	}
 
-	public getPriceAxisWidth(position: PriceAxisPosition): number {
-		if (position === 'none') {
-			return 0;
-		}
-
+	public getPriceAxisWidth(position: DefaultPriceScaleId): number {
 		if (position === 'left' && !this._isLeftAxisVisible()) {
 			return 0;
 		}
@@ -343,7 +349,8 @@ export class ChartWidget implements IDestroyable {
 		// const separatorCount = this._paneSeparators.length;
 		// const separatorHeight = SEPARATOR_HEIGHT;
 		const separatorsHeight = 0; // separatorHeight * separatorCount;
-		let timeAxisHeight = this._options.timeScale.visible ? this._timeAxisWidget.optimalHeight() : 0;
+		const timeAxisVisible = this._options.timeScale.visible;
+		let timeAxisHeight = timeAxisVisible ? this._timeAxisWidget.optimalHeight() : 0;
 		// TODO: Fix it better
 		// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
 		if (timeAxisHeight % 2) {
@@ -385,9 +392,9 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this._timeAxisWidget.setSizes(
-			new Size(paneWidth, timeAxisHeight),
-			leftPriceAxisWidth,
-			rightPriceAxisWidth
+			new Size(timeAxisVisible ? paneWidth : 0, timeAxisHeight),
+			timeAxisVisible ? leftPriceAxisWidth : 0,
+			timeAxisVisible ? rightPriceAxisWidth : 0
 		);
 
 		this._model.setWidth(paneWidth);
@@ -450,27 +457,48 @@ export class ChartWidget implements IDestroyable {
 			invalidationType === InvalidationLevel.Full ||
 			invalidationType === InvalidationLevel.Light
 		) {
-			const panes = this._model.panes();
-			for (let i = 0; i < panes.length; i++) {
-				if (invalidateMask.invalidateForPane(i).autoScale) {
-					panes[i].momentaryAutoScale();
-				}
-			}
-
-			const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
-			for (const tsInvalidation of timeScaleInvalidations) {
-				this._applyTimeScaleInvalidation(tsInvalidation);
-			}
-			if (timeScaleInvalidations.length > 0) {
-				this._model.recalculateAllPanes();
-				this._model.updateCrosshair();
-				this._model.lightUpdate();
-			}
+			this._applyMomentaryAutoScale(invalidateMask);
+			this._applyTimeScaleInvalidations(invalidateMask);
 
 			this._timeAxisWidget.update();
+			this._paneWidgets.forEach((pane: PaneWidget) => {
+				pane.updatePriceAxisWidgets();
+			});
+
+			// In the case a full invalidation has been postponed during the draw, reapply
+			// the timescale invalidations. A full invalidation would mean there is a change
+			// in the timescale width (caused by price scale changes) that needs to be drawn
+			// right away to avoid flickering.
+			if (this._invalidateMask?.fullInvalidation() === InvalidationLevel.Full) {
+				this._invalidateMask.merge(invalidateMask);
+
+				this._updateGui();
+
+				this._applyMomentaryAutoScale(this._invalidateMask);
+				this._applyTimeScaleInvalidations(this._invalidateMask);
+
+				invalidateMask = this._invalidateMask;
+				this._invalidateMask = null;
+			}
 		}
 
 		this.paint(invalidateMask);
+	}
+
+	private _applyTimeScaleInvalidations(invalidateMask: InvalidateMask): void {
+		const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
+		for (const tsInvalidation of timeScaleInvalidations) {
+			this._applyTimeScaleInvalidation(tsInvalidation);
+		}
+	}
+
+	private _applyMomentaryAutoScale(invalidateMask: InvalidateMask): void {
+		const panes = this._model.panes();
+		for (let i = 0; i < panes.length; i++) {
+			if (invalidateMask.invalidateForPane(i).autoScale) {
+				panes[i].momentaryAutoScale();
+			}
+		}
 	}
 
 	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {
@@ -508,8 +536,9 @@ export class ChartWidget implements IDestroyable {
 				this._drawRafId = 0;
 
 				if (this._invalidateMask !== null) {
-					this._drawImpl(this._invalidateMask);
+					const mask = this._invalidateMask;
 					this._invalidateMask = null;
+					this._drawImpl(mask);
 				}
 			});
 		}
@@ -566,7 +595,7 @@ export class ChartWidget implements IDestroyable {
 			if (paneWidget.state() !== state) {
 				paneWidget.setState(state);
 			} else {
-				paneWidget.updatePriceAxisWidgets();
+				paneWidget.updatePriceAxisWidgetsStates();
 			}
 		}
 
@@ -575,21 +604,21 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
-		const seriesPrices = new Map<Series, BarPrice | BarPrices>();
+		const seriesData = new Map<Series, SeriesPlotRow>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
 			serieses.forEach((s: Series) => {
 				// TODO: replace with search left
-				const prices = s.dataAt(index);
-				if (prices !== null) {
-					seriesPrices.set(s, prices);
+				const data = s.bars().search(index);
+				if (data !== null) {
+					seriesData.set(s, data);
 				}
 			});
 		}
-		let clientTime: TimePoint | undefined;
+		let clientTime: OriginalTime | undefined;
 		if (index !== null) {
-			const timePoint = this._model.timeScale().indexToTime(index);
-			if (timePoint !== null) {
+			const timePoint = this._model.timeScale().indexToTimeScalePoint(index)?.originalTime;
+			if (timePoint !== undefined) {
 				clientTime = timePoint;
 			}
 		}
@@ -606,9 +635,10 @@ export class ChartWidget implements IDestroyable {
 
 		return {
 			time: clientTime,
-			point: point || undefined,
+			index: index ?? undefined,
+			point: point ?? undefined,
 			hoveredSeries,
-			seriesPrices,
+			seriesData,
 			hoveredObject,
 		};
 	}
@@ -627,11 +657,11 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _isLeftAxisVisible(): boolean {
-		return this._options.leftPriceScale.visible;
+		return this._paneWidgets[0].state().leftPriceScale().options().visible;
 	}
 
 	private _isRightAxisVisible(): boolean {
-		return this._options.rightPriceScale.visible;
+		return this._paneWidgets[0].state().rightPriceScale().options().visible;
 	}
 }
 
@@ -640,9 +670,10 @@ function disableSelection(element: HTMLElement): void {
 	// eslint-disable-next-line deprecation/deprecation
 	element.style.webkitUserSelect = 'none';
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
-	(element as any).style.msUserSelect = 'none';
+	(element.style as any).msUserSelect = 'none';
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
-	(element as any).style.MozUserSelect = 'none';
+	(element.style as any).MozUserSelect = 'none';
 
-	element.style.webkitTapHighlightColor = 'transparent';
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+	(element.style as any).webkitTapHighlightColor = 'transparent';
 }

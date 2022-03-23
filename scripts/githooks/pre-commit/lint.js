@@ -65,6 +65,10 @@ function runForFiles(cmd, files) {
 }
 
 function runESLintForFiles(files) {
+	if (files.length === 0) {
+		return false;
+	}
+
 	return runForFiles('node ./node_modules/eslint/bin/eslint --quiet --format=unix', files);
 }
 
@@ -76,17 +80,21 @@ function filterByExt(files, ext) {
 	return files.filter(file => path.extname(file) === ext);
 }
 
+// eslint-disable-next-line complexity
 function lintFiles(files) {
 	let hasErrors = false;
 
-	// eslint
+	// eslint for js and jsxd
 	hasErrors = runESLintForFiles(filterByExt(files, '.js')) || hasErrors;
+	hasErrors = runESLintForFiles(filterByExt(files, '.jsx')) || hasErrors;
 
 	// tsc & eslint for ts files
 	const tsFiles = filterByExt(files, '.ts');
-	if (tsFiles.length !== 0) {
+	const tsxFiles = filterByExt(files, '.tsx');
+	if (tsFiles.length !== 0 || tsxFiles.length !== 0) {
 		hasErrors = run('npm run tsc-verify') || hasErrors;
 		hasErrors = runESLintForFiles(tsFiles) || hasErrors;
+		hasErrors = runESLintForFiles(tsxFiles) || hasErrors;
 	}
 
 	// markdown
@@ -96,6 +104,12 @@ function lintFiles(files) {
 		hasErrors = runESLintForFiles(mdFiles) || hasErrors;
 		hasErrors = runMarkdownLintForFiles(mdFiles) || hasErrors;
 		hasErrors = run('node scripts/check-markdown-links.js') || hasErrors;
+	}
+
+	// markdown react
+	const mdxFiles = filterByExt(files, '.mdx');
+	if (mdxFiles.length !== 0) {
+		hasErrors = runESLintForFiles(mdxFiles) || hasErrors;
 	}
 
 	return hasErrors;
