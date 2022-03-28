@@ -207,6 +207,10 @@ export interface IChartApi {
 	 */
 	subscribeCrosshairMove(handler: MouseEventHandler): void;
 
+	setCrossHairXY(x: number, y: number, visible: boolean): void;
+
+	clearCrossHair(): void;
+
 	/**
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeCrosshairMove}.
 	 *

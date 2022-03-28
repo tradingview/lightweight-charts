@@ -656,6 +656,31 @@ export class ChartModel implements IDestroyable {
 		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
 	}
 
+	public setAndSaveCurrentPositionFire(x: Coordinate, y: Coordinate, fire: boolean, pane: Pane): void {
+		this._crosshair.saveOriginCoord(x, y);
+		let price = NaN;
+		let index = this._timeScale.coordinateToIndex(x);
+
+		const visibleBars = this._timeScale.visibleStrictRange();
+		if (visibleBars !== null) {
+			index = Math.min(Math.max(visibleBars.left(), index), visibleBars.right()) as TimePointIndex;
+		}
+
+		const priceScale = pane.defaultPriceScale();
+		const firstValue = priceScale.firstValue();
+		if (firstValue !== null) {
+			price = priceScale.coordinateToPrice(y, firstValue);
+		}
+		price = this._magnet.align(price, index, pane);
+
+		this._crosshair.setPosition(index, price, pane);
+		/* eslint-disable @typescript-eslint/no-unsafe-call */
+		this.cursorUpdate();
+		if (fire) {
+			this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
+		}
+	}
+
 	public clearCurrentPosition(): void {
 		const crosshair = this.crosshairSource();
 		crosshair.clearPosition();

@@ -190,6 +190,15 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._timeScaleApi = new TimeScaleApi(model, this._chartWidget.timeAxisWidget());
 	}
 
+	public setCrossHairXY(x: number, y: number, visible: boolean): void {
+	/* eslint-disable @typescript-eslint/no-unsafe-call */
+		this._chartWidget?.paneWidgets()[0]?.setCrossHair(x, y, visible);
+	}
+
+	public clearCrossHair(): void {
+		this._chartWidget.paneWidgets()[0].clearCrossHair();
+	}
+
 	public remove(): void {
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
