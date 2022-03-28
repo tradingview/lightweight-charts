@@ -340,13 +340,6 @@ workflows:
           filters: *default-filters
           requires:
             - build
-
-  website:
-    jobs:
-      - install-deps:
-          filters: *default-filters
-      - install-deps-website:
-          filters: *default-filters
       - build-docusaurus-website:
           filters: *default-filters
           requires:

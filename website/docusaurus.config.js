@@ -334,6 +334,13 @@ async function getConfig() {
 			],
 			...versions.map(typedocPluginForVersion),
 			'./plugins/chart-codeblock',
+			[
+				'./plugins/generate-versions-json-dts',
+				{
+					versionsJsonPath: path.resolve('./versions.json'),
+					versionsDtsOutputPath: path.resolve('./versions.d.ts'),
+				},
+			],
 		],
 	};
 

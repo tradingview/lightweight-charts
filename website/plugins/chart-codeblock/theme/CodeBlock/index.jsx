@@ -3,21 +3,8 @@ import CodeBlock from '@theme-init/CodeBlock';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { useDocsVersion } from '@docusaurus/theme-common';
 
+import { importLightweightChartsVersion } from './import-lightweight-charts-version';
 import styles from './styles.module.css';
-
-// The Webpack bundle fails to resolve the module at runtime if we try to use a dynamic
-// import with a variable name (for example import(`lightweight-charts-${version}`)).
-// There may be a way of making that work; if there is then we should remove this function.
-function importLightweightChartsVersion(version) {
-	switch (version) {
-		case 'current': {
-			return import('lightweight-charts');
-		}
-		default: {
-			return Promise.reject(new Error('Unexpected Lightweight Charts version: ' + version));
-		}
-	}
-}
 
 function getSrcDocWithScript(script, parentOrigin) {
 	return `

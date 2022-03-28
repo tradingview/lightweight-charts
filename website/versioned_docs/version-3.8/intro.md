@@ -82,9 +82,7 @@ Note that regardless of the series type, the API calls are the same (the type of
 
 To set the data (or to replace all data items) to a series you need to use [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) method:
 
-```js
-import { createChart } from 'lightweight-charts';
-
+```js chart
 const chart = createChart(container);
 
 const areaSeries = chart.addAreaSeries();
@@ -114,11 +112,9 @@ candlestickSeries.setData([
     { time: '2018-12-30', open: 106.33, high: 110.20, low: 90.39, close: 98.10 },
     { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
 ]);
+
+chart.timeScale().fitContent();
 ```
-
-It's pretty easy, isn't it? That's it, your chart is ready to be displayed on the page:
-
-![First simple chart](/img/first-chart.png "First simple chart")
 
 ### Updating the data in a series
 
