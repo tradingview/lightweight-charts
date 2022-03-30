@@ -92,10 +92,13 @@ Note that regardless of the series type, the API calls are the same (the type of
 
 To set the data (or to replace all data items) to a series you need to use [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) method:
 
-```js chart
-const chart = createChart(container);
-
-const areaSeries = chart.addAreaSeries();
+```js chart replaceThemeConstants
+const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+const chart = createChart(document.getElementById('container'), chartOptions);
+const areaSeries = chart.addAreaSeries({
+    lineColor: LINE_LINE_COLOR, topColor: AREA_TOP_COLOR,
+    bottomColor: AREA_BOTTOM_COLOR,
+});
 areaSeries.setData([
     { time: '2018-12-22', value: 32.51 },
     { time: '2018-12-23', value: 31.11 },
@@ -109,7 +112,10 @@ areaSeries.setData([
     { time: '2018-12-31', value: 22.67 },
 ]);
 
-const candlestickSeries = chart.addCandlestickSeries();
+const candlestickSeries = chart.addCandlestickSeries({
+    upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR, borderVisible: false,
+    wickUpColor: BAR_UP_COLOR, wickDownColor: BAR_DOWN_COLOR,
+});
 candlestickSeries.setData([
     { time: '2018-12-22', open: 75.16, high: 82.84, low: 36.16, close: 45.72 },
     { time: '2018-12-23', open: 45.12, high: 53.90, low: 45.12, close: 48.09 },

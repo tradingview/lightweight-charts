@@ -333,7 +333,7 @@ async function getConfig() {
 				}),
 			],
 			...versions.map(typedocPluginForVersion),
-			'./plugins/chart-codeblock',
+			'./plugins/enhanced-codeblock',
 			[
 				'./plugins/generate-versions-json-dts',
 				{

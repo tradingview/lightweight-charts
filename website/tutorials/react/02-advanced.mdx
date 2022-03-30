@@ -212,19 +212,20 @@ ChildComponent.displayName = 'ChildComponent';
 
 By considering all the above you could end up with Chart/Series components looking like the following
 
+import { ThemedChart } from '@site/src/components/tutorials/themed-chart-colors-wrapper';
 import CodeBlock from '@theme/CodeBlock';
-import Code from '!!raw-loader!./_advanced-react-example';
+import code from '!!raw-loader!@site/src/components/tutorials/advanced-react-example';
 
-<CodeBlock className="language-jsx">{Code}</CodeBlock>
+<CodeBlock replaceThemeConstants className="language-jsx">{code}</CodeBlock>
 
 The code above will produce a line series.
 Given a `series1` reference is created to be passed to the Series component you could reuse that object via `series1.current.[any function applicable on Series]`.
 
 For instance and as shown below `series1.current.update(new data)` is used upon clicking on the button.
 
-import { App } from './_advanced-react-example';
+import { App } from '@site/src/components/tutorials/advanced-react-example';
 import styles from '@site/src/pages/chart.module.css';
 
 <div className={styles.ChartContainer}>
-    <App />
+    <ThemedChart ChartComponent={App} />
 </div>

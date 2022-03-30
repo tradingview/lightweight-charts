@@ -1,6 +1,4 @@
 import * as React from 'react';
-import CodeBlock from '@theme-init/CodeBlock';
-import BrowserOnly from '@docusaurus/BrowserOnly';
 import { useDocsVersion } from '@docusaurus/theme-common';
 
 import { importLightweightChartsVersion } from './import-lightweight-charts-version';
@@ -30,7 +28,7 @@ function getSrcDocWithScript(script, parentOrigin) {
 	`;
 }
 
-const Chart = props => {
+export const Chart = props => {
 	const { script } = props;
 	const { origin } = window;
 	const { version } = useDocsVersion();
@@ -90,28 +88,14 @@ const Chart = props => {
 		};
 
 		window.addEventListener('message', readyMessageListener, false);
-	}, [origin]);
+	}, [origin, srcDoc]);
 
 	return (
 		<iframe
+			key={script}
 			ref={ref}
 			srcDoc={srcDoc}
 			className={styles.iframe}
 		/>
 	);
 };
-
-const ChartCodeBlock = props => {
-	if (props.chart) {
-		return (
-			<>
-				<CodeBlock {...props} />
-				<BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={props.children} />}</BrowserOnly>
-			</>
-		);
-	}
-
-	return <CodeBlock {...props} />;
-};
-
-export default ChartCodeBlock;

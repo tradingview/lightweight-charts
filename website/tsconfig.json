@@ -6,9 +6,7 @@
 		"noEmit": true
 	},
 	"include": [
-		"./src/**/*.ts",
-		"./src/**/*.tsx",
-		"./plugins/**/*.ts",
-		"./plugins/**/*.tsx",
+		"./**/*.ts",
+		"./**/*.tsx",
 	]
 }

@@ -37,18 +37,19 @@ This will create a web page accessible by default on <http://localhost:1234/>.
 
 The example _React component_ on this page may not fit your requirements completely. Creating a general purpose declarative wrapper for Lightweight Charts' imperative API is a challenge, but hopefully you can adapt this example to your use case.
 
+import { ThemedChart } from '@site/src/components/tutorials/themed-chart-colors-wrapper';
 import CodeBlock from '@theme/CodeBlock';
-import code from '!!raw-loader!./_simple-react-example';
+import code from '!!raw-loader!@site/src/components/tutorials/simple-react-example';
 
-<CodeBlock className="language-jsx">{code}</CodeBlock>
+<CodeBlock replaceThemeConstants className="language-jsx">{code}</CodeBlock>
 
 and you'll have a reusable component that could then be enhanced, tweaked to meet your needs, adding properties and even functionalities.
 
 If you've successfully followed all the steps you should see something similar to
 
-import { App } from './_simple-react-example';
+import { App } from '@site/src/components/tutorials/simple-react-example';
 import styles from '@site/src/pages/chart.module.css';
 
 <div className={styles.ChartContainer}>
-    <App />
+    <ThemedChart ChartComponent={App}/>
 </div>
