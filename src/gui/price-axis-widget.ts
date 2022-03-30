@@ -220,7 +220,6 @@ export class PriceAxisWidget implements IDestroyable {
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
-			tickMarkMaxWidth +
 			Constants.LabelOffset +
 			resultTickMarksMaxWidth
 		);
