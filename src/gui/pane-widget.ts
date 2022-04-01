@@ -48,6 +48,10 @@ function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] 
 	return source.paneViews(pane);
 }
 
+function sourceLabelPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+	return source.labelPaneViews(pane);
+}
+
 function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
 	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
 }
@@ -478,6 +482,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				this._drawGrid(ctx, this._canvasBinding.pixelRatio);
 				this._drawWatermark(ctx, this._canvasBinding.pixelRatio);
 				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourcePaneViews);
+				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourceLabelPaneViews);
 			}
 			ctx.restore();
 		}

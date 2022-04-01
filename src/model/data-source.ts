@@ -30,6 +30,10 @@ export abstract class DataSource implements IDataSource {
 	public abstract priceAxisViews(pane?: Pane, priceScale?: PriceScale): readonly IPriceAxisView[];
 	public abstract paneViews(pane?: Pane): readonly IPaneView[];
 
+	public labelPaneViews(pane?: Pane): readonly IPaneView[] {
+		return [];
+	}
+
 	public timeAxisViews(): readonly ITimeAxisView[] {
 		return [];
 	}
