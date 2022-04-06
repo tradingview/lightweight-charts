@@ -58,11 +58,6 @@ export interface LayoutOptions {
 	background: Background;
 
 	/**
-	 * @deprecated Use background instead.
-	 */
-	backgroundColor: string;
-
-	/**
 	 * Color of text on the scales.
 	 *
 	 * @defaultValue `'#191919'`
@@ -83,5 +78,3 @@ export interface LayoutOptions {
 	 */
 	fontFamily: string;
 }
-
-export type LayoutOptionsInternal = Omit<LayoutOptions, 'backgroundColor'>;

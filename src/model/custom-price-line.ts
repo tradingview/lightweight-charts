@@ -35,11 +35,12 @@ export class CustomPriceLine {
 		return this._options;
 	}
 
-	public paneViews(): readonly IPaneView[] {
-		return [
-			this._priceLineView,
-			this._panePriceAxisView,
-		];
+	public paneView(): IPaneView {
+		return this._priceLineView;
+	}
+
+	public labelPaneView(): IPaneView {
+		return this._panePriceAxisView;
 	}
 
 	public priceAxisView(): IPriceAxisView {

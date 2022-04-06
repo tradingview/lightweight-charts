@@ -1,4 +1,4 @@
-import { TimePoint, TimePointIndex } from './time-data';
+import { OriginalTime, TimePoint, TimePointIndex } from './time-data';
 
 /**
  * Plot's index in plot list tuple for series
@@ -21,4 +21,5 @@ export interface PlotRow {
 	readonly index: TimePointIndex;
 	readonly time: TimePoint;
 	readonly value: PlotRowValue;
+	readonly originalTime: OriginalTime;
 }

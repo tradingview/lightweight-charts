@@ -21,15 +21,6 @@
 	display: none;
 }
 
-.HeroChartContainer * {
-	overflow: hidden;
-}
-
-.HeroChartContainer table td,
-.HeroChartContainer table tr {
-	border: none;
-}
-
 .HeroTextContainer {
 	display: flex;
 	flex-direction: column;

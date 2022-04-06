@@ -32,7 +32,7 @@ import { isDefaultPriceScale } from './default-price-scale';
 import { FirstValue } from './iprice-data-source';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
-import { PlotRowSearchMode } from './plot-list';
+import { MismatchDirection } from './plot-list';
 import { PriceDataSource } from './price-data-source';
 import { PriceLineOptions } from './price-line-options';
 import { PriceRangeImpl } from './price-range-impl';
@@ -89,11 +89,7 @@ export interface SeriesUpdateInfo {
 	lastBarUpdatedOrNewBarsAddedToTheRight: boolean;
 }
 
-// TODO: uncomment following strings after fixing typescript bug
-// https://github.com/microsoft/TypeScript/issues/36981
-// export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
-// export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Omit<SeriesPartialOptionsMap[T], 'overlay'>;
-
+// note that if would like to use `Omit` here - you can't due https://github.com/microsoft/TypeScript/issues/36981
 export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
 export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
 
@@ -110,7 +106,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView | null = null;
 	private _barColorerCache: SeriesBarColorer | null = null;
 	private readonly _options: SeriesOptionsInternal<T>;
-	private _markers: SeriesMarker<TimePoint>[] = [];
+	private _markers: readonly SeriesMarker<TimePoint>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
 	private _animationTimeoutId: TimerId | null = null;
@@ -172,7 +168,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			bar = lastBar;
 			lastIndex = lastBar.index;
 		} else {
-			const endBar = this._data.search(visibleBars.right(), PlotRowSearchMode.NearestLeft);
+			const endBar = this._data.search(visibleBars.right(), MismatchDirection.NearestLeft);
 			if (endBar === null) {
 				return noDataRes;
 			}
@@ -222,14 +218,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 		merge(this._options, options);
 
-		// eslint-disable-next-line deprecation/deprecation
-		if (this._priceScale !== null && options.scaleMargins !== undefined) {
-			this._priceScale.applyOptions({
-				// eslint-disable-next-line deprecation/deprecation
-				scaleMargins: options.scaleMargins,
-			});
-		}
-
 		if (options.priceFormat !== undefined) {
 			this._recreateFormatter();
 
@@ -272,8 +260,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().lightUpdate();
 	}
 
-	public setMarkers(data: SeriesMarker<TimePoint>[]): void {
-		this._markers = data.map<SeriesMarker<TimePoint>>((item: SeriesMarker<TimePoint>) => ({ ...item }));
+	public setMarkers(data: readonly SeriesMarker<TimePoint>[]): void {
+		this._markers = data;
 		this._recalculateMarkers();
 		const sourcePane = this.model().paneForSource(this);
 		this._markersPaneView.update('data');
@@ -281,6 +269,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().updateSource(this);
 		this.model().updateCrosshair();
 		this.model().lightUpdate();
+	}
+
+	public markers(): readonly SeriesMarker<TimePoint>[] {
+		return this._markers;
 	}
 
 	public indexedMarkers(): InternalSeriesMarker<TimePointIndex>[] {
@@ -325,7 +317,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		const startTimePoint = visibleBars.left();
-		return this._data.search(startTimePoint, PlotRowSearchMode.NearestRight);
+		return this._data.search(startTimePoint, MismatchDirection.NearestRight);
 	}
 
 	public bars(): SeriesPlotList<T> {
@@ -376,18 +368,23 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			res.push(this._baseHorizontalLineView);
 		}
 
-		for (const customPriceLine of this._customPriceLines) {
-			res.push(...customPriceLine.paneViews());
-		}
-
 		res.push(
 			this._paneView,
 			this._priceLineView,
-			this._panePriceAxisView,
 			this._markersPaneView
 		);
 
+		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
+		res.push(...priceLineViews);
+
 		return res;
+	}
+
+	public override labelPaneViews(pane?: Pane): readonly IPaneView[] {
+		return [
+			this._panePriceAxisView,
+			...this._customPriceLines.map((line: CustomPriceLine) => line.labelPaneView()),
+		];
 	}
 
 	public override priceAxisViews(pane: Pane, priceScale: PriceScale): readonly IPriceAxisView[] {
@@ -580,7 +577,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			const timePointIndex = ensureNotNull(timeScale.timeToIndex(marker.time, true));
 
 			// and then search that index inside the series data
-			const searchMode = timePointIndex < firstDataIndex ? PlotRowSearchMode.NearestRight : PlotRowSearchMode.NearestLeft;
+			const searchMode = timePointIndex < firstDataIndex ? MismatchDirection.NearestRight : MismatchDirection.NearestLeft;
 			const seriesDataIndex = ensureNotNull(this._data.search(timePointIndex, searchMode)).index;
 			return {
 				time: seriesDataIndex,

@@ -138,7 +138,9 @@ html[data-theme=dark] .docusaurus-highlight-code-line {
 	padding-left: calc(0.5rem + var(--ifm-menu-link-padding-horizontal));
 }
 
-.menu__link, .navbar-sidebar__back {
+.menu__caret,
+.menu__link,
+.navbar-sidebar__back {
 	padding-top: 16px;
 	padding-bottom: 16px;
 }

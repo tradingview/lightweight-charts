@@ -12,6 +12,7 @@ import Screens from '../img/screens.svg';
 import Shapes from '../img/shapes.svg';
 import Speedometer from '../img/speedometer.svg';
 import TradingviewHeart from '../img/tradingview-heart.svg';
+import chartStyle from './chart.module.css';
 import data from './hero-chart-data.json';
 import styles from './index.module.css';
 
@@ -124,6 +125,9 @@ function HeroChart(): JSX.Element {
 
 				const { width, height } = container.getBoundingClientRect();
 				chart.resize(width, height);
+
+				// TODO: remove this after releasing the new version (fixed in v4.0.0)
+				// and use lockVisibleTimeRangeOnResize time scale option instead
 				chart.timeScale().setVisibleLogicalRange(visibleLogicalRange);
 			};
 
@@ -148,7 +152,7 @@ function HeroChart(): JSX.Element {
 	);
 
 	return (
-		<div className={chartContainerClassName} ref={ref}></div>
+		<div className={[chartContainerClassName, chartStyle.ChartContainer].join(' ')} ref={ref}></div>
 	);
 }
 

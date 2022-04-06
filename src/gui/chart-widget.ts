@@ -5,9 +5,9 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
+import { DefaultPriceScaleId } from '../model/default-price-scale';
 import {
 	InvalidateMask,
 	InvalidationLevel,
@@ -15,9 +15,9 @@ import {
 	TimeScaleInvalidationType,
 } from '../model/invalidate-mask';
 import { Point } from '../model/point';
-import { PriceAxisPosition } from '../model/price-scale';
 import { Series } from '../model/series';
-import { TimePoint, TimePointIndex } from '../model/time-data';
+import { SeriesPlotRow } from '../model/series-data';
+import { OriginalTime, TimePointIndex } from '../model/time-data';
 
 import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from './canvas-utils';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
@@ -25,9 +25,10 @@ import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
 export interface MouseEventParamsImpl {
-	time?: TimePoint;
+	time?: OriginalTime;
+	index?: TimePointIndex;
 	point?: Point;
-	seriesPrices: Map<Series, BarPrice | BarPrices>;
+	seriesData: Map<Series, SeriesPlotRow>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
 }
@@ -233,7 +234,7 @@ export class ChartWidget implements IDestroyable {
 			let targetX = 0;
 			let targetY = 0;
 
-			const drawPriceAxises = (position: PriceAxisPosition) => {
+			const drawPriceAxises = (position: 'left' | 'right') => {
 				for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
 					const paneWidget = this._paneWidgets[paneIndex];
 					const paneWidgetHeight = paneWidget.getSize().h;
@@ -275,7 +276,7 @@ export class ChartWidget implements IDestroyable {
 				targetY = 0;
 				drawPriceAxises('right');
 			}
-			const drawStub = (position: PriceAxisPosition) => {
+			const drawStub = (position: 'left' | 'right') => {
 				const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
 				const size = stub.getSize();
 				const image = stub.getImage();
@@ -301,11 +302,7 @@ export class ChartWidget implements IDestroyable {
 		return targetCanvas;
 	}
 
-	public getPriceAxisWidth(position: PriceAxisPosition): number {
-		if (position === 'none') {
-			return 0;
-		}
-
+	public getPriceAxisWidth(position: DefaultPriceScaleId): number {
 		if (position === 'left' && !this._isLeftAxisVisible()) {
 			return 0;
 		}
@@ -607,21 +604,21 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
-		const seriesPrices = new Map<Series, BarPrice | BarPrices>();
+		const seriesData = new Map<Series, SeriesPlotRow>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
 			serieses.forEach((s: Series) => {
 				// TODO: replace with search left
-				const prices = s.dataAt(index);
-				if (prices !== null) {
-					seriesPrices.set(s, prices);
+				const data = s.bars().search(index);
+				if (data !== null) {
+					seriesData.set(s, data);
 				}
 			});
 		}
-		let clientTime: TimePoint | undefined;
+		let clientTime: OriginalTime | undefined;
 		if (index !== null) {
-			const timePoint = this._model.timeScale().indexToTime(index);
-			if (timePoint !== null) {
+			const timePoint = this._model.timeScale().indexToTimeScalePoint(index)?.originalTime;
+			if (timePoint !== undefined) {
 				clientTime = timePoint;
 			}
 		}
@@ -638,9 +635,10 @@ export class ChartWidget implements IDestroyable {
 
 		return {
 			time: clientTime,
-			point: point || undefined,
+			index: index ?? undefined,
+			point: point ?? undefined,
 			hoveredSeries,
-			seriesPrices,
+			seriesData,
 			hoveredObject,
 		};
 	}

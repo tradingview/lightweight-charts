@@ -16,7 +16,7 @@ import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale'
 import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
-import { ColorType, LayoutOptions, LayoutOptionsInternal } from './layout-options';
+import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
@@ -242,14 +242,6 @@ export interface ChartOptions {
 	layout: LayoutOptions;
 
 	/**
-	 * Price scale options.
-	 *
-	 * @deprecated Use {@link leftPriceScale}, {@link rightPriceScale} or {@link overlayPriceScales} instead.
-	 * @internal
-	 */
-	priceScale: PriceScaleOptions;
-
-	/**
 	 * Left price scale options
 	 */
 	leftPriceScale: VisiblePriceScaleOptions;
@@ -306,14 +298,14 @@ export interface ChartOptions {
 }
 
 export type ChartOptionsInternal =
-	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'priceScale' | 'layout'>
+	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'layout'>
 	& {
 		/** @public */
 		handleScroll: HandleScrollOptions;
 		/** @public */
 		handleScale: HandleScaleOptionsInternal;
 		/** @public */
-		layout: LayoutOptionsInternal;
+		layout: LayoutOptions;
 	};
 
 interface GradientColorsCache {

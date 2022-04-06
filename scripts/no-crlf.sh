@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git grep -Il "$(printf "\r\n")" :^*.bat
+git --no-pager grep -I --perl-regexp --files-with-matches '\r' ':!*.bat' .
 
 if [ $? -eq 0 ]
 then

@@ -8,7 +8,7 @@ import { makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { LayoutOptionsInternal } from '../model/layout-options';
+import { LayoutOptions } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TickMarkWeight } from '../model/time-data';
 import { TimeMark } from '../model/time-scale';
@@ -35,7 +35,7 @@ function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
 
 export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _chart: ChartWidget;
-	private readonly _options: LayoutOptionsInternal;
+	private readonly _options: LayoutOptions;
 	private readonly _element: HTMLElement;
 	private readonly _leftStubCell: HTMLElement;
 	private readonly _rightStubCell: HTMLElement;
@@ -314,7 +314,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	private _drawTickMarks(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		const tickMarks = this._chart.model().timeScale().marks();
+		const timeScale = this._chart.model().timeScale();
+		const tickMarks = timeScale.marks();
 
 		if (!tickMarks || tickMarks.length === 0) {
 			return;
@@ -348,7 +349,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const tickWidth = Math.max(1, Math.floor(pixelRatio));
 		const tickOffset = Math.floor(pixelRatio * 0.5);
 
-		if (this._chart.model().timeScale().options().borderVisible) {
+		const options = timeScale.options();
+		if (options.borderVisible && options.ticksVisible) {
 			ctx.beginPath();
 			const tickLen = Math.round(rendererOptions.tickLength * pixelRatio);
 			for (let index = tickMarks.length; index--;) {

@@ -48,17 +48,26 @@ function httpGetJson(url) {
 	});
 }
 
-function downloadTypingsToFile(typingsFilePath, version) {
+function downloadFile(urlString, filePath) {
 	return new Promise((resolve, reject) => {
 		let file;
-		const versionTypingsUrl = `https://unpkg.com/lightweight-charts@${version}/dist/typings.d.ts`;
-		const request = https.get(versionTypingsUrl, response => {
-			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
-				reject(new Error(`Cannot download typings "${versionTypingsUrl}", error code=${response.statusCode}`));
+
+		const url = new URL(urlString);
+
+		const request = https.get(url, response => {
+			if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location !== undefined) {
+				// handling redirect
+				url.pathname = response.headers.location;
+				downloadFile(url.toString(), filePath).then(resolve, reject);
 				return;
 			}
 
-			file = fs.createWriteStream(typingsFilePath);
+			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
+				reject(new Error(`Cannot download file "${urlString}", error code=${response.statusCode}`));
+				return;
+			}
+
+			file = fs.createWriteStream(filePath);
 			file.on('finish', () => {
 				file.close(resolve);
 			});
@@ -76,8 +85,19 @@ function downloadTypingsToFile(typingsFilePath, version) {
 	});
 }
 
+function downloadTypingsToFile(typingsFilePath, version) {
+	return downloadFile(
+		`https://unpkg.com/lightweight-charts@${version}/dist/typings.d.ts`,
+		typingsFilePath
+	);
+}
+
+function getTypingsCacheFilePath(version) {
+	return path.resolve(cacheDir, `./v${version}.d.ts`);
+}
+
 async function downloadTypingsFromUnpkg(version) {
-	const typingsFilePath = path.resolve(cacheDir, `./v${version}.d.ts`);
+	const typingsFilePath = getTypingsCacheFilePath(version);
 
 	try {
 		await fsp.stat(typingsFilePath);
@@ -104,6 +124,14 @@ const commonDocusaurusPluginTypedocConfig = {
 	// which would result in the title of our generated index page being 'undefined'.
 	name: 'lightweight-charts',
 	sort: ['source-order'],
+
+	// let's disable pagination for API Reference pages since it makes almost no sense there
+	frontmatter: {
+		// eslint-disable-next-line camelcase
+		pagination_next: null,
+		// eslint-disable-next-line camelcase
+		pagination_prev: null,
+	},
 };
 
 /** @type {(version: string) => import('@docusaurus/types').PluginModule} */
@@ -113,12 +141,10 @@ function typedocPluginForVersion(version) {
 
 		/** @type {() => Promise<any>} */
 		loadContent: async () => {
-			const typingsFilePath = await downloadTypingsFromUnpkg(version);
-
 			await pluginDocusaurus(context, {
 				...commonDocusaurusPluginTypedocConfig,
 				id: `${version}-api`,
-				entryPoints: [typingsFilePath],
+				entryPoints: [getTypingsCacheFilePath(version)],
 				docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
 			}).loadContent();
 		},
@@ -140,6 +166,9 @@ async function getConfig() {
 	} catch (e) {
 		logger.warn(`Cannot use size from bundlephobia, use size from size-limit instead, error=${e.toString()}`);
 	}
+
+	// pre-download required typings files before run docusaurus
+	await Promise.all(versions.map(downloadTypingsFromUnpkg));
 
 	/** @type {import('@docusaurus/types').Config} */
 	const config = {
@@ -190,6 +219,11 @@ async function getConfig() {
 							label: 'Getting Started',
 						},
 						{
+							to: '/tutorials',
+							position: 'left',
+							label: 'Tutorials',
+						},
+						{
 							type: 'doc',
 							docId: 'api/index',
 							position: 'left',
@@ -221,6 +255,10 @@ async function getConfig() {
 								{
 									label: 'Getting Started',
 									to: '/docs',
+								},
+								{
+									label: 'Tutorials',
+									to: '/tutorials',
 								},
 								{
 									label: 'API Reference',
@@ -272,6 +310,16 @@ async function getConfig() {
 			}),
 
 		plugins: [
+			[
+				'content-docs',
+				/** @type {import('@docusaurus/plugin-content-docs').Options} */
+				({
+					id: 'tutorials',
+					path: 'tutorials',
+					routeBasePath: 'tutorials',
+					sidebarPath: require.resolve('./sidebars-tutorials.js'),
+				}),
+			],
 			[
 				'docusaurus-plugin-typedoc',
 				// @ts-ignore
