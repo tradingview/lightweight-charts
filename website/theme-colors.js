@@ -1,5 +1,5 @@
 const greenWithAlpha = alpha => `rgba(15, 216, 62, ${alpha})`;
-const redWithAlpha = alpha => `rgb(255, 64, 64, ${alpha})`;
+const redWithAlpha = alpha => `rgba(255, 64, 64, ${alpha})`;
 const blueWithAlpha = alpha => `rgba(41, 98, 255, ${alpha})`;
 
 export const themeColors = {

@@ -212,6 +212,11 @@ ChildComponent.displayName = 'ChildComponent';
 
 By considering all the above you could end up with Chart/Series components looking like the following
 
+:::info
+
+For this example we are using props to set chart colors based on the current theme (light or dark). In your real code it might be a better idea to use a [Context](https://reactjs.org/docs/context.html#when-to-use-context).
+:::
+
 import { ThemedChart } from '@site/src/components/tutorials/themed-chart-colors-wrapper';
 import CodeBlock from '@theme/CodeBlock';
 import code from '!!raw-loader!@site/src/components/tutorials/advanced-react-example';

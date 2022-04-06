@@ -3,7 +3,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "cross-env TYPEDOC_WATCH=true docusaurus start",
-    "build": "docusaurus build",
+    "build": "node scripts/generate-versions-dts.js && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

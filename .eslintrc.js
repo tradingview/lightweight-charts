@@ -175,6 +175,16 @@ module.exports = {
 			},
 		},
 		{
+			files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
+			globals: {
+				CHART_BACKGROUND_COLOR: true,
+				LINE_LINE_COLOR: true,
+				CHART_TEXT_COLOR: true,
+				AREA_TOP_COLOR: true,
+				AREA_BOTTOM_COLOR: true,
+			},
+		},
+		{
 			files: ['**/*.ts', '**/*.tsx'],
 			excludedFiles: ['dist/**'],
 			parser: '@typescript-eslint/parser',

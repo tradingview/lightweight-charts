@@ -30,11 +30,7 @@ export const ChartComponent = props => {
 			});
 			chart.timeScale().fitContent();
 
-			const newSeries = chart.addAreaSeries({
-				lineColor,
-				topColor: areaTopColor,
-				bottomColor: areaBottomColor,
-			});
+			const newSeries = chart.addAreaSeries();
 			newSeries.setData(data);
 
 			window.addEventListener('resize', handleResize);
@@ -45,7 +41,7 @@ export const ChartComponent = props => {
 				chart.remove();
 			};
 		},
-		[data, backgroundColor, lineColor, textColor]
+		[data, backgroundColor, lineColor, textColor, areaTopColor, areaBottomColor]
 	);
 
 	return (

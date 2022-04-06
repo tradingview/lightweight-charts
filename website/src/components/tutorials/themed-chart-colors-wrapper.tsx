@@ -16,21 +16,15 @@ export interface ThemedChartProps {
 }
 
 function getThemeColors(isDarkTheme: boolean): ThemedChartColors {
-	return isDarkTheme
-		? {
-			backgroundColor: themeColors.DARK.CHART_BACKGROUND_COLOR,
-			lineColor: themeColors.DARK.LINE_LINE_COLOR,
-			textColor: themeColors.DARK.CHART_TEXT_COLOR,
-			areaTopColor: themeColors.DARK.AREA_TOP_COLOR,
-			areaBottomColor: themeColors.DARK.AREA_BOTTOM_COLOR,
-		}
-		: {
-			backgroundColor: themeColors.LIGHT.CHART_BACKGROUND_COLOR,
-			lineColor: themeColors.LIGHT.LINE_LINE_COLOR,
-			textColor: themeColors.LIGHT.CHART_TEXT_COLOR,
-			areaTopColor: themeColors.LIGHT.AREA_TOP_COLOR,
-			areaBottomColor: themeColors.LIGHT.AREA_BOTTOM_COLOR,
-		};
+	const themeKey = isDarkTheme ? 'DARK' : 'LIGHT';
+
+	return {
+		backgroundColor: themeColors[themeKey].CHART_BACKGROUND_COLOR,
+		lineColor: themeColors[themeKey].LINE_LINE_COLOR,
+		textColor: themeColors[themeKey].CHART_TEXT_COLOR,
+		areaTopColor: themeColors[themeKey].AREA_TOP_COLOR,
+		areaBottomColor: themeColors[themeKey].AREA_BOTTOM_COLOR,
+	};
 }
 
 export function useThemedChartColors(): ThemedChartColors {

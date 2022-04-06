@@ -2,6 +2,7 @@
 	"references": [
 		{ "path": "./src/tsconfig.composite.json" },
 		{ "path": "./tests/tsconfig.composite.json" },
+		{ "path": "./website/tsconfig.json" },
 	],
 	"include": []
 }

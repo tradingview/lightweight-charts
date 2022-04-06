@@ -37,6 +37,11 @@ This will create a web page accessible by default on <http://localhost:1234/>.
 
 The example _React component_ on this page may not fit your requirements completely. Creating a general purpose declarative wrapper for Lightweight Charts' imperative API is a challenge, but hopefully you can adapt this example to your use case.
 
+:::info
+
+For this example we are using props to set chart colors based on the current theme (light or dark). In your real code it might be a better idea to use a [Context](https://reactjs.org/docs/context.html#when-to-use-context).
+:::
+
 import { ThemedChart } from '@site/src/components/tutorials/themed-chart-colors-wrapper';
 import CodeBlock from '@theme/CodeBlock';
 import code from '!!raw-loader!@site/src/components/tutorials/simple-react-example';
