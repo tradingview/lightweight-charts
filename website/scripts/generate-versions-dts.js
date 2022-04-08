@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { readFile, writeFile } = require('fs/promises');
 const { resolve } = require('path');
 
@@ -20,8 +22,4 @@ async function generateVersionsJsonDts() {
 	await writeFile(versionsDtsOutputPath, dtsContent);
 }
 
-generateVersionsJsonDts()
-	.catch(err => {
-		// eslint-disable-next-line no-console
-		console.error(err);
-	});
+generateVersionsJsonDts();

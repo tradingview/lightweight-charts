@@ -1,7 +1,7 @@
 import { useDocsVersion } from '@docusaurus/theme-common';
 import * as React from 'react';
 
-import { importLightweightChartsVersion, LightweightChartsApi } from './import-lightweight-charts-version';
+import { importLightweightChartsVersion, LightweightChartsApi, LightweightChartsVersion } from './import-lightweight-charts-version';
 import styles from './styles.module.css';
 
 interface ChartProps {
@@ -9,11 +9,12 @@ interface ChartProps {
 }
 
 type IFrameWindow = Window & {
-	createChart: undefined | ((container: HTMLElement, options: never) => void);
-	run: undefined | (() => void);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	createChart: (...args: Parameters<LightweightChartsApi['createChart']>) => any;
+	run?: () => void;
 };
 
-function getSrcDocWithScript(script: string, parentOrigin: string): string {
+function getSrcDocWithScript(script: string): string {
 	return `
 		<style>
 			html,
@@ -36,9 +37,8 @@ function getSrcDocWithScript(script: string, parentOrigin: string): string {
 
 export const Chart = (props: ChartProps): JSX.Element => {
 	const { script } = props;
-	const { origin } = window;
 	const { version } = useDocsVersion();
-	const srcDoc = getSrcDocWithScript(script, origin);
+	const srcDoc = getSrcDocWithScript(script);
 	const ref = React.useRef<HTMLIFrameElement>(null);
 
 	React.useEffect(
@@ -52,13 +52,14 @@ export const Chart = (props: ChartProps): JSX.Element => {
 			}
 
 			const injectCreateChartAndRun = () => {
-				importLightweightChartsVersion(version).then((mod: LightweightChartsApi) => {
+				importLightweightChartsVersion(version as LightweightChartsVersion).then((mod: LightweightChartsApi) => {
 					const createChart = mod.createChart;
+					Object.assign(iframeWindow, mod); // Make ColorType, etc. available in the iframe
 
-					iframeWindow.createChart = (container: HTMLElement, options: never) => {
+					iframeWindow.createChart = (container: HTMLElement | string, options?: Parameters<LightweightChartsApi['createChart']>[1]) => {
 						const chart = createChart(container, options);
 						const resizeListener = () => {
-							const boundingClientRect = container.getBoundingClientRect();
+							const boundingClientRect = (container as HTMLElement).getBoundingClientRect();
 							chart.resize(boundingClientRect.width, boundingClientRect.height);
 						};
 
@@ -67,9 +68,7 @@ export const Chart = (props: ChartProps): JSX.Element => {
 						return chart;
 					};
 
-					if (iframeWindow.run !== undefined) {
-						iframeWindow.run();
-					}
+					iframeWindow.run?.();
 				})
 				.catch((err: unknown) => {
 					// eslint-disable-next-line no-console
@@ -77,7 +76,7 @@ export const Chart = (props: ChartProps): JSX.Element => {
 				});
 			};
 
-			if (iframeDocument.readyState === 'complete' && iframeWindow.run !== undefined) {
+			if (iframeWindow.run !== undefined) {
 				injectCreateChartAndRun();
 			} else {
 				const iframeLoadListener = () => {
@@ -88,7 +87,7 @@ export const Chart = (props: ChartProps): JSX.Element => {
 				iframeElement.addEventListener('load', iframeLoadListener);
 			}
 		},
-		[origin, srcDoc]
+		[srcDoc]
 	);
 
 	return (
