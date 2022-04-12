@@ -1,5 +1,5 @@
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
-import { HistogramPlotRow, SeriesPlotRow } from '../model/series-data';
+import { HistogramPlotRow, LinePlotRow, SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { Time } from '../model/time-data';
 
@@ -9,10 +9,11 @@ type SeriesPlotRowToDataMap = {
 	[T in keyof SeriesDataItemTypeMap]: (plotRow: SeriesPlotRow) => SeriesDataItemTypeMap[T];
 };
 
-function lineData(plotRow: PlotRow): LineData {
+function lineData(plotRow: LinePlotRow): LineData {
 	return {
 		value: plotRow.value[PlotRowValueIndex.Close],
 		time: plotRow.originalTime as unknown as Time,
+		color: plotRow.color,
 	};
 }
 
