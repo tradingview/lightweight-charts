@@ -73,6 +73,7 @@ export interface MarkerData {
 	price: BarPrice;
 	radius: number;
 	borderColor: string | null;
+	borderWidth: number;
 	backgroundColor: string;
 }
 
@@ -453,8 +454,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const price = bar.value[PlotRowValueIndex.Close] as BarPrice;
 		const radius = this._markerRadius();
 		const borderColor = this._markerBorderColor();
+		const borderWidth = this._markerBorderWidth();
 		const backgroundColor = this._markerBackgroundColor(index);
-		return { price, radius, borderColor, backgroundColor };
+		return { price, radius, borderColor, borderWidth, backgroundColor };
 	}
 
 	public title(): string {
@@ -518,6 +520,17 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		return null;
+	}
+
+	private _markerBorderWidth(): number {
+		switch (this._seriesType) {
+			case 'Line':
+			case 'Area':
+			case 'Baseline':
+				return (this._options as (LineStyleOptions | AreaStyleOptions | BaselineStyleOptions)).crosshairMarkerBorderWidth;
+		}
+
+		return 0;
 	}
 
 	private _markerBackgroundColor(index: TimePointIndex): string {

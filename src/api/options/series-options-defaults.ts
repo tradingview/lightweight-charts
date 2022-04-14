@@ -39,6 +39,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 };
@@ -53,6 +54,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 };
@@ -78,6 +80,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
 
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
