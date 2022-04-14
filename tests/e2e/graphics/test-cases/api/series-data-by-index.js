@@ -53,11 +53,11 @@ function runTestCase(container) {
 
 	console.assert(
 		compareLineData(lineSeries.dataByIndex(0), { time: '1990-04-24', value: 0 }),
-		`objects are should be equal: ${JSON.stringify(lineSeries.dataByIndex(0))} !== ${JSON.stringify({ time: '1990-04-24', value: 0 })}`
+		`objects should be equal: ${JSON.stringify(lineSeries.dataByIndex(0))} !== ${JSON.stringify({ time: '1990-04-24', value: 0 })}`
 	);
 	console.assert(
 		compareLineData(lineSeries.dataByIndex(5), { time: '1990-04-29', value: 5, color: 'red' }),
-		`objects are should be equal: ${JSON.stringify(lineSeries.dataByIndex(5))} !== ${JSON.stringify({ time: '1990-04-29', value: 5, color: 'red' })}`
+		`objects should be equal: ${JSON.stringify(lineSeries.dataByIndex(5))} !== ${JSON.stringify({ time: '1990-04-29', value: 5, color: 'red' })}`
 	);
 
 	chart.removeSeries(lineSeries);
@@ -67,7 +67,7 @@ function runTestCase(container) {
 
 	console.assert(
 		compareCandlestickData(candlestickSeries.dataByIndex(0), { time: 1514764800, open: 4, high: 9, low: 0, close: 7 }),
-		`should equal: ${JSON.stringify(candlestickSeries.dataByIndex(0))} !== ${JSON.stringify({ time: 1514764800, open: 4, high: 9, low: 0, close: 7 })}`
+		`objects should be equal: ${JSON.stringify(candlestickSeries.dataByIndex(0))} !== ${JSON.stringify({ time: 1514764800, open: 4, high: 9, low: 0, close: 7 })}`
 	);
 
 	console.assert(
@@ -84,7 +84,7 @@ function runTestCase(container) {
 				wickColor: 'green',
 			}
 		),
-		`should equal: ${JSON.stringify(candlestickSeries.dataByIndex(7))} !== ${JSON.stringify({
+		`objects should be equal: ${JSON.stringify(candlestickSeries.dataByIndex(7))} !== ${JSON.stringify({
 			time: 1515369600,
 			open: 11,
 			high: 16,
