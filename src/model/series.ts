@@ -25,8 +25,10 @@ import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view'
 
 import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { BarPrice, BarPrices } from './bar';
+import { BoxOptions } from './box-options';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
+import { CustomBox } from './custom-box';
 import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
 import { FirstValue } from './iprice-data-source';
@@ -102,6 +104,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _formatter!: IPriceFormatter;
 	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
 	private readonly _customPriceLines: CustomPriceLine[] = [];
+	private readonly _customBoxes: CustomBox[] = [];
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
 	private _paneView!: IUpdatablePaneView;
 	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView | null = null;
@@ -295,6 +298,21 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().updateSource(this);
 	}
 
+	public createBox(options: BoxOptions): CustomBox {
+		const result = new CustomBox(this, options);
+		this._customBoxes.push(result);
+		this.model().updateSource(this);
+		return result;
+	}
+
+	public removeBox(box: CustomBox): void {
+		const index = this._customBoxes.indexOf(box);
+		if (index !== -1) {
+			this._customBoxes.splice(index, 1);
+		}
+		this.model().updateSource(this);
+	}
+
 	public seriesType(): T {
 		return this._seriesType;
 	}
@@ -377,6 +395,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
 		res.push(...priceLineViews);
+		const boxViews = this._customBoxes.map((box: CustomBox) => box.paneView());
+		res.push(...boxViews);
 
 		return res;
 	}
@@ -385,6 +405,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return [
 			this._panePriceAxisView,
 			...this._customPriceLines.map((line: CustomPriceLine) => line.labelPaneView()),
+			// TODO: prices for Y lines
+			// ...this._customBoxes.map((box: CustomBox) => box.labelPaneView()),
 		];
 	}
 
@@ -396,6 +418,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		for (const customPriceLine of this._customPriceLines) {
 			result.push(customPriceLine.priceAxisView());
 		}
+		// TODO: prices for Y lines
+		// for (const customBox of this._customBoxes) {
+		// 	result.push(customBox.priceAxisView());
+		// }
 		return result;
 	}
 
@@ -429,6 +455,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		for (const customPriceLine of this._customPriceLines) {
 			customPriceLine.update();
+		}
+
+		for (const customBox of this._customBoxes) {
+			customBox.update();
 		}
 
 		this._priceLineView.update();
