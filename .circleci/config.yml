@@ -101,10 +101,10 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
+      - run: npm run build:prod
       # make sure that the project is compiled successfully with composite projects
       # so we don't have cyclic deps between projects and wrong imports
       - run: npm run tsc-verify
-      - run: npm run build:prod
       - persist_to_workspace:
           root: ./
           paths:
@@ -127,6 +127,8 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
+      - attach_workspace:
+          at: ./
       - run: npm run lint:eslint
 
   lint-dts:
@@ -230,8 +232,7 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm run tsc
-      - run: npm run bundle-dts
+      - run: npm run build:prod
       - run:
           name: "Install dependencies and build website"
           command: |
@@ -290,10 +291,6 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-      - lint-eslint:
-          filters: *default-filters
-          requires:
-            - install-deps
       - lint-markdown:
           filters: *default-filters
           requires:
@@ -339,13 +336,10 @@ workflows:
           filters: *default-filters
           requires:
             - build
-
-  website:
-    jobs:
-      - install-deps:
+      - lint-eslint:
           filters: *default-filters
-      - install-deps-website:
-          filters: *default-filters
+          requires:
+            - build
       - build-docusaurus-website:
           filters: *default-filters
           requires:

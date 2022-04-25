@@ -23,7 +23,15 @@ const initialData = [
 ];
 const currentDate = new Date(initialData[initialData.length - 1].time);
 
-export const App = () => {
+export const App = props => {
+	const {
+		colors: {
+			backgroundColor = CHART_BACKGROUND_COLOR,
+			lineColor = LINE_LINE_COLOR,
+			textColor = CHART_TEXT_COLOR,
+		},
+	} = props;
+	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
 	// The following variables illustrate how a series could be updated.
 	const series1 = useRef(null);
 	const [started, setStarted] = useState(false);
@@ -48,16 +56,27 @@ export const App = () => {
 		}
 	}, [started]);
 
+	useEffect(() => {
+		setChartLayoutOptions({
+			background: {
+				color: backgroundColor,
+
+			},
+			textColor,
+		});
+	}, [backgroundColor, textColor]);
+
 	return (
 		<>
 			<button type="button" onClick={() => setStarted(current => !current)}>
 				{started ? 'Stop updating' : 'Start updating series'}
 			</button>
-			<Chart>
+			<Chart layout={chartLayoutOptions}>
 				<Series
 					ref={series1}
 					type={'line'}
 					data={initialData}
+					color={lineColor}
 				/>
 			</Chart>
 		</>
@@ -75,12 +94,14 @@ export function Chart(props) {
 }
 
 export const ChartContainer = forwardRef((props, ref) => {
-	const context = useRef({
+	const { children, container, layout, ...rest } = props;
+
+	const chartApiRef = useRef({
 		api() {
 			if (!this._api) {
-				const { children, container, ...rest } = props;
 				this._api = createChart(container, {
 					...rest,
+					layout,
 					width: container.clientWidth,
 					height: 300,
 				});
@@ -96,9 +117,7 @@ export const ChartContainer = forwardRef((props, ref) => {
 	});
 
 	useLayoutEffect(() => {
-		const { children, container, ...rest } = props;
-
-		const currentRef = context.current;
+		const currentRef = chartApiRef.current;
 		const chart = currentRef.api();
 
 		const handleResize = () => {
@@ -116,20 +135,24 @@ export const ChartContainer = forwardRef((props, ref) => {
 	}, []);
 
 	useLayoutEffect(() => {
-		const currentRef = context.current;
+		const currentRef = chartApiRef.current;
 		currentRef.api();
 	}, []);
 
 	useLayoutEffect(() => {
-		const currentRef = context.current;
-		const { children, container, ...rest } = props;
+		const currentRef = chartApiRef.current;
 		currentRef.api().applyOptions(rest);
 	}, []);
 
-	useImperativeHandle(ref, () => context.current.api(), []);
+	useImperativeHandle(ref, () => chartApiRef.current.api(), []);
+
+	useEffect(() => {
+		const currentRef = chartApiRef.current;
+		currentRef.api().applyOptions({ layout });
+	}, [layout]);
 
 	return (
-		<Context.Provider value={context.current}>
+		<Context.Provider value={chartApiRef.current}>
 			{props.children}
 		</Context.Provider>
 	);
@@ -142,7 +165,9 @@ export const Series = forwardRef((props, ref) => {
 		api() {
 			if (!this._api) {
 				const { children, data, type, ...rest } = props;
-				this._api = type === 'line' ? parent.api().addLineSeries(rest) : parent.api().addAreaSeries(rest);
+				this._api = type === 'line'
+					? parent.api().addLineSeries(rest)
+					: parent.api().addAreaSeries(rest);
 				this._api.setData(data);
 			}
 			return this._api;

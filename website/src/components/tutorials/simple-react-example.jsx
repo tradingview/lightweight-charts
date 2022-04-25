@@ -1,7 +1,17 @@
-import { createChart } from 'lightweight-charts';
+import { createChart, ColorType } from 'lightweight-charts';
 import React, { useEffect, useRef } from 'react';
 
 export const ChartComponent = props => {
+	const {
+		data,
+		colors: {
+			backgroundColor = CHART_BACKGROUND_COLOR,
+			lineColor = LINE_LINE_COLOR,
+			textColor = CHART_TEXT_COLOR,
+			areaTopColor = AREA_TOP_COLOR,
+			areaBottomColor = AREA_BOTTOM_COLOR,
+		},
+	} = props;
 	const chartContainerRef = useRef();
 
 	useEffect(
@@ -10,25 +20,28 @@ export const ChartComponent = props => {
 				chart.applyOptions({ width: chartContainerRef.current.clientWidth });
 			};
 
-			const { data } = props;
-
 			const chart = createChart(chartContainerRef.current, {
+				layout: {
+					background: { type: ColorType.Solid, color: backgroundColor },
+					textColor,
+				},
 				width: chartContainerRef.current.clientWidth,
 				height: 300,
 			});
 			chart.timeScale().fitContent();
 
-			const newSeries = chart.addAreaSeries();
+			const newSeries = chart.addAreaSeries({ lineColor, topColor: areaTopColor, bottomColor: areaBottomColor });
 			newSeries.setData(data);
 
 			window.addEventListener('resize', handleResize);
+
 			return () => {
 				window.removeEventListener('resize', handleResize);
 
 				chart.remove();
 			};
 		},
-		[props.data]
+		[data, backgroundColor, lineColor, textColor, areaTopColor, areaBottomColor]
 	);
 
 	return (
@@ -51,8 +64,8 @@ const initialData = [
 	{ time: '2018-12-31', value: 22.67 },
 ];
 
-export function App() {
+export function App(props) {
 	return (
-		<ChartComponent data={initialData}></ChartComponent>
+		<ChartComponent {...props} data={initialData}></ChartComponent>
 	);
 }

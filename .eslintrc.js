@@ -1,21 +1,11 @@
 function getNamingConventionRules(additionalDefaultFormats = []) {
 	return [
 		{ selector: 'default', format: ['camelCase', ...additionalDefaultFormats], leadingUnderscore: 'forbid', trailingUnderscore: 'forbid' },
-
 		{ selector: 'variable', format: ['camelCase', 'UPPER_CASE', ...additionalDefaultFormats] },
-		// {
-		// 	selector: 'variable',
-		// 	types: ['boolean'],
-		// 	format: ['PascalCase'],
-		// 	prefix: ['is', 'should', 'has', 'can', 'did', 'will', 'show', 'enable', 'need'],
-		// },
-
 		{ selector: 'typeLike', format: ['PascalCase'] },
 		{ selector: 'enumMember', format: ['PascalCase'] },
-
 		{ selector: 'memberLike', modifiers: ['private'], leadingUnderscore: 'require', format: ['camelCase'] },
 		{ selector: 'memberLike', modifiers: ['protected'], leadingUnderscore: 'require', format: ['camelCase'] },
-
 		{
 			selector: 'property',
 			format: ['PascalCase'],
@@ -24,8 +14,6 @@ function getNamingConventionRules(additionalDefaultFormats = []) {
 				regex: '^(Area|Baseline|Bar|Candlestick|Histogram|Line)$',
 			},
 		},
-
-		// { selector: 'typeParameter', format: ['PascalCase'], prefix: ['T', 'U'] },
 	];
 }
 
@@ -59,6 +47,7 @@ module.exports = {
 		'prefer-arrow',
 		'unicorn',
 		'jsdoc',
+		'eslint-plugin-react',
 	],
 	settings: {
 		jsdoc: {
@@ -73,7 +62,7 @@ module.exports = {
 		'plugin:react/recommended',
 	],
 	parserOptions: {
-		ecmaVersion: 2019,
+		ecmaVersion: 2020,
 		sourceType: 'module',
 	},
 	overrides: [
@@ -94,6 +83,7 @@ module.exports = {
 					},
 					rules: {
 						'react/prop-types': 'off',
+						'import/no-default-export': 'off',
 					},
 				},
 			],
@@ -180,8 +170,8 @@ module.exports = {
 				'no-undef': 'off',
 				'no-unused-vars': 'off',
 				indent: ['error', 4],
-
 				'unicorn/filename-case': 'off',
+				'react/prop-types': 'off',
 			},
 		},
 		{
@@ -195,7 +185,7 @@ module.exports = {
 			},
 			overrides: [
 				{
-					files: ['website/**/*.tsx'],
+					files: ['website/**/*.ts', 'website/**/*.tsx'],
 					parserOptions: {
 						project: 'website/tsconfig.json',
 						sourceType: 'module',

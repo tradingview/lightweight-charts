@@ -92,7 +92,7 @@
     "bundle-dts": "tsc --noEmit --allowJs dts-config.js && dts-bundle-generator --config dts-config.js",
     "tsc": "ttsc -p tsconfig.prod.json",
     "tsc-watch": "npm run tsc -- --watch --preserveWatchOutput",
-    "tsc-verify": "tsc -b tsconfig.composite.json",
+    "tsc-verify": "node website/scripts/generate-versions-dts.js && tsc -b tsconfig.composite.json",
     "lint": "npm-run-all -p lint:**",
     "lint:eslint": "eslint --format=unix ./",
     "lint:md": "markdownlint -i \"**/node_modules/**\" -i \"**/website/docs/api/**\" -i \"**/website/versioned_docs/**/api/**\" \"**/*.md\"",

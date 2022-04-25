@@ -333,6 +333,7 @@ async function getConfig() {
 				}),
 			],
 			...versions.map(typedocPluginForVersion),
+			'./plugins/enhanced-codeblock',
 		],
 	};
 

@@ -120,10 +120,10 @@ The same technique will be used within the Series component to handle this time 
 
 Moreover those 2 "main" components will "expose" whatever functions the user wants from the internal reference object at a higher level, meaning once those references are accessible any other component would then be able to act on either the Chart or any Series.
 
-Here's a squeleton of what the final structure would be like:
+Here's a skeleton of what the final structure would be like:
 
 ```js
-import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, createContext, forwardRef } from 'react';
 
 const Context = createContext();
 
@@ -212,19 +212,25 @@ ChildComponent.displayName = 'ChildComponent';
 
 By considering all the above you could end up with Chart/Series components looking like the following
 
-import CodeBlock from '@theme/CodeBlock';
-import Code from '!!raw-loader!./_advanced-react-example';
+:::info
 
-<CodeBlock className="language-jsx">{Code}</CodeBlock>
+For this example we are using props to set chart colors based on the current theme (light or dark). In your real code it might be a better idea to use a [Context](https://reactjs.org/docs/context.html#when-to-use-context).
+:::
+
+import { ThemedChart } from '@site/src/components/tutorials/themed-chart-colors-wrapper';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!@site/src/components/tutorials/advanced-react-example';
+
+<CodeBlock replaceThemeConstants className="language-jsx">{code}</CodeBlock>
 
 The code above will produce a line series.
 Given a `series1` reference is created to be passed to the Series component you could reuse that object via `series1.current.[any function applicable on Series]`.
 
 For instance and as shown below `series1.current.update(new data)` is used upon clicking on the button.
 
-import { App } from './_advanced-react-example';
+import { App } from '@site/src/components/tutorials/advanced-react-example';
 import styles from '@site/src/pages/chart.module.css';
 
 <div className={styles.ChartContainer}>
-    <App />
+    <ThemedChart ChartComponent={App} />
 </div>
