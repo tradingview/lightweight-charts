@@ -31,7 +31,7 @@ Requires iOS 10.0+
 [CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. For usage and installation instructions, visit their website. To integrate LightweightCharts into your Xcode project using CocoaPods, specify it in your `Podfile`:
 
 ```ruby
-pod 'LightweightCharts', '~> 3.7.0'
+pod 'LightweightCharts', '~> 3.8.0'
 ```
 
 ### Swift Package Manager
@@ -42,7 +42,7 @@ Once you have your Swift package set up, adding LightweightCharts as a dependenc
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/tradingview/LightweightChartsIOS", .upToNextMajor(from: "3.7.0"))
+    .package(url: "https://github.com/tradingview/LightweightChartsIOS", .upToNextMajor(from: "3.8.0"))
 ]
 ```
 
