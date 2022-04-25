@@ -127,7 +127,7 @@ function collectFilesData(inputFiles, checkWebsiteLinks) {
 						.replace(/-+/g, '-');
 
 					if (result.charAt(0) === '-') {
-						return result.substr(1);
+						return result.slice(1);
 					}
 
 					return result;
