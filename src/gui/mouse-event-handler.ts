@@ -613,9 +613,15 @@ export class MouseEventHandler implements IDestroyable {
 				if (!this._handler.mouseDownOutsideEvent) {
 					return;
 				}
+
+				if (event.composed && this._target.contains(event.composedPath()[0] as Element)) {
+					return;
+				}
+
 				if (event.target && this._target.contains(event.target as Element)) {
 					return;
 				}
+
 				this._handler.mouseDownOutsideEvent();
 			};
 
