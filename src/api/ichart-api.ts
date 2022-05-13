@@ -205,7 +205,7 @@ export interface IChartApi {
 	 *     console.log(`Crosshair moved to ${param.point.x}, ${param.point.y}. The time is ${param.time}.`);
 	 * }
 	 *
-	 * chart.subscribeClick(myCrosshairMoveHandler);
+	 * chart.subscribeCrosshairMove(myCrosshairMoveHandler);
 	 * ```
 	 */
 	subscribeCrosshairMove(handler: MouseEventHandler): void;
