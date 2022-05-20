@@ -303,7 +303,7 @@ async function getConfig() {
 				algolia: {
 					appId: '7Q5A441YPA',
 					// Public API key: it is safe to commit it
-					apiKey: 'b6417716804e66012544fd5904e208c8',
+					apiKey: 'c8a8aaeb7ef3fbcce40bada2196e2bcb',
 					indexName: 'lightweight-charts',
 					contextualSearch: true,
 				},
@@ -333,6 +333,7 @@ async function getConfig() {
 				}),
 			],
 			...versions.map(typedocPluginForVersion),
+			'./plugins/enhanced-codeblock',
 		],
 	};
 

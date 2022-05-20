@@ -27,6 +27,7 @@ debug.html
 /website/.docusaurus
 /website/.cache-loader
 /website/.previous-typings-cache/*.d.ts
+/website/versions.d.ts
 
 !/src/typings/**/*.d.ts
 
