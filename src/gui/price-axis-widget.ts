@@ -217,7 +217,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		let res = Math.ceil(
 			rendererOptions.borderSize +
-			rendererOptions.offsetSize +
+			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
 			Constants.LabelOffset +
@@ -226,7 +226,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 		// make it even, remove this after migration to perfect fancy canvas
 		res += res % 2;
-
 		return res;
 	}
 
@@ -455,12 +454,12 @@ export class PriceAxisWidget implements IDestroyable {
 		const rendererOptions = this.rendererOptions();
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor((this._size.w - rendererOptions.offsetSize) * pixelRatio) :
+			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio) :
 			0;
 
 		const textLeftX = this._isLeft ?
 			Math.round(tickMarkLeftX - rendererOptions.paddingInner * pixelRatio) :
-			Math.round(tickMarkLeftX + rendererOptions.offsetSize * pixelRatio + rendererOptions.paddingInner * pixelRatio);
+			Math.round(tickMarkLeftX + rendererOptions.tickLength * pixelRatio + rendererOptions.paddingInner * pixelRatio);
 
 		const textAlign = this._isLeft ? 'right' : 'left';
 		const tickHeight = Math.max(1, Math.floor(pixelRatio));
@@ -468,7 +467,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const options = this._priceScale.options();
 		if (options.borderVisible && options.ticksVisible) {
-			const tickLength = Math.round(rendererOptions.offsetSize * pixelRatio);
+			const tickLength = Math.round(rendererOptions.tickLength * pixelRatio);
 			ctx.beginPath();
 			for (const tickMark of tickMarks) {
 				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * pixelRatio) - tickOffset, tickLength, tickHeight);

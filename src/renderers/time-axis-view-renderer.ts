@@ -1,6 +1,5 @@
 import { ensureNotNull } from '../helpers/assertions';
 import { drawScaled } from '../helpers/canvas-helpers';
-import { fontSizeToPixels } from '../helpers/make-font';
 
 import { ITimeAxisViewRenderer, TimeAxisViewRendererOptions } from './itime-axis-view-renderer';
 
@@ -66,7 +65,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			rendererOptions.borderSize +
 			rendererOptions.paddingTop +
 			rendererOptions.tickLength +
-			fontSizeToPixels(rendererOptions.fontSize) +
+			rendererOptions.fontSize +
 			rendererOptions.paddingBottom -
 			rendererOptions.labelBottomOffset
 		);
@@ -102,9 +101,10 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		ctx.textAlign = 'left';
 		ctx.fillStyle = this._data.color;
 
-		drawScaled(ctx, pixelRatio, () => {
-			ctx.fillText(ensureNotNull(this._data).text, x1 + horzMargin, yText);
-		});
+		const textYCorrection = rendererOptions.widthCache.yMidCorrection(ctx, 'Apr0');
+
+		ctx.translate((x1 + horzMargin) * pixelRatio, (yText + textYCorrection) * pixelRatio);
+		drawScaled(ctx, pixelRatio, () => ctx.fillText(ensureNotNull(this._data).text, 0, 0));
 
 		ctx.restore();
 	}

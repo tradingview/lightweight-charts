@@ -4,7 +4,7 @@ import { clearRect, drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
-import { fontSizeToPixels, makeFont } from '../helpers/make-font';
+import { makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -249,7 +249,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			// rendererOptions.offsetSize +
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
-			fontSizeToPixels(rendererOptions.fontSize) +
+			rendererOptions.fontSize +
 			rendererOptions.paddingTop +
 			rendererOptions.paddingBottom
 		);
@@ -338,7 +338,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			rendererOptions.borderSize +
 			rendererOptions.paddingTop +
 			rendererOptions.tickLength +
-			fontSizeToPixels(rendererOptions.fontSize) -
+			rendererOptions.fontSize -
 			rendererOptions.baselineOffset
 		);
 

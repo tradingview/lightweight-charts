@@ -14,13 +14,13 @@ export interface PriceAxisViewRendererCommonData {
 export interface PriceAxisViewRendererData {
 	visible: boolean;
 	text: string;
+	tickVisible: boolean;
 	moveTextToInvisibleTick: boolean;
 	borderColor: string;
 	color: string;
 	lineWidth?: LineWidth;
 	borderVisible: boolean;
 	separatorVisible: boolean;
-	ignoreOffset: boolean;
 }
 
 export interface PriceAxisViewRendererOptions {
@@ -35,7 +35,7 @@ export interface PriceAxisViewRendererOptions {
 	paddingInner: number;
 	paddingOuter: number;
 	paddingTop: number;
-	offsetSize: number;
+	tickLength: number;
 }
 
 export interface IPriceAxisViewRenderer {
