@@ -132,7 +132,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		align: 'left' | 'right',
 		pixelRatio: number
 	): Geometry {
-		const tickSize = (this._data.tickVisible) ? rendererOptions.tickLength : 0;
+		const tickSize = (this._data.tickVisible || !this._data.moveTextToInvisibleTick) ? rendererOptions.tickLength : 0;
 		const horzBorder = rendererOptions.borderSize;
 		const paddingTop = rendererOptions.paddingTop + this._commonData.additionalPaddingTop;
 		const paddingBottom = rendererOptions.paddingBottom + this._commonData.additionalPaddingBottom;
@@ -144,7 +144,6 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
 
-		console.log(`text: ${text} width: ${textWidth}`);
 		const totalHeight = actualTextHeight + paddingTop + paddingBottom;
 
 		const totalWidth = horzBorder + paddingInner + paddingOuter + textWidth + tickSize;
