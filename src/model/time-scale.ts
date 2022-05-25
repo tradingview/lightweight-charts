@@ -199,7 +199,7 @@ export interface TimeScaleOptions {
 	/**
 	 * Draw small vertical line on time axis labels.
 	 *
-	 * @defaultValue `true`
+	 * @defaultValue `false`
 	 */
 	ticksVisible: boolean;
 }
