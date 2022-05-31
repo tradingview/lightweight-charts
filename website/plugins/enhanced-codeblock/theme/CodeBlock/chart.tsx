@@ -9,8 +9,7 @@ interface ChartProps {
 }
 
 type IFrameWindow = Window & {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	createChart: (...args: Parameters<LightweightChartsApi['createChart']>) => any;
+	createChart: (...args: Parameters<LightweightChartsApi['createChart']>) => ReturnType<LightweightChartsApi['createChart']>;
 	run?: () => void;
 };
 
