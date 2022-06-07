@@ -29,32 +29,67 @@ describe('Formatters', () => {
 		const res = formatter.format(d);
 		expect(res).to.be.equal('2018-10-01 08:11:52');
 	});
-	it('percent-formatter', () => {
-		const formatter = new PercentageFormatter();
-		const res = formatter.format(1.5);
-		expect(res).to.be.equal('1.50%');
+	describe('percent-formatter', () => {
+		it('format', () => {
+			const formatter = new PercentageFormatter();
+			expect(formatter.format(1.5)).to.be.equal('1.50%');
+		});
+
+		it('tryCutFractionalZeros', () => {
+			const formatter = new PercentageFormatter();
+
+			expect(formatter.tryCutFractionalZeros('1.005%')).to.be.equal('1.005%');
+			expect(formatter.tryCutFractionalZeros('1.0050%')).to.be.equal('1.0050%');
+			expect(formatter.tryCutFractionalZeros('1.000%')).to.be.equal('1%');
+			expect(formatter.tryCutFractionalZeros('100.000%')).to.be.equal('100%');
+			expect(formatter.tryCutFractionalZeros('100%')).to.be.equal('100%');
+
+			expect(formatter.tryCutFractionalZeros('\u22121.005%')).to.be.equal('\u22121.005%');
+			expect(formatter.tryCutFractionalZeros('\u22121.0050%')).to.be.equal('\u22121.0050%');
+			expect(formatter.tryCutFractionalZeros('\u22121.000%')).to.be.equal('\u22121%');
+			expect(formatter.tryCutFractionalZeros('\u2212100.000%')).to.be.equal('\u2212100%');
+			expect(formatter.tryCutFractionalZeros('\u2212100%')).to.be.equal('\u2212100%');
+		});
 	});
-	it('price-formatter', () => {
-		{
+	describe('price-formatter', () => {
+		it('format', () => {
+			{
+				const formatter = new PriceFormatter();
+				const res = formatter.format(1.5);
+				expect(res).to.be.equal('1.50');
+			}
+			{
+				const formatter = new PriceFormatter(1000);
+				const res = formatter.format(1.5);
+				expect(res).to.be.equal('1.500');
+			}
+			{
+				const formatter = new PriceFormatter(1000, 250);
+				const res = formatter.format(1.6);
+				expect(res).to.be.equal('1.500');
+			}
+			{
+				const formatter = new PriceFormatter();
+				const res = formatter.format(-1.5);
+				expect(res).to.be.equal('\u22121.50');
+			}
+		});
+
+		it('tryCutFractionalZeros', () => {
 			const formatter = new PriceFormatter();
-			const res = formatter.format(1.5);
-			expect(res).to.be.equal('1.50');
-		}
-		{
-			const formatter = new PriceFormatter(1000);
-			const res = formatter.format(1.5);
-			expect(res).to.be.equal('1.500');
-		}
-		{
-			const formatter = new PriceFormatter(1000, 250);
-			const res = formatter.format(1.6);
-			expect(res).to.be.equal('1.500');
-		}
-		{
-			const formatter = new PriceFormatter();
-			const res = formatter.format(-1.5);
-			expect(res).to.be.equal('\u22121.50');
-		}
+
+			expect(formatter.tryCutFractionalZeros('1.005')).to.be.equal('1.005');
+			expect(formatter.tryCutFractionalZeros('1.0050')).to.be.equal('1.0050');
+			expect(formatter.tryCutFractionalZeros('1.000')).to.be.equal('1');
+			expect(formatter.tryCutFractionalZeros('100.000')).to.be.equal('100');
+			expect(formatter.tryCutFractionalZeros('100')).to.be.equal('100');
+
+			expect(formatter.tryCutFractionalZeros('\u22121.005')).to.be.equal('\u22121.005');
+			expect(formatter.tryCutFractionalZeros('\u22121.0050')).to.be.equal('\u22121.0050');
+			expect(formatter.tryCutFractionalZeros('\u22121.000')).to.be.equal('\u22121');
+			expect(formatter.tryCutFractionalZeros('\u2212100.000')).to.be.equal('\u2212100');
+			expect(formatter.tryCutFractionalZeros('\u2212100')).to.be.equal('\u2212100');
+		});
 	});
 	it('time-formatter', () => {
 		{

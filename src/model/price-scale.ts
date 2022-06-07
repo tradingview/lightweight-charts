@@ -29,7 +29,7 @@ import {
 	toPercent,
 	toPercentRange,
 } from './price-scale-conversions';
-import { PriceTickMarkBuilder } from './price-tick-mark-builder';
+import { CurrentAndFullMarks, PriceTickMarkBuilder } from './price-tick-mark-builder';
 import { RangeImpl } from './range-impl';
 import { sortSources } from './sort-sources';
 import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
@@ -167,6 +167,13 @@ export interface PriceScaleOptions {
 	 * @defaultValue `true`
 	 */
 	ticksVisible: boolean;
+
+	/**
+	 * Do not draw fractional part on axis tick marks if all fractional part numbers on all marks are zeros
+	 *
+	 * @defaultValue `false`
+	 */
+	tryCutFractionalZeros: boolean;
 }
 
 interface RangeCache {
@@ -181,7 +188,7 @@ const percentageFormatter = new PercentageFormatter();
 const defaultPriceFormatter = new PriceFormatter(100, 1);
 
 interface MarksCache {
-	marks: PriceMark[];
+	marks: CurrentAndFullMarks;
 	firstValueIsNull: boolean;
 }
 
@@ -587,7 +594,11 @@ export class PriceScale {
 		return this._options.invertScale;
 	}
 
-	public marks(): PriceMark[] {
+	public tryCutFractionalZeros(): boolean {
+		return this._options.tryCutFractionalZeros;
+	}
+
+	public marks(full?: boolean): PriceMark[] {
 		const firstValueIsNull = this.firstValue() === null;
 
 		// do not recalculate marks if firstValueIsNull is true because in this case we'll always get empty result
@@ -598,7 +609,7 @@ export class PriceScale {
 		// let's say you have a study/indicator attached to a price scale and then you decide to stop it, i.e. remove its data because of its visibility
 		// a user will see the previous marks on the scale until you turn on your study back or remove it from the chart completely
 		if (this._marksCache !== null && (firstValueIsNull || this._marksCache.firstValueIsNull === firstValueIsNull)) {
-			return this._marksCache.marks;
+			return full ? this._marksCache.marks.full : this._marksCache.marks.withoutFractionalZerosIfPossible;
 		}
 
 		this._markBuilder.rebuildTickMarks();
@@ -606,7 +617,7 @@ export class PriceScale {
 		this._marksCache = { marks, firstValueIsNull };
 		this._onMarksChanged.fire();
 
-		return marks;
+		return full ? marks.full : marks.withoutFractionalZerosIfPossible;
 	}
 
 	public onMarksChanged(): ISubscription {

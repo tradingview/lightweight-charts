@@ -4,7 +4,7 @@ import { IPriceFormatter } from './iprice-formatter';
 
 const formatterOptions = {
 	decimalSign: '.',
-	decimalSignFractional: '\'',
+	tryCutFractionalZerosRegExp: /\.0+$/,
 };
 
 /**
@@ -63,6 +63,10 @@ export class PriceFormatter implements IPriceFormatter {
 		price = Math.abs(price);
 
 		return sign + this._formatAsDecimal(price);
+	}
+
+	public tryCutFractionalZeros(label: string): string {
+		return label.replace(formatterOptions.tryCutFractionalZerosRegExp, '');
 	}
 
 	private _calculateDecimal(): void {

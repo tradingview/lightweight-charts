@@ -9,8 +9,13 @@ export type LogicalToCoordinateConverter = (x: number, firstValue: number, keepI
 
 const TICK_DENSITY = 2.5;
 
+export interface CurrentAndFullMarks {
+	withoutFractionalZerosIfPossible: PriceMark[];
+	full: PriceMark[];
+}
+
 export class PriceTickMarkBuilder {
-	private _marks: PriceMark[] = [];
+	private _marks: CurrentAndFullMarks | null = null;
 	private _base: number;
 	private readonly _priceScale: PriceScale;
 	private readonly _coordinateToLogicalFunc: CoordinateToLogicalConverter;
@@ -54,13 +59,37 @@ export class PriceTickMarkBuilder {
 	}
 
 	public rebuildTickMarks(): void {
+		this._marks = null;
+	}
+
+	public marks(): CurrentAndFullMarks {
+		if (this._marks === null) {
+			this._marks = this._rebuildTickMarksImpl();
+		}
+
+		return this._marks;
+	}
+
+	private _fontHeight(): number {
+		return this._priceScale.fontSize();
+	}
+
+	private _tickMarkHeight(): number {
+		return Math.ceil(this._fontHeight() * TICK_DENSITY);
+	}
+
+	// eslint-disable-next-line complexity
+	private _rebuildTickMarksImpl(): CurrentAndFullMarks {
 		const priceScale = this._priceScale;
+		const marks: PriceMark[] = [];
 
 		const firstValue = priceScale.firstValue();
 
 		if (firstValue === null) {
-			this._marks = [];
-			return;
+			return {
+				withoutFractionalZerosIfPossible: [],
+				full: [],
+			};
 		}
 
 		const scaleHeight = priceScale.height();
@@ -75,8 +104,10 @@ export class PriceTickMarkBuilder {
 		const high = Math.max(bottom, top);
 		const low = Math.min(bottom, top);
 		if (high === low) {
-			this._marks = [];
-			return;
+			return {
+				withoutFractionalZerosIfPossible: [],
+				full: [],
+			};
 		}
 
 		let span = this.tickSpan(high, low);
@@ -86,10 +117,13 @@ export class PriceTickMarkBuilder {
 		const sign = (high >= low) ? 1 : -1;
 		let prevCoord: number | null = null;
 
-		let targetIndex = 0;
+		const formatter = priceScale.formatter();
+
+		const marksWithoutTrailingZeros: PriceMark[] = [];
+		let allMarksWithoutTrailingZerosValid = priceScale.tryCutFractionalZeros();
 
 		for (let logical = high - mod; logical > low; logical -= span) {
-			const coord = this._logicalToCoordinateFunc(logical, firstValue, true);
+			const coord = this._logicalToCoordinateFunc(logical, firstValue, true) as Coordinate;
 
 			// check if there is place for it
 			// this is required for log scale
@@ -102,17 +136,21 @@ export class PriceTickMarkBuilder {
 				continue;
 			}
 
-			if (targetIndex < this._marks.length) {
-				this._marks[targetIndex].coord = coord as Coordinate;
-				this._marks[targetIndex].label = priceScale.formatLogical(logical);
-			} else {
-				this._marks.push({
-					coord: coord as Coordinate,
-					label: priceScale.formatLogical(logical),
-				});
-			}
+			const label = formatter.format(logical);
+			marks.push({ coord, label });
 
-			targetIndex++;
+			if (allMarksWithoutTrailingZerosValid) {
+				const labelWithoutFractionalZeros = formatter.tryCutFractionalZeros?.(label) ?? label;
+
+				if (labelWithoutFractionalZeros !== label) {
+					marksWithoutTrailingZeros.push({
+						coord,
+						label: labelWithoutFractionalZeros,
+					});
+				} else {
+					allMarksWithoutTrailingZerosValid = false;
+				}
+			}
 
 			prevCoord = coord;
 			if (priceScale.isLog()) {
@@ -120,18 +158,10 @@ export class PriceTickMarkBuilder {
 				span = this.tickSpan(logical * sign, low);
 			}
 		}
-		this._marks.length = targetIndex;
-	}
 
-	public marks(): PriceMark[] {
-		return this._marks;
-	}
-
-	private _fontHeight(): number {
-		return this._priceScale.fontSize();
-	}
-
-	private _tickMarkHeight(): number {
-		return Math.ceil(this._fontHeight() * TICK_DENSITY);
+		return {
+			withoutFractionalZerosIfPossible: allMarksWithoutTrailingZerosValid ? marksWithoutTrailingZeros : marks,
+			full: marks,
+		};
 	}
 }

@@ -178,7 +178,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const rendererOptions = this.rendererOptions();
 
 		const ctx = getContext2D(this._canvasBinding.canvas);
-		const tickMarks = this._priceScale.marks();
+		const tickMarks = this._priceScale.marks(true);
 
 		ctx.font = this.baseFont();
 

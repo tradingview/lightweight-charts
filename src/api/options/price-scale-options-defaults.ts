@@ -10,6 +10,7 @@ export const priceScaleOptionsDefaults: PriceScaleOptions = {
 	entireTextOnly: false,
 	visible: false,
 	ticksVisible: true,
+	tryCutFractionalZeros: false,
 	scaleMargins: {
 		bottom: 0.1,
 		top: 0.2,
