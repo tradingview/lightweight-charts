@@ -63,11 +63,10 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		const y2 = Math.ceil(
 			y1 +
 			rendererOptions.borderSize +
-			rendererOptions.paddingTop +
 			rendererOptions.tickLength +
+			rendererOptions.paddingTop +
 			rendererOptions.fontSize +
-			rendererOptions.paddingBottom -
-			rendererOptions.labelBottomOffset
+			rendererOptions.paddingBottom
 		);
 
 		ctx.fillStyle = this._data.background;
@@ -97,8 +96,15 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
 		}
 
-		const yText = y2 - rendererOptions.baselineOffset - rendererOptions.paddingBottom + rendererOptions.labelBottomOffset;
+		const yText =
+			y1 +
+			rendererOptions.borderSize +
+			rendererOptions.tickLength +
+			rendererOptions.paddingTop +
+			rendererOptions.fontSize / 2;
+
 		ctx.textAlign = 'left';
+		ctx.textBaseline = 'middle';
 		ctx.fillStyle = this._data.color;
 
 		const textYCorrection = rendererOptions.widthCache.yMidCorrection(ctx, 'Apr0');

@@ -251,7 +251,8 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			rendererOptions.tickLength +
 			rendererOptions.fontSize +
 			rendererOptions.paddingTop +
-			rendererOptions.paddingBottom
+			rendererOptions.paddingBottom +
+			rendererOptions.labelBottomOffset
 		);
 	}
 
@@ -336,13 +337,13 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const rendererOptions = this._getRendererOptions();
 		const yText = (
 			rendererOptions.borderSize +
-			rendererOptions.paddingTop +
 			rendererOptions.tickLength +
-			rendererOptions.fontSize -
-			rendererOptions.baselineOffset
+			rendererOptions.paddingTop +
+			rendererOptions.fontSize / 2
 		);
 
 		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
 		ctx.fillStyle = this._lineColor();
 
 		const tickWidth = Math.max(1, Math.floor(pixelRatio));
@@ -451,11 +452,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			const fontSize = this._fontSize();
 			rendererOptions.fontSize = fontSize;
 			rendererOptions.font = newFont;
-			rendererOptions.paddingTop = Math.ceil(fontSize / 3) - 1;
-			rendererOptions.paddingBottom = Math.ceil(fontSize / 3) + 5;
-			rendererOptions.paddingHorizontal = Math.ceil(fontSize / 2);
+			rendererOptions.paddingTop = 3 * fontSize / 12;
+			rendererOptions.paddingBottom = 3 * fontSize / 12;
+			rendererOptions.paddingHorizontal = 9 * fontSize / 12;
 			rendererOptions.baselineOffset = 0;
-			rendererOptions.labelBottomOffset = Math.ceil(fontSize / 3) - 1;
+			rendererOptions.labelBottomOffset = 4 * fontSize / 12;
 			rendererOptions.widthCache.reset();
 		}
 
