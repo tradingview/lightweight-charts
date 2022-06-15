@@ -71,7 +71,7 @@ export class PriceAxisWidget implements IDestroyable {
 		this._cell.style.position = 'relative';
 
 		this._canvasBinding = createBoundCanvas(this._cell, size({ width: 16, height: 16 }));
-		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.subscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
 		const canvas = this._canvasBinding.canvasElement;
 		canvas.style.position = 'absolute';
 		canvas.style.zIndex = '1';
@@ -79,7 +79,7 @@ export class PriceAxisWidget implements IDestroyable {
 		canvas.style.top = '0';
 
 		this._topCanvasBinding = createBoundCanvas(this._cell, size({ width: 16, height: 16 }));
-		this._topCanvasBinding.subscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		this._topCanvasBinding.subscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
 		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
 		topCanvas.style.zIndex = '2';
@@ -108,10 +108,10 @@ export class PriceAxisWidget implements IDestroyable {
 	public destroy(): void {
 		this._mouseEventHandler.destroy();
 
-		this._topCanvasBinding.unsubscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
 		this._topCanvasBinding.dispose();
 
-		this._canvasBinding.unsubscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
 		this._canvasBinding.dispose();
 
 		if (this._priceScale !== null) {
@@ -659,13 +659,15 @@ export class PriceAxisWidget implements IDestroyable {
 		);
 	}
 
-	private readonly _canvasBitmapSizeChangedHandler = () => {
+	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => {
 		this._recreateTickMarksCache(this._rendererOptionsProvider.options());
+		this._canvasBinding.applySuggestedBitmapSize();
 		const model = this._pane.chart().model();
 		model.lightUpdate();
 	};
 
-	private readonly _topCanvasBitmapSizeChangedHandler = () => {
+	private readonly _topCanvasSuggestedBitmapSizeChangedHandler = () => {
+		this._topCanvasBinding.applySuggestedBitmapSize();
 		const model = this._pane.chart().model();
 		model.lightUpdate();
 	};

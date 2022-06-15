@@ -53,11 +53,11 @@ export class PriceAxisStub implements IDestroyable {
 		this._cell.style.overflow = 'hidden';
 
 		this._canvasBinding = createBoundCanvas(this._cell, size({ width: 16, height: 16 }));
-		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.subscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
 	}
 
 	public destroy(): void {
-		this._canvasBinding.unsubscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
 		this._canvasBinding.dispose();
 	}
 
@@ -130,5 +130,8 @@ export class PriceAxisStub implements IDestroyable {
 		clearRect(target.context, 0, 0, target.bitmapSize.width, target.bitmapSize.height, this._bottomColor());
 	}
 
-	private readonly _canvasBitmapSizeChangedHandler = () => this.paint(InvalidationLevel.Full);
+	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => {
+		this._canvasBinding.applySuggestedBitmapSize();
+		this.paint(InvalidationLevel.Full);
+	};
 }

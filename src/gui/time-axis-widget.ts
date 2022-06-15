@@ -77,7 +77,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._cell.appendChild(this._dv);
 
 		this._canvasBinding = createBoundCanvas(this._dv, size({ width: 16, height: 16 }));
-		this._canvasBinding.subscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.subscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
 		const canvas = this._canvasBinding.canvasElement;
 		canvas.style.position = 'absolute';
 		canvas.style.zIndex = '1';
@@ -85,7 +85,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		canvas.style.top = '0';
 
 		this._topCanvasBinding = createBoundCanvas(this._dv, size({ width: 16, height: 16 }));
-		this._topCanvasBinding.subscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		this._topCanvasBinding.subscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
 		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
 		topCanvas.style.zIndex = '2';
@@ -118,10 +118,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._rightStub.destroy();
 		}
 
-		this._topCanvasBinding.unsubscribeBitmapSizeChanged(this._topCanvasBitmapSizeChangedHandler);
+		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
 		this._topCanvasBinding.dispose();
 
-		this._canvasBinding.unsubscribeBitmapSizeChanged(this._canvasBitmapSizeChangedHandler);
+		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
 		this._canvasBinding.dispose();
 	}
 
@@ -483,6 +483,13 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
-	private readonly _canvasBitmapSizeChangedHandler = () => this._chart.model().lightUpdate();
-	private readonly _topCanvasBitmapSizeChangedHandler = () => this._chart.model().lightUpdate();
+	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => {
+		this._canvasBinding.applySuggestedBitmapSize();
+		this._chart.model().lightUpdate();
+	};
+
+	private readonly _topCanvasSuggestedBitmapSizeChangedHandler = () => {
+		this._topCanvasBinding.applySuggestedBitmapSize();
+		this._chart.model().lightUpdate();
+	};
 }
