@@ -29,6 +29,12 @@ export interface PriceLineOptions {
 	 */
 	lineStyle: LineStyle;
 	/**
+	 * Display line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+	/**
 	 * Display the current price value in on the price scale.
 	 *
 	 * @defaultValue `true`

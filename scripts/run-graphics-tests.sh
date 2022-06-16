@@ -17,7 +17,7 @@ if [ "$PRODUCTION_BUILD" = "true" ]; then
 fi
 
 HEAD_SHA1=$(git rev-parse HEAD)
-git checkout $(git merge-base origin/next HEAD)
+git checkout $(git merge-base origin/master HEAD)
 
 npm install
 npm run $BUILD_SCRIPT

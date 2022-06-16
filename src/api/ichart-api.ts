@@ -1,6 +1,5 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
 import { Point } from '../model/point';
 import { SeriesMarker } from '../model/series-markers';
@@ -13,9 +12,9 @@ import {
 	LineSeriesPartialOptions,
 	SeriesType,
 } from '../model/series-options';
-import { BusinessDay, UTCTimestamp } from '../model/time-data';
+import { Logical, Time } from '../model/time-data';
 
-import { Time } from './data-consumer';
+import { BarData, HistogramData, LineData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -29,7 +28,11 @@ export interface MouseEventParams {
 	 *
 	 * The value will be `undefined` if the location of the event in the chart is outside the range of available data.
 	 */
-	time?: UTCTimestamp | BusinessDay;
+	time?: Time;
+	/**
+	 * Logical index
+	 */
+	logical?: Logical;
 	/**
 	 * Location of the event in the chart.
 	 *
@@ -37,12 +40,12 @@ export interface MouseEventParams {
 	 */
 	point?: Point;
 	/**
-	 * Prices of all series at the location of the event in the chart.
+	 * Data of all series at the location of the event in the chart.
 	 *
 	 * Keys of the map are {@link ISeriesApi} instances. Values are prices.
-	 * Each price is a number for line, area, and histogram series or a OHLC object for candlestick and bar series.
+	 * Values of the map are original data items
 	 */
-	seriesPrices: Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>;
+	seriesData: Map<ISeriesApi<SeriesType>, BarData | LineData | HistogramData>;
 	/**
 	 * The {@link ISeriesApi} for the series at the point of the mouse event.
 	 */
@@ -202,7 +205,7 @@ export interface IChartApi {
 	 *     console.log(`Crosshair moved to ${param.point.x}, ${param.point.y}. The time is ${param.time}.`);
 	 * }
 	 *
-	 * chart.subscribeClick(myCrosshairMoveHandler);
+	 * chart.subscribeCrosshairMove(myCrosshairMoveHandler);
 	 * ```
 	 */
 	subscribeCrosshairMove(handler: MouseEventHandler): void;

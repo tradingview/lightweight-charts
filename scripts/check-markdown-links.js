@@ -11,6 +11,37 @@ const glob = require('glob');
 const markdown = require('markdown-it');
 const markdownAnchors = require('markdown-it-anchor');
 
+const versions = require('../website/versions.json');
+
+const websiteRoot = normalizePath(path.join(__dirname, '../website/'));
+
+const websiteDocsFolders = [
+	normalizePath(path.join(websiteRoot, '/docs/')),
+	...versions.map(version => normalizePath(path.join(websiteRoot, `/versioned_docs/version-${version}/`))),
+	websiteRoot,
+];
+
+function isOutOfFolder(filePath, folderPath) {
+	const relativePath = normalizePath(path.relative(folderPath, filePath));
+	return relativePath.startsWith('../');
+}
+
+function docsRootForPath(filePath) {
+	filePath = path.resolve(filePath);
+
+	for (const websiteDocsFolder of websiteDocsFolders) {
+		if (!isOutOfFolder(filePath, websiteDocsFolder)) {
+			return websiteDocsFolder;
+		}
+	}
+
+	return null;
+}
+
+function isFromWebsiteFolder(filePath) {
+	return docsRootForPath(filePath) !== null;
+}
+
 function extractLinks(filePath, tokens, parentLineNumber) {
 	const result = [];
 	for (const token of tokens) {
@@ -34,8 +65,18 @@ function extractLinks(filePath, tokens, parentLineNumber) {
 			continue;
 		}
 
+		let linkToFilePath;
+
+		// if a link is inside website docs then we should treat links started from `/` a bit differently
+		const docsRoot = docsRootForPath(filePath);
+		if (urlPrefix.startsWith('/') && docsRoot !== null) {
+			linkToFilePath = path.join(docsRoot, urlPrefix);
+		} else {
+			linkToFilePath = urlPrefix.length === 0 ? filePath : path.join(filePath, '..', urlPrefix);
+		}
+
 		const markdownLink = {
-			filePath: normalizePath(urlPrefix.length === 0 ? filePath : path.join(filePath, '..', urlPrefix)),
+			filePath: normalizePath(linkToFilePath),
 			lineNumber: tokenLineNumber,
 		};
 
@@ -71,7 +112,7 @@ function normalizePath(filePath) {
 	return path.normalize(filePath).replace(/\\/g, '/');
 }
 
-function collectFilesData(inputFiles) {
+function collectFilesData(inputFiles, checkWebsiteLinks) {
 	const md = markdown({ html: true })
 		.use(
 			markdownAnchors,
@@ -86,7 +127,7 @@ function collectFilesData(inputFiles) {
 						.replace(/-+/g, '-');
 
 					if (result.charAt(0) === '-') {
-						return result.substr(1);
+						return result.slice(1);
 					}
 
 					return result;
@@ -107,9 +148,7 @@ function collectFilesData(inputFiles) {
 			continue;
 		}
 
-		// if this is a link to generated API then let's skip it for now
-		// since a website might not be generated yet
-		if (filePath.includes('/api/')) {
+		if (!checkWebsiteLinks && isFromWebsiteFolder(filePath)) {
 			continue;
 		}
 
@@ -166,6 +205,8 @@ function generateErrors(filesData) {
 }
 
 function main() {
+	const checkWebsiteLinks = process.argv.includes('--check-website-links');
+
 	const files = glob.sync('**/*.md', {
 		dot: true,
 		nodir: true,
@@ -177,9 +218,9 @@ function main() {
 
 	let filesData;
 	try {
-		filesData = collectFilesData(files);
+		filesData = collectFilesData(files, checkWebsiteLinks);
 	} catch (e) {
-		console.error(e.message);
+		console.error(e.stack || e.message);
 		process.exitCode = 1;
 		return;
 	}

@@ -2,7 +2,9 @@
 
 export { LineStyle, LineType } from './renderers/draw-line';
 
+export { TrackingModeExitMode } from './model/chart-model';
 export { CrosshairMode } from './model/crosshair';
+export { MismatchDirection } from './model/plot-list';
 export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource, LastPriceAnimationMode } from './model/series-options';
 export { TickMarkType } from './model/time-scale';

@@ -17,6 +17,10 @@ export const enum LineType {
 	 * A stepped line.
 	 */
 	WithSteps,
+	/**
+	 * A curved line.
+	 */
+	Curved,
 }
 
 /**

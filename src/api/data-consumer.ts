@@ -2,21 +2,7 @@ import { isNumber, isString } from '../helpers/strict-type-checks';
 
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
-import { BusinessDay, UTCTimestamp } from '../model/time-data';
-
-/**
- * The Time type is used to represent the time of data items.
- *
- * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in ISO format.
- *
- * @example
- * ```js
- * const timestamp = 1529899200; // Literal timestamp representing 2018-06-25T04:00:00.000Z
- * const businessDay = { year: 2019, month: 6, day: 1 }; // June 1, 2019
- * const businessDayString = '2021-02-03'; // Business day string literal
- * ```
- */
-export type Time = UTCTimestamp | BusinessDay | string;
+import { BusinessDay, Time, UTCTimestamp } from '../model/time-data';
 
 /**
  * Check if a time value is a business day object.
@@ -62,9 +48,9 @@ export interface WhitespaceData {
 }
 
 /**
- * Represents a data point for a line or area series.
+ * A base interface for a data point of single-value series.
  */
-export interface LineData {
+export interface SingleValueData {
 	/**
 	 * The time of the data.
 	 */
@@ -77,11 +63,21 @@ export interface LineData {
 }
 
 /**
+ * Structure describing a single item of data for line series
+ */
+export interface LineData extends SingleValueData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+}
+
+/**
  * Structure describing a single item of data for histogram series
  */
-export interface HistogramData extends LineData {
+export interface HistogramData extends SingleValueData {
 	/**
-	 * Optional color value for certain data item. If missed, color from HistogramSeriesOptions is used
+	 * Optional color value for certain data item. If missed, color from options is used
 	 */
 	color?: string;
 }
@@ -89,7 +85,7 @@ export interface HistogramData extends LineData {
 /**
  * Represents a bar with a {@link Time} and open, high, low, and close prices.
  */
-export interface BarData {
+export interface OhlcData {
 	/**
 	 * The bar time.
 	 */
@@ -113,6 +109,34 @@ export interface BarData {
 	close: number;
 }
 
+/**
+ * Structure describing a single item of data for bar series
+ */
+export interface BarData extends OhlcData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+}
+
+/**
+ * Structure describing a single item of data for candlestick series
+ */
+export interface CandlestickData extends OhlcData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+	/**
+	 * Optional border color value for certain data item. If missed, color from options is used
+	 */
+	borderColor?: string;
+	/**
+	 * Optional wick color value for certain data item. If missed, color from options is used
+	 */
+	wickColor?: string;
+}
+
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
@@ -134,15 +158,15 @@ export interface SeriesDataItemTypeMap {
 	/**
 	 * The types of candlestick series data.
 	 */
-	Candlestick: BarData | WhitespaceData;
+	Candlestick: CandlestickData | WhitespaceData;
 	/**
 	 * The types of area series data.
 	 */
-	Area: LineData | WhitespaceData;
+	Area: SingleValueData | WhitespaceData;
 	/**
 	 * The types of baseline series data.
 	 */
-	Baseline: LineData | WhitespaceData;
+	Baseline: SingleValueData | WhitespaceData;
 	/**
 	 * The types of line series data.
 	 */

@@ -10,6 +10,7 @@ export interface TimeAxisViewRendererData {
 	color: string;
 	background: string;
 	visible: boolean;
+	tickVisible: boolean;
 }
 
 const optimizationReplacementRe = /[1-9]/g;
@@ -75,14 +76,16 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		const y2scaled = Math.round(y2 * verticalPixelRatio);
 		ctx.fillRect(x1scaled, y1scaled, x2scaled - x1scaled, y2scaled - y1scaled);
 
-		const tickX = Math.round(this._data.coordinate * horizontalPixelRatio);
-		const tickTop = y1scaled;
-		const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * verticalPixelRatio);
+		if (this._data.tickVisible) {
+			const tickX = Math.round(this._data.coordinate * horizontalPixelRatio);
+			const tickTop = y1scaled;
+			const tickBottom = Math.round((tickTop + rendererOptions.borderSize + rendererOptions.tickLength) * verticalPixelRatio);
 
-		ctx.fillStyle = this._data.color;
-		const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
-		const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
-		ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
+			ctx.fillStyle = this._data.color;
+			const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
+			const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
+			ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
+		}
 
 		target.useCanvasElementCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
 			const data = ensureNotNull(this._data);

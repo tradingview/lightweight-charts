@@ -6,6 +6,7 @@ import { ChartModel } from '../../src/model/chart-model';
 import { Coordinate } from '../../src/model/coordinate';
 import { LocalizationOptions } from '../../src/model/localization-options';
 import {
+	OriginalTime,
 	TimePointIndex,
 	TimeScalePoint,
 	UTCTimestamp,
@@ -25,7 +26,7 @@ function tsUpdate(to: number): Parameters<TimeScale['update']> {
 
 	const startIndex = 0;
 	for (let i = startIndex; i <= to; ++i) {
-		points.push({ time: { timestamp: i as UTCTimestamp }, timeWeight: 20 });
+		points.push({ time: { timestamp: i as UTCTimestamp }, timeWeight: 20, originalTime: i as unknown as OriginalTime });
 	}
 
 	return [points, 0];

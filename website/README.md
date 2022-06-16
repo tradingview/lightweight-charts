@@ -31,7 +31,7 @@ This command generates static content in the `build` directory.
 ## Deployment
 
 ```console
-GIT_USER=<Your GitHub username> GITHUB_ORGANIZATION_NAME=<Your Github username or organisation name> USE_SSH=true npm deploy
+GIT_USER=<Your GitHub username> GITHUB_ORGANIZATION_NAME=<Your Github username or organization name> USE_SSH=true npm deploy
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -40,7 +40,7 @@ This will build the website into static files and push the files to the `gh-page
 
 ## Adding a new version
 
-Run the following command replacing $VERSION with the name of a version you would like to create. $VERSION should match one of the available versions of the package on [unpkg.com](unpkg.com)
+Run the following command replacing $VERSION with the name of a version you would like to create. $VERSION should match one of the available versions of the package on [unpkg.com](https://unpkg.com)
 
 See [the Docusaurus versioning docs](https://docusaurus.io/docs/versioning#tagging-a-new-version) for an explanation of the Docusaurus versioning behaviour.
 

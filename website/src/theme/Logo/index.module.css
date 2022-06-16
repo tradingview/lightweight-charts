@@ -1,0 +1,13 @@
+.Logo {
+	background-image: var(--navbar-logo-url-mobile);
+	width: 42px;
+	height: 34px; 
+}
+
+@media (min-width: 767.5px) {
+	.Logo {
+		background-image: var(--navbar-logo-url-desktop-laptop-tablet);
+		width: 254px;
+		height: 34px; 
+	}
+}

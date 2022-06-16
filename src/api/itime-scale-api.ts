@@ -1,10 +1,8 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
-import { Logical, LogicalRange, Range } from '../model/time-data';
+import { Logical, LogicalRange, Range, Time } from '../model/time-data';
 import { TimeScaleOptions } from '../model/time-scale';
-
-import { Time } from './data-consumer';
 
 /**
  * Represents a {@link Time} range.
@@ -74,14 +72,14 @@ export interface ITimeScaleApi {
 	setVisibleRange(range: TimeRange): void;
 
 	/**
-	 * Returns the current visible [logical range](#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data.
+	 * Returns the current visible [logical range](/time-scale.md#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data.
 	 *
 	 * @returns Visible range or null if the chart has no data at all.
 	 */
 	getVisibleLogicalRange(): LogicalRange | null;
 
 	/**
-	 * Sets visible [logical range](#logical-range) of data.
+	 * Sets visible [logical range](/time-scale.md#logical-range) of data.
 	 *
 	 * @param range - Target visible logical range of data.
 	 * @example

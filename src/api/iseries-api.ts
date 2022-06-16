@@ -2,6 +2,7 @@ import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { MismatchDirection } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import {
@@ -9,9 +10,9 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Range } from '../model/time-data';
+import { Range, Time } from '../model/time-data';
 
-import { SeriesDataItemTypeMap, Time } from './data-consumer';
+import { SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 
@@ -159,6 +160,19 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
 
 	/**
+	 * Returns a bar data by provided logical index.
+	 *
+	 * @param logicalIndex - Logical index
+	 * @param mismatchDirection - Search direction if no data found at provided logical index.
+	 * @returns Original data item provided via setData or update methods.
+	 * @example
+	 * ```js
+	 * const originalData = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
+	 * ```
+	 */
+	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null;
+
+	/**
 	 * Allows to set/replace all existing series markers with new ones.
 	 *
 	 * @param data - An array of series markers. This array should be sorted by time. Several markers with same time are allowed.
@@ -199,6 +213,11 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	setMarkers(data: SeriesMarker<Time>[]): void;
+
+	/**
+	 * Returns an array of series markers.
+	 */
+	markers(): SeriesMarker<Time>[];
 
 	/**
 	 * Creates a new price line

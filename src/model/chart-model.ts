@@ -176,6 +176,39 @@ export type VisiblePriceScaleOptions = PriceScaleOptions;
 export type OverlayPriceScaleOptions = Omit<PriceScaleOptions, 'visible' | 'autoScale'>;
 
 /**
+ * Determine how to exit the tracking mode.
+ *
+ * By default, mobile users will long press to deactivate the scroll and have the ability to check values and dates.
+ * Another press is required to activate the scroll, be able to move left/right, zoom, etc.
+ */
+export const enum TrackingModeExitMode {
+	/**
+	 * Tracking Mode will be deactivated on touch end event.
+	 */
+	OnTouchEnd,
+	/**
+	 * Tracking Mode will be deactivated on the next tap event.
+	 */
+	OnNextTap,
+}
+
+/**
+ * Represent options for the tracking mode's behavior.
+ *
+ * Mobile users will not have the ability to see the values/dates like they do on desktop.
+ * To see it, they should enter the tracking mode. The tracking mode will deactivate the scrolling
+ * and make it possible to check values and dates.
+ */
+export interface TrackingModeOptions {
+	// eslint-disable-next-line tsdoc/syntax
+	/** @inheritdoc TrackingModeExitMode
+	 *
+	 * @defaultValue {@link TrackingModeExitMode.OnNextTap}
+	 */
+	exitMode: TrackingModeExitMode;
+}
+
+/**
  * Structure describing options of the chart. Series options are to be set separately
  */
 export interface ChartOptions {
@@ -256,6 +289,12 @@ export interface ChartOptions {
 	 * Kinetic scroll options
 	 */
 	kineticScroll: KineticScrollOptions;
+
+	// eslint-disable-next-line tsdoc/syntax
+	/** @inheritDoc TrackingModeOptions
+	 */
+	trackingMode: TrackingModeOptions;
+
 }
 
 export type ChartOptionsInternal =

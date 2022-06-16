@@ -43,6 +43,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 	}
 
 	public text(): string {
+		this._updateRendererDataIfNeeded();
 		return this._axisRendererData.text;
 	}
 
@@ -86,8 +87,8 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		// force update tickVisible state from price scale options
 		// because we don't have and we can't have price axis in other methods
 		// (like paneRenderer or any other who call _updateRendererDataIfNeeded)
-		this._axisRendererData.tickVisible = this._axisRendererData.tickVisible && priceScale.options().drawTicks;
-		this._paneRendererData.tickVisible = this._paneRendererData.tickVisible && priceScale.options().drawTicks;
+		this._axisRendererData.tickVisible = this._axisRendererData.tickVisible && priceScale.options().ticksVisible;
+		this._paneRendererData.tickVisible = this._paneRendererData.tickVisible && priceScale.options().ticksVisible;
 
 		this._axisRenderer.setData(this._axisRendererData, this._commonRendererData);
 		this._paneRenderer.setData(this._paneRendererData, this._commonRendererData);

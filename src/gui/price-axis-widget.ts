@@ -30,6 +30,10 @@ const enum CursorType {
 	NsResize,
 }
 
+const enum Constants {
+	DefaultOptimalWidth = 34,
+}
+
 type IPriceAxisViewArray = readonly IPriceAxisView[];
 
 export class PriceAxisWidget implements IDestroyable {
@@ -46,7 +50,6 @@ export class PriceAxisWidget implements IDestroyable {
 	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
 	private readonly _topCanvasBinding: CanvasElementBitmapSizeBinding;
 
-	private _updateTimeout: TimerId | null = null;
 	private _mouseEventHandler: MouseEventHandler;
 	private _mousedown: boolean = false;
 
@@ -56,6 +59,7 @@ export class PriceAxisWidget implements IDestroyable {
 	private _color: string | null = null;
 	private _font: string | null = null;
 	private _prevOptimalWidth: number = 0;
+	private _isSettingSize: boolean = false;
 
 	public constructor(pane: PaneWidget, options: LayoutOptions, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
@@ -88,10 +92,14 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const handler: MouseEventHandlers = {
 			mouseDownEvent: this._mouseDownEvent.bind(this),
+			touchStartEvent: this._mouseDownEvent.bind(this),
 			pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
+			touchMoveEvent: this._pressedMouseMoveEvent.bind(this),
 			mouseDownOutsideEvent: this._mouseDownOutsideEvent.bind(this),
 			mouseUpEvent: this._mouseUpEvent.bind(this),
+			touchEndEvent: this._mouseUpEvent.bind(this),
 			mouseDoubleClickEvent: this._mouseDoubleClickEvent.bind(this),
+			doubleTapEvent: this._mouseDoubleClickEvent.bind(this),
 			mouseEnterEvent: this._mouseEnterEvent.bind(this),
 			mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
 		};
@@ -99,8 +107,8 @@ export class PriceAxisWidget implements IDestroyable {
 			this._topCanvasBinding.canvasElement,
 			handler,
 			{
-				treatVertTouchDragAsPageScroll: false,
-				treatHorzTouchDragAsPageScroll: true,
+				treatVertTouchDragAsPageScroll: () => false,
+				treatHorzTouchDragAsPageScroll: () => true,
 			}
 		);
 	}
@@ -119,11 +127,6 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		this._priceScale = null;
-
-		if (this._updateTimeout !== null) {
-			clearTimeout(this._updateTimeout);
-			this._updateTimeout = null;
-		}
 
 		this._tickMarksCache.destroy();
 	}
@@ -172,8 +175,7 @@ export class PriceAxisWidget implements IDestroyable {
 			return 0;
 		}
 
-		// need some reasonable value for scale while initialization
-		let tickMarkMaxWidth = 34;
+		let tickMarkMaxWidth = 0;
 		const rendererOptions = this.rendererOptions();
 
 		const ctx = ensureNotNull(this._canvasBinding.canvasElement.getContext('2d'));
@@ -214,12 +216,13 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.restore();
 
+		const resultTickMarksMaxWidth = tickMarkMaxWidth || Constants.DefaultOptimalWidth;
 		let res = Math.ceil(
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
-			tickMarkMaxWidth
+			resultTickMarksMaxWidth
 		);
 		// make it even
 		res += res % 2;
@@ -230,8 +233,10 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || !equalSizes(this._size, newSize)) {
 			this._size = newSize;
 
+			this._isSettingSize = true;
 			this._canvasBinding.resizeCanvasElement(newSize);
 			this._topCanvasBinding.resizeCanvasElement(newSize);
+			this._isSettingSize = false;
 
 			this._cell.style.width = `${newSize.width}px`;
 			// need this for IE11
@@ -294,6 +299,11 @@ export class PriceAxisWidget implements IDestroyable {
 
 	public getImage(): HTMLCanvasElement {
 		return this._canvasBinding.canvasElement;
+	}
+
+	public update(): void {
+		// this call has side-effect - it regenerates marks on the price scale
+		this._priceScale?.marks();
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {
@@ -437,7 +447,6 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.font = this.baseFont();
 		ctx.fillStyle = this.lineColor();
 		const rendererOptions = this.rendererOptions();
-		const drawTicks = this._priceScale.options().borderVisible && this._priceScale.options().drawTicks;
 
 		const { horizontalPixelRatio, verticalPixelRatio } = target;
 
@@ -453,8 +462,10 @@ export class PriceAxisWidget implements IDestroyable {
 		const tickHeight = Math.max(1, Math.floor(verticalPixelRatio));
 		const tickOffset = Math.floor(verticalPixelRatio * 0.5);
 
-		if (drawTicks) {
+		const options = this._priceScale.options();
+		if (options.borderVisible && options.ticksVisible) {
 			const tickLength = Math.round(rendererOptions.tickLength * horizontalPixelRatio);
+
 			ctx.beginPath();
 			for (const tickMark of tickMarks) {
 				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * verticalPixelRatio) - tickOffset, tickLength, tickHeight);
@@ -628,22 +639,10 @@ export class PriceAxisWidget implements IDestroyable {
 	private _onMarksChanged(): void {
 		const width = this.optimalWidth();
 
+		// avoid price scale is shrunk
+		// using < instead !== to avoid infinite changes
 		if (this._prevOptimalWidth < width) {
-			// avoid price scale is shrunk
-			// using < instead !== to avoid infinite changes
-
-			const chart = this._pane.chart();
-
-			if (this._updateTimeout === null) {
-				this._updateTimeout = setTimeout(
-					() => {
-						if (chart) {
-							chart.model().fullUpdate();
-						}
-						this._updateTimeout = null;
-					},
-					100);
-			}
+			this._pane.chart().model().fullUpdate();
 		}
 
 		this._prevOptimalWidth = width;
@@ -661,14 +660,21 @@ export class PriceAxisWidget implements IDestroyable {
 
 	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => {
 		this._recreateTickMarksCache(this._rendererOptionsProvider.options());
+
+		if (this._isSettingSize) {
+			return;
+		}
+
 		this._canvasBinding.applySuggestedBitmapSize();
-		const model = this._pane.chart().model();
-		model.lightUpdate();
+		this._pane.chart().model().lightUpdate();
 	};
 
 	private readonly _topCanvasSuggestedBitmapSizeChangedHandler = () => {
+		if (this._isSettingSize) {
+			return;
+		}
+
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const model = this._pane.chart().model();
-		model.lightUpdate();
+		this._pane.chart().model().lightUpdate();
 	};
 }

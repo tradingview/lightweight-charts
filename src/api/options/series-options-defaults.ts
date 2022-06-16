@@ -73,6 +73,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 
 	lineWidth: 3,
 	lineStyle: LineStyle.Solid,
+	lineType: LineType.Simple,
 
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,

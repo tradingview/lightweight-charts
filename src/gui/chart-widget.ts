@@ -6,7 +6,6 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { DefaultPriceScaleId } from '../model/default-price-scale';
@@ -18,7 +17,8 @@ import {
 } from '../model/invalidate-mask';
 import { Point } from '../model/point';
 import { Series } from '../model/series';
-import { TimePoint, TimePointIndex } from '../model/time-data';
+import { SeriesPlotRow } from '../model/series-data';
+import { OriginalTime, TimePointIndex } from '../model/time-data';
 
 import { createPreconfiguredCanvas } from './canvas-utils';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
@@ -26,9 +26,10 @@ import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
 export interface MouseEventParamsImpl {
-	time?: TimePoint;
+	time?: OriginalTime;
+	index?: TimePointIndex;
 	point?: Point;
-	seriesPrices: Map<Series, BarPrice | BarPrices>;
+	seriesData: Map<Series, SeriesPlotRow>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
 }
@@ -200,6 +201,9 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
+		// we don't need to merge options here because it's done in chart model
+		// and since both model and widget share the same object it will be done automatically for widget as well
+		// not ideal solution for sure, but it work's for now ¯\_(ツ)_/¯
 		this._model.applyOptions(options);
 		this._updateTimeAxisVisibility();
 
@@ -476,27 +480,48 @@ export class ChartWidget implements IDestroyable {
 			invalidationType === InvalidationLevel.Full ||
 			invalidationType === InvalidationLevel.Light
 		) {
-			const panes = this._model.panes();
-			for (let i = 0; i < panes.length; i++) {
-				if (invalidateMask.invalidateForPane(i).autoScale) {
-					panes[i].momentaryAutoScale();
-				}
-			}
-
-			const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
-			for (const tsInvalidation of timeScaleInvalidations) {
-				this._applyTimeScaleInvalidation(tsInvalidation);
-			}
-			if (timeScaleInvalidations.length > 0) {
-				this._model.recalculateAllPanes();
-				this._model.updateCrosshair();
-				this._model.lightUpdate();
-			}
+			this._applyMomentaryAutoScale(invalidateMask);
+			this._applyTimeScaleInvalidations(invalidateMask);
 
 			this._timeAxisWidget.update();
+			this._paneWidgets.forEach((pane: PaneWidget) => {
+				pane.updatePriceAxisWidgets();
+			});
+
+			// In the case a full invalidation has been postponed during the draw, reapply
+			// the timescale invalidations. A full invalidation would mean there is a change
+			// in the timescale width (caused by price scale changes) that needs to be drawn
+			// right away to avoid flickering.
+			if (this._invalidateMask?.fullInvalidation() === InvalidationLevel.Full) {
+				this._invalidateMask.merge(invalidateMask);
+
+				this._updateGui();
+
+				this._applyMomentaryAutoScale(this._invalidateMask);
+				this._applyTimeScaleInvalidations(this._invalidateMask);
+
+				invalidateMask = this._invalidateMask;
+				this._invalidateMask = null;
+			}
 		}
 
 		this.paint(invalidateMask);
+	}
+
+	private _applyTimeScaleInvalidations(invalidateMask: InvalidateMask): void {
+		const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
+		for (const tsInvalidation of timeScaleInvalidations) {
+			this._applyTimeScaleInvalidation(tsInvalidation);
+		}
+	}
+
+	private _applyMomentaryAutoScale(invalidateMask: InvalidateMask): void {
+		const panes = this._model.panes();
+		for (let i = 0; i < panes.length; i++) {
+			if (invalidateMask.invalidateForPane(i).autoScale) {
+				panes[i].momentaryAutoScale();
+			}
+		}
 	}
 
 	private _applyTimeScaleInvalidation(invalidation: TimeScaleInvalidation): void {
@@ -534,8 +559,9 @@ export class ChartWidget implements IDestroyable {
 				this._drawRafId = 0;
 
 				if (this._invalidateMask !== null) {
-					this._drawImpl(this._invalidateMask);
+					const mask = this._invalidateMask;
 					this._invalidateMask = null;
+					this._drawImpl(mask);
 				}
 			});
 		}
@@ -592,7 +618,7 @@ export class ChartWidget implements IDestroyable {
 			if (paneWidget.state() !== state) {
 				paneWidget.setState(state);
 			} else {
-				paneWidget.updatePriceAxisWidgets();
+				paneWidget.updatePriceAxisWidgetsStates();
 			}
 		}
 
@@ -601,21 +627,21 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
-		const seriesPrices = new Map<Series, BarPrice | BarPrices>();
+		const seriesData = new Map<Series, SeriesPlotRow>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
 			serieses.forEach((s: Series) => {
 				// TODO: replace with search left
-				const prices = s.dataAt(index);
-				if (prices !== null) {
-					seriesPrices.set(s, prices);
+				const data = s.bars().search(index);
+				if (data !== null) {
+					seriesData.set(s, data);
 				}
 			});
 		}
-		let clientTime: TimePoint | undefined;
+		let clientTime: OriginalTime | undefined;
 		if (index !== null) {
-			const timePoint = this._model.timeScale().indexToTime(index);
-			if (timePoint !== null) {
+			const timePoint = this._model.timeScale().indexToTimeScalePoint(index)?.originalTime;
+			if (timePoint !== undefined) {
 				clientTime = timePoint;
 			}
 		}
@@ -632,9 +658,10 @@ export class ChartWidget implements IDestroyable {
 
 		return {
 			time: clientTime,
-			point: point || undefined,
+			index: index ?? undefined,
+			point: point ?? undefined,
 			hoveredSeries,
-			seriesPrices,
+			seriesData,
 			hoveredObject,
 		};
 	}
