@@ -41,7 +41,7 @@ export class PriceAxisRendererOptionsProvider {
 			rendererOptions.fontSize = currentFontSize;
 			rendererOptions.fontFamily = currentFontFamily;
 			rendererOptions.font = makeFont(currentFontSize, currentFontFamily);
-			rendererOptions.paddingTop = Math.max(0, Math.floor(currentFontSize / 3));
+			rendererOptions.paddingTop = 2.5 / 12 * currentFontSize; // 2.5 px for 12px font
 			rendererOptions.paddingBottom = rendererOptions.paddingTop;
 			rendererOptions.paddingInner = currentFontSize / 12 * rendererOptions.tickLength;
 			rendererOptions.paddingOuter = currentFontSize / 12 * rendererOptions.tickLength;
