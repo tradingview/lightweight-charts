@@ -164,7 +164,7 @@ export interface PriceScaleOptions {
 	/**
 	 * Draw small horizontal line on price axis labels.
 	 *
-	 * @defaultValue `true`
+	 * @defaultValue `false`
 	 */
 	ticksVisible: boolean;
 }
