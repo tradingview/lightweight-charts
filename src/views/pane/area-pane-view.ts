@@ -26,6 +26,17 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		}
 
 		const areaStyleProperties = this._series.options();
+		const priceScale = this._series.priceScale();
+		const priceScaleProps = priceScale.options();
+		const isCustomScale = priceScale.id() !== 'right' && priceScale.id() !== 'left';
+
+		let top = 0;
+		let bottom = height;
+
+		if (isCustomScale && priceScaleProps.scaleMargins) {
+			bottom = height;
+			top = priceScaleProps.scaleMargins.top * height;
+		}
 
 		this._makeValid();
 
@@ -37,7 +48,8 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 			topColor: areaStyleProperties.topColor,
 			bottomColor: areaStyleProperties.bottomColor,
 			baseLevelCoordinate: height as Coordinate,
-			bottom: height as Coordinate,
+			top: top as Coordinate,
+			bottom: bottom as Coordinate,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		});

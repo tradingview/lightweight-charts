@@ -33,3 +33,6 @@ debug.html
 
 # graphics tests out data
 /tests/e2e/graphics/.gendata/
+
+# MacOS
+.DS_Store

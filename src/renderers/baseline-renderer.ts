@@ -18,8 +18,10 @@ export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererB
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
-		const baselinePercent = clamp(data.baseLevelCoordinate / data.bottom, 0, 1);
+		const gradient = ctx.createLinearGradient(0, data.top, 0, data.bottom);
+		const base = data.baseLevelCoordinate - data.top;
+		const height = data.bottom - data.top;
+		const baselinePercent = clamp(base / height, 0, 1);
 
 		gradient.addColorStop(0, data.topFillColor1);
 		gradient.addColorStop(baselinePercent, data.topFillColor2);
