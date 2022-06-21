@@ -15,7 +15,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container, {
 		rightPriceScale: {
-			ticksVisible: false,
+			ticksVisible: true,
 		},
 	});
 

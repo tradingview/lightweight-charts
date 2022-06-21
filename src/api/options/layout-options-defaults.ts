@@ -8,6 +8,6 @@ export const layoutOptionsDefaults: LayoutOptions = {
 		color: '#FFFFFF',
 	},
 	textColor: '#191919',
-	fontSize: 11,
+	fontSize: 12,
 	fontFamily: defaultFontFamily,
 };

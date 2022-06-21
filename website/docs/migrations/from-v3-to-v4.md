@@ -95,6 +95,8 @@ const chart = createChart({
 });
 ```
 
+Also this option is off by default.
+
 ## The type of outbound time values has been changed
 
 Affected API:
