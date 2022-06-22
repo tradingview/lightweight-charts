@@ -64,16 +64,16 @@ export class LabelsImageCache implements IDestroyable {
 				this._hash.delete(key);
 			}
 
-			const margin = Math.ceil(this._fontSize / 4.5);
 			const baselineOffset = Math.round(this._fontSize / 10);
 			const textWidth = Math.ceil(this._textWidthCache.measureText(target.context, text));
-			const boxWidth = ceiledEven(Math.round(textWidth + margin * 2));
-			const boxHeight = ceiledEven(this._fontSize + margin * 2);
+			// small reserve for antialiasing, measureText is not sharp
+			const width = ceiledEven(Math.round(textWidth) + 4);
+			const height = ceiledEven(this._fontSize);
 			const canvas = createPreconfiguredCanvas(
 				document,
 				size({
-					width: Math.ceil(boxWidth * target.horizontalPixelRatio),
-					height: Math.ceil(boxHeight * target.verticalPixelRatio),
+					width: Math.ceil(width * target.horizontalPixelRatio),
+					height: Math.ceil(height * target.verticalPixelRatio),
 				})
 			);
 
@@ -93,7 +93,7 @@ export class LabelsImageCache implements IDestroyable {
 			ctx.font = this._font;
 			ctx.fillStyle = this._color;
 			ctx.scale(target.horizontalPixelRatio, target.verticalPixelRatio);
-			ctx.fillText(text, 0, boxHeight - margin - baselineOffset);
+			ctx.fillText(text, 0, height - baselineOffset);
 			ctx.setTransform(1, 0, 0, 1, 0, 0);
 		}
 

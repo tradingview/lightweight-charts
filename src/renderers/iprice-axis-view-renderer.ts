@@ -9,6 +9,8 @@ export interface PriceAxisViewRendererCommonData {
 	color: string;
 	coordinate: number;
 	fixedCoordinate?: number;
+	additionalPaddingTop: number;
+	additionalPaddingBottom: number;
 }
 
 export interface PriceAxisViewRendererData {
@@ -17,7 +19,10 @@ export interface PriceAxisViewRendererData {
 	tickVisible: boolean;
 	moveTextToInvisibleTick: boolean;
 	borderColor: string;
+	color: string;
 	lineWidth?: LineWidth;
+	borderVisible: boolean;
+	separatorVisible: boolean;
 }
 
 export interface PriceAxisViewRendererOptions {
@@ -26,6 +31,7 @@ export interface PriceAxisViewRendererOptions {
 	font: string;
 	fontFamily: string;
 	color: string;
+	paneBackgroundColor: string;
 	fontSize: number;
 	paddingBottom: number;
 	paddingInner: number;

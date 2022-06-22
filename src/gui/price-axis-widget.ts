@@ -36,6 +36,10 @@ const enum Constants {
 
 type IPriceAxisViewArray = readonly IPriceAxisView[];
 
+const enum Constants {
+	LabelOffset = 5,
+}
+
 export class PriceAxisWidget implements IDestroyable {
 	private readonly _pane: PaneWidget;
 	private readonly _options: LayoutOptions;
@@ -222,9 +226,11 @@ export class PriceAxisWidget implements IDestroyable {
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
+			Constants.LabelOffset +
 			resultTickMarksMaxWidth
 		);
-		// make it even
+
+		// make it even, remove this after migration to perfect fancy canvas
 		res += res % 2;
 		return res;
 	}
@@ -451,8 +457,8 @@ export class PriceAxisWidget implements IDestroyable {
 		const { horizontalPixelRatio, verticalPixelRatio } = target;
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor((this._size.width - rendererOptions.tickLength) * horizontalPixelRatio - rendererOptions.borderSize * horizontalPixelRatio) :
-			Math.floor(rendererOptions.borderSize * horizontalPixelRatio);
+			Math.floor((this._size.width - rendererOptions.tickLength) * horizontalPixelRatio) :
+			0;
 
 		const textLeftX = this._isLeft ?
 			Math.round(tickMarkLeftX - rendererOptions.paddingInner * horizontalPixelRatio) :

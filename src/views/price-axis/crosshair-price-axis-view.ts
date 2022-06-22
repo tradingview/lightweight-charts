@@ -40,6 +40,11 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 		commonRendererData.background = colors.background;
 		commonRendererData.color = colors.foreground;
 
+		const additionalPadding = 2 / 12 * this._priceScale.fontSize();
+
+		commonRendererData.additionalPaddingTop = additionalPadding;
+		commonRendererData.additionalPaddingBottom = additionalPadding;
+
 		const value = this._valueProvider(this._priceScale);
 		commonRendererData.coordinate = value.coordinate;
 		axisRendererData.text = this._priceScale.formatPrice(value.price, firstValue);
