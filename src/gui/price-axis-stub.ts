@@ -94,6 +94,7 @@ export class PriceAxisStub implements IDestroyable {
 
 		this._invalidated = false;
 
+		this._canvasBinding.applySuggestedBitmapSize();
 		const target = createCanvasRenderingTarget(this._canvasBinding);
 		if (target !== null) {
 			this._drawBackground(target);
@@ -130,8 +131,5 @@ export class PriceAxisStub implements IDestroyable {
 		clearRect(target.context, 0, 0, target.bitmapSize.width, target.bitmapSize.height, this._bottomColor());
 	}
 
-	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => {
-		this._canvasBinding.applySuggestedBitmapSize();
-		this.paint(InvalidationLevel.Full);
-	};
+	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => this.paint(InvalidationLevel.Full);
 }

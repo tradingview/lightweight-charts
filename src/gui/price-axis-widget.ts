@@ -285,6 +285,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		if (type !== InvalidationLevel.Cursor) {
 			this._alignLabels();
+			this._canvasBinding.applySuggestedBitmapSize();
 			const target = createCanvasRenderingTarget(this._canvasBinding);
 			if (target !== null) {
 				this._drawBackground(target);
@@ -295,6 +296,7 @@ export class PriceAxisWidget implements IDestroyable {
 			target?.destroy();
 		}
 
+		this._topCanvasBinding.applySuggestedBitmapSize();
 		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
 		if (topTarget !== null) {
 			topTarget.context.clearRect(0, 0, topTarget.bitmapSize.width, topTarget.bitmapSize.height);
@@ -671,7 +673,6 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		this._canvasBinding.applySuggestedBitmapSize();
 		this._pane.chart().model().lightUpdate();
 	};
 
@@ -680,7 +681,6 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		this._topCanvasBinding.applySuggestedBitmapSize();
 		this._pane.chart().model().lightUpdate();
 	};
 }
