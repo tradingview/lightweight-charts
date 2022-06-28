@@ -1,13 +1,14 @@
 import { Coordinate } from '../model/coordinate';
-import { SeriesItemsIndexesRange } from '../model/time-data';
+import { PricedValue } from '../model/price-scale';
+import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { LineItem } from './line-renderer';
+import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
-import { walkLine } from './walk-line';
+import { getControlPoints } from './walk-line';
 
+export type AreaItem = TimedValue & PricedValue & LinePoint & { lineColor?: string; topColor?: string; bottomColor?: string };
 export interface PaneRendererAreaDataBase {
-	items: LineItem[];
+	items: AreaItem[];
 	lineType: LineType;
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
@@ -32,41 +33,87 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 			return;
 		}
 
+		const { items, visibleRange, barWidth, lineWidth, lineStyle, lineType, baseLevelCoordinate } = this._data;
+
 		ctx.lineCap = 'butt';
 		ctx.lineJoin = 'round';
-		ctx.lineWidth = this._data.lineWidth;
-		setLineStyle(ctx, this._data.lineStyle);
+		ctx.lineWidth = lineWidth;
+		setLineStyle(ctx, lineStyle);
 
 		// walk lines with width=1 to have more accurate gradient's filling
 		ctx.lineWidth = 1;
 
 		ctx.beginPath();
 
-		if (this._data.items.length === 1) {
-			const point = this._data.items[0];
-			const halfBarWidth = this._data.barWidth / 2;
-			ctx.moveTo(point.x - halfBarWidth, this._data.baseLevelCoordinate);
-			ctx.lineTo(point.x - halfBarWidth, point.y);
-			ctx.lineTo(point.x + halfBarWidth, point.y);
-			ctx.lineTo(point.x + halfBarWidth, this._data.baseLevelCoordinate);
+		const firstItem = items[visibleRange.from];
+		ctx.moveTo(firstItem.x, firstItem.y);
+
+		let currentFillStyle = this._fillStyle(ctx, firstItem);
+		let currentFillStyleFirstItem = firstItem;
+
+		const changeFillStyle = (fillStyle: CanvasRenderingContext2D['fillStyle'], currentItem: AreaItem) => {
+			ctx.lineTo(currentItem.x, baseLevelCoordinate);
+			ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
+			ctx.closePath();
+			ctx.fillStyle = currentFillStyle;
+			ctx.fill();
+			ctx.beginPath();
+			currentFillStyle = fillStyle;
+			currentFillStyleFirstItem = currentItem;
+		};
+
+		if (visibleRange.from === visibleRange.to) {
+			const halfBarWidth = barWidth / 2;
+			ctx.moveTo(firstItem.x - halfBarWidth, baseLevelCoordinate);
+			ctx.lineTo(firstItem.x - halfBarWidth, firstItem.y);
+			ctx.lineTo(firstItem.x + halfBarWidth, firstItem.y);
+			ctx.lineTo(firstItem.x + halfBarWidth, baseLevelCoordinate);
 		} else {
-			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.baseLevelCoordinate);
-			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
+			let currentItem: AreaItem | undefined;
+			for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
+				currentItem = items[i];
+				const itemFillStyle = this._fillStyle(ctx, currentItem);
 
-			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
+				switch (lineType) {
+					case LineType.Simple:
+						ctx.lineTo(currentItem.x, currentItem.y);
+						break;
+					case LineType.WithSteps:
+						ctx.lineTo(currentItem.x, items[i - 1].y);
 
-			if (this._data.visibleRange.to > this._data.visibleRange.from) {
-				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.baseLevelCoordinate);
-				ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.baseLevelCoordinate);
+						if (itemFillStyle !== currentFillStyle) {
+							changeFillStyle(itemFillStyle, currentItem);
+							ctx.lineTo(currentItem.x, items[i - 1].y);
+						}
+
+						ctx.lineTo(currentItem.x, currentItem.y);
+						break;
+					case LineType.Curved: {
+						const [cp1, cp2] = getControlPoints(items, i - 1, i);
+						ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currentItem.x, currentItem.y);
+						break;
+					}
+				}
+
+				if (lineType !== LineType.WithSteps && itemFillStyle !== currentFillStyle) {
+					changeFillStyle(itemFillStyle, currentItem);
+					ctx.moveTo(currentItem.x, currentItem.y);
+				}
+			}
+
+			if (visibleRange.to > visibleRange.from) {
+				// visibleRange.from !== visibleRange.to so currentItem should be initialized here
+				ctx.lineTo((currentItem as AreaItem).x, baseLevelCoordinate);
+				ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
 			}
 		}
-		ctx.closePath();
 
-		ctx.fillStyle = this._fillStyle(ctx);
+		ctx.closePath();
+		ctx.fillStyle = currentFillStyle;
 		ctx.fill();
 	}
 
-	protected abstract _fillStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['fillStyle'];
+	protected abstract _fillStyle(ctx: CanvasRenderingContext2D, item: AreaItem): CanvasRenderingContext2D['fillStyle'];
 }
 
 export interface PaneRendererAreaData extends PaneRendererAreaDataBase {
@@ -74,14 +121,36 @@ export interface PaneRendererAreaData extends PaneRendererAreaDataBase {
 	bottomColor: string;
 }
 
+interface FillStyleCache {
+	topColor: string;
+	bottomColor: string;
+	fillStyle: CanvasRenderingContext2D['fillStyle'];
+}
+
 export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData> {
-	protected override _fillStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['fillStyle'] {
+	private _fillStyleCache: FillStyleCache | null = null;
+
+	protected override _fillStyle(ctx: CanvasRenderingContext2D, item: AreaItem): CanvasRenderingContext2D['fillStyle'] {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
-		gradient.addColorStop(0, data.topColor);
-		gradient.addColorStop(1, data.bottomColor);
-		return gradient;
+		const topColor = item.topColor ?? data.topColor;
+		const bottomColor = item.bottomColor ?? data.bottomColor;
+
+		if (
+			this._fillStyleCache !== null &&
+			this._fillStyleCache.topColor === topColor &&
+			this._fillStyleCache.bottomColor === bottomColor
+		) {
+			return this._fillStyleCache.fillStyle;
+		}
+
+		const fillStyle = ctx.createLinearGradient(0, 0, 0, data.bottom);
+		fillStyle.addColorStop(0, topColor);
+		fillStyle.addColorStop(1, bottomColor);
+
+		this._fillStyleCache = { topColor, bottomColor, fillStyle };
+
+		return fillStyle;
 	}
 }

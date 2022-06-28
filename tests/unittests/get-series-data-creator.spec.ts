@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 
 import { getSeriesDataCreator } from '../../src/api/get-series-data-creator';
 import { PlotRow } from '../../src/model/plot-data';
-import { BarPlotRow, CandlestickPlotRow, HistogramPlotRow, LinePlotRow } from '../../src/model/series-data';
+import { AreaPlotRow, BarPlotRow, CandlestickPlotRow, HistogramPlotRow, LinePlotRow } from '../../src/model/series-data';
 import { OriginalTime, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 const plotRow: PlotRow = {
@@ -20,7 +20,15 @@ const linePlotRows: LinePlotRow[] = [
 	},
 	plotRow,
 ];
-const areaPlotRows: PlotRow = plotRow;
+const areaPlotRows: AreaPlotRow[] = [
+	{
+		...plotRow,
+		lineColor: '#FF0000',
+		topColor: '#00FF00',
+		bottomColor: '#0000FF',
+	},
+	plotRow,
+];
 const baselinePlotRows: PlotRow = plotRow;
 const histogramPlotRow: HistogramPlotRow[] = [
 	{
@@ -72,7 +80,14 @@ describe('getSeriesDataCreator', () => {
 	});
 
 	it('Area', () => {
-		expect(getSeriesDataCreator('Area')(areaPlotRows)).to.deep.equal({
+		expect(getSeriesDataCreator('Area')(areaPlotRows[0])).to.deep.equal({
+			value: 4,
+			time: 1649931070,
+			lineColor: '#FF0000',
+			topColor: '#00FF00',
+			bottomColor: '#0000FF',
+		});
+		expect(getSeriesDataCreator('Area')(areaPlotRows[1])).to.deep.equal({
 			value: 4,
 			time: 1649931070,
 		});

@@ -83,6 +83,26 @@ export interface HistogramData extends SingleValueData {
 }
 
 /**
+ * Structure describing a single item of data for area series
+ */
+export interface AreaData extends SingleValueData {
+	/**
+	 * Optional line color value for certain data item. If missed, color from options is used
+	 */
+	lineColor?: string;
+
+	/**
+	 * Optional top color value for certain data item. If missed, color from options is used
+	 */
+	topColor?: string;
+
+	/**
+	 * Optional bottom color value for certain data item. If missed, color from options is used
+	 */
+	bottomColor?: string;
+}
+
+/**
  * Represents a bar with a {@link Time} and open, high, low, and close prices.
  */
 export interface OhlcData {
@@ -162,7 +182,7 @@ export interface SeriesDataItemTypeMap {
 	/**
 	 * The types of area series data.
 	 */
-	Area: SingleValueData | WhitespaceData;
+	Area: AreaData | WhitespaceData;
 	/**
 	 * The types of baseline series data.
 	 */

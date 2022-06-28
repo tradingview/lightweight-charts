@@ -20,12 +20,16 @@ export interface PrecomputedBars {
 
 export interface BarColorerStyle {
 	barColor: string;
-	barBorderColor: string; // Used in Candlesticks
-	barWickColor: string; // Used in Candlesticks
+	topColor: string; // Used in Area series
+	bottomColor: string; // Used in Area series
+	barBorderColor: string; // Used in Candlesticks series
+	barWickColor: string; // Used in Candlesticks series
 }
 
 const emptyResult: BarColorerStyle = {
 	barColor: '',
+	topColor: '',
+	bottomColor: '',
 	barBorderColor: '',
 	barWickColor: '',
 };
@@ -48,7 +52,7 @@ export class SeriesBarColorer {
 				return this._lineStyle(seriesOptions as LineStyleOptions, barIndex, precomputedBars);
 
 			case 'Area':
-				return this._areaStyle(seriesOptions as AreaStyleOptions);
+				return this._areaStyle(seriesOptions as AreaStyleOptions, barIndex, precomputedBars);
 
 			case 'Baseline':
 				return this._baselineStyle(seriesOptions as BaselineStyleOptions, barIndex, precomputedBars);
@@ -109,10 +113,13 @@ export class SeriesBarColorer {
 		return result;
 	}
 
-	private _areaStyle(areaStyle: AreaStyleOptions): BarColorerStyle {
+	private _areaStyle(areaStyle: AreaStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Area'>;
 		return {
 			...emptyResult,
-			barColor: areaStyle.lineColor,
+			barColor: currentBar.lineColor ?? areaStyle.lineColor,
+			topColor: currentBar.topColor ?? areaStyle.topColor,
+			bottomColor: currentBar.bottomColor ?? areaStyle.bottomColor,
 		};
 	}
 

@@ -3,7 +3,7 @@ import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { OriginalTime, TimePoint, TimePointIndex } from '../model/time-data';
 
-import { BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
+import { AreaData, BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 
 function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Area' | 'Baseline'>> {
 	const val = item.value;
@@ -19,6 +19,30 @@ function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex
 	// eslint-disable-next-line no-restricted-syntax
 	if ('color' in item && item.color !== undefined) {
 		res.color = item.color;
+	}
+
+	return res;
+}
+
+function getAreaSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: AreaData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Area'>> {
+	const val = item.value;
+
+	const res: Mutable<SeriesPlotRow<'Area'>> = { index, time, value: [val, val, val, val], originalTime };
+
+	// 'color', 'topColor', 'bottomColor' here are public properties (from API) so we can use `in` here safely
+	// eslint-disable-next-line no-restricted-syntax
+	if ('lineColor' in item && item.lineColor !== undefined) {
+		res.lineColor = item.lineColor;
+	}
+
+	// eslint-disable-next-line no-restricted-syntax
+	if ('topColor' in item && item.topColor !== undefined) {
+		res.topColor = item.topColor;
+	}
+
+	// eslint-disable-next-line no-restricted-syntax
+	if ('bottomColor' in item && item.bottomColor !== undefined) {
+		res.bottomColor = item.bottomColor;
 	}
 
 	return res;
@@ -66,17 +90,11 @@ export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is 
 	return (row as Partial<SeriesPlotRow>).value !== undefined;
 }
 
-// we want to have compile-time checks that the type of the functions is correct
-// but due contravariance we cannot easily use type of values of the SeriesItemValueFnMap map itself
-// so let's use TimedSeriesItemValueFn for shut up the compiler in seriesItemValueFn
-// we need to be sure (and we're sure actually) that stored data has correct type for it's according series object
 type SeriesItemValueFnMap = {
-	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
+	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime) => Mutable<SeriesPlotRow<T> | WhitespacePlotRow>;
 };
 
-export type TimedSeriesItemValueFn = (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
-
-function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): TimedSeriesItemValueFn {
+function wrapWhitespaceData<TSeriesType extends SeriesType>(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): SeriesItemValueFnMap[TSeriesType] {
 	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime) => {
 		if (isWhitespaceData(bar)) {
 			return { time, index, originalTime };
@@ -89,12 +107,12 @@ function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) 
 const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Candlestick: wrapWhitespaceData(getCandlestickSeriesPlotRow),
 	Bar: wrapWhitespaceData(getBarSeriesPlotRow),
-	Area: wrapWhitespaceData(getLineBasedSeriesPlotRow),
+	Area: wrapWhitespaceData(getAreaSeriesPlotRow),
 	Baseline: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 	Histogram: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 };
 
-export function getSeriesPlotRowCreator(seriesType: SeriesType): TimedSeriesItemValueFn {
-	return seriesPlotRowFnMap[seriesType] as TimedSeriesItemValueFn;
+export function getSeriesPlotRowCreator<TSeriesType extends SeriesType>(seriesType: TSeriesType): SeriesItemValueFnMap[TSeriesType] {
+	return seriesPlotRowFnMap[seriesType];
 }

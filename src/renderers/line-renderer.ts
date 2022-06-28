@@ -5,7 +5,7 @@ import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-
 import { ScaledRenderer } from './scaled-renderer';
 import { getControlPoints, walkLine } from './walk-line';
 
-export type LineItem = TimedValue & PricedValue & LinePoint & { color?: string };
+export type LineItem = TimedValue & PricedValue & LinePoint & { lineColor?: string };
 
 export interface PaneRendererLineDataBase {
 	lineType: LineType;
@@ -47,8 +47,8 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 			ctx.moveTo(point.x - this._data.barWidth / 2, point.y);
 			ctx.lineTo(point.x + this._data.barWidth / 2, point.y);
 
-			if (point.color !== undefined) {
-				ctx.strokeStyle = point.color;
+			if (point.lineColor !== undefined) {
+				ctx.strokeStyle = point.lineColor;
 			}
 
 			ctx.stroke();
@@ -85,7 +85,7 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 		const firstItem = items[visibleRange.from];
 		ctx.moveTo(firstItem.x, firstItem.y);
 
-		let prevStrokeStyle = firstItem.color ?? lineColor;
+		let prevStrokeStyle = firstItem.lineColor ?? lineColor;
 		ctx.strokeStyle = prevStrokeStyle;
 
 		const changeColor = (color: string) => {
@@ -97,7 +97,7 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 
 		for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
 			const currItem = items[i];
-			const currentStrokeStyle = currItem.color ?? lineColor;
+			const currentStrokeStyle = currItem.lineColor ?? lineColor;
 
 			switch (lineType) {
 				case LineType.Simple:

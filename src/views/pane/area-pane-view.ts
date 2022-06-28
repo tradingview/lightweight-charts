@@ -2,8 +2,9 @@ import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
+import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
-import { PaneRendererArea } from '../../renderers/area-renderer';
+import { AreaItem, PaneRendererArea } from '../../renderers/area-renderer';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { LineItem, PaneRendererLine } from '../../renderers/line-renderer';
@@ -55,7 +56,22 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		return this._renderer;
 	}
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice): LineItem {
-		return this._createRawItemBase(time, price);
+	protected override _updateOptions(): void {
+		const colorer = this._series.barColorer();
+		this._items.forEach((item: AreaItem) => {
+			const style = colorer.barStyle(item.time);
+			item.lineColor = style.barColor;
+			item.topColor = style.topColor;
+			item.bottomColor = style.bottomColor;
+		});
+	}
+
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer): AreaItem {
+		const item = this._createRawItemBase(time, price) as AreaItem;
+		const style = colorer.barStyle(time);
+		item.lineColor = style.barColor;
+		item.topColor = style.topColor;
+		item.bottomColor = style.bottomColor;
+		return item;
 	}
 }

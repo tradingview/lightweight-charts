@@ -1,5 +1,9 @@
 function compareAreaData(obj1, obj2) {
-	return obj1.time === obj2.time && obj1.value === obj2.value;
+	return obj1.time === obj2.time
+		&& obj1.value === obj2.value
+		&& obj1.lineColor === obj2.lineColor
+		&& obj1.topColor === obj2.topColor
+		&& obj1.bottomColor === obj2.bottomColor;
 }
 
 function compareLineData(obj1, obj2) {
@@ -103,9 +107,9 @@ function runTestCase(container) {
 		{ time: '1990-04-24', value: 0 },
 		{ time: '1990-04-25', value: 1 },
 		{ time: '1990-04-27', value: 2 },
-		{ time: '1990-04-28', value: 3 },
-		{ time: '1990-04-29', value: 4 },
-		{ time: '1990-04-30', value: 5 },
+		{ time: '1990-04-28', value: 3, lineColor: '#FF0000', topColor: '#00FF00', bottomColor: '#0000FF' },
+		{ time: '1990-04-29', value: 4, lineColor: '#FF0000', topColor: '#00FF00', bottomColor: '#0000FF' },
+		{ time: '1990-04-30', value: 5, lineColor: '#FF0000', topColor: '#00FF00', bottomColor: '#0000FF' },
 	]);
 
 	console.assert(areaSeries.dataByIndex(-1) === null, 'should return null for logical index that is outside of data');
@@ -116,7 +120,13 @@ function runTestCase(container) {
 	);
 
 	console.assert(areaSeries.dataByIndex(6) === null, 'should return null for logical index that is outside of data');
-	console.assert(compareAreaData(areaSeries.dataByIndex(5), { time: '1990-04-30', value: 5 }), 'incorrect item at index 5: ' + JSON.stringify(areaSeries.dataByIndex(5)));
+	console.assert(
+		compareAreaData(
+			areaSeries.dataByIndex(5),
+			{ time: '1990-04-30', value: 5, lineColor: '#FF0000', topColor: '#00FF00', bottomColor: '#0000FF' }
+		),
+		'incorrect item at index 5: ' + JSON.stringify(areaSeries.dataByIndex(5))
+	);
 	console.assert(
 		compareAreaData(areaSeries.dataByIndex(6, LightweightCharts.MismatchDirection.NearestLeft), areaSeries.dataByIndex(5)),
 		'should return nearest left item if mismatch direction is MismatchDirection.NearestLeft'

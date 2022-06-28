@@ -1,5 +1,6 @@
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import {
+	AreaPlotRow,
 	BarPlotRow,
 	CandlestickPlotRow,
 	LinePlotRow,
@@ -9,6 +10,7 @@ import { SeriesType } from '../model/series-options';
 import { Time } from '../model/time-data';
 
 import {
+	AreaData,
 	BarData,
 	CandlestickData,
 	LineData,
@@ -33,6 +35,24 @@ function lineData(plotRow: LinePlotRow): LineData {
 
 	if (plotRow.color !== undefined) {
 		result.color = plotRow.color;
+	}
+
+	return result;
+}
+
+function areaData(plotRow: AreaPlotRow): AreaData {
+	const result: AreaData = singleValueData(plotRow);
+
+	if (plotRow.lineColor !== undefined) {
+		result.lineColor = plotRow.lineColor;
+	}
+
+	if (plotRow.topColor !== undefined) {
+		result.topColor = plotRow.topColor;
+	}
+
+	if (plotRow.bottomColor !== undefined) {
+		result.bottomColor = plotRow.bottomColor;
 	}
 
 	return result;
@@ -78,7 +98,7 @@ function candlestickData(plotRow: CandlestickPlotRow): CandlestickData {
 }
 
 const seriesPlotRowToDataMap: SeriesPlotRowToDataMap = {
-	Area: singleValueData,
+	Area: areaData,
 	Line: lineData,
 	Baseline: singleValueData,
 	Histogram: lineData,
