@@ -15,9 +15,7 @@ function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex
 
 	const res: Mutable<SeriesPlotRow<'Line' | 'Histogram'>> = { index, time, value: [val, val, val, val], originalTime };
 
-	// 'color' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('color' in item && item.color !== undefined) {
+	if (item.color !== undefined) {
 		res.color = item.color;
 	}
 
@@ -29,19 +27,15 @@ function getAreaSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: Area
 
 	const res: Mutable<SeriesPlotRow<'Area'>> = { index, time, value: [val, val, val, val], originalTime };
 
-	// 'color', 'topColor', 'bottomColor' here are public properties (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('lineColor' in item && item.lineColor !== undefined) {
+	if (item.lineColor !== undefined) {
 		res.lineColor = item.lineColor;
 	}
 
-	// eslint-disable-next-line no-restricted-syntax
-	if ('topColor' in item && item.topColor !== undefined) {
+	if (item.topColor !== undefined) {
 		res.topColor = item.topColor;
 	}
 
-	// eslint-disable-next-line no-restricted-syntax
-	if ('bottomColor' in item && item.bottomColor !== undefined) {
+	if (item.bottomColor !== undefined) {
 		res.bottomColor = item.bottomColor;
 	}
 
@@ -51,9 +45,7 @@ function getAreaSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: Area
 function getBarSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BarData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Bar'>> {
 	const res: Mutable<SeriesPlotRow<'Bar'>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
 
-	// 'color' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('color' in item && item.color !== undefined) {
+	if (item.color !== undefined) {
 		res.color = item.color;
 	}
 
@@ -62,22 +54,15 @@ function getBarSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BarDa
 
 function getCandlestickSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: CandlestickData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Candlestick'>> {
 	const res: Mutable<SeriesPlotRow<'Candlestick'>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
-
-	// 'color' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('color' in item && item.color !== undefined) {
+	if (item.color !== undefined) {
 		res.color = item.color;
 	}
 
-	// 'borderColor' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('borderColor' in item && item.borderColor !== undefined) {
+	if (item.borderColor !== undefined) {
 		res.borderColor = item.borderColor;
 	}
 
-	// 'wickColor' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('wickColor' in item && item.wickColor !== undefined) {
+	if (item.wickColor !== undefined) {
 		res.wickColor = item.wickColor;
 	}
 
