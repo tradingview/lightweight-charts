@@ -23,7 +23,7 @@ export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area' | 'Ba
 		priceScale.pointsArrayToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
 	}
 
-	protected abstract _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer): ItemType;
+	protected abstract _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<TSeriesType>): ItemType;
 
 	protected _createRawItemBase(time: TimePointIndex, price: BarPrice): PricedValue & TimedValue {
 		return {

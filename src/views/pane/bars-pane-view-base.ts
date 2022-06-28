@@ -24,9 +24,9 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick'
 		priceScale.barPricesToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
 	}
 
-	protected abstract _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer): ItemType;
+	protected abstract _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<TSeriesType>): ItemType;
 
-	protected _createDefaultItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer): BarCandlestickItemBase {
+	protected _createDefaultItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<TSeriesType>): BarCandlestickItemBase {
 		return {
 			time: time,
 			open: bar.value[PlotRowValueIndex.Open] as BarPrice,

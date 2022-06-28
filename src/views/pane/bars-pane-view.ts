@@ -40,7 +40,7 @@ export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 		});
 	}
 
-	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer): BarItem {
+	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<'Bar'>): BarItem {
 		return {
 			...this._createDefaultItem(time, bar, colorer),
 			color: colorer.barStyle(time).barColor,

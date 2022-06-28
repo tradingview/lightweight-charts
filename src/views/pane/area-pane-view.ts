@@ -66,7 +66,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		});
 	}
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer): AreaItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Area'>): AreaItem {
 		const item = this._createRawItemBase(time, price) as AreaItem;
 		const style = colorer.barStyle(time);
 		item.lineColor = style.barColor;

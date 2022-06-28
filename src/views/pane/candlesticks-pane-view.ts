@@ -43,7 +43,7 @@ export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', 
 		});
 	}
 
-	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer): CandlestickItem {
+	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<'Candlestick'>): CandlestickItem {
 		const style = colorer.barStyle(time);
 		return {
 			...this._createDefaultItem(time, bar, colorer),
