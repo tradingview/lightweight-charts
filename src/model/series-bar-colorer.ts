@@ -1,5 +1,3 @@
-import { SeriesDataItemTypeMap } from '../api/data-consumer';
-
 import { ensure, ensureNotNull } from '../helpers/assertions';
 
 import { PlotRowValueIndex } from './plot-data';
@@ -12,6 +10,7 @@ import {
 	CandlestickStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
+	SeriesOptionsMap,
 	SeriesType,
 } from './series-options';
 import { TimePointIndex } from './time-data';
@@ -58,7 +57,7 @@ type StyleGetterFn<T extends SeriesType> = (
 ) => BarStylesMap[T];
 
 type BarStylesFnMap = {
-	[T in keyof SeriesDataItemTypeMap]: StyleGetterFn<T>;
+	[T in keyof SeriesOptionsMap]: StyleGetterFn<T>;
 };
 
 const barStyleFnMap: BarStylesFnMap = {
