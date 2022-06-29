@@ -54,6 +54,12 @@ describe('getSeriesPlotRowCreator', () => {
 			{
 				value: 4,
 				time: 1649931070 as UTCTimestamp,
+				topFillColor1: '#000001',
+				topFillColor2: '#000002',
+				topLineColor: '#000003',
+				bottomFillColor1: '#000004',
+				bottomFillColor2: '#000005',
+				bottomLineColor: '#000006',
 			},
 			1649931070 as unknown as OriginalTime
 		)).to.deep.equal({
@@ -61,6 +67,12 @@ describe('getSeriesPlotRowCreator', () => {
 			time: { timestamp: 1649931070 as UTCTimestamp },
 			value: [4, 4, 4, 4],
 			originalTime: 1649931070 as unknown as OriginalTime,
+			topFillColor1: '#000001',
+			topFillColor2: '#000002',
+			topLineColor: '#000003',
+			bottomFillColor1: '#000004',
+			bottomFillColor2: '#000005',
+			bottomLineColor: '#000006',
 		});
 	});
 

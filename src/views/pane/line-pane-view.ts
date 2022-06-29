@@ -4,11 +4,11 @@ import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
-import { LineItem, PaneRendererLine, PaneRendererLineData } from '../../renderers/line-renderer';
+import { LineStrokeItem, PaneRendererLine, PaneRendererLineData } from '../../renderers/line-renderer';
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
+export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineStrokeItem> {
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 
 	// eslint-disable-next-line no-useless-constructor
@@ -39,15 +39,10 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
 		return this._lineRenderer;
 	}
 
-	protected override _updateOptions(): void {
-		this._items.forEach((item: LineItem) => {
-			item.lineColor = this._series.barColorer().barStyle(item.time).barColor;
-		});
-	}
-
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Line'>): LineItem {
-		const item = this._createRawItemBase(time, price) as LineItem;
-		item.lineColor = colorer.barStyle(time).barColor;
-		return item;
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Line'>): LineStrokeItem {
+		return {
+			...this._createRawItemBase(time, price),
+			... colorer.barStyle(time),
+		};
 	}
 }

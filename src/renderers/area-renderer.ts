@@ -1,14 +1,15 @@
 import { Coordinate } from '../model/coordinate';
 import { PricedValue } from '../model/price-scale';
+import { AreaFillColorerStyle } from '../model/series-bar-colorer';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
 import { getControlPoints } from './walk-line';
 
-export type AreaItem = TimedValue & PricedValue & LinePoint & { lineColor?: string; topColor?: string; bottomColor?: string };
-export interface PaneRendererAreaDataBase {
-	items: AreaItem[];
+export type AreaFillItemBase = TimedValue & PricedValue & LinePoint;
+export interface PaneRendererAreaDataBase<TItem extends AreaFillItemBase = AreaFillItemBase> {
+	items: TItem[];
 	lineType: LineType;
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
@@ -46,21 +47,10 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		ctx.beginPath();
 
 		const firstItem = items[visibleRange.from];
-		ctx.moveTo(firstItem.x, firstItem.y);
-
 		let currentFillStyle = this._fillStyle(ctx, firstItem);
 		let currentFillStyleFirstItem = firstItem;
 
-		const changeFillStyle = (fillStyle: CanvasRenderingContext2D['fillStyle'], currentItem: AreaItem) => {
-			ctx.lineTo(currentItem.x, baseLevelCoordinate);
-			ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
-			ctx.closePath();
-			ctx.fillStyle = currentFillStyle;
-			ctx.fill();
-			ctx.beginPath();
-			currentFillStyle = fillStyle;
-			currentFillStyleFirstItem = currentItem;
-		};
+		type TItem = TData['items'][0];
 
 		if (visibleRange.from === visibleRange.to) {
 			const halfBarWidth = barWidth / 2;
@@ -69,7 +59,20 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 			ctx.lineTo(firstItem.x + halfBarWidth, firstItem.y);
 			ctx.lineTo(firstItem.x + halfBarWidth, baseLevelCoordinate);
 		} else {
-			let currentItem: AreaItem | undefined;
+			const changeFillStyle = (fillStyle: CanvasRenderingContext2D['fillStyle'], currentItem: TItem) => {
+				ctx.lineTo(currentItem.x, baseLevelCoordinate);
+				ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
+				ctx.closePath();
+				ctx.fillStyle = currentFillStyle;
+				ctx.fill();
+				ctx.beginPath();
+				currentFillStyle = fillStyle;
+				currentFillStyleFirstItem = currentItem;
+			};
+
+			let currentItem: TData['items'][0] | undefined;
+
+			ctx.moveTo(firstItem.x, firstItem.y);
 			for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
 				currentItem = items[i];
 				const itemFillStyle = this._fillStyle(ctx, currentItem);
@@ -103,7 +106,7 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 
 			if (visibleRange.to > visibleRange.from) {
 				// visibleRange.from !== visibleRange.to so currentItem should be initialized here
-				ctx.lineTo((currentItem as AreaItem).x, baseLevelCoordinate);
+				ctx.lineTo((currentItem as TItem).x, baseLevelCoordinate);
 				ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
 			}
 		}
@@ -113,43 +116,43 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		ctx.fill();
 	}
 
-	protected abstract _fillStyle(ctx: CanvasRenderingContext2D, item: AreaItem): CanvasRenderingContext2D['fillStyle'];
+	protected abstract _fillStyle(ctx: CanvasRenderingContext2D, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];
 }
 
-export interface PaneRendererAreaData extends PaneRendererAreaDataBase {
-	topColor: string;
-	bottomColor: string;
+export type AreaFillItem = AreaFillItemBase & Partial<AreaFillColorerStyle>;
+export interface PaneRendererAreaData extends PaneRendererAreaDataBase<AreaFillItem>, AreaFillColorerStyle {
 }
 
-interface FillStyleCache {
-	topColor: string;
-	bottomColor: string;
+interface AreaFillCache extends Record<keyof AreaFillColorerStyle, string> {
 	fillStyle: CanvasRenderingContext2D['fillStyle'];
+	bottom: Coordinate;
 }
 
 export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData> {
-	private _fillStyleCache: FillStyleCache | null = null;
+	private _fillCache: AreaFillCache | null = null;
 
-	protected override _fillStyle(ctx: CanvasRenderingContext2D, item: AreaItem): CanvasRenderingContext2D['fillStyle'] {
+	protected override _fillStyle(ctx: CanvasRenderingContext2D, item: AreaFillItem): CanvasRenderingContext2D['fillStyle'] {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
 		const topColor = item.topColor ?? data.topColor;
 		const bottomColor = item.bottomColor ?? data.bottomColor;
+		const bottom = data.bottom;
 
 		if (
-			this._fillStyleCache !== null &&
-			this._fillStyleCache.topColor === topColor &&
-			this._fillStyleCache.bottomColor === bottomColor
+			this._fillCache !== null &&
+			this._fillCache.topColor === topColor &&
+			this._fillCache.bottomColor === bottomColor &&
+			this._fillCache.bottom === bottom
 		) {
-			return this._fillStyleCache.fillStyle;
+			return this._fillCache.fillStyle;
 		}
 
-		const fillStyle = ctx.createLinearGradient(0, 0, 0, data.bottom);
+		const fillStyle = ctx.createLinearGradient(0, 0, 0, bottom);
 		fillStyle.addColorStop(0, topColor);
 		fillStyle.addColorStop(1, bottomColor);
 
-		this._fillStyleCache = { topColor, bottomColor, fillStyle };
+		this._fillCache = { topColor, bottomColor, fillStyle, bottom };
 
 		return fillStyle;
 	}

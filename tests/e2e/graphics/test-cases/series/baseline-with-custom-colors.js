@@ -4,9 +4,18 @@ function generateBar(i, target) {
 	target.value = base * (1 - step);
 
 	if ((i % 10) > 4) {
-		target.lineColor = 'yellow';
-		target.topColor = 'black';
-		target.bottomColor = 'blue';
+		target.topFillColor1 = 'red';
+		target.topFillColor2 = 'rgba(255, 0, 0, 0)';
+	}
+
+	if ((i % 10) > 6) {
+		target.bottomFillColor1 = 'yellow';
+		target.bottomFillColor2 = 'rgba(255, 255, 0, 0)';
+	}
+
+	if ((i % 10) > 5) {
+		target.topLineColor = 'blue';
+		target.bottomLineColor = 'green';
 	}
 }
 
@@ -28,7 +37,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	const mainSeries = chart.addAreaSeries();
+	const mainSeries = chart.addBaselineSeries({ baseValue: { type: 'price', price: 50 } });
 
 	mainSeries.setData(generateData());
 }

@@ -24,13 +24,38 @@ export interface CommonBarColorerStyle {
 	barColor: string;
 }
 
-export interface AreaBarColorerStyle extends CommonBarColorerStyle {
+export interface LineStrokeColorerStyle {
+	lineColor: string;
+}
+
+export interface LineBarColorerStyle extends CommonBarColorerStyle, LineStrokeColorerStyle {
+}
+
+export interface HistogramBarColorerStyle extends CommonBarColorerStyle {
+}
+export interface AreaFillColorerStyle {
 	topColor: string;
 	bottomColor: string;
 }
+export interface AreaBarColorerStyle extends CommonBarColorerStyle, AreaFillColorerStyle, LineStrokeColorerStyle {
+}
+
+export interface BaselineStrokeColorerStyle {
+	topLineColor: string;
+	bottomLineColor: string;
+}
+
+export interface BaselineFillColorerStyle {
+	topFillColor1: string;
+	topFillColor2: string;
+	bottomFillColor2: string;
+	bottomFillColor1: string;
+}
+
+export interface BaselineBarColorerStyle extends CommonBarColorerStyle, BaselineStrokeColorerStyle, BaselineFillColorerStyle {
+}
 
 export interface BarColorerStyle extends CommonBarColorerStyle {
-	barBorderColor: string;
 }
 
 export interface CandlesticksColorerStyle extends CommonBarColorerStyle {
@@ -42,9 +67,9 @@ export interface BarStylesMap {
 	Bar: BarColorerStyle;
 	Candlestick: CandlesticksColorerStyle;
 	Area: AreaBarColorerStyle;
-	Baseline: CommonBarColorerStyle;
-	Line: CommonBarColorerStyle;
-	Histogram: CommonBarColorerStyle;
+	Baseline: BaselineBarColorerStyle;
+	Line: LineBarColorerStyle;
+	Histogram: HistogramBarColorerStyle;
 }
 
 type FindBarFn = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars) => SeriesPlotRow | null;
@@ -65,15 +90,12 @@ const barStyleFnMap: BarStylesFnMap = {
 	Bar: (findBar: FindBarFn, barStyle: BarStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle => {
 		const upColor = barStyle.upColor;
 		const downColor = barStyle.downColor;
-		const borderUpColor = upColor;
-		const borderDownColor = downColor;
 
 		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Bar'>;
 		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
 		return {
 			barColor: currentBar.color ?? (isUp ? upColor : downColor),
-			barBorderColor: currentBar.color ?? (isUp ? borderUpColor : borderDownColor),
 		};
 	},
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -100,29 +122,37 @@ const barStyleFnMap: BarStylesFnMap = {
 		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Area'>;
 		return {
 			barColor: currentBar.lineColor ?? areaStyle.lineColor,
+			lineColor: currentBar.lineColor ?? areaStyle.lineColor,
 			topColor: currentBar.topColor ?? areaStyle.topColor,
 			bottomColor: currentBar.bottomColor ?? areaStyle.bottomColor,
 		};
 	},
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	Baseline: (findBar: FindBarFn, baselineStyle: BaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CommonBarColorerStyle => {
+	Baseline: (findBar: FindBarFn, baselineStyle: BaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BaselineBarColorerStyle => {
 		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Baseline'>;
 		const isAboveBaseline = currentBar.value[PlotRowValueIndex.Close] >= baselineStyle.baseValue.price;
 
 		return {
 			barColor: isAboveBaseline ? baselineStyle.topLineColor : baselineStyle.bottomLineColor,
+			topLineColor: currentBar.topLineColor ?? baselineStyle.topLineColor,
+			bottomLineColor: currentBar.bottomLineColor ?? baselineStyle.bottomLineColor,
+			topFillColor1: currentBar.topFillColor1 ?? baselineStyle.topFillColor1,
+			topFillColor2: currentBar.topFillColor2 ?? baselineStyle.topFillColor2,
+			bottomFillColor1: currentBar.bottomFillColor1 ?? baselineStyle.bottomFillColor1,
+			bottomFillColor2: currentBar.bottomFillColor2 ?? baselineStyle.bottomFillColor2,
 		};
 	},
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	Line: (findBar: FindBarFn, lineStyle: LineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CommonBarColorerStyle => {
+	Line: (findBar: FindBarFn, lineStyle: LineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): LineBarColorerStyle => {
 		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
 
 		return {
 			barColor: currentBar.color ?? lineStyle.color,
+			lineColor: currentBar.color ?? lineStyle.color,
 		};
 	},
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	Histogram: (findBar: FindBarFn, histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CommonBarColorerStyle => {
+	Histogram: (findBar: FindBarFn, histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): HistogramBarColorerStyle => {
 		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Histogram'>;
 		return {
 			barColor: currentBar.color ?? histogramStyle.color,

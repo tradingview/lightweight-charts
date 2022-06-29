@@ -34,7 +34,12 @@ export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area' | 'Ba
 		};
 	}
 
-	protected _updateOptions(): void {}
+	protected _updateOptions(): void {
+		this._items = this._items.map((item: ItemType) => ({
+			...item,
+			...this._series.barColorer().barStyle(item.time),
+		}));
+	}
 
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();

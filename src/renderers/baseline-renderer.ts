@@ -1,56 +1,116 @@
 import { clamp } from '../helpers/mathex';
 
 import { Coordinate } from '../model/coordinate';
+import { BaselineFillColorerStyle, BaselineStrokeColorerStyle } from '../model/series-bar-colorer';
 
-import { PaneRendererAreaBase, PaneRendererAreaDataBase } from './area-renderer';
-import { PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer';
+import { AreaFillItemBase, PaneRendererAreaBase, PaneRendererAreaDataBase } from './area-renderer';
+import { LineItemBase as LineStrokeItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer';
 
-export interface PaneRendererBaselineData extends PaneRendererAreaDataBase {
-	topFillColor1: string;
-	topFillColor2: string;
-
-	bottomFillColor1: string;
-	bottomFillColor2: string;
+export type BaselineFillItem = AreaFillItemBase & Partial<BaselineFillColorerStyle>;
+export interface PaneRendererBaselineData extends PaneRendererAreaDataBase<BaselineFillItem>, BaselineFillColorerStyle {
 }
 
+interface BaselineFillCache extends Record<keyof BaselineFillColorerStyle, string> {
+	fillStyle: CanvasRenderingContext2D['fillStyle'];
+	baseLevelCoordinate: Coordinate;
+	bottom: Coordinate;
+}
 export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererBaselineData> {
-	protected override _fillStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['fillStyle'] {
+	private _fillCache: BaselineFillCache | null = null;
+
+	protected override _fillStyle(ctx: CanvasRenderingContext2D, item: BaselineFillItem): CanvasRenderingContext2D['fillStyle'] {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
-		const baselinePercent = clamp(data.baseLevelCoordinate / data.bottom, 0, 1);
+		const topFillColor1 = item.topFillColor1 ?? data.topFillColor1;
+		const topFillColor2 = item.topFillColor2 ?? data.topFillColor2;
+		const bottomFillColor1 = item.bottomFillColor1 ?? data.bottomFillColor1;
+		const bottomFillColor2 = item.bottomFillColor2 ?? data.bottomFillColor2;
+		const { baseLevelCoordinate, bottom } = data;
 
-		gradient.addColorStop(0, data.topFillColor1);
-		gradient.addColorStop(baselinePercent, data.topFillColor2);
-		gradient.addColorStop(baselinePercent, data.bottomFillColor1);
-		gradient.addColorStop(1, data.bottomFillColor2);
+		if (
+			this._fillCache !== null &&
+			this._fillCache.topFillColor1 === topFillColor1 &&
+			this._fillCache.topFillColor2 === topFillColor2 &&
+			this._fillCache.bottomFillColor1 === bottomFillColor1 &&
+			this._fillCache.bottomFillColor2 === bottomFillColor2 &&
+			this._fillCache.baseLevelCoordinate === baseLevelCoordinate &&
+			this._fillCache.bottom === bottom
+		) {
+			return this._fillCache.fillStyle;
+		}
 
-		return gradient;
+		const fillStyle = ctx.createLinearGradient(0, 0, 0, bottom);
+		const baselinePercent = clamp(baseLevelCoordinate / bottom, 0, 1);
+
+		fillStyle.addColorStop(0, topFillColor1);
+		fillStyle.addColorStop(baselinePercent, topFillColor2);
+		fillStyle.addColorStop(baselinePercent, bottomFillColor1);
+		fillStyle.addColorStop(1, bottomFillColor2);
+
+		this._fillCache = {
+			topFillColor1,
+			topFillColor2,
+			bottomFillColor1,
+			bottomFillColor2,
+			fillStyle,
+			baseLevelCoordinate,
+			bottom,
+		};
+
+		return fillStyle;
 	}
 }
 
-export interface PaneRendererBaselineLineData extends PaneRendererLineDataBase {
-	topColor: string;
-	bottomColor: string;
+export type BaselineStrokeItem = LineStrokeItemBase & Partial<BaselineStrokeColorerStyle>;
+export interface PaneRendererBaselineLineData extends PaneRendererLineDataBase<BaselineStrokeItem>, BaselineStrokeColorerStyle {
+	baseLevelCoordinate: Coordinate;
+	bottom: Coordinate;
+}
 
+interface BaselineStrokeCache extends Record<keyof BaselineStrokeColorerStyle, string> {
+	strokeStyle: CanvasRenderingContext2D['strokeStyle'];
 	baseLevelCoordinate: Coordinate;
 	bottom: Coordinate;
 }
 
 export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererBaselineLineData> {
-	protected override _strokeStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['strokeStyle'] {
+	private _strokeCache: BaselineStrokeCache | null = null;
+
+	protected override _strokeStyle(ctx: CanvasRenderingContext2D, item: BaselineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
-		const baselinePercent = clamp(data.baseLevelCoordinate / data.bottom, 0, 1);
+		const topLineColor = item.topLineColor ?? data.topLineColor;
+		const bottomLineColor = item.bottomLineColor ?? data.bottomLineColor;
+		const { baseLevelCoordinate, bottom } = data;
 
-		gradient.addColorStop(0, data.topColor);
-		gradient.addColorStop(baselinePercent, data.topColor);
-		gradient.addColorStop(baselinePercent, data.bottomColor);
-		gradient.addColorStop(1, data.bottomColor);
+		if (
+			this._strokeCache !== null &&
+			this._strokeCache.topLineColor === topLineColor &&
+			this._strokeCache.bottomLineColor === bottomLineColor &&
+			this._strokeCache.baseLevelCoordinate === baseLevelCoordinate &&
+			this._strokeCache.bottom === bottom
+		) {
+			return this._strokeCache.strokeStyle;
+		}
 
-		return gradient;
+		const strokeStyle = ctx.createLinearGradient(0, 0, 0, bottom);
+		const baselinePercent = clamp(baseLevelCoordinate / bottom, 0, 1);
+
+		strokeStyle.addColorStop(0, topLineColor);
+		strokeStyle.addColorStop(baselinePercent, topLineColor);
+		strokeStyle.addColorStop(baselinePercent, bottomLineColor);
+		strokeStyle.addColorStop(1, bottomLineColor);
+
+		this._strokeCache = {
+			topLineColor,
+			bottomLineColor,
+			strokeStyle,
+			baseLevelCoordinate,
+			bottom,
+		};
+
+		return strokeStyle;
 	}
 }

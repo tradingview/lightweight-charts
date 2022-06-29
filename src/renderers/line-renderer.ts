@@ -1,16 +1,17 @@
 import { PricedValue } from '../model/price-scale';
+import { LineStrokeColorerStyle } from '../model/series-bar-colorer';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
-import { getControlPoints, walkLine } from './walk-line';
+import { getControlPoints } from './walk-line';
 
-export type LineItem = TimedValue & PricedValue & LinePoint & { lineColor?: string };
+export type LineItemBase = TimedValue & PricedValue & LinePoint;
 
-export interface PaneRendererLineDataBase {
+export interface PaneRendererLineDataBase<TItem extends LineItemBase = LineItemBase> {
 	lineType: LineType;
 
-	items: LineItem[];
+	items: TItem[];
 
 	barWidth: number;
 
@@ -32,105 +33,80 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 			return;
 		}
 
+		const { items, visibleRange, barWidth, lineType, lineWidth, lineStyle } = this._data;
+
 		ctx.lineCap = 'butt';
-		ctx.lineWidth = this._data.lineWidth;
+		ctx.lineWidth = lineWidth;
 
-		setLineStyle(ctx, this._data.lineStyle);
+		setLineStyle(ctx, lineStyle);
 
-		ctx.strokeStyle = this._strokeStyle(ctx);
 		ctx.lineJoin = 'round';
 
-		if (this._data.items.length === 1) {
-			ctx.beginPath();
-
-			const point = this._data.items[0];
-			ctx.moveTo(point.x - this._data.barWidth / 2, point.y);
-			ctx.lineTo(point.x + this._data.barWidth / 2, point.y);
-
-			if (point.lineColor !== undefined) {
-				ctx.strokeStyle = point.lineColor;
-			}
-
-			ctx.stroke();
-		} else {
-			this._drawLine(ctx, this._data);
-		}
-	}
-
-	protected _drawLine(ctx: CanvasRenderingContext2D, data: TData): void {
-		ctx.beginPath();
-		walkLine(ctx, data.items, data.lineType, data.visibleRange as SeriesItemsIndexesRange);
-		ctx.stroke();
-	}
-
-	protected abstract _strokeStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['strokeStyle'];
-}
-
-export interface PaneRendererLineData extends PaneRendererLineDataBase {
-	lineColor: string;
-}
-
-export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData> {
-	/**
-	 * Similar to {@link walkLine}, but supports color changes
-	 */
-	protected override _drawLine(ctx: CanvasRenderingContext2D, data: PaneRendererLineData): void {
-		const { items, visibleRange, lineType, lineColor } = data;
-		if (items.length === 0 || visibleRange === null) {
-			return;
-		}
-
-		ctx.beginPath();
-
 		const firstItem = items[visibleRange.from];
-		ctx.moveTo(firstItem.x, firstItem.y);
+		let currentStrokeStyle = this._strokeStyle(ctx, firstItem);
+		ctx.beginPath();
 
-		let prevStrokeStyle = firstItem.lineColor ?? lineColor;
-		ctx.strokeStyle = prevStrokeStyle;
-
-		const changeColor = (color: string) => {
-			ctx.stroke();
+		if (visibleRange.from === visibleRange.to) {
 			ctx.beginPath();
-			ctx.strokeStyle = color;
-			prevStrokeStyle = color;
-		};
 
-		for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
-			const currItem = items[i];
-			const currentStrokeStyle = currItem.lineColor ?? lineColor;
+			ctx.moveTo(firstItem.x - barWidth / 2, firstItem.y);
+			ctx.lineTo(firstItem.x + barWidth / 2, firstItem.y);
+		} else {
+			const changeStrokeStyle = (strokeStyle: CanvasRenderingContext2D['strokeStyle']) => {
+				ctx.strokeStyle = currentStrokeStyle;
+				ctx.stroke();
+				ctx.beginPath();
+				currentStrokeStyle = strokeStyle;
+			};
 
-			switch (lineType) {
-				case LineType.Simple:
-					ctx.lineTo(currItem.x, currItem.y);
-					break;
-				case LineType.WithSteps:
-					ctx.lineTo(currItem.x, items[i - 1].y);
+			ctx.moveTo(firstItem.x, firstItem.y);
 
-					if (currentStrokeStyle !== prevStrokeStyle) {
-						changeColor(currentStrokeStyle);
-						ctx.lineTo(currItem.x, items[i - 1].y);
+			for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
+				const currentItem = items[i];
+				const itemStrokeStyle = this._strokeStyle(ctx, currentItem);
+
+				switch (lineType) {
+					case LineType.Simple:
+						ctx.lineTo(currentItem.x, currentItem.y);
+						break;
+					case LineType.WithSteps:
+						ctx.lineTo(currentItem.x, items[i - 1].y);
+
+						if (currentStrokeStyle !== itemStrokeStyle) {
+							changeStrokeStyle(itemStrokeStyle);
+							ctx.lineTo(currentItem.x, items[i - 1].y);
+						}
+
+						ctx.lineTo(currentItem.x, currentItem.y);
+						break;
+					case LineType.Curved: {
+						const [cp1, cp2] = getControlPoints(items, i - 1, i);
+						ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currentItem.x, currentItem.y);
+						break;
 					}
+				}
 
-					ctx.lineTo(currItem.x, currItem.y);
-					break;
-				case LineType.Curved: {
-					const [cp1, cp2] = getControlPoints(items, i - 1, i);
-					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
-					break;
+				if (lineType !== LineType.WithSteps && currentStrokeStyle !== itemStrokeStyle) {
+					changeStrokeStyle(itemStrokeStyle);
+					ctx.moveTo(currentItem.x, currentItem.y);
 				}
 			}
 
-			if (lineType !== LineType.WithSteps && currentStrokeStyle !== prevStrokeStyle) {
-				changeColor(currentStrokeStyle);
-				ctx.moveTo(currItem.x, currItem.y);
-			}
+			ctx.strokeStyle = currentStrokeStyle;
+			ctx.stroke();
 		}
-
-		ctx.stroke();
 	}
 
-	protected override _strokeStyle(): CanvasRenderingContext2D['strokeStyle'] {
+	protected abstract _strokeStyle(ctx: CanvasRenderingContext2D, item: TData['items'][0]): CanvasRenderingContext2D['strokeStyle'];
+}
+
+export type LineStrokeItem = LineItemBase & Partial<LineStrokeColorerStyle>;
+export interface PaneRendererLineData extends PaneRendererLineDataBase<LineStrokeItem>, LineStrokeColorerStyle {
+}
+
+export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData> {
+	protected override _strokeStyle(ctx: CanvasRenderingContext2D, item: LineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		return this._data!.lineColor;
+		return item.lineColor ?? this._data!.lineColor;
 	}
 }

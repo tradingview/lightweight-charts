@@ -4,14 +4,14 @@ import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
-import { AreaItem, PaneRendererArea } from '../../renderers/area-renderer';
+import { AreaFillItem, PaneRendererArea } from '../../renderers/area-renderer';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
-import { LineItem, PaneRendererLine } from '../../renderers/line-renderer';
+import { LineStrokeItem, PaneRendererLine } from '../../renderers/line-renderer';
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
+export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & LineStrokeItem> {
 	private readonly _renderer: CompositeRenderer = new CompositeRenderer();
 	private readonly _areaRenderer: PaneRendererArea = new PaneRendererArea();
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
@@ -56,22 +56,10 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		return this._renderer;
 	}
 
-	protected override _updateOptions(): void {
-		const colorer = this._series.barColorer();
-		this._items.forEach((item: AreaItem) => {
-			const style = colorer.barStyle(item.time);
-			item.lineColor = style.barColor;
-			item.topColor = style.topColor;
-			item.bottomColor = style.bottomColor;
-		});
-	}
-
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Area'>): AreaItem {
-		const item = this._createRawItemBase(time, price) as AreaItem;
-		const style = colorer.barStyle(time);
-		item.lineColor = style.barColor;
-		item.topColor = style.topColor;
-		item.bottomColor = style.bottomColor;
-		return item;
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Area'>): AreaFillItem & LineStrokeItem {
+		return {
+			...this._createRawItemBase(time, price),
+			...colorer.barStyle(time),
+		};
 	}
 }

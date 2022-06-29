@@ -12,6 +12,15 @@ export interface AreaPlotRow extends PlotRow {
 	bottomColor?: string;
 }
 
+export interface BaselinePlotRow extends PlotRow {
+	topFillColor1?: string;
+	topFillColor2?: string;
+	topLineColor?: string;
+	bottomFillColor1?: string;
+	bottomFillColor2?: string;
+	bottomLineColor?: string;
+}
+
 export interface HistogramPlotRow extends PlotRow {
 	readonly color?: string;
 }
@@ -30,7 +39,7 @@ export interface SeriesPlotRowTypeAtTypeMap {
 	Bar: BarPlotRow;
 	Candlestick: CandlestickPlotRow;
 	Area: AreaPlotRow;
-	Baseline: PlotRow;
+	Baseline: BaselinePlotRow;
 	Line: LinePlotRow;
 	Histogram: HistogramPlotRow;
 }

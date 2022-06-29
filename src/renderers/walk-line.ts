@@ -1,45 +1,6 @@
 import { Coordinate } from '../model/coordinate';
-import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { LinePoint, LineType } from './draw-line';
-
-/**
- * BEWARE: The method must be called after beginPath and before stroke/fill/closePath/etc
- */
-export function walkLine(
-	ctx: CanvasRenderingContext2D,
-	points: readonly LinePoint[],
-	lineType: LineType,
-	visibleRange: SeriesItemsIndexesRange
-): void {
-	if (points.length === 0) {
-		return;
-	}
-
-	const x = points[visibleRange.from].x as number;
-	const y = points[visibleRange.from].y as number;
-	ctx.moveTo(x, y);
-
-	for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
-		const currItem = points[i];
-
-		switch (lineType) {
-			case LineType.Simple:
-				ctx.lineTo(currItem.x, currItem.y);
-				break;
-			case LineType.WithSteps: {
-				ctx.lineTo(currItem.x, points[i - 1].y);
-				ctx.lineTo(currItem.x, currItem.y);
-				break;
-			}
-			case LineType.Curved: {
-				const [cp1, cp2] = getControlPoints(points, i - 1, i);
-				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currItem.x, currItem.y);
-				break;
-			}
-		}
-	}
-}
+import { LinePoint } from './draw-line';
 
 const curveTension = 6;
 
