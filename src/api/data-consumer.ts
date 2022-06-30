@@ -102,6 +102,9 @@ export interface AreaData extends SingleValueData {
 	bottomColor?: string;
 }
 
+/**
+ * Structure describing a single item of data for baseline series
+ */
 export interface BaselineData extends SingleValueData {
 	/**
 	 * Optional top area top fill color value for certain data item. If missed, color from options is used

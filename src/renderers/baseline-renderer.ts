@@ -22,7 +22,7 @@ export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererB
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const { topFillColor1, topFillColor2, bottomFillColor1, bottomFillColor2} = item;
+		const { topFillColor1, topFillColor2, bottomFillColor1, bottomFillColor2 } = item;
 		const { baseLevelCoordinate, bottom } = data;
 
 		if (
