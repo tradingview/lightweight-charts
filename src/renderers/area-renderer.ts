@@ -30,11 +30,15 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 	}
 
 	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
-		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
+		if (this._data === null) {
 			return;
 		}
 
 		const { items, visibleRange, barWidth, lineWidth, lineStyle, lineType, baseLevelCoordinate } = this._data;
+
+		if (items.length === 0 || visibleRange === null || visibleRange.from >= items.length) {
+			return;
+		}
 
 		ctx.lineCap = 'butt';
 		ctx.lineJoin = 'round';
@@ -52,7 +56,7 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 
 		type TItem = TData['items'][0];
 
-		if (visibleRange.from === visibleRange.to) {
+		if (visibleRange.to - visibleRange.from < 2) {
 			const halfBarWidth = barWidth / 2;
 			ctx.moveTo(firstItem.x - halfBarWidth, baseLevelCoordinate);
 			ctx.lineTo(firstItem.x - halfBarWidth, firstItem.y);
@@ -104,11 +108,9 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 				}
 			}
 
-			if (visibleRange.to > visibleRange.from) {
-				// visibleRange.from !== visibleRange.to so currentItem should be initialized here
-				ctx.lineTo((currentItem as TItem).x, baseLevelCoordinate);
-				ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
-			}
+			// visibleRange.to - visibleRange.from > 1 so currentItem should be initialized here
+			ctx.lineTo((currentItem as TItem).x, baseLevelCoordinate);
+			ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
 		}
 
 		ctx.closePath();
@@ -119,8 +121,8 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 	protected abstract _fillStyle(ctx: CanvasRenderingContext2D, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];
 }
 
-export type AreaFillItem = AreaFillItemBase & Partial<AreaFillColorerStyle>;
-export interface PaneRendererAreaData extends PaneRendererAreaDataBase<AreaFillItem>, AreaFillColorerStyle {
+export type AreaFillItem = AreaFillItemBase & AreaFillColorerStyle;
+export interface PaneRendererAreaData extends PaneRendererAreaDataBase<AreaFillItem> {
 }
 
 interface AreaFillCache extends Record<keyof AreaFillColorerStyle, string> {
@@ -135,8 +137,7 @@ export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData>
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const topColor = item.topColor ?? data.topColor;
-		const bottomColor = item.bottomColor ?? data.bottomColor;
+		const { topColor, bottomColor } = item;
 		const bottom = data.bottom;
 
 		if (

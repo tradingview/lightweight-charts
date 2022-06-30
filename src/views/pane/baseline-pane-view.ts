@@ -40,11 +40,6 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 		this._baselineAreaRenderer.setData({
 			items: this._items,
 
-			topFillColor1: baselineProps.topFillColor1,
-			topFillColor2: baselineProps.topFillColor2,
-			bottomFillColor1: baselineProps.bottomFillColor1,
-			bottomFillColor2: baselineProps.bottomFillColor2,
-
 			lineWidth: baselineProps.lineWidth,
 			lineStyle: baselineProps.lineStyle,
 			lineType: baselineProps.lineType,
@@ -58,9 +53,6 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 
 		this._baselineLineRenderer.setData({
 			items: this._items,
-
-			topLineColor: baselineProps.topLineColor,
-			bottomLineColor: baselineProps.bottomLineColor,
 
 			lineWidth: baselineProps.lineWidth,
 			lineStyle: baselineProps.lineStyle,

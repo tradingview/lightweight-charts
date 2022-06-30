@@ -29,11 +29,15 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 	}
 
 	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
-		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
+		if (this._data === null) {
 			return;
 		}
 
 		const { items, visibleRange, barWidth, lineType, lineWidth, lineStyle } = this._data;
+
+		if (items.length === 0 || visibleRange === null || visibleRange.from >= items.length) {
+			return;
+		}
 
 		ctx.lineCap = 'butt';
 		ctx.lineWidth = lineWidth;
@@ -46,7 +50,7 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 		let currentStrokeStyle = this._strokeStyle(ctx, firstItem);
 		ctx.beginPath();
 
-		if (visibleRange.from === visibleRange.to) {
+		if (visibleRange.to - visibleRange.from < 2) {
 			ctx.beginPath();
 
 			ctx.moveTo(firstItem.x - barWidth / 2, firstItem.y);
@@ -100,13 +104,12 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 	protected abstract _strokeStyle(ctx: CanvasRenderingContext2D, item: TData['items'][0]): CanvasRenderingContext2D['strokeStyle'];
 }
 
-export type LineStrokeItem = LineItemBase & Partial<LineStrokeColorerStyle>;
-export interface PaneRendererLineData extends PaneRendererLineDataBase<LineStrokeItem>, LineStrokeColorerStyle {
+export type LineStrokeItem = LineItemBase & LineStrokeColorerStyle;
+export interface PaneRendererLineData extends PaneRendererLineDataBase<LineStrokeItem> {
 }
 
 export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData> {
 	protected override _strokeStyle(ctx: CanvasRenderingContext2D, item: LineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		return item.lineColor ?? this._data!.lineColor;
+		return item.lineColor;
 	}
 }

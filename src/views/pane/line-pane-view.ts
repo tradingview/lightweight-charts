@@ -26,7 +26,6 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineStrokeItem>
 		this._makeValid();
 		const data: PaneRendererLineData = {
 			items: this._items,
-			lineColor: lineStyleProps.color,
 			lineStyle: lineStyleProps.lineStyle,
 			lineType: lineStyleProps.lineType,
 			lineWidth: lineStyleProps.lineWidth,

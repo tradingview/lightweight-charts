@@ -6,8 +6,8 @@ import { BaselineFillColorerStyle, BaselineStrokeColorerStyle } from '../model/s
 import { AreaFillItemBase, PaneRendererAreaBase, PaneRendererAreaDataBase } from './area-renderer';
 import { LineItemBase as LineStrokeItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer';
 
-export type BaselineFillItem = AreaFillItemBase & Partial<BaselineFillColorerStyle>;
-export interface PaneRendererBaselineData extends PaneRendererAreaDataBase<BaselineFillItem>, BaselineFillColorerStyle {
+export type BaselineFillItem = AreaFillItemBase & BaselineFillColorerStyle;
+export interface PaneRendererBaselineData extends PaneRendererAreaDataBase<BaselineFillItem> {
 }
 
 interface BaselineFillCache extends Record<keyof BaselineFillColorerStyle, string> {
@@ -22,10 +22,7 @@ export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererB
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const topFillColor1 = item.topFillColor1 ?? data.topFillColor1;
-		const topFillColor2 = item.topFillColor2 ?? data.topFillColor2;
-		const bottomFillColor1 = item.bottomFillColor1 ?? data.bottomFillColor1;
-		const bottomFillColor2 = item.bottomFillColor2 ?? data.bottomFillColor2;
+		const { topFillColor1, topFillColor2, bottomFillColor1, bottomFillColor2} = item;
 		const { baseLevelCoordinate, bottom } = data;
 
 		if (
@@ -62,8 +59,8 @@ export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererB
 	}
 }
 
-export type BaselineStrokeItem = LineStrokeItemBase & Partial<BaselineStrokeColorerStyle>;
-export interface PaneRendererBaselineLineData extends PaneRendererLineDataBase<BaselineStrokeItem>, BaselineStrokeColorerStyle {
+export type BaselineStrokeItem = LineStrokeItemBase & BaselineStrokeColorerStyle;
+export interface PaneRendererBaselineLineData extends PaneRendererLineDataBase<BaselineStrokeItem> {
 	baseLevelCoordinate: Coordinate;
 	bottom: Coordinate;
 }
@@ -81,8 +78,7 @@ export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererB
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const topLineColor = item.topLineColor ?? data.topLineColor;
-		const bottomLineColor = item.bottomLineColor ?? data.bottomLineColor;
+		const { topLineColor, bottomLineColor } = item;
 		const { baseLevelCoordinate, bottom } = data;
 
 		if (
