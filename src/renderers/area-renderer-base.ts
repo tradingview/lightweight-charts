@@ -4,7 +4,7 @@ import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
-import { getControlPoints } from './walk-line';
+import { walkLine } from './walk-line';
 
 export type AreaFillItemBase = TimedValue & PricedValue & LinePoint;
 export interface PaneRendererAreaDataBase<TItem extends AreaFillItemBase = AreaFillItemBase> {
@@ -19,6 +19,20 @@ export interface PaneRendererAreaDataBase<TItem extends AreaFillItemBase = AreaF
 	barWidth: number;
 
 	visibleRange: SeriesItemsIndexesRange | null;
+}
+
+function finishStyledArea(
+	baseLevelCoordinate: Coordinate,
+	ctx: CanvasRenderingContext2D,
+	style: CanvasRenderingContext2D['fillStyle'],
+	areaFirstItem: LinePoint,
+	newAreaFirstItem: LinePoint
+): void {
+	ctx.lineTo(newAreaFirstItem.x, baseLevelCoordinate);
+	ctx.lineTo(areaFirstItem.x, baseLevelCoordinate);
+	ctx.closePath();
+	ctx.fillStyle = style;
+	ctx.fill();
 }
 
 export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBase> extends ScaledRenderer {
@@ -47,74 +61,7 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		// walk lines with width=1 to have more accurate gradient's filling
 		ctx.lineWidth = 1;
 
-		ctx.beginPath();
-
-		const firstItem = items[visibleRange.from];
-		let currentFillStyle = this._fillStyle(ctx, firstItem);
-		let currentFillStyleFirstItem = firstItem;
-
-		type TItem = TData['items'][0];
-
-		if (visibleRange.to - visibleRange.from < 2) {
-			const halfBarWidth = barWidth / 2;
-			ctx.moveTo(firstItem.x - halfBarWidth, baseLevelCoordinate);
-			ctx.lineTo(firstItem.x - halfBarWidth, firstItem.y);
-			ctx.lineTo(firstItem.x + halfBarWidth, firstItem.y);
-			ctx.lineTo(firstItem.x + halfBarWidth, baseLevelCoordinate);
-		} else {
-			const changeFillStyle = (fillStyle: CanvasRenderingContext2D['fillStyle'], currentItem: TItem) => {
-				ctx.lineTo(currentItem.x, baseLevelCoordinate);
-				ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
-				ctx.closePath();
-				ctx.fillStyle = currentFillStyle;
-				ctx.fill();
-				ctx.beginPath();
-				currentFillStyle = fillStyle;
-				currentFillStyleFirstItem = currentItem;
-			};
-
-			let currentItem: TData['items'][0] | undefined;
-
-			ctx.moveTo(firstItem.x, firstItem.y);
-			for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
-				currentItem = items[i];
-				const itemFillStyle = this._fillStyle(ctx, currentItem);
-
-				switch (lineType) {
-					case LineType.Simple:
-						ctx.lineTo(currentItem.x, currentItem.y);
-						break;
-					case LineType.WithSteps:
-						ctx.lineTo(currentItem.x, items[i - 1].y);
-
-						if (itemFillStyle !== currentFillStyle) {
-							changeFillStyle(itemFillStyle, currentItem);
-							ctx.lineTo(currentItem.x, items[i - 1].y);
-						}
-
-						ctx.lineTo(currentItem.x, currentItem.y);
-						break;
-					case LineType.Curved: {
-						const [cp1, cp2] = getControlPoints(items, i - 1, i);
-						ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currentItem.x, currentItem.y);
-						break;
-					}
-				}
-
-				if (lineType !== LineType.WithSteps && itemFillStyle !== currentFillStyle) {
-					changeFillStyle(itemFillStyle, currentItem);
-					ctx.moveTo(currentItem.x, currentItem.y);
-				}
-			}
-
-			// visibleRange.to - visibleRange.from > 1 so currentItem should be initialized here
-			ctx.lineTo((currentItem as TItem).x, baseLevelCoordinate);
-			ctx.lineTo(currentFillStyleFirstItem.x, baseLevelCoordinate);
-		}
-
-		ctx.closePath();
-		ctx.fillStyle = currentFillStyle;
-		ctx.fill();
+		walkLine(ctx, items, lineType, visibleRange, barWidth, this._fillStyle.bind(this), finishStyledArea.bind(null, baseLevelCoordinate));
 	}
 
 	protected abstract _fillStyle(ctx: CanvasRenderingContext2D, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];

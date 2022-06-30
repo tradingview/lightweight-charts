@@ -1,4 +1,5 @@
 import { LineStrokeColorerStyle } from '../model/series-bar-colorer';
+
 import { LineItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer-base';
 
 export type LineStrokeItem = LineItemBase & LineStrokeColorerStyle;

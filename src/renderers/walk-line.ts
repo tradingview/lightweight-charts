@@ -1,6 +1,86 @@
 import { Coordinate } from '../model/coordinate';
+import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { LinePoint } from './draw-line';
+import { LinePoint, LineType } from './draw-line';
+
+// eslint-disable-next-line max-params
+export function walkLine<TItem extends LinePoint, TStyle>(
+	ctx: CanvasRenderingContext2D,
+	items: readonly TItem[],
+	lineType: LineType,
+	visibleRange: SeriesItemsIndexesRange,
+	barWidth: number,
+	styleGetter: (ctx: CanvasRenderingContext2D, item: TItem) => TStyle,
+	finishStyledArea: (ctx: CanvasRenderingContext2D, style: TStyle, areaFirstItem: LinePoint, newAreaFirstItem: LinePoint) => void
+): void {
+	const firstItem = items[visibleRange.from];
+	let currentStyle = styleGetter(ctx, firstItem);
+	let currentStyleFirstItem = firstItem;
+
+	if (visibleRange.to - visibleRange.from < 2) {
+		const halfBarWidth = barWidth / 2;
+
+		ctx.beginPath();
+
+		const item1: LinePoint = { x: firstItem.x - halfBarWidth as Coordinate, y: firstItem.y };
+		const item2: LinePoint = { x: firstItem.x + halfBarWidth as Coordinate, y: firstItem.y };
+
+		ctx.moveTo(item1.x, item1.y);
+		ctx.lineTo(item2.x, item2.y);
+
+		finishStyledArea(ctx, currentStyle, item1, item2);
+
+		return;
+	}
+
+	const changeStyle = (newStyle: TStyle, currentItem: TItem) => {
+		finishStyledArea(ctx, currentStyle, currentStyleFirstItem, currentItem);
+
+		ctx.beginPath();
+		currentStyle = newStyle;
+		currentStyleFirstItem = currentItem;
+	};
+
+	let currentItem = currentStyleFirstItem;
+
+	ctx.beginPath();
+	ctx.moveTo(firstItem.x, firstItem.y);
+
+	for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
+		currentItem = items[i];
+		const itemStyle = styleGetter(ctx, currentItem);
+
+		switch (lineType) {
+			case LineType.Simple:
+				ctx.lineTo(currentItem.x, currentItem.y);
+				break;
+			case LineType.WithSteps:
+				ctx.lineTo(currentItem.x, items[i - 1].y);
+
+				if (itemStyle !== currentStyle) {
+					changeStyle(itemStyle, currentItem);
+					ctx.lineTo(currentItem.x, items[i - 1].y);
+				}
+
+				ctx.lineTo(currentItem.x, currentItem.y);
+				break;
+			case LineType.Curved: {
+				const [cp1, cp2] = getControlPoints(items, i - 1, i);
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currentItem.x, currentItem.y);
+				break;
+			}
+		}
+
+		if (lineType !== LineType.WithSteps && itemStyle !== currentStyle) {
+			changeStyle(itemStyle, currentItem);
+			ctx.moveTo(currentItem.x, currentItem.y);
+		}
+	}
+
+	if (currentStyleFirstItem !== currentItem || currentStyleFirstItem === currentItem && lineType === LineType.WithSteps) {
+		finishStyledArea(ctx, currentStyle, currentStyleFirstItem, currentItem);
+	}
+}
 
 const curveTension = 6;
 
