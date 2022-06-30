@@ -4,7 +4,8 @@ import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
-import { BaselineFillItem, BaselineStrokeItem, PaneRendererBaselineArea, PaneRendererBaselineLine } from '../../renderers/baseline-renderer';
+import { BaselineFillItem, PaneRendererBaselineArea } from '../../renderers/baseline-renderer-area';
+import { BaselineStrokeItem, PaneRendererBaselineLine } from '../../renderers/baseline-renderer-line';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 

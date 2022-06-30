@@ -1,6 +1,6 @@
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { LineItemBase } from './line-renderer';
+import { LineItemBase } from './line-renderer-base';
 import { ScaledRenderer } from './scaled-renderer';
 
 export interface MarksRendererData {
