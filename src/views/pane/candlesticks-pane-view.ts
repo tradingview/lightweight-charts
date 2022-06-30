@@ -34,13 +34,6 @@ export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', 
 		return this._renderer;
 	}
 
-	protected _updateOptions(): void {
-		this._items = this._items.map((item: CandlestickItem) => ({
-			...item,
-			...this._series.barColorer().barStyle(item.time),
-		}));
-	}
-
 	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<'Candlestick'>): CandlestickItem {
 		return {
 			...this._createDefaultItem(time, bar, colorer),

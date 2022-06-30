@@ -34,13 +34,6 @@ export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 		return this._renderer;
 	}
 
-	protected _updateOptions(): void {
-		this._items = this._items.map((item: BarItem) => ({
-			...item,
-			...this._series.barColorer().barStyle(item.time),
-		}));
-	}
-
 	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<'Bar'>): BarItem {
 		return {
 			...this._createDefaultItem(time, bar, colorer),

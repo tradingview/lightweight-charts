@@ -55,7 +55,12 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 
 	protected abstract _fillRawPoints(): void;
 
-	protected abstract _updateOptions(): void;
+	protected _updateOptions(): void {
+		this._items = this._items.map((item: ItemType) => ({
+			...item,
+			...this._series.barColorer().barStyle(item.time),
+		}));
+	}
 
 	protected abstract _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void;
 
