@@ -95,10 +95,10 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 					ctx.moveTo(currentItem.x, currentItem.y);
 				}
 			}
-
-			ctx.strokeStyle = currentStrokeStyle;
-			ctx.stroke();
 		}
+
+		ctx.strokeStyle = currentStrokeStyle;
+		ctx.stroke();
 	}
 
 	protected abstract _strokeStyle(ctx: CanvasRenderingContext2D, item: TData['items'][0]): CanvasRenderingContext2D['strokeStyle'];
