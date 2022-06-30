@@ -7,33 +7,33 @@ import { TimePointIndex } from '../../model/time-data';
 import { BaselineFillItem, PaneRendererBaselineArea } from '../../renderers/baseline-renderer-area';
 import { BaselineStrokeItem, PaneRendererBaselineLine } from '../../renderers/baseline-renderer-line';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
-import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', BaselineFillItem & BaselineStrokeItem> {
+export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', BaselineFillItem & BaselineStrokeItem, CompositeRenderer> {
+	protected readonly _renderer: CompositeRenderer = new CompositeRenderer();
 	private readonly _baselineAreaRenderer: PaneRendererBaselineArea = new PaneRendererBaselineArea();
 	private readonly _baselineLineRenderer: PaneRendererBaselineLine = new PaneRendererBaselineLine();
-	private readonly _compositeRenderer: CompositeRenderer = new CompositeRenderer();
 
 	public constructor(series: Series<'Baseline'>, model: ChartModel) {
 		super(series, model);
-		this._compositeRenderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
+		this._renderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
-		if (!this._series.visible()) {
-			return null;
-		}
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
+		return {
+			...this._createRawItemBase(time, price),
+			...colorer.barStyle(time),
+		};
+	}
 
+	protected _prepareRendererData(width: number, height: number): void {
 		const firstValue = this._series.firstValue();
 		if (firstValue === null) {
-			return null;
+			return;
 		}
 
 		const baselineProps = this._series.options();
-
-		this._makeValid();
 
 		const baseLevelCoordinate = this._series.priceScale().priceToCoordinate(baselineProps.baseValue.price, firstValue.value);
 		const barWidth = this._model.timeScale().barSpacing();
@@ -65,14 +65,5 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 			visibleRange: this._itemsVisibleRange,
 			barWidth,
 		});
-
-		return this._compositeRenderer;
-	}
-
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
-		return {
-			...this._createRawItemBase(time, price),
-			...colorer.barStyle(time),
-		};
 	}
 }

@@ -10,11 +10,16 @@ import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { SeriesPlotRow } from '../../model/series-data';
 import { TimedValue, TimePointIndex } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
+import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-export abstract class LinePaneViewBase<TSeriesType extends 'Line' | 'Area' | 'Baseline', ItemType extends PricedValue & TimedValue> extends SeriesPaneViewBase<TSeriesType, ItemType> {
-	protected constructor(series: Series<TSeriesType>, model: ChartModel) {
+export abstract class LinePaneViewBase<
+	TSeriesType extends 'Line' | 'Area' | 'Baseline' | 'Histogram',
+	ItemType extends PricedValue & TimedValue,
+	TRenderer extends IPaneRenderer
+> extends SeriesPaneViewBase<TSeriesType, ItemType, TRenderer> {
+	public constructor(series: Series<TSeriesType>, model: ChartModel) {
 		super(series, model, true);
 	}
 

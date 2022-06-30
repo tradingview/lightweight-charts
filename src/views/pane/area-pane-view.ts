@@ -6,13 +6,12 @@ import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { AreaFillItem, PaneRendererArea } from '../../renderers/area-renderer';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
-import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { LineStrokeItem, PaneRendererLine } from '../../renderers/line-renderer';
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & LineStrokeItem> {
-	private readonly _renderer: CompositeRenderer = new CompositeRenderer();
+export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & LineStrokeItem, CompositeRenderer> {
+	protected readonly _renderer: CompositeRenderer = new CompositeRenderer();
 	private readonly _areaRenderer: PaneRendererArea = new PaneRendererArea();
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 
@@ -21,14 +20,15 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 		this._renderer.setRenderers([this._areaRenderer, this._lineRenderer]);
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
-		if (!this._series.visible()) {
-			return null;
-		}
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Area'>): AreaFillItem & LineStrokeItem {
+		return {
+			...this._createRawItemBase(time, price),
+			...colorer.barStyle(time),
+		};
+	}
 
+	protected _prepareRendererData(width: number, height: number): void {
 		const areaStyleProperties = this._series.options();
-
-		this._makeValid();
 
 		this._areaRenderer.setData({
 			lineType: areaStyleProperties.lineType,
@@ -49,14 +49,5 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		});
-
-		return this._renderer;
-	}
-
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Area'>): AreaFillItem & LineStrokeItem {
-		return {
-			...this._createRawItemBase(time, price),
-			...colorer.barStyle(time),
-		};
 	}
 }
