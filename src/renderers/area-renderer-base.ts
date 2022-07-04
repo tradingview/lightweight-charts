@@ -49,7 +49,7 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 
 		const { items, visibleRange, barWidth, lineWidth, lineStyle, lineType, baseLevelCoordinate } = this._data;
 
-		if (items.length === 0 || visibleRange === null || visibleRange.from >= items.length) {
+		if (visibleRange === null) {
 			return;
 		}
 

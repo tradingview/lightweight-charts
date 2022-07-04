@@ -39,7 +39,7 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 
 		const { items, visibleRange, barWidth, lineType, lineWidth, lineStyle } = this._data;
 
-		if (items.length === 0 || visibleRange === null || visibleRange.from >= items.length) {
+		if (visibleRange === null) {
 			return;
 		}
 

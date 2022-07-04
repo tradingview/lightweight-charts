@@ -10,9 +10,15 @@ export function walkLine<TItem extends LinePoint, TStyle>(
 	lineType: LineType,
 	visibleRange: SeriesItemsIndexesRange,
 	barWidth: number,
+	// the values returned by styleGetter are compared using the operator !==,
+	// so if styleGetter returns objects, then styleGetter should return the same object for equal styles
 	styleGetter: (ctx: CanvasRenderingContext2D, item: TItem) => TStyle,
 	finishStyledArea: (ctx: CanvasRenderingContext2D, style: TStyle, areaFirstItem: LinePoint, newAreaFirstItem: LinePoint) => void
 ): void {
+	if (items.length === 0 || visibleRange.from >= items.length) {
+		return;
+	}
+
 	const firstItem = items[visibleRange.from];
 	let currentStyle = styleGetter(ctx, firstItem);
 	let currentStyleFirstItem = firstItem;
