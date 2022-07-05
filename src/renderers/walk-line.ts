@@ -3,7 +3,7 @@ import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { LinePoint, LineType } from './draw-line';
 
-// eslint-disable-next-line max-params
+// eslint-disable-next-line max-params, complexity
 export function walkLine<TItem extends LinePoint, TStyle>(
 	ctx: CanvasRenderingContext2D,
 	items: readonly TItem[],
