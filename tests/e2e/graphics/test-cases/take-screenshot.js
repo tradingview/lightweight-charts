@@ -95,17 +95,13 @@ function runTestCase(container) {
 	// create canvas to draw screenshot
 	chart.resize(600, 240, true);
 
-	window.requestAnimationFrame(() => {
-		window.requestAnimationFrame(() => {
-			const screenshot = chart.takeScreenshot();
-			screenshot.style.position = 'absolute';
-			screenshot.style.top = '260px';
-			screenshot.style.width = '600px';
-			screenshot.style.height = '240px';
+	const screenshot = chart.takeScreenshot();
+	screenshot.style.position = 'absolute';
+	screenshot.style.top = '260px';
+	screenshot.style.width = '600px';
+	screenshot.style.height = '240px';
 
-			const parent = container.parentNode;
-			parent.style.backgroundColor = 'yellow';
-			parent.appendChild(screenshot);
-		});
-	});
+	const parent = container.parentNode;
+	parent.style.backgroundColor = 'yellow';
+	parent.appendChild(screenshot);
 }
