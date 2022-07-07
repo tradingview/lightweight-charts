@@ -1,3 +1,4 @@
+import { CanvasElementCoordsRenderingScope } from './canvas-rendering-target';
 import { ScaledRenderer } from './scaled-renderer';
 
 export interface WatermarkRendererLineData {
@@ -36,13 +37,12 @@ export class WatermarkRenderer extends ScaledRenderer {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {}
+	protected _drawImpl(renderingScope: CanvasElementCoordsRenderingScope): void {}
 
-	protected override _drawBackgroundImpl(ctx: CanvasRenderingContext2D): void {
+	protected override _drawBackgroundImpl({ context: ctx }: CanvasElementCoordsRenderingScope): void {
 		if (!this._data.visible) {
 			return;
 		}
-		ctx.save();
 
 		let textHeight = 0;
 		for (const line of this._data.lines) {
@@ -107,8 +107,6 @@ export class WatermarkRenderer extends ScaledRenderer {
 			ctx.restore();
 			vertOffset += line.lineHeight * line.zoom;
 		}
-
-		ctx.restore();
 	}
 
 	private _metrics(ctx: CanvasRenderingContext2D, text: string): number {
