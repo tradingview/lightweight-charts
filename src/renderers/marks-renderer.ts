@@ -1,6 +1,6 @@
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { CanvasElementCoordsRenderingScope } from './canvas-rendering-target';
+import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { LineItem } from './line-renderer';
 import { ScaledRenderer } from './scaled-renderer';
 
@@ -19,7 +19,7 @@ export class PaneRendererMarks extends ScaledRenderer {
 		this._data = data;
 	}
 
-	protected _drawImpl({ context: ctx }: CanvasElementCoordsRenderingScope): void {
+	protected _drawImpl({ context: ctx }: MediaCoordsRenderingScope): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}

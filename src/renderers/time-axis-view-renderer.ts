@@ -98,7 +98,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
 		}
 
-		target.useCanvasElementCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
+		target.useMediaCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
 			const data = ensureNotNull(this._data);
 
 			const yText =

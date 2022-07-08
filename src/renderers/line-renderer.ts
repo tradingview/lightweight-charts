@@ -1,7 +1,7 @@
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { CanvasElementCoordsRenderingScope } from './canvas-rendering-target';
+import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
 import { getControlPoints, walkLine } from './walk-line';
@@ -28,7 +28,7 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 		this._data = data;
 	}
 
-	protected _drawImpl({ context: ctx }: CanvasElementCoordsRenderingScope): void {
+	protected _drawImpl({ context: ctx }: MediaCoordsRenderingScope): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}

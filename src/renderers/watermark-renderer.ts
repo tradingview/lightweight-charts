@@ -1,4 +1,4 @@
-import { CanvasElementCoordsRenderingScope } from './canvas-rendering-target';
+import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { ScaledRenderer } from './scaled-renderer';
 
 export interface WatermarkRendererLineData {
@@ -37,9 +37,9 @@ export class WatermarkRenderer extends ScaledRenderer {
 		this._data = data;
 	}
 
-	protected _drawImpl(renderingScope: CanvasElementCoordsRenderingScope): void {}
+	protected _drawImpl(renderingScope: MediaCoordsRenderingScope): void {}
 
-	protected override _drawBackgroundImpl({ context: ctx }: CanvasElementCoordsRenderingScope): void {
+	protected override _drawBackgroundImpl({ context: ctx }: MediaCoordsRenderingScope): void {
 		if (!this._data.visible) {
 			return;
 		}

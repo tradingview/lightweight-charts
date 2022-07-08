@@ -3,9 +3,9 @@ import { CanvasElementBitmapSizeBinding, Size } from 'fancy-canvas';
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 
-export interface CanvasElementCoordsRenderingScope {
+export interface MediaCoordsRenderingScope {
 	context: CanvasRenderingContext2D;
-	canvasElementClientSize: Size;
+	mediaSize: Size;
 }
 
 export class CanvasRenderingTarget implements IDestroyable {
@@ -52,13 +52,13 @@ export class CanvasRenderingTarget implements IDestroyable {
 		return this.bitmapSize.height / this.canvasElementClientSize.height;
 	}
 
-	public useCanvasElementCoordinates<T>(f: (scope: CanvasElementCoordsRenderingScope) => T): T {
+	public useMediaCoordinates<T>(f: (scope: MediaCoordsRenderingScope) => T): T {
 		if (this._context === null) {
 			throw new Error('Object is disposed');
 		}
 		this._context.save();
 		this._context.scale(this.horizontalPixelRatio, this.verticalPixelRatio);
-		const result = f({ context: this._context, canvasElementClientSize: this.canvasElementClientSize });
+		const result = f({ context: this._context, mediaSize: this.canvasElementClientSize });
 		this._context.restore();
 		return result;
 	}

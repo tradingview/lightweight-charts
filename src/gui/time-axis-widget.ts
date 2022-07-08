@@ -370,7 +370,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			ctx.fill();
 		}
 
-		target.useCanvasElementCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
+		target.useMediaCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
 			context.fillStyle = this._textColor();
 
 			// draw base marks

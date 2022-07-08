@@ -1,7 +1,7 @@
 import { Coordinate } from '../model/coordinate';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { CanvasElementCoordsRenderingScope } from './canvas-rendering-target';
+import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { LineItem } from './line-renderer';
 import { ScaledRenderer } from './scaled-renderer';
@@ -28,7 +28,7 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		this._data = data;
 	}
 
-	protected _drawImpl({ context: ctx }: CanvasElementCoordsRenderingScope): void {
+	protected _drawImpl({ context: ctx }: MediaCoordsRenderingScope): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
