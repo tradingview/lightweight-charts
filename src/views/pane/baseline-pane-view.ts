@@ -1,6 +1,5 @@
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
-import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
 import { TimePointIndex } from '../../model/time-data';
 import { PaneRendererBaselineArea, PaneRendererBaselineLine } from '../../renderers/baseline-renderer';
@@ -20,7 +19,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 		this._compositeRenderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}
@@ -50,7 +49,6 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 			lineType: baselineProps.lineType,
 
 			baseLevelCoordinate,
-			bottom: height as Coordinate,
 
 			visibleRange: this._itemsVisibleRange,
 			barWidth,
@@ -67,7 +65,6 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', LineIte
 			lineType: baselineProps.lineType,
 
 			baseLevelCoordinate,
-			bottom: height as Coordinate,
 
 			visibleRange: this._itemsVisibleRange,
 			barWidth,

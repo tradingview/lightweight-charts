@@ -13,8 +13,7 @@ export interface PaneRendererAreaDataBase {
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
 
-	bottom: Coordinate;
-	baseLevelCoordinate: Coordinate;
+	baseLevelCoordinate: Coordinate | null;
 
 	barWidth: number;
 
@@ -28,10 +27,13 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		this._data = data;
 	}
 
-	protected _drawImpl({ context: ctx }: MediaCoordsRenderingScope): void {
+	protected _drawImpl(renderingScope: MediaCoordsRenderingScope): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
+
+		const ctx = renderingScope.context;
+		const baseLevelCoordinate = this._data.baseLevelCoordinate ?? renderingScope.mediaSize.height;
 
 		ctx.lineCap = 'butt';
 		ctx.lineJoin = 'round';
@@ -46,28 +48,28 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		if (this._data.items.length === 1) {
 			const point = this._data.items[0];
 			const halfBarWidth = this._data.barWidth / 2;
-			ctx.moveTo(point.x - halfBarWidth, this._data.baseLevelCoordinate);
+			ctx.moveTo(point.x - halfBarWidth, baseLevelCoordinate);
 			ctx.lineTo(point.x - halfBarWidth, point.y);
 			ctx.lineTo(point.x + halfBarWidth, point.y);
-			ctx.lineTo(point.x + halfBarWidth, this._data.baseLevelCoordinate);
+			ctx.lineTo(point.x + halfBarWidth, baseLevelCoordinate);
 		} else {
-			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.baseLevelCoordinate);
+			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, baseLevelCoordinate);
 			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
 
 			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
 
 			if (this._data.visibleRange.to > this._data.visibleRange.from) {
-				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.baseLevelCoordinate);
-				ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.baseLevelCoordinate);
+				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, baseLevelCoordinate);
+				ctx.lineTo(this._data.items[this._data.visibleRange.from].x, baseLevelCoordinate);
 			}
 		}
 		ctx.closePath();
 
-		ctx.fillStyle = this._fillStyle(ctx);
+		ctx.fillStyle = this._fillStyle(renderingScope);
 		ctx.fill();
 	}
 
-	protected abstract _fillStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['fillStyle'];
+	protected abstract _fillStyle(renderingScope: MediaCoordsRenderingScope): CanvasRenderingContext2D['fillStyle'];
 }
 
 export interface PaneRendererAreaData extends PaneRendererAreaDataBase {
@@ -76,11 +78,12 @@ export interface PaneRendererAreaData extends PaneRendererAreaDataBase {
 }
 
 export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData> {
-	protected override _fillStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['fillStyle'] {
+	protected override _fillStyle(renderingScope: MediaCoordsRenderingScope): CanvasRenderingContext2D['fillStyle'] {
+		const { context: ctx, mediaSize } = renderingScope;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const gradient = ctx.createLinearGradient(0, 0, 0, data.bottom);
+		const gradient = ctx.createLinearGradient(0, 0, 0, mediaSize.height);
 		gradient.addColorStop(0, data.topColor);
 		gradient.addColorStop(1, data.bottomColor);
 		return gradient;

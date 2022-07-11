@@ -28,17 +28,19 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 		this._data = data;
 	}
 
-	protected _drawImpl({ context: ctx }: MediaCoordsRenderingScope): void {
+	protected _drawImpl(renderingScope: MediaCoordsRenderingScope): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
+
+		const ctx = renderingScope.context;
 
 		ctx.lineCap = 'butt';
 		ctx.lineWidth = this._data.lineWidth;
 
 		setLineStyle(ctx, this._data.lineStyle);
 
-		ctx.strokeStyle = this._strokeStyle(ctx);
+		ctx.strokeStyle = this._strokeStyle(renderingScope);
 		ctx.lineJoin = 'round';
 
 		if (this._data.items.length === 1) {
@@ -64,7 +66,7 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 		ctx.stroke();
 	}
 
-	protected abstract _strokeStyle(ctx: CanvasRenderingContext2D): CanvasRenderingContext2D['strokeStyle'];
+	protected abstract _strokeStyle(renderingScope: MediaCoordsRenderingScope): CanvasRenderingContext2D['strokeStyle'];
 }
 
 export interface PaneRendererLineData extends PaneRendererLineDataBase {

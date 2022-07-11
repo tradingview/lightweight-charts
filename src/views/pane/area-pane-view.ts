@@ -1,6 +1,5 @@
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
-import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
 import { TimePointIndex } from '../../model/time-data';
 import { PaneRendererArea } from '../../renderers/area-renderer';
@@ -20,7 +19,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 		this._renderer.setRenderers([this._areaRenderer, this._lineRenderer]);
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}
@@ -36,8 +35,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', LineItem> {
 			lineWidth: areaStyleProperties.lineWidth,
 			topColor: areaStyleProperties.topColor,
 			bottomColor: areaStyleProperties.bottomColor,
-			baseLevelCoordinate: height as Coordinate,
-			bottom: height as Coordinate,
+			baseLevelCoordinate: null,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		});
