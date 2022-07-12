@@ -9,7 +9,7 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 		super(series);
 	}
 
-	protected _updateImpl(height: number, width: number): void {
+	protected _updateImpl(): void {
 		const data = this._lineRendererData;
 		data.visible = false;
 
@@ -26,8 +26,6 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 		data.visible = true;
 		data.y = lastValueData.coordinate;
 		data.color = this._series.priceLineColor(lastValueData.color);
-		data.width = width;
-		data.height = height;
 		data.lineWidth = seriesOptions.priceLineWidth;
 		data.lineStyle = seriesOptions.priceLineStyle;
 	}

@@ -6,13 +6,11 @@ import { drawHorizontalLine, LineStyle, LineWidth, setLineStyle } from './draw-l
 
 export interface HorizontalLineRendererData {
 	color: string;
-	height: number;
 	lineStyle: LineStyle;
 	lineWidth: LineWidth;
 
 	y: Coordinate;
 	visible?: boolean;
-	width: number;
 }
 
 export class HorizontalLineRenderer extends BitmapCoordinatesPaneRenderer {
@@ -36,11 +34,10 @@ export class HorizontalLineRenderer extends BitmapCoordinatesPaneRenderer {
 			return;
 		}
 
-		const width = Math.ceil(this._data.width * horizontalPixelRatio);
 		ctx.lineCap = 'butt';
 		ctx.strokeStyle = this._data.color;
 		ctx.lineWidth = Math.floor(this._data.lineWidth * horizontalPixelRatio);
 		setLineStyle(ctx, this._data.lineStyle);
-		drawHorizontalLine(ctx, y, 0, width);
+		drawHorizontalLine(ctx, y, 0, bitmapSize.width);
 	}
 }
