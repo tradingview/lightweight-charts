@@ -4,8 +4,16 @@ import { assert, ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 
 export interface MediaCoordsRenderingScope {
-	context: CanvasRenderingContext2D;
-	mediaSize: Size;
+	readonly context: CanvasRenderingContext2D;
+	readonly mediaSize: Size;
+}
+
+export interface BitmapCoordsRenderingScope {
+	readonly context: CanvasRenderingContext2D;
+	readonly mediaSize: Size;
+	readonly bitmapSize: Size;
+	readonly horizontalPixelRatio: number;
+	readonly verticalPixelRatio: number;
 }
 
 export class CanvasRenderingTarget implements IDestroyable {
@@ -59,6 +67,22 @@ export class CanvasRenderingTarget implements IDestroyable {
 		this._context.save();
 		this._context.scale(this.horizontalPixelRatio, this.verticalPixelRatio);
 		const result = f({ context: this._context, mediaSize: this.canvasElementClientSize });
+		this._context.restore();
+		return result;
+	}
+
+	public useBitmapCoordinates<T>(f: (scope: BitmapCoordsRenderingScope) => T): T {
+		if (this._context === null) {
+			throw new Error('Object is disposed');
+		}
+		this._context.save();
+		const result = f({
+			context: this._context,
+			mediaSize: this.canvasElementClientSize,
+			bitmapSize: this.bitmapSize,
+			horizontalPixelRatio: this.horizontalPixelRatio,
+			verticalPixelRatio: this.verticalPixelRatio,
+		});
 		this._context.restore();
 		return result;
 	}

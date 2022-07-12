@@ -1,6 +1,6 @@
-import { CanvasRenderingTarget } from './canvas-rendering-target';
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
+import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
 
 export interface CrosshairLineStyle {
 	lineStyle: LineStyle;
@@ -18,14 +18,15 @@ export interface CrosshairRendererData {
 	h: number;
 }
 
-export class CrosshairRenderer implements IPaneRenderer {
+export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
 	private readonly _data: CrosshairRendererData | null;
 
 	public constructor(data: CrosshairRendererData | null) {
+		super();
 		this._data = data;
 	}
 
-	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
@@ -36,10 +37,6 @@ export class CrosshairRenderer implements IPaneRenderer {
 		if (!vertLinesVisible && !horzLinesVisible) {
 			return;
 		}
-
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
-
-		ctx.save();
 
 		const x = Math.round(this._data.x * horizontalPixelRatio);
 		const y = Math.round(this._data.y * verticalPixelRatio);
@@ -63,7 +60,5 @@ export class CrosshairRenderer implements IPaneRenderer {
 			setLineStyle(ctx, this._data.horzLine.lineStyle);
 			drawHorizontalLine(ctx, y, 0, w);
 		}
-
-		ctx.restore();
 	}
 }

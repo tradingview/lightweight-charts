@@ -2,9 +2,9 @@ import { ensureNotNull } from '../helpers/assertions';
 
 import { PriceMark } from '../model/price-scale';
 
-import { CanvasRenderingTarget } from './canvas-rendering-target';
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
+import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { LineStyle, setLineStyle, strokeInPixel } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
 
 export interface GridMarks {
 	coord: number;
@@ -24,19 +24,17 @@ export interface GridRendererData {
 	w: number;
 }
 
-export class GridRenderer implements IPaneRenderer {
+export class GridRenderer extends BitmapCoordinatesPaneRenderer {
 	private _data: GridRendererData | null = null;
 
 	public setData(data: GridRendererData | null): void {
 		this._data = data;
 	}
 
-	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
-
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
 
 		const lineWidth = Math.max(1, Math.floor(horizontalPixelRatio));
 		ctx.lineWidth = lineWidth;

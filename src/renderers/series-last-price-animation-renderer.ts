@@ -1,7 +1,7 @@
 import { Point } from '../model/point';
 
-import { CanvasRenderingTarget } from './canvas-rendering-target';
-import { IPaneRenderer } from './ipane-renderer';
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
+import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 
 export interface LastPriceCircleRendererData {
 	radius: number;
@@ -12,7 +12,7 @@ export interface LastPriceCircleRendererData {
 	center: Point;
 }
 
-export class SeriesLastPriceAnimationRenderer implements IPaneRenderer {
+export class SeriesLastPriceAnimationRenderer extends BitmapCoordinatesPaneRenderer {
 	private _data: LastPriceCircleRendererData | null = null;
 
 	public setData(data: LastPriceCircleRendererData | null): void {
@@ -23,15 +23,11 @@ export class SeriesLastPriceAnimationRenderer implements IPaneRenderer {
 		return this._data;
 	}
 
-	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
 		const data = this._data;
 		if (data === null) {
 			return;
 		}
-
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
-
-		ctx.save();
 
 		const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
 
@@ -56,6 +52,5 @@ export class SeriesLastPriceAnimationRenderer implements IPaneRenderer {
 		ctx.beginPath();
 		ctx.arc(centerX, centerY, data.radius * horizontalPixelRatio + tickWidth / 2, 0, 2 * Math.PI, false);
 		ctx.stroke();
-		ctx.restore();
 	}
 }

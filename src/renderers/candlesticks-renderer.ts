@@ -3,8 +3,8 @@ import { fillRectInnerBorder } from '../helpers/canvas-helpers';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { BarCandlestickItemBase } from './bars-renderer';
-import { CanvasRenderingTarget } from './canvas-rendering-target';
-import { IPaneRenderer } from './ipane-renderer';
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
+import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { optimalCandlestickWidth } from './optimal-bar-width';
 
 export interface CandlestickItem extends BarCandlestickItemBase {
@@ -28,7 +28,7 @@ const enum Constants {
 	BarBorderWidth = 1,
 }
 
-export class PaneRendererCandlesticks implements IPaneRenderer {
+export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 	private _data: PaneRendererCandlesticksData | null = null;
 
 	// scaled with pixelRatio
@@ -38,12 +38,12 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		this._data = data;
 	}
 
-	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+	protected override _drawImpl(renderingScope: BitmapCoordsRenderingScope): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 
-		const { horizontalPixelRatio } = target;
+		const { horizontalPixelRatio } = renderingScope;
 
 		// now we know pixelRatio and we could calculate barWidth effectively
 		this._barWidth = optimalCandlestickWidth(this._data.barSpacing, horizontalPixelRatio);
@@ -61,26 +61,26 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 
 		const bars = this._data.bars;
 		if (this._data.wickVisible) {
-			this._drawWicks(target, bars, this._data.visibleRange);
+			this._drawWicks(renderingScope, bars, this._data.visibleRange);
 		}
 
 		if (this._data.borderVisible) {
-			this._drawBorder(target, bars, this._data.visibleRange, this._data.barSpacing);
+			this._drawBorder(renderingScope, bars, this._data.visibleRange, this._data.barSpacing);
 		}
 
 		const borderWidth = this._calculateBorderWidth(horizontalPixelRatio);
 
 		if (!this._data.borderVisible || this._barWidth > borderWidth * 2) {
-			this._drawCandles(target, bars, this._data.visibleRange);
+			this._drawCandles(renderingScope, bars, this._data.visibleRange);
 		}
 	}
 
-	private _drawWicks(target: CanvasRenderingTarget, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
+	private _drawWicks(renderingScope: BitmapCoordsRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = renderingScope;
 
 		let prevWickColor = '';
 		let wickWidth = Math.min(
@@ -138,12 +138,12 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		return res;
 	}
 
-	private _drawBorder(target: CanvasRenderingTarget, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, barSpacing: number): void {
+	private _drawBorder(renderingScope: BitmapCoordsRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, barSpacing: number): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = renderingScope;
 
 		let prevBorderColor: string | undefined = '';
 		const borderWidth = this._calculateBorderWidth(horizontalPixelRatio);
@@ -178,12 +178,12 @@ export class PaneRendererCandlesticks implements IPaneRenderer {
 		}
 	}
 
-	private _drawCandles(target: CanvasRenderingTarget, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
+	private _drawCandles(renderingScope: BitmapCoordsRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = renderingScope;
 
 		let prevBarColor = '';
 		const borderWidth = this._calculateBorderWidth(horizontalPixelRatio);

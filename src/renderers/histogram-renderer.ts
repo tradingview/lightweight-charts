@@ -1,8 +1,8 @@
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue, TimePointIndex } from '../model/time-data';
 
-import { CanvasRenderingTarget } from './canvas-rendering-target';
-import { IPaneRenderer } from './ipane-renderer';
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
+import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 
 const showSpacingMinimalBarWidth = 1;
 const alignToMinimalWidthLimit = 4;
@@ -28,7 +28,7 @@ interface PrecalculatedItemCoordinates {
 	time: TimePointIndex;
 }
 
-export class PaneRendererHistogram implements IPaneRenderer {
+export class PaneRendererHistogram extends BitmapCoordinatesPaneRenderer {
 	private _data: PaneRendererHistogramData | null = null;
 	private _precalculatedCache: PrecalculatedItemCoordinates[] = [];
 
@@ -37,15 +37,13 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		this._precalculatedCache = [];
 	}
 
-	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 		if (!this._precalculatedCache.length) {
-			this._fillPrecalculatedCache(target.horizontalPixelRatio);
+			this._fillPrecalculatedCache(horizontalPixelRatio);
 		}
-
-		const { context: ctx, verticalPixelRatio } = target;
 
 		const tickWidth = Math.max(1, Math.floor(verticalPixelRatio));
 		const histogramBase = Math.round((this._data.histogramBase) * verticalPixelRatio);

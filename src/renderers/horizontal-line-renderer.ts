@@ -1,8 +1,8 @@
 import { Coordinate } from '../model/coordinate';
 
-import { CanvasRenderingTarget } from './canvas-rendering-target';
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
+import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { drawHorizontalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
 
 export interface HorizontalLineRendererData {
 	color: string;
@@ -15,14 +15,14 @@ export interface HorizontalLineRendererData {
 	width: number;
 }
 
-export class HorizontalLineRenderer implements IPaneRenderer {
+export class HorizontalLineRenderer extends BitmapCoordinatesPaneRenderer {
 	private _data: HorizontalLineRendererData | null = null;
 
 	public setData(data: HorizontalLineRendererData): void {
 		this._data = data;
 	}
 
-	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+	protected _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
@@ -31,10 +31,8 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 			return;
 		}
 
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
-
 		const y = Math.round(this._data.y * verticalPixelRatio);
-		if (y < 0 || y > target.bitmapSize.height) {
+		if (y < 0 || y > bitmapSize.height) {
 			return;
 		}
 

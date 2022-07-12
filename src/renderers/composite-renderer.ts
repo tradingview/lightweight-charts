@@ -10,9 +10,7 @@ export class CompositeRenderer implements IPaneRenderer {
 
 	public draw(target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
 		this._renderers.forEach((r: IPaneRenderer) => {
-			target.context.save();
 			r.draw(target, isHovered, hitTestData);
-			target.context.restore();
 		});
 	}
 }
