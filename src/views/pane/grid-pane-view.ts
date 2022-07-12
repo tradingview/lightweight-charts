@@ -17,13 +17,11 @@ export class GridPaneView implements IUpdatablePaneView {
 		this._invalidated = true;
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (this._invalidated) {
 			const gridOptions = this._pane.model().options().grid;
 
 			const data: GridRendererData = {
-				h: height,
-				w: width,
 				horzLinesVisible: gridOptions.horzLines.visible,
 				vertLinesVisible: gridOptions.vertLines.visible,
 				horzLinesColor: gridOptions.horzLines.color,

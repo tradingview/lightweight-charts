@@ -19,9 +19,6 @@ export interface GridRendererData {
 	horzLinesColor: string;
 	horzLineStyle: LineStyle;
 	priceMarks: PriceMark[];
-
-	h: number;
-	w: number;
 }
 
 export class GridRenderer extends BitmapCoordinatesPaneRenderer {
@@ -31,16 +28,13 @@ export class GridRenderer extends BitmapCoordinatesPaneRenderer {
 		this._data = data;
 	}
 
-	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	protected override _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
 
 		const lineWidth = Math.max(1, Math.floor(horizontalPixelRatio));
 		ctx.lineWidth = lineWidth;
-
-		const height = Math.ceil(this._data.h * verticalPixelRatio);
-		const width = Math.ceil(this._data.w * horizontalPixelRatio);
 
 		strokeInPixel(ctx, () => {
 			const data = ensureNotNull(this._data);
@@ -51,7 +45,7 @@ export class GridRenderer extends BitmapCoordinatesPaneRenderer {
 				for (const timeMark of data.timeMarks) {
 					const x = Math.round(timeMark.coord * horizontalPixelRatio);
 					ctx.moveTo(x, -lineWidth);
-					ctx.lineTo(x, height + lineWidth);
+					ctx.lineTo(x, bitmapSize.height + lineWidth);
 				}
 				ctx.stroke();
 			}
@@ -62,7 +56,7 @@ export class GridRenderer extends BitmapCoordinatesPaneRenderer {
 				for (const priceMark of data.priceMarks) {
 					const y = Math.round(priceMark.coord * verticalPixelRatio);
 					ctx.moveTo(-lineWidth, y);
-					ctx.lineTo(width + lineWidth, y);
+					ctx.lineTo(bitmapSize.width + lineWidth, y);
 				}
 				ctx.stroke();
 			}

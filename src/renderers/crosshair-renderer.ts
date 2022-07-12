@@ -14,8 +14,6 @@ export interface CrosshairRendererData {
 	horzLine: CrosshairLineStyle;
 	x: number;
 	y: number;
-	w: number;
-	h: number;
 }
 
 export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
@@ -26,7 +24,7 @@ export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
 		this._data = data;
 	}
 
-	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	protected override _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
@@ -40,8 +38,6 @@ export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
 
 		const x = Math.round(this._data.x * horizontalPixelRatio);
 		const y = Math.round(this._data.y * verticalPixelRatio);
-		const w = Math.ceil(this._data.w * horizontalPixelRatio);
-		const h = Math.ceil(this._data.h * verticalPixelRatio);
 
 		ctx.lineCap = 'butt';
 
@@ -50,7 +46,7 @@ export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
 			ctx.strokeStyle = this._data.vertLine.color;
 			ctx.fillStyle = this._data.vertLine.color;
 			setLineStyle(ctx, this._data.vertLine.lineStyle);
-			drawVerticalLine(ctx, x, 0, h);
+			drawVerticalLine(ctx, x, 0, bitmapSize.height);
 		}
 
 		if (horzLinesVisible && y >= 0) {
@@ -58,7 +54,7 @@ export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
 			ctx.strokeStyle = this._data.horzLine.color;
 			ctx.fillStyle = this._data.horzLine.color;
 			setLineStyle(ctx, this._data.horzLine.lineStyle);
-			drawHorizontalLine(ctx, y, 0, w);
+			drawHorizontalLine(ctx, y, 0, bitmapSize.width);
 		}
 	}
 }
