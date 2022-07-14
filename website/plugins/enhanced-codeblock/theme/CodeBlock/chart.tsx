@@ -50,12 +50,16 @@ export const Chart = (props: ChartProps): JSX.Element => {
 				return;
 			}
 
-			const injectCreateChartAndRun = () => {
-				importLightweightChartsVersion(version as LightweightChartsVersion).then((mod: LightweightChartsApi) => {
+			const injectCreateChartAndRun = async () => {
+				try {
+					const mod = await importLightweightChartsVersion(version as LightweightChartsVersion);
+
 					const createChart = mod.createChart;
 					Object.assign(iframeWindow, mod); // Make ColorType, etc. available in the iframe
 
-					iframeWindow.createChart = (container: HTMLElement | string, options?: Parameters<LightweightChartsApi['createChart']>[1]) => {
+					type ChartsApi = (typeof mod);
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+					(iframeWindow as any).createChart = (container: HTMLElement | string, options?: Parameters<ChartsApi['createChart']>[1]) => {
 						const chart = createChart(container, options);
 						const resizeListener = () => {
 							const boundingClientRect = (container as HTMLElement).getBoundingClientRect();
@@ -68,11 +72,10 @@ export const Chart = (props: ChartProps): JSX.Element => {
 					};
 
 					iframeWindow.run?.();
-				})
-				.catch((err: unknown) => {
+				} catch (err: unknown) {
 					// eslint-disable-next-line no-console
 					console.error(err);
-				});
+				}
 			};
 
 			if (iframeWindow.run !== undefined) {
