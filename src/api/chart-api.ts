@@ -64,7 +64,10 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 	if (isBoolean(options.handleScale)) {
 		const handleScale = options.handleScale;
 		options.handleScale = {
-			axisDoubleClickReset: handleScale,
+			axisDoubleClickReset: {
+				time: handleScale,
+				price: handleScale,
+			},
 			axisPressedMouseMove: {
 				time: handleScale,
 				price: handleScale,
@@ -72,12 +75,20 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 			mouseWheel: handleScale,
 			pinch: handleScale,
 		};
-	} else if (options.handleScale !== undefined && isBoolean(options.handleScale.axisPressedMouseMove)) {
-		const axisPressedMouseMove = options.handleScale.axisPressedMouseMove;
-		options.handleScale.axisPressedMouseMove = {
-			time: axisPressedMouseMove,
-			price: axisPressedMouseMove,
-		};
+	} else if (options.handleScale !== undefined) {
+		const { axisPressedMouseMove, axisDoubleClickReset } = options.handleScale;
+		if (isBoolean(axisPressedMouseMove)) {
+			options.handleScale.axisPressedMouseMove = {
+				time: axisPressedMouseMove,
+				price: axisPressedMouseMove,
+			};
+		}
+		if (isBoolean(axisDoubleClickReset)) {
+			options.handleScale.axisDoubleClickReset = {
+				time: axisDoubleClickReset,
+				price: axisDoubleClickReset,
+			};
+		}
 	}
 
 	const handleScroll = options.handleScroll;

@@ -630,11 +630,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 		const rendererOptionsProvider = chart.model().rendererOptionsProvider();
 		if (leftAxisVisible && this._leftPriceAxisWidget === null) {
-			this._leftPriceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'left');
+			this._leftPriceAxisWidget = new PriceAxisWidget(this, chart.options(), rendererOptionsProvider, 'left');
 			this._leftAxisCell.appendChild(this._leftPriceAxisWidget.getElement());
 		}
 		if (rightAxisVisible && this._rightPriceAxisWidget === null) {
-			this._rightPriceAxisWidget = new PriceAxisWidget(this, chart.options().layout, rendererOptionsProvider, 'right');
+			this._rightPriceAxisWidget = new PriceAxisWidget(this, chart.options(), rendererOptionsProvider, 'right');
 			this._rightAxisCell.appendChild(this._rightPriceAxisWidget.getElement());
 		}
 	}

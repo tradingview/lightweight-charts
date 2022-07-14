@@ -5,6 +5,7 @@ import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
+import { ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -41,7 +42,8 @@ const enum Constants {
 
 export class PriceAxisWidget implements IDestroyable {
 	private readonly _pane: PaneWidget;
-	private readonly _options: LayoutOptions;
+	private readonly _options: Readonly<ChartOptionsInternal>;
+	private readonly _layoutOptions: Readonly<LayoutOptions>;
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 	private readonly _isLeft: boolean;
 
@@ -64,9 +66,10 @@ export class PriceAxisWidget implements IDestroyable {
 	private _prevOptimalWidth: number = 0;
 	private _isSettingSize: boolean = false;
 
-	public constructor(pane: PaneWidget, options: LayoutOptions, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
+	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternal>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
 		this._options = options;
+		this._layoutOptions = options.layout;
 		this._rendererOptionsProvider = rendererOptionsProvider;
 		this._isLeft = side === 'left';
 
@@ -142,16 +145,12 @@ export class PriceAxisWidget implements IDestroyable {
 		return ensureNotNull(this._priceScale).options().borderColor;
 	}
 
-	public textColor(): string {
-		return this._options.textColor;
-	}
-
 	public fontSize(): number {
-		return this._options.fontSize;
+		return this._layoutOptions.fontSize;
 	}
 
 	public baseFont(): string {
-		return makeFont(this.fontSize(), this._options.fontFamily);
+		return makeFont(this.fontSize(), this._layoutOptions.fontFamily);
 	}
 
 	public rendererOptions(): Readonly<PriceAxisViewRendererOptions> {
@@ -309,7 +308,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || this._priceScale.isEmpty() || !this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || this._priceScale.isEmpty() || !this._options.handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -320,7 +319,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _pressedMouseMoveEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -331,7 +330,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownOutsideEvent(): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -346,7 +345,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseUpEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 		const model = this._pane.chart().model();
@@ -356,7 +355,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDoubleClickEvent(e: TouchMouseEvent): void {
-		if (this._pane.chart().options().handleScale.axisDoubleClickReset) {
+		if (this._options.handleScale.axisDoubleClickReset.price) {
 			this.reset();
 		}
 	}
@@ -476,7 +475,7 @@ export class PriceAxisWidget implements IDestroyable {
 			ctx.fill();
 		}
 
-		ctx.fillStyle = this.textColor();
+		ctx.fillStyle = this._layoutOptions.textColor;
 		for (const tickMark of tickMarks) {
 			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, Math.round(tickMark.coord * pixelRatio), textAlign);
 		}

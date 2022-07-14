@@ -753,7 +753,7 @@ export class TimeScale {
 			&& !handleScroll.mouseWheel
 			&& !handleScroll.pressedMouseMove
 			&& !handleScroll.vertTouchDrag
-			&& !handleScale.axisDoubleClickReset
+			&& !handleScale.axisDoubleClickReset.time
 			&& !handleScale.axisPressedMouseMove.time
 			&& !handleScale.mouseWheel
 			&& !handleScale.pinch;
