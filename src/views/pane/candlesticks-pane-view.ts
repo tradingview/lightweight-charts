@@ -13,7 +13,7 @@ import { BarsPaneViewBase } from './bars-pane-view-base';
 export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', CandlestickItem> {
 	private readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}

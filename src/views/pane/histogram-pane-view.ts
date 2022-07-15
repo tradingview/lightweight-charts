@@ -43,7 +43,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._renderer = new PaneRendererHistogram();
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}

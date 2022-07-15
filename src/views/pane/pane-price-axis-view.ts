@@ -55,7 +55,7 @@ export class PanePriceAxisView implements IPaneView {
 		this._renderer = new PanePriceAxisViewRenderer(this._textWidthCache);
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		const pane = this._chartModel.paneForSource(this._dataSource);
 		if (pane === null) {
 			return null;

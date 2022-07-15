@@ -16,7 +16,7 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineItem> {
 		super(series, model);
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}

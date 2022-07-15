@@ -13,7 +13,7 @@ import { BarsPaneViewBase } from './bars-pane-view-base';
 export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem> {
 	private readonly _renderer: PaneRendererBars = new PaneRendererBars();
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}

@@ -537,7 +537,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _drawGrid(target: CanvasRenderingTarget): void {
 		const state = ensureNotNull(this._state);
 		const paneView = state.grid().paneView();
-		const renderer = paneView.renderer(state.height(), state.width());
+		const renderer = paneView.renderer();
 
 		if (renderer !== null) {
 			target.context.save();
@@ -577,8 +577,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	): void {
 		const state = ensureNotNull(this._state);
 		const paneViews = paneViewsGetter(source, state);
-		const height = state.height();
-		const width = state.width();
 		const hoveredSource = state.model().hoveredSource();
 		const isHovered = hoveredSource !== null && hoveredSource.source === source;
 		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
@@ -586,7 +584,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			: undefined;
 
 		for (const paneView of paneViews) {
-			const renderer = paneView.renderer(height, width);
+			const renderer = paneView.renderer();
 			if (renderer !== null) {
 				target.context.save();
 				drawFn(renderer, target, isHovered, objecId);
@@ -597,7 +595,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
 		for (const paneView of paneViews) {
-			const renderer = paneView.renderer(this._size.height, this._size.width);
+			const renderer = paneView.renderer();
 			if (renderer !== null && renderer.hitTest) {
 				const result = renderer.hitTest(x, y);
 				if (result !== null) {
