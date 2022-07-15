@@ -1,6 +1,8 @@
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import {
+	AreaPlotRow,
 	BarPlotRow,
+	BaselinePlotRow,
 	CandlestickPlotRow,
 	LinePlotRow,
 	SeriesPlotRow,
@@ -9,7 +11,9 @@ import { SeriesType } from '../model/series-options';
 import { Time } from '../model/time-data';
 
 import {
+	AreaData,
 	BarData,
+	BaselineData,
 	CandlestickData,
 	LineData,
 	OhlcData,
@@ -33,6 +37,54 @@ function lineData(plotRow: LinePlotRow): LineData {
 
 	if (plotRow.color !== undefined) {
 		result.color = plotRow.color;
+	}
+
+	return result;
+}
+
+function areaData(plotRow: AreaPlotRow): AreaData {
+	const result: AreaData = singleValueData(plotRow);
+
+	if (plotRow.lineColor !== undefined) {
+		result.lineColor = plotRow.lineColor;
+	}
+
+	if (plotRow.topColor !== undefined) {
+		result.topColor = plotRow.topColor;
+	}
+
+	if (plotRow.bottomColor !== undefined) {
+		result.bottomColor = plotRow.bottomColor;
+	}
+
+	return result;
+}
+
+function baselineData(plotRow: BaselinePlotRow): BaselineData {
+	const result: BaselineData = singleValueData(plotRow);
+
+	if (plotRow.topLineColor !== undefined) {
+		result.topLineColor = plotRow.topLineColor;
+	}
+
+	if (plotRow.bottomLineColor !== undefined) {
+		result.bottomLineColor = plotRow.bottomLineColor;
+	}
+
+	if (plotRow.topFillColor1 !== undefined) {
+		result.topFillColor1 = plotRow.topFillColor1;
+	}
+
+	if (plotRow.topFillColor2 !== undefined) {
+		result.topFillColor2 = plotRow.topFillColor2;
+	}
+
+	if (plotRow.bottomFillColor1 !== undefined) {
+		result.bottomFillColor1 = plotRow.bottomFillColor1;
+	}
+
+	if (plotRow.bottomFillColor2 !== undefined) {
+		result.bottomFillColor2 = plotRow.bottomFillColor2;
 	}
 
 	return result;
@@ -78,9 +130,9 @@ function candlestickData(plotRow: CandlestickPlotRow): CandlestickData {
 }
 
 const seriesPlotRowToDataMap: SeriesPlotRowToDataMap = {
-	Area: singleValueData,
+	Area: areaData,
 	Line: lineData,
-	Baseline: singleValueData,
+	Baseline: baselineData,
 	Histogram: lineData,
 	Bar: barData,
 	Candlestick: candlestickData,
