@@ -589,7 +589,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 		target.context.save();
 
-		const currentSize = this._size;
 		const views = this._backLabels();
 
 		const rendererOptions = this.rendererOptions();
@@ -599,7 +598,7 @@ export class PriceAxisWidget implements IDestroyable {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer(ensureNotNull(this._priceScale));
 				target.context.save();
-				renderer.draw(target, rendererOptions, this._widthCache, currentSize.width, align);
+				renderer.draw(target, rendererOptions, this._widthCache, align);
 				target.context.restore();
 			}
 		});
@@ -615,7 +614,6 @@ export class PriceAxisWidget implements IDestroyable {
 		const ctx = target.context;
 		ctx.save();
 
-		const currentSize = this._size;
 		const model = this._pane.chart().model();
 
 		const views: IPriceAxisViewArray[] = []; // array of arrays
@@ -632,7 +630,7 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((arr: IPriceAxisViewArray) => {
 			arr.forEach((view: IPriceAxisView) => {
 				ctx.save();
-				view.renderer(ensureNotNull(this._priceScale)).draw(target, ro, this._widthCache, currentSize.width, align);
+				view.renderer(ensureNotNull(this._priceScale)).draw(target, ro, this._widthCache, align);
 				ctx.restore();
 			});
 		});

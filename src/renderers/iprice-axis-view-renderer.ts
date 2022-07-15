@@ -45,7 +45,6 @@ export interface IPriceAxisViewRenderer {
 		target: CanvasRenderingTarget,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		width: number,
 		align: 'left' | 'right'
 	): void;
 

@@ -2,7 +2,7 @@ import { drawRoundRectWithInnerBorder } from '../helpers/canvas-helpers';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
-import { CanvasRenderingTarget } from './canvas-rendering-target';
+import { BitmapCoordsRenderingScope, CanvasRenderingTarget } from './canvas-rendering-target';
 import {
 	IPriceAxisViewRenderer,
 	PriceAxisViewRendererCommonData,
@@ -45,18 +45,36 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		target: CanvasRenderingTarget,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		width: number,
+		align: 'left' | 'right'
+	): void {
+		target.useBitmapCoordinates(
+			(scope: BitmapCoordsRenderingScope) => this._drawImpl(scope, rendererOptions, textWidthCache, align)
+		);
+	}
+
+	public height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number {
+		if (!this._data.visible) {
+			return 0;
+		}
+
+		return rendererOptions.fontSize + rendererOptions.paddingTop + rendererOptions.paddingBottom;
+	}
+
+	private _drawImpl(
+		scope: BitmapCoordsRenderingScope,
+		rendererOptions: PriceAxisViewRendererOptions,
+		textWidthCache: TextWidthCache,
 		align: 'left' | 'right'
 	): void {
 		if (!this._data.visible) {
 			return;
 		}
 
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = scope;
 
 		ctx.font = rendererOptions.font;
 
-		const geometry = this._calculateGeometry(target, rendererOptions, textWidthCache, width, align);
+		const geometry = this._calculateGeometry(scope, rendererOptions, textWidthCache, align);
 
 		const textColor = this._data.color || this._commonData.color;
 		const backgroundColor = (this._commonData.background);
@@ -118,22 +136,13 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		}
 	}
 
-	public height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number {
-		if (!this._data.visible) {
-			return 0;
-		}
-
-		return rendererOptions.fontSize + rendererOptions.paddingTop + rendererOptions.paddingBottom;
-	}
-
 	private _calculateGeometry(
-		target: CanvasRenderingTarget,
+		scope: BitmapCoordsRenderingScope,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		width: number,
 		align: 'left' | 'right'
 	): Geometry {
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = target;
+		const { context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio } = scope;
 		const tickSize = (this._data.tickVisible || !this._data.moveTextToInvisibleTick) ? rendererOptions.tickLength : 0;
 		const horzBorder = rendererOptions.borderSize;
 		const paddingTop = rendererOptions.paddingTop + this._commonData.additionalPaddingTop;
@@ -159,7 +168,6 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const totalWidthScaled = Math.round(totalWidth * horizontalPixelRatio);
 		// tick overlaps scale border
 		const tickSizeScaled = Math.round(tickSize * horizontalPixelRatio);
-		const widthScaled = Math.ceil(width * horizontalPixelRatio);
 		const paddingInnerScaled = Math.ceil(paddingInner * horizontalPixelRatio);
 
 		let yMid = this._commonData.coordinate;
@@ -173,8 +181,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const alignRight = align === 'right';
 
-		const xInside = alignRight ? widthScaled - horzBorderScaled : horzBorderScaled;
-		const rightScaled = widthScaled;
+		const xInside = alignRight ? bitmapSize.width - horzBorderScaled : horzBorderScaled;
+		const rightScaled = bitmapSize.width;
 
 		let xOutside = xInside;
 		let xTick: number;
