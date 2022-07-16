@@ -23,7 +23,7 @@ export const ChartComponent = props => {
 			const chart = createChart(chartContainerRef.current, {
 				layout: {
 					background: { type: ColorType.Solid, color: backgroundColor },
-					textColor,
+					textColor: textColor,
 				},
 				width: chartContainerRef.current.clientWidth,
 				height: 300,
