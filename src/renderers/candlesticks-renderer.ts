@@ -1,5 +1,6 @@
 import { fillRectInnerBorder } from '../helpers/canvas-helpers';
 
+import { CandlesticksColorerStyle } from '../model/series-bar-colorer';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { BarCandlestickItemBase } from './bars-renderer';
@@ -7,10 +8,7 @@ import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-rendere
 import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { optimalCandlestickWidth } from './optimal-bar-width';
 
-export interface CandlestickItem extends BarCandlestickItemBase {
-	color: string;
-	borderColor: string;
-	wickColor: string;
+export interface CandlestickItem extends BarCandlestickItemBase, CandlesticksColorerStyle {
 }
 
 export interface PaneRendererCandlesticksData {
@@ -97,9 +95,9 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
 			const bar = bars[i];
-			if (bar.wickColor !== prevWickColor) {
-				ctx.fillStyle = bar.wickColor;
-				prevWickColor = bar.wickColor;
+			if (bar.barWickColor !== prevWickColor) {
+				ctx.fillStyle = bar.barWickColor;
+				prevWickColor = bar.barWickColor;
 			}
 
 			const top = Math.round(Math.min(bar.openY, bar.closeY) * verticalPixelRatio);
@@ -152,9 +150,9 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 
 		for (let i = visibleRange.from; i < visibleRange.to; i++) {
 			const bar = bars[i];
-			if (bar.borderColor !== prevBorderColor) {
-				ctx.fillStyle = bar.borderColor;
-				prevBorderColor = bar.borderColor;
+			if (bar.barBorderColor !== prevBorderColor) {
+				ctx.fillStyle = bar.barBorderColor;
+				prevBorderColor = bar.barBorderColor;
 			}
 
 			let left = Math.round(bar.x * horizontalPixelRatio) - Math.floor(this._barWidth * 0.5);
@@ -197,8 +195,8 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 			let left = Math.round(bar.x * horizontalPixelRatio) - Math.floor(this._barWidth * 0.5);
 			let right = left + this._barWidth - 1;
 
-			if (bar.color !== prevBarColor) {
-				const barColor = bar.color;
+			if (bar.barColor !== prevBarColor) {
+				const barColor = bar.barColor;
 				ctx.fillStyle = barColor;
 				prevBarColor = barColor;
 			}

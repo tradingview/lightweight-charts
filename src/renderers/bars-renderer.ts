@@ -1,6 +1,7 @@
 import { ensureNotNull } from '../helpers/assertions';
 
 import { BarCoordinates, BarPrices } from '../model/bar';
+import { BarColorerStyle } from '../model/series-bar-colorer';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
@@ -9,8 +10,7 @@ import { optimalBarWidth } from './optimal-bar-width';
 
 export type BarCandlestickItemBase = TimedValue & BarPrices & BarCoordinates;
 
-export interface BarItem extends BarCandlestickItemBase {
-	color: string;
+export interface BarItem extends BarCandlestickItemBase, BarColorerStyle {
 }
 
 export interface PaneRendererBarsData {
@@ -57,9 +57,9 @@ export class PaneRendererBars extends BitmapCoordinatesPaneRenderer {
 		const drawOpenClose = this._barLineWidth <= this._barWidth && this._data.barSpacing >= Math.floor(1.5 * horizontalPixelRatio);
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; ++i) {
 			const bar = this._data.bars[i];
-			if (prevColor !== bar.color) {
-				ctx.fillStyle = bar.color;
-				prevColor = bar.color;
+			if (prevColor !== bar.barColor) {
+				ctx.fillStyle = bar.barColor;
+				prevColor = bar.barColor;
 			}
 
 			const bodyWidthHalf = Math.floor(this._barLineWidth * 0.5);
