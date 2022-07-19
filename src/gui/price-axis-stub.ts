@@ -5,7 +5,7 @@ import { IDestroyable } from '../helpers/idestroyable';
 
 import { ChartOptionsInternal } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
+import { BitmapCoordsRenderingScope, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
 import { createBoundCanvas } from './canvas-utils';
@@ -97,8 +97,10 @@ export class PriceAxisStub implements IDestroyable {
 		this._canvasBinding.applySuggestedBitmapSize();
 		const target = createCanvasRenderingTarget(this._canvasBinding);
 		if (target !== null) {
-			this._drawBackground(target);
-			this._drawBorder(target);
+			target.useBitmapCoordinates((scope: BitmapCoordsRenderingScope) => {
+				this._drawBackground(scope);
+				this._drawBorder(scope);
+			});
 		}
 		target?.destroy();
 	}
@@ -107,28 +109,22 @@ export class PriceAxisStub implements IDestroyable {
 		return this._canvasBinding.canvasElement;
 	}
 
-	private _drawBorder(target: CanvasRenderingTarget): void {
+	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (!this._borderVisible()) {
 			return;
 		}
-		const width = this._size.width;
-
-		const ctx = target.context;
-		ctx.save();
 
 		ctx.fillStyle = this._options.timeScale.borderColor;
 
 		// TODO: we need different size for x and y
-		const borderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * target.horizontalPixelRatio);
-
-		const left = (this._isLeft) ? Math.round(width * target.horizontalPixelRatio) - borderSize : 0;
+		const borderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * horizontalPixelRatio);
+		const left = (this._isLeft) ? bitmapSize.width - borderSize : 0;
 
 		ctx.fillRect(left, 0, borderSize, borderSize);
-		ctx.restore();
 	}
 
-	private _drawBackground(target: CanvasRenderingTarget): void {
-		clearRect(target.context, 0, 0, target.bitmapSize.width, target.bitmapSize.height, this._bottomColor());
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope): void {
+		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, this._bottomColor());
 	}
 
 	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => this.paint(InvalidationLevel.Full);

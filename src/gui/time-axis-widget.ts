@@ -12,7 +12,7 @@ import { LayoutOptions } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TickMarkWeight } from '../model/time-data';
 import { TimeMark } from '../model/time-scale';
-import { CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
+import { BitmapCoordsRenderingScope, CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 
 import { createBoundCanvas } from './canvas-utils';
@@ -275,9 +275,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._canvasBinding.applySuggestedBitmapSize();
 			const target = createCanvasRenderingTarget(this._canvasBinding);
 			if (target !== null) {
-				this._drawBackground(target);
-				this._drawBorder(target);
-
+				target.useBitmapCoordinates((scope: BitmapCoordsRenderingScope) => {
+					this._drawBackground(scope);
+					this._drawBorder(scope);
+				});
 				this._drawTickMarks(target);
 				// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
 				// so let's don't call this code at all for now
@@ -302,21 +303,17 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		topTarget?.destroy();
 	}
 
-	private _drawBackground(target: CanvasRenderingTarget): void {
-		clearRect(target.context, 0, 0, target.bitmapSize.width, target.bitmapSize.height, this._chart.model().backgroundBottomColor());
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope): void {
+		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, this._chart.model().backgroundBottomColor());
 	}
 
-	private _drawBorder(target: CanvasRenderingTarget): void {
+	private _drawBorder({ context: ctx, bitmapSize, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (this._chart.options().timeScale.borderVisible) {
-			const ctx = target.context;
-			ctx.save();
-
 			ctx.fillStyle = this._lineColor();
 
-			const borderSize = Math.max(1, Math.floor(this._getRendererOptions().borderSize * target.verticalPixelRatio));
+			const borderSize = Math.max(1, Math.floor(this._getRendererOptions().borderSize * verticalPixelRatio));
 
-			ctx.fillRect(0, 0, target.bitmapSize.width, borderSize);
-			ctx.restore();
+			ctx.fillRect(0, 0, bitmapSize.width, borderSize);
 		}
 	}
 
@@ -336,61 +333,56 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			maxWeight = TickMarkWeight.Hour1;
 		}
 
-		const ctx = target.context;
-		ctx.save();
-
-		ctx.strokeStyle = this._lineColor();
-
 		const rendererOptions = this._getRendererOptions();
-		const yText = (
-			rendererOptions.borderSize +
-			rendererOptions.tickLength +
-			rendererOptions.paddingTop +
-			rendererOptions.fontSize / 2
-		);
-
-		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
-		ctx.fillStyle = this._lineColor();
-
-		const { horizontalPixelRatio, verticalPixelRatio } = target;
-
-		const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
-		const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
 
 		const options = timeScale.options();
 		if (options.borderVisible && options.ticksVisible) {
-			ctx.beginPath();
-			const tickLen = Math.round(rendererOptions.tickLength * verticalPixelRatio);
-			for (let index = tickMarks.length; index--;) {
-				const x = Math.round(tickMarks[index].coord * horizontalPixelRatio);
-				ctx.rect(x - tickOffset, 0, tickWidth, tickLen);
-			}
+			target.useBitmapCoordinates(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope) => {
+				ctx.strokeStyle = this._lineColor();
+				ctx.fillStyle = this._lineColor();
 
-			ctx.fill();
+				const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
+				const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
+
+				ctx.beginPath();
+				const tickLen = Math.round(rendererOptions.tickLength * verticalPixelRatio);
+				for (let index = tickMarks.length; index--;) {
+					const x = Math.round(tickMarks[index].coord * horizontalPixelRatio);
+					ctx.rect(x - tickOffset, 0, tickWidth, tickLen);
+				}
+
+				ctx.fill();
+			});
 		}
 
-		target.useMediaCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
-			context.fillStyle = this._textColor();
+		target.useMediaCoordinates(({ context: ctx }: { context: CanvasRenderingContext2D }) => {
+			const yText = (
+				rendererOptions.borderSize +
+				rendererOptions.tickLength +
+				rendererOptions.paddingTop +
+				rendererOptions.fontSize / 2
+			);
+
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillStyle = this._textColor();
 
 			// draw base marks
-			context.font = this._baseFont();
+			ctx.font = this._baseFont();
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight < maxWeight) {
-					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(context, tickMark.coord, tickMark.label) : tickMark.coord;
-					context.fillText(tickMark.label, coordinate, yText);
+					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
+					ctx.fillText(tickMark.label, coordinate, yText);
 				}
 			}
-			context.font = this._baseBoldFont();
+			ctx.font = this._baseBoldFont();
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight >= maxWeight) {
-					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(context, tickMark.coord, tickMark.label) : tickMark.coord;
-					context.fillText(tickMark.label, coordinate, yText);
+					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
+					ctx.fillText(tickMark.label, coordinate, yText);
 				}
 			}
 		});
-
-		ctx.restore();
 	}
 
 	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D, coordinate: number, labelText: string): number {

@@ -1,6 +1,6 @@
 import { ensureNotNull } from '../helpers/assertions';
 
-import { CanvasRenderingTarget } from './canvas-rendering-target';
+import { BitmapCoordsRenderingScope, CanvasRenderingTarget, MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { ITimeAxisViewRenderer, TimeAxisViewRendererOptions } from './itime-axis-view-renderer';
 
 export interface TimeAxisViewRendererData {
@@ -33,15 +33,13 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			return;
 		}
 
-		const ctx = target.context;
-		ctx.font = rendererOptions.font;
-
-		const textWidth = Math.round(rendererOptions.widthCache.measureText(ctx, this._data.text, optimizationReplacementRe));
+		const textWidth = target.useMediaCoordinates(({ context: ctx }: MediaCoordsRenderingScope) => {
+			ctx.font = rendererOptions.font;
+			return Math.round(rendererOptions.widthCache.measureText(ctx, ensureNotNull(this._data).text, optimizationReplacementRe));
+		});
 		if (textWidth <= 0) {
 			return;
 		}
-
-		ctx.save();
 
 		const horzMargin = rendererOptions.paddingHorizontal;
 		const labelWidth = textWidth + 2 * horzMargin;
@@ -70,35 +68,38 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			rendererOptions.paddingBottom
 		);
 
-		ctx.fillStyle = this._data.background;
+		target.useBitmapCoordinates(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope) => {
+			const data = ensureNotNull(this._data);
 
-		const { horizontalPixelRatio, verticalPixelRatio } = target;
-		const x1scaled = Math.round(x1 * horizontalPixelRatio);
-		const y1scaled = Math.round(y1 * verticalPixelRatio);
-		const x2scaled = Math.round(x2 * horizontalPixelRatio);
-		const y2scaled = Math.round(y2 * verticalPixelRatio);
-		const radiusScaled = Math.round(radius * horizontalPixelRatio);
-		ctx.beginPath();
-		ctx.moveTo(x1scaled, y1scaled);
-		ctx.lineTo(x1scaled, y2scaled - radiusScaled);
-		ctx.arcTo(x1scaled, y2scaled, x1scaled + radiusScaled, y2scaled, radiusScaled);
-		ctx.lineTo(x2scaled - radiusScaled, y2scaled);
-		ctx.arcTo(x2scaled, y2scaled, x2scaled, y2scaled - radiusScaled, radiusScaled);
-		ctx.lineTo(x2scaled, y1scaled);
-		ctx.fill();
+			ctx.fillStyle = data.background;
 
-		if (this._data.tickVisible) {
-			const tickX = Math.round(this._data.coordinate * horizontalPixelRatio);
-			const tickTop = y1scaled;
-			const tickBottom = Math.round((tickTop + rendererOptions.tickLength) * verticalPixelRatio);
+			const x1scaled = Math.round(x1 * horizontalPixelRatio);
+			const y1scaled = Math.round(y1 * verticalPixelRatio);
+			const x2scaled = Math.round(x2 * horizontalPixelRatio);
+			const y2scaled = Math.round(y2 * verticalPixelRatio);
+			const radiusScaled = Math.round(radius * horizontalPixelRatio);
+			ctx.beginPath();
+			ctx.moveTo(x1scaled, y1scaled);
+			ctx.lineTo(x1scaled, y2scaled - radiusScaled);
+			ctx.arcTo(x1scaled, y2scaled, x1scaled + radiusScaled, y2scaled, radiusScaled);
+			ctx.lineTo(x2scaled - radiusScaled, y2scaled);
+			ctx.arcTo(x2scaled, y2scaled, x2scaled, y2scaled - radiusScaled, radiusScaled);
+			ctx.lineTo(x2scaled, y1scaled);
+			ctx.fill();
 
-			ctx.fillStyle = this._data.color;
-			const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
-			const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
-			ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
-		}
+			if (data.tickVisible) {
+				const tickX = Math.round(data.coordinate * horizontalPixelRatio);
+				const tickTop = y1scaled;
+				const tickBottom = Math.round((tickTop + rendererOptions.tickLength) * verticalPixelRatio);
 
-		target.useMediaCoordinates(({ context }: { context: CanvasRenderingContext2D }) => {
+				ctx.fillStyle = data.color;
+				const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
+				const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
+				ctx.fillRect(tickX - tickOffset, tickTop, tickWidth, tickBottom - tickTop);
+			}
+		});
+
+		target.useMediaCoordinates(({ context: ctx }: MediaCoordsRenderingScope) => {
 			const data = ensureNotNull(this._data);
 
 			const yText =
@@ -108,6 +109,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 				rendererOptions.paddingTop +
 				rendererOptions.fontSize / 2;
 
+			ctx.font = rendererOptions.font;
 			ctx.textAlign = 'left';
 			ctx.textBaseline = 'middle';
 			ctx.fillStyle = data.color;
@@ -117,7 +119,5 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			ctx.translate(x1 + horzMargin, yText + textYCorrection);
 			ctx.fillText(data.text, 0, 0);
 		});
-
-		ctx.restore();
 	}
 }

@@ -13,7 +13,7 @@ import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
-import { CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
+import { BitmapCoordsRenderingScope, CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
@@ -288,9 +288,11 @@ export class PriceAxisWidget implements IDestroyable {
 			this._canvasBinding.applySuggestedBitmapSize();
 			const target = createCanvasRenderingTarget(this._canvasBinding);
 			if (target !== null) {
-				this._drawBackground(target);
-				this._drawBorder(target);
-				this._drawTickMarks(target);
+				target.useBitmapCoordinates((scope: BitmapCoordsRenderingScope) => {
+					this._drawBackground(scope);
+					this._drawBorder(scope);
+					this._drawTickMarks(scope);
+				});
 				this._drawBackLabels(target);
 			}
 			target?.destroy();
@@ -404,50 +406,46 @@ export class PriceAxisWidget implements IDestroyable {
 		return res;
 	}
 
-	private _drawBackground(target: CanvasRenderingTarget): void {
-		const { width, height } = target.bitmapSize;
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope): void {
+		const { width, height } = bitmapSize;
 		const model = this._pane.state().model();
 		const topColor = model.backgroundTopColor();
 		const bottomColor = model.backgroundBottomColor();
 
 		if (topColor === bottomColor) {
-			clearRect(target.context, 0, 0, width, height, topColor);
+			clearRect(ctx, 0, 0, width, height, topColor);
 		} else {
-			clearRectWithGradient(target.context, 0, 0, width, height, topColor, bottomColor);
+			clearRectWithGradient(ctx, 0, 0, width, height, topColor, bottomColor);
 		}
 	}
 
-	private _drawBorder(target: CanvasRenderingTarget): void {
+	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio }: BitmapCoordsRenderingScope): void {
 		if (this._size === null || this._priceScale === null || !this._priceScale.options().borderVisible) {
 			return;
 		}
 
-		const ctx = target.context;
-		ctx.save();
-
 		ctx.fillStyle = this.lineColor();
 
-		const borderSize = Math.max(1, Math.floor(this.rendererOptions().borderSize * target.horizontalPixelRatio));
+		const borderSize = Math.max(1, Math.floor(this.rendererOptions().borderSize * horizontalPixelRatio));
 
 		let left: number;
 		if (this._isLeft) {
-			left = target.bitmapSize.width - borderSize;
+			left = bitmapSize.width - borderSize;
 		} else {
 			left = 0;
 		}
 
-		ctx.fillRect(left, 0, borderSize, target.bitmapSize.height);
-		ctx.restore();
+		ctx.fillRect(left, 0, borderSize, bitmapSize.height);
 	}
 
-	private _drawTickMarks(target: CanvasRenderingTarget): void {
+	private _drawTickMarks(renderingScope: BitmapCoordsRenderingScope): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
 
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = renderingScope;
 		const tickMarks = this._priceScale.marks();
 
-		const ctx = target.context;
 		ctx.save();
 
 		ctx.strokeStyle = this.lineColor();
@@ -455,8 +453,6 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.font = this.baseFont();
 		ctx.fillStyle = this.lineColor();
 		const rendererOptions = this.rendererOptions();
-
-		const { horizontalPixelRatio, verticalPixelRatio } = target;
 
 		const tickMarkLeftX = this._isLeft ?
 			Math.floor((this._size.width - rendererOptions.tickLength) * horizontalPixelRatio) :
@@ -484,7 +480,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.fillStyle = this.textColor();
 		for (const tickMark of tickMarks) {
-			this._tickMarksCache.paintTo(target, tickMark.label, textLeftX, Math.round(tickMark.coord * verticalPixelRatio), textAlign);
+			this._tickMarksCache.paintTo(renderingScope, tickMark.label, textLeftX, Math.round(tickMark.coord * verticalPixelRatio), textAlign);
 		}
 
 		ctx.restore();

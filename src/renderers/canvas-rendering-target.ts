@@ -52,20 +52,12 @@ export class CanvasRenderingTarget implements IDestroyable {
 		return this._context;
 	}
 
-	public get horizontalPixelRatio(): number {
-		return this.bitmapSize.width / this.canvasElementClientSize.width;
-	}
-
-	public get verticalPixelRatio(): number {
-		return this.bitmapSize.height / this.canvasElementClientSize.height;
-	}
-
 	public useMediaCoordinates<T>(f: (scope: MediaCoordsRenderingScope) => T): T {
 		if (this._context === null) {
 			throw new Error('Object is disposed');
 		}
 		this._context.save();
-		this._context.scale(this.horizontalPixelRatio, this.verticalPixelRatio);
+		this._context.scale(this._horizontalPixelRatio, this._verticalPixelRatio);
 		const result = f({ context: this._context, mediaSize: this.canvasElementClientSize });
 		this._context.restore();
 		return result;
@@ -80,11 +72,19 @@ export class CanvasRenderingTarget implements IDestroyable {
 			context: this._context,
 			mediaSize: this.canvasElementClientSize,
 			bitmapSize: this.bitmapSize,
-			horizontalPixelRatio: this.horizontalPixelRatio,
-			verticalPixelRatio: this.verticalPixelRatio,
+			horizontalPixelRatio: this._horizontalPixelRatio,
+			verticalPixelRatio: this._verticalPixelRatio,
 		});
 		this._context.restore();
 		return result;
+	}
+
+	private get _horizontalPixelRatio(): number {
+		return this.bitmapSize.width / this.canvasElementClientSize.width;
+	}
+
+	private get _verticalPixelRatio(): number {
+		return this.bitmapSize.height / this.canvasElementClientSize.height;
 	}
 }
 
