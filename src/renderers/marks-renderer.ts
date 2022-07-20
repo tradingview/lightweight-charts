@@ -1,10 +1,10 @@
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { LineItem } from './line-renderer';
+import { LineItemBase } from './line-renderer-base';
 import { ScaledRenderer } from './scaled-renderer';
 
 export interface MarksRendererData {
-	items: LineItem[];
+	items: LineItemBase[];
 	lineColor: string;
 	backColor: string;
 	radius: number;
