@@ -297,7 +297,9 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._topCanvasBinding.applySuggestedBitmapSize();
 		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
 		if (topTarget !== null) {
-			topTarget.context.clearRect(0, 0, topTarget.bitmapSize.width, topTarget.bitmapSize.height);
+			topTarget.useBitmapCoordinates(({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope) => {
+				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
+			});
 			this._drawLabels([this._chart.model().crosshairSource()], topTarget);
 		}
 		topTarget?.destroy();
@@ -403,9 +405,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const rendererOptions = this._getRendererOptions();
 		for (const source of sources) {
 			for (const view of source.timeAxisViews()) {
-				target.context.save();
 				view.renderer().draw(target, rendererOptions);
-				target.context.restore();
 			}
 		}
 	}

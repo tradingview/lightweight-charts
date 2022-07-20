@@ -17,16 +17,16 @@ export interface BitmapCoordsRenderingScope {
 }
 
 export class CanvasRenderingTarget implements IDestroyable {
-	public readonly canvasElementClientSize: Size;
-	public readonly bitmapSize: Size;
+	private readonly _canvasElementClientSize: Size;
+	private readonly _bitmapSize: Size;
 	private _context: CanvasRenderingContext2D | null;
 
 	public constructor(canvasElement: HTMLCanvasElement, canvasElementClientSize: Size, bitmapSize: Size) {
 		assert(canvasElementClientSize.width !== 0 && canvasElementClientSize.height !== 0);
-		this.canvasElementClientSize = canvasElementClientSize;
+		this._canvasElementClientSize = canvasElementClientSize;
 
 		assert(bitmapSize.width !== 0 && bitmapSize.height !== 0);
-		this.bitmapSize = bitmapSize;
+		this._bitmapSize = bitmapSize;
 
 		this._context = ensureNotNull(canvasElement.getContext('2d'));
 		this._context.save();
@@ -45,20 +45,13 @@ export class CanvasRenderingTarget implements IDestroyable {
 		this._context = null;
 	}
 
-	public get context(): CanvasRenderingContext2D {
-		if (this._context === null) {
-			throw new Error('Object is disposed');
-		}
-		return this._context;
-	}
-
 	public useMediaCoordinates<T>(f: (scope: MediaCoordsRenderingScope) => T): T {
 		if (this._context === null) {
 			throw new Error('Object is disposed');
 		}
 		this._context.save();
 		this._context.scale(this._horizontalPixelRatio, this._verticalPixelRatio);
-		const result = f({ context: this._context, mediaSize: this.canvasElementClientSize });
+		const result = f({ context: this._context, mediaSize: this._canvasElementClientSize });
 		this._context.restore();
 		return result;
 	}
@@ -70,8 +63,8 @@ export class CanvasRenderingTarget implements IDestroyable {
 		this._context.save();
 		const result = f({
 			context: this._context,
-			mediaSize: this.canvasElementClientSize,
-			bitmapSize: this.bitmapSize,
+			mediaSize: this._canvasElementClientSize,
+			bitmapSize: this._bitmapSize,
 			horizontalPixelRatio: this._horizontalPixelRatio,
 			verticalPixelRatio: this._verticalPixelRatio,
 		});
@@ -80,11 +73,11 @@ export class CanvasRenderingTarget implements IDestroyable {
 	}
 
 	private get _horizontalPixelRatio(): number {
-		return this.bitmapSize.width / this.canvasElementClientSize.width;
+		return this._bitmapSize.width / this._canvasElementClientSize.width;
 	}
 
 	private get _verticalPixelRatio(): number {
-		return this.bitmapSize.height / this.canvasElementClientSize.height;
+		return this._bitmapSize.height / this._canvasElementClientSize.height;
 	}
 }
 

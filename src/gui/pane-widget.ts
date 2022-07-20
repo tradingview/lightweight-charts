@@ -14,7 +14,7 @@ import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
-import { CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
+import { BitmapCoordsRenderingScope, CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
@@ -475,7 +475,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			this._canvasBinding.applySuggestedBitmapSize();
 			const target = createCanvasRenderingTarget(this._canvasBinding);
 			if (target !== null) {
-				this._drawBackground(target);
+				target.useBitmapCoordinates((scope: BitmapCoordsRenderingScope) => {
+					this._drawBackground(scope);
+				});
 				if (this._state) {
 					this._drawGrid(target);
 					this._drawWatermark(target);
@@ -489,7 +491,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._topCanvasBinding.applySuggestedBitmapSize();
 		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
 		if (topTarget !== null) {
-			topTarget.context.clearRect(0, 0, topTarget.bitmapSize.width, topTarget.bitmapSize.height);
+			topTarget.useBitmapCoordinates(({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope) => {
+				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
+			});
 			this._drawSources(topTarget, sourceTopPaneViews);
 			this._drawCrosshair(topTarget);
 		}
@@ -521,16 +525,16 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private _drawBackground(target: CanvasRenderingTarget): void {
-		const { width, height } = target.bitmapSize;
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope): void {
+		const { width, height } = bitmapSize;
 		const model = this._model();
 		const topColor = model.backgroundTopColor();
 		const bottomColor = model.backgroundBottomColor();
 
 		if (topColor === bottomColor) {
-			clearRect(target.context, 0, 0, width, height, bottomColor);
+			clearRect(ctx, 0, 0, width, height, bottomColor);
 		} else {
-			clearRectWithGradient(target.context, 0, 0, width, height, topColor, bottomColor);
+			clearRectWithGradient(ctx, 0, 0, width, height, topColor, bottomColor);
 		}
 	}
 
@@ -540,9 +544,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const renderer = paneView.renderer();
 
 		if (renderer !== null) {
-			target.context.save();
 			renderer.draw(target, false);
-			target.context.restore();
 		}
 	}
 
@@ -586,9 +588,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer();
 			if (renderer !== null) {
-				target.context.save();
 				drawFn(renderer, target, isHovered, objecId);
-				target.context.restore();
 			}
 		}
 	}

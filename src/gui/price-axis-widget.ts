@@ -301,7 +301,9 @@ export class PriceAxisWidget implements IDestroyable {
 		this._topCanvasBinding.applySuggestedBitmapSize();
 		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
 		if (topTarget !== null) {
-			topTarget.context.clearRect(0, 0, topTarget.bitmapSize.width, topTarget.bitmapSize.height);
+			topTarget.useBitmapCoordinates(({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope) => {
+				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
+			});
 			this._drawCrosshairLabel(topTarget);
 		}
 		topTarget?.destroy();
@@ -583,8 +585,6 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		target.context.save();
-
 		const views = this._backLabels();
 
 		const rendererOptions = this.rendererOptions();
@@ -593,22 +593,15 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((view: IPriceAxisView) => {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer(ensureNotNull(this._priceScale));
-				target.context.save();
 				renderer.draw(target, rendererOptions, this._widthCache, align);
-				target.context.restore();
 			}
 		});
-
-		target.context.restore();
 	}
 
 	private _drawCrosshairLabel(target: CanvasRenderingTarget): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
-
-		const ctx = target.context;
-		ctx.save();
 
 		const model = this._pane.chart().model();
 
@@ -625,13 +618,9 @@ export class PriceAxisWidget implements IDestroyable {
 
 		views.forEach((arr: IPriceAxisViewArray) => {
 			arr.forEach((view: IPriceAxisView) => {
-				ctx.save();
 				view.renderer(ensureNotNull(this._priceScale)).draw(target, ro, this._widthCache, align);
-				ctx.restore();
 			});
 		});
-
-		ctx.restore();
 	}
 
 	private _setCursor(type: CursorType): void {
