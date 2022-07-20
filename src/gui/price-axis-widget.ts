@@ -136,16 +136,8 @@ export class PriceAxisWidget implements IDestroyable {
 		return this._cell;
 	}
 
-	public lineColor(): string {
-		return ensureNotNull(this._priceScale).options().borderColor;
-	}
-
 	public fontSize(): number {
 		return this._layoutOptions.fontSize;
-	}
-
-	public baseFont(): string {
-		return makeFont(this.fontSize(), this._layoutOptions.fontFamily);
 	}
 
 	public rendererOptions(): Readonly<PriceAxisViewRendererOptions> {
@@ -171,7 +163,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const ctx = getContext2D(this._canvasBinding.canvas);
 		const tickMarks = this._priceScale.marks();
 
-		ctx.font = this.baseFont();
+		ctx.font = this._baseFont();
 
 		if (tickMarks.length > 0) {
 			tickMarkMaxWidth = Math.max(
@@ -410,7 +402,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 		ctx.save();
 
-		ctx.fillStyle = this.lineColor();
+		ctx.fillStyle = this._priceScale.options().borderColor;
 
 		const borderSize = Math.max(1, Math.floor(this.rendererOptions().borderSize * pixelRatio));
 
@@ -434,10 +426,12 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.save();
 
-		ctx.strokeStyle = this.lineColor();
+		const priceScaleOptions = this._priceScale.options();
 
-		ctx.font = this.baseFont();
-		ctx.fillStyle = this.lineColor();
+		ctx.strokeStyle = priceScaleOptions.borderColor;
+
+		ctx.font = this._baseFont();
+		ctx.fillStyle = priceScaleOptions.borderColor;
 		const rendererOptions = this.rendererOptions();
 
 		const tickMarkLeftX = this._isLeft ?
@@ -451,8 +445,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const tickHeight = Math.max(1, Math.floor(pixelRatio));
 		const tickOffset = Math.floor(pixelRatio * 0.5);
 
-		const options = this._priceScale.options();
-		if (options.borderVisible && options.ticksVisible) {
+		if (priceScaleOptions.borderVisible && priceScaleOptions.ticksVisible) {
 			const tickLength = Math.round(rendererOptions.tickLength * pixelRatio);
 			ctx.beginPath();
 			for (const tickMark of tickMarks) {
@@ -462,7 +455,7 @@ export class PriceAxisWidget implements IDestroyable {
 			ctx.fill();
 		}
 
-		ctx.fillStyle = this._priceScale?.options().textColor ?? this._layoutOptions.textColor;
+		ctx.fillStyle = priceScaleOptions.textColor ?? this._layoutOptions.textColor;
 		ctx.textAlign = this._isLeft ? 'right' : 'left';
 		ctx.textBaseline = 'middle';
 
@@ -656,4 +649,8 @@ export class PriceAxisWidget implements IDestroyable {
 
 		this._pane.chart().model().lightUpdate();
 	};
+
+	private _baseFont(): string {
+		return makeFont(this._layoutOptions.fontSize, this._layoutOptions.fontFamily);
+	}
 }
