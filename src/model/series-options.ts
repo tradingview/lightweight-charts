@@ -786,6 +786,38 @@ export type LineSeriesOptions = SeriesOptions<LineStyleOptions>;
 export type LineSeriesPartialOptions = SeriesPartialOptions<LineStyleOptions>;
 
 /**
+ * Represents the type of style options for each series type.
+ *
+ * For example a bar series has style options represented by {@link BarStyleOptions}.
+ */
+export interface SeriesStyleOptionsMap {
+	/**
+	 * The type of bar style options.
+	 */
+	Bar: BarStyleOptions;
+	/**
+	 * The type of candlestick style options.
+	 */
+	Candlestick: CandlestickStyleOptions;
+	/**
+	 * The type of area style options.
+	 */
+	Area: AreaStyleOptions;
+	/**
+	 * The type of baseline style options.
+	 */
+	Baseline: BaselineStyleOptions;
+	/**
+	 * The type of line style options.
+	 */
+	Line: LineStyleOptions;
+	/**
+	 * The type of histogram style options.
+	 */
+	Histogram: HistogramStyleOptions;
+}
+
+/**
  * Represents the type of options for each series type.
  *
  * For example a bar series has options represented by {@link BarSeriesOptions}.

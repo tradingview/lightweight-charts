@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"strict": true,
 		"resolveJsonModule": true,
+		"jsx": "react",
 	},
 	"include": [
 		"./**/*.ts",

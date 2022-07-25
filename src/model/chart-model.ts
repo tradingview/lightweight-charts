@@ -90,10 +90,8 @@ export interface HandleScaleOptions {
 
 	/**
 	 * Enable resetting scaling by double-clicking the left mouse button.
-	 *
-	 * @defaultValue `true`
 	 */
-	axisDoubleClickReset: boolean;
+	axisDoubleClickReset: AxisDoubleClickOptions | boolean;
 }
 
 /**
@@ -116,10 +114,13 @@ export interface KineticScrollOptions {
 }
 
 type HandleScaleOptionsInternal =
-	Omit<HandleScaleOptions, 'axisPressedMouseMove'>
+	Omit<HandleScaleOptions, 'axisPressedMouseMove' | 'axisDoubleClickReset'>
 	& {
 		/** @public */
 		axisPressedMouseMove: AxisPressedMouseMoveOptions;
+
+		/** @public */
+		axisDoubleClickReset: AxisDoubleClickOptions;
 	};
 
 /**
@@ -135,6 +136,25 @@ export interface AxisPressedMouseMoveOptions {
 
 	/**
 	 * Enable scaling the price axis by holding down the left mouse button and moving the mouse.
+	 *
+	 * @defaultValue `true`
+	 */
+	price: boolean;
+}
+
+/**
+ * Represents options for how the time and price axes react to mouse double click.
+ */
+export interface AxisDoubleClickOptions {
+	/**
+	 * Enable resetting scaling the time axis by double-clicking the left mouse button.
+	 *
+	 * @defaultValue `true`
+	 */
+	time: boolean;
+
+	/**
+	 * Enable reseting scaling the price axis by by double-clicking the left mouse button.
 	 *
 	 * @defaultValue `true`
 	 */

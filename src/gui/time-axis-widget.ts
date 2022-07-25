@@ -193,7 +193,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	public mouseDoubleClickEvent(): void {
-		if (this._chart.options().handleScale.axisDoubleClickReset) {
+		if (this._chart.options().handleScale.axisDoubleClickReset.time) {
 			this._chart.model().resetTimeScale();
 		}
 	}
