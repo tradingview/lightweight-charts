@@ -328,7 +328,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public pinchStartEvent(): void {
 		this._prevPinchScale = 1;
-		this._terminateKineticAnimation();
+		this.terminateKineticAnimation();
 	}
 
 	public pinchEvent(middlePoint: Position, scale: number): void {
@@ -499,6 +499,21 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public rightPriceAxisWidget(): PriceAxisWidget | null {
 		return this._rightPriceAxisWidget;
+	}
+
+	public terminateKineticAnimation(): void {
+		const now = performance.now();
+		const xAnimationFinished = this._scrollXAnimation === null || this._scrollXAnimation.finished(now);
+		if (this._scrollXAnimation !== null) {
+			if (!xAnimationFinished) {
+				this._finishScroll();
+			}
+		}
+
+		if (this._scrollXAnimation !== null) {
+			this._scrollXAnimation.terminate();
+			this._scrollXAnimation = null;
+		}
 	}
 
 	private _onStateDestroyed(): void {
@@ -749,7 +764,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return;
 		}
 
-		this._terminateKineticAnimation();
+		this.terminateKineticAnimation();
 
 		if (document.activeElement !== document.body && document.activeElement !== document.documentElement) {
 			// If any focusable element except the page itself is focused, remove the focus
@@ -845,21 +860,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			}
 
 			model.scrollTimeTo(event.localX);
-		}
-	}
-
-	private _terminateKineticAnimation(): void {
-		const now = performance.now();
-		const xAnimationFinished = this._scrollXAnimation === null || this._scrollXAnimation.finished(now);
-		if (this._scrollXAnimation !== null) {
-			if (!xAnimationFinished) {
-				this._finishScroll();
-			}
-		}
-
-		if (this._scrollXAnimation !== null) {
-			this._scrollXAnimation.terminate();
-			this._scrollXAnimation = null;
 		}
 	}
 
