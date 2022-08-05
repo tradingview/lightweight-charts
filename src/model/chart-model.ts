@@ -349,7 +349,6 @@ export class ChartModel implements IDestroyable {
 	private _serieses: Series[] = [];
 
 	private _width: number = 0;
-	private _initialTimeScrollPos: number | null = null;
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
@@ -618,27 +617,17 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public startScrollTime(x: Coordinate): void {
-		this._initialTimeScrollPos = x;
 		this._timeScale.startScroll(x);
 	}
 
-	public scrollTimeTo(x: Coordinate): boolean {
-		let res = false;
-		if (this._initialTimeScrollPos !== null && Math.abs(x - this._initialTimeScrollPos) > 20) {
-			this._initialTimeScrollPos = null;
-			res = true;
-		}
-
+	public scrollTimeTo(x: Coordinate): void {
 		this._timeScale.scrollTo(x);
 		this.recalculateAllPanes();
-		return res;
 	}
 
 	public endScrollTime(): void {
 		this._timeScale.endScroll();
 		this.lightUpdate();
-
-		this._initialTimeScrollPos = null;
 	}
 
 	public serieses(): readonly Series[] {

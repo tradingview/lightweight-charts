@@ -19,16 +19,8 @@ import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
-import { KineticAnimation } from './kinetic-animation';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
-
-const enum Constants {
-	MinScrollSpeed = 0.2,
-	MaxScrollSpeed = 7,
-	DumpingCoeff = 0.997,
-	ScrollMinMove = 15,
-}
 
 type DrawFunction = (renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown) => void;
 
@@ -94,7 +86,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _startTrackPoint: Point | null = null;
 	private _exitTrackingModeOnNextTry: boolean = false;
 	private _initCrosshairPosition: Point | null = null;
-	private _scrollXAnimation: KineticAnimation | null = null;
 	private _isSettingSize: boolean = false;
 
 	public constructor(chart: ChartWidget, state: Pane) {
@@ -328,7 +319,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public pinchStartEvent(): void {
 		this._prevPinchScale = 1;
-		this.terminateKineticAnimation();
+		this._model().timeScale().terminateAnimations();
 	}
 
 	public pinchEvent(middlePoint: Position, scale: number): void {
@@ -499,21 +490,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public rightPriceAxisWidget(): PriceAxisWidget | null {
 		return this._rightPriceAxisWidget;
-	}
-
-	public terminateKineticAnimation(): void {
-		const now = performance.now();
-		const xAnimationFinished = this._scrollXAnimation === null || this._scrollXAnimation.finished(now);
-		if (this._scrollXAnimation !== null) {
-			if (!xAnimationFinished) {
-				this._finishScroll();
-			}
-		}
-
-		if (this._scrollXAnimation !== null) {
-			this._scrollXAnimation.terminate();
-			this._scrollXAnimation = null;
-		}
 	}
 
 	private _onStateDestroyed(): void {
@@ -693,17 +669,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._chart.model();
 	}
 
-	private _finishScroll(): void {
-		const model = this._model();
-		const state = this.state();
-		const priceScale = state.defaultPriceScale();
-
-		model.endScrollPrice(state, priceScale);
-		model.endScrollTime();
-		this._startScrollingPos = null;
-		this._isScrolling = false;
-	}
-
 	private _endScroll(event: TouchMouseEvent): void {
 		if (!this._isScrolling) {
 			return;
@@ -711,20 +676,23 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		const startAnimationTime = performance.now();
 
-		if (this._scrollXAnimation !== null) {
-			this._scrollXAnimation.start(event.localX, startAnimationTime);
-		}
-
-		if ((this._scrollXAnimation === null || this._scrollXAnimation.finished(startAnimationTime))) {
-			// animation is not needed
-			this._finishScroll();
-			return;
-		}
-
 		const model = this._model();
 		const timeScale = model.timeScale();
+		const scrollXAnimation = timeScale.kineticAnimation();
 
-		const scrollXAnimation = this._scrollXAnimation;
+		scrollXAnimation.start(event.localX, startAnimationTime);
+
+		const state = this.state();
+		model.endScrollPrice(state, state.defaultPriceScale());
+
+		this._startScrollingPos = null;
+		this._isScrolling = false;
+
+		if ((scrollXAnimation.finished(startAnimationTime))) {
+			// animation is not needed
+			model.endScrollTime();
+			return;
+		}
 
 		const animationFn = () => {
 			if ((scrollXAnimation.terminated())) {
@@ -740,16 +708,12 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				model.scrollTimeTo(scrollXAnimation.getPosition(now));
 				if (prevRightOffset === timeScale.rightOffset()) {
 					xAnimationFinished = true;
-					this._scrollXAnimation = null;
 				}
 			}
 
-			if (xAnimationFinished) {
-				this._finishScroll();
-				return;
+			if (!xAnimationFinished) {
+				requestAnimationFrame(animationFn);
 			}
-
-			requestAnimationFrame(animationFn);
 		};
 
 		requestAnimationFrame(animationFn);
@@ -764,7 +728,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return;
 		}
 
-		this.terminateKineticAnimation();
+		this._model().timeScale().terminateAnimations();
 
 		if (document.activeElement !== document.body && document.activeElement !== document.documentElement) {
 			// If any focusable element except the page itself is focused, remove the focus
@@ -791,8 +755,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		const model = this._model();
+		const timeScale = model.timeScale();
 
-		if (model.timeScale().isEmpty()) {
+		if (timeScale.isEmpty()) {
 			return;
 		}
 
@@ -820,8 +785,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			};
 		}
 
-		if (this._scrollXAnimation !== null) {
-			this._scrollXAnimation.addPosition(event.localX, now);
+		const scrollXAnimation = timeScale.kineticAnimation();
+
+		if (scrollXAnimation.initialized()) {
+			scrollXAnimation.addPosition(event.localX, now);
 		}
 
 		if (
@@ -830,19 +797,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			(this._startScrollingPos.x !== event.clientX || this._startScrollingPos.y !== event.clientY)
 		) {
 			if (
-				this._scrollXAnimation === null && (
+				scrollXAnimation.expired(now) && (
 					event.isTouch && kineticScrollOptions.touch ||
 					!event.isTouch && kineticScrollOptions.mouse
 				)
 			) {
-				this._scrollXAnimation = new KineticAnimation(
-					Constants.MinScrollSpeed,
-					Constants.MaxScrollSpeed,
-					Constants.DumpingCoeff,
-					Constants.ScrollMinMove
-				);
-				this._scrollXAnimation.addPosition(this._startScrollingPos.localX, this._startScrollingPos.timestamp);
-				this._scrollXAnimation.addPosition(event.localX, now);
+				scrollXAnimation.reset();
+				scrollXAnimation.addPosition(this._startScrollingPos.localX, this._startScrollingPos.timestamp);
+				scrollXAnimation.addPosition(event.localX, now);
 			}
 
 			if (!priceScale.isEmpty()) {

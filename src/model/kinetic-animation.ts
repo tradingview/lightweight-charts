@@ -144,6 +144,23 @@ export class KineticAnimation {
 		this._terminated = true;
 	}
 
+	public initialized(): boolean {
+		return this._position1 !== null;
+	}
+
+	public expired(time: number): boolean {
+		return this._animationStartPosition !== null && this.terminated() || this.finished(time);
+	}
+
+	public reset(): void {
+		this._position1 = null;
+		this._position2 = null;
+		this._position3 = null;
+		this._position4 = null;
+		this._terminated = false;
+		this._animationStartPosition = null;
+	}
+
 	private _progressDuration(time: number): number {
 		const startPosition = ensureNotNull(this._animationStartPosition);
 		const progress = time - startPosition.time;

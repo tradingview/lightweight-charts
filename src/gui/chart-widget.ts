@@ -488,8 +488,9 @@ export class ChartWidget implements IDestroyable {
 	private _applyTimeScaleInvalidations(invalidateMask: InvalidateMask): void {
 		const timeScaleInvalidations = invalidateMask.timeScaleInvalidations();
 		if (timeScaleInvalidations.length > 0) {
-			this._paneWidgets.forEach((p: PaneWidget) => p.terminateKineticAnimation());
+			this._model.timeScale().terminateAnimations();
 		}
+
 		for (const tsInvalidation of timeScaleInvalidations) {
 			this._applyTimeScaleInvalidation(tsInvalidation);
 		}

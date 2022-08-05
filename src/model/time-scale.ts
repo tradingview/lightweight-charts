@@ -12,6 +12,7 @@ import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
 import { FormattedLabelsCache } from './formatted-labels-cache';
+import { KineticAnimation } from './kinetic-animation';
 import { LocalizationOptions } from './localization-options';
 import { areRangesEqual, RangeImpl } from './range-impl';
 import { TickMark, TickMarks } from './tick-marks';
@@ -34,6 +35,13 @@ const enum Constants {
 	DefaultAnimationDuration = 400,
 	// make sure that this (1 / MinVisibleBarsCount) >= coeff in max bar spacing
 	MinVisibleBarsCount = 2,
+}
+
+const enum KineticScrollConstants {
+	MinScrollSpeed = 0.2,
+	MaxScrollSpeed = 7,
+	DumpingCoeff = 0.997,
+	ScrollMinMove = 15,
 }
 
 interface TransitionState {
@@ -204,6 +212,11 @@ export interface TimeScaleOptions {
 	ticksVisible: boolean;
 }
 
+interface ScrollToPositionAnimation {
+	fn(): void;
+	terminate(): void;
+}
+
 export class TimeScale {
 	private readonly _options: TimeScaleOptions;
 	private readonly _model: ChartModel;
@@ -232,6 +245,15 @@ export class TimeScale {
 	private _timeMarksCache: TimeMark[] | null = null;
 
 	private _labels: TimeMark[] = [];
+
+	private _kineticAnimation: KineticAnimation = new KineticAnimation(
+		KineticScrollConstants.MinScrollSpeed,
+		KineticScrollConstants.MaxScrollSpeed,
+		KineticScrollConstants.DumpingCoeff,
+		KineticScrollConstants.ScrollMinMove
+	);
+
+	private _scrollToPositionAnimation: ScrollToPositionAnimation | null = null;
 
 	public constructor(model: ChartModel, options: TimeScaleOptions, localizationOptions: LocalizationOptions) {
 		this._options = options;
@@ -668,19 +690,47 @@ export class TimeScale {
 			throw new RangeError('animationDuration (optional) must be finite positive number');
 		}
 
+		this.terminateAnimations();
+
 		const source = this._rightOffset;
 		const animationStart = performance.now();
+
+		let terminated = false;
+
 		const animationFn = () => {
+			if (terminated) {
+				return;
+			}
+
 			const animationProgress = (performance.now() - animationStart) / animationDuration;
 			const finishAnimation = animationProgress >= 1;
 			const rightOffset = finishAnimation ? offset : source + (offset - source) * animationProgress;
 			this.setRightOffset(rightOffset);
 			if (!finishAnimation) {
-				setTimeout(animationFn, 20);
+				requestAnimationFrame(animationFn);
 			}
 		};
 
+		this._scrollToPositionAnimation = {
+			terminate: () => {
+				terminated = true;
+			},
+			fn: animationFn,
+		};
+
 		animationFn();
+	}
+
+	public kineticAnimation(): KineticAnimation {
+		return this._kineticAnimation;
+	}
+
+	public terminateAnimations(): void {
+		this.endScroll();
+		this._kineticAnimation.terminate();
+		if (this._scrollToPositionAnimation !== null) {
+			this._scrollToPositionAnimation.terminate();
+		}
 	}
 
 	public update(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
