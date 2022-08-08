@@ -221,7 +221,7 @@ export const enum TrackingModeExitMode {
  */
 export interface TrackingModeOptions {
 	// eslint-disable-next-line tsdoc/syntax
-	/** @inheritdoc TrackingModeExitMode
+	/** @inheritDoc TrackingModeExitMode
 	 *
 	 * @defaultValue {@link TrackingModeExitMode.OnNextTap}
 	 */
