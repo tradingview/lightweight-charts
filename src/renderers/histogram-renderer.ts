@@ -1,8 +1,9 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue, TimePointIndex } from '../model/time-data';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 
 const showSpacingMinimalBarWidth = 1;
 const alignToMinimalWidthLimit = 4;
@@ -37,7 +38,7 @@ export class PaneRendererHistogram extends BitmapCoordinatesPaneRenderer {
 		this._precalculatedCache = [];
 	}
 
-	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}

@@ -1,6 +1,6 @@
-import { TextWidthCache } from '../model/text-width-cache';
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { CanvasRenderingTarget } from './canvas-rendering-target';
+import { TextWidthCache } from '../model/text-width-cache';
 
 export interface TimeAxisViewRendererOptions {
 	baselineOffset: number;
@@ -16,5 +16,5 @@ export interface TimeAxisViewRendererOptions {
 }
 
 export interface ITimeAxisViewRenderer {
-	draw(target: CanvasRenderingTarget, rendererOptions: TimeAxisViewRendererOptions): void;
+	draw(target: CanvasRenderingTarget2D, rendererOptions: TimeAxisViewRendererOptions): void;
 }

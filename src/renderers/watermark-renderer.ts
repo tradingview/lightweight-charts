@@ -1,4 +1,5 @@
-import { MediaCoordsRenderingScope } from './canvas-rendering-target';
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { ScaledRenderer } from './scaled-renderer';
 
 export interface WatermarkRendererLineData {
@@ -35,9 +36,9 @@ export class WatermarkRenderer extends ScaledRenderer {
 		this._data = data;
 	}
 
-	protected _drawImpl(renderingScope: MediaCoordsRenderingScope): void {}
+	protected _drawImpl(renderingScope: MediaCoordinatesRenderingScope): void {}
 
-	protected override _drawBackgroundImpl(renderingScope: MediaCoordsRenderingScope): void {
+	protected override _drawBackgroundImpl(renderingScope: MediaCoordinatesRenderingScope): void {
 		if (!this._data.visible) {
 			return;
 		}

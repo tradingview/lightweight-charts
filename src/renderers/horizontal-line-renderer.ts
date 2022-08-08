@@ -1,7 +1,8 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Coordinate } from '../model/coordinate';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { drawHorizontalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 
 export interface HorizontalLineRendererData {
@@ -20,7 +21,7 @@ export class HorizontalLineRenderer extends BitmapCoordinatesPaneRenderer {
 		this._data = data;
 	}
 
-	protected _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	protected _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}

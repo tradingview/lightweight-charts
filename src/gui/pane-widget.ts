@@ -1,4 +1,12 @@
-import { CanvasElementBitmapSizeBinding, equalSizes, Size, size } from 'fancy-canvas';
+import {
+	BitmapCoordinatesRenderingScope,
+	CanvasElementBitmapSizeBinding,
+	CanvasRenderingTarget2D,
+	equalSizes,
+	Size,
+	size,
+	tryCreateCanvasRenderingTarget2D,
+} from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { clearRect, clearRectWithGradient } from '../helpers/canvas-helpers';
@@ -14,7 +22,6 @@ import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
-import { BitmapCoordsRenderingScope, CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
@@ -31,15 +38,15 @@ const enum Constants {
 	ScrollMinMove = 15,
 }
 
-type DrawFunction = (renderer: IPaneRenderer, target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown) => void;
+type DrawFunction = (renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown) => void;
 
-function drawBackground(renderer: IPaneRenderer, target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+function drawBackground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
 	if (renderer.drawBackground) {
 		renderer.drawBackground(target, isHovered, hitTestData);
 	}
 }
 
-function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget, isHovered: boolean, hitTestData?: unknown): void {
+function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
 	renderer.draw(target, isHovered, hitTestData);
 }
 
@@ -473,9 +480,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		if (type !== InvalidationLevel.Cursor) {
 			this._canvasBinding.applySuggestedBitmapSize();
-			const target = createCanvasRenderingTarget(this._canvasBinding);
+			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
 			if (target !== null) {
-				target.useBitmapCoordinates((scope: BitmapCoordsRenderingScope) => {
+				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
 				});
 				if (this._state) {
@@ -485,19 +492,17 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 					this._drawSources(target, sourceLabelPaneViews);
 				}
 			}
-			target?.destroy();
 		}
 
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
 		if (topTarget !== null) {
-			topTarget.useBitmapCoordinates(({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope) => {
+			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
 			});
 			this._drawSources(topTarget, sourceTopPaneViews);
 			this._drawCrosshair(topTarget);
 		}
-		topTarget?.destroy();
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
@@ -525,7 +530,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope): void {
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
 		const { width, height } = bitmapSize;
 		const model = this._model();
 		const topColor = model.backgroundTopColor();
@@ -538,7 +543,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private _drawGrid(target: CanvasRenderingTarget): void {
+	private _drawGrid(target: CanvasRenderingTarget2D): void {
 		const state = ensureNotNull(this._state);
 		const paneView = state.grid().paneView();
 		const renderer = paneView.renderer();
@@ -548,17 +553,17 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private _drawWatermark(target: CanvasRenderingTarget): void {
+	private _drawWatermark(target: CanvasRenderingTarget2D): void {
 		const source = this._model().watermarkSource();
 		this._drawSourceImpl(target, sourcePaneViews, drawBackground, source);
 		this._drawSourceImpl(target, sourcePaneViews, drawForeground, source);
 	}
 
-	private _drawCrosshair(target: CanvasRenderingTarget): void {
+	private _drawCrosshair(target: CanvasRenderingTarget2D): void {
 		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(target: CanvasRenderingTarget, paneViewsGetter: PaneViewsGetter): void {
+	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: PaneViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
@@ -572,7 +577,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	private _drawSourceImpl(
-		target: CanvasRenderingTarget,
+		target: CanvasRenderingTarget2D,
 		paneViewsGetter: PaneViewsGetter,
 		drawFn: DrawFunction,
 		source: IDataSource

@@ -1,6 +1,7 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { LineItemBase } from './line-renderer-base';
 import { ScaledRenderer } from './scaled-renderer';
 
@@ -19,7 +20,7 @@ export class PaneRendererMarks extends ScaledRenderer {
 		this._data = data;
 	}
 
-	protected _drawImpl({ context: ctx }: MediaCoordsRenderingScope): void {
+	protected _drawImpl({ context: ctx }: MediaCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}

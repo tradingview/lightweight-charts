@@ -1,5 +1,6 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
 
 export interface CrosshairLineStyle {
@@ -24,7 +25,7 @@ export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
 		this._data = data;
 	}
 
-	protected override _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	protected override _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}

@@ -1,7 +1,8 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Point } from '../model/point';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 
 export interface LastPriceCircleRendererData {
 	radius: number;
@@ -23,7 +24,7 @@ export class SeriesLastPriceAnimationRenderer extends BitmapCoordinatesPaneRende
 		return this._data;
 	}
 
-	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		const data = this._data;
 		if (data === null) {
 			return;

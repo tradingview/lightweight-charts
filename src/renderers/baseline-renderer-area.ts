@@ -1,10 +1,11 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { clamp } from '../helpers/mathex';
 
 import { Coordinate } from '../model/coordinate';
 import { BaselineFillColorerStyle } from '../model/series-bar-colorer';
 
 import { AreaFillItemBase, PaneRendererAreaBase, PaneRendererAreaDataBase } from './area-renderer-base';
-import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 
 export type BaselineFillItem = AreaFillItemBase & BaselineFillColorerStyle;
 export interface PaneRendererBaselineData extends PaneRendererAreaDataBase<BaselineFillItem> {
@@ -18,7 +19,7 @@ interface BaselineFillCache extends Record<keyof BaselineFillColorerStyle, strin
 export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererBaselineData> {
 	private _fillCache: BaselineFillCache | null = null;
 
-	protected override _fillStyle(renderingScope: MediaCoordsRenderingScope, item: BaselineFillItem): CanvasRenderingContext2D['fillStyle'] {
+	protected override _fillStyle(renderingScope: MediaCoordinatesRenderingScope, item: BaselineFillItem): CanvasRenderingContext2D['fillStyle'] {
 		const { context: ctx, mediaSize } = renderingScope;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;

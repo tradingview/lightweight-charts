@@ -1,3 +1,5 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { ensureNotNull } from '../helpers/assertions';
 
 import { BarCoordinates, BarPrices } from '../model/bar';
@@ -5,7 +7,6 @@ import { BarColorerStyle } from '../model/series-bar-colorer';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { optimalBarWidth } from './optimal-bar-width';
 
 export type BarCandlestickItemBase = TimedValue & BarPrices & BarCoordinates;
@@ -32,7 +33,7 @@ export class PaneRendererBars extends BitmapCoordinatesPaneRenderer {
 	}
 
 	// eslint-disable-next-line complexity
-	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}

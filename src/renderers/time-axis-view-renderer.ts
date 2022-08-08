@@ -1,6 +1,7 @@
+import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D, MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { ensureNotNull } from '../helpers/assertions';
 
-import { BitmapCoordsRenderingScope, CanvasRenderingTarget, MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { ITimeAxisViewRenderer, TimeAxisViewRendererOptions } from './itime-axis-view-renderer';
 
 export interface TimeAxisViewRendererData {
@@ -28,12 +29,12 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		this._data = data;
 	}
 
-	public draw(target: CanvasRenderingTarget, rendererOptions: TimeAxisViewRendererOptions): void {
+	public draw(target: CanvasRenderingTarget2D, rendererOptions: TimeAxisViewRendererOptions): void {
 		if (this._data === null || this._data.visible === false || this._data.text.length === 0) {
 			return;
 		}
 
-		const textWidth = target.useMediaCoordinates(({ context: ctx }: MediaCoordsRenderingScope) => {
+		const textWidth = target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
 			ctx.font = rendererOptions.font;
 			return Math.round(rendererOptions.widthCache.measureText(ctx, ensureNotNull(this._data).text, optimizationReplacementRe));
 		});
@@ -68,7 +69,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			rendererOptions.paddingBottom
 		);
 
-		target.useBitmapCoordinates(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope) => {
+		target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
 			const data = ensureNotNull(this._data);
 
 			ctx.fillStyle = data.background;
@@ -99,7 +100,7 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			}
 		});
 
-		target.useMediaCoordinates(({ context: ctx }: MediaCoordsRenderingScope) => {
+		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
 			const data = ensureNotNull(this._data);
 
 			const yText =

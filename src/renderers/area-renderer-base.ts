@@ -1,8 +1,9 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Coordinate } from '../model/coordinate';
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
@@ -42,7 +43,7 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		this._data = data;
 	}
 
-	protected _drawImpl(renderingScope: MediaCoordsRenderingScope): void {
+	protected _drawImpl(renderingScope: MediaCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
@@ -67,5 +68,5 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		walkLine(renderingScope, items, lineType, visibleRange, barWidth, this._fillStyle.bind(this), finishStyledArea.bind(null, baseLevelCoordinate));
 	}
 
-	protected abstract _fillStyle(renderingScope: MediaCoordsRenderingScope, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];
+	protected abstract _fillStyle(renderingScope: MediaCoordinatesRenderingScope, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];
 }

@@ -1,6 +1,7 @@
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
+
 import { TextWidthCache } from '../model/text-width-cache';
 
-import { CanvasRenderingTarget } from './canvas-rendering-target';
 import { LineWidth } from './draw-line';
 
 export interface PriceAxisViewRendererCommonData {
@@ -42,7 +43,7 @@ export interface PriceAxisViewRendererOptions {
 
 export interface IPriceAxisViewRenderer {
 	draw(
-		target: CanvasRenderingTarget,
+		target: CanvasRenderingTarget2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		align: 'left' | 'right'

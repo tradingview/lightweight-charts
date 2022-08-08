@@ -1,8 +1,8 @@
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
 import { ChartModel } from '../../model/chart-model';
 import { IPriceDataSource } from '../../model/iprice-data-source';
 import { TextWidthCache } from '../../model/text-width-cache';
-import { CanvasRenderingTarget } from '../../renderers/canvas-rendering-target';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { IPriceAxisViewRenderer, PriceAxisViewRendererOptions } from '../../renderers/iprice-axis-view-renderer';
 
@@ -29,7 +29,7 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 		this._align = align;
 	}
 
-	public draw(target: CanvasRenderingTarget): void {
+	public draw(target: CanvasRenderingTarget2D): void {
 		if (this._rendererOptions === null || this._priceAxisViewRenderer === null) {
 			return;
 		}

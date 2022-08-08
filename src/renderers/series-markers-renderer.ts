@@ -1,3 +1,5 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { ensureNever } from '../helpers/assertions';
 import { makeFont } from '../helpers/make-font';
 
@@ -7,7 +9,6 @@ import { SeriesMarkerShape } from '../model/series-markers';
 import { TextWidthCache } from '../model/text-width-cache';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { ScaledRenderer } from './scaled-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
@@ -74,7 +75,7 @@ export class SeriesMarkersRenderer extends ScaledRenderer {
 		return null;
 	}
 
-	protected _drawImpl({ context: ctx }: MediaCoordsRenderingScope, isHovered: boolean, hitTestData?: unknown): void {
+	protected _drawImpl({ context: ctx }: MediaCoordinatesRenderingScope, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}

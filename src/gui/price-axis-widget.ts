@@ -1,4 +1,12 @@
-import { CanvasElementBitmapSizeBinding, equalSizes, Size, size } from 'fancy-canvas';
+import {
+	BitmapCoordinatesRenderingScope,
+	CanvasElementBitmapSizeBinding,
+	CanvasRenderingTarget2D,
+	equalSizes,
+	Size,
+	size,
+	tryCreateCanvasRenderingTarget2D,
+} from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { clearRect, clearRectWithGradient } from '../helpers/canvas-helpers';
@@ -13,7 +21,6 @@ import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceMark, PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
-import { BitmapCoordsRenderingScope, CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
@@ -270,27 +277,25 @@ export class PriceAxisWidget implements IDestroyable {
 		if (type !== InvalidationLevel.Cursor) {
 			this._alignLabels();
 			this._canvasBinding.applySuggestedBitmapSize();
-			const target = createCanvasRenderingTarget(this._canvasBinding);
+			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
 			if (target !== null) {
-				target.useBitmapCoordinates((scope: BitmapCoordsRenderingScope) => {
+				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
 					this._drawBorder(scope);
 					this._drawTickMarks(scope);
 				});
 				this._drawBackLabels(target);
 			}
-			target?.destroy();
 		}
 
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
 		if (topTarget !== null) {
-			topTarget.useBitmapCoordinates(({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope) => {
+			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
 			});
 			this._drawCrosshairLabel(topTarget);
 		}
-		topTarget?.destroy();
 	}
 
 	public getImage(): HTMLCanvasElement {
@@ -392,7 +397,7 @@ export class PriceAxisWidget implements IDestroyable {
 		return res;
 	}
 
-	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope): void {
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
 		const { width, height } = bitmapSize;
 		const model = this._pane.state().model();
 		const topColor = model.backgroundTopColor();
@@ -405,7 +410,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 	}
 
-	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio }: BitmapCoordsRenderingScope): void {
+	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._size === null || this._priceScale === null || !this._priceScale.options().borderVisible) {
 			return;
 		}
@@ -424,7 +429,7 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.fillRect(left, 0, borderSize, bitmapSize.height);
 	}
 
-	private _drawTickMarks(renderingScope: BitmapCoordsRenderingScope): void {
+	private _drawTickMarks(renderingScope: BitmapCoordinatesRenderingScope): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
@@ -570,7 +575,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 	}
 
-	private _drawBackLabels(target: CanvasRenderingTarget): void {
+	private _drawBackLabels(target: CanvasRenderingTarget2D): void {
 		if (this._size === null) {
 			return;
 		}
@@ -588,7 +593,7 @@ export class PriceAxisWidget implements IDestroyable {
 		});
 	}
 
-	private _drawCrosshairLabel(target: CanvasRenderingTarget): void {
+	private _drawCrosshairLabel(target: CanvasRenderingTarget2D): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}

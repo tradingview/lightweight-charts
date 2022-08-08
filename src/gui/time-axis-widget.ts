@@ -1,4 +1,12 @@
-import { CanvasElementBitmapSizeBinding, equalSizes, Size, size } from 'fancy-canvas';
+import {
+	BitmapCoordinatesRenderingScope,
+	CanvasElementBitmapSizeBinding,
+	CanvasRenderingTarget2D,
+	equalSizes,
+	Size,
+	size,
+	tryCreateCanvasRenderingTarget2D,
+} from 'fancy-canvas';
 
 import { clearRect } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
@@ -12,7 +20,6 @@ import { LayoutOptions } from '../model/layout-options';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TickMarkWeight } from '../model/time-data';
 import { TimeMark } from '../model/time-scale';
-import { BitmapCoordsRenderingScope, CanvasRenderingTarget, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 
 import { createBoundCanvas } from './canvas-utils';
@@ -273,9 +280,9 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		if (type !== InvalidationLevel.Cursor) {
 			this._canvasBinding.applySuggestedBitmapSize();
-			const target = createCanvasRenderingTarget(this._canvasBinding);
+			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
 			if (target !== null) {
-				target.useBitmapCoordinates((scope: BitmapCoordsRenderingScope) => {
+				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
 					this._drawBorder(scope);
 				});
@@ -284,7 +291,6 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				// so let's don't call this code at all for now
 				// this._drawLabels(this._chart.model().dataSources(), target);
 			}
-			target?.destroy();
 
 			if (this._leftStub !== null) {
 				this._leftStub.paint(type);
@@ -295,21 +301,20 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const topTarget = createCanvasRenderingTarget(this._topCanvasBinding);
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
 		if (topTarget !== null) {
-			topTarget.useBitmapCoordinates(({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope) => {
+			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
 			});
 			this._drawLabels([this._chart.model().crosshairSource()], topTarget);
 		}
-		topTarget?.destroy();
 	}
 
-	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope): void {
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
 		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, this._chart.model().backgroundBottomColor());
 	}
 
-	private _drawBorder({ context: ctx, bitmapSize, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	private _drawBorder({ context: ctx, bitmapSize, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._chart.options().timeScale.borderVisible) {
 			ctx.fillStyle = this._lineColor();
 
@@ -319,7 +324,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
-	private _drawTickMarks(target: CanvasRenderingTarget): void {
+	private _drawTickMarks(target: CanvasRenderingTarget2D): void {
 		const timeScale = this._chart.model().timeScale();
 		const tickMarks = timeScale.marks();
 
@@ -339,7 +344,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		const options = timeScale.options();
 		if (options.borderVisible && options.ticksVisible) {
-			target.useBitmapCoordinates(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope) => {
+			target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
 				ctx.strokeStyle = this._lineColor();
 				ctx.fillStyle = this._lineColor();
 
@@ -357,7 +362,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			});
 		}
 
-		target.useMediaCoordinates(({ context: ctx }: { context: CanvasRenderingContext2D }) => {
+		target.useMediaCoordinateSpace(({ context: ctx }: { context: CanvasRenderingContext2D }) => {
 			const yText = (
 				rendererOptions.borderSize +
 				rendererOptions.tickLength +
@@ -401,7 +406,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		return coordinate;
 	}
 
-	private _drawLabels(sources: readonly IDataSource[], target: CanvasRenderingTarget): void {
+	private _drawLabels(sources: readonly IDataSource[], target: CanvasRenderingTarget2D): void {
 		const rendererOptions = this._getRendererOptions();
 		for (const source of sources) {
 			for (const view of source.timeAxisViews()) {

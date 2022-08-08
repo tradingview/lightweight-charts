@@ -1,3 +1,5 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { fillRectInnerBorder } from '../helpers/canvas-helpers';
 
 import { CandlesticksColorerStyle } from '../model/series-bar-colorer';
@@ -5,7 +7,6 @@ import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { BarCandlestickItemBase } from './bars-renderer';
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { optimalCandlestickWidth } from './optimal-bar-width';
 
 export interface CandlestickItem extends BarCandlestickItemBase, CandlesticksColorerStyle {
@@ -36,7 +37,7 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 		this._data = data;
 	}
 
-	protected override _drawImpl(renderingScope: BitmapCoordsRenderingScope): void {
+	protected override _drawImpl(renderingScope: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.bars.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
@@ -73,7 +74,7 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 		}
 	}
 
-	private _drawWicks(renderingScope: BitmapCoordsRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
+	private _drawWicks(renderingScope: BitmapCoordinatesRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
 		if (this._data === null) {
 			return;
 		}
@@ -136,7 +137,7 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 		return res;
 	}
 
-	private _drawBorder(renderingScope: BitmapCoordsRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, barSpacing: number): void {
+	private _drawBorder(renderingScope: BitmapCoordinatesRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, barSpacing: number): void {
 		if (this._data === null) {
 			return;
 		}
@@ -176,7 +177,7 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 		}
 	}
 
-	private _drawCandles(renderingScope: BitmapCoordsRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
+	private _drawCandles(renderingScope: BitmapCoordinatesRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
 		if (this._data === null) {
 			return;
 		}

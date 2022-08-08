@@ -1,9 +1,10 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { ensureNotNull } from '../helpers/assertions';
 
 import { PriceMark } from '../model/price-scale';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { BitmapCoordsRenderingScope } from './canvas-rendering-target';
 import { LineStyle, setLineStyle, strokeInPixel } from './draw-line';
 
 export interface GridMarks {
@@ -28,7 +29,7 @@ export class GridRenderer extends BitmapCoordinatesPaneRenderer {
 		this._data = data;
 	}
 
-	protected override _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordsRenderingScope): void {
+	protected override _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}

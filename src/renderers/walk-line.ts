@@ -1,19 +1,20 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Coordinate } from '../model/coordinate';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { LinePoint, LineType } from './draw-line';
 
 // eslint-disable-next-line max-params, complexity
 export function walkLine<TItem extends LinePoint, TStyle>(
-	renderingScope: MediaCoordsRenderingScope,
+	renderingScope: MediaCoordinatesRenderingScope,
 	items: readonly TItem[],
 	lineType: LineType,
 	visibleRange: SeriesItemsIndexesRange,
 	barWidth: number,
 	// the values returned by styleGetter are compared using the operator !==,
 	// so if styleGetter returns objects, then styleGetter should return the same object for equal styles
-	styleGetter: (renderingScope: MediaCoordsRenderingScope, item: TItem) => TStyle,
+	styleGetter: (renderingScope: MediaCoordinatesRenderingScope, item: TItem) => TStyle,
 	finishStyledArea: (ctx: CanvasRenderingContext2D, style: TStyle, areaFirstItem: LinePoint, newAreaFirstItem: LinePoint) => void
 ): void {
 	if (items.length === 0 || visibleRange.from >= items.length) {

@@ -1,8 +1,9 @@
+import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
+
 import { drawRoundRectWithInnerBorder } from '../helpers/canvas-helpers';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
-import { BitmapCoordsRenderingScope, CanvasRenderingTarget } from './canvas-rendering-target';
 import {
 	IPriceAxisViewRenderer,
 	PriceAxisViewRendererCommonData,
@@ -42,13 +43,13 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	}
 
 	public draw(
-		target: CanvasRenderingTarget,
+		target: CanvasRenderingTarget2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		align: 'left' | 'right'
 	): void {
-		target.useBitmapCoordinates(
-			(scope: BitmapCoordsRenderingScope) => this._drawImpl(scope, rendererOptions, textWidthCache, align)
+		target.useBitmapCoordinateSpace(
+			(scope: BitmapCoordinatesRenderingScope) => this._drawImpl(scope, rendererOptions, textWidthCache, align)
 		);
 	}
 
@@ -61,7 +62,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	}
 
 	private _drawImpl(
-		scope: BitmapCoordsRenderingScope,
+		scope: BitmapCoordinatesRenderingScope,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		align: 'left' | 'right'
@@ -137,7 +138,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	}
 
 	private _calculateGeometry(
-		scope: BitmapCoordsRenderingScope,
+		scope: BitmapCoordinatesRenderingScope,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		align: 'left' | 'right'

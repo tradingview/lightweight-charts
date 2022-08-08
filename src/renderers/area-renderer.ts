@@ -1,8 +1,9 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Coordinate } from '../model/coordinate';
 import { AreaFillColorerStyle } from '../model/series-bar-colorer';
 
 import { AreaFillItemBase, PaneRendererAreaBase, PaneRendererAreaDataBase } from './area-renderer-base';
-import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 
 export type AreaFillItem = AreaFillItemBase & AreaFillColorerStyle;
 export interface PaneRendererAreaData extends PaneRendererAreaDataBase<AreaFillItem> {
@@ -16,7 +17,7 @@ interface AreaFillCache extends Record<keyof AreaFillColorerStyle, string> {
 export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData> {
 	private _fillCache: AreaFillCache | null = null;
 
-	protected override _fillStyle(renderingScope: MediaCoordsRenderingScope, item: AreaFillItem): CanvasRenderingContext2D['fillStyle'] {
+	protected override _fillStyle(renderingScope: MediaCoordinatesRenderingScope, item: AreaFillItem): CanvasRenderingContext2D['fillStyle'] {
 		const { context: ctx, mediaSize } = renderingScope;
 
 		const { topColor, bottomColor } = item;

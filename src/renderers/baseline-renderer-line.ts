@@ -1,9 +1,10 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { clamp } from '../helpers/mathex';
 
 import { Coordinate } from '../model/coordinate';
 import { BaselineStrokeColorerStyle } from '../model/series-bar-colorer';
 
-import { MediaCoordsRenderingScope } from './canvas-rendering-target';
 import { LineItemBase as LineStrokeItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer-base';
 
 export type BaselineStrokeItem = LineStrokeItemBase & BaselineStrokeColorerStyle;
@@ -20,7 +21,7 @@ interface BaselineStrokeCache extends Record<keyof BaselineStrokeColorerStyle, s
 export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererBaselineLineData> {
 	private _strokeCache: BaselineStrokeCache | null = null;
 
-	protected override _strokeStyle(renderingScope: MediaCoordsRenderingScope, item: BaselineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
+	protected override _strokeStyle(renderingScope: MediaCoordinatesRenderingScope, item: BaselineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
 		const { context: ctx, mediaSize } = renderingScope;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;

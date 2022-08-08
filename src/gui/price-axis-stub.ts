@@ -1,11 +1,17 @@
-import { CanvasElementBitmapSizeBinding, equalSizes, Size, size } from 'fancy-canvas';
+import {
+	BitmapCoordinatesRenderingScope,
+	CanvasElementBitmapSizeBinding,
+	equalSizes,
+	Size,
+	size,
+	tryCreateCanvasRenderingTarget2D,
+} from 'fancy-canvas';
 
 import { clearRect } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 
 import { ChartOptionsInternal } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { BitmapCoordsRenderingScope, createCanvasRenderingTarget } from '../renderers/canvas-rendering-target';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
 import { createBoundCanvas } from './canvas-utils';
@@ -95,21 +101,20 @@ export class PriceAxisStub implements IDestroyable {
 		this._invalidated = false;
 
 		this._canvasBinding.applySuggestedBitmapSize();
-		const target = createCanvasRenderingTarget(this._canvasBinding);
+		const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
 		if (target !== null) {
-			target.useBitmapCoordinates((scope: BitmapCoordsRenderingScope) => {
+			target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 				this._drawBackground(scope);
 				this._drawBorder(scope);
 			});
 		}
-		target?.destroy();
 	}
 
 	public getImage(): HTMLCanvasElement {
 		return this._canvasBinding.canvasElement;
 	}
 
-	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio }: BitmapCoordsRenderingScope): void {
+	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (!this._borderVisible()) {
 			return;
 		}
@@ -123,7 +128,7 @@ export class PriceAxisStub implements IDestroyable {
 		ctx.fillRect(left, 0, borderSize, borderSize);
 	}
 
-	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordsRenderingScope): void {
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
 		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, this._bottomColor());
 	}
 
