@@ -25,7 +25,8 @@ export function replaceThemeConstantStrings(originalString, isDarkTheme) {
 const EnhancedCodeBlock = props => {
 	const { chart, replaceThemeConstants, ...rest } = props;
 	let { children } = props;
-	const { isDarkTheme } = useColorMode();
+	const { colorMode } = useColorMode();
+	const isDarkTheme = colorMode === 'dark';
 
 	if (replaceThemeConstants && typeof children === 'string') {
 		children = replaceThemeConstantStrings(children, isDarkTheme);
