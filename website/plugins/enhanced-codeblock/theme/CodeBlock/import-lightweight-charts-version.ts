@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention -- allows using version numbers as keys (e.g. "3.8") */
 import type { Version } from '../../../../versions';
 
 export type LightweightChartsApi38 = typeof import('lightweight-charts-3.8');
