@@ -1,6 +1,6 @@
 import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
 
-import { ScaledRenderer } from './scaled-renderer';
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 
 export interface WatermarkRendererLineData {
 	text: string;
@@ -27,7 +27,7 @@ export interface WatermarkRendererData {
 	vertAlign: VertAlign;
 }
 
-export class WatermarkRenderer extends ScaledRenderer {
+export class WatermarkRenderer extends MediaCoordinatesPaneRenderer {
 	private readonly _data: WatermarkRendererData;
 	private _metricsCache: Map<string, Map<string, number>> = new Map();
 

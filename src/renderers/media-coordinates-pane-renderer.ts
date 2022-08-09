@@ -2,7 +2,7 @@ import { CanvasRenderingTarget2D, MediaCoordinatesRenderingScope } from 'fancy-c
 
 import { IPaneRenderer } from './ipane-renderer';
 
-export abstract class ScaledRenderer implements IPaneRenderer {
+export abstract class MediaCoordinatesPaneRenderer implements IPaneRenderer {
 	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
 		target.useMediaCoordinateSpace(
 			(scope: MediaCoordinatesRenderingScope) => this._drawImpl(scope, isHovered, hitTestData)

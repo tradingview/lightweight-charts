@@ -3,7 +3,7 @@ import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { LineItemBase } from './line-renderer-base';
-import { ScaledRenderer } from './scaled-renderer';
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 
 export interface MarksRendererData {
 	items: LineItemBase[];
@@ -13,7 +13,7 @@ export interface MarksRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererMarks extends ScaledRenderer {
+export class PaneRendererMarks extends MediaCoordinatesPaneRenderer {
 	protected _data: MarksRendererData | null = null;
 
 	public setData(data: MarksRendererData): void {

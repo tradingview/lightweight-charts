@@ -9,7 +9,7 @@ import { SeriesMarkerShape } from '../model/series-markers';
 import { TextWidthCache } from '../model/text-width-cache';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { ScaledRenderer } from './scaled-renderer';
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
 import { drawSquare, hitTestSquare } from './series-markers-square';
@@ -37,7 +37,7 @@ export interface SeriesMarkerRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class SeriesMarkersRenderer extends ScaledRenderer {
+export class SeriesMarkersRenderer extends MediaCoordinatesPaneRenderer {
 	private _data: SeriesMarkerRendererData | null = null;
 	private _textWidthCache: TextWidthCache = new TextWidthCache();
 	private _fontSize: number = -1;

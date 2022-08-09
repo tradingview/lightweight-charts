@@ -5,7 +5,7 @@ import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { ScaledRenderer } from './scaled-renderer';
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 import { walkLine } from './walk-line';
 
 export type AreaFillItemBase = TimedValue & PricedValue & LinePoint;
@@ -36,7 +36,7 @@ function finishStyledArea(
 	ctx.fill();
 }
 
-export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBase> extends ScaledRenderer {
+export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBase> extends MediaCoordinatesPaneRenderer {
 	protected _data: TData | null = null;
 
 	public setData(data: TData): void {
