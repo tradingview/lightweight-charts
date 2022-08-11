@@ -3,6 +3,7 @@ import {
 	CanvasElementBitmapSizeBinding,
 	CanvasRenderingTarget2D,
 	equalSizes,
+	MediaCoordinatesRenderingScope,
 	Size,
 	size,
 	tryCreateCanvasRenderingTarget2D,
@@ -362,7 +363,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			});
 		}
 
-		target.useMediaCoordinateSpace(({ context: ctx }: { context: CanvasRenderingContext2D }) => {
+		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
 			const yText = (
 				rendererOptions.borderSize +
 				rendererOptions.tickLength +
