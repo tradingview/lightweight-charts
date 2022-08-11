@@ -318,7 +318,6 @@ export class ChartWidget implements IDestroyable {
 
 			if (this._isRightAxisVisible()) {
 				drawStub('right');
-				ctx.restore();
 			}
 		}
 
