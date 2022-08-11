@@ -157,6 +157,8 @@ export function drawRoundRectWithInnerBorder(
 		ctx.closePath();
 		ctx.stroke();
 	}
+
+	ctx.restore();
 }
 
 // eslint-disable-next-line max-params
