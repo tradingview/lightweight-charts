@@ -2,6 +2,8 @@
 
 The minimal supported version of [NodeJS](https://nodejs.org/) for development is 16.13.
 
+**Note:** you need to run `npm install` in both the root directory and the `website` directory before you can run the lint tests.
+
 ## Compiling
 
 - `npm run tsc` - compiles the source code only (excluding tests)
