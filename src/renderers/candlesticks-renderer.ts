@@ -64,7 +64,7 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 		}
 
 		if (this._data.borderVisible) {
-			this._drawBorder(renderingScope, bars, this._data.visibleRange, this._data.barSpacing);
+			this._drawBorder(renderingScope, bars, this._data.visibleRange);
 		}
 
 		const borderWidth = this._calculateBorderWidth(horizontalPixelRatio);
@@ -137,7 +137,7 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 		return res;
 	}
 
-	private _drawBorder(renderingScope: BitmapCoordinatesRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange, barSpacing: number): void {
+	private _drawBorder(renderingScope: BitmapCoordinatesRenderingScope, bars: readonly CandlestickItem[], visibleRange: SeriesItemsIndexesRange): void {
 		if (this._data === null) {
 			return;
 		}
