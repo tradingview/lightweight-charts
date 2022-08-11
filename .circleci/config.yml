@@ -42,11 +42,11 @@ aliases:
 executors:
   node16-executor:
     docker:
-      - image: circleci/node:16
+      - image: cimg/node:16.16
 
   node16-browsers-executor:
     docker:
-      - image: circleci/node:16-browsers
+      - image: cimg/node:16.16-browsers
 
 commands:
   checkout-with-deps:
@@ -294,6 +294,7 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
+            - install-deps-website
       - lint-markdown:
           filters: *default-filters
           requires:
