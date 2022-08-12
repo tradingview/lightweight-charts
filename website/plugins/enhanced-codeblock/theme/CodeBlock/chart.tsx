@@ -1,4 +1,5 @@
-import { useDocsVersion } from '@docusaurus/theme-common';
+import { type PropVersionMetadata } from '@docusaurus/plugin-content-docs';
+import { useDocsPreferredVersion } from '@docusaurus/theme-common';
 import * as React from 'react';
 
 import { importLightweightChartsVersion, LightweightChartsApiTypeMap } from './import-lightweight-charts-version';
@@ -36,7 +37,8 @@ function getSrcDocWithScript(script: string): string {
 
 export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props: ChartProps): JSX.Element {
 	const { script } = props;
-	const { version } = useDocsVersion() as unknown as { version: TVersion };
+	const { preferredVersion } = useDocsPreferredVersion() as { preferredVersion: (PropVersionMetadata & { name: string }) | null };
+	const version = (preferredVersion?.name ?? 'current') as TVersion;
 	const srcDoc = getSrcDocWithScript(script);
 	const ref = React.useRef<HTMLIFrameElement>(null);
 
