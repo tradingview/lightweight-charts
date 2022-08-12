@@ -36,8 +36,6 @@ export class KineticAnimation {
 	private _durationMsecs: number = 0;
 	private _speedPxPerMsec: number = 0;
 
-	private _terminated: boolean = false;
-
 	private readonly _minMove: number;
 	private readonly _minSpeed: number;
 	private readonly _maxSpeed: number;
@@ -134,31 +132,6 @@ export class KineticAnimation {
 
 	public finished(time: number): boolean {
 		return this._animationStartPosition === null || this._progressDuration(time) === this._durationMsecs;
-	}
-
-	public terminated(): boolean {
-		return this._terminated;
-	}
-
-	public terminate(): void {
-		this._terminated = true;
-	}
-
-	public initialized(): boolean {
-		return this._position1 !== null;
-	}
-
-	public expired(time: number): boolean {
-		return this._animationStartPosition !== null && this.terminated() || this.finished(time);
-	}
-
-	public reset(): void {
-		this._position1 = null;
-		this._position2 = null;
-		this._position3 = null;
-		this._position4 = null;
-		this._terminated = false;
-		this._animationStartPosition = null;
 	}
 
 	private _progressDuration(time: number): number {
