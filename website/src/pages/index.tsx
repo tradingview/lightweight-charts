@@ -25,7 +25,8 @@ function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptio
 }
 
 function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
-	const { isDarkTheme } = useColorMode();
+	const { colorMode } = useColorMode();
+	const isDarkTheme = colorMode === 'dark';
 
 	const [layoutOptions, setLayoutOptions] = React.useState<DeepPartial<LayoutOptions>>(getLayoutOptionsForTheme(isDarkTheme));
 
