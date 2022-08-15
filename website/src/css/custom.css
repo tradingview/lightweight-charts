@@ -75,7 +75,7 @@
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-light.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-light.svg');
 
-	--docusaurus-highlighted-code-line-bg: var(--color-tv-blue-200);
+	--docusaurus-highlighted-code-line-bg: #2962FF22; /* --color-tv-blue-500 with opacity */
 }
 
 html[data-theme=dark] {
@@ -118,8 +118,19 @@ html[data-theme=dark] .DocSearch {
 	--docsearch-searchbox-focus-background: var(--color-cold-gray-850);
 }
 
-html[data-theme=dark] {
-	--docusaurus-highlighted-code-line-bg: var(--color-tv-blue-900);
+.theme-code-block-highlighted-line {
+	display: block;
+	margin: 0 calc(-1 * var(--ifm-pre-padding));
+	padding: 0 var(--ifm-pre-padding);
+	border-left: 3px solid #2962FFBB;
+}
+
+.code-block-fade-line {
+	filter: opacity(0.8) saturate(0.2);
+	display: block;
+	margin: 0 calc(-1 * var(--ifm-pre-padding));
+	padding: 0 var(--ifm-pre-padding);
+	user-select: none;
 }
 
 .navbar {
@@ -221,4 +232,10 @@ html[data-theme=dark] {
 	.footer {
 		--footer-links-padding-horizontal: 240px;
 	}
+}
+
+.standalone-iframe {
+	height: 250px;
+	width:100%;
+	border-radius: var(--ifm-code-border-radius);
 }

@@ -299,6 +299,19 @@ async function getConfig() {
 					theme: lightCodeTheme,
 					darkTheme: darkCodeTheme,
 					additionalLanguages: ['ruby', 'swift', 'kotlin', 'groovy'],
+					magicComments: [
+						{
+							className: 'theme-code-block-highlighted-line',
+							line: 'highlight-next-line',
+							block: { start: 'highlight-start', end: 'highlight-end' },
+						},
+						{
+							// Lightly fades the code lines (useful for boilerplate sections of code)
+							className: 'code-block-fade-line',
+							block: { start: 'highlight-fade-start', end: 'highlight-fade-end' },
+							line: 'highlight-fade',
+						},
+					],
 				},
 				algolia: {
 					appId: '7Q5A441YPA',
