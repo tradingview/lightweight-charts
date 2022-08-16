@@ -36,8 +36,6 @@ export class KineticAnimation {
 	private _durationMsecs: number = 0;
 	private _speedPxPerMsec: number = 0;
 
-	private _terminated: boolean = false;
-
 	private readonly _minMove: number;
 	private readonly _minSpeed: number;
 	private readonly _maxSpeed: number;
@@ -134,14 +132,6 @@ export class KineticAnimation {
 
 	public finished(time: number): boolean {
 		return this._animationStartPosition === null || this._progressDuration(time) === this._durationMsecs;
-	}
-
-	public terminated(): boolean {
-		return this._terminated;
-	}
-
-	public terminate(): void {
-		this._terminated = true;
 	}
 
 	private _progressDuration(time: number): number {
