@@ -12,6 +12,14 @@ pagination_prev: customization/chart-colors
 pagination_next: customization/price-format
 ---
 
+:::info
+
+**This page is part of an iterative guide (where we build onto code from the previous steps).**
+
+It is recommend that you follow the guide from the [start](intro). However, if you are only interested in the content on this page then take a look at the [full code](#complete-code) at the bottom of page for context of how this code fits into a working example.
+
+:::
+
 In this section, we will be customizing the visual styling of the candlestick series.
 
 We can add our custom options to the series by using the `applyOptions` method on the ISeriesApi instance for the candlestick series. In other words, we can call the `applyOptions` method on the `mainSeries` variable (which was returned when we evoked `addCandlestickSeries()` earlier).

@@ -12,6 +12,14 @@ pagination_prev: customization/price-scale
 pagination_next: customization/crosshair
 ---
 
+:::info
+
+**This page is part of an iterative guide (where we build onto code from the previous steps).**
+
+It is recommend that you follow the guide from the [start](intro). However, if you are only interested in the content on this page then take a look at the [full code](#complete-code) at the bottom of page for context of how this code fits into a working example.
+
+:::
+
 In the previous step, we adjusted the vertical price scale, now let us adjust the horizontal time scale. We previously adjusted the border color of this scale and now we are going to adjust the starting 'zoom' level.
 
 We will be adjusting the [`barSpacing`](/docs/api/interfaces/TimeScaleOptions#barspacing) option on the time scale which is used when the chart is first rendered to determine the horizontal 'zoom' level. The property sets 'The space between bars in pixels.', where a larger number will result in wider bars and fewer bars visible on the chart. The default value is `6` and we will be increasing it to `10` which will effectively 'zoom in' for the time scale.
