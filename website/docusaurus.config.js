@@ -9,7 +9,7 @@ const https = require('https');
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const { default: pluginDocusaurus } = require('docusaurus-plugin-typedoc');
-const { default: logger } = require('@docusaurus/logger');
+const logger = require('@docusaurus/logger');
 
 const versions = require('./versions.json');
 const sizeLimits = require('../.size-limit');
@@ -55,7 +55,7 @@ function downloadFile(urlString, filePath) {
 		const url = new URL(urlString);
 
 		const request = https.get(url, response => {
-			if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location !== undefined) {
+			if (response.statusCode && response.statusCode >= 300 && response.statusCode < 400 && response.headers.location !== undefined) {
 				// handling redirect
 				url.pathname = response.headers.location;
 				downloadFile(url.toString(), filePath).then(resolve, reject);
@@ -112,7 +112,7 @@ async function downloadTypingsFromUnpkg(version) {
 	return typingsFilePath;
 }
 
-/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
+/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc').TypeDocOptions} */
 const commonDocusaurusPluginTypedocConfig = {
 	readme: 'none',
 	disableSources: true,
@@ -322,8 +322,7 @@ async function getConfig() {
 			],
 			[
 				'docusaurus-plugin-typedoc',
-				// @ts-ignore
-				/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
+				/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc').TypeDocOptions} */
 				({
 					...commonDocusaurusPluginTypedocConfig,
 					id: 'current-api',

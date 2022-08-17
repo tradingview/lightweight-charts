@@ -1,15 +1,16 @@
-import { useDocsVersion } from '@docusaurus/theme-common';
+import { type PropVersionMetadata } from '@docusaurus/plugin-content-docs';
+import { useDocsPreferredVersion } from '@docusaurus/theme-common';
 import * as React from 'react';
 
-import { importLightweightChartsVersion, LightweightChartsApi, LightweightChartsVersion } from './import-lightweight-charts-version';
+import { importLightweightChartsVersion, LightweightChartsApiTypeMap } from './import-lightweight-charts-version';
 import styles from './styles.module.css';
 
 interface ChartProps {
 	script: string;
 }
 
-type IFrameWindow = Window & {
-	createChart: (...args: Parameters<LightweightChartsApi['createChart']>) => ReturnType<LightweightChartsApi['createChart']>;
+type IFrameWindow<TVersion extends keyof LightweightChartsApiTypeMap> = Window & {
+	createChart: LightweightChartsApiTypeMap[TVersion]['createChart'];
 	run?: () => void;
 };
 
@@ -34,51 +35,42 @@ function getSrcDocWithScript(script: string): string {
 	`;
 }
 
-export const Chart = (props: ChartProps): JSX.Element => {
+export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props: ChartProps): JSX.Element {
 	const { script } = props;
-	const { version } = useDocsVersion();
+	const { preferredVersion } = useDocsPreferredVersion() as { preferredVersion: (PropVersionMetadata & { name: string }) | null };
+	const version = (preferredVersion?.name ?? 'current') as TVersion;
 	const srcDoc = getSrcDocWithScript(script);
 	const ref = React.useRef<HTMLIFrameElement>(null);
 
 	React.useEffect(
 		() => {
 			const iframeElement = ref.current;
-			const iframeWindow = iframeElement?.contentWindow as IFrameWindow;
+			const iframeWindow = iframeElement?.contentWindow as IFrameWindow<TVersion>;
 			const iframeDocument = iframeElement?.contentDocument;
 
 			if (iframeElement === null || !iframeWindow || !iframeDocument) {
 				return;
 			}
 
-			const injectCreateChartAndRun = () => {
-				importLightweightChartsVersion(version as LightweightChartsVersion).then((mod: LightweightChartsApi) => {
-					const createChart = mod.createChart;
-					Object.assign(iframeWindow, mod); // Make ColorType, etc. available in the iframe
+			const injectCreateChartAndRun = async () => {
+				try {
+					const { module, createChart } = await importLightweightChartsVersion[version](iframeWindow);
 
-					iframeWindow.createChart = (container: HTMLElement | string, options?: Parameters<LightweightChartsApi['createChart']>[1]) => {
-						const chart = createChart(container, options);
-						const resizeListener = () => {
-							const boundingClientRect = (container as HTMLElement).getBoundingClientRect();
-							chart.resize(boundingClientRect.width, boundingClientRect.height);
-						};
-
-						iframeWindow.addEventListener('resize', resizeListener, true);
-
-						return chart;
-					};
-
+					Object.assign(iframeWindow, module); // Make ColorType, etc. available in the iframe
+					iframeWindow.createChart = createChart;
 					iframeWindow.run?.();
-				})
-				.catch((err: unknown) => {
+				} catch (err: unknown) {
 					// eslint-disable-next-line no-console
 					console.error(err);
-				});
+				}
 			};
 
 			if (iframeWindow.run !== undefined) {
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				injectCreateChartAndRun();
 			} else {
 				const iframeLoadListener = () => {
+					// eslint-disable-next-line @typescript-eslint/no-floating-promises
 					injectCreateChartAndRun();
 					iframeElement.removeEventListener('load', iframeLoadListener);
 				};
@@ -97,4 +89,4 @@ export const Chart = (props: ChartProps): JSX.Element => {
 			className={styles.iframe}
 		/>
 	);
-};
+}

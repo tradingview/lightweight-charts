@@ -14,10 +14,10 @@ If you think that a tutorial is missing feel free to ask [in the discussions](ht
 :::
 
 import DocCardList from '@theme/DocCardList';
-import { useDocsSidebar } from '@docusaurus/theme-common';
+import { useDocsSidebar } from '@docusaurus/theme-common/internal';
 
 <DocCardList items={
 	// we need to filter an index page from these cards
 	// and it seems that this is easiest way to do this
-	useDocsSidebar().filter(x => x.docId !== 'index')
+	useDocsSidebar().items.filter(x => x.docId !== 'index')
 } />
