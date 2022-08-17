@@ -23,71 +23,29 @@ const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
-interface MouseWheelEventOptions {
-	type: 'mouseWheel';
-	x: number;
-	y: number;
-	deltaX: number;
-	deltaY: number;
-}
+async function doMouseScrolls(page: Page, element: ElementHandle): Promise<void> {
+	const boundingBox = await element.boundingBox();
+	if (!boundingBox) {
+		throw new Error('Unable to get boundingBox for element.');
+	}
 
-interface InternalPuppeteerClient {
-	// see https://github.com/ChromeDevTools/devtools-protocol/blob/20413fc82dea0d45a598715970293b4787296673/json/browser_protocol.json#L7822-L7898
-	// see https://github.com/puppeteer/puppeteer/issues/4119
-	send(event: 'Input.dispatchMouseEvent', options: MouseWheelEventOptions): Promise<void>;
-}
+	// move mouse to center of element
+	await page.mouse.move(
+	boundingBox.x + boundingBox.width / 2,
+	boundingBox.y + boundingBox.height / 2
+	);
 
-async function doMouseScrolls(element: ElementHandle): Promise<void> {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
-	const client: InternalPuppeteerClient = (element as any)._client;
+	await page.mouse.wheel({ deltaX: 10.0 });
 
-	await client.send('Input.dispatchMouseEvent', {
-		type: 'mouseWheel',
-		x: 0,
-		y: 0,
-		deltaX: 10.0,
-		deltaY: 0,
-	});
+	await page.mouse.wheel({ deltaY: 10.0 });
 
-	await client.send('Input.dispatchMouseEvent', {
-		type: 'mouseWheel',
-		x: 0,
-		y: 0,
-		deltaX: 0,
-		deltaY: 10.0,
-	});
+	await page.mouse.wheel({ deltaX: -10.0 });
 
-	await client.send('Input.dispatchMouseEvent', {
-		type: 'mouseWheel',
-		x: 0,
-		y: 0,
-		deltaX: -10.0,
-		deltaY: 0,
-	});
+	await page.mouse.wheel({ deltaY: -10.0 });
 
-	await client.send('Input.dispatchMouseEvent', {
-		type: 'mouseWheel',
-		x: 0,
-		y: 0,
-		deltaX: 0,
-		deltaY: -10.0,
-	});
+	await page.mouse.wheel({ deltaX: 10.0, deltaY: 10.0 });
 
-	await client.send('Input.dispatchMouseEvent', {
-		type: 'mouseWheel',
-		x: 0,
-		y: 0,
-		deltaX: 10.0,
-		deltaY: 10.0,
-	});
-
-	await client.send('Input.dispatchMouseEvent', {
-		type: 'mouseWheel',
-		x: 0,
-		y: 0,
-		deltaX: -10.0,
-		deltaY: -10.0,
-	});
+	await page.mouse.wheel({ deltaX: -10.0, deltaY: -10.0 });
 }
 
 async function doZoomInZoomOut(page: Page): Promise<void> {
@@ -131,6 +89,16 @@ async function doHorizontalDrag(page: Page, element: ElementHandle): Promise<voi
 	await page.mouse.up({ button: 'left' });
 }
 
+// await a setTimeout delay evaluated within page context
+async function pageTimeout(page: Page, delay: number): Promise<void> {
+	return page.evaluate(
+		(ms: number) => new Promise<void>(
+			(resolve: () => void) => setTimeout(resolve, ms)
+			),
+		delay
+	);
+}
+
 async function doKineticAnimation(page: Page, element: ElementHandle): Promise<void> {
 	const elBox = await element.boundingBox() as BoundingBox;
 
@@ -141,7 +109,7 @@ async function doKineticAnimation(page: Page, element: ElementHandle): Promise<v
 	await page.mouse.move(elMiddleX, elMiddleY);
 
 	await page.mouse.down({ button: 'left' });
-	await page.waitForTimeout(50);
+	await pageTimeout(page, 50);
 	await page.mouse.move(elMiddleX - 40, elMiddleY);
 	await page.mouse.move(elMiddleX - 55, elMiddleY);
 	await page.mouse.move(elMiddleX - 105, elMiddleY);
@@ -150,8 +118,7 @@ async function doKineticAnimation(page: Page, element: ElementHandle): Promise<v
 	await page.mouse.move(elMiddleX - 255, elMiddleY);
 	await page.mouse.up({ button: 'left' });
 
-	await page.waitForTimeout(200);
-
+	await pageTimeout(page, 200);
 	// stop animation
 	await page.mouse.down({ button: 'left' });
 	await page.mouse.up({ button: 'left' });
@@ -170,7 +137,7 @@ async function doUserInteractions(page: Page): Promise<void> {
 	const timeAxis = (await chartContainer.$$('tr:nth-of-type(2) td:nth-of-type(2) div canvas'))[0];
 
 	// mouse scroll
-	await doMouseScrolls(chartContainer);
+	await doMouseScrolls(page, chartContainer);
 
 	// outside click
 	await page.mouse.click(chartBox.x + chartBox.width + 20, chartBox.y + chartBox.height + 50, { button: 'left' });
