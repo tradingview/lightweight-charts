@@ -17,6 +17,7 @@
     "@docusaurus/preset-classic": "2.0.1",
     "@docusaurus/theme-search-algolia": "2.0.1",
     "@tsconfig/docusaurus": "~1.0.6",
+    "@types/react": "~17.0.39",
     "cross-env": "~7.0.3",
     "docusaurus-plugin-typedoc": "0.17.5",
     "lightweight-charts": "~3.8.0",
