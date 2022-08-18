@@ -102,26 +102,6 @@ and then add the following `<div>` element within the container element used for
 </div>
 ```
 
-## Automatically resizing the chart when the window is resized
-
-Adding the following code snippet to the end of the script tag will make the chart resize automatically to fit the browser window whenever the window is resized.
-
-:::caution
-
-This will only work correctly if you want the chart to completely fill the window.
-
-:::
-
-```js
-// Adding a window resize event handler to resize the chart when
-// the window size changes.
-// Note: for more advanced examples (when the chart doesn't fill the entire window)
-// you may need to use ResizeObserver -> https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
-window.addEventListener('resize', () => {
-    chart.resize(window.innerWidth, window.innerHeight);
-});
-```
-
 ## Result
 
 🎉 Congrats! At this point you should have the final chart which looks like this:

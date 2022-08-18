@@ -1142,6 +1142,14 @@
           bottom: 0.2,
         },
       });
+
+      // Adding a window resize event handler to resize the chart when
+      // the window size changes.
+      // Note: for more advanced examples (when the chart doesn't fill the entire window)
+      // you may need to use ResizeObserver -> https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+      window.addEventListener("resize", () => {
+        chart.resize(window.innerWidth, window.innerHeight);
+      });
     </script>
   </body>
 </html>
