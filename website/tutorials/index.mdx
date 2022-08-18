@@ -9,11 +9,16 @@ import ReactLogo from "@site/src/img/react.svg";
 
 # Tutorials
 
-import VersionWarningAdmonition from '@site/src/components/VersionWarningAdmonition'
+import VersionWarningAdmonition from "@site/src/components/VersionWarningAdmonition";
 
 <!-- Show warning when not on the latest published version  -->
 <!-- Tutorials section isn't versioned yet, hence the need for the warning message -->
-<VersionWarningAdmonition notCurrent="These tutorials are for the latest published version of Lightweight&nbsp;Charts, which is CURRENT_VERSION. Currently viewing documentation for DOC_VERSION." type="caution"/>
+
+<VersionWarningAdmonition
+	notCurrent="These tutorials are for the latest published version of Lightweight&nbsp;Charts."
+	type="caution"
+	displayVersionMessage
+/>
 
 ## Guides
 
@@ -47,5 +52,34 @@ This section contains some tutorials how to use Lightweight Charts with some pop
 
 If you think that a tutorial is missing feel free to ask [in the discussions](https://github.com/tradingview/lightweight-charts/discussions)
 or submit your own.
+
+:::
+
+## How To / Examples
+
+A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
+
+import { useDocsSidebar } from "@docusaurus/theme-common/internal";
+export const ExamplesList = () => {
+	const examplesCategory = useDocsSidebar().items.find(
+		item => item.type === "category" && item.label === "How To / Examples"
+	);
+	const examples = examplesCategory.items.filter(doc => doc.type === "link");
+	return (
+		<ul>
+			{examples.map(docLink => (
+				<li key={docLink.docId}>
+					<a href={docLink.href}>{docLink.label}</a>
+				</li>
+			))}
+		</ul>
+	);
+};
+
+<ExamplesList />
+
+:::tip
+
+More examples can be viewed on the [Lightweight Charts product page](https://www.tradingview.com/lightweight-charts/).
 
 :::

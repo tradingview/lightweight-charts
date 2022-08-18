@@ -1,0 +1,122 @@
+---
+title: Tooltips
+sidebar_label: Tooltips
+description: Examples on how to implement a tooltip for your chart.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - example
+  - tooltip
+---
+
+Lightweight charts doesn't include a built-in tooltip feature, however it is something which can be added
+to your chart by following the examples presented below.
+
+## How to
+
+In order to add a tooltip to the chart we need to create and position an `html` into the desired position above
+the chart. We can then subscribe to the crosshairMove events ([subscribeCrosshairMove](/docs/api/interfaces/IChartApi#subscribecrosshairmove)) provided by the [`IChartApi`](/docs/api/interfaces/IChartApi) instance, and manually
+update the content within our `html` tooltip element and change it's position.
+
+```js
+chart.subscribeCrosshairMove(param => {
+    if (
+        param.point === undefined ||
+		!param.time ||
+		param.point.x < 0 ||
+		param.point.y < 0
+    ) {
+        toolTip.style.display = 'none';
+    } else {
+        const dateStr = dateToString(param.time);
+        toolTip.style.display = 'block';
+        const price = param.seriesPrices.get(series);
+        toolTip.innerHTML = `<div>${price.toFixed(2)}</div>`;
+
+        // Position tooltip according to mouse cursor position
+        toolTip.style.left = param.point.x + 'px';
+        toolTip.style.top = param.point.y + 'px';
+    }
+});
+```
+
+The process of creating the tooltip html element and positioning can be seen within the examples below.
+Essentially, we create a new div element within the container div (holding the chart) and then position
+and style it using `css`.
+
+You can see full [working examples](#examples) below.
+
+### Getting the mouse cursors position
+
+The parameter object ([MouseEventParams Interface](/docs/api/interfaces/MouseEventParams)) passed to the
+crosshairMove handler function ([MouseEventhandler](/docs/api#mouseeventhandler)) contains a
+[point](/docs/api/interfaces/Point) property which gives the current mouse cursor position relative to
+the top left corner of the chart.
+
+### Getting the data points position
+
+It is possible to convert a price value into it's current vertical position on the chart by using
+the [priceToCoordinate](/docs/api/interfaces/ISeriesApi#pricetocoordinate) method on the series' instance.
+This along with the `param.point.x` can be used to determine the position of the data point.
+
+```js
+chart.subscribeCrosshairMove(param => {
+    const x = param.point.x;
+    const price = param.seriesPrices.get(series);
+    // where series is the ISeriesApi instance that we are interested in.
+    const y = series.priceToCoordinate(price);
+    console.log(`The data point is at position: ${x}, ${y}`);
+});
+```
+
+## Resources
+
+- [subscribeCrosshairMove](/docs/api/interfaces/IChartApi#subscribecrosshairmove)
+- [MouseEventParams Interface](/docs/api/interfaces/MouseEventParams)
+- [MouseEventhandler](/docs/api#mouseeventhandler)
+- [priceToCoordinate](/docs/api/interfaces/ISeriesApi#pricetocoordinate)
+
+Below are a few external resources related to creating and styling html elements:
+
+- [createElement](https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement)
+- [innerHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML)
+- [style property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style)
+
+## Examples
+
+import UsageGuidePartial from "./_usage-guide-partial.mdx";
+
+<UsageGuidePartial />
+
+import CodeBlock from "@theme/CodeBlock";
+
+### Floating Tooltip
+
+The floating tooltip in this example will position itself next to the current datapoint.
+
+import floatingCode from "!!raw-loader!./tooltip-floating.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{floatingCode}
+</CodeBlock>
+
+### Tracking Tooltip
+
+The tracking tooltip will position itself next to the user's cursor.
+
+import trackingCode from "!!raw-loader!./tooltip-tracking.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{trackingCode}
+</CodeBlock>
+
+### Magnifier Tooltip
+
+The magnifier tooltip will position itself along the top edge of the chart while following
+the user's cursor along the horizontal time axis.
+
+import magnifierCode from "!!raw-loader!./tooltip-magnifier.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{magnifierCode}
+</CodeBlock>
