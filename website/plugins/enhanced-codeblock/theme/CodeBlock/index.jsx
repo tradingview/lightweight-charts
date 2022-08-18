@@ -6,8 +6,10 @@ import { useColorMode } from '@docusaurus/theme-common';
 import { Chart } from './chart';
 
 import styles from './styles.module.css';
+import './hidden-lines-styles.css';
 
 import { themeColors } from '../../../../theme-colors';
+import { useId } from './use-id';
 
 const variableNames = Object.keys(themeColors.DARK);
 
@@ -23,20 +25,28 @@ export function replaceThemeConstantStrings(originalString, isDarkTheme) {
 }
 
 const EnhancedCodeBlock = props => {
-	const { chart, replaceThemeConstants, ...rest } = props;
+	const { chart, replaceThemeConstants, hideableCode, ...rest } = props;
 	let { children } = props;
 	const { colorMode } = useColorMode();
 	const isDarkTheme = colorMode === 'dark';
+	const uniqueId = useId();
 
 	if (replaceThemeConstants && typeof children === 'string') {
 		children = replaceThemeConstantStrings(children, isDarkTheme);
 	}
 
-	if (chart) {
+	if (chart || hideableCode) {
 		return (
 			<>
+				{hideableCode && <>
+					<input
+						id={uniqueId}
+						type="checkbox"
+						className="toggle-hidden-lines"
+					/>
+					<label className="toggle-label" htmlFor={uniqueId}>Show all code</label></>}
 				<CodeBlock {...rest}>{children}</CodeBlock>
-				<BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={children} />}</BrowserOnly>
+				{chart && <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={children} />}</BrowserOnly>}
 			</>
 		);
 	}
