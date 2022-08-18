@@ -114,18 +114,18 @@ export class PriceAxisStub implements IDestroyable {
 		return this._canvasBinding.canvasElement;
 	}
 
-	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio }: BitmapCoordinatesRenderingScope): void {
+	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (!this._borderVisible()) {
 			return;
 		}
 
 		ctx.fillStyle = this._options.timeScale.borderColor;
 
-		// TODO: we need different size for x and y
-		const borderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * horizontalPixelRatio);
-		const left = (this._isLeft) ? bitmapSize.width - borderSize : 0;
+		const horzBorderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * horizontalPixelRatio);
+		const vertBorderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * verticalPixelRatio);
+		const left = (this._isLeft) ? bitmapSize.width - horzBorderSize : 0;
 
-		ctx.fillRect(left, 0, borderSize, borderSize);
+		ctx.fillRect(left, 0, horzBorderSize, vertBorderSize);
 	}
 
 	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
