@@ -67,10 +67,11 @@ You can download the HTML file for example at this stage <a href={require('!!fil
 
 import CodeBlock from '@theme/CodeBlock';
 import code from '!!raw-loader!./assets/step3.html';
+import InstantDetails from '@site/src/components/InstantDetails'
 
-<details>
+<InstantDetails>
 <summary>
 Click here to reveal the complete code for the example at this stage of the guide.
 </summary>
 <CodeBlock className="language-html">{code}</CodeBlock>
-</details>
+</InstantDetails>
