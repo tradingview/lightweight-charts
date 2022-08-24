@@ -11,6 +11,7 @@ import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
+import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
@@ -19,11 +20,10 @@ import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
-import { KineticAnimation } from './kinetic-animation';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 
-const enum Constants {
+const enum KineticScrollConstants {
 	MinScrollSpeed = 0.2,
 	MaxScrollSpeed = 7,
 	DumpingCoeff = 0.997,
@@ -94,7 +94,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _startTrackPoint: Point | null = null;
 	private _exitTrackingModeOnNextTry: boolean = false;
 	private _initCrosshairPosition: Point | null = null;
+
 	private _scrollXAnimation: KineticAnimation | null = null;
+
 	private _isSettingSize: boolean = false;
 
 	public constructor(chart: ChartWidget, state: Pane) {
@@ -328,7 +330,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public pinchStartEvent(): void {
 		this._prevPinchScale = 1;
-		this._terminateKineticAnimation();
+		this._model().stopTimeScaleAnimation();
 	}
 
 	public pinchEvent(middlePoint: Position, scale: number): void {
@@ -678,66 +680,30 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._chart.model();
 	}
 
-	private _finishScroll(): void {
-		const model = this._model();
-		const state = this.state();
-		const priceScale = state.defaultPriceScale();
-
-		model.endScrollPrice(state, priceScale);
-		model.endScrollTime();
-		this._startScrollingPos = null;
-		this._isScrolling = false;
-	}
-
 	private _endScroll(event: TouchMouseEvent): void {
 		if (!this._isScrolling) {
 			return;
 		}
 
-		const startAnimationTime = performance.now();
+		const model = this._model();
+		const state = this.state();
+
+		model.endScrollPrice(state, state.defaultPriceScale());
+
+		this._startScrollingPos = null;
+		this._isScrolling = false;
+		model.endScrollTime();
 
 		if (this._scrollXAnimation !== null) {
-			this._scrollXAnimation.start(event.localX, startAnimationTime);
+			const startAnimationTime = performance.now();
+			const timeScale = model.timeScale();
+
+			this._scrollXAnimation.start(timeScale.rightOffset() as Coordinate, startAnimationTime);
+
+			if (!this._scrollXAnimation.finished(startAnimationTime)) {
+				model.setTimeScaleAnimation(this._scrollXAnimation);
+			}
 		}
-
-		if ((this._scrollXAnimation === null || this._scrollXAnimation.finished(startAnimationTime))) {
-			// animation is not needed
-			this._finishScroll();
-			return;
-		}
-
-		const model = this._model();
-		const timeScale = model.timeScale();
-
-		const scrollXAnimation = this._scrollXAnimation;
-
-		const animationFn = () => {
-			if ((scrollXAnimation.terminated())) {
-				// animation terminated, see _terminateKineticAnimation
-				return;
-			}
-
-			const now = performance.now();
-
-			let xAnimationFinished = scrollXAnimation.finished(now);
-			if (!scrollXAnimation.terminated()) {
-				const prevRightOffset = timeScale.rightOffset();
-				model.scrollTimeTo(scrollXAnimation.getPosition(now));
-				if (prevRightOffset === timeScale.rightOffset()) {
-					xAnimationFinished = true;
-					this._scrollXAnimation = null;
-				}
-			}
-
-			if (xAnimationFinished) {
-				this._finishScroll();
-				return;
-			}
-
-			requestAnimationFrame(animationFn);
-		};
-
-		requestAnimationFrame(animationFn);
 	}
 
 	private _onMouseEvent(): void {
@@ -749,7 +715,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return;
 		}
 
-		this._terminateKineticAnimation();
+		this._model().stopTimeScaleAnimation();
 
 		if (document.activeElement !== document.body && document.activeElement !== document.documentElement) {
 			// If any focusable element except the page itself is focused, remove the focus
@@ -776,8 +742,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		const model = this._model();
+		const timeScale = model.timeScale();
 
-		if (model.timeScale().isEmpty()) {
+		if (timeScale.isEmpty()) {
 			return;
 		}
 
@@ -805,29 +772,22 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			};
 		}
 
-		if (this._scrollXAnimation !== null) {
-			this._scrollXAnimation.addPosition(event.localX, now);
-		}
-
 		if (
 			this._startScrollingPos !== null &&
 			!this._isScrolling &&
 			(this._startScrollingPos.x !== event.clientX || this._startScrollingPos.y !== event.clientY)
 		) {
-			if (
-				this._scrollXAnimation === null && (
-					event.isTouch && kineticScrollOptions.touch ||
-					!event.isTouch && kineticScrollOptions.mouse
-				)
-			) {
+			if (event.isTouch && kineticScrollOptions.touch || !event.isTouch && kineticScrollOptions.mouse) {
+				const barSpacing = timeScale.barSpacing();
 				this._scrollXAnimation = new KineticAnimation(
-					Constants.MinScrollSpeed,
-					Constants.MaxScrollSpeed,
-					Constants.DumpingCoeff,
-					Constants.ScrollMinMove
+					KineticScrollConstants.MinScrollSpeed / barSpacing,
+					KineticScrollConstants.MaxScrollSpeed / barSpacing,
+					KineticScrollConstants.DumpingCoeff,
+					KineticScrollConstants.ScrollMinMove / barSpacing
 				);
-				this._scrollXAnimation.addPosition(this._startScrollingPos.localX, this._startScrollingPos.timestamp);
-				this._scrollXAnimation.addPosition(event.localX, now);
+				this._scrollXAnimation.addPosition(timeScale.rightOffset() as Coordinate, this._startScrollingPos.timestamp);
+			} else {
+				this._scrollXAnimation = null;
 			}
 
 			if (!priceScale.isEmpty()) {
@@ -845,21 +805,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			}
 
 			model.scrollTimeTo(event.localX);
-		}
-	}
-
-	private _terminateKineticAnimation(): void {
-		const now = performance.now();
-		const xAnimationFinished = this._scrollXAnimation === null || this._scrollXAnimation.finished(now);
-		if (this._scrollXAnimation !== null) {
-			if (!xAnimationFinished) {
-				this._finishScroll();
+			if (this._scrollXAnimation !== null) {
+				this._scrollXAnimation.addPosition(timeScale.rightOffset() as Coordinate, now);
 			}
-		}
-
-		if (this._scrollXAnimation !== null) {
-			this._scrollXAnimation.terminate();
-			this._scrollXAnimation = null;
 		}
 	}
 
