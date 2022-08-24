@@ -15,7 +15,7 @@ function generatePageContent(standaloneBundlePath: string, testCaseCode: string)
 	return dummyContent
 		.replace('PATH_TO_STANDALONE_MODULE', standaloneBundlePath)
 		.replace('TEST_CASE_SCRIPT', testCaseCode)
-	;
+		;
 }
 
 const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
@@ -35,6 +35,42 @@ function promisleep(ms: number): Promise<void> {
 	return new Promise((resolve: () => void) => {
 		setTimeout(resolve, ms);
 	});
+}
+
+/**
+ * Request garbage collection on the page.
+ * **Note:** This is only a request and the page will still decide
+ * when best to perform this action.
+ */
+async function requestGarbageCollection(page: Page): Promise<void> {
+	const client = await page.target().createCDPSession();
+	await client.send('HeapProfiler.enable');
+	return client.send('HeapProfiler.collectGarbage');
+}
+
+// Poll the references count on the page until the condition
+// is satisfied for a specific prototype.
+async function pollReferencesCount(
+	page: Page,
+	prototype: JSHandle,
+	condition: (currentCount: number) => boolean,
+	timeout: number
+): Promise<number> {
+	const start = performance.now();
+	let referencesCount = 0;
+	let done = false;
+	do {
+		const duration = performance.now() - start;
+		if (duration > timeout) {
+			throw new Error('Timeout exceeded waiting for references count to meet desired condition.');
+		}
+		referencesCount = await getReferencesCount(page, prototype);
+		done = condition(referencesCount);
+		if (!done) {
+			await promisleep(50);
+		}
+	} while (!done);
+	return referencesCount;
 }
 
 describe('Memleaks tests', () => {
@@ -99,6 +135,14 @@ describe('Memleaks tests', () => {
 				throw new Error(`Page has errors:\n${errors.join('\n')}`);
 			}
 
+			// Wait until at least one canvas element has been created.
+			await pollReferencesCount(
+				page,
+				prototype,
+				(count: number) => count > referencesCountBefore,
+				2500
+			);
+
 			// now remove chart
 
 			await page.evaluate(() => {
@@ -109,12 +153,17 @@ describe('Memleaks tests', () => {
 				delete (window as any).chart;
 			});
 
-			// IMPORTANT: This timeout is important
+			await requestGarbageCollection(page);
+
+			// Wait until all the created canvas elements have been garbage collected.
 			// Browser could keep references to DOM elements several milliseconds after its actual removing
 			// So we have to wait to be sure all is clear
-			await promisleep(100);
-
-			const referencesCountAfter = await getReferencesCount(page, prototype);
+			const referencesCountAfter = await pollReferencesCount(
+				page,
+				prototype,
+				(count: number) => count <= referencesCountBefore,
+				2500
+			);
 
 			expect(referencesCountAfter).to.be.equal(referencesCountBefore, 'There should not be extra references after removing a chart');
 		});
