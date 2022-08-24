@@ -178,8 +178,59 @@ interface InternalWindow {
 	finishTestCasePromise: Promise<() => void>;
 }
 
+function rmRf(dir: string): void {
+	if (!fs.existsSync(dir)) {
+		return;
+	}
+
+	fs.readdirSync(dir).forEach((file: string) => {
+		const filePath = path.join(dir, file);
+		if (fs.lstatSync(filePath).isDirectory()) {
+			rmRf(filePath);
+		} else {
+			fs.unlinkSync(filePath);
+		}
+	});
+
+	fs.rmdirSync(dir);
+}
+
+function generateAndSaveCoverageFile(coverageEntries: puppeteer.JSCoverageEntry[]): void {
+	// Create output directory
+	const outDir = path.resolve(process.env.CMP_OUT_DIR || path.join(__dirname, '.gendata'));
+	rmRf(outDir);
+	fs.mkdirSync(outDir, { recursive: true });
+
+	const getFileNameFromUrl = (url: string): string => url.split('/').at(-1) ?? '';
+
+	for (const entry of coverageEntries) {
+		let coveredJs = '';
+
+		const fileName = getFileNameFromUrl(entry.url);
+		// Only output the coverage for the file being tested
+		if (fileName === 'test.js') {
+			for (const range of entry.ranges) {
+				coveredJs += entry.text.slice(range.start, range.end) + '\n';
+			}
+
+			// Create and export each coverage JS file
+			try {
+				fs.writeFileSync(path.join(outDir, 'covered.js'), coveredJs);
+				console.info('\nGenerated `covered.js` file for the coverage test.\n');
+			} catch (error: unknown) {
+				console.warn('Unable to save `covered.js` file for the coverage test.');
+				console.error(error);
+			}
+		}
+	}
+}
+
 async function getCoverageResult(page: Page): Promise<Map<string, CoverageResult>> {
 	const coverageEntries = await page.coverage.stopJSCoverage();
+
+	if (process.env.GENERATE_COVERAGE_FILE === 'true') {
+		generateAndSaveCoverageFile(coverageEntries);
+	}
 
 	const result = new Map<string, CoverageResult>();
 

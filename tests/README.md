@@ -52,6 +52,16 @@ Alternatively, you can run the test on a specific file like this:
 node ./tests/e2e/coverage/runner.js ./dist/lightweight-charts.standalone.development.js
 ```
 
+#### Analysing the Coverage test
+
+If you set the environmental variable `GENERATE_COVERAGE_FILE` to `true` then the coverage test will generate a `covered.js` file within the `tests/e2e/coverage/.gendata` folder (folder can be changed with the `CMP_OUT_DIR` environmental variable). This file only includes the lines of code which were executed during the test. You can compare this file (diff) with the test input file to identify which lines are not being executed during the test.
+
+Example command:
+
+```bash
+GENERATE_COVERAGE_FILE=true node ./tests/e2e/coverage/runner.js ./dist/lightweight-charts.standalone.development.js
+```
+
 ### Graphics
 
 The e2e graphics tests visually compare the charts produced by the library against a 'golden' release (typically the latest commit on the 'master' branch). Further information about the graphics tests can be viewed here: [Graphics README](./e2e/graphics/README.md).
