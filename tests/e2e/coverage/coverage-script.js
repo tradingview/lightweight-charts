@@ -236,6 +236,10 @@ function runTestCase(container) {
 		series.seriesType();
 		series.markers();
 		series.dataByIndex(10);
+		series.dataByIndex(-5);
+		series.dataByIndex(-5, LightweightCharts.MismatchDirection.NearestRight);
+		series.dataByIndex(1500, LightweightCharts.MismatchDirection.NearestLeft);
+		series.dataByIndex(1500, LightweightCharts.MismatchDirection.None);
 	});
 
 	return new Promise(resolve => {
