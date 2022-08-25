@@ -54,7 +54,8 @@ async function pollReferencesCount(
 	page: Page,
 	prototype: JSHandle,
 	condition: (currentCount: number) => boolean,
-	timeout: number
+	timeout: number,
+	actionName?: string
 ): Promise<number> {
 	const start = performance.now();
 	let referencesCount = 0;
@@ -62,7 +63,7 @@ async function pollReferencesCount(
 	do {
 		const duration = performance.now() - start;
 		if (duration > timeout) {
-			throw new Error('Timeout exceeded waiting for references count to meet desired condition.');
+			throw new Error(`${actionName ? `${actionName}: ` : ''}Timeout exceeded waiting for references count to meet desired condition.`);
 		}
 		referencesCount = await getReferencesCount(page, prototype);
 		done = condition(referencesCount);
@@ -73,7 +74,10 @@ async function pollReferencesCount(
 	return referencesCount;
 }
 
-describe('Memleaks tests', () => {
+describe('Memleaks tests', function(): void {
+	// this tests are unstable sometimes.
+	this.retries(5);
+
 	const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {};
 	if (process.env.NO_SANDBOX) {
 		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
@@ -140,7 +144,8 @@ describe('Memleaks tests', () => {
 				page,
 				prototype,
 				(count: number) => count > referencesCountBefore,
-				2500
+				2500,
+				'Creation'
 			);
 
 			// now remove chart
@@ -162,7 +167,8 @@ describe('Memleaks tests', () => {
 				page,
 				prototype,
 				(count: number) => count <= referencesCountBefore,
-				2500
+				5000,
+				'Garbage Collection'
 			);
 
 			expect(referencesCountAfter).to.be.equal(referencesCountBefore, 'There should not be extra references after removing a chart');
