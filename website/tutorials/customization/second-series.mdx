@@ -1,0 +1,111 @@
+---
+sidebar_position: 8
+title: Adding a second series
+pagination_title: Adding a second series
+sidebar_label: Adding a second series
+description: In this section, we will be adding an area series to the chart with a subtle vertical gradient.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/crosshair
+pagination_next: customization/data-points
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In this section, we will be adding an [area series](/docs/series-types#area) to the chart with a subtle vertical gradient. It's purpose is solely for aesthetic reasons (only to make the chart more visually appealing). However, it will teach us a few key points about the differences between different series types and the visual stacking order.
+
+## Preparing the data for the area series
+
+The data structure required for the area series isn't the same as for the candlestick series. The area series is expecting each data point to have the following properties: `time` and `value`. Whereas the candlestick data points don't have a `value` property but rather the following properties: `open`, `close`, `high`, `low`, and `time`.
+
+We can create a copy of the candlestick data and transform it in a single step by using a `map` higher-order function ([more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)). We will set the `value` for the area series as the midpoint between the `open` and `close` values of the candlestick data points.
+
+```js
+// Generate sample data to use within a candlestick series
+const candleStickData = generateCandlestickData();
+
+// highlight-start
+// Convert the candlestick data for use with a line series
+const lineData = candleStickData.map(datapoint => ({
+    time: datapoint.time,
+    value: (datapoint.close + datapoint.open) / 2,
+}));
+// highlight-end
+```
+
+## Adding the area series and setting it's options
+
+We can add the area series as we did with the candlestick series by calling the `addAreaSeries()` method on the chart instance. We will pass the options for the series as the first argument to `addAreaSeries()` method instead of separately calling `applyOptions()` at a later stage.
+
+:::caution
+
+Make sure to add this code **before** the `addCandlestickSeries()` call already in the code because we want it to appear below the candlesticks (as explained in the next section).
+
+:::
+
+```js
+// Convert the candlestick data for use with a line series
+const lineData = candleStickData.map(datapoint => ({
+    time: datapoint.time,
+    value: (datapoint.close + datapoint.open) / 2,
+}));
+
+// highlight-start
+// Add an area series to the chart,
+// Adding this before we add the candlestick chart
+// so that it will appear beneath the candlesticks
+const areaSeries = chart.addAreaSeries({
+    lastValueVisible: false, // hide the last value marker for this series
+    crosshairMarkerVisible: false, // hide the crosshair marker for this series
+    lineColor: 'transparent', // hide the line
+    topColor: 'rgba(56, 33, 110,0.6)',
+    bottomColor: 'rgba(56, 33, 110, 0.1)',
+});
+// Set the data for the Area Series
+areaSeries.setData(lineData);
+// highlight-end
+
+// Create the Main Series (Candlesticks)
+const mainSeries = chart.addCandlestickSeries();
+```
+
+## Visual stacking order of series
+
+When adding multiple series to a single chart, it is important to take note of the order in which they are added because that will determine the visual stacking order (when they overlap). The first series added will appear at the bottom of the stack and each series added will be placed on top of the stack. Thus in the current example, we want the area series to appear below the candlestick series so we will make sure to first add the area series and then the candlestick series.
+
+## Result
+
+At this point we should have a chart like this:
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step8.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step8.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+In the next step, we will look at how to adjust the colour of individual candlesticks on our chart.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step8.html').default} download="customization-tutorial-step8.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step8.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

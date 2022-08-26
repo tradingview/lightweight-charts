@@ -299,6 +299,33 @@ async function getConfig() {
 					theme: lightCodeTheme,
 					darkTheme: darkCodeTheme,
 					additionalLanguages: ['ruby', 'swift', 'kotlin', 'groovy'],
+					magicComments: [
+						{
+							className: 'theme-code-block-highlighted-line',
+							line: 'highlight-next-line',
+							block: { start: 'highlight-start', end: 'highlight-end' },
+						},
+						{
+							// Lightly fades the code lines (useful for boilerplate sections of code)
+							className: 'code-block-fade-line',
+							block: { start: 'highlight-fade-start', end: 'highlight-fade-end' },
+							line: 'highlight-fade',
+						},
+						{
+							// Hides code lines but can be reveal using toggle and css
+							className: 'code-block-hide-line',
+							block: { start: 'hide-start', end: 'hide-end' },
+							line: 'hide-line',
+						},
+						{
+							// Hides code lines and can't be reveal using toggle and css.
+							// Will still be included in copied code.
+							// Useful for type comments and header notices.
+							className: 'code-block-remove-line',
+							block: { start: 'remove-start', end: 'remove-end' },
+							line: 'remove-line',
+						},
+					],
 				},
 				algolia: {
 					appId: '7Q5A441YPA',

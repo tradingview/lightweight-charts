@@ -1,0 +1,86 @@
+---
+sidebar_position: 5
+title: Price scale
+pagination_title: Price scale
+sidebar_label: Price scale
+description: In this section, we are going to adjust the functionality of the vertical price scale.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/price-format
+pagination_next: customization/time-scale
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In this section, we are going to adjust the functionality of the vertical price scale. Currently, the price scale will auto-scale to fit the visible data on the chart. You can observe this behaviour by scrolling the chart to the right such that some of the data points are no longer visible. We will disable this feature such that the price scale can only be manually adjusted by the user (by clicking and dragging on the scale).
+
+:::tip
+
+A chart can have more than one price scale and their options can be individually adjusted, however in this example we only have one price scale.
+
+:::
+
+## Adjusting settings for the price scale
+
+We can get the current [IPriceScaleApi](/docs/api/interfaces/IPriceScaleApi) instance for the chart by evoking the `priceScale()` method on the candlestick series reference.
+
+Once again, we can use the `applyOptions()` method on this API instance to adjust it's options. You can add the following code to the example at any point after the `mainSeries` reference has been created, so let us place it at the end of the script. The options available are shown here: [PriceScaleOptions](/docs/api/interfaces/PriceScaleOptions).
+
+```js
+// Adjust the options for the priceScale of the mainSeries
+mainSeries.priceScale().applyOptions({
+    autoScale: false, // disables auto scaling based on visible content
+    scaleMargins: {
+        top: 0.1,
+        bottom: 0.2,
+    },
+});
+```
+
+As discussed above we are disabling the `autoScale` feature on this price scale. We are additionally adjusting the `scaleMargins` which are used when the chart is first rendered to determine the 'zoom' and position of the scale. The scale margins set the proportion of the chart to be empty above and below the data points currently visible.
+
+## Result
+
+At this point, we should have a chart like the one presented below. Play around with scrolling the data left and right to see the change of behaviour versus the previous step.
+
+### Before
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step4.html').default}
+></iframe>
+
+### After
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step5.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step5.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+In the next step, we will be adjusting the settings on the horizontal time scale.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step5.html').default} download="customization-tutorial-step5.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step5.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

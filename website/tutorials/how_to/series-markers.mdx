@@ -1,0 +1,64 @@
+---
+title: Add Series Markers
+sidebar_label: Series Markers
+description: An example of how to add markers to a series on the chart.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - series
+  - markers
+---
+
+A series marker is an annotation which can be drawn on the chart at a specific point.
+It can be used to draw attention to specific events within the data set.
+This example shows how to add series markers to your chart.
+
+## Short answer
+
+You can add markers to a series by passing an array of [`seriesMarker`](/docs/api/interfaces/SeriesMarker)
+objects to the [`setMarkers`](/docs/api/interfaces/ISeriesApi#setmarkers) method on
+an [`ISeriesApi`](/docs/api/interfaces/ISeriesApi) instance.
+
+```js
+const markers = [
+    {
+        time: { year: 2018, month: 12, day: 23 },
+        position: 'aboveBar',
+        color: '#f68410',
+        shape: 'circle',
+        text: 'A',
+    },
+];
+series.setMarkers(markers);
+```
+
+You can see a full [working example](#full-example) below.
+
+## Further information
+
+A series marker is an annotation which can be attached to a specific data point within a series.
+We don't need to specify a vertical price value but rather only the `time` property since the
+marker will determine it's vertical position from the data points values (such as `high` and
+`low` in the case of candlestick data) and the specified `position` property ([SeriesMarkerPosition](/docs/api#seriesmarkerposition)).
+
+## Resources
+
+You can view the related APIs here:
+- [SeriesMarker](/docs/api/interfaces/SeriesMarker) - Series Marker interface.
+- [SeriesMarkerPosition](/docs/api#seriesmarkerposition) - Positions that can be set for the marker.
+- [SeriesMarkerShape](/docs/api#seriesmarkershape) - Shapes that can be set for the marker.
+- [setMarkers](/docs/api/interfaces/ISeriesApi#setmarkers) - Method for adding markers to a series.
+- [Time Types](/docs/api#time) - Different time formats available to use.
+
+## Full example
+
+import UsageGuidePartial from "./_usage-guide-partial.mdx";
+
+<UsageGuidePartial />
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./series-markers.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{code}
+</CodeBlock>

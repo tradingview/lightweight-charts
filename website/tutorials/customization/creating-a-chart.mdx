@@ -1,0 +1,148 @@
+---
+sidebar_position: 1
+title: First steps
+pagination_title: First steps
+sidebar_label: First steps
+description: In this section, we will be creating a simple chart.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/intro
+pagination_next: customization/chart-colors
+---
+
+:::tip
+
+If you haven't already, please read the [Introduction](intro). At the bottom of that page, you will find a starting file containing everything you need to get up and running with this tutorial (including some sample data to display on the chart).
+
+:::
+
+Our first task will be to create a chart and get it visible on the page. A more detailed explanation of these steps is available [here](/docs).
+
+## Adding the Lightweight Charts script
+
+For this example, we will be loading the Lightweight Charts library using the standalone version hosted on a CDN server. This approach allows us to just include the script tag within our HTML file and not be concerned about spinning up a web server to host our files, and thus open the HTML file directly on our computer.
+
+We can add the script tag to the HTML page by including the following code within the `<head>` element of the page. In this case, we will insert the code between the `<title>` and `<style>` elements.
+
+```html
+<title>Lightweight Charts Customization Tutorial</title>
+<!-- highlight-start -->
+<!-- Adding the standalone version of Lightweight charts -->
+<script
+    type="text/javascript"
+    src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"
+></script>
+<!-- highlight-end -->
+<style>
+```
+
+The standalone script will add the library as a global variable named `LightweightCharts` once it has been downloaded and executed by the browser.
+
+## Creating the chart
+
+We can create the chart instance by calling the [`createChart`](/docs/api#createchart) method on the `LightweightCharts` global variable, and providing an HTML div element as the first parameter to the method. The `createChart` method can take a second parameter for options which will be explored and used later in the guide.
+
+We will add the following code to our main script tag which already contains the code to generate the sample data. The sample file contains a `// your code here` comment as a reference of where to insert the code.
+
+```js
+// Create the Lightweight Chart within the container element
+const chart = LightweightCharts.createChart(
+    document.getElementById('container')
+);
+```
+
+The `createChart` method returns an [IChartApi](/docs/api/interfaces/IChartApi) instance which will be our main point of contact for interacting with the API.
+
+## Creating some sample data
+
+We can create some sample data for the chart by calling the provided `generateCandlestickData` function and we will assign it to a variable named `candleStickData`, as follows:
+
+```js
+// Create the Lightweight Chart within the container element
+const chart = LightweightCharts.createChart(
+    document.getElementById('container')
+);
+
+// highlight-start
+// Generate sample data to use within a candlestick series
+const candleStickData = generateCandlestickData();
+// highlight-end
+```
+
+## Adding a candlestick series
+
+We can now add a [candlestick series](/docs/series-types#candlestick) to our chart by using the `addCandlestickSeries` method on the `chart` variable (which is an [IChartApi](/docs/api/interfaces/IChartApi) instance). This will return a series instance which we will assign to a variable named `mainSeries`.
+
+`mainSeries` will be an instance of [`ISeriesApi`](/docs/api/interfaces/ISeriesApi) which will provide the API for interacting with the series and it's options.
+
+```js
+// Generate sample data to use within a candlestick series
+const candleStickData = generateCandlestickData();
+
+// highlight-start
+// Create the Main Series (Candlesticks)
+const mainSeries = chart.addCandlestickSeries();
+// Set the data for the Main Series
+mainSeries.setData(candleStickData);
+// highlight-end
+```
+
+## Automatically resizing the chart when the window is resized (Optional)
+
+This is an optional step which will enable automatically resizing the chart whenever
+the browser window is resized.
+
+:::caution
+
+This code snippet will only work correctly if you want the chart to completely fill the window / iframe.
+
+:::
+
+Adding the following code snippet to the end of the script tag to enable automatic resizing.
+
+```js
+// Adding a window resize event handler to resize the chart when
+// the window size changes.
+// Note: for more advanced examples (when the chart doesn't fill the entire window)
+// you may need to use ResizeObserver -> https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+window.addEventListener('resize', () => {
+    chart.resize(window.innerWidth, window.innerHeight);
+});
+```
+
+## Result
+
+At this point we should have a chart like this:
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step1.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step1.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+🎉 Congrats! We now have a basic, yet beautiful, candlestick chart rendering on our page.
+
+The rest of the tutorial will focus on how to customise this chart to further match our desired visual style and functionality. The next step will be to adjust the chart colors to better suit a dark theme.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step1.html').default} download="customization-tutorial-step1.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step1.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

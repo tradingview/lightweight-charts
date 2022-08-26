@@ -28,6 +28,16 @@ _Note_: API documentation will not be generated unless you have already built th
 
 This command generates static content in the `build` directory.
 
+## Serve Build Locally
+
+```console
+npm run serve
+```
+
+_Note_: Embedded `.html` examples won't display correctly when using this command but will work correctly when hosted online.
+
+This command serves the built website locally.
+
 ## Deployment
 
 ```console

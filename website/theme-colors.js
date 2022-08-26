@@ -1,6 +1,7 @@
 export const themeColors = {
 	DARK: {
 		CHART_BACKGROUND_COLOR: 'black',
+		CHART_BACKGROUND_RGB_COLOR: '0, 0, 0',
 		LINE_LINE_COLOR: '#2962FF',
 		AREA_TOP_COLOR: '#2962FF',
 		AREA_BOTTOM_COLOR: 'rgba(41, 98, 255, 0.28)',
@@ -17,6 +18,7 @@ export const themeColors = {
 	},
 	LIGHT: {
 		CHART_BACKGROUND_COLOR: 'white',
+		CHART_BACKGROUND_RGB_COLOR: '255, 255, 255',
 		LINE_LINE_COLOR: '#2962FF',
 		AREA_TOP_COLOR: '#2962FF',
 		AREA_BOTTOM_COLOR: 'rgba(41, 98, 255, 0.28)',

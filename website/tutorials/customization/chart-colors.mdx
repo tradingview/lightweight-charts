@@ -1,0 +1,151 @@
+---
+sidebar_position: 2
+title: Chart colors
+pagination_title: Chart colors
+sidebar_label: Chart colors
+description: In this section, we will be customizing the appearance of the chart 'backdrop'.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/creating-a-chart
+pagination_next: customization/series
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In this section, we will be customizing the appearance of the chart 'backdrop'. We will be adjusting the colors to better suit a dark theme.
+
+## Setting the background color of the HTML body
+
+Before we get started customizing the colors of the chart, we will first change the background color of the entire HTML page to our desired color of `#222`. If we decide to have the chart not fill the entire space of the page (the optional step further below) then this step will ensure that the chart's background matches the background of the page.
+
+:::tip
+
+It is also possible to set the chart background color to `transparent`, which may be useful in certain circumstances.
+
+:::
+
+We can set the page background by adding the following code which the `<style>` tag near the top of the HTML code.
+
+```html
+<style>
+    body {
+        padding: 0;
+        margin: 0;
+        /* highlight-start */
+        /* Add a background color to match the chart */
+        background-color: #222;
+        /* highlight-end */
+    }
+</style>
+```
+
+## Applying options
+
+One final explanation before we dive into customizing the chart. There are generally two ways to specify options for an API instance (such as IChartApi, ISeriesApi, IPriceScale, etc...) within Lightweight Charts. The first is to specify the options at the time of creation, and the second is to specify the options at any other time by using the `applyOptions` method. Which approach to use is primarily up to you, however, you can only use the `applyOptions` approach if you are changing the options at a later stage after the instance has been created.
+
+This tutorial will make use of both approaches to provide cleaner and easier-to-follow code.
+
+The options object passed into either method doesn't need to be a complete object containing all the options, but rather only you options you need to change. During the creation of an instance, the default options will be used and your options will be applied over those. When using `applyOptions`, the specified options will be merged over the current options for that instance.
+
+**The following code block isn't part of the tutorial but is included just to highlight the two approaches.**
+
+import ApplyOptionsTabs from './_apply-options-tabs-partial.mdx';
+
+<ApplyOptionsTabs/>
+
+## Adjusting the background and text colors for the chart
+
+We can adjust the chart's background color and text color by specifying our desired colors within the options for [IChartApi](/docs/api/interfaces/IChartApi). A full list of the available options for the chart instance can be viewed here: [ChartOptions](/docs/api/interfaces/ChartOptions).
+
+We are going to add the options during the creation of the chart (as the second argument to the `createChart` method) as follows:
+
+```js
+const chart = LightweightCharts.createChart(
+    document.getElementById('container'),
+    {
+        layout: {
+            background: { color: '#222' },
+            textColor: '#DDD',
+        },
+        grid: {
+            vertLines: { color: '#444' },
+            horzLines: { color: '#444' },
+        },
+    }
+);
+```
+
+We also set the color for the gridlines at the same time.
+
+## (Optional) Setting a desired height and width for the chart
+
+By default, if you don't specify a `height` and `width` within the options for the chart then the chart will fill the available space within it's HTML element.
+
+If you would like to set specific dimensions for the chart then you can do so like this:
+
+```js
+const chart = LightweightCharts.createChart(
+    document.getElementById('container'),
+    {
+        height: 400,
+        width: 600,
+    }
+);
+```
+
+## Adjusting the border colors for the axes
+
+We can set the border colors for the price and time scales by using the `applyOptions` method on the [IPriceScale](/docs/api/interfaces/IPriceScaleApi) and [ITimeScale](/docs/api/interfaces/ITimeScaleApi) instances. We can get references to these instances by using the `priceScale()` and `timeScale()` methods on a chart instance.
+
+You can add the following code beneath the `createChart` method call.
+
+```js
+// Setting the border color for the vertical axis
+chart.priceScale().applyOptions({
+    borderColor: '#71649C',
+});
+
+// Setting the border color for the horizontal axis
+chart.timeScale().applyOptions({
+    borderColor: '#71649C',
+});
+```
+
+At a later stage, we will customise these scales further.
+
+## Result
+
+At this point we should have a chart like this:
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step2.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step2.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+In the next step, we will change the colors for the candlestick series.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step2.html').default} download="customization-tutorial-step2.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step2.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>
