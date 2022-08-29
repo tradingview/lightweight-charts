@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import puppeteer, { Browser, Frame, HTTPResponse, JSHandle, launch as launchPuppeteer } from 'puppeteer';
+import puppeteer, { Browser, HTTPResponse, JSHandle, launch as launchPuppeteer, Page } from 'puppeteer';
 
 import { getTestCases } from './helpers/get-test-cases';
 
@@ -22,10 +22,9 @@ const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
-async function getReferencesCount(frame: Frame, prototypeReference: JSHandle): Promise<number> {
-	const context = await frame.executionContext();
-	const activeRefsHandle = await context.queryObjects(prototypeReference);
-	const activeRefsCount = await (await activeRefsHandle?.getProperty('length'))?.jsonValue<number>();
+async function getReferencesCount(page: Page, prototypeReference: JSHandle): Promise<number> {
+	const activeRefsHandle = await page.queryObjects(prototypeReference);
+	const activeRefsCount = await (await activeRefsHandle?.getProperty('length'))?.jsonValue();
 
 	await activeRefsHandle.dispose();
 
@@ -90,12 +89,9 @@ describe('Memleaks tests', () => {
 				return Promise.resolve(CanvasRenderingContext2D.prototype);
 			};
 
-			const frame = page.mainFrame();
-			const context = await frame.executionContext();
+			const prototype = await page.evaluateHandle(getCanvasPrototype);
 
-			const prototype = await context.evaluateHandle(getCanvasPrototype);
-
-			const referencesCountBefore = await getReferencesCount(frame, prototype);
+			const referencesCountBefore = await getReferencesCount(page, prototype);
 
 			await page.setContent(pageContent, { waitUntil: 'load' });
 
@@ -118,7 +114,7 @@ describe('Memleaks tests', () => {
 			// So we have to wait to be sure all is clear
 			await promisleep(100);
 
-			const referencesCountAfter = await getReferencesCount(frame, prototype);
+			const referencesCountAfter = await getReferencesCount(page, prototype);
 
 			expect(referencesCountAfter).to.be.equal(referencesCountBefore, 'There should not be extra references after removing a chart');
 		});

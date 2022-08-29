@@ -14,7 +14,7 @@ import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
-import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
+import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
@@ -349,7 +349,6 @@ export class ChartModel implements IDestroyable {
 	private _serieses: Series[] = [];
 
 	private _width: number = 0;
-	private _initialTimeScrollPos: number | null = null;
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
@@ -377,11 +376,11 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public fullUpdate(): void {
-		this._invalidate(new InvalidateMask(InvalidationLevel.Full));
+		this._invalidate(InvalidateMask.full());
 	}
 
 	public lightUpdate(): void {
-		this._invalidate(new InvalidateMask(InvalidationLevel.Light));
+		this._invalidate(InvalidateMask.light());
 	}
 
 	public cursorUpdate(): void {
@@ -523,7 +522,7 @@ export class ChartModel implements IDestroyable {
 		// if autoscale option is true, it is ok, just recalculate by invalidation mask
 		// if autoscale option is false, autoscale anyway on the first draw
 		// also there is a scenario when autoscale is true in constructor and false later on applyOptions
-		const mask = new InvalidateMask(InvalidationLevel.Full);
+		const mask = InvalidateMask.full();
 		mask.invalidatePane(actualIndex, {
 			level: InvalidationLevel.None,
 			autoScale: true,
@@ -618,27 +617,17 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public startScrollTime(x: Coordinate): void {
-		this._initialTimeScrollPos = x;
 		this._timeScale.startScroll(x);
 	}
 
-	public scrollTimeTo(x: Coordinate): boolean {
-		let res = false;
-		if (this._initialTimeScrollPos !== null && Math.abs(x - this._initialTimeScrollPos) > 20) {
-			this._initialTimeScrollPos = null;
-			res = true;
-		}
-
+	public scrollTimeTo(x: Coordinate): void {
 		this._timeScale.scrollTo(x);
 		this.recalculateAllPanes();
-		return res;
 	}
 
 	public endScrollTime(): void {
 		this._timeScale.endScroll();
 		this.lightUpdate();
-
-		this._initialTimeScrollPos = null;
 	}
 
 	public serieses(): readonly Series[] {
@@ -803,32 +792,44 @@ export class ChartModel implements IDestroyable {
 	}
 
 	public fitContent(): void {
-		const mask = new InvalidateMask(InvalidationLevel.Light);
+		const mask = InvalidateMask.light();
 		mask.setFitContent();
 		this._invalidate(mask);
 	}
 
 	public setTargetLogicalRange(range: LogicalRange): void {
-		const mask = new InvalidateMask(InvalidationLevel.Light);
+		const mask = InvalidateMask.light();
 		mask.applyRange(range);
 		this._invalidate(mask);
 	}
 
 	public resetTimeScale(): void {
-		const mask = new InvalidateMask(InvalidationLevel.Light);
+		const mask = InvalidateMask.light();
 		mask.resetTimeScale();
 		this._invalidate(mask);
 	}
 
 	public setBarSpacing(spacing: number): void {
-		const mask = new InvalidateMask(InvalidationLevel.Light);
+		const mask = InvalidateMask.light();
 		mask.setBarSpacing(spacing);
 		this._invalidate(mask);
 	}
 
 	public setRightOffset(offset: number): void {
-		const mask = new InvalidateMask(InvalidationLevel.Light);
+		const mask = InvalidateMask.light();
 		mask.setRightOffset(offset);
+		this._invalidate(mask);
+	}
+
+	public setTimeScaleAnimation(animation: ITimeScaleAnimation): void {
+		const mask = InvalidateMask.light();
+		mask.setTimeScaleAnimation(animation);
+		this._invalidate(mask);
+	}
+
+	public stopTimeScaleAnimation(): void {
+		const mask = InvalidateMask.light();
+		mask.stopTimeScaleAnimation();
 		this._invalidate(mask);
 	}
 
