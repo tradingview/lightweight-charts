@@ -13,6 +13,7 @@ import puppeteer, {
 	HTTPResponse,
 	launch as launchPuppeteer,
 	Page,
+	type CDPSession,
 } from 'puppeteer';
 
 import { expectedCoverage, threshold } from './coverage-config';
@@ -124,6 +125,92 @@ async function doKineticAnimation(page: Page, element: ElementHandle): Promise<v
 	await page.mouse.up({ button: 'left' });
 }
 
+// Simulate a long touch action in a single position
+async function doLongTouch(page: Page, element: ElementHandle, duration: number): Promise<void> {
+	const elBox = (await element.boundingBox()) as BoundingBox;
+
+	const elCenterX = elBox.x + elBox.width / 2;
+	const elCenterY = elBox.y + elBox.height / 2;
+
+	const client = await page.target().createCDPSession();
+
+	await client.send('Input.dispatchTouchEvent', {
+		type: 'touchStart',
+		touchPoints: [
+			{ x: elCenterX, y: elCenterY },
+		],
+	});
+	await pageTimeout(page, duration);
+	return client.send('Input.dispatchTouchEvent', {
+		type: 'touchEnd',
+		touchPoints: [
+			{ x: elCenterX, y: elCenterY },
+		],
+	});
+}
+
+// Simulate a touch swipe gesture
+async function doSwipeTouch(
+	devToolsSession: CDPSession,
+	element: ElementHandle,
+	{
+		horizontal = false,
+		vertical = false,
+	}: { horizontal?: boolean; vertical?: boolean }
+): Promise<void> {
+	const elBox = (await element.boundingBox()) as BoundingBox;
+
+	const elCenterX = elBox.x + elBox.width / 2;
+	const elCenterY = elBox.y + elBox.height / 2;
+	const xStep = horizontal ? elBox.width / 8 : 0;
+	const yStep = vertical ? elBox.height / 8 : 0;
+
+	for (let i = 2; i > 0; i--) {
+		const type = i === 2 ? 'touchStart' : 'touchMove';
+		await devToolsSession.send('Input.dispatchTouchEvent', {
+			type,
+			touchPoints: [{ x: elCenterX - i * xStep, y: elCenterY - i * yStep }],
+		});
+	}
+	return devToolsSession.send('Input.dispatchTouchEvent', {
+		type: 'touchEnd',
+		touchPoints: [{ x: elCenterX - xStep, y: elCenterY - yStep }],
+	});
+}
+
+// Perform a pinch or zoom touch gesture within the specified element.
+async function doPinchZoomTouch(
+	devToolsSession: CDPSession,
+	element: ElementHandle,
+	zoom?: boolean
+): Promise<void> {
+	const elBox = (await element.boundingBox()) as BoundingBox;
+
+	const sign = zoom ? -1 : 1;
+	const elCenterX = elBox.x + elBox.width / 2;
+	const elCenterY = elBox.y + elBox.height / 2;
+	const xStep = (sign * elBox.width) / 8;
+	const yStep = (sign * elBox.height) / 8;
+
+	for (let i = 2; i > 0; i--) {
+		const type = i === 2 ? 'touchStart' : 'touchMove';
+		await devToolsSession.send('Input.dispatchTouchEvent', {
+			type,
+			touchPoints: [
+				{ x: elCenterX - i * xStep, y: elCenterY - i * yStep },
+				{ x: elCenterX + i * xStep, y: elCenterY + i * xStep },
+			],
+		});
+	}
+	return devToolsSession.send('Input.dispatchTouchEvent', {
+		type: 'touchEnd',
+		touchPoints: [
+			{ x: elCenterX - xStep, y: elCenterY - yStep },
+			{ x: elCenterX + xStep, y: elCenterY + xStep },
+		],
+	});
+}
+
 async function doUserInteractions(page: Page): Promise<void> {
 	const chartContainer = await page.$('#container') as ElementHandle<Element>;
 	const chartBox = await chartContainer.boundingBox() as BoundingBox;
@@ -166,6 +253,28 @@ async function doUserInteractions(page: Page): Promise<void> {
 	await timeAxis.click({ button: 'left' });
 	await timeAxis.click({ button: 'left', clickCount: 2 });
 
+	// simulate a tap event
+	await page.touchscreen.tap(
+		chartBox.x + chartBox.width / 2,
+		chartBox.y + chartBox.height / 2
+	);
+
+	const devToolsSession = await page.target().createCDPSession();
+
+	await doPinchZoomTouch(devToolsSession, chartContainer);
+	await doPinchZoomTouch(devToolsSession, chartContainer, true);
+
+	await doSwipeTouch(devToolsSession, leftPriceAxis, { vertical: true });
+	await doSwipeTouch(devToolsSession, paneWidget, { vertical: true });
+	await doSwipeTouch(devToolsSession, timeAxis, { horizontal: true });
+
+	await doSwipeTouch(devToolsSession, chartContainer, {
+		horizontal: true,
+		vertical: true,
+	});
+
+	await doLongTouch(page, chartContainer, 500);
+
 	await doKineticAnimation(page, timeAxis);
 }
 
@@ -178,8 +287,59 @@ interface InternalWindow {
 	finishTestCasePromise: Promise<() => void>;
 }
 
+function rmRf(dir: string): void {
+	if (!fs.existsSync(dir)) {
+		return;
+	}
+
+	fs.readdirSync(dir).forEach((file: string) => {
+		const filePath = path.join(dir, file);
+		if (fs.lstatSync(filePath).isDirectory()) {
+			rmRf(filePath);
+		} else {
+			fs.unlinkSync(filePath);
+		}
+	});
+
+	fs.rmdirSync(dir);
+}
+
+function generateAndSaveCoverageFile(coverageEntries: puppeteer.JSCoverageEntry[]): void {
+	// Create output directory
+	const outDir = path.resolve(process.env.CMP_OUT_DIR || path.join(__dirname, '.gendata'));
+	rmRf(outDir);
+	fs.mkdirSync(outDir, { recursive: true });
+
+	const getFileNameFromUrl = (url: string): string => url.split('/').at(-1) ?? '';
+
+	for (const entry of coverageEntries) {
+		let coveredJs = '';
+
+		const fileName = getFileNameFromUrl(entry.url);
+		// Only output the coverage for the file being tested
+		if (fileName === 'test.js') {
+			for (const range of entry.ranges) {
+				coveredJs += entry.text.slice(range.start, range.end) + '\n';
+			}
+
+			// Create and export each coverage JS file
+			try {
+				fs.writeFileSync(path.join(outDir, 'covered.js'), coveredJs);
+				console.info('\nGenerated `covered.js` file for the coverage test.\n');
+			} catch (error: unknown) {
+				console.warn('Unable to save `covered.js` file for the coverage test.');
+				console.error(error);
+			}
+		}
+	}
+}
+
 async function getCoverageResult(page: Page): Promise<Map<string, CoverageResult>> {
 	const coverageEntries = await page.coverage.stopJSCoverage();
+
+	if (process.env.GENERATE_COVERAGE_FILE === 'true') {
+		generateAndSaveCoverageFile(coverageEntries);
+	}
 
 	const result = new Map<string, CoverageResult>();
 
