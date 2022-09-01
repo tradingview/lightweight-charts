@@ -3,6 +3,7 @@ import {
 	CanvasElementBitmapSizeBinding,
 	CanvasRenderingTarget2D,
 	equalSizes,
+	MediaCoordinatesRenderingScope,
 	Size,
 	size,
 	tryCreateCanvasRenderingTarget2D,
@@ -277,8 +278,8 @@ export class PriceAxisWidget implements IDestroyable {
 				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
 					this._drawBorder(scope);
-					this._drawTickMarks(scope);
 				});
+				this._drawTickMarks(target);
 				this._drawBackLabels(target);
 			}
 		}
@@ -424,59 +425,56 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.fillRect(left, 0, borderSize, bitmapSize.height);
 	}
 
-	private _drawTickMarks(renderingScope: BitmapCoordinatesRenderingScope): void {
+	private _drawTickMarks(target: CanvasRenderingTarget2D): void {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
 
-		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = renderingScope;
 		const tickMarks = this._priceScale.marks();
-
-		ctx.save();
-
 		const priceScaleOptions = this._priceScale.options();
-
-		ctx.strokeStyle = priceScaleOptions.borderColor;
-
-		ctx.font = this._baseFont();
-		ctx.fillStyle = priceScaleOptions.borderColor;
 		const rendererOptions = this.rendererOptions();
-
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor((this._size.width - rendererOptions.tickLength) * horizontalPixelRatio) :
+			(this._size.width - rendererOptions.tickLength) :
 			0;
 
-		const textLeftX = this._isLeft ?
-			Math.round(tickMarkLeftX - rendererOptions.paddingInner * horizontalPixelRatio) :
-			Math.round(tickMarkLeftX + rendererOptions.tickLength * horizontalPixelRatio + rendererOptions.paddingInner * horizontalPixelRatio);
-
-		const tickHeight = Math.max(1, Math.floor(verticalPixelRatio));
-		const tickOffset = Math.floor(verticalPixelRatio * 0.5);
-
 		if (priceScaleOptions.borderVisible && priceScaleOptions.ticksVisible) {
-			const tickLength = Math.round(rendererOptions.tickLength * horizontalPixelRatio);
+			target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
+				ctx.fillStyle = priceScaleOptions.borderColor;
 
-			ctx.beginPath();
-			for (const tickMark of tickMarks) {
-				ctx.rect(tickMarkLeftX, Math.round(tickMark.coord * verticalPixelRatio) - tickOffset, tickLength, tickHeight);
+				const tickHeight = Math.max(1, Math.floor(verticalPixelRatio));
+				const tickOffset = Math.floor(verticalPixelRatio * 0.5);
+				const tickLength = Math.round(rendererOptions.tickLength * horizontalPixelRatio);
+
+				ctx.beginPath();
+				for (const tickMark of tickMarks) {
+					ctx.rect(
+						Math.floor(tickMarkLeftX * horizontalPixelRatio),
+						Math.round(tickMark.coord * verticalPixelRatio) - tickOffset,
+						tickLength,
+						tickHeight
+					);
+				}
+				ctx.fill();
+			});
+		}
+
+		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
+			ctx.font = this._baseFont();
+			ctx.fillStyle = priceScaleOptions.textColor ?? this._layoutOptions.textColor;
+			ctx.textAlign = this._isLeft ? 'right' : 'left';
+			ctx.textBaseline = 'middle';
+
+			const textLeftX = this._isLeft ?
+				Math.round(tickMarkLeftX - rendererOptions.paddingInner) :
+				Math.round(tickMarkLeftX + rendererOptions.tickLength + rendererOptions.paddingInner);
+
+			const yMidCorrections = tickMarks.map((mark: PriceMark) => this._widthCache.yMidCorrection(ctx, mark.label));
+
+			for (let i = tickMarks.length; i--;) {
+				const tickMark = tickMarks[i];
+				ctx.fillText(tickMark.label, textLeftX, tickMark.coord + yMidCorrections[i]);
 			}
-
-			ctx.fill();
-		}
-
-		ctx.fillStyle = priceScaleOptions.textColor ?? this._layoutOptions.textColor;
-		ctx.textAlign = this._isLeft ? 'right' : 'left';
-		ctx.textBaseline = 'middle';
-
-		const yMidCorrections = tickMarks.map((mark: PriceMark) => this._widthCache.yMidCorrection(ctx, mark.label));
-
-		ctx.scale(horizontalPixelRatio, verticalPixelRatio);
-		for (let i = tickMarks.length; i--;) {
-			const tickMark = tickMarks[i];
-			ctx.fillText(tickMark.label, textLeftX / horizontalPixelRatio, tickMark.coord + yMidCorrections[i]);
-		}
-
-		ctx.restore();
+		});
 	}
 
 	private _alignLabels(): void {
