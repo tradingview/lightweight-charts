@@ -27,8 +27,8 @@
     "raw-loader": "~4.0.2",
     "react": "~17.0.2",
     "react-dom": "~17.0.2",
-    "typedoc": "~0.23.10",
-    "typedoc-plugin-markdown": "3.13.4",
+    "typedoc": "~0.23.14",
+    "typedoc-plugin-markdown": "3.13.6",
     "typescript": "4.7.3"
   }
 }
