@@ -30,7 +30,7 @@ const sidebars = {
 				{
 					type: 'doc',
 					id: 'webcomponents/custom-element',
-					label: 'Web components',
+					label: 'Web Components',
 				},
 			],
 		},
