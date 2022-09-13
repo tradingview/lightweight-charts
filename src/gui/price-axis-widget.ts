@@ -230,9 +230,7 @@ export class PriceAxisWidget implements IDestroyable {
 			this._isSettingSize = false;
 
 			this._cell.style.width = `${newSize.width}px`;
-			// need this for IE11
 			this._cell.style.height = `${newSize.height}px`;
-			this._cell.style.minWidth = `${newSize.width}px`; // for right calculate position of .pane-legend
 		}
 	}
 

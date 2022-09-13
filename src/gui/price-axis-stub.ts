@@ -82,7 +82,6 @@ export class PriceAxisStub implements IDestroyable {
 			this._canvasBinding.resizeCanvasElement(newSize);
 
 			this._cell.style.width = `${newSize.width}px`;
-			this._cell.style.minWidth = `${newSize.width}px`; // for right calculate position of .pane-legend
 			this._cell.style.height = `${newSize.height}px`;
 
 			this._invalidated = true;
