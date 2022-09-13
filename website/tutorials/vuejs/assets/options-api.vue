@@ -81,6 +81,7 @@ export default {
 		if (series) {
 			series = null;
 		}
+		window.removeEventListener('resize', resizeHandler);
 	},
 	/*
 	 * Watch for changes to any of the component properties.

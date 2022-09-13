@@ -101,6 +101,7 @@ onUnmounted(() => {
 	if (series) {
 		series = null;
 	}
+	window.removeEventListener('resize', resizeHandler);
 });
 
 /*
