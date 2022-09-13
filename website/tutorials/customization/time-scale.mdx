@@ -1,0 +1,88 @@
+---
+sidebar_position: 6
+title: Time scale
+pagination_title: Time scale
+sidebar_label: Time scale
+description: In the previous step, we adjusted the vertical price scale, now let us adjust the horizontal time scale.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/price-scale
+pagination_next: customization/crosshair
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In the previous step, we adjusted the vertical price scale, now let us adjust the horizontal time scale. We previously adjusted the border color of this scale and now we are going to adjust the starting 'zoom' level.
+
+We will be adjusting the [`barSpacing`](/docs/api/interfaces/TimeScaleOptions#barspacing) option on the time scale which is used when the chart is first rendered to determine the horizontal 'zoom' level. The property sets 'The space between bars in pixels.', where a larger number will result in wider bars and fewer bars visible on the chart. The default value is `6` and we will be increasing it to `10` which will effectively 'zoom in' for the time scale.
+
+## Adjusting settings for the time scale
+
+We can get the [ITimeScaleApi](/docs/api/interfaces/ITimeScaleApi) instance for the chart by evoking the `timeScale()` method on the chart reference.
+
+Just as with the previous step, we can use the `applyOptions()` method on this API instance to adjust it's options. You can add the following code to the example at any point after the `chart` reference has been created, but we will place it directly below where we set the border color for the time scale. The options available are shown here: [TimeScaleOptions](/docs/api/interfaces/TimeScaleOptions).
+
+```js
+// Setting the border color for the horizontal axis
+chart.timeScale().applyOptions({
+    borderColor: '#71649C',
+});
+
+// highlight-start
+// Adjust the starting bar width (essentially the horizontal zoom)
+chart.timeScale().applyOptions({
+    barSpacing: 10,
+});
+// highlight-end
+```
+
+The `applyOptions()` calls on the time scale were purposely split into two to show that it is possible to apply the options individually if that leads to cleaner code to read. It is also possible to apply both options in a single step as shown below:
+
+```js
+// Example of applying both properties in a single call
+chart.timeScale().applyOptions({
+    borderColor: '#71649C',
+    barSpacing: 10,
+});
+```
+
+## Auto fitting all the content
+
+It is possible to auto fit all the content into the visable area of the chart by calling the [`fitContent()`](/docs/api/interfaces/ITimeScaleApi#fitcontent) method on the time scale instance, for example: `chart.timeScale().fitContent();`
+
+## Result
+
+At this point we should have a chart like this (noting the wider candlestick bars):
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step6.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step6.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+In the next step, we will be adjusting the visual style and behaviour of the crosshair.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step6.html').default} download="customization-tutorial-step6.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step6.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

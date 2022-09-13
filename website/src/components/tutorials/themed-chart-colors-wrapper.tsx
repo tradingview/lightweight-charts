@@ -28,7 +28,8 @@ function getThemeColors(isDarkTheme: boolean): ThemedChartColors {
 }
 
 export function useThemedChartColors(): ThemedChartColors {
-	const { isDarkTheme } = useColorMode();
+	const { colorMode } = useColorMode();
+	const isDarkTheme = colorMode === 'dark';
 	const [colors, setColors] = useState<ThemedChartColors>(getThemeColors(isDarkTheme));
 
 	useEffect(

@@ -1,0 +1,78 @@
+---
+title: Two Price Scales
+sidebar_label: Two Price Scales
+description: An example of how to add two price scales to a chart.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - price
+  - scale
+---
+
+It is possible to have two price scales visible on a Lightweight Chart,
+namely one on the right side (default) and another on the left. This example
+shows how to configure your chart to contain two price scales.
+
+## Short answer
+
+Ensure that `rightPriceScale` and `leftPriceScale` has the `visibility` property
+set to `true` within the [chart options](/docs/api/interfaces/ChartOptions#leftpricescale).
+
+```js
+chart.applyOptions({
+    rightPriceScale: {
+        visible: true,
+    },
+    leftPriceScale: {
+        visible: true,
+    },
+});
+```
+
+and assign the `priceScaleId` property on the [series options](/docs/api/interfaces/SeriesOptionsCommon#pricescaleid)
+for the series which you would like to use the left scale. Note that by default a
+series will use the right scale thus we don't need to set that property on the other series.
+
+```js
+const leftSeries = chart.addCandlestickSeries(
+    { priceScaleId: 'left' }
+);
+```
+
+You can see a full [working example](#full-example) below.
+
+## Tips
+
+By default the crosshair will snap to the data points of the first series.
+You may prefer to set the [crosshair mode](/docs/api/enums/CrosshairMode) to
+`normal` so that you get a crosshair which allows sits directly beneath your cursor.
+
+```js
+chart.applyOptions({
+    crosshair: {
+        mode: 0, // CrosshairMode.Normal
+    },
+});
+```
+
+## Resources
+
+You can learn more about price scales here: [Price scale](/docs/price-scale)
+
+and view the related APIs here:
+- [Chart Options](/docs/api/interfaces/ChartOptions#leftpricescale)
+- [PriceScaleOptions](/docs/api/interfaces/PriceScaleOptions)
+- [SeriesOptionsCommon priceScaleId](/docs/api/interfaces/SeriesOptionsCommon#pricescaleid)
+
+## Full example
+
+import UsageGuidePartial from "./_usage-guide-partial.mdx";
+
+<UsageGuidePartial />
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./two-price-scales.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+    {code}
+</CodeBlock>

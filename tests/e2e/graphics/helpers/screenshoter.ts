@@ -79,7 +79,9 @@ export class Screenshoter {
 				return new Promise<void>((resolve: () => void) => {
 					window.requestAnimationFrame(() => {
 						// and a little more time after af :)
-						setTimeout(resolve, 50);
+						// Note: This timeout value isn't part of the test and is only
+						//       included to improve the reliability of the test.
+						setTimeout(resolve, 250);
 					});
 				});
 			});
