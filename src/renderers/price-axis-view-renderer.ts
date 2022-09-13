@@ -177,9 +177,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const yMid = this._commonData.fixedCoordinate ?? this._commonData.coordinate;
 		const yMidBitmap = Math.round(yMid * verticalPixelRatio) - Math.floor(verticalPixelRatio * 0.5);
-		const yTop = yMid - totalHeight / 2;
 		const yTopBitmap = Math.floor(yMidBitmap + tickHeightBitmap / 2 - totalHeightBitmap / 2);
-		const yBottom = yTop + totalHeight;
 		const yBottomBitmap = yTopBitmap + totalHeightBitmap;
 
 		const alignRight = align === 'right';
@@ -229,8 +227,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 				right: bitmapSize.width,
 			},
 			media: {
-				yTop,
-				yBottom,
+				yTop: yTopBitmap / verticalPixelRatio,
+				yBottom: yBottomBitmap / verticalPixelRatio,
 				xText,
 				textMidCorrection,
 			},
