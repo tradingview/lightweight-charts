@@ -171,8 +171,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const ctx = ensureNotNull(this._canvasBinding.canvasElement.getContext('2d'));
 		ctx.save();
-		// do no use resetTransform to respect Edge
-		ctx.setTransform(1, 0, 0, 1, 0, 0);
 
 		const tickMarks = this._priceScale.marks();
 
