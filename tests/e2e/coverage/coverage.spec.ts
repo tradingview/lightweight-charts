@@ -13,8 +13,11 @@ import puppeteer, {
 	HTTPResponse,
 	launch as launchPuppeteer,
 	Page,
-	type CDPSession,
 } from 'puppeteer';
+
+import { doHorizontalDrag, doKineticAnimation, doVerticalDrag } from '../helpers/mouse-drag-actions';
+import { doMouseScrolls } from '../helpers/mouse-scroll-actions';
+import { doLongTouch, doPinchZoomTouch, doSwipeTouch } from '../helpers/touch-actions';
 
 import { expectedCoverage, threshold } from './coverage-config';
 
@@ -23,31 +26,6 @@ const coverageScript = fs.readFileSync(path.join(__dirname, 'coverage-script.js'
 const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
-
-async function doMouseScrolls(page: Page, element: ElementHandle): Promise<void> {
-	const boundingBox = await element.boundingBox();
-	if (!boundingBox) {
-		throw new Error('Unable to get boundingBox for element.');
-	}
-
-	// move mouse to center of element
-	await page.mouse.move(
-	boundingBox.x + boundingBox.width / 2,
-	boundingBox.y + boundingBox.height / 2
-	);
-
-	await page.mouse.wheel({ deltaX: 10.0 });
-
-	await page.mouse.wheel({ deltaY: 10.0 });
-
-	await page.mouse.wheel({ deltaX: -10.0 });
-
-	await page.mouse.wheel({ deltaY: -10.0 });
-
-	await page.mouse.wheel({ deltaX: 10.0, deltaY: 10.0 });
-
-	await page.mouse.wheel({ deltaX: -10.0, deltaY: -10.0 });
-}
 
 async function doZoomInZoomOut(page: Page): Promise<void> {
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -58,157 +36,6 @@ async function doZoomInZoomOut(page: Page): Promise<void> {
 	});
 
 	await page.setViewport(prevViewport);
-}
-
-async function doVerticalDrag(page: Page, element: ElementHandle): Promise<void> {
-	const elBox = await element.boundingBox() as BoundingBox;
-
-	const elMiddleX = elBox.x + elBox.width / 2;
-	const elMiddleY = elBox.y + elBox.height / 2;
-
-	// move mouse to the middle of element
-	await page.mouse.move(elMiddleX, elMiddleY);
-
-	await page.mouse.down({ button: 'left' });
-	await page.mouse.move(elMiddleX, elMiddleY - 20);
-	await page.mouse.move(elMiddleX, elMiddleY + 40);
-	await page.mouse.up({ button: 'left' });
-}
-
-async function doHorizontalDrag(page: Page, element: ElementHandle): Promise<void> {
-	const elBox = await element.boundingBox() as BoundingBox;
-
-	const elMiddleX = elBox.x + elBox.width / 2;
-	const elMiddleY = elBox.y + elBox.height / 2;
-
-	// move mouse to the middle of element
-	await page.mouse.move(elMiddleX, elMiddleY);
-
-	await page.mouse.down({ button: 'left' });
-	await page.mouse.move(elMiddleX - 20, elMiddleY);
-	await page.mouse.move(elMiddleX + 40, elMiddleY);
-	await page.mouse.up({ button: 'left' });
-}
-
-// await a setTimeout delay evaluated within page context
-async function pageTimeout(page: Page, delay: number): Promise<void> {
-	return page.evaluate(
-		(ms: number) => new Promise<void>(
-			(resolve: () => void) => setTimeout(resolve, ms)
-			),
-		delay
-	);
-}
-
-async function doKineticAnimation(page: Page, element: ElementHandle): Promise<void> {
-	const elBox = await element.boundingBox() as BoundingBox;
-
-	const elMiddleX = elBox.x + elBox.width / 2;
-	const elMiddleY = elBox.y + elBox.height / 2;
-
-	// move mouse to the middle of element
-	await page.mouse.move(elMiddleX, elMiddleY);
-
-	await page.mouse.down({ button: 'left' });
-	await pageTimeout(page, 50);
-	await page.mouse.move(elMiddleX - 40, elMiddleY);
-	await page.mouse.move(elMiddleX - 55, elMiddleY);
-	await page.mouse.move(elMiddleX - 105, elMiddleY);
-	await page.mouse.move(elMiddleX - 155, elMiddleY);
-	await page.mouse.move(elMiddleX - 205, elMiddleY);
-	await page.mouse.move(elMiddleX - 255, elMiddleY);
-	await page.mouse.up({ button: 'left' });
-
-	await pageTimeout(page, 200);
-	// stop animation
-	await page.mouse.down({ button: 'left' });
-	await page.mouse.up({ button: 'left' });
-}
-
-// Simulate a long touch action in a single position
-async function doLongTouch(page: Page, element: ElementHandle, duration: number): Promise<void> {
-	const elBox = (await element.boundingBox()) as BoundingBox;
-
-	const elCenterX = elBox.x + elBox.width / 2;
-	const elCenterY = elBox.y + elBox.height / 2;
-
-	const client = await page.target().createCDPSession();
-
-	await client.send('Input.dispatchTouchEvent', {
-		type: 'touchStart',
-		touchPoints: [
-			{ x: elCenterX, y: elCenterY },
-		],
-	});
-	await pageTimeout(page, duration);
-	return client.send('Input.dispatchTouchEvent', {
-		type: 'touchEnd',
-		touchPoints: [
-			{ x: elCenterX, y: elCenterY },
-		],
-	});
-}
-
-// Simulate a touch swipe gesture
-async function doSwipeTouch(
-	devToolsSession: CDPSession,
-	element: ElementHandle,
-	{
-		horizontal = false,
-		vertical = false,
-	}: { horizontal?: boolean; vertical?: boolean }
-): Promise<void> {
-	const elBox = (await element.boundingBox()) as BoundingBox;
-
-	const elCenterX = elBox.x + elBox.width / 2;
-	const elCenterY = elBox.y + elBox.height / 2;
-	const xStep = horizontal ? elBox.width / 8 : 0;
-	const yStep = vertical ? elBox.height / 8 : 0;
-
-	for (let i = 2; i > 0; i--) {
-		const type = i === 2 ? 'touchStart' : 'touchMove';
-		await devToolsSession.send('Input.dispatchTouchEvent', {
-			type,
-			touchPoints: [{ x: elCenterX - i * xStep, y: elCenterY - i * yStep }],
-		});
-	}
-	return devToolsSession.send('Input.dispatchTouchEvent', {
-		type: 'touchEnd',
-		touchPoints: [{ x: elCenterX - xStep, y: elCenterY - yStep }],
-	});
-}
-
-// Perform a pinch or zoom touch gesture within the specified element.
-async function doPinchZoomTouch(
-	devToolsSession: CDPSession,
-	element: ElementHandle,
-	zoom?: boolean
-): Promise<void> {
-	const elBox = (await element.boundingBox()) as BoundingBox;
-
-	const sign = zoom ? -1 : 1;
-	const elCenterX = elBox.x + elBox.width / 2;
-	const elCenterY = elBox.y + elBox.height / 2;
-	const xStep = (sign * elBox.width) / 8;
-	const yStep = (sign * elBox.height) / 8;
-
-	for (let i = 2; i > 0; i--) {
-		const type = i === 2 ? 'touchStart' : 'touchMove';
-		await devToolsSession.send('Input.dispatchTouchEvent', {
-			type,
-			touchPoints: [
-				{ x: elCenterX - i * xStep, y: elCenterY - i * yStep },
-				{ x: elCenterX + i * xStep, y: elCenterY + i * xStep },
-			],
-		});
-	}
-	return devToolsSession.send('Input.dispatchTouchEvent', {
-		type: 'touchEnd',
-		touchPoints: [
-			{ x: elCenterX - xStep, y: elCenterY - yStep },
-			{ x: elCenterX + xStep, y: elCenterY + xStep },
-		],
-	});
 }
 
 async function doUserInteractions(page: Page): Promise<void> {

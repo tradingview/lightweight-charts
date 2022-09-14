@@ -220,6 +220,19 @@ jobs:
       - store_test_results:
           path: test-results/
 
+  interactions:
+    executor: node16-browsers-executor
+    environment:
+      NO_SANDBOX: "true"
+      TESTS_REPORT_FILE: "test-results/interactions/results.xml"
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: scripts/run-interactions-tests.sh
+      - store_test_results:
+          path: test-results/
+
   size-limit:
     executor: node16-executor
     steps:
@@ -333,6 +346,10 @@ workflows:
           requires:
             - build
       - coverage:
+          filters: *default-filters
+          requires:
+            - build
+      - interactions:
           filters: *default-filters
           requires:
             - build
