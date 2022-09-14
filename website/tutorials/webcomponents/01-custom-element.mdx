@@ -115,7 +115,7 @@ class LightweightChartWC extends HTMLElement {
 
         this.shadowRoot.append(container);
     }
-// hide-line
+    // hide-line
 }
 ```
 
@@ -144,7 +144,7 @@ const elementStyles = `
 class LightweightChartWC extends HTMLElement {
     // ...
     // hide-end
-    // Within the class definition
+// Within the class definition
     connectedCallback() {
         // highlight-fade-start
         // Create the div container for the chart
@@ -156,7 +156,7 @@ class LightweightChartWC extends HTMLElement {
         style.textContent = elementStyles;
         this.shadowRoot.append(style, container);
     }
-// hide-line
+    // hide-line
 }
 ```
 
@@ -190,7 +190,7 @@ class LightweightChartWC extends HTMLElement {
         // Create the Lightweight Chart
         this.chart = createChart(container);
     }
-// hide-line
+    // hide-line
 }
 ```
 
@@ -250,7 +250,7 @@ class LightweightChartWC extends HTMLElement {
     get type() {
         return this.getAttribute('type') || 'line';
     }
-// hide-line
+    // hide-line
 }
 ```
 
@@ -270,14 +270,16 @@ class LightweightChartWC extends HTMLElement {
      * `observedAttributes` array are changed.
      */
     attributeChangedCallback(name, _oldValue, newValue) {
-        if (!this.chart) { return; }
+        if (!this.chart) {
+            return;
+        }
         const hasValue = newValue !== null;
         switch (name) {
         case 'type':
-        // handle the changed attribute
+            // handle the changed attribute
             break;
         case 'autosize':
-        // handle the changed attribute
+            // handle the changed attribute
             break;
         }
     }
@@ -313,15 +315,19 @@ class LightweightChartWC extends HTMLElement {
     // hide-end
 // Within the class definition
     set options(value) {
-        if (!this.chart) { return; }
+        if (!this.chart) {
+            return;
+        }
         this.chart.applyOptions(value);
     }
 
     get options() {
-        if (!this.chart) { return null; }
+        if (!this.chart) {
+            return null;
+        }
         return this.chart.options();
     }
-// hide-line
+    // hide-line
 }
 ```
 
@@ -361,7 +367,9 @@ class LightweightChartWC extends HTMLElement {
             const propertyName = name
                 .split('-')
                 .map((text, index) => {
-                    if (index < 1) { return text; }
+                    if (index < 1) {
+                        return text;
+                    }
                     return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
                 })
                 .join('');
@@ -386,7 +394,7 @@ class LightweightChartWC extends HTMLElement {
             this._tryLoadInitialProperty(propertyName);
         });
     }
-// hide-line
+    // hide-line
 }
 ```
 
@@ -416,6 +424,89 @@ const chartApi = myChartElement.chart;
 chartApi.timeScale().fitContent();
 ```
 
+## Using a Custom Element
+
+Custom elements can be used just like any other normal html element after the
+custom element has been defined and registered. The example custom element will
+define and register itself (using
+`window.customElements.define('lightweight-chart', LightweightChartWC);`) when
+the script is loaded and executed, so all you need to do is include the script
+tag on the page.
+
+Depending on your build step for your page, you may either need to import
+Lightweight Charts via an import statement, or access the library via the global
+variable defined when using the standalone script version.
+
+```js
+// if using esm version (installed via npm):
+// import { createChart } from 'lightweight-charts';
+
+// If using standalone version (loaded via a script tag):
+const { createChart } = LightweightCharts;
+```
+
+Similarily, the custom element can either be loaded via an 'side-effect' import
+statement:
+
+```js
+// side-effect import statement (use within a module js file)
+import './lw-chart.js';
+```
+
+ or via a script tag:
+
+ ```html
+<script src="lw-chart.js" defer></script>
+```
+
+Once the custom element script has been loaded and executed then you can use the
+custom element anywhere that you can use normal html, including within other
+frameworks like React, Vue, and Angular. See
+[Custom Elements Everywhere](https://custom-elements-everywhere.com) for more
+information.
+
+### Standalone script example html file
+
+If you are loading the Lightweight Charts library via the standalone script
+version then you can also load the custom element via a script tag (see above
+section for more info) and construct your html page as follows:
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0"
+        />
+        <title>Web component Example</title>
+        <script
+            type="text/javascript"
+            src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.development.js"
+        ></script>
+        <style>
+            #my-chart {
+                height: 100vh;
+                width: 100vw;
+            }
+        </style>
+    </head>
+
+    <body style="padding: 0; margin: 0">
+        <lightweight-chart
+            id="my-chart"
+            autosize
+            type="line"
+            series-options='{"color": "red"}'
+            data='[{ "time": "2018-10-19", "value": 52.89 },{ "time": "2018-10-22", "value": 51.65 }]'
+        ></lightweight-chart>
+
+        <script src="lw-chart.js" defer></script>
+    </body>
+</html>
+```
+
 ## Complete Sample Code
 
 Presented below is the complete custom element source code for the Web
@@ -427,7 +518,15 @@ showcases how to make use of these components within a typical html page.
 The following code block contains the source code for the wrapper custom
 element.
 
-<p><a href={require('!!file-loader!./assets/lw-chart.js').default} download="lw-chart.js" target="\_blank">Download file</a></p>
+<p>
+    <a
+        href={require('!!file-loader!./assets/lw-chart.js').default}
+        download="lw-chart.js"
+        target="\_blank"
+    >
+        Download file
+    </a>
+</p>
 
 import CodeBlock from '@theme/CodeBlock';
 import InstantDetails from '@site/src/components/InstantDetails';
@@ -443,7 +542,15 @@ import wrapperCode from '!!raw-loader!./assets/lw-chart.js';
 The following code block contains the source code for the custom element
 showcasing how to use the above custom element.
 
-<p><a href={require('!!file-loader!./assets/wc-example.js').default} download="wc-example.js" target="\_blank">Download file</a></p>
+<p>
+    <a
+        href={require('!!file-loader!./assets/wc-example.js').default}
+        download="wc-example.js"
+        target="\_blank"
+    >
+        Download file
+    </a>
+</p>
 
 import exampleCode from '!!raw-loader!./assets/wc-example.js';
 
