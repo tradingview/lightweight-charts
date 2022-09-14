@@ -110,7 +110,7 @@ node ./tests/e2e/memleaks/runner.js ./dist/lightweight-charts.standalone.develop
 
 ### Interactions
 
-The interactions tests check whether the library is correctly handling user interaction on the chart. Interactions include: mouse scrolling, mouse dragging, and touches.
+The interactions tests check whether the library is correctly handling user interactions on the chart. Interactions include: mouse scrolling, mouse dragging, and touches.
 
 #### Running the Interactions tests
 
