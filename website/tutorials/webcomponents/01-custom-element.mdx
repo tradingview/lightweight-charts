@@ -107,7 +107,7 @@ example below) or by imperatively using the DOM JS api as shown below:
 class LightweightChartWC extends HTMLElement {
     // ...
     // hide-end
-// Within the class definition
+    // Within the class definition
     connectedCallback() {
         // Create the div container for the chart
         const container = document.createElement('div');
@@ -144,7 +144,7 @@ const elementStyles = `
 class LightweightChartWC extends HTMLElement {
     // ...
     // hide-end
-// Within the class definition
+    // Within the class definition
     connectedCallback() {
         // highlight-fade-start
         // Create the div container for the chart
@@ -242,7 +242,7 @@ can be achieved as follows:
 class LightweightChartWC extends HTMLElement {
     // ...
     // hide-end
-// Within the class definition
+    // Within the class definition
     set type(value) {
         this.setAttribute('type', value || 'line');
     }
@@ -313,7 +313,7 @@ over the property instead of it being just a value.
 class LightweightChartWC extends HTMLElement {
     // ...
     // hide-end
-// Within the class definition
+    // Within the class definition
     set options(value) {
         if (!this.chart) {
             return;
