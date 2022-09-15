@@ -20,6 +20,9 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 
 	const binding = bindCanvasElementBitmapSizeTo(canvas, {
 		type: 'device-pixel-content-box',
+		options: {
+			allowResizeObserver: false,
+		},
 		transform: (bitmapSize: Size, canvasElementClientSize: Size) => ({
 			width: Math.max(bitmapSize.width, canvasElementClientSize.width),
 			height: Math.max(bitmapSize.height, canvasElementClientSize.height),
