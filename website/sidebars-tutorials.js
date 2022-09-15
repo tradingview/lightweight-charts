@@ -22,6 +22,16 @@ const sidebars = {
 						dirName: 'react',
 					},
 				] },
+				{
+					type: 'doc',
+					id: 'vuejs/wrapper',
+					label: 'Vue.js',
+				},
+				{
+					type: 'doc',
+					id: 'webcomponents/custom-element',
+					label: 'Web Components',
+				},
 			],
 		},
 		{
