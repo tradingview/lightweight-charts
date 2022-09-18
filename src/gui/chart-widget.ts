@@ -20,7 +20,6 @@ import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { OriginalTime, TimePointIndex } from '../model/time-data';
 
-import { createPreconfiguredCanvas } from './canvas-utils';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -228,7 +227,10 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		const screeshotBitmapSize = this._traverseLayout(null);
-		const screenshotCanvas = createPreconfiguredCanvas(document, screeshotBitmapSize);
+		const screenshotCanvas = document.createElement('canvas');
+		screenshotCanvas.width = screeshotBitmapSize.width;
+		screenshotCanvas.height = screeshotBitmapSize.height;
+
 		const ctx = ensureNotNull(screenshotCanvas.getContext('2d'));
 		this._traverseLayout(ctx);
 
