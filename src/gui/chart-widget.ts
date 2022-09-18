@@ -1,4 +1,4 @@
-import { size } from 'fancy-canvas';
+import { Size, size } from 'fancy-canvas';
 
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
@@ -227,101 +227,12 @@ export class ChartWidget implements IDestroyable {
 			this._invalidateMask = null;
 		}
 
-		const pixelRatio = window.devicePixelRatio;
-		const targetCanvas = createPreconfiguredCanvas(
-			document,
-			// calculate target size
-			size({
-				width: this._width * pixelRatio,
-				height: this._height * pixelRatio,
-			})
-		);
-		const ctx = ensureNotNull(targetCanvas.getContext('2d'));
+		const screeshotBitmapSize = this._traverseLayout(null);
+		const screenshotCanvas = createPreconfiguredCanvas(document, screeshotBitmapSize);
+		const ctx = ensureNotNull(screenshotCanvas.getContext('2d'));
+		this._traverseLayout(ctx);
 
-		let targetX = 0;
-		let targetY = 0;
-
-		const firstPane = this._paneWidgets[0];
-
-		const drawPriceAxises = (position: 'left' | 'right') => {
-			for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
-				const paneWidget = this._paneWidgets[paneIndex];
-				const priceAxisWidget = ensureNotNull(position === 'left' ? paneWidget.leftPriceAxisWidget() : paneWidget.rightPriceAxisWidget());
-				const image = priceAxisWidget.getImage();
-				if (image.width > 0 && image.height > 0) {
-					ctx.drawImage(image, targetX, targetY);
-				}
-				targetY += image.height;
-				// if (paneIndex < this._paneWidgets.length - 1) {
-				// 	const separator = this._paneSeparators[paneIndex];
-				// 	const separatorImage = separator.getImage();
-				// if (separatorImage.width > 0 && separatorImage.height > 0) {
-				// 		ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
-				// }
-				// 	targetY += separatorImage.height;
-				// }
-			}
-		};
-
-		// draw left price scale if exists
-		if (this._isLeftAxisVisible()) {
-			drawPriceAxises('left');
-			targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getImage().width;
-		}
-		targetY = 0;
-		for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
-			const paneWidget = this._paneWidgets[paneIndex];
-			const image = paneWidget.getImage();
-			if (image.width > 0 && image.height > 0) {
-				ctx.drawImage(image, targetX, targetY);
-			}
-			targetY += image.height;
-			// if (paneIndex < this._paneWidgets.length - 1) {
-			// 	const separator = this._paneSeparators[paneIndex];
-			// 	const separatorImage = separator.getImage();
-			// if (separatorImage.width > 0 && separatorImage.height > 0) {
-			// 		ctx.drawImage(separatorImage, targetX, targetY, separatorSize.w, separatorSize.h);
-			// }
-			// 	targetY += separatorImage.height;
-			// }
-		}
-		targetX += firstPane.getImage().width;
-
-		// draw right price scale if exists
-		if (this._isRightAxisVisible()) {
-			targetY = 0;
-			drawPriceAxises('right');
-		}
-
-		const drawStub = (position: 'left' | 'right') => {
-			const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
-			const stubImage = stub.getImage();
-			if (stubImage.width > 0 && stubImage.height > 0) {
-				ctx.drawImage(stubImage, targetX, targetY);
-			}
-		};
-
-		// draw time scale and stubs
-		if (this._options.timeScale.visible) {
-			targetX = 0;
-
-			if (this._isLeftAxisVisible()) {
-				drawStub('left');
-				targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getImage().width;
-			}
-
-			const timeAxisImage = this._timeAxisWidget.getImage();
-			if (timeAxisImage.width > 0 && timeAxisImage.height > 0) {
-				ctx.drawImage(timeAxisImage, targetX, targetY);
-			}
-			targetX += timeAxisImage.width;
-
-			if (this._isRightAxisVisible()) {
-				drawStub('right');
-			}
-		}
-
-		return targetCanvas;
+		return screenshotCanvas;
 	}
 
 	public getPriceAxisWidth(position: DefaultPriceScaleId): number {
@@ -344,6 +255,105 @@ export class ChartWidget implements IDestroyable {
 			? this._paneWidgets[0].leftPriceAxisWidget()
 			: this._paneWidgets[0].rightPriceAxisWidget();
 		return ensureNotNull(priceAxisWidget).getWidth();
+	}
+
+	/**
+	 * Traverses the widget's layout (pane and axis child widgets),
+	 * draws the screenshot (if rendering context is passed) and returns the screenshot bitmap size
+	 *
+	 * @param ctx - if passed, used to draw the screenshot of widget
+	 * @returns screenshot bitmap size
+	 */
+	private _traverseLayout(ctx: CanvasRenderingContext2D | null): Size {
+		let totalWidth = 0;
+		let totalHeight = 0;
+
+		const firstPane = this._paneWidgets[0];
+
+		const drawPriceAxises = (position: 'left' | 'right', targetX: number) => {
+			let targetY = 0;
+			for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
+				const paneWidget = this._paneWidgets[paneIndex];
+				const priceAxisWidget = ensureNotNull(position === 'left' ? paneWidget.leftPriceAxisWidget() : paneWidget.rightPriceAxisWidget());
+				const bitmapSize = priceAxisWidget.getBitmapSize();
+				if (ctx !== null) {
+					priceAxisWidget.drawBitmap(ctx, targetX, targetY);
+				}
+				targetY += bitmapSize.height;
+				// if (paneIndex < this._paneWidgets.length - 1) {
+				// 	const separator = this._paneSeparators[paneIndex];
+				// 	const separatorBitmapSize = separator.getBitmapSize();
+				// 	if (ctx !== null) {
+				// 		separator.drawBitmap(ctx, targetX, targetY);
+				// 	}
+				// 	targetY += separatorBitmapSize.height;
+				// }
+			}
+		};
+
+		// draw left price scale if exists
+		if (this._isLeftAxisVisible()) {
+			drawPriceAxises('left', 0);
+			const leftAxisBitmapWidth = ensureNotNull(firstPane.leftPriceAxisWidget()).getBitmapSize().width;
+			totalWidth += leftAxisBitmapWidth;
+		}
+		for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
+			const paneWidget = this._paneWidgets[paneIndex];
+			const bitmapSize = paneWidget.getBitmapSize();
+			if (ctx !== null) {
+				paneWidget.drawBitmap(ctx, totalWidth, totalHeight);
+			}
+			totalHeight += bitmapSize.height;
+			// if (paneIndex < this._paneWidgets.length - 1) {
+			// 	const separator = this._paneSeparators[paneIndex];
+			// 	const separatorBitmapSize = separator.getBitmapSize();
+			// 	if (ctx !== null) {
+			// 		separator.drawBitmap(ctx, totalWidth, totalHeight);
+			// 	}
+			// 	totalHeight += separatorBitmapSize.height;
+			// }
+		}
+		const firstPaneBitmapWidth = firstPane.getBitmapSize().width;
+		totalWidth += firstPaneBitmapWidth;
+
+		// draw right price scale if exists
+		if (this._isRightAxisVisible()) {
+			drawPriceAxises('right', totalWidth);
+			const rightAxisBitmapWidth = ensureNotNull(firstPane.rightPriceAxisWidget()).getBitmapSize().width;
+			totalWidth += rightAxisBitmapWidth;
+		}
+
+		const drawStub = (position: 'left' | 'right', targetX: number, targetY: number) => {
+			const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
+			stub.drawBitmap(ensureNotNull(ctx), targetX, targetY);
+		};
+
+		// draw time scale and stubs
+		if (this._options.timeScale.visible) {
+			const timeAxisBitmapSize = this._timeAxisWidget.getBitmapSize();
+
+			if (ctx !== null) {
+				let targetX = 0;
+				if (this._isLeftAxisVisible()) {
+					drawStub('left', targetX, totalHeight);
+					targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getBitmapSize().width;
+				}
+
+				this._timeAxisWidget.drawBitmap(ctx, targetX, totalHeight);
+				targetX += timeAxisBitmapSize.width;
+
+				if (this._isRightAxisVisible()) {
+					drawStub('right', targetX, totalHeight);
+				}
+			}
+
+			totalHeight += timeAxisBitmapSize.height;
+		}
+
+		return size({
+			width: totalWidth,
+			height: totalHeight,
+		});
 	}
 
 	// eslint-disable-next-line complexity

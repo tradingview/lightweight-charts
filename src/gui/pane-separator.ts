@@ -1,10 +1,6 @@
-import { Size, size } from 'fancy-canvas';
-
-import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clamp } from '../helpers/mathex';
 
-import { createPreconfiguredCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -84,25 +80,25 @@ export class PaneSeparator implements IDestroyable {
 		return this._rowElement;
 	}
 
-	public getSize(): Size {
-		return size({
-			width: this._paneA.getSize().width,
-			height: SEPARATOR_HEIGHT,
-		});
-	}
+	// public getSize(): Size {
+	// 	return size({
+	// 		width: this._paneA.getSize().width,
+	// 		height: SEPARATOR_HEIGHT,
+	// 	});
+	// }
 
-	public getImage(): HTMLCanvasElement {
-		const currentSize = this.getSize();
-		const imageSize = size({
-			width: currentSize.width * window.devicePixelRatio,
-			height: currentSize.height * window.devicePixelRatio,
-		});
-		const res = createPreconfiguredCanvas(document, imageSize);
-		const ctx = ensureNotNull(res.getContext('2d'));
-		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;
-		ctx.fillRect(0, 0, imageSize.width, imageSize.height);
-		return res;
-	}
+	// public getBitmapSize(): Size {
+	// 	return size({
+	// 		width: this._paneA.getBitmapSize().width,
+	// 		height: SEPARATOR_HEIGHT * window.devicePixelRatio,
+	// 	});
+	// }
+
+	// public drawBitmap(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+	// 	const bitmapSize = this.getBitmapSize();
+	// 	ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;
+	// 	ctx.fillRect(x, y, bitmapSize.width, bitmapSize.height);
+	// }
 
 	public update(): void {
 		this._updateBorderColor();

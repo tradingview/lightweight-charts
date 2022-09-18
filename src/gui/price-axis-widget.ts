@@ -290,8 +290,15 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 	}
 
-	public getImage(): HTMLCanvasElement {
-		return this._canvasBinding.canvasElement;
+	public getBitmapSize(): Size {
+		return this._canvasBinding.bitmapSize;
+	}
+
+	public drawBitmap(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+		const bitmapSize = this.getBitmapSize();
+		if (bitmapSize.width > 0 && bitmapSize.height > 0) {
+			ctx.drawImage(this._canvasBinding.canvasElement, x, y);
+		}
 	}
 
 	public update(): void {
