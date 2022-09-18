@@ -163,7 +163,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const totalHeight = actualTextHeight + paddingTop + paddingBottom;
 
-		const totalWidth = paddingInner + paddingOuter + textWidth + tickSize;
+		const totalWidth = rendererOptions.borderSize + paddingInner + paddingOuter + textWidth + tickSize;
 
 		const tickHeightBitmap = Math.max(1, Math.floor(verticalPixelRatio));
 		let totalHeightBitmap = Math.round(totalHeight * verticalPixelRatio);
