@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0"
+		/>
+		<title>Test case page</title>
+	</head>
+
+	<body style="padding: 0; margin: 0">
+		<div
+			id="container"
+			style="position: absolute; width: 100%; height: 100%"
+		></div>
+
+		<script type="text/javascript" src="PATH_TO_STANDALONE_MODULE"></script>
+
+		<script type="text/javascript">
+			// Commonly used functions across the various test cases
+			function generateLineData() {
+				const res = [];
+				const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+				for (let i = 0; i < 500; ++i) {
+					res.push({
+						time: time.toISOString().slice(0, 10),
+						value: i,
+					});
+
+					time.setUTCDate(time.getUTCDate() + 1);
+				}
+				return res;
+			}
+
+			function generateHistogramData() {
+				const colors = ['#013370', '#3a9656', undefined];
+
+				return generateLineData().map((item, index) => ({
+					...item,
+					color: colors[index % colors.length],
+				}));
+			}
+
+			function generateBars(count = 500, startDay = 15) {
+				const res = [];
+				const time = new Date(Date.UTC(2018, 0, startDay, 0, 0, 0, 0));
+				for (let i = 0; i < count; ++i) {
+					const step = (i % 20) / 5000;
+					const base = i / 5;
+
+					res.push({
+						time: time.getTime() / 1000,
+						open: base * (1 - step),
+						high: base * (1 + 2 * step),
+						low: base * (1 - 2 * step),
+						close: base * (1 + step),
+					});
+
+					time.setUTCDate(time.getUTCDate() + 1);
+				}
+
+				return res;
+			}
+
+			TEST_CASE_SCRIPT
+		</script>
+
+		<script type="text/javascript">
+			window.interactions = interactionsToPerform();
+			window.finishedSetup = beforeInteractions(
+				document.getElementById('container')
+			);
+		</script>
+	</body>
+</html>
