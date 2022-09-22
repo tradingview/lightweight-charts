@@ -11,9 +11,10 @@ import puppeteer, {
 	launch as launchPuppeteer,
 } from 'puppeteer';
 
-import { doMouseScroll } from '../helpers/mouse-scroll-actions';
+import { TestCase } from '../helpers/get-test-cases';
+import { Interaction, performInteractions } from '../helpers/perform-interactions';
 
-import { getTestCases, TestCase } from './helpers/get-test-cases';
+import { getTestCases } from './helpers/get-interaction-test-cases';
 
 const dummyContent = fs.readFileSync(
 	path.join(__dirname, 'helpers', 'test-page-dummy.html'),
@@ -32,8 +33,6 @@ function generatePageContent(
 const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
-
-type Interaction = 'scrollLeft' | 'scrollRight' | 'scrollUp' | 'scrollDown';
 
 interface InternalWindow {
 	interactions: Interaction[];
@@ -100,26 +99,7 @@ describe('Interactions tests', function(): void {
 				return (window as unknown as InternalWindow).interactions;
 			});
 
-			for (const interactionName of interactionsToPerform) {
-				switch (interactionName) {
-					case 'scrollLeft':
-						await doMouseScroll({ x: -10.0 }, page);
-						break;
-					case 'scrollRight':
-						await doMouseScroll({ x: 10.0 }, page);
-						break;
-					case 'scrollDown':
-						await doMouseScroll({ y: 10.0 }, page);
-						break;
-					case 'scrollUp':
-						await doMouseScroll({ y: -10.0 }, page);
-						break;
-					default:
-						// eslint-disable-next-line no-case-declarations
-						const exhaustiveCheck: never = interactionName;
-						throw new Error(exhaustiveCheck);
-				}
-			}
+			await performInteractions(page, interactionsToPerform);
 
 			await page.evaluate(() => {
 				return new Promise<void>((resolve: () => void) => {

@@ -13,7 +13,7 @@ function generateData() {
 }
 
 function interactionsToPerform() {
-	return ['scrollLeft', 'scrollDown'];
+	return [{ action: 'scrollLeft' }, { action: 'scrollDown' }];
 }
 
 let chart;
