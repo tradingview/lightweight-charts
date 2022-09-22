@@ -170,7 +170,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._priceScaleApiProvider.priceScale(this._series.priceScale().id());
 	}
 
-	public createPriceLine(options: PriceLineOptions): IPriceLine {
+	public createPriceLine(options: Partial<PriceLineOptions>): IPriceLine {
 		checkPriceLineOptions(options);
 
 		const strictOptions = merge(clone(priceLineOptionsDefaults), options) as PriceLineOptions;

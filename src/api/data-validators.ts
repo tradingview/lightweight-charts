@@ -8,12 +8,11 @@ import { Time } from '../model/time-data';
 import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 
-export function checkPriceLineOptions(options: PriceLineOptions): void {
+export function checkPriceLineOptions(options: Partial<PriceLineOptions>): void {
 	if (process.env.NODE_ENV === 'production') {
 		return;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/tslint/config
 	assert(typeof options.price === 'number', `the type of 'price' price line's property must be a number, got '${typeof options.price}'`);
 }
 
