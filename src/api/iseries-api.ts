@@ -3,7 +3,7 @@ import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { MismatchDirection } from '../model/plot-list';
-import { PriceLineOptions } from '../model/price-line-options';
+import { CreatePriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
@@ -222,7 +222,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	/**
 	 * Creates a new price line
 	 *
-	 * @param options - Any subset of options.
+	 * @param options - Any subset of options, however `price` is required.
 	 * @example
 	 * ```js
 	 * const priceLine = series.createPriceLine({
@@ -235,7 +235,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * });
 	 * ```
 	 */
-	createPriceLine(options: PriceLineOptions): IPriceLine;
+	createPriceLine(options: CreatePriceLineOptions): IPriceLine;
 
 	/**
 	 * Removes the price line that was created before.
