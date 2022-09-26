@@ -47,3 +47,10 @@ export interface PriceLineOptions {
 	 */
 	title: string;
 }
+
+/**
+ * Price line options for the {@link ISeriesApi.createPriceLine} method.
+ *
+ * `price` is required, while the rest of the options are optional.
+ */
+export type CreatePriceLineOptions = Partial<PriceLineOptions> & Pick<PriceLineOptions, 'price'>;

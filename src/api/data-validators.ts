@@ -1,6 +1,6 @@
 import { assert } from '../helpers/assertions';
 
-import { PriceLineOptions } from '../model/price-line-options';
+import { CreatePriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import { SeriesType } from '../model/series-options';
 import { Time } from '../model/time-data';
@@ -8,7 +8,7 @@ import { Time } from '../model/time-data';
 import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 
-export function checkPriceLineOptions(options: PriceLineOptions): void {
+export function checkPriceLineOptions(options: CreatePriceLineOptions): void {
 	if (process.env.NODE_ENV === 'production') {
 		return;
 	}
