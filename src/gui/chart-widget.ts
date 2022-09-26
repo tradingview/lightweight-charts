@@ -69,8 +69,9 @@ export class ChartWidget implements IDestroyable {
 		this._element.appendChild(this._tableElement);
 
 		this._onWheelBound = this._onMousewheel.bind(this);
-		this._element.addEventListener('wheel', this._onWheelBound, { passive: false });
-
+		if (shouldSubscribeMouseWheel(this._options)) {
+			this._setMouseWheelEventListener(true);
+		}
 		this._model = new ChartModel(
 			this._invalidateHandler.bind(this),
 			this._options
@@ -129,7 +130,7 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	public destroy(): void {
-		this._element.removeEventListener('wheel', this._onWheelBound);
+		this._setMouseWheelEventListener(false);
 		if (this._drawRafId !== 0) {
 			window.cancelAnimationFrame(this._drawRafId);
 		}
@@ -200,10 +201,18 @@ export class ChartWidget implements IDestroyable {
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
+		const currentlyHasMouseWheelListener = shouldSubscribeMouseWheel(this._options);
+
 		// we don't need to merge options here because it's done in chart model
 		// and since both model and widget share the same object it will be done automatically for widget as well
 		// not ideal solution for sure, but it work's for now ¯\_(ツ)_/¯
 		this._model.applyOptions(options);
+
+		const shouldHaveMouseWheelListener = shouldSubscribeMouseWheel(this._options);
+		if (shouldHaveMouseWheelListener !== currentlyHasMouseWheelListener) {
+			this._setMouseWheelEventListener(shouldHaveMouseWheelListener);
+		}
+
 		this._updateTimeAxisVisibility();
 
 		const width = options.width || this._width;
@@ -404,6 +413,14 @@ export class ChartWidget implements IDestroyable {
 		if (this._rightPriceAxisWidth !== rightPriceAxisWidth) {
 			this._rightPriceAxisWidth = rightPriceAxisWidth;
 		}
+	}
+
+	private _setMouseWheelEventListener(add: boolean): void {
+		if (add) {
+			this._element.addEventListener('wheel', this._onWheelBound, { passive: false });
+			return;
+		}
+		this._element.removeEventListener('wheel', this._onWheelBound);
 	}
 
 	private _onMousewheel(event: WheelEvent): void {
@@ -687,4 +704,8 @@ function disableSelection(element: HTMLElement): void {
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 	(element.style as any).webkitTapHighlightColor = 'transparent';
+}
+
+function shouldSubscribeMouseWheel(options: ChartOptionsInternal): boolean {
+	return Boolean(options.handleScroll.mouseWheel || options.handleScale.mouseWheel);
 }
