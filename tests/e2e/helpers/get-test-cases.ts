@@ -8,8 +8,6 @@ export interface TestCase {
 	caseContent: string;
 }
 
-const testCasesDir = path.join(__dirname, '..', 'test-cases');
-
 function extractTestCaseName(fileName: string): string | null {
 	const match = /^([^.].+)\.js$/.exec(path.basename(fileName));
 	return match && match[1];
@@ -24,7 +22,7 @@ interface TestCasesGroupInfo {
 	path: string;
 }
 
-function getTestCaseGroups(): TestCasesGroupInfo[] {
+function getTestCaseGroups(testCasesDir: string): TestCasesGroupInfo[] {
 	return [
 		{
 			name: '',
@@ -41,10 +39,10 @@ function getTestCaseGroups(): TestCasesGroupInfo[] {
 	];
 }
 
-export function getTestCases(): Record<string, TestCase[]> {
+export function getTestCases(testCasesDir: string): Record<string, TestCase[]> {
 	const result: Record<string, TestCase[]> = {};
 
-	for (const group of getTestCaseGroups()) {
+	for (const group of getTestCaseGroups(testCasesDir)) {
 		result[group.name] = fs.readdirSync(group.path)
 			.map((filePath: string) => path.join(group.path, filePath))
 			.filter(isTestCaseFile)
