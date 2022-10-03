@@ -71,8 +71,27 @@ export class Screenshoter {
 				return (window as any).testCaseReady;
 			});
 
+			// move mouse to top-left corner
+			await page.mouse.move(0, 0);
+
+			const waitForMouseMove = page.evaluate(() => {
+				/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any */
+				if ((window as any).IGNORE_MOUSE_MOVE) { return Promise.resolve(); }
+				return new Promise<number[]>((resolve: (value: number[]) => void) => {
+					const chart = (window as any).getChartInstance();
+					chart.subscribeCrosshairMove((param: any) => {
+						if (param.point.x > 0 && param.point.y > 0) {
+							requestAnimationFrame(() => resolve([param.point.x, param.point.y] as number[]));
+						}
+					});
+				});
+				/* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any */
+			});
+
 			// to avoid random cursor position
 			await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
+
+			await waitForMouseMove;
 
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
