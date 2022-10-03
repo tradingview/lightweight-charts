@@ -114,8 +114,16 @@ describe(`Graphics tests with devicePixelRatio=${devicePixelRatioStr} (${buildMo
 });
 
 function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, outDir: string): void {
+	const attempts: Record<string, number> = {};
+	testCases.forEach((testCase: TestCase) => {
+		attempts[testCase.name] = 0;
+	});
+
 	for (const testCase of testCases) {
 		it(testCase.name, async () => {
+			const previousAttempts = attempts[testCase.name];
+			attempts[testCase.name] += 1;
+
 			const testCaseOutDir = path.join(outDir, testCase.name);
 			rmRf(testCaseOutDir);
 			fs.mkdirSync(testCaseOutDir, { recursive: true });
@@ -132,6 +140,12 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 
 			// run in parallel to increase speed
 			const goldenScreenshotPromise = screenshoter.generateScreenshot(goldenPageContent);
+
+			if (previousAttempts) {
+				// If a test has previously failed then attempt to run the tests in series (one at a time).
+				await goldenScreenshotPromise;
+			}
+
 			const testScreenshotPromise = screenshoter.generateScreenshot(testPageContent);
 
 			const errors: string[] = [];
