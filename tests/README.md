@@ -107,3 +107,21 @@ Alternatively, you can run the test on a specific file like this:
 ```bash
 node ./tests/e2e/memleaks/runner.js ./dist/lightweight-charts.standalone.development.js
 ```
+
+### Interactions
+
+The interactions tests check whether the library is correctly handling user interactions on the chart. Interactions include: mouse scrolling, mouse dragging, and touches.
+
+#### Running the Interactions tests
+
+You can run the interactions tests with the following command:
+
+```bash
+./scripts/run-interactions-tests.sh
+```
+
+Alternatively, you can run the tests on a specific file like this:
+
+```bash
+node ./tests/e2e/interactions/runner.js ./dist/lightweight-charts.standalone.development.js
+```
