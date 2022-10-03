@@ -12,8 +12,13 @@ function generateData(step, startDay) {
 	return res;
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addLineSeries({
 		color: '#0000ff',

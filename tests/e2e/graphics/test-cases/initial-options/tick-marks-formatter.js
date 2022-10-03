@@ -17,8 +17,13 @@ function getData() {
 	];
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			timeVisible: true,
 			secondsVisible: true,

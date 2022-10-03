@@ -22,8 +22,13 @@ function generateData() {
 	return res;
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(
+	chart = LightweightCharts.createChart(
 		container,
 		{
 			layout: {

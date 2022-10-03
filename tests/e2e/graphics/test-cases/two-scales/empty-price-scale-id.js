@@ -45,8 +45,13 @@ function generateDataLine(offset) {
 	return res;
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addBarSeries({
 		borderColor: 'rgba(0, 0, 255, 0.2)',

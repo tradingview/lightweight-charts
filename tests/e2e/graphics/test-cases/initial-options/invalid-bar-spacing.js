@@ -22,8 +22,13 @@ function generateData() {
 	return res;
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			barSpacing: 1000,
 		},

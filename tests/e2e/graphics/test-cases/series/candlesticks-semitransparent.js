@@ -22,8 +22,13 @@ function generateData() {
 	return res;
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addCandlestickSeries({
 		borderColor: 'rgba(0, 0, 255, 0.2)',

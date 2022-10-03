@@ -1,3 +1,8 @@
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
 	const data = [
 		{ time: 1609459200, value: 500 },
@@ -5,7 +10,7 @@ function runTestCase(container) {
 		{ time: 1609632000, value: 700 },
 	];
 
-	const chart = LightweightCharts.createChart(container, {
+	chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			barSpacing: 40,
 		},

@@ -34,6 +34,10 @@ let chart = null;
 let areaSeries = null;
 const ONE_DAY_IN_SEC = 24 * 60 * 60;
 
+function getChartInstance() {
+	return chart;
+}
+
 function createChart(container) {
 	chart = LightweightCharts.createChart(container);
 }

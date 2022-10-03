@@ -1,3 +1,8 @@
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
 	if (window.BUILD_MODE === 'production') {
 		return;
@@ -10,7 +15,7 @@ function runTestCase(container) {
 		// passed
 	}
 
-	const chart = LightweightCharts.createChart(container);
+	chart = LightweightCharts.createChart(container);
 	const lineSeries = chart.addLineSeries();
 	const barSeries = chart.addBarSeries();
 

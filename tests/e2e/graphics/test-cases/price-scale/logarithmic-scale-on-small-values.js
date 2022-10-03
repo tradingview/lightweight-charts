@@ -10,8 +10,13 @@ function generateData() {
 	return result;
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	chart = LightweightCharts.createChart(container, {
 		rightPriceScale: {
 			mode: LightweightCharts.PriceScaleMode.Logarithmic,
 		},

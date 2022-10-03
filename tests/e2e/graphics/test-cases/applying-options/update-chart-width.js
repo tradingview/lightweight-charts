@@ -22,9 +22,14 @@ function generateData() {
 	return res;
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
 	const box = container.getBoundingClientRect();
-	const chart = LightweightCharts.createChart(container, {
+	chart = LightweightCharts.createChart(container, {
 		width: 2000,
 		height: box.height,
 		timeScale: {

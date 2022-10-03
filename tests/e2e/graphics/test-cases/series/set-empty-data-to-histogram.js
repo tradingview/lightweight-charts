@@ -21,8 +21,13 @@ function generateColoredData() {
 	return data;
 }
 
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	chart = LightweightCharts.createChart(container);
 
 	const areaSeries = chart.addAreaSeries();
 	const volumeSeries = chart.addHistogramSeries();

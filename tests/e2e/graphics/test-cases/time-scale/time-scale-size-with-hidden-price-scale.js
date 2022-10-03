@@ -1,5 +1,10 @@
+let chart;
+function getChartInstance() {
+	return chart;
+}
+
 async function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	chart = LightweightCharts.createChart(container);
 
 	const timeScale = chart.timeScale();
 
