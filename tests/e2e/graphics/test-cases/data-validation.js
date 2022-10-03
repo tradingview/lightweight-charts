@@ -5,6 +5,10 @@ function getChartInstance() {
 
 function runTestCase(container) {
 	if (window.BUILD_MODE === 'production') {
+		// Ignore the mouse movement check because we don't run this test on production
+		window.IGNORE_MOUSE_MOVE = true;
+
+		// don't run this test on production build.
 		return;
 	}
 
