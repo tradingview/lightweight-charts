@@ -12,13 +12,8 @@ function generateData(func, shouldAddValue) {
 	return res;
 }
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	chart.priceScale('right').applyOptions({
 		visible: false,

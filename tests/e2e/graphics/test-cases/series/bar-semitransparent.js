@@ -22,13 +22,8 @@ function generateData() {
 	return res;
 }
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addBarSeries({
 		upColor: 'rgba(0, 250, 0, 0.3)',

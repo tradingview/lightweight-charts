@@ -13,13 +13,8 @@ function generateData(count) {
 	return res;
 }
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addLineSeries();
 	const series = chart.addLineSeries();

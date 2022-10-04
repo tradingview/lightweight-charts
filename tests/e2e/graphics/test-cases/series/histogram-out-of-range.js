@@ -1,12 +1,7 @@
 // see https://github.com/tradingview/lightweight-charts/issues/133
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 	const series = chart.addCandlestickSeries();
 
 	series.setData([

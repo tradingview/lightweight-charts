@@ -1,10 +1,5 @@
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 	const series = chart.addAreaSeries();
 	series.setData([
 		{ time: '1990-04-24', value: 0 },

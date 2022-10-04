@@ -3,16 +3,11 @@ function inRange(from, value, to) {
 }
 
 // Ignore the mouse movement check because height of chart is too short
-window.IGNORE_MOUSE_MOVE = true;
-
-let chart;
-function getChartInstance() {
-	return chart;
-}
+window.ignoreMouseMove = true;
 
 function runTestCase(container) {
 	const width = 400;
-	chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		width: width,
 		height: 200,
 		rightPriceScale: {

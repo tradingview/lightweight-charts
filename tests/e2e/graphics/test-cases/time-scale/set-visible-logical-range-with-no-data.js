@@ -12,13 +12,8 @@ function generateData() {
 	return res;
 }
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 	chart.timeScale().setVisibleLogicalRange({ from: -1001000, to: -1000000 });
 
 	// to force subscribe and emit event

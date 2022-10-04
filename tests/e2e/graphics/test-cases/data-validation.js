@@ -1,12 +1,7 @@
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
 	if (window.BUILD_MODE === 'production') {
 		// Ignore the mouse movement check because we don't run this test on production
-		window.IGNORE_MOUSE_MOVE = true;
+		window.ignoreMouseMove = true;
 
 		// don't run this test on production build.
 		return;
@@ -19,7 +14,7 @@ function runTestCase(container) {
 		// passed
 	}
 
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 	const lineSeries = chart.addLineSeries();
 	const barSeries = chart.addBarSeries();
 

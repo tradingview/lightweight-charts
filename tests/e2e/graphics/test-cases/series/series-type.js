@@ -1,10 +1,5 @@
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 	const line = chart.addLineSeries();
 	const area = chart.addAreaSeries();
 	const candlestick = chart.addCandlestickSeries();

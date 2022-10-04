@@ -14,7 +14,7 @@ function generateData() {
 }
 
 // Ignore the mouse movement check because we are generating multiple charts
-window.IGNORE_MOUSE_MOVE = true;
+window.ignoreMouseMove = true;
 
 const chartOptionsToHideCrosshair = {
 	vertLine: {
@@ -30,10 +30,6 @@ const chartOptionsToHideCrosshair = {
 const seriesOptionsToHideCrosshair = {
 	crosshairMarkerVisible: false,
 };
-
-function getChartInstance() {
-	return null;
-}
 
 function runTestCase(container) {
 	const configs = [{}, { width: 500 }, { height: 100 }, { width: 500, height: 100 }];

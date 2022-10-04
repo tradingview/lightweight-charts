@@ -1,13 +1,8 @@
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 // Ignore the mouse movement check because height of chart is too thin
-window.IGNORE_MOUSE_MOVE = true;
+window.ignoreMouseMove = true;
 
 async function runTestCase(container) {
-	chart = LightweightCharts.createChart(container, { width: 150 });
+	const chart = window.chart = LightweightCharts.createChart(container, { width: 150 });
 
 	const timeScale = chart.timeScale();
 

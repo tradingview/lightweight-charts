@@ -38,13 +38,8 @@ function generateData() {
 	];
 }
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			barSpacing: 40,
 			timeVisible: true,

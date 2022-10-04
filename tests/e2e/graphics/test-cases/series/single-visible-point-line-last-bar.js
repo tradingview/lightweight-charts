@@ -18,13 +18,8 @@ function generateData(priceOffset) {
 	return res;
 }
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			rightOffset: 7,
 			barSpacing: 50,

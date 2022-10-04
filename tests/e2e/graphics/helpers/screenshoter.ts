@@ -9,6 +9,9 @@ import puppeteer, {
 	Page,
 } from 'puppeteer';
 
+import { MouseEventParams } from '../../../../src/api/ichart-api';
+import { TestCaseWindow } from './testcase-window-type';
+
 const viewportWidth = 600;
 const viewportHeight = 600;
 
@@ -67,25 +70,27 @@ export class Screenshoter {
 
 			// wait for test case is ready
 			await page.evaluate(() => {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
-				return (window as any).testCaseReady;
+				return (window as unknown as TestCaseWindow).testCaseReady;
 			});
 
 			// move mouse to top-left corner
 			await page.mouse.move(0, 0);
 
 			const waitForMouseMove = page.evaluate(() => {
-				/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any */
-				if ((window as any).IGNORE_MOUSE_MOVE) { return Promise.resolve(); }
+				if ((window as unknown as TestCaseWindow).ignoreMouseMove) { return Promise.resolve(); }
 				return new Promise<number[]>((resolve: (value: number[]) => void) => {
-					const chart = (window as any).getChartInstance();
-					chart.subscribeCrosshairMove((param: any) => {
-						if (param.point.x > 0 && param.point.y > 0) {
-							requestAnimationFrame(() => resolve([param.point.x, param.point.y] as number[]));
+					const chart = (window as unknown as TestCaseWindow).chart;
+					if (!chart) {
+						throw new Error('window variable `chart` is required unless `ignoreMouseMove` is set to true');
+					}
+					chart.subscribeCrosshairMove((param: MouseEventParams) => {
+						const point = param.point;
+						if (!point) { return; }
+						if (point.x > 0 && point.y > 0) {
+							requestAnimationFrame(() => resolve([point.x, point.y] as number[]));
 						}
 					});
 				});
-				/* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any */
 			});
 
 			// to avoid random cursor position

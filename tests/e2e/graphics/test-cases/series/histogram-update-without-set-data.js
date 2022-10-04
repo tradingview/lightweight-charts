@@ -1,13 +1,8 @@
 // fix the second case from
 // https://github.com/tradingview/lightweight-charts/issues/110
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const areaSeries = chart.addAreaSeries();
 	const volumeSeries = chart.addHistogramSeries();

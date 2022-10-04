@@ -12,13 +12,8 @@ function generateData(func) {
 	return res;
 }
 
-let chart;
-function getChartInstance() {
-	return chart;
-}
-
 function runTestCase(container) {
-	chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const line1 = chart.addLineSeries({
 		priceScaleId: 'overlay',
