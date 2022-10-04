@@ -138,18 +138,23 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 			writeTestDataItem('1.golden.html', goldenPageContent);
 			writeTestDataItem('2.test.html', testPageContent);
 
+			const errors: string[] = [];
+			const failedPages: string[] = [];
+
 			// run in parallel to increase speed
 			const goldenScreenshotPromise = screenshoter.generateScreenshot(goldenPageContent);
 
 			if (previousAttempts) {
-				// If a test has previously failed then attempt to run the tests in series (one at a time).
-				await goldenScreenshotPromise;
+				try {
+					// If a test has previously failed then attempt to run the tests in series (one at a time).
+					await goldenScreenshotPromise;
+				} catch (e: unknown) {
+					errors.push(`=== Golden page ===\n${(e as Error).message}`);
+					failedPages.push('golden');
+				}
 			}
 
 			const testScreenshotPromise = screenshoter.generateScreenshot(testPageContent);
-
-			const errors: string[] = [];
-			const failedPages: string[] = [];
 
 			let goldenScreenshot: PNG | null = null;
 			try {
