@@ -148,9 +148,8 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 				try {
 					// If a test has previously failed then attempt to run the tests in series (one at a time).
 					await goldenScreenshotPromise;
-				} catch (e: unknown) {
-					errors.push(`=== Golden page ===\n${(e as Error).message}`);
-					failedPages.push('golden');
+				} catch {
+					// error will be caught again below and handled correctly there.
 				}
 			}
 
