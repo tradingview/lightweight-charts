@@ -58,9 +58,9 @@
     "eslint-plugin-markdown": "~3.0.0",
     "eslint-plugin-mdx": "~1.17.0",
     "eslint-plugin-prefer-arrow": "~1.2.3",
+    "eslint-plugin-react": "~7.30.1",
     "eslint-plugin-tsdoc": "~0.2.16",
     "eslint-plugin-unicorn": "~40.1.0",
-    "eslint-plugin-react": "~7.30.1",
     "express": "~4.18.1",
     "glob": "~8.0.3",
     "markdown-it": "~13.0.1",
@@ -83,7 +83,8 @@
     "tslint-eslint-rules": "~5.4.0",
     "tslint-microsoft-contrib": "~6.2.0",
     "ttypescript": "~1.5.13",
-    "typescript": "4.7.3"
+    "typescript": "4.7.3",
+    "yargs": "~17.6.0"
   },
   "scripts": {
     "postinstall": "npm run install-hooks",

@@ -19,7 +19,7 @@ function getData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			tickMarkFormatter: (time, tickMarkType, locale) => time, // return time as is
 		},

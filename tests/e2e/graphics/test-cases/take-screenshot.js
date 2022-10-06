@@ -43,8 +43,11 @@ function generateDataHist() {
 	return res;
 }
 
+// Ignore the mouse movement check because we are covering the chart.
+window.ignoreMouseMove = true;
+
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			barSpacing: 20,
 		},

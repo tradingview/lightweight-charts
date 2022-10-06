@@ -1,7 +1,7 @@
 // see https://github.com/tradingview/lightweight-charts/issues/133
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 	const series = chart.addCandlestickSeries();
 
 	series.setData([

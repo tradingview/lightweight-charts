@@ -1,5 +1,9 @@
 function runTestCase(container) {
 	if (window.BUILD_MODE === 'production') {
+		// Ignore the mouse movement check because we don't run this test on production
+		window.ignoreMouseMove = true;
+
+		// don't run this test on production build.
 		return;
 	}
 
@@ -10,7 +14,7 @@ function runTestCase(container) {
 		// passed
 	}
 
-	const chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 	const lineSeries = chart.addLineSeries();
 	const barSeries = chart.addBarSeries();
 
