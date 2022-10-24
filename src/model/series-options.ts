@@ -226,6 +226,13 @@ export interface AreaStyleOptions {
 	bottomColor: string;
 
 	/**
+	 * Invert the filled area. Fills the area above the line if set to true.
+	 *
+	 * @defaultValue `false`
+	 */
+	invertFilledArea: boolean;
+
+	/**
 	 * Line color.
 	 *
 	 * @defaultValue `'#33D778'`

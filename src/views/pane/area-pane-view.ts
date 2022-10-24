@@ -30,12 +30,14 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 	protected _prepareRendererData(width: number, height: number): void {
 		const areaStyleProperties = this._series.options();
 
+		const baseLevelCoordinate = (areaStyleProperties.invertFilledArea ? 0 : height) as Coordinate;
+
 		this._areaRenderer.setData({
 			lineType: areaStyleProperties.lineType,
 			items: this._items,
 			lineStyle: areaStyleProperties.lineStyle,
 			lineWidth: areaStyleProperties.lineWidth,
-			baseLevelCoordinate: height as Coordinate,
+			baseLevelCoordinate,
 			bottom: height as Coordinate,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
