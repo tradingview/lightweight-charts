@@ -580,7 +580,7 @@ export class PriceAxisWidget implements IDestroyable {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer(ensureNotNull(this._priceScale));
 				ctx.save();
-				renderer.draw(ctx, rendererOptions, this._widthCache, size.w, align, pixelRatio);
+				renderer.draw(ctx, rendererOptions, this._widthCache, size.w, size.h, align, pixelRatio);
 				ctx.restore();
 			}
 		});
@@ -612,7 +612,7 @@ export class PriceAxisWidget implements IDestroyable {
 		views.forEach((arr: IPriceAxisViewArray) => {
 			arr.forEach((view: IPriceAxisView) => {
 				ctx.save();
-				view.renderer(ensureNotNull(this._priceScale)).draw(ctx, ro, this._widthCache, size.w, align, pixelRatio);
+				view.renderer(ensureNotNull(this._priceScale)).draw(ctx, ro, this._widthCache, size.w, size.h, align, pixelRatio);
 				ctx.restore();
 			});
 		});

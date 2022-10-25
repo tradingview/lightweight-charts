@@ -12,6 +12,7 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 	private _rendererOptions: PriceAxisViewRendererOptions | null = null;
 	private _align: 'left' | 'right' = 'right';
 	private _width: number = 0;
+	private _height: number = 0;
 	private readonly _textWidthCache: TextWidthCache;
 
 	public constructor(textWidthCache: TextWidthCache) {
@@ -22,11 +23,13 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 		priceAxisViewRenderer: IPriceAxisViewRenderer,
 		rendererOptions: PriceAxisViewRendererOptions,
 		width: number,
+		height: number,
 		align: 'left' | 'right'
 	): void {
 		this._priceAxisViewRenderer = priceAxisViewRenderer;
 		this._rendererOptions = rendererOptions;
 		this._width = width;
+		this._height = height;
 		this._align = align;
 	}
 
@@ -35,7 +38,7 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 			return;
 		}
 
-		this._priceAxisViewRenderer.draw(ctx, this._rendererOptions, this._textWidthCache, this._width, this._align, pixelRatio);
+		this._priceAxisViewRenderer.draw(ctx, this._rendererOptions, this._textWidthCache, this._width, this._height, this._align, pixelRatio);
 	}
 }
 
@@ -79,7 +82,7 @@ export class PanePriceAxisView implements IPaneView {
 			this._textWidthCache.reset();
 		}
 
-		this._renderer.setParams(this._priceAxisView.paneRenderer(), options, width, position);
+		this._renderer.setParams(this._priceAxisView.paneRenderer(), options, width, height, position);
 		return this._renderer;
 	}
 }
