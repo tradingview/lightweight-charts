@@ -40,13 +40,11 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		this._commonData = commonData;
 	}
 
-	// eslint-disable-next-line max-params
 	public draw(
 		ctx: CanvasRenderingContext2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		width: number,
-		height: number,
 		align: 'left' | 'right',
 		pixelRatio: number
 	): void {
@@ -55,7 +53,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		}
 		ctx.font = rendererOptions.font;
 
-		const geometry = this._calculateGeometry(ctx, rendererOptions, textWidthCache, width, height, align, pixelRatio);
+		const geometry = this._calculateGeometry(ctx, rendererOptions, textWidthCache, width, align, pixelRatio);
 
 		const textColor = this._data.color || this._commonData.color;
 		const backgroundColor = (this._commonData.background);
@@ -126,13 +124,11 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		return rendererOptions.fontSize + rendererOptions.paddingTop + rendererOptions.paddingBottom;
 	}
 
-	// eslint-disable-next-line max-params
 	private _calculateGeometry(
 		ctx: CanvasRenderingContext2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		width: number,
-		height: number,
 		align: 'left' | 'right',
 		pixelRatio: number
 	): Geometry {
@@ -162,7 +158,6 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		// tick overlaps scale border
 		const tickSizeScaled = Math.round(tickSize * pixelRatio);
 		const widthScaled = Math.ceil(width * pixelRatio);
-		const heightScaled = Math.ceil(height * pixelRatio);
 		const paddingInnerScaled = Math.ceil(paddingInner * pixelRatio);
 
 		let yMid = this._commonData.coordinate;
@@ -170,16 +165,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			yMid = this._commonData.fixedCoordinate;
 		}
 
-		const halfTotalHeightScaled = totalHeightScaled / 2;
 		yMid = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
-		if (yMid > (heightScaled - halfTotalHeightScaled) && yMid < (heightScaled + halfTotalHeightScaled)) {
-			yMid = heightScaled - halfTotalHeightScaled;
-		}
-
-		if (yMid < halfTotalHeightScaled && yMid > (-halfTotalHeightScaled)) {
-			yMid = halfTotalHeightScaled;
-		}
-
 		const yTop = Math.floor(yMid + tickHeight / 2 - totalHeightScaled / 2);
 		const yBottom = yTop + totalHeightScaled;
 
