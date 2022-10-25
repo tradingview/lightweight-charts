@@ -162,6 +162,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		// tick overlaps scale border
 		const tickSizeScaled = Math.round(tickSize * pixelRatio);
 		const widthScaled = Math.ceil(width * pixelRatio);
+		const heightScaled = Math.ceil(height * pixelRatio);
 		const paddingInnerScaled = Math.ceil(paddingInner * pixelRatio);
 
 		let yMid = this._commonData.coordinate;
@@ -171,8 +172,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const halfTotalHeightScaled = totalHeightScaled / 2;
 		yMid = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
-		if (yMid > (height - halfTotalHeightScaled) && yMid < (height + halfTotalHeightScaled)) {
-			yMid = height - halfTotalHeightScaled;
+		if (yMid > (heightScaled - halfTotalHeightScaled) && yMid < (heightScaled + halfTotalHeightScaled)) {
+			yMid = heightScaled - halfTotalHeightScaled;
 		}
 
 		if (yMid < halfTotalHeightScaled && yMid > (-halfTotalHeightScaled)) {
