@@ -1,4 +1,5 @@
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
+import { userAgentWindowsChromium } from '../helpers/browsers';
 import { drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -53,9 +54,12 @@ export class ChartWidget implements IDestroyable {
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
+	private _windowsChrome: boolean;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
 		this._options = options;
+
+		this._windowsChrome = userAgentWindowsChromium();
 
 		this._element = document.createElement('div');
 		this._element.classList.add('tv-lightweight-charts');
@@ -423,31 +427,41 @@ export class ChartWidget implements IDestroyable {
 		this._element.removeEventListener('wheel', this._onWheelBound);
 	}
 
-	private _onMousewheel(event: WheelEvent): void {
-		let deltaX = event.deltaX / 100;
-		let deltaY = -(event.deltaY / 100);
-
-		if ((deltaX === 0 || !this._options.handleScroll.mouseWheel) &&
-			(deltaY === 0 || !this._options.handleScale.mouseWheel)) {
-			return;
-		}
-
-		if (event.cancelable) {
-			event.preventDefault();
-		}
-
+	private _determineWheelSpeedAdjustment(event: WheelEvent): number {
 		switch (event.deltaMode) {
 			case event.DOM_DELTA_PAGE:
 				// one screen at time scroll mode
-				deltaX *= 120;
-				deltaY *= 120;
-				break;
-
+				return 120;
 			case event.DOM_DELTA_LINE:
 				// one line at time scroll mode
-				deltaX *= 32;
-				deltaY *= 32;
-				break;
+				return 32;
+		}
+
+		if (!this._windowsChrome) {
+			return 1;
+		}
+
+		// Chromium on Windows has a bug where the scroll speed isn't correctly
+		// adjusted for high density displays. We need to correct for this so that
+		// scroll speed is consistent between browsers.
+		// https://bugs.chromium.org/p/chromium/issues/detail?id=1001735
+		// https://bugs.chromium.org/p/chromium/issues/detail?id=1207308
+		return (1 / window.devicePixelRatio);
+	}
+
+	private _onMousewheel(event: WheelEvent): void {
+		if ((event.deltaX === 0 || !this._options.handleScroll.mouseWheel) &&
+			(event.deltaY === 0 || !this._options.handleScale.mouseWheel)) {
+			return;
+		}
+
+		const scrollSpeedAdjustment = this._determineWheelSpeedAdjustment(event);
+
+		const deltaX = scrollSpeedAdjustment * event.deltaX / 100;
+		const deltaY = -(scrollSpeedAdjustment * event.deltaY / 100);
+
+		if (event.cancelable) {
+			event.preventDefault();
 		}
 
 		if (deltaY !== 0 && this._options.handleScale.mouseWheel) {

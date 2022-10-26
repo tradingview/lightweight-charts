@@ -22,3 +22,17 @@ export function isChrome(): boolean {
 	return window.chrome !== undefined;
 }
 
+// Determine whether the browser is Chromium based and running on windows.
+export function userAgentWindowsChromium(): boolean {
+	if (
+		!navigator.userAgentData ||
+		navigator.userAgentData.platform !== 'Windows'
+	) {
+		return false;
+	}
+	return navigator.userAgentData.brands.some(
+		(brand: UADataBrand) => {
+			return brand.brand.includes('Chromium');
+		}
+	);
+}
