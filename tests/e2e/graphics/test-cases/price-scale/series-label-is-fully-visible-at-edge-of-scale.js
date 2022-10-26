@@ -1,8 +1,5 @@
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, {
-		width: 600,
-		height: 300,
-	});
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const areaSeries = chart.addAreaSeries({
 		symbol: 'AAPL',
@@ -12,7 +9,7 @@ function runTestCase(container) {
 	areaSeries.priceScale().applyOptions({
 		scaleMargins: {
 			top: 0,
-			bottom: 0.95,
+			bottom: 0.9999,
 		},
 	});
 
