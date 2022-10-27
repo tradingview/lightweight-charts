@@ -517,6 +517,21 @@ export class PriceAxisWidget implements IDestroyable {
 		// crosshair individually
 		updateForSources(orderedSources);
 
+		views.forEach((view: IPriceAxisView) => view.setFixedCoordinate(view.coordinate()));
+
+		const options = this._priceScale.options();
+		if (!options.alignLabels) {
+			return;
+		}
+
+		this._fixLabelOverlap(views, rendererOptions, center);
+	}
+
+	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>, center: number): void {
+		if (this._size === null) {
+			return;
+		}
+
 		// split into two parts
 		const top = views.filter((view: IPriceAxisView) => view.coordinate() <= center);
 		const bottom = views.filter((view: IPriceAxisView) => view.coordinate() > center);
@@ -531,11 +546,16 @@ export class PriceAxisWidget implements IDestroyable {
 
 		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
 
-		views.forEach((view: IPriceAxisView) => view.setFixedCoordinate(view.coordinate()));
+		for (const view of views) {
+			const halfHeight = Math.floor(view.height(rendererOptions) / 2);
+			const coordinate = view.coordinate();
+			if (coordinate > -halfHeight && coordinate < halfHeight) {
+				view.setFixedCoordinate(halfHeight);
+			}
 
-		const options = this._priceScale.options();
-		if (!options.alignLabels) {
-			return;
+			if (coordinate > (this._size.h - halfHeight) && coordinate < this._size.h + halfHeight) {
+				view.setFixedCoordinate(this._size.h - halfHeight);
+			}
 		}
 
 		for (let i = 1; i < top.length; i++) {
