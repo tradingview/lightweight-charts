@@ -1,5 +1,5 @@
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
-import { userAgentWindowsChromium } from '../helpers/browsers';
+import { isChromiumBased, isWindows } from '../helpers/browsers';
 import { drawScaled } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -36,6 +36,8 @@ export interface MouseEventParamsImpl {
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
+const windowsChrome = isChromiumBased() && isWindows();
+
 export class ChartWidget implements IDestroyable {
 	private readonly _options: ChartOptionsInternal;
 	private _paneWidgets: PaneWidget[] = [];
@@ -54,12 +56,9 @@ export class ChartWidget implements IDestroyable {
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
-	private _windowsChrome: boolean;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
 		this._options = options;
-
-		this._windowsChrome = userAgentWindowsChromium();
 
 		this._element = document.createElement('div');
 		this._element.classList.add('tv-lightweight-charts');
@@ -437,7 +436,7 @@ export class ChartWidget implements IDestroyable {
 				return 32;
 		}
 
-		if (!this._windowsChrome) {
+		if (!windowsChrome) {
 			return 1;
 		}
 
