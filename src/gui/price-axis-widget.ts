@@ -5,20 +5,20 @@ import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
+import { ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
 import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
-import { PriceScale } from '../model/price-scale';
+import { PriceMark, PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
-import { LabelsImageCache } from './labels-image-cache';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
 
@@ -35,9 +35,14 @@ const enum Constants {
 
 type IPriceAxisViewArray = readonly IPriceAxisView[];
 
+const enum Constants {
+	LabelOffset = 5,
+}
+
 export class PriceAxisWidget implements IDestroyable {
 	private readonly _pane: PaneWidget;
-	private readonly _options: LayoutOptions;
+	private readonly _options: Readonly<ChartOptionsInternal>;
+	private readonly _layoutOptions: Readonly<LayoutOptions>;
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 	private readonly _isLeft: boolean;
 
@@ -52,17 +57,16 @@ export class PriceAxisWidget implements IDestroyable {
 	private _mouseEventHandler: MouseEventHandler;
 	private _mousedown: boolean = false;
 
-	private readonly _widthCache: TextWidthCache = new TextWidthCache(50);
-	private _tickMarksCache: LabelsImageCache = new LabelsImageCache(11, '#000');
+	private readonly _widthCache: TextWidthCache = new TextWidthCache(200);
 
-	private _color: string | null = null;
 	private _font: string | null = null;
 	private _prevOptimalWidth: number = 0;
 	private _isSettingSize: boolean = false;
 
-	public constructor(pane: PaneWidget, options: LayoutOptions, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
+	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternal>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
 		this._options = options;
+		this._layoutOptions = options.layout;
 		this._rendererOptionsProvider = rendererOptionsProvider;
 		this._isLeft = side === 'left';
 
@@ -126,40 +130,19 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		this._priceScale = null;
-
-		this._tickMarksCache.destroy();
 	}
 
 	public getElement(): HTMLElement {
 		return this._cell;
 	}
 
-	public lineColor(): string {
-		return ensureNotNull(this._priceScale).options().borderColor;
-	}
-
-	public textColor(): string {
-		return this._options.textColor;
-	}
-
 	public fontSize(): number {
-		return this._options.fontSize;
-	}
-
-	public baseFont(): string {
-		return makeFont(this.fontSize(), this._options.fontFamily);
+		return this._layoutOptions.fontSize;
 	}
 
 	public rendererOptions(): Readonly<PriceAxisViewRendererOptions> {
 		const options = this._rendererOptionsProvider.options();
-
-		const isColorChanged = this._color !== options.color;
 		const isFontChanged = this._font !== options.font;
-
-		if (isColorChanged || isFontChanged) {
-			this._recreateTickMarksCache(options);
-			this._color = options.color;
-		}
 
 		if (isFontChanged) {
 			this._widthCache.reset();
@@ -180,7 +163,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const ctx = getContext2D(this._canvasBinding.canvas);
 		const tickMarks = this._priceScale.marks();
 
-		ctx.font = this.baseFont();
+		ctx.font = this._baseFont();
 
 		if (tickMarks.length > 0) {
 			tickMarkMaxWidth = Math.max(
@@ -216,9 +199,11 @@ export class PriceAxisWidget implements IDestroyable {
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
 			rendererOptions.paddingOuter +
+			Constants.LabelOffset +
 			resultTickMarksMaxWidth
 		);
-		// make it even
+
+		// make it even, remove this after migration to perfect fancy canvas
 		res += res % 2;
 		return res;
 	}
@@ -303,7 +288,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || this._priceScale.isEmpty() || !this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || this._priceScale.isEmpty() || !this._options.handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -314,7 +299,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _pressedMouseMoveEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -325,7 +310,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownOutsideEvent(): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -340,7 +325,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseUpEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 		const model = this._pane.chart().model();
@@ -350,7 +335,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDoubleClickEvent(e: TouchMouseEvent): void {
-		if (this._pane.chart().options().handleScale.axisDoubleClickReset) {
+		if (this._options.handleScale.axisDoubleClickReset.price) {
 			this.reset();
 		}
 	}
@@ -417,7 +402,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 		ctx.save();
 
-		ctx.fillStyle = this.lineColor();
+		ctx.fillStyle = this._priceScale.options().borderColor;
 
 		const borderSize = Math.max(1, Math.floor(this.rendererOptions().borderSize * pixelRatio));
 
@@ -441,26 +426,26 @@ export class PriceAxisWidget implements IDestroyable {
 
 		ctx.save();
 
-		ctx.strokeStyle = this.lineColor();
+		const priceScaleOptions = this._priceScale.options();
 
-		ctx.font = this.baseFont();
-		ctx.fillStyle = this.lineColor();
+		ctx.strokeStyle = priceScaleOptions.borderColor;
+
+		ctx.font = this._baseFont();
+		ctx.fillStyle = priceScaleOptions.borderColor;
 		const rendererOptions = this.rendererOptions();
 
 		const tickMarkLeftX = this._isLeft ?
-			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio - rendererOptions.borderSize * pixelRatio) :
-			Math.floor(rendererOptions.borderSize * pixelRatio);
+			Math.floor((this._size.w - rendererOptions.tickLength) * pixelRatio) :
+			0;
 
 		const textLeftX = this._isLeft ?
 			Math.round(tickMarkLeftX - rendererOptions.paddingInner * pixelRatio) :
 			Math.round(tickMarkLeftX + rendererOptions.tickLength * pixelRatio + rendererOptions.paddingInner * pixelRatio);
 
-		const textAlign = this._isLeft ? 'right' : 'left';
 		const tickHeight = Math.max(1, Math.floor(pixelRatio));
 		const tickOffset = Math.floor(pixelRatio * 0.5);
 
-		const options = this._priceScale.options();
-		if (options.borderVisible && options.ticksVisible) {
+		if (priceScaleOptions.borderVisible && priceScaleOptions.ticksVisible) {
 			const tickLength = Math.round(rendererOptions.tickLength * pixelRatio);
 			ctx.beginPath();
 			for (const tickMark of tickMarks) {
@@ -470,10 +455,18 @@ export class PriceAxisWidget implements IDestroyable {
 			ctx.fill();
 		}
 
-		ctx.fillStyle = this.textColor();
-		for (const tickMark of tickMarks) {
-			this._tickMarksCache.paintTo(ctx, tickMark.label, textLeftX, Math.round(tickMark.coord * pixelRatio), textAlign);
-		}
+		ctx.fillStyle = priceScaleOptions.textColor ?? this._layoutOptions.textColor;
+		ctx.textAlign = this._isLeft ? 'right' : 'left';
+		ctx.textBaseline = 'middle';
+
+		const yMidCorrections = tickMarks.map((mark: PriceMark) => this._widthCache.yMidCorrection(ctx, mark.label));
+
+		drawScaled(ctx, pixelRatio, () => {
+			for (let i = tickMarks.length; i--;) {
+				const tickMark = tickMarks[i];
+				ctx.fillText(tickMark.label, textLeftX / pixelRatio, tickMark.coord + yMidCorrections[i]);
+			}
+		});
 
 		ctx.restore();
 	}
@@ -524,6 +517,21 @@ export class PriceAxisWidget implements IDestroyable {
 		// crosshair individually
 		updateForSources(orderedSources);
 
+		views.forEach((view: IPriceAxisView) => view.setFixedCoordinate(view.coordinate()));
+
+		const options = this._priceScale.options();
+		if (!options.alignLabels) {
+			return;
+		}
+
+		this._fixLabelOverlap(views, rendererOptions, center);
+	}
+
+	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>, center: number): void {
+		if (this._size === null) {
+			return;
+		}
+
 		// split into two parts
 		const top = views.filter((view: IPriceAxisView) => view.coordinate() <= center);
 		const bottom = views.filter((view: IPriceAxisView) => view.coordinate() > center);
@@ -538,11 +546,16 @@ export class PriceAxisWidget implements IDestroyable {
 
 		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
 
-		views.forEach((view: IPriceAxisView) => view.setFixedCoordinate(view.coordinate()));
+		for (const view of views) {
+			const halfHeight = Math.floor(view.height(rendererOptions) / 2);
+			const coordinate = view.coordinate();
+			if (coordinate > -halfHeight && coordinate < halfHeight) {
+				view.setFixedCoordinate(halfHeight);
+			}
 
-		const options = this._priceScale.options();
-		if (!options.alignLabels) {
-			return;
+			if (coordinate > (this._size.h - halfHeight) && coordinate < this._size.h + halfHeight) {
+				view.setFixedCoordinate(this._size.h - halfHeight);
+			}
 		}
 
 		for (let i = 1; i < top.length; i++) {
@@ -643,18 +656,7 @@ export class PriceAxisWidget implements IDestroyable {
 		this._prevOptimalWidth = width;
 	}
 
-	private _recreateTickMarksCache(options: PriceAxisViewRendererOptions): void {
-		this._tickMarksCache.destroy();
-
-		this._tickMarksCache = new LabelsImageCache(
-			options.fontSize,
-			options.color,
-			options.fontFamily
-		);
-	}
-
 	private readonly _canvasConfiguredHandler = () => {
-		this._recreateTickMarksCache(this._rendererOptionsProvider.options());
 		if (!this._isSettingSize) {
 			this._pane.chart().model().lightUpdate();
 		}
@@ -667,4 +669,8 @@ export class PriceAxisWidget implements IDestroyable {
 
 		this._pane.chart().model().lightUpdate();
 	};
+
+	private _baseFont(): string {
+		return makeFont(this._layoutOptions.fontSize, this._layoutOptions.fontFamily);
+	}
 }

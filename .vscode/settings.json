@@ -3,6 +3,7 @@
         "dist/**": true,
         "lib/**": true,
         "tests/e2e/graphics/.gendata/**": true,
+        "tests/e2e/coverage/.gendata/**": true,
         "website/.docusaurus/**": true,
         "website/build/**": true,
         "website/docs/api/**": true,

@@ -199,7 +199,7 @@ export interface TimeScaleOptions {
 	/**
 	 * Draw small vertical line on time axis labels.
 	 *
-	 * @defaultValue `true`
+	 * @defaultValue `false`
 	 */
 	ticksVisible: boolean;
 }
@@ -670,17 +670,15 @@ export class TimeScale {
 
 		const source = this._rightOffset;
 		const animationStart = performance.now();
-		const animationFn = () => {
-			const animationProgress = (performance.now() - animationStart) / animationDuration;
-			const finishAnimation = animationProgress >= 1;
-			const rightOffset = finishAnimation ? offset : source + (offset - source) * animationProgress;
-			this.setRightOffset(rightOffset);
-			if (!finishAnimation) {
-				setTimeout(animationFn, 20);
-			}
-		};
 
-		animationFn();
+		this._model.setTimeScaleAnimation({
+			finished: (time: number) => (time - animationStart) / animationDuration >= 1,
+			getPosition: (time: number) => {
+				const animationProgress = (time - animationStart) / animationDuration;
+				const finishAnimation = animationProgress >= 1;
+				return finishAnimation ? offset : source + (offset - source) * animationProgress;
+			},
+		});
 	}
 
 	public update(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
@@ -753,7 +751,7 @@ export class TimeScale {
 			&& !handleScroll.mouseWheel
 			&& !handleScroll.pressedMouseMove
 			&& !handleScroll.vertTouchDrag
-			&& !handleScale.axisDoubleClickReset
+			&& !handleScale.axisDoubleClickReset.time
 			&& !handleScale.axisPressedMouseMove.time
 			&& !handleScale.mouseWheel
 			&& !handleScale.pinch;

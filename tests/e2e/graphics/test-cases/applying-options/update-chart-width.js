@@ -24,7 +24,7 @@ function generateData() {
 
 function runTestCase(container) {
 	const box = container.getBoundingClientRect();
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		width: 2000,
 		height: box.height,
 		timeScale: {

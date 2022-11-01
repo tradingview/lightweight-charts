@@ -1,0 +1,93 @@
+---
+title: Price and volume on a single chart
+sidebar_label: Price and Volume
+description: An example of how to include both price and volume series on a single chart.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - example
+---
+
+This example shows how to include a volume study on your chart.
+
+## How to add a volume histogram
+
+An additional series can be added to a chart as an 'overlay' by setting the series'
+[`priceScaleId`](/docs/api/interfaces/SeriesOptionsCommon#pricescaleid) to `''`.
+An overlay doesn't make use of either the left or right price scale, and it's positioning
+is controlled by setting the [`scaleMargins`](/docs/api/interfaces/PriceScaleOptions#scalemargins)
+property on the series options.
+
+```js
+const volumeSeries = chart.addHistogramSeries({
+    priceFormat: {
+        type: 'volume',
+    },
+    priceScaleId: '', // set as an overlay by setting a blank priceScaleId
+    // set the positioning of the volume series
+    scaleMargins: {
+        top: 0.7, // highest point of the series will be 70% away from the top
+        bottom: 0,
+    },
+});
+```
+
+We are using the [Histogram](/docs/series-types#histogram) series type to draw the volume bars.
+We can set the `priceFormat` option to `'volume'` to have the values display correctly within
+the crosshair line label.
+
+We adjust the position of the overlay series to the bottom 30% of the chart by
+setting the [`scaleMargins`](/docs/api/interfaces/PriceScaleOptions#scalemargins) properties as follows:
+
+```js
+series.applyOptions({
+    scaleMargins: {
+        top: 0.7, // highest point of the series will be 70% away from the top
+        bottom: 0, // lowest point will be at the very bottom.
+    },
+});
+```
+
+Similarly, we can set the position of the main series using the same approach. By setting
+the `bottom` margin value to `0.4` we can ensure that the two series don't overlap each other.
+
+```js
+mainSeries.applyOptions({
+    scaleMargins: {
+        top: 0.1, // highest point of the series will be 10% away from the top
+        bottom: 0.4, // lowest point will be 40% away from the bottom
+    },
+});
+```
+
+We can control the color of the histogram bars by directly specifying color inside
+the data set.
+
+```js
+histogramSeries.setData([
+    { time: '2018-10-19', value: 19103293.0, color: 'green' },
+    { time: '2018-10-20', value: 20345000.0, color: 'red' },
+]);
+```
+
+You can see a full [working example](#full-example) below.
+
+## Resources
+
+- [OverlayPriceScale Options](/docs/api#overlaypricescaleoptions)
+- [Histogram Series Type](/docs/series-types#histogram)
+- [PriceFormat Types](/docs/api/interfaces/PriceFormatBuiltIn#type)
+- [Scale Margins](/docs/api/interfaces/PriceScaleOptions#scalemargins)
+
+## Full example
+
+import UsageGuidePartial from "./_usage-guide-partial.mdx";
+
+<UsageGuidePartial />
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./price-and-volume.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{code}
+</CodeBlock>

@@ -8,27 +8,23 @@ import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
-	AreaSeriesOptions,
 	AreaSeriesPartialOptions,
-	BarSeriesOptions,
 	BarSeriesPartialOptions,
-	BaselineSeriesOptions,
 	BaselineSeriesPartialOptions,
-	CandlestickSeriesOptions,
 	CandlestickSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
-	HistogramSeriesOptions,
 	HistogramSeriesPartialOptions,
-	LineSeriesOptions,
 	LineSeriesPartialOptions,
 	precisionByMinMove,
 	PriceFormat,
 	PriceFormatBuiltIn,
+	SeriesOptionsMap,
+	SeriesPartialOptionsMap,
+	SeriesStyleOptionsMap,
 	SeriesType,
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
 
-import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
 import { getSeriesDataCreator } from './get-series-data-creator';
@@ -64,7 +60,10 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 	if (isBoolean(options.handleScale)) {
 		const handleScale = options.handleScale;
 		options.handleScale = {
-			axisDoubleClickReset: handleScale,
+			axisDoubleClickReset: {
+				time: handleScale,
+				price: handleScale,
+			},
 			axisPressedMouseMove: {
 				time: handleScale,
 				price: handleScale,
@@ -72,12 +71,20 @@ function migrateHandleScaleScrollOptions(options: DeepPartial<ChartOptions>): vo
 			mouseWheel: handleScale,
 			pinch: handleScale,
 		};
-	} else if (options.handleScale !== undefined && isBoolean(options.handleScale.axisPressedMouseMove)) {
-		const axisPressedMouseMove = options.handleScale.axisPressedMouseMove;
-		options.handleScale.axisPressedMouseMove = {
-			time: axisPressedMouseMove,
-			price: axisPressedMouseMove,
-		};
+	} else if (options.handleScale !== undefined) {
+		const { axisPressedMouseMove, axisDoubleClickReset } = options.handleScale;
+		if (isBoolean(axisPressedMouseMove)) {
+			options.handleScale.axisPressedMouseMove = {
+				time: axisPressedMouseMove,
+				price: axisPressedMouseMove,
+			};
+		}
+		if (isBoolean(axisDoubleClickReset)) {
+			options.handleScale.axisDoubleClickReset = {
+				time: axisDoubleClickReset,
+				price: axisDoubleClickReset,
+			};
+		}
 	}
 
 	const handleScroll = options.handleScroll;
@@ -157,84 +164,30 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.resize(width, height, forceRepaint);
 	}
 
-	public addAreaSeries(options: AreaSeriesPartialOptions = {}): ISeriesApi<'Area'> {
-		patchPriceFormat(options.priceFormat);
-
-		const strictOptions = merge(clone(seriesOptionsDefaults), areaStyleDefaults, options) as AreaSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Area', strictOptions);
-
-		const res = new SeriesApi<'Area'>(series, this, this);
-		this._seriesMap.set(res, series);
-		this._seriesMapReversed.set(series, res);
-
-		return res;
+	public addAreaSeries(options?: AreaSeriesPartialOptions): ISeriesApi<'Area'> {
+		return this._addSeriesImpl('Area', areaStyleDefaults, options);
 	}
 
-	public addBaselineSeries(options: BaselineSeriesPartialOptions = {}): ISeriesApi<'Baseline'> {
-		patchPriceFormat(options.priceFormat);
-
-		// to avoid assigning fields to defaults we have to clone them
-		const strictOptions = merge(clone(seriesOptionsDefaults), clone(baselineStyleDefaults), options) as BaselineSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Baseline', strictOptions);
-
-		const res = new SeriesApi<'Baseline'>(series, this, this);
-		this._seriesMap.set(res, series);
-		this._seriesMapReversed.set(series, res);
-
-		return res;
+	public addBaselineSeries(options?: BaselineSeriesPartialOptions): ISeriesApi<'Baseline'> {
+		return this._addSeriesImpl('Baseline', baselineStyleDefaults, options);
 	}
 
-	public addBarSeries(options: BarSeriesPartialOptions = {}): ISeriesApi<'Bar'> {
-		patchPriceFormat(options.priceFormat);
-
-		const strictOptions = merge(clone(seriesOptionsDefaults), barStyleDefaults, options) as BarSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Bar', strictOptions);
-
-		const res = new SeriesApi<'Bar'>(series, this, this);
-		this._seriesMap.set(res, series);
-		this._seriesMapReversed.set(series, res);
-
-		return res;
+	public addBarSeries(options?: BarSeriesPartialOptions): ISeriesApi<'Bar'> {
+		return this._addSeriesImpl('Bar', barStyleDefaults, options);
 	}
 
 	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}): ISeriesApi<'Candlestick'> {
 		fillUpDownCandlesticksColors(options);
-		patchPriceFormat(options.priceFormat);
 
-		const strictOptions = merge(clone(seriesOptionsDefaults), candlestickStyleDefaults, options) as CandlestickSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Candlestick', strictOptions);
-
-		const res = new CandlestickSeriesApi(series, this, this);
-		this._seriesMap.set(res, series);
-		this._seriesMapReversed.set(series, res);
-
-		return res;
+		return this._addSeriesImpl('Candlestick', candlestickStyleDefaults, options);
 	}
 
-	public addHistogramSeries(options: HistogramSeriesPartialOptions = {}): ISeriesApi<'Histogram'> {
-		patchPriceFormat(options.priceFormat);
-
-		const strictOptions = merge(clone(seriesOptionsDefaults), histogramStyleDefaults, options) as HistogramSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Histogram', strictOptions);
-
-		const res = new SeriesApi<'Histogram'>(series, this, this);
-		this._seriesMap.set(res, series);
-		this._seriesMapReversed.set(series, res);
-
-		return res;
+	public addHistogramSeries(options?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram'> {
+		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options);
 	}
 
-	public addLineSeries(options: LineSeriesPartialOptions = {}): ISeriesApi<'Line'> {
-		patchPriceFormat(options.priceFormat);
-
-		const strictOptions = merge(clone(seriesOptionsDefaults), lineStyleDefaults, options) as LineSeriesOptions;
-		const series = this._chartWidget.model().createSeries('Line', strictOptions);
-
-		const res = new SeriesApi<'Line'>(series, this, this);
-		this._seriesMap.set(res, series);
-		this._seriesMapReversed.set(series, res);
-
-		return res;
+	public addLineSeries(options?: LineSeriesPartialOptions): ISeriesApi<'Line'> {
+		return this._addSeriesImpl('Line', lineStyleDefaults, options);
 	}
 
 	public removeSeries(seriesApi: SeriesApi<SeriesType>): void {
@@ -292,6 +245,23 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public takeScreenshot(): HTMLCanvasElement {
 		return this._chartWidget.takeScreenshot();
+	}
+
+	private _addSeriesImpl<TSeries extends SeriesType>(
+		type: TSeries,
+		styleDefaults: SeriesStyleOptionsMap[TSeries],
+		options: SeriesPartialOptionsMap[TSeries] = {}
+	): ISeriesApi<TSeries> {
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
+		const series = this._chartWidget.model().createSeries(type, strictOptions);
+
+		const res = new SeriesApi<TSeries>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
 	}
 
 	private _sendUpdateToChart(update: DataUpdateResponse): void {

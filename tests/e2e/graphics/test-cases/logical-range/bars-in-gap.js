@@ -14,7 +14,7 @@ function generateData(count) {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addLineSeries();
 	const series = chart.addLineSeries();

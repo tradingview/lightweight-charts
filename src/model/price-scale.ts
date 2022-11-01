@@ -148,6 +148,14 @@ export interface PriceScaleOptions {
 	borderColor: string;
 
 	/**
+	 * Price scale text color.
+	 * If not provided {@link LayoutOptions.textColor} is used.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	textColor?: string;
+
+	/**
 	 * Show top and bottom corner labels only if entire text is visible.
 	 *
 	 * @defaultValue `false`
@@ -164,7 +172,7 @@ export interface PriceScaleOptions {
 	/**
 	 * Draw small horizontal line on price axis labels.
 	 *
-	 * @defaultValue `true`
+	 * @defaultValue `false`
 	 */
 	ticksVisible: boolean;
 }

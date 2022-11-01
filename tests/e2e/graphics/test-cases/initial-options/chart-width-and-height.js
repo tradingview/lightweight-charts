@@ -13,6 +13,24 @@ function generateData() {
 	return res;
 }
 
+// Ignore the mouse movement check because we are generating multiple charts
+window.ignoreMouseMove = true;
+
+const chartOptionsToHideCrosshair = {
+	vertLine: {
+		visible: false,
+		labelVisible: false,
+	},
+	horzLine: {
+		visible: false,
+		labelVisible: false,
+	},
+};
+
+const seriesOptionsToHideCrosshair = {
+	crosshairMarkerVisible: false,
+};
+
 function runTestCase(container) {
 	const configs = [{}, { width: 500 }, { height: 100 }, { width: 500, height: 100 }];
 
@@ -27,8 +45,8 @@ function runTestCase(container) {
 
 		container.appendChild(box);
 
-		const chart = LightweightCharts.createChart(box, config);
-		const mainSeries = chart.addAreaSeries();
+		const chart = LightweightCharts.createChart(box, { ...config, ...chartOptionsToHideCrosshair });
+		const mainSeries = chart.addAreaSeries(seriesOptionsToHideCrosshair);
 
 		mainSeries.setData(generateData());
 	});

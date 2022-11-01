@@ -74,6 +74,9 @@
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-light.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-light.svg');
+
+	--docusaurus-highlighted-code-line-bg: #2962ff15; /* --color-tv-blue-500 with opacity */
+	--hidden-lines-warning-bg: rgba(0, 0, 0, 0.1);
 }
 
 html[data-theme=dark] {
@@ -104,6 +107,9 @@ html[data-theme=dark] {
 
 	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-dark.svg');
 	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
+
+	--docusaurus-highlighted-code-line-bg: #2962ff20;
+	--hidden-lines-warning-bg: rgba(0, 0, 0, 0.2);
 }
 
 html[data-theme=light] .DocSearch {
@@ -116,15 +122,27 @@ html[data-theme=dark] .DocSearch {
 	--docsearch-searchbox-focus-background: var(--color-cold-gray-850);
 }
 
-.docusaurus-highlight-code-line {
-	background-color: var(--color-black);
+.theme-code-block-highlighted-line {
 	display: block;
 	margin: 0 calc(-1 * var(--ifm-pre-padding));
 	padding: 0 var(--ifm-pre-padding);
+	border-left: 3px solid #2962ffbb;
 }
 
-html[data-theme=dark] .docusaurus-highlight-code-line {
-	background-color: rgba(0, 0, 0, 0.3);
+.code-block-fade-line {
+	display: block;
+	margin: 0 calc(-1 * var(--ifm-pre-padding));
+	padding: 0 var(--ifm-pre-padding);
+	user-select: none;
+}
+
+.code-block-remove-line, .code-block-hide-line {
+	display: none;
+	user-select: none;
+}
+
+.code-block-hide-line, .code-block-fade-line {
+	filter: opacity(0.8) saturate(0.2);
 }
 
 .navbar {
@@ -193,7 +211,7 @@ html[data-theme=dark] .docusaurus-highlight-code-line {
 
 .footer__copyright {
 	padding-top: 24px;
-	color: var(--footer-copyright-color)
+	color: var(--footer-copyright-color);
 }
 
 @media (min-width: 767.5px) {
@@ -226,4 +244,10 @@ html[data-theme=dark] .docusaurus-highlight-code-line {
 	.footer {
 		--footer-links-padding-horizontal: 240px;
 	}
+}
+
+.standalone-iframe {
+	height: 250px;
+	width: 100%;
+	border-radius: var(--ifm-code-border-radius);
 }

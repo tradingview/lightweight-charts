@@ -3,22 +3,67 @@ import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { OriginalTime, TimePoint, TimePointIndex } from '../model/time-data';
 
-import { BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
-
-function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Area' | 'Baseline'>> {
-	const val = item.value;
-	return { index, time, value: [val, val, val, val], originalTime };
-}
+import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 
 function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;
 
 	const res: Mutable<SeriesPlotRow<'Line' | 'Histogram'>> = { index, time, value: [val, val, val, val], originalTime };
 
-	// 'color' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('color' in item && item.color !== undefined) {
+	if (item.color !== undefined) {
 		res.color = item.color;
+	}
+
+	return res;
+}
+
+function getAreaSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: AreaData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Area'>> {
+	const val = item.value;
+
+	const res: Mutable<SeriesPlotRow<'Area'>> = { index, time, value: [val, val, val, val], originalTime };
+
+	if (item.lineColor !== undefined) {
+		res.lineColor = item.lineColor;
+	}
+
+	if (item.topColor !== undefined) {
+		res.topColor = item.topColor;
+	}
+
+	if (item.bottomColor !== undefined) {
+		res.bottomColor = item.bottomColor;
+	}
+
+	return res;
+}
+
+function getBaselineSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BaselineData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Baseline'>> {
+	const val = item.value;
+
+	const res: Mutable<SeriesPlotRow<'Baseline'>> = { index, time, value: [val, val, val, val], originalTime };
+
+	if (item.topLineColor !== undefined) {
+		res.topLineColor = item.topLineColor;
+	}
+
+	if (item.bottomLineColor !== undefined) {
+		res.bottomLineColor = item.bottomLineColor;
+	}
+
+	if (item.topFillColor1 !== undefined) {
+		res.topFillColor1 = item.topFillColor1;
+	}
+
+	if (item.topFillColor2 !== undefined) {
+		res.topFillColor2 = item.topFillColor2;
+	}
+
+	if (item.bottomFillColor1 !== undefined) {
+		res.bottomFillColor1 = item.bottomFillColor1;
+	}
+
+	if (item.bottomFillColor2 !== undefined) {
+		res.bottomFillColor2 = item.bottomFillColor2;
 	}
 
 	return res;
@@ -27,9 +72,7 @@ function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex
 function getBarSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BarData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Bar'>> {
 	const res: Mutable<SeriesPlotRow<'Bar'>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
 
-	// 'color' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('color' in item && item.color !== undefined) {
+	if (item.color !== undefined) {
 		res.color = item.color;
 	}
 
@@ -38,22 +81,15 @@ function getBarSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: BarDa
 
 function getCandlestickSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: CandlestickData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Candlestick'>> {
 	const res: Mutable<SeriesPlotRow<'Candlestick'>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
-
-	// 'color' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('color' in item && item.color !== undefined) {
+	if (item.color !== undefined) {
 		res.color = item.color;
 	}
 
-	// 'borderColor' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('borderColor' in item && item.borderColor !== undefined) {
+	if (item.borderColor !== undefined) {
 		res.borderColor = item.borderColor;
 	}
 
-	// 'wickColor' here is public property (from API) so we can use `in` here safely
-	// eslint-disable-next-line no-restricted-syntax
-	if ('wickColor' in item && item.wickColor !== undefined) {
+	if (item.wickColor !== undefined) {
 		res.wickColor = item.wickColor;
 	}
 
@@ -66,17 +102,11 @@ export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is 
 	return (row as Partial<SeriesPlotRow>).value !== undefined;
 }
 
-// we want to have compile-time checks that the type of the functions is correct
-// but due contravariance we cannot easily use type of values of the SeriesItemValueFnMap map itself
-// so let's use TimedSeriesItemValueFn for shut up the compiler in seriesItemValueFn
-// we need to be sure (and we're sure actually) that stored data has correct type for it's according series object
 type SeriesItemValueFnMap = {
-	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
+	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime) => Mutable<SeriesPlotRow<T> | WhitespacePlotRow>;
 };
 
-export type TimedSeriesItemValueFn = (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
-
-function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): TimedSeriesItemValueFn {
+function wrapWhitespaceData<TSeriesType extends SeriesType>(createPlotRowFn: (typeof getBaselineSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): SeriesItemValueFnMap[TSeriesType] {
 	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime) => {
 		if (isWhitespaceData(bar)) {
 			return { time, index, originalTime };
@@ -89,12 +119,12 @@ function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) 
 const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Candlestick: wrapWhitespaceData(getCandlestickSeriesPlotRow),
 	Bar: wrapWhitespaceData(getBarSeriesPlotRow),
-	Area: wrapWhitespaceData(getLineBasedSeriesPlotRow),
-	Baseline: wrapWhitespaceData(getLineBasedSeriesPlotRow),
+	Area: wrapWhitespaceData(getAreaSeriesPlotRow),
+	Baseline: wrapWhitespaceData(getBaselineSeriesPlotRow),
 	Histogram: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 };
 
-export function getSeriesPlotRowCreator(seriesType: SeriesType): TimedSeriesItemValueFn {
-	return seriesPlotRowFnMap[seriesType] as TimedSeriesItemValueFn;
+export function getSeriesPlotRowCreator<TSeriesType extends SeriesType>(seriesType: TSeriesType): SeriesItemValueFnMap[TSeriesType] {
+	return seriesPlotRowFnMap[seriesType];
 }

@@ -9,7 +9,7 @@ const https = require('https');
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const { default: pluginDocusaurus } = require('docusaurus-plugin-typedoc');
-const { default: logger } = require('@docusaurus/logger');
+const logger = require('@docusaurus/logger');
 
 const versions = require('./versions.json');
 const sizeLimits = require('../.size-limit');
@@ -55,7 +55,7 @@ function downloadFile(urlString, filePath) {
 		const url = new URL(urlString);
 
 		const request = https.get(url, response => {
-			if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location !== undefined) {
+			if (response.statusCode && response.statusCode >= 300 && response.statusCode < 400 && response.headers.location !== undefined) {
 				// handling redirect
 				url.pathname = response.headers.location;
 				downloadFile(url.toString(), filePath).then(resolve, reject);
@@ -112,7 +112,7 @@ async function downloadTypingsFromUnpkg(version) {
 	return typingsFilePath;
 }
 
-/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
+/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc').TypeDocOptions} */
 const commonDocusaurusPluginTypedocConfig = {
 	readme: 'none',
 	disableSources: true,
@@ -299,11 +299,38 @@ async function getConfig() {
 					theme: lightCodeTheme,
 					darkTheme: darkCodeTheme,
 					additionalLanguages: ['ruby', 'swift', 'kotlin', 'groovy'],
+					magicComments: [
+						{
+							className: 'theme-code-block-highlighted-line',
+							line: 'highlight-next-line',
+							block: { start: 'highlight-start', end: 'highlight-end' },
+						},
+						{
+							// Lightly fades the code lines (useful for boilerplate sections of code)
+							className: 'code-block-fade-line',
+							block: { start: 'highlight-fade-start', end: 'highlight-fade-end' },
+							line: 'highlight-fade',
+						},
+						{
+							// Hides code lines but can be reveal using toggle and css
+							className: 'code-block-hide-line',
+							block: { start: 'hide-start', end: 'hide-end' },
+							line: 'hide-line',
+						},
+						{
+							// Hides code lines and can't be reveal using toggle and css.
+							// Will still be included in copied code.
+							// Useful for type comments and header notices.
+							className: 'code-block-remove-line',
+							block: { start: 'remove-start', end: 'remove-end' },
+							line: 'remove-line',
+						},
+					],
 				},
 				algolia: {
 					appId: '7Q5A441YPA',
 					// Public API key: it is safe to commit it
-					apiKey: 'b6417716804e66012544fd5904e208c8',
+					apiKey: 'c8a8aaeb7ef3fbcce40bada2196e2bcb',
 					indexName: 'lightweight-charts',
 					contextualSearch: true,
 				},
@@ -322,8 +349,7 @@ async function getConfig() {
 			],
 			[
 				'docusaurus-plugin-typedoc',
-				// @ts-ignore
-				/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc/dist/index').TypeDocOptions} */
+				/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc').TypeDocOptions} */
 				({
 					...commonDocusaurusPluginTypedocConfig,
 					id: 'current-api',
@@ -333,6 +359,7 @@ async function getConfig() {
 				}),
 			],
 			...versions.map(typedocPluginForVersion),
+			'./plugins/enhanced-codeblock',
 		],
 	};
 

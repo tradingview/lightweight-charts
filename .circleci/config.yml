@@ -42,11 +42,11 @@ aliases:
 executors:
   node16-executor:
     docker:
-      - image: circleci/node:16
+      - image: cimg/node:16.16
 
   node16-browsers-executor:
     docker:
-      - image: circleci/node:16-browsers
+      - image: cimg/node:16.16-browsers
 
 commands:
   checkout-with-deps:
@@ -74,7 +74,10 @@ commands:
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
             echo 'export PRODUCTION_BUILD=<< parameters.productionBuild >>' >> $BASH_ENV
-      - run: scripts/run-graphics-tests.sh
+      - run:
+          command: scripts/run-graphics-tests.sh
+          no_output_timeout: 20m
+
       - store_test_results:
           path: test-results/
       - store_artifacts:
@@ -101,10 +104,10 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
+      - run: npm run build:prod
       # make sure that the project is compiled successfully with composite projects
       # so we don't have cyclic deps between projects and wrong imports
       - run: npm run tsc-verify
-      - run: npm run build:prod
       - persist_to_workspace:
           root: ./
           paths:
@@ -127,6 +130,8 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
+      - attach_workspace:
+          at: ./
       - run: npm run lint:eslint
 
   lint-dts:
@@ -215,6 +220,19 @@ jobs:
       - store_test_results:
           path: test-results/
 
+  interactions:
+    executor: node16-browsers-executor
+    environment:
+      NO_SANDBOX: "true"
+      TESTS_REPORT_FILE: "test-results/interactions/results.xml"
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: scripts/run-interactions-tests.sh
+      - store_test_results:
+          path: test-results/
+
   size-limit:
     executor: node16-executor
     steps:
@@ -230,8 +248,7 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm run tsc
-      - run: npm run bundle-dts
+      - run: npm run build:prod
       - run:
           name: "Install dependencies and build website"
           command: |
@@ -290,10 +307,7 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-      - lint-eslint:
-          filters: *default-filters
-          requires:
-            - install-deps
+            - install-deps-website
       - lint-markdown:
           filters: *default-filters
           requires:
@@ -335,17 +349,18 @@ workflows:
           filters: *default-filters
           requires:
             - build
+      - interactions:
+          filters: *default-filters
+          requires:
+            - build
       - lint-dts:
           filters: *default-filters
           requires:
             - build
-
-  website:
-    jobs:
-      - install-deps:
+      - lint-eslint:
           filters: *default-filters
-      - install-deps-website:
-          filters: *default-filters
+          requires:
+            - build
       - build-docusaurus-website:
           filters: *default-filters
           requires:

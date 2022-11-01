@@ -25,7 +25,8 @@ function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptio
 }
 
 function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
-	const { isDarkTheme } = useColorMode();
+	const { colorMode } = useColorMode();
+	const isDarkTheme = colorMode === 'dark';
 
 	const [layoutOptions, setLayoutOptions] = React.useState<DeepPartial<LayoutOptions>>(getLayoutOptionsForTheme(isDarkTheme));
 
@@ -206,7 +207,7 @@ function Index(): JSX.Element {
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard2].join(' ')}>
 					<Paperplane />
-					<h3>Ultra lightweight - just {siteConfig.customFields?.bundleSize} Kb</h3>
+					<h3>{`Ultra lightweight - just ${siteConfig.customFields?.bundleSize} Kb`}</h3>
 					<p>HTML5 Canvas technology no larger than a standard GIF file.</p>
 				</div>
 				<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>

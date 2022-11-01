@@ -16,7 +16,7 @@ function generateData(step) {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const areaSeries = chart.addAreaSeries({
 		crosshairMarkerBorderColor: '#ff00ff',

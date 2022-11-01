@@ -9,6 +9,9 @@ import puppeteer, {
 	Page,
 } from 'puppeteer';
 
+import { MouseEventParams } from '../../../../src/api/ichart-api';
+import { TestCaseWindow } from './testcase-window-type';
+
 const viewportWidth = 600;
 const viewportHeight = 600;
 
@@ -67,19 +70,42 @@ export class Screenshoter {
 
 			// wait for test case is ready
 			await page.evaluate(() => {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
-				return (window as any).testCaseReady;
+				return (window as unknown as TestCaseWindow).testCaseReady;
+			});
+
+			// move mouse to top-left corner
+			await page.mouse.move(0, 0);
+
+			const waitForMouseMove = page.evaluate(() => {
+				if ((window as unknown as TestCaseWindow).ignoreMouseMove) { return Promise.resolve(); }
+				return new Promise<number[]>((resolve: (value: number[]) => void) => {
+					const chart = (window as unknown as TestCaseWindow).chart;
+					if (!chart) {
+						throw new Error('window variable `chart` is required unless `ignoreMouseMove` is set to true');
+					}
+					chart.subscribeCrosshairMove((param: MouseEventParams) => {
+						const point = param.point;
+						if (!point) { return; }
+						if (point.x > 0 && point.y > 0) {
+							requestAnimationFrame(() => resolve([point.x, point.y] as number[]));
+						}
+					});
+				});
 			});
 
 			// to avoid random cursor position
 			await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
+
+			await waitForMouseMove;
 
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
 				return new Promise<void>((resolve: () => void) => {
 					window.requestAnimationFrame(() => {
 						// and a little more time after af :)
-						setTimeout(resolve, 50);
+						// Note: This timeout value isn't part of the test and is only
+						//       included to improve the reliability of the test.
+						setTimeout(resolve, 250);
 					});
 				});
 			});

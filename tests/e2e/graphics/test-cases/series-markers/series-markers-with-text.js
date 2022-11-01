@@ -23,7 +23,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(
+	const chart = window.chart = LightweightCharts.createChart(
 		container,
 		{
 			layout: {

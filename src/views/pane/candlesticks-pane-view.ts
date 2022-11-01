@@ -4,52 +4,29 @@ import { TimePointIndex } from '../../model/time-data';
 import {
 	CandlestickItem,
 	PaneRendererCandlesticks,
-	PaneRendererCandlesticksData,
 } from '../../renderers/candlesticks-renderer';
-import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { BarsPaneViewBase } from './bars-pane-view-base';
 
-export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', CandlestickItem> {
-	private readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
+export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', CandlestickItem, PaneRendererCandlesticks> {
+	protected readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
-		if (!this._series.visible()) {
-			return null;
-		}
+	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<'Candlestick'>): CandlestickItem {
+		return {
+			...this._createDefaultItem(time, bar, colorer),
+			...colorer.barStyle(time),
+		};
+	}
 
+	protected _prepareRendererData(): void {
 		const candlestickStyleProps = this._series.options();
 
-		this._makeValid();
-		const data: PaneRendererCandlesticksData = {
+		this._renderer.setData({
 			bars: this._items,
 			barSpacing: this._model.timeScale().barSpacing(),
 			wickVisible: candlestickStyleProps.wickVisible,
 			borderVisible: candlestickStyleProps.borderVisible,
 			visibleRange: this._itemsVisibleRange,
-		};
-
-		this._renderer.setData(data);
-
-		return this._renderer;
-	}
-
-	protected _updateOptions(): void {
-		this._items.forEach((item: CandlestickItem) => {
-			const style = this._series.barColorer().barStyle(item.time);
-			item.color = style.barColor;
-			item.wickColor = style.barWickColor;
-			item.borderColor = style.barBorderColor;
 		});
-	}
-
-	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer): CandlestickItem {
-		const style = colorer.barStyle(time);
-		return {
-			...this._createDefaultItem(time, bar, colorer),
-			color: style.barColor,
-			wickColor: style.barWickColor,
-			borderColor: style.barBorderColor,
-		};
 	}
 }

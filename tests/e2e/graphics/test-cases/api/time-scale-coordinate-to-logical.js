@@ -1,6 +1,9 @@
+// Ignore the mouse movement check because height of chart is too short
+window.ignoreMouseMove = true;
+
 function runTestCase(container) {
 	const width = 400;
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		width: width,
 		height: 200,
 		rightPriceScale: {

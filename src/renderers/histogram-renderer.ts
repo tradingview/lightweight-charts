@@ -7,7 +7,7 @@ const showSpacingMinimalBarWidth = 1;
 const alignToMinimalWidthLimit = 4;
 
 export interface HistogramItem extends PricedValue, TimedValue {
-	color: string;
+	barColor: string;
 }
 
 export interface PaneRendererHistogramData {
@@ -53,7 +53,7 @@ export class PaneRendererHistogram implements IPaneRenderer {
 			const item = this._data.items[i];
 			const current = this._precalculatedCache[i - this._data.visibleRange.from];
 			const y = Math.round(item.y * pixelRatio);
-			ctx.fillStyle = item.color;
+			ctx.fillStyle = item.barColor;
 
 			let top: number;
 			let bottom: number;

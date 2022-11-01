@@ -57,6 +57,8 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		commonRendererData.coordinate = lastValueData.coordinate;
 		paneRendererData.borderColor = source.model().backgroundColorAtYPercentFromTop(lastValueData.coordinate / source.priceScale().height());
 		axisRendererData.borderColor = lastValueColor;
+		axisRendererData.color = commonRendererData.color;
+		paneRendererData.color = commonRendererData.color;
 	}
 
 	protected _paneText(

@@ -1,0 +1,91 @@
+---
+sidebar_position: 7
+title: Crosshair
+pagination_title: Crosshair
+sidebar_label: Crosshair
+description: In this section, we will be customizing the appearance of the crosshair and it's functionality.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/time-scale
+pagination_next: customization/second-series
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In this section, we will be customizing the appearance of the crosshair and it's functionality.
+
+The crosshair can be customized within the options of the [IChartApi](/docs/api/interfaces/IChartApi) instance. You can view the full set of crosshair options available here: [CrosshairOptions](/docs/api/interfaces/CrosshairOptions).
+
+## Crosshair mode
+
+One of the options is `mode` which can be set to the default `magnet` or `normal` ([CrosshairMode](/docs/api/enums/CrosshairMode)). Magnet mode snaps the crosshair to data points on the chart such that it is easy to read the exact values on the labels shown on the two scales. However, in some circumstances, it may be more desirable to have a 'free' moving crosshair which can be enabled by setting the value to `normal`. The normal mode will always draw the crosshair at the exact point of the mouse cursor.
+
+## Styling the crosshair
+
+The crosshair consists of two lines (vertical and horizontal) which can be individually adjusted with the options set on the `vertLine` and `horzLine` properties respectively. The available options for each crosshair line can be viewed here: [CrosshairLineOptions](/docs/api/interfaces/CrosshairLineOptions).
+
+For this example, we will be adjusting the width and line style for the vertical line such that it appears like a spotlight, and adjusting the `color` and `labelBackgroundColor` for both lines so that they better match our color scheme.
+
+You can add the following code anywhere below the creation of the `chart` reference. (directly after we set the price formatter and before we add the candlestick series will do nicely so that our chart options are kept together in the code)
+
+```js
+// Customizing the Crosshair
+chart.applyOptions({
+    crosshair: {
+        // Change mode from default 'magnet' to 'normal'.
+        // Allows the crosshair to move freely without snapping to datapoints
+        mode: LightweightCharts.CrosshairMode.Normal,
+
+        // Vertical crosshair line (showing Date in Label)
+        vertLine: {
+            width: 8,
+            color: '#C3BCDB44',
+            style: LightweightCharts.LineStyle.Solid,
+            labelBackgroundColor: '#9B7DFF',
+        },
+
+        // Horizontal crosshair line (showing Price in Label)
+        horzLine: {
+            color: '#9B7DFF',
+            labelBackgroundColor: '#9B7DFF',
+        },
+    },
+});
+```
+
+## Result
+
+At this point we should have a chart like this:
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step7.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step7.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+In the next step, we will be adding a second series to the chart such that we can add a subtle gradient effect below the candlestick series.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step7.html').default} download="customization-tutorial-step7.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step7.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

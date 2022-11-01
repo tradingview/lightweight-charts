@@ -83,6 +83,61 @@ export interface HistogramData extends SingleValueData {
 }
 
 /**
+ * Structure describing a single item of data for area series
+ */
+export interface AreaData extends SingleValueData {
+	/**
+	 * Optional line color value for certain data item. If missed, color from options is used
+	 */
+	lineColor?: string;
+
+	/**
+	 * Optional top color value for certain data item. If missed, color from options is used
+	 */
+	topColor?: string;
+
+	/**
+	 * Optional bottom color value for certain data item. If missed, color from options is used
+	 */
+	bottomColor?: string;
+}
+
+/**
+ * Structure describing a single item of data for baseline series
+ */
+export interface BaselineData extends SingleValueData {
+	/**
+	 * Optional top area top fill color value for certain data item. If missed, color from options is used
+	 */
+	topFillColor1?: string;
+
+	/**
+	 * Optional top area bottom fill color value for certain data item. If missed, color from options is used
+	 */
+	topFillColor2?: string;
+
+	/**
+	 * Optional top area line color value for certain data item. If missed, color from options is used
+	 */
+	topLineColor?: string;
+
+	/**
+	 * Optional bottom area top fill color value for certain data item. If missed, color from options is used
+	 */
+	bottomFillColor1?: string;
+
+	/**
+	 * Optional bottom area bottom fill color value for certain data item. If missed, color from options is used
+	 */
+	bottomFillColor2?: string;
+
+	/**
+	 * Optional bottom area line color value for certain data item. If missed, color from options is used
+	 */
+	bottomLineColor?: string;
+}
+
+/**
  * Represents a bar with a {@link Time} and open, high, low, and close prices.
  */
 export interface OhlcData {
@@ -162,11 +217,11 @@ export interface SeriesDataItemTypeMap {
 	/**
 	 * The types of area series data.
 	 */
-	Area: SingleValueData | WhitespaceData;
+	Area: AreaData | WhitespaceData;
 	/**
 	 * The types of baseline series data.
 	 */
-	Baseline: SingleValueData | WhitespaceData;
+	Baseline: BaselineData | WhitespaceData;
 	/**
 	 * The types of line series data.
 	 */
