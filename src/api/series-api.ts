@@ -187,10 +187,12 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public createBox(options: BoxOptions): IBox {
-		checkBoxOptions(options);
-
 		const strictOptions = merge(clone(boxOptionsDefaults), options) as BoxOptions;
+
+		checkBoxOptions(strictOptions);
+
 		const box = this._series.createBox(strictOptions);
+
 		return new Box(box);
 	}
 

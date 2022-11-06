@@ -15,6 +15,7 @@ export abstract class SeriesBoxPaneView implements IPaneView {
 		borderStyle: LineStyle.Solid,
 		borderWidth: 1,
 		borderVisible: false,
+		corners: [],
 		xLow: 0 as Coordinate,
 		xHigh: 0 as Coordinate,
 		yLow: 0 as Coordinate,

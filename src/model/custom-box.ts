@@ -55,24 +55,24 @@ export class CustomBox {
 	}
 
 	public xLowCoord(): Coordinate | null {
-		return this._xCoord(this._options.earlyTime as UTCTimestamp);
+		return this.xCoord(this._options.earlyTime as UTCTimestamp);
 	}
 
 	public xHighCoord(): Coordinate | null {
-		return this._xCoord(this._options.lateTime as UTCTimestamp);
+		return this.xCoord(this._options.lateTime as UTCTimestamp);
 	}
 
 	public yLowCoord(): Coordinate | null {
 		// low Y coord = the high price (it is intentionally flipped)
-		return this._yCoord(this._options.highPrice);
+		return this.yCoord(this._options.highPrice);
 	}
 
 	public yHighCoord(): Coordinate | null {
 		// high Y coord = the low price (it is intentionally flipped)
-		return this._yCoord(this._options.lowPrice);
+		return this.yCoord(this._options.lowPrice);
 	}
 
-	private _xCoord(time: UTCTimestamp): Coordinate | null {
+	public xCoord(time: UTCTimestamp): Coordinate | null {
 		const series = this._series;
 		const timeScale = series.model().timeScale();
 		const timeIndex = timeScale.timeToIndex({ timestamp: time }, true);
@@ -84,7 +84,7 @@ export class CustomBox {
 		return timeScale.indexToCoordinate(timeIndex);
 	}
 
-	private _yCoord(price: number): Coordinate | null {
+	public yCoord(price: number): Coordinate | null {
 		const series = this._series;
 		const priceScale = series.priceScale();
 		const timeScale = series.model().timeScale();

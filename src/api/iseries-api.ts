@@ -258,6 +258,10 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * @example
 	 * ```js
 	 * box.applyOptions({
+	 *     corners: [
+	 *         { time: 1641240000, price: 80 },
+         *         { time: 1641040000, price: 70 },
+	 *     ],
 	 *     lowPrice: 80.0,
 	 *     highPrice: 90.0,
 	 *     earlyTime: 1641240000, // 2022-01-03 20:00:00

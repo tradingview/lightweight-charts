@@ -2,6 +2,7 @@ import { BoxOptions } from '../../model/box-options';
 import { LineStyle } from '../../renderers/draw-line';
 
 export const boxOptionsDefaults: BoxOptions = {
+	corners: [],
 	lowPrice: 0.0,
 	highPrice: 0.0,
 	earlyTime: 0,

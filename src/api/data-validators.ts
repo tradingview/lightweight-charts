@@ -23,10 +23,14 @@ export function checkBoxOptions(options: BoxOptions): void {
 		return;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	assert(typeof options.lowPrice === 'number', `the type of 'lowPrice' box's property must be a number, got '${typeof options.lowPrice}'`);
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	assert(typeof options.highPrice === 'number', `the type of 'highPrice' box's property must be a number, got '${typeof options.highPrice}'`);
+	if (options.corners.length === 0) {
+		// eslint-disable-next-line @typescript-eslint/tslint/config
+		assert(typeof options.lowPrice === 'number', `the type of 'lowPrice' box's property must be a number, got '${typeof options.lowPrice}'`);
+		// eslint-disable-next-line @typescript-eslint/tslint/config
+		assert(typeof options.highPrice === 'number', `the type of 'highPrice' box's property must be a number, got '${typeof options.highPrice}'`);
+	} else {
+		assert(options.corners.length !== 1, `at least 2 corners must be specified, but only got 1 corner`);
+	}
 }
 
 export function checkItemsAreOrdered(data: readonly (SeriesMarker<Time> | SeriesDataItemTypeMap[SeriesType])[], allowDuplicates: boolean = false): void {

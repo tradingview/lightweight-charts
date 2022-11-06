@@ -13,3 +13,17 @@ export interface Point {
 	 */
 	readonly y: Coordinate;
 }
+
+/**
+ * Represents a point input from the user.
+ */
+export interface UserPoint {
+	/**
+	 * The x coordinate.
+	 */
+	readonly time: number;
+	/**
+	 * The y coordinate.
+	 */
+	readonly price: number;
+}

@@ -1,9 +1,16 @@
+import { UserPoint } from '../model/point';
 import { LineStyle, LineWidth } from '../renderers/draw-line';
 
 /**
  * Represents a box options.
  */
 export interface BoxOptions {
+	/**
+	 * Corners of the shape.
+	 *
+	 * @defaultValue `[]`
+	 */
+	corners: UserPoint[];
 	/**
 	 * Line: bottom.
 	 *
