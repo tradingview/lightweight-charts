@@ -23,6 +23,7 @@ function createEmptyMarkerData(): MarksRendererData {
 		lineColor: '',
 		backColor: '',
 		radius: 0,
+		lineWidth: 0,
 		visibleRange: null,
 	};
 }
@@ -84,6 +85,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 			const firstValue = ensureNotNull(s.firstValue());
 			data.lineColor = seriesData.backgroundColor;
 			data.radius = seriesData.radius;
+			data.lineWidth = seriesData.borderWidth;
 			data.items[0].price = seriesData.price;
 			data.items[0].y = s.priceScale().priceToCoordinate(seriesData.price, firstValue.value);
 			data.backColor = seriesData.borderColor ?? this._chartModel.backgroundColorAtYPercentFromTop(data.items[0].y / height);

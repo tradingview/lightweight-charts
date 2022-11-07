@@ -6,6 +6,7 @@ import { ScaledRenderer } from './scaled-renderer';
 export interface MarksRendererData {
 	items: LineItemBase[];
 	lineColor: string;
+	lineWidth: number;
 	backColor: string;
 	radius: number;
 	visibleRange: SeriesItemsIndexesRange | null;
@@ -38,8 +39,10 @@ export class PaneRendererMarks extends ScaledRenderer {
 			ctx.fill();
 		};
 
-		ctx.fillStyle = data.backColor;
-		draw(data.radius + 2);
+		if (data.lineWidth > 0) {
+			ctx.fillStyle = data.backColor;
+			draw(data.radius + data.lineWidth);
+		}
 
 		ctx.fillStyle = data.lineColor;
 		draw(data.radius);

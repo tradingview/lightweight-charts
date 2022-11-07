@@ -198,6 +198,12 @@ export interface LineStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.
@@ -284,6 +290,12 @@ export interface AreaStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.
@@ -405,6 +417,12 @@ export interface BaselineStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.
