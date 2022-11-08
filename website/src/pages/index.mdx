@@ -1,0 +1,37 @@
+---
+hide_table_of_contents: true
+---
+
+# Lightweight Charts Documentation
+
+Welcome to the documentation page for
+[Lightweight Charts](https://www.tradingview.com/lightweight-charts/).
+
+import CardLinkList from '@site/src/components/CardLinkList';
+import Shapes from '@site/src/img/shapes.svg';
+import Cog from "@site/src/img/cog.svg";
+import Plane from "@site/src/img/paperplane.svg";
+
+<CardLinkList
+    frontPage
+	items={[
+		{
+			href: '/docs',
+			title: 'Getting Started',
+			description: 'Install the library, and create your first chart',
+            image: <Plane/>,
+		},
+		{
+			href: '/tutorials',
+			title: 'Tutorials',
+			description: 'Tutorials, examples, and framework integrations',
+            image: <Shapes/>,
+		},
+		{
+			href: '/docs/api',
+			title: 'API Reference',
+			description: 'API reference documentation',
+            image: <Cog/>,
+		},
+	]}
+/>
