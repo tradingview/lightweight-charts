@@ -2,36 +2,63 @@
 hide_table_of_contents: true
 ---
 
-# Lightweight Charts Documentation
-
-Welcome to the documentation page for
-[Lightweight Charts](https://www.tradingview.com/lightweight-charts/).
-
 import CardLinkList from '@site/src/components/CardLinkList';
 import Shapes from '@site/src/img/shapes.svg';
-import Cog from "@site/src/img/cog.svg";
-import Plane from "@site/src/img/paperplane.svg";
+import Cog from '@site/src/img/cog.svg';
+import Plane from '@site/src/img/paperplane.svg';
+import GitHubLogo from '@site/src/img/github-logo.svg';
 
-<CardLinkList
-    frontPage
-	items={[
-		{
-			href: '/docs',
-			title: 'Getting Started',
-			description: 'Install the library, and create your first chart',
-            image: <Plane/>,
-		},
-		{
-			href: '/tutorials',
-			title: 'Tutorials',
-			description: 'Tutorials, examples, and framework integrations',
-            image: <Shapes/>,
-		},
-		{
-			href: '/docs/api',
-			title: 'API Reference',
-			description: 'API reference documentation',
-            image: <Cog/>,
-		},
-	]}
-/>
+<!-- Using html here so we can control the width of the content -->
+
+<div style={{ maxWidth: '900px', margin: '0px auto', textAlign: 'justify' }}>
+	<h1>Lightweight Charts Documentation</h1>
+	<p>
+		This page is an overview of the Lightweight Charts documentation.
+		Lightweight Charts is a JavaScript library for creating interactive
+		financial charts. Learn more about Lightweight Charts on <a href="https://tradingview.com/lightweight-charts">the homepage</a>.
+	</p>
+	<p>
+		The aim of this website is to drive you from downloading and creating charts
+		for the first time to implementing some top notch features and answering
+		questions you may have along your development process.
+	</p>
+	<p>
+		You’ll also find tutorials to easily grasp the full potential of the library
+		using React, Vue or Angular among popular frameworks but also highly raised
+		topics answered by examples.
+	</p>
+	<p>
+		If you’ve stumbled upon a bug or have any questions, please feel free to get
+		in touch with the team who will do its best to address the issue in a timely
+		fashion.
+	</p>
+	<CardLinkList
+		frontPage
+		items={[
+			{
+				href: '/docs',
+				title: 'Getting Started',
+				description: 'Install the library, and create your first chart',
+				image: <Plane />,
+			},
+			{
+				href: '/tutorials',
+				title: 'Tutorials',
+				description: 'Tutorials, examples, and framework integrations',
+				image: <Shapes />,
+			},
+			{
+				href: '/docs/api',
+				title: 'API Reference',
+				description: 'API reference documentation',
+				image: <Cog />,
+			},
+			{
+				href: 'https://github.com/tradingview/lightweight-charts/issues',
+				title: 'GitHub Issues',
+				description: 'Report a bug, or ask a question',
+				image: <GitHubLogo />,
+			},
+		]}
+	/>
+</div>
