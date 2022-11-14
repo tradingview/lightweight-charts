@@ -15,6 +15,7 @@
 		"./graphics/helpers/**/*.ts",
 		"./memleaks/**/*.ts",
 		"./interactions/**/*.ts",
-		"./helpers/**/*.ts"
+		"./helpers/**/*.ts",
+		"../../src/**/*.ts"
 	]
 }

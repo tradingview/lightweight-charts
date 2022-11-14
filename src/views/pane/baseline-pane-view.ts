@@ -45,6 +45,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 			lineType: baselineProps.lineType,
 
 			baseLevelCoordinate,
+			invertFilledArea: false,
 
 			visibleRange: this._itemsVisibleRange,
 			barWidth,

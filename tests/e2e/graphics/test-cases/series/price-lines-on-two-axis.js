@@ -13,7 +13,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		leftPriceScale: {
 			visible: true,
 			borderColor: '#EFF2F5',

@@ -4,7 +4,7 @@ module.exports = [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.esm.production.js',
-		limit: '43.6 KB',
+		limit: '43.9 KB',
 	},
 	{
 		name: 'Standalone',

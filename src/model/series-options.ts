@@ -198,6 +198,12 @@ export interface LineStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.
@@ -224,6 +230,13 @@ export interface AreaStyleOptions {
 	 * @defaultValue `'rgba( 40, 221, 100, 0)'`
 	 */
 	bottomColor: string;
+
+	/**
+	 * Invert the filled area. Fills the area above the line if set to true.
+	 *
+	 * @defaultValue `false`
+	 */
+	invertFilledArea: boolean;
 
 	/**
 	 * Line color.
@@ -277,6 +290,12 @@ export interface AreaStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.
@@ -398,6 +417,12 @@ export interface BaselineStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.

@@ -69,7 +69,7 @@ function getData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		handleScale: false,
 		handleScroll: false,
 		timeScale: {

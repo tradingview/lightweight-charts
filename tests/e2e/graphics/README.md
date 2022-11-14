@@ -47,7 +47,13 @@ If file is local then local server will be runner to serve that file (see [serve
     After that in `.gendata/test-case-name/1.golden.html` you can find a HTML page.
     To open this page properly you can run `./tests/e2e/serve-static-files.js golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
 
-1. The following enviromental variables can be used to adjust the test:
+1. The following environmental variables can be used to adjust the test:
 
     - `PRODUCTION_BUILD`: Set to true if testing a Production build
     - `DEVICE_PIXEL_RATIO`: Device pixel ratio to simulate during the test (number)
+
+1. You can set Mocha options from the command line arguments:
+
+```bash
+node ./tests/e2e/graphics/runner.js ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js --bail --grep "add-series"
+```

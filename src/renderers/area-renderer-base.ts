@@ -16,6 +16,7 @@ export interface PaneRendererAreaDataBase<TItem extends AreaFillItemBase = AreaF
 	lineStyle: LineStyle;
 
 	baseLevelCoordinate: Coordinate | null;
+	invertFilledArea: boolean;
 
 	barWidth: number;
 
@@ -49,7 +50,9 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		}
 
 		const { items, visibleRange, barWidth, lineWidth, lineStyle, lineType } = this._data;
-		const baseLevelCoordinate = this._data.baseLevelCoordinate ?? renderingScope.mediaSize.height as Coordinate;
+		const baseLevelCoordinate =
+			this._data.baseLevelCoordinate ??
+				(this._data.invertFilledArea ? 0 : renderingScope.mediaSize.height) as Coordinate;
 
 		if (visibleRange === null) {
 			return;

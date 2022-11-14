@@ -35,6 +35,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 			lineStyle: areaStyleProperties.lineStyle,
 			lineWidth: areaStyleProperties.lineWidth,
 			baseLevelCoordinate: null,
+			invertFilledArea: areaStyleProperties.invertFilledArea,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		});

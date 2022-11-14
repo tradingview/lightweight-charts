@@ -40,7 +40,7 @@ function generateData(valueOffset) {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const firstSeries = chart.addBaselineSeries({
 		baseValue: {

@@ -14,7 +14,7 @@ function generateData(valueOffset, count) {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		leftPriceScale: {
 			visible: true,
 			ticksVisible: false,
