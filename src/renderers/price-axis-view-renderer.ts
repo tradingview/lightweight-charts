@@ -197,7 +197,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			// 3               4
 			xOutsideBitmap = xInsideBitmap - totalWidthBitmap;
 			xTickBitmap = xInsideBitmap - tickSizeBitmap;
-			xText = xInside - tickSize - paddingInner;
+			xText = xInside - tickSize - paddingInner - horzBorder;
 		} else {
 			// 1               2
 			//
