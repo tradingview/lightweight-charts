@@ -21,6 +21,7 @@ import { SeriesPlotRow } from '../model/series-data';
 import { OriginalTime, TimePointIndex } from '../model/time-data';
 
 import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from './canvas-utils';
+import { MouseEventHandlerEventBase } from './mouse-event-handler';
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -32,6 +33,7 @@ export interface MouseEventParamsImpl {
 	seriesData: Map<Series, SeriesPlotRow>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
+	mouseEventBase?: MouseEventHandlerEventBase;
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
@@ -644,7 +646,7 @@ export class ChartWidget implements IDestroyable {
 		this._adjustSizeImpl();
 	}
 
-	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
+	private _getMouseEventParamsImpl(index: TimePointIndex | null, event: MouseEventHandlerEventBase | null): MouseEventParamsImpl {
 		const seriesData = new Map<Series, SeriesPlotRow>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
@@ -677,19 +679,38 @@ export class ChartWidget implements IDestroyable {
 		return {
 			time: clientTime,
 			index: index ?? undefined,
-			point: point ?? undefined,
+			point: event ? { x: event.localX, y: event.localY } : undefined,
 			hoveredSeries,
 			seriesData,
 			hoveredObject,
+			mouseEventBase: event ?? undefined,
 		};
 	}
 
-	private _onPaneWidgetClicked(time: TimePointIndex | null, point: Point): void {
-		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point));
+	private _onPaneWidgetClicked(time: TimePointIndex | null, event: MouseEventHandlerEventBase): void {
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, event));
 	}
 
 	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
-		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
+		const event = point ? {
+			clientX: 0 as Coordinate,
+			clientY: 0 as Coordinate,
+			pageX: 0 as Coordinate,
+			pageY: 0 as Coordinate,
+			screenX: 0 as Coordinate,
+			screenY: 0 as Coordinate,
+			localX: point?.x,
+			localY: point?.y,
+			ctrlKey: false,
+			altKey: false,
+			shiftKey: false,
+			metaKey: false,
+			srcType: '',
+			target: null,
+			view: null,
+			preventDefault: () => {},
+		} : null;
+		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, event));
 	}
 
 	private _updateTimeAxisVisibility(): void {

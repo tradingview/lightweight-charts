@@ -1,3 +1,7 @@
+import {
+	MouseEventHandlerEventBase,
+} from '../gui/mouse-event-handler';
+
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
@@ -51,9 +55,13 @@ export interface MouseEventParams {
 	 */
 	hoveredSeries?: ISeriesApi<SeriesType>;
 	/**
-	 * The ID of the marker at the point of the mouse event.
+	 * The ID of the object at the point of the mouse event.
 	 */
-	hoveredMarkerId?: SeriesMarker<Time>['id'];
+	hoveredObjectId?: SeriesMarker<Time>['id'];
+	/**
+	 * The underlying raw mouse event data, if available
+	 */
+	rawMouseEvent?: MouseEventHandlerEventBase;
 }
 
 /**

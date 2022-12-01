@@ -1,3 +1,4 @@
+import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 
 import { drawHorizontalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
@@ -12,6 +13,7 @@ export interface HorizontalLineRendererData {
 	y: Coordinate;
 	visible?: boolean;
 	width: number;
+	externalId?: string;
 }
 
 export class HorizontalLineRenderer implements IPaneRenderer {
@@ -19,6 +21,26 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 
 	public setData(data: HorizontalLineRendererData): void {
 		this._data = data;
+	}
+
+	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
+		if (!this._data?.visible) {
+			return null;
+		}
+
+		const item = this._data;
+		const itemY = item.y;
+		const width = item.lineWidth;
+		// add a fixed area threshold around line (Y + width) for hit test
+		const threshold = 7; // TODO: calculate click threshold this dynamically instead
+		if (y >= itemY - width - threshold && y <= itemY + width + threshold) {
+			return {
+				hitTestData: item,
+				externalId: item.externalId,
+			};
+		}
+
+		return null;
 	}
 
 	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
