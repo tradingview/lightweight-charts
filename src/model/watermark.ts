@@ -39,7 +39,7 @@ export interface WatermarkOptions {
 	/**
 	 * Font family.
 	 *
-	 * @defaultValue `'Trebuchet MS', Roboto, Ubuntu, sans-serif`
+	 * @defaultValue `-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif`
 	 */
 	fontFamily: string;
 

@@ -74,7 +74,7 @@ export interface LayoutOptions {
 	/**
 	 * Font family of text on the scales.
 	 *
-	 * @defaultValue `'Trebuchet MS', Roboto, Ubuntu, sans-serif`
+	 * @defaultValue `-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif`
 	 */
 	fontFamily: string;
 }
