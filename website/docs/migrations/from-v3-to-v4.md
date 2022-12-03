@@ -184,3 +184,6 @@ chart.subscribeCrosshairMove(param => {
     console.log(param.seriesData.get(barSeries)); // { time: '2001-01-01', open: 5, high: 10, low: 1, close: 7 } or undefined
 });
 ```
+
+## `MouseEventParams` field `hoveredMarkerId` was renamed to `hoveredObjectId` and now will include
+the `id` of the price line that was clicked, if any.

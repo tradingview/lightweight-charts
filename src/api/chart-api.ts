@@ -294,7 +294,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			hoveredSeries,
 			hoveredObjectId: param.hoveredObject,
 			seriesData,
-			rawMouseEvent: param.mouseEventBase,
+			sourceEvent: param.mouseEventBase,
 		};
 	}
 }

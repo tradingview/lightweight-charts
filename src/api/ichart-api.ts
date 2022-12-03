@@ -1,12 +1,8 @@
-import {
-	MouseEventHandlerEventBase,
-} from '../gui/mouse-event-handler';
-
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
+import { Coordinate } from '../model/coordinate';
 import { Point } from '../model/point';
-import { SeriesMarker } from '../model/series-markers';
 import {
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
@@ -22,6 +18,22 @@ import { BarData, HistogramData, LineData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
+
+export interface TouchMouseEventData {
+	readonly clientX: Coordinate;
+	readonly clientY: Coordinate;
+	readonly pageX: Coordinate;
+	readonly pageY: Coordinate;
+	readonly screenX: Coordinate;
+	readonly screenY: Coordinate;
+	readonly localX: Coordinate;
+	readonly localY: Coordinate;
+
+	readonly ctrlKey: boolean;
+	readonly altKey: boolean;
+	readonly shiftKey: boolean;
+	readonly metaKey: boolean;
+}
 
 /**
  * Represents a mouse event.
@@ -57,11 +69,11 @@ export interface MouseEventParams {
 	/**
 	 * The ID of the object at the point of the mouse event.
 	 */
-	hoveredObjectId?: SeriesMarker<Time>['id'];
+	hoveredObjectId?: unknown;
 	/**
-	 * The underlying raw mouse event data, if available
+	 * The underlying source mouse or touch event data, if available
 	 */
-	rawMouseEvent?: MouseEventHandlerEventBase;
+	sourceEvent?: TouchMouseEventData;
 }
 
 /**

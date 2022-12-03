@@ -16,6 +16,8 @@ export interface HorizontalLineRendererData {
 	externalId?: string;
 }
 
+const enum Constants { HitTestThreshold = 7, }
+
 export class HorizontalLineRenderer implements IPaneRenderer {
 	private _data: HorizontalLineRendererData | null = null;
 
@@ -28,15 +30,12 @@ export class HorizontalLineRenderer implements IPaneRenderer {
 			return null;
 		}
 
-		const item = this._data;
-		const itemY = item.y;
-		const width = item.lineWidth;
+		const { y: itemY, lineWidth, externalId } = this._data;
 		// add a fixed area threshold around line (Y + width) for hit test
-		const threshold = 7; // TODO: calculate click threshold this dynamically instead
-		if (y >= itemY - width - threshold && y <= itemY + width + threshold) {
+		if (y >= itemY - lineWidth - Constants.HitTestThreshold && y <= itemY + lineWidth + Constants.HitTestThreshold) {
 			return {
-				hitTestData: item,
-				externalId: item.externalId,
+				hitTestData: this._data,
+				externalId: externalId,
 			};
 		}
 
