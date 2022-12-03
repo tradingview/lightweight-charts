@@ -186,4 +186,5 @@ chart.subscribeCrosshairMove(param => {
 ```
 
 ## `MouseEventParams` field `hoveredMarkerId` was renamed to `hoveredObjectId` and now will include
+
 the `id` of the price line that was clicked, if any.
