@@ -4,6 +4,7 @@
 		{ "path": "../tsconfig.model.json" }
 	],
 	"include": [
-		"./**/*.ts"
+		"./**/*.ts",
+		"../api/**/*.ts"
 	]
 }
