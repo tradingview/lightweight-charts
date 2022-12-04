@@ -1,6 +1,7 @@
 {
+  "private": true,
   "version": "4.0.0",
-  "name": "@felipecsl/lightweight-charts",
+  "name": "lightweight-charts",
   "author": "TradingView, Inc.",
   "license": "Apache-2.0",
   "description": "Financial lightweight charts built with HTML5 canvas",
