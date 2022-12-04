@@ -1,3 +1,5 @@
+import { TouchMouseEventData } from '../api/ichart-api';
+
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { isChromiumBased, isWindows } from '../helpers/browsers';
 import { drawScaled } from '../helpers/canvas-helpers';
@@ -33,7 +35,7 @@ export interface MouseEventParamsImpl {
 	seriesData: Map<Series, SeriesPlotRow>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
-	mouseEventBase?: MouseEventHandlerEventBase;
+	touchMouseEventData?: TouchMouseEventData;
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
@@ -646,7 +648,7 @@ export class ChartWidget implements IDestroyable {
 		this._adjustSizeImpl();
 	}
 
-	private _getMouseEventParamsImpl(index: TimePointIndex | null, event: MouseEventHandlerEventBase | null): MouseEventParamsImpl {
+	private _getMouseEventParamsImpl(index: TimePointIndex | null, event: TouchMouseEventData | null): MouseEventParamsImpl {
 		const seriesData = new Map<Series, SeriesPlotRow>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
@@ -683,7 +685,7 @@ export class ChartWidget implements IDestroyable {
 			hoveredSeries,
 			seriesData,
 			hoveredObject,
-			mouseEventBase: event ?? undefined,
+			touchMouseEventData: event ?? undefined,
 		};
 	}
 
@@ -705,10 +707,6 @@ export class ChartWidget implements IDestroyable {
 			altKey: false,
 			shiftKey: false,
 			metaKey: false,
-			srcType: '',
-			target: null,
-			view: null,
-			preventDefault: () => {},
 		} : null;
 		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, event));
 	}
