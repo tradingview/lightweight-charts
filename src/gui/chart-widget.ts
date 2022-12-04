@@ -23,8 +23,6 @@ import { SeriesPlotRow } from '../model/series-data';
 import { OriginalTime, TimePointIndex } from '../model/time-data';
 
 import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from './canvas-utils';
-import { MouseEventHandlerEventBase } from './mouse-event-handler';
-// import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
@@ -689,25 +687,11 @@ export class ChartWidget implements IDestroyable {
 		};
 	}
 
-	private _onPaneWidgetClicked(time: TimePointIndex | null, event: MouseEventHandlerEventBase): void {
+	private _onPaneWidgetClicked(time: TimePointIndex | null, event: TouchMouseEventData): void {
 		this._clicked.fire(() => this._getMouseEventParamsImpl(time, event));
 	}
 
-	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
-		const event = point ? {
-			clientX: 0 as Coordinate,
-			clientY: 0 as Coordinate,
-			pageX: 0 as Coordinate,
-			pageY: 0 as Coordinate,
-			screenX: 0 as Coordinate,
-			screenY: 0 as Coordinate,
-			localX: point?.x,
-			localY: point?.y,
-			ctrlKey: false,
-			altKey: false,
-			shiftKey: false,
-			metaKey: false,
-		} : null;
+	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, event: TouchMouseEventData | null): void {
 		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, event));
 	}
 
