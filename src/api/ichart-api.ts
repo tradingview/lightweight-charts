@@ -49,9 +49,13 @@ export interface TouchMouseEventData {
 	 * The Y coordinate of the mouse pointer in global (screen) coordinates.
 	 */
 	readonly screenY: Coordinate;
-	/** TODO JSDocs */
+	/**
+	 * TODO JSDocs
+	 */
 	readonly localX: Coordinate;
-	/** TODO JSDocs */
+	/**
+	 * TODO JSDocs
+	 */
 	readonly localY: Coordinate;
 
 	/**

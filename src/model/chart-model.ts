@@ -1,5 +1,9 @@
 /// <reference types="_build-time-constants" />
 
+import {
+	MouseEventHandlerEventBase,
+} from '../gui/mouse-event-handler';
+
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { gradientColorAtPercent } from '../helpers/color';
 import { Delegate } from '../helpers/delegate';
@@ -20,7 +24,6 @@ import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
-import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
@@ -351,7 +354,7 @@ export class ChartModel implements IDestroyable {
 	private _width: number = 0;
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
-	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
+	private _crosshairMoved: Delegate<TimePointIndex | null, MouseEventHandlerEventBase | null> = new Delegate();
 
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
@@ -490,7 +493,7 @@ export class ChartModel implements IDestroyable {
 		return this._crosshair;
 	}
 
-	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null> {
+	public crosshairMoved(): ISubscription<TimePointIndex | null, MouseEventHandlerEventBase | null> {
 		return this._crosshairMoved;
 	}
 
@@ -634,7 +637,7 @@ export class ChartModel implements IDestroyable {
 		return this._serieses;
 	}
 
-	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, pane: Pane): void {
+	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: MouseEventHandlerEventBase | null, pane: Pane): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x);
@@ -654,7 +657,7 @@ export class ChartModel implements IDestroyable {
 		this._crosshair.setPosition(index, price, pane);
 
 		this.cursorUpdate();
-		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
+		this._crosshairMoved.fire(this._crosshair.appliedIndex(), event);
 	}
 
 	public clearCurrentPosition(): void {
@@ -670,7 +673,7 @@ export class ChartModel implements IDestroyable {
 		if (pane !== null) {
 			const x = this._crosshair.originCoordX();
 			const y = this._crosshair.originCoordY();
-			this.setAndSaveCurrentPosition(x, y, pane);
+			this.setAndSaveCurrentPosition(x, y, null, pane);
 		}
 
 		this._crosshair.updateAllViews();
