@@ -1,7 +1,6 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
-import { Coordinate } from '../model/coordinate';
 import { Point } from '../model/point';
 import {
 	AreaSeriesPartialOptions,
@@ -13,70 +12,12 @@ import {
 	SeriesType,
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
 import { BarData, HistogramData, LineData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
-
-/**
- * The TouchMouseEventData interface represents events that occur due to the user interacting with a
- * pointing device (such as a mouse).
- * See {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent | MouseEvent}
- */
-export interface TouchMouseEventData {
-	/**
-	 * The X coordinate of the mouse pointer in local (DOM content) coordinates.
-	 */
-	readonly clientX: Coordinate;
-	/**
-	 * The Y coordinate of the mouse pointer in local (DOM content) coordinates.
-	 */
-	readonly clientY: Coordinate;
-	/**
-	 * The X coordinate of the mouse pointer relative to the whole document.
-	 */
-	readonly pageX: Coordinate;
-	/**
-	 * The Y coordinate of the mouse pointer relative to the whole document.
-	 */
-	readonly pageY: Coordinate;
-	/**
-	 * The X coordinate of the mouse pointer in global (screen) coordinates.
-	 */
-	readonly screenX: Coordinate;
-	/**
-	 * The Y coordinate of the mouse pointer in global (screen) coordinates.
-	 */
-	readonly screenY: Coordinate;
-	/**
-	 * TODO JSDocs
-	 */
-	readonly localX: Coordinate;
-	/**
-	 * TODO JSDocs
-	 */
-	readonly localY: Coordinate;
-
-	/**
-	 * Returns a boolean value that is true if the Ctrl key was active when the key event was generated.
-	 */
-	readonly ctrlKey: boolean;
-	/**
-	 * Returns a boolean value that is true if the Alt (Option or ⌥ on macOS) key was active when the
-	 * key event was generated.
-	 */
-	readonly altKey: boolean;
-	/**
-	 * Returns a boolean value that is true if the Shift key was active when the key event was generated.
-	 */
-	readonly shiftKey: boolean;
-	/**
-	 * Returns a boolean value that is true if the Meta key (on Mac keyboards, the ⌘ Command key; on
-	 * Windows keyboards, the Windows key (⊞)) was active when the key event was generated.
-	 */
-	readonly metaKey: boolean;
-}
 
 /**
  * Represents a mouse event.

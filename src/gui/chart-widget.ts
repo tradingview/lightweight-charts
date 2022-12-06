@@ -1,5 +1,3 @@
-import { TouchMouseEventData } from '../api/ichart-api';
-
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { isChromiumBased, isWindows } from '../helpers/browsers';
 import { drawScaled } from '../helpers/canvas-helpers';
@@ -21,6 +19,7 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { OriginalTime, TimePointIndex } from '../model/time-data';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
 import { createPreconfiguredCanvas, getCanvasDevicePixelRatio, getContext2D, Size } from './canvas-utils';
 import { PaneWidget } from './pane-widget';

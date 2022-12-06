@@ -6,8 +6,6 @@
 	],
 	"include": [
 		"./model/**/*.ts",
-		"./gui/**/*.ts",
-		"./api/**/*.ts",
 		"./renderers/**/*.ts",
 		"./views/**/*.ts"
 	]

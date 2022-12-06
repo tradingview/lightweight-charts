@@ -1,11 +1,10 @@
-import { TouchMouseEventData } from '../api/ichart-api';
-
 import { ensureNotNull } from '../helpers/assertions';
 import { isFF, isIOS } from '../helpers/browsers';
 import { preventScrollByWheelClick } from '../helpers/events';
 import { IDestroyable } from '../helpers/idestroyable';
 
 import { Coordinate } from '../model/coordinate';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
 export type HandlerMouseEventCallback = (event: MouseEventHandlerMouseEvent) => void;
 export type HandlerTouchEventCallback = (event: MouseEventHandlerTouchEvent) => void;
