@@ -204,11 +204,11 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ]);
 	 *
 	 * chart.subscribeCrosshairMove(param => {
-	 *     console.log(param.hoveredMarkerId);
+	 *     console.log(param.hoveredObjectId);
 	 * });
 	 *
 	 * chart.subscribeClick(param => {
-	 *     console.log(param.hoveredMarkerId);
+	 *     console.log(param.hoveredObjectId);
 	 * });
 	 * ```
 	 */
