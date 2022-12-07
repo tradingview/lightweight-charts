@@ -185,6 +185,16 @@ chart.subscribeCrosshairMove(param => {
 });
 ```
 
-## `MouseEventParams` field `hoveredMarkerId` was renamed to `hoveredObjectId` and now will include
+## `MouseEventParams` field `hoveredMarkerId` was renamed to `hoveredObjectId`
 
-the `id` of the price line that was clicked, if any.
+Since v4 you have to use `hoveredObjectId` instead of `hoveredMarkerId`.
+
+```js
+chart.subscribeCrosshairMove(param => {
+    console.log(param.hoveredObjectId);
+});
+
+chart.subscribeClick(param => {
+    console.log(param.hoveredObjectId);
+});
+```
