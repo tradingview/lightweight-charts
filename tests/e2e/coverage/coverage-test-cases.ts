@@ -8,6 +8,7 @@ import { describe, it } from 'mocha';
 import puppeteer, {
 	Browser,
 	HTTPResponse,
+	JSCoverageEntry,
 	launch as launchPuppeteer,
 	Page,
 } from 'puppeteer';
@@ -76,7 +77,7 @@ function generateAndSaveCoverageFile(coveredJs: string): void {
 	}
 }
 
-async function getCoverageResult(page: Page): Promise<puppeteer.JSCoverageEntry | null> {
+async function getCoverageResult(page: Page): Promise<JSCoverageEntry | null> {
 	const coverageEntries = await page.coverage.stopJSCoverage();
 	const getFileNameFromUrl = (url: string): string => url.split('/').at(-1) ?? '';
 
@@ -87,7 +88,7 @@ async function getCoverageResult(page: Page): Promise<puppeteer.JSCoverageEntry 
 	return null;
 }
 
-type CoverageTestResults = Record<string, puppeteer.JSCoverageEntry>;
+type CoverageTestResults = Record<string, JSCoverageEntry>;
 interface Range {
 	start: number;
 	end: number;
