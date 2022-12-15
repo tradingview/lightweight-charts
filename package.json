@@ -40,7 +40,7 @@
     "@size-limit/file": "~8.1.0",
     "@types/chai": "~4.3.4",
     "@types/mocha": "~10.0.1",
-    "@types/node": "18.11.9",
+    "@types/node": "~16.18.9",
     "@types/pixelmatch": "~5.2.4",
     "@types/pngjs": "~6.0.1",
     "@typescript-eslint/eslint-plugin": "~5.46.1",
