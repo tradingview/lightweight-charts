@@ -99,6 +99,9 @@ export class BoxRenderer implements IPaneRenderer {
 			ctx.strokeStyle = this._data.borderColor;
 			ctx.lineWidth = this._data.borderWidth;
 			setLineStyle(ctx, this._data.borderStyle);
+		} else { // border will default to a thin black line without the following
+			ctx.lineWidth = 0.00001;
+			ctx.strokeStyle = this._hexToRgba(this._data.fillColor, this._data.fillOpacity);
 		}
 
 		ctx.stroke();
