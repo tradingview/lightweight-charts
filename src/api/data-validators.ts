@@ -5,7 +5,7 @@ import { SeriesMarker } from '../model/series-markers';
 import { SeriesType } from '../model/series-options';
 import { Time } from '../model/time-data';
 
-import { isFulfilledData, OhlcData, SeriesDataItemTypeMap, SingleValueData } from './data-consumer';
+import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 
 export function checkPriceLineOptions(options: CreatePriceLineOptions): void {
@@ -59,41 +59,57 @@ function getChecker(type: SeriesType): Checker {
 	}
 }
 
-function checkBarItem(type: 'Bar' | 'Candlestick', barItem: SeriesDataItemTypeMap[typeof type]): void {
+function checkBarItem(
+	type: 'Bar' | 'Candlestick',
+	barItem: SeriesDataItemTypeMap[typeof type]
+): void {
 	if (!isFulfilledData(barItem)) {
 		return;
 	}
 
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof (barItem as OhlcData).open === 'number',
-		`${type} series item data value of open must be a number, got=${typeof (barItem as OhlcData).open}, value=${(barItem as OhlcData).open}`
+		typeof barItem.open === 'number',
+		`${type} series item data value of open must be a number, got=${typeof barItem.open}, value=${
+			barItem.open
+		}`
 	);
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof (barItem as OhlcData).high === 'number',
-		`${type} series item data value of high must be a number, got=${typeof (barItem as OhlcData).high}, value=${(barItem as OhlcData).high}`
+		typeof barItem.high === 'number',
+		`${type} series item data value of high must be a number, got=${typeof barItem.high}, value=${
+			barItem.high
+		}`
 	);
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof (barItem as OhlcData).low === 'number',
-		`${type} series item data value of low must be a number, got=${typeof (barItem as OhlcData).low}, value=${(barItem as OhlcData).low}`
+		typeof barItem.low === 'number',
+		`${type} series item data value of low must be a number, got=${typeof barItem.low}, value=${
+			barItem.low
+		}`
 	);
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof (barItem as OhlcData).close === 'number',
-		`${type} series item data value of close must be a number, got=${typeof (barItem as OhlcData).close}, value=${(barItem as OhlcData).close}`
+		typeof barItem.close === 'number',
+		`${type} series item data value of close must be a number, got=${typeof barItem.close}, value=${
+			barItem.close
+		}`
 	);
 }
 
-function checkLineItem(type: 'Area' | 'Baseline' | 'Line' | 'Histogram', lineItem: SeriesDataItemTypeMap[typeof type]): void {
+function checkLineItem(
+	type: 'Area' | 'Baseline' | 'Line' | 'Histogram',
+	lineItem: SeriesDataItemTypeMap[typeof type]
+): void {
 	if (!isFulfilledData(lineItem)) {
 		return;
 	}
 
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof (lineItem as SingleValueData).value === 'number',
-		`${type} series item data value must be a number, got=${typeof (lineItem as SingleValueData).value}, value=${(lineItem as SingleValueData).value}`
+		typeof lineItem.value === 'number',
+		`${type} series item data value must be a number, got=${typeof lineItem.value}, value=${
+			lineItem.value
+		}`
 	);
 }
