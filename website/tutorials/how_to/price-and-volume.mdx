@@ -8,6 +8,18 @@ keywords:
   - example
 ---
 
+import VersionWarningAdmonition from "@site/src/components/VersionWarningAdmonition";
+
+<!-- Show warning when not on the latest published version  -->
+<!-- Tutorials section isn't versioned yet, hence the need for the warning message -->
+<!-- THESE TUTORIALS NEED TO BE UPDATED FOR VERSION 4 -->
+
+<VersionWarningAdmonition
+	notCurrent="This example is for the latest published version of Lightweight&nbsp;Charts."
+	type="caution"
+	displayVersionMessage
+/>
+
 This example shows how to include a volume study on your chart.
 
 ## How to add a volume histogram
