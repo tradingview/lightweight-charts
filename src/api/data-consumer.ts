@@ -196,8 +196,13 @@ export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data 
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
 
-export function isFulfilledData(data: SeriesDataItemTypeMap[SeriesType]): data is (BarData | LineData | HistogramData) {
-	return (data as Partial<BarData>).open !== undefined || (data as Partial<LineData>).value !== undefined;
+export function isFulfilledData<T extends SeriesDataItemTypeMap[SeriesType]>(
+	data: T
+): data is Extract<T, BarData | LineData | HistogramData> {
+	return (
+		(data as Partial<BarData>).open !== undefined ||
+		(data as Partial<LineData>).value !== undefined
+	);
 }
 
 /**

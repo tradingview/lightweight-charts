@@ -45,6 +45,7 @@ function generateDataHist() {
 
 // Ignore the mouse movement check because we are covering the chart.
 window.ignoreMouseMove = true;
+window.checkChartScreenshot = true;
 
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, {
@@ -95,14 +96,10 @@ function runTestCase(container) {
 
 	histSeries.setData(generateDataHist());
 
-	// create canvas to draw screenshot
+	// free up some space to draw screenshot
 	chart.resize(600, 240, true);
 
-	const screenshot = chart.takeScreenshot();
-	screenshot.style.position = 'absolute';
-	screenshot.style.top = '260px';
-
+	// change background color
 	const parent = container.parentNode;
 	parent.style.backgroundColor = 'yellow';
-	parent.appendChild(screenshot);
 }

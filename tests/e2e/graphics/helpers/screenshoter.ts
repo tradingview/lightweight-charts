@@ -114,7 +114,49 @@ export class Screenshoter {
 				throw new Error(errors.join('\n'));
 			}
 
-			return PNG.sync.read(await page.screenshot({ encoding: 'binary' }) as Buffer);
+			const pageScreenshotPNG = PNG.sync.read(await page.screenshot({ encoding: 'binary' }) as Buffer);
+			const additionalScreenshotDataURL = await page.evaluate(() => {
+				const testCaseWindow = window as unknown as TestCaseWindow;
+				if (!testCaseWindow.checkChartScreenshot) {
+					return Promise.resolve(null);
+				}
+
+				const chart = testCaseWindow.chart;
+				if (chart === undefined) {
+					return Promise.resolve(null);
+				}
+
+				return chart.takeScreenshot().toDataURL();
+			});
+
+			if (additionalScreenshotDataURL !== null) {
+				const additionalScreenshotBuffer = Buffer.from(additionalScreenshotDataURL.split(',')[1], 'base64');
+				const additionalScreenshotPNG = new PNG();
+				await new Promise((resolve: (data: PNG) => void, reject: (reason: Error) => void) => {
+					additionalScreenshotPNG.parse(additionalScreenshotBuffer, (error: Error, data: PNG) => {
+						// eslint-disable-next-line @typescript-eslint/tslint/config
+						if (error === null) {
+							resolve(data);
+						} else {
+							reject(error);
+						}
+					});
+				});
+
+				const additionalScreenshotPadding = 20;
+				additionalScreenshotPNG.bitblt(
+					pageScreenshotPNG,
+					0,
+					0,
+					// additionalScreenshotPNG could be cropped
+					Math.min(pageScreenshotPNG.width, additionalScreenshotPNG.width),
+					additionalScreenshotPNG.height,
+					0,
+					// additional screenshot height should be equal to HTML element height on page screenshot
+					additionalScreenshotPadding + additionalScreenshotPNG.height
+				);
+			}
+			return pageScreenshotPNG;
 		} finally {
 			if (page !== undefined) {
 				await page.close();

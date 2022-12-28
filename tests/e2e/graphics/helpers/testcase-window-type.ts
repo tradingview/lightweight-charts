@@ -4,4 +4,5 @@ export interface TestCaseWindow extends Window {
 	testCaseReady: void | Promise<void>;
 	chart?: IChartApi;
 	ignoreMouseMove?: boolean;
+	checkChartScreenshot?: boolean;
 }

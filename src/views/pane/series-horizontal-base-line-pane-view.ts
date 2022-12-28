@@ -9,7 +9,7 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 		super(series);
 	}
 
-	protected _updateImpl(height: number, width: number): void {
+	protected _updateImpl(): void {
 		this._lineRendererData.visible = false;
 
 		const priceScale = this._series.priceScale();
@@ -31,8 +31,6 @@ export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneVi
 
 		this._lineRendererData.visible = true;
 		this._lineRendererData.y = priceScale.priceToCoordinate(firstValue.value, firstValue.value);
-		this._lineRendererData.width = width;
-		this._lineRendererData.height = height;
 		this._lineRendererData.color = seriesOptions.baseLineColor;
 		this._lineRendererData.lineWidth = seriesOptions.baseLineWidth;
 		this._lineRendererData.lineStyle = seriesOptions.baseLineStyle;

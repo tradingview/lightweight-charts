@@ -35,12 +35,12 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		}
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}
 
-		this._makeValid(width, height);
+		this._makeValid();
 
 		return this._itemsVisibleRange === null ? null : this._renderer;
 	}
@@ -60,9 +60,9 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		this._itemsVisibleRange = null;
 	}
 
-	protected abstract _prepareRendererData(width: number, height: number): void;
+	protected abstract _prepareRendererData(): void;
 
-	private _makeValid(width: number, height: number): void {
+	private _makeValid(): void {
 		if (this._dataInvalidated) {
 			this._fillRawPoints();
 			this._dataInvalidated = false;
@@ -74,12 +74,12 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		}
 
 		if (this._invalidated) {
-			this._makeValidImpl(width, height);
+			this._makeValidImpl();
 			this._invalidated = false;
 		}
 	}
 
-	private _makeValidImpl(width: number, height: number): void {
+	private _makeValidImpl(): void {
 		const priceScale = this._series.priceScale();
 		const timeScale = this._model.timeScale();
 
@@ -106,6 +106,6 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		this._itemsVisibleRange = visibleTimedValues(this._items, visibleBars, this._extendedVisibleRange);
 		this._convertToCoordinates(priceScale, timeScale, firstValue.value);
 
-		this._prepareRendererData(width, height);
+		this._prepareRendererData();
 	}
 }

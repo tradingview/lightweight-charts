@@ -59,16 +59,16 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 		this._invalidated = true;
 	}
 
-	public renderer(height: number, width: number, addAnchors?: boolean): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (this._invalidated) {
-			this._updateImpl(height);
+			this._updateImpl();
 			this._invalidated = false;
 		}
 
 		return this._compositeRenderer;
 	}
 
-	private _updateImpl(height: number): void {
+	private _updateImpl(): void {
 		const serieses = this._chartModel.serieses();
 		const timePointIndex = this._crosshair.appliedIndex();
 		const timeScale = this._chartModel.timeScale();
@@ -88,7 +88,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 			data.lineWidth = seriesData.borderWidth;
 			data.items[0].price = seriesData.price;
 			data.items[0].y = s.priceScale().priceToCoordinate(seriesData.price, firstValue.value);
-			data.backColor = seriesData.borderColor ?? this._chartModel.backgroundColorAtYPercentFromTop(data.items[0].y / height);
+			data.backColor = seriesData.borderColor ?? this._chartModel.backgroundColorAtYPercentFromTop(data.items[0].y / s.priceScale().height());
 			data.items[0].time = timePointIndex;
 			data.items[0].x = timeScale.indexToCoordinate(timePointIndex);
 			data.visibleRange = rangeForSinglePoint;

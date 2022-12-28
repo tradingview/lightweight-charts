@@ -1,3 +1,5 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { LineStrokeColorerStyle } from '../model/series-bar-colorer';
 
 import { LineItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer-base';
@@ -7,7 +9,7 @@ export interface PaneRendererLineData extends PaneRendererLineDataBase<LineStrok
 }
 
 export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData> {
-	protected override _strokeStyle(ctx: CanvasRenderingContext2D, item: LineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
+	protected override _strokeStyle(renderingScope: MediaCoordinatesRenderingScope, item: LineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
 		return item.lineColor;
 	}
 }

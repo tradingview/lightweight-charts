@@ -13,8 +13,6 @@ export class WatermarkPaneView implements IUpdatablePaneView {
 	private readonly _rendererData: WatermarkRendererData = {
 		visible: false,
 		color: '',
-		height: 0,
-		width: 0,
 		lines: [],
 		vertAlign: 'center',
 		horzAlign: 'center',
@@ -29,16 +27,16 @@ export class WatermarkPaneView implements IUpdatablePaneView {
 		this._invalidated = true;
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer {
+	public renderer(): IPaneRenderer {
 		if (this._invalidated) {
-			this._updateImpl(height, width);
+			this._updateImpl();
 			this._invalidated = false;
 		}
 
 		return this._renderer;
 	}
 
-	private _updateImpl(height: number, width: number): void {
+	private _updateImpl(): void {
 		const options = this._source.options();
 		const data = this._rendererData;
 		data.visible = options.visible;
@@ -48,8 +46,6 @@ export class WatermarkPaneView implements IUpdatablePaneView {
 		}
 
 		data.color = options.color;
-		data.width = width;
-		data.height = height;
 		data.horzAlign = options.horzAlign;
 		data.vertAlign = options.vertAlign;
 

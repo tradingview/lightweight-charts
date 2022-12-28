@@ -1,4 +1,6 @@
-import { drawRoundRectWithInnerBorder, drawScaled } from '../helpers/canvas-helpers';
+import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D, MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
+import { drawRoundRectWithInnerBorder } from '../helpers/canvas-helpers';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
@@ -11,20 +13,30 @@ import {
 
 interface Geometry {
 	alignRight: boolean;
-	yTop: number;
-	yMid: number;
-	yBottom: number;
-	totalWidthScaled: number;
-	totalHeightScaled: number;
-	radius: number;
-	horzBorderScaled: number;
-	xOutside: number;
-	xInside: number;
-	xTick: number;
-	xText: number;
-	tickHeight: number;
-	rightScaled: number;
-	textMidCorrection: number;
+
+	// bitmap coordinate space geometry
+	bitmap: {
+		yTop: number;
+		yMid: number;
+		yBottom: number;
+		totalWidth: number;
+		totalHeight: number;
+		radius: number;
+		horzBorder: number;
+		xOutside: number;
+		xInside: number;
+		xTick: number;
+		tickHeight: number;
+		right: number;
+	};
+
+	// media coordinate space geometry
+	media: {
+		yTop: number;
+		yBottom: number;
+		xText: number;
+		textMidCorrection: number;
+	};
 }
 
 export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
@@ -40,50 +52,56 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		this._commonData = commonData;
 	}
 
+	public height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number {
+		if (!this._data.visible) {
+			return 0;
+		}
+
+		return rendererOptions.fontSize + rendererOptions.paddingTop + rendererOptions.paddingBottom;
+	}
+
 	public draw(
-		ctx: CanvasRenderingContext2D,
+		target: CanvasRenderingTarget2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		width: number,
-		align: 'left' | 'right',
-		pixelRatio: number
+		align: 'left' | 'right'
 	): void {
-		if (!this._data.visible) {
+		if (!this._data.visible || this._data.text.length === 0) {
 			return;
 		}
-		ctx.font = rendererOptions.font;
-
-		const geometry = this._calculateGeometry(ctx, rendererOptions, textWidthCache, width, align, pixelRatio);
 
 		const textColor = this._data.color || this._commonData.color;
-		const backgroundColor = (this._commonData.background);
+		const backgroundColor = this._commonData.background;
 
-		ctx.fillStyle = this._commonData.background;
+		const geometry = target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
+			const ctx = scope.context;
+			ctx.font = rendererOptions.font;
+			const geom = this._calculateGeometry(scope, rendererOptions, textWidthCache, align);
+			const gb = geom.bitmap;
 
-		if (this._data.text) {
 			const drawLabelBody = (labelBackgroundColor: string, labelBorderColor?: string): void => {
-				if (geometry.alignRight) {
+				if (geom.alignRight) {
 					drawRoundRectWithInnerBorder(
 						ctx,
-						geometry.xOutside,
-						geometry.yTop,
-						geometry.totalWidthScaled,
-						geometry.totalHeightScaled,
+						gb.xOutside,
+						gb.yTop,
+						gb.totalWidth,
+						gb.totalHeight,
 						labelBackgroundColor,
-						geometry.horzBorderScaled,
-						[geometry.radius, 0, 0, geometry.radius],
+						gb.horzBorder,
+						[gb.radius, 0, 0, gb.radius],
 						labelBorderColor
 					);
 				} else {
 					drawRoundRectWithInnerBorder(
 						ctx,
-						geometry.xInside,
-						geometry.yTop,
-						geometry.totalWidthScaled,
-						geometry.totalHeightScaled,
+						gb.xInside,
+						gb.yTop,
+						gb.totalWidth,
+						gb.totalHeight,
 						labelBackgroundColor,
-						geometry.horzBorderScaled,
-						[0, geometry.radius, geometry.radius, 0],
+						gb.horzBorder,
+						[0, gb.radius, gb.radius, 0],
 						labelBorderColor
 					);
 				}
@@ -95,7 +113,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			// draw tick
 			if (this._data.tickVisible) {
 				ctx.fillStyle = textColor;
-				ctx.fillRect(geometry.xInside, geometry.yMid, geometry.xTick - geometry.xInside, geometry.tickHeight);
+				ctx.fillRect(gb.xInside, gb.yMid, gb.xTick - gb.xInside, gb.tickHeight);
 			}
 			// draw label border above the tick
 			drawLabelBody('transparent', backgroundColor);
@@ -103,85 +121,73 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			// draw separator
 			if (this._data.borderVisible) {
 				ctx.fillStyle = rendererOptions.paneBackgroundColor;
-				ctx.fillRect(geometry.alignRight ? geometry.rightScaled - geometry.horzBorderScaled : 0, geometry.yTop, geometry.horzBorderScaled, geometry.yBottom - geometry.yTop);
+				ctx.fillRect(
+					geom.alignRight ? gb.right - gb.horzBorder : 0,
+					gb.yTop,
+					gb.horzBorder,
+					gb.yBottom - gb.yTop
+				);
 			}
 
-			ctx.save();
-			ctx.translate(geometry.xText, (geometry.yTop + geometry.yBottom) / 2 + geometry.textMidCorrection);
-			drawScaled(ctx, pixelRatio, () => {
-				ctx.fillStyle = textColor;
-				ctx.fillText(this._data.text, 0, 0);
-			});
-			ctx.restore();
-		}
-	}
+			return geom;
+		});
 
-	public height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number {
-		if (!this._data.visible) {
-			return 0;
-		}
-
-		return rendererOptions.fontSize + rendererOptions.paddingTop + rendererOptions.paddingBottom;
+		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
+			const gm = geometry.media;
+			ctx.font = rendererOptions.font;
+			ctx.textAlign = geometry.alignRight ? 'right' : 'left';
+			ctx.textBaseline = 'middle';
+			ctx.fillStyle = textColor;
+			ctx.fillText(this._data.text, gm.xText, (gm.yTop + gm.yBottom) / 2 + gm.textMidCorrection);
+		});
 	}
 
 	private _calculateGeometry(
-		ctx: CanvasRenderingContext2D,
+		scope: BitmapCoordinatesRenderingScope,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		width: number,
-		align: 'left' | 'right',
-		pixelRatio: number
+		align: 'left' | 'right'
 	): Geometry {
+		const { context: ctx, bitmapSize, mediaSize, horizontalPixelRatio, verticalPixelRatio } = scope;
 		const tickSize = (this._data.tickVisible || !this._data.moveTextToInvisibleTick) ? rendererOptions.tickLength : 0;
-		const horzBorder = rendererOptions.borderSize;
+		const horzBorder = this._data.separatorVisible ? rendererOptions.borderSize : 0;
 		const paddingTop = rendererOptions.paddingTop + this._commonData.additionalPaddingTop;
 		const paddingBottom = rendererOptions.paddingBottom + this._commonData.additionalPaddingBottom;
 		const paddingInner = rendererOptions.paddingInner;
 		const paddingOuter = rendererOptions.paddingOuter;
 		const text = this._data.text;
 		const actualTextHeight = rendererOptions.fontSize;
-		const textMidCorrection = textWidthCache.yMidCorrection(ctx, text) * pixelRatio;
+		const textMidCorrection = textWidthCache.yMidCorrection(ctx, text);
 
 		const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
 
 		const totalHeight = actualTextHeight + paddingTop + paddingBottom;
 
-		const totalWidth = horzBorder + paddingInner + paddingOuter + textWidth + tickSize;
+		const totalWidth = rendererOptions.borderSize + paddingInner + paddingOuter + textWidth + tickSize;
 
-		const tickHeight = Math.max(1, Math.floor(pixelRatio));
-		let totalHeightScaled = Math.round(totalHeight * pixelRatio);
-		if (totalHeightScaled % 2 !== tickHeight % 2) {
-			totalHeightScaled += 1;
+		const tickHeightBitmap = Math.max(1, Math.floor(verticalPixelRatio));
+		let totalHeightBitmap = Math.round(totalHeight * verticalPixelRatio);
+		if (totalHeightBitmap % 2 !== tickHeightBitmap % 2) {
+			totalHeightBitmap += 1;
 		}
-		const horzBorderScaled = this._data.separatorVisible ? Math.max(1, Math.floor(horzBorder * pixelRatio)) : 0;
-		const totalWidthScaled = Math.round(totalWidth * pixelRatio);
+		const horzBorderBitmap = horzBorder > 0 ? Math.max(1, Math.floor(horzBorder * horizontalPixelRatio)) : 0;
+		const totalWidthBitmap = Math.round(totalWidth * horizontalPixelRatio);
 		// tick overlaps scale border
-		const tickSizeScaled = Math.round(tickSize * pixelRatio);
-		const widthScaled = Math.ceil(width * pixelRatio);
-		const paddingInnerScaled = Math.ceil(paddingInner * pixelRatio);
+		const tickSizeBitmap = Math.round(tickSize * horizontalPixelRatio);
 
-		let yMid = this._commonData.coordinate;
-		if (this._commonData.fixedCoordinate) {
-			yMid = this._commonData.fixedCoordinate;
-		}
-
-		yMid = Math.round(yMid * pixelRatio) - Math.floor(pixelRatio * 0.5);
-		const yTop = Math.floor(yMid + tickHeight / 2 - totalHeightScaled / 2);
-		const yBottom = yTop + totalHeightScaled;
+		const yMid = this._commonData.fixedCoordinate ?? this._commonData.coordinate;
+		const yMidBitmap = Math.round(yMid * verticalPixelRatio) - Math.floor(verticalPixelRatio * 0.5);
+		const yTopBitmap = Math.floor(yMidBitmap + tickHeightBitmap / 2 - totalHeightBitmap / 2);
+		const yBottomBitmap = yTopBitmap + totalHeightBitmap;
 
 		const alignRight = align === 'right';
 
-		const xInside = alignRight ? widthScaled - horzBorderScaled : horzBorderScaled;
-		const rightScaled = widthScaled;
+		const xInside = alignRight ? mediaSize.width - horzBorder : horzBorder;
+		const xInsideBitmap = alignRight ? bitmapSize.width - horzBorderBitmap : horzBorderBitmap;
 
-		let xOutside = xInside;
-		let xTick: number;
+		let xOutsideBitmap: number;
+		let xTickBitmap: number;
 		let xText: number;
-
-		const radius = 2 * pixelRatio;
-
-		ctx.textAlign = alignRight ? 'right' : 'left';
-		ctx.textBaseline = 'middle';
 
 		if (alignRight) {
 			// 2               1
@@ -189,35 +195,43 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			//              6  5
 			//
 			// 3               4
-			xOutside = xInside - totalWidthScaled;
-			xTick = xInside - tickSizeScaled;
-			xText = xInside - tickSizeScaled - paddingInnerScaled - 1;
+			xOutsideBitmap = xInsideBitmap - totalWidthBitmap;
+			xTickBitmap = xInsideBitmap - tickSizeBitmap;
+			xText = xInside - tickSize - paddingInner - horzBorder;
 		} else {
 			// 1               2
 			//
 			// 6  5
 			//
 			// 4               3
-			xOutside = xInside + totalWidthScaled;
-			xTick = xInside + tickSizeScaled;
-			xText = xInside + tickSizeScaled + paddingInnerScaled;
+			xOutsideBitmap = xInsideBitmap + totalWidthBitmap;
+			xTickBitmap = xInsideBitmap + tickSizeBitmap;
+			xText = xInside + tickSize + paddingInner;
 		}
+
 		return {
 			alignRight,
-			yTop,
-			yMid,
-			yBottom,
-			totalWidthScaled,
-			totalHeightScaled,
-			radius,
-			horzBorderScaled,
-			xOutside,
-			xInside,
-			xTick,
-			xText,
-			tickHeight,
-			rightScaled,
-			textMidCorrection,
+			bitmap: {
+				yTop: yTopBitmap,
+				yMid: yMidBitmap,
+				yBottom: yBottomBitmap,
+				totalWidth: totalWidthBitmap,
+				totalHeight: totalHeightBitmap,
+				// TODO: it is better to have different horizontal and vertical radii
+				radius: 2 * horizontalPixelRatio,
+				horzBorder: horzBorderBitmap,
+				xOutside: xOutsideBitmap,
+				xInside: xInsideBitmap,
+				xTick: xTickBitmap,
+				tickHeight: tickHeightBitmap,
+				right: bitmapSize.width,
+			},
+			media: {
+				yTop: yTopBitmap / verticalPixelRatio,
+				yBottom: yBottomBitmap / verticalPixelRatio,
+				xText,
+				textMidCorrection,
+			},
 		};
 	}
 }
