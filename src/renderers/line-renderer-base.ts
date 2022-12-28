@@ -1,8 +1,10 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { ScaledRenderer } from './scaled-renderer';
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 import { walkLine } from './walk-line';
 
 export type LineItemBase = TimedValue & PricedValue & LinePoint;
@@ -25,14 +27,14 @@ function finishStyledArea(ctx: CanvasRenderingContext2D, style: CanvasRenderingC
 	ctx.stroke();
 }
 
-export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBase> extends ScaledRenderer {
+export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBase> extends MediaCoordinatesPaneRenderer {
 	protected _data: TData | null = null;
 
 	public setData(data: TData): void {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(renderingScope: MediaCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
@@ -43,6 +45,8 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 			return;
 		}
 
+		const ctx = renderingScope.context;
+
 		ctx.lineCap = 'butt';
 		ctx.lineWidth = lineWidth;
 
@@ -50,8 +54,8 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 
 		ctx.lineJoin = 'round';
 
-		walkLine(ctx, items, lineType, visibleRange, barWidth, this._strokeStyle.bind(this), finishStyledArea);
+		walkLine(renderingScope, items, lineType, visibleRange, barWidth, this._strokeStyle.bind(this), finishStyledArea);
 	}
 
-	protected abstract _strokeStyle(ctx: CanvasRenderingContext2D, item: TData['items'][0]): CanvasRenderingContext2D['strokeStyle'];
+	protected abstract _strokeStyle(renderingScope: MediaCoordinatesRenderingScope, item: TData['items'][0]): CanvasRenderingContext2D['strokeStyle'];
 }

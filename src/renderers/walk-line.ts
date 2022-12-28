@@ -1,3 +1,5 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Coordinate } from '../model/coordinate';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
@@ -5,22 +7,24 @@ import { LinePoint, LineType } from './draw-line';
 
 // eslint-disable-next-line max-params, complexity
 export function walkLine<TItem extends LinePoint, TStyle>(
-	ctx: CanvasRenderingContext2D,
+	renderingScope: MediaCoordinatesRenderingScope,
 	items: readonly TItem[],
 	lineType: LineType,
 	visibleRange: SeriesItemsIndexesRange,
 	barWidth: number,
 	// the values returned by styleGetter are compared using the operator !==,
 	// so if styleGetter returns objects, then styleGetter should return the same object for equal styles
-	styleGetter: (ctx: CanvasRenderingContext2D, item: TItem) => TStyle,
+	styleGetter: (renderingScope: MediaCoordinatesRenderingScope, item: TItem) => TStyle,
 	finishStyledArea: (ctx: CanvasRenderingContext2D, style: TStyle, areaFirstItem: LinePoint, newAreaFirstItem: LinePoint) => void
 ): void {
 	if (items.length === 0 || visibleRange.from >= items.length) {
 		return;
 	}
 
+	const ctx = renderingScope.context;
+
 	const firstItem = items[visibleRange.from];
-	let currentStyle = styleGetter(ctx, firstItem);
+	let currentStyle = styleGetter(renderingScope, firstItem);
 	let currentStyleFirstItem = firstItem;
 
 	if (visibleRange.to - visibleRange.from < 2) {
@@ -54,7 +58,7 @@ export function walkLine<TItem extends LinePoint, TStyle>(
 
 	for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
 		currentItem = items[i];
-		const itemStyle = styleGetter(ctx, currentItem);
+		const itemStyle = styleGetter(renderingScope, currentItem);
 
 		switch (lineType) {
 			case LineType.Simple:

@@ -32,7 +32,7 @@
     "node": ">=16.16.0"
   },
   "dependencies": {
-    "fancy-canvas": "0.2.2"
+    "fancy-canvas": "2.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "~15.0.1",
