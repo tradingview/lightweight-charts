@@ -85,14 +85,12 @@ describe('Memleaks tests', function(): void {
 
 	let browser: Browser;
 
-	before(async () => {
+	before(async function(): Promise<void> {
+		this.timeout(40000); // puppeteer may take a while to launch for the first time.
 		expect(testStandalonePath, `path to test standalone module must be passed via ${testStandalonePathEnvKey} env var`)
-			.to.have.length.greaterThan(0);
-
-		// note that we cannot use launchPuppeteer here as soon it wrong typing in puppeteer
-		// see https://github.com/puppeteer/puppeteer/issues/7529
-		const browserPromise = puppeteer.launch(puppeteerOptions);
-		browser = await browserPromise;
+		.to.have.length.greaterThan(0);
+		browser = await puppeteer.launch(puppeteerOptions);
+		return Promise.resolve();
 	});
 
 	const testCases = getTestCases();
