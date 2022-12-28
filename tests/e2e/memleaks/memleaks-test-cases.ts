@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import puppeteer, { Browser, HTTPResponse, JSHandle, launch as launchPuppeteer, Page } from 'puppeteer';
+import puppeteer, { type Browser, type HTTPResponse, type JSHandle, type Page, type PuppeteerLaunchOptions } from 'puppeteer';
 
 import { getTestCases } from './helpers/get-test-cases';
 
@@ -45,7 +45,14 @@ function promisleep(ms: number): Promise<void> {
 async function requestGarbageCollection(page: Page): Promise<void> {
 	const client = await page.target().createCDPSession();
 	await client.send('HeapProfiler.enable');
-	return client.send('HeapProfiler.collectGarbage');
+	await client.send('HeapProfiler.collectGarbage');
+	await client.send('HeapProfiler.disable');
+	return page.evaluate(() => {
+		// exposed when '--js-flags="expose-gc"' argument is used with chrome
+		if (window.gc) {
+			window.gc();
+		}
+	});
 }
 
 // Poll the references count on the page until the condition
@@ -55,7 +62,8 @@ async function pollReferencesCount(
 	prototype: JSHandle,
 	condition: (currentCount: number) => boolean,
 	timeout: number,
-	actionName?: string
+	actionName?: string,
+	tryCallGarbageCollection?: boolean
 ): Promise<number> {
 	const start = performance.now();
 	let referencesCount = 0;
@@ -69,6 +77,9 @@ async function pollReferencesCount(
 		done = condition(referencesCount);
 		if (!done) {
 			await promisleep(50);
+			if (tryCallGarbageCollection) {
+				await requestGarbageCollection(page);
+			}
 		}
 	} while (!done);
 	return referencesCount;
@@ -78,9 +89,10 @@ describe('Memleaks tests', function(): void {
 	// this tests are unstable sometimes.
 	this.retries(5);
 
-	const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {};
+	const puppeteerOptions: PuppeteerLaunchOptions = {};
+	puppeteerOptions.args = ['--js-flags="expose-gc"'];
 	if (process.env.NO_SANDBOX) {
-		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
+		puppeteerOptions.args.push('--no-sandbox', '--disable-setuid-sandbox');
 	}
 
 	let browser: Browser;
@@ -165,8 +177,9 @@ describe('Memleaks tests', function(): void {
 				page,
 				prototype,
 				(count: number) => count <= referencesCountBefore,
-				5000,
-				'Garbage Collection'
+				10000,
+				'Garbage Collection',
+				true
 			);
 
 			expect(referencesCountAfter).to.be.equal(referencesCountBefore, 'There should not be extra references after removing a chart');
