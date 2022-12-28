@@ -1,9 +1,11 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Coordinate } from '../model/coordinate';
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { ScaledRenderer } from './scaled-renderer';
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 import { walkLine } from './walk-line';
 
 export type AreaFillItemBase = TimedValue & PricedValue & LinePoint;
@@ -13,8 +15,8 @@ export interface PaneRendererAreaDataBase<TItem extends AreaFillItemBase = AreaF
 	lineWidth: LineWidth;
 	lineStyle: LineStyle;
 
-	bottom: Coordinate;
-	baseLevelCoordinate: Coordinate;
+	baseLevelCoordinate: Coordinate | null;
+	invertFilledArea: boolean;
 
 	barWidth: number;
 
@@ -35,23 +37,28 @@ function finishStyledArea(
 	ctx.fill();
 }
 
-export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBase> extends ScaledRenderer {
+export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBase> extends MediaCoordinatesPaneRenderer {
 	protected _data: TData | null = null;
 
 	public setData(data: TData): void {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl(renderingScope: MediaCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
 
-		const { items, visibleRange, barWidth, lineWidth, lineStyle, lineType, baseLevelCoordinate } = this._data;
+		const { items, visibleRange, barWidth, lineWidth, lineStyle, lineType } = this._data;
+		const baseLevelCoordinate =
+			this._data.baseLevelCoordinate ??
+				(this._data.invertFilledArea ? 0 : renderingScope.mediaSize.height) as Coordinate;
 
 		if (visibleRange === null) {
 			return;
 		}
+
+		const ctx = renderingScope.context;
 
 		ctx.lineCap = 'butt';
 		ctx.lineJoin = 'round';
@@ -61,8 +68,8 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		// walk lines with width=1 to have more accurate gradient's filling
 		ctx.lineWidth = 1;
 
-		walkLine(ctx, items, lineType, visibleRange, barWidth, this._fillStyle.bind(this), finishStyledArea.bind(null, baseLevelCoordinate));
+		walkLine(renderingScope, items, lineType, visibleRange, barWidth, this._fillStyle.bind(this), finishStyledArea.bind(null, baseLevelCoordinate));
 	}
 
-	protected abstract _fillStyle(ctx: CanvasRenderingContext2D, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];
+	protected abstract _fillStyle(renderingScope: MediaCoordinatesRenderingScope, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];
 }

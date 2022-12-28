@@ -1,3 +1,5 @@
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
+
 import { IPaneRenderer } from './ipane-renderer';
 
 export class CompositeRenderer implements IPaneRenderer {
@@ -7,11 +9,9 @@ export class CompositeRenderer implements IPaneRenderer {
 		this._renderers = renderers;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
 		this._renderers.forEach((r: IPaneRenderer) => {
-			ctx.save();
-			r.draw(ctx, pixelRatio, isHovered, hitTestData);
-			ctx.restore();
+			r.draw(target, isHovered, hitTestData);
 		});
 	}
 }

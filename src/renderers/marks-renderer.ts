@@ -1,7 +1,9 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
 import { LineItemBase } from './line-renderer-base';
-import { ScaledRenderer } from './scaled-renderer';
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 
 export interface MarksRendererData {
 	items: LineItemBase[];
@@ -12,14 +14,14 @@ export interface MarksRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererMarks extends ScaledRenderer {
+export class PaneRendererMarks extends MediaCoordinatesPaneRenderer {
 	protected _data: MarksRendererData | null = null;
 
 	public setData(data: MarksRendererData): void {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl({ context: ctx }: MediaCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}

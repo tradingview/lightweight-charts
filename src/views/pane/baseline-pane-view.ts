@@ -1,6 +1,5 @@
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
-import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
@@ -27,7 +26,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 		};
 	}
 
-	protected _prepareRendererData(width: number, height: number): void {
+	protected _prepareRendererData(): void {
 		const firstValue = this._series.firstValue();
 		if (firstValue === null) {
 			return;
@@ -46,7 +45,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 			lineType: baselineProps.lineType,
 
 			baseLevelCoordinate,
-			bottom: height as Coordinate,
+			invertFilledArea: false,
 
 			visibleRange: this._itemsVisibleRange,
 			barWidth,
@@ -60,7 +59,6 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 			lineType: baselineProps.lineType,
 
 			baseLevelCoordinate,
-			bottom: height as Coordinate,
 
 			visibleRange: this._itemsVisibleRange,
 			barWidth,
