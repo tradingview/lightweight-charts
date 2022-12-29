@@ -3,9 +3,11 @@
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
 		Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
+	--tv-cold-gray-50: #f8f9fd;
 	--tv-cold-gray-100: #f0f3fa;
 	--tv-cold-gray-150: #e0e3eb;
 	--tv-cold-gray-300: #b2b5be;
+	--tv-cold-gray-500: #787b86;
 	--tv-cold-gray-550: #6a6d78;
 	--tv-cold-gray-700: #434651;
 	--tv-cold-gray-750: #363a45;
@@ -86,6 +88,9 @@
 	--hero-chart-padding-left: 46px;
 	--hero-gap: 48px;
 	--chart-right-edge-spacing: var(--container-padding);
+
+	--code-block-scale: 1;
+	--right-code-block-position: -20px;
 }
 
 :root[data-theme='dark'] {
@@ -144,6 +149,7 @@
 		--hero-chart-padding-bottom: 22px;
 		--hero-chart-padding-left: 42px;
 		--chart-right-edge-spacing: var(--container-padding);
+		--right-code-block-position: -10px;
 	}
 }
 
@@ -155,6 +161,8 @@
 		--hero-chart-padding-right: 0px;
 		--hero-chart-padding-bottom: 16px;
 		--hero-chart-padding-left: 32px;
+		--code-block-scale: 0.8;
+		--right-code-block-position: -4px;
 	}
 }
 
@@ -179,6 +187,8 @@
 		--hero-chart-padding-right: 0px;
 		--hero-chart-padding-bottom: 12px;
 		--hero-chart-padding-left: 24px;
+		--code-block-scale: 0.5;
+		--right-code-block-position: -8px;
 	}
 }
 
@@ -187,6 +197,8 @@
 	:root {
 		--hero-content-gap-bottom: 32px;
 		--hero-gap: 48px;
+		--code-block-scale: 0.45;
+		--right-code-block-position: -8px;
 	}
 }
 

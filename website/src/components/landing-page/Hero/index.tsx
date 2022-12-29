@@ -1,10 +1,11 @@
 import React from 'react';
 
+import { type CodeBlockProps } from '../Codeblock';
 import CTAButton, { CTALink } from '../CTAButton';
 import HeroChart from '../HeroChart';
 import styles from './index.module.css';
 
-export default function Hero(props: { ctaLinks: CTALink[] }): JSX.Element {
+export default function Hero(props: { ctaLinks: CTALink[]; codeBlocks?: CodeBlockProps[] }): JSX.Element {
 	return (
 		<section className={styles.HeroContainer}>
 			<main className={styles.HeroMain}>
@@ -20,7 +21,7 @@ export default function Hero(props: { ctaLinks: CTALink[] }): JSX.Element {
 					))}
 				</nav>
 			</main>
-			<HeroChart />
+			<HeroChart codeBlocks={props.codeBlocks ?? []}/>
 		</section>
 	);
 }

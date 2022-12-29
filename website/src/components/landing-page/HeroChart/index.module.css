@@ -7,8 +7,9 @@
 	@supports not (aspect-ratio) {
 		height: 600px;
 	}
-	padding: var(--hero-chart-padding-top) var(--hero-chart-padding-right)
-		var(--hero-chart-padding-bottom) var(--hero-chart-padding-left);
+	margin-left: var(--hero-chart-padding-left);
+	/* padding: var(--hero-chart-padding-top) var(--hero-chart-padding-right)
+		var(--hero-chart-padding-bottom) var(--hero-chart-padding-left); */
 }
 
 /* .HeroChartGlass {
@@ -61,8 +62,8 @@
 	display: none;
 	position: absolute;
 	height: 87px;
-	left: -30px;
-	right: -30px;
+	left: -32px;
+	width: 100vw;
 }
 
 .HeroChartFadeBottom {
@@ -88,7 +89,7 @@
 	background: #000;
 }
 
-@media only screen and (min-device-width: 1279px) and (max-device-width: 1919px) {
+@media (min-width: 1279px) and (max-width: 1919px) {
 	.HeroChartFigure {
 		right: 0px !important;
 	}
