@@ -1,0 +1,113 @@
+.HeroChartSection {
+	position: relative;
+	width: 100%;
+	margin: 0px;
+
+	aspect-ratio: 15 / 9;
+	@supports not (aspect-ratio) {
+		height: 600px;
+	}
+	padding: var(--hero-chart-padding-top) var(--hero-chart-padding-right)
+		var(--hero-chart-padding-bottom) var(--hero-chart-padding-left);
+}
+
+/* .HeroChartGlass {
+	position: absolute;
+	inset: 12px;
+    backdrop-filter: blur(10.3785px);
+    border-radius: 16px;
+    outline-color: rgba(255, 255, 255, 0.05);
+    outline-width: 12px;
+    outline-style: solid;
+} */
+
+.HeroChartGlass {
+	position: absolute;
+	inset: 0px;
+	background: rgba(255, 255, 255, 0.05);
+	backdrop-filter: blur(10.3785px);
+	border-radius: 26px; /* approximate, since we can't use outline here and the size is dynamic  */
+}
+
+.HeroChartGradient {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		54.39deg,
+		rgba(63, 151, 255, 0.7) 28.27%,
+		rgba(198, 176, 248, 0.7) 47.32%,
+		rgba(191, 132, 250, 0.7) 51.53%,
+		rgba(91, 125, 233, 0.7) 61.73%,
+		rgba(41, 98, 255, 0.7) 70.81%
+	);
+	filter: blur(20.7571px);
+	border-radius: 26px;
+}
+
+.HeroChartFigure {
+	position: absolute;
+	background-color: white;
+	inset: 12px;
+	margin: 0px;
+	border-radius: 16px;
+}
+
+:root[data-theme='dark'] .HeroChartFigure {
+	background-color: black;
+}
+
+.HeroChartFadeBottom,
+.HeroChartFadeBottomDeep {
+	display: none;
+	position: absolute;
+	height: 87px;
+	left: -30px;
+	right: -30px;
+}
+
+.HeroChartFadeBottom {
+	bottom: -17px;
+	background: linear-gradient(
+		360deg,
+		#ffffff 46.84%,
+		rgba(255, 255, 255, 0) 100%
+	);
+	transform: matrix(-1, 0, 0, 1, 0, 0);
+}
+
+.HeroChartFadeBottomDeep {
+	bottom: -100px;
+	background: #fff;
+}
+
+:root[data-theme='dark'] .HeroChartFadeBottom {
+	background: linear-gradient(360deg, #000 47.67%, rgba(0, 0, 0, 0) 100%);
+}
+
+:root[data-theme='dark'] .HeroChartFadeBottomDeep {
+	background: #000;
+}
+
+@media only screen and (min-device-width: 1279px) and (max-device-width: 1919px) {
+	.HeroChartFigure {
+		right: 0px !important;
+	}
+	.HeroChartFigure,
+	.HeroChartGradient,
+	.HeroChartGlass {
+		border-top-right-radius: 0px !important;
+		border-bottom-right-radius: 0px !important;
+	}
+}
+
+/* Phone-Vertical */
+@media (max-width: 567px) {
+	.HeroChartSection {
+		height: 355px;
+		aspect-ratio: initial;
+	}
+	.HeroChartFadeBottom,
+	.HeroChartFadeBottomDeep {
+		display: block !important;
+	}
+}

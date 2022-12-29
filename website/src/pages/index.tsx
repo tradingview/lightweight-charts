@@ -1,17 +1,12 @@
-import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import React, { ComponentPropsWithoutRef } from 'react';
-// import { useColorMode } from '@docusaurus/theme-common';
+import React from 'react';
 
+import Cards, { CardLink } from '../components/landing-page/Cards';
+import { CTALink } from '../components/landing-page/CTAButton';
+import Hero from '../components/landing-page/Hero';
 import styles from './index.module.css';
-
-interface CardLink {
-	title: string;
-	link: string;
-	content: string;
-}
+// import { useColorMode } from '@docusaurus/theme-common';
 
 const cardLinks: CardLink[] = [
 	{
@@ -36,6 +31,19 @@ const cardLinks: CardLink[] = [
 	},
 ];
 
+const ctaLinks: CTALink[] = [
+	{
+		title: 'Get started',
+		link: 'docs',
+		primary: true,
+	},
+	{
+		title: 'Explore features',
+		link: 'https://www.tradingview.com/lightweight-charts/',
+		external: true,
+	},
+];
+
 // const { colorMode } = useColorMode();
 // const isDarkTheme = colorMode === 'dark';
 
@@ -48,60 +56,11 @@ function readBundleSize(): unknown {
 	return siteConfig.customFields?.bundleSize;
 }
 
-function Hero(): JSX.Element {
-	return (
-		<section className={styles.HeroContainer}>
-			<div>Here would be the hero... Library is {readBundleSize()}kb.</div>
-		</section>
-	);
-}
-
-function ArrowSVG(): JSX.Element {
-	return (
-		<svg height={28} width={28}>
-			<g clipPath="url(#clip0_1507_70976)">
-				<path
-					d="M11 8L17 14L11 20"
-					stroke="var(--arrow-fill-color, #131722)"
-                    fill="none"
-					strokeWidth="3"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-			</g>
-			<defs>
-				<clipPath id="clip0_1507_70976">
-					<rect width="28" height="28" fill="white" />
-				</clipPath>
-			</defs>
-		</svg>
-	);
-}
-
-function Card(cardData: CardLink): JSX.Element {
-	return (
-		<a href={cardData.link} className={styles.Card}>
-			<div className={styles.CardHeader}>
-				<h2>{cardData.title}</h2>
-				<ArrowSVG />
-			</div>
-			<p>{cardData.content}</p>
-		</a>
-	);
-}
-
-function Cards(): JSX.Element {
-	const cards = cardLinks.map((cardData: CardLink) => (
-		<Card key={cardData.title} {...cardData} />
-	));
-	return <section className={styles.CardsContainer}>{cards}</section>;
-}
-
 function Index(): JSX.Element {
 	return (
 		<div className={styles.RootContainer}>
-			<Hero />
-			<Cards />
+			<Hero ctaLinks={ctaLinks} />
+			<Cards cardLinks={cardLinks} />
 		</div>
 	);
 }
