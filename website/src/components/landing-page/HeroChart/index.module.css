@@ -38,16 +38,17 @@
 
 .HeroChartFigure {
 	position: absolute;
-	background-color: white;
+	background-color: #F5F8FF; /* match this with the values defined for the chart */
 	inset: 12px;
 	margin: 0px;
 	border-radius: 16px;
 	z-index: 0;
 	overflow: hidden;
+	padding-top: 6px; /* So the top tick mark doesn't appear at edge of chart area */
 }
 
 :root[data-theme='dark'] .HeroChartFigure {
-	background-color: black;
+	background-color:#010512;
 }
 
 .HeroChartFadeBottom,

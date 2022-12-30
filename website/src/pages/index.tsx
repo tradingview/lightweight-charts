@@ -145,7 +145,7 @@ const codeBlocks: CodeBlockProps[] = [
 ];
 
 const header = 'Lightweight Charts Documentation';
-const paragraph = `Lightweight Charts is a library for creating interactive financial charts. Take a look at this documentation give you the information you need to start your lightweight journey.`;
+const paragraph = `Lightweight Charts is a library for creating interactive financial charts. This documentation site provides all the information needed to get started with Lightweight Charts and help you make the most of its features.`;
 
 function Index(): JSX.Element {
 	return (

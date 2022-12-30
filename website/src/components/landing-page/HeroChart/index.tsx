@@ -41,9 +41,10 @@ function getVisibleLogicalRange(dataLength: number, addedPoints: number): Range<
 function getLayoutOptionsForTheme(
 	isDarkTheme: boolean
 ): DeepPartial<LayoutOptions> {
+	/* match background colors to those defined in .HeroChartFigure class */
 	return isDarkTheme
-		? { background: { color: '#131722' }, textColor: 'rgba(248, 249, 253, 1)' }
-		: { background: { color: 'rgba(248, 249, 253, 1)' }, textColor: '#000000' };
+		? { background: { color: '#010512' }, textColor: '#D1D1D1' }
+		: { background: { color: '#F5F8FF' }, textColor: '#2E2E2E' };
 }
 
 function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
@@ -106,6 +107,7 @@ function Chart(): JSX.Element {
 				lineColor: '#2962ff',
 				topColor: '#2962ff',
 				bottomColor: 'rgba(41, 98, 255, 0.28)',
+				lineWidth: 2,
 			});
 
 			aS.setData(chartData);
@@ -137,6 +139,18 @@ function Chart(): JSX.Element {
 			const resizeListener = () => {
 				const { width, height } = container.getBoundingClientRect();
 				chart.resize(width, height);
+
+				/**
+				 * Breakpoint of 567px minus 64px
+				 * padding of 24px on left of HeroChartSection
+				 * padding of 20px for HeroContainer (x2)
+				 */
+				const showTimeScale = width > 503;
+				chart.applyOptions({
+					timeScale: {
+						visible: showTimeScale,
+					},
+				});
 
 				// TODO: remove this after releasing the new version (fixed in v4.0.0)
 				// and use lockVisibleTimeRangeOnResize time scale option instead
