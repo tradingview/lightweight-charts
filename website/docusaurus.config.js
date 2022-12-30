@@ -183,6 +183,52 @@ async function getConfig() {
 		projectName: 'lightweight-charts',
 		trailingSlash: false,
 
+		headTags: [
+			{
+				tagName: 'link',
+				attributes: {
+					rel: 'apple-touch-icon',
+					sizes: '180x180',
+					href: `/${projectName}/img/favicon/apple-touch-icon.png`,
+				},
+			},
+			{
+				tagName: 'link',
+				attributes: {
+					rel: 'icon',
+					type: 'image/png',
+					sizes: '32x32',
+					href: `/${projectName}/img/favicon/32x32.png`,
+				},
+			},
+			{
+				tagName: 'link',
+				attributes: {
+					rel: 'icon',
+					type: 'image/png',
+					sizes: '16x16',
+					href: `/${projectName}/img/favicon/16x16.png`,
+				},
+			},
+			{
+				tagName: 'link',
+				attributes: {
+					rel: 'mask-icon',
+					color: '#2962ff',
+					href: `/${projectName}/img/favicon/safari-pinned-tab.svg`,
+				},
+			},
+			{
+				tagName: 'link',
+				attributes: {
+					rel: 'icon',
+					type: 'image/svg',
+					sizes: '32x32',
+					href: `/${projectName}/img/favicon/favicon.svg`,
+				},
+			},
+		],
+
 		presets: [
 			[
 				'@docusaurus/preset-classic',
@@ -308,7 +354,10 @@ async function getConfig() {
 						{
 							// Lightly fades the code lines (useful for boilerplate sections of code)
 							className: 'code-block-fade-line',
-							block: { start: 'highlight-fade-start', end: 'highlight-fade-end' },
+							block: {
+								start: 'highlight-fade-start',
+								end: 'highlight-fade-end',
+							},
 							line: 'highlight-fade',
 						},
 						{
