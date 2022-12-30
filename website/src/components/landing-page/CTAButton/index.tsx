@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './index.module.css';
+import styles from './ctabutton.module.css';
 
 export interface CTALink {
 	title: string;

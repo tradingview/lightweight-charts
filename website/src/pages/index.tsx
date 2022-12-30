@@ -6,7 +6,6 @@ import { type CodeBlockProps } from '../components/landing-page/Codeblock';
 import { type CTALink } from '../components/landing-page/CTAButton';
 import Hero from '../components/landing-page/Hero';
 import styles from './index.module.css';
-// import { useColorMode } from '@docusaurus/theme-common';
 
 const cardLinks: CardLink[] = [
 	{
@@ -47,7 +46,7 @@ const ctaLinks: CTALink[] = [
 const codeBlocks: CodeBlockProps[] = [
 	{
 		startLineNumber: 1,
-		lineNumberOverrides: ['$', ''],
+		lineNumberOverrides: ['~$', ''],
 		canCopy: true,
 		canSelect: true,
 		style: {
@@ -63,12 +62,11 @@ const codeBlocks: CodeBlockProps[] = [
 	},
 	{
 		startLineNumber: 1,
-		// lineNumberOverrides: ['1', '', '2', ''],
 		canCopy: false,
 		canSelect: false,
 		style: {
 			right: 'var(--right-code-block-position)', // -20,
-			top: '35%',
+			top: '20%', // '35%', <- moved up to better suit the chart data
 			transformOrigin: 'center right',
 		},
 		name: 'import',
@@ -92,7 +90,6 @@ const codeBlocks: CodeBlockProps[] = [
 	},
 	{
 		startLineNumber: 39,
-		// lineNumberOverrides: ['39', '', '40', '41', '', '', '42'],
 		canCopy: false,
 		canSelect: false,
 		style: {
@@ -147,17 +144,18 @@ const codeBlocks: CodeBlockProps[] = [
 	},
 ];
 
-// const { colorMode } = useColorMode();
-// const isDarkTheme = colorMode === 'dark';
-
-// function isScreenMinimumWidthForDisplayingChart(): boolean {
-// 	return window.matchMedia('screen and (min-width: 1279.5px)').matches;
-// }
+const header = 'Lightweight Charts Documentation';
+const paragraph = `Lightweight Charts is a library for creating interactive financial charts. Take a look at this documentation give you the information you need to start your lightweight journey.`;
 
 function Index(): JSX.Element {
 	return (
 		<div className={styles.RootContainer}>
-			<Hero ctaLinks={ctaLinks} codeBlocks={codeBlocks} />
+			<Hero
+				ctaLinks={ctaLinks}
+				codeBlocks={codeBlocks}
+				header={header}
+				paragraph={paragraph}
+			/>
 			<Cards cardLinks={cardLinks} />
 		</div>
 	);

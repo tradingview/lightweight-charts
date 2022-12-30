@@ -12,26 +12,26 @@
 	align-items: center;
 	background-color: var(--cta-button-secondary-background);
 	color: var(--cta-button-text-color);
-	outline: 1px solid var(--cta-button-border-color);
-	outline-offset: -1px;
+	/* Safari doesn't support border-radius and outline being used together */
+	box-shadow:inset 0px 0px 0px 1px var(--cta-button-border-color);
 }
 
 .SquareButton:hover {
 	text-decoration: none;
 	color: var(--cta-button-text-color);
 	background-color: var(--cta-button-secondary-background-hover);
-	outline: none;
+	box-shadow: none;
 }
 
 .SquareButton:active {
 	background-color: var(--cta-button-secondary-background-active);
-	outline: none;
+	box-shadow: none;
 }
 
 .SquareButton[data-primary] {
 	background-color: var(--cta-button-primary-background);
 	color: #fff;
-	outline: none;
+	box-shadow: none;
 }
 
 .SquareButton[data-primary]:hover {

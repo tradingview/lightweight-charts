@@ -41,6 +41,8 @@
 	transform: scale(var(--code-block-scale, 1));
 	user-select: none;
 	cursor: default;
+
+	z-index: 1;
 }
 
 .Block[data-can-select=true] {

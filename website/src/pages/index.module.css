@@ -82,9 +82,6 @@
 	--cta-button-text-color: #000;
 	--cta-svg-color: #000;
 
-	--hero-chart-padding-top: 34px;
-	--hero-chart-padding-right: 30px;
-	--hero-chart-padding-bottom: 26px;
 	--hero-chart-padding-left: 46px;
 	--hero-gap: 48px;
 	--chart-right-edge-spacing: var(--container-padding);
@@ -144,9 +141,6 @@
 		--hero-content-line-height: 30px;
 		--hero-flex-direction: column;
 		--hero-gap: 80px;
-		--hero-chart-padding-top: 32px;
-		--hero-chart-padding-right: 0px;
-		--hero-chart-padding-bottom: 22px;
 		--hero-chart-padding-left: 42px;
 		--chart-right-edge-spacing: var(--container-padding);
 		--right-code-block-position: -10px;
@@ -157,9 +151,6 @@
 @media (max-width: 1023px) {
 	:root {
 		--container-padding: 20px;
-		--hero-chart-padding-top: 24px;
-		--hero-chart-padding-right: 0px;
-		--hero-chart-padding-bottom: 16px;
 		--hero-chart-padding-left: 32px;
 		--code-block-scale: 0.8;
 		--right-code-block-position: -4px;
@@ -183,9 +174,6 @@
 		--hero-title-line-height: 36px;
 		--hero-content-font-size: 18px;
 		--hero-content-line-height: 28px;
-		--hero-chart-padding-top: 18px;
-		--hero-chart-padding-right: 0px;
-		--hero-chart-padding-bottom: 12px;
 		--hero-chart-padding-left: 24px;
 		--code-block-scale: 0.5;
 		--right-code-block-position: -8px;
@@ -210,6 +198,9 @@
 	margin: 0;
 	max-width: 1920px;
 	margin-inline: auto;
+
+	/* Don't use this because we want to have the chart reach the viewport edge for certain breakpoints */
 	/* padding-inline: var(--container-padding); */
+
 	padding-block: var(--vertical-container-padding);
 }

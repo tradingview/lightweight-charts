@@ -3,25 +3,27 @@ import React from 'react';
 import { type CodeBlockProps } from '../Codeblock';
 import CTAButton, { CTALink } from '../CTAButton';
 import HeroChart from '../HeroChart';
-import styles from './index.module.css';
+import styles from './hero.module.css';
 
-export default function Hero(props: { ctaLinks: CTALink[]; codeBlocks?: CodeBlockProps[] }): JSX.Element {
+export default function Hero(props: {
+	ctaLinks: CTALink[];
+	codeBlocks?: CodeBlockProps[];
+	header: string | JSX.Element;
+	paragraph: string | JSX.Element;
+}): JSX.Element {
+	const { header, paragraph, ctaLinks, codeBlocks } = props;
 	return (
 		<section className={styles.HeroContainer}>
 			<main className={styles.HeroMain}>
-				<h1>Lightweight Charts Documentation</h1>
-				<p>
-					Lightweight Charts is a library for creating interactive financial
-					charts. Take a look at this documentation give you the information you
-					need to start your lightweight journey.
-				</p>
+				<h1>{header}</h1>
+				<p>{paragraph}</p>
 				<nav className={styles.HeroButtons}>
-					{props.ctaLinks.map((link: CTALink) => (
+					{ctaLinks.map((link: CTALink) => (
 						<CTAButton key={link.link} {...link} />
 					))}
 				</nav>
 			</main>
-			<HeroChart codeBlocks={props.codeBlocks ?? []}/>
+			<HeroChart codeBlocks={codeBlocks ?? []} />
 		</section>
 	);
 }

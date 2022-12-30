@@ -5,6 +5,9 @@
 	background-image: var(--navbar-logo-url-desktop-laptop-tablet);
 	width: 189px;
 	height: 32px;
+
+	/* Needed for safari to allow the color change to work properly when toggling the theme */
+	transform: translate3d(0, 0, 0);
 }
 
 .Logo:focus-visible {

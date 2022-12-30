@@ -2,32 +2,23 @@
 	position: relative;
 	width: 100%;
 	margin: 0px;
-
 	aspect-ratio: 15 / 9;
-	@supports not (aspect-ratio) {
-		height: 600px;
-	}
 	margin-left: var(--hero-chart-padding-left);
-	/* padding: var(--hero-chart-padding-top) var(--hero-chart-padding-right)
-		var(--hero-chart-padding-bottom) var(--hero-chart-padding-left); */
 }
 
-/* .HeroChartGlass {
-	position: absolute;
-	inset: 12px;
-    backdrop-filter: blur(10.3785px);
-    border-radius: 16px;
-    outline-color: rgba(255, 255, 255, 0.05);
-    outline-width: 12px;
-    outline-style: solid;
-} */
+@supports not (aspect-ratio: auto) {
+	/* Fallback for very old browsers */
+	.HeroChartSection {
+		height: 600px;
+	}
+}
 
 .HeroChartGlass {
 	position: absolute;
 	inset: 0px;
 	background: rgba(255, 255, 255, 0.05);
 	backdrop-filter: blur(10.3785px);
-	border-radius: 26px; /* approximate, since we can't use outline here and the size is dynamic  */
+	border-radius: 28px;
 }
 
 .HeroChartGradient {
@@ -51,6 +42,8 @@
 	inset: 12px;
 	margin: 0px;
 	border-radius: 16px;
+	z-index: 0;
+	overflow: hidden;
 }
 
 :root[data-theme='dark'] .HeroChartFigure {
@@ -111,4 +104,24 @@
 	.HeroChartFadeBottomDeep {
 		display: block !important;
 	}
+}
+
+.ChartContainer {
+	height: 100%;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 500ms;
+}
+
+.ChartContainer[reveal] {
+	opacity: 1;
+}
+
+.ChartContainer * {
+	overflow: hidden;
+}
+
+.ChartContainer table td,
+.ChartContainer table tr {
+	border: none;
 }

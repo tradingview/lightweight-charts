@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './index.module.css';
+import styles from './codeblock.module.css';
 
 export interface CodeBlockProps {
 	startLineNumber?: number;
@@ -23,22 +23,30 @@ export interface CodeBlockProps {
 export default function LandingPageCodeBlock(
 	props: CodeBlockProps
 ): JSX.Element {
-	const startNumber = props.startLineNumber ?? 1;
+	const {
+		canSelect,
+		canCopy,
+		name,
+		style,
+		startLineNumber,
+		lines,
+		lineNumberOverrides,
+	} = props;
+	const startNumber = startLineNumber ?? 1;
 	return (
 		<aside
 			className={styles.Block}
-			data-can-select={props.canSelect}
-			data-can-copy={props.canCopy}
-			data-name={props.name}
-			style={{ ...props.style }}
+			data-can-select={canSelect}
+			data-can-copy={canCopy}
+			data-name={name}
+			style={{ ...style }}
 		>
 			<div className={styles.BlockContent}>
-				{props.lines.map((line: JSX.Element, index: number) => (
+				{lines.map((line: JSX.Element, index: number) => (
 					<div key={index} className={styles.Line}>
 						<div className={styles.LineNumber}>
-							{props.lineNumberOverrides &&
-							props.lineNumberOverrides.length > index
-								? props.lineNumberOverrides[index]
+							{lineNumberOverrides && lineNumberOverrides.length > index
+								? lineNumberOverrides[index]
 								: index + startNumber}
 						</div>
 						{line}
