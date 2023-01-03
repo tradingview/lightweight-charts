@@ -7,10 +7,23 @@
 	--code-c4: #2962ff;
 }
 
+aside[data-name='chart-code-phone'] {
+	display: none;
+}
+
 /* Phone-Vertical */
 @media (max-width: 567px) {
 	aside[data-name='npm'] {
 		display: none !important;
+	}
+	aside[data-name='import'] {
+		display: none !important;
+	}
+	aside[data-name='chart-code'] {
+		display: none !important;
+	}
+	aside[data-name='chart-code-phone'] {
+		display: block !important;
 	}
 }
 

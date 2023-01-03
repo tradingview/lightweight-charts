@@ -16,6 +16,7 @@ export interface CodeBlockProps {
 		bottom?: number | string;
 		right?: number | string;
 		transformOrigin: string;
+		maxWidth?: number | string;
 	};
 	name: string; // used for css rules to hide blocks at certain breakpoints
 }

@@ -51,7 +51,7 @@ const codeBlocks: CodeBlockProps[] = [
 		canCopy: true,
 		canSelect: true,
 		style: {
-			left: 150,
+			left: '20%',
 			bottom: -28,
 			transformOrigin: 'center left',
 		},
@@ -66,8 +66,8 @@ const codeBlocks: CodeBlockProps[] = [
 		canCopy: false,
 		canSelect: false,
 		style: {
-			right: 'var(--right-code-block-position)', // -20,
-			top: '20%', // '35%', <- moved up to better suit the chart data
+			right: 'var(--right-code-block-position)',
+			top: 'calc(35% - (60px * var(--code-block-scale))',
 			transformOrigin: 'center right',
 		},
 		name: 'import',
@@ -139,6 +139,42 @@ const codeBlocks: CodeBlockProps[] = [
 				<span data-c3>{'['}</span>
 				{' /* ... */ '}
 				<span data-c3>{']'}</span>
+				<span data-c2>{')'}</span>;
+			</span>,
+		],
+	},
+	{
+		startLineNumber: 38,
+		canCopy: false,
+		canSelect: false,
+		style: {
+			right: 0,
+			top: -8,
+			transformOrigin: 'top right',
+			width: 550,
+			maxWidth: 'calc((100vw - 60px) / var(--code-block-scale))',
+		},
+		name: 'chart-code-phone',
+		lines: [
+			<span key="3">
+				<span data-c3>const</span> chart = <span data-c4>createChart</span>
+				<span data-c2>{'('}</span>container, chartOptions
+				<span data-c2>{')'}</span>;
+			</span>,
+			<span key="4">
+				<span data-c3>const</span> areaSeries = chart.
+				<span data-c4>addAreaSeries</span>
+				<span data-c2>{'('}</span>
+				<span data-c2>{'{ '}</span>
+			</span>,
+			<span key="5">
+				&nbsp;&nbsp;lineColor: <span data-c1>{`'#2962ff'`}</span>, topColor:{' '}
+				<span data-c1>{`'#2962ff'`}</span>,
+			</span>,
+			<span key="6">
+				&nbsp;&nbsp;bottomColor:{' '}
+				<span data-c1>{`'rgba(41, 98, 255, 0.28)'`}</span>
+				<span data-c2>{' }'}</span>
 				<span data-c2>{')'}</span>;
 			</span>,
 		],
