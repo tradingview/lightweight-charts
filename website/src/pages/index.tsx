@@ -164,7 +164,7 @@ function Index(): JSX.Element {
 
 function LayoutWrapper(): JSX.Element {
 	return (
-		<Layout title="Home">
+		<Layout title="Home" description={paragraph}>
 			<Head>
 				<link rel="preload" href="https://fonts.cdnfonts.com/s/60249/Euclid Circular B SemiBold.woff" as="font" type="font/woff" crossOrigin="true"/>
 				<link rel="preload" href="https://fonts.cdnfonts.com/s/13494/Menlo-Regular.woff" as="font" type="font/woff" crossOrigin="true"/>

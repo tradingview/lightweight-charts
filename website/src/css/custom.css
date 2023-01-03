@@ -6,6 +6,7 @@
 
 /* You can override the default Infima variables here. */
 :root {
+	font-display: swap;
 	--color-white: #ffffff;
 	--color-black: #000000;
 	--color-cold-gray-50: #f8f9fd;

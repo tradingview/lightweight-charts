@@ -256,6 +256,7 @@ async function getConfig() {
 					title: 'Lightweight Charts',
 					logo: {
 						src: 'this value is not used because we swizzled the Logo component - see src/theme/Logo',
+						alt: 'Lightweight Charts home button',
 					},
 					items: [
 						{
