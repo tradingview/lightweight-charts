@@ -1,3 +1,4 @@
+@import url('https://fonts.cdnfonts.com/css/euclid-circular-b?styles=100049');
 /* Tablet-Landscape */
 @media (max-width: 1279px) {
 	.HeroMain {
@@ -37,6 +38,7 @@
 }
 
 .HeroMain h1 {
+	font-display: swap;
 	/* Accent Adaptive/L Euclid/56px Desktop */
 	font-family: 'Euclid Circular B';
 	font-style: normal;

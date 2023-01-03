@@ -36,6 +36,7 @@
 	line-height: 22px;
 	font-feature-settings: 'tnum' on, 'lnum' on;
 
+	font-display: swap;
 	font-family: 'Menlo', monospace;
 	color: var(--tv-cold-gray-50);
 	transform: scale(var(--code-block-scale, 1));
