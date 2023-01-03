@@ -202,5 +202,7 @@
 	/* Don't use this because we want to have the chart reach the viewport edge for certain breakpoints */
 	/* padding-inline: var(--container-padding); */
 
-	padding-block: var(--vertical-container-padding);
+	/* padding-block: var(--vertical-container-padding); */
+	/* ! Fix for older versions of Safari which had a bug with css variables being used for -inline / -block */
+	padding: var(--vertical-container-padding) 0px;
 }

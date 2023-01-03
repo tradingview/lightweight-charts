@@ -23,7 +23,9 @@
 	width: 100%;
 	margin-bottom: 80px;
 	gap: var(--hero-gap);
-	padding-inline: var(--container-padding);
+	/* ! Fix for older versions of Safari which had a bug with css variables being used for -inline / -block */
+	/* padding-inline: var(--container-padding); */
+	padding: 0px var(--container-padding);
 	padding-right: var(--chart-right-edge-spacing);
 	max-width: 1920px;
 }

@@ -45,7 +45,7 @@
 	z-index: 1;
 }
 
-.Block[data-can-select=true] {
+.Block[data-can-select='true'] {
 	user-select: text;
 	cursor: auto;
 }
