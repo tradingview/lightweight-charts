@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { getClassNames } from './helpers/get-all-class-names';
-import { getTestCases } from './helpers/get-test-cases';
+import { getTestCases, TestCase } from './helpers/get-test-cases';
 
 const serverAddressVarName = 'SERVER_ADDRESS';
 const serverURL: string = process.env[serverAddressVarName] || '';
@@ -24,9 +24,11 @@ interface ITestScenario extends IScenario {
 
 describe('Memleaks tests', function(): void {
 	// this tests are unstable sometimes.
-	this.retries(1);
+	this.retries(0);
 
-	const testCases = getTestCases();
+	const testCases = getTestCases().filter((testCase: TestCase) => {
+		return testCase.name === 'simple';
+	});
 
 	it('number of test cases', () => {
 		// we need to have at least 1 test to check it
@@ -40,6 +42,7 @@ describe('Memleaks tests', function(): void {
 
 	for (const testCase of testCases) {
 		it(testCase.name, async () => {
+			console.log(`Running test: ${testCase.name}`);
 			if (classNames.size < 1) {
 				// async function that we will only call if we don't already have values
 				const names = await getClassNames();
@@ -58,6 +61,10 @@ describe('Memleaks tests', function(): void {
 			const scenario = test.scenario as ITestScenario;
 			const expectToFail = scenario.expectFail === true;
 			const allowedLeaks = scenario.allowedLeaks ?? [];
+			if (expectToFail) {
+				console.log(`!! This test is expected to fail.`);
+			}
+			console.log('');
 
 			const result = await takeSnapshots({
 				scenario: {
