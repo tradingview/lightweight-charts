@@ -205,6 +205,7 @@ jobs:
     environment:
       NO_SANDBOX: "true"
       TESTS_REPORT_FILE: "test-results/memleaks/results.xml"
+      RUNNING_ON_CI: "true"
     steps:
       - checkout-with-deps
       - attach_workspace:
@@ -216,6 +217,8 @@ jobs:
       - run: scripts/run-memleaks-tests.sh
       - store_test_results:
           path: test-results/
+      - store_artifacts:
+          path: tests/e2e/memleaks/.logs/
 
   coverage:
     executor: node16-browsers-executor

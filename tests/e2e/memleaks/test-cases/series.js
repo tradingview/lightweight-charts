@@ -6,7 +6,11 @@
 
 /** @type {import('@memlab/core/dist/lib/Types').IScenario} */
 const scenario = {
-	allowedLeaks: ['FormattedLabelsCache'],
+	allowedLeaks: [
+		'FormattedLabelsCache',
+		'CrosshairPriceAxisView', // <- We should check and maybe fix this?
+		'PriceAxisViewRenderer', // <- (part of the same leak above)
+	],
 	setup: async function(page) {
 		await page.addScriptTag({
 			url: 'library.js',

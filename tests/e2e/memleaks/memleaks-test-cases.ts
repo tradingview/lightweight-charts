@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { getClassNames } from './helpers/get-all-class-names';
-import { getTestCases, TestCase } from './helpers/get-test-cases';
+import { getTestCases } from './helpers/get-test-cases';
 
 const serverAddressVarName = 'SERVER_ADDRESS';
 const serverURL: string = process.env[serverAddressVarName] || '';
@@ -26,9 +26,7 @@ describe('Memleaks tests', function(): void {
 	// this tests are unstable sometimes.
 	this.retries(0);
 
-	const testCases = getTestCases().filter((testCase: TestCase) => {
-		return testCase.name === 'simple';
-	});
+	const testCases = getTestCases();
 
 	it('number of test cases', () => {
 		// we need to have at least 1 test to check it
@@ -42,7 +40,7 @@ describe('Memleaks tests', function(): void {
 
 	for (const testCase of testCases) {
 		it(testCase.name, async () => {
-			console.log(`Running test: ${testCase.name}`);
+			console.log(`\n\tRunning test: ${testCase.name}`);
 			if (classNames.size < 1) {
 				// async function that we will only call if we don't already have values
 				const names = await getClassNames();
@@ -62,7 +60,7 @@ describe('Memleaks tests', function(): void {
 			const expectToFail = scenario.expectFail === true;
 			const allowedLeaks = scenario.allowedLeaks ?? [];
 			if (expectToFail) {
-				console.log(`!! This test is expected to fail.`);
+				console.log(`\t!! This test is expected to fail.`);
 			}
 			console.log('');
 
@@ -76,6 +74,9 @@ describe('Memleaks tests', function(): void {
 								!allowedLeaks.includes(node.name)) ||
 							node.retainedSize > 1_000_000
 						) {
+							if (!expectToFail) {
+								console.log(`LEAK FOUND! Name of constructor: ${node.name} Retained Size: ${node.retainedSize}`);
+							}
 							return true; // This is considered to be a leak.
 						}
 						return false;
