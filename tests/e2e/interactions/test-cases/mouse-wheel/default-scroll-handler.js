@@ -12,8 +12,12 @@ function generateData() {
 	return res;
 }
 
-function interactionsToPerform() {
+function initialInteractionsToPerform() {
 	return [{ action: 'scrollLeft' }, { action: 'scrollDown' }];
+}
+
+function finalInteractionsToPerform() {
+	return [];
 }
 
 let chart;
@@ -34,10 +38,20 @@ function beforeInteractions(container) {
 	});
 }
 
-function afterInteractions() {
+function afterInitialInteractions() {
+	return new Promise(resolve => {
+		requestAnimationFrame(() => {
+			resolve();
+		});
+	});
+}
+
+function afterFinalInteractions() {
 	const endRange = chart.timeScale().getVisibleLogicalRange();
 
-	const pass = Boolean(startRange.from !== endRange.from && startRange.to !== endRange.to);
+	const pass = Boolean(
+		startRange.from !== endRange.from && startRange.to !== endRange.to
+	);
 
 	if (!pass) {
 		throw new Error('Expected visible logical range to have changed.');

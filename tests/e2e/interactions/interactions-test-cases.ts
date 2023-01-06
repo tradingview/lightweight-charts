@@ -12,7 +12,10 @@ import puppeteer, {
 } from 'puppeteer';
 
 import { TestCase } from '../helpers/get-test-cases';
-import { Interaction, performInteractions } from '../helpers/perform-interactions';
+import {
+	Interaction,
+	performInteractions,
+} from '../helpers/perform-interactions';
 
 import { getTestCases } from './helpers/get-interaction-test-cases';
 
@@ -35,9 +38,11 @@ const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
 interface InternalWindow {
-	interactions: Interaction[];
+	initialInteractions: Interaction[];
+	finalInteractions: Interaction[];
 	finishedSetup: Promise<() => void>;
-	afterInteractions: () => void;
+	afterInitialInteractions?: () => void;
+	afterFinalInteractions: () => void;
 }
 
 describe('Interactions tests', function(): void {
@@ -95,15 +100,36 @@ describe('Interactions tests', function(): void {
 				return (window as unknown as InternalWindow).finishedSetup;
 			});
 
-			const interactionsToPerform = await page.evaluate(() => {
-				return (window as unknown as InternalWindow).interactions;
+			const initialInteractionsToPerform = await page.evaluate(() => {
+				return (window as unknown as InternalWindow).initialInteractions;
 			});
 
-			await performInteractions(page, interactionsToPerform);
+			await performInteractions(page, initialInteractionsToPerform);
+
+			await page.evaluate(() => {
+				if ((window as unknown as InternalWindow).afterInitialInteractions) {
+					return (
+						window as unknown as InternalWindow
+					).afterInitialInteractions?.();
+				}
+				return new Promise<void>((resolve: () => void) => {
+					window.requestAnimationFrame(() => {
+						setTimeout(resolve, 50);
+					});
+				});
+			});
+
+			const finalInteractionsToPerform = await page.evaluate(() => {
+				return (window as unknown as InternalWindow).finalInteractions;
+			});
+
+			if (finalInteractionsToPerform && finalInteractionsToPerform.length > 0) {
+				await performInteractions(page, finalInteractionsToPerform);
+			}
 
 			await page.evaluate(() => {
 				return new Promise<void>((resolve: () => void) => {
-					(window as unknown as InternalWindow).afterInteractions();
+					(window as unknown as InternalWindow).afterFinalInteractions();
 					window.requestAnimationFrame(() => {
 						setTimeout(resolve, 50);
 					});

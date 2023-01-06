@@ -6,7 +6,7 @@ module.exports = {
 		node: false,
 	},
 	rules: {
-		'no-unused-vars': ['error', { varsIgnorePattern: '^(beforeInteractions|afterInteractions|interactionsToPerform)$', args: 'none' }],
+		'no-unused-vars': ['error', { varsIgnorePattern: '^(beforeInteractions|after(Initial|Final)Interactions|(initial|final)InteractionsToPerform)$', args: 'none' }],
 	},
 	globals: {
 		LightweightCharts: false,
