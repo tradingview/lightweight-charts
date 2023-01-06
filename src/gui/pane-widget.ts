@@ -97,7 +97,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
-	private _clicked: Delegate<TimePointIndex | null, TouchMouseEventData> = new Delegate();
+	private _clicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
 	private _startTrackPoint: Point | null = null;
@@ -330,7 +330,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._clearCrosshairPosition();
 	}
 
-	public clicked(): ISubscription<TimePointIndex | null, TouchMouseEventData> {
+	public clicked(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
 		return this._clicked;
 	}
 
@@ -530,8 +530,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _fireClickedDelegate(event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
+		const y = event.localY;
 		if (this._clicked.hasListeners()) {
-			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), event);
+			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}
 	}
 
