@@ -177,9 +177,9 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 		}
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (this._invalidated) {
-			this._updateImpl(height, width);
+			this._updateImpl();
 			this._invalidated = false;
 			this._stageInvalidated = false;
 		} else if (this._stageInvalidated) {
@@ -190,7 +190,7 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 		return this._renderer;
 	}
 
-	private _updateImpl(height: number, width: number): void {
+	private _updateImpl(): void {
 		this._renderer.setData(null);
 
 		const timeScale = this._series.model().timeScale();

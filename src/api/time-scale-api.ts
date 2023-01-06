@@ -1,4 +1,5 @@
-import { Size } from '../gui/canvas-utils';
+import { Size } from 'fancy-canvas';
+
 import { TimeAxisWidget } from '../gui/time-axis-widget';
 
 import { assert } from '../helpers/assertions';
@@ -154,11 +155,11 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public width(): number {
-		return this._timeAxisWidget.getSize().w;
+		return this._timeAxisWidget.getSize().width;
 	}
 
 	public height(): number {
-		return this._timeAxisWidget.getSize().h;
+		return this._timeAxisWidget.getSize().height;
 	}
 
 	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
@@ -206,6 +207,6 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	private _onSizeChanged(size: Size): void {
-		this._sizeChanged.fire(size.w, size.h);
+		this._sizeChanged.fire(size.width, size.height);
 	}
 }

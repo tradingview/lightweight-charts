@@ -30,7 +30,7 @@ There are several e2e tests which simulate the usage of the library within a bro
 
 ### Coverage
 
-The e2e coverage test attempts to execute as many lines as possible within the library JS file. This is achieved by running a [test script](./e2e/coverage/coverage-script.js) which attempts to evoke all of the API methods and set as many options as possible. The e2e test simulates a variety of user interactions such as scrolling, clicking, and dragging.
+The e2e coverage test attempts to execute as many lines as possible within the library JS file. This is achieved by running a [test script](./e2e/coverage/coverage-test-cases.ts) which attempts to evoke all of the API methods and set as many options as possible. The e2e test simulates a variety of user interactions such as scrolling, clicking, and dragging.
 
 During this execution, if the page reports any errors then the test will fail.
 

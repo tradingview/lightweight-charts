@@ -9,8 +9,6 @@ import { IPaneView } from './ipane-view';
 
 export abstract class SeriesHorizontalLinePaneView implements IPaneView {
 	protected readonly _lineRendererData: HorizontalLineRendererData = {
-		width: 0,
-		height: 0,
 		y: 0 as Coordinate,
 		color: 'rgba(0, 0, 0, 0)',
 		lineWidth: 1,
@@ -33,17 +31,17 @@ export abstract class SeriesHorizontalLinePaneView implements IPaneView {
 		this._invalidated = true;
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}
 
 		if (this._invalidated) {
-			this._updateImpl(height, width);
+			this._updateImpl();
 			this._invalidated = false;
 		}
 		return this._lineRenderer;
 	}
 
-	protected abstract _updateImpl(height: number, width: number): void;
+	protected abstract _updateImpl(): void;
 }

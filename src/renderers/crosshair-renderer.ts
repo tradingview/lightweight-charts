@@ -1,5 +1,7 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
 import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
 
 export interface CrosshairLineStyle {
 	lineStyle: LineStyle;
@@ -13,18 +15,17 @@ export interface CrosshairRendererData {
 	horzLine: CrosshairLineStyle;
 	x: number;
 	y: number;
-	w: number;
-	h: number;
 }
 
-export class CrosshairRenderer implements IPaneRenderer {
+export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
 	private readonly _data: CrosshairRendererData | null;
 
 	public constructor(data: CrosshairRendererData | null) {
+		super();
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	protected override _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
@@ -36,31 +37,25 @@ export class CrosshairRenderer implements IPaneRenderer {
 			return;
 		}
 
-		ctx.save();
-
-		const x = Math.round(this._data.x * pixelRatio);
-		const y = Math.round(this._data.y * pixelRatio);
-		const w = Math.ceil(this._data.w * pixelRatio);
-		const h = Math.ceil(this._data.h * pixelRatio);
+		const x = Math.round(this._data.x * horizontalPixelRatio);
+		const y = Math.round(this._data.y * verticalPixelRatio);
 
 		ctx.lineCap = 'butt';
 
 		if (vertLinesVisible && x >= 0) {
-			ctx.lineWidth = Math.floor(this._data.vertLine.lineWidth * pixelRatio);
+			ctx.lineWidth = Math.floor(this._data.vertLine.lineWidth * horizontalPixelRatio);
 			ctx.strokeStyle = this._data.vertLine.color;
 			ctx.fillStyle = this._data.vertLine.color;
 			setLineStyle(ctx, this._data.vertLine.lineStyle);
-			drawVerticalLine(ctx, x, 0, h);
+			drawVerticalLine(ctx, x, 0, bitmapSize.height);
 		}
 
 		if (horzLinesVisible && y >= 0) {
-			ctx.lineWidth = Math.floor(this._data.horzLine.lineWidth * pixelRatio);
+			ctx.lineWidth = Math.floor(this._data.horzLine.lineWidth * verticalPixelRatio);
 			ctx.strokeStyle = this._data.horzLine.color;
 			ctx.fillStyle = this._data.horzLine.color;
 			setLineStyle(ctx, this._data.horzLine.lineStyle);
-			drawHorizontalLine(ctx, y, 0, w);
+			drawHorizontalLine(ctx, y, 0, bitmapSize.width);
 		}
-
-		ctx.restore();
 	}
 }
