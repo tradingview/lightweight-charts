@@ -5,6 +5,10 @@ import { LineStyle, LineWidth } from '../renderers/draw-line';
  */
 export interface PriceLineOptions {
 	/**
+	 * The optional ID of this price line.
+	 */
+	id?: string;
+	/**
 	 * Price line's value.
 	 *
 	 * @defaultValue `0`

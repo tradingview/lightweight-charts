@@ -26,6 +26,7 @@ import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
+import { TouchMouseEventData } from './touch-mouse-event-data';
 import { Watermark, WatermarkOptions } from './watermark';
 
 /**
@@ -351,7 +352,7 @@ export class ChartModel implements IDestroyable {
 	private _width: number = 0;
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
-	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
+	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
 
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
@@ -490,7 +491,7 @@ export class ChartModel implements IDestroyable {
 		return this._crosshair;
 	}
 
-	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null> {
+	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null, TouchMouseEventData | null> {
 		return this._crosshairMoved;
 	}
 
@@ -634,7 +635,7 @@ export class ChartModel implements IDestroyable {
 		return this._serieses;
 	}
 
-	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, pane: Pane): void {
+	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x);
@@ -654,14 +655,14 @@ export class ChartModel implements IDestroyable {
 		this._crosshair.setPosition(index, price, pane);
 
 		this.cursorUpdate();
-		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
+		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y }, event);
 	}
 
 	public clearCurrentPosition(): void {
 		const crosshair = this.crosshairSource();
 		crosshair.clearPosition();
 		this.cursorUpdate();
-		this._crosshairMoved.fire(null, null);
+		this._crosshairMoved.fire(null, null, null);
 	}
 
 	public updateCrosshair(): void {
@@ -670,7 +671,7 @@ export class ChartModel implements IDestroyable {
 		if (pane !== null) {
 			const x = this._crosshair.originCoordX();
 			const y = this._crosshair.originCoordY();
-			this.setAndSaveCurrentPosition(x, y, pane);
+			this.setAndSaveCurrentPosition(x, y, null, pane);
 		}
 
 		this._crosshair.updateAllViews();

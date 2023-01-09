@@ -16,7 +16,11 @@
         </script>
 
         <script type="text/javascript">
-            window.interactions = interactionsToPerform();
+            window.initialInteractions = initialInteractionsToPerform();
+            window.finalInteractions = undefined;
+            if (finalInteractionsToPerform) {
+                window.finalInteractions = finalInteractionsToPerform();
+            }
             window.finishedSetup = beforeInteractions(document.getElementById('container'));
         </script>
     </body>

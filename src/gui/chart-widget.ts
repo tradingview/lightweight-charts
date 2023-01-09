@@ -20,6 +20,7 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { OriginalTime, TimePointIndex } from '../model/time-data';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
 // import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
@@ -32,6 +33,7 @@ export interface MouseEventParamsImpl {
 	seriesData: Map<Series, SeriesPlotRow>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
+	touchMouseEventData?: TouchMouseEventData;
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
@@ -678,7 +680,11 @@ export class ChartWidget implements IDestroyable {
 		this._adjustSizeImpl();
 	}
 
-	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
+	private _getMouseEventParamsImpl(
+		index: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData | null
+	): MouseEventParamsImpl {
 		const seriesData = new Map<Series, SeriesPlotRow>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
@@ -715,15 +721,24 @@ export class ChartWidget implements IDestroyable {
 			hoveredSeries,
 			seriesData,
 			hoveredObject,
+			touchMouseEventData: event ?? undefined,
 		};
 	}
 
-	private _onPaneWidgetClicked(time: TimePointIndex | null, point: Point): void {
-		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point));
+	private _onPaneWidgetClicked(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData
+	): void {
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
-	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
-		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
+	private _onPaneWidgetCrosshairMoved(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData | null
+	): void {
+		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
 	private _updateTimeAxisVisibility(): void {
