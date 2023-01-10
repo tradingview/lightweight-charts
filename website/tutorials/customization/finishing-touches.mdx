@@ -1,0 +1,128 @@
+---
+sidebar_position: 10
+title: Finishing touches
+pagination_title: Finishing touches
+sidebar_label: Finishing touches
+description: In this section we are going to add a few finishing touches to the chart which are entirely optional.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/data-points
+pagination_next: customization/conclusion
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In this section we are going to add a few finishing touches to the chart which are entirely optional.
+
+## Changing the font
+
+It is possible to specify a custom font to use within the Lightweight Chart. As an example we are going to load the `Roboto` font from [Google Fonts](https://fonts.google.com/) by adding the following tags within the `<head>` element on the page (for example, just below the `<title>` element).
+
+```html
+<title>Lightweight Charts Customization Tutorial</title>
+<!-- Adding Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+    href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+    rel="stylesheet"
+/>
+```
+
+We can then tell Lightweight charts to use that specific font by setting the `fontFamily` property within the `layout` property of the chart options as follows:
+
+```js
+// Changing the font
+chart.applyOptions({
+    layout: {
+        fontFamily: "'Roboto', sans-serif",
+    },
+});
+```
+
+## Adding an attribution link
+
+We can add an attribution link to the top left corner of the chart to let the world know that your chart is powered by Lightweight Charts. As thanks for creating this product, we'd be grateful if you add it in a prominent place.
+
+First, we need to add a few css class rules to the `<style>` tag as follows:
+
+```html
+<style>
+    body {
+        padding: 0;
+        margin: 0;
+        /* Add a background color to match the chart */
+        background-color: #222;
+    }
+
+    /* highlight-start */
+    /* Styles for attribution message */
+    .lw-attribution {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        z-index: 3; /* place above the charts */
+        padding: 10px 0px 0px 12px;
+        font-family: "Roboto", sans-serif;
+        font-size: 0.8em;
+    }
+    .lw-attribution a {
+        cursor: pointer;
+        color: rgb(54, 116, 217);
+        opacity: 0.8;
+    }
+    .lw-attribution a:hover {
+        color: rgb(54, 116, 217);
+        opacity: 1;
+    }
+    /* highlight-end */
+</style>
+```
+
+and then add the following `<div>` element within the container element used for the chart.
+
+```html
+<div id="container" style="position: absolute; width: 100%; height: 100%">
+    <!-- highlight-start -->
+    <!-- Lightweight Charts Attribution Message and Link -->
+    <div class="lw-attribution">
+        <a href="https://tradingview.github.io/lightweight-charts/"
+            >Powered by Lightweight Charts</a
+        >
+    </div>
+    <!-- highlight-end -->
+</div>
+```
+
+## Result
+
+🎉 Congrats! At this point you should have the final chart which looks like this:
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step10.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step10.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step10.html').default} download="customization-tutorial-step10.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step10.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

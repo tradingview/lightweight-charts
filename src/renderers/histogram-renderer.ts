@@ -1,13 +1,15 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue, TimePointIndex } from '../model/time-data';
 
-import { IPaneRenderer } from './ipane-renderer';
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
 
 const showSpacingMinimalBarWidth = 1;
 const alignToMinimalWidthLimit = 4;
 
 export interface HistogramItem extends PricedValue, TimedValue {
-	color: string;
+	barColor: string;
 }
 
 export interface PaneRendererHistogramData {
@@ -27,7 +29,7 @@ interface PrecalculatedItemCoordinates {
 	time: TimePointIndex;
 }
 
-export class PaneRendererHistogram implements IPaneRenderer {
+export class PaneRendererHistogram extends BitmapCoordinatesPaneRenderer {
 	private _data: PaneRendererHistogramData | null = null;
 	private _precalculatedCache: PrecalculatedItemCoordinates[] = [];
 
@@ -36,24 +38,24 @@ export class PaneRendererHistogram implements IPaneRenderer {
 		this._precalculatedCache = [];
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	protected override _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
 			return;
 		}
 		if (!this._precalculatedCache.length) {
-			this._fillPrecalculatedCache(pixelRatio);
+			this._fillPrecalculatedCache(horizontalPixelRatio);
 		}
 
-		const tickWidth = Math.max(1, Math.floor(pixelRatio));
-		const histogramBase = Math.round((this._data.histogramBase) * pixelRatio);
+		const tickWidth = Math.max(1, Math.floor(verticalPixelRatio));
+		const histogramBase = Math.round((this._data.histogramBase) * verticalPixelRatio);
 		const topHistogramBase = histogramBase - Math.floor(tickWidth / 2);
 		const bottomHistogramBase = topHistogramBase + tickWidth;
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			const current = this._precalculatedCache[i - this._data.visibleRange.from];
-			const y = Math.round(item.y * pixelRatio);
-			ctx.fillStyle = item.color;
+			const y = Math.round(item.y * verticalPixelRatio);
+			ctx.fillStyle = item.barColor;
 
 			let top: number;
 			let bottom: number;

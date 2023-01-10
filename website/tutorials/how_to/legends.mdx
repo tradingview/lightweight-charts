@@ -1,0 +1,73 @@
+---
+title: Legends
+sidebar_label: Legends
+description: Examples on how to add a legend to your chart.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - example
+  - legend
+---
+
+Lightweight charts doesn't include a built-in legend feature, however it is something which can be added
+to your chart by following the examples presented below.
+
+## How to
+
+In order to add a legend to the chart we need to create and position an `html` into the desired position above
+the chart. We can then subscribe to the crosshairMove events ([subscribeCrosshairMove](/docs/api/interfaces/IChartApi#subscribecrosshairmove)) provided by the [`IChartApi`](/docs/api/interfaces/IChartApi) instance, and manually
+update the content within our `html` legend element.
+
+```js
+chart.subscribeCrosshairMove(param => {
+    let priceFormatted = '';
+    if (param.time) {
+        const price = param.seriesPrices.get(areaSeries);
+        priceFormatted = price.toFixed(2);
+    }
+    // legend is a html element which has already been created
+    legend.innerHTML = `${symbolName} <strong>${priceFormatted}</strong>`;
+});
+```
+
+The process of creating the legend html element and positioning can be seen within the examples below.
+Essentially, we create a new div element within the container div (holding the chart) and then position
+and style it using `css`.
+
+You can see full [working examples](#examples) below.
+
+## Resources
+
+- [subscribeCrosshairMove](/docs/api/interfaces/IChartApi#subscribecrosshairmove)
+- [MouseEventParams Interface](/docs/api/interfaces/MouseEventParams)
+- [MouseEventhandler](/docs/api#mouseeventhandler)
+
+Below are a few external resources related to creating and styling html elements:
+
+- [createElement](https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement)
+- [innerHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML)
+- [style property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style)
+
+## Examples
+
+import UsageGuidePartial from "./_usage-guide-partial.mdx";
+
+<UsageGuidePartial />
+
+import CodeBlock from "@theme/CodeBlock";
+
+### Simple Legend Example
+
+import codeLegend from "!!raw-loader!./legend.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{codeLegend}
+</CodeBlock>
+
+### 3 Line Legend Example
+
+import code3Line from "!!raw-loader!./legend-3line.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{code3Line}
+</CodeBlock>

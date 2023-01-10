@@ -15,7 +15,7 @@ function generateData(valueOffset, daysStep) {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const firstSeries = chart.addLineSeries();
 	const secondSeries = chart.addLineSeries();

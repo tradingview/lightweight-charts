@@ -14,7 +14,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		rightPriceScale: { visible: false },
 		leftPriceScale: { visible: true },
 	});

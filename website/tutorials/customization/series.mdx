@@ -1,0 +1,77 @@
+---
+sidebar_position: 3
+title: Series colors
+pagination_title: Series colors
+sidebar_label: Series colors
+description: In this section, we will be customizing the visual styling of the candlestick series.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/chart-colors
+pagination_next: customization/price-format
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In this section, we will be customizing the visual styling of the candlestick series.
+
+We can add our custom options to the series by using the `applyOptions` method on the ISeriesApi instance for the candlestick series. In other words, we can call the `applyOptions` method on the `mainSeries` variable (which was returned when we evoked `addCandlestickSeries()` earlier).
+
+The available options for the candlestick series is a combination of the following interfaces: [CandlestickStyleOptions](/docs/api/interfaces/CandlestickStyleOptions) and [SeriesOptionsCommon](/docs/api/interfaces/SeriesOptionsCommon).
+
+## Setting custom colors for the candlestick series
+
+We are going to set the colors such that upward candles will be a light blue and downward candles will be a vibrant red. The color for the body of the candle is determined by the `upColor` and `downColor` properties, whilst the wick colors are determined by `wickUpColor` and `wickDownColor`. We will additionally disable the border on the candlestick for this example.
+
+We can apply these options at any point in the code after we have created the candlestick series, and in this case, we will place the code below the `setData()` call (but it would still work if was placed before).
+
+```js
+mainSeries.setData(candleStickData);
+
+// highlight-start
+// Changing the Candlestick colors
+mainSeries.applyOptions({
+    wickUpColor: 'rgb(54, 116, 217)',
+    upColor: 'rgb(54, 116, 217)',
+    wickDownColor: 'rgb(225, 50, 85)',
+    downColor: 'rgb(225, 50, 85)',
+    borderVisible: false,
+});
+// highlight-end
+```
+
+## Result
+
+At this point we should have a chart like this:
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step3.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step3.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+In the next step, we will set a price formatter so we can customize the formatting of numbers on the chart.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step3.html').default} download="customization-tutorial-step3.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step3.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

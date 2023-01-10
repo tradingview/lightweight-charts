@@ -53,7 +53,7 @@ function runMocha(closeServer) {
 	}
 
 	mocha.diff(mochaConfig.diff);
-	mocha.addFile(path.resolve(__dirname, './coverage.spec.ts'));
+	mocha.addFile(path.resolve(__dirname, './coverage-test-cases.ts'));
 
 	mocha.run(failures => {
 		if (closeServer !== null) {

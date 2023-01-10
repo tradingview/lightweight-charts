@@ -80,6 +80,23 @@ const rightPriceScale = chart.priceScale('right');
 const leftPriceScale = chart.priceScale('left');
 ```
 
+## `drawTicks` from `leftPriceScale` and `rightPriceScale` options has been renamed to `ticksVisible`
+
+Since v4 you have to use `ticksVisible` instead of `drawTicks`.
+
+```js
+const chart = createChart({
+    leftPriceScale: {
+        ticksVisible: false,
+    },
+    rightPriceScale: {
+        ticksVisible: false,
+    },
+});
+```
+
+Also this option is off by default.
+
 ## The type of outbound time values has been changed
 
 Affected API:
@@ -165,5 +182,19 @@ barSeries.setData([{ time: '2001-01-01', open: 5, high: 10, low: 1, close: 7 }])
 chart.subscribeCrosshairMove(param => {
     console.log(param.seriesData.get(lineSeries)); // { time: '2001-01-01', value: 1 } or undefined
     console.log(param.seriesData.get(barSeries)); // { time: '2001-01-01', open: 5, high: 10, low: 1, close: 7 } or undefined
+});
+```
+
+## `MouseEventParams` field `hoveredMarkerId` was renamed to `hoveredObjectId`
+
+Since v4 you have to use `hoveredObjectId` instead of `hoveredMarkerId`.
+
+```js
+chart.subscribeCrosshairMove(param => {
+    console.log(param.hoveredObjectId);
+});
+
+chart.subscribeClick(param => {
+    console.log(param.hoveredObjectId);
 });
 ```

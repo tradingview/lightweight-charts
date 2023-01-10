@@ -5,7 +5,7 @@ import { Coordinate } from './coordinate';
 import { RangeImpl } from './range-impl';
 
 /**
- * Represents a time a a UNIX timestamp.
+ * Represents a time as a UNIX timestamp.
  *
  * If your chart displays an intraday interval you should use a UNIX Timestamp.
  *

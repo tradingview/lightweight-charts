@@ -39,6 +39,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 };
@@ -46,6 +47,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 export const areaStyleDefaults: AreaStyleOptions = {
 	topColor: 'rgba( 46, 220, 135, 0.4)',
 	bottomColor: 'rgba( 40, 221, 100, 0)',
+	invertFilledArea: false,
 	lineColor: '#33D778',
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
@@ -53,6 +55,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 };
@@ -78,6 +81,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
 
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,

@@ -83,6 +83,8 @@ export const enum TickMarkType {
  * Note that the returned string should be the shortest possible value and should have no more than 8 characters.
  * Otherwise, the tick marks will overlap each other.
  *
+ * If the formatter function returns `null` then the default tick mark formatter will be used as a fallback.
+ *
  * @example
  * ```js
  * const customFormatter = (time, tickMarkType, locale) => {
@@ -90,7 +92,7 @@ export const enum TickMarkType {
  * };
  * ```
  */
-export type TickMarkFormatter = (time: Time, tickMarkType: TickMarkType, locale: string) => string;
+export type TickMarkFormatter = (time: Time, tickMarkType: TickMarkType, locale: string) => string | null;
 
 /**
  * Options for the time scale; the horizontal scale at the bottom of the chart that displays the time of data.
@@ -195,6 +197,13 @@ export interface TimeScaleOptions {
 	 * @defaultValue `undefined`
 	 */
 	tickMarkFormatter?: TickMarkFormatter;
+
+	/**
+	 * Draw small vertical line on time axis labels.
+	 *
+	 * @defaultValue `false`
+	 */
+	ticksVisible: boolean;
 }
 
 export class TimeScale {
@@ -663,17 +672,15 @@ export class TimeScale {
 
 		const source = this._rightOffset;
 		const animationStart = performance.now();
-		const animationFn = () => {
-			const animationProgress = (performance.now() - animationStart) / animationDuration;
-			const finishAnimation = animationProgress >= 1;
-			const rightOffset = finishAnimation ? offset : source + (offset - source) * animationProgress;
-			this.setRightOffset(rightOffset);
-			if (!finishAnimation) {
-				setTimeout(animationFn, 20);
-			}
-		};
 
-		animationFn();
+		this._model.setTimeScaleAnimation({
+			finished: (time: number) => (time - animationStart) / animationDuration >= 1,
+			getPosition: (time: number) => {
+				const animationProgress = (time - animationStart) / animationDuration;
+				const finishAnimation = animationProgress >= 1;
+				return finishAnimation ? offset : source + (offset - source) * animationProgress;
+			},
+		});
 	}
 
 	public update(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
@@ -746,7 +753,7 @@ export class TimeScale {
 			&& !handleScroll.mouseWheel
 			&& !handleScroll.pressedMouseMove
 			&& !handleScroll.vertTouchDrag
-			&& !handleScale.axisDoubleClickReset
+			&& !handleScale.axisDoubleClickReset.time
 			&& !handleScale.axisPressedMouseMove.time
 			&& !handleScale.mouseWheel
 			&& !handleScale.pinch;
@@ -900,7 +907,14 @@ export class TimeScale {
 		const tickMarkType = weightToTickMarkType(tickMark.weight, this._options.timeVisible, this._options.secondsVisible);
 
 		if (this._options.tickMarkFormatter !== undefined) {
-			return this._options.tickMarkFormatter(tickMark.originalTime as unknown as Time, tickMarkType, this._localizationOptions.locale);
+			const tickMarkString = this._options.tickMarkFormatter(
+				tickMark.originalTime as unknown as Time,
+				tickMarkType,
+				this._localizationOptions.locale
+			);
+			if (tickMarkString !== null) {
+				return tickMarkString;
+			}
 		}
 
 		return defaultTickMarkFormatter(tickMark.time, tickMarkType, this._localizationOptions.locale);

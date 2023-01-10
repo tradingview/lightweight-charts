@@ -32,7 +32,7 @@ When logging a bug, please be sure to include the following:
 ### Tests
 
 1. Every pull request should have an adequate tests whenever it's possible (we have several [type of tests](./tests/), so you can find what works best for your changes).
-1. If your changes affect paining, then your changes should contain a test case (or test cases) for [graphics tests](./tests/e2e/graphics).
+1. If your changes affect painting, then your changes should contain a test case (or test cases) for [graphics tests](./tests/e2e/graphics).
 1. Your pull request should pass CI (except checks marked as "not required" - in this case a reviewer should pay attention to job's artifacts).
 
 ### Git commit messages

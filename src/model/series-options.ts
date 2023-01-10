@@ -198,6 +198,12 @@ export interface LineStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.
@@ -224,6 +230,13 @@ export interface AreaStyleOptions {
 	 * @defaultValue `'rgba( 40, 221, 100, 0)'`
 	 */
 	bottomColor: string;
+
+	/**
+	 * Invert the filled area. Fills the area above the line if set to true.
+	 *
+	 * @defaultValue `false`
+	 */
+	invertFilledArea: boolean;
 
 	/**
 	 * Line color.
@@ -277,6 +290,12 @@ export interface AreaStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.
@@ -398,6 +417,12 @@ export interface BaselineStyleOptions {
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBackgroundColor: string;
+	/**
+	 * Crosshair marker border width in pixels.
+	 *
+	 * @defaultValue `2`
+	 */
+	crosshairMarkerBorderWidth: number;
 
 	/**
 	 * Last price animation mode.
@@ -784,6 +809,38 @@ export type LineSeriesOptions = SeriesOptions<LineStyleOptions>;
  * Represents line series options where all properties are optional.
  */
 export type LineSeriesPartialOptions = SeriesPartialOptions<LineStyleOptions>;
+
+/**
+ * Represents the type of style options for each series type.
+ *
+ * For example a bar series has style options represented by {@link BarStyleOptions}.
+ */
+export interface SeriesStyleOptionsMap {
+	/**
+	 * The type of bar style options.
+	 */
+	Bar: BarStyleOptions;
+	/**
+	 * The type of candlestick style options.
+	 */
+	Candlestick: CandlestickStyleOptions;
+	/**
+	 * The type of area style options.
+	 */
+	Area: AreaStyleOptions;
+	/**
+	 * The type of baseline style options.
+	 */
+	Baseline: BaselineStyleOptions;
+	/**
+	 * The type of line style options.
+	 */
+	Line: LineStyleOptions;
+	/**
+	 * The type of histogram style options.
+	 */
+	Histogram: HistogramStyleOptions;
+}
 
 /**
  * Represents the type of options for each series type.

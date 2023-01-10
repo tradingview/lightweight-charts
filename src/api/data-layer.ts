@@ -260,7 +260,7 @@ export class DataLayer {
 			}
 		}
 
-		let seriesRows: (SeriesPlotRow | WhitespacePlotRow)[] = [];
+		let seriesRows: (SeriesPlotRow<TSeriesType> | WhitespacePlotRow)[] = [];
 
 		if (data.length !== 0) {
 			const extendedData = data as SeriesDataItemWithOriginalTime<TSeriesType>[];

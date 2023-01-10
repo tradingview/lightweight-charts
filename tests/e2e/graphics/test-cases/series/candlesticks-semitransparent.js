@@ -23,7 +23,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addCandlestickSeries({
 		borderColor: 'rgba(0, 0, 255, 0.2)',

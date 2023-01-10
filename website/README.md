@@ -11,7 +11,7 @@ Handwritten documentation should focus on explaining concepts, tutorials, intera
 ## Local Development
 
 ```console
-npm start
+npm run start
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -21,12 +21,22 @@ This command starts a local development server and opens a browser window. Most 
 ## Build
 
 ```console
-npm build
+npm run build
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
 
 This command generates static content in the `build` directory.
+
+## Serve Build Locally
+
+```console
+npm run serve
+```
+
+_Note_: Embedded `.html` examples won't display correctly when using this command but will work correctly when hosted online.
+
+This command serves the built website locally.
 
 ## Deployment
 

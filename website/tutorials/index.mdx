@@ -1,23 +1,99 @@
 ---
+sidebar_position: 0
 pagination_next: null
 ---
 
+import CardLinkList from "@site/src/components/CardLinkList";
+import Shapes from "@site/src/img/shapes.svg";
+import ReactLogo from "@site/src/img/react.svg";
+import VuejsLogo from "@site/src/img/vuejs.svg";
+import WebComponentsLogo from "@site/src/img/webcomponents.svg";
+
 # Tutorials
 
-:::caution
-These tutorials are for the latest published version of Lightweight&nbsp;Charts.
-:::
+import VersionWarningAdmonition from "@site/src/components/VersionWarningAdmonition";
+
+<!-- Show warning when not on the latest published version  -->
+<!-- Tutorials section isn't versioned yet, hence the need for the warning message -->
+
+<VersionWarningAdmonition
+	notCurrent="These tutorials are for the latest published version of Lightweight&nbsp;Charts."
+	type="caution"
+	displayVersionMessage
+/>
+
+## Guides
+
+<CardLinkList
+	items={[
+		{
+			href: "/tutorials/customization/intro",
+			title: "Customization",
+			image: <Shapes />,
+			description: "Customizing appearance & features",
+		},
+	]}
+/>
+
+## Framework integrations
+
+This section contains some tutorials how to use Lightweight Charts with some popular frameworks.
+
+<CardLinkList
+	items={[
+		{
+			href: "/tutorials/react/simple",
+			title: "React",
+			image: <ReactLogo />,
+			description: "Integration guide for React",
+		},
+		{
+			href: "/tutorials/vuejs/wrapper",
+			title: "Vue.js",
+			image: <VuejsLogo />,
+			description: "Integration guide for Vue.js",
+		},
+		{
+			href: "/tutorials/webcomponents/custom-element",
+			title: "Web Components",
+			image: <WebComponentsLogo />,
+			description: "Web components custom element",
+		},
+	]}
+/>
 
 :::info
-This section contains some tutorials how to use Lightweight Charts with some popular frameworks.
-If you think that a tutorial is missing feel free to ask [in the discussions](https://github.com/tradingview/lightweight-charts/discussions) or submit your own.
+
+If you think that a tutorial is missing feel free to ask [in the discussions](https://github.com/tradingview/lightweight-charts/discussions)
+or submit your own.
+
 :::
 
-import DocCardList from '@theme/DocCardList';
-import { useDocsSidebar } from '@docusaurus/theme-common';
+## How To / Examples
 
-<DocCardList items={
-	// we need to filter an index page from these cards
-	// and it seems that this is easiest way to do this
-	useDocsSidebar().filter(x => x.docId !== 'index')
-} />
+A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
+
+import { useDocsSidebar } from "@docusaurus/theme-common/internal";
+export const ExamplesList = () => {
+	const examplesCategory = useDocsSidebar().items.find(
+		item => item.type === "category" && item.label === "How To / Examples"
+	);
+	const examples = examplesCategory.items.filter(doc => doc.type === "link");
+	return (
+		<ul>
+			{examples.map(docLink => (
+				<li key={docLink.docId}>
+					<a href={docLink.href}>{docLink.label}</a>
+				</li>
+			))}
+		</ul>
+	);
+};
+
+<ExamplesList />
+
+:::tip
+
+More examples can be viewed on the [Lightweight Charts product page](https://www.tradingview.com/lightweight-charts/).
+
+:::

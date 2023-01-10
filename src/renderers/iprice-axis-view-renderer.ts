@@ -1,5 +1,8 @@
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
+
 import { TextWidthCache } from '../model/text-width-cache';
-import { LineWidth } from '../renderers/draw-line';
+
+import { LineWidth } from './draw-line';
 
 export interface PriceAxisViewRendererCommonData {
 	activeBackground?: string;
@@ -7,6 +10,8 @@ export interface PriceAxisViewRendererCommonData {
 	color: string;
 	coordinate: number;
 	fixedCoordinate?: number;
+	additionalPaddingTop: number;
+	additionalPaddingBottom: number;
 }
 
 export interface PriceAxisViewRendererData {
@@ -15,7 +20,10 @@ export interface PriceAxisViewRendererData {
 	tickVisible: boolean;
 	moveTextToInvisibleTick: boolean;
 	borderColor: string;
+	color: string;
 	lineWidth?: LineWidth;
+	borderVisible: boolean;
+	separatorVisible: boolean;
 }
 
 export interface PriceAxisViewRendererOptions {
@@ -24,6 +32,7 @@ export interface PriceAxisViewRendererOptions {
 	font: string;
 	fontFamily: string;
 	color: string;
+	paneBackgroundColor: string;
 	fontSize: number;
 	paddingBottom: number;
 	paddingInner: number;
@@ -34,12 +43,10 @@ export interface PriceAxisViewRendererOptions {
 
 export interface IPriceAxisViewRenderer {
 	draw(
-		ctx: CanvasRenderingContext2D,
+		target: CanvasRenderingTarget2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		width: number,
-		align: 'left' | 'right',
-		pixelRatio: number
+		align: 'left' | 'right'
 	): void;
 
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number;

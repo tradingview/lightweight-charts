@@ -3,7 +3,7 @@ function copy(data) {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container);
 	const lineSeries = chart.addLineSeries();
 
 	const data = [

@@ -1,0 +1,66 @@
+---
+title: Add Price Line
+sidebar_label: Price Lines
+description: An example of how to add price lines to a chart.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - price line
+---
+
+A price line is a horizontal line drawn across the width of the chart at a specific price value.
+This example shows how to add price lines to your chart.
+
+## Short answer
+
+A price line can be added to a chart by using the
+[`createPriceLine`](/docs/api/interfaces/ISeriesApi#createpriceline) method on an existing series
+([ISeriesApi](/docs/api/interfaces/ISeriesApi)) instance.
+
+```js
+const myPriceLine = {
+    price: 1234,
+    color: '#3179F5',
+    lineWidth: 2,
+    lineStyle: 2, // LineStyle.Dashed
+    axisLabelVisible: true,
+    title: 'my label',
+};
+
+series.createPriceLine(myPriceLine);
+```
+
+You can see a full [working example](#full-example) below.
+
+## Tips
+
+You may wish to disable the default price line drawn by Lightweight Charts
+for the last value in the series (and it's label). You can do this by adjusting the
+series options as follows:
+
+```js
+series.applyOptions({
+    lastValueVisible: false,
+    priceLineVisible: false,
+});
+```
+
+## Resources
+
+You can view the related APIs here:
+- [createPriceLine](/docs/api/interfaces/ISeriesApi#createpriceline) - Method to create a new Price Line.
+- [PriceLineOptions](/docs/api/interfaces/PriceLineOptions) - Price Line options.
+- [LineStyle](/docs/api/enums/LineStyle) - Available line styles.
+
+## Full example
+
+import UsageGuidePartial from "./_usage-guide-partial.mdx";
+
+<UsageGuidePartial />
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./price-line.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{code}
+</CodeBlock>

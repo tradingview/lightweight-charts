@@ -1,0 +1,95 @@
+---
+sidebar_position: 4
+title: Price format
+pagination_title: Price format
+sidebar_label: Price format
+description: In this section, we will be replacing the default price formatter function with our implementation.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/series
+pagination_next: customization/price-scale
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In this section, we will be replacing the default price formatter function with our implementation. Currently, the prices on the chart are been shown with two decimal places and without a currency symbol. Let's implement a formatter which will format the number correctly based on their current locale and present it as the Euro currency.
+
+## Price Formatter functions
+
+To provide a price formatter, we need to create a function which accepts a `number` as the input and returns a `string` as the output. A simple price formatter which takes a number and returns the number (as a string) formatted with two decimal points would look as follows:
+
+```js
+const myPriceFormatter = p => p.toFixed(2);
+```
+
+We can make use of the built-in functionality provided by the browser to build a more versatile price formatter by using the [Intl.NumberFormat API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat).
+
+```js
+// Get the current users primary locale
+const currentLocale = window.navigator.languages[0];
+// Create a number format using Intl.NumberFormat
+const myPriceFormatter = Intl.NumberFormat(currentLocale, {
+    style: 'currency',
+    currency: 'EUR', // Currency for data points
+}).format;
+```
+
+First, we are grabbing the primary locale for the current user which will pass into the `Intl.NumberFormat` constructor. The constructor takes a second argument for options where we can specify the `style` and `currency` properties. The instance created contains a `format` method which we can then pass into Lightweight Charts 9as shown below).
+
+## Setting the price formatter
+
+We can set the default price formatter to be used throughout the chart by passing our own custom price formatter function into the `priceformatter` property of the `localization` property ([LocalizationOptions](/docs/api/interfaces/LocalizationOptions)) within the chart options.
+
+```js
+// Apply the custom priceFormatter to the chart
+chart.applyOptions({
+    localization: {
+        priceFormatter: myPriceFormatter,
+    },
+});
+```
+
+Price values displayed on the vertical price scale will now be displayed as Euros.
+
+Price formatters can also be applied to each series individually by adjusting the [priceformat](/docs/api/interfaces/SeriesOptionsCommon#priceformat) property of the series options.
+
+## Built-in price formatting
+
+Lightweight Charts includes a few options to adjust the built-in price formatting which can be see here: [PriceFormatBuiltIn](/docs/api/interfaces/PriceFormatBuiltIn).
+
+## Result
+
+At this point we should have a chart like this:
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step4.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step4.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+In the next step, we will be making some adjustments to the functionality of the vertical price scale.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step4.html').default} download="customization-tutorial-step4.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step4.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

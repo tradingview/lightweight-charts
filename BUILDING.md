@@ -1,6 +1,8 @@
 # Building Lightweight Charts
 
-The minimal supported version of [NodeJS](https://nodejs.org/) for development is 16.13.
+The minimal supported version of [NodeJS](https://nodejs.org/) for development is 16.16.
+
+**Note:** you need to run `npm install` in both the root directory and the `website` directory before you can run the lint tests.
 
 ## Compiling
 
@@ -19,6 +21,8 @@ The minimal supported version of [NodeJS](https://nodejs.org/) for development i
 - `npm run lint` - runs lint for the code
 - `npm run test` - runs unit-tests
 
+There are several included e2e tests available which can be run individually. Please have a read through the following document for further information: [/tests/README.md](./tests/README.md)
+
 ## Tips
 
 - You can use the following command to make sure that your local copy passes all (almost) available checks:
@@ -34,6 +38,7 @@ The minimal supported version of [NodeJS](https://nodejs.org/) for development i
 1. Run `npm run docusaurus docs:version MAJ:MIN` in `website` folder to create new versioned docs.
   Note that there is not patch version in docs, only major and minor parts.
 1. (optional) Remove docs for the oldest version (see <https://docusaurus.io/docs/versioning#deleting-an-existing-version>).
+1. Handle the new version in `import-lightweight-charts-version.ts`: add a package reference for that version to `website/package.json` (e.g. `"lightweight-charts-MAJ.MIN": "npm:lightweight-charts@~MAJ.MIN.0"`) and a import of that package in a matching case statement.
 1. Bump `lightweight-charts` package version in `website/package.json` file.
 1. Add all created files to git and commit changes.
   Note that at this step the website cannot work since it uses unpublished so far version. It will be fixed in the next steps.
