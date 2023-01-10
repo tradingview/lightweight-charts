@@ -2,7 +2,7 @@
 import type { Version } from '../../../../versions';
 
 export type LightweightChartsApi38 = typeof import('lightweight-charts-3.8');
-export type LightweightChartsApiCurrent = typeof import('../../../../..');
+export type LightweightChartsApiCurrent = typeof import('../../../../../dist/lightweight-charts.esm.development');
 
 export interface LightweightChartsApiTypeMap {
 	'3.8': LightweightChartsApi38;
@@ -47,7 +47,7 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 		return { module, createChart };
 	},
 	current: async () => {
-		const module = await import('../../../../..');
+		const module = await import('../../../../../dist/lightweight-charts.esm.development');
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);

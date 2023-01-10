@@ -25,14 +25,14 @@ Note that case's file wouldn't prepared/parsed by any bundler/processor (or even
 
 This tests runs against 2 versions of the library - "golden" and "test". Golden is LKG version, test - current tested version of the library.
 
-To run this tests you need use [runner.cjs](./runner.cjs):
+To run this tests you need use [runner.js](./runner.js):
 
 ```bash
-./runner.cjs ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
+./runner.js ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
 ```
 
 Each path to the standalone module might be either to a local file (relative/absolute path to a file) or remote file (via http/https).
-If file is local then local server will be runner to serve that file (see [serve-local-files.cjs](../serve-local-files.cjs) module).
+If file is local then local server will be runner to serve that file (see [serve-local-files.js](../serve-local-files.js) module).
 
 ## Tips
 
@@ -43,7 +43,7 @@ If file is local then local server will be runner to serve that file (see [serve
     But if you test with local files, you cannot open that HTML pages in your browser to debug because there is scripts which are loaded from webserver (which a runner up to runs tests).
     In that can you can use the following hack.
 
-    Let's say you run your tests in that way - `./runner.cjs ./golden/standalone/module.js ./test/standalone/module.js`.
+    Let's say you run your tests in that way - `./runner.js ./golden/standalone/module.js ./test/standalone/module.js`.
     After that in `.gendata/test-case-name/1.golden.html` you can find a HTML page.
 
     To open this page properly you can run `./tests/e2e/serve-static-files.js golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.

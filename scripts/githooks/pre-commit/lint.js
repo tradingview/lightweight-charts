@@ -103,7 +103,7 @@ function lintFiles(files) {
 		// yeah, eslint might check code inside markdown files
 		hasErrors = runESLintForFiles(mdFiles) || hasErrors;
 		hasErrors = runMarkdownLintForFiles(mdFiles) || hasErrors;
-		hasErrors = run('node scripts/check-markdown-links.cjs') || hasErrors;
+		hasErrors = run('node scripts/check-markdown-links.js') || hasErrors;
 	}
 
 	// markdown react

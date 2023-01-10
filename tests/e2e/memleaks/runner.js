@@ -5,9 +5,9 @@ const path = require('path');
 
 const Mocha = require('mocha');
 
-const serveLocalFiles = require('../serve-local-files.cjs').serveLocalFiles;
+const serveLocalFiles = require('../serve-local-files.js').serveLocalFiles;
 
-const mochaConfig = require('../../../.mocharc.cjs');
+const mochaConfig = require('../../../.mocharc.js');
 
 // override tsconfig
 process.env.TS_NODE_PROJECT = path.resolve(__dirname, '../tsconfig.composite.json');
@@ -53,7 +53,7 @@ function runMocha(closeServer) {
 	}
 
 	mocha.diff(mochaConfig.diff);
-	mocha.addFile(path.resolve(__dirname, './coverage-test-cases.ts'));
+	mocha.addFile(path.resolve(__dirname, './memleaks-test-cases.ts'));
 
 	mocha.run(failures => {
 		if (closeServer !== null) {

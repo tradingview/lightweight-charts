@@ -8,9 +8,9 @@ const argv = yargs(process.argv.slice(4)).argv;
 
 const Mocha = require('mocha');
 
-const serveLocalFiles = require('../serve-local-files.cjs').serveLocalFiles;
+const serveLocalFiles = require('../serve-local-files.js').serveLocalFiles;
 
-const mochaConfig = require('../../../.mocharc.cjs');
+const mochaConfig = require('../../../.mocharc.js');
 
 // override tsconfig
 process.env.TS_NODE_PROJECT = path.resolve(__dirname, '../tsconfig.composite.json');

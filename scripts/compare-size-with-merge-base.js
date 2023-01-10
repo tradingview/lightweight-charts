@@ -10,7 +10,7 @@ const bytes = require('bytes');
 const sizeLimit = require('size-limit');
 const filePlugin = require('@size-limit/file');
 
-const sizeLimitConfig = require('../.size-limit.cjs');
+const sizeLimitConfig = require('../.size-limit.js');
 
 function run(cmd) {
 	try {
