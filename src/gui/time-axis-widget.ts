@@ -292,7 +292,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const pixelRatio = this._topCanvasBinding.pixelRatio;
 
 		topCtx.clearRect(0, 0, Math.ceil(this._size.w * pixelRatio), Math.ceil(this._size.h * pixelRatio));
-		this._drawLabels([this._chart.model().crosshairSource()], topCtx, pixelRatio);
+		this._drawLabels([...this._chart.model().serieses(), this._chart.model().crosshairSource()], topCtx, pixelRatio);
 	}
 
 	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {

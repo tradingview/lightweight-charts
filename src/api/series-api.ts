@@ -22,7 +22,9 @@ import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
+import { ExternalSourceWrapper } from './external-source-wrapper';
 import { getSeriesDataCreator } from './get-series-data-creator';
+import { IExternalDataSource } from './iexternal-data-source';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, ISeriesApi } from './iseries-api';
@@ -184,5 +186,9 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public seriesType(): TSeriesType {
 		return this._series.seriesType();
+	}
+
+	public attachExternalSource(source: IExternalDataSource): void {
+		this._series.addExternalSource(new ExternalSourceWrapper(source, this._series.model()));
 	}
 }

@@ -13,6 +13,7 @@ import {
 import { Range, Time } from '../model/time-data';
 
 import { SeriesDataItemTypeMap } from './data-consumer';
+import { IExternalDataSource } from './iexternal-data-source';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 
@@ -263,4 +264,6 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	seriesType(): TSeriesType;
+
+	attachExternalSource(source: IExternalDataSource): void;
 }
