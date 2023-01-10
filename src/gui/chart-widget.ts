@@ -23,10 +23,11 @@ import { SeriesPlotRow } from '../model/series-data';
 import { OriginalTime, TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { InternalLayoutSizeHints, InternalLayoutSizeHintsKeepOdd } from './internal-layout-sizes-hints';
-// import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
+import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
+
+// import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 
 export interface MouseEventParamsImpl {
 	time?: OriginalTime;
@@ -61,7 +62,6 @@ export class ChartWidget implements IDestroyable {
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 	private _observer: ResizeObserver | null = null;
-	private _sizingHints: InternalLayoutSizeHints = new InternalLayoutSizeHintsKeepOdd();
 
 	private _container: HTMLElement;
 
@@ -177,7 +177,7 @@ export class ChartWidget implements IDestroyable {
 			return;
 		}
 
-		const sizeHint = this._sizingHints.suggestChartSize(size({ width, height }));
+		const sizeHint = suggestChartSize(size({ width, height }));
 
 		this._height = sizeHint.height;
 		this._width = sizeHint.width;
@@ -412,8 +412,8 @@ export class ChartWidget implements IDestroyable {
 			totalStretch += paneWidget.stretchFactor();
 		}
 
-		leftPriceAxisWidth = this._sizingHints.suggestPriceScaleWidth(leftPriceAxisWidth);
-		rightPriceAxisWidth = this._sizingHints.suggestPriceScaleWidth(rightPriceAxisWidth);
+		leftPriceAxisWidth = suggestPriceScaleWidth(leftPriceAxisWidth);
+		rightPriceAxisWidth = suggestPriceScaleWidth(rightPriceAxisWidth);
 
 		const width = this._width;
 		const height = this._height;
@@ -425,13 +425,7 @@ export class ChartWidget implements IDestroyable {
 		const separatorsHeight = 0; // separatorHeight * separatorCount;
 		const timeAxisVisible = this._options.timeScale.visible;
 		let timeAxisHeight = timeAxisVisible ? this._timeAxisWidget.optimalHeight() : 0;
-		// TODO: Fix it better
-		// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
-		if (timeAxisHeight % 2) {
-			timeAxisHeight += 1;
-		}
-		// ! NEW
-		// const timeAxisHeight = this._sizingHints.suggestTimeScaleHeight(originalTimeAxisHeight);
+		timeAxisHeight = suggestTimeScaleHeight(timeAxisHeight);
 
 		const otherWidgetHeight = separatorsHeight + timeAxisHeight;
 		const totalPaneHeight = height < otherWidgetHeight ? 0 : height - otherWidgetHeight;
