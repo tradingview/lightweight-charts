@@ -19,7 +19,7 @@
 	inset: 0px;
 	background: rgba(255, 255, 255, 0.05);
 	backdrop-filter: blur(10.3785px);
-	border-radius: 28px;
+	border-radius: calc(16px + var(--chart-glass-border-width));
 }
 
 .HeroChartGradient {
@@ -34,7 +34,7 @@
 		rgba(41, 98, 255, 0.7) 70.81%
 	);
 	filter: blur(20.7571px);
-	border-radius: 26px;
+	border-radius: calc(16px + var(--chart-glass-border-width));
 }
 
 .HeroChartFigure {
@@ -93,6 +93,33 @@
 	.HeroChartGlass {
 		border-top-right-radius: 0px !important;
 		border-bottom-right-radius: 0px !important;
+	}
+}
+
+@media (min-width: 568px) and (max-width: 1279px) {
+	.HeroChartSection {
+		margin-left: calc(
+			var(--hero-chart-padding-left) + var(--container-padding)
+		);
+	}
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+	.HeroChartSection {
+		width: calc(100% - 48px);
+		margin-right: 48px;
+	}
+}
+
+@media (max-width: 1024px) {
+	.HeroChartSection {
+		width: calc(
+			100% - var(--container-offset-right-chart) -
+				var(--chart-glass-border-width)
+		);
+		margin-right: calc(
+			var(--container-offset-right-chart) + var(--chart-glass-border-width)
+		);
 	}
 }
 

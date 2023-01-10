@@ -25,6 +25,7 @@
 	--tv-blue-a-800: #142e61;
 
 	--container-padding: 100px;
+	--container-offset-right-chart: var(--container-padding);
 	--vertical-container-padding: 120px;
 	--hero-margin-bottom: 80px;
 
@@ -150,7 +151,7 @@
 		--hero-gap: 80px;
 		--hero-chart-padding-left: 42px;
 		--chart-right-edge-spacing: var(--container-padding);
-		--right-code-block-position: -10px;
+		--right-code-block-position: -12px;
 		--chart-glass-border-width: 8px;
 		--hero-chart-height: initial;
 		--hero-chart-aspect-ratio: 2 / 1;
@@ -164,8 +165,9 @@
 		--container-padding: 20px;
 		--hero-chart-padding-left: 32px;
 		--code-block-scale: 0.8;
-		--right-code-block-position: -4px;
+		--right-code-block-position: -20px;
 		--chart-glass-border-width: 6px;
+		--container-offset-right-chart: var(--container-padding);
 	}
 }
 
@@ -188,8 +190,11 @@
 		--hero-content-line-height: 28px;
 		--hero-chart-padding-left: 24px;
 		--code-block-scale: 0.5;
-		--right-code-block-position: -8px;
+		/* --right-code-block-position: -8px; */
+		--right-code-block-position: -18px;
 		--chart-glass-border-width: 5px;
+		--container-offset-right-chart: 16px;
+		--hero-chart-aspect-ratio: 1.75
 	}
 }
 

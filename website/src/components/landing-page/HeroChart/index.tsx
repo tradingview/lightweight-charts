@@ -144,8 +144,9 @@ function Chart(): JSX.Element {
 				 * Breakpoint of 567px minus 64px
 				 * padding of 24px on left of HeroChartSection
 				 * padding of 20px for HeroContainer (x2)
+				 * minus 8
 				 */
-				const showTimeScale = width > 503;
+				const showTimeScale = width > 495;
 				chart.applyOptions({
 					timeScale: {
 						visible: showTimeScale,
