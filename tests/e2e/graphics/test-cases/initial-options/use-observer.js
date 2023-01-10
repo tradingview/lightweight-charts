@@ -1,3 +1,4 @@
+window.ignoreMouseMove = true;
 function generateData() {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
