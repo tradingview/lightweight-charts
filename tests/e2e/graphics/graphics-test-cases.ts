@@ -114,8 +114,16 @@ describe(`Graphics tests with devicePixelRatio=${devicePixelRatioStr} (${buildMo
 });
 
 function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, outDir: string): void {
+	const attempts: Record<string, number> = {};
+	testCases.forEach((testCase: TestCase) => {
+		attempts[testCase.name] = 0;
+	});
+
 	for (const testCase of testCases) {
 		it(testCase.name, async () => {
+			const previousAttempts = attempts[testCase.name];
+			attempts[testCase.name] += 1;
+
 			const testCaseOutDir = path.join(outDir, testCase.name);
 			rmRf(testCaseOutDir);
 			fs.mkdirSync(testCaseOutDir, { recursive: true });
@@ -130,20 +138,29 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 			writeTestDataItem('1.golden.html', goldenPageContent);
 			writeTestDataItem('2.test.html', testPageContent);
 
-			// run in parallel to increase speed
-			const goldenScreenshotPromise = screenshoter.generateScreenshot(goldenPageContent);
-			const testScreenshotPromise = screenshoter.generateScreenshot(testPageContent);
-
 			const errors: string[] = [];
 			const failedPages: string[] = [];
+
+			// run in parallel to increase speed
+			const goldenScreenshotPromise = screenshoter.generateScreenshot(goldenPageContent);
+
+			if (previousAttempts) {
+				try {
+					// If a test has previously failed then attempt to run the tests in series (one at a time).
+					await goldenScreenshotPromise;
+				} catch {
+					// error will be caught again below and handled correctly there.
+				}
+			}
+
+			const testScreenshotPromise = screenshoter.generateScreenshot(testPageContent);
 
 			let goldenScreenshot: PNG | null = null;
 			try {
 				goldenScreenshot = await goldenScreenshotPromise;
 				writeTestDataItem('1.golden.png', PNG.sync.write(goldenScreenshot));
-			} catch (e) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-				errors.push(`=== Golden page ===\n${e.message}`);
+			} catch (e: unknown) {
+				errors.push(`=== Golden page ===\n${(e as Error).message}`);
 				failedPages.push('golden');
 			}
 
@@ -151,9 +168,8 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 			try {
 				testScreenshot = await testScreenshotPromise;
 				writeTestDataItem('2.test.png', PNG.sync.write(testScreenshot));
-			} catch (e) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-				errors.push(`=== Test page ===\n${e.message}`);
+			} catch (e: unknown) {
+				errors.push(`=== Test page ===\n${(e as Error).message}`);
 				failedPages.push('test');
 			}
 

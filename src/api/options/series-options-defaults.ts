@@ -1,8 +1,10 @@
 import {
 	AreaStyleOptions,
 	BarStyleOptions,
+	BaselineStyleOptions,
 	CandlestickStyleOptions,
 	HistogramStyleOptions,
+	LastPriceAnimationMode,
 	LineStyleOptions,
 	PriceLineSource,
 	SeriesOptionsCommon,
@@ -37,12 +39,15 @@ export const lineStyleDefaults: LineStyleOptions = {
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
+	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 };
 
 export const areaStyleDefaults: AreaStyleOptions = {
 	topColor: 'rgba( 46, 220, 135, 0.4)',
 	bottomColor: 'rgba( 40, 221, 100, 0)',
+	invertFilledArea: false,
 	lineColor: '#33D778',
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
@@ -50,7 +55,36 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
+	lastPriceAnimation: LastPriceAnimationMode.Disabled,
+};
+
+export const baselineStyleDefaults: BaselineStyleOptions = {
+	baseValue: {
+		type: 'price',
+		price: 0,
+	},
+
+	topFillColor1: 'rgba(38, 166, 154, 0.28)',
+	topFillColor2: 'rgba(38, 166, 154, 0.05)',
+	topLineColor: 'rgba(38, 166, 154, 1)',
+
+	bottomFillColor1: 'rgba(239, 83, 80, 0.05)',
+	bottomFillColor2: 'rgba(239, 83, 80, 0.28)',
+	bottomLineColor: 'rgba(239, 83, 80, 1)',
+
+	lineWidth: 3,
+	lineStyle: LineStyle.Solid,
+	lineType: LineType.Simple,
+
+	crosshairMarkerVisible: true,
+	crosshairMarkerRadius: 4,
+	crosshairMarkerBorderColor: '',
+	crosshairMarkerBorderWidth: 2,
+	crosshairMarkerBackgroundColor: '',
+
+	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 };
 
 export const histogramStyleDefaults: HistogramStyleOptions = {

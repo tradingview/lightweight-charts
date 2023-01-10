@@ -1,0 +1,30 @@
+<!--
+    ESLint throws an error when trying to use TabItem.
+    Created this partial file so it can be ignored by ESLint (using ignorePattern within .eslintrc.js)
+-->
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<Tabs>
+<TabItem value="creation" label="During Creation">
+
+```js
+const lineSeries = chart.addLineSeries({
+    color: '#2962FF',
+});
+```
+
+</TabItem>
+<TabItem value="applyOptions" label="Using applyOptions">
+
+```js
+const lineSeries = chart.addLineSeries();
+
+mainSeries.applyOptions({
+    color: '#2962FF',
+});
+```
+
+</TabItem>
+</Tabs>

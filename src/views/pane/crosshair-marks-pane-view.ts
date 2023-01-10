@@ -1,7 +1,7 @@
 import { ensureNotNull } from '../../helpers/assertions';
 
 import { BarPrice } from '../../model/bar';
-import { ChartModel, ChartOptionsInternal } from '../../model/chart-model';
+import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { Crosshair } from '../../model/crosshair';
 import { Series } from '../../model/series';
@@ -12,7 +12,7 @@ import { MarksRendererData, PaneRendererMarks } from '../../renderers/marks-rend
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
-function createEmptyMarkerData(chartOptions: ChartOptionsInternal): MarksRendererData {
+function createEmptyMarkerData(): MarksRendererData {
 	return {
 		items: [{
 			x: 0 as Coordinate,
@@ -21,8 +21,9 @@ function createEmptyMarkerData(chartOptions: ChartOptionsInternal): MarksRendere
 			price: 0 as BarPrice,
 		}],
 		lineColor: '',
-		backColor: chartOptions.layout.backgroundColor,
+		backColor: '',
 		radius: 0,
+		lineWidth: 0,
 		visibleRange: null,
 	};
 }
@@ -46,7 +47,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 	public update(updateType?: UpdateType): void {
 		const serieses = this._chartModel.serieses();
 		if (serieses.length !== this._markersRenderers.length) {
-			this._markersData = serieses.map(() => createEmptyMarkerData(this._chartModel.options()));
+			this._markersData = serieses.map(createEmptyMarkerData);
 			this._markersRenderers = this._markersData.map((data: MarksRendererData) => {
 				const res = new PaneRendererMarks();
 				res.setData(data);
@@ -58,7 +59,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 		this._invalidated = true;
 	}
 
-	public renderer(height: number, width: number, addAnchors?: boolean): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (this._invalidated) {
 			this._updateImpl();
 			this._invalidated = false;
@@ -83,10 +84,11 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 
 			const firstValue = ensureNotNull(s.firstValue());
 			data.lineColor = seriesData.backgroundColor;
-			data.backColor = seriesData.borderColor;
 			data.radius = seriesData.radius;
+			data.lineWidth = seriesData.borderWidth;
 			data.items[0].price = seriesData.price;
 			data.items[0].y = s.priceScale().priceToCoordinate(seriesData.price, firstValue.value);
+			data.backColor = seriesData.borderColor ?? this._chartModel.backgroundColorAtYPercentFromTop(data.items[0].y / s.priceScale().height());
 			data.items[0].time = timePointIndex;
 			data.items[0].x = timeScale.indexToCoordinate(timePointIndex);
 			data.visibleRange = rangeForSinglePoint;

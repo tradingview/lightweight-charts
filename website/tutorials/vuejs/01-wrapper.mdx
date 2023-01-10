@@ -1,0 +1,351 @@
+---
+title: Vue.js - Wrapper Component
+description:
+  A simple example of how to use Lightweight Charts within the Vue.js framework.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - vue
+  - vue.js
+  - example
+---
+
+# Vue.js - Wrapper Component
+
+:::info
+
+The following describes a relatively simple example that only allows for a
+single [series](/docs/series-types) to be rendered. This example can be used as
+a starting point and could be tweaked further using our extensive
+[API](/docs/api).
+
+**Please note: this example is intended to be used with Vue.js 3**
+
+:::
+
+This guide will focus on the key concepts required to get Lightweight Charts
+running within a Vue component. Please note this guide is not intended as a
+complete step-by-step tutorial. The example Vue components can be found at the
+[bottom](#complete-sample-code) of this guide.
+
+If you are new to Vue.js then please have a look at the
+[official Vue.js tutorials](https://vuejs.org/guide/introduction.html) before
+proceeding further with this example.
+
+## About the example wrapper component
+
+The example Vue wrapper component has the following features.
+
+The ability to:
+
+- specify the series type via a component attribute,
+- specify the series data via a component property,
+- control the chart, series, time scale, and price scale options via properties,
+- enable automatic resizing of the chart when the browser is resized.
+
+The example may not fit your requirements completely. Creating a general-purpose
+declarative wrapper for Lightweight Charts' imperative API is a challenge, but
+hopefully, you can adapt this example to your use case.
+
+### Component showcase
+
+Presented below is the finished wrapper component which is discussed throughout
+this guide. The interactive buttons beneath the chart are showcasing how to
+interact with the component and that code is provided below as well (within the
+example app component).
+
+import BrowserOnly from '@docusaurus/BrowserOnly';
+
+<BrowserOnly fallback={<div>Loading...</div>}>
+    {() => {
+        require('./assets/web-component.js');
+        return <vue-example></vue-example>;
+    }}
+</BrowserOnly>
+
+### Vue API styles
+
+Vue components can be authored in two different
+[API styles](https://vuejs.org/guide/introduction.html#api-styles): _Options
+API_ and _Composition API_.
+
+This example will make use of the **Composition API**, but complete code
+examples for both APIs will be presented at the end of the tutorial.
+
+The Vue component could be used within any Vue setup, you can learn more on the
+Vue documentation site:
+[Ways of Vue](https://vuejs.org/guide/extras/ways-of-using-vue.html)
+
+## Integrating Lightweight Charts with Vue
+
+### Avoid using `Refs` for storing API instances
+
+The preferred way to store a reference to the created chart
+([IChartApi](/docs/api/interfaces/IChartApi) instance), or any other of the
+library's instances, is to make use of a plain JS variable or class field
+instead of using Vue's [`ref`](https://vuejs.org/api/reactivity-core.html#ref)
+functionality.
+
+When Vue wraps an object in a reference object, it modifies the object (to
+enable reactivity) in such a way that it interferes with the internal logic of
+the Lightweight Chart. This can lead to unexpected behaviour. If you really need
+to use a [`ref`](https://vuejs.org/api/reactivity-core.html#ref) then please
+consider using
+[`shallowRef`](https://vuejs.org/api/reactivity-advanced.html#shallowref)
+instead.
+
+We can instead create a variable to hold these instances outside of any vue
+hooks (such as
+[`onMounted`](https://vuejs.org/api/composition-api-lifecycle.html#onmounted),
+[`watch`](https://vuejs.org/api/reactivity-core.html#watch)) within the body of
+the script.
+
+```html
+<script setup>
+    import { onMounted } from 'vue';
+
+    // variable to store the created chart instance
+    let chart;
+
+    onMounted() {
+        // ...
+    }
+</script>
+```
+
+### Use the `onMounted` lifecycle hook to create the chart
+
+Lightweight Charts requires an html element to use as its container, you can
+create a simple div element within the component's `template` and ask Vue to
+create a reference to that element by adding the `ref="chartContainer"`
+attribute to the div element and the corresponding variable within the script
+section: `const chartContainer = ref();`
+
+The ideal time to create the chart is during the `mounted` lifecycle hook
+provided by the Vue component. The container div will be created and ready for
+use at this stage. Within the
+[`onMounted`](https://vuejs.org/api/composition-api-lifecycle.html#onmounted)
+hook we can call Lightweight Charts' [`createChart`](/docs/api#createchart)
+constructor and pass it the value of the container reference (which is the div
+element).
+
+:::tip
+
+Remember to also clean up when the component is unmounted
+([`onUnmounted`](https://vuejs.org/api/composition-api-lifecycle.html#onunmounted)
+hook) by calling the [`remove`](/docs/api/interfaces/IChartApi#remove) method on
+the saved chart instance.
+
+:::
+
+```html
+<script setup>
+    import { onMounted, ref } from 'vue';
+    import { createChart } from 'lightweight-charts';
+
+    let chart;
+    const chartContainer = ref();
+
+    onMounted(() => {
+        // Create the Lightweight Charts Instance using the container ref.
+        chart = createChart(chartContainer.value);
+    });
+
+    onUnmounted(() => {
+        if (chart) {
+            chart.remove();
+            chart = null;
+        }
+    });
+</script>
+<template>
+    <div class="lw-chart" ref="chartContainer"></div>
+</template>
+<style scoped>
+    .lw-chart {
+        height: 100%;
+    }
+</style>
+```
+
+### Providing option properties
+
+A simple way to provide customisation of the chart to the component's consumers
+is to create component properties for the options you wish to be customised.
+Lightweight Charts has a variety of customisation options which can be applied
+through the [`applyOptions`](/docs/api/interfaces/IChartApi#applyOptions) method
+on an Api instance (such as [IChartApi](/docs/api/interfaces/IChartApi),
+[ISeriesApi](/docs/api/interfaces/ISeriesApi),
+[IPriceScaleApi](/docs/api/interfaces/IPriceScaleApi), and
+[ITimeScaleApi](/docs/api/interfaces/ITimeScaleApi)).
+
+We can define properties for use as the components API as follows:
+
+```html
+<script setup>
+    import { defineProps } from 'vue';
+
+    const props = defineProps({
+        type: {
+            type: String,
+            default: 'line',
+        },
+        data: {
+            type: Array,
+            required: true,
+        },
+        chartOptions: {
+            type: Object,
+        },
+        seriesOptions: {
+            type: Object,
+        },
+    });
+</script>
+```
+
+These properties can be used during the creation of Api instances, for example:
+
+```js
+chart = createChart(chartContainer.value, props.chartOptions);
+```
+
+We can instruct Vue to
+[`watch`](https://vuejs.org/api/reactivity-core.html#watch) these properties for
+changes and allow us to provide code to react to these changes. Using this
+mechanism, we can provide a direct mapping between the options properties and
+the `applyOptions` methods on the instance. This allows the consumer of the
+component to apply changes to the current options at any point during the
+lifecycle of the chart.
+
+:::info
+
+Please note: the current options aren't reset when applying the new options, and
+the new options can be a partial object. Thus it is possible to change one
+option at a time while still keeping the current options.
+
+:::
+
+```js
+watch(
+    () => props.chartOptions,
+    newOptions => {
+        if (!chart) {
+            return;
+        }
+        chart.applyOptions(newOptions);
+    }
+);
+
+watch(
+    () => props.priceScaleOptions,
+    newOptions => {
+        if (!chart) {
+            return;
+        }
+        chart.priceScale().applyOptions(newOptions);
+    }
+);
+```
+
+### Exposing the chart instance or additional methods
+
+There may be cases where you want to provide access to the chart instance, or
+provide useful methods, to the consumer of the component. This can be achieved
+with the
+[`defineExpose`](https://vuejs.org/api/sfc-script-setup.html#defineexpose) hook
+provided by Vue.
+
+```js
+import { defineExpose } from 'vue';
+
+// A simple method to call `fitContent` on the time scale
+const fitContent = () => {
+    if (!chart) {
+        return;
+    }
+    chart.timeScale().fitContent();
+};
+
+// Expose the chart instance via a method
+const getChart = () => chart;
+
+defineExpose({ fitContent, getChart });
+```
+
+The consumer of the component can create a reference to a specific instance of
+the component and use the reference's value to evoke one of the exposed methods.
+
+```html
+<script setup>
+    import { ref } from 'vue';
+    import LWChart from './components/LWChart.vue';
+
+    // ...
+
+    const myChart = ref();
+
+    const fitContent = () => {
+        // call a method on the component.
+        myChart.value.fitContent();
+    };
+</script>
+<template>
+    <LWChart type="line" :data="myData" ref="myChart" />
+    <button type="button" @click="fitContent">Fit Content</button>
+</template>
+```
+
+## Complete Sample Code
+
+Presented below is the complete component source code for the Vue components. We
+have also provided a sample Vue App component which showcases how to make use of
+these components within a typical Vue application.
+
+You can view a complete Vue project using these components at this
+[StackBlitz example](https://stackblitz.com/edit/vitejs-vite-r4bbai?file=src/App.vue).
+
+### Composition API
+
+The following code block contains the source code for the sample Vue component
+using the Composition API.
+
+<p><a href={require('!!file-loader!./assets/composition-api.vue').default} download="lw-chart.vue" target="\_blank">Download file</a></p>
+
+import CodeBlock from '@theme/CodeBlock';
+import InstantDetails from '@site/src/components/InstantDetails';
+import compositionCode from '!!raw-loader!./assets/composition-api.vue';
+
+<InstantDetails>
+    <summary>Click here to reveal the code.</summary>
+    <CodeBlock className="language-html">{compositionCode}</CodeBlock>
+</InstantDetails>
+
+### Options API
+
+The following code block contains the source code for the sample Vue component
+using the Options API.
+
+<p><a href={require('!!file-loader!./assets/options-api.vue').default} download="lw-chart.vue" target="\_blank">Download file</a></p>
+
+import optionsCode from '!!raw-loader!./assets/options-api.vue';
+
+<InstantDetails>
+    <summary>Click here to reveal the code.</summary>
+    <CodeBlock className="language-html">{optionsCode}</CodeBlock>
+</InstantDetails>
+
+### Example Vue App Component
+
+The following code block contains the source code for a sample Vue Application
+component which makes use of the Vue components shown above. It showcases a few
+ways to control and interact with the component.
+
+<p><a href={require('!!file-loader!./assets/app.vue').default} download="app.vue" target="\_blank">Download file</a></p>
+
+import appCode from '!!raw-loader!./assets/app.vue';
+
+<InstantDetails>
+    <summary>Click here to reveal the code.</summary>
+    <CodeBlock className="language-html">{appCode}</CodeBlock>
+</InstantDetails>

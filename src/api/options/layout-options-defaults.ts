@@ -1,10 +1,13 @@
 import { defaultFontFamily } from '../../helpers/make-font';
 
-import { LayoutOptions } from '../../model/layout-options';
+import { ColorType, LayoutOptions } from '../../model/layout-options';
 
 export const layoutOptionsDefaults: LayoutOptions = {
-	backgroundColor: '#FFFFFF',
+	background: {
+		type: ColorType.Solid,
+		color: '#FFFFFF',
+	},
 	textColor: '#191919',
-	fontSize: 11,
+	fontSize: 12,
 	fontFamily: defaultFontFamily,
 };

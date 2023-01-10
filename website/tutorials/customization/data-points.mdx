@@ -1,0 +1,76 @@
+---
+sidebar_position: 9
+title: Data points
+pagination_title: Data points
+sidebar_label: Data points
+description: In this section, we will modify the candlestick data such that we can individually set the color for each candlestick.
+keywords:
+  - customization
+  - appearance
+  - styling
+pagination_prev: customization/second-series
+pagination_next: customization/finishing-touches
+---
+
+import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+
+<IterativeGuideWarning/>
+
+In this section, we will modify the candlestick data such that we can individually set the color for each candlestick.
+
+If we take a look at the interface for the candlestick data here: [CandlestickData](/docs/api/interfaces/CandlestickData), we can see a few properties related to color: `color`, `borderColor`, and `wickColor`. Lightweight Charts allows the data points to override the colors specified for series as a whole. In other words, if a datapoint has one of these properties set then it will use that color for that data point instead of the colors used for the rest of the series. We can use this feature to highlight a few key data points in a different color.
+
+We are going to change the color of all data points which have a `close` value over `205` to orange. We will use the map higher-order function to go through each data point and either leave it alone if it is below `205` or otherwise add the `color` and `wickColor` properties (set to 'orange'). We don't need to set the `borderColor` because we disabled that in an earlier step.
+
+We are going to **replace** the following line of code:
+
+```js
+const candleStickData = generateCandlestickData();
+```
+
+with this block of code:
+
+```js
+// Generate sample data to use within a candlestick series
+const candleStickData = generateCandlestickData().map(datapoint => {
+    // map function is changing the color for the individual
+    // candlestick points that close above 205
+    if (datapoint.close < 205) { return datapoint; }
+    // we are adding 'color' and 'wickColor' properties to the datapoint.
+    // Using spread syntax: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax#spread_in_object_literals
+    return { ...datapoint, color: 'orange', wickColor: 'orange' };
+});
+```
+
+## Result
+
+At this point we should have a chart like this (with a few candlesticks in orange):
+
+<iframe
+    className="standalone-iframe"
+    src={require('!!file-loader!./assets/step9.html').default}
+></iframe>
+<a href={require('!!file-loader!./assets/step9.html').default} target="\_blank">
+    View in a new window
+</a>
+
+## Next steps
+
+In the next step, we will add a few finishing touches to the chart.
+
+## Download
+
+You can download the HTML file for example at this stage <a href={require('!!file-loader!./assets/step9.html').default} download="customization-tutorial-step9.html" target="\_blank">here</a> in case you've encountered a problem or would like to start the next step from this point.
+
+## Complete code
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./assets/step9.html';
+import InstantDetails from '@site/src/components/InstantDetails'
+
+<InstantDetails>
+<summary>
+Click here to reveal the complete code for the example at this stage of the guide.
+</summary>
+<CodeBlock className="language-html">{code}</CodeBlock>
+</InstantDetails>

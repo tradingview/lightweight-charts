@@ -14,9 +14,12 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		layout: {
-			backgroundColor: 'rgba(80, 80, 80, 0.5)',
+			background: {
+				type: LightweightCharts.ColorType.Solid,
+				color: 'rgba(80, 80, 80, 0.5)',
+			},
 		},
 	});
 

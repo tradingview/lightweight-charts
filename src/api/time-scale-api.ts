@@ -1,3 +1,7 @@
+import { Size } from 'fancy-canvas';
+
+import { TimeAxisWidget } from '../gui/time-axis-widget';
+
 import { assert } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -5,36 +9,49 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { Logical, LogicalRange, Range, TimePointIndex, TimePointsRange } from '../model/time-data';
+import { Logical, LogicalRange, Range, Time, TimePointIndex, TimePointsRange } from '../model/time-data';
 import { TimeScale, TimeScaleOptions } from '../model/time-scale';
 
-import { Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { ITimeScaleApi, LogicalRangeChangeEventHandler, TimeRange, TimeRangeChangeEventHandler } from './itime-scale-api';
-
+import {
+	ITimeScaleApi,
+	LogicalRangeChangeEventHandler,
+	SizeChangeEventHandler,
+	TimeRange,
+	TimeRangeChangeEventHandler,
+} from './itime-scale-api';
 const enum Constants {
 	AnimationDurationMs = 1000,
 }
 
 export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	private _model: ChartModel;
+	private _timeScale: TimeScale;
+	private readonly _timeAxisWidget: TimeAxisWidget;
 	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
 	private readonly _logicalRangeChanged: Delegate<LogicalRange | null> = new Delegate();
+	private readonly _sizeChanged: Delegate<number, number> = new Delegate();
 
-	public constructor(model: ChartModel) {
+	public constructor(model: ChartModel, timeAxisWidget: TimeAxisWidget) {
 		this._model = model;
-		this._timeScale().visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
-		this._timeScale().logicalRangeChanged().subscribe(this._onVisibleLogicalRangeChanged.bind(this));
+		this._timeScale = model.timeScale();
+		this._timeAxisWidget = timeAxisWidget;
+		this._timeScale.visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
+		this._timeScale.logicalRangeChanged().subscribe(this._onVisibleLogicalRangeChanged.bind(this));
+		this._timeAxisWidget.sizeChanged().subscribe(this._onSizeChanged.bind(this));
 	}
 
 	public destroy(): void {
-		this._timeScale().visibleBarsChanged().unsubscribeAll(this);
-		this._timeScale().logicalRangeChanged().unsubscribeAll(this);
+		this._timeScale.visibleBarsChanged().unsubscribeAll(this);
+		this._timeScale.logicalRangeChanged().unsubscribeAll(this);
+		this._timeAxisWidget.sizeChanged().unsubscribeAll(this);
 		this._timeRangeChanged.destroy();
+		this._logicalRangeChanged.destroy();
+		this._sizeChanged.destroy();
 	}
 
 	public scrollPosition(): number {
-		return this._timeScale().rightOffset();
+		return this._timeScale.rightOffset();
 	}
 
 	public scrollToPosition(position: number, animated: boolean): void {
@@ -43,15 +60,15 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 			return;
 		}
 
-		this._timeScale().scrollToOffsetAnimated(position, Constants.AnimationDurationMs);
+		this._timeScale.scrollToOffsetAnimated(position, Constants.AnimationDurationMs);
 	}
 
 	public scrollToRealTime(): void {
-		this._timeScale().scrollToRealTime();
+		this._timeScale.scrollToRealTime();
 	}
 
 	public getVisibleRange(): TimeRange | null {
-		const timeRange = this._timeScale().visibleTimeRange();
+		const timeRange = this._timeScale.visibleTimeRange();
 
 		if (timeRange === null) {
 			return null;
@@ -68,13 +85,13 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 			from: convertTime(range.from),
 			to: convertTime(range.to),
 		};
-		const logicalRange = this._timeScale().logicalRangeForTimeRange(convertedRange);
+		const logicalRange = this._timeScale.logicalRangeForTimeRange(convertedRange);
 
 		this._model.setTargetLogicalRange(logicalRange);
 	}
 
 	public getVisibleLogicalRange(): LogicalRange | null {
-		const logicalRange = this._timeScale().visibleLogicalRange();
+		const logicalRange = this._timeScale.visibleLogicalRange();
 		if (logicalRange === null) {
 			return null;
 		}
@@ -109,24 +126,21 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public coordinateToLogical(x: number): Logical | null {
-		const timeScale = this._model.timeScale();
-
-		if (timeScale.isEmpty()) {
+		if (this._timeScale.isEmpty()) {
 			return null;
 		} else {
-			return timeScale.coordinateToIndex(x as Coordinate) as unknown as Logical;
+			return this._timeScale.coordinateToIndex(x as Coordinate) as unknown as Logical;
 		}
 	}
 
 	public timeToCoordinate(time: Time): Coordinate | null {
 		const timePoint = convertTime(time);
-		const timeScale = this._model.timeScale();
-		const timePointIndex = timeScale.timeToIndex(timePoint, false);
+		const timePointIndex = this._timeScale.timeToIndex(timePoint, false);
 		if (timePointIndex === null) {
 			return null;
 		}
 
-		return timeScale.indexToCoordinate(timePointIndex);
+		return this._timeScale.indexToCoordinate(timePointIndex);
 	}
 
 	public coordinateToTime(x: number): Time | null {
@@ -138,6 +152,14 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		}
 
 		return timePoint.businessDay ?? timePoint.timestamp;
+	}
+
+	public width(): number {
+		return this._timeAxisWidget.getSize().width;
+	}
+
+	public height(): number {
+		return this._timeAxisWidget.getSize().height;
 	}
 
 	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
@@ -156,16 +178,20 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._logicalRangeChanged.unsubscribe(handler);
 	}
 
+	public subscribeSizeChange(handler: SizeChangeEventHandler): void {
+		this._sizeChanged.subscribe(handler);
+	}
+
+	public unsubscribeSizeChange(handler: SizeChangeEventHandler): void {
+		this._sizeChanged.unsubscribe(handler);
+	}
+
 	public applyOptions(options: DeepPartial<TimeScaleOptions>): void {
-		this._timeScale().applyOptions(options);
+		this._timeScale.applyOptions(options);
 	}
 
 	public options(): Readonly<TimeScaleOptions> {
-		return clone(this._timeScale().options());
-	}
-
-	private _timeScale(): TimeScale {
-		return this._model.timeScale();
+		return clone(this._timeScale.options());
 	}
 
 	private _onVisibleBarsChanged(): void {
@@ -178,5 +204,9 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		if (this._logicalRangeChanged.hasListeners()) {
 			this._logicalRangeChanged.fire(this.getVisibleLogicalRange());
 		}
+	}
+
+	private _onSizeChanged(size: Size): void {
+		this._sizeChanged.fire(size.width, size.height);
 	}
 }

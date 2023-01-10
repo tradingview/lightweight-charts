@@ -1,74 +1,43 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Coordinate } from '../model/coordinate';
-import { SeriesItemsIndexesRange } from '../model/time-data';
+import { AreaFillColorerStyle } from '../model/series-bar-colorer';
 
-import { LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { LineItem } from './line-renderer';
-import { ScaledRenderer } from './scaled-renderer';
-import { walkLine } from './walk-line';
+import { AreaFillItemBase, PaneRendererAreaBase, PaneRendererAreaDataBase } from './area-renderer-base';
 
-export interface PaneRendererAreaData {
-	items: LineItem[];
-	lineType: LineType;
-	lineColor: string;
-	lineWidth: LineWidth;
-	lineStyle: LineStyle;
-
-	topColor: string;
-	bottomColor: string;
-	bottom: Coordinate;
-
-	barWidth: number;
-
-	visibleRange: SeriesItemsIndexesRange | null;
+export type AreaFillItem = AreaFillItemBase & AreaFillColorerStyle;
+export interface PaneRendererAreaData extends PaneRendererAreaDataBase<AreaFillItem> {
 }
 
-export class PaneRendererArea extends ScaledRenderer {
-	protected _data: PaneRendererAreaData | null = null;
+interface AreaFillCache extends Record<keyof AreaFillColorerStyle, string> {
+	fillStyle: CanvasRenderingContext2D['fillStyle'];
+	bottom: Coordinate;
+}
 
-	public setData(data: PaneRendererAreaData): void {
-		this._data = data;
-	}
+export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData> {
+	private _fillCache: AreaFillCache | null = null;
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
-		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
-			return;
+	protected override _fillStyle(renderingScope: MediaCoordinatesRenderingScope, item: AreaFillItem): CanvasRenderingContext2D['fillStyle'] {
+		const { context: ctx, mediaSize } = renderingScope;
+
+		const { topColor, bottomColor } = item;
+		const bottom = mediaSize.height as Coordinate;
+
+		if (
+			this._fillCache !== null &&
+			this._fillCache.topColor === topColor &&
+			this._fillCache.bottomColor === bottomColor &&
+			this._fillCache.bottom === bottom
+		) {
+			return this._fillCache.fillStyle;
 		}
 
-		ctx.lineCap = 'butt';
-		ctx.strokeStyle = this._data.lineColor;
-		ctx.lineWidth = this._data.lineWidth;
-		setLineStyle(ctx, this._data.lineStyle);
+		const fillStyle = ctx.createLinearGradient(0, 0, 0, bottom);
+		fillStyle.addColorStop(0, topColor);
+		fillStyle.addColorStop(1, bottomColor);
 
-		// walk lines with width=1 to have more accurate gradient's filling
-		ctx.lineWidth = 1;
+		this._fillCache = { topColor, bottomColor, fillStyle, bottom };
 
-		ctx.beginPath();
-
-		if (this._data.items.length === 1) {
-			const point = this._data.items[0];
-			const halfBarWidth = this._data.barWidth / 2;
-			ctx.moveTo(point.x - halfBarWidth, this._data.bottom);
-			ctx.lineTo(point.x - halfBarWidth, point.y);
-			ctx.lineTo(point.x + halfBarWidth, point.y);
-			ctx.lineTo(point.x + halfBarWidth, this._data.bottom);
-		} else {
-			ctx.moveTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
-			ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.items[this._data.visibleRange.from].y);
-
-			walkLine(ctx, this._data.items, this._data.lineType, this._data.visibleRange);
-
-			if (this._data.visibleRange.to > this._data.visibleRange.from) {
-				ctx.lineTo(this._data.items[this._data.visibleRange.to - 1].x, this._data.bottom);
-				ctx.lineTo(this._data.items[this._data.visibleRange.from].x, this._data.bottom);
-			}
-		}
-		ctx.closePath();
-
-		const gradient = ctx.createLinearGradient(0, 0, 0, this._data.bottom);
-		gradient.addColorStop(0, this._data.topColor);
-		gradient.addColorStop(1, this._data.bottomColor);
-
-		ctx.fillStyle = gradient;
-		ctx.fill();
+		return fillStyle;
 	}
 }

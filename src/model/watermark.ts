@@ -1,27 +1,67 @@
 import { HorzAlign, VertAlign } from '../renderers/watermark-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 import { WatermarkPaneView } from '../views/pane/watermark-pane-view';
+import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { ChartModel } from './chart-model';
 import { DataSource } from './data-source';
 
-/** Structure describing watermark options */
+/** Watermark options. */
 export interface WatermarkOptions {
-	/** Color of the watermark */
+	/**
+	 * Watermark color.
+	 *
+	 * @defaultValue `'rgba(0, 0, 0, 0)'`
+	 */
 	color: string;
-	/** Visibility of the watermark. If false, other parameters are ignored */
+
+	/**
+	 * Display the watermark.
+	 *
+	 * @defaultValue `false`
+	 */
 	visible: boolean;
-	/** Text of the watermark. Word wrapping is not supported */
+
+	/**
+	 * Text of the watermark. Word wrapping is not supported.
+	 *
+	 * @defaultValue `''`
+	 */
 	text: string;
-	/** Font size in pixels */
+
+	/**
+	 * Font size in pixels.
+	 *
+	 * @defaultValue `48`
+	 */
 	fontSize: number;
-	/** Font family */
+
+	/**
+	 * Font family.
+	 *
+	 * @defaultValue `-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif`
+	 */
 	fontFamily: string;
-	/** Font style */
+
+	/**
+	 * Font style.
+	 *
+	 * @defaultValue `''`
+	 */
 	fontStyle: string;
-	/** Horizontal alignment of the watermark inside the chart area */
+
+	/**
+	 * Horizontal alignment inside the chart area.
+	 *
+	 * @defaultValue `'center'`
+	 */
 	horzAlign: HorzAlign;
-	/** Vertical alignment of the watermark inside the chart area */
+
+	/**
+	 * Vertical alignment inside the chart area.
+	 *
+	 * @defaultValue `'center'`
+	 */
 	vertAlign: VertAlign;
 }
 
@@ -33,6 +73,10 @@ export class Watermark extends DataSource {
 		super();
 		this._options = options;
 		this._paneView = new WatermarkPaneView(this);
+	}
+
+	public override priceAxisViews(): readonly IPriceAxisView[] {
+		return [];
 	}
 
 	public paneViews(): readonly IPaneView[] {

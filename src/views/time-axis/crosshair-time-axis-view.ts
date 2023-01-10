@@ -20,6 +20,7 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 		text: '',
 		width: 0,
 		coordinate: NaN,
+		tickVisible: true,
 	};
 
 	public constructor(crosshair: Crosshair, model: ChartModel, valueProvider: TimeAndCoordinateProvider) {
@@ -58,7 +59,6 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 			return;
 		}
 
-		const currentTime = timeScale.indexToTime(this._crosshair.appliedIndex());
 		data.width = timeScale.width();
 
 		const value = this._valueProvider();
@@ -67,11 +67,13 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 		}
 
 		data.coordinate = value.coordinate;
+		const currentTime = timeScale.indexToTimeScalePoint(this._crosshair.appliedIndex());
 		data.text = timeScale.formatDateTime(ensureNotNull(currentTime));
 		data.visible = true;
 
 		const colors = generateContrastColors(options.labelBackgroundColor);
 		data.background = colors.background;
 		data.color = colors.foreground;
+		data.tickVisible = timeScale.options().ticksVisible;
 	}
 }

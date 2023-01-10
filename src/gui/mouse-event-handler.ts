@@ -1,9 +1,13 @@
-import { ensure } from '../helpers/assertions';
+import { ensureNotNull } from '../helpers/assertions';
+import { isFF, isIOS } from '../helpers/browsers';
+import { preventScrollByWheelClick } from '../helpers/events';
 import { IDestroyable } from '../helpers/idestroyable';
 
-import { mobileTouch } from './support-touch';
+import { Coordinate } from '../model/coordinate';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-export type HandlerEventCallback = (event: TouchMouseEvent) => void;
+export type HandlerMouseEventCallback = (event: MouseEventHandlerMouseEvent) => void;
+export type HandlerTouchEventCallback = (event: MouseEventHandlerTouchEvent) => void;
 export type EmptyCallback = () => void;
 export type PinchEventCallback = (middlePoint: Position, scale: number) => void;
 
@@ -11,38 +15,50 @@ export interface MouseEventHandlers {
 	pinchStartEvent?: EmptyCallback;
 	pinchEvent?: PinchEventCallback;
 	pinchEndEvent?: EmptyCallback;
-	mouseClickEvent?: HandlerEventCallback;
-	mouseDoubleClickEvent?: HandlerEventCallback;
-	mouseDownEvent?: HandlerEventCallback;
+
+	mouseClickEvent?: HandlerMouseEventCallback;
+	tapEvent?: HandlerTouchEventCallback;
+
+	mouseDoubleClickEvent?: HandlerMouseEventCallback;
+	doubleTapEvent?: HandlerTouchEventCallback;
+
+	mouseDownEvent?: HandlerMouseEventCallback;
+	touchStartEvent?: HandlerTouchEventCallback;
+
+	mouseUpEvent?: HandlerMouseEventCallback;
+	touchEndEvent?: HandlerTouchEventCallback;
+
 	mouseDownOutsideEvent?: EmptyCallback;
-	mouseEnterEvent?: HandlerEventCallback;
-	mouseLeaveEvent?: HandlerEventCallback;
-	mouseMoveEvent?: HandlerEventCallback;
-	mouseUpEvent?: HandlerEventCallback;
-	pressedMouseMoveEvent?: HandlerEventCallback;
-	longTapEvent?: HandlerEventCallback;
+
+	mouseEnterEvent?: HandlerMouseEventCallback;
+	mouseLeaveEvent?: HandlerMouseEventCallback;
+
+	mouseMoveEvent?: HandlerMouseEventCallback;
+
+	pressedMouseMoveEvent?: HandlerMouseEventCallback;
+	touchMoveEvent?: HandlerTouchEventCallback;
+
+	longTapEvent?: HandlerTouchEventCallback;
 }
 
-export interface TouchMouseEvent {
-	readonly clientX: number;
-	readonly clientY: number;
-	readonly pageX: number;
-	readonly pageY: number;
-	readonly screenX: number;
-	readonly screenY: number;
-	readonly localX: number;
-	readonly localY: number;
+export interface MouseEventHandlerEventBase extends TouchMouseEventData {
+	readonly srcType: string;
 
-	readonly ctrlKey: boolean;
-	readonly altKey: boolean;
-	readonly shiftKey: boolean;
-	readonly metaKey: boolean;
-
-	// TODO: remove this after rewriting MouseEventHandler to handle touch and mouse event separately
-	readonly type: 'touch' | 'mouse';
-
+	target: MouseEvent['target'];
 	view: MouseEvent['view'];
+
+	preventDefault(): void;
 }
+
+export interface MouseEventHandlerMouseEvent extends MouseEventHandlerEventBase {
+	isTouch: false;
+}
+
+export interface MouseEventHandlerTouchEvent extends MouseEventHandlerEventBase {
+	isTouch: true;
+}
+
+export type TouchMouseEvent = MouseEventHandlerMouseEvent | MouseEventHandlerTouchEvent;
 
 export interface Position {
 	x: number;
@@ -54,37 +70,78 @@ export interface Position {
 const enum Delay {
 	ResetClick = 500,
 	LongTap = 240,
+	PreventFiresTouchEvents= 500,
+}
+
+const enum Constants {
+	CancelClickManhattanDistance = 5,
+	CancelTapManhattanDistance = 5,
+	DoubleClickManhattanDistance = 5,
+	DoubleTapManhattanDistance = 30,
 }
 
 export interface MouseEventHandlerOptions {
-	treatVertTouchDragAsPageScroll: boolean;
-	treatHorzTouchDragAsPageScroll: boolean;
+	treatVertTouchDragAsPageScroll: () => boolean;
+	treatHorzTouchDragAsPageScroll: () => boolean;
+}
+
+interface TouchMouseMoveWithDownInfo {
+	xOffset: number;
+	yOffset: number;
+	manhattanDistance: number;
 }
 
 // TODO: get rid of a lot of boolean flags, probably we should replace it with some enum
 export class MouseEventHandler implements IDestroyable {
 	private readonly _target: HTMLElement;
-	private _handler: MouseEventHandlers;
+	private readonly _handler: MouseEventHandlers;
 
 	private readonly _options: MouseEventHandlerOptions;
 
 	private _clickCount: number = 0;
 	private _clickTimeoutId: TimerId | null = null;
+	private _clickPosition: Position = { x: Number.NEGATIVE_INFINITY, y: Number.POSITIVE_INFINITY };
+
+	private _tapCount: number = 0;
+	private _tapTimeoutId: TimerId | null = null;
+	private _tapPosition: Position = { x: Number.NEGATIVE_INFINITY, y: Number.POSITIVE_INFINITY };
+
 	private _longTapTimeoutId: TimerId | null = null;
 	private _longTapActive: boolean = false;
+
 	private _mouseMoveStartPosition: Position | null = null;
-	private _moveExceededManhattanDistance: boolean = false;
+
+	private _touchMoveStartPosition: Position | null = null;
+	private _touchMoveExceededManhattanDistance: boolean = false;
+
 	private _cancelClick: boolean = false;
-	private _unsubscribeOutsideEvents: (() => void) | null = null;
+	private _cancelTap: boolean = false;
+
+	private _unsubscribeOutsideMouseEvents: (() => void) | null = null;
+	private _unsubscribeOutsideTouchEvents: (() => void) | null = null;
+	private _unsubscribeMobileSafariEvents: (() => void) | null = null;
+
 	private _unsubscribeMousemove: (() => void) | null = null;
-	private _unsubscribeRoot: (() => void) | null = null;
+
+	private _unsubscribeRootMouseEvents: (() => void) | null = null;
+	private _unsubscribeRootTouchEvents: (() => void) | null = null;
 
 	private _startPinchMiddlePoint: Position | null = null;
 	private _startPinchDistance: number = 0;
 	private _pinchPrevented: boolean = false;
-	private _preventDragProcess: boolean = false;
+	private _preventTouchDragProcess: boolean = false;
 
 	private _mousePressed: boolean = false;
+
+	private _lastTouchEventTimeStamp: number = 0;
+
+	// for touchstart/touchmove/touchend events we handle only first touch
+	// i.e. we don't support several active touches at the same time (except pinch event)
+	private _activeTouchId: number | null = null;
+
+	// accept all mouse leave events if it's not an iOS device
+	// see _mouseEnterHandler, _mouseMoveHandler, _mouseLeaveHandler
+	private _acceptMouseLeave: boolean = !isIOS();
 
 	public constructor(
 		target: HTMLElement,
@@ -99,9 +156,14 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	public destroy(): void {
-		if (this._unsubscribeOutsideEvents !== null) {
-			this._unsubscribeOutsideEvents();
-			this._unsubscribeOutsideEvents = null;
+		if (this._unsubscribeOutsideMouseEvents !== null) {
+			this._unsubscribeOutsideMouseEvents();
+			this._unsubscribeOutsideMouseEvents = null;
+		}
+
+		if (this._unsubscribeOutsideTouchEvents !== null) {
+			this._unsubscribeOutsideTouchEvents();
+			this._unsubscribeOutsideTouchEvents = null;
 		}
 
 		if (this._unsubscribeMousemove !== null) {
@@ -109,34 +171,43 @@ export class MouseEventHandler implements IDestroyable {
 			this._unsubscribeMousemove = null;
 		}
 
-		if (this._unsubscribeRoot !== null) {
-			this._unsubscribeRoot();
-			this._unsubscribeRoot = null;
+		if (this._unsubscribeRootMouseEvents !== null) {
+			this._unsubscribeRootMouseEvents();
+			this._unsubscribeRootMouseEvents = null;
+		}
+
+		if (this._unsubscribeRootTouchEvents !== null) {
+			this._unsubscribeRootTouchEvents();
+			this._unsubscribeRootTouchEvents = null;
+		}
+
+		if (this._unsubscribeMobileSafariEvents !== null) {
+			this._unsubscribeMobileSafariEvents();
+			this._unsubscribeMobileSafariEvents = null;
 		}
 
 		this._clearLongTapTimeout();
 		this._resetClickTimeout();
 	}
 
-	private _mouseEnterHandler(enterEvent: MouseEvent | TouchEvent): void {
+	private _mouseEnterHandler(enterEvent: MouseEvent): void {
 		if (this._unsubscribeMousemove) {
 			this._unsubscribeMousemove();
 		}
 
-		{
-			const boundMouseMoveHandler = this._mouseMoveHandler.bind(this);
-			this._unsubscribeMousemove = () => {
-				this._target.removeEventListener('mousemove', boundMouseMoveHandler);
-			};
-			this._target.addEventListener('mousemove', boundMouseMoveHandler);
-		}
+		const boundMouseMoveHandler = this._mouseMoveHandler.bind(this);
+		this._unsubscribeMousemove = () => {
+			this._target.removeEventListener('mousemove', boundMouseMoveHandler);
+		};
+		this._target.addEventListener('mousemove', boundMouseMoveHandler);
 
-		if (isTouchEvent(enterEvent)) {
-			this._mouseMoveHandler(enterEvent);
+		if (this._firesTouchEvents(enterEvent)) {
+			return;
 		}
 
 		const compatEvent = this._makeCompatEvent(enterEvent);
-		this._processEvent(compatEvent, this._handler.mouseEnterEvent);
+		this._processMouseEvent(compatEvent, this._handler.mouseEnterEvent);
+		this._acceptMouseLeave = true;
 	}
 
 	private _resetClickTimeout(): void {
@@ -146,130 +217,268 @@ export class MouseEventHandler implements IDestroyable {
 
 		this._clickCount = 0;
 		this._clickTimeoutId = null;
+		this._clickPosition = { x: Number.NEGATIVE_INFINITY, y: Number.POSITIVE_INFINITY };
 	}
 
-	private _mouseMoveHandler(moveEvent: MouseEvent | TouchEvent): void {
-		if (this._mousePressed && !isTouchEvent(moveEvent)) {
+	private _resetTapTimeout(): void {
+		if (this._tapTimeoutId !== null) {
+			clearTimeout(this._tapTimeoutId);
+		}
+
+		this._tapCount = 0;
+		this._tapTimeoutId = null;
+		this._tapPosition = { x: Number.NEGATIVE_INFINITY, y: Number.POSITIVE_INFINITY };
+	}
+
+	private _mouseMoveHandler(moveEvent: MouseEvent): void {
+		if (this._mousePressed || this._touchMoveStartPosition !== null) {
+			return;
+		}
+
+		if (this._firesTouchEvents(moveEvent)) {
 			return;
 		}
 
 		const compatEvent = this._makeCompatEvent(moveEvent);
-		this._processEvent(compatEvent, this._handler.mouseMoveEvent);
+		this._processMouseEvent(compatEvent, this._handler.mouseMoveEvent);
+		this._acceptMouseLeave = true;
 	}
 
-	// eslint-disable-next-line complexity
-	private _mouseMoveWithDownHandler(moveEvent: MouseEvent | TouchEvent): void {
-		// eslint-disable-next-line no-restricted-syntax
-		if ('button' in moveEvent && moveEvent.button !== MouseEventButton.Left) {
+	private _touchMoveHandler(moveEvent: TouchEvent): void {
+		const touch = touchWithId(moveEvent.changedTouches, ensureNotNull(this._activeTouchId));
+		if (touch === null) {
 			return;
 		}
+
+		this._lastTouchEventTimeStamp = eventTimeStamp(moveEvent);
 
 		if (this._startPinchMiddlePoint !== null) {
 			return;
 		}
 
-		const isTouch = isTouchEvent(moveEvent);
-		if (this._preventDragProcess && isTouch) {
+		if (this._preventTouchDragProcess) {
 			return;
 		}
 
 		// prevent pinch if move event comes faster than the second touch
 		this._pinchPrevented = true;
 
-		const compatEvent = this._makeCompatEvent(moveEvent);
+		const moveInfo = this._touchMouseMoveWithDownInfo(getPosition(touch), ensureNotNull(this._touchMoveStartPosition));
+		const { xOffset, yOffset, manhattanDistance } = moveInfo;
 
-		const startMouseMovePos = ensure(this._mouseMoveStartPosition);
-		const xOffset = Math.abs(startMouseMovePos.x - compatEvent.pageX);
-		const yOffset = Math.abs(startMouseMovePos.y - compatEvent.pageY);
-
-		const moveExceededManhattanDistance = xOffset + yOffset > 5;
-
-		if (!moveExceededManhattanDistance && isTouch) {
+		if (!this._touchMoveExceededManhattanDistance && manhattanDistance < Constants.CancelTapManhattanDistance) {
 			return;
 		}
 
-		if (moveExceededManhattanDistance && !this._moveExceededManhattanDistance && isTouch) {
+		if (!this._touchMoveExceededManhattanDistance) {
+			// first time when current position exceeded manhattan distance
+
 			// vertical drag is more important than horizontal drag
 			// because we scroll the page vertically often than horizontally
 			const correctedXOffset = xOffset * 0.5;
 
 			// a drag can be only if touch page scroll isn't allowed
-			const isVertDrag = yOffset >= correctedXOffset && !this._options.treatVertTouchDragAsPageScroll;
-			const isHorzDrag = correctedXOffset > yOffset && !this._options.treatHorzTouchDragAsPageScroll;
+			const isVertDrag = yOffset >= correctedXOffset && !this._options.treatVertTouchDragAsPageScroll();
+			const isHorzDrag = correctedXOffset > yOffset && !this._options.treatHorzTouchDragAsPageScroll();
 
 			// if drag event happened then we should revert preventDefault state to original one
 			// and try to process the drag event
 			// else we shouldn't prevent default of the event and ignore processing the drag event
 			if (!isVertDrag && !isHorzDrag) {
-				this._preventDragProcess = true;
+				this._preventTouchDragProcess = true;
 			}
+
+			this._touchMoveExceededManhattanDistance = true;
+			// if manhattan distance is more that 5 - we should cancel tap event
+			this._cancelTap = true;
+			this._clearLongTapTimeout();
+			this._resetTapTimeout();
 		}
 
-		if (moveExceededManhattanDistance) {
-			this._moveExceededManhattanDistance = true;
-
-			// if manhattan distance is more that 5 - we should cancel click event
-			this._cancelClick = true;
-
-			if (isTouch) {
-				this._clearLongTapTimeout();
-			}
-		}
-
-		if (!this._preventDragProcess) {
-			this._processEvent(compatEvent, this._handler.pressedMouseMoveEvent);
+		if (!this._preventTouchDragProcess) {
+			const compatEvent = this._makeCompatEvent(moveEvent, touch);
+			this._processTouchEvent(compatEvent, this._handler.touchMoveEvent);
 
 			// we should prevent default in case of touch only
 			// to prevent scroll of the page
-			if (isTouch) {
-				preventDefault(moveEvent);
+			preventDefault(moveEvent);
+		}
+	}
+
+	private _mouseMoveWithDownHandler(moveEvent: MouseEvent): void {
+		if (moveEvent.button !== MouseEventButton.Left) {
+			return;
+		}
+
+		const moveInfo = this._touchMouseMoveWithDownInfo(getPosition(moveEvent), ensureNotNull(this._mouseMoveStartPosition));
+		const { manhattanDistance } = moveInfo;
+
+		if (manhattanDistance >= Constants.CancelClickManhattanDistance) {
+			// if manhattan distance is more that 5 - we should cancel click event
+			this._cancelClick = true;
+			this._resetClickTimeout();
+		}
+
+		if (this._cancelClick) {
+			// if this._cancelClick is true, that means that minimum manhattan distance is already exceeded
+			const compatEvent = this._makeCompatEvent(moveEvent);
+			this._processMouseEvent(compatEvent, this._handler.pressedMouseMoveEvent);
+		}
+	}
+
+	private _touchMouseMoveWithDownInfo(currentPosition: Position, startPosition: Position): TouchMouseMoveWithDownInfo {
+		const xOffset = Math.abs(startPosition.x - currentPosition.x);
+		const yOffset = Math.abs(startPosition.y - currentPosition.y);
+
+		const manhattanDistance = xOffset + yOffset;
+
+		return {
+			xOffset: xOffset,
+			yOffset: yOffset,
+			manhattanDistance: manhattanDistance,
+		};
+	}
+
+	/**
+	 * In Firefox mouse events dont't fire if the mouse position is outside of the browser's border.
+	 * To prevent the mouse from hanging while pressed we're subscribing on the mouseleave event of the document element.
+	 * We're subscribing on mouseleave, but this event is actually fired on mouseup outside of the browser's border.
+	 */
+	private _onFirefoxOutsideMouseUp = (mouseUpEvent: MouseEvent) => {
+		this._mouseUpHandler(mouseUpEvent);
+	};
+
+	/**
+	 * Safari doesn't fire touchstart/mousedown events on double tap since iOS 13.
+	 * There are two possible solutions:
+	 * 1) Call preventDefault in touchEnd handler. But it also prevents click event from firing.
+	 * 2) Add listener on dblclick event that fires with the preceding mousedown/mouseup.
+	 * https://developer.apple.com/forums/thread/125073
+	 */
+	private _onMobileSafariDoubleClick = (dblClickEvent: MouseEvent) => {
+		if (this._firesTouchEvents(dblClickEvent)) {
+			const compatEvent = this._makeCompatEvent(dblClickEvent);
+			++this._tapCount;
+
+			if (this._tapTimeoutId && this._tapCount > 1) {
+				const { manhattanDistance } = this._touchMouseMoveWithDownInfo(getPosition(dblClickEvent), this._tapPosition);
+				if (manhattanDistance < Constants.DoubleTapManhattanDistance && !this._cancelTap) {
+					this._processTouchEvent(compatEvent as unknown as MouseEventHandlerTouchEvent, this._handler.doubleTapEvent);
+				}
+				this._resetTapTimeout();
+			}
+		} else {
+			const compatEvent = this._makeCompatEvent(dblClickEvent);
+			++this._clickCount;
+
+			if (this._clickTimeoutId && this._clickCount > 1) {
+				const { manhattanDistance } = this._touchMouseMoveWithDownInfo(getPosition(dblClickEvent), this._clickPosition);
+				if (manhattanDistance < Constants.DoubleClickManhattanDistance && !this._cancelClick) {
+					this._processMouseEvent(compatEvent, this._handler.mouseDoubleClickEvent);
+				}
+				this._resetClickTimeout();
+			}
+		}
+	};
+
+	// eslint-disable-next-line complexity
+	private _touchEndHandler(touchEndEvent: TouchEvent): void {
+		let touch = touchWithId(touchEndEvent.changedTouches, ensureNotNull(this._activeTouchId));
+		if (touch === null && touchEndEvent.touches.length === 0) {
+			// something went wrong, somehow we missed the required touchend event
+			// probably the browser has not sent this event
+			touch = touchEndEvent.changedTouches[0];
+		}
+
+		if (touch === null) {
+			return;
+		}
+
+		this._activeTouchId = null;
+		this._lastTouchEventTimeStamp = eventTimeStamp(touchEndEvent);
+		this._clearLongTapTimeout();
+		this._touchMoveStartPosition = null;
+
+		if (this._unsubscribeRootTouchEvents) {
+			this._unsubscribeRootTouchEvents();
+			this._unsubscribeRootTouchEvents = null;
+		}
+
+		const compatEvent = this._makeCompatEvent(touchEndEvent, touch);
+		this._processTouchEvent(compatEvent, this._handler.touchEndEvent);
+		++this._tapCount;
+
+		if (this._tapTimeoutId && this._tapCount > 1) {
+			// check that both clicks are near enough
+			const { manhattanDistance } = this._touchMouseMoveWithDownInfo(getPosition(touch), this._tapPosition);
+			if (manhattanDistance < Constants.DoubleTapManhattanDistance && !this._cancelTap) {
+				this._processTouchEvent(compatEvent, this._handler.doubleTapEvent);
+			}
+			this._resetTapTimeout();
+		} else {
+			if (!this._cancelTap) {
+				this._processTouchEvent(compatEvent, this._handler.tapEvent);
+
+				// do not fire mouse events if tap handler was executed
+				// prevent click event on new dom element (who appeared after tap)
+				if (this._handler.tapEvent) {
+					preventDefault(touchEndEvent);
+				}
+			}
+		}
+
+		// prevent, for example, safari's dblclick-to-zoom or fast-click after long-tap
+		// we handle mouseDoubleClickEvent here ourselves
+		if (this._tapCount === 0) {
+			preventDefault(touchEndEvent);
+		}
+
+		if (touchEndEvent.touches.length === 0) {
+			if (this._longTapActive) {
+				this._longTapActive = false;
+				// prevent native click event
+				preventDefault(touchEndEvent);
 			}
 		}
 	}
 
-	private _mouseUpHandler(mouseUpEvent: MouseEvent | TouchEvent): void {
-		// eslint-disable-next-line no-restricted-syntax
-		if ('button' in mouseUpEvent && mouseUpEvent.button !== MouseEventButton.Left) {
+	private _mouseUpHandler(mouseUpEvent: MouseEvent): void {
+		if (mouseUpEvent.button !== MouseEventButton.Left) {
 			return;
 		}
 
 		const compatEvent = this._makeCompatEvent(mouseUpEvent);
 
-		this._clearLongTapTimeout();
-
 		this._mouseMoveStartPosition = null;
-
 		this._mousePressed = false;
 
-		if (this._unsubscribeRoot) {
-			this._unsubscribeRoot();
-			this._unsubscribeRoot = null;
+		if (this._unsubscribeRootMouseEvents) {
+			this._unsubscribeRootMouseEvents();
+			this._unsubscribeRootMouseEvents = null;
 		}
 
-		if (isTouchEvent(mouseUpEvent)) {
-			this._mouseLeaveHandler(mouseUpEvent);
+		if (isFF()) {
+			const rootElement = this._target.ownerDocument.documentElement;
+			rootElement.removeEventListener('mouseleave', this._onFirefoxOutsideMouseUp);
 		}
 
-		this._processEvent(compatEvent, this._handler.mouseUpEvent);
+		if (this._firesTouchEvents(mouseUpEvent)) {
+			return;
+		}
+
+		this._processMouseEvent(compatEvent, this._handler.mouseUpEvent);
 		++this._clickCount;
+
 		if (this._clickTimeoutId && this._clickCount > 1) {
-			this._processEvent(compatEvent, this._handler.mouseDoubleClickEvent);
+			// check that both clicks are near enough
+			const { manhattanDistance } = this._touchMouseMoveWithDownInfo(getPosition(mouseUpEvent), this._clickPosition);
+			if (manhattanDistance < Constants.DoubleClickManhattanDistance && !this._cancelClick) {
+				this._processMouseEvent(compatEvent, this._handler.mouseDoubleClickEvent);
+			}
 			this._resetClickTimeout();
 		} else {
 			if (!this._cancelClick) {
-				this._processEvent(compatEvent, this._handler.mouseClickEvent);
-			}
-		}
-
-		// prevent safari's dblclick-to-zoom
-		// we handle mouseDoubleClickEvent here ourself
-		if (isTouchEvent(mouseUpEvent)) {
-			preventDefault(mouseUpEvent);
-
-			this._mouseLeaveHandler(mouseUpEvent);
-
-			if (mouseUpEvent.touches.length === 0) {
-				this._longTapActive = false;
+				this._processMouseEvent(compatEvent, this._handler.mouseClickEvent);
 			}
 		}
 	}
@@ -283,71 +492,106 @@ export class MouseEventHandler implements IDestroyable {
 		this._longTapTimeoutId = null;
 	}
 
-	private _mouseDownHandler(downEvent: MouseEvent | TouchEvent): void {
-		// eslint-disable-next-line no-restricted-syntax
-		if ('button' in downEvent && downEvent.button !== MouseEventButton.Left) {
+	private _touchStartHandler(downEvent: TouchEvent): void {
+		if (this._activeTouchId !== null) {
+			return;
+		}
+		const touch = downEvent.changedTouches[0];
+		this._activeTouchId = touch.identifier;
+
+		this._lastTouchEventTimeStamp = eventTimeStamp(downEvent);
+
+		const rootElement = this._target.ownerDocument.documentElement;
+
+		this._cancelTap = false;
+		this._touchMoveExceededManhattanDistance = false;
+		this._preventTouchDragProcess = false;
+
+		this._touchMoveStartPosition = getPosition(touch);
+
+		if (this._unsubscribeRootTouchEvents) {
+			this._unsubscribeRootTouchEvents();
+			this._unsubscribeRootTouchEvents = null;
+		}
+
+		{
+			const boundTouchMoveWithDownHandler = this._touchMoveHandler.bind(this);
+			const boundTouchEndHandler = this._touchEndHandler.bind(this);
+
+			this._unsubscribeRootTouchEvents = () => {
+				rootElement.removeEventListener('touchmove', boundTouchMoveWithDownHandler);
+				rootElement.removeEventListener('touchend', boundTouchEndHandler);
+			};
+
+			rootElement.addEventListener('touchmove', boundTouchMoveWithDownHandler, { passive: false });
+			rootElement.addEventListener('touchend', boundTouchEndHandler, { passive: false });
+
+			this._clearLongTapTimeout();
+			this._longTapTimeoutId = setTimeout(this._longTapHandler.bind(this, downEvent), Delay.LongTap);
+		}
+
+		const compatEvent = this._makeCompatEvent(downEvent, touch);
+		this._processTouchEvent(compatEvent, this._handler.touchStartEvent);
+
+		if (!this._tapTimeoutId) {
+			this._tapCount = 0;
+			this._tapTimeoutId = setTimeout(this._resetTapTimeout.bind(this), Delay.ResetClick);
+			this._tapPosition = getPosition(touch);
+		}
+	}
+
+	private _mouseDownHandler(downEvent: MouseEvent): void {
+		if (downEvent.button !== MouseEventButton.Left) {
 			return;
 		}
 
-		const compatEvent = this._makeCompatEvent(downEvent);
-
-		this._cancelClick = false;
-		this._moveExceededManhattanDistance = false;
-		this._preventDragProcess = false;
-
-		if (isTouchEvent(downEvent)) {
-			this._mouseEnterHandler(downEvent);
+		const rootElement = this._target.ownerDocument.documentElement;
+		if (isFF()) {
+			rootElement.addEventListener('mouseleave', this._onFirefoxOutsideMouseUp);
 		}
 
-		this._mouseMoveStartPosition = {
-			x: compatEvent.pageX,
-			y: compatEvent.pageY,
-		};
+		this._cancelClick = false;
 
-		if (this._unsubscribeRoot) {
-			this._unsubscribeRoot();
-			this._unsubscribeRoot = null;
+		this._mouseMoveStartPosition = getPosition(downEvent);
+
+		if (this._unsubscribeRootMouseEvents) {
+			this._unsubscribeRootMouseEvents();
+			this._unsubscribeRootMouseEvents = null;
 		}
 
 		{
 			const boundMouseMoveWithDownHandler = this._mouseMoveWithDownHandler.bind(this);
 			const boundMouseUpHandler = this._mouseUpHandler.bind(this);
-			const rootElement = this._target.ownerDocument.documentElement;
 
-			this._unsubscribeRoot = () => {
-				rootElement.removeEventListener('touchmove', boundMouseMoveWithDownHandler);
-				rootElement.removeEventListener('touchend', boundMouseUpHandler);
-
+			this._unsubscribeRootMouseEvents = () => {
 				rootElement.removeEventListener('mousemove', boundMouseMoveWithDownHandler);
 				rootElement.removeEventListener('mouseup', boundMouseUpHandler);
 			};
 
-			rootElement.addEventListener('touchmove', boundMouseMoveWithDownHandler, { passive: false });
-			rootElement.addEventListener('touchend', boundMouseUpHandler, { passive: false });
-
-			this._clearLongTapTimeout();
-
-			if (isTouchEvent(downEvent) && downEvent.touches.length === 1) {
-				this._longTapTimeoutId = setTimeout(this._longTapHandler.bind(this, downEvent), Delay.LongTap);
-			} else {
-				rootElement.addEventListener('mousemove', boundMouseMoveWithDownHandler);
-				rootElement.addEventListener('mouseup', boundMouseUpHandler);
-			}
+			rootElement.addEventListener('mousemove', boundMouseMoveWithDownHandler);
+			rootElement.addEventListener('mouseup', boundMouseUpHandler);
 		}
 
 		this._mousePressed = true;
 
-		this._processEvent(compatEvent, this._handler.mouseDownEvent);
+		if (this._firesTouchEvents(downEvent)) {
+			return;
+		}
+
+		const compatEvent = this._makeCompatEvent(downEvent);
+		this._processMouseEvent(compatEvent, this._handler.mouseDownEvent);
 
 		if (!this._clickTimeoutId) {
 			this._clickCount = 0;
 			this._clickTimeoutId = setTimeout(this._resetClickTimeout.bind(this), Delay.ResetClick);
+			this._clickPosition = getPosition(downEvent);
 		}
 	}
 
 	private _init(): void {
 		this._target.addEventListener('mouseenter', this._mouseEnterHandler.bind(this));
 
+		// Do not show context menu when something went wrong
 		this._target.addEventListener('touchcancel', this._clearLongTapTimeout.bind(this));
 
 		{
@@ -369,28 +613,37 @@ export class MouseEventHandler implements IDestroyable {
 				this._handler.mouseDownOutsideEvent();
 			};
 
-			this._unsubscribeOutsideEvents = () => {
-				doc.removeEventListener('mousedown', outsideHandler);
+			this._unsubscribeOutsideTouchEvents = () => {
 				doc.removeEventListener('touchstart', outsideHandler);
+			};
+
+			this._unsubscribeOutsideMouseEvents = () => {
+				doc.removeEventListener('mousedown', outsideHandler);
 			};
 
 			doc.addEventListener('mousedown', outsideHandler);
 			doc.addEventListener('touchstart', outsideHandler, { passive: true });
 		}
 
+		if (isIOS()) {
+			this._unsubscribeMobileSafariEvents = () => {
+				this._target.removeEventListener('dblclick', this._onMobileSafariDoubleClick);
+			};
+			this._target.addEventListener('dblclick', this._onMobileSafariDoubleClick);
+		}
+
 		this._target.addEventListener('mouseleave', this._mouseLeaveHandler.bind(this));
 
-		this._target.addEventListener('touchstart', this._mouseDownHandler.bind(this), { passive: true });
-		if (!mobileTouch) {
-			this._target.addEventListener('mousedown', this._mouseDownHandler.bind(this));
-		}
+		this._target.addEventListener('touchstart', this._touchStartHandler.bind(this), { passive: true });
+		preventScrollByWheelClick(this._target);
+		this._target.addEventListener('mousedown', this._mouseDownHandler.bind(this));
 
 		this._initPinch();
 
 		// Hey mobile Safari, what's up?
 		// If mobile Safari doesn't have any touchmove handler with passive=false
 		// it treats a touchstart and the following touchmove events as cancelable=false,
-		// so we can't prevent them (as soon we subscribe on touchmove inside handler of touchstart).
+		// so we can't prevent them (as soon we subscribe on touchmove inside touchstart's handler).
 		// And we'll get scroll of the page along with chart's one instead of only chart's scroll.
 		this._target.addEventListener('touchmove', () => {}, { passive: false });
 	}
@@ -471,24 +724,57 @@ export class MouseEventHandler implements IDestroyable {
 		}
 	}
 
-	private _mouseLeaveHandler(event: MouseEvent | TouchEvent): void {
+	private _mouseLeaveHandler(event: MouseEvent): void {
 		if (this._unsubscribeMousemove) {
 			this._unsubscribeMousemove();
 		}
+
+		if (this._firesTouchEvents(event)) {
+			return;
+		}
+
+		if (!this._acceptMouseLeave) {
+			// mobile Safari sometimes emits mouse leave event for no reason, there is no way to handle it in other way
+			// just ignore this event if there was no mouse move or mouse enter events
+			return;
+		}
+
 		const compatEvent = this._makeCompatEvent(event);
-		this._processEvent(compatEvent, this._handler.mouseLeaveEvent);
+		this._processMouseEvent(compatEvent, this._handler.mouseLeaveEvent);
+
+		// accept all mouse leave events if it's not an iOS device
+		this._acceptMouseLeave = !isIOS();
 	}
 
 	private _longTapHandler(event: TouchEvent): void {
-		const compatEvent = this._makeCompatEvent(event);
-		this._processEvent(compatEvent, this._handler.longTapEvent);
-		this._cancelClick = true;
+		const touch = touchWithId(event.touches, ensureNotNull(this._activeTouchId));
+		if (touch === null) {
+			return;
+		}
 
-		// long tap is active untill touchend event with 0 touches occured
+		const compatEvent = this._makeCompatEvent(event, touch);
+		this._processTouchEvent(compatEvent, this._handler.longTapEvent);
+		this._cancelTap = true;
+
+		// long tap is active until touchend event with 0 touches occurred
 		this._longTapActive = true;
 	}
 
-	private _processEvent(event: TouchMouseEvent, callback?: HandlerEventCallback): void {
+	private _firesTouchEvents(e: MouseEvent): boolean {
+		if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents !== undefined) {
+			return e.sourceCapabilities.firesTouchEvents;
+		}
+
+		return eventTimeStamp(e) < this._lastTouchEventTimeStamp + Delay.PreventFiresTouchEvents;
+	}
+
+	private _processTouchEvent(event: MouseEventHandlerTouchEvent, callback?: HandlerTouchEventCallback): void {
+		if (callback) {
+			callback.call(this._handler, event);
+		}
+	}
+
+	private _processMouseEvent(event: MouseEventHandlerMouseEvent, callback?: HandlerMouseEventCallback): void {
 		if (!callback) {
 			return;
 		}
@@ -496,43 +782,46 @@ export class MouseEventHandler implements IDestroyable {
 		callback.call(this._handler, event);
 	}
 
-	private _makeCompatEvent(event: MouseEvent | TouchEvent): TouchMouseEvent {
+	private _makeCompatEvent(event: MouseEvent): MouseEventHandlerMouseEvent;
+	private _makeCompatEvent(event: TouchEvent, touch: Touch): MouseEventHandlerTouchEvent;
+	private _makeCompatEvent(event: MouseEvent | TouchEvent, touch?: Touch): TouchMouseEvent {
 		// TouchEvent has no clientX/Y coordinates:
 		// We have to use the last Touch instead
-		let eventLike: MouseEvent | Touch;
-		if ('touches' in event && event.touches.length) { // eslint-disable-line no-restricted-syntax
-			eventLike = event.touches[0];
-		} else if ('changedTouches' in event && event.changedTouches.length) { // eslint-disable-line no-restricted-syntax
-			eventLike = event.changedTouches[0];
-		} else {
-			eventLike = event as MouseEvent;
-		}
-
-		const box = getBoundingClientRect(this._target);
+		const eventLike = touch || (event as MouseEvent);
+		const box = this._target.getBoundingClientRect() || { left: 0, top: 0 };
 
 		return {
-			clientX: eventLike.clientX,
-			clientY: eventLike.clientY,
-			pageX: eventLike.pageX,
-			pageY: eventLike.pageY,
-			screenX: eventLike.screenX,
-			screenY: eventLike.screenY,
-			localX: eventLike.clientX - box.left,
-			localY: eventLike.clientY - box.top,
+			clientX: eventLike.clientX as Coordinate,
+			clientY: eventLike.clientY as Coordinate,
+			pageX: eventLike.pageX as Coordinate,
+			pageY: eventLike.pageY as Coordinate,
+			screenX: eventLike.screenX as Coordinate,
+			screenY: eventLike.screenY as Coordinate,
+			localX: (eventLike.clientX - box.left) as Coordinate,
+			localY: (eventLike.clientY - box.top) as Coordinate,
 
 			ctrlKey: event.ctrlKey,
 			altKey: event.altKey,
 			shiftKey: event.shiftKey,
 			metaKey: event.metaKey,
 
-			type: event.type.startsWith('mouse') ? 'mouse' : 'touch',
+			isTouch: !event.type.startsWith('mouse') && event.type !== 'contextmenu' && event.type !== 'click',
+			srcType: event.type,
 
+			target: eventLike.target,
 			view: event.view,
+
+			preventDefault: () => {
+				if (event.type !== 'touchstart') {
+					// touchstart is passive and cannot be prevented
+					preventDefault(event);
+				}
+			},
 		};
 	}
 }
 
-function getBoundingClientRect(element: HTMLElement): ClientRect | DOMRect {
+function getBoundingClientRect(element: HTMLElement): DOMRect {
 	return element.getBoundingClientRect() || { left: 0, top: 0 };
 }
 
@@ -542,12 +831,30 @@ function getDistance(p1: Touch, p2: Touch): number {
 	return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 }
 
-function isTouchEvent(event: MouseEvent | TouchEvent): event is TouchEvent {
-	return Boolean((event as TouchEvent).touches);
-}
-
 function preventDefault(event: Event): void {
 	if (event.cancelable) {
 		event.preventDefault();
 	}
+}
+
+function getPosition(eventLike: Touch | MouseEvent): Position {
+	return {
+		x: eventLike.pageX,
+		y: eventLike.pageY,
+	};
+}
+
+function eventTimeStamp(e: TouchEvent | MouseEvent): number {
+	// for some reason e.timestamp is always 0 on iPad with magic mouse, so we use performance.now() as a fallback
+	return e.timeStamp || performance.now();
+}
+
+function touchWithId(touches: TouchList, id: number): Touch | null {
+	for (let i = 0; i < touches.length; ++i) {
+		if (touches[i].identifier === id) {
+			return touches[i];
+		}
+	}
+
+	return null;
 }

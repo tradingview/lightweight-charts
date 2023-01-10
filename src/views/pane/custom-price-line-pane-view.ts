@@ -11,11 +11,13 @@ export class CustomPriceLinePaneView extends SeriesHorizontalLinePaneView {
 		this._priceLine = priceLine;
 	}
 
-	protected _updateImpl(height: number, width: number): void {
+	protected _updateImpl(): void {
 		const data = this._lineRendererData;
 		data.visible = false;
 
-		if (!this._series.visible()) {
+		const lineOptions = this._priceLine.options();
+
+		if (!this._series.visible() || !lineOptions.lineVisible) {
 			return;
 		}
 
@@ -24,14 +26,11 @@ export class CustomPriceLinePaneView extends SeriesHorizontalLinePaneView {
 			return;
 		}
 
-		const lineOptions = this._priceLine.options();
-
 		data.visible = true;
 		data.y = y;
 		data.color = lineOptions.color;
-		data.width = width;
-		data.height = height;
 		data.lineWidth = lineOptions.lineWidth;
 		data.lineStyle = lineOptions.lineStyle;
+		data.externalId = this._priceLine.options().id;
 	}
 }

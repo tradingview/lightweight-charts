@@ -3,7 +3,7 @@ import { ChartWidget } from '../gui/chart-widget';
 import { ensureNotNull } from '../helpers/assertions';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { DefaultPriceScaleId, isDefaultPriceScale } from '../model/default-price-scale';
+import { isDefaultPriceScale } from '../model/default-price-scale';
 import { PriceScale, PriceScaleOptions } from '../model/price-scale';
 
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -30,7 +30,7 @@ export class PriceScaleApi implements IPriceScaleApi {
 			return 0;
 		}
 
-		return this._chartWidget.getPriceAxisWidth(this._priceScaleId === DefaultPriceScaleId.Left ? 'left' : 'right');
+		return this._chartWidget.getPriceAxisWidth(this._priceScaleId);
 	}
 
 	private _priceScale(): PriceScale {

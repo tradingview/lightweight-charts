@@ -1,0 +1,8 @@
+.ChartContainer * {
+	overflow: hidden;
+}
+
+.ChartContainer table td,
+.ChartContainer table tr {
+	border: none;
+}

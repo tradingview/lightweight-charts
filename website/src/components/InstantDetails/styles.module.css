@@ -1,0 +1,73 @@
+/* 
+ Styles to match those defined within:
+ @docusaurus/theme-common/components/Details
+ @docusaurus/theme-classic/theme/Details
+*/
+
+.details {
+	--docusaurus-details-summary-arrow-size: 0.38rem;
+	--docusaurus-details-transition: transform 200ms ease;
+	--ifm-code-background: var(--ifm-alert-background-color-highlight);
+	--ifm-link-color: var(--ifm-alert-foreground-color);
+	--ifm-link-hover-color: var(--ifm-alert-foreground-color);
+	--ifm-link-decoration: underline;
+	--ifm-tabs-color: var(--ifm-alert-foreground-color);
+	--ifm-tabs-color-active: var(--ifm-alert-foreground-color);
+	--ifm-tabs-color-active-border: var(--ifm-alert-border-color);
+	--ifm-alert-background-color: var(--ifm-color-info-contrast-background);
+	--ifm-alert-background-color-highlight: rgba(84, 199, 236, 0.15);
+	--ifm-alert-foreground-color: var(--ifm-color-info-contrast-foreground);
+	--ifm-alert-border-color: var(--ifm-color-info-dark);
+	--docusaurus-details-decoration-color: var(--ifm-alert-border-color);
+	--docusaurus-details-transition: transform var(--ifm-transition-fast) ease;
+	background-color: var(--ifm-alert-background-color);
+	border: var(--ifm-alert-border-width) solid var(--ifm-alert-border-color);
+	border-left-width: var(--ifm-alert-border-left-width);
+	border-radius: var(--ifm-alert-border-radius);
+	box-shadow: var(--ifm-alert-shadow);
+	color: var(--ifm-alert-foreground-color);
+	padding: var(--ifm-alert-padding-vertical) var(--ifm-alert-padding-horizontal);
+	margin: 0 0 var(--ifm-spacing-vertical);
+	border: 1px solid var(--ifm-alert-border-color);
+}
+
+.details > summary {
+	position: relative;
+	cursor: pointer;
+	list-style: none;
+	padding-left: 1rem;
+}
+
+.details[open] > summary {
+	padding-bottom: 1rem;
+	margin-bottom: 1rem;
+	border-bottom: 1px solid var(--docusaurus-details-decoration-color);
+}
+
+/* TODO: deprecation, need to remove this after Safari will support `::marker` */
+.details > summary::-webkit-details-marker {
+	display: none;
+}
+
+.details > summary::before {
+	position: absolute;
+	top: 0.45rem;
+	left: 0;
+
+	/* CSS-only Arrow */
+	content: '';
+	border-width: var(--docusaurus-details-summary-arrow-size);
+	border-style: solid;
+	border-color: transparent transparent transparent
+		var(--docusaurus-details-decoration-color);
+
+	/* Arrow rotation anim */
+	transform: rotate(0deg);
+	transition: var(--docusaurus-details-transition);
+	transform-origin: calc(var(--docusaurus-details-summary-arrow-size) / 2) 50%;
+}
+
+/* When JS disabled/failed to load: we use the open property for arrow animation: */
+.details[open] > summary::before {
+	transform: rotate(90deg);
+}

@@ -1,0 +1,253 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+	--color-white: #ffffff;
+	--color-black: #000000;
+	--color-cold-gray-50: #f8f9fd;
+	--color-cold-gray-100: #F0F3FA;
+	--color-cold-gray-150: #E0E3EB;
+	--color-cold-gray-200: #D1D4DC;
+	--color-cold-gray-300: #B2B5BE;
+	--color-cold-gray-500: #787B86;
+	--color-cold-gray-700: #434651;
+	--color-cold-gray-750: #363A45;
+	--color-cold-gray-800: #2A2E39;
+	--color-cold-gray-850: #1E222D;
+	--color-cold-gray-900: #131722;
+	--color-cold-gray-950: #0C0E15;
+	--color-tv-blue-200: #90BFF9;
+	--color-tv-blue-300: #5B9CF6;
+	--color-tv-blue-400: #3179F5;
+	--color-tv-blue-500: #2962FF;
+	--color-tv-blue-600: #1E53E5;
+	--color-tv-blue-700: #1848CC;
+	--color-tv-blue-800: #143EB3;
+	--color-tv-blue-900: #0C3299;
+
+	--ifm-color-primary: var(--color-tv-blue-500);
+	--ifm-color-primary-dark: var(--color-tv-blue-600);
+	--ifm-color-primary-darker: var(--color-tv-blue-700);
+	--ifm-color-primary-darkest: var(--color-tv-blue-800);
+	--ifm-color-primary-light: var(--color-tv-blue-400);
+	--ifm-color-primary-lighter: var(--color-tv-blue-300);
+	--ifm-color-primary-lightest: var(--color-tv-blue-200);
+	--ifm-navbar-padding-horizontal: 32px;
+	--ifm-footer-padding-horizontal: 20px;
+	--ifm-footer-padding-vertical: 48px;
+	--ifm-footer-background-color: var(--color-white);
+	--ifm-footer-link-color: var(--color-black);
+	--ifm-menu-color: var(--color-cold-gray-900);
+	--ifm-menu-color-background-active: unset;
+	--ifm-menu-color-background-hover: var(--color-cold-gray-100);
+	--ifm-menu-link-padding-horizontal: 24px;
+	--ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, SegoeUI, Ubuntu, sans-serif;
+
+	--small-card-border-color: var(--color-cold-gray-150);
+	--small-card-paragraph-color: var(--color-cold-gray-500);
+
+	--large-card-background-color: var(--color-cold-gray-100);
+	--large-card-paragraph-text-color: var(--color-cold-gray-500);
+
+	--icon-color: var(--color-black);
+
+	--hero-button-text-color: var(--color-cold-gray-900);
+	--hero-button-text-color-hover-active: var(--hero-button-text-color);
+	--hero-button-background-color-hover: var(--color-cold-gray-100);
+	--hero-button-background-color-active: var(--color-cold-gray-150);
+	--hero-text-background-color: var(--color-white);
+	--hero-text-large-background-color: var(--hero-text-background-color);
+	--hero-button-border-color: var(--color-cold-gray-150);
+	--hero-text-shadow-color: rgba(0, 0, 0, 0.2);
+
+	--footer-border-color: var(--color-cold-gray-150);
+	--footer-copyright-color: var(--color-cold-gray-500);
+	--footer-links-padding-horizontal: 0px;
+
+	--sidebar-back-button-border-color: var(--color-cold-gray-100);
+	--navbar-border-color: var(--color-cold-gray-150);
+	--below-chart-container-margin-horizontal: 20px;
+
+	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-light.svg');
+	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-light.svg');
+
+	--docusaurus-highlighted-code-line-bg: #2962ff15; /* --color-tv-blue-500 with opacity */
+	--hidden-lines-warning-bg: rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme=dark] {
+	--ifm-navbar-background-color: var(--color-black);
+	--ifm-footer-background-color: var(--color-black);
+	--ifm-background-color: var(--color-black);
+	--ifm-footer-link-color: var(--color-cold-gray-200);
+	--ifm-menu-color: var(--color-cold-gray-200);
+	--ifm-menu-color-background-hover: var(--color-cold-gray-800);
+
+	--small-card-border-color: var(--color-cold-gray-850);
+	--large-card-background-color: var(--color-cold-gray-900);
+	--small-card-paragraph-color: var(--color-cold-gray-300);
+	--icon-color: var(--color-white);
+	--hero-button-text-color: var(--color-cold-gray-200);
+	--hero-button-text-color-hover-active: var(--color-white);
+	--hero-button-background-color-hover: var(--color-cold-gray-800);
+	--hero-button-background-color-active: var(--color-cold-gray-750);
+	--hero-text-background-color: var(--color-cold-gray-900);
+	--hero-text-large-background-color: var(--color-black);
+	--hero-text-shadow-color: rgba(0, 0, 0, 0.4);
+	--large-card-paragraph-text-color: var(--color-cold-gray-300);
+	--hero-button-border-color: var(--color-cold-gray-700);
+	--footer-border-color: var(--color-cold-gray-700);
+	--navbar-border-color: var(--color-cold-gray-700);
+	--menu-item-background-hover: var(--color-cold-gray-800);
+	--sidebar-back-button-border-color: var(--color-cold-gray-800);
+
+	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-dark.svg');
+	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
+
+	--docusaurus-highlighted-code-line-bg: #2962ff20;
+	--hidden-lines-warning-bg: rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme=light] .DocSearch {
+	--docsearch-searchbox-background: var(--color-cold-gray-100);
+	--docsearch-searchbox-focus-background: var(--color-cold-gray-50);
+}
+
+html[data-theme=dark] .DocSearch {
+	--docsearch-searchbox-background: var(--color-cold-gray-800);
+	--docsearch-searchbox-focus-background: var(--color-cold-gray-850);
+}
+
+.theme-code-block-highlighted-line {
+	display: block;
+	margin: 0 calc(-1 * var(--ifm-pre-padding));
+	padding: 0 var(--ifm-pre-padding);
+	border-left: 3px solid #2962ffbb;
+}
+
+.code-block-fade-line {
+	display: block;
+	margin: 0 calc(-1 * var(--ifm-pre-padding));
+	padding: 0 var(--ifm-pre-padding);
+	user-select: none;
+}
+
+.code-block-remove-line, .code-block-hide-line {
+	display: none;
+	user-select: none;
+}
+
+.code-block-hide-line, .code-block-fade-line {
+	filter: opacity(0.8) saturate(0.2);
+}
+
+.navbar {
+	box-shadow: none;
+	border-bottom: 1px solid var(--navbar-border-color);
+	height: 65px;
+}
+
+.navbar-sidebar__back {
+	border-bottom: 1px solid var(--sidebar-back-button-border-color);
+	padding-left: calc(0.5rem + var(--ifm-menu-link-padding-horizontal));
+}
+
+.menu__caret,
+.menu__link,
+.navbar-sidebar__back {
+	padding-top: 16px;
+	padding-bottom: 16px;
+}
+
+.menu__link--active:hover {
+	background: var(--ifm-menu-color-background-hover);
+}
+
+.DocSearch-Button {
+	background: var(--docsearch-searchbox-background);
+}
+
+.footer {
+	border-top: 1px solid var(--footer-border-color);
+}
+
+.footer .container {
+	margin: 0;
+	max-width: unset;
+	padding: 0;
+}
+
+.footer__links {
+	justify-content: space-between;
+	padding: 0 var(--footer-links-padding-horizontal);
+	margin: 0;
+}
+
+.footer__title {
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 600;
+	line-height: 24px;
+	text-align: left;
+}
+
+.footer__items {
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 18px;
+	text-align: left;
+}
+
+.col.footer__col {
+	flex: 0 1 auto;
+	width: unset;
+	max-width: unset;
+}
+
+.footer__copyright {
+	padding-top: 24px;
+	color: var(--footer-copyright-color);
+}
+
+@media (min-width: 767.5px) {
+	.footer__links {
+		flex-wrap: nowrap;
+	}
+}
+
+@media (max-width: 996px) {
+	.footer {
+		--ifm-footer-padding-horizontal: 40px;
+	}
+
+	/**
+	 * Required to properly override docusaurus styles.
+	 * https://github.com/facebookincubator/infima/blob/c270e2cbdaf0659093ae7f6fbc8899430a0e9147/packages/core/styles/layout/grid.pcss#L51-L55
+	 */
+	.row .col.col.col {
+		flex-basis: auto;
+	}
+}
+
+@media (min-width: 1279.5px) {
+	.footer {
+		--footer-links-padding-horizontal: 80px;
+	}
+}
+
+@media (min-width: 1919.5px) {
+	.footer {
+		--footer-links-padding-horizontal: 240px;
+	}
+}
+
+.standalone-iframe {
+	height: 250px;
+	width: 100%;
+	border-radius: var(--ifm-code-border-radius);
+}

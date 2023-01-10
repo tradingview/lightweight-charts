@@ -13,7 +13,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = LightweightCharts.createChart(container, {
+	const chart = window.chart = LightweightCharts.createChart(container, {
 		crosshair: {
 			vertLine: {
 				labelBackgroundColor: 'rgba(123, 123, 123, 0.5)',

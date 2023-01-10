@@ -1,0 +1,54 @@
+---
+title: Inverted Price Scale
+sidebar_label: Inverted Price Scale
+description: How to invert a price scale.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - price scale
+  - Inverted
+  - example
+---
+
+This example shows how to invert a price scale. Usually, the price scale will
+map the range of numbers from small to large along the vertical axis from bottom
+to top. Inverting the price scale will change this such that the values map from
+top to bottom.
+
+## How to
+
+Set the [`invertScale`](/docs/api/interfaces/PriceScaleOptions#invertscale) property
+on the [priceScale options](/docs/api/interfaces/PriceScaleOptions) to `true`.
+
+```js
+chart.applyOptions({
+    rightPriceScale: {
+        invertScale: true,
+    },
+});
+
+// or (for a specific price scale)
+const priceScale = chart.priceScale();
+priceScale.applyOptions({
+    invertScale: true,
+});
+```
+
+You can see a full [working example](#full-example) below.
+
+## Resources
+- [invertScale](/docs/api/interfaces/PriceScaleOptions#invertscale)
+- [Price Scales](/docs/price-scale) - General introduction to Price Scales.
+
+## Full example
+
+import UsageGuidePartial from "./_usage-guide-partial.mdx";
+
+<UsageGuidePartial />
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./inverted-price-scale.js";
+
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+	{code}
+</CodeBlock>

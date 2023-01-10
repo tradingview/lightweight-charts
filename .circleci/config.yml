@@ -15,6 +15,17 @@ aliases:
         - node_modules
       key: *cache-key
 
+  - &restore-node-modules-cache-website
+      name: Restore node_modules cache for /website
+      keys:
+        - &cache-key-website v1-dependencies-website-{{ checksum "website/package.json" }}
+
+  - &save-node-modules-cache-website
+      name: Save node_modules cache for /website
+      paths:
+        - website/node_modules
+      key: *cache-key-website
+
   - &default-filters
       tags:
         ignore:
@@ -29,14 +40,13 @@ aliases:
 
 
 executors:
-  node-latest-executor:
+  node16-executor:
     docker:
-      - image: circleci/node:12
+      - image: cimg/node:16.16
 
-  node-browsers-latest-executor:
+  node16-browsers-executor:
     docker:
-      - image: circleci/node:12-browsers
-
+      - image: cimg/node:16.16-browsers
 
 commands:
   checkout-with-deps:
@@ -44,6 +54,7 @@ commands:
     steps:
       - checkout
       - restore_cache: *restore-node-modules-cache
+      - restore_cache: *restore-node-modules-cache-website
 
   run-graphics-tests:
     description: "Run graphics tests with specific devicePixelRatio"
@@ -63,7 +74,10 @@ commands:
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
             echo 'export PRODUCTION_BUILD=<< parameters.productionBuild >>' >> $BASH_ENV
-      - run: scripts/run-graphics-tests.sh
+      - run:
+          command: scripts/run-graphics-tests.sh
+          no_output_timeout: 20m
+
       - store_test_results:
           path: test-results/
       - store_artifacts:
@@ -73,20 +87,27 @@ commands:
 
 jobs:
   install-deps:
-    executor: node-latest-executor
+    executor: node16-executor
     steps:
       - checkout-with-deps
       - run: npm install
       - save_cache: *save-node-modules-cache
 
-  build:
-    executor: node-latest-executor
+  install-deps-website:
+    executor: node16-executor
     steps:
       - checkout-with-deps
+      - run: cd website && npm install
+      - save_cache: *save-node-modules-cache-website
+
+  build:
+    executor: node16-executor
+    steps:
+      - checkout-with-deps
+      - run: npm run build:prod
       # make sure that the project is compiled successfully with composite projects
       # so we don't have cyclic deps between projects and wrong imports
       - run: npm run tsc-verify
-      - run: npm run build:prod
       - persist_to_workspace:
           root: ./
           paths:
@@ -94,38 +115,42 @@ jobs:
             - dist
 
   no-crlf:
-    executor: node-latest-executor
+    executor: node16-executor
     steps:
       - checkout
       - run: scripts/no-crlf.sh
 
   trailing-lf:
-    executor: node-latest-executor
+    executor: node16-executor
     steps:
       - checkout
       - run: scripts/trailing-newlines.sh
 
-  lint-js:
-    executor: node-latest-executor
+  lint-eslint:
+    executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm run lint:js
+      - attach_workspace:
+          at: ./
+      - run: npm run lint:eslint
 
-  lint-ts:
-    executor: node-latest-executor
+  lint-dts:
+    executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm run lint:ts
+      - attach_workspace:
+          at: ./
+      - run: npm run bundle-dts
+      - run: npm run check-dts-docs
 
-  markdown:
-    executor: node-latest-executor
+  lint-markdown:
+    executor: node16-executor
     steps:
       - checkout-with-deps
       - run: npm run lint:md
-      - run: npm run check-markdown-links
 
   unittests:
-    executor: node-latest-executor
+    executor: node16-executor
     environment:
       TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
@@ -135,7 +160,7 @@ jobs:
           path: test-results/
 
   dts-changes:
-    executor: node-latest-executor
+    executor: node16-executor
     steps:
       - checkout-with-deps
       - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
@@ -144,25 +169,31 @@ jobs:
           when: on_fail
 
   graphics-tests-dpr1_0:
-    executor: node-browsers-latest-executor
+    executor: node16-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "1.0"
 
+  graphics-tests-dpr1_25:
+    executor: node16-browsers-executor
+    steps:
+      - run-graphics-tests:
+          devicePixelRatio: "1.25"
+
   graphics-tests-dpr1_5:
-    executor: node-browsers-latest-executor
+    executor: node16-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "1.5"
 
   graphics-tests-dpr2_0:
-    executor: node-browsers-latest-executor
+    executor: node16-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "2.0"
 
   graphics-tests-dpr2_0-prod:
-    executor: node-browsers-latest-executor
+    executor: node16-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "2.0"
@@ -170,7 +201,7 @@ jobs:
 
 
   memleaks-tests:
-    executor: node-browsers-latest-executor
+    executor: node16-browsers-executor
     environment:
       NO_SANDBOX: "true"
       TESTS_REPORT_FILE: "test-results/memleaks/results.xml"
@@ -183,7 +214,7 @@ jobs:
           path: test-results/
 
   coverage:
-    executor: node-browsers-latest-executor
+    executor: node16-browsers-executor
     environment:
       NO_SANDBOX: "true"
       TESTS_REPORT_FILE: "test-results/coverage/results.xml"
@@ -195,8 +226,21 @@ jobs:
       - store_test_results:
           path: test-results/
 
+  interactions:
+    executor: node16-browsers-executor
+    environment:
+      NO_SANDBOX: "true"
+      TESTS_REPORT_FILE: "test-results/interactions/results.xml"
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run: scripts/run-interactions-tests.sh
+      - store_test_results:
+          path: test-results/
+
   size-limit:
-    executor: node-latest-executor
+    executor: node16-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
@@ -206,6 +250,50 @@ jobs:
           command: node scripts/compare-size-with-merge-base.js
       - run: npm run size-limit
 
+  build-docusaurus-website:
+    executor: node16-executor
+    steps:
+      - checkout-with-deps
+      - run: npm run build:prod
+      - run:
+          name: "Install dependencies and build website"
+          command: |
+            cd website
+            npm install
+            npm run build
+      - run:
+          # we need to run this check here because only here we have generated md files of the website
+          name: "Check website markdown links"
+          command: npm run check-markdown-links -- --check-website-links
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - website
+
+  deploy-docusaurus-website:
+    executor: node16-executor
+    environment:
+      USE_SSH: "true"
+      # We should be able to remove GIT_USER when we have upgraded to a Docusaurus version > 2.0.0-beta.9
+      GIT_USER: "tvrobot"
+      CUSTOM_COMMIT_MESSAGE: "[skip ci] Deploy website based on $CIRCLE_SHA1"
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      - run:
+          name: "Setting up git user"
+          command: |
+            git config --global user.name "TradingView"
+            git config --global user.email "noreply@tradingview.com"
+      - add_ssh_keys:
+          fingerprints:
+            - "cb:bc:16:a1:03:fb:b5:fb:69:4b:68:4d:33:a9:54:8c"
+      - run:
+          name: "Deploy website"
+          command: |
+            cd website
+            npm run deploy -- --skip-build
 
 workflows:
   version: 2
@@ -213,6 +301,8 @@ workflows:
   build-lint-test:
     jobs:
       - install-deps:
+          filters: *default-filters
+      - install-deps-website:
           filters: *default-filters
       - no-crlf:
           filters: *default-filters
@@ -223,15 +313,8 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-      - lint-js:
-          filters: *default-filters
-          requires:
-            - install-deps
-      - lint-ts:
-          filters: *default-filters
-          requires:
-            - install-deps
-      - markdown:
+            - install-deps-website
+      - lint-markdown:
           filters: *default-filters
           requires:
             - install-deps
@@ -249,6 +332,10 @@ workflows:
           requires:
             - build
       - graphics-tests-dpr1_0:
+          filters: *merge-based-filters
+          requires:
+            - build
+      - graphics-tests-dpr1_25:
           filters: *merge-based-filters
           requires:
             - build
@@ -272,3 +359,26 @@ workflows:
           filters: *default-filters
           requires:
             - build
+      - interactions:
+          filters: *default-filters
+          requires:
+            - build
+      - lint-dts:
+          filters: *default-filters
+          requires:
+            - build
+      - lint-eslint:
+          filters: *default-filters
+          requires:
+            - build
+      - build-docusaurus-website:
+          filters: *default-filters
+          requires:
+            - install-deps
+            - install-deps-website
+      - deploy-docusaurus-website:
+          filters:
+            branches:
+              only: master
+          requires:
+            - build-docusaurus-website

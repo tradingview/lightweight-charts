@@ -1,24 +1,27 @@
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { LineItem } from './line-renderer';
-import { ScaledRenderer } from './scaled-renderer';
+import { LineItemBase } from './line-renderer-base';
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 
 export interface MarksRendererData {
-	items: LineItem[];
+	items: LineItemBase[];
 	lineColor: string;
+	lineWidth: number;
 	backColor: string;
 	radius: number;
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererMarks extends ScaledRenderer {
+export class PaneRendererMarks extends MediaCoordinatesPaneRenderer {
 	protected _data: MarksRendererData | null = null;
 
 	public setData(data: MarksRendererData): void {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {
+	protected _drawImpl({ context: ctx }: MediaCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
@@ -38,8 +41,10 @@ export class PaneRendererMarks extends ScaledRenderer {
 			ctx.fill();
 		};
 
-		ctx.fillStyle = data.backColor;
-		draw(data.radius + 2);
+		if (data.lineWidth > 0) {
+			ctx.fillStyle = data.backColor;
+			draw(data.radius + data.lineWidth);
+		}
 
 		ctx.fillStyle = data.lineColor;
 		draw(data.radius);

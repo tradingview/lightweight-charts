@@ -1,13 +1,20 @@
-import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+import {
+	BitmapCoordinatesRenderingScope,
+	CanvasElementBitmapSizeBinding,
+	equalSizes,
+	Size,
+	size,
+	tryCreateCanvasRenderingTarget2D,
+} from 'fancy-canvas';
 
-import { clearRect, drawScaled } from '../helpers/canvas-helpers';
+import { clearRect } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 
 import { ChartOptionsInternal } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
-import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
+import { createBoundCanvas } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
 export interface PriceAxisStubParams {
@@ -15,10 +22,11 @@ export interface PriceAxisStubParams {
 }
 
 export type BorderVisibleGetter = () => boolean;
+export type ColorGetter = () => string;
 
 export class PriceAxisStub implements IDestroyable {
 	private readonly _cell: HTMLDivElement;
-	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 
@@ -27,56 +35,54 @@ export class PriceAxisStub implements IDestroyable {
 	private _invalidated: boolean = true;
 
 	private readonly _isLeft: boolean;
-	private _size: Size = new Size(0, 0);
+	private _size: Size = size({ width: 0, height: 0 });
 	private readonly _borderVisible: BorderVisibleGetter;
+	private readonly _bottomColor: ColorGetter;
 
 	public constructor(
 		side: PriceAxisWidgetSide,
 		options: ChartOptionsInternal,
 		params: PriceAxisStubParams,
-		borderVisible: BorderVisibleGetter
+		borderVisible: BorderVisibleGetter,
+		bottomColor: ColorGetter
 	) {
 		this._isLeft = side === 'left';
 		this._rendererOptionsProvider = params.rendererOptionsProvider;
 
 		this._options = options;
 		this._borderVisible = borderVisible;
+		this._bottomColor = bottomColor;
 
 		this._cell = document.createElement('div');
 		this._cell.style.width = '25px';
 		this._cell.style.height = '100%';
 		this._cell.style.overflow = 'hidden';
 
-		this._canvasBinding = createBoundCanvas(this._cell, new Size(16, 16));
-		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
+		this._canvasBinding = createBoundCanvas(this._cell, size({ width: 16, height: 16 }));
+		this._canvasBinding.subscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
 	}
 
 	public destroy(): void {
-		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
-		this._canvasBinding.destroy();
+		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
+		this._canvasBinding.dispose();
 	}
 
 	public getElement(): HTMLElement {
 		return this._cell;
 	}
 
-	public getSize(): Readonly<Size> {
+	public getSize(): Size {
 		return this._size;
 	}
 
-	public setSize(size: Size): void {
-		if (size.w < 0 || size.h < 0) {
-			throw new Error('Try to set invalid size to PriceAxisStub ' + JSON.stringify(size));
-		}
+	public setSize(newSize: Size): void {
+		if (!equalSizes(this._size, newSize)) {
+			this._size = newSize;
 
-		if (!this._size.equals(size)) {
-			this._size = size;
+			this._canvasBinding.resizeCanvasElement(newSize);
 
-			this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
-
-			this._cell.style.width = `${size.w}px`;
-			this._cell.style.minWidth = `${size.w}px`; // for right calculate position of .pane-legend
-			this._cell.style.height = `${size.h}px`;
+			this._cell.style.width = `${newSize.width}px`;
+			this._cell.style.height = `${newSize.height}px`;
 
 			this._invalidated = true;
 		}
@@ -87,44 +93,50 @@ export class PriceAxisStub implements IDestroyable {
 			return;
 		}
 
-		if (this._size.w === 0 || this._size.h === 0) {
+		if (this._size.width === 0 || this._size.height === 0) {
 			return;
 		}
 
 		this._invalidated = false;
 
-		const ctx = getContext2D(this._canvasBinding.canvas);
-		this._drawBackground(ctx, this._canvasBinding.pixelRatio);
-		this._drawBorder(ctx, this._canvasBinding.pixelRatio);
+		this._canvasBinding.applySuggestedBitmapSize();
+		const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
+		if (target !== null) {
+			target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
+				this._drawBackground(scope);
+				this._drawBorder(scope);
+			});
+		}
 	}
 
-	public getImage(): HTMLCanvasElement {
-		return this._canvasBinding.canvas;
+	public getBitmapSize(): Size {
+		return this._canvasBinding.bitmapSize;
 	}
 
-	private _drawBorder(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+	public drawBitmap(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+		const bitmapSize = this.getBitmapSize();
+		if (bitmapSize.width > 0 && bitmapSize.height > 0) {
+			ctx.drawImage(this._canvasBinding.canvasElement, x, y);
+		}
+	}
+
+	private _drawBorder({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (!this._borderVisible()) {
 			return;
 		}
-		const width = this._size.w;
-
-		ctx.save();
 
 		ctx.fillStyle = this._options.timeScale.borderColor;
 
-		const borderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * pixelRatio);
+		const horzBorderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * horizontalPixelRatio);
+		const vertBorderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * verticalPixelRatio);
+		const left = (this._isLeft) ? bitmapSize.width - horzBorderSize : 0;
 
-		const left = (this._isLeft) ? Math.round(width * pixelRatio) - borderSize : 0;
-
-		ctx.fillRect(left, 0, borderSize, borderSize);
-		ctx.restore();
+		ctx.fillRect(left, 0, horzBorderSize, vertBorderSize);
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		drawScaled(ctx, pixelRatio, () => {
-			clearRect(ctx, 0, 0, this._size.w, this._size.h, this._options.layout.backgroundColor);
-		});
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
+		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, this._bottomColor());
 	}
 
-	private readonly _canvasConfiguredHandler = () => this.paint(InvalidationLevel.Full);
+	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => this.paint(InvalidationLevel.Full);
 }

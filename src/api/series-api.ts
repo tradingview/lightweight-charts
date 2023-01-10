@@ -1,39 +1,33 @@
+import { IPriceFormatter } from '../formatters/iprice-formatter';
+
 import { ensureNotNull } from '../helpers/assertions';
 import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
-import { PlotRowSearchMode } from '../model/plot-list';
-import { PriceLineOptions } from '../model/price-line-options';
+import { MismatchDirection } from '../model/plot-list';
+import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
-import { Series, SeriesPartialOptionsInternal } from '../model/series';
+import { Series } from '../model/series';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Logical, Range, TimePoint, TimePointIndex } from '../model/time-data';
+import { Logical, OriginalTime, Range, Time, TimePoint, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
-import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
+import { getSeriesDataCreator } from './get-series-data-creator';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { BarsInfo, IPriceFormatter, ISeriesApi } from './iseries-api';
+import { BarsInfo, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
-
-export function migrateOptions<TSeriesType extends SeriesType>(options: SeriesPartialOptionsMap[TSeriesType]): SeriesPartialOptionsInternal<TSeriesType> {
-	// eslint-disable-next-line deprecation/deprecation
-	const { overlay, ...res } = options;
-	if (overlay) {
-		res.priceScaleId = '';
-	}
-	return res;
-}
 
 export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType> {
 	protected _series: Series<TSeriesType>;
@@ -49,10 +43,6 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public priceFormatter(): IPriceFormatter {
 		return this._series.formatter();
-	}
-
-	public series(): Series<TSeriesType> {
-		return this._series;
 	}
 
 	public priceToCoordinate(price: number): Coordinate | null {
@@ -88,8 +78,8 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 			return null;
 		}
 
-		const dataFirstBarInRange = bars.search(correctedRange.left(), PlotRowSearchMode.NearestRight);
-		const dataLastBarInRange = bars.search(correctedRange.right(), PlotRowSearchMode.NearestLeft);
+		const dataFirstBarInRange = bars.search(correctedRange.left(), MismatchDirection.NearestRight);
+		const dataLastBarInRange = bars.search(correctedRange.right(), MismatchDirection.NearestLeft);
 
 		const dataFirstIndex = ensureNotNull(bars.firstIndex());
 		const dataLastIndex = ensureNotNull(bars.lastIndex());
@@ -137,19 +127,39 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		this._dataUpdatesConsumer.updateData(this._series, bar);
 	}
 
+	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null {
+		const data = this._series.bars().search(logicalIndex as unknown as TimePointIndex, mismatchDirection);
+		if (data === null) {
+			// actually it can be a whitespace
+			return null;
+		}
+
+		return getSeriesDataCreator(this.seriesType())(data);
+	}
+
 	public setMarkers(data: SeriesMarker<Time>[]): void {
 		checkItemsAreOrdered(data, true);
 
 		const convertedMarkers = data.map<SeriesMarker<TimePoint>>((marker: SeriesMarker<Time>) => ({
 			...marker,
+			originalTime: marker.time as unknown as OriginalTime,
 			time: convertTime(marker.time),
 		}));
 		this._series.setMarkers(convertedMarkers);
 	}
 
+	public markers(): SeriesMarker<Time>[] {
+		return this._series.markers().map<SeriesMarker<Time>>((internalItem: SeriesMarker<TimePoint>) => {
+			const { originalTime, time, ...item } = internalItem;
+			return {
+				time: originalTime as unknown as Time,
+				...item as Omit<SeriesMarker<TimePoint>, 'time' | 'originalTIme'>,
+			};
+		});
+	}
+
 	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {
-		const migratedOptions = migrateOptions(options);
-		this._series.applyOptions(migratedOptions);
+		this._series.applyOptions(options);
 	}
 
 	public options(): Readonly<SeriesOptionsMap[TSeriesType]> {
@@ -160,7 +170,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._priceScaleApiProvider.priceScale(this._series.priceScale().id());
 	}
 
-	public createPriceLine(options: PriceLineOptions): IPriceLine {
+	public createPriceLine(options: CreatePriceLineOptions): IPriceLine {
 		checkPriceLineOptions(options);
 
 		const strictOptions = merge(clone(priceLineOptionsDefaults), options) as PriceLineOptions;

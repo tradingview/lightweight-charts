@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { Browser, Frame, JSHandle, launch as launchPuppeteer, LaunchOptions, Response } from 'puppeteer';
+import puppeteer, { type Browser, type HTTPResponse, type JSHandle, type Page, type PuppeteerLaunchOptions } from 'puppeteer';
 
 import { getTestCases } from './helpers/get-test-cases';
 
@@ -15,17 +15,16 @@ function generatePageContent(standaloneBundlePath: string, testCaseCode: string)
 	return dummyContent
 		.replace('PATH_TO_STANDALONE_MODULE', standaloneBundlePath)
 		.replace('TEST_CASE_SCRIPT', testCaseCode)
-	;
+		;
 }
 
 const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
-async function getReferencesCount(frame: Frame, prototypeReference: JSHandle): Promise<number> {
-	const context = await frame.executionContext();
-	const activeRefsHandle = await context.queryObjects(prototypeReference);
-	const activeRefsCount = await (await activeRefsHandle.getProperty('length')).jsonValue() as number;
+async function getReferencesCount(page: Page, prototypeReference: JSHandle): Promise<number> {
+	const activeRefsHandle = await page.queryObjects(prototypeReference);
+	const activeRefsCount = await (await activeRefsHandle?.getProperty('length'))?.jsonValue();
 
 	await activeRefsHandle.dispose();
 
@@ -38,20 +37,72 @@ function promisleep(ms: number): Promise<void> {
 	});
 }
 
-describe('Memleaks tests', () => {
-	const puppeteerOptions: LaunchOptions = {};
+/**
+ * Request garbage collection on the page.
+ * **Note:** This is only a request and the page will still decide
+ * when best to perform this action.
+ */
+async function requestGarbageCollection(page: Page): Promise<void> {
+	const client = await page.target().createCDPSession();
+	await client.send('HeapProfiler.enable');
+	await client.send('HeapProfiler.collectGarbage');
+	await client.send('HeapProfiler.disable');
+	return page.evaluate(() => {
+		// exposed when '--js-flags="expose-gc"' argument is used with chrome
+		if (window.gc) {
+			window.gc();
+		}
+	});
+}
+
+// Poll the references count on the page until the condition
+// is satisfied for a specific prototype.
+async function pollReferencesCount(
+	page: Page,
+	prototype: JSHandle,
+	condition: (currentCount: number) => boolean,
+	timeout: number,
+	actionName?: string,
+	tryCallGarbageCollection?: boolean
+): Promise<number> {
+	const start = performance.now();
+	let referencesCount = 0;
+	let done = false;
+	do {
+		const duration = performance.now() - start;
+		if (duration > timeout) {
+			throw new Error(`${actionName ? `${actionName}: ` : ''}Timeout exceeded waiting for references count to meet desired condition.`);
+		}
+		referencesCount = await getReferencesCount(page, prototype);
+		done = condition(referencesCount);
+		if (!done) {
+			await promisleep(50);
+			if (tryCallGarbageCollection) {
+				await requestGarbageCollection(page);
+			}
+		}
+	} while (!done);
+	return referencesCount;
+}
+
+describe('Memleaks tests', function(): void {
+	// this tests are unstable sometimes.
+	this.retries(5);
+
+	const puppeteerOptions: PuppeteerLaunchOptions = {};
+	puppeteerOptions.args = ['--js-flags="expose-gc"'];
 	if (process.env.NO_SANDBOX) {
-		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
+		puppeteerOptions.args.push('--no-sandbox', '--disable-setuid-sandbox');
 	}
 
 	let browser: Browser;
 
-	before(async () => {
+	before(async function(): Promise<void> {
+		this.timeout(40000); // puppeteer may take a while to launch for the first time.
 		expect(testStandalonePath, `path to test standalone module must be passed via ${testStandalonePathEnvKey} env var`)
-			.to.have.length.greaterThan(0);
-
-		const browserPromise = launchPuppeteer(puppeteerOptions);
-		browser = await browserPromise;
+		.to.have.length.greaterThan(0);
+		browser = await puppeteer.launch(puppeteerOptions);
+		return Promise.resolve();
 	});
 
 	const testCases = getTestCases();
@@ -78,7 +129,7 @@ describe('Memleaks tests', () => {
 				errors.push(error.message);
 			});
 
-			page.on('response', (response: Response) => {
+			page.on('response', (response: HTTPResponse) => {
 				if (!response.ok()) {
 					errors.push(`Network error: ${response.url()} status=${response.status()}`);
 				}
@@ -88,18 +139,24 @@ describe('Memleaks tests', () => {
 				return Promise.resolve(CanvasRenderingContext2D.prototype);
 			};
 
-			const frame = page.mainFrame();
-			const context = await frame.executionContext();
+			const prototype = await page.evaluateHandle(getCanvasPrototype);
 
-			const prototype = await context.evaluateHandle(getCanvasPrototype);
-
-			const referencesCountBefore = await getReferencesCount(frame, prototype);
+			const referencesCountBefore = await getReferencesCount(page, prototype);
 
 			await page.setContent(pageContent, { waitUntil: 'load' });
 
 			if (errors.length !== 0) {
 				throw new Error(`Page has errors:\n${errors.join('\n')}`);
 			}
+
+			// Wait until at least one canvas element has been created.
+			await pollReferencesCount(
+				page,
+				prototype,
+				(count: number) => count > referencesCountBefore,
+				2500,
+				'Creation'
+			);
 
 			// now remove chart
 
@@ -111,12 +168,19 @@ describe('Memleaks tests', () => {
 				delete (window as any).chart;
 			});
 
-			// IMPORTANT: This timeout is important
+			await requestGarbageCollection(page);
+
+			// Wait until all the created canvas elements have been garbage collected.
 			// Browser could keep references to DOM elements several milliseconds after its actual removing
 			// So we have to wait to be sure all is clear
-			await promisleep(100);
-
-			const referencesCountAfter = await getReferencesCount(frame, prototype);
+			const referencesCountAfter = await pollReferencesCount(
+				page,
+				prototype,
+				(count: number) => count <= referencesCountBefore,
+				10000,
+				'Garbage Collection',
+				true
+			);
 
 			expect(referencesCountAfter).to.be.equal(referencesCountBefore, 'There should not be extra references after removing a chart');
 		});

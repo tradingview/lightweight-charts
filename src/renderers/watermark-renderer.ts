@@ -1,4 +1,6 @@
-import { ScaledRenderer } from './scaled-renderer';
+import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+
+import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 
 export interface WatermarkRendererLineData {
 	text: string;
@@ -8,20 +10,24 @@ export interface WatermarkRendererLineData {
 	zoom: number;
 }
 
+/**
+ * Represents a horizontal alignment.
+ */
 export type HorzAlign = 'left' | 'center' | 'right';
+/**
+ * Represents a vertical alignment.
+ */
 export type VertAlign = 'top' | 'center' | 'bottom';
 
 export interface WatermarkRendererData {
 	lines: WatermarkRendererLineData[];
 	color: string;
-	height: number;
-	width: number;
 	visible: boolean;
 	horzAlign: HorzAlign;
 	vertAlign: VertAlign;
 }
 
-export class WatermarkRenderer extends ScaledRenderer {
+export class WatermarkRenderer extends MediaCoordinatesPaneRenderer {
 	private readonly _data: WatermarkRendererData;
 	private _metricsCache: Map<string, Map<string, number>> = new Map();
 
@@ -30,13 +36,14 @@ export class WatermarkRenderer extends ScaledRenderer {
 		this._data = data;
 	}
 
-	protected _drawImpl(ctx: CanvasRenderingContext2D): void {}
+	protected _drawImpl(renderingScope: MediaCoordinatesRenderingScope): void {}
 
-	protected _drawBackgroundImpl(ctx: CanvasRenderingContext2D): void {
+	protected override _drawBackgroundImpl(renderingScope: MediaCoordinatesRenderingScope): void {
 		if (!this._data.visible) {
 			return;
 		}
-		ctx.save();
+
+		const { context: ctx, mediaSize } = renderingScope;
 
 		let textHeight = 0;
 		for (const line of this._data.lines) {
@@ -46,8 +53,8 @@ export class WatermarkRenderer extends ScaledRenderer {
 
 			ctx.font = line.font;
 			const textWidth = this._metrics(ctx, line.text);
-			if (textWidth > this._data.width) {
-				line.zoom = this._data.width / textWidth;
+			if (textWidth > mediaSize.width) {
+				line.zoom = mediaSize.width / textWidth;
 			} else {
 				line.zoom = 1;
 			}
@@ -62,11 +69,11 @@ export class WatermarkRenderer extends ScaledRenderer {
 				break;
 
 			case 'center':
-				vertOffset = Math.max((this._data.height - textHeight) / 2, 0);
+				vertOffset = Math.max((mediaSize.height - textHeight) / 2, 0);
 				break;
 
 			case 'bottom':
-				vertOffset = Math.max((this._data.height - textHeight), 0);
+				vertOffset = Math.max((mediaSize.height - textHeight), 0);
 				break;
 		}
 
@@ -84,12 +91,12 @@ export class WatermarkRenderer extends ScaledRenderer {
 
 				case 'center':
 					ctx.textAlign = 'center';
-					horzOffset = this._data.width / 2;
+					horzOffset = mediaSize.width / 2;
 					break;
 
 				case 'right':
 					ctx.textAlign = 'right';
-					horzOffset = this._data.width - 1 - line.lineHeight / 2;
+					horzOffset = mediaSize.width - 1 - line.lineHeight / 2;
 					break;
 			}
 
@@ -101,8 +108,6 @@ export class WatermarkRenderer extends ScaledRenderer {
 			ctx.restore();
 			vertOffset += line.lineHeight * line.zoom;
 		}
-
-		ctx.restore();
 	}
 
 	private _metrics(ctx: CanvasRenderingContext2D, text: string): number {

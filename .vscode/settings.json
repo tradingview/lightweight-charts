@@ -2,23 +2,11 @@
     "files.exclude": {
         "dist/**": true,
         "lib/**": true,
-        "tests/e2e/graphics/.gendata/**": true
+        "tests/e2e/graphics/.gendata/**": true,
+        "tests/e2e/coverage/.gendata/**": true,
+        "website/.docusaurus/**": true,
+        "website/build/**": true,
+        "website/docs/api/**": true,
     },
-    "typescript.tsdk": "node_modules\\typescript\\lib",
-    "workbench.colorCustomizations": {
-        "activityBar.activeBackground": "#1976d225",
-        "activityBar.background": "#131722",
-        "activityBar.dropBackground": "#262B3E",
-        "activityBar.foreground": "#1976D2",
-        "activityBar.inactiveForeground": "#1976D255",
-        "activityBarBadge.background": "#1E88E5",
-        "activityBarBadge.foreground": "#131722",
-        "statusBar.background": "#131722",
-        "statusBar.foreground": "#E1ECF2",
-        "statusBarItem.hoverBackground": "#2A2E39",
-        "titleBar.activeBackground": "#131722",
-        "titleBar.activeForeground": "#E1ECF2",
-        "titleBar.inactiveBackground": "#2A2E39",
-        "titleBar.inactiveForeground": "#787B86"
-    }
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

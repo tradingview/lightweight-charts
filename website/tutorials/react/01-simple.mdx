@@ -1,0 +1,60 @@
+---
+sidebar_label: 'Simple example'
+hide_table_of_contents: true
+---
+
+# React - Simple example
+
+:::info
+
+The following only describes a relatively simple example that only renders an [area series](/docs/series-types#area) that could be tweaked to render any other type of [series](/docs/series-types).
+
+For a more complete scenario where you could wrap Lightweight Charts into a component having sub components, please consult this [example](./advanced).
+
+:::
+
+On this page you will learn how to easily use Lightweight Charts with React.
+
+## Preparing your project
+
+For the example purpose we are using [Parcel starter kit](https://github.com/brandiqa/react-parcel-starter) but feel free to use any other tool or starter kit.
+
+```console
+git clone git@github.com:brandiqa/react-parcel-starter.git lwc-react
+cd lwc-react
+npm install
+```
+
+To run your project simply
+
+```console
+npm start
+```
+
+This will create a web page accessible by default on <http://localhost:1234/>.
+
+## Creating a charting component
+
+The example _React component_ on this page may not fit your requirements completely. Creating a general purpose declarative wrapper for Lightweight Charts' imperative API is a challenge, but hopefully you can adapt this example to your use case.
+
+:::info
+
+For this example we are using props to set chart colors based on the current theme (light or dark). In your real code it might be a better idea to use a [Context](https://reactjs.org/docs/context.html#when-to-use-context).
+:::
+
+import { ThemedChart } from '@site/src/components/tutorials/themed-chart-colors-wrapper';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!@site/src/components/tutorials/simple-react-example';
+
+<CodeBlock replaceThemeConstants className="language-jsx">{code}</CodeBlock>
+
+and you'll have a reusable component that could then be enhanced, tweaked to meet your needs, adding properties and even functionalities.
+
+If you've successfully followed all the steps you should see something similar to
+
+import { App } from '@site/src/components/tutorials/simple-react-example';
+import styles from '@site/src/pages/chart.module.css';
+
+<div className={styles.ChartContainer}>
+    <ThemedChart ChartComponent={App}/>
+</div>
