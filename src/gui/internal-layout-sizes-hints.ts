@@ -1,4 +1,4 @@
-import { Size } from './canvas-utils';
+import { Size, size } from 'fancy-canvas';
 
 export interface InternalLayoutSizeHints {
 	suggestChartSize(originalSize: Size): Size;
@@ -11,11 +11,11 @@ export interface InternalLayoutSizeHints {
 // For time axis this is not important, since it just affects space for pane widgets
 export class InternalLayoutSizeHintsKeepOdd implements InternalLayoutSizeHints {
 	public suggestChartSize(originalSize: Size): Size {
-		const integerWidth = Math.floor(originalSize.w);
-		const integerHeight = Math.floor(originalSize.h);
+		const integerWidth = Math.floor(originalSize.width);
+		const integerHeight = Math.floor(originalSize.height);
 		const width = integerWidth - integerWidth % 2;
 		const height = integerHeight - integerHeight % 2;
-		return new Size(width, height);
+		return size({ width, height });
 	}
 
 	public suggestTimeScaleHeight(originalHeight: number): number {

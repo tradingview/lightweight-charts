@@ -179,8 +179,8 @@ export class ChartWidget implements IDestroyable {
 
 		const sizeHint = this._sizingHints.suggestChartSize(size({ width, height }));
 
-		this._height = sizeHint.h;
-		this._width = sizeHint.w;
+		this._height = sizeHint.height;
+		this._width = sizeHint.width;
 
 		const heightStr = this._height + 'px';
 		const widthStr = this._width + 'px';
