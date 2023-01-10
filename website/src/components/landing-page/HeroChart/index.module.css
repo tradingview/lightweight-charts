@@ -2,8 +2,9 @@
 	position: relative;
 	width: 100%;
 	margin: 0px;
-	aspect-ratio: 15 / 9;
+	aspect-ratio: var(--hero-chart-aspect-ratio);
 	margin-left: var(--hero-chart-padding-left);
+	height: var(--hero-chart-height);
 }
 
 @supports not (aspect-ratio: auto) {
@@ -38,8 +39,8 @@
 
 .HeroChartFigure {
 	position: absolute;
-	background-color: #F5F8FF; /* match this with the values defined for the chart */
-	inset: 12px;
+	background-color: #f5f8ff; /* match this with the values defined for the chart */
+	inset: var(--chart-glass-border-width);
 	margin: 0px;
 	border-radius: 16px;
 	z-index: 0;
@@ -48,7 +49,7 @@
 }
 
 :root[data-theme='dark'] .HeroChartFigure {
-	background-color:#010512;
+	background-color: #010512;
 }
 
 .HeroChartFadeBottom,

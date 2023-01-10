@@ -26,6 +26,7 @@
 
 	--container-padding: 100px;
 	--vertical-container-padding: 120px;
+	--hero-margin-bottom: 80px;
 
 	--card-corner-radius: 12px;
 	--card-inner-inline-padding: 32px;
@@ -87,6 +88,11 @@
 
 	--code-block-scale: 1;
 	--right-code-block-position: -20px;
+	--chart-glass-border-width: 9px;
+	--hero-container-bottom-padding: 28px;
+	--hero-chart-height: 604px;
+	--hero-chart-aspect-ratio: initial;
+	--hero-container-margin-bottom: 80px;
 }
 
 :root[data-theme='dark'] {
@@ -126,6 +132,8 @@
 		--card-grid-columns: 2;
 		--container-padding: 32px;
 		--vertical-container-padding: 100px;
+		--chart-glass-border-width: 8px;
+		--hero-margin-bottom: 64px;
 	}
 }
 
@@ -143,6 +151,10 @@
 		--hero-chart-padding-left: 42px;
 		--chart-right-edge-spacing: var(--container-padding);
 		--right-code-block-position: -10px;
+		--chart-glass-border-width: 8px;
+		--hero-chart-height: initial;
+		--hero-chart-aspect-ratio: 2 / 1;
+		--hero-margin-bottom: 48px;
 	}
 }
 
@@ -153,6 +165,7 @@
 		--hero-chart-padding-left: 32px;
 		--code-block-scale: 0.8;
 		--right-code-block-position: -4px;
+		--chart-glass-border-width: 6px;
 	}
 }
 
@@ -176,6 +189,7 @@
 		--hero-chart-padding-left: 24px;
 		--code-block-scale: 0.5;
 		--right-code-block-position: -8px;
+		--chart-glass-border-width: 5px;
 	}
 }
 
@@ -186,6 +200,9 @@
 		--hero-gap: 48px;
 		--code-block-scale: 0.45;
 		--right-code-block-position: -8px;
+		--chart-glass-border-width: 8px;
+		--hero-container-bottom-padding: 0px;
+		--hero-margin-bottom: 38px;
 	}
 }
 

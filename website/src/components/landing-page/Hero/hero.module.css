@@ -22,7 +22,10 @@
 	flex-direction: var(--hero-flex-direction);
 	align-items: center;
 	width: 100%;
-	margin-bottom: 80px;
+	margin-bottom: calc(
+		var(--hero-margin-bottom) + var(--hero-container-bottom-padding) *
+			var(--code-block-scale)
+	);
 	gap: var(--hero-gap);
 	/* ! Fix for older versions of Safari which had a bug with css variables being used for -inline / -block */
 	/* padding-inline: var(--container-padding); */
@@ -35,6 +38,7 @@
 	display: flex;
 	flex-direction: column;
 	width: var(--hero-main-width);
+	flex-shrink: 0;
 }
 
 .HeroMain h1 {

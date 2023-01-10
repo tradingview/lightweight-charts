@@ -97,17 +97,17 @@ const codeBlocks: CodeBlockProps[] = [
 			left: `calc(-1 * var(--hero-chart-padding-left))`,
 			top: -20,
 			transformOrigin: 'top left',
+			maxWidth: '489px',
 		},
 		name: 'chart-code',
 		lines: [
 			<span key="1">
 				<span data-c3>const</span> chartOptions =<span>{' { '}</span>
 				layout: <span>{' { '}</span> background:
-				<span>{' { '}</span>
 			</span>,
 			<span key="2">
-				&nbsp;&nbsp;type: <span data-c1>{`'solid'`}</span>, color:{' '}
-				<span data-c1>{`'transparent'`}</span>
+				&nbsp;&nbsp;<span>{' { '}</span>type: <span data-c1>{`'solid'`}</span>,
+				color: <span data-c1>{`'transparent'`}</span>
 				<span>{' } '}</span>
 				<span>{' } '}</span>
 				<span>{' }'}</span>;
@@ -133,14 +133,14 @@ const codeBlocks: CodeBlockProps[] = [
 				<span>{' }'}</span>
 				<span>{')'}</span>;
 			</span>,
-			<span key="7">
-				areaSeries.<span data-c4>setData</span>
-				<span>{'('}</span>
-				<span>{'['}</span>
-				{' /* ... */ '}
-				<span>{']'}</span>
-				<span>{')'}</span>;
-			</span>,
+			// <span key="7">
+			// 	areaSeries.<span data-c4>setData</span>
+			// 	<span>{'('}</span>
+			// 	<span>{'['}</span>
+			// 	{' /* ... */ '}
+			// 	<span>{']'}</span>
+			// 	<span>{')'}</span>;
+			// </span>,
 		],
 	},
 	{
@@ -151,29 +151,35 @@ const codeBlocks: CodeBlockProps[] = [
 			right: 0,
 			top: -8,
 			transformOrigin: 'top right',
-			width: 550,
-			maxWidth: 'calc((100vw - 60px) / var(--code-block-scale))',
+			// width: 550,
+			maxWidth: 'calc(100vw - 60px)',
 		},
 		name: 'chart-code-phone',
 		lines: [
 			<span key="3">
-				<span data-c3>const</span> chart = <span data-c4>createChart</span>
+				<span data-c4>createChart</span>
 				<span>{'('}</span>container, chartOptions
 				<span>{')'}</span>;
 			</span>,
 			<span key="4">
-				<span data-c3>const</span> areaSeries = chart.
-				<span data-c4>addAreaSeries</span>
-				<span >{'('}</span>
-				<span>{'{ '}</span>
+				<span data-c3>const</span> areaSeries =
 			</span>,
 			<span key="5">
-				&nbsp;&nbsp;lineColor: <span data-c1>{`'#2962ff'`}</span>, topColor:{' '}
-				<span data-c1>{`'#2962ff'`}</span>,
+				&nbsp;&nbsp;chart.
+				<span data-c4>addAreaSeries</span>
+				<span>{'('}</span>
+				<span>{'{ '}</span>lineColor:
 			</span>,
 			<span key="6">
-				&nbsp;&nbsp;bottomColor:{' '}
-				<span data-c1>{`'rgba(41, 98, 255, 0.28)'`}</span>
+				&nbsp;&nbsp;&nbsp;&nbsp;<span data-c1>{`'#2962ff'`}</span>, topColor:{' '}
+				<span data-c1>{`'#2962ff'`}</span>,
+			</span>,
+			<span key="7">
+				&nbsp;&nbsp;&nbsp;&nbsp;bottomColor:{' '}
+				<span data-c1>{`'rgba(41, 98, 255,'`}</span>
+			</span>,
+			<span key="8">
+				&nbsp;&nbsp;&nbsp;&nbsp;<span data-c1>{`'0.28)'`}</span>
 				<span>{' }'}</span>
 				<span>{')'}</span>;
 			</span>,
@@ -202,8 +208,20 @@ function LayoutWrapper(): JSX.Element {
 	return (
 		<Layout title="Home" description={paragraph}>
 			<Head>
-				<link rel="preload" href="https://fonts.cdnfonts.com/s/60249/Euclid Circular B SemiBold.woff" as="font" type="font/woff" crossOrigin="true"/>
-				<link rel="preload" href="https://fonts.cdnfonts.com/s/13494/Menlo-Regular.woff" as="font" type="font/woff" crossOrigin="true"/>
+				<link
+					rel="preload"
+					href="https://fonts.cdnfonts.com/s/60249/Euclid Circular B SemiBold.woff"
+					as="font"
+					type="font/woff"
+					crossOrigin="true"
+				/>
+				<link
+					rel="preload"
+					href="https://fonts.cdnfonts.com/s/13494/Menlo-Regular.woff"
+					as="font"
+					type="font/woff"
+					crossOrigin="true"
+				/>
 			</Head>
 			<Index />
 		</Layout>
