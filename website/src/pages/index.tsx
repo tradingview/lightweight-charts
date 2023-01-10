@@ -58,7 +58,7 @@ const codeBlocks: CodeBlockProps[] = [
 		name: 'npm',
 		lines: [
 			<span key="1">npm install</span>,
-			<span key="2">&nbsp;&nbsp;--save lightweight-charts</span>,
+			<span key="2">&nbsp;&nbsp;&nbsp;&nbsp;--save lightweight-charts</span>,
 		],
 	},
 	{
@@ -73,19 +73,19 @@ const codeBlocks: CodeBlockProps[] = [
 		name: 'import',
 		lines: [
 			<span key="1">
-				<span data-c3>import</span>
-				<span data-c2>{' { '}</span>createChart<span data-c2>{' } '}</span>
-				<span data-c3> from</span>
+				<span>import</span>
+				<span>{' { '}</span>createChart<span>{' } '}</span>
+				<span> from</span>
 			</span>,
 			<span key="2">
-				&nbsp;&nbsp;<span data-c1>{`'lightweight-charts'`}</span>;
+				&nbsp;&nbsp;<span>{`'lightweight-charts'`}</span>;
 			</span>,
 			<span key="3">
-				<span data-c3>const</span> chart =
+				<span>const</span> chart =
 			</span>,
 			<span key="4">
-				&nbsp;&nbsp;<span data-c4>createChart</span>
-				<span data-c2>{'('}</span>container<span data-c2>{')'}</span>;
+				&nbsp;&nbsp;<span>createChart</span>
+				<span>{'('}</span>container<span>{')'}</span>;
 			</span>,
 		],
 	},
@@ -101,27 +101,27 @@ const codeBlocks: CodeBlockProps[] = [
 		name: 'chart-code',
 		lines: [
 			<span key="1">
-				<span data-c3>const</span> chartOptions =<span data-c2>{' { '}</span>
-				layout: <span data-c2>{' { '}</span> background:
-				<span data-c2>{' { '}</span>
+				<span data-c3>const</span> chartOptions =<span>{' { '}</span>
+				layout: <span>{' { '}</span> background:
+				<span>{' { '}</span>
 			</span>,
 			<span key="2">
 				&nbsp;&nbsp;type: <span data-c1>{`'solid'`}</span>, color:{' '}
 				<span data-c1>{`'transparent'`}</span>
-				<span data-c2>{' } '}</span>
-				<span data-c2>{' } '}</span>
-				<span data-c2>{' }'}</span>;
+				<span>{' } '}</span>
+				<span>{' } '}</span>
+				<span>{' }'}</span>;
 			</span>,
 			<span key="3">
 				<span data-c3>const</span> chart = <span data-c4>createChart</span>
-				<span data-c2>{'('}</span>container, chartOptions
-				<span data-c2>{')'}</span>;
+				<span>{'('}</span>container, chartOptions
+				<span>{')'}</span>;
 			</span>,
 			<span key="4">
 				<span data-c3>const</span> areaSeries = chart.
 				<span data-c4>addAreaSeries</span>
-				<span data-c2>{'('}</span>
-				<span data-c2>{'{ '}</span>
+				<span>{'('}</span>
+				<span>{'{ '}</span>
 			</span>,
 			<span key="5">
 				&nbsp;&nbsp;lineColor: <span data-c1>{`'#2962ff'`}</span>, topColor:{' '}
@@ -130,16 +130,16 @@ const codeBlocks: CodeBlockProps[] = [
 			<span key="6">
 				&nbsp;&nbsp;bottomColor:{' '}
 				<span data-c1>{`'rgba(41, 98, 255, 0.28)'`}</span>
-				<span data-c2>{' }'}</span>
-				<span data-c2>{')'}</span>;
+				<span>{' }'}</span>
+				<span>{')'}</span>;
 			</span>,
 			<span key="7">
 				areaSeries.<span data-c4>setData</span>
-				<span data-c2>{'('}</span>
-				<span data-c3>{'['}</span>
+				<span>{'('}</span>
+				<span>{'['}</span>
 				{' /* ... */ '}
-				<span data-c3>{']'}</span>
-				<span data-c2>{')'}</span>;
+				<span>{']'}</span>
+				<span>{')'}</span>;
 			</span>,
 		],
 	},
@@ -158,14 +158,14 @@ const codeBlocks: CodeBlockProps[] = [
 		lines: [
 			<span key="3">
 				<span data-c3>const</span> chart = <span data-c4>createChart</span>
-				<span data-c2>{'('}</span>container, chartOptions
-				<span data-c2>{')'}</span>;
+				<span>{'('}</span>container, chartOptions
+				<span>{')'}</span>;
 			</span>,
 			<span key="4">
 				<span data-c3>const</span> areaSeries = chart.
 				<span data-c4>addAreaSeries</span>
-				<span data-c2>{'('}</span>
-				<span data-c2>{'{ '}</span>
+				<span >{'('}</span>
+				<span>{'{ '}</span>
 			</span>,
 			<span key="5">
 				&nbsp;&nbsp;lineColor: <span data-c1>{`'#2962ff'`}</span>, topColor:{' '}
@@ -174,8 +174,8 @@ const codeBlocks: CodeBlockProps[] = [
 			<span key="6">
 				&nbsp;&nbsp;bottomColor:{' '}
 				<span data-c1>{`'rgba(41, 98, 255, 0.28)'`}</span>
-				<span data-c2>{' }'}</span>
-				<span data-c2>{')'}</span>;
+				<span>{' }'}</span>
+				<span>{')'}</span>;
 			</span>,
 		],
 	},

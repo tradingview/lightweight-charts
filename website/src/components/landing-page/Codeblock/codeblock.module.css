@@ -1,10 +1,10 @@
 @import url('https://fonts.cdnfonts.com/css/menlo?styles=15444');
 
 :root {
-	--code-c1: #089981;
+	--code-c1: #D16C91;
 	--code-c2: #9c27b0;
-	--code-c3: #673ab7;
-	--code-c4: #2962ff;
+	--code-c3: #9E7BDE;
+	--code-c4: #04BE67;
 }
 
 aside[data-name='chart-code-phone'] {
