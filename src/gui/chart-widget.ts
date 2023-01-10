@@ -227,21 +227,7 @@ export class ChartWidget implements IDestroyable {
 
 		this._updateTimeAxisVisibility();
 
-		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {
-			warn(`You should turn autoSize off explicitly before specifying sizes; try adding options.autoSize: false to new options`);
-			return;
-		}
-		if (options.autoSize && !this._observer) {
-			// installing observer will override resize if successfull
-			this._installObserver();
-		}
-
-		if (!options.autoSize && this._observer !== null) {
-			this._uninstallObserver();
-			if (options.width !== undefined && options.height !== undefined) {
-				this.resize(options.width, options.height);
-			}
-		}
+		this._applyAutoSizeOptions(options);
 	}
 
 	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
@@ -289,6 +275,26 @@ export class ChartWidget implements IDestroyable {
 			? this._paneWidgets[0].leftPriceAxisWidget()
 			: this._paneWidgets[0].rightPriceAxisWidget();
 		return ensureNotNull(priceAxisWidget).getWidth();
+	}
+
+	// eslint-disable-next-line complexity
+	private _applyAutoSizeOptions(options: DeepPartial<ChartOptionsInternal>): void {
+		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {
+			warn(`You should turn autoSize off explicitly before specifying sizes; try adding options.autoSize: false to new options`);
+			return;
+		}
+		if (options.autoSize && !this._observer) {
+			// installing observer will override resize if successful
+			this._installObserver();
+		}
+
+		if (options.autoSize === false && this._observer !== null) {
+			this._uninstallObserver();
+		}
+
+		if (!options.autoSize && (options.width !== undefined || options.height !== undefined)) {
+			this.resize(options.width || this._width, options.height || this._height);
+		}
 	}
 
 	/**
