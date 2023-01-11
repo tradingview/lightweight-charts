@@ -200,7 +200,7 @@
 		/* --right-code-block-position: -8px; */
 		--right-code-block-position: -18px;
 		--chart-glass-border-width: 5px;
-		--container-offset-right-chart: 16px;
+		--container-offset-right-chart: 34px;
 		--hero-chart-aspect-ratio: 1.75;
 		--main-code-block-left-adjustment: 2px;
 		--chart-border-radius: 8px;
@@ -219,6 +219,7 @@
 		--hero-container-bottom-padding-adjustment: -16px;
 		--hero-margin-bottom: 38px;
 		--chart-border-radius: 24px;
+		--container-offset-right-chart: 16px;
 	}
 }
 

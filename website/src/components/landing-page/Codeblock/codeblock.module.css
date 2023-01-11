@@ -142,7 +142,7 @@ aside[data-name='chart-code-phone'].Block {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	padding-block: var(--code-block-block-padding);
+	padding: var(--code-block-block-padding) 0px;
 }
 
 :root[data-theme='dark'] .BlockContent {
