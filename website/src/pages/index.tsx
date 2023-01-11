@@ -94,7 +94,7 @@ const codeBlocks: CodeBlockProps[] = [
 		canCopy: false,
 		canSelect: false,
 		style: {
-			left: `calc(-1 * var(--hero-chart-padding-left))`,
+			left: `calc(-1 * var(--hero-chart-padding-left) + var(--main-code-block-left-adjustment))`,
 			top: -20,
 			transformOrigin: 'top left',
 			maxWidth: '489px',
