@@ -26,9 +26,8 @@ html[data-theme='dark'] .Logo {
 
 /*
 Small logo on tiny screen
-Left here, until design review
 */
-@media (max-width: 339px) {
+@media (max-width: 567px) {
 	.Logo {
 		background-image: var(--navbar-logo-url-mobile);
 		width: 36px;

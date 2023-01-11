@@ -167,6 +167,19 @@ html *:focus-visible {
 	white-space: nowrap;
 }
 
+nav.navbar {
+	--ifm-navbar-padding-horizontal: var(--container-padding, 32px);
+}
+
+button.navbar__toggle {
+	padding: 5px;
+	margin-right: 1rem;
+}
+
+.navbar-sidebar .navbar__brand {
+	padding-left: 12px;
+}
+
 .menu__caret,
 .menu__link,
 .navbar-sidebar__back {
