@@ -87,7 +87,7 @@
 	--hero-gap: 48px;
 	--chart-right-edge-spacing: var(--container-padding);
 
-	--code-block-scale: 1;
+	--hero-container-bottom-padding-adjustment: 0px;
 	--right-code-block-position: -20px;
 	--chart-glass-border-width: 9px;
 	--hero-container-bottom-padding: 28px;
@@ -96,6 +96,7 @@
 	--hero-container-margin-bottom: 80px;
 	--main-code-block-left-adjustment: 0px;
 	--chart-border-radius: 16px;
+	--import-code-block-top-position: 177px;
 }
 
 :root[data-theme='dark'] {
@@ -158,7 +159,8 @@
 		--hero-chart-height: initial;
 		--hero-chart-aspect-ratio: 2 / 1;
 		--hero-margin-bottom: 48px;
-		--main-code-block-left-adjustment: 5px;
+		--main-code-block-left-adjustment: 6px;
+		--import-code-block-top-position: 150px;
 	}
 }
 
@@ -167,11 +169,12 @@
 	:root {
 		--container-padding: 20px;
 		--hero-chart-padding-left: 32px;
-		--code-block-scale: 0.8;
+		--hero-container-bottom-padding-adjustment: -6px;
 		--right-code-block-position: -20px;
 		--chart-glass-border-width: 6px;
 		--container-offset-right-chart: var(--container-padding);
 		--chart-border-radius: 12px;
+		--import-code-block-top-position: 115px;
 	}
 }
 
@@ -193,7 +196,7 @@
 		--hero-content-font-size: 18px;
 		--hero-content-line-height: 28px;
 		--hero-chart-padding-left: 24px;
-		--code-block-scale: 0.5;
+		--hero-container-bottom-padding-adjustment: -14px;
 		/* --right-code-block-position: -8px; */
 		--right-code-block-position: -18px;
 		--chart-glass-border-width: 5px;
@@ -201,8 +204,7 @@
 		--hero-chart-aspect-ratio: 1.75;
 		--main-code-block-left-adjustment: 2px;
 		--chart-border-radius: 8px;
-		/* --hero-chart-height: initial; */
-		/* --hero-chart-height: 600px; */
+		--import-code-block-top-position: 85px;
 	}
 }
 
@@ -211,10 +213,10 @@
 	:root {
 		--hero-content-gap-bottom: 32px;
 		--hero-gap: 48px;
-		--code-block-scale: 0.45;
 		--right-code-block-position: -8px;
 		--chart-glass-border-width: 8px;
 		--hero-container-bottom-padding: 0px;
+		--hero-container-bottom-padding-adjustment: -16px;
 		--hero-margin-bottom: 38px;
 		--chart-border-radius: 24px;
 	}

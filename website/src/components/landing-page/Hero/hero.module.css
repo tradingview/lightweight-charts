@@ -23,8 +23,8 @@
 	align-items: center;
 	width: 100%;
 	margin-bottom: calc(
-		var(--hero-margin-bottom) + var(--hero-container-bottom-padding) *
-			var(--code-block-scale)
+		var(--hero-margin-bottom) + var(--hero-container-bottom-padding) +
+			var(--hero-container-bottom-padding-adjustment)
 	);
 	gap: var(--hero-gap);
 	/* ! Fix for older versions of Safari which had a bug with css variables being used for -inline / -block */

@@ -67,7 +67,7 @@ const codeBlocks: CodeBlockProps[] = [
 		canSelect: false,
 		style: {
 			right: 'var(--right-code-block-position)',
-			top: 'calc(35% - (60px * var(--code-block-scale)))',
+			top: 'var(--import-code-block-top-position)',
 			transformOrigin: 'center right',
 		},
 		name: 'import',

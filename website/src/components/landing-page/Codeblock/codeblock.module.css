@@ -7,6 +7,53 @@
 	--code-c4: #04be67;
 	--code-block-paddings: 18px;
 	--code-block-line-number-width: 18px;
+
+	--code-block-font-size: 14px;
+	--code-block-line-height: 22px;
+	--code-block-border-radius: 16px;
+	--code-block-padding: 8px;
+	--code-block-inner-radius: 8px;
+	--code-block-glass-border-width: 8px;
+	--code-block-block-padding: 14px;
+}
+
+/* Tablet-Vertical */
+@media (max-width: 1023px) {
+	:root {
+		--code-block-font-size: 11px;
+		--code-block-line-height: 18px;
+		--code-block-border-radius: 12px;
+		--code-block-padding: 6px;
+		--code-block-inner-radius: 6px;
+		--code-block-glass-border-width: 6px;
+		--code-block-block-padding: 11px;
+	}
+}
+
+/* Phone-Landscape */
+@media (max-width: 767px) {
+	:root {
+		--code-block-font-size: 7px;
+		--code-block-line-height: 11px;
+		--code-block-border-radius: 8px;
+		--code-block-padding: 4px;
+		--code-block-inner-radius: 4px;
+		--code-block-glass-border-width: 4px;
+		--code-block-block-padding: 7px;
+	}
+}
+
+/* Phone-Vertical */
+@media (max-width: 567px) {
+	:root {
+		--code-block-font-size: 6px;
+		--code-block-line-height: 10px;
+		--code-block-border-radius: 8px;
+		--code-block-padding: 4px;
+		--code-block-inner-radius: 4px;
+		--code-block-glass-border-width: 4px;
+		--code-block-block-padding: 6px;
+	}
 }
 
 aside[data-name='chart-code-phone'] {
@@ -47,23 +94,22 @@ aside[data-name='chart-code-phone'].Block {
 
 .Block {
 	/* Glass effect */
-	border-radius: 16px;
+	border-radius: calc(var(--code-block-inner-radius) + var(--code-block-glass-border-width));
 	background: rgba(0, 0, 0, 0.02);
 	backdrop-filter: blur(10px);
-	padding: 8px;
+	padding: var(--code-block-glass-border-width);
 
 	position: absolute;
 
 	font-style: normal;
 	font-weight: 400;
-	font-size: 14px;
-	line-height: 22px;
+	font-size: var(--code-block-font-size);
+	line-height: var(--code-block-line-height);
 	font-feature-settings: 'tnum' on, 'lnum' on;
 
 	font-display: swap;
 	font-family: 'Menlo', monospace;
 	color: var(--tv-cold-gray-50);
-	transform: scale(var(--code-block-scale, 1));
 	user-select: none;
 	cursor: default;
 
@@ -86,7 +132,7 @@ aside[data-name='chart-code-phone'].Block {
 }
 
 .BlockContent {
-	border-radius: 8px;
+	border-radius: var(--code-block-inner-radius);
 	background-color: var(--tv-cold-gray-50);
 	color: var(--tv-cold-gray-550);
 	opacity: 0.8;
@@ -96,7 +142,7 @@ aside[data-name='chart-code-phone'].Block {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	padding-block: 14px;
+	padding-block: var(--code-block-block-padding);
 }
 
 :root[data-theme='dark'] .BlockContent {
