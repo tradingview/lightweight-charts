@@ -462,10 +462,6 @@ export class ChartWidget implements IDestroyable {
 			}
 		}
 
-		// we need this to avoid rounding error while calculating with stretchFactor
-		// ! NEW
-		// const actualTimeAxisHeight = Math.max(0, height - accumulatedHeight - separatorsHeight);
-
 		this._timeAxisWidget.setSizes(
 			size({ width: timeAxisVisible ? paneWidth : 0, height: timeAxisHeight }),
 			timeAxisVisible ? leftPriceAxisWidth : 0,
