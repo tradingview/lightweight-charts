@@ -19,7 +19,9 @@
 	inset: 0px;
 	background: rgba(255, 255, 255, 0.05);
 	backdrop-filter: blur(10.3785px);
-	border-radius: calc(var(--chart-border-radius) + var(--chart-glass-border-width));
+	border-radius: calc(
+		var(--chart-border-radius) + var(--chart-glass-border-width)
+	);
 }
 
 .HeroChartGradient {
@@ -34,7 +36,9 @@
 		rgba(41, 98, 255, 0.7) 70.81%
 	);
 	filter: blur(20.7571px);
-	border-radius: calc(var(--chart-border-radius) + var(--chart-glass-border-width));
+	border-radius: calc(
+		var(--chart-border-radius) + var(--chart-glass-border-width)
+	);
 }
 
 .HeroChartFigure {
@@ -46,6 +50,19 @@
 	z-index: 0;
 	overflow: hidden;
 	padding-top: 6px; /* So the top tick mark doesn't appear at edge of chart area */
+}
+
+.HeroChartFigure {
+	/* Disable table styling from docusaurus */
+	--ifm-table-cell-padding: 0px;
+	--ifm-table-background: transparent;
+	--ifm-table-stripe-background: transparent;
+	--ifm-table-border-width: 0px;
+	--ifm-table-border-color: transparent;
+	--ifm-table-head-background: inherit;
+	--ifm-table-head-color: inherit;
+	--ifm-table-head-font-weight: transparent;
+	--ifm-table-cell-color: inherit;
 }
 
 :root[data-theme='dark'] .HeroChartFigure {

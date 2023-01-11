@@ -139,6 +139,7 @@ function Chart(): JSX.Element {
 			const resizeListener = () => {
 				const { width, height } = container.getBoundingClientRect();
 				chart.resize(width, height);
+				const windowWidth = window.innerWidth;
 
 				/**
 				 * Breakpoint of 567px minus 64px
@@ -147,9 +148,21 @@ function Chart(): JSX.Element {
 				 * minus 8
 				 */
 				const showTimeScale = width > 495;
+				const showPriceScale = windowWidth > 299;
 				chart.applyOptions({
 					timeScale: {
 						visible: showTimeScale,
+					},
+					rightPriceScale: {
+						visible: showPriceScale,
+					},
+				});
+
+				const smallerFont = windowWidth < 1024;
+				const smallestFont = windowWidth < 568;
+				chart.applyOptions({
+					layout: {
+						fontSize: smallestFont ? 6 : smallerFont ? 8 : 12,
 					},
 				});
 
