@@ -101,7 +101,7 @@
 	background: #000;
 }
 
-@media (min-width: 1279px) and (max-width: 1919px) {
+@media (min-width: 1280px) and (max-width: 1919px) {
 	.HeroChartFigure {
 		right: 0px !important;
 	}
