@@ -89,7 +89,7 @@
 
 	--hero-container-bottom-padding-adjustment: 0px;
 	--right-code-block-position: -20px;
-	--chart-glass-border-width: 9px;
+	--chart-glass-border-width: 8px;
 	--hero-container-bottom-padding: 28px;
 	--hero-chart-height: 604px;
 	--hero-chart-aspect-ratio: initial;
@@ -136,7 +136,6 @@
 		--card-grid-columns: 2;
 		--container-padding: 32px;
 		--vertical-container-padding: 100px;
-		--chart-glass-border-width: 8px;
 		--hero-margin-bottom: 64px;
 	}
 }
@@ -155,7 +154,6 @@
 		--hero-chart-padding-left: 42px;
 		--chart-right-edge-spacing: var(--container-padding);
 		--right-code-block-position: -12px;
-		--chart-glass-border-width: 8px;
 		--hero-chart-height: initial;
 		--hero-chart-aspect-ratio: 2 / 1;
 		--hero-margin-bottom: 48px;
@@ -171,8 +169,7 @@
 		--hero-chart-padding-left: 32px;
 		--hero-container-bottom-padding-adjustment: -6px;
 		--right-code-block-position: -20px;
-		--chart-glass-border-width: 6px;
-		--container-offset-right-chart: var(--container-padding);
+		--container-offset-right-chart: 38px;
 		--chart-border-radius: 12px;
 		--import-code-block-top-position: 115px;
 	}
@@ -199,7 +196,6 @@
 		--hero-container-bottom-padding-adjustment: -14px;
 		/* --right-code-block-position: -8px; */
 		--right-code-block-position: -18px;
-		--chart-glass-border-width: 5px;
 		--container-offset-right-chart: 34px;
 		--hero-chart-aspect-ratio: 1.75;
 		--main-code-block-left-adjustment: 2px;
@@ -214,7 +210,6 @@
 		--hero-content-gap-bottom: 32px;
 		--hero-gap: 48px;
 		--right-code-block-position: -8px;
-		--chart-glass-border-width: 8px;
 		--hero-container-bottom-padding: 0px;
 		--hero-container-bottom-padding-adjustment: -16px;
 		--hero-margin-bottom: 38px;
