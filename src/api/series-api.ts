@@ -22,14 +22,14 @@ import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
-import { ExternalSourceWrapper } from './external-source-wrapper';
 import { getSeriesDataCreator } from './get-series-data-creator';
-import { IExternalDataSource } from './iexternal-data-source';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, ISeriesApi } from './iseries-api';
-import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
+import { ISeriesPrimitive } from './iseries-primitive';
 import { PriceLine } from './price-line-api';
+
+import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 
 export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType> {
 	protected _series: Series<TSeriesType>;
@@ -188,7 +188,11 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return this._series.seriesType();
 	}
 
-	public attachExternalSource(source: IExternalDataSource): void {
-		this._series.addExternalSource(new ExternalSourceWrapper(source, this._series.model()));
+	public attachPrimitive(primitive: ISeriesPrimitive): void {
+		this._series.attachPrimitive(primitive);
+	}
+
+	public detachPrimitive(primitive: ISeriesPrimitive): void {
+		this._series.detachPrimitive(primitive);
 	}
 }

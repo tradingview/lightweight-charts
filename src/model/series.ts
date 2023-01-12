@@ -1,4 +1,3 @@
-import { ExternalSourceWrapper } from '../api/external-source-wrapper';
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
@@ -52,6 +51,9 @@ import {
 	SeriesType,
 } from './series-options';
 import { TimePoint, TimePointIndex } from './time-data';
+
+import { ISeriesPrimitive } from '../api/iseries-primitive';
+import { SeriesPrimitiveWrapper } from '../api/series-primitive-wrapper';
 
 export interface LastValueDataResultWithoutData {
 	noData: true;
@@ -113,7 +115,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
 	private _animationTimeoutId: TimerId | null = null;
-	private _externalSources: ExternalSourceWrapper[] = [];
+	private _primitives: SeriesPrimitiveWrapper[] = [];
 
 	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T) {
 		super(model);
@@ -381,8 +383,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
 		res.push(...priceLineViews);
 
-		this._externalSources.forEach((source: ExternalSourceWrapper) => {
-			res.push(...source.paneViews());
+		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
+			res.push(...wrapper.paneViews());
 		});
 
 		return res;
@@ -403,13 +405,16 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		for (const customPriceLine of this._customPriceLines) {
 			result.push(customPriceLine.priceAxisView());
 		}
+		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
+			result.push(...wrapper.priceAxisViews());
+		});
 		return result;
 	}
 
 	public override timeAxisViews(): readonly ITimeAxisView[] {
 		const res: ITimeAxisView[] = [];
-		this._externalSources.forEach((source: ExternalSourceWrapper) => {
-			res.push(...source.timeAxisViews());
+		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
+			res.push(...wrapper.timeAxisViews());
 		});
 		return res;
 	}
@@ -450,7 +455,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._baseHorizontalLineView.update();
 		this._lastPriceAnimationPaneView?.update();
 
-		this._externalSources.forEach((s: ExternalSourceWrapper) => s.updateAllViews());
+		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => wrapper.updateAllViews());
 	}
 
 	public override priceScale(): PriceScale {
@@ -484,8 +489,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options.visible;
 	}
 
-	public addExternalSource(source: ExternalSourceWrapper): void {
-		this._externalSources.push(source);
+	public attachPrimitive(primitive: ISeriesPrimitive): void {
+		this._primitives.push(new SeriesPrimitiveWrapper(primitive, this));
+	}
+
+	public detachPrimitive(source: ISeriesPrimitive): void {
+		this._primitives = this._primitives.filter((wrapper: SeriesPrimitiveWrapper) => wrapper.primitive() !== source);
 	}
 
 	private _isOverlay(): boolean {
