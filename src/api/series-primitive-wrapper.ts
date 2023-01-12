@@ -1,3 +1,5 @@
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
+
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { PriceScale } from '../model/price-scale';
@@ -25,12 +27,12 @@ class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
 		this._baseRenderer = baseRenderer;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean): void {
-		this._baseRenderer.draw(ctx, pixelRatio);
+	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
+		this._baseRenderer.draw(target);
 	}
 
-	public drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean): void {
-		this._baseRenderer.drawBackground?.(ctx, pixelRatio);
+	public drawBackground?(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
+		this._baseRenderer.drawBackground?.(target);
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
@@ -51,8 +53,8 @@ class SeriesPrimitivePaneViewWrapper implements IPaneView {
 		this._paneView = paneView;
 	}
 
-	public renderer(height: number, width: number, addAnchors?: boolean): IPaneRenderer | null {
-		const baseRenderer = this._paneView.renderer(height, width);
+	public renderer(addAnchors?: boolean): IPaneRenderer | null {
+		const baseRenderer = this._paneView.renderer();
 		if (baseRenderer === null) {
 			return null;
 		}

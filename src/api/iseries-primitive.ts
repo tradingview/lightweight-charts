@@ -1,3 +1,5 @@
+import { CanvasRenderingTarget2D } from "fancy-canvas";
+
 /**
  * This interface represents a label on the price or time axis
  */
@@ -31,27 +33,19 @@ export interface ISeriesPrimitivePaneRenderer {
 	/**
 	 * Method to draw main content of the element
 	 *
-	 * @param ctx - cavnas context to draw on
-	 * @param pixelRatio - DPR of the canvas. The library used phisical pixels coordinate spaces to support pixel-perfect rendering
+	 * @param target - cavnas context to draw on, refer FancyCanvas library for more details about this class
 	 *
-	 * Usually renderer uses someting like this
-	 * ```js
-	 * const scaledX = Math.round(this._x * pixelRatio);
-	 * const scaledY = Math.round(this._y * pixelRatio);
-	 * ctx.moveTo
-	 * ```
 	 */
-	draw(ctx: CanvasRenderingContext2D, pixelRatio: number): void;
+	draw(target: CanvasRenderingTarget2D): void;
 
 	/**
 	 * Optional method to draw the background.
 	 * Some elements could implement this method to draw on the background of the chart
 	 * Usually this is some kind of watermarks or time areas highlighting
 	 *
-	 * @param ctx - cavnas context to draw on
-	 * @param pixelRatio - DPR of the canvas
+	 * @param target - cavnas context to draw on, refer FancyCanvas library for more details about this class
 	 */
-	drawBackground?(ctx: CanvasRenderingContext2D, pixelRatio: number): void;
+	drawBackground?(target: CanvasRenderingTarget2D): void;
 }
 
 /**
@@ -61,11 +55,9 @@ export interface ISeriesPrimitivePaneView {
 	/**
 	 * This method returns a renderer - special object to draw data
 	 *
-	 * @param height - height of the area to draw on
-	 * @param width - width of the area to draw on
 	 * @returns an renderer object to be used for drawing or null if we have nothin to draw
 	 */
-	renderer(height: number, width: number): ISeriesPrimitivePaneRenderer | null;
+	renderer(): ISeriesPrimitivePaneRenderer | null;
 }
 
 /**
