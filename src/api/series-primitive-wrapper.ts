@@ -10,6 +10,7 @@ import { IPaneView } from '../views/pane/ipane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
+
 import {
 	ISeriesPrimitive,
 	ISeriesPrimitiveAxisView,
