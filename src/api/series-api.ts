@@ -27,9 +27,8 @@ import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, ISeriesApi } from './iseries-api';
 import { ISeriesPrimitive } from './iseries-primitive';
-import { PriceLine } from './price-line-api';
-
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
+import { PriceLine } from './price-line-api';
 
 export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType> {
 	protected _series: Series<TSeriesType>;

@@ -1,3 +1,6 @@
+import { ISeriesPrimitive } from '../api/iseries-primitive';
+import { SeriesPrimitiveWrapper } from '../api/series-primitive-wrapper';
+
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
@@ -51,9 +54,6 @@ import {
 	SeriesType,
 } from './series-options';
 import { TimePoint, TimePointIndex } from './time-data';
-
-import { ISeriesPrimitive } from '../api/iseries-primitive';
-import { SeriesPrimitiveWrapper } from '../api/series-primitive-wrapper';
 
 export interface LastValueDataResultWithoutData {
 	noData: true;
