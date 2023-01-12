@@ -22,8 +22,6 @@ export class CrosshairPaneView implements IPaneView {
 			color: '',
 			visible: false,
 		},
-		w: 0,
-		h: 0,
 		x: 0,
 		y: 0,
 	};
@@ -37,7 +35,7 @@ export class CrosshairPaneView implements IPaneView {
 		this._invalidated = true;
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer {
+	public renderer(): IPaneRenderer {
 		if (this._invalidated) {
 			this._updateImpl();
 			this._invalidated = false;
@@ -63,9 +61,6 @@ export class CrosshairPaneView implements IPaneView {
 		data.vertLine.lineWidth = crosshairOptions.vertLine.width;
 		data.vertLine.lineStyle = crosshairOptions.vertLine.style;
 		data.vertLine.color = crosshairOptions.vertLine.color;
-
-		data.w = pane.width();
-		data.h = pane.height();
 
 		data.x = this._source.appliedX();
 		data.y = this._source.appliedY();

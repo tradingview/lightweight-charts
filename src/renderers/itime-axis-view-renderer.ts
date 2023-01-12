@@ -1,3 +1,5 @@
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
+
 import { TextWidthCache } from '../model/text-width-cache';
 
 export interface TimeAxisViewRendererOptions {
@@ -14,5 +16,5 @@ export interface TimeAxisViewRendererOptions {
 }
 
 export interface ITimeAxisViewRenderer {
-	draw(ctx: CanvasRenderingContext2D, rendererOptions: TimeAxisViewRendererOptions, pixelRatio: number): void;
+	draw(target: CanvasRenderingTarget2D, rendererOptions: TimeAxisViewRendererOptions): void;
 }

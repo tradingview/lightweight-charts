@@ -4,6 +4,7 @@ import { preventScrollByWheelClick } from '../helpers/events';
 import { IDestroyable } from '../helpers/idestroyable';
 
 import { Coordinate } from '../model/coordinate';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
 export type HandlerMouseEventCallback = (event: MouseEventHandlerMouseEvent) => void;
 export type HandlerTouchEventCallback = (event: MouseEventHandlerTouchEvent) => void;
@@ -40,20 +41,7 @@ export interface MouseEventHandlers {
 	longTapEvent?: HandlerTouchEventCallback;
 }
 
-export interface MouseEventHandlerEventBase {
-	readonly clientX: Coordinate;
-	readonly clientY: Coordinate;
-	readonly pageX: Coordinate;
-	readonly pageY: Coordinate;
-	readonly screenX: Coordinate;
-	readonly screenY: Coordinate;
-	readonly localX: Coordinate;
-	readonly localY: Coordinate;
-
-	readonly ctrlKey: boolean;
-	readonly altKey: boolean;
-	readonly shiftKey: boolean;
-	readonly metaKey: boolean;
+export interface MouseEventHandlerEventBase extends TouchMouseEventData {
 	readonly srcType: string;
 
 	target: MouseEvent['target'];

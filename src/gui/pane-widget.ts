@@ -1,7 +1,15 @@
-import { Binding as CanvasCoordinateSpaceBinding } from 'fancy-canvas/coordinate-space';
+import {
+	BitmapCoordinatesRenderingScope,
+	CanvasElementBitmapSizeBinding,
+	CanvasRenderingTarget2D,
+	equalSizes,
+	Size,
+	size,
+	tryCreateCanvasRenderingTarget2D,
+} from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
-import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-helpers';
+import { clearRect, clearRectWithGradient } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -15,10 +23,11 @@ import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { createBoundCanvas, getContext2D, Size } from './canvas-utils';
+import { createBoundCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
@@ -30,16 +39,16 @@ const enum KineticScrollConstants {
 	ScrollMinMove = 15,
 }
 
-type DrawFunction = (renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown) => void;
+type DrawFunction = (renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown) => void;
 
-function drawBackground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+function drawBackground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
 	if (renderer.drawBackground) {
-		renderer.drawBackground(ctx, pixelRatio, isHovered, hitTestData);
+		renderer.drawBackground(target, isHovered, hitTestData);
 	}
 }
 
-function drawForeground(renderer: IPaneRenderer, ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
-	renderer.draw(ctx, pixelRatio, isHovered, hitTestData);
+function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
+	renderer.draw(target, isHovered, hitTestData);
 }
 
 type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
@@ -76,19 +85,19 @@ interface StartScrollPosition extends Point {
 export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _chart: ChartWidget;
 	private _state: Pane | null;
-	private _size: Size = new Size(0, 0);
+	private _size: Size = size({ width: 0, height: 0 });
 	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
 	private _rightPriceAxisWidget: PriceAxisWidget | null = null;
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
-	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
-	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
+	private readonly _topCanvasBinding: CanvasElementBitmapSizeBinding;
 	private readonly _rowElement: HTMLElement;
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
-	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
+	private _clicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
 	private _startTrackPoint: Point | null = null;
@@ -123,17 +132,17 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		this._paneCell.appendChild(paneWrapper);
 
-		this._canvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
-		this._canvasBinding.subscribeCanvasConfigured(this._canvasConfiguredHandler);
-		const canvas = this._canvasBinding.canvas;
+		this._canvasBinding = createBoundCanvas(paneWrapper, size({ width: 16, height: 16 }));
+		this._canvasBinding.subscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
+		const canvas = this._canvasBinding.canvasElement;
 		canvas.style.position = 'absolute';
 		canvas.style.zIndex = '1';
 		canvas.style.left = '0';
 		canvas.style.top = '0';
 
-		this._topCanvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
-		this._topCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
-		const topCanvas = this._topCanvasBinding.canvas;
+		this._topCanvasBinding = createBoundCanvas(paneWrapper, size({ width: 16, height: 16 }));
+		this._topCanvasBinding.subscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
+		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
 		topCanvas.style.zIndex = '2';
 		topCanvas.style.left = '0';
@@ -146,7 +155,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this.updatePriceAxisWidgetsStates();
 
 		this._mouseEventHandler = new MouseEventHandler(
-			this._topCanvasBinding.canvas,
+			this._topCanvasBinding.canvasElement,
 			this,
 			{
 				treatVertTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options().handleScroll.vertTouchDrag,
@@ -163,11 +172,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			this._rightPriceAxisWidget.destroy();
 		}
 
-		this._topCanvasBinding.unsubscribeCanvasConfigured(this._topCanvasConfiguredHandler);
-		this._topCanvasBinding.destroy();
+		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
+		this._topCanvasBinding.dispose();
 
-		this._canvasBinding.unsubscribeCanvasConfigured(this._canvasConfiguredHandler);
-		this._canvasBinding.destroy();
+		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
+		this._canvasBinding.dispose();
 
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
@@ -246,17 +255,15 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return;
 		}
 		this._onMouseEvent();
-
 		const x = event.localX;
 		const y = event.localY;
-
-		this._setCrosshairPosition(x, y);
+		this._setCrosshairPosition(x, y, event);
 	}
 
 	public mouseDownEvent(event: MouseEventHandlerMouseEvent): void {
 		this._onMouseEvent();
 		this._mouseTouchDownEvent();
-		this._setCrosshairPosition(event.localX, event.localY);
+		this._setCrosshairPosition(event.localX, event.localY, event);
 	}
 
 	public mouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
@@ -267,8 +274,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		const x = event.localX;
 		const y = event.localY;
-
-		this._setCrosshairPosition(x, y);
+		this._setCrosshairPosition(x, y, event);
 		const hitTest = this.hitTest(x, y);
 		this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 	}
@@ -284,7 +290,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
 		this._onMouseEvent();
 		this._pressedMouseTouchMoveEvent(event);
-		this._setCrosshairPosition(event.localX, event.localY);
+		this._setCrosshairPosition(event.localX, event.localY, event);
 	}
 
 	public mouseUpEvent(event: MouseEventHandlerMouseEvent): void {
@@ -310,7 +316,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		if (this._startTrackPoint === null) {
 			const point: Point = { x: event.localX, y: event.localY };
-			this._startTrackingMode(point, point);
+			this._startTrackingMode(point, point, event);
 		}
 	}
 
@@ -324,7 +330,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._clearCrosshairPosition();
 	}
 
-	public clicked(): ISubscription<TimePointIndex | null, Point> {
+	public clicked(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
 		return this._clicked;
 	}
 
@@ -370,7 +376,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			const origPoint = ensureNotNull(this._initCrosshairPosition);
 			const newX = origPoint.x + (x - this._startTrackPoint.x) as Coordinate;
 			const newY = origPoint.y + (y - this._startTrackPoint.y) as Coordinate;
-			this._setCrosshairPosition(newX, newY);
+			this._setCrosshairPosition(newX, newY, event);
 			return;
 		}
 
@@ -408,29 +414,25 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public setPriceAxisSize(width: number, position: PriceAxisWidgetSide): void {
 		const priceAxisWidget = position === 'left' ? this._leftPriceAxisWidget : this._rightPriceAxisWidget;
-		ensureNotNull(priceAxisWidget).setSize(new Size(width, this._size.h));
+		ensureNotNull(priceAxisWidget).setSize(size({ width, height: this._size.height }));
 	}
 
 	public getSize(): Size {
 		return this._size;
 	}
 
-	public setSize(size: Size): void {
-		if (size.w < 0 || size.h < 0) {
-			throw new Error('Try to set invalid size to PaneWidget ' + JSON.stringify(size));
-		}
-
-		if (this._size.equals(size)) {
+	public setSize(newSize: Size): void {
+		if (equalSizes(this._size, newSize)) {
 			return;
 		}
 
-		this._size = size;
+		this._size = newSize;
 		this._isSettingSize = true;
-		this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
-		this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
+		this._canvasBinding.resizeCanvasElement(newSize);
+		this._topCanvasBinding.resizeCanvasElement(newSize);
 		this._isSettingSize = false;
-		this._paneCell.style.width = size.w + 'px';
-		this._paneCell.style.height = size.h + 'px';
+		this._paneCell.style.width = newSize.width + 'px';
+		this._paneCell.style.height = newSize.height + 'px';
 	}
 
 	public recalculatePriceScales(): void {
@@ -452,8 +454,15 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	public getImage(): HTMLCanvasElement {
-		return this._canvasBinding.canvas;
+	public getBitmapSize(): Size {
+		return this._canvasBinding.bitmapSize;
+	}
+
+	public drawBitmap(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+		const bitmapSize = this.getBitmapSize();
+		if (bitmapSize.width > 0 && bitmapSize.height > 0) {
+			ctx.drawImage(this._canvasBinding.canvasElement, x, y);
+		}
 	}
 
 	public paint(type: InvalidationLevel): void {
@@ -477,22 +486,30 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		if (type !== InvalidationLevel.Cursor) {
-			const ctx = getContext2D(this._canvasBinding.canvas);
-			ctx.save();
-			this._drawBackground(ctx, this._canvasBinding.pixelRatio);
-			if (this._state) {
-				this._drawGrid(ctx, this._canvasBinding.pixelRatio);
-				this._drawWatermark(ctx, this._canvasBinding.pixelRatio);
-				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourcePaneViews);
-				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourceLabelPaneViews);
+			this._canvasBinding.applySuggestedBitmapSize();
+			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
+			if (target !== null) {
+				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
+					this._drawBackground(scope);
+				});
+				if (this._state) {
+					this._drawGrid(target);
+					this._drawWatermark(target);
+					this._drawSources(target, sourcePaneViews);
+					this._drawSources(target, sourceLabelPaneViews);
+				}
 			}
-			ctx.restore();
 		}
 
-		const topCtx = getContext2D(this._topCanvasBinding.canvas);
-		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
-		this._drawSources(topCtx, this._canvasBinding.pixelRatio, sourceTopPaneViews);
-		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
+		this._topCanvasBinding.applySuggestedBitmapSize();
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
+		if (topTarget !== null) {
+			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
+				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
+			});
+			this._drawSources(topTarget, sourceTopPaneViews);
+			this._drawCrosshair(topTarget);
+		}
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
@@ -514,72 +531,65 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _fireClickedDelegate(event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
 		const y = event.localY;
-
 		if (this._clicked.hasListeners()) {
-			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y });
+			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}
 	}
 
-	private _drawBackground(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		drawScaled(ctx, pixelRatio, () => {
-			const model = this._model();
-			const topColor = model.backgroundTopColor();
-			const bottomColor = model.backgroundBottomColor();
+	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
+		const { width, height } = bitmapSize;
+		const model = this._model();
+		const topColor = model.backgroundTopColor();
+		const bottomColor = model.backgroundBottomColor();
 
-			if (topColor === bottomColor) {
-				clearRect(ctx, 0, 0, this._size.w, this._size.h, bottomColor);
-			} else {
-				clearRectWithGradient(ctx, 0, 0, this._size.w, this._size.h, topColor, bottomColor);
-			}
-		});
+		if (topColor === bottomColor) {
+			clearRect(ctx, 0, 0, width, height, bottomColor);
+		} else {
+			clearRectWithGradient(ctx, 0, 0, width, height, topColor, bottomColor);
+		}
 	}
 
-	private _drawGrid(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+	private _drawGrid(target: CanvasRenderingTarget2D): void {
 		const state = ensureNotNull(this._state);
 		const paneView = state.grid().paneView();
-		const renderer = paneView.renderer(state.height(), state.width());
+		const renderer = paneView.renderer();
 
 		if (renderer !== null) {
-			ctx.save();
-			renderer.draw(ctx, pixelRatio, false);
-			ctx.restore();
+			renderer.draw(target, false);
 		}
 	}
 
-	private _drawWatermark(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+	private _drawWatermark(target: CanvasRenderingTarget2D): void {
 		const source = this._model().watermarkSource();
-		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawBackground, source);
-		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawForeground, source);
+		this._drawSourceImpl(target, sourcePaneViews, drawBackground, source);
+		this._drawSourceImpl(target, sourcePaneViews, drawForeground, source);
 	}
 
-	private _drawCrosshair(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
-		this._drawSourceImpl(ctx, pixelRatio, sourcePaneViews, drawForeground, this._model().crosshairSource());
+	private _drawCrosshair(target: CanvasRenderingTarget2D): void {
+		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(ctx: CanvasRenderingContext2D, pixelRatio: number, paneViewsGetter: PaneViewsGetter): void {
+	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: PaneViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
 		for (const source of sources) {
-			this._drawSourceImpl(ctx, pixelRatio, paneViewsGetter, drawBackground, source);
+			this._drawSourceImpl(target, paneViewsGetter, drawBackground, source);
 		}
 
 		for (const source of sources) {
-			this._drawSourceImpl(ctx, pixelRatio, paneViewsGetter, drawForeground, source);
+			this._drawSourceImpl(target, paneViewsGetter, drawForeground, source);
 		}
 	}
 
 	private _drawSourceImpl(
-		ctx: CanvasRenderingContext2D,
-		pixelRatio: number,
+		target: CanvasRenderingTarget2D,
 		paneViewsGetter: PaneViewsGetter,
 		drawFn: DrawFunction,
 		source: IDataSource
 	): void {
 		const state = ensureNotNull(this._state);
 		const paneViews = paneViewsGetter(source, state);
-		const height = state.height();
-		const width = state.width();
 		const hoveredSource = state.model().hoveredSource();
 		const isHovered = hoveredSource !== null && hoveredSource.source === source;
 		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
@@ -587,18 +597,16 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			: undefined;
 
 		for (const paneView of paneViews) {
-			const renderer = paneView.renderer(height, width);
+			const renderer = paneView.renderer();
 			if (renderer !== null) {
-				ctx.save();
-				drawFn(renderer, ctx, pixelRatio, isHovered, objecId);
-				ctx.restore();
+				drawFn(renderer, target, isHovered, objecId);
 			}
 		}
 	}
 
 	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
 		for (const paneView of paneViews) {
-			const renderer = paneView.renderer(this._size.h, this._size.w);
+			const renderer = paneView.renderer();
 			if (renderer !== null && renderer.hitTest) {
 				const result = renderer.hitTest(x, y);
 				if (result !== null) {
@@ -646,15 +654,15 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	private _correctXCoord(x: Coordinate): Coordinate {
-		return Math.max(0, Math.min(x, this._size.w - 1)) as Coordinate;
+		return Math.max(0, Math.min(x, this._size.width - 1)) as Coordinate;
 	}
 
 	private _correctYCoord(y: Coordinate): Coordinate {
-		return Math.max(0, Math.min(y, this._size.h - 1)) as Coordinate;
+		return Math.max(0, Math.min(y, this._size.height - 1)) as Coordinate;
 	}
 
-	private _setCrosshairPosition(x: Coordinate, y: Coordinate): void {
-		this._model().setAndSaveCurrentPosition(this._correctXCoord(x), this._correctYCoord(y), ensureNotNull(this._state));
+	private _setCrosshairPosition(x: Coordinate, y: Coordinate, event: MouseEventHandlerEventBase): void {
+		this._model().setAndSaveCurrentPosition(this._correctXCoord(x), this._correctYCoord(y), event, ensureNotNull(this._state));
 	}
 
 	private _clearCrosshairPosition(): void {
@@ -668,10 +676,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private _startTrackingMode(startTrackPoint: Point, crossHairPosition: Point): void {
+	private _startTrackingMode(startTrackPoint: Point, crossHairPosition: Point, event: MouseEventHandlerEventBase): void {
 		this._startTrackPoint = startTrackPoint;
 		this._exitTrackingModeOnNextTry = false;
-		this._setCrosshairPosition(crossHairPosition.x, crossHairPosition.y);
+		this._setCrosshairPosition(crossHairPosition.x, crossHairPosition.y, event);
 		const crosshair = this._model().crosshairSource();
 		this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
 	}
@@ -811,7 +819,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private readonly _canvasConfiguredHandler = () => {
+	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => {
 		if (this._isSettingSize || this._state === null) {
 			return;
 		}
@@ -819,7 +827,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._model().lightUpdate();
 	};
 
-	private readonly _topCanvasConfiguredHandler = () => {
+	private readonly _topCanvasSuggestedBitmapSizeChangedHandler = () => {
 		if (this._isSettingSize || this._state === null) {
 			return;
 		}

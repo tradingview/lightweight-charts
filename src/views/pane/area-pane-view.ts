@@ -1,6 +1,5 @@
 import { BarPrice } from '../../model/bar';
 import { ChartModel } from '../../model/chart-model';
-import { Coordinate } from '../../model/coordinate';
 import { Series } from '../../model/series';
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
@@ -27,18 +26,16 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 		};
 	}
 
-	protected _prepareRendererData(width: number, height: number): void {
+	protected _prepareRendererData(): void {
 		const areaStyleProperties = this._series.options();
-
-		const baseLevelCoordinate = (areaStyleProperties.invertFilledArea ? 0 : height) as Coordinate;
 
 		this._areaRenderer.setData({
 			lineType: areaStyleProperties.lineType,
 			items: this._items,
 			lineStyle: areaStyleProperties.lineStyle,
 			lineWidth: areaStyleProperties.lineWidth,
-			baseLevelCoordinate,
-			bottom: height as Coordinate,
+			baseLevelCoordinate: null,
+			invertFilledArea: areaStyleProperties.invertFilledArea,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		});

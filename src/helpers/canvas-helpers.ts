@@ -36,13 +36,6 @@ export function fillRectInnerBorder(ctx: CanvasRenderingContext2D, x: number, y:
 	ctx.fillRect(x + width - borderWidth, y, borderWidth, height);
 }
 
-export function drawScaled(ctx: CanvasRenderingContext2D, ratio: number, func: () => void): void {
-	ctx.save();
-	ctx.scale(ratio, ratio);
-	func();
-	ctx.restore();
-}
-
 export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
 	ctx.save();
 	ctx.globalCompositeOperation = 'copy';
@@ -164,6 +157,8 @@ export function drawRoundRectWithInnerBorder(
 		ctx.closePath();
 		ctx.stroke();
 	}
+
+	ctx.restore();
 }
 
 // eslint-disable-next-line max-params

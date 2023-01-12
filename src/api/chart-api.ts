@@ -292,8 +292,9 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			logical: param.index as Logical | undefined,
 			point: param.point,
 			hoveredSeries,
-			hoveredMarkerId: param.hoveredObject,
+			hoveredObjectId: param.hoveredObject,
 			seriesData,
+			sourceEvent: param.touchMouseEventData,
 		};
 	}
 }
