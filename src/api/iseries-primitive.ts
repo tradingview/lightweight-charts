@@ -5,7 +5,7 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
  */
 export interface ISeriesPrimitiveAxisView {
 	/**
-	 * coordiate of the label, vertical for price axis and horizontal for time axis
+	 * coordinate of the label, vertical for price axis and horizontal for time axis
 	 *
 	 * @returns coordinate. 0 means left and top
 	 */
@@ -33,17 +33,17 @@ export interface ISeriesPrimitivePaneRenderer {
 	/**
 	 * Method to draw main content of the element
 	 *
-	 * @param target - cavnas context to draw on, refer FancyCanvas library for more details about this class
+	 * @param target - canvas context to draw on, refer to FancyCanvas library for more details about this class
 	 *
 	 */
 	draw(target: CanvasRenderingTarget2D): void;
 
 	/**
 	 * Optional method to draw the background.
-	 * Some elements could implement this method to draw on the background of the chart
-	 * Usually this is some kind of watermarks or time areas highlighting
+	 * Some elements could implement this method to draw on the background of the chart.
+	 * Usually this is some kind of watermarks or time areas highlighting.
 	 *
-	 * @param target - cavnas context to draw on, refer FancyCanvas library for more details about this class
+	 * @param target - canvas context to draw on, refer FancyCanvas library for more details about this class
 	 */
 	drawBackground?(target: CanvasRenderingTarget2D): void;
 }
@@ -55,7 +55,7 @@ export interface ISeriesPrimitivePaneView {
 	/**
 	 * This method returns a renderer - special object to draw data
 	 *
-	 * @returns an renderer object to be used for drawing or null if we have nothin to draw
+	 * @returns an renderer object to be used for drawing, or `null` if we have nothing to draw.
 	 */
 	renderer(): ISeriesPrimitivePaneRenderer | null;
 }
@@ -65,34 +65,34 @@ export interface ISeriesPrimitivePaneView {
  */
 export interface ISeriesPrimitive {
 	/**
-	 * This method is called when viewport has been changed, so primitive have to reacalculate/invaildate its data
+	 * This method is called when viewport has been changed, so primitive have to recalculate / invalidate its data
 	 */
 	updateAllViews(): void;
 
 	/**
 	 * Returns array of labels to be drawn on the price axis used by the series
 	 *
-	 * @returns array of objects; each of then must impement ISeriesPrimitiveAxisView interface
+	 * @returns array of objects; each of then must implement ISeriesPrimitiveAxisView interface
 	 *
-	 * Try to implement this method returning the same array if nothing changed, this would help the library to save memory and CPU
+	 * Try to implement this method such that the same array is returned if nothing changed, this would help the library to save memory and CPU.
 	 */
 	priceAxisViews(): readonly ISeriesPrimitiveAxisView[];
 
 	/**
 	 * Returns array of labels to be drawn on the time axis
 	 *
-	 * @returns array of objects; each of then must impement ISeriesPrimitiveAxisView interface
+	 * @returns array of objects; each of then must implement ISeriesPrimitiveAxisView interface
 	 *
-	 * Try to implement this method returning the same array if nothing changed, this would help the library to save memory and CPU
+	 * Try to implement this method such that the same array is returned if nothing changed, this would help the library to save memory and CPU.
 	 */
 	timeAxisViews(): readonly ISeriesPrimitiveAxisView[];
 
 	/**
 	 * Returns array of objects representing primitive in the main area of the chart
 	 *
-	 * @returns array of objects; each of then must impement ISeriesPrimitivePaneView interface
+	 * @returns array of objects; each of then must implement ISeriesPrimitivePaneView interface
 	 *
-	 * Try to implement this method returning the same array if nothing changed, this would help the library to save memory and CPU
+	 * Try to implement this method such that the same array is returned if nothing changed, this would help the library to save memory and CPU.
 	 */
 	paneViews(): readonly ISeriesPrimitivePaneView[];
 }
