@@ -15,6 +15,7 @@ import { Range, Time } from '../model/time-data';
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
+import { ISeriesPrimitive } from './iseries-primitive';
 
 /**
  * Represents a range of bars and the number of bars outside the range.
@@ -263,4 +264,19 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	seriesType(): TSeriesType;
+
+	/**
+	 * Attaches additional drawing primitive to the series
+	 *
+	 * @param primitive - any implementation of ISeriesPrimitive interface
+	 */
+	attachPrimitive(primitive: ISeriesPrimitive): void;
+
+	/**
+	 * Detaches additional drawing primitive from the series
+	 *
+	 * @param primitive - implementation of ISeriesPrimitive interface attached before
+	 * Does nothing if specified primitive was not attached
+	 */
+	detachPrimitive(primitive: ISeriesPrimitive): void;
 }

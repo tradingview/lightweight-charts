@@ -4,7 +4,7 @@ import { TimeAxisWidget } from '../gui/time-axis-widget';
 import { assert } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
-import { clone, DeepPartial } from '../helpers/strict-type-checks';
+import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
@@ -190,7 +190,10 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 	}
 
 	public options(): Readonly<TimeScaleOptions> {
-		return clone(this._timeScale.options());
+		return {
+			...this._timeScale.options(),
+			barSpacing: this._timeScale.barSpacing(),
+		};
 	}
 
 	private _onVisibleBarsChanged(): void {

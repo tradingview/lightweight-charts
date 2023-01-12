@@ -1,3 +1,6 @@
+import { ISeriesPrimitive } from '../api/iseries-primitive';
+import { SeriesPrimitiveWrapper } from '../api/series-primitive-wrapper';
+
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
@@ -22,6 +25,7 @@ import { SeriesMarkersPaneView } from '../views/pane/series-markers-pane-view';
 import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
+import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { BarPrice, BarPrices } from './bar';
@@ -111,6 +115,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
 	private _markersPaneView!: SeriesMarkersPaneView;
 	private _animationTimeoutId: TimerId | null = null;
+	private _primitives: SeriesPrimitiveWrapper[] = [];
 
 	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T) {
 		super(model);
@@ -378,6 +383,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
 		res.push(...priceLineViews);
 
+		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
+			res.push(...wrapper.paneViews());
+		});
+
 		return res;
 	}
 
@@ -396,7 +405,18 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		for (const customPriceLine of this._customPriceLines) {
 			result.push(customPriceLine.priceAxisView());
 		}
+		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
+			result.push(...wrapper.priceAxisViews());
+		});
 		return result;
+	}
+
+	public override timeAxisViews(): readonly ITimeAxisView[] {
+		const res: ITimeAxisView[] = [];
+		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
+			res.push(...wrapper.timeAxisViews());
+		});
+		return res;
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
@@ -434,6 +454,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._priceLineView.update();
 		this._baseHorizontalLineView.update();
 		this._lastPriceAnimationPaneView?.update();
+
+		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => wrapper.updateAllViews());
 	}
 
 	public override priceScale(): PriceScale {
@@ -465,6 +487,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public override visible(): boolean {
 		return this._options.visible;
+	}
+
+	public attachPrimitive(primitive: ISeriesPrimitive): void {
+		this._primitives.push(new SeriesPrimitiveWrapper(primitive, this));
+	}
+
+	public detachPrimitive(source: ISeriesPrimitive): void {
+		this._primitives = this._primitives.filter((wrapper: SeriesPrimitiveWrapper) => wrapper.primitive() !== source);
 	}
 
 	private _isOverlay(): boolean {

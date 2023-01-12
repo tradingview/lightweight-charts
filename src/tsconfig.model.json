@@ -7,6 +7,8 @@
 	"include": [
 		"./model/**/*.ts",
 		"./renderers/**/*.ts",
-		"./views/**/*.ts"
+		"./views/**/*.ts",
+		"./api/iseries-primitive.ts",
+		"./api/series-primitive-wrapper.ts",
 	]
 }
