@@ -1,4 +1,4 @@
-import { CanvasRenderingTarget2D } from "fancy-canvas";
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
 /**
  * This interface represents a label on the price or time axis
