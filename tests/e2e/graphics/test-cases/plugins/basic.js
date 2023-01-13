@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 class VolumeProfileRenderer {
 	constructor(data) {
 		this._data = data;
@@ -20,7 +21,7 @@ class VolumeProfileRenderer {
 				ctx.fillRect(scaledX, Math.round(row.y * scope.verticalPixelRatio), Math.round(row.width * scope.horizontalPixelRatio), 1 - scaledRowHeight);
 			});
 		});
-	}	
+	}
 }
 
 class VolumeProfilePaneView {
@@ -40,7 +41,7 @@ class VolumeProfilePaneView {
 		const maxVolume = data.profile.reduce((acc, item) => Math.max(acc, item.vol), 0);
 
 		this._top = y1;
-	
+
 		this._items = data.profile.map(row => ({
 			y: series.priceToCoordinate(row.price),
 			width: this._width * row.vol / maxVolume,
@@ -56,7 +57,6 @@ class VolumeProfilePaneView {
 			items: this._items,
 		});
 	}
-
 }
 
 class VolumeProfile {
@@ -84,19 +84,19 @@ class VolumeProfile {
 class VertLinePaneRenderer {
 	constructor(x) {
 		this._x = x;
-	}	
+	}
 	draw(target) {
 		target.useBitmapCoordinateSpace(scope => {
 			const ctx = scope.context;
 			const xScaled = Math.round(this._x * scope.horizontalPixelRatio) + 0.5;
-			ctx.strokeStyle = "red";
+			ctx.strokeStyle = 'red';
 			ctx.lineWidth = 3;
 			ctx.beginPath();
 			ctx.moveTo(xScaled, 0);
 			ctx.lineTo(xScaled, scope.bitmapSize.height);
 			ctx.stroke();
 		});
-	}	
+	}
 }
 
 class VertLinePaneView {
@@ -104,7 +104,6 @@ class VertLinePaneView {
 		this._source = source;
 	}
 	update() {
-		const series = this._source._series;
 		const timeScale = this._source._chart.timeScale();
 		this._x = timeScale.timeToCoordinate(this._source._time);
 	}
@@ -118,7 +117,6 @@ class VertLineTimeAxisView {
 		this._source = source;
 	}
 	update() {
-		const series = this._source._series;
 		const timeScale = this._source._chart.timeScale();
 		this._x = timeScale.timeToCoordinate(this._source._time);
 	}
@@ -143,11 +141,11 @@ class VertLine {
 		this._series = series;
 		this._time = time;
 		this._paneViews = [new VertLinePaneView(this)];
-		this._timeAxisViews = [new VertLineTimeAxisView(this)]
+		this._timeAxisViews = [new VertLineTimeAxisView(this)];
 	}
 	updateAllViews() {
 		this._paneViews.forEach(pw => pw.update());
-		this._timeAxisViews.forEach(tw => tw.update())
+		this._timeAxisViews.forEach(tw => tw.update());
 	}
 	priceAxisViews() {
 		return [];
@@ -174,14 +172,14 @@ class TrendLinePaneRenderer {
 			const x2Scaled = Math.round(this._p2.x * scope.horizontalPixelRatio);
 			const y2Scaled = Math.round(this._p2.y * scope.verticalPixelRatio);
 			ctx.lineWidth = 2;
-			ctx.strokeStyle = "blue";
+			ctx.strokeStyle = 'blue';
 			ctx.beginPath();
 			ctx.moveTo(x1Scaled, y1Scaled);
 			ctx.lineTo(x2Scaled, y2Scaled);
 			ctx.stroke();
-			ctx.font = '24px Arial'
+			ctx.font = '24px Arial';
 			ctx.fillStyle = 'green';
-			ctx.fillText(this._text, x2Scaled, y2Scaled)
+			ctx.fillText(this._text, x2Scaled, y2Scaled);
 		});
 	}
 }
@@ -196,8 +194,8 @@ class TrendLinePaneView {
 		const timeScale = this._source._chart.timeScale();
 		const x1 = timeScale.timeToCoordinate(this._source._p1.time);
 		const x2 = timeScale.timeToCoordinate(this._source._p2.time);
-		this._p1 = {x: x1, y: y1};
-		this._p2 = {x: x2, y: y2};
+		this._p1 = { x: x1, y: y1 };
+		this._p2 = { x: x2, y: y2 };
 	}
 	renderer() {
 		return new TrendLinePaneRenderer(this._p1, this._p2, '' + this._source._p2.price);
@@ -240,9 +238,9 @@ class RectanglePaneRenderer {
 			const y2Scaled = Math.round(this._p2.y * scope.verticalPixelRatio);
 			const width = x2Scaled - x1Scaled + 1;
 			const height = y2Scaled - y1Scaled + 1;
-			ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+			ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
 			ctx.fillRect(x1Scaled, y1Scaled, width, height);
-		});		
+		});
 	}
 }
 
@@ -257,8 +255,8 @@ class RectanglePaneView {
 		const timeScale = this._source._chart.timeScale();
 		const x1 = timeScale.timeToCoordinate(this._source._p1.time);
 		const x2 = timeScale.timeToCoordinate(this._source._p2.time);
-		this._p1 = {x: x1, y: y1};
-		this._p2 = {x: x2, y: y2};
+		this._p1 = { x: x1, y: y1 };
+		this._p2 = { x: x2, y: y2 };
 	}
 	renderer(height, width) {
 		return new RectanglePaneRenderer(this._p1, this._p2, this._source._color);
@@ -271,7 +269,6 @@ class RectangleTimeAxisView {
 		this._p = p;
 	}
 	update() {
-		const series = this._source._series;
 		const timeScale = this._source._chart.timeScale();
 		this._x = timeScale.timeToCoordinate(this._p.time);
 	}
@@ -340,7 +337,6 @@ class Rectangle {
 	}
 }
 
-
 class AnchoredTextRenderer {
 	constructor(data) {
 		this._data = data;
@@ -367,7 +363,7 @@ class AnchoredTextRenderer {
 				}
 			}
 			const vertMargin = 10;
-			const y = vertMargin + this._data.lineHeight;
+			let y = vertMargin + this._data.lineHeight;
 			switch (this._data.vertAlign) {
 				case 'middle': {
 					y = (height - this._data.lineHeight) / 2;
@@ -382,15 +378,14 @@ class AnchoredTextRenderer {
 			ctx.fillText(this._data.text, x, y);
 			ctx.restore();
 		});
-	}	
+	}
 }
 
 class AnchoredTextPaneView {
 	constructor(source) {
 		this._source = source;
 	}
-	update() {
-	}
+	update() {}
 	renderer() {
 		return new AnchoredTextRenderer(this._source._data);
 	}
@@ -402,7 +397,7 @@ class AnchoredText {
 		this._series = series;
 		this._data = data;
 		this._paneViews = [new AnchoredTextPaneView(this)];
-	}	
+	}
 	updateAllViews() {
 		this._paneViews.forEach(pw => pw.update());
 	}
@@ -417,24 +412,23 @@ class AnchoredText {
 	}
 }
 
-
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container);
 
 	chart.timeScale().applyOptions({
 		barSpacing: 50,
-		rightOffset: 5
+		rightOffset: 5,
 	});
 	const s1 = chart.addLineSeries({
-		color: 'red'
+		color: 'red',
 	});
 	s1.setData([
 		{ time: '2019-04-11', value: 80.01 },
-	    { time: '2019-04-12', value: 96.63 },
-	    { time: '2019-04-13', value: 76.64 },
-	    { time: '2019-04-14', value: 81.89 },
-	    { time: '2019-04-15', value: 74.43 },
-	    { time: '2019-04-16', value: 80.01 },
+		{ time: '2019-04-12', value: 96.63 },
+		{ time: '2019-04-13', value: 76.64 },
+		{ time: '2019-04-14', value: 81.89 },
+		{ time: '2019-04-15', value: 74.43 },
+		{ time: '2019-04-16', value: 80.01 },
 	]);
 
 	const rect = new Rectangle(chart, s1, { time: '2019-04-11', price: 70.01 }, { time: '2019-04-16', price: 90.01 });
@@ -451,45 +445,45 @@ function runTestCase(container) {
 		profile: [
 			{
 				price: 90,
-				vol: 4
+				vol: 4,
 			},
 			{
 				price: 91,
-				vol: 7
+				vol: 7,
 			},
 			{
 				price: 92,
-				vol: 7
+				vol: 7,
 			},
 			{
 				price: 93,
-				vol: 11
+				vol: 11,
 			},
 			{
 				price: 94,
-				vol: 17
+				vol: 17,
 			},
 			{
 				price: 95,
-				vol: 15
+				vol: 15,
 			},
 			{
 				price: 96,
-				vol: 10
+				vol: 10,
 			},
 			{
 				price: 97,
-				vol: 13
+				vol: 13,
 			},
 			{
 				price: 98,
-				vol: 1
+				vol: 1,
 			},
 			{
 				price: 99,
-				vol: 6
-			}
-		]
+				vol: 6,
+			},
+		],
 	};
 	const vp = new VolumeProfile(chart, s1, vpData);
 	s1.attachPrimitive(vp);
@@ -498,9 +492,9 @@ function runTestCase(container) {
 		vertAlign: 'top',
 		horzAlign: 'right',
 		text: 'My Text',
-		lineHeight: 54, 
+		lineHeight: 54,
 		font: 'italic bold 54px Arial',
-		color: 'red'
+		color: 'red',
 	});
 	s1.attachPrimitive(anchoredText);
 }
