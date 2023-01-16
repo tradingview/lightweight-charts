@@ -2,6 +2,7 @@ import Head from '@docusaurus/Head';
 import Layout from '@theme/Layout';
 import React from 'react';
 
+import Banner from '../components/landing-page/Banner';
 import Cards, { type CardLink } from '../components/landing-page/Cards';
 import { type CodeBlockProps } from '../components/landing-page/Codeblock';
 import { type CTALink } from '../components/landing-page/CTAButton';
@@ -190,17 +191,30 @@ const codeBlocks: CodeBlockProps[] = [
 const header = 'Lightweight Library Documentation';
 const paragraph = `Lightweight Charts is a library for creating interactive financial charts. Take a look at this documentation give you the information you need to start your lightweight journey.`;
 
+const showBanner = false;
+
 function Index(): JSX.Element {
 	return (
-		<div className={styles.RootContainer}>
-			<Hero
-				ctaLinks={ctaLinks}
-				codeBlocks={codeBlocks}
-				header={header}
-				paragraph={paragraph}
-			/>
-			<Cards cardLinks={cardLinks} />
-		</div>
+		<>
+			{showBanner ? (
+				<Banner
+					text="Big news! Version 4.0 of Lightweight Charts is now available"
+					link="https://www.tradingview.com/blog/en/lightweight-charts-v3-7-is-now-faster-than-ever-27576/"
+					linkText="Read more"
+				/>
+			) : (
+				''
+			)}
+			<div className={styles.RootContainer}>
+				<Hero
+					ctaLinks={ctaLinks}
+					codeBlocks={codeBlocks}
+					header={header}
+					paragraph={paragraph}
+				/>
+				<Cards cardLinks={cardLinks} />
+			</div>
+		</>
 	);
 }
 
