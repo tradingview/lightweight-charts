@@ -120,7 +120,7 @@
     "prepare-release": "npm-run-all clean build:release && npm run prepare-package-json-for-release",
     "prepare-package-json-for-release": "node ./scripts/clean-package-json.js",
     "size-limit": "size-limit",
-    "verify": "npm-run-all clean -p lint check-markdown-links build:prod -p check-dts-docs tsc-verify test size-limit",
+    "verify": "npm-run-all clean -p build:prod check-markdown-links -p lint check-dts-docs tsc-verify test size-limit",
     "test": "mocha tests/unittests/**/*.spec.ts"
   }
 }
