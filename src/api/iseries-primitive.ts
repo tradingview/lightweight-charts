@@ -5,9 +5,9 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
  */
 export interface ISeriesPrimitiveAxisView {
 	/**
-	 * coordinate of the label, vertical for price axis and horizontal for time axis
+	 *coordinate of the label. For a price axis the value returned will represent the vertical distance (pixels) from the top. For a time axis the value will represent the horizontal distance from the left.
 	 *
-	 * @returns coordinate. 0 means left and top
+	 * @returns coordinate. distance from top for price axis, or distance from left for time axis.	 *
 	 */
 	coordinate(): number;
 	/**
@@ -74,7 +74,8 @@ export interface ISeriesPrimitive {
 	 *
 	 * @returns array of objects; each of then must implement ISeriesPrimitiveAxisView interface
 	 *
-	 * Try to implement this method such that the same array is returned if nothing changed, this would help the library to save memory and CPU.
+	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
+	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
 	priceAxisViews(): readonly ISeriesPrimitiveAxisView[];
 
@@ -83,7 +84,8 @@ export interface ISeriesPrimitive {
 	 *
 	 * @returns array of objects; each of then must implement ISeriesPrimitiveAxisView interface
 	 *
-	 * Try to implement this method such that the same array is returned if nothing changed, this would help the library to save memory and CPU.
+	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
+	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
 	timeAxisViews(): readonly ISeriesPrimitiveAxisView[];
 
@@ -92,7 +94,8 @@ export interface ISeriesPrimitive {
 	 *
 	 * @returns array of objects; each of then must implement ISeriesPrimitivePaneView interface
 	 *
-	 * Try to implement this method such that the same array is returned if nothing changed, this would help the library to save memory and CPU.
+	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
+	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
 	paneViews(): readonly ISeriesPrimitivePaneView[];
 }
