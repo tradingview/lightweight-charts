@@ -1,6 +1,7 @@
 {
 	"extends": "../../tsconfig.composite.base.json",
 	"compilerOptions": {
+		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"lib": [
 			"dom",
