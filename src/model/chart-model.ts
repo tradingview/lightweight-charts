@@ -248,12 +248,12 @@ export interface ChartOptions {
 	height: number;
 
 	/**
-	 * Setting this flag to `true` will make the chart watch the chart container's size and automatically resize the chart to fit it's container whenever the size changes.
+	 * Setting this flag to `true` will make the chart watch the chart container's size and automatically resize the chart to fit its container whenever the size changes.
 	 *
 	 * This feature requires [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) class to be available in the global scope.
 	 * Note that calling code is responsible for providing a polyfill if required. If the global scope does not have `ResizeObserver`, a warning will appear and the flag will be ignored.
 	 *
-	 * Please pay your attention that `autoSize` option and explicit sizes options `width` and `height` don't conflict with one another.
+	 * Please pay attention that `autoSize` option and explicit sizes options `width` and `height` don't conflict with one another.
 	 * If you specify `autoSize` flag, then `width` and `height` options will be ignored unless `ResizeObserver` has failed. If it fails then the values will be used as fallback.
 	 *
 	 * The flag `autoSize` could also be set with and unset with `applyOptions` function.

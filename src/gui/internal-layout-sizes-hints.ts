@@ -1,7 +1,7 @@
 import { Size, size } from 'fancy-canvas';
 
 // on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
-// For chart widget we decreases because we must be inside container.
+// For chart widget we decrease the size because we must be inside container.
 // For time axis this is not important, since it just affects space for pane widgets
 export function suggestChartSize(originalSize: Size): Size {
 	const integerWidth = Math.floor(originalSize.width);
