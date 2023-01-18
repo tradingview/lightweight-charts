@@ -4,14 +4,23 @@ import React, { useEffect, useRef } from 'react';
 export const ChartComponent = props => {
 	const {
 		data,
-		colors: {
-			backgroundColor = CHART_BACKGROUND_COLOR,
-			lineColor = LINE_LINE_COLOR,
-			textColor = CHART_TEXT_COLOR,
-			areaTopColor = AREA_TOP_COLOR,
-			areaBottomColor = AREA_BOTTOM_COLOR,
+		colors = {
+			backgroundColor: CHART_BACKGROUND_COLOR,
+			lineColor: LINE_LINE_COLOR,
+			textColor: CHART_TEXT_COLOR,
+			areaTopColor: AREA_TOP_COLOR,
+			areaBottomColor: AREA_BOTTOM_COLOR,
 		},
 	} = props;
+
+	const {
+		backgroundColor,
+		lineColor,
+		textColor,
+		areaTopColor,
+		areaBottomColor,
+	} = colors;
+
 	const chartContainerRef = useRef();
 
 	useEffect(

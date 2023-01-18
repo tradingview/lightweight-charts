@@ -25,12 +25,19 @@ const currentDate = new Date(initialData[initialData.length - 1].time);
 
 export const App = props => {
 	const {
-		colors: {
-			backgroundColor = CHART_BACKGROUND_COLOR,
-			lineColor = LINE_LINE_COLOR,
-			textColor = CHART_TEXT_COLOR,
+		colors = {
+			backgroundColor: CHART_BACKGROUND_COLOR,
+			lineColor: LINE_LINE_COLOR,
+			textColor: CHART_TEXT_COLOR,
 		},
 	} = props;
+
+	const {
+		backgroundColor,
+		lineColor,
+		textColor,
+	} = colors;
+
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
 	// The following variables illustrate how a series could be updated.
 	const series1 = useRef(null);
