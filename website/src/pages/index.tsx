@@ -23,7 +23,7 @@ const cardLinks: CardLink[] = [
 	{
 		title: 'API reference',
 		link: 'docs/api',
-		content: 'View all the information about required to work with API',
+		content: 'View the API reference documentation',
 	},
 	{
 		title: 'GitHub issues',
@@ -188,8 +188,8 @@ const codeBlocks: CodeBlockProps[] = [
 	},
 ];
 
-const header = 'Lightweight Library Documentation';
-const paragraph = `Lightweight Charts is a library for creating interactive financial charts. Take a look at this documentation give you the information you need to start your lightweight journey.`;
+const header = 'Lightweight Charts Documentation';
+const paragraph = `Lightweight Charts is a library for creating interactive financial charts. This documentation site provides all the information needed to get started with Lightweight Charts and help you make the most of its features.`;
 
 const showBanner = false;
 
