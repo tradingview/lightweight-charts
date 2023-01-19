@@ -48,7 +48,13 @@ function httpGetJson(url) {
 	});
 }
 
-function downloadFile(urlString, filePath) {
+function delay(duration) {
+	return new Promise(resolve => {
+		setTimeout(resolve, duration);
+	});
+}
+
+function downloadFile(urlString, filePath, retriesRemaining = 0) {
 	return new Promise((resolve, reject) => {
 		let file;
 
@@ -58,11 +64,18 @@ function downloadFile(urlString, filePath) {
 			if (response.statusCode && response.statusCode >= 300 && response.statusCode < 400 && response.headers.location !== undefined) {
 				// handling redirect
 				url.pathname = response.headers.location;
-				downloadFile(url.toString(), filePath).then(resolve, reject);
+				downloadFile(url.toString(), filePath, retriesRemaining).then(resolve, reject);
 				return;
 			}
 
 			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
+				if (retriesRemaining > 0) {
+					logger.info(`Failed to download from ${urlString}, attempting again (${retriesRemaining - 1} retries remaining).`);
+					delay(200).then(() => {
+						downloadFile(url.toString(), filePath, retriesRemaining - 1).then(resolve, reject);
+					});
+					return;
+				}
 				reject(new Error(`Cannot download file "${urlString}", error code=${response.statusCode}`));
 				return;
 			}
@@ -88,7 +101,8 @@ function downloadFile(urlString, filePath) {
 function downloadTypingsToFile(typingsFilePath, version) {
 	return downloadFile(
 		`https://unpkg.com/lightweight-charts@${version}/dist/typings.d.ts`,
-		typingsFilePath
+		typingsFilePath,
+		2
 	);
 }
 
