@@ -1,25 +1,23 @@
+// hide-start
+/* Note: this file shouldn't be used directly because it has some constants which are set by
+the docusaurus site to ensure that the chart looks great in both dark and light color themes.
+If you want to use this example then please copy the code presented on the documentation site.
+[link](https://tradingview.github.io/lightweight-charts/tutorials/react/simple) */
+// hide-end
 import { createChart, ColorType } from 'lightweight-charts';
 import React, { useEffect, useRef } from 'react';
 
 export const ChartComponent = props => {
 	const {
 		data,
-		colors = {
-			backgroundColor: CHART_BACKGROUND_COLOR,
-			lineColor: LINE_LINE_COLOR,
-			textColor: CHART_TEXT_COLOR,
-			areaTopColor: AREA_TOP_COLOR,
-			areaBottomColor: AREA_BOTTOM_COLOR,
-		},
+		colors: {
+			backgroundColor = CHART_BACKGROUND_COLOR,
+			lineColor = LINE_LINE_COLOR,
+			textColor = CHART_TEXT_COLOR,
+			areaTopColor = AREA_TOP_COLOR,
+			areaBottomColor = AREA_BOTTOM_COLOR,
+		} = {},
 	} = props;
-
-	const {
-		backgroundColor,
-		lineColor,
-		textColor,
-		areaTopColor,
-		areaBottomColor,
-	} = colors;
 
 	const chartContainerRef = useRef();
 
