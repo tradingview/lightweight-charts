@@ -54,7 +54,7 @@ function delay(duration) {
 	});
 }
 
-function downloadFile(urlString, filePath, retriesRemaining = 0) {
+function downloadFile(urlString, filePath, retriesRemaining = 0, attempt = 1) {
 	return new Promise((resolve, reject) => {
 		let file;
 
@@ -71,8 +71,8 @@ function downloadFile(urlString, filePath, retriesRemaining = 0) {
 			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
 				if (retriesRemaining > 0) {
 					logger.info(`Failed to download from ${urlString}, attempting again (${retriesRemaining - 1} retries remaining).`);
-					delay(200).then(() => {
-						downloadFile(url.toString(), filePath, retriesRemaining - 1).then(resolve, reject);
+					delay(Math.pow(2, attempt) * 200).then(() => {
+						downloadFile(url.toString(), filePath, retriesRemaining - 1, attempt + 1).then(resolve, reject);
 					});
 					return;
 				}
