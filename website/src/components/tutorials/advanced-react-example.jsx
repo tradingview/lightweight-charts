@@ -1,9 +1,9 @@
-// hide-start
+// delete-start
 /* Note: this file shouldn't be used directly because it has some constants which are set by
 the docusaurus site to ensure that the chart looks great in both dark and light color themes.
 If you want to use this example then please copy the code presented on the documentation site.
 [link](https://tradingview.github.io/lightweight-charts/tutorials/react/advanced) */
-// hide-end
+// delete-end
 import { createChart } from 'lightweight-charts';
 import React, {
 	createContext,
