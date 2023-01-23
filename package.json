@@ -13,18 +13,25 @@
     "url": "https://github.com/tradingview/lightweight-charts.git"
   },
   "module": "dist/lightweight-charts.esm.production.js",
+  "main": "index.cjs",
   "typings": "dist/typings.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "development": {
-        "import": "./dist/lightweight-charts.esm.development.js"
+        "types": "./dist/typings.d.ts",
+        "import": "./dist/lightweight-charts.esm.development.js",
+        "require": "./dist/lightweight-charts.esm.development.js"
       },
       "production": {
-        "import": "./dist/lightweight-charts.esm.production.js"
+        "types": "./dist/typings.d.ts",
+        "import": "./dist/lightweight-charts.esm.production.js",
+        "require": "./dist/lightweight-charts.esm.production.js"
       },
       "default": {
-        "import": "./dist/lightweight-charts.esm.production.js"
+        "types": "./dist/typings.d.ts",
+        "import": "./dist/lightweight-charts.esm.production.js",
+        "require": "./index.cjs"
       }
     }
   },
