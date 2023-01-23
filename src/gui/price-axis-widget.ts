@@ -28,6 +28,7 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { createBoundCanvas } from './canvas-utils';
+import { suggestPriceScaleWidth } from './internal-layout-sizes-hints';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
 
@@ -206,7 +207,7 @@ export class PriceAxisWidget implements IDestroyable {
 		ctx.restore();
 
 		const resultTickMarksMaxWidth = tickMarkMaxWidth || Constants.DefaultOptimalWidth;
-		let res = Math.ceil(
+		const res = Math.ceil(
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
 			rendererOptions.paddingInner +
@@ -216,8 +217,7 @@ export class PriceAxisWidget implements IDestroyable {
 		);
 
 		// make it even, remove this after migration to perfect fancy canvas
-		res += res % 2;
-		return res;
+		return suggestPriceScaleWidth(res);
 	}
 
 	public setSize(newSize: Size): void {
