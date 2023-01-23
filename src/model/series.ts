@@ -1,6 +1,3 @@
-import { ISeriesPrimitive } from '../api/iseries-primitive';
-import { SeriesPrimitiveWrapper } from '../api/series-primitive-wrapper';
-
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
@@ -34,6 +31,7 @@ import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
 import { FirstValue } from './iprice-data-source';
+import { ISeriesPrimitive } from './iseries-primitive';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
 import { MismatchDirection } from './plot-list';
@@ -53,6 +51,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from './series-options';
+import { SeriesPrimitiveWrapper } from './series-primitive-wrapper';
 import { TimePoint, TimePointIndex } from './time-data';
 
 export interface LastValueDataResultWithoutData {

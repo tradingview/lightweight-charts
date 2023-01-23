@@ -2,6 +2,7 @@ import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { ISeriesPrimitive } from '../model/iseries-primitive';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
@@ -15,7 +16,6 @@ import { Range, Time } from '../model/time-data';
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { ISeriesPrimitive } from './iseries-primitive';
 
 /**
  * Represents a range of bars and the number of bars outside the range.

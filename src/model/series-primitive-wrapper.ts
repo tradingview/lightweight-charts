@@ -1,10 +1,10 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { HoveredObject } from '../model/chart-model';
-import { Coordinate } from '../model/coordinate';
-import { PriceScale } from '../model/price-scale';
-import { Series } from '../model/series';
-import { TimeScale } from '../model/time-scale';
+import { HoveredObject } from './chart-model';
+import { Coordinate } from './coordinate';
+import { PriceScale } from './price-scale';
+import { Series } from './series';
+import { TimeScale } from './time-scale';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../renderers/iprice-axis-view-renderer';
 import { TimeAxisViewRenderer } from '../renderers/time-axis-view-renderer';
