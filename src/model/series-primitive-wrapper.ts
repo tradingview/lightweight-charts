@@ -1,10 +1,5 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { HoveredObject } from './chart-model';
-import { Coordinate } from './coordinate';
-import { PriceScale } from './price-scale';
-import { Series } from './series';
-import { TimeScale } from './time-scale';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../renderers/iprice-axis-view-renderer';
 import { TimeAxisViewRenderer } from '../renderers/time-axis-view-renderer';
@@ -13,12 +8,17 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
+import { HoveredObject } from './chart-model';
+import { Coordinate } from './coordinate';
 import {
 	ISeriesPrimitive,
 	ISeriesPrimitiveAxisView,
 	ISeriesPrimitivePaneRenderer,
 	ISeriesPrimitivePaneView,
 } from './iseries-primitive';
+import { PriceScale } from './price-scale';
+import { Series } from './series';
+import { TimeScale } from './time-scale';
 
 class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
 	private readonly _baseRenderer: ISeriesPrimitivePaneRenderer;
