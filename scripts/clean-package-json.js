@@ -24,7 +24,10 @@ function main() {
 	// because for some reason tests don't work with that flag
 	// either mocha, ts-node or typescript does't want to work
 	// so let's add this setting on pre-publish phase
-	packageJson.type = 'module';
+	//
+	// Disabling this because we are setting the 'cjs' version for the 'main' key of the package.json
+	// thus the type shouldn't be module. When we drop support for cjs then we can re-enable this.
+	// packageJson.type = 'module';
 
 	fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', { encoding: 'utf-8' });
 }
