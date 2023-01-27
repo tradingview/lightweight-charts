@@ -15,19 +15,25 @@ function getCurrentVersion() {
 
 const currentVersion = getCurrentVersion();
 
-function getConfig(inputFile, format, isProd) {
-	const isStandalone = format === 'iife';
+function getConfig(
+	inputFile,
+	{ format, isProd, isStandalone, extensionOverride, suffix }
+) {
 	const mode = isProd ? 'production' : 'development';
-	const extension = {
-		cjs: 'cjs',
-		esm: 'mjs',
-		iife: 'js',
-	}[format];
+	const extension =
+		extensionOverride ||
+		{
+			cjs: 'cjs',
+			esm: 'mjs',
+			iife: 'js',
+		}[format];
 	const config = {
 		input: inputFile,
 		output: {
 			format,
-			file: `./dist/lightweight-charts${isStandalone ? '.standalone' : ''}.${mode}.${extension}`,
+			file: `./dist/lightweight-charts${isStandalone ? '.standalone' : ''}${
+				suffix || ''
+			}.${mode}.${extension}`,
 			banner: `
 /*!
  * @license
@@ -42,23 +48,26 @@ function getConfig(inputFile, format, isProd) {
 				preventAssignment: true,
 				values: {
 					// make sure that this values are synced with src/typings/globals/index.d.ts
-					'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
+					'process.env.NODE_ENV': JSON.stringify(
+						isProd ? 'production' : 'development'
+					),
 					'process.env.BUILD_VERSION': JSON.stringify(currentVersion),
 				},
 			}),
-			isProd && terser({
-				output: {
-					comments: /@license/,
-					// eslint-disable-next-line camelcase
-					inline_script: true,
-				},
-				mangle: {
-					module: (format === 'esm' || format === 'cjs'),
-					properties: {
-						regex: /^_(private|internal)_/,
+			isProd &&
+				terser({
+					output: {
+						comments: /@license/,
+						// eslint-disable-next-line camelcase
+						inline_script: true,
 					},
-				},
-			}),
+					mangle: {
+						module: format === 'esm' || format === 'cjs',
+						properties: {
+							regex: /^_(private|internal)_/,
+						},
+					},
+				}),
 		],
 		external: id => !isStandalone && /^fancy-canvas(\/.+)?$/.test(id),
 	};
@@ -66,19 +75,30 @@ function getConfig(inputFile, format, isProd) {
 	return config;
 }
 
-const configs = [
-	getConfig('./lib/prod/src/index.js', 'esm', false),
-	getConfig('./lib/prod/src/index.js', 'cjs', false),
-	getConfig('./lib/prod/src/standalone.js', 'iife', false),
-];
-
+const modes = [false];
 if (process.env.NODE_ENV === 'production') {
-	configs.push(
-		getConfig('./lib/prod/src/index.js', 'esm', true),
-		getConfig('./lib/prod/src/index.js', 'cjs', true),
-		getConfig('./lib/prod/src/standalone.js', 'iife', true)
-	);
+	modes.push(true);
 }
+
+const configs = [];
+modes.forEach(mode => {
+	configs.push(
+		getConfig('./lib/prod/src/index.js', { format: 'esm', isProd: mode }),
+		getConfig('./lib/prod/src/index.js', {
+			format: 'esm',
+			isProd: mode,
+			isStandalone: true,
+			extensionOverride: 'js',
+			suffix: '-esm',
+		}),
+		getConfig('./lib/prod/src/index.js', { format: 'cjs', isProd: mode }),
+		getConfig('./lib/prod/src/standalone.js', {
+			format: 'iife',
+			isProd: mode,
+			isStandalone: true,
+		})
+	);
+});
 
 // eslint-disable-next-line no-console
 console.log(`Building version: ${currentVersion}`);
