@@ -1,7 +1,7 @@
 'use strict';
 
 if (process.env.NODE_ENV === 'production') {
-	module.exports = require('./dist/lightweight-charts.esm.production.js');
+	module.exports = require('./dist/lightweight-charts.production.cjs');
 } else {
-	module.exports = require('./dist/lightweight-charts.esm.development.js');
+	module.exports = require('./dist/lightweight-charts.development.cjs');
 }
