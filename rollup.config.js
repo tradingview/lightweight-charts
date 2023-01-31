@@ -17,23 +17,19 @@ const currentVersion = getCurrentVersion();
 
 function getConfig(
 	inputFile,
-	{ format, isProd, isStandalone, extensionOverride, suffix }
+	{ format, isProd, isStandalone }
 ) {
 	const mode = isProd ? 'production' : 'development';
-	const extension =
-		extensionOverride ||
-		{
-			cjs: 'cjs',
-			esm: 'mjs',
-			iife: 'js',
-		}[format];
+	const extension = {
+		cjs: 'cjs',
+		esm: 'mjs',
+		iife: 'js',
+	}[format];
 	const config = {
 		input: inputFile,
 		output: {
 			format,
-			file: `./dist/lightweight-charts${isStandalone ? '.standalone' : ''}${
-				suffix || ''
-			}.${mode}.${extension}`,
+			file: `./dist/lightweight-charts${isStandalone ? '.standalone' : ''}.${mode}.${extension}`,
 			banner: `
 /*!
  * @license
@@ -88,8 +84,6 @@ modes.forEach(mode => {
 			format: 'esm',
 			isProd: mode,
 			isStandalone: true,
-			extensionOverride: 'js',
-			suffix: '-esm',
 		}),
 		getConfig('./lib/prod/src/index.js', { format: 'cjs', isProd: mode }),
 		getConfig('./lib/prod/src/standalone.js', {
