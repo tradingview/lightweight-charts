@@ -24,6 +24,10 @@ export function replaceThemeConstantStrings(originalString, isDarkTheme) {
 	return result;
 }
 
+export function removeUnwantedLines(originalString) {
+	return originalString.replace(new RegExp(/\/\/ delete-start[\w\W]*?\/\/ delete-end/, 'gm'), '');
+}
+
 const EnhancedCodeBlock = props => {
 	const { chart, replaceThemeConstants, hideableCode, ...rest } = props;
 	let { children } = props;
@@ -34,6 +38,7 @@ const EnhancedCodeBlock = props => {
 	if (replaceThemeConstants && typeof children === 'string') {
 		children = replaceThemeConstantStrings(children, isDarkTheme);
 	}
+	children = removeUnwantedLines(children);
 
 	if (chart || hideableCode) {
 		return (

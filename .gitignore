@@ -34,3 +34,6 @@ debug.html
 # graphics tests out data
 /tests/e2e/graphics/.gendata/
 tests/e2e/coverage/.gendata
+
+# memleak log output
+tests/e2e/memleaks/.logs/

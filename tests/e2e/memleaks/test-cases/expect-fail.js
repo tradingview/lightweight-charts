@@ -1,5 +1,12 @@
+/**
+ * This test is expected to cause a memory leak. By setting
+ * `expectFail` to `true` we are letting the test runner know
+ * that we are testing that the test does fail.
+ */
+
 /** @type {import('@memlab/core/dist/lib/Types').IScenario} */
 const scenario = {
+	expectFail: true,
 	setup: async function(page) {
 		await page.addScriptTag({
 			url: 'library.js',
@@ -32,12 +39,13 @@ const scenario = {
 		});
 	},
 	back: async function(page) {
+		/**
+		 * We are not removing the chart here because we
+		 * want to 'cause' a leak to test if it is detected correctly.
+		 */
 		await page.evaluate(() => {
-			if (window.chart) {
-				window.chart.remove();
-				delete window.chart;
-				delete window.LightweightCharts;
-			}
+			const container = document.querySelector('#container');
+			container.parentElement.removeChild(container);
 		});
 	},
 };
