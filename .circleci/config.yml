@@ -165,6 +165,9 @@ jobs:
             ln -s ../ lightweight-charts
       - run:
           name: "Check CJS could be imported in NodeJS"
+          command: node -e "require('lightweight-charts')" --input-type=commonjs
+      - run:
+          name: "Check ESM could be imported in NodeJS"
           command: node -e "import 'lightweight-charts'" --input-type=module
 
   unittests:
