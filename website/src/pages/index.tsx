@@ -227,14 +227,14 @@ function LayoutWrapper(): JSX.Element {
 					href="https://fonts.cdnfonts.com/s/60249/Euclid Circular B SemiBold.woff"
 					as="font"
 					type="font/woff"
-					crossOrigin="true"
+					crossOrigin="anonymous"
 				/>
 				<link
 					rel="preload"
 					href="https://fonts.cdnfonts.com/s/13494/Menlo-Regular.woff"
 					as="font"
 					type="font/woff"
-					crossOrigin="true"
+					crossOrigin="anonymous"
 				/>
 			</Head>
 			<Index />
