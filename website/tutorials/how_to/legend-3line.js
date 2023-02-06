@@ -212,8 +212,10 @@ legend.style = `position: absolute; left: 12px; top: 12px; z-index: 1; font-size
 legend.style.color = CHART_TEXT_COLOR;
 container.appendChild(legend);
 
-const getLastBar = () => data[data.length - 1];
-const buildDateString = time => `${time.year} - ${time.month} - ${time.day}`;
+const getLastBar = series => {
+	const lastIndex = series.dataByIndex(Math.Infinity, -1);
+	return series.dataByIndex(lastIndex);
+};
 const formatPrice = price => (Math.round(price * 100) / 100).toFixed(2);
 const setTooltipHtml = (name, date, price) => {
 	legend.innerHTML = `<div style="font-size: 24px; margin: 4px 0px;">${name}</div><div style="font-size: 22px; margin: 4px 0px;">${price}</div><div>${date}</div>`;
@@ -223,12 +225,13 @@ const updateLegend = param => {
 	const validCrosshairPoint = !(
 		param === undefined || param.time === undefined || param.point.x < 0 || param.point.y < 0
 	);
-	const bar = validCrosshairPoint ? param : getLastBar();
+	const bar = validCrosshairPoint ? param.seriesData.get(areaSeries) : getLastBar(areaSeries);
+	// time is in the same format that you supplied to the setData method,
+	// which in this case is YYYY-MM-DD
 	const time = bar.time;
-	const date = buildDateString(time);
-	const price = validCrosshairPoint ? param.seriesPrices.get(areaSeries) : bar.value;
+	const price = data.value !== undefined ? data.value : data.close;
 	const formattedPrice = formatPrice(price);
-	setTooltipHtml(symbolName, date, formattedPrice);
+	setTooltipHtml(symbolName, time, formattedPrice);
 };
 
 chart.subscribeCrosshairMove(updateLegend);

@@ -205,13 +205,7 @@ series.setData([
 	// hide-end
 ]);
 
-// const symbolName = 'ETC USD 7D VWAP';
-
 const container = document.getElementById('container');
-
-function dateToString(date) {
-	return `${date.year} - ${date.month} - ${date.day}`;
-}
 
 const toolTipWidth = 80;
 const toolTipHeight = 80;
@@ -237,9 +231,12 @@ chart.subscribeCrosshairMove(param => {
 	) {
 		toolTip.style.display = 'none';
 	} else {
-		const dateStr = dateToString(param.time);
+		// time will be in the same format that we supplied to setData.
+		// thus it will be YYYY-MM-DD
+		const dateStr = param.time;
 		toolTip.style.display = 'block';
-		const price = param.seriesPrices.get(series);
+		const data = param.seriesData.get(series);
+		const price = data.value !== undefined ? data.value : data.close;
 		toolTip.innerHTML = `<div style="color: ${BASELINE_TOP_LINE_COLOR}">ABC Inc.</div><div style="font-size: 24px; margin: 4px 0px; color: ${CHART_TEXT_COLOR}">
 			${Math.round(100 * price) / 100}
 			</div><div style="color: ${CHART_TEXT_COLOR}">

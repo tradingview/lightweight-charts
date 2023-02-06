@@ -34,7 +34,8 @@ update the content within our `html` legend element.
 chart.subscribeCrosshairMove(param => {
     let priceFormatted = '';
     if (param.time) {
-        const price = param.seriesPrices.get(areaSeries);
+        const dataPoint = param.seriesData.get(areaSeries);
+        const price = data.value !== undefined ? data.value : data.close;
         priceFormatted = price.toFixed(2);
     }
     // legend is a html element which has already been created

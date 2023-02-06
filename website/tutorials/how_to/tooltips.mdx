@@ -42,7 +42,8 @@ chart.subscribeCrosshairMove(param => {
     } else {
         const dateStr = dateToString(param.time);
         toolTip.style.display = 'block';
-        const price = param.seriesPrices.get(series);
+        const data = param.seriesData.get(series);
+        const price = data.value !== undefined ? data.value : data.close;
         toolTip.innerHTML = `<div>${price.toFixed(2)}</div>`;
 
         // Position tooltip according to mouse cursor position
@@ -74,8 +75,8 @@ This along with the `param.point.x` can be used to determine the position of the
 ```js
 chart.subscribeCrosshairMove(param => {
     const x = param.point.x;
-    const price = param.seriesPrices.get(series);
-    // where series is the ISeriesApi instance that we are interested in.
+    const data = param.seriesData.get(series);
+    const price = data.value !== undefined ? data.value : data.close;
     const y = series.priceToCoordinate(price);
     console.log(`The data point is at position: ${x}, ${y}`);
 });

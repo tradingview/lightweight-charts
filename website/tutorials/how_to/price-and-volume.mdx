@@ -28,7 +28,7 @@ An additional series can be added to a chart as an 'overlay' by setting the seri
 [`priceScaleId`](/docs/api/interfaces/SeriesOptionsCommon#pricescaleid) to `''`.
 An overlay doesn't make use of either the left or right price scale, and it's positioning
 is controlled by setting the [`scaleMargins`](/docs/api/interfaces/PriceScaleOptions#scalemargins)
-property on the series options.
+property on the price scale options associated with the series.
 
 ```js
 const volumeSeries = chart.addHistogramSeries({
@@ -36,6 +36,8 @@ const volumeSeries = chart.addHistogramSeries({
         type: 'volume',
     },
     priceScaleId: '', // set as an overlay by setting a blank priceScaleId
+});
+volumeSeries.priceScale().applyOptions({
     // set the positioning of the volume series
     scaleMargins: {
         top: 0.7, // highest point of the series will be 70% away from the top
@@ -52,7 +54,7 @@ We adjust the position of the overlay series to the bottom 30% of the chart by
 setting the [`scaleMargins`](/docs/api/interfaces/PriceScaleOptions#scalemargins) properties as follows:
 
 ```js
-series.applyOptions({
+volumeSeries.priceScale().applyOptions({
     scaleMargins: {
         top: 0.7, // highest point of the series will be 70% away from the top
         bottom: 0, // lowest point will be at the very bottom.
@@ -64,7 +66,7 @@ Similarly, we can set the position of the main series using the same approach. B
 the `bottom` margin value to `0.4` we can ensure that the two series don't overlap each other.
 
 ```js
-mainSeries.applyOptions({
+mainSeries.priceScale().applyOptions({
     scaleMargins: {
         top: 0.1, // highest point of the series will be 10% away from the top
         bottom: 0.4, // lowest point will be 40% away from the bottom

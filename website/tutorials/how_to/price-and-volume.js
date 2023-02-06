@@ -8,16 +8,9 @@ const chartOptions = {
 		textColor: CHART_TEXT_COLOR,
 		background: { type: 'solid', color: CHART_BACKGROUND_COLOR },
 	},
-	// highlight-start
 	rightPriceScale: {
-		// positioning the price scale for the area series
-		scaleMargins: {
-			top: 0.1,
-			bottom: 0.4,
-		},
 		borderVisible: false,
 	},
-	// highlight-end
 };
 // remove-line
 /** @type {import('lightweight-charts').IChartApi} */
@@ -28,6 +21,15 @@ const areaSeries = chart.addAreaSeries({
 	bottomColor: AREA_BOTTOM_COLOR,
 	lineColor: LINE_LINE_COLOR,
 	lineWidth: 2,
+});
+areaSeries.priceScale().applyOptions({
+	// highlight-start
+	scaleMargins: {
+		// positioning the price scale for the area series
+		top: 0.1,
+		bottom: 0.4,
+	},
+	// highlight-end
 });
 
 const volumeSeries = chart.addHistogramSeries({
@@ -42,8 +44,14 @@ const volumeSeries = chart.addHistogramSeries({
 		top: 0.7, // highest point of the series will be 70% away from the top
 		bottom: 0,
 	},
-	// highlight-end
 });
+volumeSeries.priceScale().applyOptions({
+	scaleMargins: {
+		top: 0.7, // highest point of the series will be 70% away from the top
+		bottom: 0,
+	},
+});
+// highlight-end
 
 areaSeries.setData([
 	{ time: '2018-10-19', value: 54.90 },
