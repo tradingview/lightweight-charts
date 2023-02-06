@@ -15,6 +15,75 @@ sidebar_position: 8
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
 
+## 4.0.0
+
+Long overdue as it’s been nearly 1 year since our last major update, but behold before all the changes that have happened over the last 12 months.
+
+In total, more than 20 tickets have been addressed with one of the most important ones being **fancy-canvas** – the library we use to configure HTML canvas in Lightweight Charts.
+
+**Breaking changes**
+
+- Fancy-canvas 2 | [#818](https://github.com/tradingview/lightweight-charts/issues/818)
+- Added support for ES module exports | [#613](https://github.com/tradingview/lightweight-charts/issues/613)
+- We are now generating two more build types: esm, standalone & cjs
+- Updated scales design | [#606](https://github.com/tradingview/lightweight-charts/issues/606)
+  - Changed scales look & feel according to the new design
+- Add possibility to disable time axis ticks | [#1043](https://github.com/tradingview/lightweight-charts/issues/1043)
+- Added `ticksVisible` to `TimeScaleOptions`, renamed `drawTicks` to `ticksVisible` in `PriceScaleOptions`.
+- Custom price lines should be atop of the series | [#684](https://github.com/tradingview/lightweight-charts/issues/684)
+  - Price line to be added on top of any series - shout out to thanhlmm
+- Remove deprecated code | [#626](https://github.com/tradingview/lightweight-charts/issues/626)
+- Fix types inconsistency on API level with time | [#470](https://github.com/tradingview/lightweight-charts/issues/470)
+- Add API to get chart values (data, markers, etc) | [#414](https://github.com/tradingview/lightweight-charts/issues/414)
+  - Added methods:
+    - `ISeriesApi.markers`
+    - `ISeriesApi.dataByIndex`
+  - Changed time types everywhere in the public API to `Time`
+
+**Enhancements**
+
+- Handle resize with ResizeObserver if it's exist in window | [#71](https://github.com/tradingview/lightweight-charts/issues/71)
+  - There was an issue when resizing the chart (such as rotating the screen of a phone/tablet).
+- Add possibility to use default tick mark formatter implementation as a fallback | [#1210](https://github.com/tradingview/lightweight-charts/issues/1210)
+  - Allow the custom tick mark formatter to return null so that it will use the default formatter for that specific mark.
+- Add possibility to invert Area series filled area | [#1115](https://github.com/tradingview/lightweight-charts/issues/1115)
+  - Adds invertFilledArea property to the AreaStyleOptions which when set to true will invert the filled area (draw above the line instead of below it).
+- Documentation website improvements | [#1001](https://github.com/tradingview/lightweight-charts/issues/1001) [#1002](https://github.com/tradingview/lightweight-charts/issues/1002)
+  - Provides a way to apply theme-based colors to a chart whenever the Docusaurus theme is changed.
+- Add ability to draw parts of area with different colors | [#1100](https://github.com/tradingview/lightweight-charts/issues/1100)
+  - Add a possibility to change line, top and bottom colors for the different parts of an area series
+- Add possibility to change price axis text color | [#1114](https://github.com/tradingview/lightweight-charts/issues/1114)
+- Reset price and time scale double click options | [#1118](https://github.com/tradingview/lightweight-charts/issues/1118)
+  - Distinguishing the reset between price & time scale vs having only one option
+- Add curved lines | [#506](https://github.com/tradingview/lightweight-charts/issues/506)
+  - Add a new line type that draws curved lines between series points.
+
+**Chores**
+
+- Replace deprecated String.prototype.substr | [#1048](https://github.com/tradingview/lightweight-charts/issues/1048)
+  - Shout out to CommanderRoot
+
+**Bug fixes**
+
+- Refactoring resize the chart | [#367](https://github.com/tradingview/lightweight-charts/issues/367)
+- The chart is blank on printed page in Chromium | [#873](https://github.com/tradingview/lightweight-charts/issues/873)
+  - Chart was blank when printing
+- Horizontal scroll animations improvements | [#1136](https://github.com/tradingview/lightweight-charts/issues/1136)
+  - Fixes glitches when resetting the chart time scale while scrolling
+- Draw series last price & price line labels on the top layer | [#1046](https://github.com/tradingview/lightweight-charts/issues/1046)
+  - Fixes an issue where price line could be place over price scale labels
+- Incorrect price line labels formatting | [#1032](https://github.com/tradingview/lightweight-charts/issues/1032)
+  - When setting the price scale mode to anything than 'Normal' the price for PriceLine wasn't properly calculated.
+- lockVisibleTimeRangeOnResize does not work with fixLeftEdge | [#991](https://github.com/tradingview/lightweight-charts/issues/991)
+  - The visible range is no longer changed after resizing the chart.
+
+As always, we thank you for your support and help in making Lightweight Charts the best product on the financial web. And a big shout out to our hero contributors [thanhlmm](https://github.com/thanhlmm), [CommanderRoot](https://github.com/CommanderRoot), [samhainsamhainsamhain](https://github.com/samhainsamhainsamhain) & colleague [Nipheris](https://github.com/Nipheris)!
+You can always send us your feedback via GitHub.
+We look forward to hearing from you! And as always, happy trading!
+Team TradingView
+
+See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/18?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.8.0..v4.0.0).
+
 ## 3.8.0
 
 We're happy to announce the next release of Lightweight Charts library. This release includes many improvements and bug fixes (as usual), but we are thrilled to say that from this version the library has its own [documentation website](https://tradingview.github.io/lightweight-charts/) that replaces the documentation in the repository. Check it out and share your feedback in [this discussion thread](https://github.com/tradingview/lightweight-charts/discussions/921).
