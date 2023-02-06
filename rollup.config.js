@@ -15,16 +15,21 @@ function getCurrentVersion() {
 
 const currentVersion = getCurrentVersion();
 
-function getConfig(inputFile, type, isProd) {
-	const isModular = type === 'module';
-	const suffix = isModular ? 'esm' : 'standalone';
+function getConfig(
+	inputFile,
+	{ format, isProd, isStandalone }
+) {
 	const mode = isProd ? 'production' : 'development';
-
+	const extension = {
+		cjs: 'cjs',
+		esm: 'mjs',
+		iife: 'js',
+	}[format];
 	const config = {
 		input: inputFile,
 		output: {
-			format: isModular ? 'esm' : 'iife',
-			file: `./dist/lightweight-charts.${suffix}.${mode}.js`,
+			format,
+			file: `./dist/lightweight-charts${isStandalone ? '.standalone' : ''}.${mode}.${extension}`,
 			banner: `
 /*!
  * @license
@@ -39,41 +44,55 @@ function getConfig(inputFile, type, isProd) {
 				preventAssignment: true,
 				values: {
 					// make sure that this values are synced with src/typings/globals/index.d.ts
-					'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
+					'process.env.NODE_ENV': JSON.stringify(
+						isProd ? 'production' : 'development'
+					),
 					'process.env.BUILD_VERSION': JSON.stringify(currentVersion),
 				},
 			}),
-			isProd && terser({
-				output: {
-					comments: /@license/,
-					// eslint-disable-next-line camelcase
-					inline_script: true,
-				},
-				mangle: {
-					module: (type === 'module'),
-					properties: {
-						regex: /^_(private|internal)_/,
+			isProd &&
+				terser({
+					output: {
+						comments: /@license/,
+						// eslint-disable-next-line camelcase
+						inline_script: true,
 					},
-				},
-			}),
+					mangle: {
+						module: format === 'esm' || format === 'cjs',
+						properties: {
+							regex: /^_(private|internal)_/,
+						},
+					},
+				}),
 		],
-		external: id => isModular && /^fancy-canvas(\/.+)?$/.test(id),
+		external: id => !isStandalone && /^fancy-canvas(\/.+)?$/.test(id),
 	};
 
 	return config;
 }
 
-const configs = [
-	getConfig('./lib/prod/src/index.js', 'module', false),
-	getConfig('./lib/prod/src/standalone.js', 'standalone', false),
-];
-
+const modes = [false];
 if (process.env.NODE_ENV === 'production') {
-	configs.push(
-		getConfig('./lib/prod/src/index.js', 'module', true),
-		getConfig('./lib/prod/src/standalone.js', 'standalone', true)
-	);
+	modes.push(true);
 }
+
+const configs = [];
+modes.forEach(mode => {
+	configs.push(
+		getConfig('./lib/prod/src/index.js', { format: 'esm', isProd: mode }),
+		getConfig('./lib/prod/src/index.js', {
+			format: 'esm',
+			isProd: mode,
+			isStandalone: true,
+		}),
+		getConfig('./lib/prod/src/index.js', { format: 'cjs', isProd: mode }),
+		getConfig('./lib/prod/src/standalone.js', {
+			format: 'iife',
+			isProd: mode,
+			isStandalone: true,
+		})
+	);
+});
 
 // eslint-disable-next-line no-console
 console.log(`Building version: ${currentVersion}`);
