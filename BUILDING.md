@@ -44,6 +44,7 @@ There are several included e2e tests available which can be run individually. Pl
   Note that at this step the website cannot work since it uses unpublished so far version. It will be fixed in the next steps.
 1. Create a git tag for this version with the format `vMAJ.MIN.PATCH` (see other tags).
 1. Run `npm run prepare-release` in the root folder.
+1. Run `npx publint` and ensure that there aren't any issues with the generated `package.json`.
 1. Run `npm publish` to publish changes to npm.
 1. Revert changes made in `package.json` file after `prepare-release` script.
 1. Bump the library's version in root `package.json` file to the next one (either major or minor depending on the planning and expected breaking changes).

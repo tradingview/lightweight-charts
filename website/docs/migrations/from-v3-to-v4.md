@@ -184,3 +184,17 @@ chart.subscribeCrosshairMove(param => {
     console.log(param.seriesData.get(barSeries)); // { time: '2001-01-01', open: 5, high: 10, low: 1, close: 7 } or undefined
 });
 ```
+
+## `MouseEventParams` field `hoveredMarkerId` was renamed to `hoveredObjectId`
+
+Since v4 you have to use `hoveredObjectId` instead of `hoveredMarkerId`.
+
+```js
+chart.subscribeCrosshairMove(param => {
+    console.log(param.hoveredObjectId);
+});
+
+chart.subscribeClick(param => {
+    console.log(param.hoveredObjectId);
+});
+```

@@ -31,5 +31,6 @@ export class CustomPriceLinePaneView extends SeriesHorizontalLinePaneView {
 		data.color = lineOptions.color;
 		data.lineWidth = lineOptions.lineWidth;
 		data.lineStyle = lineOptions.lineStyle;
+		data.externalId = this._priceLine.options().id;
 	}
 }

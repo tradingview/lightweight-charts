@@ -5,7 +5,7 @@ import * as path from 'path';
 
 export interface TestCase {
 	name: string;
-	caseContent: string;
+	path: string;
 }
 
 const testCasesDir = path.join(__dirname, '..', 'test-cases');
@@ -24,6 +24,6 @@ export function getTestCases(): TestCase[] {
 		.filter(isTestCaseFile)
 		.map<TestCase>((testCaseFile: string) => ({
 			name: extractTestCaseName(testCaseFile) as string,
-			caseContent: fs.readFileSync(path.join(testCasesDir, testCaseFile), { encoding: 'utf-8' }),
+			path: path.join(testCasesDir, testCaseFile),
 		}));
 }

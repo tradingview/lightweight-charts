@@ -12,8 +12,12 @@ function generateData() {
 	return res;
 }
 
-function interactionsToPerform() {
+function initialInteractionsToPerform() {
 	return [{ action: 'scrollLeft' }, { action: 'scrollDown' }];
+}
+
+function finalInteractionsToPerform() {
+	return [];
 }
 
 let chart;
@@ -41,7 +45,7 @@ function beforeInteractions(container) {
 	});
 }
 
-function afterInteractions() {
+function afterFinalInteractions() {
 	const endRange = chart.timeScale().getVisibleLogicalRange();
 
 	const pass = Boolean(startRange.from !== endRange.from && startRange.to !== endRange.to);

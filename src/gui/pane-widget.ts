@@ -23,6 +23,7 @@ import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
@@ -96,7 +97,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
-	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
+	private _clicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
 	private _startTrackPoint: Point | null = null;
@@ -254,17 +255,15 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return;
 		}
 		this._onMouseEvent();
-
 		const x = event.localX;
 		const y = event.localY;
-
-		this._setCrosshairPosition(x, y);
+		this._setCrosshairPosition(x, y, event);
 	}
 
 	public mouseDownEvent(event: MouseEventHandlerMouseEvent): void {
 		this._onMouseEvent();
 		this._mouseTouchDownEvent();
-		this._setCrosshairPosition(event.localX, event.localY);
+		this._setCrosshairPosition(event.localX, event.localY, event);
 	}
 
 	public mouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
@@ -275,8 +274,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		const x = event.localX;
 		const y = event.localY;
-
-		this._setCrosshairPosition(x, y);
+		this._setCrosshairPosition(x, y, event);
 		const hitTest = this.hitTest(x, y);
 		this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 	}
@@ -292,7 +290,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
 		this._onMouseEvent();
 		this._pressedMouseTouchMoveEvent(event);
-		this._setCrosshairPosition(event.localX, event.localY);
+		this._setCrosshairPosition(event.localX, event.localY, event);
 	}
 
 	public mouseUpEvent(event: MouseEventHandlerMouseEvent): void {
@@ -318,7 +316,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		if (this._startTrackPoint === null) {
 			const point: Point = { x: event.localX, y: event.localY };
-			this._startTrackingMode(point, point);
+			this._startTrackingMode(point, point, event);
 		}
 	}
 
@@ -332,7 +330,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._clearCrosshairPosition();
 	}
 
-	public clicked(): ISubscription<TimePointIndex | null, Point> {
+	public clicked(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
 		return this._clicked;
 	}
 
@@ -378,7 +376,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			const origPoint = ensureNotNull(this._initCrosshairPosition);
 			const newX = origPoint.x + (x - this._startTrackPoint.x) as Coordinate;
 			const newY = origPoint.y + (y - this._startTrackPoint.y) as Coordinate;
-			this._setCrosshairPosition(newX, newY);
+			this._setCrosshairPosition(newX, newY, event);
 			return;
 		}
 
@@ -533,9 +531,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _fireClickedDelegate(event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
 		const y = event.localY;
-
 		if (this._clicked.hasListeners()) {
-			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y });
+			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}
 	}
 
@@ -664,8 +661,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return Math.max(0, Math.min(y, this._size.height - 1)) as Coordinate;
 	}
 
-	private _setCrosshairPosition(x: Coordinate, y: Coordinate): void {
-		this._model().setAndSaveCurrentPosition(this._correctXCoord(x), this._correctYCoord(y), ensureNotNull(this._state));
+	private _setCrosshairPosition(x: Coordinate, y: Coordinate, event: MouseEventHandlerEventBase): void {
+		this._model().setAndSaveCurrentPosition(this._correctXCoord(x), this._correctYCoord(y), event, ensureNotNull(this._state));
 	}
 
 	private _clearCrosshairPosition(): void {
@@ -679,10 +676,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private _startTrackingMode(startTrackPoint: Point, crossHairPosition: Point): void {
+	private _startTrackingMode(startTrackPoint: Point, crossHairPosition: Point, event: MouseEventHandlerEventBase): void {
 		this._startTrackPoint = startTrackPoint;
 		this._exitTrackingModeOnNextTry = false;
-		this._setCrosshairPosition(crossHairPosition.x, crossHairPosition.y);
+		this._setCrosshairPosition(crossHairPosition.x, crossHairPosition.y, event);
 		const crosshair = this._model().crosshairSource();
 		this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
 	}

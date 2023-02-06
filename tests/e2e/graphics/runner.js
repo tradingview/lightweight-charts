@@ -8,7 +8,7 @@ const argv = yargs(process.argv.slice(4)).argv;
 
 const Mocha = require('mocha');
 
-const serveLocalFiles = require('../serve-local-files').serveLocalFiles;
+const serveLocalFiles = require('../serve-local-files.js').serveLocalFiles;
 
 const mochaConfig = require('../../../.mocharc.js');
 

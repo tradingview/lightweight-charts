@@ -1,5 +1,6 @@
 import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
+import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
@@ -12,13 +13,33 @@ export interface HorizontalLineRendererData {
 
 	y: Coordinate;
 	visible?: boolean;
+	externalId?: string;
 }
+
+const enum Constants { HitTestThreshold = 7, }
 
 export class HorizontalLineRenderer extends BitmapCoordinatesPaneRenderer {
 	private _data: HorizontalLineRendererData | null = null;
 
 	public setData(data: HorizontalLineRendererData): void {
 		this._data = data;
+	}
+
+	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
+		if (!this._data?.visible) {
+			return null;
+		}
+
+		const { y: itemY, lineWidth, externalId } = this._data;
+		// add a fixed area threshold around line (Y + width) for hit test
+		if (y >= itemY - lineWidth - Constants.HitTestThreshold && y <= itemY + lineWidth + Constants.HitTestThreshold) {
+			return {
+				hitTestData: this._data,
+				externalId: externalId,
+			};
+		}
+
+		return null;
 	}
 
 	protected _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {

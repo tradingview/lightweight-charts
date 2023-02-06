@@ -5,6 +5,7 @@ import { isChromiumBased, isWindows } from '../helpers/browsers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
+import { warn } from '../helpers/logger';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
@@ -20,10 +21,13 @@ import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { OriginalTime, TimePointIndex } from '../model/time-data';
+import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-// import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
+import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
+
+// import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 
 export interface MouseEventParamsImpl {
 	time?: OriginalTime;
@@ -32,6 +36,7 @@ export interface MouseEventParamsImpl {
 	seriesData: Map<Series, SeriesPlotRow>;
 	hoveredSeries?: Series;
 	hoveredObject?: string;
+	touchMouseEventData?: TouchMouseEventData;
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
@@ -56,8 +61,12 @@ export class ChartWidget implements IDestroyable {
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
+	private _observer: ResizeObserver | null = null;
+
+	private _container: HTMLElement;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
+		this._container = container;
 		this._options = options;
 
 		this._element = document.createElement('div');
@@ -84,29 +93,25 @@ export class ChartWidget implements IDestroyable {
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
 
+		const usedObserver = options.autoSize && this._installObserver();
+
+		// observer could not fire event immediately for some cases
+		// so we have to set initial size manually
 		let width = this._options.width;
 		let height = this._options.height;
-
-		if (width === 0 || height === 0) {
+		// ignore width/height options if observer has actually been used
+		// however respect options if installing resize observer failed
+		if (usedObserver || width === 0 || height === 0) {
 			const containerRect = container.getBoundingClientRect();
-			// TODO: Fix it better
-			// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
-			// For chart widget we decreases because we must be inside container.
-			// For time axis this is not important, since it just affects space for pane widgets
-			if (width === 0) {
-				width = Math.floor(containerRect.width);
-				width -= width % 2;
-			}
-
-			if (height === 0) {
-				height = Math.floor(containerRect.height);
-				height -= height % 2;
-			}
+			width = width || containerRect.width;
+			height = height || containerRect.height;
 		}
 
 		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
 		// or after but with adjustSize to properly update time scale
-		this.resize(width, height);
+		if (!usedObserver) {
+			this.resize(width, height);
+		}
 
 		this._syncGuiWithModel();
 
@@ -163,6 +168,8 @@ export class ChartWidget implements IDestroyable {
 
 		this._crosshairMoved.destroy();
 		this._clicked.destroy();
+
+		this._uninstallObserver();
 	}
 
 	public resize(width: number, height: number, forceRepaint: boolean = false): void {
@@ -170,11 +177,13 @@ export class ChartWidget implements IDestroyable {
 			return;
 		}
 
-		this._height = height;
-		this._width = width;
+		const sizeHint = suggestChartSize(size({ width, height }));
 
-		const heightStr = height + 'px';
-		const widthStr = width + 'px';
+		this._height = sizeHint.height;
+		this._width = sizeHint.width;
+
+		const heightStr = this._height + 'px';
+		const widthStr = this._width + 'px';
 
 		ensureNotNull(this._element).style.height = heightStr;
 		ensureNotNull(this._element).style.width = widthStr;
@@ -218,10 +227,7 @@ export class ChartWidget implements IDestroyable {
 
 		this._updateTimeAxisVisibility();
 
-		const width = options.width || this._width;
-		const height = options.height || this._height;
-
-		this.resize(width, height);
+		this._applyAutoSizeOptions(options);
 	}
 
 	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
@@ -269,6 +275,26 @@ export class ChartWidget implements IDestroyable {
 			? this._paneWidgets[0].leftPriceAxisWidget()
 			: this._paneWidgets[0].rightPriceAxisWidget();
 		return ensureNotNull(priceAxisWidget).getWidth();
+	}
+
+	// eslint-disable-next-line complexity
+	private _applyAutoSizeOptions(options: DeepPartial<ChartOptionsInternal>): void {
+		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {
+			warn(`You should turn autoSize off explicitly before specifying sizes; try adding options.autoSize: false to new options`);
+			return;
+		}
+		if (options.autoSize && !this._observer) {
+			// installing observer will override resize if successful
+			this._installObserver();
+		}
+
+		if (options.autoSize === false && this._observer !== null) {
+			this._uninstallObserver();
+		}
+
+		if (!options.autoSize && (options.width !== undefined || options.height !== undefined)) {
+			this.resize(options.width || this._width, options.height || this._height);
+		}
 	}
 
 	/**
@@ -383,9 +409,11 @@ export class ChartWidget implements IDestroyable {
 			if (this._isRightAxisVisible()) {
 				rightPriceAxisWidth = Math.max(rightPriceAxisWidth, ensureNotNull(paneWidget.rightPriceAxisWidget()).optimalWidth());
 			}
-
 			totalStretch += paneWidget.stretchFactor();
 		}
+
+		leftPriceAxisWidth = suggestPriceScaleWidth(leftPriceAxisWidth);
+		rightPriceAxisWidth = suggestPriceScaleWidth(rightPriceAxisWidth);
 
 		const width = this._width;
 		const height = this._height;
@@ -397,11 +425,8 @@ export class ChartWidget implements IDestroyable {
 		const separatorsHeight = 0; // separatorHeight * separatorCount;
 		const timeAxisVisible = this._options.timeScale.visible;
 		let timeAxisHeight = timeAxisVisible ? this._timeAxisWidget.optimalHeight() : 0;
-		// TODO: Fix it better
-		// on Hi-DPI CSS size * Device Pixel Ratio should be integer to avoid smoothing
-		if (timeAxisHeight % 2) {
-			timeAxisHeight += 1;
-		}
+		timeAxisHeight = suggestTimeScaleHeight(timeAxisHeight);
+
 		const otherWidgetHeight = separatorsHeight + timeAxisHeight;
 		const totalPaneHeight = height < otherWidgetHeight ? 0 : height - otherWidgetHeight;
 		const stretchPixels = totalPaneHeight / totalStretch;
@@ -678,7 +703,11 @@ export class ChartWidget implements IDestroyable {
 		this._adjustSizeImpl();
 	}
 
-	private _getMouseEventParamsImpl(index: TimePointIndex | null, point: Point | null): MouseEventParamsImpl {
+	private _getMouseEventParamsImpl(
+		index: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData | null
+	): MouseEventParamsImpl {
 		const seriesData = new Map<Series, SeriesPlotRow>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
@@ -715,15 +744,24 @@ export class ChartWidget implements IDestroyable {
 			hoveredSeries,
 			seriesData,
 			hoveredObject,
+			touchMouseEventData: event ?? undefined,
 		};
 	}
 
-	private _onPaneWidgetClicked(time: TimePointIndex | null, point: Point): void {
-		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point));
+	private _onPaneWidgetClicked(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData
+	): void {
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
-	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
-		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
+	private _onPaneWidgetCrosshairMoved(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData | null
+	): void {
+		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
 	private _updateTimeAxisVisibility(): void {
@@ -737,6 +775,30 @@ export class ChartWidget implements IDestroyable {
 
 	private _isRightAxisVisible(): boolean {
 		return this._paneWidgets[0].state().rightPriceScale().options().visible;
+	}
+
+	private _installObserver(): boolean {
+		// eslint-disable-next-line no-restricted-syntax
+		if (!('ResizeObserver' in window)) {
+			warn('Options contains "autoSize" flag, but the browser does not support ResizeObserver feature. Please provide polyfill.');
+			return false;
+		} else {
+			this._observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+				const containerEntry = entries.find((entry: ResizeObserverEntry) => entry.target === this._container);
+				if (!containerEntry) {
+					return;
+				}
+				this.resize(containerEntry.contentRect.width, containerEntry.contentRect.height);
+			});
+			this._observer.observe(this._container, { box: 'border-box' });
+			return true;
+		}
+	}
+
+	private _uninstallObserver(): void {
+		if (this._observer !== null) {
+			this._observer.disconnect();
+		}
 	}
 }
 

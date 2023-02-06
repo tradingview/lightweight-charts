@@ -1,3 +1,9 @@
+// delete-start
+/* Note: this file shouldn't be used directly because it has some constants which are set by
+the docusaurus site to ensure that the chart looks great in both dark and light color themes.
+If you want to use this example then please copy the code presented on the documentation site.
+[link](https://tradingview.github.io/lightweight-charts/tutorials/react/advanced) */
+// delete-end
 import { createChart } from 'lightweight-charts';
 import React, {
 	createContext,
@@ -29,8 +35,9 @@ export const App = props => {
 			backgroundColor = CHART_BACKGROUND_COLOR,
 			lineColor = LINE_LINE_COLOR,
 			textColor = CHART_TEXT_COLOR,
-		},
+		} = {},
 	} = props;
+
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
 	// The following variables illustrate how a series could be updated.
 	const series1 = useRef(null);

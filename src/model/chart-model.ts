@@ -26,6 +26,7 @@ import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { TimeScale, TimeScaleOptions } from './time-scale';
+import { TouchMouseEventData } from './touch-mouse-event-data';
 import { Watermark, WatermarkOptions } from './watermark';
 
 /**
@@ -247,6 +248,24 @@ export interface ChartOptions {
 	height: number;
 
 	/**
+	 * Setting this flag to `true` will make the chart watch the chart container's size and automatically resize the chart to fit its container whenever the size changes.
+	 *
+	 * This feature requires [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) class to be available in the global scope.
+	 * Note that calling code is responsible for providing a polyfill if required. If the global scope does not have `ResizeObserver`, a warning will appear and the flag will be ignored.
+	 *
+	 * Please pay attention that `autoSize` option and explicit sizes options `width` and `height` don't conflict with one another.
+	 * If you specify `autoSize` flag, then `width` and `height` options will be ignored unless `ResizeObserver` has failed. If it fails then the values will be used as fallback.
+	 *
+	 * The flag `autoSize` could also be set with and unset with `applyOptions` function.
+	 * ```js
+	 * const chart = LightweightCharts.createChart(document.body, {
+	 *     autoSize: true,
+	 * });
+	 * ```
+	 */
+	autoSize: boolean;
+
+	/**
 	 * Watermark options.
 	 *
 	 * A watermark is a background label that includes a brief description of the drawn data. Any text can be added to it.
@@ -351,7 +370,7 @@ export class ChartModel implements IDestroyable {
 	private _width: number = 0;
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
-	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
+	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
 
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
@@ -490,7 +509,7 @@ export class ChartModel implements IDestroyable {
 		return this._crosshair;
 	}
 
-	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null> {
+	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null, TouchMouseEventData | null> {
 		return this._crosshairMoved;
 	}
 
@@ -634,7 +653,7 @@ export class ChartModel implements IDestroyable {
 		return this._serieses;
 	}
 
-	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, pane: Pane): void {
+	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x);
@@ -654,14 +673,14 @@ export class ChartModel implements IDestroyable {
 		this._crosshair.setPosition(index, price, pane);
 
 		this.cursorUpdate();
-		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
+		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y }, event);
 	}
 
 	public clearCurrentPosition(): void {
 		const crosshair = this.crosshairSource();
 		crosshair.clearPosition();
 		this.cursorUpdate();
-		this._crosshairMoved.fire(null, null);
+		this._crosshairMoved.fire(null, null, null);
 	}
 
 	public updateCrosshair(): void {
@@ -670,7 +689,7 @@ export class ChartModel implements IDestroyable {
 		if (pane !== null) {
 			const x = this._crosshair.originCoordX();
 			const y = this._crosshair.originCoordY();
-			this.setAndSaveCurrentPosition(x, y, pane);
+			this.setAndSaveCurrentPosition(x, y, null, pane);
 		}
 
 		this._crosshair.updateAllViews();

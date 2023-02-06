@@ -5,7 +5,7 @@ const path = require('path');
 
 const Mocha = require('mocha');
 
-const serveLocalFiles = require('../serve-local-files').serveLocalFiles;
+const serveLocalFiles = require('../serve-local-files.js').serveLocalFiles;
 
 const mochaConfig = require('../../../.mocharc.js');
 
@@ -28,22 +28,29 @@ let testStandalonePath = process.argv[2];
 const hostname = 'localhost';
 const port = 34567;
 const httpServerPrefix = `http://${hostname}:${port}/`;
+let serverAddress = `${httpServerPrefix}index.html`;
 
 const filesToServe = new Map();
 
 if (fs.existsSync(testStandalonePath)) {
-	const fileNameToServe = 'test.js';
+	const fileNameToServe = 'index.html';
+	filesToServe.set(fileNameToServe, path.join(__dirname, 'helpers', 'test-page.html'));
+	serverAddress = `${httpServerPrefix}${fileNameToServe}`;
+}
+
+if (fs.existsSync(testStandalonePath)) {
+	const fileNameToServe = 'library.js';
 	filesToServe.set(fileNameToServe, path.resolve(testStandalonePath));
 	testStandalonePath = `${httpServerPrefix}${fileNameToServe}`;
 }
 
-process.env.TEST_STANDALONE_PATH = testStandalonePath;
+process.env.SERVER_ADDRESS = serverAddress;
 
 function runMocha(closeServer) {
 	console.log('Running tests...');
 	const mocha = new Mocha({
-		timeout: 20000,
-		slow: 10000,
+		timeout: 120000,
+		slow: 60000,
 		reporter: mochaConfig.reporter,
 		reporterOptions: mochaConfig._reporterOptions,
 	});
