@@ -12,12 +12,31 @@
     "type": "git",
     "url": "https://github.com/tradingview/lightweight-charts.git"
   },
-  "module": "dist/lightweight-charts.esm.production.js",
-  "main": "index.js",
+  "module": "dist/lightweight-charts.production.mjs",
+  "main": "index.cjs",
   "typings": "dist/typings.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": {
+        "types": "./dist/typings.d.ts",
+        "import": "./dist/lightweight-charts.development.mjs",
+        "require": "./dist/lightweight-charts.development.cjs"
+      },
+      "production": {
+        "types": "./dist/typings.d.ts",
+        "import": "./dist/lightweight-charts.production.mjs",
+        "require": "./dist/lightweight-charts.production.cjs"
+      },
+      "default": {
+        "types": "./dist/typings.d.ts",
+        "import": "./dist/lightweight-charts.production.mjs",
+        "require": "./index.cjs"
+      }
+    }
+  },
   "files": [
-    "dist/**",
-    "index.js"
+    "dist/**"
   ],
   "keywords": [
     "financial-charting-library",
@@ -107,9 +126,10 @@
     "build:watch": "npm-run-all tsc -p tsc-watch rollup-watch",
     "build:prod": "cross-env NODE_ENV=production npm run build",
     "build:release": "cross-env BUILD_TAG=release npm run build:prod",
-    "prepare-release": "npm-run-all clean build:release && node ./scripts/clean-package-json.js",
+    "prepare-release": "npm-run-all clean build:release && npm run prepare-package-json-for-release",
+    "prepare-package-json-for-release": "node ./scripts/clean-package-json.js",
     "size-limit": "size-limit",
-    "verify": "npm-run-all clean -p lint check-markdown-links build:prod -p check-dts-docs tsc-verify test size-limit",
+    "verify": "npm-run-all clean -p build:prod check-markdown-links -p lint check-dts-docs tsc-verify test size-limit",
     "test": "mocha tests/unittests/**/*.spec.ts"
   }
 }

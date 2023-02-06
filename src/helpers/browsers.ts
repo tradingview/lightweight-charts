@@ -24,6 +24,9 @@ export function isChrome(): boolean {
 
 // Determine whether the browser is running on windows.
 export function isWindows(): boolean {
+	if (!isRunningOnClientSide) {
+		return false;
+	}
 	// more accurate if available
 	if (
 		navigator?.userAgentData?.platform
@@ -35,6 +38,9 @@ export function isWindows(): boolean {
 
 // Determine whether the browser is Chromium based.
 export function isChromiumBased(): boolean {
+	if (!isRunningOnClientSide) {
+		return false;
+	}
 	if (!navigator.userAgentData) { return false; }
 	return navigator.userAgentData.brands.some(
 		(brand: UADataBrand) => {
