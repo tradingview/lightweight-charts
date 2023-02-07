@@ -62,7 +62,7 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 		data.width = timeScale.width();
 
 		const value = this._valueProvider();
-		if (!value.time || Number.isNaN(value.coordinate)) {
+		if (!value.time || !Number.isFinite(value.coordinate)) {
 			return;
 		}
 
