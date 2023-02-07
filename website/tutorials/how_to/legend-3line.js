@@ -229,7 +229,7 @@ const updateLegend = param => {
 	// time is in the same format that you supplied to the setData method,
 	// which in this case is YYYY-MM-DD
 	const time = bar.time;
-	const price = data.value !== undefined ? data.value : data.close;
+	const price = bar.value !== undefined ? bar.value : bar.close;
 	const formattedPrice = formatPrice(price);
 	setTooltipHtml(symbolName, time, formattedPrice);
 };
