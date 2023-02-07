@@ -26,12 +26,12 @@ export interface CrosshairPriceAndCoordinate {
 }
 
 export interface CrosshairTimeAndCoordinate {
-	time: TimePoint | null;
+	time: TimePoint;
 	coordinate: number;
 }
 
 export type PriceAndCoordinateProvider = (priceScale: PriceScale) => CrosshairPriceAndCoordinate;
-export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate;
+export type TimeAndCoordinateProvider = () => CrosshairTimeAndCoordinate | null;
 
 /**
  * Represents the crosshair mode.
@@ -166,9 +166,14 @@ export class Crosshair extends DataSource {
 
 		const valueTimeProvider = (rawIndexProvider: RawIndexProvider, rawCoordinateProvider: RawCoordinateProvider) => {
 			return () => {
+				const time = this._model.timeScale().indexToTime(rawIndexProvider());
+				const coordinate = rawCoordinateProvider();
+				if (!time || !Number.isFinite(coordinate)) {
+					return null;
+				}
 				return {
-					time: this._model.timeScale().indexToTime(rawIndexProvider()),
-					coordinate: rawCoordinateProvider(),
+					time,
+					coordinate,
 				};
 			};
 		};
