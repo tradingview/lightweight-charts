@@ -21,6 +21,8 @@ Long overdue as it’s been nearly 1 year since our last major update, but behol
 
 In total, more than 20 tickets have been addressed with one of the most important ones being **fancy-canvas** – the library we use to configure HTML canvas in Lightweight Charts.
 
+Please view the migration guide here: [Migrating from v3 to v4](./migrations/from-v3-to-v4).
+
 **Breaking changes**
 
 - Fancy-canvas 2 | [#818](https://github.com/tradingview/lightweight-charts/issues/818)
@@ -76,6 +78,8 @@ In total, more than 20 tickets have been addressed with one of the most importan
   - When setting the price scale mode to anything than 'Normal' the price for PriceLine wasn't properly calculated.
 - lockVisibleTimeRangeOnResize does not work with fixLeftEdge | [#991](https://github.com/tradingview/lightweight-charts/issues/991)
   - The visible range is no longer changed after resizing the chart.
+- Crosshair label text appears on the chart during initial render | [#1255](https://github.com/tradingview/lightweight-charts/issues/1255)
+  - Small text artefacts from the crosshair no longer appear on the time axis before any interaction with the chart.
 
 As always, we thank you for your support and help in making Lightweight Charts the best product on the financial web. And a big shout out to our hero contributors [thanhlmm](https://github.com/thanhlmm), [CommanderRoot](https://github.com/CommanderRoot), [samhainsamhainsamhain](https://github.com/samhainsamhainsamhain) & colleague [Nipheris](https://github.com/Nipheris)!
 You can always send us your feedback via GitHub.
