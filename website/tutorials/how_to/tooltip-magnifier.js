@@ -15,10 +15,6 @@ const chart = createChart(document.getElementById('container'), chartOptions);
 
 chart.applyOptions({
 	leftPriceScale: {
-		scaleMargins: {
-			top: 0.3, // leave some space for the legend
-			bottom: 0.25,
-		},
 		visible: true,
 		borderVisible: false,
 	},
@@ -60,6 +56,12 @@ const series = chart.addAreaSeries({
 	crossHairMarkerVisible: false,
 	priceLineVisible: false,
 	lastValueVisible: false,
+});
+series.priceScale().applyOptions({
+	scaleMargins: {
+		top: 0.3, // leave some space for the legend
+		bottom: 0.25,
+	},
 });
 
 series.setData([
@@ -367,21 +369,13 @@ series.setData([
 	// hide-end
 ]);
 
-// const symbolName = 'ETC USD 7D VWAP';
-
 const container = document.getElementById('container');
 
-function dateToString(date) {
-	return `${date.year} - ${date.month} - ${date.day}`;
-}
-
-const toolTipWidth = 80;
-const priceScaleWidth = 50;
-const toolTipMargin = 15;
+const toolTipWidth = 96;
 
 // Create and style the tooltip html element
 const toolTip = document.createElement('div');
-toolTip.style = `width: 96px; height: 300px; position: absolute; display: none; padding: 8px; box-sizing: border-box; font-size: 12px; text-align: left; z-index: 1000; top: 12px; left: 12px; pointer-events: none; border-radius: 4px 4px 0px 0px; border-bottom: none; box-shadow: 0 2px 5px 0 rgba(117, 134, 150, 0.45);font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;`;
+toolTip.style = `width: ${toolTipWidth}px; height: 300px; position: absolute; display: none; padding: 8px; box-sizing: border-box; font-size: 12px; text-align: left; z-index: 1000; top: 12px; left: 12px; pointer-events: none; border-radius: 4px 4px 0px 0px; border-bottom: none; box-shadow: 0 2px 5px 0 rgba(117, 134, 150, 0.45);font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;`;
 toolTip.style.background = `rgba(${CHART_BACKGROUND_RGB_COLOR}, 0.25)`;
 toolTip.style.color = CHART_TEXT_COLOR;
 toolTip.style.borderColor = BASELINE_BOTTOM_LINE_COLOR;
@@ -399,9 +393,12 @@ chart.subscribeCrosshairMove(param => {
 	) {
 		toolTip.style.display = 'none';
 	} else {
-		const dateStr = dateToString(param.time);
+		// time will be in the same format that we supplied to setData.
+		// thus it will be YYYY-MM-DD
+		const dateStr = param.time;
 		toolTip.style.display = 'block';
-		const price = param.seriesPrices.get(series);
+		const data = param.seriesData.get(series);
+		const price = data.value !== undefined ? data.value : data.close;
 		toolTip.innerHTML = `<div style="color: ${BASELINE_BOTTOM_LINE_COLOR}">⬤ ABC Inc.</div><div style="font-size: 24px; margin: 4px 0px; color: ${CHART_TEXT_COLOR}">
 			${Math.round(100 * price) / 100}
 			</div><div style="color: ${CHART_TEXT_COLOR}">
@@ -409,13 +406,13 @@ chart.subscribeCrosshairMove(param => {
 			</div>`;
 
 		// highlight-start
-		let left = param.point.x;
-
-		if (left > container.clientWidth - toolTipWidth - toolTipMargin) {
-			left = container.clientWidth - toolTipWidth;
-		} else if (left < toolTipWidth / 2) {
-			left = priceScaleWidth;
-		}
+		let left = param.point.x; // relative to timeScale
+		const timeScaleWidth = chart.timeScale().width();
+		const priceScaleWidth = chart.priceScale('left').width();
+		const halfTooltipWidth = toolTipWidth / 2;
+		left += priceScaleWidth - halfTooltipWidth;
+		left = Math.min(left, priceScaleWidth + timeScaleWidth - toolTipWidth);
+		left = Math.max(left, priceScaleWidth);
 
 		toolTip.style.left = left + 'px';
 		toolTip.style.top = 0 + 'px';

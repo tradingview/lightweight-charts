@@ -1,3 +1,4 @@
+/* This is used by React charts across the site, but not on index (see HeroChart folder) */
 .ChartContainer * {
 	overflow: hidden;
 }

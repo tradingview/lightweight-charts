@@ -9,6 +9,18 @@ keywords:
   - legend
 ---
 
+import VersionWarningAdmonition from "@site/src/components/VersionWarningAdmonition";
+
+<!-- Show warning when not on the latest published version  -->
+<!-- Tutorials section isn't versioned yet, hence the need for the warning message -->
+<!-- THESE TUTORIALS NEED TO BE UPDATED FOR VERSION 4 -->
+
+<VersionWarningAdmonition
+	notCurrent="This example is for the latest published version of Lightweight&nbsp;Charts."
+	type="caution"
+	displayVersionMessage
+/>
+
 Lightweight charts doesn't include a built-in legend feature, however it is something which can be added
 to your chart by following the examples presented below.
 
@@ -22,7 +34,8 @@ update the content within our `html` legend element.
 chart.subscribeCrosshairMove(param => {
     let priceFormatted = '';
     if (param.time) {
-        const price = param.seriesPrices.get(areaSeries);
+        const dataPoint = param.seriesData.get(areaSeries);
+        const price = data.value !== undefined ? data.value : data.close;
         priceFormatted = price.toFixed(2);
     }
     // legend is a html element which has already been created

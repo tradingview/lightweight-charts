@@ -22,7 +22,7 @@ function Logo(props: LogoProps): JSX.Element {
 	const logoLink = useBaseUrl(logo.href || '/');
 
 	return (
-		<Link to={logoLink} {...propsRest}>
+		<Link to={logoLink} {...propsRest} aria-label="Lightweight Charts home button">
 			<div className={styles.Logo} />
 		</Link>
 	);

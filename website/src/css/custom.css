@@ -6,6 +6,7 @@
 
 /* You can override the default Infima variables here. */
 :root {
+	font-display: swap;
 	--color-white: #ffffff;
 	--color-black: #000000;
 	--color-cold-gray-50: #f8f9fd;
@@ -45,7 +46,7 @@
 	--ifm-menu-color-background-active: unset;
 	--ifm-menu-color-background-hover: var(--color-cold-gray-100);
 	--ifm-menu-link-padding-horizontal: 24px;
-	--ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, SegoeUI, Ubuntu, sans-serif;
+	--ifm-font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
 	--small-card-border-color: var(--color-cold-gray-150);
 	--small-card-paragraph-color: var(--color-cold-gray-500);
@@ -72,8 +73,8 @@
 	--navbar-border-color: var(--color-cold-gray-150);
 	--below-chart-container-margin-horizontal: 20px;
 
-	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-light.svg');
-	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-light.svg');
+	--navbar-logo-url-desktop-laptop-tablet: url('../img/tradingview-logo.svg');
+	--navbar-logo-url-mobile: url('../img/tradingview-logo-small.svg');
 
 	--docusaurus-highlighted-code-line-bg: #2962ff15; /* --color-tv-blue-500 with opacity */
 	--hidden-lines-warning-bg: rgba(0, 0, 0, 0.1);
@@ -105,9 +106,6 @@ html[data-theme=dark] {
 	--menu-item-background-hover: var(--color-cold-gray-800);
 	--sidebar-back-button-border-color: var(--color-cold-gray-800);
 
-	--navbar-logo-url-desktop-laptop-tablet: url('../../static/img/navbar-logo-desktop-laptop-tablet-dark.svg');
-	--navbar-logo-url-mobile: url('../../static/img/navbar-logo-mobile-dark.svg');
-
 	--docusaurus-highlighted-code-line-bg: #2962ff20;
 	--hidden-lines-warning-bg: rgba(0, 0, 0, 0.2);
 }
@@ -120,6 +118,14 @@ html[data-theme=light] .DocSearch {
 html[data-theme=dark] .DocSearch {
 	--docsearch-searchbox-background: var(--color-cold-gray-800);
 	--docsearch-searchbox-focus-background: var(--color-cold-gray-850);
+}
+
+html *:focus-visible {
+	outline-offset: 2px;
+	outline-style: solid;
+	outline-color: var(--color-tv-blue-500);
+	outline-width: 2px;
+	border-radius: 4px;
 }
 
 .theme-code-block-highlighted-line {
@@ -154,6 +160,24 @@ html[data-theme=dark] .DocSearch {
 .navbar-sidebar__back {
 	border-bottom: 1px solid var(--sidebar-back-button-border-color);
 	padding-left: calc(0.5rem + var(--ifm-menu-link-padding-horizontal));
+}
+
+.navbar__link {
+	/* prevents nav bar links text wrapping */
+	white-space: nowrap;
+}
+
+nav.navbar {
+	--ifm-navbar-padding-horizontal: var(--container-padding, 32px);
+}
+
+button.navbar__toggle {
+	padding: 5px;
+	margin-right: 1rem;
+}
+
+.navbar-sidebar .navbar__brand {
+	padding-left: 12px;
 }
 
 .menu__caret,

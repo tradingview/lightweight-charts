@@ -1,233 +1,242 @@
-import { useColorMode } from '@docusaurus/theme-common';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import Head from '@docusaurus/Head';
 import Layout from '@theme/Layout';
-import { createChart, DeepPartial, IChartApi, LayoutOptions, LineData } from 'lightweight-charts';
 import React from 'react';
 
-import Cog from '../img/cog.svg';
-import HeroLogo from '../img/hero-logo.svg';
-import InputSliders from '../img/input-sliders.svg';
-import Paperplane from '../img/paperplane.svg';
-import Screens from '../img/screens.svg';
-import Shapes from '../img/shapes.svg';
-import Speedometer from '../img/speedometer.svg';
-import TradingviewHeart from '../img/tradingview-heart.svg';
-import chartStyle from './chart.module.css';
-import data from './hero-chart-data.json';
+import Banner from '../components/landing-page/Banner';
+import Cards, { type CardLink } from '../components/landing-page/Cards';
+import { type CodeBlockProps } from '../components/landing-page/Codeblock';
+import { type CTALink } from '../components/landing-page/CTAButton';
+import Hero from '../components/landing-page/Hero';
 import styles from './index.module.css';
 
-const visibleLogicalRange = { from: 0.5, to: data.orangeData.length - 1.5 };
+const cardLinks: CardLink[] = [
+	{
+		title: 'Getting started',
+		link: 'docs',
+		content: 'Discover how to install the library, and create your first chart',
+	},
+	{
+		title: 'Tutorials',
+		link: 'tutorials',
+		content: 'Tutorials, examples, and framework integrations',
+	},
+	{
+		title: 'API reference',
+		link: 'docs/api',
+		content: 'View the API reference documentation',
+	},
+	{
+		title: 'GitHub issues',
+		link: 'https://github.com/tradingview/lightweight-charts/issues',
+		content: 'Report a bug, or get answers to your questions',
+	},
+];
 
-function getLayoutOptionsForTheme(isDarkTheme: boolean): DeepPartial<LayoutOptions> {
-	return isDarkTheme
-		? { background: { color: '#131722' }, textColor: 'rgba(248, 249, 253, 1)' }
-		: { background: { color: 'rgba(248, 249, 253, 1)' }, textColor: '#000000' };
-}
+const ctaLinks: CTALink[] = [
+	{
+		title: 'Get started',
+		link: 'docs',
+		primary: true,
+	},
+	{
+		title: 'Explore features',
+		link: 'https://www.tradingview.com/lightweight-charts/',
+		external: true,
+	},
+];
 
-function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
-	const { colorMode } = useColorMode();
-	const isDarkTheme = colorMode === 'dark';
-
-	const [layoutOptions, setLayoutOptions] = React.useState<DeepPartial<LayoutOptions>>(getLayoutOptionsForTheme(isDarkTheme));
-
-	React.useEffect(
-		() => {
-			setLayoutOptions(getLayoutOptionsForTheme(isDarkTheme));
+const codeBlocks: CodeBlockProps[] = [
+	{
+		startLineNumber: 1,
+		lineNumberOverrides: ['~$', ''],
+		canCopy: true,
+		canSelect: true,
+		style: {
+			left: '20%',
+			bottom: -28,
+			transformOrigin: 'center left',
 		},
-		[isDarkTheme]
-	);
-
-	return layoutOptions;
-}
-
-function isScreenMinimumWidthForDisplayingChart(): boolean {
-	return window.matchMedia('screen and (min-width: 1279.5px)').matches;
-}
-
-function HeroChart(): JSX.Element {
-	const ref = React.useRef<HTMLDivElement>(null);
-	const layout = useThemeAwareLayoutOptions();
-	const [chartContainerClassName, setChartContainerClassName] = React.useState<string>(styles.HeroChartContainer);
-	const [chart, setChart] = React.useState<IChartApi | null>(null);
-
-	React.useEffect(
-		() => {
-			const container = ref.current;
-
-			if (!container) {
-				return;
-			}
-
-			const c = createChart(container, {
-				layout,
-				rightPriceScale: {
-					borderVisible: false,
-				},
-				grid: {
-					horzLines: {
-						visible: false,
-					},
-					vertLines: {
-						visible: false,
-					},
-				},
-				timeScale: {
-					borderVisible: false,
-					fixLeftEdge: true,
-					fixRightEdge: true,
-				},
-				handleScroll: false,
-				handleScale: false,
-			});
-
-			const orangeSeries = c.addAreaSeries({
-				lineColor: '#FFE902',
-				topColor: 'rgba(251, 140, 0, 0.6)',
-				bottomColor: 'rgba(251, 140, 0, 0.2)',
-			});
-			const blueSeries = c.addAreaSeries({
-				lineColor: 'rgba(15, 28, 249, 1)',
-				topColor: 'rgba(15, 28, 249, 1)',
-				bottomColor: 'rgba(15, 28, 249, 0.2)',
-			});
-
-			orangeSeries.setData(data.orangeData as LineData[]);
-			blueSeries.setData(data.blueData as LineData[]);
-
-			c.timeScale().setVisibleLogicalRange(visibleLogicalRange);
-
-			if (isScreenMinimumWidthForDisplayingChart()) {
-				setChartContainerClassName(`${styles.HeroChartContainer} ${styles.HeroChartAnimation}`);
-			}
-
-			setChart(c);
-
-			return () => {
-				c.remove();
-				setChart(null);
-			};
+		name: 'npm',
+		lines: [
+			<span key="1">npm install</span>,
+			<span key="2">&nbsp;&nbsp;&nbsp;&nbsp;--save lightweight-charts</span>,
+		],
+	},
+	{
+		startLineNumber: 1,
+		canCopy: false,
+		canSelect: false,
+		style: {
+			right: 'var(--right-code-block-position)',
+			top: 'var(--import-code-block-top-position)',
+			transformOrigin: 'center right',
 		},
-		[]
-	);
-
-	React.useEffect(
-		() => {
-			if (!chart || !ref.current) {
-				return;
-			}
-
-			const container = ref.current;
-
-			const resizeListener = () => {
-				if (!isScreenMinimumWidthForDisplayingChart()) {
-					setChartContainerClassName(styles.HeroChartContainer);
-					return;
-				}
-
-				const { width, height } = container.getBoundingClientRect();
-				chart.resize(width, height);
-
-				// TODO: remove this after releasing the new version (fixed in v4.0.0)
-				// and use lockVisibleTimeRangeOnResize time scale option instead
-				chart.timeScale().setVisibleLogicalRange(visibleLogicalRange);
-			};
-
-			window.addEventListener('resize', resizeListener);
-
-			return () => {
-				window.removeEventListener('resize', resizeListener);
-			};
+		name: 'import',
+		lines: [
+			<span key="1">
+				<span>import</span>
+				<span>{' { '}</span>createChart<span>{' } '}</span>
+				<span> from</span>
+			</span>,
+			<span key="2">
+				&nbsp;&nbsp;<span>{`'lightweight-charts'`}</span>;
+			</span>,
+			<span key="3">
+				<span>const</span> chart =
+			</span>,
+			<span key="4">
+				&nbsp;&nbsp;<span>createChart</span>
+				<span>{'('}</span>container<span>{')'}</span>;
+			</span>,
+		],
+	},
+	{
+		startLineNumber: 39,
+		canCopy: false,
+		canSelect: false,
+		style: {
+			left: `calc(-1 * var(--hero-chart-padding-left) + var(--main-code-block-left-adjustment))`,
+			top: -20,
+			transformOrigin: 'top left',
+			maxWidth: '489px',
 		},
-		[chart]
-	);
-
-	React.useEffect(
-		() => {
-			if (!chart) {
-				return;
-			}
-
-			chart.applyOptions({ layout });
+		name: 'chart-code',
+		lines: [
+			<span key="1">
+				<span data-c3>const</span> chartOptions =<span>{' { '}</span>
+				layout: <span>{' { '}</span> background:
+			</span>,
+			<span key="2">
+				&nbsp;&nbsp;<span>{' { '}</span>type: <span data-c1>{`'solid'`}</span>,
+				color: <span data-c1>{`'transparent'`}</span>
+				<span>{' } '}</span>
+				<span>{' } '}</span>
+				<span>{' }'}</span>;
+			</span>,
+			<span key="3">
+				<span data-c3>const</span> chart = <span data-c4>createChart</span>
+				<span>{'('}</span>container, chartOptions
+				<span>{')'}</span>;
+			</span>,
+			<span key="4">
+				<span data-c3>const</span> areaSeries = chart.
+				<span data-c4>addAreaSeries</span>
+				<span>{'('}</span>
+				<span>{'{ '}</span>
+			</span>,
+			<span key="5">
+				&nbsp;&nbsp;lineColor: <span data-c1>{`'#2962ff'`}</span>, topColor:{' '}
+				<span data-c1>{`'#2962ff'`}</span>,
+			</span>,
+			<span key="6">
+				&nbsp;&nbsp;bottomColor:{' '}
+				<span data-c1>{`'rgba(41, 98, 255, 0.28)'`}</span>
+				<span>{' }'}</span>
+				<span>{')'}</span>;
+			</span>,
+			// <span key="7">
+			// 	areaSeries.<span data-c4>setData</span>
+			// 	<span>{'('}</span>
+			// 	<span>{'['}</span>
+			// 	{' /* ... */ '}
+			// 	<span>{']'}</span>
+			// 	<span>{')'}</span>;
+			// </span>,
+		],
+	},
+	{
+		startLineNumber: 38,
+		canCopy: false,
+		canSelect: false,
+		style: {
+			right: -12,
+			top: -8,
+			transformOrigin: 'top right',
+			// width: 550,
+			maxWidth: 'calc(100vw - 60px)',
 		},
-		[layout, chart]
-	);
+		name: 'chart-code-phone',
+		lines: [
+			<span key="3">
+				<span data-c4>createChart</span>
+				<span>{'('}</span>container, chartOptions
+				<span>{')'}</span>;
+			</span>,
+			<span key="4">
+				<span data-c3>const</span> areaSeries =
+			</span>,
+			<span key="5">
+				&nbsp;&nbsp;chart.
+				<span data-c4>addAreaSeries</span>
+				<span>{'('}</span>
+				<span>{'{ '}</span>lineColor:
+			</span>,
+			<span key="6">
+				&nbsp;&nbsp;&nbsp;&nbsp;<span data-c1>{`'#2962ff'`}</span>, topColor:{' '}
+				<span data-c1>{`'#2962ff'`}</span>,
+			</span>,
+			<span key="7">
+				&nbsp;&nbsp;&nbsp;&nbsp;bottomColor:{' '}
+				<span data-c1>{`'rgba(41, 98, 255,'`}</span>
+			</span>,
+			<span key="8">
+				&nbsp;&nbsp;&nbsp;&nbsp;<span data-c1>{`'0.28)'`}</span>
+				<span>{' }'}</span>
+				<span>{')'}</span>;
+			</span>,
+		],
+	},
+];
 
-	return (
-		<div className={[chartContainerClassName, chartStyle.ChartContainer].join(' ')} ref={ref}></div>
-	);
-}
+const header = 'Lightweight Charts Documentation';
+const paragraph = `Lightweight Charts is a library for creating interactive financial charts. This documentation site provides all the information needed to get started with Lightweight Charts and help you make the most of its features.`;
+
+const showBanner = true;
 
 function Index(): JSX.Element {
-	const { siteConfig } = useDocusaurusContext();
-
-	return <div className={styles.RootContainer}>
-		<div className={styles.HeroContainer}>
-			<HeroChart />
-			<div className={styles.HeroTextContainer}>
-				<HeroLogo />
-				<p>Free, open-source and feature-rich interactive charts</p>
-				<div className={styles.HeroButtonsContainer}>
-					<a className={[styles.HeroButton, styles.HeroButtonPrimary].join(' ')} href="docs">Get Started</a>
-					<a className={styles.HeroButton} href="docs/api">API Reference</a>
-				</div>
+	return (
+		<>
+			{showBanner ? (
+				<Banner
+					text="Big news! Version 4.0 of Lightweight Charts is now available"
+					link="https://github.com/tradingview/lightweight-charts/releases/tag/v4.0.0"
+					linkText="Read more"
+				/>
+			) : (
+				''
+			)}
+			<div className={styles.RootContainer}>
+				<Hero
+					ctaLinks={ctaLinks}
+					codeBlocks={codeBlocks}
+					header={header}
+					paragraph={paragraph}
+				/>
+				<Cards cardLinks={cardLinks} />
 			</div>
-		</div>
-		<div className={styles.BelowChartContainer}>
-			<div className={styles.LargeTextContainer}>
-				<h1>Less is more</h1>
-				<div>Millions of websites still use static pictures for showing financial charts. The old way is not interactive and doesn&apos;t scale with various devices. Pictures always had a huge advantage of their small size and fast loading&nbsp;—&nbsp;but no more!</div>
-			</div>
-			<div className={styles.LargeCardContainer}>
-				<div className={[styles.LargeCard, styles.LargeCard1].join(' ')}>
-					<Speedometer />
-					<div className={styles.LargeCardInnerSpacer1} />
-					<h2>High-performance</h2>
-					<div className={styles.LargeCardInnerSpacer2} />
-					<p>Our charting solutions were engineered from the start to work with huge data arrays. Charts stay responsive and nimble even with thousands of bars even with updates multiple times per second with new ticks.</p>
-				</div>
-				<div className={[styles.LargeCard, styles.LargeCard2].join(' ')}>
-					<Screens />
-					<h2>Interactive, responsive and mobile-friendly</h2>
-					<div className={styles.LargeCardInnerSpacer2} />
-					<p>Intelligently adapts to any device. Charts are carefully engineered for best interactivity, both for powerful desktops with a mouse, and touch-optimized for tablets and phones.</p>
-				</div>
-				<div className={[styles.LargeCard, styles.LargeCard3].join(' ')}>
-					<TradingviewHeart />
-					<div className={styles.LargeCardInnerSpacer1} />
-					<h2>Finance is at the heart</h2>
-					<div className={styles.LargeCardInnerSpacer2} />
-					<p>Charting is our core. TradingView charts are used by tens of thousands of websites, apps and financial portals, as well as millions of traders around the world. You can be sure that we&apos;ve included everything you need, starting from popular chart types to advanced price scaling.</p>
-				</div>
-			</div>
-			<div className={styles.SmallCardContainer}>
-				<div className={[styles.SmallCard, styles.SmallCard1].join(' ')}>
-					<Cog />
-					<h3>Integrating & connecting any data is quick and easy</h3>
-					<p>Built for developers, by developers. Charts are rich in features and easy to integrate — so you can integrate with a breeze.</p>
-				</div>
-				<div className={[styles.SmallCard, styles.SmallCard2].join(' ')}>
-					<Paperplane />
-					<h3>{`Ultra lightweight - just ${siteConfig.customFields?.bundleSize} Kb`}</h3>
-					<p>HTML5 Canvas technology no larger than a standard GIF file.</p>
-				</div>
-				<div className={[styles.SmallCard, styles.SmallCard3].join(' ')}>
-					<InputSliders />
-					<h3>Open-source </h3>
-					<p>Maintained by TradingView. Hosted on GitHub. Licensed under the Apache License, Version 2.0. Contributions welcome!</p>
-				</div>
-				<div className={[styles.SmallCard, styles.SmallCard4].join(' ')}>
-					<Shapes />
-					<h3>Flexible styling</h3>
-					<p>Change the standard look & feel to match your style with perfection. There are many premade examples that you can copy & paste.</p>
-				</div>
-			</div>
-		</div>
-	</div>;
+		</>
+	);
 }
 
 function LayoutWrapper(): JSX.Element {
 	return (
-		<Layout title="Lightweight Charts">
+		<Layout title="Home" description={paragraph}>
+			<Head>
+				<link
+					rel="preload"
+					href="https://fonts.cdnfonts.com/s/60249/Euclid Circular B SemiBold.woff"
+					as="font"
+					type="font/woff"
+					crossOrigin="anonymous"
+				/>
+				<link
+					rel="preload"
+					href="https://fonts.cdnfonts.com/s/13494/Menlo-Regular.woff"
+					as="font"
+					type="font/woff"
+					crossOrigin="anonymous"
+				/>
+			</Head>
 			<Index />
 		</Layout>
 	);
