@@ -22,7 +22,8 @@
       "type": "doc",
       "id": "android",
       "label": "Android"
-    }
+    },
+    "release-notes"
   ],
   "apiSidebar": [
     {
