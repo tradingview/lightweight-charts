@@ -15,6 +15,8 @@ function getCurrentVersion() {
 
 const currentVersion = getCurrentVersion();
 
+const year = new Date().getFullYear();
+
 function getConfig(
 	inputFile,
 	{ format, isProd, isStandalone }
@@ -34,7 +36,7 @@ function getConfig(
 /*!
  * @license
  * TradingView Lightweight Charts v${currentVersion}
- * Copyright (c) 2022 TradingView, Inc.
+ * Copyright (c) ${year} TradingView, Inc.
  * Licensed under Apache License 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */`.trim(),
 		},

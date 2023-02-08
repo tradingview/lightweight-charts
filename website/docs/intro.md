@@ -26,6 +26,19 @@ npm install --save lightweight-charts
 
 _Note that the package is shipped with TypeScript declarations, so you can easily use it within TypeScript code._
 
+### Build variants
+
+The library ships with the following build variants:
+
+|Dependencies included|Mode|ES module|CommonJS ⚠️|IIFE (`window.LightweightCharts`)|
+|-|-|-|-|-|
+|No|PROD|`lightweight-charts.production.mjs`|`lightweight-charts.production.cjs`|N/A|
+|No|DEV|`lightweight-charts.development.mjs`|`lightweight-charts.development.cjs`|N/A|
+|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|-|`lightweight-charts.standalone.production.js`|
+|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|-|`lightweight-charts.standalone.development.js`|
+
+⚠️ **Deprecation note:** CommonJS support will be removed from the library at the start of 2024.
+
 ## Creating a chart
 
 Once the library has been installed in your repo you're ready to create your first chart.

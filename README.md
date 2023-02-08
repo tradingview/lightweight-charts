@@ -77,6 +77,17 @@ lineSeries.setData([
 ]);
 ```
 
+### Build Variants
+
+|Dependencies included|Mode|ES module|CommonJS ⚠️|IIFE (`window.LightweightCharts`)|
+|-|-|-|-|-|
+|No|PROD|`lightweight-charts.production.mjs`|`lightweight-charts.production.cjs`|N/A|
+|No|DEV|`lightweight-charts.development.mjs`|`lightweight-charts.development.cjs`|N/A|
+|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|-|`lightweight-charts.standalone.production.js`|
+|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|-|`lightweight-charts.standalone.development.js`|
+
+⚠️ **Deprecation note:** CommonJS support will be removed from the library at the start of 2024.
+
 ## Development
 
 See [BUILDING.md](./BUILDING.md) for instructions on how to build `lightweight-charts` from source.
