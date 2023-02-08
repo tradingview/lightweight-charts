@@ -35,6 +35,7 @@ There are several included e2e tests available which can be run individually. Pl
 
 ## Deploying a new version
 
+1. Update any documentation pages which refer to a specific version. For example, the `Android` and `iOS` pages.
 1. Run `npm run docusaurus docs:version MAJ:MIN` in `website` folder to create new versioned docs.
   Note that there is not patch version in docs, only major and minor parts.
 1. (optional) Remove docs for the oldest version (see <https://docusaurus.io/docs/versioning#deleting-an-existing-version>).
