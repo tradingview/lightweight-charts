@@ -114,7 +114,7 @@ export class Screenshoter {
 				throw new Error(errors.join('\n'));
 			}
 
-			const pageScreenshotPNG = PNG.sync.read(await page.screenshot({ encoding: 'binary' }) as Buffer);
+			const pageScreenshotPNG = PNG.sync.read(await page.screenshot({ encoding: 'binary' }));
 			const additionalScreenshotDataURL = await page.evaluate(() => {
 				const testCaseWindow = window as unknown as TestCaseWindow;
 				if (!testCaseWindow.checkChartScreenshot) {
