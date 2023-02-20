@@ -6,7 +6,7 @@ keywords:
     - iOS
     - canvas
     - charting library
-    - charting 
+    - charting
     - html5 charts
     - financial charting library
 sidebar_position: 6
@@ -16,6 +16,12 @@ sidebar_position: 6
 
 :::note
 You can find the source code of the Lightweight Charts iOS wrapper in [this repository](https://github.com/tradingview/LightweightChartsIOS).
+:::
+
+:::info
+
+This wrapper is currently still using `v3.8.0`. This will be updated to `v4.0.0` in the near future.
+
 :::
 
 You can use Lightweight Charts inside an iOS application. To use Lightweight Charts in that context, you can use our iOS wrapper, which will allow you to interact with lightweight charts library, which will be rendered in a web view.
