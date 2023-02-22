@@ -105,6 +105,7 @@ export class ChartWidget implements IDestroyable {
 			const containerRect = container.getBoundingClientRect();
 			width = width || containerRect.width;
 			height = height || containerRect.height;
+			this.resize(width, height);
 		}
 
 		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
