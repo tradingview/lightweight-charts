@@ -12,9 +12,9 @@ pagination_prev: customization/creating-a-chart
 pagination_next: customization/series
 ---
 
-import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
+import IterativeGuideWarning from "./_iterative-guide-warning-partial.mdx";
 
-<IterativeGuideWarning/>
+<IterativeGuideWarning />
 
 In this section, we will be customizing the appearance of the chart 'backdrop'. We will be adjusting the colors to better suit a dark theme.
 
@@ -32,14 +32,14 @@ We can set the page background by adding the following code which the `<style>` 
 
 ```html
 <style>
-    body {
-        padding: 0;
-        margin: 0;
-        /* highlight-start */
-        /* Add a background color to match the chart */
-        background-color: #222;
-        /* highlight-end */
-    }
+	body {
+		padding: 0;
+		margin: 0;
+		/* highlight-start */
+		/* Add a background color to match the chart */
+		background-color: #222;
+		/* highlight-end */
+	}
 </style>
 ```
 
@@ -49,13 +49,13 @@ One final explanation before we dive into customizing the chart. There are gener
 
 This tutorial will make use of both approaches to provide cleaner and easier-to-follow code.
 
-The options object passed into either method doesn't need to be a complete object containing all the options, but rather only you options you need to change. During the creation of an instance, the default options will be used and your options will be applied over those. When using `applyOptions`, the specified options will be merged over the current options for that instance.
+The options object passed into either method doesn't need to be a complete object containing all the options, but rather only the options you need to change. During the creation of an instance, the default options will be used and your options will be applied over those. When using `applyOptions`, the specified options will be merged over the current options for that instance.
 
 **The following code block isn't part of the tutorial but is included just to highlight the two approaches.**
 
-import ApplyOptionsTabs from './_apply-options-tabs-partial.mdx';
+import ApplyOptionsTabs from "./_apply-options-tabs-partial.mdx";
 
-<ApplyOptionsTabs/>
+<ApplyOptionsTabs />
 
 ## Adjusting the background and text colors for the chart
 
@@ -65,17 +65,17 @@ We are going to add the options during the creation of the chart (as the second 
 
 ```js
 const chart = LightweightCharts.createChart(
-    document.getElementById('container'),
-    {
-        layout: {
-            background: { color: '#222' },
-            textColor: '#DDD',
-        },
-        grid: {
-            vertLines: { color: '#444' },
-            horzLines: { color: '#444' },
-        },
-    }
+	document.getElementById("container"),
+	{
+		layout: {
+			background: { color: "#222" },
+			textColor: "#DDD",
+		},
+		grid: {
+			vertLines: { color: "#444" },
+			horzLines: { color: "#444" },
+		},
+	}
 );
 ```
 
@@ -89,11 +89,11 @@ If you would like to set specific dimensions for the chart then you can do so li
 
 ```js
 const chart = LightweightCharts.createChart(
-    document.getElementById('container'),
-    {
-        height: 400,
-        width: 600,
-    }
+	document.getElementById("container"),
+	{
+		height: 400,
+		width: 600,
+	}
 );
 ```
 
@@ -106,12 +106,12 @@ You can add the following code beneath the `createChart` method call.
 ```js
 // Setting the border color for the vertical axis
 chart.priceScale().applyOptions({
-    borderColor: '#71649C',
+	borderColor: "#71649C",
 });
 
 // Setting the border color for the horizontal axis
 chart.timeScale().applyOptions({
-    borderColor: '#71649C',
+	borderColor: "#71649C",
 });
 ```
 
@@ -122,11 +122,11 @@ At a later stage, we will customise these scales further.
 At this point we should have a chart like this:
 
 <iframe
-    className="standalone-iframe"
-    src={require('!!file-loader!./assets/step2.html').default}
+	className="standalone-iframe"
+	src={require("!!file-loader!./assets/step2.html").default}
 ></iframe>
-<a href={require('!!file-loader!./assets/step2.html').default} target="\_blank">
-    View in a new window
+<a href={require("!!file-loader!./assets/step2.html").default} target="\_blank">
+	View in a new window
 </a>
 
 ## Next steps
@@ -139,13 +139,14 @@ You can download the HTML file for example at this stage <a href={require('!!fil
 
 ## Complete code
 
-import CodeBlock from '@theme/CodeBlock';
-import code from '!!raw-loader!./assets/step2.html';
-import InstantDetails from '@site/src/components/InstantDetails'
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./assets/step2.html";
+import InstantDetails from "@site/src/components/InstantDetails";
 
 <InstantDetails>
-<summary>
-Click here to reveal the complete code for the example at this stage of the guide.
-</summary>
-<CodeBlock className="language-html">{code}</CodeBlock>
+	<summary>
+		Click here to reveal the complete code for the example at this stage of the
+		guide.
+	</summary>
+	<CodeBlock className="language-html">{code}</CodeBlock>
 </InstantDetails>
