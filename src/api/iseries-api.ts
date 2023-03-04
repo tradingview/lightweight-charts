@@ -1,5 +1,6 @@
+import { IBox } from './ibox';
 import { IPriceFormatter } from '../formatters/iprice-formatter';
-
+import { BoxOptions } from '../model/box-options';
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { MismatchDirection } from '../model/plot-list';
@@ -248,6 +249,46 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	removePriceLine(line: IPriceLine): void;
+
+		/**
+	 * Creates a new box.
+	 *
+	 * @param options - Any subset of options.
+	 * @example
+	 * ```js
+	 * box.applyOptions({
+	 *     corners: [
+	 *         { time: 1641240000, price: 80 },
+         *         { time: 1641040000, price: 70 },
+	 *     ],
+	 *     lowPrice: 80.0,
+	 *     highPrice: 90.0,
+	 *     earlyTime: 1641240000, // 2022-01-03 20:00:00
+	 *     lateTime: 1641250000, // 2022-01-03 22:46:40
+	 *     borderColor: '#0ff',
+	 *     borderWidth: 1,
+	 *     borderStyle: LightweightCharts.LineStyle.Solid,
+	 *     fillColor: '#0ff',
+	 *     fillOpacity: 50,
+	 *     borderVisible: true,
+	 *     axisLabelVisible: false,
+	 *     title: 'My box',
+	 * });
+	 * ```
+	 */
+		createBox(options: BoxOptions): IBox;
+
+		/**
+		 * Removes the box that was created before.
+		 *
+		 * @param box - A box to remove.
+		 * @example
+		 * ```js
+		 * const box = series.createBox({ lowPrice: 80.0 });
+		 * series.removeBox(box);
+		 * ```
+		 */
+		removeBox(box: IBox): void;
 
 	/**
 	 * Return current series type.

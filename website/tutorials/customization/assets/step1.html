@@ -10,7 +10,7 @@
     <!-- Adding the standalone version of Lightweight charts -->
     <script
       type="text/javascript"
-      src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"
+      src="../../../../dist/lightweight-charts.standalone.development.js"
     ></script>
     <style>
       body {
@@ -1087,6 +1087,23 @@
       const mainSeries = chart.addCandlestickSeries();
       // Set the data for the Main Series
       mainSeries.setData(candleStickData);
+
+      const box = {
+      lowPrice: 170.0,
+      highPrice: 197.0,
+      earlyTime: 1539980962,
+      lateTime: 1746589257,
+      borderColor: '#00008B',
+      borderWidth: 2,
+      borderStyle: LightweightCharts.LineStyle.Solid,
+      fillColor: '#0ff',
+      fillOpacity: 0.1,
+      borderVisible: false,
+      axisLabelVisible: false,
+      title: 'My box',
+    };
+
+    const createdBox = mainSeries.createBox(box);
 
       // Adding a window resize event handler to resize the chart when
       // the window size changes.
