@@ -17,7 +17,7 @@ export function walkLine<TItem extends LinePoint, TStyle>(
 	styleGetter: (renderingScope: MediaCoordinatesRenderingScope, item: TItem) => TStyle,
 	finishStyledArea: (ctx: CanvasRenderingContext2D, style: TStyle, areaFirstItem: LinePoint, newAreaFirstItem: LinePoint) => void
 ): void {
-	if (items.length === 0 || visibleRange.from >= items.length) {
+	if (items.length === 0 || visibleRange.from >= items.length || visibleRange.to <= 0) {
 		return;
 	}
 
