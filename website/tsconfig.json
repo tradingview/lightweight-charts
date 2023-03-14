@@ -4,6 +4,7 @@
 		"strict": true,
 		"resolveJsonModule": true,
 		"jsx": "react",
+		"moduleResolution": "node",
 	},
 	"include": [
 		"./**/*.ts",
