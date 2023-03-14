@@ -277,6 +277,10 @@ export class ChartWidget implements IDestroyable {
 		return ensureNotNull(priceAxisWidget).getWidth();
 	}
 
+	public autoSizeActive(): boolean {
+		return this._options.autoSize && this._observer !== null;
+	}
+
 	// eslint-disable-next-line complexity
 	private _applyAutoSizeOptions(options: DeepPartial<ChartOptionsInternal>): void {
 		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {

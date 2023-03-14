@@ -77,6 +77,9 @@ export interface IChartApi {
 	/**
 	 * Sets fixed size of the chart. By default chart takes up 100% of its container.
 	 *
+	 * If chart has the `autoSize` option enabled, and the ResizeObserver is available then
+	 * the width and height values will be ignored.
+	 *
 	 * @param width - Target width of the chart.
 	 * @param height - Target height of the chart.
 	 * @param forceRepaint - True to initiate resize immediately. One could need this to get screenshot immediately after resize.
@@ -260,4 +263,12 @@ export interface IChartApi {
 	 * @returns A canvas with the chart drawn on. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
 	 */
 	takeScreenshot(): HTMLCanvasElement;
+
+	/**
+	 * Returns the active state of the `autoSize` option. This can be used to check
+	 * whether the chart is handling resizing automatically with a `ResizeObserver`.
+	 *
+	 * @returns Whether the `autoSize` option is enabled and the active.
+	 */
+	autoSizeActive(): boolean;
 }
