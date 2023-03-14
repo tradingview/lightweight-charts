@@ -321,6 +321,10 @@ export class TimeScale {
 		return this._width === 0 || this._points.length === 0 || this._baseIndexOrNull === null;
 	}
 
+	public hasPoints(): boolean {
+		return this._points.length > 0;
+	}
+
 	// strict range: integer indices of the bars in the visible range rounded in more wide direction
 	public visibleStrictRange(): RangeImpl<TimePointIndex> | null {
 		this._updateVisibleRange();
