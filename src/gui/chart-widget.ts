@@ -109,9 +109,7 @@ export class ChartWidget implements IDestroyable {
 
 		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
 		// or after but with adjustSize to properly update time scale
-		if (!usedObserver) {
-			this.resize(width, height);
-		}
+		this.resize(width, height);
 
 		this._syncGuiWithModel();
 
