@@ -9,4 +9,6 @@ export const priceLineOptionsDefaults: PriceLineOptions = {
 	lineVisible: true,
 	axisLabelVisible: true,
 	title: '',
+	axisLabelColor: '',
+	axisLabelTextColor: '',
 };
