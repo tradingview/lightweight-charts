@@ -31,7 +31,8 @@ export type InteractionAction =
 	| 'swipeTouchDiagonal'
 	| 'kineticAnimation'
 	| 'moveMouseCenter'
-	| 'moveMouseTopLeft';
+	| 'moveMouseTopLeft'
+	| 'clickXY';
 export type InteractionTarget =
 	| 'container'
 	| 'timescale'
@@ -39,17 +40,27 @@ export type InteractionTarget =
 	| 'rightpricescale'
 	| 'pane';
 
-export interface Interaction {
+export type Interaction = {
 	action: InteractionAction;
 	target?: InteractionTarget;
-}
+} & ({
+	action: Omit<InteractionAction, 'clickXY'>;
+	options: never;
+} | {
+	action: 'clickXY';
+	options: {
+		x: number;
+		y: number;
+	};
+});
 
 // eslint-disable-next-line complexity
 async function performAction(
-	action: InteractionAction,
+	interaction: Interaction,
 	page: Page,
 	target: ElementHandle<Element>
 ): Promise<void> {
+	const action = interaction.action;
 	switch (action) {
 		case 'scrollLeft':
 			await doMouseScroll({ x: -10.0 }, page);
@@ -83,6 +94,17 @@ async function performAction(
 						boundingBox.x + boundingBox.width + 20,
 						boundingBox.y + boundingBox.height + 50,
 						{ button: 'left' }
+					);
+				}
+			}
+			break;
+		case 'clickXY':
+			{
+				const boundingBox = await target.boundingBox();
+				if (boundingBox) {
+					await page.mouse.click(
+						boundingBox.x + interaction.options.x,
+						boundingBox.y + interaction.options.y
 					);
 				}
 			}
@@ -159,7 +181,7 @@ async function performAction(
 			{
 				const boundingBox = await target.boundingBox();
 				if (boundingBox) {
-					await page.mouse.move(0, 0);
+					await page.mouse.move(boundingBox.x, boundingBox.y);
 				}
 			}
 			break;
@@ -213,6 +235,6 @@ export async function performInteractions(
 			}
 		}
 
-		await performAction(interaction.action, page, target);
+		await performAction(interaction, page, target);
 	}
 }

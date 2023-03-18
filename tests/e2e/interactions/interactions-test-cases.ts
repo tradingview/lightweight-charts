@@ -38,8 +38,8 @@ const testStandalonePathEnvKey = 'TEST_STANDALONE_PATH';
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
 
 interface InternalWindow {
-	initialInteractions: Interaction[];
-	finalInteractions: Interaction[];
+	initialInteractionsToPerform: () => Interaction[];
+	finalInteractionsToPerform: () => Interaction[];
 	finishedSetup: Promise<() => void>;
 	afterInitialInteractions?: () => void;
 	afterFinalInteractions: () => void;
@@ -101,7 +101,10 @@ describe('Interactions tests', function(): void {
 			});
 
 			const initialInteractionsToPerform = await page.evaluate(() => {
-				return (window as unknown as InternalWindow).initialInteractions;
+				if (!(window as unknown as InternalWindow).initialInteractionsToPerform) {
+					return [];
+				}
+				return (window as unknown as InternalWindow).initialInteractionsToPerform();
 			});
 
 			await performInteractions(page, initialInteractionsToPerform);
@@ -120,7 +123,10 @@ describe('Interactions tests', function(): void {
 			});
 
 			const finalInteractionsToPerform = await page.evaluate(() => {
-				return (window as unknown as InternalWindow).finalInteractions;
+				if (!(window as unknown as InternalWindow).finalInteractionsToPerform) {
+					return [];
+				}
+				return (window as unknown as InternalWindow).finalInteractionsToPerform();
 			});
 
 			if (finalInteractionsToPerform && finalInteractionsToPerform.length > 0) {
