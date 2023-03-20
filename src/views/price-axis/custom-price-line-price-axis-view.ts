@@ -54,7 +54,6 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 
 		const colors = generateContrastColors(options.axisLabelColor || options.color);
 		commonData.background = colors.background;
-		// no need to set commonData.color because it will be ignored.
 
 		const textColor = options.axisLabelTextColor || colors.foreground;
 		axisRendererData.color = textColor; // price text
