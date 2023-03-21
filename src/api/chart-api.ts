@@ -2,6 +2,7 @@ import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from 
 
 import { assert, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
+import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
@@ -161,6 +162,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	public resize(width: number, height: number, forceRepaint?: boolean): void {
+		if (this.autoSizeActive()) {
+			// We return early here instead of checking this within the actual _chartWidget.resize method
+			// because this should only apply to external resize requests.
+			warn(`Height and width values ignored because 'autoSize' option is enabled.`);
+			return;
+		}
 		this._chartWidget.resize(width, height, forceRepaint);
 	}
 
@@ -245,6 +252,10 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public takeScreenshot(): HTMLCanvasElement {
 		return this._chartWidget.takeScreenshot();
+	}
+
+	public autoSizeActive(): boolean {
+		return this._chartWidget.autoSizeActive();
 	}
 
 	private _addSeriesImpl<TSeries extends SeriesType>(
