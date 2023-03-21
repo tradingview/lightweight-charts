@@ -1,12 +1,12 @@
 ---
 id: android
-description: You can use Lightweight Charts inside an Android application. To use Lightweight Charts in that context, you can use our Android wrapper, which will allow you to interact with lightweight charts library, which will be rendered in a web view.
+description: You can use Lightweight Charts™ inside an Android application. To use Lightweight Charts™ in that context, you can use our Android wrapper, which will allow you to interact with Lightweight Charts™ library, which will be rendered in a web view.
 keywords:
     - charts
     - android
     - canvas
     - charting library
-    - charting 
+    - charting
     - html5 charts
     - financial charting library
 sidebar_position: 7
@@ -15,10 +15,10 @@ sidebar_position: 7
 # Android wrapper
 
 :::note
-You can find the source code of the Lightweight Charts Android wrapper in [this repository](https://github.com/tradingview/lightweight-charts-android).
+You can find the source code of the Lightweight Charts™ Android wrapper in [this repository](https://github.com/tradingview/lightweight-charts-android).
 :::
 
-You can use Lightweight Charts inside an Android application. To use Lightweight Charts in that context, you can use our Android wrapper, which will allow you to interact with lightweight charts library, which will be rendered in a web view.
+You can use Lightweight Charts™ inside an Android application. To use Lightweight Charts™ in that context, you can use our Android wrapper, which will allow you to interact with Lightweight Charts™ library, which will be rendered in a web view.
 
 ## Installation
 

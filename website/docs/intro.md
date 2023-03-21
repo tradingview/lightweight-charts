@@ -8,7 +8,7 @@ sidebar_position: 0
 
 ## Requirements
 
-First of all, Lightweight Charts is _a client-side_ library.
+First of all, Lightweight Charts™ is _a client-side_ library.
 This means that it does not and cannot work on the server-side (i.e. NodeJS), at least out of the box.
 
 The code of `lightweight-charts` package is targeted to [_es2016_ language specification](https://262.ecma-international.org/7.0/).

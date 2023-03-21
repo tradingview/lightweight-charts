@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Series Markers
+// Lightweight Charts™ Example: Series Markers
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/series-markers
 
 // remove-end

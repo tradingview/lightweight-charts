@@ -1,7 +1,7 @@
 ---
 title: Web Components - Custom Element
 description:
-  A simple example of how to use Lightweight Charts within the Web component
+  A simple example of how to use Lightweight Charts™ within the Web component
   custom element.
 pagination_prev: null
 pagination_next: null
@@ -22,7 +22,7 @@ a starting point, and could be tweaked further using our extensive
 
 :::
 
-This guide will focus on the key concepts required to get Lightweight Charts
+This guide will focus on the key concepts required to get Lightweight Charts™
 running within a Vanilla JS web component (using
 [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements)).
 Please note this guide is not intended as a complete step-by-step tutorial. The
@@ -48,7 +48,7 @@ The ability to:
 - enable automatic resizing of the chart when the browser is resized.
 
 The example may not fit your requirements completely. Creating a general-purpose
-declarative wrapper for Lightweight Charts' imperative API is a challenge, but
+declarative wrapper for Lightweight Charts™ imperative API is a challenge, but
 hopefully, you can adapt this example to your use case.
 
 ### Component showcase
@@ -74,7 +74,7 @@ encapsulate functionality within custom elements.
 [Custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements)
 make use of the standard web languages `html`, `css`, and `js` which means that
 there aren't many specific changes, or extra knowledge, required to get
-Lightweight Charts working within a custom element.
+Lightweight Charts™ working within a custom element.
 
 The process of creating a chart is essentially the same as when using the
 library normally, except that we are encapsulating all the `html`, `css`, and
@@ -160,8 +160,8 @@ class LightweightChartWC extends HTMLElement {
 }
 ```
 
-Finally, we can now create the chart using Lightweight Charts. Depending on your
-build process, you may either need to import Lightweight Charts, or access it
+Finally, we can now create the chart using Lightweight Charts™. Depending on your
+build process, you may either need to import Lightweight Charts™, or access it
 from the global scope (if loaded as a standalone script). To create the chart,
 we call the [`createChart`](/docs/api#createchart) constructor function, passing
 our container element as the first argument. The returned variable will be a
@@ -210,7 +210,7 @@ and the autosize flag which enables automatic resizing of the chart when the
 window is resized. We will be using properties to provide the interfaces for
 setting the series data, and options for the chart. Additionally, the IChartApi
 instance will be accessable via the `chart` property such that the consumer has
-full access to the entire API provided by Lightweight Charts.
+full access to the entire API provided by Lightweight Charts™.
 
 ### Attributes
 
@@ -412,7 +412,7 @@ follows (using JSON notation):
 
 The IChartApi instance will be accessible via the `chart` property on the custom
 element. This can be used by the consumer of the custom element to fully control
-the Lightweight Chart within the element.
+the chart within the element.
 
 ```js
 // Get a reference to an instance of the custom element on the page
@@ -434,7 +434,7 @@ the script is loaded and executed, so all you need to do is include the script
 tag on the page.
 
 Depending on your build step for your page, you may either need to import
-Lightweight Charts via an import statement, or access the library via the global
+Lightweight Charts™ via an import statement, or access the library via the global
 variable defined when using the standalone script version.
 
 ```js
@@ -467,7 +467,7 @@ information.
 
 ### Standalone script example html file
 
-If you are loading the Lightweight Charts library via the standalone script
+If you are loading the Lightweight Charts™ library via the standalone script
 version then you can also load the custom element via a script tag (see above
 section for more info) and construct your html page as follows:
 

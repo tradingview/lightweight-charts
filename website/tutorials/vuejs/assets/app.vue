@@ -12,7 +12,7 @@ import { ref } from 'vue';
 import LWChart from './components/options-api/LWChart.vue';
 
 /**
- * Generates sample data for the lightweight chart
+ * Generates sample data for the Lightweight Charts example
  * @param  {Boolean} ohlc Whether generated dat should include open, high, low, and close values
  * @returns {Array} sample data
  */
