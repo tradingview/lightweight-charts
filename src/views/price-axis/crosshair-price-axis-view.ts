@@ -38,7 +38,7 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 
 		const colors = generateContrastColors(options.labelBackgroundColor);
 		commonRendererData.background = colors.background;
-		commonRendererData.color = colors.foreground;
+		axisRendererData.color = colors.foreground;
 
 		const additionalPadding = 2 / 12 * this._priceScale.fontSize();
 

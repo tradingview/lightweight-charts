@@ -70,7 +70,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			return;
 		}
 
-		const textColor = this._data.color || this._commonData.color;
+		const textColor = this._data.color;
 		const backgroundColor = this._commonData.background;
 
 		const geometry = target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {

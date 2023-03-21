@@ -7,7 +7,6 @@ import { LineWidth } from './draw-line';
 export interface PriceAxisViewRendererCommonData {
 	activeBackground?: string;
 	background: string;
-	color: string;
 	coordinate: number;
 	fixedCoordinate?: number;
 	additionalPaddingTop: number;
