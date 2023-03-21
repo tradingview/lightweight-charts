@@ -17,6 +17,7 @@ import { drawText, hitTestText } from './series-markers-text';
 
 export interface SeriesMarkerText {
 	content: string;
+	x: Coordinate;
 	y: Coordinate;
 	width: number;
 	height: number;
@@ -88,6 +89,7 @@ export class SeriesMarkersRenderer extends MediaCoordinatesPaneRenderer {
 			if (item.text !== undefined) {
 				item.text.width = this._textWidthCache.measureText(ctx, item.text.content);
 				item.text.height = this._fontSize;
+				item.text.x = item.x - item.text.width / 2 as Coordinate;
 			}
 			drawItem(item, ctx);
 		}
@@ -98,7 +100,7 @@ function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContex
 	ctx.fillStyle = item.color;
 
 	if (item.text !== undefined) {
-		drawText(ctx, item.text.content, item.x - item.text.width / 2, item.text.y);
+		drawText(ctx, item.text.content, item.text.x, item.text.y);
 	}
 
 	drawShape(item, ctx);
@@ -128,7 +130,7 @@ function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingConte
 }
 
 function hitTestItem(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coordinate): boolean {
-	if (item.text !== undefined && hitTestText(item.x, item.text.y, item.text.width, item.text.height, x, y)) {
+	if (item.text !== undefined && hitTestText(item.text.x, item.text.y, item.text.width, item.text.height, x, y)) {
 		return true;
 	}
 
