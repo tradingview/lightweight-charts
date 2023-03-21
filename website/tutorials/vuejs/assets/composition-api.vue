@@ -41,7 +41,7 @@ function getChartSeriesConstructorName(type) {
 	return `add${type.charAt(0).toUpperCase() + type.slice(1)}Series`;
 }
 
-// Lightweight Charts instances are stored as normal JS variables
+// Lightweight Charts™ instances are stored as normal JS variables
 // If you need to use a ref then it is recommended that you use `shallowRef` instead
 let series;
 let chart;
