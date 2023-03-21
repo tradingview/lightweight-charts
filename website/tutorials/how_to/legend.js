@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Legend
+// Lightweight Charts™ Example: Legend
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/legends
 
 // remove-end

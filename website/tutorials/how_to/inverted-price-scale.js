@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Inverted Price Scale
+// Lightweight Charts™ Example: Inverted Price Scale
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/inverted-price-scale
 
 // remove-end

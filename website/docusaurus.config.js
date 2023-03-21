@@ -328,7 +328,7 @@ async function getConfig() {
 							],
 						},
 						{
-							title: 'Lightweight Charts Community',
+							title: 'Lightweight Charts™ Community',
 							items: [
 								{
 									label: 'Stack Overflow',

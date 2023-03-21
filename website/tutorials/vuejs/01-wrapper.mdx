@@ -1,7 +1,7 @@
 ---
 title: Vue.js - Wrapper Component
 description:
-  A simple example of how to use Lightweight Charts within the Vue.js framework.
+  A simple example of how to use Lightweight Charts™ within the Vue.js framework.
 pagination_prev: null
 pagination_next: null
 keywords:
@@ -23,7 +23,7 @@ a starting point and could be tweaked further using our extensive
 
 :::
 
-This guide will focus on the key concepts required to get Lightweight Charts
+This guide will focus on the key concepts required to get Lightweight Charts™
 running within a Vue component. Please note this guide is not intended as a
 complete step-by-step tutorial. The example Vue components can be found at the
 [bottom](#complete-sample-code) of this guide.
@@ -44,7 +44,7 @@ The ability to:
 - enable automatic resizing of the chart when the browser is resized.
 
 The example may not fit your requirements completely. Creating a general-purpose
-declarative wrapper for Lightweight Charts' imperative API is a challenge, but
+declarative wrapper for Lightweight Charts™ imperative API is a challenge, but
 hopefully, you can adapt this example to your use case.
 
 ### Component showcase
@@ -76,7 +76,7 @@ The Vue component could be used within any Vue setup, you can learn more on the
 Vue documentation site:
 [Ways of Vue](https://vuejs.org/guide/extras/ways-of-using-vue.html)
 
-## Integrating Lightweight Charts with Vue
+## Integrating Lightweight Charts™ with Vue
 
 ### Avoid using `Refs` for storing API instances
 
@@ -88,7 +88,7 @@ functionality.
 
 When Vue wraps an object in a reference object, it modifies the object (to
 enable reactivity) in such a way that it interferes with the internal logic of
-the Lightweight Chart. This can lead to unexpected behaviour. If you really need
+the Lightweight Charts™. This can lead to unexpected behaviour. If you really need
 to use a [`ref`](https://vuejs.org/api/reactivity-core.html#ref) then please
 consider using
 [`shallowRef`](https://vuejs.org/api/reactivity-advanced.html#shallowref)
@@ -115,7 +115,7 @@ the script.
 
 ### Use the `onMounted` lifecycle hook to create the chart
 
-Lightweight Charts requires an html element to use as its container, you can
+Lightweight Charts™ requires an html element to use as its container, you can
 create a simple div element within the component's `template` and ask Vue to
 create a reference to that element by adding the `ref="chartContainer"`
 attribute to the div element and the corresponding variable within the script
@@ -125,7 +125,7 @@ The ideal time to create the chart is during the `mounted` lifecycle hook
 provided by the Vue component. The container div will be created and ready for
 use at this stage. Within the
 [`onMounted`](https://vuejs.org/api/composition-api-lifecycle.html#onmounted)
-hook we can call Lightweight Charts' [`createChart`](/docs/api#createchart)
+hook we can call Lightweight Charts™ [`createChart`](/docs/api#createchart)
 constructor and pass it the value of the container reference (which is the div
 element).
 
@@ -172,7 +172,7 @@ the saved chart instance.
 
 A simple way to provide customisation of the chart to the component's consumers
 is to create component properties for the options you wish to be customised.
-Lightweight Charts has a variety of customisation options which can be applied
+Lightweight Charts™ has a variety of customisation options which can be applied
 through the [`applyOptions`](/docs/api/interfaces/IChartApi#applyOptions) method
 on an Api instance (such as [IChartApi](/docs/api/interfaces/IChartApi),
 [ISeriesApi](/docs/api/interfaces/ISeriesApi),

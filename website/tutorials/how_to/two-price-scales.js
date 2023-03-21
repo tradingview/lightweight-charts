@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Two Price Scales
+// Lightweight Charts™ Example: Two Price Scales
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/two-price-scales
 
 // remove-end

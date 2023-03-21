@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Magnifier Tooltip
+// Lightweight Charts™ Example: Magnifier Tooltip
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/tooltips
 
 // remove-end

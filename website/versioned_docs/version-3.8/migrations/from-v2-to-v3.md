@@ -1,6 +1,6 @@
 # From v2 to v3
 
-Lightweight charts library 3.0 announces the major improvements: supporting two price scales and improving the time scale API.
+Lightweight Charts™ library 3.0 announces the major improvements: supporting two price scales and improving the time scale API.
 In order of keep the API clear and consistent, we decided to allow breaking change of the API.
 
 In this document you can find the migration guide from the previous version to 3.0.

@@ -1,12 +1,12 @@
 ---
 id: ios
-description: You can use Lightweight Charts inside an iOS application. To use Lightweight Charts in that context, you can use our iOS wrapper, which will allow you to interact with lightweight charts library, which will be rendered in a web view.
+description: You can use Lightweight Charts™ inside an iOS application. To use Lightweight Charts™ in that context, you can use our iOS wrapper, which will allow you to interact with Lightweight Charts™ library, which will be rendered in a web view.
 keywords:
     - charts
     - iOS
     - canvas
     - charting library
-    - charting 
+    - charting
     - html5 charts
     - financial charting library
 sidebar_position: 6
@@ -15,10 +15,10 @@ sidebar_position: 6
 # iOS wrapper
 
 :::note
-You can find the source code of the Lightweight Charts iOS wrapper in [this repository](https://github.com/tradingview/LightweightChartsIOS).
+You can find the source code of the Lightweight Charts™ iOS wrapper in [this repository](https://github.com/tradingview/LightweightChartsIOS).
 :::
 
-You can use Lightweight Charts inside an iOS application. To use Lightweight Charts in that context, you can use our iOS wrapper, which will allow you to interact with lightweight charts library, which will be rendered in a web view.
+You can use Lightweight Charts™ inside an iOS application. To use Lightweight Charts™ in that context, you can use our iOS wrapper, which will allow you to interact with Lightweight Charts™ library, which will be rendered in a web view.
 
 ## Installation
 

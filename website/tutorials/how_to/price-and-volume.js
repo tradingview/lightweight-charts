@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Price and Volume
+// Lightweight Charts™ Example: Price and Volume
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/price-and-volume
 
 // remove-end

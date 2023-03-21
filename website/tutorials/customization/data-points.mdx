@@ -18,7 +18,7 @@ import IterativeGuideWarning from './_iterative-guide-warning-partial.mdx';
 
 In this section, we will modify the candlestick data such that we can individually set the color for each candlestick.
 
-If we take a look at the interface for the candlestick data here: [CandlestickData](/docs/api/interfaces/CandlestickData), we can see a few properties related to color: `color`, `borderColor`, and `wickColor`. Lightweight Charts allows the data points to override the colors specified for series as a whole. In other words, if a datapoint has one of these properties set then it will use that color for that data point instead of the colors used for the rest of the series. We can use this feature to highlight a few key data points in a different color.
+If we take a look at the interface for the candlestick data here: [CandlestickData](/docs/api/interfaces/CandlestickData), we can see a few properties related to color: `color`, `borderColor`, and `wickColor`. Lightweight Charts™ allows the data points to override the colors specified for series as a whole. In other words, if a datapoint has one of these properties set then it will use that color for that data point instead of the colors used for the rest of the series. We can use this feature to highlight a few key data points in a different color.
 
 We are going to change the color of all data points which have a `close` value over `205` to orange. We will use the map higher-order function to go through each data point and either leave it alone if it is below `205` or otherwise add the `color` and `wickColor` properties (set to 'orange'). We don't need to set the `borderColor` because we disabled that in an earlier step.
 

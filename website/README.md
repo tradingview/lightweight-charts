@@ -1,6 +1,6 @@
-# Lightweight Charts Documentation Website
+# Lightweight Charts™ Documentation Website
 
-The source of the documentation website for Lightweight Charts. This website is built using [Docusaurus 2](https://v2.docusaurus.io/).
+The source of the documentation website for Lightweight Charts™. This website is built using [Docusaurus 2](https://v2.docusaurus.io/).
 
 The aim of this documentation is to make using the library frictionless.
 

@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Tracking Tooltip
+// Lightweight Charts™ Example: Tracking Tooltip
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/tooltips
 
 // remove-end

@@ -188,8 +188,8 @@ const codeBlocks: CodeBlockProps[] = [
 	},
 ];
 
-const header = 'Lightweight Charts Documentation';
-const paragraph = `Lightweight Charts is a library for creating interactive financial charts. This documentation site provides all the information needed to get started with Lightweight Charts and help you make the most of its features.`;
+const header = 'Lightweight Charts™ Documentation';
+const paragraph = `Lightweight Charts™ is a library for creating interactive financial charts. This documentation site provides all the information needed to get started with Lightweight Charts™ and help you make the most of its features.`;
 
 const showBanner = true;
 
@@ -198,7 +198,7 @@ function Index(): JSX.Element {
 		<>
 			{showBanner ? (
 				<Banner
-					text="Big news! Version 4.0 of Lightweight Charts is now available"
+					text="Big news! Version 4.0 of Lightweight Charts™ is now available"
 					link="https://github.com/tradingview/lightweight-charts/releases/tag/v4.0.0"
 					linkText="Read more"
 				/>

@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**Lightweight Charts Version:** <!-- 1.0.0 -->
+**Lightweight Charts™ Version:** <!-- 1.0.0 -->
 
 **Steps/code to reproduce:**
 
