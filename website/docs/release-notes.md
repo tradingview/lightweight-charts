@@ -31,7 +31,7 @@ sidebar_position: 8
 - Auto contrast text color for crosshair labels. [#1309](https://github.com/tradingview/lightweight-charts/issues/1309) [#1310](https://github.com/tradingview/lightweight-charts/issues/1310)
 - Hit box from the text of marker incorrectly shifted to the right. [#1270](https://github.com/tradingview/lightweight-charts/issues/1270) [#1305](https://github.com/tradingview/lightweight-charts/issues/1305)
 
-As always, we thank you for your support and help in making Lightweight Charts the best product on the financial web. And a big shout out to our hero contributors [@victorbrambati](https://github.com/victorbrambati), and [@UcheAzubuko](https://github.com/UcheAzubuko)!
+As always, we thank you for your support and help in making Lightweight Charts™ the best product on the financial web. And a big shout out to our hero contributors [@victorbrambati](https://github.com/victorbrambati), and [@UcheAzubuko](https://github.com/UcheAzubuko)!
 
 You can always send us your feedback via GitHub.
 
