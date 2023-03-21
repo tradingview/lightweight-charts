@@ -36,7 +36,7 @@ There are several included e2e tests available which can be run individually. Pl
 ## Deploying a new version
 
 1. Update any documentation pages which refer to a specific version. For example, the `Android` and `iOS` pages.
-1. Run `npm run docusaurus docs:version MAJ:MIN` in `website` folder to create new versioned docs.
+1. Run `npm run docusaurus docs:version MAJ.MIN` in `website` folder to create new versioned docs.
   Note that there is not patch version in docs, only major and minor parts.
 1. (optional) Remove docs for the oldest version (see <https://docusaurus.io/docs/versioning#deleting-an-existing-version>).
 1. Handle the new version in `import-lightweight-charts-version.ts`: add a package reference for that version to `website/package.json` (e.g. `"lightweight-charts-MAJ.MIN": "npm:lightweight-charts@~MAJ.MIN.0"`) and a import of that package in a matching case statement.
