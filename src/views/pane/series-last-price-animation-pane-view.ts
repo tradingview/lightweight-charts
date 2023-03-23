@@ -119,8 +119,8 @@ function animationData(durationSinceStart: number, lineColor: string): Animation
 	};
 }
 
-export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
-	private readonly _series: Series<'Area'> | Series<'Line'> | Series<'Baseline'>;
+export class SeriesLastPriceAnimationPaneView<HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+	private readonly _series: Series<'Area', HorzScaleItem> | Series<'Line', HorzScaleItem> | Series<'Baseline', HorzScaleItem>;
 	private readonly _renderer: SeriesLastPriceAnimationRenderer = new SeriesLastPriceAnimationRenderer();
 	private _invalidated: boolean = true;
 	private _stageInvalidated: boolean = true;
@@ -128,7 +128,7 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 	private _startTime: number = performance.now();
 	private _endTime: number = this._startTime - 1;
 
-	public constructor(series: Series<'Area'> | Series<'Line'> | Series<'Baseline'>) {
+	public constructor(series: Series<'Area', HorzScaleItem> | Series<'Line', HorzScaleItem> | Series<'Baseline', HorzScaleItem>) {
 		this._series = series;
 	}
 

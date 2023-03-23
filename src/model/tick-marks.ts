@@ -1,25 +1,32 @@
 import { lowerbound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
-import { OriginalTime, TickMarkWeight, TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
+import { InternalHorzScaleItem } from './ihorz-scale-behavior';
+import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from './time-data';
 
-export interface TickMark {
+export interface TickMark<HorzScaleItem> {
 	index: TimePointIndex;
-	time: TimePoint;
-	weight: TickMarkWeight;
-	originalTime: OriginalTime;
+	time: InternalHorzScaleItem;
+	weight: TickMarkWeightValue;
+	originalTime: HorzScaleItem;
 }
 
-interface MarksCache {
+interface MarksCache<HorzScaleItem> {
 	maxIndexesPerMark: number;
-	marks: readonly TickMark[];
+	marks: readonly TickMark<HorzScaleItem>[];
 }
 
-export class TickMarks {
-	private _marksByWeight: Map<TickMarkWeight, TickMark[]> = new Map();
-	private _cache: MarksCache | null = null;
+export class TickMarks<HorzScaleItem> {
+	private _marksByWeight: Map<TickMarkWeightValue, TickMark<HorzScaleItem>[]> = new Map();
+	private _cache: MarksCache<HorzScaleItem> | null = null;
+	private _uniformDistribution: boolean = false;
 
-	public setTimeScalePoints(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
+	public setUniformDistribution(val: boolean): void {
+		this._uniformDistribution = val;
+		this._cache = null;
+	}
+
+	public setTimeScalePoints(newPoints: readonly TimeScalePoint<HorzScaleItem>[], firstChangedPointIndex: number): void {
 		this._removeMarksSinceIndex(firstChangedPointIndex);
 
 		this._cache = null;
@@ -41,7 +48,7 @@ export class TickMarks {
 		}
 	}
 
-	public build(spacing: number, maxWidth: number): readonly TickMark[] {
+	public build(spacing: number, maxWidth: number): readonly TickMark<HorzScaleItem>[] {
 		const maxIndexesPerMark = Math.ceil(maxWidth / spacing);
 		if (this._cache === null || this._cache.maxIndexesPerMark !== maxIndexesPerMark) {
 			this._cache = {
@@ -59,14 +66,14 @@ export class TickMarks {
 			return;
 		}
 
-		const weightsToClear: TickMarkWeight[] = [];
+		const weightsToClear: TickMarkWeightValue[] = [];
 
-		this._marksByWeight.forEach((marks: TickMark[], timeWeight: number) => {
+		this._marksByWeight.forEach((marks: TickMark<HorzScaleItem>[], timeWeight: TickMarkWeightValue) => {
 			if (sinceIndex <= marks[0].index) {
 				weightsToClear.push(timeWeight);
 			} else {
 				marks.splice(
-					lowerbound(marks, sinceIndex, (tm: TickMark) => tm.index < sinceIndex),
+					lowerbound(marks, sinceIndex, (tm: TickMark<HorzScaleItem>) => tm.index < sinceIndex),
 					Infinity
 				);
 			}
@@ -77,8 +84,8 @@ export class TickMarks {
 		}
 	}
 
-	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark[] {
-		let marks: TickMark[] = [];
+	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark<HorzScaleItem>[] {
+		let marks: TickMark<HorzScaleItem>[] = [];
 
 		for (const weight of Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a)) {
 			if (!this._marksByWeight.get(weight)) {
@@ -120,6 +127,10 @@ export class TickMarks {
 					// TickMark fits. Place it into new array
 					marks.push(mark);
 					leftIndex = currentIndex;
+				} else {
+					if (this._uniformDistribution) {
+						return prevMarks;
+					}
 				}
 			}
 

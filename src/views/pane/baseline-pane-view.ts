@@ -9,17 +9,17 @@ import { CompositeRenderer } from '../../renderers/composite-renderer';
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', BaselineFillItem & BaselineStrokeItem, CompositeRenderer> {
+export class SeriesBaselinePaneView<HorzScaleItem> extends LinePaneViewBase<'Baseline', BaselineFillItem & BaselineStrokeItem, CompositeRenderer, HorzScaleItem> {
 	protected readonly _renderer: CompositeRenderer = new CompositeRenderer();
 	private readonly _baselineAreaRenderer: PaneRendererBaselineArea = new PaneRendererBaselineArea();
 	private readonly _baselineLineRenderer: PaneRendererBaselineLine = new PaneRendererBaselineLine();
 
-	public constructor(series: Series<'Baseline'>, model: ChartModel) {
+	public constructor(series: Series<'Baseline', HorzScaleItem>, model: ChartModel<HorzScaleItem>) {
 		super(series, model);
 		this._renderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
 	}
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Baseline', HorzScaleItem>): BaselineFillItem & BaselineStrokeItem {
 		return {
 			...this._createRawItemBase(time, price),
 			...colorer.barStyle(time),

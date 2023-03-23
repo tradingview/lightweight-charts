@@ -5,6 +5,7 @@ import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
@@ -15,12 +16,11 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Logical, OriginalTime, Range, Time, TimePoint, TimePointIndex } from '../model/time-data';
+import { Logical, Range, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
-import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IPriceLine } from './iprice-line';
@@ -29,16 +29,19 @@ import { BarsInfo, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
-export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType> {
-	protected _series: Series<TSeriesType>;
-	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>;
+export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements ISeriesApi<TSeriesType, HorzScaleItem> {
+	protected _series: Series<TSeriesType, HorzScaleItem>;
+	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>;
 
-	private readonly _priceScaleApiProvider: IPriceScaleApiProvider;
+	private readonly _priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>;
 
-	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>, priceScaleApiProvider: IPriceScaleApiProvider) {
+	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
+
+	public constructor(series: Series<TSeriesType, HorzScaleItem>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>, priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
 		this._priceScaleApiProvider = priceScaleApiProvider;
+		this._horzScaleBehavior = horzScaleBehavior;
 	}
 
 	public priceFormatter(): IPriceFormatter {
@@ -63,7 +66,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	// eslint-disable-next-line complexity
-	public barsInLogicalRange(range: Range<number> | null): BarsInfo | null {
+	public barsInLogicalRange(range: Range<number> | null): BarsInfo<HorzScaleItem> | null {
 		if (range === null) {
 			return null;
 		}
@@ -103,57 +106,59 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 			? dataLastIndex - range.to
 			: dataLastIndex - dataLastBarInRange.index;
 
-		const result: BarsInfo = { barsBefore, barsAfter };
+		const result: BarsInfo<HorzScaleItem> = { barsBefore, barsAfter };
 
 		// actually they can't exist separately
 		if (dataFirstBarInRange !== null && dataLastBarInRange !== null) {
-			result.from = dataFirstBarInRange.time.businessDay || dataFirstBarInRange.time.timestamp;
-			result.to = dataLastBarInRange.time.businessDay || dataLastBarInRange.time.timestamp;
+			// result.from = dataFirstBarInRange.time.businessDay || dataFirstBarInRange.time.timestamp;
+			// result.to = dataLastBarInRange.time.businessDay || dataLastBarInRange.time.timestamp;
+			result.from = this._horzScaleBehavior.convertInternalToHorzItem(dataFirstBarInRange.time);
+			result.to = this._horzScaleBehavior.convertInternalToHorzItem(dataLastBarInRange.time);
 		}
 
 		return result;
 	}
 
-	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {
-		checkItemsAreOrdered(data);
+	public setData(data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): void {
+		checkItemsAreOrdered(data, this._horzScaleBehavior);
 		checkSeriesValuesType(this._series.seriesType(), data);
 
 		this._dataUpdatesConsumer.applyNewData(this._series, data);
 	}
 
-	public update(bar: SeriesDataItemTypeMap[TSeriesType]): void {
+	public update(bar: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void {
 		checkSeriesValuesType(this._series.seriesType(), [bar]);
 
 		this._dataUpdatesConsumer.updateData(this._series, bar);
 	}
 
-	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null {
+	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType] | null {
 		const data = this._series.bars().search(logicalIndex as unknown as TimePointIndex, mismatchDirection);
 		if (data === null) {
 			// actually it can be a whitespace
 			return null;
 		}
 
-		return getSeriesDataCreator(this.seriesType())(data);
+		return getSeriesDataCreator<TSeriesType, HorzScaleItem>(this.seriesType())(data);
 	}
 
-	public setMarkers(data: SeriesMarker<Time>[]): void {
-		checkItemsAreOrdered(data, true);
+	public setMarkers(data: SeriesMarker<HorzScaleItem, HorzScaleItem>[]): void {
+		checkItemsAreOrdered(data, this._horzScaleBehavior, true);
 
-		const convertedMarkers = data.map<SeriesMarker<TimePoint>>((marker: SeriesMarker<Time>) => ({
-			...marker,
-			originalTime: marker.time as unknown as OriginalTime,
-			time: convertTime(marker.time),
+		const convertedMarkers = data.map<SeriesMarker<InternalHorzScaleItem, HorzScaleItem>>((marker: SeriesMarker<HorzScaleItem, HorzScaleItem>) => ({
+			...marker as Omit<SeriesMarker<HorzScaleItem, HorzScaleItem>, 'time'>,
+			originalTime: marker.time,
+			time: this._horzScaleBehavior.convertHorzItemToInternal(marker.time),
 		}));
 		this._series.setMarkers(convertedMarkers);
 	}
 
-	public markers(): SeriesMarker<Time>[] {
-		return this._series.markers().map<SeriesMarker<Time>>((internalItem: SeriesMarker<TimePoint>) => {
-			const { originalTime, time, ...item } = internalItem;
+	public markers(): SeriesMarker<HorzScaleItem, HorzScaleItem>[] {
+		return this._series.markers().map<SeriesMarker<HorzScaleItem, HorzScaleItem>>((internalItem: SeriesMarker<InternalHorzScaleItem, HorzScaleItem>) => {
+			const { time, ...item } = internalItem;
 			return {
-				time: originalTime as unknown as Time,
-				...item as Omit<SeriesMarker<TimePoint>, 'time' | 'originalTIme'>,
+				time: item.originalTime,
+				...item as Omit<SeriesMarker<HorzScaleItem, HorzScaleItem>, 'time' | 'originalTIme'>,
 			};
 		});
 	}
@@ -179,7 +184,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	}
 
 	public removePriceLine(line: IPriceLine): void {
-		this._series.removePriceLine((line as PriceLine).priceLine());
+		this._series.removePriceLine((line as PriceLine<HorzScaleItem>).priceLine());
 	}
 
 	public seriesType(): TSeriesType {

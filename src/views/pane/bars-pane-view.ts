@@ -1,5 +1,6 @@
 import { SeriesBarColorer } from '../../model/series-bar-colorer';
 import { SeriesPlotRow } from '../../model/series-data';
+import { SeriesType } from '../../model/series-options';
 import { TimePointIndex } from '../../model/time-data';
 import {
 	BarItem,
@@ -8,10 +9,10 @@ import {
 
 import { BarsPaneViewBase } from './bars-pane-view-base';
 
-export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem, PaneRendererBars> {
+export class SeriesBarsPaneView<HorzScaleItem> extends BarsPaneViewBase<'Bar', BarItem, PaneRendererBars, HorzScaleItem> {
 	protected readonly _renderer: PaneRendererBars = new PaneRendererBars();
 
-	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<'Bar'>): BarItem {
+	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow<SeriesType, HorzScaleItem>, colorer: SeriesBarColorer<'Bar', HorzScaleItem>): BarItem {
 		return {
 			...this._createDefaultItem(time, bar, colorer),
 			...colorer.barStyle(time),

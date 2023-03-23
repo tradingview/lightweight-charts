@@ -1,15 +1,14 @@
 import { PriceFormatterFn } from './price-formatter-fn';
-import { Time } from './time-data';
 
 /**
  * A custom function used to override formatting of a time to a string.
  */
-export type TimeFormatterFn = (time: Time) => string;
+export type TimeFormatterFn<HorzScaleItem> = (time: HorzScaleItem) => string;
 
 /**
  * Represents options for formatting dates, times, and prices according to a locale.
  */
-export interface LocalizationOptions {
+export interface LocalizationOptions<HorzScaleItem> {
 	/**
 	 * Current locale used to format dates. Uses the browser's language settings by default.
 	 *
@@ -31,7 +30,7 @@ export interface LocalizationOptions {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	timeFormatter?: TimeFormatterFn;
+	timeFormatter?: TimeFormatterFn<HorzScaleItem>;
 
 	/**
 	 * Date formatting string.

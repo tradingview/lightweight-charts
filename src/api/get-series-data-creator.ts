@@ -8,7 +8,6 @@ import {
 	SeriesPlotRow,
 } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
-import { Time } from '../model/time-data';
 
 import {
 	AreaData,
@@ -21,19 +20,19 @@ import {
 	SingleValueData,
 } from './data-consumer';
 
-type SeriesPlotRowToDataMap = {
-	[T in keyof SeriesDataItemTypeMap]: (plotRow: SeriesPlotRow) => SeriesDataItemTypeMap[T];
+type SeriesPlotRowToDataMap<HorzScaleItem> = {
+	[T in keyof SeriesDataItemTypeMap<HorzScaleItem>]: (plotRow: SeriesPlotRow<T, HorzScaleItem>) => SeriesDataItemTypeMap<HorzScaleItem>[T];
 };
 
-function singleValueData(plotRow: PlotRow): SingleValueData {
+function singleValueData<HorzScaleItem>(plotRow: PlotRow<HorzScaleItem>): SingleValueData<HorzScaleItem> {
 	return {
 		value: plotRow.value[PlotRowValueIndex.Close],
-		time: plotRow.originalTime as unknown as Time,
+		time: plotRow.originalTime as unknown as HorzScaleItem,
 	};
 }
 
-function lineData(plotRow: LinePlotRow): LineData {
-	const result: LineData = singleValueData(plotRow);
+function lineData<HorzScaleItem>(plotRow: LinePlotRow<HorzScaleItem>): LineData<HorzScaleItem> {
+	const result: LineData<HorzScaleItem> = singleValueData(plotRow);
 
 	if (plotRow.color !== undefined) {
 		result.color = plotRow.color;
@@ -42,8 +41,8 @@ function lineData(plotRow: LinePlotRow): LineData {
 	return result;
 }
 
-function areaData(plotRow: AreaPlotRow): AreaData {
-	const result: AreaData = singleValueData(plotRow);
+function areaData<HorzScaleItem>(plotRow: AreaPlotRow<HorzScaleItem>): AreaData<HorzScaleItem> {
+	const result: AreaData<HorzScaleItem> = singleValueData(plotRow);
 
 	if (plotRow.lineColor !== undefined) {
 		result.lineColor = plotRow.lineColor;
@@ -60,8 +59,8 @@ function areaData(plotRow: AreaPlotRow): AreaData {
 	return result;
 }
 
-function baselineData(plotRow: BaselinePlotRow): BaselineData {
-	const result: BaselineData = singleValueData(plotRow);
+function baselineData<HorzScaleItem>(plotRow: BaselinePlotRow<HorzScaleItem>): BaselineData<HorzScaleItem> {
+	const result: BaselineData<HorzScaleItem> = singleValueData(plotRow);
 
 	if (plotRow.topLineColor !== undefined) {
 		result.topLineColor = plotRow.topLineColor;
@@ -90,18 +89,18 @@ function baselineData(plotRow: BaselinePlotRow): BaselineData {
 	return result;
 }
 
-function ohlcData(plotRow: PlotRow): OhlcData {
+function ohlcData<HorzScaleItem>(plotRow: PlotRow<HorzScaleItem>): OhlcData<HorzScaleItem> {
 	return {
 		open: plotRow.value[PlotRowValueIndex.Open],
 		high: plotRow.value[PlotRowValueIndex.High],
 		low: plotRow.value[PlotRowValueIndex.Low],
 		close: plotRow.value[PlotRowValueIndex.Close],
-		time: plotRow.originalTime as unknown as Time,
+		time: plotRow.originalTime as unknown as HorzScaleItem,
 	};
 }
 
-function barData(plotRow: BarPlotRow): BarData {
-	const result: BarData = ohlcData(plotRow);
+function barData<HorzScaleItem>(plotRow: BarPlotRow<HorzScaleItem>): BarData<HorzScaleItem> {
+	const result: BarData<HorzScaleItem> = ohlcData(plotRow);
 
 	if (plotRow.color !== undefined) {
 		result.color = plotRow.color;
@@ -110,8 +109,8 @@ function barData(plotRow: BarPlotRow): BarData {
 	return result;
 }
 
-function candlestickData(plotRow: CandlestickPlotRow): CandlestickData {
-	const result: CandlestickData = ohlcData(plotRow);
+function candlestickData<HorzScaleItem>(plotRow: CandlestickPlotRow<HorzScaleItem>): CandlestickData<HorzScaleItem> {
+	const result: CandlestickData<HorzScaleItem> = ohlcData(plotRow);
 	const { color, borderColor, wickColor } = plotRow;
 
 	if (color !== undefined) {
@@ -129,15 +128,15 @@ function candlestickData(plotRow: CandlestickPlotRow): CandlestickData {
 	return result;
 }
 
-const seriesPlotRowToDataMap: SeriesPlotRowToDataMap = {
-	Area: areaData,
-	Line: lineData,
-	Baseline: baselineData,
-	Histogram: lineData,
-	Bar: barData,
-	Candlestick: candlestickData,
-};
+export function getSeriesDataCreator<TSeriesType extends SeriesType, HorzScaleItem>(seriesType: TSeriesType): (plotRow: SeriesPlotRow<TSeriesType, HorzScaleItem>) => SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType] {
+	const seriesPlotRowToDataMap: SeriesPlotRowToDataMap<HorzScaleItem> = {
+		Area: areaData<HorzScaleItem>,
+		Line: lineData<HorzScaleItem>,
+		Baseline: baselineData<HorzScaleItem>,
+		Histogram: lineData<HorzScaleItem>,
+		Bar: barData,
+		Candlestick: candlestickData,
+	};
 
-export function getSeriesDataCreator<TSeriesType extends SeriesType>(seriesType: TSeriesType): (plotRow: SeriesPlotRow<TSeriesType>) => SeriesDataItemTypeMap[TSeriesType] {
 	return seriesPlotRowToDataMap[seriesType];
 }

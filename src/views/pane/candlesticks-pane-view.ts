@@ -8,10 +8,10 @@ import {
 
 import { BarsPaneViewBase } from './bars-pane-view-base';
 
-export class SeriesCandlesticksPaneView extends BarsPaneViewBase<'Candlestick', CandlestickItem, PaneRendererCandlesticks> {
+export class SeriesCandlesticksPaneView<HorzScaleItem> extends BarsPaneViewBase<'Candlestick', CandlestickItem, PaneRendererCandlesticks, HorzScaleItem> {
 	protected readonly _renderer: PaneRendererCandlesticks = new PaneRendererCandlesticks();
 
-	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<'Candlestick'>): CandlestickItem {
+	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow<'Candlestick', HorzScaleItem>, colorer: SeriesBarColorer<'Candlestick', HorzScaleItem>): CandlestickItem {
 		return {
 			...this._createDefaultItem(time, bar, colorer),
 			...colorer.barStyle(time),

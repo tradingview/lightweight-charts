@@ -37,7 +37,7 @@ const CHUNK_SIZE = 30;
  * PlotList is an array of plot rows
  * each plot row consists of key (index in timescale) and plot value map
  */
-export class PlotList<PlotRowType extends PlotRow = PlotRow> {
+export class PlotList<HorzScaleItem, PlotRowType extends PlotRow<HorzScaleItem> = PlotRow<HorzScaleItem>> {
 	private _items: readonly PlotRowType[] = [];
 	private _minMaxCache: Map<PlotRowValueIndex, Map<number, MinMax | null>> = new Map();
 	private _rowSearchCache: Map<TimePointIndex, Map<MismatchDirection, PlotRowType>> = new Map();

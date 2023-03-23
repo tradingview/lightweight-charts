@@ -5,10 +5,10 @@ import { LineStrokeItem, PaneRendererLine, PaneRendererLineData } from '../../re
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineStrokeItem, PaneRendererLine> {
+export class SeriesLinePaneView<HorzScaleItem> extends LinePaneViewBase<'Line', LineStrokeItem, PaneRendererLine, HorzScaleItem> {
 	protected readonly _renderer: PaneRendererLine = new PaneRendererLine();
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Line'>): LineStrokeItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Line', HorzScaleItem>): LineStrokeItem {
 		return {
 			...this._createRawItemBase(time, price),
 			...colorer.barStyle(time),

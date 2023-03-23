@@ -51,28 +51,28 @@ function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D
 	renderer.draw(target, isHovered, hitTestData);
 }
 
-type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
+type PaneViewsGetter<HorzScaleItem> = (source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>) => readonly IPaneView<HorzScaleItem>[];
 
-function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+function sourcePaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
 	return source.paneViews(pane);
 }
 
-function sourceLabelPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+function sourceLabelPaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
 	return source.labelPaneViews(pane);
 }
 
-function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+function sourceTopPaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
 	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
 }
 
-export interface HitTestResult {
-	source: IPriceDataSource;
+export interface HitTestResult<HorzScaleItem> {
+	source: IPriceDataSource<HorzScaleItem>;
 	object?: HoveredObject;
-	view: IPaneView;
+	view: IPaneView<HorzScaleItem>;
 }
 
-interface HitTestPaneViewResult {
-	view: IPaneView;
+interface HitTestPaneViewResult<HorzScaleItem> {
+	view: IPaneView<HorzScaleItem>;
 	object?: HoveredObject;
 }
 
@@ -82,12 +82,12 @@ interface StartScrollPosition extends Point {
 	localY: Coordinate;
 }
 
-export class PaneWidget implements IDestroyable, MouseEventHandlers {
-	private readonly _chart: ChartWidget;
-	private _state: Pane | null;
+export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandlers {
+	private readonly _chart: ChartWidget<HorzScaleItem>;
+	private _state: Pane<HorzScaleItem> | null;
 	private _size: Size = size({ width: 0, height: 0 });
-	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
-	private _rightPriceAxisWidget: PriceAxisWidget | null = null;
+	private _leftPriceAxisWidget: PriceAxisWidget<HorzScaleItem> | null = null;
+	private _rightPriceAxisWidget: PriceAxisWidget<HorzScaleItem> | null = null;
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
@@ -108,7 +108,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _isSettingSize: boolean = false;
 
-	public constructor(chart: ChartWidget, state: Pane) {
+	public constructor(chart: ChartWidget<HorzScaleItem>, state: Pane<HorzScaleItem>) {
 		this._chart = chart;
 
 		this._state = state;
@@ -185,11 +185,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._mouseEventHandler.destroy();
 	}
 
-	public state(): Pane {
+	public state(): Pane<HorzScaleItem> {
 		return ensureNotNull(this._state);
 	}
 
-	public setState(pane: Pane | null): void {
+	public setState(pane: Pane<HorzScaleItem> | null): void {
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
 		}
@@ -203,7 +203,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this.updatePriceAxisWidgetsStates();
 	}
 
-	public chart(): ChartWidget {
+	public chart(): ChartWidget<HorzScaleItem> {
 		return this._chart;
 	}
 
@@ -391,7 +391,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._endScroll(event);
 	}
 
-	public hitTest(x: Coordinate, y: Coordinate): HitTestResult | null {
+	public hitTest(x: Coordinate, y: Coordinate): HitTestResult<HorzScaleItem> | null {
 		const state = this._state;
 		if (state === null) {
 			return null;
@@ -512,11 +512,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	public leftPriceAxisWidget(): PriceAxisWidget | null {
+	public leftPriceAxisWidget(): PriceAxisWidget<HorzScaleItem> | null {
 		return this._leftPriceAxisWidget;
 	}
 
-	public rightPriceAxisWidget(): PriceAxisWidget | null {
+	public rightPriceAxisWidget(): PriceAxisWidget<HorzScaleItem> | null {
 		return this._rightPriceAxisWidget;
 	}
 
@@ -569,7 +569,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: PaneViewsGetter): void {
+	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: PaneViewsGetter<HorzScaleItem>): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
@@ -584,9 +584,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _drawSourceImpl(
 		target: CanvasRenderingTarget2D,
-		paneViewsGetter: PaneViewsGetter,
+		paneViewsGetter: PaneViewsGetter<HorzScaleItem>,
 		drawFn: DrawFunction,
-		source: IDataSource
+		source: IDataSource<HorzScaleItem>
 	): void {
 		const state = ensureNotNull(this._state);
 		const paneViews = paneViewsGetter(source, state);
@@ -604,7 +604,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 	}
 
-	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
+	private _hitTestPaneView(paneViews: readonly IPaneView<HorzScaleItem>[], x: Coordinate, y: Coordinate): HitTestPaneViewResult<HorzScaleItem> | null {
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer();
 			if (renderer !== null && renderer.hitTest) {
@@ -684,7 +684,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
 	}
 
-	private _model(): ChartModel {
+	private _model(): ChartModel<HorzScaleItem> {
 		return this._chart.model();
 	}
 

@@ -6,14 +6,14 @@ import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../.
 
 import { PriceAxisView } from './price-axis-view';
 
-export type CrosshairPriceAxisViewValueProvider = (priceScale: PriceScale) => CrosshairPriceAndCoordinate;
+export type CrosshairPriceAxisViewValueProvider<HorzScaleItem> = (priceScale: PriceScale<HorzScaleItem>) => CrosshairPriceAndCoordinate;
 
-export class CrosshairPriceAxisView extends PriceAxisView {
-	private _source: Crosshair;
-	private readonly _priceScale: PriceScale;
-	private readonly _valueProvider: CrosshairPriceAxisViewValueProvider;
+export class CrosshairPriceAxisView<HorzScaleItem> extends PriceAxisView<HorzScaleItem> {
+	private _source: Crosshair<HorzScaleItem>;
+	private readonly _priceScale: PriceScale<HorzScaleItem>;
+	private readonly _valueProvider: CrosshairPriceAxisViewValueProvider<HorzScaleItem>;
 
-	public constructor(source: Crosshair, priceScale: PriceScale, valueProvider: CrosshairPriceAxisViewValueProvider) {
+	public constructor(source: Crosshair<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>, valueProvider: CrosshairPriceAxisViewValueProvider<HorzScaleItem>) {
 		super();
 		this._source = source;
 		this._priceScale = priceScale;

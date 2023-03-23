@@ -9,17 +9,17 @@ import { LineStrokeItem, PaneRendererLine } from '../../renderers/line-renderer'
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & LineStrokeItem, CompositeRenderer> {
+export class SeriesAreaPaneView<HorzScaleItem> extends LinePaneViewBase<'Area', AreaFillItem & LineStrokeItem, CompositeRenderer, HorzScaleItem> {
 	protected readonly _renderer: CompositeRenderer = new CompositeRenderer();
 	private readonly _areaRenderer: PaneRendererArea = new PaneRendererArea();
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 
-	public constructor(series: Series<'Area'>, model: ChartModel) {
+	public constructor(series: Series<'Area', HorzScaleItem>, model: ChartModel<HorzScaleItem>) {
 		super(series, model);
 		this._renderer.setRenderers([this._areaRenderer, this._lineRenderer]);
 	}
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Area'>): AreaFillItem & LineStrokeItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Area', HorzScaleItem>): AreaFillItem & LineStrokeItem {
 		return {
 			...this._createRawItemBase(time, price),
 			...colorer.barStyle(time),

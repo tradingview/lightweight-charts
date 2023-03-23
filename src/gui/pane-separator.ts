@@ -7,14 +7,14 @@ import { PaneWidget } from './pane-widget';
 
 export const SEPARATOR_HEIGHT = 1;
 
-export class PaneSeparator implements IDestroyable {
-	private readonly _chartWidget: ChartWidget;
+export class PaneSeparator<HorzScaleItem> implements IDestroyable {
+	private readonly _chartWidget: ChartWidget<HorzScaleItem>;
 	private readonly _rowElement: HTMLTableRowElement;
 	private readonly _cell: HTMLTableCellElement;
 	private readonly _handle: HTMLDivElement | null;
 	private readonly _mouseEventHandler: MouseEventHandler | null;
-	private readonly _paneA: PaneWidget;
-	private readonly _paneB: PaneWidget;
+	private readonly _paneA: PaneWidget<HorzScaleItem>;
+	private readonly _paneB: PaneWidget<HorzScaleItem>;
 
 	private _startY: number = 0;
 	private _deltaY: number = 0;
@@ -24,7 +24,7 @@ export class PaneSeparator implements IDestroyable {
 	private _maxPaneHeight: number = 0;
 	private _pixelStretchFactor: number = 0;
 
-	public constructor(chartWidget: ChartWidget, topPaneIndex: number, bottomPaneIndex: number, disableResize: boolean) {
+	public constructor(chartWidget: ChartWidget<HorzScaleItem>, topPaneIndex: number, bottomPaneIndex: number, disableResize: boolean) {
 		this._chartWidget = chartWidget;
 		this._paneA = chartWidget.paneWidgets()[topPaneIndex];
 		this._paneB = chartWidget.paneWidgets()[bottomPaneIndex];

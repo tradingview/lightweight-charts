@@ -29,6 +29,7 @@ import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
+import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { FirstValue } from './iprice-data-source';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
@@ -49,7 +50,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from './series-options';
-import { TimePoint, TimePointIndex } from './time-data';
+import { TimePointIndex } from './time-data';
 
 export interface LastValueDataResultWithoutData {
 	noData: true;
@@ -94,25 +95,25 @@ export interface SeriesUpdateInfo {
 export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
 export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
 
-export class Series<T extends SeriesType = SeriesType> extends PriceDataSource implements IDestroyable {
+export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource<HorzScaleItem> implements IDestroyable {
 	private readonly _seriesType: T;
-	private _data: SeriesPlotList<T> = createSeriesPlotList();
-	private readonly _priceAxisViews: IPriceAxisView[];
-	private readonly _panePriceAxisView: PanePriceAxisView;
+	private _data: SeriesPlotList<T, HorzScaleItem> = createSeriesPlotList<T, HorzScaleItem>();
+	private readonly _priceAxisViews: IPriceAxisView<HorzScaleItem>[];
+	private readonly _panePriceAxisView: PanePriceAxisView<HorzScaleItem>;
 	private _formatter!: IPriceFormatter;
-	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
-	private readonly _customPriceLines: CustomPriceLine[] = [];
-	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
-	private _paneView!: IUpdatablePaneView;
-	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView | null = null;
-	private _barColorerCache: SeriesBarColorer<T> | null = null;
+	private readonly _priceLineView: SeriesPriceLinePaneView<HorzScaleItem> = new SeriesPriceLinePaneView(this);
+	private readonly _customPriceLines: CustomPriceLine<HorzScaleItem>[] = [];
+	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView<HorzScaleItem> = new SeriesHorizontalBaseLinePaneView(this);
+	private _paneView!: IUpdatablePaneView<HorzScaleItem>;
+	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView<HorzScaleItem> | null = null;
+	private _barColorerCache: SeriesBarColorer<T, HorzScaleItem> | null = null;
 	private readonly _options: SeriesOptionsInternal<T>;
-	private _markers: readonly SeriesMarker<TimePoint>[] = [];
-	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
-	private _markersPaneView!: SeriesMarkersPaneView;
+	private _markers: readonly SeriesMarker<InternalHorzScaleItem, HorzScaleItem>[] = [];
+	private _indexedMarkers: InternalSeriesMarker<TimePointIndex, HorzScaleItem>[] = [];
+	private _markersPaneView!: SeriesMarkersPaneView<HorzScaleItem>;
 	private _animationTimeoutId: TimerId | null = null;
 
-	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T) {
+	public constructor(model: ChartModel<HorzScaleItem>, options: SeriesOptionsInternal<T>, seriesType: T) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
@@ -123,7 +124,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._panePriceAxisView = new PanePriceAxisView(priceAxisView, this, model);
 
 		if (seriesType === 'Area' || seriesType === 'Line' || seriesType === 'Baseline') {
-			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'> | Series<'Baseline'>);
+			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area', HorzScaleItem> | Series<'Line', HorzScaleItem> | Series<'Baseline', HorzScaleItem>);
 		}
 
 		this._recreateFormatter();
@@ -158,7 +159,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		// find range of bars inside range
 		// TODO: make it more optimal
-		let bar: SeriesPlotRow<T> | null;
+		let bar: SeriesPlotRow<T, HorzScaleItem> | null;
 		let lastIndex: TimePointIndex;
 		if (globalLast) {
 			const lastBar = this._data.last();
@@ -198,7 +199,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		};
 	}
 
-	public barColorer(): SeriesBarColorer<T> {
+	public barColorer(): SeriesBarColorer<T, HorzScaleItem> {
 		if (this._barColorerCache !== null) {
 			return this._barColorerCache;
 		}
@@ -238,7 +239,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._paneView.update('options');
 	}
 
-	public setData(data: readonly SeriesPlotRow<T>[], updateInfo?: SeriesUpdateInfo): void {
+	public setData(data: readonly SeriesPlotRow<T, HorzScaleItem>[], updateInfo?: SeriesUpdateInfo): void {
 		this._data.setData(data);
 
 		this._recalculateMarkers();
@@ -261,7 +262,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().lightUpdate();
 	}
 
-	public setMarkers(data: readonly SeriesMarker<TimePoint>[]): void {
+	public setMarkers(data: readonly SeriesMarker<InternalHorzScaleItem, HorzScaleItem>[]): void {
 		this._markers = data;
 		this._recalculateMarkers();
 		const sourcePane = this.model().paneForSource(this);
@@ -272,22 +273,22 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().lightUpdate();
 	}
 
-	public markers(): readonly SeriesMarker<TimePoint>[] {
+	public markers(): readonly SeriesMarker<InternalHorzScaleItem, HorzScaleItem>[] {
 		return this._markers;
 	}
 
-	public indexedMarkers(): InternalSeriesMarker<TimePointIndex>[] {
+	public indexedMarkers(): InternalSeriesMarker<TimePointIndex, HorzScaleItem>[] {
 		return this._indexedMarkers;
 	}
 
-	public createPriceLine(options: PriceLineOptions): CustomPriceLine {
-		const result = new CustomPriceLine(this, options);
+	public createPriceLine(options: PriceLineOptions): CustomPriceLine<HorzScaleItem> {
+		const result = new CustomPriceLine<HorzScaleItem>(this, options);
 		this._customPriceLines.push(result);
 		this.model().updateSource(this);
 		return result;
 	}
 
-	public removePriceLine(line: CustomPriceLine): void {
+	public removePriceLine(line: CustomPriceLine<HorzScaleItem>): void {
 		const index = this._customPriceLines.indexOf(line);
 		if (index !== -1) {
 			this._customPriceLines.splice(index, 1);
@@ -311,7 +312,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		};
 	}
 
-	public firstBar(): SeriesPlotRow<T> | null {
+	public firstBar(): SeriesPlotRow<T, HorzScaleItem> | null {
 		const visibleBars = this.model().timeScale().visibleStrictRange();
 		if (visibleBars === null) {
 			return null;
@@ -321,7 +322,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._data.search(startTimePoint, MismatchDirection.NearestRight);
 	}
 
-	public bars(): SeriesPlotList<T> {
+	public bars(): SeriesPlotList<T, HorzScaleItem> {
 		return this._data;
 	}
 
@@ -342,7 +343,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 	}
 
-	public topPaneViews(pane: Pane): readonly IPaneView[] {
+	public topPaneViews(pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
 		const animationPaneView = this._lastPriceAnimationPaneView;
 		if (animationPaneView === null || !animationPaneView.visible()) {
 			return [];
@@ -362,8 +363,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return [animationPaneView];
 	}
 
-	public paneViews(): readonly IPaneView[] {
-		const res: IPaneView[] = [];
+	public paneViews(): readonly IPaneView<HorzScaleItem>[] {
+		const res: IPaneView<HorzScaleItem>[] = [];
 
 		if (!this._isOverlay()) {
 			res.push(this._baseHorizontalLineView);
@@ -375,20 +376,20 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			this._markersPaneView
 		);
 
-		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
+		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine<HorzScaleItem>) => line.paneView());
 		res.push(...priceLineViews);
 
 		return res;
 	}
 
-	public override labelPaneViews(pane?: Pane): readonly IPaneView[] {
+	public override labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
 		return [
 			this._panePriceAxisView,
-			...this._customPriceLines.map((line: CustomPriceLine) => line.labelPaneView()),
+			...this._customPriceLines.map((line: CustomPriceLine<HorzScaleItem>) => line.labelPaneView()),
 		];
 	}
 
-	public override priceAxisViews(pane: Pane, priceScale: PriceScale): readonly IPriceAxisView[] {
+	public override priceAxisViews(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>): readonly IPriceAxisView<HorzScaleItem>[] {
 		if (priceScale !== this._priceScale && !this._isOverlay()) {
 			return [];
 		}
@@ -436,7 +437,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._lastPriceAnimationPaneView?.update();
 	}
 
-	public override priceScale(): PriceScale {
+	public override priceScale(): PriceScale<HorzScaleItem> {
 		return ensureNotNull(super.priceScale());
 	}
 
@@ -585,7 +586,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		const firstDataIndex = ensureNotNull(this._data.firstIndex());
 
-		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<TimePoint>, index: number) => {
+		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex, HorzScaleItem>>((marker: SeriesMarker<InternalHorzScaleItem, HorzScaleItem>, index: number) => {
 			// the first find index on the time scale (across all series)
 			const timePointIndex = ensureNotNull(timeScale.timeToIndex(marker.time, true));
 
@@ -601,6 +602,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 				internalId: index,
 				text: marker.text,
 				size: marker.size,
+				originalTime: marker.originalTime,
 			};
 		});
 	}
@@ -610,32 +612,32 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		switch (this._seriesType) {
 			case 'Bar': {
-				this._paneView = new SeriesBarsPaneView(this as Series<'Bar'>, this.model());
+				this._paneView = new SeriesBarsPaneView(this as Series<'Bar', HorzScaleItem>, this.model());
 				break;
 			}
 
 			case 'Candlestick': {
-				this._paneView = new SeriesCandlesticksPaneView(this as Series<'Candlestick'>, this.model());
+				this._paneView = new SeriesCandlesticksPaneView(this as Series<'Candlestick', HorzScaleItem>, this.model());
 				break;
 			}
 
 			case 'Line': {
-				this._paneView = new SeriesLinePaneView(this as Series<'Line'>, this.model());
+				this._paneView = new SeriesLinePaneView(this as Series<'Line', HorzScaleItem>, this.model());
 				break;
 			}
 
 			case 'Area': {
-				this._paneView = new SeriesAreaPaneView(this as Series<'Area'>, this.model());
+				this._paneView = new SeriesAreaPaneView(this as Series<'Area', HorzScaleItem>, this.model());
 				break;
 			}
 
 			case 'Baseline': {
-				this._paneView = new SeriesBaselinePaneView(this as Series<'Baseline'>, this.model());
+				this._paneView = new SeriesBaselinePaneView(this as Series<'Baseline', HorzScaleItem>, this.model());
 				break;
 			}
 
 			case 'Histogram': {
-				this._paneView = new SeriesHistogramPaneView(this as Series<'Histogram'>, this.model());
+				this._paneView = new SeriesHistogramPaneView(this as Series<'Histogram', HorzScaleItem>, this.model());
 				break;
 			}
 

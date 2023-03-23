@@ -8,11 +8,11 @@ import { PriceScale, PriceScaleOptions } from '../model/price-scale';
 
 import { IPriceScaleApi } from './iprice-scale-api';
 
-export class PriceScaleApi implements IPriceScaleApi {
-	private _chartWidget: ChartWidget;
+export class PriceScaleApi<HorzScaleItem> implements IPriceScaleApi {
+	private _chartWidget: ChartWidget<HorzScaleItem>;
 	private readonly _priceScaleId: string;
 
-	public constructor(chartWidget: ChartWidget, priceScaleId: string) {
+	public constructor(chartWidget: ChartWidget<HorzScaleItem>, priceScaleId: string) {
 		this._chartWidget = chartWidget;
 		this._priceScaleId = priceScaleId;
 	}
@@ -33,7 +33,7 @@ export class PriceScaleApi implements IPriceScaleApi {
 		return this._chartWidget.getPriceAxisWidth(this._priceScaleId);
 	}
 
-	private _priceScale(): PriceScale {
+	private _priceScale(): PriceScale<HorzScaleItem> {
 		return ensureNotNull(this._chartWidget.model().findPriceScale(this._priceScaleId)).priceScale;
 	}
 }

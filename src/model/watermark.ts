@@ -65,21 +65,21 @@ export interface WatermarkOptions {
 	vertAlign: VertAlign;
 }
 
-export class Watermark extends DataSource {
-	private readonly _paneView: WatermarkPaneView;
+export class Watermark<HorzScaleItem> extends DataSource<HorzScaleItem> {
+	private readonly _paneView: WatermarkPaneView<HorzScaleItem>;
 	private readonly _options: WatermarkOptions;
 
-	public constructor(model: ChartModel, options: WatermarkOptions) {
+	public constructor(model: ChartModel<HorzScaleItem>, options: WatermarkOptions) {
 		super();
 		this._options = options;
 		this._paneView = new WatermarkPaneView(this);
 	}
 
-	public override priceAxisViews(): readonly IPriceAxisView[] {
+	public override priceAxisViews(): readonly IPriceAxisView<HorzScaleItem>[] {
 		return [];
 	}
 
-	public paneViews(): readonly IPaneView[] {
+	public paneViews(): readonly IPaneView<HorzScaleItem>[] {
 		return [this._paneView];
 	}
 

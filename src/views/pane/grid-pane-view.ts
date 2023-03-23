@@ -4,12 +4,12 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IUpdatablePaneView } from './iupdatable-pane-view';
 
-export class GridPaneView implements IUpdatablePaneView {
-	private readonly _pane: Pane;
+export class GridPaneView<HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+	private readonly _pane: Pane<HorzScaleItem>;
 	private readonly _renderer: GridRenderer = new GridRenderer();
 	private _invalidated: boolean = true;
 
-	public constructor(pane: Pane) {
+	public constructor(pane: Pane<HorzScaleItem>) {
 		this._pane = pane;
 	}
 

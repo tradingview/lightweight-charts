@@ -15,4 +15,5 @@ export const timeScaleOptionsDefaults: TimeScaleOptions = {
 	secondsVisible: true,
 	shiftVisibleRangeOnNewBar: true,
 	ticksVisible: false,
+	uniformDistribution: false,
 };

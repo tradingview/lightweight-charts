@@ -6,8 +6,8 @@ import { WatermarkRenderer, WatermarkRendererData } from '../../renderers/waterm
 
 import { IUpdatablePaneView } from './iupdatable-pane-view';
 
-export class WatermarkPaneView implements IUpdatablePaneView {
-	private _source: Watermark;
+export class WatermarkPaneView<HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+	private _source: Watermark<HorzScaleItem>;
 	private _invalidated: boolean = true;
 
 	private readonly _rendererData: WatermarkRendererData = {
@@ -19,7 +19,7 @@ export class WatermarkPaneView implements IUpdatablePaneView {
 	};
 	private readonly _renderer: WatermarkRenderer = new WatermarkRenderer(this._rendererData);
 
-	public constructor(source: Watermark) {
+	public constructor(source: Watermark<HorzScaleItem>) {
 		this._source = source;
 	}
 

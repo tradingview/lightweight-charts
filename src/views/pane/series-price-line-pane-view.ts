@@ -1,11 +1,11 @@
 import { Series } from '../../model/series';
-import { PriceLineSource } from '../../model/series-options';
+import { PriceLineSource, SeriesType } from '../../model/series-options';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';
 
-export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
+export class SeriesPriceLinePaneView<HorzScaleItem> extends SeriesHorizontalLinePaneView<HorzScaleItem> {
 	// eslint-disable-next-line no-useless-constructor
-	public constructor(series: Series) {
+	public constructor(series: Series<SeriesType, HorzScaleItem>) {
 		super(series);
 	}
 

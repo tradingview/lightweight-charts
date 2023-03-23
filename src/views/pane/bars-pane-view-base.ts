@@ -15,19 +15,19 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick', ItemType extends BarCandlestickItemBase, TRenderer extends IPaneRenderer> extends SeriesPaneViewBase<TSeriesType, ItemType, TRenderer> {
-	public constructor(series: Series<TSeriesType>, model: ChartModel) {
+export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick', ItemType extends BarCandlestickItemBase, TRenderer extends IPaneRenderer, HorzScaleItem> extends SeriesPaneViewBase<TSeriesType, ItemType, TRenderer, HorzScaleItem> {
+	public constructor(series: Series<TSeriesType, HorzScaleItem>, model: ChartModel<HorzScaleItem>) {
 		super(series, model, false);
 	}
 
-	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {
+	protected _convertToCoordinates(priceScale: PriceScale<HorzScaleItem>, timeScale: TimeScale<HorzScaleItem>, firstValue: number): void {
 		timeScale.indexesToCoordinates(this._items, undefinedIfNull(this._itemsVisibleRange));
 		priceScale.barPricesToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
 	}
 
-	protected abstract _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<TSeriesType>): ItemType;
+	protected abstract _createRawItem(time: TimePointIndex, bar: SeriesPlotRow<TSeriesType, HorzScaleItem>, colorer: SeriesBarColorer<TSeriesType, HorzScaleItem>): ItemType;
 
-	protected _createDefaultItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<TSeriesType>): BarCandlestickItemBase {
+	protected _createDefaultItem(time: TimePointIndex, bar: SeriesPlotRow<TSeriesType, HorzScaleItem>, colorer: SeriesBarColorer<TSeriesType, HorzScaleItem>): BarCandlestickItemBase {
 		return {
 			time: time,
 			open: bar.value[PlotRowValueIndex.Open] as BarPrice,
@@ -45,6 +45,6 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick'
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
 
-		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => this._createRawItem(row.index, row, colorer));
+		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType, HorzScaleItem>) => this._createRawItem(row.index, row, colorer));
 	}
 }

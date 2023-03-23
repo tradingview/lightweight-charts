@@ -8,6 +8,7 @@ import { Coordinate } from '../../model/coordinate';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
 import { InternalSeriesMarker } from '../../model/series-markers';
+import { SeriesType } from '../../model/series-options';
 import { TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
@@ -33,15 +34,15 @@ interface Offsets {
 }
 
 // eslint-disable-next-line max-params
-function fillSizeAndY(
+function fillSizeAndY<HorzScaleItem>(
 	rendererItem: SeriesMarkerRendererDataItem,
-	marker: InternalSeriesMarker<TimePointIndex>,
+	marker: InternalSeriesMarker<TimePointIndex, HorzScaleItem>,
 	seriesData: BarPrices | BarPrice,
 	offsets: Offsets,
 	textHeight: number,
 	shapeMargin: number,
-	priceScale: PriceScale,
-	timeScale: TimeScale,
+	priceScale: PriceScale<HorzScaleItem>,
+	timeScale: TimeScale<HorzScaleItem>,
 	firstValue: number
 ): void {
 	const inBarPrice = isNumber(seriesData) ? seriesData : seriesData.close;
@@ -83,9 +84,9 @@ function fillSizeAndY(
 	ensureNever(marker.position);
 }
 
-export class SeriesMarkersPaneView implements IUpdatablePaneView {
-	private readonly _series: Series;
-	private readonly _model: ChartModel;
+export class SeriesMarkersPaneView<HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+	private readonly _series: Series<SeriesType, HorzScaleItem>;
+	private readonly _model: ChartModel<HorzScaleItem>;
 	private _data: SeriesMarkerRendererData;
 
 	private _invalidated: boolean = true;
@@ -96,7 +97,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
-	public constructor(series: Series, model: ChartModel) {
+	public constructor(series: Series<SeriesType, HorzScaleItem>, model: ChartModel<HorzScaleItem>) {
 		this._series = series;
 		this._model = model;
 		this._data = {
@@ -154,7 +155,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		const timeScale = this._model.timeScale();
 		const seriesMarkers = this._series.indexedMarkers();
 		if (this._dataInvalidated) {
-			this._data.items = seriesMarkers.map<SeriesMarkerRendererDataItem>((marker: InternalSeriesMarker<TimePointIndex>) => ({
+			this._data.items = seriesMarkers.map<SeriesMarkerRendererDataItem>((marker: InternalSeriesMarker<TimePointIndex, HorzScaleItem>) => ({
 				time: marker.time,
 				x: 0 as Coordinate,
 				y: 0 as Coordinate,

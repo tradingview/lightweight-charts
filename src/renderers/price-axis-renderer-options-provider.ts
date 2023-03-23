@@ -9,8 +9,8 @@ const enum RendererConstants {
 	TickLength = 5,
 }
 
-export class PriceAxisRendererOptionsProvider {
-	private readonly _chartModel: ChartModel;
+export class PriceAxisRendererOptionsProvider<HorzScaleItem> {
+	private readonly _chartModel: ChartModel<HorzScaleItem>;
 
 	private readonly _rendererOptions: PriceAxisViewRendererOptions = {
 		borderSize: RendererConstants.BorderSize,
@@ -27,7 +27,7 @@ export class PriceAxisRendererOptionsProvider {
 		baselineOffset: 0,
 	};
 
-	public constructor(chartModel: ChartModel) {
+	public constructor(chartModel: ChartModel<HorzScaleItem>) {
 		this._chartModel = chartModel;
 	}
 

@@ -1,4 +1,5 @@
-import { OriginalTime, TimePoint, TimePointIndex } from './time-data';
+import { InternalHorzScaleItem } from './ihorz-scale-behavior';
+import { TimePointIndex } from './time-data';
 
 /**
  * Plot's index in plot list tuple for series
@@ -17,9 +18,9 @@ export type PlotRowValue = [
 	number, // close
 ];
 
-export interface PlotRow {
+export interface PlotRow<HorzPlotItem> {
 	readonly index: TimePointIndex;
-	readonly time: TimePoint;
+	readonly time: InternalHorzScaleItem;
 	readonly value: PlotRowValue;
-	readonly originalTime: OriginalTime;
+	readonly originalTime: HorzPlotItem;
 }

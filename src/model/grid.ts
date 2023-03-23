@@ -41,14 +41,14 @@ export interface GridOptions {
 	horzLines: GridLineOptions;
 }
 
-export class Grid {
-	private _paneView: GridPaneView;
+export class Grid<HorzScaleItem> {
+	private _paneView: GridPaneView<HorzScaleItem>;
 
-	public constructor(pane: Pane) {
+	public constructor(pane: Pane<HorzScaleItem>) {
 		this._paneView = new GridPaneView(pane);
 	}
 
-	public paneView(): IUpdatablePaneView {
+	public paneView(): IUpdatablePaneView<HorzScaleItem> {
 		return this._paneView;
 	}
 }

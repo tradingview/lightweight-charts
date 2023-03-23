@@ -8,9 +8,9 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
-export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemType extends TimedValue, TRenderer extends IPaneRenderer> implements IUpdatablePaneView {
-	protected readonly _series: Series<TSeriesType>;
-	protected readonly _model: ChartModel;
+export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemType extends TimedValue, TRenderer extends IPaneRenderer, HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+	protected readonly _series: Series<TSeriesType, HorzScaleItem>;
+	protected readonly _model: ChartModel<HorzScaleItem>;
 	protected _invalidated: boolean = true;
 	protected _dataInvalidated: boolean = true;
 	protected _optionsInvalidated: boolean = true;
@@ -19,7 +19,7 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 	protected readonly abstract _renderer: TRenderer;
 	private readonly _extendedVisibleRange: boolean;
 
-	public constructor(series: Series<TSeriesType>, model: ChartModel, extendedVisibleRange: boolean) {
+	public constructor(series: Series<TSeriesType, HorzScaleItem>, model: ChartModel<HorzScaleItem>, extendedVisibleRange: boolean) {
 		this._series = series;
 		this._model = model;
 		this._extendedVisibleRange = extendedVisibleRange;
@@ -54,7 +54,7 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		}));
 	}
 
-	protected abstract _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void;
+	protected abstract _convertToCoordinates(priceScale: PriceScale<HorzScaleItem>, timeScale: TimeScale<HorzScaleItem>, firstValue: number): void;
 
 	protected _clearVisibleRange(): void {
 		this._itemsVisibleRange = null;

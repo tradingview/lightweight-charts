@@ -43,20 +43,20 @@ const enum Constants {
 	DefaultOptimalWidth = 34,
 }
 
-type IPriceAxisViewArray = readonly IPriceAxisView[];
+type IPriceAxisViewArray<HorzScaleItem> = readonly IPriceAxisView<HorzScaleItem>[];
 
 const enum Constants {
 	LabelOffset = 5,
 }
 
-export class PriceAxisWidget implements IDestroyable {
-	private readonly _pane: PaneWidget;
-	private readonly _options: Readonly<ChartOptionsInternal>;
+export class PriceAxisWidget<HorzScaleItem> implements IDestroyable {
+	private readonly _pane: PaneWidget<HorzScaleItem>;
+	private readonly _options: Readonly<ChartOptionsInternal<HorzScaleItem>>;
 	private readonly _layoutOptions: Readonly<LayoutOptions>;
-	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
+	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider<HorzScaleItem>;
 	private readonly _isLeft: boolean;
 
-	private _priceScale: PriceScale | null = null;
+	private _priceScale: PriceScale<HorzScaleItem> | null = null;
 
 	private _size: Size | null = null;
 
@@ -73,7 +73,7 @@ export class PriceAxisWidget implements IDestroyable {
 	private _prevOptimalWidth: number = 0;
 	private _isSettingSize: boolean = false;
 
-	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternal>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
+	public constructor(pane: PaneWidget<HorzScaleItem>, options: Readonly<ChartOptionsInternal<HorzScaleItem>>, rendererOptionsProvider: PriceAxisRendererOptionsProvider<HorzScaleItem>, side: PriceAxisWidgetSide) {
 		this._pane = pane;
 		this._options = options;
 		this._layoutOptions = options.layout;
@@ -238,7 +238,7 @@ export class PriceAxisWidget implements IDestroyable {
 		return ensureNotNull(this._size).width;
 	}
 
-	public setPriceScale(priceScale: PriceScale): void {
+	public setPriceScale(priceScale: PriceScale<HorzScaleItem>): void {
 		if (this._priceScale === priceScale) {
 			return;
 		}
@@ -251,7 +251,7 @@ export class PriceAxisWidget implements IDestroyable {
 		priceScale.onMarksChanged().subscribe(this._onMarksChanged.bind(this), this);
 	}
 
-	public priceScale(): PriceScale | null {
+	public priceScale(): PriceScale<HorzScaleItem> | null {
 		return this._priceScale;
 	}
 
@@ -374,12 +374,12 @@ export class PriceAxisWidget implements IDestroyable {
 		this._setCursor(CursorType.Default);
 	}
 
-	private _backLabels(): IPriceAxisView[] {
-		const res: IPriceAxisView[] = [];
+	private _backLabels(): IPriceAxisView<HorzScaleItem>[] {
+		const res: IPriceAxisView<HorzScaleItem>[] = [];
 
 		const priceScale = (this._priceScale === null) ? undefined : this._priceScale;
 
-		const addViewsForSources = (sources: readonly IDataSource[]) => {
+		const addViewsForSources = (sources: readonly IDataSource<HorzScaleItem>[]) => {
 			for (let i = 0; i < sources.length; ++i) {
 				const source = sources[i];
 				const views = source.priceAxisViews(this._pane.state(), priceScale);
@@ -486,7 +486,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 		let center = this._size.height / 2;
 
-		const views: IPriceAxisView[] = [];
+		const views: IPriceAxisView<HorzScaleItem>[] = [];
 		const orderedSources = this._priceScale.orderedSources().slice(); // Copy of array
 		const pane = this._pane;
 		const paneState = pane.state();
@@ -496,7 +496,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const isDefault = this._priceScale === paneState.defaultVisiblePriceScale();
 
 		if (isDefault) {
-			this._pane.state().orderedSources().forEach((source: IPriceDataSource) => {
+			this._pane.state().orderedSources().forEach((source: IPriceDataSource<HorzScaleItem>) => {
 				if (paneState.isOverlay(source)) {
 					orderedSources.push(source);
 				}
@@ -507,11 +507,11 @@ export class PriceAxisWidget implements IDestroyable {
 		const centerSource = this._priceScale.dataSources()[0];
 		const priceScale = this._priceScale;
 
-		const updateForSources = (sources: IDataSource[]) => {
-			sources.forEach((source: IDataSource) => {
+		const updateForSources = (sources: IDataSource<HorzScaleItem>[]) => {
+			sources.forEach((source: IDataSource<HorzScaleItem>) => {
 				const sourceViews = source.priceAxisViews(paneState, priceScale);
 				// never align selected sources
-				sourceViews.forEach((view: IPriceAxisView) => {
+				sourceViews.forEach((view: IPriceAxisView<HorzScaleItem>) => {
 					view.setFixedCoordinate(null);
 					if (view.isVisible()) {
 						views.push(view);
@@ -526,7 +526,7 @@ export class PriceAxisWidget implements IDestroyable {
 		// crosshair individually
 		updateForSources(orderedSources);
 
-		views.forEach((view: IPriceAxisView) => view.setFixedCoordinate(view.coordinate()));
+		views.forEach((view: IPriceAxisView<HorzScaleItem>) => view.setFixedCoordinate(view.coordinate()));
 
 		const options = this._priceScale.options();
 		if (!options.alignLabels) {
@@ -536,24 +536,24 @@ export class PriceAxisWidget implements IDestroyable {
 		this._fixLabelOverlap(views, rendererOptions, center);
 	}
 
-	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>, center: number): void {
+	private _fixLabelOverlap(views: IPriceAxisView<HorzScaleItem>[], rendererOptions: Readonly<PriceAxisViewRendererOptions>, center: number): void {
 		if (this._size === null) {
 			return;
 		}
 
 		// split into two parts
-		const top = views.filter((view: IPriceAxisView) => view.coordinate() <= center);
-		const bottom = views.filter((view: IPriceAxisView) => view.coordinate() > center);
+		const top = views.filter((view: IPriceAxisView<HorzScaleItem>) => view.coordinate() <= center);
+		const bottom = views.filter((view: IPriceAxisView<HorzScaleItem>) => view.coordinate() > center);
 
 		// sort top from center to top
-		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.coordinate() - l.coordinate());
+		top.sort((l: IPriceAxisView<HorzScaleItem>, r: IPriceAxisView<HorzScaleItem>) => r.coordinate() - l.coordinate());
 
 		// share center label
 		if (top.length && bottom.length) {
 			bottom.push(top[0]);
 		}
 
-		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
+		bottom.sort((l: IPriceAxisView<HorzScaleItem>, r: IPriceAxisView<HorzScaleItem>) => l.coordinate() - r.coordinate());
 
 		for (const view of views) {
 			const halfHeight = Math.floor(view.height(rendererOptions) / 2);
@@ -602,7 +602,7 @@ export class PriceAxisWidget implements IDestroyable {
 		const rendererOptions = this.rendererOptions();
 		const align = this._isLeft ? 'right' : 'left';
 
-		views.forEach((view: IPriceAxisView) => {
+		views.forEach((view: IPriceAxisView<HorzScaleItem>) => {
 			if (view.isAxisLabelVisible()) {
 				const renderer = view.renderer(ensureNotNull(this._priceScale));
 				renderer.draw(target, rendererOptions, this._widthCache, align);
@@ -617,7 +617,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		const model = this._pane.chart().model();
 
-		const views: IPriceAxisViewArray[] = []; // array of arrays
+		const views: IPriceAxisViewArray<HorzScaleItem>[] = []; // array of arrays
 		const pane = this._pane.state();
 
 		const v = model.crosshairSource().priceAxisViews(pane, this._priceScale);
@@ -628,8 +628,8 @@ export class PriceAxisWidget implements IDestroyable {
 		const ro = this.rendererOptions();
 		const align = this._isLeft ? 'right' : 'left';
 
-		views.forEach((arr: IPriceAxisViewArray) => {
-			arr.forEach((view: IPriceAxisView) => {
+		views.forEach((arr: IPriceAxisViewArray<HorzScaleItem>) => {
+			arr.forEach((view: IPriceAxisView<HorzScaleItem>) => {
 				view.renderer(ensureNotNull(this._priceScale)).draw(target, ro, this._widthCache, align);
 			});
 		});

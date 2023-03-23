@@ -1,12 +1,11 @@
 import { assert } from '../helpers/assertions';
 
+import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { CreatePriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import { SeriesType } from '../model/series-options';
-import { Time } from '../model/time-data';
 
 import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
-import { convertTime } from './data-layer';
 
 export function checkPriceLineOptions(options: CreatePriceLineOptions): void {
 	if (process.env.NODE_ENV === 'production') {
@@ -17,7 +16,7 @@ export function checkPriceLineOptions(options: CreatePriceLineOptions): void {
 	assert(typeof options.price === 'number', `the type of 'price' price line's property must be a number, got '${typeof options.price}'`);
 }
 
-export function checkItemsAreOrdered(data: readonly (SeriesMarker<Time> | SeriesDataItemTypeMap[SeriesType])[], allowDuplicates: boolean = false): void {
+export function checkItemsAreOrdered<HorzScaleItem>(data: readonly (SeriesMarker<HorzScaleItem, HorzScaleItem> | SeriesDataItemTypeMap<HorzScaleItem>[SeriesType])[], bh: IHorzScaleBehavior<HorzScaleItem>, allowDuplicates: boolean = false): void {
 	if (process.env.NODE_ENV === 'production') {
 		return;
 	}
@@ -26,26 +25,26 @@ export function checkItemsAreOrdered(data: readonly (SeriesMarker<Time> | Series
 		return;
 	}
 
-	let prevTime = convertTime(data[0].time).timestamp;
+	let prevTime = bh.key(data[0].time);
 	for (let i = 1; i < data.length; ++i) {
-		const currentTime = convertTime(data[i].time).timestamp;
+		const currentTime = bh.key(data[i].time);
 		const checkResult = allowDuplicates ? prevTime <= currentTime : prevTime < currentTime;
 		assert(checkResult, `data must be asc ordered by time, index=${i}, time=${currentTime}, prev time=${prevTime}`);
 		prevTime = currentTime;
 	}
 }
 
-export function checkSeriesValuesType(type: SeriesType, data: readonly SeriesDataItemTypeMap[SeriesType][]): void {
+export function checkSeriesValuesType<HorzScaleItem>(type: SeriesType, data: readonly SeriesDataItemTypeMap<HorzScaleItem>[SeriesType][]): void {
 	if (process.env.NODE_ENV === 'production') {
 		return;
 	}
 
-	data.forEach(getChecker(type));
+	data.forEach(getChecker<HorzScaleItem>(type));
 }
 
-type Checker = (item: SeriesDataItemTypeMap[SeriesType]) => void;
+type Checker<HorzScaleItem> = (item: SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]) => void;
 
-function getChecker(type: SeriesType): Checker {
+function getChecker<HorzScaleItem>(type: SeriesType): Checker<HorzScaleItem> {
 	switch (type) {
 		case 'Bar':
 		case 'Candlestick':
@@ -59,9 +58,9 @@ function getChecker(type: SeriesType): Checker {
 	}
 }
 
-function checkBarItem(
+function checkBarItem<HorzScaleItem>(
 	type: 'Bar' | 'Candlestick',
-	barItem: SeriesDataItemTypeMap[typeof type]
+	barItem: SeriesDataItemTypeMap<HorzScaleItem>[typeof type]
 ): void {
 	if (!isFulfilledData(barItem)) {
 		return;
@@ -97,9 +96,9 @@ function checkBarItem(
 	);
 }
 
-function checkLineItem(
+function checkLineItem<HorzScaleItem>(
 	type: 'Area' | 'Baseline' | 'Line' | 'Histogram',
-	lineItem: SeriesDataItemTypeMap[typeof type]
+	lineItem: SeriesDataItemTypeMap<HorzScaleItem>[typeof type]
 ): void {
 	if (!isFulfilledData(lineItem)) {
 		return;

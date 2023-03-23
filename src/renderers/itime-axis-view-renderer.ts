@@ -15,6 +15,6 @@ export interface TimeAxisViewRendererOptions {
 	labelBottomOffset: number;
 }
 
-export interface ITimeAxisViewRenderer {
+export interface ITimeAxisViewRenderer<HorzScaleItem> {
 	draw(target: CanvasRenderingTarget2D, rendererOptions: TimeAxisViewRendererOptions): void;
 }

@@ -10,7 +10,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Range, Time } from '../model/time-data';
+import { Range } from '../model/time-data';
 
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceLine } from './iprice-line';
@@ -21,7 +21,7 @@ import { IPriceScaleApi } from './iprice-scale-api';
  */
 // actually range might be either exist or not
 // but to avoid hard-readable type let's say every part of range is optional
-export interface BarsInfo extends Partial<Range<Time>> {
+export interface BarsInfo<HorzScaleItem> extends Partial<Range<HorzScaleItem>> {
 	/**
 	 * The number of bars before the start of the range.
 	 * Positive value means that there are some bars before (out of logical range from the left) the {@link Range.from} logical index in the series.
@@ -40,7 +40,7 @@ export interface BarsInfo extends Partial<Range<Time>> {
 /**
  * Represents the interface for interacting with series.
  */
-export interface ISeriesApi<TSeriesType extends SeriesType> {
+export interface ISeriesApi<TSeriesType extends SeriesType, HorzScaleItem> {
 	/**
 	 * Returns current price formatter
 	 *
@@ -88,7 +88,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
 	 * ```
 	 */
-	barsInLogicalRange(range: Range<number>): BarsInfo | null;
+	barsInLogicalRange(range: Range<number>): BarsInfo<HorzScaleItem> | null;
 
 	/**
 	 * Applies new options to the existing series
@@ -132,7 +132,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ]);
 	 * ```
 	 */
-	setData(data: SeriesDataItemTypeMap[TSeriesType][]): void;
+	setData(data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): void;
 
 	/**
 	 * Adds new data item to the existing set (or updates the latest item if times of the passed/latest items are equal).
@@ -157,7 +157,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * });
 	 * ```
 	 */
-	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
+	update(bar: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void;
 
 	/**
 	 * Returns a bar data by provided logical index.
@@ -170,7 +170,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * const originalData = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
 	 * ```
 	 */
-	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null;
+	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType] | null;
 
 	/**
 	 * Allows to set/replace all existing series markers with new ones.
@@ -212,12 +212,12 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * });
 	 * ```
 	 */
-	setMarkers(data: SeriesMarker<Time>[]): void;
+	setMarkers(data: SeriesMarker<HorzScaleItem, HorzScaleItem>[]): void;
 
 	/**
 	 * Returns an array of series markers.
 	 */
-	markers(): SeriesMarker<Time>[];
+	markers(): SeriesMarker<HorzScaleItem, HorzScaleItem>[];
 
 	/**
 	 * Creates a new price line

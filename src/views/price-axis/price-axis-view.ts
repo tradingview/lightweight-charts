@@ -10,7 +10,7 @@ import { PriceAxisViewRenderer } from '../../renderers/price-axis-view-renderer'
 
 import { IPriceAxisView } from './iprice-axis-view';
 
-export abstract class PriceAxisView implements IPriceAxisView {
+export abstract class PriceAxisView<HorzScaleItem> implements IPriceAxisView<HorzScaleItem> {
 	private readonly _commonRendererData: PriceAxisViewRendererCommonData = {
 		coordinate: 0,
 		background: '#000',
@@ -88,7 +88,7 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		return this._axisRendererData.visible;
 	}
 
-	public renderer(priceScale: PriceScale): IPriceAxisViewRenderer {
+	public renderer(priceScale: PriceScale<HorzScaleItem>): IPriceAxisViewRenderer {
 		this._updateRendererDataIfNeeded();
 
 		// force update tickVisible state from price scale options

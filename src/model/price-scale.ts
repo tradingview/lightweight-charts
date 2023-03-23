@@ -193,11 +193,11 @@ interface MarksCache {
 	firstValueIsNull: boolean;
 }
 
-export class PriceScale {
+export class PriceScale<HorzScaleItem> {
 	private readonly _id: string;
 
 	private readonly _layoutOptions: LayoutOptions;
-	private readonly _localizationOptions: LocalizationOptions;
+	private readonly _localizationOptions: LocalizationOptions<HorzScaleItem>;
 	private readonly _options: PriceScaleOptions;
 
 	private _height: number = 0;
@@ -210,13 +210,13 @@ export class PriceScale {
 	private _marginAbove: number = 0;
 	private _marginBelow: number = 0;
 
-	private _markBuilder: PriceTickMarkBuilder;
+	private _markBuilder: PriceTickMarkBuilder<HorzScaleItem>;
 	private _onMarksChanged: Delegate = new Delegate();
 
 	private _modeChanged: Delegate<PriceScaleState, PriceScaleState> = new Delegate();
 
-	private _dataSources: IPriceDataSource[] = [];
-	private _cachedOrderedSources: IPriceDataSource[] | null = null;
+	private _dataSources: IPriceDataSource<HorzScaleItem>[] = [];
+	private _cachedOrderedSources: IPriceDataSource<HorzScaleItem>[] | null = null;
 
 	private _marksCache: MarksCache | null = null;
 
@@ -226,7 +226,7 @@ export class PriceScale {
 
 	private _logFormula: LogFormula = logFormulaForPriceRange(null);
 
-	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions<HorzScaleItem>) {
 		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
@@ -518,16 +518,16 @@ export class PriceScale {
 		return value as BarPrice;
 	}
 
-	public dataSources(): readonly IPriceDataSource[] {
+	public dataSources(): readonly IPriceDataSource<HorzScaleItem>[] {
 		return this._dataSources;
 	}
 
-	public orderedSources(): readonly IPriceDataSource[] {
+	public orderedSources(): readonly IPriceDataSource<HorzScaleItem>[] {
 		if (this._cachedOrderedSources) {
 			return this._cachedOrderedSources;
 		}
 
-		let sources: IPriceDataSource[] = [];
+		let sources: IPriceDataSource<HorzScaleItem>[] = [];
 		for (let i = 0; i < this._dataSources.length; i++) {
 			const ds = this._dataSources[i];
 			if (ds.zorder() === null) {
@@ -537,12 +537,12 @@ export class PriceScale {
 			sources.push(ds);
 		}
 
-		sources = sortSources(sources);
+		sources = sortSources<HorzScaleItem, IPriceDataSource<HorzScaleItem>>(sources);
 		this._cachedOrderedSources = sources;
 		return this._cachedOrderedSources;
 	}
 
-	public addDataSource(source: IPriceDataSource): void {
+	public addDataSource(source: IPriceDataSource<HorzScaleItem>): void {
 		if (this._dataSources.indexOf(source) !== -1) {
 			return;
 		}
@@ -552,7 +552,7 @@ export class PriceScale {
 		this.invalidateSourcesCache();
 	}
 
-	public removeDataSource(source: IPriceDataSource): void {
+	public removeDataSource(source: IPriceDataSource<HorzScaleItem>): void {
 		const index = this._dataSources.indexOf(source);
 		if (index === -1) {
 			throw new Error('source is not attached to scale');
@@ -768,7 +768,7 @@ export class PriceScale {
 		return percentageFormatter.format(price);
 	}
 
-	public sourcesForAutoScale(): readonly IPriceDataSource[] {
+	public sourcesForAutoScale(): readonly IPriceDataSource<HorzScaleItem>[] {
 		return this._dataSources;
 	}
 
@@ -780,7 +780,7 @@ export class PriceScale {
 	}
 
 	public updateAllViews(): void {
-		this._dataSources.forEach((s: IPriceDataSource) => s.updateAllViews());
+		this._dataSources.forEach((s: IPriceDataSource<HorzScaleItem>) => s.updateAllViews());
 	}
 
 	public updateFormatter(): void {
@@ -822,7 +822,7 @@ export class PriceScale {
 	/**
 	 * @returns The {@link IPriceDataSource} that will be used as the "formatter source" (take minMove for formatter).
 	 */
-	private _formatterSource(): IPriceDataSource | null {
+	private _formatterSource(): IPriceDataSource<HorzScaleItem> | null {
 		return this._dataSources[0] || null;
 	}
 

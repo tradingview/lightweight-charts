@@ -9,15 +9,15 @@ export type LogicalToCoordinateConverter = (x: number, firstValue: number, keepI
 
 const TICK_DENSITY = 2.5;
 
-export class PriceTickMarkBuilder {
+export class PriceTickMarkBuilder<HorzScaleItem> {
 	private _marks: PriceMark[] = [];
 	private _base: number;
-	private readonly _priceScale: PriceScale;
+	private readonly _priceScale: PriceScale<HorzScaleItem>;
 	private readonly _coordinateToLogicalFunc: CoordinateToLogicalConverter;
 	private readonly _logicalToCoordinateFunc: LogicalToCoordinateConverter;
 
 	public constructor(
-		priceScale: PriceScale,
+		priceScale: PriceScale<HorzScaleItem>,
 		base: number,
 		coordinateToLogicalFunc: CoordinateToLogicalConverter,
 		logicalToCoordinateFunc: LogicalToCoordinateConverter

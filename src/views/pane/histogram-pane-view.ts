@@ -7,10 +7,10 @@ import { HistogramItem, PaneRendererHistogram, PaneRendererHistogramData } from 
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesHistogramPaneView extends LinePaneViewBase<'Histogram', HistogramItem, PaneRendererHistogram> {
+export class SeriesHistogramPaneView<HorzScaleItem> extends LinePaneViewBase<'Histogram', HistogramItem, PaneRendererHistogram, HorzScaleItem> {
 	protected readonly _renderer: PaneRendererHistogram = new PaneRendererHistogram();
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Histogram'>): HistogramItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Histogram', HorzScaleItem>): HistogramItem {
 		return {
 			...this._createRawItemBase(time, price),
 			...colorer.barStyle(time),

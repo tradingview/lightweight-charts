@@ -6,8 +6,8 @@ import { IDataSource } from './idata-source';
 import { Pane } from './pane';
 import { PriceScale } from './price-scale';
 
-export abstract class DataSource implements IDataSource {
-	protected _priceScale: PriceScale | null = null;
+export abstract class DataSource<HorzScaleItem> implements IDataSource<HorzScaleItem> {
+	protected _priceScale: PriceScale<HorzScaleItem> | null = null;
 
 	private _zorder: number = 0;
 
@@ -19,22 +19,22 @@ export abstract class DataSource implements IDataSource {
 		this._zorder = zorder;
 	}
 
-	public priceScale(): PriceScale | null {
+	public priceScale(): PriceScale<HorzScaleItem> | null {
 		return this._priceScale;
 	}
 
-	public setPriceScale(priceScale: PriceScale | null): void {
+	public setPriceScale(priceScale: PriceScale<HorzScaleItem> | null): void {
 		this._priceScale = priceScale;
 	}
 
-	public abstract priceAxisViews(pane?: Pane, priceScale?: PriceScale): readonly IPriceAxisView[];
-	public abstract paneViews(pane?: Pane): readonly IPaneView[];
+	public abstract priceAxisViews(pane?: Pane<HorzScaleItem>, priceScale?: PriceScale<HorzScaleItem>): readonly IPriceAxisView<HorzScaleItem>[];
+	public abstract paneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[];
 
-	public labelPaneViews(pane?: Pane): readonly IPaneView[] {
+	public labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
 		return [];
 	}
 
-	public timeAxisViews(): readonly ITimeAxisView[] {
+	public timeAxisViews(): readonly ITimeAxisView<HorzScaleItem>[] {
 		return [];
 	}
 
