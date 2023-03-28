@@ -5,7 +5,7 @@
     <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true">
   </a>
 
-  <h1>Lightweight Charts</h1>
+  <h1>Lightweight Charts™</h1>
 
   [![CircleCI][ci-img]][ci-link]
   [![npm version][npm-version-img]][npm-link]
@@ -18,9 +18,9 @@
 
 [Demos][demo-url] | [Documentation](https://tradingview.github.io/lightweight-charts/) | [Discord community](https://discord.gg/UC7cGkvn4U) | [Reddit](https://www.reddit.com/r/TradingView/)
 
-TradingView Lightweight Charts are one of the smallest and fastest financial HTML5 charts.
+TradingView Lightweight Charts™ are one of the smallest and fastest financial HTML5 charts.
 
-The Lightweight Charting Library is the best choice for you if you want to display financial data as an interactive chart on your web page without affecting your web page loading speed and performance.
+The Lightweight Charts™ library is the best choice for you if you want to display financial data as an interactive chart on your web page without affecting your web page loading speed and performance.
 
 It is the best choice for you if you want to replace static image charts with interactive ones.
 The size of the library is close to static images but if you have dozens of image charts on a web page then using this library can make the size of your web page smaller.
@@ -76,6 +76,17 @@ lineSeries.setData([
     { time: '2019-04-20', value: 74.43 },
 ]);
 ```
+
+### Build Variants
+
+|Dependencies included|Mode|ES module|CommonJS ⚠️|IIFE (`window.LightweightCharts`)|
+|-|-|-|-|-|
+|No|PROD|`lightweight-charts.production.mjs`|`lightweight-charts.production.cjs`|N/A|
+|No|DEV|`lightweight-charts.development.mjs`|`lightweight-charts.development.cjs`|N/A|
+|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|-|`lightweight-charts.standalone.production.js`|
+|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|-|`lightweight-charts.standalone.development.js`|
+
+⚠️ **Deprecation note:** CommonJS support will be removed from the library at the start of 2024.
 
 ## Development
 

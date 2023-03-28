@@ -13,7 +13,6 @@ import { IPriceAxisView } from './iprice-axis-view';
 export abstract class PriceAxisView implements IPriceAxisView {
 	private readonly _commonRendererData: PriceAxisViewRendererCommonData = {
 		coordinate: 0,
-		color: '#FFF',
 		background: '#000',
 		additionalPaddingBottom: 0,
 		additionalPaddingTop: 0,

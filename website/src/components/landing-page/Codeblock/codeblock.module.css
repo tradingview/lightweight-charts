@@ -1,0 +1,185 @@
+@import url('https://fonts.cdnfonts.com/css/menlo?styles=15444');
+
+:root {
+	--code-c1: #d16c91;
+	--code-c2: #9c27b0;
+	--code-c3: #9e7bde;
+	--code-c4: #04be67;
+	--code-block-paddings: 18px;
+	--code-block-line-number-width: 18px;
+
+	--code-block-font-size: 14px;
+	--code-block-line-height: 22px;
+	--code-block-border-radius: 16px;
+	--code-block-padding: 8px;
+	--code-block-inner-radius: 8px;
+	--code-block-glass-border-width: 8px;
+	--code-block-block-padding: 14px;
+}
+
+/* Tablet-Vertical */
+@media (max-width: 1023px) {
+	:root {
+		--code-block-font-size: 11px;
+		--code-block-line-height: 18px;
+		--code-block-border-radius: 12px;
+		--code-block-padding: 6px;
+		--code-block-inner-radius: 6px;
+		--code-block-glass-border-width: 6px;
+		--code-block-block-padding: 11px;
+	}
+}
+
+/* Phone-Landscape */
+@media (max-width: 767px) {
+	:root {
+		--code-block-font-size: 7px;
+		--code-block-line-height: 11px;
+		--code-block-border-radius: 8px;
+		--code-block-padding: 4px;
+		--code-block-inner-radius: 4px;
+		--code-block-glass-border-width: 4px;
+		--code-block-block-padding: 7px;
+	}
+}
+
+/* Phone-Vertical */
+@media (max-width: 567px) {
+	:root {
+		--code-block-font-size: 6px;
+		--code-block-line-height: 10px;
+		--code-block-border-radius: 8px;
+		--code-block-padding: 4px;
+		--code-block-inner-radius: 4px;
+		--code-block-glass-border-width: 8px;
+		--code-block-block-padding: 8px;
+	}
+}
+
+aside[data-name='chart-code-phone'] {
+	display: none;
+	transform: none;
+}
+
+aside[data-name='chart-code-phone'].Block {
+	font-size: 8px;
+	line-height: 12px;
+	max-width: calc(100vw - 60px);
+	--code-block-paddings: 12px;
+	--code-block-line-number-width: initial;
+}
+
+/* Phone-Vertical */
+@media (max-width: 567px) {
+	aside[data-name='npm'] {
+		display: none !important;
+	}
+	aside[data-name='import'] {
+		display: none !important;
+	}
+	aside[data-name='chart-code'] {
+		display: none !important;
+	}
+	aside[data-name='chart-code-phone'] {
+		display: block !important;
+	}
+}
+
+/* Phone-Vertical */
+@media (max-width: 1919px) and (min-width: 1280px) {
+	aside[data-name='import'] {
+		display: none !important;
+	}
+}
+
+.Block {
+	/* Glass effect */
+	border-radius: calc(var(--code-block-inner-radius) + var(--code-block-glass-border-width));
+	background: rgba(0, 0, 0, 0.02);
+	backdrop-filter: blur(10px);
+	padding: var(--code-block-glass-border-width);
+
+	position: absolute;
+
+	font-style: normal;
+	font-weight: 400;
+	font-size: var(--code-block-font-size);
+	line-height: var(--code-block-line-height);
+	font-feature-settings: 'tnum' on, 'lnum' on;
+
+	font-display: swap;
+	font-family: 'Menlo', monospace;
+	color: var(--tv-cold-gray-50);
+	user-select: none;
+	cursor: default;
+
+	z-index: 1;
+}
+
+.Block[data-can-select='true'] {
+	user-select: text;
+	cursor: auto;
+}
+
+/* Possible future feature, click to copy content */
+/* .Block[data-can-copy=true] {
+	cursor: pointer;
+} */
+
+:root[data-theme='dark'] .Block {
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(7.5px);
+}
+
+.BlockContent {
+	border-radius: var(--code-block-inner-radius);
+	background-color: var(--tv-cold-gray-50);
+	color: var(--tv-cold-gray-550);
+	opacity: 0.8;
+	box-shadow: 0px 4.34171px 43.4171px rgba(0, 0, 0, 0.2);
+	backdrop-filter: blur(50px);
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: var(--code-block-block-padding) 0px;
+}
+
+:root[data-theme='dark'] .BlockContent {
+	background-color: black;
+	color: var(--tv-cold-gray-500);
+	box-shadow: 0px 4.34171px 43.4171px rgba(0, 0, 0, 0.85);
+}
+
+.Line {
+	display: flex;
+	flex-direction: row;
+	padding-right: var(--code-block-paddings);
+}
+
+.LineNumber {
+	color: var(--tv-cold-gray-300);
+	width: var(--code-block-line-number-width);
+	margin-inline: var(--code-block-paddings);
+	user-select: none;
+}
+
+:root[data-theme='dark'] .LineNumber {
+	color: var(--tv-cold-gray-800);
+}
+
+.Line span[data-c1] {
+	color: var(--code-c1);
+}
+
+.Line span[data-c2] {
+	color: var(--code-c2);
+}
+
+.Line span[data-c3] {
+	color: var(--code-c3);
+}
+
+.Line span[data-c4] {
+	color: var(--code-c4);
+}

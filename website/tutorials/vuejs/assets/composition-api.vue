@@ -41,7 +41,7 @@ function getChartSeriesConstructorName(type) {
 	return `add${type.charAt(0).toUpperCase() + type.slice(1)}Series`;
 }
 
-// Lightweight Chart instances are stored as normal JS variables
+// Lightweight Charts™ instances are stored as normal JS variables
 // If you need to use a ref then it is recommended that you use `shallowRef` instead
 let series;
 let chart;
@@ -110,10 +110,10 @@ onUnmounted(() => {
  * If an options property is changed then we will apply those options
  * on top of any existing options previously set (since we are using the
  * `applyOptions` method).
- * 
+ *
  * If there is a change to the chart type, then the existing series is removed
  * and the new series is created, and assigned the data.
- * 
+ *
  */
 watch(
 	() => props.autosize,

@@ -46,6 +46,8 @@ function beforeInteractions(container) {
 		color: '#f0f',
 		lineWidth: 4,
 		lineStyle: LightweightCharts.LineStyle.SparseDotted,
+		axisLabelTextColor: '#d04488',
+		axisLabelColor: '#00DDDD',
 	});
 
 	priceLine1.options();

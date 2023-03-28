@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Price Lines
+// Lightweight Charts™ Example: Price Lines
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/price-line
 
 // remove-end

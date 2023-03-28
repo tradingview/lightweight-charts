@@ -50,6 +50,19 @@ export interface PriceLineOptions {
 	 * @defaultValue `''`
 	 */
 	title: string;
+	/**
+	 * Background color for the axis label.
+	 * Will default to the price line color if unspecified.
+	 *
+	 * @defaultValue `''`
+	 */
+	axisLabelColor: string;
+	/**
+	 * Text color for the axis label.
+	 *
+	 * @defaultValue `''`
+	 */
+	axisLabelTextColor: string;
 }
 
 /**

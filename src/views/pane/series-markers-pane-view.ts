@@ -204,6 +204,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			if (marker.text !== undefined && marker.text.length > 0) {
 				rendererItem.text = {
 					content: marker.text,
+					x: 0 as Coordinate,
 					y: 0 as Coordinate,
 					width: 0,
 					height: 0,

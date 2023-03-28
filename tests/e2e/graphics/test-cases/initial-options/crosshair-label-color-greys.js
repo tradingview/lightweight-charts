@@ -16,10 +16,10 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, {
 		crosshair: {
 			vertLine: {
-				labelBackgroundColor: '#ffffff',
+				labelBackgroundColor: '#222222',
 			},
 			horzLine: {
-				labelBackgroundColor: '#000000',
+				labelBackgroundColor: '#DDDDDD',
 			},
 		},
 	});

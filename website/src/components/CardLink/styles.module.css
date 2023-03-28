@@ -23,15 +23,20 @@
 .cardDetails {
 	display: flex;
 	flex-direction: column;
-  overflow: auto;
+	overflow: auto;
+}
+
+.centerDetails {
+	justify-content: center;
 }
 
 .cardImage {
 	margin-right: 1rem;
+	height: 62px;
 }
 
 .cardImage svg {
-  height: 62px;
+	height: 62px;
 	width: 62px;
 }
 
@@ -41,4 +46,12 @@
 
 .cardDescription {
 	font-size: 0.8rem;
+}
+
+.noWrap {
+	white-space: normal;
+}
+
+.noBottomMargin {
+	margin-bottom: 0px;
 }

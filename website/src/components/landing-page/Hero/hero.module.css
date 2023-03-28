@@ -1,0 +1,79 @@
+@import url('https://fonts.cdnfonts.com/css/euclid-circular-b?styles=100049');
+/* Tablet-Landscape */
+@media (max-width: 1279px) {
+	.HeroMain {
+		text-align: center;
+	}
+	.HeroButtons {
+		justify-content: center;
+	}
+}
+
+/* Phone-Vertical */
+@media (max-width: 567px) {
+	.HeroButtons {
+		flex-direction: column !important;
+		align-items: initial !important;
+	}
+}
+
+.HeroContainer {
+	display: flex;
+	flex-direction: var(--hero-flex-direction);
+	align-items: center;
+	width: 100%;
+	margin-bottom: calc(
+		var(--hero-margin-bottom) + var(--hero-container-bottom-padding) +
+			var(--hero-container-bottom-padding-adjustment)
+	);
+	gap: var(--hero-gap);
+	/* ! Fix for older versions of Safari which had a bug with css variables being used for -inline / -block */
+	/* padding-inline: var(--container-padding); */
+	padding: 0px var(--container-padding);
+	padding-right: var(--chart-right-edge-spacing);
+	max-width: 1920px;
+}
+
+.HeroMain {
+	display: flex;
+	flex-direction: column;
+	width: var(--hero-main-width);
+	flex-shrink: 0;
+}
+
+.HeroMain h1 {
+	font-display: swap;
+	/* Accent Adaptive/L Euclid/56px Desktop */
+	font-family: 'Euclid Circular B', system-ui, -apple-system, BlinkMacSystemFont,
+		'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+		sans-serif;
+	font-style: normal;
+	font-weight: 600;
+	font-size: var(--hero-title-font-size);
+	line-height: var(--hero-title-line-height);
+	/* or 114% */
+	font-feature-settings: 'tnum' on, 'lnum' on;
+	color: var(--hero-title-color);
+	margin: 0px;
+	margin-bottom: var(--hero-content-gap-top);
+}
+
+.HeroMain p {
+	/* Regular/24px */
+	font-style: normal;
+	font-weight: 400;
+	font-size: var(--hero-content-font-size);
+	line-height: var(--hero-content-line-height);
+	letter-spacing: 0.0027em;
+	font-feature-settings: 'tnum' on, 'lnum' on;
+	color: var(--hero-content-color);
+	margin: 0px;
+	margin-bottom: var(--hero-content-gap-bottom);
+}
+
+.HeroButtons {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 16px;
+}

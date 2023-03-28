@@ -109,9 +109,7 @@ export class ChartWidget implements IDestroyable {
 
 		// BEWARE: resize must be called BEFORE _syncGuiWithModel (in constructor only)
 		// or after but with adjustSize to properly update time scale
-		if (!usedObserver) {
-			this.resize(width, height);
-		}
+		this.resize(width, height);
 
 		this._syncGuiWithModel();
 
@@ -275,6 +273,10 @@ export class ChartWidget implements IDestroyable {
 			? this._paneWidgets[0].leftPriceAxisWidget()
 			: this._paneWidgets[0].rightPriceAxisWidget();
 		return ensureNotNull(priceAxisWidget).getWidth();
+	}
+
+	public autoSizeActive(): boolean {
+		return this._options.autoSize && this._observer !== null;
 	}
 
 	// eslint-disable-next-line complexity

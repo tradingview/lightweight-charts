@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Legend
+// Lightweight Charts™ Example: Legend
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/legends
 
 // remove-end
@@ -217,7 +217,8 @@ legend.appendChild(firstRow);
 chart.subscribeCrosshairMove(param => {
 	let priceFormatted = '';
 	if (param.time) {
-		const price = param.seriesPrices.get(areaSeries);
+		const data = param.seriesData.get(areaSeries);
+		const price = data.value !== undefined ? data.value : data.close;
 		priceFormatted = price.toFixed(2);
 	}
 	firstRow.innerHTML = `${symbolName} <strong>${priceFormatted}</strong>`;

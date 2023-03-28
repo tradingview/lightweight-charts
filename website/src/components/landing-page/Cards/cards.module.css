@@ -1,0 +1,82 @@
+.CardsContainer {
+	display: grid;
+	grid-template-columns: repeat(var(--card-grid-columns), 1fr);
+	column-gap: var(--card-grid-spacing);
+	row-gap: var(--card-grid-spacing);
+	width: 100%;
+	/* padding-inline: var(--container-padding); */
+	/* ! Fix for older versions of Safari which had a bug with css variables being used for -inline / -block */
+	padding: 0px var(--container-padding);
+
+	z-index: 1; /* To appear above gradient effects */
+}
+
+.Card {
+	display: flex;
+	flex-direction: column;
+
+	/* padding-inline: var(--card-inner-inline-padding);
+	padding-block: var(--card-inner-block-padding); */
+	/* ! Fix for older versions of Safari which had a bug with css variables being used for -inline / -block */
+	padding: var(--card-inner-block-padding) var(--card-inner-inline-padding);
+
+	border-radius: var(--card-corner-radius);
+	background-color: var(--card-background);
+	color: var(--card-title-color);
+	--card-p-color: var(--card-content-color);
+	--arrow-fill-color: var(--card-title-color);
+	margin: 0px;
+	gap: var(--card-gap);
+}
+
+.Card:hover {
+	text-decoration: none;
+	background-color: var(--card-background-hover);
+	color: var(--card-title-color-hover);
+	--arrow-fill-color: var(--card-title-color-hover);
+	--card-p-color: var(--card-content-color-hover);
+}
+
+.Card:active {
+	transform: translateY(1px);
+	background-color: var(--card-background-active);
+	color: var(--card-title-color-active);
+	--arrow-fill-color: var(--card-title-color-active);
+	--card-p-color: var(--card-content-color-active);
+}
+
+.Card:focus-visible {
+	outline-color: var(--tv-blue-500);
+	outline-width: 2px;
+	outline-offset: 4px;
+}
+
+.CardHeader {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.Card p {
+	color: var(--card-p-color);
+	margin: 0px;
+	font-style: normal;
+	font-weight: 400;
+	font-size: var(--card-content-font-size);
+	line-height: var(--card-content-line-height);
+	/* identical to box height, or 150% */
+	letter-spacing: -0.023em;
+	font-feature-settings: 'tnum' on, 'lnum' on;
+}
+
+.Card h2 {
+	margin: 0px;
+	font-style: normal;
+	font-weight: 700;
+	font-size: var(--card-title-font-size);
+	line-height: var(--card-title-line-height);
+	/* identical to box height, or 129% */
+	letter-spacing: 0.0135em;
+	font-feature-settings: 'tnum' on, 'lnum' on;
+}

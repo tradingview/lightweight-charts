@@ -52,9 +52,13 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 		axisRendererData.text = this._formatPrice(options.price);
 		axisRendererData.visible = true;
 
-		const colors = generateContrastColors(options.color);
+		const colors = generateContrastColors(options.axisLabelColor || options.color);
 		commonData.background = colors.background;
-		commonData.color = colors.foreground;
+
+		const textColor = options.axisLabelTextColor || colors.foreground;
+		axisRendererData.color = textColor; // price text
+		paneRendererData.color = textColor; // title text
+
 		commonData.coordinate = y;
 	}
 

@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: Watermark Simple
+// Lightweight Charts™ Example: Watermark Simple
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/watermark
 
 // remove-end

@@ -607,7 +607,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	private _recalculateMarkers(): void {
 		const timeScale = this.model().timeScale();
-		if (timeScale.isEmpty() || this._data.size() === 0) {
+		if (!timeScale.hasPoints() || this._data.isEmpty()) {
 			this._indexedMarkers = [];
 			return;
 		}

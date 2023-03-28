@@ -1,5 +1,5 @@
 // remove-start
-// Lightweight Charts Example: No Time Scale
+// Lightweight Charts™ Example: No Time Scale
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/example
 
 // remove-end

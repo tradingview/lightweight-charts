@@ -1,0 +1,173 @@
+.HeroChartSection {
+	position: relative;
+	width: 100%;
+	margin: 0px;
+	aspect-ratio: var(--hero-chart-aspect-ratio);
+	margin-left: var(--hero-chart-padding-left);
+	height: var(--hero-chart-height);
+}
+
+@supports not (aspect-ratio: auto) {
+	/* Fallback for very old browsers */
+	.HeroChartSection {
+		height: 600px;
+	}
+}
+
+.HeroChartGlass {
+	position: absolute;
+	inset: 0px;
+	background: rgba(255, 255, 255, 0.05);
+	backdrop-filter: blur(10.3785px);
+	border-radius: calc(
+		var(--chart-border-radius) + var(--chart-glass-border-width)
+	);
+}
+
+.HeroChartGradient {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		54.39deg,
+		rgba(63, 151, 255, 0.7) 28.27%,
+		rgba(198, 176, 248, 0.7) 47.32%,
+		rgba(191, 132, 250, 0.7) 51.53%,
+		rgba(91, 125, 233, 0.7) 61.73%,
+		rgba(41, 98, 255, 0.7) 70.81%
+	);
+	filter: blur(20.7571px);
+	border-radius: calc(
+		var(--chart-border-radius) + var(--chart-glass-border-width)
+	);
+}
+
+.HeroChartFigure {
+	position: absolute;
+	background-color: #f5f8ff; /* match this with the values defined for the chart */
+	inset: var(--chart-glass-border-width);
+	margin: 0px;
+	border-radius: var(--chart-border-radius);
+	z-index: 0;
+	overflow: hidden;
+	padding-top: 6px; /* So the top tick mark doesn't appear at edge of chart area */
+}
+
+.HeroChartFigure {
+	/* Disable table styling from docusaurus */
+	--ifm-table-cell-padding: 0px;
+	--ifm-table-background: transparent;
+	--ifm-table-stripe-background: transparent;
+	--ifm-table-border-width: 0px;
+	--ifm-table-border-color: transparent;
+	--ifm-table-head-background: inherit;
+	--ifm-table-head-color: inherit;
+	--ifm-table-head-font-weight: transparent;
+	--ifm-table-cell-color: inherit;
+}
+
+:root[data-theme='dark'] .HeroChartFigure {
+	background-color: #010512;
+}
+
+.HeroChartFadeBottom,
+.HeroChartFadeBottomDeep {
+	display: none;
+	position: absolute;
+	height: 87px;
+	left: -32px;
+	width: 100vw;
+}
+
+.HeroChartFadeBottom {
+	bottom: -17px;
+	background: linear-gradient(
+		360deg,
+		#ffffff 46.84%,
+		rgba(255, 255, 255, 0) 100%
+	);
+	transform: matrix(-1, 0, 0, 1, 0, 0);
+}
+
+.HeroChartFadeBottomDeep {
+	bottom: -100px;
+	background: #fff;
+}
+
+:root[data-theme='dark'] .HeroChartFadeBottom {
+	background: linear-gradient(360deg, #000 47.67%, rgba(0, 0, 0, 0) 100%);
+}
+
+:root[data-theme='dark'] .HeroChartFadeBottomDeep {
+	background: #000;
+}
+
+@media (min-width: 1280px) and (max-width: 1919px) {
+	.HeroChartFigure {
+		right: 0px !important;
+	}
+	.HeroChartFigure,
+	.HeroChartGradient,
+	.HeroChartGlass {
+		border-top-right-radius: 0px !important;
+		border-bottom-right-radius: 0px !important;
+	}
+}
+
+@media (min-width: 568px) and (max-width: 1279px) {
+	.HeroChartSection {
+		margin-left: calc(
+			var(--hero-chart-padding-left) + var(--container-padding)
+		);
+	}
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+	.HeroChartSection {
+		width: calc(100% - 48px);
+		margin-right: 48px;
+	}
+}
+
+@media (max-width: 1024px) {
+	.HeroChartSection {
+		width: calc(
+			100% - var(--container-offset-right-chart) -
+				var(--chart-glass-border-width)
+		);
+		margin-right: calc(
+			var(--container-offset-right-chart) + var(--chart-glass-border-width)
+		);
+	}
+}
+
+/* Phone-Vertical */
+@media (max-width: 567px) {
+	.HeroChartSection {
+		height: 355px;
+		aspect-ratio: initial;
+	}
+	.HeroChartFadeBottom,
+	.HeroChartFadeBottomDeep {
+		display: block !important;
+	}
+}
+
+.ChartContainer {
+	height: 100%;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 500ms;
+}
+
+.ChartContainer[reveal] {
+	opacity: 1;
+}
+
+.ChartContainer * {
+	overflow: hidden;
+}
+
+.ChartContainer table td,
+.ChartContainer table tr {
+	border: none;
+}
