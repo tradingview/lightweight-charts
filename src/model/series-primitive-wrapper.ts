@@ -112,7 +112,7 @@ class SeriesPrimitivePriceAxisViewWrapper extends PriceAxisView {
 		axisRendererData.visible = false;
 
 		commonRendererData.background = this._baseView.backColor();
-		commonRendererData.color = this._baseView.textColor();
+		axisRendererData.color = this._baseView.textColor();
 
 		const additionalPadding = 2 / 12 * this._priceScale.fontSize();
 
