@@ -5,7 +5,7 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
  */
 export interface ISeriesPrimitiveAxisView {
 	/**
-	 *coordinate of the label. For a price axis the value returned will represent the vertical distance (pixels) from the top. For a time axis the value will represent the horizontal distance from the left.
+	 * coordinate of the label. For a price axis the value returned will represent the vertical distance (pixels) from the top. For a time axis the value will represent the horizontal distance from the left.
 	 *
 	 * @returns coordinate. distance from top for price axis, or distance from left for time axis.	 *
 	 */
