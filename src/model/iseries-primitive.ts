@@ -1,5 +1,10 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
+import { type IChartApi } from '../api/ichart-api';
+import { type ISeriesApi } from '../api/iseries-api';
+
+import { type SeriesType } from './series-options';
+
 /**
  * This interface represents a label on the price or time axis
  */
@@ -98,4 +103,19 @@ export interface ISeriesPrimitive {
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
 	paneViews(): readonly ISeriesPrimitivePaneView[];
+
+	/**
+	 * Attached Lifecycle hook.
+	 *
+	 * @param chart - Chart instance
+	 * @param series - Series to which the Primitive is attached
+	 * @returns void
+	 */
+	attached?: (chart: IChartApi, series: ISeriesApi<SeriesType>) => void;
+	/**
+	 * Detached Lifecycle hook.
+	 *
+	 * @returns void
+	 */
+	detached?: () => void;
 }

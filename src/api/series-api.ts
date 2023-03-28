@@ -24,6 +24,7 @@ import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { getSeriesDataCreator } from './get-series-data-creator';
+import { type IChartApi } from './ichart-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, ISeriesApi } from './iseries-api';
@@ -33,13 +34,15 @@ import { PriceLine } from './price-line-api';
 export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType> {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>;
+	protected readonly _chartApi: IChartApi;
 
 	private readonly _priceScaleApiProvider: IPriceScaleApiProvider;
 
-	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>, priceScaleApiProvider: IPriceScaleApiProvider) {
+	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>, priceScaleApiProvider: IPriceScaleApiProvider, chartApi: IChartApi) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
 		this._priceScaleApiProvider = priceScaleApiProvider;
+		this._chartApi = chartApi;
 	}
 
 	public priceFormatter(): IPriceFormatter {
@@ -189,9 +192,15 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public attachPrimitive(primitive: ISeriesPrimitive): void {
 		this._series.attachPrimitive(primitive);
+		if (primitive.attached) {
+			primitive.attached(this._chartApi, this);
+		}
 	}
 
 	public detachPrimitive(primitive: ISeriesPrimitive): void {
 		this._series.detachPrimitive(primitive);
+		if (primitive.detached) {
+			primitive.detached();
+		}
 	}
 }
