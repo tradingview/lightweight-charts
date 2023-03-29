@@ -213,7 +213,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	public attachPrimitive(primitive: ISeriesPrimitive): void {
 		this._series.attachPrimitive(primitive);
 		if (primitive.attached) {
-			primitive.attached(this._chartApi, this);
+			primitive.attached(this._chartApi, this, () => this._series.model().fullUpdate());
 		}
 	}
 

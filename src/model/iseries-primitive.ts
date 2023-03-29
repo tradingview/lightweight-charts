@@ -109,9 +109,10 @@ export interface ISeriesPrimitive {
 	 *
 	 * @param chart - Chart instance
 	 * @param series - Series to which the Primitive is attached
+	 * @param requestUpdate - Request an update (redraw the chart)
 	 * @returns void
 	 */
-	attached?: (chart: IChartApi, series: ISeriesApi<SeriesType>) => void;
+	attached?: (chart: IChartApi, series: ISeriesApi<SeriesType>, requestUpdate: () => void) => void;
 	/**
 	 * Detached Lifecycle hook.
 	 *
