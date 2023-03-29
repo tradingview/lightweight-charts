@@ -1,6 +1,8 @@
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { ensureNotNull } from '../helpers/assertions';
+import { Delegate } from '../helpers/delegate';
+import { IDestroyable } from '../helpers/idestroyable';
 import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
@@ -10,6 +12,7 @@ import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
 import { Series } from '../model/series';
+import { SeriesPlotRow } from '../model/series-data';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
@@ -27,22 +30,27 @@ import { getSeriesDataCreator } from './get-series-data-creator';
 import { type IChartApi } from './ichart-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { BarsInfo, ISeriesApi } from './iseries-api';
+import { BarsInfo, DataChangedHandler, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
-export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType> {
+export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType>, IDestroyable {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>;
 	protected readonly _chartApi: IChartApi;
 
 	private readonly _priceScaleApiProvider: IPriceScaleApiProvider;
+	private readonly _dataChangedDelegate: Delegate = new Delegate();
 
 	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>, priceScaleApiProvider: IPriceScaleApiProvider, chartApi: IChartApi) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
 		this._priceScaleApiProvider = priceScaleApiProvider;
 		this._chartApi = chartApi;
+	}
+
+	public destroy(): void {
+		this._dataChangedDelegate.destroy();
 	}
 
 	public priceFormatter(): IPriceFormatter {
@@ -123,12 +131,14 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		checkSeriesValuesType(this._series.seriesType(), data);
 
 		this._dataUpdatesConsumer.applyNewData(this._series, data);
+		this._onDataChanged();
 	}
 
 	public update(bar: SeriesDataItemTypeMap[TSeriesType]): void {
 		checkSeriesValuesType(this._series.seriesType(), [bar]);
 
 		this._dataUpdatesConsumer.updateData(this._series, bar);
+		this._onDataChanged();
 	}
 
 	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null {
@@ -139,6 +149,16 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		}
 
 		return getSeriesDataCreator(this.seriesType())(data);
+	}
+
+	public data(): readonly SeriesDataItemTypeMap[TSeriesType][] {
+		const seriesCreator = getSeriesDataCreator(this.seriesType());
+		const rows = this._series.bars().rows();
+		return rows.map((row: SeriesPlotRow<TSeriesType>) => seriesCreator(row));
+	}
+
+	public subscribeDataChanged(handler: DataChangedHandler): void {
+		this._dataChangedDelegate.subscribe(handler);
 	}
 
 	public setMarkers(data: SeriesMarker<Time>[]): void {
@@ -201,6 +221,12 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		this._series.detachPrimitive(primitive);
 		if (primitive.detached) {
 			primitive.detached();
+		}
+	}
+
+	private _onDataChanged(): void {
+		if (this._dataChangedDelegate.hasListeners()) {
+			this._dataChangedDelegate.fire();
 		}
 	}
 }

@@ -18,6 +18,11 @@ import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 
 /**
+ * A custom function use to handle data changed events.
+ */
+export type DataChangedHandler = () => void;
+
+/**
  * Represents a range of bars and the number of bars outside the range.
  */
 // actually range might be either exist or not
@@ -172,6 +177,34 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null;
+
+	/**
+	 * Returns all the bar data for the series.
+	 *
+	 * @returns Original data items provided via setData or update methods.
+	 * @example
+	 * ```js
+	 * const originalData = series.data();
+	 * ```
+	 */
+	data(): readonly SeriesDataItemTypeMap[TSeriesType][];
+
+	/**
+	 * Subscribe to the data changed event. This event is fired whenever the `update` or `setData` method is evoked
+	 * on the series.
+	 *
+	 * @param handler - Handler to be called on a data changed event.
+	 * @example
+	 * ```js
+	 * function myHandler() {
+	 *     const data = series.data();
+	 *     console.log(`The data has changed. New Data length: ${data.length}`);
+	 * }
+	 *
+	 * series.subscribeDataChanged(myHandler);
+	 * ```
+	 */
+	subscribeDataChanged(handler: DataChangedHandler): void;
 
 	/**
 	 * Allows to set/replace all existing series markers with new ones.
