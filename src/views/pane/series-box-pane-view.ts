@@ -41,17 +41,17 @@ export abstract class SeriesBoxPaneView implements IPaneView {
 		this._invalidated = true;
 	}
 
-	public renderer(height: number, width: number): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}
 
 		if (this._invalidated) {
-			this._updateImpl(height, width);
+			this._updateImpl();
 			this._invalidated = false;
 		}
 		return this._boxRenderer;
 	}
 
-	protected abstract _updateImpl(height: number, width: number): void;
+	protected abstract _updateImpl(): void;
 }

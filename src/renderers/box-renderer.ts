@@ -1,8 +1,10 @@
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
 import { Coordinate } from '../model/coordinate';
 import { Point } from '../model/point';
 
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
 import { LineStyle, LineWidth, setLineStyle } from './draw-line';
-import { IPaneRenderer } from './ipane-renderer';
 
 export interface BoxRendererData {
 	fillColor: string;
@@ -25,14 +27,14 @@ export interface BoxRendererData {
 	height: number; // Canvas height?
 }
 
-export class BoxRenderer implements IPaneRenderer {
+export class BoxRenderer extends BitmapCoordinatesPaneRenderer {
 	private _data: BoxRendererData | null = null;
 
 	public setData(data: BoxRendererData): void {
 		this._data = data;
 	}
 
-	public draw(ctx: CanvasRenderingContext2D, pixelRatio: number, isHovered: boolean, hitTestData?: unknown): void {
+	protected _drawImpl({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
@@ -44,27 +46,25 @@ export class BoxRenderer implements IPaneRenderer {
 		let corners: Point[] = [];
 
 		if (this._data.corners.length === 0) {
-			const height = Math.ceil(this._data.height * pixelRatio);
-			const yLow = Math.round(this._data.yLow * pixelRatio) as Coordinate;
+			const yLow = Math.round(this._data.yLow * verticalPixelRatio) as Coordinate;
 
-			if (yLow > height) {
+			if (yLow > bitmapSize.height) {
 				return;
 			}
 
-			const yHigh = Math.round(this._data.yHigh * pixelRatio) as Coordinate;
+			const yHigh = Math.round(this._data.yHigh * verticalPixelRatio) as Coordinate;
 
 			if (yHigh < 0) {
 				return;
 			}
 
-			const width = Math.ceil(this._data.width * pixelRatio);
-			const xLow = Math.round(this._data.xLow * pixelRatio) as Coordinate;
+			const xLow = Math.round(this._data.xLow * horizontalPixelRatio) as Coordinate;
 
-			if (xLow > width) {
+			if (xLow > bitmapSize.width) {
 				return;
 			}
 
-			const xHigh = Math.round(this._data.xHigh * pixelRatio) as Coordinate;
+			const xHigh = Math.round(this._data.xHigh * horizontalPixelRatio) as Coordinate;
 
 			if (xHigh < 0) {
 				return;
@@ -79,8 +79,8 @@ export class BoxRenderer implements IPaneRenderer {
 		} else {
 			for (let i = 0; i < this._data.corners.length; ++i) {
 				corners.push({
-					x: Math.round(this._data.corners[i].x * pixelRatio) as Coordinate,
-					y: Math.round(this._data.corners[i].y * pixelRatio) as Coordinate,
+					x: Math.round(this._data.corners[i].x * horizontalPixelRatio) as Coordinate,
+					y: Math.round(this._data.corners[i].y * verticalPixelRatio) as Coordinate,
 				});
 			}
 		}

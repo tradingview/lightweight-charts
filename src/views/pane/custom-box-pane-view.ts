@@ -12,7 +12,7 @@ export class CustomBoxPaneView extends SeriesBoxPaneView {
 		this._box = box;
 	}
 
-	protected _updateImpl(height: number, width: number): void {
+	protected _updateImpl(): void {
 		const data = this._boxRendererData;
 		const boxOptions = this._box.options();
 
@@ -30,9 +30,6 @@ export class CustomBoxPaneView extends SeriesBoxPaneView {
 		data.borderVisible = boxOptions.borderVisible;
 		data.corners = [];
 		data.visible = true;
-
-		data.width = width;
-		data.height = height;
 
 		if (boxOptions.corners.length === 0) {
 			const yLow = this._box.yLowCoord();
