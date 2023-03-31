@@ -17,14 +17,20 @@ import { makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
+import { SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
 import { LayoutOptions } from '../model/layout-options';
+import { Pane } from '../model/pane';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TickMarkWeight } from '../model/time-data';
 import { TimeMark } from '../model/time-scale';
+import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
+import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
+import { drawBackground, drawForeground, drawSourcePaneViews } from './draw-functions';
+import { IPaneViewsGetter } from './ipane-view-getter';
 import { MouseEventHandler, MouseEventHandlers, MouseEventHandlerTouchEvent, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
 
@@ -41,6 +47,13 @@ const enum CursorType {
 function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
 	return a.weight > b.weight ? a : b;
 }
+
+function buildTimePaneViewsGetter(zOrder: SeriesPrimitivePaneViewZOrder): IPaneViewsGetter {
+	return (source: IDataSource, pane: Pane): readonly IPaneView[] => source.timePaneViews?.(zOrder, pane) ?? [];
+}
+const sourcePaneViews = buildTimePaneViewsGetter('normal');
+const sourceTopPaneViews = buildTimePaneViewsGetter('top');
+const sourceBottomPaneViews = buildTimePaneViewsGetter('bottom');
 
 export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _chart: ChartWidget;
@@ -293,8 +306,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
 					this._drawBorder(scope);
+					this._drawAdditionalSources(target, sourceBottomPaneViews);
 				});
 				this._drawTickMarks(target);
+				this._drawAdditionalSources(target, sourcePaneViews);
 				// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
 				// so let's don't call this code at all for now
 				// this._drawLabels(this._chart.model().dataSources(), target);
@@ -315,6 +330,29 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
 			});
 			this._drawLabels([...this._chart.model().serieses(), this._chart.model().crosshairSource()], topTarget);
+			this._drawAdditionalSources(topTarget, sourceTopPaneViews);
+		}
+	}
+
+	private _drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
+		const sources = this._chart.model().serieses();
+
+		for (const source of sources) {
+			drawSourcePaneViews(
+				paneViewsGetter,
+				(renderer: IPaneRenderer) => drawBackground(renderer, target, false, undefined),
+				source,
+				undefined as unknown as Pane
+			);
+		}
+
+		for (const source of sources) {
+			drawSourcePaneViews(
+				paneViewsGetter,
+				(renderer: IPaneRenderer) => drawForeground(renderer, target, false, undefined),
+				source,
+				undefined as unknown as Pane
+			);
 		}
 	}
 

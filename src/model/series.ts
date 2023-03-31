@@ -31,7 +31,7 @@ import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
 import { FirstValue } from './iprice-data-source';
-import { ISeriesPrimitive } from './iseries-primitive';
+import { ISeriesPrimitive, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
 import { MismatchDirection } from './plot-list';
@@ -51,8 +51,35 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from './series-options';
-import { SeriesPrimitiveWrapper } from './series-primitive-wrapper';
+import { ISeriesPrimitivePaneViewWrapper, SeriesPrimitiveWrapper } from './series-primitive-wrapper';
 import { TimePoint, TimePointIndex } from './time-data';
+
+type PrimitivePaneViewExtractor = (wrapper: SeriesPrimitiveWrapper) => readonly ISeriesPrimitivePaneViewWrapper[];
+function extractPrimitivePaneViews(
+	primitives: SeriesPrimitiveWrapper[],
+	extractor: PrimitivePaneViewExtractor,
+	zOrder: SeriesPrimitivePaneViewZOrder,
+	destination: IPaneView[]
+): void {
+	primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
+		extractor(wrapper).forEach((paneView: ISeriesPrimitivePaneViewWrapper) => {
+			if (paneView.zOrder() !== zOrder) {
+				return;
+			}
+			destination.push(paneView);
+		});
+	});
+}
+
+function primitivePaneViewsExtractor(wrapper: SeriesPrimitiveWrapper): readonly ISeriesPrimitivePaneViewWrapper[] {
+	return wrapper.paneViews();
+}
+function primitivePricePaneViewsExtractor(wrapper: SeriesPrimitiveWrapper): readonly ISeriesPrimitivePaneViewWrapper[] {
+	return wrapper.priceAxisPaneViews();
+}
+function primitiveTimePaneViewsExtractor(wrapper: SeriesPrimitiveWrapper): readonly ISeriesPrimitivePaneViewWrapper[] {
+	return wrapper.timeAxisPaneViews();
+}
 
 export interface LastValueDataResultWithoutData {
 	noData: true;
@@ -347,9 +374,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	}
 
 	public topPaneViews(pane: Pane): readonly IPaneView[] {
+		const res: IPaneView[] = [];
+		extractPrimitivePaneViews(this._primitives, primitivePaneViewsExtractor, 'top', res);
 		const animationPaneView = this._lastPriceAnimationPaneView;
 		if (animationPaneView === null || !animationPaneView.visible()) {
-			return [];
+			return res;
 		}
 
 		if (this._animationTimeoutId === null && animationPaneView.animationActive()) {
@@ -363,7 +392,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		}
 
 		animationPaneView.invalidateStage();
-		return [animationPaneView];
+		res.push(animationPaneView);
+		return res;
 	}
 
 	public paneViews(): readonly IPaneView[] {
@@ -381,12 +411,21 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
 		res.push(...priceLineViews);
-
-		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
-			res.push(...wrapper.paneViews());
-		});
+		extractPrimitivePaneViews(this._primitives, primitivePaneViewsExtractor, 'normal', res);
 
 		return res;
+	}
+
+	public bottomPaneViews(): readonly IPaneView[] {
+		return this._extractPaneViews(primitivePaneViewsExtractor, 'bottom');
+	}
+
+	public pricePaneViews(zOrder: SeriesPrimitivePaneViewZOrder): readonly IPaneView[] {
+		return this._extractPaneViews(primitivePricePaneViewsExtractor, zOrder);
+	}
+
+	public timePaneViews(zOrder: SeriesPrimitivePaneViewZOrder): readonly IPaneView[] {
+		return this._extractPaneViews(primitiveTimePaneViewsExtractor, zOrder);
 	}
 
 	public override labelPaneViews(pane?: Pane): readonly IPaneView[] {
@@ -670,5 +709,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 			default: throw Error('Unknown chart style assigned: ' + this._seriesType);
 		}
+	}
+
+	private _extractPaneViews(extractor: PrimitivePaneViewExtractor, zOrder: SeriesPrimitivePaneViewZOrder): readonly IPaneView[] {
+		const res: IPaneView[] = [];
+		extractPrimitivePaneViews(this._primitives, extractor, zOrder, res);
+		return res;
 	}
 }

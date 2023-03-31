@@ -10,11 +10,21 @@ import { type SeriesType } from './series-options';
  */
 export interface ISeriesPrimitiveAxisView {
 	/**
-	 * coordinate of the label. For a price axis the value returned will represent the vertical distance (pixels) from the top. For a time axis the value will represent the horizontal distance from the left.
+	 * The desired coordinate for the label. Note that the label will be automatically moved to prevent overlapping with other labels. If you would like the label to be drawn at the
+	 * exact coordinate under all circumstances then rather use `fixedCoordinate`.
+	 * For a price axis the value returned will represent the vertical distance (pixels) from the top. For a time axis the value will represent the horizontal distance from the left.
 	 *
-	 * @returns coordinate. distance from top for price axis, or distance from left for time axis.	 *
+	 * @returns coordinate. distance from top for price axis, or distance from left for time axis.
 	 */
 	coordinate(): number;
+	/**
+	 * fixed coordinate of the label. A label with a fixed coordinate value will always be drawn at the specified coordinate and will appear above any 'unfixed' labels. If you supply
+	 * a fixed coordinate then you should return a large negative number for `coordinate` so that the automatic placement of unfixed labels doesn't leave a blank space for this label.
+	 * For a price axis the value returned will represent the vertical distance (pixels) from the top. For a time axis the value will represent the horizontal distance from the left.
+	 *
+	 * @returns coordinate. distance from top for price axis, or distance from left for time axis.
+	 */
+	fixedCoordinate?(): number | undefined;
 	/**
 	 * @returns text of the label
 	 */
@@ -54,9 +64,24 @@ export interface ISeriesPrimitivePaneRenderer {
 }
 
 /**
+ * Defines where in the visual layer stack the renderer should be executed.
+ *
+ * - `bottom`: Draw below everything except the background.
+ * - `normal`: Draw at the same level as the series.
+ * - `top`: Draw above everything (including the crosshair).
+ */
+export type SeriesPrimitivePaneViewZOrder = 'bottom' | 'normal' | 'top';
+
+/**
  * This interface represents the primitive in the main area of the chart
  */
 export interface ISeriesPrimitivePaneView {
+	/**
+	 * Defines where in the visual layer stack the renderer should be executed. Default is `'normal'`.
+	 *
+	 * @returns the desired position in the visual layer stack. @see {@link SeriesPrimitivePaneViewZOrder}
+	 */
+	zOrder?(): SeriesPrimitivePaneViewZOrder;
 	/**
 	 * This method returns a renderer - special object to draw data
 	 *
@@ -72,7 +97,7 @@ export interface ISeriesPrimitive {
 	/**
 	 * This method is called when viewport has been changed, so primitive have to recalculate / invalidate its data
 	 */
-	updateAllViews(): void;
+	updateAllViews?(): void;
 
 	/**
 	 * Returns array of labels to be drawn on the price axis used by the series
@@ -82,7 +107,7 @@ export interface ISeriesPrimitive {
 	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
-	priceAxisViews(): readonly ISeriesPrimitiveAxisView[];
+	priceAxisViews?(): readonly ISeriesPrimitiveAxisView[];
 
 	/**
 	 * Returns array of labels to be drawn on the time axis
@@ -92,7 +117,7 @@ export interface ISeriesPrimitive {
 	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
-	timeAxisViews(): readonly ISeriesPrimitiveAxisView[];
+	timeAxisViews?(): readonly ISeriesPrimitiveAxisView[];
 
 	/**
 	 * Returns array of objects representing primitive in the main area of the chart
@@ -102,7 +127,27 @@ export interface ISeriesPrimitive {
 	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
-	paneViews(): readonly ISeriesPrimitivePaneView[];
+	paneViews?(): readonly ISeriesPrimitivePaneView[];
+
+	/**
+	 * Returns array of objects representing primitive in the price axis area of the chart
+	 *
+	 * @returns array of objects; each of then must implement ISeriesPrimitivePaneView interface
+	 *
+	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
+	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
+	 */
+	priceAxisPaneViews?(): readonly ISeriesPrimitivePaneView[];
+
+	/**
+	 * Returns array of objects representing primitive in the time axis area of the chart
+	 *
+	 * @returns array of objects; each of then must implement ISeriesPrimitivePaneView interface
+	 *
+	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
+	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
+	 */
+	timeAxisPaneViews?(): readonly ISeriesPrimitivePaneView[];
 
 	/**
 	 * Attached Lifecycle hook.

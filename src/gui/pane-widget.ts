@@ -29,6 +29,8 @@ import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
+import { drawBackground, drawForeground, DrawFunction, drawSourcePaneViews } from './draw-functions';
+import { IPaneViewsGetter } from './ipane-view-getter';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 
@@ -39,30 +41,17 @@ const enum KineticScrollConstants {
 	ScrollMinMove = 15,
 }
 
-type DrawFunction = (renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown) => void;
-
-function drawBackground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-	if (renderer.drawBackground) {
-		renderer.drawBackground(target, isHovered, hitTestData);
-	}
+function sourceBottomPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+	return source.bottomPaneViews?.(pane) ?? [];
 }
-
-function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-	renderer.draw(target, isHovered, hitTestData);
-}
-
-type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
-
 function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
-	return source.paneViews(pane);
+	return source.paneViews?.(pane) ?? [];
 }
-
 function sourceLabelPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
-	return source.labelPaneViews(pane);
+	return source.labelPaneViews?.(pane) ?? [];
 }
-
 function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
-	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
+	return source.topPaneViews?.(pane) ?? [];
 }
 
 export interface HitTestResult {
@@ -493,6 +482,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 					this._drawBackground(scope);
 				});
 				if (this._state) {
+					this._drawSources(target, sourceBottomPaneViews);
 					this._drawGrid(target);
 					this._drawWatermark(target);
 					this._drawSources(target, sourcePaneViews);
@@ -507,8 +497,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
 			});
-			this._drawSources(topTarget, sourceTopPaneViews);
 			this._drawCrosshair(topTarget);
+			this._drawSources(topTarget, sourceTopPaneViews);
 		}
 	}
 
@@ -518,6 +508,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public rightPriceAxisWidget(): PriceAxisWidget | null {
 		return this._rightPriceAxisWidget;
+	}
+
+	public drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
+		this._drawSources(target, paneViewsGetter);
 	}
 
 	private _onStateDestroyed(): void {
@@ -569,7 +563,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: PaneViewsGetter): void {
+	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
@@ -584,24 +578,19 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _drawSourceImpl(
 		target: CanvasRenderingTarget2D,
-		paneViewsGetter: PaneViewsGetter,
+		paneViewsGetter: IPaneViewsGetter,
 		drawFn: DrawFunction,
 		source: IDataSource
 	): void {
 		const state = ensureNotNull(this._state);
-		const paneViews = paneViewsGetter(source, state);
 		const hoveredSource = state.model().hoveredSource();
 		const isHovered = hoveredSource !== null && hoveredSource.source === source;
 		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
 			? hoveredSource.object.hitTestData
 			: undefined;
 
-		for (const paneView of paneViews) {
-			const renderer = paneView.renderer();
-			if (renderer !== null) {
-				drawFn(renderer, target, isHovered, objecId);
-			}
-		}
+		const drawRendererFn = (renderer: IPaneRenderer) => drawFn(renderer, target, isHovered, objecId);
+		drawSourcePaneViews(paneViewsGetter, drawRendererFn, source, state);
 	}
 
 	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
