@@ -4,38 +4,42 @@ import chaiExclude from 'chai-exclude';
 import { describe, it } from 'mocha';
 
 import { BarData, HistogramData, LineData, WhitespaceData } from '../../src/model/data-consumer';
-import { convertTime, DataLayer, SeriesChanges, stringToBusinessDay } from '../../src/model/data-layer';
+import { DataLayer, SeriesChanges } from '../../src/model/data-layer';
 import { ensureDefined } from '../../src/helpers/assertions';
 import { PlotRowValueIndex } from '../../src/model/plot-data';
 import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
 import { SeriesType } from '../../src/model/series-options';
-import { BusinessDay, Time, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
+import { TimePointIndex } from '../../src/model/time-data';
+import { BusinessDay, Time, TimePoint, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
+import { convertTime, HorzScaleBehaviorTime, stringToBusinessDay } from '../../src/model/horz-scale-behavior-time/horz-scale-behavior-time';
 
 chai.use(chaiExclude);
 
-function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Series<T> {
+function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Series<T, Time> {
 	const data = new PlotList();
 
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	return {
 		bars: () => data,
 		seriesType: () => seriesType || 'Line',
-	} as Series<T>;
+	} as Series<T, Time>;
 }
 
 // just for tests
-function dataItemAt(time: Time): BarData & LineData & HistogramData {
+function dataItemAt(time: Time): BarData<Time> & LineData<Time> & HistogramData<Time> {
 	return { time, value: 0, open: 0, high: 0, low: 0, close: 0 };
 }
 
-function whitespaceItemAt(time: Time): WhitespaceData {
+function whitespaceItemAt(time: Time): WhitespaceData<Time> {
 	return { time };
 }
 
+const behavior = new HorzScaleBehaviorTime();
+
 describe('DataLayer', () => {
 	it('should be able to append new series with updating time scale', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 
 		// actually we don't need to use Series, so we just use new Object()
 		const series1 = createSeriesMock();
@@ -49,14 +53,14 @@ describe('DataLayer', () => {
 		]);
 		expect(updateResult1.timeScale.firstChangedPointIndex).to.be.equal(0);
 		expect(updateResult1.series.size).to.be.equal(1);
-		updateResult1.series.forEach((updatePacket: SeriesChanges, series: Series) => {
+		updateResult1.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
 			expect(series).to.be.equal(series1);
 			expect(updatePacket.data.length).to.be.equal(2);
 
 			expect(updatePacket.data[0].index).to.be.equal(0 as TimePointIndex);
-			expect(updatePacket.data[0].time.timestamp).to.be.equal(1000 as UTCTimestamp);
+			expect((updatePacket.data[0].time as unknown as TimePoint).timestamp).to.be.equal(1000 as UTCTimestamp);
 			expect(updatePacket.data[1].index).to.be.equal(1 as TimePointIndex);
-			expect(updatePacket.data[1].time.timestamp).to.be.equal(3000 as UTCTimestamp);
+			expect((updatePacket.data[1].time as unknown as TimePoint).timestamp).to.be.equal(3000 as UTCTimestamp);
 		});
 
 		const updateResult2 = dataLayer.setSeriesData(series2, [dataItemAt(2000 as UTCTimestamp), dataItemAt(4000 as UTCTimestamp)]);
@@ -69,7 +73,7 @@ describe('DataLayer', () => {
 		]);
 		expect(updateResult2.timeScale.firstChangedPointIndex).to.be.equal(1);
 		expect(updateResult2.series.size).to.be.equal(2);
-		updateResult2.series.forEach((updatePacket: SeriesChanges, series: Series) => {
+		updateResult2.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
 			if (series === series1) {
 				expect(updatePacket.data.length).to.be.equal(2);
 
@@ -87,7 +91,7 @@ describe('DataLayer', () => {
 	});
 
 	it('should be able to append new series WITHOUT updating time scale', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 
 		// actually we don't need to use Series, so we just use new Object()
 		const series1 = createSeriesMock();
@@ -112,7 +116,7 @@ describe('DataLayer', () => {
 	});
 
 	it('should be able to remove series if time scale is changed', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 
 		// actually we don't need to use Series, so we just use new Object()
 		const series1 = createSeriesMock();
@@ -157,7 +161,7 @@ describe('DataLayer', () => {
 	});
 
 	it('should be able to remove series if time scale is NOT changed', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 
 		// actually we don't need to use Series, so we just use new Object()
 		const series1 = createSeriesMock();
@@ -181,7 +185,7 @@ describe('DataLayer', () => {
 	});
 
 	it('should be able to add new point in the end', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 
 		// actually we don't need to use Series, so we just use new Object()
 		const series1 = createSeriesMock();
@@ -237,7 +241,7 @@ describe('DataLayer', () => {
 	});
 
 	it('should be able to change last existing point', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 
 		// actually we don't need to use Series, so we just use new Object()
 		const series1 = createSeriesMock();
@@ -252,7 +256,7 @@ describe('DataLayer', () => {
 		expect(updateResult1.timeScale.points).to.be.equal(undefined);
 		expect(updateResult1.timeScale.firstChangedPointIndex).to.be.equal(undefined);
 		expect(updateResult1.series.size).to.be.equal(1);
-		updateResult1.series.forEach((updatePacket: SeriesChanges, series: Series) => {
+		updateResult1.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
 			expect(series).to.be.equal(series1);
 			expect(updatePacket.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
 				{ index: 0, time: { timestamp: 1000 } },
@@ -266,7 +270,7 @@ describe('DataLayer', () => {
 		expect(updateResult2.timeScale.points).to.be.equal(undefined);
 		expect(updateResult2.timeScale.firstChangedPointIndex).to.be.equal(undefined);
 		expect(updateResult2.series.size).to.be.equal(1);
-		updateResult2.series.forEach((updatePacket: SeriesChanges, series: Series) => {
+		updateResult2.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
 			expect(series).to.be.equal(series2);
 			expect(updatePacket.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
 				{ index: 1, time: { timestamp: 2000 } },
@@ -276,7 +280,7 @@ describe('DataLayer', () => {
 	});
 
 	it('should be able to add new point in the middle', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 
 		// actually we don't need to use Series, so we just use new Object()
 		const series1 = createSeriesMock();
@@ -297,7 +301,7 @@ describe('DataLayer', () => {
 		]);
 		expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(2);
 		expect(updateResult.series.size).to.be.equal(2);
-		updateResult.series.forEach((updatePacket: SeriesChanges, series: Series) => {
+		updateResult.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
 			if (series === series1) {
 				expect(updatePacket.data.length).to.be.equal(2);
 
@@ -322,7 +326,7 @@ describe('DataLayer', () => {
 	});
 
 	it('allow business days', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 		const series1 = createSeriesMock();
 		const date1: BusinessDay = { day: 1, month: 10, year: 2019 };
 		const date2: BusinessDay = { day: 2, month: 10, year: 2019 };
@@ -352,26 +356,26 @@ describe('DataLayer', () => {
 			{ time: timePoint2, timeWeight: 50, originalTime: { day: 2, month: 10, year: 2019 } },
 		]);
 		expect(updateResult1.series.size).to.be.equal(1);
-		updateResult1.series.forEach((updatePacket: SeriesChanges, series: Series) => {
+		updateResult1.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
 			expect(series).to.be.equal(series);
 			expect(updatePacket.data.length).to.be.equal(2);
 
 			expect(updatePacket.data[0].index).to.be.equal(0 as TimePointIndex);
-			expect(updatePacket.data[0].time.timestamp).to.be.equal(1569888000 as UTCTimestamp);
+			expect((updatePacket.data[0].time as unknown as TimePoint).timestamp).to.be.equal(1569888000 as UTCTimestamp);
 			expect(updatePacket.data[1].index).to.be.equal(1 as TimePointIndex);
-			expect(updatePacket.data[1].time.timestamp).to.be.equal(1569974400 as UTCTimestamp);
+			expect((updatePacket.data[1].time as unknown as TimePoint).timestamp).to.be.equal(1569974400 as UTCTimestamp);
 		});
 	});
 
 	it('all points should have same time type', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 		const series = createSeriesMock();
 		expect(() => dataLayer.setSeriesData(series, [dataItemAt(5000 as UTCTimestamp), dataItemAt({ day: 1, month: 10, year: 2019 })]))
 			.to.throw();
 	});
 
 	it('all points should have same time type on updating', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 		const series = createSeriesMock();
 		dataLayer.setSeriesData(series, [dataItemAt({ day: 1, month: 10, year: 2019 })]);
 		expect(() => dataLayer.updateSeriesData(series, dataItemAt(5000 as UTCTimestamp)))
@@ -398,10 +402,10 @@ describe('DataLayer', () => {
 		const ohlcBasedTypes: SeriesType[] = ['Bar', 'Candlestick'];
 
 		for (const seriesType of ohlcBasedTypes) {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 			const series = createSeriesMock(seriesType);
 
-			const item: BarData & LineData = {
+			const item: BarData<Time> & LineData<Time> = {
 				time: '2017-01-01',
 				open: 10,
 				high: 15,
@@ -421,7 +425,7 @@ describe('DataLayer', () => {
 	});
 
 	it('should update removed series data gh#752', () => {
-		function generateData(): LineData[] {
+		function generateData(): LineData<Time>[] {
 			const res = [];
 			const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
 
@@ -434,7 +438,7 @@ describe('DataLayer', () => {
 			return res;
 		}
 
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 		const series1 = createSeriesMock();
 		const series2 = createSeriesMock();
 		const data1 = generateData();
@@ -476,7 +480,7 @@ describe('DataLayer', () => {
 	});
 
 	it('should correctly update indexes of series data if times are not changed', () => {
-		const dataLayer = new DataLayer();
+		const dataLayer = new DataLayer<Time>(behavior);
 
 		const series = createSeriesMock();
 
@@ -498,7 +502,7 @@ describe('DataLayer', () => {
 	});
 
 	describe('should update base index to null when all series data is cleared gh#757', () => {
-		const data: LineData[] = [
+		const data: LineData<Time>[] = [
 			{
 				time: 1609459200 as UTCTimestamp,
 				value: 31.533026412262345,
@@ -542,7 +546,7 @@ describe('DataLayer', () => {
 		];
 
 		it('single series', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 			const series = createSeriesMock();
 
 			dataLayer.setSeriesData(series, data);
@@ -554,7 +558,7 @@ describe('DataLayer', () => {
 
 		it('multiple series', () => {
 			const seriesCount = 5;
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 			const series = [];
 
 			for (let i = 0; i < seriesCount; i++) {
@@ -578,7 +582,7 @@ describe('DataLayer', () => {
 
 	describe('should be able to remove series and generate full update to other series if time scale is changed gh#355', () => {
 		const barsCount = 10;
-		function generateData(startTime: number, step: number): LineData[] {
+		function generateData(startTime: number, step: number): LineData<Time>[] {
 			const res = [];
 			let time = startTime;
 			for (let i = 0; i < barsCount; ++i) {
@@ -590,7 +594,7 @@ describe('DataLayer', () => {
 		}
 
 		it('remove first series', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 
 			const series1 = createSeriesMock();
 			const series2 = createSeriesMock();
@@ -615,7 +619,7 @@ describe('DataLayer', () => {
 		});
 
 		it('remove second series', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 
 			const series1 = createSeriesMock();
 			const series2 = createSeriesMock();
@@ -642,7 +646,7 @@ describe('DataLayer', () => {
 
 	describe('whitespaces', () => {
 		it('should allow to set whitespaces to series', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 
 			const series = createSeriesMock();
 
@@ -664,19 +668,19 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(1);
 
-			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges<Time>;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 			expect(seriesUpdate.data.length).to.be.equal(2);
 
 			expect(seriesUpdate.data[0].index).to.be.equal(0 as TimePointIndex);
-			expect(seriesUpdate.data[0].time.timestamp).to.be.equal(1000 as UTCTimestamp);
+			expect((seriesUpdate.data[0].time as unknown as TimePoint).timestamp).to.be.equal(1000 as UTCTimestamp);
 
 			expect(seriesUpdate.data[1].index).to.be.equal(3 as TimePointIndex);
-			expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+			expect((seriesUpdate.data[1].time as unknown as TimePoint).timestamp).to.be.equal(4000 as UTCTimestamp);
 		});
 
 		it('should allow to append whitespace via update', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 
 			const series = createSeriesMock();
 
@@ -697,19 +701,19 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(1);
 
-			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges<Time>;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 			expect(seriesUpdate.data.length).to.be.equal(2);
 
 			expect(seriesUpdate.data[0].index).to.be.equal(0 as TimePointIndex);
-			expect(seriesUpdate.data[0].time.timestamp).to.be.equal(1000 as UTCTimestamp);
+			expect((seriesUpdate.data[0].time as unknown as TimePoint).timestamp).to.be.equal(1000 as UTCTimestamp);
 
 			expect(seriesUpdate.data[1].index).to.be.equal(1 as TimePointIndex);
-			expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+			expect((seriesUpdate.data[1].time as unknown as TimePoint).timestamp).to.be.equal(4000 as UTCTimestamp);
 		});
 
 		it('should allow to replace whitespace with bar', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 
 			const series = createSeriesMock();
 
@@ -727,7 +731,7 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(1);
 
-			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges<Time>;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 
 			expect(seriesUpdate.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
@@ -738,7 +742,7 @@ describe('DataLayer', () => {
 		});
 
 		it('should allow to replace bar with whitespace', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 
 			const series = createSeriesMock();
 
@@ -756,19 +760,19 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(1);
 
-			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges<Time>;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 			expect(seriesUpdate.data.length).to.be.equal(2);
 
 			expect(seriesUpdate.data[0].index).to.be.equal(0 as TimePointIndex);
-			expect(seriesUpdate.data[0].time.timestamp).to.be.equal(1000 as UTCTimestamp);
+			expect((seriesUpdate.data[0].time as unknown as TimePoint).timestamp).to.be.equal(1000 as UTCTimestamp);
 
 			expect(seriesUpdate.data[1].index).to.be.equal(1 as TimePointIndex);
-			expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+			expect((seriesUpdate.data[1].time as unknown as TimePoint).timestamp).to.be.equal(4000 as UTCTimestamp);
 		});
 
 		it('should generate full update if whitespace extends timescale', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 
 			const series1 = createSeriesMock();
 			const series2 = createSeriesMock();
@@ -797,27 +801,27 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(2);
 
-			updateResult.series.forEach((seriesUpdate: SeriesChanges, series: Series) => {
+			updateResult.series.forEach((seriesUpdate: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
 				expect(seriesUpdate.data.length).to.be.equal(2);
 
 				if (series === series1) {
 					expect(seriesUpdate.data[0].index).to.be.equal(0 as TimePointIndex);
-					expect(seriesUpdate.data[0].time.timestamp).to.be.equal(1000 as UTCTimestamp);
+					expect((seriesUpdate.data[0].time as unknown as TimePoint).timestamp).to.be.equal(1000 as UTCTimestamp);
 
 					expect(seriesUpdate.data[1].index).to.be.equal(4 as TimePointIndex);
-					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(5000 as UTCTimestamp);
+					expect((seriesUpdate.data[1].time as unknown as TimePoint).timestamp).to.be.equal(5000 as UTCTimestamp);
 				} else {
 					expect(seriesUpdate.data[0].index).to.be.equal(1 as TimePointIndex);
-					expect(seriesUpdate.data[0].time.timestamp).to.be.equal(2000 as UTCTimestamp);
+					expect((seriesUpdate.data[0].time as unknown as TimePoint).timestamp).to.be.equal(2000 as UTCTimestamp);
 
 					expect(seriesUpdate.data[1].index).to.be.equal(2 as TimePointIndex);
-					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(3000 as UTCTimestamp);
+					expect((seriesUpdate.data[1].time as unknown as TimePoint).timestamp).to.be.equal(3000 as UTCTimestamp);
 				}
 			});
 		});
 
 		it('should remove old whitespaces while setting new data', () => {
-			const dataLayer = new DataLayer();
+			const dataLayer = new DataLayer<Time>(behavior);
 
 			const series1 = createSeriesMock();
 			const series2 = createSeriesMock();
@@ -851,21 +855,21 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(2);
 
-			updateResult.series.forEach((seriesUpdate: SeriesChanges, series: Series) => {
+			updateResult.series.forEach((seriesUpdate: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
 				expect(seriesUpdate.data.length).to.be.equal(2);
 
 				if (series === series1) {
 					expect(seriesUpdate.data[0].index).to.be.equal(0 as TimePointIndex);
-					expect(seriesUpdate.data[0].time.timestamp).to.be.equal(1000 as UTCTimestamp);
+					expect((seriesUpdate.data[0].time as unknown as TimePoint).timestamp).to.be.equal(1000 as UTCTimestamp);
 
 					expect(seriesUpdate.data[1].index).to.be.equal(3 as TimePointIndex);
-					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(5000 as UTCTimestamp);
+					expect((seriesUpdate.data[1].time as unknown as TimePoint).timestamp).to.be.equal(5000 as UTCTimestamp);
 				} else {
 					expect(seriesUpdate.data[0].index).to.be.equal(1 as TimePointIndex);
-					expect(seriesUpdate.data[0].time.timestamp).to.be.equal(2000 as UTCTimestamp);
+					expect((seriesUpdate.data[0].time as unknown as TimePoint).timestamp).to.be.equal(2000 as UTCTimestamp);
 
 					expect(seriesUpdate.data[1].index).to.be.equal(2 as TimePointIndex);
-					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(3000 as UTCTimestamp);
+					expect((seriesUpdate.data[1].time as unknown as TimePoint).timestamp).to.be.equal(3000 as UTCTimestamp);
 				}
 			});
 		});

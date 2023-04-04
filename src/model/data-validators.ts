@@ -1,11 +1,11 @@
 import { assert } from '../helpers/assertions';
 
-import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
-import { CreatePriceLineOptions } from '../model/price-line-options';
-import { SeriesMarker } from '../model/series-markers';
-import { SeriesType } from '../model/series-options';
+import { IHorzScaleBehavior } from './ihorz-scale-behavior';
+import { CreatePriceLineOptions } from './price-line-options';
+import { SeriesMarker } from './series-markers';
+import { SeriesType } from './series-options';
 
-import { isFulfilledData, SeriesDataItemTypeMap } from '../model/data-consumer';
+import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 
 export function checkPriceLineOptions(options: CreatePriceLineOptions): void {
 	if (process.env.NODE_ENV === 'production') {

@@ -2,25 +2,27 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { getSeriesDataCreator } from '../../src/api/get-series-data-creator';
+import { Time, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
+import { InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { PlotRow } from '../../src/model/plot-data';
 import { AreaPlotRow, BarPlotRow, BaselinePlotRow, CandlestickPlotRow, HistogramPlotRow, LinePlotRow } from '../../src/model/series-data';
-import { OriginalTime, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
+import { TimePointIndex } from '../../src/model/time-data';
 
-const plotRow: PlotRow = {
+const plotRow: PlotRow<Time> = {
 	index: 0 as TimePointIndex,
-	time: { timestamp: 1649931070 as UTCTimestamp },
+	time: { timestamp: 1649931070 as UTCTimestamp } as unknown as InternalHorzScaleItem,
 	value: [1, 2, 3, 4],
-	originalTime: 1649931070 as unknown as OriginalTime,
+	originalTime: 1649931070 as UTCTimestamp,
 };
 
-const linePlotRows: LinePlotRow[] = [
+const linePlotRows: LinePlotRow<Time>[] = [
 	{
 		...plotRow,
 		color: '#FF0000',
 	},
 	plotRow,
 ];
-const areaPlotRows: AreaPlotRow[] = [
+const areaPlotRows: AreaPlotRow<Time>[] = [
 	{
 		...plotRow,
 		lineColor: '#FF0000',
@@ -29,7 +31,7 @@ const areaPlotRows: AreaPlotRow[] = [
 	},
 	plotRow,
 ];
-const baselinePlotRows: BaselinePlotRow[] = [
+const baselinePlotRows: BaselinePlotRow<Time>[] = [
 	{
 		...plotRow,
 		topFillColor1: '#000001',
@@ -41,21 +43,21 @@ const baselinePlotRows: BaselinePlotRow[] = [
 	},
 	plotRow,
 ];
-const histogramPlotRow: HistogramPlotRow[] = [
+const histogramPlotRow: HistogramPlotRow<Time>[] = [
 	{
 		...plotRow,
 		color: '#00FF00',
 	},
 	plotRow,
 ];
-const barPlotRow: BarPlotRow[] = [
+const barPlotRow: BarPlotRow<Time>[] = [
 	{
 		...plotRow,
 		color: '#0000FF',
 	},
 	plotRow,
 ];
-const candlestickPlotRows: CandlestickPlotRow[] = [
+const candlestickPlotRows: CandlestickPlotRow<Time>[] = [
 	{
 		...plotRow,
 		color: '#0000FF',
