@@ -1,17 +1,18 @@
+import { DateFormatter } from '../../formatters/date-formatter';
+import { DateTimeFormatter } from '../../formatters/date-time-formatter';
+
+import { ensureNotNull } from '../../helpers/assertions';
+import { isString } from '../../helpers/strict-type-checks';
+
+import { ChartOptions } from '../chart-model';
 import { SeriesDataItemTypeMap } from '../data-consumer';
 import { TimedData } from '../data-layer';
 import { DataItem, HorzScaleItemConverterToInternalObj, IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from '../ihorz-scale-behavior';
-import { DateFormatter } from '../../formatters/date-formatter';
-import { DateTimeFormatter } from '../../formatters/date-time-formatter';
-import { ensureNotNull } from '../../helpers/assertions';
-import { isString } from '../../helpers/strict-type-checks';
-import { ChartOptions } from '../chart-model';
 import { LocalizationOptions } from '../localization-options';
 import { SeriesType } from '../series-options';
 import { TickMark } from '../tick-marks';
 import { TickMarkWeightValue, TimeScalePoint } from '../time-data';
 import { markWithGreaterWeight, TimeMark, TimeScaleOptions } from '../time-scale';
-
 import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
 import { fillWeightsForPoints } from './time-scale-point-weight-generator';
 import { BusinessDay, isBusinessDay, isUTCTimestamp, TickMarkType, TickMarkWeight, Time, TimePoint, UTCTimestamp } from './types';
@@ -164,7 +165,7 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	private _dateTimeFormatter!: DateFormatter | DateTimeFormatter;
 	private _options!: ChartOptions<Time>;
 
-	public setOptions(options: ChartOptions<Time>) {
+	public setOptions(options: ChartOptions<Time>): void {
 		this._options = options;
 		this.updateFormatter(options.localization as TimeLocalizationOptions);
 	}
@@ -187,7 +188,7 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	}
 
 	public key(item: InternalHorzScaleItem | Time): InternalHorzScaleItemKey {
-		if ((typeof item === 'object') && 'timestamp' in item) {
+		if (typeof item === 'object') {
 			return (item as unknown as TimePoint).timestamp as unknown as InternalHorzScaleItemKey;
 		} else {
 			return this.key(this.convertHorzItemToInternal(item as Time));
@@ -200,7 +201,6 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 			? new Date(time.timestamp * 1000).getTime()
 			: new Date(Date.UTC(time.businessDay.year, time.businessDay.month - 1, time.businessDay.day)).getTime();
 	}
-
 
 	public convertHorzItemToInternal(item: Time): InternalHorzScaleItem {
 		return convertTime(item);
@@ -262,5 +262,4 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	public fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint<Time>>[], startIndex: number): void {
 		fillWeightsForPoints(sortedTimePoints, startIndex);
 	}
-
 }

@@ -1,6 +1,7 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
+import { BarData, HistogramData, LineData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { Point } from '../model/point';
 import {
@@ -15,7 +16,6 @@ import {
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { BarData, HistogramData, LineData } from '../model/data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';

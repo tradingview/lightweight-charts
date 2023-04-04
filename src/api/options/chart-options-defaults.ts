@@ -9,7 +9,7 @@ import { priceScaleOptionsDefaults } from './price-scale-options-defaults';
 import { timeScaleOptionsDefaults } from './time-scale-options-defaults';
 import { watermarkOptionsDefaults } from './watermark-options-defaults';
 
-export function chartOptionsDefaults<HorzScaleItem>() : ChartOptionsInternal<HorzScaleItem> {
+export function chartOptionsDefaults<HorzScaleItem>(): ChartOptionsInternal<HorzScaleItem> {
 	return {
 		width: 0,
 		height: 0,

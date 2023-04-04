@@ -3,6 +3,7 @@ import { Nominal } from '../helpers/nominal';
 import { DeepPartial, isString, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
+import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { HorzScaleBehaviorTime } from '../model/horz-scale-behavior-time/horz-scale-behavior-time';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { DataItem, HorzScaleItemConverterToInternalObj, IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from '../model/ihorz-scale-behavior';
@@ -13,7 +14,6 @@ import { TickMarkWeightValue, TimeScalePoint } from '../model/time-data';
 import { markWithGreaterWeight, TimeMark } from '../model/time-scale';
 
 import { ChartApi } from './chart-api';
-import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { IChartApi } from './ichart-api';
 
 /**
@@ -42,6 +42,9 @@ export function createChart(container: string | HTMLElement, options?: DeepParti
 	return createChartEx<Time>(container, new HorzScaleBehaviorTime(), merge({ localization: { dateFormat: 'dd MMM \'yy' } }, options ?? {}));
 }
 
+/**
+ * Nominal for numbers used as values in the horizontal scale
+ */
 type Price = Nominal<number, 'Price'>;
 
 class HorzScaleBehaviorPrice implements IHorzScaleBehavior<Price> {

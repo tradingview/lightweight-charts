@@ -1,14 +1,3 @@
-import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
-import {
-	AreaPlotRow,
-	BarPlotRow,
-	BaselinePlotRow,
-	CandlestickPlotRow,
-	LinePlotRow,
-	SeriesPlotRow,
-} from '../model/series-data';
-import { SeriesType } from '../model/series-options';
-
 import {
 	AreaData,
 	BarData,
@@ -19,6 +8,16 @@ import {
 	SeriesDataItemTypeMap,
 	SingleValueData,
 } from '../model/data-consumer';
+import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
+import {
+	AreaPlotRow,
+	BarPlotRow,
+	BaselinePlotRow,
+	CandlestickPlotRow,
+	LinePlotRow,
+	SeriesPlotRow,
+} from '../model/series-data';
+import { SeriesType } from '../model/series-options';
 
 type SeriesPlotRowToDataMap<HorzScaleItem> = {
 	[T in keyof SeriesDataItemTypeMap<HorzScaleItem>]: (plotRow: SeriesPlotRow<T, HorzScaleItem>) => SeriesDataItemTypeMap<HorzScaleItem>[T];

@@ -1,10 +1,9 @@
+import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { PlotRow } from './plot-data';
 import { SeriesPlotRow } from './series-data';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
-
-import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 
 function getColoredLineBasedSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: LineData<HorzScaleItem> | HistogramData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Line' | 'Histogram', HorzScaleItem>> {
 	const val = item.value;

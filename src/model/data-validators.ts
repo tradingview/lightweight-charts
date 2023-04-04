@@ -1,11 +1,12 @@
+/// <reference types="_build-time-constants" />
+
 import { assert } from '../helpers/assertions';
 
+import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 import { IHorzScaleBehavior } from './ihorz-scale-behavior';
 import { CreatePriceLineOptions } from './price-line-options';
 import { SeriesMarker } from './series-markers';
 import { SeriesType } from './series-options';
-
-import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
 
 export function checkPriceLineOptions(options: CreatePriceLineOptions): void {
 	if (process.env.NODE_ENV === 'production') {

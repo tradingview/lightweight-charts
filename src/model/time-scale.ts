@@ -151,6 +151,10 @@ export interface TimeScaleOptions {
 	 */
 	ticksVisible: boolean;
 
+	/**
+	 * Chanes horizontal scale makes generation
+	 * With this flag equal to true, marks of the wame weight are drawn all or not drawn at all
+	 */
 	uniformDistribution: boolean;
 }
 

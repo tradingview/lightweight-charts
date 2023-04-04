@@ -43,6 +43,9 @@ export interface SeriesMarker<TimeType, HorzScaleItem> {
 	 */
 	size?: number;
 
+	/**
+	 * @internal
+	 */
 	originalTime: HorzScaleItem;
 }
 

@@ -1,5 +1,5 @@
-import { Nominal } from "../../helpers/nominal";
-import { isNumber, isString } from "../../helpers/strict-type-checks";
+import { Nominal } from '../../helpers/nominal';
+import { isNumber, isString } from '../../helpers/strict-type-checks';
 
 /**
  * Represents a time as a UNIX timestamp.
@@ -99,7 +99,6 @@ export const enum TickMarkType {
 	/**
 	 * A time without seconds.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-shadow
 	Time,
 	/**
 	 * A time with seconds.

@@ -11,6 +11,8 @@ export { ColorType } from './model/layout-options';
 
 export { createChart, createOptionsChart } from './api/create-chart';
 
+export { isBusinessDay } from './model/horz-scale-behavior-time/types';
+
 /**
  * Returns the current version as a string. For example `'3.3.0'`.
  */

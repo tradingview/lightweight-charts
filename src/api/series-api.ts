@@ -5,6 +5,8 @@ import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap } from '../model/data-consumer';
+import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
 import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-options';
@@ -20,8 +22,6 @@ import { Logical, Range, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
-import { DataUpdatesConsumer, SeriesDataItemTypeMap } from '../model/data-consumer';
-import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -65,7 +65,6 @@ export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements
 		return this._series.priceScale().coordinateToPrice(coordinate as Coordinate, firstValue.value);
 	}
 
-	// eslint-disable-next-line complexity
 	public barsInLogicalRange(range: Range<number> | null): BarsInfo<HorzScaleItem> | null {
 		if (range === null) {
 			return null;

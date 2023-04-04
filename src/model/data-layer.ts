@@ -3,6 +3,8 @@
 import { lowerbound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
+import { SeriesDataItemTypeMap } from './data-consumer';
+import { getSeriesPlotRowCreator, isSeriesPlotRow, WhitespacePlotRow } from './get-series-plot-row-creator';
 import { IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from './ihorz-scale-behavior';
 import { Series, SeriesUpdateInfo } from './series';
 import { SeriesPlotRow } from './series-data';
@@ -12,11 +14,6 @@ import {
 	TimePointIndex,
 	TimeScalePoint,
 } from './time-data';
-
-import {
-	SeriesDataItemTypeMap,
-} from './data-consumer';
-import { getSeriesPlotRowCreator, isSeriesPlotRow, WhitespacePlotRow } from './get-series-plot-row-creator';
 
 export type TimedData<HorzScaleItem> = Pick<SeriesDataItemTypeMap<HorzScaleItem>[SeriesType], 'time'>;
 
@@ -119,7 +116,6 @@ function timeScalePointTime<TSeriesType extends SeriesType, HorzScaleItem>(merge
 }
 
 function saveOriginalTime<TSeriesType extends SeriesType, HorzScaleItem>(data: SeriesDataItemWithOriginalTime<TSeriesType, HorzScaleItem>): void {
-	// eslint-disable-next-line @typescript-eslint/tslint/config
 	if (data.originalTime === undefined) {
 		data.originalTime = data.time;
 	}

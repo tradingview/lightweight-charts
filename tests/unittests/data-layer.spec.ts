@@ -3,16 +3,16 @@ import { expect } from 'chai';
 import chaiExclude from 'chai-exclude';
 import { describe, it } from 'mocha';
 
+import { ensureDefined } from '../../src/helpers/assertions';
 import { BarData, HistogramData, LineData, WhitespaceData } from '../../src/model/data-consumer';
 import { DataLayer, SeriesChanges } from '../../src/model/data-layer';
-import { ensureDefined } from '../../src/helpers/assertions';
+import { convertTime, HorzScaleBehaviorTime, stringToBusinessDay } from '../../src/model/horz-scale-behavior-time/horz-scale-behavior-time';
+import { BusinessDay, Time, TimePoint, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
 import { PlotRowValueIndex } from '../../src/model/plot-data';
 import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
 import { SeriesType } from '../../src/model/series-options';
 import { TimePointIndex } from '../../src/model/time-data';
-import { BusinessDay, Time, TimePoint, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
-import { convertTime, HorzScaleBehaviorTime, stringToBusinessDay } from '../../src/model/horz-scale-behavior-time/horz-scale-behavior-time';
 
 chai.use(chaiExclude);
 

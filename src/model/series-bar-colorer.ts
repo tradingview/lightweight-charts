@@ -81,14 +81,14 @@ type StyleGetterFn<T extends SeriesType, HorzScaleItem> = (
 	precomputedBars?: PrecomputedBars<HorzScaleItem>
 ) => BarStylesMap[T];
 
-type BarStylesFnMap<T extends SeriesType, HorzScaleItem> = {
+type BarStylesFnMap<HorzScaleItem> = {
 	[T in keyof SeriesOptionsMap]: StyleGetterFn<T, HorzScaleItem>;
 };
 
 export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> {
 	private _series: Series<T, HorzScaleItem>;
-	private readonly _styleGetter: BarStylesFnMap<T, HorzScaleItem>[T];
-	private readonly _barStyleFnMap: BarStylesFnMap<T, HorzScaleItem>;
+	private readonly _styleGetter: BarStylesFnMap<HorzScaleItem>[T];
+	private readonly _barStyleFnMap: BarStylesFnMap<HorzScaleItem>;
 
 	public constructor(series: Series<T, HorzScaleItem>) {
 		this._series = series;
@@ -169,7 +169,6 @@ export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> {
 		};
 
 		this._styleGetter = this._barStyleFnMap[series.seriesType()];
-
 	}
 
 	public barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): BarStylesMap[T] {

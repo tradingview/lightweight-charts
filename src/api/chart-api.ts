@@ -6,6 +6,8 @@ import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from '../model/data-consumer';
+import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
@@ -27,8 +29,6 @@ import {
 } from '../model/series-options';
 import { Logical } from '../model/time-data';
 
-import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from '../model/data-consumer';
-import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
