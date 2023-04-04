@@ -15,7 +15,7 @@ import {
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { BarData, HistogramData, LineData } from './data-consumer';
+import { BarData, HistogramData, LineData } from '../model/data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';

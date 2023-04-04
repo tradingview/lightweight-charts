@@ -13,7 +13,7 @@ import { TickMarkWeightValue, TimeScalePoint } from '../model/time-data';
 import { markWithGreaterWeight, TimeMark } from '../model/time-scale';
 
 import { ChartApi } from './chart-api';
-import { SeriesDataItemTypeMap } from './data-consumer';
+import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { IChartApi } from './ichart-api';
 
 /**

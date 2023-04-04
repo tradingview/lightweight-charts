@@ -1,5 +1,5 @@
-import { SeriesDataItemTypeMap } from '../../api/data-consumer';
-import { TimedData } from '../../api/data-layer';
+import { SeriesDataItemTypeMap } from '../data-consumer';
+import { TimedData } from '../data-layer';
 import { DataItem, HorzScaleItemConverterToInternalObj, IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from '../ihorz-scale-behavior';
 import { DateFormatter } from '../../formatters/date-formatter';
 import { DateTimeFormatter } from '../../formatters/date-time-formatter';

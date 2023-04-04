@@ -5,7 +5,7 @@ import { CreatePriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import { SeriesType } from '../model/series-options';
 
-import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
+import { isFulfilledData, SeriesDataItemTypeMap } from '../model/data-consumer';
 
 export function checkPriceLineOptions(options: CreatePriceLineOptions): void {
 	if (process.env.NODE_ENV === 'production') {

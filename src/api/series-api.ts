@@ -20,7 +20,7 @@ import { Logical, Range, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
-import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IPriceLine } from './iprice-line';

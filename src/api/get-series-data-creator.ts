@@ -18,7 +18,7 @@ import {
 	OhlcData,
 	SeriesDataItemTypeMap,
 	SingleValueData,
-} from './data-consumer';
+} from '../model/data-consumer';
 
 type SeriesPlotRowToDataMap<HorzScaleItem> = {
 	[T in keyof SeriesDataItemTypeMap<HorzScaleItem>]: (plotRow: SeriesPlotRow<T, HorzScaleItem>) => SeriesDataItemTypeMap<HorzScaleItem>[T];

@@ -27,8 +27,8 @@ import {
 } from '../model/series-options';
 import { Logical } from '../model/time-data';
 
-import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
-import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from '../model/data-consumer';
+import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';

@@ -1,5 +1,5 @@
-import { Series } from '../model/series';
-import { SeriesType } from '../model/series-options';
+import { Series } from './series';
+import { SeriesType } from './series-options';
 
 /**
  * Represents a whitespace data item, which is a data point without a value.

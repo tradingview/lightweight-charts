@@ -1,8 +1,8 @@
-import { InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
-import { PlotRow } from '../model/plot-data';
-import { SeriesPlotRow } from '../model/series-data';
-import { SeriesType } from '../model/series-options';
-import { TimePointIndex } from '../model/time-data';
+import { InternalHorzScaleItem } from './ihorz-scale-behavior';
+import { PlotRow } from './plot-data';
+import { SeriesPlotRow } from './series-data';
+import { SeriesType } from './series-options';
+import { TimePointIndex } from './time-data';
 
 import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 

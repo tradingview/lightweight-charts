@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { getSeriesPlotRowCreator } from '../../src/api/get-series-plot-row-creator';
+import { getSeriesPlotRowCreator } from '../../src/model/get-series-plot-row-creator';
 import { OriginalTime, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 describe('getSeriesPlotRowCreator', () => {

@@ -3,8 +3,8 @@ import { expect } from 'chai';
 import chaiExclude from 'chai-exclude';
 import { describe, it } from 'mocha';
 
-import { BarData, HistogramData, LineData, WhitespaceData } from '../../src/api/data-consumer';
-import { convertTime, DataLayer, SeriesChanges, stringToBusinessDay } from '../../src/api/data-layer';
+import { BarData, HistogramData, LineData, WhitespaceData } from '../../src/model/data-consumer';
+import { convertTime, DataLayer, SeriesChanges, stringToBusinessDay } from '../../src/model/data-layer';
 import { ensureDefined } from '../../src/helpers/assertions';
 import { PlotRowValueIndex } from '../../src/model/plot-data';
 import { PlotList } from '../../src/model/plot-list';

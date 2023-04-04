@@ -12,7 +12,7 @@ import {
 } from '../model/series-options';
 import { Range } from '../model/time-data';
 
-import { SeriesDataItemTypeMap } from './data-consumer';
+import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 

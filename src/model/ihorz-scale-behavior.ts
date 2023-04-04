@@ -6,7 +6,7 @@ import { TickMark } from './tick-marks';
 import { TickMarkWeightValue, TimeScalePoint } from './time-data';
 import { TimeMark } from './time-scale';
 
-import { SeriesDataItemTypeMap } from '../api/data-consumer';
+import { SeriesDataItemTypeMap } from './data-consumer';
 
 export type InternalHorzScaleItem = Nominal<unknown, 'InternalHorzScaleItem'>;
 

@@ -3,15 +3,15 @@
 import { lowerbound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
-import { IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from '../model/ihorz-scale-behavior';
-import { Series, SeriesUpdateInfo } from '../model/series';
-import { SeriesPlotRow } from '../model/series-data';
-import { SeriesType } from '../model/series-options';
+import { IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from './ihorz-scale-behavior';
+import { Series, SeriesUpdateInfo } from './series';
+import { SeriesPlotRow } from './series-data';
+import { SeriesType } from './series-options';
 import {
 	TickMarkWeightValue,
 	TimePointIndex,
 	TimeScalePoint,
-} from '../model/time-data';
+} from './time-data';
 
 import {
 	SeriesDataItemTypeMap,
