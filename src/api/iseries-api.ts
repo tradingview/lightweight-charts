@@ -18,9 +18,14 @@ import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 
 /**
+ * The extent of the data change.
+ */
+export type DataChangedScope = 'full' | 'update';
+
+/**
  * A custom function use to handle data changed events.
  */
-export type DataChangedHandler = () => void;
+export type DataChangedHandler = (scope: DataChangedScope) => void;
 
 /**
  * Represents a range of bars and the number of bars outside the range.

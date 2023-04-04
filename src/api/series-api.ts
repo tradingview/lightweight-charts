@@ -30,7 +30,7 @@ import { getSeriesDataCreator } from './get-series-data-creator';
 import { type IChartApi } from './ichart-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { BarsInfo, DataChangedHandler, ISeriesApi } from './iseries-api';
+import { BarsInfo, DataChangedHandler, DataChangedScope, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
@@ -40,7 +40,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 	protected readonly _chartApi: IChartApi;
 
 	private readonly _priceScaleApiProvider: IPriceScaleApiProvider;
-	private readonly _dataChangedDelegate: Delegate = new Delegate();
+	private readonly _dataChangedDelegate: Delegate<DataChangedScope> = new Delegate();
 
 	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>, priceScaleApiProvider: IPriceScaleApiProvider, chartApi: IChartApi) {
 		this._series = series;
@@ -131,14 +131,14 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		checkSeriesValuesType(this._series.seriesType(), data);
 
 		this._dataUpdatesConsumer.applyNewData(this._series, data);
-		this._onDataChanged();
+		this._onDataChanged('full');
 	}
 
 	public update(bar: SeriesDataItemTypeMap[TSeriesType]): void {
 		checkSeriesValuesType(this._series.seriesType(), [bar]);
 
 		this._dataUpdatesConsumer.updateData(this._series, bar);
-		this._onDataChanged();
+		this._onDataChanged('update');
 	}
 
 	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null {
@@ -224,9 +224,9 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		}
 	}
 
-	private _onDataChanged(): void {
+	private _onDataChanged(scope: DataChangedScope): void {
 		if (this._dataChangedDelegate.hasListeners()) {
-			this._dataChangedDelegate.fire();
+			this._dataChangedDelegate.fire(scope);
 		}
 	}
 }
