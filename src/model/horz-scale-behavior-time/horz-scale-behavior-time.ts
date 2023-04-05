@@ -2,9 +2,8 @@ import { DateFormatter } from '../../formatters/date-formatter';
 import { DateTimeFormatter } from '../../formatters/date-time-formatter';
 
 import { ensureNotNull } from '../../helpers/assertions';
-import { isString } from '../../helpers/strict-type-checks';
+import { DeepPartial, isString, merge } from '../../helpers/strict-type-checks';
 
-import { ChartOptions } from '../chart-model';
 import { SeriesDataItemTypeMap } from '../data-consumer';
 import { TimedData } from '../data-layer';
 import { DataItem, HorzScaleItemConverterToInternalObj, IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from '../ihorz-scale-behavior';
@@ -12,8 +11,9 @@ import { LocalizationOptions } from '../localization-options';
 import { SeriesType } from '../series-options';
 import { TickMark } from '../tick-marks';
 import { TickMarkWeightValue, TimeScalePoint } from '../time-data';
-import { markWithGreaterWeight, TimeMark, TimeScaleOptions } from '../time-scale';
+import { markWithGreaterWeight, TimeMark } from '../time-scale';
 import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
+import { TimeChartOptions } from './time-based-chart-options';
 import { fillWeightsForPoints } from './time-scale-point-weight-generator';
 import { BusinessDay, isBusinessDay, isUTCTimestamp, TickMarkType, TickMarkWeight, Time, TimePoint, UTCTimestamp } from './types';
 
@@ -123,15 +123,6 @@ interface TimeLocalizationOptions extends LocalizationOptions<Time> {
  */
 export type TickMarkFormatter = (time: Time, tickMarkType: TickMarkType, locale: string) => string | null;
 
-interface TimeTimeScaleOptions extends TimeScaleOptions {
-	/**
-	 * Tick marks formatter can be used to customize tick marks labels on the time axis.
-	 *
-	 * @defaultValue `undefined`
-	 */
-	tickMarkFormatter?: TickMarkFormatter;
-}
-
 // eslint-disable-next-line complexity
 function weightToTickMarkType(weight: TickMarkWeight, timeVisible: boolean, secondsVisible: boolean): TickMarkType {
 	switch (weight) {
@@ -163,9 +154,13 @@ function weightToTickMarkType(weight: TickMarkWeight, timeVisible: boolean, seco
 
 export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	private _dateTimeFormatter!: DateFormatter | DateTimeFormatter;
-	private _options!: ChartOptions<Time>;
+	private _options!: TimeChartOptions;
 
-	public setOptions(options: ChartOptions<Time>): void {
+	public options(): TimeChartOptions {
+		return this._options;
+	}
+
+	public setOptions(options: TimeChartOptions): void {
 		this._options = options;
 		this.updateFormatter(options.localization as TimeLocalizationOptions);
 	}
@@ -188,7 +183,8 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	}
 
 	public key(item: InternalHorzScaleItem | Time): InternalHorzScaleItemKey {
-		if (typeof item === 'object') {
+		// eslint-disable-next-line no-restricted-syntax
+		if (typeof item === 'object' && 'timestamp' in item) {
 			return (item as unknown as TimePoint).timestamp as unknown as InternalHorzScaleItemKey;
 		} else {
 			return this.key(this.convertHorzItemToInternal(item as Time));
@@ -232,7 +228,7 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	public formatTickmark(tickMark: TickMark<Time>, localizationOptions: LocalizationOptions<Time>): string {
 		const tickMarkType = weightToTickMarkType(tickMark.weight, this._options.timeScale.timeVisible, this._options.timeScale.secondsVisible);
 
-		const options = this._options.timeScale as TimeTimeScaleOptions;
+		const options = this._options.timeScale;
 
 		if (options.tickMarkFormatter !== undefined) {
 			const tickMarkString = options.tickMarkFormatter(
@@ -261,5 +257,9 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 
 	public fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint<Time>>[], startIndex: number): void {
 		fillWeightsForPoints(sortedTimePoints, startIndex);
+	}
+
+	public static applyDefaults(options?: DeepPartial<TimeChartOptions>): DeepPartial<TimeChartOptions> {
+		return merge({ localization: { dateFormat: 'dd MMM \'yy' } }, options ?? {});
 	}
 }

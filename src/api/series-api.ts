@@ -154,9 +154,9 @@ export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements
 
 	public markers(): SeriesMarker<HorzScaleItem, HorzScaleItem>[] {
 		return this._series.markers().map<SeriesMarker<HorzScaleItem, HorzScaleItem>>((internalItem: SeriesMarker<InternalHorzScaleItem, HorzScaleItem>) => {
-			const { time, ...item } = internalItem;
+			const { originalTime, time, ...item } = internalItem;
 			return {
-				time: item.originalTime,
+				time: originalTime,
 				...item as Omit<SeriesMarker<HorzScaleItem, HorzScaleItem>, 'time' | 'originalTIme'>,
 			};
 		});
