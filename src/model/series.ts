@@ -24,7 +24,7 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
-import { AutoscaleInfoImpl } from './autoscale-info-impl';
+import { AutoscaleInfoImpl, AutoScaleMargins } from './autoscale-info-impl';
 import { BarPrice, BarPrices } from './bar';
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
@@ -561,7 +561,26 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
 		}
 
-		return new AutoscaleInfoImpl(range,	this._markersPaneView.autoScaleMargins());
+		let margins = this._markersPaneView.autoScaleMargins();
+		this._primitives.forEach((primitive: SeriesPrimitiveWrapper) => {
+			const primitiveAutoscale = primitive.autoscaleInfo(
+				startTimePoint,
+				endTimePoint
+			);
+
+			if (primitiveAutoscale?.priceRange) {
+				const primitiveRange = new PriceRangeImpl(
+					primitiveAutoscale.priceRange.minValue,
+					primitiveAutoscale.priceRange.maxValue
+				);
+				range = range !== null ? range.merge(primitiveRange) : primitiveRange;
+			}
+			if (primitiveAutoscale?.margins) {
+				margins = mergeMargins(margins, primitiveAutoscale.margins);
+			}
+		});
+
+		return new AutoscaleInfoImpl(range,	margins);
 	}
 
 	private _markerRadius(): number {
@@ -716,4 +735,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		extractPrimitivePaneViews(this._primitives, extractor, zOrder, res);
 		return res;
 	}
+}
+
+function mergeMargins(source: AutoScaleMargins | null, additionalMargin: AutoScaleMargins): AutoScaleMargins {
+	return {
+		above: Math.max(source?.above ?? 0, additionalMargin.above),
+		below: Math.max(source?.below ?? 0, additionalMargin.below),
+	};
 }

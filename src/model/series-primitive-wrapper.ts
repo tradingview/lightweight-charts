@@ -19,6 +19,8 @@ import {
 } from './iseries-primitive';
 import { PriceScale } from './price-scale';
 import { Series } from './series';
+import { AutoscaleInfo } from './series-options';
+import { Logical, TimePointIndex } from './time-data';
 import { TimeScale } from './time-scale';
 
 class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
@@ -222,5 +224,17 @@ export class SeriesPrimitiveWrapper {
 			wrapper,
 		};
 		return wrapper;
+	}
+
+	public autoscaleInfo(
+		startTimePoint: TimePointIndex,
+		endTimePoint: TimePointIndex
+	): AutoscaleInfo | null {
+		return (
+			this._primitive.autoscaleInfo?.(
+				startTimePoint as unknown as Logical,
+				endTimePoint as unknown as Logical
+			) ?? null
+		);
 	}
 }

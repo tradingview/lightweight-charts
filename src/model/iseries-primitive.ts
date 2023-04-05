@@ -3,7 +3,8 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { type IChartApi } from '../api/ichart-api';
 import { type ISeriesApi } from '../api/iseries-api';
 
-import { type SeriesType } from './series-options';
+import { AutoscaleInfo, type SeriesType } from './series-options';
+import { Logical } from './time-data';
 
 /**
  * This interface represents a label on the price or time axis
@@ -148,6 +149,20 @@ export interface ISeriesPrimitive {
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
 	timeAxisPaneViews?(): readonly ISeriesPrimitivePaneView[];
+
+	/**
+	 * Return autoscaleInfo which will be merged with the series base autoscaleInfo. You can use this to expand the autoscale range
+	 * to include visual elements drawn outside of the series' current visible price range.
+	 *
+	 * **Important**: Please note that this method will be evoked very often during scrolling and zooming of the chart, thus it
+	 * is recommended that this method is either simple to execute, or makes use of optimisations such as caching to ensure that
+	 * the chart remains responsive.
+	 *
+	 * @param startTimePoint - start time point for the current visible range
+	 * @param endTimePoint - end time point for the current visible range
+	 * @returns AutoscaleInfo
+	 */
+	autoscaleInfo?(startTimePoint: Logical, endTimePoint: Logical): AutoscaleInfo;
 
 	/**
 	 * Attached Lifecycle hook.
