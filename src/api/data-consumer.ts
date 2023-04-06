@@ -45,17 +45,18 @@ export interface WhitespaceData {
 	 * The time of the data.
 	 */
 	time: Time;
+
+	/**
+	 * Additional custom values which will be ignored by the library, but
+	 * could be used by plugins.
+	 */
+	customValues?: Record<string, unknown>;
 }
 
 /**
  * A base interface for a data point of single-value series.
  */
-export interface SingleValueData {
-	/**
-	 * The time of the data.
-	 */
-	time: Time;
-
+export interface SingleValueData extends WhitespaceData {
 	/**
 	 * Price value of the data.
 	 */
@@ -140,12 +141,7 @@ export interface BaselineData extends SingleValueData {
 /**
  * Represents a bar with a {@link Time} and open, high, low, and close prices.
  */
-export interface OhlcData {
-	/**
-	 * The bar time.
-	 */
-	time: Time;
-
+export interface OhlcData extends WhitespaceData {
 	/**
 	 * The open price.
 	 */

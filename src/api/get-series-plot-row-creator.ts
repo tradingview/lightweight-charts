@@ -106,13 +106,20 @@ type SeriesItemValueFnMap = {
 	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime) => Mutable<SeriesPlotRow<T> | WhitespacePlotRow>;
 };
 
+function wrapCustomValues<T extends SeriesPlotRow | WhitespacePlotRow>(plotRow: Mutable<T>, bar: SeriesDataItemTypeMap[SeriesType]): Mutable<T> {
+	if (bar.customValues !== undefined) {
+		plotRow.customValues = bar.customValues;
+	}
+	return plotRow;
+}
+
 function wrapWhitespaceData<TSeriesType extends SeriesType>(createPlotRowFn: (typeof getBaselineSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): SeriesItemValueFnMap[TSeriesType] {
 	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime) => {
 		if (isWhitespaceData(bar)) {
-			return { time, index, originalTime };
+			return wrapCustomValues({ time, index, originalTime }, bar);
 		}
 
-		return createPlotRowFn(time, index, bar, originalTime);
+		return wrapCustomValues(createPlotRowFn(time, index, bar, originalTime), bar);
 	};
 }
 
