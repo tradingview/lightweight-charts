@@ -1,4 +1,4 @@
-import { ChartOptions } from '../chart-model';
+import { ChartOptionsBase } from '../chart-model';
 import { TimeScaleOptions } from '../time-scale';
 import { TickMarkFormatter } from './horz-scale-behavior-time';
 import { Time } from './types';
@@ -18,7 +18,7 @@ export interface TimeChartTimeScaleOptions extends TimeScaleOptions {
 /**
  * Options for chart with time at the horizontal scale
  */
-export interface TimeChartOptions extends ChartOptions<Time> {
+export interface TimeChartOptions extends ChartOptionsBase<Time> {
 	/**
 	 * Extended time scale options with option to override tickMarkFormatter
 	 */

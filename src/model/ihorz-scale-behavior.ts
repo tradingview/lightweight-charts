@@ -1,6 +1,6 @@
 import { Nominal } from '../helpers/nominal';
 
-import { ChartOptions } from './chart-model';
+import { ChartOptionsBase } from './chart-model';
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { LocalizationOptions } from './localization-options';
 import { SeriesType } from './series-options';
@@ -17,8 +17,8 @@ export type DataItem<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[Serie
 export type InternalHorzScaleItemKey = Nominal<number, 'InternalHorzScaleItemKey'>;
 
 export interface IHorzScaleBehavior<HorzScaleItem> {
-	options(): ChartOptions<HorzScaleItem>;
-	setOptions(options: ChartOptions<HorzScaleItem>): void;
+	options(): ChartOptionsBase<HorzScaleItem>;
+	setOptions(options: ChartOptionsBase<HorzScaleItem>): void;
 	preprocessData(data: DataItem<HorzScaleItem> | DataItem<HorzScaleItem>[]): void;
 	convertHorzItemToInternal(item: HorzScaleItem): InternalHorzScaleItem;
 	convertInternalToHorzItem(item: InternalHorzScaleItem): HorzScaleItem;

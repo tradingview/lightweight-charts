@@ -233,7 +233,7 @@ export interface TrackingModeOptions {
 /**
  * Structure describing options of the chart. Series options are to be set separately
  */
-export interface ChartOptions<HorzScaleItem> {
+export interface ChartOptionsBase<HorzScaleItem> {
 	/**
 	 * Width of the chart in pixels
 	 *
@@ -338,7 +338,7 @@ export interface ChartOptions<HorzScaleItem> {
 }
 
 export type ChartOptionsInternal<HorzScaleItem> =
-	Omit<ChartOptions<HorzScaleItem>, 'handleScroll' | 'handleScale' | 'layout'>
+	Omit<ChartOptionsBase<HorzScaleItem>, 'handleScroll' | 'handleScale' | 'layout'>
 	& {
 		/** @public */
 		handleScroll: HandleScrollOptions;

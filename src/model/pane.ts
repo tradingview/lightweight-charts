@@ -4,7 +4,7 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
-import { ChartModel, ChartOptions, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
+import { ChartModel, ChartOptionsBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid } from './grid';
 import { IPriceDataSource } from './iprice-data-source';
@@ -55,7 +55,7 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		this.applyScaleOptions(options);
 	}
 
-	public applyScaleOptions(options: DeepPartial<ChartOptions<HorzScaleItem>>): void {
+	public applyScaleOptions(options: DeepPartial<ChartOptionsBase<HorzScaleItem>>): void {
 		if (options.leftPriceScale) {
 			this._leftPriceScale.applyOptions(options.leftPriceScale);
 		}
