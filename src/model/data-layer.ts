@@ -2,6 +2,7 @@
 
 import { lowerbound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
+import { Mutable } from '../helpers/mutable';
 
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { getSeriesPlotRowCreator, isSeriesPlotRow, WhitespacePlotRow } from './get-series-plot-row-creator';

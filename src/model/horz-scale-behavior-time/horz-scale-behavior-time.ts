@@ -2,6 +2,7 @@ import { DateFormatter } from '../../formatters/date-formatter';
 import { DateTimeFormatter } from '../../formatters/date-time-formatter';
 
 import { ensureNotNull } from '../../helpers/assertions';
+import { Mutable } from '../../helpers/mutable';
 import { DeepPartial, isString, merge } from '../../helpers/strict-type-checks';
 
 import { SeriesDataItemTypeMap } from '../data-consumer';

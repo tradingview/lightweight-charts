@@ -1,3 +1,6 @@
+
+import { Mutable } from '../helpers/mutable';
+
 import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { PlotRow } from './plot-data';

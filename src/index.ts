@@ -9,7 +9,7 @@ export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource, LastPriceAnimationMode } from './model/series-options';
 export { ColorType } from './model/layout-options';
 
-export { createChart } from './api/create-chart';
+export { createChart, createChartEx } from './api/create-chart';
 
 export { isBusinessDay, isUTCTimestamp } from './model/horz-scale-behavior-time/types';
 export { TickMarkType } from './model/horz-scale-behavior-time/types';
