@@ -12,8 +12,8 @@ import { IChartApi } from './ichart-api';
 /**
  * This function is the main entry point of the Lightweight Charting Library.
  *
- * @template HorzScaleItem - type of points at the horizontal scale
- * @template THorzScaleBehavior - type of horz axis strategy that encapsulate all the speicific moment of the certain horz scale type
+ * @template HorzScaleItem - type of points on the horizontal scale
+ * @template THorzScaleBehavior - type of horizontal axis strategy that encapsulate all the specific behaviors of the horizontal scale type
  *
  * @param container - ID of HTML element or element itself
  * @param options - Any subset of options to be applied at start.
