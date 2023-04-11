@@ -45,7 +45,15 @@ export function createChartEx<HorzScaleItem, THorzScaleBehavior extends IHorzSca
  */
 export type ChartOptions = TimeChartOptions;
 
+/**
+ * The main interface of a single chart using time for horizontal scale.
+ */
 export interface IChartApi extends IChartApiBase<Time> {
+	/**
+	 * Applies new options to the chart
+	 *
+	 * @param options - Any subset of options.
+	 */
 	applyOptions(options: DeepPartial<ChartOptions>): void;
 }
 

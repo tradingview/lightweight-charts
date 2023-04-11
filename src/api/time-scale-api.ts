@@ -11,7 +11,7 @@ import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Logical, LogicalRange, Range, TimePointIndex, TimePointsRange } from '../model/time-data';
-import { TimeScale, HorzScaleOptions } from '../model/time-scale';
+import { HorzScaleOptions, TimeScale } from '../model/time-scale';
 
 import {
 	ITimeScaleApi,

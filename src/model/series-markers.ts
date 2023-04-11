@@ -1,4 +1,4 @@
-import { Time } from "./horz-scale-behavior-time/types";
+import { Time } from './horz-scale-behavior-time/types';
 
 /**
  * Represents the position of a series marker relative to a bar.

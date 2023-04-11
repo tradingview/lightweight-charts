@@ -26,7 +26,7 @@ import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
-import { TimeScale, HorzScaleOptions } from './time-scale';
+import { HorzScaleOptions, TimeScale } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
 import { Watermark, WatermarkOptions } from './watermark';
 
