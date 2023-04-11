@@ -10,12 +10,14 @@ import { ChartApi } from './chart-api';
 import { IChartApi } from './ichart-api';
 
 /**
- * This function is the main entry point of the Lightweight Charting Library.
+ * This function is the main entry point of the Lightweight Charting Library. If you are using time values
+ * for the horizontal scale then it is recommended that you rather use the {@link createChart} function.
  *
  * @template HorzScaleItem - type of points on the horizontal scale
  * @template THorzScaleBehavior - type of horizontal axis strategy that encapsulate all the specific behaviors of the horizontal scale type
  *
  * @param container - ID of HTML element or element itself
+ * @param horzScaleBehavior - Horizontal scale behavior
  * @param options - Any subset of options to be applied at start.
  * @returns An interface to the created chart
  */
@@ -44,7 +46,7 @@ export function createChartEx<HorzScaleItem, THorzScaleBehavior extends IHorzSca
 export type ChartOptions = TimeChartOptions;
 
 /**
- * This function is the simplified main entry point of the Lightweight Charting Library with time points at horizontal scale.
+ * This function is the simplified main entry point of the Lightweight Charting Library with time points for the horizontal scale.
  *
  * @param container - ID of HTML element or element itself
  * @param options - Any subset of options to be applied at start.

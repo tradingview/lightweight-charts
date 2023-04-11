@@ -5,11 +5,20 @@ import { Coordinate } from './coordinate';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { RangeImpl } from './range-impl';
 
+/**
+ * Weight of the tick mark. @see TickMarkWeight enum
+ */
 export type TickMarkWeightValue = Nominal<number, 'TickMarkWeightValue'>;
 
+/**
+ * Represents a point on the time scale
+ */
 export interface TimeScalePoint<HorzScaleItem> {
+	/** Weight of the point */
 	readonly timeWeight: TickMarkWeightValue;
+	/** Time of the point */
 	readonly time: InternalHorzScaleItem;
+	/** Original time for the point */
 	readonly originalTime: HorzScaleItem;
 }
 
@@ -29,6 +38,9 @@ export interface Range<T> {
 
 export type TimePointsRange = Range<InternalHorzScaleItem>;
 
+/**
+ * Index for a point on the horizontal (time) scale.
+ */
 export type TimePointIndex = Nominal<number, 'TimePointIndex'>;
 
 /**

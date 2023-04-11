@@ -1,3 +1,5 @@
+import { Mutable } from '../../helpers/mutable';
+
 import { InternalHorzScaleItem } from '../ihorz-scale-behavior';
 import { TickMarkWeightValue, TimeScalePoint } from '../time-data';
 import { TickMarkWeight, Time, TimePoint } from './types';

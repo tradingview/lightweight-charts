@@ -4,10 +4,17 @@ import { ensureDefined } from '../helpers/assertions';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from './time-data';
 
+/**
+ * Tick mark for the horizontal scale.
+ */
 export interface TickMark<HorzScaleItem> {
+	/** Index */
 	index: TimePointIndex;
+	/** Time / Coordinate */
 	time: InternalHorzScaleItem;
+	/** Weight of the tick mark */
 	weight: TickMarkWeightValue;
+	/** Original value for the `time` property */
 	originalTime: HorzScaleItem;
 }
 

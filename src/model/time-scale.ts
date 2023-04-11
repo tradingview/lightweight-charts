@@ -36,10 +36,17 @@ interface TransitionState {
 	rightOffset: number;
 }
 
+/**
+ * Represents a tick mark on the horizontal (time) scale.
+ */
 export interface TimeMark {
+	/** Does time mark need to be aligned */
 	needAlignCoordinate: boolean;
+	/** Coordinate for the time mark */
 	coord: number;
+	/** Display label for the time mark */
 	label: string;
+	/** Weight of the time mark */
 	weight: TickMarkWeightValue;
 }
 
