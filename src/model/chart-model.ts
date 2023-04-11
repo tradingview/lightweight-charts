@@ -26,7 +26,7 @@ import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
-import { TimeScale, TimeScaleOptions } from './time-scale';
+import { TimeScale, HorzScaleOptions } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
 import { Watermark, WatermarkOptions } from './watermark';
 
@@ -297,7 +297,7 @@ export interface ChartOptionsBase<HorzScaleItem> {
 	/**
 	 * Time scale options
 	 */
-	timeScale: TimeScaleOptions;
+	timeScale: HorzScaleOptions;
 
 	/**
 	 * The crosshair shows the intersection of the price and time scale values at any point on the chart.

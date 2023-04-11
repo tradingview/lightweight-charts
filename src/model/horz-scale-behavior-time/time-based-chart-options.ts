@@ -1,12 +1,12 @@
 import { ChartOptionsBase } from '../chart-model';
-import { TimeScaleOptions } from '../time-scale';
+import { HorzScaleOptions } from '../time-scale';
 import { TickMarkFormatter } from './horz-scale-behavior-time';
 import { Time } from './types';
 
 /**
  * Extended time scale options for time-base horz scale
  */
-export interface TimeChartTimeScaleOptions extends TimeScaleOptions {
+export interface TimeScaleOptions extends HorzScaleOptions {
 	/**
 	 * Tick marks formatter can be used to customize tick marks labels on the time axis.
 	 *
@@ -22,5 +22,5 @@ export interface TimeChartOptions extends ChartOptionsBase<Time> {
 	/**
 	 * Extended time scale options with option to override tickMarkFormatter
 	 */
-	timeScale: TimeChartTimeScaleOptions;
+	timeScale: TimeScaleOptions;
 }

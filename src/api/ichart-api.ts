@@ -69,7 +69,7 @@ export type MouseEventHandler<HorzScaleItem> = (param: MouseEventParams<HorzScal
 /**
  * The main interface of a single chart.
  */
-export interface IChartApi<HorzScaleItem = Time> {
+export interface IChartApiBase<HorzScaleItem = Time> {
 	/**
 	 * Removes the chart object including all DOM elements. This is an irreversible operation, you cannot do anything with the chart after removing it.
 	 */

@@ -30,7 +30,7 @@ import {
 import { Logical } from '../model/time-data';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
-import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
+import { IChartApiBase, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -106,9 +106,9 @@ function toInternalOptions<HorzScaleItem>(options: DeepPartial<ChartOptionsBase<
 	return options as DeepPartial<ChartOptionsInternal<HorzScaleItem>>;
 }
 
-export type IPriceScaleApiProvider<HorzScaleItem> = Pick<IChartApi<HorzScaleItem>, 'priceScale'>;
+export type IPriceScaleApiProvider<HorzScaleItem> = Pick<IChartApiBase<HorzScaleItem>, 'priceScale'>;
 
-export class ChartApi<HorzScaleItem> implements IChartApi<HorzScaleItem>, DataUpdatesConsumer<SeriesType, HorzScaleItem> {
+export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, DataUpdatesConsumer<SeriesType, HorzScaleItem> {
 	private _chartWidget: ChartWidget<HorzScaleItem>;
 	private _dataLayer: DataLayer<HorzScaleItem>;
 	private readonly _seriesMap: Map<SeriesApi<SeriesType, HorzScaleItem>, Series<SeriesType, HorzScaleItem>> = new Map();

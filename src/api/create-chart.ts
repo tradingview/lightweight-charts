@@ -7,7 +7,7 @@ import { Time } from '../model/horz-scale-behavior-time/types';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 
 import { ChartApi } from './chart-api';
-import { IChartApi } from './ichart-api';
+import { IChartApiBase } from './ichart-api';
 
 /**
  * This function is the main entry point of the Lightweight Charting Library.
@@ -23,7 +23,7 @@ export function createChartEx<HorzScaleItem, THorzScaleBehavior extends IHorzSca
 	container: string | HTMLElement,
 	horzScaleBehavior: THorzScaleBehavior,
 	options?: DeepPartial<ReturnType<THorzScaleBehavior['options']>>
-): IChartApi<HorzScaleItem> {
+): IChartApiBase<HorzScaleItem> {
 	let htmlElement: HTMLElement;
 	if (isString(container)) {
 		const element = document.getElementById(container);
@@ -43,6 +43,10 @@ export function createChartEx<HorzScaleItem, THorzScaleBehavior extends IHorzSca
  */
 export type ChartOptions = TimeChartOptions;
 
+export interface IChartApi extends IChartApiBase<Time> {
+	applyOptions(options: DeepPartial<ChartOptions>): void;
+}
+
 /**
  * This function is the simplified main entry point of the Lightweight Charting Library with time points at horizontal scale.
  *
@@ -50,7 +54,7 @@ export type ChartOptions = TimeChartOptions;
  * @param options - Any subset of options to be applied at start.
  * @returns An interface to the created chart
  */
-export function createChart(container: string | HTMLElement, options?: DeepPartial<ChartOptions>): IChartApi<Time> {
+export function createChart(container: string | HTMLElement, options?: DeepPartial<ChartOptions>): IChartApi {
 	return createChartEx<Time, HorzScaleBehaviorTime>(
 		container,
 		new HorzScaleBehaviorTime(),

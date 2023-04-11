@@ -2,7 +2,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
 import { Logical, LogicalRange, Range } from '../model/time-data';
-import { TimeScaleOptions } from '../model/time-scale';
+import { HorzScaleOptions } from '../model/time-scale';
 
 /**
  * A custom function used to handle changes to the time scale's time range.
@@ -219,12 +219,12 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 *
 	 * @param options - Any subset of options.
 	 */
-	applyOptions(options: DeepPartial<TimeScaleOptions>): void;
+	applyOptions(options: DeepPartial<HorzScaleOptions>): void;
 
 	/**
 	 * Returns current options
 	 *
 	 * @returns Currently applied options
 	 */
-	options(): Readonly<TimeScaleOptions>;
+	options(): Readonly<HorzScaleOptions>;
 }

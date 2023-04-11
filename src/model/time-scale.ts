@@ -50,7 +50,7 @@ export function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
 /**
  * Options for the time scale; the horizontal scale at the bottom of the chart that displays the time of data.
  */
-export interface TimeScaleOptions {
+export interface HorzScaleOptions {
 	/**
 	 * The margin space in bars from the right side of the chart.
 	 *
@@ -159,7 +159,7 @@ export interface TimeScaleOptions {
 }
 
 export class TimeScale<HorzScaleItem> {
-	private readonly _options: TimeScaleOptions;
+	private readonly _options: HorzScaleOptions;
 	private readonly _model: ChartModel<HorzScaleItem>;
 	private readonly _localizationOptions: LocalizationOptions<HorzScaleItem>;
 
@@ -187,7 +187,7 @@ export class TimeScale<HorzScaleItem> {
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
-	public constructor(model: ChartModel<HorzScaleItem>, options: TimeScaleOptions, localizationOptions: LocalizationOptions<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
+	public constructor(model: ChartModel<HorzScaleItem>, options: HorzScaleOptions, localizationOptions: LocalizationOptions<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._options = options;
 		this._localizationOptions = localizationOptions;
 		this._rightOffset = options.rightOffset;
@@ -201,7 +201,7 @@ export class TimeScale<HorzScaleItem> {
 		this._tickMarks.setUniformDistribution(options.uniformDistribution);
 	}
 
-	public options(): Readonly<TimeScaleOptions> {
+	public options(): Readonly<HorzScaleOptions> {
 		return this._options;
 	}
 
@@ -212,7 +212,7 @@ export class TimeScale<HorzScaleItem> {
 		this._updateDateTimeFormatter();
 	}
 
-	public applyOptions(options: DeepPartial<TimeScaleOptions>, localizationOptions?: DeepPartial<LocalizationOptions<HorzScaleItem>>): void {
+	public applyOptions(options: DeepPartial<HorzScaleOptions>, localizationOptions?: DeepPartial<LocalizationOptions<HorzScaleItem>>): void {
 		merge(this._options, options);
 
 		if (this._options.fixLeftEdge) {

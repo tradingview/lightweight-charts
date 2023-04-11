@@ -11,7 +11,7 @@ import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Logical, LogicalRange, Range, TimePointIndex, TimePointsRange } from '../model/time-data';
-import { TimeScale, TimeScaleOptions } from '../model/time-scale';
+import { TimeScale, HorzScaleOptions } from '../model/time-scale';
 
 import {
 	ITimeScaleApi,
@@ -189,11 +189,11 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 		this._sizeChanged.unsubscribe(handler);
 	}
 
-	public applyOptions(options: DeepPartial<TimeScaleOptions>): void {
+	public applyOptions(options: DeepPartial<HorzScaleOptions>): void {
 		this._timeScale.applyOptions(options);
 	}
 
-	public options(): Readonly<TimeScaleOptions> {
+	public options(): Readonly<HorzScaleOptions> {
 		return clone(this._timeScale.options());
 	}
 

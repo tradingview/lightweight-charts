@@ -1,9 +1,10 @@
+import { Time } from './horz-scale-behavior-time/types';
 import { PriceFormatterFn } from './price-formatter-fn';
 
 /**
  * A custom function used to override formatting of a time to a string.
  */
-export type TimeFormatterFn<HorzScaleItem> = (time: HorzScaleItem) => string;
+export type TimeFormatterFn<HorzScaleItem = Time> = (time: HorzScaleItem) => string;
 
 /**
  * Represents options for formatting dates, times, and prices according to a locale.
