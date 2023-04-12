@@ -1,6 +1,6 @@
 import { generateContrastColors } from '../../helpers/color';
 
-import { Crosshair, CrosshairPriceAndCoordinate } from '../../model/crosshair';
+import { Crosshair, CrosshairMode, CrosshairPriceAndCoordinate } from '../../model/crosshair';
 import { PriceScale } from '../../model/price-scale';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
 
@@ -25,6 +25,10 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 		paneRendererData: PriceAxisViewRendererData,
 		commonRendererData: PriceAxisViewRendererCommonData
 	): void {
+		if (this._source.options().mode === CrosshairMode.Hidden) {
+			return;
+		}
+
 		axisRendererData.visible = false;
 		const options = this._source.options().horzLine;
 		if (!options.labelVisible) {

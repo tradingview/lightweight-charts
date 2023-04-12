@@ -1,6 +1,6 @@
 import { ensureNotNull } from '../../helpers/assertions';
 
-import { Crosshair } from '../../model/crosshair';
+import { Crosshair, CrosshairMode } from '../../model/crosshair';
 import { CrosshairRenderer, CrosshairRendererData } from '../../renderers/crosshair-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
@@ -50,6 +50,10 @@ export class CrosshairPaneView implements IPaneView {
 		const crosshairOptions = pane.model().options().crosshair;
 
 		const data = this._rendererData;
+
+		if (crosshairOptions.mode === CrosshairMode.Hidden) {
+			return;
+		}
 
 		data.horzLine.visible = visible && this._source.horzLineVisible(pane);
 		data.vertLine.visible = visible && this._source.vertLineVisible();
