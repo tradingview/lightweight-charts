@@ -35,6 +35,11 @@ export interface CandlestickPlotRow extends PlotRow {
 	readonly wickColor?: string;
 }
 
+export interface AbstractPlotRow extends PlotRow {
+	// Used to store the original data values
+	data: Record<string, unknown>;
+}
+
 export interface SeriesPlotRowTypeAtTypeMap {
 	Bar: BarPlotRow;
 	Candlestick: CandlestickPlotRow;
@@ -42,6 +47,7 @@ export interface SeriesPlotRowTypeAtTypeMap {
 	Baseline: BaselinePlotRow;
 	Line: LinePlotRow;
 	Histogram: HistogramPlotRow;
+	Abstract: AbstractPlotRow;
 }
 
 export type SeriesPlotRow<T extends SeriesType = SeriesType> = SeriesPlotRowTypeAtTypeMap[T];

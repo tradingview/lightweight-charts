@@ -56,6 +56,9 @@ function getChecker(type: SeriesType): Checker {
 		case 'Line':
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
+
+		case 'Abstract':
+			return checkAbstractItem.bind(null, type);
 	}
 }
 
@@ -112,4 +115,12 @@ function checkLineItem(
 			lineItem.value
 		}`
 	);
+}
+
+function checkAbstractItem(
+	// type: 'Abstract',
+	// abstractItem: SeriesDataItemTypeMap[typeof type]
+): void {
+	// Nothing to check yet...
+	return;
 }

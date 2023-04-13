@@ -1,12 +1,15 @@
+import { AbstractDataToPlotRowValueConverter } from '../api/get-series-plot-row-creator';
+
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
 import { VolumeFormatter } from '../formatters/volume-formatter';
 
-import { ensureNotNull } from '../helpers/assertions';
+import { ensure, ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { isInteger, merge } from '../helpers/strict-type-checks';
 
+import { SeriesAbstractPaneView } from '../views/pane/abstract-pane-view';
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
 import { SeriesBaselinePaneView } from '../views/pane/baseline-pane-view';
@@ -30,6 +33,7 @@ import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
+import { IAbstractSeriesPaneView } from './iabstract-series';
 import { FirstValue } from './iprice-data-source';
 import { ISeriesPrimitive, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
 import { Pane } from './pane';
@@ -114,6 +118,7 @@ export interface SeriesDataAtTypeMap {
 	Baseline: BarPrice;
 	Line: BarPrice;
 	Histogram: BarPrice;
+	Abstract: BarPrice;
 }
 
 export interface SeriesUpdateInfo {
@@ -142,8 +147,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _markersPaneView!: SeriesMarkersPaneView;
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
+	private _abstractPaneView: IAbstractSeriesPaneView | null;
 
-	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T) {
+	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T, pane?: Pane, abstractPaneView?: IAbstractSeriesPaneView) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
@@ -156,6 +162,8 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		if (seriesType === 'Area' || seriesType === 'Line' || seriesType === 'Baseline') {
 			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'> | Series<'Baseline'>);
 		}
+
+		this._abstractPaneView = abstractPaneView ?? null;
 
 		this._recreateFormatter();
 
@@ -361,7 +369,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		if (prices === null) {
 			return null;
 		}
-		if (this._seriesType === 'Bar' || this._seriesType === 'Candlestick') {
+		if (this._seriesType === 'Bar' || this._seriesType === 'Candlestick' || this._seriesType === 'Abstract') {
 			return {
 				open: prices.value[PlotRowValueIndex.Open] as BarPrice,
 				high: prices.value[PlotRowValueIndex.High] as BarPrice,
@@ -533,6 +541,13 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public detachPrimitive(source: ISeriesPrimitive): void {
 		this._primitives = this._primitives.filter((wrapper: SeriesPrimitiveWrapper) => wrapper.primitive() !== source);
+	}
+
+	public abstractSeriesPlotValuesBuilder(): AbstractDataToPlotRowValueConverter {
+		// eslint-disable-next-line @typescript-eslint/tslint/config
+		return data => {
+			return ensure(this._abstractPaneView).priceValueBuilder(data);
+		};
 	}
 
 	private _isOverlay(): boolean {
@@ -708,6 +723,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 			case 'Line': {
 				this._paneView = new SeriesLinePaneView(this as Series<'Line'>, this.model());
+				break;
+			}
+
+			case 'Abstract': {
+				this._paneView = new SeriesAbstractPaneView(this as Series<'Abstract'>, this.model(), ensureNotNull(this._abstractPaneView));
 				break;
 			}
 

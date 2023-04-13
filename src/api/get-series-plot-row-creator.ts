@@ -1,9 +1,11 @@
+import { ensureDefined } from '../helpers/assertions';
+
 import { PlotRow } from '../model/plot-data';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { OriginalTime, TimePoint, TimePointIndex } from '../model/time-data';
 
-import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
+import { AbstractData, AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
 
 function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;
@@ -96,6 +98,20 @@ function getCandlestickSeriesPlotRow(time: TimePoint, index: TimePointIndex, ite
 	return res;
 }
 
+// The returned data is used for scaling the series, and providing the current value for the price scale
+export type AbstractDataToPlotRowValueConverter = (item: AbstractData | WhitespaceData) => [
+	number, // open
+	number, // high
+	number, // low
+	number, // close
+];
+
+function getAbstractSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: AbstractData | WhitespaceData, originalTime: OriginalTime, dataToPlotRow?: AbstractDataToPlotRowValueConverter): Mutable<SeriesPlotRow<'Abstract'>> {
+	const value = ensureDefined(dataToPlotRow)(item);
+	const { time: excludedTime, ...data } = item;
+	return { index, time, value, originalTime, data };
+}
+
 export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
 
 export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is SeriesPlotRow {
@@ -103,7 +119,7 @@ export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is 
 }
 
 type SeriesItemValueFnMap = {
-	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime) => Mutable<SeriesPlotRow<T> | WhitespacePlotRow>;
+	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime, dataToPlotRow?: AbstractDataToPlotRowValueConverter) => Mutable<SeriesPlotRow<T> | WhitespacePlotRow>;
 };
 
 function wrapCustomValues<T extends SeriesPlotRow | WhitespacePlotRow>(plotRow: Mutable<T>, bar: SeriesDataItemTypeMap[SeriesType]): Mutable<T> {
@@ -130,6 +146,7 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Baseline: wrapWhitespaceData(getBaselineSeriesPlotRow),
 	Histogram: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
+	Abstract: getAbstractSeriesPlotRow,
 };
 
 export function getSeriesPlotRowCreator<TSeriesType extends SeriesType>(seriesType: TSeriesType): SeriesItemValueFnMap[TSeriesType] {

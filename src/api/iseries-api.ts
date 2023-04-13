@@ -51,7 +51,7 @@ export interface BarsInfo extends Partial<Range<Time>> {
 /**
  * Represents the interface for interacting with series.
  */
-export interface ISeriesApi<TSeriesType extends SeriesType> {
+export interface ISeriesApi<TSeriesType extends SeriesType, TData = SeriesDataItemTypeMap[TSeriesType]> {
 	/**
 	 * Returns current price formatter
 	 *
@@ -143,7 +143,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ]);
 	 * ```
 	 */
-	setData(data: SeriesDataItemTypeMap[TSeriesType][]): void;
+	setData(data: TData[]): void;
 
 	/**
 	 * Adds new data item to the existing set (or updates the latest item if times of the passed/latest items are equal).
@@ -168,7 +168,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * });
 	 * ```
 	 */
-	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
+	update(bar: TData): void;
 
 	/**
 	 * Returns a bar data by provided logical index.
@@ -181,7 +181,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * const originalData = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
 	 * ```
 	 */
-	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null;
+	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null;
 
 	/**
 	 * Returns all the bar data for the series.
@@ -192,7 +192,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * const originalData = series.data();
 	 * ```
 	 */
-	data(): readonly SeriesDataItemTypeMap[TSeriesType][];
+	data(): readonly TData[];
 
 	/**
 	 * Subscribe to the data changed event. This event is fired whenever the `update` or `setData` method is evoked

@@ -1,8 +1,10 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
+import { IAbstractSeriesPaneView } from '../model/iabstract-series';
 import { Point } from '../model/point';
 import {
+	AbstractSeriesPartialOptions,
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
@@ -14,7 +16,7 @@ import {
 import { Logical, Time } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { BarData, HistogramData, LineData } from './data-consumer';
+import { AbstractData, BarData, HistogramData, LineData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -85,6 +87,20 @@ export interface IChartApi {
 	 * @param forceRepaint - True to initiate resize immediately. One could need this to get screenshot immediately after resize.
 	 */
 	resize(width: number, height: number, forceRepaint?: boolean): void;
+
+	/**
+	 * Creates an abstract series with specified parameters.
+	 *
+	 * An abstract series is a generic series which can be extended with a custom renderer to
+	 * implement chart types which the library doesn't support by default.
+	 *
+	 * @param abstractPaneView - An abstract series pane view which implements the custom renderer.
+	 * @param abstractOptions - Customization parameters of the series being created.
+	 * ```js
+	 * const series = chart.addAbstractSeries(myAbstractPaneView);
+	 * ```
+	 */
+	addAbstractSeries<TData extends AbstractData>(abstractPaneView: IAbstractSeriesPaneView<TData>, abstractOptions?: AbstractSeriesPartialOptions): ISeriesApi<'Abstract', TData>;
 
 	/**
 	 * Creates an area series with specified parameters.

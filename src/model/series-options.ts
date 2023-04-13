@@ -452,6 +452,16 @@ export interface HistogramStyleOptions {
 }
 
 /**
+ * Represents style options for an abstract series.
+ */
+export interface AbstractStyleOptions {
+	/**
+	 * Color used for the price line and price scale label.
+	 */
+	color: string;
+}
+
+/**
  * Represents series value formatting options.
  * The precision and minMove properties allow wide customization of formatting.
  *
@@ -802,6 +812,15 @@ export type HistogramSeriesOptions = SeriesOptions<HistogramStyleOptions>;
 export type HistogramSeriesPartialOptions = SeriesPartialOptions<HistogramStyleOptions>;
 
 /**
+ * Represents an abstract series options.
+ */
+export type AbstractSeriesOptions = SeriesOptions<AbstractStyleOptions>;
+/**
+ * Represents an abstract series options where all properties are optional.
+ */
+export type AbstractSeriesPartialOptions = SeriesPartialOptions<AbstractStyleOptions>;
+
+/**
  * Represents line series options.
  */
 export type LineSeriesOptions = SeriesOptions<LineStyleOptions>;
@@ -840,6 +859,10 @@ export interface SeriesStyleOptionsMap {
 	 * The type of histogram style options.
 	 */
 	Histogram: HistogramStyleOptions;
+	/**
+	 * The type of an abstract series' style options.
+	 */
+	Abstract: AbstractStyleOptions;
 }
 
 /**
@@ -872,6 +895,10 @@ export interface SeriesOptionsMap {
 	 * The type of histogram series options.
 	 */
 	Histogram: HistogramSeriesOptions;
+	/**
+	 * The type of an abstract series options.
+	 */
+	Abstract: AbstractSeriesOptions;
 }
 
 /**
@@ -904,6 +931,10 @@ export interface SeriesPartialOptionsMap {
 	 * The type of histogram series partial options.
 	 */
 	Histogram: HistogramSeriesPartialOptions;
+	/**
+	 * The type of an abstract series partial options.
+	 */
+	Abstract: AbstractSeriesPartialOptions;
 }
 
 /**

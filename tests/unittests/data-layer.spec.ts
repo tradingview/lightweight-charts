@@ -21,6 +21,7 @@ function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Se
 	return {
 		bars: () => data,
 		seriesType: () => seriesType || 'Line',
+		abstractSeriesPlotValuesBuilder: () => {},
 	} as Series<T>;
 }
 

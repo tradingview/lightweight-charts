@@ -1,4 +1,5 @@
 import {
+	AbstractStyleOptions,
 	AreaStyleOptions,
 	BarStyleOptions,
 	BaselineStyleOptions,
@@ -90,6 +91,10 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 export const histogramStyleDefaults: HistogramStyleOptions = {
 	color: '#26a69a',
 	base: 0,
+};
+
+export const abstractStyleDefaults: AbstractStyleOptions = {
+	color: '#2196f3',
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {

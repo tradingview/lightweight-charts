@@ -188,6 +188,17 @@ export interface CandlestickData extends OhlcData {
 	wickColor?: string;
 }
 
+/**
+ * Base structure describing a single item of data for an abstract series.
+ *
+ * This type allows for any properties to be defined
+ * within the interface. It is recommended that you extend this interface with
+ * the required data structure.
+ */
+export interface AbstractData extends WhitespaceData {
+	[key: string]: unknown;
+}
+
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
@@ -231,6 +242,10 @@ export interface SeriesDataItemTypeMap {
 	 * The types of histogram series data.
 	 */
 	Histogram: HistogramData | WhitespaceData;
+	/**
+	 * The base types of an abstract series data.
+	 */
+	Abstract: AbstractData | WhitespaceData;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {

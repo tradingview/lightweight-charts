@@ -14,6 +14,7 @@ import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
+import { IAbstractSeriesPaneView } from './iabstract-series';
 import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
@@ -764,9 +765,9 @@ export class ChartModel implements IDestroyable {
 		return this._priceScalesOptionsChanged;
 	}
 
-	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T> {
+	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], abstractPaneView?: IAbstractSeriesPaneView): Series<T> {
 		const pane = this._panes[0];
-		const series = this._createSeries(options, seriesType, pane);
+		const series = this._createSeries(options, seriesType, pane, abstractPaneView);
 		this._serieses.push(series);
 
 		if (this._serieses.length === 1) {
@@ -924,8 +925,8 @@ export class ChartModel implements IDestroyable {
 		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T> {
-		const series = new Series<T>(this, options, seriesType);
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane, abstractPaneView?: IAbstractSeriesPaneView): Series<T> {
+		const series = new Series<T>(this, options, seriesType, pane, abstractPaneView);
 
 		const targetScaleId = options.priceScaleId !== undefined ? options.priceScaleId : this.defaultVisiblePriceScaleId();
 		pane.addDataSource(series, targetScaleId);

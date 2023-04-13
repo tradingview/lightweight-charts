@@ -23,7 +23,7 @@ import { Logical, OriginalTime, Range, Time, TimePoint, TimePointIndex } from '.
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
-import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
 import { convertTime } from './data-layer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
 import { getSeriesDataCreator } from './get-series-data-creator';
@@ -34,7 +34,7 @@ import { BarsInfo, DataChangedHandler, DataChangedScope, ISeriesApi } from './is
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
-export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSeriesType>, IDestroyable {
+export class SeriesApi<TSeriesType extends SeriesType, TData extends WhitespaceData = SeriesDataItemTypeMap[TSeriesType]> implements ISeriesApi<TSeriesType, TData>, IDestroyable {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>;
 	protected readonly _chartApi: IChartApi;
@@ -126,7 +126,7 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		return result;
 	}
 
-	public setData(data: SeriesDataItemTypeMap[TSeriesType][]): void {
+	public setData(data: TData[]): void {
 		checkItemsAreOrdered(data);
 		checkSeriesValuesType(this._series.seriesType(), data);
 
@@ -134,27 +134,27 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 		this._onDataChanged('full');
 	}
 
-	public update(bar: SeriesDataItemTypeMap[TSeriesType]): void {
+	public update(bar: TData): void {
 		checkSeriesValuesType(this._series.seriesType(), [bar]);
 
 		this._dataUpdatesConsumer.updateData(this._series, bar);
 		this._onDataChanged('update');
 	}
 
-	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null {
+	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null {
 		const data = this._series.bars().search(logicalIndex as unknown as TimePointIndex, mismatchDirection);
 		if (data === null) {
 			// actually it can be a whitespace
 			return null;
 		}
 
-		return getSeriesDataCreator(this.seriesType())(data);
+		return getSeriesDataCreator(this.seriesType())(data) as TData | null;
 	}
 
-	public data(): readonly SeriesDataItemTypeMap[TSeriesType][] {
+	public data(): readonly TData[] {
 		const seriesCreator = getSeriesDataCreator(this.seriesType());
 		const rows = this._series.bars().rows();
-		return rows.map((row: SeriesPlotRow<TSeriesType>) => seriesCreator(row));
+		return rows.map((row: SeriesPlotRow<TSeriesType>) => seriesCreator(row) as TData);
 	}
 
 	public subscribeDataChanged(handler: DataChangedHandler): void {

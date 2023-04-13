@@ -4,6 +4,7 @@ import { PlotRowValueIndex } from './plot-data';
 import { Series } from './series';
 import { SeriesPlotRow } from './series-data';
 import {
+	AbstractStyleOptions,
 	AreaStyleOptions,
 	BarStyleOptions,
 	BaselineStyleOptions,
@@ -63,6 +64,8 @@ export interface CandlesticksColorerStyle extends CommonBarColorerStyle {
 	barWickColor: string;
 }
 
+export interface AbstractBarColorerStyle extends CommonBarColorerStyle {}
+
 export interface BarStylesMap {
 	Bar: BarColorerStyle;
 	Candlestick: CandlesticksColorerStyle;
@@ -70,6 +73,7 @@ export interface BarStylesMap {
 	Baseline: BaselineBarColorerStyle;
 	Line: LineBarColorerStyle;
 	Histogram: HistogramBarColorerStyle;
+	Abstract: AbstractBarColorerStyle;
 }
 
 type FindBarFn = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars) => SeriesPlotRow | null;
@@ -115,6 +119,14 @@ const barStyleFnMap: BarStylesFnMap = {
 			barColor: currentBar.color ?? (isUp ? upColor : downColor),
 			barBorderColor: currentBar.borderColor ?? (isUp ? borderUpColor : borderDownColor),
 			barWickColor: currentBar.wickColor ?? (isUp ? wickUpColor : wickDownColor),
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Abstract: (findBar: FindBarFn, abstractStyle: AbstractStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): AbstractBarColorerStyle => {
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
+
+		return {
+			barColor: currentBar.color ?? abstractStyle.color,
 		};
 	},
 	// eslint-disable-next-line @typescript-eslint/naming-convention

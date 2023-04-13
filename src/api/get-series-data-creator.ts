@@ -1,5 +1,6 @@
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import {
+	AbstractPlotRow,
 	AreaPlotRow,
 	BarPlotRow,
 	BaselinePlotRow,
@@ -11,6 +12,7 @@ import { SeriesType } from '../model/series-options';
 import { Time } from '../model/time-data';
 
 import {
+	AbstractData,
 	AreaData,
 	BarData,
 	BaselineData,
@@ -22,7 +24,7 @@ import {
 } from './data-consumer';
 
 type SeriesPlotRowToDataMap = {
-	[T in keyof SeriesDataItemTypeMap]: (plotRow: SeriesPlotRow) => SeriesDataItemTypeMap[T];
+	[T in keyof SeriesDataItemTypeMap]: (plotRow: SeriesPlotRow<T>) => SeriesDataItemTypeMap[T];
 };
 
 function singleValueData(plotRow: PlotRow): SingleValueData {
@@ -141,6 +143,14 @@ function candlestickData(plotRow: CandlestickPlotRow): CandlestickData {
 	return result;
 }
 
+function abstractData(plotRow: AbstractPlotRow): AbstractData {
+	const time = plotRow.originalTime as unknown as Time;
+	return {
+		...plotRow.data,
+		time,
+	};
+}
+
 const seriesPlotRowToDataMap: SeriesPlotRowToDataMap = {
 	Area: areaData,
 	Line: lineData,
@@ -148,6 +158,7 @@ const seriesPlotRowToDataMap: SeriesPlotRowToDataMap = {
 	Histogram: lineData,
 	Bar: barData,
 	Candlestick: candlestickData,
+	Abstract: abstractData,
 };
 
 export function getSeriesDataCreator<TSeriesType extends SeriesType>(seriesType: TSeriesType): (plotRow: SeriesPlotRow<TSeriesType>) => SeriesDataItemTypeMap[TSeriesType] {
