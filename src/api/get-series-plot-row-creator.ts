@@ -108,8 +108,8 @@ export type AbstractDataToPlotRowValueConverter = (item: AbstractData | Whitespa
 
 function getAbstractSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: AbstractData | WhitespaceData, originalTime: OriginalTime, dataToPlotRow?: AbstractDataToPlotRowValueConverter): Mutable<SeriesPlotRow<'Abstract'>> {
 	const value = ensureDefined(dataToPlotRow)(item);
-	const { time: excludedTime, ...data } = item;
-	return { index, time, value, originalTime, data };
+	const { time: excludedTime, color, ...data } = item as AbstractData;
+	return { index, time, value, originalTime, data, color };
 }
 
 export type WhitespacePlotRow = Omit<PlotRow, 'value'>;

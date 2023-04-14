@@ -38,6 +38,7 @@ export interface CandlestickPlotRow extends PlotRow {
 export interface AbstractPlotRow extends PlotRow {
 	// Used to store the original data values
 	data: Record<string, unknown>;
+	readonly color?: string;
 }
 
 export interface SeriesPlotRowTypeAtTypeMap {
