@@ -196,7 +196,6 @@ export interface CandlestickData extends OhlcData {
  * the required data structure.
  */
 export interface AbstractData extends WhitespaceData {
-	[key: string]: unknown;
 	/**
 	 * If defined then this color will be used for the price line and price scale line
 	 * for this specific data item of the abstract series.

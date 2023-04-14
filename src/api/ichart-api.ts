@@ -107,7 +107,7 @@ export interface IChartApi {
 		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
 	>(
 		abstractPaneView: IAbstractSeriesPaneView<TData, TOptions>,
-		abstractOptions?: TPartialOptions
+		abstractOptions?: SeriesPartialOptions<TOptions>
 	): ISeriesApi<'Abstract', TData, TOptions, TPartialOptions>;
 
 	/**
