@@ -184,11 +184,16 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		abstractPaneView: IAbstractSeriesPaneView<TData, TOptions>,
 		options?: SeriesPartialOptions<TOptions>
 	): ISeriesApi<'Abstract', TData, TOptions, TPartialOptions> {
+		const paneView = ensure(abstractPaneView);
+		const defaults = {
+			...abstractStyleDefaults,
+			...paneView.defaultOptions(),
+		};
 		return this._addSeriesImpl<'Abstract', TData, TOptions, TPartialOptions>(
 			'Abstract',
-			abstractStyleDefaults,
+			defaults,
 			options,
-			ensure(abstractPaneView)
+			paneView
 		);
 	}
 

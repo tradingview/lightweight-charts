@@ -1,5 +1,8 @@
 /// <reference types="_build-time-constants" />
 
+import { abstractStyleDefaults, seriesOptionsDefaults } from './api/options/series-options-defaults';
+import { AbstractSeriesOptions } from './model/series-options';
+
 export { LineStyle, LineType } from './renderers/draw-line';
 
 export { TrackingModeExitMode } from './model/chart-model';
@@ -14,6 +17,11 @@ export {
 	isBusinessDay,
 	isUTCTimestamp,
 } from './api/data-consumer';
+
+export const abstractSeriesDefaultOptions: AbstractSeriesOptions = {
+	...seriesOptionsDefaults,
+	...abstractStyleDefaults,
+};
 
 export { createChart } from './api/create-chart';
 

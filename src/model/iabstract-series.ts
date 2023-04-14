@@ -125,4 +125,9 @@ export interface IAbstractSeriesPaneView<
 	 * and the close value for the crosshair and price line position.
 	 */
 	priceValueBuilder(plotRow: TData): AbstractSeriesPricePlotValues;
+
+	/**
+	 * Default options
+	 */
+	defaultOptions(): TSeriesOptions;
 }
