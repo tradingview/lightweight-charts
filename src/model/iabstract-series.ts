@@ -3,6 +3,7 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { AbstractData, WhitespaceData } from '../api/data-consumer';
 
 import { Coordinate } from './coordinate';
+import { AbstractSeriesOptions } from './series-options';
 import { Range } from './time-data';
 
 /**
@@ -96,7 +97,8 @@ export type AbstractSeriesPricePlotValues = [number, number, number, number];
  * This interface represents the view for the custom series
  */
 export interface IAbstractSeriesPaneView<
-	TData extends AbstractData | WhitespaceData = AbstractData | WhitespaceData
+	TData extends AbstractData | WhitespaceData = AbstractData | WhitespaceData,
+	TSeriesOptions extends AbstractSeriesOptions = AbstractSeriesOptions
 > {
 	/**
 	 * This method returns a renderer - special object to draw data for the series
@@ -110,7 +112,10 @@ export interface IAbstractSeriesPaneView<
 	 * This method will be called with the latest data for the renderer to use
 	 * during the next paint.
 	 */
-	update(data: PaneRendererAbstractData<TData>): void;
+	update(
+		data: PaneRendererAbstractData<TData>,
+		seriesOptions: TSeriesOptions
+	): void;
 
 	/**
 	 * A function for interpreting the custom series data and returning an array of numbers

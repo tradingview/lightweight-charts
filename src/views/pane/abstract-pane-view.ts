@@ -104,11 +104,14 @@ export class SeriesAbstractPaneView extends SeriesPaneViewBase<
 	}
 
 	protected _prepareRendererData(): void {
-		this._paneView.update({
-			bars: this._items.map(unwrapItemData) as AbstractBarItemData[],
-			barSpacing: this._model.timeScale().barSpacing(),
-			visibleRange: this._itemsVisibleRange,
-		});
+		this._paneView.update(
+			{
+				bars: this._items.map(unwrapItemData) as AbstractBarItemData[],
+				barSpacing: this._model.timeScale().barSpacing(),
+				visibleRange: this._itemsVisibleRange,
+			},
+			this._series.options()
+		);
 	}
 }
 

@@ -51,7 +51,12 @@ export interface BarsInfo extends Partial<Range<Time>> {
 /**
  * Represents the interface for interacting with series.
  */
-export interface ISeriesApi<TSeriesType extends SeriesType, TData = SeriesDataItemTypeMap[TSeriesType]> {
+export interface ISeriesApi<
+	TSeriesType extends SeriesType,
+	TData = SeriesDataItemTypeMap[TSeriesType],
+	TOptions = SeriesOptionsMap[TSeriesType],
+	TPartialOptions = SeriesPartialOptionsMap[TSeriesType],
+	> {
 	/**
 	 * Returns current price formatter
 	 *
@@ -108,14 +113,14 @@ export interface ISeriesApi<TSeriesType extends SeriesType, TData = SeriesDataIt
 	 *
 	 * @param options - Any subset of options.
 	 */
-	applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void;
+	applyOptions(options: TPartialOptions): void;
 
 	/**
 	 * Returns currently applied options
 	 *
 	 * @returns Full set of currently applied options, including defaults
 	 */
-	options(): Readonly<SeriesOptionsMap[TSeriesType]>;
+	options(): Readonly<TOptions>;
 
 	/**
 	 * Returns interface of the price scale the series is currently attached

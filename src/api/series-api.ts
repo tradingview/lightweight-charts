@@ -34,7 +34,14 @@ import { BarsInfo, DataChangedHandler, DataChangedScope, ISeriesApi } from './is
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
-export class SeriesApi<TSeriesType extends SeriesType, TData extends WhitespaceData = SeriesDataItemTypeMap[TSeriesType]> implements ISeriesApi<TSeriesType, TData>, IDestroyable {
+export class SeriesApi<
+	TSeriesType extends SeriesType,
+	TData extends WhitespaceData = SeriesDataItemTypeMap[TSeriesType],
+	TOptions extends SeriesOptionsMap[TSeriesType] = SeriesOptionsMap[TSeriesType],
+	TPartialOptions extends SeriesPartialOptionsMap[TSeriesType] = SeriesPartialOptionsMap[TSeriesType]
+> implements
+		ISeriesApi<TSeriesType, TData, TOptions, TPartialOptions>,
+		IDestroyable {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType>;
 	protected readonly _chartApi: IChartApi;
@@ -182,12 +189,12 @@ export class SeriesApi<TSeriesType extends SeriesType, TData extends WhitespaceD
 		});
 	}
 
-	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {
+	public applyOptions(options: TPartialOptions): void {
 		this._series.applyOptions(options);
 	}
 
-	public options(): Readonly<SeriesOptionsMap[TSeriesType]> {
-		return clone(this._series.options());
+	public options(): Readonly<TOptions> {
+		return clone(this._series.options() as TOptions);
 	}
 
 	public priceScale(): IPriceScaleApi {

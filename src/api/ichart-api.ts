@@ -4,13 +4,14 @@ import { ChartOptions } from '../model/chart-model';
 import { IAbstractSeriesPaneView } from '../model/iabstract-series';
 import { Point } from '../model/point';
 import {
-	AbstractSeriesPartialOptions,
+	AbstractSeriesOptions,
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
+	SeriesPartialOptions,
 	SeriesType,
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
@@ -100,7 +101,14 @@ export interface IChartApi {
 	 * const series = chart.addAbstractSeries(myAbstractPaneView);
 	 * ```
 	 */
-	addAbstractSeries<TData extends AbstractData>(abstractPaneView: IAbstractSeriesPaneView<TData>, abstractOptions?: AbstractSeriesPartialOptions): ISeriesApi<'Abstract', TData>;
+	addAbstractSeries<
+		TData extends AbstractData,
+		TOptions extends AbstractSeriesOptions,
+		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
+	>(
+		abstractPaneView: IAbstractSeriesPaneView<TData, TOptions>,
+		abstractOptions?: TPartialOptions
+	): ISeriesApi<'Abstract', TData, TOptions, TPartialOptions>;
 
 	/**
 	 * Creates an area series with specified parameters.

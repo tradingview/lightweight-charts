@@ -10,6 +10,7 @@ import { IAbstractSeriesPaneView } from '../model/iabstract-series';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
+	AbstractSeriesOptions,
 	AbstractSeriesPartialOptions,
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
@@ -22,6 +23,7 @@ import {
 	PriceFormat,
 	PriceFormatBuiltIn,
 	SeriesOptionsMap,
+	SeriesPartialOptions,
 	SeriesPartialOptionsMap,
 	SeriesStyleOptionsMap,
 	SeriesType,
@@ -174,11 +176,15 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.resize(width, height, forceRepaint);
 	}
 
-	public addAbstractSeries<TData extends AbstractData>(
-		abstractPaneView: IAbstractSeriesPaneView<TData>,
-		options?: AbstractSeriesPartialOptions
-	): ISeriesApi<'Abstract', TData> {
-		return this._addSeriesImpl(
+	public addAbstractSeries<
+		TData extends AbstractData,
+		TOptions extends AbstractSeriesOptions,
+		TPartialOptions extends AbstractSeriesPartialOptions = SeriesPartialOptions<TOptions>
+	>(
+		abstractPaneView: IAbstractSeriesPaneView<TData, TOptions>,
+		options?: SeriesPartialOptions<TOptions>
+	): ISeriesApi<'Abstract', TData, TOptions, TPartialOptions> {
+		return this._addSeriesImpl<'Abstract', TData, TOptions, TPartialOptions>(
 			'Abstract',
 			abstractStyleDefaults,
 			options,
@@ -273,18 +279,23 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return this._chartWidget.autoSizeActive();
 	}
 
-	private _addSeriesImpl<TSeries extends SeriesType, TData extends WhitespaceData = SeriesDataItemTypeMap[TSeries]>(
+	private _addSeriesImpl<
+		TSeries extends SeriesType,
+		TData extends WhitespaceData = SeriesDataItemTypeMap[TSeries],
+		TOptions extends SeriesOptionsMap[TSeries] = SeriesOptionsMap[TSeries],
+		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries]
+	>(
 		type: TSeries,
 		styleDefaults: SeriesStyleOptionsMap[TSeries],
 		options: SeriesPartialOptionsMap[TSeries] = {},
 		abstractPaneView?: IAbstractSeriesPaneView
-	): ISeriesApi<TSeries, TData> {
+	): ISeriesApi<TSeries, TData, TOptions, TPartialOptions> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
 		const series = this._chartWidget.model().createSeries(type, strictOptions, abstractPaneView);
 
-		const res = new SeriesApi<TSeries, TData>(series, this, this, this);
+		const res = new SeriesApi<TSeries, TData, TOptions, TPartialOptions>(series, this, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
