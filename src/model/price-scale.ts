@@ -741,7 +741,7 @@ export class PriceScale {
 	public formatPrice(price: number, firstValue: number): string {
 		switch (this._options.mode) {
 			case PriceScaleMode.Percentage:
-				return this.formatter().format(toPercent(price, firstValue));
+				return this._formatPercentage(toPercent(price, firstValue));
 			case PriceScaleMode.IndexedTo100:
 				return this.formatter().format(toIndexedTo100(price, firstValue));
 			default:
@@ -752,6 +752,7 @@ export class PriceScale {
 	public formatLogical(logical: number): string {
 		switch (this._options.mode) {
 			case PriceScaleMode.Percentage:
+				return this._formatPercentage(logical);
 			case PriceScaleMode.IndexedTo100:
 				return this.formatter().format(logical);
 			default:
@@ -765,7 +766,7 @@ export class PriceScale {
 
 	public formatPricePercentage(price: number, baseValue: number): string {
 		price = toPercent(price, baseValue);
-		return percentageFormatter.format(price);
+		return this._formatPercentage(price);
 	}
 
 	public sourcesForAutoScale(): readonly IPriceDataSource[] {
@@ -1011,5 +1012,13 @@ export class PriceScale {
 		}
 
 		return this._localizationOptions.priceFormatter(price);
+	}
+
+	private _formatPercentage(percentage: number): string {
+		if (this._localizationOptions.percentageFormatter === undefined) {
+			return this.formatter().format(percentage);
+		}
+
+		return this._localizationOptions.percentageFormatter(percentage);
 	}
 }
