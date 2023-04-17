@@ -3,7 +3,7 @@ name: Documentation Website Deployment
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - '.github/workflows/deploy.yml'
       - 'src/**'
