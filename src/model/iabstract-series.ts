@@ -130,4 +130,14 @@ export interface IAbstractSeriesPaneView<
 	 * Default options
 	 */
 	defaultOptions(): TSeriesOptions;
+
+	/**
+	 * This method will be evoked when the series has been removed from the chart. This method should be used to
+	 * clean up any objects, references, and other items that could potentially cause memory leaks.
+	 *
+	 * This method should contain all the necessary code to clean up the object before it is removed from memory.
+	 * This includes removing any event listeners or timers that are attached to the object, removing any references
+	 * to other objects, and resetting any values or properties that were modified during the lifetime of the object.
+	 */
+	destroy?(): void;
 }

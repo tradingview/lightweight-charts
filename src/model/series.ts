@@ -174,6 +174,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		if (this._animationTimeoutId !== null) {
 			clearTimeout(this._animationTimeoutId);
 		}
+		if (this._abstractPaneView && this._abstractPaneView.destroy) {
+			this._abstractPaneView.destroy();
+		}
 	}
 
 	public priceLineColor(lastBarColor: string): string {
