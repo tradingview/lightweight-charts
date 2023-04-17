@@ -72,6 +72,7 @@ export class ChartWidget implements IDestroyable {
 		this._element = document.createElement('div');
 		this._element.classList.add('tv-lightweight-charts');
 		this._element.style.overflow = 'hidden';
+		this._element.style.direction = 'ltr';
 		this._element.style.width = '100%';
 		this._element.style.height = '100%';
 		disableSelection(this._element);
