@@ -1,0 +1,43 @@
+name: Documentation Website Deployment
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy.yml'
+      - 'src/**'
+      - 'website/**'
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - run: npm install
+      - run: npm run build:prod
+      - run: cd website
+      - run: npm install
+      - run: npm run build
+      - run: cd ..
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/build
+          user_name: 'TradingView'
+          user_email: 'noreply@tradingview.com'
+          commit_message: '[skip ci] Deploy website on ${{ github.event.head_commit.id }}'
