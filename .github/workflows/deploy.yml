@@ -13,6 +13,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-22.04
+    if: ${{ github.ref == 'refs/heads/main' }}
     permissions:
       contents: write
     concurrency:
@@ -25,12 +26,16 @@ jobs:
         with:
           node-version: '16'
 
-      - run: npm install
-      - run: npm run build:prod
-      - run: cd website
-      - run: npm install
-      - run: npm run build
-      - run: cd ..
+      - name: Install library dependencies
+        run: npm install
+      - name: Build library
+        run: npm run build:prod
+      - name: Install website dependencies
+        working-directory: ./website
+        run: npm install
+      - name: Build documentation website
+        working-directory: ./website
+        run: npm run build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
