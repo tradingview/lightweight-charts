@@ -81,6 +81,28 @@ class SeriesPrimitivePaneViewWrapper implements IPaneView {
 	}
 }
 
+interface AxisViewData {
+	text: string;
+	coordinate: number;
+	fixedCoordinate: number | undefined;
+	color: string;
+	background: string;
+	visible: boolean;
+	tickVisible: boolean;
+}
+
+function getAxisViewData(baseView: ISeriesPrimitiveAxisView): AxisViewData {
+	return {
+		text: baseView.text(),
+		coordinate: baseView.coordinate(),
+		fixedCoordinate: baseView.fixedCoordinate?.(),
+		color: baseView.textColor(),
+		background: baseView.backColor(),
+		visible: baseView.visible?.() ?? true,
+		tickVisible: baseView.tickVisible?.() ?? true,
+	};
+}
+
 class SeriesPrimitiveTimeAxisViewWrapper implements ITimeAxisView {
 	private readonly _baseView: ISeriesPrimitiveAxisView;
 	private readonly _timeScale: TimeScale;
@@ -94,12 +116,7 @@ class SeriesPrimitiveTimeAxisViewWrapper implements ITimeAxisView {
 	public renderer(): TimeAxisViewRenderer {
 		this._renderer.setData({
 			width: this._timeScale.width(),
-			text: this._baseView.text(),
-			coordinate: this._baseView.coordinate(),
-			color: this._baseView.textColor(),
-			background: this._baseView.backColor(),
-			visible: this._baseView.visible?.() ?? true,
-			tickVisible: this._baseView.tickVisible?.() ?? true,
+			...getAxisViewData(this._baseView),
 		});
 		return this._renderer;
 	}
@@ -120,21 +137,20 @@ class SeriesPrimitivePriceAxisViewWrapper extends PriceAxisView {
 		paneRendererData: PriceAxisViewRendererData,
 		commonRendererData: PriceAxisViewRendererCommonData
 	): void {
-		axisRendererData.visible = false;
-
-		commonRendererData.background = this._baseView.backColor();
-		axisRendererData.color = this._baseView.textColor();
+		const data = getAxisViewData(this._baseView);
+		commonRendererData.background = data.background;
+		axisRendererData.color = data.color;
 
 		const additionalPadding = 2 / 12 * this._priceScale.fontSize();
 
 		commonRendererData.additionalPaddingTop = additionalPadding;
 		commonRendererData.additionalPaddingBottom = additionalPadding;
 
-		commonRendererData.coordinate = this._baseView.coordinate();
-		commonRendererData.fixedCoordinate = this._baseView.fixedCoordinate?.() ?? undefined;
-		axisRendererData.text = this._baseView.text();
-		axisRendererData.visible = this._baseView.visible?.() ?? true;
-		axisRendererData.tickVisible = this._baseView.tickVisible?.() ?? true;
+		commonRendererData.coordinate = data.coordinate;
+		commonRendererData.fixedCoordinate = data.fixedCoordinate;
+		axisRendererData.text = data.text;
+		axisRendererData.visible = data.visible;
+		axisRendererData.tickVisible = data.tickVisible;
 	}
 }
 
