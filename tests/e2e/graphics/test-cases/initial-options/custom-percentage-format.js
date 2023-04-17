@@ -20,6 +20,9 @@ function runTestCase(container) {
 	}));
 
 	const mainSeries = chart.addLineSeries();
+	mainSeries.priceScale().applyOptions({
+		mode: LightweightCharts.PriceScaleMode.Percentage,
+	});
 
 	mainSeries.setData(generateData());
 }
