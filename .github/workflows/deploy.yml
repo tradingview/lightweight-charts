@@ -13,9 +13,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-22.04
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/master' }}
     permissions:
-      contents: write
+      contents: read
+      pages: write
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
@@ -39,7 +40,7 @@ jobs:
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./website/build
