@@ -18,6 +18,7 @@ export interface ISeriesPrimitiveAxisView {
 	 * @returns coordinate. distance from top for price axis, or distance from left for time axis.
 	 */
 	coordinate(): number;
+
 	/**
 	 * fixed coordinate of the label. A label with a fixed coordinate value will always be drawn at the specified coordinate and will appear above any 'unfixed' labels. If you supply
 	 * a fixed coordinate then you should return a large negative number for `coordinate` so that the automatic placement of unfixed labels doesn't leave a blank space for this label.
@@ -26,6 +27,7 @@ export interface ISeriesPrimitiveAxisView {
 	 * @returns coordinate. distance from top for price axis, or distance from left for time axis.
 	 */
 	fixedCoordinate?(): number | undefined;
+
 	/**
 	 * @returns text of the label
 	 */
@@ -40,6 +42,16 @@ export interface ISeriesPrimitiveAxisView {
 	 * @returns background color of the label
 	 */
 	backColor(): string;
+
+	/**
+	 * @returns whether the label should be visible (default: `true`)
+	 */
+	visible?(): boolean;
+
+	/**
+	 * @returns whether the tick mark line should be visible (default: `true`)
+	 */
+	tickVisible?(): boolean;
 }
 
 /**

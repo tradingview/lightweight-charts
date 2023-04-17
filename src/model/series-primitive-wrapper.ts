@@ -98,8 +98,8 @@ class SeriesPrimitiveTimeAxisViewWrapper implements ITimeAxisView {
 			coordinate: this._baseView.coordinate(),
 			color: this._baseView.textColor(),
 			background: this._baseView.backColor(),
-			visible: true,
-			tickVisible: true,
+			visible: this._baseView.visible?.() ?? true,
+			tickVisible: this._baseView.tickVisible?.() ?? true,
 		});
 		return this._renderer;
 	}
@@ -133,7 +133,8 @@ class SeriesPrimitivePriceAxisViewWrapper extends PriceAxisView {
 		commonRendererData.coordinate = this._baseView.coordinate();
 		commonRendererData.fixedCoordinate = this._baseView.fixedCoordinate?.() ?? undefined;
 		axisRendererData.text = this._baseView.text();
-		axisRendererData.visible = true;
+		axisRendererData.visible = this._baseView.visible?.() ?? true;
+		axisRendererData.tickVisible = this._baseView.tickVisible?.() ?? true;
 	}
 }
 
