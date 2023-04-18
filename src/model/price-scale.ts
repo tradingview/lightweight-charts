@@ -12,6 +12,7 @@ import { Coordinate } from './coordinate';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptions } from './localization-options';
+import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceRangeImpl } from './price-range-impl';
 import {
 	canConvertPriceRangeFromLog,
@@ -766,7 +767,7 @@ export class PriceScale {
 
 	public formatPricePercentage(price: number, baseValue: number): string {
 		price = toPercent(price, baseValue);
-		return this._formatPercentage(price);
+		return this._formatPercentage(price, percentageFormatter);
 	}
 
 	public sourcesForAutoScale(): readonly IPriceDataSource[] {
@@ -1002,23 +1003,22 @@ export class PriceScale {
 		return null;
 	}
 
-	private _formatPrice(price: BarPrice, fallbackFormatter?: IPriceFormatter): string {
-		if (this._localizationOptions.priceFormatter === undefined) {
+	private _formatValue(value: BarPrice | number, formatter: PriceFormatterFn | undefined, fallbackFormatter?: IPriceFormatter): string {
+		if (formatter === undefined) {
 			if (fallbackFormatter === undefined) {
 				fallbackFormatter = this.formatter();
 			}
-
-			return fallbackFormatter.format(price);
+			return fallbackFormatter.format(value);
 		}
 
-		return this._localizationOptions.priceFormatter(price);
+		return formatter(value as BarPrice);
 	}
 
-	private _formatPercentage(percentage: number): string {
-		if (this._localizationOptions.percentageFormatter === undefined) {
-			return this.formatter().format(percentage);
-		}
+	private _formatPrice(price: BarPrice, fallbackFormatter?: IPriceFormatter): string {
+		return this._formatValue(price, this._localizationOptions.priceFormatter, fallbackFormatter);
+	}
 
-		return this._localizationOptions.percentageFormatter(percentage);
+	private _formatPercentage(percentage: number, fallbackFormatter?: IPriceFormatter): string {
+		return this._formatValue(percentage, this._localizationOptions.percentageFormatter, fallbackFormatter);
 	}
 }
