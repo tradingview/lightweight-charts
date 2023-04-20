@@ -6,9 +6,9 @@ sidebar_position: 1
 
 In this article you can read a brief overview of all supported series types.
 
-## A series customizations
+## Series Customisation
 
-Any type of series can be customized and the set of available options that you can apply depends on a type of a series (see docs for each series type below).
+Customization options for series are dependent on their specific type. Each type of series has its own set of available options, which can be found in the documentation provided for that particular series type. This means that any type of series can be customized, but the options you can apply will vary depending on the type of series you are working with.
 
 If you'd like to change any option of a series, you could do this in different ways:
 
@@ -158,3 +158,11 @@ lineSeries.setData(data);
 
 chart.timeScale().fitContent();
 ```
+
+## Custom Series (Plugins)
+
+Lightweight Charts offers the ability to add your own custom series types, also known as series plugins. This feature allows developers to extend the functionality of the library by adding new chart types, indicators, or other custom visualizations.
+
+Custom series types can be defined by creating a class which implements the [IAbstractSeriesPaneView](/api/interfaces/IAbstractSeriesPaneView.md) interface. This class defines the rendering code which Lightweight Charts will use to draw the series on the chart. Once a custom series type is defined, it can be added to any chart instance using the [`addAbstractSeries()`](/api/interfaces/IChartApi.md#addabstractseries) method, and be used just like any other series.
+
+Please see the [Plugins](./plugins/intro.md) article for more details.

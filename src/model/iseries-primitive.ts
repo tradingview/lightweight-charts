@@ -86,7 +86,7 @@ export interface ISeriesPrimitivePaneRenderer {
 export type SeriesPrimitivePaneViewZOrder = 'bottom' | 'normal' | 'top';
 
 /**
- * This interface represents the primitive in the main area of the chart
+ * This interface represents the primitive for one of the pane of the chart (main chart area, time scale, price scale).
  */
 export interface ISeriesPrimitivePaneView {
 	/**
