@@ -217,6 +217,17 @@ export interface ISeriesApi<
 	subscribeDataChanged(handler: DataChangedHandler): void;
 
 	/**
+	 * Unsubscribe a handler that was previously subscribed using {@link subscribeDataChanged}.
+	 *
+	 * @param handler - Previously subscribed handler
+	 * @example
+	 * ```js
+	 * chart.unsubscribeDataChanged(myHandler);
+	 * ```
+	 */
+	unsubscribeDataChanged(handler: DataChangedHandler): void;
+
+	/**
 	 * Allows to set/replace all existing series markers with new ones.
 	 *
 	 * @param data - An array of series markers. This array should be sorted by time. Several markers with same time are allowed.

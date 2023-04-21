@@ -168,6 +168,10 @@ export class SeriesApi<
 		this._dataChangedDelegate.subscribe(handler);
 	}
 
+	public unsubscribeDataChanged(handler: DataChangedHandler): void {
+		this._dataChangedDelegate.unsubscribe(handler);
+	}
+
 	public setMarkers(data: SeriesMarker<Time>[]): void {
 		checkItemsAreOrdered(data, true);
 
