@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ github.ref == 'refs/heads/master' }}
     permissions:
-      contents: read
+      contents: write
       pages: write
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
