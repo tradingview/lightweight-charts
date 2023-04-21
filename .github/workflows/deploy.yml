@@ -8,7 +8,6 @@ on:
       - '.github/workflows/deploy.yml'
       - 'src/**'
       - 'website/**'
-  pull_request:
 
 jobs:
   deploy:
