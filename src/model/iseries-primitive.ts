@@ -174,7 +174,7 @@ export interface ISeriesPrimitive {
 	 * @param endTimePoint - end time point for the current visible range
 	 * @returns AutoscaleInfo
 	 */
-	autoscaleInfo?(startTimePoint: Logical, endTimePoint: Logical): AutoscaleInfo;
+	autoscaleInfo?(startTimePoint: Logical, endTimePoint: Logical): AutoscaleInfo | null;
 
 	/**
 	 * Attached Lifecycle hook.
