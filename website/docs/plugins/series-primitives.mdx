@@ -45,6 +45,15 @@ The views returned by the `priceAxisViews` and `timeAxisViews` getter methods
 should implement the `ISeriesPrimitiveAxisView` interface and are used to define
 labels to be drawn on the corresponding scales.
 
+Below is a visual example showing the various sections of the chart where a Primitive can draw.
+
+import CodeBlock from "@theme/CodeBlock";
+import sectionsExplainerCode from '!!raw-loader!./explainer-sections-demo.js';
+
+<CodeBlock replaceThemeConstants chart className="language-js" chartOnly>
+	{sectionsExplainerCode}
+</CodeBlock>
+
 ### ISeriesPrimitivePaneView
 
 The [`ISeriesPrimitivePaneView`](/api/interfaces/ISeriesPrimitivePaneView.md)
@@ -56,8 +65,8 @@ interface) for drawing on the corresponding area of the chart using the
 API. The view can define a
 [`zOrder`](/api/interfaces/ISeriesPrimitivePaneView.md#zorder) to control where
 in the visual stack the drawing will occur (See
-[`SeriesPrimitivePaneViewZOrder`](/api/index.md#seriesprimitivepaneviewzorder) for more
-information).
+[`SeriesPrimitivePaneViewZOrder`](/api/index.md#seriesprimitivepaneviewzorder)
+for more information).
 
 Renderers should provide a
 [`draw`](/api/interfaces/ISeriesPrimitivePaneRenderer.md#draw) method which will
@@ -65,6 +74,16 @@ be given a `CanvasRenderingTarget2D` target on which it can draw. Additionally,
 a renderer can optionally provide a
 [`drawBackground`](/api/interfaces/ISeriesPrimitivePaneRenderer.md#drawbackground)
 method for drawing beneath other elements on the same zOrder.
+
+#### Interactive Demo of zOrder layers
+
+Below is an interactive demo chart illustrating where each zOrder is drawn relative to the existing chart elements such as the grid, series, and crosshair.
+
+import layersExplainerCode from '!!raw-loader!./explainer-layers-demo.js';
+
+<CodeBlock replaceThemeConstants chart className="language-js" chartOnly>
+	{layersExplainerCode}
+</CodeBlock>
 
 ### ISeriesPrimitiveAxisView
 

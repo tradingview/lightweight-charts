@@ -81,7 +81,7 @@ levels in the visual stack, allowing for complex compositions of multiple
 primitives.
 
 **You can find a more detailed guide to developing series primitives in the
-[Series Primitives](./series_primitives/) article.**
+[Series Primitives](./series-primitives/) article.**
 
 ### Adding a primitive to an existing series
 
