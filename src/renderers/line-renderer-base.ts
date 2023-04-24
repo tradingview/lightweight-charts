@@ -10,7 +10,7 @@ import { walkLine } from './walk-line';
 export type LineItemBase = TimedValue & PricedValue & LinePoint;
 
 export interface PaneRendererLineDataBase<TItem extends LineItemBase = LineItemBase> {
-	lineType: LineType;
+	lineType?: LineType;
 
 	items: TItem[];
 

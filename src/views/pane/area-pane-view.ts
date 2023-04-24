@@ -41,7 +41,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 		});
 
 		this._lineRenderer.setData({
-			lineType: options.lineType,
+			lineType: options.lineVisible ? options.lineType : undefined,
 			items: this._items,
 			lineStyle: options.lineStyle,
 			lineWidth: options.lineWidth,

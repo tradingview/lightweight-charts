@@ -36,6 +36,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
 	lineType: LineType.Simple,
+	lineVisible: true,
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
@@ -53,6 +54,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
 	lineType: LineType.Simple,
+	lineVisible: true,
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
@@ -79,6 +81,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	lineWidth: 3,
 	lineStyle: LineStyle.Solid,
 	lineType: LineType.Simple,
+	lineVisible: true,
 
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,

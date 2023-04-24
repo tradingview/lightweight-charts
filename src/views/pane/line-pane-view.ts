@@ -21,7 +21,7 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineStrokeItem,
 		const data: PaneRendererLineData = {
 			items: this._items,
 			lineStyle: options.lineStyle,
-			lineType: options.lineType,
+			lineType: options.lineVisible ? options.lineType : undefined,
 			lineWidth: options.lineWidth,
 			pointMarkersRadius: options.pointMarkersVisible ? (options.pointMarkersRadius || options.lineWidth / 2 + 2) : undefined,
 			visibleRange: this._itemsVisibleRange,

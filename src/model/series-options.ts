@@ -175,6 +175,13 @@ export interface LineStyleOptions {
 	lineType: LineType;
 
 	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+
+	/**
 	 * Show circle markers on each point.
 	 *
 	 * @defaultValue `false`
@@ -278,6 +285,13 @@ export interface AreaStyleOptions {
 	 * @defaultValue {@link LineType.Simple}
 	 */
 	lineType: LineType;
+
+	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
 
 	/**
 	 * Show circle markers on each point.
@@ -418,6 +432,13 @@ export interface BaselineStyleOptions {
 	 * @defaultValue {@link LineType.Simple}
 	 */
 	lineType: LineType;
+
+	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
 
 	/**
 	 * Show circle markers on each point.
