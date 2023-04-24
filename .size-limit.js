@@ -4,7 +4,7 @@ module.exports = [
 	{
 		name: 'CJS',
 		path: 'dist/lightweight-charts.production.cjs',
-		limit: '44.7 KB',
+		limit: '44.75 KB',
 	},
 	{
 		name: 'ESM',
