@@ -22,7 +22,7 @@ export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererB
 	private _strokeCache: BaselineStrokeCache | null = null;
 
 	protected override _strokeStyle(renderingScope: BitmapCoordinatesRenderingScope, item: BaselineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
-		const { context: ctx, bitmapSize } = renderingScope;
+		const { context: ctx, bitmapSize, verticalPixelRatio } = renderingScope;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
@@ -41,7 +41,7 @@ export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererB
 		}
 
 		const strokeStyle = ctx.createLinearGradient(0, 0, 0, bottom);
-		const baselinePercent = clamp(baseLevelCoordinate / bottom, 0, 1);
+		const baselinePercent = clamp(baseLevelCoordinate * verticalPixelRatio / bottom, 0, 1);
 
 		strokeStyle.addColorStop(0, topLineColor);
 		strokeStyle.addColorStop(baselinePercent, topLineColor);

@@ -51,7 +51,7 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 		const ctx = renderingScope.context;
 
 		ctx.lineCap = 'butt';
-		ctx.lineWidth = lineWidth;
+		ctx.lineWidth = lineWidth * renderingScope.verticalPixelRatio;
 
 		setLineStyle(ctx, lineStyle);
 

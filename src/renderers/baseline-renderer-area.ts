@@ -20,7 +20,7 @@ export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererB
 	private _fillCache: BaselineFillCache | null = null;
 
 	protected override _fillStyle(renderingScope: BitmapCoordinatesRenderingScope, item: BaselineFillItem): CanvasRenderingContext2D['fillStyle'] {
-		const { context: ctx, bitmapSize } = renderingScope;
+		const { context: ctx, bitmapSize, verticalPixelRatio } = renderingScope;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
@@ -41,7 +41,7 @@ export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererB
 		}
 
 		const fillStyle = ctx.createLinearGradient(0, 0, 0, bottom);
-		const baselinePercent = clamp(baseLevelCoordinate / bottom, 0, 1);
+		const baselinePercent = clamp(baseLevelCoordinate * verticalPixelRatio / bottom, 0, 1);
 
 		fillStyle.addColorStop(0, topFillColor1);
 		fillStyle.addColorStop(baselinePercent, topFillColor2);
