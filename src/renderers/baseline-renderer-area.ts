@@ -1,4 +1,4 @@
-import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { clamp } from '../helpers/mathex';
 
@@ -19,14 +19,14 @@ interface BaselineFillCache extends Record<keyof BaselineFillColorerStyle, strin
 export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererBaselineData> {
 	private _fillCache: BaselineFillCache | null = null;
 
-	protected override _fillStyle(renderingScope: MediaCoordinatesRenderingScope, item: BaselineFillItem): CanvasRenderingContext2D['fillStyle'] {
-		const { context: ctx, mediaSize } = renderingScope;
+	protected override _fillStyle(renderingScope: BitmapCoordinatesRenderingScope, item: BaselineFillItem): CanvasRenderingContext2D['fillStyle'] {
+		const { context: ctx, bitmapSize } = renderingScope;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
 		const { topFillColor1, topFillColor2, bottomFillColor1, bottomFillColor2 } = item;
-		const baseLevelCoordinate = data.baseLevelCoordinate ?? mediaSize.height as Coordinate;
-		const bottom = mediaSize.height as Coordinate;
+		const baseLevelCoordinate = data.baseLevelCoordinate ?? bitmapSize.height as Coordinate;
+		const bottom = bitmapSize.height as Coordinate;
 
 		if (
 			this._fillCache !== null &&

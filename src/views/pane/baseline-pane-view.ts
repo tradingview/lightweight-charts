@@ -32,17 +32,17 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 			return;
 		}
 
-		const baselineProps = this._series.options();
+		const options = this._series.options();
 
-		const baseLevelCoordinate = this._series.priceScale().priceToCoordinate(baselineProps.baseValue.price, firstValue.value);
+		const baseLevelCoordinate = this._series.priceScale().priceToCoordinate(options.baseValue.price, firstValue.value);
 		const barWidth = this._model.timeScale().barSpacing();
 
 		this._baselineAreaRenderer.setData({
 			items: this._items,
 
-			lineWidth: baselineProps.lineWidth,
-			lineStyle: baselineProps.lineStyle,
-			lineType: baselineProps.lineType,
+			lineWidth: options.lineWidth,
+			lineStyle: options.lineStyle,
+			lineType: options.lineType,
 
 			baseLevelCoordinate,
 			invertFilledArea: false,
@@ -54,9 +54,10 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 		this._baselineLineRenderer.setData({
 			items: this._items,
 
-			lineWidth: baselineProps.lineWidth,
-			lineStyle: baselineProps.lineStyle,
-			lineType: baselineProps.lineType,
+			lineWidth: options.lineWidth,
+			lineStyle: options.lineStyle,
+			lineType: options.lineType,
+			pointMarkersRadius: options.pointMarkersVisible ? (options.pointMarkersRadius || options.lineWidth / 2 + 2) : undefined,
 
 			baseLevelCoordinate,
 

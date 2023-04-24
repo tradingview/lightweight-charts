@@ -1,4 +1,4 @@
-import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { clamp } from '../helpers/mathex';
 
@@ -21,14 +21,14 @@ interface BaselineStrokeCache extends Record<keyof BaselineStrokeColorerStyle, s
 export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererBaselineLineData> {
 	private _strokeCache: BaselineStrokeCache | null = null;
 
-	protected override _strokeStyle(renderingScope: MediaCoordinatesRenderingScope, item: BaselineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
-		const { context: ctx, mediaSize } = renderingScope;
+	protected override _strokeStyle(renderingScope: BitmapCoordinatesRenderingScope, item: BaselineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
+		const { context: ctx, bitmapSize } = renderingScope;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
 		const { topLineColor, bottomLineColor } = item;
 		const { baseLevelCoordinate } = data;
-		const bottom = mediaSize.height as Coordinate;
+		const bottom = bitmapSize.height as Coordinate;
 
 		if (
 			this._strokeCache !== null &&
