@@ -1,6 +1,8 @@
-import { BitmapCoordinatesRenderingScope } from "fancy-canvas";
-import { Coordinate } from "../model/coordinate";
-import { clamp } from "../helpers/mathex";
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+
+import { clamp } from '../helpers/mathex';
+
+import { Coordinate } from '../model/coordinate';
 
 export interface GradientCacheParams {
 	topColor1: string
@@ -17,27 +19,29 @@ export class GradientStyleCache {
 
 	public get(scope: BitmapCoordinatesRenderingScope, params:GradientCacheParams ): CanvasGradient {
 		const cachedParams = this._params;
+		const { topColor1, topColor2, bottomColor1, bottomColor2, bottom, baseLevelCoordinate } = params;
+
 		if (
 			this._cachedValue === undefined ||
 			cachedParams === undefined ||
-			cachedParams.topColor1 !== params.topColor1 ||
-			cachedParams.topColor2 !== params.topColor2 ||
-			cachedParams.bottomColor1 !== params.bottomColor1 ||
-			cachedParams.bottomColor2 !== params.bottomColor2 ||
-			cachedParams.baseLevelCoordinate !== params.baseLevelCoordinate ||
-			cachedParams.bottom !== params.bottom
+			cachedParams.topColor1 !== topColor1 ||
+			cachedParams.topColor2 !== topColor2 ||
+			cachedParams.bottomColor1 !== bottomColor1 ||
+			cachedParams.bottomColor2 !== bottomColor2 ||
+			cachedParams.baseLevelCoordinate !== baseLevelCoordinate ||
+			cachedParams.bottom !== bottom
 		) {
-			const gradient = scope.context.createLinearGradient(0, 0, 0, params.bottom);
+			const gradient = scope.context.createLinearGradient(0, 0, 0, bottom);
 
-			gradient.addColorStop(0, params.topColor1);
+			gradient.addColorStop(0, topColor1);
 
-			if (params.baseLevelCoordinate != null) {
-				const baselinePercent = clamp(params.baseLevelCoordinate * scope.verticalPixelRatio / params.bottom, 0, 1);
-				gradient.addColorStop(baselinePercent, params.topColor2);
-				gradient.addColorStop(baselinePercent, params.bottomColor1);
+			if (baseLevelCoordinate != null) {
+				const baselinePercent = clamp(baseLevelCoordinate * scope.verticalPixelRatio / bottom, 0, 1);
+				gradient.addColorStop(baselinePercent, topColor2);
+				gradient.addColorStop(baselinePercent, bottomColor1);
 			}
 
-			gradient.addColorStop(1, params.bottomColor2);
+			gradient.addColorStop(1, bottomColor2);
 
 			this._cachedValue = gradient;
 			this._params = params;
