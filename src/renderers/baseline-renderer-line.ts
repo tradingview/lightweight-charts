@@ -1,61 +1,33 @@
 import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
-import { clamp } from '../helpers/mathex';
-
 import { Coordinate } from '../model/coordinate';
 import { BaselineStrokeColorerStyle } from '../model/series-bar-colorer';
 
 import { LineItemBase as LineStrokeItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer-base';
+import { GradientStyleCache } from './gradient-style-cache';
 
 export type BaselineStrokeItem = LineStrokeItemBase & BaselineStrokeColorerStyle;
 export interface PaneRendererBaselineLineData extends PaneRendererLineDataBase<BaselineStrokeItem> {
 	baseLevelCoordinate: Coordinate;
 }
 
-interface BaselineStrokeCache extends Record<keyof BaselineStrokeColorerStyle, string> {
-	strokeStyle: CanvasRenderingContext2D['strokeStyle'];
-	baseLevelCoordinate: Coordinate;
-	bottom: Coordinate;
-}
-
 export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererBaselineLineData> {
-	private _strokeCache: BaselineStrokeCache | null = null;
+	private readonly _strokeCache: GradientStyleCache = new GradientStyleCache();
 
 	protected override _strokeStyle(renderingScope: BitmapCoordinatesRenderingScope, item: BaselineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
-		const { context: ctx, bitmapSize, verticalPixelRatio } = renderingScope;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const data = this._data!;
 
-		const { topLineColor, bottomLineColor } = item;
-		const { baseLevelCoordinate } = data;
-		const bottom = bitmapSize.height as Coordinate;
-
-		if (
-			this._strokeCache !== null &&
-			this._strokeCache.topLineColor === topLineColor &&
-			this._strokeCache.bottomLineColor === bottomLineColor &&
-			this._strokeCache.baseLevelCoordinate === baseLevelCoordinate &&
-			this._strokeCache.bottom === bottom
-		) {
-			return this._strokeCache.strokeStyle;
-		}
-
-		const strokeStyle = ctx.createLinearGradient(0, 0, 0, bottom);
-		const baselinePercent = clamp(baseLevelCoordinate * verticalPixelRatio / bottom, 0, 1);
-
-		strokeStyle.addColorStop(0, topLineColor);
-		strokeStyle.addColorStop(baselinePercent, topLineColor);
-		strokeStyle.addColorStop(baselinePercent, bottomLineColor);
-		strokeStyle.addColorStop(1, bottomLineColor);
-
-		this._strokeCache = {
-			topLineColor,
-			bottomLineColor,
-			strokeStyle,
-			baseLevelCoordinate,
-			bottom,
-		};
-
-		return strokeStyle;
+		return this._strokeCache.get(
+			renderingScope,
+			{
+				topColor1: item.topLineColor,
+				topColor2: item.topLineColor,
+				bottomColor1: item.bottomLineColor,
+				bottomColor2: item.bottomLineColor,
+				bottom: renderingScope.bitmapSize.height as Coordinate,
+				baseLevelCoordinate: data.baseLevelCoordinate,
+			}
+		);
 	}
 }
