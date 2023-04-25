@@ -41,63 +41,61 @@ export function walkLine<TItem extends LinePoint, TStyle extends CanvasRendering
 			ctx.lineTo(item2.x * horizontalPixelRatio, item2.y * verticalPixelRatio);
 
 			finishStyledArea(renderingScope, currentStyle, item1, item2);
+		} else {
+			const changeStyle = (newStyle: TStyle, currentItem: TItem) => {
+				finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
 
-			return;
-		}
+				ctx.beginPath();
+				currentStyle = newStyle;
+				currentStyleFirstItem = currentItem;
+			};
 
-		const changeStyle = (newStyle: TStyle, currentItem: TItem) => {
-			finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
+			let currentItem = currentStyleFirstItem;
 
 			ctx.beginPath();
-			currentStyle = newStyle;
-			currentStyleFirstItem = currentItem;
-		};
+			ctx.moveTo(firstItem.x * horizontalPixelRatio, firstItem.y * verticalPixelRatio);
 
-		let currentItem = currentStyleFirstItem;
+			for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
+				currentItem = items[i];
+				const itemStyle = styleGetter(renderingScope, currentItem);
 
-		ctx.beginPath();
-		ctx.moveTo(firstItem.x * horizontalPixelRatio, firstItem.y * verticalPixelRatio);
-
-		for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
-			currentItem = items[i];
-			const itemStyle = styleGetter(renderingScope, currentItem);
-
-			switch (lineType) {
-				case LineType.Simple:
-					ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
-					break;
-				case LineType.WithSteps:
-					ctx.lineTo(currentItem.x * horizontalPixelRatio, items[i - 1].y * verticalPixelRatio);
-
-					if (itemStyle !== currentStyle) {
-						changeStyle(itemStyle, currentItem);
+				switch (lineType) {
+					case LineType.Simple:
+						ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
+						break;
+					case LineType.WithSteps:
 						ctx.lineTo(currentItem.x * horizontalPixelRatio, items[i - 1].y * verticalPixelRatio);
-					}
 
-					ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
-					break;
-				case LineType.Curved: {
-					const [cp1, cp2] = getControlPoints(items, i - 1, i);
-					ctx.bezierCurveTo(
-						cp1.x * horizontalPixelRatio,
-						cp1.y * verticalPixelRatio,
-						cp2.x * horizontalPixelRatio,
-						cp2.y * verticalPixelRatio,
-						currentItem.x * horizontalPixelRatio,
-						currentItem.y * verticalPixelRatio
-					);
-					break;
+						if (itemStyle !== currentStyle) {
+							changeStyle(itemStyle, currentItem);
+							ctx.lineTo(currentItem.x * horizontalPixelRatio, items[i - 1].y * verticalPixelRatio);
+						}
+
+						ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
+						break;
+					case LineType.Curved: {
+						const [cp1, cp2] = getControlPoints(items, i - 1, i);
+						ctx.bezierCurveTo(
+							cp1.x * horizontalPixelRatio,
+							cp1.y * verticalPixelRatio,
+							cp2.x * horizontalPixelRatio,
+							cp2.y * verticalPixelRatio,
+							currentItem.x * horizontalPixelRatio,
+							currentItem.y * verticalPixelRatio
+						);
+						break;
+					}
+				}
+
+				if (lineType !== LineType.WithSteps && itemStyle !== currentStyle) {
+					changeStyle(itemStyle, currentItem);
+					ctx.moveTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
 				}
 			}
 
-			if (lineType !== LineType.WithSteps && itemStyle !== currentStyle) {
-				changeStyle(itemStyle, currentItem);
-				ctx.moveTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
+			if (currentStyleFirstItem !== currentItem || currentStyleFirstItem === currentItem && lineType === LineType.WithSteps) {
+				finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
 			}
-		}
-
-		if (currentStyleFirstItem !== currentItem || currentStyleFirstItem === currentItem && lineType === LineType.WithSteps) {
-			finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
 		}
 	}
 
