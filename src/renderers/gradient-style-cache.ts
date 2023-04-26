@@ -5,7 +5,7 @@ import { clamp } from '../helpers/mathex';
 import { Coordinate } from '../model/coordinate';
 
 export interface GradientCacheParams {
-	topColor1: string
+	topColor1: string;
 	topColor2: string;
 	bottomColor1: string;
 	bottomColor2: string;
@@ -17,7 +17,7 @@ export class GradientStyleCache {
 	private _params?: GradientCacheParams;
 	private _cachedValue?: CanvasGradient;
 
-	public get(scope: BitmapCoordinatesRenderingScope, params:GradientCacheParams ): CanvasGradient {
+	public get(scope: BitmapCoordinatesRenderingScope, params: GradientCacheParams): CanvasGradient {
 		const cachedParams = this._params;
 		const { topColor1, topColor2, bottomColor1, bottomColor2, bottom, baseLevelCoordinate } = params;
 

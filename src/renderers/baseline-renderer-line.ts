@@ -3,8 +3,8 @@ import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 import { Coordinate } from '../model/coordinate';
 import { BaselineStrokeColorerStyle } from '../model/series-bar-colorer';
 
-import { LineItemBase as LineStrokeItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer-base';
 import { GradientStyleCache } from './gradient-style-cache';
+import { LineItemBase as LineStrokeItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './line-renderer-base';
 
 export type BaselineStrokeItem = LineStrokeItemBase & BaselineStrokeColorerStyle;
 export interface PaneRendererBaselineLineData extends PaneRendererLineDataBase<BaselineStrokeItem> {
