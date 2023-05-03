@@ -33,7 +33,7 @@ import { Logical, Time } from '../model/time-data';
 import { AbstractData, DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
 import { getSeriesDataCreator } from './get-series-data-creator';
-import { ChartDimensions, IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
+import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -282,10 +282,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public autoSizeActive(): boolean {
 		return this._chartWidget.autoSizeActive();
-	}
-
-	public dimensions(): ChartDimensions {
-		return this._chartWidget.dimensions();
 	}
 
 	public chartElement(): HTMLDivElement {
