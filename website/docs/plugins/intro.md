@@ -8,7 +8,7 @@ sidebar_position: 0
 The library provides a rich set of charting capabilities out of the box, but
 developers can also extend its functionality by building custom plugins.
 
-Plugins in Lightweight Charts come in two types: [custom series](#custom-series)
+Plugins in Lightweight Charts™️ come in two types: [custom series](#custom-series)
 and [drawing primitives](#drawing-primitives). Custom series allow developers to
 define new types of series, while drawing primitives enable the creation of
 custom visualizations, drawing tools, and chart annotations (and more) which can
@@ -26,7 +26,7 @@ customizable charting applications for their users.
 :::info
 
 Examples of plugins can be found on the following repository:
-[Lightweight Charts Plugin Examples](https://github.com/tradingview/lightweight-charts-plugin-examples)
+[Lightweight Charts™️ Plugin Examples](https://github.com/tradingview/lightweight-charts-plugin-examples)
 
 :::
 
@@ -77,7 +77,7 @@ myCustomSeries.setData(data);
 ## Drawing Primitives
 
 Drawing primitives provide a more flexible approach to extending the charting
-capabilities of Lightweight Charts. They are attached to a specific series and
+capabilities of Lightweight Charts™️. They are attached to a specific series and
 can draw anywhere on the chart, including the main chart pane, price scales, and
 time scales.
 
