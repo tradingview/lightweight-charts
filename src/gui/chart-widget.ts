@@ -39,6 +39,11 @@ export interface MouseEventParamsImpl {
 	touchMouseEventData?: TouchMouseEventData;
 }
 
+interface IChartDimensions {
+	width: number;
+	height: number;
+}
+
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
 const windowsChrome = isChromiumBased() && isWindows();
@@ -277,6 +282,13 @@ export class ChartWidget implements IDestroyable {
 
 	public autoSizeActive(): boolean {
 		return this._options.autoSize && this._observer !== null;
+	}
+
+	public dimensions(): IChartDimensions {
+		return {
+			height: this._height,
+			width: this._width,
+		};
 	}
 
 	// eslint-disable-next-line complexity

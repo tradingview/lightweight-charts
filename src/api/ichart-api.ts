@@ -64,6 +64,20 @@ export interface MouseEventParams {
 }
 
 /**
+ * Dimensions of the chart including the time and price scales.
+ */
+export interface ChartDimensions {
+	/**
+	 * Height of the chart including the time scale
+	 */
+	height: number;
+	/**
+	 * Width of the chart including the price scales
+	 */
+	width: number;
+}
+
+/**
  * A custom function use to handle mouse events.
  */
 export type MouseEventHandler = (param: MouseEventParams) => void;
@@ -295,4 +309,11 @@ export interface IChartApi {
 	 * @returns Whether the `autoSize` option is enabled and the active.
 	 */
 	autoSizeActive(): boolean;
+
+	/**
+	 * Returns the height and width of the chart (includes the time and price scales)
+	 *
+	 * @returns Height and width of the chart.
+	 */
+	dimensions(): ChartDimensions;
 }
