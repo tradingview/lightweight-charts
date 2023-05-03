@@ -104,6 +104,25 @@ export interface ISeriesPrimitivePaneView {
 }
 
 /**
+ * Object containing references to the chart and series instances, and a requestUpdate method for triggering
+ * a refresh of the chart.
+ */
+export interface SeriesAttachedParameter {
+	/**
+	 * Chart instance
+	 */
+	chart: IChartApi;
+	/**
+	 * Series to which the Primitive is attached
+	 */
+	series: ISeriesApi<SeriesType>;
+	/**
+	 * Request an update (redraw the chart)
+	 */
+	requestUpdate: () => void;
+}
+
+/**
  * Base interface for series primitives. It must be implemented to add some external graphics to series
  */
 export interface ISeriesPrimitive {
@@ -179,12 +198,10 @@ export interface ISeriesPrimitive {
 	/**
 	 * Attached Lifecycle hook.
 	 *
-	 * @param chart - Chart instance
-	 * @param series - Series to which the Primitive is attached
-	 * @param requestUpdate - Request an update (redraw the chart)
+	 * @param param - An object containing useful references for the attached primitive to use.
 	 * @returns void
 	 */
-	attached?: (chart: IChartApi, series: ISeriesApi<SeriesType>, requestUpdate: () => void) => void;
+	attached?: (param: SeriesAttachedParameter) => void;
 	/**
 	 * Detached Lifecycle hook.
 	 *

@@ -224,7 +224,11 @@ export class SeriesApi<
 	public attachPrimitive(primitive: ISeriesPrimitive): void {
 		this._series.attachPrimitive(primitive);
 		if (primitive.attached) {
-			primitive.attached(this._chartApi, this, () => this._series.model().fullUpdate());
+			primitive.attached({
+				chart: this._chartApi,
+				series: this,
+				requestUpdate: () => this._series.model().fullUpdate(),
+			});
 		}
 	}
 
