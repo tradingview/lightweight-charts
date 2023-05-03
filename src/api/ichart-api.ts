@@ -316,4 +316,12 @@ export interface IChartApi {
 	 * @returns Height and width of the chart.
 	 */
 	dimensions(): ChartDimensions;
+
+	/**
+	 * Returns the generated div element containing the chart. This can be used for adding your own additional event listeners, or for measuring the
+	 * elements dimensions and position within the document.
+	 *
+	 * @returns enerated div element containing the chart.
+	 */
+	chartElement(): HTMLDivElement;
 }

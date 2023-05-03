@@ -288,6 +288,10 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return this._chartWidget.dimensions();
 	}
 
+	public chartElement(): HTMLDivElement {
+		return this._chartWidget.element();
+	}
+
 	private _addSeriesImpl<
 		TSeries extends SeriesType,
 		TData extends WhitespaceData = SeriesDataItemTypeMap[TSeries],

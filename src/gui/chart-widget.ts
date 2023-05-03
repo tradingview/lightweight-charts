@@ -58,7 +58,7 @@ export class ChartWidget implements IDestroyable {
 	private _width: number = 0;
 	private _leftPriceAxisWidth: number = 0;
 	private _rightPriceAxisWidth: number = 0;
-	private _element: HTMLElement;
+	private _element: HTMLDivElement;
 	private readonly _tableElement: HTMLElement;
 	private _timeAxisWidget: TimeAxisWidget;
 	private _invalidateMask: InvalidateMask | null = null;
@@ -289,6 +289,10 @@ export class ChartWidget implements IDestroyable {
 			height: this._height,
 			width: this._width,
 		};
+	}
+
+	public element(): HTMLDivElement {
+		return this._element;
 	}
 
 	// eslint-disable-next-line complexity
