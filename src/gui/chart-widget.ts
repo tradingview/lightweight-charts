@@ -64,6 +64,7 @@ export class ChartWidget implements IDestroyable {
 	private _observer: ResizeObserver | null = null;
 
 	private _container: HTMLElement;
+	private _cursorStyleOverride: string | null = null;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
 		this._container = container;
@@ -281,6 +282,24 @@ export class ChartWidget implements IDestroyable {
 
 	public element(): HTMLDivElement {
 		return this._element;
+	}
+
+	public setCursorStyle(style: string | null): void {
+		this._cursorStyleOverride = style;
+		if (this._cursorStyleOverride) {
+			this.element().style.setProperty('cursor', style);
+		} else {
+			this.element().style.removeProperty('cursor');
+		}
+		this.timeAxisWidget().refreshCursorType();
+		this._paneWidgets.forEach((pw: PaneWidget) => {
+			pw.leftPriceAxisWidget()?.refreshCursorType();
+			pw.rightPriceAxisWidget()?.refreshCursorType();
+		});
+	}
+
+	public getCursorOverrideStyle(): string | null {
+		return this._cursorStyleOverride;
 	}
 
 	// eslint-disable-next-line complexity

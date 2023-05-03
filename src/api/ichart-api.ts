@@ -303,4 +303,12 @@ export interface IChartApi {
 	 * @returns generated div element containing the chart.
 	 */
 	chartElement(): HTMLDivElement;
+
+	/**
+	 * Override the cursor style for the chart and the scales.
+	 *
+	 * @param style - CSS cursor style as defined here: [MDN: CSS Cursor](https://developer.mozilla.org/en-US/docs/Web/CSS/cursor) or `null`
+	 * if you want the library to use the default cursor style instead.
+	 */
+	setCursorStyle(style: string | null): void;
 }

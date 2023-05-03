@@ -74,6 +74,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _sizeChanged: Delegate<Size> = new Delegate();
 	private readonly _widthCache: TextWidthCache = new TextWidthCache(5);
 	private _isSettingSize: boolean = false;
+	private _defaultCursorType: CursorType;
 
 	public constructor(chartWidget: ChartWidget) {
 		this._chart = chartWidget;
@@ -129,6 +130,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 				treatHorzTouchDragAsPageScroll: () => false,
 			}
 		);
+		this._defaultCursorType = CursorType.Default;
 	}
 
 	public destroy(): void {
@@ -334,6 +336,10 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		}
 	}
 
+	public refreshCursorType(): void {
+		this._setCursor(this._defaultCursorType);
+	}
+
 	private _drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
 		const sources = this._chart.model().serieses();
 
@@ -516,7 +522,9 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	}
 
 	private _setCursor(type: CursorType): void {
-		this._cell.style.cursor = type === CursorType.EwResize ? 'ew-resize' : 'default';
+		this._defaultCursorType = type;
+		const override = this._chart.getCursorOverrideStyle();
+		this._cell.style.cursor = override || (type === CursorType.EwResize ? 'ew-resize' : 'default');
 	}
 
 	private _recreateStubs(): void {
