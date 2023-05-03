@@ -45,9 +45,10 @@ The views returned by the `priceAxisViews` and `timeAxisViews` getter methods
 should implement the `ISeriesPrimitiveAxisView` interface and are used to define
 labels to be drawn on the corresponding scales.
 
-Below is a visual example showing the various sections of the chart where a Primitive can draw.
+Below is a visual example showing the various sections of the chart where a
+Primitive can draw.
 
-import CodeBlock from "@theme/CodeBlock";
+import CodeBlock from '@theme/CodeBlock';
 import sectionsExplainerCode from '!!raw-loader!./explainer-sections-demo.js';
 
 <CodeBlock replaceThemeConstants chart className="language-js" chartOnly>
@@ -77,7 +78,8 @@ method for drawing beneath other elements on the same zOrder.
 
 #### Interactive Demo of zOrder layers
 
-Below is an interactive demo chart illustrating where each zOrder is drawn relative to the existing chart elements such as the grid, series, and crosshair.
+Below is an interactive demo chart illustrating where each zOrder is drawn
+relative to the existing chart elements such as the grid, series, and crosshair.
 
 import layersExplainerCode from '!!raw-loader!./explainer-layers-demo.js';
 
@@ -111,10 +113,13 @@ objects and event handlers.
 
 ### attached
 
-This method is called when the primitive is attached to a chart. The `chart` and
-`series` parameters are references to the chart API and the series API instances
-for convenience purposes so that they don't need to be manually provided within
-the primitive's constructor.
+This method is called when the primitive is attached to a chart. The attached
+method is evoked with a
+[single argument](api/interfaces/SeriesAttachedParameter.md) containing
+properties for the chart, series, and a callback to request an update. The
+`chart` and `series` properties are references to the chart API and the series
+API instances for convenience purposes so that they don't need to be manually
+provided within the primitive's constructor.
 
 The `requestUpdate` callback allows the primitive to notify the chart that it
 should be updated and redrawn.

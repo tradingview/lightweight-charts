@@ -14,10 +14,16 @@ define new types of series, while drawing primitives enable the creation of
 custom visualizations, drawing tools, and chart annotations (and more) which can
 be attached to an existing series.
 
+:::tip Picking between the Custom Series and Drawing Primitives
+
+In the majority of cases you will most likely be better served by using a [Drawing Primitive](#drawing-primitives) plugin unless you are specifically looking to create a new type of series
+
+:::
+
 With the flexibility provided by these plugins, developers can create highly
 customizable charting applications for their users.
 
-:::tip
+:::info
 
 Examples of plugins can be found on the following repository:
 [Lightweight Charts Plugin Examples](https://github.com/tradingview/lightweight-charts-plugin-examples)

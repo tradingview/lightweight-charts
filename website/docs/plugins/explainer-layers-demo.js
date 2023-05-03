@@ -157,7 +157,7 @@ class LayersPrimitive {
 		}
 	}
 
-	attached(_chart, _series, requestUpdate) {
+	attached({ requestUpdate }) {
 		this._requestUpdate = requestUpdate;
 	}
 	detached() {
