@@ -30,7 +30,10 @@ for creating a custom series view.
 
 It includes the following methods and properties:
 
-### [`renderer`](/api/interfaces/IAbstractSeriesPaneView.md#renderer)
+### Renderer
+
+- IAbstractSeriesPaneView property:
+  [`renderer`](/api/interfaces/IAbstractSeriesPaneView.md#renderer)
 
 This method should return a renderer which implements the
 [`IAbstractSeriesPaneRenderer`](/api/interfaces/IAbstractSeriesPaneRenderer.md)
@@ -39,13 +42,24 @@ interface and is used to draw the series data on the main chart pane.
 The [`draw`](/api/interfaces/IAbstractSeriesPaneRenderer.md#draw) method of the
 renderer is evoked whenever the chart needs to draw the series.
 
-The [`PriceToCoordinateConverter`](/api/index.md#pricetocoordinateconverter) provided as
-the 2nd argument to the draw method is a convenience function for changing
-prices into vertical coordinate values. It is provided since the series'
-original data will most likely be defined in price values, and the renderer
-needs to draw with coordinates.
+The [`PriceToCoordinateConverter`](/api/index.md#pricetocoordinateconverter)
+provided as the 2nd argument to the draw method is a convenience function for
+changing prices into vertical coordinate values. It is provided since the
+series' original data will most likely be defined in price values, and the
+renderer needs to draw with coordinates. The values returned by the converter
+will be defined in mediaSize (unscaled by `devicePixelRatio`).
 
-### [`update`](/api/interfaces/IAbstractSeriesPaneView.md#update)
+:::tip
+
+`CanvasRenderingTarget2D` provided within the `draw` function is explained in
+more detail on the [Canvas Rendering Target](./canvas-rendering-target) page.
+
+:::
+
+### Update
+
+- IAbstractSeriesPaneView property:
+  [`update`](/api/interfaces/IAbstractSeriesPaneView.md#update)
 
 This method will be called with the latest data for the renderer to use during
 the next paint.
@@ -64,7 +78,10 @@ series data. It includes the following properties:
 - `barSpacing`: Spacing between consecutive bars.
 - `visibleRange`: The current visible range of items on the chart.
 
-### [`priceValueBuilder`](/api/interfaces/IAbstractSeriesPaneView.md#priceValueBuilder)
+### Price Value Builder
+
+- IAbstractSeriesPaneView property:
+  [`priceValueBuilder`](/api/interfaces/IAbstractSeriesPaneView.md#priceValueBuilder)
 
 A function for interpreting the custom series data and returning an array of
 numbers representing the open, high, low, close values for the item.
@@ -74,7 +91,10 @@ the items are in view) and the crosshair and price line positions. Use the high
 and low values to specify the visible range of the painted item, and the close
 value for the crosshair and price line position.
 
-### [`defaultOptions`](/api/interfaces/IAbstractSeriesPaneView.md#defaultoptions)
+### Default Options
+
+- IAbstractSeriesPaneView property:
+  [`defaultOptions`](/api/interfaces/IAbstractSeriesPaneView.md#defaultoptions)
 
 The default options to be used for the series. The user can override these
 values using the options argument in
@@ -82,7 +102,10 @@ values using the options argument in
 the [`applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method on the
 `ISeriesAPI`.
 
-### [`destroy`](/api/interfaces/IAbstractSeriesPaneView.md#destroy)
+### Destroy
+
+- IAbstractSeriesPaneView property:
+  [`destroy`](/api/interfaces/IAbstractSeriesPaneView.md#destroy)
 
 This method will be evoked when the series has been removed from the chart. This
 method should be used to clean up any objects, references, and other items that

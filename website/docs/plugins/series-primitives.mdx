@@ -76,6 +76,12 @@ a renderer can optionally provide a
 [`drawBackground`](/api/interfaces/ISeriesPrimitivePaneRenderer.md#drawbackground)
 method for drawing beneath other elements on the same zOrder.
 
+:::tip
+
+`CanvasRenderingTarget2D` is explained in more detail on the [Canvas Rendering Target](./canvas-rendering-target) page.
+
+:::
+
 #### Interactive Demo of zOrder layers
 
 Below is an interactive demo chart illustrating where each zOrder is drawn
@@ -119,7 +125,7 @@ method is evoked with a
 properties for the chart, series, and a callback to request an update. The
 `chart` and `series` properties are references to the chart API and the series
 API instances for convenience purposes so that they don't need to be manually
-provided within the primitive's constructor.
+provided within the primitive's constructor (if needed by the primitive).
 
 The `requestUpdate` callback allows the primitive to notify the chart that it
 should be updated and redrawn.
@@ -153,7 +159,11 @@ omitted and the library will use the normal autoscale information for the
 series. If the method is implemented then the returned values will be merged
 with the base autoscale information to define the vertical visible range.
 
-**Important**: Please note that this method will be evoked very often during
+:::warning
+
+Please note that this method will be evoked very often during
 scrolling and zooming of the chart, thus it is recommended that this method is
 either simple to execute, or makes use of optimisations such as caching to
 ensure that the chart remains responsive.
+
+:::
