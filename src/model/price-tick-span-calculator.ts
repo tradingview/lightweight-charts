@@ -1,4 +1,4 @@
-import { equal, greaterOrEqual, isBaseDecimal, log10 } from '../helpers/mathex';
+import { equal, greaterOrEqual, isBaseDecimal } from '../helpers/mathex';
 
 const enum Constants {
 	TickSpanEpsilon = 1e-14,
@@ -38,7 +38,7 @@ export class PriceTickSpanCalculator {
 	public tickSpan(high: number, low: number, maxTickSpan: number): number {
 		const minMovement = (this._base === 0) ? (0) : (1 / this._base);
 
-		let resultTickSpan = Math.pow(10, Math.max(0, Math.ceil(log10(high - low))));
+		let resultTickSpan = Math.pow(10, Math.max(0, Math.ceil(Math.log10(high - low))));
 
 		let index = 0;
 		let c = this._integralDividers[0];

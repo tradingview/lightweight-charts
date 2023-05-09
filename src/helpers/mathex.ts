@@ -24,27 +24,11 @@ export function equal(x1: number, x2: number, epsilon: number): boolean {
 	return Math.abs(x1 - x2) < epsilon;
 }
 
-export function log10(x: number): number {
-	if (x <= 0) {
-		return NaN;
-	}
-
-	return Math.log(x) / Math.log(10);
-}
-
 export function min(arr: number[]): number {
 	if (arr.length < 1) {
 		throw Error('array is empty');
 	}
-
-	let minVal = arr[0];
-	for (let i = 1; i < arr.length; ++i) {
-		if (arr[i] < minVal) {
-			minVal = arr[i];
-		}
-	}
-
-	return minVal;
+	return Math.min(...arr);
 }
 
 export function ceiledEven(x: number): number {
