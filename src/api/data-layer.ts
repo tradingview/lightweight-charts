@@ -171,7 +171,7 @@ interface SeriesRowsFirstAndLastTime {
 	lastTime: UTCTimestamp;
 }
 
-function seriesRowsFirsAndLastTime(seriesRows: SeriesPlotRow[] | undefined): SeriesRowsFirstAndLastTime | undefined {
+function seriesRowsFirstAndLastTime(seriesRows: SeriesPlotRow[] | undefined): SeriesRowsFirstAndLastTime | undefined {
 	if (seriesRows === undefined || seriesRows.length === 0) {
 		return undefined;
 	}
@@ -183,8 +183,8 @@ function seriesRowsFirsAndLastTime(seriesRows: SeriesPlotRow[] | undefined): Ser
 }
 
 function seriesUpdateInfo(seriesRows: SeriesPlotRow[] | undefined, prevSeriesRows: SeriesPlotRow[] | undefined): SeriesUpdateInfo | undefined {
-	const firstAndLastTime = seriesRowsFirsAndLastTime(seriesRows);
-	const prevFirstAndLastTime = seriesRowsFirsAndLastTime(prevSeriesRows);
+	const firstAndLastTime = seriesRowsFirstAndLastTime(seriesRows);
+	const prevFirstAndLastTime = seriesRowsFirstAndLastTime(prevSeriesRows);
 	if (firstAndLastTime !== undefined && prevFirstAndLastTime !== undefined) {
 		return {
 			lastBarUpdatedOrNewBarsAddedToTheRight:
