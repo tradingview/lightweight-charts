@@ -1,7 +1,7 @@
 import { DateFormatter } from '../formatters/date-formatter';
 import { DateTimeFormatter } from '../formatters/date-time-formatter';
 
-import { lowerbound } from '../helpers/algorithms';
+import { boundCompare } from '../helpers/algorithms';
 import { ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { ISubscription } from '../helpers/isubscription';
@@ -308,7 +308,7 @@ export class TimeScale {
 			return findNearest ? this._points.length - 1 as TimePointIndex : null;
 		}
 
-		const index = lowerbound(this._points, time.timestamp, (a: TimeScalePoint, b: UTCTimestamp) => a.time.timestamp < b);
+		const index = boundCompare(this._points, time.timestamp, (a: TimeScalePoint, b: UTCTimestamp) => a.time.timestamp < b, true);
 
 		if (time.timestamp < this._points[index].time.timestamp) {
 			return findNearest ? index as TimePointIndex : null;

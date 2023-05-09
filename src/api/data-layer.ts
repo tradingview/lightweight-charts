@@ -1,6 +1,6 @@
 /// <reference types="_build-time-constants" />
 
-import { lowerbound } from '../helpers/algorithms';
+import { boundCompare } from '../helpers/algorithms';
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { isString } from '../helpers/strict-type-checks';
 
@@ -370,7 +370,7 @@ export class DataLayer {
 			originalTime: timeScalePointTime(pointDataAtTime.mapping),
 		};
 
-		const insertIndex = lowerbound(this._sortedTimePoints, newPoint.time.timestamp, (a: InternalTimeScalePoint, b: number) => a.time.timestamp < b);
+		const insertIndex = boundCompare(this._sortedTimePoints, newPoint.time.timestamp, (a: InternalTimeScalePoint, b: number) => a.time.timestamp < b, true);
 
 		// yes, I know that this array is readonly and this change is intended to make it performative
 		// we marked _sortedTimePoints array as readonly to avoid modifying this array anywhere else

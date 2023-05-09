@@ -1,4 +1,4 @@
-import { lowerbound, upperbound } from '../helpers/algorithms';
+import { boundCompare } from '../helpers/algorithms';
 import { ensureNotNull } from '../helpers/assertions';
 import { Nominal } from '../helpers/nominal';
 
@@ -161,18 +161,20 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 	}
 
 	private _lowerbound(index: TimePointIndex): number {
-		return lowerbound(
+		return boundCompare(
 			this._items,
 			index,
-			(a: PlotRowType, b: TimePointIndex) => a.index < b
+			(a: PlotRowType, b: TimePointIndex) => a.index < b,
+			true
 		);
 	}
 
 	private _upperbound(index: TimePointIndex): number {
-		return upperbound(
+		return boundCompare(
 			this._items,
 			index,
-			(a: TimePointIndex, b: PlotRowType) => b.index > a
+			(a: PlotRowType, b: TimePointIndex) => a.index > b,
+			false
 		);
 	}
 
