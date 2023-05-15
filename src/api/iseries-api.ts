@@ -1,3 +1,4 @@
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { BarPrice } from '../model/bar';
@@ -11,11 +12,33 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Range, Time } from '../model/time-data';
+import { Range, SeriesItemsIndexesRange, Time } from '../model/time-data';
+import { BarCandlestickItemBase } from '../renderers/bars-renderer';
+import { LineItemBase } from '../renderers/line-renderer-base';
 
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
+
+export interface RendererDataItemTypes {
+	Bar: BarCandlestickItemBase;
+	Candlestick: BarCandlestickItemBase;
+	Area: LineItemBase;
+	Baseline: LineItemBase;
+	Line: LineItemBase;
+	Histogram: LineItemBase;
+}
+
+export interface RendererData<TSeriesType extends SeriesType> {
+	items: readonly RendererDataItemTypes[TSeriesType][];
+	barSpacing: number;
+	visibleRange: SeriesItemsIndexesRange | null;
+}
+
+export interface SeriesRenderer<TSeriesType extends SeriesType> {
+	setData(data: RendererData<TSeriesType>): void;
+	draw(target: CanvasRenderingTarget2D): void;
+}
 
 /**
  * Represents a range of bars and the number of bars outside the range.
@@ -279,4 +302,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * Does nothing if specified primitive was not attached
 	 */
 	detachPrimitive(primitive: ISeriesPrimitive): void;
+
+
+	overrideRenderer(renderer: SeriesRenderer<TSeriesType>): void;
 }

@@ -1,3 +1,5 @@
+import { CanvasRenderingTarget2D } from 'fancy-canvas';
+import { RendererData, SeriesRenderer } from '../api/iseries-api';
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
@@ -6,9 +8,11 @@ import { VolumeFormatter } from '../formatters/volume-formatter';
 import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { isInteger, merge } from '../helpers/strict-type-checks';
+import { IPaneRenderer } from '../renderers/ipane-renderer';
 
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
+import { BarsPaneViewBase } from '../views/pane/bars-pane-view-base';
 import { SeriesBaselinePaneView } from '../views/pane/baseline-pane-view';
 import { SeriesCandlesticksPaneView } from '../views/pane/candlesticks-pane-view';
 import { SeriesHistogramPaneView } from '../views/pane/histogram-pane-view';
@@ -53,6 +57,7 @@ import {
 } from './series-options';
 import { SeriesPrimitiveWrapper } from './series-primitive-wrapper';
 import { TimePoint, TimePointIndex } from './time-data';
+import { BarCandlestickItemBase } from '../renderers/bars-renderer';
 
 export interface LastValueDataResultWithoutData {
 	noData: true;
@@ -93,6 +98,41 @@ export interface SeriesUpdateInfo {
 	lastBarUpdatedOrNewBarsAddedToTheRight: boolean;
 }
 
+class WrapperOHLCRenderer implements IPaneRenderer {
+	private readonly _baseRenderer: SeriesRenderer<'Bar'>;
+	public constructor(baseRenderer: SeriesRenderer<'Bar'>) {
+		this._baseRenderer = baseRenderer;
+	}
+
+	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
+		this._baseRenderer.draw(target);
+	}
+
+	public setData(data: RendererData<'Bar'>): void {
+		this._baseRenderer.setData(data);
+	}
+}
+
+class SeriesOHLCRendererPaneViewWrapper extends BarsPaneViewBase<'Bar', BarCandlestickItemBase, WrapperOHLCRenderer> {
+	protected readonly _renderer: WrapperOHLCRenderer;
+
+	public constructor(series: Series<'Bar'>, model: ChartModel, baseRenderer: SeriesRenderer<'Bar'>) {
+		super(series, model);
+		this._renderer = new WrapperOHLCRenderer(baseRenderer);
+	}
+
+	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow, colorer: SeriesBarColorer<'Bar'>): BarCandlestickItemBase {
+		return this._createDefaultItem(time, bar, colorer);
+	}
+
+	protected _prepareRendererData(): void {
+		this._renderer.setData({
+			items: this._items,
+			barSpacing: this._model.timeScale().barSpacing(),
+			visibleRange: this._itemsVisibleRange,
+		});
+	}
+}
 // note that if would like to use `Omit` here - you can't due https://github.com/microsoft/TypeScript/issues/36981
 export type SeriesOptionsInternal<T extends SeriesType = SeriesType> = SeriesOptionsMap[T];
 export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = SeriesPartialOptionsMap[T];
@@ -494,6 +534,12 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public detachPrimitive(source: ISeriesPrimitive): void {
 		this._primitives = this._primitives.filter((wrapper: SeriesPrimitiveWrapper) => wrapper.primitive() !== source);
+	}
+
+	public overrideRenderer(renderer: SeriesRenderer<T>): void {
+		if (this._seriesType === 'Bar') {
+			this._paneView = new SeriesOHLCRendererPaneViewWrapper(this as Series<'Bar'>, this.model(), renderer as SeriesRenderer<'Bar'>);
+		}
 	}
 
 	private _isOverlay(): boolean {

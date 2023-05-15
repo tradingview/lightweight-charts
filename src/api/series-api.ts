@@ -26,7 +26,7 @@ import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } fr
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { BarsInfo, ISeriesApi } from './iseries-api';
+import { BarsInfo, ISeriesApi, SeriesRenderer } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
@@ -193,5 +193,9 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public detachPrimitive(primitive: ISeriesPrimitive): void {
 		this._series.detachPrimitive(primitive);
+	}
+
+	public overrideRenderer(renderer: SeriesRenderer<TSeriesType>): void {
+		this._series.overrideRenderer(renderer);
 	}
 }
