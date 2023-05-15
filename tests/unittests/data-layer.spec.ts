@@ -641,6 +641,68 @@ describe('DataLayer', () => {
 		});
 	});
 
+	describe('customValues', () => {
+		it('should be able to store customValues in a data point', () => {
+			const dataLayer = new DataLayer();
+
+			// actually we don't need to use Series, so we just use new Object()
+			const series1 = createSeriesMock();
+
+			const updateResult = dataLayer.setSeriesData(series1, [
+				dataItemAt(1000 as UTCTimestamp),
+				{
+					...dataItemAt(4000 as UTCTimestamp),
+					customValues: {
+						testValue: 1234,
+						testString: 'abc',
+					},
+				},
+			]);
+
+			updateResult.series.forEach((seriesUpdate: SeriesChanges, series: Series) => {
+				expect(seriesUpdate.data.length).to.be.equal(2);
+
+				if (series === series1) {
+					expect(seriesUpdate.data[1].index).to.be.equal(1 as TimePointIndex);
+					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+					expect(seriesUpdate.data[1].customValues).to.not.be.equal(undefined);
+					expect(seriesUpdate.data[1].customValues).to.deep.equal(
+						{ testValue: 1234, testString: 'abc' }
+					);
+				}
+			});
+		});
+
+		it('should be able to remove customValues from last existing point', () => {
+			const dataLayer = new DataLayer();
+
+			// actually we don't need to use Series, so we just use new Object()
+			const series1 = createSeriesMock();
+
+			dataLayer.setSeriesData(series1, [
+				dataItemAt(1000 as UTCTimestamp),
+				{
+					...dataItemAt(4000 as UTCTimestamp),
+					customValues: {
+						testValue: 1234,
+					},
+				},
+			]);
+
+			// change the last point of the first series
+			const updateResult = dataLayer.updateSeriesData(series1, dataItemAt(4000 as UTCTimestamp));
+			updateResult.series.forEach((seriesUpdate: SeriesChanges, series: Series) => {
+				expect(seriesUpdate.data.length).to.be.equal(2);
+
+				if (series === series1) {
+					expect(seriesUpdate.data[1].index).to.be.equal(1 as TimePointIndex);
+					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+					expect(seriesUpdate.data[1].customValues).to.be.equal(undefined);
+				}
+			});
+		});
+	});
+
 	describe('whitespaces', () => {
 		it('should allow to set whitespaces to series', () => {
 			const dataLayer = new DataLayer();
