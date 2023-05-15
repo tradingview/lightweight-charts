@@ -5,11 +5,11 @@ import { undefinedIfNull } from '../../helpers/strict-type-checks';
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import {
-	AbstractBarItemData,
-	IAbstractSeriesPaneRenderer,
-	IAbstractSeriesPaneView,
+	CustomBarItemData,
+	ICustomSeriesPaneRenderer,
+	ICustomSeriesPaneView,
 	PriceToCoordinateConverter,
-} from '../../model/iabstract-series';
+} from '../../model/icustom-series';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
 import { SeriesPlotRow } from '../../model/series-data';
@@ -19,18 +19,18 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
-type AbstractBarItemBase = TimedValue;
+type CustomBarItemBase = TimedValue;
 
-interface AbstractBarItem extends AbstractBarItemBase {
+interface CustomBarItem extends CustomBarItemBase {
 	barColor: string;
 	originalData?: Record<string, unknown>;
 }
 
-class AbstractSeriesPaneRendererWrapper implements IPaneRenderer {
-	private _sourceRenderer: IAbstractSeriesPaneRenderer;
+class CustomSeriesPaneRendererWrapper implements IPaneRenderer {
+	private _sourceRenderer: ICustomSeriesPaneRenderer;
 	private _priceScale: PriceToCoordinateConverter;
 	public constructor(
-		sourceRenderer: IAbstractSeriesPaneRenderer,
+		sourceRenderer: ICustomSeriesPaneRenderer,
 		priceScale: PriceToCoordinateConverter
 	) {
 		this._sourceRenderer = sourceRenderer;
@@ -51,22 +51,22 @@ class AbstractSeriesPaneRendererWrapper implements IPaneRenderer {
 	// }
 }
 
-export class SeriesAbstractPaneView extends SeriesPaneViewBase<
-	'Abstract',
-	AbstractBarItem,
-	AbstractSeriesPaneRendererWrapper
+export class SeriesCustomPaneView extends SeriesPaneViewBase<
+	'Custom',
+	CustomBarItem,
+	CustomSeriesPaneRendererWrapper
 > {
-	protected readonly _renderer: AbstractSeriesPaneRendererWrapper;
-	private readonly _paneView: IAbstractSeriesPaneView;
+	protected readonly _renderer: CustomSeriesPaneRendererWrapper;
+	private readonly _paneView: ICustomSeriesPaneView;
 
 	public constructor(
-		series: Series<'Abstract'>,
+		series: Series<'Custom'>,
 		model: ChartModel,
-		paneView: IAbstractSeriesPaneView
+		paneView: ICustomSeriesPaneView
 	) {
 		super(series, model, false);
 		this._paneView = paneView;
-		this._renderer = new AbstractSeriesPaneRendererWrapper(
+		this._renderer = new CustomSeriesPaneRendererWrapper(
 			this._paneView.renderer(),
 			(price: number) => {
 				const firstValue = series.firstValue();
@@ -83,7 +83,7 @@ export class SeriesAbstractPaneView extends SeriesPaneViewBase<
 		this._items = this._series
 			.bars()
 			.rows()
-			.map((row: SeriesPlotRow<'Abstract'>) => {
+			.map((row: SeriesPlotRow<'Custom'>) => {
 				return {
 					time: row.index,
 					x: NaN as Coordinate,
@@ -106,7 +106,7 @@ export class SeriesAbstractPaneView extends SeriesPaneViewBase<
 	protected _prepareRendererData(): void {
 		this._paneView.update(
 			{
-				bars: this._items.map(unwrapItemData) as AbstractBarItemData[],
+				bars: this._items.map(unwrapItemData) as CustomBarItemData[],
 				barSpacing: this._model.timeScale().barSpacing(),
 				visibleRange: this._itemsVisibleRange,
 			},
@@ -116,8 +116,8 @@ export class SeriesAbstractPaneView extends SeriesPaneViewBase<
 }
 
 function unwrapItemData(
-	item: AbstractBarItem
-): Record<keyof AbstractBarItem, unknown> {
+	item: CustomBarItem
+): Record<keyof CustomBarItem, unknown> {
 	return {
 		x: item.x,
 		time: item.time,

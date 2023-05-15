@@ -258,7 +258,7 @@ export class DataLayer {
 
 			const timeConverter = ensureNotNull(selectTimeConverter(data));
 			const createPlotRow = getSeriesPlotRowCreator(series.seriesType());
-			const dataToPlotRow = series.abstractSeriesPlotValuesBuilder();
+			const dataToPlotRow = series.customSeriesPlotValuesBuilder();
 
 			seriesRows = data.map((item: SeriesDataItemTypeMap[TSeriesType], index: number) => {
 				const time = timeConverter(item.time);
@@ -339,7 +339,7 @@ export class DataLayer {
 		}
 
 		const createPlotRow = getSeriesPlotRowCreator(series.seriesType());
-		const dataToPlotRow = series.abstractSeriesPlotValuesBuilder();
+		const dataToPlotRow = series.customSeriesPlotValuesBuilder();
 		const plotRow = createPlotRow(time, pointDataAtTime.index, data, originalTime, dataToPlotRow);
 		pointDataAtTime.mapping.set(series, plotRow);
 

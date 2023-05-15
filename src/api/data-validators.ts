@@ -57,8 +57,8 @@ function getChecker(type: SeriesType): Checker {
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
 
-		case 'Abstract':
-			return checkAbstractItem.bind(null, type);
+		case 'Custom':
+			return checkCustomItem.bind(null, type);
 	}
 }
 
@@ -117,9 +117,9 @@ function checkLineItem(
 	);
 }
 
-function checkAbstractItem(
-	// type: 'Abstract',
-	// abstractItem: SeriesDataItemTypeMap[typeof type]
+function checkCustomItem(
+	// type: 'Custom',
+	// customItem: SeriesDataItemTypeMap[typeof type]
 ): void {
 	// Nothing to check yet...
 	return;

@@ -50,20 +50,20 @@ WhitespaceData interface (have a valid time property for each data point).
 ### Adding a custom series to a chart
 
 A custom series can be added to a chart using the
-[`addAbstractSeries`](/api/interfaces/IChartApi.md#addabstractseries) method
+[`addCustomSeries`](/api/interfaces/IChartApi.md#addcustomseries) method
 which expects a class implementing the
-[IAbstractSeriesPaneView](/api/interfaces/IAbstractSeriesPaneView.md) interface
+[ICustomSeriesPaneView](/api/interfaces/ICustomSeriesPaneView.md) interface
 as the first argument, and an optional set of options as the second argument.
 The series can then be used just like any other series, for example you would
 use `setData` method to provide data to the series.
 
 ```javascript title='javascript'
 class MyCustomSeries {
-    /* Class implementing the IAbstractSeriesPaneView interface */
+    /* Class implementing the ICustomSeriesPaneView interface */
 }
 
 const chart = createChart(document.getElementById('container'));
-const myCustomSeries = chart.addAbstractSeries(MyCustomSeries, {
+const myCustomSeries = chart.addCustomSeries(MyCustomSeries, {
     // options for the MyCustomSeries
     customOption: 10,
 });

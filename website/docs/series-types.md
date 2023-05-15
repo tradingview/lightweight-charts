@@ -163,6 +163,6 @@ chart.timeScale().fitContent();
 
 Lightweight Charts offers the ability to add your own custom series types, also known as series plugins. This feature allows developers to extend the functionality of the library by adding new chart types, indicators, or other custom visualizations.
 
-Custom series types can be defined by creating a class which implements the [IAbstractSeriesPaneView](/api/interfaces/IAbstractSeriesPaneView.md) interface. This class defines the rendering code which Lightweight Charts will use to draw the series on the chart. Once a custom series type is defined, it can be added to any chart instance using the [`addAbstractSeries()`](/api/interfaces/IChartApi.md#addabstractseries) method, and be used just like any other series.
+Custom series types can be defined by creating a class which implements the [ICustomSeriesPaneView](/api/interfaces/ICustomSeriesPaneView.md) interface. This class defines the rendering code which Lightweight Charts will use to draw the series on the chart. Once a custom series type is defined, it can be added to any chart instance using the [`addCustomSeries()`](/api/interfaces/IChartApi.md#addcustomseries) method, and be used just like any other series.
 
 Please see the [Plugins](./plugins/intro.md) article for more details.

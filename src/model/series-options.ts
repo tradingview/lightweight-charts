@@ -452,9 +452,9 @@ export interface HistogramStyleOptions {
 }
 
 /**
- * Represents style options for an abstract series.
+ * Represents style options for a custom series.
  */
-export interface AbstractStyleOptions {
+export interface CustomStyleOptions {
 	/**
 	 * Color used for the price line and price scale label.
 	 */
@@ -812,13 +812,13 @@ export type HistogramSeriesOptions = SeriesOptions<HistogramStyleOptions>;
 export type HistogramSeriesPartialOptions = SeriesPartialOptions<HistogramStyleOptions>;
 
 /**
- * Represents an abstract series options.
+ * Represents a custom series options.
  */
-export type AbstractSeriesOptions = SeriesOptions<AbstractStyleOptions>;
+export type CustomSeriesOptions = SeriesOptions<CustomStyleOptions>;
 /**
- * Represents an abstract series options where all properties are optional.
+ * Represents a custom series options where all properties are optional.
  */
-export type AbstractSeriesPartialOptions = SeriesPartialOptions<AbstractStyleOptions>;
+export type CustomSeriesPartialOptions = SeriesPartialOptions<CustomStyleOptions>;
 
 /**
  * Represents line series options.
@@ -860,9 +860,9 @@ export interface SeriesStyleOptionsMap {
 	 */
 	Histogram: HistogramStyleOptions;
 	/**
-	 * The type of an abstract series' style options.
+	 * The type of a custom series' style options.
 	 */
-	Abstract: AbstractStyleOptions;
+	Custom: CustomStyleOptions;
 }
 
 /**
@@ -896,9 +896,9 @@ export interface SeriesOptionsMap {
 	 */
 	Histogram: HistogramSeriesOptions;
 	/**
-	 * The type of an abstract series options.
+	 * The type of a custom series options.
 	 */
-	Abstract: AbstractSeriesOptions;
+	Custom: CustomSeriesOptions;
 }
 
 /**
@@ -932,9 +932,9 @@ export interface SeriesPartialOptionsMap {
 	 */
 	Histogram: HistogramSeriesPartialOptions;
 	/**
-	 * The type of an abstract series partial options.
+	 * The type of a custom series partial options.
 	 */
-	Abstract: AbstractSeriesPartialOptions;
+	Custom: CustomSeriesPartialOptions;
 }
 
 /**

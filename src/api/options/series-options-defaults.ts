@@ -1,9 +1,9 @@
 import {
-	AbstractStyleOptions,
 	AreaStyleOptions,
 	BarStyleOptions,
 	BaselineStyleOptions,
 	CandlestickStyleOptions,
+	CustomStyleOptions,
 	HistogramStyleOptions,
 	LastPriceAnimationMode,
 	LineStyleOptions,
@@ -93,7 +93,7 @@ export const histogramStyleDefaults: HistogramStyleOptions = {
 	base: 0,
 };
 
-export const abstractStyleDefaults: AbstractStyleOptions = {
+export const customStyleDefaults: CustomStyleOptions = {
 	color: '#2196f3',
 };
 

@@ -1,7 +1,7 @@
 /// <reference types="_build-time-constants" />
 
-import { abstractStyleDefaults, seriesOptionsDefaults } from './api/options/series-options-defaults';
-import { AbstractSeriesOptions } from './model/series-options';
+import { customStyleDefaults, seriesOptionsDefaults } from './api/options/series-options-defaults';
+import { CustomSeriesOptions } from './model/series-options';
 
 export { LineStyle, LineType } from './renderers/draw-line';
 
@@ -18,9 +18,9 @@ export {
 	isUTCTimestamp,
 } from './api/data-consumer';
 
-export const abstractSeriesDefaultOptions: AbstractSeriesOptions = {
+export const customSeriesDefaultOptions: CustomSeriesOptions = {
 	...seriesOptionsDefaults,
-	...abstractStyleDefaults,
+	...customStyleDefaults,
 };
 
 export { createChart } from './api/create-chart';

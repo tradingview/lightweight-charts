@@ -1,14 +1,14 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
-import { IAbstractSeriesPaneView } from '../model/iabstract-series';
+import { ICustomSeriesPaneView } from '../model/icustom-series';
 import { Point } from '../model/point';
 import {
-	AbstractSeriesOptions,
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
+	CustomSeriesOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
 	SeriesPartialOptions,
@@ -17,7 +17,7 @@ import {
 import { Logical, Time } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { AbstractData, BarData, HistogramData, LineData } from './data-consumer';
+import { BarData, CustomData, HistogramData, LineData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -90,25 +90,25 @@ export interface IChartApi {
 	resize(width: number, height: number, forceRepaint?: boolean): void;
 
 	/**
-	 * Creates an abstract series with specified parameters.
+	 * Creates a custom series with specified parameters.
 	 *
-	 * An abstract series is a generic series which can be extended with a custom renderer to
+	 * A custom series is a generic series which can be extended with a custom renderer to
 	 * implement chart types which the library doesn't support by default.
 	 *
-	 * @param abstractPaneView - An abstract series pane view which implements the custom renderer.
-	 * @param abstractOptions - Customization parameters of the series being created.
+	 * @param customPaneView - A custom series pane view which implements the custom renderer.
+	 * @param customOptions - Customization parameters of the series being created.
 	 * ```js
-	 * const series = chart.addAbstractSeries(myAbstractPaneView);
+	 * const series = chart.addCustomSeries(myCustomPaneView);
 	 * ```
 	 */
-	addAbstractSeries<
-		TData extends AbstractData,
-		TOptions extends AbstractSeriesOptions,
+	addCustomSeries<
+		TData extends CustomData,
+		TOptions extends CustomSeriesOptions,
 		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
 	>(
-		abstractPaneView: IAbstractSeriesPaneView<TData, TOptions>,
-		abstractOptions?: SeriesPartialOptions<TOptions>
-	): ISeriesApi<'Abstract', TData, TOptions, TPartialOptions>;
+		customPaneView: ICustomSeriesPaneView<TData, TOptions>,
+		customOptions?: SeriesPartialOptions<TOptions>
+	): ISeriesApi<'Custom', TData, TOptions, TPartialOptions>;
 
 	/**
 	 * Creates an area series with specified parameters.

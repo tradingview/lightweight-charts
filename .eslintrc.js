@@ -11,7 +11,7 @@ function getNamingConventionRules(additionalDefaultFormats = []) {
 			format: ['PascalCase'],
 			filter: {
 				match: true,
-				regex: '^(Area|Baseline|Bar|Candlestick|Histogram|Line|Abstract)$',
+				regex: '^(Area|Baseline|Bar|Candlestick|Histogram|Line|Custom)$',
 			},
 		},
 	];

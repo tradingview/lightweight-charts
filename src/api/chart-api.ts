@@ -6,16 +6,16 @@ import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
-import { IAbstractSeriesPaneView } from '../model/iabstract-series';
+import { ICustomSeriesPaneView } from '../model/icustom-series';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
-	AbstractSeriesOptions,
-	AbstractSeriesPartialOptions,
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
+	CustomSeriesOptions,
+	CustomSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
@@ -30,7 +30,7 @@ import {
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
 
-import { AbstractData, DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
+import { CustomData, DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
@@ -39,11 +39,11 @@ import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
 import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
-	abstractStyleDefaults,
 	areaStyleDefaults,
 	barStyleDefaults,
 	baselineStyleDefaults,
 	candlestickStyleDefaults,
+	customStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
@@ -176,21 +176,21 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.resize(width, height, forceRepaint);
 	}
 
-	public addAbstractSeries<
-		TData extends AbstractData,
-		TOptions extends AbstractSeriesOptions,
-		TPartialOptions extends AbstractSeriesPartialOptions = SeriesPartialOptions<TOptions>
+	public addCustomSeries<
+		TData extends CustomData,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>
 	>(
-		abstractPaneView: IAbstractSeriesPaneView<TData, TOptions>,
+		customPaneView: ICustomSeriesPaneView<TData, TOptions>,
 		options?: SeriesPartialOptions<TOptions>
-	): ISeriesApi<'Abstract', TData, TOptions, TPartialOptions> {
-		const paneView = ensure(abstractPaneView);
+	): ISeriesApi<'Custom', TData, TOptions, TPartialOptions> {
+		const paneView = ensure(customPaneView);
 		const defaults = {
-			...abstractStyleDefaults,
+			...customStyleDefaults,
 			...paneView.defaultOptions(),
 		};
-		return this._addSeriesImpl<'Abstract', TData, TOptions, TPartialOptions>(
-			'Abstract',
+		return this._addSeriesImpl<'Custom', TData, TOptions, TPartialOptions>(
+			'Custom',
 			defaults,
 			options,
 			paneView
@@ -301,12 +301,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		type: TSeries,
 		styleDefaults: SeriesStyleOptionsMap[TSeries],
 		options: SeriesPartialOptionsMap[TSeries] = {},
-		abstractPaneView?: IAbstractSeriesPaneView
+		customPaneView?: ICustomSeriesPaneView
 	): ISeriesApi<TSeries, TData, TOptions, TPartialOptions> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
-		const series = this._chartWidget.model().createSeries(type, strictOptions, abstractPaneView);
+		const series = this._chartWidget.model().createSeries(type, strictOptions, customPaneView);
 
 		const res = new SeriesApi<TSeries, TData, TOptions, TPartialOptions>(series, this, this, this);
 		this._seriesMap.set(res, series);

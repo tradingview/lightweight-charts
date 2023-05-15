@@ -189,16 +189,16 @@ export interface CandlestickData extends OhlcData {
 }
 
 /**
- * Base structure describing a single item of data for an abstract series.
+ * Base structure describing a single item of data for a custom series.
  *
  * This type allows for any properties to be defined
  * within the interface. It is recommended that you extend this interface with
  * the required data structure.
  */
-export interface AbstractData extends WhitespaceData {
+export interface CustomData extends WhitespaceData {
 	/**
 	 * If defined then this color will be used for the price line and price scale line
-	 * for this specific data item of the abstract series.
+	 * for this specific data item of the custom series.
 	 */
 	color?: string;
 }
@@ -247,9 +247,9 @@ export interface SeriesDataItemTypeMap {
 	 */
 	Histogram: HistogramData | WhitespaceData;
 	/**
-	 * The base types of an abstract series data.
+	 * The base types of an custom series data.
 	 */
-	Abstract: AbstractData | WhitespaceData;
+	Custom: CustomData | WhitespaceData;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {

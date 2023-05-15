@@ -1,16 +1,16 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { AbstractData, WhitespaceData } from '../api/data-consumer';
+import { CustomData, WhitespaceData } from '../api/data-consumer';
 
 import { Coordinate } from './coordinate';
-import { AbstractSeriesOptions } from './series-options';
+import { CustomSeriesOptions } from './series-options';
 import { Range } from './time-data';
 
 /**
- * Renderer data for an item within the abstract series.
+ * Renderer data for an item within the custom series.
  */
-export interface AbstractBarItemData<
-	TData extends AbstractData | WhitespaceData = AbstractData | WhitespaceData
+export interface CustomBarItemData<
+	TData extends CustomData | WhitespaceData = CustomData | WhitespaceData
 > {
 	/**
 	 * Horizontal coordinate for the item. Measured from the left edge of the pane in pixels.
@@ -31,16 +31,16 @@ export interface AbstractBarItemData<
 }
 
 /**
- * Data provide to the abstract series pane view which can be used within the renderer
+ * Data provide to the custom series pane view which can be used within the renderer
  * for drawing the series data.
  */
-export interface PaneRendererAbstractData<
-	TData extends AbstractData | WhitespaceData
+export interface PaneRendererCustomData<
+	TData extends CustomData | WhitespaceData
 > {
 	/**
 	 * List of all the series' items and their x coordinates.
 	 */
-	bars: readonly AbstractBarItemData<TData>[];
+	bars: readonly CustomBarItemData<TData>[];
 	/**
 	 * Spacing between consecutive bars.
 	 */
@@ -61,9 +61,9 @@ export interface PaneRendererAbstractData<
 export type PriceToCoordinateConverter = (price: number) => Coordinate | null;
 
 /**
- * Renderer for the abstract series. This paints on the main chart pane.
+ * Renderer for the custom series. This paints on the main chart pane.
  */
-export interface IAbstractSeriesPaneRenderer {
+export interface ICustomSeriesPaneRenderer {
 	/**
 	 * Draw function for the renderer.
 	 *
@@ -91,14 +91,14 @@ export interface IAbstractSeriesPaneRenderer {
  * - low
  * - close
  */
-export type AbstractSeriesPricePlotValues = [number, number, number, number];
+export type CustomSeriesPricePlotValues = [number, number, number, number];
 
 /**
  * This interface represents the view for the custom series
  */
-export interface IAbstractSeriesPaneView<
-	TData extends AbstractData | WhitespaceData = AbstractData | WhitespaceData,
-	TSeriesOptions extends AbstractSeriesOptions = AbstractSeriesOptions
+export interface ICustomSeriesPaneView<
+	TData extends CustomData | WhitespaceData = CustomData | WhitespaceData,
+	TSeriesOptions extends CustomSeriesOptions = CustomSeriesOptions
 > {
 	/**
 	 * This method returns a renderer - special object to draw data for the series
@@ -106,14 +106,14 @@ export interface IAbstractSeriesPaneView<
 	 *
 	 * @returns an renderer object to be used for drawing.
 	 */
-	renderer(): IAbstractSeriesPaneRenderer;
+	renderer(): ICustomSeriesPaneRenderer;
 
 	/**
 	 * This method will be called with the latest data for the renderer to use
 	 * during the next paint.
 	 */
 	update(
-		data: PaneRendererAbstractData<TData>,
+		data: PaneRendererCustomData<TData>,
 		seriesOptions: TSeriesOptions
 	): void;
 
@@ -124,7 +124,7 @@ export interface IAbstractSeriesPaneView<
 	 * and price line positions. Use the high and low values to specify the visible range of the painted item,
 	 * and the close value for the crosshair and price line position.
 	 */
-	priceValueBuilder(plotRow: TData): AbstractSeriesPricePlotValues;
+	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues;
 
 	/**
 	 * Default options

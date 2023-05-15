@@ -16,7 +16,7 @@ series, providing a consistent API which mirrors the built-in chart types.
 These series are expected to have a uniform width for each data point, which
 ensures that the chart maintains a consistent look and feel across all series
 types. The only restriction on the data structure is that it should extend the
-[`AbstractData`](/api/interfaces/AbstractData.md) interface (have a valid time
+[`CustomData`](/api/interfaces/CustomData.md) interface (have a valid time
 property for each data point).
 
 :::
@@ -24,7 +24,7 @@ property for each data point).
 ## Defining a Custom Series
 
 A custom series should implement the
-[`IAbstractSeriesPaneView`](/api/interfaces/IAbstractSeriesPaneView.md)
+[`ICustomSeriesPaneView`](/api/interfaces/ICustomSeriesPaneView.md)
 interface. The interface defines the basic functionality and structure required
 for creating a custom series view.
 
@@ -32,14 +32,14 @@ It includes the following methods and properties:
 
 ### Renderer
 
-- IAbstractSeriesPaneView property:
-  [`renderer`](/api/interfaces/IAbstractSeriesPaneView.md#renderer)
+- ICustomSeriesPaneView property:
+  [`renderer`](/api/interfaces/ICustomSeriesPaneView.md#renderer)
 
 This method should return a renderer which implements the
-[`IAbstractSeriesPaneRenderer`](/api/interfaces/IAbstractSeriesPaneRenderer.md)
+[`ICustomSeriesPaneRenderer`](/api/interfaces/ICustomSeriesPaneRenderer.md)
 interface and is used to draw the series data on the main chart pane.
 
-The [`draw`](/api/interfaces/IAbstractSeriesPaneRenderer.md#draw) method of the
+The [`draw`](/api/interfaces/ICustomSeriesPaneRenderer.md#draw) method of the
 renderer is evoked whenever the chart needs to draw the series.
 
 The [`PriceToCoordinateConverter`](/api/index.md#pricetocoordinateconverter)
@@ -58,8 +58,8 @@ more detail on the [Canvas Rendering Target](./canvas-rendering-target) page.
 
 ### Update
 
-- IAbstractSeriesPaneView property:
-  [`update`](/api/interfaces/IAbstractSeriesPaneView.md#update)
+- ICustomSeriesPaneView property:
+  [`update`](/api/interfaces/ICustomSeriesPaneView.md#update)
 
 This method will be called with the latest data for the renderer to use during
 the next paint.
@@ -68,20 +68,20 @@ The update method is evoked with two parameters: `data` (discussed below), and
 `seriesOptions`. seriesOptions is a reference to the currently applied options
 for the series
 
-The [`PaneRendererAbstractData`](/api/interfaces/PaneRendererAbstractData.md)
+The [`PaneRendererCustomData`](/api/interfaces/PaneRendererCustomData.md)
 interface provides the data that can be used within the renderer for drawing the
 series data. It includes the following properties:
 
 - `bars`: List of all the series' items and their x coordinates. See
-  [`AbstractBarItemData`](/api/interfaces/AbstractBarItemData.md) for more
+  [`CustomBarItemData`](/api/interfaces/CustomBarItemData.md) for more
   details
 - `barSpacing`: Spacing between consecutive bars.
 - `visibleRange`: The current visible range of items on the chart.
 
 ### Price Value Builder
 
-- IAbstractSeriesPaneView property:
-  [`priceValueBuilder`](/api/interfaces/IAbstractSeriesPaneView.md#priceValueBuilder)
+- ICustomSeriesPaneView property:
+  [`priceValueBuilder`](/api/interfaces/ICustomSeriesPaneView.md#priceValueBuilder)
 
 A function for interpreting the custom series data and returning an array of
 numbers representing the open, high, low, close values for the item.
@@ -93,19 +93,19 @@ value for the crosshair and price line position.
 
 ### Default Options
 
-- IAbstractSeriesPaneView property:
-  [`defaultOptions`](/api/interfaces/IAbstractSeriesPaneView.md#defaultoptions)
+- ICustomSeriesPaneView property:
+  [`defaultOptions`](/api/interfaces/ICustomSeriesPaneView.md#defaultoptions)
 
 The default options to be used for the series. The user can override these
 values using the options argument in
-[`addAbstractSeries`](/api/interfaces/IChartApi.md#addabstractseries), or via
+[`addCustomSeries`](/api/interfaces/IChartApi.md#addcustomseries), or via
 the [`applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method on the
 `ISeriesAPI`.
 
 ### Destroy
 
-- IAbstractSeriesPaneView property:
-  [`destroy`](/api/interfaces/IAbstractSeriesPaneView.md#destroy)
+- ICustomSeriesPaneView property:
+  [`destroy`](/api/interfaces/ICustomSeriesPaneView.md#destroy)
 
 This method will be evoked when the series has been removed from the chart. This
 method should be used to clean up any objects, references, and other items that
