@@ -82,16 +82,15 @@ export interface ICustomSeriesPaneRenderer {
 }
 
 /**
- * OHLC equivalent values for the custom series.
+ * Price values for the custom series. This list should include the largest, smallest, and current price values for the data point.
+ * The last value in the array will be used for the current value. You shouldn't need to
+ * have more than 3 values in this array since the library only needs a largest, smallest, and current value.
  *
- * The order of items is defined as follows:
- *
- * - open
- * - high
- * - low
- * - close
+ * Examples:
+ * - For a line series, this would contain a single number representing the current value.
+ * - For a candle series, this would contain the high, low, and close values. Where the last value would be the close value.
  */
-export type CustomSeriesPricePlotValues = [number, number, number, number];
+export type CustomSeriesPricePlotValues = number[];
 
 /**
  * This interface represents the view for the custom series
@@ -119,10 +118,10 @@ export interface ICustomSeriesPaneView<
 
 	/**
 	 * A function for interpreting the custom series data and returning an array of numbers
-	 * representing the open, high, low, close values for the item. These OHLC values are used
+	 * representing the price values for the item. These price values are used
 	 * by the chart to determine the auto-scaling (to ensure the items are in view) and the crosshair
-	 * and price line positions. Use the high and low values to specify the visible range of the painted item,
-	 * and the close value for the crosshair and price line position.
+	 * and price line positions. The last value in the array will be used as the current value. You shouldn't need to
+	 * have more than 3 values in this array since the library only needs a largest, smallest, and current value.
 	 */
 	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues;
 

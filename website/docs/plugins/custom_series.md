@@ -24,9 +24,9 @@ property for each data point).
 ## Defining a Custom Series
 
 A custom series should implement the
-[`ICustomSeriesPaneView`](/api/interfaces/ICustomSeriesPaneView.md)
-interface. The interface defines the basic functionality and structure required
-for creating a custom series view.
+[`ICustomSeriesPaneView`](/api/interfaces/ICustomSeriesPaneView.md) interface.
+The interface defines the basic functionality and structure required for
+creating a custom series view.
 
 It includes the following methods and properties:
 
@@ -73,8 +73,7 @@ interface provides the data that can be used within the renderer for drawing the
 series data. It includes the following properties:
 
 - `bars`: List of all the series' items and their x coordinates. See
-  [`CustomBarItemData`](/api/interfaces/CustomBarItemData.md) for more
-  details
+  [`CustomBarItemData`](/api/interfaces/CustomBarItemData.md) for more details
 - `barSpacing`: Spacing between consecutive bars.
 - `visibleRange`: The current visible range of items on the chart.
 
@@ -84,12 +83,14 @@ series data. It includes the following properties:
   [`priceValueBuilder`](/api/interfaces/ICustomSeriesPaneView.md#priceValueBuilder)
 
 A function for interpreting the custom series data and returning an array of
-numbers representing the open, high, low, close values for the item.
+numbers representing the prices values for the item, specifically the equivalent
+highest, lowest, and current price values for the data item.
 
-These OHLC values are used by the chart to determine the auto-scaling (to ensure
-the items are in view) and the crosshair and price line positions. Use the high
-and low values to specify the visible range of the painted item, and the close
-value for the crosshair and price line position.
+These price values are used by the chart to determine the auto-scaling (to
+ensure the items are in view) and the crosshair and price line positions. The
+largest and smallest values in the array will be used to specify the visible
+range of the painted item, and the last value will be used for the crosshair and
+price line position.
 
 ### Default Options
 
@@ -98,8 +99,8 @@ value for the crosshair and price line position.
 
 The default options to be used for the series. The user can override these
 values using the options argument in
-[`addCustomSeries`](/api/interfaces/IChartApi.md#addcustomseries), or via
-the [`applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method on the
+[`addCustomSeries`](/api/interfaces/IChartApi.md#addcustomseries), or via the
+[`applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method on the
 `ISeriesAPI`.
 
 ### Destroy

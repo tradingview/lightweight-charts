@@ -1,6 +1,6 @@
 import { ensureDefined } from '../helpers/assertions';
 
-import { PlotRow } from '../model/plot-data';
+import { PlotRow, PlotRowValue } from '../model/plot-data';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { OriginalTime, TimePoint, TimePointIndex } from '../model/time-data';
@@ -99,15 +99,14 @@ function getCandlestickSeriesPlotRow(time: TimePoint, index: TimePointIndex, ite
 }
 
 // The returned data is used for scaling the series, and providing the current value for the price scale
-export type CustomDataToPlotRowValueConverter = (item: CustomData | WhitespaceData) => [
-	number, // open
-	number, // high
-	number, // low
-	number, // close
-];
+export type CustomDataToPlotRowValueConverter = (item: CustomData | WhitespaceData) => number[];
 
 function getCustomSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: CustomData | WhitespaceData, originalTime: OriginalTime, dataToPlotRow?: CustomDataToPlotRowValueConverter): Mutable<SeriesPlotRow<'Custom'>> {
-	const value = ensureDefined(dataToPlotRow)(item);
+	const values = ensureDefined(dataToPlotRow)(item);
+	const max = Math.max(...values);
+	const min = Math.min(...values);
+	const last = values[values.length - 1];
+	const value: PlotRowValue = [last, max, min, last];
 	const { time: excludedTime, color, ...data } = item as CustomData;
 	return { index, time, value, originalTime, data, color };
 }
