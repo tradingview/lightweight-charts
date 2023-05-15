@@ -92,6 +92,16 @@ largest and smallest values in the array will be used to specify the visible
 range of the painted item, and the last value will be used for the crosshair and
 price line position.
 
+### Whitespace
+
+- ICustomSeriesPaneView property:
+  [`isWhitespace`](/api/interfaces/ICustomSeriesPaneView.md#iswhitespace)
+
+A function used by the library to determine which data points provided by the
+user should be considered Whitespace. The method should return `true` when the
+data point is Whitespace. Data points which are whitespace data won't be provided to
+the renderer, or the `priceValueBuilder`.
+
 ### Default Options
 
 - ICustomSeriesPaneView property:

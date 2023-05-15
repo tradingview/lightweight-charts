@@ -17,7 +17,7 @@ import {
 import { Logical, Time } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { BarData, CustomData, HistogramData, LineData } from './data-consumer';
+import { BarData, CustomData, HistogramData, LineData, WhitespaceData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -108,7 +108,7 @@ export interface IChartApi {
 	>(
 		customPaneView: ICustomSeriesPaneView<TData, TOptions>,
 		customOptions?: SeriesPartialOptions<TOptions>
-	): ISeriesApi<'Custom', TData, TOptions, TPartialOptions>;
+	): ISeriesApi<'Custom', TData | WhitespaceData, TOptions, TPartialOptions>;
 
 	/**
 	 * Creates an area series with specified parameters.

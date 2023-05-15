@@ -1,4 +1,5 @@
-import { CustomDataToPlotRowValueConverter } from '../api/get-series-plot-row-creator';
+import { CustomData, WhitespaceData } from '../api/data-consumer';
+import { CustomDataToPlotRowValueConverter, WhitespaceCheck } from '../api/get-series-plot-row-creator';
 
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
@@ -550,6 +551,15 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		// eslint-disable-next-line @typescript-eslint/tslint/config
 		return data => {
 			return ensure(this._customPaneView).priceValueBuilder(data);
+		};
+	}
+
+	public customSeriesWhitespaceCheck(): WhitespaceCheck | undefined {
+		if (this._customPaneView === null) {
+			return undefined;
+		}
+		return (data: CustomData | WhitespaceData): data is WhitespaceData => {
+			return ensure(this._customPaneView).isWhitespace(data);
 		};
 	}
 

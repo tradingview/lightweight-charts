@@ -259,6 +259,7 @@ export class DataLayer {
 			const timeConverter = ensureNotNull(selectTimeConverter(data));
 			const createPlotRow = getSeriesPlotRowCreator(series.seriesType());
 			const dataToPlotRow = series.customSeriesPlotValuesBuilder();
+			const customWhitespaceChecker = series.customSeriesWhitespaceCheck();
 
 			seriesRows = data.map((item: SeriesDataItemTypeMap[TSeriesType], index: number) => {
 				const time = timeConverter(item.time);
@@ -271,7 +272,7 @@ export class DataLayer {
 					isTimeScaleAffected = true;
 				}
 
-				const row = createPlotRow(time, timePointData.index, item, originalTimes[index], dataToPlotRow);
+				const row = createPlotRow(time, timePointData.index, item, originalTimes[index], dataToPlotRow, customWhitespaceChecker);
 				timePointData.mapping.set(series, row);
 				return row;
 			});
@@ -340,7 +341,8 @@ export class DataLayer {
 
 		const createPlotRow = getSeriesPlotRowCreator(series.seriesType());
 		const dataToPlotRow = series.customSeriesPlotValuesBuilder();
-		const plotRow = createPlotRow(time, pointDataAtTime.index, data, originalTime, dataToPlotRow);
+		const customWhitespaceChecker = series.customSeriesWhitespaceCheck();
+		const plotRow = createPlotRow(time, pointDataAtTime.index, data, originalTime, dataToPlotRow, customWhitespaceChecker);
 		pointDataAtTime.mapping.set(series, plotRow);
 
 		this._updateLastSeriesRow(series, plotRow);

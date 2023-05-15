@@ -10,7 +10,7 @@ import { Range } from './time-data';
  * Renderer data for an item within the custom series.
  */
 export interface CustomBarItemData<
-	TData extends CustomData | WhitespaceData = CustomData | WhitespaceData
+	TData extends CustomData = CustomData
 > {
 	/**
 	 * Horizontal coordinate for the item. Measured from the left edge of the pane in pixels.
@@ -35,7 +35,7 @@ export interface CustomBarItemData<
  * for drawing the series data.
  */
 export interface PaneRendererCustomData<
-	TData extends CustomData | WhitespaceData
+	TData extends CustomData
 > {
 	/**
 	 * List of all the series' items and their x coordinates.
@@ -96,7 +96,7 @@ export type CustomSeriesPricePlotValues = number[];
  * This interface represents the view for the custom series
  */
 export interface ICustomSeriesPaneView<
-	TData extends CustomData | WhitespaceData = CustomData | WhitespaceData,
+	TData extends CustomData = CustomData,
 	TSeriesOptions extends CustomSeriesOptions = CustomSeriesOptions
 > {
 	/**
@@ -124,6 +124,14 @@ export interface ICustomSeriesPaneView<
 	 * have more than 3 values in this array since the library only needs a largest, smallest, and current value.
 	 */
 	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues;
+
+	/**
+	 * A function for testing whether a data point should be considered fully specified, or if it should
+	 * be considered as whitespace. Should return `true` if is whitespace.
+	 *
+	 * @param data - data point to be tested
+	 */
+	isWhitespace(data: TData | WhitespaceData): data is WhitespaceData;
 
 	/**
 	 * Default options
