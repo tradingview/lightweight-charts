@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+	<title>Debug page</title>
+
+	<script type="text/javascript" src="./dist/lightweight-charts.standalone.development.js"></script>
+
+	<script language="javascript">
+		class BandRenderer {
+			setData(data) {
+				this._data = data
+			}
+			draw(target) {
+				target.useMediaCoordinateSpace(scope => {
+					const ctx = scope.context;
+					if (this._data.items.length == 0) {
+						return;
+					}
+					const items = this._data.items;
+					const r = this._data.visibleRange;
+
+					// fill
+					ctx.beginPath();
+					ctx.fillStyle ="rgba(0, 0, 255, 0.4)";
+					ctx.beginPath();
+					ctx.moveTo(items[0].x, items[0].highY);
+
+					for (let i = r.from; i < r.to; i++) {
+						ctx.lineTo(items[i].x, items[i].highY);
+					}
+
+					ctx.lineTo(items[r.to - 1].x, items[r.to - 1].lowY);
+
+					for (let i = r.to - 1; i >= r.from; i--) {
+						ctx.lineTo(items[i].x, items[i].lowY);
+					}
+
+					ctx.fill();
+
+					// line
+					ctx.beginPath();
+					ctx.moveTo(items[0].x, items[0].highY);
+					ctx.strokeStyle = 'blue';
+
+					for (let i = r.from; i < r.to; i++) {
+						ctx.lineTo(items[i].x, items[i].highY);
+					}
+					ctx.stroke();
+
+					ctx.beginPath();
+					ctx.moveTo(items[0].x, items[0].lowY);
+					for (let i = r.from; i < r.to; i++) {
+						ctx.lineTo(items[i].x, items[i].lowY);
+					}
+
+					ctx.stroke();
+				});
+			}
+		}
+
+		function init() {
+			document.body.style.position = 'relative';
+
+			var container = document.createElement('div');
+			document.body.appendChild(container);
+
+			var width = 900;
+			var height = 600;
+
+			var chart = LightweightCharts.createChart(container, {
+				width: width,
+				height: height,
+			});
+
+			var data = generateBarsData();
+
+			var barSeries = chart.addBarSeries();
+			barSeries.setData(data);
+
+			function generateBarsData(period) {
+				var res = [];
+				var controlPoints = generateControlPoints(res, period);
+				for (var i = 0; i < controlPoints.length - 1; i++) {
+					var left = controlPoints[i];
+					var right = controlPoints[i + 1];
+					fillBarsSegment(left, right, res);
+				}
+				return res;
+			}
+
+			function fillBarsSegment(left, right, points) {
+				var deltaY = right.price - left.price;
+				var deltaX = right.index - left.index;
+				var angle = deltaY / deltaX;
+				for (var i = left.index; i <= right.index; i++) {
+					var basePrice = left.price + (i - left.index) * angle;
+					var openNoise = (0.1 - Math.random() * 0.2) + 1;
+					var closeNoise = (0.1 - Math.random() * 0.2) + 1;
+					var open = basePrice * openNoise;
+					var close = basePrice * closeNoise;
+					var high = Math.max(basePrice * (1 + Math.random() * 0.2), open, close);
+					var low = Math.min(basePrice * (1 - Math.random() * 0.2), open, close);
+					points[i].open = open;
+					points[i].high = high;
+					points[i].low = low;
+					points[i].close = close;
+				}
+			}
+
+			function generateControlPoints(res, period, dataMultiplier) {
+				var time = period !== undefined ? period.timeFrom : { day: 1, month: 1, year: 2018 };
+				var timeTo = period !== undefined ? period.timeTo : { day: 1, month: 1, year: 2019 };
+				var days = getDiffDays(time, timeTo);
+				dataMultiplier = dataMultiplier || 1;
+				var controlPoints = [];
+				controlPoints.push({ index: 0, price: getRandomPrice() * dataMultiplier });
+				for (var i = 0; i < days; i++) {
+					if (i > 0 && i < days - 1 && Math.random() < 0.05) {
+						controlPoints.push({ index: i, price: getRandomPrice() * dataMultiplier });
+					}
+					res.push({ time: time });
+					time = nextBusinessDay(time);
+				}
+				controlPoints.push({ index: res.length - 1, price: getRandomPrice() * dataMultiplier });
+				return controlPoints;
+			}
+
+			function getDiffDays(dateFrom, dateTo) {
+				var df = convertBusinessDayToUTCTimestamp(dateFrom);
+				var dt = convertBusinessDayToUTCTimestamp(dateTo);
+				var diffTime = Math.abs(dt.getTime() - df.getTime());
+				return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			}
+
+			function convertBusinessDayToUTCTimestamp(date) {
+				return new Date(Date.UTC(date.year, date.month - 1, date.day, 0, 0, 0, 0));
+			}
+
+			function nextBusinessDay(time) {
+				var d = convertBusinessDayToUTCTimestamp({ year: time.year, month: time.month, day: time.day + 1 });
+				return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
+			}
+
+			function getRandomPrice() {
+				return 10 + Math.round(Math.random() * 10000) / 100;
+			}
+
+			barSeries.overrideRenderer(new BandRenderer());
+		}
+	</script>
+		
+</head>
+
+<body style="padding: 0; margin: 0; background-color: #505050" onload="init()">
+</body>
+
+</html>
