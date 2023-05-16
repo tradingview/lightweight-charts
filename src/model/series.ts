@@ -36,7 +36,7 @@ import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
 import { ICustomSeriesPaneView } from './icustom-series';
 import { FirstValue } from './iprice-data-source';
-import { ISeriesPrimitive, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
+import { ISeriesPrimitive, PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
 import { MismatchDirection } from './plot-list';
@@ -432,6 +432,15 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 	public timePaneViews(zOrder: SeriesPrimitivePaneViewZOrder): readonly IPaneView[] {
 		return this._extractPaneViews(primitiveTimePaneViewsExtractor, zOrder);
+	}
+
+	public primitiveHitTest(x: Coordinate, y: Coordinate): PrimitiveHoveredItem[] {
+		return this._primitives
+			.map((primitive: SeriesPrimitiveWrapper) => primitive.hitTest(x, y))
+			.filter(
+				(result: PrimitiveHoveredItem | null): result is PrimitiveHoveredItem =>
+					result !== null
+			);
 	}
 
 	public override labelPaneViews(pane?: Pane): readonly IPaneView[] {

@@ -3,7 +3,8 @@ import { IPaneView } from '../views/pane/ipane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
-import { SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
+import { Coordinate } from './coordinate';
+import { PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
 import { Pane } from './pane';
 import { PriceScale } from './price-scale';
 
@@ -16,6 +17,7 @@ interface IPluginPaneViews {
 	bottomPaneViews?(pane: Pane): readonly IPaneView[];
 	pricePaneViews?(zOrder: SeriesPrimitivePaneViewZOrder): readonly IAxisView[];
 	timePaneViews?(zOrder: SeriesPrimitivePaneViewZOrder): readonly IAxisView[];
+	primitiveHitTest?(x: Coordinate, y: Coordinate): PrimitiveHoveredItem[];
 }
 
 interface IDataSourcePaneViews extends IPluginPaneViews {

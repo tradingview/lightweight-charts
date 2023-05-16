@@ -123,6 +123,25 @@ export interface SeriesAttachedParameter {
 }
 
 /**
+ * Data representing the currently hovered object from the Hit test.
+ */
+export interface PrimitiveHoveredItem {
+	/**
+	 * CSS cursor style as defined here: [MDN: CSS Cursor](https://developer.mozilla.org/en-US/docs/Web/CSS/cursor) or `undefined`
+	 * if you want the library to use the default cursor style instead.
+	 */
+	cursorStyle?: string;
+	/**
+	 * Hovered objects external ID. Can be used to identify the source item within a mouse subscriber event.
+	 */
+	externalId: string;
+	/**
+	 * The zOrder of the hovered item.
+	 */
+	zOrder: SeriesPrimitivePaneViewZOrder;
+}
+
+/**
  * Base interface for series primitives. It must be implemented to add some external graphics to series
  */
 export interface ISeriesPrimitive {
@@ -193,7 +212,10 @@ export interface ISeriesPrimitive {
 	 * @param endTimePoint - end time point for the current visible range
 	 * @returns AutoscaleInfo
 	 */
-	autoscaleInfo?(startTimePoint: Logical, endTimePoint: Logical): AutoscaleInfo | null;
+	autoscaleInfo?(
+		startTimePoint: Logical,
+		endTimePoint: Logical
+	): AutoscaleInfo | null;
 
 	/**
 	 * Attached Lifecycle hook.
@@ -208,4 +230,17 @@ export interface ISeriesPrimitive {
 	 * @returns void
 	 */
 	detached?: () => void;
+
+	/**
+	 * Hit test method which will be called by the library when the cursor is moved.
+	 * Use this to register object ids being hovered for use within the crosshairMoved
+	 * and click events emitted by the chart. Additionally, the hit test result can
+	 * specify a preferred cursor type to display for the main chart pane. This method
+	 * should return the top most hit for this primitive if more than one object is
+	 * being intersected.
+	 *
+	 * @param x - x Coordinate of mouse event
+	 * @param y - y Coordinate of mouse event
+	 */
+	hitTest?(x: number, y: number): PrimitiveHoveredItem | null;
 }

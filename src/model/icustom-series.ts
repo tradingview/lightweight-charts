@@ -78,6 +78,8 @@ export interface ICustomSeriesPaneRenderer {
 		isHovered: boolean,
 		hitTestData?: unknown
 	): void;
+
+	// Series don't have hitTest (yet...)
 	// hitTest?(x: Coordinate, y: Coordinate): HoveredObject | null;
 }
 

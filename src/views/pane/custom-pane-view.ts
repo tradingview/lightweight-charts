@@ -47,11 +47,6 @@ class CustomSeriesPaneRendererWrapper implements IPaneRenderer {
 	): void {
 		this._sourceRenderer.draw(target, this._priceScale, isHovered, hitTestData);
 	}
-
-	// TODO: Add hitTest?
-	// public hitTest?(x: Coordinate, y: Coordinate): HoveredObject | null {
-	// 	throw new Error('Method not implemented.');
-	// }
 }
 
 export class SeriesCustomPaneView extends SeriesPaneViewBase<

@@ -8,13 +8,13 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
-import { HoveredObject } from './chart-model';
 import { Coordinate } from './coordinate';
 import {
 	ISeriesPrimitive,
 	ISeriesPrimitiveAxisView,
 	ISeriesPrimitivePaneRenderer,
 	ISeriesPrimitivePaneView,
+	PrimitiveHoveredItem,
 	SeriesPrimitivePaneViewZOrder,
 } from './iseries-primitive';
 import { PriceScale } from './price-scale';
@@ -37,10 +37,6 @@ class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
 	public drawBackground?(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
 		this._baseRenderer.drawBackground?.(target);
 	}
-
-	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
-		return null;
-	}
 }
 
 interface RendererCache<Base, Wrapper> {
@@ -60,7 +56,7 @@ class SeriesPrimitivePaneViewWrapper implements IPaneView {
 		this._paneView = paneView;
 	}
 
-	public renderer(addAnchors?: boolean): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		const baseRenderer = this._paneView.renderer();
 		if (baseRenderer === null) {
 			return null;
@@ -253,5 +249,9 @@ export class SeriesPrimitiveWrapper {
 				endTimePoint as unknown as Logical
 			) ?? null
 		);
+	}
+
+	public hitTest(x: Coordinate, y: Coordinate): PrimitiveHoveredItem | null {
+		return this._primitive.hitTest?.(x, y) ?? null;
 	}
 }

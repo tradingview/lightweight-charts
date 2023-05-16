@@ -19,6 +19,7 @@ import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
+import { PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
 import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
@@ -54,10 +55,52 @@ function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView
 	return source.topPaneViews?.(pane) ?? [];
 }
 
-export interface HitTestResult {
+// returns true if item is above reference
+function comparePrimitiveZOrder(item: SeriesPrimitivePaneViewZOrder, reference?: SeriesPrimitivePaneViewZOrder): boolean {
+	return (!reference || (item === 'top' && reference !== 'top') || (item === 'normal' && reference === 'bottom'));
+}
+
+interface BestPrimitiveHit {
+	hit: PrimitiveHoveredItem;
+	source: IPriceDataSource;
+}
+
+function findBestPrimitiveHitTest(sources: readonly IPriceDataSource[], x: Coordinate, y: Coordinate): BestPrimitiveHit | null {
+	let bestPrimitiveHit: PrimitiveHoveredItem | undefined;
+	let bestHitSource: IPriceDataSource | undefined;
+	for (const source of sources) {
+		const primitiveHitResults = source.primitiveHitTest?.(x, y) ?? [];
+		for (const hitResult of primitiveHitResults) {
+			if (comparePrimitiveZOrder(hitResult.zOrder, bestPrimitiveHit?.zOrder)) {
+				bestPrimitiveHit = hitResult;
+				bestHitSource = source;
+			}
+		}
+	}
+	if (!bestPrimitiveHit || !bestHitSource) {
+		return null;
+	}
+	return {
+		hit: bestPrimitiveHit,
+		source: bestHitSource,
+	};
+}
+
+function convertPrimitiveHitResult(primitiveHit: BestPrimitiveHit): HitTestResult {
+	return {
+		source: primitiveHit.source,
+		object: {
+			externalId: primitiveHit.hit.externalId,
+		},
+		cursorStyle: primitiveHit.hit.cursorStyle,
+	};
+}
+
+interface HitTestResult {
 	source: IPriceDataSource;
 	object?: HoveredObject;
-	view: IPaneView;
+	view?: IPaneView;
+	cursorStyle?: string;
 }
 
 interface HitTestPaneViewResult {
@@ -265,6 +308,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const y = event.localY;
 		this._setCrosshairPosition(x, y, event);
 		const hitTest = this.hitTest(x, y);
+		this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
 		this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 	}
 
@@ -381,12 +425,17 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HitTestResult | null {
+		this._chart.setCursorStyle(null);
 		const state = this._state;
 		if (state === null) {
 			return null;
 		}
 
 		const sources = state.orderedSources();
+		const bestPrimitiveHit = findBestPrimitiveHitTest(sources, x, y);
+		if (bestPrimitiveHit?.hit.zOrder === 'top') {
+			return convertPrimitiveHitResult(bestPrimitiveHit);
+		}
 		for (const source of sources) {
 			const sourceResult = this._hitTestPaneView(source.paneViews(state), x, y);
 			if (sourceResult !== null) {
@@ -396,6 +445,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 					object: sourceResult.object,
 				};
 			}
+		}
+		if (bestPrimitiveHit?.hit) {
+			return convertPrimitiveHitResult(bestPrimitiveHit);
 		}
 
 		return null;

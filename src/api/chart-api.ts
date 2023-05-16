@@ -288,10 +288,6 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return this._chartWidget.element();
 	}
 
-	public setCursorStyle(style: string | null): void {
-		this._chartWidget.setCursorStyle(style);
-	}
-
 	private _addSeriesImpl<
 		TSeries extends SeriesType,
 		TData extends WhitespaceData = SeriesDataItemTypeMap[TSeries],

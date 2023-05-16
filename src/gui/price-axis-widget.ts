@@ -94,8 +94,6 @@ export class PriceAxisWidget implements IDestroyable {
 	private _sourceTopPaneViews: IPriceAxisViewsGetter;
 	private _sourceBottomPaneViews: IPriceAxisViewsGetter;
 
-	private _defaultCursorType: CursorType;
-
 	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternal>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
 		this._options = options;
@@ -151,7 +149,6 @@ export class PriceAxisWidget implements IDestroyable {
 				treatHorzTouchDragAsPageScroll: () => true,
 			}
 		);
-		this._defaultCursorType = CursorType.Default;
 	}
 
 	public destroy(): void {
@@ -335,10 +332,6 @@ export class PriceAxisWidget implements IDestroyable {
 	public update(): void {
 		// this call has side-effect - it regenerates marks on the price scale
 		this._priceScale?.marks();
-	}
-
-	public refreshCursorType(): void {
-		this._setCursor(this._defaultCursorType);
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {
@@ -671,9 +664,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _setCursor(type: CursorType): void {
-		this._defaultCursorType = type;
-		const override = this._pane.chart().getCursorOverrideStyle();
-		this._cell.style.cursor = override || (type === CursorType.NsResize ? 'ns-resize' : 'default');
+		this._cell.style.cursor = type === CursorType.NsResize ? 'ns-resize' : 'default';
 	}
 
 	private _onMarksChanged(): void {

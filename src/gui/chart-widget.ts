@@ -291,11 +291,6 @@ export class ChartWidget implements IDestroyable {
 		} else {
 			this.element().style.removeProperty('cursor');
 		}
-		this.timeAxisWidget().refreshCursorType();
-		this._paneWidgets.forEach((pw: PaneWidget) => {
-			pw.leftPriceAxisWidget()?.refreshCursorType();
-			pw.rightPriceAxisWidget()?.refreshCursorType();
-		});
 	}
 
 	public getCursorOverrideStyle(): string | null {
