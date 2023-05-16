@@ -6,7 +6,7 @@ import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
 import { VolumeFormatter } from '../formatters/volume-formatter';
 
-import { ensure, ensureNotNull } from '../helpers/assertions';
+import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { isInteger, merge } from '../helpers/strict-type-checks';
 
@@ -139,7 +139,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
 	private readonly _customPriceLines: CustomPriceLine[] = [];
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
-	private _paneView!: IUpdatablePaneView;
+	private _paneView!: IUpdatablePaneView | SeriesCustomPaneView;
 	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView | null = null;
 	private _barColorerCache: SeriesBarColorer<T> | null = null;
 	private readonly _options: SeriesOptionsInternal<T>;
@@ -148,7 +148,6 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _markersPaneView!: SeriesMarkersPaneView;
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
-	private _customPaneView: ICustomSeriesPaneView | null;
 
 	public constructor(model: ChartModel, options: SeriesOptionsInternal<T>, seriesType: T, pane?: Pane, customPaneView?: ICustomSeriesPaneView) {
 		super(model);
@@ -164,19 +163,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'> | Series<'Baseline'>);
 		}
 
-		this._customPaneView = customPaneView ?? null;
-
 		this._recreateFormatter();
 
-		this._recreatePaneViews();
+		this._recreatePaneViews(customPaneView);
 	}
 
 	public destroy(): void {
 		if (this._animationTimeoutId !== null) {
 			clearTimeout(this._animationTimeoutId);
-		}
-		if (this._customPaneView && this._customPaneView.destroy) {
-			this._customPaneView.destroy();
 		}
 	}
 
@@ -547,19 +541,21 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this._primitives = this._primitives.filter((wrapper: SeriesPrimitiveWrapper) => wrapper.primitive() !== source);
 	}
 
-	public customSeriesPlotValuesBuilder(): CustomDataToPlotRowValueConverter {
-		// eslint-disable-next-line @typescript-eslint/tslint/config
-		return data => {
-			return ensure(this._customPaneView).priceValueBuilder(data);
+	public customSeriesPlotValuesBuilder(): CustomDataToPlotRowValueConverter | undefined {
+		if (this._paneView instanceof SeriesCustomPaneView === false) {
+			return undefined;
+		}
+		return (data: CustomData | WhitespaceData) => {
+			return (this._paneView as SeriesCustomPaneView).priceValueBuilder(data);
 		};
 	}
 
 	public customSeriesWhitespaceCheck(): WhitespaceCheck | undefined {
-		if (this._customPaneView === null) {
+		if (this._paneView instanceof SeriesCustomPaneView === false) {
 			return undefined;
 		}
 		return (data: CustomData | WhitespaceData): data is WhitespaceData => {
-			return ensure(this._customPaneView).isWhitespace(data);
+			return (this._paneView as SeriesCustomPaneView).isWhitespace(data);
 		};
 	}
 
@@ -720,7 +716,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		});
 	}
 
-	private _recreatePaneViews(): void {
+	private _recreatePaneViews(customPaneView?: ICustomSeriesPaneView): void {
 		this._markersPaneView = new SeriesMarkersPaneView(this, this.model());
 
 		switch (this._seriesType) {
@@ -740,7 +736,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			}
 
 			case 'Custom': {
-				this._paneView = new SeriesCustomPaneView(this as Series<'Custom'>, this.model(), ensureNotNull(this._customPaneView));
+				this._paneView = new SeriesCustomPaneView(this as Series<'Custom'>, this.model(), ensureDefined(customPaneView));
 				break;
 			}
 

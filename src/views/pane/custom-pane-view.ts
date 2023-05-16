@@ -1,11 +1,14 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
+import { CustomData, WhitespaceData } from '../../api/data-consumer';
+
 import { undefinedIfNull } from '../../helpers/strict-type-checks';
 
 import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import {
 	CustomBarItemData,
+	CustomSeriesPricePlotValues,
 	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
 	PriceToCoordinateConverter,
@@ -76,6 +79,14 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 				return series.priceScale().priceToCoordinate(price, firstValue.value);
 			}
 		);
+	}
+
+	public priceValueBuilder(plotRow: CustomData | WhitespaceData): CustomSeriesPricePlotValues {
+		return this._paneView.priceValueBuilder(plotRow);
+	}
+
+	public isWhitespace(data: CustomData | WhitespaceData): data is WhitespaceData {
+		return this._paneView.isWhitespace(data);
 	}
 
 	protected _fillRawPoints(): void {
