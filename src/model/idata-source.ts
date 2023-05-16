@@ -1,3 +1,4 @@
+import { IAxisView } from '../views/pane/iaxis-view';
 import { IPaneView } from '../views/pane/ipane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
@@ -13,8 +14,8 @@ import { PriceScale } from './price-scale';
  */
 interface IPluginPaneViews {
 	bottomPaneViews?(pane: Pane): readonly IPaneView[];
-	pricePaneViews?(zOrder: SeriesPrimitivePaneViewZOrder, pane: Pane): readonly IPaneView[];
-	timePaneViews?(zOrder: SeriesPrimitivePaneViewZOrder, pane: Pane): readonly IPaneView[];
+	pricePaneViews?(zOrder: SeriesPrimitivePaneViewZOrder): readonly IAxisView[];
+	timePaneViews?(zOrder: SeriesPrimitivePaneViewZOrder): readonly IAxisView[];
 }
 
 interface IDataSourcePaneViews extends IPluginPaneViews {

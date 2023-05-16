@@ -25,12 +25,12 @@ import { TickMarkWeight } from '../model/time-data';
 import { TimeMark } from '../model/time-scale';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
-import { IPaneView } from '../views/pane/ipane-view';
+import { IAxisView } from '../views/pane/iaxis-view';
 
 import { createBoundCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { drawBackground, drawForeground, drawSourcePaneViews } from './draw-functions';
-import { IPaneViewsGetter } from './ipane-view-getter';
+import { ITimeAxisViewsGetter } from './iaxis-view-getters';
 import { MouseEventHandler, MouseEventHandlers, MouseEventHandlerTouchEvent, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
 
@@ -48,12 +48,12 @@ function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
 	return a.weight > b.weight ? a : b;
 }
 
-function buildTimePaneViewsGetter(zOrder: SeriesPrimitivePaneViewZOrder): IPaneViewsGetter {
-	return (source: IDataSource, pane: Pane): readonly IPaneView[] => source.timePaneViews?.(zOrder, pane) ?? [];
+function buildTimeAxisViewsGetter(zOrder: SeriesPrimitivePaneViewZOrder): ITimeAxisViewsGetter {
+	return (source: IDataSource): readonly IAxisView[] => source.timePaneViews?.(zOrder) ?? [];
 }
-const sourcePaneViews = buildTimePaneViewsGetter('normal');
-const sourceTopPaneViews = buildTimePaneViewsGetter('top');
-const sourceBottomPaneViews = buildTimePaneViewsGetter('bottom');
+const sourcePaneViews = buildTimeAxisViewsGetter('normal');
+const sourceTopPaneViews = buildTimeAxisViewsGetter('top');
+const sourceBottomPaneViews = buildTimeAxisViewsGetter('bottom');
 
 export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _chart: ChartWidget;
@@ -340,12 +340,12 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		this._setCursor(this._defaultCursorType);
 	}
 
-	private _drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
+	private _drawAdditionalSources(target: CanvasRenderingTarget2D, axisViewsGetter: ITimeAxisViewsGetter): void {
 		const sources = this._chart.model().serieses();
 
 		for (const source of sources) {
 			drawSourcePaneViews(
-				paneViewsGetter,
+				axisViewsGetter,
 				(renderer: IPaneRenderer) => drawBackground(renderer, target, false, undefined),
 				source,
 				undefined as unknown as Pane
@@ -354,7 +354,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 
 		for (const source of sources) {
 			drawSourcePaneViews(
-				paneViewsGetter,
+				axisViewsGetter,
 				(renderer: IPaneRenderer) => drawForeground(renderer, target, false, undefined),
 				source,
 				undefined as unknown as Pane
