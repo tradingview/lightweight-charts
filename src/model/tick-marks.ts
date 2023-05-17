@@ -1,4 +1,4 @@
-import { boundCompare } from '../helpers/algorithms';
+import { lowerBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
 import { OriginalTime, TickMarkWeight, TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
@@ -66,7 +66,7 @@ export class TickMarks {
 				weightsToClear.push(timeWeight);
 			} else {
 				marks.splice(
-					boundCompare(marks, sinceIndex, (tm: TickMark) => tm.index < sinceIndex, true),
+					lowerBound(marks, sinceIndex, (tm: TickMark) => tm.index < sinceIndex),
 					Infinity
 				);
 			}

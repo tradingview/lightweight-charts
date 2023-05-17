@@ -1,4 +1,4 @@
-import { boundCompare } from '../helpers/algorithms';
+import { lowerBound, upperBound } from '../helpers/algorithms';
 import { Nominal } from '../helpers/nominal';
 
 import { Coordinate } from './coordinate';
@@ -149,8 +149,8 @@ export function visibleTimedValues(items: TimedValue[], range: RangeImpl<TimePoi
 	const firstBar = range.left();
 	const lastBar = range.right();
 
-	const from = boundCompare<TimedValue, TimePointIndex>(items, firstBar, lowerBoundItemsCompare, true);
-	const to = boundCompare<TimedValue, TimePointIndex>(items, lastBar, upperBoundItemsCompare, false);
+	const from = lowerBound(items, firstBar, lowerBoundItemsCompare);
+	const to = upperBound(items, lastBar, upperBoundItemsCompare);
 
 	if (!extendedRange) {
 		return { from, to };

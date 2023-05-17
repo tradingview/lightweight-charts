@@ -6,11 +6,11 @@ export type BoundComparatorType<TArrayElementType, TValueType> = (a: TArrayEleme
  * The function shall not modify any of its arguments.
  */
 
-export function boundCompare<TArrayElementType, TValueType>(
+function boundCompare<TArrayElementType, TValueType>(
+	lower: boolean,
 	arr: readonly TArrayElementType[],
 	value: TValueType,
 	compare: BoundComparatorType<TArrayElementType, TValueType>,
-	lower: boolean,
 	start: number = 0,
 	to: number = arr.length): number {
 	let count: number = to - start;
@@ -27,3 +27,14 @@ export function boundCompare<TArrayElementType, TValueType>(
 
 	return start;
 }
+
+type BoundCompareFunctionDefinition = <TArrayElementType, TValueType>(
+	arr: readonly TArrayElementType[],
+	value: TValueType,
+	compare: BoundComparatorType<TArrayElementType, TValueType>,
+	start?: number,
+	to?: number
+) => number;
+
+export const lowerBound = boundCompare.bind(null, true) as BoundCompareFunctionDefinition;
+export const upperBound = boundCompare.bind(null, false) as BoundCompareFunctionDefinition;
