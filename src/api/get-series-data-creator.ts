@@ -28,11 +28,14 @@ type SeriesPlotRowToDataMap = {
 };
 
 function singleValueData(plotRow: PlotRow): SingleValueData {
-	return {
+	const data: SingleValueData = {
 		value: plotRow.value[PlotRowValueIndex.Close],
 		time: plotRow.originalTime as unknown as Time,
-		...(plotRow.customValues ? { customValues: plotRow.customValues } : {}),
 	};
+	if (plotRow.customValues !== undefined) {
+		data.customValues = plotRow.customValues;
+	}
+	return data;
 }
 
 function lineData(plotRow: LinePlotRow): LineData {
@@ -94,14 +97,17 @@ function baselineData(plotRow: BaselinePlotRow): BaselineData {
 }
 
 function ohlcData(plotRow: PlotRow): OhlcData {
-	return {
+	const data: OhlcData = {
 		open: plotRow.value[PlotRowValueIndex.Open],
 		high: plotRow.value[PlotRowValueIndex.High],
 		low: plotRow.value[PlotRowValueIndex.Low],
 		close: plotRow.value[PlotRowValueIndex.Close],
 		time: plotRow.originalTime as unknown as Time,
-		...(plotRow.customValues ? { customValues: plotRow.customValues } : {}),
 	};
+	if (plotRow.customValues !== undefined) {
+		data.customValues = plotRow.customValues;
+	}
+	return data;
 }
 
 function barData(plotRow: BarPlotRow): BarData {
