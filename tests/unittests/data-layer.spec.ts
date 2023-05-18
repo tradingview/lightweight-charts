@@ -702,6 +702,53 @@ describe('DataLayer', () => {
 				}
 			});
 		});
+
+		it('should be able to replace data including customValues with whitespace', () => {
+			const dataLayer = new DataLayer();
+
+			const series = createSeriesMock();
+
+			dataLayer.setSeriesData(series, [
+				dataItemAt(1000 as UTCTimestamp),
+				dataItemAt(4000 as UTCTimestamp),
+				{
+					...dataItemAt(5000 as UTCTimestamp),
+					customValues: {
+						testValue: 1234,
+					},
+				},
+			]);
+
+			const updateResult = dataLayer.updateSeriesData(series, whitespaceItemAt(5000 as UTCTimestamp));
+
+			expect(updateResult.timeScale.baseIndex).to.be.equal(1 as TimePointIndex);
+			expect(updateResult.timeScale.points).to.be.equal(undefined);
+			expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(undefined);
+
+			expect(updateResult.series.size).to.be.equal(1);
+
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
+			expect(seriesUpdate).not.to.be.equal(undefined);
+			expect(seriesUpdate.data.length).to.be.equal(2);
+
+			expect(seriesUpdate.data[0].index).to.be.equal(0 as TimePointIndex);
+			expect(seriesUpdate.data[0].time.timestamp).to.be.equal(1000 as UTCTimestamp);
+
+			expect(seriesUpdate.data[1].index).to.be.equal(1 as TimePointIndex);
+			expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+
+			// Update the last item from whitespace back to a normal data item (without customValue)
+			const updateResultTwo = dataLayer.updateSeriesData(series, dataItemAt(5000 as UTCTimestamp));
+			updateResultTwo.series.forEach((seriesUpdateTwo: SeriesChanges, updatedSeries: Series) => {
+				expect(seriesUpdateTwo.data.length).to.be.equal(3);
+
+				if (updatedSeries === series) {
+					expect(seriesUpdateTwo.data[2].index).to.be.equal(2 as TimePointIndex);
+					expect(seriesUpdateTwo.data[2].time.timestamp).to.be.equal(5000 as UTCTimestamp);
+					expect(seriesUpdateTwo.data[2].customValues).to.be.equal(undefined);
+				}
+			});
+		});
 	});
 
 	describe('whitespaces', () => {
