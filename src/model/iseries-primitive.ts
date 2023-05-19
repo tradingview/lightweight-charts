@@ -201,13 +201,13 @@ export interface ISeriesPrimitiveBase<TSeriesAttachedParameters = unknown> {
 	 * @param param - An object containing useful references for the attached primitive to use.
 	 * @returns void
 	 */
-	attached?: (param: TSeriesAttachedParameters) => void;
+	attached?(param: TSeriesAttachedParameters): void;
 	/**
 	 * Detached Lifecycle hook.
 	 *
 	 * @returns void
 	 */
-	detached?: () => void;
+	detached?(): void;
 
 	/**
 	 * Hit test method which will be called by the library when the cursor is moved.

@@ -15,7 +15,7 @@ import { Range, Time } from '../model/time-data';
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { ISeriesPrimitive } from './series-api';
+import { ISeriesPrimitive } from './iseries-primitive-api';
 
 /**
  * The extent of the data change.
