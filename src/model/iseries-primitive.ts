@@ -1,9 +1,6 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { type IChartApi } from '../api/ichart-api';
-import { type ISeriesApi } from '../api/iseries-api';
-
-import { AutoscaleInfo, type SeriesType } from './series-options';
+import { AutoscaleInfo } from './series-options';
 import { Logical } from './time-data';
 
 /**
@@ -104,25 +101,6 @@ export interface ISeriesPrimitivePaneView {
 }
 
 /**
- * Object containing references to the chart and series instances, and a requestUpdate method for triggering
- * a refresh of the chart.
- */
-export interface SeriesAttachedParameter {
-	/**
-	 * Chart instance
-	 */
-	chart: IChartApi;
-	/**
-	 * Series to which the Primitive is attached
-	 */
-	series: ISeriesApi<SeriesType>;
-	/**
-	 * Request an update (redraw the chart)
-	 */
-	requestUpdate: () => void;
-}
-
-/**
  * Data representing the currently hovered object from the Hit test.
  */
 export interface PrimitiveHoveredItem {
@@ -144,7 +122,7 @@ export interface PrimitiveHoveredItem {
 /**
  * Base interface for series primitives. It must be implemented to add some external graphics to series
  */
-export interface ISeriesPrimitive {
+export interface ISeriesPrimitiveBase<TSeriesAttachedParameters = unknown> {
 	/**
 	 * This method is called when viewport has been changed, so primitive have to recalculate / invalidate its data
 	 */
@@ -223,7 +201,7 @@ export interface ISeriesPrimitive {
 	 * @param param - An object containing useful references for the attached primitive to use.
 	 * @returns void
 	 */
-	attached?: (param: SeriesAttachedParameter) => void;
+	attached?: (param: TSeriesAttachedParameters) => void;
 	/**
 	 * Detached Lifecycle hook.
 	 *

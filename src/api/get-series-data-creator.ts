@@ -1,3 +1,4 @@
+import { CustomData } from '../model/icustom-series';
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import {
 	AreaPlotRow,
@@ -16,7 +17,6 @@ import {
 	BarData,
 	BaselineData,
 	CandlestickData,
-	CustomData,
 	LineData,
 	OhlcData,
 	SeriesDataItemTypeMap,

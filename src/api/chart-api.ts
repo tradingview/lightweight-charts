@@ -6,7 +6,7 @@ import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
-import { ICustomSeriesPaneView } from '../model/icustom-series';
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
@@ -30,7 +30,7 @@ import {
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
 
-import { CustomData, DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';

@@ -1,5 +1,6 @@
 import { isNumber, isString } from '../helpers/strict-type-checks';
 
+import { CustomData, CustomSeriesWhitespaceData } from '../model/icustom-series';
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
 import { BusinessDay, Time, UTCTimestamp } from '../model/time-data';
@@ -188,21 +189,6 @@ export interface CandlestickData extends OhlcData {
 	wickColor?: string;
 }
 
-/**
- * Base structure describing a single item of data for a custom series.
- *
- * This type allows for any properties to be defined
- * within the interface. It is recommended that you extend this interface with
- * the required data structure.
- */
-export interface CustomData extends WhitespaceData {
-	/**
-	 * If defined then this color will be used for the price line and price scale line
-	 * for this specific data item of the custom series.
-	 */
-	color?: string;
-}
-
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
@@ -249,7 +235,7 @@ export interface SeriesDataItemTypeMap {
 	/**
 	 * The base types of an custom series data.
 	 */
-	Custom: CustomData | WhitespaceData;
+	Custom: CustomData | CustomSeriesWhitespaceData;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {

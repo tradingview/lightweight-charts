@@ -1,7 +1,7 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
-import { ICustomSeriesPaneView } from '../model/icustom-series';
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { Point } from '../model/point';
 import {
 	AreaSeriesPartialOptions,
@@ -17,7 +17,7 @@ import {
 import { Logical, Time } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { BarData, CustomData, HistogramData, LineData, WhitespaceData } from './data-consumer';
+import { BarData, HistogramData, LineData, WhitespaceData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';

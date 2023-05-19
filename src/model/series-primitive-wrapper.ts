@@ -10,8 +10,8 @@ import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { Coordinate } from './coordinate';
 import {
-	ISeriesPrimitive,
 	ISeriesPrimitiveAxisView,
+	ISeriesPrimitiveBase,
 	ISeriesPrimitivePaneRenderer,
 	ISeriesPrimitivePaneView,
 	PrimitiveHoveredItem,
@@ -150,8 +150,8 @@ class SeriesPrimitivePriceAxisViewWrapper extends PriceAxisView {
 	}
 }
 
-export class SeriesPrimitiveWrapper {
-	private readonly _primitive: ISeriesPrimitive;
+export class SeriesPrimitiveWrapper<TSeriesAttachedParameters = unknown> {
+	private readonly _primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>;
 	private readonly _series: Series;
 	private _paneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 	private _timeAxisViewsCache: RendererCache<readonly ISeriesPrimitiveAxisView[], readonly SeriesPrimitiveTimeAxisViewWrapper[]> | null = null;
@@ -159,12 +159,12 @@ export class SeriesPrimitiveWrapper {
 	private _priceAxisPaneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 	private _timeAxisPaneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 
-	public constructor(primitive: ISeriesPrimitive, series: Series) {
+	public constructor(primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>, series: Series) {
 		this._primitive = primitive;
 		this._series = series;
 	}
 
-	public primitive(): ISeriesPrimitive {
+	public primitive(): ISeriesPrimitiveBase<TSeriesAttachedParameters> {
 		return this._primitive;
 	}
 

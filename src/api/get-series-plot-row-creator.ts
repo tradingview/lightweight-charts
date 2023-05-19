@@ -1,11 +1,12 @@
 import { ensureDefined } from '../helpers/assertions';
 
+import { CustomData } from '../model/icustom-series';
 import { PlotRow, PlotRowValue } from '../model/plot-data';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { OriginalTime, TimePoint, TimePointIndex } from '../model/time-data';
 
-import { AreaData, BarData, BaselineData, CandlestickData, CustomData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
+import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
 
 function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;

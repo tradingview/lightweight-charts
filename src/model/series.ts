@@ -1,6 +1,3 @@
-import { CustomData, WhitespaceData } from '../api/data-consumer';
-import { CustomDataToPlotRowValueConverter, WhitespaceCheck } from '../api/get-series-plot-row-creator';
-
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
@@ -34,9 +31,9 @@ import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
-import { ICustomSeriesPaneView } from './icustom-series';
+import { CustomData, CustomSeriesWhitespaceData, ICustomSeriesPaneView, WhitespaceCheck } from './icustom-series';
 import { FirstValue } from './iprice-data-source';
-import { ISeriesPrimitive, PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
+import { ISeriesPrimitiveBase, PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
 import { MismatchDirection } from './plot-list';
@@ -85,6 +82,8 @@ function primitivePricePaneViewsExtractor(wrapper: SeriesPrimitiveWrapper): read
 function primitiveTimePaneViewsExtractor(wrapper: SeriesPrimitiveWrapper): readonly ISeriesPrimitivePaneViewWrapper[] {
 	return wrapper.timeAxisPaneViews();
 }
+
+type CustomDataToPlotRowValueConverter = (item: CustomData | CustomSeriesWhitespaceData) => number[];
 
 export interface LastValueDataResultWithoutData {
 	noData: true;
@@ -542,11 +541,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._options.visible;
 	}
 
-	public attachPrimitive(primitive: ISeriesPrimitive): void {
+	public attachPrimitive(primitive: ISeriesPrimitiveBase): void {
 		this._primitives.push(new SeriesPrimitiveWrapper(primitive, this));
 	}
 
-	public detachPrimitive(source: ISeriesPrimitive): void {
+	public detachPrimitive(source: ISeriesPrimitiveBase): void {
 		this._primitives = this._primitives.filter((wrapper: SeriesPrimitiveWrapper) => wrapper.primitive() !== source);
 	}
 
@@ -554,7 +553,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		if (this._paneView instanceof SeriesCustomPaneView === false) {
 			return undefined;
 		}
-		return (data: CustomData | WhitespaceData) => {
+		return (data: CustomData | CustomSeriesWhitespaceData) => {
 			return (this._paneView as SeriesCustomPaneView).priceValueBuilder(data);
 		};
 	}
@@ -563,7 +562,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		if (this._paneView instanceof SeriesCustomPaneView === false) {
 			return undefined;
 		}
-		return (data: CustomData | WhitespaceData): data is WhitespaceData => {
+		return (data: CustomData | CustomSeriesWhitespaceData): data is CustomSeriesWhitespaceData => {
 			return (this._paneView as SeriesCustomPaneView).isWhitespace(data);
 		};
 	}

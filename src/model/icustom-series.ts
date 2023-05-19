@@ -1,10 +1,41 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { CustomData, WhitespaceData } from '../api/data-consumer';
-
 import { Coordinate } from './coordinate';
 import { CustomSeriesOptions } from './series-options';
-import { Range } from './time-data';
+import { Range, Time } from './time-data';
+
+/**
+ * Represents a whitespace data item, which is a data point without a value.
+ */
+export interface CustomSeriesWhitespaceData {
+	/**
+	 * The time of the data.
+	 */
+	time: Time;
+
+	/**
+	 * Additional custom values which will be ignored by the library, but
+	 * could be used by plugins.
+	 */
+	customValues?: Record<string, unknown>;
+}
+
+/**
+ * Base structure describing a single item of data for a custom series.
+ *
+ * This type allows for any properties to be defined
+ * within the interface. It is recommended that you extend this interface with
+ * the required data structure.
+ */
+export interface CustomData extends CustomSeriesWhitespaceData {
+	/**
+	 * If defined then this color will be used for the price line and price scale line
+	 * for this specific data item of the custom series.
+	 */
+	color?: string;
+}
+
+export type WhitespaceCheck<TData extends CustomData = CustomData> = (bar: TData | CustomSeriesWhitespaceData) => bar is CustomSeriesWhitespaceData;
 
 /**
  * Renderer data for an item within the custom series.
@@ -130,7 +161,7 @@ export interface ICustomSeriesPaneView<
 	 *
 	 * @param data - data point to be tested
 	 */
-	isWhitespace(data: TData | WhitespaceData): data is WhitespaceData;
+	isWhitespace(data: TData | CustomSeriesWhitespaceData): data is CustomSeriesWhitespaceData;
 
 	/**
 	 * Default options

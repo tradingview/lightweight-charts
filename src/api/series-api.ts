@@ -7,7 +7,7 @@ import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
-import { ISeriesPrimitive } from '../model/iseries-primitive';
+import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
@@ -33,6 +33,30 @@ import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, DataChangedHandler, DataChangedScope, ISeriesApi } from './iseries-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
+
+/**
+ * Object containing references to the chart and series instances, and a requestUpdate method for triggering
+ * a refresh of the chart.
+ */
+export interface SeriesAttachedParameter<TSeriesType extends SeriesType = keyof SeriesOptionsMap> {
+	/**
+	 * Chart instance.
+	 */
+	chart: IChartApi;
+	/**
+	 * Series to which the Primitive is attached.
+	 */
+	series: ISeriesApi<TSeriesType>;
+	/**
+	 * Request an update (redraw the chart)
+	 */
+	requestUpdate: () => void;
+}
+
+/**
+ * Interface for series primitives. It must be implemented to add some external graphics to series.
+ */
+export type ISeriesPrimitive = ISeriesPrimitiveBase<SeriesAttachedParameter<SeriesType>>;
 
 export class SeriesApi<
 	TSeriesType extends SeriesType,
@@ -222,7 +246,9 @@ export class SeriesApi<
 	}
 
 	public attachPrimitive(primitive: ISeriesPrimitive): void {
-		this._series.attachPrimitive(primitive);
+		// at this point we cast the generic to unknown because we
+		// don't want the model to know the types of the API (◑_◑)
+		this._series.attachPrimitive(primitive as ISeriesPrimitiveBase<unknown>);
 		if (primitive.attached) {
 			primitive.attached({
 				chart: this._chartApi,
@@ -233,7 +259,7 @@ export class SeriesApi<
 	}
 
 	public detachPrimitive(primitive: ISeriesPrimitive): void {
-		this._series.detachPrimitive(primitive);
+		this._series.detachPrimitive(primitive as ISeriesPrimitiveBase<unknown>);
 		if (primitive.detached) {
 			primitive.detached();
 		}
