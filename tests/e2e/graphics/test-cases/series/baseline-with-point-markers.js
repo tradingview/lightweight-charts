@@ -1,7 +1,7 @@
 function generateData() {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (let i = 0; i < 50; ++i) {
+	for (let i = 0; i < 10; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
 			value: i * (-1),
@@ -10,28 +10,28 @@ function generateData() {
 		time.setUTCDate(time.getUTCDate() + 1);
 	}
 
-	for (let i = 0; i < 100; ++i) {
+	for (let i = 0; i < 20; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
-			value: -50 + i,
+			value: -10 + i,
 		});
 
 		time.setUTCDate(time.getUTCDate() + 1);
 	}
 
-	for (let i = 0; i < 100; ++i) {
+	for (let i = 0; i < 20; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
-			value: 50 - i,
+			value: 10 - i,
 		});
 
 		time.setUTCDate(time.getUTCDate() + 1);
 	}
 
-	for (let i = 0; i < 100; ++i) {
+	for (let i = 0; i < 20; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
-			value: -50 + i,
+			value: -10 + i,
 		});
 
 		time.setUTCDate(time.getUTCDate() + 1);

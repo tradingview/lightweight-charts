@@ -13,7 +13,11 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = (window.chart = LightweightCharts.createChart(container, {
+		timeScale: {
+			barSpacing: 12,
+		},
+	}));
 
 	const mainSeries = chart.addAreaSeries({ pointMarkersVisible: true });
 
