@@ -14,12 +14,10 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 
-import { ChartModel, HoveredObject, TrackingModeExitMode } from '../model/chart-model';
+import { ChartModel, TrackingModeExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { IPriceDataSource } from '../model/iprice-data-source';
-import { PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
 import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
@@ -33,6 +31,7 @@ import { ChartWidget } from './chart-widget';
 import { drawBackground, drawForeground, DrawFunction, drawSourcePaneViews } from './draw-functions';
 import { IPaneViewsGetter } from './ipane-view-getter';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
+import { hitTestPane, HitTestResult } from './pane-hit-test';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 
 const enum KineticScrollConstants {
@@ -53,59 +52,6 @@ function sourceLabelPaneViews(source: IDataSource, pane: Pane): readonly IPaneVi
 }
 function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
 	return source.topPaneViews?.(pane) ?? [];
-}
-
-// returns true if item is above reference
-function comparePrimitiveZOrder(item: SeriesPrimitivePaneViewZOrder, reference?: SeriesPrimitivePaneViewZOrder): boolean {
-	return (!reference || (item === 'top' && reference !== 'top') || (item === 'normal' && reference === 'bottom'));
-}
-
-interface BestPrimitiveHit {
-	hit: PrimitiveHoveredItem;
-	source: IPriceDataSource;
-}
-
-function findBestPrimitiveHitTest(sources: readonly IPriceDataSource[], x: Coordinate, y: Coordinate): BestPrimitiveHit | null {
-	let bestPrimitiveHit: PrimitiveHoveredItem | undefined;
-	let bestHitSource: IPriceDataSource | undefined;
-	for (const source of sources) {
-		const primitiveHitResults = source.primitiveHitTest?.(x, y) ?? [];
-		for (const hitResult of primitiveHitResults) {
-			if (comparePrimitiveZOrder(hitResult.zOrder, bestPrimitiveHit?.zOrder)) {
-				bestPrimitiveHit = hitResult;
-				bestHitSource = source;
-			}
-		}
-	}
-	if (!bestPrimitiveHit || !bestHitSource) {
-		return null;
-	}
-	return {
-		hit: bestPrimitiveHit,
-		source: bestHitSource,
-	};
-}
-
-function convertPrimitiveHitResult(primitiveHit: BestPrimitiveHit): HitTestResult {
-	return {
-		source: primitiveHit.source,
-		object: {
-			externalId: primitiveHit.hit.externalId,
-		},
-		cursorStyle: primitiveHit.hit.cursorStyle,
-	};
-}
-
-interface HitTestResult {
-	source: IPriceDataSource;
-	object?: HoveredObject;
-	view?: IPaneView;
-	cursorStyle?: string;
-}
-
-interface HitTestPaneViewResult {
-	view: IPaneView;
-	object?: HoveredObject;
 }
 
 interface StartScrollPosition extends Point {
@@ -425,32 +371,12 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HitTestResult | null {
-		this._chart.setCursorStyle(null);
 		const state = this._state;
 		if (state === null) {
 			return null;
 		}
 
-		const sources = state.orderedSources();
-		const bestPrimitiveHit = findBestPrimitiveHitTest(sources, x, y);
-		if (bestPrimitiveHit?.hit.zOrder === 'top') {
-			return convertPrimitiveHitResult(bestPrimitiveHit);
-		}
-		for (const source of sources) {
-			const sourceResult = this._hitTestPaneView(source.paneViews(state), x, y);
-			if (sourceResult !== null) {
-				return {
-					source: source,
-					view: sourceResult.view,
-					object: sourceResult.object,
-				};
-			}
-		}
-		if (bestPrimitiveHit?.hit) {
-			return convertPrimitiveHitResult(bestPrimitiveHit);
-		}
-
-		return null;
+		return hitTestPane(state, x, y);
 	}
 
 	public setPriceAxisSize(width: number, position: PriceAxisWidgetSide): void {
@@ -643,23 +569,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		const drawRendererFn = (renderer: IPaneRenderer) => drawFn(renderer, target, isHovered, objecId);
 		drawSourcePaneViews(paneViewsGetter, drawRendererFn, source, state);
-	}
-
-	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
-		for (const paneView of paneViews) {
-			const renderer = paneView.renderer();
-			if (renderer !== null && renderer.hitTest) {
-				const result = renderer.hitTest(x, y);
-				if (result !== null) {
-					return {
-						view: paneView,
-						object: result,
-					};
-				}
-			}
-		}
-
-		return null;
 	}
 
 	private _recreatePriceAxisWidgets(): void {

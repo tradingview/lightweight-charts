@@ -117,6 +117,10 @@ export interface PrimitiveHoveredItem {
 	 * The zOrder of the hovered item.
 	 */
 	zOrder: SeriesPrimitivePaneViewZOrder;
+	/**
+	 * Set to true if the object is rendered using `drawBackground` instead of `draw`.
+	 */
+	isBackground?: boolean;
 }
 
 /**
