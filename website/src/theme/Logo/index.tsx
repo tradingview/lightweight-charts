@@ -10,7 +10,7 @@ export interface LogoProps extends ComponentPropsWithoutRef<'a'> {
 	readonly titleClassName?: string;
 }
 
-function Logo(props: LogoProps): JSX.Element {
+function Logo(props: LogoProps): React.JSX.Element {
 	const { titleClassName, imageClassName, ...propsRest } = props;
 	const {
 		navbar: {
