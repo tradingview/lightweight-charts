@@ -14,6 +14,6 @@ export interface Props {
  * This results in a very long animation if revealing a lot of content
  * such as a code block.
  */
-export default function InstantDetails({ children }: Props): JSX.Element {
+export default function InstantDetails({ children }: Props): React.JSX.Element {
 	return <details className={clsx(styles.details)}>{children}</details>;
 }

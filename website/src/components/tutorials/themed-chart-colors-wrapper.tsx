@@ -42,7 +42,7 @@ export function useThemedChartColors(): ThemedChartColors {
 	return colors;
 }
 
-export function ThemedChart(props: ThemedChartProps): JSX.Element {
+export function ThemedChart(props: ThemedChartProps): React.JSX.Element {
 	const { ChartComponent } = props;
 	const colors = useThemedChartColors();
 

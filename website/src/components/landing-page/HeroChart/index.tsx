@@ -65,7 +65,7 @@ function useThemeAwareLayoutOptions(): DeepPartial<LayoutOptions> {
 	return layoutOptions;
 }
 
-function Chart(): JSX.Element {
+function Chart(): React.JSX.Element {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const layout = useThemeAwareLayoutOptions();
 	const [chart, setChart] = React.useState<IChartApi | null>(null);
@@ -220,7 +220,7 @@ function Chart(): JSX.Element {
 
 export default function HeroChart(props: {
 	codeBlocks: CodeBlockProps[];
-}): JSX.Element {
+}): React.JSX.Element {
 	return (
 		<section className={styles.HeroChartSection}>
 			<div className={styles.HeroChartGradient}></div>
