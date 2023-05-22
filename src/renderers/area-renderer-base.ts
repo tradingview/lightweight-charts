@@ -69,7 +69,7 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		// walk lines with width=1 to have more accurate gradient's filling
 		ctx.lineWidth = 1;
 
-		walkLine(renderingScope, items, lineType, undefined, visibleRange, barWidth, this._fillStyle.bind(this), finishStyledArea.bind(null, baseLevelCoordinate));
+		walkLine(renderingScope, items, lineType, visibleRange, barWidth, this._fillStyle.bind(this), finishStyledArea.bind(null, baseLevelCoordinate));
 	}
 
 	protected abstract _fillStyle(renderingScope: BitmapCoordinatesRenderingScope, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];

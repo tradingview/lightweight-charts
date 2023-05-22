@@ -5,6 +5,7 @@ import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
+import { drawSeriesPointMarkers } from './draw-series-point-markers';
 import { walkLine } from './walk-line';
 
 export type LineItemBase = TimedValue & PricedValue & LinePoint;
@@ -59,7 +60,13 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 
 		const styleGetter = this._strokeStyle.bind(this);
 
-		walkLine(renderingScope, items, lineType, pointMarkersRadius, visibleRange, barWidth, styleGetter, finishStyledArea);
+		if (lineType !== undefined) {
+			walkLine(renderingScope, items, lineType, visibleRange, barWidth, styleGetter, finishStyledArea);
+		}
+
+		if (pointMarkersRadius) {
+			drawSeriesPointMarkers(renderingScope, items, pointMarkersRadius, visibleRange, styleGetter);
+		}
 	}
 
 	protected abstract _strokeStyle(renderingScope: BitmapCoordinatesRenderingScope, item: TData['items'][0]): CanvasRenderingContext2D['strokeStyle'];

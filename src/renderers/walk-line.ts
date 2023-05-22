@@ -9,8 +9,7 @@ import { LinePoint, LineType } from './draw-line';
 export function walkLine<TItem extends LinePoint, TStyle extends CanvasRenderingContext2D['fillStyle'] | CanvasRenderingContext2D['strokeStyle']>(
 	renderingScope: BitmapCoordinatesRenderingScope,
 	items: readonly TItem[],
-	lineType: LineType | undefined,
-	pointMarkersRadius: number | undefined,
+	lineType: LineType,
 	visibleRange: SeriesItemsIndexesRange,
 	barWidth: number,
 	// the values returned by styleGetter are compared using the operator !==,
@@ -24,111 +23,77 @@ export function walkLine<TItem extends LinePoint, TStyle extends CanvasRendering
 
 	const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = renderingScope;
 
-	if (lineType !== undefined) {
-		const firstItem = items[visibleRange.from];
-		let currentStyle = styleGetter(renderingScope, firstItem);
-		let currentStyleFirstItem = firstItem;
+	const firstItem = items[visibleRange.from];
+	let currentStyle = styleGetter(renderingScope, firstItem);
+	let currentStyleFirstItem = firstItem;
 
-		if (visibleRange.to - visibleRange.from < 2) {
-			const halfBarWidth = barWidth / 2;
+	if (visibleRange.to - visibleRange.from < 2) {
+		const halfBarWidth = barWidth / 2;
 
-			ctx.beginPath();
+		ctx.beginPath();
 
-			const item1: LinePoint = { x: firstItem.x - halfBarWidth as Coordinate, y: firstItem.y };
-			const item2: LinePoint = { x: firstItem.x + halfBarWidth as Coordinate, y: firstItem.y };
+		const item1: LinePoint = { x: firstItem.x - halfBarWidth as Coordinate, y: firstItem.y };
+		const item2: LinePoint = { x: firstItem.x + halfBarWidth as Coordinate, y: firstItem.y };
 
-			ctx.moveTo(item1.x * horizontalPixelRatio, item1.y * verticalPixelRatio);
-			ctx.lineTo(item2.x * horizontalPixelRatio, item2.y * verticalPixelRatio);
+		ctx.moveTo(item1.x * horizontalPixelRatio, item1.y * verticalPixelRatio);
+		ctx.lineTo(item2.x * horizontalPixelRatio, item2.y * verticalPixelRatio);
 
-			finishStyledArea(renderingScope, currentStyle, item1, item2);
-		} else {
-			const changeStyle = (newStyle: TStyle, currentItem: TItem) => {
-				finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
-
-				ctx.beginPath();
-				currentStyle = newStyle;
-				currentStyleFirstItem = currentItem;
-			};
-
-			let currentItem = currentStyleFirstItem;
+		finishStyledArea(renderingScope, currentStyle, item1, item2);
+	} else {
+		const changeStyle = (newStyle: TStyle, currentItem: TItem) => {
+			finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
 
 			ctx.beginPath();
-			ctx.moveTo(firstItem.x * horizontalPixelRatio, firstItem.y * verticalPixelRatio);
+			currentStyle = newStyle;
+			currentStyleFirstItem = currentItem;
+		};
 
-			for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
-				currentItem = items[i];
-				const itemStyle = styleGetter(renderingScope, currentItem);
+		let currentItem = currentStyleFirstItem;
 
-				switch (lineType) {
-					case LineType.Simple:
-						ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
-						break;
-					case LineType.WithSteps:
+		ctx.beginPath();
+		ctx.moveTo(firstItem.x * horizontalPixelRatio, firstItem.y * verticalPixelRatio);
+
+		for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
+			currentItem = items[i];
+			const itemStyle = styleGetter(renderingScope, currentItem);
+
+			switch (lineType) {
+				case LineType.Simple:
+					ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
+					break;
+				case LineType.WithSteps:
+					ctx.lineTo(currentItem.x * horizontalPixelRatio, items[i - 1].y * verticalPixelRatio);
+
+					if (itemStyle !== currentStyle) {
+						changeStyle(itemStyle, currentItem);
 						ctx.lineTo(currentItem.x * horizontalPixelRatio, items[i - 1].y * verticalPixelRatio);
-
-						if (itemStyle !== currentStyle) {
-							changeStyle(itemStyle, currentItem);
-							ctx.lineTo(currentItem.x * horizontalPixelRatio, items[i - 1].y * verticalPixelRatio);
-						}
-
-						ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
-						break;
-					case LineType.Curved: {
-						const [cp1, cp2] = getControlPoints(items, i - 1, i);
-						ctx.bezierCurveTo(
-							cp1.x * horizontalPixelRatio,
-							cp1.y * verticalPixelRatio,
-							cp2.x * horizontalPixelRatio,
-							cp2.y * verticalPixelRatio,
-							currentItem.x * horizontalPixelRatio,
-							currentItem.y * verticalPixelRatio
-						);
-						break;
 					}
-				}
 
-				if (lineType !== LineType.WithSteps && itemStyle !== currentStyle) {
-					changeStyle(itemStyle, currentItem);
-					ctx.moveTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
+					ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
+					break;
+				case LineType.Curved: {
+					const [cp1, cp2] = getControlPoints(items, i - 1, i);
+					ctx.bezierCurveTo(
+						cp1.x * horizontalPixelRatio,
+						cp1.y * verticalPixelRatio,
+						cp2.x * horizontalPixelRatio,
+						cp2.y * verticalPixelRatio,
+						currentItem.x * horizontalPixelRatio,
+						currentItem.y * verticalPixelRatio
+					);
+					break;
 				}
 			}
 
-			if (currentStyleFirstItem !== currentItem || currentStyleFirstItem === currentItem && lineType === LineType.WithSteps) {
-				finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
-			}
-		}
-	}
-
-	let prevStyle: TStyle | null = null;
-
-	if (pointMarkersRadius) {
-		const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
-		const correction = (tickWidth % 2) / 2;
-
-		const radius = pointMarkersRadius * verticalPixelRatio + correction;
-		for (let i = visibleRange.to - 1; i >= visibleRange.from; --i) {
-			const point = items[i];
-			if (point) {
-				const style = styleGetter(renderingScope, point);
-				if (style !== prevStyle) {
-					ctx.beginPath();
-					if (prevStyle !== null) {
-						ctx.fill();
-					}
-
-					ctx.fillStyle = style;
-					prevStyle = style;
-				}
-
-				const centerX = Math.round(point.x * horizontalPixelRatio) + correction; // correct x coordinate only
-				const centerY = point.y * verticalPixelRatio;
-
-				ctx.moveTo(centerX, centerY);
-				ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+			if (lineType !== LineType.WithSteps && itemStyle !== currentStyle) {
+				changeStyle(itemStyle, currentItem);
+				ctx.moveTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
 			}
 		}
 
-		ctx.fill();
+		if (currentStyleFirstItem !== currentItem || currentStyleFirstItem === currentItem && lineType === LineType.WithSteps) {
+			finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
+		}
 	}
 }
 
