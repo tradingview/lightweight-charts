@@ -8,9 +8,9 @@ import styles from './hero.module.css';
 export default function Hero(props: {
 	ctaLinks: CTALink[];
 	codeBlocks?: CodeBlockProps[];
-	header: string | JSX.Element;
-	paragraph: string | JSX.Element;
-}): JSX.Element {
+	header: string | React.JSX.Element;
+	paragraph: string | React.JSX.Element;
+}): React.JSX.Element {
 	const { header, paragraph, ctaLinks, codeBlocks } = props;
 	return (
 		<section className={styles.HeroContainer}>

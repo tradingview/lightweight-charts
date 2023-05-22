@@ -9,7 +9,7 @@ interface Props {
 	frontPage?: boolean;
 }
 
-export default function DocCardList({ items, className, frontPage = false }: Props): JSX.Element {
+export default function DocCardList({ items, className, frontPage = false }: Props): React.JSX.Element {
 	return (
      <section className={clsx('row', className)}>
        {items.map((item: CardLinkItem, index: number) => (

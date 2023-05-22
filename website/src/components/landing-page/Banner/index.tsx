@@ -6,7 +6,7 @@ export default function Banner(props: {
 	text: string;
 	link: string;
 	linkText: string;
-}): JSX.Element {
+}): React.JSX.Element {
 	return (
 		<a className={styles.Banner} href={props.link}>
 			<div className={styles.BannerContent}>{props.text}</div>
