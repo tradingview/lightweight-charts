@@ -750,6 +750,7 @@ export class ChartModel implements IDestroyable {
 
 		// to avoid memleaks
 		this._options.localization.priceFormatter = undefined;
+		this._options.localization.percentageFormatter = undefined;
 		this._options.localization.timeFormatter = undefined;
 	}
 

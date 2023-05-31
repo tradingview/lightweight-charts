@@ -10,7 +10,7 @@ function CardContainer({
 }: {
 	href: string;
 	children: ReactNode;
-}): JSX.Element {
+}): React.JSX.Element {
 	return (
 		<Link
 			href={href}
@@ -35,7 +35,7 @@ function CardLayout({
 	image?: ReactNode;
 	icon?: ReactNode;
 	wrapDescription: boolean;
-}): JSX.Element {
+}): React.JSX.Element {
 	return (
 		<CardContainer href={href}>
 			{image && <div className={clsx(styles.cardImage)}>{image}</div>}
@@ -70,7 +70,7 @@ export default function CardLink({
 }: {
 	item: CardLinkItem;
 	frontPage: boolean;
-}): JSX.Element {
+}): React.JSX.Element {
 	return (
 		<CardLayout
 			href={item.href}
