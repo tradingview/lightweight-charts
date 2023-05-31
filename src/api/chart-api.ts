@@ -1,11 +1,12 @@
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
-import { assert, ensureDefined } from '../helpers/assertions';
+import { assert, ensure, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
@@ -13,6 +14,8 @@ import {
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
+	CustomSeriesOptions,
+	CustomSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
@@ -20,13 +23,14 @@ import {
 	PriceFormat,
 	PriceFormatBuiltIn,
 	SeriesOptionsMap,
+	SeriesPartialOptions,
 	SeriesPartialOptionsMap,
 	SeriesStyleOptionsMap,
 	SeriesType,
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
 
-import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
@@ -39,6 +43,7 @@ import {
 	barStyleDefaults,
 	baselineStyleDefaults,
 	candlestickStyleDefaults,
+	customStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
@@ -171,6 +176,27 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.resize(width, height, forceRepaint);
 	}
 
+	public addCustomSeries<
+		TData extends CustomData,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>
+	>(
+		customPaneView: ICustomSeriesPaneView<TData, TOptions>,
+		options?: SeriesPartialOptions<TOptions>
+	): ISeriesApi<'Custom', TData, TOptions, TPartialOptions> {
+		const paneView = ensure(customPaneView);
+		const defaults = {
+			...customStyleDefaults,
+			...paneView.defaultOptions(),
+		};
+		return this._addSeriesImpl<'Custom', TData, TOptions, TPartialOptions>(
+			'Custom',
+			defaults,
+			options,
+			paneView
+		);
+	}
+
 	public addAreaSeries(options?: AreaSeriesPartialOptions): ISeriesApi<'Area'> {
 		return this._addSeriesImpl('Area', areaStyleDefaults, options);
 	}
@@ -258,17 +284,27 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return this._chartWidget.autoSizeActive();
 	}
 
-	private _addSeriesImpl<TSeries extends SeriesType>(
+	public chartElement(): HTMLDivElement {
+		return this._chartWidget.element();
+	}
+
+	private _addSeriesImpl<
+		TSeries extends SeriesType,
+		TData extends WhitespaceData = SeriesDataItemTypeMap[TSeries],
+		TOptions extends SeriesOptionsMap[TSeries] = SeriesOptionsMap[TSeries],
+		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries]
+	>(
 		type: TSeries,
 		styleDefaults: SeriesStyleOptionsMap[TSeries],
-		options: SeriesPartialOptionsMap[TSeries] = {}
-	): ISeriesApi<TSeries> {
+		options: SeriesPartialOptionsMap[TSeries] = {},
+		customPaneView?: ICustomSeriesPaneView
+	): ISeriesApi<TSeries, TData, TOptions, TPartialOptions> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
-		const series = this._chartWidget.model().createSeries(type, strictOptions);
+		const series = this._chartWidget.model().createSeries(type, strictOptions, customPaneView);
 
-		const res = new SeriesApi<TSeries>(series, this, this);
+		const res = new SeriesApi<TSeries, TData, TOptions, TPartialOptions>(series, this, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 

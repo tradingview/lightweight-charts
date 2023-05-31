@@ -1,9 +1,12 @@
-import { PlotRow } from '../model/plot-data';
+import { ensureDefined } from '../helpers/assertions';
+
+import { CustomData } from '../model/icustom-series';
+import { PlotRow, PlotRowValue } from '../model/plot-data';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { OriginalTime, TimePoint, TimePointIndex } from '../model/time-data';
 
-import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
+import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap, WhitespaceData } from './data-consumer';
 
 function getColoredLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData, originalTime: OriginalTime): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;
@@ -96,6 +99,19 @@ function getCandlestickSeriesPlotRow(time: TimePoint, index: TimePointIndex, ite
 	return res;
 }
 
+// The returned data is used for scaling the series, and providing the current value for the price scale
+export type CustomDataToPlotRowValueConverter = (item: CustomData | WhitespaceData) => number[];
+
+function getCustomSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: CustomData | WhitespaceData, originalTime: OriginalTime, dataToPlotRow?: CustomDataToPlotRowValueConverter): Mutable<SeriesPlotRow<'Custom'>> {
+	const values = ensureDefined(dataToPlotRow)(item);
+	const max = Math.max(...values);
+	const min = Math.min(...values);
+	const last = values[values.length - 1];
+	const value: PlotRowValue = [last, max, min, last];
+	const { time: excludedTime, color, ...data } = item as CustomData;
+	return { index, time, value, originalTime, data, color };
+}
+
 export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
 
 export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is SeriesPlotRow {
@@ -103,16 +119,31 @@ export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is 
 }
 
 type SeriesItemValueFnMap = {
-	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime) => Mutable<SeriesPlotRow<T> | WhitespacePlotRow>;
+	[T in keyof SeriesDataItemTypeMap]: (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[T], originalTime: OriginalTime, dataToPlotRow?: CustomDataToPlotRowValueConverter, customIsWhitespace?: WhitespaceCheck) => Mutable<SeriesPlotRow<T> | WhitespacePlotRow>;
 };
 
-function wrapWhitespaceData<TSeriesType extends SeriesType>(createPlotRowFn: (typeof getBaselineSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): SeriesItemValueFnMap[TSeriesType] {
-	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime) => {
-		if (isWhitespaceData(bar)) {
-			return { time, index, originalTime };
+function wrapCustomValues<T extends SeriesPlotRow | WhitespacePlotRow>(plotRow: Mutable<T>, bar: SeriesDataItemTypeMap[SeriesType]): Mutable<T> {
+	if (bar.customValues !== undefined) {
+		plotRow.customValues = bar.customValues;
+	}
+	return plotRow;
+}
+
+export type WhitespaceCheck = (bar: SeriesDataItemTypeMap[SeriesType]) => bar is WhitespaceData;
+function isWhitespaceDataWithCustomCheck(bar: SeriesDataItemTypeMap[SeriesType], customIsWhitespace?: WhitespaceCheck): bar is WhitespaceData {
+	if (customIsWhitespace) {
+		return customIsWhitespace(bar);
+	}
+	return isWhitespaceData(bar);
+}
+
+function wrapWhitespaceData<TSeriesType extends SeriesType>(createPlotRowFn: (typeof getBaselineSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow) | (typeof getCustomSeriesPlotRow)): SeriesItemValueFnMap[TSeriesType] {
+	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType], originalTime: OriginalTime, dataToPlotRow?: CustomDataToPlotRowValueConverter, customIsWhitespace?: WhitespaceCheck) => {
+		if (isWhitespaceDataWithCustomCheck(bar, customIsWhitespace)) {
+			return wrapCustomValues({ time, index, originalTime }, bar);
 		}
 
-		return createPlotRowFn(time, index, bar, originalTime);
+		return wrapCustomValues(createPlotRowFn(time, index, bar, originalTime, dataToPlotRow), bar);
 	};
 }
 
@@ -123,6 +154,7 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Baseline: wrapWhitespaceData(getBaselineSeriesPlotRow),
 	Histogram: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
+	Custom: wrapWhitespaceData(getCustomSeriesPlotRow),
 };
 
 export function getSeriesPlotRowCreator<TSeriesType extends SeriesType>(seriesType: TSeriesType): SeriesItemValueFnMap[TSeriesType] {

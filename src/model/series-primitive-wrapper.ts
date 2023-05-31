@@ -8,16 +8,19 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
-import { HoveredObject } from './chart-model';
 import { Coordinate } from './coordinate';
 import {
-	ISeriesPrimitive,
 	ISeriesPrimitiveAxisView,
+	ISeriesPrimitiveBase,
 	ISeriesPrimitivePaneRenderer,
 	ISeriesPrimitivePaneView,
+	PrimitiveHoveredItem,
+	SeriesPrimitivePaneViewZOrder,
 } from './iseries-primitive';
 import { PriceScale } from './price-scale';
 import { Series } from './series';
+import { AutoscaleInfo } from './series-options';
+import { Logical, TimePointIndex } from './time-data';
 import { TimeScale } from './time-scale';
 
 class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
@@ -34,15 +37,15 @@ class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
 	public drawBackground?(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
 		this._baseRenderer.drawBackground?.(target);
 	}
-
-	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
-		return null;
-	}
 }
 
 interface RendererCache<Base, Wrapper> {
 	base: Base;
 	wrapper: Wrapper;
+}
+
+export interface ISeriesPrimitivePaneViewWrapper extends IPaneView {
+	zOrder(): SeriesPrimitivePaneViewZOrder;
 }
 
 class SeriesPrimitivePaneViewWrapper implements IPaneView {
@@ -53,7 +56,7 @@ class SeriesPrimitivePaneViewWrapper implements IPaneView {
 		this._paneView = paneView;
 	}
 
-	public renderer(addAnchors?: boolean): IPaneRenderer | null {
+	public renderer(): IPaneRenderer | null {
 		const baseRenderer = this._paneView.renderer();
 		if (baseRenderer === null) {
 			return null;
@@ -68,6 +71,32 @@ class SeriesPrimitivePaneViewWrapper implements IPaneView {
 		};
 		return wrapper;
 	}
+
+	public zOrder(): SeriesPrimitivePaneViewZOrder {
+		return this._paneView.zOrder?.() ?? 'normal';
+	}
+}
+
+interface AxisViewData {
+	text: string;
+	coordinate: number;
+	fixedCoordinate: number | undefined;
+	color: string;
+	background: string;
+	visible: boolean;
+	tickVisible: boolean;
+}
+
+function getAxisViewData(baseView: ISeriesPrimitiveAxisView): AxisViewData {
+	return {
+		text: baseView.text(),
+		coordinate: baseView.coordinate(),
+		fixedCoordinate: baseView.fixedCoordinate?.(),
+		color: baseView.textColor(),
+		background: baseView.backColor(),
+		visible: baseView.visible?.() ?? true,
+		tickVisible: baseView.tickVisible?.() ?? true,
+	};
 }
 
 class SeriesPrimitiveTimeAxisViewWrapper implements ITimeAxisView {
@@ -83,12 +112,7 @@ class SeriesPrimitiveTimeAxisViewWrapper implements ITimeAxisView {
 	public renderer(): TimeAxisViewRenderer {
 		this._renderer.setData({
 			width: this._timeScale.width(),
-			text: this._baseView.text(),
-			coordinate: this._baseView.coordinate(),
-			color: this._baseView.textColor(),
-			background: this._baseView.backColor(),
-			visible: true,
-			tickVisible: true,
+			...getAxisViewData(this._baseView),
 		});
 		return this._renderer;
 	}
@@ -109,44 +133,47 @@ class SeriesPrimitivePriceAxisViewWrapper extends PriceAxisView {
 		paneRendererData: PriceAxisViewRendererData,
 		commonRendererData: PriceAxisViewRendererCommonData
 	): void {
-		axisRendererData.visible = false;
-
-		commonRendererData.background = this._baseView.backColor();
-		axisRendererData.color = this._baseView.textColor();
+		const data = getAxisViewData(this._baseView);
+		commonRendererData.background = data.background;
+		axisRendererData.color = data.color;
 
 		const additionalPadding = 2 / 12 * this._priceScale.fontSize();
 
 		commonRendererData.additionalPaddingTop = additionalPadding;
 		commonRendererData.additionalPaddingBottom = additionalPadding;
 
-		commonRendererData.coordinate = this._baseView.coordinate();
-		axisRendererData.text = this._baseView.text();
-		axisRendererData.visible = true;
+		commonRendererData.coordinate = data.coordinate;
+		commonRendererData.fixedCoordinate = data.fixedCoordinate;
+		axisRendererData.text = data.text;
+		axisRendererData.visible = data.visible;
+		axisRendererData.tickVisible = data.tickVisible;
 	}
 }
 
-export class SeriesPrimitiveWrapper {
-	private readonly _primitive: ISeriesPrimitive;
+export class SeriesPrimitiveWrapper<TSeriesAttachedParameters = unknown> {
+	private readonly _primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>;
 	private readonly _series: Series;
 	private _paneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 	private _timeAxisViewsCache: RendererCache<readonly ISeriesPrimitiveAxisView[], readonly SeriesPrimitiveTimeAxisViewWrapper[]> | null = null;
 	private _priceAxisViewsCache: RendererCache<readonly ISeriesPrimitiveAxisView[], readonly SeriesPrimitivePriceAxisViewWrapper[]> | null = null;
+	private _priceAxisPaneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
+	private _timeAxisPaneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 
-	public constructor(primitive: ISeriesPrimitive, series: Series) {
+	public constructor(primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>, series: Series) {
 		this._primitive = primitive;
 		this._series = series;
 	}
 
-	public primitive(): ISeriesPrimitive {
+	public primitive(): ISeriesPrimitiveBase<TSeriesAttachedParameters> {
 		return this._primitive;
 	}
 
 	public updateAllViews(): void {
-		this._primitive.updateAllViews();
+		this._primitive.updateAllViews?.();
 	}
 
-	public paneViews(): readonly IPaneView[] {
-		const base = this._primitive.paneViews();
+	public paneViews(): readonly ISeriesPrimitivePaneViewWrapper[] {
+		const base = this._primitive.paneViews?.() ?? [];
 		if (this._paneViewsCache?.base === base) {
 			return this._paneViewsCache.wrapper;
 		}
@@ -159,7 +186,7 @@ export class SeriesPrimitiveWrapper {
 	}
 
 	public timeAxisViews(): readonly ITimeAxisView[] {
-		const base = this._primitive.timeAxisViews();
+		const base = this._primitive.timeAxisViews?.() ?? [];
 		if (this._timeAxisViewsCache?.base === base) {
 			return this._timeAxisViewsCache.wrapper;
 		}
@@ -173,7 +200,7 @@ export class SeriesPrimitiveWrapper {
 	}
 
 	public priceAxisViews(): readonly IPriceAxisView[] {
-		const base = this._primitive.priceAxisViews();
+		const base = this._primitive.priceAxisViews?.() ?? [];
 		if (this._priceAxisViewsCache?.base === base) {
 			return this._priceAxisViewsCache.wrapper;
 		}
@@ -184,5 +211,47 @@ export class SeriesPrimitiveWrapper {
 			wrapper,
 		};
 		return wrapper;
+	}
+
+	public priceAxisPaneViews(): readonly ISeriesPrimitivePaneViewWrapper[] {
+		const base = this._primitive.priceAxisPaneViews?.() ?? [];
+		if (this._priceAxisPaneViewsCache?.base === base) {
+			return this._priceAxisPaneViewsCache.wrapper;
+		}
+		const wrapper = base.map((pw: ISeriesPrimitivePaneView) => new SeriesPrimitivePaneViewWrapper(pw));
+		this._priceAxisPaneViewsCache = {
+			base,
+			wrapper,
+		};
+		return wrapper;
+	}
+
+	public timeAxisPaneViews(): readonly ISeriesPrimitivePaneViewWrapper[] {
+		const base = this._primitive.timeAxisPaneViews?.() ?? [];
+		if (this._timeAxisPaneViewsCache?.base === base) {
+			return this._timeAxisPaneViewsCache.wrapper;
+		}
+		const wrapper = base.map((pw: ISeriesPrimitivePaneView) => new SeriesPrimitivePaneViewWrapper(pw));
+		this._timeAxisPaneViewsCache = {
+			base,
+			wrapper,
+		};
+		return wrapper;
+	}
+
+	public autoscaleInfo(
+		startTimePoint: TimePointIndex,
+		endTimePoint: TimePointIndex
+	): AutoscaleInfo | null {
+		return (
+			this._primitive.autoscaleInfo?.(
+				startTimePoint as unknown as Logical,
+				endTimePoint as unknown as Logical
+			) ?? null
+		);
+	}
+
+	public hitTest(x: Coordinate, y: Coordinate): PrimitiveHoveredItem | null {
+		return this._primitive.hitTest?.(x, y) ?? null;
 	}
 }

@@ -2,7 +2,6 @@ import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
-import { ISeriesPrimitive } from '../model/iseries-primitive';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
 import { SeriesMarker } from '../model/series-markers';
@@ -16,6 +15,17 @@ import { Range, Time } from '../model/time-data';
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
+import { ISeriesPrimitive } from './iseries-primitive-api';
+
+/**
+ * The extent of the data change.
+ */
+export type DataChangedScope = 'full' | 'update';
+
+/**
+ * A custom function use to handle data changed events.
+ */
+export type DataChangedHandler = (scope: DataChangedScope) => void;
 
 /**
  * Represents a range of bars and the number of bars outside the range.
@@ -41,7 +51,12 @@ export interface BarsInfo extends Partial<Range<Time>> {
 /**
  * Represents the interface for interacting with series.
  */
-export interface ISeriesApi<TSeriesType extends SeriesType> {
+export interface ISeriesApi<
+	TSeriesType extends SeriesType,
+	TData = SeriesDataItemTypeMap[TSeriesType],
+	TOptions = SeriesOptionsMap[TSeriesType],
+	TPartialOptions = SeriesPartialOptionsMap[TSeriesType],
+	> {
 	/**
 	 * Returns current price formatter
 	 *
@@ -98,14 +113,14 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 *
 	 * @param options - Any subset of options.
 	 */
-	applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void;
+	applyOptions(options: TPartialOptions): void;
 
 	/**
 	 * Returns currently applied options
 	 *
 	 * @returns Full set of currently applied options, including defaults
 	 */
-	options(): Readonly<SeriesOptionsMap[TSeriesType]>;
+	options(): Readonly<TOptions>;
 
 	/**
 	 * Returns interface of the price scale the series is currently attached
@@ -133,7 +148,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ]);
 	 * ```
 	 */
-	setData(data: SeriesDataItemTypeMap[TSeriesType][]): void;
+	setData(data: TData[]): void;
 
 	/**
 	 * Adds new data item to the existing set (or updates the latest item if times of the passed/latest items are equal).
@@ -158,7 +173,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * });
 	 * ```
 	 */
-	update(bar: SeriesDataItemTypeMap[TSeriesType]): void;
+	update(bar: TData): void;
 
 	/**
 	 * Returns a bar data by provided logical index.
@@ -171,7 +186,46 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * const originalData = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
 	 * ```
 	 */
-	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap[TSeriesType] | null;
+	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null;
+
+	/**
+	 * Returns all the bar data for the series.
+	 *
+	 * @returns Original data items provided via setData or update methods.
+	 * @example
+	 * ```js
+	 * const originalData = series.data();
+	 * ```
+	 */
+	data(): readonly TData[];
+
+	/**
+	 * Subscribe to the data changed event. This event is fired whenever the `update` or `setData` method is evoked
+	 * on the series.
+	 *
+	 * @param handler - Handler to be called on a data changed event.
+	 * @example
+	 * ```js
+	 * function myHandler() {
+	 *     const data = series.data();
+	 *     console.log(`The data has changed. New Data length: ${data.length}`);
+	 * }
+	 *
+	 * series.subscribeDataChanged(myHandler);
+	 * ```
+	 */
+	subscribeDataChanged(handler: DataChangedHandler): void;
+
+	/**
+	 * Unsubscribe a handler that was previously subscribed using {@link subscribeDataChanged}.
+	 *
+	 * @param handler - Previously subscribed handler
+	 * @example
+	 * ```js
+	 * chart.unsubscribeDataChanged(myHandler);
+	 * ```
+	 */
+	unsubscribeDataChanged(handler: DataChangedHandler): void;
 
 	/**
 	 * Allows to set/replace all existing series markers with new ones.

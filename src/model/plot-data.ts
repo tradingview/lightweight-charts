@@ -22,4 +22,5 @@ export interface PlotRow {
 	readonly time: TimePoint;
 	readonly value: PlotRowValue;
 	readonly originalTime: OriginalTime;
+	readonly customValues?: Record<string, unknown>;
 }
