@@ -119,7 +119,7 @@ function animationData(durationSinceStart: number, lineColor: string): Animation
 	};
 }
 
-export class SeriesLastPriceAnimationPaneView<HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+export class SeriesLastPriceAnimationPaneView<HorzScaleItem> implements IUpdatablePaneView {
 	private readonly _series: Series<'Area', HorzScaleItem> | Series<'Line', HorzScaleItem> | Series<'Baseline', HorzScaleItem>;
 	private readonly _renderer: SeriesLastPriceAnimationRenderer = new SeriesLastPriceAnimationRenderer();
 	private _invalidated: boolean = true;

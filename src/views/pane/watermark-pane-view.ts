@@ -6,7 +6,7 @@ import { WatermarkRenderer, WatermarkRendererData } from '../../renderers/waterm
 
 import { IUpdatablePaneView } from './iupdatable-pane-view';
 
-export class WatermarkPaneView<HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+export class WatermarkPaneView<HorzScaleItem> implements IUpdatablePaneView {
 	private _source: Watermark<HorzScaleItem>;
 	private _invalidated: boolean = true;
 

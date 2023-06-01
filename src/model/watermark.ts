@@ -79,7 +79,7 @@ export class Watermark<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		return [];
 	}
 
-	public paneViews(): readonly IPaneView<HorzScaleItem>[] {
+	public paneViews(): readonly IPaneView[] {
 		return [this._paneView];
 	}
 

@@ -48,7 +48,7 @@ export class Grid<HorzScaleItem> {
 		this._paneView = new GridPaneView(pane);
 	}
 
-	public paneView(): IUpdatablePaneView<HorzScaleItem> {
+	public paneView(): IUpdatablePaneView {
 		return this._paneView;
 	}
 }

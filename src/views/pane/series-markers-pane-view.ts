@@ -84,7 +84,7 @@ function fillSizeAndY<HorzScaleItem>(
 	ensureNever(marker.position);
 }
 
-export class SeriesMarkersPaneView<HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+export class SeriesMarkersPaneView<HorzScaleItem> implements IUpdatablePaneView {
 	private readonly _series: Series<SeriesType, HorzScaleItem>;
 	private readonly _model: ChartModel<HorzScaleItem>;
 	private _data: SeriesMarkerRendererData;

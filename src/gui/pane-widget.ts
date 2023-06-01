@@ -51,28 +51,28 @@ function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D
 	renderer.draw(target, isHovered, hitTestData);
 }
 
-type PaneViewsGetter<HorzScaleItem> = (source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>) => readonly IPaneView<HorzScaleItem>[];
+type PaneViewsGetter<HorzScaleItem> = (source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>) => readonly IPaneView[];
 
-function sourcePaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
+function sourcePaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView[] {
 	return source.paneViews(pane);
 }
 
-function sourceLabelPaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
+function sourceLabelPaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView[] {
 	return source.labelPaneViews(pane);
 }
 
-function sourceTopPaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
+function sourceTopPaneViews<HorzScaleItem>(source: IDataSource<HorzScaleItem>, pane: Pane<HorzScaleItem>): readonly IPaneView[] {
 	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
 }
 
 export interface HitTestResult<HorzScaleItem> {
 	source: IPriceDataSource<HorzScaleItem>;
 	object?: HoveredObject;
-	view: IPaneView<HorzScaleItem>;
+	view: IPaneView;
 }
 
 interface HitTestPaneViewResult<HorzScaleItem> {
-	view: IPaneView<HorzScaleItem>;
+	view: IPaneView;
 	object?: HoveredObject;
 }
 
@@ -604,7 +604,7 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 		}
 	}
 
-	private _hitTestPaneView(paneViews: readonly IPaneView<HorzScaleItem>[], x: Coordinate, y: Coordinate): HitTestPaneViewResult<HorzScaleItem> | null {
+	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult<HorzScaleItem> | null {
 		for (const paneView of paneViews) {
 			const renderer = paneView.renderer();
 			if (renderer !== null && renderer.hitTest) {

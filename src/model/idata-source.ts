@@ -15,13 +15,13 @@ export interface IDataSource<HorzScaleItem> {
 
 	priceAxisViews(pane?: Pane<HorzScaleItem>, priceScale?: PriceScale<HorzScaleItem>): readonly IPriceAxisView<HorzScaleItem>[];
 	timeAxisViews(): readonly ITimeAxisView<HorzScaleItem>[];
-	paneViews(pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[];
-	labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[];
+	paneViews(pane: Pane<HorzScaleItem>): readonly IPaneView[];
+	labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView[];
 
 	/**
 	 * Pane views that are painted on the most top layer
 	 */
-	topPaneViews?(pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[];
+	topPaneViews?(pane: Pane<HorzScaleItem>): readonly IPaneView[];
 
 	visible(): boolean;
 

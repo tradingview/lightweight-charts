@@ -8,7 +8,7 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IPaneView } from './ipane-view';
 
-export abstract class SeriesHorizontalLinePaneView<HorzScaleItem> implements IPaneView<HorzScaleItem> {
+export abstract class SeriesHorizontalLinePaneView<HorzScaleItem> implements IPaneView {
 	protected readonly _lineRendererData: HorizontalLineRendererData = {
 		y: 0 as Coordinate,
 		color: 'rgba(0, 0, 0, 0)',

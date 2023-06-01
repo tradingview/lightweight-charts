@@ -8,7 +8,7 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
 
-export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemType extends TimedValue, TRenderer extends IPaneRenderer, HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemType extends TimedValue, TRenderer extends IPaneRenderer, HorzScaleItem> implements IUpdatablePaneView {
 	protected readonly _series: Series<TSeriesType, HorzScaleItem>;
 	protected readonly _model: ChartModel<HorzScaleItem>;
 	protected _invalidated: boolean = true;

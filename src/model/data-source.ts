@@ -28,9 +28,9 @@ export abstract class DataSource<HorzScaleItem> implements IDataSource<HorzScale
 	}
 
 	public abstract priceAxisViews(pane?: Pane<HorzScaleItem>, priceScale?: PriceScale<HorzScaleItem>): readonly IPriceAxisView<HorzScaleItem>[];
-	public abstract paneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[];
+	public abstract paneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView[];
 
-	public labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
+	public labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView[] {
 		return [];
 	}
 

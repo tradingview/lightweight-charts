@@ -38,7 +38,7 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 	}
 }
 
-export class PanePriceAxisView<HorzScaleItem> implements IPaneView<HorzScaleItem> {
+export class PanePriceAxisView<HorzScaleItem> implements IPaneView {
 	private _priceAxisView: IPriceAxisView<HorzScaleItem>;
 	private readonly _textWidthCache: TextWidthCache;
 	private readonly _dataSource: IPriceDataSource<HorzScaleItem>;

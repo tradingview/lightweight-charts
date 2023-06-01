@@ -255,7 +255,7 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		this.clearOriginCoord();
 	}
 
-	public paneViews(pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
+	public paneViews(pane: Pane<HorzScaleItem>): readonly IPaneView[] {
 		return this._pane !== null ? [this._paneView, this._markersPaneView] : [];
 	}
 

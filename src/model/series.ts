@@ -104,7 +104,7 @@ export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource
 	private readonly _priceLineView: SeriesPriceLinePaneView<HorzScaleItem> = new SeriesPriceLinePaneView(this);
 	private readonly _customPriceLines: CustomPriceLine<HorzScaleItem>[] = [];
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView<HorzScaleItem> = new SeriesHorizontalBaseLinePaneView(this);
-	private _paneView!: IUpdatablePaneView<HorzScaleItem>;
+	private _paneView!: IUpdatablePaneView;
 	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView<HorzScaleItem> | null = null;
 	private _barColorerCache: SeriesBarColorer<T, HorzScaleItem> | null = null;
 	private readonly _options: SeriesOptionsInternal<T>;
@@ -343,7 +343,7 @@ export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource
 		}
 	}
 
-	public topPaneViews(pane: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
+	public topPaneViews(pane: Pane<HorzScaleItem>): readonly IPaneView[] {
 		const animationPaneView = this._lastPriceAnimationPaneView;
 		if (animationPaneView === null || !animationPaneView.visible()) {
 			return [];
@@ -363,8 +363,8 @@ export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource
 		return [animationPaneView];
 	}
 
-	public paneViews(): readonly IPaneView<HorzScaleItem>[] {
-		const res: IPaneView<HorzScaleItem>[] = [];
+	public paneViews(): readonly IPaneView[] {
+		const res: IPaneView[] = [];
 
 		if (!this._isOverlay()) {
 			res.push(this._baseHorizontalLineView);
@@ -382,7 +382,7 @@ export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource
 		return res;
 	}
 
-	public override labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView<HorzScaleItem>[] {
+	public override labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView[] {
 		return [
 			this._panePriceAxisView,
 			...this._customPriceLines.map((line: CustomPriceLine<HorzScaleItem>) => line.labelPaneView()),

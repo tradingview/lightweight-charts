@@ -1,5 +1,5 @@
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
-export interface IPaneView<HorzScaleItem> {
+export interface IPaneView {
 	renderer(addAnchors?: boolean): IPaneRenderer | null;
 }

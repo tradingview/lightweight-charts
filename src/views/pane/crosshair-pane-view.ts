@@ -6,7 +6,7 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IPaneView } from './ipane-view';
 
-export class CrosshairPaneView<HorzScaleItem> implements IPaneView<HorzScaleItem> {
+export class CrosshairPaneView<HorzScaleItem> implements IPaneView {
 	private _invalidated: boolean = true;
 	private readonly _source: Crosshair<HorzScaleItem>;
 	private readonly _rendererData: CrosshairRendererData = {

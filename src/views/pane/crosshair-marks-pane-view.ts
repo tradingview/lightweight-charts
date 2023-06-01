@@ -31,7 +31,7 @@ function createEmptyMarkerData(): MarksRendererData {
 
 const rangeForSinglePoint: SeriesItemsIndexesRange = { from: 0, to: 1 };
 
-export class CrosshairMarksPaneView<HorzScaleItem> implements IUpdatablePaneView<HorzScaleItem> {
+export class CrosshairMarksPaneView<HorzScaleItem> implements IUpdatablePaneView {
 	private readonly _chartModel: ChartModel<HorzScaleItem>;
 	private readonly _crosshair: Crosshair<HorzScaleItem>;
 	private readonly _compositeRenderer: CompositeRenderer = new CompositeRenderer();

@@ -36,11 +36,11 @@ export class CustomPriceLine<HorzScaleItem> {
 		return this._options;
 	}
 
-	public paneView(): IPaneView<HorzScaleItem> {
+	public paneView(): IPaneView {
 		return this._priceLineView;
 	}
 
-	public labelPaneView(): IPaneView<HorzScaleItem> {
+	public labelPaneView(): IPaneView {
 		return this._panePriceAxisView;
 	}
 
