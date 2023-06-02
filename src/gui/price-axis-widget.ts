@@ -16,7 +16,7 @@ import { makeFont } from '../helpers/make-font';
 
 import { ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { IDataSource, IDataSourceBase } from '../model/idata-source';
+import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
 import { LayoutOptions } from '../model/layout-options';
@@ -379,7 +379,7 @@ export class PriceAxisWidget<HorzScaleItem> implements IDestroyable {
 
 		const priceScale = (this._priceScale === null) ? undefined : this._priceScale;
 
-		const addViewsForSources = (sources: readonly IDataSource<HorzScaleItem>[]) => {
+		const addViewsForSources = (sources: readonly IDataSource[]) => {
 			for (let i = 0; i < sources.length; ++i) {
 				const source = sources[i];
 				const views = source.priceAxisViews(this._pane.state(), priceScale);
@@ -496,7 +496,7 @@ export class PriceAxisWidget<HorzScaleItem> implements IDestroyable {
 		const isDefault = this._priceScale === paneState.defaultVisiblePriceScale();
 
 		if (isDefault) {
-			this._pane.state().orderedSources().forEach((source: IPriceDataSource<HorzScaleItem>) => {
+			this._pane.state().orderedSources().forEach((source: IPriceDataSource) => {
 				if (paneState.isOverlay(source)) {
 					orderedSources.push(source);
 				}
@@ -507,8 +507,8 @@ export class PriceAxisWidget<HorzScaleItem> implements IDestroyable {
 		const centerSource = this._priceScale.dataSources()[0];
 		const priceScale = this._priceScale;
 
-		const updateForSources = (sources: IDataSourceBase[]) => {
-			sources.forEach((source: IDataSourceBase) => {
+		const updateForSources = (sources: IDataSource[]) => {
+			sources.forEach((source: IDataSource) => {
 				const sourceViews = source.priceAxisViews(paneState, priceScale);
 				// never align selected sources
 				sourceViews.forEach((view: IPriceAxisView) => {

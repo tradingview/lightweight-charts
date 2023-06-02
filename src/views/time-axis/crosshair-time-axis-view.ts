@@ -7,12 +7,12 @@ import { TimeAxisViewRenderer, TimeAxisViewRendererData } from '../../renderers/
 
 import { ITimeAxisView } from './itime-axis-view';
 
-export class CrosshairTimeAxisView<HorzScaleItem> implements ITimeAxisView<HorzScaleItem> {
+export class CrosshairTimeAxisView<HorzScaleItem> implements ITimeAxisView {
 	private _invalidated: boolean = true;
 	private readonly _crosshair: Crosshair<HorzScaleItem>;
 	private readonly _model: ChartModel<HorzScaleItem>;
 	private readonly _valueProvider: TimeAndCoordinateProvider;
-	private readonly _renderer: TimeAxisViewRenderer<HorzScaleItem> = new TimeAxisViewRenderer();
+	private readonly _renderer: TimeAxisViewRenderer = new TimeAxisViewRenderer();
 	private readonly _rendererData: TimeAxisViewRendererData = {
 		visible: false,
 		background: '#4c525e',
@@ -33,7 +33,7 @@ export class CrosshairTimeAxisView<HorzScaleItem> implements ITimeAxisView<HorzS
 		this._invalidated = true;
 	}
 
-	public renderer(): TimeAxisViewRenderer<HorzScaleItem> {
+	public renderer(): TimeAxisViewRenderer {
 		if (this._invalidated) {
 			this._updateImpl();
 			this._invalidated = false;

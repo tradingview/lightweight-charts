@@ -7,7 +7,7 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 import { ChartModel, ChartOptionsImpl, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid } from './grid';
-import { IPriceDataSource, IPriceDataSourceBase } from './iprice-data-source';
+import { IPriceDataSource } from './iprice-data-source';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
 import { sortSources } from './sort-sources';
 import { TimeScale } from './time-scale';
@@ -22,7 +22,7 @@ interface MinMaxOrderInfo {
 }
 
 export interface IPaneBase {
-	addDataSource(source: IPriceDataSourceBase, targetScaleId: string, zOrder?: number): void;
+	addDataSource(source: IPriceDataSource, targetScaleId: string, zOrder?: number): void;
 	model(): IChartModelBase;
 	defaultPriceScale(): PriceScale;
 }
@@ -32,13 +32,13 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 	private readonly _model: ChartModel<HorzScaleItem>;
 	private readonly _grid: Grid;
 
-	private _dataSources: IPriceDataSource<HorzScaleItem>[] = [];
-	private _overlaySourcesByScaleId: Map<string, IPriceDataSource<HorzScaleItem>[]> = new Map();
+	private _dataSources: IPriceDataSource[] = [];
+	private _overlaySourcesByScaleId: Map<string, IPriceDataSource[]> = new Map();
 
 	private _height: number = 0;
 	private _width: number = 0;
 	private _stretchFactor: number = DEFAULT_STRETCH_FACTOR;
-	private _cachedOrderedSources: readonly IPriceDataSource<HorzScaleItem>[] | null = null;
+	private _cachedOrderedSources: readonly IPriceDataSource[] | null = null;
 
 	private _destroyed: Delegate = new Delegate();
 
@@ -105,7 +105,7 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		this._leftPriceScale.modeChanged().unsubscribeAll(this);
 		this._rightPriceScale.modeChanged().unsubscribeAll(this);
 
-		this._dataSources.forEach((source: IPriceDataSource<HorzScaleItem>) => {
+		this._dataSources.forEach((source: IPriceDataSource) => {
 			if (source.destroy) {
 				source.destroy();
 			}
@@ -145,7 +145,7 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		this._rightPriceScale.setHeight(height);
 
 		// process overlays
-		this._dataSources.forEach((ds: IPriceDataSource<HorzScaleItem>) => {
+		this._dataSources.forEach((ds: IPriceDataSource) => {
 			if (this.isOverlay(ds)) {
 				const priceScale = ds.priceScale();
 				if (priceScale !== null) {
@@ -157,11 +157,11 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		this.updateAllSources();
 	}
 
-	public dataSources(): readonly IPriceDataSource<HorzScaleItem>[] {
+	public dataSources(): readonly IPriceDataSource[] {
 		return this._dataSources;
 	}
 
-	public isOverlay(source: IPriceDataSource<HorzScaleItem>): boolean {
+	public isOverlay(source: IPriceDataSource): boolean {
 		const priceScale = source.priceScale();
 		if (priceScale === null) {
 			return true;
@@ -169,12 +169,12 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		return this._leftPriceScale !== priceScale && this._rightPriceScale !== priceScale;
 	}
 
-	public addDataSource(source: IPriceDataSource<HorzScaleItem>, targetScaleId: string, zOrder?: number): void {
+	public addDataSource(source: IPriceDataSource, targetScaleId: string, zOrder?: number): void {
 		const targetZOrder = (zOrder !== undefined) ? zOrder : this._getZOrderMinMax().maxZOrder + 1;
 		this._insertDataSource(source, targetScaleId, targetZOrder);
 	}
 
-	public removeDataSource(source: IPriceDataSource<HorzScaleItem>): void {
+	public removeDataSource(source: IPriceDataSource): void {
 		const index = this._dataSources.indexOf(source);
 		assert(index !== -1, 'removeDataSource: invalid data source');
 
@@ -255,7 +255,7 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 	}
 
 	public updateAllSources(): void {
-		this._dataSources.forEach((source: IPriceDataSource<HorzScaleItem>) => {
+		this._dataSources.forEach((source: IPriceDataSource) => {
 			source.updateAllViews();
 		});
 	}
@@ -315,7 +315,7 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		this.recalculatePriceScale(this._leftPriceScale);
 		this.recalculatePriceScale(this._rightPriceScale);
 
-		this._dataSources.forEach((ds: IPriceDataSource<HorzScaleItem>) => {
+		this._dataSources.forEach((ds: IPriceDataSource) => {
 			if (this.isOverlay(ds)) {
 				this.recalculatePriceScale(ds.priceScale());
 			}
@@ -325,9 +325,9 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		this._model.lightUpdate();
 	}
 
-	public orderedSources(): readonly IPriceDataSource<HorzScaleItem>[] {
+	public orderedSources(): readonly IPriceDataSource[] {
 		if (this._cachedOrderedSources === null) {
-			this._cachedOrderedSources = sortSources<IPriceDataSource<HorzScaleItem>>(this._dataSources);
+			this._cachedOrderedSources = sortSources<IPriceDataSource>(this._dataSources);
 		}
 
 		return this._cachedOrderedSources;
@@ -380,7 +380,7 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		return { minZOrder: minZOrder, maxZOrder: maxZOrder };
 	}
 
-	private _insertDataSource(source: IPriceDataSource<HorzScaleItem>, priceScaleId: string, zOrder: number): void {
+	private _insertDataSource(source: IPriceDataSource, priceScaleId: string, zOrder: number): void {
 		let priceScale = this.priceScaleById(priceScaleId);
 
 		if (priceScale === null) {

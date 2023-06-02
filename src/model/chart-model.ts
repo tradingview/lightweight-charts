@@ -168,8 +168,8 @@ export interface HoveredObject {
 	externalId?: string;
 }
 
-export interface HoveredSource<HorzScaleItem> {
-	source: IPriceDataSource<HorzScaleItem>;
+export interface HoveredSource {
+	source: IPriceDataSource;
 	object?: HoveredObject;
 }
 
@@ -391,7 +391,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private _serieses: Series<SeriesType, HorzScaleItem>[] = [];
 
 	private _width: number = 0;
-	private _hoveredSource: HoveredSource<HorzScaleItem> | null = null;
+	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
 
@@ -432,16 +432,16 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
-	public updateSource(source: IPriceDataSource<HorzScaleItem>): void {
+	public updateSource(source: IPriceDataSource): void {
 		const inv = this._invalidationMaskForSource(source);
 		this._invalidate(inv);
 	}
 
-	public hoveredSource(): HoveredSource<HorzScaleItem> | null {
+	public hoveredSource(): HoveredSource | null {
 		return this._hoveredSource;
 	}
 
-	public setHoveredSource(source: HoveredSource<HorzScaleItem> | null): void {
+	public setHoveredSource(source: HoveredSource | null): void {
 		const prevSource = this._hoveredSource;
 		this._hoveredSource = source;
 		if (prevSource !== null) {
@@ -758,7 +758,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 	}
 
-	public paneForSource(source: IPriceDataSource<HorzScaleItem>): Pane<HorzScaleItem> | null {
+	public paneForSource(source: IPriceDataSource): Pane<HorzScaleItem> | null {
 		const pane = this._panes.find((p: Pane<HorzScaleItem>) => p.orderedSources().includes(source));
 		return pane === undefined ? null : pane;
 	}
@@ -934,7 +934,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return inv;
 	}
 
-	private _invalidationMaskForSource(source: IPriceDataSource<HorzScaleItem>, invalidateType?: InvalidationLevel): InvalidateMask {
+	private _invalidationMaskForSource(source: IPriceDataSource, invalidateType?: InvalidationLevel): InvalidateMask {
 		if (invalidateType === undefined) {
 			invalidateType = InvalidationLevel.Light;
 		}

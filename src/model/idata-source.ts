@@ -9,7 +9,7 @@ export interface ZOrdered {
 	zorder(): number;
 }
 
-export interface IDataSourceBase extends ZOrdered {
+export interface IDataSource extends ZOrdered {
 	setZorder(value: number): void;
 	priceScale(): PriceScale | null;
 	setPriceScale(scale: PriceScale | null): void;
@@ -28,8 +28,6 @@ export interface IDataSourceBase extends ZOrdered {
 	visible(): boolean;
 
 	destroy?(): void;
-}
 
-export interface IDataSource<HorzScaleItem> extends IDataSourceBase {
-	timeAxisViews(): readonly ITimeAxisView<HorzScaleItem>[];
+	timeAxisViews(): readonly ITimeAxisView[];
 }

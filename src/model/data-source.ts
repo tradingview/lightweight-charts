@@ -6,7 +6,7 @@ import { IDataSource } from './idata-source';
 import { IPaneBase, Pane } from './pane';
 import { PriceScale } from './price-scale';
 
-export abstract class DataSource<HorzScaleItem> implements IDataSource<HorzScaleItem> {
+export abstract class DataSource<HorzScaleItem> implements IDataSource {
 	protected _priceScale: PriceScale | null = null;
 
 	private _zorder: number = 0;
@@ -34,7 +34,7 @@ export abstract class DataSource<HorzScaleItem> implements IDataSource<HorzScale
 		return [];
 	}
 
-	public timeAxisViews(): readonly ITimeAxisView<HorzScaleItem>[] {
+	public timeAxisViews(): readonly ITimeAxisView[] {
 		return [];
 	}
 

@@ -406,7 +406,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		return coordinate;
 	}
 
-	private _drawLabels(sources: readonly IDataSource<HorzScaleItem>[], target: CanvasRenderingTarget2D): void {
+	private _drawLabels(sources: readonly IDataSource[], target: CanvasRenderingTarget2D): void {
 		const rendererOptions = this._getRendererOptions();
 		for (const source of sources) {
 			for (const view of source.timeAxisViews()) {

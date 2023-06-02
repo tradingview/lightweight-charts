@@ -18,7 +18,7 @@ const optimizationReplacementRe = /[1-9]/g;
 
 const radius = 2;
 
-export class TimeAxisViewRenderer<HorzScaleItem> implements ITimeAxisViewRenderer<HorzScaleItem> {
+export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 	private _data: TimeAxisViewRendererData | null;
 
 	public constructor() {

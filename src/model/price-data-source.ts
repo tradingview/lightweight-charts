@@ -6,7 +6,7 @@ import { DataSource } from './data-source';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { TimePointIndex } from './time-data';
 
-export abstract class PriceDataSource<HorzScaleItem> extends DataSource<HorzScaleItem> implements IPriceDataSource<HorzScaleItem> {
+export abstract class PriceDataSource<HorzScaleItem> extends DataSource<HorzScaleItem> implements IPriceDataSource {
 	private readonly _model: ChartModel<HorzScaleItem>;
 
 	public constructor(model: ChartModel<HorzScaleItem>) {

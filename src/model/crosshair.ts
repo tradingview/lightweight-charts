@@ -280,7 +280,7 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		return views;
 	}
 
-	public override timeAxisViews(): readonly ITimeAxisView<HorzScaleItem>[] {
+	public override timeAxisViews(): readonly ITimeAxisView[] {
 		return this._visible ? [this._timeAxisView] : [];
 	}
 
