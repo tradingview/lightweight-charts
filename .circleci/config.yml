@@ -180,6 +180,13 @@ jobs:
       - store_test_results:
           path: test-results/
 
+  type-tests:
+    executor: node16-executor
+    steps:
+      - checkout-with-deps
+      - run: npm run tsc
+      - run: npm run type-tests
+
   dts-changes:
     executor: node16-executor
     steps:
@@ -331,6 +338,10 @@ workflows:
           requires:
             - build
       - unittests:
+          filters: *default-filters
+          requires:
+            - build
+      - type-tests:
           filters: *default-filters
           requires:
             - build
