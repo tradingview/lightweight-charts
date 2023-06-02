@@ -18,15 +18,15 @@ import { IHorzScaleBehavior } from './ihorz-scale-behavior';
 import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
-import { LocalizationOptions } from './localization-options';
+import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
-import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
+import { DEFAULT_STRETCH_FACTOR, IPaneBase, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
-import { HorzScaleOptions, TimeScale } from './time-scale';
+import { HorzScaleOptions, ITimeScale, TimeScale } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
 import { Watermark, WatermarkOptions } from './watermark';
 
@@ -173,9 +173,9 @@ export interface HoveredSource<HorzScaleItem> {
 	object?: HoveredObject;
 }
 
-export interface PriceScaleOnPane<HorzScaleItem> {
-	priceScale: PriceScale<HorzScaleItem>;
-	pane: Pane<HorzScaleItem>;
+export interface PriceScaleOnPane {
+	priceScale: PriceScale;
+	pane: IPaneBase;
 }
 
 const enum BackgroundColorSide {
@@ -230,10 +230,7 @@ export interface TrackingModeOptions {
 	exitMode: TrackingModeExitMode;
 }
 
-/**
- * Structure describing options of the chart. Series options are to be set separately
- */
-export interface ChartOptionsBase<HorzScaleItem> {
+export interface ChartOptionsBase {
 	/**
 	 * Width of the chart in pixels
 	 *
@@ -311,11 +308,6 @@ export interface ChartOptionsBase<HorzScaleItem> {
 	grid: GridOptions;
 
 	/**
-	 * Localization options.
-	 */
-	localization: LocalizationOptions<HorzScaleItem>;
-
-	/**
 	 * Scroll options, or a boolean flag that enables/disables scrolling
 	 */
 	handleScroll: HandleScrollOptions | boolean;
@@ -335,10 +327,33 @@ export interface ChartOptionsBase<HorzScaleItem> {
 	 */
 	trackingMode: TrackingModeOptions;
 
+	localization: LocalizationOptionsBase;
 }
 
+/**
+ * Structure describing options of the chart. Series options are to be set separately
+ */
+export interface ChartOptionsImpl<HorzScaleItem> extends ChartOptionsBase {
+
+	/**
+	 * Localization options.
+	 */
+	localization: LocalizationOptions<HorzScaleItem>;
+}
+
+export type ChartOptionsInternalBase =
+	Omit<ChartOptionsBase, 'handleScroll' | 'handleScale' | 'layout'>
+	& {
+		/** @public */
+		handleScroll: HandleScrollOptions;
+		/** @public */
+		handleScale: HandleScaleOptionsInternal;
+		/** @public */
+		layout: LayoutOptions;
+	};
+
 export type ChartOptionsInternal<HorzScaleItem> =
-	Omit<ChartOptionsBase<HorzScaleItem>, 'handleScroll' | 'handleScale' | 'layout'>
+	Omit<ChartOptionsImpl<HorzScaleItem>, 'handleScroll' | 'handleScale' | 'layout'>
 	& {
 		/** @public */
 		handleScroll: HandleScrollOptions;
@@ -354,7 +369,14 @@ interface GradientColorsCache {
 	colors: Map<number, string>;
 }
 
-export class ChartModel<HorzScaleItem> implements IDestroyable {
+export interface IChartModelBase {
+	applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void;
+	findPriceScale(priceScaleId: string): PriceScaleOnPane | null;
+	options(): Readonly<ChartOptionsInternalBase>;
+	timeScale(): ITimeScale;
+}
+
+export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase {
 	private readonly _options: ChartOptionsInternal<HorzScaleItem>;
 	private readonly _invalidateHandler: InvalidateHandler;
 
@@ -484,7 +506,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable {
 		this._priceScalesOptionsChanged.fire();
 	}
 
-	public findPriceScale(priceScaleId: string): PriceScaleOnPane<HorzScaleItem> | null {
+	public findPriceScale(priceScaleId: string): PriceScaleOnPane | null {
 		for (const pane of this._panes) {
 			const priceScale = pane.priceScaleById(priceScaleId);
 			if (priceScale !== null) {
@@ -555,29 +577,29 @@ export class ChartModel<HorzScaleItem> implements IDestroyable {
 		return pane;
 	}
 
-	public startScalePrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>, x: number): void {
+	public startScalePrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale, x: number): void {
 		pane.startScalePrice(priceScale, x);
 	}
 
-	public scalePriceTo(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>, x: number): void {
+	public scalePriceTo(pane: Pane<HorzScaleItem>, priceScale: PriceScale, x: number): void {
 		pane.scalePriceTo(priceScale, x);
 		this.updateCrosshair();
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
-	public endScalePrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>): void {
+	public endScalePrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale): void {
 		pane.endScalePrice(priceScale);
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
-	public startScrollPrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>, x: number): void {
+	public startScrollPrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale, x: number): void {
 		if (priceScale.isAutoScale()) {
 			return;
 		}
 		pane.startScrollPrice(priceScale, x);
 	}
 
-	public scrollPriceTo(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>, x: number): void {
+	public scrollPriceTo(pane: Pane<HorzScaleItem>, priceScale: PriceScale, x: number): void {
 		if (priceScale.isAutoScale()) {
 			return;
 		}
@@ -586,7 +608,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable {
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
-	public endScrollPrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>): void {
+	public endScrollPrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale): void {
 		if (priceScale.isAutoScale()) {
 			return;
 		}
@@ -594,7 +616,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable {
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
-	public resetPriceScale(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>): void {
+	public resetPriceScale(pane: Pane<HorzScaleItem>, priceScale: PriceScale): void {
 		pane.resetPriceScale(priceScale);
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}

@@ -1,6 +1,6 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { ChartOptionsBase } from '../model/chart-model';
+import { ChartOptionsImpl } from '../model/chart-model';
 import { BarData, HistogramData, LineData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { Point } from '../model/point';
@@ -249,14 +249,14 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 *
 	 * @param options - Any subset of options.
 	 */
-	applyOptions(options: DeepPartial<ChartOptionsBase<HorzScaleItem>>): void;
+	applyOptions(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): void;
 
 	/**
 	 * Returns currently applied options
 	 *
 	 * @returns Full set of currently applied options, including defaults
 	 */
-	options(): Readonly<ChartOptionsBase<HorzScaleItem>>;
+	options(): Readonly<ChartOptionsImpl<HorzScaleItem>>;
 
 	/**
 	 * Make a screenshot of the chart with all the elements excluding crosshair.

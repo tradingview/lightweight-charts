@@ -98,7 +98,7 @@ export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Se
 export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource<HorzScaleItem> implements IDestroyable {
 	private readonly _seriesType: T;
 	private _data: SeriesPlotList<T, HorzScaleItem> = createSeriesPlotList<T, HorzScaleItem>();
-	private readonly _priceAxisViews: IPriceAxisView<HorzScaleItem>[];
+	private readonly _priceAxisViews: IPriceAxisView[];
 	private readonly _panePriceAxisView: PanePriceAxisView<HorzScaleItem>;
 	private _formatter!: IPriceFormatter;
 	private readonly _priceLineView: SeriesPriceLinePaneView<HorzScaleItem> = new SeriesPriceLinePaneView(this);
@@ -389,7 +389,7 @@ export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource
 		];
 	}
 
-	public override priceAxisViews(pane: Pane<HorzScaleItem>, priceScale: PriceScale<HorzScaleItem>): readonly IPriceAxisView<HorzScaleItem>[] {
+	public override priceAxisViews(pane: Pane<HorzScaleItem>, priceScale: PriceScale): readonly IPriceAxisView[] {
 		if (priceScale !== this._priceScale && !this._isOverlay()) {
 			return [];
 		}
@@ -437,7 +437,7 @@ export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource
 		this._lastPriceAnimationPaneView?.update();
 	}
 
-	public override priceScale(): PriceScale<HorzScaleItem> {
+	public override priceScale(): PriceScale {
 		return ensureNotNull(super.priceScale());
 	}
 

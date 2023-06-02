@@ -5,7 +5,7 @@ import { Delegate } from '../helpers/delegate';
 import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
-import { ChartOptionsBase, ChartOptionsInternal } from '../model/chart-model';
+import { ChartOptionsImpl, ChartOptionsInternal } from '../model/chart-model';
 import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from '../model/data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
@@ -58,7 +58,7 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	}
 }
 
-function migrateHandleScaleScrollOptions<HorzScaleItem>(options: DeepPartial<ChartOptionsBase<HorzScaleItem>>): void {
+function migrateHandleScaleScrollOptions<HorzScaleItem>(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): void {
 	if (isBoolean(options.handleScale)) {
 		const handleScale = options.handleScale;
 		options.handleScale = {
@@ -100,7 +100,7 @@ function migrateHandleScaleScrollOptions<HorzScaleItem>(options: DeepPartial<Cha
 	}
 }
 
-function toInternalOptions<HorzScaleItem>(options: DeepPartial<ChartOptionsBase<HorzScaleItem>>): DeepPartial<ChartOptionsInternal<HorzScaleItem>> {
+function toInternalOptions<HorzScaleItem>(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): DeepPartial<ChartOptionsInternal<HorzScaleItem>> {
 	migrateHandleScaleScrollOptions(options);
 
 	return options as DeepPartial<ChartOptionsInternal<HorzScaleItem>>;
@@ -121,7 +121,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
-	public constructor(container: HTMLElement, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, options?: DeepPartial<ChartOptionsBase<HorzScaleItem>>) {
+	public constructor(container: HTMLElement, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, options?: DeepPartial<ChartOptionsImpl<HorzScaleItem>>) {
 		this._dataLayer = new DataLayer<HorzScaleItem>(horzScaleBehavior);
 		const internalOptions = (options === undefined) ?
 			clone(chartOptionsDefaults<HorzScaleItem>()) :
@@ -247,12 +247,12 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._timeScaleApi;
 	}
 
-	public applyOptions(options: DeepPartial<ChartOptionsBase<HorzScaleItem>>): void {
+	public applyOptions(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): void {
 		this._chartWidget.applyOptions(toInternalOptions(options));
 	}
 
-	public options(): Readonly<ChartOptionsBase<HorzScaleItem>> {
-		return this._chartWidget.options() as Readonly<ChartOptionsBase<HorzScaleItem>>;
+	public options(): Readonly<ChartOptionsImpl<HorzScaleItem>> {
+		return this._chartWidget.options() as Readonly<ChartOptionsImpl<HorzScaleItem>>;
 	}
 
 	public takeScreenshot(): HTMLCanvasElement {

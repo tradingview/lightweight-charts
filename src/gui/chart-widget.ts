@@ -8,7 +8,7 @@ import { ISubscription } from '../helpers/isubscription';
 import { warn } from '../helpers/logger';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
+import { IChartModelBase, ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { DefaultPriceScaleId } from '../model/default-price-scale';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
@@ -43,7 +43,12 @@ export type MouseEventParamsImplSupplier<HorzScaleItem> = () => MouseEventParams
 
 const windowsChrome = isChromiumBased() && isWindows();
 
-export class ChartWidget<HorzScaleItem> implements IDestroyable {
+export interface IChartWidgetBase {
+	getPriceAxisWidth(position: DefaultPriceScaleId): number;
+	model(): IChartModelBase;
+}
+
+export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBase {
 	private readonly _options: ChartOptionsInternal<HorzScaleItem>;
 	private _paneWidgets: PaneWidget<HorzScaleItem>[] = [];
 	// private _paneSeparators: PaneSeparator[] = [];

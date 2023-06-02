@@ -4,13 +4,13 @@ import {
 	PriceAxisViewRendererOptions,
 } from '../../renderers/iprice-axis-view-renderer';
 
-export interface IPriceAxisView<HorzScaleItem> {
+export interface IPriceAxisView {
 	coordinate(): number;
 	getFixedCoordinate(): number;
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine?: boolean): number;
 	isVisible(): boolean;
 	isAxisLabelVisible(): boolean;
-	renderer(priceScale: PriceScale<HorzScaleItem>): IPriceAxisViewRenderer;
+	renderer(priceScale: PriceScale): IPriceAxisViewRenderer;
 	paneRenderer(): IPriceAxisViewRenderer;
 	setFixedCoordinate(value: number | null): void;
 	text(): string;

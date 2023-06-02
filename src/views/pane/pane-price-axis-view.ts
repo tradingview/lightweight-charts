@@ -39,14 +39,14 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 }
 
 export class PanePriceAxisView<HorzScaleItem> implements IPaneView {
-	private _priceAxisView: IPriceAxisView<HorzScaleItem>;
+	private _priceAxisView: IPriceAxisView;
 	private readonly _textWidthCache: TextWidthCache;
 	private readonly _dataSource: IPriceDataSource<HorzScaleItem>;
 	private readonly _chartModel: ChartModel<HorzScaleItem>;
 	private readonly _renderer: PanePriceAxisViewRenderer;
 	private _fontSize: number;
 
-	public constructor(priceAxisView: IPriceAxisView<HorzScaleItem>, dataSource: IPriceDataSource<HorzScaleItem>, chartModel: ChartModel<HorzScaleItem>) {
+	public constructor(priceAxisView: IPriceAxisView, dataSource: IPriceDataSource<HorzScaleItem>, chartModel: ChartModel<HorzScaleItem>) {
 		this._priceAxisView = priceAxisView;
 		this._textWidthCache = new TextWidthCache(50); // when should we clear cache?
 		this._dataSource = dataSource;

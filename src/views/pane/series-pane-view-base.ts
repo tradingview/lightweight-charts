@@ -54,7 +54,7 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		}));
 	}
 
-	protected abstract _convertToCoordinates(priceScale: PriceScale<HorzScaleItem>, timeScale: TimeScale<HorzScaleItem>, firstValue: number): void;
+	protected abstract _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale<HorzScaleItem>, firstValue: number): void;
 
 	protected _clearVisibleRange(): void {
 		this._itemsVisibleRange = null;

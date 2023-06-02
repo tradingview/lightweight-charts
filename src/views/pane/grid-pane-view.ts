@@ -1,16 +1,16 @@
-import { Pane } from '../../model/pane';
+import { IPaneBase } from '../../model/pane';
 import { TimeMark } from '../../model/time-scale';
 import { GridRenderer, GridRendererData } from '../../renderers/grid-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IUpdatablePaneView } from './iupdatable-pane-view';
 
-export class GridPaneView<HorzScaleItem> implements IUpdatablePaneView {
-	private readonly _pane: Pane<HorzScaleItem>;
+export class GridPaneView implements IUpdatablePaneView {
+	private readonly _pane: IPaneBase;
 	private readonly _renderer: GridRenderer = new GridRenderer();
 	private _invalidated: boolean = true;
 
-	public constructor(pane: Pane<HorzScaleItem>) {
+	public constructor(pane: IPaneBase) {
 		this._pane = pane;
 	}
 

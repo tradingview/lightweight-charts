@@ -165,7 +165,11 @@ export interface HorzScaleOptions {
 	uniformDistribution: boolean;
 }
 
-export class TimeScale<HorzScaleItem> {
+export interface ITimeScale {
+	marks(): TimeMark[] | null;
+}
+
+export class TimeScale<HorzScaleItem> implements ITimeScale {
 	private readonly _options: HorzScaleOptions;
 	private readonly _model: ChartModel<HorzScaleItem>;
 	private readonly _localizationOptions: LocalizationOptions<HorzScaleItem>;

@@ -6,10 +6,7 @@ import { PriceFormatterFn } from './price-formatter-fn';
  */
 export type TimeFormatterFn<HorzScaleItem = Time> = (time: HorzScaleItem) => string;
 
-/**
- * Represents options for formatting dates, times, and prices according to a locale.
- */
-export interface LocalizationOptions<HorzScaleItem> {
+export interface LocalizationOptionsBase {
 	/**
 	 * Current locale used to format dates. Uses the browser's language settings by default.
 	 *
@@ -26,6 +23,12 @@ export interface LocalizationOptions<HorzScaleItem> {
 	 */
 	priceFormatter?: PriceFormatterFn;
 
+}
+
+/**
+ * Represents options for formatting dates, times, and prices according to a locale.
+ */
+export interface LocalizationOptions<HorzScaleItem> extends LocalizationOptionsBase {
 	/**
 	 * Override formatting of the time scale crosshair label.
 	 *

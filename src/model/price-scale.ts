@@ -9,9 +9,9 @@ import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { BarCoordinates, BarPrice, BarPrices } from './bar';
 import { Coordinate } from './coordinate';
-import { FirstValue, IPriceDataSource } from './iprice-data-source';
+import { FirstValue, IPriceDataSource, IPriceDataSourceBase } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
-import { LocalizationOptions } from './localization-options';
+import { LocalizationOptionsBase } from './localization-options';
 import { PriceRangeImpl } from './price-range-impl';
 import {
 	canConvertPriceRangeFromLog,
@@ -193,11 +193,11 @@ interface MarksCache {
 	firstValueIsNull: boolean;
 }
 
-export class PriceScale<HorzScaleItem> {
+export class PriceScale {
 	private readonly _id: string;
 
 	private readonly _layoutOptions: LayoutOptions;
-	private readonly _localizationOptions: LocalizationOptions<HorzScaleItem>;
+	private readonly _localizationOptions: LocalizationOptionsBase;
 	private readonly _options: PriceScaleOptions;
 
 	private _height: number = 0;
@@ -210,13 +210,13 @@ export class PriceScale<HorzScaleItem> {
 	private _marginAbove: number = 0;
 	private _marginBelow: number = 0;
 
-	private _markBuilder: PriceTickMarkBuilder<HorzScaleItem>;
+	private _markBuilder: PriceTickMarkBuilder;
 	private _onMarksChanged: Delegate = new Delegate();
 
 	private _modeChanged: Delegate<PriceScaleState, PriceScaleState> = new Delegate();
 
-	private _dataSources: IPriceDataSource<HorzScaleItem>[] = [];
-	private _cachedOrderedSources: IPriceDataSource<HorzScaleItem>[] | null = null;
+	private _dataSources: IPriceDataSourceBase[] = [];
+	private _cachedOrderedSources: IPriceDataSourceBase[] | null = null;
 
 	private _marksCache: MarksCache | null = null;
 
@@ -226,7 +226,7 @@ export class PriceScale<HorzScaleItem> {
 
 	private _logFormula: LogFormula = logFormulaForPriceRange(null);
 
-	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions<HorzScaleItem>) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptionsBase) {
 		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
@@ -518,16 +518,16 @@ export class PriceScale<HorzScaleItem> {
 		return value as BarPrice;
 	}
 
-	public dataSources(): readonly IPriceDataSource<HorzScaleItem>[] {
+	public dataSources(): readonly IPriceDataSourceBase[] {
 		return this._dataSources;
 	}
 
-	public orderedSources(): readonly IPriceDataSource<HorzScaleItem>[] {
+	public orderedSources(): readonly IPriceDataSourceBase[] {
 		if (this._cachedOrderedSources) {
 			return this._cachedOrderedSources;
 		}
 
-		let sources: IPriceDataSource<HorzScaleItem>[] = [];
+		let sources: IPriceDataSourceBase[] = [];
 		for (let i = 0; i < this._dataSources.length; i++) {
 			const ds = this._dataSources[i];
 			if (ds.zorder() === null) {
@@ -537,12 +537,12 @@ export class PriceScale<HorzScaleItem> {
 			sources.push(ds);
 		}
 
-		sources = sortSources<HorzScaleItem, IPriceDataSource<HorzScaleItem>>(sources);
+		sources = sortSources<IPriceDataSourceBase>(sources);
 		this._cachedOrderedSources = sources;
 		return this._cachedOrderedSources;
 	}
 
-	public addDataSource(source: IPriceDataSource<HorzScaleItem>): void {
+	public addDataSource(source: IPriceDataSourceBase): void {
 		if (this._dataSources.indexOf(source) !== -1) {
 			return;
 		}
@@ -552,7 +552,7 @@ export class PriceScale<HorzScaleItem> {
 		this.invalidateSourcesCache();
 	}
 
-	public removeDataSource(source: IPriceDataSource<HorzScaleItem>): void {
+	public removeDataSource(source: IPriceDataSourceBase): void {
 		const index = this._dataSources.indexOf(source);
 		if (index === -1) {
 			throw new Error('source is not attached to scale');
@@ -768,7 +768,7 @@ export class PriceScale<HorzScaleItem> {
 		return percentageFormatter.format(price);
 	}
 
-	public sourcesForAutoScale(): readonly IPriceDataSource<HorzScaleItem>[] {
+	public sourcesForAutoScale(): readonly IPriceDataSourceBase[] {
 		return this._dataSources;
 	}
 
@@ -780,7 +780,7 @@ export class PriceScale<HorzScaleItem> {
 	}
 
 	public updateAllViews(): void {
-		this._dataSources.forEach((s: IPriceDataSource<HorzScaleItem>) => s.updateAllViews());
+		this._dataSources.forEach((s: IPriceDataSourceBase) => s.updateAllViews());
 	}
 
 	public updateFormatter(): void {
@@ -822,7 +822,7 @@ export class PriceScale<HorzScaleItem> {
 	/**
 	 * @returns The {@link IPriceDataSource} that will be used as the "formatter source" (take minMove for formatter).
 	 */
-	private _formatterSource(): IPriceDataSource<HorzScaleItem> | null {
+	private _formatterSource(): IPriceDataSourceBase | null {
 		return this._dataSources[0] || null;
 	}
 

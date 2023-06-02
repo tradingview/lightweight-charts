@@ -41,7 +41,7 @@ function fillSizeAndY<HorzScaleItem>(
 	offsets: Offsets,
 	textHeight: number,
 	shapeMargin: number,
-	priceScale: PriceScale<HorzScaleItem>,
+	priceScale: PriceScale,
 	timeScale: TimeScale<HorzScaleItem>,
 	firstValue: number
 ): void {

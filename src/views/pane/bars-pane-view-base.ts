@@ -20,7 +20,7 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick'
 		super(series, model, false);
 	}
 
-	protected _convertToCoordinates(priceScale: PriceScale<HorzScaleItem>, timeScale: TimeScale<HorzScaleItem>, firstValue: number): void {
+	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale<HorzScaleItem>, firstValue: number): void {
 		timeScale.indexesToCoordinates(this._items, undefinedIfNull(this._itemsVisibleRange));
 		priceScale.barPricesToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
 	}

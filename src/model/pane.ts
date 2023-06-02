@@ -4,10 +4,10 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
-import { ChartModel, ChartOptionsBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
+import { ChartModel, ChartOptionsImpl, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid } from './grid';
-import { IPriceDataSource } from './iprice-data-source';
+import { IPriceDataSource, IPriceDataSourceBase } from './iprice-data-source';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
 import { sortSources } from './sort-sources';
 import { TimeScale } from './time-scale';
@@ -21,10 +21,16 @@ interface MinMaxOrderInfo {
 	maxZOrder: number;
 }
 
-export class Pane<HorzScaleItem> implements IDestroyable {
+export interface IPaneBase {
+	addDataSource(source: IPriceDataSourceBase, targetScaleId: string, zOrder?: number): void;
+	model(): IChartModelBase;
+	defaultPriceScale(): PriceScale;
+}
+
+export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 	private readonly _timeScale: TimeScale<HorzScaleItem>;
 	private readonly _model: ChartModel<HorzScaleItem>;
-	private readonly _grid: Grid<HorzScaleItem>;
+	private readonly _grid: Grid;
 
 	private _dataSources: IPriceDataSource<HorzScaleItem>[] = [];
 	private _overlaySourcesByScaleId: Map<string, IPriceDataSource<HorzScaleItem>[]> = new Map();
@@ -36,8 +42,8 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 
 	private _destroyed: Delegate = new Delegate();
 
-	private _leftPriceScale: PriceScale<HorzScaleItem>;
-	private _rightPriceScale: PriceScale<HorzScaleItem>;
+	private _leftPriceScale: PriceScale;
+	private _rightPriceScale: PriceScale;
 
 	public constructor(timeScale: TimeScale<HorzScaleItem>, model: ChartModel<HorzScaleItem>) {
 		this._timeScale = timeScale;
@@ -55,7 +61,7 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		this.applyScaleOptions(options);
 	}
 
-	public applyScaleOptions(options: DeepPartial<ChartOptionsBase<HorzScaleItem>>): void {
+	public applyScaleOptions(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): void {
 		if (options.leftPriceScale) {
 			this._leftPriceScale.applyOptions(options.leftPriceScale);
 		}
@@ -78,7 +84,7 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		}
 	}
 
-	public priceScaleById(id: string): PriceScale<HorzScaleItem> | null {
+	public priceScaleById(id: string): PriceScale | null {
 		switch (id) {
 			case DefaultPriceScaleId.Left: {
 				return this._leftPriceScale;
@@ -201,7 +207,7 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		this._cachedOrderedSources = null;
 	}
 
-	public priceScalePosition(priceScale: PriceScale<HorzScaleItem>): PriceScalePosition {
+	public priceScalePosition(priceScale: PriceScale): PriceScalePosition {
 		if (priceScale === this._leftPriceScale) {
 			return 'left';
 		}
@@ -212,39 +218,39 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		return 'overlay';
 	}
 
-	public leftPriceScale(): PriceScale<HorzScaleItem> {
+	public leftPriceScale(): PriceScale {
 		return this._leftPriceScale;
 	}
 
-	public rightPriceScale(): PriceScale<HorzScaleItem> {
+	public rightPriceScale(): PriceScale {
 		return this._rightPriceScale;
 	}
 
-	public startScalePrice(priceScale: PriceScale<HorzScaleItem>, x: number): void {
+	public startScalePrice(priceScale: PriceScale, x: number): void {
 		priceScale.startScale(x);
 	}
 
-	public scalePriceTo(priceScale: PriceScale<HorzScaleItem>, x: number): void {
+	public scalePriceTo(priceScale: PriceScale, x: number): void {
 		priceScale.scaleTo(x);
 
 		// TODO: be more smart and update only affected views
 		this.updateAllSources();
 	}
 
-	public endScalePrice(priceScale: PriceScale<HorzScaleItem>): void {
+	public endScalePrice(priceScale: PriceScale): void {
 		priceScale.endScale();
 	}
 
-	public startScrollPrice(priceScale: PriceScale<HorzScaleItem>, x: number): void {
+	public startScrollPrice(priceScale: PriceScale, x: number): void {
 		priceScale.startScroll(x);
 	}
 
-	public scrollPriceTo(priceScale: PriceScale<HorzScaleItem>, x: number): void {
+	public scrollPriceTo(priceScale: PriceScale, x: number): void {
 		priceScale.scrollTo(x);
 		this.updateAllSources();
 	}
 
-	public endScrollPrice(priceScale: PriceScale<HorzScaleItem>): void {
+	public endScrollPrice(priceScale: PriceScale): void {
 		priceScale.endScroll();
 	}
 
@@ -254,8 +260,8 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		});
 	}
 
-	public defaultPriceScale(): PriceScale<HorzScaleItem> {
-		let priceScale: PriceScale<HorzScaleItem> | null = null;
+	public defaultPriceScale(): PriceScale {
+		let priceScale: PriceScale | null = null;
 
 		if (this._model.options().rightPriceScale.visible && this._rightPriceScale.dataSources().length !== 0) {
 			priceScale = this._rightPriceScale;
@@ -272,8 +278,8 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		return priceScale;
 	}
 
-	public defaultVisiblePriceScale(): PriceScale<HorzScaleItem> | null {
-		let priceScale: PriceScale<HorzScaleItem> | null = null;
+	public defaultVisiblePriceScale(): PriceScale | null {
+		let priceScale: PriceScale | null = null;
 
 		if (this._model.options().rightPriceScale.visible) {
 			priceScale = this._rightPriceScale;
@@ -283,7 +289,7 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		return priceScale;
 	}
 
-	public recalculatePriceScale(priceScale: PriceScale<HorzScaleItem> | null): void {
+	public recalculatePriceScale(priceScale: PriceScale | null): void {
 		if (priceScale === null || !priceScale.isAutoScale()) {
 			return;
 		}
@@ -291,7 +297,7 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		this._recalculatePriceScaleImpl(priceScale);
 	}
 
-	public resetPriceScale(priceScale: PriceScale<HorzScaleItem>): void {
+	public resetPriceScale(priceScale: PriceScale): void {
 		const visibleBars = this._timeScale.visibleStrictRange();
 		priceScale.setMode({ autoScale: true });
 		if (visibleBars !== null) {
@@ -321,7 +327,7 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 
 	public orderedSources(): readonly IPriceDataSource<HorzScaleItem>[] {
 		if (this._cachedOrderedSources === null) {
-			this._cachedOrderedSources = sortSources<HorzScaleItem, IPriceDataSource<HorzScaleItem>>(this._dataSources);
+			this._cachedOrderedSources = sortSources<IPriceDataSource<HorzScaleItem>>(this._dataSources);
 		}
 
 		return this._cachedOrderedSources;
@@ -331,11 +337,11 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		return this._destroyed;
 	}
 
-	public grid(): Grid<HorzScaleItem> {
+	public grid(): Grid {
 		return this._grid;
 	}
 
-	private _recalculatePriceScaleImpl(priceScale: PriceScale<HorzScaleItem>): void {
+	private _recalculatePriceScaleImpl(priceScale: PriceScale): void {
 		// TODO: can use this checks
 		const sourceForAutoScale = priceScale.sourcesForAutoScale();
 
@@ -398,7 +404,7 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		this._cachedOrderedSources = null;
 	}
 
-	private _onPriceScaleModeChanged(priceScale: PriceScale<HorzScaleItem>, oldMode: PriceScaleState, newMode: PriceScaleState): void {
+	private _onPriceScaleModeChanged(priceScale: PriceScale, oldMode: PriceScaleState, newMode: PriceScaleState): void {
 		if (oldMode.mode === newMode.mode) {
 			return;
 		}
@@ -407,9 +413,9 @@ export class Pane<HorzScaleItem> implements IDestroyable {
 		this._recalculatePriceScaleImpl(priceScale);
 	}
 
-	private _createPriceScale(id: string, options: OverlayPriceScaleOptions | VisiblePriceScaleOptions): PriceScale<HorzScaleItem> {
+	private _createPriceScale(id: string, options: OverlayPriceScaleOptions | VisiblePriceScaleOptions): PriceScale {
 		const actualOptions: PriceScaleOptions = { visible: true, autoScale: true, ...clone(options) };
-		const priceScale = new PriceScale<HorzScaleItem>(
+		const priceScale = new PriceScale(
 			id,
 			actualOptions,
 			this._model.options().layout,

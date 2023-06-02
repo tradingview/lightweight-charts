@@ -75,7 +75,7 @@ export class Watermark<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		this._paneView = new WatermarkPaneView(this);
 	}
 
-	public override priceAxisViews(): readonly IPriceAxisView<HorzScaleItem>[] {
+	public override priceAxisViews(): readonly IPriceAxisView[] {
 		return [];
 	}
 

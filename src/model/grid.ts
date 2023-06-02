@@ -2,7 +2,7 @@ import { LineStyle } from '../renderers/draw-line';
 import { GridPaneView } from '../views/pane/grid-pane-view';
 import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
 
-import { Pane } from './pane';
+import { IPaneBase } from './pane';
 
 /** Grid line options. */
 export interface GridLineOptions {
@@ -41,10 +41,10 @@ export interface GridOptions {
 	horzLines: GridLineOptions;
 }
 
-export class Grid<HorzScaleItem> {
-	private _paneView: GridPaneView<HorzScaleItem>;
+export class Grid {
+	private _paneView: GridPaneView;
 
-	public constructor(pane: Pane<HorzScaleItem>) {
+	public constructor(pane: IPaneBase) {
 		this._paneView = new GridPaneView(pane);
 	}
 

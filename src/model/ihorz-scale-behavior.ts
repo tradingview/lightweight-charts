@@ -1,7 +1,7 @@
 import { Mutable } from '../helpers/mutable';
 import { Nominal } from '../helpers/nominal';
 
-import { ChartOptionsBase } from './chart-model';
+import { ChartOptionsImpl } from './chart-model';
 import { SeriesDataItemTypeMap } from './data-consumer';
 import { LocalizationOptions } from './localization-options';
 import { SeriesType } from './series-options';
@@ -38,7 +38,7 @@ export interface IHorzScaleBehavior<HorzScaleItem> {
 	 *
 	 * @returns ChartOptionsBase
 	 */
-	options(): ChartOptionsBase<HorzScaleItem>;
+	options(): ChartOptionsImpl<HorzScaleItem>;
 	/**
 	 * Set the chart options. Note that this is different to `applyOptions` since the provided options will overwrite the current options
 	 * instead of merging with the current options.
@@ -46,7 +46,7 @@ export interface IHorzScaleBehavior<HorzScaleItem> {
 	 * @param options - Chart options to be set
 	 * @returns void
 	 */
-	setOptions(options: ChartOptionsBase<HorzScaleItem>): void;
+	setOptions(options: ChartOptionsImpl<HorzScaleItem>): void;
 	/**
 	 * Method to preprocess the data.
 	 *

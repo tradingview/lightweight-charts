@@ -1,4 +1,4 @@
-import { ChartWidget } from '../gui/chart-widget';
+import { IChartWidgetBase } from '../gui/chart-widget';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { DeepPartial } from '../helpers/strict-type-checks';
@@ -8,11 +8,11 @@ import { PriceScale, PriceScaleOptions } from '../model/price-scale';
 
 import { IPriceScaleApi } from './iprice-scale-api';
 
-export class PriceScaleApi<HorzScaleItem> implements IPriceScaleApi {
-	private _chartWidget: ChartWidget<HorzScaleItem>;
+export class PriceScaleApi implements IPriceScaleApi {
+	private _chartWidget: IChartWidgetBase;
 	private readonly _priceScaleId: string;
 
-	public constructor(chartWidget: ChartWidget<HorzScaleItem>, priceScaleId: string) {
+	public constructor(chartWidget: IChartWidgetBase, priceScaleId: string) {
 		this._chartWidget = chartWidget;
 		this._priceScaleId = priceScaleId;
 	}
@@ -33,7 +33,7 @@ export class PriceScaleApi<HorzScaleItem> implements IPriceScaleApi {
 		return this._chartWidget.getPriceAxisWidth(this._priceScaleId);
 	}
 
-	private _priceScale(): PriceScale<HorzScaleItem> {
+	private _priceScale(): PriceScale {
 		return ensureNotNull(this._chartWidget.model().findPriceScale(this._priceScaleId)).priceScale;
 	}
 }

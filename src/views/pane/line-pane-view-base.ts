@@ -24,7 +24,7 @@ export abstract class LinePaneViewBase<
 		super(series, model, true);
 	}
 
-	protected _convertToCoordinates(priceScale: PriceScale<HorzScaleItem>, timeScale: TimeScale<HorzScaleItem>, firstValue: number): void {
+	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale<HorzScaleItem>, firstValue: number): void {
 		timeScale.indexesToCoordinates(this._items, undefinedIfNull(this._itemsVisibleRange));
 		priceScale.pointsArrayToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
 	}

@@ -44,7 +44,7 @@ export class CustomPriceLine<HorzScaleItem> {
 		return this._panePriceAxisView;
 	}
 
-	public priceAxisView(): IPriceAxisView<HorzScaleItem> {
+	public priceAxisView(): IPriceAxisView {
 		return this._priceAxisView;
 	}
 
