@@ -184,7 +184,7 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm run tsc
+      - run: npm run tsc-verify
       - run: npm run type-tests
 
   dts-changes:
