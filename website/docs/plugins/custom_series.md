@@ -16,7 +16,7 @@ series, providing a consistent API which mirrors the built-in chart types.
 These series are expected to have a uniform width for each data point, which
 ensures that the chart maintains a consistent look and feel across all series
 types. The only restriction on the data structure is that it should extend the
-[`CustomData`](/api/interfaces/CustomData.md) interface (have a valid time
+[`CustomData`](../api/interfaces/CustomData.md) interface (have a valid time
 property for each data point).
 
 :::
@@ -24,7 +24,7 @@ property for each data point).
 ## Defining a Custom Series
 
 A custom series should implement the
-[`ICustomSeriesPaneView`](/api/interfaces/ICustomSeriesPaneView.md) interface.
+[`ICustomSeriesPaneView`](../api/interfaces/ICustomSeriesPaneView.md) interface.
 The interface defines the basic functionality and structure required for
 creating a custom series view.
 
@@ -33,16 +33,16 @@ It includes the following methods and properties:
 ### Renderer
 
 - ICustomSeriesPaneView property:
-  [`renderer`](/api/interfaces/ICustomSeriesPaneView.md#renderer)
+  [`renderer`](../api/interfaces/ICustomSeriesPaneView.md#renderer)
 
 This method should return a renderer which implements the
-[`ICustomSeriesPaneRenderer`](/api/interfaces/ICustomSeriesPaneRenderer.md)
+[`ICustomSeriesPaneRenderer`](../api/interfaces/ICustomSeriesPaneRenderer.md)
 interface and is used to draw the series data on the main chart pane.
 
-The [`draw`](/api/interfaces/ICustomSeriesPaneRenderer.md#draw) method of the
+The [`draw`](../api/interfaces/ICustomSeriesPaneRenderer.md#draw) method of the
 renderer is evoked whenever the chart needs to draw the series.
 
-The [`PriceToCoordinateConverter`](/api/index.md#pricetocoordinateconverter)
+The [`PriceToCoordinateConverter`](../api/index.md#pricetocoordinateconverter)
 provided as the 2nd argument to the draw method is a convenience function for
 changing prices into vertical coordinate values. It is provided since the
 series' original data will most likely be defined in price values, and the
@@ -59,7 +59,7 @@ more detail on the [Canvas Rendering Target](./canvas-rendering-target) page.
 ### Update
 
 - ICustomSeriesPaneView property:
-  [`update`](/api/interfaces/ICustomSeriesPaneView.md#update)
+  [`update`](../api/interfaces/ICustomSeriesPaneView.md#update)
 
 This method will be called with the latest data for the renderer to use during
 the next paint.
@@ -68,19 +68,19 @@ The update method is evoked with two parameters: `data` (discussed below), and
 `seriesOptions`. seriesOptions is a reference to the currently applied options
 for the series
 
-The [`PaneRendererCustomData`](/api/interfaces/PaneRendererCustomData.md)
+The [`PaneRendererCustomData`](../api/interfaces/PaneRendererCustomData.md)
 interface provides the data that can be used within the renderer for drawing the
 series data. It includes the following properties:
 
 - `bars`: List of all the series' items and their x coordinates. See
-  [`CustomBarItemData`](/api/interfaces/CustomBarItemData.md) for more details
+  [`CustomBarItemData`](../api/interfaces/CustomBarItemData.md) for more details
 - `barSpacing`: Spacing between consecutive bars.
 - `visibleRange`: The current visible range of items on the chart.
 
 ### Price Value Builder
 
 - ICustomSeriesPaneView property:
-  [`priceValueBuilder`](/api/interfaces/ICustomSeriesPaneView.md#priceValueBuilder)
+  [`priceValueBuilder`](../api/interfaces/ICustomSeriesPaneView.md#priceValueBuilder)
 
 A function for interpreting the custom series data and returning an array of
 numbers representing the prices values for the item, specifically the equivalent
@@ -95,7 +95,7 @@ price line position.
 ### Whitespace
 
 - ICustomSeriesPaneView property:
-  [`isWhitespace`](/api/interfaces/ICustomSeriesPaneView.md#iswhitespace)
+  [`isWhitespace`](../api/interfaces/ICustomSeriesPaneView.md#iswhitespace)
 
 A function used by the library to determine which data points provided by the
 user should be considered Whitespace. The method should return `true` when the
@@ -105,18 +105,18 @@ the renderer, or the `priceValueBuilder`.
 ### Default Options
 
 - ICustomSeriesPaneView property:
-  [`defaultOptions`](/api/interfaces/ICustomSeriesPaneView.md#defaultoptions)
+  [`defaultOptions`](../api/interfaces/ICustomSeriesPaneView.md#defaultoptions)
 
 The default options to be used for the series. The user can override these
 values using the options argument in
-[`addCustomSeries`](/api/interfaces/IChartApi.md#addcustomseries), or via the
-[`applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method on the
+[`addCustomSeries`](../api/interfaces/IChartApi.md#addcustomseries), or via the
+[`applyOptions`](../api/interfaces/ISeriesApi.md#applyoptions) method on the
 `ISeriesAPI`.
 
 ### Destroy
 
 - ICustomSeriesPaneView property:
-  [`destroy`](/api/interfaces/ICustomSeriesPaneView.md#destroy)
+  [`destroy`](../api/interfaces/ICustomSeriesPaneView.md#destroy)
 
 This method will be evoked when the series has been removed from the chart. This
 method should be used to clean up any objects, references, and other items that

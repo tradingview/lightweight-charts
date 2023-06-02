@@ -10,7 +10,7 @@ draw on the chart using
 [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D).
 
 Primitives are defined by implementing the
-[`ISeriesPrimitive`](/api/interfaces/ISeriesPrimitive.md) interface. The
+[`ISeriesPrimitive`](../api/index.md#iseriesprimitive) interface. The
 interface defines the basic functionality and structure required for creating
 custom primitives.
 
@@ -23,18 +23,18 @@ panes.
 There are two types of views which are supported within `ISeriesPrimitive` which
 are:
 
-- [`ISeriesPrimitivePaneView`](/api/interfaces/ISeriesPrimitivePaneView.md)
-- [`ISeriesPrimitiveAxisView`](/api/interfaces/ISeriesPrimitiveAxisView.md)
+- [`ISeriesPrimitivePaneView`](../api/interfaces/ISeriesPrimitivePaneView.md)
+- [`ISeriesPrimitiveAxisView`](../api/interfaces/ISeriesPrimitiveAxisView.md)
 
 The library will evoke the following getter functions (if defined) to get
 references to the primitive's defined views for the corresponding section of the
 chart:
 
-- [`paneViews`](/api/interfaces/ISeriesPrimitive.md#paneviews)
-- [`priceAxisPaneViews`](/api/interfaces/ISeriesPrimitive.md#priceaxispaneviews)
-- [`timeAxisPaneViews`](/api/interfaces/ISeriesPrimitive.md#timeaxispaneviews)
-- [`priceAxisViews`](/api/interfaces/ISeriesPrimitive.md#priceaxisviews)
-- [`timeAxisViews`](/api/interfaces/ISeriesPrimitive.md#timeaxisviews)
+- [`paneViews`](../api/interfaces/ISeriesPrimitiveBase.md#paneviews)
+- [`priceAxisPaneViews`](../api/interfaces/ISeriesPrimitiveBase.md#priceaxispaneviews)
+- [`timeAxisPaneViews`](../api/interfaces/ISeriesPrimitiveBase.md#timeaxispaneviews)
+- [`priceAxisViews`](../api/interfaces/ISeriesPrimitiveBase.md#priceaxisviews)
+- [`timeAxisViews`](../api/interfaces/ISeriesPrimitiveBase.md#timeaxisviews)
 
 The first three views allow drawing on the corresponding panes (main chart pane,
 price scale pane, and horizontal time scale pane) using the
@@ -57,23 +57,23 @@ import sectionsExplainerCode from '!!raw-loader!./explainer-sections-demo.js';
 
 ### ISeriesPrimitivePaneView
 
-The [`ISeriesPrimitivePaneView`](/api/interfaces/ISeriesPrimitivePaneView.md)
+The [`ISeriesPrimitivePaneView`](../api/interfaces/ISeriesPrimitivePaneView.md)
 interface can be used to define a view which provides a renderer (implementing
 the
-[`ISeriesPrimitivePaneRenderer`](/api/interfaces/ISeriesPrimitivePaneRenderer.md)
+[`ISeriesPrimitivePaneRenderer`](../api/interfaces/ISeriesPrimitivePaneRenderer.md)
 interface) for drawing on the corresponding area of the chart using the
 [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
 API. The view can define a
-[`zOrder`](/api/interfaces/ISeriesPrimitivePaneView.md#zorder) to control where
+[`zOrder`](../api/interfaces/ISeriesPrimitivePaneView.md#zorder) to control where
 in the visual stack the drawing will occur (See
-[`SeriesPrimitivePaneViewZOrder`](/api/index.md#seriesprimitivepaneviewzorder)
+[`SeriesPrimitivePaneViewZOrder`](../api/index.md#seriesprimitivepaneviewzorder)
 for more information).
 
 Renderers should provide a
-[`draw`](/api/interfaces/ISeriesPrimitivePaneRenderer.md#draw) method which will
+[`draw`](../api/interfaces/ISeriesPrimitivePaneRenderer.md#draw) method which will
 be given a `CanvasRenderingTarget2D` target on which it can draw. Additionally,
 a renderer can optionally provide a
-[`drawBackground`](/api/interfaces/ISeriesPrimitivePaneRenderer.md#drawbackground)
+[`drawBackground`](../api/interfaces/ISeriesPrimitivePaneRenderer.md#drawbackground)
 method for drawing beneath other elements on the same zOrder.
 
 :::tip
@@ -95,25 +95,25 @@ import layersExplainerCode from '!!raw-loader!./explainer-layers-demo.js';
 
 ### ISeriesPrimitiveAxisView
 
-The [`ISeriesPrimitiveAxisView`](/api/interfaces/ISeriesPrimitiveAxisView.md)
+The [`ISeriesPrimitiveAxisView`](../api/interfaces/ISeriesPrimitiveAxisView.md)
 interface can be used to define a label on the price or time axis.
 
 This interface provides several methods to define the appearance and position of
 the label, such as the
-[`coordinate`](/api/interfaces/ISeriesPrimitiveAxisView.md#coordinate) method,
+[`coordinate`](../api/interfaces/ISeriesPrimitiveAxisView.md#coordinate) method,
 which should return the desired coordinate for the label on the axis. It also
 defines optional methods to set the fixed coordinate, text, text color,
 background color, and visibility of the label.
 
 Please see the
-[`ISeriesPrimitiveAxisView`](/api/interfaces/ISeriesPrimitiveAxisView.md)
+[`ISeriesPrimitiveAxisView`](../api/interfaces/ISeriesPrimitiveAxisView.md)
 interface for more details.
 
 ## Lifecycle Methods
 
 Your primitive can use the
-[`attached`](/api/interfaces/ISeriesPrimitive.md#attached) and
-[`detached`](/api/interfaces/ISeriesPrimitive.md#detached) lifecycle methods to
+[`attached`](../api/interfaces/ISeriesPrimitiveBase.md#attached) and
+[`detached`](../api/interfaces/ISeriesPrimitiveBase.md#detached) lifecycle methods to
 manage the lifecycle of the primitive, such as creating or removing external
 objects and event handlers.
 
@@ -121,7 +121,7 @@ objects and event handlers.
 
 This method is called when the primitive is attached to a chart. The attached
 method is evoked with a
-[single argument](api/interfaces/SeriesAttachedParameter.md) containing
+[single argument](../api/interfaces/SeriesAttachedParameter.md) containing
 properties for the chart, series, and a callback to request an update. The
 `chart` and `series` properties are references to the chart API and the series
 API instances for convenience purposes so that they don't need to be manually
@@ -139,7 +139,7 @@ the attached lifecycle method.
 ## Updating Views
 
 Your primitive should update the views in the
-[`updateAllViews()`](/api/interfaces/ISeriesPrimitive.md#updateallviews) method
+[`updateAllViews()`](../api/interfaces/ISeriesPrimitiveBase.md#updateallviews) method
 such that when the renderers are evoked, they can draw with the latest
 information. The library invokes this method when it wants to update and redraw
 the chart. If you would like to notify the library that it should trigger an
@@ -148,7 +148,7 @@ lifecycle method.
 
 ## Extending the Autoscale Info
 
-The [`autoscaleInfo()`](/api/interfaces/ISeriesPrimitive.md#autoscaleinfo)
+The [`autoscaleInfo()`](../api/interfaces/ISeriesPrimitiveBase.md#autoscaleinfo)
 method can be provided to extend the base autoScale information of the series.
 This can be used to ensure that the chart is automatically scaled correctly to
 include all the graphics drawn by the primitive.
