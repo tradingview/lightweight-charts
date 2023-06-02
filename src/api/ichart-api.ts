@@ -48,7 +48,7 @@ export interface MouseEventParams {
 	 * Keys of the map are {@link ISeriesApi} instances. Values are prices.
 	 * Values of the map are original data items
 	 */
-	seriesData: Map<ISeriesApi<SeriesType>, BarData | LineData | HistogramData>;
+	seriesData: Map<ISeriesApi<SeriesType>, BarData | LineData | HistogramData | CustomData>;
 	/**
 	 * The {@link ISeriesApi} for the series at the point of the mouse event.
 	 */

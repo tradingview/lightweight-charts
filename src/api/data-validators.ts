@@ -45,7 +45,7 @@ export function checkSeriesValuesType(type: SeriesType, data: readonly SeriesDat
 
 type Checker = (item: SeriesDataItemTypeMap[SeriesType]) => void;
 
-function getChecker(type: SeriesType): Checker {
+export function getChecker(type: SeriesType): Checker {
 	switch (type) {
 		case 'Bar':
 		case 'Candlestick':

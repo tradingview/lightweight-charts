@@ -327,8 +327,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
 		const seriesData: MouseEventParams['seriesData'] = new Map();
 		param.seriesData.forEach((plotRow: SeriesPlotRow, series: Series) => {
-			const data = getSeriesDataCreator(series.seriesType())(plotRow);
-			assert(isFulfilledData(data));
+			const seriesType = series.seriesType();
+			const data = getSeriesDataCreator(seriesType)(plotRow);
+			if (seriesType !== 'Custom') {
+				assert(isFulfilledData(data));
+			} else {
+				const customWhitespaceChecker = series.customSeriesWhitespaceCheck();
+				assert(!customWhitespaceChecker || customWhitespaceChecker(data) === false);
+			}
 			seriesData.set(this._mapSeriesToApi(series), data);
 		});
 
