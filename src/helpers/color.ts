@@ -81,6 +81,8 @@ const rgbRe = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$
  */
 const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
 
+const cssColorResults: Record<string, Rgba> = {};
+
 function getColorRgbFromBrowser(name: string): Rgba | undefined {
 	if (name === 'black') {
 		return [0 as RedComponent, 0 as GreenComponent, 0 as BlueComponent, 1 as AlphaComponent];
@@ -88,6 +90,9 @@ function getColorRgbFromBrowser(name: string): Rgba | undefined {
 	const div = document.createElement('div');
 	try {
 		div.style.color = name;
+		// use absolute to ensure that it doesn't reflow the rest of the page layout
+		div.style.position = 'absolute';
+		div.style.left = '-9999px';
 		document.body.appendChild(div);
 		const rgbString = window.getComputedStyle(div).color;
 		const rgb = readRGBA(rgbString);
@@ -101,7 +106,6 @@ function getColorRgbFromBrowser(name: string): Rgba | undefined {
 	}
 }
 
-const cssColorResults: Record<string, Rgba> = {};
 function tryGetRGBfromCssColor(name: string): Rgba | undefined {
 	return cssColorResults[name] ?? getColorRgbFromBrowser(name);
 }

@@ -17,7 +17,7 @@ function boundCompare<TArrayElementType, TValueType>(
 	while (0 < count) {
 		const count2: number = (count >> 1);
 		const mid: number = start + count2;
-		if (Boolean(compare(arr[mid], value)) === lower) {
+		if (compare(arr[mid], value) === lower) {
 			start = mid + 1;
 			count -= count2 + 1;
 		} else {
