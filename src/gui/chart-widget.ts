@@ -802,6 +802,7 @@ export class ChartWidget implements IDestroyable {
 		if (this._observer !== null) {
 			this._observer.disconnect();
 		}
+		this._observer = null;
 	}
 }
 
