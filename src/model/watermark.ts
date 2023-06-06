@@ -3,7 +3,7 @@ import { IPaneView } from '../views/pane/ipane-view';
 import { WatermarkPaneView } from '../views/pane/watermark-pane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
-import { ChartModel } from './chart-model';
+import { IChartModelBase } from './chart-model';
 import { DataSource } from './data-source';
 
 /** Watermark options. */
@@ -65,11 +65,11 @@ export interface WatermarkOptions {
 	vertAlign: VertAlign;
 }
 
-export class Watermark<HorzScaleItem> extends DataSource<HorzScaleItem> {
-	private readonly _paneView: WatermarkPaneView<HorzScaleItem>;
+export class Watermark extends DataSource {
+	private readonly _paneView: WatermarkPaneView;
 	private readonly _options: WatermarkOptions;
 
-	public constructor(model: ChartModel<HorzScaleItem>, options: WatermarkOptions) {
+	public constructor(model: IChartModelBase, options: WatermarkOptions) {
 		super();
 		this._options = options;
 		this._paneView = new WatermarkPaneView(this);

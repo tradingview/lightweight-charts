@@ -1,6 +1,6 @@
-import { ChartModel } from '../../model/chart-model';
+import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/series';
 import { SeriesType } from '../../model/series-options';
 import { LineStyle } from '../../renderers/draw-line';
 import { HorizontalLineRenderer, HorizontalLineRendererData } from '../../renderers/horizontal-line-renderer';
@@ -8,7 +8,7 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IPaneView } from './ipane-view';
 
-export abstract class SeriesHorizontalLinePaneView<HorzScaleItem> implements IPaneView {
+export abstract class SeriesHorizontalLinePaneView implements IPaneView {
 	protected readonly _lineRendererData: HorizontalLineRendererData = {
 		y: 0 as Coordinate,
 		color: 'rgba(0, 0, 0, 0)',
@@ -17,12 +17,12 @@ export abstract class SeriesHorizontalLinePaneView<HorzScaleItem> implements IPa
 		visible: false,
 	};
 
-	protected readonly _series: Series<SeriesType, HorzScaleItem>;
-	protected readonly _model: ChartModel<HorzScaleItem>;
+	protected readonly _series: ISeries<SeriesType>;
+	protected readonly _model: IChartModelBase;
 	protected readonly _lineRenderer: HorizontalLineRenderer = new HorizontalLineRenderer();
 	private _invalidated: boolean = true;
 
-	protected constructor(series: Series<SeriesType, HorzScaleItem>) {
+	protected constructor(series: ISeries<SeriesType>) {
 		this._series = series;
 		this._model = series.model();
 		this._lineRenderer.setData(this._lineRendererData);

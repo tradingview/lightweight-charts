@@ -6,9 +6,9 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IPaneView } from './ipane-view';
 
-export class CrosshairPaneView<HorzScaleItem> implements IPaneView {
+export class CrosshairPaneView implements IPaneView {
 	private _invalidated: boolean = true;
-	private readonly _source: Crosshair<HorzScaleItem>;
+	private readonly _source: Crosshair;
 	private readonly _rendererData: CrosshairRendererData = {
 		vertLine: {
 			lineWidth: 1,
@@ -27,7 +27,7 @@ export class CrosshairPaneView<HorzScaleItem> implements IPaneView {
 	};
 	private _renderer: CrosshairRenderer = new CrosshairRenderer(this._rendererData);
 
-	public constructor(source: Crosshair<HorzScaleItem>) {
+	public constructor(source: Crosshair) {
 		this._source = source;
 	}
 

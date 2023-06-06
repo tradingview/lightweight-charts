@@ -183,7 +183,7 @@ export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements
 	}
 
 	public removePriceLine(line: IPriceLine): void {
-		this._series.removePriceLine((line as PriceLine<HorzScaleItem>).priceLine());
+		this._series.removePriceLine((line as PriceLine).priceLine());
 	}
 
 	public seriesType(): TSeriesType {

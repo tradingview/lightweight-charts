@@ -1,7 +1,7 @@
 import { generateContrastColors } from '../../helpers/color';
 
 import { CustomPriceLine } from '../../model/custom-price-line';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/series';
 import { SeriesType } from '../../model/series-options';
 import {
 	PriceAxisViewRendererCommonData,
@@ -10,11 +10,11 @@ import {
 
 import { PriceAxisView } from './price-axis-view';
 
-export class CustomPriceLinePriceAxisView<HorzScaleItem> extends PriceAxisView<HorzScaleItem> {
-	private readonly _series: Series<SeriesType, HorzScaleItem>;
-	private readonly _priceLine: CustomPriceLine<HorzScaleItem>;
+export class CustomPriceLinePriceAxisView extends PriceAxisView {
+	private readonly _series: ISeries<SeriesType>;
+	private readonly _priceLine: CustomPriceLine;
 
-	public constructor(series: Series<SeriesType, HorzScaleItem>, priceLine: CustomPriceLine<HorzScaleItem>) {
+	public constructor(series: ISeries<SeriesType>, priceLine: CustomPriceLine) {
 		super();
 		this._series = series;
 		this._priceLine = priceLine;

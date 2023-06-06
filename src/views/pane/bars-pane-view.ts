@@ -9,10 +9,10 @@ import {
 
 import { BarsPaneViewBase } from './bars-pane-view-base';
 
-export class SeriesBarsPaneView<HorzScaleItem> extends BarsPaneViewBase<'Bar', BarItem, PaneRendererBars, HorzScaleItem> {
+export class SeriesBarsPaneView extends BarsPaneViewBase<'Bar', BarItem, PaneRendererBars> {
 	protected readonly _renderer: PaneRendererBars = new PaneRendererBars();
 
-	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow<SeriesType, HorzScaleItem>, colorer: SeriesBarColorer<'Bar', HorzScaleItem>): BarItem {
+	protected _createRawItem(time: TimePointIndex, bar: SeriesPlotRow<SeriesType, unknown>, colorer: SeriesBarColorer<'Bar', unknown>): BarItem {
 		return {
 			...this._createDefaultItem(time, bar, colorer),
 			...colorer.barStyle(time),

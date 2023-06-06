@@ -1,7 +1,7 @@
 import { BarPrice } from '../../model/bar';
-import { ChartModel } from '../../model/chart-model';
-import { Series } from '../../model/series';
-import { SeriesBarColorer } from '../../model/series-bar-colorer';
+import { IChartModelBase } from '../../model/chart-model';
+import { ISeries } from '../../model/series';
+import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { AreaFillItem, PaneRendererArea } from '../../renderers/area-renderer';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
@@ -9,17 +9,17 @@ import { LineStrokeItem, PaneRendererLine } from '../../renderers/line-renderer'
 
 import { LinePaneViewBase } from './line-pane-view-base';
 
-export class SeriesAreaPaneView<HorzScaleItem> extends LinePaneViewBase<'Area', AreaFillItem & LineStrokeItem, CompositeRenderer, HorzScaleItem> {
+export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & LineStrokeItem, CompositeRenderer> {
 	protected readonly _renderer: CompositeRenderer = new CompositeRenderer();
 	private readonly _areaRenderer: PaneRendererArea = new PaneRendererArea();
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 
-	public constructor(series: Series<'Area', HorzScaleItem>, model: ChartModel<HorzScaleItem>) {
+	public constructor(series: ISeries<'Area'>, model: IChartModelBase) {
 		super(series, model);
 		this._renderer.setRenderers([this._areaRenderer, this._lineRenderer]);
 	}
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Area', HorzScaleItem>): AreaFillItem & LineStrokeItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: ISeriesBarColorer<'Area'>): AreaFillItem & LineStrokeItem {
 		return {
 			...this._createRawItemBase(time, price),
 			...colorer.barStyle(time),

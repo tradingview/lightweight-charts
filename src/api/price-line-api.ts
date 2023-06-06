@@ -3,10 +3,10 @@ import { PriceLineOptions } from '../model/price-line-options';
 
 import { IPriceLine } from './iprice-line';
 
-export class PriceLine<HorzScaleItem> implements IPriceLine {
-	private readonly _priceLine: CustomPriceLine<HorzScaleItem>;
+export class PriceLine implements IPriceLine {
+	private readonly _priceLine: CustomPriceLine;
 
-	public constructor(priceLine: CustomPriceLine<HorzScaleItem>) {
+	public constructor(priceLine: CustomPriceLine) {
 		this._priceLine = priceLine;
 	}
 
@@ -17,7 +17,7 @@ export class PriceLine<HorzScaleItem> implements IPriceLine {
 		return this._priceLine.options();
 	}
 
-	public priceLine(): CustomPriceLine<HorzScaleItem> {
+	public priceLine(): CustomPriceLine {
 		return this._priceLine;
 	}
 }

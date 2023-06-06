@@ -10,7 +10,7 @@ import { PriceAxisViewRenderer } from '../../renderers/price-axis-view-renderer'
 
 import { IPriceAxisView } from './iprice-axis-view';
 
-export abstract class PriceAxisView<HorzScaleItem> implements IPriceAxisView {
+export abstract class PriceAxisView implements IPriceAxisView {
 	private readonly _commonRendererData: PriceAxisViewRendererCommonData = {
 		coordinate: 0,
 		background: '#000',

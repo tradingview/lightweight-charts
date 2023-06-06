@@ -3,10 +3,10 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { IDataSource } from './idata-source';
-import { IPaneBase, Pane } from './pane';
+import { IPaneBase } from './pane';
 import { PriceScale } from './price-scale';
 
-export abstract class DataSource<HorzScaleItem> implements IDataSource {
+export abstract class DataSource implements IDataSource {
 	protected _priceScale: PriceScale | null = null;
 
 	private _zorder: number = 0;
@@ -27,7 +27,7 @@ export abstract class DataSource<HorzScaleItem> implements IDataSource {
 		this._priceScale = priceScale;
 	}
 
-	public abstract priceAxisViews(pane?: Pane<HorzScaleItem>, priceScale?: PriceScale): readonly IPriceAxisView[];
+	public abstract priceAxisViews(pane?: IPaneBase, priceScale?: PriceScale): readonly IPriceAxisView[];
 	public abstract paneViews(pane?: IPaneBase): readonly IPaneView[];
 
 	public labelPaneViews(pane?: IPaneBase): readonly IPaneView[] {

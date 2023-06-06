@@ -25,6 +25,10 @@ export interface IPaneBase {
 	addDataSource(source: IPriceDataSource, targetScaleId: string, zOrder?: number): void;
 	model(): IChartModelBase;
 	defaultPriceScale(): PriceScale;
+	defaultVisiblePriceScale(): PriceScale | null;
+	dataSources(): readonly IPriceDataSource[];
+	isOverlay(source: IPriceDataSource): boolean;
+	priceScalePosition(priceScale: PriceScale): PriceScalePosition;
 }
 
 export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {

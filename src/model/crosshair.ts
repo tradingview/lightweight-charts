@@ -12,13 +12,13 @@ import { CrosshairTimeAxisView } from '../views/time-axis/crosshair-time-axis-vi
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { BarPrice } from './bar';
-import { ChartModel } from './chart-model';
+import { IChartModelBase } from './chart-model';
 import { Coordinate } from './coordinate';
 import { DataSource } from './data-source';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
-import { Pane } from './pane';
+import { IPaneBase } from './pane';
 import { PriceScale } from './price-scale';
-import { Series } from './series';
+import { ISeries } from './series';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 
@@ -124,19 +124,19 @@ type RawPriceProvider = () => BarPrice;
 type RawCoordinateProvider = () => Coordinate;
 type RawIndexProvider = () => TimePointIndex;
 
-export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
-	private _pane: Pane<HorzScaleItem> | null = null;
+export class Crosshair extends DataSource {
+	private _pane: IPaneBase | null = null;
 	private _price: number = NaN;
 	private _index: TimePointIndex = 0 as TimePointIndex;
 	private _visible: boolean = true;
-	private readonly _model: ChartModel<HorzScaleItem>;
-	private _priceAxisViews: Map<PriceScale, CrosshairPriceAxisView<HorzScaleItem>> = new Map();
-	private readonly _timeAxisView: CrosshairTimeAxisView<HorzScaleItem>;
-	private readonly _markersPaneView: CrosshairMarksPaneView<HorzScaleItem>;
+	private readonly _model: IChartModelBase;
+	private _priceAxisViews: Map<PriceScale, CrosshairPriceAxisView> = new Map();
+	private readonly _timeAxisView: CrosshairTimeAxisView;
+	private readonly _markersPaneView: CrosshairMarksPaneView;
 	private _subscribed: boolean = false;
 	private readonly _currentPosPriceProvider: PriceAndCoordinateProvider;
 	private readonly _options: CrosshairOptions;
-	private readonly _paneView: CrosshairPaneView<HorzScaleItem>;
+	private readonly _paneView: CrosshairPaneView;
 
 	private _x: Coordinate = NaN as Coordinate;
 	private _y: Coordinate = NaN as Coordinate;
@@ -144,7 +144,7 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 	private _originX: Coordinate = NaN as Coordinate;
 	private _originY: Coordinate = NaN as Coordinate;
 
-	public constructor(model: ChartModel<HorzScaleItem>, options: CrosshairOptions) {
+	public constructor(model: IChartModelBase, options: CrosshairOptions) {
 		super();
 		this._model = model;
 		this._options = options;
@@ -217,7 +217,7 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		return this._originY;
 	}
 
-	public setPosition(index: TimePointIndex, price: number, pane: Pane<HorzScaleItem>): void {
+	public setPosition(index: TimePointIndex, price: number, pane: IPaneBase): void {
 		if (!this._subscribed) {
 			this._subscribed = true;
 		}
@@ -255,11 +255,11 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		this.clearOriginCoord();
 	}
 
-	public paneViews(pane: Pane<HorzScaleItem>): readonly IPaneView[] {
+	public paneViews(pane: IPaneBase): readonly IPaneView[] {
 		return this._pane !== null ? [this._paneView, this._markersPaneView] : [];
 	}
 
-	public horzLineVisible(pane: Pane<HorzScaleItem>): boolean {
+	public horzLineVisible(pane: IPaneBase): boolean {
 		return pane === this._pane && this._options.horzLine.visible;
 	}
 
@@ -267,7 +267,7 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		return this._options.vertLine.visible;
 	}
 
-	public override priceAxisViews(pane: Pane<HorzScaleItem>, priceScale: PriceScale): IPriceAxisView[] {
+	public override priceAxisViews(pane: IPaneBase, priceScale: PriceScale): IPriceAxisView[] {
 		if (!this._visible || this._pane !== pane) {
 			this._priceAxisViews.clear();
 		}
@@ -284,18 +284,18 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		return this._visible ? [this._timeAxisView] : [];
 	}
 
-	public pane(): Pane<HorzScaleItem> | null {
+	public pane(): IPaneBase | null {
 		return this._pane;
 	}
 
 	public updateAllViews(): void {
 		this._paneView.update();
-		this._priceAxisViews.forEach((value: PriceAxisView<HorzScaleItem>) => value.update());
+		this._priceAxisViews.forEach((value: PriceAxisView) => value.update());
 		this._timeAxisView.update();
 		this._markersPaneView.update();
 	}
 
-	private _priceScaleByPane(pane: Pane<HorzScaleItem>): PriceScale | null {
+	private _priceScaleByPane(pane: IPaneBase): PriceScale | null {
 		if (pane && !pane.defaultPriceScale().isEmpty()) {
 			return pane.defaultPriceScale();
 		}
@@ -303,13 +303,13 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 		return null;
 	}
 
-	private _tryToUpdateViews(index: TimePointIndex, price: number, pane: Pane<HorzScaleItem>): void {
+	private _tryToUpdateViews(index: TimePointIndex, price: number, pane: IPaneBase): void {
 		if (this._tryToUpdateData(index, price, pane)) {
 			this.updateAllViews();
 		}
 	}
 
-	private _tryToUpdateData(newIndex: TimePointIndex, newPrice: number, newPane: Pane<HorzScaleItem>): boolean {
+	private _tryToUpdateData(newIndex: TimePointIndex, newPrice: number, newPane: IPaneBase): boolean {
 		const oldX = this._x;
 		const oldY = this._y;
 		const oldPrice = this._price;
@@ -336,13 +336,13 @@ export class Crosshair<HorzScaleItem> extends DataSource<HorzScaleItem> {
 
 	private _setIndexToLastSeriesBarIndex(): void {
 		const lastIndexes = this._model.serieses()
-			.map((s: Series<SeriesType, HorzScaleItem>) => s.bars().lastIndex())
+			.map((s: ISeries<SeriesType>) => s.bars().lastIndex())
 			.filter(notNull);
 		const lastBarIndex = (lastIndexes.length === 0) ? null : (Math.max(...lastIndexes) as TimePointIndex);
 		this._index = lastBarIndex !== null ? lastBarIndex : NaN as TimePointIndex;
 	}
 
-	private _createPriceAxisViewOnDemand(map: Map<PriceScale, CrosshairPriceAxisView<HorzScaleItem>>, priceScale: PriceScale, valueProvider: PriceAndCoordinateProvider): IPriceAxisView {
+	private _createPriceAxisViewOnDemand(map: Map<PriceScale, CrosshairPriceAxisView>, priceScale: PriceScale, valueProvider: PriceAndCoordinateProvider): IPriceAxisView {
 		let view = map.get(priceScale);
 
 		if (view === undefined) {

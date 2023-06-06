@@ -85,7 +85,11 @@ type BarStylesFnMap<HorzScaleItem> = {
 	[T in keyof SeriesOptionsMap]: StyleGetterFn<T, HorzScaleItem>;
 };
 
-export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> {
+export interface ISeriesBarColorer<T extends SeriesType> {
+	barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<unknown>): BarStylesMap[T];
+}
+
+export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements ISeriesBarColorer<T> {
 	private _series: Series<T, HorzScaleItem>;
 	private readonly _styleGetter: BarStylesFnMap<HorzScaleItem>[T];
 	private readonly _barStyleFnMap: BarStylesFnMap<HorzScaleItem>;

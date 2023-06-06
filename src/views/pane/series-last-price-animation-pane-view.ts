@@ -2,7 +2,7 @@ import { assert } from '../../helpers/assertions';
 import { applyAlpha } from '../../helpers/color';
 
 import { Point } from '../../model/point';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/series';
 import { LastPriceAnimationMode } from '../../model/series-options';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-price-animation-renderer';
@@ -119,8 +119,8 @@ function animationData(durationSinceStart: number, lineColor: string): Animation
 	};
 }
 
-export class SeriesLastPriceAnimationPaneView<HorzScaleItem> implements IUpdatablePaneView {
-	private readonly _series: Series<'Area', HorzScaleItem> | Series<'Line', HorzScaleItem> | Series<'Baseline', HorzScaleItem>;
+export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
+	private readonly _series: ISeries<'Area'> | ISeries<'Line'> | ISeries<'Baseline'>;
 	private readonly _renderer: SeriesLastPriceAnimationRenderer = new SeriesLastPriceAnimationRenderer();
 	private _invalidated: boolean = true;
 	private _stageInvalidated: boolean = true;
@@ -128,7 +128,7 @@ export class SeriesLastPriceAnimationPaneView<HorzScaleItem> implements IUpdatab
 	private _startTime: number = performance.now();
 	private _endTime: number = this._startTime - 1;
 
-	public constructor(series: Series<'Area', HorzScaleItem> | Series<'Line', HorzScaleItem> | Series<'Baseline', HorzScaleItem>) {
+	public constructor(series: ISeries<'Area'> | ISeries<'Line'> | ISeries<'Baseline'>) {
 		this._series = series;
 	}
 

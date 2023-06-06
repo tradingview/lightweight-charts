@@ -3,14 +3,14 @@ import { isNumber } from '../../helpers/strict-type-checks';
 
 import { AutoScaleMargins } from '../../model/autoscale-info-impl';
 import { BarPrice, BarPrices } from '../../model/bar';
-import { ChartModel } from '../../model/chart-model';
+import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { PriceScale } from '../../model/price-scale';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/series';
 import { InternalSeriesMarker } from '../../model/series-markers';
 import { SeriesType } from '../../model/series-options';
 import { TimePointIndex, visibleTimedValues } from '../../model/time-data';
-import { TimeScale } from '../../model/time-scale';
+import { ITimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import {
 	SeriesMarkerRendererData,
@@ -34,15 +34,15 @@ interface Offsets {
 }
 
 // eslint-disable-next-line max-params
-function fillSizeAndY<HorzScaleItem>(
+function fillSizeAndY(
 	rendererItem: SeriesMarkerRendererDataItem,
-	marker: InternalSeriesMarker<TimePointIndex, HorzScaleItem>,
+	marker: InternalSeriesMarker<TimePointIndex, unknown>,
 	seriesData: BarPrices | BarPrice,
 	offsets: Offsets,
 	textHeight: number,
 	shapeMargin: number,
 	priceScale: PriceScale,
-	timeScale: TimeScale<HorzScaleItem>,
+	timeScale: ITimeScale,
 	firstValue: number
 ): void {
 	const inBarPrice = isNumber(seriesData) ? seriesData : seriesData.close;
@@ -84,9 +84,9 @@ function fillSizeAndY<HorzScaleItem>(
 	ensureNever(marker.position);
 }
 
-export class SeriesMarkersPaneView<HorzScaleItem> implements IUpdatablePaneView {
-	private readonly _series: Series<SeriesType, HorzScaleItem>;
-	private readonly _model: ChartModel<HorzScaleItem>;
+export class SeriesMarkersPaneView implements IUpdatablePaneView {
+	private readonly _series: ISeries<SeriesType>;
+	private readonly _model: IChartModelBase;
 	private _data: SeriesMarkerRendererData;
 
 	private _invalidated: boolean = true;
@@ -97,7 +97,7 @@ export class SeriesMarkersPaneView<HorzScaleItem> implements IUpdatablePaneView 
 
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
-	public constructor(series: Series<SeriesType, HorzScaleItem>, model: ChartModel<HorzScaleItem>) {
+	public constructor(series: ISeries<SeriesType>, model: IChartModelBase) {
 		this._series = series;
 		this._model = model;
 		this._data = {
@@ -155,7 +155,7 @@ export class SeriesMarkersPaneView<HorzScaleItem> implements IUpdatablePaneView 
 		const timeScale = this._model.timeScale();
 		const seriesMarkers = this._series.indexedMarkers();
 		if (this._dataInvalidated) {
-			this._data.items = seriesMarkers.map<SeriesMarkerRendererDataItem>((marker: InternalSeriesMarker<TimePointIndex, HorzScaleItem>) => ({
+			this._data.items = seriesMarkers.map<SeriesMarkerRendererDataItem>((marker: InternalSeriesMarker<TimePointIndex, unknown>) => ({
 				time: marker.time,
 				x: 0 as Coordinate,
 				y: 0 as Coordinate,

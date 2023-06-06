@@ -167,6 +167,20 @@ export interface HorzScaleOptions {
 
 export interface ITimeScale {
 	marks(): TimeMark[] | null;
+	isEmpty(): boolean;
+	width(): number;
+	indexToTime(index: TimePointIndex): InternalHorzScaleItem | null;
+	indexToCoordinate(index: TimePointIndex): Coordinate;
+	visibleStrictRange(): RangeImpl<TimePointIndex> | null;
+	hasPoints(): boolean;
+	timeToIndex(time: InternalHorzScaleItem, findNearest: boolean): TimePointIndex | null;
+	barSpacing(): number;
+
+	indexesToCoordinates<T extends TimedValue>(points: T[], visibleRange?: SeriesItemsIndexesRange): void;
+	indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint<unknown> | null;
+	formatDateTime(timeScalePoint: TimeScalePoint<unknown>): string;
+
+	options(): Readonly<HorzScaleOptions>;
 }
 
 export class TimeScale<HorzScaleItem> implements ITimeScale {

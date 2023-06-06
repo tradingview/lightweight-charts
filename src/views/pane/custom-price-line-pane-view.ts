@@ -1,13 +1,13 @@
 import { CustomPriceLine } from '../../model/custom-price-line';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/series';
 import { SeriesType } from '../../model/series-options';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';
 
-export class CustomPriceLinePaneView<HorzScaleItem> extends SeriesHorizontalLinePaneView<HorzScaleItem> {
-	private readonly _priceLine: CustomPriceLine<HorzScaleItem>;
+export class CustomPriceLinePaneView extends SeriesHorizontalLinePaneView {
+	private readonly _priceLine: CustomPriceLine;
 
-	public constructor(series: Series<SeriesType, HorzScaleItem>, priceLine: CustomPriceLine<HorzScaleItem>) {
+	public constructor(series: ISeries<SeriesType>, priceLine: CustomPriceLine) {
 		super(series);
 		this._priceLine = priceLine;
 	}

@@ -23,7 +23,7 @@ import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, IPaneBase, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
-import { Series, SeriesOptionsInternal } from './series';
+import { ISeries, Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { HorzScaleOptions, ITimeScale, TimeScale } from './time-scale';
@@ -374,6 +374,21 @@ export interface IChartModelBase {
 	findPriceScale(priceScaleId: string): PriceScaleOnPane | null;
 	options(): Readonly<ChartOptionsInternalBase>;
 	timeScale(): ITimeScale;
+	serieses(): readonly ISeries<SeriesType>[];
+
+	updateSource(source: IPriceDataSource): void;
+	updateCrosshair(): void;
+	cursorUpdate(): void;
+
+	recalculatePane(pane: IPaneBase | null): void;
+
+	lightUpdate(): void;
+	fullUpdate(): void;
+	backgroundColorAtYPercentFromTop(percent: number): string;
+	paneForSource(source: IPriceDataSource): IPaneBase | null;
+	moveSeriesToScale(series: ISeries<SeriesType>, targetScaleId: string): void;
+
+	priceAxisRendererOptions(): Readonly<PriceAxisViewRendererOptions>;
 }
 
 export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase {
@@ -384,9 +399,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	private readonly _timeScale: TimeScale<HorzScaleItem>;
 	private readonly _panes: Pane<HorzScaleItem>[] = [];
-	private readonly _crosshair: Crosshair<HorzScaleItem>;
-	private readonly _magnet: Magnet<HorzScaleItem>;
-	private readonly _watermark: Watermark<HorzScaleItem>;
+	private readonly _crosshair: Crosshair;
+	private readonly _magnet: Magnet;
+	private readonly _watermark: Watermark;
 
 	private _serieses: Series<SeriesType, HorzScaleItem>[] = [];
 
@@ -527,11 +542,11 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._panes;
 	}
 
-	public watermarkSource(): Watermark<HorzScaleItem> {
+	public watermarkSource(): Watermark {
 		return this._watermark;
 	}
 
-	public crosshairSource(): Crosshair<HorzScaleItem> {
+	public crosshairSource(): Crosshair {
 		return this._crosshair;
 	}
 
@@ -679,7 +694,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._serieses;
 	}
 
-	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane<HorzScaleItem>): void {
+	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: IPaneBase): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x);
