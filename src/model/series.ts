@@ -356,7 +356,7 @@ export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource
 		}
 	}
 
-	public topPaneViews(pane: Pane<HorzScaleItem>): readonly IPaneView[] {
+	public topPaneViews(pane: Pane): readonly IPaneView[] {
 		const animationPaneView = this._lastPriceAnimationPaneView;
 		if (animationPaneView === null || !animationPaneView.visible()) {
 			return [];
@@ -395,14 +395,14 @@ export class Series<T extends SeriesType, HorzScaleItem> extends PriceDataSource
 		return res;
 	}
 
-	public override labelPaneViews(pane?: Pane<HorzScaleItem>): readonly IPaneView[] {
+	public override labelPaneViews(pane?: Pane): readonly IPaneView[] {
 		return [
 			this._panePriceAxisView,
 			...this._customPriceLines.map((line: CustomPriceLine) => line.labelPaneView()),
 		];
 	}
 
-	public override priceAxisViews(pane: Pane<HorzScaleItem>, priceScale: PriceScale): readonly IPriceAxisView[] {
+	public override priceAxisViews(pane: Pane, priceScale: PriceScale): readonly IPriceAxisView[] {
 		if (priceScale !== this._priceScale && !this._isOverlay()) {
 			return [];
 		}

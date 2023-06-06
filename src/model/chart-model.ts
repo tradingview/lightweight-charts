@@ -20,7 +20,7 @@ import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
-import { DEFAULT_STRETCH_FACTOR, IPaneBase, Pane } from './pane';
+import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { ISeries, Series, SeriesOptionsInternal } from './series';
@@ -175,7 +175,7 @@ export interface HoveredSource {
 
 export interface PriceScaleOnPane {
 	priceScale: PriceScale;
-	pane: IPaneBase;
+	pane: Pane;
 }
 
 const enum BackgroundColorSide {
@@ -380,15 +380,24 @@ export interface IChartModelBase {
 	updateCrosshair(): void;
 	cursorUpdate(): void;
 
-	recalculatePane(pane: IPaneBase | null): void;
+	recalculatePane(pane: Pane | null): void;
 
 	lightUpdate(): void;
 	fullUpdate(): void;
+
+	backgroundBottomColor(): string;
+	backgroundTopColor(): string;
 	backgroundColorAtYPercentFromTop(percent: number): string;
-	paneForSource(source: IPriceDataSource): IPaneBase | null;
+
+	paneForSource(source: IPriceDataSource): Pane | null;
 	moveSeriesToScale(series: ISeries<SeriesType>, targetScaleId: string): void;
 
 	priceAxisRendererOptions(): Readonly<PriceAxisViewRendererOptions>;
+
+	priceScalesOptionsChanged(): ISubscription;
+
+	hoveredSource(): HoveredSource | null;
+	setHoveredSource(source: HoveredSource | null): void;
 }
 
 export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase {
@@ -398,7 +407,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider<HorzScaleItem>;
 
 	private readonly _timeScale: TimeScale<HorzScaleItem>;
-	private readonly _panes: Pane<HorzScaleItem>[] = [];
+	private readonly _panes: Pane[] = [];
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
@@ -474,7 +483,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal<HorzScaleItem>>): void {
 		merge(this._options, options);
 
-		this._panes.forEach((p: Pane<HorzScaleItem>) => p.applyScaleOptions(options));
+		this._panes.forEach((p: Pane) => p.applyScaleOptions(options));
 
 		if (options.timeScale !== undefined) {
 			this._timeScale.applyOptions(options.timeScale);
@@ -538,7 +547,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._timeScale;
 	}
 
-	public panes(): readonly Pane<HorzScaleItem>[] {
+	public panes(): readonly Pane[] {
 		return this._panes;
 	}
 
@@ -554,7 +563,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._crosshairMoved;
 	}
 
-	public setPaneHeight(pane: Pane<HorzScaleItem>, height: number): void {
+	public setPaneHeight(pane: Pane, height: number): void {
 		pane.setHeight(height);
 		this.recalculateAllPanes();
 	}
@@ -562,11 +571,11 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	public setWidth(width: number): void {
 		this._width = width;
 		this._timeScale.setWidth(this._width);
-		this._panes.forEach((pane: Pane<HorzScaleItem>) => pane.setWidth(width));
+		this._panes.forEach((pane: Pane) => pane.setWidth(width));
 		this.recalculateAllPanes();
 	}
 
-	public createPane(index?: number): Pane<HorzScaleItem> {
+	public createPane(index?: number): Pane {
 		const pane = new Pane(this._timeScale, this);
 
 		if (index !== undefined) {
@@ -592,29 +601,29 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return pane;
 	}
 
-	public startScalePrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale, x: number): void {
+	public startScalePrice(pane: Pane, priceScale: PriceScale, x: number): void {
 		pane.startScalePrice(priceScale, x);
 	}
 
-	public scalePriceTo(pane: Pane<HorzScaleItem>, priceScale: PriceScale, x: number): void {
+	public scalePriceTo(pane: Pane, priceScale: PriceScale, x: number): void {
 		pane.scalePriceTo(priceScale, x);
 		this.updateCrosshair();
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
-	public endScalePrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale): void {
+	public endScalePrice(pane: Pane, priceScale: PriceScale): void {
 		pane.endScalePrice(priceScale);
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
-	public startScrollPrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale, x: number): void {
+	public startScrollPrice(pane: Pane, priceScale: PriceScale, x: number): void {
 		if (priceScale.isAutoScale()) {
 			return;
 		}
 		pane.startScrollPrice(priceScale, x);
 	}
 
-	public scrollPriceTo(pane: Pane<HorzScaleItem>, priceScale: PriceScale, x: number): void {
+	public scrollPriceTo(pane: Pane, priceScale: PriceScale, x: number): void {
 		if (priceScale.isAutoScale()) {
 			return;
 		}
@@ -623,7 +632,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
-	public endScrollPrice(pane: Pane<HorzScaleItem>, priceScale: PriceScale): void {
+	public endScrollPrice(pane: Pane, priceScale: PriceScale): void {
 		if (priceScale.isAutoScale()) {
 			return;
 		}
@@ -631,7 +640,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
 
-	public resetPriceScale(pane: Pane<HorzScaleItem>, priceScale: PriceScale): void {
+	public resetPriceScale(pane: Pane, priceScale: PriceScale): void {
 		pane.resetPriceScale(priceScale);
 		this._invalidate(this._paneInvalidationMask(pane, InvalidationLevel.Light));
 	}
@@ -694,7 +703,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._serieses;
 	}
 
-	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: IPaneBase): void {
+	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x);
@@ -767,25 +776,25 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._timeScale.setBaseIndex(newBaseIndex);
 	}
 
-	public recalculatePane(pane: Pane<HorzScaleItem> | null): void {
+	public recalculatePane(pane: Pane | null): void {
 		if (pane !== null) {
 			pane.recalculate();
 		}
 	}
 
-	public paneForSource(source: IPriceDataSource): Pane<HorzScaleItem> | null {
-		const pane = this._panes.find((p: Pane<HorzScaleItem>) => p.orderedSources().includes(source));
+	public paneForSource(source: IPriceDataSource): Pane | null {
+		const pane = this._panes.find((p: Pane) => p.orderedSources().includes(source));
 		return pane === undefined ? null : pane;
 	}
 
 	public recalculateAllPanes(): void {
 		this._watermark.updateAllViews();
-		this._panes.forEach((p: Pane<HorzScaleItem>) => p.recalculate());
+		this._panes.forEach((p: Pane) => p.recalculate());
 		this.updateCrosshair();
 	}
 
 	public destroy(): void {
-		this._panes.forEach((p: Pane<HorzScaleItem>) => p.destroy());
+		this._panes.forEach((p: Pane) => p.destroy());
 		this._panes.length = 0;
 
 		// to avoid memleaks
@@ -938,7 +947,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return result;
 	}
 
-	private _paneInvalidationMask(pane: Pane<HorzScaleItem> | null, level: InvalidationLevel): InvalidateMask {
+	private _paneInvalidationMask(pane: Pane | null, level: InvalidationLevel): InvalidateMask {
 		const inv = new InvalidateMask(level);
 		if (pane !== null) {
 			const index = this._panes.indexOf(pane);
@@ -962,10 +971,10 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			this._invalidateHandler(mask);
 		}
 
-		this._panes.forEach((pane: Pane<HorzScaleItem>) => pane.grid().paneView().update());
+		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane<HorzScaleItem>): Series<T, HorzScaleItem> {
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T, HorzScaleItem> {
 		const series = new Series<T, HorzScaleItem>(this, options, seriesType);
 
 		const targetScaleId = options.priceScaleId !== undefined ? options.priceScaleId : this.defaultVisiblePriceScaleId();

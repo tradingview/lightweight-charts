@@ -3,7 +3,7 @@ import { ensure } from '../helpers/assertions';
 import { Coordinate } from './coordinate';
 import { CrosshairMode, CrosshairOptions } from './crosshair';
 import { IPriceDataSource } from './iprice-data-source';
-import { IPaneBase } from './pane';
+import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
 import { ISeries, Series } from './series';
 import { SeriesType } from './series-options';
@@ -16,7 +16,7 @@ export class Magnet {
 		this._options = options;
 	}
 
-	public align(price: number, index: TimePointIndex, pane: IPaneBase): number {
+	public align(price: number, index: TimePointIndex, pane: Pane): number {
 		let res = price;
 		if (this._options.mode === CrosshairMode.Normal) {
 			return res;

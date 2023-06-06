@@ -2,7 +2,7 @@ import { IPaneView } from '../views/pane/ipane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
-import { IPaneBase } from './pane';
+import { Pane } from './pane';
 import { PriceScale } from './price-scale';
 
 export interface ZOrdered {
@@ -16,14 +16,14 @@ export interface IDataSource extends ZOrdered {
 
 	updateAllViews(): void;
 
-	priceAxisViews(pane?: IPaneBase, priceScale?: PriceScale): readonly IPriceAxisView[];
-	paneViews(pane: IPaneBase): readonly IPaneView[];
-	labelPaneViews(pane?: IPaneBase): readonly IPaneView[];
+	priceAxisViews(pane?: Pane, priceScale?: PriceScale): readonly IPriceAxisView[];
+	paneViews(pane: Pane): readonly IPaneView[];
+	labelPaneViews(pane?: Pane): readonly IPaneView[];
 
 	/**
 	 * Pane views that are painted on the most top layer
 	 */
-	topPaneViews?(pane: IPaneBase): readonly IPaneView[];
+	topPaneViews?(pane: Pane): readonly IPaneView[];
 
 	visible(): boolean;
 

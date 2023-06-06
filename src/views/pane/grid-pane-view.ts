@@ -1,4 +1,4 @@
-import { IPaneBase } from '../../model/pane';
+import { Pane } from '../../model/pane';
 import { TimeMark } from '../../model/time-scale';
 import { GridRenderer, GridRendererData } from '../../renderers/grid-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
@@ -6,11 +6,11 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { IUpdatablePaneView } from './iupdatable-pane-view';
 
 export class GridPaneView implements IUpdatablePaneView {
-	private readonly _pane: IPaneBase;
+	private readonly _pane: Pane;
 	private readonly _renderer: GridRenderer = new GridRenderer();
 	private _invalidated: boolean = true;
 
-	public constructor(pane: IPaneBase) {
+	public constructor(pane: Pane) {
 		this._pane = pane;
 	}
 

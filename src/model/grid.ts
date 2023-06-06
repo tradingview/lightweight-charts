@@ -2,7 +2,7 @@ import { LineStyle } from '../renderers/draw-line';
 import { GridPaneView } from '../views/pane/grid-pane-view';
 import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
 
-import { IPaneBase } from './pane';
+import { Pane } from './pane';
 
 /** Grid line options. */
 export interface GridLineOptions {
@@ -44,7 +44,7 @@ export interface GridOptions {
 export class Grid {
 	private _paneView: GridPaneView;
 
-	public constructor(pane: IPaneBase) {
+	public constructor(pane: Pane) {
 		this._paneView = new GridPaneView(pane);
 	}
 

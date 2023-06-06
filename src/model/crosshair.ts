@@ -16,7 +16,7 @@ import { IChartModelBase } from './chart-model';
 import { Coordinate } from './coordinate';
 import { DataSource } from './data-source';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
-import { IPaneBase } from './pane';
+import { Pane } from './pane';
 import { PriceScale } from './price-scale';
 import { ISeries } from './series';
 import { SeriesType } from './series-options';
@@ -125,7 +125,7 @@ type RawCoordinateProvider = () => Coordinate;
 type RawIndexProvider = () => TimePointIndex;
 
 export class Crosshair extends DataSource {
-	private _pane: IPaneBase | null = null;
+	private _pane: Pane | null = null;
 	private _price: number = NaN;
 	private _index: TimePointIndex = 0 as TimePointIndex;
 	private _visible: boolean = true;
@@ -217,7 +217,7 @@ export class Crosshair extends DataSource {
 		return this._originY;
 	}
 
-	public setPosition(index: TimePointIndex, price: number, pane: IPaneBase): void {
+	public setPosition(index: TimePointIndex, price: number, pane: Pane): void {
 		if (!this._subscribed) {
 			this._subscribed = true;
 		}
@@ -255,11 +255,11 @@ export class Crosshair extends DataSource {
 		this.clearOriginCoord();
 	}
 
-	public paneViews(pane: IPaneBase): readonly IPaneView[] {
+	public paneViews(pane: Pane): readonly IPaneView[] {
 		return this._pane !== null ? [this._paneView, this._markersPaneView] : [];
 	}
 
-	public horzLineVisible(pane: IPaneBase): boolean {
+	public horzLineVisible(pane: Pane): boolean {
 		return pane === this._pane && this._options.horzLine.visible;
 	}
 
@@ -267,7 +267,7 @@ export class Crosshair extends DataSource {
 		return this._options.vertLine.visible;
 	}
 
-	public override priceAxisViews(pane: IPaneBase, priceScale: PriceScale): IPriceAxisView[] {
+	public override priceAxisViews(pane: Pane, priceScale: PriceScale): IPriceAxisView[] {
 		if (!this._visible || this._pane !== pane) {
 			this._priceAxisViews.clear();
 		}
@@ -284,7 +284,7 @@ export class Crosshair extends DataSource {
 		return this._visible ? [this._timeAxisView] : [];
 	}
 
-	public pane(): IPaneBase | null {
+	public pane(): Pane | null {
 		return this._pane;
 	}
 
@@ -295,7 +295,7 @@ export class Crosshair extends DataSource {
 		this._markersPaneView.update();
 	}
 
-	private _priceScaleByPane(pane: IPaneBase): PriceScale | null {
+	private _priceScaleByPane(pane: Pane): PriceScale | null {
 		if (pane && !pane.defaultPriceScale().isEmpty()) {
 			return pane.defaultPriceScale();
 		}
@@ -303,13 +303,13 @@ export class Crosshair extends DataSource {
 		return null;
 	}
 
-	private _tryToUpdateViews(index: TimePointIndex, price: number, pane: IPaneBase): void {
+	private _tryToUpdateViews(index: TimePointIndex, price: number, pane: Pane): void {
 		if (this._tryToUpdateData(index, price, pane)) {
 			this.updateAllViews();
 		}
 	}
 
-	private _tryToUpdateData(newIndex: TimePointIndex, newPrice: number, newPane: IPaneBase): boolean {
+	private _tryToUpdateData(newIndex: TimePointIndex, newPrice: number, newPane: Pane): boolean {
 		const oldX = this._x;
 		const oldY = this._y;
 		const oldPrice = this._price;

@@ -4,13 +4,13 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
-import { ChartModel, ChartOptionsImpl, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
+import { ChartOptionsBase, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid } from './grid';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
 import { sortSources } from './sort-sources';
-import { TimeScale } from './time-scale';
+import { ITimeScale } from './time-scale';
 
 export const DEFAULT_STRETCH_FACTOR = 1000;
 
@@ -21,19 +21,9 @@ interface MinMaxOrderInfo {
 	maxZOrder: number;
 }
 
-export interface IPaneBase {
-	addDataSource(source: IPriceDataSource, targetScaleId: string, zOrder?: number): void;
-	model(): IChartModelBase;
-	defaultPriceScale(): PriceScale;
-	defaultVisiblePriceScale(): PriceScale | null;
-	dataSources(): readonly IPriceDataSource[];
-	isOverlay(source: IPriceDataSource): boolean;
-	priceScalePosition(priceScale: PriceScale): PriceScalePosition;
-}
-
-export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
-	private readonly _timeScale: TimeScale<HorzScaleItem>;
-	private readonly _model: ChartModel<HorzScaleItem>;
+export class Pane implements IDestroyable {
+	private readonly _timeScale: ITimeScale;
+	private readonly _model: IChartModelBase;
 	private readonly _grid: Grid;
 
 	private _dataSources: IPriceDataSource[] = [];
@@ -49,7 +39,7 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 	private _leftPriceScale: PriceScale;
 	private _rightPriceScale: PriceScale;
 
-	public constructor(timeScale: TimeScale<HorzScaleItem>, model: ChartModel<HorzScaleItem>) {
+	public constructor(timeScale: ITimeScale, model: IChartModelBase) {
 		this._timeScale = timeScale;
 		this._model = model;
 		this._grid = new Grid(this);
@@ -65,7 +55,7 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		this.applyScaleOptions(options);
 	}
 
-	public applyScaleOptions(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): void {
+	public applyScaleOptions(options: DeepPartial<ChartOptionsBase>): void {
 		if (options.leftPriceScale) {
 			this._leftPriceScale.applyOptions(options.leftPriceScale);
 		}
@@ -125,7 +115,7 @@ export class Pane<HorzScaleItem> implements IDestroyable, IPaneBase {
 		this._stretchFactor = factor;
 	}
 
-	public model(): ChartModel<HorzScaleItem> {
+	public model(): IChartModelBase {
 		return this._model;
 	}
 

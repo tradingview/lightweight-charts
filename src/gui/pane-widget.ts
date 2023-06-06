@@ -51,17 +51,17 @@ function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D
 	renderer.draw(target, isHovered, hitTestData);
 }
 
-type PaneViewsGetter<HorzScaleItem> = (source: IDataSource, pane: Pane<HorzScaleItem>) => readonly IPaneView[];
+type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
 
-function sourcePaneViews<HorzScaleItem>(source: IDataSource, pane: Pane<HorzScaleItem>): readonly IPaneView[] {
+function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
 	return source.paneViews(pane);
 }
 
-function sourceLabelPaneViews<HorzScaleItem>(source: IDataSource, pane: Pane<HorzScaleItem>): readonly IPaneView[] {
+function sourceLabelPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
 	return source.labelPaneViews(pane);
 }
 
-function sourceTopPaneViews<HorzScaleItem>(source: IDataSource, pane: Pane<HorzScaleItem>): readonly IPaneView[] {
+function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
 	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
 }
 
@@ -84,7 +84,7 @@ interface StartScrollPosition extends Point {
 
 export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandlers {
 	private readonly _chart: ChartWidget<HorzScaleItem>;
-	private _state: Pane<HorzScaleItem> | null;
+	private _state: Pane | null;
 	private _size: Size = size({ width: 0, height: 0 });
 	private _leftPriceAxisWidget: PriceAxisWidget<HorzScaleItem> | null = null;
 	private _rightPriceAxisWidget: PriceAxisWidget<HorzScaleItem> | null = null;
@@ -108,7 +108,7 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 
 	private _isSettingSize: boolean = false;
 
-	public constructor(chart: ChartWidget<HorzScaleItem>, state: Pane<HorzScaleItem>) {
+	public constructor(chart: ChartWidget<HorzScaleItem>, state: Pane) {
 		this._chart = chart;
 
 		this._state = state;
@@ -185,11 +185,11 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 		this._mouseEventHandler.destroy();
 	}
 
-	public state(): Pane<HorzScaleItem> {
+	public state(): Pane {
 		return ensureNotNull(this._state);
 	}
 
-	public setState(pane: Pane<HorzScaleItem> | null): void {
+	public setState(pane: Pane | null): void {
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
 		}
@@ -569,7 +569,7 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: PaneViewsGetter<HorzScaleItem>): void {
+	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: PaneViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
@@ -584,7 +584,7 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 
 	private _drawSourceImpl(
 		target: CanvasRenderingTarget2D,
-		paneViewsGetter: PaneViewsGetter<HorzScaleItem>,
+		paneViewsGetter: PaneViewsGetter,
 		drawFn: DrawFunction,
 		source: IDataSource
 	): void {
