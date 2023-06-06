@@ -14,7 +14,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 
-import { ChartModel, HoveredObject, TrackingModeExitMode } from '../model/chart-model';
+import { IChartModelBase, HoveredObject, TrackingModeExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -28,7 +28,7 @@ import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas } from './canvas-utils';
-import { ChartWidget } from './chart-widget';
+import { IChartWidgetBase } from './chart-widget';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 
@@ -82,12 +82,12 @@ interface StartScrollPosition extends Point {
 	localY: Coordinate;
 }
 
-export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandlers {
-	private readonly _chart: ChartWidget<HorzScaleItem>;
+export class PaneWidget implements IDestroyable, MouseEventHandlers {
+	private readonly _chart: IChartWidgetBase;
 	private _state: Pane | null;
 	private _size: Size = size({ width: 0, height: 0 });
-	private _leftPriceAxisWidget: PriceAxisWidget<HorzScaleItem> | null = null;
-	private _rightPriceAxisWidget: PriceAxisWidget<HorzScaleItem> | null = null;
+	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
+	private _rightPriceAxisWidget: PriceAxisWidget | null = null;
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
@@ -108,7 +108,7 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 
 	private _isSettingSize: boolean = false;
 
-	public constructor(chart: ChartWidget<HorzScaleItem>, state: Pane) {
+	public constructor(chart: IChartWidgetBase, state: Pane) {
 		this._chart = chart;
 
 		this._state = state;
@@ -203,7 +203,7 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 		this.updatePriceAxisWidgetsStates();
 	}
 
-	public chart(): ChartWidget<HorzScaleItem> {
+	public chart(): IChartWidgetBase {
 		return this._chart;
 	}
 
@@ -512,11 +512,11 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 		}
 	}
 
-	public leftPriceAxisWidget(): PriceAxisWidget<HorzScaleItem> | null {
+	public leftPriceAxisWidget(): PriceAxisWidget | null {
 		return this._leftPriceAxisWidget;
 	}
 
-	public rightPriceAxisWidget(): PriceAxisWidget<HorzScaleItem> | null {
+	public rightPriceAxisWidget(): PriceAxisWidget | null {
 		return this._rightPriceAxisWidget;
 	}
 
@@ -684,7 +684,7 @@ export class PaneWidget<HorzScaleItem> implements IDestroyable, MouseEventHandle
 		this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
 	}
 
-	private _model(): ChartModel<HorzScaleItem> {
+	private _model(): IChartModelBase {
 		return this._chart.model();
 	}
 

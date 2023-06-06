@@ -14,7 +14,7 @@ import { clearRect, clearRectWithGradient } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 import { makeFont } from '../helpers/make-font';
 
-import { ChartOptionsInternal } from '../model/chart-model';
+import { ChartOptionsInternalBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -49,11 +49,11 @@ const enum Constants {
 	LabelOffset = 5,
 }
 
-export class PriceAxisWidget<HorzScaleItem> implements IDestroyable {
-	private readonly _pane: PaneWidget<HorzScaleItem>;
-	private readonly _options: Readonly<ChartOptionsInternal<HorzScaleItem>>;
+export class PriceAxisWidget implements IDestroyable {
+	private readonly _pane: PaneWidget;
+	private readonly _options: Readonly<ChartOptionsInternalBase>;
 	private readonly _layoutOptions: Readonly<LayoutOptions>;
-	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider<HorzScaleItem>;
+	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 	private readonly _isLeft: boolean;
 
 	private _priceScale: PriceScale | null = null;
@@ -73,7 +73,7 @@ export class PriceAxisWidget<HorzScaleItem> implements IDestroyable {
 	private _prevOptimalWidth: number = 0;
 	private _isSettingSize: boolean = false;
 
-	public constructor(pane: PaneWidget<HorzScaleItem>, options: Readonly<ChartOptionsInternal<HorzScaleItem>>, rendererOptionsProvider: PriceAxisRendererOptionsProvider<HorzScaleItem>, side: PriceAxisWidgetSide) {
+	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternalBase>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
 		this._options = options;
 		this._layoutOptions = options.layout;

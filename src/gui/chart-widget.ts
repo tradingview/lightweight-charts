@@ -8,7 +8,7 @@ import { ISubscription } from '../helpers/isubscription';
 import { warn } from '../helpers/logger';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { IChartModelBase, ChartModel, ChartOptionsInternal } from '../model/chart-model';
+import { IChartModelBase, ChartModel, ChartOptionsInternal, ChartOptionsInternalBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { DefaultPriceScaleId } from '../model/default-price-scale';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
@@ -46,11 +46,13 @@ const windowsChrome = isChromiumBased() && isWindows();
 export interface IChartWidgetBase {
 	getPriceAxisWidth(position: DefaultPriceScaleId): number;
 	model(): IChartModelBase;
+	paneWidgets(): PaneWidget[];
+	options(): ChartOptionsInternalBase;
 }
 
 export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBase {
 	private readonly _options: ChartOptionsInternal<HorzScaleItem>;
-	private _paneWidgets: PaneWidget<HorzScaleItem>[] = [];
+	private _paneWidgets: PaneWidget[] = [];
 	// private _paneSeparators: PaneSeparator[] = [];
 	private readonly _model: ChartModel<HorzScaleItem>;
 	private _drawRafId: number = 0;
@@ -136,7 +138,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return this._options;
 	}
 
-	public paneWidgets(): PaneWidget<HorzScaleItem>[] {
+	public paneWidgets(): PaneWidget[] {
 		return this._paneWidgets;
 	}
 
@@ -561,7 +563,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			this._applyTimeScaleInvalidations(invalidateMask, time);
 
 			this._timeAxisWidget.update();
-			this._paneWidgets.forEach((pane: PaneWidget<HorzScaleItem>) => {
+			this._paneWidgets.forEach((pane: PaneWidget) => {
 				pane.updatePriceAxisWidgets();
 			});
 

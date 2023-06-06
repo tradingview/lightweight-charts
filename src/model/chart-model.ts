@@ -379,6 +379,8 @@ export interface IChartModelBase {
 	updateSource(source: IPriceDataSource): void;
 	updateCrosshair(): void;
 	cursorUpdate(): void;
+	clearCurrentPosition(): void;
+	setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane): void;
 
 	recalculatePane(pane: Pane | null): void;
 
@@ -393,18 +395,40 @@ export interface IChartModelBase {
 	moveSeriesToScale(series: ISeries<SeriesType>, targetScaleId: string): void;
 
 	priceAxisRendererOptions(): Readonly<PriceAxisViewRendererOptions>;
+	rendererOptionsProvider(): PriceAxisRendererOptionsProvider;
 
 	priceScalesOptionsChanged(): ISubscription;
 
 	hoveredSource(): HoveredSource | null;
 	setHoveredSource(source: HoveredSource | null): void;
+
+	crosshairSource(): Crosshair;
+	watermarkSource(): Watermark;
+
+	startScrollPrice(pane: Pane, priceScale: PriceScale, x: number): void;
+	scrollPriceTo(pane: Pane, priceScale: PriceScale, x: number): void;
+	endScrollPrice(pane: Pane, priceScale: PriceScale): void;
+	resetPriceScale(pane: Pane, priceScale: PriceScale): void;
+
+	startScalePrice(pane: Pane, priceScale: PriceScale, x: number): void;
+	scalePriceTo(pane: Pane, priceScale: PriceScale, x: number): void;
+	endScalePrice(pane: Pane, priceScale: PriceScale): void;
+
+	zoomTime(pointX: Coordinate, scale: number): void;
+	startScrollTime(x: Coordinate): void;
+	scrollTimeTo(x: Coordinate): void;
+	endScrollTime(): void;
+
+	setTimeScaleAnimation(animation: ITimeScaleAnimation): void;
+
+	stopTimeScaleAnimation(): void;
 }
 
 export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase {
 	private readonly _options: ChartOptionsInternal<HorzScaleItem>;
 	private readonly _invalidateHandler: InvalidateHandler;
 
-	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider<HorzScaleItem>;
+	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 
 	private readonly _timeScale: TimeScale<HorzScaleItem>;
 	private readonly _panes: Pane[] = [];
@@ -802,7 +826,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._options.localization.timeFormatter = undefined;
 	}
 
-	public rendererOptionsProvider(): PriceAxisRendererOptionsProvider<HorzScaleItem> {
+	public rendererOptionsProvider(): PriceAxisRendererOptionsProvider {
 		return this._rendererOptionsProvider;
 	}
 

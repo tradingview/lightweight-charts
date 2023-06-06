@@ -1,6 +1,6 @@
 import { makeFont } from '../helpers/make-font';
 
-import { ChartModel } from '../model/chart-model';
+import { IChartModelBase } from '../model/chart-model';
 
 import { PriceAxisViewRendererOptions } from './iprice-axis-view-renderer';
 
@@ -9,8 +9,8 @@ const enum RendererConstants {
 	TickLength = 5,
 }
 
-export class PriceAxisRendererOptionsProvider<HorzScaleItem> {
-	private readonly _chartModel: ChartModel<HorzScaleItem>;
+export class PriceAxisRendererOptionsProvider {
+	private readonly _chartModel: IChartModelBase;
 
 	private readonly _rendererOptions: PriceAxisViewRendererOptions = {
 		borderSize: RendererConstants.BorderSize,
@@ -27,7 +27,7 @@ export class PriceAxisRendererOptionsProvider<HorzScaleItem> {
 		baselineOffset: 0,
 	};
 
-	public constructor(chartModel: ChartModel<HorzScaleItem>) {
+	public constructor(chartModel: IChartModelBase) {
 		this._chartModel = chartModel;
 	}
 

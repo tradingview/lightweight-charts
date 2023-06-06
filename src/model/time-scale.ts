@@ -174,11 +174,14 @@ export interface ITimeScale {
 	visibleStrictRange(): RangeImpl<TimePointIndex> | null;
 	hasPoints(): boolean;
 	timeToIndex(time: InternalHorzScaleItem, findNearest: boolean): TimePointIndex | null;
+
 	barSpacing(): number;
+	rightOffset(): number;
 
 	indexesToCoordinates<T extends TimedValue>(points: T[], visibleRange?: SeriesItemsIndexesRange): void;
 	indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint<unknown> | null;
 	formatDateTime(timeScalePoint: TimeScalePoint<unknown>): string;
+	coordinateToIndex(x: Coordinate): TimePointIndex;
 
 	options(): Readonly<HorzScaleOptions>;
 }

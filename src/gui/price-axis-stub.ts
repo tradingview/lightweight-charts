@@ -10,27 +10,27 @@ import {
 import { clearRect } from '../helpers/canvas-helpers';
 import { IDestroyable } from '../helpers/idestroyable';
 
-import { ChartOptionsInternal } from '../model/chart-model';
+import { ChartOptionsBase } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
 import { createBoundCanvas } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
-export interface PriceAxisStubParams<HorzScaleItem> {
-	rendererOptionsProvider: PriceAxisRendererOptionsProvider<HorzScaleItem>;
+export interface PriceAxisStubParams {
+	rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 }
 
 export type BorderVisibleGetter = () => boolean;
 export type ColorGetter = () => string;
 
-export class PriceAxisStub<HorzScaleItem> implements IDestroyable {
+export class PriceAxisStub implements IDestroyable {
 	private readonly _cell: HTMLDivElement;
 	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
 
-	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider<HorzScaleItem>;
+	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 
-	private _options: ChartOptionsInternal<HorzScaleItem>;
+	private _options: ChartOptionsBase;
 
 	private _invalidated: boolean = true;
 
@@ -41,8 +41,8 @@ export class PriceAxisStub<HorzScaleItem> implements IDestroyable {
 
 	public constructor(
 		side: PriceAxisWidgetSide,
-		options: ChartOptionsInternal<HorzScaleItem>,
-		params: PriceAxisStubParams<HorzScaleItem>,
+		options: ChartOptionsBase,
+		params: PriceAxisStubParams,
 		borderVisible: BorderVisibleGetter,
 		bottomColor: ColorGetter
 	) {

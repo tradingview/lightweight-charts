@@ -47,8 +47,8 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	private readonly _dv: HTMLElement;
 	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
 	private readonly _topCanvasBinding: CanvasElementBitmapSizeBinding;
-	private _leftStub: PriceAxisStub<HorzScaleItem> | null = null;
-	private _rightStub: PriceAxisStub<HorzScaleItem> | null = null;
+	private _leftStub: PriceAxisStub | null = null;
+	private _rightStub: PriceAxisStub | null = null;
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _rendererOptions: TimeAxisViewRendererOptions | null = null;
 	private _mouseDown: boolean = false;
@@ -136,11 +136,11 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		return this._element;
 	}
 
-	public leftStub(): PriceAxisStub<HorzScaleItem> | null {
+	public leftStub(): PriceAxisStub | null {
 		return this._leftStub;
 	}
 
-	public rightStub(): PriceAxisStub<HorzScaleItem> | null {
+	public rightStub(): PriceAxisStub | null {
 		return this._rightStub;
 	}
 
@@ -487,7 +487,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			this._rightStub = null;
 		}
 		const rendererOptionsProvider = this._chart.model().rendererOptionsProvider();
-		const params: PriceAxisStubParams<HorzScaleItem> = {
+		const params: PriceAxisStubParams = {
 			rendererOptionsProvider: rendererOptionsProvider,
 		};
 
