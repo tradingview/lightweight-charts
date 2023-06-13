@@ -1,20 +1,23 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { Point } from '../model/point';
 import {
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
+	CustomSeriesOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
+	SeriesPartialOptions,
 	SeriesType,
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { BarData, HistogramData, LineData } from './data-consumer';
+import { BarData, HistogramData, LineData, WhitespaceData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -45,7 +48,7 @@ export interface MouseEventParams {
 	 * Keys of the map are {@link ISeriesApi} instances. Values are prices.
 	 * Values of the map are original data items
 	 */
-	seriesData: Map<ISeriesApi<SeriesType>, BarData | LineData | HistogramData>;
+	seriesData: Map<ISeriesApi<SeriesType>, BarData | LineData | HistogramData | CustomData>;
 	/**
 	 * The {@link ISeriesApi} for the series at the point of the mouse event.
 	 */
@@ -85,6 +88,27 @@ export interface IChartApi {
 	 * @param forceRepaint - True to initiate resize immediately. One could need this to get screenshot immediately after resize.
 	 */
 	resize(width: number, height: number, forceRepaint?: boolean): void;
+
+	/**
+	 * Creates a custom series with specified parameters.
+	 *
+	 * A custom series is a generic series which can be extended with a custom renderer to
+	 * implement chart types which the library doesn't support by default.
+	 *
+	 * @param customPaneView - A custom series pane view which implements the custom renderer.
+	 * @param customOptions - Customization parameters of the series being created.
+	 * ```js
+	 * const series = chart.addCustomSeries(myCustomPaneView);
+	 * ```
+	 */
+	addCustomSeries<
+		TData extends CustomData,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
+	>(
+		customPaneView: ICustomSeriesPaneView<TData, TOptions>,
+		customOptions?: SeriesPartialOptions<TOptions>
+	): ISeriesApi<'Custom', TData | WhitespaceData, TOptions, TPartialOptions>;
 
 	/**
 	 * Creates an area series with specified parameters.
@@ -271,4 +295,12 @@ export interface IChartApi {
 	 * @returns Whether the `autoSize` option is enabled and the active.
 	 */
 	autoSizeActive(): boolean;
+
+	/**
+	 * Returns the generated div element containing the chart. This can be used for adding your own additional event listeners, or for measuring the
+	 * elements dimensions and position within the document.
+	 *
+	 * @returns generated div element containing the chart.
+	 */
+	chartElement(): HTMLDivElement;
 }

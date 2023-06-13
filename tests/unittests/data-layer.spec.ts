@@ -21,6 +21,8 @@ function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Se
 	return {
 		bars: () => data,
 		seriesType: () => seriesType || 'Line',
+		customSeriesPlotValuesBuilder: () => {},
+		customSeriesWhitespaceCheck: () => {},
 	} as Series<T>;
 }
 
@@ -637,6 +639,115 @@ describe('DataLayer', () => {
 			const series2Update = updateResult.series.get(series2);
 			expect(series2Update).not.to.be.equal(undefined);
 			expect(series2Update?.data.length).to.be.equal(0);
+		});
+	});
+
+	describe('customValues', () => {
+		it('should be able to store customValues in a data point', () => {
+			const dataLayer = new DataLayer();
+
+			// actually we don't need to use Series, so we just use new Object()
+			const series1 = createSeriesMock();
+
+			const updateResult = dataLayer.setSeriesData(series1, [
+				dataItemAt(1000 as UTCTimestamp),
+				{
+					...dataItemAt(4000 as UTCTimestamp),
+					customValues: {
+						testValue: 1234,
+						testString: 'abc',
+					},
+				},
+			]);
+
+			updateResult.series.forEach((seriesUpdate: SeriesChanges, series: Series) => {
+				expect(seriesUpdate.data.length).to.be.equal(2);
+
+				if (series === series1) {
+					expect(seriesUpdate.data[1].index).to.be.equal(1 as TimePointIndex);
+					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+					expect(seriesUpdate.data[1].customValues).to.not.be.equal(undefined);
+					expect(seriesUpdate.data[1].customValues).to.deep.equal(
+						{ testValue: 1234, testString: 'abc' }
+					);
+				}
+			});
+		});
+
+		it('should be able to remove customValues from last existing point', () => {
+			const dataLayer = new DataLayer();
+
+			// actually we don't need to use Series, so we just use new Object()
+			const series1 = createSeriesMock();
+
+			dataLayer.setSeriesData(series1, [
+				dataItemAt(1000 as UTCTimestamp),
+				{
+					...dataItemAt(4000 as UTCTimestamp),
+					customValues: {
+						testValue: 1234,
+					},
+				},
+			]);
+
+			// change the last point of the first series
+			const updateResult = dataLayer.updateSeriesData(series1, dataItemAt(4000 as UTCTimestamp));
+			updateResult.series.forEach((seriesUpdate: SeriesChanges, series: Series) => {
+				expect(seriesUpdate.data.length).to.be.equal(2);
+
+				if (series === series1) {
+					expect(seriesUpdate.data[1].index).to.be.equal(1 as TimePointIndex);
+					expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+					expect(seriesUpdate.data[1].customValues).to.be.equal(undefined);
+				}
+			});
+		});
+
+		it('should be able to replace data including customValues with whitespace', () => {
+			const dataLayer = new DataLayer();
+
+			const series = createSeriesMock();
+
+			dataLayer.setSeriesData(series, [
+				dataItemAt(1000 as UTCTimestamp),
+				dataItemAt(4000 as UTCTimestamp),
+				{
+					...dataItemAt(5000 as UTCTimestamp),
+					customValues: {
+						testValue: 1234,
+					},
+				},
+			]);
+
+			const updateResult = dataLayer.updateSeriesData(series, whitespaceItemAt(5000 as UTCTimestamp));
+
+			expect(updateResult.timeScale.baseIndex).to.be.equal(1 as TimePointIndex);
+			expect(updateResult.timeScale.points).to.be.equal(undefined);
+			expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(undefined);
+
+			expect(updateResult.series.size).to.be.equal(1);
+
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
+			expect(seriesUpdate).not.to.be.equal(undefined);
+			expect(seriesUpdate.data.length).to.be.equal(2);
+
+			expect(seriesUpdate.data[0].index).to.be.equal(0 as TimePointIndex);
+			expect(seriesUpdate.data[0].time.timestamp).to.be.equal(1000 as UTCTimestamp);
+
+			expect(seriesUpdate.data[1].index).to.be.equal(1 as TimePointIndex);
+			expect(seriesUpdate.data[1].time.timestamp).to.be.equal(4000 as UTCTimestamp);
+
+			// Update the last item from whitespace back to a normal data item (without customValue)
+			const updateResultTwo = dataLayer.updateSeriesData(series, dataItemAt(5000 as UTCTimestamp));
+			updateResultTwo.series.forEach((seriesUpdateTwo: SeriesChanges, updatedSeries: Series) => {
+				expect(seriesUpdateTwo.data.length).to.be.equal(3);
+
+				if (updatedSeries === series) {
+					expect(seriesUpdateTwo.data[2].index).to.be.equal(2 as TimePointIndex);
+					expect(seriesUpdateTwo.data[2].time.timestamp).to.be.equal(5000 as UTCTimestamp);
+					expect(seriesUpdateTwo.data[2].customValues).to.be.equal(undefined);
+				}
+			});
 		});
 	});
 

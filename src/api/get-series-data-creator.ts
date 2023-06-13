@@ -1,9 +1,11 @@
+import { CustomData } from '../model/icustom-series';
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import {
 	AreaPlotRow,
 	BarPlotRow,
 	BaselinePlotRow,
 	CandlestickPlotRow,
+	CustomPlotRow,
 	LinePlotRow,
 	SeriesPlotRow,
 } from '../model/series-data';
@@ -22,14 +24,18 @@ import {
 } from './data-consumer';
 
 type SeriesPlotRowToDataMap = {
-	[T in keyof SeriesDataItemTypeMap]: (plotRow: SeriesPlotRow) => SeriesDataItemTypeMap[T];
+	[T in keyof SeriesDataItemTypeMap]: (plotRow: SeriesPlotRow<T>) => SeriesDataItemTypeMap[T];
 };
 
 function singleValueData(plotRow: PlotRow): SingleValueData {
-	return {
+	const data: SingleValueData = {
 		value: plotRow.value[PlotRowValueIndex.Close],
 		time: plotRow.originalTime as unknown as Time,
 	};
+	if (plotRow.customValues !== undefined) {
+		data.customValues = plotRow.customValues;
+	}
+	return data;
 }
 
 function lineData(plotRow: LinePlotRow): LineData {
@@ -91,13 +97,17 @@ function baselineData(plotRow: BaselinePlotRow): BaselineData {
 }
 
 function ohlcData(plotRow: PlotRow): OhlcData {
-	return {
+	const data: OhlcData = {
 		open: plotRow.value[PlotRowValueIndex.Open],
 		high: plotRow.value[PlotRowValueIndex.High],
 		low: plotRow.value[PlotRowValueIndex.Low],
 		close: plotRow.value[PlotRowValueIndex.Close],
 		time: plotRow.originalTime as unknown as Time,
 	};
+	if (plotRow.customValues !== undefined) {
+		data.customValues = plotRow.customValues;
+	}
+	return data;
 }
 
 function barData(plotRow: BarPlotRow): BarData {
@@ -129,6 +139,14 @@ function candlestickData(plotRow: CandlestickPlotRow): CandlestickData {
 	return result;
 }
 
+function customData(plotRow: CustomPlotRow): CustomData {
+	const time = plotRow.originalTime as unknown as Time;
+	return {
+		...plotRow.data,
+		time,
+	};
+}
+
 const seriesPlotRowToDataMap: SeriesPlotRowToDataMap = {
 	Area: areaData,
 	Line: lineData,
@@ -136,6 +154,7 @@ const seriesPlotRowToDataMap: SeriesPlotRowToDataMap = {
 	Histogram: lineData,
 	Bar: barData,
 	Candlestick: candlestickData,
+	Custom: customData,
 };
 
 export function getSeriesDataCreator<TSeriesType extends SeriesType>(seriesType: TSeriesType): (plotRow: SeriesPlotRow<TSeriesType>) => SeriesDataItemTypeMap[TSeriesType] {

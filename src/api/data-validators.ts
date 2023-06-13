@@ -45,7 +45,7 @@ export function checkSeriesValuesType(type: SeriesType, data: readonly SeriesDat
 
 type Checker = (item: SeriesDataItemTypeMap[SeriesType]) => void;
 
-function getChecker(type: SeriesType): Checker {
+export function getChecker(type: SeriesType): Checker {
 	switch (type) {
 		case 'Bar':
 		case 'Candlestick':
@@ -56,6 +56,9 @@ function getChecker(type: SeriesType): Checker {
 		case 'Line':
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
+
+		case 'Custom':
+			return checkCustomItem.bind(null, type);
 	}
 }
 
@@ -112,4 +115,12 @@ function checkLineItem(
 			lineItem.value
 		}`
 	);
+}
+
+function checkCustomItem(
+	// type: 'Custom',
+	// customItem: SeriesDataItemTypeMap[typeof type]
+): void {
+	// Nothing to check yet...
+	return;
 }
