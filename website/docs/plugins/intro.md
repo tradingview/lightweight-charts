@@ -25,13 +25,6 @@ looking to create a new type of series.
 With the flexibility provided by these plugins, developers can create highly
 customizable charting applications for their users.
 
-:::info
-
-Examples of plugins can be found on the following repository:
-[Lightweight Charts™️ Plugin Examples](https://github.com/tradingview/lightweight-charts-plugin-examples)
-
-:::
-
 ## Custom Series
 
 Custom series allow developers to create new types of series with their own data
