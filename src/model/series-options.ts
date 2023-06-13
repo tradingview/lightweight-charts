@@ -175,6 +175,26 @@ export interface LineStyleOptions {
 	lineType: LineType;
 
 	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+
+	/**
+	 * Show circle markers on each point.
+	 *
+	 * @defaultValue `false`
+	 */
+	pointMarkersVisible: boolean;
+	/**
+	 * Circle markers radius in pixels.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	pointMarkersRadius?: number;
+
+	/**
 	 * Show the crosshair marker.
 	 *
 	 * @defaultValue `true`
@@ -187,13 +207,13 @@ export interface LineStyleOptions {
 	 */
 	crosshairMarkerRadius: number;
 	/**
-	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 * Crosshair marker border color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
-	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 * The crosshair marker background color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
@@ -267,6 +287,26 @@ export interface AreaStyleOptions {
 	lineType: LineType;
 
 	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+
+	/**
+	 * Show circle markers on each point.
+	 *
+	 * @defaultValue `false`
+	 */
+	pointMarkersVisible: boolean;
+	/**
+	 * Circle markers radius in pixels.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	pointMarkersRadius?: number;
+
+	/**
 	 * Show the crosshair marker.
 	 *
 	 * @defaultValue `true`
@@ -279,13 +319,13 @@ export interface AreaStyleOptions {
 	 */
 	crosshairMarkerRadius: number;
 	/**
-	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 * Crosshair marker border color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
-	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 * The crosshair marker background color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
@@ -394,6 +434,26 @@ export interface BaselineStyleOptions {
 	lineType: LineType;
 
 	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+
+	/**
+	 * Show circle markers on each point.
+	 *
+	 * @defaultValue `false`
+	 */
+	pointMarkersVisible: boolean;
+	/**
+	 * Circle markers radius in pixels.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	pointMarkersRadius?: number;
+
+	/**
 	 * Show the crosshair marker.
 	 *
 	 * @defaultValue `true`
@@ -406,13 +466,13 @@ export interface BaselineStyleOptions {
 	 */
 	crosshairMarkerRadius: number;
 	/**
-	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 * Crosshair marker border color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
-	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 * The crosshair marker background color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */

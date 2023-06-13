@@ -16,13 +16,14 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineStrokeItem,
 	}
 
 	protected _prepareRendererData(): void {
-		const lineStyleProps = this._series.options();
+		const options = this._series.options();
 
 		const data: PaneRendererLineData = {
 			items: this._items,
-			lineStyle: lineStyleProps.lineStyle,
-			lineType: lineStyleProps.lineType,
-			lineWidth: lineStyleProps.lineWidth,
+			lineStyle: options.lineStyle,
+			lineType: options.lineVisible ? options.lineType : undefined,
+			lineWidth: options.lineWidth,
+			pointMarkersRadius: options.pointMarkersVisible ? (options.pointMarkersRadius || options.lineWidth / 2 + 2) : undefined,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		};

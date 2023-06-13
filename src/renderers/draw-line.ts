@@ -58,7 +58,7 @@ export const enum LineStyle {
 	 */
 	LargeDashed = 3,
 	/**
-	 * A dottled line with more space between dots.
+	 * A dotted line with more space between dots.
 	 */
 	SparseDotted = 4,
 }
