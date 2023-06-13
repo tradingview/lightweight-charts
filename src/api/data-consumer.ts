@@ -1,5 +1,6 @@
 import { isNumber, isString } from '../helpers/strict-type-checks';
 
+import { CustomData, CustomSeriesWhitespaceData } from '../model/icustom-series';
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
 import { BusinessDay, Time, UTCTimestamp } from '../model/time-data';
@@ -45,17 +46,18 @@ export interface WhitespaceData {
 	 * The time of the data.
 	 */
 	time: Time;
+
+	/**
+	 * Additional custom values which will be ignored by the library, but
+	 * could be used by plugins.
+	 */
+	customValues?: Record<string, unknown>;
 }
 
 /**
  * A base interface for a data point of single-value series.
  */
-export interface SingleValueData {
-	/**
-	 * The time of the data.
-	 */
-	time: Time;
-
+export interface SingleValueData extends WhitespaceData {
 	/**
 	 * Price value of the data.
 	 */
@@ -140,12 +142,7 @@ export interface BaselineData extends SingleValueData {
 /**
  * Represents a bar with a {@link Time} and open, high, low, and close prices.
  */
-export interface OhlcData {
-	/**
-	 * The bar time.
-	 */
-	time: Time;
-
+export interface OhlcData extends WhitespaceData {
 	/**
 	 * The open price.
 	 */
@@ -235,6 +232,10 @@ export interface SeriesDataItemTypeMap {
 	 * The types of histogram series data.
 	 */
 	Histogram: HistogramData | WhitespaceData;
+	/**
+	 * The base types of an custom series data.
+	 */
+	Custom: CustomData | CustomSeriesWhitespaceData;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {

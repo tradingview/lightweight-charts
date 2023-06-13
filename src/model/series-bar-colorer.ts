@@ -8,6 +8,7 @@ import {
 	BarStyleOptions,
 	BaselineStyleOptions,
 	CandlestickStyleOptions,
+	CustomStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
 	SeriesOptionsMap,
@@ -63,6 +64,8 @@ export interface CandlesticksColorerStyle extends CommonBarColorerStyle {
 	barWickColor: string;
 }
 
+export interface CustomBarColorerStyle extends CommonBarColorerStyle {}
+
 export interface BarStylesMap {
 	Bar: BarColorerStyle;
 	Candlestick: CandlesticksColorerStyle;
@@ -70,6 +73,7 @@ export interface BarStylesMap {
 	Baseline: BaselineBarColorerStyle;
 	Line: LineBarColorerStyle;
 	Histogram: HistogramBarColorerStyle;
+	Custom: CustomBarColorerStyle;
 }
 
 type FindBarFn = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars) => SeriesPlotRow | null;
@@ -115,6 +119,14 @@ const barStyleFnMap: BarStylesFnMap = {
 			barColor: currentBar.color ?? (isUp ? upColor : downColor),
 			barBorderColor: currentBar.borderColor ?? (isUp ? borderUpColor : borderDownColor),
 			barWickColor: currentBar.wickColor ?? (isUp ? wickUpColor : wickDownColor),
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Custom: (findBar: FindBarFn, customStyle: CustomStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CustomBarColorerStyle => {
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
+
+		return {
+			barColor: currentBar.color ?? customStyle.color,
 		};
 	},
 	// eslint-disable-next-line @typescript-eslint/naming-convention
