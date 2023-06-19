@@ -3,9 +3,11 @@ export function optimalBarWidth(barSpacing: number, pixelRatio: number): number 
 }
 
 export function optimalCandlestickWidth(barSpacing: number, pixelRatio: number): number {
+	const barSpacingSpecialCaseFrom = 2.5;
 	const barSpacingSpecialCaseTo = 4;
-	if (barSpacing < barSpacingSpecialCaseTo) {
-		return Math.max(Math.floor(barSpacing * pixelRatio), 1);
+	const barSpacingSpecialCaseCoeff = 3;
+	if (barSpacing >= barSpacingSpecialCaseFrom && barSpacing <= barSpacingSpecialCaseTo) {
+		return Math.floor(barSpacingSpecialCaseCoeff * pixelRatio);
 	}
 	// coeff should be 1 on small barspacing and go to 0.8 while bar spacing grows
 	const barSpacingReducingCoeff = 0.2;
