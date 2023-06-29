@@ -271,7 +271,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._state === null) {
 			return;
 		}
-		this._fireDblClickedDelegate(event);
+		this._fireMouseClickDelegate(this._dblClicked, event);
 	}
 
 	public doubleTapEvent(event: MouseEventHandlerTouchEvent): void {
@@ -517,18 +517,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	private _fireClickedDelegate(event: MouseEventHandlerEventBase): void {
-		const x = event.localX;
-		const y = event.localY;
-		if (this._clicked.hasListeners()) {
-			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
-		}
+		this._fireMouseClickDelegate(this._clicked, event);
 	}
 
-	private _fireDblClickedDelegate(event: MouseEventHandlerEventBase): void {
+	private _fireMouseClickDelegate(delegate: Delegate<TimePointIndex | null, Point, TouchMouseEventData>, event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
 		const y = event.localY;
-		if (this._dblClicked.hasListeners()) {
-			this._dblClicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
+		if (delegate.hasListeners()) {
+			delegate.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}
 	}
 
