@@ -14,10 +14,10 @@ function computeFiniteResult(
 ): number {
 	const firstFinite = Number.isFinite(valueOne);
 	return firstFinite && Number.isFinite(valueTwo)
-		? ensureFiniteWithFallback(method(valueOne, valueTwo), fallback)
+		? method(valueOne, valueTwo)
 		: firstFinite
 		? valueOne
-		: valueTwo;
+		: ensureFiniteWithFallback(valueTwo, fallback);
 }
 
 export class PriceRangeImpl {
