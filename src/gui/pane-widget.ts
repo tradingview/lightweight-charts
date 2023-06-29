@@ -76,6 +76,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
 	private _clicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
+	private _dblClicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
 	private _startTrackPoint: Point | null = null;
@@ -266,6 +267,17 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._fireClickedDelegate(event);
 	}
 
+	public mouseDoubleClickEvent(event: MouseEventHandlerMouseEvent | MouseEventHandlerTouchEvent): void {
+		if (this._state === null) {
+			return;
+		}
+		this._fireDblClickedDelegate(event);
+	}
+
+	public doubleTapEvent(event: MouseEventHandlerTouchEvent): void {
+		this.mouseDoubleClickEvent(event);
+	}
+
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
 		this._onMouseEvent();
 		this._pressedMouseTouchMoveEvent(event);
@@ -311,6 +323,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public clicked(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
 		return this._clicked;
+	}
+
+	public dblClicked(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
+		return this._dblClicked;
 	}
 
 	public pinchStartEvent(): void {
@@ -505,6 +521,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const y = event.localY;
 		if (this._clicked.hasListeners()) {
 			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
+		}
+	}
+
+	private _fireDblClickedDelegate(event: MouseEventHandlerEventBase): void {
+		const x = event.localX;
+		const y = event.localY;
+		if (this._dblClicked.hasListeners()) {
+			this._dblClicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}
 	}
 

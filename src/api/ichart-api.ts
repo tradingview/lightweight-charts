@@ -223,6 +223,36 @@ export interface IChartApi {
 	unsubscribeClick(handler: MouseEventHandler): void;
 
 	/**
+	 * Subscribe to the chart double-click event.
+	 *
+	 * @param handler - Handler to be called on mouse double-click.
+	 * @example
+	 * ```js
+	 * function myDblClickHandler(param) {
+	 *     if (!param.point) {
+	 *         return;
+	 *     }
+	 *
+	 *     console.log(`Double Click at ${param.point.x}, ${param.point.y}. The time is ${param.time}.`);
+	 * }
+	 *
+	 * chart.subscribeDblClick(myDblClickHandler);
+	 * ```
+	 */
+	subscribeDblClick(handler: MouseEventHandler): void;
+
+	/**
+	 * Unsubscribe a handler that was previously subscribed using {@link subscribeDblClick}.
+	 *
+	 * @param handler - Previously subscribed handler
+	 * @example
+	 * ```js
+	 * chart.unsubscribeDblClick(myDblClickHandler);
+	 * ```
+	 */
+	unsubscribeDblClick(handler: MouseEventHandler): void;
+
+	/**
 	 * Subscribe to the crosshair move event.
 	 *
 	 * @param handler - Handler to be called on crosshair move.

@@ -59,6 +59,7 @@ export class ChartWidget implements IDestroyable {
 	private _invalidateMask: InvalidateMask | null = null;
 	private _drawPlanned: boolean = false;
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _dblClicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 	private _observer: ResizeObserver | null = null;
@@ -151,6 +152,7 @@ export class ChartWidget implements IDestroyable {
 		for (const paneWidget of this._paneWidgets) {
 			this._tableElement.removeChild(paneWidget.getElement());
 			paneWidget.clicked().unsubscribeAll(this);
+			paneWidget.dblClicked().unsubscribeAll(this);
 			paneWidget.destroy();
 		}
 		this._paneWidgets = [];
@@ -168,6 +170,7 @@ export class ChartWidget implements IDestroyable {
 
 		this._crosshairMoved.destroy();
 		this._clicked.destroy();
+		this._dblClicked.destroy();
 
 		this._uninstallObserver();
 	}
@@ -232,6 +235,10 @@ export class ChartWidget implements IDestroyable {
 
 	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._clicked;
+	}
+
+	public dblClicked(): ISubscription<MouseEventParamsImplSupplier> {
+		return this._dblClicked;
 	}
 
 	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
@@ -684,6 +691,7 @@ export class ChartWidget implements IDestroyable {
 			const paneWidget = ensureDefined(this._paneWidgets.pop());
 			this._tableElement.removeChild(paneWidget.getElement());
 			paneWidget.clicked().unsubscribeAll(this);
+			paneWidget.dblClicked().unsubscribeAll(this);
 			paneWidget.destroy();
 
 			// const paneSeparator = this._paneSeparators.pop();
@@ -696,6 +704,7 @@ export class ChartWidget implements IDestroyable {
 		for (let i = actualPaneWidgetsCount; i < targetPaneWidgetsCount; i++) {
 			const paneWidget = new PaneWidget(this, panes[i]);
 			paneWidget.clicked().subscribe(this._onPaneWidgetClicked.bind(this), this);
+			paneWidget.dblClicked().subscribe(this._onPaneWidgetDblClicked.bind(this), this);
 
 			this._paneWidgets.push(paneWidget);
 
@@ -775,6 +784,14 @@ export class ChartWidget implements IDestroyable {
 		event: TouchMouseEventData
 	): void {
 		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point, event));
+	}
+
+	private _onPaneWidgetDblClicked(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData
+	): void {
+		this._dblClicked.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
 	private _onPaneWidgetCrosshairMoved(
