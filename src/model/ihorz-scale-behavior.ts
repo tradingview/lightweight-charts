@@ -110,7 +110,7 @@ export interface IHorzScaleBehavior<HorzScaleItem> {
 	 * @param localizationOptions - Localization options
 	 * @returns string
 	 */
-	formatTickmark(item: TickMark<HorzScaleItem>, localizationOptions: LocalizationOptions<HorzScaleItem>): string;
+	formatTickmark(item: TickMark, localizationOptions: LocalizationOptions<HorzScaleItem>): string;
 	/**
 	 * Returns the maximum tickmark weight value for the specified tickmarks on the time scale.
 	 *
@@ -125,5 +125,5 @@ export interface IHorzScaleBehavior<HorzScaleItem> {
 	 * @param startIndex - starting index
 	 * @returns void
 	 */
-	fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint<HorzScaleItem>>[], startIndex: number): void;
+	fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint>[], startIndex: number): void;
 }

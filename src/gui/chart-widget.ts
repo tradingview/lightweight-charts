@@ -8,7 +8,7 @@ import { ISubscription } from '../helpers/isubscription';
 import { warn } from '../helpers/logger';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { IChartModelBase, ChartModel, ChartOptionsInternal, ChartOptionsInternalBase } from '../model/chart-model';
+import { ChartModel, ChartOptionsInternal, ChartOptionsInternalBase, IChartModelBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { DefaultPriceScaleId } from '../model/default-price-scale';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
@@ -29,17 +29,17 @@ import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
-export interface MouseEventParamsImpl<HorzScaleItem> {
-	time?: HorzScaleItem;
+export interface MouseEventParamsImpl {
+	originalTime?: unknown;
 	index?: TimePointIndex;
 	point?: Point;
-	seriesData: Map<Series<SeriesType, HorzScaleItem>, SeriesPlotRow<SeriesType, HorzScaleItem>>;
-	hoveredSeries?: Series<SeriesType, HorzScaleItem>;
+	seriesData: Map<Series<SeriesType>, SeriesPlotRow<SeriesType>>;
+	hoveredSeries?: Series<SeriesType>;
 	hoveredObject?: string;
 	touchMouseEventData?: TouchMouseEventData;
 }
 
-export type MouseEventParamsImplSupplier<HorzScaleItem> = () => MouseEventParamsImpl<HorzScaleItem>;
+export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
 const windowsChrome = isChromiumBased() && isWindows();
 
@@ -65,8 +65,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	private _timeAxisWidget: TimeAxisWidget<HorzScaleItem>;
 	private _invalidateMask: InvalidateMask | null = null;
 	private _drawPlanned: boolean = false;
-	private _clicked: Delegate<MouseEventParamsImplSupplier<HorzScaleItem>> = new Delegate();
-	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier<HorzScaleItem>> = new Delegate();
+	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 	private _observer: ResizeObserver | null = null;
 
@@ -239,11 +239,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		this._applyAutoSizeOptions(options);
 	}
 
-	public clicked(): ISubscription<MouseEventParamsImplSupplier<HorzScaleItem>> {
+	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._clicked;
 	}
 
-	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier<HorzScaleItem>> {
+	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._crosshairMoved;
 	}
 
@@ -720,11 +720,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		index: TimePointIndex | null,
 		point: Point | null,
 		event: TouchMouseEventData | null
-	): MouseEventParamsImpl<HorzScaleItem> {
-		const seriesData = new Map<Series<SeriesType, HorzScaleItem>, SeriesPlotRow<SeriesType, HorzScaleItem>>();
+	): MouseEventParamsImpl {
+		const seriesData = new Map<Series<SeriesType>, SeriesPlotRow<SeriesType>>();
 		if (index !== null) {
 			const serieses = this._model.serieses();
-			serieses.forEach((s: Series<SeriesType, HorzScaleItem>) => {
+			serieses.forEach((s: Series<SeriesType>) => {
 				// TODO: replace with search left
 				const data = s.bars().search(index);
 				if (data !== null) {
@@ -732,7 +732,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 				}
 			});
 		}
-		let clientTime: HorzScaleItem | undefined;
+		let clientTime: unknown | undefined;
 		if (index !== null) {
 			const timePoint = this._model.timeScale().indexToTimeScalePoint(index)?.originalTime;
 			if (timePoint !== undefined) {
@@ -751,7 +751,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			: undefined;
 
 		return {
-			time: clientTime,
+			originalTime: clientTime,
 			index: index ?? undefined,
 			point: point ?? undefined,
 			hoveredSeries,

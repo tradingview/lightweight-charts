@@ -8,10 +8,10 @@ import { SeriesPlotRow } from './series-data';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 
-function getColoredLineBasedSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: LineData<HorzScaleItem> | HistogramData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Line' | 'Histogram', HorzScaleItem>> {
+function getColoredLineBasedSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: LineData<HorzScaleItem> | HistogramData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Line' | 'Histogram'>> {
 	const val = item.value;
 
-	const res: Mutable<SeriesPlotRow<'Line' | 'Histogram', HorzScaleItem>> = { index, time, value: [val, val, val, val], originalTime };
+	const res: Mutable<SeriesPlotRow<'Line' | 'Histogram'>> = { index, time, value: [val, val, val, val], originalTime };
 
 	if (item.color !== undefined) {
 		res.color = item.color;
@@ -20,10 +20,10 @@ function getColoredLineBasedSeriesPlotRow<HorzScaleItem>(time: InternalHorzScale
 	return res;
 }
 
-function getAreaSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: AreaData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Area', HorzScaleItem>> {
+function getAreaSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: AreaData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Area'>> {
 	const val = item.value;
 
-	const res: Mutable<SeriesPlotRow<'Area', HorzScaleItem>> = { index, time, value: [val, val, val, val], originalTime };
+	const res: Mutable<SeriesPlotRow<'Area'>> = { index, time, value: [val, val, val, val], originalTime };
 
 	if (item.lineColor !== undefined) {
 		res.lineColor = item.lineColor;
@@ -40,10 +40,10 @@ function getAreaSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index:
 	return res;
 }
 
-function getBaselineSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: BaselineData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Baseline', HorzScaleItem>> {
+function getBaselineSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: BaselineData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Baseline'>> {
 	const val = item.value;
 
-	const res: Mutable<SeriesPlotRow<'Baseline', HorzScaleItem>> = { index, time, value: [val, val, val, val], originalTime };
+	const res: Mutable<SeriesPlotRow<'Baseline'>> = { index, time, value: [val, val, val, val], originalTime };
 
 	if (item.topLineColor !== undefined) {
 		res.topLineColor = item.topLineColor;
@@ -72,8 +72,8 @@ function getBaselineSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, in
 	return res;
 }
 
-function getBarSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: BarData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Bar', HorzScaleItem>> {
-	const res: Mutable<SeriesPlotRow<'Bar', HorzScaleItem>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
+function getBarSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: BarData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Bar'>> {
+	const res: Mutable<SeriesPlotRow<'Bar'>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
 
 	if (item.color !== undefined) {
 		res.color = item.color;
@@ -82,8 +82,8 @@ function getBarSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: 
 	return res;
 }
 
-function getCandlestickSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: CandlestickData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Candlestick', HorzScaleItem>> {
-	const res: Mutable<SeriesPlotRow<'Candlestick', HorzScaleItem>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
+function getCandlestickSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem, index: TimePointIndex, item: CandlestickData<HorzScaleItem>, originalTime: HorzScaleItem): Mutable<SeriesPlotRow<'Candlestick'>> {
+	const res: Mutable<SeriesPlotRow<'Candlestick'>> = { index, time, value: [item.open, item.high, item.low, item.close], originalTime };
 	if (item.color !== undefined) {
 		res.color = item.color;
 	}
@@ -99,14 +99,14 @@ function getCandlestickSeriesPlotRow<HorzScaleItem>(time: InternalHorzScaleItem,
 	return res;
 }
 
-export type WhitespacePlotRow<HorzScaleItem> = Omit<PlotRow<HorzScaleItem>, 'value'>;
+export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
 
-export function isSeriesPlotRow<TSeriesType extends SeriesType, HorzScaleItem>(row: SeriesPlotRow<TSeriesType, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>): row is SeriesPlotRow<TSeriesType, HorzScaleItem> {
-	return (row as Partial<SeriesPlotRow<TSeriesType, HorzScaleItem>>).value !== undefined;
+export function isSeriesPlotRow<TSeriesType extends SeriesType, HorzScaleItem>(row: SeriesPlotRow<TSeriesType> | WhitespacePlotRow): row is SeriesPlotRow<TSeriesType> {
+	return (row as Partial<SeriesPlotRow<TSeriesType>>).value !== undefined;
 }
 
 type SeriesItemValueFnMap<TSeriesType extends SeriesType, HorzScaleItem> = {
-	[T in keyof SeriesDataItemTypeMap<TSeriesType>]: (time: InternalHorzScaleItem, index: TimePointIndex, item: SeriesDataItemTypeMap<HorzScaleItem>[T], originalTime: HorzScaleItem) => Mutable<SeriesPlotRow<T, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>>;
+	[T in keyof SeriesDataItemTypeMap<TSeriesType>]: (time: InternalHorzScaleItem, index: TimePointIndex, item: SeriesDataItemTypeMap<HorzScaleItem>[T], originalTime: HorzScaleItem) => Mutable<SeriesPlotRow<T> | WhitespacePlotRow>;
 };
 
 function wrapWhitespaceData<TSeriesType extends SeriesType, HorzScaleItem>(createPlotRowFn: (typeof getBaselineSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): SeriesItemValueFnMap<TSeriesType, HorzScaleItem>[TSeriesType] {

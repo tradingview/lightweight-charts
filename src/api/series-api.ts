@@ -30,14 +30,14 @@ import { priceLineOptionsDefaults } from './options/price-line-options-defaults'
 import { PriceLine } from './price-line-api';
 
 export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements ISeriesApi<TSeriesType, HorzScaleItem> {
-	protected _series: Series<TSeriesType, HorzScaleItem>;
+	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>;
 
 	private readonly _priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>;
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
-	public constructor(series: Series<TSeriesType, HorzScaleItem>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>, priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
+	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>, priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
 		this._priceScaleApiProvider = priceScaleApiProvider;
@@ -141,23 +141,23 @@ export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements
 		return getSeriesDataCreator<TSeriesType, HorzScaleItem>(this.seriesType())(data);
 	}
 
-	public setMarkers(data: SeriesMarker<HorzScaleItem, HorzScaleItem>[]): void {
+	public setMarkers(data: SeriesMarker<HorzScaleItem>[]): void {
 		checkItemsAreOrdered(data, this._horzScaleBehavior, true);
 
-		const convertedMarkers = data.map<SeriesMarker<InternalHorzScaleItem, HorzScaleItem>>((marker: SeriesMarker<HorzScaleItem, HorzScaleItem>) => ({
-			...marker as Omit<SeriesMarker<HorzScaleItem, HorzScaleItem>, 'time'>,
+		const convertedMarkers = data.map((marker: SeriesMarker<HorzScaleItem>) => ({
+			...marker as Omit<SeriesMarker<HorzScaleItem>, 'time' | 'originalTime'>,
 			originalTime: marker.time,
 			time: this._horzScaleBehavior.convertHorzItemToInternal(marker.time),
 		}));
 		this._series.setMarkers(convertedMarkers);
 	}
 
-	public markers(): SeriesMarker<HorzScaleItem, HorzScaleItem>[] {
-		return this._series.markers().map<SeriesMarker<HorzScaleItem, HorzScaleItem>>((internalItem: SeriesMarker<InternalHorzScaleItem, HorzScaleItem>) => {
+	public markers(): SeriesMarker<HorzScaleItem>[] {
+		return this._series.markers().map<SeriesMarker<HorzScaleItem>>((internalItem: SeriesMarker<InternalHorzScaleItem>) => {
 			const { originalTime, time, ...item } = internalItem;
 			return {
-				time: originalTime,
-				...item as Omit<SeriesMarker<HorzScaleItem, HorzScaleItem>, 'time' | 'originalTIme'>,
+				time: originalTime as HorzScaleItem,
+				...item as Omit<SeriesMarker<InternalHorzScaleItem>, 'time' | 'originalTIme'>,
 			};
 		});
 	}

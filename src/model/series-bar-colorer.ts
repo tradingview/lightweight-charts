@@ -15,9 +15,9 @@ import {
 } from './series-options';
 import { TimePointIndex } from './time-data';
 
-export interface PrecomputedBars<HorzScaleItem> {
-	value: SeriesPlotRow<SeriesType, HorzScaleItem>;
-	previousValue?: SeriesPlotRow<SeriesType, HorzScaleItem>;
+export interface PrecomputedBars {
+	value: SeriesPlotRow<SeriesType>;
+	previousValue?: SeriesPlotRow<SeriesType>;
 }
 
 export interface CommonBarColorerStyle {
@@ -72,38 +72,38 @@ export interface BarStylesMap {
 	Histogram: HistogramBarColorerStyle;
 }
 
-type FindBarFn<HorzScaleItem> = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>) => SeriesPlotRow<SeriesType, HorzScaleItem> | null;
+type FindBarFn = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars) => SeriesPlotRow<SeriesType> | null;
 
-type StyleGetterFn<T extends SeriesType, HorzScaleItem> = (
-	findBar: FindBarFn<HorzScaleItem>,
-	barStyle: ReturnType<Series<T, HorzScaleItem>['options']>,
+type StyleGetterFn<T extends SeriesType> = (
+	findBar: FindBarFn,
+	barStyle: ReturnType<Series<T>['options']>,
 	barIndex: TimePointIndex,
-	precomputedBars?: PrecomputedBars<HorzScaleItem>
+	precomputedBars?: PrecomputedBars
 ) => BarStylesMap[T];
 
-type BarStylesFnMap<HorzScaleItem> = {
-	[T in keyof SeriesOptionsMap]: StyleGetterFn<T, HorzScaleItem>;
+type BarStylesFnMap = {
+	[T in keyof SeriesOptionsMap]: StyleGetterFn<T>;
 };
 
 export interface ISeriesBarColorer<T extends SeriesType> {
-	barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<unknown>): BarStylesMap[T];
+	barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarStylesMap[T];
 }
 
-export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements ISeriesBarColorer<T> {
-	private _series: Series<T, HorzScaleItem>;
-	private readonly _styleGetter: BarStylesFnMap<HorzScaleItem>[T];
-	private readonly _barStyleFnMap: BarStylesFnMap<HorzScaleItem>;
+export class SeriesBarColorer<T extends SeriesType> implements ISeriesBarColorer<T> {
+	private _series: Series<T>;
+	private readonly _styleGetter: BarStylesFnMap[T];
+	private readonly _barStyleFnMap: BarStylesFnMap;
 
-	public constructor(series: Series<T, HorzScaleItem>) {
+	public constructor(series: Series<T>) {
 		this._series = series;
 
 		this._barStyleFnMap = {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Bar: (findBar: FindBarFn<HorzScaleItem>, barStyle: BarStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): BarColorerStyle => {
+			Bar: (findBar: FindBarFn, barStyle: BarStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle => {
 				const upColor = barStyle.upColor;
 				const downColor = barStyle.downColor;
 
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Bar', HorzScaleItem>;
+				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Bar'>;
 				const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
 				return {
@@ -111,7 +111,7 @@ export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements IS
 				};
 			},
 			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Candlestick: (findBar: FindBarFn<HorzScaleItem>, candlestickStyle: CandlestickStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): CandlesticksColorerStyle => {
+			Candlestick: (findBar: FindBarFn, candlestickStyle: CandlestickStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CandlesticksColorerStyle => {
 				const upColor = candlestickStyle.upColor;
 				const downColor = candlestickStyle.downColor;
 				const borderUpColor = candlestickStyle.borderUpColor;
@@ -120,7 +120,7 @@ export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements IS
 				const wickUpColor = candlestickStyle.wickUpColor;
 				const wickDownColor = candlestickStyle.wickDownColor;
 
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Candlestick', HorzScaleItem>;
+				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Candlestick'>;
 				const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
 
 				return {
@@ -130,8 +130,8 @@ export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements IS
 				};
 			},
 			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Area: (findBar: FindBarFn<HorzScaleItem>, areaStyle: AreaStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): AreaBarColorerStyle => {
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Area', HorzScaleItem>;
+			Area: (findBar: FindBarFn, areaStyle: AreaStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): AreaBarColorerStyle => {
+				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Area'>;
 				return {
 					barColor: currentBar.lineColor ?? areaStyle.lineColor,
 					lineColor: currentBar.lineColor ?? areaStyle.lineColor,
@@ -140,8 +140,8 @@ export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements IS
 				};
 			},
 			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Baseline: (findBar: FindBarFn<HorzScaleItem>, baselineStyle: BaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): BaselineBarColorerStyle => {
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Baseline', HorzScaleItem>;
+			Baseline: (findBar: FindBarFn, baselineStyle: BaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BaselineBarColorerStyle => {
+				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Baseline'>;
 				const isAboveBaseline = currentBar.value[PlotRowValueIndex.Close] >= baselineStyle.baseValue.price;
 
 				return {
@@ -155,8 +155,8 @@ export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements IS
 				};
 			},
 			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Line: (findBar: FindBarFn<HorzScaleItem>, lineStyle: LineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): LineBarColorerStyle => {
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line', HorzScaleItem>;
+			Line: (findBar: FindBarFn, lineStyle: LineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): LineBarColorerStyle => {
+				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
 
 				return {
 					barColor: currentBar.color ?? lineStyle.color,
@@ -164,8 +164,8 @@ export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements IS
 				};
 			},
 			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Histogram: (findBar: FindBarFn<HorzScaleItem>, histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): HistogramBarColorerStyle => {
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Histogram', HorzScaleItem>;
+			Histogram: (findBar: FindBarFn, histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): HistogramBarColorerStyle => {
+				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Histogram'>;
 				return {
 					barColor: currentBar.color ?? histogramStyle.color,
 				};
@@ -175,13 +175,13 @@ export class SeriesBarColorer<T extends SeriesType, HorzScaleItem> implements IS
 		this._styleGetter = this._barStyleFnMap[series.seriesType()];
 	}
 
-	public barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): BarStylesMap[T] {
+	public barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarStylesMap[T] {
 		// precomputedBars: {value: [Array BarValues], previousValue: [Array BarValues] | undefined}
 		// Used to avoid binary search if bars are already known
 		return this._styleGetter(this._findBar, this._series.options(), barIndex, precomputedBars);
 	}
 
-	private _findBar = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars<HorzScaleItem>): SeriesPlotRow<T, HorzScaleItem> | null => {
+	private _findBar = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): SeriesPlotRow<T> | null => {
 		if (precomputedBars !== undefined) {
 			return precomputedBars.value;
 		}

@@ -213,12 +213,12 @@ export interface ISeriesApi<TSeriesType extends SeriesType, HorzScaleItem = Time
 	 * });
 	 * ```
 	 */
-	setMarkers(data: SeriesMarker<HorzScaleItem, HorzScaleItem>[]): void;
+	setMarkers(data: SeriesMarker<HorzScaleItem>[]): void;
 
 	/**
 	 * Returns an array of series markers.
 	 */
-	markers(): SeriesMarker<HorzScaleItem, HorzScaleItem>[];
+	markers(): SeriesMarker<HorzScaleItem>[];
 
 	/**
 	 * Creates a new price line

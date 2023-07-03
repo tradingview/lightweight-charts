@@ -1,4 +1,5 @@
 import { ensureNotNull } from '../helpers/assertions';
+
 import { ZOrdered } from './idata-source';
 
 export function sortSources<T extends ZOrdered>(sources: readonly T[]): T[] {

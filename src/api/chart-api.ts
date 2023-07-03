@@ -111,8 +111,8 @@ export type IPriceScaleApiProvider<HorzScaleItem> = Pick<IChartApiBase<HorzScale
 export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, DataUpdatesConsumer<SeriesType, HorzScaleItem> {
 	private _chartWidget: ChartWidget<HorzScaleItem>;
 	private _dataLayer: DataLayer<HorzScaleItem>;
-	private readonly _seriesMap: Map<SeriesApi<SeriesType, HorzScaleItem>, Series<SeriesType, HorzScaleItem>> = new Map();
-	private readonly _seriesMapReversed: Map<Series<SeriesType, HorzScaleItem>, SeriesApi<SeriesType, HorzScaleItem>> = new Map();
+	private readonly _seriesMap: Map<SeriesApi<SeriesType, HorzScaleItem>, Series<SeriesType>> = new Map();
+	private readonly _seriesMapReversed: Map<Series<SeriesType>, SeriesApi<SeriesType, HorzScaleItem>> = new Map();
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
@@ -131,7 +131,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._chartWidget = new ChartWidget(container, internalOptions, horzScaleBehavior);
 
 		this._chartWidget.clicked().subscribe(
-			(paramSupplier: MouseEventParamsImplSupplier<HorzScaleItem>) => {
+			(paramSupplier: MouseEventParamsImplSupplier) => {
 				if (this._clickedDelegate.hasListeners()) {
 					this._clickedDelegate.fire(this._convertMouseParams(paramSupplier()));
 				}
@@ -139,7 +139,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			this
 		);
 		this._chartWidget.crosshairMoved().subscribe(
-			(paramSupplier: MouseEventParamsImplSupplier<HorzScaleItem>) => {
+			(paramSupplier: MouseEventParamsImplSupplier) => {
 				if (this._crosshairMovedDelegate.hasListeners()) {
 					this._crosshairMovedDelegate.fire(this._convertMouseParams(paramSupplier()));
 				}
@@ -215,11 +215,11 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._seriesMapReversed.delete(series);
 	}
 
-	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType, HorzScaleItem>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): void {
+	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): void {
 		this._sendUpdateToChart(this._dataLayer.setSeriesData(series, data));
 	}
 
-	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType, HorzScaleItem>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void {
+	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void {
 		this._sendUpdateToChart(this._dataLayer.updateSeriesData(series, data));
 	}
 
@@ -280,22 +280,22 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return res;
 	}
 
-	private _sendUpdateToChart(update: DataUpdateResponse<HorzScaleItem>): void {
+	private _sendUpdateToChart(update: DataUpdateResponse): void {
 		const model = this._chartWidget.model();
 
 		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
-		update.series.forEach((value: SeriesChanges<HorzScaleItem>, series: Series<SeriesType, HorzScaleItem>) => series.setData(value.data, value.info));
+		update.series.forEach((value: SeriesChanges, series: Series<SeriesType>) => series.setData(value.data, value.info));
 
 		model.recalculateAllPanes();
 	}
 
-	private _mapSeriesToApi(series: Series<SeriesType, HorzScaleItem>): ISeriesApi<SeriesType, HorzScaleItem> {
+	private _mapSeriesToApi(series: Series<SeriesType>): ISeriesApi<SeriesType, HorzScaleItem> {
 		return ensureDefined(this._seriesMapReversed.get(series));
 	}
 
-	private _convertMouseParams(param: MouseEventParamsImpl<HorzScaleItem>): MouseEventParams<HorzScaleItem> {
+	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams<HorzScaleItem> {
 		const seriesData: MouseEventParams<HorzScaleItem>['seriesData'] = new Map();
-		param.seriesData.forEach((plotRow: SeriesPlotRow<SeriesType, HorzScaleItem>, series: Series<SeriesType, HorzScaleItem>) => {
+		param.seriesData.forEach((plotRow: SeriesPlotRow<SeriesType>, series: Series<SeriesType>) => {
 			const data = getSeriesDataCreator<SeriesType, HorzScaleItem>(series.seriesType())(plotRow);
 			assert(isFulfilledData(data));
 			seriesData.set(this._mapSeriesToApi(series), data);
@@ -304,7 +304,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		const hoveredSeries = param.hoveredSeries === undefined ? undefined : this._mapSeriesToApi(param.hoveredSeries);
 
 		return {
-			time: param.time,
+			time: param.originalTime as HorzScaleItem,
 			logical: param.index as Logical | undefined,
 			point: param.point,
 			hoveredSeries,

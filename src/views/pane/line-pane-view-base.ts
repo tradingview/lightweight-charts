@@ -41,7 +41,7 @@ export abstract class LinePaneViewBase<
 
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
-		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType, unknown>) => {
+		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => {
 			const value = row.value[PlotRowValueIndex.Close] as BarPrice;
 			return this._createRawItem(row.index, value, colorer);
 		});

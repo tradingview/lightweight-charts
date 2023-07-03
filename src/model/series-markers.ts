@@ -1,5 +1,3 @@
-import { Time } from './horz-scale-behavior-time/types';
-
 /**
  * Represents the position of a series marker relative to a bar.
  */
@@ -13,7 +11,7 @@ export type SeriesMarkerShape = 'circle' | 'square' | 'arrowUp' | 'arrowDown';
 /**
  * Represents a series marker.
  */
-export interface SeriesMarker<TimeType, HorzScaleItem = Time> {
+export interface SeriesMarker<TimeType> {
 	/**
 	 * The time of the marker.
 	 */
@@ -48,9 +46,9 @@ export interface SeriesMarker<TimeType, HorzScaleItem = Time> {
 	/**
 	 * @internal
 	 */
-	originalTime: HorzScaleItem;
+	originalTime: unknown;
 }
 
-export interface InternalSeriesMarker<TimeType, HorzScaleItem> extends SeriesMarker<TimeType, HorzScaleItem> {
+export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {
 	internalId: number;
 }

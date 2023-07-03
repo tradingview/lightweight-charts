@@ -12,12 +12,12 @@ function timePoint(val: number): TimePoint {
 	return { timestamp: val as UTCTimestamp };
 }
 
-function plotRow(index: TimePointIndex, time: TimePoint, value: PlotRowValue): PlotRow<TimePoint> {
+function plotRow(index: TimePointIndex, time: TimePoint, value: PlotRowValue): PlotRow {
 	return { index, time: time as unknown as InternalHorzScaleItem, value, originalTime: time };
 }
 
 describe('PlotList', () => {
-	let p: PlotList<TimePoint>;
+	let p: PlotList;
 
 	beforeEach(() => {
 		p = new PlotList();
@@ -132,7 +132,7 @@ describe('PlotList', () => {
 	});
 
 	describe('minMaxOnRangeByPlotFunction and minMaxOnRangeByPlotFunctionCached', () => {
-		let pl: PlotList<TimePoint>;
+		let pl: PlotList;
 
 		beforeEach(() => {
 			pl = new PlotList();

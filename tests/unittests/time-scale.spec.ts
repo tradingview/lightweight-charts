@@ -20,7 +20,7 @@ function chartModelMock(): ChartModel<Time> {
 }
 
 function tsUpdate(to: number): Parameters<TimeScale<Time>['update']> {
-	const points: TimeScalePoint<Time>[] = [];
+	const points: TimeScalePoint[] = [];
 
 	const startIndex = 0;
 	for (let i = startIndex; i <= to; ++i) {

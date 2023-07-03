@@ -2,7 +2,7 @@ import { Mutable } from '../../helpers/mutable';
 
 import { InternalHorzScaleItem } from '../ihorz-scale-behavior';
 import { TickMarkWeightValue, TimeScalePoint } from '../time-data';
-import { TickMarkWeight, Time, TimePoint } from './types';
+import { TickMarkWeight, TimePoint } from './types';
 
 function hours(count: number): number {
 	return count * 60 * 60 * 1000;
@@ -54,7 +54,7 @@ function cast(t: InternalHorzScaleItem): TimePoint {
 	return t as unknown as TimePoint;
 }
 
-export function fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint<Time>>[], startIndex: number = 0): void {
+export function fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint>[], startIndex: number = 0): void {
 	if (sortedTimePoints.length === 0) {
 		return;
 	}

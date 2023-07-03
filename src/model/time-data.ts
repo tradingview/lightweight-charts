@@ -13,13 +13,13 @@ export type TickMarkWeightValue = Nominal<number, 'TickMarkWeightValue'>;
 /**
  * Represents a point on the time scale
  */
-export interface TimeScalePoint<HorzScaleItem> {
+export interface TimeScalePoint {
 	/** Weight of the point */
 	readonly timeWeight: TickMarkWeightValue;
 	/** Time of the point */
 	readonly time: InternalHorzScaleItem;
 	/** Original time for the point */
-	readonly originalTime: HorzScaleItem;
+	readonly originalTime: unknown;
 }
 
 /**

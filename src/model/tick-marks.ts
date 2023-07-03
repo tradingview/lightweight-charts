@@ -7,7 +7,7 @@ import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from './time-data
 /**
  * Tick mark for the horizontal scale.
  */
-export interface TickMark<HorzScaleItem> {
+export interface TickMark {
 	/** Index */
 	index: TimePointIndex;
 	/** Time / Coordinate */
@@ -15,17 +15,17 @@ export interface TickMark<HorzScaleItem> {
 	/** Weight of the tick mark */
 	weight: TickMarkWeightValue;
 	/** Original value for the `time` property */
-	originalTime: HorzScaleItem;
+	originalTime: unknown;
 }
 
-interface MarksCache<HorzScaleItem> {
+interface MarksCache {
 	maxIndexesPerMark: number;
-	marks: readonly TickMark<HorzScaleItem>[];
+	marks: readonly TickMark[];
 }
 
 export class TickMarks<HorzScaleItem> {
-	private _marksByWeight: Map<TickMarkWeightValue, TickMark<HorzScaleItem>[]> = new Map();
-	private _cache: MarksCache<HorzScaleItem> | null = null;
+	private _marksByWeight: Map<TickMarkWeightValue, TickMark[]> = new Map();
+	private _cache: MarksCache | null = null;
 	private _uniformDistribution: boolean = false;
 
 	public setUniformDistribution(val: boolean): void {
@@ -33,7 +33,7 @@ export class TickMarks<HorzScaleItem> {
 		this._cache = null;
 	}
 
-	public setTimeScalePoints(newPoints: readonly TimeScalePoint<HorzScaleItem>[], firstChangedPointIndex: number): void {
+	public setTimeScalePoints(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
 		this._removeMarksSinceIndex(firstChangedPointIndex);
 
 		this._cache = null;
@@ -55,7 +55,7 @@ export class TickMarks<HorzScaleItem> {
 		}
 	}
 
-	public build(spacing: number, maxWidth: number): readonly TickMark<HorzScaleItem>[] {
+	public build(spacing: number, maxWidth: number): readonly TickMark[] {
 		const maxIndexesPerMark = Math.ceil(maxWidth / spacing);
 		if (this._cache === null || this._cache.maxIndexesPerMark !== maxIndexesPerMark) {
 			this._cache = {
@@ -75,12 +75,12 @@ export class TickMarks<HorzScaleItem> {
 
 		const weightsToClear: TickMarkWeightValue[] = [];
 
-		this._marksByWeight.forEach((marks: TickMark<HorzScaleItem>[], timeWeight: TickMarkWeightValue) => {
+		this._marksByWeight.forEach((marks: TickMark[], timeWeight: TickMarkWeightValue) => {
 			if (sinceIndex <= marks[0].index) {
 				weightsToClear.push(timeWeight);
 			} else {
 				marks.splice(
-					lowerbound(marks, sinceIndex, (tm: TickMark<HorzScaleItem>) => tm.index < sinceIndex),
+					lowerbound(marks, sinceIndex, (tm: TickMark) => tm.index < sinceIndex),
 					Infinity
 				);
 			}
@@ -91,8 +91,8 @@ export class TickMarks<HorzScaleItem> {
 		}
 	}
 
-	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark<HorzScaleItem>[] {
-		let marks: TickMark<HorzScaleItem>[] = [];
+	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark[] {
+		let marks: TickMark[] = [];
 
 		for (const weight of Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a)) {
 			if (!this._marksByWeight.get(weight)) {

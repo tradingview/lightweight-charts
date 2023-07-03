@@ -230,6 +230,9 @@ export interface TrackingModeOptions {
 	exitMode: TrackingModeExitMode;
 }
 
+/**
+ * Represents common chart options
+ */
 export interface ChartOptionsBase {
 	/**
 	 * Width of the chart in pixels
@@ -327,6 +330,9 @@ export interface ChartOptionsBase {
 	 */
 	trackingMode: TrackingModeOptions;
 
+	/**
+	 * Basic localization options
+	 */
 	localization: LocalizationOptionsBase;
 }
 
@@ -436,7 +442,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
 
-	private _serieses: Series<SeriesType, HorzScaleItem>[] = [];
+	private _serieses: Series<SeriesType>[] = [];
 
 	private _width: number = 0;
 	private _hoveredSource: HoveredSource | null = null;
@@ -723,7 +729,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this.lightUpdate();
 	}
 
-	public serieses(): readonly Series<SeriesType, HorzScaleItem>[] {
+	public serieses(): readonly Series<SeriesType>[] {
 		return this._serieses;
 	}
 
@@ -769,7 +775,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._crosshair.updateAllViews();
 	}
 
-	public updateTimeScale(newBaseIndex: TimePointIndex | null, newPoints?: readonly TimeScalePoint<HorzScaleItem>[], firstChangedPointIndex?: number): void {
+	public updateTimeScale(newBaseIndex: TimePointIndex | null, newPoints?: readonly TimeScalePoint[], firstChangedPointIndex?: number): void {
 		const oldFirstTime = this._timeScale.indexToTime(0 as TimePointIndex);
 
 		if (newPoints !== undefined && firstChangedPointIndex !== undefined) {
@@ -838,7 +844,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._priceScalesOptionsChanged;
 	}
 
-	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T, HorzScaleItem> {
+	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T> {
 		const pane = this._panes[0];
 		const series = this._createSeries(options, seriesType, pane);
 		this._serieses.push(series);
@@ -853,7 +859,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return series;
 	}
 
-	public removeSeries(series: Series<SeriesType, HorzScaleItem>): void {
+	public removeSeries(series: Series<SeriesType>): void {
 		const pane = this.paneForSource(series);
 
 		const seriesIndex = this._serieses.indexOf(series);
@@ -866,7 +872,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 	}
 
-	public moveSeriesToScale(series: Series<SeriesType, HorzScaleItem>, targetScaleId: string): void {
+	public moveSeriesToScale(series: Series<SeriesType>, targetScaleId: string): void {
 		const pane = ensureNotNull(this.paneForSource(series));
 		pane.removeDataSource(series);
 
@@ -998,8 +1004,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T, HorzScaleItem> {
-		const series = new Series<T, HorzScaleItem>(this, options, seriesType);
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T> {
+		const series = new Series<T>(this, options, seriesType);
 
 		const targetScaleId = options.priceScaleId !== undefined ? options.priceScaleId : this.defaultVisiblePriceScaleId();
 		pane.addDataSource(series, targetScaleId);

@@ -16,14 +16,14 @@ import { TimePointIndex } from '../../src/model/time-data';
 
 chai.use(chaiExclude);
 
-function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Series<T, Time> {
+function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Series<T> {
 	const data = new PlotList();
 
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	return {
 		bars: () => data,
 		seriesType: () => seriesType || 'Line',
-	} as Series<T, Time>;
+	} as Series<T>;
 }
 
 // just for tests
@@ -53,7 +53,7 @@ describe('DataLayer', () => {
 		]);
 		expect(updateResult1.timeScale.firstChangedPointIndex).to.be.equal(0);
 		expect(updateResult1.series.size).to.be.equal(1);
-		updateResult1.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
+		updateResult1.series.forEach((updatePacket: SeriesChanges, series: Series<SeriesType>) => {
 			expect(series).to.be.equal(series1);
 			expect(updatePacket.data.length).to.be.equal(2);
 
@@ -73,7 +73,7 @@ describe('DataLayer', () => {
 		]);
 		expect(updateResult2.timeScale.firstChangedPointIndex).to.be.equal(1);
 		expect(updateResult2.series.size).to.be.equal(2);
-		updateResult2.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
+		updateResult2.series.forEach((updatePacket: SeriesChanges, series: Series<SeriesType>) => {
 			if (series === series1) {
 				expect(updatePacket.data.length).to.be.equal(2);
 
@@ -256,7 +256,7 @@ describe('DataLayer', () => {
 		expect(updateResult1.timeScale.points).to.be.equal(undefined);
 		expect(updateResult1.timeScale.firstChangedPointIndex).to.be.equal(undefined);
 		expect(updateResult1.series.size).to.be.equal(1);
-		updateResult1.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
+		updateResult1.series.forEach((updatePacket: SeriesChanges, series: Series<SeriesType>) => {
 			expect(series).to.be.equal(series1);
 			expect(updatePacket.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
 				{ index: 0, time: { timestamp: 1000 } },
@@ -270,7 +270,7 @@ describe('DataLayer', () => {
 		expect(updateResult2.timeScale.points).to.be.equal(undefined);
 		expect(updateResult2.timeScale.firstChangedPointIndex).to.be.equal(undefined);
 		expect(updateResult2.series.size).to.be.equal(1);
-		updateResult2.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
+		updateResult2.series.forEach((updatePacket: SeriesChanges, series: Series<SeriesType>) => {
 			expect(series).to.be.equal(series2);
 			expect(updatePacket.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
 				{ index: 1, time: { timestamp: 2000 } },
@@ -301,7 +301,7 @@ describe('DataLayer', () => {
 		]);
 		expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(2);
 		expect(updateResult.series.size).to.be.equal(2);
-		updateResult.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
+		updateResult.series.forEach((updatePacket: SeriesChanges, series: Series<SeriesType>) => {
 			if (series === series1) {
 				expect(updatePacket.data.length).to.be.equal(2);
 
@@ -356,7 +356,7 @@ describe('DataLayer', () => {
 			{ time: timePoint2, timeWeight: 50, originalTime: { day: 2, month: 10, year: 2019 } },
 		]);
 		expect(updateResult1.series.size).to.be.equal(1);
-		updateResult1.series.forEach((updatePacket: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
+		updateResult1.series.forEach((updatePacket: SeriesChanges, series: Series<SeriesType>) => {
 			expect(series).to.be.equal(series);
 			expect(updatePacket.data.length).to.be.equal(2);
 
@@ -668,7 +668,7 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(1);
 
-			const seriesUpdate = updateResult.series.get(series) as SeriesChanges<Time>;
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 			expect(seriesUpdate.data.length).to.be.equal(2);
 
@@ -701,7 +701,7 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(1);
 
-			const seriesUpdate = updateResult.series.get(series) as SeriesChanges<Time>;
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 			expect(seriesUpdate.data.length).to.be.equal(2);
 
@@ -731,7 +731,7 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(1);
 
-			const seriesUpdate = updateResult.series.get(series) as SeriesChanges<Time>;
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 
 			expect(seriesUpdate.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
@@ -760,7 +760,7 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(1);
 
-			const seriesUpdate = updateResult.series.get(series) as SeriesChanges<Time>;
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
 			expect(seriesUpdate).not.to.be.equal(undefined);
 			expect(seriesUpdate.data.length).to.be.equal(2);
 
@@ -801,7 +801,7 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(2);
 
-			updateResult.series.forEach((seriesUpdate: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
+			updateResult.series.forEach((seriesUpdate: SeriesChanges, series: Series<SeriesType>) => {
 				expect(seriesUpdate.data.length).to.be.equal(2);
 
 				if (series === series1) {
@@ -855,7 +855,7 @@ describe('DataLayer', () => {
 
 			expect(updateResult.series.size).to.be.equal(2);
 
-			updateResult.series.forEach((seriesUpdate: SeriesChanges<Time>, series: Series<SeriesType, Time>) => {
+			updateResult.series.forEach((seriesUpdate: SeriesChanges, series: Series<SeriesType>) => {
 				expect(seriesUpdate.data.length).to.be.equal(2);
 
 				if (series === series1) {

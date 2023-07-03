@@ -2,27 +2,27 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { getSeriesDataCreator } from '../../src/api/get-series-data-creator';
-import { Time, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
+import { UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
 import { InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { PlotRow } from '../../src/model/plot-data';
 import { AreaPlotRow, BarPlotRow, BaselinePlotRow, CandlestickPlotRow, HistogramPlotRow, LinePlotRow } from '../../src/model/series-data';
 import { TimePointIndex } from '../../src/model/time-data';
 
-const plotRow: PlotRow<Time> = {
+const plotRow: PlotRow = {
 	index: 0 as TimePointIndex,
 	time: { timestamp: 1649931070 as UTCTimestamp } as unknown as InternalHorzScaleItem,
 	value: [1, 2, 3, 4],
 	originalTime: 1649931070 as UTCTimestamp,
 };
 
-const linePlotRows: LinePlotRow<Time>[] = [
+const linePlotRows: LinePlotRow[] = [
 	{
 		...plotRow,
 		color: '#FF0000',
 	},
 	plotRow,
 ];
-const areaPlotRows: AreaPlotRow<Time>[] = [
+const areaPlotRows: AreaPlotRow[] = [
 	{
 		...plotRow,
 		lineColor: '#FF0000',
@@ -31,7 +31,7 @@ const areaPlotRows: AreaPlotRow<Time>[] = [
 	},
 	plotRow,
 ];
-const baselinePlotRows: BaselinePlotRow<Time>[] = [
+const baselinePlotRows: BaselinePlotRow[] = [
 	{
 		...plotRow,
 		topFillColor1: '#000001',
@@ -43,21 +43,21 @@ const baselinePlotRows: BaselinePlotRow<Time>[] = [
 	},
 	plotRow,
 ];
-const histogramPlotRow: HistogramPlotRow<Time>[] = [
+const histogramPlotRow: HistogramPlotRow[] = [
 	{
 		...plotRow,
 		color: '#00FF00',
 	},
 	plotRow,
 ];
-const barPlotRow: BarPlotRow<Time>[] = [
+const barPlotRow: BarPlotRow[] = [
 	{
 		...plotRow,
 		color: '#0000FF',
 	},
 	plotRow,
 ];
-const candlestickPlotRows: CandlestickPlotRow<Time>[] = [
+const candlestickPlotRows: CandlestickPlotRow[] = [
 	{
 		...plotRow,
 		color: '#0000FF',

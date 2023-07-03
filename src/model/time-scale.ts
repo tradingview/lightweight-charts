@@ -179,8 +179,8 @@ export interface ITimeScale {
 	rightOffset(): number;
 
 	indexesToCoordinates<T extends TimedValue>(points: T[], visibleRange?: SeriesItemsIndexesRange): void;
-	indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint<unknown> | null;
-	formatDateTime(timeScalePoint: TimeScalePoint<unknown>): string;
+	indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint | null;
+	formatDateTime(timeScalePoint: TimeScalePoint): string;
 	coordinateToIndex(x: Coordinate): TimePointIndex;
 
 	options(): Readonly<HorzScaleOptions>;
@@ -194,7 +194,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	private _width: number = 0;
 	private _baseIndexOrNull: TimePointIndex | null = null;
 	private _rightOffset: number;
-	private _points: readonly TimeScalePoint<HorzScaleItem>[] = [];
+	private _points: readonly TimeScalePoint[] = [];
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
@@ -277,7 +277,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		return this._points[index]?.time ?? null;
 	}
 
-	public indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint<HorzScaleItem> | null {
+	public indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint | null {
 		return this._points[index] ?? null;
 	}
 
@@ -292,7 +292,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			return findNearest ? this._points.length - 1 as TimePointIndex : null;
 		}
 
-		const index = lowerbound(this._points, this._horzScaleBehavior.key(time), (a: TimeScalePoint<HorzScaleItem>, b: InternalHorzScaleItemKey) => this._horzScaleBehavior.key(a.time) < b);
+		const index = lowerbound(this._points, this._horzScaleBehavior.key(time), (a: TimeScalePoint, b: InternalHorzScaleItemKey) => this._horzScaleBehavior.key(a.time) < b);
 
 		if (this._horzScaleBehavior.key(time) < this._horzScaleBehavior.key(this._points[index].time)) {
 			return findNearest ? index as TimePointIndex : null;
@@ -671,7 +671,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		});
 	}
 
-	public update(newPoints: readonly TimeScalePoint<HorzScaleItem>[], firstChangedPointIndex: number): void {
+	public update(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
 		this._visibleRangeInvalidated = true;
 
 		this._points = newPoints;
@@ -727,9 +727,9 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this.setVisibleRange(barRange);
 	}
 
-	public formatDateTime(timeScalePoint: TimeScalePoint<HorzScaleItem>): string {
+	public formatDateTime(timeScalePoint: TimeScalePoint): string {
 		if (this._localizationOptions.timeFormatter !== undefined) {
-			return this._localizationOptions.timeFormatter(timeScalePoint.originalTime as unknown as HorzScaleItem);
+			return this._localizationOptions.timeFormatter(timeScalePoint.originalTime as HorzScaleItem);
 		}
 
 		return this._horzScaleBehavior.formatHorzItem(timeScalePoint.time);
@@ -878,11 +878,11 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._commonTransitionStartState = null;
 	}
 
-	private _formatLabel(tickMark: TickMark<HorzScaleItem>): string {
+	private _formatLabel(tickMark: TickMark): string {
 		let formatter = this._formattedByWeight.get(tickMark.weight);
 		if (formatter === undefined) {
 			formatter = new FormattedLabelsCache(
-				(mark: TickMark<HorzScaleItem>) => {
+				(mark: TickMark) => {
 					return this._formatLabelImpl(mark);
 				},
 				this._horzScaleBehavior);
@@ -893,7 +893,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		return formatter.format(tickMark);
 	}
 
-	private _formatLabelImpl(tickMark: TickMark<HorzScaleItem>): string {
+	private _formatLabelImpl(tickMark: TickMark): string {
 		return this._horzScaleBehavior.formatTickmark(tickMark, this._localizationOptions);
 	}
 

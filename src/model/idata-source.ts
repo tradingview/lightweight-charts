@@ -6,7 +6,7 @@ import { Pane } from './pane';
 import { PriceScale } from './price-scale';
 
 export interface ZOrdered {
-	zorder(): number;
+	zorder(): number | null;
 }
 
 export interface IDataSource extends ZOrdered {

@@ -8,10 +8,10 @@ interface CachedTick {
 	tick: number;
 }
 
-export type FormatFunction<HorzScaleItem> = (tickMark: TickMark<HorzScaleItem>) => string;
+export type FormatFunction = (tickMark: TickMark) => string;
 
 export class FormattedLabelsCache<HorzScaleItem> {
-	private readonly _format: FormatFunction<HorzScaleItem>;
+	private readonly _format: FormatFunction;
 	private readonly _maxSize: number;
 	private _actualSize: number = 0;
 	private _usageTick: number = 1;
@@ -21,13 +21,13 @@ export class FormattedLabelsCache<HorzScaleItem> {
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
-	public constructor(format: FormatFunction<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, size: number = 50) {
+	public constructor(format: FormatFunction, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, size: number = 50) {
 		this._format = format;
 		this._horzScaleBehavior = horzScaleBehavior;
 		this._maxSize = size;
 	}
 
-	public format(tickMark: TickMark<HorzScaleItem>): string {
+	public format(tickMark: TickMark): string {
 		const time = tickMark.time;
 
 		const cacheKey = this._horzScaleBehavior.cacheKey(time);

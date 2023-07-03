@@ -20,17 +20,17 @@ import {
 import { SeriesType } from '../model/series-options';
 
 type SeriesPlotRowToDataMap<HorzScaleItem> = {
-	[T in keyof SeriesDataItemTypeMap<HorzScaleItem>]: (plotRow: SeriesPlotRow<T, HorzScaleItem>) => SeriesDataItemTypeMap<HorzScaleItem>[T];
+	[T in keyof SeriesDataItemTypeMap<HorzScaleItem>]: (plotRow: SeriesPlotRow<T>) => SeriesDataItemTypeMap<HorzScaleItem>[T];
 };
 
-function singleValueData<HorzScaleItem>(plotRow: PlotRow<HorzScaleItem>): SingleValueData<HorzScaleItem> {
+function singleValueData<HorzScaleItem>(plotRow: PlotRow): SingleValueData<HorzScaleItem> {
 	return {
 		value: plotRow.value[PlotRowValueIndex.Close],
-		time: plotRow.originalTime as unknown as HorzScaleItem,
+		time: plotRow.originalTime as HorzScaleItem,
 	};
 }
 
-function lineData<HorzScaleItem>(plotRow: LinePlotRow<HorzScaleItem>): LineData<HorzScaleItem> {
+function lineData<HorzScaleItem>(plotRow: LinePlotRow): LineData<HorzScaleItem> {
 	const result: LineData<HorzScaleItem> = singleValueData(plotRow);
 
 	if (plotRow.color !== undefined) {
@@ -40,7 +40,7 @@ function lineData<HorzScaleItem>(plotRow: LinePlotRow<HorzScaleItem>): LineData<
 	return result;
 }
 
-function areaData<HorzScaleItem>(plotRow: AreaPlotRow<HorzScaleItem>): AreaData<HorzScaleItem> {
+function areaData<HorzScaleItem>(plotRow: AreaPlotRow): AreaData<HorzScaleItem> {
 	const result: AreaData<HorzScaleItem> = singleValueData(plotRow);
 
 	if (plotRow.lineColor !== undefined) {
@@ -58,7 +58,7 @@ function areaData<HorzScaleItem>(plotRow: AreaPlotRow<HorzScaleItem>): AreaData<
 	return result;
 }
 
-function baselineData<HorzScaleItem>(plotRow: BaselinePlotRow<HorzScaleItem>): BaselineData<HorzScaleItem> {
+function baselineData<HorzScaleItem>(plotRow: BaselinePlotRow): BaselineData<HorzScaleItem> {
 	const result: BaselineData<HorzScaleItem> = singleValueData(plotRow);
 
 	if (plotRow.topLineColor !== undefined) {
@@ -88,18 +88,18 @@ function baselineData<HorzScaleItem>(plotRow: BaselinePlotRow<HorzScaleItem>): B
 	return result;
 }
 
-function ohlcData<HorzScaleItem>(plotRow: PlotRow<HorzScaleItem>): OhlcData<HorzScaleItem> {
+function ohlcData<HorzScaleItem>(plotRow: PlotRow): OhlcData<HorzScaleItem> {
 	return {
 		open: plotRow.value[PlotRowValueIndex.Open],
 		high: plotRow.value[PlotRowValueIndex.High],
 		low: plotRow.value[PlotRowValueIndex.Low],
 		close: plotRow.value[PlotRowValueIndex.Close],
-		time: plotRow.originalTime as unknown as HorzScaleItem,
+		time: plotRow.originalTime as HorzScaleItem,
 	};
 }
 
-function barData<HorzScaleItem>(plotRow: BarPlotRow<HorzScaleItem>): BarData<HorzScaleItem> {
-	const result: BarData<HorzScaleItem> = ohlcData(plotRow);
+function barData<HorzScaleItem>(plotRow: BarPlotRow): BarData<HorzScaleItem> {
+	const result: BarData<HorzScaleItem> = ohlcData<HorzScaleItem>(plotRow);
 
 	if (plotRow.color !== undefined) {
 		result.color = plotRow.color;
@@ -108,7 +108,7 @@ function barData<HorzScaleItem>(plotRow: BarPlotRow<HorzScaleItem>): BarData<Hor
 	return result;
 }
 
-function candlestickData<HorzScaleItem>(plotRow: CandlestickPlotRow<HorzScaleItem>): CandlestickData<HorzScaleItem> {
+function candlestickData<HorzScaleItem>(plotRow: CandlestickPlotRow): CandlestickData<HorzScaleItem> {
 	const result: CandlestickData<HorzScaleItem> = ohlcData(plotRow);
 	const { color, borderColor, wickColor } = plotRow;
 
@@ -127,12 +127,12 @@ function candlestickData<HorzScaleItem>(plotRow: CandlestickPlotRow<HorzScaleIte
 	return result;
 }
 
-export function getSeriesDataCreator<TSeriesType extends SeriesType, HorzScaleItem>(seriesType: TSeriesType): (plotRow: SeriesPlotRow<TSeriesType, HorzScaleItem>) => SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType] {
+export function getSeriesDataCreator<TSeriesType extends SeriesType, HorzScaleItem>(seriesType: TSeriesType): (plotRow: SeriesPlotRow<TSeriesType>) => SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType] {
 	const seriesPlotRowToDataMap: SeriesPlotRowToDataMap<HorzScaleItem> = {
-		Area: areaData<HorzScaleItem>,
-		Line: lineData<HorzScaleItem>,
-		Baseline: baselineData<HorzScaleItem>,
-		Histogram: lineData<HorzScaleItem>,
+		Area: areaData,
+		Line: lineData,
+		Baseline: baselineData,
+		Histogram: lineData,
 		Bar: barData,
 		Candlestick: candlestickData,
 	};

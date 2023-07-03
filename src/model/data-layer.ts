@@ -18,7 +18,7 @@ import {
 
 export type TimedData<HorzScaleItem> = Pick<SeriesDataItemTypeMap<HorzScaleItem>[SeriesType], 'time'>;
 
-export interface TimeScaleChanges<HorzScaleItem> {
+export interface TimeScaleChanges {
 	/**
 	 * An index of the first changed time scale point by any type of change (time, weight, etc)
 	 */
@@ -27,7 +27,7 @@ export interface TimeScaleChanges<HorzScaleItem> {
 	/**
 	 * An array of the new time scale points
 	 */
-	points?: readonly TimeScalePoint<HorzScaleItem>[];
+	points?: readonly TimeScalePoint[];
 
 	/**
 	 * In terms of time scale "base index" means the latest time scale point with data (there might be whitespaces)
@@ -35,43 +35,43 @@ export interface TimeScaleChanges<HorzScaleItem> {
 	baseIndex: TimePointIndex | null;
 }
 
-export interface SeriesChanges<HorzScaleItem> {
+export interface SeriesChanges {
 	/**
 	 * Data to be merged into series' plot list
 	 */
-	data: readonly SeriesPlotRow<SeriesType, HorzScaleItem>[];
+	data: readonly SeriesPlotRow<SeriesType>[];
 	/**
 	 * Additional info about this change
 	 */
 	info?: SeriesUpdateInfo;
 }
 
-export interface DataUpdateResponse<HorzScaleItem> {
+export interface DataUpdateResponse {
 	/**
 	 * Contains updates for all _changed_ series (if series data doesn't changed then it will not be here)
 	 */
-	series: Map<Series<SeriesType, HorzScaleItem>, SeriesChanges<HorzScaleItem>>;
+	series: Map<Series<SeriesType>, SeriesChanges>;
 
 	/**
 	 * Contains optional time scale points
 	 */
-	timeScale: TimeScaleChanges<HorzScaleItem>;
+	timeScale: TimeScaleChanges;
 }
 
-interface TimePointData<HorzScaleItem> {
+interface TimePointData {
 	index: TimePointIndex;
 	timePoint: InternalHorzScaleItem;
 
 	// actually the type of the value should be related to the series' type (generic type)
 	// here, in data layer all data for us is "mutable" by default, but to the chart we provide "readonly" data, to avoid modifying it
-	mapping: Map<Series<SeriesType, HorzScaleItem>, Mutable<SeriesPlotRow<SeriesType, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>>>;
+	mapping: Map<Series<SeriesType>, Mutable<SeriesPlotRow<SeriesType> | WhitespacePlotRow>>;
 }
 
-export interface InternalTimeScalePoint<HorzScaleItem> extends Mutable<TimeScalePoint<HorzScaleItem>> {
-	pointData: TimePointData<HorzScaleItem>;
+export interface InternalTimeScalePoint extends Mutable<TimeScalePoint> {
+	pointData: TimePointData;
 }
 
-function createEmptyTimePointData<HorzScaleItem>(timePoint: InternalHorzScaleItem): TimePointData<HorzScaleItem> {
+function createEmptyTimePointData(timePoint: InternalHorzScaleItem): TimePointData {
 	return { index: 0 as TimePointIndex, mapping: new Map(), timePoint };
 }
 
@@ -80,7 +80,7 @@ interface SeriesRowsFirstAndLastTime {
 	lastTime: InternalHorzScaleItemKey;
 }
 
-function seriesRowsFirsAndLastTime<TSeriesType extends SeriesType, HorzScaleItem>(seriesRows: SeriesPlotRow<TSeriesType, HorzScaleItem>[] | undefined, bh: IHorzScaleBehavior<HorzScaleItem>): SeriesRowsFirstAndLastTime | undefined {
+function seriesRowsFirsAndLastTime<TSeriesType extends SeriesType, HorzScaleItem>(seriesRows: SeriesPlotRow<TSeriesType>[] | undefined, bh: IHorzScaleBehavior<HorzScaleItem>): SeriesRowsFirstAndLastTime | undefined {
 	if (seriesRows === undefined || seriesRows.length === 0) {
 		return undefined;
 	}
@@ -91,7 +91,7 @@ function seriesRowsFirsAndLastTime<TSeriesType extends SeriesType, HorzScaleItem
 	};
 }
 
-function seriesUpdateInfo<TSeriesType extends SeriesType, HorzScaleItem>(seriesRows: SeriesPlotRow<TSeriesType, HorzScaleItem>[] | undefined, prevSeriesRows: SeriesPlotRow<TSeriesType, HorzScaleItem>[] | undefined, bh: IHorzScaleBehavior<HorzScaleItem>): SeriesUpdateInfo | undefined {
+function seriesUpdateInfo<TSeriesType extends SeriesType, HorzScaleItem>(seriesRows: SeriesPlotRow<TSeriesType>[] | undefined, prevSeriesRows: SeriesPlotRow<TSeriesType>[] | undefined, bh: IHorzScaleBehavior<HorzScaleItem>): SeriesUpdateInfo | undefined {
 	const firstAndLastTime = seriesRowsFirsAndLastTime(seriesRows, bh);
 	const prevFirstAndLastTime = seriesRowsFirsAndLastTime(prevSeriesRows, bh);
 	if (firstAndLastTime !== undefined && prevFirstAndLastTime !== undefined) {
@@ -105,11 +105,11 @@ function seriesUpdateInfo<TSeriesType extends SeriesType, HorzScaleItem>(seriesR
 	return undefined;
 }
 
-function timeScalePointTime<TSeriesType extends SeriesType, HorzScaleItem>(mergedPointData: Map<Series<TSeriesType, HorzScaleItem>, SeriesPlotRow<TSeriesType, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>>): HorzScaleItem {
+function timeScalePointTime<TSeriesType extends SeriesType, HorzScaleItem>(mergedPointData: Map<Series<TSeriesType>, SeriesPlotRow<TSeriesType> | WhitespacePlotRow>): HorzScaleItem {
 	let result: HorzScaleItem | undefined;
-	mergedPointData.forEach((v: SeriesPlotRow<TSeriesType, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>) => {
+	mergedPointData.forEach((v: SeriesPlotRow<TSeriesType> | WhitespacePlotRow) => {
 		if (result === undefined) {
-			result = v.originalTime;
+			result = v.originalTime as HorzScaleItem;
 		}
 	});
 
@@ -129,12 +129,12 @@ type SeriesDataItemWithOriginalTime<TSeriesType extends SeriesType, HorzScaleIte
 export class DataLayer<HorzScaleItem> {
 	// note that _pointDataByTimePoint and _seriesRowsBySeries shares THE SAME objects in their values between each other
 	// it's just different kind of maps to make usages/perf better
-	private _pointDataByTimePoint: Map<InternalHorzScaleItemKey, TimePointData<HorzScaleItem>> = new Map();
-	private _seriesRowsBySeries: Map<Series<SeriesType, HorzScaleItem>, SeriesPlotRow<SeriesType, HorzScaleItem>[]> = new Map();
-	private _seriesLastTimePoint: Map<Series<SeriesType, HorzScaleItem>, InternalHorzScaleItem> = new Map();
+	private _pointDataByTimePoint: Map<InternalHorzScaleItemKey, TimePointData> = new Map();
+	private _seriesRowsBySeries: Map<Series<SeriesType>, SeriesPlotRow<SeriesType>[]> = new Map();
+	private _seriesLastTimePoint: Map<Series<SeriesType>, InternalHorzScaleItem> = new Map();
 
 	// this is kind of "dest" values (in opposite to "source" ones) - we don't need to modify it manually, the only by calling _updateTimeScalePoints or updateSeriesData methods
-	private _sortedTimePoints: readonly InternalTimeScalePoint<HorzScaleItem>[] = [];
+	private _sortedTimePoints: readonly InternalTimeScalePoint[] = [];
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
@@ -149,7 +149,7 @@ export class DataLayer<HorzScaleItem> {
 		this._sortedTimePoints = [];
 	}
 
-	public setSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType, HorzScaleItem>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): DataUpdateResponse<HorzScaleItem> {
+	public setSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): DataUpdateResponse {
 		let needCleanupPoints = this._pointDataByTimePoint.size !== 0;
 
 		let isTimeScaleAffected = false;
@@ -174,7 +174,7 @@ export class DataLayer<HorzScaleItem> {
 			}
 		}
 
-		let seriesRows: (SeriesPlotRow<TSeriesType, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>)[] = [];
+		let seriesRows: (SeriesPlotRow<TSeriesType> | WhitespacePlotRow)[] = [];
 
 		if (data.length !== 0) {
 			const extendedData = data as SeriesDataItemWithOriginalTime<TSeriesType, HorzScaleItem>[];
@@ -220,8 +220,8 @@ export class DataLayer<HorzScaleItem> {
 		if (isTimeScaleAffected) {
 			// then generate the time scale points
 			// timeWeight will be updates in _updateTimeScalePoints later
-			const newTimeScalePoints: InternalTimeScalePoint<HorzScaleItem>[] = [];
-			this._pointDataByTimePoint.forEach((pointData: TimePointData<HorzScaleItem>) => {
+			const newTimeScalePoints: InternalTimeScalePoint[] = [];
+			this._pointDataByTimePoint.forEach((pointData: TimePointData) => {
 				newTimeScalePoints.push({
 					timeWeight: 0 as TickMarkWeightValue,
 					time: pointData.timePoint,
@@ -230,7 +230,7 @@ export class DataLayer<HorzScaleItem> {
 				});
 			});
 
-			newTimeScalePoints.sort((t1: InternalTimeScalePoint<HorzScaleItem>, t2: InternalTimeScalePoint<HorzScaleItem>) => this._horzScaleBehavior.key(t1.time) - this._horzScaleBehavior.key(t2.time));
+			newTimeScalePoints.sort((t1: InternalTimeScalePoint, t2: InternalTimeScalePoint) => this._horzScaleBehavior.key(t1.time) - this._horzScaleBehavior.key(t2.time));
 
 			firstChangedPointIndex = this._replaceTimeScalePoints(newTimeScalePoints);
 		}
@@ -242,11 +242,11 @@ export class DataLayer<HorzScaleItem> {
 		);
 	}
 
-	public removeSeries(series: Series<SeriesType, HorzScaleItem>): DataUpdateResponse<HorzScaleItem> {
+	public removeSeries(series: Series<SeriesType>): DataUpdateResponse {
 		return this.setSeriesData(series, []);
 	}
 
-	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType, HorzScaleItem>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): DataUpdateResponse<HorzScaleItem> {
+	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): DataUpdateResponse {
 		const extendedData = data as SeriesDataItemWithOriginalTime<TSeriesType, HorzScaleItem>;
 		saveOriginalTime(extendedData);
 		// convertStringToBusinessDay(data);
@@ -286,19 +286,19 @@ export class DataLayer<HorzScaleItem> {
 			return this._getUpdateResponse(series, -1, info);
 		}
 
-		const newPoint: InternalTimeScalePoint<HorzScaleItem> = {
+		const newPoint: InternalTimeScalePoint = {
 			timeWeight: 0 as TickMarkWeightValue,
 			time: pointDataAtTime.timePoint,
 			pointData: pointDataAtTime,
 			originalTime: timeScalePointTime(pointDataAtTime.mapping),
 		};
 
-		const insertIndex = lowerbound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint<HorzScaleItem>, b: number) => this._horzScaleBehavior.key(a.time) < b);
+		const insertIndex = lowerbound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint, b: number) => this._horzScaleBehavior.key(a.time) < b);
 
 		// yes, I know that this array is readonly and this change is intended to make it performative
 		// we marked _sortedTimePoints array as readonly to avoid modifying this array anywhere else
 		// but this place is exceptional case due performance reasons, sorry
-		(this._sortedTimePoints as InternalTimeScalePoint<HorzScaleItem>[]).splice(insertIndex, 0, newPoint);
+		(this._sortedTimePoints as InternalTimeScalePoint[]).splice(insertIndex, 0, newPoint);
 
 		for (let index = insertIndex; index < this._sortedTimePoints.length; ++index) {
 			assignIndexToPointData(this._sortedTimePoints[index].pointData, index as TimePointIndex);
@@ -309,7 +309,7 @@ export class DataLayer<HorzScaleItem> {
 		return this._getUpdateResponse(series, insertIndex, info);
 	}
 
-	private _updateLastSeriesRow(series: Series<SeriesType, HorzScaleItem>, plotRow: SeriesPlotRow<SeriesType, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>): void {
+	private _updateLastSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow): void {
 		let seriesData = this._seriesRowsBySeries.get(series);
 		if (seriesData === undefined) {
 			seriesData = [];
@@ -333,7 +333,7 @@ export class DataLayer<HorzScaleItem> {
 		this._seriesLastTimePoint.set(series, plotRow.time);
 	}
 
-	private _setRowsToSeries(series: Series<SeriesType, HorzScaleItem>, seriesRows: (SeriesPlotRow<SeriesType, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>)[]): void {
+	private _setRowsToSeries(series: Series<SeriesType>, seriesRows: (SeriesPlotRow<SeriesType> | WhitespacePlotRow)[]): void {
 		if (seriesRows.length !== 0) {
 			this._seriesRowsBySeries.set(series, seriesRows.filter(isSeriesPlotRow));
 			this._seriesLastTimePoint.set(series, seriesRows[seriesRows.length - 1].time);
@@ -360,7 +360,7 @@ export class DataLayer<HorzScaleItem> {
 	 *
 	 * @returns The index of the first changed point or `-1` if there is no change.
 	 */
-	private _replaceTimeScalePoints(newTimePoints: InternalTimeScalePoint<HorzScaleItem>[]): number {
+	private _replaceTimeScalePoints(newTimePoints: InternalTimeScalePoint[]): number {
 		let firstChangedPointIndex = -1;
 
 		// search the first different point and "syncing" time weight by the way
@@ -411,7 +411,7 @@ export class DataLayer<HorzScaleItem> {
 
 		let baseIndex = 0 as TimePointIndex;
 
-		this._seriesRowsBySeries.forEach((data: SeriesPlotRow<SeriesType, HorzScaleItem>[]) => {
+		this._seriesRowsBySeries.forEach((data: SeriesPlotRow<SeriesType>[]) => {
 			if (data.length !== 0) {
 				baseIndex = Math.max(baseIndex, data[data.length - 1].index) as TimePointIndex;
 			}
@@ -420,8 +420,8 @@ export class DataLayer<HorzScaleItem> {
 		return baseIndex;
 	}
 
-	private _getUpdateResponse(updatedSeries: Series<SeriesType, HorzScaleItem>, firstChangedPointIndex: number, info?: SeriesUpdateInfo): DataUpdateResponse<HorzScaleItem> {
-		const dataUpdateResponse: DataUpdateResponse<HorzScaleItem> = {
+	private _getUpdateResponse(updatedSeries: Series<SeriesType>, firstChangedPointIndex: number, info?: SeriesUpdateInfo): DataUpdateResponse {
+		const dataUpdateResponse: DataUpdateResponse = {
 			series: new Map(),
 			timeScale: {
 				baseIndex: this._getBaseIndex(),
@@ -431,7 +431,7 @@ export class DataLayer<HorzScaleItem> {
 		if (firstChangedPointIndex !== -1) {
 			// TODO: it's possible to make perf improvements by checking what series has data after firstChangedPointIndex
 			// but let's skip for now
-			this._seriesRowsBySeries.forEach((data: SeriesPlotRow<SeriesType, HorzScaleItem>[], s: Series<SeriesType, HorzScaleItem>) => {
+			this._seriesRowsBySeries.forEach((data: SeriesPlotRow<SeriesType>[], s: Series<SeriesType>) => {
 				dataUpdateResponse.series.set(
 					s,
 					{
@@ -460,12 +460,12 @@ export class DataLayer<HorzScaleItem> {
 	}
 }
 
-function assignIndexToPointData<HorzScaleItem>(pointData: TimePointData<HorzScaleItem>, index: TimePointIndex): void {
+function assignIndexToPointData<HorzScaleItem>(pointData: TimePointData, index: TimePointIndex): void {
 	// first, nevertheless update index of point data ("make it valid")
 	pointData.index = index;
 
 	// and then we need to sync indexes for all series
-	pointData.mapping.forEach((seriesRow: Mutable<SeriesPlotRow<SeriesType, HorzScaleItem> | WhitespacePlotRow<HorzScaleItem>>) => {
+	pointData.mapping.forEach((seriesRow: Mutable<SeriesPlotRow<SeriesType> | WhitespacePlotRow>) => {
 		seriesRow.index = index;
 	});
 }

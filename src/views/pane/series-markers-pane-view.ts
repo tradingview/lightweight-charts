@@ -36,7 +36,7 @@ interface Offsets {
 // eslint-disable-next-line max-params
 function fillSizeAndY(
 	rendererItem: SeriesMarkerRendererDataItem,
-	marker: InternalSeriesMarker<TimePointIndex, unknown>,
+	marker: InternalSeriesMarker<TimePointIndex>,
 	seriesData: BarPrices | BarPrice,
 	offsets: Offsets,
 	textHeight: number,
@@ -155,7 +155,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		const timeScale = this._model.timeScale();
 		const seriesMarkers = this._series.indexedMarkers();
 		if (this._dataInvalidated) {
-			this._data.items = seriesMarkers.map<SeriesMarkerRendererDataItem>((marker: InternalSeriesMarker<TimePointIndex, unknown>) => ({
+			this._data.items = seriesMarkers.map<SeriesMarkerRendererDataItem>((marker: InternalSeriesMarker<TimePointIndex>) => ({
 				time: marker.time,
 				x: 0 as Coordinate,
 				y: 0 as Coordinate,

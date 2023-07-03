@@ -226,14 +226,14 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 		return this._dateTimeFormatter.format(new Date(tp.timestamp * 1000));
 	}
 
-	public formatTickmark(tickMark: TickMark<Time>, localizationOptions: LocalizationOptions<Time>): string {
+	public formatTickmark(tickMark: TickMark, localizationOptions: LocalizationOptions<Time>): string {
 		const tickMarkType = weightToTickMarkType(tickMark.weight, this._options.timeScale.timeVisible, this._options.timeScale.secondsVisible);
 
 		const options = this._options.timeScale;
 
 		if (options.tickMarkFormatter !== undefined) {
 			const tickMarkString = options.tickMarkFormatter(
-				tickMark.originalTime as unknown as Time,
+				tickMark.originalTime as Time,
 				tickMarkType,
 				localizationOptions.locale
 			);
@@ -256,7 +256,7 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 		return maxWeight;
 	}
 
-	public fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint<Time>>[], startIndex: number): void {
+	public fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint>[], startIndex: number): void {
 		fillWeightsForPoints(sortedTimePoints, startIndex);
 	}
 

@@ -25,9 +25,9 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick'
 		priceScale.barPricesToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
 	}
 
-	protected abstract _createRawItem(time: TimePointIndex, bar: SeriesPlotRow<TSeriesType, unknown>, colorer: ISeriesBarColorer<TSeriesType>): ItemType;
+	protected abstract _createRawItem(time: TimePointIndex, bar: SeriesPlotRow<TSeriesType>, colorer: ISeriesBarColorer<TSeriesType>): ItemType;
 
-	protected _createDefaultItem(time: TimePointIndex, bar: SeriesPlotRow<TSeriesType, unknown>, colorer: ISeriesBarColorer<TSeriesType>): BarCandlestickItemBase {
+	protected _createDefaultItem(time: TimePointIndex, bar: SeriesPlotRow<TSeriesType>, colorer: ISeriesBarColorer<TSeriesType>): BarCandlestickItemBase {
 		return {
 			time: time,
 			open: bar.value[PlotRowValueIndex.Open] as BarPrice,
@@ -45,6 +45,6 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick'
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
 
-		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType, unknown>) => this._createRawItem(row.index, row, colorer));
+		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => this._createRawItem(row.index, row, colorer));
 	}
 }

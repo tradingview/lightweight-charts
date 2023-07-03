@@ -6,6 +6,9 @@ import { PriceFormatterFn } from './price-formatter-fn';
  */
 export type TimeFormatterFn<HorzScaleItem = Time> = (time: HorzScaleItem) => string;
 
+/**
+ * Represents basic localization options
+ */
 export interface LocalizationOptionsBase {
 	/**
 	 * Current locale used to format dates. Uses the browser's language settings by default.
