@@ -23,4 +23,5 @@ export interface PlotRow {
 	readonly time: InternalHorzScaleItem;
 	readonly originalTime: unknown;
 	readonly value: PlotRowValue;
+	readonly customValues?: Record<string, unknown>;
 }

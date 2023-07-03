@@ -31,7 +31,7 @@ export default function VersionWarningAdmonition({
 	type,
 	title,
 	displayVersionMessage,
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
 	const { preferredVersion, savePreferredVersionName } =
 		useDocsPreferredVersion() as UseDocsPreferredVersion;
 	const notCurrentWarning = Boolean(notCurrent && !preferredVersion?.isLast);

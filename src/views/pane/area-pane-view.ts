@@ -27,26 +27,27 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 	}
 
 	protected _prepareRendererData(): void {
-		const areaStyleProperties = this._series.options();
+		const options = this._series.options();
 
 		this._areaRenderer.setData({
-			lineType: areaStyleProperties.lineType,
+			lineType: options.lineType,
 			items: this._items,
-			lineStyle: areaStyleProperties.lineStyle,
-			lineWidth: areaStyleProperties.lineWidth,
+			lineStyle: options.lineStyle,
+			lineWidth: options.lineWidth,
 			baseLevelCoordinate: null,
-			invertFilledArea: areaStyleProperties.invertFilledArea,
+			invertFilledArea: options.invertFilledArea,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
 		});
 
 		this._lineRenderer.setData({
-			lineType: areaStyleProperties.lineType,
+			lineType: options.lineVisible ? options.lineType : undefined,
 			items: this._items,
-			lineStyle: areaStyleProperties.lineStyle,
-			lineWidth: areaStyleProperties.lineWidth,
+			lineStyle: options.lineStyle,
+			lineWidth: options.lineWidth,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
+			pointMarkersRadius: options.pointMarkersVisible ? (options.pointMarkersRadius || options.lineWidth / 2 + 2) : undefined,
 		});
 	}
 }

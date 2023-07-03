@@ -194,7 +194,10 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 	}
 
 	public options(): Readonly<HorzScaleOptions> {
-		return clone(this._timeScale.options());
+		return {
+			...clone(this._timeScale.options()),
+			barSpacing: this._timeScale.barSpacing(),
+		};
 	}
 
 	private _onVisibleBarsChanged(): void {

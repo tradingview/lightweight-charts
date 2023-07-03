@@ -19,15 +19,18 @@ import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
+import { SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceMark, PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
+import { IAxisView } from '../views/pane/iaxis-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { createBoundCanvas } from './canvas-utils';
+import { IPriceAxisViewsGetter } from './iaxis-view-getters';
 import { suggestPriceScaleWidth } from './internal-layout-sizes-hints';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -47,6 +50,20 @@ type IPriceAxisViewArray = readonly IPriceAxisView[];
 
 const enum Constants {
 	LabelOffset = 5,
+}
+
+function buildPriceAxisViewsGetter(
+	zOrder: SeriesPrimitivePaneViewZOrder,
+	priceScaleId: PriceAxisWidgetSide
+): IPriceAxisViewsGetter {
+	return (source: IDataSource): readonly IAxisView[] => {
+		const psId = source.priceScale()?.id() ?? '';
+		if (psId !== priceScaleId) {
+			// exclude if source is using a different price scale.
+			return [];
+		}
+		return source.pricePaneViews?.(zOrder) ?? [];
+	};
 }
 
 export class PriceAxisWidget implements IDestroyable {
@@ -73,12 +90,20 @@ export class PriceAxisWidget implements IDestroyable {
 	private _prevOptimalWidth: number = 0;
 	private _isSettingSize: boolean = false;
 
+	private _sourcePaneViews: IPriceAxisViewsGetter;
+	private _sourceTopPaneViews: IPriceAxisViewsGetter;
+	private _sourceBottomPaneViews: IPriceAxisViewsGetter;
+
 	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternalBase>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
 		this._options = options;
 		this._layoutOptions = options.layout;
 		this._rendererOptionsProvider = rendererOptionsProvider;
 		this._isLeft = side === 'left';
+
+		this._sourcePaneViews = buildPriceAxisViewsGetter('normal', side);
+		this._sourceTopPaneViews = buildPriceAxisViewsGetter('top', side);
+		this._sourceBottomPaneViews = buildPriceAxisViewsGetter('bottom', side);
 
 		this._cell = document.createElement('div');
 		this._cell.style.height = '100%';
@@ -275,7 +300,9 @@ export class PriceAxisWidget implements IDestroyable {
 					this._drawBackground(scope);
 					this._drawBorder(scope);
 				});
+				this._pane.drawAdditionalSources(target, this._sourceBottomPaneViews);
 				this._drawTickMarks(target);
+				this._pane.drawAdditionalSources(target, this._sourcePaneViews);
 				this._drawBackLabels(target);
 			}
 		}
@@ -287,6 +314,7 @@ export class PriceAxisWidget implements IDestroyable {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
 			});
 			this._drawCrosshairLabel(topTarget);
+			this._pane.drawAdditionalSources(topTarget, this._sourceTopPaneViews);
 		}
 	}
 

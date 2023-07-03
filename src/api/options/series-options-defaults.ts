@@ -3,6 +3,7 @@ import {
 	BarStyleOptions,
 	BaselineStyleOptions,
 	CandlestickStyleOptions,
+	CustomStyleOptions,
 	HistogramStyleOptions,
 	LastPriceAnimationMode,
 	LineStyleOptions,
@@ -36,12 +37,14 @@ export const lineStyleDefaults: LineStyleOptions = {
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
 	lineType: LineType.Simple,
+	lineVisible: true,
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
 	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
+	pointMarkersVisible: false,
 };
 
 export const areaStyleDefaults: AreaStyleOptions = {
@@ -52,12 +55,14 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	lineStyle: LineStyle.Solid,
 	lineWidth: 3,
 	lineType: LineType.Simple,
+	lineVisible: true,
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
 	crosshairMarkerBorderColor: '',
 	crosshairMarkerBorderWidth: 2,
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
+	pointMarkersVisible: false,
 };
 
 export const baselineStyleDefaults: BaselineStyleOptions = {
@@ -77,6 +82,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	lineWidth: 3,
 	lineStyle: LineStyle.Solid,
 	lineType: LineType.Simple,
+	lineVisible: true,
 
 	crosshairMarkerVisible: true,
 	crosshairMarkerRadius: 4,
@@ -85,11 +91,16 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	crosshairMarkerBackgroundColor: '',
 
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
+	pointMarkersVisible: false,
 };
 
 export const histogramStyleDefaults: HistogramStyleOptions = {
 	color: '#26a69a',
 	base: 0,
+};
+
+export const customStyleDefaults: CustomStyleOptions = {
+	color: '#2196f3',
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {

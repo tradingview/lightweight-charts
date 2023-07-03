@@ -1,12 +1,8 @@
 /// <reference types="node" />
-
 import * as fs from 'fs';
 import * as path from 'path';
 
-import glob from 'glob';
-import { promisify } from 'util';
-
-const globPromise = promisify(glob);
+import { glob } from 'glob';
 
 const srcDir = path.join(__dirname, '..', '..', '..', '..', 'src');
 
@@ -18,7 +14,7 @@ const classNameRegex = /class\s+([a-zA-Z_][^\W<{]*)/gm;
  * of these classes exist in the memory heap.
  */
 export async function getClassNames(): Promise<Set<string>> {
-	const sourceFiles = await globPromise(`${srcDir}/**/*.ts`);
+	const sourceFiles = await glob(`${srcDir}/**/*.ts`);
 	const classNames: Set<string> = new Set();
 	sourceFiles.forEach((sourceFilePath: string) => {
 		const content = fs.readFileSync(sourceFilePath, { encoding: 'utf-8' });

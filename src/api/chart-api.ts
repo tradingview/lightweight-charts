@@ -1,13 +1,14 @@
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
-import { assert, ensureDefined } from '../helpers/assertions';
+import { assert, ensure, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl, ChartOptionsInternal } from '../model/chart-model';
-import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from '../model/data-consumer';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
@@ -16,6 +17,8 @@ import {
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
+	CustomSeriesOptions,
+	CustomSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
@@ -23,6 +26,7 @@ import {
 	PriceFormat,
 	PriceFormatBuiltIn,
 	SeriesOptionsMap,
+	SeriesPartialOptions,
 	SeriesPartialOptionsMap,
 	SeriesStyleOptionsMap,
 	SeriesType,
@@ -40,6 +44,7 @@ import {
 	barStyleDefaults,
 	baselineStyleDefaults,
 	candlestickStyleDefaults,
+	customStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
@@ -176,6 +181,27 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._chartWidget.resize(width, height, forceRepaint);
 	}
 
+	public addCustomSeries<
+		TData extends CustomData<HorzScaleItem>,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>
+	>(
+		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
+		options?: SeriesPartialOptions<TOptions>
+	): ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions> {
+		const paneView = ensure(customPaneView);
+		const defaults = {
+			...customStyleDefaults,
+			...paneView.defaultOptions(),
+		};
+		return this._addSeriesImpl<'Custom', TData, TOptions, TPartialOptions>(
+			'Custom',
+			defaults,
+			options,
+			paneView
+		);
+	}
+
 	public addAreaSeries(options?: AreaSeriesPartialOptions): ISeriesApi<'Area', HorzScaleItem> {
 		return this._addSeriesImpl('Area', areaStyleDefaults, options);
 	}
@@ -263,17 +289,27 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._chartWidget.autoSizeActive();
 	}
 
-	private _addSeriesImpl<TSeries extends SeriesType>(
+	public chartElement(): HTMLDivElement {
+		return this._chartWidget.element();
+	}
+
+	private _addSeriesImpl<
+		TSeries extends SeriesType,
+		TData extends WhitespaceData<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[TSeries],
+		TOptions extends SeriesOptionsMap[TSeries] = SeriesOptionsMap[TSeries],
+		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries]
+	>(
 		type: TSeries,
 		styleDefaults: SeriesStyleOptionsMap[TSeries],
-		options: SeriesPartialOptionsMap[TSeries] = {}
-	): ISeriesApi<TSeries, HorzScaleItem> {
+		options: SeriesPartialOptionsMap[TSeries] = {},
+		customPaneView?: ICustomSeriesPaneView<HorzScaleItem>
+	): ISeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
-		const series = this._chartWidget.model().createSeries(type, strictOptions);
+		const series = this._chartWidget.model().createSeries(type, strictOptions, customPaneView);
 
-		const res = new SeriesApi<TSeries, HorzScaleItem>(series, this, this, this._horzScaleBehavior);
+		const res = new SeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions>(series, this, this, this, this._horzScaleBehavior);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -296,8 +332,14 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams<HorzScaleItem> {
 		const seriesData: MouseEventParams<HorzScaleItem>['seriesData'] = new Map();
 		param.seriesData.forEach((plotRow: SeriesPlotRow<SeriesType>, series: Series<SeriesType>) => {
-			const data = getSeriesDataCreator<SeriesType, HorzScaleItem>(series.seriesType())(plotRow);
-			assert(isFulfilledData(data));
+			const seriesType = series.seriesType();
+			const data = getSeriesDataCreator<SeriesType, HorzScaleItem>(seriesType)(plotRow);
+			if (seriesType !== 'Custom') {
+				assert(isFulfilledData(data));
+			} else {
+				const customWhitespaceChecker = series.customSeriesWhitespaceCheck();
+				assert(!customWhitespaceChecker || customWhitespaceChecker(data) === false);
+			}
 			seriesData.set(this._mapSeriesToApi(series), data);
 		});
 

@@ -48,6 +48,7 @@ export interface IChartWidgetBase {
 	model(): IChartModelBase;
 	paneWidgets(): PaneWidget[];
 	options(): ChartOptionsInternalBase;
+	setCursorStyle(style: string | null): void;
 }
 
 export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBase {
@@ -60,7 +61,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	private _width: number = 0;
 	private _leftPriceAxisWidth: number = 0;
 	private _rightPriceAxisWidth: number = 0;
-	private _element: HTMLElement;
+	private _element: HTMLDivElement;
 	private readonly _tableElement: HTMLElement;
 	private _timeAxisWidget: TimeAxisWidget<HorzScaleItem>;
 	private _invalidateMask: InvalidateMask | null = null;
@@ -71,6 +72,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	private _observer: ResizeObserver | null = null;
 
 	private _container: HTMLElement;
+	private _cursorStyleOverride: string | null = null;
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
@@ -82,6 +84,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		this._element = document.createElement('div');
 		this._element.classList.add('tv-lightweight-charts');
 		this._element.style.overflow = 'hidden';
+		this._element.style.direction = 'ltr';
 		this._element.style.width = '100%';
 		this._element.style.height = '100%';
 		disableSelection(this._element);
@@ -288,6 +291,23 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	public autoSizeActive(): boolean {
 		return this._options.autoSize && this._observer !== null;
+	}
+
+	public element(): HTMLDivElement {
+		return this._element;
+	}
+
+	public setCursorStyle(style: string | null): void {
+		this._cursorStyleOverride = style;
+		if (this._cursorStyleOverride) {
+			this.element().style.setProperty('cursor', style);
+		} else {
+			this.element().style.removeProperty('cursor');
+		}
+	}
+
+	public getCursorOverrideStyle(): string | null {
+		return this._cursorStyleOverride;
 	}
 
 	// eslint-disable-next-line complexity
@@ -812,6 +832,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		if (this._observer !== null) {
 			this._observer.disconnect();
 		}
+		this._observer = null;
 	}
 }
 

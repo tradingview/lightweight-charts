@@ -1,5 +1,5 @@
 import { Time } from './horz-scale-behavior-time/types';
-import { PriceFormatterFn } from './price-formatter-fn';
+import { PercentageFormatterFn, PriceFormatterFn } from './price-formatter-fn';
 
 /**
  * A custom function used to override formatting of a time to a string.
@@ -19,19 +19,26 @@ export interface LocalizationOptionsBase {
 	locale: string;
 
 	/**
-	 * Override formatting of the price scale crosshair label. Can be used for cases that can't be covered with built-in price formats.
+	 * Override formatting of the price scale tick marks, labels and crosshair labels. Can be used for cases that can't be covered with built-in price formats.
 	 *
 	 * @see {@link PriceFormatCustom}
 	 * @defaultValue `undefined`
 	 */
 	priceFormatter?: PriceFormatterFn;
 
+	/**
+	 * Override formatting of the percentage scale tick marks, labels and crosshair labels. Can be used for cases that can't be covered with built-in percentage format.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	percentageFormatter?: PercentageFormatterFn;
 }
 
 /**
  * Represents options for formatting dates, times, and prices according to a locale.
  */
 export interface LocalizationOptions<HorzScaleItem> extends LocalizationOptionsBase {
+
 	/**
 	 * Override formatting of the time scale crosshair label.
 	 *

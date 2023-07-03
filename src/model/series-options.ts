@@ -175,6 +175,26 @@ export interface LineStyleOptions {
 	lineType: LineType;
 
 	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+
+	/**
+	 * Show circle markers on each point.
+	 *
+	 * @defaultValue `false`
+	 */
+	pointMarkersVisible: boolean;
+	/**
+	 * Circle markers radius in pixels.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	pointMarkersRadius?: number;
+
+	/**
 	 * Show the crosshair marker.
 	 *
 	 * @defaultValue `true`
@@ -187,13 +207,13 @@ export interface LineStyleOptions {
 	 */
 	crosshairMarkerRadius: number;
 	/**
-	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 * Crosshair marker border color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
-	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 * The crosshair marker background color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
@@ -267,6 +287,26 @@ export interface AreaStyleOptions {
 	lineType: LineType;
 
 	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+
+	/**
+	 * Show circle markers on each point.
+	 *
+	 * @defaultValue `false`
+	 */
+	pointMarkersVisible: boolean;
+	/**
+	 * Circle markers radius in pixels.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	pointMarkersRadius?: number;
+
+	/**
 	 * Show the crosshair marker.
 	 *
 	 * @defaultValue `true`
@@ -279,13 +319,13 @@ export interface AreaStyleOptions {
 	 */
 	crosshairMarkerRadius: number;
 	/**
-	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 * Crosshair marker border color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
-	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 * The crosshair marker background color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
@@ -394,6 +434,26 @@ export interface BaselineStyleOptions {
 	lineType: LineType;
 
 	/**
+	 * Show series line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+
+	/**
+	 * Show circle markers on each point.
+	 *
+	 * @defaultValue `false`
+	 */
+	pointMarkersVisible: boolean;
+	/**
+	 * Circle markers radius in pixels.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	pointMarkersRadius?: number;
+
+	/**
 	 * Show the crosshair marker.
 	 *
 	 * @defaultValue `true`
@@ -406,13 +466,13 @@ export interface BaselineStyleOptions {
 	 */
 	crosshairMarkerRadius: number;
 	/**
-	 * Crosshair marker border color. An empty string falls back to the the color of the series under the crosshair.
+	 * Crosshair marker border color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
 	crosshairMarkerBorderColor: string;
 	/**
-	 * The crosshair marker background color. An empty string falls back to the the color of the series under the crosshair.
+	 * The crosshair marker background color. An empty string falls back to the color of the series under the crosshair.
 	 *
 	 * @defaultValue `''`
 	 */
@@ -449,6 +509,16 @@ export interface HistogramStyleOptions {
 	 * @defaultValue `0`
 	 */
 	base: number;
+}
+
+/**
+ * Represents style options for a custom series.
+ */
+export interface CustomStyleOptions {
+	/**
+	 * Color used for the price line and price scale label.
+	 */
+	color: string;
 }
 
 /**
@@ -802,6 +872,15 @@ export type HistogramSeriesOptions = SeriesOptions<HistogramStyleOptions>;
 export type HistogramSeriesPartialOptions = SeriesPartialOptions<HistogramStyleOptions>;
 
 /**
+ * Represents a custom series options.
+ */
+export type CustomSeriesOptions = SeriesOptions<CustomStyleOptions>;
+/**
+ * Represents a custom series options where all properties are optional.
+ */
+export type CustomSeriesPartialOptions = SeriesPartialOptions<CustomStyleOptions>;
+
+/**
  * Represents line series options.
  */
 export type LineSeriesOptions = SeriesOptions<LineStyleOptions>;
@@ -840,6 +919,10 @@ export interface SeriesStyleOptionsMap {
 	 * The type of histogram style options.
 	 */
 	Histogram: HistogramStyleOptions;
+	/**
+	 * The type of a custom series' style options.
+	 */
+	Custom: CustomStyleOptions;
 }
 
 /**
@@ -872,6 +955,10 @@ export interface SeriesOptionsMap {
 	 * The type of histogram series options.
 	 */
 	Histogram: HistogramSeriesOptions;
+	/**
+	 * The type of a custom series options.
+	 */
+	Custom: CustomSeriesOptions;
 }
 
 /**
@@ -904,6 +991,10 @@ export interface SeriesPartialOptionsMap {
 	 * The type of histogram series partial options.
 	 */
 	Histogram: HistogramSeriesPartialOptions;
+	/**
+	 * The type of a custom series partial options.
+	 */
+	Custom: CustomSeriesPartialOptions;
 }
 
 /**

@@ -193,7 +193,7 @@ const paragraph = `Lightweight Charts™ is a library for creating interactive f
 
 const showBanner = true;
 
-function Index(): JSX.Element {
+function Index(): React.JSX.Element {
 	return (
 		<>
 			{showBanner ? (
@@ -218,7 +218,7 @@ function Index(): JSX.Element {
 	);
 }
 
-function LayoutWrapper(): JSX.Element {
+function LayoutWrapper(): React.JSX.Element {
 	return (
 		<Layout title="Home" description={paragraph}>
 			<Head>

@@ -1,11 +1,11 @@
-import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { Coordinate } from '../model/coordinate';
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
-import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 import { walkLine } from './walk-line';
 
 export type AreaFillItemBase = TimedValue & PricedValue & LinePoint;
@@ -25,26 +25,27 @@ export interface PaneRendererAreaDataBase<TItem extends AreaFillItemBase = AreaF
 
 function finishStyledArea(
 	baseLevelCoordinate: Coordinate,
-	ctx: CanvasRenderingContext2D,
+	scope: BitmapCoordinatesRenderingScope,
 	style: CanvasRenderingContext2D['fillStyle'],
 	areaFirstItem: LinePoint,
 	newAreaFirstItem: LinePoint
 ): void {
-	ctx.lineTo(newAreaFirstItem.x, baseLevelCoordinate);
-	ctx.lineTo(areaFirstItem.x, baseLevelCoordinate);
-	ctx.closePath();
-	ctx.fillStyle = style;
-	ctx.fill();
+	const { context, horizontalPixelRatio, verticalPixelRatio } = scope;
+	context.lineTo(newAreaFirstItem.x * horizontalPixelRatio, baseLevelCoordinate * verticalPixelRatio);
+	context.lineTo(areaFirstItem.x * horizontalPixelRatio, baseLevelCoordinate * verticalPixelRatio);
+	context.closePath();
+	context.fillStyle = style;
+	context.fill();
 }
 
-export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBase> extends MediaCoordinatesPaneRenderer {
+export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBase> extends BitmapCoordinatesPaneRenderer {
 	protected _data: TData | null = null;
 
 	public setData(data: TData): void {
 		this._data = data;
 	}
 
-	protected _drawImpl(renderingScope: MediaCoordinatesRenderingScope): void {
+	protected _drawImpl(renderingScope: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null) {
 			return;
 		}
@@ -71,5 +72,5 @@ export abstract class PaneRendererAreaBase<TData extends PaneRendererAreaDataBas
 		walkLine(renderingScope, items, lineType, visibleRange, barWidth, this._fillStyle.bind(this), finishStyledArea.bind(null, baseLevelCoordinate));
 	}
 
-	protected abstract _fillStyle(renderingScope: MediaCoordinatesRenderingScope, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];
+	protected abstract _fillStyle(renderingScope: BitmapCoordinatesRenderingScope, item: TData['items'][0]): CanvasRenderingContext2D['fillStyle'];
 }

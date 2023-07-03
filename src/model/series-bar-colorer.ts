@@ -8,6 +8,7 @@ import {
 	BarStyleOptions,
 	BaselineStyleOptions,
 	CandlestickStyleOptions,
+	CustomStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
 	SeriesOptionsMap,
@@ -16,8 +17,8 @@ import {
 import { TimePointIndex } from './time-data';
 
 export interface PrecomputedBars {
-	value: SeriesPlotRow<SeriesType>;
-	previousValue?: SeriesPlotRow<SeriesType>;
+	value: SeriesPlotRow;
+	previousValue?: SeriesPlotRow;
 }
 
 export interface CommonBarColorerStyle {
@@ -63,6 +64,8 @@ export interface CandlesticksColorerStyle extends CommonBarColorerStyle {
 	barWickColor: string;
 }
 
+export interface CustomBarColorerStyle extends CommonBarColorerStyle {}
+
 export interface BarStylesMap {
 	Bar: BarColorerStyle;
 	Candlestick: CandlesticksColorerStyle;
@@ -70,6 +73,7 @@ export interface BarStylesMap {
 	Baseline: BaselineBarColorerStyle;
 	Line: LineBarColorerStyle;
 	Histogram: HistogramBarColorerStyle;
+	Custom: CustomBarColorerStyle;
 }
 
 type FindBarFn = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars) => SeriesPlotRow<SeriesType> | null;
@@ -89,90 +93,96 @@ export interface ISeriesBarColorer<T extends SeriesType> {
 	barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarStylesMap[T];
 }
 
+const barStyleFnMap: BarStylesFnMap = {
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Bar: (findBar: FindBarFn, barStyle: BarStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle => {
+		const upColor = barStyle.upColor;
+		const downColor = barStyle.downColor;
+
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Bar'>;
+		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
+
+		return {
+			barColor: currentBar.color ?? (isUp ? upColor : downColor),
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Candlestick: (findBar: FindBarFn, candlestickStyle: CandlestickStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CandlesticksColorerStyle => {
+		const upColor = candlestickStyle.upColor;
+		const downColor = candlestickStyle.downColor;
+		const borderUpColor = candlestickStyle.borderUpColor;
+		const borderDownColor = candlestickStyle.borderDownColor;
+
+		const wickUpColor = candlestickStyle.wickUpColor;
+		const wickDownColor = candlestickStyle.wickDownColor;
+
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Candlestick'>;
+		const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
+
+		return {
+			barColor: currentBar.color ?? (isUp ? upColor : downColor),
+			barBorderColor: currentBar.borderColor ?? (isUp ? borderUpColor : borderDownColor),
+			barWickColor: currentBar.wickColor ?? (isUp ? wickUpColor : wickDownColor),
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Custom: (findBar: FindBarFn, customStyle: CustomStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CustomBarColorerStyle => {
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
+
+		return {
+			barColor: currentBar.color ?? customStyle.color,
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Area: (findBar: FindBarFn, areaStyle: AreaStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): AreaBarColorerStyle => {
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Area'>;
+		return {
+			barColor: currentBar.lineColor ?? areaStyle.lineColor,
+			lineColor: currentBar.lineColor ?? areaStyle.lineColor,
+			topColor: currentBar.topColor ?? areaStyle.topColor,
+			bottomColor: currentBar.bottomColor ?? areaStyle.bottomColor,
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Baseline: (findBar: FindBarFn, baselineStyle: BaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BaselineBarColorerStyle => {
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Baseline'>;
+		const isAboveBaseline = currentBar.value[PlotRowValueIndex.Close] >= baselineStyle.baseValue.price;
+
+		return {
+			barColor: isAboveBaseline ? baselineStyle.topLineColor : baselineStyle.bottomLineColor,
+			topLineColor: currentBar.topLineColor ?? baselineStyle.topLineColor,
+			bottomLineColor: currentBar.bottomLineColor ?? baselineStyle.bottomLineColor,
+			topFillColor1: currentBar.topFillColor1 ?? baselineStyle.topFillColor1,
+			topFillColor2: currentBar.topFillColor2 ?? baselineStyle.topFillColor2,
+			bottomFillColor1: currentBar.bottomFillColor1 ?? baselineStyle.bottomFillColor1,
+			bottomFillColor2: currentBar.bottomFillColor2 ?? baselineStyle.bottomFillColor2,
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Line: (findBar: FindBarFn, lineStyle: LineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): LineBarColorerStyle => {
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
+
+		return {
+			barColor: currentBar.color ?? lineStyle.color,
+			lineColor: currentBar.color ?? lineStyle.color,
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Histogram: (findBar: FindBarFn, histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): HistogramBarColorerStyle => {
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Histogram'>;
+		return {
+			barColor: currentBar.color ?? histogramStyle.color,
+		};
+	},
+};
+
 export class SeriesBarColorer<T extends SeriesType> implements ISeriesBarColorer<T> {
 	private _series: Series<T>;
 	private readonly _styleGetter: BarStylesFnMap[T];
-	private readonly _barStyleFnMap: BarStylesFnMap;
 
 	public constructor(series: Series<T>) {
 		this._series = series;
-
-		this._barStyleFnMap = {
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Bar: (findBar: FindBarFn, barStyle: BarStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle => {
-				const upColor = barStyle.upColor;
-				const downColor = barStyle.downColor;
-
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Bar'>;
-				const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
-
-				return {
-					barColor: currentBar.color ?? (isUp ? upColor : downColor),
-				};
-			},
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Candlestick: (findBar: FindBarFn, candlestickStyle: CandlestickStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CandlesticksColorerStyle => {
-				const upColor = candlestickStyle.upColor;
-				const downColor = candlestickStyle.downColor;
-				const borderUpColor = candlestickStyle.borderUpColor;
-				const borderDownColor = candlestickStyle.borderDownColor;
-
-				const wickUpColor = candlestickStyle.wickUpColor;
-				const wickDownColor = candlestickStyle.wickDownColor;
-
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Candlestick'>;
-				const isUp = ensure(currentBar.value[PlotRowValueIndex.Open]) <= ensure(currentBar.value[PlotRowValueIndex.Close]);
-
-				return {
-					barColor: currentBar.color ?? (isUp ? upColor : downColor),
-					barBorderColor: currentBar.borderColor ?? (isUp ? borderUpColor : borderDownColor),
-					barWickColor: currentBar.wickColor ?? (isUp ? wickUpColor : wickDownColor),
-				};
-			},
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Area: (findBar: FindBarFn, areaStyle: AreaStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): AreaBarColorerStyle => {
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Area'>;
-				return {
-					barColor: currentBar.lineColor ?? areaStyle.lineColor,
-					lineColor: currentBar.lineColor ?? areaStyle.lineColor,
-					topColor: currentBar.topColor ?? areaStyle.topColor,
-					bottomColor: currentBar.bottomColor ?? areaStyle.bottomColor,
-				};
-			},
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Baseline: (findBar: FindBarFn, baselineStyle: BaselineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BaselineBarColorerStyle => {
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Baseline'>;
-				const isAboveBaseline = currentBar.value[PlotRowValueIndex.Close] >= baselineStyle.baseValue.price;
-
-				return {
-					barColor: isAboveBaseline ? baselineStyle.topLineColor : baselineStyle.bottomLineColor,
-					topLineColor: currentBar.topLineColor ?? baselineStyle.topLineColor,
-					bottomLineColor: currentBar.bottomLineColor ?? baselineStyle.bottomLineColor,
-					topFillColor1: currentBar.topFillColor1 ?? baselineStyle.topFillColor1,
-					topFillColor2: currentBar.topFillColor2 ?? baselineStyle.topFillColor2,
-					bottomFillColor1: currentBar.bottomFillColor1 ?? baselineStyle.bottomFillColor1,
-					bottomFillColor2: currentBar.bottomFillColor2 ?? baselineStyle.bottomFillColor2,
-				};
-			},
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Line: (findBar: FindBarFn, lineStyle: LineStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): LineBarColorerStyle => {
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
-
-				return {
-					barColor: currentBar.color ?? lineStyle.color,
-					lineColor: currentBar.color ?? lineStyle.color,
-				};
-			},
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Histogram: (findBar: FindBarFn, histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): HistogramBarColorerStyle => {
-				const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Histogram'>;
-				return {
-					barColor: currentBar.color ?? histogramStyle.color,
-				};
-			},
-		};
-
-		this._styleGetter = this._barStyleFnMap[series.seriesType()];
+		this._styleGetter = barStyleFnMap[series.seriesType()];
 	}
 
 	public barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarStylesMap[T] {
@@ -181,7 +191,7 @@ export class SeriesBarColorer<T extends SeriesType> implements ISeriesBarColorer
 		return this._styleGetter(this._findBar, this._series.options(), barIndex, precomputedBars);
 	}
 
-	private _findBar = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): SeriesPlotRow<T> | null => {
+	private _findBar = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): SeriesPlotRow | null => {
 		if (precomputedBars !== undefined) {
 			return precomputedBars.value;
 		}

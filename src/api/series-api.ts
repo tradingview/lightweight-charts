@@ -1,17 +1,21 @@
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { ensureNotNull } from '../helpers/assertions';
+import { Delegate } from '../helpers/delegate';
+import { IDestroyable } from '../helpers/idestroyable';
 import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
-import { DataUpdatesConsumer, SeriesDataItemTypeMap } from '../model/data-consumer';
+import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
 import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
+import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
 import { Series } from '../model/series';
+import { SeriesPlotRow } from '../model/series-data';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
@@ -23,25 +27,47 @@ import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
 import { getSeriesDataCreator } from './get-series-data-creator';
+import { type IChartApiBase } from './ichart-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
-import { BarsInfo, ISeriesApi } from './iseries-api';
+import { BarsInfo, DataChangedHandler, DataChangedScope, ISeriesApi } from './iseries-api';
+import { ISeriesPrimitive } from './iseries-primitive-api';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
-export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements ISeriesApi<TSeriesType, HorzScaleItem> {
+export class SeriesApi<
+	TSeriesType extends SeriesType,
+	HorzScaleItem,
+	TData extends WhitespaceData<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType],
+	TOptions extends SeriesOptionsMap[TSeriesType] = SeriesOptionsMap[TSeriesType],
+	TPartialOptions extends SeriesPartialOptionsMap[TSeriesType] = SeriesPartialOptionsMap[TSeriesType]
+> implements
+		ISeriesApi<TSeriesType, HorzScaleItem, TData, TOptions, TPartialOptions>,
+		IDestroyable {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>;
+	protected readonly _chartApi: IChartApiBase<HorzScaleItem>;
 
 	private readonly _priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>;
-
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
+	private readonly _dataChangedDelegate: Delegate<DataChangedScope> = new Delegate();
 
-	public constructor(series: Series<TSeriesType>, dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>, priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
+	public constructor(
+		series: Series<TSeriesType>,
+		dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>,
+		priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>,
+		chartApi: IChartApiBase<HorzScaleItem>,
+		horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>
+	) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
 		this._priceScaleApiProvider = priceScaleApiProvider;
 		this._horzScaleBehavior = horzScaleBehavior;
+		this._chartApi = chartApi;
+	}
+
+	public destroy(): void {
+		this._dataChangedDelegate.destroy();
 	}
 
 	public priceFormatter(): IPriceFormatter {
@@ -118,27 +144,44 @@ export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements
 		return result;
 	}
 
-	public setData(data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): void {
+	public setData(data: TData[]): void {
 		checkItemsAreOrdered(data, this._horzScaleBehavior);
 		checkSeriesValuesType(this._series.seriesType(), data);
 
 		this._dataUpdatesConsumer.applyNewData(this._series, data);
+		this._onDataChanged('full');
 	}
 
-	public update(bar: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void {
+	public update(bar: TData): void {
 		checkSeriesValuesType(this._series.seriesType(), [bar]);
 
 		this._dataUpdatesConsumer.updateData(this._series, bar);
+		this._onDataChanged('update');
 	}
 
-	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType] | null {
+	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null {
 		const data = this._series.bars().search(logicalIndex as unknown as TimePointIndex, mismatchDirection);
 		if (data === null) {
 			// actually it can be a whitespace
 			return null;
 		}
 
-		return getSeriesDataCreator<TSeriesType, HorzScaleItem>(this.seriesType())(data);
+		const creator = getSeriesDataCreator<TSeriesType, HorzScaleItem>(this.seriesType());
+		return creator(data) as TData | null;
+	}
+
+	public data(): readonly TData[] {
+		const seriesCreator = getSeriesDataCreator(this.seriesType());
+		const rows = this._series.bars().rows();
+		return rows.map((row: SeriesPlotRow<TSeriesType>) => seriesCreator(row) as TData);
+	}
+
+	public subscribeDataChanged(handler: DataChangedHandler): void {
+		this._dataChangedDelegate.subscribe(handler);
+	}
+
+	public unsubscribeDataChanged(handler: DataChangedHandler): void {
+		this._dataChangedDelegate.unsubscribe(handler);
 	}
 
 	public setMarkers(data: SeriesMarker<HorzScaleItem>[]): void {
@@ -162,12 +205,12 @@ export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements
 		});
 	}
 
-	public applyOptions(options: SeriesPartialOptionsMap[TSeriesType]): void {
+	public applyOptions(options: TPartialOptions): void {
 		this._series.applyOptions(options);
 	}
 
-	public options(): Readonly<SeriesOptionsMap[TSeriesType]> {
-		return clone(this._series.options());
+	public options(): Readonly<TOptions> {
+		return clone(this._series.options() as TOptions);
 	}
 
 	public priceScale(): IPriceScaleApi {
@@ -188,5 +231,31 @@ export class SeriesApi<TSeriesType extends SeriesType, HorzScaleItem> implements
 
 	public seriesType(): TSeriesType {
 		return this._series.seriesType();
+	}
+
+	public attachPrimitive(primitive: ISeriesPrimitive<HorzScaleItem>): void {
+		// at this point we cast the generic to unknown because we
+		// don't want the model to know the types of the API (◑_◑)
+		this._series.attachPrimitive(primitive as ISeriesPrimitiveBase<unknown>);
+		if (primitive.attached) {
+			primitive.attached({
+				chart: this._chartApi,
+				series: this,
+				requestUpdate: () => this._series.model().fullUpdate(),
+			});
+		}
+	}
+
+	public detachPrimitive(primitive: ISeriesPrimitive<HorzScaleItem>): void {
+		this._series.detachPrimitive(primitive as ISeriesPrimitiveBase<unknown>);
+		if (primitive.detached) {
+			primitive.detached();
+		}
+	}
+
+	private _onDataChanged(scope: DataChangedScope): void {
+		if (this._dataChangedDelegate.hasListeners()) {
+			this._dataChangedDelegate.fire(scope);
+		}
 	}
 }

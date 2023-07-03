@@ -1,16 +1,19 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl } from '../model/chart-model';
-import { BarData, HistogramData, LineData } from '../model/data-consumer';
+import { BarData, HistogramData, LineData, WhitespaceData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { Point } from '../model/point';
 import {
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
+	CustomSeriesOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
+	SeriesPartialOptions,
 	SeriesType,
 } from '../model/series-options';
 import { Logical } from '../model/time-data';
@@ -46,7 +49,7 @@ export interface MouseEventParams<HorzScaleItem = Time> {
 	 * Keys of the map are {@link ISeriesApi} instances. Values are prices.
 	 * Values of the map are original data items
 	 */
-	seriesData: Map<ISeriesApi<SeriesType, HorzScaleItem>, BarData<HorzScaleItem> | LineData<HorzScaleItem> | HistogramData<HorzScaleItem>>;
+	seriesData: Map<ISeriesApi<SeriesType, HorzScaleItem>, BarData<HorzScaleItem> | LineData<HorzScaleItem> | HistogramData<HorzScaleItem> | CustomData<HorzScaleItem>>;
 	/**
 	 * The {@link ISeriesApi} for the series at the point of the mouse event.
 	 */
@@ -86,6 +89,27 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @param forceRepaint - True to initiate resize immediately. One could need this to get screenshot immediately after resize.
 	 */
 	resize(width: number, height: number, forceRepaint?: boolean): void;
+
+	/**
+	 * Creates a custom series with specified parameters.
+	 *
+	 * A custom series is a generic series which can be extended with a custom renderer to
+	 * implement chart types which the library doesn't support by default.
+	 *
+	 * @param customPaneView - A custom series pane view which implements the custom renderer.
+	 * @param customOptions - Customization parameters of the series being created.
+	 * ```js
+	 * const series = chart.addCustomSeries(myCustomPaneView);
+	 * ```
+	 */
+	addCustomSeries<
+		TData extends CustomData<HorzScaleItem>,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
+	>(
+		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
+		customOptions?: SeriesPartialOptions<TOptions>
+	): ISeriesApi<'Custom', HorzScaleItem, TData | WhitespaceData<HorzScaleItem>, TOptions, TPartialOptions>;
 
 	/**
 	 * Creates an area series with specified parameters.
@@ -272,4 +296,12 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @returns Whether the `autoSize` option is enabled and the active.
 	 */
 	autoSizeActive(): boolean;
+
+	/**
+	 * Returns the generated div element containing the chart. This can be used for adding your own additional event listeners, or for measuring the
+	 * elements dimensions and position within the document.
+	 *
+	 * @returns generated div element containing the chart.
+	 */
+	chartElement(): HTMLDivElement;
 }

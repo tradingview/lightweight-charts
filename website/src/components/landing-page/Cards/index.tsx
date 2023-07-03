@@ -8,7 +8,7 @@ export interface CardLink {
 	content: string;
 }
 
-function ArrowSVG(): JSX.Element {
+function ArrowSVG(): React.JSX.Element {
 	return (
 		<svg height={28} width={28}>
 			<g clipPath="url(#clip0_1507_70976)">
@@ -30,7 +30,7 @@ function ArrowSVG(): JSX.Element {
 	);
 }
 
-function Card(cardData: CardLink): JSX.Element {
+function Card(cardData: CardLink): React.JSX.Element {
 	return (
 		<a href={cardData.link} className={styles.Card}>
 			<div className={styles.CardHeader}>
@@ -42,7 +42,7 @@ function Card(cardData: CardLink): JSX.Element {
 	);
 }
 
-export default function Cards(props: { cardLinks: CardLink[] }): JSX.Element {
+export default function Cards(props: { cardLinks: CardLink[] }): React.JSX.Element {
 	const cards = props.cardLinks.map((cardData: CardLink) => (
 		<Card key={cardData.title} {...cardData} />
 	));

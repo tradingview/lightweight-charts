@@ -14,6 +14,7 @@ import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
+import { ICustomSeriesPaneView } from './icustom-series';
 import { IHorzScaleBehavior } from './ihorz-scale-behavior';
 import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
@@ -829,6 +830,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		// to avoid memleaks
 		this._options.localization.priceFormatter = undefined;
+		this._options.localization.percentageFormatter = undefined;
 		this._options.localization.timeFormatter = undefined;
 	}
 
@@ -844,9 +846,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._priceScalesOptionsChanged;
 	}
 
-	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T]): Series<T> {
+	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
 		const pane = this._panes[0];
-		const series = this._createSeries(options, seriesType, pane);
+		const series = this._createSeries(options, seriesType, pane, customPaneView);
 		this._serieses.push(series);
 
 		if (this._serieses.length === 1) {
@@ -1004,8 +1006,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane): Series<T> {
-		const series = new Series<T>(this, options, seriesType);
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
+		const series = new Series<T>(this, options, seriesType, pane, customPaneView);
 
 		const targetScaleId = options.priceScaleId !== undefined ? options.priceScaleId : this.defaultVisiblePriceScaleId();
 		pane.addDataSource(series, targetScaleId);

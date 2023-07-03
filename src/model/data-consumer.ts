@@ -1,4 +1,5 @@
 import { Time } from './horz-scale-behavior-time/types';
+import { CustomData, CustomSeriesWhitespaceData } from './icustom-series';
 import { Series } from './series';
 import { SeriesType } from './series-options';
 
@@ -23,12 +24,18 @@ export interface WhitespaceData<HorzScaleItem = Time> {
 	 * The time of the data.
 	 */
 	time: HorzScaleItem;
+
+	/**
+	 * Additional custom values which will be ignored by the library, but
+	 * could be used by plugins.
+	 */
+	customValues?: Record<string, unknown>;
 }
 
 /**
  * A base interface for a data point of single-value series.
  */
-export interface SingleValueData<HorzScaleItem = Time> {
+export interface SingleValueData<HorzScaleItem = Time> extends WhitespaceData<HorzScaleItem> {
 	/**
 	 * The time of the data.
 	 */
@@ -118,7 +125,7 @@ export interface BaselineData<HorzScaleItem = Time> extends SingleValueData<Horz
 /**
  * Represents a bar with a {@link Time} and open, high, low, and close prices.
  */
-export interface OhlcData<HorzScaleItem = Time> {
+export interface OhlcData<HorzScaleItem = Time> extends WhitespaceData<HorzScaleItem> {
 	/**
 	 * The bar time.
 	 */
@@ -213,6 +220,10 @@ export interface SeriesDataItemTypeMap<HorzScaleItem = Time> {
 	 * The types of histogram series data.
 	 */
 	Histogram: HistogramData<HorzScaleItem> | WhitespaceData<HorzScaleItem>;
+	/**
+	 * The base types of an custom series data.
+	 */
+	Custom: CustomData<HorzScaleItem> | CustomSeriesWhitespaceData<HorzScaleItem>;
 }
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType, HorzScaleItem = Time> {

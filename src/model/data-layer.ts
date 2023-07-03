@@ -177,19 +177,15 @@ export class DataLayer<HorzScaleItem> {
 		let seriesRows: (SeriesPlotRow<TSeriesType> | WhitespacePlotRow)[] = [];
 
 		if (data.length !== 0) {
-			const extendedData = data as SeriesDataItemWithOriginalTime<TSeriesType, HorzScaleItem>[];
-			extendedData.forEach((i: SeriesDataItemWithOriginalTime<TSeriesType, HorzScaleItem>) => saveOriginalTime(i));
-
-			// convertStringsToBusinessDays(data);
-			this._horzScaleBehavior.preprocessData(data);
-
-			// const timeConverter = ensureNotNull(selectTimeConverter(data));
+			const originalTimes = data.map((d: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]) => d.time);
 
 			const timeConverter = this._horzScaleBehavior.createConverterToInternalObj(data);
 
 			const createPlotRow = getSeriesPlotRowCreator<TSeriesType, HorzScaleItem>(series.seriesType());
+			const dataToPlotRow = series.customSeriesPlotValuesBuilder();
+			const customWhitespaceChecker = series.customSeriesWhitespaceCheck<HorzScaleItem>();
 
-			seriesRows = extendedData.map((item: SeriesDataItemWithOriginalTime<TSeriesType, HorzScaleItem>) => {
+			seriesRows = data.map((item: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType], index: number) => {
 				const time = timeConverter(item.time);
 
 				const horzItemKey = this._horzScaleBehavior.key(time);
@@ -202,7 +198,7 @@ export class DataLayer<HorzScaleItem> {
 					isTimeScaleAffected = true;
 				}
 
-				const row = createPlotRow(time, timePointData.index, item, item.originalTime);
+				const row = createPlotRow(time, timePointData.index, item, originalTimes[index], dataToPlotRow, customWhitespaceChecker);
 				timePointData.mapping.set(series, row);
 				return row;
 			});
@@ -251,7 +247,6 @@ export class DataLayer<HorzScaleItem> {
 		saveOriginalTime(extendedData);
 		// convertStringToBusinessDay(data);
 		this._horzScaleBehavior.preprocessData(data);
-
 		const timeConverter = this._horzScaleBehavior.createConverterToInternalObj([data]);
 
 		const time = timeConverter(data.time);
@@ -274,7 +269,10 @@ export class DataLayer<HorzScaleItem> {
 		}
 
 		const createPlotRow = getSeriesPlotRowCreator<SeriesType, HorzScaleItem>(series.seriesType());
-		const plotRow = createPlotRow(time, pointDataAtTime.index, data, extendedData.originalTime);
+		const dataToPlotRow = series.customSeriesPlotValuesBuilder();
+		const customWhitespaceChecker = series.customSeriesWhitespaceCheck<HorzScaleItem>();
+		const plotRow = createPlotRow(time, pointDataAtTime.index, data, extendedData.originalTime, dataToPlotRow, customWhitespaceChecker);
+
 		pointDataAtTime.mapping.set(series, plotRow);
 
 		this._updateLastSeriesRow(series, plotRow);

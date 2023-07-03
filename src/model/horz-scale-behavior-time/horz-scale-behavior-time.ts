@@ -21,6 +21,9 @@ import { BusinessDay, isBusinessDay, isUTCTimestamp, TickMarkType, TickMarkWeigh
 type TimeConverter = (time: Time) => InternalHorzScaleItem;
 
 function businessDayConverter(time: Time): InternalHorzScaleItem {
+	if (isString(time)) {
+		time = stringToBusinessDay(time);
+	}
 	if (!isBusinessDay(time)) {
 		throw new Error('time must be of type BusinessDay');
 	}
@@ -46,7 +49,7 @@ function selectTimeConverter(data: TimedData<Time>[]): TimeConverter | null {
 	if (data.length === 0) {
 		return null;
 	}
-	if (isBusinessDay(data[0].time)) {
+	if (isBusinessDay(data[0].time) || isString(data[0].time)) {
 		return businessDayConverter;
 	}
 	return timestampConverter;

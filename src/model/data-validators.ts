@@ -45,7 +45,7 @@ export function checkSeriesValuesType<HorzScaleItem>(type: SeriesType, data: rea
 
 type Checker<HorzScaleItem> = (item: SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]) => void;
 
-function getChecker<HorzScaleItem>(type: SeriesType): Checker<HorzScaleItem> {
+export function getChecker<HorzScaleItem>(type: SeriesType): Checker<HorzScaleItem> {
 	switch (type) {
 		case 'Bar':
 		case 'Candlestick':
@@ -56,6 +56,9 @@ function getChecker<HorzScaleItem>(type: SeriesType): Checker<HorzScaleItem> {
 		case 'Line':
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
+
+		case 'Custom':
+			return checkCustomItem.bind(null, type);
 	}
 }
 
@@ -112,4 +115,12 @@ function checkLineItem<HorzScaleItem>(
 			lineItem.value
 		}`
 	);
+}
+
+function checkCustomItem(
+	// type: 'Custom',
+	// customItem: SeriesDataItemTypeMap[typeof type]
+): void {
+	// Nothing to check yet...
+	return;
 }
