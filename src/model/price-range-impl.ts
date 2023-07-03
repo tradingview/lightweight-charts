@@ -2,10 +2,6 @@ import { isNumber } from '../helpers/strict-type-checks';
 
 import { PriceRange } from './series-options';
 
-function ensureFiniteWithFallback(value: number, fallback: number): number {
-	return Number.isFinite(value) ? value : fallback;
-}
-
 function computeFiniteResult(
 	method: (...values: number[]) => number,
 	valueOne: number,
@@ -13,11 +9,13 @@ function computeFiniteResult(
 	fallback: number
 ): number {
 	const firstFinite = Number.isFinite(valueOne);
-	return firstFinite && Number.isFinite(valueTwo)
-		? method(valueOne, valueTwo)
-		: firstFinite
-		? valueOne
-		: ensureFiniteWithFallback(valueTwo, fallback);
+	const secondFinite = Number.isFinite(valueTwo);
+
+	if (firstFinite && secondFinite) {
+		return method(valueOne, valueTwo);
+	}
+
+	return !firstFinite && !secondFinite ? fallback : (firstFinite ? valueOne : valueTwo);
 }
 
 export class PriceRangeImpl {
