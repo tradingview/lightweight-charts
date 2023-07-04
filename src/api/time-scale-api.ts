@@ -9,8 +9,8 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
-import { Logical, LogicalRange, Range, TimePointIndex, TimePointsRange } from '../model/time-data';
+import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
+import { Logical, LogicalRange, Range, TimePointIndex } from '../model/time-data';
 import { HorzScaleOptions, TimeScale } from '../model/time-scale';
 
 import {
@@ -78,13 +78,13 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 		}
 
 		return {
-			from: this._horzScaleBehavior.convertInternalToHorzItem(timeRange.from),
-			to: this._horzScaleBehavior.convertInternalToHorzItem(timeRange.to),
+			from: timeRange.from.originalTime as HorzScaleItem,
+			to: timeRange.to.originalTime as HorzScaleItem,
 		};
 	}
 
 	public setVisibleRange(range: Range<HorzScaleItem>): void {
-		const convertedRange: TimePointsRange = {
+		const convertedRange: Range<InternalHorzScaleItem> = {
 			from: this._horzScaleBehavior.convertHorzItemToInternal(range.from),
 			to: this._horzScaleBehavior.convertHorzItemToInternal(range.to),
 		};
@@ -149,12 +149,12 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 	public coordinateToTime(x: number): HorzScaleItem | null {
 		const timeScale = this._model.timeScale();
 		const timePointIndex = timeScale.coordinateToIndex(x as Coordinate);
-		const timePoint = timeScale.indexToTime(timePointIndex);
+		const timePoint = timeScale.indexToTimeScalePoint(timePointIndex);
 		if (timePoint === null) {
 			return null;
 		}
 
-		return this._horzScaleBehavior.convertInternalToHorzItem(timePoint);
+		return timePoint.originalTime as HorzScaleItem;
 	}
 
 	public width(): number {

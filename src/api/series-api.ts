@@ -16,7 +16,7 @@ import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-op
 import { RangeImpl } from '../model/range-impl';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
-import { SeriesMarker } from '../model/series-markers';
+import { convertSeriesMarker, SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
@@ -137,8 +137,8 @@ export class SeriesApi<
 		if (dataFirstBarInRange !== null && dataLastBarInRange !== null) {
 			// result.from = dataFirstBarInRange.time.businessDay || dataFirstBarInRange.time.timestamp;
 			// result.to = dataLastBarInRange.time.businessDay || dataLastBarInRange.time.timestamp;
-			result.from = this._horzScaleBehavior.convertInternalToHorzItem(dataFirstBarInRange.time);
-			result.to = this._horzScaleBehavior.convertInternalToHorzItem(dataLastBarInRange.time);
+			result.from = dataFirstBarInRange.originalTime as HorzScaleItem;
+			result.to = dataLastBarInRange.originalTime as HorzScaleItem;
 		}
 
 		return result;
@@ -187,21 +187,15 @@ export class SeriesApi<
 	public setMarkers(data: SeriesMarker<HorzScaleItem>[]): void {
 		checkItemsAreOrdered(data, this._horzScaleBehavior, true);
 
-		const convertedMarkers = data.map((marker: SeriesMarker<HorzScaleItem>) => ({
-			...marker as Omit<SeriesMarker<HorzScaleItem>, 'time' | 'originalTime'>,
-			originalTime: marker.time,
-			time: this._horzScaleBehavior.convertHorzItemToInternal(marker.time),
-		}));
+		const convertedMarkers = data.map((marker: SeriesMarker<HorzScaleItem>) =>
+			convertSeriesMarker<HorzScaleItem, InternalHorzScaleItem>(marker, this._horzScaleBehavior.convertHorzItemToInternal(marker.time), marker.time)
+		);
 		this._series.setMarkers(convertedMarkers);
 	}
 
 	public markers(): SeriesMarker<HorzScaleItem>[] {
 		return this._series.markers().map<SeriesMarker<HorzScaleItem>>((internalItem: SeriesMarker<InternalHorzScaleItem>) => {
-			const { originalTime, time, ...item } = internalItem;
-			return {
-				time: originalTime as HorzScaleItem,
-				...item as Omit<SeriesMarker<InternalHorzScaleItem>, 'time' | 'originalTIme'>,
-			};
+			return convertSeriesMarker<InternalHorzScaleItem, HorzScaleItem>(internalItem, internalItem.originalTime as HorzScaleItem, undefined);
 		});
 	}
 

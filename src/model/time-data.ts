@@ -36,7 +36,7 @@ export interface Range<T> {
 	to: T;
 }
 
-export type TimePointsRange = Range<InternalHorzScaleItem>;
+export type TimePointsRange = Range<Omit<TimeScalePoint, 'timeWeight'>>;
 
 /**
  * Index for a point on the horizontal (time) scale.

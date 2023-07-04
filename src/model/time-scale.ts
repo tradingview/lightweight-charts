@@ -16,6 +16,7 @@ import { TickMark, TickMarks } from './tick-marks';
 import {
 	Logical,
 	LogicalRange,
+	Range,
 	SeriesItemsIndexesRange,
 	TickMarkWeightValue,
 	TimedValue,
@@ -342,12 +343,12 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		const lastIndex = ensureNotNull(this._lastIndex());
 
 		return {
-			from: ensureNotNull(this.indexToTime(Math.max(firstIndex, from) as TimePointIndex)),
-			to: ensureNotNull(this.indexToTime(Math.min(lastIndex, to) as TimePointIndex)),
+			from: ensureNotNull(this.indexToTimeScalePoint(Math.max(firstIndex, from) as TimePointIndex)),
+			to: ensureNotNull(this.indexToTimeScalePoint(Math.min(lastIndex, to) as TimePointIndex)),
 		};
 	}
 
-	public logicalRangeForTimeRange(range: TimePointsRange): LogicalRange {
+	public logicalRangeForTimeRange(range: Range<InternalHorzScaleItem>): LogicalRange {
 		return {
 			from: ensureNotNull(this.timeToIndex(range.from, true)) as number as Logical,
 			to: ensureNotNull(this.timeToIndex(range.to, true)) as number as Logical,

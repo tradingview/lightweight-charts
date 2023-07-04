@@ -11,10 +11,6 @@ class HorzScaleBehaviorPrice {
 		return price => price;
 	}
 
-	convertInternalToHorzItem(item) {
-		return item;
-	}
-
 	key(item) {
 		return item;
 	}

@@ -21,18 +21,19 @@ import { BusinessDay, isBusinessDay, isUTCTimestamp, TickMarkType, TickMarkWeigh
 type TimeConverter = (time: Time) => InternalHorzScaleItem;
 
 function businessDayConverter(time: Time): InternalHorzScaleItem {
+	let businessDay = time;
 	if (isString(time)) {
-		time = stringToBusinessDay(time);
+		businessDay = stringToBusinessDay(time);
 	}
-	if (!isBusinessDay(time)) {
+	if (!isBusinessDay(businessDay)) {
 		throw new Error('time must be of type BusinessDay');
 	}
 
-	const date = new Date(Date.UTC(time.year, time.month - 1, time.day, 0, 0, 0, 0));
+	const date = new Date(Date.UTC(businessDay.year, businessDay.month - 1, businessDay.day, 0, 0, 0, 0));
 
 	return {
 		timestamp: Math.round(date.getTime() / 1000) as UTCTimestamp,
-		businessDay: time,
+		businessDay,
 	} as unknown as InternalHorzScaleItem;
 }
 
@@ -179,11 +180,6 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 
 	public createConverterToInternalObj(data: SeriesDataItemTypeMap<Time>[SeriesType][]): HorzScaleItemConverterToInternalObj<Time> {
 		return ensureNotNull(selectTimeConverter(data));
-	}
-
-	public convertInternalToHorzItem(item: InternalHorzScaleItem): Time {
-		const tp = item as unknown as TimePoint;
-		return tp.businessDay ?? tp.timestamp;
 	}
 
 	public key(item: InternalHorzScaleItem | Time): InternalHorzScaleItemKey {
