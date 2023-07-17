@@ -216,7 +216,7 @@ export interface ColumnPositionItem {
 }
 
 /**
- * Calculates the column positions and widths for bars using the existing the
+ * Calculates the column positions and widths for bars using the existing
  * array of items.
  * @param items - bar items which include an `x` property, and will be mutated to contain a column property
  * @param barSpacingMedia - bar spacing in media coordinates
