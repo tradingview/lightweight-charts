@@ -63,6 +63,12 @@ export interface PriceLineOptions {
 	 * @defaultValue `''`
 	 */
 	axisLabelTextColor: string;
+    /**
+	 * Whether the price line can be dragged.
+	 *
+	 * @defaultValue `false`
+	 */
+    draggable?: boolean;
 }
 
 /**
