@@ -114,6 +114,24 @@ export function drawRoundRect(
 	}
 }
 
+
+function drawCloseButton(ctx, x, y, side, backgroundColor, textColor) {
+
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(x, y, side, side);
+  
+    const shift = 4;
+    ctx.beginPath();
+    ctx.moveTo(x + shift, y + shift);
+    ctx.lineTo(x + side - shift, y + side - shift);
+    ctx.moveTo(x + side - shift, y + shift);
+    ctx.lineTo(x + shift, y + side - shift);
+    ctx.strokeStyle = textColor || '#FFFFFF';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+}
+
+
 // eslint-disable-next-line max-params
 export function drawRoundRectWithInnerBorder(
 	ctx: CanvasRenderingContext2D,
@@ -124,7 +142,8 @@ export function drawRoundRectWithInnerBorder(
 	backgroundColor: string,
 	borderWidth: number = 0,
 	borderRadius: DrawRoundRectRadii = 0,
-	borderColor: string = ''
+	borderColor: string = '',
+    textColor: string = '#FFFFFF'
 ): void {
 	ctx.save();
 
@@ -145,6 +164,7 @@ export function drawRoundRectWithInnerBorder(
 
 		ctx.fillStyle = backgroundColor;
 		ctx.fill();
+        drawCloseButton(ctx, left + width - height, top, height, backgroundColor, textColor);
 	}
 
 	// Draw border

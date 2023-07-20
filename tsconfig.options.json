@@ -13,6 +13,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitOverride": true,
 		"noImplicitReturns": true,
+        "noImplicitAny": false,
 		"noUnusedLocals": true,
 		"preserveConstEnums": true,
 		"resolveJsonModule": true,

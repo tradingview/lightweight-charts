@@ -373,7 +373,7 @@ export class ChartModel implements IDestroyable {
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
-    private _customPriceLineDragged: Delegate<CustomPriceLine, string> = new Delegate();
+	private _customPriceLineDragged: Delegate<CustomPriceLine, string> = new Delegate();
 
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
@@ -431,6 +431,10 @@ export class ChartModel implements IDestroyable {
 
 	public options(): Readonly<ChartOptionsInternal> {
 		return this._options;
+	}
+
+	public getWidth(): number {
+		return this._width;
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
@@ -516,18 +520,18 @@ export class ChartModel implements IDestroyable {
 		return this._crosshairMoved;
 	}
 
-    public customPriceLineDragged(): ISubscription<CustomPriceLine, string> {
-        return this._customPriceLineDragged;
-    }
+	public customPriceLineDragged(): ISubscription<CustomPriceLine, string> {
+		return this._customPriceLineDragged;
+	}
 
 	public setPaneHeight(pane: Pane, height: number): void {
 		pane.setHeight(height);
 		this.recalculateAllPanes();
 	}
-    
-    public fireCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
-        this._customPriceLineDragged.fire(customPriceLine, fromPriceString);
-    }
+
+	public fireCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
+		this._customPriceLineDragged.fire(customPriceLine, fromPriceString);
+	}
 
 	public setWidth(width: number): void {
 		this._width = width;
