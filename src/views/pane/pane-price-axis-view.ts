@@ -14,9 +14,11 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 	private _rendererOptions: PriceAxisViewRendererOptions | null = null;
 	private _align: 'left' | 'right' = 'right';
 	private readonly _textWidthCache: TextWidthCache;
+	private readonly _order: boolean;
 
-	public constructor(textWidthCache: TextWidthCache) {
+	public constructor(textWidthCache: TextWidthCache, order?: boolean) {
 		this._textWidthCache = textWidthCache;
+		this._order = Boolean(order);
 	}
 
 	public setParams(
@@ -34,7 +36,7 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 			return;
 		}
 
-		this._priceAxisViewRenderer.draw(target, this._rendererOptions, this._textWidthCache, this._align);
+		this._priceAxisViewRenderer.draw(target, this._rendererOptions, this._textWidthCache, this._align, this._order);
 	}
 }
 
@@ -44,15 +46,17 @@ export class PanePriceAxisView implements IPaneView {
 	private readonly _dataSource: IPriceDataSource;
 	private readonly _chartModel: ChartModel;
 	private readonly _renderer: PanePriceAxisViewRenderer;
+	private readonly _order: any;
 	private _fontSize: number;
 
-	public constructor(priceAxisView: IPriceAxisView, dataSource: IPriceDataSource, chartModel: ChartModel) {
+	public constructor(priceAxisView: IPriceAxisView, dataSource: IPriceDataSource, chartModel: ChartModel, order: any) {
 		this._priceAxisView = priceAxisView;
 		this._textWidthCache = new TextWidthCache(50); // when should we clear cache?
 		this._dataSource = dataSource;
 		this._chartModel = chartModel;
+		this._order = order;
 		this._fontSize = -1;
-		this._renderer = new PanePriceAxisViewRenderer(this._textWidthCache);
+		this._renderer = new PanePriceAxisViewRenderer(this._textWidthCache, Boolean(this._order));
 	}
 
 	public renderer(): IPaneRenderer | null {
