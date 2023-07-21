@@ -69,6 +69,12 @@ export interface MouseEventParams {
  */
 export type MouseEventHandler = (param: MouseEventParams) => void;
 
+export interface CustomPriceLineClickedEventParams {
+    customPriceLine: CustomPriceLine;
+}
+
+export type CustomPriceLineClickedEventHandler = (param: CustomPriceLineClickedEventParams) => void;
+
 export interface CustomPriceLineDraggedEventParams {
     customPriceLine: CustomPriceLine;
     fromPriceString: string;
@@ -273,6 +279,20 @@ export interface IChartApi {
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void;
+
+    	/**
+	 * Adds a subscription to receive notifications on custom price lines being dragged
+	 *
+	 * @param handler - handler (function) to be called on dragged
+	 */
+    subscribeCustomPriceLineCloseClicked(handler: CustomPriceLineClickedEventHandler): void;
+
+	/**
+	 * Removes custom price line dragged subscription
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeCustomPriceLineCloseClicked(handler: CustomPriceLineClickedEventHandler): void;
  
 	/**
 	 * Returns API to manipulate a price scale.

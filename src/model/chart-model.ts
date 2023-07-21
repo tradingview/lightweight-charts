@@ -374,6 +374,7 @@ export class ChartModel implements IDestroyable {
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
 	private _customPriceLineDragged: Delegate<CustomPriceLine, string> = new Delegate();
+    private _customPriceLineClicked: Delegate<CustomPriceLine> = new Delegate();
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
 	private _gradientColorsCache: GradientColorsCache | null = null;
@@ -523,6 +524,10 @@ export class ChartModel implements IDestroyable {
 		return this._customPriceLineDragged;
 	}
 
+    public customPriceLineClicked(): ISubscription<CustomPriceLine> {
+        return this._customPriceLineClicked;
+    }
+
 	public setPaneHeight(pane: Pane, height: number): void {
 		pane.setHeight(height);
 		this.recalculateAllPanes();
@@ -532,8 +537,8 @@ export class ChartModel implements IDestroyable {
         this._customPriceLineDragged.fire(customPriceLine, fromPriceString);
     }
 
-	public fireCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
-		this._customPriceLineDragged.fire(customPriceLine, fromPriceString);
+	public fireCustomPriceLineClicked(customPriceLine: CustomPriceLine): void {
+		this._customPriceLineClicked.fire(customPriceLine);
 	}
 
 	public setWidth(width: number): void {

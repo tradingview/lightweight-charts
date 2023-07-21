@@ -271,6 +271,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 		this._onMouseEvent();
 		this._fireClickedDelegate(event);
+        
 	}
 
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
@@ -555,6 +556,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _fireClickedDelegate(event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
 		const y = event.localY;
+
+        if (this._mouseHoveredCustomPriceLine(y, x) !== null) {
+            this._chart.model().fireCustomPriceLineClicked(this._mouseHoveredCustomPriceLine(y, x));
+        }
+
 		if (this._clicked.hasListeners()) {
 			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}

@@ -49,6 +49,13 @@ export interface CustomPriceLineDraggedEventParamsImpl {
 
 export type CustomPriceLineDraggedEventParamsImplSupplier = () => CustomPriceLineDraggedEventParamsImpl;
 
+export interface CustomPriceLineClickedEventParamsImpl {
+    customPriceLine: CustomPriceLine;
+}
+
+export type CustomPriceLineClickedEventParamsImplSupplier = () => CustomPriceLineClickedEventParamsImpl;
+
+
 const windowsChrome = isChromiumBased() && isWindows();
 
 export class ChartWidget implements IDestroyable {
@@ -69,6 +76,7 @@ export class ChartWidget implements IDestroyable {
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
     private _customPriceLineDragged: Delegate<CustomPriceLineDraggedEventParamsImplSupplier> = new Delegate();
+    private _customPriceLineClicked: Delegate<CustomPriceLineClickedEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 	private _observer: ResizeObserver | null = null;
 
@@ -101,7 +109,8 @@ export class ChartWidget implements IDestroyable {
 		);
 		this.model().crosshairMoved().subscribe(this._onPaneWidgetCrosshairMoved.bind(this), this);
         this.model().customPriceLineDragged().subscribe(this._onCustomPriceLineDragged.bind(this), this);
-        
+        this.model().customPriceLineClicked().subscribe(this._onCustomPriceLineClicked.bind(this), this);
+
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
 
@@ -155,6 +164,7 @@ export class ChartWidget implements IDestroyable {
 
 		this._model.crosshairMoved().unsubscribeAll(this);
         this._model.customPriceLineDragged().unsubscribeAll(this);
+        this._model.customPriceLineClicked().unsubscribeAll(this);
 		this._model.timeScale().optionsApplied().unsubscribeAll(this);
 		this._model.priceScalesOptionsChanged().unsubscribeAll(this);
 		this._model.destroy();
@@ -251,6 +261,10 @@ export class ChartWidget implements IDestroyable {
 
     public customPriceLineDragged(): ISubscription<CustomPriceLineDraggedEventParamsImplSupplier> {
         return this._customPriceLineDragged;
+    }
+
+    public customPriceLineClicked(): ISubscription<CustomPriceLineClickedEventParamsImplSupplier> {
+        return this._customPriceLineClicked;
     }
 
 	public takeScreenshot(): HTMLCanvasElement {
@@ -791,6 +805,12 @@ export class ChartWidget implements IDestroyable {
         };
     }
 
+    private _getCustomPriceLineClickedEventParamsImpl(customPriceLine): CustomPriceLineClickedEventParamsImpl {
+        return {
+        	customPriceLine: customPriceLine,
+        };
+    }
+
 	private _onPaneWidgetClicked(
 		time: TimePointIndex | null,
 		point: Point | null,
@@ -809,6 +829,10 @@ export class ChartWidget implements IDestroyable {
 
     private _onCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
         this._customPriceLineDragged.fire(() => this._getCustomPriceLineDraggedEventParamsImpl(customPriceLine, fromPriceString));
+    }
+
+    private _onCustomPriceLineClicked(customPriceLine: CustomPriceLine): void {
+        this._customPriceLineClicked.fire(() => this._getCustomPriceLineClickedEventParamsImpl(customPriceLine));
     }
 
 	private _updateTimeAxisVisibility(): void {
