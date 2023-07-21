@@ -39,6 +39,8 @@ interface Geometry {
 	};
 }
 
+const CLOSE_BUTTON_SIZE = 16;
+
 export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	private _data!: PriceAxisViewRendererData;
 	private _commonData!: PriceAxisViewRendererCommonData;
@@ -64,7 +66,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		target: CanvasRenderingTarget2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		align: 'left' | 'right'
+		align: 'left' | 'right',
+        order: boolean,
 	): void {
 		if (!this._data.visible || this._data.text.length === 0) {
 			return;
@@ -90,7 +93,9 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						labelBackgroundColor,
 						gb.horzBorder,
 						[gb.radius, 0, 0, gb.radius],
-						labelBorderColor
+						labelBorderColor,
+                        textColor,
+                        order
 					);
 				} else {
 					drawRoundRectWithInnerBorder(
@@ -102,7 +107,9 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						labelBackgroundColor,
 						gb.horzBorder,
 						[0, gb.radius, gb.radius, 0],
-						labelBorderColor
+						labelBorderColor,
+                        textColor,
+                        order
 					);
 				}
 			};
@@ -138,7 +145,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.textAlign = geometry.alignRight ? 'right' : 'left';
 			ctx.textBaseline = 'middle';
 			ctx.fillStyle = textColor;
-			ctx.fillText(this._data.text, gm.xText, (gm.yTop + gm.yBottom) / 2 + gm.textMidCorrection);
+			const xOffset = this._data.moveTextToInvisibleTick ? gm.xText - CLOSE_BUTTON_SIZE : gm.xText;
+			ctx.fillText(this._data.text, xOffset, (gm.yTop + gm.yBottom) / 2 + gm.textMidCorrection);
 		});
 	}
 
@@ -163,7 +171,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const totalHeight = actualTextHeight + paddingTop + paddingBottom;
 
-		const totalWidth = rendererOptions.borderSize + paddingInner + paddingOuter + textWidth + tickSize;
+		const totalWidth = rendererOptions.borderSize + paddingInner + paddingOuter + textWidth + tickSize + (this._data.moveTextToInvisibleTick ? CLOSE_BUTTON_SIZE : 0);
 
 		const tickHeightBitmap = Math.max(1, Math.floor(verticalPixelRatio));
 		let totalHeightBitmap = Math.round(totalHeight * verticalPixelRatio);

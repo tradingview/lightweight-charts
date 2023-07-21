@@ -22,6 +22,7 @@ import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { OriginalTime, TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
+import { CustomPriceLine } from '../model/custom-price-line';
 
 import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
 import { PaneWidget } from './pane-widget';
@@ -40,6 +41,20 @@ export interface MouseEventParamsImpl {
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
+
+export interface CustomPriceLineDraggedEventParamsImpl {
+    customPriceLine: CustomPriceLine;
+    fromPriceString: string;
+}
+
+export type CustomPriceLineDraggedEventParamsImplSupplier = () => CustomPriceLineDraggedEventParamsImpl;
+
+export interface CustomPriceLineClickedEventParamsImpl {
+    customPriceLine: CustomPriceLine;
+}
+
+export type CustomPriceLineClickedEventParamsImplSupplier = () => CustomPriceLineClickedEventParamsImpl;
+
 
 const windowsChrome = isChromiumBased() && isWindows();
 
@@ -60,6 +75,8 @@ export class ChartWidget implements IDestroyable {
 	private _drawPlanned: boolean = false;
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+    private _customPriceLineDragged: Delegate<CustomPriceLineDraggedEventParamsImplSupplier> = new Delegate();
+    private _customPriceLineClicked: Delegate<CustomPriceLineClickedEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 	private _observer: ResizeObserver | null = null;
 
@@ -91,6 +108,8 @@ export class ChartWidget implements IDestroyable {
 			this._options
 		);
 		this.model().crosshairMoved().subscribe(this._onPaneWidgetCrosshairMoved.bind(this), this);
+        this.model().customPriceLineDragged().subscribe(this._onCustomPriceLineDragged.bind(this), this);
+        this.model().customPriceLineClicked().subscribe(this._onCustomPriceLineClicked.bind(this), this);
 
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
@@ -144,6 +163,8 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this._model.crosshairMoved().unsubscribeAll(this);
+        this._model.customPriceLineDragged().unsubscribeAll(this);
+        this._model.customPriceLineClicked().unsubscribeAll(this);
 		this._model.timeScale().optionsApplied().unsubscribeAll(this);
 		this._model.priceScalesOptionsChanged().unsubscribeAll(this);
 		this._model.destroy();
@@ -237,6 +258,14 @@ export class ChartWidget implements IDestroyable {
 	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._crosshairMoved;
 	}
+
+    public customPriceLineDragged(): ISubscription<CustomPriceLineDraggedEventParamsImplSupplier> {
+        return this._customPriceLineDragged;
+    }
+
+    public customPriceLineClicked(): ISubscription<CustomPriceLineClickedEventParamsImplSupplier> {
+        return this._customPriceLineClicked;
+    }
 
 	public takeScreenshot(): HTMLCanvasElement {
 		if (this._invalidateMask !== null) {
@@ -769,6 +798,19 @@ export class ChartWidget implements IDestroyable {
 		};
 	}
 
+    private _getCustomPriceLineDraggedEventParamsImpl(customPriceLine: CustomPriceLine, fromPriceString: string): CustomPriceLineDraggedEventParamsImpl {
+        return {
+        	customPriceLine: customPriceLine,
+        	fromPriceString: fromPriceString,
+        };
+    }
+
+    private _getCustomPriceLineClickedEventParamsImpl(customPriceLine): CustomPriceLineClickedEventParamsImpl {
+        return {
+        	customPriceLine: customPriceLine,
+        };
+    }
+
 	private _onPaneWidgetClicked(
 		time: TimePointIndex | null,
 		point: Point | null,
@@ -784,6 +826,14 @@ export class ChartWidget implements IDestroyable {
 	): void {
 		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
+
+    private _onCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
+        this._customPriceLineDragged.fire(() => this._getCustomPriceLineDraggedEventParamsImpl(customPriceLine, fromPriceString));
+    }
+
+    private _onCustomPriceLineClicked(customPriceLine: CustomPriceLine): void {
+        this._customPriceLineClicked.fire(() => this._getCustomPriceLineClickedEventParamsImpl(customPriceLine));
+    }
 
 	private _updateTimeAxisVisibility(): void {
 		const display = this._options.timeScale.visible ? '' : 'none';

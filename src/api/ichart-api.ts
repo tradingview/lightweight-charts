@@ -16,6 +16,7 @@ import {
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
+import { CustomPriceLine } from '../model/custom-price-line';
 
 import { BarData, HistogramData, LineData, WhitespaceData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -67,6 +68,19 @@ export interface MouseEventParams {
  * A custom function use to handle mouse events.
  */
 export type MouseEventHandler = (param: MouseEventParams) => void;
+
+export interface CustomPriceLineClickedEventParams {
+    customPriceLine: CustomPriceLine;
+}
+
+export type CustomPriceLineClickedEventHandler = (param: CustomPriceLineClickedEventParams) => void;
+
+export interface CustomPriceLineDraggedEventParams {
+    customPriceLine: CustomPriceLine;
+    fromPriceString: string;
+}
+
+export type CustomPriceLineDraggedEventHandler = (param: CustomPriceLineDraggedEventParams) => void;
 
 /**
  * The main interface of a single chart.
@@ -252,6 +266,34 @@ export interface IChartApi {
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
 
+    	/**
+	 * Adds a subscription to receive notifications on custom price lines being dragged
+	 *
+	 * @param handler - handler (function) to be called on dragged
+	 */
+	subscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void;
+
+	/**
+	 * Removes custom price line dragged subscription
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void;
+
+    	/**
+	 * Adds a subscription to receive notifications on custom price lines being dragged
+	 *
+	 * @param handler - handler (function) to be called on dragged
+	 */
+    subscribeCustomPriceLineCloseClicked(handler: CustomPriceLineClickedEventHandler): void;
+
+	/**
+	 * Removes custom price line dragged subscription
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeCustomPriceLineCloseClicked(handler: CustomPriceLineClickedEventHandler): void;
+ 
 	/**
 	 * Returns API to manipulate a price scale.
 	 *

@@ -21,9 +21,11 @@ import { InvalidationLevel } from '../model/invalidate-mask';
 import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
+import { Series } from '../model/series';
 import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
+import { CustomPriceLinePaneView } from '../views/pane/custom-price-line-pane-view';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas } from './canvas-utils';
@@ -254,7 +256,12 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const y = event.localY;
 		this._setCrosshairPosition(x, y, event);
 		const hitTest = this.hitTest(x, y);
-		this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
+
+		if (this._mouseHoveredCustomPriceLine(y, x) !== null) {
+			this._chart.setCursorStyle('pointer');
+		} else {
+			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
+		}
 		this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 	}
 
@@ -264,6 +271,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 		this._onMouseEvent();
 		this._fireClickedDelegate(event);
+        
 	}
 
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
@@ -492,6 +500,51 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSources(target, paneViewsGetter);
 	}
 
+	private _getDraggableCustomPriceLines() {
+		const lines: any = [];
+		if (!this._state) {return [];}
+		for (const source of this._state.orderedSources()) {
+			if (source instanceof Series) {
+				lines.push(...source.customPriceLines().filter(
+                    (line: any) => line.options().draggable && line.priceAxisView().isAxisLabelVisible()
+                ));
+			}
+		}
+		return lines;
+	}
+
+	private _mouseHoveredCustomPriceLine(y: Coordinate, x: Coordinate) {
+		const rendererOptions = this._chart.model().rendererOptionsProvider().options();
+		const width = this._chart.model().getWidth();
+		if (width - (x + 2) > 16) {
+			return null;
+		}
+		for (const customPriceLine of this._getDraggableCustomPriceLines()) {
+			if (!customPriceLine) {
+				return null;
+			}
+			const options = customPriceLine.options();
+			if (!options.order) {
+				return null;
+			}
+			const view = customPriceLine.priceAxisView();
+			const height = view.height(rendererOptions, false);
+			const fixedCoordinate = view.getFixedCoordinate();
+
+			const hitTest = this.hitTest(x, y);
+			if (!hitTest) {
+				return null;
+			}
+			if (!(hitTest.view instanceof CustomPriceLinePaneView)) {
+				return null;
+			}
+			if (fixedCoordinate - height / 2 <= y && y <= fixedCoordinate + height / 2) {
+				return customPriceLine;
+			}
+		}
+		return null;
+	}
+
 	private _onStateDestroyed(): void {
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
@@ -503,6 +556,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _fireClickedDelegate(event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
 		const y = event.localY;
+
+        if (this._mouseHoveredCustomPriceLine(y, x) !== null) {
+            this._chart.model().fireCustomPriceLineClicked(this._mouseHoveredCustomPriceLine(y, x));
+        }
+
 		if (this._clicked.hasListeners()) {
 			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}

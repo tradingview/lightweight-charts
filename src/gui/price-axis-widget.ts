@@ -16,6 +16,7 @@ import { makeFont } from '../helpers/make-font';
 
 import { ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
+import { CustomPriceLine } from '../model/custom-price-line';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { IPriceDataSource } from '../model/iprice-data-source';
@@ -23,6 +24,7 @@ import { SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceMark, PriceScale } from '../model/price-scale';
+import { Series } from '../model/series';
 import { TextWidthCache } from '../model/text-width-cache';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
@@ -40,6 +42,8 @@ export type PriceAxisWidgetSide = Exclude<PriceScalePosition, 'overlay'>;
 const enum CursorType {
 	Default,
 	NsResize,
+    Grab,
+	Grabbing,
 }
 
 const enum Constants {
@@ -83,6 +87,8 @@ export class PriceAxisWidget implements IDestroyable {
 
 	private _mouseEventHandler: MouseEventHandler;
 	private _mousedown: boolean = false;
+	private _mouseDraggingCustomPriceLine: CustomPriceLine | null = null;
+	private _mouseDragFromPriceString: string = '';
 
 	private readonly _widthCache: TextWidthCache = new TextWidthCache(200);
 
@@ -129,6 +135,7 @@ export class PriceAxisWidget implements IDestroyable {
 		topCanvas.style.top = '0';
 
 		const handler: MouseEventHandlers = {
+			mouseMoveEvent: this._mouseMoveEvent.bind(this),
 			mouseDownEvent: this._mouseDownEvent.bind(this),
 			touchStartEvent: this._mouseDownEvent.bind(this),
 			pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
@@ -334,54 +341,135 @@ export class PriceAxisWidget implements IDestroyable {
 		this._priceScale?.marks();
 	}
 
+	private _getDraggableCustomPriceLines(): CustomPriceLine[] {
+		const lines: CustomPriceLine[] = [];
+		for (const source of this._pane.state().orderedSources()) {
+			if (source instanceof Series) {
+				lines.push(...source.customPriceLines().filter(
+                    (line: CustomPriceLine) => line.options().draggable && line.priceAxisView().isAxisLabelVisible()
+                ));
+			}
+		}
+		return lines;
+	}
+
+	private _mouseHoveredCustomPriceLine(y: number): CustomPriceLine | null {
+		const rendererOptions = this.rendererOptions();
+		for (const customPriceLine of this._getDraggableCustomPriceLines()) {
+			const view = customPriceLine.priceAxisView();
+			const height = view.height(rendererOptions, false);
+			const fixedCoordinate = view.getFixedCoordinate();
+			if (fixedCoordinate - height / 2 <= y && y <= fixedCoordinate + height / 2) {
+				return customPriceLine;
+			}
+		}
+		return null;
+	}
+
+	private _mouseMoveEvent(e: TouchMouseEvent): void {
+		if (this._mouseHoveredCustomPriceLine(e.localY) !== null) {
+			this._setCursor(CursorType.Grab);
+		} else {
+			this._setCursor(CursorType.NsResize);
+		}
+	}
+
 	private _mouseDownEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || this._priceScale.isEmpty() || !this._options.handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || this._priceScale.isEmpty()) {
+			return;
+		}
+
+		this._mousedown = true;
+
+		const hoveredCustomPriceLine = this._mouseHoveredCustomPriceLine(e.localY);
+		if (hoveredCustomPriceLine) {
+			this._mouseDraggingCustomPriceLine = hoveredCustomPriceLine;
+			const price = hoveredCustomPriceLine.options().price;
+			const firstValue = ensureNotNull(this._priceScale.firstValue());
+			this._mouseDragFromPriceString = this._priceScale.formatPrice(price, firstValue);
+			this._setCursor(CursorType.Grabbing);
+			return;
+		}
+
+		if (!this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 
 		const model = this._pane.chart().model();
 		const pane = this._pane.state();
-		this._mousedown = true;
 		model.startScalePrice(pane, this._priceScale, e.localY);
 	}
 
 	private _pressedMouseMoveEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null) {
+			return;
+		}
+
+		const priceScale = this._priceScale;
+		if (this._mouseDraggingCustomPriceLine) {
+			const firstValue = ensureNotNull(priceScale.firstValue());
+			const price = priceScale.coordinateToPrice(e.localY, firstValue);
+			this._mouseDraggingCustomPriceLine.applyOptions({ price: price });
+			return;
+		}
+
+		if (!this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
 			return;
 		}
 
 		const model = this._pane.chart().model();
 		const pane = this._pane.state();
-		const priceScale = this._priceScale;
 		model.scalePriceTo(pane, priceScale, e.localY);
 	}
 
 	private _mouseDownOutsideEvent(): void {
-		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null) {
 			return;
 		}
 
-		const model = this._pane.chart().model();
-		const pane = this._pane.state();
-
-		const priceScale = this._priceScale;
 		if (this._mousedown) {
 			this._mousedown = false;
+			this._mouseDraggingCustomPriceLine = null;
+			this._mouseDragFromPriceString = '';
+
+			if (!this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+				return;
+			}
+			const model = this._pane.chart().model();
+			const pane = this._pane.state();
+			const priceScale = this._priceScale;
 			model.endScalePrice(pane, priceScale);
 		}
 	}
 
 	private _mouseUpEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null) {
 			return;
 		}
 		const model = this._pane.chart().model();
-		const pane = this._pane.state();
 		this._mousedown = false;
+
+		if (this._mouseDraggingCustomPriceLine) {
+			model.fireCustomPriceLineDragged(this._mouseDraggingCustomPriceLine, this._mouseDragFromPriceString);
+			this._mouseDraggingCustomPriceLine = null;
+			this._mouseDragFromPriceString = '';
+			this._setCursor(CursorType.Grab);
+			return;
+		}
+
+		if (!this._pane.chart().options().handleScale.axisPressedMouseMove.price) {
+			return;
+		}
+
+		const pane = this._pane.state();
 		model.endScalePrice(pane, this._priceScale);
 	}
 
 	private _mouseDoubleClickEvent(e: TouchMouseEvent): void {
+		if (this._mouseHoveredCustomPriceLine(e.localY) !== null) {
+			return;
+		}
+
 		if (this._options.handleScale.axisDoubleClickReset.price) {
 			this.reset();
 		}
@@ -389,6 +477,15 @@ export class PriceAxisWidget implements IDestroyable {
 
 	private _mouseEnterEvent(e: TouchMouseEvent): void {
 		if (this._priceScale === null) {
+			return;
+		}
+
+		if (this._mouseDraggingCustomPriceLine !== null) {
+			this._setCursor(CursorType.Grabbing);
+			return;
+		}
+		if (this._mouseHoveredCustomPriceLine(e.localY) !== null) {
+			this._setCursor(CursorType.Grab);
 			return;
 		}
 
@@ -664,7 +761,15 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _setCursor(type: CursorType): void {
-		this._cell.style.cursor = type === CursorType.NsResize ? 'ns-resize' : 'default';
+		let cursor = 'default';
+		if (type === CursorType.NsResize) {
+			cursor = 'ns-resize';
+		} else if (type === CursorType.Grab) {
+			cursor = 'grab';
+		} else if (type === CursorType.Grabbing) {
+			cursor = 'grabbing';
+		}
+		this._cell.style.cursor = cursor;
 	}
 
 	private _onMarksChanged(): void {
