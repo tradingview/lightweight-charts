@@ -68,7 +68,13 @@ export interface PriceLineOptions {
 	 *
 	 * @defaultValue `false`
 	 */
-    draggable?: boolean;
+	draggable?: boolean;
+    /**
+	 * Custom price line order
+	 *
+	 * @defaultValue `undefined`
+	 */
+	order?: any;
 }
 
 /**

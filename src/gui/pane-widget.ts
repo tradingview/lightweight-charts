@@ -257,7 +257,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._setCrosshairPosition(x, y, event);
 		const hitTest = this.hitTest(x, y);
 
-		if (this._mouseHoveredCustomPriceLine(x, y) !== null) {
+		if (this._mouseHoveredCustomPriceLine(y, x) !== null) {
 			this._chart.setCursorStyle('pointer');
 		} else {
 			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
@@ -512,7 +512,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return lines;
 	}
 
-	private _mouseHoveredCustomPriceLine(x: Coordinate, y: Coordinate) {
+	private _mouseHoveredCustomPriceLine(y: Coordinate, x: Coordinate) {
 		const rendererOptions = this._chart.model().rendererOptionsProvider().options();
 		const width = this._chart.model().getWidth();
 		if (width - (x + 2) > 16) {
@@ -532,7 +532,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 			const hitTest = this.hitTest(x, y);
 			if (!hitTest) {
-				return;
+				return null;
 			}
 			if (!(hitTest.view instanceof CustomPriceLinePaneView)) {
 				return null;

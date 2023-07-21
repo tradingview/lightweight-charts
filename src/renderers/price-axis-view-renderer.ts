@@ -66,7 +66,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		target: CanvasRenderingTarget2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		align: 'left' | 'right'
+		align: 'left' | 'right',
+        order: boolean,
 	): void {
 		if (!this._data.visible || this._data.text.length === 0) {
 			return;
@@ -93,7 +94,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						gb.horzBorder,
 						[gb.radius, 0, 0, gb.radius],
 						labelBorderColor,
-                        textColor
+                        textColor,
+                        order
 					);
 				} else {
 					drawRoundRectWithInnerBorder(
@@ -106,7 +108,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						gb.horzBorder,
 						[0, gb.radius, gb.radius, 0],
 						labelBorderColor,
-                        textColor
+                        textColor,
+                        order
 					);
 				}
 			};

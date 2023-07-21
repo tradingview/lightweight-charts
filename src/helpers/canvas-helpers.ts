@@ -114,23 +114,20 @@ export function drawRoundRect(
 	}
 }
 
+function drawCloseButton(ctx: CanvasRenderingContext2D, x: number, y: number, side: number, backgroundColor: string, textColor: string): any {
+	ctx.fillStyle = backgroundColor;
+	ctx.fillRect(x, y, side, side);
 
-function drawCloseButton(ctx, x, y, side, backgroundColor, textColor) {
-
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(x, y, side, side);
-  
-    const shift = 4;
-    ctx.beginPath();
-    ctx.moveTo(x + shift, y + shift);
-    ctx.lineTo(x + side - shift, y + side - shift);
-    ctx.moveTo(x + side - shift, y + shift);
-    ctx.lineTo(x + shift, y + side - shift);
-    ctx.strokeStyle = textColor || '#FFFFFF';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+	const shift = 4;
+	ctx.beginPath();
+	ctx.moveTo(x + shift, y + shift);
+	ctx.lineTo(x + side - shift, y + side - shift);
+	ctx.moveTo(x + side - shift, y + shift);
+	ctx.lineTo(x + shift, y + side - shift);
+	ctx.strokeStyle = textColor || '#FFFFFF';
+	ctx.lineWidth = 1.5;
+	ctx.stroke();
 }
-
 
 // eslint-disable-next-line max-params
 export function drawRoundRectWithInnerBorder(
@@ -143,7 +140,8 @@ export function drawRoundRectWithInnerBorder(
 	borderWidth: number = 0,
 	borderRadius: DrawRoundRectRadii = 0,
 	borderColor: string = '',
-    textColor: string = '#FFFFFF'
+ textColor: string = '#FFFFFF',
+ order: boolean = false
 ): void {
 	ctx.save();
 
@@ -164,7 +162,9 @@ export function drawRoundRectWithInnerBorder(
 
 		ctx.fillStyle = backgroundColor;
 		ctx.fill();
-        drawCloseButton(ctx, left + width - height, top, height, backgroundColor, textColor);
+		if (order) {
+			drawCloseButton(ctx, left + width - height, top, height, backgroundColor, textColor);
+		}
 	}
 
 	// Draw border

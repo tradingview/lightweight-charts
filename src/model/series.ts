@@ -156,7 +156,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		const priceAxisView = new SeriesPriceAxisView(this);
 		this._priceAxisViews = [priceAxisView];
 
-		this._panePriceAxisView = new PanePriceAxisView(priceAxisView, this, model);
+		this._panePriceAxisView = new PanePriceAxisView(priceAxisView, this, model, undefined);
 
 		if (seriesType === 'Area' || seriesType === 'Line' || seriesType === 'Baseline') {
 			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'> | Series<'Baseline'>);
@@ -331,9 +331,9 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		this.model().updateSource(this);
 	}
 
-    public customPriceLines(): CustomPriceLine[] {
-        return this._customPriceLines;
-    }
+	public customPriceLines(): CustomPriceLine[] {
+		return this._customPriceLines;
+	}
 
 	public seriesType(): T {
 		return this._seriesType;
