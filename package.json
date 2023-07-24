@@ -1,7 +1,7 @@
 {
   "private": true,
   "version": "4.1.0",
-  "name": "lightweight-charts",
+  "name": "unity-lightweight-charts",
   "author": "TradingView, Inc.",
   "license": "Apache-2.0",
   "description": "Performant financial charts built with HTML5 canvas",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tradingview/lightweight-charts.git"
+    "url": "https://github.com/unity-systems/unity-lightweight-charts.git"
   },
   "module": "dist/lightweight-charts.production.mjs",
   "main": "index.cjs",
