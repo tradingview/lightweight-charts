@@ -114,6 +114,8 @@ export function drawRoundRect(
 	}
 }
 
+export const ADD_BUTTON_SIZE = 21;
+
 function drawCloseButton(ctx: CanvasRenderingContext2D, x: number, y: number, side: number, backgroundColor: string, textColor: string): any {
 	ctx.fillStyle = backgroundColor;
 	ctx.fillRect(x, y, side, side);
@@ -157,20 +159,21 @@ export function drawRoundRectWithInnerBorder(
 
 	// Draw body
 	if (backgroundColor !== 'transparent') {
+		const offsetRight = order ? ADD_BUTTON_SIZE : 0;
 		const innerRadii = changeBorderRadius(borderRadius, - borderWidth);
-		drawRoundRect(ctx, left + borderWidth, top + borderWidth, width - borderWidth * 2, height - borderWidth * 2, innerRadii);
-
+		drawRoundRect(ctx, left + borderWidth - offsetRight, top + borderWidth, width - borderWidth * 2, height - borderWidth * 2, innerRadii);
 		ctx.fillStyle = backgroundColor;
 		ctx.fill();
 		if (order) {
-			drawCloseButton(ctx, left + width - height, top, height, backgroundColor, textColor);
+			drawCloseButton(ctx, left + width - height - offsetRight, top, height, backgroundColor, textColor);
 		}
 	}
 
 	// Draw border
 	if (borderColor !== 'transparent') {
+		const offsetRight = order ? ADD_BUTTON_SIZE : 0;
 		const outerRadii = changeBorderRadius(borderRadius, - halfBorderWidth);
-		drawRoundRect(ctx, left + halfBorderWidth, top + halfBorderWidth, width - borderWidth, height - borderWidth, outerRadii);
+		drawRoundRect(ctx, left + halfBorderWidth - offsetRight, top + halfBorderWidth, width - borderWidth, height - borderWidth, outerRadii);
 
 		ctx.lineWidth = borderWidth;
 		ctx.strokeStyle = borderColor;

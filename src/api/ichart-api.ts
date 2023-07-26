@@ -1,6 +1,7 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptions } from '../model/chart-model';
+import { CustomPriceLine } from '../model/custom-price-line';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { Point } from '../model/point';
 import {
@@ -16,7 +17,6 @@ import {
 } from '../model/series-options';
 import { Logical, Time } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
-import { CustomPriceLine } from '../model/custom-price-line';
 
 import { BarData, HistogramData, LineData, WhitespaceData } from './data-consumer';
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -70,14 +70,14 @@ export interface MouseEventParams {
 export type MouseEventHandler = (param: MouseEventParams) => void;
 
 export interface CustomPriceLineClickedEventParams {
-    customPriceLine: CustomPriceLine;
+	customPriceLine: CustomPriceLine;
 }
 
 export type CustomPriceLineClickedEventHandler = (param: CustomPriceLineClickedEventParams) => void;
 
 export interface CustomPriceLineDraggedEventParams {
-    customPriceLine: CustomPriceLine;
-    fromPriceString: string;
+	customPriceLine: CustomPriceLine;
+	fromPriceString: string;
 }
 
 export type CustomPriceLineDraggedEventHandler = (param: CustomPriceLineDraggedEventParams) => void;
@@ -266,7 +266,7 @@ export interface IChartApi {
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
 
-    	/**
+    /**
 	 * Adds a subscription to receive notifications on custom price lines being dragged
 	 *
 	 * @param handler - handler (function) to be called on dragged
@@ -280,20 +280,34 @@ export interface IChartApi {
 	 */
 	unsubscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void;
 
-    	/**
-	 * Adds a subscription to receive notifications on custom price lines being dragged
+    /**
+	 * Adds a subscription to receive notifications on custom price close icon clicked
 	 *
 	 * @param handler - handler (function) to be called on dragged
 	 */
-    subscribeCustomPriceLineCloseClicked(handler: CustomPriceLineClickedEventHandler): void;
+	subscribeCustomPriceLineCloseClicked(handler: CustomPriceLineClickedEventHandler): void;
 
 	/**
-	 * Removes custom price line dragged subscription
+	 * Removes custom price line close click subscription
 	 *
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeCustomPriceLineCloseClicked(handler: CustomPriceLineClickedEventHandler): void;
- 
+
+     /**
+	 * Adds a subscription to receive notifications on add button click
+	 *
+	 * @param handler - handler (function) to be called on dragged
+	 */
+	subscribeAddButtonClicked(handler: MouseEventHandler): void;
+
+      /**
+       * Removes add button click subscription
+       *
+       * @param handler - previously subscribed handler
+       */
+	unsubscribeAddButtonClicked(handler: MouseEventHandler): void;
+
 	/**
 	 * Returns API to manipulate a price scale.
 	 *

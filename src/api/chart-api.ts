@@ -1,27 +1,27 @@
 import {
 	ChartWidget,
-	CustomPriceLineDraggedEventParamsImpl,
-	CustomPriceLineDraggedEventParamsImplSupplier,
 	CustomPriceLineClickedEventParamsImpl,
 	CustomPriceLineClickedEventParamsImplSupplier,
+	CustomPriceLineDraggedEventParamsImpl,
+	CustomPriceLineDraggedEventParamsImplSupplier,
 	MouseEventParamsImpl,
 	MouseEventParamsImplSupplier,
-} from "../gui/chart-widget";
+} from '../gui/chart-widget';
 
-import { assert, ensure, ensureDefined } from "../helpers/assertions";
-import { Delegate } from "../helpers/delegate";
-import { warn } from "../helpers/logger";
+import { assert, ensure, ensureDefined } from '../helpers/assertions';
+import { Delegate } from '../helpers/delegate';
+import { warn } from '../helpers/logger';
 import {
 	clone,
 	DeepPartial,
 	isBoolean,
 	merge,
-} from "../helpers/strict-type-checks";
+} from '../helpers/strict-type-checks';
 
-import { ChartOptions, ChartOptionsInternal } from "../model/chart-model";
-import { CustomData, ICustomSeriesPaneView } from "../model/icustom-series";
-import { Series } from "../model/series";
-import { SeriesPlotRow } from "../model/series-data";
+import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
+import { Series } from '../model/series';
+import { SeriesPlotRow } from '../model/series-data';
 import {
 	AreaSeriesPartialOptions,
 	BarSeriesPartialOptions,
@@ -40,30 +40,30 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesStyleOptionsMap,
 	SeriesType,
-} from "../model/series-options";
-import { Logical, Time } from "../model/time-data";
+} from '../model/series-options';
+import { Logical, Time } from '../model/time-data';
 
 import {
 	DataUpdatesConsumer,
 	isFulfilledData,
 	SeriesDataItemTypeMap,
 	WhitespaceData,
-} from "./data-consumer";
-import { DataLayer, DataUpdateResponse, SeriesChanges } from "./data-layer";
-import { getSeriesDataCreator } from "./get-series-data-creator";
+} from './data-consumer';
+import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
+import { getSeriesDataCreator } from './get-series-data-creator';
 import {
-	CustomPriceLineDraggedEventHandler,
-	CustomPriceLineDraggedEventParams,
 	CustomPriceLineClickedEventHandler,
 	CustomPriceLineClickedEventParams,
+	CustomPriceLineDraggedEventHandler,
+	CustomPriceLineDraggedEventParams,
 	IChartApi,
 	MouseEventHandler,
 	MouseEventParams,
-} from "./ichart-api";
-import { IPriceScaleApi } from "./iprice-scale-api";
-import { ISeriesApi } from "./iseries-api";
-import { ITimeScaleApi } from "./itime-scale-api";
-import { chartOptionsDefaults } from "./options/chart-options-defaults";
+} from './ichart-api';
+import { IPriceScaleApi } from './iprice-scale-api';
+import { ISeriesApi } from './iseries-api';
+import { ITimeScaleApi } from './itime-scale-api';
+import { chartOptionsDefaults } from './options/chart-options-defaults';
 import {
 	areaStyleDefaults,
 	barStyleDefaults,
@@ -73,13 +73,13 @@ import {
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
-} from "./options/series-options-defaults";
-import { PriceScaleApi } from "./price-scale-api";
-import { SeriesApi } from "./series-api";
-import { TimeScaleApi } from "./time-scale-api";
+} from './options/series-options-defaults';
+import { PriceScaleApi } from './price-scale-api';
+import { SeriesApi } from './series-api';
+import { TimeScaleApi } from './time-scale-api';
 
 function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
-	if (priceFormat === undefined || priceFormat.type === "custom") {
+	if (priceFormat === undefined || priceFormat.type === 'custom') {
 		return;
 	}
 	const priceFormatBuiltIn = priceFormat as DeepPartial<PriceFormatBuiltIn>;
@@ -145,7 +145,7 @@ function toInternalOptions(
 	return options as DeepPartial<ChartOptionsInternal>;
 }
 
-export type IPriceScaleApiProvider = Pick<IChartApi, "priceScale">;
+export type IPriceScaleApiProvider = Pick<IChartApi, 'priceScale'>;
 
 export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _chartWidget: ChartWidget;
@@ -161,6 +161,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private readonly _customPriceLineDraggedDelegate: Delegate<CustomPriceLineDraggedEventParams> =
 		new Delegate();
 	private readonly _customPriceLineClickedDelegate: Delegate<CustomPriceLineClickedEventParams> =
+		new Delegate();
+	private readonly _addButtonClickedDelegate: Delegate<MouseEventParams> =
 		new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi;
@@ -185,7 +187,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 				if (this._clickedDelegate.hasListeners()) {
 					this._clickedDelegate.fire(this._convertMouseParams(paramSupplier()));
 				}
-			}, this);
+			},         this);
 		this._chartWidget
 			.crosshairMoved()
 			.subscribe((paramSupplier: MouseEventParamsImplSupplier) => {
@@ -194,7 +196,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 						this._convertMouseParams(paramSupplier())
 					);
 				}
-			}, this);
+			},         this);
 		this._chartWidget
 			.customPriceLineDragged()
 			.subscribe(
@@ -221,6 +223,19 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 				this
 			);
 
+		this._chartWidget
+			.addButtonClicked()
+			.subscribe(
+				(paramSupplier: MouseEventParamsImplSupplier) => {
+					if (this._addButtonClickedDelegate.hasListeners()) {
+						this._addButtonClickedDelegate.fire(
+							this._convertMouseParams(paramSupplier())
+						);
+					}
+				},
+				this
+			);
+
 		const model = this._chartWidget.model();
 		this._timeScaleApi = new TimeScaleApi(
 			model,
@@ -232,7 +247,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
 		this._chartWidget.customPriceLineDragged().unsubscribeAll(this);
-        this._chartWidget.customPriceLineClicked().unsubscribeAll(this);
+		this._chartWidget.customPriceLineClicked().unsubscribeAll(this);
+		this._chartWidget.addButtonClicked().unsubscribeAll(this);
 
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
@@ -243,7 +259,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._clickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
 		this._customPriceLineDraggedDelegate.destroy();
-        this._customPriceLineClickedDelegate.destroy();
+		this._customPriceLineClickedDelegate.destroy();
+		this._addButtonClickedDelegate.destroy();
 		this._dataLayer.destroy();
 	}
 
@@ -266,41 +283,41 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	>(
 		customPaneView: ICustomSeriesPaneView<TData, TOptions>,
 		options?: SeriesPartialOptions<TOptions>
-	): ISeriesApi<"Custom", TData, TOptions, TPartialOptions> {
+	): ISeriesApi<'Custom', TData, TOptions, TPartialOptions> {
 		const paneView = ensure(customPaneView);
 		const defaults = {
 			...customStyleDefaults,
 			...paneView.defaultOptions(),
 		};
-		return this._addSeriesImpl<"Custom", TData, TOptions, TPartialOptions>(
-			"Custom",
+		return this._addSeriesImpl<'Custom', TData, TOptions, TPartialOptions>(
+			'Custom',
 			defaults,
 			options,
 			paneView
 		);
 	}
 
-	public addAreaSeries(options?: AreaSeriesPartialOptions): ISeriesApi<"Area"> {
-		return this._addSeriesImpl("Area", areaStyleDefaults, options);
+	public addAreaSeries(options?: AreaSeriesPartialOptions): ISeriesApi<'Area'> {
+		return this._addSeriesImpl('Area', areaStyleDefaults, options);
 	}
 
 	public addBaselineSeries(
 		options?: BaselineSeriesPartialOptions
-	): ISeriesApi<"Baseline"> {
-		return this._addSeriesImpl("Baseline", baselineStyleDefaults, options);
+	): ISeriesApi<'Baseline'> {
+		return this._addSeriesImpl('Baseline', baselineStyleDefaults, options);
 	}
 
-	public addBarSeries(options?: BarSeriesPartialOptions): ISeriesApi<"Bar"> {
-		return this._addSeriesImpl("Bar", barStyleDefaults, options);
+	public addBarSeries(options?: BarSeriesPartialOptions): ISeriesApi<'Bar'> {
+		return this._addSeriesImpl('Bar', barStyleDefaults, options);
 	}
 
 	public addCandlestickSeries(
 		options: CandlestickSeriesPartialOptions = {}
-	): ISeriesApi<"Candlestick"> {
+	): ISeriesApi<'Candlestick'> {
 		fillUpDownCandlesticksColors(options);
 
 		return this._addSeriesImpl(
-			"Candlestick",
+			'Candlestick',
 			candlestickStyleDefaults,
 			options
 		);
@@ -308,12 +325,12 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public addHistogramSeries(
 		options?: HistogramSeriesPartialOptions
-	): ISeriesApi<"Histogram"> {
-		return this._addSeriesImpl("Histogram", histogramStyleDefaults, options);
+	): ISeriesApi<'Histogram'> {
+		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options);
 	}
 
-	public addLineSeries(options?: LineSeriesPartialOptions): ISeriesApi<"Line"> {
-		return this._addSeriesImpl("Line", lineStyleDefaults, options);
+	public addLineSeries(options?: LineSeriesPartialOptions): ISeriesApi<'Line'> {
+		return this._addSeriesImpl('Line', lineStyleDefaults, options);
 	}
 
 	public removeSeries(seriesApi: SeriesApi<SeriesType>): void {
@@ -371,7 +388,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._customPriceLineDraggedDelegate.unsubscribe(handler);
 	}
 
-    public subscribeCustomPriceLineCloseClicked(
+	public subscribeCustomPriceLineCloseClicked(
 		handler: CustomPriceLineClickedEventHandler
 	): void {
 		this._customPriceLineClickedDelegate.subscribe(handler);
@@ -381,6 +398,18 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		handler: CustomPriceLineClickedEventHandler
 	): void {
 		this._customPriceLineClickedDelegate.unsubscribe(handler);
+	}
+
+	public subscribeAddButtonClicked(
+		handler: MouseEventHandler
+	): void {
+		this._addButtonClickedDelegate.subscribe(handler);
+	}
+
+	public unsubscribeAddButtonClicked(
+		handler: MouseEventHandler
+	): void {
+		this._addButtonClickedDelegate.unsubscribe(handler);
 	}
 
 	public priceScale(priceScaleId: string): IPriceScaleApi {
@@ -433,12 +462,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			.model()
 			.createSeries(type, strictOptions, customPaneView);
 
-		const res = new SeriesApi<TSeries, TData, TOptions, TPartialOptions>(
-			series,
-			this,
-			this,
-			this
-		);
+		const res = new SeriesApi<TSeries, TData, TOptions, TPartialOptions>(series, this, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -465,11 +489,11 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
-		const seriesData: MouseEventParams["seriesData"] = new Map();
+		const seriesData: MouseEventParams['seriesData'] = new Map();
 		param.seriesData.forEach((plotRow: SeriesPlotRow, series: Series) => {
 			const seriesType = series.seriesType();
 			const data = getSeriesDataCreator(seriesType)(plotRow);
-			if (seriesType !== "Custom") {
+			if (seriesType !== 'Custom') {
 				assert(isFulfilledData(data));
 			} else {
 				const customWhitespaceChecker = series.customSeriesWhitespaceCheck();

@@ -1,4 +1,4 @@
-import { Coordinate } from '../model/coordinate';
+import { Coordinate } from "../model/coordinate";
 
 /**
  * Represents the width of a line.
@@ -63,7 +63,10 @@ export const enum LineStyle {
 	SparseDotted = 4,
 }
 
-export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): void {
+export function setLineStyle(
+	ctx: CanvasRenderingContext2D,
+	style: LineStyle
+): void {
 	const dashPatterns = {
 		[LineStyle.Solid]: [],
 		[LineStyle.Dotted]: [ctx.lineWidth, ctx.lineWidth],
@@ -76,27 +79,70 @@ export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): v
 	ctx.setLineDash(dashPattern);
 }
 
-export function drawHorizontalLine(ctx: CanvasRenderingContext2D, y: number, left: number, right: number): void {
+export function drawHorizontalLine(
+	ctx: CanvasRenderingContext2D,
+	y: number,
+	left: number,
+	right: number
+): void {
 	ctx.beginPath();
-	const correction = (ctx.lineWidth % 2) ? 0.5 : 0;
+	const correction = ctx.lineWidth % 2 ? 0.5 : 0;
 	ctx.moveTo(left, y + correction);
 	ctx.lineTo(right, y + correction);
 	ctx.stroke();
 }
 
-export function drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, top: number, bottom: number): void {
+export function drawVerticalLine(
+	ctx: CanvasRenderingContext2D,
+	x: number,
+	top: number,
+	bottom: number
+): void {
 	ctx.beginPath();
-	const correction = (ctx.lineWidth % 2) ? 0.5 : 0;
+	const correction = ctx.lineWidth % 2 ? 0.5 : 0;
 	ctx.moveTo(x + correction, top);
 	ctx.lineTo(x + correction, bottom);
 	ctx.stroke();
 }
 
-export function strokeInPixel(ctx: CanvasRenderingContext2D, drawFunction: () => void): void {
+export function strokeInPixel(
+	ctx: CanvasRenderingContext2D,
+	drawFunction: () => void
+): void {
 	ctx.save();
 	if (ctx.lineWidth % 2) {
 		ctx.translate(0.5, 0.5);
 	}
 	drawFunction();
 	ctx.restore();
+}
+
+export function drawPlusButton(
+	ctx: CanvasRenderingContext2D,
+	rawX: number,
+	y: number,
+	side: number,
+	backgroundColor: string,
+	textColor: string
+): void {
+	const x = rawX - 1;
+	ctx.fillStyle = backgroundColor;
+	ctx.fillRect(x, y, side, side);
+	const arcShift = 3;
+	const shift = 7;
+	const halfSide = side / 2;
+
+	ctx.beginPath();
+	ctx.arc(x + halfSide, y + halfSide, halfSide - arcShift, 0, 2 * Math.PI);
+
+	ctx.setLineDash([]);
+	ctx.moveTo(x + halfSide, y + shift);
+	ctx.lineTo(x + halfSide, y + side - shift);
+
+	ctx.moveTo(x + shift, y + halfSide);
+	ctx.lineTo(x + side - shift, y + halfSide);
+
+	ctx.strokeStyle = textColor || '#FFFFFF';
+	ctx.lineWidth = 1;
+	ctx.stroke();
 }
