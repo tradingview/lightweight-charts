@@ -9,7 +9,7 @@ import {
 } from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
-import { clearRect, clearRectWithGradient } from '../helpers/canvas-helpers';
+import { ADD_BUTTON_SIZE, clearRect, clearRectWithGradient } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -256,8 +256,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const y = event.localY;
 		this._setCrosshairPosition(x, y, event);
 		const hitTest = this.hitTest(x, y);
-
-		if (this._mouseHoveredCustomPriceLine(y, x) !== null) {
+		if (this._mouseHoveredCustomPriceLine(y, x) !== null || this._mouseHoveredPlusButton(y, x)) {
 			this._chart.setCursorStyle('pointer');
 		} else {
 			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
@@ -271,7 +270,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 		this._onMouseEvent();
 		this._fireClickedDelegate(event);
-        
 	}
 
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
@@ -516,7 +514,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _mouseHoveredCustomPriceLine(y: Coordinate, x: Coordinate) {
 		const rendererOptions = this._chart.model().rendererOptionsProvider().options();
 		const width = this._chart.model().getWidth();
-		if (width - (x + 2) > 16) {
+		if (width - (x + 2) > 16 + ADD_BUTTON_SIZE || width - (x + 2) < ADD_BUTTON_SIZE) {
 			return null;
 		}
 		for (const customPriceLine of this._getDraggableCustomPriceLines()) {
@@ -545,6 +543,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return null;
 	}
 
+	private _mouseHoveredPlusButton(y: Coordinate, x: Coordinate): boolean {
+		const width = this._chart.model().getWidth();
+		return width - (x + 1) <= ADD_BUTTON_SIZE;
+	}
+
 	private _onStateDestroyed(): void {
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
@@ -557,9 +560,13 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const x = event.localX;
 		const y = event.localY;
 
-        if (this._mouseHoveredCustomPriceLine(y, x) !== null) {
-            this._chart.model().fireCustomPriceLineClicked(this._mouseHoveredCustomPriceLine(y, x));
-        }
+		if (this._mouseHoveredCustomPriceLine(y, x) !== null) {
+			this._chart.model().fireCustomPriceLineClicked(this._mouseHoveredCustomPriceLine(y, x));
+		}
+
+		if (this._mouseHoveredPlusButton(y, x)) {
+			this._chart.model().fireAddButtonClicked(event, { x, y });
+		}
 
 		if (this._clicked.hasListeners()) {
 			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);

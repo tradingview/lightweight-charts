@@ -1,6 +1,6 @@
 import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D, MediaCoordinatesRenderingScope } from 'fancy-canvas';
 
-import { drawRoundRectWithInnerBorder } from '../helpers/canvas-helpers';
+import { ADD_BUTTON_SIZE, drawRoundRectWithInnerBorder } from '../helpers/canvas-helpers';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
@@ -145,7 +145,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.textAlign = geometry.alignRight ? 'right' : 'left';
 			ctx.textBaseline = 'middle';
 			ctx.fillStyle = textColor;
-			const xOffset = this._data.moveTextToInvisibleTick ? gm.xText - CLOSE_BUTTON_SIZE : gm.xText;
+			const xOffset = this._data.moveTextToInvisibleTick && order ? gm.xText - CLOSE_BUTTON_SIZE - ADD_BUTTON_SIZE : gm.xText;
 			ctx.fillText(this._data.text, xOffset, (gm.yTop + gm.yBottom) / 2 + gm.textMidCorrection);
 		});
 	}

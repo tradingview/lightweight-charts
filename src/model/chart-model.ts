@@ -1,5 +1,7 @@
 /// <reference types="_build-time-constants" />
 
+import { MouseEventHandlerEventBase } from '../gui/mouse-event-handler';
+
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { gradientColorAtPercent } from '../helpers/color';
 import { Delegate } from '../helpers/delegate';
@@ -374,7 +376,8 @@ export class ChartModel implements IDestroyable {
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
 	private _customPriceLineDragged: Delegate<CustomPriceLine, string> = new Delegate();
-    private _customPriceLineClicked: Delegate<CustomPriceLine> = new Delegate();
+	private _customPriceLineClicked: Delegate<CustomPriceLine> = new Delegate();
+	private _addButtonClicked: Delegate<MouseEventHandlerEventBase, Point> = new Delegate();
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
 	private _gradientColorsCache: GradientColorsCache | null = null;
@@ -524,21 +527,29 @@ export class ChartModel implements IDestroyable {
 		return this._customPriceLineDragged;
 	}
 
-    public customPriceLineClicked(): ISubscription<CustomPriceLine> {
-        return this._customPriceLineClicked;
-    }
+	public customPriceLineClicked(): ISubscription<CustomPriceLine> {
+		return this._customPriceLineClicked;
+	}
+
+	public addButtonClicked(): ISubscription<MouseEventHandlerEventBase, Point> {
+		return this._addButtonClicked;
+	}
 
 	public setPaneHeight(pane: Pane, height: number): void {
 		pane.setHeight(height);
 		this.recalculateAllPanes();
 	}
-    
-    public fireCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
-        this._customPriceLineDragged.fire(customPriceLine, fromPriceString);
-    }
+
+	public fireCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
+		this._customPriceLineDragged.fire(customPriceLine, fromPriceString);
+	}
 
 	public fireCustomPriceLineClicked(customPriceLine: CustomPriceLine): void {
 		this._customPriceLineClicked.fire(customPriceLine);
+	}
+
+	public fireAddButtonClicked(event: MouseEventHandlerEventBase, point: Point): void {
+		this._addButtonClicked.fire(event, point);
 	}
 
 	public setWidth(width: number): void {
