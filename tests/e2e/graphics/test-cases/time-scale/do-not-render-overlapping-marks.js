@@ -2,7 +2,9 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, {
 		handleScroll: false,
 		handleScale: false,
-		tickMarkFormatter: time => `long prefix ${time}`,
+		timeScale: {
+			tickMarkFormatter: time => `long prefix ${time}`,
+		},
 	});
 
 	const mainSeries = chart.addLineSeries();
