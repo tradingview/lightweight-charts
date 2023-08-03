@@ -220,7 +220,7 @@ export class TimeScale {
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
-	private readonly _tickMarks: TickMarks = new TickMarks();
+	private readonly _tickMarks: TickMarks = new TickMarks((mark: TickMark) => this._formatLabel(mark));
 	private _formattedByWeight: Map<number, FormattedLabelsCache> = new Map();
 
 	private _visibleRange: TimeScaleVisibleRange = TimeScaleVisibleRange.invalid();
@@ -493,7 +493,7 @@ export class TimeScale {
 		const firstBar = Math.max(visibleBars.left(), visibleBars.left() - indexPerLabel);
 		const lastBar = Math.max(visibleBars.right(), visibleBars.right() - indexPerLabel);
 
-		const items = this._tickMarks.build(spacing, maxLabelWidth);
+		const items = this._tickMarks.build(spacing, maxLabelWidth, fontSize);
 
 		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second label on time scale"
 		const earliestIndexOfSecondLabel = (this._firstIndex() as number) + indexPerLabel;
