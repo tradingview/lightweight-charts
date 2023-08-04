@@ -527,30 +527,30 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSources(target, paneViewsGetter);
 	}
 
-	private _getDraggableCustomPriceLines(): CustomPriceLine[] {
+	private _getCustomPriceLines(draggableOnly?: boolean): CustomPriceLine[] {
 		const lines: CustomPriceLine[] = [];
 		if (!this._state) {return [];}
 		for (const source of this._state.orderedSources()) {
 			if (source instanceof Series) {
 				lines.push(...source.customPriceLines().filter(
-                    (line: CustomPriceLine) => line.options().draggable && line.priceAxisView().isAxisLabelVisible()
+                    (line: CustomPriceLine) => (draggableOnly ? line.options().draggable : true) && line.priceAxisView().isAxisLabelVisible()
                 ));
 			}
 		}
 		return lines;
 	}
 
-    // eslint-disable-next-line complexity
 	private _mouseHoveredCustomPriceLineCloseButton(y: Coordinate, x: Coordinate): CustomPriceLine | null {
 		const rendererOptions = this._chart.model().rendererOptionsProvider().options();
 		const width = this._chart.model().getWidth();
 
-		for (const customPriceLine of this._getDraggableCustomPriceLines()) {
+		for (const customPriceLine of this._getCustomPriceLines()) {
 			if (!customPriceLine) {
 				return null;
 			}
+
 			const options = customPriceLine.options();
-			if (!options.order) {
+			if (!options.order && !options.alert) {
 				return null;
 			}
 			const view = customPriceLine.priceAxisView();
@@ -575,12 +575,12 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const width = this._chart.model().getWidth();
 		const rendererOptions = this._chart.model().rendererOptionsProvider().options();
 
-		for (const customPriceLine of this._getDraggableCustomPriceLines()) {
+		for (const customPriceLine of this._getCustomPriceLines(true)) {
 			if (!customPriceLine) {
 				return null;
 			}
 			const options = customPriceLine.options();
-			if (!options.order) {
+			if (!options.draggable) {
 				return null;
 			}
 			const hitTest = this.hitTest(x, y);
@@ -609,6 +609,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	private _mouseHoveredPlusButton(y: Coordinate, x: Coordinate): boolean {
+		const showAddButton = this._chart.options().showAddButton;
+		if (!showAddButton) {
+			return false;
+		}
 		const width = this._chart.model().getWidth();
 		return width - (x + 1) <= ADD_BUTTON_SIZE;
 	}

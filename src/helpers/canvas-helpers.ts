@@ -163,7 +163,8 @@ export function drawRoundRectWithInnerBorder(
 	borderRadius: DrawRoundRectRadii = 0,
 	borderColor: string = '',
  textColor: string = '#FFFFFF',
- order: boolean = false
+ draggable: boolean = false,
+ closeButton: boolean = false
 ): void {
 	ctx.save();
 
@@ -176,25 +177,28 @@ export function drawRoundRectWithInnerBorder(
 	}
 
 	const halfBorderWidth = borderWidth / 2;
+	const dragHandleSize = draggable ? DRAG_HANDLE_SIZE : 0;
 
 	// Draw body
 	if (backgroundColor !== 'transparent') {
-		const offsetRight = order ? ADD_BUTTON_SIZE + DRAG_HANDLE_SIZE + 1 : 0;
-		const fixedWidth = order ? width + DRAG_HANDLE_SIZE : width;
+		const offsetRight = closeButton ? ADD_BUTTON_SIZE + dragHandleSize + 1 : 0;
+		const fixedWidth = closeButton ? width + dragHandleSize : width;
 		const innerRadii = changeBorderRadius(borderRadius, - borderWidth);
 		drawRoundRect(ctx, left + borderWidth - offsetRight, top + borderWidth, fixedWidth - borderWidth * 2, height - borderWidth * 2, innerRadii);
 		ctx.fillStyle = backgroundColor;
 		ctx.fill();
-		if (order) {
+		if (draggable) {
 			drawDragHandle(ctx, left + borderWidth - offsetRight, top, height, backgroundColor, textColor);
+		}
+		if (closeButton) {
 			drawCloseButton(ctx, left + fixedWidth - height - offsetRight, top, height, backgroundColor, textColor);
 		}
 	}
 
 	// Draw border
 	if (borderColor !== 'transparent') {
-		const offsetRight = order ? ADD_BUTTON_SIZE + DRAG_HANDLE_SIZE + 1 : 0;
-		const fixedWidth = order ? width + DRAG_HANDLE_SIZE : width;
+		const offsetRight = closeButton ? ADD_BUTTON_SIZE + dragHandleSize + 1 : 0;
+		const fixedWidth = closeButton ? width + dragHandleSize : width;
 		const outerRadii = changeBorderRadius(borderRadius, - halfBorderWidth);
 		drawRoundRect(ctx, left + halfBorderWidth - offsetRight, top + halfBorderWidth, fixedWidth - borderWidth, height - borderWidth, outerRadii);
 

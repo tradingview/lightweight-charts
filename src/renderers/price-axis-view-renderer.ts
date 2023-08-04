@@ -67,7 +67,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		align: 'left' | 'right',
-        order: boolean,
+        draggable: boolean,
+        closeButton: boolean,
 	): void {
 		if (!this._data.visible || this._data.text.length === 0) {
 			return;
@@ -95,7 +96,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						[gb.radius, 0, 0, gb.radius],
 						labelBorderColor,
                         textColor,
-                        order
+                        draggable,
+                        closeButton
 					);
 				} else {
 					drawRoundRectWithInnerBorder(
@@ -109,7 +111,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						[0, gb.radius, gb.radius, 0],
 						labelBorderColor,
                         textColor,
-                        order
+                        draggable,
+                        closeButton
 					);
 				}
 			};
@@ -145,7 +148,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.textAlign = geometry.alignRight ? 'right' : 'left';
 			ctx.textBaseline = 'middle';
 			ctx.fillStyle = textColor;
-			const xOffset = this._data.moveTextToInvisibleTick && order ? gm.xText - CLOSE_BUTTON_SIZE - ADD_BUTTON_SIZE : gm.xText;
+			const xOffset = this._data.moveTextToInvisibleTick && closeButton ? gm.xText - CLOSE_BUTTON_SIZE - ADD_BUTTON_SIZE : gm.xText;
 			ctx.fillText(this._data.text, xOffset, (gm.yTop + gm.yBottom) / 2 + gm.textMidCorrection);
 		});
 	}

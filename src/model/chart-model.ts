@@ -337,6 +337,7 @@ export interface ChartOptions {
 	/** @inheritDoc TrackingModeOptions
 	 */
 	trackingMode: TrackingModeOptions;
+	showAddButton: boolean;
 
 }
 
