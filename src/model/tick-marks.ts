@@ -49,7 +49,7 @@ export class TickMarks {
 
 	public build(spacing: number, maxWidth: number, fontSize: number): readonly TickMark[] {
 		const maxIndexesPerMark = Math.ceil(maxWidth / spacing);
-		const maxCharactersPerIndex = Math.max(1, Math.ceil(spacing / fontSize) - 1);
+		const maxCharactersPerIndex = Math.round(((spacing / fontSize) + Number.EPSILON) * 100) / 100;
 		if (this._cache === null || this._cache.maxIndexesPerMark !== maxIndexesPerMark || this._cache.maxCharactersPerIndex !== maxCharactersPerIndex) {
 			this._cache = {
 				marks: this._buildMarksImpl(maxIndexesPerMark, maxCharactersPerIndex),
@@ -90,7 +90,9 @@ export class TickMarks {
 
 		const indexesToSkip = new Set<number>();
 
-		for (const weight of Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a)) {
+		const weights = Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a);
+
+		for (const weight of weights) {
 			if (!this._marksByWeight.get(weight)) {
 				continue;
 			}
@@ -115,6 +117,7 @@ export class TickMarks {
 				}
 
 				const label = this._formatLabel(mark);
+				const labelLength = label.length + (mark.weight === weights[0] ? 4 : 2);
 
 				/* eslint-disable jsdoc/check-indentation */
 				/**
@@ -129,7 +132,7 @@ export class TickMarks {
 				 * floor(6.333333333333333 / 2) is is the number of marks either side of index 5 that will be covered.
 				 */
 				/* eslint-enable jsdoc/check-indentation */
-				const labelIndexOverflow = Math.floor(label.length / maxCharactersPerIndex / 2);
+				const labelIndexOverflow = Math.floor(labelLength / maxCharactersPerIndex / 2);
 
 				// Determine indexes with which current index will be compared
 				// All marks to the right is moved to new array
@@ -171,3 +174,22 @@ export class TickMarks {
 		return marks;
 	}
 }
+
+// // eslint-disable-next-line complexity
+// function markWeightCoefficient(mark: TickMark, maxWeight: TickMarkWeight): number {
+// 	return mark.weight === maxWeight ? 1.5 : 1;
+// 	// switch (mark.weight) {
+// 	// 	case TickMarkWeight.LessThanSecond: return 1;
+// 	// 	case TickMarkWeight.Second: return 1.1;
+// 	// 	case TickMarkWeight.Minute1: return 1.2;
+// 	// 	case TickMarkWeight.Minute5:
+// 	// 	case TickMarkWeight.Minute30: return 1.3;
+// 	// 	case TickMarkWeight.Hour1:
+// 	// 	case TickMarkWeight.Hour3:
+// 	// 	case TickMarkWeight.Hour6:
+// 	// 	case TickMarkWeight.Hour12: return 1.4;
+// 	// 	case TickMarkWeight.Day: return 1.5;
+// 	// 	case TickMarkWeight.Month: return 1.6;
+// 	// 	case TickMarkWeight.Year: return 1.7;
+// 	// }
+// }
