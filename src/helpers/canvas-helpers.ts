@@ -164,7 +164,8 @@ export function drawRoundRectWithInnerBorder(
 	borderColor: string = '',
  textColor: string = '#FFFFFF',
  draggable: boolean = false,
- closeButton: boolean = false
+ closeButton: boolean = false,
+ iconColor?: string
 ): void {
 	ctx.save();
 

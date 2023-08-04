@@ -41,9 +41,12 @@ interface Geometry {
 
 const CLOSE_BUTTON_SIZE = 16;
 
+const ICON_SIZE = 13;
+
 export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 	private _data!: PriceAxisViewRendererData;
 	private _commonData!: PriceAxisViewRendererCommonData;
+	private _iconColor?: string;
 
 	public constructor(data: PriceAxisViewRendererData, commonData: PriceAxisViewRendererCommonData) {
 		this.setData(data, commonData);
@@ -62,18 +65,21 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		return rendererOptions.fontSize + rendererOptions.paddingTop + rendererOptions.paddingBottom;
 	}
 
+    // eslint-disable-next-line max-params
 	public draw(
 		target: CanvasRenderingTarget2D,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		align: 'left' | 'right',
-        draggable: boolean,
-        closeButton: boolean,
+  draggable: boolean,
+  closeButton: boolean,
+  iconColor?: string
 	): void {
 		if (!this._data.visible || this._data.text.length === 0) {
 			return;
 		}
 
+		this._iconColor = iconColor;
 		const textColor = this._data.color;
 		const backgroundColor = this._commonData.background;
 
@@ -95,9 +101,10 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						gb.horzBorder,
 						[gb.radius, 0, 0, gb.radius],
 						labelBorderColor,
-                        textColor,
-                        draggable,
-                        closeButton
+      textColor,
+      draggable,
+      closeButton,
+      iconColor
 					);
 				} else {
 					drawRoundRectWithInnerBorder(
@@ -110,9 +117,10 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						gb.horzBorder,
 						[0, gb.radius, gb.radius, 0],
 						labelBorderColor,
-                        textColor,
-                        draggable,
-                        closeButton
+      textColor,
+      draggable,
+      closeButton,
+      iconColor
 					);
 				}
 			};
@@ -144,6 +152,15 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
 			const gm = geometry.media;
+			if (iconColor) {
+				ctx.font = `${ICON_SIZE}px icomoon`;
+				ctx.textAlign = 'left';
+				ctx.textBaseline = 'middle';
+				ctx.fillStyle = iconColor;
+				const xOffset = this._data.moveTextToInvisibleTick && closeButton ? gm.xText - CLOSE_BUTTON_SIZE - ADD_BUTTON_SIZE : gm.xText;
+				ctx.fillText('\ue966', xOffset - ICON_SIZE, (gm.yTop + gm.yBottom) / 2 + gm.textMidCorrection - 1);
+				return;
+			}
 			ctx.font = rendererOptions.font;
 			ctx.textAlign = geometry.alignRight ? 'right' : 'left';
 			ctx.textBaseline = 'middle';
@@ -170,7 +187,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const actualTextHeight = rendererOptions.fontSize;
 		const textMidCorrection = textWidthCache.yMidCorrection(ctx, text);
 
-		const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
+		const textWidth = this._iconColor ? ICON_SIZE : Math.ceil(textWidthCache.measureText(ctx, text));
 
 		const totalHeight = actualTextHeight + paddingTop + paddingBottom;
 

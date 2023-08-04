@@ -17,11 +17,13 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 	private readonly _textWidthCache: TextWidthCache;
 	private readonly _closeButton: boolean;
 	private readonly _draggable: boolean;
+	private readonly _iconColor?: string;
 
-	public constructor(textWidthCache: TextWidthCache, draggable?: boolean, closeButton?: boolean) {
+	public constructor(textWidthCache: TextWidthCache, draggable?: boolean, closeButton?: boolean, iconColor?: string) {
 		this._textWidthCache = textWidthCache;
 		this._closeButton = Boolean(closeButton);
 		this._draggable = Boolean(draggable);
+		this._iconColor = iconColor;
 	}
 
 	public setParams(
@@ -38,8 +40,7 @@ class PanePriceAxisViewRenderer implements IPaneRenderer {
 		if (this._rendererOptions === null || this._priceAxisViewRenderer === null) {
 			return;
 		}
-
-		this._priceAxisViewRenderer.draw(target, this._rendererOptions, this._textWidthCache, this._align, this._draggable, this._closeButton);
+		this._priceAxisViewRenderer.draw(target, this._rendererOptions, this._textWidthCache, this._align, this._draggable, this._closeButton, this._iconColor);
 	}
 }
 
@@ -52,6 +53,7 @@ export class PanePriceAxisView implements IPaneView {
 	private readonly _order: any;
 	private readonly _alert: any;
 	private readonly _draggable: boolean;
+	private readonly _iconColor?: string;
 	private _fontSize: number;
 
 	public constructor(priceAxisView: IPriceAxisView, dataSource: IPriceDataSource, chartModel: ChartModel, options?: PriceLineOptions) {
@@ -62,8 +64,9 @@ export class PanePriceAxisView implements IPaneView {
 		this._order = options?.order;
 		this._alert = options?.alert;
 		this._draggable = Boolean(options?.draggable);
+		this._iconColor = options?.iconColor;
 		this._fontSize = -1;
-		this._renderer = new PanePriceAxisViewRenderer(this._textWidthCache, this._draggable, Boolean(this._order || this._alert));
+		this._renderer = new PanePriceAxisViewRenderer(this._textWidthCache, this._draggable, Boolean(this._order || this._alert), this._iconColor);
 	}
 
 	public renderer(): IPaneRenderer | null {
