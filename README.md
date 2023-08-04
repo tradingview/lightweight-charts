@@ -111,7 +111,7 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 
 [npm-version-img]: https://badge.fury.io/js/lightweight-charts.svg
 [npm-downloads-img]: https://img.shields.io/npm/dm/lightweight-charts.svg
-[npm-link]: https://www.npmjs.com/package/lightweight-charts
+[npm-link]: https://www.npmjs.com/package/unity-lightweight-charts
 
 [bundle-size-img]: https://badgen.net/bundlephobia/minzip/lightweight-charts
 [deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependecies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
