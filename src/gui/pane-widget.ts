@@ -16,12 +16,14 @@ import { ISubscription } from '../helpers/isubscription';
 
 import { ChartModel, TrackingModeExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
+import { CustomPriceLine } from '../model/custom-price-line';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { Series } from '../model/series';
+import { TextWidthCache } from '../model/text-width-cache';
 import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
@@ -83,6 +85,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _startTrackPoint: Point | null = null;
 	private _exitTrackingModeOnNextTry: boolean = false;
 	private _initCrosshairPosition: Point | null = null;
+	private _mouseDraggingCustomPriceLine: CustomPriceLine | null = null;
+	private _mouseDragFromPriceString: string = '';
 
 	private _scrollXAnimation: KineticAnimation | null = null;
 
@@ -244,6 +248,16 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._onMouseEvent();
 		this._mouseTouchDownEvent();
 		this._setCrosshairPosition(event.localX, event.localY, event);
+
+		const hoveredCustomPriceLine = this._mouseHoveredCustomPriceLineDragHandle(event.localY, event.localX);
+		if (hoveredCustomPriceLine && this._state) {
+			this._mouseDraggingCustomPriceLine = hoveredCustomPriceLine;
+			const price = hoveredCustomPriceLine.options().price;
+			const priceScale = this._state.defaultPriceScale();
+			const firstValue = ensureNotNull(priceScale.firstValue());
+			this._mouseDragFromPriceString = priceScale.formatPrice(price, firstValue);
+			this._chart.setCursorStyle('grabbing');
+		}
 	}
 
 	public mouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
@@ -256,7 +270,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const y = event.localY;
 		this._setCrosshairPosition(x, y, event);
 		const hitTest = this.hitTest(x, y);
-		if (this._mouseHoveredCustomPriceLine(y, x) !== null || this._mouseHoveredPlusButton(y, x)) {
+		if (hitTest?.view instanceof CustomPriceLinePaneView && this._mouseHoveredCustomPriceLineDragHandle(y, x)) {
+			this._chart.setCursorStyle('grab');
+		} else if ((hitTest?.view instanceof CustomPriceLinePaneView && this._mouseHoveredCustomPriceLineCloseButton(y, x)) || this._mouseHoveredPlusButton(y, x)) {
 			this._chart.setCursorStyle('pointer');
 		} else {
 			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
@@ -287,6 +303,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._longTap = false;
 
 		this._endScroll(event);
+
+		if (this._mouseDraggingCustomPriceLine) {
+			this._state.model().fireCustomPriceLineDragged(this._mouseDraggingCustomPriceLine, this._mouseDragFromPriceString);
+			this._mouseDraggingCustomPriceLine = null;
+			this._mouseDragFromPriceString = '';
+			this._chart.setCursorStyle('grab');
+			return;
+		}
 	}
 
 	public tapEvent(event: MouseEventHandlerTouchEvent): void {
@@ -352,9 +376,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._state === null) {
 			return;
 		}
-
 		const x = event.localX;
 		const y = event.localY;
+		const hitTest = this.hitTest(x, y);
+
+		if (hitTest?.view instanceof CustomPriceLinePaneView && this._mouseHoveredCustomPriceLineDragHandle(y, x)) {
+			this._chart.setCursorStyle('grabbing');
+		}
+
 		if (this._startTrackPoint !== null) {
 			// tracking mode: move crosshair
 			this._exitTrackingModeOnNextTry = false;
@@ -498,25 +527,24 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSources(target, paneViewsGetter);
 	}
 
-	private _getDraggableCustomPriceLines() {
-		const lines: any = [];
+	private _getDraggableCustomPriceLines(): CustomPriceLine[] {
+		const lines: CustomPriceLine[] = [];
 		if (!this._state) {return [];}
 		for (const source of this._state.orderedSources()) {
 			if (source instanceof Series) {
 				lines.push(...source.customPriceLines().filter(
-                    (line: any) => line.options().draggable && line.priceAxisView().isAxisLabelVisible()
+                    (line: CustomPriceLine) => line.options().draggable && line.priceAxisView().isAxisLabelVisible()
                 ));
 			}
 		}
 		return lines;
 	}
 
-	private _mouseHoveredCustomPriceLine(y: Coordinate, x: Coordinate) {
+    // eslint-disable-next-line complexity
+	private _mouseHoveredCustomPriceLineCloseButton(y: Coordinate, x: Coordinate): CustomPriceLine | null {
 		const rendererOptions = this._chart.model().rendererOptionsProvider().options();
 		const width = this._chart.model().getWidth();
-		if (width - (x + 2) > 16 + ADD_BUTTON_SIZE || width - (x + 2) < ADD_BUTTON_SIZE) {
-			return null;
-		}
+
 		for (const customPriceLine of this._getDraggableCustomPriceLines()) {
 			if (!customPriceLine) {
 				return null;
@@ -530,13 +558,39 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			const fixedCoordinate = view.getFixedCoordinate();
 
 			const hitTest = this.hitTest(x, y);
-			if (!hitTest) {
+			if (!hitTest || !(hitTest.view instanceof CustomPriceLinePaneView)) {
 				return null;
 			}
-			if (!(hitTest.view instanceof CustomPriceLinePaneView)) {
+			if (width - (x + 2) > 16 + ADD_BUTTON_SIZE || width - (x + 2) < ADD_BUTTON_SIZE) {
 				return null;
 			}
 			if (fixedCoordinate - height / 2 <= y && y <= fixedCoordinate + height / 2) {
+				return customPriceLine;
+			}
+		}
+		return null;
+	}
+
+	private _mouseHoveredCustomPriceLineDragHandle(y: Coordinate, x: Coordinate): CustomPriceLine | null {
+		const width = this._chart.model().getWidth();
+		for (const customPriceLine of this._getDraggableCustomPriceLines()) {
+			if (!customPriceLine) {
+				return null;
+			}
+			const options = customPriceLine.options();
+			if (!options.order) {
+				return null;
+			}
+			const hitTest = this.hitTest(x, y);
+			const ctx = ensureNotNull(this._canvasBinding.canvasElement.getContext('2d'));
+			const textWidthCache = new TextWidthCache();
+			const textWidth = Math.ceil(textWidthCache.measureText(ctx, options.title));
+
+			if (!hitTest || !(hitTest.view instanceof CustomPriceLinePaneView)) {
+				return null;
+			}
+
+			if ((width - ADD_BUTTON_SIZE - 24 - textWidth - 24 <= x + 2) && (width - ADD_BUTTON_SIZE - 24 - textWidth - 12 > x + 2)) {
 				return customPriceLine;
 			}
 		}
@@ -560,8 +614,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const x = event.localX;
 		const y = event.localY;
 
-		if (this._mouseHoveredCustomPriceLine(y, x) !== null) {
-			this._chart.model().fireCustomPriceLineClicked(this._mouseHoveredCustomPriceLine(y, x));
+		const customPriceLine = this._mouseHoveredCustomPriceLineCloseButton(y, x);
+		if (customPriceLine !== null) {
+			this._chart.model().fireCustomPriceLineClicked(customPriceLine);
 		}
 
 		if (this._mouseHoveredPlusButton(y, x)) {
@@ -766,8 +821,15 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		const model = this._model();
 		const timeScale = model.timeScale();
-
 		if (timeScale.isEmpty()) {
+			return;
+		}
+
+		const priceScale = this._state.defaultPriceScale();
+		if (this._mouseDraggingCustomPriceLine) {
+			const firstValue = ensureNotNull(priceScale.firstValue());
+			const price = priceScale.coordinateToPrice(event.localY, firstValue);
+			this._mouseDraggingCustomPriceLine.applyOptions({ price: price });
 			return;
 		}
 
@@ -780,8 +842,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		) {
 			return;
 		}
-
-		const priceScale = this._state.defaultPriceScale();
 
 		const now = performance.now();
 
