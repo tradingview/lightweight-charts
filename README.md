@@ -109,10 +109,10 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 [ci-img]: https://img.shields.io/circleci/build/github/tradingview/lightweight-charts.svg
 [ci-link]: https://circleci.com/gh/tradingview/lightweight-charts
 
-[npm-version-img]: https://badge.fury.io/js/lightweight-charts.svg
-[npm-downloads-img]: https://img.shields.io/npm/dm/lightweight-charts.svg
+[npm-version-img]: https://badge.fury.io/js/unity-lightweight-charts.svg
+[npm-downloads-img]: https://img.shields.io/npm/dm/unity-lightweight-charts.svg
 [npm-link]: https://www.npmjs.com/package/unity-lightweight-charts
 
-[bundle-size-img]: https://badgen.net/bundlephobia/minzip/lightweight-charts
+[bundle-size-img]: https://badgen.net/bundlephobia/minzip/unity-lightweight-charts
 [deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependecies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
-[bundle-size-link]: https://bundlephobia.com/result?p=lightweight-charts
+[bundle-size-link]: https://bundlephobia.com/result?p=unity-lightweight-charts
