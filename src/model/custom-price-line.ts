@@ -22,7 +22,7 @@ export class CustomPriceLine {
 		this._options = options;
 		this._priceLineView = new CustomPriceLinePaneView(series, this);
 		this._priceAxisView = new CustomPriceLinePriceAxisView(series, this);
-		this._panePriceAxisView = new PanePriceAxisView(this._priceAxisView, series, series.model(), options.order);
+		this._panePriceAxisView = new PanePriceAxisView(this._priceAxisView, series, series.model(), options);
 	}
 
 	public applyOptions(options: Partial<PriceLineOptions>): void {

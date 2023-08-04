@@ -177,7 +177,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 				: (merge(
 						clone(chartOptionsDefaults),
 						toInternalOptions(options)
-				  ) as ChartOptionsInternal);
+			) as ChartOptionsInternal);
 
 		this._chartWidget = new ChartWidget(container, internalOptions);
 
@@ -187,7 +187,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 				if (this._clickedDelegate.hasListeners()) {
 					this._clickedDelegate.fire(this._convertMouseParams(paramSupplier()));
 				}
-			},         this);
+			}, this);
 		this._chartWidget
 			.crosshairMoved()
 			.subscribe((paramSupplier: MouseEventParamsImplSupplier) => {
@@ -196,7 +196,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 						this._convertMouseParams(paramSupplier())
 					);
 				}
-			},         this);
+			}, this);
 		this._chartWidget
 			.customPriceLineDragged()
 			.subscribe(

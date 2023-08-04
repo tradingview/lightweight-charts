@@ -17,6 +17,7 @@ export interface CrosshairRendererData {
 	horzLine: CrosshairLineStyle;
 	labelTextColor: string;
 	labelBackgroundColor: string;
+	showAddButton: boolean;
 	x: number;
 	y: number;
 }
@@ -60,7 +61,9 @@ export class CrosshairRenderer extends BitmapCoordinatesPaneRenderer {
 			ctx.fillStyle = this._data.horzLine.color;
 			setLineStyle(ctx, this._data.horzLine.lineStyle);
 			drawHorizontalLine(ctx, y, 0, bitmapSize.width);
-			drawPlusButton(ctx, bitmapSize.width - ADD_BUTTON_SIZE, y - ((ADD_BUTTON_SIZE - 1) / 2), ADD_BUTTON_SIZE, this._data.labelBackgroundColor, this._data.labelTextColor);
+			if (this._data.showAddButton) {
+				drawPlusButton(ctx, bitmapSize.width - ADD_BUTTON_SIZE, y - ((ADD_BUTTON_SIZE - 1) / 2), ADD_BUTTON_SIZE, this._data.labelBackgroundColor, this._data.labelTextColor);
+			}
 		}
 	}
 }

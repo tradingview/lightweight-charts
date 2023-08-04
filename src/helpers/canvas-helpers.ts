@@ -115,6 +115,7 @@ export function drawRoundRect(
 }
 
 export const ADD_BUTTON_SIZE = 21;
+export const DRAG_HANDLE_SIZE = 12;
 
 function drawCloseButton(ctx: CanvasRenderingContext2D, x: number, y: number, side: number, backgroundColor: string, textColor: string): any {
 	ctx.fillStyle = backgroundColor;
@@ -131,6 +132,25 @@ function drawCloseButton(ctx: CanvasRenderingContext2D, x: number, y: number, si
 	ctx.stroke();
 }
 
+function drawDragHandle(ctx: CanvasRenderingContext2D, x: number, y: number, side: number, backgroundColor: string, textColor: string): any {
+	ctx.fillStyle = backgroundColor;
+	const shift = 4;
+	const radius = 1;
+	ctx.beginPath();
+
+	const height = side - shift * 2;
+	const coords = [[0, 0], [0, height / 2], [0, height], [4, 0], [4, height / 2], [4, height]];
+	coords.forEach((coord: number[]) => {
+		ctx.moveTo(x + shift + coord[0], y + shift + coord[1]);
+		ctx.arc(x + shift + coord[0], y + shift + coord[1], radius, 0, Math.PI * 2, true);
+	});
+	ctx.fillStyle = textColor;
+	ctx.fill();
+	ctx.strokeStyle = textColor || '#FFFFFF';
+	ctx.lineWidth = 1;
+	ctx.stroke();
+}
+
 // eslint-disable-next-line max-params
 export function drawRoundRectWithInnerBorder(
 	ctx: CanvasRenderingContext2D,
@@ -143,7 +163,9 @@ export function drawRoundRectWithInnerBorder(
 	borderRadius: DrawRoundRectRadii = 0,
 	borderColor: string = '',
  textColor: string = '#FFFFFF',
- order: boolean = false
+ draggable: boolean = false,
+ closeButton: boolean = false,
+ iconColor?: string
 ): void {
 	ctx.save();
 
@@ -156,24 +178,30 @@ export function drawRoundRectWithInnerBorder(
 	}
 
 	const halfBorderWidth = borderWidth / 2;
+	const dragHandleSize = draggable ? DRAG_HANDLE_SIZE : 0;
 
 	// Draw body
 	if (backgroundColor !== 'transparent') {
-		const offsetRight = order ? ADD_BUTTON_SIZE : 0;
+		const offsetRight = closeButton ? ADD_BUTTON_SIZE + dragHandleSize + 1 : 0;
+		const fixedWidth = closeButton ? width + dragHandleSize : width;
 		const innerRadii = changeBorderRadius(borderRadius, - borderWidth);
-		drawRoundRect(ctx, left + borderWidth - offsetRight, top + borderWidth, width - borderWidth * 2, height - borderWidth * 2, innerRadii);
+		drawRoundRect(ctx, left + borderWidth - offsetRight, top + borderWidth, fixedWidth - borderWidth * 2, height - borderWidth * 2, innerRadii);
 		ctx.fillStyle = backgroundColor;
 		ctx.fill();
-		if (order) {
-			drawCloseButton(ctx, left + width - height - offsetRight, top, height, backgroundColor, textColor);
+		if (draggable) {
+			drawDragHandle(ctx, left + borderWidth - offsetRight, top, height, backgroundColor, textColor);
+		}
+		if (closeButton) {
+			drawCloseButton(ctx, left + fixedWidth - height - offsetRight, top, height, backgroundColor, textColor);
 		}
 	}
 
 	// Draw border
 	if (borderColor !== 'transparent') {
-		const offsetRight = order ? ADD_BUTTON_SIZE : 0;
+		const offsetRight = closeButton ? ADD_BUTTON_SIZE + dragHandleSize + 1 : 0;
+		const fixedWidth = closeButton ? width + dragHandleSize : width;
 		const outerRadii = changeBorderRadius(borderRadius, - halfBorderWidth);
-		drawRoundRect(ctx, left + halfBorderWidth - offsetRight, top + halfBorderWidth, width - borderWidth, height - borderWidth, outerRadii);
+		drawRoundRect(ctx, left + halfBorderWidth - offsetRight, top + halfBorderWidth, fixedWidth - borderWidth, height - borderWidth, outerRadii);
 
 		ctx.lineWidth = borderWidth;
 		ctx.strokeStyle = borderColor;

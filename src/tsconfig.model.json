@@ -7,6 +7,6 @@
 	"include": [
 		"./model/**/*.ts",
 		"./renderers/**/*.ts",
-		"./views/**/*.ts"
+		"./views/**/*.ts",
 	]
 }

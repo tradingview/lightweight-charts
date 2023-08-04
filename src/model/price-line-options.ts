@@ -75,6 +75,18 @@ export interface PriceLineOptions {
 	 * @defaultValue `undefined`
 	 */
 	order?: any;
+     /**
+	 * Custom price line alert
+	 *
+	 * @defaultValue `undefined`
+	 */
+	alert?: any;
+    /**
+	 * Custom price line alert icon color
+	 *
+	 * @defaultValue `undefined`
+	 */
+	iconColor?: string;
 }
 
 /**

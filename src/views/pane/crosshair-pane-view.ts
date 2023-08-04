@@ -24,6 +24,7 @@ export class CrosshairPaneView implements IPaneView {
 		},
 		labelTextColor: '',
 		labelBackgroundColor: '',
+		showAddButton: false,
 		x: 0,
 		y: 0,
 	};
@@ -53,7 +54,6 @@ export class CrosshairPaneView implements IPaneView {
 		const crosshairOptions = options.crosshair;
 
 		const data = this._rendererData;
-
 		data.horzLine.visible = visible && this._source.horzLineVisible(pane);
 		data.vertLine.visible = visible && this._source.vertLineVisible();
 
@@ -67,6 +67,7 @@ export class CrosshairPaneView implements IPaneView {
 
 		data.labelBackgroundColor = crosshairOptions.horzLine.labelBackgroundColor;
 		data.labelTextColor = options.layout.textColor;
+		data.showAddButton = options.showAddButton;
 
 		data.x = this._source.appliedX();
 		data.y = this._source.appliedY();

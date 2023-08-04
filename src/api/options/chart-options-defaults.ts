@@ -58,4 +58,5 @@ export const chartOptionsDefaults: ChartOptionsInternal = {
 	trackingMode: {
 		exitMode: TrackingModeExitMode.OnNextTap,
 	},
+	showAddButton: false,
 };
