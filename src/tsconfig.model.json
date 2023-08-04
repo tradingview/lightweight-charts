@@ -8,6 +8,5 @@
 		"./model/**/*.ts",
 		"./renderers/**/*.ts",
 		"./views/**/*.ts",
-        "./gui/**/*.ts"
 	]
 }
