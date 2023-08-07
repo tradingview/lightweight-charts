@@ -220,7 +220,7 @@ export class TimeScale {
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
-	private readonly _tickMarks: TickMarks = new TickMarks((mark: TickMark) => this._formatLabel(mark));
+	private readonly _tickMarks: TickMarks = new TickMarks();
 	private _formattedByWeight: Map<number, FormattedLabelsCache> = new Map();
 
 	private _visibleRange: TimeScaleVisibleRange = TimeScaleVisibleRange.invalid();
@@ -234,6 +234,7 @@ export class TimeScale {
 	private _timeMarksCache: TimeMark[] | null = null;
 
 	private _labels: TimeMark[] = [];
+	private _labelLengthEstimate: number = 0;
 
 	public constructor(model: ChartModel, options: TimeScaleOptions, localizationOptions: LocalizationOptions) {
 		this._options = options;
@@ -243,6 +244,7 @@ export class TimeScale {
 		this._model = model;
 
 		this._updateDateTimeFormatter();
+		this._updateLabelLengthEstimate();
 	}
 
 	public options(): Readonly<TimeScaleOptions> {
@@ -254,6 +256,7 @@ export class TimeScale {
 
 		this._invalidateTickMarks();
 		this._updateDateTimeFormatter();
+		this._updateLabelLengthEstimate();
 	}
 
 	public applyOptions(options: DeepPartial<TimeScaleOptions>, localizationOptions?: DeepPartial<LocalizationOptions>): void {
@@ -285,6 +288,7 @@ export class TimeScale {
 
 		this._invalidateTickMarks();
 		this._updateDateTimeFormatter();
+		this._updateLabelLengthEstimate();
 
 		this._optionsApplied.fire();
 	}
@@ -485,7 +489,7 @@ export class TimeScale {
 		const spacing = this._barSpacing;
 		const fontSize = this._model.options().layout.fontSize;
 
-		const maxLabelWidth = (fontSize + 4) * 5;
+		const maxLabelWidth = Math.max((fontSize + 4) * 5, this._labelLengthEstimate * fontSize);
 		const indexPerLabel = Math.round(maxLabelWidth / spacing);
 
 		const visibleBars = ensureNotNull(this.visibleStrictRange());
@@ -493,7 +497,7 @@ export class TimeScale {
 		const firstBar = Math.max(visibleBars.left(), visibleBars.left() - indexPerLabel);
 		const lastBar = Math.max(visibleBars.right(), visibleBars.right() - indexPerLabel);
 
-		const items = this._tickMarks.build(spacing, maxLabelWidth, fontSize);
+		const items = this._tickMarks.build(spacing, maxLabelWidth);
 
 		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second label on time scale"
 		const earliestIndexOfSecondLabel = (this._firstIndex() as number) + indexPerLabel;
@@ -992,6 +996,24 @@ export class TimeScale {
 		this._correctOffset();
 
 		this._correctBarSpacing();
+	}
+
+	private _updateLabelLengthEstimate(): void {
+		const formatter = this._options.tickMarkFormatter;
+
+		if (formatter === undefined) {
+			this._labelLengthEstimate = 0;
+			return;
+		}
+
+		const formattedLabel = formatter(0 as UTCTimestamp, TickMarkType.TimeWithSeconds, this._localizationOptions.locale);
+
+		if (typeof formattedLabel !== 'string') {
+			this._labelLengthEstimate = 0;
+			return;
+		}
+
+		this._labelLengthEstimate = formattedLabel.length;
 	}
 }
 

@@ -67,7 +67,7 @@ export interface LayoutOptions {
 	/**
 	 * Font size of text on scales in pixels.
 	 *
-	 * @defaultValue `11`
+	 * @defaultValue `12`
 	 */
 	fontSize: number;
 
