@@ -80,9 +80,7 @@ export class TickMarks {
 	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark[] {
 		let marks: TickMark[] = [];
 
-		const weights = Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a);
-
-		for (const weight of weights) {
+		for (const weight of Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a)) {
 			if (!this._marksByWeight.get(weight)) {
 				continue;
 			}
