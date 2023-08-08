@@ -58,3 +58,11 @@ export interface TouchMouseEventData {
 	 */
 	readonly metaKey: boolean;
 }
+export interface MouseEventHandlerEventBase extends TouchMouseEventData {
+	readonly srcType: string;
+
+	target: MouseEvent['target'];
+	view: MouseEvent['view'];
+
+	preventDefault(): void;
+}

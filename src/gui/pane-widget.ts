@@ -22,7 +22,6 @@ import { InvalidationLevel } from '../model/invalidate-mask';
 import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
-import { Series } from '../model/series';
 import { TextWidthCache } from '../model/text-width-cache';
 import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
@@ -527,46 +526,29 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSources(target, paneViewsGetter);
 	}
 
-	private _getCustomPriceLines(draggableOnly?: boolean): CustomPriceLine[] {
-		const lines: CustomPriceLine[] = [];
-		if (!this._state) {return [];}
-		for (const source of this._state.orderedSources()) {
-			if (source instanceof Series) {
-				lines.push(...source.customPriceLines().filter(
-                    (line: CustomPriceLine) => (draggableOnly ? line.options().draggable : true) && line.priceAxisView().isAxisLabelVisible()
-                ));
-			}
-		}
-		return lines;
-	}
-
 	private _mouseHoveredCustomPriceLineCloseButton(y: Coordinate, x: Coordinate): CustomPriceLine | null {
 		const rendererOptions = this._chart.model().rendererOptionsProvider().options();
 		const width = this._chart.model().getWidth();
+		const hitTest = this.hitTest(x, y);
+		const customPriceLine = hitTest?.view?.priceLine;
+		if (!hitTest || !(hitTest.view instanceof CustomPriceLinePaneView) || !customPriceLine) {
+			return null;
+		}
+		const options = customPriceLine.options();
 
-		for (const customPriceLine of this._getCustomPriceLines()) {
-			if (!customPriceLine) {
-				return null;
-			}
+		if (!options.order && !options.alert) {
+			return null;
+		}
 
-			const options = customPriceLine.options();
-			if (!options.order && !options.alert) {
-				return null;
-			}
-			const view = customPriceLine.priceAxisView();
-			const height = view.height(rendererOptions, false);
-			const fixedCoordinate = view.getFixedCoordinate();
+		const view = customPriceLine.priceAxisView();
+		const height = view.height(rendererOptions, false);
+		const fixedCoordinate = view.getFixedCoordinate();
 
-			const hitTest = this.hitTest(x, y);
-			if (!hitTest || !(hitTest.view instanceof CustomPriceLinePaneView)) {
-				return null;
-			}
-			if (width - (x + 2) > 16 + ADD_BUTTON_SIZE || width - (x + 2) < ADD_BUTTON_SIZE) {
-				return null;
-			}
-			if (fixedCoordinate - height / 2 <= y && y <= fixedCoordinate + height / 2) {
-				return customPriceLine;
-			}
+		if (width - (x + 2) > 16 + ADD_BUTTON_SIZE || width - (x + 2) < ADD_BUTTON_SIZE) {
+			return null;
+		}
+		if (fixedCoordinate - height / 2 <= y && y <= fixedCoordinate + height / 2) {
+			return customPriceLine;
 		}
 		return null;
 	}
@@ -574,37 +556,37 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _mouseHoveredCustomPriceLineDragHandle(y: Coordinate, x: Coordinate): CustomPriceLine | null {
 		const width = this._chart.model().getWidth();
 		const rendererOptions = this._chart.model().rendererOptionsProvider().options();
-
-		for (const customPriceLine of this._getCustomPriceLines(true)) {
-			if (!customPriceLine) {
-				return null;
-			}
-			const options = customPriceLine.options();
-			if (!options.draggable) {
-				return null;
-			}
-			const hitTest = this.hitTest(x, y);
-			const text = options.title;
-			const ctx = ensureNotNull(this._canvasBinding.canvasElement.getContext('2d'));
-			ctx.font = rendererOptions.font;
-			const textWidthCache = new TextWidthCache();
-			const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
-			const paddingInner = rendererOptions.paddingInner;
-			const paddingOuter = rendererOptions.paddingOuter;
-			const totalTextWidth = paddingInner + paddingOuter + textWidth;
-			if (!hitTest || !(hitTest.view instanceof CustomPriceLinePaneView)) {
-				return null;
-			}
-			const view = customPriceLine.priceAxisView();
-			const height = view.height(rendererOptions, false);
-			const fixedCoordinate = view.getFixedCoordinate();
-			const isYCorrect = (fixedCoordinate - height / 2 <= y && y <= fixedCoordinate + height / 2);
-			const isXCorrect = (width - ADD_BUTTON_SIZE - totalTextWidth - 30 <= x) && (width - ADD_BUTTON_SIZE - totalTextWidth - 18 > x);
-
-			if (isYCorrect && isXCorrect) {
-				return customPriceLine;
-			}
+		const hitTest = this.hitTest(x, y);
+		const customPriceLine = hitTest?.view?.priceLine;
+		if (!customPriceLine) {
+			return null;
 		}
+		const options = customPriceLine.options();
+		if (!options.draggable) {
+			return null;
+		}
+
+		const text = options.title;
+		const ctx = ensureNotNull(this._canvasBinding.canvasElement.getContext('2d'));
+		ctx.font = rendererOptions.font;
+		const textWidthCache = new TextWidthCache();
+		const textWidth = Math.ceil(textWidthCache.measureText(ctx, text));
+		const paddingInner = rendererOptions.paddingInner;
+		const paddingOuter = rendererOptions.paddingOuter;
+		const totalTextWidth = paddingInner + paddingOuter + textWidth;
+		if (!hitTest || !(hitTest.view instanceof CustomPriceLinePaneView)) {
+			return null;
+		}
+		const view = customPriceLine.priceAxisView();
+		const height = view.height(rendererOptions, false);
+		const fixedCoordinate = view.getFixedCoordinate();
+		const isYCorrect = (fixedCoordinate - height / 2 <= y && y <= fixedCoordinate + height / 2);
+		const isXCorrect = (width - ADD_BUTTON_SIZE - totalTextWidth - 30 <= x) && (width - ADD_BUTTON_SIZE - totalTextWidth - 18 > x);
+
+		if (isYCorrect && isXCorrect) {
+			return customPriceLine;
+		}
+
 		return null;
 	}
 

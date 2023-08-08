@@ -46,9 +46,9 @@ export interface IPriceAxisViewRenderer {
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
 		align: 'left' | 'right',
-        draggable?: boolean,
-        closeButton?: boolean,
-        iconColor?: string,
+  draggable?: boolean,
+  closeButton?: boolean,
+  iconColor?: string,
 	): void;
 
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine: boolean): number;

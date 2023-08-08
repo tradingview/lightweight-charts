@@ -86,7 +86,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		const geometry = target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 			const ctx = scope.context;
 			ctx.font = rendererOptions.font;
-			const geom = this._calculateGeometry(scope, rendererOptions, textWidthCache, align);
+			const geom = this._calculateGeometry(scope, rendererOptions, textWidthCache, align, closeButton);
 			const gb = geom.bitmap;
 
 			const drawLabelBody = (labelBackgroundColor: string, labelBorderColor?: string): void => {
@@ -166,7 +166,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			ctx.textBaseline = 'middle';
 			ctx.fillStyle = textColor;
 			const xOffset = this._data.moveTextToInvisibleTick && closeButton ? gm.xText - CLOSE_BUTTON_SIZE - ADD_BUTTON_SIZE : gm.xText;
-			ctx.fillText(this._data.text, xOffset, (gm.yTop + gm.yBottom) / 2 + gm.textMidCorrection);
+			ctx.fillText(this._data.text, xOffset, (gm.yTop + gm.yBottom) / 2 + gm.textMidCorrection - 1);
 		});
 	}
 
@@ -174,7 +174,8 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		scope: BitmapCoordinatesRenderingScope,
 		rendererOptions: PriceAxisViewRendererOptions,
 		textWidthCache: TextWidthCache,
-		align: 'left' | 'right'
+		align: 'left' | 'right',
+  closeButton: boolean
 	): Geometry {
 		const { context: ctx, bitmapSize, mediaSize, horizontalPixelRatio, verticalPixelRatio } = scope;
 		const tickSize = (this._data.tickVisible || !this._data.moveTextToInvisibleTick) ? rendererOptions.tickLength : 0;
@@ -191,7 +192,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 
 		const totalHeight = actualTextHeight + paddingTop + paddingBottom;
 
-		const totalWidth = rendererOptions.borderSize + paddingInner + paddingOuter + textWidth + tickSize + (this._data.moveTextToInvisibleTick ? CLOSE_BUTTON_SIZE : 0);
+		const totalWidth = rendererOptions.borderSize + paddingInner + paddingOuter + textWidth + tickSize + (closeButton ? CLOSE_BUTTON_SIZE : 0);
 
 		const tickHeightBitmap = Math.max(1, Math.floor(verticalPixelRatio));
 		let totalHeightBitmap = Math.round(totalHeight * verticalPixelRatio);

@@ -9,7 +9,7 @@ import { ensureDefined } from '../../src/helpers/assertions';
 import { PlotRowValueIndex } from '../../src/model/plot-data';
 import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
-import { SeriesType } from '../../src/model/series-options';
+import { SeriesOptionsMap, SeriesType } from '../../src/model/series-options';
 import { BusinessDay, Time, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
 
 chai.use(chaiExclude);
@@ -424,7 +424,7 @@ describe('DataLayer', () => {
 
 	it('should update removed series data gh#752', () => {
 		function generateData(): LineData[] {
-			const res = [];
+			const res: LineData[] = [];
 			const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
 
 			for (let i = 0; i < 10; ++i) {
@@ -557,7 +557,7 @@ describe('DataLayer', () => {
 		it('multiple series', () => {
 			const seriesCount = 5;
 			const dataLayer = new DataLayer();
-			const series = [];
+			const series: Series<keyof SeriesOptionsMap>[] = [];
 
 			for (let i = 0; i < seriesCount; i++) {
 				series[i] = createSeriesMock();
@@ -581,7 +581,7 @@ describe('DataLayer', () => {
 	describe('should be able to remove series and generate full update to other series if time scale is changed gh#355', () => {
 		const barsCount = 10;
 		function generateData(startTime: number, step: number): LineData[] {
-			const res = [];
+			const res: LineData[] = [];
 			let time = startTime;
 			for (let i = 0; i < barsCount; ++i) {
 				res.push(dataItemAt(time as UTCTimestamp));
