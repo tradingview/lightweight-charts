@@ -2,6 +2,9 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, {
 		handleScroll: false,
 		handleScale: false,
+		layout: {
+			fontSize: 24,
+		},
 		timeScale: {
 			tickMarkMaxCharacterLength: 'long prefix 0000-00-00'.length,
 			tickMarkFormatter: time => `long prefix ${time}`,

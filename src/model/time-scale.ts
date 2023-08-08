@@ -30,6 +30,8 @@ import {
 } from './time-data';
 import { TimeScaleVisibleRange } from './time-scale-visible-range';
 
+const defaultTickMarkMaxCharacterLength = 8;
+
 const enum Constants {
 	DefaultAnimationDuration = 400,
 	// make sure that this (1 / MinVisibleBarsCount) >= coeff in max bar spacing
@@ -204,6 +206,13 @@ export interface TimeScaleOptions {
 	 * @defaultValue `false`
 	 */
 	ticksVisible: boolean;
+
+	/**
+	 * Maximum tick mark label length. Used to override the default 8 character maximum length.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	tickMarkMaxCharacterLength?: number;
 }
 
 export class TimeScale {
@@ -234,7 +243,6 @@ export class TimeScale {
 	private _timeMarksCache: TimeMark[] | null = null;
 
 	private _labels: TimeMark[] = [];
-	private _labelLengthEstimate: number = 0;
 
 	public constructor(model: ChartModel, options: TimeScaleOptions, localizationOptions: LocalizationOptions) {
 		this._options = options;
@@ -244,7 +252,6 @@ export class TimeScale {
 		this._model = model;
 
 		this._updateDateTimeFormatter();
-		this._updateLabelLengthEstimate();
 	}
 
 	public options(): Readonly<TimeScaleOptions> {
@@ -256,7 +263,6 @@ export class TimeScale {
 
 		this._invalidateTickMarks();
 		this._updateDateTimeFormatter();
-		this._updateLabelLengthEstimate();
 	}
 
 	public applyOptions(options: DeepPartial<TimeScaleOptions>, localizationOptions?: DeepPartial<LocalizationOptions>): void {
@@ -288,8 +294,6 @@ export class TimeScale {
 
 		this._invalidateTickMarks();
 		this._updateDateTimeFormatter();
-		this._updateLabelLengthEstimate();
-
 		this._optionsApplied.fire();
 	}
 
@@ -489,7 +493,9 @@ export class TimeScale {
 		const spacing = this._barSpacing;
 		const fontSize = this._model.options().layout.fontSize;
 
-		const maxLabelWidth = Math.max((fontSize + 4) * 5, this._labelLengthEstimate * fontSize);
+		const pixelsPer8Characters = (fontSize + 4) * 5;
+		const pixelsPerCharacter = pixelsPer8Characters / defaultTickMarkMaxCharacterLength;
+		const maxLabelWidth = pixelsPerCharacter * (this._options.tickMarkMaxCharacterLength || defaultTickMarkMaxCharacterLength);
 		const indexPerLabel = Math.round(maxLabelWidth / spacing);
 
 		const visibleBars = ensureNotNull(this.visibleStrictRange());
@@ -996,24 +1002,6 @@ export class TimeScale {
 		this._correctOffset();
 
 		this._correctBarSpacing();
-	}
-
-	private _updateLabelLengthEstimate(): void {
-		const formatter = this._options.tickMarkFormatter;
-
-		if (formatter === undefined) {
-			this._labelLengthEstimate = 0;
-			return;
-		}
-
-		const formattedLabel = formatter(0 as UTCTimestamp, TickMarkType.TimeWithSeconds, this._localizationOptions.locale);
-
-		if (typeof formattedLabel !== 'string') {
-			this._labelLengthEstimate = 0;
-			return;
-		}
-
-		this._labelLengthEstimate = formattedLabel.length;
 	}
 }
 
