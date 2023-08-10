@@ -87,6 +87,12 @@ export interface PriceLineOptions {
 	 * @defaultValue `undefined`
 	 */
 	iconColor?: string;
+     /**
+	 * Custom price line label position
+	 *
+	 * @defaultValue `undefined`
+	 */
+	labelPosition?: 'left' | 'right';
 }
 
 /**

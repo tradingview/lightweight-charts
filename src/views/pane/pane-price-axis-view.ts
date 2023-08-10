@@ -53,6 +53,7 @@ export class PanePriceAxisView implements IPaneView {
 	private readonly _order: any;
 	private readonly _alert: any;
 	private readonly _draggable: boolean;
+	private readonly _labelPosition?: 'left' | 'right';
 	private readonly _iconColor?: string;
 	private _fontSize: number;
 
@@ -65,6 +66,7 @@ export class PanePriceAxisView implements IPaneView {
 		this._alert = options?.alert;
 		this._draggable = Boolean(options?.draggable);
 		this._iconColor = options?.iconColor;
+		this._labelPosition = options?.labelPosition;
 		this._fontSize = -1;
 		this._renderer = new PanePriceAxisViewRenderer(this._textWidthCache, this._draggable, Boolean(this._order || this._alert), this._iconColor);
 	}
@@ -77,6 +79,7 @@ export class PanePriceAxisView implements IPaneView {
 
 		// this price scale will be used to find label placement only (left, right, none)
 		const priceScale = pane.isOverlay(this._dataSource) ? pane.defaultVisiblePriceScale() : this._dataSource.priceScale();
+
 		if (priceScale === null) {
 			return null;
 		}
@@ -92,7 +95,7 @@ export class PanePriceAxisView implements IPaneView {
 			this._textWidthCache.reset();
 		}
 
-		this._renderer.setParams(this._priceAxisView.paneRenderer(), options, position);
+		this._renderer.setParams(this._priceAxisView.paneRenderer(), options, this._labelPosition || position);
 		return this._renderer;
 	}
 }
