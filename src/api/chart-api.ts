@@ -120,6 +120,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private readonly _seriesMapReversed: Map<Series<SeriesType>, SeriesApi<SeriesType, HorzScaleItem>> = new Map();
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
+	private readonly _dblClickedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi<HorzScaleItem>;
@@ -143,6 +144,14 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			},
 			this
 		);
+		this._chartWidget.dblClicked().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._dblClickedDelegate.hasListeners()) {
+					this._dblClickedDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+			this
+		);
 		this._chartWidget.crosshairMoved().subscribe(
 			(paramSupplier: MouseEventParamsImplSupplier) => {
 				if (this._crosshairMovedDelegate.hasListeners()) {
@@ -158,6 +167,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	public remove(): void {
 		this._chartWidget.clicked().unsubscribeAll(this);
+		this._chartWidget.dblClicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
 
 		this._timeScaleApi.destroy();
@@ -167,6 +177,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._seriesMapReversed.clear();
 
 		this._clickedDelegate.destroy();
+		this._dblClickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
 		this._dataLayer.destroy();
 	}
@@ -263,6 +274,14 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	public unsubscribeCrosshairMove(handler: MouseEventHandler<HorzScaleItem>): void {
 		this._crosshairMovedDelegate.unsubscribe(handler);
+	}
+
+	public subscribeDblClick(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._dblClickedDelegate.subscribe(handler);
+	}
+
+	public unsubscribeDblClick(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._dblClickedDelegate.unsubscribe(handler);
 	}
 
 	public priceScale(priceScaleId: string): IPriceScaleApi {
