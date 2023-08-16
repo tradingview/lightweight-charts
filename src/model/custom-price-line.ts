@@ -8,16 +8,17 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { Coordinate } from './coordinate';
 import { PriceLineOptions } from './price-line-options';
-import { Series } from './series';
+import { ISeries } from './series';
+import { SeriesType } from './series-options';
 
 export class CustomPriceLine {
-	private readonly _series: Series;
+	private readonly _series: ISeries<SeriesType>;
 	private readonly _priceLineView: CustomPriceLinePaneView;
 	private readonly _priceAxisView: CustomPriceLinePriceAxisView;
 	private readonly _panePriceAxisView: PanePriceAxisView;
 	private readonly _options: PriceLineOptions;
 
-	public constructor(series: Series, options: PriceLineOptions) {
+	public constructor(series: ISeries<SeriesType>, options: PriceLineOptions) {
 		this._series = series;
 		this._options = options;
 		this._priceLineView = new CustomPriceLinePaneView(series, this);

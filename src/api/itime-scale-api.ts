@@ -1,18 +1,13 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
-import { Logical, LogicalRange, Range, Time } from '../model/time-data';
-import { TimeScaleOptions } from '../model/time-scale';
-
-/**
- * Represents a {@link Time} range.
- */
-export type TimeRange = Range<Time>;
+import { Logical, LogicalRange, Range } from '../model/time-data';
+import { HorzScaleOptions } from '../model/time-scale';
 
 /**
  * A custom function used to handle changes to the time scale's time range.
  */
-export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
+export type TimeRangeChangeEventHandler<HorzScaleItem> = (timeRange: Range<HorzScaleItem> | null) => void;
 /**
  * A custom function used to handle changes to the time scale's logical range.
  */
@@ -23,7 +18,7 @@ export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null)
 export type SizeChangeEventHandler = (width: number, height: number) => void;
 
 /** Interface to chart time scale */
-export interface ITimeScaleApi {
+export interface ITimeScaleApi<HorzScaleItem> {
 	/**
 	 * Return the distance from the right edge of the time scale to the lastest bar of the series measured in bars.
 	 */
@@ -50,7 +45,7 @@ export interface ITimeScaleApi {
 	 *
 	 * @returns Visible range or null if the chart has no data at all.
 	 */
-	getVisibleRange(): TimeRange | null;
+	getVisibleRange(): Range<HorzScaleItem> | null;
 
 	/**
 	 * Sets visible range of data.
@@ -69,7 +64,7 @@ export interface ITimeScaleApi {
 	 * });
 	 * ```
 	 */
-	setVisibleRange(range: TimeRange): void;
+	setVisibleRange(range: Range<HorzScaleItem>): void;
 
 	/**
 	 * Returns the current visible [logical range](/time-scale.md#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data.
@@ -121,7 +116,7 @@ export interface ITimeScaleApi {
 	 * @param time - Time needs to be converted
 	 * @returns X coordinate of that time or `null` if no time found on time scale
 	 */
-	timeToCoordinate(time: Time): Coordinate | null;
+	timeToCoordinate(time: HorzScaleItem): Coordinate | null;
 
 	/**
 	 * Converts a coordinate to time.
@@ -129,7 +124,7 @@ export interface ITimeScaleApi {
 	 * @param x - Coordinate needs to be converted.
 	 * @returns Time of a bar that is located on that coordinate or `null` if there are no bars found on that coordinate.
 	 */
-	coordinateToTime(x: number): Time | null;
+	coordinateToTime(x: number): HorzScaleItem | null;
 
 	/**
 	 * Returns a width of the time scale.
@@ -160,7 +155,7 @@ export interface ITimeScaleApi {
 	 * chart.timeScale().subscribeVisibleTimeRangeChange(myVisibleTimeRangeChangeHandler);
 	 * ```
 	 */
-	subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
+	subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler<HorzScaleItem>): void;
 
 	/**
 	 * Unsubscribe a handler that was previously subscribed using {@link subscribeVisibleTimeRangeChange}.
@@ -171,7 +166,7 @@ export interface ITimeScaleApi {
 	 * chart.timeScale().unsubscribeVisibleTimeRangeChange(myVisibleTimeRangeChangeHandler);
 	 * ```
 	 */
-	unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void;
+	unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler<HorzScaleItem>): void;
 
 	/**
 	 * Subscribe to the visible logical range change events.
@@ -224,12 +219,12 @@ export interface ITimeScaleApi {
 	 *
 	 * @param options - Any subset of options.
 	 */
-	applyOptions(options: DeepPartial<TimeScaleOptions>): void;
+	applyOptions(options: DeepPartial<HorzScaleOptions>): void;
 
 	/**
 	 * Returns current options
 	 *
 	 * @returns Currently applied options
 	 */
-	options(): Readonly<TimeScaleOptions>;
+	options(): Readonly<HorzScaleOptions>;
 }

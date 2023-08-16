@@ -14,7 +14,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 
-import { ChartModel, TrackingModeExitMode } from '../model/chart-model';
+import { IChartModelBase, TrackingModeExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -27,7 +27,7 @@ import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas } from './canvas-utils';
-import { ChartWidget } from './chart-widget';
+import { IChartWidgetBase } from './chart-widget';
 import { drawBackground, drawForeground, DrawFunction, drawSourcePaneViews } from './draw-functions';
 import { IPaneViewsGetter } from './ipane-view-getter';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
@@ -61,7 +61,7 @@ interface StartScrollPosition extends Point {
 }
 
 export class PaneWidget implements IDestroyable, MouseEventHandlers {
-	private readonly _chart: ChartWidget;
+	private readonly _chart: IChartWidgetBase;
 	private _state: Pane | null;
 	private _size: Size = size({ width: 0, height: 0 });
 	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
@@ -87,7 +87,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _isSettingSize: boolean = false;
 
-	public constructor(chart: ChartWidget, state: Pane) {
+	public constructor(chart: IChartWidgetBase, state: Pane) {
 		this._chart = chart;
 
 		this._state = state;
@@ -182,7 +182,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this.updatePriceAxisWidgetsStates();
 	}
 
-	public chart(): ChartWidget {
+	public chart(): IChartWidgetBase {
 		return this._chart;
 	}
 
@@ -654,7 +654,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
 	}
 
-	private _model(): ChartModel {
+	private _model(): IChartModelBase {
 		return this._chart.model();
 	}
 

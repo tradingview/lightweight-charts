@@ -8,6 +8,9 @@ import { PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from './iseries-p
 import { Pane } from './pane';
 import { PriceScale } from './price-scale';
 
+export interface ZOrdered {
+	zorder(): number | null;
+}
 /**
  * Prefix meanings:
  * - bottom: Pane views that are painted at the bottom (above background color, below grid lines)
@@ -32,8 +35,7 @@ interface IDataSourcePaneViews extends IPluginPaneViews {
 
 export type DataSourcePaneViewGetterNames = keyof IDataSourcePaneViews;
 
-export interface IDataSource extends IDataSourcePaneViews {
-	zorder(): number | null;
+export interface IDataSource extends IDataSourcePaneViews, ZOrdered {
 	setZorder(value: number): void;
 	priceScale(): PriceScale | null;
 	setPriceScale(scale: PriceScale | null): void;
@@ -41,6 +43,13 @@ export interface IDataSource extends IDataSourcePaneViews {
 	updateAllViews(): void;
 
 	priceAxisViews(pane?: Pane, priceScale?: PriceScale): readonly IPriceAxisView[];
+	paneViews(pane: Pane): readonly IPaneView[];
+	labelPaneViews(pane?: Pane): readonly IPaneView[];
+
+	/**
+	 * Pane views that are painted on the most top layer
+	 */
+	topPaneViews?(pane: Pane): readonly IPaneView[];
 	timeAxisViews(): readonly ITimeAxisView[];
 
 	visible(): boolean;

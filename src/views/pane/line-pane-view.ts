@@ -1,5 +1,5 @@
 import { BarPrice } from '../../model/bar';
-import { SeriesBarColorer } from '../../model/series-bar-colorer';
+import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { LineStrokeItem, PaneRendererLine, PaneRendererLineData } from '../../renderers/line-renderer';
 
@@ -8,7 +8,7 @@ import { LinePaneViewBase } from './line-pane-view-base';
 export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineStrokeItem, PaneRendererLine> {
 	protected readonly _renderer: PaneRendererLine = new PaneRendererLine();
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Line'>): LineStrokeItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: ISeriesBarColorer<'Line'>): LineStrokeItem {
 		return {
 			...this._createRawItemBase(time, price),
 			...colorer.barStyle(time),

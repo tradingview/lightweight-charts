@@ -1,4 +1,4 @@
-import { IChartApi } from '../../../../src/api/ichart-api';
+import { IChartApi } from '../../../../src/api/create-chart';
 
 export interface TestCaseWindow extends Window {
 	testCaseReady: void | Promise<void>;

@@ -1,6 +1,6 @@
 import { makeFont } from '../helpers/make-font';
 
-import { ChartModel } from '../model/chart-model';
+import { IChartModelBase } from '../model/chart-model';
 
 import { PriceAxisViewRendererOptions } from './iprice-axis-view-renderer';
 
@@ -10,7 +10,7 @@ const enum RendererConstants {
 }
 
 export class PriceAxisRendererOptionsProvider {
-	private readonly _chartModel: ChartModel;
+	private readonly _chartModel: IChartModelBase;
 
 	private readonly _rendererOptions: PriceAxisViewRendererOptions = {
 		borderSize: RendererConstants.BorderSize,
@@ -27,7 +27,7 @@ export class PriceAxisRendererOptionsProvider {
 		baselineOffset: 0,
 	};
 
-	public constructor(chartModel: ChartModel) {
+	public constructor(chartModel: IChartModelBase) {
 		this._chartModel = chartModel;
 	}
 

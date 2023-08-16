@@ -1,8 +1,8 @@
 import { createChart, customSeriesDefaultOptions } from '../../src';
-import { CandlestickData, WhitespaceData } from '../../src/api/data-consumer';
+import { CandlestickData, WhitespaceData } from '../../src/model/data-consumer';
+import { Time } from '../../src/model/horz-scale-behavior-time/types';
 import { CustomData, CustomSeriesPricePlotValues, ICustomSeriesPaneRenderer, ICustomSeriesPaneView, PaneRendererCustomData } from '../../src/model/icustom-series';
 import { CustomSeriesOptions } from '../../src/model/series-options';
-import { Time } from '../../src/model/time-data';
 
 interface WhiskerBoxSeriesOptions extends CustomSeriesOptions {
 	whiskerColor: string;
@@ -31,7 +31,7 @@ interface WhiskerData extends CustomData {
 }
 
 class WhiskerBoxSeries<TData extends WhiskerData>
-	implements ICustomSeriesPaneView<TData, WhiskerBoxSeriesOptions> {
+	implements ICustomSeriesPaneView<Time, TData, WhiskerBoxSeriesOptions> {
 	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
 		return [];
 	}
@@ -46,7 +46,7 @@ class WhiskerBoxSeries<TData extends WhiskerData>
 	}
 
 	public update(
-		data: PaneRendererCustomData<TData>,
+		data: PaneRendererCustomData<Time, TData>,
 		options: WhiskerBoxSeriesOptions
 	): void {}
 

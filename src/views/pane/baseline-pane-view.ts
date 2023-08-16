@@ -1,7 +1,7 @@
 import { BarPrice } from '../../model/bar';
-import { ChartModel } from '../../model/chart-model';
-import { Series } from '../../model/series';
-import { SeriesBarColorer } from '../../model/series-bar-colorer';
+import { IChartModelBase } from '../../model/chart-model';
+import { ISeries } from '../../model/series';
+import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { BaselineFillItem, PaneRendererBaselineArea } from '../../renderers/baseline-renderer-area';
 import { BaselineStrokeItem, PaneRendererBaselineLine } from '../../renderers/baseline-renderer-line';
@@ -14,12 +14,12 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 	private readonly _baselineAreaRenderer: PaneRendererBaselineArea = new PaneRendererBaselineArea();
 	private readonly _baselineLineRenderer: PaneRendererBaselineLine = new PaneRendererBaselineLine();
 
-	public constructor(series: Series<'Baseline'>, model: ChartModel) {
+	public constructor(series: ISeries<'Baseline'>, model: IChartModelBase) {
 		super(series, model);
 		this._renderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
 	}
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: ISeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
 		return {
 			...this._createRawItemBase(time, price),
 			...colorer.barStyle(time),

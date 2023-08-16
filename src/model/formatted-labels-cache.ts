@@ -1,5 +1,6 @@
 import { ensureDefined } from '../helpers/assertions';
 
+import { IHorzScaleBehavior } from './ihorz-scale-behavior';
 import { TickMark } from './tick-marks';
 
 interface CachedTick {
@@ -9,7 +10,7 @@ interface CachedTick {
 
 export type FormatFunction = (tickMark: TickMark) => string;
 
-export class FormattedLabelsCache {
+export class FormattedLabelsCache<HorzScaleItem> {
 	private readonly _format: FormatFunction;
 	private readonly _maxSize: number;
 	private _actualSize: number = 0;
@@ -18,16 +19,18 @@ export class FormattedLabelsCache {
 	private _cache: Map<number, CachedTick> = new Map();
 	private _tick2Labels: Map<number, number> = new Map();
 
-	public constructor(format: FormatFunction, size: number = 50) {
+	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
+
+	public constructor(format: FormatFunction, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, size: number = 50) {
 		this._format = format;
+		this._horzScaleBehavior = horzScaleBehavior;
 		this._maxSize = size;
 	}
 
 	public format(tickMark: TickMark): string {
 		const time = tickMark.time;
-		const cacheKey = time.businessDay === undefined
-			? new Date(time.timestamp * 1000).getTime()
-			: new Date(Date.UTC(time.businessDay.year, time.businessDay.month - 1, time.businessDay.day)).getTime();
+
+		const cacheKey = this._horzScaleBehavior.cacheKey(time);
 
 		const tick = this._cache.get(cacheKey);
 		if (tick !== undefined) {
