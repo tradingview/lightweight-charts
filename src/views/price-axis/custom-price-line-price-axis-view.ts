@@ -1,7 +1,8 @@
 import { generateContrastColors } from '../../helpers/color';
 
 import { CustomPriceLine } from '../../model/custom-price-line';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/series';
+import { SeriesType } from '../../model/series-options';
 import {
 	PriceAxisViewRendererCommonData,
 	PriceAxisViewRendererData,
@@ -10,10 +11,10 @@ import {
 import { PriceAxisView } from './price-axis-view';
 
 export class CustomPriceLinePriceAxisView extends PriceAxisView {
-	private readonly _series: Series;
+	private readonly _series: ISeries<SeriesType>;
 	private readonly _priceLine: CustomPriceLine;
 
-	public constructor(series: Series, priceLine: CustomPriceLine) {
+	public constructor(series: ISeries<SeriesType>, priceLine: CustomPriceLine) {
 		super();
 		this._series = series;
 		this._priceLine = priceLine;

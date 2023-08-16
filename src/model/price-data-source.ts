@@ -1,20 +1,20 @@
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 
 import { AutoscaleInfoImpl } from './autoscale-info-impl';
-import { ChartModel } from './chart-model';
+import { IChartModelBase } from './chart-model';
 import { DataSource } from './data-source';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { TimePointIndex } from './time-data';
 
 export abstract class PriceDataSource extends DataSource implements IPriceDataSource {
-	private readonly _model: ChartModel;
+	private readonly _model: IChartModelBase;
 
-	public constructor(model: ChartModel) {
+	public constructor(model: IChartModelBase) {
 		super();
 		this._model = model;
 	}
 
-	public model(): ChartModel {
+	public model(): IChartModelBase {
 		return this._model;
 	}
 

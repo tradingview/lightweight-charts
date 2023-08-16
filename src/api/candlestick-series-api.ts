@@ -5,7 +5,7 @@ import {
 
 import { SeriesApi } from './series-api';
 
-export class CandlestickSeriesApi extends SeriesApi<'Candlestick'> {
+export class CandlestickSeriesApi<HorzScaleItem> extends SeriesApi<'Candlestick', HorzScaleItem> {
 	public override applyOptions(options: CandlestickSeriesPartialOptions): void {
 		fillUpDownCandlesticksColors(options);
 		super.applyOptions(options);

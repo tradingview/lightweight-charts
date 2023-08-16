@@ -5,40 +5,43 @@ import { TimeAxisWidget } from '../gui/time-axis-widget';
 import { assert } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
-import { DeepPartial } from '../helpers/strict-type-checks';
+import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { Logical, LogicalRange, Range, Time, TimePointIndex, TimePointsRange } from '../model/time-data';
-import { TimeScale, TimeScaleOptions } from '../model/time-scale';
+import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
+import { Logical, LogicalRange, Range, TimePointIndex } from '../model/time-data';
+import { HorzScaleOptions, TimeScale } from '../model/time-scale';
 
-import { convertTime } from './data-layer';
 import {
 	ITimeScaleApi,
 	LogicalRangeChangeEventHandler,
 	SizeChangeEventHandler,
-	TimeRange,
 	TimeRangeChangeEventHandler,
 } from './itime-scale-api';
 const enum Constants {
 	AnimationDurationMs = 1000,
 }
 
-export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
-	private _model: ChartModel;
-	private _timeScale: TimeScale;
-	private readonly _timeAxisWidget: TimeAxisWidget;
-	private readonly _timeRangeChanged: Delegate<TimeRange | null> = new Delegate();
+export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>, IDestroyable {
+	private _model: ChartModel<HorzScaleItem>;
+	private _timeScale: TimeScale<HorzScaleItem>;
+	private readonly _timeAxisWidget: TimeAxisWidget<HorzScaleItem>;
+	private readonly _timeRangeChanged: Delegate<Range<HorzScaleItem> | null> = new Delegate();
 	private readonly _logicalRangeChanged: Delegate<LogicalRange | null> = new Delegate();
 	private readonly _sizeChanged: Delegate<number, number> = new Delegate();
 
-	public constructor(model: ChartModel, timeAxisWidget: TimeAxisWidget) {
+	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
+
+	public constructor(model: ChartModel<HorzScaleItem>, timeAxisWidget: TimeAxisWidget<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._model = model;
 		this._timeScale = model.timeScale();
 		this._timeAxisWidget = timeAxisWidget;
 		this._timeScale.visibleBarsChanged().subscribe(this._onVisibleBarsChanged.bind(this));
 		this._timeScale.logicalRangeChanged().subscribe(this._onVisibleLogicalRangeChanged.bind(this));
 		this._timeAxisWidget.sizeChanged().subscribe(this._onSizeChanged.bind(this));
+
+		this._horzScaleBehavior = horzScaleBehavior;
 	}
 
 	public destroy(): void {
@@ -67,7 +70,7 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._timeScale.scrollToRealTime();
 	}
 
-	public getVisibleRange(): TimeRange | null {
+	public getVisibleRange(): Range<HorzScaleItem> | null {
 		const timeRange = this._timeScale.visibleTimeRange();
 
 		if (timeRange === null) {
@@ -75,15 +78,15 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		}
 
 		return {
-			from: timeRange.from.businessDay ?? timeRange.from.timestamp,
-			to: timeRange.to.businessDay ?? timeRange.to.timestamp,
+			from: timeRange.from.originalTime as HorzScaleItem,
+			to: timeRange.to.originalTime as HorzScaleItem,
 		};
 	}
 
-	public setVisibleRange(range: TimeRange): void {
-		const convertedRange: TimePointsRange = {
-			from: convertTime(range.from),
-			to: convertTime(range.to),
+	public setVisibleRange(range: Range<HorzScaleItem>): void {
+		const convertedRange: Range<InternalHorzScaleItem> = {
+			from: this._horzScaleBehavior.convertHorzItemToInternal(range.from),
+			to: this._horzScaleBehavior.convertHorzItemToInternal(range.to),
 		};
 		const logicalRange = this._timeScale.logicalRangeForTimeRange(convertedRange);
 
@@ -133,8 +136,8 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		}
 	}
 
-	public timeToCoordinate(time: Time): Coordinate | null {
-		const timePoint = convertTime(time);
+	public timeToCoordinate(time: HorzScaleItem): Coordinate | null {
+		const timePoint = this._horzScaleBehavior.convertHorzItemToInternal(time);
 		const timePointIndex = this._timeScale.timeToIndex(timePoint, false);
 		if (timePointIndex === null) {
 			return null;
@@ -143,15 +146,15 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		return this._timeScale.indexToCoordinate(timePointIndex);
 	}
 
-	public coordinateToTime(x: number): Time | null {
+	public coordinateToTime(x: number): HorzScaleItem | null {
 		const timeScale = this._model.timeScale();
 		const timePointIndex = timeScale.coordinateToIndex(x as Coordinate);
-		const timePoint = timeScale.indexToTime(timePointIndex);
+		const timePoint = timeScale.indexToTimeScalePoint(timePointIndex);
 		if (timePoint === null) {
 			return null;
 		}
 
-		return timePoint.businessDay ?? timePoint.timestamp;
+		return timePoint.originalTime as HorzScaleItem;
 	}
 
 	public width(): number {
@@ -162,11 +165,11 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		return this._timeAxisWidget.getSize().height;
 	}
 
-	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
+	public subscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler<HorzScaleItem>): void {
 		this._timeRangeChanged.subscribe(handler);
 	}
 
-	public unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler): void {
+	public unsubscribeVisibleTimeRangeChange(handler: TimeRangeChangeEventHandler<HorzScaleItem>): void {
 		this._timeRangeChanged.unsubscribe(handler);
 	}
 
@@ -186,13 +189,13 @@ export class TimeScaleApi implements ITimeScaleApi, IDestroyable {
 		this._sizeChanged.unsubscribe(handler);
 	}
 
-	public applyOptions(options: DeepPartial<TimeScaleOptions>): void {
+	public applyOptions(options: DeepPartial<HorzScaleOptions>): void {
 		this._timeScale.applyOptions(options);
 	}
 
-	public options(): Readonly<TimeScaleOptions> {
+	public options(): Readonly<HorzScaleOptions> {
 		return {
-			...this._timeScale.options(),
+			...clone(this._timeScale.options()),
 			barSpacing: this._timeScale.barSpacing(),
 		};
 	}

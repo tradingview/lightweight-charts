@@ -1,17 +1,18 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
 import { Coordinate } from './coordinate';
+import { Time } from './horz-scale-behavior-time/types';
 import { CustomSeriesOptions } from './series-options';
-import { Range, Time } from './time-data';
+import { Range } from './time-data';
 
 /**
  * Represents a whitespace data item, which is a data point without a value.
  */
-export interface CustomSeriesWhitespaceData {
+export interface CustomSeriesWhitespaceData<HorzScaleItem> {
 	/**
 	 * The time of the data.
 	 */
-	time: Time;
+	time: HorzScaleItem;
 
 	/**
 	 * Additional custom values which will be ignored by the library, but
@@ -27,7 +28,7 @@ export interface CustomSeriesWhitespaceData {
  * within the interface. It is recommended that you extend this interface with
  * the required data structure.
  */
-export interface CustomData extends CustomSeriesWhitespaceData {
+export interface CustomData<HorzScaleItem = Time> extends CustomSeriesWhitespaceData<HorzScaleItem> {
 	/**
 	 * If defined then this color will be used for the price line and price scale line
 	 * for this specific data item of the custom series.
@@ -35,13 +36,14 @@ export interface CustomData extends CustomSeriesWhitespaceData {
 	color?: string;
 }
 
-export type WhitespaceCheck<TData extends CustomData = CustomData> = (bar: TData | CustomSeriesWhitespaceData) => bar is CustomSeriesWhitespaceData;
+export type WhitespaceCheck<HorzScaleItem, TData extends CustomData<HorzScaleItem> = CustomData<HorzScaleItem>> = (bar: TData | CustomSeriesWhitespaceData<HorzScaleItem>) => bar is CustomSeriesWhitespaceData<HorzScaleItem>;
 
 /**
  * Renderer data for an item within the custom series.
  */
 export interface CustomBarItemData<
-	TData extends CustomData = CustomData
+	HorzScaleItem,
+	TData extends CustomData<HorzScaleItem> = CustomData<HorzScaleItem>
 > {
 	/**
 	 * Horizontal coordinate for the item. Measured from the left edge of the pane in pixels.
@@ -66,12 +68,13 @@ export interface CustomBarItemData<
  * for drawing the series data.
  */
 export interface PaneRendererCustomData<
-	TData extends CustomData
+	HorzScaleItem,
+	TData extends CustomData<HorzScaleItem>
 > {
 	/**
 	 * List of all the series' items and their x coordinates.
 	 */
-	bars: readonly CustomBarItemData<TData>[];
+	bars: readonly CustomBarItemData<HorzScaleItem, TData>[];
 	/**
 	 * Spacing between consecutive bars.
 	 */
@@ -126,7 +129,8 @@ export type CustomSeriesPricePlotValues = number[];
  * This interface represents the view for the custom series
  */
 export interface ICustomSeriesPaneView<
-	TData extends CustomData = CustomData,
+	HorzScaleItem = Time,
+	TData extends CustomData<HorzScaleItem> = CustomData<HorzScaleItem>,
 	TSeriesOptions extends CustomSeriesOptions = CustomSeriesOptions
 > {
 	/**
@@ -142,7 +146,7 @@ export interface ICustomSeriesPaneView<
 	 * during the next paint.
 	 */
 	update(
-		data: PaneRendererCustomData<TData>,
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		seriesOptions: TSeriesOptions
 	): void;
 
@@ -161,7 +165,7 @@ export interface ICustomSeriesPaneView<
 	 *
 	 * @param data - data point to be tested
 	 */
-	isWhitespace(data: TData | CustomSeriesWhitespaceData): data is CustomSeriesWhitespaceData;
+	isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem>;
 
 	/**
 	 * Default options

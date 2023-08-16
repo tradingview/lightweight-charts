@@ -1,5 +1,19 @@
+function reorderField(obj) {
+	const keys = Object.keys(obj);
+	keys.sort();
+	const res = {};
+	for (const key of keys) {
+		res[key] = obj[key];
+	}
+	return res;
+}
+
+function reorderFieldInArray(arr) {
+	return arr.map(reorderField);
+}
+
 function compare(markers, seriesApiMarkers) {
-	return JSON.stringify(markers) === JSON.stringify(seriesApiMarkers);
+	return JSON.stringify(reorderFieldInArray(markers)) === JSON.stringify(reorderFieldInArray(seriesApiMarkers));
 }
 
 function runTestCase(container) {
@@ -34,5 +48,5 @@ function runTestCase(container) {
 		},
 	});
 
-	console.assert(compare(markers, seriesApiMarkers), `series.markers() should return exactly the same that was provided to series.setMarkers()\n${JSON.stringify(seriesApiMarkers)}`);
+	console.assert(compare(markers, seriesApiMarkers), `series.markers() should return exactly the same that was provided to series.setMarkers()\n${JSON.stringify(seriesApiMarkers)}\n${JSON.stringify(markers)}`);
 }

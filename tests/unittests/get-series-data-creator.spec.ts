@@ -2,15 +2,17 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { getSeriesDataCreator } from '../../src/api/get-series-data-creator';
+import { UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
+import { InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { PlotRow } from '../../src/model/plot-data';
 import { AreaPlotRow, BarPlotRow, BaselinePlotRow, CandlestickPlotRow, HistogramPlotRow, LinePlotRow } from '../../src/model/series-data';
-import { OriginalTime, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
+import { TimePointIndex } from '../../src/model/time-data';
 
 const plotRow: PlotRow = {
 	index: 0 as TimePointIndex,
-	time: { timestamp: 1649931070 as UTCTimestamp },
+	time: { timestamp: 1649931070 as UTCTimestamp } as unknown as InternalHorzScaleItem,
 	value: [1, 2, 3, 4],
-	originalTime: 1649931070 as unknown as OriginalTime,
+	originalTime: 1649931070 as UTCTimestamp,
 };
 
 const linePlotRows: LinePlotRow[] = [

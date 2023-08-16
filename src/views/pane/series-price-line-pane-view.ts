@@ -1,11 +1,11 @@
-import { Series } from '../../model/series';
-import { PriceLineSource } from '../../model/series-options';
+import { ISeries } from '../../model/series';
+import { PriceLineSource, SeriesType } from '../../model/series-options';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';
 
 export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 	// eslint-disable-next-line no-useless-constructor
-	public constructor(series: Series) {
+	public constructor(series: ISeries<SeriesType>) {
 		super(series);
 	}
 
