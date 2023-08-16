@@ -26,6 +26,8 @@ import {
 } from './time-data';
 import { TimeScaleVisibleRange } from './time-scale-visible-range';
 
+const defaultTickMarkMaxCharacterLength = 8;
+
 const enum Constants {
 	DefaultAnimationDuration = 400,
 	// make sure that this (1 / MinVisibleBarsCount) >= coeff in max bar spacing
@@ -160,8 +162,14 @@ export interface HorzScaleOptions {
 	ticksVisible: boolean;
 
 	/**
-	 * Chanes horizontal scale makes generation
-	 * With this flag equal to true, marks of the wame weight are drawn all or not drawn at all
+	 * Maximum tick mark label length. Used to override the default 8 character maximum length.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	tickMarkMaxCharacterLength?: number;
+	/**
+	 * Changes horizontal scale marks generation.
+	 * With this flag equal to `true`, marks of the same weight are either all drawn or none are drawn at all.
 	 */
 	uniformDistribution: boolean;
 }
@@ -270,7 +278,6 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 
 		this._invalidateTickMarks();
 		this._updateDateTimeFormatter();
-
 		this._optionsApplied.fire();
 	}
 
@@ -470,7 +477,9 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		const spacing = this._barSpacing;
 		const fontSize = this._model.options().layout.fontSize;
 
-		const maxLabelWidth = (fontSize + 4) * 5;
+		const pixelsPer8Characters = (fontSize + 4) * 5;
+		const pixelsPerCharacter = pixelsPer8Characters / defaultTickMarkMaxCharacterLength;
+		const maxLabelWidth = pixelsPerCharacter * (this._options.tickMarkMaxCharacterLength || defaultTickMarkMaxCharacterLength);
 		const indexPerLabel = Math.round(maxLabelWidth / spacing);
 
 		const visibleBars = ensureNotNull(this.visibleStrictRange());
