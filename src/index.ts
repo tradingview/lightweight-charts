@@ -10,20 +10,16 @@ export { CrosshairMode } from './model/crosshair';
 export { MismatchDirection } from './model/plot-list';
 export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource, LastPriceAnimationMode } from './model/series-options';
-export { TickMarkType } from './model/time-scale';
 export { ColorType } from './model/layout-options';
 
-export {
-	isBusinessDay,
-	isUTCTimestamp,
-} from './api/data-consumer';
-
+export { isBusinessDay, isUTCTimestamp } from './model/horz-scale-behavior-time/types';
+export { TickMarkType } from './model/horz-scale-behavior-time/types';
 export const customSeriesDefaultOptions: CustomSeriesOptions = {
 	...seriesOptionsDefaults,
 	...customStyleDefaults,
 };
 
-export { createChart } from './api/create-chart';
+export { createChart, createChartEx } from './api/create-chart';
 
 /**
  * Returns the current version as a string. For example `'3.3.0'`.

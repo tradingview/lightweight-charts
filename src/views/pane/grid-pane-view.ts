@@ -1,4 +1,5 @@
 import { Pane } from '../../model/pane';
+import { TimeMark } from '../../model/time-scale';
 import { GridRenderer, GridRendererData } from '../../renderers/grid-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
@@ -29,7 +30,11 @@ export class GridPaneView implements IUpdatablePaneView {
 				horzLineStyle: gridOptions.horzLines.style,
 				vertLineStyle: gridOptions.vertLines.style,
 				priceMarks: this._pane.defaultPriceScale().marks(),
-				timeMarks: this._pane.model().timeScale().marks() || [],
+				// need this conversiom because TimeMark is a part of external interface
+				// and fields inside TimeMark are not minified
+				timeMarks: (this._pane.model().timeScale().marks() || []).map((tm: TimeMark) => {
+					return { coord: tm.coord };
+				}),
 			};
 
 			this._renderer.setData(data);

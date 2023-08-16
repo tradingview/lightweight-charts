@@ -1,15 +1,15 @@
 import { generateContrastColors } from '../../helpers/color';
 
-import { LastValueDataResultWithData, Series } from '../../model/series';
-import { PriceAxisLastValueMode } from '../../model/series-options';
+import { ISeries, LastValueDataResultWithData } from '../../model/series';
+import { PriceAxisLastValueMode, SeriesType } from '../../model/series-options';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
 
 import { PriceAxisView } from './price-axis-view';
 
 export class SeriesPriceAxisView extends PriceAxisView {
-	private readonly _source: Series;
+	private readonly _source: ISeries<SeriesType>;
 
-	public constructor(source: Series) {
+	public constructor(source: ISeries<SeriesType>) {
 		super();
 		this._source = source;
 	}

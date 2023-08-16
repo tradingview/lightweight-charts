@@ -2,16 +2,18 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { ensureNotNull } from '../../src/helpers/assertions';
+import { TimePoint, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
+import { InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { PlotRow, PlotRowValue, PlotRowValueIndex } from '../../src/model/plot-data';
 import { MismatchDirection, PlotList } from '../../src/model/plot-list';
-import { OriginalTime, TimePoint, TimePointIndex, UTCTimestamp } from '../../src/model/time-data';
+import { TimePointIndex } from '../../src/model/time-data';
 
 function timePoint(val: number): TimePoint {
 	return { timestamp: val as UTCTimestamp };
 }
 
 function plotRow(index: TimePointIndex, time: TimePoint, value: PlotRowValue): PlotRow {
-	return { index, time, value, originalTime: time as unknown as OriginalTime };
+	return { index, time: time as unknown as InternalHorzScaleItem, value, originalTime: time };
 }
 
 describe('PlotList', () => {

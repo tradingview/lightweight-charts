@@ -2,7 +2,7 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
 import { undefinedIfNull } from '../../helpers/strict-type-checks';
 
-import { ChartModel } from '../../model/chart-model';
+import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import {
 	CustomBarItemData,
@@ -17,7 +17,7 @@ import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
 import { SeriesPlotRow } from '../../model/series-data';
 import { TimedValue } from '../../model/time-data';
-import { TimeScale } from '../../model/time-scale';
+import { ITimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
@@ -55,12 +55,12 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 	CustomSeriesPaneRendererWrapper
 > {
 	protected readonly _renderer: CustomSeriesPaneRendererWrapper;
-	private readonly _paneView: ICustomSeriesPaneView;
+	private readonly _paneView: ICustomSeriesPaneView<unknown>;
 
 	public constructor(
 		series: Series<'Custom'>,
-		model: ChartModel,
-		paneView: ICustomSeriesPaneView
+		model: IChartModelBase,
+		paneView: ICustomSeriesPaneView<unknown>
 	) {
 		super(series, model, false);
 		this._paneView = paneView;
@@ -76,11 +76,11 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 		);
 	}
 
-	public priceValueBuilder(plotRow: CustomData | CustomSeriesWhitespaceData): CustomSeriesPricePlotValues {
+	public priceValueBuilder(plotRow: CustomData<unknown> | CustomSeriesWhitespaceData<unknown>): CustomSeriesPricePlotValues {
 		return this._paneView.priceValueBuilder(plotRow);
 	}
 
-	public isWhitespace(data: CustomData | CustomSeriesWhitespaceData): data is CustomSeriesWhitespaceData {
+	public isWhitespace(data: CustomData<unknown> | CustomSeriesWhitespaceData<unknown>): data is CustomSeriesWhitespaceData<unknown> {
 		return this._paneView.isWhitespace(data);
 	}
 
@@ -101,7 +101,7 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 
 	protected override _convertToCoordinates(
 		priceScale: PriceScale,
-		timeScale: TimeScale
+		timeScale: ITimeScale
 	): void {
 		timeScale.indexesToCoordinates(
 			this._items,
@@ -112,7 +112,7 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 	protected _prepareRendererData(): void {
 		this._paneView.update(
 			{
-				bars: this._items.map(unwrapItemData) as CustomBarItemData[],
+				bars: this._items.map(unwrapItemData) as CustomBarItemData<unknown>[],
 				barSpacing: this._model.timeScale().barSpacing(),
 				visibleRange: this._itemsVisibleRange,
 			},

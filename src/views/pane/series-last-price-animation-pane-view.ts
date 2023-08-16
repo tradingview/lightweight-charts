@@ -2,7 +2,7 @@ import { assert } from '../../helpers/assertions';
 import { applyAlpha } from '../../helpers/color';
 
 import { Point } from '../../model/point';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/series';
 import { LastPriceAnimationMode } from '../../model/series-options';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-price-animation-renderer';
@@ -120,7 +120,7 @@ function animationData(durationSinceStart: number, lineColor: string): Animation
 }
 
 export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
-	private readonly _series: Series<'Area'> | Series<'Line'> | Series<'Baseline'>;
+	private readonly _series: ISeries<'Area'> | ISeries<'Line'> | ISeries<'Baseline'>;
 	private readonly _renderer: SeriesLastPriceAnimationRenderer = new SeriesLastPriceAnimationRenderer();
 	private _invalidated: boolean = true;
 	private _stageInvalidated: boolean = true;
@@ -128,7 +128,7 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 	private _startTime: number = performance.now();
 	private _endTime: number = this._startTime - 1;
 
-	public constructor(series: Series<'Area'> | Series<'Line'> | Series<'Baseline'>) {
+	public constructor(series: ISeries<'Area'> | ISeries<'Line'> | ISeries<'Baseline'>) {
 		this._series = series;
 	}
 

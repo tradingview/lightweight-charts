@@ -15,18 +15,19 @@ import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
 import { ICustomSeriesPaneView } from './icustom-series';
+import { IHorzScaleBehavior } from './ihorz-scale-behavior';
 import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
-import { LocalizationOptions } from './localization-options';
+import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
-import { Series, SeriesOptionsInternal } from './series';
+import { ISeries, Series, SeriesOptionsInternal } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
-import { TimeScale, TimeScaleOptions } from './time-scale';
+import { HorzScaleOptions, ITimeScale, TimeScale } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
 import { Watermark, WatermarkOptions } from './watermark';
 
@@ -231,9 +232,9 @@ export interface TrackingModeOptions {
 }
 
 /**
- * Structure describing options of the chart. Series options are to be set separately
+ * Represents common chart options
  */
-export interface ChartOptions {
+export interface ChartOptionsBase {
 	/**
 	 * Width of the chart in pixels
 	 *
@@ -297,7 +298,7 @@ export interface ChartOptions {
 	/**
 	 * Time scale options
 	 */
-	timeScale: TimeScaleOptions;
+	timeScale: HorzScaleOptions;
 
 	/**
 	 * The crosshair shows the intersection of the price and time scale values at any point on the chart.
@@ -309,11 +310,6 @@ export interface ChartOptions {
 	 * A grid is represented in the chart background as a vertical and horizontal lines drawn at the levels of visible marks of price and the time scales.
 	 */
 	grid: GridOptions;
-
-	/**
-	 * Localization options.
-	 */
-	localization: LocalizationOptions;
 
 	/**
 	 * Scroll options, or a boolean flag that enables/disables scrolling
@@ -335,10 +331,36 @@ export interface ChartOptions {
 	 */
 	trackingMode: TrackingModeOptions;
 
+	/**
+	 * Basic localization options
+	 */
+	localization: LocalizationOptionsBase;
 }
 
-export type ChartOptionsInternal =
-	Omit<ChartOptions, 'handleScroll' | 'handleScale' | 'layout'>
+/**
+ * Structure describing options of the chart. Series options are to be set separately
+ */
+export interface ChartOptionsImpl<HorzScaleItem> extends ChartOptionsBase {
+
+	/**
+	 * Localization options.
+	 */
+	localization: LocalizationOptions<HorzScaleItem>;
+}
+
+export type ChartOptionsInternalBase =
+	Omit<ChartOptionsBase, 'handleScroll' | 'handleScale' | 'layout'>
+	& {
+		/** @public */
+		handleScroll: HandleScrollOptions;
+		/** @public */
+		handleScale: HandleScaleOptionsInternal;
+		/** @public */
+		layout: LayoutOptions;
+	};
+
+export type ChartOptionsInternal<HorzScaleItem> =
+	Omit<ChartOptionsImpl<HorzScaleItem>, 'handleScroll' | 'handleScale' | 'layout'>
 	& {
 		/** @public */
 		handleScroll: HandleScrollOptions;
@@ -354,19 +376,74 @@ interface GradientColorsCache {
 	colors: Map<number, string>;
 }
 
-export class ChartModel implements IDestroyable {
-	private readonly _options: ChartOptionsInternal;
+export interface IChartModelBase {
+	applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void;
+	findPriceScale(priceScaleId: string): PriceScaleOnPane | null;
+	options(): Readonly<ChartOptionsInternalBase>;
+	timeScale(): ITimeScale;
+	serieses(): readonly ISeries<SeriesType>[];
+
+	updateSource(source: IPriceDataSource): void;
+	updateCrosshair(): void;
+	cursorUpdate(): void;
+	clearCurrentPosition(): void;
+	setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane): void;
+
+	recalculatePane(pane: Pane | null): void;
+
+	lightUpdate(): void;
+	fullUpdate(): void;
+
+	backgroundBottomColor(): string;
+	backgroundTopColor(): string;
+	backgroundColorAtYPercentFromTop(percent: number): string;
+
+	paneForSource(source: IPriceDataSource): Pane | null;
+	moveSeriesToScale(series: ISeries<SeriesType>, targetScaleId: string): void;
+
+	priceAxisRendererOptions(): Readonly<PriceAxisViewRendererOptions>;
+	rendererOptionsProvider(): PriceAxisRendererOptionsProvider;
+
+	priceScalesOptionsChanged(): ISubscription;
+
+	hoveredSource(): HoveredSource | null;
+	setHoveredSource(source: HoveredSource | null): void;
+
+	crosshairSource(): Crosshair;
+	watermarkSource(): Watermark;
+
+	startScrollPrice(pane: Pane, priceScale: PriceScale, x: number): void;
+	scrollPriceTo(pane: Pane, priceScale: PriceScale, x: number): void;
+	endScrollPrice(pane: Pane, priceScale: PriceScale): void;
+	resetPriceScale(pane: Pane, priceScale: PriceScale): void;
+
+	startScalePrice(pane: Pane, priceScale: PriceScale, x: number): void;
+	scalePriceTo(pane: Pane, priceScale: PriceScale, x: number): void;
+	endScalePrice(pane: Pane, priceScale: PriceScale): void;
+
+	zoomTime(pointX: Coordinate, scale: number): void;
+	startScrollTime(x: Coordinate): void;
+	scrollTimeTo(x: Coordinate): void;
+	endScrollTime(): void;
+
+	setTimeScaleAnimation(animation: ITimeScaleAnimation): void;
+
+	stopTimeScaleAnimation(): void;
+}
+
+export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase {
+	private readonly _options: ChartOptionsInternal<HorzScaleItem>;
 	private readonly _invalidateHandler: InvalidateHandler;
 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 
-	private readonly _timeScale: TimeScale;
+	private readonly _timeScale: TimeScale<HorzScaleItem>;
 	private readonly _panes: Pane[] = [];
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
 
-	private _serieses: Series[] = [];
+	private _serieses: Series<SeriesType>[] = [];
 
 	private _width: number = 0;
 	private _hoveredSource: HoveredSource | null = null;
@@ -377,13 +454,16 @@ export class ChartModel implements IDestroyable {
 	private _backgroundBottomColor: string;
 	private _gradientColorsCache: GradientColorsCache | null = null;
 
-	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptionsInternal) {
+	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
+
+	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptionsInternal<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._invalidateHandler = invalidateHandler;
 		this._options = options;
+		this._horzScaleBehavior = horzScaleBehavior;
 
 		this._rendererOptionsProvider = new PriceAxisRendererOptionsProvider(this);
 
-		this._timeScale = new TimeScale(this, options.timeScale, this._options.localization);
+		this._timeScale = new TimeScale(this, options.timeScale, this._options.localization, horzScaleBehavior);
 		this._crosshair = new Crosshair(this, options.crosshair);
 		this._magnet = new Magnet(options.crosshair);
 		this._watermark = new Watermark(this, options.watermark);
@@ -427,11 +507,11 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	public options(): Readonly<ChartOptionsInternal> {
+	public options(): Readonly<ChartOptionsInternal<HorzScaleItem>> {
 		return this._options;
 	}
 
-	public applyOptions(options: DeepPartial<ChartOptionsInternal>): void {
+	public applyOptions(options: DeepPartial<ChartOptionsInternal<HorzScaleItem>>): void {
 		merge(this._options, options);
 
 		this._panes.forEach((p: Pane) => p.applyScaleOptions(options));
@@ -494,7 +574,7 @@ export class ChartModel implements IDestroyable {
 		return null;
 	}
 
-	public timeScale(): TimeScale {
+	public timeScale(): TimeScale<HorzScaleItem> {
 		return this._timeScale;
 	}
 
@@ -650,7 +730,7 @@ export class ChartModel implements IDestroyable {
 		this.lightUpdate();
 	}
 
-	public serieses(): readonly Series[] {
+	public serieses(): readonly Series<SeriesType>[] {
 		return this._serieses;
 	}
 
@@ -713,7 +793,7 @@ export class ChartModel implements IDestroyable {
 		// (and actually we cannot)
 		if (visibleBars !== null && oldFirstTime !== null && newFirstTime !== null) {
 			const isLastSeriesBarVisible = visibleBars.contains(currentBaseIndex);
-			const isLeftBarShiftToLeft = oldFirstTime.timestamp > newFirstTime.timestamp;
+			const isLeftBarShiftToLeft = this._horzScaleBehavior.key(oldFirstTime) > this._horzScaleBehavior.key(newFirstTime);
 			const isSeriesPointsAdded = newBaseIndex !== null && newBaseIndex > currentBaseIndex;
 			const isSeriesPointsAddedToRight = isSeriesPointsAdded && !isLeftBarShiftToLeft;
 
@@ -766,7 +846,7 @@ export class ChartModel implements IDestroyable {
 		return this._priceScalesOptionsChanged;
 	}
 
-	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], customPaneView?: ICustomSeriesPaneView): Series<T> {
+	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
 		const pane = this._panes[0];
 		const series = this._createSeries(options, seriesType, pane, customPaneView);
 		this._serieses.push(series);
@@ -781,7 +861,7 @@ export class ChartModel implements IDestroyable {
 		return series;
 	}
 
-	public removeSeries(series: Series): void {
+	public removeSeries(series: Series<SeriesType>): void {
 		const pane = this.paneForSource(series);
 
 		const seriesIndex = this._serieses.indexOf(series);
@@ -794,7 +874,7 @@ export class ChartModel implements IDestroyable {
 		}
 	}
 
-	public moveSeriesToScale(series: Series, targetScaleId: string): void {
+	public moveSeriesToScale(series: Series<SeriesType>, targetScaleId: string): void {
 		const pane = ensureNotNull(this.paneForSource(series));
 		pane.removeDataSource(series);
 
@@ -926,7 +1006,7 @@ export class ChartModel implements IDestroyable {
 		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane, customPaneView?: ICustomSeriesPaneView): Series<T> {
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
 		const series = new Series<T>(this, options, seriesType, pane, customPaneView);
 
 		const targetScaleId = options.priceScaleId !== undefined ? options.priceScaleId : this.defaultVisiblePriceScaleId();

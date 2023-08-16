@@ -11,7 +11,7 @@ import { BarCoordinates, BarPrice, BarPrices } from './bar';
 import { Coordinate } from './coordinate';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
-import { LocalizationOptions } from './localization-options';
+import { LocalizationOptionsBase } from './localization-options';
 import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceRangeImpl } from './price-range-impl';
 import {
@@ -198,7 +198,7 @@ export class PriceScale {
 	private readonly _id: string;
 
 	private readonly _layoutOptions: LayoutOptions;
-	private readonly _localizationOptions: LocalizationOptions;
+	private readonly _localizationOptions: LocalizationOptionsBase;
 	private readonly _options: PriceScaleOptions;
 
 	private _height: number = 0;
@@ -227,7 +227,7 @@ export class PriceScale {
 
 	private _logFormula: LogFormula = logFormulaForPriceRange(null);
 
-	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptionsBase) {
 		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
@@ -538,7 +538,7 @@ export class PriceScale {
 			sources.push(ds);
 		}
 
-		sources = sortSources(sources);
+		sources = sortSources<IPriceDataSource>(sources);
 		this._cachedOrderedSources = sources;
 		return this._cachedOrderedSources;
 	}

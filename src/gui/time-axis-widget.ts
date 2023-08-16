@@ -16,13 +16,12 @@ import { ISubscription } from '../helpers/isubscription';
 import { makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
+import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { Pane } from '../model/pane';
 import { TextWidthCache } from '../model/text-width-cache';
-import { TickMarkWeight } from '../model/time-data';
-import { TimeMark } from '../model/time-scale';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { IAxisView } from '../views/pane/iaxis-view';
@@ -44,10 +43,6 @@ const enum CursorType {
 	EwResize,
 }
 
-function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
-	return a.weight > b.weight ? a : b;
-}
-
 function buildTimeAxisViewsGetter(zOrder: SeriesPrimitivePaneViewZOrder): ITimeAxisViewsGetter {
 	return (source: IDataSource): readonly IAxisView[] => source.timePaneViews?.(zOrder) ?? [];
 }
@@ -55,8 +50,8 @@ const sourcePaneViews = buildTimeAxisViewsGetter('normal');
 const sourceTopPaneViews = buildTimeAxisViewsGetter('top');
 const sourceBottomPaneViews = buildTimeAxisViewsGetter('bottom');
 
-export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
-	private readonly _chart: ChartWidget;
+export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestroyable {
+	private readonly _chart: ChartWidget<HorzScaleItem>;
 	private readonly _options: LayoutOptions;
 	private readonly _element: HTMLElement;
 	private readonly _leftStubCell: HTMLElement;
@@ -75,8 +70,11 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 	private readonly _widthCache: TextWidthCache = new TextWidthCache(5);
 	private _isSettingSize: boolean = false;
 
-	public constructor(chartWidget: ChartWidget) {
+	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
+
+	public constructor(chartWidget: ChartWidget<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._chart = chartWidget;
+		this._horzScaleBehavior = horzScaleBehavior;
 		this._options = chartWidget.options().layout;
 
 		this._element = document.createElement('tr');
@@ -378,13 +376,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			return;
 		}
 
-		let maxWeight = tickMarks.reduce(markWithGreaterWeight, tickMarks[0]).weight;
-
-		// special case: it looks strange if 15:00 is bold but 14:00 is not
-		// so if maxWeight > TickMarkWeight.Hour1 and < TickMarkWeight.Day reduce it to TickMarkWeight.Hour1
-		if (maxWeight > TickMarkWeight.Hour1 && maxWeight < TickMarkWeight.Day) {
-			maxWeight = TickMarkWeight.Hour1;
-		}
+		const maxWeight = this._horzScaleBehavior.maxTickMarkWeight(tickMarks);
 
 		const rendererOptions = this._getRendererOptions();
 

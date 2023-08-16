@@ -1,7 +1,7 @@
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { SeriesOptionsMap, SeriesType } from '../model/series-options';
 
-import { IChartApi } from './ichart-api';
+import { IChartApiBase } from './ichart-api';
 import { ISeriesApi } from './iseries-api';
 
 /**
@@ -9,16 +9,17 @@ import { ISeriesApi } from './iseries-api';
  * a refresh of the chart.
  */
 export interface SeriesAttachedParameter<
+	HorzScaleItem,
 	TSeriesType extends SeriesType = keyof SeriesOptionsMap
 > {
 	/**
 	 * Chart instance.
 	 */
-	chart: IChartApi;
+	chart: IChartApiBase<HorzScaleItem>;
 	/**
 	 * Series to which the Primitive is attached.
 	 */
-	series: ISeriesApi<TSeriesType>;
+	series: ISeriesApi<TSeriesType, HorzScaleItem>;
 	/**
 	 * Request an update (redraw the chart)
 	 */
@@ -28,6 +29,6 @@ export interface SeriesAttachedParameter<
 /**
  * Interface for series primitives. It must be implemented to add some external graphics to series.
  */
-export type ISeriesPrimitive = ISeriesPrimitiveBase<
-	SeriesAttachedParameter<SeriesType>
+export type ISeriesPrimitive<HorzScaleItem> = ISeriesPrimitiveBase<
+	SeriesAttachedParameter<HorzScaleItem, SeriesType>
 >;

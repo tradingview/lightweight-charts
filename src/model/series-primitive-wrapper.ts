@@ -19,9 +19,9 @@ import {
 } from './iseries-primitive';
 import { PriceScale } from './price-scale';
 import { Series } from './series';
-import { AutoscaleInfo } from './series-options';
+import { AutoscaleInfo, SeriesType } from './series-options';
 import { Logical, TimePointIndex } from './time-data';
-import { TimeScale } from './time-scale';
+import { ITimeScale } from './time-scale';
 
 class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
 	private readonly _baseRenderer: ISeriesPrimitivePaneRenderer;
@@ -101,10 +101,10 @@ function getAxisViewData(baseView: ISeriesPrimitiveAxisView): AxisViewData {
 
 class SeriesPrimitiveTimeAxisViewWrapper implements ITimeAxisView {
 	private readonly _baseView: ISeriesPrimitiveAxisView;
-	private readonly _timeScale: TimeScale;
+	private readonly _timeScale: ITimeScale;
 	private readonly _renderer: TimeAxisViewRenderer = new TimeAxisViewRenderer();
 
-	public constructor(baseView: ISeriesPrimitiveAxisView, timeScale: TimeScale) {
+	public constructor(baseView: ISeriesPrimitiveAxisView, timeScale: ITimeScale) {
 		this._baseView = baseView;
 		this._timeScale = timeScale;
 	}
@@ -152,14 +152,14 @@ class SeriesPrimitivePriceAxisViewWrapper extends PriceAxisView {
 
 export class SeriesPrimitiveWrapper<TSeriesAttachedParameters = unknown> {
 	private readonly _primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>;
-	private readonly _series: Series;
+	private readonly _series: Series<SeriesType>;
 	private _paneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 	private _timeAxisViewsCache: RendererCache<readonly ISeriesPrimitiveAxisView[], readonly SeriesPrimitiveTimeAxisViewWrapper[]> | null = null;
 	private _priceAxisViewsCache: RendererCache<readonly ISeriesPrimitiveAxisView[], readonly SeriesPrimitivePriceAxisViewWrapper[]> | null = null;
 	private _priceAxisPaneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 	private _timeAxisPaneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 
-	public constructor(primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>, series: Series) {
+	public constructor(primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>, series: Series<SeriesType>) {
 		this._primitive = primitive;
 		this._series = series;
 	}
