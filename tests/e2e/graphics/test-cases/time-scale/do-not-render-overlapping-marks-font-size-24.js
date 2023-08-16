@@ -5,6 +5,7 @@ function runTestCase(container) {
 		layout: {
 			fontSize: 24,
 		},
+		crosshair: { vertLine: { labelVisible: false } },
 		timeScale: {
 			tickMarkMaxCharacterLength: 'long prefix 0000-00-00'.length,
 			tickMarkFormatter: time => `long prefix ${time}`,
