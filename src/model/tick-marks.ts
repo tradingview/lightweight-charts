@@ -16,17 +16,34 @@ export interface TickMark {
 	weight: TickMarkWeightValue;
 	/** Original value for the `time` property */
 	originalTime: unknown;
+	/** Formatted tick mark time label */
+	label: string;
 }
 
 interface MarksCache {
 	maxIndexesPerMark: number;
 	marks: readonly TickMark[];
+	defaultMaxIndexesPerMark: number;
+}
+
+export interface TickMarkBuildResult {
+	marks: readonly TickMark[];
+	maxLabelWidth: number;
+}
+
+function roundToOneDecimalPlace(n: number): number {
+	return Math.round((n + Number.EPSILON) * 10) / 10;
 }
 
 export class TickMarks<HorzScaleItem> {
+	private readonly _formatLabel: (mark: TickMark) => string;
 	private _marksByWeight: Map<TickMarkWeightValue, TickMark[]> = new Map();
 	private _cache: MarksCache | null = null;
 	private _uniformDistribution: boolean = false;
+
+	public constructor(formatLabel: (mark: TickMark) => string) {
+		this._formatLabel = formatLabel;
+	}
 
 	public setUniformDistribution(val: boolean): void {
 		this._uniformDistribution = val;
@@ -51,20 +68,23 @@ export class TickMarks<HorzScaleItem> {
 				time: point.time,
 				weight: point.timeWeight,
 				originalTime: point.originalTime,
+				label: '',
 			});
 		}
 	}
 
-	public build(spacing: number, maxWidth: number): readonly TickMark[] {
-		const maxIndexesPerMark = Math.ceil(maxWidth / spacing);
-		if (this._cache === null || this._cache.maxIndexesPerMark !== maxIndexesPerMark) {
-			this._cache = {
-				marks: this._buildMarksImpl(maxIndexesPerMark),
-				maxIndexesPerMark,
-			};
+	public build(spacing: number, fontSize: number): TickMarkBuildResult {
+		const maxLabelWidth = (fontSize + 4) * 5;
+		const widthPerCharacterEstimate = maxLabelWidth / 8;
+		// "default" because we will adjust the value based on actual label widths
+		const defaultMaxIndexesPerMark = roundToOneDecimalPlace(maxLabelWidth / spacing);
+
+		if (this._cache === null || this._cache.defaultMaxIndexesPerMark !== defaultMaxIndexesPerMark) {
+			const result = this._buildMarksImpl(defaultMaxIndexesPerMark, widthPerCharacterEstimate, spacing);
+			this._cache = result;
 		}
 
-		return this._cache.marks;
+		return { marks: this._cache.marks, maxLabelWidth };
 	}
 
 	private _removeMarksSinceIndex(sinceIndex: number): void {
@@ -91,8 +111,9 @@ export class TickMarks<HorzScaleItem> {
 		}
 	}
 
-	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark[] {
+	private _buildMarksImpl(defaultMaxIndexesPerMark: number, widthPerCharacterEstimate: number, spacing: number): MarksCache {
 		let marks: TickMark[] = [];
+		let maxIndexesPerMark = defaultMaxIndexesPerMark;
 
 		for (const weight of Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a)) {
 			if (!this._marksByWeight.get(weight)) {
@@ -132,11 +153,18 @@ export class TickMarks<HorzScaleItem> {
 
 				if (rightIndex - currentIndex >= maxIndexesPerMark && currentIndex - leftIndex >= maxIndexesPerMark) {
 					// TickMark fits. Place it into new array
+					const currentLabel = this._formatLabel(mark);
+					mark.label = currentLabel;
 					marks.push(mark);
 					leftIndex = currentIndex;
+
+					const indexesPerMarkEstimate = roundToOneDecimalPlace((currentLabel.length * widthPerCharacterEstimate) / spacing);
+					if (indexesPerMarkEstimate > maxIndexesPerMark) {
+						maxIndexesPerMark = indexesPerMarkEstimate;
+					}
 				} else {
 					if (this._uniformDistribution) {
-						return prevMarks;
+						return { marks: prevMarks, defaultMaxIndexesPerMark, maxIndexesPerMark };
 					}
 				}
 			}
@@ -147,6 +175,6 @@ export class TickMarks<HorzScaleItem> {
 			}
 		}
 
-		return marks;
+		return { marks, defaultMaxIndexesPerMark, maxIndexesPerMark };
 	}
 }

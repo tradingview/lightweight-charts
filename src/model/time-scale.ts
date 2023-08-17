@@ -26,8 +26,6 @@ import {
 } from './time-data';
 import { TimeScaleVisibleRange } from './time-scale-visible-range';
 
-const defaultTickMarkMaxCharacterLength = 8;
-
 const enum Constants {
 	DefaultAnimationDuration = 400,
 	// make sure that this (1 / MinVisibleBarsCount) >= coeff in max bar spacing
@@ -160,13 +158,6 @@ export interface HorzScaleOptions {
 	 * @defaultValue `false`
 	 */
 	ticksVisible: boolean;
-
-	/**
-	 * Maximum tick mark label length. Used to override the default 8 character maximum length.
-	 *
-	 * @defaultValue `undefined`
-	 */
-	tickMarkMaxCharacterLength?: number;
 	/**
 	 * Changes horizontal scale marks generation.
 	 * With this flag equal to `true`, marks of the same weight are either all drawn or none are drawn at all.
@@ -207,7 +198,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
-	private readonly _tickMarks: TickMarks<HorzScaleItem> = new TickMarks();
+	private readonly _tickMarks: TickMarks<HorzScaleItem> = new TickMarks((mark: TickMark) => this._formatLabel(mark));
 	private _formattedByWeight: Map<number, FormattedLabelsCache<HorzScaleItem>> = new Map();
 
 	private _visibleRange: TimeScaleVisibleRange = TimeScaleVisibleRange.invalid();
@@ -477,17 +468,13 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		const spacing = this._barSpacing;
 		const fontSize = this._model.options().layout.fontSize;
 
-		const pixelsPer8Characters = (fontSize + 4) * 5;
-		const pixelsPerCharacter = pixelsPer8Characters / defaultTickMarkMaxCharacterLength;
-		const maxLabelWidth = pixelsPerCharacter * (this._options.tickMarkMaxCharacterLength || defaultTickMarkMaxCharacterLength);
+		const { marks: items, maxLabelWidth } = this._tickMarks.build(spacing, fontSize);
 		const indexPerLabel = Math.round(maxLabelWidth / spacing);
 
 		const visibleBars = ensureNotNull(this.visibleStrictRange());
 
 		const firstBar = Math.max(visibleBars.left(), visibleBars.left() - indexPerLabel);
 		const lastBar = Math.max(visibleBars.right(), visibleBars.right() - indexPerLabel);
-
-		const items = this._tickMarks.build(spacing, maxLabelWidth);
 
 		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second label on time scale"
 		const earliestIndexOfSecondLabel = (this._firstIndex() as number) + indexPerLabel;
@@ -509,13 +496,13 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			if (targetIndex < this._labels.length) {
 				label = this._labels[targetIndex];
 				label.coord = this.indexToCoordinate(tm.index);
-				label.label = this._formatLabel(tm);
+				label.label = tm.label;
 				label.weight = tm.weight;
 			} else {
 				label = {
 					needAlignCoordinate: false,
 					coord: this.indexToCoordinate(tm.index),
-					label: this._formatLabel(tm),
+					label: tm.label,
 					weight: tm.weight,
 				};
 
