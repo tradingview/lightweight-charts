@@ -18,7 +18,7 @@ export function merge(dst: Record<string, any>, ...sources: Record<string, any>[
 				continue;
 			}
 
-			if ('object' !== typeof src[i] || dst[i] === undefined) {
+			if ('object' !== typeof src[i] || dst[i] === undefined || Array.isArray(src[i])) {
 				dst[i] = src[i];
 			} else {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument

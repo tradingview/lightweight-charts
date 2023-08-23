@@ -1,5 +1,3 @@
-import { OriginalTime } from './time-data';
-
 /**
  * Represents the position of a series marker relative to a bar.
  */
@@ -48,9 +46,23 @@ export interface SeriesMarker<TimeType> {
 	/**
 	 * @internal
 	 */
-	originalTime: OriginalTime;
+	originalTime: unknown;
 }
 
-export interface InternalSeriesMarker<TimeType> extends Omit<SeriesMarker<TimeType>, 'originalTime'> {
+export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {
 	internalId: number;
+}
+
+export function convertSeriesMarker<InTimeType, OutTimeType>(sm: SeriesMarker<InTimeType>, newTime: OutTimeType, originalTime?: unknown): SeriesMarker<OutTimeType> {
+	const { time: inTime, originalTime: inOriginalTime, ...values } = sm;
+	/* eslint-disable @typescript-eslint/consistent-type-assertions */
+	const res = {
+		time: newTime,
+		...values,
+	} as SeriesMarker<OutTimeType>;
+	/* eslint-enable @typescript-eslint/consistent-type-assertions */
+	if (originalTime !== undefined) {
+		res.originalTime = originalTime;
+	}
+	return res;
 }

@@ -1,7 +1,7 @@
 import { ensureNotNull } from '../../helpers/assertions';
 import { generateContrastColors } from '../../helpers/color';
 
-import { ChartModel } from '../../model/chart-model';
+import { IChartModelBase } from '../../model/chart-model';
 import { Crosshair, CrosshairMode, TimeAndCoordinateProvider } from '../../model/crosshair';
 import { TimeAxisViewRenderer, TimeAxisViewRendererData } from '../../renderers/time-axis-view-renderer';
 
@@ -10,7 +10,7 @@ import { ITimeAxisView } from './itime-axis-view';
 export class CrosshairTimeAxisView implements ITimeAxisView {
 	private _invalidated: boolean = true;
 	private readonly _crosshair: Crosshair;
-	private readonly _model: ChartModel;
+	private readonly _model: IChartModelBase;
 	private readonly _valueProvider: TimeAndCoordinateProvider;
 	private readonly _renderer: TimeAxisViewRenderer = new TimeAxisViewRenderer();
 	private readonly _rendererData: TimeAxisViewRendererData = {
@@ -23,7 +23,7 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 		tickVisible: true,
 	};
 
-	public constructor(crosshair: Crosshair, model: ChartModel, valueProvider: TimeAndCoordinateProvider) {
+	public constructor(crosshair: Crosshair, model: IChartModelBase, valueProvider: TimeAndCoordinateProvider) {
 		this._crosshair = crosshair;
 		this._model = model;
 		this._valueProvider = valueProvider;

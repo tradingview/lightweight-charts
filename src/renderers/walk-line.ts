@@ -1,4 +1,4 @@
-import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { Coordinate } from '../model/coordinate';
 import { SeriesItemsIndexesRange } from '../model/time-data';
@@ -6,22 +6,22 @@ import { SeriesItemsIndexesRange } from '../model/time-data';
 import { LinePoint, LineType } from './draw-line';
 
 // eslint-disable-next-line max-params, complexity
-export function walkLine<TItem extends LinePoint, TStyle>(
-	renderingScope: MediaCoordinatesRenderingScope,
+export function walkLine<TItem extends LinePoint, TStyle extends CanvasRenderingContext2D['fillStyle'] | CanvasRenderingContext2D['strokeStyle']>(
+	renderingScope: BitmapCoordinatesRenderingScope,
 	items: readonly TItem[],
 	lineType: LineType,
 	visibleRange: SeriesItemsIndexesRange,
 	barWidth: number,
 	// the values returned by styleGetter are compared using the operator !==,
 	// so if styleGetter returns objects, then styleGetter should return the same object for equal styles
-	styleGetter: (renderingScope: MediaCoordinatesRenderingScope, item: TItem) => TStyle,
-	finishStyledArea: (ctx: CanvasRenderingContext2D, style: TStyle, areaFirstItem: LinePoint, newAreaFirstItem: LinePoint) => void
+	styleGetter: (renderingScope: BitmapCoordinatesRenderingScope, item: TItem) => TStyle,
+	finishStyledArea: (renderingScope: BitmapCoordinatesRenderingScope, style: TStyle, areaFirstItem: LinePoint, newAreaFirstItem: LinePoint) => void
 ): void {
 	if (items.length === 0 || visibleRange.from >= items.length || visibleRange.to <= 0) {
 		return;
 	}
 
-	const ctx = renderingScope.context;
+	const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = renderingScope;
 
 	const firstItem = items[visibleRange.from];
 	let currentStyle = styleGetter(renderingScope, firstItem);
@@ -35,60 +35,65 @@ export function walkLine<TItem extends LinePoint, TStyle>(
 		const item1: LinePoint = { x: firstItem.x - halfBarWidth as Coordinate, y: firstItem.y };
 		const item2: LinePoint = { x: firstItem.x + halfBarWidth as Coordinate, y: firstItem.y };
 
-		ctx.moveTo(item1.x, item1.y);
-		ctx.lineTo(item2.x, item2.y);
+		ctx.moveTo(item1.x * horizontalPixelRatio, item1.y * verticalPixelRatio);
+		ctx.lineTo(item2.x * horizontalPixelRatio, item2.y * verticalPixelRatio);
 
-		finishStyledArea(ctx, currentStyle, item1, item2);
+		finishStyledArea(renderingScope, currentStyle, item1, item2);
+	} else {
+		const changeStyle = (newStyle: TStyle, currentItem: TItem) => {
+			finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
 
-		return;
-	}
+			ctx.beginPath();
+			currentStyle = newStyle;
+			currentStyleFirstItem = currentItem;
+		};
 
-	const changeStyle = (newStyle: TStyle, currentItem: TItem) => {
-		finishStyledArea(ctx, currentStyle, currentStyleFirstItem, currentItem);
+		let currentItem = currentStyleFirstItem;
 
 		ctx.beginPath();
-		currentStyle = newStyle;
-		currentStyleFirstItem = currentItem;
-	};
+		ctx.moveTo(firstItem.x * horizontalPixelRatio, firstItem.y * verticalPixelRatio);
 
-	let currentItem = currentStyleFirstItem;
+		for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
+			currentItem = items[i];
+			const itemStyle = styleGetter(renderingScope, currentItem);
 
-	ctx.beginPath();
-	ctx.moveTo(firstItem.x, firstItem.y);
+			switch (lineType) {
+				case LineType.Simple:
+					ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
+					break;
+				case LineType.WithSteps:
+					ctx.lineTo(currentItem.x * horizontalPixelRatio, items[i - 1].y * verticalPixelRatio);
 
-	for (let i = visibleRange.from + 1; i < visibleRange.to; ++i) {
-		currentItem = items[i];
-		const itemStyle = styleGetter(renderingScope, currentItem);
+					if (itemStyle !== currentStyle) {
+						changeStyle(itemStyle, currentItem);
+						ctx.lineTo(currentItem.x * horizontalPixelRatio, items[i - 1].y * verticalPixelRatio);
+					}
 
-		switch (lineType) {
-			case LineType.Simple:
-				ctx.lineTo(currentItem.x, currentItem.y);
-				break;
-			case LineType.WithSteps:
-				ctx.lineTo(currentItem.x, items[i - 1].y);
-
-				if (itemStyle !== currentStyle) {
-					changeStyle(itemStyle, currentItem);
-					ctx.lineTo(currentItem.x, items[i - 1].y);
+					ctx.lineTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
+					break;
+				case LineType.Curved: {
+					const [cp1, cp2] = getControlPoints(items, i - 1, i);
+					ctx.bezierCurveTo(
+						cp1.x * horizontalPixelRatio,
+						cp1.y * verticalPixelRatio,
+						cp2.x * horizontalPixelRatio,
+						cp2.y * verticalPixelRatio,
+						currentItem.x * horizontalPixelRatio,
+						currentItem.y * verticalPixelRatio
+					);
+					break;
 				}
+			}
 
-				ctx.lineTo(currentItem.x, currentItem.y);
-				break;
-			case LineType.Curved: {
-				const [cp1, cp2] = getControlPoints(items, i - 1, i);
-				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, currentItem.x, currentItem.y);
-				break;
+			if (lineType !== LineType.WithSteps && itemStyle !== currentStyle) {
+				changeStyle(itemStyle, currentItem);
+				ctx.moveTo(currentItem.x * horizontalPixelRatio, currentItem.y * verticalPixelRatio);
 			}
 		}
 
-		if (lineType !== LineType.WithSteps && itemStyle !== currentStyle) {
-			changeStyle(itemStyle, currentItem);
-			ctx.moveTo(currentItem.x, currentItem.y);
+		if (currentStyleFirstItem !== currentItem || currentStyleFirstItem === currentItem && lineType === LineType.WithSteps) {
+			finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, currentItem);
 		}
-	}
-
-	if (currentStyleFirstItem !== currentItem || currentStyleFirstItem === currentItem && lineType === LineType.WithSteps) {
-		finishStyledArea(ctx, currentStyle, currentStyleFirstItem, currentItem);
 	}
 }
 

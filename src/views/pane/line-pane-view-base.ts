@@ -1,15 +1,15 @@
 import { undefinedIfNull } from '../../helpers/strict-type-checks';
 
 import { BarPrice } from '../../model/bar';
-import { ChartModel } from '../../model/chart-model';
+import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { PlotRowValueIndex } from '../../model/plot-data';
 import { PricedValue, PriceScale } from '../../model/price-scale';
-import { Series } from '../../model/series';
-import { SeriesBarColorer } from '../../model/series-bar-colorer';
+import { ISeries } from '../../model/series';
+import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { SeriesPlotRow } from '../../model/series-data';
 import { TimedValue, TimePointIndex } from '../../model/time-data';
-import { TimeScale } from '../../model/time-scale';
+import { ITimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { SeriesPaneViewBase } from './series-pane-view-base';
@@ -19,16 +19,16 @@ export abstract class LinePaneViewBase<
 	ItemType extends PricedValue & TimedValue,
 	TRenderer extends IPaneRenderer
 > extends SeriesPaneViewBase<TSeriesType, ItemType, TRenderer> {
-	public constructor(series: Series<TSeriesType>, model: ChartModel) {
+	public constructor(series: ISeries<TSeriesType>, model: IChartModelBase) {
 		super(series, model, true);
 	}
 
-	protected _convertToCoordinates(priceScale: PriceScale, timeScale: TimeScale, firstValue: number): void {
+	protected _convertToCoordinates(priceScale: PriceScale, timeScale: ITimeScale, firstValue: number): void {
 		timeScale.indexesToCoordinates(this._items, undefinedIfNull(this._itemsVisibleRange));
 		priceScale.pointsArrayToCoordinates(this._items, firstValue, undefinedIfNull(this._itemsVisibleRange));
 	}
 
-	protected abstract _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<TSeriesType>): ItemType;
+	protected abstract _createRawItem(time: TimePointIndex, price: BarPrice, colorer: ISeriesBarColorer<TSeriesType>): ItemType;
 
 	protected _createRawItemBase(time: TimePointIndex, price: BarPrice): PricedValue & TimedValue {
 		return {

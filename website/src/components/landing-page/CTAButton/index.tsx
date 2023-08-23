@@ -9,7 +9,7 @@ export interface CTALink {
 	external?: boolean;
 }
 
-function ExternalLinkSVG(): JSX.Element {
+function ExternalLinkSVG(): React.JSX.Element {
 	return (
 		<svg
 			width="28"
@@ -28,7 +28,7 @@ function ExternalLinkSVG(): JSX.Element {
 	);
 }
 
-export default function CTAButton(link: CTALink): JSX.Element {
+export default function CTAButton(link: CTALink): React.JSX.Element {
 	return (
 		<a
 			className={styles.SquareButton}

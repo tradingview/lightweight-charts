@@ -6,7 +6,7 @@ export interface CodeBlockProps {
 	startLineNumber?: number;
 	canCopy?: boolean;
 	canSelect?: boolean;
-	lines: JSX.Element[];
+	lines: React.JSX.Element[];
 	lineNumberOverrides?: string[];
 	style: {
 		height?: number | string;
@@ -23,7 +23,7 @@ export interface CodeBlockProps {
 
 export default function LandingPageCodeBlock(
 	props: CodeBlockProps
-): JSX.Element {
+): React.JSX.Element {
 	const {
 		canSelect,
 		canCopy,
@@ -43,7 +43,7 @@ export default function LandingPageCodeBlock(
 			style={{ ...style }}
 		>
 			<div className={styles.BlockContent}>
-				{lines.map((line: JSX.Element, index: number) => (
+				{lines.map((line: React.JSX.Element, index: number) => (
 					<div key={index} className={styles.Line}>
 						<div className={styles.LineNumber}>
 							{lineNumberOverrides && lineNumberOverrides.length > index

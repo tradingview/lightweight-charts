@@ -4,13 +4,13 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
-import { ChartModel, ChartOptions, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
+import { ChartOptionsBase, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid } from './grid';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
 import { sortSources } from './sort-sources';
-import { TimeScale } from './time-scale';
+import { ITimeScale } from './time-scale';
 
 export const DEFAULT_STRETCH_FACTOR = 1000;
 
@@ -22,8 +22,8 @@ interface MinMaxOrderInfo {
 }
 
 export class Pane implements IDestroyable {
-	private readonly _timeScale: TimeScale;
-	private readonly _model: ChartModel;
+	private readonly _timeScale: ITimeScale;
+	private readonly _model: IChartModelBase;
 	private readonly _grid: Grid;
 
 	private _dataSources: IPriceDataSource[] = [];
@@ -39,7 +39,7 @@ export class Pane implements IDestroyable {
 	private _leftPriceScale: PriceScale;
 	private _rightPriceScale: PriceScale;
 
-	public constructor(timeScale: TimeScale, model: ChartModel) {
+	public constructor(timeScale: ITimeScale, model: IChartModelBase) {
 		this._timeScale = timeScale;
 		this._model = model;
 		this._grid = new Grid(this);
@@ -55,7 +55,7 @@ export class Pane implements IDestroyable {
 		this.applyScaleOptions(options);
 	}
 
-	public applyScaleOptions(options: DeepPartial<ChartOptions>): void {
+	public applyScaleOptions(options: DeepPartial<ChartOptionsBase>): void {
 		if (options.leftPriceScale) {
 			this._leftPriceScale.applyOptions(options.leftPriceScale);
 		}
@@ -115,7 +115,7 @@ export class Pane implements IDestroyable {
 		this._stretchFactor = factor;
 	}
 
-	public model(): ChartModel {
+	public model(): IChartModelBase {
 		return this._model;
 	}
 
@@ -321,7 +321,7 @@ export class Pane implements IDestroyable {
 
 	public orderedSources(): readonly IPriceDataSource[] {
 		if (this._cachedOrderedSources === null) {
-			this._cachedOrderedSources = sortSources(this._dataSources);
+			this._cachedOrderedSources = sortSources<IPriceDataSource>(this._dataSources);
 		}
 
 		return this._cachedOrderedSources;

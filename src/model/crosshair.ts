@@ -12,13 +12,15 @@ import { CrosshairTimeAxisView } from '../views/time-axis/crosshair-time-axis-vi
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { BarPrice } from './bar';
-import { ChartModel } from './chart-model';
+import { IChartModelBase } from './chart-model';
 import { Coordinate } from './coordinate';
 import { DataSource } from './data-source';
+import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { Pane } from './pane';
 import { PriceScale } from './price-scale';
-import { Series } from './series';
-import { TimePoint, TimePointIndex } from './time-data';
+import { ISeries } from './series';
+import { SeriesType } from './series-options';
+import { TimePointIndex } from './time-data';
 
 export interface CrosshairPriceAndCoordinate {
 	price: number;
@@ -26,7 +28,7 @@ export interface CrosshairPriceAndCoordinate {
 }
 
 export interface CrosshairTimeAndCoordinate {
-	time: TimePoint;
+	time: InternalHorzScaleItem;
 	coordinate: number;
 }
 
@@ -131,7 +133,7 @@ export class Crosshair extends DataSource {
 	private _price: number = NaN;
 	private _index: TimePointIndex = 0 as TimePointIndex;
 	private _visible: boolean = true;
-	private readonly _model: ChartModel;
+	private readonly _model: IChartModelBase;
 	private _priceAxisViews: Map<PriceScale, CrosshairPriceAxisView> = new Map();
 	private readonly _timeAxisView: CrosshairTimeAxisView;
 	private readonly _markersPaneView: CrosshairMarksPaneView;
@@ -146,7 +148,7 @@ export class Crosshair extends DataSource {
 	private _originX: Coordinate = NaN as Coordinate;
 	private _originY: Coordinate = NaN as Coordinate;
 
-	public constructor(model: ChartModel, options: CrosshairOptions) {
+	public constructor(model: IChartModelBase, options: CrosshairOptions) {
 		super();
 		this._model = model;
 		this._options = options;
@@ -338,7 +340,7 @@ export class Crosshair extends DataSource {
 
 	private _setIndexToLastSeriesBarIndex(): void {
 		const lastIndexes = this._model.serieses()
-			.map((s: Series) => s.bars().lastIndex())
+			.map((s: ISeries<SeriesType>) => s.bars().lastIndex())
 			.filter(notNull);
 		const lastBarIndex = (lastIndexes.length === 0) ? null : (Math.max(...lastIndexes) as TimePointIndex);
 		this._index = lastBarIndex !== null ? lastBarIndex : NaN as TimePointIndex;

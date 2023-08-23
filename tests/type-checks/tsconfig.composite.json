@@ -1,0 +1,13 @@
+{
+	"extends": "../../tsconfig.composite.base.json",
+	"compilerOptions": {
+		"module": "commonjs",
+		"strict": true,
+	},
+	"references": [
+		{ "path": "../../src/tsconfig.composite.json" }
+	],
+	"include": [
+		"./**/*.ts"
+	]
+}

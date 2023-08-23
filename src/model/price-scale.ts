@@ -11,7 +11,8 @@ import { BarCoordinates, BarPrice, BarPrices } from './bar';
 import { Coordinate } from './coordinate';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
-import { LocalizationOptions } from './localization-options';
+import { LocalizationOptionsBase } from './localization-options';
+import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceRangeImpl } from './price-range-impl';
 import {
 	canConvertPriceRangeFromLog,
@@ -197,7 +198,7 @@ export class PriceScale {
 	private readonly _id: string;
 
 	private readonly _layoutOptions: LayoutOptions;
-	private readonly _localizationOptions: LocalizationOptions;
+	private readonly _localizationOptions: LocalizationOptionsBase;
 	private readonly _options: PriceScaleOptions;
 
 	private _height: number = 0;
@@ -226,7 +227,7 @@ export class PriceScale {
 
 	private _logFormula: LogFormula = logFormulaForPriceRange(null);
 
-	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptions) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptionsBase) {
 		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
@@ -537,7 +538,7 @@ export class PriceScale {
 			sources.push(ds);
 		}
 
-		sources = sortSources(sources);
+		sources = sortSources<IPriceDataSource>(sources);
 		this._cachedOrderedSources = sources;
 		return this._cachedOrderedSources;
 	}
@@ -741,7 +742,7 @@ export class PriceScale {
 	public formatPrice(price: number, firstValue: number): string {
 		switch (this._options.mode) {
 			case PriceScaleMode.Percentage:
-				return this.formatter().format(toPercent(price, firstValue));
+				return this._formatPercentage(toPercent(price, firstValue));
 			case PriceScaleMode.IndexedTo100:
 				return this.formatter().format(toIndexedTo100(price, firstValue));
 			default:
@@ -752,6 +753,7 @@ export class PriceScale {
 	public formatLogical(logical: number): string {
 		switch (this._options.mode) {
 			case PriceScaleMode.Percentage:
+				return this._formatPercentage(logical);
 			case PriceScaleMode.IndexedTo100:
 				return this.formatter().format(logical);
 			default:
@@ -765,7 +767,7 @@ export class PriceScale {
 
 	public formatPricePercentage(price: number, baseValue: number): string {
 		price = toPercent(price, baseValue);
-		return percentageFormatter.format(price);
+		return this._formatPercentage(price, percentageFormatter);
 	}
 
 	public sourcesForAutoScale(): readonly IPriceDataSource[] {
@@ -1001,15 +1003,22 @@ export class PriceScale {
 		return null;
 	}
 
-	private _formatPrice(price: BarPrice, fallbackFormatter?: IPriceFormatter): string {
-		if (this._localizationOptions.priceFormatter === undefined) {
+	private _formatValue(value: BarPrice | number, formatter: PriceFormatterFn | undefined, fallbackFormatter?: IPriceFormatter): string {
+		if (formatter === undefined) {
 			if (fallbackFormatter === undefined) {
 				fallbackFormatter = this.formatter();
 			}
-
-			return fallbackFormatter.format(price);
+			return fallbackFormatter.format(value);
 		}
 
-		return this._localizationOptions.priceFormatter(price);
+		return formatter(value as BarPrice);
+	}
+
+	private _formatPrice(price: BarPrice, fallbackFormatter?: IPriceFormatter): string {
+		return this._formatValue(price, this._localizationOptions.priceFormatter, fallbackFormatter);
+	}
+
+	private _formatPercentage(percentage: number, fallbackFormatter?: IPriceFormatter): string {
+		return this._formatValue(percentage, this._localizationOptions.percentageFormatter, fallbackFormatter);
 	}
 }

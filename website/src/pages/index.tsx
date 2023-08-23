@@ -191,9 +191,9 @@ const codeBlocks: CodeBlockProps[] = [
 const header = 'Lightweight Charts™ Documentation';
 const paragraph = `Lightweight Charts™ is a library for creating interactive financial charts. This documentation site provides all the information needed to get started with Lightweight Charts™ and help you make the most of its features.`;
 
-const showBanner = true;
+const showBanner = false;
 
-function Index(): JSX.Element {
+function Index(): React.JSX.Element {
 	return (
 		<>
 			{showBanner ? (
@@ -218,7 +218,7 @@ function Index(): JSX.Element {
 	);
 }
 
-function LayoutWrapper(): JSX.Element {
+function LayoutWrapper(): React.JSX.Element {
 	return (
 		<Layout title="Home" description={paragraph}>
 			<Head>

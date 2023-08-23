@@ -35,7 +35,7 @@ There are several included e2e tests available which can be run individually. Pl
 
 ## Deploying a new version
 
-1. Update any documentation pages which refer to a specific version. For example, the `Android` and `iOS` pages.
+1. Update any documentation pages which refer to a specific version. For example, the `Android` and `iOS` pages (only if the mobile package version is also updated).
 1. Run `npm run docusaurus docs:version MAJ.MIN` in `website` folder to create new versioned docs.
   Note that there is not patch version in docs, only major and minor parts.
 1. (optional) Remove docs for the oldest version (see <https://docusaurus.io/docs/versioning#deleting-an-existing-version>).
@@ -52,3 +52,16 @@ There are several included e2e tests available which can be run individually. Pl
 1. Push the changes back to github (don't forget to push tags).
 1. Create and publish a release on github.
 1. Close the milestone.
+
+## Deploying a pre-release version
+
+These steps are similar to those listed above except that we don't need to do anything related to the documentation site. There isn't typically anything to commit to the repo when doing these steps.
+
+1. Checkout master branch.
+1. Update `package.json`, set version to a prerelease version, e.g. 2.0.0-rc1, 3.1.5-rc4,...
+1. Run `npm run prepare-release` in the root folder.
+1. Run `npx publint@latest` and ensure that there aren't any issues with the generated `package.json`.
+1. Run `npm publish --tag next` to publish changes to npm. Use `--dry-run` if you are unsure.
+1. Assign the same version number to a git tag for the latest commit in GitHub.
+1. (Optional) Create and publish a release on github.
+1. Discard any changes locally, to ensure you don't commit the modified package.json at a later stage.

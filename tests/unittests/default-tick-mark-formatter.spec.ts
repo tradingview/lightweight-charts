@@ -1,9 +1,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { defaultTickMarkFormatter } from '../../src/model/default-tick-mark-formatter';
-import { TimePoint, UTCTimestamp } from '../../src/model/time-data';
-import { TickMarkType } from '../../src/model/time-scale';
+import { defaultTickMarkFormatter } from '../../src/model/horz-scale-behavior-time/default-tick-mark-formatter';
+import { TickMarkType, TimePoint, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
 
 function time(dateTimeStr: string): TimePoint {
 	return {

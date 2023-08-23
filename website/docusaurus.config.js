@@ -348,8 +348,12 @@ async function getConfig() {
 							title: 'More',
 							items: [
 								{
-									label: 'GitHub',
-									href: projectUrl,
+									label: 'Advanced Charts',
+									href: 'https://www.tradingview.com/charting-library-docs/',
+								},
+								{
+									label: 'TradingView Widgets',
+									href: 'https://www.tradingview.com/widget/',
 								},
 							],
 						},
