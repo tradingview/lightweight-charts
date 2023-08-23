@@ -25,11 +25,11 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 		paneRendererData: PriceAxisViewRendererData,
 		commonRendererData: PriceAxisViewRendererCommonData
 	): void {
+		axisRendererData.visible = false;
 		if (this._source.options().mode === CrosshairMode.Hidden) {
 			return;
 		}
 
-		axisRendererData.visible = false;
 		const options = this._source.options().horzLine;
 		if (!options.labelVisible) {
 			return;

@@ -52,6 +52,8 @@ export class CrosshairPaneView implements IPaneView {
 		const data = this._rendererData;
 
 		if (crosshairOptions.mode === CrosshairMode.Hidden) {
+			data.horzLine.visible = false;
+			data.vertLine.visible = false;
 			return;
 		}
 
