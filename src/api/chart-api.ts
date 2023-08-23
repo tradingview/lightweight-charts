@@ -34,7 +34,7 @@ import {
 import { Logical } from '../model/time-data';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
-import { IChartApiBase, MouseEventHandler, MouseEventParams } from './ichart-api';
+import { IChartApiBase, MouseEventHandler, MouseEventParams, PaneSize } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -310,6 +310,14 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	public chartElement(): HTMLDivElement {
 		return this._chartWidget.element();
+	}
+
+	public paneSize(): PaneSize {
+		const size = this._chartWidget.paneSize();
+		return {
+			height: size.height,
+			width: size.width,
+		};
 	}
 
 	private _addSeriesImpl<
