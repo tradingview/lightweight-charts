@@ -53,6 +53,7 @@ export class PanePriceAxisView implements IPaneView {
 	private readonly _order: any;
 	private readonly _alert: any;
 	private readonly _draggable: boolean;
+	private readonly _closeButton: boolean;
 	private readonly _labelPosition?: 'left' | 'right';
 	private readonly _iconColor?: string;
 	private _fontSize: number;
@@ -65,10 +66,11 @@ export class PanePriceAxisView implements IPaneView {
 		this._order = options?.order;
 		this._alert = options?.alert;
 		this._draggable = Boolean(options?.draggable);
+		this._closeButton = Boolean(this._order || this._alert) && !options?.hideCloseButton;
 		this._iconColor = options?.iconColor;
 		this._labelPosition = options?.labelPosition;
 		this._fontSize = -1;
-		this._renderer = new PanePriceAxisViewRenderer(this._textWidthCache, this._draggable, Boolean(this._order || this._alert), this._iconColor);
+		this._renderer = new PanePriceAxisViewRenderer(this._textWidthCache, this._draggable, this._closeButton, this._iconColor);
 	}
 
 	public renderer(): IPaneRenderer | null {

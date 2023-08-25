@@ -536,7 +536,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 		const options = customPriceLine.options();
 
-		if (!options.order && !options.alert) {
+		if ((!options.order && !options.alert) || options.hideCloseButton) {
 			return null;
 		}
 

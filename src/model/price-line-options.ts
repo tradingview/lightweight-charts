@@ -86,6 +86,12 @@ export interface PriceLineOptions {
 	 *
 	 * @defaultValue `undefined`
 	 */
+	hideCloseButton?: boolean;
+     /**
+      * Custom price line hide close button
+      *
+      * @defaultValue `false`
+      */
 	iconColor?: string;
      /**
 	 * Custom price line label position
