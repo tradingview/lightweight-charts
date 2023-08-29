@@ -81,7 +81,7 @@ project and import the JS module in your code.
 
 ## Creating your own Plugin
 
-[create-lwc-plugin](https://github.com/tradingview/create-lwc-plugin) is an npm
+[create-lwc-plugin](https://github.com/tradingview/lightweight-charts/tree/master/packages/create-lwc-plugin) is an npm
 package designed to simplify the process of creating a new plugin for
 Lightweight Charts™. With this generator, you can quickly scaffold a project
 from a template for either
