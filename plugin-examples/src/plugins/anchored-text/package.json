@@ -1,0 +1,5 @@
+{
+    "private": true,
+    "main": "anchored-text",
+    "types": "anchored-text.d.ts"
+}

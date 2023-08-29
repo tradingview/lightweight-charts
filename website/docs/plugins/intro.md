@@ -136,3 +136,9 @@ const chartSeries = chart.addLineSeries();
 chartSeries.attachPrimitive(myCustomPrimitive);
 
 ```
+
+## Examples
+
+We have a few example plugins within the `plugin-examples` folder of the Lightweight Charts™️ repo: [plugin-examples](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples).
+
+You can view a demo site for these plugin examples here: [Plugin Examples Demos](https://tradingview.github.io/lightweight-charts/plugin-examples).

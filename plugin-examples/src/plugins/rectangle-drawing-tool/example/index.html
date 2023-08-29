@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Lightweight Charts - Rectangle Drawing Tool Plugin Example</title>
+		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			#toolbar {
+				display: flex;
+				flex-direction: row;
+				gap: 10px;
+				padding-inline-start: 10px;
+				box-sizing: border-box;
+				padding: 10px;
+				background-color: rgba(224, 227, 235, 1);
+				border-top-left-radius: 5px;
+				border-top-right-radius: 5px;
+			}
+			#chart {
+				border-top-left-radius: 0px;
+				border-top-right-radius: 0px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="toolbar" class="column"></div>
+		<div id="chart"></div>
+		<div id="description">
+			<h1>Rectangle Drawing Tool</h1>
+			<p>
+				A simple drawing tool for rectangles. Click on the icon in the top left
+				corner to activate drawing mode, and then click on the chart to define
+				the top left and bottom right corners of a rectangle. The color can be
+				changed using the color picker in the top toolbar.
+			</p>
+		</div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>

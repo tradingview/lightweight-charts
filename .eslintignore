@@ -13,3 +13,5 @@
 /website/docs/api/**
 /website/versioned_docs/**/api/**
 /website/build/**
+
+/plugin-examples
