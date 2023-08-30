@@ -76,6 +76,9 @@ export class TickMarks<HorzScaleItem> {
 	public build(spacing: number, fontSize: number): TickMarkBuildResult {
 		const maxLabelWidth = (fontSize + 4) * 5;
 		const widthPerCharacterEstimate = maxLabelWidth / 8;
+		// If we do not round then even very small changes in the spacing will cause the marks to be rebuilt.
+		// Limiting this to increments of 0.1 seems to be an acceptable compromise but probably there is a cleverer way to handle this.
+
 		// "default" because we will adjust the value based on actual label widths
 		const defaultMaxIndexesPerMark = roundToOneDecimalPlace(maxLabelWidth / spacing);
 
