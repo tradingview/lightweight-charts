@@ -176,6 +176,20 @@ export interface PriceScaleOptions {
 	 * @defaultValue `false`
 	 */
 	ticksVisible: boolean;
+
+	/**
+	 * Define a minimum width for the price scale.
+	 * Note: This value will be exceeded if the
+	 * price scale needs more space to display it's contents.
+	 *
+	 * Setting a minimum width could be useful for ensuring that
+	 * multiple charts positioned in a vertical stack each have
+	 * an identical price scale width, or for plugins which
+	 * require a bit more space within the price scale pane.
+	 *
+	 * @defaultValue 0
+	 */
+	minimumWidth: number;
 }
 
 interface RangeCache {
