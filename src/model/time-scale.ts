@@ -7,7 +7,6 @@ import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
 
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
-// import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from './ihorz-scale-behavior';
 import { LocalizationOptions } from './localization-options';

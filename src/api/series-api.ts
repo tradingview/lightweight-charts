@@ -135,8 +135,6 @@ export class SeriesApi<
 
 		// actually they can't exist separately
 		if (dataFirstBarInRange !== null && dataLastBarInRange !== null) {
-			// result.from = dataFirstBarInRange.time.businessDay || dataFirstBarInRange.time.timestamp;
-			// result.to = dataLastBarInRange.time.businessDay || dataLastBarInRange.time.timestamp;
 			result.from = dataFirstBarInRange.originalTime as HorzScaleItem;
 			result.to = dataLastBarInRange.originalTime as HorzScaleItem;
 		}

@@ -4,7 +4,7 @@ import { TickMarkFormatter } from './horz-scale-behavior-time';
 import { Time } from './types';
 
 /**
- * Extended time scale options for time-base horz scale
+ * Extended time scale options for time-based horizontal scale
  */
 export interface TimeScaleOptions extends HorzScaleOptions {
 	/**
