@@ -24,6 +24,17 @@ import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
 
 /**
+ * Dimensions of the Chart Pane
+ * (the main chart area which excludes the time and price scales).
+ */
+export interface PaneSize {
+	/** Height of the Chart Pane (pixels) */
+	height: number;
+	/** Width of the Chart Pane (pixels) */
+	width: number;
+}
+
+/**
  * Represents a mouse event.
  */
 export interface MouseEventParams<HorzScaleItem = Time> {
@@ -334,4 +345,12 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @returns generated div element containing the chart.
 	 */
 	chartElement(): HTMLDivElement;
+
+	/**
+	 * Returns the dimensions of the chart pane (the plot surface which excludes time and price scales).
+	 * This would typically only be useful for plugin development.
+	 *
+	 * @returns Dimensions of the chart pane
+	 */
+	paneSize(): PaneSize;
 }

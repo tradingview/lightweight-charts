@@ -317,6 +317,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return this._cursorStyleOverride;
 	}
 
+	public paneSize(): Size {
+		// we currently only support a single pane.
+		return ensureDefined(this._paneWidgets[0]).getSize();
+	}
+
 	// eslint-disable-next-line complexity
 	private _applyAutoSizeOptions(options: DeepPartial<ChartOptionsInternal<HorzScaleItem>>): void {
 		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {
