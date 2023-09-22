@@ -36,6 +36,7 @@
 
 .SquareButton[data-primary]:hover {
 	background-color: var(--cta-button-primary-background-hover);
+	color: #ffffff;
 }
 
 .SquareButton[data-primary]:active {
