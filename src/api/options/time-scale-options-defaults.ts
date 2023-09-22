@@ -1,6 +1,6 @@
-import { TimeScaleOptions } from '../../model/time-scale';
+import { HorzScaleOptions } from '../../model/time-scale';
 
-export const timeScaleOptionsDefaults: TimeScaleOptions = {
+export const timeScaleOptionsDefaults: HorzScaleOptions = {
 	rightOffset: 0,
 	barSpacing: 6,
 	minBarSpacing: 0.5,
@@ -15,4 +15,5 @@ export const timeScaleOptionsDefaults: TimeScaleOptions = {
 	secondsVisible: true,
 	shiftVisibleRangeOnNewBar: true,
 	ticksVisible: false,
+	uniformDistribution: false,
 };

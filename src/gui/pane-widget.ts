@@ -14,11 +14,10 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 
-import { ChartModel, HoveredObject, TrackingModeExitMode } from '../model/chart-model';
+import { IChartModelBase, TrackingModeExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { IPriceDataSource } from '../model/iprice-data-source';
 import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
 import { Point } from '../model/point';
@@ -28,8 +27,11 @@ import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { createBoundCanvas } from './canvas-utils';
-import { ChartWidget } from './chart-widget';
+import { IChartWidgetBase } from './chart-widget';
+import { drawBackground, drawForeground, DrawFunction, drawSourcePaneViews } from './draw-functions';
+import { IPaneViewsGetter } from './ipane-view-getter';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
+import { hitTestPane, HitTestResult } from './pane-hit-test';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 
 const enum KineticScrollConstants {
@@ -39,41 +41,17 @@ const enum KineticScrollConstants {
 	ScrollMinMove = 15,
 }
 
-type DrawFunction = (renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown) => void;
-
-function drawBackground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-	if (renderer.drawBackground) {
-		renderer.drawBackground(target, isHovered, hitTestData);
-	}
+function sourceBottomPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+	return source.bottomPaneViews?.(pane) ?? [];
 }
-
-function drawForeground(renderer: IPaneRenderer, target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-	renderer.draw(target, isHovered, hitTestData);
-}
-
-type PaneViewsGetter = (source: IDataSource, pane: Pane) => readonly IPaneView[];
-
 function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
-	return source.paneViews(pane);
+	return source.paneViews?.(pane) ?? [];
 }
-
 function sourceLabelPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
-	return source.labelPaneViews(pane);
+	return source.labelPaneViews?.(pane) ?? [];
 }
-
 function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
-	return source.topPaneViews !== undefined ? source.topPaneViews(pane) : [];
-}
-
-export interface HitTestResult {
-	source: IPriceDataSource;
-	object?: HoveredObject;
-	view: IPaneView;
-}
-
-interface HitTestPaneViewResult {
-	view: IPaneView;
-	object?: HoveredObject;
+	return source.topPaneViews?.(pane) ?? [];
 }
 
 interface StartScrollPosition extends Point {
@@ -83,7 +61,7 @@ interface StartScrollPosition extends Point {
 }
 
 export class PaneWidget implements IDestroyable, MouseEventHandlers {
-	private readonly _chart: ChartWidget;
+	private readonly _chart: IChartWidgetBase;
 	private _state: Pane | null;
 	private _size: Size = size({ width: 0, height: 0 });
 	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
@@ -98,6 +76,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
 	private _clicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
+	private _dblClicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
 	private _startTrackPoint: Point | null = null;
@@ -108,7 +87,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _isSettingSize: boolean = false;
 
-	public constructor(chart: ChartWidget, state: Pane) {
+	public constructor(chart: IChartWidgetBase, state: Pane) {
 		this._chart = chart;
 
 		this._state = state;
@@ -203,7 +182,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this.updatePriceAxisWidgetsStates();
 	}
 
-	public chart(): ChartWidget {
+	public chart(): IChartWidgetBase {
 		return this._chart;
 	}
 
@@ -276,6 +255,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const y = event.localY;
 		this._setCrosshairPosition(x, y, event);
 		const hitTest = this.hitTest(x, y);
+		this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
 		this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 	}
 
@@ -285,6 +265,17 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 		this._onMouseEvent();
 		this._fireClickedDelegate(event);
+	}
+
+	public mouseDoubleClickEvent(event: MouseEventHandlerMouseEvent | MouseEventHandlerTouchEvent): void {
+		if (this._state === null) {
+			return;
+		}
+		this._fireMouseClickDelegate(this._dblClicked, event);
+	}
+
+	public doubleTapEvent(event: MouseEventHandlerTouchEvent): void {
+		this.mouseDoubleClickEvent(event);
 	}
 
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
@@ -332,6 +323,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public clicked(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
 		return this._clicked;
+	}
+
+	public dblClicked(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
+		return this._dblClicked;
 	}
 
 	public pinchStartEvent(): void {
@@ -397,19 +392,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return null;
 		}
 
-		const sources = state.orderedSources();
-		for (const source of sources) {
-			const sourceResult = this._hitTestPaneView(source.paneViews(state), x, y);
-			if (sourceResult !== null) {
-				return {
-					source: source,
-					view: sourceResult.view,
-					object: sourceResult.object,
-				};
-			}
-		}
-
-		return null;
+		return hitTestPane(state, x, y);
 	}
 
 	public setPriceAxisSize(width: number, position: PriceAxisWidgetSide): void {
@@ -493,6 +476,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 					this._drawBackground(scope);
 				});
 				if (this._state) {
+					this._drawSources(target, sourceBottomPaneViews);
 					this._drawGrid(target);
 					this._drawWatermark(target);
 					this._drawSources(target, sourcePaneViews);
@@ -507,8 +491,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
 			});
-			this._drawSources(topTarget, sourceTopPaneViews);
 			this._drawCrosshair(topTarget);
+			this._drawSources(topTarget, sourceTopPaneViews);
 		}
 	}
 
@@ -520,6 +504,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._rightPriceAxisWidget;
 	}
 
+	public drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
+		this._drawSources(target, paneViewsGetter);
+	}
+
 	private _onStateDestroyed(): void {
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
@@ -529,10 +517,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	private _fireClickedDelegate(event: MouseEventHandlerEventBase): void {
+		this._fireMouseClickDelegate(this._clicked, event);
+	}
+
+	private _fireMouseClickDelegate(delegate: Delegate<TimePointIndex | null, Point, TouchMouseEventData>, event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
 		const y = event.localY;
-		if (this._clicked.hasListeners()) {
-			this._clicked.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
+		if (delegate.hasListeners()) {
+			delegate.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}
 	}
 
@@ -569,7 +561,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: PaneViewsGetter): void {
+	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
@@ -584,41 +576,19 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _drawSourceImpl(
 		target: CanvasRenderingTarget2D,
-		paneViewsGetter: PaneViewsGetter,
+		paneViewsGetter: IPaneViewsGetter,
 		drawFn: DrawFunction,
 		source: IDataSource
 	): void {
 		const state = ensureNotNull(this._state);
-		const paneViews = paneViewsGetter(source, state);
 		const hoveredSource = state.model().hoveredSource();
 		const isHovered = hoveredSource !== null && hoveredSource.source === source;
 		const objecId = hoveredSource !== null && isHovered && hoveredSource.object !== undefined
 			? hoveredSource.object.hitTestData
 			: undefined;
 
-		for (const paneView of paneViews) {
-			const renderer = paneView.renderer();
-			if (renderer !== null) {
-				drawFn(renderer, target, isHovered, objecId);
-			}
-		}
-	}
-
-	private _hitTestPaneView(paneViews: readonly IPaneView[], x: Coordinate, y: Coordinate): HitTestPaneViewResult | null {
-		for (const paneView of paneViews) {
-			const renderer = paneView.renderer();
-			if (renderer !== null && renderer.hitTest) {
-				const result = renderer.hitTest(x, y);
-				if (result !== null) {
-					return {
-						view: paneView,
-						object: result,
-					};
-				}
-			}
-		}
-
-		return null;
+		const drawRendererFn = (renderer: IPaneRenderer) => drawFn(renderer, target, isHovered, objecId);
+		drawSourcePaneViews(paneViewsGetter, drawRendererFn, source, state);
 	}
 
 	private _recreatePriceAxisWidgets(): void {
@@ -684,7 +654,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
 	}
 
-	private _model(): ChartModel {
+	private _model(): IChartModelBase {
 		return this._chart.model();
 	}
 

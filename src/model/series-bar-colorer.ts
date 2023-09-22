@@ -8,6 +8,7 @@ import {
 	BarStyleOptions,
 	BaselineStyleOptions,
 	CandlestickStyleOptions,
+	CustomStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
 	SeriesOptionsMap,
@@ -63,6 +64,8 @@ export interface CandlesticksColorerStyle extends CommonBarColorerStyle {
 	barWickColor: string;
 }
 
+export interface CustomBarColorerStyle extends CommonBarColorerStyle {}
+
 export interface BarStylesMap {
 	Bar: BarColorerStyle;
 	Candlestick: CandlesticksColorerStyle;
@@ -70,9 +73,10 @@ export interface BarStylesMap {
 	Baseline: BaselineBarColorerStyle;
 	Line: LineBarColorerStyle;
 	Histogram: HistogramBarColorerStyle;
+	Custom: CustomBarColorerStyle;
 }
 
-type FindBarFn = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars) => SeriesPlotRow | null;
+type FindBarFn = (barIndex: TimePointIndex, precomputedBars?: PrecomputedBars) => SeriesPlotRow<SeriesType> | null;
 
 type StyleGetterFn<T extends SeriesType> = (
 	findBar: FindBarFn,
@@ -84,6 +88,10 @@ type StyleGetterFn<T extends SeriesType> = (
 type BarStylesFnMap = {
 	[T in keyof SeriesOptionsMap]: StyleGetterFn<T>;
 };
+
+export interface ISeriesBarColorer<T extends SeriesType> {
+	barStyle(barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarStylesMap[T];
+}
 
 const barStyleFnMap: BarStylesFnMap = {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -115,6 +123,14 @@ const barStyleFnMap: BarStylesFnMap = {
 			barColor: currentBar.color ?? (isUp ? upColor : downColor),
 			barBorderColor: currentBar.borderColor ?? (isUp ? borderUpColor : borderDownColor),
 			barWickColor: currentBar.wickColor ?? (isUp ? wickUpColor : wickDownColor),
+		};
+	},
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Custom: (findBar: FindBarFn, customStyle: CustomStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): CustomBarColorerStyle => {
+		const currentBar = ensureNotNull(findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Line'>;
+
+		return {
+			barColor: currentBar.color ?? customStyle.color,
 		};
 	},
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -160,9 +176,9 @@ const barStyleFnMap: BarStylesFnMap = {
 	},
 };
 
-export class SeriesBarColorer<T extends SeriesType> {
+export class SeriesBarColorer<T extends SeriesType> implements ISeriesBarColorer<T> {
 	private _series: Series<T>;
-	private readonly _styleGetter: typeof barStyleFnMap[T];
+	private readonly _styleGetter: BarStylesFnMap[T];
 
 	public constructor(series: Series<T>) {
 		this._series = series;

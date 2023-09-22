@@ -6,6 +6,7 @@ import {
 	doVerticalDrag,
 } from './mouse-drag-actions';
 import { doMouseScroll } from './mouse-scroll-actions';
+import { pageTimeout } from './page-timeout';
 import { doLongTouch, doPinchZoomTouch, doSwipeTouch } from './touch-actions';
 import { doZoomInZoomOut } from './zoom-action';
 
@@ -84,7 +85,9 @@ async function performAction(
 			await target.click({ button: 'left' });
 			break;
 		case 'doubleClick':
-			await target.click({ button: 'left', clickCount: 2 });
+			await target.click({ button: 'left' });
+			await pageTimeout(page, 200);
+			await target.click({ button: 'left' });
 			break;
 		case 'outsideClick':
 			{

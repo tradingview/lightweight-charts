@@ -2,6 +2,22 @@ import { isNumber } from '../helpers/strict-type-checks';
 
 import { PriceRange } from './series-options';
 
+function computeFiniteResult(
+	method: (...values: number[]) => number,
+	valueOne: number,
+	valueTwo: number,
+	fallback: number
+): number {
+	const firstFinite = Number.isFinite(valueOne);
+	const secondFinite = Number.isFinite(valueTwo);
+
+	if (firstFinite && secondFinite) {
+		return method(valueOne, valueTwo);
+	}
+
+	return !firstFinite && !secondFinite ? fallback : (firstFinite ? valueOne : valueTwo);
+}
+
 export class PriceRangeImpl {
 	private _minValue: number;
 	private _maxValue!: number;
@@ -43,8 +59,8 @@ export class PriceRangeImpl {
 			return this;
 		}
 		return new PriceRangeImpl(
-			Math.min(this.minValue(), anotherRange.minValue()),
-			Math.max(this.maxValue(), anotherRange.maxValue())
+			computeFiniteResult(Math.min, this.minValue(), anotherRange.minValue(), -Infinity),
+			computeFiniteResult(Math.max, this.maxValue(), anotherRange.maxValue(), Infinity)
 		);
 	}
 

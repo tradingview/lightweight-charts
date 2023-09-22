@@ -1,13 +1,21 @@
 import { lowerBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
-import { OriginalTime, TickMarkWeight, TimePoint, TimePointIndex, TimeScalePoint } from './time-data';
+import { InternalHorzScaleItem } from './ihorz-scale-behavior';
+import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from './time-data';
 
+/**
+ * Tick mark for the horizontal scale.
+ */
 export interface TickMark {
+	/** Index */
 	index: TimePointIndex;
-	time: TimePoint;
-	weight: TickMarkWeight;
-	originalTime: OriginalTime;
+	/** Time / Coordinate */
+	time: InternalHorzScaleItem;
+	/** Weight of the tick mark */
+	weight: TickMarkWeightValue;
+	/** Original value for the `time` property */
+	originalTime: unknown;
 }
 
 interface MarksCache {
@@ -15,9 +23,15 @@ interface MarksCache {
 	marks: readonly TickMark[];
 }
 
-export class TickMarks {
-	private _marksByWeight: Map<TickMarkWeight, TickMark[]> = new Map();
+export class TickMarks<HorzScaleItem> {
+	private _marksByWeight: Map<TickMarkWeightValue, TickMark[]> = new Map();
 	private _cache: MarksCache | null = null;
+	private _uniformDistribution: boolean = false;
+
+	public setUniformDistribution(val: boolean): void {
+		this._uniformDistribution = val;
+		this._cache = null;
+	}
 
 	public setTimeScalePoints(newPoints: readonly TimeScalePoint[], firstChangedPointIndex: number): void {
 		this._removeMarksSinceIndex(firstChangedPointIndex);
@@ -59,9 +73,9 @@ export class TickMarks {
 			return;
 		}
 
-		const weightsToClear: TickMarkWeight[] = [];
+		const weightsToClear: TickMarkWeightValue[] = [];
 
-		this._marksByWeight.forEach((marks: TickMark[], timeWeight: number) => {
+		this._marksByWeight.forEach((marks: TickMark[], timeWeight: TickMarkWeightValue) => {
 			if (sinceIndex <= marks[0].index) {
 				weightsToClear.push(timeWeight);
 			} else {
@@ -120,6 +134,10 @@ export class TickMarks {
 					// TickMark fits. Place it into new array
 					marks.push(mark);
 					leftIndex = currentIndex;
+				} else {
+					if (this._uniformDistribution) {
+						return prevMarks;
+					}
 				}
 			}
 

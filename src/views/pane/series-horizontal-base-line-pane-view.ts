@@ -1,11 +1,12 @@
 import { PriceScaleMode } from '../../model/price-scale';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/series';
+import { SeriesType } from '../../model/series-options';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';
 
 export class SeriesHorizontalBaseLinePaneView extends SeriesHorizontalLinePaneView {
 	// eslint-disable-next-line no-useless-constructor
-	public constructor(series: Series) {
+	public constructor(series: ISeries<SeriesType>) {
 		super(series);
 	}
 

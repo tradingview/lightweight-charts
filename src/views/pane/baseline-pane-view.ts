@@ -1,7 +1,7 @@
 import { BarPrice } from '../../model/bar';
-import { ChartModel } from '../../model/chart-model';
-import { Series } from '../../model/series';
-import { SeriesBarColorer } from '../../model/series-bar-colorer';
+import { IChartModelBase } from '../../model/chart-model';
+import { ISeries } from '../../model/series';
+import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { BaselineFillItem, PaneRendererBaselineArea } from '../../renderers/baseline-renderer-area';
 import { BaselineStrokeItem, PaneRendererBaselineLine } from '../../renderers/baseline-renderer-line';
@@ -14,12 +14,12 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 	private readonly _baselineAreaRenderer: PaneRendererBaselineArea = new PaneRendererBaselineArea();
 	private readonly _baselineLineRenderer: PaneRendererBaselineLine = new PaneRendererBaselineLine();
 
-	public constructor(series: Series<'Baseline'>, model: ChartModel) {
+	public constructor(series: ISeries<'Baseline'>, model: IChartModelBase) {
 		super(series, model);
 		this._renderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
 	}
 
-	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: SeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
+	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: ISeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
 		return {
 			...this._createRawItemBase(time, price),
 			...colorer.barStyle(time),
@@ -32,17 +32,17 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 			return;
 		}
 
-		const baselineProps = this._series.options();
+		const options = this._series.options();
 
-		const baseLevelCoordinate = this._series.priceScale().priceToCoordinate(baselineProps.baseValue.price, firstValue.value);
+		const baseLevelCoordinate = this._series.priceScale().priceToCoordinate(options.baseValue.price, firstValue.value);
 		const barWidth = this._model.timeScale().barSpacing();
 
 		this._baselineAreaRenderer.setData({
 			items: this._items,
 
-			lineWidth: baselineProps.lineWidth,
-			lineStyle: baselineProps.lineStyle,
-			lineType: baselineProps.lineType,
+			lineWidth: options.lineWidth,
+			lineStyle: options.lineStyle,
+			lineType: options.lineType,
 
 			baseLevelCoordinate,
 			invertFilledArea: false,
@@ -54,9 +54,10 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 		this._baselineLineRenderer.setData({
 			items: this._items,
 
-			lineWidth: baselineProps.lineWidth,
-			lineStyle: baselineProps.lineStyle,
-			lineType: baselineProps.lineType,
+			lineWidth: options.lineWidth,
+			lineStyle: options.lineStyle,
+			lineType: options.lineVisible ? options.lineType : undefined,
+			pointMarkersRadius: options.pointMarkersVisible ? (options.pointMarkersRadius || options.lineWidth / 2 + 2) : undefined,
 
 			baseLevelCoordinate,
 
