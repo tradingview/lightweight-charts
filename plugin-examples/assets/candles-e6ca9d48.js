@@ -1,0 +1,1 @@
+function s(a){return Math.max(1,Math.floor(a))}function p(a){return s(a)/a}function f(a,c){if(a>=2.5&&a<=4)return Math.floor(3*c);const i=1-.2*Math.atan(Math.max(4,a)-4)/(Math.PI*.5),o=Math.floor(a*i*c),r=Math.floor(a*c),e=Math.min(o,r);return Math.max(Math.floor(c),e)}function C(a,c){let t=f(a,c);return t>=2&&Math.floor(c)%2!==t%2&&t--,t}export{C as c,p as g};
