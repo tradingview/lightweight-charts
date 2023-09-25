@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Lightweight Charts - Tooltip Plugin Example</title>
+		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			#chart {
+				height: 450px;
+				position: relative;
+			}
+			#buttons {
+				display: flex;
+				gap: 10px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="buttons" class="column">
+			<button id="top-button">Stick to Top</button>
+			<button id="tracking-button">Tracking</button>
+		</div>
+		<div id="chart"></div>
+		<div id="description">
+			<h1>Tooltip</h1>
+			<p>
+				A tooltip created using an HTML DOM Element which can either track the
+				cursor vertical, or remain fixed to a specific vertical position. The
+				Delta Tooltip is an example of using the Canvas instead of HTML elements
+				to achieve the tooltip.
+			</p>
+		</div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>

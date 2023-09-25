@@ -1,0 +1,17 @@
+{
+    "name": "to-be-replaced",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --config src/vite.config.js",
+        "compile": "tsc && node compile.mjs"
+    },
+    "devDependencies": {
+        "typescript": "^5.0.4",
+        "vite": "^4.3.1"
+    },
+    "dependencies": {
+        "dts-bundle-generator": "^8.0.1",
+        "fancy-canvas": "^2.1.0",
+        "lightweight-charts": "^4.1.0-rc2"
+    }
+}

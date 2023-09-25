@@ -1,0 +1,41 @@
+{
+  "name": "create-lwc-plugin",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "author": "TradingView, Inc.",
+  "description": "Wizard-like CLI tool for scaffolding a new plugin for Lightweight Charts™",
+  "keywords": ["lightweight-charts", "lwc-plugin", "plugins"],
+  "bin": {
+    "create-lwc-plugin": "index.js"
+  },
+  "files": [
+    "index.js",
+    "template-*",
+    "dist"
+  ],
+  "scripts": {
+    "dev": "unbuild --stub && echo 'now run `node index.js`'",
+    "build": "unbuild",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": "^18.0.0 || >=20.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tradingview/lightweight-charts.git",
+    "directory": "packages/create-lwc-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/slicedsilver/create-lwc-plugin/issues"
+  },
+  "homepage": "https://tradingview.github.io/lightweight-charts/",
+  "devDependencies": {
+    "@clack/prompts": "^0.7.0",
+    "@types/node": "^20.5.1",
+    "picocolors": "^1.0.0",
+    "unbuild": "^1.2.1"
+  }
+}
