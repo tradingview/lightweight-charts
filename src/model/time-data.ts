@@ -1,4 +1,4 @@
-import { lowerbound, upperbound } from '../helpers/algorithms';
+import { lowerBound, upperBound } from '../helpers/algorithms';
 import { Nominal } from '../helpers/nominal';
 
 import { Coordinate } from './coordinate';
@@ -73,7 +73,7 @@ function lowerBoundItemsCompare(item: TimedValue, time: TimePointIndex): boolean
 	return item.time < time;
 }
 
-function upperBoundItemsCompare(time: TimePointIndex, item: TimedValue): boolean {
+function upperBoundItemsCompare(item: TimedValue, time: TimePointIndex): boolean {
 	return time < item.time;
 }
 
@@ -81,8 +81,8 @@ export function visibleTimedValues(items: TimedValue[], range: RangeImpl<TimePoi
 	const firstBar = range.left();
 	const lastBar = range.right();
 
-	const from = lowerbound<TimedValue, TimePointIndex>(items, firstBar, lowerBoundItemsCompare);
-	const to = upperbound<TimedValue, TimePointIndex>(items, lastBar, upperBoundItemsCompare);
+	const from = lowerBound(items, firstBar, lowerBoundItemsCompare);
+	const to = upperBound(items, lastBar, upperBoundItemsCompare);
 
 	if (!extendedRange) {
 		return { from, to };

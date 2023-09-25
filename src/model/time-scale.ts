@@ -1,4 +1,4 @@
-import { lowerbound } from '../helpers/algorithms';
+import { lowerBound } from '../helpers/algorithms';
 import { ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { ISubscription } from '../helpers/isubscription';
@@ -313,7 +313,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			return findNearest ? this._points.length - 1 as TimePointIndex : null;
 		}
 
-		const index = lowerbound(this._points, this._horzScaleBehavior.key(time), (a: TimeScalePoint, b: InternalHorzScaleItemKey) => this._horzScaleBehavior.key(a.time) < b);
+		const index = lowerBound(this._points, this._horzScaleBehavior.key(time), (a: TimeScalePoint, b: InternalHorzScaleItemKey) => this._horzScaleBehavior.key(a.time) < b);
 
 		if (this._horzScaleBehavior.key(time) < this._horzScaleBehavior.key(this._points[index].time)) {
 			return findNearest ? index as TimePointIndex : null;

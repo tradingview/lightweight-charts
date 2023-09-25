@@ -36,6 +36,15 @@ jobs:
       - name: Build documentation website
         working-directory: ./website
         run: npm run build
+      - name: Install plugin example dependencies
+        working-directory: ./plugin-examples
+        run: npm install
+      - name: Build plugin examples website
+        working-directory: ./plugin-examples
+        run: npm run build:examples:site
+      - name: Build plugin examples website
+        working-directory: ./plugin-examples
+        run: npm run build:examples:site
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3

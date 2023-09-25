@@ -1,4 +1,4 @@
-import { lowerbound } from '../helpers/algorithms';
+import { lowerBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
@@ -80,7 +80,7 @@ export class TickMarks<HorzScaleItem> {
 				weightsToClear.push(timeWeight);
 			} else {
 				marks.splice(
-					lowerbound(marks, sinceIndex, (tm: TickMark) => tm.index < sinceIndex),
+					lowerBound(marks, sinceIndex, (tm: TickMark) => tm.index < sinceIndex),
 					Infinity
 				);
 			}

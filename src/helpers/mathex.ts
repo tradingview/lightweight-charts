@@ -24,14 +24,7 @@ export function equal(x1: number, x2: number, epsilon: number): boolean {
 	return Math.abs(x1 - x2) < epsilon;
 }
 
-export function log10(x: number): number {
-	if (x <= 0) {
-		return NaN;
-	}
-
-	return Math.log(x) / Math.log(10);
-}
-
+// We can't use Math.min(...arr) because that would only support arrays shorter than 65536 items.
 export function min(arr: number[]): number {
 	if (arr.length < 1) {
 		throw Error('array is empty');

@@ -1,0 +1,5 @@
+{
+    "private": true,
+    "main": "background-shade-series",
+    "types": "background-shade-series.d.ts"
+}
