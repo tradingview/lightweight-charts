@@ -1,5 +1,3 @@
-import { log10 } from '../helpers/mathex';
-
 import { PriceRangeImpl } from './price-range-impl';
 
 export interface LogFormula {
@@ -57,7 +55,7 @@ export function toLog(price: number, logFormula: LogFormula): number {
 		return 0;
 	}
 
-	const res = log10(m + logFormula.coordOffset) + logFormula.logicalOffset;
+	const res = Math.log10(m + logFormula.coordOffset) + logFormula.logicalOffset;
 	return ((price < 0) ? -res : res);
 }
 

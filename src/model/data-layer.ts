@@ -1,6 +1,6 @@
 /// <reference types="_build-time-constants" />
 
-import { lowerbound } from '../helpers/algorithms';
+import { lowerBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 import { Mutable } from '../helpers/mutable';
 
@@ -80,7 +80,7 @@ interface SeriesRowsFirstAndLastTime {
 	lastTime: InternalHorzScaleItemKey;
 }
 
-function seriesRowsFirsAndLastTime<TSeriesType extends SeriesType, HorzScaleItem>(seriesRows: SeriesPlotRow<TSeriesType>[] | undefined, bh: IHorzScaleBehavior<HorzScaleItem>): SeriesRowsFirstAndLastTime | undefined {
+function seriesRowsFirstAndLastTime<TSeriesType extends SeriesType, HorzScaleItem>(seriesRows: SeriesPlotRow<TSeriesType>[] | undefined, bh: IHorzScaleBehavior<HorzScaleItem>): SeriesRowsFirstAndLastTime | undefined {
 	if (seriesRows === undefined || seriesRows.length === 0) {
 		return undefined;
 	}
@@ -92,8 +92,8 @@ function seriesRowsFirsAndLastTime<TSeriesType extends SeriesType, HorzScaleItem
 }
 
 function seriesUpdateInfo<TSeriesType extends SeriesType, HorzScaleItem>(seriesRows: SeriesPlotRow<TSeriesType>[] | undefined, prevSeriesRows: SeriesPlotRow<TSeriesType>[] | undefined, bh: IHorzScaleBehavior<HorzScaleItem>): SeriesUpdateInfo | undefined {
-	const firstAndLastTime = seriesRowsFirsAndLastTime(seriesRows, bh);
-	const prevFirstAndLastTime = seriesRowsFirsAndLastTime(prevSeriesRows, bh);
+	const firstAndLastTime = seriesRowsFirstAndLastTime(seriesRows, bh);
+	const prevFirstAndLastTime = seriesRowsFirstAndLastTime(prevSeriesRows, bh);
 	if (firstAndLastTime !== undefined && prevFirstAndLastTime !== undefined) {
 		return {
 			lastBarUpdatedOrNewBarsAddedToTheRight:
@@ -291,7 +291,7 @@ export class DataLayer<HorzScaleItem> {
 			originalTime: timeScalePointTime(pointDataAtTime.mapping),
 		};
 
-		const insertIndex = lowerbound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint, b: number) => this._horzScaleBehavior.key(a.time) < b);
+		const insertIndex = lowerBound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint, b: number) => this._horzScaleBehavior.key(a.time) < b);
 
 		// yes, I know that this array is readonly and this change is intended to make it performative
 		// we marked _sortedTimePoints array as readonly to avoid modifying this array anywhere else
