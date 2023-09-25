@@ -7,7 +7,6 @@ import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
 
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
-// import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
 import { FormattedLabelsCache } from './formatted-labels-cache';
 import { IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from './ihorz-scale-behavior';
 import { LocalizationOptions } from './localization-options';
@@ -172,6 +171,20 @@ export interface HorzScaleOptions {
 	 * With this flag equal to `true`, marks of the same weight are either all drawn or none are drawn at all.
 	 */
 	uniformDistribution: boolean;
+
+	/**
+	 * Define a minimum height for the time scale.
+	 * Note: This value will be exceeded if the
+	 * time scale needs more space to display it's contents.
+	 *
+	 * Setting a minimum height could be useful for ensuring that
+	 * multiple charts positioned in a horizontal stack each have
+	 * an identical time scale height, or for plugins which
+	 * require a bit more space within the time scale pane.
+	 *
+	 * @defaultValue 0
+	 */
+	minimumHeight: number;
 }
 
 export interface ITimeScale {

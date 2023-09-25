@@ -16,6 +16,18 @@ npm install --save lightweight-charts
 
 _Note that the package is shipped with TypeScript declarations, so you can easily use it within TypeScript code._
 
+## License and attribution
+
+:::tip
+
+The Lightweight Charts™ license requires specifying TradingView as the product creator.
+
+:::
+
+You shall add the "attribution notice" from the [NOTICE](https://github.com/tradingview/lightweight-charts/blob/013424ecbf672db80646fe51ee48b187e9b71cec/NOTICE) file and a link to <https://www.tradingview.com/> to the page of your website or mobile application that is available to your users.
+
+As thanks for creating Lightweight Charts™, we'd be grateful if you add the attribution notice in a prominent place.
+
 ## Creating a chart
 
 Once the library has been installed in your repo you're ready to create your first chart.

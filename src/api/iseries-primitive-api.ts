@@ -1,3 +1,4 @@
+import { Time } from '../model/horz-scale-behavior-time/types';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { SeriesOptionsMap, SeriesType } from '../model/series-options';
 
@@ -9,7 +10,7 @@ import { ISeriesApi } from './iseries-api';
  * a refresh of the chart.
  */
 export interface SeriesAttachedParameter<
-	HorzScaleItem,
+	HorzScaleItem = Time,
 	TSeriesType extends SeriesType = keyof SeriesOptionsMap
 > {
 	/**
@@ -29,6 +30,6 @@ export interface SeriesAttachedParameter<
 /**
  * Interface for series primitives. It must be implemented to add some external graphics to series.
  */
-export type ISeriesPrimitive<HorzScaleItem> = ISeriesPrimitiveBase<
+export type ISeriesPrimitive<HorzScaleItem = Time> = ISeriesPrimitiveBase<
 	SeriesAttachedParameter<HorzScaleItem, SeriesType>
 >;

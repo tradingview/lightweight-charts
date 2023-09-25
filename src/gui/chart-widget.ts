@@ -317,6 +317,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return this._cursorStyleOverride;
 	}
 
+	public paneSize(): Size {
+		// we currently only support a single pane.
+		return ensureDefined(this._paneWidgets[0]).getSize();
+	}
+
 	// eslint-disable-next-line complexity
 	private _applyAutoSizeOptions(options: DeepPartial<ChartOptionsInternal<HorzScaleItem>>): void {
 		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {
@@ -444,10 +449,18 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 		for (const paneWidget of this._paneWidgets) {
 			if (this._isLeftAxisVisible()) {
-				leftPriceAxisWidth = Math.max(leftPriceAxisWidth, ensureNotNull(paneWidget.leftPriceAxisWidget()).optimalWidth());
+				leftPriceAxisWidth = Math.max(
+					leftPriceAxisWidth,
+					ensureNotNull(paneWidget.leftPriceAxisWidget()).optimalWidth(),
+					this._options.leftPriceScale.minimumWidth
+				);
 			}
 			if (this._isRightAxisVisible()) {
-				rightPriceAxisWidth = Math.max(rightPriceAxisWidth, ensureNotNull(paneWidget.rightPriceAxisWidget()).optimalWidth());
+				rightPriceAxisWidth = Math.max(
+					rightPriceAxisWidth,
+					ensureNotNull(paneWidget.rightPriceAxisWidget()).optimalWidth(),
+					this._options.rightPriceScale.minimumWidth
+				);
 			}
 			totalStretch += paneWidget.stretchFactor();
 		}
@@ -464,7 +477,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		// const separatorHeight = SEPARATOR_HEIGHT;
 		const separatorsHeight = 0; // separatorHeight * separatorCount;
 		const timeAxisVisible = this._options.timeScale.visible;
-		let timeAxisHeight = timeAxisVisible ? this._timeAxisWidget.optimalHeight() : 0;
+		let timeAxisHeight = timeAxisVisible ? Math.max(this._timeAxisWidget.optimalHeight(), this._options.timeScale.minimumHeight) : 0;
 		timeAxisHeight = suggestTimeScaleHeight(timeAxisHeight);
 
 		const otherWidgetHeight = separatorsHeight + timeAxisHeight;
