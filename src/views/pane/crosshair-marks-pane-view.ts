@@ -3,7 +3,7 @@ import { ensureNotNull } from '../../helpers/assertions';
 import { BarPrice } from '../../model/bar';
 import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
-import { Crosshair } from '../../model/crosshair';
+import { Crosshair, CrosshairMode } from '../../model/crosshair';
 import { ISeries } from '../../model/series';
 import { SeriesType } from '../../model/series-options';
 import { SeriesItemsIndexesRange, TimePointIndex } from '../../model/time-data';
@@ -70,6 +70,8 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 	}
 
 	private _updateImpl(): void {
+		const forceHidden = this._crosshair.options().mode === CrosshairMode.Hidden;
+
 		const serieses = this._chartModel.serieses();
 		const timePointIndex = this._crosshair.appliedIndex();
 		const timeScale = this._chartModel.timeScale();
@@ -78,7 +80,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 			const data = this._markersData[index];
 			const seriesData = s.markerDataAtIndex(timePointIndex);
 
-			if (seriesData === null || !s.visible()) {
+			if (forceHidden || seriesData === null || !s.visible()) {
 				data.visibleRange = null;
 				return;
 			}

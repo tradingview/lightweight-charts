@@ -2,7 +2,7 @@ import { ensureNotNull } from '../../helpers/assertions';
 import { generateContrastColors } from '../../helpers/color';
 
 import { IChartModelBase } from '../../model/chart-model';
-import { Crosshair, TimeAndCoordinateProvider } from '../../model/crosshair';
+import { Crosshair, CrosshairMode, TimeAndCoordinateProvider } from '../../model/crosshair';
 import { TimeAxisViewRenderer, TimeAxisViewRendererData } from '../../renderers/time-axis-view-renderer';
 
 import { ITimeAxisView } from './itime-axis-view';
@@ -47,6 +47,10 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 	private _updateImpl(): void {
 		const data = this._rendererData;
 		data.visible = false;
+
+		if (this._crosshair.options().mode === CrosshairMode.Hidden) {
+			return;
+		}
 
 		const options = this._crosshair.options().vertLine;
 
