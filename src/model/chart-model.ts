@@ -805,7 +805,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			// whitespace locations. In this case we would not want the chart to
 			// shift the visible range. #1201
 			const lastIndex = this._timeScale.lastIndex();
-			const replacedExistingWhitespace = lastIndex === oldLastIndex;
+			const replacedExistingWhitespace = lastIndex === oldLastIndex && this._timeScale.options().dontShiftVisibleRangeWhenNewBarReplacesWhitespace;
 
 			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && !replacedExistingWhitespace && this._timeScale.options().shiftVisibleRangeOnNewBar;
 			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
