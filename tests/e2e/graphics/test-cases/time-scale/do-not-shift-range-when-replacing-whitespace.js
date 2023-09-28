@@ -20,7 +20,7 @@ function runTestCase(container) {
 			barSpacing: 30,
 			rightOffset: 10,
 			shiftVisibleRangeOnNewBar: true,
-			dontShiftVisibleRangeWhenNewBarReplacesWhitespace: true,
+			shiftVisibleRangeWhenNewBarReplacesWhitespace: false,
 		},
 	});
 

@@ -154,14 +154,14 @@ export interface HorzScaleOptions {
 	shiftVisibleRangeOnNewBar: boolean;
 
 	/**
-	 * Don't shift the visible range to the right (into the future) by the number of new bars when new data is added IF
+	 * Should shift the visible range to the right (into the future) by the number of new bars when new data is added IF
 	 * that data is placed on existing whitespace data points (times).
 	 *
 	 * {@link shiftVisibleRangeOnNewBar} needs to be enabled for this to have any effect.
 	 *
-	 * @defaultValue `false`
+	 * @defaultValue `true`
 	 */
-	dontShiftVisibleRangeWhenNewBarReplacesWhitespace: boolean;
+	shiftVisibleRangeWhenNewBarReplacesWhitespace: boolean;
 
 	/**
 	 * Draw small vertical line on time axis labels.
