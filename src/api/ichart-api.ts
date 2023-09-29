@@ -347,12 +347,19 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	chartElement(): HTMLDivElement;
 
 	/**
-	 * TODO: set crosshair position
+	 * Set the crosshair position within the chart.
+	 *
+	 * Usually the crosshair position is set automatically by the user's actions. However in some cases you may want to set it explicitly.
+	 *
+	 * For example if you want to synchronise the crosshairs of two separate charts.
+	 *
+	 * @param price - The price (vertical coordinate) of the new crosshair position.
+	 * @param horizontalPosition - The horizontal coordinate (time by default) of the new crosshair position.
 	 */
 	setCrosshairPosition(price: number, horizontalPosition: HorzScaleItem): void;
 
 	/**
-	 * TODO: clear crosshair position
+	 * Clear the crosshair position within the chart.
 	 */
 	clearCrosshairPosition(): void;
 
