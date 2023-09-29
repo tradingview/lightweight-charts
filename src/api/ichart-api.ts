@@ -347,6 +347,16 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	chartElement(): HTMLDivElement;
 
 	/**
+	 * TODO: set crosshair position
+	 */
+	setCrosshairPosition(price: number, horizontalPosition: HorzScaleItem): void;
+
+	/**
+	 * TODO: clear crosshair position
+	 */
+	clearCrosshairPosition(): void;
+
+	/**
 	 * Returns the dimensions of the chart pane (the plot surface which excludes time and price scales).
 	 * This would typically only be useful for plugin development.
 	 *
