@@ -779,6 +779,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	public updateTimeScale(newBaseIndex: TimePointIndex | null, newPoints?: readonly TimeScalePoint[], firstChangedPointIndex?: number): void {
 		const oldFirstTime = this._timeScale.indexToTime(0 as TimePointIndex);
 
+		const oldLastIndex = this._timeScale.lastIndex();
 		if (newPoints !== undefined && firstChangedPointIndex !== undefined) {
 			this._timeScale.update(newPoints, firstChangedPointIndex);
 		}
@@ -797,7 +798,16 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			const isSeriesPointsAdded = newBaseIndex !== null && newBaseIndex > currentBaseIndex;
 			const isSeriesPointsAddedToRight = isSeriesPointsAdded && !isLeftBarShiftToLeft;
 
-			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && this._timeScale.options().shiftVisibleRangeOnNewBar;
+			// If the lastIndex of the time scale hasn't changed then this means
+			// that the new point/s has been placed on existing time index point/s.
+			// This can happen when you have a whitespace series which extends past
+			// the baseIndex, and now you are adding a new data point at one of those
+			// whitespace locations. In this case we would not want the chart to
+			// shift the visible range. #1201
+			const lastIndex = this._timeScale.lastIndex();
+			const replacedExistingWhitespace = lastIndex === oldLastIndex;
+
+			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && !replacedExistingWhitespace && this._timeScale.options().shiftVisibleRangeOnNewBar;
 			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
