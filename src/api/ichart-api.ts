@@ -356,7 +356,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @param price - The price (vertical coordinate) of the new crosshair position.
 	 * @param horizontalPosition - The horizontal coordinate (time by default) of the new crosshair position.
 	 */
-	setCrosshairPosition(price: number, horizontalPosition: HorzScaleItem): void;
+	setCrosshairPosition(price: number, horizontalPosition: HorzScaleItem, seriesApi: ISeriesApi<SeriesType, HorzScaleItem>): void;
 
 	/**
 	 * Clear the crosshair position within the chart.

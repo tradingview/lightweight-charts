@@ -320,10 +320,20 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		};
 	}
 
-	public setCrosshairPosition(price: number, horizontalPosition: HorzScaleItem): void {
-		const paneIndex = 0;
-		const pane = this._chartWidget.paneWidgets()[paneIndex];
-		this._chartWidget.model().setAndSaveSyntheticPosition(price, horizontalPosition, pane.state());
+	public setCrosshairPosition(price: number, horizontalPosition: HorzScaleItem, seriesApi: ISeriesApi<SeriesType, HorzScaleItem>): void {
+		const series = this._seriesMap.get(seriesApi as SeriesApi<SeriesType, HorzScaleItem>);
+
+		if (series === undefined) {
+			return;
+		}
+
+		const pane = this._chartWidget.model().paneForSource(series);
+
+		if (pane === null) {
+			return;
+		}
+
+		this._chartWidget.model().setAndSaveSyntheticPosition(price, horizontalPosition, pane);
 	}
 
 	public clearCrosshairPosition(): void {

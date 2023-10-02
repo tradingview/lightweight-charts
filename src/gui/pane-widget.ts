@@ -351,8 +351,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		this._mouseTouchDownEvent();
 
-		if (this._startTrackPoint !== null) {
-			const crosshair = this._model().crosshairSource();
+		const crosshair = this._model().crosshairSource();
+		if (this._startTrackPoint !== null && crosshair.visible()) {
 			this._initCrosshairPosition = { x: crosshair.appliedX(), y: crosshair.appliedY() };
 			this._startTrackPoint = { x: event.localX, y: event.localY };
 		}
