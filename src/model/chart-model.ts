@@ -803,9 +803,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			// This can happen when you have a whitespace series which extends past
 			// the baseIndex, and now you are adding a new data point at one of those
 			// whitespace locations. In this case we would not want the chart to
-			// shift the visible range when `shiftVisibleRangeWhenNewBarReplacesWhitespace` is `false`. #1201
+			// shift the visible range. #1201
 			const lastIndex = this._timeScale.lastIndex();
-			const replacedExistingWhitespace = lastIndex === oldLastIndex && !this._timeScale.options().shiftVisibleRangeWhenNewBarReplacesWhitespace;
+			const replacedExistingWhitespace = lastIndex === oldLastIndex;
 
 			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && !replacedExistingWhitespace && this._timeScale.options().shiftVisibleRangeOnNewBar;
 			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
