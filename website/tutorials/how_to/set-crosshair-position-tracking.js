@@ -50,5 +50,9 @@ document.getElementById('container').addEventListener('touchmove', e => {
 		return;
 	}
 
-	chart.setCrosshairPosition(price, time);
+	chart.setCrosshairPosition(price, time, mainSeries);
+});
+
+document.getElementById('container').addEventListener('touchend', () => {
+	chart.clearCrosshairPosition();
 });

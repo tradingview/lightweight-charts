@@ -76,7 +76,7 @@ function syncCrosshair(chart, series, param) {
 	}
 	const dataPoint = param.seriesData.get(series);
 	if (dataPoint) {
-		chart.setCrosshairPosition(dataPoint.value, dataPoint.time);
+		chart.setCrosshairPosition(dataPoint.value, dataPoint.time, series);
 		return;
 	}
 	chart.clearCrosshairPosition();
