@@ -29,7 +29,7 @@ export function removeUnwantedLines(originalString) {
 }
 
 const EnhancedCodeBlock = props => {
-	const { chart, replaceThemeConstants, hideableCode, chartOnly, ...rest } = props;
+	const { chart, replaceThemeConstants, hideableCode, chartOnly, iframeStyle, ...rest } = props;
 	let { children } = props;
 	const { colorMode } = useColorMode();
 	const isDarkTheme = colorMode === 'dark';
@@ -51,7 +51,7 @@ const EnhancedCodeBlock = props => {
 					/>
 					<label className="toggle-label" htmlFor={uniqueId}>Show all code</label></>}
 				{!chartOnly && <CodeBlock {...rest}>{children}</CodeBlock>}
-				{chart && <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={children} />}</BrowserOnly>}
+				{chart && <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={children} iframeStyle={iframeStyle} />}</BrowserOnly>}
 			</>
 		);
 	}

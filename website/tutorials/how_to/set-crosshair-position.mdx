@@ -1,0 +1,50 @@
+---
+title: Set crosshair position
+sidebar_label: Set crosshair position
+description: Examples of how to add a programatically set the crosshair position.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - crosshair
+  - tracking
+  - example
+---
+
+import CodeBlock from "@theme/CodeBlock";
+
+import MinimumVersionWrapper from "../../src/components/MinimumVersionWrapper";
+
+Lightweight Charts™ allows the crosshair position to be set programatically using the [`setCrosshairPosition`](/docs/api/interfaces/IChartApi#setcrosshairposition), and cleared using [`clearCrosshairPosition`](/docs/api/interfaces/IChartApi#clearcrosshairposition).
+
+Usually the crosshair position is set automatically by the user's actions. However in some cases you may want to set it explicitly. For example if you want to synchronise the crosshairs of two separate charts.
+
+import syncingCode from "!!raw-loader!./set-crosshair-position-syncing.js";
+import trackingCode from "!!raw-loader!./set-crosshair-position-tracking.js";
+import VersionWarningAdmonition from "@site/src/components/VersionWarningAdmonition";
+
+<!-- Show warning when not on the required version  -->
+<!-- Tutorials section isn't versioned yet, hence the need for the warning message -->
+
+<MinimumVersionWrapper version={4.1} fallback={() => {
+  return (<VersionWarningAdmonition
+    notCurrent="These tutorials are for version 4.1 (or greater) of Lightweight&nbsp;Charts™."
+    type="caution"
+    displayVersionMessage
+  />);
+}}>
+
+  ## Syncing two charts
+
+  <CodeBlock replaceThemeConstants chart className="language-js" hideableCode iframeStyle={{ height: '500px' }}>
+    {syncingCode}
+  </CodeBlock>
+
+  ## Tracking without long-press (on mobile)
+
+  If scrolling and scaling is disabled, then the API can be used to enable a kind of tracking mode without the user having to long-press the screen.
+
+  <CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+    {trackingCode}
+  </CodeBlock>
+
+</MinimumVersionWrapper>

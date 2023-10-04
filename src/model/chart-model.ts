@@ -15,7 +15,7 @@ import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
 import { ICustomSeriesPaneView } from './icustom-series';
-import { IHorzScaleBehavior } from './ihorz-scale-behavior';
+import { IHorzScaleBehavior, InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
@@ -734,7 +734,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._serieses;
 	}
 
-	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane): void {
+	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane, skipEvent?: boolean): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x);
@@ -754,14 +754,28 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._crosshair.setPosition(index, price, pane);
 
 		this.cursorUpdate();
-		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y }, event);
+		if (!skipEvent) {
+			this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y }, event);
+		}
 	}
 
-	public clearCurrentPosition(): void {
+	// A position provided external (not from an internal event listener)
+	public setAndSaveSyntheticPosition(price: number, horizontalPosition: HorzScaleItem, pane: Pane): void {
+		const priceScale = pane.defaultPriceScale();
+		const firstValue = priceScale.firstValue();
+		const y = priceScale.priceToCoordinate(price, ensureNotNull(firstValue));
+		const index = this._timeScale.timeToIndex(horizontalPosition as InternalHorzScaleItem, true);
+		const x = this._timeScale.indexToCoordinate(ensureNotNull(index));
+		this.setAndSaveCurrentPosition(x, y, null, pane, true);
+	}
+
+	public clearCurrentPosition(skipEvent?: boolean): void {
 		const crosshair = this.crosshairSource();
 		crosshair.clearPosition();
 		this.cursorUpdate();
-		this._crosshairMoved.fire(null, null, null);
+		if (!skipEvent) {
+			this._crosshairMoved.fire(null, null, null);
+		}
 	}
 
 	public updateCrosshair(): void {
