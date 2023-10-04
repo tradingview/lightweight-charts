@@ -14,7 +14,7 @@ export default function MinimumVersionWrapper(props: React.PropsWithChildren<Min
 	const currentVersion = versions && versions.length > 0 ? versions[0] : '';
 	const version = (preferredVersion?.name ?? currentVersion ?? 'current');
 
-	const canShowExamples = version === 'current' || parseFloat(version) > props.version;
+	const canShowExamples = version === 'current' || parseFloat(version) >= props.version;
 
 	if (canShowExamples) {
 		return props.children as React.ReactElement;
