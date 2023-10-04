@@ -24,7 +24,6 @@ export class _CLASSNAME_AxisPaneRenderer implements ISeriesPrimitivePaneRenderer
 		target.useBitmapCoordinateSpace(scope => {
 			if (this._p1 === null || this._p2 === null) return;
 			const ctx = scope.context;
-			ctx.save();
 			ctx.globalAlpha = 0.5;
 			const positions = positionsBox(
 				this._p1,
@@ -37,8 +36,6 @@ export class _CLASSNAME_AxisPaneRenderer implements ISeriesPrimitivePaneRenderer
 			} else {
 				ctx.fillRect(positions.position, 0, positions.length, 15);
 			}
-
-			ctx.restore();
 		});
 	}
 }

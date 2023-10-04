@@ -62,7 +62,6 @@ export class _CLASSNAME_Renderer<TData extends _CLASSNAME_Data>
 		});
 
 		const ctx = renderingScope.context;
-		ctx.save();
 		ctx.beginPath();
 		const lowLine = new Path2D();
 		const highLine = new Path2D();
@@ -103,7 +102,5 @@ export class _CLASSNAME_Renderer<TData extends _CLASSNAME_Data>
 		ctx.strokeStyle = options.highLineColor;
 		ctx.lineWidth = options.highLineWidth * renderingScope.verticalPixelRatio;
 		ctx.stroke(highLine);
-
-		ctx.restore();
 	}
 }
