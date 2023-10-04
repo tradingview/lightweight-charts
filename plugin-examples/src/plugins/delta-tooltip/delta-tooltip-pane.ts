@@ -249,12 +249,10 @@ class DeltaTooltipPaneRenderer implements ISeriesPrimitivePaneRenderer {
 				ctx,
 				scope.mediaSize
 			);
-			ctx.save();
 			this._drawMainTooltip(ctx, drawingPositions);
 			this._drawDeltaArea(ctx, drawingPositions);
 			this._drawTooltipsText(ctx, drawingPositions);
 			this._drawDeltaText(ctx, drawingPositions);
-			ctx.restore();
 		});
 	}
 

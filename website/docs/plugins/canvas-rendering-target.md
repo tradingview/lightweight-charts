@@ -105,13 +105,17 @@ target.useMediaCoordinateSpace(scope => {
 
 It is recommended that rendering functions should save and restore the canvas
 context before and after all the rendering logic to ensure that the canvas state
-is the same as when the renderer function was evoked. To get handle the case
+is the same as when the renderer function was evoked. To handle the case
 when an error in the code might prevent the restore function from being evoked,
 you should use the try - finally code block to ensure that the context is
 correctly restored in all cases.
 
+**Note** that `useBitmapCoordinateSpace` and `useMediaCoordinateSpace` will automatically
+save and restore the canvas context for the logic defined within them. This tip for your
+additional rendering functions within the `use*CoordinateSpace`.
+
 ```js title='javascript'
-target.useMediaCoordinateSpace(scope => {
+function myRenderingFunction(scope) {
     const ctx = scope.context;
 
     // save the current state of the context to the stack
@@ -127,5 +131,11 @@ target.useMediaCoordinateSpace(scope => {
         // restore the saved context from the stack
         ctx.restore();
     }
+}
+
+target.useMediaCoordinateSpace(scope => {
+    myRenderingFunction(scope);
+    myOtherRenderingFunction(scope);
+    /* ... */
 });
 ```

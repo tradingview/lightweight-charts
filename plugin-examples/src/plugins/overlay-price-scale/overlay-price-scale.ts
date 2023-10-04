@@ -57,7 +57,6 @@ class OverlayPriceScaleRenderer implements ISeriesPrimitivePaneRenderer {
 			}, 0);
 			const testLabelForWidth = ''.padEnd(maxLabelLength, '0');
 			const ctx = scope.context;
-			ctx.save();
 			const isLeft = this._data.options.side === 'left';
 			ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif`;
 			ctx.textAlign = 'center';
@@ -84,7 +83,6 @@ class OverlayPriceScaleRenderer implements ISeriesPrimitivePaneRenderer {
 				ctx.fillStyle = this._data!.options.textColor;
 				ctx.fillText(label.label, textX, topY + verticalPadding, width);
 			});
-			ctx.restore();
 		});
 	}
 

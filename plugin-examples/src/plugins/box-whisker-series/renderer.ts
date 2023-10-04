@@ -102,7 +102,6 @@ export class WhiskerBoxSeriesRenderer<TData extends WhiskerData>
 			renderingScope.verticalPixelRatio
 		);
 
-		renderingScope.context.save();
 		for (
 			let i = this._data.visibleRange.from;
 			i < this._data.visibleRange.to;
@@ -147,7 +146,6 @@ export class WhiskerBoxSeriesRenderer<TData extends WhiskerData>
 				horizontalLineWidth
 			);
 		}
-		renderingScope.context.restore();
 	}
 
 	_drawWhisker(

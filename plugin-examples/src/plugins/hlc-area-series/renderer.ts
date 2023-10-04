@@ -64,7 +64,6 @@ export class HLCAreaSeriesRenderer<TData extends HLCAreaData>
 		});
 
 		const ctx = renderingScope.context;
-		ctx.save();
 		ctx.beginPath();
 		const lowLine = new Path2D();
 		const highLine = new Path2D();
@@ -121,7 +120,5 @@ export class HLCAreaSeriesRenderer<TData extends HLCAreaData>
 		ctx.strokeStyle = options.closeLineColor;
 		ctx.lineWidth = options.closeLineWidth * renderingScope.verticalPixelRatio;
 		ctx.stroke(closeLine);
-
-		ctx.restore();
 	}
 }

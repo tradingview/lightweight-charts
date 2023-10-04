@@ -83,7 +83,6 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 			};
 		});
 		const zeroY = priceToCoordinate(0) ?? 0;
-		renderingScope.context.save();
 		const linesMeshed = this._createLinePaths(
 			bars,
 			this._data.visibleRange,
@@ -107,7 +106,6 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 				options.colors[(index - 1) % colorsCount].line;
 			renderingScope.context.stroke(linePath.path);
 		});
-		renderingScope.context.restore();
 	}
 
 	_createLinePaths(

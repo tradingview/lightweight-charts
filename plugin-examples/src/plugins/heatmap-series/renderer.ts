@@ -76,7 +76,6 @@ export class HeatMapSeriesRenderer<TData extends HeatMapData>
 		});
 		const drawBorder = this._data.barSpacing > options.cellBorderWidth * 3;
 
-		renderingScope.context.save();
 		for (
 			let i = this._data.visibleRange.from;
 			i < this._data.visibleRange.to;
@@ -117,6 +116,5 @@ export class HeatMapSeriesRenderer<TData extends HeatMapData>
 				}
 			}
 		}
-		renderingScope.context.restore();
 	}
 }

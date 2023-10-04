@@ -85,7 +85,6 @@ export class GroupedBarsSeriesRenderer<TData extends GroupedBarsData>
 		});
 
 		const zeroY = priceToCoordinate(0) ?? 0;
-		renderingScope.context.save();
 		for (
 			let i = this._data.visibleRange.from;
 			i < this._data.visibleRange.to;
@@ -116,6 +115,5 @@ export class GroupedBarsSeriesRenderer<TData extends GroupedBarsData>
 				lastX = xPos.position + xPos.length;
 			});
 		}
-		renderingScope.context.restore();
 	}
 }

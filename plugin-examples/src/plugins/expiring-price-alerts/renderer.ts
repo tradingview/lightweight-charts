@@ -24,7 +24,6 @@ export class ExpiringPriceAlertsPaneRenderer implements ISeriesPrimitivePaneRend
 
 		target.useMediaCoordinateSpace(scope => {
 			const ctx = scope.context;
-			ctx.save();
 			ctx.lineWidth = 2;
 
 			this._data.forEach(d => {
@@ -70,8 +69,6 @@ export class ExpiringPriceAlertsPaneRenderer implements ISeriesPrimitivePaneRend
 				ctx.fill(d.icon, 'evenodd');
 				ctx.restore();
 			});
-
-			ctx.restore();
 		});
 	}
 

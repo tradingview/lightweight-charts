@@ -35,7 +35,6 @@ class BandsIndicatorPaneRenderer implements ISeriesPrimitivePaneRenderer {
 		const points: BandRendererData[] = this._viewData.data;
 		target.useBitmapCoordinateSpace(scope => {
 			const ctx = scope.context;
-			ctx.save();
 			ctx.scale(scope.horizontalPixelRatio, scope.verticalPixelRatio);
 
 			ctx.strokeStyle = this._viewData.options.lineColor;
@@ -61,8 +60,6 @@ class BandsIndicatorPaneRenderer implements ISeriesPrimitivePaneRenderer {
 			ctx.stroke(lines);
 			ctx.fillStyle = this._viewData.options.fillColor;
 			ctx.fill(region);
-
-			ctx.restore();
 		});
 	}
 }

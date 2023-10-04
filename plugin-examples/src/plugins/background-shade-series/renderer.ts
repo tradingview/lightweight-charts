@@ -92,7 +92,6 @@ export class BackgroundShadeSeriesRenderer<TData extends LineData>
 			};
 		});
 
-		renderingScope.context.save();
 		const halfWidth = this._data.barSpacing / 2;
 		for (
 			let i = this._data.visibleRange.from;
@@ -106,6 +105,5 @@ export class BackgroundShadeSeriesRenderer<TData extends LineData>
 			renderingScope.context.fillStyle = bar.color || 'rgba(0, 0, 0, 0)';
 			renderingScope.context.fillRect(fullWidth.position, yTop, fullWidth.length, height);
 		}
-		renderingScope.context.restore();
 	}
 }

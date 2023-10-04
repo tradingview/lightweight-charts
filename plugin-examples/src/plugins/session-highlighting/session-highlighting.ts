@@ -27,25 +27,20 @@ class SessionHighlightingPaneRenderer implements ISeriesPrimitivePaneRenderer {
 		const points: SessionHighlightingRendererData[] = this._viewData.data;
 		target.useBitmapCoordinateSpace(scope => {
 			const ctx = scope.context;
-			ctx.save();
-			try {
-				const yTop = 0;
-				const height = scope.bitmapSize.height;
-				const halfWidth =
-					(scope.horizontalPixelRatio * this._viewData.barWidth) / 2;
-				const cutOff = -1 * (halfWidth + 1);
-				const maxX = scope.bitmapSize.width;
-				points.forEach(point => {
-					const xScaled = point.x * scope.horizontalPixelRatio;
-					if (xScaled < cutOff) return;
-					ctx.fillStyle = point.color || 'rgba(0, 0, 0, 0)';
-					const x1 = Math.max(0, Math.round(xScaled - halfWidth));
-					const x2 = Math.min(maxX, Math.round(xScaled + halfWidth));
-					ctx.fillRect(x1, yTop, x2 - x1, height);
-				});
-			} finally {
-				ctx.restore();
-			}
+			const yTop = 0;
+			const height = scope.bitmapSize.height;
+			const halfWidth =
+				(scope.horizontalPixelRatio * this._viewData.barWidth) / 2;
+			const cutOff = -1 * (halfWidth + 1);
+			const maxX = scope.bitmapSize.width;
+			points.forEach(point => {
+				const xScaled = point.x * scope.horizontalPixelRatio;
+				if (xScaled < cutOff) return;
+				ctx.fillStyle = point.color || 'rgba(0, 0, 0, 0)';
+				const x1 = Math.max(0, Math.round(xScaled - halfWidth));
+				const x2 = Math.min(maxX, Math.round(xScaled + halfWidth));
+				ctx.fillRect(x1, yTop, x2 - x1, height);
+			});
 		});
 	}
 }

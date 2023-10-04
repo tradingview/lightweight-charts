@@ -17,7 +17,6 @@ class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
 		if (!this._data.length) return;
 		target.useBitmapCoordinateSpace(scope => {
 			const ctx = scope.context;
-			ctx.save();
 			this._data.forEach(data => {
 				const crosshairPos = positionsLine(
 					data.x,
@@ -58,8 +57,6 @@ class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
 					ctx.fill();
 				}
 			});
-
-			ctx.restore();
 		});
 	}
 }

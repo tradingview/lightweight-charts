@@ -33,7 +33,6 @@ class PartialPriceLineRenderer implements ISeriesPrimitivePaneRenderer {
 			const yPosition = positionsLine(this._price, scope.verticalPixelRatio, scope.verticalPixelRatio);
 			const yCentre = yPosition.position + yPosition.length / 2;
 			const ctx = scope.context;
-			ctx.save();
 			ctx.beginPath();
 			ctx.setLineDash([
 				4 * scope.verticalPixelRatio,
@@ -44,7 +43,6 @@ class PartialPriceLineRenderer implements ISeriesPrimitivePaneRenderer {
 			ctx.strokeStyle = this._color;
 			ctx.lineWidth = scope.verticalPixelRatio;
 			ctx.stroke();
-			ctx.restore();
 		});
 	}
 }

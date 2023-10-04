@@ -26,7 +26,6 @@ class AnchoredTextRenderer implements ISeriesPrimitivePaneRenderer {
 	draw(target: CanvasRenderingTarget2D) {
 		target.useMediaCoordinateSpace(scope => {
 			const ctx = scope.context;
-			ctx.save();
 			ctx.font = this._data.font;
 			const textWidth = ctx.measureText(this._data.text).width;
 			const horzMargin = 20;
@@ -58,7 +57,6 @@ class AnchoredTextRenderer implements ISeriesPrimitivePaneRenderer {
 			}
 			ctx.fillStyle = this._data.color;
 			ctx.fillText(this._data.text, x, y);
-			ctx.restore();
 		});
 	}
 }

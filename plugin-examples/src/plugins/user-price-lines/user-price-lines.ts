@@ -56,7 +56,6 @@ class UserPriceLinesPaneRenderer implements ISeriesPrimitivePaneRenderer {
 		if (!this._data.visible) return;
 		target.useBitmapCoordinateSpace(scope => {
 			const ctx = scope.context;
-			ctx.save();
 
 			const height = LABEL_HEIGHT;
 			const width = height + 1;
@@ -77,7 +76,6 @@ class UserPriceLinesPaneRenderer implements ISeriesPrimitivePaneRenderer {
 				ctx.fill();
 			}
 
-			ctx.save();
 			ctx.translate(xPos.position + 3 * scope.horizontalPixelRatio, yPos.position + 3 * scope.verticalPixelRatio);
 			ctx.scale(scope.horizontalPixelRatio, scope.verticalPixelRatio);
 			const iconScaling = 15 / plusIconSize;
@@ -85,8 +83,6 @@ class UserPriceLinesPaneRenderer implements ISeriesPrimitivePaneRenderer {
 			ctx.strokeStyle = this._data.textColor;
 			ctx.lineWidth = 1;
 			ctx.stroke(plusIconPath);
-			ctx.restore();
-			ctx.restore();
 		});
 	}
 }

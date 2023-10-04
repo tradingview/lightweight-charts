@@ -31,7 +31,6 @@ class ImageWatermarkPaneRenderer implements ISeriesPrimitivePaneRenderer {
 			const pos = this._view._placement;
 			if (!pos) return;
 			if (!this._source._imgElement) throw new Error(`Image element missing.`);
-			ctx.save();
 			ctx.globalAlpha = this._source._options.alpha ?? 1;
 			ctx.drawImage(
 				this._source._imgElement,
@@ -40,7 +39,6 @@ class ImageWatermarkPaneRenderer implements ISeriesPrimitivePaneRenderer {
 				pos.width,
 				pos.height
 			);
-			ctx.restore();
 		});
 	}
 }

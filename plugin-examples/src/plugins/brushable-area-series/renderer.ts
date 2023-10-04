@@ -68,7 +68,6 @@ export class BrushableAreaSeriesRenderer<TData extends BrushableAreaData>
 
 		const ctx = renderingScope.context;
 		const bottomChartY = renderingScope.bitmapSize.height;
-		ctx.save();
 
 		const getRangeStyle = (index: number): BrushableAreaStyle => {
 			if (typeof options.brushRanges === 'string') return options;
@@ -157,6 +156,5 @@ export class BrushableAreaSeriesRenderer<TData extends BrushableAreaData>
 			}
 			previousPosition = [bar.x, bar.y];
 		}
-		ctx.restore();
 	}
 }

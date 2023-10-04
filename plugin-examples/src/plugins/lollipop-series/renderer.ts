@@ -66,7 +66,6 @@ export class LollipopSeriesRenderer<TData extends LollipopData>
 
 		const lineWidth = Math.min(this._options.lineWidth, this._data.barSpacing);
 
-		renderingScope.context.save();
 		const barWidth = this._data.barSpacing;
 		const radius = Math.floor(barWidth / 2);
 		const zeroY = priceToCoordinate(0);
@@ -103,6 +102,5 @@ export class LollipopSeriesRenderer<TData extends LollipopData>
 			);
 			renderingScope.context.fill();
 		}
-		renderingScope.context.restore();
 	}
 }

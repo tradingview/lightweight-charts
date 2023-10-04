@@ -83,7 +83,6 @@ export class StackedBarsSeriesRenderer<TData extends StackedBarsData>
 			this._data.visibleRange.to
 		);
 		const zeroY = priceToCoordinate(0) ?? 0;
-		renderingScope.context.save();
 		for (
 			let i = this._data.visibleRange.from;
 			i < this._data.visibleRange.to;
@@ -107,6 +106,5 @@ export class StackedBarsSeriesRenderer<TData extends StackedBarsData>
 				previousY = y;
 			});
 		}
-		renderingScope.context.restore();
 	}
 }
