@@ -1,6 +1,7 @@
 // remove-start
 // Lightweight Charts™ Example: Crosshair syncing
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/set-crosshair-position
+// remove-end
 
 // hide-start
 function generateData(startValue, startDate) {
@@ -59,6 +60,7 @@ const mainSeries2 = chart2.addLineSeries({
 });
 
 mainSeries2.setData(generateData(100));
+// hide-end
 
 chart1.timeScale().subscribeVisibleLogicalRangeChange(timeRange => {
 	chart2.timeScale().setVisibleLogicalRange(timeRange);
@@ -67,25 +69,27 @@ chart1.timeScale().subscribeVisibleLogicalRangeChange(timeRange => {
 chart2.timeScale().subscribeVisibleLogicalRangeChange(timeRange => {
 	chart1.timeScale().setVisibleLogicalRange(timeRange);
 });
-// hide-end
 
-function syncCrosshair(chart, series, param) {
+function getCrosshairDataPoint(series, param) {
 	if (!param.time) {
-		chart.clearCrosshairPosition();
-		return;
+		return null;
 	}
 	const dataPoint = param.seriesData.get(series);
+	return dataPoint || null;
+}
+
+function syncCrosshair(chart, series, dataPoint) {
 	if (dataPoint) {
 		chart.setCrosshairPosition(dataPoint.value, dataPoint.time, series);
 		return;
 	}
 	chart.clearCrosshairPosition();
 }
-
 chart1.subscribeCrosshairMove(param => {
-	syncCrosshair(chart2, mainSeries1, param);
+	const dataPoint = getCrosshairDataPoint(mainSeries1, param);
+	syncCrosshair(chart2, mainSeries2, dataPoint);
 });
-
 chart2.subscribeCrosshairMove(param => {
-	syncCrosshair(chart1, mainSeries2, param);
+	const dataPoint = getCrosshairDataPoint(mainSeries2, param);
+	syncCrosshair(chart1, mainSeries1, dataPoint);
 });

@@ -1,6 +1,7 @@
 // remove-start
 // Lightweight Charts™ Example: Crosshair syncing
 // https://tradingview.github.io/lightweight-charts/tutorials/how_to/set-crosshair-position
+// remove-end
 
 // hide-start
 function generateData() {
