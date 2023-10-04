@@ -23,11 +23,11 @@ Version 4.1 of Lightweight Charts introduces exciting new features, including th
 
 **Plugins**
 
-Developers can now leverage the power of Plugins in Lightweight Charts. Two types of Plugins are supported -  [Custom Series](https://tradingview.github.io/lightweight-charts/docs/plugins/intro#custom-series) and [Drawing Primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/intro#drawing-primitives), offering the ability to define new series types and create custom visualizations, drawing tools, and annotations.
+Developers can now leverage the power of Plugins in Lightweight Charts. Two types of Plugins are supported -  [Custom Series](/plugins/intro.md#custom-series) and [Drawing Primitives](/plugins/intro.md#drawing-primitives), offering the ability to define new series types and create custom visualizations, drawing tools, and annotations.
 
 With the flexibility provided by these plugins, developers can create highly customizable charting applications for their users.
 
-To get started with plugins, please refer to our [Plugins Documentation](https://tradingview.github.io/lightweight-charts/docs/plugins/intro) for a better understanding of what is possible and how plugins work. You can also explore our collection of [plugin examples](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) (with a [preview hosted here](https://tradingview.github.io/lightweight-charts/plugin-examples/)) for inspiration and guidance on implementing specific functionality.
+To get started with plugins, please refer to our [Plugins Documentation](/plugins/intro.md) for a better understanding of what is possible and how plugins work. You can also explore our collection of [plugin examples](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) (with a [preview hosted here](https://tradingview.github.io/lightweight-charts/plugin-examples/)) for inspiration and guidance on implementing specific functionality.
 
 To help you get started quickly, we have created an NPM package called [create-lwc-plugin](https://www.npmjs.com/package/create-lwc-plugin), which sets up a plugin project for you. This way, you can hit the ground running with your plugin development.
 
@@ -35,20 +35,20 @@ To help you get started quickly, we have created an NPM package called [create-l
 
 The horizontal scale is no longer restricted to only time-based values. The API has been extended to allow customization of the horizontal scale behavior, and enable uses cases like options chart where price values are displayed in the horizontal scale. The most common use-case would be to customise the tick marks behaviour.
 
-The [createChartEx](https://tradingview.github.io/lightweight-charts/docs/next/api#createchartex) function should be used instead of the usual `createChart` function, and an instance of a class implementing [IHorzScaleBehavior](https://tradingview.github.io/lightweight-charts/docs/next/api/interfaces/IHorzScaleBehavior) should be provided.
+The [createChartEx](/api/index.md#createchartex) function should be used instead of the usual `createChart` function, and an instance of a class implementing [IHorzScaleBehavior](/api/interfaces/IHorzScaleBehavior.md) should be provided.
 
 A simple example can be found in this test case: [horizontal-price-scale.js](https://github.com/tradingview/lightweight-charts/blob/master/tests/e2e/graphics/test-cases/horizontal-price-scale.js)
 
 **Enhancements**
 
-- Added point markers styling option for line-based series. (closes [#365](https://github.com/tradingview/lightweight-charts/issues/365)) [Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/LineStyleOptions#pointmarkersvisible)
-- Added double click subscriber for the main chart pane. (closes [#1385](https://github.com/tradingview/lightweight-charts/issues/1385)) [Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#subscribedblclick)
-- Added ﻿`setCrosshairPosition` API, allowing programmatic setting of the crosshair position. (fixes [#1198](https://github.com/tradingview/lightweight-charts/issues/1198), [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#438](https://github.com/tradingview/lightweight-charts/issues/438)) [Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#setCrosshairPosition)
-- Added an option to disable crosshair. Introduced the ﻿`Hidden` option in the ﻿`CrosshairMode` setting. (closes [#749](https://github.com/tradingview/lightweight-charts/issues/749), thanks to [@luk707](https://github.com/luk707)) [Docs]([Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/CrosshairOptions#mode))
-- Allow overriding tick mark label length via the ﻿`tickMarkMaxCharacterLength` option. (closes [#1396](https://github.com/tradingview/lightweight-charts/issues/1396)) [Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/HorzScaleOptions#tickmarkmaxcharacterlength)
-- Support for overriding the percentage formatter within the localization options. (fixes [#1328](https://github.com/tradingview/lightweight-charts/issues/1328), [#1291](https://github.com/tradingview/lightweight-charts/issues/1291)) [Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/LocalizationOptions#percentageformatter)
-- Added ﻿`paneSize` getter to `IChartApi`, returning the dimensions of the chart pane. (issue [#1411](https://github.com/tradingview/lightweight-charts/issues/1411)) [Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#panesize)
-- Added options to set minimum dimensions for the price and time scales. (closes [#1062](https://github.com/tradingview/lightweight-charts/issues/1062), related to [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#50](https://github.com/tradingview/lightweight-charts/issues/50)) [Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/TimeScaleOptions#minimumheight), [Docs](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/PriceScaleOptions#minimumwidth)
+- Added point markers styling option for line-based series. (closes [#365](https://github.com/tradingview/lightweight-charts/issues/365)) [Docs](/api/interfaces/LineStyleOptions.md#pointmarkersvisible)
+- Added double click subscriber for the main chart pane. (closes [#1385](https://github.com/tradingview/lightweight-charts/issues/1385)) [Docs](/api/interfaces/IChartApi.md#subscribedblclick)
+- Added ﻿`setCrosshairPosition` API, allowing programmatic setting of the crosshair position. (fixes [#1198](https://github.com/tradingview/lightweight-charts/issues/1198), [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#438](https://github.com/tradingview/lightweight-charts/issues/438)) [Docs](/api/interfaces/IChartApi.md#setCrosshairPosition)
+- Added an option to disable crosshair. Introduced the ﻿`Hidden` option in the ﻿`CrosshairMode` setting. (closes [#749](https://github.com/tradingview/lightweight-charts/issues/749), thanks to [@luk707](https://github.com/luk707))
+- Allow overriding tick mark label length via the ﻿`tickMarkMaxCharacterLength` option. (closes [#1396](https://github.com/tradingview/lightweight-charts/issues/1396)) [Docs](/api/interfaces/HorzScaleOptions.md#tickmarkmaxcharacterlength)
+- Support for overriding the percentage formatter within the localization options. (fixes [#1328](https://github.com/tradingview/lightweight-charts/issues/1328), [#1291](https://github.com/tradingview/lightweight-charts/issues/1291)) [Docs](/api/interfaces/LocalizationOptions.md#percentageformatter)
+- Added ﻿`paneSize` getter to `IChartApi`, returning the dimensions of the chart pane. (issue [#1411](https://github.com/tradingview/lightweight-charts/issues/1411)) [Docs](/api/interfaces/IChartApi.md#panesize)
+- Added options to set minimum dimensions for the price and time scales. (closes [#1062](https://github.com/tradingview/lightweight-charts/issues/1062), related to [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#50](https://github.com/tradingview/lightweight-charts/issues/50)) [Docs](/api/interfaces/TimeScaleOptions.md#minimumheight), [Docs](/api/interfaces/PriceScaleOptions.md#minimumwidth)
 
 **Bug Fixes**
 
