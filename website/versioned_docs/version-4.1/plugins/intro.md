@@ -44,7 +44,7 @@ WhitespaceData interface (have a valid time property for each data point).
 
 A custom series can be added to a chart using the
 [`addCustomSeries`](../api/interfaces/IChartApi.md#addcustomseries) method
-which expects a class implementing the
+which expects an instance of a class implementing the
 [ICustomSeriesPaneView](../api/interfaces/ICustomSeriesPaneView.md) interface
 as the first argument, and an optional set of options as the second argument.
 The series can then be used just like any other series, for example you would
@@ -55,8 +55,11 @@ class MyCustomSeries {
     /* Class implementing the ICustomSeriesPaneView interface */
 }
 
+// Create an instantiated custom series.
+const customSeriesInstance = new MyCustomSeries();
+
 const chart = createChart(document.getElementById('container'));
-const myCustomSeries = chart.addCustomSeries(MyCustomSeries, {
+const myCustomSeries = chart.addCustomSeries(customSeriesInstance, {
     // options for the MyCustomSeries
     customOption: 10,
 });
