@@ -18,7 +18,7 @@ create in this readme document.
 hesitate to get in touch.
 
 🚀 Need a starting point for your plugin idea? Check out
-[create-lwc-plugin](https://github.com/tradingview/create-lwc-plugin) package.
+[create-lwc-plugin](https://www.npmjs.com/package/create-lwc-plugin) package.
 
 📊 You can view a demo page of the plugins within this repo at his link:
 [Plugin Examples](https://tradingview.github.io/lightweight-charts/plugin-examples)
