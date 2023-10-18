@@ -124,7 +124,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			this,
 			{
 				treatVertTouchDragAsPageScroll: () => true,
-				treatHorzTouchDragAsPageScroll: () => false,
+				treatHorzTouchDragAsPageScroll: () => !this._chart.options().handleScroll.horzTouchDrag,
 			}
 		);
 	}
