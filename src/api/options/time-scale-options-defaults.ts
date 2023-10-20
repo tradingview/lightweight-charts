@@ -14,6 +14,7 @@ export const timeScaleOptionsDefaults: HorzScaleOptions = {
 	timeVisible: false,
 	secondsVisible: true,
 	shiftVisibleRangeOnNewBar: true,
+	allowShiftVisibleRangeOnWhitespaceReplacement: false,
 	ticksVisible: false,
 	uniformDistribution: false,
 	minimumHeight: 0,

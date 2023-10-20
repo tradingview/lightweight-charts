@@ -811,8 +811,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			const isSeriesPointsAdded = newBaseIndex !== null && newBaseIndex > currentBaseIndex;
 			const isSeriesPointsAddedToRight = isSeriesPointsAdded && !isLeftBarShiftToLeft;
 
+			const allowShiftWhenReplacingWhitespace = this._timeScale.options().allowShiftVisibleRangeOnWhitespaceReplacement;
 			const replacedExistingWhitespace = firstChangedPointIndex === undefined;
-			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && !replacedExistingWhitespace && this._timeScale.options().shiftVisibleRangeOnNewBar;
+			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && (!replacedExistingWhitespace || allowShiftWhenReplacingWhitespace) && this._timeScale.options().shiftVisibleRangeOnNewBar;
 			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);

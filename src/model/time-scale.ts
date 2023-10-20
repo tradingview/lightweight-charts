@@ -154,6 +154,16 @@ export interface HorzScaleOptions {
 	shiftVisibleRangeOnNewBar: boolean;
 
 	/**
+	 * Allow the visible range to be shifted to the right when a new bar is added which
+	 * is replacing an existing whitespace time point on the chart.
+	 *
+	 * Note that this only applies when the last bar is visible & `shiftVisibleRangeOnNewBar` is enabled.
+	 *
+	 * @defaultValue `false`
+	 */
+	allowShiftVisibleRangeOnWhitespaceReplacement: boolean;
+
+	/**
 	 * Draw small vertical line on time axis labels.
 	 *
 	 * @defaultValue `false`
