@@ -1,0 +1,1 @@
+import{C as i}from"./lightweight-charts.production-42c8e8a1.js";import{a}from"./sample-data-c7d89ab8.js";import{C as r}from"./highlight-bar-crosshair-a9e86b4e.js";import"./positions-0a54307c.js";const e=window.chart=i("chart",{autoSize:!0}),t=e.addCandlestickSeries();t.setData(a());const o=new r({color:"rgba(0, 50, 100, 0.2)"});t.attachPrimitive(o);
