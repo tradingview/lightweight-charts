@@ -1,0 +1,6 @@
+/*!
+ * @license
+ * TradingView Lightweight Charts™ v4.1.1
+ * Copyright (c) 2023 TradingView, Inc.
+ * Licensed under Apache License 2.0 https://www.apache.org/licenses/LICENSE-2.0
+ */
