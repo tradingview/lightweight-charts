@@ -142,6 +142,8 @@ describe('Interactions tests', function(): void {
 				});
 			});
 
+			await page.close();
+
 			if (errors.length !== 0) {
 				throw new Error(`Page has errors:\n${errors.join('\n')}`);
 			}
