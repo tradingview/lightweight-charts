@@ -15,6 +15,15 @@ sidebar_position: 8
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
 
+## 4.1.1
+
+**Bug Fixes**
+
+- Fixed `shiftVisibleRangeOnNewBar` behaviour for realtime updates to a series. Additionally, a new option `allowShiftVisibleRangeOnWhitespaceReplacement` has been added if you wish to have the old 4.0 behaviour for when new data replaces existing whitespace. (PR [#1444](https://github.com/tradingview/lightweight-charts/pull/1444))
+- When disabling touch scrolling on the chart via either the `vertTouchDrag` or `horzTouchDrag` setting in the `handleScroll` options, any touch scroll events over the corresponding scale will now be ignored so the page can be scrolled. (PR [#1445](https://github.com/tradingview/lightweight-charts/pull/1445))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.0..v4.1.1).
+
 ## 4.1.0
 
 Version 4.1 of Lightweight Charts introduces exciting new features, including the introduction of Plugins, which provide developers the ability to extend the library's functionality. Additionally, this release includes enhancements to customize the horizontal scale and various minor improvements and bug fixes.
