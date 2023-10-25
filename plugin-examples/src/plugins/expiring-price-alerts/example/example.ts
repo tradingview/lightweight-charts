@@ -12,6 +12,8 @@ const chart = createChart('chart', {
 	timeScale: {
 		secondsVisible: true,
 		timeVisible: true,
+		rightOffset: 20,
+		allowShiftVisibleRangeOnWhitespaceReplacement: true,
 	},
 });
 
@@ -23,9 +25,6 @@ const [initialData, realtimeUpdates] = [data.slice(0, 400), data.slice(400)];
 lineSeries.setData(initialData);
 
 const priceAlerts = new ExpiringPriceAlerts(lineSeries, { interval: 60 });
-
-const rightMarginPosition = 20;
-chart.timeScale().scrollToPosition(rightMarginPosition, false);
 
 // The rest simulates updates and the user adding price alerts.
 
@@ -100,19 +99,6 @@ function* getNextRealtimeUpdate(realtimeData: LineData[]) {
 }
 const streamingDataProvider = getNextRealtimeUpdate(realtimeUpdates);
 
-// Since we are using whitespace to draw into the future
-// updates which are within that whitespace time won't
-// trigger an automatic scrolling of the chart
-// We are thus doing this manually we we update the series,
-// but should check if the user has scrolled and then disable that.
-let userScrolledChart = false;
-chart.timeScale().subscribeVisibleLogicalRangeChange(() => {
-	const pos = chart.timeScale().scrollPosition();
-	if (pos !== 0 && Math.abs(pos - rightMarginPosition) > 1) {
-		userScrolledChart = true;
-	}
-});
-
 const intervalID = window.setInterval(() => {
 	const update = streamingDataProvider.next();
 	if (update.done) {
@@ -120,9 +106,6 @@ const intervalID = window.setInterval(() => {
 		return;
 	}
 	lineSeries.update(update.value);
-	if (!userScrolledChart) {
-		chart.timeScale().scrollToPosition(rightMarginPosition, false);
-	}
 	simulateUserPriceAlerts(update.value.time);
 }, 200);
 
