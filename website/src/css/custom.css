@@ -275,3 +275,7 @@ button.navbar__toggle {
 	width: 100%;
 	border-radius: var(--ifm-code-border-radius);
 }
+
+.standalone-iframe.h400 {
+	height: 400px;
+}
