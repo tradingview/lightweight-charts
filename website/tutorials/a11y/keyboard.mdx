@@ -14,9 +14,9 @@ pagination_prev: a11y/intro
 pagination_next: a11y/screenreader
 ---
 
-# Keyboard Navigation
+# Keyboard navigation
 
-## Purpose of Keyboard Navigation
+## Purpose of keyboard navigation
 
 One cornerstone of web accessibility is ensuring that sites and applications are
 fully operable via keyboard alone. This navigation method benefits a wide range
@@ -29,15 +29,15 @@ personal preference. By including keyboard navigation in our charts, we make the
 tool more accessible and user-friendly, living up to the principles of inclusive
 design.
 
-## Implementing Keyboard Actions with Lightweight Charts
+## Implementing keyboard actions with Lightweight Charts™
 
-The Lightweight Charts API provides numerous methods that enable handling chart
+The Lightweight Charts™ API provides numerous methods that enable handling chart
 actions programmatically, making it possible to tie these actions to keyboard
 events.
 
 Here's a walk-through of how to add keyboard navigation to the chart.
 
-### Setting Focus on the Chart
+### Setting focus on the chart
 
 Firstly, we must ensure the chart is programmatically focusable for keyboard
 interaction. We can achieve this by placing a `tabindex` attribute to the
@@ -47,14 +47,14 @@ chart's container div:
 <div id="chart" tabindex="0"></div>
 ```
 
-This can also be achieved via JS:
+This can also be achieved via JavaScript:
 
 ```js
 const containerEl = chart.chartElement().parentElement;
 containerEl.tabIndex = 0;
 ```
 
-### Adding Event Listener for Keyboard Actions
+### Adding event listener for keyboard actions
 
 Following that, we will tie specific chart interactions to keypress events using
 JavaScript's `addEventListener` method. This will allow us to control the chart
@@ -78,7 +78,7 @@ chartContainer.addEventListener('keydown', event => {
 The `addEventListener` function lets us listen to `keydown` events that occur
 when the user presses a key.
 
-### Utilizing Lightweight Chart's API for Actions
+### Utilizing Lightweight Chart's API for actions
 
 Next, for each case, we use Lightweight Chart's API for desired actions.
 
@@ -104,7 +104,7 @@ chartContainer.addEventListener('keydown', event => {
 ```
 
 In the above JavaScript code, the `timeScale().scrollToPosition()` method from
-Lightweight Charts API is used inside the event listener to scroll the chart
+Lightweight Charts™ API is used inside the event listener to scroll the chart
 whenever the left or right arrow key is pressed.
 
 Additionally, we can assign the up and down arrow keys to adjust the zoom level
