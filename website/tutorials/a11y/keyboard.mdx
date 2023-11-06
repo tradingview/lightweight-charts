@@ -24,7 +24,7 @@ of users, especially those who are unable to use a mouse or have visual
 impairments.
 
 Screen readers and other assistive technologies rely heavily on keyboard
-interaction, and some users prefer this method due to an acquired skill set or
+interaction, and some users choose this method due to an acquired skill set or
 personal preference. By including keyboard navigation in our charts, we make the
 tool more accessible and user-friendly, living up to the principles of inclusive
 design.
@@ -35,7 +35,7 @@ The Lightweight Charts API provides numerous methods that enable handling chart
 actions programmatically, making it possible to tie these actions to keyboard
 events.
 
-Here's a walk-through of how to add keyboard navigation to the chart:
+Here's a walk-through of how to add keyboard navigation to the chart.
 
 ### Setting Focus on the Chart
 
@@ -137,10 +137,10 @@ chartContainer.addEventListener('keydown', event => {
 });
 ```
 
-We are scaling the chart by adjusting the visibleLogicalRange instead of
-changing the `barSpacing` option on the time scale. In this example we are
+We are scaling the chart by adjusting the `visibleLogicalRange` instead of
+changing the `barSpacing` option on the time scale. In this example, we are
 keeping the right data point fixed when zooming in or out by retaining the `to`
-value and aonly modifying the `from` value.
+value and only modifying the `from` value.
 
 ---
 
@@ -150,11 +150,11 @@ with the chart's functions.
 
 :::tip
 
-Do remember that more keyboard actions can be added according to
+Note that more keyboard actions can be added according to
 project-specific requirements, thereby further enhancing the navigation controls
 and accessibility.
 
 :::
 
 In the next section, we'll continue enhancing our accessible charts by
-integrating ARIA roles and properties and generating descriptive content.
+integrating ARIA (Accessible Rich Internet Applications) roles and properties and generating descriptive content.

@@ -25,7 +25,7 @@ toolkit to improve this interaction by conveying information about the behavior
 and purpose of interface components.
 
 In the context of our line chart, we'll be looking at how to implement ARIA
-properties to further enhance its accessibility in addition to generating
+attributes to further enhance its accessibility in addition to generating
 descriptive content for our graph.
 
 ## Use of ARIA attributes in the chart
@@ -66,7 +66,7 @@ On our chart, it could read something like this:
 
 ### aria-hidden
 
-On the other hand, `aria-hidden` is used to hide irrelevant or redundant
+The `aria-hidden` attribute is used to hide irrelevant or redundant
 information from assistive technologies. Its value is either "true" or "false".
 
 For example, if our chart contained a decorative element with no semantic
@@ -133,7 +133,7 @@ translate the chart's data into human-readable insights. The function would vary
 greatly based on what the charts represent and how much detail you wish to
 provide.
 
-The example describes the chart based on it's first, and last visible data
+The example describes the chart based on its first and last visible data
 points in addition to the highest and lowest points displayed. This is used to
 generate a description like this:
 
