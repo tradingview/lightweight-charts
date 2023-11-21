@@ -12,9 +12,9 @@ function minutes(count: number): number {
 	return count * 60 * 1000;
 }
 
-function seconds(count: number): number {
-	return count * 1000;
-}
+// function seconds(count: number): number {
+// 	return count * 1000;
+// }
 
 interface WeightDivisor {
 	divisor: number;
@@ -22,14 +22,10 @@ interface WeightDivisor {
 }
 
 const intradayWeightDivisors: WeightDivisor[] = [
-	{ divisor: seconds(1), weight: TickMarkWeight.Second },
-	{ divisor: minutes(1), weight: TickMarkWeight.Minute1 },
 	{ divisor: minutes(5), weight: TickMarkWeight.Minute5 },
+	{ divisor: minutes(15), weight: TickMarkWeight.Minute15 },
 	{ divisor: minutes(30), weight: TickMarkWeight.Minute30 },
 	{ divisor: hours(1), weight: TickMarkWeight.Hour1 },
-	{ divisor: hours(3), weight: TickMarkWeight.Hour3 },
-	{ divisor: hours(6), weight: TickMarkWeight.Hour6 },
-	{ divisor: hours(12), weight: TickMarkWeight.Hour12 },
 ];
 
 function weightByTime(currentDate: Date, prevDate: Date): TickMarkWeight {
@@ -47,7 +43,7 @@ function weightByTime(currentDate: Date, prevDate: Date): TickMarkWeight {
 		}
 	}
 
-	return TickMarkWeight.LessThanSecond;
+	return TickMarkWeight.Minute5;
 }
 
 function cast(t: InternalHorzScaleItem): TimePoint {
