@@ -274,6 +274,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	public unsubscribeCrosshairMove(handler: MouseEventHandler<HorzScaleItem>): void {
 		this._crosshairMovedDelegate.unsubscribe(handler);
+		
 	}
 
 	public subscribeDblClick(handler: MouseEventHandler<HorzScaleItem>): void {
