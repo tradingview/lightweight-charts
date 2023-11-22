@@ -66,6 +66,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	private _timeAxisWidget: TimeAxisWidget<HorzScaleItem>;
 	private _invalidateMask: InvalidateMask | null = null;
 	private _drawPlanned: boolean = false;
+	
+	private _mouseDown: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _dblClicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
@@ -163,6 +165,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 		for (const paneWidget of this._paneWidgets) {
 			this._tableElement.removeChild(paneWidget.getElement());
+			paneWidget.mouseDown().unsubscribeAll(this);
 			paneWidget.clicked().unsubscribeAll(this);
 			paneWidget.dblClicked().unsubscribeAll(this);
 			paneWidget.destroy();
@@ -181,6 +184,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		}
 
 		this._crosshairMoved.destroy();
+		this._mouseDown.destroy();
 		this._clicked.destroy();
 		this._dblClicked.destroy();
 
@@ -245,6 +249,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		this._applyAutoSizeOptions(options);
 	}
 
+	public mouseDown(): ISubscription<MouseEventParamsImplSupplier> {
+		return this._mouseDown;
+	}
 	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._clicked;
 	}
@@ -715,6 +722,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		for (let i = targetPaneWidgetsCount; i < actualPaneWidgetsCount; i++) {
 			const paneWidget = ensureDefined(this._paneWidgets.pop());
 			this._tableElement.removeChild(paneWidget.getElement());
+			paneWidget.mouseDown().unsubscribeAll(this);
 			paneWidget.clicked().unsubscribeAll(this);
 			paneWidget.dblClicked().unsubscribeAll(this);
 			paneWidget.destroy();
@@ -728,6 +736,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		// Create (if needed) new pane widgets and separators
 		for (let i = actualPaneWidgetsCount; i < targetPaneWidgetsCount; i++) {
 			const paneWidget = new PaneWidget(this, panes[i]);
+			paneWidget.mouseDown().subscribe(this._onPaneWidgetMouseDown.bind(this), this);
 			paneWidget.clicked().subscribe(this._onPaneWidgetClicked.bind(this), this);
 			paneWidget.dblClicked().subscribe(this._onPaneWidgetDblClicked.bind(this), this);
 
@@ -801,6 +810,14 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			hoveredObject,
 			touchMouseEventData: event ?? undefined,
 		};
+	}
+	
+	private _onPaneWidgetMouseDown(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData
+	): void {
+		this._mouseDown.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
 	private _onPaneWidgetClicked(

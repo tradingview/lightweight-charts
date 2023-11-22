@@ -37,3 +37,4 @@ tests/e2e/coverage/.gendata
 
 # memleak log output
 tests/e2e/memleaks/.logs/
+.DS_Store

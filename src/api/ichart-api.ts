@@ -204,6 +204,9 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 */
 	removeSeries(seriesApi: ISeriesApi<SeriesType, HorzScaleItem>): void;
 
+	subscribeMouseDownEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeMouseDownEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
 	/**
 	 * Subscribe to the chart click event.
 	 *
