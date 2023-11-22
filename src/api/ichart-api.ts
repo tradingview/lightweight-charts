@@ -207,6 +207,18 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	subscribeMouseDownEvent(handler: MouseEventHandler<HorzScaleItem>): void;
 	unsubscribeMouseDownEvent(handler: MouseEventHandler<HorzScaleItem>): void;
 
+	subscribeMouseUpEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeMouseUpEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeDoubleTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeDoubleTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeLongTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeLongTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
 	/**
 	 * Subscribe to the chart click event.
 	 *

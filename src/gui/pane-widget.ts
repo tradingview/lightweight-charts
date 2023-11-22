@@ -76,7 +76,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
 	
+	private _mobileTap: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
+	private _doubleMobileTap: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
+	private _longMobileTap: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _mouseDown: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
+	private _mouseUp: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _clicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _dblClicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _prevPinchScale: number = 0;
@@ -278,7 +282,18 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public doubleTapEvent(event: MouseEventHandlerTouchEvent): void {
+		if (this._state !== null) {
+			const hitTest = this.hitTest(event.localX, event.localY);
+			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
+			this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+		}
+		
 		this.mouseDoubleClickEvent(event);
+		this._fireMobileScreenDoubleTapDelegate(event);
+
+		if (this._state !== null) {
+			this._state.model().setHoveredSource(null);
+		}
 	}
 
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
@@ -296,13 +311,22 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._longTap = false;
 
 		this._endScroll(event);
+		this._fireMouseClickUpDelegate(event);
 	}
 
 	public tapEvent(event: MouseEventHandlerTouchEvent): void {
 		if (this._state === null) {
 			return;
 		}
+
+		const hitTest = this.hitTest(event.localX, event.localY);
+		this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
+		this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+
 		this._fireClickedDelegate(event);
+		this._fireMobileScreenTapDelegate(event);
+
+		this._state.model().setHoveredSource(null);
 	}
 
 	public longTapEvent(event: MouseEventHandlerTouchEvent): void {
@@ -310,7 +334,18 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		if (this._startTrackPoint === null) {
 			const point: Point = { x: event.localX, y: event.localY };
+
+			if (this._state !== null) {
+				const hitTest = this.hitTest(event.localX, event.localY);
+				this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
+				this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+			}
 			this._startTrackingMode(point, point, event);
+			this._fireMobileScreenLongTapDelegate(event);
+
+			if (this._state !== null) {
+				this._state.model().setHoveredSource(null);
+			}
 		}
 	}
 
@@ -324,8 +359,24 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._clearCrosshairPosition();
 	}
 
+	public tap(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
+		return this._mobileTap;
+	}
+
+	public doubleTap(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
+		return this._doubleMobileTap;
+	}
+
+	public longTap(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
+		return this._longMobileTap;
+	}
+
 	public mouseDown(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
 		return this._mouseDown;
+	}
+
+	public mouseUp(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
+		return this._mouseUp;
 	}
 
 	public clicked(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
@@ -379,6 +430,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			const newX = origPoint.x + (x - this._startTrackPoint.x) as Coordinate;
 			const newY = origPoint.y + (y - this._startTrackPoint.y) as Coordinate;
 			this._setCrosshairPosition(newX, newY, event);
+
+			const hitTest = this.hitTest(x, y);
+			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
+			this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+
 			return;
 		}
 
@@ -391,6 +447,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 		this._tryExitTrackingMode();
 		this._endScroll(event);
+		
+		if (this._state === null) {
+			return;
+		}
+		this._onMouseEvent();
+
+		this._state.model().setHoveredSource(null);
+		this._clearCrosshairPosition();
 	}
 
 	public hitTest(x: Coordinate, y: Coordinate): HitTestResult | null {
@@ -523,16 +587,34 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._state = null;
 	}
 
-	private _fireMouseClickDownDelegate(event: MouseEventHandlerEventBase): void {
-		this._fireMouseDownDelegate(this._mouseDown, event);
+	private _fireMobileScreenTapDelegate(event: MouseEventHandlerEventBase): void {
+		this._fireTapDelegate(this._mobileTap, event);
 	}
 
-	private _fireMouseDownDelegate(delegate: Delegate<TimePointIndex | null, Point, TouchMouseEventData>, event: MouseEventHandlerEventBase): void {
+	private _fireMobileScreenDoubleTapDelegate(event: MouseEventHandlerEventBase): void {
+		this._fireTapDelegate(this._doubleMobileTap, event);
+	}
+
+
+	private _fireMobileScreenLongTapDelegate(event: MouseEventHandlerEventBase): void {
+		this._fireTapDelegate(this._longMobileTap, event);
+	}
+
+	private _fireTapDelegate(delegate: Delegate<TimePointIndex | null, Point, TouchMouseEventData>, event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
 		const y = event.localY;
 		if (delegate.hasListeners()) {
 			delegate.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}
+	}
+
+	private _fireMouseClickDownDelegate(event: MouseEventHandlerEventBase): void {
+		this._fireMouseClickDelegate(this._mouseDown, event);
+	}
+
+
+	private _fireMouseClickUpDelegate(event: MouseEventHandlerEventBase): void {
+		this._fireMouseClickDelegate(this._mouseUp, event);
 	}
 
 	private _fireClickedDelegate(event: MouseEventHandlerEventBase): void {

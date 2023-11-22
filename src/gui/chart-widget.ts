@@ -67,7 +67,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	private _invalidateMask: InvalidateMask | null = null;
 	private _drawPlanned: boolean = false;
 	
+	private _tap: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _doubleTap: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _longTap: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _mouseDown: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _mouseUp: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _dblClicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
@@ -165,7 +169,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 		for (const paneWidget of this._paneWidgets) {
 			this._tableElement.removeChild(paneWidget.getElement());
+			paneWidget.tap().unsubscribeAll(this);
+			paneWidget.doubleTap().unsubscribeAll(this);
+			paneWidget.longTap().unsubscribeAll(this);
 			paneWidget.mouseDown().unsubscribeAll(this);
+			paneWidget.mouseUp().unsubscribeAll(this);
 			paneWidget.clicked().unsubscribeAll(this);
 			paneWidget.dblClicked().unsubscribeAll(this);
 			paneWidget.destroy();
@@ -184,7 +192,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		}
 
 		this._crosshairMoved.destroy();
+		this._tap.destroy();
+		this._doubleTap.destroy();
+		this._longTap.destroy();
 		this._mouseDown.destroy();
+		this._mouseUp.destroy();
 		this._clicked.destroy();
 		this._dblClicked.destroy();
 
@@ -249,9 +261,26 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		this._applyAutoSizeOptions(options);
 	}
 
+	public tap(): ISubscription<MouseEventParamsImplSupplier> {
+		return this._tap;
+	}
+
+	public doubleTap(): ISubscription<MouseEventParamsImplSupplier> {
+		return this._doubleTap;
+	}
+
+	public longTap(): ISubscription<MouseEventParamsImplSupplier> {
+		return this._longTap;
+	}
+
 	public mouseDown(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._mouseDown;
 	}
+
+	public mouseUp(): ISubscription<MouseEventParamsImplSupplier> {
+		return this._mouseUp;
+	}
+
 	public clicked(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._clicked;
 	}
@@ -722,7 +751,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		for (let i = targetPaneWidgetsCount; i < actualPaneWidgetsCount; i++) {
 			const paneWidget = ensureDefined(this._paneWidgets.pop());
 			this._tableElement.removeChild(paneWidget.getElement());
+			paneWidget.tap().unsubscribeAll(this);
+			paneWidget.doubleTap().unsubscribeAll(this);
+			paneWidget.longTap().unsubscribeAll(this);
 			paneWidget.mouseDown().unsubscribeAll(this);
+			paneWidget.mouseUp().unsubscribeAll(this);
 			paneWidget.clicked().unsubscribeAll(this);
 			paneWidget.dblClicked().unsubscribeAll(this);
 			paneWidget.destroy();
@@ -736,7 +769,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		// Create (if needed) new pane widgets and separators
 		for (let i = actualPaneWidgetsCount; i < targetPaneWidgetsCount; i++) {
 			const paneWidget = new PaneWidget(this, panes[i]);
+			paneWidget.tap().subscribe(this._onPaneWidgetTap.bind(this), this);
+			paneWidget.doubleTap().subscribe(this._onPaneWidgetDoubleTap.bind(this), this);
+			paneWidget.longTap().subscribe(this._onPaneWidgetLongTap.bind(this), this);
 			paneWidget.mouseDown().subscribe(this._onPaneWidgetMouseDown.bind(this), this);
+			paneWidget.mouseUp().subscribe(this._onPaneWidgetMouseUp.bind(this), this);
 			paneWidget.clicked().subscribe(this._onPaneWidgetClicked.bind(this), this);
 			paneWidget.dblClicked().subscribe(this._onPaneWidgetDblClicked.bind(this), this);
 
@@ -811,6 +848,30 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			touchMouseEventData: event ?? undefined,
 		};
 	}
+
+	private _onPaneWidgetTap(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData
+	): void {
+		this._tap.fire(() => this._getMouseEventParamsImpl(time, point, event));
+	}
+
+	private _onPaneWidgetDoubleTap(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData
+	): void {
+		this._doubleTap.fire(() => this._getMouseEventParamsImpl(time, point, event));
+	}
+
+	private _onPaneWidgetLongTap(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData
+	): void {
+		this._longTap.fire(() => this._getMouseEventParamsImpl(time, point, event));
+	}
 	
 	private _onPaneWidgetMouseDown(
 		time: TimePointIndex | null,
@@ -818,6 +879,14 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		event: TouchMouseEventData
 	): void {
 		this._mouseDown.fire(() => this._getMouseEventParamsImpl(time, point, event));
+	}
+
+	private _onPaneWidgetMouseUp(
+		time: TimePointIndex | null,
+		point: Point | null,
+		event: TouchMouseEventData
+	): void {
+		this._mouseUp.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
 	private _onPaneWidgetClicked(
