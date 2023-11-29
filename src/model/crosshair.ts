@@ -284,6 +284,10 @@ export class Crosshair extends DataSource {
 		return views;
 	}
 
+	public price(): number {
+		return this._price;
+	}
+
 	public override timeAxisViews(): readonly ITimeAxisView[] {
 		return this._visible ? [this._timeAxisView] : [];
 	}

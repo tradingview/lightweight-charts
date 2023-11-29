@@ -76,6 +76,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
 	
+	private _mouseEnter: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
+	private _mouseLeave: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _mobileTap: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _doubleMobileTap: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _longMobileTap: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
@@ -243,6 +245,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const x = event.localX;
 		const y = event.localY;
 		this._setCrosshairPosition(x, y, event);
+		this._fireMouseEnterDelegate(event);
 	}
 
 	public mouseDownEvent(event: MouseEventHandlerMouseEvent): void {
@@ -357,6 +360,15 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		this._state.model().setHoveredSource(null);
 		this._clearCrosshairPosition();
+		this._fireMouseLeaveDelegate(event);
+	}
+
+	public mouseEnter(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
+		return this._mouseEnter;
+	}
+
+	public mouseLeave(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
+		return this._mouseLeave;
 	}
 
 	public tap(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
@@ -585,6 +597,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		this._state = null;
+	}
+
+	private _fireMouseEnterDelegate(event: MouseEventHandlerEventBase): void {
+		this._fireTapDelegate(this._mouseEnter, event);
+	}
+
+	private _fireMouseLeaveDelegate(event: MouseEventHandlerEventBase): void {
+		this._fireTapDelegate(this._mouseLeave, event);
 	}
 
 	private _fireMobileScreenTapDelegate(event: MouseEventHandlerEventBase): void {

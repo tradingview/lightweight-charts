@@ -54,6 +54,11 @@ export interface MouseEventParams<HorzScaleItem = Time> {
 	 * The value will be `undefined` if the event is fired outside the chart, for example a mouse leave event.
 	 */
 	point?: Point;
+
+	price?: Point;
+
+	seriesId?: string;
+
 	/**
 	 * Data of all series at the location of the event in the chart.
 	 *
@@ -218,6 +223,12 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 
 	subscribeLongTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
 	unsubscribeLongTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeMouseEnterEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeMouseEnterEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeMouseLeaveEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeMouseLeaveEvent(handler: MouseEventHandler<HorzScaleItem>): void;
 
 	/**
 	 * Subscribe to the chart click event.

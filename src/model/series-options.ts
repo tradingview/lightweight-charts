@@ -766,6 +766,8 @@ export interface SeriesOptionsCommon {
 	 */
 	baseLineStyle: LineStyle;
 
+	seriesId: string;
+
 	/**
 	 * Override the default {@link AutoscaleInfo} provider.
 	 * By default, the chart scales data automatically based on visible data range.

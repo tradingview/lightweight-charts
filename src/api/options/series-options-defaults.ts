@@ -104,6 +104,7 @@ export const customStyleDefaults: CustomStyleOptions = {
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {
+	seriesId:'',
 	title: '',
 	visible: true,
 	lastValueVisible: true,
