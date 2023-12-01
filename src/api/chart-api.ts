@@ -1,3 +1,4 @@
+import { TrendLineDrawingController } from '../drawing/controller/trend-line-drawing-controller';
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { assert, ensure, ensureDefined } from '../helpers/assertions';
@@ -129,7 +130,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private readonly _clickedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 	private readonly _dblClickedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
- 
+
 	private readonly _timeScaleApi: TimeScaleApi<HorzScaleItem>;
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
@@ -541,5 +542,22 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			sourceEvent: param.touchMouseEventData,
 			seriesId: seriesId,
 		};
+	}
+
+	public initTrendLineDrawingController(
+		chart: any,
+		domElement: any,
+		klines: any,
+		xspan: any,
+		candleseries: any,
+	): void {
+		const trendLineController = new TrendLineDrawingController(
+			chart,
+			domElement,
+			klines,
+			xspan,
+			candleseries
+		);
+		trendLineController.mouseHandler();
 	}
 }

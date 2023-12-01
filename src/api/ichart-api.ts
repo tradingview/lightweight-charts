@@ -396,4 +396,12 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @returns Dimensions of the chart pane
 	 */
 	paneSize(): PaneSize;
+
+	initTrendLineDrawingController(
+		chart: any,
+		domElement: any,
+		klines: any,
+		xspan: any,
+		candleseries: any
+	): void
 }
