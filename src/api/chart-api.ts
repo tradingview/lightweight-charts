@@ -1,4 +1,4 @@
-import { TrendLineDrawingController } from '../drawing/controller/trend-line-drawing-controller';
+import { DrawingTrendLinePaneRenderer, TrendLineOptions, ViewPoint } from '../drawing/renderers/drawing-trend-line-pane-renderer';
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { assert, ensure, ensureDefined } from '../helpers/assertions';
@@ -544,20 +544,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		};
 	}
 
-	public initTrendLineDrawingController(
-		chart: any,
-		domElement: any,
-		klines: any,
-		xspan: any,
-		candleseries: any,
-	): void {
-		const trendLineController = new TrendLineDrawingController(
-			chart,
-			domElement,
-			klines,
-			xspan,
-			candleseries
-		);
-		trendLineController.mouseHandler();
+	drawingTrendLinePaneRenderer(
+		p1: ViewPoint,
+		p2: ViewPoint,
+		text1: string,
+		text2: string,
+		options: TrendLineOptions
+	) {
+		return new DrawingTrendLinePaneRenderer(p1, p2, text1, text2, options);
 	}
 }

@@ -1,3 +1,4 @@
+import { DrawingTrendLinePaneRenderer, TrendLineOptions, ViewPoint } from '../drawing/renderers/drawing-trend-line-pane-renderer';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl } from '../model/chart-model';
@@ -397,11 +398,12 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 */
 	paneSize(): PaneSize;
 
-	initTrendLineDrawingController(
-		chart: any,
-		domElement: any,
-		klines: any,
-		xspan: any,
-		candleseries: any
-	): void
+	drawingTrendLinePaneRenderer(
+		p1: ViewPoint,
+		p2: ViewPoint,
+		text1: string,
+		text2: string,
+		options: TrendLineOptions
+	): DrawingTrendLinePaneRenderer;
+
 }
