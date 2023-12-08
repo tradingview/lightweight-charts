@@ -1,4 +1,4 @@
-import { DrawingTrendLinePaneRenderer, TrendLineOptions, ViewPoint } from '../drawing/renderers/drawing-trend-line-pane-renderer';
+import { DrawingTrendLine, TrendLineOptions } from '../drawing/renderers/drawing-trend-line-pane-renderer';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl } from '../model/chart-model';
@@ -19,6 +19,7 @@ import {
 } from '../model/series-options';
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
+import { IChartApi } from './create-chart';
 
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
@@ -398,12 +399,12 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 */
 	paneSize(): PaneSize;
 
-	drawingTrendLinePaneRenderer(
-		p1: ViewPoint,
-		p2: ViewPoint,
-		text1: string,
-		text2: string,
-		options: TrendLineOptions
-	): DrawingTrendLinePaneRenderer;
+	drawingTrendLine(
+		chart: IChartApi,
+		lineSeries: ISeriesApi<SeriesType>,
+		point1: any,
+		point2: any,
+		options?: Partial<TrendLineOptions>
+	): DrawingTrendLine;
 
 }

@@ -1,4 +1,4 @@
-import { DrawingTrendLinePaneRenderer, TrendLineOptions, ViewPoint } from '../drawing/renderers/drawing-trend-line-pane-renderer';
+import { DrawingTrendLine, TrendLineOptions } from '../drawing/renderers/drawing-trend-line-pane-renderer';
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { assert, ensure, ensureDefined } from '../helpers/assertions';
@@ -33,6 +33,7 @@ import {
 	SeriesType,
 } from '../model/series-options';
 import { Logical } from '../model/time-data';
+import { IChartApi } from './create-chart';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApiBase, MouseEventHandler, MouseEventParams, PaneSize } from './ichart-api';
@@ -544,13 +545,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		};
 	}
 
-	drawingTrendLinePaneRenderer(
-		p1: ViewPoint,
-		p2: ViewPoint,
-		text1: string,
-		text2: string,
-		options: TrendLineOptions
-	) {
-		return new DrawingTrendLinePaneRenderer(p1, p2, text1, text2, options);
+	public drawingTrendLine = (
+		chart: IChartApi,
+		lineSeries: ISeriesApi<SeriesType>,
+		point1: any,
+		point2: any,
+		options?: Partial<TrendLineOptions>
+	): DrawingTrendLine => {
+		return new DrawingTrendLine(chart, lineSeries, point1, point2, options);
 	}
 }

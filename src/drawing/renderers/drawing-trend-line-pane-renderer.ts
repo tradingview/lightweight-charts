@@ -8,7 +8,7 @@ import { ISeriesApi } from '../../api/iseries-api';
 import { AutoscaleInfo, SeriesOptionsMap, SeriesType } from '../../model/series-options';
 import { Logical } from '../../model/time-data';
 
-export class DrawingTrendLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
+class DrawingTrendLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
 	_p1: ViewPoint;
 	_p2: ViewPoint;
 	_text1: string;
@@ -55,7 +55,7 @@ export class DrawingTrendLinePaneRenderer implements ISeriesPrimitivePaneRendere
 		const textWidth = scope.context.measureText(text);
 		const leftAdjustment = left ? textWidth.width + offset * 4 : 0;
 		scope.context.fillStyle = this._options.labelBackgroundColor;
-		scope.context.roundRect(x + offset - leftAdjustment, y - 24, textWidth.width + offset * 2,  24 + offset, 5);
+		scope.context.roundRect(x + offset - leftAdjustment, y - 24, textWidth.width + offset * 2, 24 + offset, 5);
 		scope.context.fill();
 		scope.context.beginPath();
 		scope.context.fillStyle = this._options.labelTextColor;
@@ -63,17 +63,17 @@ export class DrawingTrendLinePaneRenderer implements ISeriesPrimitivePaneRendere
 	}
 }
 
-export interface ViewPoint {
+interface ViewPoint {
 	x: Coordinate | null;
 	y: Coordinate | null;
 }
 
 class TrendLinePaneView implements ISeriesPrimitivePaneView {
-	_source: TrendLine;
+	_source: DrawingTrendLine;
 	_p1: ViewPoint = { x: null, y: null };
 	_p2: ViewPoint = { x: null, y: null };
 
-	constructor(source: TrendLine) {
+	constructor(source: DrawingTrendLine) {
 		this._source = source;
 	}
 
@@ -99,7 +99,7 @@ class TrendLinePaneView implements ISeriesPrimitivePaneView {
 	}
 }
 
-export interface Point {
+interface Point {
 	time: Time;
 	price: number;
 }
@@ -120,7 +120,7 @@ const defaultOptions: TrendLineOptions = {
 	labelTextColor: 'rgb(0, 0, 0)',
 };
 
-export class TrendLine implements ISeriesPrimitive<Time> {
+export class DrawingTrendLine implements ISeriesPrimitive<Time> {
 	_chart: IChartApi;
 	_series: ISeriesApi<keyof SeriesOptionsMap>;
 	_p1: Point;
