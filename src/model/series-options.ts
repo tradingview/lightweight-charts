@@ -766,7 +766,19 @@ export interface SeriesOptionsCommon {
 	 */
 	baseLineStyle: LineStyle;
 
+	/**
+	 * Series Id.
+	 *
+	 * @defaultValue `''`
+	 */
 	seriesId: string;
+
+	/**
+	 * Pane Index.
+	 *
+	 * @defaultValue `0`
+	 */
+	paneIndex?: number;
 
 	/**
 	 * Override the default {@link AutoscaleInfo} provider.

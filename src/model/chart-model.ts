@@ -377,6 +377,8 @@ interface GradientColorsCache {
 }
 
 export interface IChartModelBase {
+	getPaneIndex(pane: Pane): number;
+	getPaneIndexByPaneId(paneId: string): number;
 	applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void;
 	findPriceScale(priceScaleId: string): PriceScaleOnPane | null;
 	options(): Readonly<ChartOptionsInternalBase>;
@@ -408,6 +410,9 @@ export interface IChartModelBase {
 
 	hoveredSource(): HoveredSource | null;
 	setHoveredSource(source: HoveredSource | null): void;
+
+	crosshairFreeze(): boolean;
+	setCrosshairFreeze(freeze: boolean): void;
 
 	crosshairSource(): Crosshair;
 	watermarkSource(): Watermark;
@@ -505,6 +510,14 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		if (source !== null) {
 			this.updateSource(source.source);
 		}
+	}
+
+	public crosshairFreeze(): boolean {
+		return this._crosshair.freeze();
+	}
+
+	public setCrosshairFreeze(value: boolean): void {
+		this._crosshair.setFreeze(value);
 	}
 
 	public options(): Readonly<ChartOptionsInternal<HorzScaleItem>> {
@@ -606,8 +619,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this.recalculateAllPanes();
 	}
 
-	public createPane(index?: number): Pane {
-		const pane = new Pane(this._timeScale, this);
+	public createPane(paneId?: string | null, index?: number): Pane {
+		const pane = new Pane(this._timeScale, this, paneId);
 
 		if (index !== undefined) {
 			this._panes.splice(index, 0, pane);
@@ -829,6 +842,27 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 	}
 
+	public getPanes(): Pane[] {
+		return this._panes;
+	}
+
+	public getPaneByPaneId(paneId: string): Pane | null {
+		const pane = this._panes.find((p: Pane) => p.paneId() === paneId);
+		return pane === undefined ? null : pane;
+	}
+
+	public getPaneIndex(pane: Pane): number {
+		return this._panes.indexOf(pane);
+	}
+
+	public getPaneIndexByPaneId(paneId: string): number {
+		const pane = this.getPaneByPaneId(paneId);
+		if (pane === null) {
+			return -1;
+		}
+		return this._panes.indexOf(pane);
+	}
+
 	public paneForSource(source: IPriceDataSource): Pane | null {
 		const pane = this._panes.find((p: Pane) => p.orderedSources().includes(source));
 		return pane === undefined ? null : pane;
@@ -862,8 +896,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._priceScalesOptionsChanged;
 	}
 
-	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
-		const pane = this._panes[0];
+	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], customPaneView?: ICustomSeriesPaneView<HorzScaleItem>, pane?: Pane): Series<T> {
+		pane = pane || this._panes[0];
 		const series = this._createSeries(options, seriesType, pane, customPaneView);
 		this._serieses.push(series);
 

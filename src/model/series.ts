@@ -551,6 +551,10 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return this._options.title;
 	}
 
+	public seriesId(): string {
+		return this._options.seriesId;
+	}
+
 	public override visible(): boolean {
 		return this._options.visible;
 	}
@@ -626,7 +630,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 			}
 		});
 
-		return new AutoscaleInfoImpl(range,	margins);
+		return new AutoscaleInfoImpl(range, margins);
 	}
 
 	private _markerRadius(): number {

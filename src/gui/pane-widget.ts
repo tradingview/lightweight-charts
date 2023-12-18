@@ -75,7 +75,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
-	
+
 	private _mouseEnter: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _mouseLeave: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _mobileTap: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
@@ -241,14 +241,21 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (!this._state) {
 			return;
 		}
-		this._onMouseEvent();
-		const x = event.localX;
-		const y = event.localY;
-		this._setCrosshairPosition(x, y, event);
-		this._fireMouseEnterDelegate(event);
+		// event.paneIndex = this._model().getPaneIndex(this._state);
+		if (!this._model().crosshairFreeze()) {
+			this._onMouseEvent();
+			const x = event.localX;
+			const y = event.localY;
+			this._setCrosshairPosition(x, y, event);
+			this._fireMouseEnterDelegate(event);
+		}
 	}
 
 	public mouseDownEvent(event: MouseEventHandlerMouseEvent): void {
+		// if (!this._state) {
+		// 	return;
+		// }
+		// event.paneIndex = this._model().getPaneIndex(this._state);
 		this._onMouseEvent();
 		this._mouseTouchDownEvent();
 		this._setCrosshairPosition(event.localX, event.localY, event);
@@ -259,20 +266,24 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (!this._state) {
 			return;
 		}
-		this._onMouseEvent();
+		// event.paneIndex = this._model().getPaneIndex(this._state);
+		if (!this._model().crosshairFreeze()) {
+			this._onMouseEvent();
 
-		const x = event.localX;
-		const y = event.localY;
-		this._setCrosshairPosition(x, y, event);
-		const hitTest = this.hitTest(x, y);
-		this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
-		this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+			const x = event.localX;
+			const y = event.localY;
+			this._setCrosshairPosition(x, y, event);
+			const hitTest = this.hitTest(x, y);
+			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
+			this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+		}
 	}
 
 	public mouseClickEvent(event: MouseEventHandlerMouseEvent): void {
 		if (this._state === null) {
 			return;
 		}
+		// event.paneIndex = this._model().getPaneIndex(this._state);
 		this._onMouseEvent();
 		this._fireClickedDelegate(event);
 	}
@@ -290,7 +301,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
 			this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 		}
-		
+
 		this.mouseDoubleClickEvent(event);
 		this._fireMobileScreenDoubleTapDelegate(event);
 
@@ -300,15 +311,31 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
-		this._onMouseEvent();
-		this._pressedMouseTouchMoveEvent(event);
-		this._setCrosshairPosition(event.localX, event.localY, event);
+		// if (!this._state) {
+		// 	return;
+		// }
+		// event.paneIndex = this._model().getPaneIndex(this._state);
+		if (!this._model().crosshairFreeze()) {
+			this._onMouseEvent();
+			this._pressedMouseTouchMoveEvent(event);
+			this._setCrosshairPosition(event.localX, event.localY, event);
+		} else {
+			this._onMouseEvent();
+
+			const x = event.localX;
+			const y = event.localY;
+			this._setCrosshairPosition(x, y, event);
+			const hitTest = this.hitTest(x, y);
+			this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
+			this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+		}
 	}
 
 	public mouseUpEvent(event: MouseEventHandlerMouseEvent): void {
 		if (this._state === null) {
 			return;
 		}
+		// event.paneIndex = this._model().getPaneIndex(this._state);
 		this._onMouseEvent();
 
 		this._longTap = false;
@@ -356,11 +383,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._state === null) {
 			return;
 		}
-		this._onMouseEvent();
+		// event.paneIndex = this._model().getPaneIndex(this._state);
+		if (!this._model().crosshairFreeze()) {
+			this._onMouseEvent();
 
-		this._state.model().setHoveredSource(null);
-		this._clearCrosshairPosition();
-		this._fireMouseLeaveDelegate(event);
+			this._state.model().setHoveredSource(null);
+			this._clearCrosshairPosition();
+			this._fireMouseLeaveDelegate(event);
+		}
 	}
 
 	public mouseEnter(): ISubscription<TimePointIndex | null, Point, TouchMouseEventData> {
@@ -454,12 +484,15 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public touchEndEvent(event: MouseEventHandlerTouchEvent): void {
+		// if (this._state) {
+		// 	event.paneIndex = this._model().getPaneIndex(this._state);
+		// }
 		if (this.chart().options().trackingMode.exitMode === TrackingModeExitMode.OnTouchEnd) {
 			this._exitTrackingModeOnNextTry = true;
 		}
 		this._tryExitTrackingMode();
 		this._endScroll(event);
-		
+
 		if (this._state === null) {
 			return;
 		}

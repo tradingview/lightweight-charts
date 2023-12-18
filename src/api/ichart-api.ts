@@ -392,6 +392,20 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	clearCrosshairPosition(): void;
 
 	/**
+	 * Returns the current crosshair position within the chart.
+	 *
+	 * @returns The current crosshair position within the chart.
+	 */
+	crosshairFreeze(): boolean;
+
+	/**
+	 * Freeze the crosshair position within the chart.
+	 *
+	 * @param freeze - true to freeze the crosshair, false to unfreeze.
+	 */
+	setCrosshairFreeze(freeze: boolean): void;
+
+	/**
 	 * Returns the dimensions of the chart pane (the plot surface which excludes time and price scales).
 	 * This would typically only be useful for plugin development.
 	 *

@@ -11,6 +11,7 @@ import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, Whitespace
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
+import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
@@ -270,7 +271,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>
 	>(
 		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
-		options?: SeriesPartialOptions<TOptions>
+		options?: SeriesPartialOptions<TOptions>,
+		pane?: Pane
 	): ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions> {
 		const paneView = ensure(customPaneView);
 		const defaults = {
@@ -281,34 +283,35 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			'Custom',
 			defaults,
 			options,
+			pane,
 			paneView
 		);
 	}
 
-	public addAreaSeries(options?: AreaSeriesPartialOptions): ISeriesApi<'Area', HorzScaleItem> {
-		return this._addSeriesImpl('Area', areaStyleDefaults, options);
+	public addAreaSeries(options?: AreaSeriesPartialOptions, pane?: Pane): ISeriesApi<'Area', HorzScaleItem> {
+		return this._addSeriesImpl('Area', areaStyleDefaults, options, pane);
 	}
 
-	public addBaselineSeries(options?: BaselineSeriesPartialOptions): ISeriesApi<'Baseline', HorzScaleItem> {
-		return this._addSeriesImpl('Baseline', baselineStyleDefaults, options);
+	public addBaselineSeries(options?: BaselineSeriesPartialOptions, pane?: Pane): ISeriesApi<'Baseline', HorzScaleItem> {
+		return this._addSeriesImpl('Baseline', baselineStyleDefaults, options, pane);
 	}
 
-	public addBarSeries(options?: BarSeriesPartialOptions): ISeriesApi<'Bar', HorzScaleItem> {
-		return this._addSeriesImpl('Bar', barStyleDefaults, options);
+	public addBarSeries(options?: BarSeriesPartialOptions, pane?: Pane): ISeriesApi<'Bar', HorzScaleItem> {
+		return this._addSeriesImpl('Bar', barStyleDefaults, options, pane);
 	}
 
-	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}): ISeriesApi<'Candlestick', HorzScaleItem> {
+	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}, pane?: Pane): ISeriesApi<'Candlestick', HorzScaleItem> {
 		fillUpDownCandlesticksColors(options);
 
-		return this._addSeriesImpl('Candlestick', candlestickStyleDefaults, options);
+		return this._addSeriesImpl('Candlestick', candlestickStyleDefaults, options, pane);
 	}
 
-	public addHistogramSeries(options?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram', HorzScaleItem> {
-		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options);
+	public addHistogramSeries(options?: HistogramSeriesPartialOptions, pane?: Pane): ISeriesApi<'Histogram', HorzScaleItem> {
+		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options, pane);
 	}
 
-	public addLineSeries(options?: LineSeriesPartialOptions): ISeriesApi<'Line', HorzScaleItem> {
-		return this._addSeriesImpl('Line', lineStyleDefaults, options);
+	public addLineSeries(options?: LineSeriesPartialOptions, pane?: Pane): ISeriesApi<'Line', HorzScaleItem> {
+		return this._addSeriesImpl('Line', lineStyleDefaults, options, pane);
 	}
 
 	public removeSeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): void {
@@ -468,21 +471,34 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._chartWidget.model().clearCurrentPosition(true);
 	}
 
+	public crosshairFreeze(): boolean {
+		return this._chartWidget.model().crosshairFreeze();
+	}
+
+	public setCrosshairFreeze(freeze: boolean): void {
+		this._chartWidget.model().setCrosshairFreeze(freeze);
+	}
+
 	private _addSeriesImpl<
 		TSeries extends SeriesType,
 		TData extends WhitespaceData<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[TSeries],
 		TOptions extends SeriesOptionsMap[TSeries] = SeriesOptionsMap[TSeries],
-		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries]
+		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries],
 	>(
 		type: TSeries,
 		styleDefaults: SeriesStyleOptionsMap[TSeries],
 		options: SeriesPartialOptionsMap[TSeries] = {},
+		pane?: Pane,
 		customPaneView?: ICustomSeriesPaneView<HorzScaleItem>
 	): ISeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions> {
 		patchPriceFormat(options.priceFormat);
+		const model = this._chartWidget.model();
+		if (!pane && options.paneIndex !== undefined) {
+			pane = model.getPanes()[options.paneIndex] || model.createPane(null, options.paneIndex);
+		}
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
-		const series = this._chartWidget.model().createSeries(type, strictOptions, customPaneView);
+		const series = model.createSeries(type, strictOptions, customPaneView, pane);
 
 		const res = new SeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions>(series, this, this, this, this._horzScaleBehavior);
 		this._seriesMap.set(res, series);
