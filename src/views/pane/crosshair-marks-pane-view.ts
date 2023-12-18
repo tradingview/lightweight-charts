@@ -62,7 +62,10 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 
 	public renderer(): IPaneRenderer | null {
 		if (this._invalidated) {
-			this._updateImpl();
+			// force not to update crosshair marks
+			if (!this._invalidated) {
+				this._updateImpl();
+			}
 			this._invalidated = false;
 		}
 

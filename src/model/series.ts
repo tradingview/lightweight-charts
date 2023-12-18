@@ -1,3 +1,4 @@
+import { SeriesDrawingPaneView } from '../drawing/views/pane/series-drawing-pane-view';
 import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
@@ -19,7 +20,6 @@ import { SeriesLinePaneView } from '../views/pane/line-pane-view';
 import { PanePriceAxisView } from '../views/pane/pane-price-axis-view';
 import { SeriesHorizontalBaseLinePaneView } from '../views/pane/series-horizontal-base-line-pane-view';
 import { SeriesLastPriceAnimationPaneView } from '../views/pane/series-last-price-animation-pane-view';
-import { SeriesMarkersPaneView } from '../views/pane/series-markers-pane-view';
 import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
@@ -158,7 +158,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private readonly _options: SeriesOptionsInternal<T>;
 	private _markers: readonly SeriesMarker<InternalHorzScaleItem>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
-	private _markersPaneView!: SeriesMarkersPaneView;
+	private _drawingPaneView!: SeriesDrawingPaneView;
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
 
@@ -294,7 +294,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this._recalculateMarkers();
 
 		this._paneView.update('data');
-		this._markersPaneView.update('data');
+		this._drawingPaneView.update('data');
 
 		if (this._lastPriceAnimationPaneView !== null) {
 			if (updateInfo && updateInfo.lastBarUpdatedOrNewBarsAddedToTheRight) {
@@ -315,7 +315,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this._markers = data;
 		this._recalculateMarkers();
 		const sourcePane = this.model().paneForSource(this);
-		this._markersPaneView.update('data');
+		this._drawingPaneView.update('data');
 		this.model().recalculatePane(sourcePane);
 		this.model().updateSource(this);
 		this.model().updateCrosshair();
@@ -425,7 +425,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		res.push(
 			this._paneView,
 			this._priceLineView,
-			this._markersPaneView
+			this._drawingPaneView
 		);
 
 		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
@@ -507,7 +507,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 	public updateAllViews(): void {
 		this._paneView.update();
-		this._markersPaneView.update();
+		this._drawingPaneView.update();
 
 		for (const priceAxisView of this._priceAxisViews) {
 			priceAxisView.update();
@@ -549,6 +549,10 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 	public title(): string {
 		return this._options.title;
+	}
+
+	public seriesId(): string {
+		return this._options.seriesId;
 	}
 
 	public override visible(): boolean {
@@ -607,7 +611,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
 		}
 
-		let margins = this._markersPaneView.autoScaleMargins();
+		let margins = this._drawingPaneView.autoScaleMargins();
 		this._primitives.forEach((primitive: SeriesPrimitiveWrapper) => {
 			const primitiveAutoscale = primitive.autoscaleInfo(
 				startTimePoint,
@@ -626,7 +630,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 			}
 		});
 
-		return new AutoscaleInfoImpl(range,	margins);
+		return new AutoscaleInfoImpl(range, margins);
 	}
 
 	private _markerRadius(): number {
@@ -740,7 +744,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	}
 
 	private _recreatePaneViews(customPaneView?: ICustomSeriesPaneView<unknown>): void {
-		this._markersPaneView = new SeriesMarkersPaneView(this, this.model());
+		this._drawingPaneView = new SeriesDrawingPaneView(this, this.model());
 
 		switch (this._seriesType) {
 			case 'Bar': {

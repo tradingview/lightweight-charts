@@ -46,6 +46,7 @@ export interface MouseEventHandlerEventBase extends TouchMouseEventData {
 
 	target: MouseEvent['target'];
 	view: MouseEvent['view'];
+	paneIndex: number;
 
 	preventDefault(): void;
 }
@@ -70,7 +71,7 @@ export interface Position {
 const enum Delay {
 	ResetClick = 500,
 	LongTap = 240,
-	PreventFiresTouchEvents= 500,
+	PreventFiresTouchEvents = 500,
 }
 
 const enum Constants {
@@ -810,6 +811,7 @@ export class MouseEventHandler implements IDestroyable {
 
 			target: eventLike.target,
 			view: event.view,
+			paneIndex: 0,
 
 			preventDefault: () => {
 				if (event.type !== 'touchstart') {

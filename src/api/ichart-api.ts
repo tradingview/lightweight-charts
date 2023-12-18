@@ -1,3 +1,4 @@
+import { DrawingTrendLine, TrendLineOptions } from '../drawing/renderers/drawing-trend-line-pane-renderer';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl } from '../model/chart-model';
@@ -18,6 +19,7 @@ import {
 } from '../model/series-options';
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
+import { IChartApi } from './create-chart';
 
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
@@ -54,6 +56,11 @@ export interface MouseEventParams<HorzScaleItem = Time> {
 	 * The value will be `undefined` if the event is fired outside the chart, for example a mouse leave event.
 	 */
 	point?: Point;
+
+	price?: Point;
+
+	seriesId?: string;
+
 	/**
 	 * Data of all series at the location of the event in the chart.
 	 *
@@ -203,6 +210,27 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * ```
 	 */
 	removeSeries(seriesApi: ISeriesApi<SeriesType, HorzScaleItem>): void;
+
+	subscribeMouseDownEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeMouseDownEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeMouseUpEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeMouseUpEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeDoubleTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeDoubleTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeLongTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeLongTapEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeMouseEnterEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeMouseEnterEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+
+	subscribeMouseLeaveEvent(handler: MouseEventHandler<HorzScaleItem>): void;
+	unsubscribeMouseLeaveEvent(handler: MouseEventHandler<HorzScaleItem>): void;
 
 	/**
 	 * Subscribe to the chart click event.
@@ -364,10 +392,33 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	clearCrosshairPosition(): void;
 
 	/**
+	 * Returns the current crosshair position within the chart.
+	 *
+	 * @returns The current crosshair position within the chart.
+	 */
+	crosshairFreeze(): boolean;
+
+	/**
+	 * Freeze the crosshair position within the chart.
+	 *
+	 * @param freeze - true to freeze the crosshair, false to unfreeze.
+	 */
+	setCrosshairFreeze(freeze: boolean): void;
+
+	/**
 	 * Returns the dimensions of the chart pane (the plot surface which excludes time and price scales).
 	 * This would typically only be useful for plugin development.
 	 *
 	 * @returns Dimensions of the chart pane
 	 */
 	paneSize(): PaneSize;
+
+	drawingTrendLine(
+		chart: IChartApi,
+		lineSeries: ISeriesApi<SeriesType>,
+		point1: any,
+		point2: any,
+		options?: Partial<TrendLineOptions>
+	): DrawingTrendLine;
+
 }

@@ -92,6 +92,8 @@ export const enum TickMarkType {
 	 * The start of the month (e.g. it's the first tick mark in a month).
 	 */
 	Month,
+
+	Week,
 	/**
 	 * A day of the month.
 	 */
@@ -100,10 +102,6 @@ export const enum TickMarkType {
 	 * A time without seconds.
 	 */
 	Time,
-	/**
-	 * A time with seconds.
-	 */
-	TimeWithSeconds,
 }
 
 /**
@@ -114,16 +112,12 @@ export const enum TickMarkType {
  * @example Between 2020-01-01 and 2020-02-02 there is a month of difference, i.e. for 2020-02-02 weight would be a month.
  */
 export const enum TickMarkWeight {
-	LessThanSecond = 0,
-	Second = 10,
-	Minute1 = 20,
-	Minute5 = 21,
-	Minute30 = 22,
-	Hour1 = 30,
-	Hour3 = 31,
-	Hour6 = 32,
-	Hour12 = 33,
-	Day = 50,
-	Month = 60,
-	Year = 70,
+	Minute5 = 5,
+	Minute15 = 15,
+	Minute30 = 30,
+	Hour1 = 60,
+	Day = 100,
+	Week = 101,
+	Month = 102,
+	Year = 103,
 }

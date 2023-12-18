@@ -39,7 +39,10 @@ export class Pane implements IDestroyable {
 	private _leftPriceScale: PriceScale;
 	private _rightPriceScale: PriceScale;
 
-	public constructor(timeScale: ITimeScale, model: IChartModelBase) {
+	private _paneId: string;
+
+	public constructor(timeScale: ITimeScale, model: IChartModelBase, paneId?: string | null) {
+		this._paneId = paneId || 'pane-' + Date.now() + '-' + Math.round(Math.random() * 10000);
 		this._timeScale = timeScale;
 		this._model = model;
 		this._grid = new Grid(this);
@@ -76,6 +79,10 @@ export class Pane implements IDestroyable {
 				}
 			}
 		}
+	}
+
+	public paneId(): string {
+		return this._paneId;
 	}
 
 	public priceScaleById(id: string): PriceScale | null {

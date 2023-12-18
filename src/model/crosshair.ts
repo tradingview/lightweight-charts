@@ -148,6 +148,8 @@ export class Crosshair extends DataSource {
 	private _originX: Coordinate = NaN as Coordinate;
 	private _originY: Coordinate = NaN as Coordinate;
 
+	private _freeze: boolean = false;
+
 	public constructor(model: IChartModelBase, options: CrosshairOptions) {
 		super();
 		this._model = model;
@@ -221,6 +223,14 @@ export class Crosshair extends DataSource {
 		return this._originY;
 	}
 
+	public freeze(): boolean {
+		return this._freeze;
+	}
+
+	public setFreeze(freeze: boolean): void {
+		this._freeze = freeze;
+	}
+
 	public setPosition(index: TimePointIndex, price: number, pane: Pane): void {
 		if (!this._subscribed) {
 			this._subscribed = true;
@@ -282,6 +292,10 @@ export class Crosshair extends DataSource {
 		}
 
 		return views;
+	}
+
+	public price(): number {
+		return this._price;
 	}
 
 	public override timeAxisViews(): readonly ITimeAxisView[] {

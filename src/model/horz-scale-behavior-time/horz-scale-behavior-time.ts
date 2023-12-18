@@ -131,22 +131,16 @@ export type TickMarkFormatter = (time: Time, tickMarkType: TickMarkType, locale:
 // eslint-disable-next-line complexity
 function weightToTickMarkType(weight: TickMarkWeight, timeVisible: boolean, secondsVisible: boolean): TickMarkType {
 	switch (weight) {
-		case TickMarkWeight.LessThanSecond:
-		case TickMarkWeight.Second:
-			return timeVisible
-				? (secondsVisible ? TickMarkType.TimeWithSeconds : TickMarkType.Time)
-				: TickMarkType.DayOfMonth;
-
-		case TickMarkWeight.Minute1:
 		case TickMarkWeight.Minute5:
+		case TickMarkWeight.Minute15:
 		case TickMarkWeight.Minute30:
 		case TickMarkWeight.Hour1:
-		case TickMarkWeight.Hour3:
-		case TickMarkWeight.Hour6:
-		case TickMarkWeight.Hour12:
 			return timeVisible ? TickMarkType.Time : TickMarkType.DayOfMonth;
 
 		case TickMarkWeight.Day:
+			return TickMarkType.DayOfMonth;
+
+		case TickMarkWeight.Week:
 			return TickMarkType.DayOfMonth;
 
 		case TickMarkWeight.Month:

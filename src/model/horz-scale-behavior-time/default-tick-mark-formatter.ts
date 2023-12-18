@@ -1,4 +1,4 @@
-import { ensureNever } from '../../helpers/assertions';
+// import { ensureNever } from '../../helpers/assertions';
 
 import { TickMarkType, TimePoint } from './types';
 
@@ -24,15 +24,15 @@ export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: Tic
 			formatOptions.minute = '2-digit';
 			break;
 
-		case TickMarkType.TimeWithSeconds:
-			formatOptions.hour12 = false;
-			formatOptions.hour = '2-digit';
-			formatOptions.minute = '2-digit';
-			formatOptions.second = '2-digit';
-			break;
+		// case TickMarkType.TimeWithSeconds:
+		// 	formatOptions.hour12 = false;
+		// 	formatOptions.hour = '2-digit';
+		// 	formatOptions.minute = '2-digit';
+		// 	formatOptions.second = '2-digit';
+		// 	break;
 
-		default:
-			ensureNever(tickMarkType);
+		// default:
+		// 	ensureNever(tickMarkType);
 	}
 
 	const date = timePoint.businessDay === undefined

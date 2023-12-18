@@ -1,3 +1,4 @@
+import { DrawingTrendLine, TrendLineOptions } from '../drawing/renderers/drawing-trend-line-pane-renderer';
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { assert, ensure, ensureDefined } from '../helpers/assertions';
@@ -10,6 +11,7 @@ import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, Whitespace
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
+import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
@@ -32,6 +34,7 @@ import {
 	SeriesType,
 } from '../model/series-options';
 import { Logical } from '../model/time-data';
+import { IChartApi } from './create-chart';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApiBase, MouseEventHandler, MouseEventParams, PaneSize } from './ichart-api';
@@ -119,6 +122,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private readonly _seriesMap: Map<SeriesApi<SeriesType, HorzScaleItem>, Series<SeriesType>> = new Map();
 	private readonly _seriesMapReversed: Map<Series<SeriesType>, SeriesApi<SeriesType, HorzScaleItem>> = new Map();
 
+	private readonly _mouseEnterEventDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
+	private readonly _mouseLeaveEventDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
+	private readonly _tapEventDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
+	private readonly _doubleTapEventDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
+	private readonly _longTapEventDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
+	private readonly _mouseDownEventDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
+	private readonly _mouseUpEventDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 	private readonly _clickedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 	private readonly _dblClickedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
@@ -136,6 +146,55 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._horzScaleBehavior = horzScaleBehavior;
 		this._chartWidget = new ChartWidget(container, internalOptions, horzScaleBehavior);
 
+		this._chartWidget.mouseEnter().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._mouseEnterEventDelegate.hasListeners()) {
+					this._mouseEnterEventDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+		);
+		this._chartWidget.mouseLeave().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._mouseLeaveEventDelegate.hasListeners()) {
+					this._mouseLeaveEventDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+		);
+		this._chartWidget.tap().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._tapEventDelegate.hasListeners()) {
+					this._tapEventDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+		);
+		this._chartWidget.doubleTap().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._doubleTapEventDelegate.hasListeners()) {
+					this._doubleTapEventDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+		);
+		this._chartWidget.longTap().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._longTapEventDelegate.hasListeners()) {
+					this._longTapEventDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+		);
+		this._chartWidget.mouseDown().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._mouseDownEventDelegate.hasListeners()) {
+					this._mouseDownEventDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+		);
+		this._chartWidget.mouseUp().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._mouseUpEventDelegate.hasListeners()) {
+					this._mouseUpEventDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			},
+		);
 		this._chartWidget.clicked().subscribe(
 			(paramSupplier: MouseEventParamsImplSupplier) => {
 				if (this._clickedDelegate.hasListeners()) {
@@ -166,6 +225,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	}
 
 	public remove(): void {
+		this._chartWidget.mouseEnter().unsubscribeAll(this);
+		this._chartWidget.mouseLeave().unsubscribeAll(this);
+		this._chartWidget.tap().unsubscribeAll(this);
+		this._chartWidget.doubleTap().unsubscribeAll(this);
+		this._chartWidget.longTap().unsubscribeAll(this);
+		this._chartWidget.mouseDown().unsubscribeAll(this);
+		this._chartWidget.mouseUp().unsubscribeAll(this);
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.dblClicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
@@ -176,6 +242,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._seriesMap.clear();
 		this._seriesMapReversed.clear();
 
+		this._mouseEnterEventDelegate.destroy();
+		this._mouseLeaveEventDelegate.destroy();
+		this._tapEventDelegate.destroy();
+		this._doubleTapEventDelegate.destroy();
+		this._longTapEventDelegate.destroy();
+		this._mouseDownEventDelegate.destroy();
+		this._mouseUpEventDelegate.destroy();
 		this._clickedDelegate.destroy();
 		this._dblClickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
@@ -198,7 +271,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>
 	>(
 		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
-		options?: SeriesPartialOptions<TOptions>
+		options?: SeriesPartialOptions<TOptions>,
+		pane?: Pane
 	): ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions> {
 		const paneView = ensure(customPaneView);
 		const defaults = {
@@ -209,34 +283,35 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			'Custom',
 			defaults,
 			options,
+			pane,
 			paneView
 		);
 	}
 
-	public addAreaSeries(options?: AreaSeriesPartialOptions): ISeriesApi<'Area', HorzScaleItem> {
-		return this._addSeriesImpl('Area', areaStyleDefaults, options);
+	public addAreaSeries(options?: AreaSeriesPartialOptions, pane?: Pane): ISeriesApi<'Area', HorzScaleItem> {
+		return this._addSeriesImpl('Area', areaStyleDefaults, options, pane);
 	}
 
-	public addBaselineSeries(options?: BaselineSeriesPartialOptions): ISeriesApi<'Baseline', HorzScaleItem> {
-		return this._addSeriesImpl('Baseline', baselineStyleDefaults, options);
+	public addBaselineSeries(options?: BaselineSeriesPartialOptions, pane?: Pane): ISeriesApi<'Baseline', HorzScaleItem> {
+		return this._addSeriesImpl('Baseline', baselineStyleDefaults, options, pane);
 	}
 
-	public addBarSeries(options?: BarSeriesPartialOptions): ISeriesApi<'Bar', HorzScaleItem> {
-		return this._addSeriesImpl('Bar', barStyleDefaults, options);
+	public addBarSeries(options?: BarSeriesPartialOptions, pane?: Pane): ISeriesApi<'Bar', HorzScaleItem> {
+		return this._addSeriesImpl('Bar', barStyleDefaults, options, pane);
 	}
 
-	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}): ISeriesApi<'Candlestick', HorzScaleItem> {
+	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}, pane?: Pane): ISeriesApi<'Candlestick', HorzScaleItem> {
 		fillUpDownCandlesticksColors(options);
 
-		return this._addSeriesImpl('Candlestick', candlestickStyleDefaults, options);
+		return this._addSeriesImpl('Candlestick', candlestickStyleDefaults, options, pane);
 	}
 
-	public addHistogramSeries(options?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram', HorzScaleItem> {
-		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options);
+	public addHistogramSeries(options?: HistogramSeriesPartialOptions, pane?: Pane): ISeriesApi<'Histogram', HorzScaleItem> {
+		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options, pane);
 	}
 
-	public addLineSeries(options?: LineSeriesPartialOptions): ISeriesApi<'Line', HorzScaleItem> {
-		return this._addSeriesImpl('Line', lineStyleDefaults, options);
+	public addLineSeries(options?: LineSeriesPartialOptions, pane?: Pane): ISeriesApi<'Line', HorzScaleItem> {
+		return this._addSeriesImpl('Line', lineStyleDefaults, options, pane);
 	}
 
 	public removeSeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): void {
@@ -258,6 +333,62 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void {
 		this._sendUpdateToChart(this._dataLayer.updateSeriesData(series, data));
+	}
+
+	public subscribeMouseEnterEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._mouseEnterEventDelegate.subscribe(handler);
+	}
+
+	public unsubscribeMouseEnterEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._mouseEnterEventDelegate.unsubscribe(handler);
+	}
+
+	public subscribeMouseLeaveEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._mouseLeaveEventDelegate.subscribe(handler);
+	}
+
+	public unsubscribeMouseLeaveEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._mouseLeaveEventDelegate.unsubscribe(handler);
+	}
+
+	public subscribeTapEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._tapEventDelegate.subscribe(handler);
+	}
+
+	public unsubscribeTapEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._tapEventDelegate.unsubscribe(handler);
+	}
+
+	public subscribeDoubleTapEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._doubleTapEventDelegate.subscribe(handler);
+	}
+
+	public unsubscribeDoubleTapEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._doubleTapEventDelegate.unsubscribe(handler);
+	}
+
+	public subscribeLongTapEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._longTapEventDelegate.subscribe(handler);
+	}
+
+	public unsubscribeLongTapEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._longTapEventDelegate.unsubscribe(handler);
+	}
+
+	public subscribeMouseDownEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._mouseDownEventDelegate.subscribe(handler);
+	}
+
+	public unsubscribeMouseDownEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._mouseDownEventDelegate.unsubscribe(handler);
+	}
+
+	public subscribeMouseUpEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._mouseUpEventDelegate.subscribe(handler);
+	}
+
+	public unsubscribeMouseUpEvent(handler: MouseEventHandler<HorzScaleItem>): void {
+		this._mouseUpEventDelegate.unsubscribe(handler);
 	}
 
 	public subscribeClick(handler: MouseEventHandler<HorzScaleItem>): void {
@@ -340,21 +471,34 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._chartWidget.model().clearCurrentPosition(true);
 	}
 
+	public crosshairFreeze(): boolean {
+		return this._chartWidget.model().crosshairFreeze();
+	}
+
+	public setCrosshairFreeze(freeze: boolean): void {
+		this._chartWidget.model().setCrosshairFreeze(freeze);
+	}
+
 	private _addSeriesImpl<
 		TSeries extends SeriesType,
 		TData extends WhitespaceData<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[TSeries],
 		TOptions extends SeriesOptionsMap[TSeries] = SeriesOptionsMap[TSeries],
-		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries]
+		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries],
 	>(
 		type: TSeries,
 		styleDefaults: SeriesStyleOptionsMap[TSeries],
 		options: SeriesPartialOptionsMap[TSeries] = {},
+		pane?: Pane,
 		customPaneView?: ICustomSeriesPaneView<HorzScaleItem>
 	): ISeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions> {
 		patchPriceFormat(options.priceFormat);
+		const model = this._chartWidget.model();
+		if (!pane && options.paneIndex !== undefined) {
+			pane = model.getPanes()[options.paneIndex] || model.createPane(null, options.paneIndex);
+		}
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
-		const series = this._chartWidget.model().createSeries(type, strictOptions, customPaneView);
+		const series = model.createSeries(type, strictOptions, customPaneView, pane);
 
 		const res = new SeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions>(series, this, this, this, this._horzScaleBehavior);
 		this._seriesMap.set(res, series);
@@ -378,9 +522,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams<HorzScaleItem> {
 		const seriesData: MouseEventParams<HorzScaleItem>['seriesData'] = new Map();
+		let price;
 		param.seriesData.forEach((plotRow: SeriesPlotRow<SeriesType>, series: Series<SeriesType>) => {
 			const seriesType = series.seriesType();
 			const data = getSeriesDataCreator<SeriesType, HorzScaleItem>(seriesType)(plotRow);
+
+			price = series.model().crosshairSource().price();
+
 			if (seriesType !== 'Custom') {
 				assert(isFulfilledData(data));
 			} else {
@@ -389,17 +537,37 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			}
 			seriesData.set(this._mapSeriesToApi(series), data);
 		});
-
 		const hoveredSeries = param.hoveredSeries === undefined ? undefined : this._mapSeriesToApi(param.hoveredSeries);
+
+		let seriesId = '';
+		if (hoveredSeries) {
+			for (let key1 in hoveredSeries) {
+				if (hoveredSeries.hasOwnProperty(key1)) {
+					seriesId = hoveredSeries.options().seriesId;
+				}
+			}
+		}
 
 		return {
 			time: param.originalTime as HorzScaleItem,
 			logical: param.index as Logical | undefined,
 			point: param.point,
+			price: price,
 			hoveredSeries,
 			hoveredObjectId: param.hoveredObject,
 			seriesData,
 			sourceEvent: param.touchMouseEventData,
+			seriesId: seriesId,
 		};
+	}
+
+	public drawingTrendLine = (
+		chart: IChartApi,
+		lineSeries: ISeriesApi<SeriesType>,
+		point1: any,
+		point2: any,
+		options?: Partial<TrendLineOptions>
+	): DrawingTrendLine => {
+		return new DrawingTrendLine(chart, lineSeries, point1, point2, options);
 	}
 }
