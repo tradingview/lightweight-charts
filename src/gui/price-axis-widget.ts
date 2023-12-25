@@ -29,7 +29,7 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 import { IAxisView } from '../views/pane/iaxis-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
-import { createBoundCanvas } from './canvas-utils';
+import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IPriceAxisViewsGetter } from './iaxis-view-getters';
 import { suggestPriceScaleWidth } from './internal-layout-sizes-hints';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
@@ -155,9 +155,11 @@ export class PriceAxisWidget implements IDestroyable {
 		this._mouseEventHandler.destroy();
 
 		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
+		releaseCanvas(this._topCanvasBinding.canvasElement);
 		this._topCanvasBinding.dispose();
 
 		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
+		releaseCanvas(this._canvasBinding.canvasElement);
 		this._canvasBinding.dispose();
 
 		if (this._priceScale !== null) {
