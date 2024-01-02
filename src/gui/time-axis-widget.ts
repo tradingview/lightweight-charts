@@ -26,7 +26,7 @@ import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { IAxisView } from '../views/pane/iaxis-view';
 
-import { createBoundCanvas } from './canvas-utils';
+import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { drawBackground, drawForeground, drawSourcePaneViews } from './draw-functions';
 import { ITimeAxisViewsGetter } from './iaxis-view-getters';
@@ -139,9 +139,11 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		}
 
 		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
+		releaseCanvas(this._topCanvasBinding.canvasElement);
 		this._topCanvasBinding.dispose();
 
 		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
+		releaseCanvas(this._canvasBinding.canvasElement);
 		this._canvasBinding.dispose();
 	}
 

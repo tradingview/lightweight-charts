@@ -26,7 +26,7 @@ import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { createBoundCanvas } from './canvas-utils';
+import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IChartWidgetBase } from './chart-widget';
 import { drawBackground, drawForeground, DrawFunction, drawSourcePaneViews } from './draw-functions';
 import { IPaneViewsGetter } from './ipane-view-getter';
@@ -152,9 +152,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
+		releaseCanvas(this._topCanvasBinding.canvasElement);
 		this._topCanvasBinding.dispose();
 
 		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
+		releaseCanvas(this._canvasBinding.canvasElement);
 		this._canvasBinding.dispose();
 
 		if (this._state !== null) {

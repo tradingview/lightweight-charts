@@ -14,7 +14,7 @@ import { ChartOptionsBase } from '../model/chart-model';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
-import { createBoundCanvas } from './canvas-utils';
+import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { PriceAxisWidgetSide } from './price-axis-widget';
 
 export interface PriceAxisStubParams {
@@ -64,6 +64,7 @@ export class PriceAxisStub implements IDestroyable {
 
 	public destroy(): void {
 		this._canvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._canvasSuggestedBitmapSizeChangedHandler);
+		releaseCanvas(this._canvasBinding.canvasElement);
 		this._canvasBinding.dispose();
 	}
 
