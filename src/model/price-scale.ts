@@ -273,7 +273,7 @@ export class PriceScale {
 				throw new Error(`Invalid top margin - expect value between 0 and 1, given=${top}`);
 			}
 
-			if (bottom < 0 || bottom > 1 || top + bottom > 1) {
+			if (bottom < 0 || bottom > 1) {
 				throw new Error(`Invalid bottom margin - expect value between 0 and 1, given=${bottom}`);
 			}
 
