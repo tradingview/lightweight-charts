@@ -52,6 +52,7 @@
     "fancy-canvas": "2.1.0"
   },
   "devDependencies": {
+    "@juggle/resize-observer": "~3.4.0",
     "@rollup/plugin-node-resolve": "~15.0.2",
     "@rollup/plugin-replace": "~5.0.2",
     "@rollup/plugin-terser": "~0.4.3",
