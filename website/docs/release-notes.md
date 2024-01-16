@@ -15,6 +15,18 @@ sidebar_position: 8
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
 
+## 4.1.2
+
+**Bug Fixes**
+
+- Fix for 'Total canvas memory use exceeds the maximum limit' error raised on iOS Safari. (PR [#1485](https://github.com/tradingview/lightweight-charts/pull/1485))
+
+**Minor Improvements**
+
+- Improved error messages for price scale margins. (PR [#1489](https://github.com/tradingview/lightweight-charts/pull/1489))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.1..v4.1.2).
+
 ## 4.1.1
 
 **Bug Fixes**
