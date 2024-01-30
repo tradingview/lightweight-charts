@@ -30,14 +30,15 @@ function runTestCase(container) {
 
 	chart.timeScale().applyOptions({ barSpacing: 27.701, fixRightEdge: true, rightOffset: 0 });
 	return new Promise(resolve => {
-		setTimeout(() => {
-			chart.setCrosshairPosition(
-				200,
-				{ year: 2024, month: 1, day: 2 },
-				mainSeries
-			);
-
-			resolve();
-		}, 10);
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				chart.setCrosshairPosition(
+					200,
+					{ year: 2024, month: 1, day: 2 },
+					mainSeries
+				);
+				resolve();
+			});
+		});
 	});
 }
