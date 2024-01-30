@@ -73,8 +73,14 @@ export class Screenshoter {
 				return (window as unknown as TestCaseWindow).testCaseReady;
 			});
 
-			// move mouse to top-left corner
-			await page.mouse.move(0, 0);
+			const shouldIgnoreMouseMove = await page.evaluate(() => {
+				return Boolean((window as unknown as TestCaseWindow).ignoreMouseMove);
+			});
+
+			if (!shouldIgnoreMouseMove) {
+				// move mouse to top-left corner
+				await page.mouse.move(0, 0);
+			}
 
 			const waitForMouseMove = page.evaluate(() => {
 				if ((window as unknown as TestCaseWindow).ignoreMouseMove) { return Promise.resolve(); }
@@ -93,10 +99,11 @@ export class Screenshoter {
 				});
 			});
 
-			// to avoid random cursor position
-			await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
-
-			await waitForMouseMove;
+			if (!shouldIgnoreMouseMove) {
+				// to avoid random cursor position
+				await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
+				await waitForMouseMove;
+			}
 
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
