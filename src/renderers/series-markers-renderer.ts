@@ -45,7 +45,6 @@ export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
 	private _fontSize: number = -1;
 	private _fontFamily: string = '';
 	private _font: string = '';
-	private _fontPixelRatio: number = 1;
 
 	public setData(data: SeriesMarkerRendererData): void {
 		this._data = data;
@@ -55,7 +54,8 @@ export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
 		if (this._fontSize !== fontSize || this._fontFamily !== fontFamily) {
 			this._fontSize = fontSize;
 			this._fontFamily = fontFamily;
-			this._buildFont();
+			this._font = makeFont(this._fontSize, this._fontFamily);
+			this._textWidthCache.reset();
 		}
 	}
 
@@ -81,10 +81,6 @@ export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
-		if (this._fontPixelRatio !== horizontalPixelRatio) {
-			this._fontPixelRatio = horizontalPixelRatio;
-			this._buildFont();
-		}
 
 		ctx.textBaseline = 'middle';
 		ctx.font = this._font;
@@ -92,17 +88,12 @@ export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
 			if (item.text !== undefined) {
-				item.text.width = this._textWidthCache.measureText(ctx, item.text.content) / horizontalPixelRatio;
+				item.text.width = this._textWidthCache.measureText(ctx, item.text.content);
 				item.text.height = this._fontSize;
 				item.text.x = item.x - item.text.width / 2 as Coordinate;
 			}
 			drawItem(item, ctx, horizontalPixelRatio, verticalPixelRatio);
 		}
-	}
-
-	private _buildFont(): void {
-		this._font = makeFont(this._fontSize * this._fontPixelRatio, this._fontFamily);
-		this._textWidthCache.reset();
 	}
 }
 
@@ -120,7 +111,7 @@ function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContex
 	ctx.fillStyle = item.color;
 
 	if (item.text !== undefined) {
-		drawText(ctx, item.text.content, item.text.x * horizontalPixelRatio, item.text.y * verticalPixelRatio);
+		drawText(ctx, item.text.content, item.text.x, item.text.y, horizontalPixelRatio, verticalPixelRatio);
 	}
 
 	drawShape(item, ctx, bitmapShapeItemCoordinates(item, horizontalPixelRatio, verticalPixelRatio));
