@@ -54,7 +54,7 @@ export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
 		if (this._fontSize !== fontSize || this._fontFamily !== fontFamily) {
 			this._fontSize = fontSize;
 			this._fontFamily = fontFamily;
-			this._font = makeFont(this._fontSize, this._fontFamily);
+			this._font = makeFont(fontSize, fontFamily);
 			this._textWidthCache.reset();
 		}
 	}
