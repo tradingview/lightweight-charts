@@ -195,6 +195,13 @@ export interface HorzScaleOptions {
 	 * @defaultValue 0
 	 */
 	minimumHeight: number;
+
+	/**
+	 * Allow major time scale labels to be rendered in a bolder font weight.
+	 *
+	 * @defaultValue true
+	 */
+	allowBoldLabels: boolean;
 }
 
 export interface ITimeScale {

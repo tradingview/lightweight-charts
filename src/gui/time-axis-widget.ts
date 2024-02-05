@@ -422,7 +422,9 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 					ctx.fillText(tickMark.label, coordinate, yText);
 				}
 			}
-			ctx.font = this._baseBoldFont();
+			if (this._chart.options().timeScale.allowBoldLabels) {
+				ctx.font = this._baseBoldFont();
+			}
 			for (const tickMark of tickMarks) {
 				if (tickMark.weight >= maxWeight) {
 					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
