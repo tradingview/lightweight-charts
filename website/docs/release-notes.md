@@ -15,6 +15,18 @@ sidebar_position: 8
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
 
+## 4.1.3
+
+**Minor Improvements**
+
+- Added option to disable bold labels in the time scale. (PR [#1510](https://github.com/tradingview/lightweight-charts/pull/1510))
+
+**Bug Fixes**
+
+- Fixed sub-pixel horizontal alignment of the crosshair marker and series markers. (PR [#1505](https://github.com/tradingview/lightweight-charts/pull/1505), fixes [#1504](https://github.com/tradingview/lightweight-charts/issues/1504))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.2..v4.1.3).
+
 ## 4.1.2
 
 **Bug Fixes**
