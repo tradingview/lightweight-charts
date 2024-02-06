@@ -1,9 +1,9 @@
-import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
 import { LineItemBase } from './line-renderer-base';
-import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
 
 export interface MarksRendererData {
 	items: LineItemBase[];
@@ -14,14 +14,14 @@ export interface MarksRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class PaneRendererMarks extends MediaCoordinatesPaneRenderer {
+export class PaneRendererMarks extends BitmapCoordinatesPaneRenderer {
 	protected _data: MarksRendererData | null = null;
 
 	public setData(data: MarksRendererData): void {
 		this._data = data;
 	}
 
-	protected _drawImpl({ context: ctx }: MediaCoordinatesRenderingScope): void {
+	protected _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
@@ -29,13 +29,19 @@ export class PaneRendererMarks extends MediaCoordinatesPaneRenderer {
 		const visibleRange = this._data.visibleRange;
 		const data = this._data;
 
-		const draw = (radius: number) => {
+		const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
+		const correction = (tickWidth % 2) / 2;
+
+		const draw = (radiusMedia: number) => {
 			ctx.beginPath();
 
 			for (let i = visibleRange.to - 1; i >= visibleRange.from; --i) {
 				const point = data.items[i];
-				ctx.moveTo(point.x, point.y);
-				ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+				const centerX = Math.round(point.x * horizontalPixelRatio) + correction; // correct x coordinate only
+				const centerY = point.y * verticalPixelRatio;
+				const radius = radiusMedia * verticalPixelRatio + correction;
+				ctx.moveTo(centerX, centerY);
+				ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
 			}
 
 			ctx.fill();

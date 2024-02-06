@@ -1,4 +1,4 @@
-import { MediaCoordinatesRenderingScope } from 'fancy-canvas';
+import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { ensureNever } from '../helpers/assertions';
 import { makeFont } from '../helpers/make-font';
@@ -9,11 +9,12 @@ import { SeriesMarkerShape } from '../model/series-markers';
 import { TextWidthCache } from '../model/text-width-cache';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
-import { MediaCoordinatesPaneRenderer } from './media-coordinates-pane-renderer';
+import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
 import { drawSquare, hitTestSquare } from './series-markers-square';
 import { drawText, hitTestText } from './series-markers-text';
+import { BitmapShapeItemCoordinates } from './series-markers-utils';
 
 export interface SeriesMarkerText {
 	content: string;
@@ -38,7 +39,7 @@ export interface SeriesMarkerRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class SeriesMarkersRenderer extends MediaCoordinatesPaneRenderer {
+export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
 	private _data: SeriesMarkerRendererData | null = null;
 	private _textWidthCache: TextWidthCache = new TextWidthCache();
 	private _fontSize: number = -1;
@@ -76,7 +77,7 @@ export class SeriesMarkersRenderer extends MediaCoordinatesPaneRenderer {
 		return null;
 	}
 
-	protected _drawImpl({ context: ctx }: MediaCoordinatesRenderingScope, isHovered: boolean, hitTestData?: unknown): void {
+	protected _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope, isHovered: boolean, hitTestData?: unknown): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
@@ -91,38 +92,48 @@ export class SeriesMarkersRenderer extends MediaCoordinatesPaneRenderer {
 				item.text.height = this._fontSize;
 				item.text.x = item.x - item.text.width / 2 as Coordinate;
 			}
-			drawItem(item, ctx);
+			drawItem(item, ctx, horizontalPixelRatio, verticalPixelRatio);
 		}
 	}
 }
 
-function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
+function bitmapShapeItemCoordinates(item: SeriesMarkerRendererDataItem, horizontalPixelRatio: number, verticalPixelRatio: number): BitmapShapeItemCoordinates {
+	const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
+	const correction = (tickWidth % 2) / 2;
+	return {
+		x: Math.round(item.x * horizontalPixelRatio) + correction,
+		y: item.y * verticalPixelRatio,
+		pixelRatio: horizontalPixelRatio,
+	};
+}
+
+function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, horizontalPixelRatio: number, verticalPixelRatio: number): void {
 	ctx.fillStyle = item.color;
 
 	if (item.text !== undefined) {
-		drawText(ctx, item.text.content, item.text.x, item.text.y);
+		drawText(ctx, item.text.content, item.text.x, item.text.y, horizontalPixelRatio, verticalPixelRatio);
 	}
 
-	drawShape(item, ctx);
+	drawShape(item, ctx, bitmapShapeItemCoordinates(item, horizontalPixelRatio, verticalPixelRatio));
 }
 
-function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D): void {
+function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, coordinates: BitmapShapeItemCoordinates): void {
 	if (item.size === 0) {
 		return;
 	}
 
 	switch (item.shape) {
 		case 'arrowDown':
-			drawArrow(false, ctx, item.x, item.y, item.size);
+			drawArrow(false, ctx, coordinates, item.size);
 			return;
 		case 'arrowUp':
-			drawArrow(true, ctx, item.x, item.y, item.size);
+			drawArrow(true, ctx, coordinates, item.size);
 			return;
 		case 'circle':
-			drawCircle(ctx, item.x, item.y, item.size);
+			drawCircle(ctx, coordinates, item.size);
 			return;
 		case 'square':
-			drawSquare(ctx, item.x, item.y, item.size);
+			drawSquare(ctx, coordinates, item.size);
 			return;
 	}
 

@@ -19,6 +19,6 @@ module.exports = [
 	{
 		name: 'Standalone',
 		path: 'dist/lightweight-charts.standalone.production.js',
-		limit: '49.68 KB',
+		limit: '49.67 KB',
 	},
 ];

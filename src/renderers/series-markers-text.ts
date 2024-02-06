@@ -4,9 +4,14 @@ export function drawText(
 	ctx: CanvasRenderingContext2D,
 	text: string,
 	x: number,
-	y: number
+	y: number,
+	horizontalPixelRatio: number,
+	verticalPixelRatio: number
 ): void {
+	ctx.save();
+	ctx.scale(horizontalPixelRatio, verticalPixelRatio);
 	ctx.fillText(text, x, y);
+	ctx.restore();
 }
 
 export function hitTestText(

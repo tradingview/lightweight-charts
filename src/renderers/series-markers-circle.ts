@@ -1,18 +1,17 @@
 import { Coordinate } from '../model/coordinate';
 
-import { shapeSize } from './series-markers-utils';
+import { BitmapShapeItemCoordinates, shapeSize } from './series-markers-utils';
 
 export function drawCircle(
 	ctx: CanvasRenderingContext2D,
-	centerX: Coordinate,
-	centerY: Coordinate,
+	coords: BitmapShapeItemCoordinates,
 	size: number
 ): void {
 	const circleSize = shapeSize('circle', size);
 	const halfSize = (circleSize - 1) / 2;
 
 	ctx.beginPath();
-	ctx.arc(centerX, centerY, halfSize, 0, 2 * Math.PI, false);
+	ctx.arc(coords.x, coords.y, halfSize * coords.pixelRatio, 0, 2 * Math.PI, false);
 
 	ctx.fill();
 }
