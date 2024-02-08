@@ -100,7 +100,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		const paneWrapper = document.createElement('div');
 		paneWrapper.style.width = '100%';
 		paneWrapper.style.height = '100%';
-		paneWrapper.style.position = 'relative';
+		paneWrapper.style.position = 'absolute';
 		paneWrapper.style.overflow = 'hidden';
 
 		this._leftAxisCell = document.createElement('td');
