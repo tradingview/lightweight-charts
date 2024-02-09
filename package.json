@@ -25,8 +25,8 @@
       },
       "production": {
         "types": "./dist/typings.d.ts",
-        "import": "./dist/lightweight-charts.production.mjs",
-        "require": "./dist/lightweight-charts.production.cjs"
+        "import": "./dist/lightweight-charts.development.mjs",
+        "require": "./dist/lightweight-charts.development.cjs"
       },
       "default": {
         "types": "./dist/typings.d.ts",
