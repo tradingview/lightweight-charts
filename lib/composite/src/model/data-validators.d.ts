@@ -1,0 +1,11 @@
+import { SeriesDataItemTypeMap } from './data-consumer';
+import { IHorzScaleBehavior } from './ihorz-scale-behavior';
+import { CreatePriceLineOptions } from './price-line-options';
+import { SeriesMarker } from './series-markers';
+import { SeriesType } from './series-options';
+export declare function checkPriceLineOptions(options: CreatePriceLineOptions): void;
+export declare function checkItemsAreOrdered<HorzScaleItem>(data: readonly (SeriesMarker<HorzScaleItem> | SeriesDataItemTypeMap<HorzScaleItem>[SeriesType])[], bh: IHorzScaleBehavior<HorzScaleItem>, allowDuplicates?: boolean): void;
+export declare function checkSeriesValuesType<HorzScaleItem>(type: SeriesType, data: readonly SeriesDataItemTypeMap<HorzScaleItem>[SeriesType][]): void;
+type Checker<HorzScaleItem> = (item: SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]) => void;
+export declare function getChecker<HorzScaleItem>(type: SeriesType): Checker<HorzScaleItem>;
+export {};
