@@ -44,6 +44,7 @@ function runTestCase(container) {
 			barSpacing: 40,
 			timeVisible: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const bar = chart.addBarSeries({

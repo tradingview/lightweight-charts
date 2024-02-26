@@ -48,6 +48,7 @@ function runTestCase(container) {
 			barSpacing: 24,
 			shiftVisibleRangeOnNewBar: true,
 		},
+		layout: { attributionLogo: false },
 	}));
 
 	const s1 = chart.addCandlestickSeries();

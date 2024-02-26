@@ -29,6 +29,7 @@ function runTestCase(container) {
 			},
 			mode: LightweightCharts.CrosshairMode.Hidden,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries();

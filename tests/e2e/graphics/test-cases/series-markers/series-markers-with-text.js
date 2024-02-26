@@ -28,6 +28,7 @@ function runTestCase(container) {
 		{
 			layout: {
 				fontSize: 20,
+				attributionLogo: false,
 			},
 		}
 	);

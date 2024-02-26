@@ -20,6 +20,7 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, {
 		width: 600,
 		height: 300,
+		layout: { attributionLogo: false },
 	});
 	chart.applyOptions({
 		timeScale: {

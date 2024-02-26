@@ -3,6 +3,7 @@ function runTestCase(container) {
 		timeScale: {
 			fixLeftEdge: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const line = chart.addLineSeries();

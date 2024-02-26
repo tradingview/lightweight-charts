@@ -15,7 +15,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
 	const baselineSeries = chart.addBaselineSeries({
 		lineType: LightweightCharts.LineType.Curved,

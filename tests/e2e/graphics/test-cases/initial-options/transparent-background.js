@@ -20,6 +20,7 @@ function runTestCase(container) {
 				type: LightweightCharts.ColorType.Solid,
 				color: 'rgba(80, 80, 80, 0.5)',
 			},
+			attributionLogo: false,
 		},
 	});
 
