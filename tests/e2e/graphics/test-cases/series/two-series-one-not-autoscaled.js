@@ -21,6 +21,7 @@ function runTestCase(container) {
 				top: 0,
 			},
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries({

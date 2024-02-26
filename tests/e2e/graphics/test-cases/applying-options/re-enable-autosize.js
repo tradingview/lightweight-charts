@@ -23,7 +23,7 @@ function runTestCase(container) {
 	box.style.height = '200px';
 	container.appendChild(box);
 
-	const chart = LightweightCharts.createChart(box, { autoSize: true, height: 200, width: 200 });
+	const chart = LightweightCharts.createChart(box, { autoSize: true, height: 200, width: 200, layout: { attributionLogo: false } });
 	const mainSeries = chart.addAreaSeries();
 
 	mainSeries.setData(generateData());

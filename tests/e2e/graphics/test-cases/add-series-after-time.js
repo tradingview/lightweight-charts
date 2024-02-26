@@ -15,6 +15,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, {
 		height: 500, width: 600,
+		layout: { attributionLogo: false },
 	});
 
 	return new Promise(resolve => {

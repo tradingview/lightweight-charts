@@ -17,7 +17,7 @@ function compare(markers, seriesApiMarkers) {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 	const series = chart.addAreaSeries();
 	series.setData([
 		{ time: '1990-04-24', value: 0 },

@@ -39,6 +39,7 @@ function runTestCase(container) {
 			barSpacing: 40,
 			timeVisible: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series1 = chart.addLineSeries({ title: 'Series 1' });

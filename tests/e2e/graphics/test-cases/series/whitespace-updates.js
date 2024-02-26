@@ -2,7 +2,7 @@
 	End result should be 4 visible bars, 1 whitespace, and finally 1 visible bar.
 */
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
 	const mainSeries = chart.addCandlestickSeries();
 

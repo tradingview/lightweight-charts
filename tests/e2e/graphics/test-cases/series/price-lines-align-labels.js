@@ -18,6 +18,7 @@ function runTestCase(container) {
 			mode: LightweightCharts.PriceScaleMode.Percentage,
 			alignLabels: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series = chart.addLineSeries();
