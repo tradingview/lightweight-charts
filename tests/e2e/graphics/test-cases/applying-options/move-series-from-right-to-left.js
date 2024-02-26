@@ -21,6 +21,7 @@ function runTestCase(container) {
 		rightPriceScale: {
 			visible: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const firstSeries = chart.addLineSeries({

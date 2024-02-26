@@ -13,7 +13,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 	chart.timeScale().scrollToPosition(-100000);
 
 	// to force subscribe and emit event

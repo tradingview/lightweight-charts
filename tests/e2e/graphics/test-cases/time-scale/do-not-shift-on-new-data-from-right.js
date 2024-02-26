@@ -18,6 +18,7 @@ function runTestCase(container) {
 			rightOffset: 10,
 			shiftVisibleRangeOnNewBar: false,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries();

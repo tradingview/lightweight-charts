@@ -73,7 +73,8 @@ function runTestCase(container) {
 	const horzItemBehavior = new HorzScaleBehaviorPrice();
 	const chart = (window.chart = LightweightCharts.createChartEx(
 		container,
-		horzItemBehavior
+		horzItemBehavior,
+		{ layout: { attributionLogo: false } }
 	));
 	const s1 = chart.addLineSeries({
 		color: 'red',

@@ -57,6 +57,7 @@ function runTestCase(container) {
 				type: LightweightCharts.ColorType.Solid,
 				color: '#fff',
 			},
+			attributionLogo: false,
 		},
 		leftPriceScale: {
 			visible: true,

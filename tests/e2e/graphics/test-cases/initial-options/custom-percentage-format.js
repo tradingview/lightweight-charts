@@ -17,6 +17,7 @@ function runTestCase(container) {
 		localization: {
 			percentageFormatter: p => `%${p.toFixed(3)}`,
 		},
+		layout: { attributionLogo: false },
 	}));
 
 	const mainSeries = chart.addLineSeries();

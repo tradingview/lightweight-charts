@@ -24,6 +24,7 @@ function runTestCase(container) {
 			borderColor: '#EFF2F5',
 			ticksVisible: false,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series = chart.addLineSeries({

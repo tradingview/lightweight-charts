@@ -23,6 +23,7 @@ function runTestCase(container) {
 		timeScale: {
 			tickMarkFormatter: (time, tickMarkType, locale) => time.toString(), // return time as is
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const firstSeries = chart.addLineSeries();
