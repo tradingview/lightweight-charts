@@ -324,6 +324,10 @@ export function generateContrastColors(backgroundColor: string): ContrastColors 
 	};
 }
 
+export function colorStringToGrayscale(backgroundColor: string): number {
+	return rgbaToGrayscale(colorStringToRgba(backgroundColor));
+}
+
 export function gradientColorAtPercent(topColor: string, bottomColor: string, percent: number): string {
 	const [topR, topG, topB, topA] = colorStringToRgba(topColor);
 	const [bottomR, bottomG, bottomB, bottomA] = colorStringToRgba(bottomColor);

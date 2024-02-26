@@ -77,4 +77,17 @@ export interface LayoutOptions {
 	 * @defaultValue `-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif`
 	 */
 	fontFamily: string;
+
+	/**
+	 * Display the 'Charting by TradingView' attribution logo on the main chart pane.
+	 *
+	 * The licence for library specifies that you shall add the "attribution notice"
+	 * from the NOTICE file and a link to \<https://www.tradingview.com/\> to the page
+	 * of your website or mobile application that is available to your users. Using this
+	 * attribution logo is sufficient for meeting this requirement. However, if you already
+	 * fulfill this requirement then you can disable this attribution logo.
+	 *
+	 * @defaultValue true
+	 */
+	attributionLogo: boolean;
 }

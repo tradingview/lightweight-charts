@@ -10,4 +10,5 @@ export const layoutOptionsDefaults: LayoutOptions = {
 	textColor: '#191919',
 	fontSize: 12,
 	fontFamily: defaultFontFamily,
+	attributionLogo: true,
 };
