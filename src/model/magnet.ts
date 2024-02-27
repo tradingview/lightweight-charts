@@ -33,7 +33,7 @@ export class Magnet {
 
 		// get all serieses from the pane
 		const serieses: readonly ISeries<SeriesType>[] = pane.dataSources().filter(
-			((ds: IPriceDataSource) => (ds instanceof Series<SeriesType>)) as (ds: IPriceDataSource) => ds is Series<SeriesType>);
+			((ds: IPriceDataSource) => (ds instanceof Series)) as (ds: IPriceDataSource) => ds is Series<SeriesType>);
 
 		const candidates = serieses.reduce(
 			(acc: Coordinate[], series: ISeries<SeriesType>) => {
