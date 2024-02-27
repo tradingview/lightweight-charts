@@ -32,3 +32,9 @@ export function calculateShapeHeight(barSpacing: number): number {
 export function shapeMargin(barSpacing: number): number {
 	return Math.max(size(barSpacing, 0.1), Constants.MinShapeMargin);
 }
+
+export interface BitmapShapeItemCoordinates {
+	x: number;
+	y: number;
+	pixelRatio: number;
+}
