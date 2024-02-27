@@ -13,25 +13,23 @@
     "url": "https://github.com/tradingview/lightweight-charts.git"
   },
   "module": "dist/lightweight-charts.production.mjs",
-  "main": "index.cjs",
+  "main": "dist/lightweight-charts.production.mjs",
   "typings": "dist/typings.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "development": {
         "types": "./dist/typings.d.ts",
-        "import": "./dist/lightweight-charts.development.mjs",
-        "require": "./dist/lightweight-charts.development.cjs"
+        "import": "./dist/lightweight-charts.development.mjs"
       },
       "production": {
         "types": "./dist/typings.d.ts",
-        "import": "./dist/lightweight-charts.production.mjs",
-        "require": "./dist/lightweight-charts.production.cjs"
+        "import": "./dist/lightweight-charts.production.mjs"
       },
       "default": {
         "types": "./dist/typings.d.ts",
-        "import": "./dist/lightweight-charts.production.mjs",
-        "require": "./index.cjs"
+        "import": "./dist/lightweight-charts.production.mjs"
+
       }
     }
   },
@@ -48,7 +46,7 @@
     "charts"
   ],
   "engines": {
-    "node": ">=16.16.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "fancy-canvas": "2.1.0"
