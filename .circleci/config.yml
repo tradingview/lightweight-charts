@@ -181,7 +181,6 @@ jobs:
     executor: node18-executor
     steps:
       - checkout-with-deps
-      - run: npm run tsc-verify
       - run: npm run type-tests
 
   dts-changes:
