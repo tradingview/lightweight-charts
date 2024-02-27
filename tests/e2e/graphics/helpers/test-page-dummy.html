@@ -9,6 +9,14 @@
     <body style="padding: 0; margin: 0;">
         <div id="container" style="position: absolute; width: 100%; height: 100%;"></div>
 
+        <!--
+            When emulating different devicePixelRatios within the e2e tests,
+            the resizeObserver will return the incorrect values for
+            devicePixelContentBox readings. This polyfill allows the tests
+            to be run correctly while DPCB support is enabled in the library.
+        -->
+        <script type="text/javascript">//RESIZE_OBSERVER_POLYFILL</script>
+
         <script type="text/javascript" src="PATH_TO_STANDALONE_MODULE"></script>
 
         <script type="text/javascript">

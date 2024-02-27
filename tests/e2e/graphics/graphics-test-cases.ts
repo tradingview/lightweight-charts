@@ -16,10 +16,15 @@ import { getTestCases, TestCase } from './helpers/get-test-cases';
 import { Screenshoter } from './helpers/screenshoter';
 
 const dummyContent = fs.readFileSync(path.join(__dirname, 'helpers', 'test-page-dummy.html'), { encoding: 'utf-8' });
+const resizeObserverPolyfill = fs.readFileSync(
+	path.join(__dirname, ...'../../../node_modules/@juggle/resize-observer/lib/exports/resize-observer.umd.js'.split('/')),
+	{ encoding: 'utf-8' }
+).replace(/global\.ResizeObserver/g, 'global.ResizeObserverPolyfill') + '; window.ResizeObserver = window.ResizeObserverPolyfill.ResizeObserver';
 const buildMode = process.env.PRODUCTION_BUILD === 'true' ? 'production' : 'development';
 
 function generatePageContent(standaloneBundlePath: string, testCaseCode: string): string {
 	return dummyContent
+		.replace('//RESIZE_OBSERVER_POLYFILL', resizeObserverPolyfill)
 		.replace('PATH_TO_STANDALONE_MODULE', standaloneBundlePath)
 		.replace('TEST_CASE_SCRIPT', testCaseCode)
 		.replace('{BUILD_MODE}', buildMode)
