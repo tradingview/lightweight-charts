@@ -58,7 +58,7 @@ export function getChecker<HorzScaleItem>(type: SeriesType): Checker<HorzScaleIt
 			return checkLineItem.bind(null, type);
 
 		case 'Custom':
-			return checkCustomItem.bind(null, type);
+			return checkCustomItem.bind(null);
 	}
 }
 
