@@ -195,6 +195,10 @@ button.navbar__toggle {
 	background: var(--docsearch-searchbox-background);
 }
 
+.DocSearch-Input:focus {
+	outline: none;
+}
+
 .footer {
 	border-top: 1px solid var(--footer-border-color);
 }
