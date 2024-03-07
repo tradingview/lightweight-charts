@@ -50,6 +50,7 @@ export const App = props => {
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
 	// The following variables illustrate how a series could be updated.
 	const series1 = useRef(null);
+	const series2 = useRef(null);
 	const [started, setStarted] = useState(false);
 	const [isSecondSeriesActive, setIsSecondSeriesActive] = useState(false);
 
@@ -59,18 +60,25 @@ export const App = props => {
 		if (series1.current === null) {
 			return;
 		}
+		let intervalId;
 
 		if (started) {
-			const interval = setInterval(() => {
+			intervalId = setInterval(() => {
 				currentDate.setDate(currentDate.getDate() + 1);
 				const next = {
 					time: currentDate.toISOString().slice(0, 10),
 					value: 53 - 2 * Math.random(),
 				};
 				series1.current.update(next);
+				if (series2.current) {
+					series2.current.update({
+						...next,
+						value: 43 - 2 * Math.random(),
+					});
+				}
 			}, 1000);
-			return () => clearInterval(interval);
 		}
+		return () => clearInterval(intervalId);
 	}, [started]);
 
 	useEffect(() => {
@@ -98,6 +106,7 @@ export const App = props => {
 					color={lineColor}
 				/>
 				{isSecondSeriesActive && <Series
+					ref={series2}
 					type={'area'}
 					data={initialData2}
 					color={lineColor}
