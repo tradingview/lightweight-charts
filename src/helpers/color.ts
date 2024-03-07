@@ -195,11 +195,16 @@ function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueCom
 }
 
 function normalizeAlphaComponent(component: AlphaComponent): AlphaComponent {
-	return (!(component <= 0) && !(component > 0) ? 0 as AlphaComponent :
-		component < 0 ? 0 as AlphaComponent :
-			component > 1 ? 1 as AlphaComponent :
-				// limit the precision of all numbers to at most 4 digits in fractional part
-				Math.round(component * 10000) / 10000) as AlphaComponent;
+	return Number.isNaN(component)
+	? (1 as AlphaComponent)
+	: ((!(component <= 0) && !(component > 0)
+	? (0 as AlphaComponent)
+	: component < 0
+	? (0 as AlphaComponent)
+	: component > 1
+	? (1 as AlphaComponent)
+	: // limit the precision of all numbers to at most 4 digits in fractional part
+	Math.round(component * 10000) / 10000) as AlphaComponent);
 }
 
 /**
@@ -236,7 +241,7 @@ const rgbRe = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$
  * @example
  * rgba(255,234,245,0.1)
  */
-const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
+const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(\S+)\s*\)$/;
 
 function colorStringToRgba(colorString: string): Rgba {
 	colorString = colorString.toLowerCase();
@@ -253,7 +258,7 @@ function colorStringToRgba(colorString: string): Rgba {
 				normalizeRgbComponent<RedComponent>(parseInt(matches[1], 10)),
 				normalizeRgbComponent<GreenComponent>(parseInt(matches[2], 10)),
 				normalizeRgbComponent<BlueComponent>(parseInt(matches[3], 10)),
-				normalizeAlphaComponent((matches.length < 5 ? 1 : parseFloat(matches[4])) as AlphaComponent),
+				normalizeAlphaComponent((matches.length < 4 ? 1 : parseFloat(matches[4])) as AlphaComponent),
 			];
 		}
 	}
