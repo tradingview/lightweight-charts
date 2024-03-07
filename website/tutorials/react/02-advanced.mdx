@@ -221,7 +221,7 @@ import { ThemedChart } from '@site/src/components/tutorials/themed-chart-colors-
 import CodeBlock from '@theme/CodeBlock';
 import code from '!!raw-loader!@site/src/components/tutorials/advanced-react-example';
 
-<CodeBlock replaceThemeConstants className="language-jsx">{code.replace(/\t/g, '    ')}</CodeBlock>
+<CodeBlock replaceThemeConstants replaceTabs className="language-jsx">{code}</CodeBlock>
 
 The code above will produce a line series.
 Given a `series1` reference is created to be passed to the Series component you could reuse that object via `series1.current.[any function applicable on Series]`.
