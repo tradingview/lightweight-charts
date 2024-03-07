@@ -33,7 +33,7 @@ export function removeUnwantedLines(originalString) {
 }
 
 const EnhancedCodeBlock = props => {
-	const { chart, replaceThemeConstants, hideableCode, chartOnly, iframeStyle, replaceTabs, ...rest } = props;
+	const { chart, replaceThemeConstants, hideableCode, chartOnly, iframeStyle, replaceTabs = true, ...rest } = props;
 	let { children } = props;
 	const { colorMode } = useColorMode();
 	const isDarkTheme = colorMode === 'dark';
