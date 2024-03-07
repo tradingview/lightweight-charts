@@ -195,16 +195,14 @@ function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueCom
 }
 
 function normalizeAlphaComponent(component: AlphaComponent): AlphaComponent {
-	return Number.isNaN(component)
-		? (1 as AlphaComponent)
-		: ((!(component <= 0) && !(component > 0)
-			? (0 as AlphaComponent)
-			: component < 0
-				? (0 as AlphaComponent)
-				: component > 1
-					? (1 as AlphaComponent)
-					: // limit the precision of all numbers to at most 4 digits in fractional part
-					Math.round(component * 10000) / 10000) as AlphaComponent);
+	if (Number.isNaN(component)) {
+		return 1 as AlphaComponent;
+	}
+	if (component <= 0 || component > 1) {
+		return (component < 0 ? 0 : 1) as AlphaComponent;
+	}
+	// limit the precision of all numbers to at most 4 digits in fractional part
+	return Math.round(component * 10000) / 10000 as AlphaComponent;
 }
 
 /**
