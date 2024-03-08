@@ -390,7 +390,11 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			seriesData.set(this._mapSeriesToApi(series), data);
 		});
 
-		const hoveredSeries = param.hoveredSeries === undefined ? undefined : this._mapSeriesToApi(param.hoveredSeries);
+		const hoveredSeries =
+			param.hoveredSeries === undefined ||
+			!this._seriesMapReversed.has(param.hoveredSeries)
+				? undefined
+				: this._mapSeriesToApi(param.hoveredSeries);
 
 		return {
 			time: param.originalTime as HorzScaleItem,
