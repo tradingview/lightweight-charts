@@ -136,18 +136,11 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				const barSpacing = this._model.timeScale().barSpacing();
 				const shapeMargin = calculateShapeMargin(barSpacing);
 				const marginsAboveAndBelow = calculateShapeHeight(barSpacing) * 1.5 + shapeMargin * 2;
-				let above = marginsAboveAndBelow as Coordinate;
-				let below = marginsAboveAndBelow as Coordinate;
 				const position = this._hasAllMarkerSamePosition();
-				if (position === 'aboveBar') {
-					below = 0 as Coordinate;
-				}
-				if (position === 'belowBar') {
-					above = 0 as Coordinate;
-				}
+
 				this._autoScaleMargins = {
-					above,
-					below,
+					above: position === 'belowBar' ? marginsAboveAndBelow : 0,
+					below: position === 'aboveBar' ? marginsAboveAndBelow : 0,
 				};
 			} else {
 				this._autoScaleMargins = null;
