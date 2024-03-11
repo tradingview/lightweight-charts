@@ -131,14 +131,16 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 	}
 
 	public autoScaleMargins(): AutoScaleMargins | null {
-		if (this._autoScaleMarginsInvalidated) {
+		if (this._autoScaleMarginsInvalidated && this._dataInvalidated) {
 			if (this._series.indexedMarkers().length > 0) {
 				const barSpacing = this._model.timeScale().barSpacing();
 				const shapeMargin = calculateShapeMargin(barSpacing);
 				const marginsAboveAndBelow = calculateShapeHeight(barSpacing) * 1.5 + shapeMargin * 2;
+				const position = this._hasAllMarkerSamePosition();
+
 				this._autoScaleMargins = {
-					above: marginsAboveAndBelow as Coordinate,
-					below: marginsAboveAndBelow as Coordinate,
+					above: position === 'belowBar' ? 0 : marginsAboveAndBelow,
+					below: position === 'aboveBar' ? 0 : marginsAboveAndBelow,
 				};
 			} else {
 				this._autoScaleMargins = null;
@@ -148,6 +150,14 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		}
 
 		return this._autoScaleMargins;
+	}
+	protected _hasAllMarkerSamePosition(): string|null {
+		const markers = this._series.indexedMarkers();
+		const markersPositions = markers.every((i: InternalSeriesMarker<TimePointIndex>) => i.position === markers[0].position);
+		if (markersPositions) {
+			return markers[0].position;
+		}
+		return null;
 	}
 
 	protected _makeValid(): void {
