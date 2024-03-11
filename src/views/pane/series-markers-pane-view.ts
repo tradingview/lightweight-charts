@@ -131,7 +131,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 	}
 
 	public autoScaleMargins(): AutoScaleMargins | null {
-		if (this._autoScaleMarginsInvalidated) {
+		if (this._autoScaleMarginsInvalidated && this._dataInvalidated) {
 			if (this._series.indexedMarkers().length > 0) {
 				const barSpacing = this._model.timeScale().barSpacing();
 				const shapeMargin = calculateShapeMargin(barSpacing);
@@ -139,8 +139,8 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				const position = this._hasAllMarkerSamePosition();
 
 				this._autoScaleMargins = {
-					above: position === 'belowBar' ? marginsAboveAndBelow : 0,
-					below: position === 'aboveBar' ? marginsAboveAndBelow : 0,
+					above: position === 'belowBar' ? 0 : marginsAboveAndBelow,
+					below: position === 'aboveBar' ? 0 : marginsAboveAndBelow,
 				};
 			} else {
 				this._autoScaleMargins = null;
