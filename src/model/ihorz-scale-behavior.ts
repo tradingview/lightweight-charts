@@ -34,12 +34,6 @@ export type InternalHorzScaleItemKey = Nominal<number, 'InternalHorzScaleItemKey
  */
 export interface IHorzScaleBehavior<HorzScaleItem> {
 	/**
-	 * Structure describing options of the chart.
-	 *
-	 * @returns ChartOptionsBase
-	 */
-	options(): ChartOptionsImpl<HorzScaleItem>;
-	/**
 	 * Set the chart options. Note that this is different to `applyOptions` since the provided options will overwrite the current options
 	 * instead of merging with the current options.
 	 *
