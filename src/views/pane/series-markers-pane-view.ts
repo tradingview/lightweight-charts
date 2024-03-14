@@ -18,6 +18,7 @@ import {
 	SeriesMarkersRenderer,
 } from '../../renderers/series-markers-renderer';
 import {
+	calculateAdjustedMargin,
 	calculateShapeHeight,
 	shapeMargin as calculateShapeMargin,
 } from '../../renderers/series-markers-utils';
@@ -96,7 +97,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 	private _autoScaleMarginsInvalidated: boolean = true;
 
 	private _autoScaleMargins: AutoScaleMargins | null = null;
-	private _makersPositions: MarkerPositions | null = null;
+	private _markersPositions: MarkerPositions | null = null;
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
 	public constructor(series: ISeries<SeriesType>, model: IChartModelBase) {
@@ -113,7 +114,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		this._autoScaleMarginsInvalidated = true;
 		if (updateType === 'data') {
 			this._dataInvalidated = true;
-			this._makersPositions = this._getMarkerPositions();
+			this._markersPositions = null;
 		}
 	}
 
@@ -139,11 +140,11 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 				const barSpacing = this._model.timeScale().barSpacing();
 				const shapeMargin = calculateShapeMargin(barSpacing);
 				const marginValue = calculateShapeHeight(barSpacing) * 1.5 + shapeMargin * 2;
-				const positions = this._makersPositions ?? this._getMarkerPositions();
+				const positions = this._getMarkerPositions();
 
 				this._autoScaleMargins = {
-					above: this._calculateAdjustedMargin(marginValue, positions.aboveBar, positions.inBar),
-					below: this._calculateAdjustedMargin(marginValue, positions.belowBar, positions.inBar),
+					above: calculateAdjustedMargin(marginValue, positions.aboveBar, positions.inBar),
+					below: calculateAdjustedMargin(marginValue, positions.belowBar, positions.inBar),
 				};
 			} else {
 				this._autoScaleMargins = null;
@@ -155,28 +156,21 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		return this._autoScaleMargins;
 	}
 
-	protected _calculateAdjustedMargin(margin: number, hasSide: boolean, hasInBar: boolean): number {
-		if (hasSide) {
-			return margin;
-		} else if (hasInBar) {
-			return Math.ceil(margin / 2);
-		}
-
-		return 0;
-	}
-
 	protected _getMarkerPositions(): MarkerPositions {
-		return this._series.indexedMarkers().reduce((acc: MarkerPositions, maker: InternalSeriesMarker<TimePointIndex>) => {
-			if (!acc[maker.position]) {
-				acc[maker.position] = true;
-			}
-			return acc;
-			// eslint-disable-next-line @typescript-eslint/tslint/config
-		}, {
-			inBar: false,
-			aboveBar: false,
-			belowBar: false,
-		});
+		if (this._markersPositions === null) {
+			this._markersPositions = this._series.indexedMarkers().reduce((acc: MarkerPositions, marker: InternalSeriesMarker<TimePointIndex>) => {
+				if (!acc[marker.position]) {
+					acc[marker.position] = true;
+				}
+				return acc;
+				// eslint-disable-next-line @typescript-eslint/tslint/config
+			}, {
+				inBar: false,
+				aboveBar: false,
+				belowBar: false,
+			});
+		}
+		return this._markersPositions;
 	}
 
 	protected _makeValid(): void {
