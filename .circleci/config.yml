@@ -90,7 +90,9 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm install --loglevel verbose
+      - run: mkdir -p node_modules/.cache/puppeteer
+      - run: PUPPETEER_SKIP_DOWNLOAD=1 npm install --loglevel verbose
+      - run: node ./node_modules/puppeteer/install.mjs
       - save_cache: *save-node-modules-cache
 
   install-deps-website:
