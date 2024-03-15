@@ -158,17 +158,19 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 
 	protected _getMarkerPositions(): MarkerPositions {
 		if (this._markersPositions === null) {
-			this._markersPositions = this._series.indexedMarkers().reduce((acc: MarkerPositions, marker: InternalSeriesMarker<TimePointIndex>) => {
-				if (!acc[marker.position]) {
-					acc[marker.position] = true;
+			this._markersPositions = this._series.indexedMarkers().reduce(
+				(acc: MarkerPositions, marker: InternalSeriesMarker<TimePointIndex>) => {
+					if (!acc[marker.position]) {
+						acc[marker.position] = true;
+					}
+					return acc;
+				},
+				{
+					inBar: false,
+					aboveBar: false,
+					belowBar: false,
 				}
-				return acc;
-				// eslint-disable-next-line @typescript-eslint/tslint/config
-			}, {
-				inBar: false,
-				aboveBar: false,
-				belowBar: false,
-			});
+			);
 		}
 		return this._markersPositions;
 	}
