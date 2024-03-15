@@ -90,14 +90,14 @@ jobs:
     executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: npm install
+      - run: npm install --loglevel verbose
       - save_cache: *save-node-modules-cache
 
   install-deps-website:
     executor: node16-executor
     steps:
       - checkout-with-deps
-      - run: cd website && npm install
+      - run: cd website && npm install --loglevel verbose
       - save_cache: *save-node-modules-cache-website
 
   build:
