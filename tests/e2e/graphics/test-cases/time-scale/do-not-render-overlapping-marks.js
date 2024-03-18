@@ -7,6 +7,7 @@ function runTestCase(container) {
 			tickMarkMaxCharacterLength: 'long prefix 0000-00-00'.length,
 			tickMarkFormatter: time => `long prefix ${time}`,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries();

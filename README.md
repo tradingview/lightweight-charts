@@ -103,6 +103,7 @@ This software incorporates several parts of tslib (<https://github.com/Microsoft
 This license requires specifying TradingView as the product creator.
 You shall add the "attribution notice" from the NOTICE file and a link to <https://www.tradingview.com/> to the page of your website or mobile application that is available to your users.
 As thanks for creating this product, we'd be grateful if you add it in a prominent place.
+You can use the [`attributionLogo`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/LayoutOptions#attributionLogo) chart option for displaying an appropriate link to <https://www.tradingview.com/> on the chart itself, which will satisfy the link requirement.
 
 [demo-url]: https://www.tradingview.com/lightweight-charts/
 

@@ -25,6 +25,7 @@ const chartOptionsToHideCrosshair = {
 		visible: false,
 		labelVisible: false,
 	},
+	layout: { attributionLogo: false },
 };
 
 const seriesOptionsToHideCrosshair = {

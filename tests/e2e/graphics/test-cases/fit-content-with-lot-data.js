@@ -26,6 +26,7 @@ function runTestCase(container) {
 			timeVisible: true,
 			lockVisibleTimeRangeOnResize: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series = chart.addLineSeries({

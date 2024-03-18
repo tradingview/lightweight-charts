@@ -14,13 +14,23 @@ function generateData() {
 
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
-		timeScale: {
-			barSpacing: 12,
+		layout: {
+			attributionLogo: true,
+			background: {
+				type: 'solid',
+				color: 'rgb(255,200,100)',
+			},
+			textColor: 'rgb(50,100,150)',
 		},
-		layout: { attributionLogo: false },
+		leftPriceScale: {
+			visible: true,
+		},
+		rightPriceScale: {
+			visible: false,
+		},
 	}));
 
-	const mainSeries = chart.addAreaSeries({ pointMarkersVisible: true });
+	const mainSeries = chart.addLineSeries();
 
 	mainSeries.setData(generateData());
 }
