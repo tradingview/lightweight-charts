@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "4.2.0",
+  "version": "4.1.3",
   "name": "lightweight-charts",
   "author": "TradingView, Inc.",
   "license": "Apache-2.0",
@@ -114,12 +114,11 @@
     "bundle-dts": "tsc --noEmit --allowJs dts-config.js && dts-bundle-generator --config dts-config.js",
     "tsc": "ttsc -p tsconfig.prod.json",
     "tsc-watch": "npm run tsc -- --watch --preserveWatchOutput",
-    "tsc-verify": "node website/scripts/generate-versions-dts.js && tsc -b tsconfig.composite.json",
+    "tsc-verify": "tsc -b tsconfig.composite.json",
     "lint": "npm-run-all -p lint:**",
     "lint:eslint": "eslint --format=unix ./",
     "lint:md": "markdownlint -i \"**/node_modules/**\" -i \"**/website/docs/api/**\" -i \"**/website/versioned_docs/**/api/**\" \"**/*.md\"",
     "check-dts-docs": "eslint --format=unix ./dist/typings.d.ts",
-    "check-markdown-links": "node scripts/check-markdown-links.js",
     "rollup": "rollup -c rollup.config.js",
     "rollup-watch": "npm run rollup -- --watch",
     "build": "npm-run-all tsc rollup bundle-dts",
@@ -132,8 +131,5 @@
     "verify": "npm-run-all clean -p build:prod check-markdown-links -p lint check-dts-docs tsc-verify test size-limit -p type-tests",
     "test": "mocha tests/unittests/**/*.spec.ts",
     "type-tests": "tsc -p ./tests/type-checks/tsconfig.composite.json --noEmit"
-  },
-  "volta": {
-    "node": "19.9.0"
   }
 }

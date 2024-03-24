@@ -24,16 +24,12 @@ export function replaceThemeConstantStrings(originalString, isDarkTheme) {
 	return result;
 }
 
-export function replaceTabsString(string) {
-	return string.replace(/\t/g, '    ');
-}
-
 export function removeUnwantedLines(originalString) {
 	return originalString.replace(new RegExp(/\/\/ delete-start[\w\W]*?\/\/ delete-end/, 'gm'), '');
 }
 
 const EnhancedCodeBlock = props => {
-	const { chart, replaceThemeConstants, hideableCode, chartOnly, iframeStyle, replaceTabs = true, ...rest } = props;
+	const { chart, replaceThemeConstants, hideableCode, chartOnly, iframeStyle, ...rest } = props;
 	let { children } = props;
 	const { colorMode } = useColorMode();
 	const isDarkTheme = colorMode === 'dark';
@@ -41,9 +37,6 @@ const EnhancedCodeBlock = props => {
 
 	if (replaceThemeConstants && typeof children === 'string') {
 		children = replaceThemeConstantStrings(children, isDarkTheme);
-	}
-	if (replaceTabs && typeof children === 'string') {
-		children = replaceTabsString(children);
 	}
 	children = removeUnwantedLines(children);
 

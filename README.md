@@ -1,3 +1,25 @@
+# About this fork
+This is a fork of [John Wallace's fork](https://github.com/john-wallace-dev/lightweight-charts) which adds support for multiple indicator panes.  I plan on maintaining this as best I can to keep it up to date with [Lightweight Charts](https://github.com/tradingview/lightweight-charts).  Currently this is up to date with v4.1.3
+
+Example of a chart with an additional pane with MACD:
+
+<img src="./images/macd.PNG" height="400px" width="800px">
+
+## Previous Fork
+
+This is a fork of TradingView's [Lightweight Charts](https://github.com/tradingview/lightweight-charts).
+I needed certain features that weren't included yet (and maybe never) in the official version of LWC.
+Specifically, I have an application that is very much like TradingView.com where each window can contain multiple charts, and each chart can have multiple indicator panes.
+
+[John Wallace](https://github.com/john-wallace-dev)
+March 2022
+
+## Multiple Panes
+
+Allows multiple panes below the main chart. I use them to display interactive indicators below the main chart. Implemented by [ntf](https://github.com/ntf) to satisfy requests from [Lightweight Charts issue 50](https://github.com/tradingview/lightweight-charts/issues/50).
+
+---
+
 <!-- markdownlint-disable no-inline-html first-line-h1 -->
 
 <div align="center">

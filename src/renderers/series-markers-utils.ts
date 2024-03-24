@@ -38,13 +38,3 @@ export interface BitmapShapeItemCoordinates {
 	y: number;
 	pixelRatio: number;
 }
-
-export function calculateAdjustedMargin(margin: number, hasSide: boolean, hasInBar: boolean): number {
-	if (hasSide) {
-		return margin;
-	} else if (hasInBar) {
-		return Math.ceil(margin / 2);
-	}
-
-	return 0;
-}

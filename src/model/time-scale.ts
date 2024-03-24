@@ -153,7 +153,7 @@ export interface HorzScaleOptions {
 	 */
 	shiftVisibleRangeOnNewBar: boolean;
 
-	/**
+    /**
 	 * Allow the visible range to be shifted to the right when a new bar is added which
 	 * is replacing an existing whitespace time point on the chart.
 	 *
@@ -377,7 +377,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		const to = Math.round(range.to);
 
 		const firstIndex = ensureNotNull(this._firstIndex());
-		const lastIndex = ensureNotNull(this._lastIndex());
+		const lastIndex = ensureNotNull(this.lastIndex());
 
 		return {
 			from: ensureNotNull(this.indexToTimeScalePoint(Math.max(firstIndex, from) as TimePointIndex)),
@@ -523,7 +523,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		const earliestIndexOfSecondLabel = (this._firstIndex() as number) + indexPerLabel;
 
 		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second last label on time scale"
-		const indexOfSecondLastLabel = (this._lastIndex() as number) - indexPerLabel;
+		const indexOfSecondLastLabel = (this.lastIndex() as number) - indexPerLabel;
 
 		const isAllScalingAndScrollingDisabled = this._isAllScalingAndScrollingDisabled();
 		const isLeftEdgeFixed = this._options.fixLeftEdge || isAllScalingAndScrollingDisabled;
@@ -751,7 +751,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 
 	public fitContent(): void {
 		const first = this._firstIndex();
-		const last = this._lastIndex();
+		const last = this.lastIndex();
 		if (first === null || last === null) {
 			return;
 		}
@@ -775,6 +775,10 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		return this._horzScaleBehavior.formatHorzItem(timeScalePoint.time);
 	}
 
+	public lastIndex(): TimePointIndex | null {
+		return this._points.length === 0 ? null : (this._points.length - 1) as TimePointIndex;
+	}
+
 	private _isAllScalingAndScrollingDisabled(): boolean {
 		const { handleScroll, handleScale } = this._model.options();
 		return !handleScroll.horzTouchDrag
@@ -789,10 +793,6 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 
 	private _firstIndex(): TimePointIndex | null {
 		return this._points.length === 0 ? null : 0 as TimePointIndex;
-	}
-
-	private _lastIndex(): TimePointIndex | null {
-		return this._points.length === 0 ? null : (this._points.length - 1) as TimePointIndex;
 	}
 
 	private _rightOffsetForCoordinate(x: Coordinate): number {

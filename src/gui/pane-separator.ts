@@ -23,6 +23,7 @@ export class PaneSeparator implements IDestroyable {
 	private _minPaneHeight: number = 0;
 	private _maxPaneHeight: number = 0;
 	private _pixelStretchFactor: number = 0;
+	private _mouseActive: boolean = false;
 
 	public constructor(chartWidget: IChartWidgetBase, topPaneIndex: number, bottomPaneIndex: number, disableResize: boolean) {
 		this._chartWidget = chartWidget;
@@ -33,7 +34,9 @@ export class PaneSeparator implements IDestroyable {
 		this._rowElement.style.height = SEPARATOR_HEIGHT + 'px';
 
 		this._cell = document.createElement('td');
+		this._cell.style.position = 'relative';
 		this._cell.style.padding = '0';
+		this._cell.style.margin = '0';
 		this._cell.setAttribute('colspan', '3');
 
 		this._updateBorderColor();
@@ -46,12 +49,15 @@ export class PaneSeparator implements IDestroyable {
 			this._handle = document.createElement('div');
 			this._handle.style.position = 'absolute';
 			this._handle.style.zIndex = '50';
-			this._handle.style.height = '5px';
+			this._handle.style.top = '-4px';
+			this._handle.style.height = '9px';
 			this._handle.style.width = '100%';
-			this._handle.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-			this._handle.style.cursor = 'ns-resize';
+			this._handle.style.backgroundColor = '';
+			this._handle.style.cursor = 'row-resize';
 			this._cell.appendChild(this._handle);
 			const handlers: MouseEventHandlers = {
+				mouseEnterEvent: this._mouseOverEvent.bind(this),
+				mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
 				mouseDownEvent: this._mouseDownEvent.bind(this),
 				touchStartEvent: this._mouseDownEvent.bind(this),
 				pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
@@ -108,14 +114,31 @@ export class PaneSeparator implements IDestroyable {
 		this._cell.style.background = this._chartWidget.options().timeScale.borderColor;
 	}
 
+	private _mouseOverEvent(event: TouchMouseEvent): void {
+		if (this._handle !== null) {
+			this._handle.style.backgroundColor = 'hsla(225,8%,72%,.2)';
+		}
+	}
+
+	private _mouseLeaveEvent(event: TouchMouseEvent): void {
+		if (this._handle !== null && !this._mouseActive) {
+			this._handle.style.backgroundColor = '';
+		}
+	}
 	private _mouseDownEvent(event: TouchMouseEvent): void {
 		this._startY = event.pageY;
 		this._deltaY = 0;
-		this._totalHeight = this._paneA.getSize().height + this._paneB.getSize().height;
-		this._totalStretch = this._paneA.stretchFactor() + this._paneB.stretchFactor();
+		const totalHeight = this._paneA.getSize().height + this._paneB.getSize().height;
+		const totalStretch = this._paneA.stretchFactor() + this._paneB.stretchFactor();
+		this._totalHeight = totalHeight;
+		this._totalStretch = totalStretch;
 		this._minPaneHeight = 30;
-		this._maxPaneHeight = this._totalHeight - this._minPaneHeight;
-		this._pixelStretchFactor = this._totalStretch / this._totalHeight;
+		this._maxPaneHeight = totalHeight - this._minPaneHeight;
+		this._pixelStretchFactor = totalStretch / totalHeight;
+
+		// Here for debugging purposes, trying to set the property directly was causing issues for some reason.
+		const asdf = this._totalHeight;
+		this._totalHeight = asdf;
 	}
 
 	private _pressedMouseMoveEvent(event: TouchMouseEvent): void {
@@ -128,11 +151,13 @@ export class PaneSeparator implements IDestroyable {
 		this._paneA.setStretchFactor(newUpperPaneStretch);
 		this._paneB.setStretchFactor(newLowerPaneStretch);
 
-		this._chartWidget.model().fullUpdate();
+		this._chartWidget.adjustSize();
 
 		if (this._paneA.getSize().height !== upperHeight) {
 			this._startY = event.pageY;
 		}
+
+		this._chartWidget.model().fullUpdate();
 	}
 
 	private _mouseUpEvent(event: TouchMouseEvent): void {
@@ -143,5 +168,6 @@ export class PaneSeparator implements IDestroyable {
 		this._minPaneHeight = 0;
 		this._maxPaneHeight = 0;
 		this._pixelStretchFactor = 0;
+		this._mouseLeaveEvent(event);
 	}
 }

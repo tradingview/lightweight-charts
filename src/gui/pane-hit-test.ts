@@ -78,14 +78,17 @@ function convertPrimitiveHitResult(
  * Performs a hit test on a collection of pane views to determine which view and object
  * is located at a given coordinate (x, y) and returns the matching pane view and
  * hit-tested result object, or null if no match is found.
+ *
+ * rwitzlib - Modified to take in pane parameter and pass to renderer
  */
 function hitTestPaneView(
 	paneViews: readonly IPaneView[],
 	x: Coordinate,
-	y: Coordinate
+	y: Coordinate,
+	pane: Pane
 ): HitTestPaneViewResult | null {
 	for (const paneView of paneViews) {
-		const renderer = paneView.renderer();
+		const renderer = paneView.renderer(pane);
 		if (renderer !== null && renderer.hitTest) {
 			const result = renderer.hitTest(x, y);
 			if (result !== null) {
@@ -118,7 +121,7 @@ export function hitTestPane(
             // therefore it takes precedence here.
 			return convertPrimitiveHitResult(bestPrimitiveHit);
 		}
-		const sourceResult = hitTestPaneView(source.paneViews(pane), x, y);
+		const sourceResult = hitTestPaneView(source.paneViews(pane), x, y, pane);
 		if (sourceResult !== null) {
 			return {
 				source: source,

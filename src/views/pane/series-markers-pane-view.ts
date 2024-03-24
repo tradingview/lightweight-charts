@@ -5,9 +5,10 @@ import { AutoScaleMargins } from '../../model/autoscale-info-impl';
 import { BarPrice, BarPrices } from '../../model/bar';
 import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
+import { Pane } from '../../model/pane';
 import { PriceScale } from '../../model/price-scale';
 import { ISeries } from '../../model/series';
-import { InternalSeriesMarker, SeriesMarkerPosition } from '../../model/series-markers';
+import { InternalSeriesMarker } from '../../model/series-markers';
 import { SeriesType } from '../../model/series-options';
 import { TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { ITimeScale } from '../../model/time-scale';
@@ -18,7 +19,6 @@ import {
 	SeriesMarkersRenderer,
 } from '../../renderers/series-markers-renderer';
 import {
-	calculateAdjustedMargin,
 	calculateShapeHeight,
 	shapeMargin as calculateShapeMargin,
 } from '../../renderers/series-markers-utils';
@@ -33,8 +33,6 @@ interface Offsets {
 	aboveBar: number;
 	belowBar: number;
 }
-
-type MarkerPositions = Record<SeriesMarkerPosition, boolean>;
 
 // eslint-disable-next-line max-params
 function fillSizeAndY(
@@ -97,7 +95,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 	private _autoScaleMarginsInvalidated: boolean = true;
 
 	private _autoScaleMargins: AutoScaleMargins | null = null;
-	private _markersPositions: MarkerPositions | null = null;
+
 	private _renderer: SeriesMarkersRenderer = new SeriesMarkersRenderer();
 
 	public constructor(series: ISeries<SeriesType>, model: IChartModelBase) {
@@ -114,11 +112,10 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		this._autoScaleMarginsInvalidated = true;
 		if (updateType === 'data') {
 			this._dataInvalidated = true;
-			this._markersPositions = null;
 		}
 	}
 
-	public renderer(addAnchors?: boolean): IPaneRenderer | null {
+	public renderer(pane: Pane, addAnchors?: boolean): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}
@@ -139,12 +136,10 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			if (this._series.indexedMarkers().length > 0) {
 				const barSpacing = this._model.timeScale().barSpacing();
 				const shapeMargin = calculateShapeMargin(barSpacing);
-				const marginValue = calculateShapeHeight(barSpacing) * 1.5 + shapeMargin * 2;
-				const positions = this._getMarkerPositions();
-
+				const marginsAboveAndBelow = calculateShapeHeight(barSpacing) * 1.5 + shapeMargin * 2;
 				this._autoScaleMargins = {
-					above: calculateAdjustedMargin(marginValue, positions.aboveBar, positions.inBar),
-					below: calculateAdjustedMargin(marginValue, positions.belowBar, positions.inBar),
+					above: marginsAboveAndBelow as Coordinate,
+					below: marginsAboveAndBelow as Coordinate,
 				};
 			} else {
 				this._autoScaleMargins = null;
@@ -154,25 +149,6 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		}
 
 		return this._autoScaleMargins;
-	}
-
-	protected _getMarkerPositions(): MarkerPositions {
-		if (this._markersPositions === null) {
-			this._markersPositions = this._series.indexedMarkers().reduce(
-				(acc: MarkerPositions, marker: InternalSeriesMarker<TimePointIndex>) => {
-					if (!acc[marker.position]) {
-						acc[marker.position] = true;
-					}
-					return acc;
-				},
-				{
-					inBar: false,
-					aboveBar: false,
-					belowBar: false,
-				}
-			);
-		}
-		return this._markersPositions;
 	}
 
 	protected _makeValid(): void {

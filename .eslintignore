@@ -6,8 +6,6 @@
 !/dist/typings.d.ts
 /lib/**
 
-/src/typings/_resize-observer/index.d.ts
-
 **/node_modules
 
 /website/docs/api/**
