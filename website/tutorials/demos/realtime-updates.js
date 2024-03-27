@@ -89,6 +89,14 @@ const container = document.getElementById('container');
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(container, chartOptions);
 
+// remove-start
+// Only needed within demo page
+// eslint-disable-next-line no-undef
+window.addEventListener('resize', () => {
+	chart.applyOptions({ height: 200 });
+});
+// remove-end
+
 const series = chart.addCandlestickSeries({
 	upColor: BAR_UP_COLOR,
 	downColor: BAR_DOWN_COLOR,

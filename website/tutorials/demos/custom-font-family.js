@@ -17,6 +17,14 @@ const container = document.getElementById('container');
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(container, chartOptions);
 
+// remove-start
+// Only needed within demo page
+// eslint-disable-next-line no-undef
+window.addEventListener('resize', () => {
+	chart.applyOptions({ height: 200 });
+});
+// remove-end
+
 function setFontFamily(fontFamily) {
 	// highlight-start
 	chart.applyOptions({
