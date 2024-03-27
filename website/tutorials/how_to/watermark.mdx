@@ -44,7 +44,7 @@ You can see full [working examples](#examples) below.
 
 ## Examples
 
-import UsageGuidePartial from "./_usage-guide-partial.mdx";
+import UsageGuidePartial from "../_usage-guide-partial.mdx";
 
 <UsageGuidePartial />
 
@@ -54,7 +54,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 import codeSimple from "!!raw-loader!./watermark-simple.js";
 
-<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode chartOnTop>
 	{codeSimple}
 </CodeBlock>
 
@@ -101,6 +101,6 @@ container.appendChild(background);
 
 import codeAdvanced from "!!raw-loader!./watermark-advanced.js";
 
-<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode chartOnTop>
 	{codeAdvanced}
 </CodeBlock>

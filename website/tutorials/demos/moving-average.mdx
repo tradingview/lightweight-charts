@@ -1,0 +1,41 @@
+---
+title: Moving average indicator
+sidebar_label: Moving average
+description: An example of how to add a moving average indicator line
+pagination_prev: null
+pagination_next: null
+keywords:
+  - moving average
+  - indicator
+---
+
+This example demonstrates the implementation of a moving average (MA) indicator
+using Lightweight Charts™. It effectively shows how to overlay a line series
+representing the moving average on a candlestick series.
+
+Initial rendering involves the creation of a candlestick series using randomly
+generated data. The `calculateMovingAverageSeriesData` function subsequently
+computes the 20-period MA data from the candlestick data. For each point, if
+less than 20 data points precede it, the function creates a whitespace data
+point. If 20 or more data points precede it, it calculates the MA for that
+period.
+
+The MA data set forms a line series, which is placed underneath the candlestick
+series (by creating the line series first). As a result, users can view the
+underlying price data (via the candlestick series) in conjunction with the
+moving average trend line which provides valuable analytical insight.
+
+import UsageGuidePartial from '../_usage-guide-partial.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./moving-average.js';
+
+<CodeBlock
+	replaceThemeConstants
+	chart
+	className="language-js"
+	hideableCode
+	chartOnTop
+	codeUsage={<UsageGuidePartial />}
+>
+	{code}
+</CodeBlock>

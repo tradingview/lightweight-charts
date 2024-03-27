@@ -97,7 +97,7 @@ Below are a few external resources related to creating and styling html elements
 
 ## Examples
 
-import UsageGuidePartial from "./_usage-guide-partial.mdx";
+import UsageGuidePartial from "../_usage-guide-partial.mdx";
 
 <UsageGuidePartial />
 
@@ -109,7 +109,7 @@ The floating tooltip in this example will position itself next to the current da
 
 import floatingCode from "!!raw-loader!./tooltip-floating.js";
 
-<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode chartOnTop>
 	{floatingCode}
 </CodeBlock>
 
@@ -119,7 +119,7 @@ The tracking tooltip will position itself next to the user's cursor.
 
 import trackingCode from "!!raw-loader!./tooltip-tracking.js";
 
-<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode chartOnTop>
 	{trackingCode}
 </CodeBlock>
 
@@ -130,6 +130,6 @@ the user's cursor along the horizontal time axis.
 
 import magnifierCode from "!!raw-loader!./tooltip-magnifier.js";
 
-<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode chartOnTop>
 	{magnifierCode}
 </CodeBlock>

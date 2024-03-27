@@ -1,0 +1,36 @@
+---
+title: Realtime updates
+sidebar_label: Realtime updates
+description: An example of how to handle realtime updates
+pagination_prev: null
+pagination_next: null
+keywords:
+  - realtime updates
+---
+
+This sample demonstrates how to mimic real-time updates on a candlestick chart
+with Lightweight Charts™. The chart initially populates with some historical
+data. By using `setInterval` function, the chart then begins to receive
+simulated real-time updates with the usage of `series.update(...)`.
+
+Each real-time update represents a new data point or modifies the latest point,
+providing the illusion of a live, updating chart. If you scroll the chart and
+wish to return to the latest data points then you can use the "Go to realtime"
+button provided which calls the
+[`scrollToRealtime`](/docs/api/interfaces/ITimeScaleApi#scrolltorealtime) method
+on the timescale.
+
+import UsageGuidePartial from '../_usage-guide-partial.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./realtime-updates.js';
+
+<CodeBlock
+	replaceThemeConstants
+	chart
+	className="language-js"
+	hideableCode
+	chartOnTop
+	codeUsage={<UsageGuidePartial />}
+>
+	{code}
+</CodeBlock>

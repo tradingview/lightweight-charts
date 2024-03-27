@@ -1,0 +1,45 @@
+---
+title: Custom font family
+sidebar_label: Custom font
+description: An example of how to configure a custom font family for the chart
+pagination_prev: null
+pagination_next: null
+keywords:
+  - font
+  - typeface
+---
+
+In this example, Lightweight Charts™ showcases its high customizability,
+specifically with respect to adjusting font families. The primary tool for
+implementing this shift in font is the `chart.applyOptions()` method.
+
+This method is called within the `setFontFamily(fontFamily)` function, accepting
+an object that modifies the `layout` section of the chart options. The object
+changes the `fontFamily` property to the passed argument, allowing quick and
+responsive alterations to the chart's font style.
+
+The flexibility in adjusting text characteristics enables the fine-tuning of the
+chart's visual elements for better readability or to match specific styles,
+attesting to the adaptability of Lightweight Charts™.
+
+A more detailed tutorial on customizing the appearance of the chart can be found
+[here](../customization/intro.mdx).
+
+### API Reference
+
+- [LayoutOptions.fontFamily](/docs/api/interfaces/LayoutOptions#fontfamily)
+
+import UsageGuidePartial from '../_usage-guide-partial.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./custom-font-family.js';
+
+<CodeBlock
+	replaceThemeConstants
+	chart
+	className="language-js"
+	hideableCode
+	chartOnTop
+	codeUsage={<UsageGuidePartial />}
+>
+	{code}
+</CodeBlock>
