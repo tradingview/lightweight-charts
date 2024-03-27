@@ -509,10 +509,20 @@ const container = document.getElementById('container');
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(container, chartOptions);
 
-const lineSeries = chart.addLineSeries({ color: LINE_LINE_COLOR });
+const intervalColors = {
+	'1D': LINE_LINE_COLOR,
+	'1W': LINE_LINE2_COLOR,
+	'1M': LINE_LINE3_COLOR,
+	'1Y': LINE_LINE4_COLOR,
+};
+
+const lineSeries = chart.addLineSeries({ color: intervalColors['1D'] });
 
 function setChartInterval(interval) {
 	lineSeries.setData(seriesesData.get(interval));
+	lineSeries.applyOptions({
+		color: intervalColors[interval],
+	});
 	chart.timeScale().fitContent();
 }
 
