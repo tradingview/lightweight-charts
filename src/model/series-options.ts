@@ -813,6 +813,8 @@ export interface SeriesOptionsCommon {
 	 * ```
 	 */
 	autoscaleInfoProvider?: AutoscaleInfoProvider;
+	/** Panel this series to be added */
+	pane?: number;
 }
 
 /**

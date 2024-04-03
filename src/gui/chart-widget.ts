@@ -18,6 +18,7 @@ import {
 	TimeScaleInvalidation,
 	TimeScaleInvalidationType,
 } from '../model/invalidate-mask';
+import { PaneInfo } from '../model/pane';
 import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
@@ -26,14 +27,16 @@ import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
 import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
+import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
-export interface MouseEventParamsImpl {
+export interface MouseEventParamsImpl extends PaneInfo {
 	originalTime?: unknown;
 	index?: TimePointIndex;
 	point?: Point;
 	seriesData: Map<Series<SeriesType>, SeriesPlotRow<SeriesType>>;
+	paneIndex?: number;
 	hoveredSeries?: Series<SeriesType>;
 	hoveredObject?: string;
 	touchMouseEventData?: TouchMouseEventData;
@@ -54,7 +57,7 @@ export interface IChartWidgetBase {
 export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBase {
 	private readonly _options: ChartOptionsInternal<HorzScaleItem>;
 	private _paneWidgets: PaneWidget[] = [];
-	// private _paneSeparators: PaneSeparator[] = [];
+	private _paneSeparators: PaneSeparator[] = [];
 	private readonly _model: ChartModel<HorzScaleItem>;
 	private _drawRafId: number = 0;
 	private _height: number = 0;
@@ -169,10 +172,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		}
 		this._paneWidgets = [];
 
-		// for (const paneSeparator of this._paneSeparators) {
-		// 	this._destroySeparator(paneSeparator);
-		// }
-		// this._paneSeparators = [];
+		for (const paneSeparator of this._paneSeparators) {
+			this._destroySeparator(paneSeparator);
+		}
+		this._paneSeparators = [];
 
 		ensureNotNull(this._timeAxisWidget).destroy();
 
@@ -322,6 +325,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return ensureDefined(this._paneWidgets[0]).getSize();
 	}
 
+	public adjustSize(): void {
+		this._adjustSizeImpl();
+	}
+
 	// eslint-disable-next-line complexity
 	private _applyAutoSizeOptions(options: DeepPartial<ChartOptionsInternal<HorzScaleItem>>): void {
 		if (options.autoSize === undefined && this._observer && (options.width !== undefined || options.height !== undefined)) {
@@ -365,14 +372,14 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 					priceAxisWidget.drawBitmap(ctx, targetX, targetY);
 				}
 				targetY += bitmapSize.height;
-				// if (paneIndex < this._paneWidgets.length - 1) {
-				// 	const separator = this._paneSeparators[paneIndex];
-				// 	const separatorBitmapSize = separator.getBitmapSize();
-				// 	if (ctx !== null) {
-				// 		separator.drawBitmap(ctx, targetX, targetY);
-				// 	}
-				// 	targetY += separatorBitmapSize.height;
-				// }
+				if (paneIndex < this._paneWidgets.length - 1) {
+					const separator = this._paneSeparators[paneIndex];
+					const separatorBitmapSize = separator.getBitmapSize();
+					if (ctx !== null) {
+						separator.drawBitmap(ctx, targetX, targetY);
+					}
+					targetY += separatorBitmapSize.height;
+				}
 			}
 		};
 
@@ -389,14 +396,14 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 				paneWidget.drawBitmap(ctx, totalWidth, totalHeight);
 			}
 			totalHeight += bitmapSize.height;
-			// if (paneIndex < this._paneWidgets.length - 1) {
-			// 	const separator = this._paneSeparators[paneIndex];
-			// 	const separatorBitmapSize = separator.getBitmapSize();
-			// 	if (ctx !== null) {
-			// 		separator.drawBitmap(ctx, totalWidth, totalHeight);
-			// 	}
-			// 	totalHeight += separatorBitmapSize.height;
-			// }
+			if (paneIndex < this._paneWidgets.length - 1) {
+				const separator = this._paneSeparators[paneIndex];
+				const separatorBitmapSize = separator.getBitmapSize();
+				if (ctx !== null) {
+					separator.drawBitmap(ctx, totalWidth, totalHeight);
+				}
+				totalHeight += separatorBitmapSize.height;
+			}
 		}
 		const firstPaneBitmapWidth = firstPane.getBitmapSize().width;
 		totalWidth += firstPaneBitmapWidth;
@@ -473,9 +480,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 		const paneWidth = Math.max(width - leftPriceAxisWidth - rightPriceAxisWidth, 0);
 
-		// const separatorCount = this._paneSeparators.length;
-		// const separatorHeight = SEPARATOR_HEIGHT;
-		const separatorsHeight = 0; // separatorHeight * separatorCount;
+		const separatorCount = this._paneSeparators.length;
+		const separatorHeight = SEPARATOR_HEIGHT;
+		const separatorsHeight = separatorHeight * separatorCount;
 		const timeAxisVisible = this._options.timeScale.visible;
 		let timeAxisHeight = timeAxisVisible ? Math.max(this._timeAxisWidget.optimalHeight(), this._options.timeScale.minimumHeight) : 0;
 		timeAxisHeight = suggestTimeScaleHeight(timeAxisHeight);
@@ -485,6 +492,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		const stretchPixels = totalPaneHeight / totalStretch;
 
 		let accumulatedHeight = 0;
+
+		const pixelRatio = document.body.ownerDocument.defaultView?.devicePixelRatio || 1;
+
 		for (let paneIndex = 0; paneIndex < this._paneWidgets.length; ++paneIndex) {
 			const paneWidget = this._paneWidgets[paneIndex];
 			paneWidget.setState(this._model.panes()[paneIndex]);
@@ -493,9 +503,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			let calculatePaneHeight = 0;
 
 			if (paneIndex === this._paneWidgets.length - 1) {
-				calculatePaneHeight = totalPaneHeight - accumulatedHeight;
+				calculatePaneHeight = Math.ceil((totalPaneHeight - accumulatedHeight) * pixelRatio) / pixelRatio;
 			} else {
-				calculatePaneHeight = Math.round(paneWidget.stretchFactor() * stretchPixels);
+				calculatePaneHeight = Math.round(paneWidget.stretchFactor() * stretchPixels * pixelRatio) / pixelRatio;
 			}
 
 			paneHeight = Math.max(calculatePaneHeight, 2);
@@ -701,10 +711,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		this._syncGuiWithModel();
 	}
 
-	// private _destroySeparator(separator: PaneSeparator): void {
-	// 	this._tableElement.removeChild(separator.getElement());
-	// 	separator.destroy();
-	// }
+	private _destroySeparator(separator: PaneSeparator): void {
+		this._tableElement.removeChild(separator.getElement());
+		separator.destroy();
+	}
 
 	private _syncGuiWithModel(): void {
 		const panes = this._model.panes();
@@ -719,10 +729,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			paneWidget.dblClicked().unsubscribeAll(this);
 			paneWidget.destroy();
 
-			// const paneSeparator = this._paneSeparators.pop();
-			// if (paneSeparator !== undefined) {
-			// 	this._destroySeparator(paneSeparator);
-			// }
+			const paneSeparator = this._paneSeparators.pop();
+			if (paneSeparator !== undefined) {
+				this._destroySeparator(paneSeparator);
+			}
 		}
 
 		// Create (if needed) new pane widgets and separators
@@ -734,11 +744,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			this._paneWidgets.push(paneWidget);
 
 			// create and insert separator
-			// if (i > 1) {
-			// 	const paneSeparator = new PaneSeparator(this, i - 1, i, true);
-			// 	this._paneSeparators.push(paneSeparator);
-			// 	this._tableElement.insertBefore(paneSeparator.getElement(), this._timeAxisWidget.getElement());
-			// }
+			if (i > 0) {
+				const paneSeparator = new PaneSeparator(this, i - 1, i, false);
+				this._paneSeparators.push(paneSeparator);
+				this._tableElement.insertBefore(paneSeparator.getElement(), this._timeAxisWidget.getElement());
+			}
 
 			// insert paneWidget
 			this._tableElement.insertBefore(paneWidget.getElement(), this._timeAxisWidget.getElement());
@@ -760,7 +770,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	private _getMouseEventParamsImpl(
 		index: TimePointIndex | null,
-		point: Point | null,
+		details: (Point & PaneInfo) | null,
 		event: TouchMouseEventData | null
 	): MouseEventParamsImpl {
 		const seriesData = new Map<Series<SeriesType>, SeriesPlotRow<SeriesType>>();
@@ -795,7 +805,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return {
 			originalTime: clientTime,
 			index: index ?? undefined,
-			point: point ?? undefined,
+			point: details ?? undefined,
+			paneIndex: (details as PaneInfo)?.paneIndex ?? undefined,
 			hoveredSeries,
 			seriesData,
 			hoveredObject,
@@ -805,10 +816,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	private _onPaneWidgetClicked(
 		time: TimePointIndex | null,
-		point: Point | null,
+		details: Point & PaneInfo | null,
 		event: TouchMouseEventData
 	): void {
-		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point, event));
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, details, event));
 	}
 
 	private _onPaneWidgetDblClicked(
@@ -821,10 +832,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	private _onPaneWidgetCrosshairMoved(
 		time: TimePointIndex | null,
-		point: Point | null,
+		details: Point & PaneInfo | null,
 		event: TouchMouseEventData | null
 	): void {
-		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
+		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, details, event));
 	}
 
 	private _updateTimeAxisVisibility(): void {
