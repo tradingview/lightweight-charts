@@ -52,6 +52,7 @@ export interface IChartWidgetBase {
 	paneWidgets(): PaneWidget[];
 	options(): ChartOptionsInternalBase;
 	setCursorStyle(style: string | null): void;
+	adjustSize(): void;
 }
 
 export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBase {

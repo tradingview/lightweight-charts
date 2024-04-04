@@ -148,12 +148,12 @@ export class PaneSeparator implements IDestroyable {
 		this._paneA.setStretchFactor(newUpperPaneStretch);
 		this._paneB.setStretchFactor(newLowerPaneStretch);
 
-		this._chartWidget.model().fullUpdate();
+		this._chartWidget.adjustSize();
 
 		if (this._paneA.getSize().height !== upperHeight) {
 			this._startY = event.pageY;
 		}
-		this._chartWidget.model().fullUpdate();
+		this._chartWidget.adjustSize();
 	}
 
 	private _mouseUpEvent(event: TouchMouseEvent): void {
