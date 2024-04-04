@@ -1044,11 +1044,14 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		if (series.options().pane !== newPaneIndex) {
 			series.applyOptions({ pane: newPaneIndex });
 		}
-		// @todo check
-		const previousPane = this.paneForSource(series);
-		previousPane?.removeDataSource(series);
+
+		const previousPane = ensureNotNull(this.paneForSource(series));
+		previousPane.removeDataSource(series);
 		const newPane = this.createPane(newPaneIndex);
 		this._addSeriesToPane(series, newPane);
+		if (previousPane.dataSources().length === 0) {
+			this.removePane(fromPaneIndex);
+		}
 	}
 
 	public backgroundBottomColor(): string {
