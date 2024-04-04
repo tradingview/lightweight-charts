@@ -321,9 +321,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return this._cursorStyleOverride;
 	}
 
-	public paneSize(): Size {
-		// we currently only support a single pane.
-		return ensureDefined(this._paneWidgets[0]).getSize();
+	public paneSize(paneIndex: number): Size {
+		return ensureDefined(this._paneWidgets[paneIndex]).getSize();
 	}
 
 	public adjustSize(): void {

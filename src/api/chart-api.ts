@@ -325,8 +325,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._chartWidget.element();
 	}
 
-	public paneSize(): PaneSize {
-		const size = this._chartWidget.paneSize();
+	public paneSize(paneIndex: number): PaneSize {
+		const size = this._chartWidget.paneSize(paneIndex);
 		return {
 			height: size.height,
 			width: size.width,

@@ -388,7 +388,8 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Returns the dimensions of the chart pane (the plot surface which excludes time and price scales).
 	 * This would typically only be useful for plugin development.
 	 *
+	 * @param paneIndex - The index of the pane
 	 * @returns Dimensions of the chart pane
 	 */
-	paneSize(): PaneSize;
+	paneSize(paneIndex: number): PaneSize;
 }
