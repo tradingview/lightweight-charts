@@ -652,11 +652,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public removePane(index: number): void {
-		if (index === 0) {
-			// we don't support removing the first pane.
+		if (this._panes.length === 1) {
 			return;
 		}
-
 		const paneToRemove = this._panes[index];
 		paneToRemove.orderedSources().forEach((source: IPriceDataSource) => {
 			if (source instanceof Series) {
@@ -665,23 +663,16 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		});
 
 		this._suppressSeriesMoving = true;
-		if (index !== this._panes.length - 1) {
-			// this is not the last pane
-			for (let i = index + 1; i < this._panes.length; i++) {
-				const pane = this._panes[i];
-				pane.orderedSources().forEach((source: IPriceDataSource) => {
-					if (source instanceof Series) {
-						(source as Series<SeriesType>).applyOptions({ pane: i - 1 });
-					}
-				});
-			}
+		for (let i = index + 1; i < this._panes.length; i++) {
+			const pane = this._panes[i];
+			pane.orderedSources().forEach((source: IPriceDataSource) => {
+				if (source instanceof Series) {
+					(source as Series<SeriesType>).applyOptions({ pane: i - 1 });
+				}
+			});
 		}
 
-		this._panes.splice(index, 1);
-		this._suppressSeriesMoving = false;
-		this._buildPaneIndexMapping();
-		const mask = new InvalidateMask(InvalidationLevel.Full);
-		this._invalidate(mask);
+		this._cleanupIfPaneIsEmpty(paneToRemove);
 	}
 
 	public swapPane(first: number, second: number): void {
@@ -963,12 +954,13 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		const seriesIndex = this._serieses.indexOf(series);
 		assert(seriesIndex !== -1, 'Series not found');
-
+		const paneImpl = ensureNotNull(pane);
 		this._serieses.splice(seriesIndex, 1);
-		ensureNotNull(pane).removeDataSource(series);
+		paneImpl.removeDataSource(series);
 		if (series.destroy) {
 			series.destroy();
 		}
+		this._cleanupIfPaneIsEmpty(paneImpl);
 	}
 
 	public moveSeriesToScale(series: ISeries<SeriesType>, targetScaleId: string): void {
@@ -1160,6 +1152,16 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._panesToIndex.clear();
 		for (let i = 0; i < this._panes.length; i++) {
 			this._panesToIndex.set(this._panes[i], i);
+		}
+	}
+
+	private _cleanupIfPaneIsEmpty(pane: Pane): void {
+		if (pane.dataSources().length === 0) {
+			this._panes.splice(this.getPaneIndex(pane), 1);
+			this._suppressSeriesMoving = false;
+			this._buildPaneIndexMapping();
+			const mask = new InvalidateMask(InvalidationLevel.Full);
+			this._invalidate(mask);
 		}
 	}
 }
