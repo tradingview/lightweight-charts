@@ -1,6 +1,6 @@
 import { Size, size } from 'fancy-canvas';
 
-import { ensureDefined, ensureNotNull } from '../helpers/assertions';
+import { ensureDefined, ensureNotNull, ValueIsUndefinedError } from '../helpers/assertions';
 import { isChromiumBased, isWindows } from '../helpers/browsers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
@@ -824,7 +824,13 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		point: Point | null,
 		event: TouchMouseEventData | null
 	): void {
-		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
+		try {
+			this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
+		} catch (e: any) {
+			if (e !instanceof ValueIsUndefinedError) {
+				throw e;
+			}
+		}
 	}
 
 	private _updateTimeAxisVisibility(): void {

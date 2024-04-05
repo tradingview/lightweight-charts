@@ -11,6 +11,20 @@ export function assert(condition: boolean, message?: string): asserts condition 
 }
 
 /**
+ * Custom Value is undefined error for useful handling.
+ *
+ * @message value - error message.
+ * @returns Custom error
+ */
+export class ValueIsUndefinedError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    this.name = "ValueIsUndefinedError";
+  }
+}
+
+/**
  * Ensures that value is defined.
  * Throws if the value is undefined, returns the original value otherwise.
  *
@@ -21,7 +35,7 @@ export function ensureDefined(value: undefined): never;
 export function ensureDefined<T>(value: T | undefined): T;
 export function ensureDefined<T>(value: T | undefined): T {
 	if (value === undefined) {
-		throw new Error('Value is undefined');
+		throw new ValueIsUndefinedError('Value is undefined');
 	}
 
 	return value;
