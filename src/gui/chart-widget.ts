@@ -826,9 +826,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	): void {
 		try {
 			this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
-		} catch (e: any) {
-			if (e !instanceof ValueIsUndefinedError) {
-				throw e;
+		} catch (error) {
+			if (!(error instanceof ValueIsUndefinedError)) {
+				throw error;
 			}
 		}
 	}

@@ -12,16 +12,17 @@ export function assert(condition: boolean, message?: string): asserts condition 
 
 /**
  * Custom Value is undefined error for useful handling.
- *
- * @message value - error message.
- * @returns Custom error
  */
 export class ValueIsUndefinedError extends Error {
-  constructor(message: string) {
-    super(message);
-
-    this.name = "ValueIsUndefinedError";
-  }
+	/**
+	 * Creates an instance of ValueIsUndefinedError.
+	 *
+	 * @param message - Error message
+	 */
+	public constructor(message: string) {
+		super(message);
+		this.name = 'ValueIsUndefinedError';
+	}
 }
 
 /**
