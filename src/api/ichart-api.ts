@@ -349,6 +349,11 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 */
 	swapPane(first: number, second: number): void;
 
+	/**
+	 * Returns the DOM elements of the chart panes.
+	 *
+	 * @returns Array of the chart panes.
+	 */
 	getPaneElements(): HTMLElement[];
 
 	/**
