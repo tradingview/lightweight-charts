@@ -73,9 +73,6 @@ export class CrosshairPaneView implements IPaneView {
 		data.vertLine.lineStyle = crosshairOptions.vertLine.style;
 		data.vertLine.color = crosshairOptions.vertLine.color;
 
-		// data.w = renderingPane.width();
-		// data.h = renderingPane.height();
-
 		data.x = this._source.appliedX();
 		data.y = this._source.appliedY();
 	}

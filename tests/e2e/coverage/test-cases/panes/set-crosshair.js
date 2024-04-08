@@ -11,19 +11,26 @@ function interactionsToPerform() {
 }
 
 let chart;
+let secondSeries;
 function beforeInteractions(container) {
-	chart = LightweightCharts.createChart(container, { panes: { separatorColor: '#00ff00', enableResize: true } });
+	chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addLineSeries();
-	const secondSeries = chart.addLineSeries({ pane: 1 });
+	secondSeries = chart.addLineSeries();
 
 	mainSeries.setData(simpleData());
 	secondSeries.setData(simpleData());
 
+	chart.setCrosshairPosition(20, 1663750000, secondSeries);
 	return Promise.resolve();
 }
 
 function afterInteractions() {
-	chart.applyOptions({ panes: { separatorColor: '#ff0000', enableResize: false } });
-	return Promise.resolve();
+	secondSeries.applyOptions({ pane: 1 });
+	return new Promise(resolve => {
+		requestAnimationFrame(() => {
+			secondSeries.applyOptions({ pane: 0 });
+			requestAnimationFrame(resolve);
+		});
+	});
 }

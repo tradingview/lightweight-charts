@@ -39,7 +39,8 @@ export type InteractionTarget =
 	| 'timescale'
 	| 'leftpricescale'
 	| 'rightpricescale'
-	| 'pane';
+	| 'pane'
+	| 'paneSeparator';
 
 export type Interaction = {
 	action: InteractionAction;
@@ -212,6 +213,9 @@ export async function performInteractions(
 	const timeAxis = (
 		await chartContainer.$$('tr:nth-of-type(2) td:nth-of-type(2) div canvas')
 	)[0];
+	const paneSeparator = (
+		await chartContainer.$$('tr:nth-of-type(2) td div')
+	)[0];
 
 	for (const interaction of interactionsToPerform) {
 		let target: ElementHandle<Element>;
@@ -231,6 +235,9 @@ export async function performInteractions(
 				break;
 			case 'pane':
 				target = paneWidget;
+				break;
+			case 'paneSeparator':
+				target = paneSeparator;
 				break;
 			default: {
 				const exhaustiveCheck: never = interaction.target;
