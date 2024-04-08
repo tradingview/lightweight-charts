@@ -663,16 +663,16 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		});
 
 		this._suppressSeriesMoving = true;
-		for (let i = index + 1; i < this._panes.length; i++) {
-			const pane = this._panes[i];
-			pane.orderedSources().forEach((source: IPriceDataSource) => {
-				if (source instanceof Series) {
-					(source as Series<SeriesType>).applyOptions({ pane: i - 1 });
-				}
-			});
+		if (index !== this._panes.length - 1) {
+			for (let i = index + 1; i < this._panes.length; i++) {
+				const pane = this._panes[i];
+				pane.orderedSources().forEach((source: IPriceDataSource) => {
+					if (source instanceof Series) {
+						(source as Series<SeriesType>).applyOptions({ pane: i - 1 });
+					}
+				});
+			}
 		}
-
-		this._cleanupIfPaneIsEmpty(paneToRemove);
 	}
 
 	public swapPane(first: number, second: number): void {
@@ -1041,8 +1041,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		previousPane.removeDataSource(series);
 		const newPane = this.createPane(newPaneIndex);
 		this._addSeriesToPane(series, newPane);
+
 		if (previousPane.dataSources().length === 0) {
-			this.removePane(fromPaneIndex);
+			this._cleanupIfPaneIsEmpty(previousPane);
 		}
 	}
 

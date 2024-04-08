@@ -34,18 +34,18 @@ function runTestCase(container) {
 	mainSeries.setData(generateData(startValue));
 	secondSeries.setData(generateData(startValue + 10));
 	thirdSeries.setData(generateData(startValue + 20));
-	try {
-		chart.removePane(1);
-	// eslint-disable-next-line no-empty
-	} catch (e) {}
+
 	return new Promise((resolve, reject) => {
-		setTimeout(() => {
+		requestAnimationFrame(() => {
 			try {
-				console.assert(chart.getPaneElements().length === 2, 'Pane should be removed');
-				resolve();
-			} catch (error) {
-				reject(error);
+				chart.removePane(1);
+				requestAnimationFrame(() => {
+					console.assert(chart.getPaneElements().length === 2, 'Pane should be removed');
+					return	resolve(true);
+				});
+			} catch (e) {
+				return reject(e);
 			}
-		}, 100);
+		});
 	});
 }

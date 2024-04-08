@@ -36,13 +36,13 @@ function runTestCase(container) {
 	thirdSeries.setData(generateData(startValue + 20));
 
 	return new Promise((resolve, reject) => {
-		setTimeout(() => {
+		requestAnimationFrame(() => {
 			try {
 				chart.swapPane(0, 2);
 				resolve();
 			} catch (error) {
 				reject(error);
 			}
-		}, 100);
+		});
 	});
 }

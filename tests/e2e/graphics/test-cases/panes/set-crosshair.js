@@ -33,17 +33,17 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData(startValue));
 	secondSeries.setData(generateData(startValue + 10));
-	thirdSeries.setData(generateData(startValue + 20));
+	const thirdSeriesData =	generateData(startValue + 20);
+	thirdSeries.setData(thirdSeriesData);
+
 	return new Promise((resolve, reject) => {
-		try {
-			requestAnimationFrame(() => {
-				secondSeries.applyOptions({ pane: 0 });
-				requestAnimationFrame(() => {
-					resolve(true);
-				});
-			});
-		} catch (error) {
-			reject(error);
-		}
+		requestAnimationFrame(() => {
+			try {
+				chart.setCrosshairPosition(thirdSeriesData[10].value, thirdSeriesData[10].time, thirdSeries);
+				return resolve();
+			} catch (error) {
+				reject(error);
+			}
+		});
 	});
 }

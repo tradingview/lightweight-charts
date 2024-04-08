@@ -27,24 +27,26 @@ function runTestCase(container) {
 
 	const mainSeries = chart.addBarSeries();
 	const secondSeries = chart.addBarSeries({ pane: 1 });
+	const thirdSeries = chart.addBarSeries({ pane: 2 });
 
 	const startValue = Math.floor(container.getBoundingClientRect().height / 100) * 100;
 
 	mainSeries.setData(generateData(startValue));
 	secondSeries.setData(generateData(startValue + 10));
+	thirdSeries.setData(generateData(startValue + 20));
 	try {
 		chart.removeSeries(mainSeries);
 	} catch (error) {
 		console.error(error);
 	}
 	return new Promise((resolve, reject) => {
-		setTimeout(() => {
+		requestAnimationFrame(() => {
 			try {
-				console.assert(chart.getPaneElements().length === 1, 'Pane should be removed');
+				console.assert(chart.getPaneElements().length === 2, 'Pane should be removed');
 				resolve();
 			} catch (error) {
 				reject(error);
 			}
-		}, 100);
+		});
 	});
 }
