@@ -1,0 +1,34 @@
+---
+title: Compare multiple series
+sidebar_label: Compare multiple series
+description:
+  An example of how to compare multiple series on a single price scale
+pagination_prev: null
+pagination_next: null
+keywords:
+  - compare
+  - series
+---
+
+This Multi-Series Comparison Example illustrates how an assortment of data
+series can be integrated into a single chart for comparisons. Simply use the
+charting API to create multiple series (such as `addLineSeries`).
+
+If you would like an unique price scales for each individual series,
+particularly when dealing with data series with divergent value ranges, then
+take a look at the [Two Price Scales Example](../how_to/two-price-scales.mdx).
+
+import UsageGuidePartial from '../_usage-guide-partial.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./compare-multiple-series.js';
+
+<CodeBlock
+  replaceThemeConstants
+  chart
+  className="language-js"
+  hideableCode
+  chartOnTop
+  codeUsage={<UsageGuidePartial />}
+>
+	{code}
+</CodeBlock>
