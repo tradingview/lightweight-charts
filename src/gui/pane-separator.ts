@@ -13,11 +13,12 @@ export class PaneSeparator implements IDestroyable {
 	private readonly _chartWidget: IChartWidgetBase;
 	private readonly _rowElement: HTMLTableRowElement;
 	private readonly _cell: HTMLTableCellElement;
-	private readonly _handle: HTMLDivElement | null;
-	private readonly _mouseEventHandler: MouseEventHandler | null;
 	private readonly _paneA: PaneWidget;
 	private readonly _paneB: PaneWidget;
 
+	private _handle: HTMLDivElement | null = null;
+	private _mouseEventHandler: MouseEventHandler | null = null;
+	private _resizeEnabled: boolean = true;
 	private _startY: number = 0;
 	private _deltaY: number = 0;
 	private _totalHeight: number = 0;
@@ -27,7 +28,7 @@ export class PaneSeparator implements IDestroyable {
 	private _pixelStretchFactor: number = 0;
 	private _mouseActive: boolean = false;
 
-	public constructor(chartWidget: IChartWidgetBase, topPaneIndex: number, bottomPaneIndex: number, disableResize: boolean) {
+	public constructor(chartWidget: IChartWidgetBase, topPaneIndex: number, bottomPaneIndex: number) {
 		this._chartWidget = chartWidget;
 		this._paneA = chartWidget.paneWidgets()[topPaneIndex];
 		this._paneB = chartWidget.paneWidgets()[bottomPaneIndex];
@@ -43,38 +44,13 @@ export class PaneSeparator implements IDestroyable {
 
 		this._updateBorderColor();
 		this._rowElement.appendChild(this._cell);
+		this._resizeEnabled = this._chartWidget.options().panes.enableResize;
 
-		if (disableResize) {
+		if (!this._resizeEnabled) {
 			this._handle = null;
 			this._mouseEventHandler = null;
 		} else {
-			this._handle = document.createElement('div');
-			this._handle.style.position = 'absolute';
-			this._handle.style.zIndex = '50';
-			this._handle.style.top = '-4px';
-			this._handle.style.height = '9px';
-			this._handle.style.width = '100%';
-			this._handle.style.backgroundColor = '';
-			this._handle.style.cursor = 'row-resize';
-			this._cell.appendChild(this._handle);
-			const handlers: MouseEventHandlers = {
-				mouseEnterEvent: this._mouseOverEvent.bind(this),
-				mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
-				mouseDownEvent: this._mouseDownEvent.bind(this),
-				touchStartEvent: this._mouseDownEvent.bind(this),
-				pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
-				touchMoveEvent: this._pressedMouseMoveEvent.bind(this),
-				mouseUpEvent: this._mouseUpEvent.bind(this),
-				touchEndEvent: this._mouseUpEvent.bind(this),
-			};
-			this._mouseEventHandler = new MouseEventHandler(
-				this._handle,
-				handlers,
-				{
-					treatVertTouchDragAsPageScroll: () => false,
-					treatHorzTouchDragAsPageScroll: () => true,
-				}
-			);
+			this._addResizableHandle();
 		}
 	}
 
@@ -104,16 +80,59 @@ export class PaneSeparator implements IDestroyable {
 
 	public drawBitmap(ctx: CanvasRenderingContext2D, x: number, y: number): void {
 		const bitmapSize = this.getBitmapSize();
-		ctx.fillStyle = this._chartWidget.options().timeScale.borderColor;
+		ctx.fillStyle = this._chartWidget.options().panes.separatorColor;
 		ctx.fillRect(x, y, bitmapSize.width, bitmapSize.height);
 	}
 
 	public update(): void {
 		this._updateBorderColor();
+		if (this._chartWidget.options().panes.enableResize !== this._resizeEnabled) {
+			this._resizeEnabled = this._chartWidget.options().panes.enableResize;
+			if (this._resizeEnabled) {
+				this._addResizableHandle();
+			} else {
+				if (this._handle !== null) {
+					this._cell.removeChild(this._handle);
+					this._handle = null;
+				}
+				if (this._mouseEventHandler !== null) {
+					this._mouseEventHandler.destroy();
+					this._mouseEventHandler = null;
+				}
+			}
+		}
 	}
-
+	private _addResizableHandle(): void {
+		this._handle = document.createElement('div');
+		this._handle.style.position = 'absolute';
+		this._handle.style.zIndex = '50';
+		this._handle.style.top = '-4px';
+		this._handle.style.height = '9px';
+		this._handle.style.width = '100%';
+		this._handle.style.backgroundColor = '';
+		this._handle.style.cursor = 'row-resize';
+		this._cell.appendChild(this._handle);
+		const handlers: MouseEventHandlers = {
+			mouseEnterEvent: this._mouseOverEvent.bind(this),
+			mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
+			mouseDownEvent: this._mouseDownEvent.bind(this),
+			touchStartEvent: this._mouseDownEvent.bind(this),
+			pressedMouseMoveEvent: this._pressedMouseMoveEvent.bind(this),
+			touchMoveEvent: this._pressedMouseMoveEvent.bind(this),
+			mouseUpEvent: this._mouseUpEvent.bind(this),
+			touchEndEvent: this._mouseUpEvent.bind(this),
+		};
+		this._mouseEventHandler = new MouseEventHandler(
+			this._handle,
+			handlers,
+			{
+				treatVertTouchDragAsPageScroll: () => false,
+				treatHorzTouchDragAsPageScroll: () => true,
+			}
+		);
+	}
 	private _updateBorderColor(): void {
-		this._cell.style.background = this._chartWidget.options().timeScale.borderColor;
+		this._cell.style.background = this._chartWidget.options().panes.separatorColor;
 	}
 
 	private _mouseOverEvent(event: TouchMouseEvent): void {

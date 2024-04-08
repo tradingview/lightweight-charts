@@ -244,6 +244,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			this._setMouseWheelEventListener(shouldHaveMouseWheelListener);
 		}
 
+		if (options.panes) {
+			this._applyPanesOptions();
+		}
 		this._updateTimeAxisVisibility();
 
 		this._applyAutoSizeOptions(options);
@@ -327,6 +330,12 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	public adjustSize(): void {
 		this._adjustSizeImpl();
+	}
+
+	private _applyPanesOptions(): void {
+		this._paneSeparators.forEach((separator: PaneSeparator) => {
+			separator.update();
+		});
 	}
 
 	// eslint-disable-next-line complexity
@@ -745,7 +754,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 			// create and insert separator
 			if (i > 0) {
-				const paneSeparator = new PaneSeparator(this, i - 1, i, false);
+				const paneSeparator = new PaneSeparator(this, i - 1, i);
 				this._paneSeparators.push(paneSeparator);
 				this._tableElement.insertBefore(paneSeparator.getElement(), this._timeAxisWidget.getElement());
 			}
