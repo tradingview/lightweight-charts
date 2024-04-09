@@ -447,7 +447,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	private readonly _timeScale: TimeScale<HorzScaleItem>;
 	private readonly _panes: Pane[] = [];
-	private readonly _panesToIndex: Map<Pane, number> = new Map<Pane, number>();
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
@@ -639,7 +638,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			this._panes.push(pane);
 		}
 
-		this._buildPaneIndexMapping();
 		// we always do autoscaling on the creation
 		// if autoscale option is true, it is ok, just recalculate by invalidation mask
 		// if autoscale option is false, autoscale anyway on the first draw
@@ -730,7 +728,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._panes[second] = firstPane;
 
 		this._suppressSeriesMoving = false;
-		this._buildPaneIndexMapping();
 		this._invalidate(new InvalidateMask(InvalidationLevel.Full));
 	}
 
@@ -1124,7 +1121,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public getPaneIndex(pane: Pane): number {
-		return this._panesToIndex.get(pane) ?? 0;
+		return this._panes.indexOf(pane);
 	}
 
 	private _paneInvalidationMask(pane: Pane | null, level: InvalidationLevel): InvalidateMask {
@@ -1184,18 +1181,10 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return layoutOptions.background.color;
 	}
 
-	private _buildPaneIndexMapping(): void {
-		this._panesToIndex.clear();
-		for (let i = 0; i < this._panes.length; i++) {
-			this._panesToIndex.set(this._panes[i], i);
-		}
-	}
-
 	private _cleanupIfPaneIsEmpty(pane: Pane): void {
 		if (pane.dataSources().length === 0) {
 			this._panes.splice(this.getPaneIndex(pane), 1);
 			this._suppressSeriesMoving = false;
-			this._buildPaneIndexMapping();
 			const mask = new InvalidateMask(InvalidationLevel.Full);
 			this._invalidate(mask);
 		}
