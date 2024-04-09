@@ -19,6 +19,7 @@ import {
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
+import { IPaneApi } from './ipane-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -333,6 +334,13 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @returns A canvas with the chart drawn on. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
 	 */
 	takeScreenshot(): HTMLCanvasElement;
+
+	/**
+	 * Removes a pane with index
+	 *
+	 * @returns array of pane's Api
+	 */
+	panes(): IPaneApi[];
 
 	/**
 	 * Removes a pane with index

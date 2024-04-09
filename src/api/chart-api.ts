@@ -11,6 +11,7 @@ import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, Whitespace
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
+import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
@@ -36,6 +37,7 @@ import { Logical } from '../model/time-data';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApiBase, MouseEventHandler, MouseEventParams, PaneSize } from './ichart-api';
+import { IPaneApi } from './ipane-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -50,6 +52,7 @@ import {
 	lineStyleDefaults,
 	seriesOptionsDefaults,
 } from './options/series-options-defaults';
+import { PaneApi } from './pane-api';
 import { PriceScaleApi } from './price-scale-api';
 import { SeriesApi } from './series-api';
 import { TimeScaleApi } from './time-scale-api';
@@ -125,7 +128,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi<HorzScaleItem>;
-
+	private readonly _panes: WeakMap<Pane, PaneApi> = new WeakMap();
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
 	public constructor(container: HTMLElement, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, options?: DeepPartial<ChartOptionsImpl<HorzScaleItem>>) {
@@ -325,7 +328,11 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._chartWidget.element();
 	}
 
-	public paneSize(paneIndex: number): PaneSize {
+	public panes(): IPaneApi[] {
+		return this._chartWidget.model().panes().map((pane: Pane) => this._getPaneApi(pane));
+	}
+
+	public paneSize(paneIndex: number = 0): PaneSize {
 		const size = this._chartWidget.paneSize(paneIndex);
 		return {
 			height: size.height,
@@ -415,5 +422,15 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			seriesData,
 			sourceEvent: param.touchMouseEventData,
 		};
+	}
+
+	private _getPaneApi(pane: Pane): PaneApi {
+		let result = this._panes.get(pane);
+		if (!result) {
+			result = new PaneApi(this._chartWidget, pane);
+			this._panes.set(pane, result);
+		}
+
+		return result;
 	}
 }

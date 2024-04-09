@@ -438,9 +438,11 @@ export interface IChartModelBase {
 
 	stopTimeScaleAnimation(): void;
 	moveSeriesToPane(series: Series<SeriesType>, fromPaneIndex: number, newPaneIndex: number): void;
+	panes(): readonly Pane[];
 	getPaneIndex(pane: Pane): number;
 	swapPane(first: number, second: number): void;
 	removePane(index: number): void;
+	changePanesHeight(paneIndex: number, height: number): void;
 }
 
 export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase {
@@ -679,6 +681,39 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 				});
 			}
 		}
+	}
+
+	public changePanesHeight(paneIndex: number, height: number): void {
+		if (this._panes.length < 2) {
+			return;
+		}
+
+		assert(paneIndex >= 0 && paneIndex < this._panes.length, 'Invalid pane index');
+		const targetPane = this._panes[paneIndex];
+
+		const totalStretch = this._panes.reduce((prevValue: number, pane: Pane) => prevValue + pane.stretchFactor(), 0);
+		const totalHeight = this._panes.reduce((prevValue: number, pane: Pane) => prevValue + pane.height(), 0);
+		const maxPaneHeight = totalHeight - 30 * (this._panes.length - 1);
+		height = Math.min(maxPaneHeight, Math.max(30, height));
+		const pixelStretchFactor = totalStretch / totalHeight;
+
+		const oldHeight = targetPane.height();
+		targetPane.setStretchFactor(height * pixelStretchFactor);
+
+		let otherPanesChange = height - oldHeight;
+		let panesCount = this._panes.length - 1;
+
+		for (const pane of this._panes) {
+			if (pane !== targetPane) {
+				const newPaneHeight = Math.min(maxPaneHeight, Math.max(30, pane.height() - otherPanesChange / panesCount));
+				otherPanesChange -= (pane.height() - newPaneHeight);
+				panesCount -= 1;
+				const newStretchFactor = newPaneHeight * pixelStretchFactor;
+				pane.setStretchFactor(newStretchFactor);
+			}
+		}
+
+		this.fullUpdate();
 	}
 
 	public swapPane(first: number, second: number): void {
