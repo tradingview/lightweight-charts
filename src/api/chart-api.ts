@@ -312,8 +312,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._chartWidget.model().removePane(index);
 	}
 
-	public swapPane(first: number, second: number): void {
-		this._chartWidget.model().swapPane(first, second);
+	public swapPanes(first: number, second: number): void {
+		this._chartWidget.model().swapPanes(first, second);
 	}
 
 	public getPaneElements(): HTMLElement[] {

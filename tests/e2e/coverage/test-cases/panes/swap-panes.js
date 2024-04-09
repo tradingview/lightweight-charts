@@ -24,7 +24,7 @@ function beforeInteractions(container) {
 }
 
 function afterInteractions() {
-	chart.swapPane(1, 1);
-	chart.swapPane(0, 1);
+	chart.swapPanes(1, 1);
+	chart.swapPanes(0, 1);
 	return Promise.resolve();
 }

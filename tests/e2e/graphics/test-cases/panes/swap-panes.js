@@ -38,7 +38,7 @@ function runTestCase(container) {
 	return new Promise((resolve, reject) => {
 		requestAnimationFrame(() => {
 			try {
-				chart.swapPane(0, 2);
+				chart.swapPanes(0, 2);
 				resolve();
 			} catch (error) {
 				reject(error);

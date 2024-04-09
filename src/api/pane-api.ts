@@ -38,6 +38,6 @@ export class PaneApi implements IPaneApi {
 
 		assert(paneIndex >= 0 && paneIndex < this._chartWidget.paneWidgets().length, 'Invalid pane index');
 
-		this._chartWidget.model().swapPane(currentIndex, paneIndex);
+		this._chartWidget.model().swapPanes(currentIndex, paneIndex);
 	}
 }
