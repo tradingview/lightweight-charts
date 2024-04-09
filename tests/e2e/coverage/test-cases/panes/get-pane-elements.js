@@ -12,7 +12,7 @@ function interactionsToPerform() {
 
 let chart;
 function beforeInteractions(container) {
-	chart = LightweightCharts.createChart(container, { panes: { separatorColor: '#00ff00', enableResize: true } });
+	chart = LightweightCharts.createChart(container, { layout: { panes: { separatorColor: '#00ff00', enableResize: true } } });
 
 	const mainSeries = chart.addLineSeries();
 	const secondSeries = chart.addLineSeries({ pane: 1 });

@@ -22,7 +22,6 @@ import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane, PaneInfo } from './pane';
-import { PanesOptions } from './pane-options';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { ISeries, Series, SeriesOptionsInternal } from './series';
@@ -338,11 +337,6 @@ export interface ChartOptionsBase {
 	 * Basic localization options
 	 */
 	localization: LocalizationOptionsBase;
-
-	/**
-	 * Panes options
-	 */
-	panes: PanesOptions;
 }
 
 /**

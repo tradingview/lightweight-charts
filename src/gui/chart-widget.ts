@@ -244,7 +244,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			this._setMouseWheelEventListener(shouldHaveMouseWheelListener);
 		}
 
-		if (options.panes) {
+		if (options.layout?.panes) {
 			this._applyPanesOptions();
 		}
 		this._updateTimeAxisVisibility();

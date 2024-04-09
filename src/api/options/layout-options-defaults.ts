@@ -10,4 +10,8 @@ export const layoutOptionsDefaults: LayoutOptions = {
 	textColor: '#191919',
 	fontSize: 12,
 	fontFamily: defaultFontFamily,
+	panes: {
+		enableResize: true,
+		separatorColor: '#2B2B43',
+	},
 };

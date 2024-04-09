@@ -48,6 +48,22 @@ export interface VerticalGradientColor {
  */
 export type Background = SolidColor | VerticalGradientColor;
 
+export interface LayoutPanesOptions {
+	/**
+	* Enable panes resizing
+	*
+	* @defaultValue `true`
+	*/
+	enableResize: boolean;
+
+	/**
+	* Color of pane separator
+	*
+	* @defaultValue `#2B2B43`
+	*/
+	separatorColor: string;
+}
+
 /** Represents layout options */
 export interface LayoutOptions {
 	/**
@@ -77,4 +93,11 @@ export interface LayoutOptions {
 	 * @defaultValue `-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif`
 	 */
 	fontFamily: string;
+
+	/**
+	 * Panes options.
+	 *
+	 * @defaultValue `{ enableResize: true, separatorColor: '#2B2B43' }`
+	 */
+	panes: LayoutPanesOptions;
 }
