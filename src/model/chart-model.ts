@@ -618,6 +618,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	public createPane(index?: number): Pane {
 		if (index !== undefined) {
+			index = Math.max(0, Math.min(this._panes.length, index));
 			if (index > this._panes.length) {
 				for (let i = this._panes.length; i < index; i++) {
 					this.createPane(i);
@@ -1057,15 +1058,20 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._options.rightPriceScale.visible ? DefaultPriceScaleId.Right : DefaultPriceScaleId.Left;
 	}
 
+	public seriesPaneIndex(series: Series<SeriesType>): number | null {
+		for (let i = 0; i < this._panes.length; i += 1) {
+			if (this._panes[i].dataSources().includes(series)) {
+				return i;
+			}
+		}
+		return null;
+	}
+
 	public moveSeriesToPane(series: Series<SeriesType>, newPaneIndex: number): void {
-		const fromPaneIndex = series.paneIndex();
+		const fromPaneIndex = this.seriesPaneIndex(series);
 		if (newPaneIndex === fromPaneIndex || this._suppressSeriesMoving) {
 			// no change
 			return;
-		}
-
-		if (fromPaneIndex !== newPaneIndex) {
-			series.setPaneIndex(newPaneIndex);
 		}
 
 		const previousPane = ensureNotNull(this.paneForSource(series));

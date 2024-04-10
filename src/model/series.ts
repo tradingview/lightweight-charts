@@ -161,7 +161,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private _markersPaneView!: SeriesMarkersPaneView;
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
-	private _paneIndex: number;
 
 	public constructor(model: IChartModelBase, options: SeriesOptionsInternal<T>, seriesType: T, paneIndex?: number, customPaneView?: ICustomSeriesPaneView<unknown>) {
 		super(model);
@@ -172,7 +171,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this._priceAxisViews = [priceAxisView];
 
 		this._panePriceAxisView = new PanePriceAxisView(priceAxisView, this, model);
-		this._paneIndex = paneIndex ?? 0;
 		if (seriesType === 'Area' || seriesType === 'Line' || seriesType === 'Baseline') {
 			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'> | Series<'Baseline'>);
 		}
@@ -256,14 +254,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 		this._barColorerCache = new SeriesBarColorer(this);
 		return this._barColorerCache;
-	}
-
-	public paneIndex(): number {
-		return this._paneIndex;
-	}
-
-	public setPaneIndex(paneIndex: number): void {
-		this._paneIndex = paneIndex;
 	}
 
 	public options(): Readonly<SeriesOptionsMap[T]> {
