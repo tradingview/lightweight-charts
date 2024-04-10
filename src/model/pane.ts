@@ -21,10 +21,6 @@ interface MinMaxOrderInfo {
 	maxZOrder: number;
 }
 
-export interface PaneInfo {
-	paneIndex?: number;
-}
-
 export class Pane implements IDestroyable {
 	private readonly _timeScale: ITimeScale;
 	private readonly _model: IChartModelBase;

@@ -21,7 +21,7 @@ import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
-import { DEFAULT_STRETCH_FACTOR, Pane, PaneInfo } from './pane';
+import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { ISeries, Series, SeriesOptionsInternal } from './series';
@@ -456,7 +456,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private _width: number = 0;
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
-	private _crosshairMoved: Delegate<TimePointIndex | null, Point & PaneInfo | null, TouchMouseEventData | null> = new Delegate();
+	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
 
 	private _suppressSeriesMoving: boolean = false;
 
@@ -600,7 +600,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._crosshair;
 	}
 
-	public crosshairMoved(): ISubscription<TimePointIndex | null, (Point & PaneInfo) | null, TouchMouseEventData | null> {
+	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null, TouchMouseEventData | null> {
 		return this._crosshairMoved;
 	}
 
@@ -854,8 +854,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		this.cursorUpdate();
 		if (!skipEvent) {
-			const paneIndex = this.getPaneIndex(pane);
-			this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y, paneIndex }, event);
+			this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y }, event);
 		}
 	}
 

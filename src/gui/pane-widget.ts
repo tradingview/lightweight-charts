@@ -19,7 +19,7 @@ import { Coordinate } from '../model/coordinate';
 import { IDataSource } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { KineticAnimation } from '../model/kinetic-animation';
-import { Pane, PaneInfo } from '../model/pane';
+import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
@@ -75,8 +75,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
-	private _clicked: Delegate<TimePointIndex | null, Point & PaneInfo, TouchMouseEventData> = new Delegate();
-	private _dblClicked: Delegate<TimePointIndex | null, Point & PaneInfo, TouchMouseEventData> = new Delegate();
+	private _clicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
+	private _dblClicked: Delegate<TimePointIndex | null, Point, TouchMouseEventData> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
 	private _startTrackPoint: Point | null = null;
@@ -526,12 +526,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._fireMouseClickDelegate(this._clicked, event);
 	}
 
-	private _fireMouseClickDelegate(delegate: Delegate<TimePointIndex | null, Point & PaneInfo, TouchMouseEventData>, event: MouseEventHandlerEventBase): void {
+	private _fireMouseClickDelegate(delegate: Delegate<TimePointIndex | null, Point, TouchMouseEventData>, event: MouseEventHandlerEventBase): void {
 		const x = event.localX;
 		const y = event.localY;
 		if (delegate.hasListeners()) {
-			const paneIndex = this._model().getPaneIndex(ensureNotNull(this._state));
-			delegate.fire(this._model().timeScale().coordinateToIndex(x), { x, y, paneIndex }, event);
+			delegate.fire(this._model().timeScale().coordinateToIndex(x), { x, y }, event);
 		}
 	}
 

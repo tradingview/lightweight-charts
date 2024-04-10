@@ -18,7 +18,7 @@ import {
 	TimeScaleInvalidation,
 	TimeScaleInvalidationType,
 } from '../model/invalidate-mask';
-import { PaneInfo } from '../model/pane';
+import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
@@ -31,7 +31,7 @@ import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
-export interface MouseEventParamsImpl extends PaneInfo {
+export interface MouseEventParamsImpl {
 	originalTime?: unknown;
 	index?: TimePointIndex;
 	point?: Point;
@@ -747,8 +747,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		// Create (if needed) new pane widgets and separators
 		for (let i = actualPaneWidgetsCount; i < targetPaneWidgetsCount; i++) {
 			const paneWidget = new PaneWidget(this, panes[i]);
-			paneWidget.clicked().subscribe(this._onPaneWidgetClicked.bind(this), this);
-			paneWidget.dblClicked().subscribe(this._onPaneWidgetDblClicked.bind(this), this);
+			paneWidget.clicked().subscribe(this._onPaneWidgetClicked.bind(this, paneWidget), this);
+			paneWidget.dblClicked().subscribe(this._onPaneWidgetDblClicked.bind(this, paneWidget), this);
 
 			this._paneWidgets.push(paneWidget);
 
@@ -779,8 +779,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	private _getMouseEventParamsImpl(
 		index: TimePointIndex | null,
-		details: (Point & PaneInfo) | null,
-		event: TouchMouseEventData | null
+		details: Point | null,
+		event: TouchMouseEventData | null,
+		pane?: PaneWidget
 	): MouseEventParamsImpl {
 		const seriesData = new Map<Series<SeriesType>, SeriesPlotRow<SeriesType>>();
 		if (index !== null) {
@@ -810,12 +811,15 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		const hoveredObject = hoveredSource !== null && hoveredSource.object !== undefined
 			? hoveredSource.object.externalId
 			: undefined;
+		const paneIndex = pane
+			? this._paneWidgets.indexOf(pane)
+			: this.model().panes().indexOf(this.model().crosshairSource().pane() as Pane);
 
 		return {
 			originalTime: clientTime,
 			index: index ?? undefined,
 			point: details ?? undefined,
-			paneIndex: (details as PaneInfo)?.paneIndex ?? undefined,
+			paneIndex: paneIndex !== -1 ? paneIndex : undefined,
 			hoveredSeries,
 			seriesData,
 			hoveredObject,
@@ -824,24 +828,26 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	}
 
 	private _onPaneWidgetClicked(
+		pane: PaneWidget,
 		time: TimePointIndex | null,
-		details: Point & PaneInfo | null,
+		details: Point | null,
 		event: TouchMouseEventData
 	): void {
-		this._clicked.fire(() => this._getMouseEventParamsImpl(time, details, event));
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, details, event, pane));
 	}
 
 	private _onPaneWidgetDblClicked(
+		pane: PaneWidget,
 		time: TimePointIndex | null,
 		point: Point | null,
 		event: TouchMouseEventData
 	): void {
-		this._dblClicked.fire(() => this._getMouseEventParamsImpl(time, point, event));
+		this._dblClicked.fire(() => this._getMouseEventParamsImpl(time, point, event, pane));
 	}
 
 	private _onPaneWidgetCrosshairMoved(
 		time: TimePointIndex | null,
-		details: Point & PaneInfo | null,
+		details: Point | null,
 		event: TouchMouseEventData | null
 	): void {
 		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, details, event));
