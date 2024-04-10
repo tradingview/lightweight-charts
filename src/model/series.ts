@@ -5,7 +5,7 @@ import { VolumeFormatter } from '../formatters/volume-formatter';
 
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
-import { DeepPartial, isInteger, isNumber, merge } from '../helpers/strict-type-checks';
+import { isInteger, merge } from '../helpers/strict-type-checks';
 
 import { SeriesAreaPaneView } from '../views/pane/area-pane-view';
 import { SeriesBarsPaneView } from '../views/pane/bars-pane-view';
@@ -50,7 +50,6 @@ import {
 	BaselineStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
-	SeriesOptionsCommon,
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
@@ -162,8 +161,9 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private _markersPaneView!: SeriesMarkersPaneView;
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
+	private _paneIndex: number;
 
-	public constructor(model: IChartModelBase, options: SeriesOptionsInternal<T>, seriesType: T, pane?: Pane, customPaneView?: ICustomSeriesPaneView<unknown>) {
+	public constructor(model: IChartModelBase, options: SeriesOptionsInternal<T>, seriesType: T, paneIndex?: number, customPaneView?: ICustomSeriesPaneView<unknown>) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
@@ -172,7 +172,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this._priceAxisViews = [priceAxisView];
 
 		this._panePriceAxisView = new PanePriceAxisView(priceAxisView, this, model);
-
+		this._paneIndex = paneIndex ?? 0;
 		if (seriesType === 'Area' || seriesType === 'Line' || seriesType === 'Baseline') {
 			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'> | Series<'Baseline'>);
 		}
@@ -258,17 +258,25 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return this._barColorerCache;
 	}
 
+	public paneIndex(): number {
+		return this._paneIndex;
+	}
+
+	public setPaneIndex(paneIndex: number): void {
+		this._paneIndex = paneIndex;
+	}
+
 	public options(): Readonly<SeriesOptionsMap[T]> {
 		return this._options as SeriesOptionsMap[T];
 	}
 
-	public applyOptions(options: SeriesPartialOptionsInternal<T> | DeepPartial<SeriesOptionsCommon>): void {
+	public applyOptions(options: SeriesPartialOptionsInternal<T>): void {
 		const targetPriceScaleId = options.priceScaleId;
 		if (targetPriceScaleId !== undefined && targetPriceScaleId !== this._options.priceScaleId) {
 			// series cannot do it itself, ask model
 			this.model().moveSeriesToScale(this, targetPriceScaleId);
 		}
-		const previousPaneIndex = this._options.pane ?? 0;
+
 		merge(this._options, options);
 
 		if (options.priceFormat !== undefined) {
@@ -279,10 +287,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 			// full update is quite heavy operation in terms of performance
 			// but updating formatter looks like quite rare so forcing a full update here shouldn't affect the performance a lot
 			this.model().fullUpdate();
-		}
-
-		if (isNumber(options.pane) && previousPaneIndex !== options.pane) {
-			this.model().moveSeriesToPane(this, previousPaneIndex, options.pane);
 		}
 
 		this.model().updateSource(this);

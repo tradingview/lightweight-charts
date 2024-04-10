@@ -199,10 +199,11 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	public addCustomSeries<
 		TData extends CustomData<HorzScaleItem>,
 		TOptions extends CustomSeriesOptions,
-		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>
+		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>,
 	>(
 		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
-		options?: SeriesPartialOptions<TOptions>
+		options?: SeriesPartialOptions<TOptions>,
+		paneIndex?: number
 	): ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions> {
 		const paneView = ensure(customPaneView);
 		const defaults = {
@@ -213,30 +214,31 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			'Custom',
 			defaults,
 			options,
+			paneIndex,
 			paneView
 		);
 	}
 
-	public addAreaSeries(options?: AreaSeriesPartialOptions): ISeriesApi<'Area', HorzScaleItem> {
-		return this._addSeriesImpl('Area', areaStyleDefaults, options);
+	public addAreaSeries(options?: AreaSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Area', HorzScaleItem> {
+		return this._addSeriesImpl('Area', areaStyleDefaults, options, paneIndex);
 	}
 
-	public addBaselineSeries(options?: BaselineSeriesPartialOptions): ISeriesApi<'Baseline', HorzScaleItem> {
-		return this._addSeriesImpl('Baseline', baselineStyleDefaults, options);
+	public addBaselineSeries(options?: BaselineSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Baseline', HorzScaleItem> {
+		return this._addSeriesImpl('Baseline', baselineStyleDefaults, options, paneIndex);
 	}
 
-	public addBarSeries(options?: BarSeriesPartialOptions): ISeriesApi<'Bar', HorzScaleItem> {
-		return this._addSeriesImpl('Bar', barStyleDefaults, options);
+	public addBarSeries(options?: BarSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Bar', HorzScaleItem> {
+		return this._addSeriesImpl('Bar', barStyleDefaults, options, paneIndex);
 	}
 
-	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}): ISeriesApi<'Candlestick', HorzScaleItem> {
+	public addCandlestickSeries(options: CandlestickSeriesPartialOptions = {}, paneIndex?: number): ISeriesApi<'Candlestick', HorzScaleItem> {
 		fillUpDownCandlesticksColors(options);
 
-		return this._addSeriesImpl('Candlestick', candlestickStyleDefaults, options);
+		return this._addSeriesImpl('Candlestick', candlestickStyleDefaults, options, paneIndex);
 	}
 
-	public addHistogramSeries(options?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram', HorzScaleItem> {
-		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options);
+	public addHistogramSeries(options?: HistogramSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Histogram', HorzScaleItem> {
+		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options, paneIndex);
 	}
 
 	public addLineSeries(options?: LineSeriesPartialOptions): ISeriesApi<'Line', HorzScaleItem> {
@@ -369,12 +371,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		type: TSeries,
 		styleDefaults: SeriesStyleOptionsMap[TSeries],
 		options: SeriesPartialOptionsMap[TSeries] = {},
+		paneIndex?: number,
 		customPaneView?: ICustomSeriesPaneView<HorzScaleItem>
 	): ISeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions> {
 		patchPriceFormat(options.priceFormat);
 
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
-		const series = this._chartWidget.model().createSeries(type, strictOptions, customPaneView);
+		const series = this._chartWidget.model().createSeries(type, strictOptions, paneIndex, customPaneView);
 
 		const res = new SeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions>(series, this, this, this, this._horzScaleBehavior);
 		this._seriesMap.set(res, series);

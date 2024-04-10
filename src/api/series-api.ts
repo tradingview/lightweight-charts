@@ -245,6 +245,10 @@ export class SeriesApi<
 		}
 	}
 
+	public moveToPane(paneIndex: number): void {
+		this._series.model().moveSeriesToPane(this._series, paneIndex);
+	}
+
 	private _onDataChanged(scope: DataChangedScope): void {
 		if (this._dataChangedDelegate.hasListeners()) {
 			this._dataChangedDelegate.fire(scope);
