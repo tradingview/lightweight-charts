@@ -26,8 +26,8 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addBarSeries();
-	const secondSeries = chart.addBarSeries({ pane: 1 });
-	const thirdSeries = chart.addBarSeries({ pane: 2 });
+	const secondSeries = chart.addBarSeries({}, 1);
+	const thirdSeries = chart.addBarSeries({}, 2);
 
 	const startValue = Math.floor(container.getBoundingClientRect().height / 100) * 100;
 
@@ -39,8 +39,8 @@ function runTestCase(container) {
 	return new Promise((resolve, reject) => {
 		requestAnimationFrame(() => {
 			try {
-				chart.setCrosshairPosition(thirdSeriesData[10].value, thirdSeriesData[10].time, thirdSeries);
-				return resolve();
+				chart.setCrosshairPosition(thirdSeriesData[1].value, thirdSeriesData[1].time, thirdSeries);
+				return requestAnimationFrame(resolve);
 			} catch (error) {
 				reject(error);
 			}

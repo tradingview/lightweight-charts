@@ -26,10 +26,10 @@ function beforeInteractions(container) {
 }
 
 function afterInteractions() {
-	secondSeries.applyOptions({ pane: 1 });
+	secondSeries.moveToPane(1);
 	return new Promise(resolve => {
 		requestAnimationFrame(() => {
-			secondSeries.applyOptions({ pane: 0 });
+			secondSeries.moveToPane(0);
 			requestAnimationFrame(resolve);
 		});
 	});

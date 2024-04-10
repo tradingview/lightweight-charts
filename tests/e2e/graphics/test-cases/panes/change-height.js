@@ -26,8 +26,8 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addBarSeries();
-	const secondSeries = chart.addBarSeries({ pane: 1 });
-	const thirdSeries = chart.addBarSeries({ pane: 2 });
+	const secondSeries = chart.addBarSeries({}, 1);
+	const thirdSeries = chart.addBarSeries({}, 2);
 
 	const startValue = Math.floor(container.getBoundingClientRect().height / 100) * 100;
 
@@ -38,9 +38,7 @@ function runTestCase(container) {
 		try {
 			requestAnimationFrame(() => {
 				chart.panes()[1].setHeight(300);
-				requestAnimationFrame(() => {
-					resolve(true);
-				});
+				return requestAnimationFrame(resolve);
 			});
 		} catch (error) {
 			reject(error);

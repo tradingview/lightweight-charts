@@ -26,7 +26,7 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addBarSeries();
-	const secondSeries = chart.addBarSeries({ pane: 1 });
+	const secondSeries = chart.addBarSeries({}, 1);
 
 	const startValue = Math.floor(container.getBoundingClientRect().height / 100) * 100;
 
