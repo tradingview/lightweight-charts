@@ -241,8 +241,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._addSeriesImpl('Histogram', histogramStyleDefaults, options, paneIndex);
 	}
 
-	public addLineSeries(options?: LineSeriesPartialOptions): ISeriesApi<'Line', HorzScaleItem> {
-		return this._addSeriesImpl('Line', lineStyleDefaults, options);
+	public addLineSeries(options?: LineSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Line', HorzScaleItem> {
+		return this._addSeriesImpl('Line', lineStyleDefaults, options, paneIndex);
 	}
 
 	public removeSeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): void {
