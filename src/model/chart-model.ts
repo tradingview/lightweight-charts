@@ -456,8 +456,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
 
-	private _suppressSeriesMoving: boolean = false;
-
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
 	private _gradientColorsCache: GradientColorsCache | null = null;
@@ -1037,8 +1035,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	public moveSeriesToPane(series: Series<SeriesType>, newPaneIndex: number): void {
 		const fromPaneIndex = this.seriesPaneIndex(series);
-		if (newPaneIndex === fromPaneIndex || this._suppressSeriesMoving) {
-			// no change
+		if (newPaneIndex === fromPaneIndex) {
 			return;
 		}
 
@@ -1158,7 +1155,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private _cleanupIfPaneIsEmpty(pane: Pane): void {
 		if (pane.dataSources().length === 0 && this._panes.length > 1) {
 			this._panes.splice(this.getPaneIndex(pane), 1);
-			this._suppressSeriesMoving = false;
 			const mask = new InvalidateMask(InvalidationLevel.Full);
 			this._invalidate(mask);
 		}

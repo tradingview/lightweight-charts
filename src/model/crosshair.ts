@@ -259,9 +259,6 @@ export class Crosshair extends DataSource {
 	}
 
 	public paneViews(pane: Pane): readonly IPaneView[] {
-		if (this._pane === null) {
-			return [];
-		}
 		let crosshairPaneView = this._crosshairPaneViewCache.get(pane);
 		if (!crosshairPaneView) {
 			crosshairPaneView = new CrosshairPaneView(this, pane);
@@ -303,7 +300,6 @@ export class Crosshair extends DataSource {
 		this._model.panes().forEach((pane: Pane) => {
 			this._crosshairPaneViewCache.get(pane)?.update();
 		});
-		this._crosshairPaneViewCache.get(this._pane as Pane)?.update();
 		this._priceAxisViews.forEach((value: PriceAxisView) => value.update());
 		this._timeAxisView.update();
 		this._markersPaneView.update();
