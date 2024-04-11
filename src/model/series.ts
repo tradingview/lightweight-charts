@@ -162,7 +162,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
 
-	public constructor(model: IChartModelBase, options: SeriesOptionsInternal<T>, seriesType: T, paneIndex?: number, customPaneView?: ICustomSeriesPaneView<unknown>) {
+	public constructor(model: IChartModelBase, options: SeriesOptionsInternal<T>, seriesType: T, customPaneView?: ICustomSeriesPaneView<unknown>) {
 		super(model);
 		this._options = options;
 		this._seriesType = seriesType;
