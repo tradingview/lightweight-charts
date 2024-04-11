@@ -47,11 +47,7 @@ export class Pane implements IDestroyable {
 		const options = model.options();
 
 		this._leftPriceScale = this._createPriceScale(DefaultPriceScaleId.Left, options.leftPriceScale);
-		if (initialPaneIndex === 0) {
-			this._rightPriceScale = this._createPriceScale(DefaultPriceScaleId.Right, options.rightPriceScale);
-		} else {
-			this._rightPriceScale = this._createPriceScale(DefaultPriceScaleId.NonPrimary, options.nonPrimaryPriceScale);
-		}
+		this._rightPriceScale = this._createPriceScale(DefaultPriceScaleId.Right, options.rightPriceScale);
 
 		this._leftPriceScale.modeChanged().subscribe(this._onPriceScaleModeChanged.bind(this, this._leftPriceScale), this);
 		this._rightPriceScale.modeChanged().subscribe(this._onPriceScaleModeChanged.bind(this, this._rightPriceScale), this);
@@ -66,10 +62,6 @@ export class Pane implements IDestroyable {
 
 		if (this._rightPriceScale.id() === DefaultPriceScaleId.Right && options.rightPriceScale) {
 			this._rightPriceScale.applyOptions(options.rightPriceScale);
-		}
-
-		if (this._rightPriceScale.id() === DefaultPriceScaleId.NonPrimary && options.nonPrimaryPriceScale) {
-			this._rightPriceScale.applyOptions(options.nonPrimaryPriceScale);
 		}
 
 		if (options.localization) {

@@ -28,10 +28,6 @@ export function chartOptionsDefaults<HorzScaleItem>(): ChartOptionsInternal<Horz
 			...priceScaleOptionsDefaults,
 			visible: true,
 		},
-		nonPrimaryPriceScale: {
-			...priceScaleOptionsDefaults,
-			visible: true,
-		},
 		timeScale: timeScaleOptionsDefaults,
 		watermark: watermarkOptionsDefaults,
 		localization: {

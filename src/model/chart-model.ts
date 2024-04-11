@@ -295,8 +295,6 @@ export interface ChartOptionsBase {
 	 */
 	overlayPriceScales: OverlayPriceScaleOptions;
 
-	/** Structure describing price scale options for non-primary pane */
-	nonPrimaryPriceScale: VisiblePriceScaleOptions;
 	/**
 	 * Time scale options
 	 */
