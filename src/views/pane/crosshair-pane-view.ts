@@ -6,7 +6,8 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { IPaneView } from './ipane-view';
 
 export class CrosshairPaneView implements IPaneView {
-	private _validated: WeakMap<Pane, boolean> = new WeakMap();
+	private _invalidated: boolean = true;
+	private readonly _pane: Pane;
 	private readonly _source: Crosshair;
 	private readonly _rendererData: CrosshairRendererData = {
 		vertLine: {
@@ -26,28 +27,26 @@ export class CrosshairPaneView implements IPaneView {
 	};
 	private _renderer: CrosshairRenderer = new CrosshairRenderer(this._rendererData);
 
-	public constructor(source: Crosshair) {
+	public constructor(source: Crosshair, pane: Pane) {
 		this._source = source;
+		this._pane = pane;
 	}
 
-	public update(pane: Pane | null): void {
-		if (pane !== null) {
-			this._validated.delete(pane);
-		} else {
-			this._validated = new WeakMap();
-		}
+	public update(): void {
+		this._invalidated = true;
 	}
 
 	public renderer(pane: Pane): IPaneRenderer {
-		if (!this._validated.get(pane)) {
-			this._updateImpl(pane);
-			this._validated.set(pane, true);
+		if (this._invalidated) {
+			this._updateImpl();
+			this._invalidated = false;
 		}
 
 		return this._renderer;
 	}
 
-	private _updateImpl(pane: Pane): void {
+	private _updateImpl(): void {
+		const pane = this._pane;
 		const visible = this._source.visible();
 		const crosshairOptions = pane.model().options().crosshair;
 
@@ -59,7 +58,7 @@ export class CrosshairPaneView implements IPaneView {
 			return;
 		}
 
-		data.horzLine.visible = visible && this._source.horzLineVisible(pane);
+		data.horzLine.visible = visible && this._source.horzLineVisible(this._pane);
 		data.vertLine.visible = visible && this._source.vertLineVisible();
 
 		data.horzLine.lineWidth = crosshairOptions.horzLine.width;

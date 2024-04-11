@@ -140,8 +140,8 @@ export class Crosshair extends DataSource {
 	private _subscribed: boolean = false;
 	private readonly _currentPosPriceProvider: PriceAndCoordinateProvider;
 	private readonly _options: CrosshairOptions;
-	private readonly _paneView: CrosshairPaneView;
 
+	private _crosshairPaneViewCache: WeakMap<Pane, CrosshairPaneView> = new WeakMap();
 	private _x: Coordinate = NaN as Coordinate;
 	private _y: Coordinate = NaN as Coordinate;
 
@@ -196,7 +196,6 @@ export class Crosshair extends DataSource {
 		);
 
 		this._timeAxisView = new CrosshairTimeAxisView(this, model, currentPosTimeProvider);
-		this._paneView = new CrosshairPaneView(this);
 	}
 
 	public options(): Readonly<CrosshairOptions> {
@@ -260,7 +259,15 @@ export class Crosshair extends DataSource {
 	}
 
 	public paneViews(pane: Pane): readonly IPaneView[] {
-		return this._pane !== null ? [this._paneView, this._markersPaneView] : [];
+		if (this._pane === null) {
+			return [];
+		}
+		let crosshairPaneView = this._crosshairPaneViewCache.get(pane);
+		if (!crosshairPaneView) {
+			crosshairPaneView = new CrosshairPaneView(this, pane);
+			this._crosshairPaneViewCache.set(pane, crosshairPaneView);
+		}
+		return [crosshairPaneView, this._markersPaneView];
 	}
 
 	public horzLineVisible(pane: Pane): boolean {
@@ -293,7 +300,10 @@ export class Crosshair extends DataSource {
 	}
 
 	public updateAllViews(): void {
-		this._paneView.update(this.pane());
+		this._model.panes().forEach((pane: Pane) => {
+			this._crosshairPaneViewCache.get(pane)?.update();
+		});
+		this._crosshairPaneViewCache.get(this._pane as Pane)?.update();
 		this._priceAxisViews.forEach((value: PriceAxisView) => value.update());
 		this._timeAxisView.update();
 		this._markersPaneView.update();
