@@ -27,7 +27,7 @@ import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
 import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
-import { PaneSeparator, SEPARATOR_HEIGHT } from './pane-separator';
+import { PaneSeparator, SeparatorConstants } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
@@ -490,7 +490,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		const paneWidth = Math.max(width - leftPriceAxisWidth - rightPriceAxisWidth, 0);
 
 		const separatorCount = this._paneSeparators.length;
-		const separatorHeight = SEPARATOR_HEIGHT;
+		const separatorHeight = SeparatorConstants.SeparatorHeight;
 		const separatorsHeight = separatorHeight * separatorCount;
 		const timeAxisVisible = this._options.timeScale.visible;
 		let timeAxisHeight = timeAxisVisible ? Math.max(this._timeAxisWidget.optimalHeight(), this._options.timeScale.minimumHeight) : 0;
