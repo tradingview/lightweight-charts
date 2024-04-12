@@ -1,5 +1,4 @@
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
-import { PaneWidget } from '../gui/pane-widget';
 
 import { assert, ensure, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
@@ -316,10 +315,6 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	public swapPanes(first: number, second: number): void {
 		this._chartWidget.model().swapPanes(first, second);
-	}
-
-	public getPaneElements(): HTMLElement[] {
-		return this._chartWidget.paneWidgets().map((paneWidget: PaneWidget) => paneWidget.getPaneCell());
 	}
 
 	public autoSizeActive(): boolean {

@@ -358,13 +358,6 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	swapPanes(first: number, second: number): void;
 
 	/**
-	 * Returns the DOM elements of the chart panes.
-	 *
-	 * @returns Array of the chart panes.
-	 */
-	getPaneElements(): HTMLElement[];
-
-	/**
 	 * Returns the active state of the `autoSize` option. This can be used to check
 	 * whether the chart is handling resizing automatically with a `ResizeObserver`.
 	 *

@@ -1155,8 +1155,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private _cleanupIfPaneIsEmpty(pane: Pane): void {
 		if (pane.dataSources().length === 0 && this._panes.length > 1) {
 			this._panes.splice(this.getPaneIndex(pane), 1);
-			const mask = new InvalidateMask(InvalidationLevel.Full);
-			this._invalidate(mask);
+			this.fullUpdate();
 		}
 	}
 }
