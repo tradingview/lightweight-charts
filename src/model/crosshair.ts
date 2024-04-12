@@ -136,12 +136,12 @@ export class Crosshair extends DataSource {
 	private readonly _model: IChartModelBase;
 	private _priceAxisViews: Map<PriceScale, CrosshairPriceAxisView> = new Map();
 	private readonly _timeAxisView: CrosshairTimeAxisView;
-	private readonly _markersPaneView: CrosshairMarksPaneView;
 	private _subscribed: boolean = false;
 	private readonly _currentPosPriceProvider: PriceAndCoordinateProvider;
 	private readonly _options: CrosshairOptions;
 
 	private _crosshairPaneViewCache: WeakMap<Pane, CrosshairPaneView> = new WeakMap();
+	private readonly _markersPaneViewCache: WeakMap<Pane, CrosshairMarksPaneView> = new WeakMap();
 	private _x: Coordinate = NaN as Coordinate;
 	private _y: Coordinate = NaN as Coordinate;
 
@@ -152,7 +152,6 @@ export class Crosshair extends DataSource {
 		super();
 		this._model = model;
 		this._options = options;
-		this._markersPaneView = new CrosshairMarksPaneView(model, this);
 
 		const valuePriceProvider = (rawPriceProvider: RawPriceProvider, rawCoordinateProvider: RawCoordinateProvider) => {
 			return (priceScale: PriceScale) => {
@@ -259,12 +258,20 @@ export class Crosshair extends DataSource {
 	}
 
 	public paneViews(pane: Pane): readonly IPaneView[] {
+		if (this._pane === null) {
+			return [];
+		}
 		let crosshairPaneView = this._crosshairPaneViewCache.get(pane);
 		if (!crosshairPaneView) {
 			crosshairPaneView = new CrosshairPaneView(this, pane);
 			this._crosshairPaneViewCache.set(pane, crosshairPaneView);
 		}
-		return [crosshairPaneView, this._markersPaneView];
+		let markersPaneView = this._markersPaneViewCache.get(pane);
+		if (!markersPaneView) {
+			markersPaneView = new CrosshairMarksPaneView(this._model, this, pane);
+			this._markersPaneViewCache.set(pane, markersPaneView);
+		}
+		return [crosshairPaneView, markersPaneView];
 	}
 
 	public horzLineVisible(pane: Pane): boolean {
@@ -299,10 +306,11 @@ export class Crosshair extends DataSource {
 	public updateAllViews(): void {
 		this._model.panes().forEach((pane: Pane) => {
 			this._crosshairPaneViewCache.get(pane)?.update();
+			this._markersPaneViewCache.get(pane)?.update();
 		});
+		this._crosshairPaneViewCache.get(this._pane as Pane)?.update();
 		this._priceAxisViews.forEach((value: PriceAxisView) => value.update());
 		this._timeAxisView.update();
-		this._markersPaneView.update();
 	}
 
 	private _priceScaleByPane(pane: Pane): PriceScale | null {
