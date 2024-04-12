@@ -60,7 +60,7 @@ export class Pane implements IDestroyable {
 			this._leftPriceScale.applyOptions(options.leftPriceScale);
 		}
 
-		if (this._rightPriceScale.id() === DefaultPriceScaleId.Right && options.rightPriceScale) {
+		if (options.rightPriceScale) {
 			this._rightPriceScale.applyOptions(options.rightPriceScale);
 		}
 

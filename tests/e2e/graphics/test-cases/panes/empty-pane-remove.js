@@ -42,7 +42,7 @@ function runTestCase(container) {
 	return new Promise((resolve, reject) => {
 		requestAnimationFrame(() => {
 			try {
-				console.assert(chart.getPaneElements().length === 2, 'Pane should be removed');
+				console.assert(chart.panes().length === 2, 'Pane should be removed');
 				return requestAnimationFrame(resolve);
 			} catch (error) {
 				reject(error);

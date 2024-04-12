@@ -40,7 +40,7 @@ function runTestCase(container) {
 			try {
 				chart.removePane(1);
 				requestAnimationFrame(() => {
-					console.assert(chart.getPaneElements().length === 2, 'Pane should be removed');
+					console.assert(chart.panes().length === 2, 'Pane should be removed');
 					return	resolve();
 				});
 			} catch (e) {
