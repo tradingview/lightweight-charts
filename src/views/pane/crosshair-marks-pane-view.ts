@@ -49,16 +49,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 	}
 
 	public update(updateType?: UpdateType): void {
-		const serieses = this._pane.dataSources();
-		if (serieses.length !== this._markersRenderers.length) {
-			this._markersData = serieses.map(createEmptyMarkerData);
-			this._markersRenderers = this._markersData.map((data: MarksRendererData) => {
-				const res = new PaneRendererMarks();
-				res.setData(data);
-				return res;
-			});
-			this._compositeRenderer.setRenderers(this._markersRenderers);
-		}
+		this._createMarkerRenderersIfNeeded();
 
 		this._invalidated = true;
 	}
@@ -72,18 +63,29 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 		return this._compositeRenderer;
 	}
 
+	private _createMarkerRenderersIfNeeded(): void {
+		const serieses = this._pane.orderedSources();
+		if (serieses.length !== this._markersRenderers.length) {
+			this._markersData = serieses.map(createEmptyMarkerData);
+			this._markersRenderers = this._markersData.map((data: MarksRendererData) => {
+				const res = new PaneRendererMarks();
+				res.setData(data);
+				return res;
+			});
+			this._compositeRenderer.setRenderers(this._markersRenderers);
+		}
+	}
+
 	private _updateImpl(): void {
 		const forceHidden = this._crosshair.options().mode === CrosshairMode.Hidden;
-		const serieses = this._pane.dataSources() as ISeries<SeriesType>[];
+		const serieses = this._pane.orderedSources() as ISeries<SeriesType>[];
 		const timePointIndex = this._crosshair.appliedIndex();
 		const timeScale = this._chartModel.timeScale();
+		this._createMarkerRenderersIfNeeded();
 
 		serieses.forEach((s: ISeries<SeriesType>, index: number) => {
 			const data = this._markersData[index];
 			const seriesData = s.markerDataAtIndex(timePointIndex);
-			if (!data) {
-				return;
-			}
 			if (forceHidden || seriesData === null || !s.visible()) {
 				data.visibleRange = null;
 				return;
