@@ -48,6 +48,9 @@ export interface VerticalGradientColor {
  */
 export type Background = SolidColor | VerticalGradientColor;
 
+/**
+ * Represents panes customizations.
+ */
 export interface LayoutPanesOptions {
 	/**
 	* Enable panes resizing
