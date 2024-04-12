@@ -1,6 +1,6 @@
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
-import { assert, ensure, ensureDefined } from '../helpers/assertions';
+import { assert, ensure, ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
@@ -10,6 +10,7 @@ import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, Whitespace
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
+import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
@@ -127,7 +128,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams<HorzScaleItem>> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi<HorzScaleItem>;
-	private readonly _panes: WeakMap<Pane, PaneApi> = new WeakMap();
+	private readonly _panes: WeakMap<Pane, PaneApi<HorzScaleItem>> = new WeakMap();
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
 	public constructor(container: HTMLElement, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, options?: DeepPartial<ChartOptionsImpl<HorzScaleItem>>) {
@@ -325,8 +326,19 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._chartWidget.element();
 	}
 
-	public panes(): IPaneApi[] {
+	public panes(): IPaneApi<HorzScaleItem>[] {
 		return this._chartWidget.model().panes().map((pane: Pane) => this._getPaneApi(pane));
+	}
+
+	public getPaneBySeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): IPaneApi<HorzScaleItem> {
+		const series = this._seriesMap.get(seriesApi);
+		const pane = ensureNotNull(this._chartWidget.model().paneForSource(series as IPriceDataSource));
+		return this._getPaneApi(pane);
+	}
+
+	public getSeriesByPane(paneApi: PaneApi<HorzScaleItem>): ISeriesApi<SeriesType, HorzScaleItem>[] {
+		const pane = this._chartWidget.model().panes()[paneApi.paneIndex()];
+		return pane.dataSources().map((source: IPriceDataSource) => this._mapSeriesToApi(source as Series<SeriesType>)) ?? [];
 	}
 
 	public paneSize(paneIndex: number = 0): PaneSize {
@@ -422,10 +434,10 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		};
 	}
 
-	private _getPaneApi(pane: Pane): PaneApi {
+	private _getPaneApi(pane: Pane): PaneApi<HorzScaleItem> {
 		let result = this._panes.get(pane);
 		if (!result) {
-			result = new PaneApi(this._chartWidget, pane);
+			result = new PaneApi(this, this._chartWidget, pane);
 			this._panes.set(pane, result);
 		}
 

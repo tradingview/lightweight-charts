@@ -3,15 +3,20 @@ import { IChartWidgetBase } from '../gui/chart-widget';
 import { assert } from '../helpers/assertions';
 
 import { Pane } from '../model/pane';
+import { SeriesType } from '../model/series-options';
 
+import { IChartApiBase } from './ichart-api';
 import { IPaneApi } from './ipane-api';
+import { ISeriesApi } from './iseries-api';
 
-export class PaneApi implements IPaneApi {
+export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 	private _chartWidget: IChartWidgetBase;
 	private _pane: Pane;
+	private readonly _chartApi: IChartApiBase<HorzScaleItem>;
 
-	public constructor(chartWidget: IChartWidgetBase, pane: Pane) {
+	public constructor(chartApi: IChartApiBase<HorzScaleItem>, chartWidget: IChartWidgetBase, pane: Pane) {
 		this._chartWidget = chartWidget;
+		this._chartApi = chartApi;
 		this._pane = pane;
 	}
 
@@ -39,5 +44,9 @@ export class PaneApi implements IPaneApi {
 		assert(paneIndex >= 0 && paneIndex < this._chartWidget.paneWidgets().length, 'Invalid pane index');
 
 		this._chartWidget.model().swapPanes(currentIndex, paneIndex);
+	}
+
+	public series(): ISeriesApi<SeriesType, HorzScaleItem>[] {
+		return this._chartApi.getSeriesByPane(this);
 	}
 }

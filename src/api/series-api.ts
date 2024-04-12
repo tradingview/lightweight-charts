@@ -28,6 +28,7 @@ import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 import { IPriceScaleApiProvider } from './chart-api';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { type IChartApiBase } from './ichart-api';
+import { IPaneApi } from './ipane-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, DataChangedHandler, DataChangedScope, ISeriesApi } from './iseries-api';
@@ -243,6 +244,10 @@ export class SeriesApi<
 		if (primitive.detached) {
 			primitive.detached();
 		}
+	}
+
+	public getPane(): IPaneApi<HorzScaleItem> {
+		return this._chartApi.getPaneBySeries(this);
 	}
 
 	public moveToPane(paneIndex: number): void {
