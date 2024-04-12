@@ -779,7 +779,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	private _getMouseEventParamsImpl(
 		index: TimePointIndex | null,
-		details: Point | null,
+		point: Point | null,
 		event: TouchMouseEventData | null,
 		pane?: PaneWidget
 	): MouseEventParamsImpl {
@@ -818,7 +818,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return {
 			originalTime: clientTime,
 			index: index ?? undefined,
-			point: details ?? undefined,
+			point: point ?? undefined,
 			paneIndex: paneIndex !== -1 ? paneIndex : undefined,
 			hoveredSeries,
 			seriesData,
@@ -830,10 +830,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	private _onPaneWidgetClicked(
 		pane: PaneWidget,
 		time: TimePointIndex | null,
-		details: Point | null,
+		point: Point | null,
 		event: TouchMouseEventData
 	): void {
-		this._clicked.fire(() => this._getMouseEventParamsImpl(time, details, event, pane));
+		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point, event, pane));
 	}
 
 	private _onPaneWidgetDblClicked(
@@ -847,10 +847,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	private _onPaneWidgetCrosshairMoved(
 		time: TimePointIndex | null,
-		details: Point | null,
+		point: Point | null,
 		event: TouchMouseEventData | null
 	): void {
-		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, details, event));
+		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
 	private _updateTimeAxisVisibility(): void {
