@@ -614,7 +614,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	public createPane(index?: number): Pane {
 		if (index !== undefined) {
-			index = Math.max(0, Math.min(this._panes.length, index));
+			assert(index >= 0, 'Index should be greater or equal to 0');
+			index = Math.min(this._panes.length, index);
 			if (index > this._panes.length) {
 				for (let i = this._panes.length; i < index; i++) {
 					this.createPane(i);
@@ -928,12 +929,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], paneIndex: number = 0, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
-		if (this._panes.length - 1 <= paneIndex) {
-			paneIndex = Math.max(0, Math.min(this._panes.length, paneIndex));
-			this.createPane(paneIndex);
-		}
+		const pane = this.createPane(paneIndex);
 
-		const series = this._createSeries(options, seriesType, paneIndex, customPaneView);
+		const series = this._createSeries(options, seriesType, pane, customPaneView);
 		this._serieses.push(series);
 
 		if (this._serieses.length === 1) {
@@ -1121,9 +1119,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
 	}
 
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, paneIndex: number, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
+	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
 		const series = new Series<T>(this, options, seriesType, customPaneView);
-		const pane = this._panes[paneIndex];
 		this._addSeriesToPane(series, pane);
 
 		return series;
