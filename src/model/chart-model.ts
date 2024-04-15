@@ -1026,7 +1026,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	public seriesPaneIndex(series: Series<SeriesType>): number | null {
 		for (let i = 0; i < this._panes.length; i += 1) {
-			if (this._panes[i].dataSources().includes(series)) {
+			if (this._panes[i].series().includes(series)) {
 				return i;
 			}
 		}

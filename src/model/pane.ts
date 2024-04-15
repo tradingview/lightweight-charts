@@ -9,8 +9,14 @@ import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale'
 import { Grid } from './grid';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
+import { ISeries, Series } from './series';
+import { SeriesType } from './series-options';
 import { sortSources } from './sort-sources';
 import { ITimeScale } from './time-scale';
+
+function isSeries(source: IPriceDataSource): source is Series<SeriesType> {
+	return source instanceof Series;
+}
 
 export const DEFAULT_STRETCH_FACTOR = 1000;
 
@@ -151,6 +157,10 @@ export class Pane implements IDestroyable {
 		});
 
 		this.updateAllSources();
+	}
+
+	public series(): readonly Series<SeriesType>[] {
+		return this._dataSources.filter(isSeries);
 	}
 
 	public dataSources(): readonly IPriceDataSource[] {
@@ -327,6 +337,10 @@ export class Pane implements IDestroyable {
 		}
 
 		return this._cachedOrderedSources;
+	}
+
+	public orderedSeries(): readonly ISeries<SeriesType>[] {
+		return this.orderedSources().filter(isSeries);
 	}
 
 	public onDestroyed(): ISubscription {
