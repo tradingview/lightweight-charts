@@ -76,14 +76,36 @@ or submit your own.
 
 :::
 
-## How To / Examples
+## How To
 
 A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
 
 import { useDocsSidebar } from "@docusaurus/theme-common/internal";
+export const HowToList = () => {
+	const examplesCategory = useDocsSidebar().items.find(
+		item => item.type === "category" && item.label === "How To"
+	);
+	const examples = examplesCategory.items.filter(doc => doc.type === "link");
+	return (
+		<ul>
+			{examples.map(docLink => (
+				<li key={docLink.docId}>
+					<a href={docLink.href}>{docLink.label}</a>
+				</li>
+			))}
+		</ul>
+	);
+};
+
+<HowToList />
+
+## Examples / Demos
+
+A collection of demos showcasing the various capabilities of the library.
+
 export const ExamplesList = () => {
 	const examplesCategory = useDocsSidebar().items.find(
-		item => item.type === "category" && item.label === "How To / Examples"
+		item => item.type === "category" && item.label === "Examples / Demos"
 	);
 	const examples = examplesCategory.items.filter(doc => doc.type === "link");
 	return (
@@ -98,9 +120,3 @@ export const ExamplesList = () => {
 };
 
 <ExamplesList />
-
-:::tip
-
-More examples can be viewed on the [Lightweight Charts™ product page](https://www.tradingview.com/lightweight-charts/).
-
-:::

@@ -1,0 +1,42 @@
+---
+title: Infinite history
+sidebar_label: Infinite history
+description: An example of how to load historical data on demand
+pagination_prev: null
+pagination_next: null
+keywords:
+  - history
+---
+
+This sample showcases the capability of Lightweight Charts™ to manage and display
+an ever-expanding dataset, resembling a live feed that loads older data when the
+user scrolls back in time. The example depicts a chart that initially loads a
+limited amount of data, but later fetches additional data as required.
+
+Key to this functionality is the
+[`subscribeVisibleLogicalRangeChange`](docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange)
+method. This function is triggered when the visible data range changes, in this
+case, when the user scrolls beyond the initially loaded data.
+
+By checking if the amount of unseen data on the left of the screen falls below a
+certain threshold (in this example, 10 units), it's determined whether
+additional data needs to be loaded. New data is appended through a simulated
+delay using `setTimeout`.
+
+This kind of infinite history functionality is typical of financial charts which
+frequently handle large and continuously expanding datasets.
+
+import UsageGuidePartial from '../_usage-guide-partial.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./infinite-history.js';
+
+<CodeBlock
+	replaceThemeConstants
+	chart
+	className="language-js"
+	hideableCode
+	chartOnTop
+	codeUsage={<UsageGuidePartial />}
+>
+	{code}
+</CodeBlock>

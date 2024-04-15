@@ -33,7 +33,7 @@ export function removeUnwantedLines(originalString) {
 }
 
 const EnhancedCodeBlock = props => {
-	const { chart, replaceThemeConstants, hideableCode, chartOnly, iframeStyle, replaceTabs = true, ...rest } = props;
+	const { chart, replaceThemeConstants, hideableCode, chartOnly, chartOnTop = false, iframeStyle, replaceTabs = true, codeUsage, ...rest } = props;
 	let { children } = props;
 	const { colorMode } = useColorMode();
 	const isDarkTheme = colorMode === 'dark';
@@ -48,19 +48,19 @@ const EnhancedCodeBlock = props => {
 	children = removeUnwantedLines(children);
 
 	if (chart || hideableCode) {
-		return (
-			<>
-				{hideableCode && <>
-					<input
-						id={uniqueId}
-						type="checkbox"
-						className="toggle-hidden-lines"
-					/>
-					<label className="toggle-label" htmlFor={uniqueId}>Show all code</label></>}
-				{!chartOnly && <CodeBlock {...rest}>{children}</CodeBlock>}
-				{chart && <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={children} iframeStyle={iframeStyle} />}</BrowserOnly>}
-			</>
-		);
+		const codeBlockSection = !chartOnly && <CodeBlock {...rest}>{children}</CodeBlock>;
+		const chartSection = chart && <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={children} iframeStyle={iframeStyle} />}</BrowserOnly>;
+		const hideCodeToggle = (hideableCode && <>
+			<input
+				id={uniqueId}
+				type="checkbox"
+				className="toggle-hidden-lines"
+			/>
+			<label className="toggle-label" htmlFor={uniqueId}>Show all code</label></>);
+		if (chartOnTop) {
+			return <>{chartSection}{codeUsage}{hideCodeToggle}{codeBlockSection}</>;
+		}
+		return <>{codeUsage}{hideCodeToggle}{codeBlockSection}{chartSection}</>;
 	}
 
 	return <CodeBlock {...rest}>{children}</CodeBlock>;
