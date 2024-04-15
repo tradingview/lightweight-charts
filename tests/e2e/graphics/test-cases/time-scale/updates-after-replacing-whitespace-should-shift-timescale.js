@@ -115,6 +115,7 @@ function runTestCase(container) {
             */
 			rightOffset: 2,
 		},
+		layout: { attributionLogo: false },
 	}));
 
 	const s1 = chart.addCandlestickSeries();

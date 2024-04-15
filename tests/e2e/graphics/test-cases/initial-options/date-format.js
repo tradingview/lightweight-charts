@@ -17,6 +17,7 @@ function runTestCase(container) {
 		localization: {
 			dateFormat: 'MMM dd, yyyy',
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addAreaSeries();

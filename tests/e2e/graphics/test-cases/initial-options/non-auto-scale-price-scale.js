@@ -17,6 +17,7 @@ function runTestCase(container) {
 		rightPriceScale: {
 			autoScale: false,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries();

@@ -79,6 +79,7 @@ function runTestCase(container) {
 		timeScale: {
 			timeVisible: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series = chart.addAreaSeries();

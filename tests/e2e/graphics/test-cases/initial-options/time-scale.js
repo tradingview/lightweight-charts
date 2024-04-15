@@ -28,6 +28,7 @@ function runTestCase(container) {
 			rightOffset: 10,
 			barSpacing: 12,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addCandlestickSeries();

@@ -12,6 +12,7 @@ function runTestCase(container) {
 			timeVisible: true,
 			secondsVisible: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries();

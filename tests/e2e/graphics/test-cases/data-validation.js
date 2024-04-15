@@ -14,7 +14,7 @@ function runTestCase(container) {
 		// passed
 	}
 
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 	const lineSeries = chart.addLineSeries();
 	const barSeries = chart.addBarSeries();
 

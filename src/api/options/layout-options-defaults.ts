@@ -14,4 +14,5 @@ export const layoutOptionsDefaults: LayoutOptions = {
 		enableResize: true,
 		separatorColor: '#2B2B43',
 	},
+	attributionLogo: true,
 };
