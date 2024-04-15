@@ -48,8 +48,10 @@ class TrendLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
 			ctx.moveTo(x1Scaled, y1Scaled);
 			ctx.lineTo(x2Scaled, y2Scaled);
 			ctx.stroke();
-			this._drawTextLabel(scope, this._text1, x1Scaled, y1Scaled, true);
-			this._drawTextLabel(scope, this._text2, x2Scaled, y2Scaled, false);
+			if (this._options.showLabels) {
+				this._drawTextLabel(scope, this._text1, x1Scaled, y1Scaled, true);
+				this._drawTextLabel(scope, this._text2, x2Scaled, y2Scaled, false);
+			}
 		});
 	}
 
