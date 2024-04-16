@@ -40,4 +40,11 @@ export interface IPaneApi<HorzScaleItem> {
 	 * @returns An array of series.
 	 */
 	series(): ISeriesApi<SeriesType, HorzScaleItem>[];
+
+	/**
+	 * Retrieves the HTML element of the pane.
+	 *
+	 * @returns The HTML element of the pane.
+	 */
+	getHTMLElement(): HTMLElement;
 }

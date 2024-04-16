@@ -47,6 +47,10 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 	}
 
 	public series(): ISeriesApi<SeriesType, HorzScaleItem>[] {
-		return this._chartApi.getSeriesByPane(this);
+		return this._chartApi.getSeriesByPane(this.paneIndex());
+	}
+
+	public getHTMLElement(): HTMLElement {
+		return this._chartWidget.paneWidgets()[this.paneIndex()].getElement();
 	}
 }

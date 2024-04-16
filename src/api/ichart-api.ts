@@ -356,7 +356,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @param pane - Pane.
 	 * @returns Array of series.
 	 */
-	getSeriesByPane(paneApi: IPaneApi<HorzScaleItem>): ISeriesApi<SeriesType, HorzScaleItem>[];
+	getSeriesByPane(paneIndex: number): ISeriesApi<SeriesType, HorzScaleItem>[];
 
 	/**
 	 * Removes a pane with index
