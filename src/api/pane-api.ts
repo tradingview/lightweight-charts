@@ -3,21 +3,25 @@ import { IChartWidgetBase } from '../gui/chart-widget';
 import { assert } from '../helpers/assertions';
 
 import { Pane } from '../model/pane';
+import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
 
-import { IChartApiBase } from './ichart-api';
 import { IPaneApi } from './ipane-api';
 import { ISeriesApi } from './iseries-api';
 
 export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 	private _chartWidget: IChartWidgetBase;
 	private _pane: Pane;
-	private readonly _chartApi: IChartApiBase<HorzScaleItem>;
+	private readonly _seriesApiGetter: (series: Series<SeriesType>) => ISeriesApi<SeriesType, HorzScaleItem>;
 
-	public constructor(chartApi: IChartApiBase<HorzScaleItem>, chartWidget: IChartWidgetBase, pane: Pane) {
+	public constructor(
+		chartWidget: IChartWidgetBase,
+		seriesApiGetter: (series: Series<SeriesType>) => ISeriesApi<SeriesType, HorzScaleItem>,
+		pane: Pane
+	) {
 		this._chartWidget = chartWidget;
-		this._chartApi = chartApi;
 		this._pane = pane;
+		this._seriesApiGetter = seriesApiGetter;
 	}
 
 	public getHeight(): number {
@@ -47,7 +51,7 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 	}
 
 	public getSeries(): ISeriesApi<SeriesType, HorzScaleItem>[] {
-		return this._chartApi.getSeriesByPane(this.paneIndex());
+		return this._pane.series().map((source: Series<SeriesType>) => this._seriesApiGetter(source)) ?? [];
 	}
 
 	public getHTMLElement(): HTMLElement {

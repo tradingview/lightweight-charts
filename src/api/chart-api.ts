@@ -1,6 +1,6 @@
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
-import { assert, ensure, ensureDefined, ensureNotNull } from '../helpers/assertions';
+import { assert, ensure, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
@@ -10,7 +10,6 @@ import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, Whitespace
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
-import { IPriceDataSource } from '../model/iprice-data-source';
 import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
@@ -330,17 +329,6 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._chartWidget.model().panes().map((pane: Pane) => this._getPaneApi(pane));
 	}
 
-	public getPaneBySeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): IPaneApi<HorzScaleItem> {
-		const series = this._seriesMap.get(seriesApi);
-		const pane = ensureNotNull(this._chartWidget.model().paneForSource(series as IPriceDataSource));
-		return this._getPaneApi(pane);
-	}
-
-	public getSeriesByPane(paneIndex: number): ISeriesApi<SeriesType, HorzScaleItem>[] {
-		const pane = this._chartWidget.model().panes()[paneIndex];
-		return pane.series().map((source: Series<SeriesType>) => this._mapSeriesToApi(source)) ?? [];
-	}
-
 	public paneSize(paneIndex: number = 0): PaneSize {
 		const size = this._chartWidget.paneSize(paneIndex);
 		return {
@@ -386,7 +374,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(styleDefaults), options) as SeriesOptionsMap[TSeries];
 		const series = this._chartWidget.model().createSeries(type, strictOptions, paneIndex, customPaneView);
 
-		const res = new SeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions>(series, this, this, this, this._horzScaleBehavior);
+		const res = new SeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions>(series, this, this, this, this._horzScaleBehavior, (pane: Pane) => this._getPaneApi(pane));
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 
@@ -437,7 +425,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private _getPaneApi(pane: Pane): PaneApi<HorzScaleItem> {
 		let result = this._panes.get(pane);
 		if (!result) {
-			result = new PaneApi(this, this._chartWidget, pane);
+			result = new PaneApi(this._chartWidget, (series: Series<SeriesType>) => this._mapSeriesToApi(series), pane);
 			this._panes.set(pane, result);
 		}
 
