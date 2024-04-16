@@ -34,6 +34,8 @@ function afterInteractions() {
 			panes[1].paneIndex();
 			panes[2].setHeight(100);
 			panes[0].moveTo(2);
+			panes[0].getHTMLElement();
+			panes[1].getSeries();
 
 			requestAnimationFrame(resolve);
 		});
