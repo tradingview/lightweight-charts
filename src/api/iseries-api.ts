@@ -347,7 +347,7 @@ export interface ISeriesApi<
 	moveToPane(paneIndex: number): void;
 
 	/**
-	 * Returns the pane the series is currently attached to.
+	 * Returns the pane to which the series is currently attached.
 	 *
 	 * @returns Pane API object to control the pane
 	 */
