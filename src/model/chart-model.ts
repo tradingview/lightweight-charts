@@ -1022,13 +1022,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._options.rightPriceScale.visible ? DefaultPriceScaleId.Right : DefaultPriceScaleId.Left;
 	}
 
-	public seriesPaneIndex(series: Series<SeriesType>): number | null {
-		for (let i = 0; i < this._panes.length; i += 1) {
-			if (this._panes[i].series().includes(series)) {
-				return i;
-			}
-		}
-		return null;
+	private _seriesPaneIndex(series: Series<SeriesType>): number {
+		return this._panes.findIndex((pane: Pane) => pane.series().includes(series));
 	}
 
 	public moveSeriesToPane(series: Series<SeriesType>, newPaneIndex: number): void {
