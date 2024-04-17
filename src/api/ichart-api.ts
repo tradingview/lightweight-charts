@@ -336,7 +336,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	takeScreenshot(): HTMLCanvasElement;
 
 	/**
-	 * Removes a pane with index
+	 * Returns array of panes' API
 	 *
 	 * @returns array of pane's Api
 	 */
@@ -395,6 +395,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * This would typically only be useful for plugin development.
 	 *
 	 * @param paneIndex - The index of the pane
+	 * @defaultValue `0`
 	 * @returns Dimensions of the chart pane
 	 */
 	paneSize(paneIndex: number): PaneSize;

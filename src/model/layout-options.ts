@@ -65,6 +65,13 @@ export interface LayoutPanesOptions {
 	* @defaultValue `#2B2B43`
 	*/
 	separatorColor: string;
+
+	/**
+	* Color of pane separator background applied on hover
+	*
+	* @defaultValue `rgba(178, 181, 189, 0.2)`
+	*/
+	separatorHoverColor: string;
 }
 
 /** Represents layout options */
@@ -100,7 +107,7 @@ export interface LayoutOptions {
 	/**
 	 * Panes options.
 	 *
-	 * @defaultValue `{ enableResize: true, separatorColor: '#2B2B43' }`
+	 * @defaultValue `{ enableResize: true, separatorColor: '#2B2B43', separatorHoverColor: 'rgba(178, 181, 189, 0.2)'}`
 	 */
 	panes: LayoutPanesOptions;
 

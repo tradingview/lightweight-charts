@@ -342,7 +342,7 @@ export interface ISeriesApi<
 	 *
 	 * If the pane with the specified index does not exist, the pane will be created.
 	 *
-	 * @param paneIndex - The index of the pane. Should be a number between 0 and the total number of panes - 1.
+	 * @param paneIndex - The index of the pane. Should be a number between 0 and the total number of panes + 1.
 	 */
 	moveToPane(paneIndex: number): void;
 

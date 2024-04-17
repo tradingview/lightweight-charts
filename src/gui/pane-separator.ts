@@ -164,7 +164,7 @@ export class PaneSeparator implements IDestroyable {
 
 	private _mouseOverEvent(event: TouchMouseEvent): void {
 		if (this._handle !== null) {
-			this._handle.element.style.backgroundColor = 'hsla(225,8%,72%,.2)';
+			this._handle.element.style.backgroundColor = this._chartWidget.options().layout.panes.separatorHoverColor;
 		}
 	}
 
@@ -229,6 +229,5 @@ export class PaneSeparator implements IDestroyable {
 
 		this._resizeInfo = null;
 		this._handle.backgroundElement.style.display = 'none';
-		this._handle.element.style.backgroundColor = '';
 	}
 }

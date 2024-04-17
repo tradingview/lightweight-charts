@@ -171,6 +171,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this._priceAxisViews = [priceAxisView];
 
 		this._panePriceAxisView = new PanePriceAxisView(priceAxisView, this, model);
+
 		if (seriesType === 'Area' || seriesType === 'Line' || seriesType === 'Baseline') {
 			this._lastPriceAnimationPaneView = new SeriesLastPriceAnimationPaneView(this as Series<'Area'> | Series<'Line'> | Series<'Baseline'>);
 		}

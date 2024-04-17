@@ -19,6 +19,7 @@ function isSeries(source: IPriceDataSource): source is Series<SeriesType> {
 }
 
 export const DEFAULT_STRETCH_FACTOR = 1000;
+export const MIN_PANE_HEIGHT = 30;
 
 export type PriceScalePosition = 'left' | 'right' | 'overlay';
 
@@ -45,7 +46,7 @@ export class Pane implements IDestroyable {
 	private _leftPriceScale: PriceScale;
 	private _rightPriceScale: PriceScale;
 
-	public constructor(timeScale: ITimeScale, model: IChartModelBase, initialPaneIndex: number = 0) {
+	public constructor(timeScale: ITimeScale, model: IChartModelBase) {
 		this._timeScale = timeScale;
 		this._model = model;
 		this._grid = new Grid(this);

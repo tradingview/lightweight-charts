@@ -46,9 +46,8 @@ export class CrosshairPaneView implements IPaneView {
 	}
 
 	private _updateImpl(): void {
-		const pane = this._pane;
 		const visible = this._source.visible();
-		const crosshairOptions = pane.model().options().crosshair;
+		const crosshairOptions = this._pane.model().options().crosshair;
 
 		const data = this._rendererData;
 

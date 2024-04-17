@@ -510,10 +510,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._leftPriceAxisWidget;
 	}
 
-	public getPaneCell(): HTMLElement {
-		return this._paneCell;
-	}
-
 	public rightPriceAxisWidget(): PriceAxisWidget | null {
 		return this._rightPriceAxisWidget;
 	}

@@ -52,7 +52,6 @@ export interface IChartWidgetBase {
 	paneWidgets(): PaneWidget[];
 	options(): ChartOptionsInternalBase;
 	setCursorStyle(style: string | null): void;
-	adjustSize(): void;
 }
 
 export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBase {
@@ -328,10 +327,6 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return ensureDefined(this._paneWidgets[paneIndex]).getSize();
 	}
 
-	public adjustSize(): void {
-		this._adjustSizeImpl();
-	}
-
 	private _applyPanesOptions(): void {
 		this._paneSeparators.forEach((separator: PaneSeparator) => {
 			separator.update();
@@ -502,7 +497,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 		let accumulatedHeight = 0;
 
-		const pixelRatio = document.body.ownerDocument.defaultView?.devicePixelRatio || 1;
+		const pixelRatio = window.devicePixelRatio || 1;
 
 		for (let paneIndex = 0; paneIndex < this._paneWidgets.length; ++paneIndex) {
 			const paneWidget = this._paneWidgets[paneIndex];

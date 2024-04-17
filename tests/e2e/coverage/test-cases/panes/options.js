@@ -7,12 +7,16 @@ function simpleData() {
 }
 
 function interactionsToPerform() {
-	return [];
+	return [
+		{ action: 'moveMouseCenter', target: 'paneSeparator' },
+		{ action: 'verticalDrag', target: 'paneSeparator' },
+		{ action: 'verticalDrag', target: 'paneSeparator' },
+	];
 }
 
 let chart;
 function beforeInteractions(container) {
-	chart = LightweightCharts.createChart(container, { layout: { panes: { separatorColor: '#00ff00', enableResize: true } } });
+	chart = LightweightCharts.createChart(container, { layout: { panes: { separatorColor: '#00ff00', separatorHoverColor: '#ff0000', enableResize: true } } });
 
 	const mainSeries = chart.addLineSeries();
 	const secondSeries = chart.addLineSeries({}, 1);
@@ -24,6 +28,6 @@ function beforeInteractions(container) {
 }
 
 function afterInteractions() {
-	chart.applyOptions({ layout: { panes: { separatorColor: '#ff0000', enableResize: false } } });
+	chart.applyOptions({ layout: { panes: { separatorColor: '#ff0000', separatorHoverColor: '#ff0000', enableResize: false } } });
 	return Promise.resolve();
 }

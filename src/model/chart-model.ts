@@ -21,7 +21,7 @@ import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
-import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
+import { DEFAULT_STRETCH_FACTOR, MIN_PANE_HEIGHT, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { ISeries, Series, SeriesOptionsInternal } from './series';
@@ -627,7 +627,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		const actualIndex = (index === undefined) ? (this._panes.length - 1) + 1 : index;
 
-		const pane = new Pane(this._timeScale, this, actualIndex);
+		const pane = new Pane(this._timeScale, this);
 
 		if (index !== undefined) {
 			this._panes.splice(index, 0, pane);
@@ -653,6 +653,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		if (this._panes.length === 1) {
 			return;
 		}
+
+		assert(index >= 0 && index < this._panes.length, 'Invalid pane index');
+
 		this._panes.splice(index, 1);
 		this.fullUpdate();
 	}
@@ -667,8 +670,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		const totalStretch = this._panes.reduce((prevValue: number, pane: Pane) => prevValue + pane.stretchFactor(), 0);
 		const totalHeight = this._panes.reduce((prevValue: number, pane: Pane) => prevValue + pane.height(), 0);
-		const maxPaneHeight = totalHeight - 30 * (this._panes.length - 1);
-		height = Math.min(maxPaneHeight, Math.max(30, height));
+		const maxPaneHeight = totalHeight - MIN_PANE_HEIGHT * (this._panes.length - 1);
+		height = Math.min(maxPaneHeight, Math.max(MIN_PANE_HEIGHT, height));
 		const pixelStretchFactor = totalStretch / totalHeight;
 
 		const oldHeight = targetPane.height();

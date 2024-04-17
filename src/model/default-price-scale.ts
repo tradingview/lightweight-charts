@@ -1,6 +1,6 @@
 export const enum DefaultPriceScaleId {
 	Left = 'left',
-	Right = 'right'
+	Right = 'right',
 }
 
 export function isDefaultPriceScale(priceScaleId: string): priceScaleId is DefaultPriceScaleId {

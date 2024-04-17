@@ -214,7 +214,7 @@ export async function performInteractions(
 		await chartContainer.$$('tr:nth-of-type(2) td:nth-of-type(2) div canvas')
 	)[0];
 	const paneSeparator = (
-		await chartContainer.$$('tr:nth-of-type(2) td div')
+		await chartContainer.$$('tr:nth-of-type(2) td div:nth-of-type(2)')
 	)[0];
 
 	for (const interaction of interactionsToPerform) {

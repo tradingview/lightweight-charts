@@ -12,7 +12,8 @@ export const layoutOptionsDefaults: LayoutOptions = {
 	fontFamily: defaultFontFamily,
 	panes: {
 		enableResize: true,
-		separatorColor: '#2B2B43',
+		separatorColor: '#E0E3EB',
+		separatorHoverColor: 'rgba(178, 181, 189, 0.2)',
 	},
 	attributionLogo: true,
 };
