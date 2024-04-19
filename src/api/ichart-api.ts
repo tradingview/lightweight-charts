@@ -398,5 +398,5 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @defaultValue `0`
 	 * @returns Dimensions of the chart pane
 	 */
-	paneSize(paneIndex: number): PaneSize;
+	paneSize(paneIndex?: number): PaneSize;
 }
