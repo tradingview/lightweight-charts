@@ -18,7 +18,6 @@ import {
 	TimeScaleInvalidation,
 	TimeScaleInvalidationType,
 } from '../model/invalidate-mask';
-import { Pane } from '../model/pane';
 import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
@@ -806,9 +805,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		const hoveredObject = hoveredSource !== null && hoveredSource.object !== undefined
 			? hoveredSource.object.externalId
 			: undefined;
-		const paneIndex = pane
-			? this._paneWidgets.indexOf(pane)
-			: this.model().panes().indexOf(this.model().crosshairSource().pane() as Pane);
+
+		const paneIndex = this._getPaneIndex(pane);
 
 		return {
 			originalTime: clientTime,
@@ -820,6 +818,20 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			hoveredObject,
 			touchMouseEventData: event ?? undefined,
 		};
+	}
+
+	private _getPaneIndex(pane?: PaneWidget): number {
+		let paneIndex = -1;
+
+		if (pane) {
+			paneIndex = this._paneWidgets.indexOf(pane);
+		} else {
+			const crosshairPane = this.model().crosshairSource().pane();
+			if (crosshairPane !== null) {
+				paneIndex = this.model().panes().indexOf(crosshairPane);
+			}
+		}
+		return paneIndex;
 	}
 
 	private _onPaneWidgetClicked(
