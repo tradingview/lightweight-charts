@@ -143,8 +143,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				treatHorzTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options().handleScroll.horzTouchDrag,
 			}
 		);
-
-		this._attributionLogoWidget = new AttributionLogoWidget(this._paneCell, this._chart);
 	}
 
 	public destroy(): void {
@@ -187,8 +185,13 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		this.updatePriceAxisWidgetsStates();
-		if (this._attributionLogoWidget) {
+
+		if (this._chart.paneWidgets().indexOf(this) === this._chart.paneWidgets().length - 1) {
+			this._attributionLogoWidget = this._attributionLogoWidget ?? new AttributionLogoWidget(this._paneCell, this._chart);
 			this._attributionLogoWidget.update();
+		} else {
+			this._attributionLogoWidget?.removeElement();
+			this._attributionLogoWidget = null;
 		}
 	}
 
