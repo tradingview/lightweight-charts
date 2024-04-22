@@ -20,7 +20,7 @@ You can see a full [working example](#full-example) below.
 ## How to add a pane
 
 To introduce an additional pane into a chart, specify the `paneIndex` during series creation
-or later by invoking the `moveToPane(index)` method on the series instance.
+or later by invoking the [`moveToPane`](/docs/next/api/interfaces/ISeriesApi#movetopane) method on the series instance.
 
 ```js
 const volumeSeries = chart.addHistogramSeries(
@@ -41,7 +41,7 @@ If a series is moved out of a pane and no other series remain, the pane will be 
 ### Customisations
 
 Lightweight Charts provides few option to customize the panes. You can set the pane separator color by setting the `separatorColor` property on the
-`layout.panes` chart options, and `separatorHoverColor` to change the color when the mouse is over the separator.
+[`layout.panes`](/docs/next/api/interfaces/LayoutPanesOptions) chart options, and `separatorHoverColor` to change the color when the mouse is over the separator.
 And you can disable resizing of the panes by setting the `enableResize` property to `false`, by default it is set to `true`.
 
 ```js
@@ -56,7 +56,7 @@ chart.applyOptions({
 });
 ```
 
-Additionaly we can control each pane via the `PaneApi`. It has few methods to get some data about the pane,
+Additionaly we can control each pane via the [`PaneApi`](/docs/next/api/interfaces/IPaneApi). It has few methods to get some data about the pane,
 like `getHeight()` to get height of current pane, `paneIndex()` to get pane index, `getSeries()`
 to get list of series displayed on the pane and also contains methods manipulate the pane like `setHeight(height)` and `moveTo(paneIndex)`.
 
