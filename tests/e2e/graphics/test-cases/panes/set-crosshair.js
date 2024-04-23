@@ -1,3 +1,6 @@
+// Ignore the mouse movement because we are using setCrosshairPosition
+window.ignoreMouseMove = true;
+
 function generateBar(i, startValue, target) {
 	const step = (i % 20) / 1000;
 	const base = i + startValue;
@@ -36,14 +39,12 @@ function runTestCase(container) {
 	const thirdSeriesData =	generateData(startValue + 20);
 	thirdSeries.setData(thirdSeriesData);
 
-	return new Promise((resolve, reject) => {
+	return new Promise(resolve => {
 		requestAnimationFrame(() => {
-			try {
-				chart.setCrosshairPosition(thirdSeriesData[1].value, thirdSeriesData[1].time, thirdSeries);
+			requestAnimationFrame(() => {
+				chart.setCrosshairPosition(thirdSeriesData[thirdSeriesData.length - 2].value, thirdSeriesData[thirdSeriesData.length - 2].time, thirdSeries);
 				return requestAnimationFrame(resolve);
-			} catch (error) {
-				reject(error);
-			}
+			});
 		});
 	});
 }
