@@ -8,7 +8,7 @@ keywords:
   - example
 ---
 
-Lightweight Charts™ allows you to create multiple [panes](/docs/next/panes) in a single chart.
+Lightweight Charts™ allows you to create multiple [panes](/docs/next/panes.md) in a single chart.
 
 Using multiple panes in a charting library can be incredibly useful for a variety of analytical and visualization scenarios,
 especially when dealing with complex datasets or requiring detailed comparative analysis across different data dimensions.
@@ -21,7 +21,7 @@ You can see a full [working example](#full-example) below.
 
 To introduce an additional pane into a chart, specify `paneIndex` during series creation.
 
-Alternatively, you can invoke the [`moveToPane`](/docs/next/api/interfaces/ISeriesApi#movetopane) method on the series instance. Note that if the pane with specified index doesn't exist, it will be created.
+Alternatively, you can invoke the [`moveToPane`](/docs/next/api/interfaces/ISeriesApi.md#movetopane) method on the series instance. Note that if the pane with specified index doesn't exist, it will be created.
 
 ```js
 const volumeSeries = chart.addHistogramSeries(
@@ -41,7 +41,7 @@ If a series is moved out of a pane and no other series remain, the pane will be 
 ### Customizations
 
 Lightweight Charts™ provides options to customize the panes. You can adjust the pane separator color by specifying the `separatorColor` property in the
-[`layout.panes`](/docs/next/api/interfaces/LayoutPanesOptions) chart options, and use `separatorHoverColor` to change the separator color on hover.
+[`layout.panes`](/docs/next/api/interfaces/LayoutPanesOptions.md) chart options, and use `separatorHoverColor` to change the separator color on hover.
 
 ```js
 chart.applyOptions({
@@ -55,7 +55,7 @@ chart.applyOptions({
 });
 ```
 
-Lightweight Charts™ includes  [`PaneApi`](/docs/next/api/interfaces/IPaneApi) that allows you to control each pane. The API has methods to get information on the pane such as `getHeight()`, `paneIndex(), and `getSeries()`. It also contains methods to adjust the pane parameters, for example `setHeight(height)` and `moveTo(paneIndex)`.
+Lightweight Charts™ includes  [`PaneApi`](/docs/next/api/interfaces/IPaneApi.md) that allows you to control each pane. The API has methods to get information on the pane such as `getHeight()`, `paneIndex(), and `getSeries()`. It also contains methods to adjust the pane parameters, for example `setHeight(height)` and `moveTo(paneIndex)`.
 
 To get the `PaneApi` instance for each pane, you need to call the `panes` method on the `ChartApi` instance.
 Let's say we want to set the height of the second pane to 300px and move it to the first position.
