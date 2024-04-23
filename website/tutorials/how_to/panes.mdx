@@ -8,19 +8,20 @@ keywords:
   - example
 ---
 
-Lightweight Charts™ allows you to create multiple panes in a single chart.
+Lightweight Charts™ allows you to create multiple [panes](/docs/next/panes) in a single chart.
 
 Using multiple panes in a charting library can be incredibly useful for a variety of analytical and visualization scenarios,
 especially when dealing with complex datasets or requiring detailed comparative analysis across different data dimensions.
 
-This example shows how to use panes in Lightweight Charts. We will create a chart with two panes, one for the main series and another for the candles.
+This example shows how to use panes in Lightweight Charts™. We will create a chart with two panes: the first one will display a stock's price over time and the second one will contain trading volume. The price and volume will be represented with candles and an area, respectively.
 
 You can see a full [working example](#full-example) below.
 
 ## How to add a pane
 
-To introduce an additional pane into a chart, specify the `paneIndex` during series creation
-or later by invoking the [`moveToPane`](/docs/next/api/interfaces/ISeriesApi#movetopane) method on the series instance.
+To introduce an additional pane into a chart, specify `paneIndex` during series creation.
+
+Alternatively, you can invoke the [`moveToPane`](/docs/next/api/interfaces/ISeriesApi#movetopane) method on the series instance. Note that if the pane with specified index doesn't exist, it will be created.
 
 ```js
 const volumeSeries = chart.addHistogramSeries(
@@ -29,20 +30,18 @@ const volumeSeries = chart.addHistogramSeries(
             type: 'volume',
         },
     },
-    1
-); // Specifying the pane index as the 2nd argument
-// Alternatively, you can move the series to a different pane via the moveToPane method
-// note that if pane with index 2 doesn't exist, it will be created
+    1 // Pane index
+);
+// Moving the series to a different pane
 volumeSeries.moveToPane(2);
 ```
 
 If a series is moved out of a pane and no other series remain, the pane will be automatically removed.
 
-### Customisations
+### Customizations
 
-Lightweight Charts provides few option to customize the panes. You can set the pane separator color by setting the `separatorColor` property on the
-[`layout.panes`](/docs/next/api/interfaces/LayoutPanesOptions) chart options, and `separatorHoverColor` to change the color when the mouse is over the separator.
-And you can disable resizing of the panes by setting the `enableResize` property to `false`, by default it is set to `true`.
+Lightweight Charts™ provides options to customize the panes. You can adjust the pane separator color by specifying the `separatorColor` property in the
+[`layout.panes`](/docs/next/api/interfaces/LayoutPanesOptions) chart options, and use `separatorHoverColor` to change the separator color on hover.
 
 ```js
 chart.applyOptions({
@@ -56,11 +55,9 @@ chart.applyOptions({
 });
 ```
 
-Additionaly we can control each pane via the [`PaneApi`](/docs/next/api/interfaces/IPaneApi). It has few methods to get some data about the pane,
-like `getHeight()` to get height of current pane, `paneIndex()` to get pane index, `getSeries()`
-to get list of series displayed on the pane and also contains methods manipulate the pane like `setHeight(height)` and `moveTo(paneIndex)`.
+Lightweight Charts™ includes  [`PaneApi`](/docs/next/api/interfaces/IPaneApi) that allows you to control each pane. The API has methods to get information on the pane such as `getHeight()`, `paneIndex(), and `getSeries()`. It also contains methods to adjust the pane parameters, for example `setHeight(height)` and `moveTo(paneIndex)`.
 
-To get the `PaneApi` instance, you need to call the `panes` method on the `ChartApi` instance, it returns an array of `PaneApi` instances.
+To get the `PaneApi` instance for each pane, you need to call the `panes` method on the `ChartApi` instance.
 Let's say we want to set the height of the second pane to 300px and move it to the first position.
 
 ```js
@@ -69,15 +66,15 @@ secondPane.setHeight(300);
 secondPane.moveTo(0);
 ```
 
-Note: minimum pane height is 30px so if you set height less than 30px it will be set to 30px.
+Note that the minimum pane height is 30px. Any values lower than 30px will be ignored.
 
-To remove the pane you can call the `removePane(paneIndex)` method on the `ChartApi` instance.
+To remove the pane, you can call the `removePane(paneIndex)` method on the `ChartApi` instance.
 
 ```js
 chart.removePane(1);
 ```
 
-Note: Removing a pane also removes any series contained within it.
+Note that removing a pane also removes any series contained within it.
 
 ## Full Example
 
