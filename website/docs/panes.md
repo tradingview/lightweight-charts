@@ -11,7 +11,7 @@ By default, Lightweight Charts™ has a single pane, however, you can add more p
 
 ## Customization Options
 
-Lightweight Charts offers™ a few [customization options](/api/interfaces/LayoutPanesOptions.md) to tailor the appearance and behavior of panes:
+Lightweight Charts™ offers a few [customization options](/api/interfaces/LayoutPanesOptions.md) to tailor the appearance and behavior of panes:
 
 - [Pane Separator Color](/api/interfaces/LayoutPanesOptions.md#separatorcolor): Customize the color of the pane separators to match the chart design or improve visibility.
 
