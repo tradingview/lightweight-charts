@@ -8,8 +8,12 @@ const chartOptions = {
 		textColor: CHART_TEXT_COLOR,
 		background: { type: 'solid', color: CHART_BACKGROUND_COLOR },
 		// highlight-start
-		// setting this to false will disable the resize of the panes by the user
-		panes: { separatorColor: '#f22c3d', separatorHoverColor: 'rgba(255, 0, 0, 0.1)' },
+		panes: {
+			separatorColor: '#f22c3d',
+			separatorHoverColor: 'rgba(255, 0, 0, 0.1)',
+			// setting this to false will disable the resize of the panes by the user
+			enableResize: false,
+		},
 		// highlight-end
 	},
 };
