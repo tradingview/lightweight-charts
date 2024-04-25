@@ -474,7 +474,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._magnet = new Magnet(options.crosshair);
 		this._watermark = new Watermark(this, options.watermark);
 
-		this.createPane();
+		this.getOrCreatePane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
 
 		this._backgroundTopColor = this._getBackgroundColor(BackgroundColorSide.Top);
@@ -612,15 +612,11 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this.recalculateAllPanes();
 	}
 
-	public createPane(index?: number): Pane {
+	public getOrCreatePane(index?: number): Pane {
 		if (index !== undefined) {
 			assert(index >= 0, 'Index should be greater or equal to 0');
 			index = Math.min(this._panes.length, index);
-			if (index > this._panes.length) {
-				for (let i = this._panes.length; i < index; i++) {
-					this.createPane(i);
-				}
-			} else if (index < this._panes.length) {
+			if (index < this._panes.length) {
 				return this._panes[index];
 			}
 		}
@@ -932,7 +928,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], paneIndex: number = 0, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
-		const pane = this.createPane(paneIndex);
+		const pane = this.getOrCreatePane(paneIndex);
 
 		const series = this._createSeries(options, seriesType, pane, customPaneView);
 		this._serieses.push(series);
@@ -1033,7 +1029,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		const previousPane = ensureNotNull(this.paneForSource(series));
 		previousPane.removeDataSource(series);
-		const newPane = this.createPane(newPaneIndex);
+		const newPane = this.getOrCreatePane(newPaneIndex);
 		this._addSeriesToPane(series, newPane);
 
 		if (previousPane.dataSources().length === 0) {
