@@ -474,7 +474,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._magnet = new Magnet(options.crosshair);
 		this._watermark = new Watermark(this, options.watermark);
 
-		this.getOrCreatePane();
+		this._getOrCreatePane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
 
 		this._backgroundTopColor = this._getBackgroundColor(BackgroundColorSide.Top);
@@ -610,39 +610,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._timeScale.setWidth(this._width);
 		this._panes.forEach((pane: Pane) => pane.setWidth(width));
 		this.recalculateAllPanes();
-	}
-
-	public getOrCreatePane(index?: number): Pane {
-		if (index !== undefined) {
-			assert(index >= 0, 'Index should be greater or equal to 0');
-			index = Math.min(this._panes.length, index);
-			if (index < this._panes.length) {
-				return this._panes[index];
-			}
-		}
-
-		const actualIndex = (index === undefined) ? (this._panes.length - 1) + 1 : index;
-
-		const pane = new Pane(this._timeScale, this);
-
-		if (index !== undefined) {
-			this._panes.splice(index, 0, pane);
-		} else {
-			// adding to the end - common case
-			this._panes.push(pane);
-		}
-
-		// we always do autoscaling on the creation
-		// if autoscale option is true, it is ok, just recalculate by invalidation mask
-		// if autoscale option is false, autoscale anyway on the first draw
-		// also there is a scenario when autoscale is true in constructor and false later on applyOptions
-		const mask = InvalidateMask.full();
-		mask.invalidatePane(actualIndex, {
-			level: InvalidationLevel.None,
-			autoScale: true,
-		});
-		this._invalidate(mask);
-		return pane;
 	}
 
 	public removePane(index: number): void {
@@ -928,7 +895,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], paneIndex: number = 0, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
-		const pane = this.getOrCreatePane(paneIndex);
+		const pane = this._getOrCreatePane(paneIndex);
 
 		const series = this._createSeries(options, seriesType, pane, customPaneView);
 		this._serieses.push(series);
@@ -1029,7 +996,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		const previousPane = ensureNotNull(this.paneForSource(series));
 		previousPane.removeDataSource(series);
-		const newPane = this.getOrCreatePane(newPaneIndex);
+		const newPane = this._getOrCreatePane(newPaneIndex);
 		this._addSeriesToPane(series, newPane);
 
 		if (previousPane.dataSources().length === 0) {
@@ -1080,6 +1047,39 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	public getPaneIndex(pane: Pane): number {
 		return this._panes.indexOf(pane);
+	}
+
+	private _getOrCreatePane(index?: number): Pane {
+		if (index !== undefined) {
+			assert(index >= 0, 'Index should be greater or equal to 0');
+			index = Math.min(this._panes.length, index);
+			if (index < this._panes.length) {
+				return this._panes[index];
+			}
+		}
+
+		const actualIndex = (index === undefined) ? (this._panes.length - 1) + 1 : index;
+
+		const pane = new Pane(this._timeScale, this);
+
+		if (index !== undefined) {
+			this._panes.splice(index, 0, pane);
+		} else {
+			// adding to the end - common case
+			this._panes.push(pane);
+		}
+
+		// we always do autoscaling on the creation
+		// if autoscale option is true, it is ok, just recalculate by invalidation mask
+		// if autoscale option is false, autoscale anyway on the first draw
+		// also there is a scenario when autoscale is true in constructor and false later on applyOptions
+		const mask = InvalidateMask.full();
+		mask.invalidatePane(actualIndex, {
+			level: InvalidationLevel.None,
+			autoScale: true,
+		});
+		this._invalidate(mask);
+		return pane;
 	}
 
 	private _seriesPaneIndex(series: Series<SeriesType>): number {
