@@ -74,6 +74,7 @@ export class AttributionLogoWidget {
 			this._element.href = `https://www.tradingview.com/?utm_medium=lwc-link&utm_campaign=lwc-chart${this._getUTMSource()}`;
 			this._element.title = 'Charting by TradingView';
 			this._element.id = 'tv-attr-logo';
+			this._element.target = '_blank';
 			this._element.innerHTML = svg;
 			this._element.toggleAttribute('data-dark', this._theme === 'dark');
 			this._container.appendChild(this._cssElement);
