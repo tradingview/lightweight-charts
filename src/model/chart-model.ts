@@ -657,6 +657,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public swapPanes(first: number, second: number): void {
+		assert(first >= 0 && first < this._panes.length && second >= 0 && second < this._panes.length, 'Invalid pane index');
 		const firstPane = this._panes[first];
 		const secondPane = this._panes[second];
 		this._panes[first] = secondPane;
@@ -928,18 +929,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		const pane = ensureNotNull(this.paneForSource(series));
 		pane.removeDataSource(series);
 
-		// check if targetScaleId exists
-		const target = this.findPriceScale(targetScaleId);
-		if (target === null) {
-			// new scale on the same pane
-			const zOrder = series.zorder();
-			pane.addDataSource(series, targetScaleId, ensureNotNull(zOrder));
-		} else {
-			// if move to the new scale of the same pane, keep zorder
-			// if move to new pane
-			const zOrder = (target.pane === pane) ? series.zorder() : undefined;
-			target.pane.addDataSource(series, targetScaleId, ensureNotNull(zOrder));
-		}
+		pane.addDataSource(series, targetScaleId, ensureNotNull(series.zorder()));
 	}
 
 	public fitContent(): void {
@@ -989,6 +979,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public moveSeriesToPane(series: Series<SeriesType>, newPaneIndex: number): void {
+		assert(newPaneIndex >= 0, 'Index should be greater or equal to 0');
 		const fromPaneIndex = this._seriesPaneIndex(series);
 		if (newPaneIndex === fromPaneIndex) {
 			return;
