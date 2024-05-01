@@ -1,4 +1,4 @@
-import { LineStyle, createChart } from 'lightweight-charts';
+import { LastPriceAnimationMode, LineStyle, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { UserAlertInfo } from '../state';
 import { UserPriceAlerts } from '../user-price-alerts';
@@ -41,6 +41,7 @@ const areaSeries = chart.addAreaSeries({
 	topColor: 'rgba(4,153,129, 0.4)',
 	bottomColor: 'rgba(4,153,129, 0)',
 	priceLineVisible: false,
+	lastPriceAnimation: LastPriceAnimationMode.Continuous,
 });
 const data = generateLineData();
 areaSeries.setData(data);
