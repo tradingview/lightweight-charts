@@ -6,7 +6,7 @@ import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl, ChartOptionsInternal } from '../model/chart-model';
-import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
+import { DataUpdatesConsumer, isFulfilledBarData, isFulfilledLineData, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
@@ -382,7 +382,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			const seriesType = series.seriesType();
 			const data = getSeriesDataCreator<SeriesType, HorzScaleItem>(seriesType)(plotRow);
 			if (seriesType !== 'Custom') {
-				assert(isFulfilledData(data));
+				assert(isFulfilledBarData(data) || isFulfilledLineData(data));
 			} else {
 				const customWhitespaceChecker = series.customSeriesWhitespaceCheck();
 				assert(!customWhitespaceChecker || customWhitespaceChecker(data) === false);

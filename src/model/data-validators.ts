@@ -2,7 +2,7 @@
 
 import { assert } from '../helpers/assertions';
 
-import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
+import { isFulfilledBarData, isFulfilledLineData, SeriesDataItemTypeMap } from './data-consumer';
 import { IHorzScaleBehavior } from './ihorz-scale-behavior';
 import { CreatePriceLineOptions } from './price-line-options';
 import { SeriesMarker } from './series-markers';
@@ -66,7 +66,7 @@ function checkBarItem<HorzScaleItem>(
 	type: 'Bar' | 'Candlestick',
 	barItem: SeriesDataItemTypeMap<HorzScaleItem>[typeof type]
 ): void {
-	if (!isFulfilledData(barItem)) {
+	if (!isFulfilledBarData(barItem)) {
 		return;
 	}
 
@@ -104,7 +104,7 @@ function checkLineItem<HorzScaleItem>(
 	type: 'Area' | 'Baseline' | 'Line' | 'Histogram',
 	lineItem: SeriesDataItemTypeMap<HorzScaleItem>[typeof type]
 ): void {
-	if (!isFulfilledData(lineItem)) {
+	if (!isFulfilledLineData(lineItem)) {
 		return;
 	}
 
