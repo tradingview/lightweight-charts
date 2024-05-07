@@ -181,15 +181,21 @@ export function isWhitespaceData<HorzScaleItem = Time>(data: SeriesDataItemTypeM
 	return (data as Partial<BarData<HorzScaleItem>>).open === undefined && (data as Partial<LineData<HorzScaleItem>>).value === undefined;
 }
 
-export function isFulfilledBarData<HorzScaleItem, T extends SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]>(
+export function isFulfilledData<HorzScaleItem, T extends SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]>(
 	data: T
 ): data is Extract<T, BarData<HorzScaleItem> | LineData<HorzScaleItem> | HistogramData<HorzScaleItem>> {
+	return isFulfilledBarData(data) || isFulfilledLineData(data);
+}
+
+export function isFulfilledBarData<HorzScaleItem, T extends SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]>(
+	data: T
+): data is Extract<T, BarData<HorzScaleItem>> {
 	return (data as Partial<BarData<HorzScaleItem>>).open !== undefined;
 }
 
 export function isFulfilledLineData<HorzScaleItem, T extends SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]>(
 	data: T
-): data is Extract<T, BarData<HorzScaleItem> | LineData<HorzScaleItem> | HistogramData<HorzScaleItem>> {
+): data is Extract<T, LineData<HorzScaleItem> | HistogramData<HorzScaleItem>> {
 	return (data as Partial<LineData<HorzScaleItem>>).value !== undefined;
 }
 
