@@ -41,7 +41,7 @@ function runTestCase(container) {
 			lineSeries.applyOptions({
 				visible: false,
 			});
-			resolve();
+			requestAnimationFrame(resolve);
 		}, 300);
 	});
 }
