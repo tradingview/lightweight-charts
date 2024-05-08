@@ -7,6 +7,7 @@ const sidebars = {
 		'series-types',
 		'price-scale',
 		'time-scale',
+		'panes',
 		'time-zones',
 		{
 			Plugins: [

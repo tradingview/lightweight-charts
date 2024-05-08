@@ -9,7 +9,7 @@ keywords:
     - charting
     - html5 charts
     - financial charting library
-sidebar_position: 6
+sidebar_position: 7
 ---
 
 # iOS wrapper

@@ -19,6 +19,7 @@ import {
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
+import { IPaneApi } from './ipane-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -54,6 +55,10 @@ export interface MouseEventParams<HorzScaleItem = Time> {
 	 * The value will be `undefined` if the event is fired outside the chart, for example a mouse leave event.
 	 */
 	point?: Point;
+	/**
+	 * The index of the Pane
+	 */
+	paneIndex?: number;
 	/**
 	 * Data of all series at the location of the event in the chart.
 	 *
@@ -331,6 +336,28 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	takeScreenshot(): HTMLCanvasElement;
 
 	/**
+	 * Returns array of panes' API
+	 *
+	 * @returns array of pane's Api
+	 */
+	panes(): IPaneApi<HorzScaleItem>[];
+
+	/**
+	 * Removes a pane with index
+	 *
+	 * @param index - the pane to be removed
+	 */
+	removePane(index: number): void;
+
+	/**
+	 * swap the position of two panes.
+	 *
+	 * @param first - the first index
+	 * @param second - the second index
+	 */
+	swapPanes(first: number, second: number): void;
+
+	/**
 	 * Returns the active state of the `autoSize` option. This can be used to check
 	 * whether the chart is handling resizing automatically with a `ResizeObserver`.
 	 *
@@ -367,7 +394,9 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Returns the dimensions of the chart pane (the plot surface which excludes time and price scales).
 	 * This would typically only be useful for plugin development.
 	 *
+	 * @param paneIndex - The index of the pane
+	 * @defaultValue `0`
 	 * @returns Dimensions of the chart pane
 	 */
-	paneSize(): PaneSize;
+	paneSize(paneIndex?: number): PaneSize;
 }
