@@ -48,6 +48,32 @@ export interface VerticalGradientColor {
  */
 export type Background = SolidColor | VerticalGradientColor;
 
+/**
+ * Represents panes customizations.
+ */
+export interface LayoutPanesOptions {
+	/**
+	* Enable panes resizing
+	*
+	* @defaultValue `true`
+	*/
+	enableResize: boolean;
+
+	/**
+	* Color of pane separator
+	*
+	* @defaultValue `#2B2B43`
+	*/
+	separatorColor: string;
+
+	/**
+	* Color of pane separator background applied on hover
+	*
+	* @defaultValue `rgba(178, 181, 189, 0.2)`
+	*/
+	separatorHoverColor: string;
+}
+
 /** Represents layout options */
 export interface LayoutOptions {
 	/**
@@ -77,6 +103,13 @@ export interface LayoutOptions {
 	 * @defaultValue `-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif`
 	 */
 	fontFamily: string;
+
+	/**
+	 * Panes options.
+	 *
+	 * @defaultValue `{ enableResize: true, separatorColor: '#2B2B43', separatorHoverColor: 'rgba(178, 181, 189, 0.2)'}`
+	 */
+	panes: LayoutPanesOptions;
 
 	/**
 	 * Display the TradingView attribution logo on the main chart pane.

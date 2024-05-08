@@ -28,11 +28,7 @@ export class AttributionLogoWidget {
 		this._render();
 	}
 
-	private _shouldUpdate(): boolean {
-		return this._visible !== this._shouldBeVisible() || this._theme !== this._themeToUse();
-	}
-
-	private _removeElement(): void {
+	public removeElement(): void {
 		if (this._element) {
 			this._container.removeChild(this._element);
 		}
@@ -41,6 +37,10 @@ export class AttributionLogoWidget {
 		}
 		this._element = undefined;
 		this._cssElement = undefined;
+	}
+
+	private _shouldUpdate(): boolean {
+		return this._visible !== this._shouldBeVisible() || this._theme !== this._themeToUse();
 	}
 
 	private _themeToUse(): LogoTheme {
@@ -64,7 +64,7 @@ export class AttributionLogoWidget {
 		if (!this._shouldUpdate()) {
 			return;
 		}
-		this._removeElement();
+		this.removeElement();
 		this._visible = this._shouldBeVisible();
 		if (this._visible) {
 			this._theme = this._themeToUse();
@@ -74,6 +74,7 @@ export class AttributionLogoWidget {
 			this._element.href = `https://www.tradingview.com/?utm_medium=lwc-link&utm_campaign=lwc-chart${this._getUTMSource()}`;
 			this._element.title = 'Charting by TradingView';
 			this._element.id = 'tv-attr-logo';
+			this._element.target = '_blank';
 			this._element.innerHTML = svg;
 			this._element.toggleAttribute('data-dark', this._theme === 'dark');
 			this._container.appendChild(this._cssElement);
