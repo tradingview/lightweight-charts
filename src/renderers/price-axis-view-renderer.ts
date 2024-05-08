@@ -1,6 +1,6 @@
 import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D, MediaCoordinatesRenderingScope } from 'fancy-canvas';
 
-import { drawRoundRectWithInnerBorder } from '../helpers/canvas-helpers';
+import { drawRoundRectWithBorder } from '../helpers/canvas-helpers';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
@@ -80,8 +80,12 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			const gb = geom.bitmap;
 
 			const drawLabelBody = (labelBackgroundColor: string, labelBorderColor?: string): void => {
+				/*
+				 labelBackgroundColor (and labelBorderColor) will always be a solid color (no alpha) [see generateContrastColors in color.ts].
+				 Therefore we can draw the rounded label using simplified code (drawRoundRectWithBorder) that doesn't need to ensure the background and the border don't overlap.
+				*/
 				if (geom.alignRight) {
-					drawRoundRectWithInnerBorder(
+					drawRoundRectWithBorder(
 						ctx,
 						gb.xOutside,
 						gb.yTop,
@@ -93,7 +97,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 						labelBorderColor
 					);
 				} else {
-					drawRoundRectWithInnerBorder(
+					drawRoundRectWithBorder(
 						ctx,
 						gb.xInside,
 						gb.yTop,
