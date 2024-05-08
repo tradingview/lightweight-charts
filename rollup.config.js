@@ -23,7 +23,6 @@ function getConfig(
 ) {
 	const mode = isProd ? 'production' : 'development';
 	const extension = {
-		cjs: 'cjs',
 		esm: 'mjs',
 		iife: 'js',
 	}[format];
@@ -60,7 +59,7 @@ function getConfig(
 						inline_script: true,
 					},
 					mangle: {
-						module: format === 'esm' || format === 'cjs',
+						module: format === 'esm',
 						properties: {
 							regex: /^_(private|internal)_/,
 						},
@@ -87,7 +86,6 @@ modes.forEach(mode => {
 			isProd: mode,
 			isStandalone: true,
 		}),
-		getConfig('./lib/prod/src/index.js', { format: 'cjs', isProd: mode }),
 		getConfig('./lib/prod/src/standalone.js', {
 			format: 'iife',
 			isProd: mode,
