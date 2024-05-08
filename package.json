@@ -82,7 +82,7 @@
     "eslint-plugin-react": "~7.32.2",
     "eslint-plugin-tsdoc": "~0.2.17",
     "eslint-plugin-unicorn": "~40.1.0",
-    "express": "~4.18.2",
+    "express": "~4.19.2",
     "glob": "~10.2.5",
     "markdown-it": "~13.0.1",
     "markdown-it-anchor": "~8.6.7",

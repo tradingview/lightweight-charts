@@ -42,13 +42,10 @@ You can see a full [working example](#full-example) below.
 
 ## Full example
 
-import UsageGuidePartial from "./_usage-guide-partial.mdx";
-
-<UsageGuidePartial />
-
+import UsageGuidePartial from "../_usage-guide-partial.mdx";
 import CodeBlock from "@theme/CodeBlock";
 import code from "!!raw-loader!./inverted-price-scale.js";
 
-<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode chartOnTop codeUsage={<UsageGuidePartial />}>
 	{code}
 </CodeBlock>
