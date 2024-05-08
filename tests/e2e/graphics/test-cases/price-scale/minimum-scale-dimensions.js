@@ -28,6 +28,7 @@ function runTestCase(container) {
 		timeScale: {
 			minimumHeight: 50,
 		},
+		layout: { attributionLogo: false },
 	};
 
 	const chart = (window.chart = LightweightCharts.createChart(

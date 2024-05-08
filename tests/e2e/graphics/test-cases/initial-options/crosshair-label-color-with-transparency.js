@@ -22,6 +22,7 @@ function runTestCase(container) {
 				labelBackgroundColor: 'rgba(120, 0, 19, 0.5)',
 			},
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addAreaSeries();

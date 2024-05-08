@@ -17,6 +17,7 @@ function runTestCase(container) {
 		rightPriceScale: {
 			mode: LightweightCharts.PriceScaleMode.Logarithmic,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries();

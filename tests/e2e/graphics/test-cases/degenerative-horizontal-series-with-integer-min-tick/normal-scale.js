@@ -20,6 +20,7 @@ function runTestCase(container) {
 		rightPriceScale: {
 			mode: LightweightCharts.PriceScaleMode.Normal,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const firstSeries = chart.addLineSeries({

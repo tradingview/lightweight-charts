@@ -16,6 +16,7 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, {
 		rightPriceScale: { visible: true },
 		leftPriceScale: { visible: false },
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries({

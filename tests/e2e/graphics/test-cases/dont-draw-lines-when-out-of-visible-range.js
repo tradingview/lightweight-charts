@@ -26,6 +26,7 @@ function runTestCase(container) {
 				labelVisible: false,
 			},
 		},
+		layout: { attributionLogo: false },
 	}));
 
 	const whitespaceData = generateData().map(d => ({ time: d.time }));

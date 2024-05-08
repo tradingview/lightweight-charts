@@ -63,7 +63,7 @@ Below are a few external resources related to creating and styling html elements
 
 ## Examples
 
-import UsageGuidePartial from "./_usage-guide-partial.mdx";
+import UsageGuidePartial from "../_usage-guide-partial.mdx";
 
 <UsageGuidePartial />
 
@@ -73,7 +73,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 import codeLegend from "!!raw-loader!./legend.js";
 
-<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode chartOnTop>
 	{codeLegend}
 </CodeBlock>
 
@@ -81,6 +81,6 @@ import codeLegend from "!!raw-loader!./legend.js";
 
 import code3Line from "!!raw-loader!./legend-3line.js";
 
-<CodeBlock replaceThemeConstants chart className="language-js" hideableCode>
+<CodeBlock replaceThemeConstants chart className="language-js" hideableCode chartOnTop>
 	{code3Line}
 </CodeBlock>

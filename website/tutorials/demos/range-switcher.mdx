@@ -1,0 +1,38 @@
+---
+title: Range switcher
+sidebar_label: Range switcher
+description: An example of how to switch range (resolution) of the chart
+pagination_prev: null
+pagination_next: null
+keywords:
+  - range
+  - resolution
+---
+
+This example illustrates the creation of a range switcher in Lightweight Charts™
+that allows for changing the data set displayed based on a selected time range
+or interval. Different data sets representing ranges such as daily ('1D'),
+weekly ('1W'), monthly ('1M'), and yearly ('1Y') are prepared.
+
+The chart begins with daily data displayed by default. Then, buttons
+corresponding to each predefined interval are created. When a user clicks one of
+these buttons, the `setChartInterval` function is called with the chosen
+interval, swapping the currently displayed data series with the one
+corresponding to the chosen interval. Consequently, the viewers can quickly
+switch between different timeframes, providing flexible analysis of the data
+trends.
+
+import UsageGuidePartial from '../_usage-guide-partial.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./range-switcher.js';
+
+<CodeBlock
+	replaceThemeConstants
+	chart
+	className="language-js"
+	hideableCode
+	chartOnTop
+	codeUsage={<UsageGuidePartial />}
+>
+	{code}
+</CodeBlock>

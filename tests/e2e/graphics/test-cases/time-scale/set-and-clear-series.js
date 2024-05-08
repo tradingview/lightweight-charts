@@ -9,6 +9,7 @@ function runTestCase(container) {
 		timeScale: {
 			barSpacing: 40,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series = chart.addLineSeries();

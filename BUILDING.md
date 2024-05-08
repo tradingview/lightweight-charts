@@ -51,6 +51,7 @@ There are several included e2e tests available which can be run individually. Pl
 1. Bump the library's version in root `package.json` file to the next one (either major or minor depending on the planning and expected breaking changes).
 1. Push the changes back to github (don't forget to push tags).
 1. Create and publish a release on github.
+1. Check that none of the tutorials pages are using links to 'next' api interfaces. If you find any then you should be able to update the link to use the new 'current' release we have just released.
 1. Close the milestone.
 
 ## Deploying a pre-release version

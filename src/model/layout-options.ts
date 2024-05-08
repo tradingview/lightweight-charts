@@ -48,6 +48,32 @@ export interface VerticalGradientColor {
  */
 export type Background = SolidColor | VerticalGradientColor;
 
+/**
+ * Represents panes customizations.
+ */
+export interface LayoutPanesOptions {
+	/**
+	* Enable panes resizing
+	*
+	* @defaultValue `true`
+	*/
+	enableResize: boolean;
+
+	/**
+	* Color of pane separator
+	*
+	* @defaultValue `#2B2B43`
+	*/
+	separatorColor: string;
+
+	/**
+	* Color of pane separator background applied on hover
+	*
+	* @defaultValue `rgba(178, 181, 189, 0.2)`
+	*/
+	separatorHoverColor: string;
+}
+
 /** Represents layout options */
 export interface LayoutOptions {
 	/**
@@ -77,4 +103,25 @@ export interface LayoutOptions {
 	 * @defaultValue `-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif`
 	 */
 	fontFamily: string;
+
+	/**
+	 * Panes options.
+	 *
+	 * @defaultValue `{ enableResize: true, separatorColor: '#2B2B43', separatorHoverColor: 'rgba(178, 181, 189, 0.2)'}`
+	 */
+	panes: LayoutPanesOptions;
+
+	/**
+	 * Display the TradingView attribution logo on the main chart pane.
+	 *
+	 * The licence for library specifies that you add the "attribution notice"
+	 * from the NOTICE file to your code and a link to https://www.tradingview.com/ to
+	 * the page of your website or mobile application that is available to your users.
+	 * Using this attribution logo is sufficient for meeting this linking requirement.
+	 * However, if you already fulfill this requirement then you can disable this
+	 * attribution logo.
+	 *
+	 * @defaultValue true
+	 */
+	attributionLogo: boolean;
 }

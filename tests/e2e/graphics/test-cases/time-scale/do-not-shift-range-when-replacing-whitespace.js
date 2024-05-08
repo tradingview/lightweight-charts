@@ -21,6 +21,7 @@ function runTestCase(container) {
 			rightOffset: 10,
 			shiftVisibleRangeOnNewBar: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const s1 = chart.addLineSeries({

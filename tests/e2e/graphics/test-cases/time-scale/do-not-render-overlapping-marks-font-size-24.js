@@ -4,6 +4,7 @@ function runTestCase(container) {
 		handleScale: false,
 		layout: {
 			fontSize: 24,
+			attributionLogo: false,
 		},
 		crosshair: { vertLine: { labelVisible: false } },
 		timeScale: {
