@@ -23,6 +23,7 @@ function runTestCase(container) {
 		localization: {
 			timeFormatter: time => time, // return time as is
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const firstSeries = chart.addLineSeries();

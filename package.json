@@ -13,25 +13,23 @@
     "url": "https://github.com/tradingview/lightweight-charts.git"
   },
   "module": "dist/lightweight-charts.production.mjs",
-  "main": "index.cjs",
+  "main": "dist/lightweight-charts.production.mjs",
   "typings": "dist/typings.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "development": {
         "types": "./dist/typings.d.ts",
-        "import": "./dist/lightweight-charts.development.mjs",
-        "require": "./dist/lightweight-charts.development.cjs"
+        "import": "./dist/lightweight-charts.development.mjs"
       },
       "production": {
         "types": "./dist/typings.d.ts",
-        "import": "./dist/lightweight-charts.production.mjs",
-        "require": "./dist/lightweight-charts.production.cjs"
+        "import": "./dist/lightweight-charts.production.mjs"
       },
       "default": {
         "types": "./dist/typings.d.ts",
-        "import": "./dist/lightweight-charts.production.mjs",
-        "require": "./index.cjs"
+        "import": "./dist/lightweight-charts.production.mjs"
+
       }
     }
   },
@@ -48,12 +46,13 @@
     "charts"
   ],
   "engines": {
-    "node": ">=16.16.0"
+    "node": ">=18.19.0"
   },
   "dependencies": {
     "fancy-canvas": "2.1.0"
   },
   "devDependencies": {
+    "@juggle/resize-observer": "~3.4.0",
     "@rollup/plugin-node-resolve": "~15.0.2",
     "@rollup/plugin-replace": "~5.0.2",
     "@rollup/plugin-terser": "~0.4.3",
@@ -61,7 +60,7 @@
     "@types/chai": "~4.3.5",
     "@types/glob": "~8.1.0",
     "@types/mocha": "~10.0.1",
-    "@types/node": "~16.18.9",
+    "@types/node": "~18.19.18",
     "@types/pixelmatch": "~5.2.4",
     "@types/pngjs": "~6.0.1",
     "@typescript-eslint/eslint-plugin": "~5.59.6",
@@ -92,7 +91,7 @@
     "npm-run-all": "~4.1.5",
     "pixelmatch": "~5.3.0",
     "pngjs": "~7.0.0",
-    "puppeteer": "~20.2.1",
+    "puppeteer": "~21.7.0",
     "rimraf": "~5.0.1",
     "rollup": "~3.22.0",
     "size-limit": "~8.2.4",
@@ -131,6 +130,6 @@
     "size-limit": "size-limit",
     "verify": "npm-run-all clean -p build:prod check-markdown-links -p lint check-dts-docs tsc-verify test size-limit -p type-tests",
     "test": "mocha tests/unittests/**/*.spec.ts",
-    "type-tests": "tsc -p ./tests/type-checks/tsconfig.composite.json --noEmit"
+    "type-tests": "tsc -b ./src/tsconfig.composite.json && tsc -p ./tests/type-checks/tsconfig.composite.json --noEmit"
   }
 }

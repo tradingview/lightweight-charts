@@ -9,6 +9,7 @@ module.exports = {
 	 * can reliably find the installed chrome binary
 	 */
 	cacheDirectory: join(__dirname, 'node_modules', '.cache', 'puppeteer'),
+	downloadBaseUrl: 'https://storage.googleapis.com/chrome-for-testing-public',
 	experiments: {
 		/**
 		 * This can also be configured / overridden with the

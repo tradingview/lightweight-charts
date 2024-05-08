@@ -1,5 +1,5 @@
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
 	const lineSeries1 = chart.addLineSeries();
 	const lineSeries2 = chart.addLineSeries();

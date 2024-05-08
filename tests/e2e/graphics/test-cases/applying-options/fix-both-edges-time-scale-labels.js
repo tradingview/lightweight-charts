@@ -35,6 +35,7 @@ function runTestCase(container) {
 			fixLeftEdge: true,
 			fixRightEdge: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series = chart.addLineSeries();

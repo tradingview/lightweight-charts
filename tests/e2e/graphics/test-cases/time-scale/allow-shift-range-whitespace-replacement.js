@@ -23,6 +23,7 @@ function runTestCase(container) {
 			shiftVisibleRangeOnNewBar: true,
 			allowShiftVisibleRangeOnWhitespaceReplacement: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const s1 = chart.addAreaSeries({

@@ -195,11 +195,11 @@ function normalizeRgbComponent<T extends RedComponent | GreenComponent | BlueCom
 }
 
 function normalizeAlphaComponent(component: AlphaComponent): AlphaComponent {
-	return (!(component <= 0) && !(component > 0) ? 0 as AlphaComponent :
-		component < 0 ? 0 as AlphaComponent :
-			component > 1 ? 1 as AlphaComponent :
-				// limit the precision of all numbers to at most 4 digits in fractional part
-				Math.round(component * 10000) / 10000) as AlphaComponent;
+	if (component <= 0 || component > 1) {
+		return Math.min(Math.max(component, 0), 1) as AlphaComponent;
+	}
+	// limit the precision of all numbers to at most 4 digits in fractional part
+	return Math.round(component * 10000) / 10000 as AlphaComponent;
 }
 
 /**
@@ -236,8 +236,8 @@ const rgbRe = /^rgb\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*\)$
  * @example
  * rgba(255,234,245,0.1)
  */
-const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?[\d]{0,10}(?:\.\d+)?)\s*\)$/;
 
+const rgbaRe = /^rgba\(\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d{1,10})\s*,\s*(-?\d*\.?\d+)\s*\)$/;
 function colorStringToRgba(colorString: string): Rgba {
 	colorString = colorString.toLowerCase();
 
@@ -322,6 +322,10 @@ export function generateContrastColors(backgroundColor: string): ContrastColors 
 		background: `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
 		foreground: rgbaToGrayscale(rgb) > 160 ? 'black' : 'white',
 	};
+}
+
+export function colorStringToGrayscale(backgroundColor: string): number {
+	return rgbaToGrayscale(colorStringToRgba(backgroundColor));
 }
 
 export function gradientColorAtPercent(topColor: string, bottomColor: string, percent: number): string {

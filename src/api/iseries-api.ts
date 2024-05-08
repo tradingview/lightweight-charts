@@ -14,6 +14,7 @@ import {
 } from '../model/series-options';
 import { Range } from '../model/time-data';
 
+import { IPaneApi } from './ipane-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesPrimitive } from './iseries-primitive-api';
@@ -335,4 +336,20 @@ export interface ISeriesApi<
 	 * Does nothing if specified primitive was not attached
 	 */
 	detachPrimitive(primitive: ISeriesPrimitive<HorzScaleItem>): void;
+
+	/**
+	 * Move the series to another pane.
+	 *
+	 * If the pane with the specified index does not exist, the pane will be created.
+	 *
+	 * @param paneIndex - The index of the pane. Should be a number between 0 and the total number of panes.
+	 */
+	moveToPane(paneIndex: number): void;
+
+	/**
+	 * Returns the pane to which the series is currently attached.
+	 *
+	 * @returns Pane API object to control the pane
+	 */
+	getPane(): IPaneApi<HorzScaleItem>;
 }

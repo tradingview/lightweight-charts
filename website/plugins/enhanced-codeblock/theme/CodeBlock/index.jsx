@@ -24,12 +24,16 @@ export function replaceThemeConstantStrings(originalString, isDarkTheme) {
 	return result;
 }
 
+export function replaceTabsString(string) {
+	return string.replace(/\t/g, '    ');
+}
+
 export function removeUnwantedLines(originalString) {
 	return originalString.replace(new RegExp(/\/\/ delete-start[\w\W]*?\/\/ delete-end/, 'gm'), '');
 }
 
 const EnhancedCodeBlock = props => {
-	const { chart, replaceThemeConstants, hideableCode, chartOnly, iframeStyle, ...rest } = props;
+	const { chart, replaceThemeConstants, hideableCode, chartOnly, chartOnTop = false, iframeStyle, replaceTabs = true, codeUsage, ...rest } = props;
 	let { children } = props;
 	const { colorMode } = useColorMode();
 	const isDarkTheme = colorMode === 'dark';
@@ -38,22 +42,25 @@ const EnhancedCodeBlock = props => {
 	if (replaceThemeConstants && typeof children === 'string') {
 		children = replaceThemeConstantStrings(children, isDarkTheme);
 	}
+	if (replaceTabs && typeof children === 'string') {
+		children = replaceTabsString(children);
+	}
 	children = removeUnwantedLines(children);
 
 	if (chart || hideableCode) {
-		return (
-			<>
-				{hideableCode && <>
-					<input
-						id={uniqueId}
-						type="checkbox"
-						className="toggle-hidden-lines"
-					/>
-					<label className="toggle-label" htmlFor={uniqueId}>Show all code</label></>}
-				{!chartOnly && <CodeBlock {...rest}>{children}</CodeBlock>}
-				{chart && <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={children} iframeStyle={iframeStyle} />}</BrowserOnly>}
-			</>
-		);
+		const codeBlockSection = !chartOnly && <CodeBlock {...rest}>{children}</CodeBlock>;
+		const chartSection = chart && <BrowserOnly fallback={<div className={styles.iframe}>&nbsp;</div>}>{() => <Chart script={children} iframeStyle={iframeStyle} />}</BrowserOnly>;
+		const hideCodeToggle = (hideableCode && <>
+			<input
+				id={uniqueId}
+				type="checkbox"
+				className="toggle-hidden-lines"
+			/>
+			<label className="toggle-label" htmlFor={uniqueId}>Show all code</label></>);
+		if (chartOnTop) {
+			return <>{chartSection}{codeUsage}{hideCodeToggle}{codeBlockSection}</>;
+		}
+		return <>{codeUsage}{hideCodeToggle}{codeBlockSection}{chartSection}</>;
 	}
 
 	return <CodeBlock {...rest}>{children}</CodeBlock>;

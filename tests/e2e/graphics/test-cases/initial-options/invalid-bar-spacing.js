@@ -27,6 +27,7 @@ function runTestCase(container) {
 		timeScale: {
 			barSpacing: 1000,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addCandlestickSeries();

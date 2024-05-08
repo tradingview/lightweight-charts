@@ -7,6 +7,7 @@ function runTestCase(container) {
 		layout: {
 			textColor: 'black',
 			background: { type: 'solid', color: 'white' },
+			attributionLogo: false,
 		},
 	};
 	const chart = (window.chart = LightweightCharts.createChart(

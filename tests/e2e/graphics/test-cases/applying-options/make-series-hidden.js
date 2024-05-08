@@ -18,6 +18,7 @@ function runTestCase(container) {
 		rightPriceScale: {
 			mode: LightweightCharts.PriceScaleMode.IndexedTo100,
 		},
+		layout: { attributionLogo: false },
 	});
 	const lineSeries = chart.addLineSeries({
 		baseLineVisible: true,
@@ -40,7 +41,7 @@ function runTestCase(container) {
 			lineSeries.applyOptions({
 				visible: false,
 			});
-			resolve();
+			requestAnimationFrame(resolve);
 		}, 300);
 	});
 }

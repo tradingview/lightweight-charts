@@ -413,7 +413,7 @@ class AnchoredText {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
 	chart.timeScale().applyOptions({
 		barSpacing: 50,
