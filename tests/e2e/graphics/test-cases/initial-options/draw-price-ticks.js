@@ -17,6 +17,7 @@ function runTestCase(container) {
 		rightPriceScale: {
 			ticksVisible: true,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries();

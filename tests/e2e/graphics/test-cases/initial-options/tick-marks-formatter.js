@@ -47,6 +47,7 @@ function runTestCase(container) {
 				throw new Error('unhandled tick mark type ' + tickMarkType);
 			},
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const firstSeries = chart.addLineSeries();

@@ -9,10 +9,17 @@ import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale'
 import { Grid } from './grid';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
+import { ISeries, Series } from './series';
+import { SeriesType } from './series-options';
 import { sortSources } from './sort-sources';
 import { ITimeScale } from './time-scale';
 
+function isSeries(source: IPriceDataSource): source is Series<SeriesType> {
+	return source instanceof Series;
+}
+
 export const DEFAULT_STRETCH_FACTOR = 1000;
+export const MIN_PANE_HEIGHT = 30;
 
 export type PriceScalePosition = 'left' | 'right' | 'overlay';
 
@@ -59,9 +66,11 @@ export class Pane implements IDestroyable {
 		if (options.leftPriceScale) {
 			this._leftPriceScale.applyOptions(options.leftPriceScale);
 		}
+
 		if (options.rightPriceScale) {
 			this._rightPriceScale.applyOptions(options.rightPriceScale);
 		}
+
 		if (options.localization) {
 			this._leftPriceScale.updateFormatter();
 			this._rightPriceScale.updateFormatter();
@@ -149,6 +158,10 @@ export class Pane implements IDestroyable {
 		});
 
 		this.updateAllSources();
+	}
+
+	public series(): readonly Series<SeriesType>[] {
+		return this._dataSources.filter(isSeries);
 	}
 
 	public dataSources(): readonly IPriceDataSource[] {
@@ -325,6 +338,10 @@ export class Pane implements IDestroyable {
 		}
 
 		return this._cachedOrderedSources;
+	}
+
+	public orderedSeries(): readonly ISeries<SeriesType>[] {
+		return this.orderedSources().filter(isSeries);
 	}
 
 	public onDestroyed(): ISubscription {

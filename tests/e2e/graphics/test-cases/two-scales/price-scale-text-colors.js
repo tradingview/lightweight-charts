@@ -21,6 +21,7 @@ function runTestCase(container) {
 			visible: true,
 			textColor: 'red',
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series1 = chart.addLineSeries({ color: 'red', priceScaleId: 'right' });

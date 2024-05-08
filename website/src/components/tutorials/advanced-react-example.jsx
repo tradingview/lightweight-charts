@@ -27,6 +27,15 @@ const initialData = [
 	{ time: '2018-10-15', value: 51.86 },
 	{ time: '2018-10-16', value: 51.25 },
 ];
+
+const initialData2 = [
+	{ time: '2018-10-11', value: 42.89 },
+	{ time: '2018-10-12', value: 41.65 },
+	{ time: '2018-10-13', value: 41.56 },
+	{ time: '2018-10-14', value: 40.19 },
+	{ time: '2018-10-15', value: 41.86 },
+	{ time: '2018-10-16', value: 41.25 },
+];
 const currentDate = new Date(initialData[initialData.length - 1].time);
 
 export const App = props => {
@@ -41,7 +50,9 @@ export const App = props => {
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
 	// The following variables illustrate how a series could be updated.
 	const series1 = useRef(null);
+	const series2 = useRef(null);
 	const [started, setStarted] = useState(false);
+	const [isSecondSeriesActive, setIsSecondSeriesActive] = useState(false);
 
 	// The purpose of this effect is purely to show how a series could
 	// be updated using the `reference` passed to the `Series` component.
@@ -49,25 +60,31 @@ export const App = props => {
 		if (series1.current === null) {
 			return;
 		}
+		let intervalId;
 
 		if (started) {
-			const interval = setInterval(() => {
+			intervalId = setInterval(() => {
 				currentDate.setDate(currentDate.getDate() + 1);
 				const next = {
 					time: currentDate.toISOString().slice(0, 10),
 					value: 53 - 2 * Math.random(),
 				};
 				series1.current.update(next);
+				if (series2.current) {
+					series2.current.update({
+						...next,
+						value: 43 - 2 * Math.random(),
+					});
+				}
 			}, 1000);
-			return () => clearInterval(interval);
 		}
+		return () => clearInterval(intervalId);
 	}, [started]);
 
 	useEffect(() => {
 		setChartLayoutOptions({
 			background: {
 				color: backgroundColor,
-
 			},
 			textColor,
 		});
@@ -78,6 +95,9 @@ export const App = props => {
 			<button type="button" onClick={() => setStarted(current => !current)}>
 				{started ? 'Stop updating' : 'Start updating series'}
 			</button>
+			<button type="button" onClick={() => setIsSecondSeriesActive(current => !current)}>
+				{isSecondSeriesActive ? 'Remove second series' : 'Add second series'}
+			</button>
 			<Chart layout={chartLayoutOptions}>
 				<Series
 					ref={series1}
@@ -85,6 +105,12 @@ export const App = props => {
 					data={initialData}
 					color={lineColor}
 				/>
+				{isSecondSeriesActive && <Series
+					ref={series2}
+					type={'area'}
+					data={initialData2}
+					color={lineColor}
+				/>}
 			</Chart>
 		</>
 	);
@@ -104,6 +130,7 @@ export const ChartContainer = forwardRef((props, ref) => {
 	const { children, container, layout, ...rest } = props;
 
 	const chartApiRef = useRef({
+		isRemoved: false,
 		api() {
 			if (!this._api) {
 				this._api = createChart(container, {
@@ -116,9 +143,9 @@ export const ChartContainer = forwardRef((props, ref) => {
 			}
 			return this._api;
 		},
-		free() {
-			if (this._api) {
-				this._api.remove();
+		free(series) {
+			if (this._api && series) {
+				this._api.removeSeries(series);
 			}
 		},
 	});
@@ -137,6 +164,7 @@ export const ChartContainer = forwardRef((props, ref) => {
 		window.addEventListener('resize', handleResize);
 		return () => {
 			window.removeEventListener('resize', handleResize);
+			chartApiRef.current.isRemoved = true;
 			chart.remove();
 		};
 	}, []);
@@ -172,16 +200,19 @@ export const Series = forwardRef((props, ref) => {
 		api() {
 			if (!this._api) {
 				const { children, data, type, ...rest } = props;
-				this._api = type === 'line'
-					? parent.api().addLineSeries(rest)
-					: parent.api().addAreaSeries(rest);
+				this._api =
+					type === 'line'
+						? parent.api().addLineSeries(rest)
+						: parent.api().addAreaSeries(rest);
 				this._api.setData(data);
 			}
 			return this._api;
 		},
 		free() {
-			if (this._api) {
-				parent.free();
+			// check if parent component was removed already
+			if (this._api && !parent.isRemoved) {
+				// remove only current series
+				parent.free(this._api);
 			}
 		},
 	});

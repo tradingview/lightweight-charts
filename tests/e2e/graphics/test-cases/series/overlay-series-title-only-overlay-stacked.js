@@ -13,7 +13,7 @@ function generateData(func, shouldAddValue) {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
 	chart.priceScale('right').applyOptions({
 		visible: false,

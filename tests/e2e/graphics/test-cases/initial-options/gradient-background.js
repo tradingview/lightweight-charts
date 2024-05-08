@@ -21,6 +21,7 @@ function runTestCase(container) {
 				topColor: '#b1ff73',
 				bottomColor: '#1106b1',
 			},
+			attributionLogo: false,
 		},
 	});
 

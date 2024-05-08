@@ -26,6 +26,7 @@ function runTestCase(container) {
 				labelVisible: false,
 			},
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addAreaSeries();

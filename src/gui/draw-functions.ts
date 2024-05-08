@@ -44,7 +44,7 @@ export function drawSourcePaneViews(
 	const paneViews = paneViewsGetter(source, pane);
 
 	for (const paneView of paneViews) {
-		const renderer = paneView.renderer();
+		const renderer = paneView.renderer(pane);
 		if (renderer !== null) {
 			drawRendererFn(renderer);
 		}

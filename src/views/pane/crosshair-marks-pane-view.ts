@@ -4,6 +4,7 @@ import { BarPrice } from '../../model/bar';
 import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { Crosshair, CrosshairMode } from '../../model/crosshair';
+import { Pane } from '../../model/pane';
 import { ISeries } from '../../model/series';
 import { SeriesType } from '../../model/series-options';
 import { SeriesItemsIndexesRange, TimePointIndex } from '../../model/time-data';
@@ -34,28 +35,21 @@ const rangeForSinglePoint: SeriesItemsIndexesRange = { from: 0, to: 1 };
 export class CrosshairMarksPaneView implements IUpdatablePaneView {
 	private readonly _chartModel: IChartModelBase;
 	private readonly _crosshair: Crosshair;
+	private readonly _pane: Pane;
 	private readonly _compositeRenderer: CompositeRenderer = new CompositeRenderer();
 	private _markersRenderers: PaneRendererMarks[] = [];
 	private _markersData: MarksRendererData[] = [];
 	private _invalidated: boolean = true;
 
-	public constructor(chartModel: IChartModelBase, crosshair: Crosshair) {
+	public constructor(chartModel: IChartModelBase, crosshair: Crosshair, pane: Pane) {
 		this._chartModel = chartModel;
 		this._crosshair = crosshair;
+		this._pane = pane;
 		this._compositeRenderer.setRenderers(this._markersRenderers);
 	}
 
 	public update(updateType?: UpdateType): void {
-		const serieses = this._chartModel.serieses();
-		if (serieses.length !== this._markersRenderers.length) {
-			this._markersData = serieses.map(createEmptyMarkerData);
-			this._markersRenderers = this._markersData.map((data: MarksRendererData) => {
-				const res = new PaneRendererMarks();
-				res.setData(data);
-				return res;
-			});
-			this._compositeRenderer.setRenderers(this._markersRenderers);
-		}
+		this._createMarkerRenderersIfNeeded();
 
 		this._invalidated = true;
 	}
@@ -69,22 +63,33 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 		return this._compositeRenderer;
 	}
 
+	private _createMarkerRenderersIfNeeded(): void {
+		const serieses = this._pane.orderedSources();
+		if (serieses.length !== this._markersRenderers.length) {
+			this._markersData = serieses.map(createEmptyMarkerData);
+			this._markersRenderers = this._markersData.map((data: MarksRendererData) => {
+				const res = new PaneRendererMarks();
+				res.setData(data);
+				return res;
+			});
+			this._compositeRenderer.setRenderers(this._markersRenderers);
+		}
+	}
+
 	private _updateImpl(): void {
 		const forceHidden = this._crosshair.options().mode === CrosshairMode.Hidden;
-
-		const serieses = this._chartModel.serieses();
+		const serieses = this._pane.orderedSeries();
 		const timePointIndex = this._crosshair.appliedIndex();
 		const timeScale = this._chartModel.timeScale();
+		this._createMarkerRenderersIfNeeded();
 
 		serieses.forEach((s: ISeries<SeriesType>, index: number) => {
 			const data = this._markersData[index];
 			const seriesData = s.markerDataAtIndex(timePointIndex);
-
 			if (forceHidden || seriesData === null || !s.visible()) {
 				data.visibleRange = null;
 				return;
 			}
-
 			const firstValue = ensureNotNull(s.firstValue());
 			data.lineColor = seriesData.backgroundColor;
 			data.radius = seriesData.radius;

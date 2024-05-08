@@ -288,7 +288,7 @@ class WhiskerBoxSeries {
 }
 
 function runTestCase(container) {
-	const chart = (window.chart = LightweightCharts.createChart(container));
+	const chart = (window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } }));
 
 	const customSeriesView = new WhiskerBoxSeries();
 	const myCustomSeries = chart.addCustomSeries(customSeriesView, {

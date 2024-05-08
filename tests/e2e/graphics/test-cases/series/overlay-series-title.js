@@ -13,7 +13,7 @@ function generateData(func) {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
 	const mainSeries = chart.addLineSeries({
 		color: '#ff0000',

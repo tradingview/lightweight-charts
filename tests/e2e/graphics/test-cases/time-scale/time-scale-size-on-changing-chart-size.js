@@ -2,7 +2,7 @@
 window.ignoreMouseMove = true;
 
 async function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, { width: 150 });
+	const chart = window.chart = LightweightCharts.createChart(container, { width: 150, layout: { attributionLogo: false } });
 
 	const timeScale = chart.timeScale();
 
