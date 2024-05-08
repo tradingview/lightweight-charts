@@ -2,11 +2,6 @@
 
 module.exports = [
 	{
-		name: 'CJS',
-		path: 'dist/lightweight-charts.production.cjs',
-		limit: '50.79 KB',
-	},
-	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
 		limit: '50.72 KB',
