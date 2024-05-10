@@ -1,6 +1,7 @@
 import { lowerBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
+import { TickMarkWeight } from './horz-scale-behavior-time/types';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from './time-data';
 
@@ -131,8 +132,26 @@ export class TickMarks<HorzScaleItem> {
 				}
 
 				if (rightIndex - currentIndex >= maxIndexesPerMark && currentIndex - leftIndex >= maxIndexesPerMark) {
-					// TickMark fits. Place it into new array
-					marks.push(mark);
+					// Check if we need to add month mark
+					if (weight === TickMarkWeight.Day && typeof mark.originalTime === 'number') {
+						const startOfTheMonth = new Date(mark.originalTime * 1000);
+						startOfTheMonth.setDate(1);
+						startOfTheMonth.setHours(0);
+						startOfTheMonth.setMinutes(0);
+						startOfTheMonth.setSeconds(0);
+						const startOfTheMonthUtcSeconds = Math.floor(startOfTheMonth.getTime() / 1000);
+						const monthMark = marks.find((m: TickMark) => {
+							return m.weight === TickMarkWeight.Month && (m.originalTime as number) >= startOfTheMonthUtcSeconds;
+						});
+						// If there is no month mark, but current day mark first, promote current mark to month mark
+						if (!monthMark) {
+							mark.weight = TickMarkWeight.Month as TickMarkWeightValue;
+						}
+						marks.push(mark);
+					} else {
+						// TickMark fits. Place it into new array
+						marks.push(mark);
+					}
 					leftIndex = currentIndex;
 				} else {
 					if (this._uniformDistribution) {

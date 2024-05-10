@@ -237,7 +237,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	private _barSpacing: number;
 	private _scrollStartPoint: Coordinate | null = null;
 	private _scaleStartPoint: Coordinate | null = null;
-	private readonly _tickMarks: TickMarks<HorzScaleItem> = new TickMarks();
+	private readonly _tickMarks: TickMarks<HorzScaleItem> = new TickMarks<HorzScaleItem>();
 	private _formattedByWeight: Map<number, FormattedLabelsCache<HorzScaleItem>> = new Map();
 
 	private _visibleRange: TimeScaleVisibleRange = TimeScaleVisibleRange.invalid();
