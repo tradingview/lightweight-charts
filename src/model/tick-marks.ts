@@ -144,7 +144,7 @@ export class TickMarks<HorzScaleItem> {
 							return m.weight === TickMarkWeight.Month && (m.originalTime as number) >= startOfTheMonthUtcSeconds;
 						});
 						// If there is no month mark, but current day mark first, promote current mark to month mark
-						if (!monthMark) {
+						if (!monthMark && startOfTheMonth.getMonth() !== 0) {
 							mark.weight = TickMarkWeight.Month as TickMarkWeightValue;
 						}
 						marks.push(mark);
