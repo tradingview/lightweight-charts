@@ -92,9 +92,9 @@ export class TickMarks<HorzScaleItem> {
 		}
 	}
 
+	// eslint-disable-next-line complexity
 	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark[] {
 		let marks: TickMark[] = [];
-
 		for (const weight of Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a)) {
 			if (!this._marksByWeight.get(weight)) {
 				continue;
@@ -133,7 +133,7 @@ export class TickMarks<HorzScaleItem> {
 
 				if (rightIndex - currentIndex >= maxIndexesPerMark && currentIndex - leftIndex >= maxIndexesPerMark) {
 					// Check if we need to add month mark
-					if (weight === TickMarkWeight.Day && typeof mark.originalTime === 'number') {
+					if (this._marksByWeight.has(TickMarkWeight.Month as TickMarkWeightValue) && weight === TickMarkWeight.Day && i !== currentWeightLength - 1 && typeof mark.originalTime === 'number') {
 						const startOfTheMonth = new Date(mark.originalTime * 1000);
 						startOfTheMonth.setDate(1);
 						startOfTheMonth.setHours(0);
