@@ -103,7 +103,8 @@ export function fixMonthMarks(marks: readonly TickMark[], mark: TickMark): void 
 	const startOfTheMonthUtcSeconds = Math.floor(startOfTheMonth.getTime() / 1000);
 
 	const monthMark = marks.find((m: TickMark) => {
-		return m.weight === TickMarkWeight.Month && (m.originalTime as number) >= startOfTheMonthUtcSeconds;
+		const monthTimePoint = convertTime(m.originalTime as Time) as unknown as TimePoint;
+		return m.weight === TickMarkWeight.Month && monthTimePoint.timestamp >= startOfTheMonthUtcSeconds;
 	});
 
 	// If there is no month mark, but current day mark first, promote current mark to month mark
