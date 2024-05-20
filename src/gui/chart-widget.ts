@@ -25,6 +25,7 @@ import { SeriesType } from '../model/series-options';
 import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
+import { reviveCanvas } from './canvas-utils';
 import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -70,6 +71,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	private _dblClicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
+	private _onVisibilityChanged: ((event: Event) => void) | null = null;
 	private _observer: ResizeObserver | null = null;
 
 	private _container: HTMLElement;
@@ -132,6 +134,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		this._updateTimeAxisVisibility();
 		this._model.timeScale().optionsApplied().subscribe(this._model.fullUpdate.bind(this._model), this);
 		this._model.priceScalesOptionsChanged().subscribe(this._model.fullUpdate.bind(this._model), this);
+		this._setVisibilityChangeListener(true);
 	}
 
 	public model(): ChartModel<HorzScaleItem> {
@@ -185,6 +188,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		this._dblClicked.destroy();
 
 		this._uninstallObserver();
+		this._setVisibilityChangeListener(false);
 	}
 
 	public resize(width: number, height: number, forceRepaint: boolean = false): void {
@@ -584,6 +588,33 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		if (deltaX !== 0 && this._options.handleScroll.mouseWheel) {
 			this.model().scrollChart(deltaX * -80 as Coordinate); // 80 is a made up coefficient, and minus is for the "natural" scroll
 		}
+	}
+
+	private _setVisibilityChangeListener(add: boolean): void {
+		/**
+		 * Chrome 124 - 126 have a bug where the canvas will become blank
+		 * if the user view different tabs and then returns to the tab containing
+		 * the chart.
+		 * It is enough to just draw a single transparent pixel on the canvas to 'revive' it.
+		 * https://issues.chromium.org/issues/328755781
+		 */
+		if (!isChromiumBased(['123', '124', '125', '126'])) {
+			return;
+		}
+		if (!this._onVisibilityChanged) {
+			const container = this._container;
+			this._onVisibilityChanged = function(): void {
+				if (!document.hidden) {
+					container.querySelectorAll('canvas').forEach(reviveCanvas);
+				}
+			};
+		}
+		if (add) {
+			document.addEventListener('visibilitychange', this._onVisibilityChanged);
+			return;
+		}
+		document.removeEventListener('visibilitychange', this._onVisibilityChanged);
+		this._onVisibilityChanged = null;
 	}
 
 	private _drawImpl(invalidateMask: InvalidateMask, time: number): void {

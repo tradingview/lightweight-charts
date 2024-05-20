@@ -37,13 +37,16 @@ export function isWindows(): boolean {
 }
 
 // Determine whether the browser is Chromium based.
-export function isChromiumBased(): boolean {
+export function isChromiumBased(specificVersionsOnly?: string[]): boolean {
 	if (!isRunningOnClientSide) {
 		return false;
 	}
 	if (!navigator.userAgentData) { return false; }
 	return navigator.userAgentData.brands.some(
 		(brand: UADataBrand) => {
+			if (specificVersionsOnly && !specificVersionsOnly.includes(brand.version)) {
+				return false;
+			}
 			return brand.brand.includes('Chromium');
 		}
 	);

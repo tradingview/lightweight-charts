@@ -34,3 +34,24 @@ export function releaseCanvas(canvas: HTMLCanvasElement): void {
 	canvas.height = 1;
 	canvas.getContext('2d')?.clearRect(0, 0, 1, 1);
 }
+
+/**
+ * Chrome 124 - 126 have a bug where the canvas will become blank
+ * if the user view different tabs and then returns to the tab containing
+ * the chart.
+ * It is enough to just draw a single transparent pixel on the canvas to 'revive' it.
+ * https://issues.chromium.org/issues/328755781
+ */
+export function reviveCanvas(canvas: HTMLCanvasElement): void {
+	const ctx = canvas.getContext('2d');
+	if (!ctx) {
+		// Probably, this canvas is used for webgl
+		return;
+	}
+	ctx.save();
+	// Fully transparent
+	ctx.fillStyle = '#0000';
+	// Draw something
+	ctx.fillRect(1, 1, 1, 1);
+	ctx.restore();
+}
