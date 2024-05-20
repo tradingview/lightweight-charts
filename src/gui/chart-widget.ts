@@ -25,7 +25,6 @@ import { SeriesType } from '../model/series-options';
 import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
-import { reviveCanvas } from './canvas-utils';
 import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -71,7 +70,6 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	private _dblClicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
-	private _onVisibilityChanged: ((event: Event) => void) | null = null;
 	private _observer: ResizeObserver | null = null;
 
 	private _container: HTMLElement;
@@ -601,21 +599,18 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		if (!isChromiumBased(['123', '124', '125', '126'])) {
 			return;
 		}
-		if (!this._onVisibilityChanged) {
-			const container = this._container;
-			this._onVisibilityChanged = function(): void {
-				if (!document.hidden) {
-					container.querySelectorAll('canvas').forEach(reviveCanvas);
-				}
-			};
-		}
 		if (add) {
 			document.addEventListener('visibilitychange', this._onVisibilityChanged);
 			return;
 		}
 		document.removeEventListener('visibilitychange', this._onVisibilityChanged);
-		this._onVisibilityChanged = null;
 	}
+
+	private _onVisibilityChanged = (): void => {
+		if (!document.hidden) {
+			this.model().lightUpdate();
+		}
+	};
 
 	private _drawImpl(invalidateMask: InvalidateMask, time: number): void {
 		const invalidationType = invalidateMask.fullInvalidation();
