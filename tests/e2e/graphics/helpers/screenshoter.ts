@@ -141,7 +141,6 @@ export class Screenshoter {
 				const additionalScreenshotPNG = new PNG();
 				await new Promise((resolve: (data: PNG) => void, reject: (reason: Error) => void) => {
 					additionalScreenshotPNG.parse(additionalScreenshotBuffer, (error: Error, data: PNG) => {
-						// eslint-disable-next-line @typescript-eslint/tslint/config
 						if (error === null) {
 							resolve(data);
 						} else {
