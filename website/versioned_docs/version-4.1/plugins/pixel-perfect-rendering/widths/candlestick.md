@@ -61,7 +61,7 @@ function optimalCandlestickWidth(
 /**
  * Calculates the candlestick width that the library would use for the current
  * bar spacing.
- * @param barSpacing bar spacing in media coordinates
+ * @param barSpacing - bar spacing in media coordinates
  * @param horizontalPixelRatio - horizontal pixel ratio
  * @returns The width (in bitmap coordinates) that the chart would use to draw a candle body
  */

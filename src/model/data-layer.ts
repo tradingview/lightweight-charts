@@ -253,6 +253,7 @@ export class DataLayer<HorzScaleItem> {
 
 		const lastSeriesTime = this._seriesLastTimePoint.get(series);
 		if (lastSeriesTime !== undefined && this._horzScaleBehavior.key(time) < this._horzScaleBehavior.key(lastSeriesTime)) {
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
 			throw new Error(`Cannot update oldest data, last time=${lastSeriesTime}, new time=${time}`);
 		}
 

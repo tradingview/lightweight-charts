@@ -89,9 +89,11 @@ export class Pane implements IDestroyable {
 
 	public priceScaleById(id: string): PriceScale | null {
 		switch (id) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 			case DefaultPriceScaleId.Left: {
 				return this._leftPriceScale;
 			}
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 			case DefaultPriceScaleId.Right: {
 				return this._rightPriceScale;
 			}

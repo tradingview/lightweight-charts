@@ -541,11 +541,13 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (priceScaleId === DefaultPriceScaleId.Left) {
 			this.applyOptions({
 				leftPriceScale: options,
 			});
 			return;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		} else if (priceScaleId === DefaultPriceScaleId.Right) {
 			this.applyOptions({
 				rightPriceScale: options,

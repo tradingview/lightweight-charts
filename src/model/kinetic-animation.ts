@@ -71,6 +71,7 @@ export class KineticAnimation {
 			return;
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (time - this._position1.time > Constants.MaxStartDelay) {
 			return;
 		}

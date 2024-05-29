@@ -1,6 +1,7 @@
 // eslint-env node
 
-module.exports = [
+// eslint-disable-next-line import/no-default-export
+export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',

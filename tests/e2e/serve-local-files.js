@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import express from 'express';
 
-const express = require('express');
-
-function serveLocalFiles(filesToServe, port, hostname) {
+export function serveLocalFiles(filesToServe, port, hostname) {
 	if (filesToServe.size === 0) {
 		return Promise.resolve(null);
 	}
@@ -35,9 +34,7 @@ function serveLocalFiles(filesToServe, port, hostname) {
 	});
 }
 
-module.exports.serveLocalFiles = serveLocalFiles;
-
-function main() {
+async function main() {
 	if (process.argv.length < 3) {
 		console.log(`Usage: ${process.argv[1]} [...paths]`);
 		console.log(`Example: ${process.argv[1]} path/to/file renamed-file-name:path/to/file`);
@@ -74,9 +71,7 @@ function main() {
 	return serveLocalFiles(filesToServe, port, '0.0.0.0');
 }
 
-if (require.main === module) {
-	main().catch(e => {
-		console.error('Error:', e);
-		process.exitCode = 1;
-	});
-}
+main().catch(e => {
+	console.error('Error:', e);
+	process.exitCode = 1;
+});

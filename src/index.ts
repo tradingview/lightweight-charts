@@ -21,6 +21,8 @@ export const customSeriesDefaultOptions: CustomSeriesOptions = {
 
 export { createChart, createChartEx } from './api/create-chart';
 
+export { Range } from './model/time-data';
+
 /**
  * Returns the current version as a string. For example `'3.3.0'`.
  */

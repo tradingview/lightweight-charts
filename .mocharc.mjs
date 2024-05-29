@@ -1,14 +1,10 @@
 'use strict';
-
-const path = require('path');
+import { resolve } from 'node:path';
 
 // override tsconfig for tests
-process.env.TS_NODE_PROJECT = path.resolve(__dirname, './tests/unittests/tsconfig.composite.json');
+process.env.TS_NODE_PROJECT = resolve(__dirname, './tests/unittests/tsconfig.composite.json');
 
 const config = {
-	require: [
-		'ts-node/register',
-	],
 	extension: ['ts'],
 	checkLeaks: true,
 	recursive: true,
@@ -30,4 +26,5 @@ if (process.env.TESTS_REPORT_FILE) {
 		.join(',');
 }
 
-module.exports = config;
+// eslint-disable-next-line import/no-default-export
+export default config;

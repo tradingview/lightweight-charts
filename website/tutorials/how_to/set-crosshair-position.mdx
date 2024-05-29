@@ -22,12 +22,14 @@ import syncingCode from "!!raw-loader!./set-crosshair-position-syncing.js";
 import trackingCode from "!!raw-loader!./set-crosshair-position-tracking.js";
 import VersionWarningAdmonition from "@site/src/components/VersionWarningAdmonition";
 
-<!-- Show warning when not on the required version  -->
-<!-- Tutorials section isn't versioned yet, hence the need for the warning message -->
+{/*
+  Show warning when not on the required version
+  Tutorials section isn't versioned yet, hence the need for the warning message
+*/}
 
 <MinimumVersionWrapper version={4.1} fallback={() => {
   return (<VersionWarningAdmonition
-    notCurrent="These tutorials are for version 4.1 (or greater) of Lightweight&nbsp;Charts™."
+    notCurrent="These tutorials are for version 4.1 (or greater) of Lightweight Charts™."
     type="caution"
     displayVersionMessage
   />);

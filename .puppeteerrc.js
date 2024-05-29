@@ -1,14 +1,14 @@
-const { join } = require('path');
+import { join } from 'node:path';
 
 /**
  * @type {import("puppeteer").Configuration}
  */
-module.exports = {
+const puppeteerConfig = {
 	/**
 	 * We need to set the cacheDirectory so that the CircleCI pipeline
 	 * can reliably find the installed chrome binary
 	 */
-	cacheDirectory: join(__dirname, 'node_modules', '.cache', 'puppeteer'),
+	cacheDirectory: join(new URL('.', import.meta.url).pathname, 'node_modules', '.cache', 'puppeteer'),
 	downloadBaseUrl: 'https://storage.googleapis.com/chrome-for-testing-public',
 	experiments: {
 		/**
@@ -19,3 +19,5 @@ module.exports = {
 		macArmChromiumEnabled: true,
 	},
 };
+
+export default puppeteerConfig;

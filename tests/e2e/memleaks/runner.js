@@ -1,20 +1,24 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import Mocha from 'mocha';
+import { serveLocalFiles } from '../serve-local-files.js';
 
-const Mocha = require('mocha');
+import mochaConfig from '../../../.mocharc.mjs';
 
-const serveLocalFiles = require('../serve-local-files.js').serveLocalFiles;
-
-const mochaConfig = require('../../../.mocharc.js');
-
-// override tsconfig
+// Override tsconfig
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 process.env.TS_NODE_PROJECT = path.resolve(__dirname, '../tsconfig.composite.json');
 
-mochaConfig.require.forEach(module => {
-	require(module);
-});
+// Dynamically import the required modules from mochaConfig
+async function loadMochaModules() {
+	await Promise.all(mochaConfig.require.map(async module => {
+		await import(module);
+	}));
+}
 
 if (process.argv.length !== 3) {
 	console.log('Usage: runner PATH_TO_TEST_STANDALONE_MODULE');
@@ -74,5 +78,10 @@ function runMocha(closeServer) {
 	});
 }
 
-serveLocalFiles(filesToServe, port, hostname)
-	.then(runMocha);
+async function main() {
+	await loadMochaModules();
+	await serveLocalFiles(filesToServe, port, hostname);
+	runMocha();
+}
+
+main();

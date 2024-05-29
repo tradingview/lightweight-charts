@@ -243,6 +243,13 @@ module.exports = {
 						'@typescript-eslint/require-await': 'off',
 						'@typescript-eslint/tslint/config': 'off',
 						'@typescript-eslint/unbound-method': 'off',
+						'@typescript-eslint/no-base-to-string': 'off',
+						'@typescript-eslint/no-duplicate-type-constituents': 'off',
+						'@typescript-eslint/no-redundant-type-constituents': 'off',
+						'@typescript-eslint/no-unsafe-argument': 'off',
+						'@typescript-eslint/no-unsafe-enum-comparison': 'off',
+						'no-undef-init': 'off',
+						curly: 'off',
 						'deprecation/deprecation': 'off',
 					},
 				},
@@ -315,7 +322,6 @@ module.exports = {
 				'@typescript-eslint/no-loop-func': 'error',
 				'@typescript-eslint/no-namespace': 'off',
 				'@typescript-eslint/no-non-null-assertion': 'error',
-				'@typescript-eslint/no-parameter-properties': 'error',
 				'@typescript-eslint/no-require-imports': 'off',
 				'@typescript-eslint/no-shadow': 'error',
 				'@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
@@ -350,12 +356,6 @@ module.exports = {
 				'deprecation/deprecation': 'error',
 
 				'tsdoc/syntax': ['error'],
-				'jsdoc/check-examples': [
-					'error',
-					{
-						exampleCodeRegex: '/```js\\s+(.*)\\s+```/su',
-					},
-				],
 
 				// can't use at the moment - see https://github.com/typescript-eslint/typescript-eslint/issues/1824
 				// '@typescript-eslint/indent': [
@@ -792,7 +792,6 @@ module.exports = {
 		}],
 
 		'jsdoc/check-indentation': 'error',
-		'jsdoc/newline-after-description': 'error',
 
 		'import/no-default-export': 'error',
 

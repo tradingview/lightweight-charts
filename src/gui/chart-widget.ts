@@ -280,11 +280,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	}
 
 	public getPriceAxisWidth(position: DefaultPriceScaleId): number {
-		if (position === 'left' && !this._isLeftAxisVisible()) {
+		if (position === DefaultPriceScaleId.Left && !this._isLeftAxisVisible()) {
 			return 0;
 		}
 
-		if (position === 'right' && !this._isRightAxisVisible()) {
+		if (position === DefaultPriceScaleId.Right && !this._isRightAxisVisible()) {
 			return 0;
 		}
 
@@ -295,7 +295,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		// we don't need to worry about exactly pane widget here
 		// because all pane widgets have the same width of price axis widget
 		// see _adjustSizeImpl
-		const priceAxisWidget = position === 'left'
+		const priceAxisWidget = position === DefaultPriceScaleId.Left
 			? this._paneWidgets[0].leftPriceAxisWidget()
 			: this._paneWidgets[0].rightPriceAxisWidget();
 		return ensureNotNull(priceAxisWidget).getWidth();
@@ -788,7 +788,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 				}
 			});
 		}
-		let clientTime: unknown | undefined;
+		let clientTime: unknown;
 		if (index !== null) {
 			const timePoint = this._model.timeScale().indexToTimeScalePoint(index)?.originalTime;
 			if (timePoint !== undefined) {

@@ -1,7 +1,12 @@
-const nodeResolve = require('@rollup/plugin-node-resolve').default;
-const replace = require('@rollup/plugin-replace');
-const terser = require('@rollup/plugin-terser').default;
-const packageJson = require('./package.json');
+import { default as nodeResolve } from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
+import { default as terser } from '@rollup/plugin-terser';
+import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const packageJsonPath = resolve(fileURLToPath(import.meta.url), '../package.json');
+const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 
 function getDevBuildMetadata() {
 	const now = new Date();
@@ -17,10 +22,7 @@ const currentVersion = getCurrentVersion();
 
 const year = new Date().getFullYear();
 
-function getConfig(
-	inputFile,
-	{ format, isProd, isStandalone }
-) {
+function getConfig(inputFile, { format, isProd, isStandalone }) {
 	const mode = isProd ? 'production' : 'development';
 	const extension = {
 		esm: 'mjs',
@@ -45,30 +47,26 @@ function getConfig(
 				preventAssignment: true,
 				values: {
 					// make sure that this values are synced with src/typings/globals/index.d.ts
-					'process.env.NODE_ENV': JSON.stringify(
-						isProd ? 'production' : 'development'
-					),
+					'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
 					'process.env.BUILD_VERSION': JSON.stringify(currentVersion),
 				},
 			}),
-			isProd &&
-				terser({
-					output: {
-						comments: /@license/,
-						// eslint-disable-next-line camelcase
-						inline_script: true,
+			isProd && terser({
+				output: {
+					comments: /@license/,
+					// eslint-disable-next-line camelcase
+					inline_script: true,
+				},
+				mangle: {
+					module: format === 'esm',
+					properties: {
+						regex: /^_(private|internal)_/,
 					},
-					mangle: {
-						module: format === 'esm',
-						properties: {
-							regex: /^_(private|internal)_/,
-						},
-					},
-				}),
+				},
+			}),
 		],
 		external: id => !isStandalone && /^fancy-canvas(\/.+)?$/.test(id),
 	};
-
 	return config;
 }
 
@@ -97,4 +95,5 @@ modes.forEach(mode => {
 // eslint-disable-next-line no-console
 console.log(`Building version: ${currentVersion}`);
 
-module.exports = configs;
+// eslint-disable-next-line import/no-default-export
+export default configs;
