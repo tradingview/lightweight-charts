@@ -139,31 +139,31 @@ async function performAction(
 			break;
 		case 'pinchZoomIn':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doPinchZoomTouch(devToolsSession, target, true);
 			}
 			break;
 		case 'pinchZoomOut':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doPinchZoomTouch(devToolsSession, target);
 			}
 			break;
 		case 'swipeTouchHorizontal':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, { horizontal: true });
 			}
 			break;
 		case 'swipeTouchVertical':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, { vertical: true });
 			}
 			break;
 		case 'swipeTouchDiagonal':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, {
 					vertical: true,
 					horizontal: true,

@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://www.tradingview.com/lightweight-charts/" target="_blank">
-    <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true">
+    <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true" alt="Lightweight Charts logo">
   </a>
 
   <h1>Lightweight Charts™</h1>

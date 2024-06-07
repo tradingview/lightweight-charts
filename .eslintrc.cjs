@@ -482,10 +482,10 @@ module.exports = {
 						contexts: [
 							'TSEnumDeclaration',
 							'TSEnumMember',
-							'TSInterfaceDeclaration',
+							// 'TSInterfaceDeclaration',
 							'TSMethodSignature',
 							'TSPropertySignature',
-							'TSTypeAliasDeclaration',
+							// 'TSTypeAliasDeclaration',
 						],
 					},
 				],

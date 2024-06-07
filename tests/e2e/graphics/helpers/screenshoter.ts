@@ -26,7 +26,7 @@ export class Screenshoter {
 				width: viewportWidth,
 				height: viewportHeight,
 			},
-			headless: 'new',
+			headless: true,
 		};
 
 		if (noSandbox) {
