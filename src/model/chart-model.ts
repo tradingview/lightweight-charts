@@ -348,27 +348,36 @@ export interface ChartOptionsImpl<HorzScaleItem> extends ChartOptionsBase {
 	localization: LocalizationOptions<HorzScaleItem>;
 }
 
+/**
+ * These properties should not be renamed by `ts-transformer-properties-rename`.
+ * To ensure that this is respected in all places, please only use the
+ * ['name'] syntax to read or write these properties.
+ */
+interface ChartOptionsInternalFixedNames {
+	/**
+	 * **Only access using ['handleScroll']**
+	 * @public
+	 */
+	handleScroll: HandleScrollOptions;
+	/**
+	 * **Only access using ['handleScale']**
+	 * @public
+	 */
+	handleScale: HandleScaleOptionsInternal;
+	/**
+	 * **Only access using ['layout']**
+	 * @public
+	 */
+	layout: LayoutOptions;
+}
+
 export type ChartOptionsInternalBase =
 	Omit<ChartOptionsBase, 'handleScroll' | 'handleScale' | 'layout'>
-	& {
-		/** @public */
-		handleScroll: HandleScrollOptions;
-		/** @public */
-		handleScale: HandleScaleOptionsInternal;
-		/** @public */
-		layout: LayoutOptions;
-	};
+	& ChartOptionsInternalFixedNames;
 
 export type ChartOptionsInternal<HorzScaleItem> =
 	Omit<ChartOptionsImpl<HorzScaleItem>, 'handleScroll' | 'handleScale' | 'layout'>
-	& {
-		/** @public */
-		handleScroll: HandleScrollOptions;
-		/** @public */
-		handleScale: HandleScaleOptionsInternal;
-		/** @public */
-		layout: LayoutOptions;
-	};
+	& ChartOptionsInternalFixedNames;
 
 interface GradientColorsCache {
 	topColor: string;
@@ -1115,7 +1124,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	private _getBackgroundColor(side: BackgroundColorSide): string {
-		const layoutOptions = this._options.layout;
+		const layoutOptions = this._options['layout'];
 
 		if (layoutOptions.background.type === ColorType.VerticalGradient) {
 			return side === BackgroundColorSide.Top ?

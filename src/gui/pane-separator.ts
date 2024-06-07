@@ -54,7 +54,7 @@ export class PaneSeparator implements IDestroyable {
 
 		this._updateBorderColor();
 		this._rowElement.appendChild(this._cell);
-		this._resizeEnabled = this._chartWidget.options().layout.panes.enableResize;
+		this._resizeEnabled = this._chartWidget.options()['layout'].panes.enableResize;
 
 		if (!this._resizeEnabled) {
 			this._handle = null;
@@ -90,14 +90,14 @@ export class PaneSeparator implements IDestroyable {
 
 	public drawBitmap(ctx: CanvasRenderingContext2D, x: number, y: number): void {
 		const bitmapSize = this.getBitmapSize();
-		ctx.fillStyle = this._chartWidget.options().layout.panes.separatorColor;
+		ctx.fillStyle = this._chartWidget.options()['layout'].panes.separatorColor;
 		ctx.fillRect(x, y, bitmapSize.width, bitmapSize.height);
 	}
 
 	public update(): void {
 		this._updateBorderColor();
-		if (this._chartWidget.options().layout.panes.enableResize !== this._resizeEnabled) {
-			this._resizeEnabled = this._chartWidget.options().layout.panes.enableResize;
+		if (this._chartWidget.options()['layout'].panes.enableResize !== this._resizeEnabled) {
+			this._resizeEnabled = this._chartWidget.options()['layout'].panes.enableResize;
 			if (this._resizeEnabled) {
 				this._addResizableHandle();
 			} else {
@@ -159,12 +159,12 @@ export class PaneSeparator implements IDestroyable {
 		this._handle = { element, backgroundElement };
 	}
 	private _updateBorderColor(): void {
-		this._cell.style.background = this._chartWidget.options().layout.panes.separatorColor;
+		this._cell.style.background = this._chartWidget.options()['layout'].panes.separatorColor;
 	}
 
 	private _mouseOverEvent(event: TouchMouseEvent): void {
 		if (this._handle !== null) {
-			this._handle.element.style.backgroundColor = this._chartWidget.options().layout.panes.separatorHoverColor;
+			this._handle.element.style.backgroundColor = this._chartWidget.options()['layout'].panes.separatorHoverColor;
 		}
 	}
 

@@ -67,9 +67,9 @@ function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 }
 
 function migrateHandleScaleScrollOptions<HorzScaleItem>(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): void {
-	if (isBoolean(options.handleScale)) {
-		const handleScale = options.handleScale;
-		options.handleScale = {
+	if (isBoolean(options['handleScale'])) {
+		const handleScale = options['handleScale'];
+		options['handleScale'] = {
 			axisDoubleClickReset: {
 				time: handleScale,
 				price: handleScale,
@@ -81,25 +81,25 @@ function migrateHandleScaleScrollOptions<HorzScaleItem>(options: DeepPartial<Cha
 			mouseWheel: handleScale,
 			pinch: handleScale,
 		};
-	} else if (options.handleScale !== undefined) {
-		const { axisPressedMouseMove, axisDoubleClickReset } = options.handleScale;
+	} else if (options['handleScale'] !== undefined) {
+		const { axisPressedMouseMove, axisDoubleClickReset } = options['handleScale'];
 		if (isBoolean(axisPressedMouseMove)) {
-			options.handleScale.axisPressedMouseMove = {
+			options['handleScale'].axisPressedMouseMove = {
 				time: axisPressedMouseMove,
 				price: axisPressedMouseMove,
 			};
 		}
 		if (isBoolean(axisDoubleClickReset)) {
-			options.handleScale.axisDoubleClickReset = {
+			options['handleScale'].axisDoubleClickReset = {
 				time: axisDoubleClickReset,
 				price: axisDoubleClickReset,
 			};
 		}
 	}
 
-	const handleScroll = options.handleScroll;
+	const handleScroll = options['handleScroll'];
 	if (isBoolean(handleScroll)) {
-		options.handleScroll = {
+		options['handleScroll'] = {
 			horzTouchDrag: handleScroll,
 			vertTouchDrag: handleScroll,
 			mouseWheel: handleScroll,

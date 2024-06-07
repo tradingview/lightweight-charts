@@ -139,8 +139,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			this._topCanvasBinding.canvasElement,
 			this,
 			{
-				treatVertTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options().handleScroll.vertTouchDrag,
-				treatHorzTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options().handleScroll.horzTouchDrag,
+				treatVertTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options()['handleScroll'].vertTouchDrag,
+				treatHorzTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options()['handleScroll'].horzTouchDrag,
 			}
 		);
 	}
@@ -348,7 +348,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public pinchEvent(middlePoint: Position, scale: number): void {
-		if (!this._chart.options().handleScale.pinch) {
+		if (!this._chart.options()['handleScale'].pinch) {
 			return;
 		}
 
@@ -740,7 +740,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		const chartOptions = this._chart.options();
-		const scrollOptions = chartOptions.handleScroll;
+		const scrollOptions = chartOptions['handleScroll'];
 		const kineticScrollOptions = chartOptions.kineticScroll;
 		if (
 			(!scrollOptions.pressedMouseMove || event.isTouch) &&

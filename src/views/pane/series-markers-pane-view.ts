@@ -128,7 +128,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			this._makeValid();
 		}
 
-		const layout = this._model.options().layout;
+		const layout = this._model.options()['layout'];
 		this._renderer.setParams(layout.fontSize, layout.fontFamily);
 		this._renderer.setData(this._data);
 
@@ -195,7 +195,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			this._dataInvalidated = false;
 		}
 
-		const layoutOptions = this._model.options().layout;
+		const layoutOptions = this._model.options()['layout'];
 
 		this._data.visibleRange = null;
 		const visibleBars = timeScale.visibleStrictRange();

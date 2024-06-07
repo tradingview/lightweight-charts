@@ -44,11 +44,11 @@ export class AttributionLogoWidget {
 	}
 
 	private _themeToUse(): LogoTheme {
-		return colorStringToGrayscale(this._chart.options().layout.textColor) > 160 ? 'dark' : 'light';
+		return colorStringToGrayscale(this._chart.options()['layout'].textColor) > 160 ? 'dark' : 'light';
 	}
 
 	private _shouldBeVisible(): boolean {
-		return this._chart.options().layout.attributionLogo;
+		return this._chart.options()['layout'].attributionLogo;
 	}
 
 	private _getUTMSource(): string {

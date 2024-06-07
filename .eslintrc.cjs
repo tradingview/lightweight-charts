@@ -270,7 +270,7 @@ module.exports = {
 					},
 				],
 				'@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
-				'@typescript-eslint/dot-notation': 'error',
+				'@typescript-eslint/dot-notation': ['error', { allowPattern: '^(layout|handleScroll|handleScale)$' }],
 				'@typescript-eslint/explicit-member-accessibility': [
 					'error',
 					{

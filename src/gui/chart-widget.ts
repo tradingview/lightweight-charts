@@ -242,7 +242,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			this._setMouseWheelEventListener(shouldHaveMouseWheelListener);
 		}
 
-		if (options.layout?.panes) {
+		if (options['layout']?.panes) {
 			this._applyPanesOptions();
 		}
 		this._updateTimeAxisVisibility();
@@ -574,8 +574,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	}
 
 	private _onMousewheel(event: WheelEvent): void {
-		if ((event.deltaX === 0 || !this._options.handleScroll.mouseWheel) &&
-			(event.deltaY === 0 || !this._options.handleScale.mouseWheel)) {
+		if ((event.deltaX === 0 || !this._options['handleScroll'].mouseWheel) &&
+			(event.deltaY === 0 || !this._options['handleScale'].mouseWheel)) {
 			return;
 		}
 
@@ -588,13 +588,13 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			event.preventDefault();
 		}
 
-		if (deltaY !== 0 && this._options.handleScale.mouseWheel) {
+		if (deltaY !== 0 && this._options['handleScale'].mouseWheel) {
 			const zoomScale = Math.sign(deltaY) * Math.min(1, Math.abs(deltaY));
 			const scrollPosition = event.clientX - this._element.getBoundingClientRect().left;
 			this.model().zoomTime(scrollPosition as Coordinate, zoomScale);
 		}
 
-		if (deltaX !== 0 && this._options.handleScroll.mouseWheel) {
+		if (deltaX !== 0 && this._options['handleScroll'].mouseWheel) {
 			this.model().scrollChart(deltaX * -80 as Coordinate); // 80 is a made up coefficient, and minus is for the "natural" scroll
 		}
 	}
@@ -913,5 +913,5 @@ function disableSelection(element: HTMLElement): void {
 }
 
 function shouldSubscribeMouseWheel<HorzScaleItem>(options: ChartOptionsInternal<HorzScaleItem>): boolean {
-	return Boolean(options.handleScroll.mouseWheel || options.handleScale.mouseWheel);
+	return Boolean(options['handleScroll'].mouseWheel || options['handleScale'].mouseWheel);
 }

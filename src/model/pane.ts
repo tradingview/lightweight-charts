@@ -431,7 +431,7 @@ export class Pane implements IDestroyable {
 		const priceScale = new PriceScale(
 			id,
 			actualOptions,
-			this._model.options().layout,
+			this._model.options()['layout'],
 			this._model.options().localization
 		);
 		priceScale.setHeight(this.height());

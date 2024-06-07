@@ -75,7 +75,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	public constructor(chartWidget: ChartWidget<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._chart = chartWidget;
 		this._horzScaleBehavior = horzScaleBehavior;
-		this._options = chartWidget.options().layout;
+		this._options = chartWidget.options()['layout'];
 
 		this._element = document.createElement('tr');
 
@@ -124,7 +124,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			this,
 			{
 				treatVertTouchDragAsPageScroll: () => true,
-				treatHorzTouchDragAsPageScroll: () => !this._chart.options().handleScroll.horzTouchDrag,
+				treatHorzTouchDragAsPageScroll: () => !this._chart.options()['handleScroll'].horzTouchDrag,
 			}
 		);
 	}
@@ -166,7 +166,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 		this._mouseDown = true;
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove.time) {
+		if (model.timeScale().isEmpty() || !this._chart.options()['handleScale'].axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -181,7 +181,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		const model = this._chart.model();
 		if (!model.timeScale().isEmpty() && this._mouseDown) {
 			this._mouseDown = false;
-			if (this._chart.options().handleScale.axisPressedMouseMove.time) {
+			if (this._chart.options()['handleScale'].axisPressedMouseMove.time) {
 				model.endScaleTime();
 			}
 		}
@@ -189,7 +189,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 	public pressedMouseMoveEvent(event: TouchMouseEvent): void {
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove.time) {
+		if (model.timeScale().isEmpty() || !this._chart.options()['handleScale'].axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -203,7 +203,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	public mouseUpEvent(): void {
 		this._mouseDown = false;
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() && !this._chart.options().handleScale.axisPressedMouseMove.time) {
+		if (model.timeScale().isEmpty() && !this._chart.options()['handleScale'].axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -215,7 +215,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	}
 
 	public mouseDoubleClickEvent(): void {
-		if (this._chart.options().handleScale.axisDoubleClickReset.time) {
+		if (this._chart.options()['handleScale'].axisDoubleClickReset.time) {
 			this._chart.model().resetTimeScale();
 		}
 	}
@@ -225,7 +225,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	}
 
 	public mouseEnterEvent(): void {
-		if (this._chart.model().options().handleScale.axisPressedMouseMove.time) {
+		if (this._chart.model().options()['handleScale'].axisPressedMouseMove.time) {
 			this._setCursor(CursorType.EwResize);
 		}
 	}

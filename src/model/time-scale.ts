@@ -505,7 +505,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		}
 
 		const spacing = this._barSpacing;
-		const fontSize = this._model.options().layout.fontSize;
+		const fontSize = this._model.options()['layout'].fontSize;
 
 		const pixelsPer8Characters = (fontSize + 4) * 5;
 		const pixelsPerCharacter = pixelsPer8Characters / defaultTickMarkMaxCharacterLength;
@@ -776,7 +776,8 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	private _isAllScalingAndScrollingDisabled(): boolean {
-		const { handleScroll, handleScale } = this._model.options();
+		const handleScroll = this._model.options()['handleScroll'];
+		const handleScale = this._model.options()['handleScale'];
 		return !handleScroll.horzTouchDrag
 			&& !handleScroll.mouseWheel
 			&& !handleScroll.pressedMouseMove
