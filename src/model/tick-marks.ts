@@ -93,6 +93,7 @@ export class TickMarks<HorzScaleItem> {
 
 	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark[] {
 		let marks: TickMark[] = [];
+
 		for (const weight of Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a)) {
 			if (!this._marksByWeight.get(weight)) {
 				continue;
@@ -101,6 +102,7 @@ export class TickMarks<HorzScaleItem> {
 			// Built tickMarks are now prevMarks, and marks it as new array
 			const prevMarks = marks;
 			marks = [];
+
 			const prevMarksLength = prevMarks.length;
 			let prevMarksPointer = 0;
 			const currentWeight = ensureDefined(this._marksByWeight.get(weight));
