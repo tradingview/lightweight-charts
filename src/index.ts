@@ -19,7 +19,7 @@ export const customSeriesDefaultOptions: CustomSeriesOptions = {
 	...customStyleDefaults,
 };
 
-export { createChart, createChartEx, defaultHorzScaleBehaviour } from './api/create-chart';
+export { createChart, createChartEx, defaultHorzScaleBehavior } from './api/create-chart';
 
 /**
  * Returns the current version as a string. For example `'3.3.0'`.
