@@ -854,7 +854,8 @@ function convertTimeWithMemory(t) {
 	converted.set(t, answer);
 	return answer;
 }
-class CustomBehavior extends LightweightCharts.HorzScaleBehaviorTime {
+const DefaultHorzScaleBehavior	= LightweightCharts.defaultHorzScaleBehaviour();
+class CustomBehavior extends DefaultHorzScaleBehavior {
 	constructor(...props) {
 		super(...props);
 		this._lastHash = '';
