@@ -3,9 +3,7 @@ import { isString } from '../../helpers/strict-type-checks';
 
 import { TimedData } from '../data-layer';
 import { InternalHorzScaleItem } from '../ihorz-scale-behavior';
-import { TickMark } from '../tick-marks';
-import { TickMarkWeightValue } from '../time-data';
-import { BusinessDay, isBusinessDay, isUTCTimestamp, TickMarkWeight, Time, TimePoint, UTCTimestamp } from './types';
+import { BusinessDay, isBusinessDay, isUTCTimestamp, Time, UTCTimestamp } from './types';
 
 export type TimeConverter = (time: Time) => InternalHorzScaleItem;
 
@@ -93,23 +91,3 @@ export function convertStringToBusinessDay(value: TimedData<Time>): void {
 export function convertStringsToBusinessDays(data: TimedData<Time>[]): void {
 	return data.forEach(convertStringToBusinessDay);
 }
-
-export function fixMonthMarks(marks: readonly TickMark[], mark: TickMark): void {
-	const timePoint = convertTime(mark.originalTime as Time) as unknown as TimePoint;
-	const startOfTheMonth = new Date(timePoint.timestamp * 1000);
-	startOfTheMonth.setDate(1);
-	startOfTheMonth.setHours(0, 0, 0, 0);
-
-	const startOfTheMonthUtcSeconds = Math.floor(startOfTheMonth.getTime() / 1000);
-
-	const monthMark = marks.find((m: TickMark) => {
-		const monthTimePoint = convertTime(m.originalTime as Time) as unknown as TimePoint;
-		return m.weight === TickMarkWeight.Month && monthTimePoint.timestamp >= startOfTheMonthUtcSeconds;
-	});
-
-	// If there is no month mark, but current day mark first, promote current mark to month mark
-	if (!monthMark && startOfTheMonth.getMonth() !== 0) {
-		mark.weight = TickMarkWeight.Month as TickMarkWeightValue;
-	}
-}
-

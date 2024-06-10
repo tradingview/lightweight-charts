@@ -1,8 +1,6 @@
 import { lowerBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 
-import { fixMonthMarks } from './horz-scale-behavior-time/time-utils';
-import { TickMarkWeight } from './horz-scale-behavior-time/types';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from './time-data';
 
@@ -103,7 +101,6 @@ export class TickMarks<HorzScaleItem> {
 			// Built tickMarks are now prevMarks, and marks it as new array
 			const prevMarks = marks;
 			marks = [];
-
 			const prevMarksLength = prevMarks.length;
 			let prevMarksPointer = 0;
 			const currentWeight = ensureDefined(this._marksByWeight.get(weight));
@@ -132,9 +129,6 @@ export class TickMarks<HorzScaleItem> {
 				}
 
 				if (rightIndex - currentIndex >= maxIndexesPerMark && currentIndex - leftIndex >= maxIndexesPerMark) {
-					if (weight === TickMarkWeight.Day && i !== currentWeightLength - 1 && this._marksByWeight.has(TickMarkWeight.Month as TickMarkWeightValue)) {
-						fixMonthMarks(marks, mark);
-					}
 					// TickMark fits. Place it into new array
 					marks.push(mark);
 					leftIndex = currentIndex;

@@ -17,7 +17,15 @@ import { TimeChartOptions } from './time-based-chart-options';
 import { fillWeightsForPoints } from './time-scale-point-weight-generator';
 import { convertStringsToBusinessDays, convertStringToBusinessDay, convertTime, selectTimeConverter } from './time-utils';
 import { TickMarkType, TickMarkWeight, Time, TimePoint } from './types';
+
+/**
+ * Represents options for formatting dates, times, and prices according to a locale.
+ */
 interface TimeLocalizationOptions extends LocalizationOptions<Time> {
+	/**
+	 * Date formatting string.
+	 *
+	 */
 	dateFormat: string;
 }
 

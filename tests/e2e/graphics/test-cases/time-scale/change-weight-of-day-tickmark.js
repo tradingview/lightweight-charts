@@ -833,9 +833,71 @@ const brokenData = [
 		close: 742.5289999999999,
 	},
 ];
+function convertTime(t) {
+	if (LightweightCharts.isUTCTimestamp(t)) {
+		return t * 1000;
+	}
+	if (LightweightCharts.isBusinessDay(t)) {
+		return new Date(t.year, t.month, t.day).valueOf();
+	}
+	const [year, month, day] = t.split('-').map(tm => parseInt(tm, 10));
+	return new Date(year, month, day).valueOf();
+}
 
+const converted = new Map();
+function convertTimeWithMemory(t) {
+	const existingAnswer = converted.get(t);
+	if (existingAnswer) {
+		return existingAnswer;
+	}
+	const answer = new Date(convertTime(t));
+	converted.set(t, answer);
+	return answer;
+}
+class CustomBehavior extends LightweightCharts.HorzScaleBehaviorTime {
+	constructor(...props) {
+		super(...props);
+		this._lastHash = '';
+	}
+
+	shouldResetTickmarkLabels(items) {
+		const itemsHash = items.reduce((prev, current) => prev + current.index, '');
+		const res = itemsHash !== this._lastHash;
+		this._lastHash = itemsHash;
+		return res;
+	}
+}
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, { width: 800, height: 400 });
+	const chart = window.chart = LightweightCharts.createChartEx(container, new CustomBehavior(), { width: 800, height: 400 });
+	let lastDate;
+	let lastTickMarkType;
+
+	chart.timeScale().applyOptions({
+		tickMarkFormatter: (time, tickMarkType) => {
+			let answer = null;
+			const date = convertTimeWithMemory(time);
+			if (
+				lastDate &&
+				lastTickMarkType !== undefined &&
+				date.valueOf() > lastDate.valueOf() &&
+				tickMarkType > lastTickMarkType
+			) {
+				if (tickMarkType === LightweightCharts.TickMarkType.DayOfMonth) {
+					if (
+						date.getMonth() !== lastDate.getMonth() ||
+						date.getFullYear() !== lastDate.getFullYear()
+					) {
+						answer = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date);
+					}
+				}
+			}
+			if (answer !== '') {
+				lastDate = date;
+				lastTickMarkType = tickMarkType;
+			}
+			return answer;
+		},
+	});
 
 	const mainSeries = chart.addBarSeries();
 	mainSeries.setData(brokenData);

@@ -11,6 +11,7 @@ export { MismatchDirection } from './model/plot-list';
 export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource, LastPriceAnimationMode } from './model/series-options';
 export { ColorType } from './model/layout-options';
+export { HorzScaleBehaviorTime } from './model/horz-scale-behavior-time/horz-scale-behavior-time';
 
 export { isBusinessDay, isUTCTimestamp } from './model/horz-scale-behavior-time/types';
 export { TickMarkType } from './model/horz-scale-behavior-time/types';
