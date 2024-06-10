@@ -73,10 +73,12 @@ export function createChart(container: string | HTMLElement, options?: DeepParti
 }
 
 /**
- * Use this if you want to extend the default behavior of the horizontal time scale.
- * This should be used with the createChartEx function
+ * Provides the default implementation of the horizontal scale (time-based) that can be used as a base for extending the horizontal scale with custom behavior.
+ * This allows for the introduction of custom functionality without re-implementing the entire {@link IHorzScaleBehavior}`<{@link Time}>` interface.
  *
- * @returns An uninitialized class implementing the {@link IHorzScaleBehavior}`<Time>` interface
+ * For further details, refer to the {@link createChartEx} chart constructor method.
+ *
+ * @returns An uninitialized class implementing the {@link IHorzScaleBehavior}`<{@link Time}>` interface
  */
 export function defaultHorzScaleBehavior(): new () => IHorzScaleBehavior<Time> {
 	return HorzScaleBehaviorTime;
