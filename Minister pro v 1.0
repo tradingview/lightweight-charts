@@ -1,0 +1,31 @@
+//@version=5
+indicator("Simple MA Crossover Strategy", overlay=true)
+
+// Parameters
+fastLength = input(10, title="Fast MA Length")
+slowLength = input(50, title="Slow MA Length")
+stopLossPoints = input(100, title="Stop Loss Points")
+
+// Moving Averages
+fastMA = ta.sma(close, fastLength)
+slowMA = ta.sma(close, slowLength)
+
+// Plot Moving Averages
+plot(fastMA, color=color.blue, title="Fast MA")
+plot(slowMA, color=color.red, title="Slow MA")
+
+// Buy Signal
+longCondition = ta.crossover(fastMA, slowMA)
+if (longCondition)
+    strategy.entry("Buy", strategy.long)
+    strategy.exit("Sell", from_entry="Buy", stop=close - stopLossPoints)
+
+// Sell Signal
+shortCondition = ta.crossunder(fastMA, slowMA)
+if (shortCondition)
+    strategy.entry("Sell", strategy.short)
+    strategy.exit("Buy", from_entry="Sell", stop=close + stopLossPoints)
+
+// Plot Buy/Sell Signals
+plotshape(series=longCondition, location=location.belowbar, color=color.green, style=shape.labelup, title="Buy Signal")
+plotshape(series=shortCondition, location=location.abovebar, color=color.red, style=shape.labeldown, title="Sell Signal")
