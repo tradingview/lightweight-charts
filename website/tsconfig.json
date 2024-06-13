@@ -5,6 +5,9 @@
 		"resolveJsonModule": true,
 		"jsx": "react",
 		"moduleResolution": "node",
+		"typeRoots": [
+			"./node_modules/@types"
+		]
 	},
 	"include": [
 		"./**/*.ts",

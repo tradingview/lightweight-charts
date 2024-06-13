@@ -12,7 +12,6 @@ const { default: pluginDocusaurus } = require('docusaurus-plugin-typedoc');
 const logger = require('@docusaurus/logger');
 
 const versions = require('./versions.json');
-const sizeLimits = require('../.size-limit.js');
 
 const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
 const projectName = 'lightweight-charts';
@@ -166,7 +165,8 @@ function typedocPluginForVersion(version) {
 }
 
 async function getConfig() {
-	let size = sizeLimits
+	const sizeLimits = await import('../.size-limit.js');
+	let size = sizeLimits.default
 		.map(limit => parseFloat(limit.limit.split(' ')[0]))
 		.reduce((a, b) => Math.max(a, b));
 
