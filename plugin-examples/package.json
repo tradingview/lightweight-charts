@@ -8,13 +8,13 @@
         "build:examples:site": "vite build --config src/vite.config.js && node build-website.mjs"
     },
     "devDependencies": {
-        "typescript": "^5.0.4",
-        "vite": "^4.3.1"
+        "typescript": "^5.4.5",
+        "vite": "^5.3.0"
     },
     "dependencies": {
-        "dts-bundle-generator": "^8.0.1",
+        "dts-bundle-generator": "^9.5.1",
         "fancy-canvas": "^2.1.0",
-        "globby": "^13.1.4",
+        "globby": "^14.0.1",
         "lightweight-charts": "file:.."
     }
 }

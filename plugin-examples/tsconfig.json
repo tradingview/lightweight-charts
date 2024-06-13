@@ -15,7 +15,10 @@
 		"skipLibCheck": true,
 		"declaration": true,
 		"declarationDir": "typings",
-		"emitDeclarationOnly": true
+		"emitDeclarationOnly": true,
+		"typeRoots": [
+			"./node_modules/@types"
+		]
 	},
 	"include": ["src"]
 }
