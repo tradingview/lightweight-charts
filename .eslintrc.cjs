@@ -378,7 +378,6 @@ module.exports = {
 						rules: {
 							// tslint-microsoft-contrib
 							'no-typeof-undefined': true,
-							'no-unnecessary-local-variable': false, // TODO: CHECK AFTER UPDATING PACKAGES
 							'no-unnecessary-override': true,
 
 							// tslint-eslint-rules
@@ -447,7 +446,6 @@ module.exports = {
 								},
 							],
 							'static-this': true,
-							'strict-type-predicates': false, // TODO: CHECK AFTER UPDATING PACKAGES
 
 							// we can't use @typescript-eslint/typedef in couple with @typescript-eslint/explicit-function-return-type
 							// because it isn't the same - explicit-function-return-type requires to specify return type of arrow functions
@@ -482,10 +480,8 @@ module.exports = {
 						contexts: [
 							'TSEnumDeclaration',
 							'TSEnumMember',
-							// 'TSInterfaceDeclaration',
 							'TSMethodSignature',
 							'TSPropertySignature',
-							// 'TSTypeAliasDeclaration',
 						],
 					},
 				],
