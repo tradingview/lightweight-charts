@@ -12,7 +12,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Range } from '../model/time-data';
+import { IRange } from '../model/time-data';
 
 import { IPaneApi } from './ipane-api';
 import { IPriceLine } from './iprice-line';
@@ -34,7 +34,7 @@ export type DataChangedHandler = (scope: DataChangedScope) => void;
  */
 // actually range might be either exist or not
 // but to avoid hard-readable type let's say every part of range is optional
-export interface BarsInfo<HorzScaleItem> extends Partial<Range<HorzScaleItem>> {
+export interface BarsInfo<HorzScaleItem> extends Partial<IRange<HorzScaleItem>> {
 	/**
 	 * The number of bars before the start of the range.
 	 * Positive value means that there are some bars before (out of logical range from the left) the {@link Range.from} logical index in the series.
@@ -107,7 +107,7 @@ export interface ISeriesApi<
 	 * chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
 	 * ```
 	 */
-	barsInLogicalRange(range: Range<number>): BarsInfo<HorzScaleItem> | null;
+	barsInLogicalRange(range: IRange<number>): BarsInfo<HorzScaleItem> | null;
 
 	/**
 	 * Applies new options to the existing series

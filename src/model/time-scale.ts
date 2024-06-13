@@ -13,9 +13,9 @@ import { LocalizationOptions } from './localization-options';
 import { areRangesEqual, RangeImpl } from './range-impl';
 import { TickMark, TickMarks } from './tick-marks';
 import {
+	IRange,
 	Logical,
 	LogicalRange,
-	Range,
 	SeriesItemsIndexesRange,
 	TickMarkWeightValue,
 	TimedValue,
@@ -385,7 +385,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		};
 	}
 
-	public logicalRangeForTimeRange(range: Range<InternalHorzScaleItem>): LogicalRange {
+	public logicalRangeForTimeRange(range: IRange<InternalHorzScaleItem>): LogicalRange {
 		return {
 			from: ensureNotNull(this.timeToIndex(range.from, true)) as number as Logical,
 			to: ensureNotNull(this.timeToIndex(range.to, true)) as number as Logical,

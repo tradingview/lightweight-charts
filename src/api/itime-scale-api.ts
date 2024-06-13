@@ -1,13 +1,13 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
-import { Logical, LogicalRange, Range } from '../model/time-data';
+import { IRange, Logical, LogicalRange } from '../model/time-data';
 import { HorzScaleOptions } from '../model/time-scale';
 
 /**
  * A custom function used to handle changes to the time scale's time range.
  */
-export type TimeRangeChangeEventHandler<HorzScaleItem> = (timeRange: Range<HorzScaleItem> | null) => void;
+export type TimeRangeChangeEventHandler<HorzScaleItem> = (timeRange: IRange<HorzScaleItem> | null) => void;
 /**
  * A custom function used to handle changes to the time scale's logical range.
  */
@@ -45,7 +45,7 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 *
 	 * @returns Visible range or null if the chart has no data at all.
 	 */
-	getVisibleRange(): Range<HorzScaleItem> | null;
+	getVisibleRange(): IRange<HorzScaleItem> | null;
 
 	/**
 	 * Sets visible range of data.
@@ -64,7 +64,7 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 * });
 	 * ```
 	 */
-	setVisibleRange(range: Range<HorzScaleItem>): void;
+	setVisibleRange(range: IRange<HorzScaleItem>): void;
 
 	/**
 	 * Returns the current visible [logical range](/time-scale.md#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data.
@@ -82,7 +82,7 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 * chart.timeScale().setVisibleLogicalRange({ from: 0, to: Date.now() / 1000 });
 	 * ```
 	 */
-	setVisibleLogicalRange(range: Range<number>): void;
+	setVisibleLogicalRange(range: IRange<number>): void;
 
 	/**
 	 * Restores default zoom level and scroll position of the time scale.

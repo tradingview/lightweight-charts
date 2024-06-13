@@ -23,7 +23,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Logical, Range, TimePointIndex } from '../model/time-data';
+import { IRange, Logical, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
@@ -96,7 +96,7 @@ export class SeriesApi<
 		return this._series.priceScale().coordinateToPrice(coordinate as Coordinate, firstValue.value);
 	}
 
-	public barsInLogicalRange(range: Range<number> | null): BarsInfo<HorzScaleItem> | null {
+	public barsInLogicalRange(range: IRange<number> | null): BarsInfo<HorzScaleItem> | null {
 		if (range === null) {
 			return null;
 		}

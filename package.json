@@ -112,7 +112,7 @@
     "postinstall": "npm run install-hooks",
     "install-hooks": "node scripts/githooks/install.js",
     "clean": "rimraf lib/ dist/",
-    "bundle-dts": "dts-bundle-generator --config dts-config.json && node scripts/fix-dts.mjs",
+    "bundle-dts": "dts-bundle-generator --config dts-config.json",
     "tsc": "tspc -p tsconfig.prod.json",
     "tsc-watch": "npm run tsc -- --watch --preserveWatchOutput",
     "tsc-verify": "node website/scripts/generate-versions-dts.js && tsc -b tsconfig.composite.json",

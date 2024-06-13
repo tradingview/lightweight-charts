@@ -8,8 +8,7 @@
 			"outFile": "./dist/typings.d.ts",
 			"output": {
 				"sortNodes": true,
-				"respectPreserveConstEnum": true,
-				"exportReferencedTypes": false
+				"respectPreserveConstEnum": true
 			}
 		}
 	]

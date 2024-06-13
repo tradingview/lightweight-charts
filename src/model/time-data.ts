@@ -25,7 +25,7 @@ export interface TimeScalePoint {
 /**
  * Represents a generic range `from` one value `to` another.
  */
-export interface Range<T> {
+export interface IRange<T> {
 	/**
 	 * The from value. The start of the range.
 	 */
@@ -36,7 +36,7 @@ export interface Range<T> {
 	to: T;
 }
 
-export type TimePointsRange = Range<Omit<TimeScalePoint, 'timeWeight'>>;
+export type TimePointsRange = IRange<Omit<TimeScalePoint, 'timeWeight'>>;
 
 /**
  * Index for a point on the horizontal (time) scale.
@@ -60,14 +60,14 @@ export type Logical = Nominal<number, 'Logical'>;
  * Thus, if we have 5.2 as the last visible logical index (`to` field), that means that the last visible bar has index 5, but we also have partially visible (for 20%) 6th bar.
  * Half (e.g. 1.5, 3.5, 10.5) means exactly a middle of the bar.
  */
-export type LogicalRange = Range<Logical>;
+export type LogicalRange = IRange<Logical>;
 
 export interface TimedValue {
 	time: TimePointIndex;
 	x: Coordinate;
 }
 
-export type SeriesItemsIndexesRange = Range<number>;
+export type SeriesItemsIndexesRange = IRange<number>;
 
 function lowerBoundItemsCompare(item: TimedValue, time: TimePointIndex): boolean {
 	return item.time < time;

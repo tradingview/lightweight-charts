@@ -3,7 +3,7 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { Coordinate } from './coordinate';
 import { Time } from './horz-scale-behavior-time/types';
 import { CustomSeriesOptions } from './series-options';
-import { Range } from './time-data';
+import { IRange } from './time-data';
 
 /**
  * Represents a whitespace data item, which is a data point without a value.
@@ -82,7 +82,7 @@ export interface PaneRendererCustomData<
 	/**
 	 * The current visible range of items on the chart.
 	 */
-	visibleRange: Range<number> | null;
+	visibleRange: IRange<number> | null;
 }
 
 /**
