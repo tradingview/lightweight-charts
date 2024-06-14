@@ -122,7 +122,7 @@ const data = [];
 for (let i = 0; i < 5000; i++) {
 	data.push({
 		time: i * 0.25,
-		value: Math.sin(i / 100),
+		value: Math.sin(i / 100) + i / 500,
 	});
 }
 

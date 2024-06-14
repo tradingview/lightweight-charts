@@ -2,7 +2,7 @@
 title: Custom horizontal scale
 sidebar_label: Custom horizontal scale
 description:
-  Customizing Horizontal Scale Behavior with IHorzScaleBehavior Interface.
+  Customizing horizontal scale behavior with IHorzScaleBehavior interface.
 pagination_prev: null
 pagination_next: null
 keywords:
@@ -12,18 +12,17 @@ keywords:
   - options
 ---
 
-The `IHorzScaleBehavior` interface in the Lightweight Charts™ library allows
-developers to customize the behavior of the horizontal scale. By default, this
-scale uses [time](/docs/api#time) values, but you can override it to use any
-other type of horizontal scale items, such as price values. The most typical use
-case is the creation of Options charts.
+The `IHorzScaleBehavior` interface allows you to customize the behavior of the
+horizontal scale. By default, this scale uses [time](/docs/api#time) values, but
+you can override it to use any other type of horizontal scale items, such as
+price values. The most typical use case is the creation of Options charts.
 
 This guide will explain the
 [`IHorzScaleBehavior`](/docs/api/interfaces/IHorzScaleBehavior) interface and
 how to implement it to create a horizontal scale using price values with
 customizable precision.
 
-## Understanding the IHorzScaleBehavior Interface
+## Understanding the IHorzScaleBehavior interface
 
 The `IHorzScaleBehavior` interface consists of several methods that you need to
 implement to customize the horizontal scale behavior. Here's a breakdown of each
@@ -152,13 +151,13 @@ This method assigns weights to the sorted time points. These weights influence
 the tick marks' visual prominence. Implement this method to provide a weighting
 system for your horizontal scale items.
 
-## Example: Implementing a Price-Based Horizontal Scale with Precision
+## Example
 
 Below is an example implementation of a custom horizontal scale behavior using
 price values. This example also includes customizable precision for formatting
 price values.
 
-### Step-by-Step Implementation
+### Implement price-based horizontal scale
 
 1. **Define the Custom Localization Options Interface**
 
@@ -205,7 +204,9 @@ export class HorzScaleBehaviorPrice implements IHorzScaleBehavior<HorzScalePrice
     public preprocessData(
         data: DataItem<HorzScalePriceItem> | DataItem<HorzScalePriceItem>[]
     ): void {
-        // un-needed in this example
+        // un-needed in this example because we do not require any additional
+        // data processing for this scale.
+        // The method is still required to be implemented in the class.
     }
 
     public updateFormatter(options: CustomLocalizationOptions): void {
@@ -296,9 +297,9 @@ export class HorzScaleBehaviorPrice implements IHorzScaleBehavior<HorzScalePrice
 This class provides additional precision control through localization options,
 allowing formatted price values to use a specific number of decimal places.
 
-### Using the Custom Horizontal Scale Behavior
+### Customize horizontal scale behavior
 
-To use this custom horizontal scale behavior, instantiate the
+To use the custom horizontal scale behavior, instantiate the
 `HorzScaleBehaviorPrice` class and pass it to
 [`createChartEx`](/docs/api#createchartex).
 
@@ -332,7 +333,7 @@ custom data types, such as price values. The provided example demonstrates how
 to implement a horizontal scale with customizable precision, allowing for
 tailored display formats to fit your specific requirements.
 
-## Full example
+### Full example
 
 import UsageGuidePartial from '../_usage-guide-partial.mdx';
 import CodeBlock from '@theme/CodeBlock';
@@ -342,7 +343,6 @@ import code from '!!raw-loader!./horizontal-price-scale.js';
     replaceThemeConstants
     chart
     className="language-js"
-    hideableCode
     chartOnTop
     codeUsage={<UsageGuidePartial />}
 >
