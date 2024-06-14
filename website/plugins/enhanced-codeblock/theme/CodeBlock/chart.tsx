@@ -13,6 +13,7 @@ interface ChartProps {
 
 type IFrameWindow<TVersion extends keyof LightweightChartsApiTypeMap> = Window & {
 	createChart: LightweightChartsApiTypeMap[TVersion]['createChart'];
+	createChartEx: TVersion extends '4.1' | 'current' ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
 	run?: () => void;
 };
 
@@ -57,10 +58,11 @@ export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props:
 
 			const injectCreateChartAndRun = async () => {
 				try {
-					const { module, createChart } = await importLightweightChartsVersion[version](iframeWindow);
+					const { module, createChart, createChartEx } = await importLightweightChartsVersion[version](iframeWindow);
 
 					Object.assign(iframeWindow, module); // Make ColorType, etc. available in the iframe
 					iframeWindow.createChart = createChart;
+					iframeWindow.createChartEx = createChartEx;
 					iframeWindow.run?.();
 				} catch (err: unknown) {
 					// eslint-disable-next-line no-console
