@@ -119,4 +119,14 @@ export interface IHorzScaleBehavior<HorzScaleItem> {
 	 * @returns void
 	 */
 	fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScalePoint>[], startIndex: number): void;
+
+	/**
+	 * If returns true, then the tick mark formatter will be called for all the visible
+	 * tick marks even if the formatter has previously been called for a specific tick mark.
+	 * This allows you to change the formatting on all the tick marks.
+	 *
+	 * @param tickMarks - array of tick marks
+	 * @returns boolean
+	 */
+	shouldResetTickmarkLabels?(tickMarks: readonly TickMark[]): boolean;
 }

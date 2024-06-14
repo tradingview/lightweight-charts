@@ -14,6 +14,14 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.1.5
+
+**Enhancements**
+
+- Added `IHorzScaleBehavior.shouldResetTickmarkLabels`. (PR [#1614](https://github.com/tradingview/lightweight-charts/pull/1614))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.4..v4.1.5).
+
 ## 4.1.4
 
 **Bug Fixes**
