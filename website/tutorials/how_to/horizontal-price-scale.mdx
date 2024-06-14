@@ -159,7 +159,7 @@ price values.
 
 ### Implement price-based horizontal scale
 
-1. **Define the Custom Localization Options Interface**
+1. **Define the custom localization options interface**
 
 Extend the [`LocalizationOptions`](/docs/api/interfaces/LocalizationOptions)
 interface to include a `precision` property.
@@ -171,7 +171,7 @@ export interface CustomLocalizationOptions
 }
 ```
 
-2. **Define the Type Alias**
+2. **Define the type alias**
 
 Define a type alias for the horizontal scale item representing price values.
 
@@ -179,7 +179,7 @@ Define a type alias for the horizontal scale item representing price values.
 export type HorzScalePriceItem = number;
 ```
 
-3. **Implement the Custom Horizontal Scale Behavior Class**
+3. **Implement the custom horizontal scale behavior class**
 
 The `HorzScaleBehaviorPrice` class implements the `IHorzScaleBehavior`
 interface, with additional logic to handle the precision provided in the custom
