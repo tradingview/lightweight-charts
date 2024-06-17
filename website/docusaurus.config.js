@@ -6,8 +6,7 @@ const fs = require('fs');
 const fsp = require('fs/promises');
 const https = require('https');
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const { themes } = require('prism-react-renderer');
 const { default: pluginDocusaurus } = require('docusaurus-plugin-typedoc');
 const logger = require('@docusaurus/logger');
 
@@ -125,7 +124,8 @@ async function downloadTypingsFromUnpkg(version) {
 	return typingsFilePath;
 }
 
-/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc').TypeDocOptions} */
+// PluginOptions
+/** @type {Partial<import('docusaurus-plugin-typedoc/dist/models').PluginOptions> & Partial<import('typedoc').TypeDocOptions> & Partial<import('typedoc-plugin-frontmatter/dist/options/models').PluginOptions>} */
 const commonDocusaurusPluginTypedocConfig = {
 	readme: 'none',
 	disableSources: true,
@@ -137,29 +137,30 @@ const commonDocusaurusPluginTypedocConfig = {
 	// which would result in the title of our generated index page being 'undefined'.
 	name: 'lightweight-charts',
 	sort: ['source-order'],
-
-	// let's disable pagination for API Reference pages since it makes almost no sense there
-	frontmatter: {
-		// eslint-disable-next-line camelcase
+	plugin: ['typedoc-plugin-frontmatter'],
+	frontmatterGlobals: {
+		/* eslint-disable camelcase */
+		// @ts-ignore
 		pagination_next: null,
-		// eslint-disable-next-line camelcase
 		pagination_prev: null,
+		/* eslint-enable camelcase */
 	},
 };
 
-/** @type {(version: string) => import('@docusaurus/types').PluginModule} */
 function typedocPluginForVersion(version) {
 	return context => ({
 		name: `typedoc-for-v${version}`,
 
 		/** @type {() => Promise<any>} */
 		loadContent: async () => {
-			await pluginDocusaurus(context, {
-				...commonDocusaurusPluginTypedocConfig,
-				id: `${version}-api`,
-				entryPoints: [getTypingsCacheFilePath(version)],
-				docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
-			}).loadContent();
+			await pluginDocusaurus(context,
+				{
+					...commonDocusaurusPluginTypedocConfig,
+					id: `${version}-api`,
+					// @ts-ignore
+					entryPoints: [getTypingsCacheFilePath(version)],
+					out: path.resolve(__dirname, `./versioned_docs/version-${version}/api`),
+				});
 		},
 	});
 }
@@ -361,8 +362,8 @@ async function getConfig() {
 					copyright: `Copyright © ${new Date().getFullYear()} TradingView, Inc. Built with Docusaurus.`,
 				},
 				prism: {
-					theme: lightCodeTheme,
-					darkTheme: darkCodeTheme,
+					theme: themes.github,
+					darkTheme: themes.dracula,
 					additionalLanguages: ['ruby', 'swift', 'kotlin', 'groovy'],
 					magicComments: [
 						{
@@ -417,7 +418,7 @@ async function getConfig() {
 			],
 			[
 				'docusaurus-plugin-typedoc',
-				/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc').TypeDocOptions} */
+				/** @type {Partial<import('docusaurus-plugin-typedoc/dist/models').PluginOptions> & Partial<import('typedoc').TypeDocOptions>} */
 				({
 					...commonDocusaurusPluginTypedocConfig,
 					id: 'current-api',

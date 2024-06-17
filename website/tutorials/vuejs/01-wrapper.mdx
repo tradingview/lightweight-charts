@@ -125,7 +125,7 @@ The ideal time to create the chart is during the `mounted` lifecycle hook
 provided by the Vue component. The container div will be created and ready for
 use at this stage. Within the
 [`onMounted`](https://vuejs.org/api/composition-api-lifecycle.html#onmounted)
-hook we can call Lightweight Charts™ [`createChart`](/docs/api#createchart)
+hook we can call Lightweight Charts™ [`createChart`](/docs/api/functions/createChart)
 constructor and pass it the value of the container reference (which is the div
 element).
 
@@ -173,7 +173,7 @@ the saved chart instance.
 A simple way to provide customisation of the chart to the component's consumers
 is to create component properties for the options you wish to be customised.
 Lightweight Charts™ has a variety of customisation options which can be applied
-through the [`applyOptions`](/docs/api/interfaces/IChartApi#applyOptions) method
+through the [`applyOptions`](/docs/api/interfaces/IChartApi#applyoptions) method
 on an Api instance (such as [IChartApi](/docs/api/interfaces/IChartApi),
 [ISeriesApi](/docs/api/interfaces/ISeriesApi),
 [IPriceScaleApi](/docs/api/interfaces/IPriceScaleApi), and

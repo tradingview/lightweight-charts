@@ -4,7 +4,7 @@ In this document you can find the migration guide from the previous version v3 t
 
 ## Exported enum `LasPriceAnimationMode` has been removed
 
-Please use [`LastPriceAnimationMode`](/api/enums/LastPriceAnimationMode.md) instead.
+Please use [`LastPriceAnimationMode`](/api/enumerations/LastPriceAnimationMode.md) instead.
 
 ## `scaleMargins` option has been removed from series options
 
@@ -103,8 +103,8 @@ Affected API:
 
 - [`IChartApi.subscribeClick`](/api/interfaces/IChartApi.md#subscribeclick) (via [`MouseEventParams.time`](/api/interfaces/MouseEventParams.md#time))
 - [`IChartApi.subscribeCrosshairMove`](/api/interfaces/IChartApi.md#subscribecrosshairmove) (via [`MouseEventParams.time`](/api/interfaces/MouseEventParams.md#time))
-- [`LocalizationOptions.timeFormatter`](/api/interfaces/LocalizationOptions.md#timeformatter) (via argument of [`TimeFormatterFn`](/api/index.md#timeformatterfn))
-- [`TimeScaleOptions.tickMarkFormatter`](/api/interfaces/TimeScaleOptions.md#tickmarkformatter) (via argument of [`TickMarkFormatter`](/api/index.md#tickmarkformatter))
+- [`LocalizationOptions.timeFormatter`](/api/interfaces/LocalizationOptions.md#timeformatter) (via argument of [`TimeFormatterFn`](/api/type-aliases/TimeFormatterFn.md))
+- [`TimeScaleOptions.tickMarkFormatter`](/api/interfaces/TimeScaleOptions.md#tickmarkformatter) (via argument of [`TickMarkFormatter`](/api/type-aliases/TickMarkFormatter.md))
 
 Previously the type of an inbound time (a values you provide to the library, e.g. in [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata)) was different from an outbound one (a values the library provides to your code, e.g. an argument of [`LocalizationOptions.timeFormatter`](/api/interfaces/LocalizationOptions.md#timeformatter)).
 So the difference between types was that outbound time couldn't be a business day string.

@@ -8,7 +8,7 @@ Time scale (or time axis) is a horizontal scale at the bottom of the chart that 
 
 ![Time scale](/img/time-scale.png "Time scale")
 
-Time scale controls a current visible range, allows you to affect or change it, and can convert a time point or [an index](/api/index.md#logical) to a coordinate and vice versa (basically everything related to a x-scale of a chart).
+Time scale controls a current visible range, allows you to affect or change it, and can convert a time point or [an index](/api/type-aliases/Logical.md) to a coordinate and vice versa (basically everything related to a x-scale of a chart).
 
 Also, it has a couple of events you can subscribe to to be notified when anything is happened.
 
@@ -19,7 +19,7 @@ Note that you can apply options either via [`ITimeScaleApi.applyOptions`](/api/i
 
 ## Logical range
 
-A [logical range](/api/index.md#logicalrange) is an object with 2 properties: `from` and `to`, which are numbers and represent logical indexes on the time scale.
+A [logical range](/api/type-aliases/LogicalRange.md) is an object with 2 properties: `from` and `to`, which are numbers and represent logical indexes on the time scale.
 
 The starting point of the time scale's logical range is the first data item among all series.
 Before that point all indexes are negative, starting from that point - positive.
