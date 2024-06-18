@@ -597,27 +597,72 @@ export class PriceAxisWidget implements IDestroyable {
 			}
 		}
 
-		for (let i = 1; i < top.length; i++) {
-			const view = top[i];
-			const prev = top[i - 1];
-			const height = prev.height(rendererOptions, false);
-			const coordinate = view.coordinate();
-			const prevFixedCoordinate = prev.getFixedCoordinate();
+		if (top.length) {
+			let currentGroupStart = 0;
+			const scaleHeight = this._size.height;
 
-			if (coordinate > prevFixedCoordinate - height) {
-				view.setFixedCoordinate(prevFixedCoordinate - height);
-			}
+			const height = top[0].height(rendererOptions, true);
+			let spaceBeforeCurrentGroup = Math.max(0, scaleHeight / 2 - (top[0].getFixedCoordinate() - height / 2));
+
+			for (let i = 1; i < top.length; i++) {
+				const view = top[i];
+				const prev = top[i - 1];
+				const height = prev.height(rendererOptions, false);
+				const coordinate = view.coordinate();
+				const prevFixedCoordinate = prev.getFixedCoordinate();
+
+				if (coordinate > prevFixedCoordinate - height) {
+					const fixedCoordinate = prevFixedCoordinate - height;
+					view.setFixedCoordinate(fixedCoordinate);
+					const topPoint = fixedCoordinate - height / 2;
+					if (topPoint < 0 && spaceBeforeCurrentGroup > 0) {
+						// shift the whole group down
+						const desiredGroupShift = -topPoint;
+						const possibleShift = Math.min(desiredGroupShift, spaceBeforeCurrentGroup);
+						for (let k = currentGroupStart; k < top.length; k++) {
+							top[k].setFixedCoordinate(top[k].getFixedCoordinate() + possibleShift);
+						}
+						spaceBeforeCurrentGroup -= possibleShift;
+					}
+				} else {
+					currentGroupStart = i;
+					spaceBeforeCurrentGroup = prevFixedCoordinate - height - coordinate;
+				}
+			}			
 		}
 
-		for (let j = 1; j < bottom.length; j++) {
-			const view = bottom[j];
-			const prev = bottom[j - 1];
-			const height = prev.height(rendererOptions, true);
-			const coordinate = view.coordinate();
-			const prevFixedCoordinate = prev.getFixedCoordinate();
+		if (bottom.length) {
+			let currentGroupStart = 0;
+			const scaleHeight = this._size.height;
 
-			if (coordinate < prevFixedCoordinate + height) {
-				view.setFixedCoordinate(prevFixedCoordinate + height);
+			const height = bottom[0].height(rendererOptions, true);
+			let spaceBeforeCurrentGroup = Math.max(0, bottom[0].getFixedCoordinate() - height / 2 - scaleHeight / 2);
+
+			for (let j = 1; j < bottom.length; j++) {
+				const view = bottom[j];
+				const prev = bottom[j - 1];
+				const height = prev.height(rendererOptions, true);
+				const coordinate = view.coordinate();
+				const prevFixedCoordinate = prev.getFixedCoordinate();
+
+				if (coordinate < prevFixedCoordinate + height) {
+					const fixedCoordinate = prevFixedCoordinate + height;
+					view.setFixedCoordinate(fixedCoordinate);
+					const bottomPoint = fixedCoordinate + height / 2;
+					if (bottomPoint >= scaleHeight && spaceBeforeCurrentGroup > 0) {
+						// shift the whole group up
+						const desiredGroupShift = bottomPoint - scaleHeight;
+						const possibleShift = Math.min(desiredGroupShift, spaceBeforeCurrentGroup);
+						// do shift
+						for (let k = currentGroupStart; k < bottom.length; k++) {
+							bottom[k].setFixedCoordinate(bottom[k].getFixedCoordinate() - possibleShift);
+						}
+						spaceBeforeCurrentGroup -= possibleShift;
+					}
+				} else {
+					currentGroupStart = j;
+					spaceBeforeCurrentGroup = coordinate - (prevFixedCoordinate + height);
+				}
 			}
 		}
 	}
