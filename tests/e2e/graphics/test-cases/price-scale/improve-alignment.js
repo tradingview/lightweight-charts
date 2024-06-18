@@ -8,7 +8,8 @@ function runTestCase(container) {
 				bottom: 0,
 			},
 			entireTextOnly: true,
-		}
+			alignLabels: true,
+		},
 	};
 
 	const chart = (window.chart = LightweightCharts.createChart(
@@ -16,10 +17,10 @@ function runTestCase(container) {
 		chartOptions
 	));
 
-	const data1 = Array.from({length: 10}).map((_, index) => ({ time: index * 10000, value: 100 - index }) );
-	const data2 = Array.from({length: 10}).map((_, index) => ({ time: index * 10000, value: 108.3 - index * 2 }) );
-	const data3 = Array.from({length: 10}).map((_, index) => ({ time: index * 10000, value: 99 + index }) );
-	const data4 = Array.from({length: 10}).map((_, index) => ({ time: index * 10000, value: 92.8 + (index - 1) * 2}) );
+	const data1 = Array.from({ length: 10 }).map((_, index) => ({ time: index * 10000, value: 100 - index }));
+	const data2 = Array.from({ length: 10 }).map((_, index) => ({ time: index * 10000, value: 108.3 - index * 2 }));
+	const data3 = Array.from({ length: 10 }).map((_, index) => ({ time: index * 10000, value: 99 + index }));
+	const data4 = Array.from({ length: 10 }).map((_, index) => ({ time: index * 10000, value: 92.8 + (index - 1) * 2 }));
 
 	const series1 = chart.addLineSeries();
 	series1.setData(data1);

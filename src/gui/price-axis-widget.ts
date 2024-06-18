@@ -566,6 +566,51 @@ export class PriceAxisWidget implements IDestroyable {
 		this._fixLabelOverlap(views, rendererOptions, center);
 	}
 
+	private _recalculateOverlapping(views: IPriceAxisView[], direction: 1 | -1, scaleHeight: number, rendererOptions: Readonly<PriceAxisViewRendererOptions>): void {
+		if (views.length) {
+			let currentGroupStart = 0;
+
+			const initLabelHeight = views[0].height(rendererOptions, true);
+			let spaceBeforeCurrentGroup = direction === 1
+				? scaleHeight / 2 - (views[0].getFixedCoordinate() - initLabelHeight / 2)
+				: views[0].getFixedCoordinate() - initLabelHeight / 2 - scaleHeight / 2;
+			spaceBeforeCurrentGroup = Math.max(0, spaceBeforeCurrentGroup);
+
+			for (let i = 1; i < views.length; i++) {
+				const view = views[i];
+				const prev = views[i - 1];
+				const height = prev.height(rendererOptions, false);
+				const coordinate = view.getFixedCoordinate();
+				const prevFixedCoordinate = prev.getFixedCoordinate();
+
+				const overlap = direction === 1
+					? coordinate > prevFixedCoordinate - height
+					: coordinate < prevFixedCoordinate + height;
+
+				if (overlap) {
+					const fixedCoordinate = prevFixedCoordinate - height * direction;
+					view.setFixedCoordinate(fixedCoordinate);
+					const edgePoint = fixedCoordinate - direction * height / 2;
+					const outOfViewport = direction === 1 ? edgePoint < 0 : edgePoint > scaleHeight;
+					if (outOfViewport && spaceBeforeCurrentGroup > 0) {
+						// shift the whole group up or down
+						const desiredGroupShift = direction === 1 ? -1 - edgePoint : edgePoint - scaleHeight;
+						const possibleShift = Math.min(desiredGroupShift, spaceBeforeCurrentGroup);
+						for (let k = currentGroupStart; k < views.length; k++) {
+							views[k].setFixedCoordinate(views[k].getFixedCoordinate() + direction * possibleShift);
+						}
+						spaceBeforeCurrentGroup -= possibleShift;
+					}
+				} else {
+					currentGroupStart = i;
+					spaceBeforeCurrentGroup = direction === 1
+						? prevFixedCoordinate - height - coordinate
+						: coordinate - (prevFixedCoordinate + height);
+				}
+			}
+		}
+	}
+
 	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>, center: number): void {
 		if (this._size === null) {
 			return;
@@ -597,74 +642,8 @@ export class PriceAxisWidget implements IDestroyable {
 			}
 		}
 
-		if (top.length) {
-			let currentGroupStart = 0;
-			const scaleHeight = this._size.height;
-
-			const height = top[0].height(rendererOptions, true);
-			let spaceBeforeCurrentGroup = Math.max(0, scaleHeight / 2 - (top[0].getFixedCoordinate() - height / 2));
-
-			for (let i = 1; i < top.length; i++) {
-				const view = top[i];
-				const prev = top[i - 1];
-				const height = prev.height(rendererOptions, false);
-				const coordinate = view.coordinate();
-				const prevFixedCoordinate = prev.getFixedCoordinate();
-
-				if (coordinate > prevFixedCoordinate - height) {
-					const fixedCoordinate = prevFixedCoordinate - height;
-					view.setFixedCoordinate(fixedCoordinate);
-					const topPoint = fixedCoordinate - height / 2;
-					if (topPoint < 0 && spaceBeforeCurrentGroup > 0) {
-						// shift the whole group down
-						const desiredGroupShift = -topPoint;
-						const possibleShift = Math.min(desiredGroupShift, spaceBeforeCurrentGroup);
-						for (let k = currentGroupStart; k < top.length; k++) {
-							top[k].setFixedCoordinate(top[k].getFixedCoordinate() + possibleShift);
-						}
-						spaceBeforeCurrentGroup -= possibleShift;
-					}
-				} else {
-					currentGroupStart = i;
-					spaceBeforeCurrentGroup = prevFixedCoordinate - height - coordinate;
-				}
-			}			
-		}
-
-		if (bottom.length) {
-			let currentGroupStart = 0;
-			const scaleHeight = this._size.height;
-
-			const height = bottom[0].height(rendererOptions, true);
-			let spaceBeforeCurrentGroup = Math.max(0, bottom[0].getFixedCoordinate() - height / 2 - scaleHeight / 2);
-
-			for (let j = 1; j < bottom.length; j++) {
-				const view = bottom[j];
-				const prev = bottom[j - 1];
-				const height = prev.height(rendererOptions, true);
-				const coordinate = view.coordinate();
-				const prevFixedCoordinate = prev.getFixedCoordinate();
-
-				if (coordinate < prevFixedCoordinate + height) {
-					const fixedCoordinate = prevFixedCoordinate + height;
-					view.setFixedCoordinate(fixedCoordinate);
-					const bottomPoint = fixedCoordinate + height / 2;
-					if (bottomPoint >= scaleHeight && spaceBeforeCurrentGroup > 0) {
-						// shift the whole group up
-						const desiredGroupShift = bottomPoint - scaleHeight;
-						const possibleShift = Math.min(desiredGroupShift, spaceBeforeCurrentGroup);
-						// do shift
-						for (let k = currentGroupStart; k < bottom.length; k++) {
-							bottom[k].setFixedCoordinate(bottom[k].getFixedCoordinate() - possibleShift);
-						}
-						spaceBeforeCurrentGroup -= possibleShift;
-					}
-				} else {
-					currentGroupStart = j;
-					spaceBeforeCurrentGroup = coordinate - (prevFixedCoordinate + height);
-				}
-			}
-		}
+		this._recalculateOverlapping(top, 1, this._size.height, rendererOptions);
+		this._recalculateOverlapping(bottom, -1, this._size.height, rendererOptions);
 	}
 
 	private _drawBackLabels(target: CanvasRenderingTarget2D): void {
