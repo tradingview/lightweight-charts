@@ -66,6 +66,52 @@ function buildPriceAxisViewsGetter(
 	};
 }
 
+function recalculateOverlapping(views: IPriceAxisView[], direction: 1 | -1, scaleHeight: number, rendererOptions: Readonly<PriceAxisViewRendererOptions>): void {
+	if (!views.length) {
+		return;
+	}
+	let currentGroupStart = 0;
+
+	const initLabelHeight = views[0].height(rendererOptions, true);
+	let spaceBeforeCurrentGroup = direction === 1
+		? scaleHeight / 2 - (views[0].getFixedCoordinate() - initLabelHeight / 2)
+		: views[0].getFixedCoordinate() - initLabelHeight / 2 - scaleHeight / 2;
+	spaceBeforeCurrentGroup = Math.max(0, spaceBeforeCurrentGroup);
+
+	for (let i = 1; i < views.length; i++) {
+		const view = views[i];
+		const prev = views[i - 1];
+		const height = prev.height(rendererOptions, false);
+		const coordinate = view.getFixedCoordinate();
+		const prevFixedCoordinate = prev.getFixedCoordinate();
+
+		const overlap = direction === 1
+			? coordinate > prevFixedCoordinate - height
+			: coordinate < prevFixedCoordinate + height;
+
+		if (overlap) {
+			const fixedCoordinate = prevFixedCoordinate - height * direction;
+			view.setFixedCoordinate(fixedCoordinate);
+			const edgePoint = fixedCoordinate - direction * height / 2;
+			const outOfViewport = direction === 1 ? edgePoint < 0 : edgePoint > scaleHeight;
+			if (outOfViewport && spaceBeforeCurrentGroup > 0) {
+				// shift the whole group up or down
+				const desiredGroupShift = direction === 1 ? -1 - edgePoint : edgePoint - scaleHeight;
+				const possibleShift = Math.min(desiredGroupShift, spaceBeforeCurrentGroup);
+				for (let k = currentGroupStart; k < views.length; k++) {
+					views[k].setFixedCoordinate(views[k].getFixedCoordinate() + direction * possibleShift);
+				}
+				spaceBeforeCurrentGroup -= possibleShift;
+			}
+		} else {
+			currentGroupStart = i;
+			spaceBeforeCurrentGroup = direction === 1
+				? prevFixedCoordinate - height - coordinate
+				: coordinate - (prevFixedCoordinate + height);
+		}
+	}
+}
+
 export class PriceAxisWidget implements IDestroyable {
 	private readonly _pane: PaneWidget;
 	private readonly _options: Readonly<ChartOptionsInternalBase>;
@@ -597,29 +643,8 @@ export class PriceAxisWidget implements IDestroyable {
 			}
 		}
 
-		for (let i = 1; i < top.length; i++) {
-			const view = top[i];
-			const prev = top[i - 1];
-			const height = prev.height(rendererOptions, false);
-			const coordinate = view.coordinate();
-			const prevFixedCoordinate = prev.getFixedCoordinate();
-
-			if (coordinate > prevFixedCoordinate - height) {
-				view.setFixedCoordinate(prevFixedCoordinate - height);
-			}
-		}
-
-		for (let j = 1; j < bottom.length; j++) {
-			const view = bottom[j];
-			const prev = bottom[j - 1];
-			const height = prev.height(rendererOptions, true);
-			const coordinate = view.coordinate();
-			const prevFixedCoordinate = prev.getFixedCoordinate();
-
-			if (coordinate < prevFixedCoordinate + height) {
-				view.setFixedCoordinate(prevFixedCoordinate + height);
-			}
-		}
+		recalculateOverlapping(top, 1, this._size.height, rendererOptions);
+		recalculateOverlapping(bottom, -1, this._size.height, rendererOptions);
 	}
 
 	private _drawBackLabels(target: CanvasRenderingTarget2D): void {
