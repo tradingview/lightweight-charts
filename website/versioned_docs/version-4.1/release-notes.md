@@ -14,6 +14,14 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.1.6
+
+**Enhancements**
+
+- Improved Price Scale Label Alignment: Enhanced the alignment algorithm for price scale labels to ensure they do not move out of the viewport. This improves the visibility of price labels, particularly when they are near the edges of the scale. Fixes [#1620](https://github.com/tradingview/lightweight-charts/issues/1620) (PR [#1621](https://github.com/tradingview/lightweight-charts/pull/1621))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.5..v4.1.6).
+
 ## 4.1.5
 
 **Enhancements**
