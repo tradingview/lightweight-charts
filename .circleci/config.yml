@@ -40,13 +40,13 @@ aliases:
 
 
 executors:
-  node18-executor:
+  node22-executor:
     docker:
-      - image: cimg/node:18.19
+      - image: cimg/node:22.3
 
-  node18-browsers-executor:
+  node22-browsers-executor:
     docker:
-      - image: cimg/node:18.19-browsers
+      - image: cimg/node:22.3-browsers
 
 commands:
   checkout-with-deps:
@@ -87,21 +87,21 @@ commands:
 
 jobs:
   install-deps:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - run: npm install
       - save_cache: *save-node-modules-cache
 
   install-deps-website:
-    executor: node18-executor
+    executor: node-executor
     steps:
       - checkout-with-deps
       - run: cd website && npm install
       - save_cache: *save-node-modules-cache-website
 
   build:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - run: npm run build:prod
@@ -115,19 +115,19 @@ jobs:
             - dist
 
   no-crlf:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout
       - run: scripts/no-crlf.sh
 
   trailing-lf:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout
       - run: scripts/trailing-newlines.sh
 
   lint-eslint:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
@@ -135,7 +135,7 @@ jobs:
       - run: npm run lint:eslint
 
   lint-dts:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
@@ -144,13 +144,13 @@ jobs:
       - run: npm run check-dts-docs
 
   lint-markdown:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - run: npm run lint:md
 
   usable-in-nodejs:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
@@ -168,7 +168,7 @@ jobs:
           command: node -e "import 'lightweight-charts'" --input-type=module
 
   unittests:
-    executor: node18-executor
+    executor: node22-executor
     environment:
       TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
@@ -178,13 +178,13 @@ jobs:
           path: test-results/
 
   type-tests:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - run: npm run type-tests
 
   dts-changes:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
@@ -193,31 +193,31 @@ jobs:
           when: on_fail
 
   graphics-tests-dpr1_0:
-    executor: node18-browsers-executor
+    executor: node22-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "1.0"
 
   graphics-tests-dpr1_25:
-    executor: node18-browsers-executor
+    executor: node22-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "1.25"
 
   graphics-tests-dpr1_5:
-    executor: node18-browsers-executor
+    executor: node22-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "1.5"
 
   graphics-tests-dpr2_0:
-    executor: node18-browsers-executor
+    executor: node22-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "2.0"
 
   graphics-tests-dpr2_0-prod:
-    executor: node18-browsers-executor
+    executor: node22-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: "2.0"
@@ -225,7 +225,7 @@ jobs:
 
 
   memleaks-tests:
-    executor: node18-browsers-executor
+    executor: node22-browsers-executor
     environment:
       NO_SANDBOX: "true"
       TESTS_REPORT_FILE: "test-results/memleaks/results.xml"
@@ -245,7 +245,7 @@ jobs:
           path: tests/e2e/memleaks/.logs/
 
   coverage:
-    executor: node18-browsers-executor
+    executor: node22-browsers-executor
     environment:
       NO_SANDBOX: "true"
       TESTS_REPORT_FILE: "test-results/coverage/results.xml"
@@ -258,7 +258,7 @@ jobs:
           path: test-results/
 
   interactions:
-    executor: node18-browsers-executor
+    executor: node22-browsers-executor
     environment:
       NO_SANDBOX: "true"
       TESTS_REPORT_FILE: "test-results/interactions/results.xml"
@@ -271,7 +271,7 @@ jobs:
           path: test-results/
 
   size-limit:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - attach_workspace:
@@ -282,7 +282,7 @@ jobs:
       - run: npm run size-limit
 
   build-docusaurus-website:
-    executor: node18-executor
+    executor: node22-executor
     steps:
       - checkout-with-deps
       - run: npm run build:prod
