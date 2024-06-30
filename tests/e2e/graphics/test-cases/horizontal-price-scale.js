@@ -3,7 +3,6 @@ function markWithGreaterWeight(a, b) {
 }
 
 class HorzScaleBehaviorPrice {
-	options() {}
 	setOptions() {}
 	preprocessData() {}
 	updateFormatter() {}

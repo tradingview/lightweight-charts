@@ -1,6 +1,7 @@
 import { assert } from '../helpers/assertions';
 import { DeepPartial, isString } from '../helpers/strict-type-checks';
 
+import { ChartOptionsImpl } from '../model/chart-model';
 import { HorzScaleBehaviorTime } from '../model/horz-scale-behavior-time/horz-scale-behavior-time';
 import { TimeChartOptions } from '../model/horz-scale-behavior-time/time-based-chart-options';
 import { Time } from '../model/horz-scale-behavior-time/types';
@@ -24,7 +25,7 @@ import { IChartApiBase } from './ichart-api';
 export function createChartEx<HorzScaleItem, THorzScaleBehavior extends IHorzScaleBehavior<HorzScaleItem>>(
 	container: string | HTMLElement,
 	horzScaleBehavior: THorzScaleBehavior,
-	options?: DeepPartial<ReturnType<THorzScaleBehavior['options']>>
+	options?: DeepPartial<ChartOptionsImpl<HorzScaleItem>>
 ): IChartApiBase<HorzScaleItem> {
 	let htmlElement: HTMLElement;
 	if (isString(container)) {
