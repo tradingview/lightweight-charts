@@ -66,7 +66,13 @@ function buildPriceAxisViewsGetter(
 	};
 }
 
-function recalculateOverlapping(views: IPriceAxisView[], direction: 1 | -1, scaleHeight: number, rendererOptions: Readonly<PriceAxisViewRendererOptions>): void {
+function recalculateOverlapping(
+	views: IPriceAxisView[],
+	direction: 1 | -1,
+	scaleHeight: number,
+	center: number,
+	rendererOptions: Readonly<PriceAxisViewRendererOptions>
+): void {
 	if (!views.length) {
 		return;
 	}
@@ -74,8 +80,8 @@ function recalculateOverlapping(views: IPriceAxisView[], direction: 1 | -1, scal
 
 	const initLabelHeight = views[0].height(rendererOptions, true);
 	let spaceBeforeCurrentGroup = direction === 1
-		? scaleHeight / 2 - (views[0].getFixedCoordinate() - initLabelHeight / 2)
-		: views[0].getFixedCoordinate() - initLabelHeight / 2 - scaleHeight / 2;
+		? center - (views[0].getFixedCoordinate() - initLabelHeight / 2)
+		: views[0].getFixedCoordinate() - initLabelHeight / 2 - center;
 	spaceBeforeCurrentGroup = Math.max(0, spaceBeforeCurrentGroup);
 
 	for (let i = 1; i < views.length; i++) {
@@ -643,8 +649,8 @@ export class PriceAxisWidget implements IDestroyable {
 			}
 		}
 
-		recalculateOverlapping(top, 1, this._size.height, rendererOptions);
-		recalculateOverlapping(bottom, -1, this._size.height, rendererOptions);
+		recalculateOverlapping(top, 1, this._size.height, center, rendererOptions);
+		recalculateOverlapping(bottom, -1, this._size.height, center, rendererOptions);
 	}
 
 	private _drawBackLabels(target: CanvasRenderingTarget2D): void {
