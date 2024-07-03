@@ -793,8 +793,6 @@ module.exports = {
 		}],
 
 		'jsdoc/check-indentation': 'error',
-		'jsdoc/newline-after-description': 'error',
-
 		'import/no-default-export': 'error',
 
 		'prefer-arrow/prefer-arrow-functions': [
