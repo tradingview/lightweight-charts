@@ -1,12 +1,13 @@
 /// <reference types="node" />
 
 import { PNG } from 'pngjs';
-import puppeteer, {
+import {
 	Browser,
 	ConsoleMessage,
 	HTTPResponse,
 	launch as launchPuppeteer,
 	Page,
+	PuppeteerLaunchOptions,
 } from 'puppeteer';
 
 import { MouseEventParams } from '../../../../src/api/ichart-api';
@@ -19,21 +20,20 @@ export class Screenshoter {
 	private _browserPromise: Promise<Browser>;
 
 	public constructor(noSandbox: boolean, devicePixelRatio: number = 1) {
-		const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {
+		const puppeteerOptions: PuppeteerLaunchOptions = {
 			defaultViewport: {
 				deviceScaleFactor: devicePixelRatio,
 				width: viewportWidth,
 				height: viewportHeight,
 			},
+			headless: true,
 		};
 
 		if (noSandbox) {
 			puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
 		}
 
-		// note that we cannot use launchPuppeteer here as soon it wrong typing in puppeteer
-		// see https://github.com/puppeteer/puppeteer/issues/7529
-		this._browserPromise = puppeteer.launch(puppeteerOptions);
+		this._browserPromise = launchPuppeteer(puppeteerOptions);
 	}
 
 	public async close(): Promise<void> {
@@ -141,7 +141,6 @@ export class Screenshoter {
 				const additionalScreenshotPNG = new PNG();
 				await new Promise((resolve: (data: PNG) => void, reject: (reason: Error) => void) => {
 					additionalScreenshotPNG.parse(additionalScreenshotBuffer, (error: Error, data: PNG) => {
-						// eslint-disable-next-line @typescript-eslint/tslint/config
 						if (error === null) {
 							resolve(data);
 						} else {

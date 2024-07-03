@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention -- allows using version numbers as keys (e.g. "3.8") */
-import type { Version } from '../../../../versions';
-
 export type LightweightChartsApi38 = typeof import('lightweight-charts-3.8');
 export type LightweightChartsApi40 = typeof import('lightweight-charts-4.0');
 export type LightweightChartsApi41 = typeof import('lightweight-charts-4.1');
@@ -19,8 +17,6 @@ export interface LightweightChartsCreateChartTypeMap {
 	'4.1': LightweightChartsApi41['createChart'];
 	current: LightweightChartsApiCurrent['createChart'];
 }
-
-export type LightweightChartsVersion = Version | 'current';
 
 export interface LightweightChartsApiGetterResult<T extends keyof LightweightChartsApiTypeMap> {
 	module: LightweightChartsApiTypeMap[T];

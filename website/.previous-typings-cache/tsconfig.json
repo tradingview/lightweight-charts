@@ -1,4 +1,13 @@
 {
+	"compilerOptions": {
+		"typeRoots": [
+			"./node_modules/@types"
+		],
+		"lib": [
+			"dom",
+			"es2020"
+		]
+	},
 	"include": [
 		"./*.d.ts",
 		"../../dist/typings.d.ts"

@@ -82,10 +82,11 @@ function convertPrimitiveHitResult(
 function hitTestPaneView(
 	paneViews: readonly IPaneView[],
 	x: Coordinate,
-	y: Coordinate
+	y: Coordinate,
+	pane: Pane
 ): HitTestPaneViewResult | null {
 	for (const paneView of paneViews) {
-		const renderer = paneView.renderer();
+		const renderer = paneView.renderer(pane);
 		if (renderer !== null && renderer.hitTest) {
 			const result = renderer.hitTest(x, y);
 			if (result !== null) {
@@ -118,7 +119,7 @@ export function hitTestPane(
             // therefore it takes precedence here.
 			return convertPrimitiveHitResult(bestPrimitiveHit);
 		}
-		const sourceResult = hitTestPaneView(source.paneViews(pane), x, y);
+		const sourceResult = hitTestPaneView(source.paneViews(pane), x, y, pane);
 		if (sourceResult !== null) {
 			return {
 				source: source,

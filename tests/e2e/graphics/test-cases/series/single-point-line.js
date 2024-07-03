@@ -4,6 +4,7 @@ function runTestCase(container) {
 			rightOffset: 7,
 			barSpacing: 50,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addLineSeries({

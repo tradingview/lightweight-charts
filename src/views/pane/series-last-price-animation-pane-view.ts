@@ -9,6 +9,7 @@ import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-pr
 
 import { IUpdatablePaneView } from './iupdatable-pane-view';
 
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 const enum Constants {
 	AnimationPeriod = 2600,
 
@@ -37,6 +38,7 @@ const enum Constants {
 	Stage3StartStrokeAlpha = Stage2EndStrokeAlpha,
 	Stage3EndStrokeAlpha = Stage2EndStrokeAlpha,
 }
+/* eslint-enable @typescript-eslint/no-duplicate-enum-values */
 
 interface AnimationStageData {
 	start: number;

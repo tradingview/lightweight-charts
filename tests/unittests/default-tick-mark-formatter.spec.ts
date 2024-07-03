@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
 
 import { defaultTickMarkFormatter } from '../../src/model/horz-scale-behavior-time/default-tick-mark-formatter';
 import { TickMarkType, TimePoint, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';

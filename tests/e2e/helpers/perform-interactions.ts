@@ -39,7 +39,8 @@ export type InteractionTarget =
 	| 'timescale'
 	| 'leftpricescale'
 	| 'rightpricescale'
-	| 'pane';
+	| 'pane'
+	| 'paneSeparator';
 
 export type Interaction = {
 	action: InteractionAction;
@@ -138,31 +139,31 @@ async function performAction(
 			break;
 		case 'pinchZoomIn':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doPinchZoomTouch(devToolsSession, target, true);
 			}
 			break;
 		case 'pinchZoomOut':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doPinchZoomTouch(devToolsSession, target);
 			}
 			break;
 		case 'swipeTouchHorizontal':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, { horizontal: true });
 			}
 			break;
 		case 'swipeTouchVertical':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, { vertical: true });
 			}
 			break;
 		case 'swipeTouchDiagonal':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, {
 					vertical: true,
 					horizontal: true,
@@ -212,6 +213,9 @@ export async function performInteractions(
 	const timeAxis = (
 		await chartContainer.$$('tr:nth-of-type(2) td:nth-of-type(2) div canvas')
 	)[0];
+	const paneSeparator = (
+		await chartContainer.$$('tr:nth-of-type(2) td div:nth-of-type(2)')
+	)[0];
 
 	for (const interaction of interactionsToPerform) {
 		let target: ElementHandle<Element>;
@@ -231,6 +235,9 @@ export async function performInteractions(
 				break;
 			case 'pane':
 				target = paneWidget;
+				break;
+			case 'paneSeparator':
+				target = paneSeparator;
 				break;
 			default: {
 				const exhaustiveCheck: never = interaction.target;

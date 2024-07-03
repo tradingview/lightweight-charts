@@ -25,7 +25,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, { autoSize: true });
+	const chart = window.chart = LightweightCharts.createChart(container, { autoSize: true, layout: { attributionLogo: false } });
 
 	const series = chart.addCandlestickSeries();
 

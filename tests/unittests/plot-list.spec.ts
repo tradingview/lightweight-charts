@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { beforeEach, describe, it } from 'node:test';
 
 import { ensureNotNull } from '../../src/helpers/assertions';
 import { TimePoint, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';

@@ -55,7 +55,7 @@ export class PriceAxisRendererOptionsProvider {
 	}
 
 	private _textColor(): string {
-		return this._chartModel.options().layout.textColor;
+		return this._chartModel.options()['layout'].textColor;
 	}
 
 	private _paneBackgroundColor(): string {
@@ -63,10 +63,10 @@ export class PriceAxisRendererOptionsProvider {
 	}
 
 	private _fontSize(): number {
-		return this._chartModel.options().layout.fontSize;
+		return this._chartModel.options()['layout'].fontSize;
 	}
 
 	private _fontFamily(): string {
-		return this._chartModel.options().layout.fontFamily;
+		return this._chartModel.options()['layout'].fontFamily;
 	}
 }

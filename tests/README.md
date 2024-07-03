@@ -20,8 +20,6 @@ The unit tests can be run using the following command:
 
 - `npm run test`
 
-which is equivalent to `mocha tests/unittests/**/*.spec.ts`
-
 The unit tests form part of the `npm run verify` command which should be run before committing to the repo.
 
 ## End-to-end (e2e) Tests

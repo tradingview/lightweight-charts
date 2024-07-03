@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://www.tradingview.com/lightweight-charts/" target="_blank">
-    <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true">
+    <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true" alt="Lightweight Charts logo">
   </a>
 
   <h1>Lightweight Charts™</h1>
@@ -79,14 +79,12 @@ lineSeries.setData([
 
 ### Build Variants
 
-|Dependencies included|Mode|ES module|CommonJS ⚠️|IIFE (`window.LightweightCharts`)|
-|-|-|-|-|-|
-|No|PROD|`lightweight-charts.production.mjs`|`lightweight-charts.production.cjs`|N/A|
-|No|DEV|`lightweight-charts.development.mjs`|`lightweight-charts.development.cjs`|N/A|
-|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|-|`lightweight-charts.standalone.production.js`|
-|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|-|`lightweight-charts.standalone.development.js`|
-
-⚠️ **Deprecation note:** CommonJS support will be removed from the library at the start of 2024.
+|Dependencies included|Mode|ES module|IIFE (`window.LightweightCharts`)|
+|-|-|-|-|
+|No|PROD|`lightweight-charts.production.mjs`|N/A|
+|No|DEV|`lightweight-charts.development.mjs`|N/A|
+|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|`lightweight-charts.standalone.production.js`|
+|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|`lightweight-charts.standalone.development.js`|
 
 ## Development
 
@@ -103,6 +101,7 @@ This software incorporates several parts of tslib (<https://github.com/Microsoft
 This license requires specifying TradingView as the product creator.
 You shall add the "attribution notice" from the NOTICE file and a link to <https://www.tradingview.com/> to the page of your website or mobile application that is available to your users.
 As thanks for creating this product, we'd be grateful if you add it in a prominent place.
+You can use the [`attributionLogo`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/LayoutOptions#attributionLogo) chart option for displaying an appropriate link to <https://www.tradingview.com/> on the chart itself, which will satisfy the link requirement.
 
 [demo-url]: https://www.tradingview.com/lightweight-charts/
 

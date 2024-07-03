@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import * as chai from 'chai';
 import { expect } from 'chai';
 import chaiExclude from 'chai-exclude';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
 
 import { ensureDefined } from '../../src/helpers/assertions';
 import { BarData, HistogramData, LineData, WhitespaceData } from '../../src/model/data-consumer';

@@ -42,11 +42,11 @@ aliases:
 executors:
   node-executor:
     docker:
-      - image: cimg/node:18.19
+      - image: cimg/node:22.3
 
   node-browsers-executor:
     docker:
-      - image: cimg/node:18.19-browsers
+      - image: cimg/node:22.3-browsers
 
 commands:
   checkout-with-deps:
@@ -91,6 +91,7 @@ jobs:
     steps:
       - checkout-with-deps
       - run: npm install
+      - run: npx puppeteer browsers install chrome
       - save_cache: *save-node-modules-cache
 
   install-deps-website:
@@ -164,9 +165,6 @@ jobs:
             cd node_modules
             ln -s ../ lightweight-charts
       - run:
-          name: "Check CJS could be imported in NodeJS"
-          command: node -e "require('lightweight-charts')" --input-type=commonjs
-      - run:
           name: "Check ESM could be imported in NodeJS"
           command: node -e "import 'lightweight-charts'" --input-type=module
 
@@ -184,7 +182,6 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm run tsc-verify
       - run: npm run type-tests
 
   dts-changes:

@@ -5,7 +5,7 @@
  */
 
 /** @type {import('@memlab/core/dist/lib/Types').IScenario} */
-const scenario = {
+export const scenario = {
 	allowedLeaks: [
 		'FormattedLabelsCache',
 		'CrosshairPriceAxisView', // <- We should check and maybe fix this?
@@ -92,6 +92,3 @@ const scenario = {
 		});
 	},
 };
-
-// eslint-disable-next-line no-undef
-exports.scenario = scenario;

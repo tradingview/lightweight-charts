@@ -24,6 +24,7 @@ function runTestCase(container) {
 				return 'ts=' + businessDayOrTimestamp;
 			},
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const series = chart.addLineSeries();

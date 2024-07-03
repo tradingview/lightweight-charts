@@ -1,17 +1,21 @@
 /// <reference types="node" />
-
 import * as fs from 'fs';
-import * as path from 'path';
+
+import { basename, dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirectory = dirname(currentFilePath);
 
 export interface TestCase {
 	name: string;
 	caseContent: string;
 }
 
-const testCasesDir = path.join(__dirname, '..', 'test-cases');
+const testCasesDir = join(currentDirectory, '..', 'test-cases');
 
 function extractTestCaseName(fileName: string): string | null {
-	const match = /^([^.].+)\.js$/.exec(path.basename(fileName));
+	const match = /^([^.].+)\.js$/.exec(basename(fileName));
 	return match && match[1];
 }
 
@@ -31,29 +35,47 @@ function getTestCaseGroups(): TestCasesGroupInfo[] {
 			path: testCasesDir,
 		},
 		...fs.readdirSync(testCasesDir)
-			.filter((filePath: string) => fs.lstatSync(path.join(testCasesDir, filePath)).isDirectory())
+			.filter((filePath: string) => fs.lstatSync(join(testCasesDir, filePath)).isDirectory())
 			.map((filePath: string) => {
 				return {
 					name: filePath,
-					path: path.join(testCasesDir, filePath),
+					path: join(testCasesDir, filePath),
 				};
 			}),
 	];
+}
+
+let testFilterRegex: RegExp;
+if (process.env.GREP) {
+	testFilterRegex = new RegExp(process.env.GREP);
 }
 
 export function getTestCases(): Record<string, TestCase[]> {
 	const result: Record<string, TestCase[]> = {};
 
 	for (const group of getTestCaseGroups()) {
-		result[group.name] = fs.readdirSync(group.path)
-			.map((filePath: string) => path.join(group.path, filePath))
+		const groupFiles = fs.readdirSync(group.path)
+			.map((filePath: string) => join(group.path, filePath))
 			.filter(isTestCaseFile)
+			.filter((testCaseFile: string) => {
+				if (!testFilterRegex) {
+					return true;
+				}
+				const name = extractTestCaseName(testCaseFile);
+				if (name) {
+					return testFilterRegex.test(name);
+				}
+				return true;
+			})
 			.map((testCaseFile: string) => {
 				return {
 					name: extractTestCaseName(testCaseFile) as string,
 					caseContent: fs.readFileSync(testCaseFile, { encoding: 'utf-8' }),
 				};
 			});
+		if (groupFiles.length > 0) {
+			result[group.name] = groupFiles;
+		}
 	}
 
 	return result;

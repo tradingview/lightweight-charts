@@ -1,10 +1,9 @@
 /// <reference types="node" />
-
-import * as fs from 'fs';
-import * as path from 'path';
-
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { after, before, describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import puppeteer, {
 	Browser,
 	HTTPResponse,
@@ -19,8 +18,11 @@ import { Interaction, performInteractions } from '../helpers/perform-interaction
 import { expectedCoverage, threshold } from './coverage-config';
 import { getTestCases } from './helpers/get-coverage-test-cases';
 
-const dummyContent = fs.readFileSync(
-	path.join(__dirname, 'helpers', 'test-page-dummy.html'),
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirectory = dirname(currentFilePath);
+
+const dummyContent = readFileSync(
+	join(currentDirectory, 'helpers', 'test-page-dummy.html'),
 	{ encoding: 'utf-8' }
 );
 
@@ -44,31 +46,31 @@ interface InternalWindow {
 }
 
 function rmRf(dir: string): void {
-	if (!fs.existsSync(dir)) {
+	if (!existsSync(dir)) {
 		return;
 	}
 
-	fs.readdirSync(dir).forEach((file: string) => {
-		const filePath = path.join(dir, file);
-		if (fs.lstatSync(filePath).isDirectory()) {
+	readdirSync(dir).forEach((file: string) => {
+		const filePath = join(dir, file);
+		if (lstatSync(filePath).isDirectory()) {
 			rmRf(filePath);
 		} else {
-			fs.unlinkSync(filePath);
+			unlinkSync(filePath);
 		}
 	});
 
-	fs.rmdirSync(dir);
+	rmdirSync(dir);
 }
 
 function generateAndSaveCoverageFile(coveredJs: string): void {
 	// Create output directory
-	const outDir = path.resolve(process.env.CMP_OUT_DIR || path.join(__dirname, '.gendata'));
+	const outDir = resolve(process.env.CMP_OUT_DIR || join(currentDirectory, '.gendata'));
 	rmRf(outDir);
-	fs.mkdirSync(outDir, { recursive: true });
+	mkdirSync(outDir, { recursive: true });
 
 	try {
-		const filePath = path.join(outDir, 'covered.js');
-		fs.writeFileSync(filePath, coveredJs);
+		const filePath = join(outDir, 'covered.js');
+		writeFileSync(filePath, coveredJs);
 		console.info('\nGenerated `covered.js` file for the coverage test.\n');
 		console.info(filePath);
 	} catch (error: unknown) {
@@ -145,7 +147,7 @@ function consolidateCoverageResults(testResults: CoverageTestResults): CoverageR
 	};
 }
 
-describe('Coverage tests', (): void => {
+void describe('Coverage tests', (): void => {
 	const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {};
 	if (process.env.NO_SANDBOX) {
 		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
@@ -170,7 +172,7 @@ describe('Coverage tests', (): void => {
 
 	const runTestCase = (testCase: TestCase) => {
 		testCaseCount += 1;
-		it(testCase.name, async () => {
+		void it(testCase.name, async () => {
 			const pageContent = generatePageContent(
 				testStandalonePath,
 				testCase.caseContent
@@ -206,10 +208,10 @@ describe('Coverage tests', (): void => {
 			await performInteractions(page, interactionsToPerform);
 
 			await page.evaluate(() => {
-				return new Promise<void>((resolve: () => void) => {
+				return new Promise<void>((resolveTwo: () => void) => {
 					(window as unknown as InternalWindow).afterInteractions();
 					window.requestAnimationFrame(() => {
-						setTimeout(resolve, 50);
+						setTimeout(resolveTwo, 50);
 					});
 				});
 			});
@@ -239,7 +241,7 @@ describe('Coverage tests', (): void => {
 				runTestCase(testCase);
 			}
 		} else {
-			describe(groupName, () => {
+			void describe(groupName, () => {
 				for (const testCase of testCaseGroups[groupName]) {
 					runTestCase(testCase);
 				}
@@ -247,7 +249,7 @@ describe('Coverage tests', (): void => {
 		}
 	}
 
-	it('number of test cases', () => {
+	void it('number of test cases', () => {
 		// we need to have at least 1 test to check it
 		expect(testCaseCount).to.be.greaterThan(
 			0,

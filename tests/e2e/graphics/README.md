@@ -5,7 +5,7 @@ This tests uses [puppeteer](https://github.com/GoogleChrome/puppeteer) to genera
 ## How it works
 
 1. If there are local files to serve - run web server.
-1. Run `mocha` with loaded test cases.
+1. Run `node:test` with loaded test cases.
 1. Then, for each test case, open webpage by `puppeteer` for golden and test version, take 2 screenshots.
 1. Compare given screenshots by `pixelmatch`, write them in out folder (with HTML pages).
 
@@ -25,14 +25,14 @@ Note that case's file wouldn't prepared/parsed by any bundler/processor (or even
 
 This tests runs against 2 versions of the library - "golden" and "test". Golden is LKG version, test - current tested version of the library.
 
-To run this tests you need use [runner.js](./runner.js):
+To run this tests you need use [runner.ts](./runner.ts):
 
 ```bash
-./runner.js ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
+npx esno ./runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
 ```
 
 Each path to the standalone module might be either to a local file (relative/absolute path to a file) or remote file (via http/https).
-If file is local then local server will be runner to serve that file (see [serve-local-files.js](../serve-local-files.js) module).
+If file is local then local server will be runner to serve that file (see [serve-local-files.ts](../serve-local-files.ts) module).
 
 ## Tips
 
@@ -43,18 +43,18 @@ If file is local then local server will be runner to serve that file (see [serve
     But if you test with local files, you cannot open that HTML pages in your browser to debug because there is scripts which are loaded from webserver (which a runner up to runs tests).
     In that can you can use the following hack.
 
-    Let's say you run your tests in that way - `./runner.js ./golden/standalone/module.js ./test/standalone/module.js`.
+    Let's say you run your tests in that way - `npx esno ./runner.ts ./golden/standalone/module.js ./test/standalone/module.js`.
     After that in `.gendata/test-case-name/1.golden.html` you can find a HTML page.
 
-    To open this page properly you can run `./tests/e2e/serve-static-files.js golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
+    To open this page properly you can run `npx esno ./tests/e2e/serve-static-files.ts golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
 
 1. The following environmental variables can be used to adjust the test:
 
     - `PRODUCTION_BUILD`: Set to true if testing a Production build
     - `DEVICE_PIXEL_RATIO`: Device pixel ratio to simulate during the test (number)
 
-1. You can set Mocha options from the command line arguments:
+1. You can set additional options from the command line arguments:
 
 ```bash
-node ./tests/e2e/graphics/runner.js ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js --bail --grep "add-series"
+npx esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js --bail --grep "add-series"
 ```

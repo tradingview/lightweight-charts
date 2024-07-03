@@ -1,24 +1,23 @@
 // eslint-env node
 
-module.exports = [
-	{
-		name: 'CJS',
-		path: 'dist/lightweight-charts.production.cjs',
-		limit: '48.35 KB',
-	},
+// eslint-disable-next-line import/no-default-export
+export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '48.28 KB',
+		limit: '49.98 KB',
+		gzip: true,
 	},
 	{
 		name: 'Standalone-ESM',
 		path: 'dist/lightweight-charts.standalone.production.mjs',
-		limit: '50.00 KB',
+		limit: '51.75 KB',
+		gzip: true,
 	},
 	{
 		name: 'Standalone',
 		path: 'dist/lightweight-charts.standalone.production.js',
-		limit: '50.04 KB',
+		limit: '51.80 KB',
+		gzip: true,
 	},
 ];

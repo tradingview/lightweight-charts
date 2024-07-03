@@ -27,6 +27,7 @@ function runTestCase(container) {
 		timeScale: {
 			minBarSpacing: 0.001,
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addBarSeries();

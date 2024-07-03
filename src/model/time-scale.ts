@@ -13,9 +13,9 @@ import { LocalizationOptions } from './localization-options';
 import { areRangesEqual, RangeImpl } from './range-impl';
 import { TickMark, TickMarks } from './tick-marks';
 import {
+	IRange,
 	Logical,
 	LogicalRange,
-	Range,
 	SeriesItemsIndexesRange,
 	TickMarkWeightValue,
 	TimedValue,
@@ -385,7 +385,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		};
 	}
 
-	public logicalRangeForTimeRange(range: Range<InternalHorzScaleItem>): LogicalRange {
+	public logicalRangeForTimeRange(range: IRange<InternalHorzScaleItem>): LogicalRange {
 		return {
 			from: ensureNotNull(this.timeToIndex(range.from, true)) as number as Logical,
 			to: ensureNotNull(this.timeToIndex(range.to, true)) as number as Logical,
@@ -505,7 +505,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		}
 
 		const spacing = this._barSpacing;
-		const fontSize = this._model.options().layout.fontSize;
+		const fontSize = this._model.options()['layout'].fontSize;
 
 		const pixelsPer8Characters = (fontSize + 4) * 5;
 		const pixelsPerCharacter = pixelsPer8Characters / defaultTickMarkMaxCharacterLength;
@@ -776,7 +776,8 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	private _isAllScalingAndScrollingDisabled(): boolean {
-		const { handleScroll, handleScale } = this._model.options();
+		const handleScroll = this._model.options()['handleScroll'];
+		const handleScale = this._model.options()['handleScale'];
 		return !handleScroll.horzTouchDrag
 			&& !handleScroll.mouseWheel
 			&& !handleScroll.pressedMouseMove

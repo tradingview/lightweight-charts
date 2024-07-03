@@ -5,6 +5,7 @@ import { AutoScaleMargins } from '../../model/autoscale-info-impl';
 import { BarPrice, BarPrices } from '../../model/bar';
 import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
+import { Pane } from '../../model/pane';
 import { PriceScale } from '../../model/price-scale';
 import { ISeries } from '../../model/series';
 import { InternalSeriesMarker, SeriesMarkerPosition } from '../../model/series-markers';
@@ -118,7 +119,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 		}
 	}
 
-	public renderer(addAnchors?: boolean): IPaneRenderer | null {
+	public renderer(pane: Pane, addAnchors?: boolean): IPaneRenderer | null {
 		if (!this._series.visible()) {
 			return null;
 		}
@@ -127,7 +128,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			this._makeValid();
 		}
 
-		const layout = this._model.options().layout;
+		const layout = this._model.options()['layout'];
 		this._renderer.setParams(layout.fontSize, layout.fontFamily);
 		this._renderer.setData(this._data);
 
@@ -194,7 +195,7 @@ export class SeriesMarkersPaneView implements IUpdatablePaneView {
 			this._dataInvalidated = false;
 		}
 
-		const layoutOptions = this._model.options().layout;
+		const layoutOptions = this._model.options()['layout'];
 
 		this._data.visibleRange = null;
 		const visibleBars = timeScale.visibleStrictRange();

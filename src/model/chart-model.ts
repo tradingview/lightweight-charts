@@ -21,7 +21,7 @@ import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
-import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
+import { DEFAULT_STRETCH_FACTOR, MIN_PANE_HEIGHT, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { ISeries, Series, SeriesOptionsInternal } from './series';
@@ -348,27 +348,36 @@ export interface ChartOptionsImpl<HorzScaleItem> extends ChartOptionsBase {
 	localization: LocalizationOptions<HorzScaleItem>;
 }
 
+/**
+ * These properties should not be renamed by `ts-transformer-properties-rename`.
+ * To ensure that this is respected in all places, please only use the
+ * ['name'] syntax to read or write these properties.
+ */
+interface ChartOptionsInternalFixedNames {
+	/**
+	 * **Only access using ['handleScroll']**
+	 * @public
+	 */
+	handleScroll: HandleScrollOptions;
+	/**
+	 * **Only access using ['handleScale']**
+	 * @public
+	 */
+	handleScale: HandleScaleOptionsInternal;
+	/**
+	 * **Only access using ['layout']**
+	 * @public
+	 */
+	layout: LayoutOptions;
+}
+
 export type ChartOptionsInternalBase =
 	Omit<ChartOptionsBase, 'handleScroll' | 'handleScale' | 'layout'>
-	& {
-		/** @public */
-		handleScroll: HandleScrollOptions;
-		/** @public */
-		handleScale: HandleScaleOptionsInternal;
-		/** @public */
-		layout: LayoutOptions;
-	};
+	& ChartOptionsInternalFixedNames;
 
 export type ChartOptionsInternal<HorzScaleItem> =
 	Omit<ChartOptionsImpl<HorzScaleItem>, 'handleScroll' | 'handleScale' | 'layout'>
-	& {
-		/** @public */
-		handleScroll: HandleScrollOptions;
-		/** @public */
-		handleScale: HandleScaleOptionsInternal;
-		/** @public */
-		layout: LayoutOptions;
-	};
+	& ChartOptionsInternalFixedNames;
 
 interface GradientColorsCache {
 	topColor: string;
@@ -381,7 +390,7 @@ export interface IChartModelBase {
 	findPriceScale(priceScaleId: string): PriceScaleOnPane | null;
 	options(): Readonly<ChartOptionsInternalBase>;
 	timeScale(): ITimeScale;
-	serieses(): readonly ISeries<SeriesType>[];
+	serieses(): readonly Series<SeriesType>[];
 
 	updateSource(source: IPriceDataSource): void;
 	updateCrosshair(): void;
@@ -429,6 +438,12 @@ export interface IChartModelBase {
 	setTimeScaleAnimation(animation: ITimeScaleAnimation): void;
 
 	stopTimeScaleAnimation(): void;
+	moveSeriesToPane(series: Series<SeriesType>, newPaneIndex: number): void;
+	panes(): readonly Pane[];
+	getPaneIndex(pane: Pane): number;
+	swapPanes(first: number, second: number): void;
+	removePane(index: number): void;
+	changePanesHeight(paneIndex: number, height: number): void;
 }
 
 export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase {
@@ -468,7 +483,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._magnet = new Magnet(options.crosshair);
 		this._watermark = new Watermark(this, options.watermark);
 
-		this.createPane();
+		this._getOrCreatePane(0);
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
 
 		this._backgroundTopColor = this._getBackgroundColor(BackgroundColorSide.Top);
@@ -535,11 +550,13 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (priceScaleId === DefaultPriceScaleId.Left) {
 			this.applyOptions({
 				leftPriceScale: options,
 			});
 			return;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		} else if (priceScaleId === DefaultPriceScaleId.Right) {
 			this.applyOptions({
 				rightPriceScale: options,
@@ -606,30 +623,57 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this.recalculateAllPanes();
 	}
 
-	public createPane(index?: number): Pane {
-		const pane = new Pane(this._timeScale, this);
-
-		if (index !== undefined) {
-			this._panes.splice(index, 0, pane);
-		} else {
-			// adding to the end - common case
-			this._panes.push(pane);
+	public removePane(index: number): void {
+		if (this._panes.length === 1) {
+			return;
 		}
 
-		const actualIndex = (index === undefined) ? this._panes.length - 1 : index;
+		assert(index >= 0 && index < this._panes.length, 'Invalid pane index');
 
-		// we always do autoscaling on the creation
-		// if autoscale option is true, it is ok, just recalculate by invalidation mask
-		// if autoscale option is false, autoscale anyway on the first draw
-		// also there is a scenario when autoscale is true in constructor and false later on applyOptions
-		const mask = InvalidateMask.full();
-		mask.invalidatePane(actualIndex, {
-			level: InvalidationLevel.None,
-			autoScale: true,
-		});
-		this._invalidate(mask);
+		this._panes.splice(index, 1);
+		this.fullUpdate();
+	}
 
-		return pane;
+	public changePanesHeight(paneIndex: number, height: number): void {
+		if (this._panes.length < 2) {
+			return;
+		}
+
+		assert(paneIndex >= 0 && paneIndex < this._panes.length, 'Invalid pane index');
+		const targetPane = this._panes[paneIndex];
+
+		const totalStretch = this._panes.reduce((prevValue: number, pane: Pane) => prevValue + pane.stretchFactor(), 0);
+		const totalHeight = this._panes.reduce((prevValue: number, pane: Pane) => prevValue + pane.height(), 0);
+		const maxPaneHeight = totalHeight - MIN_PANE_HEIGHT * (this._panes.length - 1);
+		height = Math.min(maxPaneHeight, Math.max(MIN_PANE_HEIGHT, height));
+		const pixelStretchFactor = totalStretch / totalHeight;
+
+		const oldHeight = targetPane.height();
+		targetPane.setStretchFactor(height * pixelStretchFactor);
+
+		let otherPanesChange = height - oldHeight;
+		let panesCount = this._panes.length - 1;
+
+		for (const pane of this._panes) {
+			if (pane !== targetPane) {
+				const newPaneHeight = Math.min(maxPaneHeight, Math.max(30, pane.height() - otherPanesChange / panesCount));
+				otherPanesChange -= (pane.height() - newPaneHeight);
+				panesCount -= 1;
+				const newStretchFactor = newPaneHeight * pixelStretchFactor;
+				pane.setStretchFactor(newStretchFactor);
+			}
+		}
+
+		this.fullUpdate();
+	}
+
+	public swapPanes(first: number, second: number): void {
+		assert(first >= 0 && first < this._panes.length && second >= 0 && second < this._panes.length, 'Invalid pane index');
+		const firstPane = this._panes[first];
+		const secondPane = this._panes[second];
+		this._panes[first] = secondPane;
+		this._panes[second] = firstPane;
+		this.fullUpdate();
 	}
 
 	public startScalePrice(pane: Pane, priceScale: PriceScale, x: number): void {
@@ -862,8 +906,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._priceScalesOptionsChanged;
 	}
 
-	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
-		const pane = this._panes[0];
+	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], paneIndex: number = 0, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
+		const pane = this._getOrCreatePane(paneIndex);
+
 		const series = this._createSeries(options, seriesType, pane, customPaneView);
 		this._serieses.push(series);
 
@@ -882,30 +927,20 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		const seriesIndex = this._serieses.indexOf(series);
 		assert(seriesIndex !== -1, 'Series not found');
-
+		const paneImpl = ensureNotNull(pane);
 		this._serieses.splice(seriesIndex, 1);
-		ensureNotNull(pane).removeDataSource(series);
+		paneImpl.removeDataSource(series);
 		if (series.destroy) {
 			series.destroy();
 		}
+		this._cleanupIfPaneIsEmpty(paneImpl);
 	}
 
-	public moveSeriesToScale(series: Series<SeriesType>, targetScaleId: string): void {
+	public moveSeriesToScale(series: ISeries<SeriesType>, targetScaleId: string): void {
 		const pane = ensureNotNull(this.paneForSource(series));
 		pane.removeDataSource(series);
 
-		// check if targetScaleId exists
-		const target = this.findPriceScale(targetScaleId);
-		if (target === null) {
-			// new scale on the same pane
-			const zOrder = series.zorder();
-			pane.addDataSource(series, targetScaleId, zOrder);
-		} else {
-			// if move to the new scale of the same pane, keep zorder
-			// if move to new pane
-			const zOrder = (target.pane === pane) ? series.zorder() : undefined;
-			target.pane.addDataSource(series, targetScaleId, zOrder);
-		}
+		pane.addDataSource(series, targetScaleId, ensureNotNull(series.zorder()));
 	}
 
 	public fitContent(): void {
@@ -954,6 +989,23 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._options.rightPriceScale.visible ? DefaultPriceScaleId.Right : DefaultPriceScaleId.Left;
 	}
 
+	public moveSeriesToPane(series: Series<SeriesType>, newPaneIndex: number): void {
+		assert(newPaneIndex >= 0, 'Index should be greater or equal to 0');
+		const fromPaneIndex = this._seriesPaneIndex(series);
+		if (newPaneIndex === fromPaneIndex) {
+			return;
+		}
+
+		const previousPane = ensureNotNull(this.paneForSource(series));
+		previousPane.removeDataSource(series);
+		const newPane = this._getOrCreatePane(newPaneIndex);
+		this._addSeriesToPane(series, newPane);
+
+		if (previousPane.dataSources().length === 0) {
+			this._cleanupIfPaneIsEmpty(previousPane);
+		}
+	}
+
 	public backgroundBottomColor(): string {
 		return this._backgroundBottomColor;
 	}
@@ -995,6 +1047,37 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return result;
 	}
 
+	public getPaneIndex(pane: Pane): number {
+		return this._panes.indexOf(pane);
+	}
+
+	private _getOrCreatePane(index: number): Pane {
+		assert(index >= 0, 'Index should be greater or equal to 0');
+		index = Math.min(this._panes.length, index);
+		if (index < this._panes.length) {
+			return this._panes[index];
+		}
+
+		const pane = new Pane(this._timeScale, this);
+		this._panes.push(pane);
+
+		// we always do autoscaling on the creation
+		// if autoscale option is true, it is ok, just recalculate by invalidation mask
+		// if autoscale option is false, autoscale anyway on the first draw
+		// also there is a scenario when autoscale is true in constructor and false later on applyOptions
+		const mask = InvalidateMask.full();
+		mask.invalidatePane(index, {
+			level: InvalidationLevel.None,
+			autoScale: true,
+		});
+		this._invalidate(mask);
+		return pane;
+	}
+
+	private _seriesPaneIndex(series: Series<SeriesType>): number {
+		return this._panes.findIndex((pane: Pane) => pane.series().includes(series));
+	}
+
 	private _paneInvalidationMask(pane: Pane | null, level: InvalidationLevel): InvalidateMask {
 		const inv = new InvalidateMask(level);
 		if (pane !== null) {
@@ -1023,21 +1106,25 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
-		const series = new Series<T>(this, options, seriesType, pane, customPaneView);
-
-		const targetScaleId = options.priceScaleId !== undefined ? options.priceScaleId : this.defaultVisiblePriceScaleId();
-		pane.addDataSource(series, targetScaleId);
-
-		if (!isDefaultPriceScale(targetScaleId)) {
-			// let's apply that options again to apply margins
-			series.applyOptions(options);
-		}
+		const series = new Series<T>(this, options, seriesType, customPaneView);
+		this._addSeriesToPane(series, pane);
 
 		return series;
 	}
 
+	private _addSeriesToPane(series: Series<SeriesType>, pane: Pane): void {
+		const priceScaleId = series.options().priceScaleId;
+		const targetScaleId: string = priceScaleId !== undefined ? priceScaleId : this.defaultVisiblePriceScaleId();
+		pane.addDataSource(series, targetScaleId);
+
+		if (!isDefaultPriceScale(targetScaleId)) {
+			// let's apply that options again to apply margins
+			series.applyOptions(series.options());
+		}
+	}
+
 	private _getBackgroundColor(side: BackgroundColorSide): string {
-		const layoutOptions = this._options.layout;
+		const layoutOptions = this._options['layout'];
 
 		if (layoutOptions.background.type === ColorType.VerticalGradient) {
 			return side === BackgroundColorSide.Top ?
@@ -1046,5 +1133,12 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 
 		return layoutOptions.background.color;
+	}
+
+	private _cleanupIfPaneIsEmpty(pane: Pane): void {
+		if (pane.dataSources().length === 0 && this._panes.length > 1) {
+			this._panes.splice(this.getPaneIndex(pane), 1);
+			this.fullUpdate();
+		}
 	}
 }

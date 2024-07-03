@@ -6,7 +6,7 @@ import { SeriesItemsIndexesRange } from '../model/time-data';
 import { LinePoint, LineType } from './draw-line';
 
 // eslint-disable-next-line max-params, complexity
-export function walkLine<TItem extends LinePoint, TStyle extends CanvasRenderingContext2D['fillStyle'] | CanvasRenderingContext2D['strokeStyle']>(
+export function walkLine<TItem extends LinePoint, TStyle extends CanvasRenderingContext2D['fillStyle' | 'strokeStyle']>(
 	renderingScope: BitmapCoordinatesRenderingScope,
 	items: readonly TItem[],
 	lineType: LineType,

@@ -26,6 +26,7 @@ import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
+import { AttributionLogoWidget } from './attribution-logo-widget';
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IChartWidgetBase } from './chart-widget';
 import { drawBackground, drawForeground, DrawFunction, drawSourcePaneViews } from './draw-functions';
@@ -66,6 +67,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _size: Size = size({ width: 0, height: 0 });
 	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
 	private _rightPriceAxisWidget: PriceAxisWidget | null = null;
+	private _attributionLogoWidget: AttributionLogoWidget | null = null;
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
@@ -137,8 +139,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			this._topCanvasBinding.canvasElement,
 			this,
 			{
-				treatVertTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options().handleScroll.vertTouchDrag,
-				treatHorzTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options().handleScroll.horzTouchDrag,
+				treatVertTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options()['handleScroll'].vertTouchDrag,
+				treatHorzTouchDragAsPageScroll: () => this._startTrackPoint === null && !this._chart.options()['handleScroll'].horzTouchDrag,
 			}
 		);
 	}
@@ -150,6 +152,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._rightPriceAxisWidget !== null) {
 			this._rightPriceAxisWidget.destroy();
 		}
+		this._attributionLogoWidget = null;
 
 		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
 		releaseCanvas(this._topCanvasBinding.canvasElement);
@@ -182,6 +185,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		this.updatePriceAxisWidgetsStates();
+
+		if (this._chart.paneWidgets().indexOf(this) === this._chart.paneWidgets().length - 1) {
+			this._attributionLogoWidget = this._attributionLogoWidget ?? new AttributionLogoWidget(this._paneCell, this._chart);
+			this._attributionLogoWidget.update();
+		} else {
+			this._attributionLogoWidget?.removeElement();
+			this._attributionLogoWidget = null;
+		}
 	}
 
 	public chart(): IChartWidgetBase {
@@ -337,7 +348,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	public pinchEvent(middlePoint: Position, scale: number): void {
-		if (!this._chart.options().handleScale.pinch) {
+		if (!this._chart.options()['handleScale'].pinch) {
 			return;
 		}
 
@@ -546,7 +557,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _drawGrid(target: CanvasRenderingTarget2D): void {
 		const state = ensureNotNull(this._state);
 		const paneView = state.grid().paneView();
-		const renderer = paneView.renderer();
+		const renderer = paneView.renderer(state);
 
 		if (renderer !== null) {
 			renderer.draw(target, false);
@@ -729,7 +740,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		const chartOptions = this._chart.options();
-		const scrollOptions = chartOptions.handleScroll;
+		const scrollOptions = chartOptions['handleScroll'];
 		const kineticScrollOptions = chartOptions.kineticScroll;
 		if (
 			(!scrollOptions.pressedMouseMove || event.isTouch) &&

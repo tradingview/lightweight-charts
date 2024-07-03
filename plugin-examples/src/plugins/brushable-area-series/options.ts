@@ -1,12 +1,12 @@
 import {
 	CustomSeriesOptions,
 	customSeriesDefaultOptions,
-	Range,
+	IRange,
 	Logical,
 } from 'lightweight-charts';
 
 export interface BrushRange {
-	range: Range<Logical>;
+	range: IRange<Logical>;
 	style: BrushableAreaStyle;
 }
 

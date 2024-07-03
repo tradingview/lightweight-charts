@@ -4,16 +4,26 @@
  * This script checks that all local links in markdown files are valid (include anchors)
  */
 
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const glob = require('glob');
-const markdown = require('markdown-it');
-const markdownAnchors = require('markdown-it-anchor');
+import { glob } from 'glob';
+import markdown from 'markdown-it';
+import markdownAnchors from 'markdown-it-anchor';
 
-const versions = require('../website/versions.json');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const websiteRoot = normalizePath(path.join(__dirname, '../website/'));
+
+const versionsPath = normalizePath(path.join(websiteRoot, 'versions.json'));
+
+function readJsonFileSync(jsonPath) {
+	const data = fs.readFileSync(jsonPath, 'utf-8');
+	return JSON.parse(data);
+}
+const versions = readJsonFileSync(versionsPath);
 
 const websiteDocsFolders = [
 	normalizePath(path.join(websiteRoot, '/docs/')),
@@ -243,6 +253,4 @@ function main() {
 	}
 }
 
-if (require.main === module) {
-	main();
-}
+main();

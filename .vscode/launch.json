@@ -2,54 +2,42 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "type": "node-terminal",
             "request": "launch",
             "name": "Unittests",
-            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            "args": [
-                "tests/unittests/**/*.spec.ts"
-            ],
+            "command": "npm run test",
+            "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
-            "type": "node",
+            "type": "node-terminal",
             "request": "launch",
             "name": "Graphics tests",
-            "program": "${workspaceFolder}/tests/e2e/graphics/runner.js",
-            "args": [
-                "${input:goldenStandalonePath}",
-                "${input:testStandalonePath}"
-            ],
+            "command": "npx esno ./tests/e2e/graphics/runner.ts ${input:goldenStandalonePath} ${input:testStandalonePath}",
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
-            "type": "node",
+            "type": "node-terminal",
             "request": "launch",
             "name": "Memleaks tests",
-            "program": "${workspaceFolder}/tests/e2e/memleaks/runner.js",
-            "args": [
-                "${input:testStandalonePath}"
-            ],
+            "command": "npm run e2e:memleaks ${input:testStandalonePath}",
+            "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
-            "type": "node",
+            "type": "node-terminal",
             "request": "launch",
             "name": "Coverage tests",
-            "program": "${workspaceFolder}/tests/e2e/coverage/runner.js",
-            "args": [
-                "${input:testStandalonePath}"
-            ],
+            "command": "npm run e2e:coverage ${input:testStandalonePath}",
+            "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
-            "type": "node",
+            "type": "node-terminal",
             "request": "launch",
             "name": "Interaction tests",
-            "program": "${workspaceFolder}/tests/e2e/interactions/runner.js",
-            "args": [
-                "${input:testStandalonePath}"
-            ],
+            "command": "npm run e2e:interactions ${input:testStandalonePath}",
+            "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
         }
     ],

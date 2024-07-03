@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const magentaColor = '\x1b[1;35m';
 const redColor = '\x1b[1;31m';
@@ -80,6 +84,4 @@ function main() {
 	console.log(`${magentaColor}Installed to ${gitRoot}${noColor}`);
 }
 
-if (require.main === module) {
-	main();
-}
+main();

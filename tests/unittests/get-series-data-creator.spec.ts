@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
 
 import { getSeriesDataCreator } from '../../src/api/get-series-data-creator';
 import { UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';

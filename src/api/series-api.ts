@@ -11,6 +11,7 @@ import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../m
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
 import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
+import { Pane } from '../model/pane';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
@@ -22,12 +23,13 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Logical, Range, TimePointIndex } from '../model/time-data';
+import { IRange, Logical, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { type IChartApiBase } from './ichart-api';
+import { IPaneApi } from './ipane-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, DataChangedHandler, DataChangedScope, ISeriesApi } from './iseries-api';
@@ -51,19 +53,22 @@ export class SeriesApi<
 	private readonly _priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>;
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 	private readonly _dataChangedDelegate: Delegate<DataChangedScope> = new Delegate();
+	private readonly _paneApiGetter: (pane: Pane) => IPaneApi<HorzScaleItem>;
 
 	public constructor(
 		series: Series<TSeriesType>,
 		dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>,
 		priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>,
 		chartApi: IChartApiBase<HorzScaleItem>,
-		horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>
+		horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>,
+		paneApiGetter: (pane: Pane) => IPaneApi<HorzScaleItem>
 	) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
 		this._priceScaleApiProvider = priceScaleApiProvider;
 		this._horzScaleBehavior = horzScaleBehavior;
 		this._chartApi = chartApi;
+		this._paneApiGetter = paneApiGetter;
 	}
 
 	public destroy(): void {
@@ -91,7 +96,7 @@ export class SeriesApi<
 		return this._series.priceScale().coordinateToPrice(coordinate as Coordinate, firstValue.value);
 	}
 
-	public barsInLogicalRange(range: Range<number> | null): BarsInfo<HorzScaleItem> | null {
+	public barsInLogicalRange(range: IRange<number> | null): BarsInfo<HorzScaleItem> | null {
 		if (range === null) {
 			return null;
 		}
@@ -243,6 +248,16 @@ export class SeriesApi<
 		if (primitive.detached) {
 			primitive.detached();
 		}
+	}
+
+	public getPane(): IPaneApi<HorzScaleItem> {
+		const series = this._series;
+		const pane = ensureNotNull(this._series.model().paneForSource(series));
+		return this._paneApiGetter(pane);
+	}
+
+	public moveToPane(paneIndex: number): void {
+		this._series.model().moveSeriesToPane(this._series, paneIndex);
 	}
 
 	private _onDataChanged(scope: DataChangedScope): void {

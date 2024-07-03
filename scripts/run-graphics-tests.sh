@@ -31,7 +31,7 @@ npm run $BUILD_SCRIPT
 
 echo "Graphics tests"
 set +e
-node ./tests/e2e/graphics/runner.js ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
+npx esno ./tests/e2e/graphics/runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
 EXIT_CODE=$?
 set -e
 
