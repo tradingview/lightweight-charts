@@ -60,13 +60,17 @@ function formatChange(newSize, oldSize) {
 	return `${formatSizeChange(diff)} (${formatNumber(diffInPercent)}%)`;
 }
 
+const compareBranch = process.env.COMPARE_BRANCH;
+
 async function main() {
 	let headRev = runForOutput('git rev-parse --abbrev-ref HEAD');
 	if (headRev.length === 0 || headRev === 'HEAD') {
 		headRev = runForOutput('git rev-parse HEAD');
 	}
 
-	const revToCheck = runForOutput(`git merge-base origin/master "${headRev}"`);
+	const revToCheck = compareBranch
+		? runForOutput(`git rev-parse origin/${compareBranch}"`)
+		: runForOutput(`git merge-base origin/master "${headRev}"`);
 
 	console.log(`Using "${revToCheck}" as base\n`);
 
