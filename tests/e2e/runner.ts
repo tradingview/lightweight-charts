@@ -75,7 +75,6 @@ export async function runTests(
 
 	testStream.once('end', () => {
 		if (closeServer !== null) {
-			console.log('closing');
 			closeServer();
 		}
 		const duration = Date.now() - start;

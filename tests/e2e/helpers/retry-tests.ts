@@ -3,7 +3,6 @@ export async function retryTest(retries: number, fn: TestFn): Promise<void> {
 	for (let i = 0; i <= retries; i++) {
 		try {
 			await fn();
-			console.log('Test passed');
 			return;
 		} catch (err) {
 			if (i === retries) {

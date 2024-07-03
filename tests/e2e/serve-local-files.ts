@@ -1,6 +1,9 @@
 import express, { Request, Response } from 'express';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const currentFilePath = fileURLToPath(import.meta.url);
 
 type CloseServer = () => void;
 
@@ -87,7 +90,10 @@ async function main(): Promise<CloseServer | null> {
 	return serveLocalFiles(filesToServe, port, '0.0.0.0');
 }
 
-main().catch((e: unknown) => {
-	console.error('Error:', e);
-	process.exitCode = 1;
-});
+if (process.argv[1] === currentFilePath) {
+	console.log('Hello');
+	main().catch((e: unknown) => {
+		console.error('Error:', e);
+		process.exitCode = 1;
+	});
+}
