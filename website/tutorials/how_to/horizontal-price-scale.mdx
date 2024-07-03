@@ -13,7 +13,7 @@ keywords:
 ---
 
 The `IHorzScaleBehavior` interface allows you to customize the behavior of the
-horizontal scale. By default, this scale uses [time](/docs/api#time) values, but
+horizontal scale. By default, this scale uses [time](/docs/api/type-aliases/Time) values, but
 you can override it to use any other type of horizontal scale items, such as
 price values. The most typical use case is the creation of Options charts.
 
@@ -301,7 +301,7 @@ allowing formatted price values to use a specific number of decimal places.
 
 To use the custom horizontal scale behavior, instantiate the
 `HorzScaleBehaviorPrice` class and pass it to
-[`createChartEx`](/docs/api#createchartex).
+[`createChartEx`](/docs/api/functions/createChartEx).
 
 You can pass the custom option for `precision` within the `localization`
 property of the chart options.
