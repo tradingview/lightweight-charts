@@ -1,4 +1,4 @@
-import { dirname, join, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { FileToServe, runTests } from '../runner';
@@ -16,19 +16,15 @@ if (process.argv.length < 3) {
 const testStandalonePath = process.argv[2];
 const additionalTestFiles = process.argv.slice(3);
 const testFiles = [
-	resolve(currentDirectory, './memleaks-test-cases.ts'),
+	resolve(currentDirectory, './coverage-test-cases.ts'),
 	...additionalTestFiles,
 ];
 
 const filesToServe: FileToServe[] = [
 	{
-		name: 'library.js',
+		name: 'test.js',
 		filePath: resolve(testStandalonePath),
-	},
-	{
-		name: 'index.html',
-		filePath: join(currentDirectory, 'helpers', 'test-page.html'),
-		envVar: 'SERVER_ADDRESS',
+		envVar: 'TEST_STANDALONE_PATH',
 	},
 ];
 

@@ -1,10 +1,9 @@
 /// <reference types="node" />
-
-import * as fs from 'fs';
-import * as path from 'path';
-
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { after, before, describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import puppeteer, {
 	Browser,
 	HTTPResponse,
@@ -16,11 +15,15 @@ import {
 	Interaction,
 	performInteractions,
 } from '../helpers/perform-interactions';
+import { retryTest } from '../helpers/retry-tests';
 
 import { getTestCases } from './helpers/get-interaction-test-cases';
 
-const dummyContent = fs.readFileSync(
-	path.join(__dirname, 'helpers', 'test-page-dummy.html'),
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirectory = dirname(currentFilePath);
+
+const dummyContent = readFileSync(
+	join(currentDirectory, 'helpers', 'test-page-dummy.html'),
 	{ encoding: 'utf-8' }
 );
 
@@ -45,10 +48,7 @@ interface InternalWindow {
 	afterFinalInteractions: () => void;
 }
 
-describe('Interactions tests', function(): void {
-	// this tests are unstable sometimes.
-	this.retries(5);
-
+void describe('Interactions tests', () => {
 	const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {};
 	if (process.env.NO_SANDBOX) {
 		puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
@@ -72,86 +72,88 @@ describe('Interactions tests', function(): void {
 
 	const runTestCase = (testCase: TestCase) => {
 		testCaseCount += 1;
-		it(testCase.name, async () => {
-			const pageContent = generatePageContent(
-				testStandalonePath,
-				testCase.caseContent
-			);
+		void it(testCase.name, async () => {
+			await retryTest(3, async () => {
+				const pageContent = generatePageContent(
+					testStandalonePath,
+					testCase.caseContent
+				);
 
-			const page = await browser.newPage();
-			await page.setViewport({ width: 600, height: 600 });
+				const page = await browser.newPage();
+				await page.setViewport({ width: 600, height: 600 });
 
-			const errors: string[] = [];
-			page.on('pageerror', (error: Error) => {
-				errors.push(error.message);
-			});
+				const errors: string[] = [];
+				page.on('pageerror', (error: Error) => {
+					errors.push(error.message);
+				});
 
-			page.on('response', (response: HTTPResponse) => {
-				if (!response.ok()) {
-					errors.push(
-						`Network error: ${response.url()} status=${response.status()}`
-					);
-				}
-			});
+				page.on('response', (response: HTTPResponse) => {
+					if (!response.ok()) {
+						errors.push(
+							`Network error: ${response.url()} status=${response.status()}`
+						);
+					}
+				});
 
-			await page.setContent(pageContent, { waitUntil: 'load' });
+				await page.setContent(pageContent, { waitUntil: 'load' });
 
-			await page.evaluate(() => {
-				return (window as unknown as InternalWindow).finishedSetup;
-			});
+				await page.evaluate(() => {
+					return (window as unknown as InternalWindow).finishedSetup;
+				});
 
-			const initialInteractionsToPerform = await page.evaluate(() => {
-				if (!(window as unknown as InternalWindow).initialInteractionsToPerform) {
-					return [];
-				}
-				return (window as unknown as InternalWindow).initialInteractionsToPerform();
-			});
+				const initialInteractionsToPerform = await page.evaluate(() => {
+					if (!(window as unknown as InternalWindow).initialInteractionsToPerform) {
+						return [];
+					}
+					return (window as unknown as InternalWindow).initialInteractionsToPerform();
+				});
 
-			await performInteractions(page, initialInteractionsToPerform);
+				await performInteractions(page, initialInteractionsToPerform);
 
-			await page.evaluate(() => {
-				if ((window as unknown as InternalWindow).afterInitialInteractions) {
-					return (
-						window as unknown as InternalWindow
-					).afterInitialInteractions?.();
-				}
-				return new Promise<void>((resolve: () => void) => {
-					window.requestAnimationFrame(() => {
-						setTimeout(resolve, 50);
+				await page.evaluate(() => {
+					if ((window as unknown as InternalWindow).afterInitialInteractions) {
+						return (
+							window as unknown as InternalWindow
+						).afterInitialInteractions?.();
+					}
+					return new Promise<void>((resolve: () => void) => {
+						window.requestAnimationFrame(() => {
+							setTimeout(resolve, 50);
+						});
 					});
 				});
-			});
 
-			const finalInteractionsToPerform = await page.evaluate(() => {
-				if (!(window as unknown as InternalWindow).finalInteractionsToPerform) {
-					return [];
+				const finalInteractionsToPerform = await page.evaluate(() => {
+					if (!(window as unknown as InternalWindow).finalInteractionsToPerform) {
+						return [];
+					}
+					return (window as unknown as InternalWindow).finalInteractionsToPerform();
+				});
+
+				if (finalInteractionsToPerform && finalInteractionsToPerform.length > 0) {
+					await performInteractions(page, finalInteractionsToPerform);
 				}
-				return (window as unknown as InternalWindow).finalInteractionsToPerform();
-			});
 
-			if (finalInteractionsToPerform && finalInteractionsToPerform.length > 0) {
-				await performInteractions(page, finalInteractionsToPerform);
-			}
-
-			await page.evaluate(() => {
-				return new Promise<void>((resolve: () => void) => {
-					(window as unknown as InternalWindow).afterFinalInteractions();
-					window.requestAnimationFrame(() => {
-						setTimeout(resolve, 50);
+				await page.evaluate(() => {
+					return new Promise<void>((resolve: () => void) => {
+						(window as unknown as InternalWindow).afterFinalInteractions();
+						window.requestAnimationFrame(() => {
+							setTimeout(resolve, 50);
+						});
 					});
 				});
+
+				await page.close();
+
+				if (errors.length !== 0) {
+					throw new Error(`Page has errors:\n${errors.join('\n')}`);
+				}
+
+				expect(errors.length).to.be.equal(
+					0,
+					'There should not be any errors thrown within the test page.'
+				);
 			});
-
-			await page.close();
-
-			if (errors.length !== 0) {
-				throw new Error(`Page has errors:\n${errors.join('\n')}`);
-			}
-
-			expect(errors.length).to.be.equal(
-				0,
-				'There should not be any errors thrown within the test page.'
-			);
 		});
 	};
 
@@ -163,7 +165,7 @@ describe('Interactions tests', function(): void {
 				runTestCase(testCase);
 			}
 		} else {
-			describe(groupName, () => {
+			void describe(groupName, () => {
 				for (const testCase of testCaseGroups[groupName]) {
 					runTestCase(testCase);
 				}
@@ -171,7 +173,7 @@ describe('Interactions tests', function(): void {
 		}
 	}
 
-	it('number of test cases', () => {
+	void it('number of test cases', () => {
 		// we need to have at least 1 test to check it
 		expect(testCaseCount).to.be.greaterThan(
 			0,

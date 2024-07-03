@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { run } from 'node:test';
@@ -7,10 +6,18 @@ import { fileURLToPath } from 'node:url';
 
 import { serveLocalFiles } from './serve-local-files';
 
+export interface FileToServe {
+	/** Name for the file when hosted on the localhost server */
+	name: string;
+	/** Path to the file on the system */
+	filePath: string;
+	/** ENV var name to assign with the value of the hosted address for this file */
+	envVar?: string;
+}
+
 export async function runTests(
 	testFiles: string[],
-	testStandalonePath: string,
-	indexPagePath: string
+	filesToServe: FileToServe[]
 ): Promise<void> {
 	const currentFilePath = fileURLToPath(import.meta.url);
 	const currentDirectory = dirname(currentFilePath);
@@ -22,28 +29,18 @@ export async function runTests(
 	const hostname = 'localhost';
 	const port = 34567;
 	const httpServerPrefix = `http://${hostname}:${port}/`;
-	let serverAddress = `${httpServerPrefix}index.html`;
 
-	const filesToServe = new Map<string, string>();
+	const filesToServeLocally = new Map<string, string>();
 
-	if (existsSync(testStandalonePath)) {
-		const fileNameToServe = 'index.html';
-		filesToServe.set(
-			fileNameToServe,
-			indexPagePath
-		);
-		serverAddress = `${httpServerPrefix}${fileNameToServe}`;
+	for (const { name, filePath, envVar } of filesToServe) {
+		filesToServeLocally.set(name, filePath);
+		if (envVar) {
+			const address = `${httpServerPrefix}${name}`;
+			process.env[envVar] = address;
+		}
 	}
 
-	if (existsSync(testStandalonePath)) {
-		const fileNameToServe = 'library.js';
-		filesToServe.set(fileNameToServe, resolve(testStandalonePath));
-		testStandalonePath = `${httpServerPrefix}${fileNameToServe}`;
-	}
-
-	process.env.SERVER_ADDRESS = serverAddress;
-
-	const closeServer = await serveLocalFiles(filesToServe, port, hostname);
+	const closeServer = await serveLocalFiles(filesToServeLocally, port, hostname);
 
 	const spec = new Spec();
 
