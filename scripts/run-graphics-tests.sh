@@ -17,7 +17,16 @@ if [ "$PRODUCTION_BUILD" = "true" ]; then
 fi
 
 HEAD_SHA1=$(git rev-parse HEAD)
-git checkout $(git merge-base origin/master HEAD)
+
+if [ -z "$COMPARE_BRANCH" ]; then
+    # If COMPARE_BRANCH is not set, use the old behaviour
+    echo "checking out merge-base with master"
+    git checkout $(git merge-base origin/master HEAD)
+else
+    # If COMPARE_BRANCH is set, use the specified branch
+    echo "Using latest commit on target branch: $COMPARE_BRANCH"
+    git checkout origin/$COMPARE_BRANCH
+fi
 
 npm install
 npm run $BUILD_SCRIPT
