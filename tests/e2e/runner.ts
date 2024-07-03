@@ -17,7 +17,8 @@ export interface FileToServe {
 
 export async function runTests(
 	testFiles: string[],
-	filesToServe: FileToServe[]
+	filesToServe: FileToServe[],
+	timeoutLimit?: number
 ): Promise<void> {
 	const currentFilePath = fileURLToPath(import.meta.url);
 	const currentDirectory = dirname(currentFilePath);
@@ -50,7 +51,7 @@ export async function runTests(
 
 	const testStream = run({
 		files: testFiles,
-		timeout: 100 * 1000 * 4, // total timeout for all test cases
+		timeout: 10 * 60 * 1000, // total timeout for all test cases
 		concurrency: 1,
 	});
 

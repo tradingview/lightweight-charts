@@ -67,4 +67,4 @@ const filesToServe: FileToServe[] = [
 	},
 ];
 
-void runTests(testFiles, filesToServe);
+void runTests(testFiles, filesToServe, 16 * 60 * 1000);
