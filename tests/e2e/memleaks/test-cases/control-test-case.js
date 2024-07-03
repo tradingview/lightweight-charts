@@ -8,7 +8,7 @@
  */
 
 /** @type {import('@memlab/core/dist/lib/Types').IScenario} */
-const scenario = {
+export const scenario = {
 	setup: async function(page) {
 		await page.addScriptTag({
 			url: 'library.js',
@@ -31,6 +31,3 @@ const scenario = {
 		await page.evaluate(() => {});
 	},
 };
-
-// eslint-disable-next-line no-undef
-exports.scenario = scenario;
