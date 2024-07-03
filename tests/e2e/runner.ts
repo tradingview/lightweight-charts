@@ -51,7 +51,7 @@ export async function runTests(
 
 	const testStream = run({
 		files: testFiles,
-		timeout: 10 * 60 * 1000, // total timeout for all test cases
+		timeout: timeoutLimit, // total timeout for all test cases
 		concurrency: 1,
 	});
 
