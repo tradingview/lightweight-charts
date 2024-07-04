@@ -72,7 +72,7 @@ void describe('Interactions tests', () => {
 
 	const runTestCase = (testCase: TestCase) => {
 		testCaseCount += 1;
-		void it(testCase.name, async () => {
+		void it(testCase.name, { timeout: 15000 }, async () => {
 			await retryTest(3, async () => {
 				const pageContent = generatePageContent(
 					testStandalonePath,

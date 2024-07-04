@@ -172,7 +172,7 @@ void describe('Coverage tests', (): void => {
 
 	const runTestCase = (testCase: TestCase) => {
 		testCaseCount += 1;
-		void it(testCase.name, async () => {
+		void it(testCase.name, { timeout: 10000 }, async () => {
 			const pageContent = generatePageContent(
 				testStandalonePath,
 				testCase.caseContent

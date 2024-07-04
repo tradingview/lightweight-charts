@@ -10,6 +10,7 @@ function runTestCase(container) {
 			entireTextOnly: true,
 			alignLabels: true,
 		},
+		layout: { attributionLogo: false },
 	};
 
 	const chart = (window.chart = LightweightCharts.createChart(

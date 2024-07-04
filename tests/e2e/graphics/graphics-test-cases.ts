@@ -127,7 +127,7 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 	});
 
 	for (const testCase of testCases) {
-		void it(testCase.name, async () => {
+		void it(testCase.name, { timeout: 15000 }, async () => {
 			await retryTest(3, async () => {
 				const previousAttempts = attempts[testCase.name];
 				attempts[testCase.name] += 1;
