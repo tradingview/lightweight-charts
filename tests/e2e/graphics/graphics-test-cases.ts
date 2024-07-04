@@ -20,6 +20,9 @@ import { Screenshoter } from './helpers/screenshoter';
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFilePath);
 
+const TEST_CASE_TIMEOUT = 5000;
+const NUMBER_RETRIES = 3;
+
 const dummyContent = fs.readFileSync(path.join(currentDirectory, 'helpers', 'test-page-dummy.html'), { encoding: 'utf-8' });
 const resizeObserverPolyfill = fs.readFileSync(
 	path.join(currentDirectory, ...'../../../node_modules/@juggle/resize-observer/lib/exports/resize-observer.umd.js'.split('/')),
@@ -49,6 +52,18 @@ const devicePixelRatioStr = devicePixelRatio.toFixed(2);
 const testResultsOutDir = path.resolve(process.env.CMP_OUT_DIR || path.join(currentDirectory, '.gendata'));
 const goldenStandalonePath: string = process.env[goldenStandalonePathEnvKey] || '';
 const testStandalonePath: string = process.env[testStandalonePathEnvKey] || '';
+
+function withTimeout<P>(promise: Promise<P>, ms: number): Promise<P> {
+	const timeoutPromise = new Promise<P>(
+		(
+			resolve: (value: P | PromiseLike<P>) => void,
+			reject: (reason?: unknown) => void
+		) => {
+			setTimeout(() => reject(new Error(`Operation timed out after ${ms} ms`)), ms);
+		}
+	);
+	return Promise.race([promise, timeoutPromise]);
+}
 
 function rmRf(dir: string): void {
 	if (!fs.existsSync(dir)) {
@@ -127,8 +142,8 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 	});
 
 	for (const testCase of testCases) {
-		void it(testCase.name, { timeout: 15000 }, async () => {
-			await retryTest(3, async () => {
+		void it(testCase.name, { timeout: TEST_CASE_TIMEOUT * NUMBER_RETRIES + 1000 }, async () => {
+			await retryTest(NUMBER_RETRIES, async () => {
 				const previousAttempts = attempts[testCase.name];
 				attempts[testCase.name] += 1;
 
@@ -150,7 +165,7 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 				const failedPages: string[] = [];
 
 				// run in parallel to increase speed
-				const goldenScreenshotPromise = screenshoter.generateScreenshot(goldenPageContent);
+				const goldenScreenshotPromise = withTimeout(screenshoter.generateScreenshot(goldenPageContent), TEST_CASE_TIMEOUT);
 
 				if (previousAttempts) {
 					try {
@@ -161,7 +176,7 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 					}
 				}
 
-				const testScreenshotPromise = screenshoter.generateScreenshot(testPageContent);
+				const testScreenshotPromise = withTimeout(screenshoter.generateScreenshot(testPageContent), TEST_CASE_TIMEOUT);
 
 				let goldenScreenshot: PNG | null = null;
 				try {
