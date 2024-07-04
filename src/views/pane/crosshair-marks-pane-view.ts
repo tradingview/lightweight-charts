@@ -1,5 +1,3 @@
-import { ensureNotNull } from '../../helpers/assertions';
-
 import { BarPrice } from '../../model/bar';
 import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
@@ -86,11 +84,11 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 		serieses.forEach((s: ISeries<SeriesType>, index: number) => {
 			const data = this._markersData[index];
 			const seriesData = s.markerDataAtIndex(timePointIndex);
-			if (forceHidden || seriesData === null || !s.visible()) {
+			const firstValue = s.firstValue();
+			if (forceHidden || seriesData === null || !s.visible() || firstValue === null) {
 				data.visibleRange = null;
 				return;
 			}
-			const firstValue = ensureNotNull(s.firstValue());
 			data.lineColor = seriesData.backgroundColor;
 			data.radius = seriesData.radius;
 			data.lineWidth = seriesData.borderWidth;
