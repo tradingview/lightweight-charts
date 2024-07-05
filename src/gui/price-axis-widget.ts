@@ -566,7 +566,7 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
-		let center = this._size.height / 2;
+		const center = this._size.height / 2;
 
 		const views: IPriceAxisView[] = [];
 		const orderedSources = this._priceScale.orderedSources().slice(); // Copy of array
@@ -585,8 +585,6 @@ export class PriceAxisWidget implements IDestroyable {
 			});
 		}
 
-		// we can use any, but let's use the first source as "center" one
-		const centerSource = this._priceScale.dataSources()[0];
 		const priceScale = this._priceScale;
 
 		const updateForSources = (sources: IDataSource[]) => {
@@ -599,9 +597,6 @@ export class PriceAxisWidget implements IDestroyable {
 						views.push(view);
 					}
 				});
-				if (centerSource === source && sourceViews.length > 0) {
-					center = sourceViews[0].coordinate();
-				}
 			});
 		};
 
@@ -630,12 +625,12 @@ export class PriceAxisWidget implements IDestroyable {
 		// sort top from center to top
 		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.coordinate() - l.coordinate());
 
+		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
+
 		// share center label
 		if (top.length && bottom.length) {
-			bottom.push(top[0]);
+			bottom.unshift(top[0]);
 		}
-
-		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
 
 		for (const view of views) {
 			const halfHeight = Math.floor(view.height(rendererOptions) / 2);
