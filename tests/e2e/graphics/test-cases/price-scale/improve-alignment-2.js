@@ -1,6 +1,6 @@
 function runTestCase(container) {
 	const chartOptions = {
-		height: 320,
+		height: 500,
 		width: 600,
 		rightPriceScale: {
 			scaleMargins: {

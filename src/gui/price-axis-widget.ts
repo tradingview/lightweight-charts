@@ -70,13 +70,13 @@ function recalculateOverlapping(
 	views: IPriceAxisView[],
 	direction: 1 | -1,
 	scaleHeight: number,
-	center: number,
 	rendererOptions: Readonly<PriceAxisViewRendererOptions>
 ): void {
 	if (!views.length) {
 		return;
 	}
 	let currentGroupStart = 0;
+	const center = scaleHeight / 2;
 
 	const initLabelHeight = views[0].height(rendererOptions, true);
 	let spaceBeforeCurrentGroup = direction === 1
@@ -566,8 +566,6 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
-		const center = this._size.height / 2;
-
 		const views: IPriceAxisView[] = [];
 		const orderedSources = this._priceScale.orderedSources().slice(); // Copy of array
 		const pane = this._pane;
@@ -610,13 +608,15 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		this._fixLabelOverlap(views, rendererOptions, center);
+		this._fixLabelOverlap(views, rendererOptions);
 	}
 
-	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>, center: number): void {
+	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>): void {
 		if (this._size === null) {
 			return;
 		}
+
+		const center = this._size.height / 2;
 
 		// split into two parts
 		const top = views.filter((view: IPriceAxisView) => view.coordinate() <= center);
@@ -624,13 +624,7 @@ export class PriceAxisWidget implements IDestroyable {
 
 		// sort top from center to top
 		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.coordinate() - l.coordinate());
-
 		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
-
-		// share center label
-		if (top.length && bottom.length) {
-			bottom.unshift(top[0]);
-		}
 
 		for (const view of views) {
 			const halfHeight = Math.floor(view.height(rendererOptions) / 2);
@@ -644,8 +638,8 @@ export class PriceAxisWidget implements IDestroyable {
 			}
 		}
 
-		recalculateOverlapping(top, 1, this._size.height, center, rendererOptions);
-		recalculateOverlapping(bottom, -1, this._size.height, center, rendererOptions);
+		recalculateOverlapping(top, 1, this._size.height, rendererOptions);
+		recalculateOverlapping(bottom, -1, this._size.height, rendererOptions);
 	}
 
 	private _drawBackLabels(target: CanvasRenderingTarget2D): void {
