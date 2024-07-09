@@ -66,16 +66,22 @@ function buildPriceAxisViewsGetter(
 	};
 }
 
-function recalculateOverlapping(views: IPriceAxisView[], direction: 1 | -1, scaleHeight: number, rendererOptions: Readonly<PriceAxisViewRendererOptions>): void {
+function recalculateOverlapping(
+	views: IPriceAxisView[],
+	direction: 1 | -1,
+	scaleHeight: number,
+	rendererOptions: Readonly<PriceAxisViewRendererOptions>
+): void {
 	if (!views.length) {
 		return;
 	}
 	let currentGroupStart = 0;
+	const center = scaleHeight / 2;
 
 	const initLabelHeight = views[0].height(rendererOptions, true);
 	let spaceBeforeCurrentGroup = direction === 1
-		? scaleHeight / 2 - (views[0].getFixedCoordinate() - initLabelHeight / 2)
-		: views[0].getFixedCoordinate() - initLabelHeight / 2 - scaleHeight / 2;
+		? center - (views[0].getFixedCoordinate() - initLabelHeight / 2)
+		: views[0].getFixedCoordinate() - initLabelHeight / 2 - center;
 	spaceBeforeCurrentGroup = Math.max(0, spaceBeforeCurrentGroup);
 
 	for (let i = 1; i < views.length; i++) {
@@ -560,8 +566,6 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
-		let center = this._size.height / 2;
-
 		const views: IPriceAxisView[] = [];
 		const orderedSources = this._priceScale.orderedSources().slice(); // Copy of array
 		const pane = this._pane;
@@ -579,8 +583,6 @@ export class PriceAxisWidget implements IDestroyable {
 			});
 		}
 
-		// we can use any, but let's use the first source as "center" one
-		const centerSource = this._priceScale.dataSources()[0];
 		const priceScale = this._priceScale;
 
 		const updateForSources = (sources: IDataSource[]) => {
@@ -593,9 +595,6 @@ export class PriceAxisWidget implements IDestroyable {
 						views.push(view);
 					}
 				});
-				if (centerSource === source && sourceViews.length > 0) {
-					center = sourceViews[0].coordinate();
-				}
 			});
 		};
 
@@ -609,13 +608,15 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		this._fixLabelOverlap(views, rendererOptions, center);
+		this._fixLabelOverlap(views, rendererOptions);
 	}
 
-	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>, center: number): void {
+	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>): void {
 		if (this._size === null) {
 			return;
 		}
+
+		const center = this._size.height / 2;
 
 		// split into two parts
 		const top = views.filter((view: IPriceAxisView) => view.coordinate() <= center);
@@ -623,12 +624,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 		// sort top from center to top
 		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.coordinate() - l.coordinate());
-
-		// share center label
-		if (top.length && bottom.length) {
-			bottom.push(top[0]);
-		}
-
 		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
 
 		for (const view of views) {
