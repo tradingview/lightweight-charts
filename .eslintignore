@@ -13,6 +13,7 @@
 /website/docs/api/**
 /website/versioned_docs/**/api/**
 /website/build/**
+/website/src/theme/**/*.js
 
 /plugin-examples
 /packages/create-lwc-plugin
