@@ -25,6 +25,7 @@ export type LightweightChartsVersion = Version | 'current';
 export interface LightweightChartsApiGetterResult<T extends keyof LightweightChartsApiTypeMap> {
 	module: LightweightChartsApiTypeMap[T];
 	createChart: LightweightChartsApiTypeMap[T]['createChart'];
+	createChartEx: T extends '4.1' | 'current' ? LightweightChartsApiTypeMap[T]['createChartEx'] : undefined;
 }
 
 export type LightweightChartsApiGetters = {
@@ -50,7 +51,7 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 			return result;
 		};
 
-		return { module, createChart };
+		return { module, createChart, createChartEx: undefined };
 	},
 	'4.0': async (window: Window) => {
 		const module = await import('lightweight-charts-4.0');
@@ -61,7 +62,7 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 			return result;
 		};
 
-		return { module, createChart };
+		return { module, createChart, createChartEx: undefined };
 	},
 	4.1: async (window: Window) => {
 		const module = await import('lightweight-charts-4.1');
@@ -72,7 +73,13 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 			return result;
 		};
 
-		return { module, createChart };
+		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
+			const result = module.createChartEx(container, behaviour, options);
+			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			return result;
+		};
+
+		return { module, createChart, createChartEx: createChartEx as typeof module.createChartEx };
 	},
 	current: async () => {
 		const module = await import('../../../../..');
@@ -83,6 +90,12 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 			return result;
 		};
 
-		return { module, createChart };
+		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
+			const result = module.createChartEx(container, behaviour, options);
+			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			return result;
+		};
+
+		return { module, createChart, createChartEx: createChartEx as typeof module.createChartEx };
 	},
 };

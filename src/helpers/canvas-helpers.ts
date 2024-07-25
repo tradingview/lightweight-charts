@@ -64,6 +64,13 @@ export function drawRoundRect(
 	 * be able to switch to the native version soon.
 	 */
 	ctx.beginPath();
+	if (ctx.roundRect) {
+		ctx.roundRect(x, y, w, h, radii);
+		return;
+	}
+	/*
+	 * Deprecate the rest in v5.
+	 */
 	ctx.lineTo(x + w - radii[1], y);
 	if (radii[1] !== 0) {
 		ctx.arcTo(x + w, y, x + w, y + radii[1], radii[1]);
@@ -85,8 +92,16 @@ export function drawRoundRect(
 	}
 }
 
+/**
+ * Draws a rounded rect with a border.
+ *
+ * This function assumes that the colors will be solid, without
+ * any alpha. (This allows us to fix a rendering artefact.)
+ *
+ * @param outerBorderRadius - The radius of the border (outer edge)
+ */
 // eslint-disable-next-line max-params
-export function drawRoundRectWithInnerBorder(
+export function drawRoundRectWithBorder(
 	ctx: CanvasRenderingContext2D,
 	left: number,
 	top: number,
@@ -94,13 +109,13 @@ export function drawRoundRectWithInnerBorder(
 	height: number,
 	backgroundColor: string,
 	borderWidth: number = 0,
-	borderRadius: LeftTopRightTopRightBottomLeftBottomRadii = [0, 0, 0, 0],
+	outerBorderRadius: LeftTopRightTopRightBottomLeftBottomRadii = [0, 0, 0, 0],
 	borderColor: string = ''
 ): void {
 	ctx.save();
 
 	if (!borderWidth || !borderColor || borderColor === backgroundColor) {
-		drawRoundRect(ctx, left, top, width, height, borderRadius);
+		drawRoundRect(ctx, left, top, width, height, outerBorderRadius);
 		ctx.fillStyle = backgroundColor;
 		ctx.fill();
 		ctx.restore();
@@ -108,21 +123,16 @@ export function drawRoundRectWithInnerBorder(
 	}
 
 	const halfBorderWidth = borderWidth / 2;
+	const radii = changeBorderRadius(outerBorderRadius, - halfBorderWidth);
 
-	// Draw body
+	drawRoundRect(ctx, left + halfBorderWidth, top + halfBorderWidth, width - borderWidth, height - borderWidth, radii);
+
 	if (backgroundColor !== 'transparent') {
-		const innerRadii = changeBorderRadius(borderRadius, - borderWidth);
-		drawRoundRect(ctx, left + borderWidth, top + borderWidth, width - borderWidth * 2, height - borderWidth * 2, innerRadii);
-
 		ctx.fillStyle = backgroundColor;
 		ctx.fill();
 	}
 
-	// Draw border
 	if (borderColor !== 'transparent') {
-		const outerRadii = changeBorderRadius(borderRadius, - halfBorderWidth);
-		drawRoundRect(ctx, left + halfBorderWidth, top + halfBorderWidth, width - borderWidth, height - borderWidth, outerRadii);
-
 		ctx.lineWidth = borderWidth;
 		ctx.strokeStyle = borderColor;
 		ctx.closePath();

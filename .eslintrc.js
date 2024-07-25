@@ -235,6 +235,7 @@ module.exports = {
 						'@typescript-eslint/no-misused-promises': 'off',
 						'@typescript-eslint/no-unnecessary-qualifier': 'off',
 						'@typescript-eslint/no-unnecessary-type-assertion': 'off',
+						'@typescript-eslint/no-unsafe-argument': 'off',
 						'@typescript-eslint/no-unsafe-call': 'off',
 						'@typescript-eslint/no-unsafe-member-access': 'off',
 						'@typescript-eslint/no-unsafe-return': 'off',
@@ -792,8 +793,6 @@ module.exports = {
 		}],
 
 		'jsdoc/check-indentation': 'error',
-		'jsdoc/newline-after-description': 'error',
-
 		'import/no-default-export': 'error',
 
 		'prefer-arrow/prefer-arrow-functions': [

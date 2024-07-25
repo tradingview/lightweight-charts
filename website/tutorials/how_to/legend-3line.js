@@ -213,7 +213,7 @@ legend.style.color = CHART_TEXT_COLOR;
 container.appendChild(legend);
 
 const getLastBar = series => {
-	const lastIndex = series.dataByIndex(Math.Infinity, -1);
+	const lastIndex = series.dataByIndex(Number.MAX_SAFE_INTEGER, -1);
 	return series.dataByIndex(lastIndex);
 };
 const formatPrice = price => (Math.round(price * 100) / 100).toFixed(2);

@@ -3,10 +3,9 @@ import { DateTimeFormatter } from '../../formatters/date-time-formatter';
 
 import { ensureNotNull } from '../../helpers/assertions';
 import { Mutable } from '../../helpers/mutable';
-import { DeepPartial, isString, merge } from '../../helpers/strict-type-checks';
+import { DeepPartial, merge } from '../../helpers/strict-type-checks';
 
 import { SeriesDataItemTypeMap } from '../data-consumer';
-import { TimedData } from '../data-layer';
 import { DataItem, HorzScaleItemConverterToInternalObj, IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from '../ihorz-scale-behavior';
 import { LocalizationOptions } from '../localization-options';
 import { SeriesType } from '../series-options';
@@ -16,96 +15,17 @@ import { markWithGreaterWeight, TimeMark } from '../time-scale';
 import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
 import { TimeChartOptions } from './time-based-chart-options';
 import { fillWeightsForPoints } from './time-scale-point-weight-generator';
-import { BusinessDay, isBusinessDay, isUTCTimestamp, TickMarkType, TickMarkWeight, Time, TimePoint, UTCTimestamp } from './types';
+import { convertStringsToBusinessDays, convertStringToBusinessDay, convertTime, selectTimeConverter } from './time-utils';
+import { TickMarkType, TickMarkWeight, Time, TimePoint } from './types';
 
-type TimeConverter = (time: Time) => InternalHorzScaleItem;
-
-function businessDayConverter(time: Time): InternalHorzScaleItem {
-	let businessDay = time;
-	if (isString(time)) {
-		businessDay = stringToBusinessDay(time);
-	}
-	if (!isBusinessDay(businessDay)) {
-		throw new Error('time must be of type BusinessDay');
-	}
-
-	const date = new Date(Date.UTC(businessDay.year, businessDay.month - 1, businessDay.day, 0, 0, 0, 0));
-
-	return {
-		timestamp: Math.round(date.getTime() / 1000) as UTCTimestamp,
-		businessDay,
-	} as unknown as InternalHorzScaleItem;
-}
-
-function timestampConverter(time: Time): InternalHorzScaleItem {
-	if (!isUTCTimestamp(time)) {
-		throw new Error('time must be of type isUTCTimestamp');
-	}
-	return {
-		timestamp: time,
-	} as unknown as InternalHorzScaleItem;
-}
-
-function selectTimeConverter(data: TimedData<Time>[]): TimeConverter | null {
-	if (data.length === 0) {
-		return null;
-	}
-	if (isBusinessDay(data[0].time) || isString(data[0].time)) {
-		return businessDayConverter;
-	}
-	return timestampConverter;
-}
-
-const validDateRegex = /^\d\d\d\d-\d\d-\d\d$/;
-
-export function convertTime(time: Time): InternalHorzScaleItem {
-	if (isUTCTimestamp(time)) {
-		return timestampConverter(time);
-	}
-
-	if (!isBusinessDay(time)) {
-		return businessDayConverter(stringToBusinessDay(time));
-	}
-
-	return businessDayConverter(time);
-}
-
-export function stringToBusinessDay(value: string): BusinessDay {
-	if (process.env.NODE_ENV === 'development') {
-		// in some browsers (I look at your Chrome) the Date constructor may accept invalid date string
-		// but parses them in 'implementation specific' way
-		// for example 2019-1-1 isn't the same as 2019-01-01 (for Chrome both are 'valid' date strings)
-		// see https://bugs.chromium.org/p/chromium/issues/detail?id=968939
-		// so, we need to be sure that date has valid format to avoid strange behavior and hours of debugging
-		// but let's do this in development build only because of perf
-		if (!validDateRegex.test(value)) {
-			throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
-		}
-	}
-
-	const d = new Date(value);
-	if (isNaN(d.getTime())) {
-		throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
-	}
-
-	return {
-		day: d.getUTCDate(),
-		month: d.getUTCMonth() + 1,
-		year: d.getUTCFullYear(),
-	};
-}
-
-function convertStringToBusinessDay(value: TimedData<Time>): void {
-	if (isString(value.time)) {
-		value.time = stringToBusinessDay(value.time);
-	}
-}
-
-function convertStringsToBusinessDays(data: TimedData<Time>[]): void {
-	return data.forEach(convertStringToBusinessDay);
-}
-
+/**
+ * Represents options for formatting dates, times, and prices according to a locale.
+ */
 interface TimeLocalizationOptions extends LocalizationOptions<Time> {
+	/**
+	 * Date formatting string.
+	 *
+	 */
 	dateFormat: string;
 }
 

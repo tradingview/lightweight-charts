@@ -411,7 +411,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		}
 
 		animationPaneView.invalidateStage();
-		res.push(animationPaneView);
+		res.unshift(animationPaneView);
 		return res;
 	}
 

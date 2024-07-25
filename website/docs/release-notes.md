@@ -14,6 +14,41 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.1.7
+
+**Enhancements**
+
+- Further Refinement of the Price Scale Label Alignment (PR [#1630](https://github.com/tradingview/lightweight-charts/pull/1630))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.6..v4.1.7).
+
+## 4.1.6
+
+**Enhancements**
+
+- Improved Price Scale Label Alignment: Enhanced the alignment algorithm for price scale labels to ensure they do not move out of the viewport. This improves the visibility of price labels, particularly when they are near the edges of the scale. Fixes [#1620](https://github.com/tradingview/lightweight-charts/issues/1620) (PR [#1621](https://github.com/tradingview/lightweight-charts/pull/1621))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.5..v4.1.6).
+
+## 4.1.5
+
+**Enhancements**
+
+- Added `IHorzScaleBehavior.shouldResetTickmarkLabels`. (PR [#1614](https://github.com/tradingview/lightweight-charts/pull/1614))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.4..v4.1.5).
+
+## 4.1.4
+
+**Bug Fixes**
+
+- Fixed hoveredSeries being undefined during series removal and creation. (PR [#1529](https://github.com/tradingview/lightweight-charts/pull/1529), fixes [#1406](https://github.com/tradingview/lightweight-charts/pull/1406), fixes [#1499](https://github.com/tradingview/lightweight-charts/pull/1499))
+- Fixed price label rendering artefact. (PR [#1585](https://github.com/tradingview/lightweight-charts/pull/1585), fixes [#1584](https://github.com/tradingview/lightweight-charts/pull/1584))
+- Fixed an issue that prevented primitives with `zOrder` set to `top` from drawing above the last price animation. (PR [#1576](https://github.com/tradingview/lightweight-charts/pull/1576))
+- Fixed possible ReDos. (PR [#1536](https://github.com/tradingview/lightweight-charts/pull/1536))
+- Fixed marker positioning, which could cause a space between histogram and bottom of the chart. (PR [#1538](https://github.com/tradingview/lightweight-charts/pull/1538) & [#1539](https://github.com/tradingview/lightweight-charts/pull/1539), fixes [#1382](https://github.com/tradingview/lightweight-charts/pull/1382))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.3..v4.1.4).
 
 ## 4.1.3
 
