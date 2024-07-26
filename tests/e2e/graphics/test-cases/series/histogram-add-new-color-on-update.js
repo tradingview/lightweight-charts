@@ -24,7 +24,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
 	const mainSeries = chart.addHistogramSeries({
 		color: '#ff0000',

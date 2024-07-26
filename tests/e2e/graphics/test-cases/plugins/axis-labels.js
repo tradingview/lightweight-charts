@@ -48,7 +48,7 @@ class TestPlugin {
 }
 
 function runTestCase(container) {
-	const chart = (window.chart = LightweightCharts.createChart(container));
+	const chart = (window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } }));
 	const mainSeries = chart.addLineSeries();
 	mainSeries.setData(generateData());
 	mainSeries.attachPrimitive(new TestPlugin());

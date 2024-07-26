@@ -9,25 +9,22 @@ function generateData() {
 
 		time.setUTCDate(time.getUTCDate() + 1);
 	}
-
 	return res;
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, {
+	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: {
+			attributionLogo: true,
 			background: {
-				type: LightweightCharts.ColorType.VerticalGradient,
-				topColor: '#b1ff73',
-				bottomColor: '#1106b1',
+				type: 'solid',
+				color: 'rgb(50,100,150)',
 			},
-			attributionLogo: false,
+			textColor: 'rgb(255,200,100)',
 		},
-	});
+	}));
 
-	const series = chart.addLineSeries({
-		title: 'ABCD',
-	});
+	const mainSeries = chart.addLineSeries();
 
-	series.setData(generateData());
+	mainSeries.setData(generateData());
 }

@@ -869,7 +869,11 @@ class CustomBehavior extends DefaultHorzScaleBehavior {
 	}
 }
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChartEx(container, new CustomBehavior(), { width: 800, height: 400 });
+	const chart = window.chart = LightweightCharts.createChartEx(container, new CustomBehavior(), {
+		width: 800,
+		height: 400,
+		layout: { attributionLogo: false },
+	});
 	let lastDate;
 	let lastTickMarkType;
 

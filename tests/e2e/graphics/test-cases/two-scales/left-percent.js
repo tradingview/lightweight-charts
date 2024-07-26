@@ -54,6 +54,7 @@ function runTestCase(container) {
 				bottom: 0,
 			},
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addBarSeries({

@@ -22,6 +22,7 @@ function runTestCase(container) {
 				labelBackgroundColor: 'hotpink',
 			},
 		},
+		layout: { attributionLogo: false },
 	});
 
 	const mainSeries = chart.addAreaSeries();

@@ -15,7 +15,7 @@ function generateData() {
 function runTestCase(container) {
 	window.document.dir = 'rtl';
 
-	const chart = window.chart = LightweightCharts.createChart(container);
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
 	const mainSeries = chart.addLineSeries();
 
