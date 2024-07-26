@@ -4,12 +4,14 @@ import type { Version } from '../../../../versions';
 export type LightweightChartsApi38 = typeof import('lightweight-charts-3.8');
 export type LightweightChartsApi40 = typeof import('lightweight-charts-4.0');
 export type LightweightChartsApi41 = typeof import('lightweight-charts-4.1');
+export type LightweightChartsApi42 = typeof import('lightweight-charts-4.2');
 export type LightweightChartsApiCurrent = typeof import('../../../../..');
 
 export interface LightweightChartsApiTypeMap {
 	'3.8': LightweightChartsApi38;
 	'4.0': LightweightChartsApi40;
 	'4.1': LightweightChartsApi41;
+	'4.2': LightweightChartsApi42;
 	current: LightweightChartsApiCurrent;
 }
 
@@ -17,6 +19,7 @@ export interface LightweightChartsCreateChartTypeMap {
 	'3.8': LightweightChartsApi38['createChart'];
 	'4.0': LightweightChartsApi40['createChart'];
 	'4.1': LightweightChartsApi41['createChart'];
+	'4.2': LightweightChartsApi42['createChart'];
 	current: LightweightChartsApiCurrent['createChart'];
 }
 
@@ -25,7 +28,7 @@ export type LightweightChartsVersion = Version | 'current';
 export interface LightweightChartsApiGetterResult<T extends keyof LightweightChartsApiTypeMap> {
 	module: LightweightChartsApiTypeMap[T];
 	createChart: LightweightChartsApiTypeMap[T]['createChart'];
-	createChartEx: T extends '4.1' | 'current' ? LightweightChartsApiTypeMap[T]['createChartEx'] : undefined;
+	createChartEx: T extends '4.2' | '4.1' | 'current' ? LightweightChartsApiTypeMap[T]['createChartEx'] : undefined;
 }
 
 export type LightweightChartsApiGetters = {
@@ -66,6 +69,23 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 	},
 	4.1: async (window: Window) => {
 		const module = await import('lightweight-charts-4.1');
+
+		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
+			const result = module.createChart(container, options);
+			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			return result;
+		};
+
+		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
+			const result = module.createChartEx(container, behaviour, options);
+			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			return result;
+		};
+
+		return { module, createChart, createChartEx: createChartEx as typeof module.createChartEx };
+	},
+	4.2: async (window: Window) => {
+		const module = await import('lightweight-charts-4.2');
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
