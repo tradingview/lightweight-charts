@@ -13,7 +13,7 @@ interface ChartProps {
 
 type IFrameWindow<TVersion extends keyof LightweightChartsApiTypeMap> = Window & {
 	createChart: LightweightChartsApiTypeMap[TVersion]['createChart'];
-	createChartEx: TVersion extends '4.1' | 'current' ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
+	createChartEx: TVersion extends '4.2' | '4.1' | 'current' ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
 	run?: () => void;
 };
 
