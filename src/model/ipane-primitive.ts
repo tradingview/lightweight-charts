@@ -38,7 +38,7 @@ export interface IPrimitivePaneView {
 	/**
 	 * Defines where in the visual layer stack the renderer should be executed. Default is `'normal'`.
 	 *
-	 * @returns the desired position in the visual layer stack. @see {@link SeriesPrimitivePaneViewZOrder}
+	 * @returns the desired position in the visual layer stack. @see {@link PrimitivePaneViewZOrder}
 	 */
 	zOrder?(): PrimitivePaneViewZOrder;
 	/**
@@ -61,7 +61,7 @@ export interface IPanePrimitivePaneView {
 	/**
 	 * Defines where in the visual layer stack the renderer should be executed. Default is `'normal'`.
 	 *
-	 * @returns the desired position in the visual layer stack. @see {@link SeriesPrimitivePaneViewZOrder}
+	 * @returns the desired position in the visual layer stack. @see {@link PrimitivePaneViewZOrder}
 	 */
 	zOrder?(): PrimitivePaneViewZOrder;
 	/**
@@ -107,7 +107,7 @@ export interface IPanePrimitiveBase<TPaneAttachedParameters = unknown> {
 	/**
 	 * Returns array of objects representing primitive in the main area of the chart
 	 *
-	 * @returns array of objects; each of then must implement ISeriesPrimitivePaneView interface
+	 * @returns array of objects; each of then must implement IPrimitivePaneView interface
 	 *
 	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed

@@ -29,9 +29,7 @@ import { IPaneView } from '../views/pane/ipane-view';
 import { AttributionLogoWidget } from './attribution-logo-widget';
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IChartWidgetBase } from './chart-widget';
-import { drawBackground, drawForeground, DrawFunction, drawSourceViews } from './draw-functions';
-import { IAxisViewsGetter } from './iaxis-view-getters';
-import { IPaneViewsGetter } from './ipane-view-getter';
+import { drawBackground, drawForeground, DrawFunction, drawSourceViews, ViewsGetter } from './draw-functions';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { hitTestPane, HitTestResult } from './pane-hit-test';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
@@ -518,7 +516,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._rightPriceAxisWidget;
 	}
 
-	public drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter | IAxisViewsGetter): void {
+	public drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: ViewsGetter<IDataSourcePaneViews>): void {
 		this._drawSources(target, paneViewsGetter);
 	}
 
@@ -575,7 +573,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter | IAxisViewsGetter): void {
+	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: ViewsGetter<IDataSourcePaneViews>): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
@@ -597,7 +595,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _drawSourceImpl(
 		target: CanvasRenderingTarget2D,
-		paneViewsGetter: IPaneViewsGetter | IAxisViewsGetter,
+		paneViewsGetter: ViewsGetter<IDataSourcePaneViews>,
 		drawFn: DrawFunction,
 		source: IDataSourcePaneViews
 	): void {
@@ -609,7 +607,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			: undefined;
 
 		const drawRendererFn = (renderer: IPaneRenderer) => drawFn(renderer, target, isHovered, objecId);
-		drawSourceViews(paneViewsGetter as IPaneViewsGetter, drawRendererFn, source, state);
+		drawSourceViews(paneViewsGetter, drawRendererFn, source, state);
 	}
 
 	private _recreatePriceAxisWidgets(): void {

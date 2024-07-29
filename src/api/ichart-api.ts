@@ -132,6 +132,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Creates an area series with specified parameters.
 	 *
 	 * @param areaOptions - Customization parameters of the series being created.
+	 * @param paneIndex - Index of the Pane to create the series on.
 	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
@@ -144,6 +145,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Creates a baseline series with specified parameters.
 	 *
 	 * @param baselineOptions - Customization parameters of the series being created.
+	 * @param paneIndex - Index of the Pane to create the series on.
 	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
@@ -156,6 +158,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Creates a bar series with specified parameters.
 	 *
 	 * @param barOptions - Customization parameters of the series being created.
+	 * @param paneIndex - Index of the Pane to create the series on.
 	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
@@ -168,6 +171,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Creates a candlestick series with specified parameters.
 	 *
 	 * @param candlestickOptions - Customization parameters of the series being created.
+	 * @param paneIndex - Index of the Pane to create the series on.
 	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
@@ -180,6 +184,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Creates a histogram series with specified parameters.
 	 *
 	 * @param histogramOptions - Customization parameters of the series being created.
+	 * @param paneIndex - Index of the Pane to create the series on.
 	 * @returns An interface of the created series.
 	 * @example
 	 * ```js
@@ -192,6 +197,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Creates a line series with specified parameters.
 	 *
 	 * @param lineOptions - Customization parameters of the series being created.
+	 * @param paneIndex - Index of the Pane to create the series on.
 	 * @returns An interface of the created series.
 	 * @example
 	 * ```js

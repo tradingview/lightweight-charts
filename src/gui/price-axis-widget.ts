@@ -30,7 +30,7 @@ import { IAxisView } from '../views/pane/iaxis-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
-import { IPriceAxisViewsGetter } from './iaxis-view-getters';
+import { ViewsGetter } from './draw-functions';
 import { suggestPriceScaleWidth } from './internal-layout-sizes-hints';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -59,7 +59,7 @@ function hasPriceScale(source: IDataSource | IDataSourcePaneViews): source is ID
 function buildPriceAxisViewsGetter(
 	zOrder: PrimitivePaneViewZOrder,
 	priceScaleId: PriceAxisWidgetSide
-): IPriceAxisViewsGetter {
+): ViewsGetter<IDataSourcePaneViews> {
 	return (source: IDataSource | IDataSourcePaneViews): readonly IAxisView[] => {
 		if (!hasPriceScale(source)) {
 			return [];
@@ -143,9 +143,9 @@ export class PriceAxisWidget implements IDestroyable {
 	private _prevOptimalWidth: number = 0;
 	private _isSettingSize: boolean = false;
 
-	private _sourcePaneViews: IPriceAxisViewsGetter;
-	private _sourceTopPaneViews: IPriceAxisViewsGetter;
-	private _sourceBottomPaneViews: IPriceAxisViewsGetter;
+	private _sourcePaneViews: ViewsGetter<IDataSourcePaneViews>;
+	private _sourceTopPaneViews: ViewsGetter<IDataSourcePaneViews>;
+	private _sourceBottomPaneViews: ViewsGetter<IDataSourcePaneViews>;
 
 	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternalBase>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;

@@ -4,7 +4,7 @@ import { IPanePrimitiveBase } from '../model/ipane-primitive';
 import { IChartApiBase } from './ichart-api';
 
 /**
- * Object containing references to the chart and series instances, and a requestUpdate method for triggering
+ * Object containing references to the chart instance, and a requestUpdate method for triggering
  * a refresh of the chart.
  */
 export interface PaneAttachedParameter<
@@ -21,7 +21,7 @@ export interface PaneAttachedParameter<
 }
 
 /**
- * Interface for series primitives. It must be implemented to add some external graphics to series.
+ * Interface for pane primitives. It must be implemented to add some external graphics to a pane.
  */
 export type IPanePrimitive<HorzScaleItem = Time> = IPanePrimitiveBase<
     PaneAttachedParameter<HorzScaleItem>

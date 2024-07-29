@@ -447,6 +447,10 @@ export interface IChartModelBase {
 	changePanesHeight(paneIndex: number, height: number): void;
 }
 
+function isPanePrimitive(source: IPriceDataSource | IPrimitiveHitTestSource): source is IPrimitiveHitTestSource | Pane {
+	return source instanceof Pane;
+}
+
 export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase {
 	private readonly _options: ChartOptionsInternal<HorzScaleItem>;
 	private readonly _invalidateHandler: InvalidateHandler;
@@ -875,10 +879,10 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public paneForSource(source: IPriceDataSource | IPrimitiveHitTestSource): Pane | null {
-		if (source instanceof Pane) {
-			return source;
+		if (isPanePrimitive(source)) {
+			return source as Pane;
 		}
-		const pane = this._panes.find((p: Pane) => p.orderedSources().includes(source as IPriceDataSource));
+		const pane = this._panes.find((p: Pane) => p.orderedSources().includes(source));
 		return pane === undefined ? null : pane;
 	}
 

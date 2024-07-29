@@ -3,6 +3,8 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { IDataSource, IDataSourcePaneViews } from '../model/idata-source';
 import { Pane } from '../model/pane';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
+import { IAxisView } from '../views/pane/iaxis-view';
+import { IPaneView } from '../views/pane/ipane-view';
 
 import { IAxisViewsGetter } from './iaxis-view-getters';
 import { IPaneViewsGetter } from './ipane-view-getter';
@@ -47,10 +49,7 @@ export function drawSourceViews<T extends IDataSource | IDataSourcePaneViews>(
 	pane: Pane
 ): void {
 	const views = (
-		paneViewsGetter as unknown as (
-			source: T,
-			pane: Pane
-		) => ReturnType<ViewsGetter<T>>
+		paneViewsGetter as (s: T, p: Pane) => readonly (IAxisView | IPaneView)[]
 	)(source, pane);
 	for (const view of views) {
 		const renderer = view.renderer(pane);
