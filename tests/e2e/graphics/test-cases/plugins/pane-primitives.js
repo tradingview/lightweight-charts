@@ -99,12 +99,7 @@ class AnchoredText {
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: {
-			attributionLogo: true,
-			background: {
-				type: 'solid',
-				color: 'rgb(50,100,150)',
-			},
-			textColor: 'rgb(255,200,100)',
+			attributionLogo: false,
 		},
 	}));
 

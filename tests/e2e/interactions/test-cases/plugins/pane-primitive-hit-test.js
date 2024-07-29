@@ -133,7 +133,7 @@ function beforeInteractions(container) {
 		if (!mouseParams) {
 			return;
 		}
-		if (mouseParams.hoveredObjectId === 'TEST') {
+		if (mouseParams.hoveredObjectId === 'PLUGIN') {
 			pass = true;
 			return;
 		}
@@ -156,7 +156,7 @@ function afterInitialInteractions() {
 
 function afterFinalInteractions() {
 	if (!pass) {
-		throw new Error("Expected hoveredObjectId to be equal to 'TEST'.");
+		throw new Error("Expected hoveredObjectId to be equal to 'PLUGIN'.");
 	}
 
 	return Promise.resolve();
