@@ -16,7 +16,7 @@ import { ISubscription } from '../helpers/isubscription';
 
 import { IChartModelBase, TrackingModeExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { IDataSource } from '../model/idata-source';
+import { IDataSourcePaneViews } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
@@ -29,7 +29,8 @@ import { IPaneView } from '../views/pane/ipane-view';
 import { AttributionLogoWidget } from './attribution-logo-widget';
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IChartWidgetBase } from './chart-widget';
-import { drawBackground, drawForeground, DrawFunction, drawSourcePaneViews } from './draw-functions';
+import { drawBackground, drawForeground, DrawFunction, drawSourceViews } from './draw-functions';
+import { IAxisViewsGetter } from './iaxis-view-getters';
 import { IPaneViewsGetter } from './ipane-view-getter';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { hitTestPane, HitTestResult } from './pane-hit-test';
@@ -42,16 +43,16 @@ const enum KineticScrollConstants {
 	ScrollMinMove = 15,
 }
 
-function sourceBottomPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+function sourceBottomPaneViews(source: IDataSourcePaneViews, pane: Pane): readonly IPaneView[] {
 	return source.bottomPaneViews?.(pane) ?? [];
 }
-function sourcePaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+function sourcePaneViews(source: IDataSourcePaneViews, pane: Pane): readonly IPaneView[] {
 	return source.paneViews?.(pane) ?? [];
 }
-function sourceLabelPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+function sourceLabelPaneViews(source: IDataSourcePaneViews, pane: Pane): readonly IPaneView[] {
 	return source.labelPaneViews?.(pane) ?? [];
 }
-function sourceTopPaneViews(source: IDataSource, pane: Pane): readonly IPaneView[] {
+function sourceTopPaneViews(source: IDataSourcePaneViews, pane: Pane): readonly IPaneView[] {
 	return source.topPaneViews?.(pane) ?? [];
 }
 
@@ -517,7 +518,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._rightPriceAxisWidget;
 	}
 
-	public drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
+	public drawAdditionalSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter | IAxisViewsGetter): void {
 		this._drawSources(target, paneViewsGetter);
 	}
 
@@ -574,14 +575,21 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawSourceImpl(target, sourcePaneViews, drawForeground, this._model().crosshairSource());
 	}
 
-	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter): void {
+	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: IPaneViewsGetter | IAxisViewsGetter): void {
 		const state = ensureNotNull(this._state);
 		const sources = state.orderedSources();
 
+		const panePrimitives = state.primitives();
+		for (const panePrimitive of panePrimitives) {
+			this._drawSourceImpl(target, paneViewsGetter, drawBackground, panePrimitive);
+		}
 		for (const source of sources) {
 			this._drawSourceImpl(target, paneViewsGetter, drawBackground, source);
 		}
 
+		for (const panePrimitive of panePrimitives) {
+			this._drawSourceImpl(target, paneViewsGetter, drawForeground, panePrimitive);
+		}
 		for (const source of sources) {
 			this._drawSourceImpl(target, paneViewsGetter, drawForeground, source);
 		}
@@ -589,9 +597,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _drawSourceImpl(
 		target: CanvasRenderingTarget2D,
-		paneViewsGetter: IPaneViewsGetter,
+		paneViewsGetter: IPaneViewsGetter | IAxisViewsGetter,
 		drawFn: DrawFunction,
-		source: IDataSource
+		source: IDataSourcePaneViews
 	): void {
 		const state = ensureNotNull(this._state);
 		const hoveredSource = state.model().hoveredSource();
@@ -601,7 +609,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			: undefined;
 
 		const drawRendererFn = (renderer: IPaneRenderer) => drawFn(renderer, target, isHovered, objecId);
-		drawSourcePaneViews(paneViewsGetter, drawRendererFn, source, state);
+		drawSourceViews(paneViewsGetter as IPaneViewsGetter, drawRendererFn, source, state);
 	}
 
 	private _recreatePriceAxisWidgets(): void {

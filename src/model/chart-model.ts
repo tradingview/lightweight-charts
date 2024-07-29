@@ -15,6 +15,7 @@ import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
 import { ICustomSeriesPaneView } from './icustom-series';
+import { IPrimitiveHitTestSource } from './idata-source';
 import { IHorzScaleBehavior, InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
@@ -170,7 +171,7 @@ export interface HoveredObject {
 }
 
 export interface HoveredSource {
-	source: IPriceDataSource;
+	source: IPriceDataSource | IPrimitiveHitTestSource;
 	object?: HoveredObject;
 }
 
@@ -502,7 +503,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._invalidate(new InvalidateMask(InvalidationLevel.Cursor));
 	}
 
-	public updateSource(source: IPriceDataSource): void {
+	public updateSource(source: IPriceDataSource | IPrimitiveHitTestSource): void {
 		const inv = this._invalidationMaskForSource(source);
 		this._invalidate(inv);
 	}
@@ -873,8 +874,11 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 	}
 
-	public paneForSource(source: IPriceDataSource): Pane | null {
-		const pane = this._panes.find((p: Pane) => p.orderedSources().includes(source));
+	public paneForSource(source: IPriceDataSource | IPrimitiveHitTestSource): Pane | null {
+		if (source instanceof Pane) {
+			return source;
+		}
+		const pane = this._panes.find((p: Pane) => p.orderedSources().includes(source as IPriceDataSource));
 		return pane === undefined ? null : pane;
 	}
 
@@ -1089,7 +1093,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return inv;
 	}
 
-	private _invalidationMaskForSource(source: IPriceDataSource, invalidateType?: InvalidationLevel): InvalidateMask {
+	private _invalidationMaskForSource(source: IPriceDataSource | IPrimitiveHitTestSource, invalidateType?: InvalidationLevel): InvalidateMask {
 		if (invalidateType === undefined) {
 			invalidateType = InvalidationLevel.Light;
 		}

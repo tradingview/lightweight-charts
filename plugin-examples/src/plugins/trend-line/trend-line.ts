@@ -5,15 +5,15 @@ import {
 	IChartApi,
 	ISeriesApi,
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	Logical,
 	SeriesOptionsMap,
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
 
-class TrendLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
+class TrendLinePaneRenderer implements IPrimitivePaneRenderer {
 	_p1: ViewPoint;
 	_p2: ViewPoint;
 	_text1: string;
@@ -75,7 +75,7 @@ interface ViewPoint {
 	y: Coordinate | null;
 }
 
-class TrendLinePaneView implements ISeriesPrimitivePaneView {
+class TrendLinePaneView implements IPrimitivePaneView {
 	_source: TrendLine;
 	_p1: ViewPoint = { x: null, y: null };
 	_p2: ViewPoint = { x: null, y: null };

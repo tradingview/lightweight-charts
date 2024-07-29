@@ -8,7 +8,7 @@ import {
 	ColorType,
 	LineStyleOptions,
 	AreaStyleOptions,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneView,
 	Time,
 } from 'lightweight-charts';
 import { Delegate, ISubscription } from '../../helpers/delegate';
@@ -58,7 +58,7 @@ export class DeltaTooltipPrimitive implements ISeriesPrimitive<Time> {
 	private _options: TooltipPrimitiveOptions;
 	_crosshairPaneView: MultiTouchCrosshairPaneView;
 	_deltaTooltipPaneView: DeltaTooltipPaneView;
-	_paneViews: ISeriesPrimitivePaneView[];
+	_paneViews: IPrimitivePaneView[];
 	_crosshairData: TooltipCrosshairLineData[] = [];
 	_tooltipData: Partial<DeltaTooltipData>;
 	_attachedParams: SeriesAttachedParameter<Time> | undefined;

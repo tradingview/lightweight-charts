@@ -5,9 +5,13 @@ import { ISubscription } from '../helpers/isubscription';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsBase, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
+import { Coordinate } from './coordinate';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid } from './grid';
+import { IPrimitiveHitTestSource } from './idata-source';
+import { IPanePrimitiveBase, PrimitiveHoveredItem } from './ipane-primitive';
 import { IPriceDataSource } from './iprice-data-source';
+import { PanePrimitiveWrapper } from './pane-primitive-wrapper';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
 import { ISeries, Series } from './series';
 import { SeriesType } from './series-options';
@@ -28,7 +32,7 @@ interface MinMaxOrderInfo {
 	maxZOrder: number;
 }
 
-export class Pane implements IDestroyable {
+export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 	private readonly _timeScale: ITimeScale;
 	private readonly _model: IChartModelBase;
 	private readonly _grid: Grid;
@@ -45,6 +49,8 @@ export class Pane implements IDestroyable {
 
 	private _leftPriceScale: PriceScale;
 	private _rightPriceScale: PriceScale;
+
+	private _primitives: PanePrimitiveWrapper[] = [];
 
 	public constructor(timeScale: ITimeScale, model: IChartModelBase) {
 		this._timeScale = timeScale;
@@ -352,6 +358,27 @@ export class Pane implements IDestroyable {
 
 	public grid(): Grid {
 		return this._grid;
+	}
+
+	public attachPrimitive(primitive: IPanePrimitiveBase): void {
+		this._primitives.push(new PanePrimitiveWrapper(primitive));
+	}
+
+	public detachPrimitive(source: IPanePrimitiveBase): void {
+		this._primitives = this._primitives.filter((wrapper: PanePrimitiveWrapper) => wrapper.primitive() !== source);
+	}
+
+	public primitives(): PanePrimitiveWrapper[] {
+		return this._primitives;
+	}
+
+	public primitiveHitTest(x: Coordinate, y: Coordinate): PrimitiveHoveredItem[] {
+		return this._primitives
+			.map((primitive: PanePrimitiveWrapper) => primitive.hitTest(x, y))
+			.filter(
+				(result: PrimitiveHoveredItem | null): result is PrimitiveHoveredItem =>
+					result !== null
+			);
 	}
 
 	private _recalculatePriceScaleImpl(priceScale: PriceScale): void {

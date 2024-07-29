@@ -16,10 +16,10 @@ import { makeFont } from '../helpers/make-font';
 
 import { ChartOptionsInternalBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { IDataSource } from '../model/idata-source';
+import { IDataSource, IDataSourcePaneViews } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
+import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { IPriceDataSource } from '../model/iprice-data-source';
-import { SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceMark, PriceScale } from '../model/price-scale';
@@ -52,11 +52,18 @@ const enum Constants {
 	LabelOffset = 5,
 }
 
+function hasPriceScale(source: IDataSource | IDataSourcePaneViews): source is IDataSource {
+	return (source as IDataSource).priceScale !== undefined;
+}
+
 function buildPriceAxisViewsGetter(
-	zOrder: SeriesPrimitivePaneViewZOrder,
+	zOrder: PrimitivePaneViewZOrder,
 	priceScaleId: PriceAxisWidgetSide
 ): IPriceAxisViewsGetter {
-	return (source: IDataSource): readonly IAxisView[] => {
+	return (source: IDataSource | IDataSourcePaneViews): readonly IAxisView[] => {
+		if (!hasPriceScale(source)) {
+			return [];
+		}
 		const psId = source.priceScale()?.id() ?? '';
 		if (psId !== priceScaleId) {
 			// exclude if source is using a different price scale.

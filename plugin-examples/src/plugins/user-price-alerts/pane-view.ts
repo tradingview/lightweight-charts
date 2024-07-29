@@ -1,13 +1,13 @@
 import {
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
-	SeriesPrimitivePaneViewZOrder,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
+	PrimitivePaneViewZOrder,
 } from 'lightweight-charts';
 import { IRendererData } from './irenderer-data';
 import { PaneRenderer } from './pane-renderer';
 import { PriceScalePaneRenderer } from './price-scale-pane-renderer';
 
-export class UserAlertPricePaneView implements ISeriesPrimitivePaneView {
+export class UserAlertPricePaneView implements IPrimitivePaneView {
 	_renderer: PaneRenderer | PriceScalePaneRenderer;
 	constructor(isPriceScale: boolean) {
 		this._renderer = isPriceScale
@@ -15,11 +15,11 @@ export class UserAlertPricePaneView implements ISeriesPrimitivePaneView {
 			: new PaneRenderer();
 	}
 
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'top';
 	}
 
-	renderer(): ISeriesPrimitivePaneRenderer {
+	renderer(): IPrimitivePaneRenderer {
 		return this._renderer;
 	}
 

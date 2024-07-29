@@ -3,11 +3,11 @@ import {
 	CrosshairMode,
 	IChartApi,
 	ISeriesApi,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	MouseEventParams,
 	SeriesType,
-	SeriesPrimitivePaneViewZOrder,
+	PrimitivePaneViewZOrder,
 	LineStyle
 } from 'lightweight-charts';
 import { PluginBase } from '../plugin-base';
@@ -45,7 +45,7 @@ interface UserPriceLinesRendererData {
 	hovered: boolean;
 }
 
-class UserPriceLinesPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class UserPriceLinesPaneRenderer implements IPrimitivePaneRenderer {
 	_data: UserPriceLinesRendererData;
 
 	constructor(data: UserPriceLinesRendererData) {
@@ -89,9 +89,9 @@ class UserPriceLinesPaneRenderer implements ISeriesPrimitivePaneRenderer {
 
 class UserPriceLinesPaneView
 	extends UserPriceLineDataBase
-	implements ISeriesPrimitivePaneView
+	implements IPrimitivePaneView
 {
-	renderer(): ISeriesPrimitivePaneRenderer | null {
+	renderer(): IPrimitivePaneRenderer | null {
 		const color = this._data.crosshairColor;
 		return new UserPriceLinesPaneRenderer({
 			visible: this._data.visible,
@@ -104,7 +104,7 @@ class UserPriceLinesPaneView
 		});
 	}
 
-    zOrder(): SeriesPrimitivePaneViewZOrder {
+    zOrder(): PrimitivePaneViewZOrder {
         return 'top';
     }
 }

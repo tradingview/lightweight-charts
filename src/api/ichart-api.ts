@@ -124,7 +124,8 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
 	>(
 		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
-		customOptions?: SeriesPartialOptions<TOptions>
+		customOptions?: SeriesPartialOptions<TOptions>,
+		paneIndex?: number
 	): ISeriesApi<'Custom', HorzScaleItem, TData | WhitespaceData<HorzScaleItem>, TOptions, TPartialOptions>;
 
 	/**
@@ -137,7 +138,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addAreaSeries();
 	 * ```
 	 */
-	addAreaSeries(areaOptions?: AreaSeriesPartialOptions): ISeriesApi<'Area', HorzScaleItem>;
+	addAreaSeries(areaOptions?: AreaSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Area', HorzScaleItem>;
 
 	/**
 	 * Creates a baseline series with specified parameters.
@@ -149,7 +150,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addBaselineSeries();
 	 * ```
 	 */
-	addBaselineSeries(baselineOptions?: BaselineSeriesPartialOptions): ISeriesApi<'Baseline', HorzScaleItem>;
+	addBaselineSeries(baselineOptions?: BaselineSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Baseline', HorzScaleItem>;
 
 	/**
 	 * Creates a bar series with specified parameters.
@@ -161,7 +162,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addBarSeries();
 	 * ```
 	 */
-	addBarSeries(barOptions?: BarSeriesPartialOptions): ISeriesApi<'Bar', HorzScaleItem>;
+	addBarSeries(barOptions?: BarSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Bar', HorzScaleItem>;
 
 	/**
 	 * Creates a candlestick series with specified parameters.
@@ -173,7 +174,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addCandlestickSeries();
 	 * ```
 	 */
-	addCandlestickSeries(candlestickOptions?: CandlestickSeriesPartialOptions): ISeriesApi<'Candlestick', HorzScaleItem>;
+	addCandlestickSeries(candlestickOptions?: CandlestickSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Candlestick', HorzScaleItem>;
 
 	/**
 	 * Creates a histogram series with specified parameters.
@@ -185,7 +186,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addHistogramSeries();
 	 * ```
 	 */
-	addHistogramSeries(histogramOptions?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram', HorzScaleItem>;
+	addHistogramSeries(histogramOptions?: HistogramSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Histogram', HorzScaleItem>;
 
 	/**
 	 * Creates a line series with specified parameters.
@@ -197,7 +198,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addLineSeries();
 	 * ```
 	 */
-	addLineSeries(lineOptions?: LineSeriesPartialOptions): ISeriesApi<'Line', HorzScaleItem>;
+	addLineSeries(lineOptions?: LineSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Line', HorzScaleItem>;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.

@@ -1,5 +1,4 @@
-import { CanvasRenderingTarget2D } from 'fancy-canvas';
-
+import { IPrimitivePaneView, PrimitivePaneViewZOrder } from './ipane-primitive';
 import { AutoscaleInfo } from './series-options';
 import { Logical } from './time-data';
 
@@ -52,55 +51,6 @@ export interface ISeriesPrimitiveAxisView {
 }
 
 /**
- * This interface represents rendering some element on the canvas
- */
-export interface ISeriesPrimitivePaneRenderer {
-	/**
-	 * Method to draw main content of the element
-	 *
-	 * @param target - canvas context to draw on, refer to FancyCanvas library for more details about this class
-	 *
-	 */
-	draw(target: CanvasRenderingTarget2D): void;
-
-	/**
-	 * Optional method to draw the background.
-	 * Some elements could implement this method to draw on the background of the chart.
-	 * Usually this is some kind of watermarks or time areas highlighting.
-	 *
-	 * @param target - canvas context to draw on, refer FancyCanvas library for more details about this class
-	 */
-	drawBackground?(target: CanvasRenderingTarget2D): void;
-}
-
-/**
- * Defines where in the visual layer stack the renderer should be executed.
- *
- * - `bottom`: Draw below everything except the background.
- * - `normal`: Draw at the same level as the series.
- * - `top`: Draw above everything (including the crosshair).
- */
-export type SeriesPrimitivePaneViewZOrder = 'bottom' | 'normal' | 'top';
-
-/**
- * This interface represents the primitive for one of the pane of the chart (main chart area, time scale, price scale).
- */
-export interface ISeriesPrimitivePaneView {
-	/**
-	 * Defines where in the visual layer stack the renderer should be executed. Default is `'normal'`.
-	 *
-	 * @returns the desired position in the visual layer stack. @see {@link SeriesPrimitivePaneViewZOrder}
-	 */
-	zOrder?(): SeriesPrimitivePaneViewZOrder;
-	/**
-	 * This method returns a renderer - special object to draw data
-	 *
-	 * @returns an renderer object to be used for drawing, or `null` if we have nothing to draw.
-	 */
-	renderer(): ISeriesPrimitivePaneRenderer | null;
-}
-
-/**
  * Data representing the currently hovered object from the Hit test.
  */
 export interface PrimitiveHoveredItem {
@@ -116,7 +66,7 @@ export interface PrimitiveHoveredItem {
 	/**
 	 * The zOrder of the hovered item.
 	 */
-	zOrder: SeriesPrimitivePaneViewZOrder;
+	zOrder: PrimitivePaneViewZOrder;
 	/**
 	 * Set to true if the object is rendered using `drawBackground` instead of `draw`.
 	 */
@@ -160,7 +110,7 @@ export interface ISeriesPrimitiveBase<TSeriesAttachedParameters = unknown> {
 	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
-	paneViews?(): readonly ISeriesPrimitivePaneView[];
+	paneViews?(): readonly IPrimitivePaneView[];
 
 	/**
 	 * Returns array of objects representing primitive in the price axis area of the chart
@@ -170,7 +120,7 @@ export interface ISeriesPrimitiveBase<TSeriesAttachedParameters = unknown> {
 	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
-	priceAxisPaneViews?(): readonly ISeriesPrimitivePaneView[];
+	priceAxisPaneViews?(): readonly IPrimitivePaneView[];
 
 	/**
 	 * Returns array of objects representing primitive in the time axis area of the chart
@@ -180,7 +130,7 @@ export interface ISeriesPrimitiveBase<TSeriesAttachedParameters = unknown> {
 	 * For performance reasons, the lightweight library uses internal caches based on references to arrays
 	 * So, this method must return new array if set of views has changed and should try to return the same array if nothing changed
 	 */
-	timeAxisPaneViews?(): readonly ISeriesPrimitivePaneView[];
+	timeAxisPaneViews?(): readonly IPrimitivePaneView[];
 
 	/**
 	 * Return autoscaleInfo which will be merged with the series base autoscaleInfo. You can use this to expand the autoscale range

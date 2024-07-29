@@ -5,8 +5,8 @@ import {
 	Coordinate,
 	DataChangedScope,
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	LineData,
 	Logical,
 	SeriesAttachedParameter,
@@ -25,7 +25,7 @@ interface BandRendererData {
 	lower: Coordinate | number;
 }
 
-class BandsIndicatorPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class BandsIndicatorPaneRenderer implements IPrimitivePaneRenderer {
 	_viewData: BandViewData;
 	constructor(data: BandViewData) {
 		this._viewData = data;
@@ -69,7 +69,7 @@ interface BandViewData {
 	options: Required<BandsIndicatorOptions>;
 }
 
-class BandsIndicatorPaneView implements ISeriesPrimitivePaneView {
+class BandsIndicatorPaneView implements IPrimitivePaneView {
 	_source: BandsIndicator;
 	_data: BandViewData;
 
