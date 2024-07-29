@@ -24,36 +24,6 @@ const cacheDir = path.resolve(
 );
 const typedocWatch = process.env.TYPEDOC_WATCH === 'true';
 
-function httpGetJson(url) {
-	return new Promise((resolve, reject) => {
-		const request = https.get(url, response => {
-			if (
-				response.statusCode &&
-				(response.statusCode < 100 || response.statusCode > 299)
-			) {
-				reject(
-					new Error(`Cannot load "${url}", error code=${response.statusCode}`)
-				);
-				return;
-			}
-
-			let data = '';
-
-			response.on('data', d => {
-				data += d;
-			});
-
-			response.on('end', () => {
-				resolve(JSON.parse(data));
-			});
-		});
-
-		request.on('error', error => {
-			reject(error);
-		});
-	});
-}
-
 function delay(duration) {
 	return new Promise(resolve => {
 		setTimeout(resolve, duration);
@@ -195,28 +165,6 @@ function typedocPluginForVersion(version) {
 }
 
 const getConfig = async () => {
-	const sizeLimits = await import('../.size-limit.js');
-	let size = sizeLimits.default
-		.map(limit => parseFloat(limit.limit.split(' ')[0]))
-		.reduce((a, b) => Math.max(a, b));
-
-	try {
-		const bhResult = await httpGetJson(
-			`https://bundlephobia.com/api/size?package=lightweight-charts@${
-				versions[0] || 'latest'
-			}&record=true`
-		);
-
-		logger.info(
-			`The bundlephobia result has been loaded: version=${bhResult.version}, gzip=${bhResult.gzip}`
-		);
-		size = bhResult.gzip / 1024;
-	} catch (e) {
-		logger.warn(
-			`Cannot use size from bundlephobia, use size from size-limit instead, error=${e.toString()}`
-		);
-	}
-
 	await Promise.all(versions.map(downloadTypingsFromUnpkg));
 
 	/** @type {import('@docusaurus/types').Config} */
@@ -294,9 +242,7 @@ const getConfig = async () => {
 			],
 		],
 
-		customFields: {
-			bundleSize: size.toFixed(0),
-		},
+		customFields: {},
 
 		themeConfig: {
 			navbar: {
