@@ -4,9 +4,9 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
-	<title>Debug page</title>
+	<title>Standalone Debug page</title>
 
-	<script type="text/javascript" src="./dist/lightweight-charts.standalone.development.js"></script>
+	<script type="text/javascript" src="../dist/lightweight-charts.standalone.development.js"></script>
 </head>
 
 <body style="padding: 0; margin: 0;">
@@ -28,9 +28,9 @@
 			return res;
 		}
 
-		var chart = LightweightCharts.createChart(document.getElementById('container'));
+		const chart = LightweightCharts.createChart(document.getElementById('container'));
 
-		var mainSeries = chart.addLineSeries({
+		const mainSeries = chart.addLineSeries({
 			priceFormat: {
 				minMove: 1,
 				precision: 0,

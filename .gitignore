@@ -3,7 +3,12 @@ node_modules/
 npm-debug.log*
 package-lock.json
 
-debug.html
+/debug/**/*
+!/debug/README.md
+!/debug/debug-standalone.html.example
+!/debug/debug-esm.html.example
+!/debug/debug-esm.mjs.example
+
 
 # python
 *.pyc
