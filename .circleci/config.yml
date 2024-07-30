@@ -361,7 +361,7 @@ workflows:
             - build
       - graphics-tests:
           name: graphics-tests-part1-dpr<< matrix.dpr >><< matrix.productionBuild >>
-          grep: "(api/|applying-options/|degenerative-horizontal-series-with-integer-min-tick/)"
+          grep: "(api/|applying-options/|series-markers/|price-scale/)"
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
       - graphics-tests:
@@ -371,7 +371,7 @@ workflows:
           <<: *graphics-test-config
       - graphics-tests:
           name: graphics-tests-part3-dpr<< matrix.dpr >><< matrix.productionBuild >>
-          grep: "(price-scale/|series/|series-markers/|time-scale/)"
+          grep: "(series/|series-markers/|time-scale/|degenerative-horizontal-series-with-integer-min-tick/)"
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
       - memleaks-tests:
