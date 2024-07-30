@@ -8,11 +8,11 @@ import {
     IPanePrimitiveBase,
     IPrimitivePaneRenderer,
     IPrimitivePaneView,
+    PrimitiveHoveredItem,
     PrimitivePaneViewZOrder,
 } from './ipane-primitive';
 import {
 	ISeriesPrimitiveBase,
-	PrimitiveHoveredItem,
 } from './iseries-primitive';
 
 class PrimitiveRendererWrapper implements IPaneRenderer {

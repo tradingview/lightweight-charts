@@ -4,8 +4,7 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { Coordinate } from './coordinate';
-import { PrimitivePaneViewZOrder } from './ipane-primitive';
-import { PrimitiveHoveredItem } from './iseries-primitive';
+import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from './ipane-primitive';
 import { Pane } from './pane';
 import { PriceScale } from './price-scale';
 

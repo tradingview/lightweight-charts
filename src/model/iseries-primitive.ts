@@ -1,4 +1,4 @@
-import { IPrimitivePaneView, PrimitivePaneViewZOrder } from './ipane-primitive';
+import { IPrimitivePaneView, PrimitiveHoveredItem } from './ipane-primitive';
 import { AutoscaleInfo } from './series-options';
 import { Logical } from './time-data';
 
@@ -48,29 +48,6 @@ export interface ISeriesPrimitiveAxisView {
 	 * @returns whether the tick mark line should be visible (default: `true`)
 	 */
 	tickVisible?(): boolean;
-}
-
-/**
- * Data representing the currently hovered object from the Hit test.
- */
-export interface PrimitiveHoveredItem {
-	/**
-	 * CSS cursor style as defined here: [MDN: CSS Cursor](https://developer.mozilla.org/en-US/docs/Web/CSS/cursor) or `undefined`
-	 * if you want the library to use the default cursor style instead.
-	 */
-	cursorStyle?: string;
-	/**
-	 * Hovered objects external ID. Can be used to identify the source item within a mouse subscriber event.
-	 */
-	externalId: string;
-	/**
-	 * The zOrder of the hovered item.
-	 */
-	zOrder: PrimitivePaneViewZOrder;
-	/**
-	 * Set to true if the object is rendered using `drawBackground` instead of `draw`.
-	 */
-	isBackground?: boolean;
 }
 
 /**
