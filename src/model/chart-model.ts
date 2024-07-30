@@ -30,7 +30,6 @@ import { SeriesOptionsMap, SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { HorzScaleOptions, ITimeScale, TimeScale } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
-import { Watermark, WatermarkOptions } from './watermark';
 
 /**
  * Represents options for how the chart is scrolled by the mouse and touch gestures.
@@ -269,16 +268,6 @@ export interface ChartOptionsBase {
 	autoSize: boolean;
 
 	/**
-	 * Watermark options.
-	 *
-	 * A watermark is a background label that includes a brief description of the drawn data. Any text can be added to it.
-	 *
-	 * Please make sure you enable it and set an appropriate font color and size to make your watermark visible in the background of the chart.
-	 * We recommend a semi-transparent color and a large font. Also note that watermark position can be aligned vertically and horizontally.
-	 */
-	watermark: WatermarkOptions;
-
-	/**
 	 * Layout options
 	 */
 	layout: LayoutOptions;
@@ -420,7 +409,6 @@ export interface IChartModelBase {
 	setHoveredSource(source: HoveredSource | null): void;
 
 	crosshairSource(): Crosshair;
-	watermarkSource(): Watermark;
 
 	startScrollPrice(pane: Pane, priceScale: PriceScale, x: number): void;
 	scrollPriceTo(pane: Pane, priceScale: PriceScale, x: number): void;
@@ -461,7 +449,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private readonly _panes: Pane[] = [];
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
-	private readonly _watermark: Watermark;
 
 	private _serieses: Series<SeriesType>[] = [];
 
@@ -486,7 +473,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._timeScale = new TimeScale(this, options.timeScale, this._options.localization, horzScaleBehavior);
 		this._crosshair = new Crosshair(this, options.crosshair);
 		this._magnet = new Magnet(options.crosshair);
-		this._watermark = new Watermark(this, options.watermark);
 
 		this._getOrCreatePane(0);
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
@@ -602,10 +588,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	public panes(): readonly Pane[] {
 		return this._panes;
-	}
-
-	public watermarkSource(): Watermark {
-		return this._watermark;
 	}
 
 	public crosshairSource(): Crosshair {
@@ -887,7 +869,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public recalculateAllPanes(): void {
-		this._watermark.updateAllViews();
 		this._panes.forEach((p: Pane) => p.recalculate());
 		this.updateCrosshair();
 	}

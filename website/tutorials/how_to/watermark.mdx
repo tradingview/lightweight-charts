@@ -16,31 +16,36 @@ included below.
 
 ## Short answer
 
-A simple text watermark can be configured and added by specifying the [`watermark`](/docs/api/interfaces/ChartOptionsBase#watermark) property within
-the chart options as follows:
+A simple text watermark can be configured and added by using the [`TextWatermark`](/docs/next/api/classes/TextWatermark) pane primitive exported
+from the library as follows:
 
 ```js
-chart.applyOptions({
-    watermark: {
-        visible: true,
-        fontSize: 24,
-        horzAlign: 'center',
-        vertAlign: 'center',
-        color: 'rgba(171, 71, 188, 0.5)',
-        text: 'Watermark Example',
-    },
+import { TextWatermark } from 'lightweight-charts';
+
+const textWatermark = new TextWatermark({
+    horzAlign: 'center',
+    vertAlign: 'center',
+    lines: [
+        {
+            text: 'Watermark Example',
+            color: 'rgba(171, 71, 188, 0.5)',
+            fontSize: 24,
+        },
+    ],
 });
+
+const firstPane = chart.panes()[0];
+firstPane.attachPrimitive(textWatermark);
 ```
 
-The options available for the watermark are: [Watermark Options](/docs/api/interfaces/WatermarkOptions).
-
-To have the watermark appear, you need to set `visible` to `true` and ensure that the `text` property isn't empty.
+The options available for the watermark are: [TextWatermark Options](/docs/next/api/interfaces/TextWatermarkOptions).
 
 You can see full [working examples](#examples) below.
 
 ## Resources
 
-- [Watermark Options](/docs/api/interfaces/WatermarkOptions)
+- [`TextWatermark` pane primitive](/docs/next/api/classes/TextWatermark).
+- [TextWatermark Options](/docs/next/api/interfaces/TextWatermarkOptions)
 
 ## Examples
 

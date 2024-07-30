@@ -13,7 +13,7 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, {
+	const chart = (window.chart = LightweightCharts.createChart(container, {
 		watermark: {
 			visible: true,
 			color: 'red',
@@ -23,9 +23,24 @@ function runTestCase(container) {
 			fontStyle: 'italic',
 		},
 		layout: { attributionLogo: false },
-	});
+	}));
 
 	const mainSeries = chart.addAreaSeries();
-
 	mainSeries.setData(generateData());
+
+	const textWatermark = new LightweightCharts.TextWatermark({
+		visible: true,
+		lines: [
+			{
+				color: 'red',
+				text: 'TradingView Watermark Example',
+				fontSize: 24,
+				fontFamily: 'Roboto',
+				fontStyle: 'italic',
+			},
+		],
+	});
+
+	const pane = chart.panes()[0];
+	pane.attachPrimitive(textWatermark);
 }

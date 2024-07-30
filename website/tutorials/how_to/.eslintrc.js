@@ -3,5 +3,6 @@ module.exports = {
 		document: false,
 		createChart: false,
 		createChartEx: false,
+		TextWatermark: false,
 	},
 };

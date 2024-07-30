@@ -490,7 +490,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				if (this._state) {
 					this._drawSources(target, sourceBottomPaneViews);
 					this._drawGrid(target);
-					this._drawWatermark(target);
 					this._drawSources(target, sourcePaneViews);
 					this._drawSources(target, sourceLabelPaneViews);
 				}
@@ -561,12 +560,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (renderer !== null) {
 			renderer.draw(target, false);
 		}
-	}
-
-	private _drawWatermark(target: CanvasRenderingTarget2D): void {
-		const source = this._model().watermarkSource();
-		this._drawSourceImpl(target, sourcePaneViews, drawBackground, source);
-		this._drawSourceImpl(target, sourcePaneViews, drawForeground, source);
 	}
 
 	private _drawCrosshair(target: CanvasRenderingTarget2D): void {
