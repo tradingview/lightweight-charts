@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import * as fs from 'fs';
 
-import { basename, dirname, join } from 'node:path';
+import { basename, dirname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const currentFilePath = fileURLToPath(import.meta.url);
@@ -13,6 +13,18 @@ export interface TestCase {
 }
 
 const testCasesDir = join(currentDirectory, '..', 'test-cases');
+
+function splitPathToFolders(inputPath: string): string[] {
+	const normalizedPath = normalize(inputPath);
+	const folders = normalizedPath.split(sep).filter(Boolean);
+	return folders;
+}
+
+function extractTestCaseNameAndFolder(fileName: string): string | null {
+	const parentFolderAndFileName = splitPathToFolders(fileName).slice(-2).join('/');
+	const match = /^([^.].+)\.js$/.exec(parentFolderAndFileName);
+	return match && match[1];
+}
 
 function extractTestCaseName(fileName: string): string | null {
 	const match = /^([^.].+)\.js$/.exec(basename(fileName));
@@ -61,7 +73,7 @@ export function getTestCases(): Record<string, TestCase[]> {
 				if (!testFilterRegex) {
 					return true;
 				}
-				const name = extractTestCaseName(testCaseFile);
+				const name = extractTestCaseNameAndFolder(testCaseFile);
 				if (name) {
 					return testFilterRegex.test(name);
 				}
