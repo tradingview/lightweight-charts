@@ -75,7 +75,7 @@ commands:
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
             echo 'export PRODUCTION_BUILD=<< parameters.productionBuild >>' >> $BASH_ENV
-            echo 'export GREP=<< parameters.grep >>' >> $BASH_ENV
+            echo 'export GREP="<< parameters.grep >>"' >> $BASH_ENV
             echo 'export COMPARE_BRANCH="v5-candidate"' >> $BASH_ENV
       - run:
           command: scripts/run-graphics-tests.sh
@@ -361,7 +361,7 @@ workflows:
             - build
       - graphics-tests:
           name: graphics-tests-part1-dpr<< matrix.dpr >><< matrix.productionBuild >>
-          grep: "(api/|applying-options/|degenerative-horizontal-series-with-integer-min-tick/|)"
+          grep: "(api/|applying-options/|degenerative-horizontal-series-with-integer-min-tick/)"
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
       - graphics-tests:
