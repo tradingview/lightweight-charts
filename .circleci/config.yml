@@ -2,7 +2,6 @@
 
 version: 2.1
 
-
 aliases:
   - &restore-node-modules-cache
       name: Restore node_modules cache
@@ -64,6 +63,8 @@ commands:
       productionBuild:
         type: boolean
         default: false
+      grep:
+        type: string
     steps:
       - checkout-with-deps
       - run:
@@ -74,6 +75,7 @@ commands:
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
             echo 'export PRODUCTION_BUILD=<< parameters.productionBuild >>' >> $BASH_ENV
+            echo 'export GREP=<< parameters.grep >>' >> $BASH_ENV
             echo 'export COMPARE_BRANCH="v5-candidate"' >> $BASH_ENV
       - run:
           command: scripts/run-graphics-tests.sh
@@ -195,37 +197,21 @@ jobs:
           path: ./dts-changes
           when: on_fail
 
-  graphics-tests-dpr1_0:
+  graphics-tests:
+    parameters:
+      grep:
+        type: string
+      dpr:
+        type: string
+      productionBuild:
+        type: boolean
+        default: false
     executor: node-browsers-executor
     steps:
       - run-graphics-tests:
-          devicePixelRatio: "1.0"
-
-  graphics-tests-dpr1_25:
-    executor: node-browsers-executor
-    steps:
-      - run-graphics-tests:
-          devicePixelRatio: "1.25"
-
-  graphics-tests-dpr1_5:
-    executor: node-browsers-executor
-    steps:
-      - run-graphics-tests:
-          devicePixelRatio: "1.5"
-
-  graphics-tests-dpr2_0:
-    executor: node-browsers-executor
-    steps:
-      - run-graphics-tests:
-          devicePixelRatio: "2.0"
-
-  graphics-tests-dpr2_0-prod:
-    executor: node-browsers-executor
-    steps:
-      - run-graphics-tests:
-          devicePixelRatio: "2.0"
-          productionBuild: true
-
+          devicePixelRatio: << parameters.dpr >>
+          grep: << parameters.grep >>
+          productionBuild: << parameters.productionBuild >>
 
   memleaks-tests:
     executor: node-browsers-executor
@@ -307,6 +293,28 @@ jobs:
           paths:
             - website
 
+
+anchors:
+  - &graphics-test-matrix
+    parameters:
+      dpr: ["1.0", "1.25", "1.5", "2.0"]
+      productionBuild: [false, true]
+    exclude:
+      - dpr: "1.0"
+        productionBuild: true
+      - dpr: "1.25"
+        productionBuild: true
+      - dpr: "1.5"
+        productionBuild: true
+
+  - &graphics-test-config
+    requires:
+      - build
+    filters: *merge-based-filters
+    dpr: << matrix.dpr >>
+    productionBuild: << matrix.productionBuild >>
+
+
 workflows:
   version: 2
 
@@ -351,26 +359,21 @@ workflows:
           filters: *merge-based-filters
           requires:
             - build
-      - graphics-tests-dpr1_0:
-          filters: *merge-based-filters
-          requires:
-            - build
-      - graphics-tests-dpr1_25:
-          filters: *merge-based-filters
-          requires:
-            - build
-      - graphics-tests-dpr1_5:
-          filters: *merge-based-filters
-          requires:
-            - build
-      - graphics-tests-dpr2_0:
-          filters: *merge-based-filters
-          requires:
-            - build
-      - graphics-tests-dpr2_0-prod:
-          filters: *merge-based-filters
-          requires:
-            - build
+      - graphics-tests:
+          name: graphics-tests-part1-dpr<< matrix.dpr >><< matrix.productionBuild >>
+          grep: "(api/|applying-options/|degenerative-horizontal-series-with-integer-min-tick/|)"
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - graphics-tests:
+          name: graphics-tests-part2-dpr<< matrix.dpr >><< matrix.productionBuild >>
+          grep: "(initial-options/|logical-range/|panes/|plugins/|two-scales/|test-cases/)"
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - graphics-tests:
+          name: graphics-tests-part3-dpr<< matrix.dpr >><< matrix.productionBuild >>
+          grep: "(price-scale/|series/|series-markers/|time-scale/)"
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
       - memleaks-tests:
           filters: *default-filters
           requires:
