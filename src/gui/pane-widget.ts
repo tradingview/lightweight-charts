@@ -447,6 +447,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				source.updateAllViews();
 			}
 		}
+		for (const primitive of pane.primitives()) {
+			primitive.updateAllViews();
+		}
 	}
 
 	public getBitmapSize(): Size {
