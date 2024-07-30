@@ -5,6 +5,7 @@ import {
 
 import { DeepPartial } from '../../helpers/strict-type-checks';
 
+import { Time } from '../../model/horz-scale-behavior-time/types';
 import { IPanePrimitivePaneView } from '../../model/ipane-primitive';
 
 import {
@@ -61,7 +62,7 @@ function mergeOptionsWithDefaults(
  * chart.panes()[0].attachPrimitive(textWatermark);
  * ```
  */
-export class TextWatermark implements IPanePrimitive<unknown> {
+export class TextWatermark<T = Time> implements IPanePrimitive<T> {
 	public requestUpdate?: () => void;
 	private _paneViews: TextWatermarkPaneView[];
 	private _options: TextWatermarkOptions;
@@ -81,7 +82,7 @@ export class TextWatermark implements IPanePrimitive<unknown> {
 		return this._paneViews;
 	}
 
-	public attached({ requestUpdate }: PaneAttachedParameter<unknown>): void {
+	public attached({ requestUpdate }: PaneAttachedParameter<T>): void {
 		this.requestUpdate = requestUpdate;
 	}
 

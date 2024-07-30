@@ -50,4 +50,12 @@ export default [
 		limit: '2.00 KB',
 		brotli: true,
 	},
+	{
+		name: 'Plugin: Image Watermark',
+		path: 'dist/lightweight-charts.production.mjs',
+		import: '{ ImageWatermark }',
+		ignore: ['fancy-canvas'],
+		limit: '2.00 KB',
+		brotli: true,
+	},
 ];

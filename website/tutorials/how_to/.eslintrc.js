@@ -4,5 +4,6 @@ module.exports = {
 		createChart: false,
 		createChartEx: false,
 		TextWatermark: false,
+		ImageWatermark: false,
 	},
 };

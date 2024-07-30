@@ -12,6 +12,8 @@ In the new version of Lightweight Charts, the watermark feature has undergone si
 1. **Extraction from Core**: The watermark functionality has been extracted from the core library.
 2. **Re-implementation**: It's now re-implemented as a Pane Primitive (plugin) included within the library.
 3. **Improved Tree-shaking**: This change makes the feature more tree-shakeable, potentially reducing bundle sizes for users who don't need watermarks.
+4. **Added an Image Watermark Primitive**: In addition to the usual text based watermark, there is now
+an image watermark feature provided by the [`ImageWatermark`](/api/classes/ImageWatermark.md) primitive.
 
 If you're currently using the watermark feature, you'll need to make a few adjustments to your code.
 
