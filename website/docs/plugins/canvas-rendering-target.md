@@ -1,6 +1,6 @@
 ---
 sidebar_label: Canvas Rendering Target
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 # Canvas Rendering Target
