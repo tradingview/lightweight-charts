@@ -155,10 +155,10 @@ export class SeriesApi<
 		this._onDataChanged('full');
 	}
 
-	public update(bar: TData): void {
+	public update(bar: TData, historicalUpdate: boolean = false): void {
 		checkSeriesValuesType(this._series.seriesType(), [bar]);
 
-		this._dataUpdatesConsumer.updateData(this._series, bar);
+		this._dataUpdatesConsumer.updateData(this._series, bar, historicalUpdate);
 		this._onDataChanged('update');
 	}
 

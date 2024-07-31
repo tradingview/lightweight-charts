@@ -261,8 +261,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._sendUpdateToChart(this._dataLayer.setSeriesData(series, data));
 	}
 
-	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void {
-		this._sendUpdateToChart(this._dataLayer.updateSeriesData(series, data));
+	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType], historicalUpdate: boolean): void {
+		this._sendUpdateToChart(this._dataLayer.updateSeriesData(series, data, historicalUpdate));
 	}
 
 	public subscribeClick(handler: MouseEventHandler<HorzScaleItem>): void {

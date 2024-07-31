@@ -88,5 +88,22 @@ async function afterInteractions() {
 		...barData[barData.length - 1],
 		time: barData[barData.length - 1].time + 3600,
 	});
+
+	await awaitNewFrame();
+
+	lineSeries.update(
+		{
+			...barData[barData.length - 5],
+			value: 1234,
+		},
+		true // historical update
+	);
+	lineSeries.update(
+		{
+			time: barData[barData.length - 6],
+		},
+		true // historical update
+	);
+
 	return Promise.resolve();
 }

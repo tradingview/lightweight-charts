@@ -124,6 +124,7 @@ export interface SeriesDataAtTypeMap {
 
 export interface SeriesUpdateInfo {
 	lastBarUpdatedOrNewBarsAddedToTheRight: boolean;
+	historicalUpdate: boolean;
 }
 
 // note that if would like to use `Omit` here - you can't due https://github.com/microsoft/TypeScript/issues/36981
