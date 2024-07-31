@@ -781,7 +781,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane, skipEvent?: boolean): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
-		let index = this._timeScale.coordinateToIndex(x);
+		let index = this._timeScale.coordinateToIndex(x, true);
 
 		const visibleBars = this._timeScale.visibleStrictRange();
 		if (visibleBars !== null) {
@@ -933,6 +933,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		if (series.destroy) {
 			series.destroy();
 		}
+
+		this._timeScale.recalculateIndicesWithData();
+
 		this._cleanupIfPaneIsEmpty(paneImpl);
 	}
 
