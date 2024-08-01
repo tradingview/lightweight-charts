@@ -117,6 +117,8 @@ function toInternalOptions<HorzScaleItem>(options: DeepPartial<ChartOptionsImpl<
 export type IPriceScaleApiProvider<HorzScaleItem> = Pick<IChartApiBase<HorzScaleItem>, 'priceScale'>;
 
 export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, DataUpdatesConsumer<SeriesType, HorzScaleItem> {
+	protected readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
+
 	private _chartWidget: ChartWidget<HorzScaleItem>;
 	private _dataLayer: DataLayer<HorzScaleItem>;
 	private readonly _seriesMap: Map<SeriesApi<SeriesType, HorzScaleItem>, Series<SeriesType>> = new Map();
@@ -128,7 +130,6 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	private readonly _timeScaleApi: TimeScaleApi<HorzScaleItem>;
 	private readonly _panes: WeakMap<Pane, PaneApi<HorzScaleItem>> = new WeakMap();
-	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
 	public constructor(container: HTMLElement, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, options?: DeepPartial<ChartOptionsImpl<HorzScaleItem>>) {
 		this._dataLayer = new DataLayer<HorzScaleItem>(horzScaleBehavior);

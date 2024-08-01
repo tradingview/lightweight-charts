@@ -207,6 +207,8 @@ export interface HorzScaleOptions {
 	 * Ignore time scale points containing only whitespace (for all series) when
 	 * drawing grid lines, tick marks, and snapping the crosshair to time scale points.
 	 *
+	 * For the yield curve chart type it defaults to `true`.
+	 *
 	 * @defaultValue false
 	 */
 	ignoreWhitespaceIndices: boolean;

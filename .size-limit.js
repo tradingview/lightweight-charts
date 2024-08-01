@@ -30,6 +30,14 @@ export default [
 		brotli: true,
 	},
 	{
+		name: 'ESM createYieldCurveChart',
+		path: 'dist/lightweight-charts.production.mjs',
+		limit: '45.00 KB',
+		import: '{ createYieldCurveChart }',
+		ignore: ['fancy-canvas'],
+		brotli: true,
+	},
+	{
 		name: 'Standalone-ESM',
 		path: 'dist/lightweight-charts.standalone.production.mjs',
 		limit: '50.00 KB',
