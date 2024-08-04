@@ -38,6 +38,14 @@ export default [
 		brotli: true,
 	},
 	{
+		name: 'ESM createOptionsChart',
+		path: 'dist/lightweight-charts.production.mjs',
+		limit: '45.00 KB',
+		import: '{ createOptionsChart }',
+		ignore: ['fancy-canvas'],
+		brotli: true,
+	},
+	{
 		name: 'Standalone-ESM',
 		path: 'dist/lightweight-charts.standalone.production.mjs',
 		limit: '50.00 KB',

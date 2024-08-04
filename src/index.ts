@@ -21,6 +21,7 @@ export const customSeriesDefaultOptions: CustomSeriesOptions = {
 
 export { createChart, createChartEx, defaultHorzScaleBehavior } from './api/create-chart';
 export { createYieldCurveChart } from './api/create-yield-curve-chart';
+export { createOptionsChart } from './api/create-options-chart';
 
 export { UpDownMarkersPrimitive } from './plugins/up-down-markers-plugin/primitive';
 
