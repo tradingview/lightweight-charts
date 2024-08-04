@@ -239,6 +239,7 @@ export class SeriesApi<
 				chart: this._chartApi,
 				series: this,
 				requestUpdate: () => this._series.model().fullUpdate(),
+				horzScaleBehavior: this._horzScaleBehavior,
 			});
 		}
 	}

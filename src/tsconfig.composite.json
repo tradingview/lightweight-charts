@@ -8,6 +8,7 @@
 		{ "path": "./tsconfig.model.json" }
 	],
 	"include": [
+		"./plugins/**/*.ts",
 		"./index.ts",
 		"./standalone.ts"
 	]

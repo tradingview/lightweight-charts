@@ -73,6 +73,7 @@ const defaultOptions: DeepPartial<YieldCurveChartOptions> = {
 
 const lineStyleDefaultOptionOverrides: DeepPartial<LineStyleOptions & SeriesOptionsCommon & AreaStyleOptions> = {
 	lastValueVisible: false,
+	priceLineVisible: false,
 };
 
 export class YieldChartApi extends ChartApi<number> implements IYieldCurveChartApi {
