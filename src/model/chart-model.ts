@@ -617,7 +617,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		assert(index >= 0 && index < this._panes.length, 'Invalid pane index');
 
+		const pane = this._panes[index];
 		this._panes.splice(index, 1);
+		pane.destroy();
 		this.fullUpdate();
 	}
 

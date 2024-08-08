@@ -121,6 +121,13 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 				source.destroy();
 			}
 		});
+		this._primitives = this._primitives.filter((primitive: PanePrimitiveWrapper) => {
+			const p = primitive.primitive();
+			if (p.detached) {
+				p.detached();
+			}
+			return false;
+		});
 		this._destroyed.fire();
 	}
 
@@ -366,6 +373,10 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 
 	public detachPrimitive(source: IPanePrimitiveBase): void {
 		this._primitives = this._primitives.filter((wrapper: PanePrimitiveWrapper) => wrapper.primitive() !== source);
+		if (source.detached) {
+			source.detached();
+		}
+		this._model.lightUpdate();
 	}
 
 	public primitives(): PanePrimitiveWrapper[] {

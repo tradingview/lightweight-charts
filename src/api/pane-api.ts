@@ -76,8 +76,5 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 
 	public detachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void {
 		this._pane.detachPrimitive(primitive as IPanePrimitiveBase<unknown>);
-		if (primitive.detached) {
-			primitive.detached();
-		}
 	}
 }
