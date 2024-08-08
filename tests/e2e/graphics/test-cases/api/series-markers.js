@@ -40,13 +40,16 @@ function runTestCase(container) {
 	series.setMarkers(markers);
 	const seriesApiMarkers = series.markers();
 
-	chart.applyOptions({
-		watermark: {
-			color: 'red',
-			visible: true,
-			text: JSON.stringify(seriesApiMarkers[0]),
-		},
+	const textWatermark = new LightweightCharts.TextWatermark({
+		lines: [
+			{
+				text: JSON.stringify(seriesApiMarkers[0]),
+				color: 'red',
+			},
+		],
 	});
+	const pane = chart.panes()[0];
+	pane.attachPrimitive(textWatermark);
 
 	console.assert(compare(markers, seriesApiMarkers), `series.markers() should return exactly the same that was provided to series.setMarkers()\n${JSON.stringify(seriesApiMarkers)}\n${JSON.stringify(markers)}`);
 }
