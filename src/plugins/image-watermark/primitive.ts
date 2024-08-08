@@ -64,7 +64,7 @@ export class ImageWatermark<T = Time> implements IPanePrimitive<T> {
 	}
 
 	public attached(attachedParams: PaneAttachedParameter<T>): void {
-		const { requestUpdate, chart } = attachedParams;
+		const { requestUpdate } = attachedParams;
 		this._requestUpdate = requestUpdate;
 		this._imgElement = new Image();
 		this._imgElement.onload = () => {
@@ -75,7 +75,6 @@ export class ImageWatermark<T = Time> implements IPanePrimitive<T> {
 					imageHeight,
 					imageWidth,
 					image: this._imgElement,
-					chart,
 				})
 			);
 			if (this._requestUpdate) {
