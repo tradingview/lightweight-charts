@@ -1,15 +1,12 @@
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { IPriceDataSource } from '../model/iprice-data-source';
-import {
-	PrimitiveHoveredItem,
-	SeriesPrimitivePaneViewZOrder,
-} from '../model/iseries-primitive';
+import { IDataSource, IPrimitiveHitTestSource } from '../model/idata-source';
+import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { Pane } from '../model/pane';
 import { IPaneView } from '../views/pane/ipane-view';
 
 export interface HitTestResult {
-	source: IPriceDataSource;
+	source: IPrimitiveHitTestSource;
 	object?: HoveredObject;
 	view?: IPaneView;
 	cursorStyle?: string;
@@ -22,13 +19,13 @@ export interface HitTestPaneViewResult {
 
 interface BestPrimitiveHit {
 	hit: PrimitiveHoveredItem;
-	source: IPriceDataSource;
+	source: IPrimitiveHitTestSource;
 }
 
 // returns true if item is above reference
 function comparePrimitiveZOrder(
-	item: SeriesPrimitivePaneViewZOrder,
-	reference?: SeriesPrimitivePaneViewZOrder
+	item: PrimitivePaneViewZOrder,
+	reference?: PrimitivePaneViewZOrder
 ): boolean {
 	return (
 		!reference ||
@@ -38,12 +35,12 @@ function comparePrimitiveZOrder(
 }
 
 function findBestPrimitiveHitTest(
-	sources: readonly IPriceDataSource[],
+	sources: readonly IPrimitiveHitTestSource[],
 	x: Coordinate,
 	y: Coordinate
 ): BestPrimitiveHit | null {
 	let bestPrimitiveHit: PrimitiveHoveredItem | undefined;
-	let bestHitSource: IPriceDataSource | undefined;
+	let bestHitSource: IPrimitiveHitTestSource | undefined;
 	for (const source of sources) {
 		const primitiveHitResults = source.primitiveHitTest?.(x, y) ?? [];
 		for (const hitResult of primitiveHitResults) {
@@ -101,12 +98,17 @@ function hitTestPaneView(
 	return null;
 }
 
+function isDataSource(source: IPrimitiveHitTestSource): source is IDataSource {
+	return (source as IDataSource).paneViews !== undefined;
+}
+
+// eslint-disable-next-line complexity
 export function hitTestPane(
 	pane: Pane,
 	x: Coordinate,
 	y: Coordinate
 ): HitTestResult | null {
-	const sources = pane.orderedSources();
+	const sources: IPrimitiveHitTestSource[] = [pane, ...pane.orderedSources()];
 	const bestPrimitiveHit = findBestPrimitiveHitTest(sources, x, y);
 	if (bestPrimitiveHit?.hit.zOrder === 'top') {
         // a primitive hit on the 'top' layer will always beat the built-in hit tests
@@ -119,13 +121,15 @@ export function hitTestPane(
             // therefore it takes precedence here.
 			return convertPrimitiveHitResult(bestPrimitiveHit);
 		}
-		const sourceResult = hitTestPaneView(source.paneViews(pane), x, y, pane);
-		if (sourceResult !== null) {
-			return {
-				source: source,
-				view: sourceResult.view,
-				object: sourceResult.object,
-			};
+		if (isDataSource(source)) {
+			const sourceResult = hitTestPaneView(source.paneViews(pane), x, y, pane);
+			if (sourceResult !== null) {
+				return {
+					source: source,
+					view: sourceResult.view,
+					object: sourceResult.object,
+				};
+			}
 		}
 		if (bestPrimitiveHit && bestPrimitiveHit.source === source && bestPrimitiveHit.hit.zOrder !== 'bottom' && bestPrimitiveHit.hit.isBackground) {
 			return convertPrimitiveHitResult(bestPrimitiveHit);

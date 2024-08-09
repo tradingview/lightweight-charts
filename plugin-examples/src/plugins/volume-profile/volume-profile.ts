@@ -5,8 +5,8 @@ import {
 	IChartApi,
 	ISeriesApi,
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	Logical,
 	SeriesOptionsMap,
 	SeriesType,
@@ -38,7 +38,7 @@ export interface VolumeProfileData {
 	width: number;
 }
 
-class VolumeProfileRenderer implements ISeriesPrimitivePaneRenderer {
+class VolumeProfileRenderer implements IPrimitivePaneRenderer {
 	_data: VolumeProfileRendererData;
 	constructor(data: VolumeProfileRendererData) {
 		this._data = data;
@@ -91,7 +91,7 @@ class VolumeProfileRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-class VolumeProfilePaneView implements ISeriesPrimitivePaneView {
+class VolumeProfilePaneView implements IPrimitivePaneView {
 	_source: VolumeProfile;
 	_x: Coordinate | null = null;
 	_width: number = 6;

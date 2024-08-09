@@ -22,26 +22,46 @@ function generateData() {
 	return res;
 }
 
+let textWatermark;
+
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
+	const chart = (window.chart = LightweightCharts.createChart(container, {
+		layout: { attributionLogo: false },
+	}));
 
 	const mainSeries = chart.addCandlestickSeries();
 
 	mainSeries.setData(generateData());
 
+	textWatermark = new LightweightCharts.TextWatermark({
+		horzAlign: 'left',
+		vertAlign: 'bottom',
+		lines: [
+			{
+				text: 'Watermark Before',
+				color: 'rgba(0, 0, 0, 0.5)',
+				fontSize: 12,
+			},
+		],
+	});
+	const pane = chart.panes()[0];
+	pane.attachPrimitive(textWatermark);
+
 	return new Promise(resolve => {
 		setTimeout(() => {
-			chart.applyOptions({
-				watermark: {
-					visible: true,
-					fontSize: 24,
-					horzAlign: 'center',
-					vertAlign: 'center',
-					color: 'rgba(171, 71, 188, 0.5)',
-					text: 'Watermark',
-					fontFamily: 'Roboto',
-					fontStyle: 'bold',
-				},
+			textWatermark.applyOptions({
+				visible: true,
+				horzAlign: 'center',
+				vertAlign: 'center',
+				lines: [
+					{
+						text: 'Watermark',
+						color: 'rgba(171, 71, 188, 0.5)',
+						fontSize: 24,
+						fontFamily: 'Roboto',
+						fontStyle: 'bold',
+					},
+				],
 			});
 			resolve();
 		}, 300);

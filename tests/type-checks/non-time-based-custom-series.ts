@@ -1,4 +1,4 @@
-import { createChartEx, customSeriesDefaultOptions } from '../../src';
+import { createChartEx, customSeriesDefaultOptions, TextWatermark } from '../../src';
 import { CandlestickData, WhitespaceData } from '../../src/model/data-consumer';
 import { Time } from '../../src/model/horz-scale-behavior-time/types';
 import { CustomData, CustomSeriesPricePlotValues, ICustomSeriesPaneRenderer, ICustomSeriesPaneView, PaneRendererCustomData } from '../../src/model/icustom-series';
@@ -106,3 +106,8 @@ if (dataSet) {
 // @ts-expect-error readonly array
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 dataSet.push({ time: 12 });
+
+const textWatermark = new TextWatermark<HorizontalScaleType>({
+	lines: [],
+});
+chart.panes()[1].attachPrimitive(textWatermark);

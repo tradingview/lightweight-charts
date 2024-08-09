@@ -4,8 +4,8 @@ import {
 	IChartApi,
 	ISeriesApi,
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	LineData,
 	LineStyleOptions,
 	MismatchDirection,
@@ -16,7 +16,7 @@ import {
 } from 'lightweight-charts';
 import { positionsLine } from '../../helpers/dimensions/positions';
 
-class PartialPriceLineRenderer implements ISeriesPrimitivePaneRenderer {
+class PartialPriceLineRenderer implements IPrimitivePaneRenderer {
 	_price: number | null = null;
 	_x: number | null = null;
 	_color: string = '#000000';
@@ -47,13 +47,13 @@ class PartialPriceLineRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-class PartialPriceLineView implements ISeriesPrimitivePaneView {
+class PartialPriceLineView implements IPrimitivePaneView {
 	_renderer: PartialPriceLineRenderer;
 	constructor() {
 		this._renderer = new PartialPriceLineRenderer();
 	}
 
-	renderer(): ISeriesPrimitivePaneRenderer {
+	renderer(): IPrimitivePaneRenderer {
 		return this._renderer;
 	}
 

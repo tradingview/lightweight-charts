@@ -21,6 +21,12 @@ export const customSeriesDefaultOptions: CustomSeriesOptions = {
 
 export { createChart, createChartEx, defaultHorzScaleBehavior } from './api/create-chart';
 
+/*
+	Plugins
+*/
+export { TextWatermark } from './plugins/text-watermark/primitive';
+export { ImageWatermark } from './plugins/image-watermark/primitive';
+
 /**
  * Returns the current version as a string. For example `'3.3.0'`.
  */

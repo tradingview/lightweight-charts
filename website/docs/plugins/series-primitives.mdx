@@ -23,7 +23,7 @@ panes.
 There are two types of views which are supported within `ISeriesPrimitive` which
 are:
 
-- [`ISeriesPrimitivePaneView`](../api/interfaces/ISeriesPrimitivePaneView.md)
+- [`IPrimitivePaneView`](../api/interfaces/IPrimitivePaneView.md)
 - [`ISeriesPrimitiveAxisView`](../api/interfaces/ISeriesPrimitiveAxisView.md)
 
 The library will evoke the following getter functions (if defined) to get
@@ -55,25 +55,25 @@ import sectionsExplainerCode from '!!raw-loader!./explainer-sections-demo.js';
 	{sectionsExplainerCode}
 </CodeBlock>
 
-### ISeriesPrimitivePaneView
+### IPrimitivePaneView
 
-The [`ISeriesPrimitivePaneView`](../api/interfaces/ISeriesPrimitivePaneView.md)
+The [`IPrimitivePaneView`](../api/interfaces/IPrimitivePaneView.md)
 interface can be used to define a view which provides a renderer (implementing
 the
-[`ISeriesPrimitivePaneRenderer`](../api/interfaces/ISeriesPrimitivePaneRenderer.md)
+[`IPrimitivePaneRenderer`](../api/interfaces/IPrimitivePaneRenderer.md)
 interface) for drawing on the corresponding area of the chart using the
 [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
 API. The view can define a
-[`zOrder`](../api/interfaces/ISeriesPrimitivePaneView.md#zorder) to control where
+[`zOrder`](../api/interfaces/IPrimitivePaneView.md#zorder) to control where
 in the visual stack the drawing will occur (See
-[`SeriesPrimitivePaneViewZOrder`](../api/type-aliases/SeriesPrimitivePaneViewZOrder.md)
+[`PrimitivePaneViewZOrder`](../api/type-aliases/PrimitivePaneViewZOrder.md)
 for more information).
 
 Renderers should provide a
-[`draw`](../api/interfaces/ISeriesPrimitivePaneRenderer.md#draw) method which will
+[`draw`](../api/interfaces/IPrimitivePaneRenderer.md#draw) method which will
 be given a `CanvasRenderingTarget2D` target on which it can draw. Additionally,
 a renderer can optionally provide a
-[`drawBackground`](../api/interfaces/ISeriesPrimitivePaneRenderer.md#drawbackground)
+[`drawBackground`](../api/interfaces/IPrimitivePaneRenderer.md#drawbackground)
 method for drawing beneath other elements on the same zOrder.
 
 :::tip

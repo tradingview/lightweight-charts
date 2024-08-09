@@ -1,6 +1,6 @@
 ---
 sidebar_label: Custom Series Types
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Custom Series Types

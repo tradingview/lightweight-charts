@@ -13,17 +13,22 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
+// remove-line
+/** @type {import('lightweight-charts').TextWatermark} */
 // highlight-start
-chart.applyOptions({
-	watermark: {
-		visible: true,
-		fontSize: 24,
-		horzAlign: 'center',
-		vertAlign: 'center',
-		color: 'rgba(171, 71, 188, 0.5)',
-		text: 'Watermark Example',
-	},
+const textWatermark = new TextWatermark({
+	horzAlign: 'center',
+	vertAlign: 'center',
+	lines: [
+		{
+			text: 'Watermark Example',
+			color: 'rgba(171, 71, 188, 0.5)',
+			fontSize: 24,
+		},
+	],
 });
+const firstPane = chart.panes()[0];
+firstPane.attachPrimitive(textWatermark);
 // highlight-end
 
 const lineSeries = chart.addAreaSeries({

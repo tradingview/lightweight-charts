@@ -33,8 +33,9 @@ import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
 import { CustomData, CustomSeriesWhitespaceData, ICustomSeriesPaneView, WhitespaceCheck } from './icustom-series';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
+import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from './ipane-primitive';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
-import { ISeriesPrimitiveBase, PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
+import { ISeriesPrimitiveBase } from './iseries-primitive';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
 import { MismatchDirection } from './plot-list';
@@ -61,7 +62,7 @@ type PrimitivePaneViewExtractor = (wrapper: SeriesPrimitiveWrapper) => readonly 
 function extractPrimitivePaneViews(
 	primitives: SeriesPrimitiveWrapper[],
 	extractor: PrimitivePaneViewExtractor,
-	zOrder: SeriesPrimitivePaneViewZOrder,
+	zOrder: PrimitivePaneViewZOrder,
 	destination: IPaneView[]
 ): void {
 	primitives.forEach((wrapper: SeriesPrimitiveWrapper) => {
@@ -440,11 +441,11 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return this._extractPaneViews(primitivePaneViewsExtractor, 'bottom');
 	}
 
-	public pricePaneViews(zOrder: SeriesPrimitivePaneViewZOrder): readonly IPaneView[] {
+	public pricePaneViews(zOrder: PrimitivePaneViewZOrder): readonly IPaneView[] {
 		return this._extractPaneViews(primitivePricePaneViewsExtractor, zOrder);
 	}
 
-	public timePaneViews(zOrder: SeriesPrimitivePaneViewZOrder): readonly IPaneView[] {
+	public timePaneViews(zOrder: PrimitivePaneViewZOrder): readonly IPaneView[] {
 		return this._extractPaneViews(primitiveTimePaneViewsExtractor, zOrder);
 	}
 
@@ -783,7 +784,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		}
 	}
 
-	private _extractPaneViews(extractor: PrimitivePaneViewExtractor, zOrder: SeriesPrimitivePaneViewZOrder): readonly IPaneView[] {
+	private _extractPaneViews(extractor: PrimitivePaneViewExtractor, zOrder: PrimitivePaneViewZOrder): readonly IPaneView[] {
 		const res: IPaneView[] = [];
 		extractPrimitivePaneViews(this._primitives, extractor, zOrder, res);
 		return res;

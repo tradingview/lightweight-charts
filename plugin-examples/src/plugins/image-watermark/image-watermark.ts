@@ -2,10 +2,10 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
 	IChartApi,
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	SeriesAttachedParameter,
-	SeriesPrimitivePaneViewZOrder,
+	PrimitivePaneViewZOrder,
 	Time,
 } from 'lightweight-charts';
 
@@ -16,7 +16,7 @@ export interface ImageWatermarkOptions {
 	alpha?: number;
 }
 
-class ImageWatermarkPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class ImageWatermarkPaneRenderer implements IPrimitivePaneRenderer {
 	_source: ImageWatermark;
 	_view: ImageWatermarkPaneView;
 
@@ -50,7 +50,7 @@ interface Placement {
 	width: number;
 }
 
-class ImageWatermarkPaneView implements ISeriesPrimitivePaneView {
+class ImageWatermarkPaneView implements IPrimitivePaneView {
 	_source: ImageWatermark;
 	_placement: Placement | null = null;
 
@@ -58,7 +58,7 @@ class ImageWatermarkPaneView implements ISeriesPrimitivePaneView {
 		this._source = source;
 	}
 
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'bottom';
 	}
 

@@ -2,7 +2,7 @@ import {
 	IChartApi,
 	ISeriesApi,
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneView,
 	PrimitiveHoveredItem,
 	SeriesAttachedParameter,
 	SeriesType,
@@ -78,11 +78,11 @@ export class UserPriceAlerts
 		this._series = undefined;
 	}
 
-	paneViews(): readonly ISeriesPrimitivePaneView[] {
+	paneViews(): readonly IPrimitivePaneView[] {
 		return this._paneViews;
 	}
 
-	priceAxisPaneViews(): readonly ISeriesPrimitivePaneView[] {
+	priceAxisPaneViews(): readonly IPrimitivePaneView[] {
 		return this._pricePaneViews;
 	}
 

@@ -4,9 +4,13 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { Coordinate } from './coordinate';
-import { PrimitiveHoveredItem, SeriesPrimitivePaneViewZOrder } from './iseries-primitive';
+import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from './ipane-primitive';
 import { Pane } from './pane';
 import { PriceScale } from './price-scale';
+
+export interface IPrimitiveHitTestSource {
+	primitiveHitTest?(x: Coordinate, y: Coordinate): PrimitiveHoveredItem[];
+}
 
 export interface ZOrdered {
 	zorder(): number | null;
@@ -16,14 +20,13 @@ export interface ZOrdered {
  * - bottom: Pane views that are painted at the bottom (above background color, below grid lines)
  * - top: Pane views that are painted on the most top layer and ABOVE the crosshair
  */
-interface IPluginPaneViews {
+interface IPluginPaneViews extends IPrimitiveHitTestSource {
 	bottomPaneViews?(pane: Pane): readonly IPaneView[];
-	pricePaneViews?(zOrder: SeriesPrimitivePaneViewZOrder): readonly IAxisView[];
-	timePaneViews?(zOrder: SeriesPrimitivePaneViewZOrder): readonly IAxisView[];
-	primitiveHitTest?(x: Coordinate, y: Coordinate): PrimitiveHoveredItem[];
+	pricePaneViews?(zOrder: PrimitivePaneViewZOrder): readonly IAxisView[];
+	timePaneViews?(zOrder: PrimitivePaneViewZOrder): readonly IAxisView[];
 }
 
-interface IDataSourcePaneViews extends IPluginPaneViews {
+export interface IDataSourcePaneViews extends IPluginPaneViews {
 	paneViews(pane: Pane): readonly IPaneView[];
 	labelPaneViews(pane?: Pane): readonly IPaneView[];
 

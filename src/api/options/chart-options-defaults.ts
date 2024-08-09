@@ -7,7 +7,6 @@ import { gridOptionsDefaults } from './grid-options-defaults';
 import { layoutOptionsDefaults } from './layout-options-defaults';
 import { priceScaleOptionsDefaults } from './price-scale-options-defaults';
 import { timeScaleOptionsDefaults } from './time-scale-options-defaults';
-import { watermarkOptionsDefaults } from './watermark-options-defaults';
 
 export function chartOptionsDefaults<HorzScaleItem>(): ChartOptionsInternal<HorzScaleItem> {
 	return {
@@ -29,7 +28,6 @@ export function chartOptionsDefaults<HorzScaleItem>(): ChartOptionsInternal<Horz
 			visible: true,
 		},
 		timeScale: timeScaleOptionsDefaults,
-		watermark: watermarkOptionsDefaults,
 		localization: {
 			locale: isRunningOnClientSide ? navigator.language : '',
 			dateFormat: 'dd MMM \'yy',
