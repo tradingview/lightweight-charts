@@ -163,6 +163,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
+			this._state.destroy();
 		}
 
 		this._mouseEventHandler.destroy();
