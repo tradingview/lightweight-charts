@@ -43,6 +43,6 @@ export interface MarkerCoordinates {
 }
 
 /**
- * Defines the supported series types for markers.
+ * Defines the supported series types for up down markers primitive plugin.
  */
-export type SupportedSeriesTypes = 'Line' | 'Area';
+export type UpDownMarkersSupportedSeriesTypes = 'Line' | 'Area';

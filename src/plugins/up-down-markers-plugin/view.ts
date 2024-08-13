@@ -16,27 +16,27 @@ import { MarkersPrimitiveRenderer } from './renderer';
 import {
 	MarkerCoordinates,
 	SeriesUpDownMarker,
-	SupportedSeriesTypes,
+	UpDownMarkersSupportedSeriesTypes,
 } from './types';
 
-function isAreaStyleOptions(opts: SupportedSeriesOptions, seriesType: SupportedSeriesTypes): opts is AreaSeriesOptions {
+function isAreaStyleOptions(opts: SupportedSeriesOptions, seriesType: UpDownMarkersSupportedSeriesTypes): opts is AreaSeriesOptions {
 	return seriesType === 'Area';
 }
 
-function getNeutralColor<TSeriesType extends SupportedSeriesTypes>(opts: LineSeriesOptions | AreaSeriesOptions, seriesType: TSeriesType): string {
+function getNeutralColor<TSeriesType extends UpDownMarkersSupportedSeriesTypes>(opts: LineSeriesOptions | AreaSeriesOptions, seriesType: TSeriesType): string {
 	if (isAreaStyleOptions(opts, seriesType)) {
 		return opts.lineColor;
 	}
 	return opts.color;
 }
 
-type SupportedSeriesOptions = SeriesOptionsMap[SupportedSeriesTypes];
+type SupportedSeriesOptions = SeriesOptionsMap[UpDownMarkersSupportedSeriesTypes];
 
 export class MarkersPrimitivePaneView<
 	HorzScaleItem,
-	TSeriesType extends SupportedSeriesTypes
+	TSeriesType extends UpDownMarkersSupportedSeriesTypes
 > implements IPrimitivePaneView {
-	private readonly _series: ISeriesApi<SupportedSeriesTypes, HorzScaleItem>;
+	private readonly _series: ISeriesApi<UpDownMarkersSupportedSeriesTypes, HorzScaleItem>;
 	private readonly _timeScale: ITimeScaleApi<HorzScaleItem>;
 	private readonly _options: UpDownMarkersPluginOptions;
 	private _data: MarkerCoordinates[] = [];

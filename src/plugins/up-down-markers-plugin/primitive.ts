@@ -13,12 +13,12 @@ import {
 	upDownMarkersPluginOptionDefaults,
 	UpDownMarkersPluginOptions,
 } from './options';
-import { SeriesUpDownMarker, SupportedSeriesTypes } from './types';
+import { SeriesUpDownMarker, UpDownMarkersSupportedSeriesTypes } from './types';
 import { MarkersPrimitivePaneView } from './view';
 
 function isLineData<T>(
-	item: SeriesDataItemTypeMap<T>[SupportedSeriesTypes],
-	type: SupportedSeriesTypes
+	item: SeriesDataItemTypeMap<T>[UpDownMarkersSupportedSeriesTypes],
+	type: UpDownMarkersSupportedSeriesTypes
 ): item is LineData<T> {
 	return type === 'Line' || type === 'Area';
 }
@@ -44,14 +44,14 @@ function isLineData<T>(
  */
 export class UpDownMarkersPrimitive<
 	HorzScaleItem,
-	TData extends SeriesDataItemTypeMap<HorzScaleItem>[SupportedSeriesTypes] = SeriesDataItemTypeMap<HorzScaleItem>['Line']
+	TData extends SeriesDataItemTypeMap<HorzScaleItem>[UpDownMarkersSupportedSeriesTypes] = SeriesDataItemTypeMap<HorzScaleItem>['Line']
 > {
 	private _chart: IChartApiBase<HorzScaleItem> | undefined = undefined;
-	private _series: ISeriesApi<SupportedSeriesTypes, HorzScaleItem> | undefined =
+	private _series: ISeriesApi<UpDownMarkersSupportedSeriesTypes, HorzScaleItem> | undefined =
 		undefined;
 	private _paneViews: MarkersPrimitivePaneView<
 		HorzScaleItem,
-		SupportedSeriesTypes
+		UpDownMarkersSupportedSeriesTypes
 	>[] = [];
 	private _markersManager: ExpiringMarkerManager<HorzScaleItem>;
 	private _requestUpdate?: () => void;
@@ -123,7 +123,7 @@ export class UpDownMarkersPrimitive<
 			horzScaleBehavior,
 		} = params;
 		this._chart = chart;
-		this._series = series as ISeriesApi<SupportedSeriesTypes, HorzScaleItem>;
+		this._series = series as ISeriesApi<UpDownMarkersSupportedSeriesTypes, HorzScaleItem>;
 		this._horzScaleBehavior = horzScaleBehavior;
 		const seriesType = this._series.seriesType();
 		if (seriesType !== 'Area' && seriesType !== 'Line') {
@@ -155,13 +155,13 @@ export class UpDownMarkersPrimitive<
 		return ensureDefined(this._chart);
 	}
 
-	public series(): ISeriesApi<SupportedSeriesTypes, HorzScaleItem> {
+	public series(): ISeriesApi<UpDownMarkersSupportedSeriesTypes, HorzScaleItem> {
 		return ensureDefined(this._series);
 	}
 
 	public updateAllViews(): void {
 		this._paneViews.forEach(
-			(pw: MarkersPrimitivePaneView<HorzScaleItem, SupportedSeriesTypes>) =>
+			(pw: MarkersPrimitivePaneView<HorzScaleItem, UpDownMarkersSupportedSeriesTypes>) =>
 				pw.update(this.markers())
 		);
 	}
