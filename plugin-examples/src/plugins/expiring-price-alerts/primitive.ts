@@ -1,6 +1,6 @@
 import {
-	ISeriesPrimitivePaneView,
-	ISeriesPrimitivePaneRenderer,
+	IPrimitivePaneView,
+	IPrimitivePaneRenderer,
 	Time,
 	AutoscaleInfo,
 } from 'lightweight-charts';
@@ -9,7 +9,7 @@ import { ExpiringPriceAlerts } from './expiring-price-alerts';
 import { upArrowIcon, tickIcon, cancelIcon, downArrowIcon } from './icons';
 import { ExpiringPriceAlertsPaneRenderer, RendererDataItem } from './renderer';
 
-class ExpiringPriceAlertsPaneView implements ISeriesPrimitivePaneView {
+class ExpiringPriceAlertsPaneView implements IPrimitivePaneView {
 	_source: ExpiringPriceAlerts;
 	_renderer: ExpiringPriceAlertsPaneRenderer;
 
@@ -18,7 +18,7 @@ class ExpiringPriceAlertsPaneView implements ISeriesPrimitivePaneView {
 		this._renderer = new ExpiringPriceAlertsPaneRenderer();
 	}
 
-	renderer(): ISeriesPrimitivePaneRenderer {
+	renderer(): IPrimitivePaneRenderer {
 		return this._renderer;
 	}
 
@@ -96,7 +96,7 @@ export class ExpiringAlertPrimitive extends PluginBase {
 		this._views.forEach(view => view.update());
 	}
 
-	paneViews(): readonly ISeriesPrimitivePaneView[] {
+	paneViews(): readonly IPrimitivePaneView[] {
 		return this._views;
 	}
 

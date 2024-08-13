@@ -2,14 +2,18 @@ import { IChartWidgetBase } from '../gui/chart-widget';
 
 import { assert } from '../helpers/assertions';
 
+import { IPanePrimitiveBase } from '../model/ipane-primitive';
 import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
 
+import { IChartApiBase } from './ichart-api';
 import { IPaneApi } from './ipane-api';
+import { IPanePrimitive } from './ipane-primitive-api';
 import { ISeriesApi } from './iseries-api';
 
 export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
+	protected readonly _chartApi: IChartApiBase<HorzScaleItem>;
 	private _chartWidget: IChartWidgetBase;
 	private _pane: Pane;
 	private readonly _seriesApiGetter: (series: Series<SeriesType>) => ISeriesApi<SeriesType, HorzScaleItem>;
@@ -17,11 +21,13 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 	public constructor(
 		chartWidget: IChartWidgetBase,
 		seriesApiGetter: (series: Series<SeriesType>) => ISeriesApi<SeriesType, HorzScaleItem>,
-		pane: Pane
+		pane: Pane,
+		chartApi: IChartApiBase<HorzScaleItem>
 	) {
 		this._chartWidget = chartWidget;
 		this._pane = pane;
 		this._seriesApiGetter = seriesApiGetter;
+		this._chartApi = chartApi;
 	}
 
 	public getHeight(): number {
@@ -56,5 +62,19 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 
 	public getHTMLElement(): HTMLElement {
 		return this._chartWidget.paneWidgets()[this.paneIndex()].getElement();
+	}
+
+	public attachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void {
+		this._pane.attachPrimitive(primitive as IPanePrimitiveBase<unknown>);
+		if (primitive.attached) {
+			primitive.attached({
+				chart: this._chartApi,
+				requestUpdate: () => this._pane.model().fullUpdate(),
+			});
+		}
+	}
+
+	public detachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void {
+		this._pane.detachPrimitive(primitive as IPanePrimitiveBase<unknown>);
 	}
 }

@@ -1,10 +1,10 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
 	CrosshairMode,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	MouseEventParams,
-	SeriesPrimitivePaneViewZOrder,
+	PrimitivePaneViewZOrder,
 	ISeriesPrimitive,
 	SeriesAttachedParameter,
 	LineData,
@@ -16,7 +16,7 @@ import { TooltipElement, TooltipOptions } from './tooltip-element';
 import { convertTime, formattedDateAndTime } from '../../helpers/time';
 import { positionsLine } from '../../helpers/dimensions/positions';
 
-class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
+class TooltipCrosshairLinePaneRenderer implements IPrimitivePaneRenderer {
 	_data: TooltipCrosshairLineData;
 
 	constructor(data: TooltipCrosshairLineData) {
@@ -43,7 +43,7 @@ class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-class MultiTouchCrosshairPaneView implements ISeriesPrimitivePaneView {
+class MultiTouchCrosshairPaneView implements IPrimitivePaneView {
 	_data: TooltipCrosshairLineData;
 	constructor(data: TooltipCrosshairLineData) {
 		this._data = data;
@@ -53,11 +53,11 @@ class MultiTouchCrosshairPaneView implements ISeriesPrimitivePaneView {
 		this._data = data;
 	}
 
-	renderer(): ISeriesPrimitivePaneRenderer | null {
+	renderer(): IPrimitivePaneRenderer | null {
 		return new TooltipCrosshairLinePaneRenderer(this._data);
 	}
 
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'bottom';
 	}
 }

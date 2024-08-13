@@ -430,7 +430,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private _getPaneApi(pane: Pane): PaneApi<HorzScaleItem> {
 		let result = this._panes.get(pane);
 		if (!result) {
-			result = new PaneApi(this._chartWidget, (series: Series<SeriesType>) => this._mapSeriesToApi(series), pane);
+			result = new PaneApi(this._chartWidget, (series: Series<SeriesType>) => this._mapSeriesToApi(series), pane, this);
 			this._panes.set(pane, result);
 		}
 

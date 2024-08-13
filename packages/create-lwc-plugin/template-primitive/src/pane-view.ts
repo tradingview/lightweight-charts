@@ -1,4 +1,4 @@
-import { Coordinate, ISeriesPrimitivePaneView } from 'lightweight-charts';
+import { Coordinate, IPrimitivePaneView } from 'lightweight-charts';
 import { _CLASSNAME_PaneRenderer } from './pane-renderer';
 import { _CLASSNAME_DataSource } from './data-source';
 
@@ -7,7 +7,7 @@ export interface ViewPoint {
 	y: Coordinate | null;
 }
 
-export class _CLASSNAME_PaneView implements ISeriesPrimitivePaneView {
+export class _CLASSNAME_PaneView implements IPrimitivePaneView {
 	_source: _CLASSNAME_DataSource;
 	_p1: ViewPoint = { x: null, y: null };
 	_p2: ViewPoint = { x: null, y: null };

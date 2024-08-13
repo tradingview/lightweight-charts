@@ -25,6 +25,12 @@ export { createOptionsChart } from './api/create-options-chart';
 
 export { UpDownMarkersPrimitive } from './plugins/up-down-markers-plugin/primitive';
 
+/*
+	Plugins
+*/
+export { TextWatermark } from './plugins/text-watermark/primitive';
+export { ImageWatermark } from './plugins/image-watermark/primitive';
+
 /**
  * Returns the current version as a string. For example `'3.3.0'`.
  */

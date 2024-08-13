@@ -1,8 +1,8 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	SeriesAttachedParameter,
 	Time,
 } from 'lightweight-charts';
@@ -16,7 +16,7 @@ interface AnchoredTextOptions {
 	color: string;
 }
 
-class AnchoredTextRenderer implements ISeriesPrimitivePaneRenderer {
+class AnchoredTextRenderer implements IPrimitivePaneRenderer {
 	_data: AnchoredTextOptions;
 
 	constructor(options: AnchoredTextOptions) {
@@ -61,7 +61,7 @@ class AnchoredTextRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-class AnchoredTextPaneView implements ISeriesPrimitivePaneView {
+class AnchoredTextPaneView implements IPrimitivePaneView {
 	private _source: AnchoredText;
 	constructor(source: AnchoredText) {
 		this._source = source;

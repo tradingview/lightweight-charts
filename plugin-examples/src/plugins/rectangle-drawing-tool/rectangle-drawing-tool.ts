@@ -5,10 +5,10 @@ import {
 	isBusinessDay,
 	ISeriesApi,
 	ISeriesPrimitiveAxisView,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	MouseEventParams,
-	SeriesPrimitivePaneViewZOrder,
+	PrimitivePaneViewZOrder,
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
@@ -16,7 +16,7 @@ import { ensureDefined } from '../../helpers/assertions';
 import { PluginBase } from '../plugin-base';
 import { positionsBox } from '../../helpers/dimensions/positions';
 
-class RectanglePaneRenderer implements ISeriesPrimitivePaneRenderer {
+class RectanglePaneRenderer implements IPrimitivePaneRenderer {
 	_p1: ViewPoint;
 	_p2: ViewPoint;
 	_fillColor: string;
@@ -63,7 +63,7 @@ interface ViewPoint {
 	y: Coordinate | null;
 }
 
-class RectanglePaneView implements ISeriesPrimitivePaneView {
+class RectanglePaneView implements IPrimitivePaneView {
 	_source: Rectangle;
 	_p1: ViewPoint = { x: null, y: null };
 	_p2: ViewPoint = { x: null, y: null };
@@ -92,7 +92,7 @@ class RectanglePaneView implements ISeriesPrimitivePaneView {
 	}
 }
 
-class RectangleAxisPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class RectangleAxisPaneRenderer implements IPrimitivePaneRenderer {
 	_p1: number | null;
 	_p2: number | null;
 	_fillColor: string;
@@ -130,7 +130,7 @@ class RectangleAxisPaneRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-abstract class RectangleAxisPaneView implements ISeriesPrimitivePaneView {
+abstract class RectangleAxisPaneView implements IPrimitivePaneView {
 	_source: Rectangle;
 	_p1: number | null = null;
 	_p2: number | null = null;
@@ -155,7 +155,7 @@ abstract class RectangleAxisPaneView implements ISeriesPrimitivePaneView {
 			this._vertical
 		);
 	}
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'bottom';
 	}
 }
