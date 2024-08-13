@@ -37,9 +37,14 @@ function runTestCase(container) {
 	} catch (e) {
 		// passed
 	}
-	mainSeries.update(
-		{ ...thirdLastPoint, value: thirdLastPoint.value - 10 },
-		true
-	);
+	try {
+		mainSeries.update(
+			{ ...thirdLastPoint, value: thirdLastPoint.value - 10 },
+			true
+		);
+	} catch (e) {
+		// would fail on older version of library,
+		// but graphics difference should be visible
+	}
 	chart.timeScale().fitContent();
 }
