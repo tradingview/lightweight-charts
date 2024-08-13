@@ -1,4 +1,5 @@
 import { Time } from '../model/horz-scale-behavior-time/types';
+import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { SeriesOptionsMap, SeriesType } from '../model/series-options';
 
@@ -25,6 +26,10 @@ export interface SeriesAttachedParameter<
 	 * Request an update (redraw the chart)
 	 */
 	requestUpdate: () => void;
+	/**
+	 * Horizontal Scale Behaviour for the chart.
+	 */
+	horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 }
 
 /**
