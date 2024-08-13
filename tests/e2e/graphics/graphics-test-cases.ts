@@ -21,7 +21,7 @@ const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFilePath);
 
 const TEST_CASE_TIMEOUT = 5000;
-const NUMBER_RETRIES = 3;
+const NUMBER_RETRIES = 0;
 
 const dummyContent = fs.readFileSync(path.join(currentDirectory, 'helpers', 'test-page-dummy.html'), { encoding: 'utf-8' });
 const resizeObserverPolyfill = fs.readFileSync(
