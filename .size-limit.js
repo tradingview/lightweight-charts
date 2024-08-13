@@ -8,7 +8,7 @@ export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '46.00 KB',
+		limit: '47.00 KB',
 		import: '*',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -56,6 +56,22 @@ export default [
 		name: 'Standalone',
 		path: 'dist/lightweight-charts.standalone.production.js',
 		limit: '50.00 KB',
+		brotli: true,
+	},
+	{
+		name: 'Plugin: Text Watermark',
+		path: 'dist/lightweight-charts.production.mjs',
+		import: '{ TextWatermark }',
+		ignore: ['fancy-canvas'],
+		limit: '2.00 KB',
+		brotli: true,
+	},
+	{
+		name: 'Plugin: Image Watermark',
+		path: 'dist/lightweight-charts.production.mjs',
+		import: '{ ImageWatermark }',
+		ignore: ['fancy-canvas'],
+		limit: '2.00 KB',
 		brotli: true,
 	},
 	{
