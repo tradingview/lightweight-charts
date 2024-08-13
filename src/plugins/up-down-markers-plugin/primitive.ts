@@ -6,7 +6,7 @@ import { ensureDefined } from '../../helpers/assertions';
 
 import { isFulfilledData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from '../../model/data-consumer';
 import { IHorzScaleBehavior, InternalHorzScaleItemKey } from '../../model/ihorz-scale-behavior';
-import { ISeriesPrimitivePaneView } from '../../model/iseries-primitive';
+import { IPrimitivePaneView } from '../../model/ipane-primitive';
 
 import { ExpiringMarkerManager } from './expiring-markers-manager';
 import {
@@ -166,7 +166,7 @@ export class UpDownMarkersPrimitive<
 		);
 	}
 
-	public paneViews(): readonly ISeriesPrimitivePaneView[] {
+	public paneViews(): readonly IPrimitivePaneView[] {
 		return this._paneViews;
 	}
 

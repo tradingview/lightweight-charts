@@ -3,7 +3,7 @@ import {
 	CanvasRenderingTarget2D,
 } from 'fancy-canvas';
 
-import { ISeriesPrimitivePaneRenderer } from '../../model/iseries-primitive';
+import { IPrimitivePaneRenderer } from '../../model/ipane-primitive';
 
 import { MarkerCoordinates } from './types';
 
@@ -15,7 +15,7 @@ const enum Constants {
 	VerticalScale = 0.5,
 }
 
-export class MarkersPrimitiveRenderer implements ISeriesPrimitivePaneRenderer {
+export class MarkersPrimitiveRenderer implements IPrimitivePaneRenderer {
 	private _data: MarkerCoordinates[];
 	private readonly _neutralColor: string;
 	private readonly _negativeColor: string;

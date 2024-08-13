@@ -4,7 +4,7 @@ import { ITimeScaleApi } from '../../api/itime-scale-api';
 import { ensureNotNull } from '../../helpers/assertions';
 import { notNull } from '../../helpers/strict-type-checks';
 
-import { ISeriesPrimitivePaneView } from '../../model/iseries-primitive';
+import { IPrimitivePaneView } from '../../model/ipane-primitive';
 import {
 	AreaSeriesOptions,
 	LineSeriesOptions,
@@ -35,7 +35,7 @@ type SupportedSeriesOptions = SeriesOptionsMap[SupportedSeriesTypes];
 export class MarkersPrimitivePaneView<
 	HorzScaleItem,
 	TSeriesType extends SupportedSeriesTypes
-> implements ISeriesPrimitivePaneView {
+> implements IPrimitivePaneView {
 	private readonly _series: ISeriesApi<SupportedSeriesTypes, HorzScaleItem>;
 	private readonly _timeScale: ITimeScaleApi<HorzScaleItem>;
 	private readonly _options: UpDownMarkersPluginOptions;
