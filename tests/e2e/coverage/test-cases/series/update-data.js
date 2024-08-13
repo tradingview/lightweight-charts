@@ -100,7 +100,7 @@ async function afterInteractions() {
 	);
 	lineSeries.update(
 		{
-			time: barData[barData.length - 6],
+			time: barData[barData.length - 6].time,
 		},
 		true // historical update
 	);
