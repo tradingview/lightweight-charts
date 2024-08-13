@@ -17,28 +17,40 @@ const viewportWidth = 600;
 const viewportHeight = 600;
 
 export class Screenshoter {
-	private _browserPromise: Promise<Browser>;
+	private _browserPromise: Promise<Browser> | null = null;
+	private _noSandbox: boolean;
+	private _devicePixelRatio: number;
 
 	public constructor(noSandbox: boolean, devicePixelRatio: number = 1) {
+		this._noSandbox = noSandbox;
+		this._devicePixelRatio = devicePixelRatio;
+		void this.start();
+	}
+
+	public async start(): Promise<void> {
+		await this.close();
 		const puppeteerOptions: PuppeteerLaunchOptions = {
 			defaultViewport: {
-				deviceScaleFactor: devicePixelRatio,
+				deviceScaleFactor: this._devicePixelRatio,
 				width: viewportWidth,
 				height: viewportHeight,
 			},
 			headless: true,
 		};
 
-		if (noSandbox) {
+		if (this._noSandbox) {
 			puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
 		}
 
 		this._browserPromise = launchPuppeteer(puppeteerOptions);
+		await this._browserPromise;
 	}
 
 	public async close(): Promise<void> {
 		const browser = await this._browserPromise;
-		await browser.close();
+		if (browser) {
+			await browser.close();
+		}
 	}
 
 	public async generateScreenshot(pageContent: string): Promise<PNG> {
@@ -46,6 +58,9 @@ export class Screenshoter {
 
 		try {
 			const browser = await this._browserPromise;
+			if (!browser) {
+				throw new Error('Browser not created');
+			}
 			page = await browser.newPage();
 
 			const errors: string[] = [];
