@@ -18,7 +18,7 @@ import { makeFont } from '../helpers/make-font';
 import { IDataSource } from '../model/idata-source';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
+import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { Pane } from '../model/pane';
 import { TextWidthCache } from '../model/text-width-cache';
@@ -28,7 +28,7 @@ import { IAxisView } from '../views/pane/iaxis-view';
 
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
-import { drawBackground, drawForeground, drawSourcePaneViews } from './draw-functions';
+import { drawBackground, drawForeground, drawSourceViews } from './draw-functions';
 import { ITimeAxisViewsGetter } from './iaxis-view-getters';
 import { MouseEventHandler, MouseEventHandlers, MouseEventHandlerTouchEvent, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
@@ -43,7 +43,7 @@ const enum CursorType {
 	EwResize,
 }
 
-function buildTimeAxisViewsGetter(zOrder: SeriesPrimitivePaneViewZOrder): ITimeAxisViewsGetter {
+function buildTimeAxisViewsGetter(zOrder: PrimitivePaneViewZOrder): ITimeAxisViewsGetter {
 	return (source: IDataSource): readonly IAxisView[] => source.timePaneViews?.(zOrder) ?? [];
 }
 const sourcePaneViews = buildTimeAxisViewsGetter('normal');
@@ -338,7 +338,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		const sources = this._chart.model().serieses();
 
 		for (const source of sources) {
-			drawSourcePaneViews(
+			drawSourceViews(
 				axisViewsGetter,
 				(renderer: IPaneRenderer) => drawBackground(renderer, target, false, undefined),
 				source,
@@ -347,7 +347,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		}
 
 		for (const source of sources) {
-			drawSourcePaneViews(
+			drawSourceViews(
 				axisViewsGetter,
 				(renderer: IPaneRenderer) => drawForeground(renderer, target, false, undefined),
 				source,

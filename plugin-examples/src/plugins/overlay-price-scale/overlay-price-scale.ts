@@ -6,8 +6,8 @@ import {
 	IPriceFormatter,
 	ISeriesApi,
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	SeriesAttachedParameter,
 	SeriesType,
 	Time,
@@ -39,7 +39,7 @@ const sideMargin = 10;
 const fontSize = 12;
 const radius = 4;
 
-class OverlayPriceScaleRenderer implements ISeriesPrimitivePaneRenderer {
+class OverlayPriceScaleRenderer implements IPrimitivePaneRenderer {
 	_data: RendererData | null = null;
 	update(data: RendererData) {
 		this._data = data;
@@ -109,13 +109,13 @@ class OverlayPriceScaleRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-class OverlayPriceScaleView implements ISeriesPrimitivePaneView {
+class OverlayPriceScaleView implements IPrimitivePaneView {
 	_renderer: OverlayPriceScaleRenderer;
 	constructor() {
 		this._renderer = new OverlayPriceScaleRenderer();
 	}
 
-	renderer(): ISeriesPrimitivePaneRenderer {
+	renderer(): IPrimitivePaneRenderer {
 		return this._renderer;
 	}
 

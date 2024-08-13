@@ -8,11 +8,14 @@ sidebar_position: 0
 The library provides a rich set of charting capabilities out of the box, but
 developers can also extend its functionality by building custom plugins.
 
-Plugins in Lightweight Charts™️ come in two types:
-[custom series](#custom-series) and [drawing primitives](#drawing-primitives).
+Plugins in Lightweight Charts™️ come in three types:
+[custom series](#custom-series), [drawing primitives](#drawing-primitives),
+and [pane primitives](#pane-primitives).
 Custom series allow developers to define new types of series, while drawing
 primitives enable the creation of custom visualizations, drawing tools, and
 chart annotations (and more) which can be attached to an existing series.
+Pane primitives are similar to series primitives but are attached to the chart
+pane itself, allowing for chart-wide annotations or features like watermarks.
 
 :::tip Picking between the Custom Series and Drawing Primitives
 
@@ -115,30 +118,30 @@ const data = [
 lineSeries.attachPrimitive(myCustomPrimitive);
 ```
 
-### Adding a primitive to the chart instead of a series
+## Pane Primitives
 
-It is required that a drawing primitive is attached to series on the chart. In some cases, it might not make sense to attach a primitive to a specific series on the chart, for example if you are dynamically adding and removing series but would like a specific primitive to remain on the chart always. If this is the case then it is recommended to create an empty series (of any type) and attach the primitive to that instead.
+Pane Primitives are similar to Series Primitives but are attached to the chart pane itself rather than a specific series. They are ideal for creating chart-wide annotations or features that are not tied to any particular series data.
 
-:::caution
+### Adding a Pane Primitive to a chart
 
-This series wouldn't have data, and thus wouldn't have the concept of price values for the vertical positioning of items. In some cases, such as a watermark, this isn't an issue.
+A Pane Primitive can be added to a chart using the `attachPrimitive()` method on the `IPaneApi` interface. Here's an example:
 
-:::
+```javascript
+class MyCustomPanePrimitive {
+    /* Class implementing the IPanePrimitive interface */
+}
 
-**Example:**
-
-```js title='javascript'
-// ...
-// Create an instantiated series primitive.
-const myCustomPrimitive = new MyCustomPrimitive();
+// Create an instantiated pane primitive.
+const myCustomPanePrimitive = new MyCustomPanePrimitive();
 
 const chart = createChart(document.getElementById('container'));
+const mainPane = chart.panes()[0]; // Get the main pane
 
-// an empty series which won't ever have data
-const chartSeries = chart.addLineSeries();
-chartSeries.attachPrimitive(myCustomPrimitive);
-
+// Attach the primitive to the pane
+mainPane.attachPrimitive(myCustomPanePrimitive);
 ```
+
+Pane Primitives offer a powerful way to add chart-wide features or annotations without the need to associate them with a specific series.
 
 ## Examples
 

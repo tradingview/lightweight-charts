@@ -1,5 +1,6 @@
 import { SeriesType } from '../model/series-options';
 
+import { IPanePrimitive } from './ipane-primitive-api';
 import { ISeriesApi } from './iseries-api';
 
 /**
@@ -47,4 +48,19 @@ export interface IPaneApi<HorzScaleItem> {
 	 * @returns The HTML element of the pane.
 	 */
 	getHTMLElement(): HTMLElement;
+
+	/**
+	 * Attaches additional drawing primitive to the pane
+	 *
+	 * @param primitive - any implementation of IPanePrimitive interface
+	 */
+	attachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void;
+
+	/**
+	 * Detaches additional drawing primitive from the pane
+	 *
+	 * @param primitive - implementation of IPanePrimitive interface attached before
+	 * Does nothing if specified primitive was not attached
+	 */
+	detachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void;
 }

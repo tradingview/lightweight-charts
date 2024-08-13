@@ -8,15 +8,12 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
-import { Coordinate } from './coordinate';
+import { IPrimitivePaneRenderer, IPrimitivePaneView, PrimitivePaneViewZOrder } from './ipane-primitive';
 import {
 	ISeriesPrimitiveAxisView,
 	ISeriesPrimitiveBase,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
-	PrimitiveHoveredItem,
-	SeriesPrimitivePaneViewZOrder,
 } from './iseries-primitive';
+import { PrimitiveWrapper } from './pane-primitive-wrapper';
 import { PriceScale } from './price-scale';
 import { Series } from './series';
 import { AutoscaleInfo, SeriesType } from './series-options';
@@ -24,9 +21,9 @@ import { Logical, TimePointIndex } from './time-data';
 import { ITimeScale } from './time-scale';
 
 class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
-	private readonly _baseRenderer: ISeriesPrimitivePaneRenderer;
+	private readonly _baseRenderer: IPrimitivePaneRenderer;
 
-	public constructor(baseRenderer: ISeriesPrimitivePaneRenderer) {
+	public constructor(baseRenderer: IPrimitivePaneRenderer) {
 		this._baseRenderer = baseRenderer;
 	}
 
@@ -45,14 +42,14 @@ interface RendererCache<Base, Wrapper> {
 }
 
 export interface ISeriesPrimitivePaneViewWrapper extends IPaneView {
-	zOrder(): SeriesPrimitivePaneViewZOrder;
+	zOrder(): PrimitivePaneViewZOrder;
 }
 
 class SeriesPrimitivePaneViewWrapper implements IPaneView {
-	private readonly _paneView: ISeriesPrimitivePaneView;
-	private _cache: RendererCache<ISeriesPrimitivePaneRenderer, SeriesPrimitiveRendererWrapper> | null = null;
+	private readonly _paneView: IPrimitivePaneView;
+	private _cache: RendererCache<IPrimitivePaneRenderer, SeriesPrimitiveRendererWrapper> | null = null;
 
-	public constructor(paneView: ISeriesPrimitivePaneView) {
+	public constructor(paneView: IPrimitivePaneView) {
 		this._paneView = paneView;
 	}
 
@@ -72,7 +69,7 @@ class SeriesPrimitivePaneViewWrapper implements IPaneView {
 		return wrapper;
 	}
 
-	public zOrder(): SeriesPrimitivePaneViewZOrder {
+	public zOrder(): PrimitivePaneViewZOrder {
 		return this._paneView.zOrder?.() ?? 'normal';
 	}
 }
@@ -150,39 +147,16 @@ class SeriesPrimitivePriceAxisViewWrapper extends PriceAxisView {
 	}
 }
 
-export class SeriesPrimitiveWrapper<TSeriesAttachedParameters = unknown> {
-	private readonly _primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>;
+export class SeriesPrimitiveWrapper<TSeriesAttachedParameters = unknown> extends PrimitiveWrapper<ISeriesPrimitiveBase<TSeriesAttachedParameters>> {
 	private readonly _series: Series<SeriesType>;
-	private _paneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 	private _timeAxisViewsCache: RendererCache<readonly ISeriesPrimitiveAxisView[], readonly SeriesPrimitiveTimeAxisViewWrapper[]> | null = null;
 	private _priceAxisViewsCache: RendererCache<readonly ISeriesPrimitiveAxisView[], readonly SeriesPrimitivePriceAxisViewWrapper[]> | null = null;
-	private _priceAxisPaneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
-	private _timeAxisPaneViewsCache: RendererCache<readonly ISeriesPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
+	private _priceAxisPaneViewsCache: RendererCache<readonly IPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
+	private _timeAxisPaneViewsCache: RendererCache<readonly IPrimitivePaneView[], readonly SeriesPrimitivePaneViewWrapper[]> | null = null;
 
 	public constructor(primitive: ISeriesPrimitiveBase<TSeriesAttachedParameters>, series: Series<SeriesType>) {
-		this._primitive = primitive;
+		super(primitive);
 		this._series = series;
-	}
-
-	public primitive(): ISeriesPrimitiveBase<TSeriesAttachedParameters> {
-		return this._primitive;
-	}
-
-	public updateAllViews(): void {
-		this._primitive.updateAllViews?.();
-	}
-
-	public paneViews(): readonly ISeriesPrimitivePaneViewWrapper[] {
-		const base = this._primitive.paneViews?.() ?? [];
-		if (this._paneViewsCache?.base === base) {
-			return this._paneViewsCache.wrapper;
-		}
-		const wrapper = base.map((pw: ISeriesPrimitivePaneView) => new SeriesPrimitivePaneViewWrapper(pw));
-		this._paneViewsCache = {
-			base,
-			wrapper,
-		};
-		return wrapper;
 	}
 
 	public timeAxisViews(): readonly ITimeAxisView[] {
@@ -218,7 +192,7 @@ export class SeriesPrimitiveWrapper<TSeriesAttachedParameters = unknown> {
 		if (this._priceAxisPaneViewsCache?.base === base) {
 			return this._priceAxisPaneViewsCache.wrapper;
 		}
-		const wrapper = base.map((pw: ISeriesPrimitivePaneView) => new SeriesPrimitivePaneViewWrapper(pw));
+		const wrapper = base.map((pw: IPrimitivePaneView) => new SeriesPrimitivePaneViewWrapper(pw));
 		this._priceAxisPaneViewsCache = {
 			base,
 			wrapper,
@@ -231,7 +205,7 @@ export class SeriesPrimitiveWrapper<TSeriesAttachedParameters = unknown> {
 		if (this._timeAxisPaneViewsCache?.base === base) {
 			return this._timeAxisPaneViewsCache.wrapper;
 		}
-		const wrapper = base.map((pw: ISeriesPrimitivePaneView) => new SeriesPrimitivePaneViewWrapper(pw));
+		const wrapper = base.map((pw: IPrimitivePaneView) => new SeriesPrimitivePaneViewWrapper(pw));
 		this._timeAxisPaneViewsCache = {
 			base,
 			wrapper,
@@ -249,9 +223,5 @@ export class SeriesPrimitiveWrapper<TSeriesAttachedParameters = unknown> {
 				endTimePoint as unknown as Logical
 			) ?? null
 		);
-	}
-
-	public hitTest(x: Coordinate, y: Coordinate): PrimitiveHoveredItem | null {
-		return this._primitive.hitTest?.(x, y) ?? null;
 	}
 }

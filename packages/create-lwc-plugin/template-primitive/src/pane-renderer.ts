@@ -1,9 +1,9 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
-import { ISeriesPrimitivePaneRenderer } from 'lightweight-charts';
+import { IPrimitivePaneRenderer } from 'lightweight-charts';
 import { ViewPoint } from './pane-view';
 import { positionsBox } from './helpers/dimensions/positions';
 
-export class _CLASSNAME_PaneRenderer implements ISeriesPrimitivePaneRenderer {
+export class _CLASSNAME_PaneRenderer implements IPrimitivePaneRenderer {
 	_p1: ViewPoint;
 	_p2: ViewPoint;
 	_fillColor: string;

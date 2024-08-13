@@ -1,8 +1,8 @@
 import { CanvasRenderingTarget2D, Size } from 'fancy-canvas';
 import {
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
-	SeriesPrimitivePaneViewZOrder,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
+	PrimitivePaneViewZOrder,
 } from 'lightweight-charts';
 
 const styles = {
@@ -233,7 +233,7 @@ function calculateDrawingPositions(
 	};
 }
 
-class DeltaTooltipPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class DeltaTooltipPaneRenderer implements IPrimitivePaneRenderer {
 	_data: DeltaTooltipData;
 
 	constructor(data: DeltaTooltipData) {
@@ -347,7 +347,7 @@ class DeltaTooltipPaneRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-export class DeltaTooltipPaneView implements ISeriesPrimitivePaneView {
+export class DeltaTooltipPaneView implements IPrimitivePaneView {
 	_data: DeltaTooltipData;
 	constructor(data: Partial<DeltaTooltipData>) {
 		this._data = {
@@ -363,11 +363,11 @@ export class DeltaTooltipPaneView implements ISeriesPrimitivePaneView {
 		};
 	}
 
-	renderer(): ISeriesPrimitivePaneRenderer | null {
+	renderer(): IPrimitivePaneRenderer | null {
 		return new DeltaTooltipPaneRenderer(this._data);
 	}
 
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'top';
 	}
 }
