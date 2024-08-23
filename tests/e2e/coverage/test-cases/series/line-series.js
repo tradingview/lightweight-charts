@@ -12,7 +12,7 @@ function testSeriesApi(series) {
 	});
 	series.priceFormatter();
 	series.seriesType();
-	series.markers();
+	// series.markers();
 	series.dataByIndex(10);
 	series.dataByIndex(-5);
 	series.dataByIndex(-5, LightweightCharts.MismatchDirection.NearestRight);
