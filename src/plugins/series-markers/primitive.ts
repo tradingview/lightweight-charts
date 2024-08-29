@@ -203,6 +203,32 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
 	}
 }
 
+/**
+ * A function to create a series markers primitive.
+ *
+ * @example
+ * ```js
+ * import { createSeriesMarkersPrimitive } from 'lightweight-charts';
+ *
+ *	const seriesMarkersPrimitive = createSeriesMarkersPrimitive(
+ *		series,
+ *		chart,
+ *		[
+ *			{
+ *				color: 'green',
+ *				position: 'inBar',
+ * 				shape: 'arrowDown',
+ *				time: 1556880900,
+ *			},
+ *		]
+ *	);
+ *  // and then you can modify the markers
+ *  // set it to empty array to remove all markers
+ *  seriesMarkersPrimitive.setMarkers([]);
+ *
+ *  // or you can call `seriesMarkersPrimitive.markers()` to get the current markers
+ * ```
+ */
 export function createSeriesMarkersPrimitive<HorzScaleItem>(
 	series: ISeriesApi<SeriesType, HorzScaleItem>,
 	chart: IChartApiBase<HorzScaleItem>,

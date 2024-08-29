@@ -58,4 +58,12 @@ export default [
 		limit: '2.00 KB',
 		brotli: true,
 	},
+	{
+		name: 'Plugin: Series Markers',
+		path: 'dist/lightweight-charts.production.mjs',
+		import: '{ createSeriesMarkersPrimitive }',
+		ignore: ['fancy-canvas'],
+		limit: '3.00 KB',
+		brotli: true,
+	},
 ];
