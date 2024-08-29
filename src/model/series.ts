@@ -571,7 +571,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		const barsMinMax = this._data.minMaxOnRangeCached(startTimePoint, endTimePoint, plots);
 
 		let range = barsMinMax !== null ? new PriceRangeImpl(barsMinMax.min, barsMinMax.max) : null;
-
+		let margins = null;
 		if (this.seriesType() === 'Histogram') {
 			const base = (this._options as HistogramStyleOptions).base;
 			const rangeWithBase = new PriceRangeImpl(base, base);
@@ -591,9 +591,12 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 				);
 				range = range !== null ? range.merge(primitiveRange) : primitiveRange;
 			}
+			if (primitiveAutoscale?.margins) {
+				margins = primitiveAutoscale.margins;
+			}
 		});
 
-		return new AutoscaleInfoImpl(range);
+		return new AutoscaleInfoImpl(range, margins);
 	}
 
 	private _markerRadius(): number {

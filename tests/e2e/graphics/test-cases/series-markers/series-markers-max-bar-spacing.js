@@ -20,14 +20,16 @@ function runTestCase(container) {
 	const data = generateData();
 	mainSeries.setData(data);
 
-	const markers = [
-		{ time: data[data.length - 4].time, position: 'inBar', color: 'red', shape: 'square' },
-		{ time: data[data.length - 3].time, position: 'inBar', color: 'red', shape: 'circle' },
-		{ time: data[data.length - 2].time, position: 'inBar', color: 'red', shape: 'arrowDown' },
-		{ time: data[data.length - 1].time, position: 'inBar', color: 'red', shape: 'arrowUp' },
-	];
-
-	mainSeries.setMarkers(markers);
+	LightweightCharts.createSeriesMarkersPrimitive(
+		mainSeries,
+		chart,
+		[
+			{ time: data[data.length - 4].time, position: 'inBar', color: 'red', shape: 'square' },
+			{ time: data[data.length - 3].time, position: 'inBar', color: 'red', shape: 'circle' },
+			{ time: data[data.length - 2].time, position: 'inBar', color: 'red', shape: 'arrowDown' },
+			{ time: data[data.length - 1].time, position: 'inBar', color: 'red', shape: 'arrowUp' },
+		]
+	);
 	chart.applyOptions({
 		timeScale: {
 			barSpacing: 1000, // will be corrected to max available bar spacing

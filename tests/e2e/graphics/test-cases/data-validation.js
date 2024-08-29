@@ -30,10 +30,14 @@ function runTestCase(container) {
 	}
 
 	try {
-		lineSeries.setMarkers([
-			{ time: 1 },
-			{ time: 0, value: 0 },
-		]);
+		LightweightCharts.createSeriesMarkersPrimitive(
+			lineSeries,
+			chart,
+			[
+				{ time: 1 },
+				{ time: 0, value: 0 },
+			]
+		);
 
 		console.assert(false, 'should fail if series markers is not ordered');
 	} catch (e) {
@@ -93,18 +97,22 @@ function runTestCase(container) {
 	}
 
 	// should pass - several markers could be on the same bar
-	lineSeries.setMarkers([
-		{
-			color: 'green',
-			position: 'belowBar',
-			shape: 'arrowDown',
-			time: 0,
-		},
-		{
-			color: 'green',
-			position: 'aboveBar',
-			shape: 'arrowUp',
-			time: 0,
-		},
-	]);
+	LightweightCharts.createSeriesMarkersPrimitive(
+		lineSeries,
+		chart,
+		[
+			{
+				color: 'green',
+				position: 'belowBar',
+				shape: 'arrowDown',
+				time: 0,
+			},
+			{
+				color: 'green',
+				position: 'aboveBar',
+				shape: 'arrowUp',
+				time: 0,
+			},
+		]
+	);
 }

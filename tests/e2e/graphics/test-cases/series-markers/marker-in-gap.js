@@ -25,14 +25,18 @@ function runTestCase(container) {
 		{ time: 1556895600, value: 132.52 },
 	]);
 
-	lineSeries.setMarkers([
-		{
-			color: 'green',
-			position: 'inBar',
-			shape: 'arrowDown',
-			time: 1556880900,
-		},
-	]);
+	LightweightCharts.createSeriesMarkersPrimitive(
+		lineSeries,
+		chart,
+		[
+			{
+				color: 'green',
+				position: 'inBar',
+				shape: 'arrowDown',
+				time: 1556880900,
+			},
+		]
+	);
 
 	chart.timeScale().fitContent();
 }

@@ -29,11 +29,8 @@ export class AutoscaleInfoImpl {
 	}
 
 	public toRaw(): AutoscaleInfo | null {
-		if (this._priceRange === null) {
-			return null;
-		}
 		return {
-			priceRange: this._priceRange.toRaw(),
+			priceRange: this._priceRange === null ? null : this._priceRange.toRaw(),
 			margins: this._margins || undefined,
 		};
 	}

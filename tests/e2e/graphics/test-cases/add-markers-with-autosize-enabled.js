@@ -70,5 +70,9 @@ function runTestCase(container) {
 			});
 		}
 	}
-	series.setMarkers(markers);
+	LightweightCharts.createSeriesMarkersPrimitive(
+		series,
+		chart,
+		markers
+	);
 }

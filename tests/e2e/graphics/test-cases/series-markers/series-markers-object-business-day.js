@@ -15,13 +15,17 @@ function runTestCase(container) {
 		{ time: '2017-04-23', value: 81.89 },
 	]);
 
-	line.setMarkers([
-		{ time: { year: 2017, month: 4, day: 11 }, position: 'inBar', color: 'orange', shape: 'circle' },
-		{ time: { year: 2017, month: 4, day: 14 }, position: 'inBar', color: 'orange', shape: 'circle' },
-		{ time: { year: 2017, month: 4, day: 15 }, position: 'inBar', color: 'orange', shape: 'circle' },
-		{ time: { year: 2017, month: 4, day: 19 }, position: 'inBar', color: 'orange', shape: 'circle' },
-		{ time: { year: 2017, month: 4, day: 23 }, position: 'inBar', color: 'orange', shape: 'circle' },
-	]);
+	LightweightCharts.createSeriesMarkersPrimitive(
+		line,
+		chart,
+		[
+			{ time: { year: 2017, month: 4, day: 11 }, position: 'inBar', color: 'orange', shape: 'circle' },
+			{ time: { year: 2017, month: 4, day: 14 }, position: 'inBar', color: 'orange', shape: 'circle' },
+			{ time: { year: 2017, month: 4, day: 15 }, position: 'inBar', color: 'orange', shape: 'circle' },
+			{ time: { year: 2017, month: 4, day: 19 }, position: 'inBar', color: 'orange', shape: 'circle' },
+			{ time: { year: 2017, month: 4, day: 23 }, position: 'inBar', color: 'orange', shape: 'circle' },
+		]
+	);
 
 	chart.timeScale().fitContent();
 }

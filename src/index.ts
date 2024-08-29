@@ -26,6 +26,7 @@ export { createChart, createChartEx, defaultHorzScaleBehavior } from './api/crea
 */
 export { TextWatermark } from './plugins/text-watermark/primitive';
 export { ImageWatermark } from './plugins/image-watermark/primitive';
+export { createSeriesMarkersPrimitive } from './plugins/series-markers/primitive';
 
 /**
  * Returns the current version as a string. For example `'3.3.0'`.

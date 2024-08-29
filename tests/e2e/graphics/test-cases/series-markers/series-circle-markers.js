@@ -29,15 +29,18 @@ function runTestCase(container) {
 
 	const data = generateData();
 	mainSeries.setData(data);
-
-	mainSeries.setMarkers([
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'circle' },
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'yellow', shape: 'circle' },
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'red', shape: 'circle' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'orange', shape: 'circle' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'yellow', shape: 'circle' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'red', shape: 'circle' },
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'orange', shape: 'circle' },
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'circle' },
-	]);
+	LightweightCharts.createSeriesMarkersPrimitive(
+		mainSeries,
+		chart,
+		[
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'circle' },
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'yellow', shape: 'circle' },
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'red', shape: 'circle' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'orange', shape: 'circle' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'yellow', shape: 'circle' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'red', shape: 'circle' },
+			{ time: data[data.length - 10].time, position: 'inBar', color: 'orange', shape: 'circle' },
+			{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'circle' },
+		]
+	);
 }
