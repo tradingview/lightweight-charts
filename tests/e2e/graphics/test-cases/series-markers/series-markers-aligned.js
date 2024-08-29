@@ -17,7 +17,6 @@ function runTestCase(container) {
 
 	LightweightCharts.createSeriesMarkersPrimitive(
 		line,
-		chart,
 		[
 			{ time: '2017-04-10', position: 'inBar', color: 'orange', shape: 'circle' },
 			{ time: '2017-04-16', position: 'inBar', color: 'orange', shape: 'circle' },

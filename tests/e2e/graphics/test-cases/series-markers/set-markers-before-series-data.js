@@ -5,7 +5,6 @@ function runTestCase(container) {
 
 	LightweightCharts.createSeriesMarkersPrimitive(
 		mainSeries,
-		chart,
 		[
 			{
 				time: '2019-04-09',

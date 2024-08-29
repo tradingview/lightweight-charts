@@ -72,7 +72,6 @@ function runTestCase(container) {
 	}
 	LightweightCharts.createSeriesMarkersPrimitive(
 		series,
-		chart,
 		markers
 	);
 }

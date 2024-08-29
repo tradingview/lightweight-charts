@@ -32,18 +32,14 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
 	private _autoScaleMargins: AutoScaleMargins | null = null;
 	private _markersPositions: MarkerPositions | null = null;
 
-	public constructor(chart: IChartApiBase<HorzScaleItem>, series: ISeriesApi<SeriesType, HorzScaleItem>) {
-		this._chart = chart;
-		this._series = series;
-	}
-
 	public attached(param: SeriesAttachedParameter<HorzScaleItem>): void {
 		this._attached = param;
-		const series = param.series;
 		this._recalculateMarkers();
-		this._paneView = new SeriesMarkersPaneView(series, ensureNotNull(this._chart));
+		this._chart = param.chart;
+		this._series = param.series;
+		this._paneView = new SeriesMarkersPaneView(this._series, ensureNotNull(this._chart));
 		this._requestUpdate = param.requestUpdate;
-		series.subscribeDataChanged((scope: DataChangedScope) => this._onDataChanged(scope));
+		this._series.subscribeDataChanged((scope: DataChangedScope) => this._onDataChanged(scope));
 		this.requestUpdate();
 	}
 
@@ -196,8 +192,6 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
  *
  * @param series - The series to which the primitive will be attached.
  *
- * @param chart - The chart instance.
- *
  * @param markers - An array of markers to be displayed on the series.
  *
  * @example
@@ -206,7 +200,6 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
  *
  *	const seriesMarkersPrimitive = createSeriesMarkersPrimitive(
  *		series,
- *		chart,
  *		[
  *			{
  *				color: 'green',
@@ -220,21 +213,17 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
  *  // set it to empty array to remove all markers
  *  seriesMarkersPrimitive.setMarkers([]);
  *
- *  // or you can call `seriesMarkersPrimitive.markers()` to get the current markers
+ *  // `seriesMarkersPrimitive.markers()` returns current markers
  * ```
  */
 export function createSeriesMarkersPrimitive<HorzScaleItem>(
 	series: ISeriesApi<SeriesType, HorzScaleItem>,
-	chart: IChartApiBase<HorzScaleItem>,
 	markers?: SeriesMarker<HorzScaleItem>[]
 ): SeriesMarkersPrimitive<HorzScaleItem> {
-	const primitive = new SeriesMarkersPrimitive<HorzScaleItem>(chart, series);
-
+	const primitive = new SeriesMarkersPrimitive<HorzScaleItem>();
 	if (markers) {
 		primitive.setMarkers(markers);
 	}
-
 	series.attachPrimitive(primitive);
-
 	return primitive;
 }

@@ -17,7 +17,6 @@ function beforeInteractions(container) {
 	mainSeries.setData(data);
 	seriesMarkerPrimitives = LightweightCharts.createSeriesMarkersPrimitive(
 		mainSeries,
-		chart,
 		[
 			{ time: data[data.length - 7].time, position: 'belowBar', color: 'rgb(255, 0, 0)', shape: 'arrowUp', text: 'test' },
 			{ time: data[data.length - 5].time, position: 'aboveBar', color: 'rgba(255, 255, 0, 1)', shape: 'arrowDown', text: 'test' },

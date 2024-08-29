@@ -39,7 +39,6 @@ function runTestCase(container) {
 	mainSeries.setData(data);
 	LightweightCharts.createSeriesMarkersPrimitive(
 		mainSeries,
-		chart,
 		[
 			{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'arrowUp', text: 'test' },
 			{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'arrowDown', text: 'test' },

@@ -29,7 +29,6 @@ function runTestCase(container) {
 
 	LightweightCharts.createSeriesMarkersPrimitive(
 		mainSeries,
-		chart,
 		markers
 	);
 	chart.applyOptions({

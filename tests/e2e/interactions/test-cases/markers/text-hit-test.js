@@ -51,7 +51,6 @@ function beforeInteractions(container) {
 	mainSeries.setData(mainSeriesData);
 	LightweightCharts.createSeriesMarkersPrimitive(
 		mainSeries,
-		chart,
 		[
 			{
 				time: markerTime,

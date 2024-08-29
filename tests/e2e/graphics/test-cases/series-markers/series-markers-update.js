@@ -28,7 +28,6 @@ function runTestCase(container) {
 	];
 	const markerPrimitive = LightweightCharts.createSeriesMarkersPrimitive(
 		mainSeries,
-		chart,
 		markers
 	);
 

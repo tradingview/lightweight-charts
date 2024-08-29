@@ -27,7 +27,6 @@ function runTestCase(container) {
 
 	LightweightCharts.createSeriesMarkersPrimitive(
 		lineSeries,
-		chart,
 		[
 			{
 				color: 'green',

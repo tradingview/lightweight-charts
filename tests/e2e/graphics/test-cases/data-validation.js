@@ -32,7 +32,6 @@ function runTestCase(container) {
 	try {
 		LightweightCharts.createSeriesMarkersPrimitive(
 			lineSeries,
-			chart,
 			[
 				{ time: 1 },
 				{ time: 0, value: 0 },
@@ -99,7 +98,6 @@ function runTestCase(container) {
 	// should pass - several markers could be on the same bar
 	LightweightCharts.createSeriesMarkersPrimitive(
 		lineSeries,
-		chart,
 		[
 			{
 				color: 'green',
