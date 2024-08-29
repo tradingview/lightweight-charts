@@ -66,6 +66,7 @@ export async function runTests(
 		summary.push(
 			`${data.file} - "${data.name}" (${Math.round(
 				data.details.duration_ms
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
 			)}ms)\n${error.toString()} `
 		);
 	});
