@@ -68,7 +68,7 @@ export class SeriesMarkersRenderer implements IPrimitivePaneRenderer {
 			if (item && hitTestItem(item, x as Coordinate, y as Coordinate)) {
 				return {
 					zOrder: 'normal',
-					externalId: String(item.internalId),
+					externalId: item.externalId ?? '',
 				};
 			}
 		}
