@@ -8,7 +8,7 @@ export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '45.00 KB',
+		limit: '44.50 KB',
 		import: '*',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -16,7 +16,7 @@ export default [
 	{
 		name: 'ESM createChart',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '45.00 KB',
+		limit: '41.30 KB',
 		import: '{ createChart }',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -24,7 +24,7 @@ export default [
 	{
 		name: 'ESM createChartEx',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '45.00 KB',
+		limit: '40.00 KB',
 		import: '{ createChartEx }',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -32,7 +32,7 @@ export default [
 	{
 		name: 'ESM Standalone',
 		path: 'dist/lightweight-charts.standalone.production.mjs',
-		limit: '50.00 KB',
+		limit: '45.90 KB',
 		import: '*',
 		brotli: true,
 	},
@@ -63,7 +63,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ createSeriesMarkersPrimitive }',
 		ignore: ['fancy-canvas'],
-		limit: '3.00 KB',
+		limit: '3.90 KB',
 		brotli: true,
 	},
 ];

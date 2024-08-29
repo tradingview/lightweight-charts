@@ -51,6 +51,8 @@ export interface SeriesMarker<TimeType = Time> {
 	originalTime: unknown;
 }
 
+export type MarkerPositions = Record<SeriesMarkerPosition, boolean>;
+
 export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {
 	internalId: number;
 }

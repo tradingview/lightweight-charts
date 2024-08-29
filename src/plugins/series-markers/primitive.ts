@@ -12,24 +12,12 @@ import { Logical, TimePointIndex } from '../../model/time-data';
 import { UpdateType } from '../../views/pane/iupdatable-pane-view';
 
 import { SeriesMarkersPaneView } from './pane-view';
-import { InternalSeriesMarker, SeriesMarkerPosition, SeriesMarkerShape } from './types';
+import { InternalSeriesMarker, MarkerPositions, SeriesMarker } from './types';
 import {
 	calculateAdjustedMargin,
 	calculateShapeHeight,
 	shapeMargin as calculateShapeMargin,
 } from './utils';
-interface SeriesMarker<TimeType> {
-	time: TimeType;
-	position: SeriesMarkerPosition;
-	shape: SeriesMarkerShape;
-	color: string;
-	id?: string;
-	text?: string;
-	size?: number;
-	originalTime?: TimeType;
-}
-
-type MarkerPositions = Record<SeriesMarkerPosition, boolean>;
 
 class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScaleItem> {
 	private _attached: SeriesAttachedParameter<HorzScaleItem> | null = null;
@@ -205,6 +193,12 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
 
 /**
  * A function to create a series markers primitive.
+ *
+ * @param series - The series to which the primitive will be attached.
+ *
+ * @param chart - The chart instance.
+ *
+ * @param markers - An array of markers to be displayed on the series.
  *
  * @example
  * ```js
