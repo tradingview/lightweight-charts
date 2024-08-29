@@ -47,17 +47,22 @@ function beforeInteractions(container) {
 	const mainSeriesData = generateData();
 	const markerTime = mainSeriesData[450].time;
 	const price = mainSeriesData[450].value;
+
 	mainSeries.setData(mainSeriesData);
-	mainSeries.setMarkers([
-		{
-			time: markerTime,
-			position: 'belowBar',
-			color: '#2196F3',
-			shape: 'arrowUp',
-			text: 'This is a Marker',
-			id: 'TEST',
-		},
-	]);
+	LightweightCharts.createSeriesMarkersPrimitive(
+		mainSeries,
+		chart,
+		[
+			{
+				time: markerTime,
+				position: 'belowBar',
+				color: '#2196F3',
+				shape: 'arrowUp',
+				text: 'This is a Marker',
+				id: 'TEST',
+			},
+		]
+	);
 
 	chart.subscribeClick(mouseParams => {
 		if (!mouseParams) {
