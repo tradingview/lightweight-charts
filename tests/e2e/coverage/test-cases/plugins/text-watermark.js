@@ -39,6 +39,7 @@ function beforeInteractions(container) {
 			},
 		],
 	});
+	textWatermark.getPane();
 
 	return Promise.resolve();
 }
@@ -55,6 +56,7 @@ function afterInteractions() {
 				horzAlign: 'right',
 				vertAlign: 'bottom',
 			});
+			textWatermark.detach();
 		});
 		requestAnimationFrame(resolve);
 	});

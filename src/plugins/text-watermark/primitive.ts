@@ -77,7 +77,6 @@ export class TextWatermark<T> implements IPanePrimitive<T>, IPrimitiveWithOption
  * Creates an image watermark.
  *
  * @param pane - Target pane.
- * @param imageUrl - Image URL.
  * @param options - Watermark options.
  *
  * @returns Image watermark wrapper.

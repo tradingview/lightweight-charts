@@ -26,11 +26,13 @@ function beforeInteractions(container) {
 	);
 
 	seriesMarkerPrimitives.markers();
-
+	seriesMarkerPrimitives.getSeries();
+	seriesMarkerPrimitives.applyOptions({});
 	return Promise.resolve();
 }
 
 function afterInteractions() {
 	seriesMarkerPrimitives.setMarkers([]);
+	seriesMarkerPrimitives.detach();
 	return Promise.resolve();
 }
