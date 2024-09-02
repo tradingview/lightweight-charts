@@ -13,7 +13,8 @@ In the new version of Lightweight Charts, the watermark feature has undergone si
 2. **Re-implementation**: It's now re-implemented as a Pane Primitive (plugin) included within the library.
 3. **Improved Tree-shaking**: This change makes the feature more tree-shakeable, potentially reducing bundle sizes for users who don't need watermarks.
 4. **Added an Image Watermark Primitive**: In addition to the usual text based watermark, there is now
-an image watermark feature provided by the [`ImageWatermark`](/api/classes/ImageWatermark.md) primitive.
+an image watermark feature provided by the [`createImageWatermark`](/api/functions/createImageWatermark.md) primitive.
+5. **Series Markers**: The series markers feature has been moved to a separate plugin as well. To create a series marker, use the [`createSeriesMarkers`](/api/functions/createSeriesMarkers.md) function exported from the library.
 
 If you're currently using the watermark feature, you'll need to make a few adjustments to your code.
 
@@ -21,8 +22,8 @@ If you're currently using the watermark feature, you'll need to make a few adjus
 
 The TextWatermark primitive is now available as follows:
 
-- **ESM builds**: Import [`TextWatermark`](/api/classes/TextWatermark.md) directly.
-- **Standalone script build**: Access via `LightweightCharts.TextWatermark`.
+- **ESM builds**: Import [`createTextWatermark`](/api/functions/createTextWatermark.md) directly.
+- **Standalone script build**: Access via `LightweightCharts.createTextWatermark`.
 
 ### Changes in Options
 
@@ -47,7 +48,8 @@ const chart = createChart(container, options);
 const mainSeries = chart.addLineSeries();
 mainSeries.setData(generateData());
 
-const textWatermark = new TextWatermark({
+const firstPane = chart.panes()[0];
+createTextWatermark(firstPane, {
     horzAlign: 'center',
     vertAlign: 'center',
     lines: [
@@ -66,9 +68,6 @@ const textWatermark = new TextWatermark({
         },
     ],
 });
-
-const firstPane = chart.panes()[0];
-firstPane.attachPrimitive(textWatermark);
 ```
 
 ## Plugin Typings
