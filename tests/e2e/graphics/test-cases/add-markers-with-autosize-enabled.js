@@ -70,7 +70,7 @@ function runTestCase(container) {
 			});
 		}
 	}
-	LightweightCharts.createSeriesMarkersPrimitive(
+	LightweightCharts.createSeriesMarkers(
 		series,
 		markers
 	);

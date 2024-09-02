@@ -14,7 +14,7 @@ function runTestCase(container) {
 
 	chart.timeScale().fitContent();
 
-	const textWatermark = new LightweightCharts.TextWatermark({
+	const textWatermark = LightweightCharts.createTextWatermark(chart.panes()[0], {
 		lines: [
 			{
 				text: '',
@@ -23,8 +23,6 @@ function runTestCase(container) {
 			},
 		],
 	});
-	const pane = chart.panes()[0];
-	pane.attachPrimitive(textWatermark);
 
 	chart.subscribeCrosshairMove(param => {
 		if (param.time) {

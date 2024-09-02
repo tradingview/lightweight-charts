@@ -1,3 +1,4 @@
+import { IPaneApi } from '../../api/ipane-api';
 import {
 	IPanePrimitive,
 	PaneAttachedParameter,
@@ -5,9 +6,9 @@ import {
 
 import { DeepPartial } from '../../helpers/strict-type-checks';
 
-import { Time } from '../../model/horz-scale-behavior-time/types';
 import { IPanePrimitivePaneView } from '../../model/ipane-primitive';
 
+import { IPanePrimitiveWithOptions, PanePrimitiveWrapper } from '../pane-primitive-wrapper';
 import {
 	ImageWatermarkOptions,
 	imageWatermarkOptionsDefaults,
@@ -23,23 +24,7 @@ function mergeOptionsWithDefaults(
 	};
 }
 
-/**
- * A pane primitive for rendering a image watermark.
- *
- * @example
- * ```js
- * import { ImageWatermark } from 'lightweight-charts';
- *
- * const imageWatermark = new ImageWatermark('/images/my-image.png', {
- *   alpha: 0.5,
- *   padding: 20,
- * });
- *
- * const firstPane = chart.panes()[0];
- * firstPane.attachPrimitive(imageWatermark);
- * ```
- */
-export class ImageWatermark<T = Time> implements IPanePrimitive<T> {
+class ImageWatermark<T> implements IPanePrimitive<T> {
 	private _requestUpdate?: () => void;
 	private _paneViews: ImageWatermarkPaneView<T>[];
 	private _options: ImageWatermarkOptions;
@@ -108,4 +93,32 @@ export class ImageWatermark<T = Time> implements IPanePrimitive<T> {
 			pw.optionsUpdate(this._options)
 		);
 	}
+}
+
+/**
+ * Creates an image watermark.
+ *
+ * @param pane - Target pane.
+ * @param imageUrl - Image URL.
+ * @param options - Watermark options.
+ *
+ * @returns Image watermark wrapper.
+ *
+ * @example
+ * ```js
+ * import { createImageWatermark } from 'lightweight-charts';
+ *
+ * const firstPane = chart.panes()[0];
+ * const imageWatermark = createImageWatermark(firstPane, '/images/my-image.png', {
+ *   alpha: 0.5,
+ *   padding: 20,
+ * });
+ * // to change options
+ * imageWatermark.applyOptions({ padding: 10 });
+ * // to remove watermark from the pane
+ * imageWatermark.detach();
+ * ```
+ */
+export function createImageWatermark<T>(pane: IPaneApi<T>, imageUrl: string, options: DeepPartial<ImageWatermarkOptions>): PanePrimitiveWrapper<T, ImageWatermarkOptions, IPanePrimitiveWithOptions<T, ImageWatermarkOptions>> {
+	return new PanePrimitiveWrapper<T, ImageWatermarkOptions, IPanePrimitiveWithOptions<T, ImageWatermarkOptions>>(pane, new ImageWatermark(imageUrl, options));
 }

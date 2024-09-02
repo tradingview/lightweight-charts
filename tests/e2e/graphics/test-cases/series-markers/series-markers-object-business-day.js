@@ -15,7 +15,7 @@ function runTestCase(container) {
 		{ time: '2017-04-23', value: 81.89 },
 	]);
 
-	LightweightCharts.createSeriesMarkersPrimitive(
+	LightweightCharts.createSeriesMarkers(
 		line,
 		[
 			{ time: { year: 2017, month: 4, day: 11 }, position: 'inBar', color: 'orange', shape: 'circle' },

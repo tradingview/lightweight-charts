@@ -25,7 +25,7 @@ function runTestCase(container) {
 	});
 	const data = generateData();
 	lineSeries.setData(data);
-	LightweightCharts.createSeriesMarkersPrimitive(
+	LightweightCharts.createSeriesMarkers(
 		lineSeries,
 		[
 			{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'arrowUp' },

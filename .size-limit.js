@@ -8,7 +8,7 @@ export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '44.50 KB',
+		limit: '45.00 KB',
 		import: '*',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -16,7 +16,7 @@ export default [
 	{
 		name: 'ESM createChart',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '41.30 KB',
+		limit: '45.00 KB',
 		import: '{ createChart }',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -24,7 +24,7 @@ export default [
 	{
 		name: 'ESM createChartEx',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '40.00 KB',
+		limit: '45.00 KB',
 		import: '{ createChartEx }',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -32,7 +32,7 @@ export default [
 	{
 		name: 'ESM Standalone',
 		path: 'dist/lightweight-charts.standalone.production.mjs',
-		limit: '45.90 KB',
+		limit: '50.00 KB',
 		import: '*',
 		brotli: true,
 	},
@@ -45,7 +45,7 @@ export default [
 	{
 		name: 'Plugin: Text Watermark',
 		path: 'dist/lightweight-charts.production.mjs',
-		import: '{ TextWatermark }',
+		import: '{ createTextWatermark }',
 		ignore: ['fancy-canvas'],
 		limit: '2.00 KB',
 		brotli: true,
@@ -53,7 +53,7 @@ export default [
 	{
 		name: 'Plugin: Image Watermark',
 		path: 'dist/lightweight-charts.production.mjs',
-		import: '{ ImageWatermark }',
+		import: '{ createImageWatermark }',
 		ignore: ['fancy-canvas'],
 		limit: '2.00 KB',
 		brotli: true,
@@ -61,9 +61,9 @@ export default [
 	{
 		name: 'Plugin: Series Markers',
 		path: 'dist/lightweight-charts.production.mjs',
-		import: '{ createSeriesMarkersPrimitive }',
+		import: '{ createSeriesMarkers }',
 		ignore: ['fancy-canvas'],
-		limit: '3.90 KB',
+		limit: '4.08 KB',
 		brotli: true,
 	},
 ];

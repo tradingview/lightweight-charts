@@ -3,7 +3,7 @@ function runTestCase(container) {
 
 	const mainSeries = chart.addLineSeries();
 
-	LightweightCharts.createSeriesMarkersPrimitive(
+	LightweightCharts.createSeriesMarkers(
 		mainSeries,
 		[
 			{

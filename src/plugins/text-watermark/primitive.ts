@@ -1,3 +1,4 @@
+import { IPaneApi } from '../../api/ipane-api';
 import {
 	IPanePrimitive,
 	PaneAttachedParameter,
@@ -5,9 +6,10 @@ import {
 
 import { DeepPartial } from '../../helpers/strict-type-checks';
 
-import { Time } from '../../model/horz-scale-behavior-time/types';
 import { IPanePrimitivePaneView } from '../../model/ipane-primitive';
 
+import { IPanePrimitiveWithOptions, PanePrimitiveWrapper } from '../pane-primitive-wrapper';
+import { IPrimitiveWithOptions } from '../primitive-wrapper-base';
 import {
 	TextWatermarkLineOptions,
 	textWatermarkLineOptionsDefaults,
@@ -35,34 +37,7 @@ function mergeOptionsWithDefaults(
 	};
 }
 
-/**
- * A pane primitive for rendering a text watermark.
- *
- * @example
- * ```js
- *  const textWatermark = new TextWatermark({
- * 	  horzAlign: 'center',
- * 	  vertAlign: 'center',
- * 	  lines: [
- * 	    {
- * 	      text: 'Hello',
- * 	      color: 'rgba(255,0,0,0.5)',
- * 	      fontSize: 100,
- * 	      fontStyle: 'bold',
- * 	    },
- * 	    {
- * 	      text: 'This is a text watermark',
- * 	      color: 'rgba(0,0,255,0.5)',
- * 	      fontSize: 50,
- * 	      fontStyle: 'italic',
- * 	      fontFamily: 'monospace',
- * 	    },
- * 	  ],
- *  });
- * chart.panes()[0].attachPrimitive(textWatermark);
- * ```
- */
-export class TextWatermark<T = Time> implements IPanePrimitive<T> {
+export class TextWatermark<T> implements IPanePrimitive<T>, IPrimitiveWithOptions<TextWatermarkOptions> {
 	public requestUpdate?: () => void;
 	private _paneViews: TextWatermarkPaneView[];
 	private _options: TextWatermarkOptions;
@@ -96,4 +71,47 @@ export class TextWatermark<T = Time> implements IPanePrimitive<T> {
 			this.requestUpdate();
 		}
 	}
+}
+
+/**
+ * Creates an image watermark.
+ *
+ * @param pane - Target pane.
+ * @param imageUrl - Image URL.
+ * @param options - Watermark options.
+ *
+ * @returns Image watermark wrapper.
+ *
+ * @example
+ * ```js
+ * import { createTextWatermark } from 'lightweight-charts';
+ *
+ * const firstPane = chart.panes()[0];
+ * const textWatermark = createTextWatermark(firstPane, {
+ * 	  horzAlign: 'center',
+ * 	  vertAlign: 'center',
+ * 	  lines: [
+ * 	    {
+ * 	      text: 'Hello',
+ * 	      color: 'rgba(255,0,0,0.5)',
+ * 	      fontSize: 100,
+ * 	      fontStyle: 'bold',
+ * 	    },
+ * 	    {
+ * 	      text: 'This is a text watermark',
+ * 	      color: 'rgba(0,0,255,0.5)',
+ * 	      fontSize: 50,
+ * 	      fontStyle: 'italic',
+ * 	      fontFamily: 'monospace',
+ * 	    },
+ * 	  ],
+ * });
+ * // to change options
+ * textWatermark.applyOptions({ horzAlign: 'left' });
+ * // to remove watermark from the pane
+ * textWatermark.detach();
+ * ```
+ */
+export function createTextWatermark<T>(pane: IPaneApi<T>, options: DeepPartial<TextWatermarkOptions>): PanePrimitiveWrapper<T, TextWatermarkOptions, IPanePrimitiveWithOptions<T, TextWatermarkOptions>> {
+	return new PanePrimitiveWrapper<T, TextWatermarkOptions, IPanePrimitiveWithOptions<T, TextWatermarkOptions>>(pane, new TextWatermark(options));
 }

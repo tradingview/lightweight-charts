@@ -28,7 +28,7 @@ export class AutoscaleInfoImpl {
 		return this._margins;
 	}
 
-	public toRaw(): AutoscaleInfo | null {
+	public toRaw(): AutoscaleInfo {
 		return {
 			priceRange: this._priceRange === null ? null : this._priceRange.toRaw(),
 			margins: this._margins || undefined,

@@ -25,7 +25,7 @@ function runTestCase(container) {
 		{ time: 1556892000, value: 132.24 },
 		{ time: 1556895600, value: 132.52 },
 	]);
-	LightweightCharts.createSeriesMarkersPrimitive(
+	LightweightCharts.createSeriesMarkers(
 		lineSeries,
 		[
 			{

@@ -19,8 +19,7 @@ import {
 	shapeMargin as calculateShapeMargin,
 } from './utils';
 
-class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScaleItem> {
-	private _attached: SeriesAttachedParameter<HorzScaleItem> | null = null;
+export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScaleItem> {
 	private _paneView: SeriesMarkersPaneView<HorzScaleItem> | null = null;
 	private _markers: SeriesMarker<HorzScaleItem>[] = [];
 	private _indexedMarkers: InternalSeriesMarker<TimePointIndex>[] = [];
@@ -33,7 +32,6 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
 	private _markersPositions: MarkerPositions | null = null;
 
 	public attached(param: SeriesAttachedParameter<HorzScaleItem>): void {
-		this._attached = param;
 		this._recalculateMarkers();
 		this._chart = param.chart;
 		this._series = param.series;
@@ -50,12 +48,11 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
 	}
 
 	public detached(): void {
-		if (this._attached && this._dataChangedHandler) {
-			this._attached.series.unsubscribeDataChanged(this._dataChangedHandler);
+		if (this._series && this._dataChangedHandler) {
+			this._series.unsubscribeDataChanged(this._dataChangedHandler);
 		}
 		this._chart = null;
 		this._series = null;
-		this._attached = null;
 		this._paneView = null;
 		this._dataChangedHandler = null;
 	}
@@ -122,7 +119,7 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
 		return this._autoScaleMargins;
 	}
 
-	protected _getMarkerPositions(): MarkerPositions {
+	private _getMarkerPositions(): MarkerPositions {
 		if (this._markersPositions === null) {
 			this._markersPositions = this._markers.reduce(
 				(acc: MarkerPositions, marker: SeriesMarker<HorzScaleItem>) => {
@@ -187,43 +184,3 @@ class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScal
 	}
 }
 
-/**
- * A function to create a series markers primitive.
- *
- * @param series - The series to which the primitive will be attached.
- *
- * @param markers - An array of markers to be displayed on the series.
- *
- * @example
- * ```js
- * import { createSeriesMarkersPrimitive } from 'lightweight-charts';
- *
- *	const seriesMarkersPrimitive = createSeriesMarkersPrimitive(
- *		series,
- *		[
- *			{
- *				color: 'green',
- *				position: 'inBar',
- * 				shape: 'arrowDown',
- *				time: 1556880900,
- *			},
- *		]
- *	);
- *  // and then you can modify the markers
- *  // set it to empty array to remove all markers
- *  seriesMarkersPrimitive.setMarkers([]);
- *
- *  // `seriesMarkersPrimitive.markers()` returns current markers
- * ```
- */
-export function createSeriesMarkersPrimitive<HorzScaleItem>(
-	series: ISeriesApi<SeriesType, HorzScaleItem>,
-	markers?: SeriesMarker<HorzScaleItem>[]
-): SeriesMarkersPrimitive<HorzScaleItem> {
-	const primitive = new SeriesMarkersPrimitive<HorzScaleItem>();
-	if (markers) {
-		primitive.setMarkers(markers);
-	}
-	series.attachPrimitive(primitive);
-	return primitive;
-}

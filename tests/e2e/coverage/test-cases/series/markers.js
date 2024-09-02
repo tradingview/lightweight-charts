@@ -15,7 +15,7 @@ function beforeInteractions(container) {
 
 	const data = generateLineData();
 	mainSeries.setData(data);
-	seriesMarkerPrimitives = LightweightCharts.createSeriesMarkersPrimitive(
+	seriesMarkerPrimitives = LightweightCharts.createSeriesMarkers(
 		mainSeries,
 		[
 			{ time: data[data.length - 7].time, position: 'belowBar', color: 'rgb(255, 0, 0)', shape: 'arrowUp', text: 'test' },

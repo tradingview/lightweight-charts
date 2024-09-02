@@ -1,6 +1,6 @@
 import { ceiledEven, ceiledOdd } from '../../helpers/mathex';
 
-import { SeriesMarker, SeriesMarkerShape } from './types';
+import { SeriesMarkerShape } from './types';
 
 const enum Constants {
 	MinShapeSize = 12,
@@ -47,17 +47,4 @@ export function calculateAdjustedMargin(margin: number, hasSide: boolean, hasInB
 	}
 
 	return 0;
-}
-export function convertSeriesMarker<InTimeType, OutTimeType>(sm: SeriesMarker<InTimeType>, newTime: OutTimeType, originalTime?: unknown): SeriesMarker<OutTimeType> {
-	const { time: inTime, originalTime: inOriginalTime, ...values } = sm;
-	/* eslint-disable @typescript-eslint/consistent-type-assertions */
-	const res = {
-		time: newTime,
-		...values,
-	} as SeriesMarker<OutTimeType>;
-	/* eslint-enable @typescript-eslint/consistent-type-assertions */
-	if (originalTime !== undefined) {
-		res.originalTime = originalTime;
-	}
-	return res;
 }

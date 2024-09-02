@@ -20,7 +20,7 @@ function runTestCase(container) {
 	const data = generateData();
 	mainSeries.setData(data);
 
-	LightweightCharts.createSeriesMarkersPrimitive(
+	LightweightCharts.createSeriesMarkers(
 		mainSeries,
 		[
 			{ time: data[0].time, position: 'aboveBar', color: 'red', shape: 'arrowUp' },

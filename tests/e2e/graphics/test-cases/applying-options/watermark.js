@@ -33,7 +33,7 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	textWatermark = new LightweightCharts.TextWatermark({
+	textWatermark = LightweightCharts.createTextWatermark(chart.panes()[0], {
 		horzAlign: 'left',
 		vertAlign: 'bottom',
 		lines: [
@@ -44,8 +44,6 @@ function runTestCase(container) {
 			},
 		],
 	});
-	const pane = chart.panes()[0];
-	pane.attachPrimitive(textWatermark);
 
 	return new Promise(resolve => {
 		setTimeout(() => {

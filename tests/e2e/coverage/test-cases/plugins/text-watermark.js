@@ -19,8 +19,8 @@ function beforeInteractions(container) {
 	const mainSeries = chart.addLineSeries();
 
 	mainSeries.setData(simpleData());
-
-	textWatermark = new LightweightCharts.TextWatermark({
+	const pane = chart.panes()[0];
+	textWatermark = LightweightCharts.createTextWatermark(pane, {
 		horzAlign: 'center',
 		vertAlign: 'center',
 		lines: [
@@ -39,9 +39,6 @@ function beforeInteractions(container) {
 			},
 		],
 	});
-
-	const pane = chart.panes()[0];
-	pane.attachPrimitive(textWatermark);
 
 	return Promise.resolve();
 }

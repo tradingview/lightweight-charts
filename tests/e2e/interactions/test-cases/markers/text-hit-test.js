@@ -49,7 +49,7 @@ function beforeInteractions(container) {
 	const price = mainSeriesData[450].value;
 
 	mainSeries.setData(mainSeriesData);
-	LightweightCharts.createSeriesMarkersPrimitive(
+	LightweightCharts.createSeriesMarkers(
 		mainSeries,
 		[
 			{

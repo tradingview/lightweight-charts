@@ -14,9 +14,9 @@ const chartOptions = {
 const chart = createChart(document.getElementById('container'), chartOptions);
 
 // remove-line
-/** @type {import('lightweight-charts').TextWatermark} */
+/** @type {import('lightweight-charts').createTextWatermark} */
 // highlight-start
-const textWatermark = new TextWatermark({
+createTextWatermark(chart.panes()[0], {
 	horzAlign: 'center',
 	vertAlign: 'center',
 	lines: [
@@ -27,8 +27,6 @@ const textWatermark = new TextWatermark({
 		},
 	],
 });
-const firstPane = chart.panes()[0];
-firstPane.attachPrimitive(textWatermark);
 // highlight-end
 
 const lineSeries = chart.addAreaSeries({
