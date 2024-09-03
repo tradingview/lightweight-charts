@@ -70,9 +70,10 @@ export function fillWeightsForPoints(sortedTimePoints: readonly Mutable<TimeScal
 
 		if (prevDate !== null) {
 			currentPoint.timeWeight = weightByTime(currentDate, prevDate) as TickMarkWeightValue;
-		}
 
-		totalTimeDiff += cast(currentPoint.time).timestamp - (prevTime || cast(currentPoint.time).timestamp);
+			// Calculate the time difference only if prevTime is not null
+			totalTimeDiff += cast(currentPoint.time).timestamp - (prevTime || cast(currentPoint.time).timestamp);
+		}
 
 		prevTime = cast(currentPoint.time).timestamp;
 		prevDate = currentDate;
