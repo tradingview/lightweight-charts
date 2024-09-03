@@ -103,20 +103,20 @@ const nonDefaultChart = createChartEx<HorizontalScaleType, HorzScaleBehaviorPric
 const lineSeries = nonDefaultChart.addLineSeries();
 lineSeries.setData([]);
 
-const markerApi = createSeriesMarkers(mainSeries, [
+const timeValue: HorizontalScaleType = 12345;
+const markerApi = createSeriesMarkers(lineSeries, [
 	{
 		color: 'green',
 		position: 'inBar',
 		shape: 'arrowDown',
-		time: 1556880900 as Time,
+		time: timeValue,
 	},
 ]);
-
 markerApi.setMarkers([
 	{
 		color: 'red',
 		position: 'aboveBar',
 		shape: 'arrowDown',
-		time: 1556880900 as Time,
+		time: 1556880900,
 	},
 ]);

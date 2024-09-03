@@ -8,7 +8,7 @@ import { DeepPartial } from '../../helpers/strict-type-checks';
 
 import { IPanePrimitivePaneView } from '../../model/ipane-primitive';
 
-import { IPanePrimitiveWithOptions, PanePrimitiveWrapper } from '../pane-primitive-wrapper';
+import { IPanePrimitiveWithOptions, IPanePrimitiveWrapper, PanePrimitiveWrapper } from '../pane-primitive-wrapper';
 import { IPrimitiveWithOptions } from '../primitive-wrapper-base';
 import {
 	TextWatermarkLineOptions,
@@ -37,7 +37,7 @@ function mergeOptionsWithDefaults(
 	};
 }
 
-export class TextWatermark<T> implements IPanePrimitive<T>, IPrimitiveWithOptions<TextWatermarkOptions> {
+class TextWatermark<T> implements IPanePrimitive<T>, IPrimitiveWithOptions<TextWatermarkOptions> {
 	public requestUpdate?: () => void;
 	private _paneViews: TextWatermarkPaneView[];
 	private _options: TextWatermarkOptions;
@@ -72,6 +72,8 @@ export class TextWatermark<T> implements IPanePrimitive<T>, IPrimitiveWithOption
 		}
 	}
 }
+
+export type ITextWatermarkPluginApi<T> = IPanePrimitiveWrapper<T, TextWatermarkOptions>;
 
 /**
  * Creates an image watermark.
@@ -111,6 +113,6 @@ export class TextWatermark<T> implements IPanePrimitive<T>, IPrimitiveWithOption
  * textWatermark.detach();
  * ```
  */
-export function createTextWatermark<T>(pane: IPaneApi<T>, options: DeepPartial<TextWatermarkOptions>): PanePrimitiveWrapper<T, TextWatermarkOptions, IPanePrimitiveWithOptions<T, TextWatermarkOptions>> {
+export function createTextWatermark<T>(pane: IPaneApi<T>, options: DeepPartial<TextWatermarkOptions>): ITextWatermarkPluginApi<T> {
 	return new PanePrimitiveWrapper<T, TextWatermarkOptions, IPanePrimitiveWithOptions<T, TextWatermarkOptions>>(pane, new TextWatermark(options));
 }

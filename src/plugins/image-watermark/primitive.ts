@@ -8,7 +8,7 @@ import { DeepPartial } from '../../helpers/strict-type-checks';
 
 import { IPanePrimitivePaneView } from '../../model/ipane-primitive';
 
-import { IPanePrimitiveWithOptions, PanePrimitiveWrapper } from '../pane-primitive-wrapper';
+import { IPanePrimitiveWithOptions, IPanePrimitiveWrapper, PanePrimitiveWrapper } from '../pane-primitive-wrapper';
 import {
 	ImageWatermarkOptions,
 	imageWatermarkOptionsDefaults,
@@ -95,6 +95,8 @@ class ImageWatermark<T> implements IPanePrimitive<T> {
 	}
 }
 
+export type IImageWatermarkPluginApi<T> = IPanePrimitiveWrapper<T, ImageWatermarkOptions>;
+
 /**
  * Creates an image watermark.
  *
@@ -119,6 +121,6 @@ class ImageWatermark<T> implements IPanePrimitive<T> {
  * imageWatermark.detach();
  * ```
  */
-export function createImageWatermark<T>(pane: IPaneApi<T>, imageUrl: string, options: DeepPartial<ImageWatermarkOptions>): PanePrimitiveWrapper<T, ImageWatermarkOptions, IPanePrimitiveWithOptions<T, ImageWatermarkOptions>> {
+export function createImageWatermark<T>(pane: IPaneApi<T>, imageUrl: string, options: DeepPartial<ImageWatermarkOptions>): IImageWatermarkPluginApi<T> {
 	return new PanePrimitiveWrapper<T, ImageWatermarkOptions, IPanePrimitiveWithOptions<T, ImageWatermarkOptions>>(pane, new ImageWatermark(imageUrl, options));
 }

@@ -2,11 +2,30 @@ import { ISeriesApi } from '../../api/iseries-api';
 
 import { SeriesType } from '../../model/series-options';
 
-import { SeriesPrimitiveAdapter } from '../series-primitive-adapter';
+import { ISeriesPrimitiveWrapper, SeriesPrimitiveAdapter } from '../series-primitive-adapter';
 import { SeriesMarkersPrimitive } from './primitive';
 import { SeriesMarker } from './types';
 
-class SeriesMarkersPrimitiveWrapper<HorzScaleItem> extends SeriesPrimitiveAdapter<HorzScaleItem, unknown, SeriesMarkersPrimitive<HorzScaleItem>> {
+/**
+ * Interface for a series markers plugin
+ */
+export interface ISeriesMarkersPluginApi<HorzScaleItem> {
+	/**
+	 * Set markers to the series.
+	 * @param markers - An array of markers to be displayed on the series.
+	 */
+	setMarkers: (markers: SeriesMarker<HorzScaleItem>[]) => void;
+	/**
+	 * Returns current markers.
+	 */
+	markers: () => readonly SeriesMarker<HorzScaleItem>[];
+	/**
+	 * Detaches the plugin from the series.
+	 */
+	detach: () => void;
+}
+
+class SeriesMarkersPrimitiveWrapper<HorzScaleItem> extends SeriesPrimitiveAdapter<HorzScaleItem, unknown, SeriesMarkersPrimitive<HorzScaleItem>> implements ISeriesPrimitiveWrapper<HorzScaleItem>, ISeriesMarkersPluginApi<HorzScaleItem> {
 	public constructor(series: ISeriesApi<SeriesType, HorzScaleItem>, primitive: SeriesMarkersPrimitive<HorzScaleItem>, markers?: SeriesMarker<HorzScaleItem>[]) {
 		super(series, primitive);
 		if (markers) {
@@ -54,7 +73,7 @@ class SeriesMarkersPrimitiveWrapper<HorzScaleItem> extends SeriesPrimitiveAdapte
 export function createSeriesMarkers<HorzScaleItem>(
 	series: ISeriesApi<SeriesType, HorzScaleItem>,
 	markers?: SeriesMarker<HorzScaleItem>[]
-): SeriesMarkersPrimitiveWrapper<HorzScaleItem> {
+): ISeriesMarkersPluginApi<HorzScaleItem> {
 	const wrapper = new SeriesMarkersPrimitiveWrapper(series, new SeriesMarkersPrimitive<HorzScaleItem>());
 	if (markers) {
 		wrapper.setMarkers(markers);

@@ -13,14 +13,14 @@ In the new version of Lightweight Charts, the watermark feature has undergone si
 2. **Re-implementation**: It's now re-implemented as a Pane Primitive (plugin) included within the library.
 3. **Improved Tree-shaking**: This change makes the feature more tree-shakeable, potentially reducing bundle sizes for users who don't need watermarks.
 4. **Added an Image Watermark Primitive**: In addition to the usual text based watermark, there is now
-an image watermark feature provided by the [`createImageWatermark`](/api/functions/createImageWatermark.md) primitive.
+an image watermark feature provided by the [`createImageWatermark`](/api/functions/createImageWatermark.md) plugin.
 5. **Series Markers**: The series markers feature has been moved to a separate plugin as well. To create a series marker, use the [`createSeriesMarkers`](/api/functions/createSeriesMarkers.md) function exported from the library.
 
 If you're currently using the watermark feature, you'll need to make a few adjustments to your code.
 
 ### Accessing the New TextWatermark
 
-The TextWatermark primitive is now available as follows:
+The TextWatermark plugin is now available as follows:
 
 - **ESM builds**: Import [`createTextWatermark`](/api/functions/createTextWatermark.md) directly.
 - **Standalone script build**: Access via `LightweightCharts.createTextWatermark`.
@@ -34,7 +34,7 @@ The options structure for watermarks has been revised:
 
 ### Attaching the Watermark
 
-To use the Primitive, you need to attach it to a Pane:
+To use the plugin, you need pass a pane object to the `createTextWatermark` function. The pane object specifies where the watermark should be attached:
 
 1. **Single Pane**: If you're using only one pane, you can easily fetch it using `chart.panes()[0]`.
 2. **Multiple Panes**: For charts with multiple panes, you'll need to specify which pane to attach the watermark to.

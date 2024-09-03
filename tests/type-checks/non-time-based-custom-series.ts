@@ -4,6 +4,7 @@ import { Time } from '../../src/model/horz-scale-behavior-time/types';
 import { CustomData, CustomSeriesPricePlotValues, ICustomSeriesPaneRenderer, ICustomSeriesPaneView, PaneRendererCustomData } from '../../src/model/icustom-series';
 import { IHorzScaleBehavior } from '../../src/model/ihorz-scale-behavior';
 import { CustomSeriesOptions } from '../../src/model/series-options';
+import { ITextWatermarkPluginApi } from '../../src/plugins/text-watermark/primitive';
 
 type HorizontalScaleType = number;
 
@@ -107,6 +108,11 @@ if (dataSet) {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 dataSet.push({ time: 12 });
 
-createTextWatermark<HorizontalScaleType>(chart.panes()[1], {
+createTextWatermark(chart.panes()[1], {
 	lines: [],
-});
+}) satisfies ITextWatermarkPluginApi<number>;
+
+createTextWatermark(chart.panes()[1], {
+	lines: [],
+// @ts-expect-error Time is not the expected Generic here.
+}) satisfies ITextWatermarkPluginApi<Time>;

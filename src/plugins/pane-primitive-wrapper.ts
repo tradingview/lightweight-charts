@@ -15,9 +15,28 @@ export interface IPanePrimitiveWithOptions<T, K> extends IPanePrimitive<T> {
 	applyOptions?: (options: DeepPartial<K>) => void;
 }
 
+/**
+ * Interface for a pane primitive.
+ */
+export interface IPanePrimitiveWrapper<T, Options> {
+	/**
+	 * Detaches the plugin from the pane.
+	 */
+	detach: () => void;
+	/**
+	 * Returns the current pane.
+	 */
+	getPane: () => IPaneApi<T>;
+	/**
+	 * Applies options to the primitive.
+	 * @param options - Options to apply. The options are deeply merged with the current options.
+	 */
+	applyOptions?: (options: DeepPartial<Options>) => void;
+}
+
 export class PanePrimitiveWrapper<T, Options = unknown, TPrimitive extends IPanePrimitiveWithOptions<T, Options> = IPanePrimitive<T>> implements IPrimitiveWrapper<T, Options> {
-	protected _primitive: TPrimitive;
-	protected _pane: IPaneApi<T>;
+	private _primitive: TPrimitive;
+	private _pane: IPaneApi<T>;
 
 	public constructor(pane: IPaneApi<T>, primitive: TPrimitive) {
 		this._pane = pane;
