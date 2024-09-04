@@ -87,7 +87,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 
 	public autoscaleInfo(startTimePoint: Logical, endTimePoint: Logical): AutoscaleInfo | null {
 		if (this._paneView) {
-			const margins = this.autoScaleMargins();
+			const margins = this._getAutoScaleMargins();
 			if (margins) {
 				return {
 					priceRange: null,
@@ -98,7 +98,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		return null;
 	}
 
-	public autoScaleMargins(): AutoScaleMargins | null {
+	private _getAutoScaleMargins(): AutoScaleMargins | null {
 		const chart = ensureNotNull(this._chart);
 		const barSpacing = chart.timeScale().options().barSpacing;
 		if (this._autoScaleMarginsInvalidated || barSpacing !== this._cachedBarSpacing) {
