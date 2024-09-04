@@ -30,6 +30,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	private _autoScaleMarginsInvalidated: boolean = true;
 	private _autoScaleMargins: AutoScaleMargins | null = null;
 	private _markersPositions: MarkerPositions | null = null;
+	private _cachedBarSpacing: number | null = null;
 
 	public attached(param: SeriesAttachedParameter<HorzScaleItem>): void {
 		this._recalculateMarkers();
@@ -98,9 +99,11 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	}
 
 	public autoScaleMargins(): AutoScaleMargins | null {
-		if (this._autoScaleMarginsInvalidated) {
-			if (this._markers.length > 0 && this._chart) {
-				const barSpacing = this._chart.timeScale().options().barSpacing;
+		const chart = ensureNotNull(this._chart);
+		const barSpacing = chart.timeScale().options().barSpacing;
+		if (this._autoScaleMarginsInvalidated || barSpacing !== this._cachedBarSpacing) {
+			this._cachedBarSpacing = barSpacing;
+			if (this._markers.length > 0) {
 				const shapeMargin = calculateShapeMargin(barSpacing);
 				const marginValue = calculateShapeHeight(barSpacing) * 1.5 + shapeMargin * 2;
 				const positions = this._getMarkerPositions();
