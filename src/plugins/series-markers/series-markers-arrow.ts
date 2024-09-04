@@ -1,9 +1,9 @@
-import { ceiledOdd } from '../helpers/mathex';
+import { ceiledOdd } from '../../helpers/mathex';
 
-import { Coordinate } from '../model/coordinate';
+import { Coordinate } from '../../model/coordinate';
 
 import { hitTestSquare } from './series-markers-square';
-import { BitmapShapeItemCoordinates, shapeSize } from './series-markers-utils';
+import { BitmapShapeItemCoordinates, shapeSize } from './utils';
 
 export function drawArrow(
 	up: boolean,

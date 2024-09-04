@@ -16,13 +16,14 @@ included below.
 
 ## Short answer
 
-A simple text watermark can be configured and added by using the [`TextWatermark`](/docs/next/api/classes/TextWatermark) pane primitive exported
+A simple text watermark can be configured and added by using the [`createTextWatermark`](/docs/next/api#createTextWatermark) function exported
 from the library as follows:
 
 ```js
-import { TextWatermark } from 'lightweight-charts';
+import { createTextWatermark } from 'lightweight-charts';
 
-const textWatermark = new TextWatermark({
+const firstPane = chart.panes()[0];
+const textWatermark = createTextWatermark(firstPane, {
     horzAlign: 'center',
     vertAlign: 'center',
     lines: [
@@ -34,8 +35,6 @@ const textWatermark = new TextWatermark({
     ],
 });
 
-const firstPane = chart.panes()[0];
-firstPane.attachPrimitive(textWatermark);
 ```
 
 The options available for the watermark are: [TextWatermark Options](/docs/next/api/interfaces/TextWatermarkOptions).
@@ -44,7 +43,7 @@ You can see full [working examples](#examples) below.
 
 ## Resources
 
-- [`TextWatermark` pane primitive](/docs/next/api/classes/TextWatermark).
+- [`createTextWatermark` function](/docs/next/api#createTextWatermark).
 - [TextWatermark Options](/docs/next/api/interfaces/TextWatermarkOptions)
 
 ## Examples
@@ -65,19 +64,17 @@ import codeSimple from "!!raw-loader!./watermark-simple.js";
 
 ### Image Watermark Example
 
-If a simple text watermark doesn't meet your requirements then you can use the [`ImageWatermark`](/docs/next/api/classes/ImageWatermark) pane primitive exported
+If a simple text watermark doesn't meet your requirements then you can use the Image watermark via [`createImageWatermark`](/docs/next/api#createImageWatermark) function exported
 from the library as follows:
 
 ```js
-import { ImageWatermark } from 'lightweight-charts';
+import { createImageWatermark } from 'lightweight-charts';
 
-const imageWatermark = new ImageWatermark('/images/my-image.png', {
+const firstPane = chart.panes()[0];
+const imageWatermark = createImageWatermark(firstPane, '/images/my-image.png', {
     alpha: 0.5,
     padding: 20,
 });
-
-const firstPane = chart.panes()[0];
-firstPane.attachPrimitive(imageWatermark);
 ```
 
 The options available for the watermark are: [ImageWatermark Options](/docs/next/api/interfaces/ImageWatermarkOptions).
@@ -86,7 +83,7 @@ You can see full [working examples](#examples) below.
 
 ## Resources
 
-- [`ImageWatermark` pane primitive](/docs/next/api/classes/ImageWatermark).
+- [`createImageWatermark` pane primitive](/docs/next/api#createImageWatermark).
 - [ImageWatermark Options](/docs/next/api/interfaces/ImageWatermarkOptions)
 
 :::tip

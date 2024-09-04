@@ -29,15 +29,17 @@ function runTestCase(container) {
 
 	const data = generateData();
 	mainSeries.setData(data);
-
-	mainSeries.setMarkers([
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'square' },
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'yellow', shape: 'square' },
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'red', shape: 'square' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'orange', shape: 'square' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'yellow', shape: 'square' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'red', shape: 'square' },
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'orange', shape: 'square' },
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'square' },
-	]);
+	LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		[
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'square' },
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'yellow', shape: 'square' },
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'red', shape: 'square' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'orange', shape: 'square' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'yellow', shape: 'square' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'red', shape: 'square' },
+			{ time: data[data.length - 10].time, position: 'inBar', color: 'orange', shape: 'square' },
+			{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'square' },
+		]
+	);
 }

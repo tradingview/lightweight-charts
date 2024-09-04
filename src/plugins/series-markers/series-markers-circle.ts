@@ -1,6 +1,6 @@
-import { Coordinate } from '../model/coordinate';
+import { Coordinate } from '../../model/coordinate';
 
-import { BitmapShapeItemCoordinates, shapeSize } from './series-markers-utils';
+import { BitmapShapeItemCoordinates, shapeSize } from './utils';
 
 export function drawCircle(
 	ctx: CanvasRenderingContext2D,

@@ -769,7 +769,8 @@ for (let i = 0; i < datesForMarkers.length; i++) {
 		});
 	}
 }
-series.setMarkers(markers);
+/** @type {import('lightweight-charts').createSeriesMarkers} */
+createSeriesMarkers(series, markers);
 // highlight-end
 
 chart.timeScale().fitContent();

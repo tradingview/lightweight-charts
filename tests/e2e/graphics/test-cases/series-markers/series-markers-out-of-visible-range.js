@@ -20,13 +20,15 @@ function runTestCase(container) {
 	const data = generateData();
 	mainSeries.setData(data);
 
-	mainSeries.setMarkers([
-		{ time: data[0].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
-		{ time: data[data.length - 4].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
-		{ time: data[data.length - 3].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
-		{ time: data[data.length - 2].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
-		{ time: data[data.length - 1].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
-	]);
-
+	LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		[
+			{ time: data[0].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+			{ time: data[data.length - 4].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+			{ time: data[data.length - 3].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+			{ time: data[data.length - 2].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+			{ time: data[data.length - 1].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+		]
+	);
 	chart.timeScale().scrollToPosition(-4);
 }

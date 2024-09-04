@@ -45,7 +45,7 @@ export default [
 	{
 		name: 'Plugin: Text Watermark',
 		path: 'dist/lightweight-charts.production.mjs',
-		import: '{ TextWatermark }',
+		import: '{ createTextWatermark }',
 		ignore: ['fancy-canvas'],
 		limit: '2.00 KB',
 		brotli: true,
@@ -53,9 +53,17 @@ export default [
 	{
 		name: 'Plugin: Image Watermark',
 		path: 'dist/lightweight-charts.production.mjs',
-		import: '{ ImageWatermark }',
+		import: '{ createImageWatermark }',
 		ignore: ['fancy-canvas'],
 		limit: '2.00 KB',
+		brotli: true,
+	},
+	{
+		name: 'Plugin: Series Markers',
+		path: 'dist/lightweight-charts.production.mjs',
+		import: '{ createSeriesMarkers }',
+		ignore: ['fancy-canvas'],
+		limit: '4.08 KB',
 		brotli: true,
 	},
 ];

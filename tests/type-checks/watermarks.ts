@@ -1,19 +1,18 @@
-import { createChart, ImageWatermark, TextWatermark } from '../../src';
+import { createChart, createImageWatermark, createTextWatermark } from '../../src';
 
 const chart = createChart('anything');
 
 const mainSeries = chart.addLineSeries();
 mainSeries.setData([]);
 
-const imageWatermark = new ImageWatermark('/debug/image.svg', {
+createImageWatermark(chart.panes()[0], '/debug/image.svg', {
 	alpha: 0.5,
 	padding: 50,
 	maxHeight: 400,
 	maxWidth: 400,
 });
-chart.panes()[0].attachPrimitive(imageWatermark);
 
-const textWatermark = new TextWatermark({
+createTextWatermark(chart.panes()[1], {
 	horzAlign: 'center',
 	vertAlign: 'center',
 	lines: [
@@ -25,4 +24,3 @@ const textWatermark = new TextWatermark({
 		},
 	],
 });
-chart.panes()[1].attachPrimitive(textWatermark);

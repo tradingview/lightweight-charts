@@ -1,20 +1,19 @@
-import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
+import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { ensureNever } from '../helpers/assertions';
-import { makeFont } from '../helpers/make-font';
+import { ensureNever } from '../../helpers/assertions';
+import { makeFont } from '../../helpers/make-font';
 
-import { HoveredObject } from '../model/chart-model';
-import { Coordinate } from '../model/coordinate';
-import { SeriesMarkerShape } from '../model/series-markers';
-import { TextWidthCache } from '../model/text-width-cache';
-import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
+import { Coordinate } from '../../model/coordinate';
+import { IPrimitivePaneRenderer, PrimitiveHoveredItem } from '../../model/ipane-primitive';
+import { TextWidthCache } from '../../model/text-width-cache';
+import { SeriesItemsIndexesRange, TimedValue } from '../../model/time-data';
 
-import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
 import { drawSquare, hitTestSquare } from './series-markers-square';
 import { drawText, hitTestText } from './series-markers-text';
-import { BitmapShapeItemCoordinates } from './series-markers-utils';
+import { SeriesMarkerShape } from './types';
+import { BitmapShapeItemCoordinates } from './utils';
 
 export interface SeriesMarkerText {
 	content: string;
@@ -39,7 +38,7 @@ export interface SeriesMarkerRendererData {
 	visibleRange: SeriesItemsIndexesRange | null;
 }
 
-export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
+export class SeriesMarkersRenderer implements IPrimitivePaneRenderer {
 	private _data: SeriesMarkerRendererData | null = null;
 	private _textWidthCache: TextWidthCache = new TextWidthCache();
 	private _fontSize: number = -1;
@@ -59,17 +58,17 @@ export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
 		}
 	}
 
-	public hitTest(x: Coordinate, y: Coordinate): HoveredObject | null {
+	public hitTest(x: number, y: number): PrimitiveHoveredItem | null {
 		if (this._data === null || this._data.visibleRange === null) {
 			return null;
 		}
 
 		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
 			const item = this._data.items[i];
-			if (hitTestItem(item, x, y)) {
+			if (item && hitTestItem(item, x as Coordinate, y as Coordinate)) {
 				return {
-					hitTestData: item.internalId,
-					externalId: item.externalId,
+					zOrder: 'normal',
+					externalId: item.externalId ?? '',
 				};
 			}
 		}
@@ -77,16 +76,21 @@ export class SeriesMarkersRenderer extends BitmapCoordinatesPaneRenderer {
 		return null;
 	}
 
-	protected _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope, isHovered: boolean, hitTestData?: unknown): void {
+	public draw(target: CanvasRenderingTarget2D): void {
+		target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
+			this._drawImpl(scope);
+		});
+	}
+
+	protected _drawImpl({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
 		if (this._data === null || this._data.visibleRange === null) {
 			return;
 		}
 
 		ctx.textBaseline = 'middle';
 		ctx.font = this._font;
-
-		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
-			const item = this._data.items[i];
+		for (let index = this._data.visibleRange.from; index < this._data.visibleRange.to; index++) {
+			const item = this._data.items[index];
 			if (item.text !== undefined) {
 				item.text.width = this._textWidthCache.measureText(ctx, item.text.content);
 				item.text.height = this._fontSize;
@@ -109,7 +113,6 @@ function bitmapShapeItemCoordinates(item: SeriesMarkerRendererDataItem, horizont
 
 function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, horizontalPixelRatio: number, verticalPixelRatio: number): void {
 	ctx.fillStyle = item.color;
-
 	if (item.text !== undefined) {
 		drawText(ctx, item.text.content, item.text.x, item.text.y, horizontalPixelRatio, verticalPixelRatio);
 	}

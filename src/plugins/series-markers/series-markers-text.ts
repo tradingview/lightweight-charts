@@ -1,4 +1,4 @@
-import { Coordinate } from '../model/coordinate';
+import { Coordinate } from '../../model/coordinate';
 
 export function drawText(
 	ctx: CanvasRenderingContext2D,

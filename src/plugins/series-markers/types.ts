@@ -42,27 +42,10 @@ export interface SeriesMarker<TimeType> {
 	 * @defaultValue `1`
 	 */
 	size?: number;
-
-	/**
-	 * @internal
-	 */
-	originalTime: unknown;
 }
+
+export type MarkerPositions = Record<SeriesMarkerPosition, boolean>;
 
 export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {
 	internalId: number;
-}
-
-export function convertSeriesMarker<InTimeType, OutTimeType>(sm: SeriesMarker<InTimeType>, newTime: OutTimeType, originalTime?: unknown): SeriesMarker<OutTimeType> {
-	const { time: inTime, originalTime: inOriginalTime, ...values } = sm;
-	/* eslint-disable @typescript-eslint/consistent-type-assertions */
-	const res = {
-		time: newTime,
-		...values,
-	} as SeriesMarker<OutTimeType>;
-	/* eslint-enable @typescript-eslint/consistent-type-assertions */
-	if (originalTime !== undefined) {
-		res.originalTime = originalTime;
-	}
-	return res;
 }

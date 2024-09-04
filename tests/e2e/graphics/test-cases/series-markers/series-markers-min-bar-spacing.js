@@ -27,7 +27,10 @@ function runTestCase(container) {
 		{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'arrowUp' },
 	];
 
-	mainSeries.setMarkers(markers);
+	LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		markers
+	);
 	chart.applyOptions({
 		timeScale: {
 			barSpacing: 0.01, // will be corrected to min available bar spacing

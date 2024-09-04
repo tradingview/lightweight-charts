@@ -1,6 +1,6 @@
-import { ceiledEven, ceiledOdd } from '../helpers/mathex';
+import { ceiledEven, ceiledOdd } from '../../helpers/mathex';
 
-import { SeriesMarkerShape } from '../model/series-markers';
+import { SeriesMarkerShape } from './types';
 
 const enum Constants {
 	MinShapeSize = 12,
