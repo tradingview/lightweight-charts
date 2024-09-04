@@ -52,7 +52,7 @@ class SeriesMarkersPrimitiveWrapper<HorzScaleItem> extends SeriesPrimitiveAdapte
  * ```js
  * import { createSeriesMarkers } from 'lightweight-charts';
  *
- *	const seriesMarkersPrimitive = createSeriesMarkers(
+ *	const seriesMarkers = createSeriesMarkers(
  *		series,
  *		[
  *			{
@@ -65,9 +65,9 @@ class SeriesMarkersPrimitiveWrapper<HorzScaleItem> extends SeriesPrimitiveAdapte
  *	);
  *  // and then you can modify the markers
  *  // set it to empty array to remove all markers
- *  seriesMarkersPrimitive.setMarkers([]);
+ *  seriesMarkers.setMarkers([]);
  *
- *  // `seriesMarkersPrimitive.markers()` returns current markers
+ *  // `seriesMarkers.markers()` returns current markers
  * ```
  */
 export function createSeriesMarkers<HorzScaleItem>(
