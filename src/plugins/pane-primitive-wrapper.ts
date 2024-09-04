@@ -3,8 +3,6 @@ import { IPanePrimitive } from '../api/ipane-primitive-api';
 
 import { DeepPartial } from '../helpers/strict-type-checks';
 
-import { IPrimitiveWrapper } from './primitive-wrapper-base';
-
 /**
  * Interface for a primitive with options.
  */
@@ -34,7 +32,7 @@ export interface IPanePrimitiveWrapper<T, Options> {
 	applyOptions?: (options: DeepPartial<Options>) => void;
 }
 
-export class PanePrimitiveWrapper<T, Options = unknown, TPrimitive extends IPanePrimitiveWithOptions<T, Options> = IPanePrimitive<T>> implements IPrimitiveWrapper<T, Options> {
+export class PanePrimitiveWrapper<T, Options = unknown, TPrimitive extends IPanePrimitiveWithOptions<T, Options> = IPanePrimitive<T>> implements IPanePrimitiveWrapper<T, Options> {
 	private _primitive: TPrimitive;
 	private _pane: IPaneApi<T>;
 

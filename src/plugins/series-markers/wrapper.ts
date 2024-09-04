@@ -9,7 +9,7 @@ import { SeriesMarker } from './types';
 /**
  * Interface for a series markers plugin
  */
-export interface ISeriesMarkersPluginApi<HorzScaleItem> {
+export interface ISeriesMarkersPluginApi<HorzScaleItem> extends ISeriesPrimitiveWrapper<HorzScaleItem> {
 	/**
 	 * Set markers to the series.
 	 * @param markers - An array of markers to be displayed on the series.
