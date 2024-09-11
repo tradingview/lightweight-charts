@@ -36,11 +36,12 @@ candlestickSeries.setData(alternateCandleData);
 const tooltipPrimitive = new TooltipPrimitive({
 	lineColor: 'rgba(0, 0, 0, 0.2)',
 	tooltip: {
-		followMode: 'top',
+		followMode: 'tracking',
 	},
 });
 
-candlestickSeries.attachPrimitive(tooltipPrimitive);
+// not attaching tooltip to stock candle stick
+// candlestickSeries.attachPrimitive(tooltipPrimitive);
 
 const optioncandlestickSeries = chart.addCandlestickSeries();
 optioncandlestickSeries.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10));
@@ -48,8 +49,10 @@ optioncandlestickSeries.setData(generateOptionPrices(alternateCandleData[alterna
 optioncandlestickSeries.attachPrimitive(tooltipPrimitive);
 
 const trackingButtonEl = document.querySelector('#tracking-button');
-if (trackingButtonEl) trackingButtonEl.classList.add('grey');
 const topButtonEl = document.querySelector('#top-button');
+// default to tracking
+if (topButtonEl) topButtonEl.classList.add('grey');
+
 if (trackingButtonEl) {
 	trackingButtonEl.addEventListener('click', function () {
 		trackingButtonEl.classList.remove('grey');
