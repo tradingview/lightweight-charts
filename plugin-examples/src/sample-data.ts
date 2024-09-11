@@ -15,7 +15,7 @@ export type CandleData = {
 
 let randomFactor = 25 + Math.random() * 25;
 const samplePoint = (i: number) =>
-	i *
+	1 *
 		(0.5 +
 			Math.sin(i / 10) * 0.2 +
 			Math.sin(i / 20) * 0.4 +
@@ -26,7 +26,8 @@ const samplePoint = (i: number) =>
 export function generateLineData(numberOfPoints: number = 500): LineData[] {
 	randomFactor = 25 + Math.random() * 25;
 	const res = [];
-	const date = new Date(Date.UTC(2018, 0, 1, 12, 0, 0, 0));
+	// YYYY-MM-DD HH:mm:ss
+	const date = new Date(Date.UTC(2023, 0, 1, 12, 0, 0, 0));
 	for (let i = 0; i < numberOfPoints; ++i) {
 		const time = (date.getTime() / 1000) as Time;
 		const value = samplePoint(i);
@@ -38,6 +39,32 @@ export function generateLineData(numberOfPoints: number = 500): LineData[] {
 		date.setUTCDate(date.getUTCDate() + 1);
 	}
 
+	return res;
+}
+
+// generate list of option prices. the function takes as input the strike price and returns the option price for different expiries
+// the function should return an array of objects with the following structure:
+// {
+// 	strike: number;
+// 	expiry: Date;
+// 	price: number;
+// }
+// The date should start from 1 June 2024 and the list should data for every week expiry for 3 months
+export function generateOptionPrices(strikePrice: number): {
+	strike: number;
+	expiry: Date;
+	price: number;
+}[] {
+	const res = [];
+	const date = new Date(Date.UTC(2024, 5, 1, 12, 0, 0, 0));
+	for (let i = 0; i < 12; ++i) {
+		res.push({
+			strike: strikePrice,
+			expiry: date,
+			price: strikePrice + i * 10,
+		});
+		date.setUTCDate(date.getUTCDate() + 7);
+	}
 	return res;
 }
 

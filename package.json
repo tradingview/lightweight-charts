@@ -51,13 +51,17 @@
     "node": ">=16.16.0"
   },
   "dependencies": {
-    "fancy-canvas": "2.1.0"
+    "fancy-canvas": "2.1.0",
+    "lightweight-charts": "~4.2.0"
   },
   "devDependencies": {
+    "@docusaurus/module-type-aliases": "~3.5.2",
+    "@docusaurus/theme-classic": "~3.5.2",
     "@rollup/plugin-node-resolve": "~15.0.2",
     "@rollup/plugin-replace": "~5.0.2",
     "@rollup/plugin-terser": "~0.4.3",
     "@size-limit/file": "~8.2.4",
+    "@tsconfig/docusaurus": "~2.0.3",
     "@types/chai": "~4.3.5",
     "@types/glob": "~8.1.0",
     "@types/mocha": "~10.0.1",
