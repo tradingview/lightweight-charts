@@ -152,9 +152,9 @@ export class TooltipElement {
 		if (tooltipContentData.title !== undefined && this._titleElement) {
 			setElementText(this._titleElement, tooltipContentData.title);
 		}
-		setElementText(this._priceElement, tooltipContentData.price);
-		setElementText(this._dateElement, tooltipContentData.date);
-		setElementText(this._timeElement, tooltipContentData.time);
+		setElementText(this._priceElement, 'Breakeven: ' + tooltipContentData.price);
+		setElementText(this._dateElement, 'Expiry: ' + tooltipContentData.date);
+		setElementText(this._timeElement, 'Time: ' + tooltipContentData.time);
 	}
 
 	public updatePosition(positionData: TooltipPosition) {

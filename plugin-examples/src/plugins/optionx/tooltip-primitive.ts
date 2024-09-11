@@ -222,6 +222,11 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 		}
 		const price = this._options.priceExtractor(data);
 		const priceCoordinate = series.priceToCoordinate(parseFloat(price));
+		
+		// console log data
+		console.log(data);
+		// console log series
+		// console.log(series);
 
 		const threshold = 7;
 		if (priceCoordinate === null || Math.abs(param.point?.y - priceCoordinate) > threshold) {
