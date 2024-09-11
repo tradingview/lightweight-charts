@@ -1,6 +1,6 @@
 import { createChart } from 'lightweight-charts';
-import { generateLineData } from '../../../sample-data';
-import { TooltipPrimitive } from '../optionx';
+import { generateAlternativeCandleData } from '../../../sample-data';
+import { TooltipPrimitive } from '../tooltip-primitive';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
@@ -20,13 +20,17 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	},
 }));
 
-const areaSeries = chart.addAreaSeries({
-	lineColor: 'rgb(4,153,129)',
-	topColor: 'rgba(4,153,129, 0.4)',
-	bottomColor: 'rgba(4,153,129, 0)',
-	priceLineVisible: false,
-});
-areaSeries.setData(generateLineData());
+// const areaSeries = chart.addAreaSeries({
+// 	lineColor: 'rgb(4,153,129)',
+// 	topColor: 'rgba(4,153,129, 0.4)',
+// 	bottomColor: 'rgba(4,153,129, 0)',
+// 	priceLineVisible: false,
+// });
+// areaSeries.setData(generateLineData());
+
+// create candlestick series
+const candlestickSeries = chart.addCandlestickSeries();
+candlestickSeries.setData(generateAlternativeCandleData());
 
 const tooltipPrimitive = new TooltipPrimitive({
 	lineColor: 'rgba(0, 0, 0, 0.2)',
@@ -35,7 +39,7 @@ const tooltipPrimitive = new TooltipPrimitive({
 	},
 });
 
-areaSeries.attachPrimitive(tooltipPrimitive);
+candlestickSeries.attachPrimitive(tooltipPrimitive);
 
 const trackingButtonEl = document.querySelector('#tracking-button');
 if (trackingButtonEl) trackingButtonEl.classList.add('grey');
