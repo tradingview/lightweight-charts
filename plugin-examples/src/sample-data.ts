@@ -54,14 +54,24 @@ export function generateOptionPrices(strikePrice: number): {
 	strike: number;
 	expiry: Date;
 	price: number;
+	time: Time;
+	open: number;
+	high: number;
+	low: number;
+	close: number;
 }[] {
 	const res = [];
-	const date = new Date(Date.UTC(2024, 5, 1, 12, 0, 0, 0));
+	const date = new Date(Date.UTC(2023, 9, 1, 12, 0, 0, 0));
 	for (let i = 0; i < 12; ++i) {
 		res.push({
 			strike: strikePrice,
 			expiry: date,
 			price: strikePrice + i * 10,
+			time: (date.getTime() / 1000) as Time,
+			open: strikePrice + i * 10,
+			high: strikePrice + i * 10,
+			low: strikePrice + i * 10,
+			close: strikePrice + i * 10,
 		});
 		date.setUTCDate(date.getUTCDate() + 7);
 	}

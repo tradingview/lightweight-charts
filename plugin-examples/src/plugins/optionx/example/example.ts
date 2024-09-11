@@ -1,5 +1,5 @@
 import { createChart } from 'lightweight-charts';
-import { generateAlternativeCandleData } from '../../../sample-data';
+import { generateAlternativeCandleData, generateOptionPrices } from '../../../sample-data';
 import { TooltipPrimitive } from '../tooltip-primitive';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
@@ -30,7 +30,8 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 
 // create candlestick series
 const candlestickSeries = chart.addCandlestickSeries();
-candlestickSeries.setData(generateAlternativeCandleData());
+const alternateCandleData = generateAlternativeCandleData();
+candlestickSeries.setData(alternateCandleData);
 
 const tooltipPrimitive = new TooltipPrimitive({
 	lineColor: 'rgba(0, 0, 0, 0.2)',
@@ -40,6 +41,11 @@ const tooltipPrimitive = new TooltipPrimitive({
 });
 
 candlestickSeries.attachPrimitive(tooltipPrimitive);
+
+const optioncandlestickSeries = chart.addCandlestickSeries();
+optioncandlestickSeries.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10));
+
+optioncandlestickSeries.attachPrimitive(tooltipPrimitive);
 
 const trackingButtonEl = document.querySelector('#tracking-button');
 if (trackingButtonEl) trackingButtonEl.classList.add('grey');
