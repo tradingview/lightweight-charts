@@ -6,8 +6,15 @@
 		<title>Lightweight Charts - Tooltip Plugin Example</title>
 		<link href="../../../examples-base.css" rel="stylesheet" />
 		<style>
+			html, body {
+				height: 100%;
+				margin-top: 20px;
+				padding: 0;
+			}
 			#chart {
-				height: 500px;
+				height: 80%;
+				width: 80%;
+				max-width: none;
 				/* width: 100%; */
 				position: relative;
 			}
@@ -20,20 +27,21 @@
 		</style>
 	</head>
 	<body>
-		<div id="buttons" class="column">
+		<!-- <div id="buttons" class="column">
 			<button id="top-button">Stick to Top</button>
 			<button id="tracking-button">Tracking</button>
-		</div>
-		<div id="chart"></div>
+		</div> -->
 		<div id="description">
 			<h1>OptionX</h1>
-			<p>
+			<!-- <p>
 				A tooltip created using an HTML DOM Element which can either track the
 				cursor vertical, or remain fixed to a specific vertical position. The
 				Delta Tooltip is an example of using the Canvas instead of HTML elements
 				to achieve the tooltip.
-			</p>
+			</p> -->
 		</div>
+		<div id="chart"></div>
+		
 		<script type="module" src="./example.ts"></script>
 	</body>
 </html>
