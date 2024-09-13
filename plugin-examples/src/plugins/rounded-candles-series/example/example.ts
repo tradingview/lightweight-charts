@@ -7,7 +7,7 @@ import { RoundedCandleSeries } from '../rounded-candles-series';
 // }));
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
-	autoSize: true,
+	// autoSize: true,
 	
 	grid: {
 		vertLines: {
@@ -16,7 +16,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 		horzLines: {
 			visible: false,
 		},
-		lastValueVisible: false,
+		
 	},
 	timeScale: {
 		borderVisible: false,

@@ -54,20 +54,25 @@ export function generateLineData(numberOfPoints: number = 500): LineData[] {
 // The date should start from 1 June 2024 and the list should data for every week expiry for 3 months
 export function generateOptionPrices(strikePrice: number): OptionPriceSeriesData[] {
 	const res: OptionPriceSeriesData[] = [];
-	const date = new Date(Date.UTC(2023, 9, 1, 12, 0, 0, 0));
+	let expiryDate = new Date(Date.UTC(2023, 9, 1, 12, 0, 0, 0));
+	const displayDelta = 0.5;
 	for (let i = 0; i < 12; ++i) {
+		const price = i * 5;
 		res.push({
 			strike: strikePrice,
-			expiry: date,
-			price: strikePrice + i * 10,
+			expiry: expiryDate,
+			price: price,
 
-			time: (date.getTime() / 1000) as Time,
-			open: strikePrice + i * 10,
-			high: strikePrice + i * 10,
-			low: strikePrice + i * 10,
-			close: strikePrice + i * 10,
+			time: (expiryDate.getTime() / 1000) as Time,
+			open: strikePrice + price,
+			high: strikePrice + price + displayDelta,
+			low: strikePrice + price,
+			close: strikePrice + price + displayDelta,
 		});
-		date.setUTCDate(date.getUTCDate() + 7);
+		// set the expiry date to the next week without affecting the existing entries
+		const newExpiryDate = new Date(expiryDate);
+		newExpiryDate.setUTCDate(newExpiryDate.getUTCDate() + 7);
+		expiryDate = newExpiryDate;
 	}
 	return res;
 }

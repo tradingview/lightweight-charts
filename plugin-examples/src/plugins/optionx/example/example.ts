@@ -13,12 +13,22 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 			visible: false,
 		},
 	},
-	timeScale: {
-		borderVisible: false,
-	},
+	// timeScale: {
+	// 	borderVisible: false,
+	// },
 	rightPriceScale: {
 		borderVisible: false,
 	},
+	crosshair: {
+        vertLine: {
+            labelVisible: true,
+			visible: true,
+        },
+        horzLine: {
+            labelVisible: true,
+			visible: true,
+        },
+    },
 }));
 
 // const areaSeries = chart.addAreaSeries({

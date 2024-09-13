@@ -22,8 +22,10 @@ const defaultOptions: TooltipOptions = {
 
 export interface TooltipContentData {
 	title?: string;
-	price: string;
-	date: string;
+	breakEvenPrice: string;
+	optionPrice: string;
+	strikePrice: string;
+	expiryDate: string;
 	time: string;
 }
 
@@ -38,8 +40,10 @@ export class TooltipElement {
 
 	private _element: HTMLDivElement | null;
 	private _titleElement: HTMLDivElement | null;
-	private _priceElement: HTMLDivElement | null;
-	private _dateElement: HTMLDivElement | null;
+	private _breakEvenPriceElement: HTMLDivElement | null;
+	private _optionPriceElement: HTMLDivElement | null;
+	private _strikePriceElement: HTMLDivElement | null;
+	private _expiryDateElement: HTMLDivElement | null;
 	private _timeElement: HTMLDivElement | null;
 
 	private _options: TooltipOptions;
@@ -77,6 +81,7 @@ export class TooltipElement {
 			color: '#131722',
 		});
 
+		// Title
 		const titleElement = document.createElement('div');
 		applyStyle(titleElement, {
 			'font-size': '16px',
@@ -86,22 +91,41 @@ export class TooltipElement {
 		setElementText(titleElement, this._options.title);
 		element.appendChild(titleElement);
 
-		const priceElement = document.createElement('div');
-		applyStyle(priceElement, {
+		// Option Price
+		const optionPriceElement = document.createElement('div');
+		applyStyle(optionPriceElement, {
 			'font-size': '14px',
 			'line-height': '18px',
 			'font-weight': '590',
 		});
-		setElementText(priceElement, '');
-		element.appendChild(priceElement);
+		setElementText(optionPriceElement, '');
+		element.appendChild(optionPriceElement);
 
-		const dateElement = document.createElement('div');
-		applyStyle(dateElement, {
+		// Break Even Price
+		const breakEvenPriceElement = document.createElement('div');
+		applyStyle(breakEvenPriceElement, {
 			color: '#787B86',
 		});
-		setElementText(dateElement, '');
-		element.appendChild(dateElement);
+		setElementText(breakEvenPriceElement, '');
+		element.appendChild(breakEvenPriceElement);
 
+		// Strike Price
+		const strikePriceElement = document.createElement('div');
+		applyStyle(strikePriceElement, {
+			color: '#787B86',
+		});
+		setElementText(strikePriceElement, '');
+		element.appendChild(strikePriceElement);
+		
+		// Expiry Date
+		const expiryDateElement = document.createElement('div');
+		applyStyle(expiryDateElement, {
+			color: '#787B86',
+		});
+		setElementText(expiryDateElement, '');
+		element.appendChild(expiryDateElement);
+
+		// Time
 		const timeElement = document.createElement('div');
 		applyStyle(timeElement, {
 			color: '#787B86',
@@ -111,8 +135,10 @@ export class TooltipElement {
 
 		this._element = element;
 		this._titleElement = titleElement;
-		this._priceElement = priceElement;
-		this._dateElement = dateElement;
+		this._breakEvenPriceElement = breakEvenPriceElement;
+		this._optionPriceElement = optionPriceElement;
+		this._strikePriceElement = strikePriceElement;
+		this._expiryDateElement = expiryDateElement;
 		this._timeElement = timeElement;
 
 		const chartElement = this._chart.chartElement();
@@ -149,12 +175,14 @@ export class TooltipElement {
 		if (!this._element) return;
 		const tooltipMeasurement = this._element.getBoundingClientRect();
 		this._lastTooltipWidth = tooltipMeasurement.width;
-		if (tooltipContentData.title !== undefined && this._titleElement) {
-			setElementText(this._titleElement, tooltipContentData.title);
-		}
-		setElementText(this._priceElement, 'Breakeven: ' + tooltipContentData.price);
-		setElementText(this._dateElement, 'Expiry: ' + tooltipContentData.date);
-		setElementText(this._timeElement, 'Time: ' + tooltipContentData.time);
+		// if (tooltipContentData.title !== undefined && this._titleElement) {
+		// 	setElementText(this._titleElement, 'Price: ' + tooltipContentData.title);
+		// }
+		setElementText(this._breakEvenPriceElement, 'Breakeven: ' + tooltipContentData.breakEvenPrice);
+		setElementText(this._optionPriceElement, 'Price: ' + tooltipContentData.optionPrice);
+		setElementText(this._strikePriceElement, 'Strike: ' + tooltipContentData.strikePrice);
+		setElementText(this._expiryDateElement, 'Expiry: ' + tooltipContentData.expiryDate);
+		// setElementText(this._timeElement, 'Time: ' + tooltipContentData.time);
 	}
 
 	public updatePosition(positionData: TooltipPosition) {

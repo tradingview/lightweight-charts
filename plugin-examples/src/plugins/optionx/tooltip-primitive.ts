@@ -16,23 +16,11 @@ import { TooltipElement, TooltipOptions } from './tooltip-element';
 import { convertTime, formattedDateAndTime } from '../../helpers/time';
 import { positionsLine } from '../../helpers/dimensions/positions';
 
-// Update the PriceFormatter type to include the new fields
-// type PriceFormatter = (price: {
-// 	open: number;
-// 	high: number;
-// 	low: number;
-// 	close: number;
-// 	strike?: number;
-// 	expiry?: Date;
-// 	time?: Time;
-// 	price?: number;
-// }) => string;
-
 // create an interface for OptionCandleStickData which extends CandlestickData
 export interface OptionCandleStickData extends CandlestickData {
 	strike?: number;
 	expiry?: Date;
-	price?: number;
+	price?: number; // price of the option; not break even price
 }
 
 class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
@@ -93,16 +81,12 @@ const defaultOptions: TooltipPrimitiveOptions = {
 	priceExtractor: (data: LineData | OptionCandleStickData | WhitespaceData | CandlestickData) => {
 		// console.log(data);
 		if ((data as OptionCandleStickData).price !== undefined) {
-			console.log(data);
-			return (data as OptionCandleStickData).close.toFixed(2);
+			// console.log(data);
+			return (data as OptionCandleStickData).open.toFixed(2);
 		}
 		if ((data as LineData).value !== undefined) {
 			return (data as LineData).value.toFixed(2);
 		}
-		// if ((data as CandlestickData).close !== undefined) {
-		// 	// console.log(data);
-		// 	return (data as CandlestickData).close.toFixed(2);
-		// }
 		return '';
 	}
 };
@@ -190,17 +174,18 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 				'Unable to change crosshair mode because the chart instance is undefined'
 			);
 		}
+		// need to check the following
 		chart.applyOptions({
 			crosshair: {
-				mode: CrosshairMode.Magnet,
-				vertLine: {
-					visible: false,
-					labelVisible: false,
-				},
-				horzLine: {
-					visible: false,
-					labelVisible: false,
-				}
+				mode: CrosshairMode.Normal,
+				// vertLine: {
+				// 	visible: false,
+				// 	labelVisible: false,
+				// },
+				// horzLine: {
+				// 	visible: false,
+				// 	labelVisible: false,
+				// }
 			},
 		});
 	}
@@ -211,8 +196,10 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 		if (!this._tooltip) return;
 		this._tooltip.updateTooltipContent({
 			title: '',
-			price: '',
-			date: '',
+			breakEvenPrice: '',
+			optionPrice: '',
+			strikePrice: '',
+			expiryDate: '',
 			time: '',
 		});
 		this._tooltip.updatePosition({
@@ -245,20 +232,19 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 			this._hideCrosshair();
 			return;
 		}
-		const price = this._options.priceExtractor(data);
-		const priceCoordinate = series.priceToCoordinate(parseFloat(price));
 		
-		// console log data
-		console.log(data);
-		// console log series
-		// console.log(series);
+		const optionPrice = (data as OptionCandleStickData).price ?? 0;
+		const strikePrice = (data as OptionCandleStickData).strike;
+		const breakEvenPrice = (strikePrice ?? 0) + (optionPrice ?? 0);
+		const priceCoordinate = series.priceToCoordinate(breakEvenPrice);
+		const expiryDate = (data as OptionCandleStickData).expiry;
 
-		const threshold = 7;
+		const threshold = 5;
 		if (priceCoordinate === null || Math.abs(param.point?.y - priceCoordinate) > threshold) {
 			this._hideCrosshair();
 			return;
 		}
-
+		
 		const coordinate = chart.timeScale().logicalToCoordinate(logical);
 		const [date, time] = formattedDateAndTime(param.time ? convertTime(param.time) : undefined);
 		if (this._tooltip) {
@@ -270,9 +256,20 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 				color: this.currentColor(),
 				topMargin,
 			});
+			// interface TooltipContentData {
+			// 	title?: string;
+			// 	breakEvenPrice: string;
+			// 	optionPrice: string;
+			// 	strikePrice: string;
+			// 	expiryDate: string;
+			// 	time: string;
+			// }
 			this._tooltip.updateTooltipContent({
-				price,
-				date,
+				title: optionPrice?.toString() ?? '',
+				breakEvenPrice: breakEvenPrice.toString(),
+				optionPrice: optionPrice?.toString() ?? '',
+				strikePrice: strikePrice?.toString() ?? '',
+				expiryDate: expiryDate?.toDateString() ?? '',
 				time,
 			});
 			this._tooltip.updatePosition({
