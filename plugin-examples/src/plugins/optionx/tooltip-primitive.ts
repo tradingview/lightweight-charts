@@ -239,7 +239,7 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 		const priceCoordinate = series.priceToCoordinate(breakEvenPrice);
 		const expiryDate = (data as OptionCandleStickData).expiry;
 
-		const threshold = 5;
+		const threshold = 3;
 		if (priceCoordinate === null || Math.abs(param.point?.y - priceCoordinate) > threshold) {
 			this._hideCrosshair();
 			return;

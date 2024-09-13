@@ -55,7 +55,7 @@ export function generateLineData(numberOfPoints: number = 500): LineData[] {
 export function generateOptionPrices(strikePrice: number): OptionPriceSeriesData[] {
 	const res: OptionPriceSeriesData[] = [];
 	let expiryDate = new Date(Date.UTC(2023, 9, 1, 12, 0, 0, 0));
-	const displayDelta = 0.5;
+	const displayDelta = 0;
 	for (let i = 0; i < 12; ++i) {
 		const price = i * 5;
 		res.push({

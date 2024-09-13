@@ -181,7 +181,7 @@ export class TooltipElement {
 		setElementText(this._breakEvenPriceElement, 'Breakeven: ' + tooltipContentData.breakEvenPrice);
 		setElementText(this._optionPriceElement, 'Price: ' + tooltipContentData.optionPrice);
 		setElementText(this._strikePriceElement, 'Strike: ' + tooltipContentData.strikePrice);
-		setElementText(this._expiryDateElement, 'Expiry: ' + tooltipContentData.expiryDate);
+		// setElementText(this._expiryDateElement, 'Expiry: ' + tooltipContentData.expiryDate);
 		// setElementText(this._timeElement, 'Time: ' + tooltipContentData.time);
 	}
 
