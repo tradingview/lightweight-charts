@@ -1,4 +1,6 @@
 import type { Time, WhitespaceData } from 'lightweight-charts';
+import { OptionCandleStickData } from './plugins/optionx/tooltip-primitive';
+import { OptionPriceSeriesData } from './plugins/option-price-series/data';
 
 type LineData = {
 	time: Time;
@@ -50,23 +52,15 @@ export function generateLineData(numberOfPoints: number = 500): LineData[] {
 // 	price: number;
 // }
 // The date should start from 1 June 2024 and the list should data for every week expiry for 3 months
-export function generateOptionPrices(strikePrice: number): {
-	strike: number;
-	expiry: Date;
-	price: number;
-	time: Time;
-	open: number;
-	high: number;
-	low: number;
-	close: number;
-}[] {
-	const res = [];
+export function generateOptionPrices(strikePrice: number): OptionPriceSeriesData[] {
+	const res: OptionPriceSeriesData[] = [];
 	const date = new Date(Date.UTC(2023, 9, 1, 12, 0, 0, 0));
 	for (let i = 0; i < 12; ++i) {
 		res.push({
 			strike: strikePrice,
 			expiry: date,
 			price: strikePrice + i * 10,
+
 			time: (date.getTime() / 1000) as Time,
 			open: strikePrice + i * 10,
 			high: strikePrice + i * 10,

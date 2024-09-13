@@ -16,6 +16,25 @@ import { TooltipElement, TooltipOptions } from './tooltip-element';
 import { convertTime, formattedDateAndTime } from '../../helpers/time';
 import { positionsLine } from '../../helpers/dimensions/positions';
 
+// Update the PriceFormatter type to include the new fields
+// type PriceFormatter = (price: {
+// 	open: number;
+// 	high: number;
+// 	low: number;
+// 	close: number;
+// 	strike?: number;
+// 	expiry?: Date;
+// 	time?: Time;
+// 	price?: number;
+// }) => string;
+
+// create an interface for OptionCandleStickData which extends CandlestickData
+export interface OptionCandleStickData extends CandlestickData {
+	strike?: number;
+	expiry?: Date;
+	price?: number;
+}
+
 class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
 	_data: TooltipCrosshairLineData;
 
@@ -71,13 +90,19 @@ interface TooltipCrosshairLineData {
 
 const defaultOptions: TooltipPrimitiveOptions = {
 	lineColor: 'rgba(0, 0, 0, 0.2)',
-	priceExtractor: (data: LineData | CandlestickData | WhitespaceData) => {
+	priceExtractor: (data: LineData | OptionCandleStickData | WhitespaceData | CandlestickData) => {
+		// console.log(data);
+		if ((data as OptionCandleStickData).price !== undefined) {
+			console.log(data);
+			return (data as OptionCandleStickData).close.toFixed(2);
+		}
 		if ((data as LineData).value !== undefined) {
 			return (data as LineData).value.toFixed(2);
 		}
-		if ((data as CandlestickData).close !== undefined) {
-			return (data as CandlestickData).close.toFixed(2);
-		}
+		// if ((data as CandlestickData).close !== undefined) {
+		// 	// console.log(data);
+		// 	return (data as CandlestickData).close.toFixed(2);
+		// }
 		return '';
 	}
 };
@@ -107,7 +132,7 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 		};
 		this._paneViews = [new MultiTouchCrosshairPaneView(this._data)];
 	}
-
+	
 	attached(param: SeriesAttachedParameter<Time>): void {
 		this._attachedParams = param;
 		this._setCrosshairMode();

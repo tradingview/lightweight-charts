@@ -8,10 +8,10 @@ import {
 	WhitespaceData,
 	Time,
 } from 'lightweight-charts';
-import { RoundedCandleSeriesData, /* isRoundedCandleData */ } from './data';
-import { RoundedCandleSeriesRenderer } from './renderer';
+import { OptionPriceSeriesData, /* isRoundedCandleData */ } from './data';
+import { OptionPriceSeriesRenderer } from './renderer';
 
-export interface RoundedCandleSeriesOptions
+export interface OptionPriceSeriesOptions
 	extends CustomSeriesOptions,
 		Exclude<
 			CandlestickSeriesOptions,
@@ -20,7 +20,7 @@ export interface RoundedCandleSeriesOptions
 	radius: (barSpacing: number) => number;
 }
 
-const defaultOptions: RoundedCandleSeriesOptions = {
+const defaultOptions: OptionPriceSeriesOptions = {
 	...customSeriesDefaultOptions,
 	lastValueVisible: false,
 	priceLineVisible: false,
@@ -40,20 +40,20 @@ const defaultOptions: RoundedCandleSeriesOptions = {
 	},
 } as const;
 
-export class RoundedCandleSeries<TData extends RoundedCandleSeriesData>
-	implements ICustomSeriesPaneView<Time, TData, RoundedCandleSeriesOptions>
+export class OptionPriceSeries<TData extends OptionPriceSeriesData>
+	implements ICustomSeriesPaneView<Time, TData, OptionPriceSeriesOptions>
 {
-	_renderer: RoundedCandleSeriesRenderer<TData>;
+	_renderer: OptionPriceSeriesRenderer<TData>;
 
 	constructor() {
-		this._renderer = new RoundedCandleSeriesRenderer();
+		this._renderer = new OptionPriceSeriesRenderer();
 	}
 
 	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
 		return [plotRow.high, plotRow.low, plotRow.close];
 	}
 
-	renderer(): RoundedCandleSeriesRenderer<TData> {
+	renderer(): OptionPriceSeriesRenderer<TData> {
 		return this._renderer;
 	}
 
@@ -63,7 +63,7 @@ export class RoundedCandleSeries<TData extends RoundedCandleSeriesData>
 
 	update(
 		data: PaneRendererCustomData<Time, TData>,
-		options: RoundedCandleSeriesOptions
+		options: OptionPriceSeriesOptions
 	): void {
 		this._renderer.update(data, options);
 	}

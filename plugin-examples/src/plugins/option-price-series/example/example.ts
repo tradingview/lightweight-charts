@@ -1,6 +1,6 @@
 import { WhitespaceData, createChart } from 'lightweight-charts';
 import { CandleData, generateAlternativeCandleData } from '../../../sample-data';
-import { RoundedCandleSeries } from '../rounded-candles-series';
+import { OptionPriceSeries } from '../option-price-series';
 
 // const chart = ((window as unknown as any).chart = createChart('chart', {
 // 	autoSize: true,
@@ -16,7 +16,6 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 		horzLines: {
 			visible: false,
 		},
-		lastValueVisible: false,
 	},
 	timeScale: {
 		borderVisible: false,
@@ -38,7 +37,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
     },
 }));
 
-const customSeriesView = new RoundedCandleSeries();
+const customSeriesView = new OptionPriceSeries();
 const myCustomSeries = chart.addCustomSeries(customSeriesView, {
 	color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
 });

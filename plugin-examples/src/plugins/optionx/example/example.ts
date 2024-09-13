@@ -1,6 +1,7 @@
 import { createChart } from 'lightweight-charts';
 import { generateAlternativeCandleData, generateOptionPrices } from '../../../sample-data';
 import { TooltipPrimitive } from '../tooltip-primitive';
+import { OptionPriceSeries } from '../../option-price-series/option-price-series';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
@@ -28,6 +29,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 // });
 // areaSeries.setData(generateLineData());
 
+
 // create candlestick series
 const candlestickSeries = chart.addCandlestickSeries();
 const alternateCandleData = generateAlternativeCandleData();
@@ -43,10 +45,15 @@ const tooltipPrimitive = new TooltipPrimitive({
 // not attaching tooltip to stock candle stick
 // candlestickSeries.attachPrimitive(tooltipPrimitive);
 
-const optioncandlestickSeries = chart.addCandlestickSeries();
-optioncandlestickSeries.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10));
+const customSeriesView = new OptionPriceSeries();
+const optionPriceSeries = chart.addCustomSeries(customSeriesView, {
+	color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
+});
 
-optioncandlestickSeries.attachPrimitive(tooltipPrimitive);
+// const optioncandlestickSeries = chart.addCandlestickSeries();
+optionPriceSeries.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10));
+
+optionPriceSeries.attachPrimitive(tooltipPrimitive);
 
 const trackingButtonEl = document.querySelector('#tracking-button');
 const topButtonEl = document.querySelector('#top-button');
