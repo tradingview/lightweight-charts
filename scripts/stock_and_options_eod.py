@@ -116,11 +116,12 @@ def get_option_prices(ticker: str, strike: float, expiration: str) -> List[float
     # start and end date are current date
     start_date = datetime.now().strftime("%Y%m%d")
     end_date = datetime.now().strftime("%Y%m%d")
-    conn.request("GET", f"/v2/hist/option/eod?exp={expiration}&right=C&strike={strike}&start_date={start_date}&end_date={end_date}&root={ticker}", headers=headers)
+    import pdb; pdb.set_trace()
+    conn.request("GET", f"/v2/hist/option/eod?exp={expiration}&right=C&strike={int(strike*1000)}&start_date={start_date}&end_date={end_date}&root={ticker}", headers=headers)
     res = conn.getresponse()
     data = res.read()
     data_json = json.loads(data.decode("utf-8"))['response']
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     bid = [x[10] for x in data_json]
     ask = [x[14] for x in data_json]
     mid = [(bid[i] + ask[i]) / 2 for i in range(len(bid))]
@@ -150,6 +151,7 @@ def get_stock_prices(ticker: str) -> List[float]:
 
 if __name__ == "__main__":
     ticker = "AAPL"
+    stock_data = get_stock_prices(ticker)
     expirations = get_expirations(ticker)
     print(expirations)
     current_price = 222.5
@@ -157,19 +159,26 @@ if __name__ == "__main__":
     print(strikes)
     # for each strike, get the option prices for all the expirations
     data = []
-    for strike in strikes:
-        for expiration in expirations:
-            option_closing_price = get_option_prices(ticker, strike, expiration)
-            data.append([ticker, expiration, strike, option_closing_price])
+    try:
+        for strike in strikes:
+            for expiration in expirations:
+                option_closing_price = get_option_prices(ticker, strike, expiration)
+                data.append([ticker, expiration, strike, option_closing_price])
+    except Exception as e:
+        print(e)
     print(data)
     # export the data to a csv file
     base_path = f"/Users/aayushahuja/Documents/projects/optionx/dump"
-    with open(f"{base_path}/{ticker}_options_eod_{datetime.now().strftime('%Y%m%d')}.csv", "w") as f:
-        writer = csv.writer(f)
-        writer.writerow(["ticker", "expiration", "strike", "option_closing_price"])
-        writer.writerows(data)
-    stock_data = get_stock_prices(ticker)
+    
+    # export stock data to csv
     with open(f"{base_path}/{ticker}_stock_eod_{datetime.now().strftime('%Y%m%d')}.csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["date", "open", "high", "low", "close"])
         writer.writerows(stock_data)
+
+    # export options data to csv
+    with open(f"{base_path}/{ticker}_options_eod_{datetime.now().strftime('%Y%m%d')}.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["ticker", "expiration", "strike", "option_closing_price"])
+        writer.writerows(data)
+    
