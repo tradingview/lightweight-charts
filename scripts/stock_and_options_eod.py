@@ -113,10 +113,17 @@ def get_strikes(ticker: str, expiration: str, current_price: float, strike_range
 def get_option_prices(ticker: str, strike: float, expiration: str) -> List[float]:
     conn = http.client.HTTPConnection("127.0.0.1:25510")
     headers = { 'Accept': "application/json" }
-    # start and end date are current date
-    start_date = datetime.now().strftime("%Y%m%d")
-    end_date = datetime.now().strftime("%Y%m%d")
-    import pdb; pdb.set_trace()
+    # start and end date are current date or if today is weekend, the weekday before
+    if datetime.now().weekday() == 5:
+        start_date = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+        end_date = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+    elif datetime.now().weekday() == 6:
+        start_date = (datetime.now() - timedelta(days=2)).strftime("%Y%m%d")
+        end_date = (datetime.now() - timedelta(days=2)).strftime("%Y%m%d")
+    else:
+        start_date = datetime.now().strftime("%Y%m%d")
+        end_date = datetime.now().strftime("%Y%m%d")
+    # import pdb; pdb.set_trace()
     conn.request("GET", f"/v2/hist/option/eod?exp={expiration}&right=C&strike={int(strike*1000)}&start_date={start_date}&end_date={end_date}&root={ticker}", headers=headers)
     res = conn.getresponse()
     data = res.read()
@@ -124,9 +131,10 @@ def get_option_prices(ticker: str, strike: float, expiration: str) -> List[float
     # import pdb; pdb.set_trace()
     bid = [x[10] for x in data_json]
     ask = [x[14] for x in data_json]
+    # mid should be formatted to 2 decimal places
     mid = [(bid[i] + ask[i]) / 2 for i in range(len(bid))]
     assert len(mid) == 1, "More than one price found for the option"
-    return mid[0]
+    return round(mid[0], 2)
 
 def get_stock_prices(ticker: str) -> List[float]:
     conn = http.client.HTTPConnection("127.0.0.1:25510")
@@ -159,13 +167,14 @@ if __name__ == "__main__":
     print("strikes: ", strikes)
     # for each strike, get the option prices for all the expirations
     data = []
-    try:
-        for strike in strikes:
-            for expiration in expirations:
+    for strike in strikes:
+        for expiration in expirations:
+            try:
                 option_closing_price = get_option_prices(ticker, strike, expiration)
                 data.append([ticker, expiration, strike, option_closing_price])
-    except Exception as e:
-        print(e)
+            except Exception as e:
+                print(f"Error for {ticker} {expiration} {strike}: {e}")
+
     print("data: ", data)
     # export the data to a csv file
     base_path = f"/Users/aayushahuja/Documents/projects/optionx/dump"
