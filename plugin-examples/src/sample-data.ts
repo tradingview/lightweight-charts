@@ -1,6 +1,7 @@
 import type { Time, WhitespaceData } from 'lightweight-charts';
 import { OptionCandleStickData } from './plugins/optionx/tooltip-primitive';
 import { OptionPriceSeriesData } from './plugins/option-price-series/data';
+import { parseCSV } from './utils';
 
 type LineData = {
 	time: Time;
@@ -76,6 +77,34 @@ export function generateOptionPrices(strikePrice: number): OptionPriceSeriesData
 	}
 	return res;
 }
+
+
+// Generate a list of option prices for a given ticker and strike price. It should read a csv file with the following columns:
+// ticker, expiration, strike, option_closing_price
+// The function should return an array of objects with the following structure:
+// OptionPriceSeriesData
+
+export function generateOptionPricesFromCSV(ticker: string, strikePrice: number): OptionPriceSeriesData[] {
+	let res: OptionPriceSeriesData[] = [];
+	const displayDelta = 0;
+	parseCSV(`/Users/aayushahuja/Documents/projects/optionx/dump/${ticker}_options_eod_20240601.csv`).then((data) => {
+		console.log("data: ", data);
+		data.map((d: any) => {
+			res.push({
+				strike: strikePrice,
+				expiry: d.expiration,
+				price: d.option_closing_price,
+				time: d.expiration,
+				open: strikePrice + d.option_closing_price,
+				high: strikePrice + d.option_closing_price + displayDelta,
+				low: strikePrice + d.option_closing_price,
+				close: strikePrice + d.option_closing_price + displayDelta,
+			});
+		});
+	});
+	return res;
+}
+
 
 export function generateCandleData(numberOfPoints: number = 250): CandleData[] {
 	const lineData = generateLineData(numberOfPoints);

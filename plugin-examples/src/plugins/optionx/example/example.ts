@@ -1,5 +1,5 @@
 import { createChart } from 'lightweight-charts';
-import { generateAlternativeCandleData, generateOptionPrices } from '../../../sample-data';
+import { generateAlternativeCandleData, generateOptionPrices, generateOptionPricesFromCSV } from '../../../sample-data';
 import { TooltipPrimitive } from '../tooltip-primitive';
 import { OptionPriceSeries } from '../../option-price-series/option-price-series';
 
@@ -60,6 +60,8 @@ const customSeriesView = new OptionPriceSeries();
 const optionPriceSeries = chart.addCustomSeries(customSeriesView, {
 	color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
 });
+const data = generateOptionPricesFromCSV('AAPL', 212.5);
+console.log(data);
 optionPriceSeries.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10));
 optionPriceSeries.attachPrimitive(tooltipPrimitive);
 
