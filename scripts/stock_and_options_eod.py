@@ -140,23 +140,23 @@ def get_stock_prices(ticker: str) -> List[float]:
     data_json = json.loads(data.decode("utf-8"))['response']
     return_data = []
     for x in data_json:
-        import pdb; pdb.set_trace()
         open = x[2]
         high = x[3]
         low = x[4]
         close = x[5]
         cur_date = x[-1]
         return_data.append([cur_date, open, high, low, close])
+    # import pdb; pdb.set_trace()
     return return_data
 
 if __name__ == "__main__":
     ticker = "AAPL"
     stock_data = get_stock_prices(ticker)
     expirations = get_expirations(ticker)
-    print(expirations)
+    print("expirations: ", expirations)
     current_price = 222.5
     strikes = get_strikes(ticker, expirations[0], current_price)
-    print(strikes)
+    print("strikes: ", strikes)
     # for each strike, get the option prices for all the expirations
     data = []
     try:
@@ -166,7 +166,7 @@ if __name__ == "__main__":
                 data.append([ticker, expiration, strike, option_closing_price])
     except Exception as e:
         print(e)
-    print(data)
+    print("data: ", data)
     # export the data to a csv file
     base_path = f"/Users/aayushahuja/Documents/projects/optionx/dump"
     
