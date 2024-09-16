@@ -2,6 +2,7 @@ import { createChart } from 'lightweight-charts';
 import { generateAlternativeCandleData, generateOptionPrices, generateOptionPricesFromCSV } from '../../../sample-data';
 import { TooltipPrimitive } from '../tooltip-primitive';
 import { OptionPriceSeries } from '../../option-price-series/option-price-series';
+import { fetchStockData, fetchOptionData } from '../../../sample-data';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
@@ -40,45 +41,69 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 // areaSeries.setData(generateLineData());
 
 
-// create candlestick series
+// stock candle stick
 const candlestickSeries = chart.addCandlestickSeries();
-const alternateCandleData = generateAlternativeCandleData();
-candlestickSeries.setData(alternateCandleData);
+const stockData = await fetchStockData('AAPL');
+candlestickSeries.setData(stockData);
 
-const tooltipPrimitive = new TooltipPrimitive({
-	lineColor: 'rgba(0, 0, 0, 0.2)',
-	tooltip: {
-		followMode: 'tracking',
-	},
-});
+// const tooltipPrimitive = new TooltipPrimitive({
+// 	lineColor: 'rgba(0, 0, 0, 0.2)',
+// 	tooltip: {
+// 		followMode: 'tracking',
+// 	},
+// });
 
 // not attaching tooltip to stock candle stick
 // candlestickSeries.attachPrimitive(tooltipPrimitive);
 
-// option price series 1
-const customSeriesView = new OptionPriceSeries();
-const optionPriceSeries = chart.addCustomSeries(customSeriesView, {
-	color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
-});
-const data = generateOptionPricesFromCSV('AAPL', 212.5);
-console.log(data);
-optionPriceSeries.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10));
-optionPriceSeries.attachPrimitive(tooltipPrimitive);
+const optionData = await fetchOptionData('AAPL');
+console.log('optionData: ', optionData);
 
-// option price series 2 with another tooltip
-const tooltipPrimitive2 = new TooltipPrimitive({
-	lineColor: 'rgba(0, 0, 0, 0.2)',
-	tooltip: {
-		followMode: 'tracking',
-	},
+// optionData is an array of arrays, each sub-array is a set of option prices for a given strike and expiration
+// need to create a custom series for each set of option prices
+// then attach a new tooltip primitive to each custom series
+
+// create a custom series for each set of option prices
+optionData.forEach((data) => {
+
+	const customSeriesView = new OptionPriceSeries();
+	const optionPriceSeries = chart.addCustomSeries(customSeriesView, {
+		color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
+	});
+	const tooltipPrimitive = new TooltipPrimitive({
+		lineColor: 'rgba(0, 0, 0, 0.2)',
+		tooltip: {
+			followMode: 'tracking',
+		},
+	});
+	optionPriceSeries.setData(data);
+	optionPriceSeries.attachPrimitive(tooltipPrimitive);
 });
 
-const customSeriesView2 = new OptionPriceSeries();
-const optionPriceSeries2 = chart.addCustomSeries(customSeriesView2, {
-	color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
-});
-optionPriceSeries2.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10.3));
-optionPriceSeries2.attachPrimitive(tooltipPrimitive2);
+// // option price series 1
+// const customSeriesView = new OptionPriceSeries();
+// const optionPriceSeries = chart.addCustomSeries(customSeriesView, {
+// 	color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
+// });
+// // const data = generateOptionPricesFromCSV('AAPL', 212.5);
+// // console.log(data);
+// optionPriceSeries.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10));
+// optionPriceSeries.attachPrimitive(tooltipPrimitive);
+
+// // option price series 2 with another tooltip
+// const tooltipPrimitive2 = new TooltipPrimitive({
+// 	lineColor: 'rgba(0, 0, 0, 0.2)',
+// 	tooltip: {
+// 		followMode: 'tracking',
+// 	},
+// });
+
+// const customSeriesView2 = new OptionPriceSeries();
+// const optionPriceSeries2 = chart.addCustomSeries(customSeriesView2, {
+// 	color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
+// });
+// optionPriceSeries2.setData(generateOptionPrices(alternateCandleData[alternateCandleData.length - 1].close + 10.3));
+// optionPriceSeries2.attachPrimitive(tooltipPrimitive2);
 
 const trackingButtonEl = document.querySelector('#tracking-button');
 const topButtonEl = document.querySelector('#top-button');

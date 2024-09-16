@@ -15,7 +15,7 @@ export const parseCSV = async (filePath: string): Promise<any[]> => {
   return records;
 };
 
-// Usage
-parseCSV('./path/to/your/file.csv')
-  .then(data => console.log(data))
-  .catch(error => console.error(error));
+// // Usage
+// parseCSV('./path/to/your/file.csv')
+//   .then(data => console.log(data))
+//   .catch(error => console.error(error));

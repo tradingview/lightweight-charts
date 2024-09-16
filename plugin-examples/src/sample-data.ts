@@ -1,7 +1,8 @@
 import type { Time, WhitespaceData } from 'lightweight-charts';
 import { OptionCandleStickData } from './plugins/optionx/tooltip-primitive';
 import { OptionPriceSeriesData } from './plugins/option-price-series/data';
-import { parseCSV } from './utils';
+// import { parseCSV } from './utils';
+import axios from 'axios';
 
 type LineData = {
 	time: Time;
@@ -84,26 +85,26 @@ export function generateOptionPrices(strikePrice: number): OptionPriceSeriesData
 // The function should return an array of objects with the following structure:
 // OptionPriceSeriesData
 
-export function generateOptionPricesFromCSV(ticker: string, strikePrice: number): OptionPriceSeriesData[] {
-	let res: OptionPriceSeriesData[] = [];
-	const displayDelta = 0;
-	parseCSV(`/Users/aayushahuja/Documents/projects/optionx/dump/${ticker}_options_eod_20240601.csv`).then((data) => {
-		console.log("data: ", data);
-		data.map((d: any) => {
-			res.push({
-				strike: strikePrice,
-				expiry: d.expiration,
-				price: d.option_closing_price,
-				time: d.expiration,
-				open: strikePrice + d.option_closing_price,
-				high: strikePrice + d.option_closing_price + displayDelta,
-				low: strikePrice + d.option_closing_price,
-				close: strikePrice + d.option_closing_price + displayDelta,
-			});
-		});
-	});
-	return res;
-}
+// export function generateOptionPricesFromCSV(ticker: string, strikePrice: number): OptionPriceSeriesData[] {
+// 	let res: OptionPriceSeriesData[] = [];
+// 	const displayDelta = 0;
+// 	parseCSV(`/Users/aayushahuja/Documents/projects/optionx/dump/${ticker}_options_eod_20240601.csv`).then((data) => {
+// 		console.log("data: ", data);
+// 		data.map((d: any) => {
+// 			res.push({
+// 				strike: strikePrice,
+// 				expiry: d.expiration,
+// 				price: d.option_closing_price,
+// 				time: d.expiration,
+// 				open: strikePrice + d.option_closing_price,
+// 				high: strikePrice + d.option_closing_price + displayDelta,
+// 				low: strikePrice + d.option_closing_price,
+// 				close: strikePrice + d.option_closing_price + displayDelta,
+// 			});
+// 		});
+// 	});
+// 	return res;
+// }
 
 
 export function generateCandleData(numberOfPoints: number = 250): CandleData[] {
@@ -122,6 +123,71 @@ export function generateCandleData(numberOfPoints: number = 250): CandleData[] {
 		};
 	});
 }
+
+// curl -X POST -H "Content-Type: application/json" -d '{"ticker":"AAPL"}' https://researchx.online:5010/getStockData
+export async function fetchStockData(ticker: string): Promise<CandleData[]> {
+	try {
+	  const response = await axios.post('https://researchx.online:5010/getStockData', { ticker });
+	  const stockData = response.data;
+
+
+	//   console.log("stockData: ", stockData.result);
+	  const returnData = stockData.result.map((d: any) => {
+		const dateString = d.date.toString();
+		// Convert YYYYMMDD to Date object at 1 PM UTC
+		const year = parseInt(dateString.substring(0, 4));
+		const month = parseInt(dateString.substring(4, 6)) - 1; // Months are 0-indexed
+		const day = parseInt(dateString.substring(6, 8));
+		const date = new Date(Date.UTC(year, month, day, 20, 0, 0)); // 20:00 UTC (8 PM)
+		return {
+			time: date.getTime() / 1000 as Time,
+			open: d.open,
+			high: d.high,
+			low: d.low,
+			close: d.close,
+		};
+	});
+	//   console.log("stockData: ", returnData);
+	  return returnData;
+	} catch (error) {
+	  console.error('Error fetching stock data:', error);
+	  return [];
+	}
+  }
+  
+  // curl -X POST -H "Content-Type: application/json" -d '{"ticker":"AAPL"}' https://researchx.online:5010/getOptionData
+  export async function fetchOptionData(ticker: string): Promise<OptionPriceSeriesData[][]> {
+	try {
+	  const response = await axios.post('https://researchx.online:5010/getOptionData', { ticker });
+	  const optionData = response.data.result;
+	//   console.log("optionData: ", optionData);
+
+	  const returnData = optionData.map((strikeData: any) => 
+		strikeData.data.map((d: any) => {
+			const dateString = d.expiration.toString();
+			// Convert YYYYMMDD to Date object at 1 PM UTC
+			const year = parseInt(dateString.substring(0, 4));
+			const month = parseInt(dateString.substring(4, 6)) - 1; // Months are 0-indexed
+			const day = parseInt(dateString.substring(6, 8));
+			const expiryDate = new Date(Date.UTC(year, month, day, 20, 0, 0)); // 20:00 UTC (8 PM)
+
+		  return {
+		  strike: strikeData.strike,
+		  expiry: expiryDate,
+		  price: d.option_closing_price,
+		  time: expiryDate.getTime() / 1000 as Time,
+		  open: strikeData.strike + d.option_closing_price,
+		  high: strikeData.strike + d.option_closing_price,
+		  low: strikeData.strike + d.option_closing_price,
+		  close: strikeData.strike + d.option_closing_price,
+		};
+	  }));
+	  return returnData;
+	} catch (error) {
+	  console.error('Error fetching option data:', error);
+	  return [];
+	}
+  }
 
 function randomNumber(min: number, max: number) {
 	return Math.random() * (max - min) + min;
