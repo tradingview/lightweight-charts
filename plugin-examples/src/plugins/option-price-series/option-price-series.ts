@@ -25,6 +25,7 @@ const defaultOptions: OptionPriceSeriesOptions = {
 	lastValueVisible: false,
 	priceLineVisible: false,
 	upColor: '#26a69a',
+	// upColor: 'blue',
 	downColor: '#ef5350',
 	wickVisible: true,
 	borderVisible: true,

@@ -101,6 +101,14 @@ export class TooltipElement {
 		setElementText(optionPriceElement, '');
 		element.appendChild(optionPriceElement);
 
+		// Strike Price
+		const strikePriceElement = document.createElement('div');
+		applyStyle(strikePriceElement, {
+			color: '#787B86',
+		});
+		setElementText(strikePriceElement, '');
+		element.appendChild(strikePriceElement);
+
 		// Break Even Price
 		const breakEvenPriceElement = document.createElement('div');
 		applyStyle(breakEvenPriceElement, {
@@ -109,14 +117,6 @@ export class TooltipElement {
 		setElementText(breakEvenPriceElement, '');
 		element.appendChild(breakEvenPriceElement);
 
-		// Strike Price
-		const strikePriceElement = document.createElement('div');
-		applyStyle(strikePriceElement, {
-			color: '#787B86',
-		});
-		setElementText(strikePriceElement, '');
-		element.appendChild(strikePriceElement);
-		
 		// Expiry Date
 		const expiryDateElement = document.createElement('div');
 		applyStyle(expiryDateElement, {
