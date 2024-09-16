@@ -123,6 +123,16 @@ def get_option_prices(ticker: str, strike: float, expiration: str) -> List[float
     else:
         start_date = datetime.now().strftime("%Y%m%d")
         end_date = datetime.now().strftime("%Y%m%d")
+    
+    # if current time is during market hours (i.e. 6:30 AM to 1:00 PM), set start and end date to previous weekday
+    if datetime.now().hour >= 6 and datetime.now().hour <= 13:
+        # if monday, set start date to previous Friday
+        if datetime.now().weekday() == 0:
+            start_date = (datetime.now() - timedelta(days=3)).strftime("%Y%m%d")
+            end_date = (datetime.now() - timedelta(days=3)).strftime("%Y%m%d")
+        else:
+            start_date = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+            end_date = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
     # import pdb; pdb.set_trace()
     conn.request("GET", f"/v2/hist/option/eod?exp={expiration}&right=C&strike={int(strike*1000)}&start_date={start_date}&end_date={end_date}&root={ticker}", headers=headers)
     res = conn.getresponse()
@@ -162,7 +172,7 @@ if __name__ == "__main__":
     stock_data = get_stock_prices(ticker)
     expirations = get_expirations(ticker)
     print("expirations: ", expirations)
-    current_price = 222.5
+    current_price = 215
     strikes = get_strikes(ticker, expirations[0], current_price)
     print("strikes: ", strikes)
     # for each strike, get the option prices for all the expirations
