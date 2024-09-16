@@ -106,10 +106,15 @@ optionData.forEach((data) => {
 });
 
 // Set the visible range for both time and price scales
+// add 5 days to the end date
+const endDatePlusNDays = (endDate as number) + 40 * 86400;
+// console.log('endDatePlusNDays: ', endDatePlusNDays);
+// console.log('endDate: ', endDate);
 chart.timeScale().setVisibleRange({
     from: startDate,
-    to: endDate,
+    to: endDatePlusNDays as UTCTimestamp,
 });
+// chart.priceScale('right').fitContent();
 
 const trackingButtonEl = document.querySelector('#tracking-button');
 const topButtonEl = document.querySelector('#top-button');
