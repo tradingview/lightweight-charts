@@ -16,7 +16,7 @@ const defaultOptions: TooltipOptions = {
 	followMode: 'tracking',
 	horizontalDeadzoneWidth: 45,
 	verticalDeadzoneHeight: 100,
-	verticalSpacing: 20,
+	verticalSpacing: 10,
 	topOffset: 20,
 };
 
@@ -209,7 +209,7 @@ export class TooltipElement {
 			Math.max(deadzoneWidth, x),
 			chart.timeScale().width() - deadzoneWidth
 		);
-		return `calc(${xAdjusted}px - 50%)`;
+		return `calc(${xAdjusted}px + 7%)`;
 	}
 
 	private _calculateYPosition(positionData: TooltipPosition): string {

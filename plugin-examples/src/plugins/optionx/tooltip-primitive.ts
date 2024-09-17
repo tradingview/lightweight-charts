@@ -251,12 +251,12 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 		if (this._tooltip) {
 			const tooltipOptions = this._tooltip.options();
 			const topMargin = tooltipOptions.followMode == 'top' ? tooltipOptions.topOffset + 10 : 0;
-			this.setData({
-				x: coordinate ?? 0,
-				visible: coordinate !== null,
-				color: this.currentColor(),
-				topMargin,
-			});
+			// this.setData({
+			// 	x: coordinate ?? 0,
+			// 	visible: coordinate !== null,
+			// 	color: this.currentColor(),
+			// 	topMargin,
+			// });
 			// interface TooltipContentData {
 			// 	title?: string;
 			// 	breakEvenPrice: string;
