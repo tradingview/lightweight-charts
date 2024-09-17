@@ -21,6 +21,7 @@ export interface OptionCandleStickData extends CandlestickData {
 	strike?: number;
 	expiry?: Date;
 	price?: number; // price of the option; not break even price
+	isCall?: boolean;
 }
 
 class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
@@ -232,10 +233,10 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 			this._hideCrosshair();
 			return;
 		}
-		
+		const isCall = (data as OptionCandleStickData).isCall;
 		const optionPrice = (data as OptionCandleStickData).price ?? 0;
 		const strikePrice = (data as OptionCandleStickData).strike;
-		const breakEvenPrice = (strikePrice ?? 0) + (optionPrice ?? 0);
+		const breakEvenPrice = isCall ? (strikePrice ?? 0) + (optionPrice ?? 0) : (strikePrice ?? 0) - (optionPrice ?? 0);
 		const priceCoordinate = series.priceToCoordinate(breakEvenPrice);
 		const expiryDate = (data as OptionCandleStickData).expiry;
 
@@ -265,7 +266,7 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 			// 	time: string;
 			// }
 			this._tooltip.updateTooltipContent({
-				title: optionPrice?.toString() ?? '',
+				title: isCall ? 'Call' : 'Put',
 				breakEvenPrice: breakEvenPrice.toString(),
 				optionPrice: optionPrice?.toString() ?? '',
 				strikePrice: strikePrice?.toString() ?? '',

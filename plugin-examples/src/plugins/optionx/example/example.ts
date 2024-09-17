@@ -78,7 +78,7 @@ const startDate = Math.min(stockStartDate as number, optionStartDate) as UTCTime
 const endDate = Math.max(stockEndDate as number, optionEndDate) as UTCTimestamp;
 
 // Create and add the empty series
-const emptySeriesView = new OptionPriceSeries();
+const emptySeriesView = new OptionPriceSeries('call');
 const emptySeries = chart.addCustomSeries(emptySeriesView, {
     color: 'transparent',
 });
@@ -90,8 +90,8 @@ emptySeries.setData(createEmptyData(startDate, endDate));
 // then attach a new tooltip primitive to each custom series
 // create a custom series for each set of option prices
 optionData.forEach((data) => {
-
-	const customSeriesView = new OptionPriceSeries();
+	console.log('data: ', data);
+	const customSeriesView = new OptionPriceSeries(data[0].isCall ? 'call' : 'put');
 	const optionPriceSeries = chart.addCustomSeries(customSeriesView, {
 		color: 'blue', // TESTING: shouldn't see this because we are coloring each bar later
 	});

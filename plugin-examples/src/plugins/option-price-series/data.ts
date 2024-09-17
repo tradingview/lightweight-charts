@@ -9,4 +9,5 @@ export interface OptionPriceSeriesData
 	strike: number;
 	expiry: Date;
 	price: number;
+	isCall: boolean;
 }

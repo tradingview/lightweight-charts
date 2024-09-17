@@ -26,7 +26,8 @@ const defaultOptions: OptionPriceSeriesOptions = {
 	priceLineVisible: false,
 	// upColor: '#26a69a',
 	upColor: 'blue',
-	downColor: '#ef5350',
+	// downColor: '#ef5350',
+	downColor: 'orange',
 	wickVisible: true,
 	borderVisible: true,
 	borderColor: '#378658',
@@ -45,9 +46,11 @@ export class OptionPriceSeries<TData extends OptionPriceSeriesData>
 	implements ICustomSeriesPaneView<Time, TData, OptionPriceSeriesOptions>
 {
 	_renderer: OptionPriceSeriesRenderer<TData>;
+	_optionType: 'call' | 'put';
 
-	constructor() {
+	constructor(optionType: 'call' | 'put') {
 		this._renderer = new OptionPriceSeriesRenderer();
+		this._optionType = optionType;
 	}
 
 	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {

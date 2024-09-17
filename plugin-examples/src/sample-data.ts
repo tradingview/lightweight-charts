@@ -54,30 +54,30 @@ export function generateLineData(numberOfPoints: number = 500): LineData[] {
 // 	price: number;
 // }
 // The date should start from 1 June 2024 and the list should data for every week expiry for 3 months
-export function generateOptionPrices(strikePrice: number): OptionPriceSeriesData[] {
-	const res: OptionPriceSeriesData[] = [];
-	let expiryDate = new Date(Date.UTC(2023, 9, 1, 12, 0, 0, 0));
-	const displayDelta = 0;
-	for (let i = 0; i < 12; ++i) {
-		const price = i * 5;
-		res.push({
-			strike: strikePrice,
-			expiry: expiryDate,
-			price: price,
+// export function generateOptionPrices(strikePrice: number): OptionPriceSeriesData[] {
+// 	const res: OptionPriceSeriesData[] = [];
+// 	let expiryDate = new Date(Date.UTC(2023, 9, 1, 12, 0, 0, 0));
+// 	const displayDelta = 0;
+// 	for (let i = 0; i < 12; ++i) {
+// 		const price = i * 5;
+// 		res.push({
+// 			strike: strikePrice,
+// 			expiry: expiryDate,
+// 			price: price,
 
-			time: (expiryDate.getTime() / 1000) as Time,
-			open: strikePrice + price,
-			high: strikePrice + price + displayDelta,
-			low: strikePrice + price,
-			close: strikePrice + price + displayDelta,
-		});
-		// set the expiry date to the next week without affecting the existing entries
-		const newExpiryDate = new Date(expiryDate);
-		newExpiryDate.setUTCDate(newExpiryDate.getUTCDate() + 7);
-		expiryDate = newExpiryDate;
-	}
-	return res;
-}
+// 			time: (expiryDate.getTime() / 1000) as Time,
+// 			open: strikePrice + price,
+// 			high: strikePrice + price + displayDelta,
+// 			low: strikePrice + price,
+// 			close: strikePrice + price + displayDelta,
+// 		});
+// 		// set the expiry date to the next week without affecting the existing entries
+// 		const newExpiryDate = new Date(expiryDate);
+// 		newExpiryDate.setUTCDate(newExpiryDate.getUTCDate() + 7);
+// 		expiryDate = newExpiryDate;
+// 	}
+// 	return res;
+// }
 
 
 // Generate a list of option prices for a given ticker and strike price. It should read a csv file with the following columns:
@@ -160,7 +160,6 @@ export async function fetchStockData(ticker: string): Promise<CandleData[]> {
 	try {
 	  const response = await axios.post('https://researchx.online:5010/getOptionData', { ticker });
 	  const optionData = response.data.result;
-	//   console.log("optionData: ", optionData);
 
 	  const returnData = optionData.map((strikeData: any) => 
 		strikeData.data.map((d: any) => {
@@ -176,10 +175,11 @@ export async function fetchStockData(ticker: string): Promise<CandleData[]> {
 		  expiry: expiryDate,
 		  price: d.option_closing_price,
 		  time: expiryDate.getTime() / 1000 as Time,
-		  open: strikeData.strike + d.option_closing_price,
-		  high: strikeData.strike + d.option_closing_price,
-		  low: strikeData.strike + d.option_closing_price,
-		  close: strikeData.strike + d.option_closing_price,
+		  open: strikeData.is_call ? strikeData.strike + d.option_closing_price : strikeData.strike - d.option_closing_price,
+		  high: strikeData.is_call ? strikeData.strike + d.option_closing_price : strikeData.strike - d.option_closing_price,
+		  low: strikeData.is_call ? strikeData.strike + d.option_closing_price : strikeData.strike - d.option_closing_price,
+		  close: strikeData.is_call ? strikeData.strike + d.option_closing_price : strikeData.strike - d.option_closing_price,
+		  isCall: strikeData.is_call,
 		};
 	  }));
 	  return returnData;

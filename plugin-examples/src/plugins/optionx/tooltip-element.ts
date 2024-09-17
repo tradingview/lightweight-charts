@@ -94,9 +94,10 @@ export class TooltipElement {
 		// Option Price
 		const optionPriceElement = document.createElement('div');
 		applyStyle(optionPriceElement, {
-			'font-size': '14px',
-			'line-height': '18px',
-			'font-weight': '590',
+			color: '#787B86',
+			// 'font-size': '14px',
+			// 'line-height': '18px',
+			// 'font-weight': '590',
 		});
 		setElementText(optionPriceElement, '');
 		element.appendChild(optionPriceElement);
@@ -175,9 +176,9 @@ export class TooltipElement {
 		if (!this._element) return;
 		const tooltipMeasurement = this._element.getBoundingClientRect();
 		this._lastTooltipWidth = tooltipMeasurement.width;
-		// if (tooltipContentData.title !== undefined && this._titleElement) {
-		// 	setElementText(this._titleElement, 'Price: ' + tooltipContentData.title);
-		// }
+		if (tooltipContentData.title !== undefined && this._titleElement) {
+			setElementText(this._titleElement, tooltipContentData.title);
+		}
 		setElementText(this._breakEvenPriceElement, 'Breakeven: ' + tooltipContentData.breakEvenPrice);
 		setElementText(this._optionPriceElement, 'Price: ' + tooltipContentData.optionPrice);
 		setElementText(this._strikePriceElement, 'Strike: ' + tooltipContentData.strikePrice);
