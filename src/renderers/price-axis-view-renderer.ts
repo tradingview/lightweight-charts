@@ -79,48 +79,40 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 			const geom = this._calculateGeometry(scope, rendererOptions, textWidthCache, align);
 			const gb = geom.bitmap;
 
-			const drawLabelBody = (labelBackgroundColor: string, labelBorderColor?: string): void => {
-				/*
-				 labelBackgroundColor (and labelBorderColor) will always be a solid color (no alpha) [see generateContrastColors in color.ts].
-				 Therefore we can draw the rounded label using simplified code (drawRoundRectWithBorder) that doesn't need to ensure the background and the border don't overlap.
-				*/
-				if (geom.alignRight) {
-					drawRoundRectWithBorder(
-						ctx,
-						gb.xOutside,
-						gb.yTop,
-						gb.totalWidth,
-						gb.totalHeight,
-						labelBackgroundColor,
-						gb.horzBorder,
-						[gb.radius, 0, 0, gb.radius],
-						labelBorderColor
-					);
-				} else {
-					drawRoundRectWithBorder(
-						ctx,
-						gb.xInside,
-						gb.yTop,
-						gb.totalWidth,
-						gb.totalHeight,
-						labelBackgroundColor,
-						gb.horzBorder,
-						[0, gb.radius, gb.radius, 0],
-						labelBorderColor
-					);
-				}
-			};
-
-			// draw border
-			// draw label background
-			drawLabelBody(backgroundColor, 'transparent');
+			/*
+			 draw label. backgroundColor will always be a solid color (no alpha) [see generateContrastColors in color.ts].
+			 Therefore we can draw the rounded label using simplified code (drawRoundRectWithBorder) that doesn't need to ensure the background and the border don't overlap.
+			*/
+			if (geom.alignRight) {
+				drawRoundRectWithBorder(
+					ctx,
+					gb.xOutside,
+					gb.yTop,
+					gb.totalWidth,
+					gb.totalHeight,
+					backgroundColor,
+					gb.horzBorder,
+					[gb.radius, 0, 0, gb.radius],
+					backgroundColor
+				);
+			} else {
+				drawRoundRectWithBorder(
+					ctx,
+					gb.xInside,
+					gb.yTop,
+					gb.totalWidth,
+					gb.totalHeight,
+					backgroundColor,
+					gb.horzBorder,
+					[0, gb.radius, gb.radius, 0],
+					backgroundColor
+				);
+			}
 			// draw tick
 			if (this._data.tickVisible) {
 				ctx.fillStyle = textColor;
 				ctx.fillRect(gb.xInside, gb.yMid, gb.xTick - gb.xInside, gb.tickHeight);
 			}
-			// draw label border above the tick
-			drawLabelBody('transparent', backgroundColor);
 
 			// draw separator
 			if (this._data.borderVisible) {

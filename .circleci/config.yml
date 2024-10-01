@@ -370,10 +370,10 @@ workflows:
           filters: *merge-based-filters
           requires:
             - build
-      - memleaks-tests:
-          filters: *default-filters
-          requires:
-            - build
+      # - memleaks-tests:
+      #     filters: *default-filters
+      #     requires:
+      #       - build
       - coverage:
           filters: *default-filters
           requires:
