@@ -14,6 +14,14 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.2.1
+
+**Bug Fixes**
+
+- Fixed an issue where the series title part of a price scale label appeared blurry when using Firefox.
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.0..v4.2.1).
+
 ## 4.2.0
 
 **Enhancements**
