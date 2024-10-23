@@ -18,12 +18,12 @@ function generateData(step) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const areaSeries = chart.addAreaSeries({
+	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		crosshairMarkerBorderColor: '#ff00ff',
 		crosshairMarkerBackgroundColor: '#2296f3',
 	});
 
-	const lineSeries = chart.addLineSeries({
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		crosshairMarkerBorderColor: '#00ffff',
 		crosshairMarkerBackgroundColor: '#2296f3',
 	});

@@ -32,7 +32,7 @@ function runTestCase(container) {
 	const data1 = generateData(false);
 	const data2 = generateData(true);
 
-	const areaSeries = chart.addAreaSeries();
+	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries);
 	areaSeries.setData(data1);
 	chart.timeScale().fitContent();
 
@@ -43,6 +43,6 @@ function runTestCase(container) {
 		},
 	});
 	chart.removeSeries(areaSeries);
-	chart.addAreaSeries().setData(data2);
+	chart.addSeries(LightweightCharts.AreaSeries).setData(data2);
 	chart.timeScale().fitContent();
 }

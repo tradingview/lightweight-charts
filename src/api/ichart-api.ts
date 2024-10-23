@@ -3,19 +3,18 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { ChartOptionsImpl } from '../model/chart-model';
 import { BarData, HistogramData, LineData, WhitespaceData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
-import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
+import {
+	CustomData,
+	ICustomSeriesPaneView,
+} from '../model/icustom-series';
 import { Point } from '../model/point';
 import {
-	AreaSeriesPartialOptions,
-	BarSeriesPartialOptions,
-	BaselineSeriesPartialOptions,
-	CandlestickSeriesPartialOptions,
 	CustomSeriesOptions,
-	HistogramSeriesPartialOptions,
-	LineSeriesPartialOptions,
 	SeriesPartialOptions,
+	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
+import { BuiltInSeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
@@ -107,6 +106,25 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	resize(width: number, height: number, forceRepaint?: boolean): void;
 
 	/**
+	 * Creates a series with specified parameters.
+	 *
+	 * A custom series is a generic series which can be extended with a custom renderer to
+	 * implement chart types which the library doesn't support by default.
+	 *
+	 * @param definition - A series definition.
+	 * @param customOptions - Customization parameters of the series being created.
+	 * @param paneIndex - An index of the pane where the series should be created.
+	 * ```js
+	 * const series = chart.addSeries(LineSeries, { lineWidth: 2 });
+	 * ```
+	 */
+	addSeries<T extends SeriesType>(
+		definition: BuiltInSeriesDefinition<T>,
+		options?: SeriesPartialOptionsMap[T],
+		paneIndex?: number
+	): ISeriesApi<T, HorzScaleItem>;
+
+	/**
 	 * Creates a custom series with specified parameters.
 	 *
 	 * A custom series is a generic series which can be extended with a custom renderer to
@@ -127,84 +145,6 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 		customOptions?: SeriesPartialOptions<TOptions>,
 		paneIndex?: number
 	): ISeriesApi<'Custom', HorzScaleItem, TData | WhitespaceData<HorzScaleItem>, TOptions, TPartialOptions>;
-
-	/**
-	 * Creates an area series with specified parameters.
-	 *
-	 * @param areaOptions - Customization parameters of the series being created.
-	 * @param paneIndex - Index of the Pane to create the series on.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addAreaSeries();
-	 * ```
-	 */
-	addAreaSeries(areaOptions?: AreaSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Area', HorzScaleItem>;
-
-	/**
-	 * Creates a baseline series with specified parameters.
-	 *
-	 * @param baselineOptions - Customization parameters of the series being created.
-	 * @param paneIndex - Index of the Pane to create the series on.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addBaselineSeries();
-	 * ```
-	 */
-	addBaselineSeries(baselineOptions?: BaselineSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Baseline', HorzScaleItem>;
-
-	/**
-	 * Creates a bar series with specified parameters.
-	 *
-	 * @param barOptions - Customization parameters of the series being created.
-	 * @param paneIndex - Index of the Pane to create the series on.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addBarSeries();
-	 * ```
-	 */
-	addBarSeries(barOptions?: BarSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Bar', HorzScaleItem>;
-
-	/**
-	 * Creates a candlestick series with specified parameters.
-	 *
-	 * @param candlestickOptions - Customization parameters of the series being created.
-	 * @param paneIndex - Index of the Pane to create the series on.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addCandlestickSeries();
-	 * ```
-	 */
-	addCandlestickSeries(candlestickOptions?: CandlestickSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Candlestick', HorzScaleItem>;
-
-	/**
-	 * Creates a histogram series with specified parameters.
-	 *
-	 * @param histogramOptions - Customization parameters of the series being created.
-	 * @param paneIndex - Index of the Pane to create the series on.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addHistogramSeries();
-	 * ```
-	 */
-	addHistogramSeries(histogramOptions?: HistogramSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Histogram', HorzScaleItem>;
-
-	/**
-	 * Creates a line series with specified parameters.
-	 *
-	 * @param lineOptions - Customization parameters of the series being created.
-	 * @param paneIndex - Index of the Pane to create the series on.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addLineSeries();
-	 * ```
-	 */
-	addLineSeries(lineOptions?: LineSeriesPartialOptions, paneIndex?: number): ISeriesApi<'Line', HorzScaleItem>;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.

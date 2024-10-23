@@ -24,14 +24,14 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const s1 = chart.addLineSeries({
+	const s1 = chart.addSeries(LightweightCharts.LineSeries, {
 		color: 'red',
 	});
 	s1.setData(seriesOneData);
 
 	return new Promise(resolve => {
 		requestAnimationFrame(() => {
-			const s2 = chart.addLineSeries({
+			const s2 = chart.addSeries(LightweightCharts.LineSeries, {
 				color: 'blue',
 			});
 			s2.setData(seriesTwoWhitespaceData);

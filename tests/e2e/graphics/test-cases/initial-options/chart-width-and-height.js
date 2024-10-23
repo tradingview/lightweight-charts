@@ -47,7 +47,7 @@ function runTestCase(container) {
 		container.appendChild(box);
 
 		const chart = LightweightCharts.createChart(box, { ...config, ...chartOptionsToHideCrosshair });
-		const mainSeries = chart.addAreaSeries(seriesOptionsToHideCrosshair);
+		const mainSeries = chart.addSeries(LightweightCharts.AreaSeries, seriesOptionsToHideCrosshair);
 
 		mainSeries.setData(generateData());
 	});

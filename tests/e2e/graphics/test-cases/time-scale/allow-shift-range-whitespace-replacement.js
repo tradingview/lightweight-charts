@@ -26,7 +26,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const s1 = chart.addAreaSeries({
+	const s1 = chart.addSeries(LightweightCharts.AreaSeries, {
 		lineColor: 'rgb(0, 50, 200)',
 		topColor: 'rgba(0, 50, 200, 0.2)',
 		bottomColor: 'rgba(0, 50, 200, 0.2)',
@@ -35,7 +35,7 @@ function runTestCase(container) {
 
 	return new Promise(resolve => {
 		requestAnimationFrame(() => {
-			const s2 = chart.addLineSeries({
+			const s2 = chart.addSeries(LightweightCharts.LineSeries, {
 				color: 'black',
 			});
 			s2.setData(seriesTwoWhitespaceData);
