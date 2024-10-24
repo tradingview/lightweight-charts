@@ -13,19 +13,24 @@ export const barStyleDefaults: BarStyleOptions = {
 	thinBars: true,
 };
 
-export class BarSeries implements BuiltInSeriesDefinition<'Bar'> {
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly type = 'Bar' as const;
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly isBuiltIn = true as const;
+// export class BarSeries implements BuiltInSeriesDefinition<'Bar'> {
+// 	// eslint-disable-next-line @typescript-eslint/tslint/config
+// 	public readonly type = 'Bar' as const;
+// 	// eslint-disable-next-line @typescript-eslint/tslint/config
+// 	public readonly isBuiltIn = true as const;
 
-	public readonly defaultOptions: BarStyleOptions = barStyleDefaults;
-	/**
-	* @internal
-	*/
-	public createPaneView(series: ISeries<'Bar'>, model: IChartModelBase): IUpdatablePaneView {
-		return new SeriesBarsPaneView(series, model);
-	}
-}
+// 	public readonly defaultOptions: BarStyleOptions = barStyleDefaults;
+// 	/**
+// 	* @internal
+// 	*/
+// 	public createPaneView(series: ISeries<'Bar'>, model: IChartModelBase): IUpdatablePaneView {
+// 		return new SeriesBarsPaneView(series, model);
+// 	}
+// }
 
-export const barSeries = new BarSeries();
+export const barSeries: BuiltInSeriesDefinition<'Bar'> = {
+	type: 'Bar' as const,
+	isBuiltIn: true as const,
+	defaultOptions: barStyleDefaults,
+	createPaneView: (series: ISeries<'Bar'>, model: IChartModelBase): IUpdatablePaneView => new SeriesBarsPaneView(series, model),
+};

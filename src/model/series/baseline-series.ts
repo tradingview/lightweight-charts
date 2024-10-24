@@ -36,18 +36,23 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	pointMarkersVisible: false,
 };
 
-export class BaselineSeries implements BuiltInSeriesDefinition<'Baseline'> {
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly type = 'Baseline' as const;
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly isBuiltIn = true as const;
-	public readonly defaultOptions: BaselineStyleOptions = baselineStyleDefaults;
-	/**
-	* @internal
-	*/
-	public createPaneView(series: ISeries<'Baseline'>, model: IChartModelBase): IUpdatablePaneView {
-		return new SeriesBaselinePaneView(series, model);
-	}
-}
+// export class BaselineSeries implements BuiltInSeriesDefinition<'Baseline'> {
+// 	// eslint-disable-next-line @typescript-eslint/tslint/config
+// 	public readonly type = 'Baseline' as const;
+// 	// eslint-disable-next-line @typescript-eslint/tslint/config
+// 	public readonly isBuiltIn = true as const;
+// 	public readonly defaultOptions: BaselineStyleOptions = baselineStyleDefaults;
+// 	/**
+// 	* @internal
+// 	*/
+// 	public createPaneView(series: ISeries<'Baseline'>, model: IChartModelBase): IUpdatablePaneView {
+// 		return new SeriesBaselinePaneView(series, model);
+// 	}
+// }
+export const baselineSeries: BuiltInSeriesDefinition<'Baseline'> = {
+	type: 'Baseline' as const,
+	isBuiltIn: true as const,
+	defaultOptions: baselineStyleDefaults,
+	createPaneView: (series: ISeries<'Baseline'>, model: IChartModelBase): IUpdatablePaneView => new SeriesBaselinePaneView(series, model),
+};
 
-export const baselineSeries = new BaselineSeries();

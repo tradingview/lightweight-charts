@@ -21,21 +21,27 @@ export const lineStyleDefaults: LineStyleOptions = {
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
 };
+
+// export class LineSeries implements BuiltInSeriesDefinition<'Line'> {
+// 	// eslint-disable-next-line @typescript-eslint/tslint/config
+// 	public readonly type = 'Line' as const;
+// 	// eslint-disable-next-line @typescript-eslint/tslint/config
+// 	public readonly isBuiltIn = true as const;
+// 	public readonly defaultOptions: LineStyleOptions = lineStyleDefaults;
+// 	/**
+// 	* @internal
+// 	*/
+// 	public createPaneView(series: ISeries<'Line'>, model: IChartModelBase): IUpdatablePaneView {
+// 		return new SeriesLinePaneView(series, model);
+// 	}
+// }
 /*
  * Line series
  */
-export class LineSeries implements BuiltInSeriesDefinition<'Line'> {
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly type = 'Line' as const;
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly isBuiltIn = true as const;
-	public readonly defaultOptions: LineStyleOptions = lineStyleDefaults;
-	/**
-	* @internal
-	*/
-	public createPaneView(series: ISeries<'Line'>, model: IChartModelBase): IUpdatablePaneView {
-		return new SeriesLinePaneView(series, model);
-	}
-}
+export const lineSeries: BuiltInSeriesDefinition<'Line'> = {
+	type: 'Line' as const,
+	isBuiltIn: true as const,
+	defaultOptions: lineStyleDefaults,
+	createPaneView: (series: ISeries<'Line'>, model: IChartModelBase): IUpdatablePaneView => new SeriesLinePaneView(series, model),
+};
 
-export const lineSeries = new LineSeries();

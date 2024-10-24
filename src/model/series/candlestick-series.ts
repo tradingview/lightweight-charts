@@ -20,18 +20,23 @@ export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	wickDownColor: '#ef5350',
 };
 
-export class CandlestickSeries implements BuiltInSeriesDefinition<'Candlestick'> {
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly type = 'Candlestick' as const;
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly isBuiltIn = true as const;
-	public readonly defaultOptions: CandlestickStyleOptions = candlestickStyleDefaults;
-	/**
-	* @internal
-	*/
-	public createPaneView(series: ISeries<'Candlestick'>, model: IChartModelBase): IUpdatablePaneView {
-		return new SeriesCandlesticksPaneView(series, model);
-	}
-}
+// export class CandlestickSeries implements BuiltInSeriesDefinition<'Candlestick'> {
+// 	// eslint-disable-next-line @typescript-eslint/tslint/config
+// 	public readonly type = 'Candlestick' as const;
+// 	// eslint-disable-next-line @typescript-eslint/tslint/config
+// 	public readonly isBuiltIn = true as const;
+// 	public readonly defaultOptions: CandlestickStyleOptions = candlestickStyleDefaults;
+// 	/**
+// 	* @internal
+// 	*/
+// 	public createPaneView(series: ISeries<'Candlestick'>, model: IChartModelBase): IUpdatablePaneView {
+// 		return new SeriesCandlesticksPaneView(series, model);
+// 	}
+// }
 
-export const candlestickSeries = new CandlestickSeries();
+export const candlestickSeries: BuiltInSeriesDefinition<'Candlestick'> = {
+	type: 'Candlestick' as const,
+	isBuiltIn: true as const,
+	defaultOptions: candlestickStyleDefaults,
+	createPaneView: (series: ISeries<'Candlestick'>, model: IChartModelBase): IUpdatablePaneView => new SeriesCandlesticksPaneView(series, model),
+};

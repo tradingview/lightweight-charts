@@ -25,18 +25,12 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	pointMarkersVisible: false,
 };
 
-export class AreaSeries implements BuiltInSeriesDefinition<'Area'> {
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly type = 'Area' as const;
-	// eslint-disable-next-line @typescript-eslint/tslint/config
-	public readonly isBuiltIn = true as const;
-	public readonly defaultOptions: AreaStyleOptions = areaStyleDefaults;
+export const areaSeries: BuiltInSeriesDefinition<'Area'> = {
+	type: 'Area' as const,
+	isBuiltIn: true as const,
+	defaultOptions: areaStyleDefaults,
 	/**
 	* @internal
 	*/
-	public createPaneView(series: ISeries<'Area'>, model: IChartModelBase): IUpdatablePaneView {
-		return new SeriesAreaPaneView(series, model);
-	}
-}
-
-export const areaSeries = new AreaSeries();
+	createPaneView: (series: ISeries<'Area'>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model),
+};
