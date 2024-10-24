@@ -1,9 +1,10 @@
-import { SeriesCandlesticksPaneView } from '../../views/pane/candlesticks-pane-view';
+
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { CandlestickStyleOptions } from '../series-options';
+import { SeriesCandlesticksPaneView } from './candlesticks-pane-view';
 import { BuiltInSeriesDefinition } from './series-def';
 
 export const candlestickStyleDefaults: CandlestickStyleOptions = {

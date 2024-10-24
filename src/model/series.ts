@@ -7,7 +7,6 @@ import { ensure, ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { isInteger, merge } from '../helpers/strict-type-checks';
 
-import { SeriesCustomPaneView } from '../views/pane/custom-pane-view';
 import { IPaneView } from '../views/pane/ipane-view';
 import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
 import { PanePriceAxisView } from '../views/pane/pane-price-axis-view';
@@ -46,6 +45,7 @@ import {
 	SeriesType,
 } from './series-options';
 import { ISeriesPrimitivePaneViewWrapper, SeriesPrimitiveWrapper } from './series-primitive-wrapper';
+import { SeriesCustomPaneView } from './series/custom-pane-view';
 import { SeriesDefinition } from './series/series-def';
 import { TimePointIndex } from './time-data';
 

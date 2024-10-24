@@ -1,10 +1,10 @@
 
-import { SeriesHistogramPaneView } from '../../views/pane/histogram-pane-view';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { HistogramStyleOptions } from '../series-options';
+import { SeriesHistogramPaneView } from './histogram-pane-view';
 import { BuiltInSeriesDefinition } from './series-def';
 
 export const histogramStyleDefaults: HistogramStyleOptions = {

@@ -1,10 +1,10 @@
 import { LineStyle, LineType } from '../../renderers/draw-line';
-import { SeriesBaselinePaneView } from '../../views/pane/baseline-pane-view';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { BaselineStyleOptions, LastPriceAnimationMode } from '../series-options';
+import { SeriesBaselinePaneView } from './baseline-pane-view';
 import { BuiltInSeriesDefinition } from './series-def';
 
 export const baselineStyleDefaults: BaselineStyleOptions = {

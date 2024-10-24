@@ -1,9 +1,9 @@
-import { SeriesBarsPaneView } from '../../views/pane/bars-pane-view';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { BarStyleOptions } from '../series-options';
+import { SeriesBarsPaneView } from './bars-pane-view';
 import { BuiltInSeriesDefinition } from './series-def';
 
 export const barStyleDefaults: BarStyleOptions = {

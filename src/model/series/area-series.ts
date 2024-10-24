@@ -1,10 +1,10 @@
 import { LineStyle, LineType } from '../../renderers/draw-line';
-import { SeriesAreaPaneView } from '../../views/pane/area-pane-view';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { AreaStyleOptions, LastPriceAnimationMode } from '../series-options';
+import { SeriesAreaPaneView } from './area-pane-view';
 import { BuiltInSeriesDefinition } from './series-def';
 
 export const areaStyleDefaults: AreaStyleOptions = {
