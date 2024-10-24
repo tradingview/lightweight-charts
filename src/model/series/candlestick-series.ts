@@ -5,7 +5,7 @@ import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { CandlestickStyleOptions } from '../series-options';
 import { SeriesCandlesticksPaneView } from './candlesticks-pane-view';
-import { BuiltInSeriesDefinition } from './series-def';
+import { SeriesDefinition } from './series-def';
 
 export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	upColor: '#26a69a',
@@ -20,7 +20,7 @@ export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	wickDownColor: '#ef5350',
 };
 
-export const candlestickSeries: BuiltInSeriesDefinition<'Candlestick'> = {
+export const candlestickSeries: SeriesDefinition<'Candlestick'> = {
 	type: 'Candlestick' as const,
 	isBuiltIn: true as const,
 	defaultOptions: candlestickStyleDefaults,

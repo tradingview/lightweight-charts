@@ -3,7 +3,7 @@ import { PercentageFormatter } from '../formatters/percentage-formatter';
 import { PriceFormatter } from '../formatters/price-formatter';
 import { VolumeFormatter } from '../formatters/volume-formatter';
 
-import { ensure, ensureNotNull } from '../helpers/assertions';
+import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { isInteger, merge } from '../helpers/strict-type-checks';
 
@@ -45,7 +45,7 @@ import {
 	SeriesType,
 } from './series-options';
 import { ISeriesPrimitivePaneViewWrapper, SeriesPrimitiveWrapper } from './series-primitive-wrapper';
-import { SeriesCustomPaneView } from './series/custom-pane-view';
+import { ISeriesCustomPaneView } from './series/pane-view';
 import { SeriesDefinition } from './series/series-def';
 import { TimePointIndex } from './time-data';
 
@@ -143,7 +143,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
 	private readonly _customPriceLines: CustomPriceLine[] = [];
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
-	private _paneView!: IUpdatablePaneView;
+	private _paneView!: IUpdatablePaneView | ISeriesCustomPaneView;
 	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView | null = null;
 	private _barColorerCache: SeriesBarColorer<T> | null = null;
 	private readonly _options: SeriesOptionsInternal<T>;
@@ -166,12 +166,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 		this._recreateFormatter();
 
-		if (definition.isBuiltIn) {
-			this._paneView = definition.createPaneView(this, this.model());
-		} else {
-			const paneView = ensure(customPaneView);
-			this._paneView = new SeriesCustomPaneView(this as unknown as Series<'Custom'>, this.model(), paneView);
-		}
+		this._paneView = definition.createPaneView(this, this.model());
 	}
 
 	public destroy(): void {
@@ -534,20 +529,20 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	}
 
 	public customSeriesPlotValuesBuilder(): CustomDataToPlotRowValueConverter<unknown> | undefined {
-		if (this._paneView instanceof SeriesCustomPaneView === false) {
+		if (this._seriesType !== 'Custom') {
 			return undefined;
 		}
 		return (data: CustomData<unknown> | CustomSeriesWhitespaceData<unknown>) => {
-			return (this._paneView as SeriesCustomPaneView).priceValueBuilder(data);
+			return (this._paneView as ISeriesCustomPaneView).priceValueBuilder(data);
 		};
 	}
 
 	public customSeriesWhitespaceCheck<HorzScaleItem>(): WhitespaceCheck<HorzScaleItem> | undefined {
-		if (this._paneView instanceof SeriesCustomPaneView === false) {
+		if (this._seriesType !== 'Custom') {
 			return undefined;
 		}
 		return (data: CustomData<HorzScaleItem> | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> => {
-			return (this._paneView as SeriesCustomPaneView).isWhitespace(data);
+			return (this._paneView as ISeriesCustomPaneView).isWhitespace(data);
 		};
 	}
 

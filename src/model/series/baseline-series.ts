@@ -5,7 +5,7 @@ import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { BaselineStyleOptions, LastPriceAnimationMode } from '../series-options';
 import { SeriesBaselinePaneView } from './baseline-pane-view';
-import { BuiltInSeriesDefinition } from './series-def';
+import { SeriesDefinition } from './series-def';
 
 export const baselineStyleDefaults: BaselineStyleOptions = {
 	baseValue: {
@@ -36,7 +36,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	pointMarkersVisible: false,
 };
 
-export const baselineSeries: BuiltInSeriesDefinition<'Baseline'> = {
+export const baselineSeries: SeriesDefinition<'Baseline'> = {
 	type: 'Baseline' as const,
 	isBuiltIn: true as const,
 	defaultOptions: baselineStyleDefaults,

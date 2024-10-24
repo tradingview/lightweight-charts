@@ -1,24 +1,15 @@
+import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
+
+import { IChartModelBase } from '../chart-model';
+import { ISeries } from '../series';
 import { SeriesStyleOptionsMap, SeriesType } from '../series-options';
-import { BuiltInPaneViewFactory } from './pane-view';
 
-export interface BaseSeriesDefinition<T extends SeriesType> {
+export interface SeriesDefinition<T extends SeriesType> {
 	readonly type: T;
+	readonly isBuiltIn: boolean;
 	readonly defaultOptions: SeriesStyleOptionsMap[T];
-}
-
-export interface BuiltInSeriesDefinition<T extends SeriesType> extends BaseSeriesDefinition<T> {
-	readonly isBuiltIn: true;
 	/**
 	* @internal
 	*/
-	createPaneView: BuiltInPaneViewFactory<T>;
+	createPaneView(series: ISeries<T>, model: IChartModelBase): IUpdatablePaneView;
 }
-
-export interface CustomSeriesDefinition<T extends SeriesType> extends BaseSeriesDefinition<T> {
-	readonly isBuiltIn: false;
-}
-
-export type SeriesDefinition<T extends SeriesType> =
-| BuiltInSeriesDefinition<T>
-| CustomSeriesDefinition<T>;
-

@@ -16,10 +16,11 @@ import {
 	PriceToCoordinateConverter,
 } from '../icustom-series';
 import { PriceScale } from '../price-scale';
-import { Series } from '../series';
+import { ISeries } from '../series';
 import { SeriesPlotRow } from '../series-data';
 import { TimedValue } from '../time-data';
 import { ITimeScale } from '../time-scale';
+import { ISeriesCustomPaneView } from './pane-view';
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
 type CustomBarItemBase = TimedValue;
@@ -53,12 +54,12 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 	'Custom',
 	CustomBarItem,
 	CustomSeriesPaneRendererWrapper
-> {
+> implements ISeriesCustomPaneView {
 	protected readonly _renderer: CustomSeriesPaneRendererWrapper;
 	private readonly _paneView: ICustomSeriesPaneView<unknown>;
 
 	public constructor(
-		series: Series<'Custom'>,
+		series: ISeries<'Custom'>,
 		model: IChartModelBase,
 		paneView: ICustomSeriesPaneView<unknown>
 	) {

@@ -5,7 +5,7 @@ import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { LastPriceAnimationMode, LineStyleOptions } from '../series-options';
 import { SeriesLinePaneView } from './line-pane-view';
-import { BuiltInSeriesDefinition } from './series-def';
+import { SeriesDefinition } from './series-def';
 
 export const lineStyleDefaults: LineStyleOptions = {
 	color: '#2196f3',
@@ -25,7 +25,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 /*
  * Line series
  */
-export const lineSeries: BuiltInSeriesDefinition<'Line'> = {
+export const lineSeries: SeriesDefinition<'Line'> = {
 	type: 'Line' as const,
 	isBuiltIn: true as const,
 	defaultOptions: lineStyleDefaults,

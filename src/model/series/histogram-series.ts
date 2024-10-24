@@ -5,14 +5,14 @@ import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { HistogramStyleOptions } from '../series-options';
 import { SeriesHistogramPaneView } from './histogram-pane-view';
-import { BuiltInSeriesDefinition } from './series-def';
+import { SeriesDefinition } from './series-def';
 
 export const histogramStyleDefaults: HistogramStyleOptions = {
 	color: '#26a69a',
 	base: 0,
 };
 
-export const histogramSeries: BuiltInSeriesDefinition<'Histogram'> = {
+export const histogramSeries: SeriesDefinition<'Histogram'> = {
 	type: 'Histogram' as const,
 	isBuiltIn: true as const,
 	defaultOptions: histogramStyleDefaults,

@@ -5,7 +5,7 @@ import { IChartModelBase } from '../chart-model';
 import { ISeries } from '../series';
 import { AreaStyleOptions, LastPriceAnimationMode } from '../series-options';
 import { SeriesAreaPaneView } from './area-pane-view';
-import { BuiltInSeriesDefinition } from './series-def';
+import { SeriesDefinition } from './series-def';
 
 export const areaStyleDefaults: AreaStyleOptions = {
 	topColor: 'rgba( 46, 220, 135, 0.4)',
@@ -25,7 +25,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	pointMarkersVisible: false,
 };
 
-export const areaSeries: BuiltInSeriesDefinition<'Area'> = {
+export const areaSeries: SeriesDefinition<'Area'> = {
 	type: 'Area' as const,
 	isBuiltIn: true as const,
 	defaultOptions: areaStyleDefaults,

@@ -14,7 +14,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { BuiltInSeriesDefinition } from '../model/series/series-def';
+import { SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
@@ -119,7 +119,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * ```
 	 */
 	addSeries<T extends SeriesType>(
-		definition: BuiltInSeriesDefinition<T>,
+		definition: SeriesDefinition<T>,
 		options?: SeriesPartialOptionsMap[T],
 		paneIndex?: number
 	): ISeriesApi<T, HorzScaleItem>;

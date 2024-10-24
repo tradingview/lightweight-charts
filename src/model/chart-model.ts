@@ -27,7 +27,7 @@ import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { ISeries, Series } from './series';
 import { SeriesOptionsMap, SeriesType } from './series-options';
-import { BuiltInSeriesDefinition, CustomSeriesDefinition } from './series/series-def';
+import { SeriesDefinition } from './series/series-def';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { HorzScaleOptions, ITimeScale, TimeScale } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
@@ -897,7 +897,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public createSeries<T extends SeriesType>(
-		definition: BuiltInSeriesDefinition<T> | CustomSeriesDefinition<T>,
+		definition: SeriesDefinition<T>,
 		options: SeriesOptionsMap[T],
 		paneIndex: number,
 		paneView?: ICustomSeriesPaneView<unknown>

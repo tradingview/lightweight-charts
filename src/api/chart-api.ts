@@ -24,7 +24,8 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { BuiltInSeriesDefinition, CustomSeriesDefinition } from '../model/series/series-def';
+import { createCustomSeriesDefinition } from '../model/series/custom-series';
+import { SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
@@ -34,7 +35,7 @@ import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
 import { chartOptionsDefaults } from './options/chart-options-defaults';
-import { customStyleDefaults, seriesOptionsDefaults } from './options/series-options-defaults';
+import { seriesOptionsDefaults } from './options/series-options-defaults';
 import { PaneApi } from './pane-api';
 import { PriceScaleApi } from './price-scale-api';
 import { SeriesApi } from './series-api';
@@ -180,7 +181,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	}
 
 	public addSeries<T extends SeriesType>(
-		definition: BuiltInSeriesDefinition<T>,
+		definition: SeriesDefinition<T>,
 		options: SeriesPartialOptionsMap[T] = {},
 		paneIndex: number = 0
 	): ISeriesApi<T, HorzScaleItem> {
@@ -197,13 +198,10 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		paneIndex?: number
 	): ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions> {
 		const paneView = ensure(customPaneView);
-		const defaults = {
-			...customStyleDefaults,
-			...paneView.defaultOptions(),
-		};
+		const definition = createCustomSeriesDefinition(customPaneView);
 
 		return this._addSeriesImpl(
-			{ isBuiltIn: false, type: 'Custom', defaultOptions: defaults },
+			definition,
 			options,
 			paneIndex ?? 0,
 			paneView
@@ -329,7 +327,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		TOptions extends SeriesOptionsMap[TSeries] = SeriesOptionsMap[TSeries],
 		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries]
 	>(
-		definition: BuiltInSeriesDefinition<TSeries>| CustomSeriesDefinition<TSeries>,
+		definition: SeriesDefinition<TSeries>,
 		options: SeriesPartialOptionsMap[TSeries] = {},
 		paneIndex: number = 0,
 		customPaneView?: ICustomSeriesPaneView<HorzScaleItem>
