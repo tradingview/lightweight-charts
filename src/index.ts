@@ -21,6 +21,12 @@ export const customSeriesDefaultOptions: CustomSeriesOptions = {
 
 export { createChart, createChartEx, defaultHorzScaleBehavior } from './api/create-chart';
 
+export { lineSeries as LineSeries } from './model/series/line-series';
+export { baselineSeries as BaselineSeries } from './model/series/baseline-series';
+export { areaSeries as AreaSeries } from './model/series/area-series';
+export { barSeries as BarSeries } from './model/series/bar-series';
+export { candlestickSeries as CandlestickSeries } from './model/series/candlestick-series';
+export { histogramSeries as HistogramSeries } from './model/series/histogram-series';
 /*
 	Plugins
 */

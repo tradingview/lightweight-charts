@@ -1,12 +1,12 @@
-import { IChartModelBase } from '../../model/chart-model';
-import { PriceScale } from '../../model/price-scale';
-import { ISeries } from '../../model/series';
-import { SeriesType } from '../../model/series-options';
-import { SeriesItemsIndexesRange, TimedValue, visibleTimedValues } from '../../model/time-data';
-import { ITimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
+import { IUpdatablePaneView, UpdateType } from '../../views/pane/iupdatable-pane-view';
 
-import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
+import { IChartModelBase } from '../chart-model';
+import { PriceScale } from '../price-scale';
+import { ISeries } from '../series';
+import { SeriesType } from '../series-options';
+import { SeriesItemsIndexesRange, TimedValue, visibleTimedValues } from '../time-data';
+import { ITimeScale } from '../time-scale';
 
 export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemType extends TimedValue, TRenderer extends IPaneRenderer> implements IUpdatablePaneView {
 	protected readonly _series: ISeries<TSeriesType>;
