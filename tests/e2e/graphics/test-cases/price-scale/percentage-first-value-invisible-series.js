@@ -20,7 +20,7 @@ function runTestCase(container) {
 	 * and the red series to BE visible
 	 */
 
-	const series1 = chart.addSeries(LightweightCharts.LineSeries, {
+	const series1 = chart.addLineSeries({
 		color: '#2962FF',
 	});
 	series1.setData([
@@ -28,7 +28,7 @@ function runTestCase(container) {
 		{ time: 1529895600, value: -3 },
 		{ time: 1537758000, value: 3 },
 	]);
-	const series2 = chart.addSeries(LightweightCharts.LineSeries, {
+	const series2 = chart.addLineSeries({
 		color: '#FF2962',
 	});
 	series2.setData([

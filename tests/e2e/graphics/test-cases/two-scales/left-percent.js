@@ -57,7 +57,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.BarSeries, {
+	const mainSeries = chart.addBarSeries({
 		borderColor: 'rgba(0, 0, 255, 0.2)',
 		upColor: 'rgba(0, 80, 0, 0.4)',
 		downColor: 'rgba(80, 0, 0, 0.4)',
@@ -67,7 +67,7 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	const histSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
+	const histSeries = chart.addHistogramSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,

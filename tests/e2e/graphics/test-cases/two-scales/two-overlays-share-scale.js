@@ -48,7 +48,7 @@ function generateDataLine(offset) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addSeries(LightweightCharts.BarSeries, {
+	const mainSeries = chart.addBarSeries({
 		borderColor: 'rgba(0, 0, 255, 0.2)',
 		upColor: 'rgba(0, 80, 0, 0.4)',
 		downColor: 'rgba(80, 0, 0, 0.4)',
@@ -58,7 +58,7 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	const lineSeires1 = chart.addSeries(LightweightCharts.LineSeries, {
+	const lineSeires1 = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,
@@ -68,7 +68,7 @@ function runTestCase(container) {
 
 	lineSeires1.setData(generateDataLine());
 
-	const lineSeires2 = chart.addSeries(LightweightCharts.LineSeries, {
+	const lineSeires2 = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#0000ff',
 		priceLineWidth: 1,

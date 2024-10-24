@@ -4,7 +4,7 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
+	const mainSeries = chart.addCandlestickSeries();
 
 	mainSeries.setData([
 		{ time: '2019-01-01', open: 10, high: 25, low: 5, close: 20 },

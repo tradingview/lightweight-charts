@@ -21,7 +21,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const series = chart.addSeries(LightweightCharts.LineSeries);
+	const series = chart.addLineSeries();
 	series.setData(generateData());
 
 	series.createPriceLine({ price: 58 });

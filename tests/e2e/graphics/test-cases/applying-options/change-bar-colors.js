@@ -47,7 +47,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const bar = chart.addSeries(LightweightCharts.BarSeries, {
+	const bar = chart.addBarSeries({
 		upColor: 'green',
 		downColor: 'red',
 	});

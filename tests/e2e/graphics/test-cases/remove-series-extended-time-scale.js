@@ -15,13 +15,13 @@ function generateData(step, startDay) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const mainSeries = chart.addLineSeries({
 		color: '#0000ff',
 	});
 
 	mainSeries.setData(generateData(1, 4));
 
-	const secondSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const secondSeries = chart.addLineSeries({
 		color: '#ff0000',
 	});
 

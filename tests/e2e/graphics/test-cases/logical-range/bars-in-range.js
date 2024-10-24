@@ -16,7 +16,7 @@ function generateData(count) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const series = chart.addSeries(LightweightCharts.LineSeries);
+	const series = chart.addLineSeries();
 
 	const data = generateData(10);
 	series.setData(data);
@@ -63,7 +63,7 @@ function runTestCase(container) {
 	console.assert(bars5.barsBefore === -5, `barsBefore should be -5, actual=${bars5.barsBefore}`);
 	console.assert(bars5.barsAfter === -5, `barsAfter should be -5, actual=${bars5.barsAfter}`);
 
-	const emptySeries = chart.addSeries(LightweightCharts.LineSeries);
+	const emptySeries = chart.addLineSeries();
 	console.assert(emptySeries.barsInLogicalRange({ from: 0, to: 3 }) === null, 'Bars should be null if series is empty');
 
 	console.assert(series.barsInLogicalRange(null) === null, 'Bars should be null if range is null');

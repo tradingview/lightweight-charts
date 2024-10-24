@@ -10,7 +10,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const mainSeries = chart.addLineSeries();
 
 	const data = [
 		{ time: '2018-03-28', value: 154 },

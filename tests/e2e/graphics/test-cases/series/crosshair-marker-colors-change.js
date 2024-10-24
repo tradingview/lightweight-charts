@@ -18,8 +18,8 @@ function generateData(step) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries);
-	const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const areaSeries = chart.addAreaSeries();
+	const lineSeries = chart.addLineSeries();
 
 	areaSeries.setData(generateData(1));
 	lineSeries.setData(generateData(-1));

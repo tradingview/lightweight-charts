@@ -1,7 +1,7 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const series = chart.addSeries(LightweightCharts.LineSeries, {
+	const series = chart.addLineSeries({
 		lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.OnDataUpdate,
 	});
 	series.setData([

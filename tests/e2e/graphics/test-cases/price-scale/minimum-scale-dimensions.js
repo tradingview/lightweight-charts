@@ -36,10 +36,10 @@ function runTestCase(container) {
 		chartOptions
 	));
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {});
+	const mainSeries = chart.addLineSeries({});
 	mainSeries.setData(generateData(0));
 
-	const mainSeries2 = chart.addSeries(LightweightCharts.LineSeries, {
+	const mainSeries2 = chart.addLineSeries({
 		color: '#000000',
 		priceScaleId: 'left',
 	});

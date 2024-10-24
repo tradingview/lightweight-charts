@@ -1,8 +1,8 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const lineSeries1 = chart.addSeries(LightweightCharts.LineSeries);
-	const lineSeries2 = chart.addSeries(LightweightCharts.LineSeries);
+	const lineSeries1 = chart.addLineSeries();
+	const lineSeries2 = chart.addLineSeries();
 
 	lineSeries1.setData([
 		{ time: '2020-01-02', value: 2 },

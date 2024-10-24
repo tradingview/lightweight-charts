@@ -30,7 +30,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+	const mainSeries = chart.addCandlestickSeries({
 		drawBorder: true,
 		borderColor: 'blue',
 	});

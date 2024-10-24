@@ -15,7 +15,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const mainSeries = chart.addLineSeries({
 		priceFormat: {
 			minMove: 0.000001,
 			precision: 6,

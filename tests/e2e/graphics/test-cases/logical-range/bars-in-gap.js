@@ -16,8 +16,8 @@ function generateData(count) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
-	const series = chart.addSeries(LightweightCharts.LineSeries);
+	const mainSeries = chart.addLineSeries();
+	const series = chart.addLineSeries();
 
 	mainSeries.setData(generateData(61));
 

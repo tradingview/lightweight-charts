@@ -20,7 +20,7 @@ function runTestCase(container) {
 
 	return new Promise(resolve => {
 		setTimeout(() => {
-			const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
+			const mainSeries = chart.addLineSeries();
 			mainSeries.setData(generateData());
 
 			resolve();

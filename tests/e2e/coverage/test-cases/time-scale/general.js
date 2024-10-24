@@ -10,7 +10,7 @@ let data;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
+	mainSeries = chart.addCandlestickSeries();
 
 	data = generateBars();
 	mainSeries.setData(data);

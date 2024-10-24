@@ -1,10 +1,10 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
-	const line = chart.addSeries(LightweightCharts.LineSeries);
-	const area = chart.addSeries(LightweightCharts.AreaSeries);
-	const candlestick = chart.addSeries(LightweightCharts.CandlestickSeries);
-	const bar = chart.addSeries(LightweightCharts.BarSeries);
-	const histogram = chart.addSeries(LightweightCharts.HistogramSeries);
+	const line = chart.addLineSeries();
+	const area = chart.addAreaSeries();
+	const candlestick = chart.addCandlestickSeries();
+	const bar = chart.addBarSeries();
+	const histogram = chart.addHistogramSeries();
 
 	console.assert(line.seriesType() === 'Line', 'line.seriesType() should return Line');
 	console.assert(area.seriesType() === 'Area', 'area.seriesType() should return Area');

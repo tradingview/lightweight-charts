@@ -20,12 +20,12 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const mainSeries = chart.addLineSeries();
 
 	mainSeries.setData(generateData());
 
 	// overlay price scale shouldn't inherit mode option
-	const histogramSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
+	const histogramSeries = chart.addHistogramSeries({
 		priceScaleId: 'overlay',
 		color: '#ff0000',
 	});

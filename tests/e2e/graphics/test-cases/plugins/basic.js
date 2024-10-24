@@ -419,7 +419,7 @@ function runTestCase(container) {
 		barSpacing: 50,
 		rightOffset: 5,
 	});
-	const s1 = chart.addSeries(LightweightCharts.LineSeries, {
+	const s1 = chart.addLineSeries({
 		color: 'red',
 	});
 	s1.setData([

@@ -17,7 +17,7 @@ function runTestCase(container) {
 		autoSize: true,
 		layout: { attributionLogo: false },
 	}));
-	const series = chart.addSeries(LightweightCharts.LineSeries);
+	const series = chart.addLineSeries();
 	series.setData(generateData());
 
 	return new Promise(resolve => {

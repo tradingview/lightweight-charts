@@ -50,7 +50,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const firstSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const firstSeries = chart.addLineSeries();
 	firstSeries.setData(getData());
 	chart.timeScale().fitContent();
 }

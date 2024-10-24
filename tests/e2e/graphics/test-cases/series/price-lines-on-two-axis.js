@@ -27,7 +27,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const series = chart.addSeries(LightweightCharts.LineSeries, {
+	const series = chart.addLineSeries({
 		priceScaleId: 'left',
 	});
 	series.setData(generateData());
@@ -40,7 +40,7 @@ function runTestCase(container) {
 		title: 'price line',
 	});
 
-	const series2 = chart.addSeries(LightweightCharts.LineSeries, {
+	const series2 = chart.addLineSeries({
 		priceScaleId: 'right',
 	});
 	series2.setData(

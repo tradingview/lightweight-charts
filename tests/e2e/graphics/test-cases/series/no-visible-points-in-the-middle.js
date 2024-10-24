@@ -27,7 +27,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const firstSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const firstSeries = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineVisible: false,
@@ -40,7 +40,7 @@ function runTestCase(container) {
 		}),
 	});
 
-	const secondSeries = chart.addSeries(LightweightCharts.AreaSeries, {
+	const secondSeries = chart.addAreaSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineVisible: false,

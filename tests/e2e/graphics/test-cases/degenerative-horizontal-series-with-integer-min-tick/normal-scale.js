@@ -23,7 +23,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const firstSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const firstSeries = chart.addLineSeries({
 		priceFormat: {
 			minMove: 10,
 		},

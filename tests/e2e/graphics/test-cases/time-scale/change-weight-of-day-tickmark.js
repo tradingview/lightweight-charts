@@ -904,6 +904,6 @@ function runTestCase(container) {
 		},
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.BarSeries);
+	const mainSeries = chart.addBarSeries();
 	mainSeries.setData(brokenData);
 }

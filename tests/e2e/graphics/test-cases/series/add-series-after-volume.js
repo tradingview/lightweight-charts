@@ -4,8 +4,8 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries); // or any other series type
-	const volumeSeries = chart.addSeries(LightweightCharts.HistogramSeries);
+	const areaSeries = chart.addAreaSeries(); // or any other series type
+	const volumeSeries = chart.addHistogramSeries();
 
 	volumeSeries.setData([
 		{ time: '2019-05-24', value: 23714686.00, color: 'red' },

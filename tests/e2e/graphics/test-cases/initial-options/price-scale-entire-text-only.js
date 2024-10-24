@@ -15,7 +15,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const mainSeries = chart.addLineSeries();
 
 	mainSeries.setData([
 		{ time: 1564617660, value: 32.51 },

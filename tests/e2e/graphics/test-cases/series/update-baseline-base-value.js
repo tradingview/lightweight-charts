@@ -42,7 +42,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addSeries(LightweightCharts.BaselineSeries, {
+	const mainSeries = chart.addBaselineSeries({
 		lineWidth: 1,
 		baseValue: {
 			type: 'price',

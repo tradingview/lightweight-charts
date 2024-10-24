@@ -21,7 +21,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const firstSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const firstSeries = chart.addLineSeries({
 		priceLineVisible: true,
 		priceLineWidth: 2,
 		priceLineColor: '#92151E',

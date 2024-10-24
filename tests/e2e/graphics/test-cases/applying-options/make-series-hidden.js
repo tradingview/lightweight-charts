@@ -20,7 +20,7 @@ function runTestCase(container) {
 		},
 		layout: { attributionLogo: false },
 	});
-	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const lineSeries = chart.addLineSeries({
 		baseLineVisible: true,
 	});
 	const data = generateData();

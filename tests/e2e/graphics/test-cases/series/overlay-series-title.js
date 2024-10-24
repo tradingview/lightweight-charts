@@ -15,12 +15,12 @@ function generateData(func) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const mainSeries = chart.addLineSeries({
 		color: '#ff0000',
 		title: 'Main series',
 	});
 
-	const overlaySeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const overlaySeries = chart.addLineSeries({
 		color: '#00ff00',
 		title: 'Overlay series',
 		priceScaleId: 'overlay-scale-id',

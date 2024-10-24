@@ -103,7 +103,7 @@ function runTestCase(container) {
 		},
 	}));
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries,
+	const mainSeries = chart.addLineSeries(
 		{
 			priceFormat: {
 				minMove: 1,
@@ -114,7 +114,7 @@ function runTestCase(container) {
 	);
 	mainSeries.setData(generateData());
 
-	const secondSeries = chart.addSeries(LightweightCharts.LineSeries,
+	const secondSeries = chart.addLineSeries(
 		{
 			priceFormat: {
 				minMove: 1,

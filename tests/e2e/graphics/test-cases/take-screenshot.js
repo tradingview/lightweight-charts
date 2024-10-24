@@ -71,7 +71,7 @@ function runTestCase(container) {
 		},
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+	const mainSeries = chart.addCandlestickSeries({
 		drawBorder: true,
 		borderColor: 'blue',
 		priceScaleId: 'left',
@@ -79,7 +79,7 @@ function runTestCase(container) {
 
 	mainSeries.setData(generateData());
 
-	const secondarySeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+	const secondarySeries = chart.addCandlestickSeries({
 		drawBorder: true,
 		borderColor: 'blue',
 		priceScaleId: 'right',
@@ -87,7 +87,7 @@ function runTestCase(container) {
 
 	secondarySeries.setData(generateData());
 
-	const histSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
+	const histSeries = chart.addHistogramSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineWidth: 1,

@@ -22,12 +22,12 @@ function runTestCase(container) {
 		visible: true,
 	});
 
-	const line1 = chart.addSeries(LightweightCharts.LineSeries, {
+	const line1 = chart.addLineSeries({
 		priceScaleId: 'overlay',
 		color: 'rgb(255, 0, 0)',
 		title: 'SIN',
 	});
-	const line2 = chart.addSeries(LightweightCharts.LineSeries, {
+	const line2 = chart.addLineSeries({
 		priceScaleId: 'overlay',
 		color: 'rgb(0, 255, 0)',
 		title: 'COS',

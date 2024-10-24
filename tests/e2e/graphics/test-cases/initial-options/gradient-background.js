@@ -25,7 +25,7 @@ function runTestCase(container) {
 		},
 	});
 
-	const series = chart.addSeries(LightweightCharts.LineSeries, {
+	const series = chart.addLineSeries({
 		title: 'ABCD',
 	});
 

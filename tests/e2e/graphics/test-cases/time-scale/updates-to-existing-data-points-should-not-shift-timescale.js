@@ -51,7 +51,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	}));
 
-	const s1 = chart.addSeries(LightweightCharts.CandlestickSeries);
+	const s1 = chart.addCandlestickSeries();
 	s1.setData(startData);
 
 	return new Promise(resolve => {

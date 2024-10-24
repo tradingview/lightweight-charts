@@ -23,7 +23,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const mainSeries = chart.addLineSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		autoscaleInfoProvider: () => ({

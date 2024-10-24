@@ -1,7 +1,7 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries, {
+	const areaSeries = chart.addAreaSeries({
 		symbol: 'AAPL',
 		lineWidth: 2,
 	});
@@ -13,7 +13,7 @@ function runTestCase(container) {
 		},
 	});
 
-	const volumeSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
+	const volumeSeries = chart.addHistogramSeries({
 		priceFormat: {
 			type: 'volume',
 		},

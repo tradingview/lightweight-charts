@@ -41,13 +41,13 @@ function createChart(container) {
 }
 
 function createFirstSeries() {
-	areaSeries1 = chart.addSeries(LightweightCharts.AreaSeries);
+	areaSeries1 = chart.addAreaSeries();
 	data1 = generateData(61, Date.UTC(2018, 0, 1, 0, 0, 0, 0));
 	areaSeries1.setData(data1);
 }
 
 function createSecondSeries() {
-	areaSeries2 = chart.addSeries(LightweightCharts.AreaSeries, {
+	areaSeries2 = chart.addAreaSeries({
 		lineColor: 'red',
 	});
 	data2 = [...generateData(20, Date.UTC(2022, 0, 1, 0, 0, 0, 0), true), ...generateData(61, Date.UTC(2022, 1, 1, 0, 0, 0, 0))];

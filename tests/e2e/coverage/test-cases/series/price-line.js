@@ -9,7 +9,7 @@ let priceLine1;
 function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	mainSeries = chart.addSeries(LightweightCharts.BarSeries);
+	mainSeries = chart.addBarSeries();
 
 	mainSeries.setData(generateBars());
 

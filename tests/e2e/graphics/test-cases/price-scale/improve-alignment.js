@@ -23,20 +23,20 @@ function runTestCase(container) {
 	const data3 = Array.from({ length: 10 }).map((_, index) => ({ time: index * 10000, value: 99 + index }));
 	const data4 = Array.from({ length: 10 }).map((_, index) => ({ time: index * 10000, value: 92.8 + (index - 1) * 2 }));
 
-	const series1 = chart.addSeries(LightweightCharts.LineSeries);
+	const series1 = chart.addLineSeries();
 	series1.setData(data1);
 
-	const series2 = chart.addSeries(LightweightCharts.LineSeries, {
+	const series2 = chart.addLineSeries({
 		color: 'green',
 	});
 	series2.setData(data2);
 
-	const series3 = chart.addSeries(LightweightCharts.LineSeries, {
+	const series3 = chart.addLineSeries({
 		color: 'purple',
 	});
 	series3.setData(data3);
 
-	const series4 = chart.addSeries(LightweightCharts.LineSeries, {
+	const series4 = chart.addLineSeries({
 		color: 'orange',
 	});
 	series4.setData(data4);

@@ -30,7 +30,7 @@ function runTestCase(container) {
 		},
 	}));
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const mainSeries = chart.addLineSeries();
 
 	mainSeries.setData(generateData());
 }

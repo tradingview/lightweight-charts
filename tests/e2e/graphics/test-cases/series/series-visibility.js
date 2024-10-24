@@ -39,7 +39,7 @@ function runTestCase(container) {
 		},
 		layout: { attributionLogo: false },
 	});
-	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
+	const lineSeries = chart.addLineSeries({
 		visible: false,
 		baseLineVisible: true,
 	});
@@ -59,25 +59,25 @@ function runTestCase(container) {
 		]
 	);
 
-	const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+	const candleSeries = chart.addCandlestickSeries({
 		visible: false,
 		baseLineVisible: true,
 	});
 	candleSeries.setData(generateBarData());
 
-	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries, {
+	const areaSeries = chart.addAreaSeries({
 		visible: false,
 		baseLineVisible: true,
 	});
 	areaSeries.setData(generateData());
 
-	const barSeries = chart.addSeries(LightweightCharts.BarSeries, {
+	const barSeries = chart.addBarSeries({
 		visible: false,
 		baseLineVisible: true,
 	});
 	barSeries.setData(generateBarData());
 
-	const histrogramSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
+	const histrogramSeries = chart.addHistogramSeries({
 		lineWidth: 1,
 		color: '#ff0000',
 		visible: false,

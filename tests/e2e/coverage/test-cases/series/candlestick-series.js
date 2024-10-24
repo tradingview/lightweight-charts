@@ -22,7 +22,7 @@ function testSeriesApi(series) {
 function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
+	const mainSeries = chart.addCandlestickSeries();
 
 	mainSeries.setData(generateBars());
 

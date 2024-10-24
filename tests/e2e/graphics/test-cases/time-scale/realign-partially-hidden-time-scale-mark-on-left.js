@@ -78,7 +78,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const series = chart.addSeries(LightweightCharts.AreaSeries);
+	const series = chart.addAreaSeries();
 	const data = getData();
 
 	series.setData(data);

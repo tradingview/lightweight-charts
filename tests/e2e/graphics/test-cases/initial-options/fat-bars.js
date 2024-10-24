@@ -30,7 +30,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.BarSeries, {
+	const mainSeries = chart.addBarSeries({
 		thinBars: false,
 	});
 

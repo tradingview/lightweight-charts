@@ -2,7 +2,7 @@
 
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
-	const series = chart.addSeries(LightweightCharts.CandlestickSeries);
+	const series = chart.addCandlestickSeries();
 
 	series.setData([
 		{ time: '2018-12-06', open: 141.77, high: 170.39, low: 120.25, close: 145.72 },
@@ -33,7 +33,7 @@ function runTestCase(container) {
 		{ time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
 	]);
 
-	const histogramSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
+	const histogramSeries = chart.addHistogramSeries({
 		color: 'yellow',
 	});
 
