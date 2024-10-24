@@ -22,19 +22,6 @@ export const lineStyleDefaults: LineStyleOptions = {
 	pointMarkersVisible: false,
 };
 
-// export class LineSeries implements BuiltInSeriesDefinition<'Line'> {
-// 	// eslint-disable-next-line @typescript-eslint/tslint/config
-// 	public readonly type = 'Line' as const;
-// 	// eslint-disable-next-line @typescript-eslint/tslint/config
-// 	public readonly isBuiltIn = true as const;
-// 	public readonly defaultOptions: LineStyleOptions = lineStyleDefaults;
-// 	/**
-// 	* @internal
-// 	*/
-// 	public createPaneView(series: ISeries<'Line'>, model: IChartModelBase): IUpdatablePaneView {
-// 		return new SeriesLinePaneView(series, model);
-// 	}
-// }
 /*
  * Line series
  */

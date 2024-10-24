@@ -12,19 +12,6 @@ export const histogramStyleDefaults: HistogramStyleOptions = {
 	base: 0,
 };
 
-// export class HistogramSeries implements BuiltInSeriesDefinition<'Histogram'> {
-// 	// eslint-disable-next-line @typescript-eslint/tslint/config
-// 	public readonly type = 'Histogram' as const;
-// 	// eslint-disable-next-line @typescript-eslint/tslint/config
-// 	public readonly isBuiltIn = true as const;
-// 	public readonly defaultOptions: HistogramStyleOptions = histogramStyleDefaults;
-// 	/**
-// 	* @internal
-// 	*/
-// 	public createPaneView(series: ISeries<'Histogram'>, model: IChartModelBase): IUpdatablePaneView {
-// 		return new SeriesHistogramPaneView(series, model);
-// 	}
-// }
 export const histogramSeries: BuiltInSeriesDefinition<'Histogram'> = {
 	type: 'Histogram' as const,
 	isBuiltIn: true as const,

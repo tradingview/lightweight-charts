@@ -29,8 +29,5 @@ export const areaSeries: BuiltInSeriesDefinition<'Area'> = {
 	type: 'Area' as const,
 	isBuiltIn: true as const,
 	defaultOptions: areaStyleDefaults,
-	/**
-	* @internal
-	*/
 	createPaneView: (series: ISeries<'Area'>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model),
 };
