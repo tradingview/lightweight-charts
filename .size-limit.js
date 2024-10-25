@@ -75,11 +75,11 @@ export default [
 		brotli: true,
 	},
 	{
-		name: 'Series: all',
+		name: 'Series: Chart and one series',
 		path: 'dist/lightweight-charts.production.mjs',
-		import: '{ LineSeries, BaselineSeries, AreaSeries, BarSeries, CandlestickSeries, HistogramSeries }',
+		import: '{ LineSeries, createChartEx }',
 		ignore: ['fancy-canvas'],
-		limit: '5.5 KB',
+		limit: '38.8 KB',
 		brotli: true,
 	},
 ];
