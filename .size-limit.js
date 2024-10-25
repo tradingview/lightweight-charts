@@ -67,9 +67,9 @@ export default [
 		brotli: true,
 	},
 	{
-		name: 'Series: Line',
+		name: 'Series: custom series',
 		path: 'dist/lightweight-charts.production.mjs',
-		import: '{ LineSeries }',
+		import: '{ createChartEx, createCustomSeries }',
 		ignore: ['fancy-canvas'],
 		limit: '5.5 KB',
 		brotli: true,

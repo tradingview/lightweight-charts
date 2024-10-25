@@ -188,26 +188,6 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._addSeriesImpl(definition, options, paneIndex);
 	}
 
-	// public addCustomSeries<
-	// 	TData extends CustomData<HorzScaleItem>,
-	// 	TOptions extends CustomSeriesOptions,
-	// 	TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>,
-	// >(
-	// 	customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
-	// 	options: SeriesPartialOptions<TOptions> = {},
-	// 	paneIndex?: number
-	// ): ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions> {
-	// 	const paneView = ensure(customPaneView);
-	// 	const definition = createCustomSeriesDefinition(customPaneView);
-
-	// 	return this._addSeriesImpl(
-	// 		definition,
-	// 		options,
-	// 		paneIndex ?? 0,
-	// 		paneView
-	// 	);
-	// }
-
 	public removeSeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): void {
 		const series = ensureDefined(this._seriesMap.get(seriesApi));
 
