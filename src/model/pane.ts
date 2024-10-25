@@ -19,7 +19,8 @@ import { sortSources } from './sort-sources';
 import { ITimeScale } from './time-scale';
 
 function isSeries(source: IPriceDataSource): source is Series<SeriesType> {
-	return source instanceof Series;
+	// eslint-disable-next-line no-restricted-syntax
+	return 'seriesType' in source;
 }
 
 export const DEFAULT_STRETCH_FACTOR = 1000;

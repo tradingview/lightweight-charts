@@ -1,8 +1,8 @@
-import { LineStyle, LineType } from '../../renderers/draw-line';
+import { LineStyle, LineType } from '../../renderers/line-types';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
-import { ISeries } from '../series';
+import { Series, SeriesOptionsInternal } from '../series';
 import { BaselineStyleOptions, LastPriceAnimationMode } from '../series-options';
 import { SeriesBaselinePaneView } from './baseline-pane-view';
 import { SeriesDefinition } from './series-def';
@@ -35,11 +35,15 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
 };
+const seriesType = 'Baseline';
+const createPaneView = (series: Series<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesBaselinePaneView(series, model);
 
-export const baselineSeries: SeriesDefinition<'Baseline'> = {
-	type: 'Baseline' as const,
+export const baselineSeries: SeriesDefinition<typeof seriesType> = {
+	type: seriesType,
 	isBuiltIn: true as const,
 	defaultOptions: baselineStyleDefaults,
-	createPaneView: (series: ISeries<'Baseline'>, model: IChartModelBase): IUpdatablePaneView => new SeriesBaselinePaneView(series, model),
+	createSeries: (model: IChartModelBase, options: SeriesOptionsInternal<typeof seriesType>): Series<typeof seriesType> => {
+		return new Series<typeof seriesType>(model, seriesType, options, createPaneView);
+	},
 };
 

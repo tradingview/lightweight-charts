@@ -3,7 +3,7 @@
 import { customStyleDefaults, seriesOptionsDefaults } from './api/options/series-options-defaults';
 import { CustomSeriesOptions } from './model/series-options';
 
-export { LineStyle, LineType } from './renderers/draw-line';
+export { LineStyle, LineType } from './renderers/line-types';
 
 export { TrackingModeExitMode } from './model/chart-model';
 export { CrosshairMode } from './model/crosshair';

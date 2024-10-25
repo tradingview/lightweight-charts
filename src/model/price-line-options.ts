@@ -1,4 +1,4 @@
-import { LineStyle, LineWidth } from '../renderers/draw-line';
+import { LineStyle, LineWidth } from '../renderers/line-types';
 
 /**
  * Represents a price line options.

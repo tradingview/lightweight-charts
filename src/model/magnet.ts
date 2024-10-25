@@ -5,7 +5,7 @@ import { CrosshairMode, CrosshairOptions } from './crosshair';
 import { IPriceDataSource } from './iprice-data-source';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
-import { ISeries, Series } from './series';
+import { ISeries } from './series';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 
@@ -33,7 +33,8 @@ export class Magnet {
 
 		// get all serieses from the pane
 		const serieses: readonly ISeries<SeriesType>[] = pane.dataSources().filter(
-			((ds: IPriceDataSource) => (ds instanceof Series)) as (ds: IPriceDataSource) => ds is Series<SeriesType>);
+			// eslint-disable-next-line no-restricted-syntax, @typescript-eslint/no-explicit-any
+			((ds: IPriceDataSource) => ('seriesType' in (ds as unknown as any))) as (ds: IPriceDataSource) => ds is ISeries<SeriesType>);
 
 		const candidates = serieses.reduce(
 			(acc: Coordinate[], series: ISeries<SeriesType>) => {

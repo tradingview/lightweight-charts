@@ -4,7 +4,8 @@ import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { drawHorizontalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
+import { drawHorizontalLine, setLineStyle } from './draw-line';
+import { LineStyle, LineWidth } from './line-types';
 
 export interface HorizontalLineRendererData {
 	color: string;

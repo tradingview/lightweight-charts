@@ -46,7 +46,6 @@ import {
 } from './series-options';
 import { ISeriesPrimitivePaneViewWrapper, SeriesPrimitiveWrapper } from './series-primitive-wrapper';
 import { ISeriesCustomPaneView } from './series/pane-view';
-import { SeriesDefinition } from './series/series-def';
 import { TimePointIndex } from './time-data';
 
 type PrimitivePaneViewExtractor = (wrapper: SeriesPrimitiveWrapper) => readonly ISeriesPrimitivePaneViewWrapper[];
@@ -150,10 +149,16 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
 
-	public constructor(model: IChartModelBase, definition: SeriesDefinition<T>, options: SeriesOptionsInternal<T>, customPaneView?: ICustomSeriesPaneView<unknown>) {
+	public constructor(
+		model: IChartModelBase,
+		seriesType: T,
+		options: SeriesOptionsInternal<T>,
+		createPaneView: (series: Series<T>, model: IChartModelBase, customPaneView?: ICustomSeriesPaneView<unknown>) => IUpdatablePaneView | ISeriesCustomPaneView,
+		customPaneView?: ICustomSeriesPaneView<unknown>
+	) {
 		super(model);
 		this._options = options;
-		this._seriesType = definition.type;
+		this._seriesType = seriesType;
 
 		const priceAxisView = new SeriesPriceAxisView(this);
 		this._priceAxisViews = [priceAxisView];
@@ -166,7 +171,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 		this._recreateFormatter();
 
-		this._paneView = definition.createPaneView(this, this.model());
+		this._paneView = createPaneView(this, this.model(), customPaneView);
 	}
 
 	public destroy(): void {

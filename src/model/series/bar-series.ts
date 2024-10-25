@@ -1,7 +1,7 @@
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
-import { ISeries } from '../series';
+import { Series, SeriesOptionsInternal } from '../series';
 import { BarStyleOptions } from '../series-options';
 import { SeriesBarsPaneView } from './bars-pane-view';
 import { SeriesDefinition } from './series-def';
@@ -12,10 +12,14 @@ export const barStyleDefaults: BarStyleOptions = {
 	openVisible: true,
 	thinBars: true,
 };
+const seriesType = 'Bar';
+const createPaneView = (series: Series<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesBarsPaneView(series, model);
 
-export const barSeries: SeriesDefinition<'Bar'> = {
-	type: 'Bar' as const,
+export const barSeries: SeriesDefinition<typeof seriesType> = {
+	type: seriesType,
 	isBuiltIn: true as const,
 	defaultOptions: barStyleDefaults,
-	createPaneView: (series: ISeries<'Bar'>, model: IChartModelBase): IUpdatablePaneView => new SeriesBarsPaneView(series, model),
+	createSeries: (model: IChartModelBase, options: SeriesOptionsInternal<typeof seriesType>): Series<typeof seriesType> => {
+		return new Series<typeof seriesType>(model, seriesType, options, createPaneView);
+	},
 };

@@ -2,7 +2,7 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
 import { TextWidthCache } from '../model/text-width-cache';
 
-import { LineWidth } from './draw-line';
+import { LineWidth } from './line-types';
 
 export interface PriceAxisViewRendererCommonData {
 	activeBackground?: string;

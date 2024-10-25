@@ -2,9 +2,9 @@ import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { ISeries } from '../../model/series';
 import { SeriesType } from '../../model/series-options';
-import { LineStyle } from '../../renderers/draw-line';
 import { HorizontalLineRenderer, HorizontalLineRendererData } from '../../renderers/horizontal-line-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
+import { LineStyle } from '../../renderers/line-types';
 
 import { IPaneView } from './ipane-view';
 

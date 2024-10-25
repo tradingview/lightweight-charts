@@ -4,8 +4,9 @@ import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
+import { setLineStyle } from './draw-line';
 import { drawSeriesPointMarkers } from './draw-series-point-markers';
+import { LinePoint, LineStyle, LineType, LineWidth } from './line-types';
 import { walkLine } from './walk-line';
 
 export type LineItemBase = TimedValue & PricedValue & LinePoint;

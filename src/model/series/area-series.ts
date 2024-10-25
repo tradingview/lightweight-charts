@@ -1,8 +1,8 @@
-import { LineStyle, LineType } from '../../renderers/draw-line';
+import { LineStyle, LineType } from '../../renderers/line-types';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
-import { ISeries } from '../series';
+import { Series, SeriesOptionsInternal } from '../series';
 import { AreaStyleOptions, LastPriceAnimationMode } from '../series-options';
 import { SeriesAreaPaneView } from './area-pane-view';
 import { SeriesDefinition } from './series-def';
@@ -24,10 +24,13 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
 };
-
+const seriesType = 'Area';
+const createPaneView = (series: Series<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model);
 export const areaSeries: SeriesDefinition<'Area'> = {
-	type: 'Area' as const,
+	type: seriesType,
 	isBuiltIn: true as const,
 	defaultOptions: areaStyleDefaults,
-	createPaneView: (series: ISeries<'Area'>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model),
+	createSeries: (model: IChartModelBase, options: SeriesOptionsInternal<typeof seriesType>): Series<typeof seriesType> => {
+		return new Series<typeof seriesType>(model, seriesType, options, createPaneView);
+	},
 };

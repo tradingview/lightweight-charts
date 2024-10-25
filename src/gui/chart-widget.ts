@@ -11,6 +11,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { ChartModel, ChartOptionsInternal, ChartOptionsInternalBase, IChartModelBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { DefaultPriceScaleId } from '../model/default-price-scale';
+import { IPrimitiveHitTestSource } from '../model/idata-source';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import {
 	InvalidateMask,
@@ -18,6 +19,7 @@ import {
 	TimeScaleInvalidation,
 	TimeScaleInvalidationType,
 } from '../model/invalidate-mask';
+import { IPriceDataSource } from '../model/iprice-data-source';
 import { Point } from '../model/point';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
@@ -44,7 +46,10 @@ export interface MouseEventParamsImpl {
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
 
 const windowsChrome = isChromiumBased() && isWindows();
-
+function isSeries(source: IPriceDataSource | IPrimitiveHitTestSource): source is Series<SeriesType> {
+	// eslint-disable-next-line no-restricted-syntax
+	return 'seriesType' in source;
+}
 export interface IChartWidgetBase {
 	getPriceAxisWidth(position: DefaultPriceScaleId): number;
 	model(): IChartModelBase;
@@ -798,7 +803,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 		const hoveredSource = this.model().hoveredSource();
 
-		const hoveredSeries = hoveredSource !== null && hoveredSource.source instanceof Series
+		const hoveredSeries = hoveredSource !== null && isSeries(hoveredSource.source)
 			? hoveredSource.source
 			: undefined;
 

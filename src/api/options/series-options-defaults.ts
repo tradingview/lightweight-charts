@@ -3,7 +3,7 @@ import {
 	PriceLineSource,
 	SeriesOptionsCommon,
 } from '../../model/series-options';
-import { LineStyle } from '../../renderers/draw-line';
+import { LineStyle } from '../../renderers/line-types';
 
 export const customStyleDefaults: CustomStyleOptions = {
 	color: '#2196f3',

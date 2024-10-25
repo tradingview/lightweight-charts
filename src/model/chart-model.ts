@@ -14,7 +14,6 @@ import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
-import { ICustomSeriesPaneView } from './icustom-series';
 import { IPrimitiveHitTestSource } from './idata-source';
 import { IHorzScaleBehavior, InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
@@ -26,8 +25,7 @@ import { DEFAULT_STRETCH_FACTOR, MIN_PANE_HEIGHT, Pane } from './pane';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { ISeries, Series } from './series';
-import { SeriesOptionsMap, SeriesType } from './series-options';
-import { SeriesDefinition } from './series/series-def';
+import { SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { HorzScaleOptions, ITimeScale, TimeScale } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
@@ -896,14 +894,11 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._priceScalesOptionsChanged;
 	}
 
-	public createSeries<T extends SeriesType>(
-		definition: SeriesDefinition<T>,
-		options: SeriesOptionsMap[T],
-		paneIndex: number,
-		paneView?: ICustomSeriesPaneView<unknown>
-	): Series<T> {
+	public addSeriesToPane<T extends SeriesType>(
+		series: Series<T>,
+		paneIndex: number
+	): void {
 		const pane = this._getOrCreatePane(paneIndex);
-		const series = new Series(this, definition, options, paneView);
 		this._addSeriesToPane(series, pane);
 
 		this._serieses.push(series);
@@ -913,8 +908,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		} else {
 			this.lightUpdate();
 		}
-
-		return series;
 	}
 
 	public removeSeries(series: Series<SeriesType>): void {

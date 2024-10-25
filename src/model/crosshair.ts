@@ -1,7 +1,7 @@
 import { ensureNotNull } from '../helpers/assertions';
 import { notNull } from '../helpers/strict-type-checks';
 
-import { LineStyle, LineWidth } from '../renderers/draw-line';
+import { LineStyle, LineWidth } from '../renderers/line-types';
 import { CrosshairMarksPaneView } from '../views/pane/crosshair-marks-pane-view';
 import { CrosshairPaneView } from '../views/pane/crosshair-pane-view';
 import { IPaneView } from '../views/pane/ipane-view';

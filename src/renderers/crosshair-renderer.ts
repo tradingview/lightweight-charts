@@ -1,7 +1,8 @@
 import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { drawHorizontalLine, drawVerticalLine, LineStyle, LineWidth, setLineStyle } from './draw-line';
+import { drawHorizontalLine, drawVerticalLine, setLineStyle } from './draw-line';
+import { LineStyle, LineWidth } from './line-types';
 
 export interface CrosshairLineStyle {
 	lineStyle: LineStyle;

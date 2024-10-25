@@ -2,7 +2,7 @@ import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { LinePoint } from './draw-line';
+import { LinePoint } from './line-types';
 
 export function drawSeriesPointMarkers<TItem extends LinePoint, TStyle extends CanvasRenderingContext2D['fillStyle']>(
 	renderingScope: BitmapCoordinatesRenderingScope,
