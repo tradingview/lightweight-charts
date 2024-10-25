@@ -14,17 +14,13 @@ import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
-	// CustomSeriesOptions,
-	// CustomSeriesPartialOptions,
 	precisionByMinMove,
 	PriceFormat,
 	PriceFormatBuiltIn,
 	SeriesOptionsMap,
-	// SeriesPartialOptions,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-// import { createCustomSeriesDefinition } from '../model/series/custom-series';
 import { SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 

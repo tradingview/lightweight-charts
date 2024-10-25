@@ -9,5 +9,8 @@ export interface SeriesDefinition<T extends SeriesType> {
 	readonly type: T;
 	readonly isBuiltIn: boolean;
 	readonly defaultOptions: SeriesStyleOptionsMap[T];
+	/**
+	 * @internal
+	 */
 	createSeries(model: IChartModelBase, options: SeriesOptionsInternal<T>, customPaneView?: ICustomSeriesPaneView<unknown>): Series<T>;
 }
