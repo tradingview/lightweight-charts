@@ -5,8 +5,7 @@ import { ensureNotNull } from '../helpers/assertions';
 import { PriceMark } from '../model/price-scale';
 
 import { BitmapCoordinatesPaneRenderer } from './bitmap-coordinates-pane-renderer';
-import { setLineStyle, strokeInPixel } from './draw-line';
-import { LineStyle } from './line-types';
+import { LineStyle, setLineStyle, strokeInPixel } from './draw-line';
 
 export interface GridMarks {
 	coord: number;

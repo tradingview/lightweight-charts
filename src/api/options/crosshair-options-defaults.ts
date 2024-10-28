@@ -1,4 +1,4 @@
-import { CrosshairMode, CrosshairOptions } from '../../model/crosshair'; import { LineStyle } from '../../renderers/line-types';
+import { CrosshairMode, CrosshairOptions } from '../../model/crosshair'; import { LineStyle } from '../../renderers/draw-line';
 
 export const crosshairOptionsDefaults: CrosshairOptions = {
 	vertLine: {

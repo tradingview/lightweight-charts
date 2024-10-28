@@ -1,4 +1,4 @@
-import { LineStyle } from '../renderers/line-types';
+import { LineStyle } from '../renderers/draw-line';
 import { GridPaneView } from '../views/pane/grid-pane-view';
 import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
 

@@ -1,5 +1,5 @@
 import { GridOptions } from '../../model/grid';
-import { LineStyle } from '../../renderers/line-types';
+import { LineStyle } from '../../renderers/draw-line';
 
 export const gridOptionsDefaults: GridOptions = {
 	vertLines: {

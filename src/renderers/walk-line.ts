@@ -3,7 +3,7 @@ import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 import { Coordinate } from '../model/coordinate';
 import { SeriesItemsIndexesRange } from '../model/time-data';
 
-import { LinePoint, LineType } from './line-types';
+import { LinePoint, LineType } from './draw-line';
 
 // eslint-disable-next-line max-params, complexity
 export function walkLine<TItem extends LinePoint, TStyle extends CanvasRenderingContext2D['fillStyle' | 'strokeStyle']>(

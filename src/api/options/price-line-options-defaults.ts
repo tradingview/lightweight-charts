@@ -1,5 +1,5 @@
 import { PriceLineOptions } from '../../model/price-line-options';
-import { LineStyle } from '../../renderers/line-types';
+import { LineStyle } from '../../renderers/draw-line';
 
 export const priceLineOptionsDefaults: PriceLineOptions = {
 	color: '#FF0000',

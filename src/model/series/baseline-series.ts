@@ -1,4 +1,4 @@
-import { LineStyle, LineType } from '../../renderers/line-types';
+import { LineStyle, LineType } from '../../renderers/draw-line';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
