@@ -363,7 +363,9 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding, {
+			colorSpace: this._pane.chart().options().layout.colorSpace,
+		});
 		if (topTarget !== null) {
 			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);

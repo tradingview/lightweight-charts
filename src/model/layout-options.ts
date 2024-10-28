@@ -48,6 +48,8 @@ export interface VerticalGradientColor {
  */
 export type Background = SolidColor | VerticalGradientColor;
 
+export type ColorSpace = 'display-p3' | 'srgb';
+
 /**
  * Represents panes customizations.
  */
@@ -124,4 +126,17 @@ export interface LayoutOptions {
 	 * @defaultValue true
 	 */
 	attributionLogo: boolean;
+
+	/**
+	 * Specifies the color space of the rendering context for the internal
+	 * canvas elements.
+	 *
+	 * Note: this option should only be specified during the chart creation
+	 * and not changed at a later stage by using `applyOptions`.
+	 *
+	 * @defaultValue `srgb`
+	 *
+	 * See [HTMLCanvasElement: getContext() method - Web APIs | MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext#colorspace) for more info
+	 */
+	colorSpace: ColorSpace;
 }

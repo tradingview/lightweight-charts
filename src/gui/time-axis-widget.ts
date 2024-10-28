@@ -301,7 +301,9 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 		if (type !== InvalidationLevel.Cursor) {
 			this._canvasBinding.applySuggestedBitmapSize();
-			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
+			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding, {
+				colorSpace: this._options.colorSpace,
+			});
 			if (target !== null) {
 				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
@@ -324,7 +326,9 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		}
 
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding, {
+			colorSpace: this._options.colorSpace,
+		});
 		if (topTarget !== null) {
 			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
