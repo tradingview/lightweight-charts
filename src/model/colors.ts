@@ -61,6 +61,28 @@ function rgbaToGrayscale(rgbValue: Rgba): number {
 	);
 }
 
+/**
+ * For colors which fall within the sRGB space, the browser can
+ * be used to convert the color string into a rgb /rgba string.
+ *
+ * For other colors, it will be returned as specified (i.e. for
+ * newer formats like display-p3)
+ *
+ * See: https://www.w3.org/TR/css-color-4/#serializing-sRGB-values
+ */
+function getRgbStringViaBrowser(color: string): string {
+	const element = document.createElement('div');
+	element.style.display = 'none';
+	// We append to the body as it is the most reliable way to get a color reading
+	// appending to the chart container or similar element can result in the following
+	// getComputedStyle returning empty strings on each check.
+	document.body.appendChild(element);
+	element.style.color = color;
+	const computed = window.getComputedStyle(element).color;
+	document.body.removeChild(element);
+	return computed;
+}
+
 export interface ContrastColors {
 	foreground: string;
 	background: string;
@@ -69,7 +91,6 @@ export interface ContrastColors {
 export type CustomColorParser = (color: string) => Rgba | null;
 
 export class ColorParser {
-	private _element: HTMLDivElement | null = null;
 	private _rgbaCache: Map<string, Rgba> = new Map();
 	private _customParsers: CustomColorParser[];
 
@@ -134,28 +155,13 @@ export class ColorParser {
 		return `rgba(${resultRgba[0]}, ${resultRgba[1]}, ${resultRgba[2]}, ${resultRgba[3]})`;
 	}
 
-	public destroy(): void {
-		if (this._element) {
-			this._element.remove();
-			this._element = null;
-		}
-		this._rgbaCache.clear();
-	}
-
 	private _parseColor(color: string): Rgba {
 		const cached = this._rgbaCache.get(color);
 		if (cached) {
 			return cached;
 		}
 
-		if (!this._element) {
-			this._element = document.createElement('div');
-			this._element.style.display = 'none';
-			document.body.appendChild(this._element);
-		}
-		// Use browser to parse color
-		this._element.style.color = color;
-		const computed = window.getComputedStyle(this._element).color;
+		const computed = getRgbStringViaBrowser(color);
 
 		const match = computed.match(
 			/^rgba?\s*\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)$/
