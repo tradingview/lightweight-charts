@@ -886,7 +886,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._options.localization.priceFormatter = undefined;
 		this._options.localization.percentageFormatter = undefined;
 		this._options.localization.timeFormatter = undefined;
-		this._colorParser.destroy();
 	}
 
 	public rendererOptionsProvider(): PriceAxisRendererOptionsProvider {
