@@ -17,4 +17,5 @@ export const layoutOptionsDefaults: LayoutOptions = {
 	},
 	attributionLogo: true,
 	colorSpace: 'srgb',
+	colorParsers: [],
 };

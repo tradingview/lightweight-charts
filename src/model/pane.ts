@@ -470,7 +470,8 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 			id,
 			actualOptions,
 			this._model.options()['layout'],
-			this._model.options().localization
+			this._model.options().localization,
+			this._model.colorParser()
 		);
 		priceScale.setHeight(this.height());
 		return priceScale;

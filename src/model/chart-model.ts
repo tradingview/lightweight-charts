@@ -1,7 +1,6 @@
 /// <reference types="_build-time-constants" />
 
 import { assert, ensureNotNull } from '../helpers/assertions';
-import { gradientColorAtPercent } from '../helpers/color';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
@@ -10,6 +9,7 @@ import { DeepPartial, merge } from '../helpers/strict-type-checks';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 
+import { ColorParser } from './colors';
 import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
@@ -433,6 +433,8 @@ export interface IChartModelBase {
 	swapPanes(first: number, second: number): void;
 	removePane(index: number): void;
 	changePanesHeight(paneIndex: number, height: number): void;
+
+	colorParser(): ColorParser;
 }
 
 function isPanePrimitive(source: IPriceDataSource | IPrimitiveHitTestSource): source is IPrimitiveHitTestSource | Pane {
@@ -463,10 +465,13 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
+	private _colorParser: ColorParser;
+
 	public constructor(invalidateHandler: InvalidateHandler, options: ChartOptionsInternal<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._invalidateHandler = invalidateHandler;
 		this._options = options;
 		this._horzScaleBehavior = horzScaleBehavior;
+		this._colorParser = new ColorParser(this._options.layout.colorParsers);
 
 		this._rendererOptionsProvider = new PriceAxisRendererOptionsProvider(this);
 
@@ -881,6 +886,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._options.localization.priceFormatter = undefined;
 		this._options.localization.percentageFormatter = undefined;
 		this._options.localization.timeFormatter = undefined;
+		this._colorParser.destroy();
 	}
 
 	public rendererOptionsProvider(): PriceAxisRendererOptionsProvider {
@@ -1031,13 +1037,17 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			}
 		}
 
-		const result = gradientColorAtPercent(topColor, bottomColor, percent / 100);
+		const result = this._colorParser.gradientColorAtPercent(topColor, bottomColor, percent / 100);
 		this._gradientColorsCache.colors.set(percent, result);
 		return result;
 	}
 
 	public getPaneIndex(pane: Pane): number {
 		return this._panes.indexOf(pane);
+	}
+
+	public colorParser(): ColorParser {
+		return this._colorParser;
 	}
 
 	private _getOrCreatePane(index: number): Pane {

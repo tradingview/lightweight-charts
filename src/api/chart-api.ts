@@ -304,6 +304,10 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			if (colorSpace !== undefined && colorSpace !== this.options().layout.colorSpace) {
 				throw new Error(`colorSpace option should not be changed once the chart has been created.`);
 			}
+			const colorParsers = options.layout?.colorParsers;
+			if (colorParsers !== undefined && colorParsers !== this.options().layout.colorParsers) {
+				throw new Error(`colorParsers option should not be changed once the chart has been created.`);
+			}
 		}
 		this._chartWidget.applyOptions(toInternalOptions(options));
 	}
