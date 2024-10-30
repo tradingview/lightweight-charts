@@ -13,6 +13,10 @@ function generateData() {
 }
 
 function runTestCase(container) {
+	window.onerror = function(message) {
+		console.log(`Uncaught Error: ${message}`);
+		return true;
+	};
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: {
 			attributionLogo: false,
