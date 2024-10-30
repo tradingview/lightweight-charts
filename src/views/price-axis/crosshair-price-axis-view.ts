@@ -1,5 +1,3 @@
-import { generateContrastColors } from '../../helpers/color';
-
 import { Crosshair, CrosshairMode, CrosshairPriceAndCoordinate } from '../../model/crosshair';
 import { PriceScale } from '../../model/price-scale';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
@@ -40,7 +38,7 @@ export class CrosshairPriceAxisView extends PriceAxisView {
 			return;
 		}
 
-		const colors = generateContrastColors(options.labelBackgroundColor);
+		const colors = this._priceScale.colorParser().generateContrastColors(options.labelBackgroundColor);
 		commonRendererData.background = colors.background;
 		axisRendererData.color = colors.foreground;
 
