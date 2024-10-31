@@ -1,11 +1,10 @@
-
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
-import { Series, SeriesOptionsInternal } from '../series';
+import { Series } from '../series';
 import { CandlestickStyleOptions } from '../series-options';
 import { SeriesCandlesticksPaneView } from './candlesticks-pane-view';
-import { SeriesDefinition } from './series-def';
+import { SeriesDefinition, SeriesDefinitionInternal } from './series-def';
 
 export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	upColor: '#26a69a',
@@ -20,13 +19,22 @@ export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	wickDownColor: '#ef5350',
 };
 const seriesType = 'Candlestick';
+
+/**
+ * @internal
+ */
 const createPaneView = (series: Series<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesCandlesticksPaneView(series, model);
 
-export const candlestickSeries: SeriesDefinition<typeof seriesType> = {
-	type: seriesType,
-	isBuiltIn: true as const,
-	defaultOptions: candlestickStyleDefaults,
-	createSeries: (model: IChartModelBase, options: SeriesOptionsInternal<typeof seriesType>): Series<typeof seriesType> => {
-		return new Series<typeof seriesType>(model, seriesType, options, createPaneView);
-	},
+export const createSeries = (): SeriesDefinition<typeof seriesType> => {
+	const definition: SeriesDefinitionInternal<typeof seriesType> = {
+		type: seriesType,
+		isBuiltIn: true as const,
+		defaultOptions: candlestickStyleDefaults,
+		/**
+		 * @internal
+		 */
+		createPaneView: createPaneView,
+	};
+	return definition as SeriesDefinition<typeof seriesType>;
 };
+export const candlestickSeries: SeriesDefinition<typeof seriesType> = createSeries();

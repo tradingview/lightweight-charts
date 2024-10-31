@@ -2,10 +2,10 @@ import { LineStyle, LineType } from '../../renderers/draw-line';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
-import { Series, SeriesOptionsInternal } from '../series';
+import { Series } from '../series';
 import { BaselineStyleOptions, LastPriceAnimationMode } from '../series-options';
 import { SeriesBaselinePaneView } from './baseline-pane-view';
-import { SeriesDefinition } from './series-def';
+import { SeriesDefinition, SeriesDefinitionInternal } from './series-def';
 
 export const baselineStyleDefaults: BaselineStyleOptions = {
 	baseValue: {
@@ -38,12 +38,16 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 const seriesType = 'Baseline';
 const createPaneView = (series: Series<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesBaselinePaneView(series, model);
 
-export const baselineSeries: SeriesDefinition<typeof seriesType> = {
-	type: seriesType,
-	isBuiltIn: true as const,
-	defaultOptions: baselineStyleDefaults,
-	createSeries: (model: IChartModelBase, options: SeriesOptionsInternal<typeof seriesType>): Series<typeof seriesType> => {
-		return new Series<typeof seriesType>(model, seriesType, options, createPaneView);
-	},
+export const createSeries = (): SeriesDefinition<typeof seriesType> => {
+	const definition: SeriesDefinitionInternal<typeof seriesType> = {
+		type: seriesType,
+		isBuiltIn: true as const,
+		defaultOptions: baselineStyleDefaults,
+		/**
+		 * @internal
+		 */
+		createPaneView: createPaneView,
+	};
+	return definition as SeriesDefinition<typeof seriesType>;
 };
-
+export const baselineSeries: SeriesDefinition<typeof seriesType> = createSeries();

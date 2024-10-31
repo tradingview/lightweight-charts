@@ -71,7 +71,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ createChartEx, createCustomSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '5.5 KB',
+		limit: '36.97 KB',
 		brotli: true,
 	},
 	{

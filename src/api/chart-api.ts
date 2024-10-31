@@ -8,7 +8,6 @@ import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-che
 import { ChartOptionsImpl, ChartOptionsInternal } from '../model/chart-model';
 import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
-import { ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Pane } from '../model/pane';
 import { Series } from '../model/series';
@@ -21,7 +20,7 @@ import {
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { SeriesDefinition } from '../model/series/series-def';
+import { isSeriesDefinition, SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
@@ -305,12 +304,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	>(
 		definition: SeriesDefinition<TSeries>,
 		options: SeriesPartialOptionsMap[TSeries] = {},
-		paneIndex: number = 0,
-		customPaneView?: ICustomSeriesPaneView<HorzScaleItem>
+		paneIndex: number = 0
 	): ISeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions> {
+		assert(isSeriesDefinition<TSeries>(definition));
 		patchPriceFormat(options.priceFormat);
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(definition.defaultOptions), options) as SeriesOptionsMap[TSeries];
-		const series = definition.createSeries(this._chartWidget.model(), strictOptions, customPaneView);
+		const createPaneView = definition.createPaneView;
+		const series = new Series(this._chartWidget.model(), definition.type, strictOptions, createPaneView, definition.customPaneView);
 		this._chartWidget.model().addSeriesToPane(
 			series,
 			paneIndex
