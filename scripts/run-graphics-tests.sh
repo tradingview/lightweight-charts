@@ -30,6 +30,8 @@ fi
 
 npm install
 npm run $BUILD_SCRIPT
+# Remove existing merge-base-dist if it exists
+rm -rf ./merge-base-dist
 mv ./dist ./merge-base-dist
 
 echo "Checkout to HEAD back and build..."
