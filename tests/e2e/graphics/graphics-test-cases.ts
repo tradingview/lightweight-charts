@@ -144,7 +144,6 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 	for (const testCase of testCases) {
 		void it(testCase.name, { timeout: TEST_CASE_TIMEOUT * NUMBER_RETRIES + 1000 }, async () => {
 			await retryTest(NUMBER_RETRIES, async () => {
-				const previousAttempts = attempts[testCase.name];
 				attempts[testCase.name] += 1;
 
 				const testCaseOutDir = path.join(outDir, testCase.name);
@@ -164,36 +163,24 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 				const errors: string[] = [];
 				const failedPages: string[] = [];
 
-				// run in parallel to increase speed
-				const goldenScreenshotPromise = withTimeout(screenshoter.generateScreenshot(goldenPageContent), TEST_CASE_TIMEOUT);
-
-				if (previousAttempts) {
-					try {
-						// If a test has previously failed then attempt to run the tests in series (one at a time).
-						await goldenScreenshotPromise;
-					} catch {
-						// error will be caught again below and handled correctly there.
-					}
-				}
-
-				const testScreenshotPromise = withTimeout(screenshoter.generateScreenshot(testPageContent), TEST_CASE_TIMEOUT);
-
 				let goldenScreenshot: PNG | null = null;
 				try {
-					goldenScreenshot = await goldenScreenshotPromise;
+					goldenScreenshot = await withTimeout(screenshoter.generateScreenshot(goldenPageContent), TEST_CASE_TIMEOUT);
 					writeTestDataItem('1.golden.png', PNG.sync.write(goldenScreenshot));
 				} catch (e: unknown) {
 					errors.push(`=== Golden page ===\n${(e as Error).message}`);
 					failedPages.push('golden');
+					await screenshoter.close();
 				}
 
 				let testScreenshot: PNG | null = null;
 				try {
-					testScreenshot = await testScreenshotPromise;
+					testScreenshot = await withTimeout(screenshoter.generateScreenshot(testPageContent), TEST_CASE_TIMEOUT);
 					writeTestDataItem('2.test.png', PNG.sync.write(testScreenshot));
 				} catch (e: unknown) {
 					errors.push(`=== Test page ===\n${(e as Error).message}`);
 					failedPages.push('test');
+					await screenshoter.close();
 				}
 
 				if (goldenScreenshot !== null && testScreenshot !== null) {
