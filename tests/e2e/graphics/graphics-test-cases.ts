@@ -204,10 +204,10 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 					expect(compareResult.diffPixelsCount).to.be.equal(0, 'number of different pixels must be 0');
 				} else {
 					writeTestDataItem('3.errors.txt', errors.join('\n\n'));
-					throw new Error(
-						`The error(s) happened while generating a screenshot for the page(s): ${failedPages.join(', ')}.
-	See ${testCaseOutDir} directory for an output of the test case.`
-					);
+					expect(
+						false,
+						`The error(s) happened while generating a screenshot for the page(s): ${failedPages.join(', ')}. See ${testCaseOutDir} directory for an output of the test case.`
+					).to.equal(true);
 				}
 
 				rmRf(testCaseOutDir);
