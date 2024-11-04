@@ -1,8 +1,16 @@
-import { createChart, createChartEx, createSeriesMarkers, LineSeries } from '../../src';
+import {
+	AreaSeries,
+	BarSeries,
+	BaselineSeries,
+	CandlestickSeries,
+	createChart,
+	createChartEx,
+	HistogramSeries,
+	LineSeries,
+} from '../../src';
 import { Mutable } from '../../src/helpers/mutable';
 import { ChartOptionsImpl } from '../../src/model/chart-model';
 import { SeriesDataItemTypeMap } from '../../src/model/data-consumer';
-import { Time } from '../../src/model/horz-scale-behavior-time/types';
 import { DataItem, HorzScaleItemConverterToInternalObj, IHorzScaleBehavior, InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { LocalizationOptions } from '../../src/model/localization-options';
 import { SeriesType } from '../../src/model/series-options';
@@ -12,26 +20,42 @@ import { TimeMark } from '../../src/model/time-scale';
 
 const chart = createChart('container');
 
-const mainSeries = chart.addSeries(LineSeries);
-mainSeries.setData([]);
-
-const seriesMarkersPrimitive = createSeriesMarkers(mainSeries, [
+const lineSeries = chart.addSeries(LineSeries, { lineWidth: 2 });
+lineSeries.setData([
 	{
-		color: 'green',
-		position: 'inBar',
-		shape: 'arrowDown',
-		time: 1556880900 as Time,
+		time: '2018-12-03',
+		value: 27.02,
+	},
+	{ time: '2018-12-04' },
+	{
+		time: '2018-12-08',
+		value: 23.92,
 	},
 ]);
-
-seriesMarkersPrimitive.setMarkers([
-	{
-		color: 'red',
-		position: 'aboveBar',
-		shape: 'arrowDown',
-		time: 1556880900 as Time,
-	},
+lineSeries.applyOptions({ lineStyle: 0 });
+// @ts-expect-error invalid value
+lineSeries.applyOptions({ lineStyle: '1' });
+// @ts-expect-error invalid property
+lineSeries.applyOptions({ upColor: 'red' });
+const areaSeries = chart.addSeries(AreaSeries);
+areaSeries.setData([
+	{ time: '2018-12-03', value: 27.02 },
+	{ time: '2018-12-04' },
+	{ time: '2018-12-08', value: 23.92 },
 ]);
+const barSeries = chart.addSeries(BarSeries, { upColor: 'red' }, 1);
+barSeries.setData([
+	{ time: '2018-12-03', open: 27.02, high: 27.02, low: 27.02, close: 27.02 },
+	{ time: '2018-12-04' },
+	{ time: '2018-12-08', open: 23.92, high: 23.92, low: 23.92, close: 23.92 },
+]);
+const baselineSeries = chart.addSeries(BaselineSeries);
+baselineSeries.setData([]);
+const candlestickSeries = chart.addSeries(CandlestickSeries);
+candlestickSeries.setData([]);
+
+const histogramSeries = chart.addSeries(HistogramSeries);
+histogramSeries.setData([]);
 
 type HorizontalScaleType = number;
 
@@ -100,23 +124,5 @@ const horizontalScaleBehaviourMock = new HorzScaleBehaviorPrice();
 
 // @ts-expect-error Mock Class
 const nonDefaultChart = createChartEx<HorizontalScaleType, HorzScaleBehaviorPrice>('anything', horizontalScaleBehaviourMock);
-const lineSeries = nonDefaultChart.addSeries(LineSeries);
-lineSeries.setData([]);
-
-const timeValue: HorizontalScaleType = 12345;
-const markerApi = createSeriesMarkers(lineSeries, [
-	{
-		color: 'green',
-		position: 'inBar',
-		shape: 'arrowDown',
-		time: timeValue,
-	},
-]);
-markerApi.setMarkers([
-	{
-		color: 'red',
-		position: 'aboveBar',
-		shape: 'arrowDown',
-		time: 1556880900,
-	},
-]);
+const lineSeries2 = nonDefaultChart.addSeries(LineSeries);
+lineSeries2.setData([]);

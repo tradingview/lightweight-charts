@@ -1,4 +1,4 @@
-import { createChartEx, createTextWatermark, customSeriesDefaultOptions } from '../../src';
+import { createChartEx, createCustomSeries, createTextWatermark, customSeriesDefaultOptions } from '../../src';
 import { CandlestickData, WhitespaceData } from '../../src/model/data-consumer';
 import { Time } from '../../src/model/horz-scale-behavior-time/types';
 import { CustomData, CustomSeriesPricePlotValues, ICustomSeriesPaneRenderer, ICustomSeriesPaneView, PaneRendererCustomData } from '../../src/model/icustom-series';
@@ -56,13 +56,12 @@ const horizontalScaleBehaviourMock = new MyHorizontalScaleBehaviour();
 // @ts-expect-error Mock Class
 const chart = createChartEx<HorizontalScaleType, MyHorizontalScaleBehaviour>('anything', horizontalScaleBehaviourMock);
 const customSeriesView = (new NonTimeSeries()) as ICustomSeriesPaneView<HorizontalScaleType, NonTimeData, NonTimeSeriesOptions>;
-
+const customSeriesDefinition = createCustomSeries<HorizontalScaleType, NonTimeData, NonTimeSeriesOptions>(customSeriesView);
 // @ts-expect-error invalid property
-const failSeries = chart.addCustomSeries(customSeriesView, { badOption: 123 });
+const failSeries = chart.addSeries(createCustomSeries(customSeriesView), { badOption: 123 });
 // @ts-expect-error invalid value
-const failSeries2 = chart.addCustomSeries(customSeriesView, { testOption: 123 });
-
-const series = chart.addCustomSeries(customSeriesView, { testOption: 'string' });
+const failSeries2 = chart.addSeries(customSeriesDefinition, { testOption: 123 });
+const series = chart.addSeries<NonTimeData, NonTimeSeriesOptions>(customSeriesDefinition, { testOption: 'string' });
 
 const data: (NonTimeData | WhitespaceData<HorizontalScaleType>)[] = [
     { time: 12345 }, // whitespace

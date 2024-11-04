@@ -6,21 +6,25 @@ import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl, ChartOptionsInternal } from '../model/chart-model';
-import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap } from '../model/data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
+import { CustomData } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
+	CustomSeriesOptions,
 	precisionByMinMove,
 	PriceFormat,
 	PriceFormatBuiltIn,
 	SeriesOptionsMap,
+	SeriesPartialOptions,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { isSeriesDefinition, SeriesDefinition } from '../model/series/series-def';
+import { isCustomSeriesDefinition } from '../model/series/custom-series';
+import { CustomSeriesDefinition, isSeriesDefinition, SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
@@ -176,11 +180,23 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	}
 
 	public addSeries<T extends SeriesType>(
-		definition: SeriesDefinition<T>,
-		options: SeriesPartialOptionsMap[T] = {},
+		definition: SeriesDefinition<T> | CustomSeriesDefinition<HorzScaleItem, CustomData<HorzScaleItem>, CustomSeriesOptions>,
+		options: SeriesPartialOptionsMap[T] | SeriesPartialOptions<CustomSeriesOptions> = {},
 		paneIndex: number = 0
 	): ISeriesApi<T, HorzScaleItem> {
-		return this._addSeriesImpl(definition, options, paneIndex);
+		if (isCustomSeriesDefinition(definition)) {
+			return this._addSeriesImpl<T, SeriesPartialOptions<CustomSeriesOptions>>(
+				definition,
+				options as SeriesPartialOptions<CustomSeriesOptions>,
+				paneIndex
+			);
+		} else {
+			return this._addSeriesImpl<T, SeriesPartialOptionsMap[T]>(
+				definition,
+				options as SeriesPartialOptionsMap[T],
+				paneIndex
+			);
+		}
 	}
 
 	public removeSeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): void {
@@ -297,25 +313,29 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	}
 
 	private _addSeriesImpl<
-		TSeries extends SeriesType,
-		TData extends WhitespaceData<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[TSeries],
-		TOptions extends SeriesOptionsMap[TSeries] = SeriesOptionsMap[TSeries],
-		TPartialOptions extends SeriesPartialOptionsMap[TSeries] = SeriesPartialOptionsMap[TSeries]
-	>(
-		definition: SeriesDefinition<TSeries>,
-		options: SeriesPartialOptionsMap[TSeries] = {},
-		paneIndex: number = 0
-	): ISeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions> {
-		assert(isSeriesDefinition<TSeries>(definition));
+    T extends SeriesType,
+    TPartialOptions extends SeriesPartialOptionsMap[T]
+>(
+	definition: SeriesDefinition<T> | CustomSeriesDefinition<HorzScaleItem, CustomData<HorzScaleItem>, CustomSeriesOptions>,
+	options: TPartialOptions,
+	paneIndex: number = 0
+): ISeriesApi<T, HorzScaleItem> {
+		assert(isSeriesDefinition<T>(definition));
 		patchPriceFormat(options.priceFormat);
-		const strictOptions = merge(clone(seriesOptionsDefaults), clone(definition.defaultOptions), options) as SeriesOptionsMap[TSeries];
+		const strictOptions = merge(clone(seriesOptionsDefaults), clone(definition.defaultOptions), options) as SeriesOptionsMap[T];
 		const createPaneView = definition.createPaneView;
-		const series = new Series(this._chartWidget.model(), definition.type, strictOptions, createPaneView, definition.customPaneView);
+		const series = new Series(
+			this._chartWidget.model(),
+			definition.type,
+			strictOptions,
+			createPaneView,
+			isCustomSeriesDefinition(definition) ? definition.customPaneView : undefined
+		);
 		this._chartWidget.model().addSeriesToPane(
 			series,
 			paneIndex
 		);
-		const res = new SeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions>(series, this, this, this, this._horzScaleBehavior, (pane: Pane) => this._getPaneApi(pane));
+		const res = new SeriesApi<T, HorzScaleItem>(series, this, this, this, this._horzScaleBehavior, (pane: Pane) => this._getPaneApi(pane));
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 

@@ -1,17 +1,18 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl } from '../model/chart-model';
-import { BarData, HistogramData, LineData } from '../model/data-consumer';
+import { BarData, HistogramData, LineData, WhitespaceData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
-import {
-	CustomData,
-} from '../model/icustom-series';
+import { CustomData } from '../model/icustom-series';
 import { Point } from '../model/point';
 import {
+	CustomSeriesOptions,
+	SeriesOptionsMap,
+	SeriesPartialOptions,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { SeriesDefinition } from '../model/series/series-def';
+import { CustomSeriesDefinition, SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
@@ -115,12 +116,24 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addSeries(LineSeries, { lineWidth: 2 });
 	 * ```
 	 */
-	addSeries<T extends SeriesType>(
+	addSeries<
+		T extends SeriesType,
+		TData extends WhitespaceData<HorzScaleItem>,
+		TOptions extends SeriesOptionsMap[T],
+		TPartialOptions extends SeriesPartialOptionsMap[T]
+	>(
 		definition: SeriesDefinition<T>,
 		options?: SeriesPartialOptionsMap[T],
 		paneIndex?: number
 	): ISeriesApi<T, HorzScaleItem>;
-
+	addSeries<
+		TData extends CustomData<HorzScaleItem>,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
+	>(
+        definition: CustomSeriesDefinition<HorzScaleItem, TData, TOptions>,
+        options?: Partial<TOptions>
+    ): ISeriesApi<'Custom', HorzScaleItem, TData | WhitespaceData<HorzScaleItem>, TOptions, TPartialOptions>;
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
 	 *

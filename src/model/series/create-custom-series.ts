@@ -1,7 +1,7 @@
 import { CustomData, ICustomSeriesPaneView } from '../icustom-series';
 import { CustomSeriesOptions } from '../series-options';
 import { createCustomSeriesDefinition } from './custom-series';
-import { SeriesDefinition } from './series-def';
+import { CustomSeriesDefinition } from './series-def';
 
 /**
  * Function to create a custom series
@@ -22,7 +22,6 @@ export function createCustomSeries<
 	HorzScaleItem,
 	TData extends CustomData<HorzScaleItem>,
 	TOptions extends CustomSeriesOptions,
->(customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>): SeriesDefinition<'Custom'> {
-	const definition = createCustomSeriesDefinition(customPaneView);
-	return definition;
+>(customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>): CustomSeriesDefinition<HorzScaleItem, TData, TOptions> {
+	return createCustomSeriesDefinition(customPaneView);
 }

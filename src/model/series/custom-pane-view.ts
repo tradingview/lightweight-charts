@@ -18,6 +18,7 @@ import {
 import { PriceScale } from '../price-scale';
 import { ISeries } from '../series';
 import { SeriesPlotRow } from '../series-data';
+import { SeriesOptionsMap } from '../series-options';
 import { TimedValue } from '../time-data';
 import { ITimeScale } from '../time-scale';
 import { ISeriesCustomPaneView } from './pane-view';
@@ -51,7 +52,7 @@ class CustomSeriesPaneRendererWrapper implements IPaneRenderer {
 }
 
 export class SeriesCustomPaneView extends SeriesPaneViewBase<
-	'Custom',
+	'Custom'& keyof SeriesOptionsMap,
 	CustomBarItem,
 	CustomSeriesPaneRendererWrapper
 > implements ISeriesCustomPaneView {
@@ -59,7 +60,7 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 	private readonly _paneView: ICustomSeriesPaneView<unknown>;
 
 	public constructor(
-		series: ISeries<'Custom'>,
+		series: ISeries<'Custom' & keyof SeriesOptionsMap>,
 		model: IChartModelBase,
 		paneView: ICustomSeriesPaneView<unknown>
 	) {
