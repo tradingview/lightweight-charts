@@ -3,16 +3,15 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { ChartOptionsImpl } from '../model/chart-model';
 import { BarData, HistogramData, LineData, WhitespaceData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
-import { CustomData } from '../model/icustom-series';
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { Point } from '../model/point';
 import {
 	CustomSeriesOptions,
-	SeriesOptionsMap,
 	SeriesPartialOptions,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { CustomSeriesDefinition, SeriesDefinition } from '../model/series/series-def';
+import { SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
@@ -104,6 +103,26 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	resize(width: number, height: number, forceRepaint?: boolean): void;
 
 	/**
+	 * Creates a custom series with specified parameters.
+	 *
+	 * A custom series is a generic series which can be extended with a custom renderer to
+	 * implement chart types which the library doesn't support by default.
+	 *
+	 * @param customPaneView - A custom series pane view which implements the custom renderer.
+	 * @param customOptions - Customization parameters of the series being created.
+	 * ```js
+	 * const series = chart.addCustomSeries(myCustomPaneView);
+	 * ```
+	 */
+	addCustomSeries<TData extends CustomData<HorzScaleItem>,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
+	>(
+		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
+		customOptions?: SeriesPartialOptions<TOptions>,
+		paneIndex?: number
+	): ISeriesApi<'Custom', HorzScaleItem, TData | WhitespaceData<HorzScaleItem>, TOptions, TPartialOptions>;
+	/**
 	 * Creates a series with specified parameters.
 	 *
 	 * A custom series is a generic series which can be extended with a custom renderer to
@@ -116,26 +135,12 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addSeries(LineSeries, { lineWidth: 2 });
 	 * ```
 	 */
-	addSeries<
-		T extends SeriesType,
-		TData extends WhitespaceData<HorzScaleItem>,
-		TOptions extends SeriesOptionsMap[T],
-		TPartialOptions extends SeriesPartialOptionsMap[T]
-	>(
+	addSeries<T extends SeriesType>(
 		definition: SeriesDefinition<T>,
 		options?: SeriesPartialOptionsMap[T],
 		paneIndex?: number
 	): ISeriesApi<T, HorzScaleItem>;
-	// eslint-disable-next-line tsdoc/syntax
-	/** @inheritdoc */
-	addSeries<
-		TData extends CustomData<HorzScaleItem>,
-		TOptions extends CustomSeriesOptions,
-		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
-	>(
-        definition: CustomSeriesDefinition<HorzScaleItem, TData, TOptions>,
-        options?: Partial<TOptions>
-    ): ISeriesApi<'Custom', HorzScaleItem, TData | WhitespaceData<HorzScaleItem>, TOptions, TPartialOptions>;
+
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
 	 *

@@ -21,7 +21,6 @@ export const customSeriesDefaultOptions: CustomSeriesOptions = {
 export { ICustomSeriesPaneView, ICustomSeriesPaneRenderer, CustomBarItemData, CustomData } from './model/icustom-series';
 
 export { createChart, createChartEx, defaultHorzScaleBehavior } from './api/create-chart';
-export { createCustomSeries } from './model/series/create-custom-series';
 export { lineSeries as LineSeries } from './model/series/line-series';
 export { baselineSeries as BaselineSeries } from './model/series/baseline-series';
 export { areaSeries as AreaSeries } from './model/series/area-series';
