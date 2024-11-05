@@ -1,6 +1,6 @@
 import { generateContrastColors } from '../../helpers/color';
 
-import { ISeries, LastValueDataResultWithData } from '../../model/series';
+import { ISeries, LastValueDataResultWithData } from '../../model/iseries';
 import { PriceAxisLastValueMode, SeriesType } from '../../model/series-options';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
 

@@ -7,8 +7,8 @@ import { CustomPriceLinePriceAxisView } from '../views/price-axis/custom-price-l
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { Coordinate } from './coordinate';
+import { ISeries } from './iseries';
 import { PriceLineOptions } from './price-line-options';
-import { ISeries } from './series';
 import { SeriesType } from './series-options';
 
 export class CustomPriceLine {

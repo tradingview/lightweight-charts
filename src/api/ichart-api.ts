@@ -126,6 +126,8 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 		options?: SeriesPartialOptionsMap[T],
 		paneIndex?: number
 	): ISeriesApi<T, HorzScaleItem>;
+	// eslint-disable-next-line tsdoc/syntax
+	/** @inheritdoc */
 	addSeries<
 		TData extends CustomData<HorzScaleItem>,
 		TOptions extends CustomSeriesOptions,

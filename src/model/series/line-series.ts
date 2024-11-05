@@ -2,7 +2,7 @@ import { LineStyle, LineType } from '../../renderers/draw-line';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
-import { Series } from '../series';
+import { ISeries } from '../iseries';
 import { LastPriceAnimationMode, LineStyleOptions } from '../series-options';
 import { SeriesLinePaneView } from './line-pane-view';
 import { SeriesDefinition, SeriesDefinitionInternal } from './series-def';
@@ -23,7 +23,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 };
 const seriesType = 'Line';
 
-const createPaneView = (series: Series<'Line'>, model: IChartModelBase): IUpdatablePaneView => new SeriesLinePaneView(series, model);
+const createPaneView = (series: ISeries<'Line'>, model: IChartModelBase): IUpdatablePaneView => new SeriesLinePaneView(series, model);
 
 export const createLineSeries = (): SeriesDefinition<typeof seriesType> => {
 	const definition: SeriesDefinitionInternal<typeof seriesType> = {

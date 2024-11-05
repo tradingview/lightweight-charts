@@ -4,7 +4,7 @@ import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
 import { CustomData, ICustomSeriesPaneView } from '../icustom-series';
-import { Series } from '../series';
+import { ISeries } from '../iseries';
 import { CustomSeriesOptions, CustomStyleOptions } from '../series-options';
 import { SeriesCustomPaneView } from './custom-pane-view';
 import { CustomSeriesDefinition, CustomSeriesDefinitionInternal } from './series-def';
@@ -13,7 +13,7 @@ export const customStyleDefaults: CustomStyleOptions = {
 	color: '#2196f3',
 };
 const seriesType = 'Custom';
-const createPaneView = <HorzScaleItem>(series: Series<typeof seriesType>, model: IChartModelBase, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): IUpdatablePaneView => {
+const createPaneView = <HorzScaleItem>(series: ISeries<typeof seriesType>, model: IChartModelBase, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): IUpdatablePaneView => {
 	const paneView = ensure(customPaneView);
 	return new SeriesCustomPaneView(series, model, paneView);
 };

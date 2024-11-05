@@ -1,7 +1,7 @@
 import { generateContrastColors } from '../../helpers/color';
 
 import { CustomPriceLine } from '../../model/custom-price-line';
-import { ISeries } from '../../model/series';
+import { ISeries } from '../../model/iseries';
 import { SeriesType } from '../../model/series-options';
 import {
 	PriceAxisViewRendererCommonData,

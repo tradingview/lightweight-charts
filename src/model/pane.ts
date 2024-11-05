@@ -11,16 +11,16 @@ import { Grid } from './grid';
 import { IPrimitiveHitTestSource } from './idata-source';
 import { IPanePrimitiveBase, PrimitiveHoveredItem } from './ipane-primitive';
 import { IPriceDataSource } from './iprice-data-source';
+import { ISeries } from './iseries';
 import { PanePrimitiveWrapper } from './pane-primitive-wrapper';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
-import { ISeries, Series } from './series';
+import { Series } from './series';
 import { SeriesType } from './series-options';
 import { sortSources } from './sort-sources';
 import { ITimeScale } from './time-scale';
 
 function isSeries(source: IPriceDataSource): source is Series<SeriesType> {
-	// eslint-disable-next-line no-restricted-syntax
-	return 'seriesType' in source;
+	return source instanceof Series;
 }
 
 export const DEFAULT_STRETCH_FACTOR = 1000;

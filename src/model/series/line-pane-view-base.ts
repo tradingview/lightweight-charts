@@ -5,9 +5,9 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { BarPrice } from '../bar';
 import { IChartModelBase } from '../chart-model';
 import { Coordinate } from '../coordinate';
+import { ISeries } from '../iseries';
 import { PlotRowValueIndex } from '../plot-data';
 import { PricedValue, PriceScale } from '../price-scale';
-import { Series } from '../series';
 import { ISeriesBarColorer } from '../series-bar-colorer';
 import { SeriesPlotRow } from '../series-data';
 import { TimedValue, TimePointIndex } from '../time-data';
@@ -19,7 +19,7 @@ export abstract class LinePaneViewBase<
 	ItemType extends PricedValue & TimedValue,
 	TRenderer extends IPaneRenderer
 > extends SeriesPaneViewBase<TSeriesType, ItemType, TRenderer> {
-	public constructor(series: Series<TSeriesType>, model: IChartModelBase) {
+	public constructor(series: ISeries<TSeriesType>, model: IChartModelBase) {
 		super(series, model, true);
 	}
 

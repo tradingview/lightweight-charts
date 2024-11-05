@@ -2,8 +2,8 @@ import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { IUpdatablePaneView, UpdateType } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
+import { ISeries } from '../iseries';
 import { PriceScale } from '../price-scale';
-import { ISeries } from '../series';
 import { SeriesType } from '../series-options';
 import { SeriesItemsIndexesRange, TimedValue, visibleTimedValues } from '../time-data';
 import { ITimeScale } from '../time-scale';

@@ -15,8 +15,8 @@ import {
 	ICustomSeriesPaneView,
 	PriceToCoordinateConverter,
 } from '../icustom-series';
+import { ISeries } from '../iseries';
 import { PriceScale } from '../price-scale';
-import { ISeries } from '../series';
 import { SeriesPlotRow } from '../series-data';
 import { SeriesOptionsMap } from '../series-options';
 import { TimedValue } from '../time-data';

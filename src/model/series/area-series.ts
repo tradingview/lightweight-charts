@@ -2,7 +2,7 @@ import { LineStyle, LineType } from '../../renderers/draw-line';
 import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
-import { Series } from '../series';
+import { ISeries } from '../iseries';
 import { AreaStyleOptions, LastPriceAnimationMode } from '../series-options';
 import { SeriesAreaPaneView } from './area-pane-view';
 import { SeriesDefinition, SeriesDefinitionInternal } from './series-def';
@@ -25,7 +25,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	pointMarkersVisible: false,
 };
 const seriesType = 'Area';
-const createPaneView = (series: Series<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model);
+const createPaneView = (series: ISeries<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model);
 
 export const createSeries = (): SeriesDefinition<typeof seriesType> => {
 	const definition: SeriesDefinitionInternal<typeof seriesType> = {

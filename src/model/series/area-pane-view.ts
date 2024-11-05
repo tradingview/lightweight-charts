@@ -1,6 +1,6 @@
 import { BarPrice } from '../../model/bar';
 import { IChartModelBase } from '../../model/chart-model';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/iseries';
 import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { AreaFillItem, PaneRendererArea } from '../../renderers/area-renderer';
@@ -14,7 +14,7 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 	private readonly _areaRenderer: PaneRendererArea = new PaneRendererArea();
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 
-	public constructor(series: Series<'Area'>, model: IChartModelBase) {
+	public constructor(series: ISeries<'Area'>, model: IChartModelBase) {
 		super(series, model);
 		this._renderer.setRenderers([this._areaRenderer, this._lineRenderer]);
 	}

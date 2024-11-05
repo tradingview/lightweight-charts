@@ -1,6 +1,6 @@
 import { BarPrice } from '../../model/bar';
 import { IChartModelBase } from '../../model/chart-model';
-import { Series } from '../../model/series';
+import { ISeries } from '../../model/iseries';
 import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { BaselineFillItem, PaneRendererBaselineArea } from '../../renderers/baseline-renderer-area';
@@ -14,7 +14,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 	private readonly _baselineAreaRenderer: PaneRendererBaselineArea = new PaneRendererBaselineArea();
 	private readonly _baselineLineRenderer: PaneRendererBaselineLine = new PaneRendererBaselineLine();
 
-	public constructor(series: Series<'Baseline'>, model: IChartModelBase) {
+	public constructor(series: ISeries<'Baseline'>, model: IChartModelBase) {
 		super(series, model);
 		this._renderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
 	}

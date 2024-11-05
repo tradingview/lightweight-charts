@@ -2,7 +2,7 @@ import { IUpdatablePaneView } from '../../views/pane/iupdatable-pane-view';
 
 import { IChartModelBase } from '../chart-model';
 import { CustomData, CustomSeriesPricePlotValues, CustomSeriesWhitespaceData } from '../icustom-series';
-import { ISeries } from '../series';
+import { ISeries } from '../iseries';
 import { SeriesType } from '../series-options';
 
 export interface ISeriesCustomPaneView extends IUpdatablePaneView {

@@ -10,10 +10,11 @@ import {
 } from '../../src';
 import { Mutable } from '../../src/helpers/mutable';
 import { ChartOptionsImpl } from '../../src/model/chart-model';
-import { SeriesDataItemTypeMap } from '../../src/model/data-consumer';
+import { BarData, LineData, SeriesDataItemTypeMap, WhitespaceData } from '../../src/model/data-consumer';
+import { Time } from '../../src/model/horz-scale-behavior-time/types';
 import { DataItem, HorzScaleItemConverterToInternalObj, IHorzScaleBehavior, InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { LocalizationOptions } from '../../src/model/localization-options';
-import { SeriesType } from '../../src/model/series-options';
+import { BarSeriesOptions, LineSeriesOptions, SeriesType } from '../../src/model/series-options';
 import { TickMark } from '../../src/model/tick-marks';
 import { TickMarkWeightValue, TimeScalePoint } from '../../src/model/time-data';
 import { TimeMark } from '../../src/model/time-scale';
@@ -43,12 +44,27 @@ areaSeries.setData([
 	{ time: '2018-12-04' },
 	{ time: '2018-12-08', value: 23.92 },
 ]);
+areaSeries.setData([
+	// @ts-expect-error wrong data type
+	{ time: '2018-12-03', open: 27.02, high: 27.02, low: 27.02, close: 27.02 },
+]);
 const barSeries = chart.addSeries(BarSeries, { upColor: 'red' }, 1);
 barSeries.setData([
 	{ time: '2018-12-03', open: 27.02, high: 27.02, low: 27.02, close: 27.02 },
 	{ time: '2018-12-04' },
 	{ time: '2018-12-08', open: 23.92, high: 23.92, low: 23.92, close: 23.92 },
 ]);
+barSeries.setData([
+	// @ts-expect-error wrong data type
+	{ time: '2018-12-03', value: 27.02 },
+]);
+barSeries.data() satisfies readonly (WhitespaceData<Time> | BarData<Time>)[];
+barSeries.data() satisfies readonly (WhitespaceData<Time>)[];
+// @ts-expect-error wrong data type
+barSeries.data() satisfies readonly (LineData<Time>)[];
+barSeries.options() satisfies Readonly<BarSeriesOptions>;
+// @ts-expect-error wrong options type
+barSeries.options() satisfies Readonly<LineSeriesOptions>;
 const baselineSeries = chart.addSeries(BaselineSeries);
 baselineSeries.setData([]);
 const candlestickSeries = chart.addSeries(CandlestickSeries);
