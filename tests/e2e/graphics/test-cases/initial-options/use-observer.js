@@ -29,7 +29,7 @@ function runTestCase(container) {
 		container.appendChild(box);
 
 		const chart = LightweightCharts.createChart(box, { autoSize: true, layout: { attributionLogo: false }, ...config });
-		const mainSeries = chart.addAreaSeries();
+		const mainSeries = chart.addSeries(LightweightCharts.AreaSeries);
 
 		mainSeries.setData(generateData());
 

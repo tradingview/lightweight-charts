@@ -15,7 +15,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addLineSeries({
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		lineWidth: 1,
 		lineType: LightweightCharts.LineType.WithSteps,
 		color: '#ff0000',

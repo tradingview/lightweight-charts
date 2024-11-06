@@ -23,7 +23,7 @@ function beforeInteractions(container) {
 		},
 	});
 
-	const mainSeries = chart.addCandlestickSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
 	mainSeries.setData(generateBars());
 
 	const lineSeries = chart.addLineSeries({

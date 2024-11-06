@@ -24,8 +24,8 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const series1 = chart.addLineSeries({ color: 'red', priceScaleId: 'right' });
-	const series2 = chart.addLineSeries({ color: 'blue', priceScaleId: 'left' });
+	const series1 = chart.addSeries(LightweightCharts.LineSeries, { color: 'red', priceScaleId: 'right' });
+	const series2 = chart.addSeries(LightweightCharts.LineSeries, { color: 'blue', priceScaleId: 'left' });
 
 	series1.setData(generateData(0));
 	series2.setData(generateData(Math.PI));

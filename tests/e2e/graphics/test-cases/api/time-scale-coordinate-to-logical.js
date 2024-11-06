@@ -15,7 +15,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const series = chart.addLineSeries();
+	const series = chart.addSeries(LightweightCharts.LineSeries);
 
 	const data = [
 		{ time: '1990-04-24', value: 0 },

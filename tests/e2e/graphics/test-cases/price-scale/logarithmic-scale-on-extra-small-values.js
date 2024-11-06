@@ -18,7 +18,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addAreaSeries({
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		priceFormat: {
 			minMove: 1e-10,
 			precision: 10,

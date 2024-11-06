@@ -76,7 +76,7 @@ function runTestCase(container) {
 		horzItemBehavior,
 		{ layout: { attributionLogo: false } }
 	));
-	const s1 = chart.addLineSeries({
+	const s1 = chart.addSeries(LightweightCharts.LineSeries, {
 		color: 'red',
 	});
 	const arr = [];
