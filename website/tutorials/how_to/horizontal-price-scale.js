@@ -116,7 +116,9 @@ const chart = createChartEx(
 	chartOptions
 );
 
-const lineSeries = chart.addLineSeries({ color: LINE_LINE_COLOR });
+// remove-line
+// eslint-disable-next-line no-undef
+const lineSeries = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
 
 const data = [];
 for (let i = 0; i < 5000; i++) {

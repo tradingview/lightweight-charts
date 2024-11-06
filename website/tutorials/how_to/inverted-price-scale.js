@@ -25,7 +25,9 @@ chart.applyOptions({
 	},
 });
 
-const lineSeries = chart.addLineSeries({ color: LINE_LINE_COLOR });
+// remove-line
+// eslint-disable-next-line no-undef
+const lineSeries = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
 
 const data = [
 	{ time: '2016-07-18', value: 661.47 },

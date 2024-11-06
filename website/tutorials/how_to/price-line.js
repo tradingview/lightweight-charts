@@ -13,7 +13,9 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-const series = chart.addLineSeries({
+// remove-line
+// eslint-disable-next-line no-undef
+const series = chart.addSeries(LineSeries, {
 	color: LINE_LINE_COLOR,
 	lineWidth: 2,
 	// highlight-start

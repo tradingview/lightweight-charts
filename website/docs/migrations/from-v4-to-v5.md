@@ -3,6 +3,26 @@
 In this document you can find the migration guide from the previous version v4
 to v5.
 
+## Series changes
+
+To make the API more consistent and to utilize tree-shaking capabilities of modern JS bundlers, the `addSeries` function was introduced. It replaces the previous `addLineSeries`, `addCandlestickSeries`, etc. functions.
+To migrate your code, you need to replace all the `chart.add<SeriesType>Series` calls with `chart.addSeries(SeriesDefinition, options)` calls.
+In ESM builds, you can import the `SeriesDefinition` from the library, in the UMD builds it's available under `LightweightCharts.SeriesDefinition`. Example:
+ESM:
+
+```js
+import { createChart, LineSeries } from 'lightweight-charts';
+const chart = createChart(container, {});
+const lineSeries = chart.addSeries(LineSeries, { color: 'red' });
+```
+
+UMD:
+
+```js
+const chart = LightweightCharts.createChart(container, {});
+const lineSeries = chart.addSeries(LightweightCharts.LineSeries, { color: 'red' });
+```
+
 ## Watermarks
 
 ### Overview of Changes
@@ -45,7 +65,7 @@ Here's a comprehensive example demonstrating how to implement a text watermark i
 
 ```js
 const chart = createChart(container, options);
-const mainSeries = chart.addLineSeries();
+const mainSeries = chart.addSeries(LineSeries);
 mainSeries.setData(generateData());
 
 const firstPane = chart.panes()[0];

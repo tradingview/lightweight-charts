@@ -524,7 +524,9 @@ const intervalColors = {
 	'1Y': LINE_LINE4_COLOR,
 };
 
-const lineSeries = chart.addLineSeries({ color: intervalColors['1D'] });
+// remove-line
+// eslint-disable-next-line no-undef
+const lineSeries = chart.addSeries(LineSeries, { color: intervalColors['1D'] });
 
 function setChartInterval(interval) {
 	lineSeries.setData(seriesesData.get(interval));

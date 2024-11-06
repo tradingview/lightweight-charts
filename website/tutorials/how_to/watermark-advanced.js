@@ -22,7 +22,9 @@ createImageWatermark(chart.panes()[0], imageDataUrl, {
 });
 // highlight-end
 
-const lineSeries = chart.addAreaSeries({
+// remove-line
+// eslint-disable-next-line no-undef
+const lineSeries = chart.addSeries(AreaSeries, {
 	topColor: AREA_TOP_COLOR,
 	bottomColor: AREA_BOTTOM_COLOR,
 	lineColor: LINE_LINE_COLOR,

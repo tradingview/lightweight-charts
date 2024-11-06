@@ -313,7 +313,7 @@ const chart = LightweightCharts.createChartEx(container, horzItemBehavior, {
         precision: 2, // custom option
     },
 });
-const s1 = chart.addLineSeries();
+const s1 = chart.addSeries(LightweightCharts.LineSeries);
 const data = [];
 for (let i = 0; i < 5000; i++) {
     data.push({

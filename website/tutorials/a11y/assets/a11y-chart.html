@@ -185,7 +185,7 @@
 	</template>
 
 	<script type="text/javascript">
-		const { createChart } = LightweightCharts;
+		const { createChart, LineSeries } = LightweightCharts;
 		function generateSampleData() {
 			const randomFactor = 25 + Math.random() * 25;
 			const samplePoint = i =>
@@ -258,7 +258,7 @@
 			},
 		});
 
-		const mainSeries = chart.addLineSeries({
+		const mainSeries = chart.addSeries(LineSeries, {
 			priceFormat: {
 				minMove: 1,
 				precision: 0,

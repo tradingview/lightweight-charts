@@ -4,7 +4,7 @@ the docusaurus site to ensure that the chart looks great in both dark and light 
 If you want to use this example then please copy the code presented on the documentation site.
 [link](https://tradingview.github.io/lightweight-charts/tutorials/react/simple) */
 // delete-end
-import { createChart, ColorType } from 'lightweight-charts';
+import { AreaSeries, createChart, ColorType } from 'lightweight-charts';
 import React, { useEffect, useRef } from 'react';
 
 export const ChartComponent = props => {
@@ -37,7 +37,7 @@ export const ChartComponent = props => {
 			});
 			chart.timeScale().fitContent();
 
-			const newSeries = chart.addAreaSeries({ lineColor, topColor: areaTopColor, bottomColor: areaBottomColor });
+			const newSeries = chart.addSeries(AreaSeries, { lineColor, topColor: areaTopColor, bottomColor: areaBottomColor });
 			newSeries.setData(data);
 
 			window.addEventListener('resize', handleResize);

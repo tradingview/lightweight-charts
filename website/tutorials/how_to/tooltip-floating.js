@@ -35,8 +35,9 @@ chart.applyOptions({
 		},
 	},
 });
-
-const series = chart.addAreaSeries({
+// remove-line
+// eslint-disable-next-line no-undef
+const series = chart.addSeries({
 	topColor: AREA_TOP_COLOR,
 	bottomColor: AREA_BOTTOM_COLOR,
 	lineColor: LINE_LINE_COLOR,

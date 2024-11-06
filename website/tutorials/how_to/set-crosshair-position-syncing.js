@@ -37,7 +37,9 @@ const chart1 = createChart(
 		},
 	}
 );
-const mainSeries1 = chart1.addLineSeries({
+// remove-line
+// eslint-disable-next-line no-undef
+const mainSeries1 = chart1.addSeries(LineSeries, {
 	color: 'red',
 });
 
@@ -55,7 +57,9 @@ const chart2 = createChart(
 		},
 	}
 );
-const mainSeries2 = chart2.addLineSeries({
+// remove-line
+// eslint-disable-next-line no-undef
+const mainSeries2 = chart2.addSeries(LineSeries, {
 	color: 'blue',
 });
 

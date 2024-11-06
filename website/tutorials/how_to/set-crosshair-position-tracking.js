@@ -27,7 +27,9 @@ const chart = createChart(
 	}
 );
 
-const mainSeries = chart.addLineSeries({
+// remove-line
+// eslint-disable-next-line no-undef
+const mainSeries = chart.addSeries({
 	priceFormat: {
 		minMove: 1,
 		precision: 0,

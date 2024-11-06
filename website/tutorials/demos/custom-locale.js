@@ -36,7 +36,9 @@ function setLocale(locale) {
 	// highlight-end
 }
 
-const candlestickSeries = chart.addCandlestickSeries({
+// remove-line
+// eslint-disable-next-line no-undef
+const candlestickSeries = chart.addSeries(CandlestickSeries, {
 	upColor: BAR_UP_COLOR,
 	downColor: BAR_DOWN_COLOR,
 	borderVisible: false,

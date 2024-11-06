@@ -42,9 +42,15 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-const lineSeriesOne = chart.addLineSeries({ color: LINE_LINE_COLOR });
-const lineSeriesTwo = chart.addLineSeries({ color: LINE_LINE2_COLOR });
-const lineSeriesThree = chart.addLineSeries({ color: LINE_LINE3_COLOR });
+// remove-line
+// eslint-disable-next-line no-undef
+const lineSeriesOne = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
+// remove-line
+// eslint-disable-next-line no-undef
+const lineSeriesTwo = chart.addSeries(LineSeries, { color: LINE_LINE2_COLOR });
+// remove-line
+// eslint-disable-next-line no-undef
+const lineSeriesThree = chart.addSeries(LineSeries, { color: LINE_LINE3_COLOR });
 
 const lineSeriesOneData = generateLineData();
 const lineSeriesTwoData = generateLineData();
