@@ -21,13 +21,12 @@ export const lineStyleDefaults: LineStyleOptions = {
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
 };
-const seriesType = 'Line';
 
 const createPaneView = (series: ISeries<'Line'>, model: IChartModelBase): IUpdatablePaneView => new SeriesLinePaneView(series, model);
 
-export const createLineSeries = (): SeriesDefinition<typeof seriesType> => {
-	const definition: SeriesDefinitionInternal<typeof seriesType> = {
-		type: seriesType,
+export const createLineSeries = (): SeriesDefinition<'Line'> => {
+	const definition: SeriesDefinitionInternal<'Line'> = {
+		type: 'Line',
 		isBuiltIn: true as const,
 		defaultOptions: lineStyleDefaults,
 		/**
@@ -35,7 +34,7 @@ export const createLineSeries = (): SeriesDefinition<typeof seriesType> => {
 		 */
 		createPaneView: createPaneView,
 	};
-	return definition as SeriesDefinition<typeof seriesType>;
+	return definition as SeriesDefinition<'Line'>;
 };
-export const lineSeries: SeriesDefinition<typeof seriesType> = createLineSeries();
+export const lineSeries: SeriesDefinition<'Line'> = createLineSeries();
 

@@ -35,12 +35,11 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
 };
-const seriesType = 'Baseline';
-const createPaneView = (series: ISeries<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesBaselinePaneView(series, model);
+const createPaneView = (series: ISeries<'Baseline'>, model: IChartModelBase): IUpdatablePaneView => new SeriesBaselinePaneView(series, model);
 
-export const createSeries = (): SeriesDefinition<typeof seriesType> => {
-	const definition: SeriesDefinitionInternal<typeof seriesType> = {
-		type: seriesType,
+export const createSeries = (): SeriesDefinition<'Baseline'> => {
+	const definition: SeriesDefinitionInternal<'Baseline'> = {
+		type: 'Baseline',
 		isBuiltIn: true as const,
 		defaultOptions: baselineStyleDefaults,
 		/**
@@ -48,6 +47,6 @@ export const createSeries = (): SeriesDefinition<typeof seriesType> => {
 		 */
 		createPaneView: createPaneView,
 	};
-	return definition as SeriesDefinition<typeof seriesType>;
+	return definition as SeriesDefinition<'Baseline'>;
 };
-export const baselineSeries: SeriesDefinition<typeof seriesType> = createSeries();
+export const baselineSeries: SeriesDefinition<'Baseline'> = createSeries();

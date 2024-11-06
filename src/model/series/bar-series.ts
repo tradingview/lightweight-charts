@@ -12,12 +12,11 @@ export const barStyleDefaults: BarStyleOptions = {
 	openVisible: true,
 	thinBars: true,
 };
-const seriesType = 'Bar';
-const createPaneView = (series: ISeries<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesBarsPaneView(series, model);
+const createPaneView = (series: ISeries<'Bar'>, model: IChartModelBase): IUpdatablePaneView => new SeriesBarsPaneView(series, model);
 
-export const createSeries = (): SeriesDefinition<typeof seriesType> => {
-	const definition: SeriesDefinitionInternal<typeof seriesType> = {
-		type: seriesType,
+export const createSeries = (): SeriesDefinition<'Bar'> => {
+	const definition: SeriesDefinitionInternal<'Bar'> = {
+		type: 'Bar',
 		isBuiltIn: true as const,
 		defaultOptions: barStyleDefaults,
 		/**
@@ -26,6 +25,6 @@ export const createSeries = (): SeriesDefinition<typeof seriesType> => {
 		createPaneView: createPaneView,
 	};
 
-	return definition as SeriesDefinition<typeof seriesType>;
+	return definition as SeriesDefinition<'Bar'>;
 };
-export const barSeries: SeriesDefinition<typeof seriesType> = createSeries();
+export const barSeries: SeriesDefinition<'Bar'> = createSeries();

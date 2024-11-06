@@ -10,13 +10,11 @@ export const histogramStyleDefaults: HistogramStyleOptions = {
 	color: '#26a69a',
 	base: 0,
 };
-const seriesType = 'Histogram';
+const createPaneView = (series: ISeries<'Histogram'>, model: IChartModelBase): IUpdatablePaneView => new SeriesHistogramPaneView(series, model);
 
-const createPaneView = (series: ISeries<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesHistogramPaneView(series, model);
-
-export const createSeries = (): SeriesDefinition<typeof seriesType> => {
-	const definition: SeriesDefinitionInternal<typeof seriesType> = {
-		type: seriesType,
+export const createSeries = (): SeriesDefinition<'Histogram'> => {
+	const definition: SeriesDefinitionInternal<'Histogram'> = {
+		type: 'Histogram',
 		isBuiltIn: true as const,
 		defaultOptions: histogramStyleDefaults,
 		/**
@@ -24,6 +22,6 @@ export const createSeries = (): SeriesDefinition<typeof seriesType> => {
 		 */
 		createPaneView: createPaneView,
 	};
-	return definition as SeriesDefinition<typeof seriesType>;
+	return definition as SeriesDefinition<'Histogram'>;
 };
-export const histogramSeries: SeriesDefinition<typeof seriesType> = createSeries();
+export const histogramSeries: SeriesDefinition<'Histogram'> = createSeries();

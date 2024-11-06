@@ -12,8 +12,7 @@ import { SeriesDefinition, SeriesDefinitionInternal } from './series-def';
 export const customStyleDefaults: CustomStyleOptions = {
 	color: '#2196f3',
 };
-const seriesType = 'Custom';
-const createPaneView = <HorzScaleItem>(series: ISeries<typeof seriesType>, model: IChartModelBase, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): IUpdatablePaneView => {
+const createPaneView = <HorzScaleItem>(series: ISeries<'Custom'>, model: IChartModelBase, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): IUpdatablePaneView => {
 	const paneView = ensure(customPaneView);
 	return new SeriesCustomPaneView(series, model, paneView);
 };
@@ -24,7 +23,7 @@ export const createCustomSeriesDefinition = <
 	TSeriesOptions extends CustomSeriesOptions = CustomSeriesOptions
 >(paneView: ICustomSeriesPaneView<HorzScaleItem, TData, TSeriesOptions>): SeriesDefinition<'Custom'> => {
 	const definition: SeriesDefinitionInternal<'Custom'> = {
-		type: seriesType,
+		type: 'Custom',
 		isBuiltIn: false as const,
 		defaultOptions: { ...customStyleDefaults, ...paneView.defaultOptions() },
 		/**

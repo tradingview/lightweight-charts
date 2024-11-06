@@ -5,10 +5,25 @@ import { ICustomSeriesPaneView } from '../icustom-series';
 import { ISeries } from '../iseries';
 import { SeriesStyleOptionsMap, SeriesType } from '../series-options';
 
+/**
+ * Series definition interface.
+ */
 export interface SeriesDefinition<T extends SeriesType> {
+	/**
+	 * Series type.
+	 */
 	readonly type: T;
+	/**
+	 * Indicates if the series is built-in.
+	 */
 	readonly isBuiltIn: boolean;
+	/**
+	 * Default series options.
+	 */
 	readonly defaultOptions: SeriesStyleOptionsMap[T];
+	/**
+	 * Custom pane view (optional).
+	 */
 	readonly customPaneView?: ICustomSeriesPaneView<unknown>;
 }
 

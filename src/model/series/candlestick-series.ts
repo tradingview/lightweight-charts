@@ -18,13 +18,12 @@ export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	wickUpColor: '#26a69a',
 	wickDownColor: '#ef5350',
 };
-const seriesType = 'Candlestick';
 
-const createPaneView = (series: ISeries<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesCandlesticksPaneView(series, model);
+const createPaneView = (series: ISeries<'Candlestick'>, model: IChartModelBase): IUpdatablePaneView => new SeriesCandlesticksPaneView(series, model);
 
-export const createSeries = (): SeriesDefinition<typeof seriesType> => {
-	const definition: SeriesDefinitionInternal<typeof seriesType> = {
-		type: seriesType,
+export const createSeries = (): SeriesDefinition<'Candlestick'> => {
+	const definition: SeriesDefinitionInternal<'Candlestick'> = {
+		type: 'Candlestick',
 		isBuiltIn: true as const,
 		defaultOptions: candlestickStyleDefaults,
 		/**
@@ -32,6 +31,6 @@ export const createSeries = (): SeriesDefinition<typeof seriesType> => {
 		 */
 		createPaneView: createPaneView,
 	};
-	return definition as SeriesDefinition<typeof seriesType>;
+	return definition as SeriesDefinition<'Candlestick'>;
 };
-export const candlestickSeries: SeriesDefinition<typeof seriesType> = createSeries();
+export const candlestickSeries: SeriesDefinition<'Candlestick'> = createSeries();

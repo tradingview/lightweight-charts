@@ -24,12 +24,10 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
 };
-const seriesType = 'Area';
-const createPaneView = (series: ISeries<typeof seriesType>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model);
-
-export const createSeries = (): SeriesDefinition<typeof seriesType> => {
-	const definition: SeriesDefinitionInternal<typeof seriesType> = {
-		type: seriesType,
+const createPaneView = (series: ISeries<'Area'>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model);
+export const createSeries = (): SeriesDefinition<'Area'> => {
+	const definition: SeriesDefinitionInternal<'Area'> = {
+		type: 'Area',
 		isBuiltIn: true as const,
 		defaultOptions: areaStyleDefaults,
 		/**
@@ -37,6 +35,6 @@ export const createSeries = (): SeriesDefinition<typeof seriesType> => {
 		 */
 		createPaneView: createPaneView,
 	};
-	return definition as SeriesDefinition<typeof seriesType>;
+	return definition as SeriesDefinition<'Area'>;
 };
-export const areaSeries: SeriesDefinition<typeof seriesType> = createSeries();
+export const areaSeries: SeriesDefinition<'Area'> = createSeries();
