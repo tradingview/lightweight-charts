@@ -3,6 +3,7 @@ import {
 	LineData,
 	Time,
 	createChart,
+	LineSeries,
 } from 'lightweight-charts';
 import { ExpiringPriceAlerts } from '../expiring-price-alerts';
 import { sampleAlertLineData } from '../sample-data';
@@ -17,7 +18,7 @@ const chart = createChart('chart', {
 	},
 });
 
-const lineSeries = chart.addLineSeries({
+const lineSeries = chart.addSeries(LineSeries, {
 	lastPriceAnimation: LastPriceAnimationMode.OnDataUpdate,
 });
 const data = sampleAlertLineData(); // 622 items
