@@ -22,7 +22,7 @@ If you'd like to change any option of a series, you could do this in different w
     });
     ````
 
-    Note that every method to create a series has an optional `options` parameter.
+    Note that `addSeries` has an optional `options` parameter.
 
 1. You can use [`ISeriesApi.applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method to apply other options on the fly:
 
@@ -36,7 +36,7 @@ If you'd like to change any option of a series, you could do this in different w
 
 ## Area
 
-- **Method to create**: [`IChartApi.addAreaSeries`](/api/interfaces/IChartApi.md#addareaseries)
+- **Series Definition**: [`AreaSeries`](/api/variables/AreaSeries.md)
 - **Data format**: [`SingleValueData`](/api/interfaces/SingleValueData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`AreaStyleOptions`](/api/interfaces/AreaStyleOptions.md)
 
@@ -56,7 +56,7 @@ chart.timeScale().fitContent();
 
 ## Bar
 
-- **Method to create**: [`IChartApi.addBarSeries`](/api/interfaces/IChartApi.md#addbarseries)
+- **Series Definition**: [`BarSeries`](/api/variables/BarSeries.md)
 - **Data format**: [`BarData`](/api/interfaces/BarData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`BarStyleOptions`](/api/interfaces/BarStyleOptions.md)
 
@@ -79,7 +79,7 @@ chart.timeScale().fitContent();
 
 ## Baseline
 
-- **Method to create**: [`IChartApi.addBaselineSeries`](/api/interfaces/IChartApi.md#addbaselineseries)
+- **Series Definition**: [`BaselineSeries`](/api/variables/BaselineSeries.md)
 - **Data format**: [`SingleValueData`](/api/interfaces/SingleValueData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`BaselineStyleOptions`](/api/interfaces/BaselineStyleOptions.md)
 
@@ -99,7 +99,7 @@ chart.timeScale().fitContent();
 
 ## Candlestick
 
-- **Method to create**: [`IChartApi.addCandlestickSeries`](/api/interfaces/IChartApi.md#addcandlestickseries)
+- **Series Definition**: [`CandlestickSeries`](/api/variables/CandlestickSeries.md)
 - **Data format**: [`CandlestickData`](/api/interfaces/CandlestickData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`CandlestickStyleOptions`](/api/interfaces/CandlestickStyleOptions.md)
 
@@ -120,7 +120,7 @@ chart.timeScale().fitContent();
 
 ## Histogram
 
-- **Method to create**: [`IChartApi.addHistogramSeries`](/api/interfaces/IChartApi.md#addhistogramseries)
+- **Series Definition**: [`HistogramSeries`](/api/variables/HistogramSeries.md)
 - **Data format**: [`HistogramData`](/api/interfaces/HistogramData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`HistogramStyleOptions`](/api/interfaces/HistogramStyleOptions.md)
 
@@ -141,7 +141,7 @@ chart.timeScale().fitContent();
 
 ## Line
 
-- **Method to create**: [`IChartApi.addLineSeries`](/api/interfaces/IChartApi.md#addlineseries)
+- **Series Definition**: [`LineSeries`](/api/variables/LineSeries.md)
 - **Data format**: [`LineData`](/api/interfaces/LineData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`LineStyleOptions`](/api/interfaces/LineStyleOptions.md)
 
