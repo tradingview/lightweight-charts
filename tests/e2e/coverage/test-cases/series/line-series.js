@@ -24,7 +24,7 @@ let mainSeries;
 function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	mainSeries = chart.addLineSeries();
+	mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	mainSeries.setData(generateLineData());
 

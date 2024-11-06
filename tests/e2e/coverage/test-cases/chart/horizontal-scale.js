@@ -79,7 +79,7 @@ function interactionsToPerform() {
 function beforeInteractions(container) {
 	const horzItemBehavior = new HorzScaleBehaviorPrice();
 	const chart = LightweightCharts.createChartEx(container, horzItemBehavior);
-	const s1 = chart.addLineSeries({
+	const s1 = chart.addSeries(LightweightCharts.LineSeries, {
 		color: 'red',
 	});
 	const arr = [];

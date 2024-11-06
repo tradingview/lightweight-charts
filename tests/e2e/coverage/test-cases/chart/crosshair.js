@@ -26,7 +26,7 @@ function beforeInteractions(container) {
 	const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
 	mainSeries.setData(generateBars());
 
-	const lineSeries = chart.addLineSeries({
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		crosshairMarkerBorderColor: 'orange',
 		crosshairMarkerBackgroundColor: 'orange',
 		crosshairMarkerRadius: 6,

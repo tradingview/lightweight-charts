@@ -17,7 +17,7 @@ function beforeInteractions(container) {
 		},
 	});
 
-	const mainSeries = chart.addHistogramSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.HistogramSeries);
 
 	mainSeries.setData(generateHistogramData());
 
