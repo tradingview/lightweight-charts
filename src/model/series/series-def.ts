@@ -21,10 +21,6 @@ export interface SeriesDefinition<T extends SeriesType> {
 	 * Default series options.
 	 */
 	readonly defaultOptions: SeriesStyleOptionsMap[T];
-	/**
-	 * Custom pane view (optional).
-	 */
-	readonly customPaneView?: ICustomSeriesPaneView<unknown>;
 }
 
 export const isSeriesDefinition = <T extends SeriesType>(value: unknown): value is SeriesDefinitionInternal<T> => {
@@ -33,4 +29,5 @@ export const isSeriesDefinition = <T extends SeriesType>(value: unknown): value 
 
 export interface SeriesDefinitionInternal<T extends SeriesType> extends SeriesDefinition<T> {
 	createPaneView: (series: ISeries<T>, model: IChartModelBase, customPaneView?: ICustomSeriesPaneView<unknown>) => IUpdatablePaneView;
+	customPaneView?: ICustomSeriesPaneView<unknown>;
 }
