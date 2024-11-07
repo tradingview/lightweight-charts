@@ -34,6 +34,13 @@ npm run $BUILD_SCRIPT
 rm -rf ./merge-base-dist
 mv ./dist ./merge-base-dist
 
+if [ "$BRANCH_SPECIFIC_TEST" = "true" ]; then
+	echo "Using BRANCH_SPECIFIC_TEST"
+	echo "Running generate-golden-content"
+	npx esno ./tests/e2e/graphics/generate-golden-content.ts ./golden_test_files
+	export GOLDEN_TEST_CONTENT_PATH="./golden_test_files"
+fi
+
 echo "Checkout to HEAD back and build..."
 
 git checkout $HEAD_SHA1
