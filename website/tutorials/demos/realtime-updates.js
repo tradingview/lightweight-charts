@@ -97,8 +97,6 @@ window.addEventListener('resize', () => {
 });
 // remove-end
 
-// remove-line
-// eslint-disable-next-line no-undef
 const series = chart.addSeries(CandlestickSeries, {
 	upColor: BAR_UP_COLOR,
 	downColor: BAR_DOWN_COLOR,

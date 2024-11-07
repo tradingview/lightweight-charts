@@ -48,8 +48,6 @@ chart.applyOptions({
 	},
 });
 
-// remove-line
-// eslint-disable-next-line no-undef
 const series = chart.addSeries(AreaSeries, {
 	topColor: BASELINE_BOTTOM_FILL_COLOR1,
 	bottomColor: BASELINE_BOTTOM_FILL_COLOR2,

@@ -21,8 +21,6 @@ chart.applyOptions({
 });
 // highlight-end
 
-// remove-line
-// eslint-disable-next-line no-undef
 const lineSeries = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
 
 const data = [

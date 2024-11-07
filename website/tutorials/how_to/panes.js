@@ -21,8 +21,6 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-// remove-line
-// eslint-disable-next-line no-undef
 const areaSeries = chart.addSeries(AreaSeries, {
 	topColor: AREA_TOP_COLOR,
 	bottomColor: AREA_BOTTOM_COLOR,
@@ -30,8 +28,6 @@ const areaSeries = chart.addSeries(AreaSeries, {
 	lineWidth: 2,
 });
 
-// remove-line
-// eslint-disable-next-line no-undef
 const candlestickSeries = chart.addSeries(CandlestickSeries, {
 	upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
 	wickUpColor: '#26a69a', wickDownColor: '#ef5350',

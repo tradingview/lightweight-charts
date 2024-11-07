@@ -26,8 +26,6 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 chart
-	// remove-line
-	// eslint-disable-next-line no-undef
 	.addSeries(LineSeries, {
 		color: LINE_LINE_COLOR,
 		lineWidth: 2,
@@ -137,8 +135,7 @@ chart
 		{ time: { year: 2018, month: 12, day: 31 }, value: 98.99348823473713 },
 		// hide-end
 	]);
-// remove-line
-// eslint-disable-next-line no-undef
+
 const candlestickSeries = chart.addSeries(CandlestickSeries, {
 	// highlight-start
 	priceScaleId: 'left',

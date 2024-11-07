@@ -16,8 +16,6 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-// remove-line
-// eslint-disable-next-line no-undef
 const areaSeries = chart.addSeries(AreaSeries, {
 	topColor: AREA_TOP_COLOR,
 	bottomColor: AREA_BOTTOM_COLOR,
@@ -34,8 +32,6 @@ areaSeries.priceScale().applyOptions({
 	// highlight-end
 });
 
-// remove-line
-// eslint-disable-next-line no-undef
 const volumeSeries = chart.addSeries(HistogramSeries, {
 	color: BAR_UP_COLOR,
 	// highlight-start

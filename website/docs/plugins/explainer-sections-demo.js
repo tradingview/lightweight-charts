@@ -191,8 +191,7 @@ const chartOptions = {
 };
 
 const chart = createChart(document.getElementById('container'), chartOptions);
-// remove-line
-// eslint-disable-next-line no-undef
+
 const lineSeries = chart.addSeries(LineSeries, {
 	color: CHART_TEXT_COLOR,
 });

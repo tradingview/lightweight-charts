@@ -109,13 +109,9 @@ function calculateMovingAverageSeriesData(candleData, maLength) {
 
 const maData = calculateMovingAverageSeriesData(barData, 20);
 
-// remove-line
-// eslint-disable-next-line no-undef
 const maSeries = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR, lineWidth: 1 });
 maSeries.setData(maData);
 
-// remove-line
-// eslint-disable-next-line no-undef
 const candlestickSeries = chart.addSeries(CandlestickSeries, {
 	upColor: BAR_UP_COLOR,
 	downColor: BAR_DOWN_COLOR,
