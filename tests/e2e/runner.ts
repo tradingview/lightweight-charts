@@ -41,6 +41,8 @@ export async function runTests(
 		}
 	}
 
+	await new Promise<void>((resolver: () => void) => setTimeout(resolver, 1000));
+	console.log('filesToServeLocally', Object.fromEntries(filesToServeLocally));
 	const closeServer = await serveLocalFiles(filesToServeLocally, port, hostname);
 
 	const spec = new Spec();
