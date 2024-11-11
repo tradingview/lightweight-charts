@@ -1,5 +1,3 @@
-import { generateContrastColors } from '../../helpers/color';
-
 import { CustomPriceLine } from '../../model/custom-price-line';
 import { ISeries } from '../../model/series';
 import { SeriesType } from '../../model/series-options';
@@ -53,7 +51,10 @@ export class CustomPriceLinePriceAxisView extends PriceAxisView {
 		axisRendererData.text = this._formatPrice(options.price);
 		axisRendererData.visible = true;
 
-		const colors = generateContrastColors(options.axisLabelColor || options.color);
+		const colors = this._series
+			.model()
+			.colorParser()
+			.generateContrastColors(options.axisLabelColor || options.color);
 		commonData.background = colors.background;
 
 		const textColor = options.axisLabelTextColor || colors.foreground;
