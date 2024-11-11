@@ -14,8 +14,10 @@ import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
+	CandlestickStyleOptions,
 	CustomSeriesOptions,
 	CustomSeriesPartialOptions,
+	fillUpDownCandlesticksColors,
 	precisionByMinMove,
 	PriceFormat,
 	PriceFormatBuiltIn,
@@ -335,6 +337,9 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	): ISeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions> {
 		assert(isSeriesDefinition<TSeries>(definition));
 		patchPriceFormat(options.priceFormat);
+		if (definition.type === 'Candlestick') {
+			fillUpDownCandlesticksColors(options as DeepPartial<CandlestickStyleOptions>);
+		}
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(definition.defaultOptions), options) as SeriesOptionsMap[TSeries];
 		const createPaneView = definition.createPaneView;
 		const series = new Series(this._chartWidget.model(), definition.type, strictOptions, createPaneView, definition.customPaneView);
