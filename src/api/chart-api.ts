@@ -1,3 +1,4 @@
+/// <reference types="_build-time-constants" />
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { assert, ensure, ensureDefined } from '../helpers/assertions';
@@ -14,8 +15,10 @@ import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
+	CandlestickStyleOptions,
 	CustomSeriesOptions,
 	CustomSeriesPartialOptions,
+	fillUpDownCandlesticksColors,
 	precisionByMinMove,
 	PriceFormat,
 	PriceFormatBuiltIn,
@@ -264,6 +267,16 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): void {
+		if (process.env.NODE_ENV === 'development') {
+			const colorSpace = options.layout?.colorSpace;
+			if (colorSpace !== undefined && colorSpace !== this.options().layout.colorSpace) {
+				throw new Error(`colorSpace option should not be changed once the chart has been created.`);
+			}
+			const colorParsers = options.layout?.colorParsers;
+			if (colorParsers !== undefined && colorParsers !== this.options().layout.colorParsers) {
+				throw new Error(`colorParsers option should not be changed once the chart has been created.`);
+			}
+		}
 		this._chartWidget.applyOptions(toInternalOptions(options));
 	}
 
@@ -335,6 +348,9 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	): ISeriesApi<TSeries, HorzScaleItem, TData, TOptions, TPartialOptions> {
 		assert(isSeriesDefinition<TSeries>(definition));
 		patchPriceFormat(options.priceFormat);
+		if (definition.type === 'Candlestick') {
+			fillUpDownCandlesticksColors(options as DeepPartial<CandlestickStyleOptions>);
+		}
 		const strictOptions = merge(clone(seriesOptionsDefaults), clone(definition.defaultOptions), options) as SeriesOptionsMap[TSeries];
 		const createPaneView = definition.createPaneView;
 		const series = new Series(this._chartWidget.model(), definition.type, strictOptions, createPaneView, definition.customPaneView);

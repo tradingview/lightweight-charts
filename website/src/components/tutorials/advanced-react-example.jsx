@@ -4,7 +4,7 @@ the docusaurus site to ensure that the chart looks great in both dark and light 
 If you want to use this example then please copy the code presented on the documentation site.
 [link](https://tradingview.github.io/lightweight-charts/tutorials/react/advanced) */
 // delete-end
-import { createChart } from 'lightweight-charts';
+import { createChart, LineSeries, AreaSeries } from 'lightweight-charts';
 import React, {
 	createContext,
 	forwardRef,
@@ -202,8 +202,8 @@ export const Series = forwardRef((props, ref) => {
 				const { children, data, type, ...rest } = props;
 				this._api =
 					type === 'line'
-						? parent.api().addLineSeries(rest)
-						: parent.api().addAreaSeries(rest);
+						? parent.api().addSeries(LineSeries, rest)
+						: parent.api().addSeries(AreaSeries, rest);
 				this._api.setData(data);
 			}
 			return this._api;

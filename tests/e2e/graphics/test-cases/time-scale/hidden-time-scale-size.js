@@ -3,7 +3,7 @@ async function runTestCase(container) {
 
 	const timeScale = chart.timeScale();
 
-	const series = chart.addLineSeries();
+	const series = chart.addSeries(LightweightCharts.LineSeries);
 	series.setData([
 		{ time: '1990-04-24', value: 0 },
 		{ time: '1990-04-25', value: 1 },

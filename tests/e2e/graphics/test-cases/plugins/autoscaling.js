@@ -200,7 +200,7 @@ class BandsIndicator extends PluginBase {
 
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } }));
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 	const data = generateData();
 	mainSeries.setData(data);
 	const bandIndicator = new BandsIndicator();

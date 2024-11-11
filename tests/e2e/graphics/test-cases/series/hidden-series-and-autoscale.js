@@ -16,9 +16,9 @@ function generateData(mul = 1) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const lineSeries = chart.addLineSeries({ visible: false });
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, { visible: false });
 	lineSeries.setData(generateData());
 
-	const alwaysVisibleSeries = chart.addLineSeries();
+	const alwaysVisibleSeries = chart.addSeries(LightweightCharts.LineSeries);
 	alwaysVisibleSeries.setData(generateData(1.5));
 }

@@ -42,8 +42,8 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const series1 = chart.addLineSeries({ title: 'Series 1' });
-	const series2 = chart.addLineSeries({ title: 'Series 2' });
+	const series1 = chart.addSeries(LightweightCharts.LineSeries, { title: 'Series 1' });
+	const series2 = chart.addSeries(LightweightCharts.LineSeries, { title: 'Series 2' });
 
 	return new Promise(resolve => {
 		setTimeout(() => {

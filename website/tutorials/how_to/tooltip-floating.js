@@ -35,8 +35,7 @@ chart.applyOptions({
 		},
 	},
 });
-
-const series = chart.addAreaSeries({
+const series = chart.addSeries({
 	topColor: AREA_TOP_COLOR,
 	bottomColor: AREA_BOTTOM_COLOR,
 	lineColor: LINE_LINE_COLOR,

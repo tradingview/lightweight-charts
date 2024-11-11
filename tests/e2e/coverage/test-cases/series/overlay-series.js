@@ -8,11 +8,11 @@ let overlaySeries;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	mainSeries.setData(generateLineData());
 
-	overlaySeries = chart.addAreaSeries({
+	overlaySeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		priceScaleId: 'overlay-id',
 		priceFormat: {
 			type: 'volume',

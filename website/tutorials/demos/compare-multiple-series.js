@@ -42,9 +42,11 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-const lineSeriesOne = chart.addLineSeries({ color: LINE_LINE_COLOR });
-const lineSeriesTwo = chart.addLineSeries({ color: LINE_LINE2_COLOR });
-const lineSeriesThree = chart.addLineSeries({ color: LINE_LINE3_COLOR });
+const lineSeriesOne = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
+
+const lineSeriesTwo = chart.addSeries(LineSeries, { color: LINE_LINE2_COLOR });
+
+const lineSeriesThree = chart.addSeries(LineSeries, { color: LINE_LINE3_COLOR });
 
 const lineSeriesOneData = generateLineData();
 const lineSeriesTwoData = generateLineData();

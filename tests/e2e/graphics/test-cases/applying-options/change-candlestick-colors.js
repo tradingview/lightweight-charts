@@ -47,7 +47,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const candlestick = chart.addCandlestickSeries({
+	const candlestick = chart.addSeries(LightweightCharts.CandlestickSeries, {
 		upColor: 'green',
 		downColor: 'red',
 	});

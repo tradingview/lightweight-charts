@@ -6,5 +6,11 @@ module.exports = {
 		createTextWatermark: false,
 		createImageWatermark: false,
 		createSeriesMarkers: false,
+		LineSeries: false,
+		AreaSeries: false,
+		BarSeries: false,
+		BaselineSeries: false,
+		CandlestickSeries: false,
+		HistogramSeries: false,
 	},
 };

@@ -219,7 +219,7 @@ const chartOptions = {
 
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-const lineSeries = chart.addLineSeries({
+const lineSeries = chart.addSeries(LineSeries, {
 	color: CHART_TEXT_COLOR,
 });
 const data = generateLineData();

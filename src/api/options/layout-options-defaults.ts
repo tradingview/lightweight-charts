@@ -16,4 +16,6 @@ export const layoutOptionsDefaults: LayoutOptions = {
 		separatorHoverColor: 'rgba(178, 181, 189, 0.2)',
 	},
 	attributionLogo: true,
+	colorSpace: 'srgb',
+	colorParsers: [],
 };

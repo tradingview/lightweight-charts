@@ -36,7 +36,7 @@ function setLocale(locale) {
 	// highlight-end
 }
 
-const candlestickSeries = chart.addCandlestickSeries({
+const candlestickSeries = chart.addSeries(CandlestickSeries, {
 	upColor: BAR_UP_COLOR,
 	downColor: BAR_DOWN_COLOR,
 	borderVisible: false,

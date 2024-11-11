@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { CandlestickSeries, createChart } from 'lightweight-charts';
 import { generateAlternativeCandleData } from '../../../sample-data';
 import { CrosshairHighlightPrimitive } from '../highlight-bar-crosshair';
 
@@ -6,7 +6,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const candleSeries = chart.addCandlestickSeries();
+const candleSeries = chart.addSeries(CandlestickSeries);
 candleSeries.setData(generateAlternativeCandleData());
 
 const highlightPrimitive = new CrosshairHighlightPrimitive({

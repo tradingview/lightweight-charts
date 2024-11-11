@@ -33,7 +33,7 @@ function runTestCase(container) {
 		}
 	);
 
-	const mainSeries = chart.addBarSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.BarSeries);
 
 	const data = generateData();
 	mainSeries.setData(data);

@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { createChart, LineSeries } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { OverlayPriceScale } from '../overlay-price-scale';
 
@@ -14,7 +14,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	},
 }));
 
-const lineSeries = chart.addAreaSeries({
+const lineSeries = chart.addSeries(LineSeries, {
 	priceScaleId: 'overlay',
 });
 

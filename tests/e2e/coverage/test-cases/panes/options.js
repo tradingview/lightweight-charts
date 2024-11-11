@@ -18,8 +18,8 @@ let chart;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container, { layout: { panes: { separatorColor: '#00ff00', separatorHoverColor: '#ff0000', enableResize: true } } });
 
-	const mainSeries = chart.addLineSeries();
-	const secondSeries = chart.addLineSeries({}, 1);
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const secondSeries = chart.addSeries(LightweightCharts.LineSeries, {}, 1);
 
 	mainSeries.setData(simpleData());
 	secondSeries.setData(simpleData());

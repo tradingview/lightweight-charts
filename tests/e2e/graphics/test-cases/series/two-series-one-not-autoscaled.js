@@ -24,14 +24,14 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addLineSeries({
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		lineWidth: 1,
 		color: '#0000ff',
 	});
 
 	mainSeries.setData(generateData(20));
 
-	const secondSeries = chart.addLineSeries({
+	const secondSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		lineWidth: 1,
 		color: '#ff0000',
 		autoscaleInfoProvider: () => null,

@@ -31,7 +31,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addCandlestickSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
 
 	mainSeries.setData(generateData());
 }

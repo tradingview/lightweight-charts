@@ -17,7 +17,7 @@ export const scenario = {
 			window.chart = LightweightCharts.createChart(
 				document.getElementById('container')
 			);
-			const mainSeries = window.chart.addLineSeries();
+			const mainSeries = window.chart.addSeries(LightweightCharts.LineSeries);
 			mainSeries.setData([
 				{ time: 0, value: 1 },
 				{ time: 1, value: 2 },
