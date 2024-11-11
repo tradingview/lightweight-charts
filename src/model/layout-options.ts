@@ -1,3 +1,5 @@
+import { CustomColorParser } from './colors';
+
 /**
  * Represents a type of color.
  */
@@ -47,6 +49,8 @@ export interface VerticalGradientColor {
  * Represents the background color of the chart.
  */
 export type Background = SolidColor | VerticalGradientColor;
+
+export type ColorSpace = 'display-p3' | 'srgb';
 
 /**
  * Represents panes customizations.
@@ -124,4 +128,47 @@ export interface LayoutOptions {
 	 * @defaultValue true
 	 */
 	attributionLogo: boolean;
+
+	/**
+	 * Specifies the color space of the rendering context for the internal
+	 * canvas elements.
+	 *
+	 * Note: this option should only be specified during the chart creation
+	 * and not changed at a later stage by using `applyOptions`.
+	 *
+	 * @defaultValue `srgb`
+	 *
+	 * See [HTMLCanvasElement: getContext() method - Web APIs | MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext#colorspace) for more info
+	 */
+	colorSpace: ColorSpace;
+
+	/**
+	 * Array of custom color parser functions to handle color formats outside of standard sRGB values.
+	 * Each parser function takes a string input and should return either:
+	 * - An {@link Rgba} array [r,g,b,a] for valid colors (with values 0-255 for rgb and 0-1 for a)
+	 * - null if the parser cannot handle that color string, allowing the next parser to attempt it
+	 *
+	 * Parsers are tried in order until one returns a non-null result. This allows chaining multiple
+	 * parsers to handle different color space formats.
+	 *
+	 * Note: this option should only be specified during the chart creation
+	 * and not changed at a later stage by using `applyOptions`.
+	 *
+	 * The library already supports these color formats by default:
+	 * - Hex colors (#RGB, #RGBA, #RRGGBB, #RRGGBBAA)
+	 * - RGB/RGBA functions (rgb(), rgba())
+	 * - HSL/HSLA functions (hsl(), hsla())
+	 * - HWB function (hwb())
+	 * - Named colors (red, blue, etc.)
+	 * - 'transparent' keyword
+	 *
+	 * Custom parsers are only needed for other color spaces like:
+	 * - Display P3: color(display-p3 r g b)
+	 * - CIE Lab: lab(l a b)
+	 * - LCH: lch(l c h)
+	 * - Oklab: oklab(l a b)
+	 * - Oklch: oklch(l c h)
+	 * - ...
+	 */
+	colorParsers: CustomColorParser[];
 }

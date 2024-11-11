@@ -1,5 +1,3 @@
-import { generateContrastColors } from '../../helpers/color';
-
 import { ISeries, LastValueDataResultWithData } from '../../model/iseries';
 import { PriceAxisLastValueMode, SeriesType } from '../../model/series-options';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
@@ -50,7 +48,10 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		}
 
 		const lastValueColor = source.priceLineColor(lastValueData.color);
-		const colors = generateContrastColors(lastValueColor);
+		const colors = this._source
+			.model()
+			.colorParser()
+			.generateContrastColors(lastValueColor);
 
 		commonRendererData.background = colors.background;
 		commonRendererData.coordinate = lastValueData.coordinate;

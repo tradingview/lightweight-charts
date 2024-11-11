@@ -8,6 +8,7 @@ import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { BarCoordinates, BarPrice, BarPrices } from './bar';
+import { ColorParser } from './colors';
 import { Coordinate } from './coordinate';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
@@ -240,12 +241,14 @@ export class PriceScale {
 	private _formatter: IPriceFormatter = defaultPriceFormatter;
 
 	private _logFormula: LogFormula = logFormulaForPriceRange(null);
+	private _colorParser: ColorParser;
 
-	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptionsBase) {
+	public constructor(id: string, options: PriceScaleOptions, layoutOptions: LayoutOptions, localizationOptions: LocalizationOptionsBase, colorParser: ColorParser) {
 		this._id = id;
 		this._options = options;
 		this._layoutOptions = layoutOptions;
 		this._localizationOptions = localizationOptions;
+		this._colorParser = colorParser;
 		this._markBuilder = new PriceTickMarkBuilder(this, 100, this._coordinateToLogical.bind(this), this._logicalToCoordinate.bind(this));
 	}
 
@@ -833,6 +836,10 @@ export class PriceScale {
 
 	public invalidateSourcesCache(): void {
 		this._cachedOrderedSources = null;
+	}
+
+	public colorParser(): ColorParser {
+		return this._colorParser;
 	}
 
 	/**

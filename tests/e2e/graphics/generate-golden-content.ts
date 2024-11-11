@@ -24,12 +24,12 @@ rmRf(goldenOutputPath);
 fs.mkdirSync(goldenOutputPath, { recursive: true });
 
 for (const groupName of Object.keys(testCases)) {
-	generateTestCases(testCases[groupName]);
+	generateTestCases(groupName, testCases[groupName]);
 }
 
-function generateTestCases(groupTestCases: TestCase[]): void {
+function generateTestCases(groupName: string, groupTestCases: TestCase[]): void {
 	for (const testCase of groupTestCases) {
-		const testCaseOutDir = path.join(goldenOutputPath, testCase.name);
+		const testCaseOutDir = path.join(goldenOutputPath, groupName, testCase.name);
 		rmRf(testCaseOutDir);
 		fs.mkdirSync(testCaseOutDir, { recursive: true });
 		path.join(testCaseOutDir, 'test-content.html');

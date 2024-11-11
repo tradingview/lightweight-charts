@@ -1,3 +1,4 @@
+/// <reference types="_build-time-constants" />
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { assert, ensure, ensureDefined } from '../helpers/assertions';
@@ -266,6 +267,16 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	}
 
 	public applyOptions(options: DeepPartial<ChartOptionsImpl<HorzScaleItem>>): void {
+		if (process.env.NODE_ENV === 'development') {
+			const colorSpace = options.layout?.colorSpace;
+			if (colorSpace !== undefined && colorSpace !== this.options().layout.colorSpace) {
+				throw new Error(`colorSpace option should not be changed once the chart has been created.`);
+			}
+			const colorParsers = options.layout?.colorParsers;
+			if (colorParsers !== undefined && colorParsers !== this.options().layout.colorParsers) {
+				throw new Error(`colorParsers option should not be changed once the chart has been created.`);
+			}
+		}
 		this._chartWidget.applyOptions(toInternalOptions(options));
 	}
 

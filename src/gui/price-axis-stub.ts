@@ -101,7 +101,9 @@ export class PriceAxisStub implements IDestroyable {
 		this._invalidated = false;
 
 		this._canvasBinding.applySuggestedBitmapSize();
-		const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
+		const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding, {
+			colorSpace: this._options.layout.colorSpace,
+		});
 		if (target !== null) {
 			target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 				this._drawBackground(scope);
