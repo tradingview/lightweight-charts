@@ -5,23 +5,62 @@ to v5.
 
 ## Series changes
 
-To make the API more consistent and to utilize tree-shaking capabilities of modern JS bundlers, the `addSeries` function was introduced. It replaces the previous `addLineSeries`, `addCandlestickSeries`, etc. functions.
-To migrate your code, you need to replace all the `chart.add<SeriesType>Series` calls with `chart.addSeries(SeriesDefinition, options)` calls.
-In ESM builds, you can import the `SeriesDefinition` from the library, in the UMD builds it's available under `LightweightCharts.SeriesDefinition`. Example:
-ESM:
+In v5, we've unified the way series are added to charts to make the API more consistent and to better utilize tree-shaking capabilities of modern JS bundlers. Instead of having separate functions for each series type (like `addLineSeries`, `addCandlestickSeries`, etc.), there is now a single `addSeries` function.
+
+### Migration Steps
+
+Replace all series creation calls with the new `addSeries` syntax. Here's how the migration works for each series type:
+
+Old v4 syntax:
 
 ```js
+// Example with Line Series in v4
+import { createChart } from 'lightweight-charts';
+const chart = createChart(container, {});
+const lineSeries = chart.addLineSeries({ color: 'red' });
+```
+
+New v5 syntax:
+
+```js
+// Example with Line Series in v5
 import { createChart, LineSeries } from 'lightweight-charts';
 const chart = createChart(container, {});
 const lineSeries = chart.addSeries(LineSeries, { color: 'red' });
 ```
 
-UMD:
+### Complete Migration Reference
+
+Here's how to migrate each series type:
+
+| v4 Method | v5 Method |
+|-----------|-----------|
+| `chart.addLineSeries(options)` | `chart.addSeries(LineSeries, options)` |
+| `chart.addAreaSeries(options)` | `chart.addSeries(AreaSeries, options)` |
+| `chart.addBarSeries(options)` | `chart.addSeries(BarSeries, options)` |
+| `chart.addBaselineSeries(options)` | `chart.addSeries(BaselineSeries, options)` |
+| `chart.addCandlestickSeries(options)` | `chart.addSeries(CandlestickSeries, options)` |
+| `chart.addHistogramSeries(options)` | `chart.addSeries(HistogramSeries, options)` |
+
+### Usage Examples
+
+ESM (ES Modules):
+
+```js
+import { createChart, LineSeries } from 'lightweight-charts';
+
+const chart = createChart(container, {});
+const lineSeries = chart.addSeries(LineSeries, { color: 'red' });
+```
+
+UMD (Universal Module Definition):
 
 ```js
 const chart = LightweightCharts.createChart(container, {});
 const lineSeries = chart.addSeries(LightweightCharts.LineSeries, { color: 'red' });
 ```
+
+Note: Make sure to import the specific series type (e.g., `LineSeries`, `AreaSeries`) along with `createChart` when using ES Modules. For UMD builds, all series types are available under the `LightweightCharts` namespace.
 
 ## Watermarks
 
