@@ -6,7 +6,6 @@ import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
-import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
@@ -231,53 +230,6 @@ export interface ISeriesApi<
 	 * ```
 	 */
 	unsubscribeDataChanged(handler: DataChangedHandler): void;
-
-	/**
-	 * Allows to set/replace all existing series markers with new ones.
-	 *
-	 * @param data - An array of series markers. This array should be sorted by time. Several markers with same time are allowed.
-	 * @example
-	 * ```js
-	 * series.setMarkers([
-	 *     {
-	 *         time: '2019-04-09',
-	 *         position: 'aboveBar',
-	 *         color: 'black',
-	 *         shape: 'arrowDown',
-	 *     },
-	 *     {
-	 *         time: '2019-05-31',
-	 *         position: 'belowBar',
-	 *         color: 'red',
-	 *         shape: 'arrowUp',
-	 *         id: 'id3',
-	 *     },
-	 *     {
-	 *         time: '2019-05-31',
-	 *         position: 'belowBar',
-	 *         color: 'orange',
-	 *         shape: 'arrowUp',
-	 *         id: 'id4',
-	 *         text: 'example',
-	 *         size: 2,
-	 *     },
-	 * ]);
-	 *
-	 * chart.subscribeCrosshairMove(param => {
-	 *     console.log(param.hoveredObjectId);
-	 * });
-	 *
-	 * chart.subscribeClick(param => {
-	 *     console.log(param.hoveredObjectId);
-	 * });
-	 * ```
-	 */
-	setMarkers(data: SeriesMarker<HorzScaleItem>[]): void;
-
-	/**
-	 * Returns an array of series markers.
-	 */
-	markers(): SeriesMarker<HorzScaleItem>[];
 
 	/**
 	 * Creates a new price line

@@ -20,7 +20,7 @@ function runTestCase(container) {
 	const mainSeries = chart.addAreaSeries();
 	mainSeries.setData(generateData());
 
-	const textWatermark = new LightweightCharts.TextWatermark({
+	LightweightCharts.createTextWatermark(chart.panes()[0], {
 		visible: true,
 		lines: [
 			{
@@ -32,7 +32,4 @@ function runTestCase(container) {
 			},
 		],
 	});
-
-	const pane = chart.panes()[0];
-	pane.attachPrimitive(textWatermark);
 }

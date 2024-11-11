@@ -641,7 +641,7 @@ export interface AutoscaleInfo {
 	/**
 	 * Price range.
 	 */
-	priceRange: PriceRange;
+	priceRange: PriceRange | null;
 
 	/**
 	 * Scale margins.

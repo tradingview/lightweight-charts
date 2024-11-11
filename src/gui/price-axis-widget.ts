@@ -250,7 +250,11 @@ export class PriceAxisWidget implements IDestroyable {
 		let tickMarkMaxWidth = 0;
 		const rendererOptions = this.rendererOptions();
 
-		const ctx = ensureNotNull(this._canvasBinding.canvasElement.getContext('2d'));
+		const ctx = ensureNotNull(
+			this._canvasBinding.canvasElement.getContext('2d', {
+				colorSpace: this._pane.chart().options().layout.colorSpace,
+			})
+		);
 		ctx.save();
 
 		const tickMarks = this._priceScale.marks();
@@ -345,11 +349,13 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null) {
 			return;
 		}
-
+		const canvasOptions: CanvasRenderingContext2DSettings = {
+			colorSpace: this._pane.chart().options().layout.colorSpace,
+		};
 		if (type !== InvalidationLevel.Cursor) {
 			this._alignLabels();
 			this._canvasBinding.applySuggestedBitmapSize();
-			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
+			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding, canvasOptions);
 			if (target !== null) {
 				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
@@ -363,7 +369,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding, canvasOptions);
 		if (topTarget !== null) {
 			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);

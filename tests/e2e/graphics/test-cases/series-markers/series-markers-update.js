@@ -26,10 +26,12 @@ function runTestCase(container) {
 		{ time: data[data.length - 20].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
 		{ time: data[data.length - 10].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
 	];
-
-	mainSeries.setMarkers(markers);
+	const markerPrimitive = LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		markers
+	);
 
 	markers.push({ time: data[data.length - 1].time, position: 'belowBar', color: 'red', shape: 'arrowUp' });
 
-	mainSeries.setMarkers(markers);
+	markerPrimitive.setMarkers(markers);
 }

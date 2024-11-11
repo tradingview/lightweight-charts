@@ -41,6 +41,8 @@ export async function runTests(
 		}
 	}
 
+	await new Promise<void>((resolver: () => void) => setTimeout(resolver, 1000));
+	console.log('filesToServeLocally', Object.fromEntries(filesToServeLocally));
 	const closeServer = await serveLocalFiles(filesToServeLocally, port, hostname);
 
 	const spec = new Spec();
@@ -66,6 +68,7 @@ export async function runTests(
 		summary.push(
 			`${data.file} - "${data.name}" (${Math.round(
 				data.details.duration_ms
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
 			)}ms)\n${error.toString()} `
 		);
 	});

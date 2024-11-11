@@ -106,7 +106,7 @@
     "tslint-eslint-rules": "~5.4.0",
     "tslint-microsoft-contrib": "~6.2.0",
     "tsx": "~4.16.2",
-    "typescript": "~5.4.5",
+    "typescript": "~5.5.4",
     "yargs": "~17.7.2"
   },
   "scripts": {

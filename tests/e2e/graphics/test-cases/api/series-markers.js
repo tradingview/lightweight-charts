@@ -37,10 +37,14 @@ function runTestCase(container) {
 		{ time: '1990-04-30', position: 'aboveBar', color: 'red', shape: 'arrowDown' },
 	];
 
-	series.setMarkers(markers);
-	const seriesApiMarkers = series.markers();
+	const markersPrimitive = LightweightCharts.createSeriesMarkers(
+		series,
+		markers
+	);
+	const seriesApiMarkers = markersPrimitive.markers();
 
-	const textWatermark = new LightweightCharts.TextWatermark({
+	const pane = chart.panes()[0];
+	LightweightCharts.createTextWatermark(pane, {
 		lines: [
 			{
 				text: JSON.stringify(seriesApiMarkers[0]),
@@ -48,8 +52,6 @@ function runTestCase(container) {
 			},
 		],
 	});
-	const pane = chart.panes()[0];
-	pane.attachPrimitive(textWatermark);
 
-	console.assert(compare(markers, seriesApiMarkers), `series.markers() should return exactly the same that was provided to series.setMarkers()\n${JSON.stringify(seriesApiMarkers)}\n${JSON.stringify(markers)}`);
+	console.assert(compare(markers, seriesApiMarkers), `seriesMarkersPrimitive.markers() should return exactly the same that was provided to series.setMarkers()\n${JSON.stringify(seriesApiMarkers)}\n${JSON.stringify(markers)}`);
 }

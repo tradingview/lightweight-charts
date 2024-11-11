@@ -28,8 +28,9 @@ export { UpDownMarkersPrimitive } from './plugins/up-down-markers-plugin/primiti
 /*
 	Plugins
 */
-export { TextWatermark } from './plugins/text-watermark/primitive';
-export { ImageWatermark } from './plugins/image-watermark/primitive';
+export { createTextWatermark } from './plugins/text-watermark/primitive';
+export { createImageWatermark } from './plugins/image-watermark/primitive';
+export { createSeriesMarkers } from './plugins/series-markers/wrapper';
 
 /**
  * Returns the current version as a string. For example `'3.3.0'`.

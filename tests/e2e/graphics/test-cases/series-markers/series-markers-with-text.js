@@ -37,27 +37,29 @@ function runTestCase(container) {
 
 	const data = generateData();
 	mainSeries.setData(data);
-
-	mainSeries.setMarkers([
-		{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'arrowUp', text: 'test' },
-		{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'arrowDown', text: 'test' },
-		{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'circle', text: 'test' },
-		{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'square', text: 'test' },
-		{ time: data[data.length - 40].time, position: 'aboveBar', color: 'red', shape: 'arrowUp', text: 'test' },
-		{ time: data[data.length - 40].time, position: 'aboveBar', color: 'red', shape: 'arrowDown', text: 'test' },
-		{ time: data[data.length - 40].time, position: 'aboveBar', color: 'red', shape: 'circle', text: 'test' },
-		{ time: data[data.length - 40].time, position: 'aboveBar', color: 'red', shape: 'square', text: 'test' },
-		{ time: data[data.length - 30].time, position: 'inBar', color: 'blue', shape: 'arrowUp', text: 'test' },
-		{ time: data[data.length - 30].time, position: 'inBar', color: 'blue', shape: 'arrowDown', text: 'test' },
-		{ time: data[data.length - 30].time, position: 'inBar', color: 'blue', shape: 'circle', text: 'test' },
-		{ time: data[data.length - 30].time, position: 'inBar', color: 'blue', shape: 'square', text: 'test' },
-		{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 0 },
-		{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 1 },
-		{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 2 },
-		{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 3 },
-		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 0 },
-		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 1 },
-		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 2 },
-		{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 3 },
-	]);
+	LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		[
+			{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'arrowUp', text: 'test' },
+			{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'arrowDown', text: 'test' },
+			{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'circle', text: 'test' },
+			{ time: data[data.length - 50].time, position: 'belowBar', color: 'red', shape: 'square', text: 'test' },
+			{ time: data[data.length - 40].time, position: 'aboveBar', color: 'red', shape: 'arrowUp', text: 'test' },
+			{ time: data[data.length - 40].time, position: 'aboveBar', color: 'red', shape: 'arrowDown', text: 'test' },
+			{ time: data[data.length - 40].time, position: 'aboveBar', color: 'red', shape: 'circle', text: 'test' },
+			{ time: data[data.length - 40].time, position: 'aboveBar', color: 'red', shape: 'square', text: 'test' },
+			{ time: data[data.length - 30].time, position: 'inBar', color: 'blue', shape: 'arrowUp', text: 'test' },
+			{ time: data[data.length - 30].time, position: 'inBar', color: 'blue', shape: 'arrowDown', text: 'test' },
+			{ time: data[data.length - 30].time, position: 'inBar', color: 'blue', shape: 'circle', text: 'test' },
+			{ time: data[data.length - 30].time, position: 'inBar', color: 'blue', shape: 'square', text: 'test' },
+			{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 0 },
+			{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 1 },
+			{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 2 },
+			{ time: data[data.length - 20].time, position: 'belowBar', color: 'aqua', shape: 'square', text: 'test', size: 3 },
+			{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 0 },
+			{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 1 },
+			{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 2 },
+			{ time: data[data.length - 10].time, position: 'aboveBar', color: 'aqua', shape: 'cricle', text: '', size: 3 },
+		]
+	);
 }

@@ -71,11 +71,8 @@ function runTestCase(container) {
 	const mainSeries = chart.addAreaSeries();
 	mainSeries.setData(generateData());
 
-	const imageWatermark = new LightweightCharts.ImageWatermark(imageDataUrl, {
+	LightweightCharts.createImageWatermark(chart.panes()[0], imageDataUrl, {
 		alpha: 0.5,
 		padding: 20,
 	});
-
-	const pane = chart.panes()[0];
-	pane.attachPrimitive(imageWatermark);
 }

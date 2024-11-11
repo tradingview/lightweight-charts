@@ -16,7 +16,7 @@ This example shows how to add series markers to your chart.
 ## Short answer
 
 You can add markers to a series by passing an array of [`seriesMarker`](/docs/api/interfaces/SeriesMarker)
-objects to the [`setMarkers`](/docs/api/interfaces/ISeriesApi#setmarkers) method on
+objects to the [`createSeriesMarkers`](/docs/api#createSeriesMarkers) method on
 an [`ISeriesApi`](/docs/api/interfaces/ISeriesApi) instance.
 
 ```js
@@ -29,7 +29,7 @@ const markers = [
         text: 'A',
     },
 ];
-series.setMarkers(markers);
+createSeriesMarkers(series, markers);
 ```
 
 You can see a full [working example](#full-example) below.
@@ -47,7 +47,7 @@ You can view the related APIs here:
 - [SeriesMarker](/docs/api/interfaces/SeriesMarker) - Series Marker interface.
 - [SeriesMarkerPosition](/docs/api/type-aliases/SeriesMarkerPosition) - Positions that can be set for the marker.
 - [SeriesMarkerShape](/docs/api/type-aliases/SeriesMarkerShape) - Shapes that can be set for the marker.
-- [setMarkers](/docs/api/interfaces/ISeriesApi#setmarkers) - Method for adding markers to a series.
+- [createSeriesMarkers](/docs/next/api/interfaces/ISeriesApi#setmarkers) - Method for adding markers to a series.
 - [Time Types](/docs/api/type-aliases/Time) - Different time formats available to use.
 
 ## Full example

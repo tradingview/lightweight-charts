@@ -9,7 +9,7 @@ import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
-import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
+import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { Pane } from '../model/pane';
 import { MismatchDirection } from '../model/plot-list';
@@ -17,7 +17,6 @@ import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-op
 import { RangeImpl } from '../model/range-impl';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
-import { convertSeriesMarker, SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
@@ -185,21 +184,6 @@ export class SeriesApi<
 
 	public unsubscribeDataChanged(handler: DataChangedHandler): void {
 		this._dataChangedDelegate.unsubscribe(handler);
-	}
-
-	public setMarkers(data: SeriesMarker<HorzScaleItem>[]): void {
-		checkItemsAreOrdered(data, this._horzScaleBehavior, true);
-
-		const convertedMarkers = data.map((marker: SeriesMarker<HorzScaleItem>) =>
-			convertSeriesMarker<HorzScaleItem, InternalHorzScaleItem>(marker, this._horzScaleBehavior.convertHorzItemToInternal(marker.time), marker.time)
-		);
-		this._series.setMarkers(convertedMarkers);
-	}
-
-	public markers(): SeriesMarker<HorzScaleItem>[] {
-		return this._series.markers().map<SeriesMarker<HorzScaleItem>>((internalItem: SeriesMarker<InternalHorzScaleItem>) => {
-			return convertSeriesMarker<InternalHorzScaleItem, HorzScaleItem>(internalItem, internalItem.originalTime as HorzScaleItem, undefined);
-		});
 	}
 
 	public applyOptions(options: TPartialOptions): void {

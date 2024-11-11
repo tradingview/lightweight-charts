@@ -34,6 +34,23 @@ npx esno ./runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standa
 Each path to the standalone module might be either to a local file (relative/absolute path to a file) or remote file (via http/https).
 If file is local then local server will be runner to serve that file (see [serve-local-files.ts](../serve-local-files.ts) module).
 
+## Branch-Specific Test Cases
+
+By default, the test runner uses the current branch's test case code for both golden and test builds of the library. However, you can configure the test runner to use test case code from different branches:
+
+### Using Golden Branch Test Cases
+
+To use test case code from the golden branch for the golden build (useful when testing API syntax changes):
+
+1. Use the `scripts/run-graphics-tests.sh` script
+2. Set the environment variable `BRANCH_SPECIFIC_TEST="true"`
+
+Example:
+
+```bash
+BRANCH_SPECIFIC_TEST="true" ./scripts/run-graphics-tests.sh
+```
+
 ## Tips
 
 1. By default for each test case golden, test and diff screenshots will be written to a `.gendata` folder (can be changed via `CMP_OUT_DIR` env variable).

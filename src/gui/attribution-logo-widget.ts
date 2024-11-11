@@ -1,5 +1,3 @@
-import { colorStringToGrayscale } from '../helpers/color';
-
 import { IChartWidgetBase } from './chart-widget';
 
 type LogoTheme = 'dark' | 'light';
@@ -44,7 +42,12 @@ export class AttributionLogoWidget {
 	}
 
 	private _themeToUse(): LogoTheme {
-		return colorStringToGrayscale(this._chart.options()['layout'].textColor) > 160 ? 'dark' : 'light';
+		return this._chart
+			.model()
+			.colorParser()
+			.colorStringToGrayscale(this._chart.options()['layout'].textColor) > 160
+			? 'dark'
+			: 'light';
 	}
 
 	private _shouldBeVisible(): boolean {

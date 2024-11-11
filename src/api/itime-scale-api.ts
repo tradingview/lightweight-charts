@@ -1,7 +1,7 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
-import { IRange, Logical, LogicalRange } from '../model/time-data';
+import { IRange, Logical, LogicalRange, TimePointIndex } from '../model/time-data';
 import { HorzScaleOptions } from '../model/time-scale';
 
 /**
@@ -109,6 +109,14 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 * @returns Logical index that is located on that coordinate or `null` if the chart doesn't have data
 	 */
 	coordinateToLogical(x: number): Logical | null;
+
+	/**
+	 * Converts a time to local x coordinate.
+	 *
+	 * @param time - Time needs to be converted
+	 * @returns X coordinate of that time or `null` if no time found on time scale
+	 */
+	timeToIndex(time: HorzScaleItem, findNearest?: boolean): TimePointIndex | null;
 
 	/**
 	 * Converts a time to local x coordinate.
