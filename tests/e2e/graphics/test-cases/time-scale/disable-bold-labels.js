@@ -16,7 +16,7 @@ function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 	chart.timeScale().applyOptions({ allowBoldLabels: false });
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	mainSeries.setData(generateData());
 }

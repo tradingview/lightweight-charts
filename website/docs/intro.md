@@ -91,13 +91,13 @@ To create a series with desired type you need to use appropriate method from [`I
 All of them have the same naming `add<type>Series`, where `<type>` is a type of a series you'd like to create:
 
 ```js
-import { createChart } from 'lightweight-charts';
+import { AreaSeries, BarSeries, BaselineSeries, createChart } from 'lightweight-charts';
 
 const chart = createChart(container);
 
-const areaSeries = chart.addAreaSeries();
-const barSeries = chart.addBarSeries();
-const baselineSeries = chart.addBaselineSeries();
+const areaSeries = chart.addSeries(AreaSeries);
+const barSeries = chart.addSeries(BarSeries);
+const baselineSeries = chart.addSeries(BaselineSeries);
 // ... and so on
 ```
 
@@ -118,7 +118,7 @@ To set the data (or to replace all data items) to a series you need to use [`ISe
 ```js chart replaceThemeConstants
 const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
-const areaSeries = chart.addAreaSeries({
+const areaSeries = chart.addSeries(AreaSeries, {
     lineColor: LINE_LINE_COLOR, topColor: AREA_TOP_COLOR,
     bottomColor: AREA_BOTTOM_COLOR,
 });
@@ -135,7 +135,7 @@ areaSeries.setData([
     { time: '2018-12-31', value: 22.67 },
 ]);
 
-const candlestickSeries = chart.addCandlestickSeries({
+const candlestickSeries = chart.addSeries(CandlestickSeries, {
     upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR, borderVisible: false,
     wickUpColor: BAR_UP_COLOR, wickDownColor: BAR_DOWN_COLOR,
 });
@@ -166,17 +166,17 @@ Thus, to update the data you can use a method [`ISeriesApi.update`](/api/interfa
 It allows you to update the last data item or add a new one much faster without affecting the performance:
 
 ```js
-import { createChart } from 'lightweight-charts';
+import { AreaSeries, CandlestickSeries, createChart } from 'lightweight-charts';
 
 const chart = createChart(container);
 
-const areaSeries = chart.addAreaSeries();
+const areaSeries = chart.addSeries(AreaSeries);
 areaSeries.setData([
     // ... other data items
     { time: '2018-12-31', value: 22.67 },
 ]);
 
-const candlestickSeries = chart.addCandlestickSeries();
+const candlestickSeries = chart.addSeries(CandlestickSeries);
 candlestickSeries.setData([
     // ... other data items
     { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },

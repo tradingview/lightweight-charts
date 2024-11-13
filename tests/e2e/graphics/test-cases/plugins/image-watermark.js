@@ -68,7 +68,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	}));
 
-	const mainSeries = chart.addAreaSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries);
 	mainSeries.setData(generateData());
 
 	LightweightCharts.createImageWatermark(chart.panes()[0], imageDataUrl, {

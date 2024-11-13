@@ -1,8 +1,8 @@
-import { createChart, createImageWatermark, createTextWatermark } from '../../src';
+import { createChart, createImageWatermark, createTextWatermark, LineSeries } from '../../src';
 
 const chart = createChart('anything');
 
-const mainSeries = chart.addLineSeries();
+const mainSeries = chart.addSeries(LineSeries);
 mainSeries.setData([]);
 
 createImageWatermark(chart.panes()[0], '/debug/image.svg', {

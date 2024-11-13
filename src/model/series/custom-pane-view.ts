@@ -2,8 +2,10 @@ import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
 import { undefinedIfNull } from '../../helpers/strict-type-checks';
 
-import { IChartModelBase } from '../../model/chart-model';
-import { Coordinate } from '../../model/coordinate';
+import { IPaneRenderer } from '../../renderers/ipane-renderer';
+
+import { IChartModelBase } from '../chart-model';
+import { Coordinate } from '../coordinate';
 import {
 	CustomBarItemData,
 	CustomData,
@@ -12,14 +14,14 @@ import {
 	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
 	PriceToCoordinateConverter,
-} from '../../model/icustom-series';
-import { PriceScale } from '../../model/price-scale';
-import { Series } from '../../model/series';
-import { SeriesPlotRow } from '../../model/series-data';
-import { TimedValue } from '../../model/time-data';
-import { ITimeScale } from '../../model/time-scale';
-import { IPaneRenderer } from '../../renderers/ipane-renderer';
-
+} from '../icustom-series';
+import { ISeries } from '../iseries';
+import { PriceScale } from '../price-scale';
+import { SeriesPlotRow } from '../series-data';
+import { SeriesOptionsMap } from '../series-options';
+import { TimedValue } from '../time-data';
+import { ITimeScale } from '../time-scale';
+import { ISeriesCustomPaneView } from './pane-view';
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
 type CustomBarItemBase = TimedValue;
@@ -50,15 +52,15 @@ class CustomSeriesPaneRendererWrapper implements IPaneRenderer {
 }
 
 export class SeriesCustomPaneView extends SeriesPaneViewBase<
-	'Custom',
+	'Custom'& keyof SeriesOptionsMap,
 	CustomBarItem,
 	CustomSeriesPaneRendererWrapper
-> {
+> implements ISeriesCustomPaneView {
 	protected readonly _renderer: CustomSeriesPaneRendererWrapper;
 	private readonly _paneView: ICustomSeriesPaneView<unknown>;
 
 	public constructor(
-		series: Series<'Custom'>,
+		series: ISeries<'Custom' & keyof SeriesOptionsMap>,
 		model: IChartModelBase,
 		paneView: ICustomSeriesPaneView<unknown>
 	) {

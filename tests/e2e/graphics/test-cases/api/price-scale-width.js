@@ -9,7 +9,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const series = chart.addLineSeries({ priceScaleId: 'overlay-scale' });
+	const series = chart.addSeries(LightweightCharts.LineSeries, { priceScaleId: 'overlay-scale' });
 	series.setData([
 		{ time: '1990-04-24', value: 0 },
 		{ time: '1990-04-25', value: 1 },

@@ -90,7 +90,7 @@ function beforeInteractions(container) {
 		},
 	}));
 
-	const mainSeries = chart.addAreaSeries({
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		priceFormat: {
 			minMove: 1,
 			precision: 0,

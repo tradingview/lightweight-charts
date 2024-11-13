@@ -22,7 +22,7 @@ createImageWatermark(chart.panes()[0], imageDataUrl, {
 });
 // highlight-end
 
-const lineSeries = chart.addAreaSeries({
+const lineSeries = chart.addSeries(AreaSeries, {
 	topColor: AREA_TOP_COLOR,
 	bottomColor: AREA_BOTTOM_COLOR,
 	lineColor: LINE_LINE_COLOR,

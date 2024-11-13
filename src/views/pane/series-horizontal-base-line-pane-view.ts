@@ -1,5 +1,5 @@
+import { ISeries } from '../../model/iseries';
 import { PriceScaleMode } from '../../model/price-scale';
-import { ISeries } from '../../model/series';
 import { SeriesType } from '../../model/series-options';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';

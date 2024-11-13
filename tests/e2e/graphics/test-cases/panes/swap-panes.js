@@ -25,9 +25,9 @@ function generateData(startValue) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addBarSeries();
-	const secondSeries = chart.addBarSeries({}, 1);
-	const thirdSeries = chart.addBarSeries({}, 2);
+	const mainSeries = chart.addSeries(LightweightCharts.BarSeries);
+	const secondSeries = chart.addSeries(LightweightCharts.BarSeries, {}, 1);
+	const thirdSeries = chart.addSeries(LightweightCharts.BarSeries, {}, 2);
 
 	const startValue = Math.floor(container.getBoundingClientRect().height / 100) * 100;
 

@@ -8,7 +8,7 @@ let chart;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	series = chart.addAreaSeries();
+	series = chart.addSeries(LightweightCharts.AreaSeries);
 
 	series.setData(generateLineData());
 

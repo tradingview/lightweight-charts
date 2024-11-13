@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { LineSeries, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 
 import imgUrl from './image.svg';
@@ -27,10 +27,10 @@ const watermark = new ImageWatermark(imgUrl, {
  * series to be useful. Maybe if they are dynamically adding and removing series
  * but would like some primitives to always be visible (i.e. a 'chart primitive').
  */
-// const chartSeries = chart.addLineSeries();
+// const chartSeries = chart.addSeries(LineSeries);
 // chartSeries.attachPrimitive(watermark);
 
-const lineSeries = chart.addLineSeries();
+const lineSeries = chart.addSeries(LineSeries);
 const data = generateLineData();
 lineSeries.setData(data);
 

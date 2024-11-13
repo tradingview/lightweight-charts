@@ -1,4 +1,4 @@
-import { ISeries } from '../../model/series';
+import { ISeries } from '../../model/iseries';
 import { PriceLineSource, SeriesType } from '../../model/series-options';
 
 import { SeriesHorizontalLinePaneView } from './series-horizontal-line-pane-view';

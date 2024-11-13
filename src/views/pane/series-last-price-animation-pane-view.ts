@@ -1,7 +1,7 @@
 import { assert } from '../../helpers/assertions';
 
+import { ISeries } from '../../model/iseries';
 import { Point } from '../../model/point';
-import { ISeries } from '../../model/series';
 import { LastPriceAnimationMode } from '../../model/series-options';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-price-animation-renderer';

@@ -61,8 +61,7 @@ const customSeriesView = (new NonTimeSeries()) as ICustomSeriesPaneView<Horizont
 const failSeries = chart.addCustomSeries(customSeriesView, { badOption: 123 });
 // @ts-expect-error invalid value
 const failSeries2 = chart.addCustomSeries(customSeriesView, { testOption: 123 });
-
-const series = chart.addCustomSeries(customSeriesView, { testOption: 'string' });
+const series = chart.addCustomSeries<NonTimeData, NonTimeSeriesOptions>(customSeriesView, { testOption: 'string' });
 
 const data: (NonTimeData | WhitespaceData<HorizontalScaleType>)[] = [
     { time: 12345 }, // whitespace

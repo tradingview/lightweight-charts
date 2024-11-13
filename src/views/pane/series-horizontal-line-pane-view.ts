@@ -1,6 +1,6 @@
 import { IChartModelBase } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
-import { ISeries } from '../../model/series';
+import { ISeries } from '../../model/iseries';
 import { SeriesType } from '../../model/series-options';
 import { LineStyle } from '../../renderers/draw-line';
 import { HorizontalLineRenderer, HorizontalLineRendererData } from '../../renderers/horizontal-line-renderer';

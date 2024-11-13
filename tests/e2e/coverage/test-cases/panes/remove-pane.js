@@ -14,8 +14,8 @@ let chart;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	const mainSeries = chart.addLineSeries();
-	const secondSeries = chart.addLineSeries({}, 1);
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const secondSeries = chart.addSeries(LightweightCharts.LineSeries, {}, 1);
 
 	mainSeries.setData(simpleData());
 	secondSeries.setData(simpleData());
