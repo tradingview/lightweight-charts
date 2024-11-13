@@ -120,8 +120,8 @@ const codeBlocks: CodeBlockProps[] = [
 			</span>,
 			<span key="4">
 				<span data-c3>const</span> areaSeries = chart.
-				<span data-c4>addAreaSeries</span>
-				<span>{'('}</span>
+				<span data-c4>addSeries</span>
+				<span>{'(AreaSeries, '}</span>
 				<span>{'{ '}</span>
 			</span>,
 			<span key="5">
@@ -167,8 +167,8 @@ const codeBlocks: CodeBlockProps[] = [
 			</span>,
 			<span key="5">
 				&nbsp;&nbsp;chart.
-				<span data-c4>addAreaSeries</span>
-				<span>{'('}</span>
+				<span data-c4>addSeries</span>
+				<span>{'(AreaSeries, '}</span>
 				<span>{'{ '}</span>lineColor:
 			</span>,
 			<span key="6">

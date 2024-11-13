@@ -1,4 +1,4 @@
-import { createChart, createChartEx, createSeriesMarkers } from '../../src';
+import { createChart, createChartEx, createSeriesMarkers, LineSeries } from '../../src';
 import { Mutable } from '../../src/helpers/mutable';
 import { ChartOptionsImpl } from '../../src/model/chart-model';
 import { SeriesDataItemTypeMap } from '../../src/model/data-consumer';
@@ -12,7 +12,7 @@ import { TimeMark } from '../../src/model/time-scale';
 
 const chart = createChart('container');
 
-const mainSeries = chart.addLineSeries();
+const mainSeries = chart.addSeries(LineSeries);
 mainSeries.setData([]);
 
 const seriesMarkersPrimitive = createSeriesMarkers(mainSeries, [
@@ -100,7 +100,7 @@ const horizontalScaleBehaviourMock = new HorzScaleBehaviorPrice();
 
 // @ts-expect-error Mock Class
 const nonDefaultChart = createChartEx<HorizontalScaleType, HorzScaleBehaviorPrice>('anything', horizontalScaleBehaviourMock);
-const lineSeries = nonDefaultChart.addLineSeries();
+const lineSeries = nonDefaultChart.addSeries(LineSeries);
 lineSeries.setData([]);
 
 const timeValue: HorizontalScaleType = 12345;

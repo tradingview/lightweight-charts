@@ -1,4 +1,9 @@
-import { LastPriceAnimationMode, LineData, createChart } from 'lightweight-charts';
+import {
+	LastPriceAnimationMode,
+	LineData,
+	LineSeries,
+	createChart,
+} from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { PartialPriceLine } from '../partial-price-line';
 
@@ -6,7 +11,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const lineSeries = chart.addLineSeries({
+const lineSeries = chart.addSeries(LineSeries, {
 	lastPriceAnimation: LastPriceAnimationMode.OnDataUpdate,
 });
 

@@ -1,4 +1,9 @@
-import { LastPriceAnimationMode, LineStyle, createChart } from 'lightweight-charts';
+import {
+	LastPriceAnimationMode,
+	LineStyle,
+	AreaSeries,
+	createChart,
+} from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { UserAlertInfo } from '../state';
 import { UserPriceAlerts } from '../user-price-alerts';
@@ -36,7 +41,7 @@ const chart = createChart('chart', {
 	handleScroll: false,
 });
 
-const areaSeries = chart.addAreaSeries({
+const areaSeries = chart.addSeries(AreaSeries, {
 	lineColor: 'rgb(4,153,129)',
 	topColor: 'rgba(4,153,129, 0.4)',
 	bottomColor: 'rgba(4,153,129, 0)',

@@ -22,7 +22,7 @@ export const scenario = {
 			window.chart = LightweightCharts.createChart(
 				document.getElementById('container')
 			);
-			const mainSeries = window.chart.addLineSeries({
+			const mainSeries = window.chart.addSeries(LightweightCharts.LineSeries, {
 				priceFormat: {
 					minMove: 1,
 					precision: 0,

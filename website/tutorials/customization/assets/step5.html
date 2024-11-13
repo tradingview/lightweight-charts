@@ -1121,7 +1121,7 @@
       const candleStickData = generateCandlestickData();
 
       // Create the Main Series (Candlesticks)
-      const mainSeries = chart.addCandlestickSeries();
+      const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
       // Set the data for the Main Series
       mainSeries.setData(candleStickData);
 

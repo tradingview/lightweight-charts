@@ -4,7 +4,7 @@ function copy(data) {
 
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
-	const lineSeries = chart.addLineSeries();
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	const data = [
 		{ time: '2019-04-11', value: 80.01 },
@@ -26,7 +26,7 @@ function runTestCase(container) {
 			chart.removeSeries(lineSeries);
 
 			setTimeout(() => {
-				const newLineSeries = chart.addLineSeries();
+				const newLineSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 				setTimeout(() => {
 					newLineSeries.setData(copy(data));

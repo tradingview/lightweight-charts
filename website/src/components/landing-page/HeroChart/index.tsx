@@ -1,14 +1,15 @@
 import { useColorMode } from '@docusaurus/theme-common';
 import {
+	AreaSeries,
 	createChart,
 	type DeepPartial,
 	type IChartApi,
+	type IRange,
 	type ISeriesApi,
 	type LayoutOptions,
 	type LineData,
-	type Range,
 	type Time,
-} from 'lightweight-charts';
+} from 'lightweight-charts-local';
 import React from 'react';
 
 import CodeBlock, { CodeBlockProps } from '../Codeblock';
@@ -34,7 +35,7 @@ const allChartData = buildChartData();
 const chartData = allChartData.slice(0, -realtimeUpdatesCount);
 const realtimeData = allChartData.slice(-realtimeUpdatesCount);
 
-function getVisibleLogicalRange(dataLength: number, addedPoints: number): Range<number> {
+function getVisibleLogicalRange(dataLength: number, addedPoints: number): IRange<number> {
 	return { from: addedPoints + 0.5, to: dataLength + addedPoints };
 }
 
@@ -103,7 +104,7 @@ function Chart(): React.JSX.Element {
 				handleScale: false,
 			});
 
-			const aS = c.addAreaSeries({
+			const aS = c.addSeries(AreaSeries, {
 				lineColor: '#2962ff',
 				topColor: '#2962ff',
 				bottomColor: 'rgba(41, 98, 255, 0.28)',

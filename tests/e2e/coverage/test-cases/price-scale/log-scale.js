@@ -11,7 +11,7 @@ let mainSeries;
 function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	mainSeries = chart.addLineSeries();
+	mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 	const priceScale = chart.priceScale('right');
 	priceScale.applyOptions({
 		mode: LightweightCharts.PriceScaleMode.Logarithmic,

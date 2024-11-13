@@ -1,7 +1,7 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const lineSeries = chart.addLineSeries({
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		lineType: LightweightCharts.LineType.Curved,
 	});
 

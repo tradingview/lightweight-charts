@@ -1,6 +1,6 @@
 import { BarPrice } from '../../model/bar';
 import { IChartModelBase } from '../../model/chart-model';
-import { ISeries } from '../../model/series';
+import { ISeries } from '../../model/iseries';
 import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { BaselineFillItem, PaneRendererBaselineArea } from '../../renderers/baseline-renderer-area';

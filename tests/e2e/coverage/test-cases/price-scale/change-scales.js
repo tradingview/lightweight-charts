@@ -14,7 +14,7 @@ let chart;
 async function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	mainSeries = chart.addLineSeries();
+	mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 	mainSeries.setData(generateLineData());
 
 	await awaitNewFrame();

@@ -39,7 +39,7 @@ function createChart(container) {
 }
 
 function createOneSeries() {
-	areaSeries = chart.addAreaSeries();
+	areaSeries = chart.addSeries(LightweightCharts.AreaSeries);
 	data = generateData(61, Date.UTC(2018, 0, 1, 0, 0, 0, 0));
 	areaSeries.setData(data);
 }

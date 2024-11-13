@@ -13,7 +13,7 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-const series = chart.addCandlestickSeries({
+const series = chart.addSeries(CandlestickSeries, {
 	upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR, borderVisible: false,
 	wickUpColor: BAR_UP_COLOR, wickDownColor: BAR_DOWN_COLOR,
 });

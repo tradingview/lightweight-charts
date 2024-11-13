@@ -7,7 +7,7 @@ let mainSeries;
 function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	mainSeries = chart.addBarSeries({
+	mainSeries = chart.addSeries(LightweightCharts.BarSeries, {
 		title: 'Initial title',
 		priceFormat: {
 			type: 'percent',

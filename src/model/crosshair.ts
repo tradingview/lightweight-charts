@@ -16,9 +16,9 @@ import { IChartModelBase } from './chart-model';
 import { Coordinate } from './coordinate';
 import { DataSource } from './data-source';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
+import { ISeries } from './iseries';
 import { Pane } from './pane';
 import { PriceScale } from './price-scale';
-import { ISeries } from './series';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 

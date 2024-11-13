@@ -97,7 +97,7 @@ window.addEventListener('resize', () => {
 });
 // remove-end
 
-const series = chart.addCandlestickSeries({
+const series = chart.addSeries(CandlestickSeries, {
 	upColor: BAR_UP_COLOR,
 	downColor: BAR_DOWN_COLOR,
 	borderVisible: false,

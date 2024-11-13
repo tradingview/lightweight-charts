@@ -14,11 +14,11 @@ import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
-import { ICustomSeriesPaneView } from './icustom-series';
 import { IPrimitiveHitTestSource } from './idata-source';
 import { IHorzScaleBehavior, InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { InvalidateMask, InvalidationLevel, ITimeScaleAnimation } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
+import { ISeries } from './iseries';
 import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
@@ -26,8 +26,8 @@ import { DEFAULT_STRETCH_FACTOR, MIN_PANE_HEIGHT, Pane } from './pane';
 import { hitTestPane } from './pane-hit-test';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
-import { ISeries, Series, SeriesOptionsInternal } from './series';
-import { SeriesOptionsMap, SeriesType } from './series-options';
+import { Series } from './series';
+import { SeriesType } from './series-options';
 import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { HorzScaleOptions, ITimeScale, TimeScale } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
@@ -906,20 +906,20 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._priceScalesOptionsChanged;
 	}
 
-	public createSeries<T extends SeriesType>(seriesType: T, options: SeriesOptionsMap[T], paneIndex: number = 0, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
+	public addSeriesToPane<T extends SeriesType>(
+		series: Series<T>,
+		paneIndex: number
+	): void {
 		const pane = this._getOrCreatePane(paneIndex);
+		this._addSeriesToPane(series, pane);
 
-		const series = this._createSeries(options, seriesType, pane, customPaneView);
 		this._serieses.push(series);
-
 		if (this._serieses.length === 1) {
 			// call fullUpdate to recalculate chart's parts geometry
 			this.fullUpdate();
 		} else {
 			this.lightUpdate();
 		}
-
-		return series;
 	}
 
 	public removeSeries(series: Series<SeriesType>): void {
@@ -1114,13 +1114,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 
 		this._panes.forEach((pane: Pane) => pane.grid().paneView().update());
-	}
-
-	private _createSeries<T extends SeriesType>(options: SeriesOptionsInternal<T>, seriesType: T, pane: Pane, customPaneView?: ICustomSeriesPaneView<HorzScaleItem>): Series<T> {
-		const series = new Series<T>(this, options, seriesType, customPaneView);
-		this._addSeriesToPane(series, pane);
-
-		return series;
 	}
 
 	private _addSeriesToPane(series: Series<SeriesType>, pane: Pane): void {

@@ -20,7 +20,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	}));
 
-	const mainSeries = chart.addAreaSeries({ pointMarkersVisible: true });
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries, { pointMarkersVisible: true });
 
 	mainSeries.setData(generateData());
 }

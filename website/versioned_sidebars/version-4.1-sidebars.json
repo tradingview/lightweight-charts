@@ -832,11 +832,7 @@
 					"id": "api/functions/createChartEx",
 					"label": "createChartEx"
 				},
-				{
-					"type": "doc",
-					"id": "api/functions/defaultHorzScaleBehavior",
-					"label": "defaultHorzScaleBehavior"
-				},
+
 				{
 					"type": "doc",
 					"id": "api/functions/isBusinessDay",

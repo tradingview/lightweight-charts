@@ -49,10 +49,10 @@ function beforeInteractions(container) {
 		},
 	});
 
-	const lineSeries = chart.addLineSeries();
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
 	lineSeries.setData(generateLineData());
 
-	const candlestickSeries = chart.addCandlestickSeries({
+	const candlestickSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
 		priceScaleId: 'left',
 	});
 	chart.priceScale('left').applyOptions({
@@ -60,22 +60,22 @@ function beforeInteractions(container) {
 	});
 	candlestickSeries.setData(generateBars());
 
-	const histogramSeries = chart.addHistogramSeries({
+	const histogramSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
 		priceScaleId: 'overlay-1',
 	});
 	histogramSeries.setData(generateHistogramData());
 
-	const barSeries = chart.addBarSeries({
+	const barSeries = chart.addSeries(LightweightCharts.BarSeries, {
 		priceScaleId: 'overlay-2',
 	});
 	barSeries.setData(generateBars());
 
-	const areaSeries = chart.addAreaSeries({
+	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		priceScaleId: 'overlay-3',
 	});
 	areaSeries.setData(generateLineData());
 
-	const baselineSeries = chart.addBaselineSeries({
+	const baselineSeries = chart.addSeries(LightweightCharts.BaselineSeries, {
 		priceScaleId: 'overlay-4',
 	});
 	baselineSeries.setData(generateLineData());
