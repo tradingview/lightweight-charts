@@ -20,6 +20,8 @@ export interface TickMark {
 
 interface MarksCache {
 	maxIndexesPerMark: number;
+	indicesWithDataId: number;
+	checkIndicesForData: boolean;
 	marks: readonly TickMark[];
 }
 
@@ -55,11 +57,18 @@ export class TickMarks<HorzScaleItem> {
 		}
 	}
 
-	public build(spacing: number, maxWidth: number): readonly TickMark[] {
+	public build(spacing: number, maxWidth: number, checkIndicesForData: boolean, indicesWithDataMap: Map<TimePointIndex, boolean>, indicesWithDataId: number): readonly TickMark[] {
 		const maxIndexesPerMark = Math.ceil(maxWidth / spacing);
-		if (this._cache === null || this._cache.maxIndexesPerMark !== maxIndexesPerMark) {
+		if (
+			this._cache === null ||
+			this._cache.maxIndexesPerMark !== maxIndexesPerMark ||
+			indicesWithDataId !== this._cache.indicesWithDataId ||
+			checkIndicesForData !== this._cache.checkIndicesForData
+		) {
 			this._cache = {
-				marks: this._buildMarksImpl(maxIndexesPerMark),
+				indicesWithDataId,
+				checkIndicesForData,
+				marks: this._buildMarksImpl(maxIndexesPerMark, checkIndicesForData, indicesWithDataMap),
 				maxIndexesPerMark,
 			};
 		}
@@ -91,8 +100,10 @@ export class TickMarks<HorzScaleItem> {
 		}
 	}
 
-	private _buildMarksImpl(maxIndexesPerMark: number): readonly TickMark[] {
+	private _buildMarksImpl(maxIndexesPerMark: number, checkIndicesForData: boolean, indicesWithDataMap: Map<TimePointIndex, boolean>): readonly TickMark[] {
 		let marks: TickMark[] = [];
+
+		const canBeIncluded = (mark: TickMark): boolean => !checkIndicesForData || indicesWithDataMap.has(mark.index);
 
 		for (const weight of Array.from(this._marksByWeight.keys()).sort((a: number, b: number) => b - a)) {
 			if (!this._marksByWeight.get(weight)) {
@@ -119,7 +130,7 @@ export class TickMarks<HorzScaleItem> {
 				while (prevMarksPointer < prevMarksLength) {
 					const lastMark = prevMarks[prevMarksPointer];
 					const lastIndex = lastMark.index;
-					if (lastIndex < currentIndex) {
+					if (lastIndex < currentIndex && canBeIncluded(lastMark)) {
 						prevMarksPointer++;
 						marks.push(lastMark);
 						leftIndex = lastIndex;
@@ -130,7 +141,11 @@ export class TickMarks<HorzScaleItem> {
 					}
 				}
 
-				if (rightIndex - currentIndex >= maxIndexesPerMark && currentIndex - leftIndex >= maxIndexesPerMark) {
+				if (
+					rightIndex - currentIndex >= maxIndexesPerMark &&
+					currentIndex - leftIndex >= maxIndexesPerMark &&
+					canBeIncluded(mark)
+				) {
 					// TickMark fits. Place it into new array
 					marks.push(mark);
 					leftIndex = currentIndex;
@@ -143,7 +158,9 @@ export class TickMarks<HorzScaleItem> {
 
 			// Place all unused tickMarks into new array;
 			for (; prevMarksPointer < prevMarksLength; prevMarksPointer++) {
-				marks.push(prevMarks[prevMarksPointer]);
+				if (canBeIncluded(prevMarks[prevMarksPointer])) {
+					marks.push(prevMarks[prevMarksPointer]);
+				}
 			}
 		}
 

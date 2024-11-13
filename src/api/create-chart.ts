@@ -9,6 +9,15 @@ import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { ChartApi } from './chart-api';
 import { IChartApiBase } from './ichart-api';
 
+export function fetchHtmlElement(container: string | HTMLElement): HTMLElement {
+	if (isString(container)) {
+		const element = document.getElementById(container);
+		assert(element !== null, `Cannot find element in DOM with id=${container}`);
+		return element;
+	}
+	return container;
+}
+
 /**
  * This function is the main entry point of the Lightweight Charting Library. If you are using time values
  * for the horizontal scale then it is recommended that you rather use the {@link createChart} function.
@@ -26,15 +35,7 @@ export function createChartEx<HorzScaleItem, THorzScaleBehavior extends IHorzSca
 	horzScaleBehavior: THorzScaleBehavior,
 	options?: DeepPartial<ReturnType<THorzScaleBehavior['options']>>
 ): IChartApiBase<HorzScaleItem> {
-	let htmlElement: HTMLElement;
-	if (isString(container)) {
-		const element = document.getElementById(container);
-		assert(element !== null, `Cannot find element in DOM with id=${container}`);
-		htmlElement = element;
-	} else {
-		htmlElement = container;
-	}
-
+	const htmlElement = fetchHtmlElement(container);
 	const res = new ChartApi<HorzScaleItem>(htmlElement, horzScaleBehavior, options);
 	horzScaleBehavior.setOptions(res.options());
 	return res;

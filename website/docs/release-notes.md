@@ -9,7 +9,7 @@ keywords:
     - charting
     - html5 charts
     - financial charting library
-sidebar_position: 8
+sidebar_position: 9
 ---
 
 <!-- markdownlint-disable no-emphasis-as-heading -->

@@ -663,7 +663,7 @@ export interface SeriesOptionsCommon {
 	/**
 	 * Visibility of the label with the latest visible price on the price scale.
 	 *
-	 * @defaultValue `true`
+	 * @defaultValue `true`, `false` for yield curve charts
 	 */
 	lastValueVisible: boolean;
 
@@ -698,7 +698,7 @@ export interface SeriesOptionsCommon {
 	/**
 	 * Show the price line. Price line is a horizontal line indicating the last price of the series.
 	 *
-	 * @defaultValue `true`
+	 * @defaultValue `true`, `false` for yield curve charts
 	 */
 	priceLineVisible: boolean;
 
