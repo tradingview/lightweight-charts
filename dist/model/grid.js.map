@@ -1,0 +1,1 @@
+{"version":3,"file":"grid.js","sourceRoot":"","sources":["../../src/model/grid.ts"],"names":[],"mappings":";;;AACA,iEAA4D;AA0C5D,MAAa,IAAI;IAGhB,YAAmB,IAAU;QAC5B,IAAI,CAAC,SAAS,GAAG,IAAI,6BAAY,CAAC,IAAI,CAAC,CAAC;IACzC,CAAC;IAEM,QAAQ;QACd,OAAO,IAAI,CAAC,SAAS,CAAC;IACvB,CAAC;CACD;AAVD,oBAUC"}

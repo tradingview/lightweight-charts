@@ -1,0 +1,1 @@
+{"version":3,"file":"volume-formatter.d.ts","sourceRoot":"","sources":["../../src/formatters/volume-formatter.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,oBAAoB,CAAC;AAErD,qBAAa,eAAgB,YAAW,eAAe;IACtD,OAAO,CAAC,QAAQ,CAAC,UAAU,CAAS;gBAEjB,SAAS,EAAE,MAAM;IAI7B,MAAM,CAAC,GAAG,EAAE,MAAM,GAAG,MAAM;IAoBlC,OAAO,CAAC,aAAa;CAWrB"}

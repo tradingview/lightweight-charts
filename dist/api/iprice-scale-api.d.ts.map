@@ -1,0 +1,1 @@
+{"version":3,"file":"iprice-scale-api.d.ts","sourceRoot":"","sources":["../../src/api/iprice-scale-api.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,+BAA+B,CAAC;AAE5D,OAAO,EAAE,iBAAiB,EAAE,MAAM,sBAAsB,CAAC;AAGzD,MAAM,WAAW,cAAc;IAM9B,YAAY,CAAC,OAAO,EAAE,WAAW,CAAC,iBAAiB,CAAC,GAAG,IAAI,CAAC;IAO5D,OAAO,IAAI,QAAQ,CAAC,iBAAiB,CAAC,CAAC;IAKvC,KAAK,IAAI,MAAM,CAAC;CAChB"}

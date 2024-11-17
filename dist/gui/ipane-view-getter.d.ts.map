@@ -1,0 +1,1 @@
+{"version":3,"file":"ipane-view-getter.d.ts","sourceRoot":"","sources":["../../src/gui/ipane-view-getter.ts"],"names":[],"mappings":"AAAA,OAAO,EACN,WAAW,EACX,MAAM,uBAAuB,CAAC;AAC/B,OAAO,EAAE,IAAI,EAAE,MAAM,eAAe,CAAC;AACrC,OAAO,EAAE,SAAS,EAAE,MAAM,0BAA0B,CAAC;AAErD,MAAM,MAAM,gBAAgB,GAAG,CAC9B,MAAM,EAAE,WAAW,EACnB,IAAI,EAAE,IAAI,KACN,SAAS,SAAS,EAAE,CAAC"}

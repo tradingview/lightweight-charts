@@ -1,0 +1,1 @@
+{"version":3,"file":"price-data-source.js","sourceRoot":"","sources":["../../src/model/price-data-source.ts"],"names":[],"mappings":";;;AAIA,+CAA2C;AAI3C,MAAsB,eAAgB,SAAQ,wBAAU;IAGvD,YAAmB,KAAsB;QACxC,KAAK,EAAE,CAAC;QACR,IAAI,CAAC,MAAM,GAAG,KAAK,CAAC;IACrB,CAAC;IAEM,KAAK;QACX,OAAO,IAAI,CAAC,MAAM,CAAC;IACpB,CAAC;CASD;AAnBD,0CAmBC"}

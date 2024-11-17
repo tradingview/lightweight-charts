@@ -1,0 +1,1 @@
+{"version":3,"file":"bitmap-coordinates-pane-renderer.js","sourceRoot":"","sources":["../../src/renderers/bitmap-coordinates-pane-renderer.ts"],"names":[],"mappings":";;;AAIA,MAAsB,6BAA6B;IAC3C,IAAI,CAAC,MAA+B,EAAE,SAAkB,EAAE,WAAqB;QACrF,MAAM,CAAC,wBAAwB,CAC9B,CAAC,KAAsC,EAAE,EAAE,CAAC,IAAI,CAAC,SAAS,CAAC,KAAK,EAAE,SAAS,EAAE,WAAW,CAAC,CACzF,CAAC;IACH,CAAC;CAWD;AAhBD,sEAgBC"}

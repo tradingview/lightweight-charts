@@ -1,0 +1,1 @@
+{"version":3,"file":"percentage-formatter.js","sourceRoot":"","sources":["../../src/formatters/percentage-formatter.ts"],"names":[],"mappings":";;;AAAA,uDAAmD;AAEnD,MAAa,mBAAoB,SAAQ,gCAAc;IACtD,YAAmB,aAAqB,GAAG;QAC1C,KAAK,CAAC,UAAU,CAAC,CAAC;IACnB,CAAC;IAEe,MAAM,CAAC,KAAa;QACnC,OAAO,GAAG,KAAK,CAAC,MAAM,CAAC,KAAK,CAAC,GAAG,CAAC;IAClC,CAAC;CACD;AARD,kDAQC"}

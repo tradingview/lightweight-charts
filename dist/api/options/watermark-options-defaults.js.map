@@ -1,0 +1,1 @@
+{"version":3,"file":"watermark-options-defaults.js","sourceRoot":"","sources":["../../../src/api/options/watermark-options-defaults.ts"],"names":[],"mappings":";;;AAAA,uDAA4D;AAI/C,QAAA,wBAAwB,GAAqB;IACzD,KAAK,EAAE,kBAAkB;IACzB,OAAO,EAAE,KAAK;IACd,QAAQ,EAAE,EAAE;IACZ,UAAU,EAAE,6BAAiB;IAC7B,SAAS,EAAE,EAAE;IACb,IAAI,EAAE,EAAE;IACR,SAAS,EAAE,QAAQ;IACnB,SAAS,EAAE,QAAQ;CACnB,CAAC"}

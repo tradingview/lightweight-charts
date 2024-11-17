@@ -1,0 +1,1 @@
+{"version":3,"file":"grid-options-defaults.js","sourceRoot":"","sources":["../../../src/api/options/grid-options-defaults.ts"],"names":[],"mappings":";;;AAGa,QAAA,mBAAmB,GAAgB;IAC/C,SAAS,EAAE;QACV,KAAK,EAAE,SAAS;QAChB,KAAK,GAAiB;QACtB,OAAO,EAAE,IAAI;KACb;IACD,SAAS,EAAE;QACV,KAAK,EAAE,SAAS;QAChB,KAAK,GAAiB;QACtB,OAAO,EAAE,IAAI;KACb;CACD,CAAC"}

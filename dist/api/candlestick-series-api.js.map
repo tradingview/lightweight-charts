@@ -1,0 +1,1 @@
+{"version":3,"file":"candlestick-series-api.js","sourceRoot":"","sources":["../../src/api/candlestick-series-api.ts"],"names":[],"mappings":";;;AAAA,4DAGiC;AAEjC,6CAAyC;AAEzC,MAAa,oBAAoC,SAAQ,sBAAuC;IAC/E,YAAY,CAAC,OAAwC;QACpE,IAAA,6CAA4B,EAAC,OAAO,CAAC,CAAC;QACtC,KAAK,CAAC,YAAY,CAAC,OAAO,CAAC,CAAC;IAC7B,CAAC;CACD;AALD,oDAKC"}

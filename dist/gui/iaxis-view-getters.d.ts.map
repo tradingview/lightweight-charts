@@ -1,0 +1,1 @@
+{"version":3,"file":"iaxis-view-getters.d.ts","sourceRoot":"","sources":["../../src/gui/iaxis-view-getters.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,uBAAuB,CAAC;AACpD,OAAO,EAAE,SAAS,EAAE,MAAM,0BAA0B,CAAC;AAErD,KAAK,gBAAgB,GAAG,CACvB,MAAM,EAAE,WAAW,KACf,SAAS,SAAS,EAAE,CAAC;AAE1B,MAAM,MAAM,qBAAqB,GAAG,gBAAgB,CAAC;AACrD,MAAM,MAAM,oBAAoB,GAAG,gBAAgB,CAAC"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"layout-options-defaults.js","sourceRoot":"","sources":["../../../src/api/options/layout-options-defaults.ts"],"names":[],"mappings":";;;AAAA,uDAA4D;AAI/C,QAAA,qBAAqB,GAAkB;IACnD,UAAU,EAAE;QACX,IAAI,SAAiB;QACrB,KAAK,EAAE,SAAS;KAChB;IACD,SAAS,EAAE,SAAS;IACpB,QAAQ,EAAE,EAAE;IACZ,UAAU,EAAE,6BAAiB;IAC7B,eAAe,EAAE,IAAI;CACrB,CAAC"}

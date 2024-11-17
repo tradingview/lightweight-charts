@@ -1,0 +1,1 @@
+{"version":3,"file":"candlestick-series-api.d.ts","sourceRoot":"","sources":["../../src/api/candlestick-series-api.ts"],"names":[],"mappings":"AAAA,OAAO,EACN,+BAA+B,EAE/B,MAAM,yBAAyB,CAAC;AAEjC,OAAO,EAAE,SAAS,EAAE,MAAM,cAAc,CAAC;AAEzC,qBAAa,oBAAoB,CAAC,aAAa,CAAE,SAAQ,SAAS,CAAC,aAAa,EAAE,aAAa,CAAC;IAC/E,YAAY,CAAC,OAAO,EAAE,+BAA+B,GAAG,IAAI;CAI5E"}

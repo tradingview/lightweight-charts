@@ -1,0 +1,1 @@
+{"version":3,"file":"iupdatable-pane-view.d.ts","sourceRoot":"","sources":["../../../src/views/pane/iupdatable-pane-view.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,cAAc,CAAC;AAEzC,MAAM,MAAM,UAAU,GAAG,MAAM,GAAG,OAAO,GAAG,SAAS,CAAC;AAEtD,MAAM,WAAW,kBAAmB,SAAQ,SAAS;IACpD,MAAM,CAAC,UAAU,CAAC,EAAE,UAAU,GAAG,IAAI,CAAC;CACtC"}
