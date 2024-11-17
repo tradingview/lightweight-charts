@@ -9,8 +9,6 @@ import { IPaneView } from '../views/pane/ipane-view';
 
 import { BoxOptions } from './box-options';
 import { Coordinate } from './coordinate';
-import { Time, UTCTimestamp } from './horz-scale-behavior-time/types';
-import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { Series } from './series';
 import { SeriesType } from './series-options';
 
@@ -57,11 +55,11 @@ export class CustomBox {
 	}
 
 	public xLowCoord(): Coordinate | null {
-		return this.xCoord(this._options.earlyTime as any);
+		return this.xCoord(this._options.earlyTime);
 	}
 
 	public xHighCoord(): Coordinate | null {
-		return this.xCoord(this._options.lateTime as any);
+		return this.xCoord(this._options.lateTime);
 	}
 
 	public yLowCoord(): Coordinate | null {
@@ -74,10 +72,10 @@ export class CustomBox {
 		return this.yCoord(this._options.lowPrice);
 	}
 
-	public xCoord(time: InternalHorzScaleItem): Coordinate | null {
+	public xCoord(time: number): Coordinate | null {
 		const series = this._series;
 		const timeScale = series.model().timeScale();
-		const timeIndex = timeScale.timeToIndex(time, true);
+		const timeIndex = timeScale.timeToIndex(time as never, true);
 
 		if (timeScale.isEmpty() || timeIndex === null) {
 			return null;
