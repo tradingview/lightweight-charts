@@ -1,10 +1,18 @@
 {
-	"extends": "./tsconfig.options.json",
 	"compilerOptions": {
-		"noEmit": true
+		"target": "ES2016", // Set the ECMAScript target version
+		"module": "ESNext", // Specify the module system
+		"moduleResolution": "Node", // Resolve modules like Node.js
+		"lib": ["DOM", "ES2016"], // Include standard library declarations
+		"declaration": true, // Generate .d.ts files
+		"outDir": "./dist", // Output compiled files here
+		"strict": true, // Enable all strict type-checking options
+		"rootDir": "./src",
+		"allowJs": true
 	},
-	"include": [
-		"src/**/*.ts",
-		"tests/**/*.ts"
+	"include": ["src/**/*"],
+	"exclude": [
+		"node_modules", // Exclude `node_modules`
+		"dist" // Exclude compiled output
 	]
 }

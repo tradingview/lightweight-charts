@@ -1,5 +1,3 @@
-/// <reference types="_build-time-constants" />
-
 import { lowerBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 import { Mutable } from '../helpers/mutable';

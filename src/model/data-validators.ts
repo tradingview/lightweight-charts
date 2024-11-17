@@ -1,4 +1,3 @@
-/// <reference types="_build-time-constants" />
 
 import { assert } from '../helpers/assertions';
 import { BoxOptions } from './box-options';
@@ -58,8 +57,9 @@ export function getChecker<HorzScaleItem>(type: SeriesType): Checker<HorzScaleIt
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
 
+        
 		case 'Custom':
-			return checkCustomItem.bind(null, type);
+			return checkCustomItem.bind(null);
 	}
 }
 

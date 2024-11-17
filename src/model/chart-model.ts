@@ -1,5 +1,3 @@
-/// <reference types="_build-time-constants" />
-
 import { assert, ensureNotNull } from '../helpers/assertions';
 import { gradientColorAtPercent } from '../helpers/color';
 import { Delegate } from '../helpers/delegate';
