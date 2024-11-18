@@ -307,6 +307,11 @@ export interface ISeriesApi<
 	removePriceLine(line: IPriceLine): void;
 
 	/**
+	 * Returns an array of price lines.
+	 */
+	priceLines(): IPriceLine[];
+
+	/**
 	 * Return current series type.
 	 *
 	 * @returns Type of the series.

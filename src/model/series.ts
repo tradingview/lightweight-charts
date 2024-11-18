@@ -345,6 +345,10 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this.model().updateSource(this);
 	}
 
+	public priceLines(): CustomPriceLine[] {
+		return this._customPriceLines.slice();
+	}
+
 	public seriesType(): T {
 		return this._seriesType;
 	}
