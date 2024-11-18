@@ -4,6 +4,7 @@ npm-debug.log*
 package-lock.json
 
 /debug/**/*
+!/debug/playground
 !/debug/README.md
 !/debug/debug-standalone.html.example
 !/debug/debug-esm.html.example
