@@ -9,6 +9,8 @@ import { LineItemBase as LineStrokeItemBase, PaneRendererLineBase, PaneRendererL
 export type BaselineStrokeItem = LineStrokeItemBase & BaselineStrokeColorerStyle;
 export interface PaneRendererBaselineLineData extends PaneRendererLineDataBase<BaselineStrokeItem> {
 	baseLevelCoordinate: Coordinate;
+	topCoordinate?: Coordinate;
+	bottomCoordinate?: Coordinate;
 }
 
 export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererBaselineLineData> {
@@ -25,8 +27,9 @@ export class PaneRendererBaselineLine extends PaneRendererLineBase<PaneRendererB
 				topColor2: item.topLineColor,
 				bottomColor1: item.bottomLineColor,
 				bottomColor2: item.bottomLineColor,
-				bottom: renderingScope.bitmapSize.height as Coordinate,
 				baseLevelCoordinate: data.baseLevelCoordinate,
+				topCoordinate: data.topCoordinate ?? 0 as Coordinate,
+				bottomCoordinate: data.bottomCoordinate ?? renderingScope.bitmapSize.height as Coordinate,
 			}
 		);
 	}

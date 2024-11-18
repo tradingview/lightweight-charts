@@ -10,7 +10,8 @@ export interface GradientCacheParams {
 	bottomColor1: string;
 	bottomColor2: string;
 	baseLevelCoordinate?: Coordinate | null;
-	bottom: Coordinate;
+	topCoordinate: Coordinate;
+	bottomCoordinate: Coordinate;
 }
 
 export class GradientStyleCache {
@@ -19,7 +20,10 @@ export class GradientStyleCache {
 
 	public get(scope: BitmapCoordinatesRenderingScope, params: GradientCacheParams): CanvasGradient {
 		const cachedParams = this._params;
-		const { topColor1, topColor2, bottomColor1, bottomColor2, bottom, baseLevelCoordinate } = params;
+		const {
+			topColor1, topColor2, bottomColor1, bottomColor2,
+			baseLevelCoordinate, topCoordinate, bottomCoordinate,
+		} = params;
 
 		if (
 			this._cachedValue === undefined ||
@@ -29,18 +33,23 @@ export class GradientStyleCache {
 			cachedParams.bottomColor1 !== bottomColor1 ||
 			cachedParams.bottomColor2 !== bottomColor2 ||
 			cachedParams.baseLevelCoordinate !== baseLevelCoordinate ||
-			cachedParams.bottom !== bottom
+			cachedParams.topCoordinate !== topCoordinate ||
+			cachedParams.bottomCoordinate !== bottomCoordinate
 		) {
-			const gradient = scope.context.createLinearGradient(0, 0, 0, bottom);
+			const { verticalPixelRatio } = scope;
+			const top = (topCoordinate) * verticalPixelRatio;
+			const bottom = (bottomCoordinate) * verticalPixelRatio;
+			const baseline = (baseLevelCoordinate ?? 0) * verticalPixelRatio;
+			const gradient = scope.context.createLinearGradient(0, top, 0, bottom);
 
 			gradient.addColorStop(0, topColor1);
+			if (baseLevelCoordinate !== null && baseLevelCoordinate !== undefined) {
+				const range = bottom - top;
+				const baselineRatio = clamp(((baseline - top) / range), 0, 1);
 
-			if (baseLevelCoordinate != null) {
-				const baselinePercent = clamp(baseLevelCoordinate * scope.verticalPixelRatio / bottom, 0, 1);
-				gradient.addColorStop(baselinePercent, topColor2);
-				gradient.addColorStop(baselinePercent, bottomColor1);
+				gradient.addColorStop(baselineRatio, topColor2);
+				gradient.addColorStop(baselineRatio, bottomColor1);
 			}
-
 			gradient.addColorStop(1, bottomColor2);
 
 			this._cachedValue = gradient;

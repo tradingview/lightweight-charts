@@ -21,7 +21,8 @@ export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData>
 				topColor2: '',
 				bottomColor1: '',
 				bottomColor2: item.bottomColor,
-				bottom: renderingScope.bitmapSize.height as Coordinate,
+				topCoordinate: 0 as Coordinate,
+				bottomCoordinate: renderingScope.bitmapSize.height as Coordinate,
 			}
 		);
 	}

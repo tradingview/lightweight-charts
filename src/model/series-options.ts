@@ -375,7 +375,13 @@ export interface BaselineStyleOptions {
 	 * @defaultValue `{ type: 'price', price: 0 }`
 	 */
 	baseValue: BaseValueType;
-
+	/**
+	 * Gradient is relative to the base value and the currently visible range.
+	 * If it is false, the gradient is relative to the top and bottom of the chart.
+	 *
+	 * @defaultValue `false`
+	 */
+	relativeGradient: boolean;
 	/**
 	 * The first color of the top area.
 	 *
