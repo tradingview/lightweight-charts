@@ -231,6 +231,7 @@ export class SeriesApi<
 		this._series.detachPrimitive(primitive as ISeriesPrimitiveBase<unknown>);
 		if (primitive.detached) {
 			primitive.detached();
+			this._series.model().fullUpdate();
 		}
 	}
 
