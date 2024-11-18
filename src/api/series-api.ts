@@ -210,6 +210,10 @@ export class SeriesApi<
 		this._series.removePriceLine((line as PriceLine).priceLine());
 	}
 
+	public priceLines(): IPriceLine[] {
+		return this._series.priceLines();
+	}
+
 	public seriesType(): TSeriesType {
 		return this._series.seriesType();
 	}

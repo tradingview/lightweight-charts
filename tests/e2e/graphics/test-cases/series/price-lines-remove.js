@@ -18,11 +18,12 @@ function runTestCase(container) {
 	const series = chart.addSeries(LightweightCharts.LineSeries);
 	series.setData(generateData());
 
-	const line1 = series.createPriceLine({ price: 10 });
-	const line2 = series.createPriceLine({ price: 20 });
+	series.createPriceLine({ price: 10 });
+	series.createPriceLine({ price: 20 });
 
 	return new Promise(resolve => {
 		setTimeout(() => {
+			const [line1, line2] = series.priceLines();
 			series.removePriceLine(line2);
 			series.removePriceLine(line1);
 			resolve();
