@@ -131,6 +131,7 @@
     "size-limit": "size-limit",
     "verify": "npm-run-all clean -p build:prod check-markdown-links -p lint check-dts-docs tsc-verify test size-limit -p type-tests",
     "test": "mocha tests/unittests/**/*.spec.ts",
-    "type-tests": "tsc -p ./tests/type-checks/tsconfig.composite.json --noEmit"
+    "type-tests": "tsc -p ./tests/type-checks/tsconfig.composite.json --noEmit",
+    "playground": "./playground/run.sh"
   }
 }

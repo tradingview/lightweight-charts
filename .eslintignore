@@ -16,4 +16,5 @@
 /website/src/theme/**/*.js
 
 /plugin-examples
+/playground
 /packages/create-lwc-plugin
