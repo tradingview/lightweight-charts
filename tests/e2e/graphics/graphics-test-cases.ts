@@ -180,6 +180,10 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 					).to.equal(true);
 				}
 
+				if (process.env.KEEP_OUT_DIR) {
+					return;
+				}
+
 				rmRf(testCaseOutDir);
 			});
 		});
