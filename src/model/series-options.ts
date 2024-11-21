@@ -252,6 +252,14 @@ export interface AreaStyleOptions {
 	bottomColor: string;
 
 	/**
+	 * Gradient is relative to the base value and the currently visible range.
+	 * If it is false, the gradient is relative to the top and bottom of the chart.
+	 *
+	 * @defaultValue `false`
+	 */
+	relativeGradient: boolean;
+
+	/**
 	 * Invert the filled area. Fills the area above the line if set to true.
 	 *
 	 * @defaultValue `false`

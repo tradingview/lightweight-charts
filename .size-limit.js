@@ -79,7 +79,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ BaselineSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '3.3 KB',
+		limit: '4.00 KB',
 		brotli: true,
 	},
 	{
@@ -87,7 +87,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ AreaSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '3.2 KB',
+		limit: '4.00 KB',
 		brotli: true,
 	},
 	{
