@@ -9,6 +9,12 @@ function interactionsToPerform() {
 	];
 }
 
+async function awaitNewFrame() {
+	return new Promise(resolve => {
+		requestAnimationFrame(resolve);
+	});
+}
+
 let chart;
 
 function beforeInteractions(container) {
@@ -28,10 +34,25 @@ function beforeInteractions(container) {
 	});
 }
 
-function afterInteractions() {
+async function afterInteractions() {
 	chart.timeScale().applyOptions({
 		minBarSpacing: 12,
 	});
+
+	await awaitNewFrame();
+
+	chart.timeScale().applyOptions({
+		minBarSpacing: 12,
+		maxBarSpacing: 24,
+	});
+
+	await awaitNewFrame();
+
+	chart.timeScale().applyOptions({
+		minBarSpacing: 2,
+		maxBarSpacing: 1,
+	});
+
 	return new Promise(resolve => {
 		requestAnimationFrame(resolve);
 	});
