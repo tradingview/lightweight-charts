@@ -90,7 +90,6 @@ function afterInitialInteractions() {
 
 function afterFinalInteractions() {
 	const pass = lastHoveredObjectId === 'TEST';
-	// throw new Error(`Expected hoveredObjectId to be equal to 'TEST'. Actual: ${markerX} = ${markerY}`);
 	if (!pass) {
 		throw new Error("Expected hoveredObjectId to be equal to 'TEST'.");
 	}
