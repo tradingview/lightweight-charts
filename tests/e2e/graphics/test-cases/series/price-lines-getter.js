@@ -18,13 +18,26 @@ function runTestCase(container) {
 	const series = chart.addSeries(LightweightCharts.LineSeries);
 	series.setData(generateData());
 
-	const line1 = series.createPriceLine({ price: 10 });
-	const line2 = series.createPriceLine({ price: 20 });
+	series.createPriceLine({ price: 10 });
+	series.createPriceLine({ price: 20 });
+	series.createPriceLine({ price: 30 });
 
 	return new Promise(resolve => {
 		setTimeout(() => {
-			series.removePriceLine(line2);
+			const priceLines = series.priceLines();
+			const [line1, line2] = priceLines;
+
+			// remove line 3 from array, however line3 should still be visible on the chart
+			priceLines.splice(2, 1);
+
+			// still check it can be removed
 			series.removePriceLine(line1);
+
+			// modify line 2 returned from the getter
+			line2.applyOptions({
+				price: 15,
+				color: 'red',
+			});
 			resolve();
 		}, 1000);
 	});

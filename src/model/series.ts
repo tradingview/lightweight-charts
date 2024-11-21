@@ -273,7 +273,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	}
 
 	public priceLines(): CustomPriceLine[] {
-		return this._customPriceLines.slice();
+		return this._customPriceLines;
 	}
 
 	public seriesType(): T {

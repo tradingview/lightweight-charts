@@ -7,6 +7,7 @@ import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { CustomPriceLine } from '../model/custom-price-line';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
@@ -43,8 +44,8 @@ export class SeriesApi<
 	TOptions extends SeriesOptionsMap[TSeriesType] = SeriesOptionsMap[TSeriesType],
 	TPartialOptions extends SeriesPartialOptionsMap[TSeriesType] = SeriesPartialOptionsMap[TSeriesType]
 > implements
-		ISeriesApi<TSeriesType, HorzScaleItem, TData, TOptions, TPartialOptions>,
-		IDestroyable {
+	ISeriesApi<TSeriesType, HorzScaleItem, TData, TOptions, TPartialOptions>,
+	IDestroyable {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>;
 	protected readonly _chartApi: IChartApiBase<HorzScaleItem>;
@@ -211,7 +212,7 @@ export class SeriesApi<
 	}
 
 	public priceLines(): IPriceLine[] {
-		return this._series.priceLines();
+		return this._series.priceLines().map((priceLine: CustomPriceLine): IPriceLine => new PriceLine(priceLine));
 	}
 
 	public seriesType(): TSeriesType {
