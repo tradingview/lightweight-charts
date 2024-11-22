@@ -134,6 +134,14 @@ function runTestCase(container) {
 	]);
 
 	const rect = new Rectangle(chart, s1, { time: '2019-04-11', price: 70.01 }, { time: '2019-04-16', price: 90.01 });
-	s1.attachPrimitive(rect);
-	s1.detachPrimitive(rect);
+
+	return new Promise(resolve => {
+		requestAnimationFrame(() => {
+			s1.attachPrimitive(rect);
+			requestAnimationFrame(() => {
+				s1.detachPrimitive(rect);
+				requestAnimationFrame(resolve);
+			});
+		});
+	});
 }
