@@ -23,6 +23,7 @@ import { ColorType, LayoutOptions } from './layout-options';
 import { LocalizationOptions, LocalizationOptionsBase } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, MIN_PANE_HEIGHT, Pane } from './pane';
+import { hitTestPane } from './pane-hit-test';
 import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series } from './series';
@@ -508,12 +509,16 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public setHoveredSource(source: HoveredSource | null): void {
+		if (this._hoveredSource?.source === source?.source && this._hoveredSource?.object?.externalId === source?.object?.externalId) {
+			return;
+		}
 		const prevSource = this._hoveredSource;
 		this._hoveredSource = source;
 		if (prevSource !== null) {
 			this.updateSource(prevSource.source);
 		}
-		if (source !== null) {
+		// additional check to prevent unnecessary updates of same source
+		if (source !== null && source.source !== prevSource?.source) {
 			this.updateSource(source.source);
 		}
 	}
@@ -791,6 +796,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		this.cursorUpdate();
 		if (!skipEvent) {
+			this._updateHoveredSourceOnChange(pane, x, y);
 			this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y }, event);
 		}
 	}
@@ -1047,6 +1053,13 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	public colorParser(): ColorParser {
 		return this._colorParser;
+	}
+
+	private _updateHoveredSourceOnChange(pane: Pane, x: Coordinate, y: Coordinate): void {
+		if (pane) {
+			const hitTest = hitTestPane(pane, x, y);
+			this.setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+		}
 	}
 
 	private _getOrCreatePane(index: number): Pane {
