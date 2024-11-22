@@ -44,8 +44,7 @@ export class SeriesApi<
 	TOptions extends SeriesOptionsMap[TSeriesType] = SeriesOptionsMap[TSeriesType],
 	TPartialOptions extends SeriesPartialOptionsMap[TSeriesType] = SeriesPartialOptionsMap[TSeriesType]
 > implements
-	ISeriesApi<TSeriesType, HorzScaleItem, TData, TOptions, TPartialOptions>,
-	IDestroyable {
+	ISeriesApi<TSeriesType, HorzScaleItem, TData, TOptions, TPartialOptions>, IDestroyable {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>;
 	protected readonly _chartApi: IChartApiBase<HorzScaleItem>;
