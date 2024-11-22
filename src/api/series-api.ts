@@ -236,6 +236,7 @@ export class SeriesApi<
 		if (primitive.detached) {
 			primitive.detached();
 		}
+		this._series.model().fullUpdate();
 	}
 
 	public getPane(): IPaneApi<HorzScaleItem> {
