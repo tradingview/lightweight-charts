@@ -508,6 +508,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			});
 			this._drawCrosshair(topTarget);
 			this._drawSources(topTarget, sourceTopPaneViews);
+			this._drawSources(topTarget, sourceLabelPaneViews);
 		}
 	}
 
