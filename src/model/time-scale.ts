@@ -853,13 +853,9 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	private _correctBarSpacing(): void {
-		const minBarSpacing = this._minBarSpacing();
-		const maxBarSpacing = this._maxBarSpacing();
-		if (maxBarSpacing > 0 && this._barSpacing > maxBarSpacing) {
-			this._barSpacing = maxBarSpacing;
-			this._visibleRangeInvalidated = true;
-		} else if (this._barSpacing < minBarSpacing) {
-			this._barSpacing = minBarSpacing;
+		const barSpacing = clamp(this._barSpacing, this._minBarSpacing(), this._maxBarSpacing());
+		if (this._barSpacing !== barSpacing) {
+			this._barSpacing = barSpacing;
 			this._visibleRangeInvalidated = true;
 		}
 	}
@@ -867,7 +863,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	private _maxBarSpacing(): number {
 		if (this._options.maxBarSpacing > 0) {
 			// option takes precedance
-			return Math.max(this._minBarSpacing(), this._options.maxBarSpacing);
+			return this._options.maxBarSpacing;
 		} else {
 			// half of the width is default value for maximum bar spacing
 			return this._width * 0.5;

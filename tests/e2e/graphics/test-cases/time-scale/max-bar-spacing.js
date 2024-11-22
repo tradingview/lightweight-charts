@@ -32,7 +32,7 @@ function runTestCase(container) {
 		width: 500,
 	});
 
-	const mainSeries = chart.addBarSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.BarSeries);
 
 	const data = generateData(0);
 	mainSeries.setData(data);
