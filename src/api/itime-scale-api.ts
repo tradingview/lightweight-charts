@@ -79,7 +79,7 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 * @param range - Target visible logical range of data.
 	 * @example
 	 * ```js
-	 * chart.timeScale().setVisibleLogicalRange({ from: 0, to: Date.now() / 1000 });
+	 * chart.timeScale().setVisibleLogicalRange({ from: 0, to: 10 });
 	 * ```
 	 */
 	setVisibleLogicalRange(range: Range<number>): void;
