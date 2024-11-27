@@ -18,6 +18,7 @@ export class GradientStyleCache {
 	private _params?: GradientCacheParams;
 	private _cachedValue?: CanvasGradient;
 
+	// eslint-disable-next-line complexity
 	public get(scope: BitmapCoordinatesRenderingScope, params: GradientCacheParams): CanvasGradient {
 		const cachedParams = this._params;
 		const {
@@ -37,9 +38,10 @@ export class GradientStyleCache {
 			cachedParams.bottomCoordinate !== bottomCoordinate
 		) {
 			const { verticalPixelRatio } = scope;
-			const top = (topCoordinate) * verticalPixelRatio;
-			const bottom = (bottomCoordinate) * verticalPixelRatio;
-			const baseline = (baseLevelCoordinate ?? 0) * verticalPixelRatio;
+			const multiplier = baseLevelCoordinate || topCoordinate > 0 ? verticalPixelRatio : 1;
+			const top = topCoordinate * multiplier;
+			const bottom = bottomCoordinate === scope.bitmapSize.height ? bottomCoordinate : bottomCoordinate * multiplier;
+			const baseline = (baseLevelCoordinate ?? 0) * multiplier;
 			const gradient = scope.context.createLinearGradient(0, top, 0, bottom);
 
 			gradient.addColorStop(0, topColor1);
