@@ -8,6 +8,8 @@ import { GradientStyleCache } from './gradient-style-cache';
 
 export type BaselineFillItem = AreaFillItemBase & BaselineFillColorerStyle;
 export interface PaneRendererBaselineData extends PaneRendererAreaDataBase<BaselineFillItem> {
+	topCoordinate?: Coordinate;
+	bottomCoordinate?: Coordinate;
 }
 export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererBaselineData> {
 	private readonly _fillCache: GradientStyleCache = new GradientStyleCache();
@@ -23,8 +25,9 @@ export class PaneRendererBaselineArea extends PaneRendererAreaBase<PaneRendererB
 				topColor2: item.topFillColor2,
 				bottomColor1: item.bottomFillColor1,
 				bottomColor2: item.bottomFillColor2,
-				bottom: renderingScope.bitmapSize.height as Coordinate,
 				baseLevelCoordinate: data.baseLevelCoordinate,
+				topCoordinate: data.topCoordinate ?? 0 as Coordinate,
+				bottomCoordinate: data.bottomCoordinate ?? renderingScope.bitmapSize.height as Coordinate,
 			}
 		);
 	}

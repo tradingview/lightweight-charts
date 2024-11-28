@@ -12,7 +12,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 		type: 'price',
 		price: 0,
 	},
-
+	relativeGradient: false,
 	topFillColor1: 'rgba(38, 166, 154, 0.28)',
 	topFillColor2: 'rgba(38, 166, 154, 0.05)',
 	topLineColor: 'rgba(38, 166, 154, 1)',

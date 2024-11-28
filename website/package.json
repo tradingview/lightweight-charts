@@ -35,6 +35,6 @@
     "vue": "^3.4.29"
   },
   "devDependencies": {
-    "typedoc-plugin-frontmatter": "^1.0.0"
+    "typedoc-plugin-frontmatter": "1.0.0"
   }
 }

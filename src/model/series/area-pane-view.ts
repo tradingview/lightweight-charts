@@ -28,13 +28,28 @@ export class SeriesAreaPaneView extends LinePaneViewBase<'Area', AreaFillItem & 
 
 	protected _prepareRendererData(): void {
 		const options = this._series.options();
+		if (this._itemsVisibleRange === null || this._items.length === 0) {
+			return;
+		}
+		let topCoordinate;
 
+		if (options.relativeGradient) {
+			topCoordinate = this._items[this._itemsVisibleRange.from].y;
+
+			for (let i = this._itemsVisibleRange.from; i < this._itemsVisibleRange.to; i++) {
+				const item = this._items[i];
+				if (item.y < topCoordinate) {
+					topCoordinate = item.y;
+				}
+			}
+		}
 		this._areaRenderer.setData({
 			lineType: options.lineType,
 			items: this._items,
 			lineStyle: options.lineStyle,
 			lineWidth: options.lineWidth,
 			baseLevelCoordinate: null,
+			topCoordinate,
 			invertFilledArea: options.invertFilledArea,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
