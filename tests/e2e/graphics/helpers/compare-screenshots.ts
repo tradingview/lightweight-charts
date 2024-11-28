@@ -24,7 +24,7 @@ export function compareScreenshots(leftImg: PNG, rightImg: PNG): CompareResult {
 		leftImg.data, rightImg.data,
 		diffImg.data,
 		leftImg.width, leftImg.height,
-		{ threshold: 0.1 }
+		{ threshold: 0.01 }
 	);
 
 	return { diffPixelsCount, diffImg };
