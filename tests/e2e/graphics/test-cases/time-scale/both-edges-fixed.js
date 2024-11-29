@@ -22,10 +22,13 @@ function runTestCase(container) {
 		bottomColor: 'rgba(54, 204, 130, 0.48)',
 		lineColor: 'rgba(54, 204, 130, 1)',
 	});
+
 	return new Promise(resolve => {
 		requestAnimationFrame(() => {
-			mainSeries.setData(generateData);
-			requestAnimationFrame(resolve);
+			mainSeries.setData(generateData());
+			requestAnimationFrame(() => {
+				resolve();
+			});
 		});
 	});
 }
