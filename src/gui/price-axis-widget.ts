@@ -16,6 +16,7 @@ import { makeFont } from '../helpers/make-font';
 
 import { ChartOptionsInternalBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
+import { CrosshairMode } from '../model/crosshair';
 import { IDataSource, IDataSourcePaneViews } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
@@ -277,7 +278,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		const firstValue = this._priceScale.firstValue();
-		if (firstValue !== null && this._size !== null) {
+		if (firstValue !== null && this._size !== null && this._options.crosshair.mode !== CrosshairMode.Hidden) {
 			const topValue = this._priceScale.coordinateToPrice(1 as Coordinate, firstValue);
 			const bottomValue = this._priceScale.coordinateToPrice(this._size.height - 2 as Coordinate, firstValue);
 
