@@ -14,6 +14,18 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.2.2
+
+**Minor Improvements**
+
+- Improved price scale width calculation by not allocating space for crosshair labels when the crosshair is disabled. (PR [#1743](https://github.com/tradingview/lightweight-charts/issues/1743))
+
+**Bug Fixes**
+
+- Fixed calculations for `fixLeftEdge` and `fixRightEdge` on the first render when both are true and data is added to an initially empty chart. Fixes issue [#1356](https://github.com/tradingview/lightweight-charts/issues/1356). (PR [#1741](https://github.com/tradingview/lightweight-charts/issues/1741))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.1..v4.2.2).
+
 ## 4.2.1
 
 **Bug Fixes**
