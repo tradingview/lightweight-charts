@@ -62,6 +62,65 @@ const lineSeries = chart.addSeries(LightweightCharts.LineSeries, { color: 'red' 
 
 Note: Make sure to import the specific series type (e.g., `LineSeries`, `AreaSeries`) along with `createChart` when using ES Modules. For UMD builds, all series types are available under the `LightweightCharts` namespace.
 
+I'll help write a migration guide section for the series markers change from Lightweight Charts v4 to v5. Here's a suggested write-up:
+
+## Series Markers
+
+In v5, series markers have been moved to a separate primitive to optimize bundle size. If your application uses markers, you'll need to update your code to use the new syntax.
+
+### Before (v4)
+
+```javascript
+// Markers were directly managed through the series instance
+series.setMarkers([
+    {
+        time: '2019-04-09',
+        position: 'aboveBar',
+        color: 'black',
+        shape: 'arrowDown',
+    },
+]);
+
+// Getting markers
+const markers = series.markers();
+```
+
+### After (v5)
+
+```javascript
+// Import the markers primitive
+import { createSeriesMarkers } from 'lightweight-charts';
+
+// Create a markers primitive instance
+const seriesMarkers = createSeriesMarkers(series, [
+    {
+        time: '2019-04-09',
+        position: 'aboveBar',
+        color: 'black',
+        shape: 'arrowDown',
+    },
+]);
+
+// Getting markers
+const markers = seriesMarkers.markers();
+
+// Updating markers
+seriesMarkers.setMarkers([/* new markers */]);
+
+// Remove all markers
+seriesMarkers.setMarkers([]);
+```
+
+### Key Changes
+
+- You must now import `createSeriesMarkers` separately
+- Instead of calling methods directly on the series instance, create a markers primitive using `createSeriesMarkers`
+- The markers API is now accessed through the markers primitive instance
+- The marker configuration object format remains the same
+- This change results in smaller bundle sizes when markers aren't used
+
+If your application doesn't use markers, you can now benefit from a smaller bundle size as this functionality is no longer included in the core package.
+
 ## Watermarks
 
 ### Overview of Changes
