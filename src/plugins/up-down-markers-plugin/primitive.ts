@@ -1,6 +1,6 @@
 import { IChartApiBase } from '../../api/ichart-api';
 import { ISeriesApi } from '../../api/iseries-api';
-import { SeriesAttachedParameter } from '../../api/iseries-primitive-api';
+import { ISeriesPrimitive, SeriesAttachedParameter } from '../../api/iseries-primitive-api';
 
 import { ensureDefined } from '../../helpers/assertions';
 
@@ -23,29 +23,10 @@ function isLineData<T>(
 	return type === 'Line' || type === 'Area';
 }
 
-/**
- * UpDownMarkersPrimitive class for showing the direction of price changes on the chart.
- * This plugin can only be used with Line and Area series types.
- * 1. Manual control:
- *
- * - Use the `setMarkers` method to manually add markers to the chart.
- * This will replace any existing markers.
- * - Use `clearMarkers` to remove all markers.
- *
- * 2. Automatic updates:
- *
- * Use `setData` and `update` from this primitive instead of the those on the series to let the
- * primitive handle the creation of price change markers automatically.
- *
- * - Use `setData` to initialize or replace all data points.
- * - Use `update` to modify individual data points. This will automatically
- * create markers for price changes on existing data points.
- * - The `updateVisibilityDuration` option controls how long markers remain visible.
- */
 export class UpDownMarkersPrimitive<
 	HorzScaleItem,
 	TData extends SeriesDataItemTypeMap<HorzScaleItem>[UpDownMarkersSupportedSeriesTypes] = SeriesDataItemTypeMap<HorzScaleItem>['Line']
-> {
+> implements ISeriesPrimitive<HorzScaleItem> {
 	private _chart: IChartApiBase<HorzScaleItem> | undefined = undefined;
 	private _series: ISeriesApi<UpDownMarkersSupportedSeriesTypes, HorzScaleItem> | undefined =
 		undefined;
@@ -69,10 +50,6 @@ export class UpDownMarkersPrimitive<
 		};
 	}
 
-	/**
-     * Applies new options to the plugin.
-     * @param options - Partial options to apply.
-     */
 	public applyOptions(options: Partial<UpDownMarkersPluginOptions>): void {
 		this._options = {
 			...this._options,
@@ -81,10 +58,6 @@ export class UpDownMarkersPrimitive<
 		this.requestUpdate();
 	}
 
-	/**
-     * Manually sets markers on the chart.
-     * @param markers - Array of SeriesUpDownMarker to set.
-     */
 	public setMarkers(markers: SeriesUpDownMarker<HorzScaleItem>[]): void {
 		this._markersManager.clearAllMarkers();
 		const horzBehaviour = this._horzScaleBehavior;
@@ -96,25 +69,14 @@ export class UpDownMarkersPrimitive<
 		});
 	}
 
-	/**
-     * Retrieves the current markers on the chart.
-     * @returns An array of SeriesUpDownMarker.
-     */
 	public markers(): readonly SeriesUpDownMarker<HorzScaleItem>[] {
 		return this._markersManager.getMarkers();
 	}
 
-	/**
-     * Requests an update of the chart.
-     */
 	public requestUpdate(): void {
 		this._requestUpdate?.();
 	}
 
-	/**
-     * Attaches the primitive to the chart and series.
-     * @param params - Parameters for attaching the primitive.
-     */
 	public attached(params: SeriesAttachedParameter<HorzScaleItem>): void {
 		const {
 			chart,
@@ -142,9 +104,6 @@ export class UpDownMarkersPrimitive<
 		this.requestUpdate();
 	}
 
-	/**
-     * Detaches the primitive from the chart and series.
-     */
 	public detached(): void {
 		this._chart = undefined;
 		this._series = undefined;
@@ -170,10 +129,6 @@ export class UpDownMarkersPrimitive<
 		return this._paneViews;
 	}
 
-	/**
-     * Sets the data for the series and manages data points for marker updates.
-     * @param data - Array of data points to set.
-     */
 	public setData(data: TData[]): void {
 		if (!this._series) {
 			throw new Error('Primitive not attached to series');
@@ -191,11 +146,6 @@ export class UpDownMarkersPrimitive<
 		ensureDefined(this._series).setData(data);
 	}
 
-	/**
-     * Updates a single data point and manages marker updates for existing data points.
-     * @param data - The data point to update.
-     * @param historicalUpdate - Optional flag for historical updates.
-     */
 	public update(data: TData, historicalUpdate?: boolean): void {
 		if (!this._series || !this._horzScaleBehavior) {
 			throw new Error('Primitive not attached to series');
@@ -222,9 +172,6 @@ export class UpDownMarkersPrimitive<
 		ensureDefined(this._series).update(data, historicalUpdate);
 	}
 
-	/**
-     * Clears all markers from the chart.
-     */
 	public clearMarkers(): void {
 		this._markersManager.clearAllMarkers();
 	}

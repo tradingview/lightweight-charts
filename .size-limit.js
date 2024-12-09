@@ -133,7 +133,7 @@ export default [
 	{
 		name: 'Plugin: UpDownMarkersPrimitive',
 		path: 'dist/lightweight-charts.production.mjs',
-		import: '{ UpDownMarkersPrimitive }',
+		import: '{ createUpDownMarkers }',
 		ignore: ['fancy-canvas'],
 		limit: '2.50 KB',
 	},

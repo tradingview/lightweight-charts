@@ -70,13 +70,11 @@ function beforeInteractions(container) {
 
 	mainSeries.setData(simpleData());
 
-	const imageWatermark = new LightweightCharts.ImageWatermark(imageDataUrl, {
+	const pane = chart.panes()[0];
+	LightweightCharts.createImageWatermark(pane, imageDataUrl, {
 		alpha: 0.5,
 		padding: 20,
 	});
-
-	const pane = chart.panes()[0];
-	pane.attachPrimitive(imageWatermark);
 
 	return Promise.resolve();
 }

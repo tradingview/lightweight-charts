@@ -70,8 +70,7 @@ const series1 = chart.addSeries(LineSeries, {
 	pointMarkersVisible: true,
 	lineWidth: 2,
 });
-const priceChangeMarkers = new UpDownMarkersPrimitive();
-series1.attachPrimitive(priceChangeMarkers);
+const priceChangeMarkers = createUpDownMarkers(series1);
 priceChangeMarkers.setData(curve1);
 
 const series2 = chart.addSeries(LineSeries, {

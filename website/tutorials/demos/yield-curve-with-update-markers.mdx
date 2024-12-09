@@ -15,7 +15,7 @@ keywords:
 This sample demonstrates how to create a yield curve chart with real-time
 updates using Lightweight Charts™. The chart displays two
 [yield curves](/docs/next/chart-types#yield-curve-chart) and utilizes the
-[UpDownMarkersPrimitive](/docs/next/api/classes/UpDownMarkersPrimitive) plugin
+[UpDownMarkersPrimitive](/docs/next/api/classes/createUpDownMarkers) plugin
 to show price change markers for updates.
 
 The chart is initialized with historical yield curve data for two series. By
@@ -31,8 +31,8 @@ Key features of this demo:
 3. Usage of the UpDownMarkersPrimitive plugin for displaying update markers.
 4. Simulated real-time updates to demonstrate dynamic data handling.
 
-The UpDownMarkersPrimitive is attached to the first series using
-`series1.attachPrimitive(priceChangeMarkers)`. We then use
+The UpDownMarkersPrimitive is attached to the first series when created using
+`priceChangeMarkers = createUpDownMarkers(series1)`. We then use
 `priceChangeMarkers.setData(curve1)` to initialize the data and
 `priceChangeMarkers.update(...)` for subsequent updates. This approach allows
 the primitive to manage both the series data and the markers, providing a

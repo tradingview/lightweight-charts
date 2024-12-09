@@ -37,8 +37,7 @@ function beforeInteractions(container) {
 		pointMarkersVisible: true,
 	});
 
-	const primitive = new LightweightCharts.UpDownMarkersPrimitive();
-	series1.attachPrimitive(primitive);
+	const primitive = LightweightCharts.createUpDownMarkers(series1);
 	primitive.setData(curve1);
 
 	primitive.update({ time: 24, value: 4.3 }, true); // up

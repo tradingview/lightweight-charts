@@ -3,7 +3,7 @@ module.exports = {
 		document: false,
 		createChart: false,
 		createYieldCurveChart: false,
-		UpDownMarkersPrimitive: false,
+		createUpDownMarkers: false,
 		LineSeries: false,
 		AreaSeries: false,
 		BarSeries: false,
