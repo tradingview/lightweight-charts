@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { createChart, AreaSeries } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { DeltaTooltipPrimitive } from '../delta-tooltip';
 
@@ -22,7 +22,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	handleScroll: false,
 }));
 
-const areaSeries = chart.addAreaSeries({
+const areaSeries = chart.addSeries(AreaSeries, {
 	lineColor: 'rgb(40,98,255)',
 	topColor: 'rgba(40,98,255, 0.4)',
 	bottomColor: 'rgba(40,98,255, 0)',

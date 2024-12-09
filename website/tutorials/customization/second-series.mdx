@@ -39,11 +39,11 @@ const lineData = candleStickData.map(datapoint => ({
 
 ## Adding the area series and setting it's options
 
-We can add the area series as we did with the candlestick series by calling the `addAreaSeries()` method on the chart instance. We will pass the options for the series as the first argument to `addAreaSeries()` method instead of separately calling `applyOptions()` at a later stage.
+We can add the area series as we did with the candlestick series by calling the `addSeries(AreaSeries)` method on the chart instance. We will pass the options for the series as the second argument to `addSeries()` method instead of separately calling `applyOptions()` at a later stage.
 
 :::caution
 
-Make sure to add this code **before** the `addCandlestickSeries()` call already in the code because we want it to appear below the candlesticks (as explained in the next section).
+Make sure to add this code **before** the `addSeries(CandlestickSeries)` call already in the code because we want it to appear below the candlesticks (as explained in the next section).
 
 :::
 
@@ -58,7 +58,7 @@ const lineData = candleStickData.map(datapoint => ({
 // Add an area series to the chart,
 // Adding this before we add the candlestick chart
 // so that it will appear beneath the candlesticks
-const areaSeries = chart.addAreaSeries({
+const areaSeries = chart.addSeries(AreaSeries, {
     lastValueVisible: false, // hide the last value marker for this series
     crosshairMarkerVisible: false, // hide the crosshair marker for this series
     lineColor: 'transparent', // hide the line
@@ -70,7 +70,7 @@ areaSeries.setData(lineData);
 // highlight-end
 
 // Create the Main Series (Candlesticks)
-const mainSeries = chart.addCandlestickSeries();
+const mainSeries = chart.addSeries(CandlestickSeries);
 ```
 
 ## Visual stacking order of series

@@ -24,8 +24,8 @@ function generateColoredData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const areaSeries = chart.addAreaSeries();
-	const volumeSeries = chart.addHistogramSeries();
+	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries);
+	const volumeSeries = chart.addSeries(LightweightCharts.HistogramSeries);
 
 	areaSeries.setData(generateData());
 

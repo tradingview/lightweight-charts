@@ -4,6 +4,7 @@ export const timeScaleOptionsDefaults: HorzScaleOptions = {
 	rightOffset: 0,
 	barSpacing: 6,
 	minBarSpacing: 0.5,
+	maxBarSpacing: 0,
 	fixLeftEdge: false,
 	fixRightEdge: false,
 	lockVisibleTimeRangeOnResize: false,

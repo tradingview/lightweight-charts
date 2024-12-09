@@ -11,7 +11,7 @@ let seriesMarkerPrimitives;
 function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	const mainSeries = chart.addBaselineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.BaselineSeries);
 
 	const data = generateLineData();
 	mainSeries.setData(data);

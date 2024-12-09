@@ -26,7 +26,7 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 chart
-	.addLineSeries({
+	.addSeries(LineSeries, {
 		color: LINE_LINE_COLOR,
 		lineWidth: 2,
 	})
@@ -136,7 +136,7 @@ chart
 		// hide-end
 	]);
 
-const candlestickSeries = chart.addCandlestickSeries({
+const candlestickSeries = chart.addSeries(CandlestickSeries, {
 	// highlight-start
 	priceScaleId: 'left',
 	// highlight-end

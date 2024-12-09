@@ -107,7 +107,7 @@ class MyCustomPrimitive {
 const myCustomPrimitive = new MyCustomPrimitive();
 
 const chart = createChart(document.getElementById('container'));
-const lineSeries = chart.addLineSeries();
+const lineSeries = chart.addSeries(LineSeries);
 
 const data = [
     { time: 1642425322, value: 123 },

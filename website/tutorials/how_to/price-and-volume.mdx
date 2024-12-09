@@ -33,7 +33,7 @@ is controlled by setting the [`scaleMargins`](/docs/api/interfaces/PriceScaleOpt
 property on the price scale options associated with the series.
 
 ```js
-const volumeSeries = chart.addHistogramSeries({
+const volumeSeries = chart.addSeries(HistogramSeries, {
     priceFormat: {
         type: 'volume',
     },

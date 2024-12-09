@@ -24,7 +24,8 @@ To introduce an additional pane into a chart, specify `paneIndex` during series 
 Alternatively, you can invoke the [`moveToPane`](/docs/next/api/interfaces/ISeriesApi#movetopane) method on the series instance. Note that if the pane with specified index doesn't exist, it will be created.
 
 ```js
-const volumeSeries = chart.addHistogramSeries(
+const volumeSeries = chart.addSeries(
+    HistogramSeries,
     {
         priceFormat: {
             type: 'volume',

@@ -14,6 +14,11 @@ interface ChartProps {
 type IFrameWindow<TVersion extends keyof LightweightChartsApiTypeMap> = Window & {
 	createChart: LightweightChartsApiTypeMap[TVersion]['createChart'];
 	createChartEx: TVersion extends '4.1' | 'current' ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
+	LineSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['LineSeries'] : undefined;
+	AreaSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['AreaSeries'] : undefined;
+	CandlestickSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['CandlestickSeries'] : undefined;
+	BarSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['BarSeries'] : undefined;
+	HistogramSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['HistogramSeries'] : undefined;
 	run?: () => void;
 };
 
@@ -63,6 +68,21 @@ export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props:
 					Object.assign(iframeWindow, module); // Make ColorType, etc. available in the iframe
 					iframeWindow.createChart = createChart;
 					iframeWindow.createChartEx = createChartEx;
+
+					if (version === 'current') {
+						const typedModule = module as unknown as {
+							LineSeries: typeof iframeWindow.LineSeries;
+							AreaSeries: typeof iframeWindow.AreaSeries;
+							CandlestickSeries: typeof iframeWindow.CandlestickSeries;
+							BarSeries: typeof iframeWindow.BarSeries;
+							HistogramSeries: typeof iframeWindow.HistogramSeries;
+						};
+						iframeWindow.LineSeries = typedModule.LineSeries;
+						iframeWindow.AreaSeries = typedModule.AreaSeries;
+						iframeWindow.CandlestickSeries = typedModule.CandlestickSeries;
+						iframeWindow.BarSeries = typedModule.BarSeries;
+						iframeWindow.HistogramSeries = typedModule.HistogramSeries;
+					}
 					iframeWindow.run?.();
 				} catch (err: unknown) {
 					// eslint-disable-next-line no-console

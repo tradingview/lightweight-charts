@@ -1,7 +1,7 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const series = chart.addHistogramSeries({
+	const series = chart.addSeries(LightweightCharts.HistogramSeries, {
 		color: 'blue',
 	});
 

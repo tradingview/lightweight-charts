@@ -2,7 +2,6 @@ import { ceiledOdd } from '../../helpers/mathex';
 
 import { Coordinate } from '../../model/coordinate';
 
-import { hitTestSquare } from './series-markers-square';
 import { BitmapShapeItemCoordinates, shapeSize } from './utils';
 
 export function drawArrow(
@@ -46,6 +45,42 @@ export function hitTestArrow(
 	x: Coordinate,
 	y: Coordinate
 ): boolean {
-	// TODO: implement arrow hit test
-	return hitTestSquare(centerX, centerY, size, x, y);
+	const arrowSize = shapeSize('arrowUp', size);
+	const halfArrowSize = (arrowSize - 1) / 2;
+	const baseSize = ceiledOdd(size / 2);
+	const halfBaseSize = (baseSize - 1) / 2;
+
+	const triangleTolerance = 3;
+	const rectTolerance = 2;
+
+	const baseLeft = centerX - halfBaseSize - rectTolerance;
+	const baseRight = centerX + halfBaseSize + rectTolerance;
+	const baseTop = up ? centerY : centerY - halfArrowSize;
+	const baseBottom = up ? centerY + halfArrowSize : centerY;
+
+	if (x >= baseLeft && x <= baseRight &&
+		y >= baseTop - rectTolerance && y <= baseBottom + rectTolerance) {
+		return true;
+	}
+
+	const isInTriangleBounds = (): boolean => {
+		const headLeft = centerX - halfArrowSize - triangleTolerance;
+		const headRight = centerX + halfArrowSize + triangleTolerance;
+		const headTop = up ? centerY - halfArrowSize - triangleTolerance : centerY;
+		const headBottom = up ? centerY : centerY + halfArrowSize + triangleTolerance;
+
+		if (x < headLeft || x > headRight ||
+			y < headTop || y > headBottom) {
+			return false;
+		}
+
+		const dx = Math.abs(x - centerX);
+		const dy = up
+			? Math.abs(y - centerY) // up arrow
+			: Math.abs(y - centerY); // down arrow
+
+		return dy + triangleTolerance >= dx / 2;
+	};
+
+	return isInTriangleBounds();
 }

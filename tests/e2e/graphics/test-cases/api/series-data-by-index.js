@@ -92,7 +92,7 @@ function checkSeries(series, data, compareItemsFn) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const lineSeries = chart.addLineSeries();
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
 	checkSeries(
 		lineSeries,
 		[
@@ -108,7 +108,7 @@ function runTestCase(container) {
 
 	chart.removeSeries(lineSeries);
 
-	const candlestickSeries = chart.addCandlestickSeries();
+	const candlestickSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
 
 	checkSeries(
 		candlestickSeries,
@@ -118,7 +118,7 @@ function runTestCase(container) {
 
 	chart.removeSeries(candlestickSeries);
 
-	const areaSeries = chart.addAreaSeries();
+	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries);
 
 	checkSeries(
 		areaSeries,
@@ -135,7 +135,7 @@ function runTestCase(container) {
 
 	chart.removeSeries(areaSeries);
 
-	const baselineSeries = chart.addBaselineSeries();
+	const baselineSeries = chart.addSeries(LightweightCharts.BaselineSeries);
 
 	checkSeries(
 		baselineSeries,

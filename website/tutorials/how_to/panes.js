@@ -21,14 +21,14 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-const areaSeries = chart.addAreaSeries({
+const areaSeries = chart.addSeries(AreaSeries, {
 	topColor: AREA_TOP_COLOR,
 	bottomColor: AREA_BOTTOM_COLOR,
 	lineColor: LINE_LINE_COLOR,
 	lineWidth: 2,
 });
 
-const candlestickSeries = chart.addCandlestickSeries({
+const candlestickSeries = chart.addSeries(CandlestickSeries, {
 	upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
 	wickUpColor: '#26a69a', wickDownColor: '#ef5350',
 	// we are setting pane index 1 for this series

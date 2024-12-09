@@ -1,9 +1,8 @@
 import { BarPrice } from '../../model/bar';
 import { ISeriesBarColorer } from '../../model/series-bar-colorer';
+import { LinePaneViewBase } from '../../model/series/line-pane-view-base';
 import { TimePointIndex } from '../../model/time-data';
 import { LineStrokeItem, PaneRendererLine, PaneRendererLineData } from '../../renderers/line-renderer';
-
-import { LinePaneViewBase } from './line-pane-view-base';
 
 export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineStrokeItem, PaneRendererLine> {
 	protected readonly _renderer: PaneRendererLine = new PaneRendererLine();

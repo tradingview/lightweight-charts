@@ -22,9 +22,9 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const lineSeries = chart.addLineSeries();
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
 	lineSeries.setData(generateData(1));
 
-	const histogramSeries = chart.addHistogramSeries();
+	const histogramSeries = chart.addSeries(LightweightCharts.HistogramSeries);
 	histogramSeries.setData(generateData(3));
 }

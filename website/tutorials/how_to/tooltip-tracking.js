@@ -42,7 +42,7 @@ chart.applyOptions({
 	},
 });
 
-const series = chart.addAreaSeries({
+const series = chart.addSeries(AreaSeries, {
 	topColor: BASELINE_TOP_FILL_COLOR1,
 	bottomColor: BASELINE_TOP_FILL_COLOR2,
 	lineColor: BASELINE_TOP_LINE_COLOR,

@@ -37,7 +37,7 @@ const chart1 = createChart(
 		},
 	}
 );
-const mainSeries1 = chart1.addLineSeries({
+const mainSeries1 = chart1.addSeries(LineSeries, {
 	color: 'red',
 });
 
@@ -55,7 +55,8 @@ const chart2 = createChart(
 		},
 	}
 );
-const mainSeries2 = chart2.addLineSeries({
+
+const mainSeries2 = chart2.addSeries(LineSeries, {
 	color: 'blue',
 });
 

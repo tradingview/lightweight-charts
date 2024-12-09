@@ -82,6 +82,15 @@ export interface HorzScaleOptions {
 	minBarSpacing: number;
 
 	/**
+	 * The maximum space between bars in pixels.
+	 *
+	 * Has no effect if value is set to `0`.
+	 *
+	 * @defaultValue `0`
+	 */
+	maxBarSpacing: number;
+
+	/**
 	 * Prevent scrolling to the left of the first bar.
 	 *
 	 * @defaultValue `false`
@@ -316,8 +325,8 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			this._model.setRightOffset(options.rightOffset);
 		}
 
-		if (options.minBarSpacing !== undefined) {
-			// yes, if we apply min bar spacing then we need to correct bar spacing
+		if (options.minBarSpacing !== undefined || options.maxBarSpacing !== undefined) {
+			// yes, if we apply bar spacing constrains then we need to correct bar spacing
 			// the easiest way is to apply it once again
 			this._model.setBarSpacing(options.barSpacing ?? this._barSpacing);
 		}
@@ -892,20 +901,20 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	private _correctBarSpacing(): void {
-		const minBarSpacing = this._minBarSpacing();
-
-		if (this._barSpacing < minBarSpacing) {
-			this._barSpacing = minBarSpacing;
+		const barSpacing = clamp(this._barSpacing, this._minBarSpacing(), this._maxBarSpacing());
+		if (this._barSpacing !== barSpacing) {
+			this._barSpacing = barSpacing;
 			this._visibleRangeInvalidated = true;
 		}
+	}
 
-		if (this._width !== 0) {
-			// make sure that this (1 / Constants.MinVisibleBarsCount) >= coeff in max bar spacing (it's 0.5 here)
-			const maxBarSpacing = this._width * 0.5;
-			if (this._barSpacing > maxBarSpacing) {
-				this._barSpacing = maxBarSpacing;
-				this._visibleRangeInvalidated = true;
-			}
+	private _maxBarSpacing(): number {
+		if (this._options.maxBarSpacing > 0) {
+			// option takes precedance
+			return this._options.maxBarSpacing;
+		} else {
+			// half of the width is default value for maximum bar spacing
+			return this._width * 0.5;
 		}
 	}
 

@@ -1,7 +1,7 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const line1 = chart.addLineSeries();
+	const line1 = chart.addSeries(LightweightCharts.LineSeries);
 	line1.setData([
 		{ time: '2017-04-11', value: 80.01 },
 		{ time: '2017-04-12', value: 96.63 },
@@ -18,7 +18,7 @@ function runTestCase(container) {
 		{ time: '2017-04-23', value: 81.89 },
 	]);
 
-	const line2 = chart.addLineSeries();
+	const line2 = chart.addSeries(LightweightCharts.LineSeries);
 	line2.setData([
 		{ time: '2018-04-11', value: 80.01 },
 		{ time: '2018-04-12', value: 96.63 },

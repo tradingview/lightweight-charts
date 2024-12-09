@@ -68,10 +68,10 @@ void describe(`Graphics tests with devicePixelRatio=${devicePixelRatioStr} (${bu
 		const currentGroupOutDir = path.join(currentDprOutDir, groupName);
 
 		if (groupName.length === 0) {
-			registerTestCases(testCases[groupName], screenshoter, currentGroupOutDir);
+			registerTestCases(testCases[groupName], screenshoter, currentGroupOutDir, groupName);
 		} else {
 			void describe(groupName, () => {
-				registerTestCases(testCases[groupName], screenshoter, currentGroupOutDir);
+				registerTestCases(testCases[groupName], screenshoter, currentGroupOutDir, groupName);
 			});
 		}
 	}
@@ -82,7 +82,7 @@ void describe(`Graphics tests with devicePixelRatio=${devicePixelRatioStr} (${bu
 	});
 });
 
-function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, outDir: string): void {
+function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, outDir: string, groupName: string): void {
 	const attempts: Record<string, number> = {};
 	testCases.forEach((testCase: TestCase) => {
 		attempts[testCase.name] = 0;
@@ -108,7 +108,7 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 					if (goldenContentDir) {
 						try {
 							const content = fs.readFileSync(
-								path.join(goldenContentDir, testCase.name, 'test-content.html'),
+								path.join(goldenContentDir, groupName, testCase.name, 'test-content.html'),
 								{ encoding: 'utf-8' }
 							);
 							return content.replace('PATH_TO_STANDALONE_MODULE', goldenStandalonePath);
@@ -178,6 +178,10 @@ function registerTestCases(testCases: TestCase[], screenshoter: Screenshoter, ou
 						false,
 						`The error(s) happened while generating a screenshot for the page(s): ${failedPages.join(', ')}. See ${testCaseOutDir} directory for an output of the test case.`
 					).to.equal(true);
+				}
+
+				if (process.env.KEEP_OUT_DIR) {
+					return;
 				}
 
 				rmRf(testCaseOutDir);

@@ -42,7 +42,7 @@ function generateData(valueOffset) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const firstSeries = chart.addBaselineSeries({
+	const firstSeries = chart.addSeries(LightweightCharts.BaselineSeries, {
 		baseValue: {
 			type: 'price',
 			price: 0,
@@ -51,7 +51,7 @@ function runTestCase(container) {
 
 	firstSeries.setData(generateData(0));
 
-	const secondSeries = chart.addBaselineSeries({
+	const secondSeries = chart.addSeries(LightweightCharts.BaselineSeries, {
 		baseValue: {
 			type: 'price',
 			price: 100,

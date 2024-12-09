@@ -1,17 +1,17 @@
 import { undefinedIfNull } from '../../helpers/strict-type-checks';
 
-import { BarPrice } from '../../model/bar';
-import { IChartModelBase } from '../../model/chart-model';
-import { Coordinate } from '../../model/coordinate';
-import { PlotRowValueIndex } from '../../model/plot-data';
-import { PricedValue, PriceScale } from '../../model/price-scale';
-import { ISeries } from '../../model/series';
-import { ISeriesBarColorer } from '../../model/series-bar-colorer';
-import { SeriesPlotRow } from '../../model/series-data';
-import { TimedValue, TimePointIndex } from '../../model/time-data';
-import { ITimeScale } from '../../model/time-scale';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
+import { BarPrice } from '../bar';
+import { IChartModelBase } from '../chart-model';
+import { Coordinate } from '../coordinate';
+import { ISeries } from '../iseries';
+import { PlotRowValueIndex } from '../plot-data';
+import { PricedValue, PriceScale } from '../price-scale';
+import { ISeriesBarColorer } from '../series-bar-colorer';
+import { SeriesPlotRow } from '../series-data';
+import { TimedValue, TimePointIndex } from '../time-data';
+import { ITimeScale } from '../time-scale';
 import { SeriesPaneViewBase } from './series-pane-view-base';
 
 export abstract class LinePaneViewBase<

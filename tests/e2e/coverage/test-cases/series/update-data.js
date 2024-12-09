@@ -18,7 +18,7 @@ let lastTime;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	lineSeries = chart.addLineSeries({
+	lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.Continuous,
 	});
 
@@ -26,7 +26,7 @@ function beforeInteractions(container) {
 	lastTime = new Date(lineData[lineData.length - 1].time);
 	lineSeries.setData(lineData);
 
-	leftSeries = chart.addCandlestickSeries({
+	leftSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
 		priceScaleId: 'left',
 		lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.OnDataUpdate,
 	});

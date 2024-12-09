@@ -11,7 +11,7 @@ let mainSeries;
 function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	mainSeries = chart.addLineSeries({
+	mainSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		priceFormat: {
 			type: 'custom',
 			minMove: 0.02,
@@ -21,7 +21,7 @@ function beforeInteractions(container) {
 
 	mainSeries.setData(generateLineData());
 
-	const overlaySeries = chart.addAreaSeries({
+	const overlaySeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		priceScaleId: 'overlay-id',
 		priceFormat: {
 			type: 'volume',

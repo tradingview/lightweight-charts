@@ -20,7 +20,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addAreaSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries);
 
 	mainSeries.setData(generateData());
 }
