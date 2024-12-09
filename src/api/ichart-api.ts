@@ -4,6 +4,7 @@ import { ChartOptionsImpl } from '../model/chart-model';
 import { BarData, HistogramData, LineData, WhitespaceData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
+import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Point } from '../model/point';
 import {
 	CustomSeriesOptions,
@@ -338,4 +339,9 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @returns Dimensions of the chart pane
 	 */
 	paneSize(paneIndex?: number): PaneSize;
+
+	/**
+	 * Returns the horizontal scale behaviour.
+	 */
+	horzBehaviour(): IHorzScaleBehavior<HorzScaleItem>;
 }

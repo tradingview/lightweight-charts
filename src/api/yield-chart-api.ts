@@ -106,7 +106,7 @@ export class YieldChartApi extends ChartApi<number> implements IYieldCurveChartA
 	}
 
 	private _initWhitespaceSeries(): void {
-		const horzBehaviour = this._horzScaleBehavior as YieldCurveHorzScaleBehavior;
+		const horzBehaviour = this.horzBehaviour() as YieldCurveHorzScaleBehavior;
 		const whiteSpaceSeries = this.addSeries(lineSeries);
 
 		let currentWhitespaceHash: string;

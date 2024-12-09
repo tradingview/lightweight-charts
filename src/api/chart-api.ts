@@ -337,6 +337,10 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._chartWidget.model().clearCurrentPosition(true);
 	}
 
+	public horzBehaviour(): IHorzScaleBehavior<HorzScaleItem> {
+		return this._horzScaleBehavior;
+	}
+
 	private _addSeriesImpl<
 		TSeries extends SeriesType,
 		TData extends WhitespaceData<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[TSeries],
