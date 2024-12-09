@@ -5,14 +5,18 @@ const chart = createChart('anything');
 const mainSeries = chart.addSeries(LineSeries);
 mainSeries.setData([]);
 
-createImageWatermark(chart.panes()[0], '/debug/image.svg', {
+const imageWatermark = createImageWatermark(chart.panes()[0], '/debug/image.svg', {
 	alpha: 0.5,
 	padding: 50,
 	maxHeight: 400,
 	maxWidth: 400,
 });
 
-createTextWatermark(chart.panes()[1], {
+imageWatermark.applyOptions({
+	alpha: 0.75,
+});
+
+const watermarkPlugin = createTextWatermark(chart.panes()[1], {
 	horzAlign: 'center',
 	vertAlign: 'center',
 	lines: [
@@ -23,4 +27,8 @@ createTextWatermark(chart.panes()[1], {
 			fontStyle: 'bold',
 		},
 	],
+});
+
+watermarkPlugin.applyOptions({
+	horzAlign: 'left',
 });

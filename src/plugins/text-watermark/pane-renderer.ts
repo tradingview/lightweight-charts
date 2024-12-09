@@ -29,6 +29,9 @@ export class TextWatermarkRenderer implements IPrimitivePaneRenderer {
 
 	public draw(target: CanvasRenderingTarget2D): void {
 		target.useMediaCoordinateSpace((scope: MediaCoordinatesRenderingScope) => {
+			if (!this._data.visible) {
+				return;
+			}
 			const { context: ctx, mediaSize } = scope;
 
 			let textHeight = 0;

@@ -23,6 +23,7 @@ type UseDocsPreferredVersion = Omit<
 	'preferredVersion'
 > & {
 	preferredVersion: (PropVersionMetadata & { name: string }) | null;
+	savePreferredVersionName: (version: string) => void;
 };
 
 export default function VersionWarningAdmonition({

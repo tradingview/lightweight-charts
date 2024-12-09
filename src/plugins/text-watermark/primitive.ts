@@ -10,6 +10,7 @@ import { IPanePrimitivePaneView } from '../../model/ipane-primitive';
 
 import { IPanePrimitiveWithOptions, IPanePrimitiveWrapper, PanePrimitiveWrapper } from '../pane-primitive-wrapper';
 import { IPrimitiveWithOptions } from '../primitive-wrapper-base';
+import { PrimitiveHasApplyOptions } from '../types';
 import {
 	TextWatermarkLineOptions,
 	textWatermarkLineOptionsDefaults,
@@ -73,7 +74,7 @@ class TextWatermark<T> implements IPanePrimitive<T>, IPrimitiveWithOptions<TextW
 	}
 }
 
-export type ITextWatermarkPluginApi<T> = IPanePrimitiveWrapper<T, TextWatermarkOptions>;
+export type ITextWatermarkPluginApi<T> = PrimitiveHasApplyOptions<IPanePrimitiveWrapper<T, TextWatermarkOptions>>;
 
 /**
  * Creates an image watermark.

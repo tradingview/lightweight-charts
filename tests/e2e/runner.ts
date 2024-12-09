@@ -57,7 +57,7 @@ export async function runTests(
 		concurrency: 1,
 	});
 
-	testStream.compose<Spec>(spec).pipe(process.stdout);
+	testStream.compose<NodeJS.ReadableStream>(spec).pipe(process.stdout);
 
 	const summary: string[] = [];
 
