@@ -25,7 +25,7 @@ This chart type uses time values for the horizontal scale and is ideal for most 
 import CodeBlock from '@theme/CodeBlock';
 export const timeBasedExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
-const areaSeries = chart.addAreaSeries({ lineColor: LINE_LINE_COLOR, topColor: AREA_TOP_COLOR, bottomColor: AREA_BOTTOM_COLOR });
+const areaSeries = chart.addSeries(AreaSeries, { lineColor: LINE_LINE_COLOR, topColor: AREA_TOP_COLOR, bottomColor: AREA_BOTTOM_COLOR });
 
 const data = [{ value: 0, time: 1642425322 }, { value: 8, time: 1642511722 }, { value: 10, time: 1642598122 }, { value: 20, time: 1642684522 }, { value: 3, time: 1642770922 }, { value: 43, time: 1642857322 }, { value: 41, time: 1642943722 }, { value: 43, time: 1643030122 }, { value: 56, time: 1643116522 }, { value: 46, time: 1643202922 }];
 
@@ -60,7 +60,7 @@ export const yieldCurveExample = `const chartOptions = {
 };
 
 const chart = createYieldCurveChart(document.getElementById('container'), chartOptions);
-const lineSeries = chart.addLineSeries({ color: LINE_LINE_COLOR });
+const lineSeries = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
 
 const curve = [{ time: 1, value: 5.378 }, { time: 2, value: 5.372 }, { time: 3, value: 5.271 }, { time: 6, value: 5.094 }, { time: 12, value: 4.739 }, { time: 24, value: 4.237 }, { time: 36, value: 4.036 }, { time: 60, value: 3.887 }, { time: 84, value: 3.921 }, { time: 120, value: 4.007 }, { time: 240, value: 4.366 }, { time: 360, value: 4.290 }];
 
@@ -91,7 +91,7 @@ export const optionsExample = `const chartOptions = {
 };
 
 const chart = createOptionsChart(document.getElementById('container'), chartOptions);
-const lineSeries = chart.addLineSeries({ color: LINE_LINE_COLOR });
+const lineSeries = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
 
 const data = [];
 for (let i = 0; i < 1000; i++) {

@@ -125,9 +125,6 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	/**
 	 * Creates a series with specified parameters.
 	 *
-	 * A custom series is a generic series which can be extended with a custom renderer to
-	 * implement chart types which the library doesn't support by default.
-	 *
 	 * @param definition - A series definition.
 	 * @param customOptions - Customization parameters of the series being created.
 	 * @param paneIndex - An index of the pane where the series should be created.

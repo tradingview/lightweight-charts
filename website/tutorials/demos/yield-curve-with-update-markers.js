@@ -60,7 +60,7 @@ const chartOptions = {
 const container = document.getElementById('container');
 const chart = createYieldCurveChart(container, chartOptions);
 
-const series1 = chart.addLineSeries({
+const series1 = chart.addSeries(LineSeries, {
 	lineType: 2,
 	color: '#26c6da',
 	pointMarkersVisible: true,
@@ -70,7 +70,7 @@ const priceChangeMarkers = new UpDownMarkersPrimitive();
 series1.attachPrimitive(priceChangeMarkers);
 priceChangeMarkers.setData(curve1);
 
-const series2 = chart.addLineSeries({
+const series2 = chart.addSeries(LineSeries, {
 	lineType: 2,
 	color: 'rgb(164, 89, 209)',
 	pointMarkersVisible: true,

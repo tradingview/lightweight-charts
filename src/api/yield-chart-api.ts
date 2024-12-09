@@ -1,13 +1,15 @@
 import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
-import { AreaData, LineData, WhitespaceData } from '../model/data-consumer';
+import { LineData, WhitespaceData } from '../model/data-consumer';
 import {
-	AreaSeriesOptions,
 	AreaStyleOptions,
-	LineSeriesOptions,
 	LineStyleOptions,
 	SeriesOptionsCommon,
+	SeriesPartialOptionsMap,
+	SeriesType,
 } from '../model/series-options';
+import { lineSeries } from '../model/series/line-series';
+import { SeriesDefinition } from '../model/series/series-def';
 import { YieldCurveChartOptions, YieldCurveOptions } from '../model/yield-curve-horz-scale-behavior/yield-curve-chart-options';
 import { YieldCurveHorzScaleBehavior } from '../model/yield-curve-horz-scale-behavior/yield-curve-horz-scale-behavior';
 
@@ -88,25 +90,24 @@ export class YieldChartApi extends ChartApi<number> implements IYieldCurveChartA
 		this._initWhitespaceSeries();
 	}
 
-	public override addLineSeries(options?: DeepPartial<LineStyleOptions & SeriesOptionsCommon> | undefined, paneIndex?: number | undefined): ISeriesApi<'Line', number, WhitespaceData<number> | LineData<number>, LineSeriesOptions, DeepPartial<LineStyleOptions & SeriesOptionsCommon>> {
+	public override addSeries<T extends SeriesType>(
+		definition: SeriesDefinition<T>,
+		options: SeriesPartialOptionsMap[T] = {},
+		paneIndex: number = 0
+	): ISeriesApi<T, number, WhitespaceData<number> | LineData<number>> {
+		if (definition.isBuiltIn && ['Area', 'Line'].includes(definition.type) === false) {
+			throw new Error('Yield curve only support Area and Line series');
+		}
 		const optionOverrides = {
 			...lineStyleDefaultOptionOverrides,
 			...options,
 		};
-		return super.addLineSeries(optionOverrides, paneIndex);
-	}
-
-	public override addAreaSeries(options?: DeepPartial<AreaStyleOptions & SeriesOptionsCommon> | undefined, paneIndex?: number | undefined): ISeriesApi<'Area', number, AreaData<number> | WhitespaceData<number>, AreaSeriesOptions, DeepPartial<AreaStyleOptions & SeriesOptionsCommon>> {
-		const optionOverrides = {
-			...lineStyleDefaultOptionOverrides,
-			...options,
-		};
-		return super.addAreaSeries(optionOverrides, paneIndex);
+		return super.addSeries(definition, optionOverrides, paneIndex);
 	}
 
 	private _initWhitespaceSeries(): void {
 		const horzBehaviour = this._horzScaleBehavior as YieldCurveHorzScaleBehavior;
-		const whiteSpaceSeries = this.addLineSeries();
+		const whiteSpaceSeries = this.addSeries(lineSeries);
 
 		let currentWhitespaceHash: string;
 		function updateWhitespace(lastIndex: number): void {
