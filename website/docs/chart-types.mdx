@@ -53,6 +53,12 @@ const chart = createYieldCurveChart(document.getElementById('container'), option
 
 Use this chart type when you need to visualize yield curves or similar financial data where the horizontal scale represents time durations rather than specific dates.
 
+:::tip
+
+If you want to spread out the beginning of the plot further and don't need a linear time scale, you can enforce a minimum spacing around each point by increasing the [`minBarSpacing`](api/interfaces/TimeScaleOptions.md#minbarspacing) option in the TimeScaleOptions. To prevent the rest of the chart from spreading too wide, adjust the `baseResolution` to a larger number, such as `12` (months).
+
+:::
+
 export const yieldCurveExample = `const chartOptions = {
     layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } },
     yieldCurve: { baseResolution: 1, minimumTimeRange: 10, startTimeRange: 3 },

@@ -36,12 +36,13 @@ const curve2 = [
 // hide-end
 
 const chartOptions = {
+	autoSize: true,
 	layout: {
 		textColor: CHART_TEXT_COLOR,
 		background: { type: 'solid', color: CHART_BACKGROUND_COLOR },
 	},
 	yieldCurve: {
-		baseResolution: 1,
+		baseResolution: 12,
 		minimumTimeRange: 10,
 		startTimeRange: 3,
 	},
@@ -54,6 +55,9 @@ const chartOptions = {
 		horzLines: {
 			visible: false,
 		},
+	},
+	timeScale: {
+		minBarSpacing: 3,
 	},
 };
 
