@@ -1,5 +1,5 @@
 // if using esm version (installed via npm):
-import { createChart } from 'lightweight-charts';
+import { createChart, LineSeries, AreaSeries, CandlestickSeries, BaselineSeries, HistogramSeries, BarSeries } from 'lightweight-charts';
 
 // If using standalone version (loaded via a script tag):
 // const { createChart } = LightweightCharts;
@@ -26,10 +26,22 @@ import { createChart } from 'lightweight-charts';
 			return ['type', 'autosize'];
 		}
 
-		// Helper function to get the series constructor name from a chart type
-		// eg. 'line' -> 'addLineSeries'
-		static getChartSeriesConstructorName(type) {
-			return `add${type.charAt(0).toUpperCase() + type.slice(1)}Series`;
+		static getChartSeriesDefinition(type) {
+			switch (type) {
+				case 'line':
+					return LineSeries;
+				case 'area':
+					return AreaSeries;
+				case 'candlestick':
+					return CandlestickSeries;
+				case 'baseline':
+					return BaselineSeries;
+				case 'bar':
+					return HistogramSeries;
+				case 'histogram':
+					return BarSeries;
+			}
+			throw new Error(`${type} is an unsupported series type`);
 		}
 
 		constructor() {
@@ -134,9 +146,7 @@ import { createChart } from 'lightweight-charts';
 				this.chart.removeSeries(this.series);
 			}
 			this.series =
-				this.chart[
-					LightweightChartWC.getChartSeriesConstructorName(this.type)
-				]();
+				this.chart.addSeries(LightweightChartWC.getChartSeriesDefinition(this.type));
 			this.series.setData(this.data);
 		}
 

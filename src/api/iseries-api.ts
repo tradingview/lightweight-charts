@@ -272,7 +272,7 @@ export interface ISeriesApi<
 	 * @returns Type of the series.
 	 * @example
 	 * ```js
-	 * const lineSeries = chart.addLineSeries();
+	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.seriesType()); // "Line"
 	 *
 	 * const candlestickSeries = chart.addCandlestickSeries();

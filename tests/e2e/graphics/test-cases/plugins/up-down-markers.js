@@ -30,7 +30,7 @@ function runTestCase(container) {
 		options
 	));
 
-	const series1 = chart.addLineSeries({
+	const series1 = chart.addSeries(LightweightCharts.LineSeries, {
 		lineType: 2,
 		color: 'black',
 		pointMarkersVisible: true,

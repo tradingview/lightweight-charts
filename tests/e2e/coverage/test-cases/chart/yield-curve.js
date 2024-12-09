@@ -53,13 +53,13 @@ async function waitNextFrame() {
 function beforeInteractions(container) {
 	chart = LightweightCharts.createYieldCurveChart(container, options);
 
-	const series1 = chart.addAreaSeries({
+	const series1 = chart.addSeries(LightweightCharts.AreaSeries, {
 		lineType: 2,
 		color: 'red',
 		pointMarkersVisible: true,
 	});
 	series1.setData(curve1);
-	const series2 = chart.addLineSeries({
+	const series2 = chart.addSeries(LightweightCharts.LineSeries, {
 		lineType: 2,
 		color: 'green',
 		pointMarkersVisible: true,

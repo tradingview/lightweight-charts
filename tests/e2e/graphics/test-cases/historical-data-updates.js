@@ -19,7 +19,7 @@ function runTestCase(container) {
 		},
 	}));
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	const data = generateData();
 	const thirdLastPoint = {

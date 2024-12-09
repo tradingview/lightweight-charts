@@ -4,7 +4,7 @@ function runTestCase(container) {
 		{ layout: { attributionLogo: false }, localization: { precision: 1 } }
 	));
 
-	const lineSeries = chart.addLineSeries({ color: 'blue' });
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, { color: 'blue' });
 
 	const data = [];
 	for (let i = 0; i < 1000; i++) {

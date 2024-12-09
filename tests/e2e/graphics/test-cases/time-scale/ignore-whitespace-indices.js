@@ -25,7 +25,7 @@ function runTestCase(container) {
 		},
 	}));
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	const data = generateWhiteSpaceData();
 	data[0].value = 50;
