@@ -33,7 +33,7 @@ export interface ISeriesPrimitiveWrapper<T, Options = unknown> {
 	applyOptions?: (options: DeepPartial<Options>) => void;
 }
 
-export class SeriesPrimitiveAdapter<T, Options = unknown, IPrimitive extends ISeriesPrimitiveWithOptions<T, Options> = ISeriesPrimitive<T>, TSeriesType extends SeriesType = SeriesType> implements ISeriesPrimitiveWrapper<T, Options> {
+export class SeriesPrimitiveAdapter<T, Options = unknown, IPrimitive extends ISeriesPrimitiveWithOptions<T, Options> = ISeriesPrimitiveWithOptions<T, Options>, TSeriesType extends SeriesType = SeriesType> implements ISeriesPrimitiveWrapper<T, Options> {
 	protected _primitive: IPrimitive;
 	protected _series: ISeriesApi<TSeriesType, T>;
 

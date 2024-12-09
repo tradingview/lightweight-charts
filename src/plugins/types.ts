@@ -18,3 +18,13 @@ export interface IPluginApiBase<Options extends DefaultOptionsType<string>> {
 	options(): Options;
 	applyOptions(options: Options | Partial<Options>): void;
 }
+
+/**
+ * Primitive has `applyOptions` as a method for adjusting the options after creation.
+ */
+export type PrimitiveHasApplyOptions<T extends {
+	/**
+	 * Method for applying options after the Primitive has been created.
+	 */
+	applyOptions?: unknown;
+}> = T & Required<Pick<T, 'applyOptions'>>;
