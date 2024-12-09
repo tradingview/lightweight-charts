@@ -82,7 +82,7 @@ or submit your own.
 
 A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
 
-import { useDocsSidebar } from "@docusaurus/theme-common/internal";
+import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
 export const HowToList = () => {
 	const examplesCategory = useDocsSidebar().items.find(
 		item => item.type === "category" && item.label === "How To"

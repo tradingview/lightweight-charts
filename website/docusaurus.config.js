@@ -180,6 +180,12 @@ const getConfig = async () => {
 		projectName: 'lightweight-charts',
 		trailingSlash: false,
 
+		future: {
+			// @ts-ignore experimental property name
+			// eslint-disable-next-line camelcase
+			experimental_faster: true,
+		},
+
 		headTags: [
 			{
 				tagName: 'link',
