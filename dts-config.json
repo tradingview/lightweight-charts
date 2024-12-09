@@ -9,7 +9,8 @@
 			"output": {
 				"sortNodes": true,
 				"respectPreserveConstEnum": true
-			}
+			},
+			"failOnClass": true
 		}
 	]
 }

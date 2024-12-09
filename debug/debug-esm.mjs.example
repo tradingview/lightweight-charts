@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import {
 	createChart,
+	LineSeries,
 } from '../dist/lightweight-charts.standalone.development.mjs';
 
 /** @type {HTMLDivElement | null} */
@@ -17,7 +18,7 @@ const chart = createChart(container, options);
 // @ts-ignore expose the chart api for easier debugging
 window.chart = chart;
 
-const mainSeries = chart.addLineSeries({
+const mainSeries = chart.addSeries(LineSeries, {
 	priceFormat: {
 		minMove: 1,
 		precision: 0,

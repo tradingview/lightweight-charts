@@ -6,19 +6,33 @@
  * chart colours as required.
  */
 import { defineCustomElement } from 'vue/dist/vue.esm-bundler';
-import { createChart, ColorType } from 'lightweight-charts';
+import { createChart, ColorType, LineSeries, AreaSeries, CandlestickSeries, BaselineSeries, HistogramSeries, BarSeries } from 'lightweight-charts';
 import { themeColors } from '../../../theme-colors';
 
 let series;
 let chart;
 
-function getChartSeriesConstructorName(type) {
-	return `add${type.charAt(0).toUpperCase() + type.slice(1)}Series`;
+function getChartSeriesDefinition(type) {
+	switch (type) {
+		case 'line':
+			return LineSeries;
+		case 'area':
+			return AreaSeries;
+		case 'candlestick':
+			return CandlestickSeries;
+		case 'baseline':
+			return BaselineSeries;
+		case 'bar':
+			return HistogramSeries;
+		case 'histogram':
+			return BarSeries;
+	}
+	throw new Error(`${type} is an unsupported series type`);
 }
 
 const addSeriesAndData = (type, seriesOptions, data) => {
-	const seriesConstructor = getChartSeriesConstructorName(type);
-	series = chart[seriesConstructor](seriesOptions);
+	const seriesDef = getChartSeriesDefinition(type);
+	series = chart.addSeries(seriesDef, seriesOptions);
 	series.setData(data);
 };
 
@@ -259,11 +273,11 @@ const VueExample = defineCustomElement({
             :chart-options="chartOptions"
             :series-options="seriesOptions"
             ref="lwChart"
-          />  
+          />
         </div>
         <button type="button" @click="changeColors">Set Random Colors</button>
         <button type="button" @click="changeType">Change Chart Type</button>
-        <button type="button" @click="changeData">Change Data</button>  
+        <button type="button" @click="changeData">Change Data</button>
         `,
 	styles: [
 		`
@@ -289,11 +303,11 @@ const VueExample = defineCustomElement({
       button:focus-visible {
         outline: 4px auto -webkit-focus-ring-color;
       }
-        
+
       .chart-container {
         height: var(--lwchart-height, 300px);
       }
-    
+
       .lw-chart {
         height: 100%;
       }

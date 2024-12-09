@@ -105,6 +105,8 @@ function toInternalOptions<HorzScaleItem>(options: DeepPartial<ChartOptionsImpl<
 export type IPriceScaleApiProvider<HorzScaleItem> = Pick<IChartApiBase<HorzScaleItem>, 'priceScale'>;
 
 export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, DataUpdatesConsumer<SeriesType, HorzScaleItem> {
+	protected readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
+
 	private _chartWidget: ChartWidget<HorzScaleItem>;
 	private _dataLayer: DataLayer<HorzScaleItem>;
 	private readonly _seriesMap: Map<SeriesApi<SeriesType, HorzScaleItem>, Series<SeriesType>> = new Map();
@@ -116,7 +118,6 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	private readonly _timeScaleApi: TimeScaleApi<HorzScaleItem>;
 	private readonly _panes: WeakMap<Pane, PaneApi<HorzScaleItem>> = new WeakMap();
-	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
 	public constructor(container: HTMLElement, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, options?: DeepPartial<ChartOptionsImpl<HorzScaleItem>>) {
 		this._dataLayer = new DataLayer<HorzScaleItem>(horzScaleBehavior);
@@ -230,8 +231,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._sendUpdateToChart(this._dataLayer.setSeriesData(series, data));
 	}
 
-	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void {
-		this._sendUpdateToChart(this._dataLayer.updateSeriesData(series, data));
+	public updateData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType], historicalUpdate: boolean): void {
+		this._sendUpdateToChart(this._dataLayer.updateSeriesData(series, data, historicalUpdate));
 	}
 
 	public subscribeClick(handler: MouseEventHandler<HorzScaleItem>): void {
@@ -336,6 +337,10 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._chartWidget.model().clearCurrentPosition(true);
 	}
 
+	public horzBehaviour(): IHorzScaleBehavior<HorzScaleItem> {
+		return this._horzScaleBehavior;
+	}
+
 	private _addSeriesImpl<
 		TSeries extends SeriesType,
 		TData extends WhitespaceData<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[TSeries],
@@ -371,6 +376,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
 		update.series.forEach((value: SeriesChanges, series: Series<SeriesType>) => series.setData(value.data, value.info));
 
+		model.timeScale().recalculateIndicesWithData();
 		model.recalculateAllPanes();
 	}
 

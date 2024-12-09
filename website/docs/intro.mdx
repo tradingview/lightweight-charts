@@ -101,7 +101,7 @@ const baselineSeries = chart.addSeries(BaselineSeries);
 // ... and so on
 ```
 
-Please look at [this page](/series-types.md) for more information about different series types.
+Please look at [this page](/series-types.mdx) for more information about different series types.
 
 Note that **a series cannot be transferred from one type to another one** since different series types have different data and options types.
 
@@ -115,8 +115,8 @@ Note that regardless of the series type, the API calls are the same (the type of
 
 To set the data (or to replace all data items) to a series you need to use [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) method:
 
-```js chart replaceThemeConstants
-const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+import CodeBlock from '@theme/CodeBlock';
+export const example = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
 const areaSeries = chart.addSeries(AreaSeries, {
     lineColor: LINE_LINE_COLOR, topColor: AREA_TOP_COLOR,
@@ -152,8 +152,9 @@ candlestickSeries.setData([
     { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
 ]);
 
-chart.timeScale().fitContent();
-```
+chart.timeScale().fitContent();`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{example}</CodeBlock>
 
 ### Updating the data in a series
 

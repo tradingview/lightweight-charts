@@ -42,8 +42,8 @@ If you'd like to change any option of a series, you could do this in different w
 
 An area chart is basically a colored area between the line connecting all data points and [the time scale](./time-scale.md):
 
-```js chart replaceThemeConstants
-const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+import CodeBlock from '@theme/CodeBlock';
+export const areaExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
 const areaSeries = chart.addSeries(AreaSeries, { lineColor: LINE_LINE_COLOR, topColor: AREA_TOP_COLOR, bottomColor: AREA_BOTTOM_COLOR });
 
@@ -52,7 +52,9 @@ const data = [{ value: 0, time: 1642425322 }, { value: 8, time: 1642511722 }, { 
 areaSeries.setData(data);
 
 chart.timeScale().fitContent();
-```
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{areaExample}</CodeBlock>
 
 ## Bar
 
@@ -65,8 +67,7 @@ A bar chart shows price movements in the form of bars.
 Vertical line length of a bar is limited by the highest and lowest price values.
 Open & Close values are represented by tick marks, on the left & right hand side of the bar respectively:
 
-```js chart replaceThemeConstants
-const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+export const barExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
 const barSeries = chart.addSeries(BarSeries, { upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR });
 
@@ -75,7 +76,9 @@ const data = [{ open: 10, high: 10.63, low: 9.49, close: 9.55, time: 1642427876 
 barSeries.setData(data);
 
 chart.timeScale().fitContent();
-```
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{barExample}</CodeBlock>
 
 ## Baseline
 
@@ -85,8 +88,7 @@ chart.timeScale().fitContent();
 
 A baseline is basically two colored areas (top and bottom) between the line connecting all data points and [the base value line](/api/interfaces/BaselineStyleOptions.md#basevalue):
 
-```js chart replaceThemeConstants
-const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+export const baselineExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
 const baselineSeries = chart.addSeries(BaselineSeries, { baseValue: { type: 'price', price: 25 }, topLineColor: BASELINE_TOP_LINE_COLOR, topFillColor1: BASELINE_TOP_FILL_COLOR1, topFillColor2: BASELINE_TOP_FILL_COLOR2, bottomLineColor: BASELINE_BOTTOM_LINE_COLOR, bottomFillColor1: BASELINE_BOTTOM_FILL_COLOR1, bottomFillColor2: BASELINE_BOTTOM_FILL_COLOR2 });
 
@@ -95,7 +97,9 @@ const data = [{ value: 1, time: 1642425322 }, { value: 8, time: 1642511722 }, { 
 baselineSeries.setData(data);
 
 chart.timeScale().fitContent();
-```
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{baselineExample}</CodeBlock>
 
 ## Candlestick
 
@@ -106,8 +110,7 @@ chart.timeScale().fitContent();
 A candlestick chart shows price movements in the form of candlesticks.
 On the candlestick chart, open & close values form a solid body of a candle while wicks show high & low values for a candlestick's time interval:
 
-```js chart replaceThemeConstants
-const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+export const candlestickExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
 const candlestickSeries = chart.addSeries(CandlestickSeries, { upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR, borderVisible: false, wickUpColor: BAR_UP_COLOR, wickDownColor: BAR_DOWN_COLOR });
 
@@ -116,7 +119,9 @@ const data = [{ open: 10, high: 10.63, low: 9.49, close: 9.55, time: 1642427876 
 candlestickSeries.setData(data);
 
 chart.timeScale().fitContent();
-```
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{candlestickExample}</CodeBlock>
 
 ## Histogram
 
@@ -127,8 +132,7 @@ chart.timeScale().fitContent();
 A histogram series is a graphical representation of the value distribution.
 Histogram creates intervals (columns) and counts how many values fall into each column:
 
-```js chart replaceThemeConstants
-const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+export const histogramExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
 const histogramSeries = chart.addSeries(HistogramSeries, { color: HISTOGRAM_COLOR });
 
@@ -137,7 +141,9 @@ const data = [{ value: 1, time: 1642425322 }, { value: 8, time: 1642511722 }, { 
 histogramSeries.setData(data);
 
 chart.timeScale().fitContent();
-```
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{histogramExample}</CodeBlock>
 
 ## Line
 
@@ -147,8 +153,7 @@ chart.timeScale().fitContent();
 
 A line chart is a type of chart that displays information as series of the data points connected by straight line segments:
 
-```js chart replaceThemeConstants
-const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+export const lineExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
 const lineSeries = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
 
@@ -157,7 +162,9 @@ const data = [{ value: 0, time: 1642425322 }, { value: 8, time: 1642511722 }, { 
 lineSeries.setData(data);
 
 chart.timeScale().fitContent();
-```
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{lineExample}</CodeBlock>
 
 ## Custom Series (Plugins)
 

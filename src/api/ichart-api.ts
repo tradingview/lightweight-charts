@@ -4,6 +4,7 @@ import { ChartOptionsImpl } from '../model/chart-model';
 import { BarData, HistogramData, LineData, WhitespaceData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
+import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Point } from '../model/point';
 import {
 	CustomSeriesOptions,
@@ -124,9 +125,6 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	): ISeriesApi<'Custom', HorzScaleItem, TData | WhitespaceData<HorzScaleItem>, TOptions, TPartialOptions>;
 	/**
 	 * Creates a series with specified parameters.
-	 *
-	 * A custom series is a generic series which can be extended with a custom renderer to
-	 * implement chart types which the library doesn't support by default.
 	 *
 	 * @param definition - A series definition.
 	 * @param customOptions - Customization parameters of the series being created.
@@ -341,4 +339,9 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * @returns Dimensions of the chart pane
 	 */
 	paneSize(paneIndex?: number): PaneSize;
+
+	/**
+	 * Returns the horizontal scale behaviour.
+	 */
+	horzBehaviour(): IHorzScaleBehavior<HorzScaleItem>;
 }

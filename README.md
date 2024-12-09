@@ -34,10 +34,10 @@ npm install lightweight-charts
 ```
 
 ```js
-import { createChart } from 'lightweight-charts';
+import { createChart, LineSeries } from 'lightweight-charts';
 
 const chart = createChart(document.body, { width: 400, height: 300 });
-const lineSeries = chart.addLineSeries();
+const lineSeries = chart.addSeries(LineSeries);
 lineSeries.setData([
     { time: '2019-04-11', value: 80.01 },
     { time: '2019-04-12', value: 96.63 },
@@ -62,7 +62,7 @@ The standalone version creates `window.LightweightCharts` object with all export
 
 ```js
 const chart = LightweightCharts.createChart(document.body, { width: 400, height: 300 });
-const lineSeries = chart.addLineSeries();
+const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
 lineSeries.setData([
     { time: '2019-04-11', value: 80.01 },
     { time: '2019-04-12', value: 96.63 },

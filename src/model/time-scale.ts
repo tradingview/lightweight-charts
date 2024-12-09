@@ -211,6 +211,16 @@ export interface HorzScaleOptions {
 	 * @defaultValue true
 	 */
 	allowBoldLabels: boolean;
+
+	/**
+	 * Ignore time scale points containing only whitespace (for all series) when
+	 * drawing grid lines, tick marks, and snapping the crosshair to time scale points.
+	 *
+	 * For the yield curve chart type it defaults to `true`.
+	 *
+	 * @defaultValue false
+	 */
+	ignoreWhitespaceIndices: boolean;
 }
 
 export interface ITimeScale {
@@ -232,6 +242,8 @@ export interface ITimeScale {
 	coordinateToIndex(x: Coordinate): TimePointIndex;
 
 	options(): Readonly<HorzScaleOptions>;
+
+	recalculateIndicesWithData(): void;
 }
 
 export class TimeScale<HorzScaleItem> implements ITimeScale {
@@ -259,6 +271,9 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	private _commonTransitionStartState: TransitionState | null = null;
 	private _timeMarksCache: TimeMark[] | null = null;
 
+	private _indicesWithData: Map<TimePointIndex, boolean> = new Map();
+	private _indicesWithDataUpdateId: number = -1;
+
 	private _labels: TimeMark[] = [];
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
@@ -275,6 +290,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._updateDateTimeFormatter();
 
 		this._tickMarks.setUniformDistribution(options.uniformDistribution);
+		this.recalculateIndicesWithData();
 	}
 
 	public options(): Readonly<HorzScaleOptions> {
@@ -313,6 +329,10 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			// yes, if we apply bar spacing constrains then we need to correct bar spacing
 			// the easiest way is to apply it once again
 			this._model.setBarSpacing(options.barSpacing ?? this._barSpacing);
+		}
+
+		if (options.ignoreWhitespaceIndices !== undefined && options.ignoreWhitespaceIndices !== this._options.ignoreWhitespaceIndices) {
+			this.recalculateIndicesWithData();
 		}
 
 		this._invalidateTickMarks();
@@ -473,8 +493,16 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		}
 	}
 
-	public coordinateToIndex(x: Coordinate): TimePointIndex {
-		return Math.ceil(this._coordinateToFloatIndex(x)) as TimePointIndex;
+	public coordinateToIndex(x: Coordinate, considerIgnoreWhitespace?: boolean): TimePointIndex {
+		const index = Math.ceil(this._coordinateToFloatIndex(x)) as TimePointIndex;
+		if (
+			!considerIgnoreWhitespace ||
+			!this._options.ignoreWhitespaceIndices ||
+			this._shouldConsiderIndex(index)
+		) {
+			return index;
+		}
+		return this._findNearestIndexWithData(index);
 	}
 
 	public setRightOffset(offset: number): void {
@@ -526,7 +554,13 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		const firstBar = Math.max(visibleBars.left(), visibleBars.left() - indexPerLabel);
 		const lastBar = Math.max(visibleBars.right(), visibleBars.right() - indexPerLabel);
 
-		const items = this._tickMarks.build(spacing, maxLabelWidth);
+		const items = this._tickMarks.build(
+			spacing,
+			maxLabelWidth,
+			this._options.ignoreWhitespaceIndices,
+			this._indicesWithData,
+			this._indicesWithDataUpdateId
+		);
 
 		// according to indexPerLabel value this value means "earliest index which _might be_ used as the second label on time scale"
 		const earliestIndexOfSecondLabel = (this._firstIndex() as number) + indexPerLabel;
@@ -784,6 +818,20 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		return this._horzScaleBehavior.formatHorzItem(timeScalePoint.time);
 	}
 
+	public recalculateIndicesWithData(): void {
+		if (!this._options.ignoreWhitespaceIndices) {
+			return;
+		}
+		this._indicesWithData.clear();
+		const series = this._model.serieses();
+		for (const s of series) {
+			for (const index of s.fulfilledIndices()) {
+				this._indicesWithData.set(index, true);
+			}
+		}
+		this._indicesWithDataUpdateId++;
+	}
+
 	private _isAllScalingAndScrollingDisabled(): boolean {
 		const handleScroll = this._model.options()['handleScroll'];
 		const handleScale = this._model.options()['handleScale'];
@@ -1004,5 +1052,44 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._correctOffset();
 
 		this._correctBarSpacing();
+	}
+
+	private _shouldConsiderIndex(index: TimePointIndex): boolean {
+		if (!this._options.ignoreWhitespaceIndices) {
+			return true;
+		}
+		return this._indicesWithData.get(index) || false;
+	}
+
+	private _findNearestIndexWithData(x: TimePointIndex): TimePointIndex {
+		const gen = testNearestIntegers(x);
+		const maxIndex = this._lastIndex();
+		while (maxIndex) {
+			const index = gen.next().value as TimePointIndex;
+			if (this._indicesWithData.get(index)) {
+				return index;
+			}
+			if (index < 0 || index > maxIndex) {
+				break;
+			}
+		}
+		return x; // fallback to original index
+	}
+}
+
+function* testNearestIntegers(num: number): Generator<number, number, unknown> {
+	const rounded = Math.round(num);
+	const isRoundedDown = rounded < num;
+	let offset = 1;
+
+	while (true) {
+		if (isRoundedDown) {
+			yield rounded + offset;
+			yield rounded - offset;
+		} else {
+			yield rounded - offset;
+			yield rounded + offset;
+		}
+		offset++;
 	}
 }

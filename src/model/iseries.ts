@@ -52,4 +52,5 @@ export interface ISeries<T extends SeriesType> extends IPriceDataSource {
 	barColorer(): ISeriesBarColorer<T>;
 	markerDataAtIndex(index: TimePointIndex): MarkerData | null;
 	dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null;
+	fulfilledIndices(): readonly TimePointIndex[];
 }

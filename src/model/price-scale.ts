@@ -167,7 +167,8 @@ export interface PriceScaleOptions {
 	/**
 	 * Indicates if this price scale visible. Ignored by overlay price scales.
 	 *
-	 * @defaultValue `true` for the right price scale and `false` for the left
+	 * @defaultValue `true` for the right price scale and `false` for the left.
+	 * For the yield curve chart, the default is for the left scale to be visible.
 	 */
 	visible: boolean;
 

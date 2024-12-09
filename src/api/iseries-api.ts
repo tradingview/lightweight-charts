@@ -157,6 +157,8 @@ export interface ISeriesApi<
 	 *
 	 * @param bar - A single data item to be added. Time of the new item must be greater or equal to the latest existing time point.
 	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
+	 * @param historicalUpdate - If true, allows updating an existing data point that is not the latest bar. Default is false.
+	 * Updating older data using `historicalUpdate` will be slower than updating the most recent data point.
 	 * @example Updating line series data
 	 * ```js
 	 * lineSeries.update({
@@ -175,7 +177,7 @@ export interface ISeriesApi<
 	 * });
 	 * ```
 	 */
-	update(bar: TData): void;
+	update(bar: TData, historicalUpdate?: boolean): void;
 
 	/**
 	 * Returns a bar data by provided logical index.
@@ -270,7 +272,7 @@ export interface ISeriesApi<
 	 * @returns Type of the series.
 	 * @example
 	 * ```js
-	 * const lineSeries = chart.addLineSeries();
+	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.seriesType()); // "Line"
 	 *
 	 * const candlestickSeries = chart.addCandlestickSeries();

@@ -82,6 +82,7 @@ type CustomDataToPlotRowValueConverter<HorzScaleItem> = (item: CustomData<HorzSc
 
 export interface SeriesUpdateInfo {
 	lastBarUpdatedOrNewBarsAddedToTheRight: boolean;
+	historicalUpdate: boolean;
 }
 
 // note that if would like to use `Omit` here - you can't due https://github.com/microsoft/TypeScript/issues/36981
@@ -508,6 +509,10 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return (data: CustomData<HorzScaleItem> | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> => {
 			return (this._paneView as ISeriesCustomPaneView).isWhitespace(data);
 		};
+	}
+
+	public fulfilledIndices(): readonly TimePointIndex[] {
+		return this._data.indices();
 	}
 
 	private _isOverlay(): boolean {
