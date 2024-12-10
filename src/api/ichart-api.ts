@@ -127,7 +127,7 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Creates a series with specified parameters.
 	 *
 	 * @param definition - A series definition.
-	 * @param customOptions - Customization parameters of the series being created.
+	 * @param options - Customization parameters of the series being created.
 	 * @param paneIndex - An index of the pane where the series should be created.
 	 * ```js
 	 * const series = chart.addSeries(LineSeries, { lineWidth: 2 });

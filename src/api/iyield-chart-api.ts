@@ -17,7 +17,7 @@ export interface IYieldCurveChartApi extends Omit<IChartApiBase<number>, 'addSer
 	 * Note that the Yield Curve chart only supports the Area and Line series types.
 	 *
 	 * @param definition - A series definition for either AreaSeries or LineSeries.
-	 * @param customOptions - Customization parameters of the series being created.
+	 * @param options - Customization parameters of the series being created.
 	 * @param paneIndex - An index of the pane where the series should be created.
 	 * ```js
 	 * const series = chart.addSeries(LineSeries, { lineWidth: 2 });

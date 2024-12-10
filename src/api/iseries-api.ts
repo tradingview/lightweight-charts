@@ -36,15 +36,15 @@ export type DataChangedHandler = (scope: DataChangedScope) => void;
 export interface BarsInfo<HorzScaleItem> extends Partial<IRange<HorzScaleItem>> {
 	/**
 	 * The number of bars before the start of the range.
-	 * Positive value means that there are some bars before (out of logical range from the left) the {@link Range.from} logical index in the series.
-	 * Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the {@link Range.from} logical index are some bars.
+	 * Positive value means that there are some bars before (out of logical range from the left) the {@link IRange.from} logical index in the series.
+	 * Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the {@link IRange.from} logical index are some bars.
 	 */
 	barsBefore: number;
 
 	/**
 	 * The number of bars after the end of the range.
-	 * Positive value in the `barsAfter` field means that there are some bars after (out of logical range from the right) the {@link Range.to} logical index in the series.
-	 * Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the {@link Range.to} logical index are some bars.
+	 * Positive value in the `barsAfter` field means that there are some bars after (out of logical range from the right) the {@link IRange.to} logical index in the series.
+	 * Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the {@link IRange.to} logical index are some bars.
 	 */
 	barsAfter: number;
 }
