@@ -14,7 +14,11 @@ export function merge(dst: Record<string, any>, ...sources: Record<string, any>[
 	for (const src of sources) {
 		// eslint-disable-next-line no-restricted-syntax
 		for (const i in src) {
-			if (src[i] === undefined) {
+			if (
+				src[i] === undefined ||
+				!Object.prototype.hasOwnProperty.call(src, i) ||
+				['__proto__', 'constructor', 'prototype'].includes(i)
+			) {
 				continue;
 			}
 
