@@ -16,7 +16,7 @@ import { makeFont } from '../helpers/make-font';
 
 import { ChartOptionsInternalBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { CrosshairMode } from '../model/crosshair';
+import { CrosshairMode, CrosshairOptions } from '../model/crosshair';
 import { IDataSource, IDataSourcePaneViews } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
@@ -118,6 +118,10 @@ function recalculateOverlapping(views: IPriceAxisView[], direction: 1 | -1, scal
 				: coordinate - (prevFixedCoordinate + height);
 		}
 	}
+}
+
+function priceScaleCrosshairLabelVisible(crosshair: CrosshairOptions): boolean {
+	return crosshair.mode !== CrosshairMode.Hidden && crosshair.horzLine.visible && crosshair.horzLine.labelVisible;
 }
 
 export class PriceAxisWidget implements IDestroyable {
@@ -278,7 +282,11 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		const firstValue = this._priceScale.firstValue();
-		if (firstValue !== null && this._size !== null && this._options.crosshair.mode !== CrosshairMode.Hidden) {
+		if (
+			firstValue !== null &&
+			this._size !== null &&
+			priceScaleCrosshairLabelVisible(this._options.crosshair)
+		) {
 			const topValue = this._priceScale.coordinateToPrice(1 as Coordinate, firstValue);
 			const bottomValue = this._priceScale.coordinateToPrice(this._size.height - 2 as Coordinate, firstValue);
 
