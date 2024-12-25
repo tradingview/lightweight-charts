@@ -8,7 +8,7 @@ sidebar_position: 0
 
 ## Requirements
 
-Lightweight Charts™ is _a client-side_ library that is not designed to work server-side, for example, with Node.js.
+Lightweight Charts™ is _a client-side_ library that is not designed to work on the server side, for example, with Node.js.
 
 The library code targets the [_ES2020_ language specification](https://262.ecma-international.org/11.0/).
 Therefore, the browsers you work with should support this language revision. Consider the following [table](https://compat-table.github.io/compat-table/es2016plus/) to ensure the browser compatibility.
@@ -62,14 +62,14 @@ const firstChart = createChart(document.getElementById('firstContainer'));
 const secondChart = createChart(document.getElementById('secondContainer'));
 ```
 
-As a result, `createChart` returns a [`IChartApi`](/api/interfaces/IChartApi.md) object that allows you to interact with the created chart.
+As a result, `createChart` returns an [`IChartApi`](/api/interfaces/IChartApi.md) object that allows you to interact with the created chart.
 
 ## Creating a series
 
 When the chart is created, you can display data on it.
 
 The basic primitive to display data is a [series](/api/interfaces/ISeriesApi.md).
-There library supports the following series types:
+The library supports the following series types:
 
 - Area
 - Bar
