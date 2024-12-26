@@ -8,23 +8,23 @@ sidebar_position: 0
 
 ## Requirements
 
-First of all, Lightweight Charts™ is _a client-side_ library.
-This means that it does not and cannot work on the server-side (i.e. NodeJS), at least out of the box.
+Lightweight Charts™ is _a client-side_ library that is not designed to work on the server side, for example, with Node.js.
 
-The code of `lightweight-charts` package targets the [_es2020_ language specification](https://262.ecma-international.org/11.0/).
-Thus, all the browsers you will have to work with should support this language revision (see [this compatibility table](https://compat-table.github.io/compat-table/es2016plus/)).
-If you need to support the previous revisions, you could try to setup a transpilation of the package to the target you need to support in your build system (e.g. by using Babel).
-If you'll have any issues with that, please raise an issue on github with the details and we'll investigate possible ways to solve it.
+The library code targets the [_ES2020_ language specification](https://262.ecma-international.org/11.0/).
+Therefore, the browsers you work with should support this language revision. Consider the following [table](https://compat-table.github.io/compat-table/es2016plus/) to ensure the browser compatibility.
+
+To support previous revisions, you can set up a transpilation process for the `lightweight-charts` package in your build system using tools such as Babel.
+If you encounter any issues, open a [GitHub issue](https://github.com/tradingview/lightweight-charts/issues) with detailed information, and we will investigate potential solutions.
 
 ## Installation
 
-The first thing you need to do to use `lightweight-charts` is to install it from [npm](https://www.npmjs.com/):
+To set up the library, install the [`lightweight-charts`](https://www.npmjs.com/package/lightweight-charts) npm package:
 
 ```console
 npm install --save lightweight-charts
 ```
 
-_Note that the package is shipped with TypeScript declarations, so you can easily use it within TypeScript code._
+The package includes TypeScript declarations, enabling seamless integration within TypeScript projects.
 
 ### Build variants
 
@@ -39,46 +39,37 @@ The library ships with the following build variants:
 
 ## License and attribution
 
-:::tip
+The Lightweight Charts™ license **requires** specifying TradingView as the product creator.
+You should add the following attributes to a public page of your website or mobile application:
 
-The Lightweight Charts™ license requires specifying TradingView as the product creator.
-
-:::
-
-You shall add the "attribution notice" from the [NOTICE](https://github.com/tradingview/lightweight-charts/blob/master/NOTICE) file and a link to [https://www.tradingview.com](https://www.tradingview.com) to the page of your website or mobile application that is available to your users.
-
-As thanks for creating Lightweight Charts™, we'd be grateful if you add the attribution notice in a prominent place.
+- Attribution notice from the [`NOTICE`](https://github.com/tradingview/lightweight-charts/blob/master/NOTICE) file
+- The [https://www.tradingview.com](https://www.tradingview.com) link
 
 ## Creating a chart
 
-Once the library has been installed in your repo you're ready to create your first chart.
-
-First of all, in a file where you would like to create a chart you need to import the library:
+As a first step, import the library to your file:
 
 ```js
 import { createChart } from 'lightweight-charts';
 ```
-
-[`createChart`](/api/functions/createChart.md) is the entry-point for creating charts. You can use it to create as many charts as you need:
+To create a chart, use the [`createChart`](/api/functions/createChart.md) function. You can call the function multiple times to create as many charts as needed:
 
 ```js
 import { createChart } from 'lightweight-charts';
 
 // ...
-
-// somewhere in your code
 const firstChart = createChart(document.getElementById('firstContainer'));
 const secondChart = createChart(document.getElementById('secondContainer'));
 ```
 
-The result of this function is a [`IChartApi`](/api/interfaces/IChartApi.md) object, which you need to use to work with a chart instance.
+As a result, `createChart` returns an [`IChartApi`](/api/interfaces/IChartApi.md) object that allows you to interact with the created chart.
 
 ## Creating a series
 
-Once your chart is created it is ready to display data.
+When the chart is created, you can display data on it.
 
-The basic primitive to display a data is [a series](/api/interfaces/ISeriesApi.md).
-There are different types of series:
+The basic primitive to display data is a [series](/api/interfaces/ISeriesApi.md).
+The library supports the following series types:
 
 - Area
 - Bar
@@ -87,8 +78,8 @@ There are different types of series:
 - Histogram
 - Line
 
-To create a series with desired type you need to use appropriate method from [`IChartApi`](/api/interfaces/IChartApi.md).
-All of them have the same naming `add<type>Series`, where `<type>` is a type of a series you'd like to create:
+To create a series, use the [`addSeries`](/api/interfaces/IChartApi.md#addseries) method from [`IChartApi`](/api/interfaces/IChartApi.md).
+As a parameter, specify a [series type](/series-types.mdx) you would like to create:
 
 ```js
 import { AreaSeries, BarSeries, BaselineSeries, createChart } from 'lightweight-charts';
@@ -98,22 +89,19 @@ const chart = createChart(container);
 const areaSeries = chart.addSeries(AreaSeries);
 const barSeries = chart.addSeries(BarSeries);
 const baselineSeries = chart.addSeries(BaselineSeries);
-// ... and so on
+// ...
 ```
 
-Please look at [this page](/series-types.mdx) for more information about different series types.
-
-Note that **a series cannot be transferred from one type to another one** since different series types have different data and options types.
+Note that a series **cannot be transferred** from one type to another one, since different series types require different data and options types.
 
 ## Setting and updating a data
 
-Once your chart and series are created it's time to set data to the series.
-
-Note that regardless of the series type, the API calls are the same (the type of the data might be different though).
+When the series is created, you can populate it with data.
+Note that the API calls remain the same regardless of the series type, although the data format may vary.
 
 ### Setting the data to a series
 
-To set the data (or to replace all data items) to a series you need to use [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) method:
+To set the data to a series, you should call the [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) method:
 
 import CodeBlock from '@theme/CodeBlock';
 export const example = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
@@ -156,15 +144,12 @@ chart.timeScale().fitContent();`;
 
 <CodeBlock className="language-js" replaceThemeConstants chart>{example}</CodeBlock>
 
+You can also use `setData` to replace all data items.
+
 ### Updating the data in a series
 
-In a case when your data is updated (e.g. real-time updates) you might want to update the chart as well.
-
-But using [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) very often might affect the performance and we do not recommend to do this.
-Also it replaces all series data with the new one, and probably this is not what you're looking for.
-
-Thus, to update the data you can use a method [`ISeriesApi.update`](/api/interfaces/ISeriesApi.md#update).
-It allows you to update the last data item or add a new one much faster without affecting the performance:
+If your data is updated, for example in real-time, you may also need to refresh the chart accordingly.
+To do this, call the [`ISeriesApi.update`](/api/interfaces/ISeriesApi.md#update) method that allows you to update the last data item or add a new one.
 
 ```js
 import { AreaSeries, CandlestickSeries, createChart } from 'lightweight-charts';
@@ -173,23 +158,25 @@ const chart = createChart(container);
 
 const areaSeries = chart.addSeries(AreaSeries);
 areaSeries.setData([
-    // ... other data items
+    // Other data items
     { time: '2018-12-31', value: 22.67 },
 ]);
 
 const candlestickSeries = chart.addSeries(CandlestickSeries);
 candlestickSeries.setData([
-    // ... other data items
+    // Other data items
     { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
 ]);
 
-// sometime later
+// ...
 
-// update the most recent bar
+// Update the most recent bar
 areaSeries.update({ time: '2018-12-31', value: 25 });
 candlestickSeries.update({ time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 112 });
 
-// creating the new bar
+// Creating the new bar
 areaSeries.update({ time: '2019-01-01', value: 20 });
 candlestickSeries.update({ time: '2019-01-01', open: 112, high: 112, low: 100, close: 101 });
 ```
+
+We do not recommend calling [`ISeriesApi.setData`](/api/interfaces/ISeriesApi.md#setdata) to update the chart, as this method replaces all series data and can significantly affect the performance.
