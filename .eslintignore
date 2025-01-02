@@ -15,3 +15,4 @@
 
 /plugin-examples
 /packages/create-lwc-plugin
+/debug/**
