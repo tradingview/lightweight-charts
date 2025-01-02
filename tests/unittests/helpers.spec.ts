@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
