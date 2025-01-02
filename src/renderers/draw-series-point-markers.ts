@@ -13,6 +13,10 @@ export function drawSeriesPointMarkers<TItem extends LinePoint, TStyle extends C
 	// so if styleGetter returns objects, then styleGetter should return the same object for equal styles
 	styleGetter: (renderingScope: BitmapCoordinatesRenderingScope, item: TItem) => TStyle
 ): void {
+	if (visibleRange.to - visibleRange.from <= 0) {
+		return;
+	}
+
 	const { horizontalPixelRatio, verticalPixelRatio, context } = renderingScope;
 	let prevStyle: TStyle | null = null;
 
