@@ -7,7 +7,10 @@ import { LineItemBase, PaneRendererLineBase, PaneRendererLineDataBase } from './
 export type LineStrokeItem = LineItemBase & LineStrokeColorerStyle;
 export interface PaneRendererLineData extends PaneRendererLineDataBase<LineStrokeItem> {
 }
-
+export interface LineItem {
+    x: number;
+    y: number;
+}
 export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData> {
 	protected override _strokeStyle(renderingScope: MediaCoordinatesRenderingScope, item: LineStrokeItem): CanvasRenderingContext2D['strokeStyle'] {
 		return item.lineColor;
