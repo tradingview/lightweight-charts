@@ -35,3 +35,25 @@ Half (e.g. `1.5`, `3.5`, `10.5`) means exactly a middle of the bar.
 Red vertical lines here are borders between bars.
 
 Thus, the visible logical range on the chart above is approximately from `-4.73` to `5.05`.
+
+## Gaps on the chart
+
+If the chart contains extra space, you can use the [`fitContent`](/api/interfaces/ITimeScaleApi.md#fitcontent) method to adjust the view and fit all data from all series.
+
+```javascript
+chart.timeScale().fitContent();
+```
+
+If calling `fitContent` does not change the view, it might be due to how the library displays data.
+
+The library allocates specific width for each data point to maintain consistency between different chart types.
+For example, for line series, the plot point is placed at the center of this allocated space, while candlestick series use most of the width for the candle body.
+
+The allocated space for each data point is proportional to the chart width. As a result, series with fewer data points may have extra space on their sides.
+To remove this space, you can adjusts the [logical range](#logical-range) with the [`setVisibleLogicalRange`](/api/interfaces/ITimeScaleApi.md#setvisiblelogicalrange) method.
+For example, the following code sample adjusts the range by half a bar-width on both sides.
+
+```javascript
+const vr = chart.timeScale().getVisibleLogicalRange();
+chart.timeScale().setVisibleLogicalRange({ from: vr.from + 0.5, to: vr.to - 0.5 });
+```
