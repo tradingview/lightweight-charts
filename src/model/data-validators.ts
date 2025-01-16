@@ -77,7 +77,7 @@ function checkBarItem<HorzScaleItem>(
 
 		assert(
 			isSafeValue(barItem[key]),
-			`${type} series item data value of ${key} must be between ${MIN_SAVE_VALUE.toPrecision(16)} and ${MAX_SAVE_VALUE.toPrecision(16)}, got=${typeof barItem[key]}, value=${
+			`${type} series item data value of ${key} must be between ${MIN_SAFE_VALUE.toPrecision(16)} and ${MAX_SAFE_VALUE.toPrecision(16)}, got=${typeof barItem[key]}, value=${
 				barItem[key]
 			}`
 		);
@@ -101,7 +101,7 @@ function checkLineItem<HorzScaleItem>(
 
 	assert(
 		isSafeValue(lineItem.value),
-		`${type} series item data value must be between ${MIN_SAVE_VALUE.toPrecision(16)} and ${MAX_SAVE_VALUE.toPrecision(16)}, got=${typeof lineItem.value}, value=${
+		`${type} series item data value must be between ${MIN_SAFE_VALUE.toPrecision(16)} and ${MAX_SAFE_VALUE.toPrecision(16)}, got=${typeof lineItem.value}, value=${
 			lineItem.value
 		}`
 	);
@@ -119,5 +119,5 @@ const MIN_SAFE_VALUE = Number.MIN_SAFE_INTEGER / 100;
 const MAX_SAFE_VALUE = Number.MAX_SAFE_INTEGER / 100;
 
 function isSafeValue(value: number): boolean {
-	return value >= MIN_SAVE_VALUE && value <= MAX_SAVE_VALUE;
+	return value >= MIN_SAFE_VALUE && value <= MAX_SAFE_VALUE;
 }
