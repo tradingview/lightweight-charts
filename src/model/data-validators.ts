@@ -115,8 +115,8 @@ function checkCustomItem(
 	return;
 }
 
-const MIN_SAVE_VALUE = Number.MIN_SAFE_INTEGER / 100;
-const MAX_SAVE_VALUE = Number.MAX_SAFE_INTEGER / 100;
+const MIN_SAFE_VALUE = Number.MIN_SAFE_INTEGER / 100;
+const MAX_SAFE_VALUE = Number.MAX_SAFE_INTEGER / 100;
 
 function isSafeValue(value: number): boolean {
 	return value >= MIN_SAVE_VALUE && value <= MAX_SAVE_VALUE;
