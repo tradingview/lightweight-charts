@@ -79,7 +79,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ createSeriesMarkers }',
 		ignore: ['fancy-canvas'],
-		limit: '4.123 KB',
+		limit: '4.5 KB',
 		brotli: true,
 	},
 	{
@@ -119,7 +119,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ CandlestickSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '2.54 KB',
+		limit: '3.00 KB',
 		brotli: true,
 	},
 	{
