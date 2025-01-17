@@ -36,22 +36,21 @@ Red vertical lines here are borders between bars.
 
 Thus, the visible logical range on the chart above is approximately from `-4.73` to `5.05`.
 
-## Gaps on the chart
+## Series margin
 
-If the chart contains extra space, you can use the [`fitContent`](/api/interfaces/ITimeScaleApi.md#fitcontent) method to adjust the view and fit all data from all series.
-
-```javascript
-chart.timeScale().fitContent();
-```
-
-If calling `fitContent` does not change the view, it might be due to how the library displays data.
+Margin is the space between the chart's borders and the series.
 
 The library allocates specific width for each data point to maintain consistency between different chart types.
 For example, for line series, the plot point is placed at the center of this allocated space, while candlestick series use most of the width for the candle body.
 
-The allocated space for each data point is proportional to the chart width. As a result, series with fewer data points may have extra space on their sides.
-To remove this space, you can adjusts the [logical range](#logical-range) with the [`setVisibleLogicalRange`](/api/interfaces/ITimeScaleApi.md#setvisiblelogicalrange) method.
-For example, the following code sample adjusts the range by half a bar-width on both sides.
+The allocated space for each data point is proportional to the chart width. As a result, series with fewer data points may have a larger margin.
+
+![Margin of the series with few points](/img/extra-margin.png)
+
+To adjust the margin, you can specify the [logical range](#logical-range) with the [`setVisibleLogicalRange`](/api/interfaces/ITimeScaleApi.md#setvisiblelogicalrange) method.
+For example, to remove the margin on the chart below, you can adjusts the range by half a bar-width on both sides.
+
+![Margin](/img/margin.png)
 
 ```javascript
 const vr = chart.timeScale().getVisibleLogicalRange();
