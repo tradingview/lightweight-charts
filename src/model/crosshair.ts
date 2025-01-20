@@ -255,6 +255,7 @@ export class Crosshair extends DataSource {
 		this._pane = null;
 
 		this.clearOriginCoord();
+		this.updateAllViews();
 	}
 
 	public paneViews(pane: Pane): readonly IPaneView[] {
