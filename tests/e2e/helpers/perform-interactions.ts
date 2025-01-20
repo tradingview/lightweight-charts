@@ -33,6 +33,7 @@ export type InteractionAction =
 	| 'kineticAnimation'
 	| 'moveMouseCenter'
 	| 'moveMouseTopLeft'
+	| 'moveMouseBottomRight'
 	| 'clickXY';
 export type InteractionTarget =
 	| 'container'
@@ -189,6 +190,17 @@ async function performAction(
 				}
 			}
 			break;
+		case 'moveMouseBottomRight':
+			{
+				const boundingBox = await target.boundingBox();
+				if (boundingBox) {
+					await page.mouse.move(
+						boundingBox.x + boundingBox.width,
+						boundingBox.y + boundingBox.height
+					);
+				}
+			}
+			break;
 		default: {
 			const exhaustiveCheck: never = action;
 			throw new Error(exhaustiveCheck);
@@ -247,4 +259,55 @@ export async function performInteractions(
 
 		await performAction(interaction, page, target);
 	}
+}
+
+interface InternalWindowForInteractions {
+	initialInteractionsToPerform: () => Interaction[];
+	finalInteractionsToPerform: () => Interaction[];
+	afterInitialInteractions?: () => void;
+	afterFinalInteractions?: () => void;
+}
+
+export async function runInteractionsOnPage(page: Page): Promise<void> {
+	const initialInteractionsToPerform = await page.evaluate(() => {
+		if (!(window as unknown as InternalWindowForInteractions).initialInteractionsToPerform) {
+			return [];
+		}
+		return (window as unknown as InternalWindowForInteractions).initialInteractionsToPerform();
+	});
+
+	await performInteractions(page, initialInteractionsToPerform);
+
+	await page.evaluate(() => {
+		if ((window as unknown as InternalWindowForInteractions).afterInitialInteractions) {
+			return (
+				window as unknown as InternalWindowForInteractions
+			).afterInitialInteractions?.();
+		}
+		return new Promise<void>((resolve: () => void) => {
+			window.requestAnimationFrame(() => {
+				setTimeout(resolve, 50);
+			});
+		});
+	});
+
+	const finalInteractionsToPerform = await page.evaluate(() => {
+		if (!(window as unknown as InternalWindowForInteractions).finalInteractionsToPerform) {
+			return [];
+		}
+		return (window as unknown as InternalWindowForInteractions).finalInteractionsToPerform();
+	});
+
+	if (finalInteractionsToPerform && finalInteractionsToPerform.length > 0) {
+		await performInteractions(page, finalInteractionsToPerform);
+	}
+
+	await page.evaluate(() => {
+		return new Promise<void>((resolve: () => void) => {
+			(window as unknown as InternalWindowForInteractions).afterFinalInteractions?.();
+			window.requestAnimationFrame(() => {
+				setTimeout(resolve, 50);
+			});
+		});
+	});
 }

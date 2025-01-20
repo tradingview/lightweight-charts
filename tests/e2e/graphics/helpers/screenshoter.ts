@@ -9,6 +9,8 @@ import puppeteer, {
 	Page,
 } from 'puppeteer';
 
+import { runInteractionsOnPage } from '../../helpers/perform-interactions';
+
 import { MouseEventParams } from '../../../../src/api/ichart-api';
 import { TestCaseWindow } from './testcase-window-type';
 
@@ -107,6 +109,8 @@ export class Screenshoter {
 				await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
 				await waitForMouseMove;
 			}
+
+			await runInteractionsOnPage(page);
 
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
