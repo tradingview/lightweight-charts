@@ -66,7 +66,7 @@ As a result, series with fewer data points may have a small margin on both sides
 
 ![Margin](/img/margin.png)
 
-In this case, you can specify the [logical range](#logical-range) with the [`setVisibleLogicalRange`](/api/interfaces/ITimeScaleApi.md#setvisiblelogicalrange) method to display the series exactly to the edges.
+You can specify the [logical range](#logical-range) with the [`setVisibleLogicalRange`](/api/interfaces/ITimeScaleApi.md#setvisiblelogicalrange) method to display the series exactly to the edges.
 For example, the code sample below adjusts the range by half a bar-width on both sides.
 
 ```javascript
