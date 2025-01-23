@@ -47,7 +47,7 @@ The Lightweight Charts™ license requires specifying TradingView as the product
 
 :::
 
-You shall add the "attribution notice" from the [NOTICE](https://github.com/tradingview/lightweight-charts/blob/master/NOTICE) file and a link to <https://www.tradingview.com/> to the page of your website or mobile application that is available to your users.
+You shall add the "attribution notice" from the [NOTICE](https://github.com/tradingview/lightweight-charts/blob/master/NOTICE) file and a link to [https://www.tradingview.com/](https://www.tradingview.com/) to the page of your website or mobile application that is available to your users.
 
 As thanks for creating Lightweight Charts™, we'd be grateful if you add the attribution notice in a prominent place.
 

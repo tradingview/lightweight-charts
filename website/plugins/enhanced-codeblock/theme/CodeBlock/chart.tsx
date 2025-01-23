@@ -3,7 +3,13 @@ import { useDocsPreferredVersion } from '@docusaurus/theme-common';
 import * as React from 'react';
 
 import versions from '../../../../versions.json';
-import { importLightweightChartsVersion, LightweightChartsApiTypeMap, VersionsSupportingCreateChartEx, VersionsSupportingTreeShakenSeries } from './import-lightweight-charts-version';
+import {
+	importLightweightChartsVersion,
+	LightweightChartsApiTypeMap,
+	VersionsSupportingAdditionalChartTypes,
+	VersionsSupportingCreateChartEx,
+	VersionsSupportingTreeShakenSeries,
+} from './import-lightweight-charts-version';
 import styles from './styles.module.css';
 
 interface ChartProps {
@@ -14,6 +20,8 @@ interface ChartProps {
 type IFrameWindow<TVersion extends keyof LightweightChartsApiTypeMap> = Window & {
 	createChart: LightweightChartsApiTypeMap[TVersion]['createChart'];
 	createChartEx: TVersion extends VersionsSupportingCreateChartEx ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
+	createYieldCurveChart: TVersion extends VersionsSupportingAdditionalChartTypes ? LightweightChartsApiTypeMap[TVersion]['createYieldCurveChart'] : undefined;
+	createOptionsChart: TVersion extends VersionsSupportingAdditionalChartTypes ? LightweightChartsApiTypeMap[TVersion]['createOptionsChart'] : undefined;
 	LineSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['LineSeries'] : undefined;
 	AreaSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['AreaSeries'] : undefined;
 	CandlestickSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['CandlestickSeries'] : undefined;
@@ -63,11 +71,19 @@ export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props:
 
 			const injectCreateChartAndRun = async () => {
 				try {
-					const { module, createChart, createChartEx } = await importLightweightChartsVersion[version](iframeWindow);
+					const {
+						module,
+						createChart,
+						createChartEx,
+						createYieldCurveChart,
+						createOptionsChart,
+					} = await importLightweightChartsVersion[version](iframeWindow);
 
 					Object.assign(iframeWindow, module); // Make ColorType, etc. available in the iframe
 					iframeWindow.createChart = createChart;
 					iframeWindow.createChartEx = createChartEx;
+					iframeWindow.createYieldCurveChart = createYieldCurveChart;
+					iframeWindow.createOptionsChart = createOptionsChart;
 
 					if (version === 'current') {
 						const typedModule = module as unknown as {
