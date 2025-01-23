@@ -3,7 +3,7 @@ import { useDocsPreferredVersion } from '@docusaurus/theme-common';
 import * as React from 'react';
 
 import versions from '../../../../versions.json';
-import { importLightweightChartsVersion, LightweightChartsApiTypeMap } from './import-lightweight-charts-version';
+import { importLightweightChartsVersion, LightweightChartsApiTypeMap, VersionsSupportingCreateChartEx, VersionsSupportingTreeShakenSeries } from './import-lightweight-charts-version';
 import styles from './styles.module.css';
 
 interface ChartProps {
@@ -13,12 +13,12 @@ interface ChartProps {
 
 type IFrameWindow<TVersion extends keyof LightweightChartsApiTypeMap> = Window & {
 	createChart: LightweightChartsApiTypeMap[TVersion]['createChart'];
-	createChartEx: TVersion extends '4.1' | 'current' ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
-	LineSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['LineSeries'] : undefined;
-	AreaSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['AreaSeries'] : undefined;
-	CandlestickSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['CandlestickSeries'] : undefined;
-	BarSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['BarSeries'] : undefined;
-	HistogramSeries: TVersion extends '5.0' | 'current' ? LightweightChartsApiTypeMap[TVersion]['HistogramSeries'] : undefined;
+	createChartEx: TVersion extends VersionsSupportingCreateChartEx ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
+	LineSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['LineSeries'] : undefined;
+	AreaSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['AreaSeries'] : undefined;
+	CandlestickSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['CandlestickSeries'] : undefined;
+	BarSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['BarSeries'] : undefined;
+	HistogramSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['HistogramSeries'] : undefined;
 	run?: () => void;
 };
 
