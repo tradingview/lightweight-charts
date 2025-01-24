@@ -4,6 +4,9 @@ This folder is designed for creating and testing debug files that won't be
 committed to the repository. It's a safe space for contributors to experiment
 and test without affecting the main codebase.
 
+If you looking for development environment akin to blitzstack or codesandbox, please
+see [PLAYGROUND/README.md](./PLAYGROUND).
+
 ## Contents
 
 This folder contains example files to help you get started:
