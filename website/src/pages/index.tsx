@@ -198,8 +198,8 @@ function Index(): React.JSX.Element {
 		<>
 			{showBanner ? (
 				<Banner
-					text="Exciting Update: Version 4.1 now available, introducing plugin support for enhanced functionality."
-					link="https://tradingview.github.io/lightweight-charts/docs/release-notes#410"
+					text="Exciting Update: Version 5.0 now available, introducing pane support and decreased bundle size."
+					link="https://tradingview.github.io/lightweight-charts/docs/release-notes#500"
 					linkText="Read more"
 				/>
 			) : (

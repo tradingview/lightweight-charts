@@ -14,6 +14,97 @@ sidebar_position: 9
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.0
+
+Version 5.0 represents a significant milestone in the evolution of Lightweight Charts™, delivering on our commitment to keep the library truly "lightweight". Despite adding numerous new features, improvements, and fixes, we've managed to reduce the bundle size by up to 16%, bringing the base bundle size down to just 35kB. This remarkable reduction was achieved through enhanced tree-shaking capabilities, modernized architecture, and careful optimization of core features. This release introduces highly requested features like multi-pane support and new chart types, while also modernizing the codebase and improving its architecture to set a foundation for future enhancements without compromising on size.
+
+## Major Updates
+
+### Multi-Pane Support
+
+One of our most requested features, multi-pane support is now available, allowing you to create complex chart layouts with multiple independent viewing areas. This enhancement enables sophisticated technical analysis setups and better visualization of related data series.
+
+- Full support for multiple panes within a single chart
+- Independent scale and series management per pane
+- Flexible pane sizing and arrangement options
+- [Documentation Link](./panes.md)
+
+### New Chart Types
+
+**Yield Curve Charts**
+
+- New specialized chart type for displaying yield curves
+- Custom horizontal scale behavior with linear spacing
+- Optimized whitespace handling
+- [Documentation Link](./chart-types.mdx#yield-curve-chart)
+
+**Options Charts**
+
+- Price-based horizontal scale support
+- Specialized formatting and interaction handling
+- Ideal for options chain visualization
+- [Documentation Link](./chart-types.mdx#options-chart-price-based)
+
+### Enhanced Color Support
+
+- Expanded native support for sRGB-based colors (rgb, rgba, hex, named colors, hsl)
+- Support for expanded color gamuts like display-p3
+- Ability to specify a custom color parser to add support for non-sRGB formats
+- Reduced bundle size through browser-native color parsing
+
+### Architectural Improvements
+
+**Plugin System Enhancements**
+
+- Watermark feature reimplemented as plugins (`TextWatermark` and `ImageWatermark`)
+- Series Markers extracted as a plugin for better tree-shaking
+- New Up/Down Markers Plugin for price change visualization
+- Introduction of Pane Primitives for plugin attachment
+
+## Breaking Changes
+
+- New unified series creation API (see [migration guide](./migrations/from-v4-to-v5.md))
+- Dropped CommonJS support and updated JS syntax version to ES2020
+- Watermark functionality moved to plugins
+- Series markers implementation changed to plugin system
+
+## Enhancements
+
+- Added relative gradient option for baseline and area series (`relativeGradient`)
+- New time scale option for maximum bar spacing (`maxBarSpacing`)
+- Added `priceLines()` method to `ISeriesApi` interface
+- Enhanced watermark capabilities with multi-line text support
+- Improved plugin system with Pane Primitives support
+- Better tree-shaking capabilities for smaller bundle sizes
+
+## Bug Fixes
+
+- Fixed primitive detachment update issues ([#1594](https://github.com/tradingview/lightweight-charts/issues/1594))
+- Various performance and rendering improvements
+
+## Migration Guide
+
+We've prepared a comprehensive migration guide to help you upgrade from v4 to v5. Key areas to note:
+
+1. Series Creation API changes
+2. Watermarks and Series Markers moving to separate plugins
+3. Plugin system updates
+
+See the full migration guide here: [Migrating from v4 to v5](./migrations/from-v4-to-v5)
+
+## Technical Notes
+
+This release uses ES2020 syntax and no longer supports CommonJS. If you need to support older environments, you'll need to set up transpilation for the `lightweight-charts` package in your build system using tools like Babel.
+
+As always, we thank you for your support and help in making Lightweight Charts™ the best product on the financial web. We look forward to seeing what you build with these new capabilities!
+
+You can always send us your feedback via GitHub.
+Happy trading!
+
+Team TradingView
+
+See [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.3..v5.0.1).
+
 ## 4.2.2
 
 **Minor Improvements**
