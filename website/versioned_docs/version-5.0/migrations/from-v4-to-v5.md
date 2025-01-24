@@ -3,26 +3,15 @@
 In this document you can find the migration guide from the previous version v4
 to v5.
 
-## Table of Contents
-
-- [Series changes](#series-changes)
-- [Series Markers](#series-markers)
-- [Watermarks](#watermarks)
-- [Plugin Typings](#plugin-typings)
-
 ## Series changes
 
-### Overview of Changes {#overview-changes-series}
+In v5, we've unified the way series are added to charts to make the API more consistent and to better utilize tree-shaking capabilities of modern JS bundlers. Instead of having separate functions for each series type (like `addLineSeries`, `addCandlestickSeries`, etc.), there is now a single `addSeries` function.
 
-- Unified series creation API using single `addSeries` function
-- Better tree-shaking support
-- Individual series types must now be imported separately (for ESM)
-
-### Migration Steps {#migration-steps-series}
+### Migration Steps
 
 Replace all series creation calls with the new `addSeries` syntax. Here's how the migration works for each series type:
 
-#### Before (v4) {#v4-series}
+Old v4 syntax:
 
 ```js
 // Example with Line Series in v4
@@ -31,7 +20,7 @@ const chart = createChart(container, {});
 const lineSeries = chart.addLineSeries({ color: 'red' });
 ```
 
-#### After (v5) {#v5-series}
+New v5 syntax:
 
 ```js
 // Example with Line Series in v5
@@ -40,7 +29,7 @@ const chart = createChart(container, {});
 const lineSeries = chart.addSeries(LineSeries, { color: 'red' });
 ```
 
-#### Migration Reference {#omigration-reference-series}
+### Complete Migration Reference
 
 Here's how to migrate each series type:
 
@@ -53,7 +42,7 @@ Here's how to migrate each series type:
 | `chart.addCandlestickSeries(options)` | `chart.addSeries(CandlestickSeries, options)` |
 | `chart.addHistogramSeries(options)` | `chart.addSeries(HistogramSeries, options)` |
 
-### Usage Examples {#usage-examples-series}
+### Usage Examples
 
 ESM (ES Modules):
 
@@ -73,17 +62,13 @@ const lineSeries = chart.addSeries(LightweightCharts.LineSeries, { color: 'red' 
 
 Note: Make sure to import the specific series type (e.g., `LineSeries`, `AreaSeries`) along with `createChart` when using ES Modules. For UMD builds, all series types are available under the `LightweightCharts` namespace.
 
+I'll help write a migration guide section for the series markers change from Lightweight Charts v4 to v5. Here's a suggested write-up:
+
 ## Series Markers
 
-### Overview of Changes {#overview-changes-markers}
+In v5, series markers have been moved to a separate primitive to optimize bundle size. If your application uses markers, you'll need to update your code to use the new syntax.
 
-- Markers moved to separate primitive for optimized bundle size
-- New ⁠createSeriesMarkers function required
-- Marker management through dedicated primitive instance
-
-### Migration Steps {#migration-steps-markers}
-
-#### Before (v4) {#v4-markers}
+### Before (v4)
 
 ```javascript
 // Markers were directly managed through the series instance
@@ -100,7 +85,7 @@ series.setMarkers([
 const markers = series.markers();
 ```
 
-#### After (v5) {#v5-markers}
+### After (v5)
 
 ```javascript
 // Import the markers primitive
@@ -126,7 +111,7 @@ seriesMarkers.setMarkers([/* new markers */]);
 seriesMarkers.setMarkers([]);
 ```
 
-### Key Changes {#key-changes-markers}
+### Key Changes
 
 - You must now import `createSeriesMarkers` separately
 - Instead of calling methods directly on the series instance, create a markers primitive using `createSeriesMarkers`
@@ -138,7 +123,7 @@ If your application doesn't use markers, you can now benefit from a smaller bund
 
 ## Watermarks
 
-### Overview of Changes {#overview-changes-watermarks}
+### Overview of Changes
 
 In the new version of Lightweight Charts, the watermark feature has undergone significant changes:
 
@@ -149,38 +134,7 @@ In the new version of Lightweight Charts, the watermark feature has undergone si
 an image watermark feature provided by the [`createImageWatermark`](/api/functions/createImageWatermark.md) plugin.
 5. **Series Markers**: The series markers feature has been moved to a separate plugin as well. To create a series marker, use the [`createSeriesMarkers`](/api/functions/createSeriesMarkers.md) function exported from the library.
 
-### Migration Steps {#migration-steps-watermarks}
-
-#### Before (v4) {#v4-watermarks}
-
-```js
-const chart = createChart(container, {
-    watermark: {
-        text: 'Watermark Text',
-        color: 'rgba(255,0,0,0.5)',
-    },
-});
-```
-
-#### After (v5) {#v5-watermarks}
-
-```js
-import { createChart, createTextWatermark } from 'lightweight-charts';
-
-const chart = createChart(container, options);
-const firstPane = chart.panes()[0];
-
-createTextWatermark(firstPane, {
-    horzAlign: 'center',
-    vertAlign: 'center',
-    lines: [{
-        text: 'Watermark Text',
-        color: 'rgba(255,0,0,0.5)',
-        fontSize: 50,
-    }],
-});
-
-```
+If you're currently using the watermark feature, you'll need to make a few adjustments to your code.
 
 ### Accessing the New TextWatermark
 
@@ -235,8 +189,6 @@ createTextWatermark(firstPane, {
 ```
 
 ## Plugin Typings
-
-### Overview of Changes {#overview-changes-plugins}
 
 Some of the plugin types and interfaces have been renamed due to the additional
 of Pane Primitives.
