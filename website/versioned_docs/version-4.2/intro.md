@@ -61,7 +61,7 @@ First of all, in a file where you would like to create a chart you need to impor
 import { createChart } from 'lightweight-charts';
 ```
 
-[`createChart`](/api/index.md#createchart) is the entry-point for creating charts. You can use it to create as many charts as you need:
+[`createChart`](/api/functions/createChart.md) is the entry-point for creating charts. You can use it to create as many charts as you need:
 
 ```js
 import { createChart } from 'lightweight-charts';
