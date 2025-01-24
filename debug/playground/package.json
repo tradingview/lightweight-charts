@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
+    "lightweight-charts": "file:../..",
     "eslint": "^9.15.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.11"
