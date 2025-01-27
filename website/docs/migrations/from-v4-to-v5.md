@@ -142,12 +142,11 @@ If your application doesn't use markers, you can now benefit from a smaller bund
 
 In the new version of Lightweight Charts, the watermark feature has undergone significant changes:
 
-1. **Extraction from Core**: The watermark functionality has been extracted from the core library.
-2. **Re-implementation**: It's now re-implemented as a Pane Primitive (plugin) included within the library.
-3. **Improved Tree-shaking**: This change makes the feature more tree-shakeable, potentially reducing bundle sizes for users who don't need watermarks.
-4. **Added an Image Watermark Primitive**: In addition to the usual text based watermark, there is now
+- Extraction from Core: The watermark functionality has been extracted from the core library.
+- Re-implementation: It's now re-implemented as a Pane Primitive (plugin) included within the library.
+- Improved Tree-shaking: This change makes the feature more tree-shakeable, potentially reducing bundle sizes for users who don't need watermarks.
+- Added an Image Watermark Primitive: In addition to the usual text based watermark, there is now
 an image watermark feature provided by the [`createImageWatermark`](/api/functions/createImageWatermark.md) plugin.
-5. **Series Markers**: The series markers feature has been moved to a separate plugin as well. To create a series marker, use the [`createSeriesMarkers`](/api/functions/createSeriesMarkers.md) function exported from the library.
 
 ### Migration Steps {#migration-steps-watermarks}
 
@@ -241,6 +240,6 @@ createTextWatermark(firstPane, {
 Some of the plugin types and interfaces have been renamed due to the additional
 of Pane Primitives.
 
-- `ISeriesPrimitivePaneView` -> `IPrimitivePaneView`
-- `ISeriesPrimitivePaneRenderer` -> `IPrimitivePaneRenderer`
-- `SeriesPrimitivePaneViewZOrder` -> `PrimitivePaneViewZOrder`
+- `ISeriesPrimitivePaneView` → `IPrimitivePaneView`
+- `ISeriesPrimitivePaneRenderer` → `IPrimitivePaneRenderer`
+- `SeriesPrimitivePaneViewZOrder` → `PrimitivePaneViewZOrder`

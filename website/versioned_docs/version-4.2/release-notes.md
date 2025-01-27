@@ -14,6 +14,18 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.2.3
+
+**Minor Improvements**
+
+- Improve check for crosshair label visibility on the price scale. This improves upon previous work (#1743 in v4.2.2) by reducing the allocated space for the crosshair when it is enabled, but the label is disabled. (PR [#1757](https://github.com/tradingview/lightweight-charts/issues/1757))
+
+**Bug Fixes**
+
+- Added additional prototype pollution protection for internal merge helper function. (PR [#1758](https://github.com/tradingview/lightweight-charts/issues/1758))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.2..v4.2.3).
+
 ## 4.2.2
 
 **Minor Improvements**
