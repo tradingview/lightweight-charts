@@ -16,13 +16,15 @@ sidebar_position: 9
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
 ## 5.0.0
 
-Version 5.0 represents a significant milestone in the evolution of Lightweight Charts™, delivering on our commitment to keep the library truly "lightweight". Despite adding numerous new features, improvements, and fixes, we've managed to reduce the bundle size by up to 16%, bringing the base bundle size down to just 35kB. This remarkable reduction was achieved through enhanced tree-shaking capabilities, modernized architecture, and careful optimization of core features. This release introduces highly requested features like multi-pane support and new chart types, while also modernizing the codebase and improving its architecture to set a foundation for future enhancements without compromising on size.
+Version 5.0.0 represents a significant milestone in the evolution of Lightweight Charts™, delivering on our commitment to keep the library truly "lightweight". Despite adding numerous new features, improvements, and fixes, we've managed to reduce the bundle size by up to 16%, bringing the base bundle size down to just 35kB. This remarkable reduction was achieved through enhanced tree-shaking capabilities, modernized architecture, and careful optimization of core features. 
+
+This release introduces highly requested features like multi-pane support and new chart types. It also modernizes the codebase and improves its architecture to set a foundation for future enhancements without compromising on size.
 
 ## Major Updates
 
 ### Multi-Pane Support
 
-One of our most requested features, multi-pane support is now available, allowing you to create complex chart layouts with multiple independent viewing areas. This enhancement enables sophisticated technical analysis setups and better visualization of related data series.
+One of our most requested features, multi-pane support is now available. It allows you to create complex chart layouts with multiple independent viewing areas. This enhancement enables sophisticated technical analysis setups and better visualization of related data series. Additional key benefits include:
 
 - Full support for multiple panes within a single chart
 - Independent scale and series management per pane
@@ -47,8 +49,8 @@ One of our most requested features, multi-pane support is now available, allowin
 
 ### Enhanced Color Support
 
-- Expanded native support for sRGB-based colors (rgb, rgba, hex, named colors, hsl)
-- Support for expanded color gamuts like display-p3
+- Expanded native support for sRGB-based colors (RGB, RGBA, hex, named colors, HSL)
+- Support for expanded color gamuts like Display P3
 - Ability to specify a custom color parser to add support for non-sRGB formats
 - Reduced bundle size through browser-native color parsing
 
@@ -90,7 +92,7 @@ We've prepared a comprehensive migration guide to help you upgrade from v4 to v5
 2. Watermarks and Series Markers moving to separate plugins
 3. Plugin system updates
 
-See the full migration guide here: [Migrating from v4 to v5](./migrations/from-v4-to-v5)
+See the full migration guide: [Migrating from v4 to v5](./migrations/from-v4-to-v5.md)
 
 ## Technical Notes
 

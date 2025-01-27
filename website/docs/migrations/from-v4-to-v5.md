@@ -40,7 +40,7 @@ const chart = createChart(container, {});
 const lineSeries = chart.addSeries(LineSeries, { color: 'red' });
 ```
 
-#### Migration Reference {#omigration-reference-series}
+#### Migration Reference {#migration-reference-series}
 
 Here's how to migrate each series type:
 
@@ -78,7 +78,7 @@ Note: Make sure to import the specific series type (e.g., `LineSeries`, `AreaSer
 ### Overview of Changes {#overview-changes-markers}
 
 - Markers moved to separate primitive for optimized bundle size
-- New ⁠createSeriesMarkers function required
+- New ⁠`createSeriesMarkers` function required
 - Marker management through dedicated primitive instance
 
 ### Migration Steps {#migration-steps-markers}
