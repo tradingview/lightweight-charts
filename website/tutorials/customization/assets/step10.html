@@ -27,38 +27,11 @@
         /* Add a background color to match the chart */
         background-color: #222;
       }
-
-      /* Styles for attribution message */
-      .lw-attribution {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        z-index: 3; /* place above the charts */
-        padding: 10px 0px 0px 12px;
-        font-family: "Roboto", sans-serif;
-        font-size: 0.8em;
-      }
-      .lw-attribution a {
-        cursor: pointer;
-        color: rgb(54, 116, 217);
-        opacity: 0.8;
-      }
-      .lw-attribution a:hover {
-        color: rgb(54, 116, 217);
-        opacity: 1;
-      }
     </style>
   </head>
 
   <body>
-    <div id="container" style="position: absolute; width: 100%; height: 100%">
-      <!-- Lightweight Charts Attribution Message and Link -->
-      <div class="lw-attribution">
-        <a href="https://tradingview.github.io/lightweight-charts/"
-          >Powered by Lightweight Charts</a
-        >
-      </div>
-    </div>
+    <div id="container" style="position: absolute; width: 100%; height: 100%"></div>
     <script type="text/javascript">
       // Function to generate a sample set of Candlestick datapoints
       function generateCandlestickData() {

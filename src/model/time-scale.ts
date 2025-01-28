@@ -929,18 +929,17 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	private _correctOffset(): void {
+		// block scrolling of to past
+		const minRightOffset = this._minRightOffset();
+		if (minRightOffset !== null && this._rightOffset < minRightOffset) {
+			this._rightOffset = minRightOffset;
+			this._visibleRangeInvalidated = true;
+		}
+
 		// block scrolling of to future
 		const maxRightOffset = this._maxRightOffset();
 		if (this._rightOffset > maxRightOffset) {
 			this._rightOffset = maxRightOffset;
-			this._visibleRangeInvalidated = true;
-		}
-
-		// block scrolling of to past
-		const minRightOffset = this._minRightOffset();
-
-		if (minRightOffset !== null && this._rightOffset < minRightOffset) {
-			this._rightOffset = minRightOffset;
 			this._visibleRangeInvalidated = true;
 		}
 	}

@@ -14,6 +14,14 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.1.7
+
+**Enhancements**
+
+- Further Refinement of the Price Scale Label Alignment (PR [#1630](https://github.com/tradingview/lightweight-charts/pull/1630))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.6..v4.1.7).
+
 ## 4.1.6
 
 **Enhancements**
