@@ -14,6 +14,56 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.2.3
+
+**Minor Improvements**
+
+- Improve check for crosshair label visibility on the price scale. This improves upon previous work (#1743 in v4.2.2) by reducing the allocated space for the crosshair when it is enabled, but the label is disabled. (PR [#1757](https://github.com/tradingview/lightweight-charts/issues/1757))
+
+**Bug Fixes**
+
+- Added additional prototype pollution protection for internal merge helper function. (PR [#1758](https://github.com/tradingview/lightweight-charts/issues/1758))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.2..v4.2.3).
+
+## 4.2.2
+
+**Minor Improvements**
+
+- Improved price scale width calculation by not allocating space for crosshair labels when the crosshair is disabled. (PR [#1743](https://github.com/tradingview/lightweight-charts/issues/1743))
+
+**Bug Fixes**
+
+- Fixed calculations for `fixLeftEdge` and `fixRightEdge` on the first render when both are true and data is added to an initially empty chart. Fixes issue [#1356](https://github.com/tradingview/lightweight-charts/issues/1356). (PR [#1741](https://github.com/tradingview/lightweight-charts/issues/1741))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.1..v4.2.2).
+
+## 4.2.1
+
+**Bug Fixes**
+
+- Fixed an issue where the series title part of a price scale label appeared blurry when using Firefox.
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.0..v4.2.1).
+
+## 4.2.0
+
+**Enhancements**
+
+- Added new [`attributionLogo`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/LayoutOptions#attributionLogo) option to `LayoutOptions`. This feature displays the TradingView attribution logo on the main chart pane by default, helping users meet the library's licensing requirements for attribution.
+  - The TradingView attribution logo can be easily hidden by setting the `attributionLogo` option to `false` in the chart's `layout` option.
+- Improved data validation for `OhlcData` and `SingleValueData`. Introduced `isFulfilledBarData` for `OhlcData` and `isFulfilledLineData` for `SingleValueData`, ensuring more accurate validation of data types. Contributed by [@mozeryansky](https://github.com/mozeryansky) (PR [#1579](https://github.com/tradingview/lightweight-charts/pull/1579), fixes [#1526](https://github.com/tradingview/lightweight-charts/issues/1526)).
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.7..v4.2.0).
+
+## 4.1.7
+
+**Enhancements**
+
+- Further Refinement of the Price Scale Label Alignment (PR [#1630](https://github.com/tradingview/lightweight-charts/pull/1630))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.6..v4.1.7).
+
 ## 4.1.6
 
 **Enhancements**
@@ -112,7 +162,7 @@ A simple example can be found in this test case: [horizontal-price-scale.js](htt
 
 **Bug Fixes**
 
-- Fixed chart layout when direction is set to ﻿RTL. (PR [#1338](https://github.com/tradingview/lightweight-charts/pull/1338))
+- Fixed chart layout when direction is set to RTL. (PR [#1338](https://github.com/tradingview/lightweight-charts/pull/1338))
 - Fixed re-enabling of `autoSize` after disabling it. (PR [#1274](https://github.com/tradingview/lightweight-charts/pull/1377))
 - Corrected percentage mode and zero first value. (fixes [#1386](https://github.com/tradingview/lightweight-charts/issues/1386))
 - Prevent chart shifting when new data replaces existing whitespace. (fixes [#1201](https://github.com/tradingview/lightweight-charts/issues/1201))
