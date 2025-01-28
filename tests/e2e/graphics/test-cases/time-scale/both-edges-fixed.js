@@ -16,7 +16,7 @@ function runTestCase(container) {
 		},
 	});
 
-	const mainSeries = chart.addAreaSeries({
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		lineWidth: 2,
 		topColor: 'rgba(54, 204, 130, 0.48)',
 		bottomColor: 'rgba(54, 204, 130, 0.48)',

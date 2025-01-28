@@ -49,7 +49,7 @@ function runTestCase(container) {
 	};
 
 	for (let i = 0; i < levels.length; i++) {
-		const s = chart.addLineSeries({
+		const s = chart.addSeries(LightweightCharts.LineSeries, {
 			color: colorByIndex(i),
 		});
 		s.setData([
