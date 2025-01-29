@@ -2,7 +2,7 @@
 
 import { assert } from '../helpers/assertions';
 
-import { isFulfilledData, SeriesDataItemTypeMap } from './data-consumer';
+import { isFulfilledData, OhlcData, SeriesDataItemTypeMap } from './data-consumer';
 import { IHorzScaleBehavior } from './ihorz-scale-behavior';
 import { CreatePriceLineOptions } from './price-line-options';
 import { SeriesType } from './series-options';
@@ -67,31 +67,21 @@ function checkBarItem<HorzScaleItem>(
 	if (!isFulfilledData(barItem)) {
 		return;
 	}
+	(['open', 'high', 'low', 'close'] as (keyof OhlcData)[]).forEach((key: keyof OhlcData) => {
+		assert(
+			typeof barItem[key] === 'number',
+			`${type} series item data value of ${key} must be a number, got=${typeof barItem[key]}, value=${
+				barItem[key]
+			}`
+		);
 
-	assert(
-		typeof barItem.open === 'number',
-		`${type} series item data value of open must be a number, got=${typeof barItem.open}, value=${
-			barItem.open
-		}`
-	);
-	assert(
-		typeof barItem.high === 'number',
-		`${type} series item data value of high must be a number, got=${typeof barItem.high}, value=${
-			barItem.high
-		}`
-	);
-	assert(
-		typeof barItem.low === 'number',
-		`${type} series item data value of low must be a number, got=${typeof barItem.low}, value=${
-			barItem.low
-		}`
-	);
-	assert(
-		typeof barItem.close === 'number',
-		`${type} series item data value of close must be a number, got=${typeof barItem.close}, value=${
-			barItem.close
-		}`
-	);
+		assert(
+			isSafeValue(barItem[key]),
+			`${type} series item data value of ${key} must be between ${MIN_SAFE_VALUE.toPrecision(16)} and ${MAX_SAFE_VALUE.toPrecision(16)}, got=${typeof barItem[key]}, value=${
+				barItem[key]
+			}`
+		);
+	});
 }
 
 function checkLineItem<HorzScaleItem>(
@@ -108,6 +98,13 @@ function checkLineItem<HorzScaleItem>(
 			lineItem.value
 		}`
 	);
+
+	assert(
+		isSafeValue(lineItem.value),
+		`${type} series item data value must be between ${MIN_SAFE_VALUE.toPrecision(16)} and ${MAX_SAFE_VALUE.toPrecision(16)}, got=${typeof lineItem.value}, value=${
+			lineItem.value
+		}`
+	);
 }
 
 function checkCustomItem(
@@ -116,4 +113,11 @@ function checkCustomItem(
 ): void {
 	// Nothing to check yet...
 	return;
+}
+
+const MIN_SAFE_VALUE = Number.MIN_SAFE_INTEGER / 100;
+const MAX_SAFE_VALUE = Number.MAX_SAFE_INTEGER / 100;
+
+function isSafeValue(value: number): boolean {
+	return value >= MIN_SAFE_VALUE && value <= MAX_SAFE_VALUE;
 }

@@ -184,10 +184,19 @@ export function isWhitespaceData<HorzScaleItem = Time>(data: SeriesDataItemTypeM
 export function isFulfilledData<HorzScaleItem, T extends SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]>(
 	data: T
 ): data is Extract<T, BarData<HorzScaleItem> | LineData<HorzScaleItem> | HistogramData<HorzScaleItem>> {
-	return (
-		(data as Partial<BarData<HorzScaleItem>>).open !== undefined ||
-		(data as Partial<LineData<HorzScaleItem>>).value !== undefined
-	);
+	return isFulfilledBarData(data) || isFulfilledLineData(data);
+}
+
+export function isFulfilledBarData<HorzScaleItem, T extends SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]>(
+	data: T
+): data is Extract<T, BarData<HorzScaleItem>> {
+	return (data as Partial<BarData<HorzScaleItem>>).open !== undefined;
+}
+
+export function isFulfilledLineData<HorzScaleItem, T extends SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]>(
+	data: T
+): data is Extract<T, LineData<HorzScaleItem> | HistogramData<HorzScaleItem>> {
+	return (data as Partial<LineData<HorzScaleItem>>).value !== undefined;
 }
 
 /**
@@ -228,5 +237,5 @@ export interface SeriesDataItemTypeMap<HorzScaleItem = Time> {
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType, HorzScaleItem = Time> {
 	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): void;
-	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): void;
+	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType], historicalUpdate: boolean): void;
 }

@@ -9,6 +9,7 @@ import { DeepPartial } from '../../helpers/strict-type-checks';
 import { IPanePrimitivePaneView } from '../../model/ipane-primitive';
 
 import { IPanePrimitiveWithOptions, IPanePrimitiveWrapper, PanePrimitiveWrapper } from '../pane-primitive-wrapper';
+import { PrimitiveHasApplyOptions } from '../types';
 import {
 	ImageWatermarkOptions,
 	imageWatermarkOptionsDefaults,
@@ -95,7 +96,7 @@ class ImageWatermark<T> implements IPanePrimitive<T> {
 	}
 }
 
-export type IImageWatermarkPluginApi<T> = IPanePrimitiveWrapper<T, ImageWatermarkOptions>;
+export type IImageWatermarkPluginApi<T> = PrimitiveHasApplyOptions<IPanePrimitiveWrapper<T, ImageWatermarkOptions>>;
 
 /**
  * Creates an image watermark.

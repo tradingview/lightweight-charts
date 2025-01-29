@@ -25,7 +25,9 @@ export interface ISeriesMarkersPluginApi<HorzScaleItem> extends ISeriesPrimitive
 	detach: () => void;
 }
 
-class SeriesMarkersPrimitiveWrapper<HorzScaleItem> extends SeriesPrimitiveAdapter<HorzScaleItem, unknown, SeriesMarkersPrimitive<HorzScaleItem>> implements ISeriesPrimitiveWrapper<HorzScaleItem>, ISeriesMarkersPluginApi<HorzScaleItem> {
+class SeriesMarkersPrimitiveWrapper<HorzScaleItem>
+	extends SeriesPrimitiveAdapter<HorzScaleItem, unknown, SeriesMarkersPrimitive<HorzScaleItem>>
+	implements ISeriesPrimitiveWrapper<HorzScaleItem>, ISeriesMarkersPluginApi<HorzScaleItem> {
 	public constructor(series: ISeriesApi<SeriesType, HorzScaleItem>, primitive: SeriesMarkersPrimitive<HorzScaleItem>, markers?: SeriesMarker<HorzScaleItem>[]) {
 		super(series, primitive);
 		if (markers) {

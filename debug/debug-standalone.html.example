@@ -30,7 +30,7 @@
 
 		const chart = LightweightCharts.createChart(document.getElementById('container'));
 
-		const mainSeries = chart.addLineSeries({
+		const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {
 			priceFormat: {
 				minMove: 1,
 				precision: 0,

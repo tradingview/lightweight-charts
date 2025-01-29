@@ -191,15 +191,15 @@ const codeBlocks: CodeBlockProps[] = [
 const header = 'Lightweight Charts™ Documentation';
 const paragraph = `Lightweight Charts™ is a library for creating interactive financial charts. This documentation site provides all the information needed to get started with Lightweight Charts™ and help you make the most of its features.`;
 
-const showBanner = true;
+const showBanner = false;
 
 function Index(): React.JSX.Element {
 	return (
 		<>
 			{showBanner ? (
 				<Banner
-					text="Exciting Update: Version 4.1 now available, introducing plugin support for enhanced functionality."
-					link="https://tradingview.github.io/lightweight-charts/docs/release-notes#410"
+					text="Exciting Update: Version 5.0 now available, introducing pane support and decreased bundle size."
+					link="https://tradingview.github.io/lightweight-charts/docs/release-notes#500"
 					linkText="Read more"
 				/>
 			) : (

@@ -36,15 +36,15 @@ export type DataChangedHandler = (scope: DataChangedScope) => void;
 export interface BarsInfo<HorzScaleItem> extends Partial<IRange<HorzScaleItem>> {
 	/**
 	 * The number of bars before the start of the range.
-	 * Positive value means that there are some bars before (out of logical range from the left) the {@link Range.from} logical index in the series.
-	 * Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the {@link Range.from} logical index are some bars.
+	 * Positive value means that there are some bars before (out of logical range from the left) the {@link IRange.from} logical index in the series.
+	 * Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the {@link IRange.from} logical index are some bars.
 	 */
 	barsBefore: number;
 
 	/**
 	 * The number of bars after the end of the range.
-	 * Positive value in the `barsAfter` field means that there are some bars after (out of logical range from the right) the {@link Range.to} logical index in the series.
-	 * Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the {@link Range.to} logical index are some bars.
+	 * Positive value in the `barsAfter` field means that there are some bars after (out of logical range from the right) the {@link IRange.to} logical index in the series.
+	 * Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the {@link IRange.to} logical index are some bars.
 	 */
 	barsAfter: number;
 }
@@ -157,6 +157,8 @@ export interface ISeriesApi<
 	 *
 	 * @param bar - A single data item to be added. Time of the new item must be greater or equal to the latest existing time point.
 	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
+	 * @param historicalUpdate - If true, allows updating an existing data point that is not the latest bar. Default is false.
+	 * Updating older data using `historicalUpdate` will be slower than updating the most recent data point.
 	 * @example Updating line series data
 	 * ```js
 	 * lineSeries.update({
@@ -175,7 +177,7 @@ export interface ISeriesApi<
 	 * });
 	 * ```
 	 */
-	update(bar: TData): void;
+	update(bar: TData, historicalUpdate?: boolean): void;
 
 	/**
 	 * Returns a bar data by provided logical index.
@@ -260,12 +262,17 @@ export interface ISeriesApi<
 	removePriceLine(line: IPriceLine): void;
 
 	/**
+	 * Returns an array of price lines.
+	 */
+	priceLines(): IPriceLine[];
+
+	/**
 	 * Return current series type.
 	 *
 	 * @returns Type of the series.
 	 * @example
 	 * ```js
-	 * const lineSeries = chart.addLineSeries();
+	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.seriesType()); // "Line"
 	 *
 	 * const candlestickSeries = chart.addCandlestickSeries();

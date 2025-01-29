@@ -20,6 +20,7 @@ import { IDataSourcePaneViews } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
 import { KineticAnimation } from '../model/kinetic-animation';
 import { Pane } from '../model/pane';
+import { hitTestPane, HitTestResult } from '../model/pane-hit-test';
 import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
@@ -31,7 +32,6 @@ import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IChartWidgetBase } from './chart-widget';
 import { drawBackground, drawForeground, DrawFunction, drawSourceViews, ViewsGetter } from './draw-functions';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
-import { hitTestPane, HitTestResult } from './pane-hit-test';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 
 const enum KineticScrollConstants {
@@ -263,13 +263,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return;
 		}
 		this._onMouseEvent();
-
 		const x = event.localX;
 		const y = event.localY;
 		this._setCrosshairPosition(x, y, event);
-		const hitTest = this.hitTest(x, y);
-		this._chart.setCursorStyle(hitTest?.cursorStyle ?? null);
-		this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 	}
 
 	public mouseClickEvent(event: MouseEventHandlerMouseEvent): void {
@@ -512,6 +508,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			});
 			this._drawCrosshair(topTarget);
 			this._drawSources(topTarget, sourceTopPaneViews);
+			this._drawSources(topTarget, sourceLabelPaneViews);
 		}
 	}
 

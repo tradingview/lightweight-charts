@@ -8,7 +8,7 @@ export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '45.00 KB',
+		limit: '47.00 KB',
 		import: '*',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -30,7 +30,23 @@ export default [
 		brotli: true,
 	},
 	{
-		name: 'ESM Standalone',
+		name: 'ESM createYieldCurveChart',
+		path: 'dist/lightweight-charts.production.mjs',
+		limit: '45.00 KB',
+		import: '{ createYieldCurveChart }',
+		ignore: ['fancy-canvas'],
+		brotli: true,
+	},
+	{
+		name: 'ESM createOptionsChart',
+		path: 'dist/lightweight-charts.production.mjs',
+		limit: '45.00 KB',
+		import: '{ createOptionsChart }',
+		ignore: ['fancy-canvas'],
+		brotli: true,
+	},
+	{
+		name: 'Standalone-ESM',
 		path: 'dist/lightweight-charts.standalone.production.mjs',
 		limit: '50.00 KB',
 		import: '*',
@@ -63,7 +79,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ createSeriesMarkers }',
 		ignore: ['fancy-canvas'],
-		limit: '4.08 KB',
+		limit: '4.5 KB',
 		brotli: true,
 	},
 	{
@@ -79,7 +95,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ BaselineSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '3.2 KB',
+		limit: '4.00 KB',
 		brotli: true,
 	},
 	{
@@ -87,7 +103,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ AreaSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '3.2 KB',
+		limit: '4.00 KB',
 		brotli: true,
 	},
 	{
@@ -103,7 +119,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ CandlestickSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '2.5 KB',
+		limit: '3.00 KB',
 		brotli: true,
 	},
 	{
@@ -113,5 +129,12 @@ export default [
 		ignore: ['fancy-canvas'],
 		limit: '2.5 KB',
 		brotli: true,
+	},
+	{
+		name: 'Plugin: UpDownMarkersPrimitive',
+		path: 'dist/lightweight-charts.production.mjs',
+		import: '{ createUpDownMarkers }',
+		ignore: ['fancy-canvas'],
+		limit: '2.50 KB',
 	},
 ];

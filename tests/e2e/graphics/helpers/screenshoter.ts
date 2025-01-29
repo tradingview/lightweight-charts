@@ -5,9 +5,11 @@ import puppeteer, {
 	Browser,
 	ConsoleMessage,
 	HTTPResponse,
+	LaunchOptions,
 	Page,
-	PuppeteerLaunchOptions,
 } from 'puppeteer';
+
+import { runInteractionsOnPage } from '../../helpers/perform-interactions';
 
 import { MouseEventParams } from '../../../../src/api/ichart-api';
 import { TestCaseWindow } from './testcase-window-type';
@@ -108,6 +110,8 @@ export class Screenshoter {
 				await waitForMouseMove;
 			}
 
+			await runInteractionsOnPage(page);
+
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
 				return new Promise<void>((resolve: () => void) => {
@@ -124,7 +128,8 @@ export class Screenshoter {
 				throw new Error(errors.join('\n'));
 			}
 
-			const pageScreenshotPNG = PNG.sync.read(await page.screenshot({ encoding: 'binary' }));
+			const uint8Array = await page.screenshot({ encoding: 'binary' });
+			const pageScreenshotPNG = PNG.sync.read(Buffer.from(uint8Array));
 			const additionalScreenshotDataURL = await page.evaluate(() => {
 				const testCaseWindow = window as unknown as TestCaseWindow;
 				if (!testCaseWindow.checkChartScreenshot) {
@@ -174,7 +179,7 @@ export class Screenshoter {
 	}
 
 	private _createBrowser(): Promise<Browser> {
-		const puppeteerOptions: PuppeteerLaunchOptions = {
+		const puppeteerOptions: LaunchOptions = {
 			defaultViewport: {
 				deviceScaleFactor: this._devicePixelRatio,
 				width: viewportWidth,

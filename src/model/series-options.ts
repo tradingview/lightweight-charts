@@ -252,6 +252,14 @@ export interface AreaStyleOptions {
 	bottomColor: string;
 
 	/**
+	 * Gradient is relative to the base value and the currently visible range.
+	 * If it is false, the gradient is relative to the top and bottom of the chart.
+	 *
+	 * @defaultValue `false`
+	 */
+	relativeGradient: boolean;
+
+	/**
 	 * Invert the filled area. Fills the area above the line if set to true.
 	 *
 	 * @defaultValue `false`
@@ -375,7 +383,13 @@ export interface BaselineStyleOptions {
 	 * @defaultValue `{ type: 'price', price: 0 }`
 	 */
 	baseValue: BaseValueType;
-
+	/**
+	 * Gradient is relative to the base value and the currently visible range.
+	 * If it is false, the gradient is relative to the top and bottom of the chart.
+	 *
+	 * @defaultValue `false`
+	 */
+	relativeGradient: boolean;
 	/**
 	 * The first color of the top area.
 	 *
@@ -663,7 +677,7 @@ export interface SeriesOptionsCommon {
 	/**
 	 * Visibility of the label with the latest visible price on the price scale.
 	 *
-	 * @defaultValue `true`
+	 * @defaultValue `true`, `false` for yield curve charts
 	 */
 	lastValueVisible: boolean;
 
@@ -698,7 +712,7 @@ export interface SeriesOptionsCommon {
 	/**
 	 * Show the price line. Price line is a horizontal line indicating the last price of the series.
 	 *
-	 * @defaultValue `true`
+	 * @defaultValue `true`, `false` for yield curve charts
 	 */
 	priceLineVisible: boolean;
 
@@ -774,7 +788,7 @@ export interface SeriesOptionsCommon {
 	 * @defaultValue `undefined`
 	 * @example Use price range from 0 to 100 regardless the current visible range
 	 * ```js
-	 * const firstSeries = chart.addLineSeries({
+	 * const firstSeries = chart.addSeries(LineSeries, {
 	 *     autoscaleInfoProvider: () => ({
 	 *         priceRange: {
 	 *             minValue: 0,
@@ -785,7 +799,7 @@ export interface SeriesOptionsCommon {
 	 * ```
 	 * @example Adding a small pixel margins to the price range
 	 * ```js
-	 * const firstSeries = chart.addLineSeries({
+	 * const firstSeries = chart.addSeries(LineSeries, {
 	 *     autoscaleInfoProvider: () => ({
 	 *         priceRange: {
 	 *             minValue: 0,
@@ -800,7 +814,7 @@ export interface SeriesOptionsCommon {
 	 * ```
 	 * @example Using the default implementation to adjust the result
 	 * ```js
-	 * const firstSeries = chart.addLineSeries({
+	 * const firstSeries = chart.addSeries(LineSeries, {
 	 *     autoscaleInfoProvider: original => {
 	 *         const res = original();
 	 *         if (res !== null) {

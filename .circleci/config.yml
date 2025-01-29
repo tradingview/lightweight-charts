@@ -84,7 +84,7 @@ commands:
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
             echo 'export PRODUCTION_BUILD=<< parameters.productionBuild >>' >> $BASH_ENV
             echo 'export GREP="<< parameters.grep >>"' >> $BASH_ENV
-            echo 'export COMPARE_BRANCH="v5-candidate"' >> $BASH_ENV
+            echo 'export COMPARE_BRANCH="master"' >> $BASH_ENV
             echo 'export BRANCH_SPECIFIC_TEST=<< parameters.branchSpecificTest >>' >> $BASH_ENV
       - run:
           command: scripts/run-graphics-tests.sh
@@ -200,8 +200,7 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      # - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
-      - run: scripts/check-dts-changes.sh ./dts-changes $(git rev-parse origin/v5-candidate) $(git rev-parse HEAD)
+      - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
       - store_artifacts:
           path: ./dts-changes
           when: on_fail
@@ -279,7 +278,7 @@ jobs:
       - attach_workspace:
           at: ./
       - run:
-          command: echo 'export COMPARE_BRANCH="v5-candidate"' >> $BASH_ENV
+          command: echo 'export COMPARE_BRANCH="master"' >> $BASH_ENV
       - run:
           name: "Comparing sizes with merge-base"
           command: node scripts/compare-size-with-merge-base.js

@@ -32,7 +32,7 @@ export interface IPanePrimitiveWrapper<T, Options> {
 	applyOptions?: (options: DeepPartial<Options>) => void;
 }
 
-export class PanePrimitiveWrapper<T, Options = unknown, TPrimitive extends IPanePrimitiveWithOptions<T, Options> = IPanePrimitive<T>> implements IPanePrimitiveWrapper<T, Options> {
+export class PanePrimitiveWrapper<T, Options = unknown, TPrimitive extends IPanePrimitiveWithOptions<T, Options> = IPanePrimitiveWithOptions<T, Options>> implements IPanePrimitiveWrapper<T, Options> {
 	private _primitive: TPrimitive;
 	private _pane: IPaneApi<T>;
 

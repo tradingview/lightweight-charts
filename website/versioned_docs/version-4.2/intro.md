@@ -30,12 +30,14 @@ _Note that the package is shipped with TypeScript declarations, so you can easil
 
 The library ships with the following build variants:
 
-|Dependencies included|Mode|ES module|IIFE (`window.LightweightCharts`)|
-|-|-|-|-|
-|No|PROD|`lightweight-charts.production.mjs`|N/A|
-|No|DEV|`lightweight-charts.development.mjs`|N/A|
-|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|`lightweight-charts.standalone.production.js`|
-|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|`lightweight-charts.standalone.development.js`|
+|Dependencies included|Mode|ES module|CommonJS ⚠️|IIFE (`window.LightweightCharts`)|
+|-|-|-|-|-|
+|No|PROD|`lightweight-charts.production.mjs`|`lightweight-charts.production.cjs`|N/A|
+|No|DEV|`lightweight-charts.development.mjs`|`lightweight-charts.development.cjs`|N/A|
+|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|-|`lightweight-charts.standalone.production.js`|
+|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|-|`lightweight-charts.standalone.development.js`|
+
+⚠️ **Deprecation note:** CommonJS support will be removed from the library at the start of 2024.
 
 ## License and attribution
 
@@ -45,7 +47,7 @@ The Lightweight Charts™ license requires specifying TradingView as the product
 
 :::
 
-You shall add the "attribution notice" from the [NOTICE](https://github.com/tradingview/lightweight-charts/blob/master/NOTICE) file and a link to [https://www.tradingview.com](https://www.tradingview.com) to the page of your website or mobile application that is available to your users.
+You shall add the "attribution notice" from the [NOTICE](https://github.com/tradingview/lightweight-charts/blob/master/NOTICE) file and a link to [https://www.tradingview.com/](https://www.tradingview.com/) to the page of your website or mobile application that is available to your users.
 
 As thanks for creating Lightweight Charts™, we'd be grateful if you add the attribution notice in a prominent place.
 
@@ -91,13 +93,13 @@ To create a series with desired type you need to use appropriate method from [`I
 All of them have the same naming `add<type>Series`, where `<type>` is a type of a series you'd like to create:
 
 ```js
-import { AreaSeries, BarSeries, BaselineSeries, createChart } from 'lightweight-charts';
+import { createChart } from 'lightweight-charts';
 
 const chart = createChart(container);
 
-const areaSeries = chart.addSeries(AreaSeries);
-const barSeries = chart.addSeries(BarSeries);
-const baselineSeries = chart.addSeries(BaselineSeries);
+const areaSeries = chart.addAreaSeries();
+const barSeries = chart.addBarSeries();
+const baselineSeries = chart.addBaselineSeries();
 // ... and so on
 ```
 
@@ -118,7 +120,7 @@ To set the data (or to replace all data items) to a series you need to use [`ISe
 ```js chart replaceThemeConstants
 const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
-const areaSeries = chart.addSeries(AreaSeries, {
+const areaSeries = chart.addAreaSeries({
     lineColor: LINE_LINE_COLOR, topColor: AREA_TOP_COLOR,
     bottomColor: AREA_BOTTOM_COLOR,
 });
@@ -135,7 +137,7 @@ areaSeries.setData([
     { time: '2018-12-31', value: 22.67 },
 ]);
 
-const candlestickSeries = chart.addSeries(CandlestickSeries, {
+const candlestickSeries = chart.addCandlestickSeries({
     upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR, borderVisible: false,
     wickUpColor: BAR_UP_COLOR, wickDownColor: BAR_DOWN_COLOR,
 });
@@ -166,17 +168,17 @@ Thus, to update the data you can use a method [`ISeriesApi.update`](/api/interfa
 It allows you to update the last data item or add a new one much faster without affecting the performance:
 
 ```js
-import { AreaSeries, CandlestickSeries, createChart } from 'lightweight-charts';
+import { createChart } from 'lightweight-charts';
 
 const chart = createChart(container);
 
-const areaSeries = chart.addSeries(AreaSeries);
+const areaSeries = chart.addAreaSeries();
 areaSeries.setData([
     // ... other data items
     { time: '2018-12-31', value: 22.67 },
 ]);
 
-const candlestickSeries = chart.addSeries(CandlestickSeries);
+const candlestickSeries = chart.addCandlestickSeries();
 candlestickSeries.setData([
     // ... other data items
     { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },

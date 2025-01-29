@@ -14,6 +14,14 @@ sidebar_position: 8
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 4.1.7
+
+**Enhancements**
+
+- Further Refinement of the Price Scale Label Alignment (PR [#1630](https://github.com/tradingview/lightweight-charts/pull/1630))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.6..v4.1.7).
+
 ## 4.1.6
 
 **Enhancements**
@@ -103,11 +111,11 @@ A simple example can be found in this test case: [horizontal-price-scale.js](htt
 
 - Added point markers styling option for line-based series. (closes [#365](https://github.com/tradingview/lightweight-charts/issues/365)) [Docs](/api/interfaces/LineStyleOptions.md#pointmarkersvisible)
 - Added double click subscriber for the main chart pane. (closes [#1385](https://github.com/tradingview/lightweight-charts/issues/1385)) [Docs](/api/interfaces/IChartApi.md#subscribedblclick)
-- Added ﻿`setCrosshairPosition` API, allowing programmatic setting of the crosshair position. (fixes [#1198](https://github.com/tradingview/lightweight-charts/issues/1198), [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#438](https://github.com/tradingview/lightweight-charts/issues/438)) [Docs](/api/interfaces/IChartApi.md#setcrosshairposition)
-- Added an option to disable crosshair. Introduced the ﻿`Hidden` option in the ﻿`CrosshairMode` setting. (closes [#749](https://github.com/tradingview/lightweight-charts/issues/749), thanks to [@luk707](https://github.com/luk707))
-- Allow overriding tick mark label length via the ﻿`tickMarkMaxCharacterLength` option. (closes [#1396](https://github.com/tradingview/lightweight-charts/issues/1396)) [Docs](/api/interfaces/HorzScaleOptions.md#tickmarkmaxcharacterlength)
+- Added `setCrosshairPosition` API, allowing programmatic setting of the crosshair position. (fixes [#1198](https://github.com/tradingview/lightweight-charts/issues/1198), [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#438](https://github.com/tradingview/lightweight-charts/issues/438)) [Docs](/api/interfaces/IChartApi.md#setcrosshairposition)
+- Added an option to disable crosshair. Introduced the `Hidden` option in the `CrosshairMode` setting. (closes [#749](https://github.com/tradingview/lightweight-charts/issues/749), thanks to [@luk707](https://github.com/luk707))
+- Allow overriding tick mark label length via the `tickMarkMaxCharacterLength` option. (closes [#1396](https://github.com/tradingview/lightweight-charts/issues/1396)) [Docs](/api/interfaces/HorzScaleOptions.md#tickmarkmaxcharacterlength)
 - Support for overriding the percentage formatter within the localization options. (fixes [#1328](https://github.com/tradingview/lightweight-charts/issues/1328), [#1291](https://github.com/tradingview/lightweight-charts/issues/1291)) [Docs](/api/interfaces/LocalizationOptions.md#percentageformatter)
-- Added ﻿`paneSize` getter to `IChartApi`, returning the dimensions of the chart pane. (issue [#1411](https://github.com/tradingview/lightweight-charts/issues/1411)) [Docs](/api/interfaces/IChartApi.md#panesize)
+- Added `paneSize` getter to `IChartApi`, returning the dimensions of the chart pane. (issue [#1411](https://github.com/tradingview/lightweight-charts/issues/1411)) [Docs](/api/interfaces/IChartApi.md#panesize)
 - Added options to set minimum dimensions for the price and time scales. (closes [#1062](https://github.com/tradingview/lightweight-charts/issues/1062), related to [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#50](https://github.com/tradingview/lightweight-charts/issues/50)) [Docs](/api/interfaces/TimeScaleOptions.md#minimumheight), [Docs](/api/interfaces/PriceScaleOptions.md#minimumwidth)
 
 **Bug Fixes**

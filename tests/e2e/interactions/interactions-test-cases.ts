@@ -11,10 +11,7 @@ import puppeteer, {
 } from 'puppeteer';
 
 import { TestCase } from '../helpers/get-test-cases';
-import {
-	Interaction,
-	performInteractions,
-} from '../helpers/perform-interactions';
+import { Interaction, runInteractionsOnPage } from '../helpers/perform-interactions';
 import { retryTest } from '../helpers/retry-tests';
 
 import { getTestCases } from './helpers/get-interaction-test-cases';
@@ -101,47 +98,7 @@ void describe('Interactions tests', () => {
 					return (window as unknown as InternalWindow).finishedSetup;
 				});
 
-				const initialInteractionsToPerform = await page.evaluate(() => {
-					if (!(window as unknown as InternalWindow).initialInteractionsToPerform) {
-						return [];
-					}
-					return (window as unknown as InternalWindow).initialInteractionsToPerform();
-				});
-
-				await performInteractions(page, initialInteractionsToPerform);
-
-				await page.evaluate(() => {
-					if ((window as unknown as InternalWindow).afterInitialInteractions) {
-						return (
-							window as unknown as InternalWindow
-						).afterInitialInteractions?.();
-					}
-					return new Promise<void>((resolve: () => void) => {
-						window.requestAnimationFrame(() => {
-							setTimeout(resolve, 50);
-						});
-					});
-				});
-
-				const finalInteractionsToPerform = await page.evaluate(() => {
-					if (!(window as unknown as InternalWindow).finalInteractionsToPerform) {
-						return [];
-					}
-					return (window as unknown as InternalWindow).finalInteractionsToPerform();
-				});
-
-				if (finalInteractionsToPerform && finalInteractionsToPerform.length > 0) {
-					await performInteractions(page, finalInteractionsToPerform);
-				}
-
-				await page.evaluate(() => {
-					return new Promise<void>((resolve: () => void) => {
-						(window as unknown as InternalWindow).afterFinalInteractions();
-						window.requestAnimationFrame(() => {
-							setTimeout(resolve, 50);
-						});
-					});
-				});
+				await runInteractionsOnPage(page);
 
 				await page.close();
 

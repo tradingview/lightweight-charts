@@ -8,6 +8,7 @@ import { GradientStyleCache } from './gradient-style-cache';
 
 export type AreaFillItem = AreaFillItemBase & AreaFillColorerStyle;
 export interface PaneRendererAreaData extends PaneRendererAreaDataBase<AreaFillItem> {
+	topCoordinate?: Coordinate;
 }
 
 export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData> {
@@ -21,7 +22,8 @@ export class PaneRendererArea extends PaneRendererAreaBase<PaneRendererAreaData>
 				topColor2: '',
 				bottomColor1: '',
 				bottomColor2: item.bottomColor,
-				bottom: renderingScope.bitmapSize.height as Coordinate,
+				topCoordinate: this._data?.topCoordinate ?? 0 as Coordinate,
+				bottomCoordinate: renderingScope.bitmapSize.height as Coordinate,
 			}
 		);
 	}

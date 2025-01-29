@@ -3,7 +3,6 @@ on:
   pull_request:
     branches:
       - master
-      - v5-candidate
 permissions:
   pull-requests: write
 jobs:

@@ -1,9 +1,10 @@
-import { HoveredObject } from '../model/chart-model';
-import { Coordinate } from '../model/coordinate';
-import { IDataSource, IPrimitiveHitTestSource } from '../model/idata-source';
-import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from '../model/ipane-primitive';
-import { Pane } from '../model/pane';
 import { IPaneView } from '../views/pane/ipane-view';
+
+import { HoveredObject } from './chart-model';
+import { Coordinate } from './coordinate';
+import { IDataSource, IPrimitiveHitTestSource } from './idata-source';
+import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from './ipane-primitive';
+import { Pane } from './pane';
 
 export interface HitTestResult {
 	source: IPrimitiveHitTestSource;

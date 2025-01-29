@@ -2,7 +2,7 @@
 
 Description of the Plugin.
 
-- Developed for Lightweight Charts version: `v4.1.0`
+- Developed for Lightweight Charts version: `v5.0.0`
 
 ## Running Locally
 
