@@ -42,22 +42,26 @@ let pass = false;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	const mainSeriesData = generateData();
 	const markerTime = mainSeriesData[450].time;
 	const price = mainSeriesData[450].value;
+
 	mainSeries.setData(mainSeriesData);
-	mainSeries.setMarkers([
-		{
-			time: markerTime,
-			position: 'belowBar',
-			color: '#2196F3',
-			shape: 'arrowUp',
-			text: 'This is a Marker',
-			id: 'TEST',
-		},
-	]);
+	LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		[
+			{
+				time: markerTime,
+				position: 'belowBar',
+				color: '#2196F3',
+				shape: 'arrowUp',
+				text: 'This is a Marker',
+				id: 'TEST',
+			},
+		]
+	);
 
 	chart.subscribeClick(mouseParams => {
 		if (!mouseParams) {

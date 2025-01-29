@@ -13,19 +13,23 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, {
-		watermark: {
-			visible: true,
-			color: 'red',
-			text: 'TradingView Watermark Example',
-			fontSize: 24,
-			fontFamily: 'Roboto',
-			fontStyle: 'italic',
-		},
+	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
-	});
+	}));
 
-	const mainSeries = chart.addAreaSeries();
-
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries);
 	mainSeries.setData(generateData());
+
+	LightweightCharts.createTextWatermark(chart.panes()[0], {
+		visible: true,
+		lines: [
+			{
+				color: 'red',
+				text: 'TradingView Watermark Example',
+				fontSize: 24,
+				fontFamily: 'Roboto',
+				fontStyle: 'italic',
+			},
+		],
+	});
 }

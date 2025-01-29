@@ -4,13 +4,12 @@
  * This script uses size-limit to show size changes since merge-base
  */
 
-const childProcess = require('child_process');
+import * as childProcess from 'node:child_process';
+import bytes from 'bytes';
+import sizeLimit from 'size-limit';
+import filePlugin from '@size-limit/file';
 
-const bytes = require('bytes');
-const sizeLimit = require('size-limit');
-const filePlugin = require('@size-limit/file');
-
-const sizeLimitConfig = require('../.size-limit.js');
+import sizeLimitConfig from '../.size-limit.js';
 
 function run(cmd) {
 	try {
@@ -61,13 +60,17 @@ function formatChange(newSize, oldSize) {
 	return `${formatSizeChange(diff)} (${formatNumber(diffInPercent)}%)`;
 }
 
+const compareBranch = process.env.COMPARE_BRANCH;
+
 async function main() {
 	let headRev = runForOutput('git rev-parse --abbrev-ref HEAD');
 	if (headRev.length === 0 || headRev === 'HEAD') {
 		headRev = runForOutput('git rev-parse HEAD');
 	}
 
-	const revToCheck = runForOutput(`git merge-base origin/master "${headRev}"`);
+	const revToCheck = compareBranch
+		? runForOutput(`git rev-parse origin/${compareBranch}`)
+		: runForOutput(`git merge-base origin/master "${headRev}"`);
 
 	console.log(`Using "${revToCheck}" as base\n`);
 
@@ -100,6 +103,6 @@ async function main() {
 	console.log(`\nResults:\n${output.sort().map(s => `- ${s}`).join('\n')}`);
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
 	main();
 }

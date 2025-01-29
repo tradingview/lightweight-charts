@@ -7,8 +7,12 @@
  * see https://github.com/tradingview/lightweight-charts/issues/474
  */
 
-const path = require('path');
-const fs = require('fs');
+import * as path from 'node:path';
+import * as fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function main() {
 	const packageJsonPath = path.resolve(__dirname, '..', 'package.json');
@@ -20,18 +24,7 @@ function main() {
 	delete packageJson.devDependencies;
 	delete packageJson.scripts;
 
-	// unfortunately, it seems that for now it is impossible to put this line to package.json directly
-	// because for some reason tests don't work with that flag
-	// either mocha, ts-node or typescript does't want to work
-	// so let's add this setting on pre-publish phase
-	//
-	// Disabling this because we are setting the 'cjs' version for the 'main' key of the package.json
-	// thus the type shouldn't be module. When we drop support for cjs then we can re-enable this.
-	// packageJson.type = 'module';
-
 	fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', { encoding: 'utf-8' });
 }
 
-if (require.main === module) {
-	main();
-}
+main();

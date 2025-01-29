@@ -18,7 +18,7 @@ import { makeFont } from '../helpers/make-font';
 import { IDataSource } from '../model/idata-source';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { InvalidationLevel } from '../model/invalidate-mask';
-import { SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
+import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { Pane } from '../model/pane';
 import { TextWidthCache } from '../model/text-width-cache';
@@ -28,7 +28,7 @@ import { IAxisView } from '../views/pane/iaxis-view';
 
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
-import { drawBackground, drawForeground, drawSourcePaneViews } from './draw-functions';
+import { drawBackground, drawForeground, drawSourceViews } from './draw-functions';
 import { ITimeAxisViewsGetter } from './iaxis-view-getters';
 import { MouseEventHandler, MouseEventHandlers, MouseEventHandlerTouchEvent, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
@@ -43,7 +43,7 @@ const enum CursorType {
 	EwResize,
 }
 
-function buildTimeAxisViewsGetter(zOrder: SeriesPrimitivePaneViewZOrder): ITimeAxisViewsGetter {
+function buildTimeAxisViewsGetter(zOrder: PrimitivePaneViewZOrder): ITimeAxisViewsGetter {
 	return (source: IDataSource): readonly IAxisView[] => source.timePaneViews?.(zOrder) ?? [];
 }
 const sourcePaneViews = buildTimeAxisViewsGetter('normal');
@@ -75,7 +75,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	public constructor(chartWidget: ChartWidget<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
 		this._chart = chartWidget;
 		this._horzScaleBehavior = horzScaleBehavior;
-		this._options = chartWidget.options().layout;
+		this._options = chartWidget.options()['layout'];
 
 		this._element = document.createElement('tr');
 
@@ -124,7 +124,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			this,
 			{
 				treatVertTouchDragAsPageScroll: () => true,
-				treatHorzTouchDragAsPageScroll: () => !this._chart.options().handleScroll.horzTouchDrag,
+				treatHorzTouchDragAsPageScroll: () => !this._chart.options()['handleScroll'].horzTouchDrag,
 			}
 		);
 	}
@@ -166,7 +166,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 		this._mouseDown = true;
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove.time) {
+		if (model.timeScale().isEmpty() || !this._chart.options()['handleScale'].axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -181,7 +181,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		const model = this._chart.model();
 		if (!model.timeScale().isEmpty() && this._mouseDown) {
 			this._mouseDown = false;
-			if (this._chart.options().handleScale.axisPressedMouseMove.time) {
+			if (this._chart.options()['handleScale'].axisPressedMouseMove.time) {
 				model.endScaleTime();
 			}
 		}
@@ -189,7 +189,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 	public pressedMouseMoveEvent(event: TouchMouseEvent): void {
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() || !this._chart.options().handleScale.axisPressedMouseMove.time) {
+		if (model.timeScale().isEmpty() || !this._chart.options()['handleScale'].axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -203,7 +203,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	public mouseUpEvent(): void {
 		this._mouseDown = false;
 		const model = this._chart.model();
-		if (model.timeScale().isEmpty() && !this._chart.options().handleScale.axisPressedMouseMove.time) {
+		if (model.timeScale().isEmpty() && !this._chart.options()['handleScale'].axisPressedMouseMove.time) {
 			return;
 		}
 
@@ -215,7 +215,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	}
 
 	public mouseDoubleClickEvent(): void {
-		if (this._chart.options().handleScale.axisDoubleClickReset.time) {
+		if (this._chart.options()['handleScale'].axisDoubleClickReset.time) {
 			this._chart.model().resetTimeScale();
 		}
 	}
@@ -225,7 +225,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	}
 
 	public mouseEnterEvent(): void {
-		if (this._chart.model().options().handleScale.axisPressedMouseMove.time) {
+		if (this._chart.model().options()['handleScale'].axisPressedMouseMove.time) {
 			this._setCursor(CursorType.EwResize);
 		}
 	}
@@ -298,10 +298,12 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		if (type === InvalidationLevel.None) {
 			return;
 		}
-
+		const canvasOptions: CanvasRenderingContext2DSettings = {
+			colorSpace: this._options.colorSpace,
+		};
 		if (type !== InvalidationLevel.Cursor) {
 			this._canvasBinding.applySuggestedBitmapSize();
-			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
+			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding, canvasOptions);
 			if (target !== null) {
 				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
@@ -324,7 +326,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		}
 
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding, canvasOptions);
 		if (topTarget !== null) {
 			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
@@ -338,7 +340,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		const sources = this._chart.model().serieses();
 
 		for (const source of sources) {
-			drawSourcePaneViews(
+			drawSourceViews(
 				axisViewsGetter,
 				(renderer: IPaneRenderer) => drawBackground(renderer, target, false, undefined),
 				source,
@@ -347,7 +349,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		}
 
 		for (const source of sources) {
-			drawSourcePaneViews(
+			drawSourceViews(
 				axisViewsGetter,
 				(renderer: IPaneRenderer) => drawForeground(renderer, target, false, undefined),
 				source,

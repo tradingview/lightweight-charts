@@ -27,7 +27,7 @@ const chart = createChart(
 	}
 );
 
-const mainSeries = chart.addLineSeries({
+const mainSeries = chart.addSeries({
 	priceFormat: {
 		minMove: 1,
 		precision: 0,

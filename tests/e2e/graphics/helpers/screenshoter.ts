@@ -5,9 +5,11 @@ import puppeteer, {
 	Browser,
 	ConsoleMessage,
 	HTTPResponse,
-	launch as launchPuppeteer,
+	LaunchOptions,
 	Page,
 } from 'puppeteer';
+
+import { runInteractionsOnPage } from '../../helpers/perform-interactions';
 
 import { MouseEventParams } from '../../../../src/api/ichart-api';
 import { TestCaseWindow } from './testcase-window-type';
@@ -17,34 +19,29 @@ const viewportHeight = 600;
 
 export class Screenshoter {
 	private _browserPromise: Promise<Browser>;
+	private _noSandbox: boolean;
+	private _devicePixelRatio: number;
+	private _created: boolean = false;
 
 	public constructor(noSandbox: boolean, devicePixelRatio: number = 1) {
-		const puppeteerOptions: Parameters<typeof launchPuppeteer>[0] = {
-			defaultViewport: {
-				deviceScaleFactor: devicePixelRatio,
-				width: viewportWidth,
-				height: viewportHeight,
-			},
-		};
-
-		if (noSandbox) {
-			puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
-		}
-
-		// note that we cannot use launchPuppeteer here as soon it wrong typing in puppeteer
-		// see https://github.com/puppeteer/puppeteer/issues/7529
-		this._browserPromise = puppeteer.launch(puppeteerOptions);
+		this._noSandbox = noSandbox;
+		this._devicePixelRatio = devicePixelRatio;
+		this._browserPromise = this._createBrowser();
 	}
 
 	public async close(): Promise<void> {
 		const browser = await this._browserPromise;
 		await browser.close();
+		this._created = false;
 	}
 
 	public async generateScreenshot(pageContent: string): Promise<PNG> {
 		let page: Page | undefined;
 
 		try {
+			if (!this._created) {
+				this._browserPromise = this._createBrowser();
+			}
 			const browser = await this._browserPromise;
 			page = await browser.newPage();
 
@@ -77,33 +74,43 @@ export class Screenshoter {
 				return Boolean((window as unknown as TestCaseWindow).ignoreMouseMove);
 			});
 
+			const hasChartGlobal = await page.evaluate(() => {
+				return Boolean((window as unknown as TestCaseWindow).chart);
+			});
+
+			if (!shouldIgnoreMouseMove && !hasChartGlobal) {
+				throw new Error('Either an error occurred during the chart creation, or the window variable `chart` was required because `ignoreMouseMove` was not set to true');
+			}
+
 			if (!shouldIgnoreMouseMove) {
 				// move mouse to top-left corner
 				await page.mouse.move(0, 0);
 			}
 
-			const waitForMouseMove = page.evaluate(() => {
-				if ((window as unknown as TestCaseWindow).ignoreMouseMove) { return Promise.resolve(); }
-				return new Promise<number[]>((resolve: (value: number[]) => void) => {
-					const chart = (window as unknown as TestCaseWindow).chart;
-					if (!chart) {
-						throw new Error('window variable `chart` is required unless `ignoreMouseMove` is set to true');
-					}
-					chart.subscribeCrosshairMove((param: MouseEventParams) => {
-						const point = param.point;
-						if (!point) { return; }
-						if (point.x > 0 && point.y > 0) {
-							requestAnimationFrame(() => resolve([point.x, point.y] as number[]));
+			if (!shouldIgnoreMouseMove) {
+				const waitForMouseMove = page.evaluate(() => {
+					if ((window as unknown as TestCaseWindow).ignoreMouseMove) { return Promise.resolve(); }
+					return new Promise<number[]>((resolve: (value: number[]) => void) => {
+						const chart = (window as unknown as TestCaseWindow).chart;
+						if (!chart) {
+							// An error occurred during the chart creation
+							return;
 						}
+						chart.subscribeCrosshairMove((param: MouseEventParams) => {
+							const point = param.point;
+							if (!point) { return; }
+							if (point.x > 0 && point.y > 0) {
+								requestAnimationFrame(() => resolve([point.x, point.y] as number[]));
+							}
+						});
 					});
 				});
-			});
-
-			if (!shouldIgnoreMouseMove) {
 				// to avoid random cursor position
 				await page.mouse.move(viewportWidth / 2, viewportHeight / 2);
 				await waitForMouseMove;
 			}
+
+			await runInteractionsOnPage(page);
 
 			// let's wait until the next af to make sure that everything is repainted
 			await page.evaluate(() => {
@@ -121,7 +128,8 @@ export class Screenshoter {
 				throw new Error(errors.join('\n'));
 			}
 
-			const pageScreenshotPNG = PNG.sync.read(await page.screenshot({ encoding: 'binary' }));
+			const uint8Array = await page.screenshot({ encoding: 'binary' });
+			const pageScreenshotPNG = PNG.sync.read(Buffer.from(uint8Array));
 			const additionalScreenshotDataURL = await page.evaluate(() => {
 				const testCaseWindow = window as unknown as TestCaseWindow;
 				if (!testCaseWindow.checkChartScreenshot) {
@@ -141,7 +149,6 @@ export class Screenshoter {
 				const additionalScreenshotPNG = new PNG();
 				await new Promise((resolve: (data: PNG) => void, reject: (reason: Error) => void) => {
 					additionalScreenshotPNG.parse(additionalScreenshotBuffer, (error: Error, data: PNG) => {
-						// eslint-disable-next-line @typescript-eslint/tslint/config
 						if (error === null) {
 							resolve(data);
 						} else {
@@ -169,5 +176,22 @@ export class Screenshoter {
 				await page.close();
 			}
 		}
+	}
+
+	private _createBrowser(): Promise<Browser> {
+		const puppeteerOptions: LaunchOptions = {
+			defaultViewport: {
+				deviceScaleFactor: this._devicePixelRatio,
+				width: viewportWidth,
+				height: viewportHeight,
+			},
+			headless: true,
+		};
+
+		if (this._noSandbox) {
+			puppeteerOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
+		}
+		this._created = true;
+		return puppeteer.launch(puppeteerOptions);
 	}
 }

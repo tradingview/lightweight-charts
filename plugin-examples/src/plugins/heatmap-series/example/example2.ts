@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { createChart, LineSeries } from 'lightweight-charts';
 import { HeatMapSeries } from '../heatmap-series';
 import { HeatMapData, HeatmapCell } from '../data';
 import { generateLineData } from '../../../sample-data';
@@ -57,7 +57,7 @@ const myCustomSeries = chart.addCustomSeries(customSeriesView, {
 
 myCustomSeries.setData(heatmapData);
 
-const lineSeries = chart.addLineSeries({
+const lineSeries = chart.addSeries(LineSeries, {
 	color: 'black',
 });
 lineSeries.setData(lineData);

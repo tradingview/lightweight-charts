@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import * as LightweightChartsModule from './index';
 
 // put all exports from package to window.LightweightCharts object

@@ -1,52 +1,28 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const path = require('path');
-const fs = require('fs');
-const fsp = require('fs/promises');
-const https = require('https');
+import path from 'path';
+import fs from 'fs';
+import fsp from 'fs/promises';
+import https from 'https';
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
-const { default: pluginDocusaurus } = require('docusaurus-plugin-typedoc');
-const logger = require('@docusaurus/logger');
+import { themes } from 'prism-react-renderer';
+import pluginDocusaurus from 'docusaurus-plugin-typedoc';
+import logger from '@docusaurus/logger';
 
-const versions = require('./versions.json');
-const sizeLimits = require('../.size-limit.js');
+import versions from './versions.json';
 
+/* Configuration Constants */
 const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
 const projectName = 'lightweight-charts';
 const projectUrl = `https://github.com/${organizationName}/${projectName}`;
 const githubPagesUrl = `https://${organizationName}.github.io`;
 
-const cacheDir = path.resolve(__dirname, './.previous-typings-cache/');
-
+const cacheDir = path.resolve(
+	new URL('.', import.meta.url).pathname,
+	'./.previous-typings-cache/'
+);
 const typedocWatch = process.env.TYPEDOC_WATCH === 'true';
-
-function httpGetJson(url) {
-	return new Promise((resolve, reject) => {
-		const request = https.get(url, response => {
-			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
-				reject(new Error(`Cannot load "${url}", error code=${response.statusCode}`));
-				return;
-			}
-
-			let data = '';
-
-			response.on('data', d => {
-				data += d;
-			});
-
-			response.on('end', () => {
-				resolve(JSON.parse(data));
-			});
-		});
-
-		request.on('error', error => {
-			reject(error);
-		});
-	});
-}
 
 function delay(duration) {
 	return new Promise(resolve => {
@@ -61,22 +37,46 @@ function downloadFile(urlString, filePath, retriesRemaining = 0, attempt = 1) {
 		const url = new URL(urlString);
 
 		const request = https.get(url, response => {
-			if (response.statusCode && response.statusCode >= 300 && response.statusCode < 400 && response.headers.location !== undefined) {
+			if (
+				response.statusCode &&
+				response.statusCode >= 300 &&
+				response.statusCode < 400 &&
+				response.headers.location !== undefined
+			) {
 				// handling redirect
 				url.pathname = response.headers.location;
-				downloadFile(url.toString(), filePath, retriesRemaining).then(resolve, reject);
+				downloadFile(url.toString(), filePath, retriesRemaining).then(
+					resolve,
+					reject
+				);
 				return;
 			}
 
-			if (response.statusCode && (response.statusCode < 100 || response.statusCode > 299)) {
+			if (
+				response.statusCode &&
+				(response.statusCode < 100 || response.statusCode > 299)
+			) {
 				if (retriesRemaining > 0) {
-					logger.info(`Failed to download from ${urlString}, attempting again (${retriesRemaining - 1} retries remaining).`);
+					logger.info(
+						`Failed to download from ${urlString}, attempting again (${
+							retriesRemaining - 1
+						} retries remaining).`
+					);
 					delay(Math.pow(2, attempt) * 200).then(() => {
-						downloadFile(url.toString(), filePath, retriesRemaining - 1, attempt + 1).then(resolve, reject);
+						downloadFile(
+							url.toString(),
+							filePath,
+							retriesRemaining - 1,
+							attempt + 1
+						).then(resolve, reject);
 					});
 					return;
 				}
-				reject(new Error(`Cannot download file "${urlString}", error code=${response.statusCode}`));
+				reject(
+					new Error(
+						`Cannot download file "${urlString}", error code=${response.statusCode}`
+					)
+				);
 				return;
 			}
 
@@ -126,62 +126,45 @@ async function downloadTypingsFromUnpkg(version) {
 	return typingsFilePath;
 }
 
-/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc').TypeDocOptions} */
+// PluginOptions
+/** @type {Partial<import('docusaurus-plugin-typedoc/dist/models').PluginOptions> & Partial<import('typedoc').TypeDocOptions> & Partial<import('typedoc-plugin-frontmatter/dist/options/models').PluginOptions>} */
 const commonDocusaurusPluginTypedocConfig = {
 	readme: 'none',
 	disableSources: true,
 	tsconfig: path.resolve(cacheDir, './tsconfig.json'),
-	// The trailing slash is required.
-	// @ts-ignore
 	publicPath: '/api/',
-	// This needs to be here because TypeDoc fails to auto-detect the project name
-	// which would result in the title of our generated index page being 'undefined'.
 	name: 'lightweight-charts',
 	sort: ['source-order'],
-
-	// let's disable pagination for API Reference pages since it makes almost no sense there
-	frontmatter: {
-		// eslint-disable-next-line camelcase
+	plugin: ['typedoc-plugin-frontmatter'],
+	frontmatterGlobals: {
+		/* eslint-disable camelcase */
+		// @ts-ignore
 		pagination_next: null,
-		// eslint-disable-next-line camelcase
+		// @ts-ignore
 		pagination_prev: null,
+		/* eslint-enable camelcase */
 	},
 };
 
-/** @type {(version: string) => import('@docusaurus/types').PluginModule} */
 function typedocPluginForVersion(version) {
 	return context => ({
 		name: `typedoc-for-v${version}`,
-
-		/** @type {() => Promise<any>} */
 		loadContent: async () => {
 			await pluginDocusaurus(context, {
 				...commonDocusaurusPluginTypedocConfig,
 				id: `${version}-api`,
+				// @ts-ignore
 				entryPoints: [getTypingsCacheFilePath(version)],
-				docsRoot: path.resolve(__dirname, `./versioned_docs/version-${version}`),
-			}).loadContent();
+				out: path.resolve(
+					new URL('.', import.meta.url).pathname,
+					`./versioned_docs/version-${version}/api`
+				),
+			});
 		},
 	});
 }
 
-async function getConfig() {
-	let size = sizeLimits
-		.map(limit => parseFloat(limit.limit.split(' ')[0]))
-		.reduce((a, b) => Math.max(a, b));
-
-	try {
-		// TODO: cache the result to avoid requesting the size every time on config change
-		// load the latest version every time
-		const bhResult = await httpGetJson(`https://bundlephobia.com/api/size?package=lightweight-charts@${versions[0] || 'latest'}&record=true`);
-
-		logger.info(`The bundlephobia result has been loaded: version=${bhResult.version}, gzip=${bhResult.gzip}`);
-		size = bhResult.gzip / 1024;
-	} catch (e) {
-		logger.warn(`Cannot use size from bundlephobia, use size from size-limit instead, error=${e.toString()}`);
-	}
-
-	// pre-download required typings files before run docusaurus
+const getConfig = async () => {
 	await Promise.all(versions.map(downloadTypingsFromUnpkg));
 
 	/** @type {import('@docusaurus/types').Config} */
@@ -196,6 +179,12 @@ async function getConfig() {
 		organizationName,
 		projectName: 'lightweight-charts',
 		trailingSlash: false,
+
+		future: {
+			// @ts-ignore experimental property name
+			// eslint-disable-next-line camelcase
+			experimental_faster: true,
+		},
 
 		headTags: [
 			{
@@ -246,185 +235,174 @@ async function getConfig() {
 		presets: [
 			[
 				'@docusaurus/preset-classic',
-				/** @type {import('@docusaurus/preset-classic').Options} */
-				({
+				{
 					blog: false,
 					docs: {
-						sidebarPath: require.resolve('./sidebars.js'),
+						sidebarPath: new URL('./sidebars.js', import.meta.url).pathname,
 					},
 					theme: {
-						customCss: require.resolve('./src/css/custom.css'),
+						customCss: new URL('./src/css/custom.css', import.meta.url)
+							.pathname,
 					},
-				}),
+				},
 			],
 		],
 
-		customFields: {
-			bundleSize: size.toFixed(0),
-		},
+		customFields: {},
 
-		themeConfig:
-			/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-			({
-				navbar: {
-					title: 'Lightweight Charts',
-					logo: {
-						src: 'this value is not used because we swizzled the Logo component - see src/theme/Logo',
-						alt: 'Lightweight Charts home button',
+		themeConfig: {
+			navbar: {
+				title: 'Lightweight Charts',
+				logo: {
+					src: 'this value is not used because we swizzled the Logo component - see src/theme/Logo',
+					alt: 'Lightweight Charts home button',
+				},
+				items: [
+					{
+						type: 'doc',
+						docId: 'intro',
+						position: 'left',
+						label: 'Getting Started',
 					},
-					items: [
-						{
-							type: 'doc',
-							docId: 'intro',
-							position: 'left',
-							label: 'Getting Started',
-						},
-						{
-							to: '/tutorials',
-							position: 'left',
-							label: 'Tutorials',
-						},
-						{
-							type: 'doc',
-							docId: 'api/index',
-							position: 'left',
-							label: 'API Reference',
-						},
-						{
-							type: 'docsVersionDropdown',
-							position: 'right',
-							dropdownActiveClassDisabled: true,
-							dropdownItemsAfter: [
-								{
-									href: 'https://github.com/tradingview/lightweight-charts/tree/v3.7.0/docs',
-									label: '3.7.0',
-								},
-							],
-						},
-						{
-							href: projectUrl,
-							label: 'GitHub',
-							position: 'right',
-						},
-					],
-				},
-				footer: {
-					links: [
-						{
-							title: 'Docs',
-							items: [
-								{
-									label: 'Getting Started',
-									to: '/docs',
-								},
-								{
-									label: 'Tutorials',
-									to: '/tutorials',
-								},
-								{
-									label: 'API Reference',
-									to: '/docs/api',
-								},
-							],
-						},
-						{
-							title: 'Lightweight Charts™ Community',
-							items: [
-								{
-									label: 'Stack Overflow',
-									href: 'https://stackoverflow.com/questions/tagged/lightweight-charts',
-								},
-								{
-									label: 'Discord',
-									href: 'https://discord.gg/UC7cGkvn4U',
-								},
-								{
-									label: 'Twitter',
-									href: 'https://twitter.com/tradingview',
-								},
-							],
-						},
-						{
-							title: 'More',
-							items: [
-								{
-									label: 'Advanced Charts',
-									href: 'https://www.tradingview.com/charting-library-docs/',
-								},
-								{
-									label: 'TradingView Widgets',
-									href: 'https://www.tradingview.com/widget/',
-								},
-							],
-						},
-					],
-					copyright: `Copyright © ${new Date().getFullYear()} TradingView, Inc. Built with Docusaurus.`,
-				},
-				prism: {
-					theme: lightCodeTheme,
-					darkTheme: darkCodeTheme,
-					additionalLanguages: ['ruby', 'swift', 'kotlin', 'groovy'],
-					magicComments: [
-						{
-							className: 'theme-code-block-highlighted-line',
-							line: 'highlight-next-line',
-							block: { start: 'highlight-start', end: 'highlight-end' },
-						},
-						{
-							// Lightly fades the code lines (useful for boilerplate sections of code)
-							className: 'code-block-fade-line',
-							block: {
-								start: 'highlight-fade-start',
-								end: 'highlight-fade-end',
+					{
+						to: '/tutorials',
+						position: 'left',
+						label: 'Tutorials',
+					},
+					{
+						type: 'doc',
+						docId: 'api/index',
+						position: 'left',
+						label: 'API Reference',
+					},
+					{
+						type: 'docsVersionDropdown',
+						position: 'right',
+						dropdownActiveClassDisabled: true,
+						dropdownItemsAfter: [
+							{
+								href: 'https://github.com/tradingview/lightweight-charts/tree/v3.7.0/docs',
+								label: '3.7.0',
 							},
-							line: 'highlight-fade',
+						],
+					},
+					{
+						href: projectUrl,
+						label: 'GitHub',
+						position: 'right',
+					},
+				],
+			},
+			footer: {
+				links: [
+					{
+						title: 'Docs',
+						items: [
+							{
+								label: 'Getting Started',
+								to: '/docs',
+							},
+							{
+								label: 'Tutorials',
+								to: '/tutorials',
+							},
+							{
+								label: 'API Reference',
+								to: '/docs/api',
+							},
+						],
+					},
+					{
+						title: 'Lightweight Charts™ Community',
+						items: [
+							{
+								label: 'Stack Overflow',
+								href: 'https://stackoverflow.com/questions/tagged/lightweight-charts',
+							},
+							{
+								label: 'Discord',
+								href: 'https://discord.gg/UC7cGkvn4U',
+							},
+							{
+								label: 'Twitter',
+								href: 'https://twitter.com/tradingview',
+							},
+						],
+					},
+					{
+						title: 'More',
+						items: [
+							{
+								label: 'Advanced Charts',
+								href: 'https://www.tradingview.com/charting-library-docs/',
+							},
+							{
+								label: 'TradingView Widgets',
+								href: 'https://www.tradingview.com/widget/',
+							},
+						],
+					},
+				],
+				copyright: `Copyright © ${new Date().getFullYear()} TradingView, Inc. Built with Docusaurus.`,
+			},
+			prism: {
+				theme: themes.github,
+				darkTheme: themes.dracula,
+				additionalLanguages: ['ruby', 'swift', 'kotlin', 'groovy'],
+				magicComments: [
+					{
+						className: 'theme-code-block-highlighted-line',
+						line: 'highlight-next-line',
+						block: { start: 'highlight-start', end: 'highlight-end' },
+					},
+					{
+						className: 'code-block-fade-line',
+						block: {
+							start: 'highlight-fade-start',
+							end: 'highlight-fade-end',
 						},
-						{
-							// Hides code lines but can be reveal using toggle and css
-							className: 'code-block-hide-line',
-							block: { start: 'hide-start', end: 'hide-end' },
-							line: 'hide-line',
-						},
-						{
-							// Hides code lines and can't be reveal using toggle and css.
-							// Will still be included in copied code.
-							// Useful for type comments and header notices.
-							className: 'code-block-remove-line',
-							block: { start: 'remove-start', end: 'remove-end' },
-							line: 'remove-line',
-						},
-					],
-				},
-				algolia: {
-					appId: '7Q5A441YPA',
-					// Public API key: it is safe to commit it
-					apiKey: 'c8a8aaeb7ef3fbcce40bada2196e2bcb',
-					indexName: 'lightweight-charts',
-					contextualSearch: true,
-				},
-			}),
+						line: 'highlight-fade',
+					},
+					{
+						className: 'code-block-hide-line',
+						block: { start: 'hide-start', end: 'hide-end' },
+						line: 'hide-line',
+					},
+					{
+						className: 'code-block-remove-line',
+						block: { start: 'remove-start', end: 'remove-end' },
+						line: 'remove-line',
+					},
+				],
+			},
+			algolia: {
+				appId: '7Q5A441YPA',
+				apiKey: 'c8a8aaeb7ef3fbcce40bada2196e2bcb',
+				indexName: 'lightweight-charts',
+				contextualSearch: true,
+			},
+		},
 
 		plugins: [
 			[
 				'content-docs',
-				/** @type {import('@docusaurus/plugin-content-docs').Options} */
-				({
+				{
 					id: 'tutorials',
 					path: 'tutorials',
 					routeBasePath: 'tutorials',
-					sidebarPath: require.resolve('./sidebars-tutorials.js'),
-				}),
+					sidebarPath: new URL('./sidebars-tutorials.js', import.meta.url)
+						.pathname,
+				},
 			],
 			[
 				'docusaurus-plugin-typedoc',
-				/** @type {Partial<import('docusaurus-plugin-typedoc/dist/types').PluginOptions> & import('typedoc').TypeDocOptions} */
-				({
+				{
 					...commonDocusaurusPluginTypedocConfig,
 					id: 'current-api',
 					entryPoints: ['../dist/typings.d.ts'],
 					watch: typedocWatch,
 					preserveWatchOutput: typedocWatch,
-				}),
+				},
 			],
 			...versions.map(typedocPluginForVersion),
 			'./plugins/enhanced-codeblock',
@@ -432,6 +410,7 @@ async function getConfig() {
 	};
 
 	return config;
-}
+};
 
-module.exports = getConfig();
+// eslint-disable-next-line import/no-default-export
+export default getConfig();

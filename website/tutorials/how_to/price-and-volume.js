@@ -16,7 +16,7 @@ const chartOptions = {
 /** @type {import('lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
-const areaSeries = chart.addAreaSeries({
+const areaSeries = chart.addSeries(AreaSeries, {
 	topColor: AREA_TOP_COLOR,
 	bottomColor: AREA_BOTTOM_COLOR,
 	lineColor: LINE_LINE_COLOR,
@@ -32,7 +32,7 @@ areaSeries.priceScale().applyOptions({
 	// highlight-end
 });
 
-const volumeSeries = chart.addHistogramSeries({
+const volumeSeries = chart.addSeries(HistogramSeries, {
 	color: BAR_UP_COLOR,
 	// highlight-start
 	priceFormat: {

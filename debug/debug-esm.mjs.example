@@ -1,0 +1,43 @@
+/* eslint-env browser */
+import {
+	createChart,
+	LineSeries,
+} from '../dist/lightweight-charts.standalone.development.mjs';
+
+/** @type {HTMLDivElement | null} */
+const container = document.querySelector('#container');
+
+/** @type {import('../dist/typings').DeepPartial<import('../dist/typings').ChartOptions>} */
+const options = {
+	autoSize: true,
+};
+
+/** @type {import('../dist/typings').IChartApi} */
+const chart = createChart(container, options);
+
+// @ts-ignore expose the chart api for easier debugging
+window.chart = chart;
+
+const mainSeries = chart.addSeries(LineSeries, {
+	priceFormat: {
+		minMove: 1,
+		precision: 0,
+	},
+});
+mainSeries.setData(generateData());
+
+function generateData() {
+	/** @type {import('../dist/typings').LineData[]} */
+	const res = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < 500; ++i) {
+		res.push({
+			time: /** @type {import('../dist/typings').Time} */ (time.getTime() / 1000),
+			value: i,
+		});
+
+		time.setUTCDate(time.getUTCDate() + 1);
+	}
+
+	return res;
+}

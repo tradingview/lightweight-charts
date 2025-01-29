@@ -27,7 +27,7 @@ let dblClickCount = 0;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	const mainSeriesData = generateData();
 	mainSeries.setData(mainSeriesData);

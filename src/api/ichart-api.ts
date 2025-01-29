@@ -4,21 +4,19 @@ import { ChartOptionsImpl } from '../model/chart-model';
 import { BarData, HistogramData, LineData, WhitespaceData } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
+import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Point } from '../model/point';
 import {
-	AreaSeriesPartialOptions,
-	BarSeriesPartialOptions,
-	BaselineSeriesPartialOptions,
-	CandlestickSeriesPartialOptions,
 	CustomSeriesOptions,
-	HistogramSeriesPartialOptions,
-	LineSeriesPartialOptions,
 	SeriesPartialOptions,
+	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
+import { SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
+import { IPaneApi } from './ipane-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -54,6 +52,10 @@ export interface MouseEventParams<HorzScaleItem = Time> {
 	 * The value will be `undefined` if the event is fired outside the chart, for example a mouse leave event.
 	 */
 	point?: Point;
+	/**
+	 * The index of the Pane
+	 */
+	paneIndex?: number;
 	/**
 	 * Data of all series at the location of the event in the chart.
 	 *
@@ -113,86 +115,29 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * const series = chart.addCustomSeries(myCustomPaneView);
 	 * ```
 	 */
-	addCustomSeries<
-		TData extends CustomData<HorzScaleItem>,
+	addCustomSeries<TData extends CustomData<HorzScaleItem>,
 		TOptions extends CustomSeriesOptions,
 		TPartialOptions extends SeriesPartialOptions<TOptions> = SeriesPartialOptions<TOptions>
 	>(
 		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
-		customOptions?: SeriesPartialOptions<TOptions>
+		customOptions?: SeriesPartialOptions<TOptions>,
+		paneIndex?: number
 	): ISeriesApi<'Custom', HorzScaleItem, TData | WhitespaceData<HorzScaleItem>, TOptions, TPartialOptions>;
-
 	/**
-	 * Creates an area series with specified parameters.
+	 * Creates a series with specified parameters.
 	 *
-	 * @param areaOptions - Customization parameters of the series being created.
-	 * @returns An interface of the created series.
-	 * @example
+	 * @param definition - A series definition.
+	 * @param options - Customization parameters of the series being created.
+	 * @param paneIndex - An index of the pane where the series should be created.
 	 * ```js
-	 * const series = chart.addAreaSeries();
+	 * const series = chart.addSeries(LineSeries, { lineWidth: 2 });
 	 * ```
 	 */
-	addAreaSeries(areaOptions?: AreaSeriesPartialOptions): ISeriesApi<'Area', HorzScaleItem>;
-
-	/**
-	 * Creates a baseline series with specified parameters.
-	 *
-	 * @param baselineOptions - Customization parameters of the series being created.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addBaselineSeries();
-	 * ```
-	 */
-	addBaselineSeries(baselineOptions?: BaselineSeriesPartialOptions): ISeriesApi<'Baseline', HorzScaleItem>;
-
-	/**
-	 * Creates a bar series with specified parameters.
-	 *
-	 * @param barOptions - Customization parameters of the series being created.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addBarSeries();
-	 * ```
-	 */
-	addBarSeries(barOptions?: BarSeriesPartialOptions): ISeriesApi<'Bar', HorzScaleItem>;
-
-	/**
-	 * Creates a candlestick series with specified parameters.
-	 *
-	 * @param candlestickOptions - Customization parameters of the series being created.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addCandlestickSeries();
-	 * ```
-	 */
-	addCandlestickSeries(candlestickOptions?: CandlestickSeriesPartialOptions): ISeriesApi<'Candlestick', HorzScaleItem>;
-
-	/**
-	 * Creates a histogram series with specified parameters.
-	 *
-	 * @param histogramOptions - Customization parameters of the series being created.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addHistogramSeries();
-	 * ```
-	 */
-	addHistogramSeries(histogramOptions?: HistogramSeriesPartialOptions): ISeriesApi<'Histogram', HorzScaleItem>;
-
-	/**
-	 * Creates a line series with specified parameters.
-	 *
-	 * @param lineOptions - Customization parameters of the series being created.
-	 * @returns An interface of the created series.
-	 * @example
-	 * ```js
-	 * const series = chart.addLineSeries();
-	 * ```
-	 */
-	addLineSeries(lineOptions?: LineSeriesPartialOptions): ISeriesApi<'Line', HorzScaleItem>;
+	addSeries<T extends SeriesType>(
+		definition: SeriesDefinition<T>,
+		options?: SeriesPartialOptionsMap[T],
+		paneIndex?: number
+	): ISeriesApi<T, HorzScaleItem>;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
@@ -331,6 +276,28 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	takeScreenshot(): HTMLCanvasElement;
 
 	/**
+	 * Returns array of panes' API
+	 *
+	 * @returns array of pane's Api
+	 */
+	panes(): IPaneApi<HorzScaleItem>[];
+
+	/**
+	 * Removes a pane with index
+	 *
+	 * @param index - the pane to be removed
+	 */
+	removePane(index: number): void;
+
+	/**
+	 * swap the position of two panes.
+	 *
+	 * @param first - the first index
+	 * @param second - the second index
+	 */
+	swapPanes(first: number, second: number): void;
+
+	/**
 	 * Returns the active state of the `autoSize` option. This can be used to check
 	 * whether the chart is handling resizing automatically with a `ResizeObserver`.
 	 *
@@ -367,7 +334,14 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Returns the dimensions of the chart pane (the plot surface which excludes time and price scales).
 	 * This would typically only be useful for plugin development.
 	 *
+	 * @param paneIndex - The index of the pane
+	 * @defaultValue `0`
 	 * @returns Dimensions of the chart pane
 	 */
-	paneSize(): PaneSize;
+	paneSize(paneIndex?: number): PaneSize;
+
+	/**
+	 * Returns the horizontal scale behaviour.
+	 */
+	horzBehaviour(): IHorzScaleBehavior<HorzScaleItem>;
 }

@@ -15,7 +15,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	const data = generateData();
 	mainSeries.setData(data);
@@ -27,7 +27,10 @@ function runTestCase(container) {
 		{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'arrowUp' },
 	];
 
-	mainSeries.setMarkers(markers);
+	LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		markers
+	);
 	chart.applyOptions({
 		timeScale: {
 			barSpacing: 0.01, // will be corrected to min available bar spacing

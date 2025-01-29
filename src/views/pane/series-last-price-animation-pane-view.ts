@@ -1,14 +1,14 @@
 import { assert } from '../../helpers/assertions';
-import { applyAlpha } from '../../helpers/color';
 
+import { ISeries } from '../../model/iseries';
 import { Point } from '../../model/point';
-import { ISeries } from '../../model/series';
 import { LastPriceAnimationMode } from '../../model/series-options';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { SeriesLastPriceAnimationRenderer } from '../../renderers/series-last-price-animation-renderer';
 
 import { IUpdatablePaneView } from './iupdatable-pane-view';
 
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 const enum Constants {
 	AnimationPeriod = 2600,
 
@@ -37,6 +37,7 @@ const enum Constants {
 	Stage3StartStrokeAlpha = Stage2EndStrokeAlpha,
 	Stage3EndStrokeAlpha = Stage2EndStrokeAlpha,
 }
+/* eslint-enable @typescript-eslint/no-duplicate-enum-values */
 
 interface AnimationStageData {
 	start: number;
@@ -88,35 +89,8 @@ interface AnimationData {
 	strokeColor: string;
 }
 
-function color(seriesLineColor: string, stage: number, startAlpha: number, endAlpha: number): string {
-	const alpha = startAlpha + (endAlpha - startAlpha) * stage;
-	return applyAlpha(seriesLineColor, alpha);
-}
-
 function radius(stage: number, startRadius: number, endRadius: number): number {
 	return startRadius + (endRadius - startRadius) * stage;
-}
-
-function animationData(durationSinceStart: number, lineColor: string): AnimationData {
-	const globalStage = (durationSinceStart % Constants.AnimationPeriod) / Constants.AnimationPeriod;
-
-	let currentStageData: AnimationStageData | undefined;
-
-	for (const stageData of animationStagesData) {
-		if (globalStage >= stageData.start && globalStage <= stageData.end) {
-			currentStageData = stageData;
-			break;
-		}
-	}
-
-	assert(currentStageData !== undefined, 'Last price animation internal logic error');
-
-	const subStage = (globalStage - currentStageData.start) / (currentStageData.end - currentStageData.start);
-	return {
-		fillColor: color(lineColor, subStage, currentStageData.startFillAlpha, currentStageData.endFillAlpha),
-		strokeColor: color(lineColor, subStage, currentStageData.startStrokeAlpha, currentStageData.endStrokeAlpha),
-		radius: radius(subStage, currentStageData.startRadius, currentStageData.endRadius),
-	};
 }
 
 export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
@@ -213,7 +187,7 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 		const seriesLineColor = lastValue.color;
 		const seriesLineWidth = this._series.options().lineWidth;
 
-		const data = animationData(this._duration(), seriesLineColor);
+		const data = this._animationData(this._duration(), seriesLineColor);
 
 		this._renderer.setData({
 			seriesLineColor,
@@ -228,7 +202,7 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 	private _updateRendererDataStage(): void {
 		const rendererData = this._renderer.data();
 		if (rendererData !== null) {
-			const data = animationData(this._duration(), rendererData.seriesLineColor);
+			const data = this._animationData(this._duration(), rendererData.seriesLineColor);
 			rendererData.fillColor = data.fillColor;
 			rendererData.strokeColor = data.strokeColor;
 			rendererData.radius = data.radius;
@@ -237,5 +211,35 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 
 	private _duration(): number {
 		return this.animationActive() ? performance.now() - this._startTime : Constants.AnimationPeriod - 1;
+	}
+
+	private _color(seriesLineColor: string, stage: number, startAlpha: number, endAlpha: number): string {
+		const alpha = startAlpha + (endAlpha - startAlpha) * stage;
+		return this._series
+			.model()
+			.colorParser()
+			.applyAlpha(seriesLineColor, alpha);
+	}
+
+	private _animationData(durationSinceStart: number, lineColor: string): AnimationData {
+		const globalStage = (durationSinceStart % Constants.AnimationPeriod) / Constants.AnimationPeriod;
+
+		let currentStageData: AnimationStageData | undefined;
+
+		for (const stageData of animationStagesData) {
+			if (globalStage >= stageData.start && globalStage <= stageData.end) {
+				currentStageData = stageData;
+				break;
+			}
+		}
+
+		assert(currentStageData !== undefined, 'Last price animation internal logic error');
+
+		const subStage = (globalStage - currentStageData.start) / (currentStageData.end - currentStageData.start);
+		return {
+			fillColor: this._color(lineColor, subStage, currentStageData.startFillAlpha, currentStageData.endFillAlpha),
+			strokeColor: this._color(lineColor, subStage, currentStageData.startStrokeAlpha, currentStageData.endStrokeAlpha),
+			radius: radius(subStage, currentStageData.startRadius, currentStageData.endRadius),
+		};
 	}
 }

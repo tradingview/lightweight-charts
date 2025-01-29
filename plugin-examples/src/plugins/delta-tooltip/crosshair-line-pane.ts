@@ -1,12 +1,12 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
-	SeriesPrimitivePaneViewZOrder,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
+	PrimitivePaneViewZOrder,
 } from 'lightweight-charts';
 import { positionsLine } from '../../helpers/dimensions/positions';
 
-class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
+class TooltipCrosshairLinePaneRenderer implements IPrimitivePaneRenderer {
 	_data: TooltipCrosshairLineData[];
 
 	constructor(data: TooltipCrosshairLineData[]) {
@@ -61,7 +61,7 @@ class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-export class MultiTouchCrosshairPaneView implements ISeriesPrimitivePaneView {
+export class MultiTouchCrosshairPaneView implements IPrimitivePaneView {
 	_data: TooltipCrosshairLineData[];
 	constructor(data: TooltipCrosshairLineData[]) {
 		this._data = data;
@@ -71,11 +71,11 @@ export class MultiTouchCrosshairPaneView implements ISeriesPrimitivePaneView {
 		this._data = data;
 	}
 
-	renderer(): ISeriesPrimitivePaneRenderer | null {
+	renderer(): IPrimitivePaneRenderer | null {
 		return new TooltipCrosshairLinePaneRenderer(this._data);
 	}
 
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'top';
 	}
 }

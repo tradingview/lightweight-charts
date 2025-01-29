@@ -96,6 +96,7 @@ function seriesUpdateInfo<TSeriesType extends SeriesType, HorzScaleItem>(seriesR
 	const prevFirstAndLastTime = seriesRowsFirstAndLastTime(prevSeriesRows, bh);
 	if (firstAndLastTime !== undefined && prevFirstAndLastTime !== undefined) {
 		return {
+			historicalUpdate: false,
 			lastBarUpdatedOrNewBarsAddedToTheRight:
 				firstAndLastTime.lastTime >= prevFirstAndLastTime.lastTime &&
 				firstAndLastTime.firstTime >= prevFirstAndLastTime.firstTime,
@@ -242,7 +243,7 @@ export class DataLayer<HorzScaleItem> {
 		return this.setSeriesData(series, []);
 	}
 
-	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType]): DataUpdateResponse {
+	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType], historicalUpdate: boolean): DataUpdateResponse {
 		const extendedData = data as SeriesDataItemWithOriginalTime<TSeriesType, HorzScaleItem>;
 		saveOriginalTime(extendedData);
 		// convertStringToBusinessDay(data);
@@ -252,11 +253,16 @@ export class DataLayer<HorzScaleItem> {
 		const time = timeConverter(data.time);
 
 		const lastSeriesTime = this._seriesLastTimePoint.get(series);
-		if (lastSeriesTime !== undefined && this._horzScaleBehavior.key(time) < this._horzScaleBehavior.key(lastSeriesTime)) {
+		if (!historicalUpdate && lastSeriesTime !== undefined && this._horzScaleBehavior.key(time) < this._horzScaleBehavior.key(lastSeriesTime)) {
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
 			throw new Error(`Cannot update oldest data, last time=${lastSeriesTime}, new time=${time}`);
 		}
 
 		let pointDataAtTime = this._pointDataByTimePoint.get(this._horzScaleBehavior.key(time));
+
+		if (historicalUpdate && pointDataAtTime === undefined) {
+			throw new Error('Cannot update non-existing data point when historicalUpdate is true');
+		}
 
 		// if no point data found for the new data item
 		// that means that we need to update scale
@@ -275,9 +281,16 @@ export class DataLayer<HorzScaleItem> {
 
 		pointDataAtTime.mapping.set(series, plotRow);
 
-		this._updateLastSeriesRow(series, plotRow);
+		if (historicalUpdate) {
+			this._updateHistoricalSeriesRow(series, plotRow, pointDataAtTime.index);
+		} else {
+			this._updateLastSeriesRow(series, plotRow);
+		}
 
-		const info: SeriesUpdateInfo = { lastBarUpdatedOrNewBarsAddedToTheRight: isSeriesPlotRow(plotRow) };
+		const info: SeriesUpdateInfo = {
+			lastBarUpdatedOrNewBarsAddedToTheRight: isSeriesPlotRow(plotRow),
+			historicalUpdate,
+		};
 
 		// if point already exist on the time scale - we don't need to make a full update and just make an incremental one
 		if (!affectsTimeScale) {
@@ -329,6 +342,22 @@ export class DataLayer<HorzScaleItem> {
 		}
 
 		this._seriesLastTimePoint.set(series, plotRow.time);
+	}
+
+	private _updateHistoricalSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow, pointDataIndex: number): void {
+		const seriesData = this._seriesRowsBySeries.get(series);
+		if (seriesData === undefined) {
+			return;
+		}
+		// binary search for actual index in array.
+		const index = lowerBound(seriesData, pointDataIndex, (row: SeriesPlotRow<SeriesType>, currentIndex: number): boolean =>
+			row.index < currentIndex
+		);
+		if (isSeriesPlotRow(plotRow)) {
+			seriesData[index] = plotRow;
+		} else {
+			seriesData.splice(index, 1);
+		}
 	}
 
 	private _setRowsToSeries(series: Series<SeriesType>, seriesRows: (SeriesPlotRow<SeriesType> | WhitespacePlotRow)[]): void {

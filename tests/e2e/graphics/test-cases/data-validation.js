@@ -15,8 +15,8 @@ function runTestCase(container) {
 	}
 
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
-	const lineSeries = chart.addLineSeries();
-	const barSeries = chart.addBarSeries();
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const barSeries = chart.addSeries(LightweightCharts.BarSeries);
 
 	try {
 		lineSeries.setData([
@@ -25,17 +25,6 @@ function runTestCase(container) {
 		]);
 
 		console.assert(false, 'should fail if series data is not ordered');
-	} catch (e) {
-		// passed
-	}
-
-	try {
-		lineSeries.setMarkers([
-			{ time: 1 },
-			{ time: 0, value: 0 },
-		]);
-
-		console.assert(false, 'should fail if series markers is not ordered');
 	} catch (e) {
 		// passed
 	}
@@ -93,18 +82,21 @@ function runTestCase(container) {
 	}
 
 	// should pass - several markers could be on the same bar
-	lineSeries.setMarkers([
-		{
-			color: 'green',
-			position: 'belowBar',
-			shape: 'arrowDown',
-			time: 0,
-		},
-		{
-			color: 'green',
-			position: 'aboveBar',
-			shape: 'arrowUp',
-			time: 0,
-		},
-	]);
+	LightweightCharts.createSeriesMarkers(
+		lineSeries,
+		[
+			{
+				color: 'green',
+				position: 'belowBar',
+				shape: 'arrowDown',
+				time: 0,
+			},
+			{
+				color: 'green',
+				position: 'aboveBar',
+				shape: 'arrowUp',
+				time: 0,
+			},
+		]
+	);
 }

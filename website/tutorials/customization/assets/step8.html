@@ -1157,7 +1157,7 @@
       // Add an area series to the chart,
       // Adding this before we add the candlestick chart
       // so that it will appear beneath the candlesticks
-      const areaSeries = chart.addAreaSeries({
+      const areaSeries = chart.addSeries(LightweightCharts.AreaSeries, {
         lastValueVisible: false, // hide the last value marker for this series
         crosshairMarkerVisible: false, // hide the crosshair marker for this series
         lineColor: "transparent", // hide the line
@@ -1168,7 +1168,7 @@
       areaSeries.setData(lineData);
 
       // Create the Main Series (Candlesticks)
-      const mainSeries = chart.addCandlestickSeries();
+      const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
       // Set the data for the Main Series
       mainSeries.setData(candleStickData);
 

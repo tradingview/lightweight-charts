@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { AreaSeries, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { TooltipPrimitive } from '../tooltip';
 
@@ -20,7 +20,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	},
 }));
 
-const areaSeries = chart.addAreaSeries({
+const areaSeries = chart.addSeries(AreaSeries, {
 	lineColor: 'rgb(4,153,129)',
 	topColor: 'rgba(4,153,129, 0.4)',
 	bottomColor: 'rgba(4,153,129, 0)',

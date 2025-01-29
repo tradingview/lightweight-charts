@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { createChart, LineSeries } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { BackgroundShadeSeries } from '../background-shade-series';
 
@@ -16,5 +16,5 @@ const myCustomSeries = chart.addCustomSeries(customSeriesView, {
 
 myCustomSeries.setData(data);
 
-const lineSeries = chart.addLineSeries({ color: 'black' });
+const lineSeries = chart.addSeries(LineSeries, { color: 'black' });
 lineSeries.setData(data);

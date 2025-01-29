@@ -5,7 +5,7 @@
  */
 
 /** @type {import('@memlab/core/dist/lib/Types').IScenario} */
-const scenario = {
+export const scenario = {
 	allowedLeaks: [
 		'FormattedLabelsCache',
 		'CrosshairPriceAxisView', // <- We should check and maybe fix this?
@@ -56,18 +56,18 @@ const scenario = {
 				return res;
 			}
 			if (window.chart) {
-				window.lineSeries = window.chart.addLineSeries();
+				window.lineSeries = window.chart.addSeries(LightweightCharts.LineSeries);
 				window.lineSeries.setData(generateData());
-				window.areaSeries = window.chart.addAreaSeries();
+				window.areaSeries = window.chart.addSeries(LightweightCharts.AreaSeries);
 				window.areaSeries.setData(generateData());
-				window.baselineSeries = window.chart.addBaselineSeries();
+				window.baselineSeries = window.chart.addSeries(LightweightCharts.BaselineSeries);
 				window.baselineSeries.setData(generateData());
-				window.histogramSeries = window.chart.addHistogramSeries();
+				window.histogramSeries = window.chart.addSeries(LightweightCharts.HistogramSeries);
 				window.histogramSeries.setData(generateData());
 
-				window.barSeries = window.chart.addBarSeries();
+				window.barSeries = window.chart.addSeries(LightweightCharts.BarSeries);
 				window.barSeries.setData(generateBars());
-				window.candlestickSeries = window.chart.addCandlestickSeries();
+				window.candlestickSeries = window.chart.addSeries(LightweightCharts.CandlestickSeries);
 				window.candlestickSeries.setData(generateBars());
 			}
 		});
@@ -92,6 +92,3 @@ const scenario = {
 		});
 	},
 };
-
-// eslint-disable-next-line no-undef
-exports.scenario = scenario;

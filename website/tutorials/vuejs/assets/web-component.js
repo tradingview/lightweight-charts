@@ -17,8 +17,7 @@ function getChartSeriesConstructorName(type) {
 }
 
 const addSeriesAndData = (type, seriesOptions, data) => {
-	const seriesConstructor = getChartSeriesConstructorName(type);
-	series = chart[seriesConstructor](seriesOptions);
+	series = chart[getChartSeriesConstructorName(type)](seriesOptions);
 	series.setData(data);
 };
 
@@ -259,11 +258,11 @@ const VueExample = defineCustomElement({
             :chart-options="chartOptions"
             :series-options="seriesOptions"
             ref="lwChart"
-          />  
+          />
         </div>
         <button type="button" @click="changeColors">Set Random Colors</button>
         <button type="button" @click="changeType">Change Chart Type</button>
-        <button type="button" @click="changeData">Change Data</button>  
+        <button type="button" @click="changeData">Change Data</button>
         `,
 	styles: [
 		`
@@ -289,11 +288,11 @@ const VueExample = defineCustomElement({
       button:focus-visible {
         outline: 4px auto -webkit-focus-ring-color;
       }
-        
+
       .chart-container {
         height: var(--lwchart-height, 300px);
       }
-    
+
       .lw-chart {
         height: 100%;
       }

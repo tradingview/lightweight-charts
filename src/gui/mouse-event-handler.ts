@@ -67,6 +67,7 @@ export interface Position {
 
 // we can use `const name = 500;` but with `const enum` this values will be inlined into code
 // so we do not need to have it as variables
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 const enum Delay {
 	ResetClick = 500,
 	LongTap = 240,
@@ -79,6 +80,7 @@ const enum Constants {
 	DoubleClickManhattanDistance = 5,
 	DoubleTapManhattanDistance = 30,
 }
+/* eslint-enable @typescript-eslint/no-duplicate-enum-values */
 
 export interface MouseEventHandlerOptions {
 	treatVertTouchDragAsPageScroll: () => boolean;
@@ -266,6 +268,7 @@ export class MouseEventHandler implements IDestroyable {
 		const moveInfo = this._touchMouseMoveWithDownInfo(getPosition(touch), ensureNotNull(this._touchMoveStartPosition));
 		const { xOffset, yOffset, manhattanDistance } = moveInfo;
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (!this._touchMoveExceededManhattanDistance && manhattanDistance < Constants.CancelTapManhattanDistance) {
 			return;
 		}
@@ -306,6 +309,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _mouseMoveWithDownHandler(moveEvent: MouseEvent): void {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (moveEvent.button !== MouseEventButton.Left) {
 			return;
 		}
@@ -313,6 +317,7 @@ export class MouseEventHandler implements IDestroyable {
 		const moveInfo = this._touchMouseMoveWithDownInfo(getPosition(moveEvent), ensureNotNull(this._mouseMoveStartPosition));
 		const { manhattanDistance } = moveInfo;
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (manhattanDistance >= Constants.CancelClickManhattanDistance) {
 			// if manhattan distance is more that 5 - we should cancel click event
 			this._cancelClick = true;
@@ -362,6 +367,7 @@ export class MouseEventHandler implements IDestroyable {
 
 			if (this._tapTimeoutId && this._tapCount > 1) {
 				const { manhattanDistance } = this._touchMouseMoveWithDownInfo(getPosition(dblClickEvent), this._tapPosition);
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 				if (manhattanDistance < Constants.DoubleTapManhattanDistance && !this._cancelTap) {
 					this._processTouchEvent(compatEvent as unknown as MouseEventHandlerTouchEvent, this._handler.doubleTapEvent);
 				}
@@ -373,6 +379,7 @@ export class MouseEventHandler implements IDestroyable {
 
 			if (this._clickTimeoutId && this._clickCount > 1) {
 				const { manhattanDistance } = this._touchMouseMoveWithDownInfo(getPosition(dblClickEvent), this._clickPosition);
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 				if (manhattanDistance < Constants.DoubleClickManhattanDistance && !this._cancelClick) {
 					this._processMouseEvent(compatEvent, this._handler.mouseDoubleClickEvent);
 				}
@@ -411,6 +418,7 @@ export class MouseEventHandler implements IDestroyable {
 		if (this._tapTimeoutId && this._tapCount > 1) {
 			// check that both clicks are near enough
 			const { manhattanDistance } = this._touchMouseMoveWithDownInfo(getPosition(touch), this._tapPosition);
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 			if (manhattanDistance < Constants.DoubleTapManhattanDistance && !this._cancelTap) {
 				this._processTouchEvent(compatEvent, this._handler.doubleTapEvent);
 			}
@@ -443,6 +451,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _mouseUpHandler(mouseUpEvent: MouseEvent): void {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (mouseUpEvent.button !== MouseEventButton.Left) {
 			return;
 		}
@@ -472,6 +481,7 @@ export class MouseEventHandler implements IDestroyable {
 		if (this._clickTimeoutId && this._clickCount > 1) {
 			// check that both clicks are near enough
 			const { manhattanDistance } = this._touchMouseMoveWithDownInfo(getPosition(mouseUpEvent), this._clickPosition);
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 			if (manhattanDistance < Constants.DoubleClickManhattanDistance && !this._cancelClick) {
 				this._processMouseEvent(compatEvent, this._handler.mouseDoubleClickEvent);
 			}
@@ -541,6 +551,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	private _mouseDownHandler(downEvent: MouseEvent): void {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (downEvent.button !== MouseEventButton.Left) {
 			return;
 		}

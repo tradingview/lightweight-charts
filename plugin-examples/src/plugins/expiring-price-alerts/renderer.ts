@@ -1,5 +1,5 @@
 import { CanvasRenderingTarget2D } from "fancy-canvas";
-import { ISeriesPrimitivePaneRenderer } from 'lightweight-charts';
+import { IPrimitivePaneRenderer } from 'lightweight-charts';
 import { iconDimensions } from "./icons";
 import { positionsLine } from "../../helpers/dimensions/positions";
 
@@ -13,7 +13,7 @@ export interface RendererDataItem {
 	fade: boolean;
 }
 
-export class ExpiringPriceAlertsPaneRenderer implements ISeriesPrimitivePaneRenderer {
+export class ExpiringPriceAlertsPaneRenderer implements IPrimitivePaneRenderer {
 	_data: RendererDataItem[] = [];
 
 	draw(target: CanvasRenderingTarget2D) {

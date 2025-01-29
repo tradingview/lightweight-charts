@@ -20,11 +20,11 @@ async function beforeInteractions(container) {
 		},
 	});
 
-	const areaSeries = chart.addAreaSeries();
+	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries);
 
 	areaSeries.setData(generateLineData());
 
-	const lineSeries = chart.addLineSeries({ priceScaleId: 'left' });
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, { priceScaleId: 'left' });
 	lineSeries.setData(generateLineData());
 
 	await awaitNewFrame();

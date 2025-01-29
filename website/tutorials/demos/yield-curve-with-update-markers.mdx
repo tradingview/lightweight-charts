@@ -1,0 +1,54 @@
+---
+title: Yield Curve Chart with Update Markers
+sidebar_label: Yield Curve with Updates
+description:
+  An example of a yield curve chart with real-time updates using markers
+pagination_prev: null
+pagination_next: null
+keywords:
+  - yield curve
+  - realtime updates
+  - markers
+  - plugins
+---
+
+This sample demonstrates how to create a yield curve chart with real-time
+updates using Lightweight Charts™. The chart displays two
+[yield curves](/docs/next/chart-types#yield-curve-chart) and utilizes the
+[UpDownMarkersPrimitive](/docs/next/api/functions/createUpDownMarkers) plugin
+to show price change markers for updates.
+
+The chart is initialized with historical yield curve data for two series. By
+using the `setInterval` function, we simulate real-time updates to the first
+curve. These updates are applied using the `update` method provided by the
+UpDownMarkersPrimitive, which automatically handles the creation and display of
+markers for price changes.
+
+Key features of this demo:
+
+1. Yield curve chart configuration with custom time range settings.
+2. Two line series representing different yield curves.
+3. Usage of the UpDownMarkersPrimitive plugin for displaying update markers.
+4. Simulated real-time updates to demonstrate dynamic data handling.
+
+The UpDownMarkersPrimitive is attached to the first series when created using
+`priceChangeMarkers = createUpDownMarkers(series1)`. We then use
+`priceChangeMarkers.setData(curve1)` to initialize the data and
+`priceChangeMarkers.update(...)` for subsequent updates. This approach allows
+the primitive to manage both the series data and the markers, providing a
+seamless way to visualize price changes.
+
+import UsageGuidePartial from '../_usage-guide-partial.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./yield-curve-with-update-markers.js';
+
+<CodeBlock
+	replaceThemeConstants
+	chart
+	className="language-js"
+	hideableCode
+	chartOnTop
+	codeUsage={<UsageGuidePartial />}
+>
+	{code}
+</CodeBlock>

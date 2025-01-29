@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
 
 import { timeScaleOptionsDefaults } from '../../src/api/options/time-scale-options-defaults';
 import { ChartModel } from '../../src/model/chart-model';

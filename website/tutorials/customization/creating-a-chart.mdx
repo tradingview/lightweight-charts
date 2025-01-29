@@ -42,7 +42,7 @@ The standalone script will add the library as a global variable named `Lightweig
 
 ## Creating the chart
 
-We can create the chart instance by calling the [`createChart`](/docs/api#createchart) method on the `LightweightCharts` global variable, and providing an HTML div element as the first parameter to the method. The `createChart` method can take a second parameter for options which will be explored and used later in the guide.
+We can create the chart instance by calling the [`createChart`](/docs/api/functions/createChart) method on the `LightweightCharts` global variable, and providing an HTML div element as the first parameter to the method. The `createChart` method can take a second parameter for options which will be explored and used later in the guide.
 
 We will add the following code to our main script tag which already contains the code to generate the sample data. The sample file contains a `// your code here` comment as a reference of where to insert the code.
 
@@ -83,7 +83,7 @@ const candleStickData = generateCandlestickData();
 
 // highlight-start
 // Create the Main Series (Candlesticks)
-const mainSeries = chart.addCandlestickSeries();
+const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
 // Set the data for the Main Series
 mainSeries.setData(candleStickData);
 // highlight-end

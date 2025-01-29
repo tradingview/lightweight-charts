@@ -17,10 +17,10 @@ import { makeFont } from '../helpers/make-font';
 import { ChartOptionsInternalBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { CrosshairMode, CrosshairOptions } from '../model/crosshair';
-import { IDataSource } from '../model/idata-source';
+import { IDataSource, IDataSourcePaneViews } from '../model/idata-source';
 import { InvalidationLevel } from '../model/invalidate-mask';
+import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { IPriceDataSource } from '../model/iprice-data-source';
-import { SeriesPrimitivePaneViewZOrder } from '../model/iseries-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceMark, PriceScale } from '../model/price-scale';
@@ -31,7 +31,7 @@ import { IAxisView } from '../views/pane/iaxis-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
-import { IPriceAxisViewsGetter } from './iaxis-view-getters';
+import { ViewsGetter } from './draw-functions';
 import { suggestPriceScaleWidth } from './internal-layout-sizes-hints';
 import { MouseEventHandler, MouseEventHandlers, TouchMouseEvent } from './mouse-event-handler';
 import { PaneWidget } from './pane-widget';
@@ -53,11 +53,18 @@ const enum Constants {
 	LabelOffset = 5,
 }
 
+function hasPriceScale(source: IDataSource | IDataSourcePaneViews): source is IDataSource {
+	return (source as IDataSource).priceScale !== undefined;
+}
+
 function buildPriceAxisViewsGetter(
-	zOrder: SeriesPrimitivePaneViewZOrder,
+	zOrder: PrimitivePaneViewZOrder,
 	priceScaleId: PriceAxisWidgetSide
-): IPriceAxisViewsGetter {
-	return (source: IDataSource): readonly IAxisView[] => {
+): ViewsGetter<IDataSourcePaneViews> {
+	return (source: IDataSource | IDataSourcePaneViews): readonly IAxisView[] => {
+		if (!hasPriceScale(source)) {
+			return [];
+		}
 		const psId = source.priceScale()?.id() ?? '';
 		if (psId !== priceScaleId) {
 			// exclude if source is using a different price scale.
@@ -67,22 +74,16 @@ function buildPriceAxisViewsGetter(
 	};
 }
 
-function recalculateOverlapping(
-	views: IPriceAxisView[],
-	direction: 1 | -1,
-	scaleHeight: number,
-	rendererOptions: Readonly<PriceAxisViewRendererOptions>
-): void {
+function recalculateOverlapping(views: IPriceAxisView[], direction: 1 | -1, scaleHeight: number, rendererOptions: Readonly<PriceAxisViewRendererOptions>): void {
 	if (!views.length) {
 		return;
 	}
 	let currentGroupStart = 0;
-	const center = scaleHeight / 2;
 
 	const initLabelHeight = views[0].height(rendererOptions, true);
 	let spaceBeforeCurrentGroup = direction === 1
-		? center - (views[0].getFixedCoordinate() - initLabelHeight / 2)
-		: views[0].getFixedCoordinate() - initLabelHeight / 2 - center;
+		? scaleHeight / 2 - (views[0].getFixedCoordinate() - initLabelHeight / 2)
+		: views[0].getFixedCoordinate() - initLabelHeight / 2 - scaleHeight / 2;
 	spaceBeforeCurrentGroup = Math.max(0, spaceBeforeCurrentGroup);
 
 	for (let i = 1; i < views.length; i++) {
@@ -147,14 +148,14 @@ export class PriceAxisWidget implements IDestroyable {
 	private _prevOptimalWidth: number = 0;
 	private _isSettingSize: boolean = false;
 
-	private _sourcePaneViews: IPriceAxisViewsGetter;
-	private _sourceTopPaneViews: IPriceAxisViewsGetter;
-	private _sourceBottomPaneViews: IPriceAxisViewsGetter;
+	private _sourcePaneViews: ViewsGetter<IDataSourcePaneViews>;
+	private _sourceTopPaneViews: ViewsGetter<IDataSourcePaneViews>;
+	private _sourceBottomPaneViews: ViewsGetter<IDataSourcePaneViews>;
 
 	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternalBase>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
 		this._pane = pane;
 		this._options = options;
-		this._layoutOptions = options.layout;
+		this._layoutOptions = options['layout'];
 		this._rendererOptionsProvider = rendererOptionsProvider;
 		this._isLeft = side === 'left';
 
@@ -202,7 +203,7 @@ export class PriceAxisWidget implements IDestroyable {
 			this._topCanvasBinding.canvasElement,
 			handler,
 			{
-				treatVertTouchDragAsPageScroll: () => !this._options.handleScroll.vertTouchDrag,
+				treatVertTouchDragAsPageScroll: () => !this._options['handleScroll'].vertTouchDrag,
 				treatHorzTouchDragAsPageScroll: () => true,
 			}
 		);
@@ -254,7 +255,11 @@ export class PriceAxisWidget implements IDestroyable {
 		let tickMarkMaxWidth = 0;
 		const rendererOptions = this.rendererOptions();
 
-		const ctx = ensureNotNull(this._canvasBinding.canvasElement.getContext('2d'));
+		const ctx = ensureNotNull(
+			this._canvasBinding.canvasElement.getContext('2d', {
+				colorSpace: this._pane.chart().options().layout.colorSpace,
+			})
+		);
 		ctx.save();
 
 		const tickMarks = this._priceScale.marks();
@@ -353,11 +358,13 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null) {
 			return;
 		}
-
+		const canvasOptions: CanvasRenderingContext2DSettings = {
+			colorSpace: this._pane.chart().options().layout.colorSpace,
+		};
 		if (type !== InvalidationLevel.Cursor) {
 			this._alignLabels();
 			this._canvasBinding.applySuggestedBitmapSize();
-			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding);
+			const target = tryCreateCanvasRenderingTarget2D(this._canvasBinding, canvasOptions);
 			if (target !== null) {
 				target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 					this._drawBackground(scope);
@@ -371,7 +378,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		this._topCanvasBinding.applySuggestedBitmapSize();
-		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding);
+		const topTarget = tryCreateCanvasRenderingTarget2D(this._topCanvasBinding, canvasOptions);
 		if (topTarget !== null) {
 			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
@@ -398,7 +405,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || this._priceScale.isEmpty() || !this._options.handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || this._priceScale.isEmpty() || !this._options['handleScale'].axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -409,7 +416,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _pressedMouseMoveEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options['handleScale'].axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -420,7 +427,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDownOutsideEvent(): void {
-		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options['handleScale'].axisPressedMouseMove.price) {
 			return;
 		}
 
@@ -435,7 +442,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseUpEvent(e: TouchMouseEvent): void {
-		if (this._priceScale === null || !this._options.handleScale.axisPressedMouseMove.price) {
+		if (this._priceScale === null || !this._options['handleScale'].axisPressedMouseMove.price) {
 			return;
 		}
 		const model = this._pane.chart().model();
@@ -445,7 +452,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _mouseDoubleClickEvent(e: TouchMouseEvent): void {
-		if (this._options.handleScale.axisDoubleClickReset.price) {
+		if (this._options['handleScale'].axisDoubleClickReset.price) {
 			this.reset();
 		}
 	}
@@ -456,7 +463,7 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		const model = this._pane.chart().model();
-		if (model.options().handleScale.axisPressedMouseMove.price && !this._priceScale.isPercentage() && !this._priceScale.isIndexedTo100()) {
+		if (model.options()['handleScale'].axisPressedMouseMove.price && !this._priceScale.isPercentage() && !this._priceScale.isIndexedTo100()) {
 			this._setCursor(CursorType.NsResize);
 		}
 	}
@@ -575,6 +582,8 @@ export class PriceAxisWidget implements IDestroyable {
 		if (this._size === null || this._priceScale === null) {
 			return;
 		}
+		let center = this._size.height / 2;
+
 		const views: IPriceAxisView[] = [];
 		const orderedSources = this._priceScale.orderedSources().slice(); // Copy of array
 		const pane = this._pane;
@@ -592,6 +601,8 @@ export class PriceAxisWidget implements IDestroyable {
 			});
 		}
 
+		// we can use any, but let's use the first source as "center" one
+		const centerSource = this._priceScale.dataSources()[0];
 		const priceScale = this._priceScale;
 
 		const updateForSources = (sources: IDataSource[]) => {
@@ -604,6 +615,9 @@ export class PriceAxisWidget implements IDestroyable {
 						views.push(view);
 					}
 				});
+				if (centerSource === source && sourceViews.length > 0) {
+					center = sourceViews[0].coordinate();
+				}
 			});
 		};
 
@@ -617,15 +631,13 @@ export class PriceAxisWidget implements IDestroyable {
 			return;
 		}
 
-		this._fixLabelOverlap(views, rendererOptions);
+		this._fixLabelOverlap(views, rendererOptions, center);
 	}
 
-	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>): void {
+	private _fixLabelOverlap(views: IPriceAxisView[], rendererOptions: Readonly<PriceAxisViewRendererOptions>, center: number): void {
 		if (this._size === null) {
 			return;
 		}
-
-		const center = this._size.height / 2;
 
 		// split into two parts
 		const top = views.filter((view: IPriceAxisView) => view.coordinate() <= center);
@@ -633,6 +645,12 @@ export class PriceAxisWidget implements IDestroyable {
 
 		// sort top from center to top
 		top.sort((l: IPriceAxisView, r: IPriceAxisView) => r.coordinate() - l.coordinate());
+
+		// share center label
+		if (top.length && bottom.length) {
+			bottom.push(top[0]);
+		}
+
 		bottom.sort((l: IPriceAxisView, r: IPriceAxisView) => l.coordinate() - r.coordinate());
 
 		for (const view of views) {

@@ -33,13 +33,15 @@ export type InteractionAction =
 	| 'kineticAnimation'
 	| 'moveMouseCenter'
 	| 'moveMouseTopLeft'
+	| 'moveMouseBottomRight'
 	| 'clickXY';
 export type InteractionTarget =
 	| 'container'
 	| 'timescale'
 	| 'leftpricescale'
 	| 'rightpricescale'
-	| 'pane';
+	| 'pane'
+	| 'paneSeparator';
 
 export type Interaction = {
 	action: InteractionAction;
@@ -138,31 +140,31 @@ async function performAction(
 			break;
 		case 'pinchZoomIn':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doPinchZoomTouch(devToolsSession, target, true);
 			}
 			break;
 		case 'pinchZoomOut':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doPinchZoomTouch(devToolsSession, target);
 			}
 			break;
 		case 'swipeTouchHorizontal':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, { horizontal: true });
 			}
 			break;
 		case 'swipeTouchVertical':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, { vertical: true });
 			}
 			break;
 		case 'swipeTouchDiagonal':
 			{
-				const devToolsSession = await page.target().createCDPSession();
+				const devToolsSession = await page.createCDPSession();
 				await doSwipeTouch(devToolsSession, target, {
 					vertical: true,
 					horizontal: true,
@@ -185,6 +187,17 @@ async function performAction(
 				const boundingBox = await target.boundingBox();
 				if (boundingBox) {
 					await page.mouse.move(boundingBox.x, boundingBox.y);
+				}
+			}
+			break;
+		case 'moveMouseBottomRight':
+			{
+				const boundingBox = await target.boundingBox();
+				if (boundingBox) {
+					await page.mouse.move(
+						boundingBox.x + boundingBox.width,
+						boundingBox.y + boundingBox.height
+					);
 				}
 			}
 			break;
@@ -212,6 +225,9 @@ export async function performInteractions(
 	const timeAxis = (
 		await chartContainer.$$('tr:nth-of-type(2) td:nth-of-type(2) div canvas')
 	)[0];
+	const paneSeparator = (
+		await chartContainer.$$('tr:nth-of-type(2) td div:nth-of-type(2)')
+	)[0];
 
 	for (const interaction of interactionsToPerform) {
 		let target: ElementHandle<Element>;
@@ -232,6 +248,9 @@ export async function performInteractions(
 			case 'pane':
 				target = paneWidget;
 				break;
+			case 'paneSeparator':
+				target = paneSeparator;
+				break;
 			default: {
 				const exhaustiveCheck: never = interaction.target;
 				throw new Error(exhaustiveCheck);
@@ -240,4 +259,55 @@ export async function performInteractions(
 
 		await performAction(interaction, page, target);
 	}
+}
+
+interface InternalWindowForInteractions {
+	initialInteractionsToPerform: () => Interaction[];
+	finalInteractionsToPerform: () => Interaction[];
+	afterInitialInteractions?: () => void;
+	afterFinalInteractions?: () => void;
+}
+
+export async function runInteractionsOnPage(page: Page): Promise<void> {
+	const initialInteractionsToPerform = await page.evaluate(() => {
+		if (!(window as unknown as InternalWindowForInteractions).initialInteractionsToPerform) {
+			return [];
+		}
+		return (window as unknown as InternalWindowForInteractions).initialInteractionsToPerform();
+	});
+
+	await performInteractions(page, initialInteractionsToPerform);
+
+	await page.evaluate(() => {
+		if ((window as unknown as InternalWindowForInteractions).afterInitialInteractions) {
+			return (
+				window as unknown as InternalWindowForInteractions
+			).afterInitialInteractions?.();
+		}
+		return new Promise<void>((resolve: () => void) => {
+			window.requestAnimationFrame(() => {
+				setTimeout(resolve, 50);
+			});
+		});
+	});
+
+	const finalInteractionsToPerform = await page.evaluate(() => {
+		if (!(window as unknown as InternalWindowForInteractions).finalInteractionsToPerform) {
+			return [];
+		}
+		return (window as unknown as InternalWindowForInteractions).finalInteractionsToPerform();
+	});
+
+	if (finalInteractionsToPerform && finalInteractionsToPerform.length > 0) {
+		await performInteractions(page, finalInteractionsToPerform);
+	}
+
+	await page.evaluate(() => {
+		return new Promise<void>((resolve: () => void) => {
+			(window as unknown as InternalWindowForInteractions).afterFinalInteractions?.();
+			window.requestAnimationFrame(() => {
+				setTimeout(resolve, 50);
+			});
+		});
+	});
 }

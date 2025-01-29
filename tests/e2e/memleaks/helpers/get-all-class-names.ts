@@ -1,10 +1,14 @@
 /// <reference types="node" />
 import * as fs from 'fs';
-import * as path from 'path';
 
 import { glob } from 'glob';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const srcDir = path.join(__dirname, '..', '..', '..', '..', 'src');
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirectory = path.dirname(currentFilePath);
+
+const srcDir = path.join(currentDirectory, '..', '..', '..', '..', 'src');
 
 const classNameRegex = /class\s+([a-zA-Z_][^\W<{]*)/gm;
 

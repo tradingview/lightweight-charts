@@ -92,7 +92,7 @@ primitives.
 A custom series primitive can be added to an existing series using the
 [`attachPrimitive()`](../api/interfaces/ISeriesApi.md#attachprimitive) method
 which expects an instantiated object implementing the
-[ISeriesPrimitive](../api/index.md#iseriesprimitive) interface as the first
+[ISeriesPrimitive](../api/type-aliases/ISeriesPrimitive.md) interface as the first
 argument.
 
 ```javascript title='javascript'

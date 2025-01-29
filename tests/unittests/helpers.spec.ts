@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
 
 import { clone, merge } from '../../src/helpers/strict-type-checks';
 

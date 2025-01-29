@@ -30,18 +30,18 @@ function runTestCase(container) {
 	}));
 
 	const whitespaceData = generateData().map(d => ({ time: d.time }));
-	const whitespaceSeries = chart.addLineSeries();
+	const whitespaceSeries = chart.addSeries(LightweightCharts.LineSeries);
 	whitespaceSeries.setData(whitespaceData);
 
 	const lineData = generateData().slice(-100);
-	const lineSeries = chart.addLineSeries({
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		priceLineVisible: false,
 		lastValueVisible: false,
 	});
 	lineSeries.setData(lineData);
 
 	const baselineData = generateData().slice(200, 300);
-	const baselineSeries = chart.addBaselineSeries({
+	const baselineSeries = chart.addSeries(LightweightCharts.BaselineSeries, {
 		baseValue: { type: 'price', price: baselineData[49].value },
 		priceLineVisible: false,
 		lastValueVisible: false,

@@ -2,6 +2,10 @@
 
 version: 2.1
 
+parameters:
+  run_branch_specific_graphics_tests:
+    type: boolean
+    default: false
 
 aliases:
   - &restore-node-modules-cache
@@ -42,11 +46,11 @@ aliases:
 executors:
   node-executor:
     docker:
-      - image: cimg/node:18.19
+      - image: cimg/node:22.3
 
   node-browsers-executor:
     docker:
-      - image: cimg/node:18.19-browsers
+      - image: cimg/node:22.3-browsers
 
 commands:
   checkout-with-deps:
@@ -64,6 +68,11 @@ commands:
       productionBuild:
         type: boolean
         default: false
+      grep:
+        type: string
+      branchSpecificTest:
+        type: boolean
+        default: false
     steps:
       - checkout-with-deps
       - run:
@@ -74,6 +83,9 @@ commands:
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
             echo 'export PRODUCTION_BUILD=<< parameters.productionBuild >>' >> $BASH_ENV
+            echo 'export GREP="<< parameters.grep >>"' >> $BASH_ENV
+            echo 'export COMPARE_BRANCH="v5-candidate"' >> $BASH_ENV
+            echo 'export BRANCH_SPECIFIC_TEST=<< parameters.branchSpecificTest >>' >> $BASH_ENV
       - run:
           command: scripts/run-graphics-tests.sh
           no_output_timeout: 20m
@@ -91,6 +103,7 @@ jobs:
     steps:
       - checkout-with-deps
       - run: npm install
+      - run: npx puppeteer browsers install chrome
       - save_cache: *save-node-modules-cache
 
   install-deps-website:
@@ -164,9 +177,6 @@ jobs:
             cd node_modules
             ln -s ../ lightweight-charts
       - run:
-          name: "Check CJS could be imported in NodeJS"
-          command: node -e "require('lightweight-charts')" --input-type=commonjs
-      - run:
           name: "Check ESM could be imported in NodeJS"
           command: node -e "import 'lightweight-charts'" --input-type=module
 
@@ -184,49 +194,37 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm run tsc-verify
       - run: npm run type-tests
 
   dts-changes:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
+      # - run: scripts/check-dts-changes.sh ./dts-changes $(git merge-base origin/master HEAD) $(git rev-parse HEAD)
+      - run: scripts/check-dts-changes.sh ./dts-changes $(git rev-parse origin/v5-candidate) $(git rev-parse HEAD)
       - store_artifacts:
           path: ./dts-changes
           when: on_fail
 
-  graphics-tests-dpr1_0:
+  graphics-tests:
+    parameters:
+      grep:
+        type: string
+      dpr:
+        type: string
+      productionBuild:
+        type: boolean
+        default: false
+      branchSpecificTest:
+        type: boolean
+        default: false
     executor: node-browsers-executor
     steps:
       - run-graphics-tests:
-          devicePixelRatio: "1.0"
-
-  graphics-tests-dpr1_25:
-    executor: node-browsers-executor
-    steps:
-      - run-graphics-tests:
-          devicePixelRatio: "1.25"
-
-  graphics-tests-dpr1_5:
-    executor: node-browsers-executor
-    steps:
-      - run-graphics-tests:
-          devicePixelRatio: "1.5"
-
-  graphics-tests-dpr2_0:
-    executor: node-browsers-executor
-    steps:
-      - run-graphics-tests:
-          devicePixelRatio: "2.0"
-
-  graphics-tests-dpr2_0-prod:
-    executor: node-browsers-executor
-    steps:
-      - run-graphics-tests:
-          devicePixelRatio: "2.0"
-          productionBuild: true
-
+          devicePixelRatio: << parameters.dpr >>
+          grep: << parameters.grep >>
+          productionBuild: << parameters.productionBuild >>
+          branchSpecificTest: << parameters.branchSpecificTest >>
 
   memleaks-tests:
     executor: node-browsers-executor
@@ -281,6 +279,8 @@ jobs:
       - attach_workspace:
           at: ./
       - run:
+          command: echo 'export COMPARE_BRANCH="v5-candidate"' >> $BASH_ENV
+      - run:
           name: "Comparing sizes with merge-base"
           command: node scripts/compare-size-with-merge-base.js
       - run: npm run size-limit
@@ -306,10 +306,66 @@ jobs:
           paths:
             - website
 
+
+anchors:
+  - &graphics-test-matrix
+    parameters:
+      dpr: ["1.0", "1.25", "1.5", "2.0"]
+      productionBuild: [false, true]
+    exclude:
+      - dpr: "1.0"
+        productionBuild: true
+      - dpr: "1.25"
+        productionBuild: true
+      - dpr: "1.5"
+        productionBuild: true
+
+  - &graphics-test-config
+    requires:
+      - build
+    filters: *merge-based-filters
+    dpr: << matrix.dpr >>
+    productionBuild: << matrix.productionBuild >>
+
+
 workflows:
   version: 2
 
+  branch-specific-graphics-tests:
+    when: << pipeline.parameters.run_branch_specific_graphics_tests >>
+    jobs:
+      - install-deps:
+          filters: *default-filters
+      - install-deps-website:
+          filters: *default-filters
+      - build:
+          filters: *default-filters
+          requires:
+            - install-deps
+            - install-deps-website
+
+      - graphics-tests:
+          name: branch_specific_graphics-tests-part1-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "(api/|applying-options/|series-markers/|price-scale/)"
+          branchSpecificTest: true
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - graphics-tests:
+          name: branch_specific_graphics-tests-part2-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "(initial-options/|logical-range/|panes/|plugins/|two-scales/|test-cases/)"
+          branchSpecificTest: true
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - graphics-tests:
+          name: branch_specific_graphics-tests-part3-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "(series/|time-scale/|degenerative-horizontal-series-with-integer-min-tick/)"
+          branchSpecificTest: true
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+
   build-lint-test:
+    when:
+      not: << pipeline.parameters.run_branch_specific_graphics_tests >>
     jobs:
       - install-deps:
           filters: *default-filters
@@ -350,30 +406,25 @@ workflows:
           filters: *merge-based-filters
           requires:
             - build
-      - graphics-tests-dpr1_0:
-          filters: *merge-based-filters
+      - graphics-tests:
+          name: graphics-tests-part1-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "(api/|applying-options/|series-markers/|price-scale/)"
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - graphics-tests:
+          name: graphics-tests-part2-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "(initial-options/|logical-range/|panes/|plugins/|two-scales/|test-cases/)"
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - graphics-tests:
+          name: graphics-tests-part3-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "(series/|time-scale/|degenerative-horizontal-series-with-integer-min-tick/)"
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - memleaks-tests:
+          filters: *default-filters
           requires:
             - build
-      - graphics-tests-dpr1_25:
-          filters: *merge-based-filters
-          requires:
-            - build
-      - graphics-tests-dpr1_5:
-          filters: *merge-based-filters
-          requires:
-            - build
-      - graphics-tests-dpr2_0:
-          filters: *merge-based-filters
-          requires:
-            - build
-      - graphics-tests-dpr2_0-prod:
-          filters: *merge-based-filters
-          requires:
-            - build
-      # - memleaks-tests:
-      #     filters: *default-filters
-      #     requires:
-      #       - build
       - coverage:
           filters: *default-filters
           requires:

@@ -22,7 +22,7 @@ function runTestCase(container) {
 
 	const data1 = Array.from({ length: 10 }).map((_, index) => ({ time: index * 10000, value: 1000000 * (100 - index), color: index % 2 ? '#ff0000' : '#0000ff' }));
 
-	const series1 = chart.addLineSeries({
+	const series1 = chart.addSeries(LightweightCharts.LineSeries, {
 		priceFormat: {
 			type: 'volume',
 			precision: 3,

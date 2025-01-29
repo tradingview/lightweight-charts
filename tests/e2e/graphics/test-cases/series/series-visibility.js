@@ -39,42 +39,45 @@ function runTestCase(container) {
 		},
 		layout: { attributionLogo: false },
 	});
-	const lineSeries = chart.addLineSeries({
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		visible: false,
 		baseLineVisible: true,
 	});
 	const data = generateData();
 	lineSeries.setData(data);
-	lineSeries.setMarkers([
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'arrowUp' },
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'yellow', shape: 'arrowUp' },
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'orange', shape: 'arrowDown' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'yellow', shape: 'arrowDown' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'red', shape: 'arrowDown' },
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'orange', shape: 'arrowUp' },
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'arrowDown' },
-	]);
+	LightweightCharts.createSeriesMarkers(
+		lineSeries,
+		[
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'arrowUp' },
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'yellow', shape: 'arrowUp' },
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'orange', shape: 'arrowDown' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'yellow', shape: 'arrowDown' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'red', shape: 'arrowDown' },
+			{ time: data[data.length - 10].time, position: 'inBar', color: 'orange', shape: 'arrowUp' },
+			{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'arrowDown' },
+		]
+	);
 
-	const candleSeries = chart.addCandlestickSeries({
+	const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
 		visible: false,
 		baseLineVisible: true,
 	});
 	candleSeries.setData(generateBarData());
 
-	const areaSeries = chart.addAreaSeries({
+	const areaSeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		visible: false,
 		baseLineVisible: true,
 	});
 	areaSeries.setData(generateData());
 
-	const barSeries = chart.addBarSeries({
+	const barSeries = chart.addSeries(LightweightCharts.BarSeries, {
 		visible: false,
 		baseLineVisible: true,
 	});
 	barSeries.setData(generateBarData());
 
-	const histrogramSeries = chart.addHistogramSeries({
+	const histrogramSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
 		lineWidth: 1,
 		color: '#ff0000',
 		visible: false,

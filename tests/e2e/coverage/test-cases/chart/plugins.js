@@ -9,7 +9,7 @@ function beforeInteractions(container) {
 		barSpacing: 50,
 		rightOffset: 5,
 	});
-	const s1 = chart.addLineSeries({
+	const s1 = chart.addSeries(LightweightCharts.LineSeries, {
 		color: 'red',
 	});
 	s1.setData([

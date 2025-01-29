@@ -13,20 +13,18 @@ function generateData() {
 }
 
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, {
-		layout: { attributionLogo: false },
-	});
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addHistogramSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.HistogramSeries);
 
 	const data = generateData();
 	mainSeries.setData(data);
 
-	const markers = [
-		{ time: data[0].time, position: 'aboveBar', color: 'red', shape: 'arrowUp' },
-		{ time: data[1].time, position: 'aboveBar', color: 'red', shape: 'arrowUp' },
-
-	];
-
-	mainSeries.setMarkers(markers);
+	LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		[
+			{ time: data[0].time, position: 'aboveBar', color: 'red', shape: 'arrowUp' },
+			{ time: data[1].time, position: 'aboveBar', color: 'red', shape: 'arrowUp' },
+		]
+	);
 }

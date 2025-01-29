@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { LineSeries, createChart } from 'lightweight-charts';
 import { generateLineData } from '../sample-data';
 import { _CLASSNAME_ } from '../template-entry';
 
@@ -6,7 +6,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const lineSeries = chart.addLineSeries({
+const lineSeries = chart.addSeries(LineSeries, {
 	color: '#000000',
 });
 const data = generateLineData();

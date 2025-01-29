@@ -10,7 +10,7 @@ import { clone, DeepPartial } from '../helpers/strict-type-checks';
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
-import { Logical, LogicalRange, Range, TimePointIndex } from '../model/time-data';
+import { IRange, Logical, LogicalRange, TimePointIndex } from '../model/time-data';
 import { HorzScaleOptions, TimeScale } from '../model/time-scale';
 
 import {
@@ -27,7 +27,7 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 	private _model: ChartModel<HorzScaleItem>;
 	private _timeScale: TimeScale<HorzScaleItem>;
 	private readonly _timeAxisWidget: TimeAxisWidget<HorzScaleItem>;
-	private readonly _timeRangeChanged: Delegate<Range<HorzScaleItem> | null> = new Delegate();
+	private readonly _timeRangeChanged: Delegate<IRange<HorzScaleItem> | null> = new Delegate();
 	private readonly _logicalRangeChanged: Delegate<LogicalRange | null> = new Delegate();
 	private readonly _sizeChanged: Delegate<number, number> = new Delegate();
 
@@ -70,7 +70,7 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 		this._timeScale.scrollToRealTime();
 	}
 
-	public getVisibleRange(): Range<HorzScaleItem> | null {
+	public getVisibleRange(): IRange<HorzScaleItem> | null {
 		const timeRange = this._timeScale.visibleTimeRange();
 
 		if (timeRange === null) {
@@ -83,8 +83,8 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 		};
 	}
 
-	public setVisibleRange(range: Range<HorzScaleItem>): void {
-		const convertedRange: Range<InternalHorzScaleItem> = {
+	public setVisibleRange(range: IRange<HorzScaleItem>): void {
+		const convertedRange: IRange<InternalHorzScaleItem> = {
 			from: this._horzScaleBehavior.convertHorzItemToInternal(range.from),
 			to: this._horzScaleBehavior.convertHorzItemToInternal(range.to),
 		};
@@ -105,7 +105,7 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 		};
 	}
 
-	public setVisibleLogicalRange(range: Range<number>): void {
+	public setVisibleLogicalRange(range: IRange<number>): void {
 		assert(range.from <= range.to, 'The from index cannot be after the to index.');
 		this._model.setTargetLogicalRange(range as LogicalRange);
 	}
@@ -136,9 +136,13 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 		}
 	}
 
-	public timeToCoordinate(time: HorzScaleItem): Coordinate | null {
+	public timeToIndex(time: HorzScaleItem, findNearest: boolean): TimePointIndex | null {
 		const timePoint = this._horzScaleBehavior.convertHorzItemToInternal(time);
-		const timePointIndex = this._timeScale.timeToIndex(timePoint, false);
+		return this._timeScale.timeToIndex(timePoint, findNearest);
+	}
+
+	public timeToCoordinate(time: HorzScaleItem): Coordinate | null {
+		const timePointIndex = this.timeToIndex(time, false);
 		if (timePointIndex === null) {
 			return null;
 		}

@@ -7,7 +7,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	});
 
-	const mainSeries = chart.addAreaSeries({
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries, {
 		lineWidth: 1,
 		color: '#ff0000',
 		priceLineVisible: false,

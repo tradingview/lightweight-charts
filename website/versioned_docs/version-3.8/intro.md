@@ -24,7 +24,7 @@ The Lightweight Charts™ license requires specifying TradingView as the product
 
 :::
 
-You shall add the "attribution notice" from the [NOTICE](https://github.com/tradingview/lightweight-charts/blob/013424ecbf672db80646fe51ee48b187e9b71cec/NOTICE) file and a link to <https://www.tradingview.com/> to the page of your website or mobile application that is available to your users.
+You shall add the "attribution notice" from the [NOTICE](https://github.com/tradingview/lightweight-charts/blob/013424ecbf672db80646fe51ee48b187e9b71cec/NOTICE) file and a link to [https://www.tradingview.com](https://www.tradingview.com) to the page of your website or mobile application that is available to your users.
 
 As thanks for creating Lightweight Charts™, we'd be grateful if you add the attribution notice in a prominent place.
 
@@ -38,7 +38,7 @@ First of all, in a file where you would like to create a chart you need to impor
 import { createChart } from 'lightweight-charts';
 ```
 
-[`createChart`](/api/index.md#createchart) is the entry-point for creating charts. You can use it to create as many charts as you need:
+[`createChart`](/api/functions/createChart.md) is the entry-point for creating charts. You can use it to create as many charts as you need:
 
 ```js
 import { createChart } from 'lightweight-charts';

@@ -9,11 +9,107 @@ keywords:
     - charting
     - html5 charts
     - financial charting library
-sidebar_position: 8
+sidebar_position: 9
+toc_min_heading_level: 2
+toc_max_heading_level: 2
 ---
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.0
+
+Version 5.0.0 represents a significant milestone in the evolution of Lightweight Charts™, delivering on our commitment to keep the library truly "lightweight". Despite adding numerous new features, improvements, and fixes, we've managed to reduce the bundle size by up to 16%, bringing the base bundle size down to just 35kB. This remarkable reduction was achieved through enhanced tree-shaking capabilities, modernized architecture, and careful optimization of core features.
+
+This release introduces highly requested features like multi-pane support and new chart types. It also modernizes the codebase and improves its architecture to set a foundation for future enhancements without compromising on size.
+
+### Major Updates
+
+#### Multi-Pane Support
+
+One of our most requested features, multi-pane support is now available. It allows you to create complex chart layouts with multiple independent viewing areas. This enhancement enables sophisticated technical analysis setups and better visualization of related data series. Additional key benefits include:
+
+- Full support for multiple panes within a single chart
+- Independent scale and series management per pane
+- Flexible pane sizing and arrangement options
+
+See [Panes](./panes.md) for more information.
+
+#### New Chart Types
+
+**Yield Curve Charts**
+
+- New specialized chart type for displaying yield curves
+- Custom horizontal scale behavior with linear spacing
+- Optimized whitespace handling
+
+**Options Charts**
+
+- Price-based horizontal scale support
+- Specialized formatting and interaction handling
+- Ideal for options chain visualization
+
+See [Chart types](./chart-types.mdx) for more information about the [Yield Curve Chart](./chart-types.mdx#yield-curve-chart) and [Options Chart](./chart-types.mdx#options-chart-price-based) types.
+
+#### Enhanced Color Support
+
+- Expanded native support for sRGB-based colors (RGB, RGBA, hex, named colors, HSL)
+- Support for expanded color gamuts like Display P3
+- Ability to specify a custom color parser to add support for non-sRGB formats
+- Reduced bundle size through browser-native color parsing
+
+#### Architectural Improvements
+
+- Watermark feature reimplemented as plugins (`TextWatermark` and `ImageWatermark`)
+- Series Markers extracted as a plugin for better tree-shaking
+- New Up/Down Markers Plugin for price change visualization
+- Introduction of Pane Primitives for plugin attachment
+
+### Breaking Changes
+
+- New unified series creation API (see [migration guide](./migrations/from-v4-to-v5.md))
+- Dropped CommonJS support and updated JS syntax version to ES2020
+- Watermark functionality moved to plugins
+- Series markers implementation changed to plugin system
+
+### Enhancements
+
+- Added relative gradient option for baseline and area series (`relativeGradient`)
+- New time scale option for maximum bar spacing (`maxBarSpacing`)
+- Added `priceLines()` method to `ISeriesApi` interface
+- Enhanced watermark capabilities with multi-line text support
+- Improved plugin system with Pane Primitives support
+- Better tree-shaking capabilities for smaller bundle sizes
+
+### Bug Fixes
+
+- Fixed primitive detachment update issues ([#1594](https://github.com/tradingview/lightweight-charts/issues/1594))
+- Various performance and rendering improvements
+
+### Migration Guide
+
+We've prepared a comprehensive migration guide to help you upgrade from v4 to v5. Key areas to note:
+
+1. Series Creation API changes
+2. Watermarks and Series Markers moving to separate plugins
+3. Plugin system updates
+
+See the full migration guide: [Migrating from v4 to v5](./migrations/from-v4-to-v5.md)
+
+### Technical Notes
+
+This release uses ES2020 syntax and no longer supports CommonJS. If you need to support older environments, you'll need to set up transpilation for the `lightweight-charts` package in your build system using tools like Babel.
+
+As always, we thank you for your support and help in making Lightweight Charts™ the best product on the financial web. We look forward to seeing what you build with these new capabilities!
+
+You can always send us your feedback via GitHub.
+Happy trading!
+
+Team TradingView
+
+See [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.3..v5.0.1).
+
+---
+
 ## 4.2.3
 
 **Minor Improvements**
@@ -25,6 +121,8 @@ sidebar_position: 8
 - Added additional prototype pollution protection for internal merge helper function. (PR [#1758](https://github.com/tradingview/lightweight-charts/issues/1758))
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.2..v4.2.3).
+
+---
 
 ## 4.2.2
 
@@ -38,6 +136,8 @@ sidebar_position: 8
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.1..v4.2.2).
 
+---
+
 ## 4.2.1
 
 **Bug Fixes**
@@ -45,6 +145,8 @@ sidebar_position: 8
 - Fixed an issue where the series title part of a price scale label appeared blurry when using Firefox.
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.2.0..v4.2.1).
+
+---
 
 ## 4.2.0
 
@@ -56,6 +158,8 @@ sidebar_position: 8
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.7..v4.2.0).
 
+---
+
 ## 4.1.7
 
 **Enhancements**
@@ -63,6 +167,8 @@ sidebar_position: 8
 - Further Refinement of the Price Scale Label Alignment (PR [#1630](https://github.com/tradingview/lightweight-charts/pull/1630))
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.6..v4.1.7).
+
+---
 
 ## 4.1.6
 
@@ -72,6 +178,8 @@ sidebar_position: 8
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.5..v4.1.6).
 
+---
+
 ## 4.1.5
 
 **Enhancements**
@@ -79,6 +187,8 @@ sidebar_position: 8
 - Added `IHorzScaleBehavior.shouldResetTickmarkLabels`. (PR [#1614](https://github.com/tradingview/lightweight-charts/pull/1614))
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.4..v4.1.5).
+
+---
 
 ## 4.1.4
 
@@ -92,6 +202,8 @@ sidebar_position: 8
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.3..v4.1.4).
 
+---
+
 ## 4.1.3
 
 **Minor Improvements**
@@ -103,6 +215,8 @@ sidebar_position: 8
 - Fixed sub-pixel horizontal alignment of the crosshair marker and series markers. (PR [#1505](https://github.com/tradingview/lightweight-charts/pull/1505), fixes [#1504](https://github.com/tradingview/lightweight-charts/issues/1504))
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.2..v4.1.3).
+
+---
 
 ## 4.1.2
 
@@ -116,6 +230,8 @@ sidebar_position: 8
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.1..v4.1.2).
 
+---
+
 ## 4.1.1
 
 **Bug Fixes**
@@ -124,6 +240,8 @@ sidebar_position: 8
 - When disabling touch scrolling on the chart via either the `vertTouchDrag` or `horzTouchDrag` setting in the `handleScroll` options, any touch scroll events over the corresponding scale will now be ignored so the page can be scrolled. (PR [#1445](https://github.com/tradingview/lightweight-charts/pull/1445))
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.0..v4.1.1).
+
+---
 
 ## 4.1.0
 
@@ -145,7 +263,7 @@ To help you get started quickly, we have created an NPM package called [create-l
 
 The horizontal scale is no longer restricted to only time-based values. The API has been extended to allow customization of the horizontal scale behavior, and enable uses cases like options chart where price values are displayed in the horizontal scale. The most common use-case would be to customise the tick marks behaviour.
 
-The [createChartEx](/api/index.md#createchartex) function should be used instead of the usual `createChart` function, and an instance of a class implementing [IHorzScaleBehavior](/api/interfaces/IHorzScaleBehavior.md) should be provided.
+The [createChartEx](/api/functions/createChartEx.md) function should be used instead of the usual `createChart` function, and an instance of a class implementing [IHorzScaleBehavior](/api/interfaces/IHorzScaleBehavior.md) should be provided.
 
 A simple example can be found in this test case: [horizontal-price-scale.js](https://github.com/tradingview/lightweight-charts/blob/master/tests/e2e/graphics/test-cases/horizontal-price-scale.js)
 
@@ -153,16 +271,16 @@ A simple example can be found in this test case: [horizontal-price-scale.js](htt
 
 - Added point markers styling option for line-based series. (closes [#365](https://github.com/tradingview/lightweight-charts/issues/365)) [Docs](/api/interfaces/LineStyleOptions.md#pointmarkersvisible)
 - Added double click subscriber for the main chart pane. (closes [#1385](https://github.com/tradingview/lightweight-charts/issues/1385)) [Docs](/api/interfaces/IChartApi.md#subscribedblclick)
-- Added ﻿`setCrosshairPosition` API, allowing programmatic setting of the crosshair position. (fixes [#1198](https://github.com/tradingview/lightweight-charts/issues/1198), [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#438](https://github.com/tradingview/lightweight-charts/issues/438)) [Docs](/api/interfaces/IChartApi.md#setCrosshairPosition)
-- Added an option to disable crosshair. Introduced the ﻿`Hidden` option in the ﻿`CrosshairMode` setting. (closes [#749](https://github.com/tradingview/lightweight-charts/issues/749), thanks to [@luk707](https://github.com/luk707))
-- Allow overriding tick mark label length via the ﻿`tickMarkMaxCharacterLength` option. (closes [#1396](https://github.com/tradingview/lightweight-charts/issues/1396)) [Docs](/api/interfaces/HorzScaleOptions.md#tickmarkmaxcharacterlength)
+- Added `setCrosshairPosition` API, allowing programmatic setting of the crosshair position. (fixes [#1198](https://github.com/tradingview/lightweight-charts/issues/1198), [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#438](https://github.com/tradingview/lightweight-charts/issues/438)) [Docs](/api/interfaces/IChartApi.md#setcrosshairposition)
+- Added an option to disable crosshair. Introduced the `Hidden` option in the `CrosshairMode` setting. (closes [#749](https://github.com/tradingview/lightweight-charts/issues/749), thanks to [@luk707](https://github.com/luk707))
+- Allow overriding tick mark label length via the `tickMarkMaxCharacterLength` option. (closes [#1396](https://github.com/tradingview/lightweight-charts/issues/1396)) [Docs](/api/interfaces/HorzScaleOptions.md#tickmarkmaxcharacterlength)
 - Support for overriding the percentage formatter within the localization options. (fixes [#1328](https://github.com/tradingview/lightweight-charts/issues/1328), [#1291](https://github.com/tradingview/lightweight-charts/issues/1291)) [Docs](/api/interfaces/LocalizationOptions.md#percentageformatter)
-- Added ﻿`paneSize` getter to `IChartApi`, returning the dimensions of the chart pane. (issue [#1411](https://github.com/tradingview/lightweight-charts/issues/1411)) [Docs](/api/interfaces/IChartApi.md#panesize)
+- Added `paneSize` getter to `IChartApi`, returning the dimensions of the chart pane. (issue [#1411](https://github.com/tradingview/lightweight-charts/issues/1411)) [Docs](/api/interfaces/IChartApi.md#panesize)
 - Added options to set minimum dimensions for the price and time scales. (closes [#1062](https://github.com/tradingview/lightweight-charts/issues/1062), related to [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#50](https://github.com/tradingview/lightweight-charts/issues/50)) [Docs](/api/interfaces/TimeScaleOptions.md#minimumheight), [Docs](/api/interfaces/PriceScaleOptions.md#minimumwidth)
 
 **Bug Fixes**
 
-- Fixed chart layout when direction is set to ﻿RTL. (PR [#1338](https://github.com/tradingview/lightweight-charts/pull/1338))
+- Fixed chart layout when direction is set to RTL. (PR [#1338](https://github.com/tradingview/lightweight-charts/pull/1338))
 - Fixed re-enabling of `autoSize` after disabling it. (PR [#1274](https://github.com/tradingview/lightweight-charts/pull/1377))
 - Corrected percentage mode and zero first value. (fixes [#1386](https://github.com/tradingview/lightweight-charts/issues/1386))
 - Prevent chart shifting when new data replaces existing whitespace. (fixes [#1201](https://github.com/tradingview/lightweight-charts/issues/1201))
@@ -177,6 +295,8 @@ We look forward to hearing from you! And as always, happy trading!
 Team TradingView
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/24?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.0.1..v4.1.0).
+
+---
 
 ## 4.0.1
 
@@ -202,6 +322,8 @@ We look forward to hearing from you! And as always, happy trading!
 Team TradingView
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/25?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.0.0..v4.0.1).
+
+---
 
 ## 4.0.0
 
@@ -276,6 +398,8 @@ Team TradingView
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/18?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.8.0..v4.0.0).
 
+---
+
 ## 3.8.0
 
 We're happy to announce the next release of Lightweight Charts™ library. This release includes many improvements and bug fixes (as usual), but we are thrilled to say that from this version the library has its own [documentation website](https://tradingview.github.io/lightweight-charts/) that replaces the documentation in the repository. Check it out and share your feedback in [this discussion thread](https://github.com/tradingview/lightweight-charts/discussions/921).
@@ -313,6 +437,8 @@ Thanks to our contributors:
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/23?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.7.0..v3.8.0).
 
+---
+
 ## 3.7.0
 
 **Enhancement**
@@ -337,6 +463,8 @@ Thanks to our contributors:
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/22?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.6.1..v3.7.0).
 
+---
+
 ## 3.6.1
 
 **Fixed**
@@ -344,6 +472,8 @@ See [issues assigned to this version's milestone](https://github.com/tradingview
 - In v3.6.0 there was a typo in `LasPriceAnimationMode` const enum (`Last` without `t`), which was fixed in this release. The incorrect name is still available to import and could be used in your code so no breaking change so far (see e5133cb0c50fc557182aba4011e170aaf30a5b1a)
 
 See [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.6.0..v3.6.1).
+
+---
 
 ## 3.6.0
 
@@ -369,6 +499,8 @@ Thanks to our contributors:
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/21?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.5.0..v3.6.0).
 
+---
+
 ## 3.5.0
 
 **A note about rendering order of series, which might be interpret as a bug or breaking change since this release**
@@ -389,6 +521,8 @@ Thanks to our contributors:
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/20?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.4.0..v3.5.0).
 
+---
+
 ## 3.4.0
 
 **Enhancement**
@@ -408,6 +542,8 @@ See [issues assigned to this version's milestone](https://github.com/tradingview
 - series.priceFormatter().format(price) does not work (see [#790](https://github.com/tradingview/lightweight-charts/issues/790))
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/19?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.3.0..v3.4.0).
+
+---
 
 ## 3.3.0
 
@@ -430,6 +566,8 @@ Thanks to our contributors:
 - [@mecm1993](https://github.com/mecm1993) Manuel Cepeda
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/17?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.2.0..v3.3.0).
+
+---
 
 ## 3.2.0
 
@@ -470,6 +608,8 @@ Thanks to our contributors:
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/11?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.1.5..v3.2.0).
 
+---
+
 ## 3.1.5
 
 It's a just re-published accidentally published 3.1.4 version, which didn't actually fix the issue [#536](https://github.com/tradingview/lightweight-charts/issues/536).
@@ -482,6 +622,8 @@ Version 3.1.4 has been deprecated.
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/16?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.1.3..v3.1.5).
 
+---
+
 ## 3.1.3
 
 **Fixed**
@@ -489,6 +631,8 @@ See [issues assigned to this version's milestone](https://github.com/tradingview
 - `handleScroll` and `handleScale` options aren't applied (see [#527](https://github.com/tradingview/lightweight-charts/issues/527))
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/14?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.1.2..v3.1.3).
+
+---
 
 ## 3.1.2
 
@@ -498,6 +642,8 @@ See [issues assigned to this version's milestone](https://github.com/tradingview
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/13?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.1.1..v3.1.2).
 
+---
+
 ## 3.1.1
 
 **Fixed**
@@ -505,6 +651,8 @@ See [issues assigned to this version's milestone](https://github.com/tradingview
 - Fixed production build of 3.1 version (see [#502](https://github.com/tradingview/lightweight-charts/issues/502) and [62aa93724e40fbb1b678d9b44655279a1df529c5](https://github.com/tradingview/lightweight-charts/commit/62aa93724e40fbb1b678d9b44655279a1df529c5))
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/12?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.1.0..v3.1.1).
+
+---
 
 ## 3.1.0
 
@@ -541,6 +689,8 @@ Thanks to our contributors:
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/9?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.0.1..v3.1.0).
 
+---
+
 ## 3.0.1
 
 **Fixed**
@@ -548,6 +698,8 @@ See [issues assigned to this version's milestone](https://github.com/tradingview
 - Correctly handle `overlay: true` in series options while create series to backward compat (see [#475](https://github.com/tradingview/lightweight-charts/issues/475))
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/10?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v3.0.0..v3.0.1).
+
+---
 
 ## 3.0.0
 
@@ -597,6 +749,8 @@ Thanks to our contributors:
 
 See [issues assigned to this version's milestone](https://github.com/tradingview/lightweight-charts/milestone/7?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v2.0.0..v3.0.0).
 
+---
+
 ## 2.0.0
 
 **Breaking changes**
@@ -632,11 +786,15 @@ Thanks to our contributors:
 
 See [issues assigned to this version’s milestone](https://github.com/tradingview/lightweight-charts/milestone/6?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v1.2.2..v2.0.0).
 
+---
+
 ## 1.2.2
 
 **Fixed**
 
 - Bug while rendering few datasets with not equal timescale ([#321](https://github.com/tradingview/lightweight-charts/issues/321))
+
+---
 
 ## 1.2.1
 
@@ -659,6 +817,8 @@ See [issues assigned to this version’s milestone](https://github.com/tradingvi
 - Added some missing docs ([#211](https://github.com/tradingview/lightweight-charts/issues/211) [#193](https://github.com/tradingview/lightweight-charts/issues/193) [#245](https://github.com/tradingview/lightweight-charts/issues/245))
 
 See [issues assigned to this version’s milestone](https://github.com/tradingview/lightweight-charts/milestone/4?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v1.1.0...v1.2.1).
+
+---
 
 ## 1.1.0
 
@@ -688,17 +848,23 @@ Thanks to our contributors:
 
 See [issues assigned to this version’s milestone](https://github.com/tradingview/lightweight-charts/milestone/2?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v1.0.2...v1.1.0).
 
+---
+
 ## 1.0.2
 
 **Fixed**
 
 - The histogram last bar not hide in chart ([#133](https://github.com/tradingview/lightweight-charts/issues/133))
 
+---
+
 ## 1.0.1
 
 **Fixed**
 
 - Setting the data to series fails after setting the data to histogram series with custom color ([#110](https://github.com/tradingview/lightweight-charts/issues/110))
+
+---
 
 ## 1.0.0
 

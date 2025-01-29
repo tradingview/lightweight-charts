@@ -1,13 +1,13 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
-import { Logical, LogicalRange, Range } from '../model/time-data';
+import { IRange, Logical, LogicalRange, TimePointIndex } from '../model/time-data';
 import { HorzScaleOptions } from '../model/time-scale';
 
 /**
  * A custom function used to handle changes to the time scale's time range.
  */
-export type TimeRangeChangeEventHandler<HorzScaleItem> = (timeRange: Range<HorzScaleItem> | null) => void;
+export type TimeRangeChangeEventHandler<HorzScaleItem> = (timeRange: IRange<HorzScaleItem> | null) => void;
 /**
  * A custom function used to handle changes to the time scale's logical range.
  */
@@ -45,7 +45,7 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 *
 	 * @returns Visible range or null if the chart has no data at all.
 	 */
-	getVisibleRange(): Range<HorzScaleItem> | null;
+	getVisibleRange(): IRange<HorzScaleItem> | null;
 
 	/**
 	 * Sets visible range of data.
@@ -64,7 +64,7 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 * });
 	 * ```
 	 */
-	setVisibleRange(range: Range<HorzScaleItem>): void;
+	setVisibleRange(range: IRange<HorzScaleItem>): void;
 
 	/**
 	 * Returns the current visible [logical range](/time-scale.md#logical-range) of the chart as an object with the first and last time points of the logical range, or returns `null` if the chart has no data.
@@ -82,7 +82,7 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 * chart.timeScale().setVisibleLogicalRange({ from: 0, to: 10 });
 	 * ```
 	 */
-	setVisibleLogicalRange(range: Range<number>): void;
+	setVisibleLogicalRange(range: IRange<number>): void;
 
 	/**
 	 * Restores default zoom level and scroll position of the time scale.
@@ -109,6 +109,14 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 * @returns Logical index that is located on that coordinate or `null` if the chart doesn't have data
 	 */
 	coordinateToLogical(x: number): Logical | null;
+
+	/**
+	 * Converts a time to local x coordinate.
+	 *
+	 * @param time - Time needs to be converted
+	 * @returns X coordinate of that time or `null` if no time found on time scale
+	 */
+	timeToIndex(time: HorzScaleItem, findNearest?: boolean): TimePointIndex | null;
 
 	/**
 	 * Converts a time to local x coordinate.

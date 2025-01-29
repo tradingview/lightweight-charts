@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { beforeEach, describe, it } from 'node:test';
 
 import { ensureNotNull } from '../../src/helpers/assertions';
 import { TimePoint, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
@@ -183,6 +184,26 @@ describe('PlotList', () => {
 			const minMaxNonCached = pl.minMaxOnRangeCached(0 as TimePointIndex, 4 as TimePointIndex, [PlotRowValueIndex.Close]);
 			expect(ensureNotNull(minMaxNonCached).min).to.be.equal(6);
 			expect(ensureNotNull(minMaxNonCached).max).to.be.equal(26);
+		});
+	});
+
+	describe('indices', () => {
+		it('should return indices for fulfilled data', () => {
+			const p1 = new PlotList();
+			p1.setData([
+				plotRow(-5 as TimePointIndex, timePoint(1), [1, 2, 3, 4]),
+				plotRow(0 as TimePointIndex, timePoint(2), [10, 20, 30, 40]),
+				plotRow(5 as TimePointIndex, timePoint(3), [100, 200, 300, 400]),
+			]);
+			expect(p1.indices().length).to.be.equal(3);
+			expect(p1.indices()).to.deep.equal([-5, 0, 5]);
+			p1.setData([
+				plotRow(-2 as TimePointIndex, timePoint(4), [1, 2, 3, 4]),
+				plotRow(0 as TimePointIndex, timePoint(5), [10, 20, 30, 40]),
+				plotRow(2 as TimePointIndex, timePoint(6), [100, 200, 300, 400]),
+			]);
+			expect(p1.indices().length).to.be.equal(3);
+			expect(p1.indices()).to.deep.equal([-2, 0, 2]);
 		});
 	});
 });

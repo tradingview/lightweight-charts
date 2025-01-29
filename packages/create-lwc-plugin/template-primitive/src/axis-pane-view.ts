@@ -1,12 +1,12 @@
 import {
 	Coordinate,
-	ISeriesPrimitivePaneView,
-	SeriesPrimitivePaneViewZOrder,
+	IPrimitivePaneView,
+	PrimitivePaneViewZOrder,
 } from 'lightweight-charts';
 import { _CLASSNAME_AxisPaneRenderer } from './axis-pane-renderer';
 import { _CLASSNAME_DataSource } from './data-source';
 
-abstract class _CLASSNAME_AxisPaneView implements ISeriesPrimitivePaneView {
+abstract class _CLASSNAME_AxisPaneView implements IPrimitivePaneView {
 	_source: _CLASSNAME_DataSource;
 	_p1: number | null = null;
 	_p2: number | null = null;
@@ -31,7 +31,7 @@ abstract class _CLASSNAME_AxisPaneView implements ISeriesPrimitivePaneView {
 			this._vertical
 		);
 	}
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'bottom';
 	}
 }

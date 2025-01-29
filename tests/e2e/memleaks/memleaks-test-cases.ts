@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { findLeaks, takeSnapshots } from '@memlab/api';
 import type { IHeapNode, IScenario } from '@memlab/core';
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
 
 import { getClassNames } from './helpers/get-all-class-names';
 import { getTestCases } from './helpers/get-test-cases';
@@ -22,13 +23,10 @@ interface ITestScenario extends IScenario {
 	allowedLeaks?: string[];
 }
 
-describe('Memleaks tests', function(): void {
-	// this tests are unstable sometimes.
-	this.retries(0);
-
+describe('Memleaks tests', async (): Promise<void> => {
 	const testCases = getTestCases();
 
-	it('number of test cases', () => {
+	await it('number of test cases', () => {
 		// we need to have at least 1 test to check it
 		expect(testCases.length).to.be.greaterThan(
 			0,
@@ -69,11 +67,9 @@ describe('Memleaks tests', function(): void {
 					...scenario,
 					url: () => serverURL,
 					leakFilter: (node: IHeapNode) => {
-						if (
-							(classNames.has(node.name) &&
-								!allowedLeaks.includes(node.name)) ||
-							node.retainedSize > 1_000_000
-						) {
+						if ((classNames.has(node.name) &&
+							!allowedLeaks.includes(node.name)) ||
+							node.retainedSize > 1000000) {
 							if (!expectToFail) {
 								console.log(`LEAK FOUND! Name of constructor: ${node.name} Retained Size: ${node.retainedSize}`);
 							}

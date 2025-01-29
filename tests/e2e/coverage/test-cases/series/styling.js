@@ -23,14 +23,14 @@ async function beforeInteractions(container) {
 		},
 	});
 
-	const lineSeries = chart.addLineSeries({
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		lineWidth: 2,
 		color: '#ff0000',
 		lineType: LightweightCharts.LineType.Simple,
 	});
 	lineSeries.setData(generateLineData());
 
-	candlestickSeries = chart.addCandlestickSeries({ priceScaleId: 'left', wickColor: 'blue', borderColor: 'green' });
+	candlestickSeries = chart.addSeries(LightweightCharts.CandlestickSeries, { priceScaleId: 'left', wickColor: 'blue', borderColor: 'green' });
 	const candleStickData = generateBars().map((bar, index) => {
 		if (index > 5) { return bar; }
 		return { ...bar, color: 'orange', wickColor: 'orange', borderColor: 'orange' };

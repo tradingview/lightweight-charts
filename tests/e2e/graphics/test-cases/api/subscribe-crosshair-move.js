@@ -1,6 +1,8 @@
 function runTestCase(container) {
-	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
-	const series = chart.addAreaSeries();
+	const chart = (window.chart = LightweightCharts.createChart(container, {
+		layout: { attributionLogo: false },
+	}));
+	const series = chart.addSeries(LightweightCharts.AreaSeries);
 	series.setData([
 		{ time: '1990-04-24', value: 0 },
 		{ time: '1990-04-25', value: 1 },
@@ -12,15 +14,27 @@ function runTestCase(container) {
 
 	chart.timeScale().fitContent();
 
+	const textWatermark = LightweightCharts.createTextWatermark(chart.panes()[0], {
+		lines: [
+			{
+				text: '',
+				color: 'red',
+				fontSize: 12,
+			},
+		],
+	});
+
 	chart.subscribeCrosshairMove(param => {
 		if (param.time) {
 			const seriesData = param.seriesData.get(series) || {};
-			chart.applyOptions({
-				watermark: {
-					color: 'red',
-					visible: true,
-					text: `${param.time} - ${seriesData.time}`,
-				},
+			textWatermark.applyOptions({
+				lines: [
+					{
+						text: `${param.time} - ${seriesData.time}`,
+						color: 'red',
+						fontSize: 12,
+					},
+				],
 			});
 		}
 	});

@@ -42,7 +42,7 @@ interface and is used to draw the series data on the main chart pane.
 The [`draw`](../api/interfaces/ICustomSeriesPaneRenderer.md#draw) method of the
 renderer is evoked whenever the chart needs to draw the series.
 
-The [`PriceToCoordinateConverter`](../api/index.md#pricetocoordinateconverter)
+The [`PriceToCoordinateConverter`](../api/type-aliases/PriceToCoordinateConverter.md)
 provided as the 2nd argument to the draw method is a convenience function for
 changing prices into vertical coordinate values. It is provided since the
 series' original data will most likely be defined in price values, and the
@@ -80,7 +80,7 @@ series data. It includes the following properties:
 ### Price Value Builder
 
 - ICustomSeriesPaneView property:
-  [`priceValueBuilder`](../api/interfaces/ICustomSeriesPaneView.md#priceValueBuilder)
+  [`priceValueBuilder`](../api/interfaces/ICustomSeriesPaneView.md#pricevaluebuilder)
 
 A function for interpreting the custom series data and returning an array of
 numbers representing the prices values for the item, specifically the equivalent

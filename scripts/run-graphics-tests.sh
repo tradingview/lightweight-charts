@@ -17,11 +17,29 @@ if [ "$PRODUCTION_BUILD" = "true" ]; then
 fi
 
 HEAD_SHA1=$(git rev-parse HEAD)
-git checkout $(git merge-base origin/master HEAD)
+
+if [ -z "$COMPARE_BRANCH" ]; then
+    # If COMPARE_BRANCH is not set, use the old behaviour
+    echo "checking out merge-base with master"
+    git checkout $(git merge-base origin/master HEAD)
+else
+    # If COMPARE_BRANCH is set, use the specified branch
+    echo "Using latest commit on target branch: $COMPARE_BRANCH"
+    git checkout origin/$COMPARE_BRANCH
+fi
 
 npm install
 npm run $BUILD_SCRIPT
+# Remove existing merge-base-dist if it exists
+rm -rf ./merge-base-dist
 mv ./dist ./merge-base-dist
+
+if [ "$BRANCH_SPECIFIC_TEST" = "true" ]; then
+	echo "Using BRANCH_SPECIFIC_TEST"
+	echo "Running generate-golden-content"
+	npx esno ./tests/e2e/graphics/generate-golden-content.ts ./golden_test_files
+	export GOLDEN_TEST_CONTENT_PATH="./golden_test_files"
+fi
 
 echo "Checkout to HEAD back and build..."
 
@@ -31,7 +49,7 @@ npm run $BUILD_SCRIPT
 
 echo "Graphics tests"
 set +e
-node ./tests/e2e/graphics/runner.js ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
+npx esno ./tests/e2e/graphics/runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
 EXIT_CODE=$?
 set -e
 

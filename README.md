@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://www.tradingview.com/lightweight-charts/" target="_blank">
-    <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true">
+    <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true" alt="Lightweight Charts logo">
   </a>
 
   <h1>Lightweight Charts™</h1>
@@ -34,10 +34,10 @@ npm install lightweight-charts
 ```
 
 ```js
-import { createChart } from 'lightweight-charts';
+import { createChart, LineSeries } from 'lightweight-charts';
 
 const chart = createChart(document.body, { width: 400, height: 300 });
-const lineSeries = chart.addLineSeries();
+const lineSeries = chart.addSeries(LineSeries);
 lineSeries.setData([
     { time: '2019-04-11', value: 80.01 },
     { time: '2019-04-12', value: 96.63 },
@@ -62,7 +62,7 @@ The standalone version creates `window.LightweightCharts` object with all export
 
 ```js
 const chart = LightweightCharts.createChart(document.body, { width: 400, height: 300 });
-const lineSeries = chart.addLineSeries();
+const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
 lineSeries.setData([
     { time: '2019-04-11', value: 80.01 },
     { time: '2019-04-12', value: 96.63 },
@@ -79,14 +79,12 @@ lineSeries.setData([
 
 ### Build Variants
 
-|Dependencies included|Mode|ES module|CommonJS ⚠️|IIFE (`window.LightweightCharts`)|
-|-|-|-|-|-|
-|No|PROD|`lightweight-charts.production.mjs`|`lightweight-charts.production.cjs`|N/A|
-|No|DEV|`lightweight-charts.development.mjs`|`lightweight-charts.development.cjs`|N/A|
-|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|-|`lightweight-charts.standalone.production.js`|
-|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|-|`lightweight-charts.standalone.development.js`|
-
-⚠️ **Deprecation note:** CommonJS support will be removed from the library at the start of 2024.
+|Dependencies included|Mode|ES module|IIFE (`window.LightweightCharts`)|
+|-|-|-|-|
+|No|PROD|`lightweight-charts.production.mjs`|N/A|
+|No|DEV|`lightweight-charts.development.mjs`|N/A|
+|Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|`lightweight-charts.standalone.production.js`|
+|Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|`lightweight-charts.standalone.development.js`|
 
 ## Development
 

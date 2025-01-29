@@ -1,9 +1,12 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { IDataSource } from '../model/idata-source';
+import { IDataSource, IDataSourcePaneViews } from '../model/idata-source';
 import { Pane } from '../model/pane';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
+import { IAxisView } from '../views/pane/iaxis-view';
+import { IPaneView } from '../views/pane/ipane-view';
 
+import { IAxisViewsGetter } from './iaxis-view-getters';
 import { IPaneViewsGetter } from './ipane-view-getter';
 
 export type DrawFunction = (
@@ -35,16 +38,21 @@ export function drawForeground(
 
 type DrawRendererFn = (renderer: IPaneRenderer) => void;
 
-export function drawSourcePaneViews(
-	paneViewsGetter: IPaneViewsGetter,
+export type ViewsGetter<T> = T extends IDataSource
+	? IAxisViewsGetter
+	: IPaneViewsGetter;
+
+export function drawSourceViews<T extends IDataSource | IDataSourcePaneViews>(
+	paneViewsGetter: ViewsGetter<T>,
 	drawRendererFn: DrawRendererFn,
-	source: IDataSource,
+	source: T,
 	pane: Pane
 ): void {
-	const paneViews = paneViewsGetter(source, pane);
-
-	for (const paneView of paneViews) {
-		const renderer = paneView.renderer();
+	const views = (
+		paneViewsGetter as (s: T, p: Pane) => readonly (IAxisView | IPaneView)[]
+	)(source, pane);
+	for (const view of views) {
+		const renderer = view.renderer(pane);
 		if (renderer !== null) {
 			drawRendererFn(renderer);
 		}

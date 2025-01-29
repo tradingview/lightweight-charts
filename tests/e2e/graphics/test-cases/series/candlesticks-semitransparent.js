@@ -25,7 +25,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addCandlestickSeries({
+	const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
 		borderColor: 'rgba(0, 0, 255, 0.2)',
 		upColor: 'rgba(0, 80, 0, 0.2)',
 		downColor: 'rgba(80, 0, 0, 0.2)',

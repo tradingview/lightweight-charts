@@ -1,7 +1,7 @@
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const lineSeries = chart.addLineSeries();
+	const lineSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	lineSeries.setData([
 		{ time: 1556877600, value: 230.12 },
@@ -12,7 +12,7 @@ function runTestCase(container) {
 		{ time: 1556895600, value: 232.52 },
 	]);
 
-	const lineSeries1 = chart.addLineSeries({
+	const lineSeries1 = chart.addSeries(LightweightCharts.LineSeries, {
 		color: 'red',
 	});
 
@@ -25,14 +25,17 @@ function runTestCase(container) {
 		{ time: 1556895600, value: 132.52 },
 	]);
 
-	lineSeries.setMarkers([
-		{
-			color: 'green',
-			position: 'inBar',
-			shape: 'arrowDown',
-			time: 1556880900,
-		},
-	]);
+	LightweightCharts.createSeriesMarkers(
+		lineSeries,
+		[
+			{
+				color: 'green',
+				position: 'inBar',
+				shape: 'arrowDown',
+				time: 1556880900,
+			},
+		]
+	);
 
 	chart.timeScale().fitContent();
 }

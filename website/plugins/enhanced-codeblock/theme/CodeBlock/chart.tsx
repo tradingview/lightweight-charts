@@ -3,7 +3,13 @@ import { useDocsPreferredVersion } from '@docusaurus/theme-common';
 import * as React from 'react';
 
 import versions from '../../../../versions.json';
-import { importLightweightChartsVersion, LightweightChartsApiTypeMap } from './import-lightweight-charts-version';
+import {
+	importLightweightChartsVersion,
+	LightweightChartsApiTypeMap,
+	VersionsSupportingAdditionalChartTypes,
+	VersionsSupportingCreateChartEx,
+	VersionsSupportingTreeShakenSeries,
+} from './import-lightweight-charts-version';
 import styles from './styles.module.css';
 
 interface ChartProps {
@@ -13,7 +19,14 @@ interface ChartProps {
 
 type IFrameWindow<TVersion extends keyof LightweightChartsApiTypeMap> = Window & {
 	createChart: LightweightChartsApiTypeMap[TVersion]['createChart'];
-	createChartEx: TVersion extends '4.2' | '4.1' | 'current' ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
+	createChartEx: TVersion extends VersionsSupportingCreateChartEx ? LightweightChartsApiTypeMap[TVersion]['createChartEx'] : undefined;
+	createYieldCurveChart: TVersion extends VersionsSupportingAdditionalChartTypes ? LightweightChartsApiTypeMap[TVersion]['createYieldCurveChart'] : undefined;
+	createOptionsChart: TVersion extends VersionsSupportingAdditionalChartTypes ? LightweightChartsApiTypeMap[TVersion]['createOptionsChart'] : undefined;
+	LineSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['LineSeries'] : undefined;
+	AreaSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['AreaSeries'] : undefined;
+	CandlestickSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['CandlestickSeries'] : undefined;
+	BarSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['BarSeries'] : undefined;
+	HistogramSeries: TVersion extends VersionsSupportingTreeShakenSeries ? LightweightChartsApiTypeMap[TVersion]['HistogramSeries'] : undefined;
 	run?: () => void;
 };
 
@@ -58,11 +71,34 @@ export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props:
 
 			const injectCreateChartAndRun = async () => {
 				try {
-					const { module, createChart, createChartEx } = await importLightweightChartsVersion[version](iframeWindow);
+					const {
+						module,
+						createChart,
+						createChartEx,
+						createYieldCurveChart,
+						createOptionsChart,
+					} = await importLightweightChartsVersion[version](iframeWindow);
 
 					Object.assign(iframeWindow, module); // Make ColorType, etc. available in the iframe
 					iframeWindow.createChart = createChart;
 					iframeWindow.createChartEx = createChartEx;
+					iframeWindow.createYieldCurveChart = createYieldCurveChart;
+					iframeWindow.createOptionsChart = createOptionsChart;
+
+					if (version === 'current') {
+						const typedModule = module as unknown as {
+							LineSeries: typeof iframeWindow.LineSeries;
+							AreaSeries: typeof iframeWindow.AreaSeries;
+							CandlestickSeries: typeof iframeWindow.CandlestickSeries;
+							BarSeries: typeof iframeWindow.BarSeries;
+							HistogramSeries: typeof iframeWindow.HistogramSeries;
+						};
+						iframeWindow.LineSeries = typedModule.LineSeries;
+						iframeWindow.AreaSeries = typedModule.AreaSeries;
+						iframeWindow.CandlestickSeries = typedModule.CandlestickSeries;
+						iframeWindow.BarSeries = typedModule.BarSeries;
+						iframeWindow.HistogramSeries = typedModule.HistogramSeries;
+					}
 					iframeWindow.run?.();
 				} catch (err: unknown) {
 					// eslint-disable-next-line no-console

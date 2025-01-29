@@ -6,14 +6,14 @@ import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
-import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Range } from '../model/time-data';
+import { IRange } from '../model/time-data';
 
+import { IPaneApi } from './ipane-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesPrimitive } from './iseries-primitive-api';
@@ -33,18 +33,18 @@ export type DataChangedHandler = (scope: DataChangedScope) => void;
  */
 // actually range might be either exist or not
 // but to avoid hard-readable type let's say every part of range is optional
-export interface BarsInfo<HorzScaleItem> extends Partial<Range<HorzScaleItem>> {
+export interface BarsInfo<HorzScaleItem> extends Partial<IRange<HorzScaleItem>> {
 	/**
 	 * The number of bars before the start of the range.
-	 * Positive value means that there are some bars before (out of logical range from the left) the {@link Range.from} logical index in the series.
-	 * Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the {@link Range.from} logical index are some bars.
+	 * Positive value means that there are some bars before (out of logical range from the left) the {@link IRange.from} logical index in the series.
+	 * Negative value means that the first series' bar is inside the passed logical range, and between the first series' bar and the {@link IRange.from} logical index are some bars.
 	 */
 	barsBefore: number;
 
 	/**
 	 * The number of bars after the end of the range.
-	 * Positive value in the `barsAfter` field means that there are some bars after (out of logical range from the right) the {@link Range.to} logical index in the series.
-	 * Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the {@link Range.to} logical index are some bars.
+	 * Positive value in the `barsAfter` field means that there are some bars after (out of logical range from the right) the {@link IRange.to} logical index in the series.
+	 * Negative value means that the last series' bar is inside the passed logical range, and between the last series' bar and the {@link IRange.to} logical index are some bars.
 	 */
 	barsAfter: number;
 }
@@ -106,7 +106,7 @@ export interface ISeriesApi<
 	 * chart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleLogicalRangeChanged);
 	 * ```
 	 */
-	barsInLogicalRange(range: Range<number>): BarsInfo<HorzScaleItem> | null;
+	barsInLogicalRange(range: IRange<number>): BarsInfo<HorzScaleItem> | null;
 
 	/**
 	 * Applies new options to the existing series
@@ -157,6 +157,8 @@ export interface ISeriesApi<
 	 *
 	 * @param bar - A single data item to be added. Time of the new item must be greater or equal to the latest existing time point.
 	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
+	 * @param historicalUpdate - If true, allows updating an existing data point that is not the latest bar. Default is false.
+	 * Updating older data using `historicalUpdate` will be slower than updating the most recent data point.
 	 * @example Updating line series data
 	 * ```js
 	 * lineSeries.update({
@@ -175,7 +177,7 @@ export interface ISeriesApi<
 	 * });
 	 * ```
 	 */
-	update(bar: TData): void;
+	update(bar: TData, historicalUpdate?: boolean): void;
 
 	/**
 	 * Returns a bar data by provided logical index.
@@ -230,53 +232,6 @@ export interface ISeriesApi<
 	unsubscribeDataChanged(handler: DataChangedHandler): void;
 
 	/**
-	 * Allows to set/replace all existing series markers with new ones.
-	 *
-	 * @param data - An array of series markers. This array should be sorted by time. Several markers with same time are allowed.
-	 * @example
-	 * ```js
-	 * series.setMarkers([
-	 *     {
-	 *         time: '2019-04-09',
-	 *         position: 'aboveBar',
-	 *         color: 'black',
-	 *         shape: 'arrowDown',
-	 *     },
-	 *     {
-	 *         time: '2019-05-31',
-	 *         position: 'belowBar',
-	 *         color: 'red',
-	 *         shape: 'arrowUp',
-	 *         id: 'id3',
-	 *     },
-	 *     {
-	 *         time: '2019-05-31',
-	 *         position: 'belowBar',
-	 *         color: 'orange',
-	 *         shape: 'arrowUp',
-	 *         id: 'id4',
-	 *         text: 'example',
-	 *         size: 2,
-	 *     },
-	 * ]);
-	 *
-	 * chart.subscribeCrosshairMove(param => {
-	 *     console.log(param.hoveredObjectId);
-	 * });
-	 *
-	 * chart.subscribeClick(param => {
-	 *     console.log(param.hoveredObjectId);
-	 * });
-	 * ```
-	 */
-	setMarkers(data: SeriesMarker<HorzScaleItem>[]): void;
-
-	/**
-	 * Returns an array of series markers.
-	 */
-	markers(): SeriesMarker<HorzScaleItem>[];
-
-	/**
 	 * Creates a new price line
 	 *
 	 * @param options - Any subset of options, however `price` is required.
@@ -307,12 +262,17 @@ export interface ISeriesApi<
 	removePriceLine(line: IPriceLine): void;
 
 	/**
+	 * Returns an array of price lines.
+	 */
+	priceLines(): IPriceLine[];
+
+	/**
 	 * Return current series type.
 	 *
 	 * @returns Type of the series.
 	 * @example
 	 * ```js
-	 * const lineSeries = chart.addLineSeries();
+	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.seriesType()); // "Line"
 	 *
 	 * const candlestickSeries = chart.addCandlestickSeries();
@@ -335,4 +295,20 @@ export interface ISeriesApi<
 	 * Does nothing if specified primitive was not attached
 	 */
 	detachPrimitive(primitive: ISeriesPrimitive<HorzScaleItem>): void;
+
+	/**
+	 * Move the series to another pane.
+	 *
+	 * If the pane with the specified index does not exist, the pane will be created.
+	 *
+	 * @param paneIndex - The index of the pane. Should be a number between 0 and the total number of panes.
+	 */
+	moveToPane(paneIndex: number): void;
+
+	/**
+	 * Returns the pane to which the series is currently attached.
+	 *
+	 * @returns Pane API object to control the pane
+	 */
+	getPane(): IPaneApi<HorzScaleItem>;
 }

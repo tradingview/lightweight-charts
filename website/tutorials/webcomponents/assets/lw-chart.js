@@ -26,8 +26,6 @@ import { createChart } from 'lightweight-charts';
 			return ['type', 'autosize'];
 		}
 
-		// Helper function to get the series constructor name from a chart type
-		// eg. 'line' -> 'addLineSeries'
 		static getChartSeriesConstructorName(type) {
 			return `add${type.charAt(0).toUpperCase() + type.slice(1)}Series`;
 		}
@@ -134,9 +132,7 @@ import { createChart } from 'lightweight-charts';
 				this.chart.removeSeries(this.series);
 			}
 			this.series =
-				this.chart[
-					LightweightChartWC.getChartSeriesConstructorName(this.type)
-				]();
+				this.chart[LightweightChartWC.getChartSeriesConstructorName(this.type)]();
 			this.series.setData(this.data);
 		}
 

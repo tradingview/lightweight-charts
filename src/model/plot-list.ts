@@ -41,6 +41,7 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 	private _items: readonly PlotRowType[] = [];
 	private _minMaxCache: Map<PlotRowValueIndex, Map<number, MinMax | null>> = new Map();
 	private _rowSearchCache: Map<TimePointIndex, Map<MismatchDirection, PlotRowType>> = new Map();
+	private _indices: readonly TimePointIndex[] = [];
 
 	// @returns Last row
 	public last(): PlotRowType | null {
@@ -108,8 +109,13 @@ export class PlotList<PlotRowType extends PlotRow = PlotRow> {
 	public setData(plotRows: readonly PlotRowType[]): void {
 		this._rowSearchCache.clear();
 		this._minMaxCache.clear();
-
 		this._items = plotRows;
+		this._indices = plotRows.map((plotRow: PlotRowType) => plotRow.index);
+	}
+
+	// TimePointIndex values for fulfilled data points
+	public indices(): readonly TimePointIndex[] {
+		return this._indices;
 	}
 
 	private _indexAt(offset: PlotRowIndex): TimePointIndex {

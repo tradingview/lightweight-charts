@@ -1,17 +1,17 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
 	CrosshairMode,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	MouseEventParams,
-	SeriesPrimitivePaneViewZOrder,
+	PrimitivePaneViewZOrder,
 	ISeriesPrimitive,
 	SeriesAttachedParameter,
 	Time,
 } from 'lightweight-charts';
 import { positionsLine } from '../../helpers/dimensions/positions';
 
-class CrosshairHighlightPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class CrosshairHighlightPaneRenderer implements IPrimitivePaneRenderer {
 	_data: CrosshairHighlightData;
 
 	constructor(data: CrosshairHighlightData) {
@@ -38,7 +38,7 @@ class CrosshairHighlightPaneRenderer implements ISeriesPrimitivePaneRenderer {
 	}
 }
 
-class CrosshairHighlightPaneView implements ISeriesPrimitivePaneView {
+class CrosshairHighlightPaneView implements IPrimitivePaneView {
 	_data: CrosshairHighlightData;
 	constructor(data: CrosshairHighlightData) {
 		this._data = data;
@@ -48,11 +48,11 @@ class CrosshairHighlightPaneView implements ISeriesPrimitivePaneView {
 		this._data = data;
 	}
 
-	renderer(): ISeriesPrimitivePaneRenderer | null {
+	renderer(): IPrimitivePaneRenderer | null {
 		return new CrosshairHighlightPaneRenderer(this._data);
 	}
 
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'bottom';
 	}
 }

@@ -3,9 +3,10 @@ import { ensure } from '../helpers/assertions';
 import { Coordinate } from './coordinate';
 import { CrosshairMode, CrosshairOptions } from './crosshair';
 import { IPriceDataSource } from './iprice-data-source';
+import { ISeries } from './iseries';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
-import { ISeries, Series } from './series';
+import { Series } from './series';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 
@@ -33,7 +34,7 @@ export class Magnet {
 
 		// get all serieses from the pane
 		const serieses: readonly ISeries<SeriesType>[] = pane.dataSources().filter(
-			((ds: IPriceDataSource) => (ds instanceof Series<SeriesType>)) as (ds: IPriceDataSource) => ds is Series<SeriesType>);
+			((ds: IPriceDataSource) => (ds instanceof Series)) as (ds: IPriceDataSource) => ds is Series<SeriesType>);
 
 		const candidates = serieses.reduce(
 			(acc: Coordinate[], series: ISeries<SeriesType>) => {

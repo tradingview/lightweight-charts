@@ -4,9 +4,9 @@ import {
 } from 'fancy-canvas';
 import {
 	ICustomSeriesPaneRenderer,
+	IRange,
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
-	Range,
 	Time,
 } from 'lightweight-charts';
 import { StackedAreaData } from './data';
@@ -110,7 +110,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 
 	_createLinePaths(
 		bars: StackedAreaBarItem[],
-		visibleRange: Range<number>,
+		visibleRange: IRange<number>,
 		renderingScope: BitmapCoordinatesRenderingScope,
 		zeroY: number
 	) {

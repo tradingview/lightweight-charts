@@ -145,7 +145,7 @@ To help you get started quickly, we have created an NPM package called [create-l
 
 The horizontal scale is no longer restricted to only time-based values. The API has been extended to allow customization of the horizontal scale behavior, and enable uses cases like options chart where price values are displayed in the horizontal scale. The most common use-case would be to customise the tick marks behaviour.
 
-The [createChartEx](/api/index.md#createchartex) function should be used instead of the usual `createChart` function, and an instance of a class implementing [IHorzScaleBehavior](/api/interfaces/IHorzScaleBehavior.md) should be provided.
+The [createChartEx](/api/functions/createChartEx.md) function should be used instead of the usual `createChart` function, and an instance of a class implementing [IHorzScaleBehavior](/api/interfaces/IHorzScaleBehavior.md) should be provided.
 
 A simple example can be found in this test case: [horizontal-price-scale.js](https://github.com/tradingview/lightweight-charts/blob/master/tests/e2e/graphics/test-cases/horizontal-price-scale.js)
 
@@ -153,16 +153,16 @@ A simple example can be found in this test case: [horizontal-price-scale.js](htt
 
 - Added point markers styling option for line-based series. (closes [#365](https://github.com/tradingview/lightweight-charts/issues/365)) [Docs](/api/interfaces/LineStyleOptions.md#pointmarkersvisible)
 - Added double click subscriber for the main chart pane. (closes [#1385](https://github.com/tradingview/lightweight-charts/issues/1385)) [Docs](/api/interfaces/IChartApi.md#subscribedblclick)
-- Added ﻿`setCrosshairPosition` API, allowing programmatic setting of the crosshair position. (fixes [#1198](https://github.com/tradingview/lightweight-charts/issues/1198), [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#438](https://github.com/tradingview/lightweight-charts/issues/438)) [Docs](/api/interfaces/IChartApi.md#setCrosshairPosition)
-- Added an option to disable crosshair. Introduced the ﻿`Hidden` option in the ﻿`CrosshairMode` setting. (closes [#749](https://github.com/tradingview/lightweight-charts/issues/749), thanks to [@luk707](https://github.com/luk707))
-- Allow overriding tick mark label length via the ﻿`tickMarkMaxCharacterLength` option. (closes [#1396](https://github.com/tradingview/lightweight-charts/issues/1396)) [Docs](/api/interfaces/HorzScaleOptions.md#tickmarkmaxcharacterlength)
+- Added `setCrosshairPosition` API, allowing programmatic setting of the crosshair position. (fixes [#1198](https://github.com/tradingview/lightweight-charts/issues/1198), [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#438](https://github.com/tradingview/lightweight-charts/issues/438)) [Docs](/api/interfaces/IChartApi.md#setcrosshairposition)
+- Added an option to disable crosshair. Introduced the `Hidden` option in the `CrosshairMode` setting. (closes [#749](https://github.com/tradingview/lightweight-charts/issues/749), thanks to [@luk707](https://github.com/luk707))
+- Allow overriding tick mark label length via the `tickMarkMaxCharacterLength` option. (closes [#1396](https://github.com/tradingview/lightweight-charts/issues/1396)) [Docs](/api/interfaces/HorzScaleOptions.md#tickmarkmaxcharacterlength)
 - Support for overriding the percentage formatter within the localization options. (fixes [#1328](https://github.com/tradingview/lightweight-charts/issues/1328), [#1291](https://github.com/tradingview/lightweight-charts/issues/1291)) [Docs](/api/interfaces/LocalizationOptions.md#percentageformatter)
-- Added ﻿`paneSize` getter to `IChartApi`, returning the dimensions of the chart pane. (issue [#1411](https://github.com/tradingview/lightweight-charts/issues/1411)) [Docs](/api/interfaces/IChartApi.md#panesize)
+- Added `paneSize` getter to `IChartApi`, returning the dimensions of the chart pane. (issue [#1411](https://github.com/tradingview/lightweight-charts/issues/1411)) [Docs](/api/interfaces/IChartApi.md#panesize)
 - Added options to set minimum dimensions for the price and time scales. (closes [#1062](https://github.com/tradingview/lightweight-charts/issues/1062), related to [#1163](https://github.com/tradingview/lightweight-charts/issues/1163), [#50](https://github.com/tradingview/lightweight-charts/issues/50)) [Docs](/api/interfaces/TimeScaleOptions.md#minimumheight), [Docs](/api/interfaces/PriceScaleOptions.md#minimumwidth)
 
 **Bug Fixes**
 
-- Fixed chart layout when direction is set to ﻿RTL. (PR [#1338](https://github.com/tradingview/lightweight-charts/pull/1338))
+- Fixed chart layout when direction is set to RTL. (PR [#1338](https://github.com/tradingview/lightweight-charts/pull/1338))
 - Fixed re-enabling of `autoSize` after disabling it. (PR [#1274](https://github.com/tradingview/lightweight-charts/pull/1377))
 - Corrected percentage mode and zero first value. (fixes [#1386](https://github.com/tradingview/lightweight-charts/issues/1386))
 - Prevent chart shifting when new data replaces existing whitespace. (fixes [#1201](https://github.com/tradingview/lightweight-charts/issues/1201))

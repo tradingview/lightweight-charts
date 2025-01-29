@@ -9,7 +9,7 @@ export async function doLongTouch(page: Page, element: ElementHandle, duration: 
 	const elCenterX = elBox.x + elBox.width / 2;
 	const elCenterY = elBox.y + elBox.height / 2;
 
-	const client = await page.target().createCDPSession();
+	const client = await page.createCDPSession();
 
 	await client.send('Input.dispatchTouchEvent', {
 		type: 'touchStart',

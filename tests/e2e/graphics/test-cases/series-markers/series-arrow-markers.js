@@ -25,19 +25,22 @@ function generateData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addBarSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.BarSeries);
 
 	const data = generateData();
 	mainSeries.setData(data);
 
-	mainSeries.setMarkers([
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'arrowUp' },
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'yellow', shape: 'arrowUp' },
-		{ time: data[data.length - 30].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'orange', shape: 'arrowDown' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'yellow', shape: 'arrowDown' },
-		{ time: data[data.length - 20].time, position: 'aboveBar', color: 'red', shape: 'arrowDown' },
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'orange', shape: 'arrowUp' },
-		{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'arrowDown' },
-	]);
+	LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		[
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'orange', shape: 'arrowUp' },
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'yellow', shape: 'arrowUp' },
+			{ time: data[data.length - 30].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'orange', shape: 'arrowDown' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'yellow', shape: 'arrowDown' },
+			{ time: data[data.length - 20].time, position: 'aboveBar', color: 'red', shape: 'arrowDown' },
+			{ time: data[data.length - 10].time, position: 'inBar', color: 'orange', shape: 'arrowUp' },
+			{ time: data[data.length - 10].time, position: 'inBar', color: 'red', shape: 'arrowDown' },
+		]
+	);
 }

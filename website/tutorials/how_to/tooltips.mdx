@@ -11,12 +11,14 @@ keywords:
 
 import VersionWarningAdmonition from "@site/src/components/VersionWarningAdmonition";
 
-<!-- Show warning when not on the latest published version  -->
-<!-- Tutorials section isn't versioned yet, hence the need for the warning message -->
-<!-- THESE TUTORIALS NEED TO BE UPDATED FOR VERSION 4 -->
+{/*
+  Show warning when not on the latest published version
+  Tutorials section isn't versioned yet, hence the need for the warning message
+  THESE TUTORIALS NEED TO BE UPDATED FOR VERSION 4
+*/}
 
 <VersionWarningAdmonition
-	notCurrent="This example is for the latest published version of Lightweight&nbsp;Charts."
+	notCurrent="This example is for the latest published version of Lightweight Charts."
 	type="caution"
 	displayVersionMessage
 />
@@ -62,7 +64,7 @@ You can see full [working examples](#examples) below.
 ### Getting the mouse cursors position
 
 The parameter object ([MouseEventParams Interface](/docs/api/interfaces/MouseEventParams)) passed to the
-crosshairMove handler function ([MouseEventhandler](/docs/api#mouseeventhandler)) contains a
+crosshairMove handler function ([MouseEventhandler](/docs/api/type-aliases/MouseEventHandler)) contains a
 [point](/docs/api/interfaces/Point) property which gives the current mouse cursor position relative to
 the top left corner of the chart.
 
@@ -86,7 +88,7 @@ chart.subscribeCrosshairMove(param => {
 
 - [subscribeCrosshairMove](/docs/api/interfaces/IChartApi#subscribecrosshairmove)
 - [MouseEventParams Interface](/docs/api/interfaces/MouseEventParams)
-- [MouseEventhandler](/docs/api#mouseeventhandler)
+- [MouseEventhandler](/docs/api/type-aliases/MouseEventHandler)
 - [priceToCoordinate](/docs/api/interfaces/ISeriesApi#pricetocoordinate)
 
 Below are a few external resources related to creating and styling html elements:

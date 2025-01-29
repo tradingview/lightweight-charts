@@ -18,7 +18,7 @@ let lastTime;
 function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
-	lineSeries = chart.addLineSeries({
+	lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.Continuous,
 	});
 
@@ -26,7 +26,7 @@ function beforeInteractions(container) {
 	lastTime = new Date(lineData[lineData.length - 1].time);
 	lineSeries.setData(lineData);
 
-	leftSeries = chart.addCandlestickSeries({
+	leftSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
 		priceScaleId: 'left',
 		lastPriceAnimation: LightweightCharts.LastPriceAnimationMode.OnDataUpdate,
 	});
@@ -88,5 +88,22 @@ async function afterInteractions() {
 		...barData[barData.length - 1],
 		time: barData[barData.length - 1].time + 3600,
 	});
+
+	await awaitNewFrame();
+
+	lineSeries.update(
+		{
+			...barData[barData.length - 5],
+			value: 1234,
+		},
+		true // historical update
+	);
+	lineSeries.update(
+		{
+			time: barData[barData.length - 6].time,
+		},
+		true // historical update
+	);
+
 	return Promise.resolve();
 }

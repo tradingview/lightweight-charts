@@ -15,7 +15,7 @@ function generateData() {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	const data = generateData();
 	mainSeries.setData(data);
@@ -26,10 +26,12 @@ function runTestCase(container) {
 		{ time: data[data.length - 20].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
 		{ time: data[data.length - 10].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
 	];
-
-	mainSeries.setMarkers(markers);
+	const markerPrimitive = LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		markers
+	);
 
 	markers.push({ time: data[data.length - 1].time, position: 'belowBar', color: 'red', shape: 'arrowUp' });
 
-	mainSeries.setMarkers(markers);
+	markerPrimitive.setMarkers(markers);
 }

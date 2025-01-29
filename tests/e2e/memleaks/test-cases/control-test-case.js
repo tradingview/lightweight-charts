@@ -8,7 +8,7 @@
  */
 
 /** @type {import('@memlab/core/dist/lib/Types').IScenario} */
-const scenario = {
+export const scenario = {
 	setup: async function(page) {
 		await page.addScriptTag({
 			url: 'library.js',
@@ -17,7 +17,7 @@ const scenario = {
 			window.chart = LightweightCharts.createChart(
 				document.getElementById('container')
 			);
-			const mainSeries = window.chart.addLineSeries();
+			const mainSeries = window.chart.addSeries(LightweightCharts.LineSeries);
 			mainSeries.setData([
 				{ time: 0, value: 1 },
 				{ time: 1, value: 2 },
@@ -31,6 +31,3 @@ const scenario = {
 		await page.evaluate(() => {});
 	},
 };
-
-// eslint-disable-next-line no-undef
-exports.scenario = scenario;

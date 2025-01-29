@@ -5,14 +5,26 @@ import { ISubscription } from '../helpers/isubscription';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsBase, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
+import { Coordinate } from './coordinate';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid } from './grid';
+import { IPrimitiveHitTestSource } from './idata-source';
+import { IPanePrimitiveBase, PrimitiveHoveredItem } from './ipane-primitive';
 import { IPriceDataSource } from './iprice-data-source';
+import { ISeries } from './iseries';
+import { PanePrimitiveWrapper } from './pane-primitive-wrapper';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
+import { Series } from './series';
+import { SeriesType } from './series-options';
 import { sortSources } from './sort-sources';
 import { ITimeScale } from './time-scale';
 
+function isSeries(source: IPriceDataSource): source is Series<SeriesType> {
+	return source instanceof Series;
+}
+
 export const DEFAULT_STRETCH_FACTOR = 1000;
+export const MIN_PANE_HEIGHT = 30;
 
 export type PriceScalePosition = 'left' | 'right' | 'overlay';
 
@@ -21,7 +33,7 @@ interface MinMaxOrderInfo {
 	maxZOrder: number;
 }
 
-export class Pane implements IDestroyable {
+export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 	private readonly _timeScale: ITimeScale;
 	private readonly _model: IChartModelBase;
 	private readonly _grid: Grid;
@@ -38,6 +50,8 @@ export class Pane implements IDestroyable {
 
 	private _leftPriceScale: PriceScale;
 	private _rightPriceScale: PriceScale;
+
+	private _primitives: PanePrimitiveWrapper[] = [];
 
 	public constructor(timeScale: ITimeScale, model: IChartModelBase) {
 		this._timeScale = timeScale;
@@ -59,9 +73,11 @@ export class Pane implements IDestroyable {
 		if (options.leftPriceScale) {
 			this._leftPriceScale.applyOptions(options.leftPriceScale);
 		}
+
 		if (options.rightPriceScale) {
 			this._rightPriceScale.applyOptions(options.rightPriceScale);
 		}
+
 		if (options.localization) {
 			this._leftPriceScale.updateFormatter();
 			this._rightPriceScale.updateFormatter();
@@ -80,9 +96,11 @@ export class Pane implements IDestroyable {
 
 	public priceScaleById(id: string): PriceScale | null {
 		switch (id) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 			case DefaultPriceScaleId.Left: {
 				return this._leftPriceScale;
 			}
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 			case DefaultPriceScaleId.Right: {
 				return this._rightPriceScale;
 			}
@@ -103,6 +121,13 @@ export class Pane implements IDestroyable {
 			if (source.destroy) {
 				source.destroy();
 			}
+		});
+		this._primitives = this._primitives.filter((primitive: PanePrimitiveWrapper) => {
+			const p = primitive.primitive();
+			if (p.detached) {
+				p.detached();
+			}
+			return false;
 		});
 		this._destroyed.fire();
 	}
@@ -149,6 +174,10 @@ export class Pane implements IDestroyable {
 		});
 
 		this.updateAllSources();
+	}
+
+	public series(): readonly Series<SeriesType>[] {
+		return this._dataSources.filter(isSeries);
 	}
 
 	public dataSources(): readonly IPriceDataSource[] {
@@ -327,12 +356,41 @@ export class Pane implements IDestroyable {
 		return this._cachedOrderedSources;
 	}
 
+	public orderedSeries(): readonly ISeries<SeriesType>[] {
+		return this.orderedSources().filter(isSeries);
+	}
+
 	public onDestroyed(): ISubscription {
 		return this._destroyed;
 	}
 
 	public grid(): Grid {
 		return this._grid;
+	}
+
+	public attachPrimitive(primitive: IPanePrimitiveBase): void {
+		this._primitives.push(new PanePrimitiveWrapper(primitive));
+	}
+
+	public detachPrimitive(source: IPanePrimitiveBase): void {
+		this._primitives = this._primitives.filter((wrapper: PanePrimitiveWrapper) => wrapper.primitive() !== source);
+		if (source.detached) {
+			source.detached();
+		}
+		this._model.lightUpdate();
+	}
+
+	public primitives(): PanePrimitiveWrapper[] {
+		return this._primitives;
+	}
+
+	public primitiveHitTest(x: Coordinate, y: Coordinate): PrimitiveHoveredItem[] {
+		return this._primitives
+			.map((primitive: PanePrimitiveWrapper) => primitive.hitTest(x, y))
+			.filter(
+				(result: PrimitiveHoveredItem | null): result is PrimitiveHoveredItem =>
+					result !== null
+			);
 	}
 
 	private _recalculatePriceScaleImpl(priceScale: PriceScale): void {
@@ -412,8 +470,9 @@ export class Pane implements IDestroyable {
 		const priceScale = new PriceScale(
 			id,
 			actualOptions,
-			this._model.options().layout,
-			this._model.options().localization
+			this._model.options()['layout'],
+			this._model.options().localization,
+			this._model.colorParser()
 		);
 		priceScale.setHeight(this.height());
 		return priceScale;

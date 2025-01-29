@@ -12,7 +12,6 @@ function testSeriesApi(series) {
 	});
 	series.priceFormatter();
 	series.seriesType();
-	series.markers();
 	series.dataByIndex(10);
 	series.dataByIndex(-5);
 	series.dataByIndex(-5, LightweightCharts.MismatchDirection.NearestRight);
@@ -23,7 +22,7 @@ function testSeriesApi(series) {
 function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container);
 
-	const mainSeries = chart.addAreaSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.AreaSeries);
 
 	mainSeries.setData(generateLineData());
 

@@ -5,18 +5,22 @@
 		"esModuleInterop": true,
 		"lib": [
 			"dom",
-			"es2015",
-			"es5"
+			"es2020"
 		],
-		"module": "commonjs"
+		"moduleResolution": "bundler",
+		"module": "Preserve",
 	},
 	"include": [
 		"./coverage/**/*.ts",
 		"./graphics/graphics-test-cases.ts",
+		"./graphics/generate-golden-content.ts",
+		"./graphics/generate-test-cases.ts",
+		"./graphics/utils.ts",
 		"./graphics/helpers/**/*.ts",
 		"./memleaks/**/*.ts",
 		"./interactions/**/*.ts",
 		"./helpers/**/*.ts",
-		"../../src/**/*.ts"
+		"../../src/**/*.ts",
+		"./*.ts"
 	]
 }

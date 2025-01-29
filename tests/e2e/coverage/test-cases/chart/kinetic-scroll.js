@@ -17,7 +17,7 @@ function beforeInteractions(container) {
 		},
 	});
 
-	const mainSeries = chart.addLineSeries();
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 
 	mainSeries.setData(simpleData());
 

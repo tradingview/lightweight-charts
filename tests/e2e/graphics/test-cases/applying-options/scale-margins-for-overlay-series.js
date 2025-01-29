@@ -16,10 +16,10 @@ function generateData(valueOffset) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
 
-	const firstSeries = chart.addLineSeries({
+	const firstSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		color: 'blue',
 	});
-	const secondSeries = chart.addLineSeries({
+	const secondSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		priceScaleId: 'first-overlay',
 		color: 'green',
 	});
@@ -31,7 +31,7 @@ function runTestCase(container) {
 		},
 	});
 
-	const thirdSeries = chart.addLineSeries({
+	const thirdSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		priceScaleId: '',
 	});
 

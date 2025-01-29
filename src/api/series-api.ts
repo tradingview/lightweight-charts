@@ -7,27 +7,29 @@ import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
+import { CustomPriceLine } from '../model/custom-price-line';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
-import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
+import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
+import { Pane } from '../model/pane';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions, PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
-import { convertSeriesMarker, SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
 } from '../model/series-options';
-import { Logical, Range, TimePointIndex } from '../model/time-data';
+import { IRange, Logical, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { type IChartApiBase } from './ichart-api';
+import { IPaneApi } from './ipane-api';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, DataChangedHandler, DataChangedScope, ISeriesApi } from './iseries-api';
@@ -42,8 +44,7 @@ export class SeriesApi<
 	TOptions extends SeriesOptionsMap[TSeriesType] = SeriesOptionsMap[TSeriesType],
 	TPartialOptions extends SeriesPartialOptionsMap[TSeriesType] = SeriesPartialOptionsMap[TSeriesType]
 > implements
-		ISeriesApi<TSeriesType, HorzScaleItem, TData, TOptions, TPartialOptions>,
-		IDestroyable {
+	ISeriesApi<TSeriesType, HorzScaleItem, TData, TOptions, TPartialOptions>, IDestroyable {
 	protected _series: Series<TSeriesType>;
 	protected _dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>;
 	protected readonly _chartApi: IChartApiBase<HorzScaleItem>;
@@ -51,19 +52,22 @@ export class SeriesApi<
 	private readonly _priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>;
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 	private readonly _dataChangedDelegate: Delegate<DataChangedScope> = new Delegate();
+	private readonly _paneApiGetter: (pane: Pane) => IPaneApi<HorzScaleItem>;
 
 	public constructor(
 		series: Series<TSeriesType>,
 		dataUpdatesConsumer: DataUpdatesConsumer<TSeriesType, HorzScaleItem>,
 		priceScaleApiProvider: IPriceScaleApiProvider<HorzScaleItem>,
 		chartApi: IChartApiBase<HorzScaleItem>,
-		horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>
+		horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>,
+		paneApiGetter: (pane: Pane) => IPaneApi<HorzScaleItem>
 	) {
 		this._series = series;
 		this._dataUpdatesConsumer = dataUpdatesConsumer;
 		this._priceScaleApiProvider = priceScaleApiProvider;
 		this._horzScaleBehavior = horzScaleBehavior;
 		this._chartApi = chartApi;
+		this._paneApiGetter = paneApiGetter;
 	}
 
 	public destroy(): void {
@@ -91,7 +95,7 @@ export class SeriesApi<
 		return this._series.priceScale().coordinateToPrice(coordinate as Coordinate, firstValue.value);
 	}
 
-	public barsInLogicalRange(range: Range<number> | null): BarsInfo<HorzScaleItem> | null {
+	public barsInLogicalRange(range: IRange<number> | null): BarsInfo<HorzScaleItem> | null {
 		if (range === null) {
 			return null;
 		}
@@ -150,10 +154,10 @@ export class SeriesApi<
 		this._onDataChanged('full');
 	}
 
-	public update(bar: TData): void {
+	public update(bar: TData, historicalUpdate: boolean = false): void {
 		checkSeriesValuesType(this._series.seriesType(), [bar]);
 
-		this._dataUpdatesConsumer.updateData(this._series, bar);
+		this._dataUpdatesConsumer.updateData(this._series, bar, historicalUpdate);
 		this._onDataChanged('update');
 	}
 
@@ -182,21 +186,6 @@ export class SeriesApi<
 		this._dataChangedDelegate.unsubscribe(handler);
 	}
 
-	public setMarkers(data: SeriesMarker<HorzScaleItem>[]): void {
-		checkItemsAreOrdered(data, this._horzScaleBehavior, true);
-
-		const convertedMarkers = data.map((marker: SeriesMarker<HorzScaleItem>) =>
-			convertSeriesMarker<HorzScaleItem, InternalHorzScaleItem>(marker, this._horzScaleBehavior.convertHorzItemToInternal(marker.time), marker.time)
-		);
-		this._series.setMarkers(convertedMarkers);
-	}
-
-	public markers(): SeriesMarker<HorzScaleItem>[] {
-		return this._series.markers().map<SeriesMarker<HorzScaleItem>>((internalItem: SeriesMarker<InternalHorzScaleItem>) => {
-			return convertSeriesMarker<InternalHorzScaleItem, HorzScaleItem>(internalItem, internalItem.originalTime as HorzScaleItem, undefined);
-		});
-	}
-
 	public applyOptions(options: TPartialOptions): void {
 		this._series.applyOptions(options);
 	}
@@ -221,6 +210,10 @@ export class SeriesApi<
 		this._series.removePriceLine((line as PriceLine).priceLine());
 	}
 
+	public priceLines(): IPriceLine[] {
+		return this._series.priceLines().map((priceLine: CustomPriceLine): IPriceLine => new PriceLine(priceLine));
+	}
+
 	public seriesType(): TSeriesType {
 		return this._series.seriesType();
 	}
@@ -234,6 +227,7 @@ export class SeriesApi<
 				chart: this._chartApi,
 				series: this,
 				requestUpdate: () => this._series.model().fullUpdate(),
+				horzScaleBehavior: this._horzScaleBehavior,
 			});
 		}
 	}
@@ -243,6 +237,17 @@ export class SeriesApi<
 		if (primitive.detached) {
 			primitive.detached();
 		}
+		this._series.model().fullUpdate();
+	}
+
+	public getPane(): IPaneApi<HorzScaleItem> {
+		const series = this._series;
+		const pane = ensureNotNull(this._series.model().paneForSource(series));
+		return this._paneApiGetter(pane);
+	}
+
+	public moveToPane(paneIndex: number): void {
+		this._series.model().moveSeriesToPane(this._series, paneIndex);
 	}
 
 	private _onDataChanged(scope: DataChangedScope): void {

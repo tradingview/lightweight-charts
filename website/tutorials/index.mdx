@@ -14,11 +14,13 @@ import A11y from "@site/src/img/a11y.svg";
 
 import VersionWarningAdmonition from "@site/src/components/VersionWarningAdmonition";
 
-<!-- Show warning when not on the latest published version  -->
-<!-- Tutorials section isn't versioned yet, hence the need for the warning message -->
+{/*
+  Show warning when not on the latest published version
+  Tutorials section isn't versioned yet, hence the need for the warning message
+*/}
 
 <VersionWarningAdmonition
-	notCurrent="These tutorials are for the latest published version of Lightweight&nbsp;Charts."
+	notCurrent="These tutorials are for the latest published version of Lightweight Charts."
 	type="caution"
 	displayVersionMessage
 />
@@ -80,7 +82,7 @@ or submit your own.
 
 A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
 
-import { useDocsSidebar } from "@docusaurus/theme-common/internal";
+import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
 export const HowToList = () => {
 	const examplesCategory = useDocsSidebar().items.find(
 		item => item.type === "category" && item.label === "How To"

@@ -1,14 +1,18 @@
 /// <reference types="node" />
-
 import * as fs from 'fs';
-import * as path from 'path';
+
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirectory = path.dirname(currentFilePath);
 
 export interface TestCase {
 	name: string;
 	path: string;
 }
 
-const testCasesDir = path.join(__dirname, '..', 'test-cases');
+const testCasesDir = path.join(currentDirectory, '..', 'test-cases');
 
 function extractTestCaseName(fileName: string): string | null {
 	const match = /^([^.].+)\.js$/.exec(fileName);

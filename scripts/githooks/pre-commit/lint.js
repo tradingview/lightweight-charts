@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const childProcess = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import * as childProcess from 'node:child_process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 const redColor = '\x1b[1;31m';
 const noColor = '\x1b[0m';
@@ -128,6 +128,4 @@ ${noColor}`);
 	}
 }
 
-if (require.main === module) {
-	main();
-}
+main();

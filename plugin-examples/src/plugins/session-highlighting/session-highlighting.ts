@@ -3,11 +3,11 @@ import {
 	Coordinate,
 	DataChangedScope,
 	ISeriesPrimitive,
-	ISeriesPrimitivePaneRenderer,
-	ISeriesPrimitivePaneView,
+	IPrimitivePaneRenderer,
+	IPrimitivePaneView,
 	SeriesAttachedParameter,
 	SeriesDataItemTypeMap,
-	SeriesPrimitivePaneViewZOrder,
+	PrimitivePaneViewZOrder,
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
@@ -18,7 +18,7 @@ interface SessionHighlightingRendererData {
 	color: string;
 }
 
-class SessionHighlightingPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class SessionHighlightingPaneRenderer implements IPrimitivePaneRenderer {
 	_viewData: SessionHighlightingViewData;
 	constructor(data: SessionHighlightingViewData) {
 		this._viewData = data;
@@ -51,7 +51,7 @@ interface SessionHighlightingViewData {
 	barWidth: number;
 }
 
-class SessionHighlightingPaneView implements ISeriesPrimitivePaneView {
+class SessionHighlightingPaneView implements IPrimitivePaneView {
 	_source: SessionHighlighting;
 	_data: SessionHighlightingViewData;
 
@@ -83,7 +83,7 @@ class SessionHighlightingPaneView implements ISeriesPrimitivePaneView {
 		return new SessionHighlightingPaneRenderer(this._data);
 	}
 
-	zOrder(): SeriesPrimitivePaneViewZOrder {
+	zOrder(): PrimitivePaneViewZOrder {
 		return 'bottom';
 	}
 }

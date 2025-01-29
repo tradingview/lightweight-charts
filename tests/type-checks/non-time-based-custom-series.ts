@@ -1,9 +1,10 @@
-import { createChartEx, customSeriesDefaultOptions } from '../../src';
+import { createChartEx, createTextWatermark, customSeriesDefaultOptions } from '../../src';
 import { CandlestickData, WhitespaceData } from '../../src/model/data-consumer';
 import { Time } from '../../src/model/horz-scale-behavior-time/types';
 import { CustomData, CustomSeriesPricePlotValues, ICustomSeriesPaneRenderer, ICustomSeriesPaneView, PaneRendererCustomData } from '../../src/model/icustom-series';
 import { IHorzScaleBehavior } from '../../src/model/ihorz-scale-behavior';
 import { CustomSeriesOptions } from '../../src/model/series-options';
+import { ITextWatermarkPluginApi } from '../../src/plugins/text-watermark/primitive';
 
 type HorizontalScaleType = number;
 
@@ -60,8 +61,7 @@ const customSeriesView = (new NonTimeSeries()) as ICustomSeriesPaneView<Horizont
 const failSeries = chart.addCustomSeries(customSeriesView, { badOption: 123 });
 // @ts-expect-error invalid value
 const failSeries2 = chart.addCustomSeries(customSeriesView, { testOption: 123 });
-
-const series = chart.addCustomSeries(customSeriesView, { testOption: 'string' });
+const series = chart.addCustomSeries<NonTimeData, NonTimeSeriesOptions>(customSeriesView, { testOption: 'string' });
 
 const data: (NonTimeData | WhitespaceData<HorizontalScaleType>)[] = [
     { time: 12345 }, // whitespace
@@ -106,3 +106,12 @@ if (dataSet) {
 // @ts-expect-error readonly array
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 dataSet.push({ time: 12 });
+
+createTextWatermark(chart.panes()[1], {
+	lines: [],
+}) satisfies ITextWatermarkPluginApi<number>;
+
+createTextWatermark(chart.panes()[1], {
+	lines: [],
+// @ts-expect-error Time is not the expected Generic here.
+}) satisfies ITextWatermarkPluginApi<Time>;
