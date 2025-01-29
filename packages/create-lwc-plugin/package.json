@@ -29,9 +29,9 @@
     "directory": "packages/create-lwc-plugin"
   },
   "bugs": {
-    "url": "https://github.com/slicedsilver/create-lwc-plugin/issues"
+    "url": "https://github.com/tradingview/lightweight-charts/issues"
   },
-  "homepage": "https://tradingview.github.io/lightweight-charts/",
+  "homepage": "https://www.tradingview.com/lightweight-charts/",
   "devDependencies": {
     "@clack/prompts": "^0.7.0",
     "@types/node": "^20.5.1",

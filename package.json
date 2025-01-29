@@ -5,12 +5,13 @@
   "author": "TradingView, Inc.",
   "license": "Apache-2.0",
   "description": "Performant financial charts built with HTML5 canvas",
+  "homepage": "https://www.tradingview.com/lightweight-charts/",
   "bugs": {
     "url": "https://github.com/tradingview/lightweight-charts/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tradingview/lightweight-charts.git"
+    "url": "git+https://github.com/tradingview/lightweight-charts.git"
   },
   "type": "module",
   "module": "dist/lightweight-charts.production.mjs",
@@ -43,7 +44,9 @@
     "canvas",
     "typescript",
     "charting",
-    "charts"
+    "charts",
+    "tradingview",
+    "candlestick"
   ],
   "engines": {
     "node": ">=22.3"
