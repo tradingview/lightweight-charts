@@ -880,8 +880,13 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			return false;
 		} else {
 			this._observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-				const containerEntry = entries.find((entry: ResizeObserverEntry) => entry.target === this._container);
+				// There is no need to check if entry.target === this._container since there is only
+				// a single element being observed.
+				// and we want to use the last entry (if multiple) because it would be most up to date
+				// (since the browser may batch multiple updates).
+				const containerEntry = entries[entries.length - 1];
 				if (!containerEntry) {
+					// this may be undefined if the entries array was empty.
 					return;
 				}
 				this.resize(containerEntry.contentRect.width, containerEntry.contentRect.height);
