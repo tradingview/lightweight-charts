@@ -255,6 +255,7 @@ const colorsTypeMap = {
 const checkPageTheme = () =>
 	document.documentElement.getAttribute('data-theme') === 'dark';
 
+window.__VUE_PROD_DEVTOOLS__ = false; // ¯\_(ツ)_/¯ required for a production build of the documentation site
 const VueExample = defineCustomElement({
 	components: {
 		LWChart,
