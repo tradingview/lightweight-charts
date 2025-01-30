@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0" />
+	<title>Lightweight Charts™ A11y Tutorial</title>
+	<script type="text/javascript"
+		src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+	<style>
+		:host {
+			display: block;
+			font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto,
+				Ubuntu, sans-serif;
+		}
+
+		:host[hidden] {
+			display: none;
+		}
+
+		#example {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+			width: 100%;
+		}
+
+		#chart {
+			flex-grow: 1;
+		}
+
+		.buttons {
+			display: inline-flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			padding-inline: 30px;
+			gap: 8px;
+		}
+
+		button {
+			all: initial;
+			font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto,
+				Ubuntu, sans-serif;
+			font-size: 16px;
+			font-style: normal;
+			line-height: 24px;
+			/* 150% */
+			letter-spacing: -0.32px;
+			padding: 8px 24px;
+			color: #fff;
+			background-color: rgba(41, 98, 255, 1);
+			border-radius: 8px;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background-color: rgba(30, 83, 229, 1);
+		}
+
+		button:active {
+			background-color: rgba(24, 72, 204, 1);
+		}
+
+		button.grey {
+			color: rgba(19, 23, 34, 1);
+			background-color: rgba(240, 243, 250, 1);
+		}
+
+		button.grey:hover {
+			background-color: rgba(224, 227, 235, 1);
+		}
+
+		button.grey:active {
+			background-color: rgba(209, 212, 220, 1);
+		}
+
+		#chart {
+			height: var(--lwchart-height, 240px);
+			border-radius: 8px;
+		}
+
+		#chart:focus,
+		button:focus {
+			outline-offset: 3px;
+			outline: blue;
+			outline-style: solid;
+			outline-width: 3px;
+		}
+
+		key {
+			display: inline-block;
+			width: 18px;
+			margin: 3px 5px 3px 0px;
+			font-weight: 590;
+			text-align: center;
+			color: #000;
+			background-color: #fff;
+			border: 2px solid rgba(0, 0, 0, 0.25);
+			border-radius: 2px;
+		}
+
+		*[role='alert'] {
+			position: absolute;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.tooltip {
+			position: absolute;
+			font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto,
+				Ubuntu, sans-serif;
+			pointer-events: none;
+			left: 10px;
+			top: 10px;
+			border-radius: 5px;
+			background-color: rgba(0, 0, 0, 0.8);
+			color: white;
+			padding: 5px 10px;
+			z-index: 10;
+			opacity: 0;
+		}
+
+		label {
+			font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto,
+				Ubuntu, sans-serif;
+		}
+
+		.group {
+			display: inline-block;
+			padding: 8px 8px;
+			border-radius: 8px;
+			border: 2px solid rgba(0, 0, 0, 0.25);
+		}
+
+		input[type="checkbox"],
+		input[type="checkbox"]+label {
+			cursor: pointer;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="example">
+		<div class="buttons">
+			<button id="random-data-button" type="button" tabindex="0">
+				Randomise Data
+			</button>
+			<div class="group">
+				<input type="checkbox" id="high-contrast-checkbox" tabindex="0" />
+				<label for="high-contrast-checkbox">Toggle Higher Contrast</label>
+			</div>
+			<div class="group">
+				<input type="checkbox" id="large-font-checkbox" tabindex="0" />
+				<label for="large-font-checkbox">Toggle Larger Font</label>
+			</div>
+		</div>
+		<figure id="chart"></figure>
+	</div>
+	<div class="buttons">
+		<button id="reset-chart-button" type="button" tabindex="0">
+			Reset Chart
+		</button>
+	</div>
+
+	<template id="status-tooltip-content"><span>Press <key>h</key>to list commands</span></template>
+	<template id="status-tooltip-expanded-content"><span>
+			<key>h</key>hide commands
+		</span><br />
+		<span>
+			<key>←</key>move backwards
+		</span><br />
+		<span>
+			<key>→</key>move forwards
+		</span><br />
+		<span>
+			<key>↑</key>zoom in
+		</span><br />
+		<span>
+			<key>↓</key>zoom out
+		</span></template>
+	<!-- Template for HTML elements added to the chart container for the A11y improvements -->
+	<template id="a11y-helpers">
+		<div tabindex="-1" role="alert" aria-live="assertive"></div>
+		<div class="tooltip" tabindex="-1" aria-hidden="true"></div>
+	</template>
+
+	<script type="text/javascript">
+		const { createChart, LineSeries } = LightweightCharts;
+		function generateSampleData() {
+			const randomFactor = 25 + Math.random() * 25;
+			const samplePoint = i =>
+				i *
+				(0.5 +
+					Math.sin(i / 10) * 0.2 +
+					Math.sin(i / 20) * 0.4 +
+					Math.sin(i / randomFactor) * 0.8 +
+					Math.sin(i / 500) * 0.5) +
+				200;
+
+			const res = [];
+			const date = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+			const numberOfPoints = 500;
+			for (let i = 0; i < numberOfPoints; ++i) {
+				const time = date.getTime() / 1000;
+				const value = samplePoint(i);
+
+				res.push({
+					time,
+					value,
+				});
+
+				date.setUTCDate(date.getUTCDate() + 1);
+			}
+
+			return res;
+		}
+
+		const seriesBaseContrastSettings = {
+			color: 'rgb(41, 98, 255)',
+			lineWidth: 2,
+		};
+		const chartBaseContrastSettings = {
+			layout: {
+				textColor: '#191919',
+			},
+			grid: {
+				vertLines: {
+					color: '#D6DCDE',
+				},
+				horzLines: {
+					color: '#D6DCDE',
+				},
+			},
+		};
+		const seriesHighContrastSettings = {
+			color: 'rgb(0, 0, 0)',
+			lineWidth: 4,
+		};
+		const chartHighContrastSettings = {
+			layout: {
+				textColor: '#000000',
+			},
+			grid: {
+				vertLines: {
+					color: '#777777',
+				},
+				horzLines: {
+					color: '#777777',
+				},
+			},
+		};
+
+		const chart = createChart('chart', {
+			autoSize: true,
+			timeScale: {
+				rightOffset: 20,
+				barSpacing: 3,
+			},
+		});
+
+		const mainSeries = chart.addSeries(LineSeries, {
+			priceFormat: {
+				minMove: 1,
+				precision: 0,
+			},
+			title: 'A11y',
+		});
+
+		mainSeries.setData(generateSampleData());
+
+		function setHighContrast(enabled) {
+			mainSeries.applyOptions(
+				enabled ? seriesHighContrastSettings : seriesBaseContrastSettings
+			);
+			chart.applyOptions(
+				enabled ? chartHighContrastSettings : chartBaseContrastSettings
+			);
+		}
+
+		function setFontSize(large) {
+			chart.applyOptions({
+				layout: {
+					fontSize: large ? 16 : 12,
+				},
+			});
+		}
+
+		// Check if user prefers high contrast mode
+		function checkHighContrast() {
+			// Use window.matchMedia to check 'prefers-contrast' media feature
+			const highContrast = window.matchMedia(
+				'(prefers-contrast: high)'
+			).matches;
+			return highContrast; // returns true if high contrast is enabled, false otherwise
+		}
+
+		if (checkHighContrast()) {
+			setHighContrast(true);
+			document.getElementById('high-contrast-checkbox').checked = true;
+		}
+		setFontSize(false);
+
+		document
+			.querySelector('#random-data-button')
+			?.addEventListener('click', () => {
+				mainSeries.setData(generateSampleData());
+			});
+		document
+			.querySelector('#high-contrast-checkbox')
+			?.addEventListener('change', event => {
+				setHighContrast(event.target.checked);
+			});
+		document
+			.querySelector('#large-font-checkbox')
+			?.addEventListener('change', event => {
+				setFontSize(event.target.checked);
+			});
+		document
+			.querySelector('#reset-chart-button')
+			?.addEventListener('click', () => {
+				chart.timeScale().resetTimeScale();
+				mainSeries.priceScale().applyOptions({
+					autoScale: true,
+				});
+			});
+
+		function formatDate(time) {
+			return new Date(time * 1000).toDateString();
+		}
+
+		function formatValue(value) {
+			return `${value < 0 ? '-' : ''}$${Math.abs(value).toFixed(2)}`;
+		}
+
+		function getStats(data) {
+			const stats = {
+				start: data[0],
+				close: data[data.length - 1],
+				low: data[0],
+				high: data[0],
+			};
+
+			for (const point of data) {
+				if (point.value > stats.high.value) {
+					stats.high = point;
+				}
+				if (point.value < stats.low.value) {
+					stats.low = point;
+				}
+			}
+
+			return stats;
+		}
+
+		function getVisibleSeriesData(chart, series) {
+			const timeScale = chart.timeScale();
+			const visibleRange = timeScale.getVisibleLogicalRange();
+			const data = [];
+			for (let i = Math.round(visibleRange.from); i <= visibleRange.to; i++) {
+				const d = series.dataByIndex(i, 0);
+				if (d !== null) {
+					data.push(d);
+				}
+			}
+			return data;
+		}
+
+		function describeFinanceChart(data) {
+			if (!data || data.length === 0) {
+				return 'The data set is empty.';
+			}
+
+			const stats = getStats(data);
+
+			const firstPrice = `The first price is ${formatValue(
+				stats.start.value
+			)} at ${formatDate(stats.start.time)}.`;
+			const lastPrice = `The last price is ${formatValue(
+				stats.close.value
+			)} at ${formatDate(stats.close.time)}.`;
+
+			const actualChange = stats.close.value - stats.start.value;
+			const percentChange = (actualChange / stats.start.value) * 100;
+
+			const changeDescription = `The actual change in price was ${formatValue(
+				actualChange
+			)}, corresponding to a percentage change of ${percentChange.toFixed(
+				2
+			)}%.`;
+
+			let lowHigh = '';
+			if (
+				stats.low.time !== stats.start.time &&
+				stats.low.time !== stats.close.time
+			) {
+				lowHigh += `The lowest price was ${formatValue(
+					stats.low.value
+				)} at ${formatDate(stats.low.time)}.`;
+			}
+			if (
+				stats.high.time !== stats.start.time &&
+				stats.high.time !== stats.close.time
+			) {
+				lowHigh += ` The highest price was ${formatValue(
+					stats.high.value
+				)} at ${formatDate(stats.high.time)}.`;
+			}
+
+			return `${firstPrice} ${lastPrice} ${changeDescription} ${lowHigh}`.trim();
+		}
+
+		function makeA11y(chart, series) {
+			const containerEl = chart.chartElement().parentElement;
+			if (!containerEl) return;
+			// make focusable
+			containerEl.tabIndex = 0;
+			containerEl.style.position = 'relative';
+			containerEl.ariaLabel =
+				'Line plot of Accessibility stock price. Press the H key to display the available interaction keys.';
+			chart.chartElement().ariaHidden = 'true';
+
+			const templateElement = document.getElementById('a11y-helpers');
+			const clone = templateElement.content.cloneNode(true);
+			containerEl.appendChild(clone);
+			const alerter = containerEl.querySelector('[role="alert"]');
+			const tooltip = containerEl.querySelector('.tooltip');
+
+			let tooltipDetailedVisible = false;
+
+			function shiftChart(diff) {
+				const currentPos = chart.timeScale().scrollPosition();
+				chart.timeScale().scrollToPosition(currentPos + diff, false);
+			}
+
+			function scaleChart(pct, zoomIn) {
+				const currentRange = chart.timeScale().getVisibleLogicalRange();
+				if (currentRange) {
+					const bars = currentRange.to - currentRange.from;
+					const direction = zoomIn ? -1 : 1;
+					const newRangeBars = bars * pct * direction + bars;
+					chart.timeScale().setVisibleLogicalRange({
+						to: currentRange.to,
+						from: currentRange.to - newRangeBars,
+					});
+				}
+			}
+
+			function setTooltipContentFromTemplate(id) {
+				const tooltipContent = document
+					.querySelector(id)
+					.content.cloneNode(true);
+				tooltip.innerHTML = '';
+				tooltip.appendChild(tooltipContent);
+			}
+
+			containerEl.addEventListener('focusin', () => {
+				tooltipDetailedVisible = false;
+				setTooltipContentFromTemplate('#status-tooltip-content');
+				tooltip.style.opacity = '1';
+			});
+			containerEl.addEventListener('focusout', () => {
+				tooltip.innerHTML = '';
+				tooltip.style.opacity = '0';
+			});
+			containerEl.addEventListener('keydown', e => {
+				const keys = [
+					'h',
+					'ArrowLeft',
+					'ArrowRight',
+					'ArrowUp',
+					'ArrowDown',
+					' ',
+				];
+				if (keys.includes(e.key)) {
+					e.preventDefault();
+				}
+				switch (e.key) {
+					case 'h':
+						alerter.innerText = `Press space to describe the chart.
+                                Press left arrow to move backwards.
+                                Press right arrow to move forwards.
+                                Press up arrow to zoom in.
+                                Press down arrow to zoom out.
+                                `;
+						tooltipDetailedVisible = !tooltipDetailedVisible;
+						if (tooltipDetailedVisible) {
+							setTooltipContentFromTemplate(
+								'#status-tooltip-expanded-content'
+							);
+						} else {
+							setTooltipContentFromTemplate('#status-tooltip-content');
+						}
+						break;
+					case 'ArrowLeft':
+						shiftChart(-10);
+						break;
+					case 'ArrowRight':
+						shiftChart(10);
+						break;
+					case 'ArrowUp':
+						scaleChart(1 / 8, true);
+						break;
+					case 'ArrowDown':
+						scaleChart(1 / 8, false);
+						break;
+					case ' ':
+						const data = getVisibleSeriesData(chart, mainSeries);
+						alerter.innerText = describeFinanceChart(data);
+						break;
+					default:
+						break;
+				}
+			});
+		}
+
+		makeA11y(chart, mainSeries);
+	</script>
+</body>
+
+</html>
