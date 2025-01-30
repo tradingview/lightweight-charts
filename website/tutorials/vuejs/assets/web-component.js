@@ -6,18 +6,41 @@
  * chart colours as required.
  */
 import { defineCustomElement } from 'vue/dist/vue.esm-bundler';
-import { createChart, ColorType } from 'lightweight-charts';
+import {
+	createChart,
+	ColorType,
+	LineSeries,
+	AreaSeries,
+	BarSeries,
+	CandlestickSeries,
+	HistogramSeries,
+	BaselineSeries,
+} from 'lightweight-charts';
 import { themeColors } from '../../../theme-colors';
 
 let series;
 let chart;
 
-function getChartSeriesConstructorName(type) {
-	return `add${type.charAt(0).toUpperCase() + type.slice(1)}Series`;
+function getChartSeriesDefinition(type) {
+	switch (type) {
+		case 'line':
+			return LineSeries;
+		case 'area':
+			return AreaSeries;
+		case 'candlestick':
+			return CandlestickSeries;
+		case 'baseline':
+			return BaselineSeries;
+		case 'bar':
+			return BarSeries;
+		case 'histogram':
+			return HistogramSeries;
+	}
+	throw new Error(`${type} is an unsupported series type`);
 }
 
 const addSeriesAndData = (type, seriesOptions, data) => {
-	series = chart[getChartSeriesConstructorName(type)](seriesOptions);
+	series = chart.addSeries(getChartSeriesDefinition(type), seriesOptions);
 	series.setData(data);
 };
 

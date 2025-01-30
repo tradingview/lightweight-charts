@@ -1,20 +1,41 @@
 <script>
-import { createChart } from 'lightweight-charts';
+import {
+	createChart,
+	LineSeries,
+	AreaSeries,
+	BarSeries,
+	CandlestickSeries,
+	HistogramSeries,
+	BaselineSeries,
+} from 'lightweight-charts';
 
 // Lightweight Chart instances are stored as normal JS variables
 // If you need to use a ref then it is recommended that you use `shallowRef` instead
 let series;
 let chart;
 
-// Function to get the correct series constructor name for current series type.
-function getChartSeriesConstructorName(type) {
-	return `add${type.charAt(0).toUpperCase() + type.slice(1)}Series`;
+function getChartSeriesDefinition(type) {
+	switch (type.toLowerCase()) {
+		case 'line':
+			return LineSeries;
+		case 'area':
+			return AreaSeries;
+		case 'bar':
+			return BarSeries;
+		case 'candlestick':
+			return CandlestickSeries;
+		case 'histogram':
+			return HistogramSeries;
+		case 'baseline':
+			return BaselineSeries;
+	}
+	return LineSeries;
 }
 
 // Creates the chart series and sets the data.
 const addSeriesAndData = (type, seriesOptions, data) => {
-	const seriesConstructor = getChartSeriesConstructorName(type);
-	series = chart[seriesConstructor](seriesOptions);
+	const seriesDefinition = getChartSeriesDefinition(type);
+	series = chart.addSeries(seriesDefinition, seriesOptions);
 	series.setData(data);
 };
 

@@ -7,7 +7,15 @@ import {
 	defineExpose,
 	defineProps,
 } from 'vue';
-import { createChart } from 'lightweight-charts';
+import {
+	createChart,
+	LineSeries,
+	AreaSeries,
+	BarSeries,
+	CandlestickSeries,
+	HistogramSeries,
+	BaselineSeries,
+} from 'lightweight-charts';
 
 const props = defineProps({
 	type: {
@@ -36,9 +44,22 @@ const props = defineProps({
 	},
 });
 
-// Function to get the correct series constructor name for current series type.
-function getChartSeriesConstructorName(type) {
-	return `add${type.charAt(0).toUpperCase() + type.slice(1)}Series`;
+function getChartSeriesDefinition(type) {
+	switch (type.toLowerCase()) {
+		case 'line':
+			return LineSeries;
+		case 'area':
+			return AreaSeries;
+		case 'bar':
+			return BarSeries;
+		case 'candlestick':
+			return CandlestickSeries;
+		case 'histogram':
+			return HistogramSeries;
+		case 'baseline':
+			return BaselineSeries;
+	}
+	return LineSeries;
 }
 
 // Lightweight Charts™ instances are stored as normal JS variables
@@ -68,8 +89,8 @@ const resizeHandler = () => {
 
 // Creates the chart series and sets the data.
 const addSeriesAndData = props => {
-	const seriesConstructor = getChartSeriesConstructorName(props.type);
-	series = chart[seriesConstructor](props.seriesOptions);
+	const seriesDefinition = getChartSeriesDefinition(props.type);
+	series = chart.addSeries(seriesDefinition, props.seriesOptions);
 	series.setData(props.data);
 };
 
