@@ -1,6 +1,6 @@
 {
   "name": "create-lwc-plugin",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "license": "MIT",
   "author": "TradingView, Inc.",
@@ -11,7 +11,9 @@
   },
   "files": [
     "index.js",
-    "template-*",
+    "template-common",
+    "template-primitive",
+    "template-series",
     "dist"
   ],
   "scripts": {
