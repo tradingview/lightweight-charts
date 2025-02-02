@@ -1,0 +1,35 @@
+import { createChart, LineSeries } from 'lightweight-charts';
+
+// Chart
+const chart = createChart(document.querySelector<HTMLDivElement>('#container')!, {
+  width: 1024,
+  height: 768,
+});
+
+// Series
+const series = chart.addSeries(LineSeries);
+
+// Data
+const data = genData(new Date(2024, 0, 1).getTime(), 100, 2, 10);
+series.setData(data.map(item => ({ ...item })))
+chart.timeScale().fitContent()
+
+// Update 
+setInterval(() => {
+  const last = data.at(-1);
+  const [item] = genData(new Date(last.time).getTime(), last.value, 1.5, 1)
+  series.update({ ...item });
+  data.push(item);
+}, 1500)
+
+function genData(startTs: number, startPrice: number, volatility: number, total: number = 100) {
+  let currentPrice = startPrice;
+  const data: any = [];
+  for (let i = 1; i <= total; i++) {
+    data.push({
+      time: (new Date(startTs + i * 86400000)).toISOString().split('T')[0],
+      value: (currentPrice = Math.max(0, currentPrice + (Math.random() - 0.5) * volatility)),
+    });
+  }
+  return data;
+};
