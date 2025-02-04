@@ -406,6 +406,7 @@ const getConfig = async () => {
 			],
 			...versions.map(typedocPluginForVersion),
 			'./plugins/enhanced-codeblock',
+			'./plugins/suppress-resize-observer-error',
 		],
 	};
 
