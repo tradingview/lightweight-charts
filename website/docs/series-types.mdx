@@ -2,45 +2,19 @@
 sidebar_position: 1
 ---
 
-# Series types
+# Series
 
-In this article you can read a brief overview of all supported series types.
+This article describes supported series types and ways to [customize](#customization) them.
 
-## Series Customisation
+## Supported types
 
-Customization options for series are dependent on their specific type. Each type of series has its own set of available options, which can be found in the documentation provided for that particular series type. This means that any type of series can be customized, but the options you can apply will vary depending on the type of series you are working with.
-
-If you'd like to change any option of a series, you could do this in different ways:
-
-1. You can specify the default options while creating a series:
-
-    ```js
-    // change default top & bottom colors of an area series in creating time
-    const series = chart.addSeries(AreaSeries, {
-        topColor: 'red',
-        bottomColor: 'green',
-    });
-    ````
-
-    Note that `addSeries` has an optional `options` parameter.
-
-1. You can use [`ISeriesApi.applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method to apply other options on the fly:
-
-    ```js
-    // updating candlestick series options on the fly
-    candlestickSeries.applyOptions({
-        upColor: 'red',
-        downColor: 'blue',
-    });
-    ```
-
-## Area
+### Area
 
 - **Series Definition**: [`AreaSeries`](/api/variables/AreaSeries.md)
 - **Data format**: [`SingleValueData`](/api/interfaces/SingleValueData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`AreaStyleOptions`](/api/interfaces/AreaStyleOptions.md)
 
-An area chart is basically a colored area between the line connecting all data points and [the time scale](./time-scale.md):
+This series is represented with a colored area between the [time scale](./time-scale.md) and line connecting all data points:
 
 import CodeBlock from '@theme/CodeBlock';
 export const areaExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
@@ -56,22 +30,42 @@ chart.timeScale().fitContent();
 
 <CodeBlock className="language-js" replaceThemeConstants chart>{areaExample}</CodeBlock>
 
-## Bar
+### Bar
 
 - **Series Definition**: [`BarSeries`](/api/variables/BarSeries.md)
 - **Data format**: [`BarData`](/api/interfaces/BarData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`BarStyleOptions`](/api/interfaces/BarStyleOptions.md)
 
-A bar chart shows price movements in the form of bars.
-
-Vertical line length of a bar is limited by the highest and lowest price values.
-Open & Close values are represented by tick marks, on the left & right hand side of the bar respectively:
+This series illustrates price movements with vertical bars.
+The length of each bar corresponds to the range between the highest and lowest price values.
+Open and close values are represented with the tick marks on the left and right side of the bar, respectively:
 
 export const barExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
 const barSeries = chart.addSeries(BarSeries, { upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR });
 
-const data = [{ open: 10, high: 10.63, low: 9.49, close: 9.55, time: 1642427876 }, { open: 9.55, high: 10.30, low: 9.42, close: 9.94, time: 1642514276 }, { open: 9.94, high: 10.17, low: 9.92, close: 9.78, time: 1642600676 }, { open: 9.78, high: 10.59, low: 9.18, close: 9.51, time: 1642687076 }, { open: 9.51, high: 10.46, low: 9.10, close: 10.17, time: 1642773476 }, { open: 10.17, high: 10.96, low: 10.16, close: 10.47, time: 1642859876 }, { open: 10.47, high: 11.39, low: 10.40, close: 10.81, time: 1642946276 }, { open: 10.81, high: 11.60, low: 10.30, close: 10.75, time: 1643032676 }, { open: 10.75, high: 11.60, low: 10.49, close: 10.93, time: 1643119076 }, { open: 10.93, high: 11.53, low: 10.76, close: 10.96, time: 1643205476 }];
+const data = [
+  { open: 10, high: 10.63, low: 9.49, close: 9.55, time: 1642427876 },
+  { open: 9.55, high: 10.30, low: 9.42, close: 9.94, time: 1642514276 },
+  { open: 9.94, high: 10.17, low: 9.92, close: 9.78, time: 1642600676 },
+  { open: 9.78, high: 10.59, low: 9.18, close: 9.51, time: 1642687076 },
+  { open: 9.51, high: 10.46, low: 9.10, close: 10.17, time: 1642773476 },
+  { open: 10.17, high: 10.96, low: 10.16, close: 10.47, time: 1642859876 },
+  { open: 10.47, high: 11.39, low: 10.40, close: 10.81, time: 1642946276 },
+  { open: 10.81, high: 11.60, low: 10.30, close: 10.75, time: 1643032676 },
+  { open: 10.75, high: 11.60, low: 10.49, close: 10.93, time: 1643119076 },
+  { open: 10.93, high: 11.53, low: 10.76, close: 10.96, time: 1643205476 },
+  { open: 10.96, high: 11.90, low: 10.80, close: 11.50, time: 1643291876 },
+  { open: 11.50, high: 12.00, low: 11.30, close: 11.80, time: 1643378276 },
+  { open: 11.80, high: 12.20, low: 11.70, close: 12.00, time: 1643464676 },
+  { open: 12.00, high: 12.50, low: 11.90, close: 12.30, time: 1643551076 },
+  { open: 12.30, high: 12.80, low: 12.10, close: 12.60, time: 1643637476 },
+  { open: 12.60, high: 13.00, low: 12.50, close: 12.90, time: 1643723876 },
+  { open: 12.90, high: 13.50, low: 12.70, close: 13.20, time: 1643810276 },
+  { open: 13.20, high: 13.70, low: 13.00, close: 13.50, time: 1643896676 },
+  { open: 13.50, high: 14.00, low: 13.30, close: 13.80, time: 1643983076 },
+  { open: 13.80, high: 14.20, low: 13.60, close: 14.00, time: 1644069476 },
+];
 
 barSeries.setData(data);
 
@@ -80,13 +74,13 @@ chart.timeScale().fitContent();
 
 <CodeBlock className="language-js" replaceThemeConstants chart>{barExample}</CodeBlock>
 
-## Baseline
+### Baseline
 
 - **Series Definition**: [`BaselineSeries`](/api/variables/BaselineSeries.md)
 - **Data format**: [`SingleValueData`](/api/interfaces/SingleValueData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`BaselineStyleOptions`](/api/interfaces/BaselineStyleOptions.md)
 
-A baseline is basically two colored areas (top and bottom) between the line connecting all data points and [the base value line](/api/interfaces/BaselineStyleOptions.md#basevalue):
+This series is represented with two colored areas between the [the base value line](/api/interfaces/BaselineStyleOptions.md#basevalue) and line connecting all data points:
 
 export const baselineExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
@@ -101,14 +95,14 @@ chart.timeScale().fitContent();
 
 <CodeBlock className="language-js" replaceThemeConstants chart>{baselineExample}</CodeBlock>
 
-## Candlestick
+### Candlestick
 
 - **Series Definition**: [`CandlestickSeries`](/api/variables/CandlestickSeries.md)
 - **Data format**: [`CandlestickData`](/api/interfaces/CandlestickData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`CandlestickStyleOptions`](/api/interfaces/CandlestickStyleOptions.md)
 
-A candlestick chart shows price movements in the form of candlesticks.
-On the candlestick chart, open & close values form a solid body of a candle while wicks show high & low values for a candlestick's time interval:
+This series illustrates price movements with candlesticks.
+The solid body of each candlestick represents the open and close values for the time period. Vertical lines, known as wicks, above and below the candle body represent the high and low values, respectively:
 
 export const candlestickExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
@@ -123,14 +117,13 @@ chart.timeScale().fitContent();
 
 <CodeBlock className="language-js" replaceThemeConstants chart>{candlestickExample}</CodeBlock>
 
-## Histogram
+### Histogram
 
 - **Series Definition**: [`HistogramSeries`](/api/variables/HistogramSeries.md)
 - **Data format**: [`HistogramData`](/api/interfaces/HistogramData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`HistogramStyleOptions`](/api/interfaces/HistogramStyleOptions.md)
 
-A histogram series is a graphical representation of the value distribution.
-Histogram creates intervals (columns) and counts how many values fall into each column:
+This series represents the distribution of values. It divides data into intervals (columns) and displays the frequency of values within each interval:
 
 export const histogramExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
@@ -145,13 +138,13 @@ chart.timeScale().fitContent();
 
 <CodeBlock className="language-js" replaceThemeConstants chart>{histogramExample}</CodeBlock>
 
-## Line
+### Line
 
 - **Series Definition**: [`LineSeries`](/api/variables/LineSeries.md)
 - **Data format**: [`LineData`](/api/interfaces/LineData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
 - **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`LineStyleOptions`](/api/interfaces/LineStyleOptions.md)
 
-A line chart is a type of chart that displays information as series of the data points connected by straight line segments:
+This series is represented with a set of data points connected by straight line segments:
 
 export const lineExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
 const chart = createChart(document.getElementById('container'), chartOptions);
@@ -166,10 +159,37 @@ chart.timeScale().fitContent();
 
 <CodeBlock className="language-js" replaceThemeConstants chart>{lineExample}</CodeBlock>
 
-## Custom Series (Plugins)
+### Custom series (plugins)
 
-Lightweight Charts offers the ability to add your own custom series types, also known as series plugins. This feature allows developers to extend the functionality of the library by adding new chart types, indicators, or other custom visualizations.
+The library enables you to create custom series types, also known as series plugins, to expand its functionality. With this feature, you can add new series types, indicators, and other visualizations.
 
-Custom series types can be defined by creating a class which implements the [ICustomSeriesPaneView](/api/interfaces/ICustomSeriesPaneView.md) interface. This class defines the rendering code which Lightweight Charts will use to draw the series on the chart. Once a custom series type is defined, it can be added to any chart instance using the [`addCustomSeries()`](/api/interfaces/IChartApi.md#addcustomseries) method, and be used just like any other series.
+To define a custom series type, create a class that implements the [`ICustomSeriesPaneView`](/api/interfaces/ICustomSeriesPaneView.md) interface. This class defines the rendering code that Lightweight Charts&trade; uses to draw the series on the chart.
+Once your custom series type is defined, it can be added to any chart instance using the [`addCustomSeries()`](/api/interfaces/IChartApi.md#addcustomseries) method. Custom series types function like any other series.
 
-Please see the [Plugins](./plugins/intro.md) article for more details.
+For more information, refer to the [Plugins](./plugins/intro.md) article.
+
+## Customization
+
+Each series type offers a unique set of customization options listed on the [`SeriesStyleOptionsMap`](/api/interfaces/SeriesStyleOptionsMap.md) page.
+
+You can adjust series options in two ways:
+
+- Specify the default options using the corresponding parameter while creating a series:
+
+    ```js
+    // change default top & bottom colors of an area series in creating time
+    const series = chart.addSeries(AreaSeries, {
+        topColor: 'red',
+        bottomColor: 'green',
+    });
+    ````
+
+- Use the [`ISeriesApi.applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method to apply other options on the fly:
+
+    ```js
+    // updating candlestick series options on the fly
+    candlestickSeries.applyOptions({
+        upColor: 'red',
+        downColor: 'blue',
+    });
+    ```
