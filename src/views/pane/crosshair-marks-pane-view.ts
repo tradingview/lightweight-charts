@@ -75,7 +75,7 @@ export class CrosshairMarksPaneView implements IUpdatablePaneView {
 	}
 
 	private _updateImpl(): void {
-		const forceHidden = this._crosshair.options().mode === CrosshairMode.Hidden;
+		const forceHidden = this._crosshair.options().mode === CrosshairMode.Hidden || !this._crosshair.visible();
 		const serieses = this._pane.orderedSeries();
 		const timePointIndex = this._crosshair.appliedIndex();
 		const timeScale = this._chartModel.timeScale();
