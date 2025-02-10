@@ -16,6 +16,16 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.2
+
+**Bug Fixes**
+
+- Fixed an issue where the crosshair marker would remain visible after the mouse pointer has left the chart. (PR [#1807](https://github.com/tradingview/lightweight-charts/issues/1807))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.0.1..v5.0.2).
+
+---
+
 ## 5.0.0
 
 Version 5.0.0 represents a significant milestone in the evolution of Lightweight Charts™, delivering on our commitment to keep the library truly "lightweight". Despite adding numerous new features, improvements, and fixes, we've managed to reduce the bundle size by up to 16%, bringing the base bundle size down to just 35kB. This remarkable reduction was achieved through enhanced tree-shaking capabilities, modernized architecture, and careful optimization of core features.
