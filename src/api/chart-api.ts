@@ -259,8 +259,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._dblClickedDelegate.unsubscribe(handler);
 	}
 
-	public priceScale(priceScaleId: string): IPriceScaleApi {
-		return new PriceScaleApi(this._chartWidget, priceScaleId);
+	public priceScale(priceScaleId: string, paneIndex: number = 0): IPriceScaleApi {
+		return new PriceScaleApi(this._chartWidget, priceScaleId, paneIndex);
 	}
 
 	public timeScale(): ITimeScaleApi<HorzScaleItem> {
