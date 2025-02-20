@@ -85,11 +85,22 @@ function runTestCase(container) {
 	}, 2);
 
 	lineSeries.setData(generateData());
+	const lineSeries2 = chart.addSeries(LightweightCharts.BarSeries, {
+		borderColor: 'rgba(0, 0, 255, 0.2)',
+		upColor: 'rgba(0, 80, 0, 0.4)',
+		downColor: 'rgba(80, 0, 0, 0.4)',
+		thinBars: false,
+		priceScaleId: 'left',
+	}, 3);
 
+	lineSeries2.setData(generateData());
 	lineSeries.priceScale().applyOptions({
 		mode: 1,
 	});
 	mainSeries.priceScale().applyOptions({
+		mode: 2,
+	});
+	lineSeries2.priceScale().applyOptions({
 		mode: 2,
 	});
 }
