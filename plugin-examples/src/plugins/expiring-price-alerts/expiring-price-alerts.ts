@@ -7,6 +7,7 @@ import {
 	SeriesOptionsMap,
 	UTCTimestamp,
 	WhitespaceData,
+	LineSeries
 } from 'lightweight-charts';
 import {
 	ExpiringPriceAlert,
@@ -61,7 +62,7 @@ export class ExpiringPriceAlerts implements IExpiringPriceAlerts {
 		if (currentLastPoint) this.checkedCrossed(currentLastPoint);
 
 		this._chart = this._primitive.chart;
-		this._whitespaceSeries = this._chart.addLineSeries();
+		this._whitespaceSeries = this._chart.addSeries(LineSeries);
 	}
 
 	destroy() {

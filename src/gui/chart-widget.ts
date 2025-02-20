@@ -857,6 +857,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		point: Point | null,
 		event: TouchMouseEventData | null
 	): void {
+		this.setCursorStyle(this.model().hoveredSource()?.cursorStyle ?? null);
 		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point, event));
 	}
 
