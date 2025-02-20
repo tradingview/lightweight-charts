@@ -1,4 +1,4 @@
-import { Time, createChart, isBusinessDay, isUTCTimestamp } from 'lightweight-charts';
+import { Time, createChart, isBusinessDay, isUTCTimestamp, CandlestickSeries } from 'lightweight-charts';
 import { generateAlternativeCandleData } from '../../../sample-data';
 import { SessionHighlighting } from '../session-highlighting';
 
@@ -6,7 +6,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const candleSeries = chart.addCandlestickSeries();
+const candleSeries = chart.addSeries(CandlestickSeries);
 const data = generateAlternativeCandleData();
 candleSeries.setData(data);
 
