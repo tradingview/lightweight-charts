@@ -1,0 +1,16 @@
+{
+  "name": "playground_root",
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "private": true,
+  "scripts": {
+    "init": "mkdir playground && cp default/.global.json playground/package.json && cp .npmrc playground && npm install --prefix playground;",
+    "create": "npm run --prefix playground create",
+    "remove": "npm run --prefix playground remove",
+    "list": "npm run --prefix playground list",
+    "serve": "npm run --prefix playground serve",
+    "serve:prod": "NODE_ENV=production npm run --prefix playground serve"
+  }
+}

@@ -1,0 +1,18 @@
+{
+	"dependencies": {
+		"lightweight-charts": "file://../.."
+	},
+	"devDependencies": {
+		"typescript": "^5.7.3",
+		"vite": "^6.1.0"
+	},
+	"private": true,
+	"workspaces": [
+		"./*"
+	],
+	"scripts": {
+		"create": "sh -c 'mkdir -p $1.d && cd $1.d && cp ../../default/.local.json package.json && cp ../../default/* . && npm install' -",
+		"remove": "sh -c 'rm -fr $PWD/${1##*/}.d' -",
+		"serve": "sh -c 'vite $1.d' -"
+	}
+}
