@@ -1,71 +1,56 @@
 # Debug Folder
 
-This folder is designed for creating and testing debug files that won't be
-committed to the repository. It's a safe space for contributors to experiment
-and test without affecting the main codebase.
-
-## Contents
-
-This folder contains example files to help you get started:
-
-- `debug-esm.html.example`
-- `debug-esm.js.example`
-- `debug-standalone.html.example`
+This folder is dedicated to creating and testing debug files that won't be committed to the repository. It provides a safe environment for contributors to experiment and test without impacting the main codebase.
+It also offers an easy way to manage multiple sandboxes and includes a default template to help you get started quickly.
 
 ## Usage
 
-### ESM Version
+Before using the package, initialize the common root directory for all experiments by running:
 
-To use the ESM (ECMAScript Module) version:
+```bash
+npm run init
+```
 
-1. Serve the repository on a local HTTP server. For example, you can use:
+### Creating a Sandbox
 
-   ```bash
-   npx serve
-   ```
+To create a new sandbox, use the following command:
 
-2. Navigate to `http://localhost:3000/debug/debug-esm.html` in your browser.
-   - Note: The port number (3000 in this example) should match the output from
-     your HTTP server tool.
-   - Replace `debug-esm.html` with the name of your test file.
+```bash
+npm run create <NAME>
+```
 
-### Standalone Version
+Replace `<NAME>` with the desired name for your new sandbox, which will be created under `playground/<NAME>.d`.
 
-The standalone version can be opened directly in the browser without needing a
-local HTTP server.
+By default, the sandbox includes lightweight-charts, typescript, and vite. Additional packages can be installed as needed, and any installed package will be shared across all sandboxes, both existing and future.
 
-## Creating Your Own Debug Files
+### Running a Sandbox
 
-1. Create a new file in this folder with a descriptive name (e.g.,
-   `my-debug-test.html` or `my-debug-test.js`).
-2. Use the example files as templates for your own debug files.
-3. These files will be automatically ignored by Git (via .gitignore), so they
-   won't be committed to the repository.
+To run a sandbox, use the serve command. This starts a web server, compiles TypeScript, and enables live reload when files change.
 
-## TypeScript Support
+```bash
+npm run serve <NAME>
+```
 
-This folder includes a `tsconfig.json` file to enable TypeScript type checking for JavaScript files. This allows you to get IDE warnings and suggestions based on JSDoc type annotations.
+To run sandbox against production (minified) build of the lightweight-charts:
 
-To take advantage of this:
+```bash
+npm run serve:prod <NAME>
+```
 
-1. Ensure your IDE is configured to use the `tsconfig.json` in this folder.
-2. Use JSDoc comments in your JavaScript files to provide type information.
-3. You should now see TypeScript warnings and suggestions in your IDE when working with .js and .mjs files in this folder.
+Note: Before running the sandbox, ensure that lightweight-charts is built, as it depends on your local copy.
 
-## Best Practices
+To rebuild lightweight-charts, run:
 
-- Always use this folder for temporary debugging and testing.
-- Don't rely on files in this folder for actual project functionality.
-- Remember to clean up your debug files when you're done with them.
+```bash
+npm run build --prefix ..
+```
 
-## Contributing
+### Removing a Sandbox
 
-When contributing to the project:
+If you need to delete a sandbox, use the following command:
 
-1. Use this debug folder to test your changes or experiments.
-2. Once you're confident in your changes, implement them in the main project
-   files.
-3. Do not commit any files from the debug folder to the repository.
+```bash
+npm run remove <NAME>
+```
 
-If you have any questions about using the debug folder, please reach out to the
-project maintainers.
+This will remove everything under `playground/<NAME>.d`, including the directory itself.

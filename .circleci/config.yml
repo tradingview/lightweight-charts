@@ -46,11 +46,11 @@ aliases:
 executors:
   node-executor:
     docker:
-      - image: cimg/node:22.3
+      - image: cimg/node:22.14.0
 
   node-browsers-executor:
     docker:
-      - image: cimg/node:22.3-browsers
+      - image: cimg/node:22.14.0-browsers
 
 commands:
   checkout-with-deps:
