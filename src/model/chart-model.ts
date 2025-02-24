@@ -173,6 +173,7 @@ export interface HoveredObject {
 export interface HoveredSource {
 	source: IPriceDataSource | IPrimitiveHitTestSource;
 	object?: HoveredObject;
+	cursorStyle?: string | null;
 }
 
 export interface PriceScaleOnPane {
@@ -796,7 +797,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		this.cursorUpdate();
 		if (!skipEvent) {
-			this._updateHoveredSourceOnChange(pane, x, y);
+			const hitTest = hitTestPane(pane, x, y);
+			this.setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object, cursorStyle: hitTest.cursorStyle || null });
 			this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y }, event);
 		}
 	}
@@ -1056,13 +1058,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	public colorParser(): ColorParser {
 		return this._colorParser;
-	}
-
-	private _updateHoveredSourceOnChange(pane: Pane, x: Coordinate, y: Coordinate): void {
-		if (pane) {
-			const hitTest = hitTestPane(pane, x, y);
-			this.setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
-		}
 	}
 
 	private _getOrCreatePane(index: number): Pane {
