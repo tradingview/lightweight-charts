@@ -1,18 +1,21 @@
 import {
 	AreaSeries,
 	CandlestickSeries,
+	ChartOptions,
+	ColorType,
 	createChart,
+	DeepPartial,
 } from "lightweight-charts";
 
 const chartOptions = {
 	layout: {
 		textColor: "black",
 		background: {
-			type: "solid",
+			type: ColorType.Solid,
 			color: "white",
 		},
 	},
-};
+} satisfies DeepPartial<ChartOptions>;
 
 const chart = createChart(
 	(() => {
