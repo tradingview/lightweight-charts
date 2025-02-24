@@ -31,6 +31,12 @@ To run a sandbox, use the serve command. This starts a web server, compiles Type
 npm run serve <NAME>
 ```
 
+To run sandbox against production (minified) build of the lightweight-charts:
+
+```bash
+npm run serve:prod <NAME>
+```
+
 Note: Before running the sandbox, ensure that lightweight-charts is built, as it depends on your local copy.
 
 To rebuild lightweight-charts, run:

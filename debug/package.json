@@ -10,6 +10,7 @@
     "create": "npm run --prefix playground create",
     "remove": "npm run --prefix playground remove",
     "list": "npm run --prefix playground list",
-    "serve": "npm run --prefix playground serve"
+    "serve": "npm run --prefix playground serve",
+    "serve:prod": "NODE_ENV=production npm run --prefix playground serve"
   }
 }
