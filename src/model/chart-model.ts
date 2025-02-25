@@ -562,6 +562,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (priceScaleId === DefaultPriceScaleId.Left) {
+			merge(this._options, {
+				leftPriceScale: options,
+			});
 			pane.applyScaleOptions({
 				leftPriceScale: options,
 			});
@@ -571,6 +574,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			return;
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		} else if (priceScaleId === DefaultPriceScaleId.Right) {
+			merge(this._options, {
+				rightPriceScale: options,
+			});
 			pane.applyScaleOptions({
 				rightPriceScale: options,
 			});
