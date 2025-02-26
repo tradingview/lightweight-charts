@@ -11,14 +11,16 @@ import { IPriceScaleApi } from './iprice-scale-api';
 export class PriceScaleApi implements IPriceScaleApi {
 	private _chartWidget: IChartWidgetBase;
 	private readonly _priceScaleId: string;
+	private readonly _paneIndex: number;
 
-	public constructor(chartWidget: IChartWidgetBase, priceScaleId: string) {
+	public constructor(chartWidget: IChartWidgetBase, priceScaleId: string, paneIndex?: number) {
 		this._chartWidget = chartWidget;
 		this._priceScaleId = priceScaleId;
+		this._paneIndex = paneIndex ?? 0;
 	}
 
 	public applyOptions(options: DeepPartial<PriceScaleOptions>): void {
-		this._chartWidget.model().applyPriceScaleOptions(this._priceScaleId, options);
+		this._chartWidget.model().applyPriceScaleOptions(this._priceScaleId, options, this._paneIndex);
 	}
 
 	public options(): Readonly<PriceScaleOptions> {
@@ -34,6 +36,6 @@ export class PriceScaleApi implements IPriceScaleApi {
 	}
 
 	private _priceScale(): PriceScale {
-		return ensureNotNull(this._chartWidget.model().findPriceScale(this._priceScaleId)).priceScale;
+		return ensureNotNull(this._chartWidget.model().findPriceScale(this._priceScaleId, this._paneIndex)).priceScale;
 	}
 }

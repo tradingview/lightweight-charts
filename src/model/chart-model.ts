@@ -378,8 +378,8 @@ interface GradientColorsCache {
 }
 
 export interface IChartModelBase {
-	applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void;
-	findPriceScale(priceScaleId: string): PriceScaleOnPane | null;
+	applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>, paneIndex?: number): void;
+	findPriceScale(priceScaleId: string, paneIndex: number): PriceScaleOnPane | null;
 	options(): Readonly<ChartOptionsInternalBase>;
 	timeScale(): ITimeScale;
 	serieses(): readonly Series<SeriesType>[];
@@ -551,22 +551,42 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this.fullUpdate();
 	}
 
-	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>): void {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-		if (priceScaleId === DefaultPriceScaleId.Left) {
-			this.applyOptions({
-				leftPriceScale: options,
-			});
-			return;
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-		} else if (priceScaleId === DefaultPriceScaleId.Right) {
-			this.applyOptions({
-				rightPriceScale: options,
-			});
+	public applyPriceScaleOptions(priceScaleId: string, options: DeepPartial<PriceScaleOptions>, paneIndex: number = 0): void {
+		const pane = this._panes[paneIndex];
+		if (pane === undefined) {
+			if (process.env.NODE_ENV === 'development') {
+				throw new Error(`Trying to apply price scale options with incorrect pane index: ${paneIndex}`);
+			}
 			return;
 		}
 
-		const res = this.findPriceScale(priceScaleId);
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+		if (priceScaleId === DefaultPriceScaleId.Left) {
+			merge(this._options, {
+				leftPriceScale: options,
+			});
+			pane.applyScaleOptions({
+				leftPriceScale: options,
+			});
+
+			this._priceScalesOptionsChanged.fire();
+			this.fullUpdate();
+			return;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+		} else if (priceScaleId === DefaultPriceScaleId.Right) {
+			merge(this._options, {
+				rightPriceScale: options,
+			});
+			pane.applyScaleOptions({
+				rightPriceScale: options,
+			});
+
+			this._priceScalesOptionsChanged.fire();
+			this.fullUpdate();
+			return;
+		}
+
+		const res = this.findPriceScale(priceScaleId, paneIndex);
 
 		if (res === null) {
 			if (process.env.NODE_ENV === 'development') {
@@ -580,15 +600,18 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._priceScalesOptionsChanged.fire();
 	}
 
-	public findPriceScale(priceScaleId: string): PriceScaleOnPane | null {
-		for (const pane of this._panes) {
-			const priceScale = pane.priceScaleById(priceScaleId);
-			if (priceScale !== null) {
-				return {
-					pane,
-					priceScale,
-				};
-			}
+	public findPriceScale(priceScaleId: string, paneIndex: number): PriceScaleOnPane | null {
+		const pane = this._panes[paneIndex];
+		if (pane === undefined) {
+			return null;
+		}
+
+		const priceScale = pane.priceScaleById(priceScaleId);
+		if (priceScale !== null) {
+			return {
+				pane,
+				priceScale,
+			};
 		}
 		return null;
 	}

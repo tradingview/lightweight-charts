@@ -243,9 +243,10 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 * Returns API to manipulate a price scale.
 	 *
 	 * @param priceScaleId - ID of the price scale.
+	 * @param paneIndex - Index of the pane (default: 0)
 	 * @returns Price scale API.
 	 */
-	priceScale(priceScaleId: string): IPriceScaleApi;
+	priceScale(priceScaleId: string, paneIndex?: number): IPriceScaleApi;
 
 	/**
 	 * Returns API to manipulate the time scale

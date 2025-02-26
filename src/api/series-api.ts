@@ -195,7 +195,7 @@ export class SeriesApi<
 	}
 
 	public priceScale(): IPriceScaleApi {
-		return this._priceScaleApiProvider.priceScale(this._series.priceScale().id());
+		return this._priceScaleApiProvider.priceScale(this._series.priceScale().id(), this.getPane().paneIndex());
 	}
 
 	public createPriceLine(options: CreatePriceLineOptions): IPriceLine {

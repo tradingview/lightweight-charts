@@ -1,6 +1,7 @@
 import { SeriesType } from '../model/series-options';
 
 import { IPanePrimitive } from './ipane-primitive-api';
+import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 
 /**
@@ -63,4 +64,12 @@ export interface IPaneApi<HorzScaleItem> {
 	 * Does nothing if specified primitive was not attached
 	 */
 	detachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void;
+
+	/**
+	 * Returns the price scale with the given id.
+	 *
+	 * @param priceScaleId - ID of the price scale to find
+	 * @throws If the price scale with the given id is not found in this pane
+	 */
+	priceScale(priceScaleId: string): IPriceScaleApi;
 }

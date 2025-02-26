@@ -10,7 +10,9 @@ import { SeriesType } from '../model/series-options';
 import { IChartApiBase } from './ichart-api';
 import { IPaneApi } from './ipane-api';
 import { IPanePrimitive } from './ipane-primitive-api';
+import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
+import { PriceScaleApi } from './price-scale-api';
 
 export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 	protected readonly _chartApi: IChartApiBase<HorzScaleItem>;
@@ -76,5 +78,13 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 
 	public detachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void {
 		this._pane.detachPrimitive(primitive as IPanePrimitiveBase<unknown>);
+	}
+
+	public priceScale(priceScaleId: string): IPriceScaleApi {
+		const priceScale = this._pane.priceScaleById(priceScaleId);
+		if (priceScale === null) {
+			throw new Error(`Cannot find price scale with id: ${priceScaleId}`);
+		}
+		return new PriceScaleApi(this._chartWidget, priceScaleId, this.paneIndex());
 	}
 }
