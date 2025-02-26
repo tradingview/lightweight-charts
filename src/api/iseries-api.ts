@@ -125,10 +125,18 @@ export interface ISeriesApi<
 	options(): Readonly<TOptions>;
 
 	/**
-	 * Returns interface of the price scale the series is currently attached on the current pane.
-	 * Note that if the series is moved to another pane or attached to another price scale, the returned object will remain the same. You need to call this method again to get the updated price scale.
+	 * Returns the API interface for controlling the price scale that this series is currently attached to.
 	 *
-	 * @returns IPriceScaleApi object to control the price scale
+	 * @returns IPriceScaleApi An interface for controlling the price scale (axis component) currently used by this series
+	 *
+	 * @remarks
+	 * Important: The returned PriceScaleApi is bound to the specific price scale (by ID and pane) that the series
+	 * is using at the time this method is called. If you later move the series to a different pane or attach it
+	 * to a different price scale (e.g., from 'right' to 'left'), the previously returned PriceScaleApi will NOT
+	 * follow the series. It will continue to control the original price scale it was created for.
+	 *
+	 * To control the new price scale after moving a series, you must call this method again to get a fresh
+	 * PriceScaleApi instance for the current price scale.
 	 */
 	priceScale(): IPriceScaleApi;
 
