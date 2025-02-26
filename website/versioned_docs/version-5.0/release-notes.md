@@ -16,6 +16,15 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.3
+
+**Bug Fixes**
+
+- Fixed an issue where changing the price scale for one pane would impact all panes in multi-pane setups. Added pane index parameter to the price scale API to ensure changes only affect the intended pane. (PR [#1821](https://github.com/tradingview/lightweight-charts/pull/1821), fixes [#1817](https://github.com/tradingview/lightweight-charts/issues/1817))
+- Fixed an issue where a cursorStyle defined in a primitive hit-test wouldn't be applied. Additionally improved cursor style handling to maintain the correct cursor when the mouse remains in the same position while price/time scales are adjusted. (PR [#1823](https://github.com/tradingview/lightweight-charts/pull/1823))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.0.2..v5.0.3).
+
 ## 5.0.2
 
 **Bug Fixes**
