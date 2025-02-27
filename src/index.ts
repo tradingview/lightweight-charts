@@ -36,6 +36,7 @@ export { histogramSeries as HistogramSeries } from './model/series/histogram-ser
 export { createTextWatermark } from './plugins/text-watermark/primitive';
 export { createImageWatermark } from './plugins/image-watermark/primitive';
 export { createSeriesMarkers } from './plugins/series-markers/wrapper';
+export { SeriesMarker, SeriesMarkerPosition, SeriesMarkerShape } from './plugins/series-markers/types';
 export { createUpDownMarkers } from './plugins/up-down-markers-plugin/wrapper';
 
 /**
