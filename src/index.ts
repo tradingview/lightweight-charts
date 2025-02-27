@@ -36,11 +36,13 @@ export { histogramSeries as HistogramSeries } from './model/series/histogram-ser
 export { createTextWatermark } from './plugins/text-watermark/primitive';
 export { createImageWatermark } from './plugins/image-watermark/primitive';
 export { createSeriesMarkers } from './plugins/series-markers/wrapper';
+export { SeriesMarker, SeriesMarkerPosition, SeriesMarkerShape } from './plugins/series-markers/types';
 export { createUpDownMarkers } from './plugins/up-down-markers-plugin/wrapper';
 
 /**
  * Returns the current version as a string. For example `'3.3.0'`.
  */
 export function version(): string {
-	return process.env.BUILD_VERSION;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return (process.env as unknown as { version?: string }).version || 'x.y.z-SNAPSHOT';
 }

@@ -1,6 +1,6 @@
 /*!
  * @license
- * TradingView Lightweight Charts™ v5.0.3-dev+202502270840
+ * TradingView Lightweight Charts™ v5.0.3-dev+202502271113
  * Copyright (c) 2025 TradingView, Inc.
  * Licensed under Apache License 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
@@ -131,10 +131,6 @@ function ensureNotNull(value) {
 function ensure(value) {
     return ensureNotNull(ensureDefined(value));
 }
-/**
- * Compile time check for never
- */
-function ensureNever(value) { }
 
 class Delegate {
     constructor() {
@@ -14203,7 +14199,10 @@ function shapeSize(shape, originalSize) {
             return size(originalSize, 0.8);
         case 'square':
             return size(originalSize, 0.7);
+        case 'diamond':
+            return size(originalSize, 0.7);
     }
+    return size(originalSize, 1);
 }
 function calculateShapeHeight(barSpacing) {
     return ceiledEven(size(barSpacing, 1));
@@ -14413,8 +14412,14 @@ function drawShape(item, ctx, coordinates) {
         case 'square':
             drawSquare(ctx, coordinates, item._internal_size);
             return;
+        case 'diamond':
+            // TODO: Implement diamond shape drawing
+            drawSquare(ctx, coordinates, item._internal_size);
+            return;
     }
-    ensureNever(item._internal_shape);
+    // This should never happen
+    // eslint-disable-next-line no-console
+    console.error(`Unknown marker shape: ${item._internal_shape}`);
 }
 function hitTestItem(item, x, y) {
     if (item._internal_text !== undefined && hitTestText(item._internal_text._internal_x, item._internal_text._internal_y, item._internal_text._internal_width, item._internal_text._internal_height, x, y)) {
@@ -14428,67 +14433,150 @@ function hitTestShape(item, x, y) {
     }
     switch (item._internal_shape) {
         case 'arrowDown':
-            return hitTestArrow(true, item._internal_x, item._internal_y, item._internal_size, x, y);
-        case 'arrowUp':
             return hitTestArrow(false, item._internal_x, item._internal_y, item._internal_size, x, y);
+        case 'arrowUp':
+            return hitTestArrow(true, item._internal_x, item._internal_y, item._internal_size, x, y);
         case 'circle':
             return hitTestCircle(item._internal_x, item._internal_y, item._internal_size, x, y);
         case 'square':
+        case 'diamond':
             return hitTestSquare(item._internal_x, item._internal_y, item._internal_size, x, y);
     }
+    return false;
 }
 
-// eslint-disable-next-line max-params
-function fillSizeAndY(rendererItem, marker, seriesData, offsets, textHeight, shapeMargin, series, chart) {
-    const timeScale = chart.timeScale();
-    let inBarPrice;
-    let highPrice;
-    let lowPrice;
-    if (isValueData(seriesData)) {
-        inBarPrice = seriesData.value;
-        highPrice = seriesData.value;
-        lowPrice = seriesData.value;
-    }
-    else if (isOhlcData(seriesData)) {
-        inBarPrice = seriesData.close;
-        highPrice = seriesData.high;
-        lowPrice = seriesData.low;
-    }
-    else {
-        return;
+// Helper function to handle price-based positioning
+function positionMarkerAtPrice(rendererItem, marker, y, series) {
+    if (y === null) {
+        return false;
     }
     const sizeMultiplier = isNumber(marker.size) ? Math.max(marker.size, 0) : 1;
-    const shapeSize = calculateShapeHeight(timeScale.options().barSpacing) * sizeMultiplier;
+    const shapeSize = calculateShapeHeight(sizeMultiplier);
     const halfSize = shapeSize / 2;
     rendererItem._internal_size = shapeSize;
+    // Position the marker based on its position property and price
     switch (marker.position) {
-        case 'inBar': {
-            rendererItem._internal_y = ensureNotNull(series.priceToCoordinate(inBarPrice));
-            if (rendererItem._internal_text !== undefined) {
-                rendererItem._internal_text._internal_y = rendererItem._internal_y + halfSize + shapeMargin + textHeight * (0.5 + 0.1 /* Constants.TextMargin */);
-            }
-            return;
-        }
-        case 'aboveBar': {
-            rendererItem._internal_y = (ensureNotNull(series.priceToCoordinate(highPrice)) - halfSize - offsets._internal_aboveBar);
-            if (rendererItem._internal_text !== undefined) {
-                rendererItem._internal_text._internal_y = rendererItem._internal_y - halfSize - textHeight * (0.5 + 0.1 /* Constants.TextMargin */);
-                offsets._internal_aboveBar += textHeight * (1 + 2 * 0.1 /* Constants.TextMargin */);
-            }
-            offsets._internal_aboveBar += shapeSize + shapeMargin;
-            return;
-        }
-        case 'belowBar': {
-            rendererItem._internal_y = (ensureNotNull(series.priceToCoordinate(lowPrice)) + halfSize + offsets._internal_belowBar);
-            if (rendererItem._internal_text !== undefined) {
-                rendererItem._internal_text._internal_y = rendererItem._internal_y + halfSize + shapeMargin + textHeight * (0.5 + 0.1 /* Constants.TextMargin */);
-                offsets._internal_belowBar += textHeight * (1 + 2 * 0.1 /* Constants.TextMargin */);
-            }
-            offsets._internal_belowBar += shapeSize + shapeMargin;
-            return;
+        case 'atPriceTop':
+            // Bottom of marker at price level
+            rendererItem._internal_y = (y - halfSize);
+            break;
+        case 'atPriceBottom':
+            // Top of marker at price level
+            rendererItem._internal_y = (y + halfSize);
+            break;
+        case 'atPriceMiddle':
+            // Center of marker at price level
+            rendererItem._internal_y = y;
+            break;
+        default:
+            // For other positions, just use the price coordinate
+            rendererItem._internal_y = y;
+    }
+    if (rendererItem._internal_text !== undefined) {
+        rendererItem._internal_text._internal_y = rendererItem._internal_y;
+    }
+    return true;
+}
+// Helper function to get prices from series data
+function getPricesFromData(seriesData) {
+    if (isOhlcData(seriesData)) {
+        return {
+            _internal_inBarPrice: seriesData.close,
+            _internal_highPrice: seriesData.high,
+            _internal_lowPrice: seriesData.low,
+        };
+    }
+    else if (isValueData(seriesData)) {
+        return {
+            _internal_inBarPrice: seriesData.value,
+            _internal_highPrice: seriesData.value,
+            _internal_lowPrice: seriesData.value,
+        };
+    }
+    return null;
+}
+// Helper function to position marker above bar
+function positionAboveBar(series, highPrice, halfSize, offsets, shapeSize, shapeMargin) {
+    const topCoordinate = series.priceToCoordinate(highPrice);
+    if (topCoordinate === null) {
+        return null;
+    }
+    const y = topCoordinate - halfSize - offsets._internal_aboveBar;
+    offsets._internal_aboveBar += shapeSize + shapeMargin;
+    return y;
+}
+// Helper function to position marker below bar
+function positionBelowBar(series, lowPrice, halfSize, offsets, shapeSize, shapeMargin) {
+    const bottomCoordinate = series.priceToCoordinate(lowPrice);
+    if (bottomCoordinate === null) {
+        return null;
+    }
+    const y = bottomCoordinate + halfSize + offsets._internal_belowBar;
+    offsets._internal_belowBar += shapeSize + shapeMargin;
+    return y;
+}
+// Helper function to position marker at price level
+function positionAtPrice(series, price, position, halfSize) {
+    const coordinate = series.priceToCoordinate(price);
+    if (coordinate === null) {
+        return null;
+    }
+    switch (position) {
+        case 'atPriceTop':
+            return coordinate - halfSize;
+        case 'atPriceBottom':
+            return coordinate + halfSize;
+        case 'atPriceMiddle':
+        case 'inBar':
+        default:
+            return coordinate;
+    }
+}
+// Helper function to position marker on bar
+function positionMarkerOnBar(rendererItem, marker, seriesData, offsets, shapeMargin, series) {
+    // Get prices from series data
+    const prices = getPricesFromData(seriesData);
+    if (prices === null) {
+        return;
+    }
+    const { _internal_inBarPrice: inBarPrice, _internal_highPrice: highPrice, _internal_lowPrice: lowPrice } = prices;
+    const sizeMultiplier = isNumber(marker.size) ? Math.max(marker.size, 0) : 1;
+    const shapeSize = calculateShapeHeight(sizeMultiplier);
+    const halfSize = shapeSize / 2;
+    rendererItem._internal_size = shapeSize;
+    // Position the marker based on its position property
+    let y = null;
+    switch (marker.position) {
+        case 'aboveBar':
+            y = positionAboveBar(series, highPrice, halfSize, offsets, shapeSize, shapeMargin);
+            break;
+        case 'belowBar':
+            y = positionBelowBar(series, lowPrice, halfSize, offsets, shapeSize, shapeMargin);
+            break;
+        default:
+            y = positionAtPrice(series, inBarPrice, marker.position, halfSize);
+            break;
+    }
+    if (y !== null) {
+        rendererItem._internal_y = y;
+        if (rendererItem._internal_text !== undefined) {
+            rendererItem._internal_text._internal_y = y;
         }
     }
-    ensureNever(marker.position);
+}
+// eslint-disable-next-line max-params
+function fillSizeAndY(rendererItem, marker, seriesData, offsets, textHeight, shapeMargin, series, chart) {
+    // If marker has a price property, use it for exact Y-axis positioning
+    if (marker.price !== undefined) {
+        // Use the price property for positioning
+        const y = series.priceToCoordinate(marker.price);
+        if (positionMarkerAtPrice(rendererItem, marker, y)) {
+            return;
+        }
+        // If price-to-coordinate conversion fails, fall back to default positioning
+    }
+    // Position based on bar data
+    positionMarkerOnBar(rendererItem, marker, seriesData, offsets, shapeMargin, series);
 }
 function isValueData(data) {
     // eslint-disable-next-line no-restricted-syntax
@@ -14693,16 +14781,20 @@ class SeriesMarkersPrimitive {
     }
     _private__getMarkerPositions() {
         if (this._private__markersPositions === null) {
+            const initialPositions = {
+                inBar: false,
+                aboveBar: false,
+                belowBar: false,
+                atPriceTop: false,
+                atPriceBottom: false,
+                atPriceMiddle: false,
+            };
             this._private__markersPositions = this._private__markers.reduce((acc, marker) => {
                 if (!acc[marker.position]) {
                     acc[marker.position] = true;
                 }
                 return acc;
-            }, {
-                inBar: false,
-                aboveBar: false,
-                belowBar: false,
-            });
+            }, initialPositions);
         }
         return this._private__markersPositions;
     }
@@ -15127,6 +15219,104 @@ function createUpDownMarkers(series, options = {}) {
     return wrapper;
 }
 
+// Store markers for each series
+const seriesMarkers = new WeakMap();
+/**
+ * Adds a marker at a specific price position
+ * @param series - The series to add the marker to
+ * @param marker - The marker configuration
+ */
+function addPricePositionMarker(series, marker) {
+    // Get existing markers or initialize empty array
+    const markers = seriesMarkers.get(series) || [];
+    // Create complete marker with defaults
+    const completeMarker = {
+        time: marker.time,
+        price: marker.price,
+        position: marker.position || 'inBar',
+        shape: marker.shape || 'circle',
+        color: marker.color || '#FF0000',
+        id: marker.id || `marker-${Date.now()}`,
+        text: marker.text,
+        size: marker.size,
+    };
+    markers.push(completeMarker);
+    // Update stored markers
+    seriesMarkers.set(series, markers);
+    // Update markers on the series
+    updateSeriesMarkers(series, markers);
+}
+/**
+ * Removes a marker with the specified ID
+ * @param series - The series to remove the marker from
+ * @param markerId - The ID of the marker to remove
+ */
+function removePricePositionMarker(series, markerId) {
+    // Get existing markers
+    const markers = seriesMarkers.get(series) || [];
+    // Filter out the marker with the specified ID
+    const filteredMarkers = markers.filter((m) => m.id !== markerId);
+    // Update stored markers
+    seriesMarkers.set(series, filteredMarkers);
+    // Convert to series markers and update
+    updateSeriesMarkers(series, filteredMarkers);
+}
+/**
+ * Updates an existing marker with new properties
+ * @param series - The series containing the marker
+ * @param markerId - The ID of the marker to update
+ * @param marker - The new marker properties
+ */
+function updatePricePositionMarker(series, markerId, marker) {
+    // Get existing markers
+    const markers = seriesMarkers.get(series) || [];
+    // Find the marker with the specified ID
+    const index = markers.findIndex((m) => m.id === markerId);
+    if (index !== -1) {
+        // Update the marker
+        markers[index] = { ...markers[index], ...marker };
+        // Update stored markers
+        seriesMarkers.set(series, markers);
+        // Convert to series markers and update
+        updateSeriesMarkers(series, markers);
+    }
+}
+/**
+ * Gets all price position markers for the specified series
+ * @param series - The series to get markers from
+ * @returns An array of price position markers
+ */
+function getPricePositionMarkers(series) {
+    return seriesMarkers.get(series) || [];
+}
+/**
+ * Removes all price position markers from the specified series
+ * @param series - The series to clear markers from
+ */
+function clearPricePositionMarkers(series) {
+    // Clear stored markers
+    seriesMarkers.set(series, []);
+    // Clear markers on the series
+    createSeriesMarkers(series, []);
+}
+/**
+ * Helper function to update series markers
+ */
+function updateSeriesMarkers(series, markers) {
+    // Convert price position markers to series markers
+    const seriesMarkersData = markers.map((m) => ({
+        time: m.time,
+        position: m.position,
+        shape: m.shape,
+        color: m.color,
+        id: m.id,
+        text: m.text,
+        size: m.size,
+    }));
+    // Update markers on the series
+    createSeriesMarkers(series, seriesMarkersData);
+}
+
 /// <reference types="_build-time-constants" />
 const customSeriesDefaultOptions = {
     ...seriesOptionsDefaults,
@@ -15136,7 +15326,8 @@ const customSeriesDefaultOptions = {
  * Returns the current version as a string. For example `'3.3.0'`.
  */
 function version() {
-    return "5.0.3-dev+202502270840";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return process.env._internal_version || 'x.y.z-SNAPSHOT';
 }
 
-export { areaSeries as AreaSeries, barSeries as BarSeries, baselineSeries as BaselineSeries, candlestickSeries as CandlestickSeries, ColorType, CrosshairMode, histogramSeries as HistogramSeries, LastPriceAnimationMode, lineSeries as LineSeries, LineStyle, LineType, MismatchDirection, PriceLineSource, PriceScaleMode, TickMarkType, TrackingModeExitMode, createChart, createChartEx, createImageWatermark, createOptionsChart, createSeriesMarkers, createTextWatermark, createUpDownMarkers, createYieldCurveChart, customSeriesDefaultOptions, defaultHorzScaleBehavior, isBusinessDay, isUTCTimestamp, version };
+export { areaSeries as AreaSeries, barSeries as BarSeries, baselineSeries as BaselineSeries, candlestickSeries as CandlestickSeries, ColorType, CrosshairMode, histogramSeries as HistogramSeries, LastPriceAnimationMode, lineSeries as LineSeries, LineStyle, LineType, MismatchDirection, PriceLineSource, PriceScaleMode, TickMarkType, TrackingModeExitMode, addPricePositionMarker, clearPricePositionMarkers, createChart, createChartEx, createImageWatermark, createOptionsChart, createSeriesMarkers, createTextWatermark, createUpDownMarkers, createYieldCurveChart, customSeriesDefaultOptions, defaultHorzScaleBehavior, getPricePositionMarkers, isBusinessDay, isUTCTimestamp, removePricePositionMarker, updatePricePositionMarker, version };

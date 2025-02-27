@@ -25,6 +25,7 @@
             background-color: white;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .legend {
@@ -62,11 +63,117 @@
             max-height: 300px;
             overflow-y: auto;
         }
+        
+        #control-panel {
+            width: 800px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        #control-panel h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Custom overlay for precise marker positioning */
+        .chart-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        
+        .price-marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        
+        .price-marker-circle {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #FF9800;
+            border: 1px solid white;
+        }
+        
+        .price-marker-arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 10px solid #FF9800;
+        }
+        
+        .price-marker-label {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 11px;
+            white-space: nowrap;
+            left: 15px;
+            top: 0;
+            display: none;
+        }
+        
+        .price-marker:hover .price-marker-label {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <h1>Candlestick Chart with Moving Average & Markers</h1>
     <div id="chart-container"></div>
+    <div class="chart-overlay" id="custom-markers-overlay"></div>
     <div class="legend">
         <div class="legend-item">
             <div class="legend-marker" style="background-color: #26a69a;"></div>
@@ -90,6 +197,49 @@
         </div>
     </div>
     <div id="debug-info"></div>
+
+    <div id="control-panel">
+        <h3>Add Marker</h3>
+        <div class="form-group">
+            <label for="time">Time</label>
+            <input type="text" id="time" placeholder="YYYY-MM-DD HH:MM">
+        </div>
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="text" id="price" placeholder="Enter price">
+        </div>
+        <div class="form-group">
+            <label for="color">Color</label>
+            <input type="text" id="color" placeholder="Enter color (e.g., #FF9800)">
+        </div>
+        <div class="form-group">
+            <label for="shape">Shape</label>
+            <select id="shape">
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+                <option value="arrowUp">Arrow Up</option>
+                <option value="arrowDown">Arrow Down</option>
+                <option value="diamond">Diamond</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="size">Size</label>
+            <input type="text" id="size" placeholder="Enter size">
+        </div>
+        <div class="form-group">
+            <label for="position">Position</label>
+            <select id="position">
+                <option value="aboveBar">Above Bar</option>
+                <option value="belowBar">Below Bar</option>
+                <option value="inBar">In Bar</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="text">Text</label>
+            <input type="text" id="text" placeholder="Enter text">
+        </div>
+        <button id="add-marker">Add Marker</button>
+    </div>
 
     <script type="module">
         const debugInfo = document.getElementById('debug-info');
@@ -266,14 +416,14 @@
                         log("Adding price level markers at exact price points...");
                         
                         // Create a horizontal line at the price level instead
-                        const horizontalLine = {
-                            price: 150,
-                            color: '#FF9800',
-                            lineWidth: 2,
-                            lineStyle: 0, // Solid
-                            axisLabelVisible: true,
-                            title: 'Key Support/Resistance: 150'
-                        };
+                        // const horizontalLine = {
+                        //     price: 150,
+                        //     color: '#FF9800',
+                        //     lineWidth: 2,
+                        //     lineStyle: 0, // Solid
+                        //     axisLabelVisible: true,
+                        //     title: 'Key Support/Resistance: 150'
+                        // };
                         
                         // Add the horizontal line to the chart
                         candlestickSeries.createPriceLine(horizontalLine);
@@ -314,6 +464,89 @@
                         } else {
                             log("No candles cross the 150 price level exactly");
                         }
+                        
+                        // NEW FEATURE: Add markers at exact price positions
+                        log("Adding markers at exact price positions...");
+                        
+                        // Function to add a marker at a specific price and time
+                        function addPricePositionMarker(time, price, options = {}) {
+                            const defaultOptions = {
+                                color: '#FF5722',
+                                shape: 'circle',
+                                text: `Price: ${price}`,
+                                size: 2,
+                                position: 'inBar'
+                            };
+                            
+                            const markerOptions = { ...defaultOptions, ...options };
+                            
+                            // Find the candle for the specified time
+                            const targetCandle = candlestickData.find(candle => candle.time === time);
+                            
+                            if (!targetCandle) {
+                                log(`Warning: No candle found for time ${time}`);
+                                return;
+                            }
+                            
+                            // Create the marker
+                            const priceMarker = [{
+                                time: time,
+                                position: markerOptions.position,
+                                color: markerOptions.color,
+                                shape: markerOptions.shape,
+                                text: markerOptions.text,
+                                size: markerOptions.size
+                            }];
+                            
+                            // Add the marker to the chart
+                            createSeriesMarkers(candlestickSeries, priceMarker);
+                            
+                            // Log the marker details
+                            log(`Added price position marker at time ${time} and price ${price}`);
+                            
+                            // Add a horizontal line at the exact price level for reference
+                            const priceLine = {
+                                price: price,
+                                color: markerOptions.color,
+                                lineWidth: 1,
+                                lineStyle: 2, // Dashed
+                                axisLabelVisible: true,
+                                title: markerOptions.text
+                            };
+                            
+                            // Add the price line to the chart
+                            const priceLineId = candlestickSeries.createPriceLine(priceLine);
+                            
+                            // Store the price line ID for potential removal later
+                            return priceLineId;
+                        }
+                        
+                        // Example: Add markers at specific price positions
+                        // 1. Add a marker at a specific price on a specific date
+                        addPricePositionMarker('2023-01-15', 140, {
+                            color: '#4CAF50',
+                            shape: 'square',
+                            text: 'Buy Signal: 140',
+                            size: 2
+                        });
+                        
+                        // 2. Add a marker at another price position
+                        addPricePositionMarker('2023-01-25', 160, {
+                            color: '#F44336',
+                            shape: 'arrowUp',
+                            text: 'Sell Signal: 160',
+                            size: 2
+                        });
+                        
+                        // 3. Add a custom marker at the 150 price level on a specific date
+                        addPricePositionMarker('2023-01-20', 150, {
+                            color: '#FF9800',
+                            shape: 'diamond',
+                            text: 'Key Level: 150',
+                            size: 3
+                        });
+                        
+                        log("Price position markers added successfully");
                     } catch (err) {
                         log("Error adding marker: " + err.message);
                         console.error("Marker error:", err);
@@ -356,8 +589,82 @@
                         const candleData = param.seriesData.get(candlestickSeries);
                         if (candleData) {
                             log(`Clicked on ${param.time}: Open=${candleData.open}, High=${candleData.high}, Low=${candleData.low}, Close=${candleData.close}`);
+                            
+                            // Get the price at the clicked position
+                            const price = candlestickSeries.coordinateToPrice(param.point.y);
+                            log(`Clicked at price level: ${price.toFixed(2)}`);
+                            
+                            // Ask user if they want to add a marker at this position
+                            if (confirm(`Add a marker at ${param.time} with price ${price.toFixed(2)}?`)) {
+                                // Add a marker at the exact clicked position
+                                addPricePositionMarker(param.time, parseFloat(price.toFixed(2)), {
+                                    color: '#673AB7',
+                                    shape: 'circle',
+                                    text: `User Marker: ${price.toFixed(2)}`,
+                                    size: 2,
+                                    position: 'inBar'
+                                });
+                            }
                         }
                     });
+                    
+                    // Set up control panel functionality
+                    document.getElementById('add-marker').addEventListener('click', () => {
+                        const time = document.getElementById('time').value;
+                        const price = parseFloat(document.getElementById('price').value);
+                        const color = document.getElementById('color').value || '#FF5722';
+                        const shape = document.getElementById('shape').value;
+                        const size = parseInt(document.getElementById('size').value) || 2;
+                        const position = document.getElementById('position').value;
+                        const text = document.getElementById('text').value || `Price: ${price}`;
+                        
+                        if (!time || isNaN(price)) {
+                            alert('Please enter valid time and price values');
+                            return;
+                        }
+                        
+                        // Add the marker
+                        addPricePositionMarker(time, price, {
+                            color,
+                            shape,
+                            text,
+                            size,
+                            position
+                        });
+                        
+                        log(`Marker added from control panel at ${time} with price ${price}`);
+                    });
+                    
+                    // Pre-fill the time dropdown with available dates from the data
+                    const timeSelect = document.getElementById('time');
+                    const dateOptions = candlestickData.map(candle => candle.time);
+                    
+                    // Create a datalist for time input
+                    const datalist = document.createElement('datalist');
+                    datalist.id = 'time-options';
+                    dateOptions.forEach(date => {
+                        const option = document.createElement('option');
+                        option.value = date;
+                        datalist.appendChild(option);
+                    });
+                    document.body.appendChild(datalist);
+                    timeSelect.setAttribute('list', 'time-options');
+                    
+                    // Set default values
+                    document.getElementById('color').value = '#FF5722';
+                    document.getElementById('size').value = '2';
+                    
+                    // Helper function to get a random date from the dataset
+                    function getRandomDate() {
+                        const randomIndex = Math.floor(Math.random() * candlestickData.length);
+                        return candlestickData[randomIndex].time;
+                    }
+                    
+                    // Set a random date as default
+                    timeSelect.value = getRandomDate();
+                    
+                    // Set a default price
+                    document.getElementById('price').value = '150';
                 } catch (err) {
                     log(`Error creating chart: ${err.message}`);
                     console.error("Chart creation error:", err);
