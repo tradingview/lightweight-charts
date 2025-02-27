@@ -60,13 +60,13 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		if (this._series && this._dataChangedHandler) {
 			this._series.unsubscribeDataChanged(this._dataChangedHandler);
 		}
-		
+
 		// Clean up price scale monitoring
 		if (this._priceScaleUpdateHandler) {
 			window.removeEventListener('mousemove', this._priceScaleUpdateHandler);
 			this._priceScaleUpdateHandler = null;
 		}
-		
+
 		this._chart = null;
 		this._series = null;
 		this._paneView = null;
@@ -140,7 +140,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		}
 		return null;
 	}
-	
+
 	private _setupPriceScaleMonitoring(): void {
 		if (!this._series || !this._chart) {
 			return;
@@ -157,7 +157,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 			if (!this._series) {
 				return;
 			}
-			
+
 			// Get current price range as a string for comparison
 			let currentPriceRange = 'unknown';
 			try {
@@ -181,7 +181,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 				this._updateAllViews('data');
 				this.requestUpdate();
 			}
-			
+
 			this._lastPriceRange = currentPriceRange;
 		};
 

@@ -43,6 +43,5 @@ export { createUpDownMarkers } from './plugins/up-down-markers-plugin/wrapper';
  * Returns the current version as a string. For example `'3.3.0'`.
  */
 export function version(): string {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return (process.env as unknown as { version?: string }).version || 'x.y.z-SNAPSHOT';
+	return process.env.BUILD_VERSION;
 }
