@@ -265,63 +265,54 @@
                         // Add price level markers at specific prices
                         log("Adding price level markers at exact price points...");
                         
-                        // Create price markers at specific price levels
-                        const priceMarkers = [
-                            {
-                                price: 150,
-                                color: '#FF9800',
-                                shape: 'arrowRight',
-                                text: 'Key Support/Resistance: 150',
-                                size: 4
-                            }
-                        ];
+                        // Create a horizontal line at the price level instead
+                        const horizontalLine = {
+                            price: 150,
+                            color: '#FF9800',
+                            lineWidth: 2,
+                            lineStyle: 0, // Solid
+                            axisLabelVisible: true,
+                            title: 'Key Support/Resistance: 150'
+                        };
                         
-                        // Add price markers to the chart
-                        log("Using createPriceMarkers function...");
-                        try {
-                            // Check if createPriceMarkers exists
-                            if (typeof module.createPriceMarkers === 'function') {
-                                module.createPriceMarkers(candlestickSeries, priceMarkers);
-                                log("Price markers added successfully");
-                            } else {
-                                // Alternative approach if createPriceMarkers doesn't exist
-                                log("createPriceMarkers function not found, trying alternative approach");
-                                
-                                // Log available functions for debugging
-                                log("Available module functions: " + Object.keys(module).join(", "));
-                                
-                                // Create a horizontal line at the price level instead
-                                const horizontalLine = {
-                                    price: 150,
-                                    color: '#FF9800',
-                                    lineWidth: 2,
-                                    lineStyle: 0, // Solid
-                                    axisLabelVisible: true,
-                                    title: 'Key Support/Resistance: 150'
-                                };
-                                
-                                // Add the horizontal line to the chart
-                                candlestickSeries.createPriceLine(horizontalLine);
-                                log("Horizontal price line added at 150");
-                                
-                                // Also add a marker at a specific point for better visibility
-                                const visibleMarker = [
-                                    {
-                                        time: candlestickData[candlestickData.length - 3].time,
-                                        position: 'inBar',
-                                        color: '#FF9800',
-                                        shape: 'arrowDown',
-                                        text: 'Key Level',
-                                        size: 1
-                                    }
-                                ];
-                                
-                                createSeriesMarkers(candlestickSeries, visibleMarker);
-                                log("Additional marker added for better visibility");
+                        // Add the horizontal line to the chart
+                        candlestickSeries.createPriceLine(horizontalLine);
+                        log("Horizontal price line added at 150");
+                        
+                        // Find candles that cross the 150 price level
+                        const priceLevelCrosses = [];
+                        for (let i = 0; i < candlestickData.length; i++) {
+                            const candle = candlestickData[i];
+                            // Check if this candle crosses or touches the 150 price level
+                            if (candle.low <= 150 && candle.high >= 150) {
+                                priceLevelCrosses.push({
+                                    index: i,
+                                    time: candle.time
+                                });
                             }
-                        } catch (err) {
-                            log("Error adding price markers: " + err.message);
-                            console.error("Price marker error:", err);
+                        }
+                        
+                        // Add markers at points where price crosses the level
+                        if (priceLevelCrosses.length > 0) {
+                            // Use the last crossing point for the marker
+                            const lastCross = priceLevelCrosses[priceLevelCrosses.length - 1];
+                            
+                            const visibleMarker = [
+                                {
+                                    time: lastCross.time,
+                                    position: 'inBar',
+                                    color: '#FF9800',
+                                    shape: 'arrowDown',
+                                    text: 'Price Cross: 150',
+                                    size: 1,
+                                    price: 150 // This doesn't directly set the y-coordinate but helps with context
+                                }
+                            ];
+                            
+                            createSeriesMarkers(candlestickSeries, visibleMarker);
+                            log("Marker added at price level crossing point: " + lastCross.time);
+                        } else {
+                            log("No candles cross the 150 price level exactly");
                         }
                     } catch (err) {
                         log("Error adding marker: " + err.message);
