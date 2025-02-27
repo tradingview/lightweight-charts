@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Chart Example</title>
+    <style>
+        #chart-container {
+            width: 600px;
+            height: 300px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Basic Chart Example</h1>
+    <div id="chart-container"></div>
+
+    <script src="./dist/lightweight-charts.standalone.development.js"></script>
+    <script>
+        // Create the chart using the global LightweightCharts object
+        const chart = LightweightCharts.createChart(
+            document.getElementById('chart-container'), 
+            {
+                width: 600,
+                height: 300,
+                layout: {
+                    background: { color: '#ffffff' },
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: { color: '#f0f0f0' },
+                    horzLines: { color: '#f0f0f0' },
+                },
+            }
+        );
+
+        // Create a line series
+        const lineSeries = chart.addLineSeries({
+            color: '#2962FF',
+            lineWidth: 2,
+        });
+
+        // Sample data
+        const data = [
+            { time: '2023-01-01', value: 10 },
+            { time: '2023-01-02', value: 12 },
+            { time: '2023-01-03', value: 15 },
+            { time: '2023-01-04', value: 13 },
+            { time: '2023-01-05', value: 17 },
+        ];
+
+        // Set the data
+        lineSeries.setData(data);
+
+        // Fit the chart to the data
+        chart.timeScale().fitContent();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candlestick Chart Example</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        #chart-container {
+            width: 800px;
+            height: 400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            z-index: 1;
+            font-size: 12px;
+            font-family: sans-serif;
+            line-height: 18px;
+            font-weight: 300;
+            background-color: rgba(255, 255, 255, 0.23);
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .legend-marker {
+            width: 12px;
+            height: 12px;
+            margin-right: 8px;
+        }
+        
+        #debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Candlestick Chart with Moving Average & Markers</h1>
+    <div id="chart-container"></div>
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-marker" style="background-color: #26a69a;"></div>
+            <div>Bullish Candle</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker" style="background-color: #ef5350;"></div>
+            <div>Bearish Candle</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker" style="background-color: #2962FF;"></div>
+            <div>20-period MA</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker" style="background-color: #9C27B0;"></div>
+            <div>Price Markers</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker" style="background-color: #FF9800;"></div>
+            <div>Price Level Markers</div>
+        </div>
+    </div>
+    <div id="debug-info"></div>
+
+    <script type="module">
+        const debugInfo = document.getElementById('debug-info');
+        
+        function log(message) {
+            console.log(message);
+            debugInfo.innerHTML += message + '<br>';
+        }
+        
+        try {
+            log("Loading module...");
+            
+            // Import the createChart function from the local build
+            import('./dist/lightweight-charts.standalone.development.mjs')
+            .then(module => {
+                log("Module loaded successfully.");
+                
+                // Log available exports for debugging
+                log("Available exports: " + Object.keys(module).join(", "));
+                
+                const { createChart, CandlestickSeries, LineSeries, createSeriesMarkers } = module;
+                
+                try {
+                    // Create the chart
+                    log("Creating chart...");
+                    const chart = createChart(document.getElementById('chart-container'), {
+                        width: 800,
+                        height: 400,
+                        layout: {
+                            background: { color: '#ffffff' },
+                            textColor: '#333',
+                        },
+                        grid: {
+                            vertLines: { color: '#f0f0f0' },
+                            horzLines: { color: '#f0f0f0' },
+                        },
+                        crosshair: {
+                            mode: 0, // CrosshairMode.Normal
+                        },
+                        rightPriceScale: {
+                            borderColor: '#dfdfdf',
+                        },
+                        timeScale: {
+                            borderColor: '#dfdfdf',
+                            timeVisible: true,
+                        },
+                    });
+                    
+                    log("Chart created.");
+                    
+                    // Log available methods on chart for debugging
+                    log("Chart methods: " + Object.keys(chart).join(", "));
+                    
+                    // Create the candlestick series using the new API
+                    log("Adding candlestick series...");
+                    const candlestickSeries = chart.addSeries(module.CandlestickSeries, {
+                        upColor: '#26a69a',
+                        downColor: '#ef5350',
+                        borderVisible: true,
+                        borderColor: '#378658',
+                        borderUpColor: '#26a69a',
+                        borderDownColor: '#ef5350',
+                        wickUpColor: '#26a69a',
+                        wickDownColor: '#ef5350',
+                        barSpacing: 20,
+                        priceScaleId: 'right',
+                    });
+                    
+                    log("Candlestick series added.");
+                    
+                    // Create a line series for the moving average using the new API
+                    log("Adding line series for MA...");
+                    const maSeries = chart.addSeries(module.LineSeries, {
+                        color: '#2962FF',
+                        lineWidth: 2,
+                        priceLineVisible: false,
+                        lastValueVisible: false,
+                    });
+                    
+                    log("Line series added.");
+
+                    // Sample data
+                    const candlestickData = [
+                        { time: '2023-01-01', open: 100, high: 110, low: 90, close: 102 },
+                        { time: '2023-01-02', open: 102, high: 115, low: 95, close: 105 },
+                        { time: '2023-01-03', open: 105, high: 120, low: 100, close: 108 },
+                        { time: '2023-01-04', open: 108, high: 125, low: 102, close: 110 },
+                        { time: '2023-01-05', open: 110, high: 130, low: 105, close: 114 },
+                        { time: '2023-01-06', open: 114, high: 135, low: 105, close: 120 },
+                        { time: '2023-01-07', open: 120, high: 134, low: 110, close: 118 },
+                        { time: '2023-01-08', open: 118, high: 131, low: 110, close: 120 },
+                        { time: '2023-01-09', open: 120, high: 133, low: 105, close: 114 },
+                        { time: '2023-01-10', open: 114, high: 135, low: 108, close: 124 },
+                        { time: '2023-01-11', open: 124, high: 137, low: 118, close: 126 },
+                        { time: '2023-01-12', open: 126, high: 148, low: 120, close: 136 },
+                        { time: '2023-01-13', open: 136, high: 149, low: 122, close: 130 },
+                        { time: '2023-01-14', open: 130, high: 145, low: 124, close: 133 },
+                        { time: '2023-01-15', open: 133, high: 148, low: 127, close: 136 },
+                        { time: '2023-01-16', open: 136, high: 150, low: 130, close: 139 },
+                        { time: '2023-01-17', open: 139, high: 159, low: 127, close: 139 },
+                        { time: '2023-01-18', open: 141, high: 155, low: 135, close: 143 },
+                        { time: '2023-01-19', open: 143, high: 158, low: 137, close: 146 },
+                        { time: '2023-01-20', open: 146, high: 165, low: 137, close: 152 },
+                        { time: '2023-01-21', open: 152, high: 168, low: 142, close: 150 },
+                        { time: '2023-01-22', open: 150, high: 170, low: 140, close: 155 },
+                        { time: '2023-01-23', open: 155, high: 172, low: 143, close: 153 },
+                        { time: '2023-01-24', open: 153, high: 167, low: 137, close: 145 },
+                        { time: '2023-01-25', open: 145, high: 170, low: 139, close: 158 },
+                        { time: '2023-01-26', open: 158, high: 172, low: 152, close: 160 },
+                        { time: '2023-01-27', open: 160, high: 173, low: 154, close: 162 },
+                        { time: '2023-01-28', open: 162, high: 175, low: 156, close: 164 },
+                        { time: '2023-01-29', open: 164, high: 178, low: 158, close: 167 },
+                        { time: '2023-01-30', open: 167, high: 190, low: 161, close: 169 },
+                    ];
+
+                    // Calculate 20-period moving average
+                    const maData = [];
+                    const maLength = 20;
+                    
+                    for (let i = 0; i < candlestickData.length; i++) {
+                        if (i >= maLength - 1) {
+                            let sum = 0;
+                            for (let j = 0; j < maLength; j++) {
+                                sum += candlestickData[i - j].close;
+                            }
+                            maData.push({
+                                time: candlestickData[i].time,
+                                value: sum / maLength,
+                            });
+                        }
+                    }
+
+                    // Set the data
+                    log("Setting candlestick data...");
+                    candlestickSeries.setData(candlestickData);
+                    
+                    log("Setting MA data...");
+                    maSeries.setData(maData);
+
+                    // Find highest and lowest points for markers
+                    log("Finding highest point for marker...");
+                    let highestPoint = { price: 0, time: '' };
+                    let lowestPoint = { price: Number.MAX_VALUE, time: '' };
+                    
+                    candlestickData.forEach(candle => {
+                        if (candle.high > highestPoint.price) {
+                            highestPoint = { price: candle.high, time: candle.time };
+                        }
+                        if (candle.low < lowestPoint.price) {
+                            lowestPoint = { price: candle.low, time: candle.time };
+                        }
+                    });
+                    
+                    // Add a single marker using createSeriesMarkers
+                    log("Adding markers to the chart...");
+                    try {
+                        // Traditional marker at the highest point
+                        const markers = [
+                            {
+                                time: highestPoint.time,
+                                position: 'aboveBar',
+                                color: '#9C27B0',
+                                shape: 'arrowDown',
+                                text: 'Highest: ' + highestPoint.price,
+                                size: 3
+                            }
+                        ];
+                        
+                        log("Using createSeriesMarkers function for bar marker...");
+                        createSeriesMarkers(candlestickSeries, markers);
+                        log("Bar marker added successfully at " + highestPoint.time + " with price " + highestPoint.price);
+                        
+                        // Add price level markers at specific prices
+                        log("Adding price level markers at exact price points...");
+                        
+                        // Create price markers at specific price levels
+                        const priceMarkers = [
+                            {
+                                price: 150,
+                                color: '#FF9800',
+                                shape: 'arrowRight',
+                                text: 'Key Support/Resistance: 150',
+                                size: 4
+                            }
+                        ];
+                        
+                        // Add price markers to the chart
+                        log("Using createPriceMarkers function...");
+                        try {
+                            // Check if createPriceMarkers exists
+                            if (typeof module.createPriceMarkers === 'function') {
+                                module.createPriceMarkers(candlestickSeries, priceMarkers);
+                                log("Price markers added successfully");
+                            } else {
+                                // Alternative approach if createPriceMarkers doesn't exist
+                                log("createPriceMarkers function not found, trying alternative approach");
+                                
+                                // Log available functions for debugging
+                                log("Available module functions: " + Object.keys(module).join(", "));
+                                
+                                // Create a horizontal line at the price level instead
+                                const horizontalLine = {
+                                    price: 150,
+                                    color: '#FF9800',
+                                    lineWidth: 2,
+                                    lineStyle: 0, // Solid
+                                    axisLabelVisible: true,
+                                    title: 'Key Support/Resistance: 150'
+                                };
+                                
+                                // Add the horizontal line to the chart
+                                candlestickSeries.createPriceLine(horizontalLine);
+                                log("Horizontal price line added at 150");
+                                
+                                // Also add a marker at a specific point for better visibility
+                                const visibleMarker = [
+                                    {
+                                        time: candlestickData[candlestickData.length - 3].time,
+                                        position: 'inBar',
+                                        color: '#FF9800',
+                                        shape: 'arrowDown',
+                                        text: 'Key Level',
+                                        size: 1
+                                    }
+                                ];
+                                
+                                createSeriesMarkers(candlestickSeries, visibleMarker);
+                                log("Additional marker added for better visibility");
+                            }
+                        } catch (err) {
+                            log("Error adding price markers: " + err.message);
+                            console.error("Price marker error:", err);
+                        }
+                    } catch (err) {
+                        log("Error adding marker: " + err.message);
+                        console.error("Marker error:", err);
+                        
+                        // Log available methods on candlestickSeries
+                        log("Available methods on candlestickSeries: " + Object.keys(candlestickSeries).join(", "));
+                    }
+
+                    // Fit the chart to the data
+                    log("Fitting content...");
+                    chart.timeScale().fitContent();
+                    
+                    log("Chart setup complete.");
+
+                    // Add a tooltip
+                    chart.subscribeCrosshairMove((param) => {
+                        if (!param.time || param.point.x < 0 || param.point.y < 0) {
+                            // Hide tooltip when cursor is outside the chart
+                            return;
+                        }
+
+                        const candleData = param.seriesData.get(candlestickSeries);
+                        const maValue = param.seriesData.get(maSeries);
+                        
+                        if (candleData) {
+                            console.log(`Date: ${param.time}`);
+                            console.log(`Open: ${candleData.open}, High: ${candleData.high}, Low: ${candleData.low}, Close: ${candleData.close}`);
+                            if (maValue) {
+                                console.log(`MA(20): ${maValue.value.toFixed(2)}`);
+                            }
+                        }
+                    });
+                    
+                    // Add click handler to show details
+                    chart.subscribeClick((param) => {
+                        if (!param.time || param.point.x < 0 || param.point.y < 0) {
+                            return;
+                        }
+                        
+                        const candleData = param.seriesData.get(candlestickSeries);
+                        if (candleData) {
+                            log(`Clicked on ${param.time}: Open=${candleData.open}, High=${candleData.high}, Low=${candleData.low}, Close=${candleData.close}`);
+                        }
+                    });
+                } catch (err) {
+                    log(`Error creating chart: ${err.message}`);
+                    console.error("Chart creation error:", err);
+                }
+            })
+            .catch(err => {
+                log(`Error importing module: ${err.message}`);
+                console.error("Import error:", err);
+            });
+        } catch (err) {
+            log(`Error in script: ${err.message}`);
+            console.error("Script error:", err);
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Debug Chart</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        #chart-container {
+            width: 600px;
+            height: 300px;
+            margin: 0 auto;
+            background-color: white;
+            border: 2px solid red; /* Make the container very visible */
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Ensure canvas elements are visible */
+        canvas {
+            border: 1px dashed blue;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS Debug Chart</h1>
+    <div id="chart-container"></div>
+
+    <!-- Load the UMD/IIFE version of the library -->
+    <script src="./dist/lightweight-charts.standalone.development.js"></script>
+    
+    <script>
+        // Create the chart
+        const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
+            width: 600,
+            height: 300,
+            layout: {
+                background: { color: 'rgba(255, 255, 0, 0.3)' }, // Semi-transparent yellow background
+                textColor: '#333',
+            },
+            grid: {
+                vertLines: { color: '#f00' }, // Red vertical lines
+                horzLines: { color: '#00f' }, // Blue horizontal lines
+            },
+            timeScale: {
+                timeVisible: true,
+                secondsVisible: false,
+                borderColor: '#000', // Black border
+                borderVisible: true,
+            },
+            rightPriceScale: {
+                borderColor: '#000', // Black border
+                borderVisible: true,
+            },
+        });
+
+        // Create a line series with very visible styling
+        const lineSeries = chart.addLineSeries({
+            color: '#ff0000', // Bright red
+            lineWidth: 3,
+            crosshairMarkerVisible: true,
+            lastValueVisible: true,
+            priceLineVisible: true,
+            priceLineWidth: 2,
+            priceLineColor: '#00ff00', // Bright green
+        });
+
+        // Sample data with extreme values to ensure visibility
+        const data = [
+            { time: '2023-01-01', value: 10 },
+            { time: '2023-01-02', value: 50 },
+            { time: '2023-01-03', value: 15 },
+            { time: '2023-01-04', value: 40 },
+            { time: '2023-01-05', value: 20 },
+        ];
+
+        // Set the data
+        lineSeries.setData(data);
+
+        // Fit the chart to the data
+        chart.timeScale().fitContent();
+        
+        // Add a DOM observer to check what's happening with the chart container
+        const observer = new MutationObserver((mutations) => {
+            console.log('DOM mutations detected:', mutations);
+            const container = document.getElementById('chart-container');
+            console.log('Chart container children:', container.children);
+            console.log('Canvas elements:', document.querySelectorAll('canvas'));
+        });
+        
+        observer.observe(document.getElementById('chart-container'), { 
+            childList: true, 
+            subtree: true,
+            attributes: true
+        });
+        
+        // Log information about the chart container
+        setTimeout(() => {
+            const container = document.getElementById('chart-container');
+            console.log('Chart container:', container);
+            console.log('Chart container children:', container.children);
+            console.log('Canvas elements:', document.querySelectorAll('canvas'));
+            
+            // Check if canvas elements have zero dimensions
+            document.querySelectorAll('canvas').forEach((canvas, index) => {
+                console.log(`Canvas ${index} dimensions:`, {
+                    width: canvas.width,
+                    height: canvas.height,
+                    clientWidth: canvas.clientWidth,
+                    clientHeight: canvas.clientHeight,
+                    style: canvas.getAttribute('style')
+                });
+            });
+        }, 1000);
+    </script>
+</body>
+</html> 
