@@ -54,7 +54,12 @@ export class Magnet {
 
 				// convert bar to pixels
 				const firstPrice = ensure(series.firstValue());
-				return acc.concat([ps.priceToCoordinate(bar.value[PlotRowValueIndex.Close], firstPrice.value)]);
+				return acc.concat([
+					ps.priceToCoordinate(bar.value[PlotRowValueIndex.Open], firstPrice.value),
+					ps.priceToCoordinate(bar.value[PlotRowValueIndex.High], firstPrice.value),
+					ps.priceToCoordinate(bar.value[PlotRowValueIndex.Low], firstPrice.value),
+					ps.priceToCoordinate(bar.value[PlotRowValueIndex.Close], firstPrice.value),
+				]);
 			},
 			[] as Coordinate[]);
 
