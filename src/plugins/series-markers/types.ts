@@ -1,7 +1,7 @@
 /**
  * Represents the position of a series marker relative to a bar.
  */
-export type SeriesMarkerPosition = 'aboveBar' | 'belowBar' | 'inBar';
+export type SeriesMarkerPosition = 'aboveBar' | 'belowBar' | 'inBar' | 'atPriceTop' | 'atPriceBottom' | 'atPriceMiddle';
 
 /**
  * Represents the shape of a series marker.
@@ -42,6 +42,11 @@ export interface SeriesMarker<TimeType> {
 	 * @defaultValue `1`
 	 */
 	size?: number;
+	/**
+	 * The optional price value for exact Y-axis positioning.
+	 * If provided, this will override the default positioning based on bar values.
+	 */
+	price?: number;
 }
 
 export type MarkerPositions = Record<SeriesMarkerPosition, boolean>;

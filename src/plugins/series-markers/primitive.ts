@@ -31,6 +31,8 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	private _autoScaleMargins: AutoScaleMargins | null = null;
 	private _markersPositions: MarkerPositions | null = null;
 	private _cachedBarSpacing: number | null = null;
+	private _priceScaleUpdateHandler: (() => void) | null = null;
+	private _lastPriceRange: string | null = null;
 
 	public attached(param: SeriesAttachedParameter<HorzScaleItem>): void {
 		this._recalculateMarkers();
@@ -38,7 +40,13 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		this._series = param.series;
 		this._paneView = new SeriesMarkersPaneView(this._series, ensureNotNull(this._chart));
 		this._requestUpdate = param.requestUpdate;
-		this._series.subscribeDataChanged((scope: DataChangedScope) => this._onDataChanged(scope));
+
+		// Listen for data changes
+		this._dataChangedHandler = (scope: DataChangedScope) => this._onDataChanged(scope);
+		this._series.subscribeDataChanged(this._dataChangedHandler);
+
+		// Set up price scale monitoring
+		this._setupPriceScaleMonitoring();
 		this.requestUpdate();
 	}
 
@@ -52,6 +60,13 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		if (this._series && this._dataChangedHandler) {
 			this._series.unsubscribeDataChanged(this._dataChangedHandler);
 		}
+
+		// Clean up price scale monitoring
+		if (this._priceScaleUpdateHandler) {
+			window.removeEventListener('mousemove', this._priceScaleUpdateHandler);
+			this._priceScaleUpdateHandler = null;
+		}
+
 		this._chart = null;
 		this._series = null;
 		this._paneView = null;
@@ -64,6 +79,34 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		this._autoScaleMarginsInvalidated = true;
 		this._markersPositions = null;
 		this.requestUpdate();
+
+		// Add a sequence of delayed updates to catch price scale adjustments
+		// that might occur after initial marker placement
+		if (this._markers.length > 0) {
+			// First immediate update to position markers
+			this._updateAllViews('data');
+
+			// Schedule multiple updates to catch scale adjustments
+			const updateTimes = [50, 150, 300, 500]; // milliseconds
+			updateTimes.forEach((delay: number) => {
+				setTimeout(
+					() => {
+						if (this._series) {
+							// Force price scale update
+							try {
+								this._series.priceScale().applyOptions({});
+							} catch (e) {
+								// Ignore if price scale is not available
+							}
+							// Recalculate with latest coordinates
+							this._updateAllViews('data');
+							this.requestUpdate();
+						}
+					},
+					delay
+				);
+			});
+		}
 	}
 
 	public markers(): readonly SeriesMarker<HorzScaleItem>[] {
@@ -98,6 +141,54 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		return null;
 	}
 
+	private _setupPriceScaleMonitoring(): void {
+		if (!this._series || !this._chart) {
+			return;
+		}
+
+		// Clear any existing handler
+		if (this._priceScaleUpdateHandler) {
+			window.removeEventListener('mousemove', this._priceScaleUpdateHandler);
+			this._priceScaleUpdateHandler = null;
+		}
+
+		// Create handler that detects price scale changes
+		this._priceScaleUpdateHandler = () => {
+			if (!this._series) {
+				return;
+			}
+
+			// Get current price range as a string for comparison
+			let currentPriceRange = 'unknown';
+			try {
+				const priceScale = this._series.priceScale();
+				if (priceScale) {
+					// Use visible price range as a proxy for scale changes
+					const visibleBars = this._chart?.timeScale().getVisibleLogicalRange();
+					if (visibleBars) {
+						// Get coordinate for a reference price to detect scale changes
+						const testPrice = 100;
+						const coordinate = this._series.priceToCoordinate(testPrice);
+						currentPriceRange = `${coordinate}`;
+					}
+				}
+			} catch (e) {
+				// Ignore errors getting price range
+			}
+
+			// If price range changed, update markers
+			if (this._lastPriceRange !== null && this._lastPriceRange !== currentPriceRange) {
+				this._updateAllViews('data');
+				this.requestUpdate();
+			}
+
+			this._lastPriceRange = currentPriceRange;
+		};
+
+		// Monitor for price scale changes on key events that might trigger scale adjustments
+		window.addEventListener('mousemove', this._priceScaleUpdateHandler);
+	}
+
 	private _getAutoScaleMargins(): AutoScaleMargins | null {
 		const chart = ensureNotNull(this._chart);
 		const barSpacing = chart.timeScale().options().barSpacing;
@@ -124,6 +215,15 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 
 	private _getMarkerPositions(): MarkerPositions {
 		if (this._markersPositions === null) {
+			const initialPositions: MarkerPositions = {
+				inBar: false,
+				aboveBar: false,
+				belowBar: false,
+				atPriceTop: false,
+				atPriceBottom: false,
+				atPriceMiddle: false,
+			};
+
 			this._markersPositions = this._markers.reduce(
 				(acc: MarkerPositions, marker: SeriesMarker<HorzScaleItem>) => {
 					if (!acc[marker.position]) {
@@ -131,11 +231,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 					}
 					return acc;
 				},
-				{
-					inBar: false,
-					aboveBar: false,
-					belowBar: false,
-				}
+				initialPositions
 			);
 		}
 		return this._markersPositions;
@@ -146,18 +242,17 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 			return;
 		}
 		const timeScale = this._chart.timeScale();
-		if (timeScale.getVisibleLogicalRange() == null || !this._series || this._series?.data().length === 0) {
+		const seriesData = this._series?.data();
+		if (seriesData.length === 0) {
 			this._indexedMarkers = [];
 			return;
 		}
 
-		const seriesData = this._series?.data();
 		const firstDataIndex = timeScale.timeToIndex(ensureNotNull(seriesData[0].time), true) as unknown as Logical;
 		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<HorzScaleItem>, index: number) => {
 			const timePointIndex = timeScale.timeToIndex(marker.time, true) as unknown as Logical;
 			const searchMode = timePointIndex < firstDataIndex ? MismatchDirection.NearestRight : MismatchDirection.NearestLeft;
 			const seriesDataByIndex = ensureNotNull(this._series).dataByIndex(timePointIndex, searchMode);
-			// @TODO think about should we expose the series' `.search()` method
 			const finalIndex = timeScale.timeToIndex(ensureNotNull(seriesDataByIndex).time, false) as unknown as TimePointIndex;
 
 			return {
@@ -169,6 +264,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 				internalId: index,
 				text: marker.text,
 				size: marker.size,
+				price: marker.price,
 				originalTime: marker.time,
 			};
 		});
