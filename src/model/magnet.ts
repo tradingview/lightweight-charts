@@ -12,6 +12,7 @@ import { TimePointIndex } from './time-data';
 
 export class Magnet {
 	private readonly _options: CrosshairOptions;
+	private static readonly MAGNET_THRESHOLD: number = 15;
 
 	public constructor(options: CrosshairOptions) {
 		this._options = options;
@@ -54,12 +55,12 @@ export class Magnet {
 
 				// convert bar to pixels
 				const firstPrice = ensure(series.firstValue());
-				return acc.concat([
-					ps.priceToCoordinate(bar.value[PlotRowValueIndex.Open], firstPrice.value),
-					ps.priceToCoordinate(bar.value[PlotRowValueIndex.High], firstPrice.value),
-					ps.priceToCoordinate(bar.value[PlotRowValueIndex.Low], firstPrice.value),
-					ps.priceToCoordinate(bar.value[PlotRowValueIndex.Close], firstPrice.value),
-				]);
+				const plotRowKeys = this._options.mode === CrosshairMode.MagnetOHLC
+					? [PlotRowValueIndex.Open, PlotRowValueIndex.High, PlotRowValueIndex.Low, PlotRowValueIndex.Close]
+					: [PlotRowValueIndex.Close];
+				return acc.concat(
+					plotRowKeys.map(key: PlotRowValueIndex => ps.priceToCoordinate(bar.value[key], firstPrice.value))
+				);
 			},
 			[] as Coordinate[]);
 
@@ -70,6 +71,9 @@ export class Magnet {
 		candidates.sort((y1: Coordinate, y2: Coordinate) => Math.abs(y1 - y) - Math.abs(y2 - y));
 
 		const nearest = candidates[0];
+		if (this._options.mode === CrosshairMode.MagnetOHLC && Math.abs(nearest - y) > Magnet.MAGNET_THRESHOLD) {
+			return res;
+		}
 		res = defaultPriceScale.coordinateToPrice(nearest, firstValue);
 
 		return res;
