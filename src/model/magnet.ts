@@ -12,6 +12,7 @@ import { TimePointIndex } from './time-data';
 
 export class Magnet {
 	private readonly _options: CrosshairOptions;
+
 	public constructor(options: CrosshairOptions) {
 		this._options = options;
 	}
