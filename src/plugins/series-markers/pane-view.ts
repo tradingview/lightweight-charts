@@ -17,7 +17,7 @@ import {
 	SeriesMarkerRendererDataItem,
 	SeriesMarkersRenderer,
 } from './renderer';
-import { InternalSeriesMarker } from './types';
+import { InternalSeriesMarker, SeriesMarkerPosition, SeriesMarkerPricePosition } from './types';
 import {
 	calculateShapeHeight,
 	shapeMargin as calculateShapeMargin,
@@ -32,143 +32,32 @@ interface Offsets {
 	belowBar: number;
 }
 
-// Helper function to calculate marker size more precisely
-function calculateMarkerSize(barSpacing: number, sizeMultiplier: number): number {
-	// Base size from the standard calculation
-	const baseSize = calculateShapeHeight(barSpacing);
-	
-	// If size multiplier is 1, return the standard size
-	if (sizeMultiplier === 1) {
-		return baseSize;
-	}
-	
-	// For other size multipliers, scale more aggressively
-	// This allows for more noticeable size differences
-	if (sizeMultiplier < 1) {
-		// For smaller sizes, scale down more aggressively
-		return Math.max(baseSize * (0.5 + 0.5 * sizeMultiplier), 6);
-	} else {
-		// For larger sizes, scale up more aggressively
-		return baseSize * sizeMultiplier;
-	}
+function isPriceMarker(position: SeriesMarkerPosition): position is SeriesMarkerPricePosition {
+	return position === 'atPriceTop' || position === 'atPriceBottom' || position === 'atPriceMiddle';
 }
 
-// Helper function to handle price-based positioning
-/* eslint-disable */
-function positionMarkerAtPrice<HorzScaleItem>(
-	rendererItem: SeriesMarkerRendererDataItem,
-	marker: InternalSeriesMarker<TimePointIndex>,
-	y: number | null,
-	series: ISeriesApi<SeriesType, HorzScaleItem>,
-	textHeight: number,
-	shapeMargin: number,
-	chart?: IChartApiBase<HorzScaleItem>
-): boolean {
-	// If we don't have a price, we can't position properly
-	if (marker.price === undefined) {
-		return false;
+function getPrice(seriesData: SeriesDataItemTypeMap<unknown>[SeriesType], marker: InternalSeriesMarker<TimePointIndex>): number | undefined {
+	if (isPriceMarker(marker.position) && marker.price) {
+		return marker.price;
 	}
-	
-	// ALWAYS get fresh coordinate for the marker price
-	// This ensures we use the latest price scale, matching how price lines work
-	const latestYCoordinate = series.priceToCoordinate(marker.price);	
-	if (latestYCoordinate === null) {
-		return false;
+	if (isValueData(seriesData)) {
+		return seriesData.value;
 	}
-	
-	// Use the latest coordinate instead of the cached value
-	y = latestYCoordinate;
-	
-	// Get the timeScale from chart to ensure we use the exact same barSpacing
-	const timeScale = chart?.timeScale();
-	if (!timeScale) {
-		return false;
+	if (isOhlcData(seriesData)) {
+		if (marker.position === 'inBar') {
+			return seriesData.close;
+		}
+		if (marker.position === 'aboveBar') {
+			return seriesData.high;
+		}
+		if (marker.position === 'belowBar') {
+			return seriesData.low;
+		}
 	}
-	
-	// Use EXACTLY the same size calculation as in fillSizeAndY
-	const sizeMultiplier = isNumber(marker.size) ? Math.max(marker.size, 0) : 1;
-	const barSpacing = timeScale.options().barSpacing;
-	// Use our new more precise size calculation
-	const shapeSize = calculateMarkerSize(barSpacing, sizeMultiplier);
-	
-	const halfSize = shapeSize / 2;
-	rendererItem.size = shapeSize;
-
-	// Position the marker based on its position property and price
-	switch (marker.position) {
-		case 'atPriceTop':
-			// Position marker so its bottom edge is exactly at the price level
-			rendererItem.y = (y - halfSize) as Coordinate;
-			if (rendererItem.text !== undefined) {
-				// Position text above marker using original logic
-				rendererItem.text.y = (rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
-			}
-			break;
-		case 'atPriceBottom':
-			// Position marker so its top edge is exactly at the price level
-			rendererItem.y = (y + halfSize) as Coordinate;
-			if (rendererItem.text !== undefined) {
-				// Position text below marker using original logic
-				rendererItem.text.y = (rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
-			}
-			break;
-		case 'atPriceMiddle':
-			// Position marker centered at the price level
-			rendererItem.y = y as Coordinate;
-			if (rendererItem.text !== undefined) {
-				// Position text above marker using original logic
-				rendererItem.text.y = (rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
-			}
-			break;
-		default:
-			// For other positions, we'll handle them in the original way
-			return false;
-	}
-	
-	return true;
-}
-/* eslint-enable */
-
-
-
-// Helper function to position marker above bar
-function positionAboveBar<HorzScaleItem>(
-	series: ISeriesApi<SeriesType, HorzScaleItem>,
-	highPrice: number,
-	halfSize: number,
-	offsets: Offsets,
-	shapeSize: number,
-	shapeMargin: number
-): Coordinate | null {
-	const topCoordinate = series.priceToCoordinate(highPrice);
-	if (topCoordinate === null) {
-		return null;
-	}
-	const y = topCoordinate - halfSize - offsets.aboveBar as Coordinate;
-	offsets.aboveBar += shapeSize + shapeMargin;
-	return y;
+	return;
 }
 
-// Helper function to position marker below bar
-function positionBelowBar<HorzScaleItem>(
-	series: ISeriesApi<SeriesType, HorzScaleItem>,
-	lowPrice: number,
-	halfSize: number,
-	offsets: Offsets,
-	shapeSize: number,
-	shapeMargin: number
-): Coordinate | null {
-	const bottomCoordinate = series.priceToCoordinate(lowPrice);
-	if (bottomCoordinate === null) {
-		return null;
-	}
-	const y = bottomCoordinate + halfSize + offsets.belowBar as Coordinate;
-	offsets.belowBar += shapeSize + shapeMargin;
-	return y;
-}
-
-// eslint-disable-next-line max-params
-/* eslint-disable */
+// eslint-disable-next-line max-params, complexity
 function fillSizeAndY<HorzScaleItem>(
 	rendererItem: SeriesMarkerRendererDataItem,
 	marker: InternalSeriesMarker<TimePointIndex>,
@@ -179,133 +68,52 @@ function fillSizeAndY<HorzScaleItem>(
 	series: ISeriesApi<SeriesType, HorzScaleItem>,
 	chart: IChartApiBase<HorzScaleItem>
 ): void {
-	// If marker has a price property AND is using one of the atPrice* positions,
-	// prioritize exact price positioning
-	if (marker.price !== undefined && 
-	    (marker.position === 'atPriceTop' || 
-	     marker.position === 'atPriceBottom' || 
-	     marker.position === 'atPriceMiddle')) {
-		// We don't need to pass the y coordinate - positionMarkerAtPrice will get it fresh
-		if (positionMarkerAtPrice(rendererItem, marker, null, series, textHeight, shapeMargin, chart)) {
-			// Successfully positioned using price, we're done
-			return;
-		}
-		// Only if price-to-coordinate conversion fails, fall back to bar positioning
-	}
-
-	// Original positioning logic
-	const timeScale = chart.timeScale();
-	let inBarPrice: number;
-	let highPrice: number;
-	let lowPrice: number;
-
-	if (isValueData(seriesData)) {
-		inBarPrice = seriesData.value;
-		highPrice = seriesData.value;
-		lowPrice = seriesData.value;
-	} else if (isOhlcData(seriesData)) {
-		inBarPrice = seriesData.close;
-		highPrice = seriesData.high;
-		lowPrice = seriesData.low;
-	} else {
+	const price = getPrice(seriesData, marker);
+	if (price === undefined) {
 		return;
 	}
-
+	const ignoreOffset = isPriceMarker(marker.position);
+	const timeScale = chart.timeScale();
 	const sizeMultiplier = isNumber(marker.size) ? Math.max(marker.size, 0) : 1;
-	const barSpacing = timeScale.options().barSpacing;
-	
-	
-	// Use our new more precise size calculation
-	const shapeSize = calculateMarkerSize(barSpacing, sizeMultiplier);
-	
+	const shapeSize = calculateShapeHeight(timeScale.options().barSpacing) * sizeMultiplier;
+
 	const halfSize = shapeSize / 2;
 	rendererItem.size = shapeSize;
-	
-	let y: Coordinate | null = null;
-	
-	switch (marker.position) {
-		case 'inBar': {
-			rendererItem.y = ensureNotNull(series.priceToCoordinate(inBarPrice));
-			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = (rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
-			}
-			return;
-		}
-		case 'aboveBar': {
-			y = positionAboveBar(series, highPrice, halfSize, offsets, shapeSize, shapeMargin);
-			if (y === null) return;
-			rendererItem.y = y;
-			
-			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = (rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
-				offsets.aboveBar += textHeight * (1 + 2 * Constants.TextMargin);
-			}
-			return;
-		}
-		case 'belowBar': {
-			y = positionBelowBar(series, lowPrice, halfSize, offsets, shapeSize, shapeMargin);
-			if (y === null) return;
-			rendererItem.y = y;
-			
-			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = (rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
-				offsets.belowBar += textHeight * (1 + 2 * Constants.TextMargin);
-			}
-			return;
-		}
-		// Handle the price-based positions as a fallback if they didn't have a price attribute
-		case 'atPriceTop': {
-			if (marker.price !== undefined) {
-				// This should have been handled by positionMarkerAtPrice
-				// If we're here, it means the price coordinate conversion failed
-				return;
-			}
-			// Fallback to aboveBar behavior
-			y = positionAboveBar(series, highPrice, halfSize, offsets, shapeSize, shapeMargin);
-			if (y === null) return;
-			rendererItem.y = y;
-			
-			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = (rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
-				offsets.aboveBar += textHeight * (1 + 2 * Constants.TextMargin);
-			}
-			return;
-		}
-		case 'atPriceBottom': {
-			if (marker.price !== undefined) {
-				// This should have been handled by positionMarkerAtPrice
-				// If we're here, it means the price coordinate conversion failed
-				return;
-			}
-			// Fallback to belowBar behavior
-			y = positionBelowBar(series, lowPrice, halfSize, offsets, shapeSize, shapeMargin);
-			if (y === null) return;
-			rendererItem.y = y;
-			
-			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = (rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
-				offsets.belowBar += textHeight * (1 + 2 * Constants.TextMargin);
-			}
-			return;
-		}
+
+	const position = marker.position;
+	switch (position) {
+		case 'inBar':
 		case 'atPriceMiddle': {
-			if (marker.price !== undefined) {
-				// This should have been handled by positionMarkerAtPrice
-				// If we're here, it means the price coordinate conversion failed
-				return;
-			}
-			// Fallback to inBar behavior
-			rendererItem.y = ensureNotNull(series.priceToCoordinate(inBarPrice));
+			rendererItem.y = ensureNotNull(series.priceToCoordinate(price));
 			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = (rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
+				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin) as Coordinate;
+			}
+			return;
+		}
+		case 'aboveBar':
+		case 'atPriceTop': {
+			const offset = ignoreOffset ? 0 : offsets.aboveBar;
+			rendererItem.y = (ensureNotNull(series.priceToCoordinate(price)) - halfSize - offset) as Coordinate;
+			if (rendererItem.text !== undefined) {
+				rendererItem.text.y = rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin) as Coordinate;
+				offsets.aboveBar += textHeight * (1 + 2 * Constants.TextMargin);
+			}
+			return;
+		}
+		case 'belowBar':
+		case 'atPriceBottom': {
+			const offset = ignoreOffset ? 0 : offsets.belowBar;
+			rendererItem.y = (ensureNotNull(series.priceToCoordinate(price)) + halfSize + offset) as Coordinate;
+			if (rendererItem.text !== undefined) {
+				rendererItem.text.y = (rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
+				offsets.belowBar += textHeight * (1 + 2 * Constants.TextMargin);
 			}
 			return;
 		}
 	}
 
-	ensureNever(marker.position);
+	ensureNever(position);
 }
-/* eslint-enable */
 
 function isValueData<HorzScaleItem>(
 	data: SeriesDataItemTypeMap<HorzScaleItem>[SeriesType]
