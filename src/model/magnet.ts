@@ -59,7 +59,7 @@ export class Magnet {
 					? [PlotRowValueIndex.Open, PlotRowValueIndex.High, PlotRowValueIndex.Low, PlotRowValueIndex.Close]
 					: [PlotRowValueIndex.Close];
 				return acc.concat(
-					plotRowKeys.map(key: PlotRowValueIndex => ps.priceToCoordinate(bar.value[key], firstPrice.value))
+					plotRowKeys.map((key: PlotRowValueIndex) => ps.priceToCoordinate(bar.value[key], firstPrice.value))
 				);
 			},
 			[] as Coordinate[]);
