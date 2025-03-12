@@ -12,8 +12,6 @@ import { TimePointIndex } from './time-data';
 
 export class Magnet {
 	private readonly _options: CrosshairOptions;
-	private static readonly MAGNET_THRESHOLD: number = 15;
-
 	public constructor(options: CrosshairOptions) {
 		this._options = options;
 	}
@@ -71,9 +69,6 @@ export class Magnet {
 		candidates.sort((y1: Coordinate, y2: Coordinate) => Math.abs(y1 - y) - Math.abs(y2 - y));
 
 		const nearest = candidates[0];
-		if (this._options.mode === CrosshairMode.MagnetOHLC && Math.abs(nearest - y) > Magnet.MAGNET_THRESHOLD) {
-			return res;
-		}
 		res = defaultPriceScale.coordinateToPrice(nearest, firstValue);
 
 		return res;
