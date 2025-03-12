@@ -98,6 +98,9 @@ function fillSizeAndY<HorzScaleItem>(
 				rendererItem.text.y = rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin) as Coordinate;
 				offsets.aboveBar += textHeight * (1 + 2 * Constants.TextMargin);
 			}
+			if (!ignoreOffset) {
+				offsets.aboveBar += shapeSize + shapeMargin;
+			}
 			return;
 		}
 		case 'belowBar':
@@ -107,6 +110,9 @@ function fillSizeAndY<HorzScaleItem>(
 			if (rendererItem.text !== undefined) {
 				rendererItem.text.y = (rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
 				offsets.belowBar += textHeight * (1 + 2 * Constants.TextMargin);
+			}
+			if (!ignoreOffset) {
+				offsets.belowBar += shapeSize + shapeMargin;
 			}
 			return;
 		}
