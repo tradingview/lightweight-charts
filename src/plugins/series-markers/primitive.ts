@@ -54,6 +54,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		if (this._series && this._dataChangedHandler) {
 			this._series.unsubscribeDataChanged(this._dataChangedHandler);
 		}
+
 		this._chart = null;
 		this._series = null;
 		this._paneView = null;
@@ -138,6 +139,9 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 					inBar: false,
 					aboveBar: false,
 					belowBar: false,
+					atPriceTop: false,
+					atPriceBottom: false,
+					atPriceMiddle: false,
 				}
 			);
 		}
@@ -149,21 +153,21 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 			return;
 		}
 		const timeScale = this._chart.timeScale();
-		if (timeScale.getVisibleLogicalRange() == null || !this._series || this._series?.data().length === 0) {
+		const seriesData = this._series?.data();
+		if (timeScale.getVisibleLogicalRange() == null || !this._series || seriesData.length === 0) {
 			this._indexedMarkers = [];
 			return;
 		}
 
-		const seriesData = this._series?.data();
 		const firstDataIndex = timeScale.timeToIndex(ensureNotNull(seriesData[0].time), true) as unknown as Logical;
 		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<HorzScaleItem>, index: number) => {
 			const timePointIndex = timeScale.timeToIndex(marker.time, true) as unknown as Logical;
 			const searchMode = timePointIndex < firstDataIndex ? MismatchDirection.NearestRight : MismatchDirection.NearestLeft;
 			const seriesDataByIndex = ensureNotNull(this._series).dataByIndex(timePointIndex, searchMode);
-			// @TODO think about should we expose the series' `.search()` method
 			const finalIndex = timeScale.timeToIndex(ensureNotNull(seriesDataByIndex).time, false) as unknown as TimePointIndex;
 
-			return {
+			// You must explicitly define the types so that the minification build processes the field names correctly
+			const baseMarker: InternalSeriesMarker<TimePointIndex> = {
 				time: finalIndex,
 				position: marker.position,
 				shape: marker.shape,
@@ -172,8 +176,30 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 				internalId: index,
 				text: marker.text,
 				size: marker.size,
+				price: marker.price,
 				originalTime: marker.time,
 			};
+
+			if (
+				marker.position === 'atPriceTop' ||
+				marker.position === 'atPriceBottom' ||
+				marker.position === 'atPriceMiddle'
+			) {
+				if (marker.price === undefined) {
+					throw new Error(`Price is required for position ${marker.position}`);
+				}
+				return {
+					...baseMarker,
+					position: marker.position, // TypeScript knows this is SeriesMarkerPricePosition
+					price: marker.price,
+				} satisfies InternalSeriesMarker<TimePointIndex>;
+			} else {
+				return {
+					...baseMarker,
+					position: marker.position, // TypeScript knows this is SeriesMarkerBarPosition
+					price: marker.price, // Optional for bar positions
+				} satisfies InternalSeriesMarker<TimePointIndex>;
+			}
 		});
 		this._recalculationRequired = false;
 	}
