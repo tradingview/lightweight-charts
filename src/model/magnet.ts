@@ -10,6 +10,16 @@ import { Series } from './series';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 
+const magnetPlotRowKeys: readonly PlotRowValueIndex[] = [
+	PlotRowValueIndex.Close,
+] as const;
+const magnetOHLCPlotRowKeys: readonly PlotRowValueIndex[] = [
+	PlotRowValueIndex.Open,
+	PlotRowValueIndex.High,
+	PlotRowValueIndex.Low,
+	PlotRowValueIndex.Close,
+] as const;
+
 export class Magnet {
 	private readonly _options: CrosshairOptions;
 
@@ -54,7 +64,12 @@ export class Magnet {
 
 				// convert bar to pixels
 				const firstPrice = ensure(series.firstValue());
-				return acc.concat([ps.priceToCoordinate(bar.value[PlotRowValueIndex.Close], firstPrice.value)]);
+				const plotRowKeys = this._options.mode === CrosshairMode.MagnetOHLC
+					? magnetOHLCPlotRowKeys
+					: magnetPlotRowKeys;
+				return acc.concat(
+					plotRowKeys.map((key: PlotRowValueIndex) => ps.priceToCoordinate(bar.value[key], firstPrice.value))
+				);
 			},
 			[] as Coordinate[]);
 

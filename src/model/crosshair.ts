@@ -51,6 +51,10 @@ export const enum CrosshairMode {
 	 * This mode disables rendering of the crosshair.
 	 */
 	Hidden,
+	/**
+	 * This mode sticks crosshair's horizontal line to the price value of a single-value series or to the open/high/low/close price of OHLC-based series.
+	 */
+	MagnetOHLC,
 }
 
 /** Structure describing a crosshair line (vertical or horizontal) */
