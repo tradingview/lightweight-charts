@@ -16,6 +16,18 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+<!--
+
+Unreleased
+
+## 5.0.4
+
+**Improvements**
+
+- Fixed performance degradation when adding series markers to charts with large datasets (15,000+ data points) by optimizing marker calculations to only run when necessary. (PR [#1835](https://github.com/tradingview/lightweight-charts/pull/1835), fixes [#1808](https://github.com/tradingview/lightweight-charts/issues/1808))
+
+-->
+
 ## 5.0.3
 
 **Bug Fixes**

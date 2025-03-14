@@ -31,6 +31,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	private _autoScaleMargins: AutoScaleMargins | null = null;
 	private _markersPositions: MarkerPositions | null = null;
 	private _cachedBarSpacing: number | null = null;
+	private _recalculationRequired: boolean = true;
 
 	public attached(param: SeriesAttachedParameter<HorzScaleItem>): void {
 		this._recalculateMarkers();
@@ -39,6 +40,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		this._paneView = new SeriesMarkersPaneView(this._series, ensureNotNull(this._chart));
 		this._requestUpdate = param.requestUpdate;
 		this._series.subscribeDataChanged((scope: DataChangedScope) => this._onDataChanged(scope));
+		this._recalculationRequired = true;
 		this.requestUpdate();
 	}
 
@@ -59,6 +61,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	}
 
 	public setMarkers(markers: SeriesMarker<HorzScaleItem>[]): void {
+		this._recalculationRequired = true;
 		this._markers = markers;
 		this._recalculateMarkers();
 		this._autoScaleMarginsInvalidated = true;
@@ -142,7 +145,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	}
 
 	private _recalculateMarkers(): void {
-		if (!this._chart || !this._series) {
+		if (!this._recalculationRequired || !this._chart || !this._series) {
 			return;
 		}
 		const timeScale = this._chart.timeScale();
@@ -172,6 +175,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 				originalTime: marker.time,
 			};
 		});
+		this._recalculationRequired = false;
 	}
 
 	private _updateAllViews(updateType?: UpdateType): void {
@@ -183,6 +187,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	}
 
 	private _onDataChanged(scope: DataChangedScope): void {
+		this._recalculationRequired = true;
 		this.requestUpdate();
 	}
 }
