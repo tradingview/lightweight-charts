@@ -17,7 +17,7 @@ import {
 	SeriesMarkerRendererDataItem,
 	SeriesMarkersRenderer,
 } from './renderer';
-import { InternalSeriesMarker } from './types';
+import { InternalSeriesMarker, SeriesMarkerPosition, SeriesMarkerPricePosition } from './types';
 import {
 	calculateShapeHeight,
 	shapeMargin as calculateShapeMargin,
@@ -32,7 +32,32 @@ interface Offsets {
 	belowBar: number;
 }
 
-// eslint-disable-next-line max-params
+function isPriceMarker(position: SeriesMarkerPosition): position is SeriesMarkerPricePosition {
+	return position === 'atPriceTop' || position === 'atPriceBottom' || position === 'atPriceMiddle';
+}
+
+function getPrice(seriesData: SeriesDataItemTypeMap<unknown>[SeriesType], marker: InternalSeriesMarker<TimePointIndex>): number | undefined {
+	if (isPriceMarker(marker.position) && marker.price) {
+		return marker.price;
+	}
+	if (isValueData(seriesData)) {
+		return seriesData.value;
+	}
+	if (isOhlcData(seriesData)) {
+		if (marker.position === 'inBar') {
+			return seriesData.close;
+		}
+		if (marker.position === 'aboveBar') {
+			return seriesData.high;
+		}
+		if (marker.position === 'belowBar') {
+			return seriesData.low;
+		}
+	}
+	return;
+}
+
+// eslint-disable-next-line max-params, complexity
 function fillSizeAndY<HorzScaleItem>(
 	rendererItem: SeriesMarkerRendererDataItem,
 	marker: InternalSeriesMarker<TimePointIndex>,
@@ -43,56 +68,57 @@ function fillSizeAndY<HorzScaleItem>(
 	series: ISeriesApi<SeriesType, HorzScaleItem>,
 	chart: IChartApiBase<HorzScaleItem>
 ): void {
-	const timeScale = chart.timeScale();
-	let inBarPrice: number;
-	let highPrice: number;
-	let lowPrice: number;
-
-	if (isValueData(seriesData)) {
-		inBarPrice = seriesData.value;
-		highPrice = seriesData.value;
-		lowPrice = seriesData.value;
-	} else if (isOhlcData(seriesData)) {
-		inBarPrice = seriesData.close;
-		highPrice = seriesData.high;
-		lowPrice = seriesData.low;
-	} else {
+	const price = getPrice(seriesData, marker);
+	if (price === undefined) {
 		return;
 	}
-
+	const ignoreOffset = isPriceMarker(marker.position);
+	const timeScale = chart.timeScale();
 	const sizeMultiplier = isNumber(marker.size) ? Math.max(marker.size, 0) : 1;
 	const shapeSize = calculateShapeHeight(timeScale.options().barSpacing) * sizeMultiplier;
+
 	const halfSize = shapeSize / 2;
 	rendererItem.size = shapeSize;
-	switch (marker.position) {
-		case 'inBar': {
-			rendererItem.y = ensureNotNull(series.priceToCoordinate(inBarPrice));
+
+	const position = marker.position;
+	switch (position) {
+		case 'inBar':
+		case 'atPriceMiddle': {
+			rendererItem.y = ensureNotNull(series.priceToCoordinate(price));
 			if (rendererItem.text !== undefined) {
 				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin) as Coordinate;
 			}
 			return;
 		}
-		case 'aboveBar': {
-			rendererItem.y = (ensureNotNull(series.priceToCoordinate(highPrice)) - halfSize - offsets.aboveBar) as Coordinate;
+		case 'aboveBar':
+		case 'atPriceTop': {
+			const offset = ignoreOffset ? 0 : offsets.aboveBar;
+			rendererItem.y = (ensureNotNull(series.priceToCoordinate(price)) - halfSize - offset) as Coordinate;
 			if (rendererItem.text !== undefined) {
 				rendererItem.text.y = rendererItem.y - halfSize - textHeight * (0.5 + Constants.TextMargin) as Coordinate;
 				offsets.aboveBar += textHeight * (1 + 2 * Constants.TextMargin);
 			}
-			offsets.aboveBar += shapeSize + shapeMargin;
+			if (!ignoreOffset) {
+				offsets.aboveBar += shapeSize + shapeMargin;
+			}
 			return;
 		}
-		case 'belowBar': {
-			rendererItem.y = (ensureNotNull(series.priceToCoordinate(lowPrice)) + halfSize + offsets.belowBar) as Coordinate;
+		case 'belowBar':
+		case 'atPriceBottom': {
+			const offset = ignoreOffset ? 0 : offsets.belowBar;
+			rendererItem.y = (ensureNotNull(series.priceToCoordinate(price)) + halfSize + offset) as Coordinate;
 			if (rendererItem.text !== undefined) {
-				rendererItem.text.y = rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin) as Coordinate;
+				rendererItem.text.y = (rendererItem.y + halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin)) as Coordinate;
 				offsets.belowBar += textHeight * (1 + 2 * Constants.TextMargin);
 			}
-			offsets.belowBar += shapeSize + shapeMargin;
+			if (!ignoreOffset) {
+				offsets.belowBar += shapeSize + shapeMargin;
+			}
 			return;
 		}
 	}
 
-	ensureNever(marker.position);
+	ensureNever(position);
 }
 
 function isValueData<HorzScaleItem>(

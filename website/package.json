@@ -17,7 +17,6 @@
     "@docusaurus/module-type-aliases": "3.7.0",
     "@docusaurus/preset-classic": "3.7.0",
     "@docusaurus/theme-search-algolia": "3.7.0",
-    "@tsconfig/docusaurus": "2.0.3",
     "@types/react": "18.3",
     "cross-env": "7.0.3",
     "docusaurus-plugin-typedoc": "1.0.1",
@@ -38,6 +37,7 @@
     "vue": "3.5.13"
   },
   "devDependencies": {
+    "@tsconfig/docusaurus": "2.0.3",
     "typedoc-plugin-frontmatter": "1.0.0"
   }
 }
