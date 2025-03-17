@@ -52,8 +52,9 @@ function beforeInteractions(container) {
 		mainSeries,
 		[
 			{
+				price: price,
 				time: markerTime,
-				position: 'belowBar',
+				position: 'atPriceMiddle',
 				color: '#2196F3',
 				shape: 'arrowUp',
 				text: 'This is a Marker',
