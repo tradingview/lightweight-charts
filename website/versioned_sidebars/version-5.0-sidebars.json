@@ -503,11 +503,6 @@
         },
         {
           "type": "doc",
-          "id": "api/interfaces/SeriesMarker",
-          "label": "SeriesMarker"
-        },
-        {
-          "type": "doc",
           "id": "api/interfaces/SeriesOptionsCommon",
           "label": "SeriesOptionsCommon"
         },
@@ -896,6 +891,11 @@
           "type": "doc",
           "id": "api/type-aliases/Rgba",
           "label": "Rgba"
+        },
+        {
+          "type": "doc",
+          "id": "api/type-aliases/SeriesMarker",
+          "label": "SeriesMarker"
         },
         {
           "type": "doc",
