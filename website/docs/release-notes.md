@@ -20,13 +20,22 @@ toc_max_heading_level: 2
 
 Unreleased
 
+## 5.0.5
+
+-->
 ## 5.0.4
 
 **Improvements**
 
 - Fixed performance degradation when adding series markers to charts with large datasets (15,000+ data points) by optimizing marker calculations to only run when necessary. (PR [#1835](https://github.com/tradingview/lightweight-charts/pull/1835), fixes [#1808](https://github.com/tradingview/lightweight-charts/issues/1808))
+- Added price-based positioning for series markers, allowing more precise control over marker placement. New position types include `atPriceTop`, `atPriceBottom`, and `atPriceMiddle`, which require a `price` value to be specified. (PR [#1826](https://github.com/tradingview/lightweight-charts/pull/1826), thanks to [@EranGrin](https://github.com/EranGrin))
+- Added `MagnetOHLC` to `CrosshairMode`. This mode sticks the crosshair's horizontal line to the price value of a single-value series or to the open/high/low/close price of OHLC-based series. (PR [#1831](https://github.com/tradingview/lightweight-charts/pull/1831), thanks to [@Jonney](https://github.com/Jonney))
 
--->
+**Bug Fixes**
+
+- Fixed an issue where the crosshair marker would be visible on the first data point when the chart is initially loaded, before any user interaction. This behavior has been reverted to match version 4, where the crosshair remains hidden until user interaction. (PR [#1840](https://github.com/tradingview/lightweight-charts/pull/1840))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.0.3..v5.0.4).
 
 ## 5.0.3
 
