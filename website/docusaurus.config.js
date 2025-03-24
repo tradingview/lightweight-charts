@@ -1,10 +1,8 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-import path from 'path';
-import fs from 'fs';
-import fsp from 'fs/promises';
-import https from 'https';
+import path from 'node:path';
+import fs from 'node:fs/promises';
 
 import { themes } from 'prism-react-renderer';
 import pluginDocusaurus from 'docusaurus-plugin-typedoc';
@@ -24,80 +22,92 @@ const cacheDir = path.resolve(
 );
 const typedocWatch = process.env.TYPEDOC_WATCH === 'true';
 
-function delay(duration) {
-	return new Promise(resolve => {
-		setTimeout(resolve, duration);
-	});
+async function ensureDirectoryExists(directory) {
+	try {
+		await fs.mkdir(directory, { recursive: true });
+	} catch (error) {
+		// Ignore the error if the directory already exists
+		if (error.code !== 'EEXIST') {
+			throw error;
+		}
+	}
 }
 
-function downloadFile(urlString, filePath, retriesRemaining = 0, attempt = 1) {
-	return new Promise((resolve, reject) => {
-		let file;
+async function downloadFile(
+	urlString,
+	filePath,
+	retriesRemaining = 3,
+	attempt = 1
+) {
+	try {
+		// Ensure the directory exists
+		const directory = path.dirname(filePath);
+		await ensureDirectoryExists(directory);
 
-		const url = new URL(urlString);
-
-		const request = https.get(url, response => {
-			if (
-				response.statusCode &&
-				response.statusCode >= 300 &&
-				response.statusCode < 400 &&
-				response.headers.location !== undefined
-			) {
-				// handling redirect
-				url.pathname = response.headers.location;
-				downloadFile(url.toString(), filePath, retriesRemaining).then(
-					resolve,
-					reject
-				);
-				return;
-			}
-
-			if (
-				response.statusCode &&
-				(response.statusCode < 100 || response.statusCode > 299)
-			) {
-				if (retriesRemaining > 0) {
-					logger.info(
-						`Failed to download from ${urlString}, attempting again (${
-							retriesRemaining - 1
-						} retries remaining).`
-					);
-					delay(Math.pow(2, attempt) * 200).then(() => {
-						downloadFile(
-							url.toString(),
-							filePath,
-							retriesRemaining - 1,
-							attempt + 1
-						).then(resolve, reject);
-					});
-					return;
-				}
-				reject(
-					new Error(
-						`Cannot download file "${urlString}", error code=${response.statusCode}`
-					)
-				);
-				return;
-			}
-
-			file = fs.createWriteStream(filePath);
-			file.on('finish', () => {
-				file.close(resolve);
-			});
-
-			response.pipe(file);
+		const response = await fetch(urlString, {
+			redirect: 'follow', // Automatically follow redirects
+			signal: AbortSignal.timeout(5000), // 5 second timeout
 		});
 
-		request.on('error', error => {
-			if (file !== undefined) {
-				file.close();
+		if (!response.ok) {
+			// Handle non-2xx responses
+			if (retriesRemaining > 0) {
+				logger.info(
+					`Failed to download from ${urlString}, attempting again (${
+						retriesRemaining - 1
+					} retries remaining).`
+				);
+
+				// Exponential backoff
+				await new Promise(resolve =>
+					setTimeout(resolve, Math.pow(2, attempt) * 200)
+				);
+
+				return downloadFile(
+					urlString,
+					filePath,
+					retriesRemaining - 1,
+					attempt + 1
+				);
 			}
 
-			reject(error);
-		});
-	});
+			throw new Error(
+				`Cannot download file "${urlString}", error code=${response.status}`
+			);
+		}
+
+		// Get the response as an ArrayBuffer or Buffer
+		const fileData = await response.arrayBuffer();
+
+		// Write the file asynchronously
+		await fs.writeFile(filePath, Buffer.from(fileData));
+	} catch (error) {
+		// Handle fetch errors (network issues, timeouts, etc.)
+		if (error.name === 'AbortError') {
+			if (retriesRemaining > 0) {
+				logger.info(
+					`Request timed out for ${urlString}, attempting again (${
+						retriesRemaining - 1
+					} retries remaining).`
+				);
+
+				return downloadFile(
+					urlString,
+					filePath,
+					retriesRemaining - 1,
+					attempt + 1
+				);
+			}
+		}
+
+		throw error;
+	}
 }
 
+/**
+ * @param {string} typingsFilePath
+ * @param {any} version
+ */
 function downloadTypingsToFile(typingsFilePath, version) {
 	return downloadFile(
 		`https://unpkg.com/lightweight-charts@${version}/dist/typings.d.ts`,
@@ -106,15 +116,21 @@ function downloadTypingsToFile(typingsFilePath, version) {
 	);
 }
 
+/**
+ * @param {any} version
+ */
 function getTypingsCacheFilePath(version) {
 	return path.resolve(cacheDir, `./v${version}.d.ts`);
 }
 
+/**
+ * @param {any} version
+ */
 async function downloadTypingsFromUnpkg(version) {
 	const typingsFilePath = getTypingsCacheFilePath(version);
 
 	try {
-		await fsp.stat(typingsFilePath);
+		await fs.stat(typingsFilePath);
 	} catch (e) {
 		if (e.code !== 'ENOENT') {
 			throw e;
@@ -146,8 +162,11 @@ const commonDocusaurusPluginTypedocConfig = {
 	},
 };
 
+/**
+ * @param {any} version
+ */
 function typedocPluginForVersion(version) {
-	return context => ({
+	return (/** @type {any} */ context) => ({
 		name: `typedoc-for-v${version}`,
 		loadContent: async () => {
 			await pluginDocusaurus(context, {

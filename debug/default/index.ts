@@ -2,32 +2,15 @@ import {
 	AreaSeries,
 	CandlestickSeries,
 	ChartOptions,
-	ColorType,
 	createChart,
 	DeepPartial,
 } from "lightweight-charts";
 
 const chartOptions = {
-	layout: {
-		textColor: "black",
-		background: {
-			type: ColorType.Solid,
-			color: "white",
-		},
-	},
+	autosize: true,
 } satisfies DeepPartial<ChartOptions>;
 
-const chart = createChart(
-	(() => {
-		const containerElement = document.createElement("div");
-		containerElement.style.width = "1024px";
-		containerElement.style.height = "768px";
-		document.body.appendChild(containerElement);
-
-		return containerElement;
-	})(),
-	chartOptions
-);
+const chart = createChart('container', chartOptions);
 
 const areaSeries = chart.addSeries(AreaSeries, {
 	lineColor: "#2962FF",

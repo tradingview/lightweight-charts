@@ -136,7 +136,7 @@ export class Crosshair extends DataSource {
 	private _pane: Pane | null = null;
 	private _price: number = NaN;
 	private _index: TimePointIndex = 0 as TimePointIndex;
-	private _visible: boolean = true;
+	private _visible: boolean = false; // initially the crosshair should not be visible, until the user interacts.
 	private readonly _model: IChartModelBase;
 	private _priceAxisViews: Map<PriceScale, CrosshairPriceAxisView> = new Map();
 	private readonly _timeAxisView: CrosshairTimeAxisView;
