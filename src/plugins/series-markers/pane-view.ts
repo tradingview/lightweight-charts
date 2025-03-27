@@ -7,6 +7,7 @@ import { isNumber } from '../../helpers/strict-type-checks';
 import { Coordinate } from '../../model/coordinate';
 import { AreaData, BarData, BaselineData, CandlestickData, HistogramData, LineData, SeriesDataItemTypeMap, SingleValueData } from '../../model/data-consumer';
 import { IPrimitivePaneView } from '../../model/ipane-primitive';
+import { MismatchDirection } from '../../model/plot-list';
 import { RangeImpl } from '../../model/range-impl';
 import { SeriesType } from '../../model/series-options';
 import { Logical, TimePointIndex, visibleTimedValues } from '../../model/time-data';
@@ -37,7 +38,7 @@ function isPriceMarker(position: SeriesMarkerPosition): position is SeriesMarker
 }
 
 function getPrice(seriesData: SeriesDataItemTypeMap<unknown>[SeriesType], marker: InternalSeriesMarker<TimePointIndex>): number | undefined {
-	if (isPriceMarker(marker.position) && marker.price) {
+	if (isPriceMarker(marker.position) && marker.price !== undefined) {
 		return marker.price;
 	}
 	if (isValueData(seriesData)) {
@@ -246,8 +247,8 @@ export class SeriesMarkersPaneView<HorzScaleItem> implements IPrimitivePaneView 
 				};
 			}
 
-			const dataAt = this._series.dataByIndex(marker.time, -1);
-			if (!dataAt) {
+			const dataAt = this._series.dataByIndex(marker.time, MismatchDirection.None);
+			if (dataAt === null) {
 				continue;
 			}
 			fillSizeAndY<HorzScaleItem>(rendererItem, marker, dataAt, offsets, layoutOptions.fontSize, shapeMargin, this._series, this._chart);
