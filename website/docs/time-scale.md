@@ -12,7 +12,7 @@ Time scale (or time axis) is a horizontal scale that displays the time of data p
 
 To adjust the time scale appearance, use either the [`ITimeScaleApi.applyOptions`](/api/interfaces/ITimeScaleApi.md#applyoptions) or [`IChartApi.applyOptions`](/api/interfaces/IChartApi.md#applyoptions) method. Both methods produce the same result. Refer to [`TimeScaleOptions`](/api/interfaces/TimeScaleOptions.md) for a list of available options.
 
-You can call the [`IChartApi.timeScale`](/api/interfaces/IChartApi.md#timescale) method to manage the time scale.
+You can call the [`IChartApi.timeScale`](/api/interfaces/IChartApi.md#timescale) method to manage the scale.
 This method returns an instance of the [`ITimeScaleApi`](/api/interfaces/ITimeScaleApi.md) interface that provides an extensive API for controlling the time scale. For example, you can adjust the visible range, convert a time point or [index](/api/type-aliases/Logical.md) to a coordinate, and subscribe to events.
 
 ## Logical range
