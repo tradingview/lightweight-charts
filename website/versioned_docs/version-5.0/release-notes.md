@@ -16,6 +16,14 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.5
+
+**Bug Fixes**
+
+- Fixed an issue where the series marker plugin could throw an exception if the series data required for individual markers could not be found (such as when the data is cleared or changed via ⁠setData on the series). (PR [#1845](https://github.com/tradingview/lightweight-charts/pull/1845))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.0.4..v5.0.5).
+
 ## 5.0.4
 
 **Improvements**
