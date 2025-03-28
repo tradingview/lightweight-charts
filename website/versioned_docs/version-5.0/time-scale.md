@@ -6,37 +6,30 @@ sidebar_position: 5
 
 ## Overview
 
-Time scale (or time axis) is a horizontal scale at the bottom of the chart that displays the time of bars.
+Time scale (or time axis) is a horizontal scale that displays the time of data points at the bottom of the chart.
 
 ![Time scale](/img/time-scale.png "Time scale")
 
-Time scale controls a current visible range, allows you to affect or change it, and can convert a time point or [an index](/api/type-aliases/Logical.md) to a coordinate and vice versa (basically everything related to a x-scale of a chart).
+To adjust the time scale appearance, use either the [`ITimeScaleApi.applyOptions`](/api/interfaces/ITimeScaleApi.md#applyoptions) or [`IChartApi.applyOptions`](/api/interfaces/IChartApi.md#applyoptions) method. Both methods produce the same result. Refer to [`TimeScaleOptions`](/api/interfaces/TimeScaleOptions.md) for a list of available options.
 
-Also, it has a couple of events you can subscribe to to be notified when anything is happened.
-
-To work with time scale you can either change its options or use methods [ITimeScaleApi](/api/interfaces/ITimeScaleApi.md) which could be retrieved by using [`IChartApi.timeScale`](/api/interfaces/IChartApi.md#timescale) method.
-All available options are declared in [TimeScaleOptions](/api/interfaces/TimeScaleOptions.md) interface.
-
-Note that you can apply options either via [`ITimeScaleApi.applyOptions`](/api/interfaces/ITimeScaleApi.md#applyoptions) or [`IChartApi.applyOptions`](/api/interfaces/IChartApi.md#applyoptions) with `timeScale` sub-object in passed options - these 2 approaches both have the same effect.
+You can call the [`IChartApi.timeScale`](/api/interfaces/IChartApi.md#timescale) method to manage the scale.
+This method returns an instance of the [`ITimeScaleApi`](/api/interfaces/ITimeScaleApi.md) interface that provides an extensive API for controlling the time scale. For example, you can adjust the visible range, convert a time point or [index](/api/type-aliases/Logical.md) to a coordinate, and subscribe to events.
 
 ## Logical range
 
-A [logical range](/api/type-aliases/LogicalRange.md) is an object with 2 properties: `from` and `to`, which are numbers and represent logical indexes on the time scale.
-
-The starting point of the time scale's logical range is the first data item among all series.
-Before that point all indexes are negative, starting from that point - positive.
-
-Indexes might have fractional parts, for instance `4.2`, due to the time-scale being continuous rather than discrete.
-
-Integer part of the logical index means index of the fully visible bar.
-Thus, if we have `5.2` as the last visible logical index (`to` field), that means that the last visible bar has index 5, but we also have partially visible (for 20%) 6th bar.
-Half (e.g. `1.5`, `3.5`, `10.5`) means exactly a middle of the bar.
+The time scale can be measured with both a time range and a logical range.
+The logical range is illustrated below with red vertical lines between bars. Each line represents a logical [index](/api/type-aliases/Logical.md) on the scale.
 
 ![Logical range](/img/logical-range.png "Logical range")
 
-Red vertical lines here are borders between bars.
+The logical range starts from the first data point across all series, with negative indices before it and positive ones after.
 
-Thus, the visible logical range on the chart above is approximately from `-4.73` to `5.05`.
+The indices can have fractional parts. The integer part represents the fully visible bar, while the fractional part indicates partial visibility. For example, the `5.2` index means that the fifth bar is fully visible, while the sixth bar is 20% visible.
+A half-index, such as `3.5`, represents the middle of the bar.
+
+In the library, the logical range is represented with a [`LogicalRange`](/api/type-aliases/LogicalRange.md) object. This object has the `from` and `to` properties, which are logical indices on the time scale. For example, the visible logical range on the chart above is approximately from `-4.73` to `5.05`.
+
+You can manage the logical range with [`ITimeScaleApi`](/api/interfaces/ITimeScaleApi.md) as described in the [overview](#overview).
 
 ## Chart margin
 
