@@ -11,8 +11,8 @@
 		"./*"
 	],
 	"scripts": {
-		"create": "sh -c 'mkdir -p $1.d && cd $1.d && cp ../../default/.local.json package.json && cp ../../default/* . && npm install' -",
-		"remove": "sh -c 'rm -fr $PWD/${1##*/}.d' -",
-		"serve": "sh -c 'vite $1.d' -"
+		"create": "sh -c ': \"${1:?name is empty}\"; mkdir -p $1.d && cd $1.d && cp ../../default/.local.json package.json && cp ../../default/* . && npm install' 'npm run create'",
+		"remove": "sh -c ': \"${1:?name is empty}\"; rm -fr $PWD/${1##*/}.d' 'npm run remove'",
+		"serve": "sh -c ': \"${1:?name is empty}\"; vite $1.d' 'npm run serve'"
 	}
 }
