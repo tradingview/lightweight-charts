@@ -192,6 +192,11 @@ export interface PriceScaleOptions {
 	 * @defaultValue 0
 	 */
 	minimumWidth: number;
+
+	/**
+	 * Boundary marks are the marks that are drawn at the top and bottom of the price scale.
+	 */
+	boundaryMarksVisible: boolean;
 }
 
 interface RangeCache {
@@ -251,7 +256,16 @@ export class PriceScale {
 		this._layoutOptions = layoutOptions;
 		this._localizationOptions = localizationOptions;
 		this._colorParser = colorParser;
-		this._markBuilder = new PriceTickMarkBuilder(this, 100, this._coordinateToLogical.bind(this), this._logicalToCoordinate.bind(this));
+		this._markBuilder = new PriceTickMarkBuilder(
+			this,
+			100,
+			this._coordinateToLogical.bind(this),
+			this._logicalToCoordinate.bind(this),
+			options.boundaryMarksVisible ? {
+				getPadding: () => this.fontSize() / 2,
+				getMinDist: () => this.fontSize() * 2,
+			} : undefined
+		);
 	}
 
 	public id(): string {
@@ -828,7 +842,11 @@ export class PriceScale {
 			this,
 			base,
 			this._coordinateToLogical.bind(this),
-			this._logicalToCoordinate.bind(this)
+			this._logicalToCoordinate.bind(this),
+			this._options.boundaryMarksVisible ? {
+				getPadding: () => this.fontSize() / 2,
+				getMinDist: () => this.fontSize() * 2,
+			} : undefined
 		);
 
 		this._markBuilder.rebuildTickMarks();
