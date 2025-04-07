@@ -95,17 +95,16 @@ export class PriceTickMarkBuilder {
 		}
 
 		this._updateMarks(
+			firstValue,
 			high,
 			low,
-			firstValue,
 			minCoord,
 			maxCoord
 		);
 
 		if (this._boundariesMarks) {
 			this._extendWithBoundariesMarks(
-				high,
-				low,
+				firstValue,
 				minCoord,
 				maxCoord,
 				this._boundariesMarks.getMinDist(),
@@ -126,7 +125,7 @@ export class PriceTickMarkBuilder {
 		return Math.ceil(this._fontHeight() * TICK_DENSITY);
 	}
 
-	private _updateMarks(high: number, low: number, firstValue: number, minCoord: number, maxCoord: number): void {
+	private _updateMarks(firstValue: number, high: number, low: number, minCoord: number, maxCoord: number): void {
 		const marks = this._marks;
 		const priceScale = this._priceScale;
 
@@ -176,8 +175,7 @@ export class PriceTickMarkBuilder {
 	}
 
 	private _extendWithBoundariesMarks(
-		high: number,
-		low: number,
+		firstValue: number,
 		minCoord: number,
 		maxCoord: number,
 		minDist: number,
@@ -190,14 +188,18 @@ export class PriceTickMarkBuilder {
 		}
 		marks.unshift({
 			coord: (minCoord + padding) as Coordinate,
-			label: this._priceScale.formatLogical(high),
+			label: this._priceScale.formatLogical(
+				this._coordinateToLogicalFunc(minCoord + padding, firstValue)
+			),
 		});
 		if (maxCoord - marks[marks.length - 1].coord < minDist) {
 			marks.pop();
 		}
 		marks.push({
 			coord: (maxCoord - padding) as Coordinate,
-			label: this._priceScale.formatLogical(low),
+			label: this._priceScale.formatLogical(
+				this._coordinateToLogicalFunc(maxCoord - padding, firstValue)
+			),
 		});
 	}
 }
