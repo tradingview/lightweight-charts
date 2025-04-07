@@ -12,10 +12,6 @@ interface BoundariesMarksOptions {
 	 * Padding for the boundaries tick marks on the price scale.
 	 */
 	getPadding: () => number;
-	/**
-	 * Minimum distance between the boundaries tick marks and calculated tick marks.
-	 */
-	getMinDist: () => number;
 }
 
 const TICK_DENSITY = 2.5;
@@ -103,12 +99,13 @@ export class PriceTickMarkBuilder {
 		);
 
 		if (this._boundariesMarks) {
+			const padding = this._boundariesMarks.getPadding();
 			this._extendWithBoundariesMarks(
 				firstValue,
 				minCoord,
 				maxCoord,
-				this._boundariesMarks.getMinDist(),
-				this._boundariesMarks.getPadding()
+				padding,
+				padding * 2
 			);
 		}
 	}
@@ -178,28 +175,55 @@ export class PriceTickMarkBuilder {
 		firstValue: number,
 		minCoord: number,
 		maxCoord: number,
-		minDist: number,
-		padding: number
+		minPadding: number,
+		maxPadding: number
 	): void {
 		const marks = this._marks;
 
-		if (marks[0].coord - minCoord < minDist) {
+		// top boundary
+
+		const topMark = this._computeBoundaryPriceMark(
+			firstValue,
+			minCoord,
+			minPadding,
+			maxPadding
+		);
+
+		if (marks[0].coord - topMark.coord < maxPadding) {
 			marks.shift();
 		}
-		marks.unshift({
-			coord: (minCoord + padding) as Coordinate,
-			label: this._priceScale.formatLogical(
-				this._coordinateToLogicalFunc(minCoord + padding, firstValue)
-			),
-		});
-		if (maxCoord - marks[marks.length - 1].coord < minDist) {
+		marks.unshift(topMark);
+
+		// bottom boundary
+		const bottomMark = this._computeBoundaryPriceMark(
+			firstValue,
+			maxCoord,
+			-maxPadding,
+			-minPadding
+		);
+		if (bottomMark.coord - marks[marks.length - 1].coord < maxPadding) {
 			marks.pop();
 		}
-		marks.push({
-			coord: (maxCoord - padding) as Coordinate,
-			label: this._priceScale.formatLogical(
-				this._coordinateToLogicalFunc(maxCoord - padding, firstValue)
-			),
-		});
+		marks.push(bottomMark);
+	}
+
+	private _computeBoundaryPriceMark(
+		firstValue: number,
+		coord: number,
+		minPadding: number,
+		maxPadding: number
+	): PriceMark {
+		const avgPadding = (minPadding + maxPadding) / 2;
+		const value1 = this._coordinateToLogicalFunc(coord + minPadding, firstValue);
+		const value2 = this._coordinateToLogicalFunc(coord + maxPadding, firstValue);
+		const minValue = Math.min(value1, value2);
+		const maxValue = Math.max(value1, value2);
+		const valueSpan = Math.max(0.1, this.tickSpan(maxValue, minValue));
+
+		const value = this._coordinateToLogicalFunc(coord + avgPadding, firstValue);
+		const roundedValue = value - (value % valueSpan);
+		const roundedCoord = this._logicalToCoordinateFunc(roundedValue, firstValue, true);
+
+		return { label: this._priceScale.formatLogical(roundedValue), coord: roundedCoord as Coordinate };
 	}
 }
