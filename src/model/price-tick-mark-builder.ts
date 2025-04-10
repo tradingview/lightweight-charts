@@ -181,18 +181,12 @@ export class PriceTickMarkBuilder {
 		const marks = this._marks;
 
 		// top boundary
-
 		const topMark = this._computeBoundaryPriceMark(
 			firstValue,
 			minCoord,
 			minPadding,
 			maxPadding
 		);
-
-		if (marks[0].coord - topMark.coord < maxPadding) {
-			marks.shift();
-		}
-		marks.unshift(topMark);
 
 		// bottom boundary
 		const bottomMark = this._computeBoundaryPriceMark(
@@ -201,9 +195,16 @@ export class PriceTickMarkBuilder {
 			-maxPadding,
 			-minPadding
 		);
-		if (bottomMark.coord - marks[marks.length - 1].coord < maxPadding) {
+
+		if (marks.length > 0 && marks[0].coord - topMark.coord < maxPadding) {
+			marks.shift();
+		}
+
+		if (marks.length > 0 && bottomMark.coord - marks[marks.length - 1].coord < maxPadding) {
 			marks.pop();
 		}
+
+		marks.unshift(topMark);
 		marks.push(bottomMark);
 	}
 
