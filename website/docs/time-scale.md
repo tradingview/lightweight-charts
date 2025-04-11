@@ -58,7 +58,7 @@ The logical range starts from the first data point across all series, with negat
 The indices can have fractional parts. The integer part represents the fully visible bar, while the fractional part indicates partial visibility. For example, the `5.2` index means that the fifth bar is fully visible, while the sixth bar is 20% visible.
 A half-index, such as `3.5`, represents the middle of the bar.
 
-In the library, the logical range is represented with a [`LogicalRange`](/api/type-aliases/LogicalRange.md) object. This object has the `from` and `to` properties, which are logical indices on the time scale. For example, the visible logical range on the chart above is approximately from `-4.73` to `5.05`.
+In the library, the logical range is represented with the [`LogicalRange`](/api/type-aliases/LogicalRange.md) object. This object has the `from` and `to` properties, which are logical indices on the time scale. For example, the visible logical range on the chart above is approximately from `-4.73` to `5.05`.
 
 The [`setVisibleLogicalRange`] method allows you to specify the visible range beyond the bounds of the available data. This can be useful for setting a [chart margin](#chart-margin) or aligning series visually.
 
@@ -69,7 +69,7 @@ Margin is the space between the chart's borders and the series. It depends on th
 - [`barSpacing`](/api/interfaces/TimeScaleOptions.md#barspacing). The default value is `6`.
 - [`rightOffset`](/api/interfaces/TimeScaleOptions.md#rightoffset). The default value is `0`.
 
-You can specify these options as described in [Overview](#overview).
+You can specify these options as described [above](#time-scale-appearance).
 
 Note that if a series contains only a few data points, the chart may have a large margin on the left side.
 
@@ -98,7 +98,7 @@ const vr = chart.timeScale().getVisibleLogicalRange();
 chart.timeScale().setVisibleLogicalRange({ from: vr.from + 0.5, to: vr.to - 0.5 });
 ```
 
-[`setVisibleRange`]: /api/interfaces/ITimeScaleApi.md#getvisiblerange
-[`getVisibleRange`]: /api/interfaces/ITimeScaleApi.md#setvisiblerange
-[`setVisibleLogicalRange`]: /api/interfaces/ITimeScaleApi.md#getvisiblelogicalrange
-[`getVisibleLogicalRange`]: /api/interfaces/ITimeScaleApi.md#setvisiblelogicalrange
+[`setVisibleRange`]: /api/interfaces/ITimeScaleApi.md#setvisiblerange
+[`getVisibleRange`]: /api/interfaces/ITimeScaleApi.md#getvisiblerange
+[`setVisibleLogicalRange`]: /api/interfaces/ITimeScaleApi.md#setvisiblelogicalrange
+[`getVisibleLogicalRange`]: /api/interfaces/ITimeScaleApi.md#getvisiblelogicalrange
