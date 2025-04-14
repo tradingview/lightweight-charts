@@ -18,7 +18,7 @@ export const customSeriesDefaultOptions: CustomSeriesOptions = {
 	...seriesOptionsDefaults,
 	...customStyleDefaults,
 };
-export { ICustomSeriesPaneView, ICustomSeriesPaneRenderer, CustomBarItemData, CustomData } from './model/icustom-series';
+export type { ICustomSeriesPaneView, ICustomSeriesPaneRenderer, CustomBarItemData, CustomData } from './model/icustom-series';
 
 export { createChart, createChartEx, defaultHorzScaleBehavior } from './api/create-chart';
 export { createYieldCurveChart } from './api/create-yield-curve-chart';

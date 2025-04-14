@@ -1,3 +1,4 @@
+import { ensure } from '../helpers/assertions';
 import { min } from '../helpers/mathex';
 
 import { Coordinate } from './coordinate';
@@ -7,7 +8,7 @@ import { PriceTickSpanCalculator } from './price-tick-span-calculator';
 export type CoordinateToLogicalConverter = (x: number, firstValue: number) => number;
 export type LogicalToCoordinateConverter = (x: number, firstValue: number, keepItFloat: boolean) => number;
 
-interface BoundariesMarksOptions {
+export interface EdgeMarksOptions {
 	/**
 	 * Padding for the boundaries tick marks on the price scale.
 	 */
@@ -22,20 +23,20 @@ export class PriceTickMarkBuilder {
 	private readonly _priceScale: PriceScale;
 	private readonly _coordinateToLogicalFunc: CoordinateToLogicalConverter;
 	private readonly _logicalToCoordinateFunc: LogicalToCoordinateConverter;
-	private readonly _boundariesMarks?: undefined | BoundariesMarksOptions;
+	private readonly _edgeMarks?: undefined | EdgeMarksOptions;
 
 	public constructor(
 		priceScale: PriceScale,
 		base: number,
 		coordinateToLogicalFunc: CoordinateToLogicalConverter,
 		logicalToCoordinateFunc: LogicalToCoordinateConverter,
-		boundariesMarks?: BoundariesMarksOptions
+		boundariesMarks?: EdgeMarksOptions
 	) {
 		this._priceScale = priceScale;
 		this._base = base;
 		this._coordinateToLogicalFunc = coordinateToLogicalFunc;
 		this._logicalToCoordinateFunc = logicalToCoordinateFunc;
-		this._boundariesMarks = boundariesMarks;
+		this._edgeMarks = boundariesMarks;
 	}
 
 	public tickSpan(high: number, low: number): number {
@@ -90,18 +91,21 @@ export class PriceTickMarkBuilder {
 			return;
 		}
 
+		const span = this.tickSpan(high, low);
 		this._updateMarks(
 			firstValue,
+			span,
 			high,
 			low,
 			minCoord,
 			maxCoord
 		);
 
-		if (this._boundariesMarks) {
-			const padding = this._boundariesMarks.getPadding();
-			this._extendWithBoundariesMarks(
+		if (this._edgeMarks && this._shouldApplyEdgeMarks(span, low, high)) {
+			const padding = this._edgeMarks.getPadding();
+			this._applyEdgeMarks(
 				firstValue,
+				span,
 				minCoord,
 				maxCoord,
 				padding,
@@ -122,11 +126,10 @@ export class PriceTickMarkBuilder {
 		return Math.ceil(this._fontHeight() * TICK_DENSITY);
 	}
 
-	private _updateMarks(firstValue: number, high: number, low: number, minCoord: number, maxCoord: number): void {
+	private _updateMarks(firstValue: number, span: number, high: number, low: number, minCoord: number, maxCoord: number): void {
 		const marks = this._marks;
 		const priceScale = this._priceScale;
 
-		let span = this.tickSpan(high, low);
 		let mod = high % span;
 		mod += mod < 0 ? span : 0;
 
@@ -171,15 +174,15 @@ export class PriceTickMarkBuilder {
 		marks.length = targetIndex;
 	}
 
-	private _extendWithBoundariesMarks(
+	private _applyEdgeMarks(
 		firstValue: number,
+		span: number,
 		minCoord: number,
 		maxCoord: number,
 		minPadding: number,
 		maxPadding: number
 	): void {
 		const marks = this._marks;
-
 		// top boundary
 		const topMark = this._computeBoundaryPriceMark(
 			firstValue,
@@ -196,11 +199,14 @@ export class PriceTickMarkBuilder {
 			-minPadding
 		);
 
-		if (marks.length > 0 && marks[0].coord - topMark.coord < maxPadding) {
+		const spanPx = this._logicalToCoordinateFunc(0, firstValue, true)
+			- this._logicalToCoordinateFunc(span, firstValue, true);
+
+		if (marks.length > 0 && marks[0].coord - topMark.coord < spanPx / 2) {
 			marks.shift();
 		}
 
-		if (marks.length > 0 && bottomMark.coord - marks[marks.length - 1].coord < maxPadding) {
+		if (marks.length > 0 && bottomMark.coord - marks[marks.length - 1].coord < spanPx / 2) {
 			marks.pop();
 		}
 
@@ -226,5 +232,14 @@ export class PriceTickMarkBuilder {
 		const roundedCoord = this._logicalToCoordinateFunc(roundedValue, firstValue, true);
 
 		return { label: this._priceScale.formatLogical(roundedValue), coord: roundedCoord as Coordinate };
+	}
+
+	private _shouldApplyEdgeMarks(span: number, low: number, high: number): boolean {
+		if (!this._priceScale.isAutoScale()) {
+			return false;
+		}
+
+		const range = ensure(this._priceScale.priceRange());
+		return (range.minValue() - low < span) && (high - range.maxValue() < span);
 	}
 }
