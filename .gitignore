@@ -1,7 +1,6 @@
 # nodejs & npm
 node_modules/
 npm-debug.log*
-package-lock.json
 
 /debug/**/*
 !/debug/README.md
