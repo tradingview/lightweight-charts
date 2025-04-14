@@ -27,6 +27,9 @@ The size of the library is close to static images but if you have dozens of imag
 
 Take a look at [awesome-tradingview](https://github.com/tradingview/awesome-tradingview?tab=readme-ov-file#lightweight-charts) for related projects created by our community members.
 
+
+The library provides a rich set of charting capabilities out of the box, but developers can also extend its functionality by building custom plugins. See the [interactive plugin examples here](https://tradingview.github.io/lightweight-charts/plugin-examples/), or check out [plugin-examples/README.md](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) for more details.
+
 ## Installing
 
 ### es6 via npm
@@ -87,6 +90,8 @@ lineSeries.setData([
 |No|DEV|`lightweight-charts.development.mjs`|N/A|
 |Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|`lightweight-charts.standalone.production.js`|
 |Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|`lightweight-charts.standalone.development.js`|
+
+## Plugins
 
 ## Development
 
