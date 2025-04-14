@@ -4,6 +4,7 @@ import { ensureNotNull } from '../helpers/assertions';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { isDefaultPriceScale } from '../model/default-price-scale';
+import { PriceRangeImpl } from '../model/price-range-impl';
 import { PriceScale, PriceScaleOptions } from '../model/price-scale';
 
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -33,6 +34,22 @@ export class PriceScaleApi implements IPriceScaleApi {
 		}
 
 		return this._chartWidget.getPriceAxisWidth(this._priceScaleId);
+	}
+
+	public setVisibleRange(range: { from: number; to: number }): void {
+		this._priceScale().setPriceRange(new PriceRangeImpl(range.from, range.to));
+	}
+
+	public getVisibleRange(): { from: number; to: number } | null {
+		const range = this._priceScale().priceRange();
+		return range === null ? null : {
+			from: range.minValue(),
+			to: range.maxValue(),
+		};
+	}
+
+	public setAutoScale(on: boolean): void {
+		this.applyOptions({ autoScale: on });
 	}
 
 	private _priceScale(): PriceScale {
