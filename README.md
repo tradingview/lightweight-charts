@@ -91,8 +91,6 @@ lineSeries.setData([
 |Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|`lightweight-charts.standalone.production.js`|
 |Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|`lightweight-charts.standalone.development.js`|
 
-## Plugins
-
 ## Development
 
 See [BUILDING.md](./BUILDING.md) for instructions on how to build `lightweight-charts` from source.
