@@ -11,7 +11,7 @@ aliases:
   - &restore-node-modules-cache
       name: Restore node_modules cache
       keys:
-        - &cache-key v1-dependencies-{{ checksum "package.json" }}
+        - &cache-key v1-dependencies-{{ checksum "package-lock.json" }}
 
   - &save-node-modules-cache
       name: Save node_modules cache
@@ -102,7 +102,7 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm install
+      - run: npm ci
       - run: npx puppeteer browsers install chrome
       - save_cache: *save-node-modules-cache
 
