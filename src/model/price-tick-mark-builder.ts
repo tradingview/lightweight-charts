@@ -1,3 +1,4 @@
+import { ensure } from '../helpers/assertions';
 import { min } from '../helpers/mathex';
 
 import { Coordinate } from './coordinate';
@@ -7,6 +8,13 @@ import { PriceTickSpanCalculator } from './price-tick-span-calculator';
 export type CoordinateToLogicalConverter = (x: number, firstValue: number) => number;
 export type LogicalToCoordinateConverter = (x: number, firstValue: number, keepItFloat: boolean) => number;
 
+export interface EdgeMarksOptions {
+	/**
+	 * Padding for the boundaries tick marks on the price scale.
+	 */
+	getPadding: () => number;
+}
+
 const TICK_DENSITY = 2.5;
 
 export class PriceTickMarkBuilder {
@@ -15,17 +23,20 @@ export class PriceTickMarkBuilder {
 	private readonly _priceScale: PriceScale;
 	private readonly _coordinateToLogicalFunc: CoordinateToLogicalConverter;
 	private readonly _logicalToCoordinateFunc: LogicalToCoordinateConverter;
+	private readonly _edgeMarks?: undefined | EdgeMarksOptions;
 
 	public constructor(
 		priceScale: PriceScale,
 		base: number,
 		coordinateToLogicalFunc: CoordinateToLogicalConverter,
-		logicalToCoordinateFunc: LogicalToCoordinateConverter
+		logicalToCoordinateFunc: LogicalToCoordinateConverter,
+		boundariesMarks?: EdgeMarksOptions
 	) {
 		this._priceScale = priceScale;
 		this._base = base;
 		this._coordinateToLogicalFunc = coordinateToLogicalFunc;
 		this._logicalToCoordinateFunc = logicalToCoordinateFunc;
+		this._edgeMarks = boundariesMarks;
 	}
 
 	public tickSpan(high: number, low: number): number {
@@ -74,12 +85,51 @@ export class PriceTickMarkBuilder {
 
 		const high = Math.max(bottom, top);
 		const low = Math.min(bottom, top);
+
 		if (high === low) {
 			this._marks = [];
 			return;
 		}
 
-		let span = this.tickSpan(high, low);
+		const span = this.tickSpan(high, low);
+		this._updateMarks(
+			firstValue,
+			span,
+			high,
+			low,
+			minCoord,
+			maxCoord
+		);
+
+		if (this._edgeMarks && this._shouldApplyEdgeMarks(span, low, high)) {
+			const padding = this._edgeMarks.getPadding();
+			this._applyEdgeMarks(
+				firstValue,
+				span,
+				minCoord,
+				maxCoord,
+				padding,
+				padding * 2
+			);
+		}
+	}
+
+	public marks(): PriceMark[] {
+		return this._marks;
+	}
+
+	private _fontHeight(): number {
+		return this._priceScale.fontSize();
+	}
+
+	private _tickMarkHeight(): number {
+		return Math.ceil(this._fontHeight() * TICK_DENSITY);
+	}
+
+	private _updateMarks(firstValue: number, span: number, high: number, low: number, minCoord: number, maxCoord: number): void {
+		const marks = this._marks;
+		const priceScale = this._priceScale;
+
 		let mod = high % span;
 		mod += mod < 0 ? span : 0;
 
@@ -102,11 +152,11 @@ export class PriceTickMarkBuilder {
 				continue;
 			}
 
-			if (targetIndex < this._marks.length) {
-				this._marks[targetIndex].coord = coord as Coordinate;
-				this._marks[targetIndex].label = priceScale.formatLogical(logical);
+			if (targetIndex < marks.length) {
+				marks[targetIndex].coord = coord as Coordinate;
+				marks[targetIndex].label = priceScale.formatLogical(logical);
 			} else {
-				this._marks.push({
+				marks.push({
 					coord: coord as Coordinate,
 					label: priceScale.formatLogical(logical),
 				});
@@ -120,18 +170,76 @@ export class PriceTickMarkBuilder {
 				span = this.tickSpan(logical * sign, low);
 			}
 		}
-		this._marks.length = targetIndex;
+
+		marks.length = targetIndex;
 	}
 
-	public marks(): PriceMark[] {
-		return this._marks;
+	private _applyEdgeMarks(
+		firstValue: number,
+		span: number,
+		minCoord: number,
+		maxCoord: number,
+		minPadding: number,
+		maxPadding: number
+	): void {
+		const marks = this._marks;
+		// top boundary
+		const topMark = this._computeBoundaryPriceMark(
+			firstValue,
+			minCoord,
+			minPadding,
+			maxPadding
+		);
+
+		// bottom boundary
+		const bottomMark = this._computeBoundaryPriceMark(
+			firstValue,
+			maxCoord,
+			-maxPadding,
+			-minPadding
+		);
+
+		const spanPx = this._logicalToCoordinateFunc(0, firstValue, true)
+			- this._logicalToCoordinateFunc(span, firstValue, true);
+
+		if (marks.length > 0 && marks[0].coord - topMark.coord < spanPx / 2) {
+			marks.shift();
+		}
+
+		if (marks.length > 0 && bottomMark.coord - marks[marks.length - 1].coord < spanPx / 2) {
+			marks.pop();
+		}
+
+		marks.unshift(topMark);
+		marks.push(bottomMark);
 	}
 
-	private _fontHeight(): number {
-		return this._priceScale.fontSize();
+	private _computeBoundaryPriceMark(
+		firstValue: number,
+		coord: number,
+		minPadding: number,
+		maxPadding: number
+	): PriceMark {
+		const avgPadding = (minPadding + maxPadding) / 2;
+		const value1 = this._coordinateToLogicalFunc(coord + minPadding, firstValue);
+		const value2 = this._coordinateToLogicalFunc(coord + maxPadding, firstValue);
+		const minValue = Math.min(value1, value2);
+		const maxValue = Math.max(value1, value2);
+		const valueSpan = Math.max(0.1, this.tickSpan(maxValue, minValue));
+
+		const value = this._coordinateToLogicalFunc(coord + avgPadding, firstValue);
+		const roundedValue = value - (value % valueSpan);
+		const roundedCoord = this._logicalToCoordinateFunc(roundedValue, firstValue, true);
+
+		return { label: this._priceScale.formatLogical(roundedValue), coord: roundedCoord as Coordinate };
 	}
 
-	private _tickMarkHeight(): number {
-		return Math.ceil(this._fontHeight() * TICK_DENSITY);
+	private _shouldApplyEdgeMarks(span: number, low: number, high: number): boolean {
+		if (!this._priceScale.isAutoScale()) {
+			return false;
+		}
+
+		const range = ensure(this._priceScale.priceRange());
+		return (range.minValue() - low < span) && (high - range.maxValue() < span);
 	}
 }
