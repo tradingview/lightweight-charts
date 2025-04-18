@@ -75,8 +75,26 @@ function runTestCase(container) {
 
 	chart.timeScale().fitContent();
 
+	console.assert(areaSeries1.seriesOrder() === 0, `areaSeries1 order should be 0, actual: ${areaSeries1.seriesOrder()}`);
+	console.assert(areaSeries2.seriesOrder() === 1, `areaSeries2 order should be 1, actual: ${areaSeries2.seriesOrder()}`);
+	console.assert(areaSeries3.seriesOrder() === 2, `areaSeries3 order should be 2, actual: ${areaSeries3.seriesOrder()}`);
+
 	areaSeries2.setSeriesOrder(0);
+
+	console.assert(areaSeries1.seriesOrder() === 1, `areaSeries1 order should be 1, actual: ${areaSeries1.seriesOrder()}`);
+	console.assert(areaSeries2.seriesOrder() === 0, `areaSeries2 order should be 0, actual: ${areaSeries2.seriesOrder()}`);
+	console.assert(areaSeries3.seriesOrder() === 2, `areaSeries3 order should be 2, actual: ${areaSeries3.seriesOrder()}`);
+
 	areaSeries3.setSeriesOrder(0);
+
+	console.assert(areaSeries1.seriesOrder() === 2, `areaSeries1 order should be 2, actual: ${areaSeries1.seriesOrder()}`);
+	console.assert(areaSeries2.seriesOrder() === 1, `areaSeries2 order should be 1, actual: ${areaSeries2.seriesOrder()}`);
+	console.assert(areaSeries3.seriesOrder() === 0, `areaSeries3 order should be 0, actual: ${areaSeries3.seriesOrder()}`);
+
 	areaSeries3.applyOptions({ priceScaleId: 'left' });
 	chart.priceScale('left').applyOptions({ visible: true });
+
+	console.assert(areaSeries1.seriesOrder() === 2, `areaSeries1 order should be 2, actual: ${areaSeries1.seriesOrder()}`);
+	console.assert(areaSeries2.seriesOrder() === 1, `areaSeries2 order should be 1, actual: ${areaSeries2.seriesOrder()}`);
+	console.assert(areaSeries3.seriesOrder() === 0, `areaSeries3 order should be 0, actual: ${areaSeries3.seriesOrder()}`);
 }
