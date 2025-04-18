@@ -233,6 +233,7 @@ export class PriceScale {
 	private _modeChanged: Delegate<PriceScaleState, PriceScaleState> = new Delegate();
 
 	private _dataSources: IPriceDataSource[] = [];
+	private _formatterSource: IPriceDataSource | null = null;
 	private _cachedOrderedSources: IPriceDataSource[] | null = null;
 
 	private _marksCache: MarksCache | null = null;
@@ -780,7 +781,7 @@ export class PriceScale {
 	}
 
 	public formatPriceAbsolute(price: number): string {
-		return this._formatPrice(price as BarPrice, ensureNotNull(this._formatterSource()).formatter());
+		return this._formatPrice(price as BarPrice, ensureNotNull(this._formatterSource).formatter());
 	}
 
 	public formatPricePercentage(price: number, baseValue: number): string {
@@ -805,10 +806,20 @@ export class PriceScale {
 
 	public updateFormatter(): void {
 		this._marksCache = null;
-		const formatterSource = this._formatterSource();
+
+		let zOrder = Infinity;
+		this._formatterSource = null;
+		// choose source with the lowest zorder
+		for (const source of this._dataSources) {
+			if (source.zorder() < zOrder) {
+				zOrder = source.zorder();
+				this._formatterSource = source;
+			}
+		}
+
 		let base = 100;
-		if (formatterSource !== null) {
-			base = Math.round(1 / formatterSource.minMove());
+		if (this._formatterSource !== null) {
+			base = Math.round(1 / this._formatterSource.minMove());
 		}
 
 		this._formatter = defaultPriceFormatter;
@@ -819,9 +830,9 @@ export class PriceScale {
 			this._formatter = new PriceFormatter(100, 1);
 			base = 100;
 		} else {
-			if (formatterSource !== null) {
+			if (this._formatterSource !== null) {
 				// user
-				this._formatter = formatterSource.formatter();
+				this._formatter = this._formatterSource.formatter();
 			}
 		}
 
@@ -841,13 +852,6 @@ export class PriceScale {
 
 	public colorParser(): ColorParser {
 		return this._colorParser;
-	}
-
-	/**
-	 * @returns The {@link IPriceDataSource} that will be used as the "formatter source" (take minMove for formatter).
-	 */
-	private _formatterSource(): IPriceDataSource | null {
-		return this._dataSources[0] || null;
 	}
 
 	private _topMarginPx(): number {
@@ -970,7 +974,7 @@ export class PriceScale {
 		if (priceRange !== null) {
 			// keep current range is new is empty
 			if (priceRange.minValue() === priceRange.maxValue()) {
-				const formatterSource = this._formatterSource();
+				const formatterSource = this._formatterSource;
 				const minMove = formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : formatterSource.minMove();
 
 				// if price range is degenerated to 1 point let's extend it by 10 min move values

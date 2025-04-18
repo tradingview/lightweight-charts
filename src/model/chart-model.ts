@@ -968,7 +968,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		const pane = ensureNotNull(this.paneForSource(series));
 		pane.removeDataSource(series);
 
-		pane.addDataSource(series, targetScaleId, ensureNotNull(series.zorder()));
+		pane.addDataSource(series, targetScaleId);
 	}
 
 	public fitContent(): void {

@@ -2,6 +2,7 @@ import { assert, ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
+import { clamp } from '../helpers/mathex';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsBase, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
@@ -27,11 +28,6 @@ export const DEFAULT_STRETCH_FACTOR = 1000;
 export const MIN_PANE_HEIGHT = 30;
 
 export type PriceScalePosition = 'left' | 'right' | 'overlay';
-
-interface MinMaxOrderInfo {
-	minZOrder: number;
-	maxZOrder: number;
-}
 
 export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 	private readonly _timeScale: ITimeScale;
@@ -192,9 +188,8 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 		return this._leftPriceScale !== priceScale && this._rightPriceScale !== priceScale;
 	}
 
-	public addDataSource(source: IPriceDataSource, targetScaleId: string, zOrder?: number): void {
-		const targetZOrder = (zOrder !== undefined) ? zOrder : this._getZOrderMinMax().maxZOrder + 1;
-		this._insertDataSource(source, targetScaleId, targetZOrder);
+	public addDataSource(source: IPriceDataSource, targetScaleId: string): void {
+		this._insertDataSource(source, targetScaleId);
 	}
 
 	public removeDataSource(source: IPriceDataSource): void {
@@ -202,6 +197,7 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 		assert(index !== -1, 'removeDataSource: invalid data source');
 
 		this._dataSources.splice(index, 1);
+		this._dataSources.forEach((ds: IPriceDataSource, i: number) => ds.setZorder(i));
 
 		const priceScaleId = ensureNotNull(source.priceScale()).id();
 		if (this._overlaySourcesByScaleId.has(priceScaleId)) {
@@ -220,10 +216,6 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 		// and it does not have source in their list
 		if (priceScale && priceScale.dataSources().indexOf(source) >= 0) {
 			priceScale.removeDataSource(source);
-		}
-
-		if (priceScale !== null) {
-			priceScale.invalidateSourcesCache();
 			this.recalculatePriceScale(priceScale);
 		}
 
@@ -356,6 +348,28 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 		return this._cachedOrderedSources;
 	}
 
+	public setSeriesOrder(series: Series<SeriesType>, order: number): void {
+		order = clamp(order, 0, this._dataSources.length - 1);
+
+		const index = this._dataSources.indexOf(series);
+		assert(index !== -1, 'setSeriesOrder: invalid data source');
+
+		this._dataSources.splice(index, 1);
+		this._dataSources.splice(order, 0, series);
+
+		this._dataSources.forEach((ps: IPriceDataSource, i: number) => ps.setZorder(i));
+
+		this._cachedOrderedSources = null;
+
+		this._leftPriceScale.invalidateSourcesCache();
+		this._leftPriceScale.updateFormatter();
+
+		this._rightPriceScale.invalidateSourcesCache();
+		this._rightPriceScale.updateFormatter();
+
+		this._model.lightUpdate();
+	}
+
 	public orderedSeries(): readonly ISeries<SeriesType>[] {
 		return this.orderedSources().filter(isSeries);
 	}
@@ -407,32 +421,7 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 		priceScale.updateAllViews();
 	}
 
-	private _getZOrderMinMax(): MinMaxOrderInfo {
-		const sources = this.orderedSources();
-		if (sources.length === 0) {
-			return { minZOrder: 0, maxZOrder: 0 };
-		}
-
-		let minZOrder = 0;
-		let maxZOrder = 0;
-		for (let j = 0; j < sources.length; j++) {
-			const ds = sources[j];
-			const zOrder = ds.zorder();
-			if (zOrder !== null) {
-				if (zOrder < minZOrder) {
-					minZOrder = zOrder;
-				}
-
-				if (zOrder > maxZOrder) {
-					maxZOrder = zOrder;
-				}
-			}
-		}
-
-		return { minZOrder: minZOrder, maxZOrder: maxZOrder };
-	}
-
-	private _insertDataSource(source: IPriceDataSource, priceScaleId: string, zOrder: number): void {
+	private _insertDataSource(source: IPriceDataSource, priceScaleId: string): void {
 		let priceScale = this.priceScaleById(priceScaleId);
 
 		if (priceScale === null) {
@@ -446,10 +435,11 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 			this._overlaySourcesByScaleId.set(priceScaleId, overlaySources);
 		}
 
+		const zOrder = this._dataSources.length;
+		source.setZorder(zOrder);
+
 		priceScale.addDataSource(source);
 		source.setPriceScale(priceScale);
-
-		source.setZorder(zOrder);
 
 		this.recalculatePriceScale(priceScale);
 
