@@ -543,22 +543,10 @@ export class PriceScale {
 	}
 
 	public orderedSources(): readonly IPriceDataSource[] {
-		if (this._cachedOrderedSources) {
-			return this._cachedOrderedSources;
+		if (!this._cachedOrderedSources) {
+			this._cachedOrderedSources = sortSources<IPriceDataSource>(this._dataSources);
 		}
 
-		let sources: IPriceDataSource[] = [];
-		for (let i = 0; i < this._dataSources.length; i++) {
-			const ds = this._dataSources[i];
-			if (ds.zorder() === null) {
-				ds.setZorder(i + 1);
-			}
-
-			sources.push(ds);
-		}
-
-		sources = sortSources<IPriceDataSource>(sources);
-		this._cachedOrderedSources = sources;
 		return this._cachedOrderedSources;
 	}
 

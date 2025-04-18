@@ -188,16 +188,22 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 		return this._leftPriceScale !== priceScale && this._rightPriceScale !== priceScale;
 	}
 
-	public addDataSource(source: IPriceDataSource, targetScaleId: string): void {
-		this._insertDataSource(source, targetScaleId);
+	public addDataSource(source: IPriceDataSource, targetScaleId: string, keepSourcesOrder?: boolean): void {
+		this._insertDataSource(
+			source,
+			targetScaleId,
+			keepSourcesOrder ? source.zorder() : this._dataSources.length
+		);
 	}
 
-	public removeDataSource(source: IPriceDataSource): void {
+	public removeDataSource(source: IPriceDataSource, keepSourceOrder?: boolean): void {
 		const index = this._dataSources.indexOf(source);
 		assert(index !== -1, 'removeDataSource: invalid data source');
 
 		this._dataSources.splice(index, 1);
-		this._dataSources.forEach((ds: IPriceDataSource, i: number) => ds.setZorder(i));
+		if (!keepSourceOrder) {
+			this._dataSources.forEach((ds: IPriceDataSource, i: number) => ds.setZorder(i));
+		}
 
 		const priceScaleId = ensureNotNull(source.priceScale()).id();
 		if (this._overlaySourcesByScaleId.has(priceScaleId)) {
@@ -361,11 +367,10 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 
 		this._cachedOrderedSources = null;
 
-		this._leftPriceScale.invalidateSourcesCache();
-		this._leftPriceScale.updateFormatter();
-
-		this._rightPriceScale.invalidateSourcesCache();
-		this._rightPriceScale.updateFormatter();
+		for (const ps of [this._leftPriceScale, this._rightPriceScale]) {
+			ps.invalidateSourcesCache();
+			ps.updateFormatter();
+		}
 
 		this._model.lightUpdate();
 	}
@@ -421,22 +426,21 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 		priceScale.updateAllViews();
 	}
 
-	private _insertDataSource(source: IPriceDataSource, priceScaleId: string): void {
+	private _insertDataSource(source: IPriceDataSource, priceScaleId: string, order: number): void {
 		let priceScale = this.priceScaleById(priceScaleId);
 
 		if (priceScale === null) {
 			priceScale = this._createPriceScale(priceScaleId, this._model.options().overlayPriceScales);
 		}
 
-		this._dataSources.push(source);
+		this._dataSources.splice(order, 0, source);
 		if (!isDefaultPriceScale(priceScaleId)) {
 			const overlaySources = this._overlaySourcesByScaleId.get(priceScaleId) || [];
 			overlaySources.push(source);
 			this._overlaySourcesByScaleId.set(priceScaleId, overlaySources);
 		}
 
-		const zOrder = this._dataSources.length;
-		source.setZorder(zOrder);
+		source.setZorder(order);
 
 		priceScale.addDataSource(source);
 		source.setPriceScale(priceScale);
