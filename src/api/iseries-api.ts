@@ -315,6 +315,25 @@ export interface ISeriesApi<
 	moveToPane(paneIndex: number): void;
 
 	/**
+	 * Gets the zero-based index of this series within the list of all series on the current pane.
+	 *
+	 * @returns The current index of the series in the pane's series collection.
+	 */
+	seriesOrder(): number;
+
+	/**
+	 * Sets the zero-based index of this series within the pane's series collection, thereby adjusting its rendering order.
+	 *
+	 * Note:
+	 * - The chart may automatically recalculate this index after operations such as removing other series or moving this series to a different pane.
+	 * - If the provided index is less than 0, equal to, or greater than the number of series, it will be clamped to a valid range.
+	 * - Price scales derive their formatters from the series with the lowest index; changing the order may affect the price scale's formatting
+	 *
+	 * @param order - The desired zero-based index to set for this series within the pane.
+	 */
+	setSeriesOrder(order: number): void;
+
+	/**
 	 * Returns the pane to which the series is currently attached.
 	 *
 	 * @returns Pane API object to control the pane
