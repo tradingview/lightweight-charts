@@ -16,6 +16,14 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.6
+
+**Enhancements**
+
+- Implemented series order functionality, allowing control over the rendering order of series within a pane. Series with higher order values are rendered on top of those with lower values. Added two new methods to `ISeriesApi`: `seriesOrder()` to get the current order index and `setSeriesOrder(order)` to set a specific order. (PR [#1868](https://github.com/tradingview/lightweight-charts/pull/1868))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.0.5..v5.0.6).
+
 ## 5.0.5
 
 **Bug Fixes**
