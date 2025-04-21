@@ -13,7 +13,7 @@ export interface IPrimitiveHitTestSource {
 }
 
 export interface ZOrdered {
-	zorder(): number | null;
+	zorder(): number;
 }
 /**
  * Prefix meanings:

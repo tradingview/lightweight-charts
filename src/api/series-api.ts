@@ -250,6 +250,24 @@ export class SeriesApi<
 		this._series.model().moveSeriesToPane(this._series, paneIndex);
 	}
 
+	public seriesOrder(): number {
+		const pane = this._series.model().paneForSource(this._series);
+		if (pane === null) {
+			return -1;
+		}
+
+		return pane.series().indexOf(this._series);
+	}
+
+	public setSeriesOrder(order: number): void {
+		const pane = this._series.model().paneForSource(this._series);
+		if (pane === null) {
+			return;
+		}
+
+		pane.setSeriesOrder(this._series, order);
+	}
+
 	private _onDataChanged(scope: DataChangedScope): void {
 		if (this._dataChangedDelegate.hasListeners()) {
 			this._dataChangedDelegate.fire(scope);
