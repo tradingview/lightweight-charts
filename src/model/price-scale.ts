@@ -194,7 +194,11 @@ export interface PriceScaleOptions {
 	minimumWidth: number;
 
 	/**
-	 * Boundary marks are the marks that are drawn at the top and bottom of the price scale.
+	 * Ensures that tick marks are always visible at the very top and bottom of the price scale,
+	 * regardless of the data range. When enabled, a tick mark will be drawn at both edges of the scale, 
+	 * providing clear boundary indicators.
+	 *
+	 * @default false
 	 */
 	ensureEdgeTickMarksVisible: boolean;
 }
