@@ -31,7 +31,7 @@ import {
 	toPercent,
 	toPercentRange,
 } from './price-scale-conversions';
-import { EdgeMarksOptions, PriceTickMarkBuilder } from './price-tick-mark-builder';
+import { PriceTickMarkBuilder } from './price-tick-mark-builder';
 import { RangeImpl } from './range-impl';
 import { sortSources } from './sort-sources';
 import { SeriesItemsIndexesRange, TimePointIndex } from './time-data';
@@ -264,8 +264,7 @@ export class PriceScale {
 			this,
 			100,
 			this._coordinateToLogical.bind(this),
-			this._logicalToCoordinate.bind(this),
-			this._getEdgeMarksOptions()
+			this._logicalToCoordinate.bind(this)
 		);
 	}
 
@@ -807,6 +806,14 @@ export class PriceScale {
 		this._dataSources.forEach((s: IPriceDataSource) => s.updateAllViews());
 	}
 
+	public hasVisibleEdgeMarks(): boolean {
+		return this._options.ensureEdgeTickMarksVisible && this.isAutoScale();
+	}
+
+	public getEdgeMarksPadding(): number {
+		return this.fontSize() / 2;
+	}
+
 	public updateFormatter(): void {
 		this._marksCache = null;
 
@@ -843,8 +850,7 @@ export class PriceScale {
 			this,
 			base,
 			this._coordinateToLogical.bind(this),
-			this._logicalToCoordinate.bind(this),
-			this._getEdgeMarksOptions()
+			this._logicalToCoordinate.bind(this)
 		);
 
 		this._markBuilder.rebuildTickMarks();
@@ -968,9 +974,9 @@ export class PriceScale {
 			}
 		}
 
-		if (this._visibleEdgeMarks()) {
-			marginAbove = Math.max(marginAbove, this._getEdgeMarksPadding());
-			marginBelow = Math.max(marginBelow, this._getEdgeMarksPadding());
+		if (this.hasVisibleEdgeMarks()) {
+			marginAbove = Math.max(marginAbove, this.getEdgeMarksPadding());
+			marginBelow = Math.max(marginBelow, this.getEdgeMarksPadding());
 		}
 
 		if (marginAbove !== this._marginAbove || marginBelow !== this._marginBelow) {
@@ -1055,17 +1061,5 @@ export class PriceScale {
 
 	private _formatPercentage(percentage: number, fallbackFormatter?: IPriceFormatter): string {
 		return this._formatValue(percentage, this._localizationOptions.percentageFormatter, fallbackFormatter);
-	}
-
-	private _visibleEdgeMarks(): boolean {
-		return this._options.ensureEdgeTickMarksVisible;
-	}
-
-	private _getEdgeMarksPadding(): number {
-		return this.fontSize() / 2;
-	}
-
-	private _getEdgeMarksOptions(): undefined | EdgeMarksOptions {
-		return this._visibleEdgeMarks() ? { getPadding: () => this._getEdgeMarksPadding() } : undefined;
 	}
 }

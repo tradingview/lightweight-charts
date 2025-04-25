@@ -8,13 +8,6 @@ import { PriceTickSpanCalculator } from './price-tick-span-calculator';
 export type CoordinateToLogicalConverter = (x: number, firstValue: number) => number;
 export type LogicalToCoordinateConverter = (x: number, firstValue: number, keepItFloat: boolean) => number;
 
-export interface EdgeMarksOptions {
-	/**
-	 * Padding for the boundaries tick marks on the price scale.
-	 */
-	getPadding: () => number;
-}
-
 const TICK_DENSITY = 2.5;
 
 export class PriceTickMarkBuilder {
@@ -23,20 +16,17 @@ export class PriceTickMarkBuilder {
 	private readonly _priceScale: PriceScale;
 	private readonly _coordinateToLogicalFunc: CoordinateToLogicalConverter;
 	private readonly _logicalToCoordinateFunc: LogicalToCoordinateConverter;
-	private readonly _edgeMarks?: undefined | EdgeMarksOptions;
 
 	public constructor(
 		priceScale: PriceScale,
 		base: number,
 		coordinateToLogicalFunc: CoordinateToLogicalConverter,
-		logicalToCoordinateFunc: LogicalToCoordinateConverter,
-		boundariesMarks?: EdgeMarksOptions
+		logicalToCoordinateFunc: LogicalToCoordinateConverter
 	) {
 		this._priceScale = priceScale;
 		this._base = base;
 		this._coordinateToLogicalFunc = coordinateToLogicalFunc;
 		this._logicalToCoordinateFunc = logicalToCoordinateFunc;
-		this._edgeMarks = boundariesMarks;
 	}
 
 	public tickSpan(high: number, low: number): number {
@@ -101,8 +91,8 @@ export class PriceTickMarkBuilder {
 			maxCoord
 		);
 
-		if (this._edgeMarks && this._shouldApplyEdgeMarks(span, low, high)) {
-			const padding = this._edgeMarks.getPadding();
+		if (priceScale.hasVisibleEdgeMarks() && this._shouldApplyEdgeMarks(span, low, high)) {
+			const padding = this._priceScale.getEdgeMarksPadding();
 			this._applyEdgeMarks(
 				firstValue,
 				span,
@@ -235,10 +225,6 @@ export class PriceTickMarkBuilder {
 	}
 
 	private _shouldApplyEdgeMarks(span: number, low: number, high: number): boolean {
-		if (!this._priceScale.isAutoScale()) {
-			return false;
-		}
-
 		const range = ensure(this._priceScale.priceRange());
 		return (range.minValue() - low < span) && (high - range.maxValue() < span);
 	}
