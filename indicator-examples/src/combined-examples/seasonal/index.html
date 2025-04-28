@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Lightweight Charts - Seasonal chart with indicators example</title>
+		<link href="../../examples-base.css" rel="stylesheet" />
+	</head>
+	<style>
+		#chart.seasonal {
+			max-width: 800px;
+			height: 500px;
+		}
+		#year-select-row {
+			max-width: 800px;
+			display: flex;
+			flex-direction: row;
+			gap: 16px;
+			margin: 0 auto;
+		}
+	</style>
+	<body>
+		<div id="year-select-row"></div>
+
+		<div id="chart" class="seasonal"></div>
+		<div id="description">
+			<h1>Seasonal chart with indicators</h1>
+			<p>Please select an indicator below</p>
+			<select id="indicator-select">
+				<option>None</option>
+				<option>Spread</option>
+				<option>Correlation</option>
+				<option>Moving average</option>
+			</select>
+		</div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>

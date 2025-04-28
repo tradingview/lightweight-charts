@@ -1,0 +1,69 @@
+:root {
+	font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu,
+		sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+}
+body {
+	background-color: rgba(248, 249, 253, 1);
+	color: rgba(19, 23, 34, 1);
+}
+#chart {
+	height: 300px;
+	background-color: rgba(240, 243, 250, 1);
+	border-radius: 5px;
+	overflow: hidden;
+}
+.column,
+#chart,
+#description {
+	margin-inline: auto;
+	max-width: 600px;
+}
+
+.hint-message {
+	color: rgba(120, 123, 134, 1);
+}
+
+button {
+	all: initial;
+	font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu,
+		sans-serif;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 510;
+	line-height: 24px; /* 150% */
+	letter-spacing: -0.32px;
+	padding: 8px 24px;
+	color: #fff;
+	background-color: rgba(41, 98, 255, 1);
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: rgba(30, 83, 229, 1);
+}
+
+button:active {
+	background-color: rgba(24, 72, 204, 1);
+}
+
+button.grey {
+	color: rgba(19, 23, 34, 1);
+	background-color: rgba(240, 243, 250, 1);
+}
+
+button.grey:hover {
+	background-color: rgba(224, 227, 235, 1);
+}
+
+button.grey:active {
+	background-color: rgba(209, 212, 220, 1);
+}
