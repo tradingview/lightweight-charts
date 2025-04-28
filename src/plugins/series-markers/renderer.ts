@@ -8,6 +8,7 @@ import { IPrimitivePaneRenderer, PrimitiveHoveredItem } from '../../model/ipane-
 import { TextWidthCache } from '../../model/text-width-cache';
 import { SeriesItemsIndexesRange, TimedValue } from '../../model/time-data';
 
+import { SeriesMarkerZOrder } from './options';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
 import { drawSquare, hitTestSquare } from './series-markers-square';
@@ -44,18 +45,20 @@ export class SeriesMarkersRenderer implements IPrimitivePaneRenderer {
 	private _fontSize: number = -1;
 	private _fontFamily: string = '';
 	private _font: string = '';
+	private _zOrder: SeriesMarkerZOrder = 'normal';
 
 	public setData(data: SeriesMarkerRendererData): void {
 		this._data = data;
 	}
 
-	public setParams(fontSize: number, fontFamily: string): void {
+	public setParams(fontSize: number, fontFamily: string, zOrder: SeriesMarkerZOrder): void {
 		if (this._fontSize !== fontSize || this._fontFamily !== fontFamily) {
 			this._fontSize = fontSize;
 			this._fontFamily = fontFamily;
 			this._font = makeFont(fontSize, fontFamily);
 			this._textWidthCache.reset();
 		}
+		this._zOrder = zOrder;
 	}
 
 	public hitTest(x: number, y: number): PrimitiveHoveredItem | null {
@@ -77,6 +80,18 @@ export class SeriesMarkersRenderer implements IPrimitivePaneRenderer {
 	}
 
 	public draw(target: CanvasRenderingTarget2D): void {
+		if (this._zOrder === 'aboveSeries') {
+			return;
+		}
+		target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
+			this._drawImpl(scope);
+		});
+	}
+
+	public drawBackground(target: CanvasRenderingTarget2D): void {
+		if (this._zOrder !== 'aboveSeries') {
+			return;
+		}
 		target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 			this._drawImpl(scope);
 		});

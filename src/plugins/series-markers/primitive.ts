@@ -3,6 +3,7 @@ import { DataChangedHandler, DataChangedScope, ISeriesApi } from '../../api/iser
 import { ISeriesPrimitive, SeriesAttachedParameter } from '../../api/iseries-primitive-api';
 
 import { ensureNotNull } from '../../helpers/assertions';
+import { DeepPartial } from '../../helpers/strict-type-checks';
 
 import { AutoScaleMargins } from '../../model/autoscale-info-impl';
 import { IPrimitivePaneView, PrimitiveHoveredItem } from '../../model/ipane-primitive';
@@ -11,6 +12,7 @@ import { AutoscaleInfo, SeriesType } from '../../model/series-options';
 import { Logical, TimePointIndex } from '../../model/time-data';
 import { UpdateType } from '../../views/pane/iupdatable-pane-view';
 
+import { seriesMarkerOptionsDefaults, SeriesMarkersOptions } from './options';
 import { SeriesMarkersPaneView } from './pane-view';
 import { InternalSeriesMarker, MarkerPositions, SeriesMarker } from './types';
 import {
@@ -18,6 +20,15 @@ import {
 	calculateShapeHeight,
 	shapeMargin as calculateShapeMargin,
 } from './utils';
+
+function mergeOptionsWithDefaults(
+	options: DeepPartial<SeriesMarkersOptions>
+): SeriesMarkersOptions {
+	return {
+		...seriesMarkerOptionsDefaults,
+		...options,
+	};
+}
 
 export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<HorzScaleItem> {
 	private _paneView: SeriesMarkersPaneView<HorzScaleItem> | null = null;
@@ -32,12 +43,17 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	private _markersPositions: MarkerPositions | null = null;
 	private _cachedBarSpacing: number | null = null;
 	private _recalculationRequired: boolean = true;
+	private _options: SeriesMarkersOptions;
+
+	public constructor(options: DeepPartial<SeriesMarkersOptions>) {
+		this._options = mergeOptionsWithDefaults(options);
+	}
 
 	public attached(param: SeriesAttachedParameter<HorzScaleItem>): void {
 		this._recalculateMarkers();
 		this._chart = param.chart;
 		this._series = param.series;
-		this._paneView = new SeriesMarkersPaneView(this._series, ensureNotNull(this._chart));
+		this._paneView = new SeriesMarkersPaneView(this._series, ensureNotNull(this._chart), this._options);
 		this._requestUpdate = param.requestUpdate;
 		this._series.subscribeDataChanged((scope: DataChangedScope) => this._onDataChanged(scope));
 		this._recalculationRequired = true;
@@ -100,6 +116,13 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 			}
 		}
 		return null;
+	}
+
+	public applyOptions(options: DeepPartial<SeriesMarkersOptions>): void {
+		this._options = mergeOptionsWithDefaults({ ...this._options, ...options });
+		if (this.requestUpdate) {
+			this.requestUpdate();
+		}
 	}
 
 	private _getAutoScaleMargins(): AutoScaleMargins | null {
@@ -208,6 +231,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		if (this._paneView) {
 			this._recalculateMarkers();
 			this._paneView.setMarkers(this._indexedMarkers);
+			this._paneView.updateOptions(this._options);
 			this._paneView.update(updateType);
 		}
 	}
