@@ -12,10 +12,10 @@ import {
 	LineStyle,
 } from 'lightweight-charts';
 import { convertToLineData, generateMultipleYears } from '../../sample-data';
-import { calculateSpreadIndicatorValues } from '../../indicators/spread/spread';
 import { alignDataToYear, splitDataByYears } from './helpers';
-import { calculateCorrelationIndicatorValues } from '../../indicators/correlation/correlation';
-import { calculateMovingAverageIndicatorValues } from '../../indicators/moving-average/moving-average';
+import { calculateSpreadIndicatorValues } from '../../indicators/spread/spread-calculation';
+import { calculateCorrelationIndicatorValues } from '../../indicators/correlation/correlation-calculation';
+import { calculateMovingAverageIndicatorValues } from '../../indicators/moving-average/moving-average-calculation';
 
 const chartOptions = {
 	autoSize: true,
@@ -157,7 +157,12 @@ function changeIndicator(name: IndicatorName | null): void {
 		case 'moving average': {
 			const fullMAData = calculateMovingAverageIndicatorValues(
 				allSymbolOneData,
-				{ length: 10, smoothingLength: 5, smoothingLine: 'SMA', source: 'close' }
+				{
+					length: 10,
+					smoothingLength: 5,
+					smoothingLine: 'SMA',
+					source: 'close',
+				}
 			);
 			console.log(fullMAData);
 			addIndicatorByYear(

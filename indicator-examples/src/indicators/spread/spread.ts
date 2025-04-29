@@ -1,128 +1,134 @@
 import {
-	CandlestickData,
-	LineData,
-	UTCTimestamp,
-	WhitespaceData,
+	IChartApi,
+	ISeriesApi,
+	ISeriesPrimitive,
+	LineSeries,
+	SeriesAttachedParameter,
+	SeriesDataItemTypeMap,
+	SeriesOptionsMap,
+	SeriesType,
+	Time,
 } from 'lightweight-charts';
-import { ClosestTimeIndexFinder } from '../../helpers/closest-index';
-import { ensureTimestampData } from '../../helpers/timestamp-data';
-
-type SupportedData = LineData | CandlestickData;
-
-/**
- * Options for spread calculation between two sets of series data.
- *
- * @template TPrimaryData - The type of the primary data series (e.g., LineData, CandlestickData).
- * @template TSecondaryData - The type of the secondary data series.
- */
-export interface SpreadCalculationOptions<
-	TPrimaryData extends SupportedData,
-	TSecondaryData extends SupportedData
-> {
-	/**
-	 * The property name to use as the value from primary data.
-	 * The calculation will automatically determine this value if
-	 * your data has either 'close' or 'value' keys
-	 */
-	primarySource?: keyof TPrimaryData | (string & {});
-	/**
-	 * The property name to use as the value from secondary data.
-	 */
-	secondarySource?: keyof TSecondaryData | (string & {});
-	/**
-	 * If true, allows spread calculation even when dates do not match exactly.
-	 */
-	allowMismatchedDates?: boolean;
-}
-
-function determineSource(data: WhitespaceData[]): string | null {
-	for (const point of data) {
-		if (typeof point['close' as never] === 'number') {
-			return 'close';
-		}
-		if (typeof point['value' as never] === 'number') {
-			return 'value';
-		}
-	}
-	return null;
-}
+import {
+	calculateSpreadIndicatorValues,
+	SpreadCalculationOptions,
+	SupportedData,
+} from './spread-calculation';
 
 /**
- * Calculates spread indicator values between two data series.
+ * Apply (add) a Spread indicator to the specified series.
+ * The data from the two series will be automatically read and used as the
+ * source data for the indicator calculation (and will be updated when
+ * the data of the series is updated or changed)
  *
- * For each item in the primary data, finds the closest corresponding item in the secondary data (by time),
- * and computes the difference between the selected value properties. If values are missing or dates are mismatched
- * (and mismatches are not allowed), a whitespace data point is returned for that time.
- *
- * @template TPrimaryData - The type of the primary data series (e.g., LineData, CandlestickData).
- * @template TSecondaryData - The type of the secondary data series.
- * @param {TPrimaryData[]} primaryData - The primary data series (sorted in ascending order by time).
- * @param {TSecondaryData[]} secondaryData - The secondary data series (sorted in ascending order by time).
- * @param {SpreadCalculationOptions<TPrimaryData, TSecondaryData>} options - Options for calculation, such as which property to use and mismatch handling.
- * @returns {(LineData | WhitespaceData)[]} An array of spread values (or whitespace data) for each time in the primary series.
- *
- * @throws {Error} If a source property is not provided and cannot be inferred from the data.
+ * @param series - Source series
+ * @param secondarySeries - Second source series
+ * @param options - Calculation options for the spread
+ * @returns A Line series (ISeriesApi) for the attached indicator
  *
  * @example
- * const result = calculateSpreadIndicatorValues(
- *   [{ time: 1, value: 10 }, { time: 2, value: 20 }],
- *   [{ time: 1, value: 8 }, { time: 2, value: 15 }],
- *   { primarySource: 'value', secondarySource: 'value' }
- * );
+ * const spreadSeries = applySpreadIndicator(seriesOne, seriesTwo, {
+ * 	allowMismatchedDates: false,
+ * });
+ * spreadSeries.applyOptions({
+ * 	color: 'black',
+ * 	lineStyle: LineStyle.Dotted,
+ * 	lineWidth: 1,
+ * });
  */
-export function calculateSpreadIndicatorValues<
-	TPrimaryData extends SupportedData,
-	TSecondaryData extends SupportedData
+export function applySpreadIndicator<
+	TSeries extends SeriesType,
+	TSecondSeries extends SeriesType
 >(
-	primaryData: TPrimaryData[],
-	secondaryData: TSecondaryData[],
-	options: SpreadCalculationOptions<TPrimaryData, TSecondaryData>
-): (LineData | WhitespaceData)[] {
-	const primaryDataSource =
-		options.primarySource ?? determineSource(primaryData);
-	if (!primaryDataSource) {
-		throw new Error(
-			'Please provide a `primarySource` for the primary data of the spread indicator.'
-		);
-	}
-	const secondaryDataSource =
-		options.secondarySource ?? determineSource(secondaryData);
-	if (!secondaryDataSource) {
-		throw new Error(
-			'Please provide a `secondarySource` for the secondary data of the spread indicator.'
-		);
-	}
-	ensureTimestampData(primaryData);
-	const closestIndexFinder = new ClosestTimeIndexFinder(
-		ensureTimestampData(secondaryData)
-	);
-	return primaryData.map((primaryDataPoint): LineData | WhitespaceData => {
-		const whitespaceData: WhitespaceData = {
-			time: primaryDataPoint.time,
-		};
-		const primaryValue = primaryDataPoint[primaryDataSource as never] as
-			| number
-			| undefined;
-		if (primaryValue === undefined) {
-			return whitespaceData;
+	series: ISeriesApi<TSeries>,
+	secondarySeries: ISeriesApi<TSecondSeries>,
+	options: SpreadCalculationOptions<
+		SeriesDataItemTypeMap[TSeries],
+		SeriesDataItemTypeMap[TSecondSeries]
+	>
+): ISeriesApi<'Line'> {
+	class SpreadPrimitive implements ISeriesPrimitive {
+		private _baseSeries: ISeriesApi<SeriesType> | null = null;
+		private _secondarySeries: ISeriesApi<SeriesType> | null = null;
+		private _indicatorSeries: ISeriesApi<'Line'> | null = null;
+		private _chart: IChartApi | null = null;
+		private _options: SpreadCalculationOptions<
+			SeriesDataItemTypeMap[TSeries],
+			SeriesDataItemTypeMap[TSecondSeries]
+		> | null = null;
+
+		public attached(
+			param: SeriesAttachedParameter<Time, keyof SeriesOptionsMap>
+		): void {
+			const { chart, series } = param;
+			this._chart = chart;
+			this._baseSeries = series;
+			this._secondarySeries = secondarySeries;
+			this._indicatorSeries = this._chart.addSeries(LineSeries);
+			this._options = options;
+			series.subscribeDataChanged(this._updateData);
+			this._secondarySeries.subscribeDataChanged(this._updateData);
+			this._updateData();
 		}
-		const comparisionDataIndex = closestIndexFinder.findClosestIndex(
-			primaryDataPoint.time as UTCTimestamp,
-			'left'
-		);
-		const secondaryValue = secondaryData[comparisionDataIndex][
-			secondaryDataSource as never
-		] as number | undefined;
-		if (
-			secondaryValue === undefined ||
-			(!options.allowMismatchedDates &&
-				secondaryData[comparisionDataIndex].time !== primaryDataPoint.time)
-		) {
-			return whitespaceData;
+
+		public detached(): void {
+			if (this._baseSeries) {
+				this._baseSeries.unsubscribeDataChanged(this._updateData);
+			}
+			if (this._secondarySeries) {
+				this._secondarySeries.unsubscribeDataChanged(this._updateData);
+			}
+			if (this._indicatorSeries) {
+				this._chart?.removeSeries(this._indicatorSeries);
+			}
+			this._indicatorSeries = null;
 		}
-		return {
-			time: primaryDataPoint.time,
-			value: primaryValue - secondaryValue,
+
+		public indicatorSeries(): ISeriesApi<'Line'> {
+			if (!this._indicatorSeries) {
+				throw new Error('unable to provide indicator series');
+			}
+			return this._indicatorSeries;
+		}
+
+		public applyOptions(
+			options: Partial<
+				SpreadCalculationOptions<
+					SeriesDataItemTypeMap[TSeries],
+					SeriesDataItemTypeMap[TSecondSeries]
+				>
+			>
+		): void {
+			this._options = {
+				...(this._options || {}),
+				...(options as SpreadCalculationOptions<
+					SeriesDataItemTypeMap[TSeries],
+					SeriesDataItemTypeMap[TSecondSeries]
+				>),
+			};
+			this._updateData();
+		}
+
+		private _updateData = () => {
+			if (!this._indicatorSeries) {
+				return;
+			}
+			if (!this._baseSeries || !this._secondarySeries) {
+				this._indicatorSeries.setData([]);
+				return;
+			}
+			const seriesData = this._baseSeries.data() as SupportedData[];
+			const secondarySeriesData =
+				this._secondarySeries.data() as SupportedData[];
+			const indicatorValues = calculateSpreadIndicatorValues(
+				seriesData,
+				secondarySeriesData,
+				this._options || options
+			);
+			this._indicatorSeries.setData(indicatorValues);
 		};
-	});
+	}
+	const primitive = new SpreadPrimitive();
+	series.attachPrimitive(primitive);
+	return primitive.indicatorSeries();
 }

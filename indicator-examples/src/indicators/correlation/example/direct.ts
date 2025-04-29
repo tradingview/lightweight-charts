@@ -3,13 +3,13 @@ import {
 	ChartOptions,
 	createChart,
 	DeepPartial,
-	LineStyle,
+	BaselineSeries,
 } from 'lightweight-charts';
 import {
 	convertToLineData,
 	generateAlternativeCandleData,
 } from '../../../sample-data';
-import { calculateSpreadIndicatorValues } from '../spread';
+import { calculateCorrelationIndicatorValues } from '../correlation-calculation';
 
 const chartOptions = {
 	autoSize: true,
@@ -32,19 +32,25 @@ const seriesTwo = chart.addSeries(LineSeries, {
 });
 seriesTwo.setData(symbolTwoData);
 
-const spreadIndicatorData = calculateSpreadIndicatorValues(
+const indicatorData = calculateCorrelationIndicatorValues(
 	symbolOneData,
 	symbolTwoData,
 	{
 		allowMismatchedDates: true,
+		length: 20,
 	}
 );
 
-const spreadIndicatorSeries = chart.addSeries(LineSeries, {
-	color: 'black',
-	lineStyle: LineStyle.Dotted,
-	lineWidth: 1,
-});
-spreadIndicatorSeries.setData(spreadIndicatorData);
+const indicatorSeries = chart.addSeries(
+	BaselineSeries,
+	{
+		baseValue: {
+			type: 'price',
+			price: 0,
+		},
+	},
+	1
+);
+indicatorSeries.setData(indicatorData);
 
 chart.timeScale().fitContent();

@@ -7,7 +7,7 @@ import {
 	CandlestickSeries,
 } from 'lightweight-charts';
 import { generateAlternativeCandleData } from '../../../sample-data';
-import { calculateMovingAverageIndicatorValues } from '../moving-average';
+import { calculateMovingAverageIndicatorValues } from '../moving-average-calculation';
 
 const chartOptions = {
 	autoSize: true,

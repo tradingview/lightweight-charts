@@ -13,7 +13,6 @@ import { generateDtsBundle } from 'dts-bundle-generator';
 
 function findIndicatorFiles(folderPath, recursive) {
 	const pathNames = readdirSync(folderPath);
-	console.log(pathNames);
 	const matchingFiles = [];
 
 	pathNames.forEach(pathName => {
@@ -28,6 +27,11 @@ function findIndicatorFiles(folderPath, recursive) {
 			pathName === `${basename(folderPath)}${extname(pathName)}`
 		) {
 			matchingFiles.push([fullPath, basename(folderPath)]);
+		} else if (
+			stats.isFile() &&
+			pathName === `${basename(folderPath)}-calculation${extname(pathName)}`
+		) {
+			matchingFiles.push([fullPath, `${basename(folderPath)}-calculation`]);
 		}
 	});
 
@@ -136,9 +140,17 @@ const compile = async () => {
 	console.log('Generating the typings files...');
 	filesToBuild.forEach(file => {
 		try {
+			function stripCalculation(value) {
+				return value.replace('-calculation', '');
+			}
 			const esModuleTyping = generateDtsBundle([
 				{
-					filePath: `./typings/indicators/${file.exportName}/${file.exportName}.d.ts`,
+					filePath: `./typings/indicators/${stripCalculation(
+						file.exportName
+					)}/${file.exportName}.d.ts`,
+					// libraries: {
+					// 	importedLibraries: ['lightweight-charts'],
+					// },
 					// output: {
 					// 	umdModuleName: file.name,
 					// },

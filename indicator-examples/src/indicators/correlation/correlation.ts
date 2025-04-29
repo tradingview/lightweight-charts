@@ -1,191 +1,130 @@
 import {
-	CandlestickData,
-	LineData,
-	UTCTimestamp,
-	WhitespaceData,
+	BaselineSeries,
+	IChartApi,
+	ISeriesApi,
+	ISeriesPrimitive,
+	SeriesAttachedParameter,
+	SeriesDataItemTypeMap,
+	SeriesOptionsMap,
+	SeriesType,
+	Time,
 } from 'lightweight-charts';
-import { ClosestTimeIndexFinder } from '../../helpers/closest-index';
-import { ensureTimestampData } from '../../helpers/timestamp-data';
-
-type SupportedData = LineData | CandlestickData;
-
-/**
- * Options for correlation calculation between two sets of series data.
- *
- * @template TPrimaryData - The type of the primary data series (e.g., LineData, CandlestickData).
- * @template TSecondaryData - The type of the secondary data series.
- */
-export interface CorrelationCalculationOptions<
-	TPrimaryData extends SupportedData,
-	TSecondaryData extends SupportedData
-> {
-	/**
-	 * The property name to use as the value from primary data.
-	 * The calculation will automatically determine this value if
-	 * your data has either 'close' or 'value' keys
-	 */
-	primarySource?: keyof TPrimaryData | (string & {});
-	/**
-	 * The property name to use as the value from secondary data.
-	 */
-	secondarySource?: keyof TSecondaryData | (string & {});
-	/**
-	 * If true, allows spread calculation even when dates do not match exactly.
-	 */
-	allowMismatchedDates?: boolean;
-	/**
-	 * The length (amount of) previous data points to be used in the correlation calculation.
-	 */
-	length: number;
-}
-
-function determineSource(data: WhitespaceData[]): string | null {
-	for (const point of data) {
-		if (typeof point['close' as never] === 'number') {
-			return 'close';
-		}
-		if (typeof point['value' as never] === 'number') {
-			return 'value';
-		}
-	}
-	return null;
-}
+import {
+	calculateCorrelationIndicatorValues,
+	CorrelationCalculationOptions,
+	SupportedData,
+} from './correlation-calculation';
 
 /**
- * Calculates rolling correlation coefficient indicator values between two data series.
+ * Apply (add) a correlation indicator to the specified series.
+ * The data from the two series will be automatically read and used as the
+ * source data for the indicator calculation (and will be updated when
+ * the data of the series is updated or changed)
  *
- * For each item in the primary data, finds the closest corresponding item in the secondary data (by time),
- * and computes the Pearson correlation coefficient between the selected value properties over the last `length` points.
- * If values are missing, or dates are mismatched (and mismatches are not allowed), a whitespace data point is returned for that time.
+ * @param series - Source series
+ * @param secondarySeries - Second source series
+ * @param options - Calculation options for the spread
+ * @returns A Baseline series (ISeriesApi) for the attached indicator
  *
- * @template TPrimaryData - The type of the primary data series (e.g., LineData, CandlestickData).
- * @template TSecondaryData - The type of the secondary data series.
- * @param {TPrimaryData[]} primaryData - The primary data series (sorted in ascending order by time).
- * @param {TSecondaryData[]} secondaryData - The secondary data series (sorted in ascending order by time).
- * @param {CorrelationCalculationOptions<TPrimaryData, TSecondaryData>} options - Options for calculation, such as which property to use and mismatch handling.
- * @returns {(LineData | WhitespaceData)[]} An array of correlation values (or whitespace data) for each time in the primary series.
- *
- * @throws {Error} If a source property is not provided and cannot be inferred from the data.
+ * @example
+ * const correlationSeries = applyCorrelationIndicator(seriesOne, seriesTwo, {
+ * 	length: 20,
+ * });
+ * correlationSeries.moveToPane(1);
  */
-export function calculateCorrelationIndicatorValues<
-	TPrimaryData extends SupportedData,
-	TSecondaryData extends SupportedData
+export function applyCorrelationIndicator<
+	TSeries extends SeriesType,
+	TSecondSeries extends SeriesType
 >(
-	primaryData: TPrimaryData[],
-	secondaryData: TSecondaryData[],
-	options: CorrelationCalculationOptions<TPrimaryData, TSecondaryData>
-): (LineData | WhitespaceData)[] {
-	const primaryDataSource =
-		options.primarySource ?? determineSource(primaryData);
-	if (!primaryDataSource) {
-		throw new Error(
-			'Please provide a `primarySource` for the primary data of the correlation indicator.'
-		);
-	}
-	const secondaryDataSource =
-		options.secondarySource ?? determineSource(secondaryData);
-	if (!secondaryDataSource) {
-		throw new Error(
-			'Please provide a `secondarySource` for the secondary data of the correlation indicator.'
-		);
-	}
-	ensureTimestampData(primaryData);
-	const closestIndexFinder = new ClosestTimeIndexFinder(
-		ensureTimestampData(secondaryData)
-	);
+	series: ISeriesApi<TSeries>,
+	secondarySeries: ISeriesApi<TSecondSeries>,
+	options: CorrelationCalculationOptions<
+		SeriesDataItemTypeMap[TSeries],
+		SeriesDataItemTypeMap[TSecondSeries]
+	>
+): ISeriesApi<'Baseline'> {
+	class CorrelationPrimitive implements ISeriesPrimitive {
+		private _baseSeries: ISeriesApi<SeriesType> | null = null;
+		private _secondarySeries: ISeriesApi<SeriesType> | null = null;
+		private _indicatorSeries: ISeriesApi<'Baseline'> | null = null;
+		private _chart: IChartApi | null = null;
+		private _options: CorrelationCalculationOptions<
+			SeriesDataItemTypeMap[TSeries],
+			SeriesDataItemTypeMap[TSecondSeries]
+		> | null = null;
 
-	const length = options.length;
+		public attached(
+			param: SeriesAttachedParameter<Time, keyof SeriesOptionsMap>
+		): void {
+			const { chart, series } = param;
+			this._chart = chart;
+			this._baseSeries = series;
+			this._secondarySeries = secondarySeries;
+			this._indicatorSeries = this._chart.addSeries(BaselineSeries);
+			this._options = options;
+			series.subscribeDataChanged(this._updateData);
+			this._secondarySeries.subscribeDataChanged(this._updateData);
+			this._updateData();
+		}
 
-	// Arrays to hold the rolling window of values
-	const primaryWindow: number[] = [];
-	const secondaryWindow: number[] = [];
-
-	return primaryData.map((primaryDataPoint): LineData | WhitespaceData => {
-		const whitespaceData: WhitespaceData = {
-			time: primaryDataPoint.time,
-		};
-		const primaryValue = primaryDataPoint[primaryDataSource as never] as
-			| number
-			| undefined;
-		if (primaryValue === undefined) {
-			primaryWindow.push(NaN);
-			secondaryWindow.push(NaN);
-			if (primaryWindow.length > length) {
-				primaryWindow.shift();
-				secondaryWindow.shift();
+		public detached(): void {
+			if (this._baseSeries) {
+				this._baseSeries.unsubscribeDataChanged(this._updateData);
 			}
-			return whitespaceData;
-		}
-
-		const comparisionDataIndex = closestIndexFinder.findClosestIndex(
-			primaryDataPoint.time as UTCTimestamp,
-			'left'
-		);
-
-		const secondaryDataPoint = secondaryData[comparisionDataIndex];
-		const secondaryValue = secondaryDataPoint?.[
-			secondaryDataSource as never
-		] as number | undefined;
-		const timesMatch = secondaryDataPoint?.time === primaryDataPoint.time;
-
-		if (
-			secondaryValue === undefined ||
-			(!options.allowMismatchedDates && !timesMatch)
-		) {
-			primaryWindow.push(NaN);
-			secondaryWindow.push(NaN);
-			if (primaryWindow.length > length) {
-				primaryWindow.shift();
-				secondaryWindow.shift();
+			if (this._secondarySeries) {
+				this._secondarySeries.unsubscribeDataChanged(this._updateData);
 			}
-			return whitespaceData;
+			if (this._indicatorSeries) {
+				this._chart?.removeSeries(this._indicatorSeries);
+			}
+			this._indicatorSeries = null;
 		}
 
-		primaryWindow.push(primaryValue);
-		secondaryWindow.push(secondaryValue);
-
-		if (primaryWindow.length > length) {
-			primaryWindow.shift();
-			secondaryWindow.shift();
+		public indicatorSeries(): ISeriesApi<'Baseline'> {
+			if (!this._indicatorSeries) {
+				throw new Error('unable to provide indicator series');
+			}
+			return this._indicatorSeries;
 		}
 
-		// Not enough data for correlation yet
-		if (
-			primaryWindow.length < length ||
-			primaryWindow.some(isNaN) ||
-			secondaryWindow.some(isNaN)
-		) {
-			return whitespaceData;
+		public applyOptions(
+			options: Partial<
+				CorrelationCalculationOptions<
+					SeriesDataItemTypeMap[TSeries],
+					SeriesDataItemTypeMap[TSecondSeries]
+				>
+			>
+		): void {
+			this._options = {
+				...(this._options || {}),
+				...(options as CorrelationCalculationOptions<
+					SeriesDataItemTypeMap[TSeries],
+					SeriesDataItemTypeMap[TSecondSeries]
+				>),
+			};
+			this._updateData();
 		}
 
-		// Pearson correlation calculation
-		const n = length;
-		const sumX = primaryWindow.reduce((a, b) => a + b, 0);
-		const sumY = secondaryWindow.reduce((a, b) => a + b, 0);
-		const sumXY = primaryWindow.reduce(
-			(a, b, idx) => a + b * secondaryWindow[idx],
-			0
-		);
-		const sumX2 = primaryWindow.reduce((a, b) => a + b * b, 0);
-		const sumY2 = secondaryWindow.reduce((a, b) => a + b * b, 0);
-
-		const numerator = n * sumXY - sumX * sumY;
-		const denominator = Math.sqrt(
-			(n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY)
-		);
-
-		let correlation: number;
-		if (denominator === 0) {
-			correlation = 0;
-		} else {
-			correlation = numerator / denominator;
-			// Clamp correlation to [-1, 1] due to floating point arithmetic
-			correlation = Math.max(-1, Math.min(1, correlation));
-		}
-
-		return {
-			time: primaryDataPoint.time,
-			value: correlation,
+		private _updateData = () => {
+			if (!this._indicatorSeries) {
+				return;
+			}
+			if (!this._baseSeries || !this._secondarySeries) {
+				this._indicatorSeries.setData([]);
+				return;
+			}
+			const seriesData = this._baseSeries.data() as SupportedData[];
+			const secondarySeriesData =
+				this._secondarySeries.data() as SupportedData[];
+			const indicatorValues = calculateCorrelationIndicatorValues(
+				seriesData,
+				secondarySeriesData,
+				this._options || options
+			);
+			this._indicatorSeries.setData(indicatorValues);
 		};
-	});
+	}
+	const primitive = new CorrelationPrimitive();
+	series.attachPrimitive(primitive);
+	return primitive.indicatorSeries();
 }
