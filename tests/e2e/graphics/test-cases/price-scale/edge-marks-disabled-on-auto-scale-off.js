@@ -1,4 +1,10 @@
-function runTestCase(container) {
+async function awaitNewFrame() {
+	return new Promise(resolve => {
+		requestAnimationFrame(resolve);
+	});
+}
+
+async function runTestCase(container) {
 	const chartOptions = {
 		rightPriceScale: {
 			mode: LightweightCharts.PriceScaleMode.Normal,
@@ -20,7 +26,11 @@ function runTestCase(container) {
 
 	chart.timeScale().fitContent();
 
+	await awaitNewFrame();
+
 	chart.priceScale('right').applyOptions({
 		autoScale: false,
 	});
+
+	await awaitNewFrame();
 }

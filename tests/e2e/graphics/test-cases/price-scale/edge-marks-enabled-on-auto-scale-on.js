@@ -1,4 +1,10 @@
-function runTestCase(container) {
+async function awaitNewFrame() {
+	return new Promise(resolve => {
+		requestAnimationFrame(resolve);
+	});
+}
+
+async function runTestCase(container) {
 	const chartOptions = {
 		rightPriceScale: {
 			autoScale: false,
@@ -21,7 +27,11 @@ function runTestCase(container) {
 
 	chart.timeScale().fitContent();
 
+	await awaitNewFrame();
+
 	chart.priceScale('right').applyOptions({
 		autoScale: true,
 	});
+
+	await awaitNewFrame();
 }
