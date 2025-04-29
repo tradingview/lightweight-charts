@@ -1,8 +1,7 @@
 function runTestCase(container) {
 	const chartOptions = {
 		rightPriceScale: {
-			// autoScale: false,
-			mode: 0,
+			mode: LightweightCharts.PriceScaleMode.Normal,
 			scaleMargins: {
 				top: 0,
 				bottom: 0,
