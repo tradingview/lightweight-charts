@@ -3,6 +3,7 @@ import { min } from '../helpers/mathex';
 
 import { Coordinate } from './coordinate';
 import { PriceMark, PriceScale } from './price-scale';
+import { convertPriceRangeFromLog } from './price-scale-conversions';
 import { PriceTickSpanCalculator } from './price-tick-span-calculator';
 
 export type CoordinateToLogicalConverter = (x: number, firstValue: number) => number;
@@ -225,7 +226,12 @@ export class PriceTickMarkBuilder {
 	}
 
 	private _shouldApplyEdgeMarks(span: number, low: number, high: number): boolean {
-		const range = ensure(this._priceScale.priceRange());
+		let range = ensure(this._priceScale.priceRange());
+
+		if (this._priceScale.isLog()) {
+			range = convertPriceRangeFromLog(range, this._priceScale.getLogFormula());
+		}
+
 		return (range.minValue() - low < span) && (high - range.maxValue() < span);
 	}
 }

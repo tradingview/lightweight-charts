@@ -321,6 +321,10 @@ export class PriceScale {
 		return this._options.mode === PriceScaleMode.IndexedTo100;
 	}
 
+	public getLogFormula(): LogFormula {
+		return this._logFormula;
+	}
+
 	public mode(): PriceScaleState {
 		return {
 			autoScale: this._options.autoScale,
