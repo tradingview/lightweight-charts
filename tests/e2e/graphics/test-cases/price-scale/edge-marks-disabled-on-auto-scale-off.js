@@ -1,6 +1,6 @@
-async function awaitNewFrame() {
+async function awaitMacroTick() {
 	return new Promise(resolve => {
-		requestAnimationFrame(resolve);
+		setTimeout(resolve, 1);
 	});
 }
 
@@ -26,11 +26,11 @@ async function runTestCase(container) {
 
 	chart.timeScale().fitContent();
 
-	await awaitNewFrame();
+	await awaitMacroTick();
 
 	chart.priceScale('right').applyOptions({
 		autoScale: false,
 	});
 
-	await awaitNewFrame();
+	await awaitMacroTick();
 }
