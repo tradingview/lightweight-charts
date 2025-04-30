@@ -1,6 +1,6 @@
 async function awaitMacroTick() {
 	return new Promise(resolve => {
-		setTimeout(resolve, 1);
+		setTimeout(resolve, 10);
 	});
 }
 
