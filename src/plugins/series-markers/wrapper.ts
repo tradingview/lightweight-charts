@@ -1,8 +1,11 @@
 import { ISeriesApi } from '../../api/iseries-api';
 
+import { DeepPartial } from '../../helpers/strict-type-checks';
+
 import { SeriesType } from '../../model/series-options';
 
 import { ISeriesPrimitiveWrapper, SeriesPrimitiveAdapter } from '../series-primitive-adapter';
+import { SeriesMarkersOptions } from './options';
 import { SeriesMarkersPrimitive } from './primitive';
 import { SeriesMarker } from './types';
 
@@ -50,6 +53,8 @@ class SeriesMarkersPrimitiveWrapper<HorzScaleItem>
  *
  * @param markers - An array of markers to be displayed on the series.
  *
+ * @param options - Options for the series markers plugin.
+ *
  * @example
  * ```js
  * import { createSeriesMarkers } from 'lightweight-charts';
@@ -74,9 +79,13 @@ class SeriesMarkersPrimitiveWrapper<HorzScaleItem>
  */
 export function createSeriesMarkers<HorzScaleItem>(
 	series: ISeriesApi<SeriesType, HorzScaleItem>,
-	markers?: SeriesMarker<HorzScaleItem>[]
+	markers?: SeriesMarker<HorzScaleItem>[],
+	options?: DeepPartial<SeriesMarkersOptions>
 ): ISeriesMarkersPluginApi<HorzScaleItem> {
-	const wrapper = new SeriesMarkersPrimitiveWrapper(series, new SeriesMarkersPrimitive<HorzScaleItem>());
+	const wrapper = new SeriesMarkersPrimitiveWrapper(
+		series,
+		new SeriesMarkersPrimitive<HorzScaleItem>(options ?? {})
+	);
 	if (markers) {
 		wrapper.setMarkers(markers);
 	}
