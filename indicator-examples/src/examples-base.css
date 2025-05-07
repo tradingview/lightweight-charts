@@ -22,7 +22,8 @@ body {
 }
 .column,
 #chart,
-#description {
+#description,
+#inputs {
 	margin-inline: auto;
 	max-width: 600px;
 }
