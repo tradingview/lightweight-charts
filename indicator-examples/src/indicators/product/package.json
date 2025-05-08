@@ -1,0 +1,5 @@
+{
+	"private": true,
+	"main": "product-calculation",
+	"types": "product-calculation.d.ts"
+}
