@@ -925,6 +925,10 @@ export class PriceScale {
 
 	// eslint-disable-next-line complexity
 	private _recalculatePriceRangeImpl(): void {
+		if (!this.isAutoScale()) {
+			return;
+		}
+
 		const visibleBars = this._invalidatedForRange.visibleBars;
 		if (visibleBars === null) {
 			return;
