@@ -51,15 +51,7 @@ export class PriceScaleApi implements IPriceScaleApi {
 	}
 
 	public setAutoScale(on: boolean): void {
-		const currentRange = on ? null : this.getVisibleRange();
-
 		this.applyOptions({ autoScale: on });
-
-		if (currentRange !== null) {
-			this._priceScale().setPriceRange(
-				new PriceRangeImpl(currentRange.from, currentRange.to)
-			);
-		}
 	}
 
 	private _priceScale(): PriceScale {

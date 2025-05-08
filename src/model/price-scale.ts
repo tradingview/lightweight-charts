@@ -925,7 +925,7 @@ export class PriceScale {
 
 	// eslint-disable-next-line complexity
 	private _recalculatePriceRangeImpl(): void {
-		if (!this.isAutoScale()) {
+		if (!this.isAutoScale() && this.priceRange() !== null) {
 			return;
 		}
 
