@@ -10,6 +10,7 @@ import {
 	SeriesType,
 	LineData,
 	LineStyle,
+	WhitespaceData,
 } from 'lightweight-charts';
 import { convertToLineData, generateMultipleYears } from '../../sample-data';
 import { alignDataToYear, splitDataByYears } from './helpers';
@@ -102,7 +103,7 @@ function clearIndicators() {
 
 function addIndicatorByYear(
 	indicatorName: IndicatorName,
-	fullData: LineData<UTCTimestamp>[],
+	fullData: (LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>)[],
 	seriesOptionsFn: (year: number) => LineSeriesPartialOptions,
 	paneIndex?: number
 ) {
@@ -135,7 +136,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'average price',
-				fullAveragePriceData as LineData<UTCTimestamp>[],
+				fullAveragePriceData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineStyle: LineStyle.Dashed,
@@ -152,7 +153,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'correlation',
-				fullCorrelationData as LineData<UTCTimestamp>[],
+				fullCorrelationData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
@@ -168,7 +169,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'median price',
-				fullMPData as LineData<UTCTimestamp>[],
+				fullMPData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
@@ -185,7 +186,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'momentum',
-				fullMomentumData as LineData<UTCTimestamp>[],
+				fullMomentumData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
@@ -205,7 +206,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'moving average',
-				fullMAData as LineData<UTCTimestamp>[],
+				fullMAData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
@@ -220,7 +221,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'percent change',
-				fullPercentChangeData as LineData<UTCTimestamp>[],
+				fullPercentChangeData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
@@ -237,7 +238,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'product',
-				fullProductData as LineData<UTCTimestamp>[],
+				fullProductData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
@@ -254,7 +255,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'ratio',
-				fullSpreadData as LineData<UTCTimestamp>[],
+				fullSpreadData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineStyle: LineStyle.Dashed,
@@ -271,7 +272,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'spread',
-				fullSpreadData as LineData<UTCTimestamp>[],
+				fullSpreadData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineStyle: LineStyle.Dashed,
@@ -288,7 +289,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'sum',
-				fullSumData as LineData<UTCTimestamp>[],
+				fullSumData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
@@ -303,7 +304,7 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			addIndicatorByYear(
 				'sum',
-				fullWCData as LineData<UTCTimestamp>[],
+				fullWCData,
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,

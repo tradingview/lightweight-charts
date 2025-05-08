@@ -4,7 +4,7 @@ import {
 	WhitespaceData,
 } from 'lightweight-charts';
 
-export type SupportedData = CandlestickData | WhitespaceData;
+export type SupportedData<T> = CandlestickData<T> | WhitespaceData<T>;
 
 /**
  * Options for median price calculation.
@@ -34,12 +34,10 @@ export interface MedianPriceCalculationOptions {
  *   [{ time: 1, open: 10, high: 11, low: 4, close: 9 }, { time: 2, open: 9, high: 12, low: 8, close: 10 }],
  * );
  */
-export function calculateMedianPriceIndicatorValues<
-	TData extends SupportedData
->(
-	data: TData[],
+export function calculateMedianPriceIndicatorValues<T>(
+	data: SupportedData<T>[],
 	options: MedianPriceCalculationOptions
-): (LineData | WhitespaceData)[] {
+): (LineData<T> | WhitespaceData<T>)[] {
 	if (data.length === 0) {
 		return [];
 	}

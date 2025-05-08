@@ -6,7 +6,7 @@ import {
 } from 'lightweight-charts';
 import { ensureTimestampData } from '../../helpers/timestamp-data';
 
-export type SupportedData = LineData | CandlestickData | WhitespaceData;
+export type SupportedData = LineData<UTCTimestamp> | CandlestickData<UTCTimestamp> | WhitespaceData<UTCTimestamp>;
 
 export type MovingAverageSmoothing = 'SMA' | 'EMA' | 'WMA';
 
@@ -73,7 +73,7 @@ export function calculateMovingAverageIndicatorValues<
 >(
 	data: TData[],
 	options: MovingAverageCalculationOptions<TData>
-): (LineData | WhitespaceData)[] {
+): (LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>)[] {
 	const source = options.source ?? determineSource(data);
 
 	if (!source) {

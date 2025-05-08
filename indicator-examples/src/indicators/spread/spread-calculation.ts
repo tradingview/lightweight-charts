@@ -7,7 +7,7 @@ import {
 import { ClosestTimeIndexFinder } from '../../helpers/closest-index';
 import { ensureTimestampData } from '../../helpers/timestamp-data';
 
-export type SupportedData = LineData | CandlestickData | WhitespaceData;
+export type SupportedData = LineData<UTCTimestamp> | CandlestickData<UTCTimestamp> | WhitespaceData<UTCTimestamp>;
 
 /**
  * Options for spread calculation between two sets of series data.
@@ -77,7 +77,7 @@ export function calculateSpreadIndicatorValues<
 	primaryData: TPrimaryData[],
 	secondaryData: TSecondaryData[],
 	options: SpreadCalculationOptions<TPrimaryData, TSecondaryData>
-): (LineData | WhitespaceData)[] {
+): (LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>)[] {
 	const primaryDataSource =
 		options.primarySource ?? determineSource(primaryData);
 	if (!primaryDataSource) {
@@ -96,8 +96,8 @@ export function calculateSpreadIndicatorValues<
 	const closestIndexFinder = new ClosestTimeIndexFinder(
 		ensureTimestampData(secondaryData)
 	);
-	return primaryData.map((primaryDataPoint): LineData | WhitespaceData => {
-		const whitespaceData: WhitespaceData = {
+	return primaryData.map((primaryDataPoint): LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp> => {
+		const whitespaceData: WhitespaceData<UTCTimestamp> = {
 			time: primaryDataPoint.time,
 		};
 		const primaryValue = primaryDataPoint[primaryDataSource as never] as

@@ -6,24 +6,24 @@ import {
 } from 'lightweight-charts';
 import { ensureTimestampData } from '../../helpers/timestamp-data';
 
-export type SupportedData = LineData | CandlestickData | WhitespaceData;
+export type SupportedData = LineData<UTCTimestamp> | CandlestickData<UTCTimestamp> | WhitespaceData<UTCTimestamp>;
 
 /**
  * Options for moving average calculation.
  */
-export interface MomentumCalculationOptions<TData extends SupportedData> {
+export interface MomentumCalculationOptions {
 	/**
 	 * The property name to use as the value from the data.
 	 * If not provided, will try 'close' or 'value'.
 	 */
-	source?: keyof TData | (string & {});
+	source?: keyof SupportedData | (string & {});
 	/**
 	 * The number of points to use for calculating momentum.
 	 */
 	length: number;
 }
 
-function determineSource(data: WhitespaceData[]): string | null {
+function determineSource<T>(data: WhitespaceData<T>[]): string | null {
 	for (const point of data) {
 		if (typeof point['close' as never] === 'number') {
 			return 'close';
@@ -41,9 +41,9 @@ function determineSource(data: WhitespaceData[]): string | null {
  * The Momentum indicator measures the difference between
  * the current price and a previous price over a specified period. 
  *
- * @template TData - The type of the input data.
- * @param {TData[]} data - The input data array (sorted by time).
- * @param {MomentumCalculationOptions<TData>} options - Calculation options.
+ * @template T - The type of the time data.
+ * @param {SupportedData<T>[]} data - The input data array (sorted by time).
+ * @param {MomentumCalculationOptions<T>} options - Calculation options.
  * @returns {(LineData | WhitespaceData)[]} An array of values (or whitespace data).
  *
  * @example
@@ -56,8 +56,8 @@ export function calculateMomentumIndicatorValues<
 	TData extends SupportedData
 >(
 	data: TData[],
-	options: MomentumCalculationOptions<TData>
-): (LineData | WhitespaceData)[] {
+	options: MomentumCalculationOptions
+): (LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>)[] {
 	const source = options.source ?? determineSource(data);
 
 	if (!source) {
@@ -80,7 +80,7 @@ export function calculateMomentumIndicatorValues<
 	);
 
 	// Map to output
-	return times.map((time, i) =>
+	return times.map((time, i): LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp> =>
 		typeof momentum[i] === 'number'
 			? { time, value: momentum[i] as number }
 			: { time }

@@ -1,17 +1,11 @@
-import type { UTCTimestamp } from 'lightweight-charts';
+import type { OhlcData, UTCTimestamp } from 'lightweight-charts';
 
 type LineData = {
 	time: UTCTimestamp;
 	value: number;
 };
 
-export type CandleData = {
-	time: UTCTimestamp;
-	high: number;
-	low: number;
-	close: number;
-	open: number;
-};
+export type CandleData = OhlcData<UTCTimestamp>
 
 let randomFactor = 25 + Math.random() * 25;
 const samplePoint = (i: number) =>

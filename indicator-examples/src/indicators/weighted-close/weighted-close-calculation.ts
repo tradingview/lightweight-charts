@@ -1,6 +1,7 @@
 import {
 	CandlestickData,
 	LineData,
+	UTCTimestamp,
 	WhitespaceData,
 } from 'lightweight-charts';
 
@@ -39,9 +40,9 @@ export interface WeightedCloseCalculationOptions {
  * );
  */
 export function calculateWeightedCloseIndicatorValues(
-	data: (CandlestickData | WhitespaceData)[],
+	data: (CandlestickData<UTCTimestamp> | WhitespaceData<UTCTimestamp>)[],
 	options: WeightedCloseCalculationOptions
-): (LineData | WhitespaceData)[] {
+): (LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>)[] {
 	if (data.length === 0) {
 		return [];
 	}

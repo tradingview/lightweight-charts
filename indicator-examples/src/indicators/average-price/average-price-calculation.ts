@@ -1,6 +1,7 @@
 import {
 	CandlestickData,
 	LineData,
+	Time,
 	WhitespaceData,
 } from 'lightweight-charts';
 
@@ -32,10 +33,10 @@ export interface AveragePriceCalculationOptions {
  *   { length: 2 }
  * );
  */
-export function calculateAveragePriceIndicatorValues(
-	data: (CandlestickData | WhitespaceData)[],
+export function calculateAveragePriceIndicatorValues<T = Time>(
+	data: (CandlestickData<T> | WhitespaceData<T>)[],
 	options: AveragePriceCalculationOptions
-): (LineData | WhitespaceData)[] {
+): (LineData<T> | WhitespaceData<T>)[] {
 	if (data.length === 0) {
 		return [];
 	}
@@ -68,5 +69,6 @@ export function calculateAveragePriceIndicatorValues(
 		resultIndex += 1;
 	}
 
+	console.log(result);
 	return result;
 }

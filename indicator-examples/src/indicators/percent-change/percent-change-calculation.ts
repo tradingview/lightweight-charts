@@ -1,10 +1,11 @@
 import {
 	CandlestickData,
 	LineData,
+	UTCTimestamp,
 	WhitespaceData,
 } from 'lightweight-charts';
 
-export type SupportedData = CandlestickData | WhitespaceData;
+export type SupportedData = CandlestickData<UTCTimestamp> | WhitespaceData<UTCTimestamp>;
 
 /**
  * Options for percent change calculation.
@@ -39,7 +40,7 @@ export function calculatePercentChangeIndicatorValues<
 >(
 	data: TData[],
 	options: PercentChangeCalculationOptions
-): (LineData | WhitespaceData)[] {
+): (LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>)[] {
 	if (data.length === 0) {
 		return [];
 	}
