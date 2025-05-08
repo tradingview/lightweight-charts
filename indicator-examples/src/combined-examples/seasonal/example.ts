@@ -17,6 +17,7 @@ import { calculateSpreadIndicatorValues } from '../../indicators/spread/spread-c
 import { calculateCorrelationIndicatorValues } from '../../indicators/correlation/correlation-calculation';
 import { calculateMovingAverageIndicatorValues } from '../../indicators/moving-average/moving-average-calculation';
 import { calculateMedianPriceIndicatorValues } from '../../indicators/median-price/median-price-calculation';
+import { calculateMomentumIndicatorValues } from '../../indicators/momentum/momentum-calculation';
 
 const chartOptions = {
 	autoSize: true,
@@ -77,7 +78,7 @@ function drawYearSeries() {
 	chart.timeScale().fitContent();
 }
 
-type IndicatorName = 'spread' | 'correlation' | 'moving average' | 'median price';
+type IndicatorName = 'spread' | 'correlation' | 'moving average' | 'median price' | 'momentum';
 type AppliedIndicatorsMap = Map<IndicatorName, ISeriesApi<SeriesType>>;
 const indicatorsByYear: Map<number, AppliedIndicatorsMap> = new Map();
 for (const year of allYears) {
@@ -185,6 +186,24 @@ function changeIndicator(name: IndicatorName | null): void {
 			addIndicatorByYear(
 				'median price',
 				fullMPData as LineData<UTCTimestamp>[],
+				year => ({
+					color: colours[year as never] || 'black',
+					lineWidth: 1,
+				})
+			);
+			break;
+		}
+		case 'momentum': {
+			const fullMomentumData = calculateMomentumIndicatorValues(
+				allSymbolOneData,
+				{
+					length: 10
+				}
+			);
+			console.log(fullMomentumData);
+			addIndicatorByYear(
+				'momentum',
+				fullMomentumData as LineData<UTCTimestamp>[],
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
