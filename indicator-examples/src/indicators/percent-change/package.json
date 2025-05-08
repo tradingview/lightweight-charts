@@ -1,0 +1,5 @@
+{
+	"private": true,
+	"main": "percent-change-calculation",
+	"types": "percent-change-calculation.d.ts"
+}
