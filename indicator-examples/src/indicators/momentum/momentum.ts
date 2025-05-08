@@ -7,7 +7,6 @@ import {
 	Time,
 	IChartApi,
 	LineSeries,
-	SeriesDataItemTypeMap,
 } from 'lightweight-charts';
 import {
 	calculateMomentumIndicatorValues,
@@ -38,15 +37,13 @@ import {
  */
 export function applyMomentumIndicator<T extends SeriesType>(
 	series: ISeriesApi<T>,
-	options: MomentumCalculationOptions<SeriesDataItemTypeMap[T]>
+	options: MomentumCalculationOptions
 ): ISeriesApi<'Line'> {
 	class MomemtumPrimitive implements ISeriesPrimitive {
 		private _baseSeries: ISeriesApi<SeriesType> | null = null;
 		private _indicatorSeries: ISeriesApi<'Line'> | null = null;
 		private _chart: IChartApi | null = null;
-		private _options: MomentumCalculationOptions<
-			SeriesDataItemTypeMap[T]
-		> | null = null;
+		private _options: MomentumCalculationOptions | null = null;
 
 		public attached(
 			param: SeriesAttachedParameter<Time, keyof SeriesOptionsMap>
@@ -78,15 +75,11 @@ export function applyMomentumIndicator<T extends SeriesType>(
 		}
 
 		public applyOptions(
-			options: Partial<
-				MomentumCalculationOptions<SeriesDataItemTypeMap[T]>
-			>
+			options: Partial<MomentumCalculationOptions>
 		): void {
 			this._options = {
 				...(this._options || {}),
-				...(options as MomentumCalculationOptions<
-					SeriesDataItemTypeMap[T]
-				>),
+				...(options as MomentumCalculationOptions),
 			};
 			this._updateData();
 		}

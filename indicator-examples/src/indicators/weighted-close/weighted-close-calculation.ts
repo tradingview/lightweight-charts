@@ -7,7 +7,7 @@ import {
 
 const DEFAULT_WEIGHT = 2;
 
-export type SupportedData = CandlestickData | WhitespaceData;
+export type SupportedData = CandlestickData<UTCTimestamp> | WhitespaceData<UTCTimestamp>;
 
 /**
  * Options for weighted close calculation.

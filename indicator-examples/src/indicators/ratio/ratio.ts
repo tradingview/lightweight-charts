@@ -8,6 +8,7 @@ import {
 	SeriesOptionsMap,
 	SeriesType,
 	Time,
+	UTCTimestamp,
 } from 'lightweight-charts';
 import {
 	calculateRatioIndicatorValues,
@@ -43,8 +44,8 @@ export function applyRatioIndicator<
 	series: ISeriesApi<TSeries>,
 	secondarySeries: ISeriesApi<TSecondSeries>,
 	options: RatioCalculationOptions<
-		SeriesDataItemTypeMap[TSeries],
-		SeriesDataItemTypeMap[TSecondSeries]
+		SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+		SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 	>
 ): ISeriesApi<'Line'> {
 	class RatioPrimitive implements ISeriesPrimitive {
@@ -53,8 +54,8 @@ export function applyRatioIndicator<
 		private _indicatorSeries: ISeriesApi<'Line'> | null = null;
 		private _chart: IChartApi | null = null;
 		private _options: RatioCalculationOptions<
-			SeriesDataItemTypeMap[TSeries],
-			SeriesDataItemTypeMap[TSecondSeries]
+			SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+			SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 		> | null = null;
 
 		public attached(
@@ -94,16 +95,16 @@ export function applyRatioIndicator<
 		public applyOptions(
 			options: Partial<
 				RatioCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>
 			>
 		): void {
 			this._options = {
 				...(this._options || {}),
 				...(options as RatioCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>),
 			};
 			this._updateData();

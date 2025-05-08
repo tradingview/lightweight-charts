@@ -8,6 +8,7 @@ import {
 	SeriesOptionsMap,
 	SeriesType,
 	Time,
+	UTCTimestamp,
 } from 'lightweight-charts';
 import {
 	calculateSumIndicatorValues,
@@ -43,8 +44,8 @@ export function applySumIndicator<
 	series: ISeriesApi<TSeries>,
 	secondarySeries: ISeriesApi<TSecondSeries>,
 	options: SumCalculationOptions<
-		SeriesDataItemTypeMap[TSeries],
-		SeriesDataItemTypeMap[TSecondSeries]
+		SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+		SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 	>
 ): ISeriesApi<'Line'> {
 	class SumPrimitive implements ISeriesPrimitive {
@@ -53,8 +54,8 @@ export function applySumIndicator<
 		private _indicatorSeries: ISeriesApi<'Line'> | null = null;
 		private _chart: IChartApi | null = null;
 		private _options: SumCalculationOptions<
-			SeriesDataItemTypeMap[TSeries],
-			SeriesDataItemTypeMap[TSecondSeries]
+			SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+			SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 		> | null = null;
 
 		public attached(
@@ -94,16 +95,16 @@ export function applySumIndicator<
 		public applyOptions(
 			options: Partial<
 				SumCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>
 			>
 		): void {
 			this._options = {
 				...(this._options || {}),
 				...(options as SumCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>),
 			};
 			this._updateData();

@@ -8,6 +8,7 @@ import {
 	SeriesOptionsMap,
 	SeriesType,
 	Time,
+	UTCTimestamp,
 } from 'lightweight-charts';
 import {
 	calculateProductIndicatorValues,
@@ -43,8 +44,8 @@ export function applyProductIndicator<
 	series: ISeriesApi<TSeries>,
 	secondarySeries: ISeriesApi<TSecondSeries>,
 	options: ProductCalculationOptions<
-		SeriesDataItemTypeMap[TSeries],
-		SeriesDataItemTypeMap[TSecondSeries]
+		SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+		SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 	>
 ): ISeriesApi<'Line'> {
 	class ProductPrimitive implements ISeriesPrimitive {
@@ -53,8 +54,8 @@ export function applyProductIndicator<
 		private _indicatorSeries: ISeriesApi<'Line'> | null = null;
 		private _chart: IChartApi | null = null;
 		private _options: ProductCalculationOptions<
-			SeriesDataItemTypeMap[TSeries],
-			SeriesDataItemTypeMap[TSecondSeries]
+			SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+			SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 		> | null = null;
 
 		public attached(
@@ -94,16 +95,16 @@ export function applyProductIndicator<
 		public applyOptions(
 			options: Partial<
 				ProductCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>
 			>
 		): void {
 			this._options = {
 				...(this._options || {}),
 				...(options as ProductCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>),
 			};
 			this._updateData();

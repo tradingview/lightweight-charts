@@ -1,6 +1,6 @@
 # Lightweight Charts™ Indicator Examples
 
-TODO: ...
+This directory contains implementations of indicator calculations and examples of how they can be shown on a chart.
 
 ## Learning More
 
@@ -8,7 +8,7 @@ TODO: ...
 
 ## Running Locally
 
-To run this repo locally, follow these steps:
+To run these examples locally follow these steps:
 
 1. Clone the repo to your local machine
 2. First build the library
@@ -18,7 +18,7 @@ To run this repo locally, follow these steps:
    npm run build:prod
    ```
 
-3. Switch to the Indicator Examples Folder, install and start the development server
+3. Switch to the Indicator Examples Folder, install dependencies, and start the development server
 
    ```shell
    cd indicator-examples

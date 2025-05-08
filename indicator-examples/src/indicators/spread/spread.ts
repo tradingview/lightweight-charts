@@ -8,6 +8,7 @@ import {
 	SeriesOptionsMap,
 	SeriesType,
 	Time,
+	UTCTimestamp,
 } from 'lightweight-charts';
 import {
 	calculateSpreadIndicatorValues,
@@ -43,8 +44,8 @@ export function applySpreadIndicator<
 	series: ISeriesApi<TSeries>,
 	secondarySeries: ISeriesApi<TSecondSeries>,
 	options: SpreadCalculationOptions<
-		SeriesDataItemTypeMap[TSeries],
-		SeriesDataItemTypeMap[TSecondSeries]
+		SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+		SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 	>
 ): ISeriesApi<'Line'> {
 	class SpreadPrimitive implements ISeriesPrimitive {
@@ -53,8 +54,8 @@ export function applySpreadIndicator<
 		private _indicatorSeries: ISeriesApi<'Line'> | null = null;
 		private _chart: IChartApi | null = null;
 		private _options: SpreadCalculationOptions<
-			SeriesDataItemTypeMap[TSeries],
-			SeriesDataItemTypeMap[TSecondSeries]
+			SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+			SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 		> | null = null;
 
 		public attached(
@@ -94,16 +95,16 @@ export function applySpreadIndicator<
 		public applyOptions(
 			options: Partial<
 				SpreadCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>
 			>
 		): void {
 			this._options = {
 				...(this._options || {}),
 				...(options as SpreadCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>),
 			};
 			this._updateData();

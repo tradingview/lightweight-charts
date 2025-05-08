@@ -8,6 +8,7 @@ import {
 	IChartApi,
 	LineSeries,
 	SeriesDataItemTypeMap,
+	UTCTimestamp,
 } from 'lightweight-charts';
 import {
 	calculateMovingAverageIndicatorValues,
@@ -41,14 +42,14 @@ import {
  */
 export function applyMovingAverageIndicator<T extends SeriesType>(
 	series: ISeriesApi<T>,
-	options: MovingAverageCalculationOptions<SeriesDataItemTypeMap[T]>
+	options: MovingAverageCalculationOptions<SeriesDataItemTypeMap<UTCTimestamp>[T]>
 ): ISeriesApi<'Line'> {
 	class MAPrimitive implements ISeriesPrimitive {
 		private _baseSeries: ISeriesApi<SeriesType> | null = null;
 		private _indicatorSeries: ISeriesApi<'Line'> | null = null;
 		private _chart: IChartApi | null = null;
 		private _options: MovingAverageCalculationOptions<
-			SeriesDataItemTypeMap[T]
+			SeriesDataItemTypeMap<UTCTimestamp>[T]
 		> | null = null;
 
 		public attached(
@@ -82,13 +83,13 @@ export function applyMovingAverageIndicator<T extends SeriesType>(
 
 		public applyOptions(
 			options: Partial<
-				MovingAverageCalculationOptions<SeriesDataItemTypeMap[T]>
+				MovingAverageCalculationOptions<SeriesDataItemTypeMap<UTCTimestamp>[T]>
 			>
 		): void {
 			this._options = {
 				...(this._options || {}),
 				...(options as MovingAverageCalculationOptions<
-					SeriesDataItemTypeMap[T]
+					SeriesDataItemTypeMap<UTCTimestamp>[T]
 				>),
 			};
 			this._updateData();

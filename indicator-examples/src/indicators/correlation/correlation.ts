@@ -8,6 +8,7 @@ import {
 	SeriesOptionsMap,
 	SeriesType,
 	Time,
+	UTCTimestamp,
 } from 'lightweight-charts';
 import {
 	calculateCorrelationIndicatorValues,
@@ -39,8 +40,8 @@ export function applyCorrelationIndicator<
 	series: ISeriesApi<TSeries>,
 	secondarySeries: ISeriesApi<TSecondSeries>,
 	options: CorrelationCalculationOptions<
-		SeriesDataItemTypeMap[TSeries],
-		SeriesDataItemTypeMap[TSecondSeries]
+		SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+		SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 	>
 ): ISeriesApi<'Baseline'> {
 	class CorrelationPrimitive implements ISeriesPrimitive {
@@ -49,8 +50,8 @@ export function applyCorrelationIndicator<
 		private _indicatorSeries: ISeriesApi<'Baseline'> | null = null;
 		private _chart: IChartApi | null = null;
 		private _options: CorrelationCalculationOptions<
-			SeriesDataItemTypeMap[TSeries],
-			SeriesDataItemTypeMap[TSecondSeries]
+			SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+			SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 		> | null = null;
 
 		public attached(
@@ -90,16 +91,16 @@ export function applyCorrelationIndicator<
 		public applyOptions(
 			options: Partial<
 				CorrelationCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>
 			>
 		): void {
 			this._options = {
 				...(this._options || {}),
 				...(options as CorrelationCalculationOptions<
-					SeriesDataItemTypeMap[TSeries],
-					SeriesDataItemTypeMap[TSecondSeries]
+					SeriesDataItemTypeMap<UTCTimestamp>[TSeries],
+					SeriesDataItemTypeMap<UTCTimestamp>[TSecondSeries]
 				>),
 			};
 			this._updateData();
