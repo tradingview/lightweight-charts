@@ -13,14 +13,17 @@ import {
 } from 'lightweight-charts';
 import { convertToLineData, generateMultipleYears } from '../../sample-data';
 import { alignDataToYear, splitDataByYears } from './helpers';
-import { calculateSpreadIndicatorValues } from '../../indicators/spread/spread-calculation';
+import { calculateAveragePriceIndicatorValues } from '../../indicators/average-price/average-price-calculation';
 import { calculateCorrelationIndicatorValues } from '../../indicators/correlation/correlation-calculation';
-import { calculateMovingAverageIndicatorValues } from '../../indicators/moving-average/moving-average-calculation';
 import { calculateMedianPriceIndicatorValues } from '../../indicators/median-price/median-price-calculation';
 import { calculateMomentumIndicatorValues } from '../../indicators/momentum/momentum-calculation';
+import { calculateMovingAverageIndicatorValues } from '../../indicators/moving-average/moving-average-calculation';
 import { calculatePercentChangeIndicatorValues } from '../../indicators/percent-change/percent-change-calculation';
 import { calculateProductIndicatorValues } from '../../indicators/product/product-calculation';
+import { calculateRatioIndicatorValues } from '../../indicators/ratio/ratio-calculation';
+import { calculateSpreadIndicatorValues } from '../../indicators/spread/spread-calculation';
 import { calculateSumIndicatorValues } from '../../indicators/sum/sum-calculation';
+import { calculateWeightedCloseIndicatorValues } from '../../indicators/weighted-close/weighted-close-calculation';
 
 const chartOptions = {
 	autoSize: true,
@@ -81,7 +84,7 @@ function drawYearSeries() {
 	chart.timeScale().fitContent();
 }
 
-type IndicatorName = 'spread' | 'correlation' | 'moving average' | 'median price' | 'momentum' | 'percent change' | 'product' | 'sum';
+type IndicatorName = 'average price' | 'correlation' | 'median price' | 'momentum' | 'moving average' | 'percent change' | 'product' | 'ratio' | 'spread' | 'sum' | 'weighted close';
 type AppliedIndicatorsMap = Map<IndicatorName, ISeriesApi<SeriesType>>;
 const indicatorsByYear: Map<number, AppliedIndicatorsMap> = new Map();
 for (const year of allYears) {
@@ -125,15 +128,14 @@ function changeIndicator(name: IndicatorName | null): void {
 	clearIndicators();
 	if (!name) return;
 	switch (name) {
-		case 'spread': {
-			const fullSpreadData = calculateSpreadIndicatorValues(
+		case 'average price': {
+			const fullAveragePriceData = calculateAveragePriceIndicatorValues(
 				allSymbolOneData,
-				allSymbolTwoData,
-				{ allowMismatchedDates: false }
+				{ }
 			);
 			addIndicatorByYear(
-				'spread',
-				fullSpreadData as LineData<UTCTimestamp>[],
+				'average price',
+				fullAveragePriceData as LineData<UTCTimestamp>[],
 				year => ({
 					color: colours[year as never] || 'black',
 					lineStyle: LineStyle.Dashed,
@@ -159,33 +161,11 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			break;
 		}
-		case 'moving average': {
-			const fullMAData = calculateMovingAverageIndicatorValues(
-				allSymbolOneData,
-				{
-					length: 10,
-					smoothingLength: 5,
-					smoothingLine: 'SMA',
-					source: 'close',
-				}
-			);
-			console.log(fullMAData);
-			addIndicatorByYear(
-				'moving average',
-				fullMAData as LineData<UTCTimestamp>[],
-				year => ({
-					color: colours[year as never] || 'black',
-					lineWidth: 1,
-				})
-			);
-			break;
-		}
 		case 'median price': {
 			const fullMPData = calculateMedianPriceIndicatorValues(
 				allSymbolOneData,
 				{}
 			);
-			console.log(fullMPData);
 			addIndicatorByYear(
 				'median price',
 				fullMPData as LineData<UTCTimestamp>[],
@@ -203,10 +183,29 @@ function changeIndicator(name: IndicatorName | null): void {
 					length: 10
 				}
 			);
-			console.log(fullMomentumData);
 			addIndicatorByYear(
 				'momentum',
 				fullMomentumData as LineData<UTCTimestamp>[],
+				year => ({
+					color: colours[year as never] || 'black',
+					lineWidth: 1,
+				})
+			);
+			break;
+		}
+		case 'moving average': {
+			const fullMAData = calculateMovingAverageIndicatorValues(
+				allSymbolOneData,
+				{
+					length: 10,
+					smoothingLength: 5,
+					smoothingLine: 'SMA',
+					source: 'close',
+				}
+			);
+			addIndicatorByYear(
+				'moving average',
+				fullMAData as LineData<UTCTimestamp>[],
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
@@ -219,7 +218,6 @@ function changeIndicator(name: IndicatorName | null): void {
 				allSymbolOneData,
 				{ }
 			);
-			console.log(fullPercentChangeData);
 			addIndicatorByYear(
 				'percent change',
 				fullPercentChangeData as LineData<UTCTimestamp>[],
@@ -237,7 +235,6 @@ function changeIndicator(name: IndicatorName | null): void {
 				allSymbolTwoData,
 				{ allowMismatchedDates: false }
 			);
-			console.log(fullProductData);
 			addIndicatorByYear(
 				'product',
 				fullProductData as LineData<UTCTimestamp>[],
@@ -249,16 +246,64 @@ function changeIndicator(name: IndicatorName | null): void {
 			);
 			break;
 		}
+		case 'ratio': {
+			const fullSpreadData = calculateRatioIndicatorValues(
+				allSymbolOneData,
+				allSymbolTwoData,
+				{ allowMismatchedDates: false }
+			);
+			addIndicatorByYear(
+				'ratio',
+				fullSpreadData as LineData<UTCTimestamp>[],
+				year => ({
+					color: colours[year as never] || 'black',
+					lineStyle: LineStyle.Dashed,
+					lineWidth: 1,
+				})
+			);
+			break;
+		}
+		case 'spread': {
+			const fullSpreadData = calculateSpreadIndicatorValues(
+				allSymbolOneData,
+				allSymbolTwoData,
+				{ allowMismatchedDates: false }
+			);
+			addIndicatorByYear(
+				'spread',
+				fullSpreadData as LineData<UTCTimestamp>[],
+				year => ({
+					color: colours[year as never] || 'black',
+					lineStyle: LineStyle.Dashed,
+					lineWidth: 1,
+				})
+			);
+			break;
+		}
 		case 'sum': {
 			const fullSumData = calculateSumIndicatorValues(
 				allSymbolOneData,
 				allSymbolTwoData,
 				{ allowMismatchedDates: false }
 			);
-			console.log(fullSumData);
 			addIndicatorByYear(
 				'sum',
 				fullSumData as LineData<UTCTimestamp>[],
+				year => ({
+					color: colours[year as never] || 'black',
+					lineWidth: 1,
+				})
+			);
+			break;
+		}
+		case 'weighted close': {
+			const fullWCData = calculateWeightedCloseIndicatorValues(
+				allSymbolOneData,
+				{ }
+			);
+			addIndicatorByYear(
+				'sum',
+				fullWCData as LineData<UTCTimestamp>[],
 				year => ({
 					color: colours[year as never] || 'black',
 					lineWidth: 1,
