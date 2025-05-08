@@ -192,6 +192,15 @@ export interface PriceScaleOptions {
 	 * @defaultValue 0
 	 */
 	minimumWidth: number;
+
+	/**
+	 * Ensures that tick marks are always visible at the very top and bottom of the price scale,
+	 * regardless of the data range. When enabled, a tick mark will be drawn at both edges of the scale,
+	 * providing clear boundary indicators.
+	 *
+	 * @defaultValue false
+	 */
+	ensureEdgeTickMarksVisible: boolean;
 }
 
 interface RangeCache {
@@ -251,7 +260,12 @@ export class PriceScale {
 		this._layoutOptions = layoutOptions;
 		this._localizationOptions = localizationOptions;
 		this._colorParser = colorParser;
-		this._markBuilder = new PriceTickMarkBuilder(this, 100, this._coordinateToLogical.bind(this), this._logicalToCoordinate.bind(this));
+		this._markBuilder = new PriceTickMarkBuilder(
+			this,
+			100,
+			this._coordinateToLogical.bind(this),
+			this._logicalToCoordinate.bind(this)
+		);
 	}
 
 	public id(): string {
@@ -305,6 +319,10 @@ export class PriceScale {
 
 	public isIndexedTo100(): boolean {
 		return this._options.mode === PriceScaleMode.IndexedTo100;
+	}
+
+	public getLogFormula(): LogFormula {
+		return this._logFormula;
 	}
 
 	public mode(): PriceScaleState {
@@ -792,6 +810,14 @@ export class PriceScale {
 		this._dataSources.forEach((s: IPriceDataSource) => s.updateAllViews());
 	}
 
+	public hasVisibleEdgeMarks(): boolean {
+		return this._options.ensureEdgeTickMarksVisible && this.isAutoScale();
+	}
+
+	public getEdgeMarksPadding(): number {
+		return this.fontSize() / 2;
+	}
+
 	public updateFormatter(): void {
 		this._marksCache = null;
 
@@ -899,6 +925,10 @@ export class PriceScale {
 
 	// eslint-disable-next-line complexity
 	private _recalculatePriceRangeImpl(): void {
+		if (!this.isAutoScale() && this.priceRange() !== null) {
+			return;
+		}
+
 		const visibleBars = this._invalidatedForRange.visibleBars;
 		if (visibleBars === null) {
 			return;
@@ -950,6 +980,11 @@ export class PriceScale {
 					}
 				}
 			}
+		}
+
+		if (this.hasVisibleEdgeMarks()) {
+			marginAbove = Math.max(marginAbove, this.getEdgeMarksPadding());
+			marginBelow = Math.max(marginBelow, this.getEdgeMarksPadding());
 		}
 
 		if (marginAbove !== this._marginAbove || marginBelow !== this._marginBelow) {
