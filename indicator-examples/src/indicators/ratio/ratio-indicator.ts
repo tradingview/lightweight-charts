@@ -13,7 +13,7 @@ import { ClosestTimeIndexFinder } from '../../helpers/closest-index';
 import { merge } from '../../helpers/merge';
 
 export interface RatioIndicatorOptions<TSeriesType extends SeriesType> {
-	comparisionData: SeriesDataItemTypeMap<Time>[TSeriesType][];
+	comparisonData: SeriesDataItemTypeMap<Time>[TSeriesType][];
 	source: string;
 	mainSource?: string;
 	seriesOptions?: LineSeriesPartialOptions;
@@ -76,32 +76,32 @@ class RatioIndicator<TSeriesType extends SeriesType> {
 	private _updateData() {
 		this._closestIndex = new ClosestTimeIndexFinder<
 			SeriesDataItemTypeMap<UTCTimestamp>[TSeriesType]
-		>(ensureTimestampData(this._options.comparisionData));
+		>(ensureTimestampData(this._options.comparisonData));
 		const mainData = ensureTimestampData(this._series.data() as never);
 		const indicatorData = mainData.map(mainDataPoint => {
-			const comparisionDataIndex = this._closestIndex!.findClosestIndex(
+			const comparisonDataIndex = this._closestIndex!.findClosestIndex(
 				mainDataPoint.time as UTCTimestamp,
 				'left'
 			);
-			const comparisionData =
-				this._options.comparisionData[comparisionDataIndex];
+			const comparisonData =
+				this._options.comparisonData[comparisonDataIndex];
 			const mainSourceKey = this._options.mainSource ?? this._options.source;
 			const mainHasSource = mainDataPoint[mainSourceKey as never] !== undefined;
 			const compareHasSource =
-				comparisionData[this._options.source as never] !== undefined;
+				comparisonData[this._options.source as never] !== undefined;
 			if (
-				!comparisionData ||
+				!comparisonData ||
 				!mainHasSource ||
 				!compareHasSource ||
 				(!this._options.allowMismatchedDates &&
-					comparisionData.time !== mainDataPoint.time)
+					comparisonData.time !== mainDataPoint.time)
 			) {
 				// whitespace
 				return {
 					time: mainDataPoint.time,
 				};
 			}
-			const compareValue = comparisionData[
+			const compareValue = comparisonData[
 				this._options.source as never
 			] as number;
 			const mainValue = (

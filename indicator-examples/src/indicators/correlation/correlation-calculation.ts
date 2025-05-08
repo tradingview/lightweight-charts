@@ -117,12 +117,12 @@ export function calculateCorrelationIndicatorValues<
 			return whitespaceData;
 		}
 
-		const comparisionDataIndex = closestIndexFinder.findClosestIndex(
+		const comparisonDataIndex = closestIndexFinder.findClosestIndex(
 			primaryDataPoint.time as UTCTimestamp,
 			'left'
 		);
 
-		const secondaryDataPoint = secondaryData[comparisionDataIndex];
+		const secondaryDataPoint = secondaryData[comparisonDataIndex];
 		const secondaryValue = secondaryDataPoint?.[
 			secondaryDataSource as never
 		] as number | undefined;

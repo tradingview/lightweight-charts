@@ -35,7 +35,7 @@ const seriesTwo = chart.addSeries(LineSeries, {
 seriesTwo.setData(symbolTwoData);
 
 const ratioIndicator = createRatioIndicator(seriesOne, {
-	comparisionData: symbolTwoData,
+	comparisonData: symbolTwoData,
 	source: 'value',
 	seriesOptions: {
 		lineStyle: LineStyle.Dotted,

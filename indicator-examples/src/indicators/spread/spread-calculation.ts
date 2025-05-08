@@ -106,17 +106,17 @@ export function calculateSpreadIndicatorValues<
 		if (primaryValue === undefined) {
 			return whitespaceData;
 		}
-		const comparisionDataIndex = closestIndexFinder.findClosestIndex(
+		const comparisonDataIndex = closestIndexFinder.findClosestIndex(
 			primaryDataPoint.time as UTCTimestamp,
 			'left'
 		);
-		const secondaryValue = secondaryData[comparisionDataIndex][
+		const secondaryValue = secondaryData[comparisonDataIndex][
 			secondaryDataSource as never
 		] as number | undefined;
 		if (
 			secondaryValue === undefined ||
 			(!options.allowMismatchedDates &&
-				secondaryData[comparisionDataIndex].time !== primaryDataPoint.time)
+				secondaryData[comparisonDataIndex].time !== primaryDataPoint.time)
 		) {
 			return whitespaceData;
 		}
