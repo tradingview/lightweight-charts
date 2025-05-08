@@ -20,6 +20,7 @@ import { calculateMedianPriceIndicatorValues } from '../../indicators/median-pri
 import { calculateMomentumIndicatorValues } from '../../indicators/momentum/momentum-calculation';
 import { calculatePercentChangeIndicatorValues } from '../../indicators/percent-change/percent-change-calculation';
 import { calculateProductIndicatorValues } from '../../indicators/product/product-calculation';
+import { calculateSumIndicatorValues } from '../../indicators/sum/sum-calculation';
 
 const chartOptions = {
 	autoSize: true,
@@ -80,7 +81,7 @@ function drawYearSeries() {
 	chart.timeScale().fitContent();
 }
 
-type IndicatorName = 'spread' | 'correlation' | 'moving average' | 'median price' | 'momentum' | 'percent change' | 'product';
+type IndicatorName = 'spread' | 'correlation' | 'moving average' | 'median price' | 'momentum' | 'percent change' | 'product' | 'sum';
 type AppliedIndicatorsMap = Map<IndicatorName, ISeriesApi<SeriesType>>;
 const indicatorsByYear: Map<number, AppliedIndicatorsMap> = new Map();
 for (const year of allYears) {
@@ -245,6 +246,23 @@ function changeIndicator(name: IndicatorName | null): void {
 					lineWidth: 1,
 				}),
 				1 // paneIndex for product
+			);
+			break;
+		}
+		case 'sum': {
+			const fullSumData = calculateSumIndicatorValues(
+				allSymbolOneData,
+				allSymbolTwoData,
+				{ allowMismatchedDates: false }
+			);
+			console.log(fullSumData);
+			addIndicatorByYear(
+				'sum',
+				fullSumData as LineData<UTCTimestamp>[],
+				year => ({
+					color: colours[year as never] || 'black',
+					lineWidth: 1,
+				})
 			);
 			break;
 		}
