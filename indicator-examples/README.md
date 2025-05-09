@@ -40,3 +40,5 @@ Check the output in the `compiled` folder.
 
 Once you have compiled the examples then simply copy that folder into your
 project and import the JS module in your code.
+
+Alternatively you can copy the source directly into your project structure and compile it with your own toolchain.
