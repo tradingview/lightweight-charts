@@ -39,7 +39,7 @@ export class PriceScaleApi implements IPriceScaleApi {
 
 	public setVisibleRange(range: IRange<number>): void {
 		this.setAutoScale(false);
-		this._priceScale().setPriceRange(new PriceRangeImpl(range.from, range.to));
+		this._priceScale().setCustomPriceRange(new PriceRangeImpl(range.from, range.to));
 	}
 
 	public getVisibleRange(): IRange<number> | null {

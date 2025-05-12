@@ -233,6 +233,8 @@ export class PriceScale {
 	private _priceRangeSnapshot: PriceRangeImpl | null = null;
 	private _invalidatedForRange: RangeCache = { isValid: false, visibleBars: null };
 
+	private _isCustomPriceRange: boolean = false;
+
 	private _marginAbove: number = 0;
 	private _marginBelow: number = 0;
 
@@ -307,6 +309,10 @@ export class PriceScale {
 
 	public isAutoScale(): boolean {
 		return this._options.autoScale;
+	}
+
+	public isCustomPriceRange(): boolean {
+		return this._isCustomPriceRange;
 	}
 
 	public isLog(): boolean {
@@ -438,6 +444,11 @@ export class PriceScale {
 
 		this._marksCache = null;
 		this._priceRange = newPriceRange;
+	}
+
+	public setCustomPriceRange(newPriceRange: PriceRangeImpl | null): void {
+		this.setPriceRange(newPriceRange);
+		this._toggleCustomPriceRange(newPriceRange !== null);
 	}
 
 	public isEmpty(): boolean {
@@ -868,6 +879,10 @@ export class PriceScale {
 		return this._colorParser;
 	}
 
+	private _toggleCustomPriceRange(v: boolean): void {
+		this._isCustomPriceRange = v;
+	}
+
 	private _topMarginPx(): number {
 		return this.isInverted()
 			? this._options.scaleMargins.bottom * this.height() + this._marginBelow
@@ -925,7 +940,7 @@ export class PriceScale {
 
 	// eslint-disable-next-line complexity
 	private _recalculatePriceRangeImpl(): void {
-		if (!this.isAutoScale() && this.priceRange() !== null) {
+		if (this.isCustomPriceRange() && !this.isAutoScale()) {
 			return;
 		}
 
@@ -1036,8 +1051,6 @@ export class PriceScale {
 				this._logFormula = logFormulaForPriceRange(null);
 			}
 		}
-
-		this._invalidatedForRange.isValid = true;
 	}
 
 	private _getCoordinateTransformer(): PriceTransformer | null {
