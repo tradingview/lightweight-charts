@@ -26,6 +26,10 @@ import { calculateSpreadIndicatorValues } from '../../indicators/spread/spread-c
 import { calculateSumIndicatorValues } from '../../indicators/sum/sum-calculation';
 import { calculateWeightedCloseIndicatorValues } from '../../indicators/weighted-close/weighted-close-calculation';
 
+import { StackedBarsSeries } from '../../../../plugin-examples/src/plugins/stacked-bars-series/stacked-bars-series';
+import { StackedBarsData } from '../../../../plugin-examples/src/plugins/stacked-bars-series/data';
+import { ExactTimeIndexFinder } from '../../helpers/exact-index';
+
 const chartOptions = {
 	autoSize: true,
 } satisfies DeepPartial<ChartOptions>;
@@ -85,7 +89,19 @@ function drawYearSeries() {
 	chart.timeScale().fitContent();
 }
 
-type IndicatorName = 'average price' | 'correlation' | 'median price' | 'momentum' | 'moving average' | 'percent change' | 'product' | 'ratio' | 'spread' | 'sum' | 'weighted close';
+type IndicatorName =
+	| 'average price'
+	| 'correlation'
+	| 'median price'
+	| 'momentum'
+	| 'moving average'
+	| 'percent change'
+	| 'product'
+	| 'ratio'
+	| 'spread'
+	| 'sum'
+	| 'weighted close'
+	| 'volume';
 type AppliedIndicatorsMap = Map<IndicatorName, ISeriesApi<SeriesType>>;
 const indicatorsByYear: Map<number, AppliedIndicatorsMap> = new Map();
 for (const year of allYears) {
@@ -123,6 +139,29 @@ function addIndicatorByYear(
 	}
 }
 
+function buildVolumeData(
+	fullData: (LineData<UTCTimestamp> | WhitespaceData<UTCTimestamp>)[]
+) {
+	const dataByYear = splitDataByYears(fullData);
+	const fakeYearData = dataByYear[fakeYear];
+	const exactIndexFinder = new ExactTimeIndexFinder(fakeYearData);
+	const stackedData: StackedBarsData[] = fakeYearData.map(d => ({
+		time: d.time,
+		values: [],
+	}));
+	for (const year of selectedYears) {
+		const yearData = dataByYear[year];
+		const alignedYearData = alignDataToYear(yearData, fakeYear);
+		alignedYearData.forEach(data => {
+			const time = data.time;
+			const expectedIndex = exactIndexFinder.findExactIndex(time, 0);
+			const volume: number = (data.customValues?.['volume'] as number) || 0;
+			stackedData[expectedIndex].values.push(volume);
+		});
+	}
+	return stackedData;
+}
+
 let currentIndicator: IndicatorName | null = null;
 
 function changeIndicator(name: IndicatorName | null): void {
@@ -132,17 +171,13 @@ function changeIndicator(name: IndicatorName | null): void {
 		case 'average price': {
 			const fullAveragePriceData = calculateAveragePriceIndicatorValues(
 				allSymbolOneData,
-				{ }
+				{}
 			);
-			addIndicatorByYear(
-				'average price',
-				fullAveragePriceData,
-				year => ({
-					color: colours[year as never] || 'black',
-					lineStyle: LineStyle.Dashed,
-					lineWidth: 1,
-				})
-			);
+			addIndicatorByYear('average price', fullAveragePriceData, year => ({
+				color: colours[year as never] || 'black',
+				lineStyle: LineStyle.Dashed,
+				lineWidth: 1,
+			}));
 			break;
 		}
 		case 'correlation': {
@@ -167,31 +202,23 @@ function changeIndicator(name: IndicatorName | null): void {
 				allSymbolOneData,
 				{}
 			);
-			addIndicatorByYear(
-				'median price',
-				fullMPData,
-				year => ({
-					color: colours[year as never] || 'black',
-					lineWidth: 1,
-				})
-			);
+			addIndicatorByYear('median price', fullMPData, year => ({
+				color: colours[year as never] || 'black',
+				lineWidth: 1,
+			}));
 			break;
 		}
 		case 'momentum': {
 			const fullMomentumData = calculateMomentumIndicatorValues(
 				allSymbolOneData,
 				{
-					length: 10
+					length: 10,
 				}
 			);
-			addIndicatorByYear(
-				'momentum',
-				fullMomentumData,
-				year => ({
-					color: colours[year as never] || 'black',
-					lineWidth: 1,
-				})
-			);
+			addIndicatorByYear('momentum', fullMomentumData, year => ({
+				color: colours[year as never] || 'black',
+				lineWidth: 1,
+			}));
 			break;
 		}
 		case 'moving average': {
@@ -204,20 +231,16 @@ function changeIndicator(name: IndicatorName | null): void {
 					source: 'close',
 				}
 			);
-			addIndicatorByYear(
-				'moving average',
-				fullMAData,
-				year => ({
-					color: colours[year as never] || 'black',
-					lineWidth: 1,
-				})
-			);
+			addIndicatorByYear('moving average', fullMAData, year => ({
+				color: colours[year as never] || 'black',
+				lineWidth: 1,
+			}));
 			break;
 		}
 		case 'percent change': {
 			const fullPercentChangeData = calculatePercentChangeIndicatorValues(
 				allSymbolOneData,
-				{ }
+				{}
 			);
 			addIndicatorByYear(
 				'percent change',
@@ -253,15 +276,11 @@ function changeIndicator(name: IndicatorName | null): void {
 				allSymbolTwoData,
 				{ allowMismatchedDates: false }
 			);
-			addIndicatorByYear(
-				'ratio',
-				fullSpreadData,
-				year => ({
-					color: colours[year as never] || 'black',
-					lineStyle: LineStyle.Dashed,
-					lineWidth: 1,
-				})
-			);
+			addIndicatorByYear('ratio', fullSpreadData, year => ({
+				color: colours[year as never] || 'black',
+				lineStyle: LineStyle.Dashed,
+				lineWidth: 1,
+			}));
 			break;
 		}
 		case 'spread': {
@@ -270,15 +289,11 @@ function changeIndicator(name: IndicatorName | null): void {
 				allSymbolTwoData,
 				{ allowMismatchedDates: false }
 			);
-			addIndicatorByYear(
-				'spread',
-				fullSpreadData,
-				year => ({
-					color: colours[year as never] || 'black',
-					lineStyle: LineStyle.Dashed,
-					lineWidth: 1,
-				})
-			);
+			addIndicatorByYear('spread', fullSpreadData, year => ({
+				color: colours[year as never] || 'black',
+				lineStyle: LineStyle.Dashed,
+				lineWidth: 1,
+			}));
 			break;
 		}
 		case 'sum': {
@@ -287,29 +302,41 @@ function changeIndicator(name: IndicatorName | null): void {
 				allSymbolTwoData,
 				{ allowMismatchedDates: false }
 			);
-			addIndicatorByYear(
-				'sum',
-				fullSumData,
-				year => ({
-					color: colours[year as never] || 'black',
-					lineWidth: 1,
-				})
-			);
+			addIndicatorByYear('sum', fullSumData, year => ({
+				color: colours[year as never] || 'black',
+				lineWidth: 1,
+			}));
 			break;
 		}
 		case 'weighted close': {
 			const fullWCData = calculateWeightedCloseIndicatorValues(
 				allSymbolOneData,
-				{ }
+				{}
 			);
-			addIndicatorByYear(
-				'sum',
-				fullWCData,
-				year => ({
-					color: colours[year as never] || 'black',
-					lineWidth: 1,
-				})
+			addIndicatorByYear('sum', fullWCData, year => ({
+				color: colours[year as never] || 'black',
+				lineWidth: 1,
+			}));
+			break;
+		}
+		case 'volume': {
+			const stackedSeriesDef = new StackedBarsSeries();
+			const stackedColours = selectedYears.map(year => colours[year]);
+			const volumeSeries = chart.addCustomSeries(
+				stackedSeriesDef,
+				{
+					colors: stackedColours,
+					priceFormat: {
+						type: 'volume',
+					},
+					lastValueVisible: false,
+					// color: 'black', // Colour of price line (what appears in the price axis for the last price)
+					// priceLineVisible: false,
+				},
+				1
 			);
+			volumeSeries.setData(buildVolumeData(allSymbolOneData));
+			indicatorsByYear.get(fakeYear)?.set('volume', volumeSeries);
 			break;
 		}
 		default:

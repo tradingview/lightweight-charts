@@ -3,9 +3,10 @@ import type { OhlcData, UTCTimestamp } from 'lightweight-charts';
 type LineData = {
 	time: UTCTimestamp;
 	value: number;
+	customValues?: Record<string, unknown>;
 };
 
-export type CandleData = OhlcData<UTCTimestamp>
+export type CandleData = OhlcData<UTCTimestamp>;
 
 let randomFactor = 25 + Math.random() * 25;
 const samplePoint = (i: number) =>
@@ -22,14 +23,18 @@ export function generateLineData(
 	startDate: Date
 ): LineData[] {
 	randomFactor = 25 + Math.random() * 25;
-	const res = [];
+	const res: LineData[] = [];
 	const date = startDate;
 	for (let i = 0; i < numberOfPoints; ++i) {
 		const time = (date.getTime() / 1000) as UTCTimestamp;
 		const value = samplePoint(i);
+		const volume = Math.round(Math.random() * 10_000);
 		res.push({
 			time,
 			value,
+			customValues: {
+				volume,
+			},
 		});
 
 		date.setUTCDate(date.getUTCDate() + 1);
@@ -54,6 +59,7 @@ export function generateCandleData(
 			high: d.value + randomRanges[1],
 			open: d.value + sign * randomRanges[2],
 			close: samplePoint(i + 1),
+			customValues: d.customValues,
 		};
 	});
 }
@@ -96,6 +102,7 @@ export function generateAlternativeCandleData(
 			high: candle.high,
 			open: candle.open,
 			close: candle.close,
+			customValues: d.customValues,
 		};
 	});
 }
@@ -119,7 +126,9 @@ export function generateMultipleYears<T extends readonly number[]>(
 	}
 	for (const dataPoint of allData) {
 		const date = new Date((dataPoint.time as number) * 1000);
+		date.setHours(0, 0, 0, 0); // we need to use midnight because daylight savings can make it harder to match timestamps later
 		const year = date.getUTCFullYear();
+		dataPoint.time = (date.getTime() / 1000) as UTCTimestamp;
 		result[year]?.push(dataPoint);
 	}
 	return result as Record<T[number], CandleData[]>;
@@ -129,5 +138,6 @@ export function convertToLineData(candleData: CandleData[]): LineData[] {
 	return candleData.map(d => ({
 		time: d.time,
 		value: d.close,
+		customValues: d.customValues,
 	}));
 }
