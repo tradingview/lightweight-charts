@@ -13,12 +13,14 @@ lineSeries.setData(data);
 const vertLine = new VertLine(chart, lineSeries, data[data.length - 50].time, {
 	showLabel: true,
 	labelText: 'Hello',
+  coordinate: 0,
 });
 lineSeries.attachPrimitive(vertLine);
 
 const vertLine2 = new VertLine(chart, lineSeries, data[data.length - 25].time, {
-	showLabel: false,
-	color: 'red',
-	width: 2,
+  showLabel: true,
+  labelTextColor: 'red',
+  labelText: 'Hello',
+  coordinate: 50,
 });
 lineSeries.attachPrimitive(vertLine2);

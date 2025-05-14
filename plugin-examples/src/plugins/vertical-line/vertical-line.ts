@@ -78,7 +78,7 @@ class VertLineTimeAxisView implements ISeriesPrimitiveAxisView {
 		return this._options.showLabel;
 	}
 	coordinate() {
-		return this._x ?? 0;
+		return this._options.coordinate ?? 0;
 	}
 	text() {
 		return this._options.labelText;
@@ -98,6 +98,7 @@ export interface VertLineOptions {
 	labelBackgroundColor: string;
 	labelTextColor: string;
 	showLabel: boolean;
+  coordinate: number;
 }
 
 const defaultOptions: VertLineOptions = {
@@ -107,6 +108,7 @@ const defaultOptions: VertLineOptions = {
 	labelBackgroundColor: 'green',
 	labelTextColor: 'white',
 	showLabel: false,
+  coordinate: 0,
 };
 
 export class VertLine implements ISeriesPrimitive<Time> {
@@ -115,6 +117,7 @@ export class VertLine implements ISeriesPrimitive<Time> {
 	_time: Time;
 	_paneViews: VertLinePaneView[];
 	_timeAxisViews: VertLineTimeAxisView[];
+  _coordinate: number;
 
 	constructor(
 		chart: IChartApi,
