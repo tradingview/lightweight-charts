@@ -16,6 +16,15 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.7
+
+**Enhancements**
+
+- Added price scale visible range control with new methods in `IPriceScaleApi`: `setVisibleRange(range)`, `getVisibleRange()`, and `setAutoScale(on)`. These methods allow for programmatic control of the visible price range on a price scale. Also added `ensureEdgeTickMarksVisible` option to `PriceScaleOptions`, which ensures tick marks are always visible at the very top and bottom of the price scale, providing clear boundary indicators. These features are particularly useful for charts with zooming and panning disabled that are primarily for display purposes. (PR [#1856](https://github.com/tradingview/lightweight-charts/pull/1856))
+- Added control over the rendering stacking order of series markers through a new `zOrder` option in the series markers plugin. This enhancement provides greater flexibility in controlling marker visibility and layering in complex charts. (PR [#1876](https://github.com/tradingview/lightweight-charts/pull/1876)).
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.0.6..v5.0.7).
+
 ## 5.0.6
 
 **Enhancements**
