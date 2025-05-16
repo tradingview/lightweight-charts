@@ -192,6 +192,15 @@ export interface PriceScaleOptions {
 	 * @defaultValue 0
 	 */
 	minimumWidth: number;
+
+	/**
+	 * Ensures that tick marks are always visible at the very top and bottom of the price scale,
+	 * regardless of the data range. When enabled, a tick mark will be drawn at both edges of the scale,
+	 * providing clear boundary indicators.
+	 *
+	 * @defaultValue false
+	 */
+	ensureEdgeTickMarksVisible: boolean;
 }
 
 interface RangeCache {
@@ -224,6 +233,8 @@ export class PriceScale {
 	private _priceRangeSnapshot: PriceRangeImpl | null = null;
 	private _invalidatedForRange: RangeCache = { isValid: false, visibleBars: null };
 
+	private _isCustomPriceRange: boolean = false;
+
 	private _marginAbove: number = 0;
 	private _marginBelow: number = 0;
 
@@ -251,7 +262,12 @@ export class PriceScale {
 		this._layoutOptions = layoutOptions;
 		this._localizationOptions = localizationOptions;
 		this._colorParser = colorParser;
-		this._markBuilder = new PriceTickMarkBuilder(this, 100, this._coordinateToLogical.bind(this), this._logicalToCoordinate.bind(this));
+		this._markBuilder = new PriceTickMarkBuilder(
+			this,
+			100,
+			this._coordinateToLogical.bind(this),
+			this._logicalToCoordinate.bind(this)
+		);
 	}
 
 	public id(): string {
@@ -295,6 +311,10 @@ export class PriceScale {
 		return this._options.autoScale;
 	}
 
+	public isCustomPriceRange(): boolean {
+		return this._isCustomPriceRange;
+	}
+
 	public isLog(): boolean {
 		return this._options.mode === PriceScaleMode.Logarithmic;
 	}
@@ -305,6 +325,10 @@ export class PriceScale {
 
 	public isIndexedTo100(): boolean {
 		return this._options.mode === PriceScaleMode.IndexedTo100;
+	}
+
+	public getLogFormula(): LogFormula {
+		return this._logFormula;
 	}
 
 	public mode(): PriceScaleState {
@@ -420,6 +444,11 @@ export class PriceScale {
 
 		this._marksCache = null;
 		this._priceRange = newPriceRange;
+	}
+
+	public setCustomPriceRange(newPriceRange: PriceRangeImpl | null): void {
+		this.setPriceRange(newPriceRange);
+		this._toggleCustomPriceRange(newPriceRange !== null);
 	}
 
 	public isEmpty(): boolean {
@@ -792,6 +821,14 @@ export class PriceScale {
 		this._dataSources.forEach((s: IPriceDataSource) => s.updateAllViews());
 	}
 
+	public hasVisibleEdgeMarks(): boolean {
+		return this._options.ensureEdgeTickMarksVisible && this.isAutoScale();
+	}
+
+	public getEdgeMarksPadding(): number {
+		return this.fontSize() / 2;
+	}
+
 	public updateFormatter(): void {
 		this._marksCache = null;
 
@@ -840,6 +877,10 @@ export class PriceScale {
 
 	public colorParser(): ColorParser {
 		return this._colorParser;
+	}
+
+	private _toggleCustomPriceRange(v: boolean): void {
+		this._isCustomPriceRange = v;
 	}
 
 	private _topMarginPx(): number {
@@ -899,6 +940,10 @@ export class PriceScale {
 
 	// eslint-disable-next-line complexity
 	private _recalculatePriceRangeImpl(): void {
+		if (this.isCustomPriceRange() && !this.isAutoScale()) {
+			return;
+		}
+
 		const visibleBars = this._invalidatedForRange.visibleBars;
 		if (visibleBars === null) {
 			return;
@@ -952,6 +997,11 @@ export class PriceScale {
 			}
 		}
 
+		if (this.hasVisibleEdgeMarks()) {
+			marginAbove = Math.max(marginAbove, this.getEdgeMarksPadding());
+			marginBelow = Math.max(marginBelow, this.getEdgeMarksPadding());
+		}
+
 		if (marginAbove !== this._marginAbove || marginBelow !== this._marginBelow) {
 			this._marginAbove = marginAbove;
 			this._marginBelow = marginBelow;
@@ -1001,8 +1051,6 @@ export class PriceScale {
 				this._logFormula = logFormulaForPriceRange(null);
 			}
 		}
-
-		this._invalidatedForRange.isValid = true;
 	}
 
 	private _getCoordinateTransformer(): PriceTransformer | null {
