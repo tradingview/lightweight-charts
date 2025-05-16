@@ -7,7 +7,7 @@ import {
 } from "lightweight-charts";
 
 const chartOptions = {
-	autosize: true,
+	autoSize: true,
 } satisfies DeepPartial<ChartOptions>;
 
 const chart = createChart('container', chartOptions);
