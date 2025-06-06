@@ -1,5 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { createChart, type IChartApi, type CandlestickData } from 'lightweight-charts';
+import {
+  createChart,
+  type IChartApi,
+  type CandlestickData,
+  CandlestickSeries,
+} from 'lightweight-charts';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://chart-widget-backend-production.up.railway.app/api';
 const CHART_ID = '1766151d-f972-42ac-bbb6-d31579f80dc2';
@@ -12,7 +17,7 @@ export default function App() {
     if (!chartContainerRef.current) return;
     const chart = createChart(chartContainerRef.current, { height: chartContainerRef.current.clientHeight });
     chartRef.current = chart;
-    const series = chart.addCandlestickSeries();
+    const series = chart.addSeries(CandlestickSeries);
 
     async function loadData() {
       const chartResp = await fetch(`${API_URL}/charts/${CHART_ID}`);
