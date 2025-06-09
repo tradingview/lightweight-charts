@@ -87,4 +87,12 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 		}
 		return new PriceScaleApi(this._chartWidget, priceScaleId, this.paneIndex());
 	}
+
+	public setPreserveEmptyPane(preserve: boolean): void {
+		this._pane.setPreserveEmptyPane(preserve);
+	}
+
+	public preserveEmptyPane(): boolean {
+		return this._pane.preserveEmptyPane();
+	}
 }

@@ -327,6 +327,13 @@ export interface ChartOptionsBase {
 	 * Basic localization options
 	 */
 	localization: LocalizationOptionsBase;
+
+	/**
+	 * Whether to add a default pane to the chart
+	 * Disable this option when you want to create a chart with no panes and add them manually
+	 * @defaultValue `true`
+	 */
+	addDefaultPane: boolean;
 }
 
 /**
@@ -481,8 +488,10 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._crosshair = new Crosshair(this, options.crosshair);
 		this._magnet = new Magnet(options.crosshair);
 
-		this._getOrCreatePane(0);
-		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
+		if (options.addDefaultPane) {
+			this._getOrCreatePane(0);
+			this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
+		}
 
 		this._backgroundTopColor = this._getBackgroundColor(BackgroundColorSide.Top);
 		this._backgroundBottomColor = this._getBackgroundColor(BackgroundColorSide.Bottom);
@@ -857,6 +866,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._crosshair.updateAllViews();
 	}
 
+	// eslint-disable-next-line complexity
 	public updateTimeScale(newBaseIndex: TimePointIndex | null, newPoints?: readonly TimeScalePoint[], firstChangedPointIndex?: number): void {
 		const oldFirstTime = this._timeScale.indexToTime(0 as TimePointIndex);
 
@@ -884,6 +894,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
+			} else if (isLeftBarShiftToLeft && newBaseIndex != null && newBaseIndex !== currentBaseIndex) {
+				const compensationShift = newBaseIndex - currentBaseIndex;
+				this._timeScale.setRightOffset(this._timeScale.rightOffset() + compensationShift);
 			}
 		}
 
@@ -1027,10 +1040,10 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		previousPane.removeDataSource(series);
 		const newPane = this._getOrCreatePane(newPaneIndex);
 		this._addSeriesToPane(series, newPane);
-
 		if (previousPane.dataSources().length === 0) {
 			this._cleanupIfPaneIsEmpty(previousPane);
 		}
+		this.fullUpdate();
 	}
 
 	public backgroundBottomColor(): string {
@@ -1082,6 +1095,27 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._colorParser;
 	}
 
+	public addPane(): Pane {
+		return this._addPane();
+	}
+
+	private _addPane(index?: number): Pane {
+		const pane = new Pane(this._timeScale, this);
+		this._panes.push(pane);
+		const idx = index ?? this._panes.length - 1;
+		// we always do autoscaling on the creation
+		// if autoscale option is true, it is ok, just recalculate by invalidation mask
+		// if autoscale option is false, autoscale anyway on the first draw
+		// also there is a scenario when autoscale is true in constructor and false later on applyOptions
+		const mask = InvalidateMask.full();
+		mask.invalidatePane(idx, {
+			level: InvalidationLevel.None,
+			autoScale: true,
+		});
+		this._invalidate(mask);
+		return pane;
+	}
+
 	private _getOrCreatePane(index: number): Pane {
 		assert(index >= 0, 'Index should be greater or equal to 0');
 		index = Math.min(this._panes.length, index);
@@ -1089,20 +1123,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			return this._panes[index];
 		}
 
-		const pane = new Pane(this._timeScale, this);
-		this._panes.push(pane);
-
-		// we always do autoscaling on the creation
-		// if autoscale option is true, it is ok, just recalculate by invalidation mask
-		// if autoscale option is false, autoscale anyway on the first draw
-		// also there is a scenario when autoscale is true in constructor and false later on applyOptions
-		const mask = InvalidateMask.full();
-		mask.invalidatePane(index, {
-			level: InvalidationLevel.None,
-			autoScale: true,
-		});
-		this._invalidate(mask);
-		return pane;
+		return this._addPane(index);
 	}
 
 	private _seriesPaneIndex(series: Series<SeriesType>): number {
@@ -1160,9 +1181,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	private _cleanupIfPaneIsEmpty(pane: Pane): void {
-		if (pane.dataSources().length === 0 && this._panes.length > 1) {
+		if (!pane.preserveEmptyPane() && (pane.dataSources().length === 0 && this._panes.length > 1)) {
 			this._panes.splice(this.getPaneIndex(pane), 1);
-			this.fullUpdate();
 		}
 	}
 }

@@ -72,4 +72,18 @@ export interface IPaneApi<HorzScaleItem> {
 	 * @throws If the price scale with the given id is not found in this pane
 	 */
 	priceScale(priceScaleId: string): IPriceScaleApi;
+
+	/**
+	 * Sets whether to preserve the empty pane
+	 *
+	 * @param preserve - Whether to preserve the empty pane
+	 */
+	setPreserveEmptyPane(preserve: boolean): void;
+
+	/**
+	 * Returns whether to preserve the empty pane
+	 *
+	 * @returns Whether to preserve the empty pane
+	 */
+	preserveEmptyPane(): boolean;
 }

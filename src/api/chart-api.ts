@@ -289,6 +289,12 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._chartWidget.takeScreenshot();
 	}
 
+	public addPane(preserveEmptyPane: boolean = false): IPaneApi<HorzScaleItem> {
+		const pane = this._chartWidget.model().addPane();
+		pane.setPreserveEmptyPane(preserveEmptyPane);
+		return this._getPaneApi(pane);
+	}
+
 	public removePane(index: number): void {
 		this._chartWidget.model().removePane(index);
 	}
