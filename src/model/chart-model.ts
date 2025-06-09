@@ -866,7 +866,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._crosshair.updateAllViews();
 	}
 
-	// eslint-disable-next-line complexity
 	public updateTimeScale(newBaseIndex: TimePointIndex | null, newPoints?: readonly TimeScalePoint[], firstChangedPointIndex?: number): void {
 		const oldFirstTime = this._timeScale.indexToTime(0 as TimePointIndex);
 
@@ -894,9 +893,6 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
 				const compensationShift = newBaseIndex - currentBaseIndex;
 				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
-			} else if (isLeftBarShiftToLeft && newBaseIndex != null && newBaseIndex !== currentBaseIndex) {
-				const compensationShift = newBaseIndex - currentBaseIndex;
-				this._timeScale.setRightOffset(this._timeScale.rightOffset() + compensationShift);
 			}
 		}
 
