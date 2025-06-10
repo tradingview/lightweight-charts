@@ -55,7 +55,7 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 
 		assert(paneIndex >= 0 && paneIndex < this._chartWidget.paneWidgets().length, 'Invalid pane index');
 
-		this._chartWidget.model().swapPanes(currentIndex, paneIndex);
+		this._chartWidget.model().movePane(currentIndex, paneIndex);
 	}
 
 	public getSeries(): ISeriesApi<SeriesType, HorzScaleItem>[] {

@@ -440,6 +440,7 @@ export interface IChartModelBase {
 	panes(): readonly Pane[];
 	getPaneIndex(pane: Pane): number;
 	swapPanes(first: number, second: number): void;
+	movePane(from: number, to: number): void;
 	removePane(index: number): void;
 	changePanesHeight(paneIndex: number, height: number): void;
 
@@ -703,6 +704,17 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		const secondPane = this._panes[second];
 		this._panes[first] = secondPane;
 		this._panes[second] = firstPane;
+		this.fullUpdate();
+	}
+
+	public movePane(from: number, to: number): void {
+		assert(from >= 0 && from < this._panes.length && to >= 0 && to < this._panes.length, 'Invalid pane index');
+		if (from === to) {
+			return;
+		}
+
+		const [paneToMove] = this._panes.splice(from, 1);
+		this._panes.splice(to, 0, paneToMove);
 		this.fullUpdate();
 	}
 
