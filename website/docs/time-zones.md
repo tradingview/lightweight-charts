@@ -65,8 +65,8 @@ If you process a large dataset and approaches above do not meet your performance
 
 This approach can significantly improve performance for the following reasons:
 
-- you don't need to parse dates every time you want to get an offset so you could use [lowerbound algorithm](https://en.wikipedia.org/wiki/Upper_and_lower_bounds) (which is `O(log N)`) to find an offset of very first data point quickly
-- after you found an offset, you go through all data items and check whether an offset should be changed or not to the next one (based on a time of the next time shift)
+- You do not need to calculate the time zone offset for every data point individually. Instead, you can look up the correct offset just once for the first timestamp using a fast binary search.
+- After finding the starting offset, you go through the rest data and check whether an offset should be changed, for example, because of DST starting/ending.
 
 ## Why time zones are not supported?
 
