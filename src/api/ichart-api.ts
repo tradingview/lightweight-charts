@@ -277,6 +277,13 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	takeScreenshot(): HTMLCanvasElement;
 
 	/**
+	 * Add a pane to the chart
+	 * @param preserveEmptyPane - Whether to preserve the empty pane
+	 * @returns The pane API
+	 */
+	addPane(preserveEmptyPane?: boolean): IPaneApi<HorzScaleItem>;
+
+	/**
 	 * Returns array of panes' API
 	 *
 	 * @returns array of pane's Api

@@ -55,7 +55,7 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 
 		assert(paneIndex >= 0 && paneIndex < this._chartWidget.paneWidgets().length, 'Invalid pane index');
 
-		this._chartWidget.model().swapPanes(currentIndex, paneIndex);
+		this._chartWidget.model().movePane(currentIndex, paneIndex);
 	}
 
 	public getSeries(): ISeriesApi<SeriesType, HorzScaleItem>[] {
@@ -86,5 +86,13 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 			throw new Error(`Cannot find price scale with id: ${priceScaleId}`);
 		}
 		return new PriceScaleApi(this._chartWidget, priceScaleId, this.paneIndex());
+	}
+
+	public setPreserveEmptyPane(preserve: boolean): void {
+		this._pane.setPreserveEmptyPane(preserve);
+	}
+
+	public preserveEmptyPane(): boolean {
+		return this._pane.preserveEmptyPane();
 	}
 }

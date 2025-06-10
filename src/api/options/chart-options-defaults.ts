@@ -10,6 +10,7 @@ import { timeScaleOptionsDefaults } from './time-scale-options-defaults';
 
 export function chartOptionsDefaults<HorzScaleItem>(): ChartOptionsInternal<HorzScaleItem> {
 	return {
+		addDefaultPane: true,
 		width: 0,
 		height: 0,
 		autoSize: false,
