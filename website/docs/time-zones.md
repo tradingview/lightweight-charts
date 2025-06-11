@@ -7,14 +7,14 @@ sidebar_position: 6
 
 Lightweight Charts™ **does not** natively **support** time zones. If necessary, you should handle time zone adjustments manually.
 
-The library processes all date and time values in UTC. To support time zones, adjust each bar's timestamp in your dataset according to the appropriate time zone offset.
-Therefore, a timestamp in UTC should reflect a local time value in the target time zone.
+The library processes all date and time values in UTC. To support time zones, adjust each bar's timestamp in your dataset based on the appropriate time zone offset.
+Therefore, a UTC timestamp should correspond to the local time in the target time zone.
 
 Consider the example. A data point has the `2021-01-01T10:00:00.000Z` timestamp in UTC. You want to display it in the `Europe/Moscow` time zone, which has the `UTC+03:00` offset according to the [IANA time zone database](https://www.iana.org/time-zones). To do this, adjust the original UTC timestamp by adding 3 hours. Therefore, the new timestamp should be `2021-01-01T13:00:00.000Z`.
 
 :::info
 
-When making time zone converting consider the following:
+When converting time zones, consider the following:
 
 - Adding a time zone offset could change not only the time but the date as well.
 - An offset may vary due to DST (Daylight Saving Time) or other regional adjustments.
@@ -46,7 +46,7 @@ function timeToLocal(originalTime) {
 }
 ```
 
-### Using date-fns-tz library
+### Using the date-fns-tz library
 
 You can use the `utcToZonedTime` function from the [`date-fns-tz`](https://github.com/marnusw/date-fns-tz) library as follows:
 
@@ -68,12 +68,12 @@ This approach can significantly improve performance for the following reasons:
 - You do not need to calculate the time zone offset for every data point individually. Instead, you can look up the correct offset just once for the first timestamp using a fast binary search.
 - After finding the starting offset, you go through the rest data and check whether an offset should be changed, for example, because of DST starting/ending.
 
-## Why time zones are not supported?
+## Why are time zones not supported?
 
 The approaches above were not implemented in Lightweight Charts™ for the following reasons:
 
 - Using [pure JavaScript](#using-pure-javascript) is slow. In our tests, processing 100,000 data points took over 20 seconds.
 - Using the [date-fns-tz library](#using-date-fns-tz-library) introduces additional dependencies and is also slow. In our tests, processing 100,000 data points took 18 seconds.
-- Incorporating [IANA time zone database](#using-iana-time-zone-database) increases the bundle size by [29.9 kB](https://bundlephobia.com/package/tzdata), which is nearly the size of the entire Lightweight Charts™ library.
+- Incorporating the [IANA time zone database](#using-iana-time-zone-database) increases the bundle size by [29.9 kB](https://bundlephobia.com/package/tzdata), which is nearly the size of the entire Lightweight Charts™ library.
 
 Since time zone support is not required for all users, it is intentionally left out of the library to maintain high performance and a lightweight package size.
