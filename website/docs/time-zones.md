@@ -59,7 +59,7 @@ function timeToTz(originalTime, timeZone) {
 }
 ```
 
-### Using IANA time zone database
+### Using the IANA time zone database
 
 If you process a large dataset and approaches above do not meet your performance requirements, consider using the [`tzdata`](https://www.npmjs.com/package/tzdata).
 
@@ -73,7 +73,7 @@ This approach can significantly improve performance for the following reasons:
 The approaches above were not implemented in Lightweight Charts™ for the following reasons:
 
 - Using [pure JavaScript](#using-pure-javascript) is slow. In our tests, processing 100,000 data points took over 20 seconds.
-- Using the [date-fns-tz library](#using-date-fns-tz-library) introduces additional dependencies and is also slow. In our tests, processing 100,000 data points took 18 seconds.
-- Incorporating the [IANA time zone database](#using-iana-time-zone-database) increases the bundle size by [29.9 kB](https://bundlephobia.com/package/tzdata), which is nearly the size of the entire Lightweight Charts™ library.
+- Using the [date-fns-tz library](#using-the-date-fns-tz-library) introduces additional dependencies and is also slow. In our tests, processing 100,000 data points took 18 seconds.
+- Incorporating the [IANA time zone database](#using-the-iana-time-zone-database) increases the bundle size by [29.9 kB](https://bundlephobia.com/package/tzdata), which is nearly the size of the entire Lightweight Charts™ library.
 
 Since time zone support is not required for all users, it is intentionally left out of the library to maintain high performance and a lightweight package size.
