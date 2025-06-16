@@ -115,19 +115,14 @@ export interface LayoutOptions {
 	 */
 	panes: LayoutPanesOptions;
 
-	/**
-	 * Display the TradingView attribution logo on the main chart pane.
-	 *
-	 * The licence for library specifies that you add the "attribution notice"
-	 * from the NOTICE file to your code and a link to https://www.tradingview.com/ to
-	 * the page of your website or mobile application that is available to your users.
-	 * Using this attribution logo is sufficient for meeting this linking requirement.
-	 * However, if you already fulfill this requirement then you can disable this
-	 * attribution logo.
-	 *
-	 * @defaultValue true
-	 */
-	attributionLogo: boolean;
+       /**
+        * Display a small brand mark on the main chart pane.
+        *
+        * If you do not wish to display the mark on the chart you can disable this option.
+        *
+        * @defaultValue true
+        */
+       brandMark: boolean;
 
 	/**
 	 * Specifies the color space of the rendering context for the internal

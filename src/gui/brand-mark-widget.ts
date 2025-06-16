@@ -1,19 +1,19 @@
 import { IChartWidgetBase } from './chart-widget';
 
-type LogoTheme = 'dark' | 'light';
+type BrandTheme = 'dark' | 'light';
 
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="35" height="19" fill="none"><g fill-rule="evenodd" clip-path="url(#a)" clip-rule="evenodd"><path fill="var(--stroke)" d="M2 0H0v10h6v9h21.4l.5-1.3 6-15 1-2.7H23.7l-.5 1.3-.2.6a5 5 0 0 0-7-.9V0H2Zm20 17h4l5.2-13 .8-2h-7l-1 2.5-.2.5-1.5 3.8-.3.7V17Zm-.8-10a3 3 0 0 0 .7-2.7A3 3 0 1 0 16.8 7h4.4ZM14 7V2H2v6h6v9h4V7h2Z"/><path fill="var(--fill)" d="M14 2H2v6h6v9h6V2Zm12 15h-7l6-15h7l-6 15Zm-7-9a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></g><defs><clipPath id="a"><path fill="var(--stroke)" d="M0 0h35v19H0z"/></clipPath></defs></svg>`;
-const css = `a#tv-attr-logo{--fill:#131722;--stroke:#fff;position:absolute;left:10px;bottom:10px;height:19px;width:35px;margin:0;padding:0;border:0;z-index:3;}a#tv-attr-logo[data-dark]{--fill:#D1D4DC;--stroke:#131722;}`;
+const html = `<span style="font-weight:bold">MG</span>`;
+const css = `a#mg-brand-mark{--fill:#131722;--stroke:#fff;position:absolute;left:10px;bottom:10px;height:19px;width:35px;display:flex;align-items:center;justify-content:center;margin:0;padding:0;border:0;z-index:3;font-family:inherit;}a#mg-brand-mark[data-dark]{--fill:#D1D4DC;--stroke:#131722;}`;
 
 // This widget doesn't support dynamically responding to options changes
-// because it is expected that the `attributionLogo` option won't be changed
+// because it is expected that the `brandMark` option won't be changed
 // and this saves some bundle size.
-export class AttributionLogoWidget {
+export class BrandMarkWidget {
 	private readonly _chart: IChartWidgetBase;
 	private readonly _container: HTMLElement;
 	private _element: HTMLAnchorElement | undefined = undefined;
-	private _cssElement: HTMLStyleElement | undefined = undefined;
-	private _theme: LogoTheme | undefined = undefined;
+    private _cssElement: HTMLStyleElement | undefined = undefined;
+    private _theme: BrandTheme | undefined = undefined;
 	private _visible: boolean = false;
 
 	public constructor(container: HTMLElement, chart: IChartWidgetBase) {
@@ -41,7 +41,7 @@ export class AttributionLogoWidget {
 		return this._visible !== this._shouldBeVisible() || this._theme !== this._themeToUse();
 	}
 
-	private _themeToUse(): LogoTheme {
+    private _themeToUse(): BrandTheme {
 		return this._chart
 			.model()
 			.colorParser()
@@ -51,7 +51,7 @@ export class AttributionLogoWidget {
 	}
 
 	private _shouldBeVisible(): boolean {
-		return this._chart.options()['layout'].attributionLogo;
+            return this._chart.options()['layout'].brandMark;
 	}
 
 	private _getUTMSource(): string {
@@ -73,13 +73,13 @@ export class AttributionLogoWidget {
 			this._theme = this._themeToUse();
 			this._cssElement = document.createElement('style');
 			this._cssElement.innerText = css;
-			this._element = document.createElement('a');
-			this._element.href = `https://www.tradingview.com/?utm_medium=lwc-link&utm_campaign=lwc-chart${this._getUTMSource()}`;
-			this._element.title = 'Charting by TradingView';
-			this._element.id = 'tv-attr-logo';
+                this._element = document.createElement('a');
+                this._element.href = `https://macroglide.com/?utm_source=${this._getUTMSource()}`;
+                this._element.title = 'Charting by MacroGlide';
+                this._element.id = 'mg-brand-mark';
 			this._element.target = '_blank';
-			this._element.innerHTML = svg;
-			this._element.toggleAttribute('data-dark', this._theme === 'dark');
+                this._element.innerHTML = html;
+                this._element.toggleAttribute('data-dark', this._theme === 'dark');
 			this._container.appendChild(this._cssElement);
 			this._container.appendChild(this._element);
 		}

@@ -13,7 +13,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "lightweight-charts": "^5.0.7",
+    "macroglide-charts": "^5.0.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

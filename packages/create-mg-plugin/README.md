@@ -1,7 +1,7 @@
-# create-lwc-plugin
+# create-mg-plugin
 
-**create-lwc-plugin** is an npm package designed to simplify the process of
-creating a new plugin for Lightweight Charts™. With this generator, you can
+**create-mg-plugin** is an npm package designed to simplify the process of
+creating a new plugin for MacroGlide Charts. With this generator, you can
 quickly scaffold a project from a template for either
 
 - a Drawing primitive plugin, or
@@ -12,21 +12,21 @@ plugin project by answering a few questions. This allows for a seamless and
 efficient starting point, saving valuable time and effort.
 
 Whether you are developing a new Drawing primitive plugin or a Custom series
-plugin for Lightweight Charts, this generator provides a structured and
+plugin for MacroGlide Charts, this generator provides a structured and
 organized foundation. It ensures that your plugin adheres to the best practices
-and conventions of Lightweight Charts, making it easier to develop, maintain,
+and conventions of MacroGlide Charts, making it easier to develop, maintain,
 and contribute to the community.
 
-Getting started with your Lightweight Charts plugin development has never been
-easier. Let the Lightweight Charts™ Plugin Scaffold Generator
-(`create-lwc-plugin`) handle the initial setup, so you can focus on creating
-outstanding plugins for Lightweight Charts™.
+Getting started with your MacroGlide Charts plugin development has never been
+easier. Let the MacroGlide Charts Plugin Scaffold Generator
+(`create-mg-plugin`) handle the initial setup, so you can focus on creating
+outstanding plugins for MacroGlide Charts.
 
 ✨ Need some examples for inspiration? Check out the
 [plugin-examples](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples)
-folder in the Lightweight Charts repo.
+folder in the MacroGlide Charts repo.
 
-## Scaffolding Your First Lightweight Charts™ Plugin
+## Scaffolding Your First MacroGlide Charts Plugin
 
 With NPM:
 

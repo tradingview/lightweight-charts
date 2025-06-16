@@ -1,6 +1,6 @@
 # React Chart Example
 
-This example app shows how to use the `lightweight-charts` library with a backend API.
+This example app shows how to use the `macroglide-charts` library with a backend API.
 
 ## Setup
 

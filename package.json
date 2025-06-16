@@ -1,17 +1,17 @@
 {
   "private": true,
   "version": "5.0.7",
-  "name": "lightweight-charts",
-  "author": "TradingView, Inc.",
+  "name": "macroglide-charts",
+  "author": "MacroGlide", 
   "license": "Apache-2.0",
   "description": "Performant financial charts built with HTML5 canvas",
-  "homepage": "https://www.tradingview.com/lightweight-charts/",
+  "homepage": "https://macroglide.com/macroglide-charts/",
   "bugs": {
-    "url": "https://github.com/tradingview/lightweight-charts/issues"
+    "url": "https://github.com/macroglide/macroglide-charts/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tradingview/lightweight-charts.git"
+    "url": "git+https://github.com/macroglide/macroglide-charts.git"
   },
   "type": "module",
   "module": "dist/lightweight-charts.production.mjs",
@@ -45,7 +45,6 @@
     "typescript",
     "charting",
     "charts",
-    "tradingview",
     "candlestick"
   ],
   "engines": {

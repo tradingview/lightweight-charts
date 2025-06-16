@@ -10,7 +10,7 @@ import {
   BaselineSeries,
   BarSeries,
   HistogramSeries,
-} from 'lightweight-charts';
+} from 'macroglide-charts';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://chart-widget-backend-production.up.railway.app/api';
 const CHART_ID = '1766151d-f972-42ac-bbb6-d31579f80dc2';

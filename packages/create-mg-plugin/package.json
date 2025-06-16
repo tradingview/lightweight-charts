@@ -1,9 +1,9 @@
 {
-  "name": "create-lwc-plugin",
+  "name": "create-mg-plugin",
   "version": "0.1.2",
   "type": "module",
   "license": "MIT",
-  "author": "TradingView, Inc.",
+  "author": "MacroGlide",
   "description": "Wizard-like CLI tool for scaffolding a new plugin for Lightweight Charts™",
   "keywords": ["lightweight-charts", "lwc-plugin", "plugins"],
   "bin": {
