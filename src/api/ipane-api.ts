@@ -86,4 +86,18 @@ export interface IPaneApi<HorzScaleItem> {
 	 * @returns Whether to preserve the empty pane
 	 */
 	preserveEmptyPane(): boolean;
+
+	/**
+	 * Returns the stretch factor of the pane.
+	 *
+	 * @returns The stretch factor of the pane. Default is 1000
+	 */
+	getStretchFactor(): number;
+
+	/**
+	 * Sets the stretch factor of the pane.
+	 *
+	 * @param stretchFactor - The stretch factor of the pane.
+	 */
+	setStretchFactor(stretchFactor: number): void;
 }

@@ -42,6 +42,15 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 		chartModel.changePanesHeight(paneIndex, height);
 	}
 
+	public getStretchFactor(): number {
+		return this._pane.stretchFactor();
+	}
+
+	public setStretchFactor(stretchFactor: number): void {
+		this._pane.setStretchFactor(stretchFactor);
+		this._chartWidget.model().fullUpdate();
+	}
+
 	public paneIndex(): number {
 		return this._chartWidget.model().getPaneIndex(this._pane);
 	}
