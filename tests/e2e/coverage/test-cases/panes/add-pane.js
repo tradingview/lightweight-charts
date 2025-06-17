@@ -23,7 +23,7 @@ function beforeInteractions(container) {
 
 	mainSeries.setData(simpleData());
 	secondSeries.setData(simpleData());
-	const pane1 = chart.getPane(1);
+	const pane1 = chart.panes()[1];
 
 	pane1.setStretchFactor(pane0.getStretchFactor() * 2);
 
