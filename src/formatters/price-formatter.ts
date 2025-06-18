@@ -1,5 +1,6 @@
 import { isInteger, isNumber } from '../helpers/strict-type-checks';
 
+import { FormatterBase } from './formatter-base';
 import { IPriceFormatter } from './iprice-formatter';
 
 const formatterOptions = {
@@ -32,12 +33,13 @@ export function numberToStringWithLeadingZero(value: number, length: number): st
 	return (dummyString + value.toString()).slice(-length);
 }
 
-export class PriceFormatter implements IPriceFormatter {
+export class PriceFormatter extends FormatterBase implements IPriceFormatter {
 	protected _fractionalLength: number | undefined;
 	private readonly _priceScale: number;
 	private readonly _minMove: number;
 
 	public constructor(priceScale?: number, minMove?: number) {
+		super();
 		if (!minMove) {
 			minMove = 1;
 		}
