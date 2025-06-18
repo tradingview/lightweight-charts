@@ -2,10 +2,12 @@ import { IChartWidgetBase } from '../gui/chart-widget';
 
 import { assert } from '../helpers/assertions';
 
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IPanePrimitiveBase } from '../model/ipane-primitive';
 import { Pane } from '../model/pane';
 import { Series } from '../model/series';
-import { SeriesType } from '../model/series-options';
+import { CustomSeriesOptions, CustomSeriesPartialOptions, SeriesPartialOptions, SeriesPartialOptionsMap, SeriesType } from '../model/series-options';
+import { SeriesDefinition } from '../model/series/series-def';
 
 import { IChartApiBase } from './ichart-api';
 import { IPaneApi } from './ipane-api';
@@ -103,5 +105,24 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 
 	public preserveEmptyPane(): boolean {
 		return this._pane.preserveEmptyPane();
+	}
+
+	public addCustomSeries<
+		TData extends CustomData<HorzScaleItem>,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>,
+	>(
+		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
+		options: SeriesPartialOptions<TOptions> = {},
+		paneIndex: number = 0
+	): ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions> {
+		return this._chartApi.addCustomSeries(customPaneView, options, paneIndex) as ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions>;
+	}
+
+	public addSeries<T extends SeriesType>(
+	definition: SeriesDefinition<T>,
+	options: SeriesPartialOptionsMap[T] = {}
+	): ISeriesApi<T, HorzScaleItem> {
+		return this._chartApi.addSeries(definition, options, this.paneIndex());
 	}
 }
