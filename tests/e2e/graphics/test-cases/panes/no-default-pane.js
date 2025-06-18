@@ -25,9 +25,10 @@ function generateData(startValue) {
 function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, { addDefaultPane: false, layout: { attributionLogo: false } });
 
+	// eslint-disable-next-line no-unused-vars
 	const pane0 = chart.addPane(true);
 	const pane1 = chart.addPane(true);
-	const mainSeries = pane0.addSeries(LightweightCharts.BarSeries);
+	const mainSeries = pane1.addSeries(LightweightCharts.BarSeries);
 	const thirdSeries = chart.addSeries(LightweightCharts.BarSeries, {}, 2);
 
 	const startValue = Math.floor(container.getBoundingClientRect().height / 100) * 100;
@@ -36,13 +37,7 @@ function runTestCase(container) {
 	thirdSeries.setData(generateData(startValue + 20));
 	return new Promise((resolve, reject) => {
 		try {
-			requestAnimationFrame(() => {
-				pane0.setStretchFactor(0.2);
-				pane1.setStretchFactor(0.3);
-				const pane2 = chart.panes()[2];
-				pane2.setStretchFactor(0.5);
-				return requestAnimationFrame(resolve);
-			});
+			requestAnimationFrame(() => requestAnimationFrame(resolve));
 		} catch (error) {
 			reject(error);
 		}
