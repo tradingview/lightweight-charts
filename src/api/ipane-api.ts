@@ -94,13 +94,13 @@ export interface IPaneApi<HorzScaleItem> {
 	 * Returns the stretch factor of the pane.
 	 * Stretch factor determines the relative size of the pane compared to other panes.
 	 *
-	 * @returns The stretch factor of the pane. Default is 1000
+	 * @returns The stretch factor of the pane. Default is 1
 	 */
 	getStretchFactor(): number;
 
 	/**
 	 * Sets the stretch factor of the pane.
-	 * When you creating a pane, the stretch factor is 1000 by default.
+	 * When you creating a pane, the stretch factor is 1 by default.
 	 * So if you have three panes, and you want to make the first pane twice as big as the second and third panes, you can set the stretch factor of the first pane to 2000.
 	 * Example:
 	 * ```js
@@ -111,8 +111,8 @@ export interface IPaneApi<HorzScaleItem> {
 	 * pane2.setStretchFactor(0.3);
 	 * pane3.setStretchFactor(0.5);
 	 * // Now the first pane will be 20% of the total height, the second pane will be 30% of the total height, and the third pane will be 50% of the total height.
-	 * // Note: if you have one pane with default stretch factor of 1000 and set other pane's stretch factor to 2,
-	 * // library will try to make second pane 500 times smaller than the first pane
+	 * // Note: if you have one pane with default stretch factor of 1 and set other pane's stretch factor to 50,
+	 * // library will try to make second pane 50 times smaller than the first pane
 	 * ```
 	 * @param stretchFactor - The stretch factor of the pane.
 	 */

@@ -24,7 +24,7 @@ function isSeries(source: IPriceDataSource): source is Series<SeriesType> {
 	return source instanceof Series;
 }
 
-export const DEFAULT_STRETCH_FACTOR = 1000;
+export const DEFAULT_STRETCH_FACTOR = 1;
 export const MIN_PANE_HEIGHT = 30;
 
 export type PriceScalePosition = 'left' | 'right' | 'overlay';
