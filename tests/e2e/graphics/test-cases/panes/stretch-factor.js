@@ -41,8 +41,8 @@ function runTestCase(container) {
 				const pane1 = chart.panes()[1];
 				const pane2 = chart.panes()[2];
 
-				pane1.setStretchFactor(pane0.stretchFactor() * 2);
-				pane2.setStretchFactor(pane1.stretchFactor() * 3);
+				pane1.setStretchFactor(pane0.getStretchFactor() * 2);
+				pane2.setStretchFactor(pane1.getStretchFactor() * 3);
 				return requestAnimationFrame(resolve);
 			});
 		} catch (error) {
