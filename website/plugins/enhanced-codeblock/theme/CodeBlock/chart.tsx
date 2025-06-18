@@ -1,5 +1,6 @@
 import { type PropVersionMetadata } from '@docusaurus/plugin-content-docs';
 import { useDocsPreferredVersion } from '@docusaurus/theme-common';
+import Admonition from '@theme/Admonition';
 import * as React from 'react';
 
 import versions from '../../../../versions.json';
@@ -58,6 +59,7 @@ export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props:
 	const version = (preferredVersion?.name ?? currentVersion ?? 'current') as TVersion;
 	const srcDoc = getSrcDocWithScript(script);
 	const ref = React.useRef<HTMLIFrameElement>(null);
+	const shouldRenderChart = version === 'current' || parseInt(version.split('.')[0]) >= 5;
 
 	React.useEffect(
 		() => {
@@ -65,7 +67,7 @@ export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props:
 			const iframeWindow = iframeElement?.contentWindow as IFrameWindow<TVersion>;
 			const iframeDocument = iframeElement?.contentDocument;
 
-			if (iframeElement === null || !iframeWindow || !iframeDocument) {
+			if (iframeElement === null || !iframeWindow || !iframeDocument || !shouldRenderChart) {
 				return;
 			}
 
@@ -85,20 +87,18 @@ export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props:
 					iframeWindow.createYieldCurveChart = createYieldCurveChart;
 					iframeWindow.createOptionsChart = createOptionsChart;
 
-					if (version === 'current') {
-						const typedModule = module as unknown as {
-							LineSeries: typeof iframeWindow.LineSeries;
-							AreaSeries: typeof iframeWindow.AreaSeries;
-							CandlestickSeries: typeof iframeWindow.CandlestickSeries;
-							BarSeries: typeof iframeWindow.BarSeries;
-							HistogramSeries: typeof iframeWindow.HistogramSeries;
-						};
-						iframeWindow.LineSeries = typedModule.LineSeries;
-						iframeWindow.AreaSeries = typedModule.AreaSeries;
-						iframeWindow.CandlestickSeries = typedModule.CandlestickSeries;
-						iframeWindow.BarSeries = typedModule.BarSeries;
-						iframeWindow.HistogramSeries = typedModule.HistogramSeries;
-					}
+					const typedModule = module as unknown as {
+						LineSeries: typeof iframeWindow.LineSeries;
+						AreaSeries: typeof iframeWindow.AreaSeries;
+						CandlestickSeries: typeof iframeWindow.CandlestickSeries;
+						BarSeries: typeof iframeWindow.BarSeries;
+						HistogramSeries: typeof iframeWindow.HistogramSeries;
+					};
+					iframeWindow.LineSeries = typedModule.LineSeries;
+					iframeWindow.AreaSeries = typedModule.AreaSeries;
+					iframeWindow.CandlestickSeries = typedModule.CandlestickSeries;
+					iframeWindow.BarSeries = typedModule.BarSeries;
+					iframeWindow.HistogramSeries = typedModule.HistogramSeries;
 					iframeWindow.run?.();
 				} catch (err: unknown) {
 					// eslint-disable-next-line no-console
@@ -121,6 +121,16 @@ export function Chart<TVersion extends keyof LightweightChartsApiTypeMap>(props:
 		},
 		[srcDoc]
 	);
+
+	if (!shouldRenderChart) {
+		return (
+			<div>
+			<Admonition type="caution" title="Chart visualization is not available for this version">
+				<p>Switch to a version 5 or higher to see the chart</p>
+			</Admonition>
+		</div>
+		);
+	}
 
 	return (
 		<iframe
