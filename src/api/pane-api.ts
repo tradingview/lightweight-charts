@@ -73,8 +73,12 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 		return this._pane.series().map((source: Series<SeriesType>) => this._seriesApiGetter(source)) ?? [];
 	}
 
-	public getHTMLElement(): HTMLElement {
-		return this._chartWidget.paneWidgets()[this.paneIndex()].getElement();
+	public getHTMLElement(): HTMLElement | null {
+		const widgets = this._chartWidget.paneWidgets();
+		if (!widgets || widgets.length === 0 || !widgets[this.paneIndex()]) {
+			return null;
+		}
+		return widgets[this.paneIndex()].getElement();
 	}
 
 	public attachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void {

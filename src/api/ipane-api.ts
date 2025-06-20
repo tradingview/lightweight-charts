@@ -49,9 +49,9 @@ export interface IPaneApi<HorzScaleItem> {
 	/**
 	 * Retrieves the HTML element of the pane.
 	 *
-	 * @returns The HTML element of the pane.
+	 * @returns The HTML element of the pane or null if pane wasn't created yet.
 	 */
-	getHTMLElement(): HTMLElement;
+	getHTMLElement(): HTMLElement | null;
 
 	/**
 	 * Attaches additional drawing primitive to the pane
