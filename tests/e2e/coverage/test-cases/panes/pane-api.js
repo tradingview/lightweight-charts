@@ -16,7 +16,8 @@ function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container);
 
 	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
-	secondSeries = chart.addSeries(LightweightCharts.LineSeries, {}, 1);
+	const pane1 = chart.addPane(true);
+	secondSeries = pane1.addSeries(LightweightCharts.LineSeries);
 	const thirdSeries = chart.addSeries(LightweightCharts.LineSeries, {}, 2);
 
 	mainSeries.setData(simpleData());
@@ -33,6 +34,8 @@ function afterInteractions() {
 			panes[1].getHeight();
 			panes[1].paneIndex();
 			panes[2].setHeight(100);
+			panes[0].setStretchFactor(200);
+			panes[1].getStretchFactor();
 			panes[0].moveTo(2);
 			panes[0].getHTMLElement();
 			panes[1].getSeries();

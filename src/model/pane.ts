@@ -24,7 +24,7 @@ function isSeries(source: IPriceDataSource): source is Series<SeriesType> {
 	return source instanceof Series;
 }
 
-export const DEFAULT_STRETCH_FACTOR = 1000;
+export const DEFAULT_STRETCH_FACTOR = 1;
 export const MIN_PANE_HEIGHT = 30;
 
 export type PriceScalePosition = 'left' | 'right' | 'overlay';
@@ -41,6 +41,7 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 	private _width: number = 0;
 	private _stretchFactor: number = DEFAULT_STRETCH_FACTOR;
 	private _cachedOrderedSources: readonly IPriceDataSource[] | null = null;
+	private _preserveEmptyPane: boolean = false;
 
 	private _destroyed: Delegate = new Delegate();
 
@@ -170,6 +171,14 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 		});
 
 		this.updateAllSources();
+	}
+
+	public setPreserveEmptyPane(preserve: boolean): void {
+		this._preserveEmptyPane = preserve;
+	}
+
+	public preserveEmptyPane(): boolean {
+		return this._preserveEmptyPane;
 	}
 
 	public series(): readonly Series<SeriesType>[] {

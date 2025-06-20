@@ -2,10 +2,12 @@ import { IChartWidgetBase } from '../gui/chart-widget';
 
 import { assert } from '../helpers/assertions';
 
+import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IPanePrimitiveBase } from '../model/ipane-primitive';
 import { Pane } from '../model/pane';
 import { Series } from '../model/series';
-import { SeriesType } from '../model/series-options';
+import { CustomSeriesOptions, CustomSeriesPartialOptions, SeriesPartialOptions, SeriesPartialOptionsMap, SeriesType } from '../model/series-options';
+import { SeriesDefinition } from '../model/series/series-def';
 
 import { IChartApiBase } from './ichart-api';
 import { IPaneApi } from './ipane-api';
@@ -42,6 +44,15 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 		chartModel.changePanesHeight(paneIndex, height);
 	}
 
+	public getStretchFactor(): number {
+		return this._pane.stretchFactor();
+	}
+
+	public setStretchFactor(stretchFactor: number): void {
+		this._pane.setStretchFactor(stretchFactor);
+		this._chartWidget.model().fullUpdate();
+	}
+
 	public paneIndex(): number {
 		return this._chartWidget.model().getPaneIndex(this._pane);
 	}
@@ -55,15 +66,19 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 
 		assert(paneIndex >= 0 && paneIndex < this._chartWidget.paneWidgets().length, 'Invalid pane index');
 
-		this._chartWidget.model().swapPanes(currentIndex, paneIndex);
+		this._chartWidget.model().movePane(currentIndex, paneIndex);
 	}
 
 	public getSeries(): ISeriesApi<SeriesType, HorzScaleItem>[] {
 		return this._pane.series().map((source: Series<SeriesType>) => this._seriesApiGetter(source)) ?? [];
 	}
 
-	public getHTMLElement(): HTMLElement {
-		return this._chartWidget.paneWidgets()[this.paneIndex()].getElement();
+	public getHTMLElement(): HTMLElement | null {
+		const widgets = this._chartWidget.paneWidgets();
+		if (!widgets || widgets.length === 0 || !widgets[this.paneIndex()]) {
+			return null;
+		}
+		return widgets[this.paneIndex()].getElement();
 	}
 
 	public attachPrimitive(primitive: IPanePrimitive<HorzScaleItem>): void {
@@ -86,5 +101,32 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 			throw new Error(`Cannot find price scale with id: ${priceScaleId}`);
 		}
 		return new PriceScaleApi(this._chartWidget, priceScaleId, this.paneIndex());
+	}
+
+	public setPreserveEmptyPane(preserve: boolean): void {
+		this._pane.setPreserveEmptyPane(preserve);
+	}
+
+	public preserveEmptyPane(): boolean {
+		return this._pane.preserveEmptyPane();
+	}
+
+	public addCustomSeries<
+		TData extends CustomData<HorzScaleItem>,
+		TOptions extends CustomSeriesOptions,
+		TPartialOptions extends CustomSeriesPartialOptions = SeriesPartialOptions<TOptions>,
+	>(
+		customPaneView: ICustomSeriesPaneView<HorzScaleItem, TData, TOptions>,
+		options: SeriesPartialOptions<TOptions> = {},
+		paneIndex: number = 0
+	): ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions> {
+		return this._chartApi.addCustomSeries(customPaneView, options, paneIndex) as ISeriesApi<'Custom', HorzScaleItem, TData, TOptions, TPartialOptions>;
+	}
+
+	public addSeries<T extends SeriesType>(
+	definition: SeriesDefinition<T>,
+	options: SeriesPartialOptionsMap[T] = {}
+	): ISeriesApi<T, HorzScaleItem> {
+		return this._chartApi.addSeries(definition, options, this.paneIndex());
 	}
 }
