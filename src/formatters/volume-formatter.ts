@@ -1,9 +1,11 @@
+import { FormatterBase } from './formatter-base';
 import { IPriceFormatter } from './iprice-formatter';
 
-export class VolumeFormatter implements IPriceFormatter {
+export class VolumeFormatter extends FormatterBase implements IPriceFormatter {
 	private readonly _precision: number;
 
 	public constructor(precision: number) {
+		super();
 		this._precision = precision;
 	}
 

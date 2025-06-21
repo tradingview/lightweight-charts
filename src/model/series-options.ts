@@ -3,7 +3,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
 import { AutoScaleMargins } from './autoscale-info-impl';
-import { PriceFormatterFn } from './price-formatter-fn';
+import { PriceFormatterFn, PricesFormatterFn } from './price-formatter-fn';
 
 /**
  * Represents style options for a candlestick series.
@@ -584,6 +584,11 @@ export interface PriceFormatCustom {
 	 * Override price formatting behaviour. Can be used for cases that can't be covered with built-in price formats.
 	 */
 	formatter: PriceFormatterFn;
+
+	/**
+	 * Override price formatting for multiple prices. Can be used if formatter should be adjusted based of all values being formatted.
+	 */
+	formatterAll?: PricesFormatterFn;
 
 	/**
 	 * The minimum possible step size for price value movement.

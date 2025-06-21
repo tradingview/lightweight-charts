@@ -617,7 +617,11 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private _recreateFormatter(): void {
 		switch (this._options.priceFormat.type) {
 			case 'custom': {
-				this._formatter = { format: this._options.priceFormat.formatter };
+				const formatter = this._options.priceFormat.formatter;
+				this._formatter = {
+					format: formatter,
+					formatAll: this._options.priceFormat.formatterAll ?? ((prices: readonly BarPrice[]) => prices.map(formatter)),
+				};
 				break;
 			}
 			case 'volume': {

@@ -7,4 +7,11 @@ export interface IPriceFormatter {
 	 * @returns Formatted price
 	 */
 	format(price: number): string;
+
+	/**
+	 * Formatting function. This function is used for consistent format adjusting for all prices
+	 * @param prices - Prices to be formatted
+	 * @returns Formatted prices
+	 */
+	formatAll(prices: readonly number[]): string[];
 }

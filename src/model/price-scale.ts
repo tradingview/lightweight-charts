@@ -13,7 +13,7 @@ import { Coordinate } from './coordinate';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LayoutOptions } from './layout-options';
 import { LocalizationOptionsBase } from './localization-options';
-import { PriceFormatterFn } from './price-formatter-fn';
+import { PriceFormatterFn, PricesFormatterFn } from './price-formatter-fn';
 import { PriceRangeImpl } from './price-range-impl';
 import {
 	canConvertPriceRangeFromLog,
@@ -68,6 +68,7 @@ export interface PriceScaleState {
 export interface PriceMark {
 	coord: Coordinate;
 	label: string;
+	logical: number;
 }
 
 export interface PricedValue {
@@ -797,6 +798,17 @@ export class PriceScale {
 		}
 	}
 
+	public formatLogicals(logicals: readonly number[]): string[] {
+		switch (this._options.mode) {
+			case PriceScaleMode.Percentage:
+				return this._formatPercentages(logicals);
+			case PriceScaleMode.IndexedTo100:
+				return this.formatter().formatAll(logicals);
+			default:
+				return this._formatPrices(logicals as BarPrice[]);
+		}
+	}
+
 	public formatPriceAbsolute(price: number): string {
 		return this._formatPrice(price as BarPrice, ensureNotNull(this._formatterSource).formatter());
 	}
@@ -1076,11 +1088,40 @@ export class PriceScale {
 		return formatter(value as BarPrice);
 	}
 
+	private _formatValues(values: readonly (BarPrice | number)[], formatter: PricesFormatterFn | undefined, fallbackFormatter?: IPriceFormatter): string[] {
+		if (formatter === undefined) {
+			if (fallbackFormatter === undefined) {
+				fallbackFormatter = this.formatter();
+			}
+			return fallbackFormatter.formatAll(values);
+		}
+
+		return formatter(values as BarPrice[]);
+	}
+
 	private _formatPrice(price: BarPrice, fallbackFormatter?: IPriceFormatter): string {
 		return this._formatValue(price, this._localizationOptions.priceFormatter, fallbackFormatter);
 	}
 
+	private _formatPrices(prices: readonly BarPrice[], fallbackFormatter?: IPriceFormatter): string[] {
+		const priceFormatter = this._localizationOptions.priceFormatter;
+		return this._formatValues(
+			prices,
+			this._localizationOptions.pricesFormatter ?? (priceFormatter ? (values: readonly BarPrice[]) => values.map(priceFormatter) : undefined),
+			fallbackFormatter
+		);
+	}
+
 	private _formatPercentage(percentage: number, fallbackFormatter?: IPriceFormatter): string {
 		return this._formatValue(percentage, this._localizationOptions.percentageFormatter, fallbackFormatter);
+	}
+
+	private _formatPercentages(percentages: readonly number[], fallbackFormatter?: IPriceFormatter): string[] {
+		const percentagesFormatter = this._localizationOptions.percentageFormatter;
+		return this._formatValues(
+			percentages,
+			this._localizationOptions.percentagesFormatter ?? (percentagesFormatter ? (values: readonly number[]) => values.map(percentagesFormatter) : undefined),
+			fallbackFormatter
+		);
 	}
 }
