@@ -13,5 +13,5 @@ export interface IPriceFormatter {
 	 * @param prices - Prices to be formatted
 	 * @returns Formatted prices
 	 */
-	formatAll(prices: readonly number[]): string[];
+	formatTickmarks(prices: readonly number[]): string[];
 }

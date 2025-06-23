@@ -105,7 +105,7 @@ export class PriceTickMarkBuilder {
 		}
 
 		const logicals = this._marks.map((mark: PriceMark) => mark.logical);
-		const labels = this._priceScale.formatLogicals(logicals);
+		const labels = this._priceScale.formatLogicalTickmarks(logicals);
 		for (let i = 0; i < this._marks.length; i++) {
 			this._marks[i].label = labels[i];
 		}

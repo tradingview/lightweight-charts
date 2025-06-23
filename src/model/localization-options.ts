@@ -1,5 +1,10 @@
 import { Time } from './horz-scale-behavior-time/types';
-import { PercentageFormatterFn, PercentagesFormatterFn, PriceFormatterFn, PricesFormatterFn } from './price-formatter-fn';
+import {
+	PercentageFormatterFn,
+	PriceFormatterFn,
+	TickmarksPercentageFormatterFn,
+	TickmarksPriceFormatterFn,
+} from './price-formatter-fn';
 
 /**
  * A custom function used to override formatting of a time to a string.
@@ -31,7 +36,7 @@ export interface LocalizationOptionsBase {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	pricesFormatter?: PricesFormatterFn;
+	tickmarksPriceFormatter?: TickmarksPriceFormatterFn;
 
 	/**
 	 * Override formatting of the percentage scale tick marks, labels and crosshair labels. Can be used for cases that can't be covered with built-in percentage format.
@@ -45,7 +50,7 @@ export interface LocalizationOptionsBase {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	percentagesFormatter?: PercentagesFormatterFn;
+	tickmarksPercentageFormatter?: TickmarksPercentageFormatterFn;
 
 }
 

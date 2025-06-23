@@ -620,7 +620,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 				const formatter = this._options.priceFormat.formatter;
 				this._formatter = {
 					format: formatter,
-					formatAll: this._options.priceFormat.formatterAll ?? ((prices: readonly BarPrice[]) => prices.map(formatter)),
+					formatTickmarks: this._options.priceFormat.tickmarksFormatter ?? ((prices: readonly BarPrice[]) => prices.map(formatter)),
 				};
 				break;
 			}
