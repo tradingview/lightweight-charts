@@ -9,7 +9,7 @@ export interface IPriceFormatter {
 	format(price: number): string;
 
 	/**
-	 * Formatting function. This function is used for consistent format adjusting for all prices
+	 * A formatting function for price scale tick marks. Use this function to define formatting rules based on all provided price values.
 	 * @param prices - Prices to be formatted
 	 * @returns Formatted prices
 	 */

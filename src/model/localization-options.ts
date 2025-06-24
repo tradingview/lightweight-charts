@@ -32,14 +32,14 @@ export interface LocalizationOptionsBase {
 	priceFormatter?: PriceFormatterFn;
 
 	/**
-	 * Override formatting of the price scale tick marks. Can be used if formatting should be adjusted based on all the values being formatted
+	 * Overrides the formatting of price scale tick marks. Use this to define formatting rules based on all provided price values.
 	 *
 	 * @defaultValue `undefined`
 	 */
 	tickmarksPriceFormatter?: TickmarksPriceFormatterFn;
 
 	/**
-	 * Override formatting of the percentage scale tick marks, labels and crosshair labels. Can be used for cases that can't be covered with built-in percentage format.
+	 * Overrides the formatting of percentage scale tick marks. Use this to define formatting rules based on all provided values.
 	 *
 	 * @defaultValue `undefined`
 	 */
