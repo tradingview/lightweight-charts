@@ -717,7 +717,7 @@ export class LineDrawingTool {
 	stopDrawing(): void {
 		this._drawing = false;
 		this._points = [];
-        this._removePreviewLine();
+		this._removePreviewLine();
 	}
 
 	isDrawing(): boolean {
@@ -858,7 +858,7 @@ export class RectangleDrawingTool {
 	stopDrawing(): void {
 		this._drawing = false;
 		this._points = [];
-        this._removePreviewRectangle();
+		this._removePreviewRectangle();
 	}
 
 	isDrawing(): boolean {
@@ -948,12 +948,12 @@ export class DrawingTools {
 	private _rectangleTool: RectangleDrawingTool;
 	private _lineTool: LineDrawingTool;
 	private _currentTool: 'rectangle' | 'line' | null = null;
-    private _drawingsToolbarContainer: HTMLDivElement;
-    private _rectangleButton: HTMLDivElement | undefined;
-    private _lineButton: HTMLDivElement | undefined;
+	private _drawingsToolbarContainer: HTMLDivElement;
+	private _rectangleButton: HTMLDivElement | undefined;
+	private _lineButton: HTMLDivElement | undefined;
 
-    private _activeButtonColor: string = '#000000'; 
-    private readonly _inactiveColor = 'rgb(100, 100, 100)';
+	private _activeButtonColor: string = '#000000'; 
+	private readonly _inactiveColor = 'rgb(100, 100, 100)';
 
 	private _selectedBaseColor: string = '#000000'; 
 	private _currentOpacity: number = 0.35; 
@@ -964,7 +964,7 @@ export class DrawingTools {
 		rectangleOptions: Partial<RectangleDrawingToolOptions> = {},
 		lineOptions: Partial<LineDrawingToolOptions> = {}
 	) {
-        this._drawingsToolbarContainer = drawingsToolbarContainer;
+		this._drawingsToolbarContainer = drawingsToolbarContainer;
 		this._rectangleTool = new RectangleDrawingTool(
 			chart,
 			series,
@@ -978,33 +978,33 @@ export class DrawingTools {
 			this.stopDrawing.bind(this)
 		);
 
-        this._selectedBaseColor = '#000000'; 
-        this._currentOpacity = 0.35;
-        this._activeButtonColor = this._selectedBaseColor; 
+		this._selectedBaseColor = '#000000'; 
+		this._currentOpacity = 0.35;
+		this._activeButtonColor = this._selectedBaseColor; 
 
-        this._createToolbar();
-        this._updateDrawingToolColorsAndOpacity();
+		this._createToolbar();
+		this._updateDrawingToolColorsAndOpacity();
 	}
 
-    private _createToolbar() {
-        const lineButton = document.createElement('div');
+	private _createToolbar() {
+		const lineButton = document.createElement('div');
 		lineButton.style.width = '24px';
 		lineButton.style.height = '24px';
-        lineButton.style.cursor = 'pointer';
-        lineButton.style.fill = this._inactiveColor;
+		lineButton.style.cursor = 'pointer';
+		lineButton.style.fill = this._inactiveColor;
 		lineButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.71,3.29a1,1,0,0,0-1.42,0L3.29,20.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L21.71,4.71A1,1,0,0,0,21.71,3.29Z"/></svg>`;
 		lineButton.addEventListener('click', () => this.selectLineTool());
 		this._drawingsToolbarContainer.appendChild(lineButton);
-        this._lineButton = lineButton;
+		this._lineButton = lineButton;
 
-        const rectButton = document.createElement('div');
+		const rectButton = document.createElement('div');
 		rectButton.style.width = '24px';
 		rectButton.style.height = '24px';
-        rectButton.style.cursor = 'pointer';
-        rectButton.style.fill = this._inactiveColor;
+		rectButton.style.cursor = 'pointer';
+		rectButton.style.fill = this._inactiveColor;
 		rectButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 2v20h20V2H2zm18 18H4V4h16v16z"/></svg>`;
 		rectButton.addEventListener('click', () => this.selectRectangleTool());
-        this._drawingsToolbarContainer.appendChild(rectButton);
+		this._drawingsToolbarContainer.appendChild(rectButton);
 		this._rectangleButton = rectButton;
 
 		const colorPicker = document.createElement('input');
@@ -1037,7 +1037,7 @@ export class DrawingTools {
 			this._updateDrawingToolColorsAndOpacity();
 		});
 		this._drawingsToolbarContainer.appendChild(opacitySlider);
-    }
+	}
 
 	private _hexToRgba(hex: string, alpha: number): string {
 		const r = parseInt(hex.slice(1, 3), 16);
@@ -1057,31 +1057,31 @@ export class DrawingTools {
 	}
 
 	selectRectangleTool() {
-        if (this._currentTool === 'rectangle') {
-            this.stopDrawing();
-            return;
-        }
+		if (this._currentTool === 'rectangle') {
+			this.stopDrawing();
+			return;
+		}
 		this._stopAllDrawing();
 		this._currentTool = 'rectangle';
 		this._rectangleTool.startDrawing();
-        this._updateButtonStyles();
+		this._updateButtonStyles();
 	}
 
 	selectLineTool() {
-        if (this._currentTool === 'line') {
-            this.stopDrawing();
-            return;
-        }
+		if (this._currentTool === 'line') {
+			this.stopDrawing();
+			return;
+		}
 		this._stopAllDrawing();
 		this._currentTool = 'line';
 		this._lineTool.startDrawing();
-        this._updateButtonStyles();
+		this._updateButtonStyles();
 	}
 
 	stopDrawing() {
 		this._stopAllDrawing();
 		this._currentTool = null;
-        this._updateButtonStyles();
+		this._updateButtonStyles();
 	}
 
 	private _stopAllDrawing() {
@@ -1089,23 +1089,23 @@ export class DrawingTools {
 		this._lineTool.stopDrawing();
 	}
 
-    private _updateButtonStyles() {
-        if (this._rectangleButton) {
-            this._rectangleButton.style.fill = this._currentTool === 'rectangle' ? this._activeButtonColor : this._inactiveColor;
-        }
-        if (this._lineButton) {
-            this._lineButton.style.fill = this._currentTool === 'line' ? this._activeButtonColor : this._inactiveColor;
-        }
-    }
+	private _updateButtonStyles() {
+		if (this._rectangleButton) {
+			this._rectangleButton.style.fill = this._currentTool === 'rectangle' ? this._activeButtonColor : this._inactiveColor;
+		}
+		if (this._lineButton) {
+			this._lineButton.style.fill = this._currentTool === 'line' ? this._activeButtonColor : this._inactiveColor;
+		}
+	}
 
 	getCurrentTool() {
 		return this._currentTool;
 	}
 
 	remove() {
-        this.stopDrawing();
+		this.stopDrawing();
 		this._rectangleTool.remove();
 		this._lineTool.remove();
-        this._drawingsToolbarContainer.innerHTML = '';
+		this._drawingsToolbarContainer.innerHTML = '';
 	}
 }
