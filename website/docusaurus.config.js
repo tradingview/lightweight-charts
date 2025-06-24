@@ -339,10 +339,6 @@ const getConfig = async () => {
 								href: 'https://stackoverflow.com/questions/tagged/lightweight-charts',
 							},
 							{
-								label: 'Discord',
-								href: 'https://discord.gg/UC7cGkvn4U',
-							},
-							{
 								label: 'Twitter',
 								href: 'https://twitter.com/tradingview',
 							},

@@ -12,13 +12,20 @@ function interactionsToPerform() {
 
 let chart;
 function beforeInteractions(container) {
-	chart = LightweightCharts.createChart(container);
+	chart = LightweightCharts.createChart(container, {
+		addDefaultPane: false,
+	});
 
-	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
+	const pane0 = chart.addPane(true);
+
+	const mainSeries = chart.addSeries(LightweightCharts.LineSeries, {}, pane0.paneIndex());
 	const secondSeries = chart.addSeries(LightweightCharts.LineSeries, {}, 1);
 
 	mainSeries.setData(simpleData());
 	secondSeries.setData(simpleData());
+	const pane1 = chart.panes()[1];
+
+	pane1.setStretchFactor(pane0.getStretchFactor() * 2);
 
 	return Promise.resolve();
 }
