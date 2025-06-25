@@ -39,7 +39,7 @@ export interface LocalizationOptionsBase {
 	tickmarksPriceFormatter?: TickmarksPriceFormatterFn;
 
 	/**
-	 * Overrides the formatting of percentage scale tick marks. Use this to define formatting rules based on all provided values.
+	 * Overrides the formatting of percentage scale tick marks.
 	 *
 	 * @defaultValue `undefined`
 	 */
