@@ -145,7 +145,7 @@ const compile = async () => {
 			}
 			const esModuleTyping = generateDtsBundle([
 				{
-					filePath: `./typings/indicators/${stripCalculation(
+					filePath: `./typings/indicator-examples/src/indicators/${stripCalculation(
 						file.exportName
 					)}/${file.exportName}.d.ts`,
 					// libraries: {
