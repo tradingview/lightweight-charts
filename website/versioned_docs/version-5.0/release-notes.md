@@ -16,6 +16,28 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.8
+
+**Enhancements**
+
+- Improved pane API with several new methods and options:
+  - Added `addDefaultPane` option to chart options, allowing creation of charts with no initial panes
+  - Added `addPane` method to `IChartApi` for programmatically adding panes
+  - Added `setPreserveEmptyPane` and `preserveEmptyPane` methods to control empty pane behavior
+  - Added `getStretchFactor` and `setStretchFactor` methods to control relative pane sizes
+  - Added `addCustomSeries` and `addSeries` methods to `IPaneApi` for creating series directly on a specific pane
+  - Updated `getHTMLElement` to return `null` when a pane hasn't been created yet
+  - These improvements provide greater flexibility when working with multi-pane charts
+  (PR [#1894](https://github.com/tradingview/lightweight-charts/pull/1894), fixes [#1898](https://github.com/tradingview/lightweight-charts/issues/1898), [#1896](https://github.com/tradingview/lightweight-charts/issues/1896), [#1872](https://github.com/tradingview/lightweight-charts/issues/1872), [#1907](https://github.com/tradingview/lightweight-charts/issues/1907))
+- Added additional price scale tick mark formatting capabilities:
+  - Added `formatTickmarks` method to `IPriceFormatter` interface
+  - Added `tickmarksPriceFormatter` and `tickmarksPercentageFormatter` options to `LocalizationOptionsBase`
+  - Added `tickmarksFormatter` option to `PriceFormatCustom`
+  - These new formatters provide all tick mark values at once, allowing for context-aware formatting decisions such as determining the optimal precision level needed
+  (PR [#1903](https://github.com/tradingview/lightweight-charts/pull/1903))
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.0.7..v5.0.8).
+
 ## 5.0.7
 
 **Enhancements**
