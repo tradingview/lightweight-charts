@@ -103,6 +103,12 @@ export class PriceTickMarkBuilder {
 				padding * 2
 			);
 		}
+
+		const logicals = this._marks.map((mark: PriceMark) => mark.logical);
+		const labels = this._priceScale.formatLogicalTickmarks(logicals);
+		for (let i = 0; i < this._marks.length; i++) {
+			this._marks[i].label = labels[i];
+		}
 	}
 
 	public marks(): PriceMark[] {
@@ -146,10 +152,12 @@ export class PriceTickMarkBuilder {
 			if (targetIndex < marks.length) {
 				marks[targetIndex].coord = coord as Coordinate;
 				marks[targetIndex].label = priceScale.formatLogical(logical);
+				marks[targetIndex].logical = logical;
 			} else {
 				marks.push({
 					coord: coord as Coordinate,
 					label: priceScale.formatLogical(logical),
+					logical,
 				});
 			}
 
@@ -222,7 +230,7 @@ export class PriceTickMarkBuilder {
 		const roundedValue = value - (value % valueSpan);
 		const roundedCoord = this._logicalToCoordinateFunc(roundedValue, firstValue, true);
 
-		return { label: this._priceScale.formatLogical(roundedValue), coord: roundedCoord as Coordinate };
+		return { label: this._priceScale.formatLogical(roundedValue), coord: roundedCoord as Coordinate, logical: roundedValue };
 	}
 
 	private _shouldApplyEdgeMarks(span: number, low: number, high: number): boolean {
