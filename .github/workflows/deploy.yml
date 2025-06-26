@@ -9,6 +9,7 @@ on:
       - 'src/**'
       - 'website/**'
       - 'plugin-examples/src/**'
+      - 'indicator-examples/src/**'
 
 jobs:
   deploy:
@@ -43,8 +44,11 @@ jobs:
       - name: Build plugin examples website
         working-directory: ./plugin-examples
         run: npm run build:examples:site
-      - name: Build plugin examples website
-        working-directory: ./plugin-examples
+      - name: Install indicator example dependencies
+        working-directory: ./indicator-examples
+        run: npm install
+      - name: Build indicator examples website
+        working-directory: ./indicator-examples
         run: npm run build:examples:site
 
       - name: Deploy

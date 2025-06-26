@@ -16,7 +16,7 @@ const currentDir = dirname(__filename);
 const distFolder = resolve(currentDir, 'dist');
 const distSrcFolder = resolve(currentDir, 'dist', 'src');
 const websiteFolder = resolve(currentDir, 'website');
-const docsWebsiteFolder = resolve(currentDir, '..', 'website', 'build', 'plugin-examples');
+const docsWebsiteFolder = resolve(currentDir, '..', 'website', 'build', 'indicator-examples');
 
 function emptyDir(dir) {
 	if (!existsSync(dir)) {
