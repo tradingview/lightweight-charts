@@ -20,6 +20,7 @@ const sidebars = {
 				] },
 			],
 		},
+		'analysis-indicators',
 		{
 			'Framework Integrations': [
 				{ React: [
