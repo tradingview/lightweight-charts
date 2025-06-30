@@ -78,6 +78,51 @@ or submit your own.
 
 :::
 
+## How To
+
+A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
+
+import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
+export const HowToList = () => {
+	const examplesCategory = useDocsSidebar().items.find(
+		item => item.type === "category" && item.label === "How To"
+	);
+	const examples = examplesCategory.items.filter(doc => doc.type === "link");
+	return (
+		<ul>
+			{examples.map(docLink => (
+				<li key={docLink.docId}>
+					<a href={docLink.href}>{docLink.label}</a>
+				</li>
+			))}
+		</ul>
+	);
+};
+
+<HowToList />
+
+## Examples / Demos
+
+A collection of demos showcasing the various capabilities of the library.
+
+export const ExamplesList = () => {
+	const examplesCategory = useDocsSidebar().items.find(
+		item => item.type === "category" && item.label === "Examples / Demos"
+	);
+	const examples = examplesCategory.items.filter(doc => doc.type === "link");
+	return (
+		<ul>
+			{examples.map(docLink => (
+				<li key={docLink.docId}>
+					<a href={docLink.href}>{docLink.label}</a>
+				</li>
+			))}
+		</ul>
+	);
+};
+
+<ExamplesList />
+
 ## Analysis indicators
 
 We've prepared [analysis indicator examples](./tutorials/analysis-indicators) that are designed to be a starting point for creating your own indicators and can be used directly in your projects.
@@ -145,48 +190,3 @@ You can also explore each indicator in action on a [live demo page](https://trad
 		},
 	]}
 />
-
-## How To
-
-A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
-
-import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
-export const HowToList = () => {
-	const examplesCategory = useDocsSidebar().items.find(
-		item => item.type === "category" && item.label === "How To"
-	);
-	const examples = examplesCategory.items.filter(doc => doc.type === "link");
-	return (
-		<ul>
-			{examples.map(docLink => (
-				<li key={docLink.docId}>
-					<a href={docLink.href}>{docLink.label}</a>
-				</li>
-			))}
-		</ul>
-	);
-};
-
-<HowToList />
-
-## Examples / Demos
-
-A collection of demos showcasing the various capabilities of the library.
-
-export const ExamplesList = () => {
-	const examplesCategory = useDocsSidebar().items.find(
-		item => item.type === "category" && item.label === "Examples / Demos"
-	);
-	const examples = examplesCategory.items.filter(doc => doc.type === "link");
-	return (
-		<ul>
-			{examples.map(docLink => (
-				<li key={docLink.docId}>
-					<a href={docLink.href}>{docLink.label}</a>
-				</li>
-			))}
-		</ul>
-	);
-};
-
-<ExamplesList />

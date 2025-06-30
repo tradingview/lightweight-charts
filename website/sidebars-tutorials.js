@@ -20,7 +20,6 @@ const sidebars = {
 				] },
 			],
 		},
-		'analysis-indicators',
 		{
 			'Framework Integrations': [
 				{ React: [
@@ -57,6 +56,7 @@ const sidebars = {
 				},
 			],
 		},
+		'analysis-indicators',
 	],
 };
 
