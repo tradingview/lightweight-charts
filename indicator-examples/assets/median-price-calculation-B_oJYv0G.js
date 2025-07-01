@@ -1,0 +1,1 @@
+function f(t,c){if(t.length===0)return[];const o=c.offset??0,i=new Array(t.length),r=o>0?o:0,s=o<0?t.length-1+o:t.length-1;let n=0;for(let e=0;e<r;e++)i[n]={time:t[e].time},n+=1;for(let e=r;e<s;e++){const l=t[e];"close"in l?i[n]={time:l.time,value:(l.high+l.low)/2}:i[n]={time:l.time},n+=1}for(let e=s;e<t.length;e++)i[n]={time:t[e].time},n+=1;return i}export{f as c};
