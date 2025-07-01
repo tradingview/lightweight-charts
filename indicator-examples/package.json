@@ -1,0 +1,20 @@
+{
+    "name": "lightweight-charts-indicator-examples",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "compile": "tsc && node compile.mjs",
+        "dev": "vite --config src/vite.config.js",
+        "build:examples:site": "vite build --config src/vite.config.js && node build-website.mjs"
+    },
+    "devDependencies": {
+        "typescript": "5.5.4",
+        "vite": "^6.3.4"
+    },
+    "dependencies": {
+        "dts-bundle-generator": "^9.5.1",
+        "fancy-canvas": "^2.1.0",
+        "globby": "^14.1.0",
+        "lightweight-charts": "file:.."
+    }
+}

@@ -1,0 +1,5 @@
+{
+	"private": true,
+	"main": "sum-calculation",
+	"types": "sum-calculation.d.ts"
+}

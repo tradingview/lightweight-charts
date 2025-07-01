@@ -56,6 +56,7 @@ const sidebars = {
 				},
 			],
 		},
+		'analysis-indicators',
 	],
 };
 

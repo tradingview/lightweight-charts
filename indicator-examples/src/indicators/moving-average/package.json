@@ -1,0 +1,5 @@
+{
+	"private": true,
+	"main": "moving-average-calculation",
+	"types": "moving-average-calculation.d.ts"
+}

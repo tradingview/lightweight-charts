@@ -1,0 +1,62 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  font-weight: 500;
+  color: rgba(41, 98, 255, 1);
+  text-decoration: inherit;
+}
+a:hover {
+  color: rgba(30, 83, 229, 1);
+}
+a:active {
+  color: rgba(24, 72, 204, 1);
+}
+
+body {
+  margin: 20px;
+  background: white;
+}
+
+h1 {
+	/* font-display: swap; */
+	font-family: 'Euclid Circular B', system-ui, -apple-system, BlinkMacSystemFont,
+		'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+		sans-serif;
+	font-style: normal;
+	font-weight: 600;
+	font-size: 56px;
+	line-height: 68px;
+	font-feature-settings: 'tnum' on, 'lnum' on;
+	color: black;
+}
+
+h1 {
+  display: flex;
+  flex-direction: column;
+}
+
+.line1, .line2 {
+  display: block;
+}
+
+.line2 {
+  background: linear-gradient(90deg, #006FDE 0%, #3A99CE 25%, #00E7E7 54.17%, #3A99CE 80%, #1238FF 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.top-links {
+  padding-inline-start: 0px;
+  list-style-type: none;
+}

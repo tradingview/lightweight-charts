@@ -15,6 +15,7 @@
 /website/src/theme/**/*.js
 
 /plugin-examples
+/indicator-examples
 /packages/create-lwc-plugin
 
 /debug

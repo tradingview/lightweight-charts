@@ -1,0 +1,5 @@
+{
+	"private": true,
+	"main": "average-price-calculation",
+	"types": "average-price-calculation.d.ts"
+}

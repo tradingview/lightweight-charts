@@ -1,0 +1,5 @@
+{
+	"private": true,
+	"main": "spread-calculation",
+	"types": "spread-calculation.d.ts"
+}

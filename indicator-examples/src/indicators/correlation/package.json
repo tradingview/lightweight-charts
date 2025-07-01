@@ -1,0 +1,5 @@
+{
+	"private": true,
+	"main": "correlation-calculation",
+	"types": "correlation-calculation.d.ts"
+}

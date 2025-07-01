@@ -1,0 +1,5 @@
+{
+	"private": true,
+	"main": "momentum-calculation",
+	"types": "momentum-calculation.d.ts"
+}
