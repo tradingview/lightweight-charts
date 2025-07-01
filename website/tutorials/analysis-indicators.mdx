@@ -16,11 +16,8 @@ id: analysis-indicators
 ## Overview
 
 This guide provides an overview of the custom indicator examples.
-These examples are designed to be a starting point for creating your own indicators and can be used directly in your projects.
-
-The examples are self-contained and are not published on NPM.
-There are two different options for integrating them into your project.
-Also, there are two approaches to add the indicators on the chart.
+These examples serve as a starting point for creating your own indicators.
+You can use them directly in your projects.
 
 ### Available indicators
 
@@ -48,7 +45,8 @@ Each indicator has two demos:
 
 ## How to use the examples
 
-Since these examples are not available on a package manager like NPM, you have two options for integrating them into your project.
+The examples are self-contained and not available on a package manager like NPM.
+Therefore, you have two options for integrating them into your project.
 
 ### Option 1: copy the source code
 
@@ -179,9 +177,9 @@ const smaSeries = chart.addSeries(LineSeries, {
 smaSeries.setData(smaData);
 ```
 
-:::info
+:::warning
 
 This approach is **not reactive**. If you update the `mainSeries` with new data (e.g., from a real-time feed), the `smaSeries` will **not** update automatically.
-You are responsible for manually re-calculating the indicator and calling `smaSeries.setData()` again.
+You are responsible for manually recalculating the indicator and calling `smaSeries.setData()` again.
 
 :::
