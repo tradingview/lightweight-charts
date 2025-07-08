@@ -1,48 +1,68 @@
 import { 
-	Coordinate, 
-	IChartApi, 
-	ISeriesApi, 
-	IPrimitivePaneView, 
-	ISeriesPrimitiveAxisView, 
-	MouseEventParams, 
-	PrimitiveHoveredItem,
-	SeriesType
+	MouseEventParams,
+	ISeriesPrimitiveBase
 } from 'lightweight-charts';
 import { Point } from './types';
 
 export interface IDrawingTool {
-	chart: IChartApi;
-	series: ISeriesApi<SeriesType>;
-	defaultOptions: any;
-	points: Point[];
-	drawing: boolean;
-	options: any;
-	onDrawingCompleteCallback: () => void;
-
+	/**
+	 * Handles mouse click event.
+	 * @param param Mouse event parameters
+	 */
 	onClick(param: MouseEventParams): void;
+
+	/**
+	 * Handles mouse move event.
+	 * @param param Mouse event parameters
+	 */
 	onMouseMove(param: MouseEventParams): void;
+
+	/**
+	 * Handles mouse double click event.
+	 * @param param Mouse event parameters
+	 */
 	onDblClick(param: MouseEventParams): void;
+
+	/**
+	 * Adds a new point to the shape.
+	 * @param p Coordinates of the point to add
+	 */
 	addPoint(p: Point): void;
+
+	/**
+	 * Removes the shape.
+	 */
 	remove(): void;
+
+	/**
+	 * Starts drawing the shape.
+	 */
 	startDrawing(): void;
+
+	/**
+	 * Stops drawing the shape.
+	 */
 	stopDrawing(): void;
+
+	/**
+	 * Returns the current drawing state.
+	 * @returns Whether the shape is being drawn
+	 */
 	isDrawing(): boolean;
 }
 
-export interface IShape {
-	id: string;
-	p1: Point;
-	p2: Point;
-	option: any;
-
-	updateAllViews(): void;
-	priceAxisViews(): ISeriesPrimitiveAxisView[];
-	timeAxisViews(): ISeriesPrimitiveAxisView[];
-	paneViews(): IPrimitivePaneView[];
+export interface IShape extends ISeriesPrimitiveBase {
+	/**
+	 * Updates the shape's options.
+	 * @param options Options to update
+	 */
 	applyOptions(options: any): void;
-	hitTest(x: Coordinate, y: Coordinate): PrimitiveHoveredItem | null;
 }
 
 export interface IPreviewShape extends IShape {
+	/**
+	 * Updates the end point of the shape.
+	 * @param p Coordinates of the new end point
+	 */
 	updateEndPoint(p: Point): void;
 } 
