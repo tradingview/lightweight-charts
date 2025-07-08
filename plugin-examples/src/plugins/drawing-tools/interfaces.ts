@@ -11,23 +11,18 @@ import {
 import { Point } from './types';
 
 export interface IDrawingTool {
-	_chart: IChartApi;
-	_series: ISeriesApi<SeriesType>;
-	_defaultOptions: any;
-	_points: Point[];
-	_drawing: boolean;
-	_onDrawingCompleteCallback?: () => void;
-	
-	_clickHandler: (param: MouseEventParams) => void;
-	_moveHandler: (param: MouseEventParams) => void;
-	_dblClickHandler: (param: MouseEventParams) => void;
-	
-	_onClick(param: MouseEventParams): void;
-	_onMouseMove(param: MouseEventParams): void;
-	_onDblClick(param: MouseEventParams): void;
-	_addPoint(p: Point): void;
-
+	chart: IChartApi;
+	series: ISeriesApi<SeriesType>;
+	defaultOptions: any;
+	points: Point[];
+	drawing: boolean;
 	options: any;
+	onDrawingCompleteCallback: () => void;
+
+	onClick(param: MouseEventParams): void;
+	onMouseMove(param: MouseEventParams): void;
+	onDblClick(param: MouseEventParams): void;
+	addPoint(p: Point): void;
 	remove(): void;
 	startDrawing(): void;
 	stopDrawing(): void;
@@ -35,10 +30,11 @@ export interface IDrawingTool {
 }
 
 export interface IShape {
-	_id: string;
-	_p1: Point;
-	_p2: Point;
-	_options: any;
+	id: string;
+	p1: Point;
+	p2: Point;
+	option: any;
+
 	updateAllViews(): void;
 	priceAxisViews(): ISeriesPrimitiveAxisView[];
 	timeAxisViews(): ISeriesPrimitiveAxisView[];
@@ -47,6 +43,6 @@ export interface IShape {
 	hitTest(x: Coordinate, y: Coordinate): PrimitiveHoveredItem | null;
 }
 
-export interface IPreviewShape {
+export interface IPreviewShape extends IShape {
 	updateEndPoint(p: Point): void;
 } 

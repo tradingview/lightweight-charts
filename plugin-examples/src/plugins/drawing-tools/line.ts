@@ -18,14 +18,14 @@ import { IShape, IPreviewShape, IDrawingTool } from './interfaces';
 import { defaultLineOptions, LineDrawingToolOptions } from './options';
 
 class LinePaneRenderer implements IPrimitivePaneRenderer {
-	_p1: ViewPoint;
-	_p2: ViewPoint;
+	p1: ViewPoint;
+	p2: ViewPoint;
 	_lineColor: string;
 	_lineWidth: number;
 
 	constructor(p1: ViewPoint, p2: ViewPoint, lineColor: string, lineWidth: number) {
-		this._p1 = p1;
-		this._p2 = p2;
+		this.p1 = p1;
+		this.p2 = p2;
 		this._lineColor = lineColor;
 		this._lineWidth = lineWidth;
 	}
@@ -33,18 +33,18 @@ class LinePaneRenderer implements IPrimitivePaneRenderer {
 	draw(target: CanvasRenderingTarget2D) {
 		target.useBitmapCoordinateSpace(scope => {
 			if (
-				this._p1.x === null ||
-				this._p1.y === null ||
-				this._p2.x === null ||
-				this._p2.y === null
+				this.p1.x === null ||
+				this.p1.y === null ||
+				this.p2.x === null ||
+				this.p2.y === null
 			)
 				return;
 			const ctx = scope.context;
 			
-			const x1 = this._p1.x * scope.horizontalPixelRatio;
-			const y1 = this._p1.y * scope.verticalPixelRatio;
-			const x2 = this._p2.x * scope.horizontalPixelRatio;
-			const y2 = this._p2.y * scope.verticalPixelRatio;
+			const x1 = this.p1.x * scope.horizontalPixelRatio;
+			const y1 = this.p1.y * scope.verticalPixelRatio;
+			const x2 = this.p2.x * scope.horizontalPixelRatio;
+			const y2 = this.p2.y * scope.verticalPixelRatio;
 
 			ctx.strokeStyle = this._lineColor;
 			ctx.lineWidth = this._lineWidth * scope.horizontalPixelRatio;
@@ -61,8 +61,8 @@ class LinePaneRenderer implements IPrimitivePaneRenderer {
 
 class LinePaneView implements IPrimitivePaneView {
 	_source: Line;
-	_p1: ViewPoint = { x: null, y: null };
-	_p2: ViewPoint = { x: null, y: null };
+	p1: ViewPoint = { x: null, y: null };
+	p2: ViewPoint = { x: null, y: null };
 
 	constructor(source: Line) {
 		this._source = source;
@@ -70,21 +70,21 @@ class LinePaneView implements IPrimitivePaneView {
 
 	update() {
 		const series = this._source.series;
-		const y1 = series.priceToCoordinate(this._source._p1.price);
-		const y2 = series.priceToCoordinate(this._source._p2.price);
+		const y1 = series.priceToCoordinate(this._source.p1.price);
+		const y2 = series.priceToCoordinate(this._source.p2.price);
 		const timeScale = this._source.chart.timeScale();
-		const x1 = timeScale.timeToCoordinate(this._source._p1.time);
-		const x2 = timeScale.timeToCoordinate(this._source._p2.time);
-		this._p1 = { x: x1, y: y1 };
-		this._p2 = { x: x2, y: y2 };
+		const x1 = timeScale.timeToCoordinate(this._source.p1.time);
+		const x2 = timeScale.timeToCoordinate(this._source.p2.time);
+		this.p1 = { x: x1, y: y1 };
+		this.p2 = { x: x2, y: y2 };
 	}
 
 	renderer() {
 		return new LinePaneRenderer(
-			this._p1,
-			this._p2,
-			this._source._options.lineColor,
-			this._source._options.lineWidth
+			this.p1,
+			this.p2,
+			this._source.option.lineColor,
+			this._source.option.lineWidth
 		);
 	}
 }
@@ -105,18 +105,18 @@ abstract class LineAxisView implements ISeriesPrimitiveAxisView {
 	}
 
 	visible(): boolean {
-		return this._source._options.showLabels;
+		return this._source.option.showLabels;
 	}
 
 	tickVisible(): boolean {
-		return this._source._options.showLabels;
+		return this._source.option.showLabels;
 	}
 
 	textColor() {
-		return this._source._options.labelTextColor;
+		return this._source.option.labelTextColor;
 	}
 	backColor() {
-		return this._source._options.labelColor;
+		return this._source.option.labelColor;
 	}
 	movePoint(p: Point) {
 		this._p = p;
@@ -130,7 +130,7 @@ class LineTimeAxisView extends LineAxisView {
 		this._pos = timeScale.timeToCoordinate(this._p.time);
 	}
 	text() {
-		return this._source._options.timeLabelFormatter(this._p.time);
+		return this._source.option.timeLabelFormatter(this._p.time);
 	}
 }
 
@@ -140,16 +140,16 @@ class LinePriceAxisView extends LineAxisView {
 		this._pos = series.priceToCoordinate(this._p.price);
 	}
 	text() {
-		return this._source._options.priceLabelFormatter(this._p.price);
+		return this._source.option.priceLabelFormatter(this._p.price);
 	}
 }
 
 
 export class Line extends PluginBase implements IShape {
-	_id: string;
-	_options: LineDrawingToolOptions;
-	_p1: Point;
-	_p2: Point;
+	id: string;
+	option: LineDrawingToolOptions;
+	p1: Point;
+	p2: Point;
 	_paneViews: LinePaneView[];
 	_timeAxisViews: LineTimeAxisView[];
 	_priceAxisViews: LinePriceAxisView[];
@@ -160,10 +160,10 @@ export class Line extends PluginBase implements IShape {
 		options: Partial<LineDrawingToolOptions> = {}
 	) {
 		super();
-		this._id = ShapeIdGenerator.getNextId();
-		this._p1 = p1;
-		this._p2 = p2;
-		this._options = {
+		this.id = ShapeIdGenerator.getNextId();
+		this.p1 = p1;
+		this.p2 = p2;
+		this.option = {
 			...defaultLineOptions,
 			...options,
 		};
@@ -197,7 +197,7 @@ export class Line extends PluginBase implements IShape {
 	}
 
 	applyOptions(options: Partial<LineDrawingToolOptions>) {
-		this._options = { ...this._options, ...options };
+		this.option = { ...this.option, ...options };
 		this.requestUpdate();
 	}
 
@@ -205,8 +205,8 @@ export class Line extends PluginBase implements IShape {
 		if (!this._paneViews || !this._paneViews[0]) {
 			return null;
 		}
-		const p1View = this._paneViews[0]._p1;
-		const p2View = this._paneViews[0]._p2;
+		const p1View = this._paneViews[0].p1;
+		const p2View = this._paneViews[0].p2;
 
 		if (p1View.x === null || p1View.y === null || p2View.x === null || p2View.y === null) {
 			return null;
@@ -228,10 +228,10 @@ export class Line extends PluginBase implements IShape {
 		};
 
 		const distanceSq = distSqToSegment(point, p1View, p2View);
-		const tolerance = (this._options.lineWidth / 2) + 2;
+		const tolerance = (this.option.lineWidth / 2) + 2;
 		if (distanceSq <= tolerance * tolerance) {
 			return {
-				externalId: this._id,
+				externalId: this.id,
 				zOrder: 'normal',
 				cursorStyle: 'pointer',
 			};
@@ -247,11 +247,11 @@ export class PreviewLine extends Line implements IPreviewShape {
 		options: Partial<LineDrawingToolOptions> = {}
 	) {
 		super(p1, p2, options);
-		this._options.lineColor = this._options.previewLineColor;
+		this.option.lineColor = this.option.previewLineColor;
 	}
 
 	public updateEndPoint(p: Point) {
-		this._p2 = p;
+		this.p2 = p;
 		this._paneViews[0].update();
 		this._timeAxisViews[1].movePoint(p);
 		this._priceAxisViews[1].movePoint(p);
@@ -260,82 +260,78 @@ export class PreviewLine extends Line implements IPreviewShape {
 }
 
 export class LineDrawingTool implements IDrawingTool {
-	_chart: IChartApi;
-	_series: ISeriesApi<SeriesType>;
-	_defaultOptions: Partial<LineDrawingToolOptions>;
+	chart: IChartApi;
+	series: ISeriesApi<SeriesType>;
+	defaultOptions: Partial<LineDrawingToolOptions>;
 	private _lines: Line[];
 	private _previewLine: PreviewLine | undefined = undefined;
-	_points: Point[] = [];
-	_drawing: boolean = false;
-	_onDrawingCompleteCallback?: () => void;
+	points: Point[] = [];
+	drawing: boolean = false;
+	onDrawingCompleteCallback: () => void;
 
 	constructor(
 		chart: IChartApi,
 		series: ISeriesApi<SeriesType>,
 		options: Partial<LineDrawingToolOptions>,
-		onDrawingCompleteCallback?: () => void
+		onDrawingCompleteCallback: () => void
 	) {
-		this._chart = chart;
-		this._series = series;
-		this._defaultOptions = options;
-		this._onDrawingCompleteCallback = onDrawingCompleteCallback;
+		this.chart = chart;
+		this.series = series;
+		this.defaultOptions = options;
+		this.onDrawingCompleteCallback = onDrawingCompleteCallback;
 		this._lines = [];
-		this._chart.subscribeClick(this._clickHandler);
-		this._chart.subscribeCrosshairMove(this._moveHandler);
-		this._chart.subscribeDblClick(this._dblClickHandler);
+		this.chart.subscribeClick(this.onClick.bind(this));
+		this.chart.subscribeCrosshairMove(this.onMouseMove.bind(this));
+		this.chart.subscribeDblClick(this.onDblClick.bind(this));
 	}
 
-	_clickHandler = (param: MouseEventParams) => this._onClick(param);
-	_moveHandler = (param: MouseEventParams) => this._onMouseMove(param);
-	_dblClickHandler = (param: MouseEventParams) => this._onDblClick(param);
-
 	public get options(): Partial<LineDrawingToolOptions> {
-		return this._defaultOptions;
+		return this.defaultOptions;
 	}
 
 	remove() {
 		this._lines.forEach(line => this._removeLine(line));
 		this.stopDrawing();
-		this._chart.unsubscribeClick(this._clickHandler);
-		this._chart.unsubscribeCrosshairMove(this._moveHandler);
+		this.chart.unsubscribeClick(this.onClick);
+		this.chart.unsubscribeCrosshairMove(this.onMouseMove);
 		this._lines.forEach(line => {
 			this._removeLine(line);
 		});
 		this._lines = [];
 		this._removePreviewLine();
-		this._chart.unsubscribeDblClick(this._dblClickHandler);
+		this.chart.unsubscribeDblClick(this.onDblClick);
 	}
 
 	startDrawing(): void {
-		this._drawing = true;
-		this._points = [];
+		this.drawing = true;
+		this.points = [];
 	}
 
 	stopDrawing(): void {
-		this._drawing = false;
-		this._points = [];
+		this.drawing = false;
+		this.points = [];
 		this._removePreviewLine();
 	}
 
 	isDrawing(): boolean {
-		return this._drawing;
+		return this.drawing;
 	}
 
-	_onClick(param: MouseEventParams) {
-		if (!this._drawing || !param.point || !param.time || !this._series) return;
-		const price = this._series.coordinateToPrice(param.point.y);
+	onClick = (param: MouseEventParams) => {
+		if (!this.drawing || !param.point || !param.time || !this.series) return;
+		const price = this.series.coordinateToPrice(param.point.y);
 		if (price === null) {
 			return;
 		}
-		this._addPoint({
+		this.addPoint({
 			time: param.time,
 			price,
 		});
 	}
 
-	_onMouseMove(param: MouseEventParams) {
-		if (!this._drawing || !param.point || !param.time || !this._series) return;
-		const price = this._series.coordinateToPrice(param.point.y);
+	onMouseMove = (param: MouseEventParams) => {
+		if (!this.drawing || !param.point || !param.time || !this.series) return;
+		const price = this.series.coordinateToPrice(param.point.y);
 		if (price === null) {
 			return;
 		}
@@ -347,13 +343,13 @@ export class LineDrawingTool implements IDrawingTool {
 		}
 	}
 
-	_onDblClick(param: MouseEventParams) {
-		if (this._drawing) return;
+	onDblClick = (param: MouseEventParams) => {
+		if (this.drawing) return;
 
 		const hoveredId = param.hoveredObjectId as string | undefined;
 		if (!hoveredId) return;
 
-		const lineIndex = this._lines.findIndex(line => line._id === hoveredId);
+		const lineIndex = this._lines.findIndex(line => line.id === hoveredId);
 		if (lineIndex !== -1) {
 			const lineToRemove = this._lines[lineIndex];
 			this._removeLine(lineToRemove);
@@ -361,40 +357,40 @@ export class LineDrawingTool implements IDrawingTool {
 		}
 	}
 
-	_addPoint(p: Point) {
-		this._points.push(p);
-		if (this._points.length >= 2) {
-			this._addNewLine(this._points[0], this._points[1]);
+	addPoint(p: Point) {
+		this.points.push(p);
+		if (this.points.length >= 2) {
+			this._addNewLine(this.points[0], this.points[1]);
 			this.stopDrawing(); 
-			if (this._onDrawingCompleteCallback) {
-				this._onDrawingCompleteCallback();
+			if (this.onDrawingCompleteCallback) {
+				this.onDrawingCompleteCallback();
 			}
 		}
-		if (this._points.length === 1) {
-			this._addPreviewLine(this._points[0]);
+		if (this.points.length === 1) {
+			this._addPreviewLine(this.points[0]);
 		}
 	}
 
 	private _addNewLine(p1: Point, p2: Point) {
-		const line = new Line(p1, p2, { ...this._defaultOptions });
+		const line = new Line(p1, p2, { ...this.defaultOptions });
 		this._lines.push(line);
-		ensureDefined(this._series).attachPrimitive(line);
+		ensureDefined(this.series).attachPrimitive(line);
 	}
 
 	private _removeLine(line: Line) {
-		ensureDefined(this._series).detachPrimitive(line);
+		ensureDefined(this.series).detachPrimitive(line);
 	}
 
 	private _addPreviewLine(p: Point) {
 		this._previewLine = new PreviewLine(p, p, {
-			...this._defaultOptions,
+			...this.defaultOptions,
 		});
-		ensureDefined(this._series).attachPrimitive(this._previewLine);
+		ensureDefined(this.series).attachPrimitive(this._previewLine);
 	}
 
 	private _removePreviewLine() {
 		if (this._previewLine) {
-			ensureDefined(this._series).detachPrimitive(this._previewLine);
+			ensureDefined(this.series).detachPrimitive(this._previewLine);
 			this._previewLine = undefined;
 		}
 	}

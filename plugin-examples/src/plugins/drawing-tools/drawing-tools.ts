@@ -19,7 +19,7 @@ export class DrawingTools {
 	private _lineButton: HTMLDivElement | undefined;
 
 	private _activeButtonColor: string = '#000000'; 
-	private readonly _inactiveColor = 'rgb(100, 100, 100)';
+	private readonly _inactiveColor = '#646464';
 
 	private _selectedBaseColor: string = '#000000'; 
 	private _currentOpacity: number = 0.35; 
@@ -44,10 +44,6 @@ export class DrawingTools {
 			lineOptions,
 			this.stopDrawing.bind(this)
 		);
-
-		this._selectedBaseColor = '#000000'; 
-		this._currentOpacity = 0.35;
-		this._activeButtonColor = this._selectedBaseColor; 
 
 		this._createToolbar();
 		this._updateDrawingToolColorsAndOpacity();
