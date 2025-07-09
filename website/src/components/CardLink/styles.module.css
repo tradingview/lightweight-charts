@@ -41,10 +41,6 @@
 	width: 62px;
 }
 
-/* .cardTitle {
-	font-size: 1.2rem;
-} */
-
 .cardTitle {
   font-size: 1.2rem;
   overflow: hidden;              /* Hide overflow content */
