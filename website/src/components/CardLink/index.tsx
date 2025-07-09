@@ -36,12 +36,12 @@ function CardLayout({
 	icon?: ReactNode;
 	wrapDescription: boolean;
 }): React.JSX.Element {
-	const isSingleWord = title.trim().split(/\s+/).length === 1;
+	const isTitleSingleWord = title.trim().split(/\s+/).length === 1;
 	return (
 		<CardContainer href={href}>
 			{image && <div className={clsx(styles.cardImage)}>{image}</div>}
 			<div className={clsx(styles.cardDetails, wrapDescription && styles.centerDetails)}>
-				<h2 className={clsx(wrapDescription && styles.noBottomMargin, 'text--truncate', styles.cardTitle, isSingleWord && styles.cardTitleSingleWord)} title={title}>
+				<h2 className={clsx(wrapDescription && styles.noBottomMargin, 'text--truncate', styles.cardTitle, isTitleSingleWord && styles.cardTitleSingleWord)} title={title}>
 					{icon} {title}
 				</h2>
 				{description && (
