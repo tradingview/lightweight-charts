@@ -42,20 +42,20 @@
 }
 
 .cardTitle {
-  font-size: 1.2rem;
-  overflow: hidden;              /* Hide overflow content */
-  text-overflow: ellipsis;       /* Show ellipsis when overflowing */
-  white-space: normal;           /* Allow wrapping */
-  word-break: keep-all;        /* Break only if necessary, at word boundaries */
-  overflow-wrap: break-word;     /* Break long words if needed */
-  display: -webkit-box;          /* Needed for webkit line clamping */
-  -webkit-line-clamp: 2;         /* Number of lines before ellipsis */
-  -webkit-box-orient: vertical;  /* Vertical orientation for webkit box */
+	font-size: 1.2rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: normal;
+	word-break: keep-all; /* Break only if necessary, at word boundaries */
+	overflow-wrap: break-word; /* Break long words if needed */
+	display: -webkit-box;
+	-webkit-line-clamp: 2; /* Number of lines before ellipsis */
+	-webkit-box-orient: vertical;
 }
 
 .cardTitleSingleWord {
-  white-space: nowrap;
-  -webkit-line-clamp: 1;
+	white-space: nowrap;
+	-webkit-line-clamp: 1;
 }
 
 .cardDescription {
