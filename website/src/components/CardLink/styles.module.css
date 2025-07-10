@@ -9,6 +9,7 @@
 	transition-property: border, box-shadow;
 
 	flex-direction: row;
+	height: 100%;
 }
 
 .cardContainer:hover {
@@ -42,10 +43,25 @@
 
 .cardTitle {
 	font-size: 1.2rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: normal;
+	word-break: keep-all; /* Break only if necessary, at word boundaries */
+	overflow-wrap: break-word; /* Break long words if needed */
+	display: -webkit-box;
+	-webkit-line-clamp: 2; /* Number of lines before ellipsis */
+	-webkit-box-orient: vertical;
+}
+
+.cardTitleSingleWord {
+	white-space: nowrap;
+	-webkit-line-clamp: 1;
 }
 
 .cardDescription {
 	font-size: 0.8rem;
+	text-wrap: wrap;
+	text-wrap: pretty;
 }
 
 .noWrap {
