@@ -38,6 +38,6 @@
     "@clack/prompts": "^0.7.0",
     "@types/node": "^20.5.1",
     "picocolors": "^1.0.0",
-    "unbuild": "^1.2.1"
+    "unbuild": "^3.5.0"
   }
 }
