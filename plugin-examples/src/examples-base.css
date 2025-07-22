@@ -47,6 +47,22 @@ button {
 	cursor: pointer;
 }
 
+input[type='text'] {
+	all: initial;
+	font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu,
+		sans-serif;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 510;
+	line-height: 24px; /* 150% */
+	letter-spacing: -0.32px;
+	padding: 8px 24px;
+	border-radius: 8px;
+	background-color: #fff;
+	border: 1px solid rgba(224, 227, 235, 1);
+	cursor: pointer;
+}
+
 button:hover {
 	background-color: rgba(30, 83, 229, 1);
 }
