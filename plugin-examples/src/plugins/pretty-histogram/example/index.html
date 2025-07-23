@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Lightweight Charts - Pretty Histogram Series Plugin Example</title>
+		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			.barEditor {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				margin: 10px;
+				justify-content: space-between;
+				white-space: nowrap;
+			}
+			.barEditor input {
+				padding-left: 10px;
+				margin-left: 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="chart"></div>
+		<div id="description">
+			<h1>Pretty Histogram Series</h1>
+			<p>
+				Histogram series with custom rendering. Round corners and customazible column widths.
+			</p>
+			<div style="display: flex; flex-direction: row;">
+				<div style="display: flex; flex-direction: column;margin:10px">
+					<div class="barEditor">
+						Bar 1:
+						<input id="bar_1" type="text">
+					</div>
+					<div class="barEditor">
+						Bar 2:
+						<input id="bar_2" type="text">
+					</div>
+					<div class="barEditor">
+						Bar 3:
+						<input id="bar_3" type="text">
+					</div>
+					<div class="barEditor" type="text">
+						Bar 4:
+						<input id="bar_4" type="text">
+					</div>
+					<div class="barEditor" type="text">
+						Bar 5:
+						<input id="bar_5" type="text">
+					</div>
+					<div class="barEditor" type="text">
+						Bar 5:
+						<input id="bar_6" type="text">
+					</div>
+				</div>
+				<div style="display: flex; flex-direction: column;margin:10px">
+					<div class="barEditor">
+						Radius:
+						<input id="radius" type="text">
+					</div>
+					<div class="barEditor">
+						Width %:
+						<input id="width" type="text">
+					</div>
+					<div class="barEditor">
+						<label for="autoscaleToZero">Autoscale to zero</label>
+						<input id="autoscaleToZero" type="checkbox" checked>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>
