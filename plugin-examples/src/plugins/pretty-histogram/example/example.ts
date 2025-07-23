@@ -25,7 +25,7 @@ const options: DeepPartial<PrettyHistogramSeriesOptions> = {
 		const maxValue = Math.max(baseRes.priceRange.maxValue, 0);
 		return { ...baseRes, priceRange: { minValue, maxValue } };
 	},
-	radius: 2,
+	radius: 6,
 	widthPercent: 50,
 };
 

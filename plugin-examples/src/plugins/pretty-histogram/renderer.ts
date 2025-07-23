@@ -1,9 +1,10 @@
 import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { CustomBarItemData, ICustomSeriesPaneRenderer, PaneRendererCustomData, PriceToCoordinateConverter, SeriesDataItemTypeMap, SingleValueData } from 'lightweight-charts';
+import { CustomBarItemData, ICustomSeriesPaneRenderer, PaneRendererCustomData, PriceToCoordinateConverter } from 'lightweight-charts';
 
 import { PrettyHistogramSeriesOptions } from './options';
 import { PrettyHistogramData } from './data';
+import { positionsBox } from '../../helpers/dimensions/positions';
 
 interface PrettyHistogramBarItem {
 	x: number;
@@ -48,12 +49,12 @@ export class PrettyHistogramSeriesRenderer<HorzScaleItem, TData extends PrettyHi
 		const bars: PrettyHistogramBarItem[] = this._data.bars.map((bar: CustomBarItemData<HorzScaleItem, TData>) => {
 			return {
 				x: bar.x * renderingScope.horizontalPixelRatio,
-				value: priceToCoordinate(bar.originalData.value!)! * renderingScope.verticalPixelRatio,
+				value: priceToCoordinate(bar.originalData.value!)!,
 				color: bar.barColor ?? options.color,
 			};
 		});
 
-		const zeroCoordinate = priceToCoordinate(0)! * renderingScope.verticalPixelRatio;
+		const zeroCoordinate = priceToCoordinate(0) ?? 0;
 
 		const ctx = renderingScope.context;
 
@@ -61,25 +62,27 @@ export class PrettyHistogramSeriesRenderer<HorzScaleItem, TData extends PrettyHi
 		ctx.beginPath();
 		const width = Math.max(1, Math.round(0.01 * options.widthPercent * this._data.barSpacing * renderingScope.horizontalPixelRatio));
 		const radius = Math.floor(options.radius * renderingScope.horizontalPixelRatio);
-		bars.forEach((item: PrettyHistogramBarItem) => {
+		bars.slice(this._data.visibleRange.from, this._data.visibleRange.to + 1).forEach((item: PrettyHistogramBarItem) => {
 			const color = item.color;
 			if (prevColor !== null && prevColor !== color) {
 				ctx.fill();
 				ctx.beginPath();
 			}
 			ctx.fillStyle = color;
-			const height = item.value - zeroCoordinate;
-			const actualRadius = Math.floor(Math.min(radius, width / 2, Math.abs(height)));
-			const vertRadius = Math.sign(height) * actualRadius;
+			const yPositionBox = positionsBox(
+				zeroCoordinate,
+				item.value,
+				renderingScope.verticalPixelRatio
+			)
+			const actualRadius = Math.floor(Math.min(radius, width / 2, Math.abs(yPositionBox.length)));
 			const left = Math.round(item.x - width / 2);
-			const right = left + width;
-			ctx.moveTo(left, zeroCoordinate);
-			ctx.lineTo(left, item.value - vertRadius);
-			ctx.arcTo(left, item.value, left + actualRadius, item.value, actualRadius);
-			ctx.lineTo(right - actualRadius, item.value);
-			ctx.arcTo(right, item.value, right, item.value - vertRadius, actualRadius);
-			ctx.lineTo(right, zeroCoordinate);
-			ctx.lineTo(left, zeroCoordinate);
+			ctx.roundRect(
+				left,
+				yPositionBox.position,
+				width,
+				yPositionBox.length,
+				item.value < zeroCoordinate ? [actualRadius, actualRadius, 0, 0] : [0, 0, actualRadius, actualRadius]
+			);
 			prevColor = color;
 		});
 		ctx.fill();
