@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Lightweight Charts - DualRangeHistogram Series Plugin Example</title>
+		<link href="../../../examples-base.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div id="chart"></div>
+		<div id="description">
+			<h1>Dual Range Histogram Series</h1>
+			<p>
+				The Dual Range Histogram is a versatile column-based visualisation
+				designed to represent paired positive and negative value ranges for each
+				time point. Each group of columns consists of two positive (upward)
+				bars—typically differentiated by light and dark shades—and two negative
+				(downward) bars, also in contrasting shades. The lighter columns
+				represent the total extent of a metric (such as run-up or drawdown),
+				while the darker columns indicate a subset or related component that
+				must always be less than or equal to the corresponding lighter column.
+				This structure allows for clear comparison between total and partial
+				values within both positive and negative domains. The Dual Range
+				Histogram is well-suited for financial analysis, performance
+				backtesting, or any scenario where it is useful to visualise both the
+				magnitude and composition of upward and downward movements over time.
+			</p>
+		</div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>
