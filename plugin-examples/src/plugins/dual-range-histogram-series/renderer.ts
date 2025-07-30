@@ -27,8 +27,9 @@ interface DualRangeHistogramBarItem {
 	column?: ColumnPosition;
 }
 
-export class DualRangeHistogramSeriesRenderer<TData extends DualRangeHistogramData>
-	implements ICustomSeriesPaneRenderer
+export class DualRangeHistogramSeriesRenderer<
+	TData extends DualRangeHistogramData
+> implements ICustomSeriesPaneRenderer
 {
 	_data: PaneRendererCustomData<Time, TData> | null = null;
 	_options: DualRangeHistogramSeriesOptions | null = null;
@@ -110,7 +111,7 @@ export class DualRangeHistogramSeriesRenderer<TData extends DualRangeHistogramDa
 		) {
 			const group = bars[i];
 			const column = group.column;
-			if (!column) return;
+			if (!column) continue;
 			const width = Math.min(
 				Math.max(
 					renderingScope.horizontalPixelRatio,

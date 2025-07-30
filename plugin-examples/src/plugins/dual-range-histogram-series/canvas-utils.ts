@@ -15,7 +15,7 @@ function changeBorderRadius(
 }
 
 export function drawRoundRect(
-	// eslint:disable-next-line:max-params
+	// eslint-disable-next-line max-params
 	ctx: CanvasRenderingContext2D,
 	x: number,
 	y: number,
