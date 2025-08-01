@@ -130,9 +130,12 @@ export class DualRangeHistogramSeriesRenderer<
 					options.borderRadius[index % options.borderRadius.length] *
 					renderingScope.verticalPixelRatio;
 				const positive = group.positive[index];
+				const actualRadius = Math.floor(
+					Math.min(radius, width / 2, Math.abs(columnPosition.length))
+				);
 				const borderRadius: LeftTopRightTopRightBottomLeftBottomRadii = positive
-					? [radius, radius, 0, 0]
-					: [0, 0, radius, radius];
+					? [actualRadius, actualRadius, 0, 0]
+					: [0, 0, actualRadius, actualRadius];
 				drawRoundRectWithBorder(
 					renderingScope.context,
 					column.left,
