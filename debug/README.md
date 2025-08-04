@@ -25,6 +25,14 @@ By default, the sandbox includes lightweight-charts, typescript, and vite. Addit
 
 ### Running a Sandbox
 
+Ensure that lightweight-charts is built, as it depends on your local copy.
+
+To (re)build lightweight-charts, run:
+
+```bash
+npm run build --prefix ..
+```
+
 To run a sandbox, use the serve command. This starts a web server, compiles TypeScript, and enables live reload when files change.
 
 ```bash
@@ -35,14 +43,6 @@ To run sandbox against production (minified) build of the lightweight-charts:
 
 ```bash
 npm run serve:prod <NAME>
-```
-
-Note: Before running the sandbox, ensure that lightweight-charts is built, as it depends on your local copy.
-
-To rebuild lightweight-charts, run:
-
-```bash
-npm run build --prefix ..
 ```
 
 ### Removing a Sandbox

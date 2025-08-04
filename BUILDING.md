@@ -29,9 +29,7 @@ There are several included e2e tests available which can be run individually. Pl
 
     `npm run verify`
 
-- If you want to play with a locally built package, you can create a `debug.html` page: `cp debug.html.example debug.html`.
-
-    This file (`debug.html`) is under gitignore, so you don't need to worry about changing it and you can modify it as you wish.
+- If you want to play with a locally built package, follow the instructions in [/debug/README.md](./debug/README.md) to create a sandbox for developing in.
 
 ## Deploying a new version
 
