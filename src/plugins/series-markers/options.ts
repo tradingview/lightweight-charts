@@ -13,6 +13,13 @@ export type SeriesMarkerZOrder = 'top' | 'aboveSeries' | 'normal';
  */
 export interface SeriesMarkersOptions {
 	/**
+	 * Autoscaling is a feature that automatically adjusts a price scale to fit the visible range of data.
+	 *
+	 * @defaultValue `true`
+	 */
+	autoScale: boolean;
+
+	/**
 	 * Defines the stacking order of the markers relative to the series and other primitives.
 	 *
 	 * @defaultValue `normal`
@@ -21,5 +28,6 @@ export interface SeriesMarkersOptions {
 }
 
 export const seriesMarkerOptionsDefaults: SeriesMarkersOptions = {
+	autoScale: true,
 	zOrder: 'normal',
 } as const;
