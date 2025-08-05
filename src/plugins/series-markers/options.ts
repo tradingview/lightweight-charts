@@ -13,7 +13,15 @@ export type SeriesMarkerZOrder = 'top' | 'aboveSeries' | 'normal';
  */
 export interface SeriesMarkersOptions {
 	/**
-	 * Autoscaling is a feature that automatically adjusts a price scale to fit the visible range of data.
+ 	 * Specifies whether the auto-scaling calculation should expand to include the size of markers.
+ 	 *
+ 	 * When `true`, the auto-scale feature will adjust the price scale's range to ensure
+ 	 * series markers are fully visible and not cropped by the chart's edges.
+ 	 *
+ 	 * When `false`, the scale will only fit the series data points, which may cause
+ 	 * markers to be partially hidden.
+	 *
+	 * Note: This option only has an effect when auto-scaling is enabled for the price scale.
 	 *
 	 * @defaultValue `true`
 	 */
