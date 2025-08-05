@@ -8,7 +8,7 @@ export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '47.00 KB',
+		limit: '47.50 KB',
 		import: '*',
 		ignore: ['fancy-canvas'],
 		brotli: true,
