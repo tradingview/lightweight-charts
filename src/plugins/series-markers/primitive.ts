@@ -106,7 +106,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	}
 
 	public autoscaleInfo(startTimePoint: Logical, endTimePoint: Logical): AutoscaleInfo | null {
-		if (this._paneView) {
+		if (this._options.autoScale && this._paneView) {
 			const margins = this._getAutoScaleMargins();
 			if (margins) {
 				return {
