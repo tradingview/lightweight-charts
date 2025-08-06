@@ -3,6 +3,7 @@ import { IChartWidgetBase } from '../gui/chart-widget';
 import { ensureNotNull } from '../helpers/assertions';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { AxisMouseEventHandler } from '../model/axis-model';
 import { isDefaultPriceScale } from '../model/default-price-scale';
 import { PriceRangeImpl } from '../model/price-range-impl';
 import { PriceScale, PriceScaleOptions } from '../model/price-scale';
@@ -52,6 +53,26 @@ export class PriceScaleApi implements IPriceScaleApi {
 
 	public setAutoScale(on: boolean): void {
 		this.applyOptions({ autoScale: on });
+	}
+
+	public subscribeClick(handler: AxisMouseEventHandler): void {
+		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).subscribeClick(handler);
+	}
+
+	public unsubscribeClick(handler: AxisMouseEventHandler): void {
+		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).unsubscribeClick(handler);
+	}
+
+	public subscribeMouseMove(handler: AxisMouseEventHandler): void {
+		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).subscribeMouseMove(handler);
+	}
+
+	public unsubscribeMouseMove(handler: AxisMouseEventHandler): void {
+		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).unsubscribeMouseMove(handler);
+	}
+
+	public overrideCursorStyle(cursor: string | undefined): void {
+		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).overrideCursorStyle(cursor);
 	}
 
 	private _priceScale(): PriceScale {

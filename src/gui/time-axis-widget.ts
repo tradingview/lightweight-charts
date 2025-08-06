@@ -15,6 +15,7 @@ import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { makeFont } from '../helpers/make-font';
 
+import { AxisMouseEventParamsImplSupplier } from '../model/axis-widget';
 import { IDataSource } from '../model/idata-source';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { InvalidationLevel } from '../model/invalidate-mask';
@@ -26,11 +27,12 @@ import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { IAxisView } from '../views/pane/iaxis-view';
 
+import { fireMouseDelegate, fireNullMouseDelegate } from './axis-mouse-event-helpers';
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { ChartWidget } from './chart-widget';
 import { drawBackground, drawForeground, drawSourceViews } from './draw-functions';
 import { ITimeAxisViewsGetter } from './iaxis-view-getters';
-import { MouseEventHandler, MouseEventHandlers, MouseEventHandlerTouchEvent, TouchMouseEvent } from './mouse-event-handler';
+import { MouseEventHandler, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
 
 const enum Constants {
@@ -69,6 +71,9 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	private readonly _sizeChanged: Delegate<Size> = new Delegate();
 	private readonly _widthCache: TextWidthCache = new TextWidthCache(5);
 	private _isSettingSize: boolean = false;
+	private _clicked: Delegate<AxisMouseEventParamsImplSupplier> = new Delegate();
+	private _mouseMoved: Delegate<AxisMouseEventParamsImplSupplier> = new Delegate();
+	private _cursorOverride: string | undefined = undefined;
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
@@ -130,6 +135,8 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	}
 
 	public destroy(): void {
+		this._clicked.destroy();
+		this._mouseMoved.destroy();
 		this._mouseEventHandler.destroy();
 		if (this._leftStub !== null) {
 			this._leftStub.destroy();
@@ -157,6 +164,11 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 	public rightStub(): PriceAxisStub | null {
 		return this._rightStub;
+	}
+
+	public overrideCursorStyle(cursor: string | undefined): void {
+		this._cursorOverride = cursor;
+		this._setCursor(CursorType.Default);
 	}
 
 	public mouseDownEvent(event: TouchMouseEvent): void {
@@ -198,6 +210,11 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 	public touchMoveEvent(event: MouseEventHandlerTouchEvent): void {
 		this.pressedMouseMoveEvent(event);
+		fireMouseDelegate(this._mouseMoved, event);
+	}
+
+	public mouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
+		fireMouseDelegate(this._mouseMoved, event);
 	}
 
 	public mouseUpEvent(): void {
@@ -232,6 +249,19 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 	public mouseLeaveEvent(): void {
 		this._setCursor(CursorType.Default);
+		fireNullMouseDelegate(this._mouseMoved);
+	}
+
+	public mouseClickEvent(event: MouseEventHandlerMouseEvent): void {
+		fireMouseDelegate(this._clicked, event);
+	}
+
+	public clicked(): ISubscription<AxisMouseEventParamsImplSupplier> {
+		return this._clicked;
+	}
+
+	public mouseMoved(): ISubscription<AxisMouseEventParamsImplSupplier> {
+		return this._mouseMoved;
 	}
 
 	public getSize(): Size {
@@ -514,7 +544,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	}
 
 	private _setCursor(type: CursorType): void {
-		this._cell.style.cursor = type === CursorType.EwResize ? 'ew-resize' : 'default';
+		this._cell.style.cursor = this._cursorOverride || (type === CursorType.EwResize ? 'ew-resize' : 'default');
 	}
 
 	private _recreateStubs(): void {
