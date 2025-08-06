@@ -320,6 +320,39 @@ export class DataLayer<HorzScaleItem> {
 		return this._getUpdateResponse(series, insertIndex, info);
 	}
 
+	public popSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, count: number): [SeriesPlotRow<SeriesType>[], DataUpdateResponse] {
+		const seriesData = this._seriesRowsBySeries.get(series);
+		const poppedData: SeriesPlotRow<SeriesType>[] = [];
+
+		if (seriesData === undefined) {
+			const dataUpdateResponse: DataUpdateResponse = {
+				series: new Map(),
+				timeScale: {
+					baseIndex: this._getBaseIndex(),
+				},
+			};
+
+			return [poppedData, dataUpdateResponse];
+		}
+
+		for (let i = 0; i < count && seriesData.length > 0; ++i) {
+			poppedData.push(seriesData.pop() as SeriesPlotRow<SeriesType>);
+		}
+
+		if (seriesData.length === 0) {
+			this._seriesLastTimePoint.delete(series);
+		} else {
+			this._seriesLastTimePoint.set(series, seriesData[seriesData.length - 1].time);
+		}
+
+		const info: SeriesUpdateInfo = {
+			historicalUpdate: false,
+			lastBarUpdatedOrNewBarsAddedToTheRight: false,
+		};
+
+		return [poppedData, this._getUpdateResponse(series, seriesData.length - 1, info)];
+	}
+
 	private _updateLastSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow): void {
 		let seriesData = this._seriesRowsBySeries.get(series);
 		if (seriesData === undefined) {

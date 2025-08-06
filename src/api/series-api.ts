@@ -161,6 +161,13 @@ export class SeriesApi<
 		this._onDataChanged('update');
 	}
 
+	public pop(count: number = 1): SeriesPlotRow<TSeriesType>[] {
+		const poppedRows = this._dataUpdatesConsumer.popData(this._series, count);
+		this._onDataChanged('update');
+
+		return poppedRows;
+	}
+
 	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null {
 		const data = this._series.bars().search(logicalIndex as unknown as TimePointIndex, mismatchDirection);
 		if (data === null) {
