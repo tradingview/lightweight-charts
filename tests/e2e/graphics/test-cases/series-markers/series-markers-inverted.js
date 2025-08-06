@@ -1,0 +1,47 @@
+function generateData() {
+	const res = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < 30; ++i) {
+		res.push({
+			time: time.getTime() / 1000,
+			value: i,
+		});
+
+		time.setUTCDate(time.getUTCDate() + 1);
+	}
+	return res;
+}
+
+function runTestCase(container) {
+	const chart = window.chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
+
+	const mainSeries = chart.addSeries(LightweightCharts.HistogramSeries);
+
+	const data = generateData();
+	mainSeries.setData(data);
+
+	const markers = [
+		{ time: data[0].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+		{ time: data[0].time, position: 'aboveBar', color: 'red', shape: 'arrowDown' },
+		{ time: data[1].time, position: 'belowBar', color: 'red', shape: 'arrowUp' },
+		{ time: data[2].time, position: 'aboveBar', color: 'red', shape: 'arrowDown' },
+	];
+
+	const markerSeries = LightweightCharts.createSeriesMarkers(
+		mainSeries,
+		markers
+	);
+
+	chart.applyOptions({
+		rightPriceScale: {
+			invertScale: true,
+		},
+	});
+
+	for (const marker of markers) {
+		marker.position = marker.position === 'aboveBar' ? 'belowBar' : 'aboveBar';
+		marker.shape = marker.shape === 'arrowUp' ? 'arrowDown' : 'arrowUp';
+	}
+
+	markerSeries.setMarkers(markers);
+}
