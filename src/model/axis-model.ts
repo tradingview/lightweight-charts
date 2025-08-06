@@ -50,8 +50,8 @@ export abstract class AxisApi {
 
 	protected _removeMouseEvents(widget: IAxisWidget): void {
 		widget.clicked().unsubscribeAll(this);
-		this._clickedDelegate.destroy();
 		widget.mouseMoved().unsubscribeAll(this);
+		this._clickedDelegate.destroy();
 		this._movedDelegate.destroy();
 	}
 

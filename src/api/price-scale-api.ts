@@ -1,6 +1,7 @@
 import { IChartWidgetBase } from '../gui/chart-widget';
 
 import { ensureNotNull } from '../helpers/assertions';
+import { warn } from '../helpers/logger';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { AxisMouseEventHandler } from '../model/axis-model';
@@ -56,23 +57,41 @@ export class PriceScaleApi implements IPriceScaleApi {
 	}
 
 	public subscribeClick(handler: AxisMouseEventHandler): void {
-		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).subscribeClick(handler);
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).subscribeClick(handler);
+		}
 	}
 
 	public unsubscribeClick(handler: AxisMouseEventHandler): void {
-		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).unsubscribeClick(handler);
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).unsubscribeClick(handler);
+		}
 	}
 
 	public subscribeMouseMove(handler: AxisMouseEventHandler): void {
-		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).subscribeMouseMove(handler);
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).subscribeMouseMove(handler);
+		}
 	}
 
 	public unsubscribeMouseMove(handler: AxisMouseEventHandler): void {
-		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).unsubscribeMouseMove(handler);
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).unsubscribeMouseMove(handler);
+		}
 	}
 
 	public overrideCursorStyle(cursor: string | undefined): void {
-		this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).overrideCursorStyle(cursor);
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).overrideCursorStyle(cursor);
+		}
+	}
+
+	private _checkDefaultPriceScale(): boolean {
+		if (!isDefaultPriceScale(this._priceScaleId)) {
+			warn('Method only supported on visible price scales');
+			return false;
+		}
+		return true;
 	}
 
 	private _priceScale(): PriceScale {
