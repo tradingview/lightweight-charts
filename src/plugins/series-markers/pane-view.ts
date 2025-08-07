@@ -38,7 +38,7 @@ function isPriceMarker(position: SeriesMarkerPosition): position is SeriesMarker
 	return position === 'atPriceTop' || position === 'atPriceBottom' || position === 'atPriceMiddle';
 }
 
-function getPrice(seriesData: SeriesDataItemTypeMap<unknown>[SeriesType], marker: InternalSeriesMarker<TimePointIndex>): number | undefined {
+function getPrice(seriesData: SeriesDataItemTypeMap<unknown>[SeriesType], marker: InternalSeriesMarker<TimePointIndex>, isInverted: boolean): number | undefined {
 	if (isPriceMarker(marker.position) && marker.price !== undefined) {
 		return marker.price;
 	}
@@ -50,10 +50,16 @@ function getPrice(seriesData: SeriesDataItemTypeMap<unknown>[SeriesType], marker
 			return seriesData.close;
 		}
 		if (marker.position === 'aboveBar') {
-			return seriesData.high;
+			if (!isInverted) {
+				return seriesData.high;
+			}
+			return seriesData.low;
 		}
 		if (marker.position === 'belowBar') {
-			return seriesData.low;
+			if (!isInverted) {
+				return seriesData.low;
+			}
+			return seriesData.high;
 		}
 	}
 	return;
@@ -70,7 +76,7 @@ function fillSizeAndY<HorzScaleItem>(
 	series: ISeriesApi<SeriesType, HorzScaleItem>,
 	chart: IChartApiBase<HorzScaleItem>
 ): void {
-	const price = getPrice(seriesData, marker);
+	const price = getPrice(seriesData, marker, series.priceScale().options().invertScale);
 	if (price === undefined) {
 		return;
 	}
