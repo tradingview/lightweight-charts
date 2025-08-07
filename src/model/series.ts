@@ -22,6 +22,7 @@ import { BarPrice } from './bar';
 import { IChartModelBase } from './chart-model';
 import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
+import { DataConflater } from './data-conflater';
 import { isDefaultPriceScale } from './default-price-scale';
 import { CustomData, CustomSeriesWhitespaceData, ICustomSeriesPaneView, WhitespaceCheck } from './icustom-series';
 import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from './ipane-primitive';
@@ -104,6 +105,10 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private readonly _options: SeriesOptionsInternal<T>;
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
+
+	private readonly _dataConflater: DataConflater<T> = new DataConflater<T>();
+	private _conflatedDataCache: SeriesPlotList<T> | null = null;
+	private _lastConflationFactor: number = 1;
 
 	public constructor(
 		model: IChartModelBase,
@@ -241,6 +246,9 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	public setData(data: readonly SeriesPlotRow<T>[], updateInfo?: SeriesUpdateInfo): void {
 		this._data.setData(data);
 
+		// Invalidate conflated data cache when new data is set
+		this._conflatedDataCache = null;
+
 		this._paneView.update('data');
 
 		if (this._lastPriceAnimationPaneView !== null) {
@@ -305,6 +313,26 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 	public bars(): SeriesPlotList<T> {
 		return this._data;
+	}
+
+	public conflatedBars(): SeriesPlotList<T> {
+		const timeScale = this.model().timeScale();
+		const barSpacing = timeScale.barSpacing();
+		const conflationEnabled = timeScale.options().enableConflation;
+
+		// If conflation is disabled or bar spacing is large enough, return original data
+		if (!conflationEnabled || barSpacing >= 0.5) {
+			return this._data;
+		}
+
+		// Use bar spacing as the cache key instead of conflation factor
+		const cacheKey = Math.round(barSpacing * 1000);
+		if (this._conflatedDataCache === null || this._lastConflationFactor !== cacheKey) {
+			this._regenerateConflatedDataAdaptive(barSpacing);
+			this._lastConflationFactor = cacheKey;
+		}
+
+		return this._conflatedDataCache !== null ? this._conflatedDataCache : this._data;
 	}
 
 	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
@@ -650,5 +678,14 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		const res: IPaneView[] = [];
 		extractPrimitivePaneViews(this._primitives, extractor, zOrder, res);
 		return res;
+	}
+
+	private _regenerateConflatedDataAdaptive(barSpacing: number): void {
+		const originalRows = this._data.rows();
+		const conflatedRows = this._dataConflater.conflateDataAdaptive(originalRows, barSpacing);
+
+		// Create a new plot list with conflated data
+		this._conflatedDataCache = createSeriesPlotList<T>();
+		this._conflatedDataCache.setData(conflatedRows);
 	}
 }

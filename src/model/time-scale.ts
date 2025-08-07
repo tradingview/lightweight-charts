@@ -221,6 +221,16 @@ export interface HorzScaleOptions {
 	 * @defaultValue false
 	 */
 	ignoreWhitespaceIndices: boolean;
+
+	/**
+	 * Enable data conflation for performance optimization when bar spacing is very small.
+	 * When enabled, multiple data points are automatically combined into single points
+	 * when they would be rendered in less than 0.5 pixels of screen space.
+	 * This significantly improves rendering performance for large datasets when zoomed out.
+	 *
+	 * @defaultValue false
+	 */
+	enableConflation: boolean;
 }
 
 export interface ITimeScale {
@@ -244,6 +254,7 @@ export interface ITimeScale {
 	options(): Readonly<HorzScaleOptions>;
 
 	recalculateIndicesWithData(): void;
+	conflationFactor(): number;
 }
 
 export class TimeScale<HorzScaleItem> implements ITimeScale {
@@ -276,6 +287,8 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 
 	private _labels: TimeMark[] = [];
 
+	private _conflationFactor: number = 1;
+
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
 	public constructor(model: ChartModel<HorzScaleItem>, options: HorzScaleOptions, localizationOptions: LocalizationOptions<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
@@ -290,6 +303,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._updateDateTimeFormatter();
 
 		this._tickMarks.setUniformDistribution(options.uniformDistribution);
+		this._updateConflationFactor();
 		this.recalculateIndicesWithData();
 	}
 
@@ -832,6 +846,14 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._indicesWithDataUpdateId++;
 	}
 
+	/**
+	 * Returns the current data conflation factor.
+	 * Factor \> 1 means data points should be conflated for performance.
+	 */
+	public conflationFactor(): number {
+		return this._conflationFactor;
+	}
+
 	private _isAllScalingAndScrollingDisabled(): boolean {
 		const handleScroll = this._model.options()['handleScroll'];
 		const handleScale = this._model.options()['handleScale'];
@@ -876,6 +898,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		if (oldBarSpacing !== this._barSpacing) {
 			this._visibleRangeInvalidated = true;
 			this._resetTimeMarksCache();
+			this._updateConflationFactor();
 		}
 	}
 
@@ -926,6 +949,29 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		}
 
 		return this._options.minBarSpacing;
+	}
+
+	/**
+	 * Updates the conflation factor based on the current bar spacing.
+	 * When bar spacing is very small (\< 0.5 pixels), we conflate data points
+	 * to improve rendering performance.
+	 */
+	private _updateConflationFactor(): void {
+		// Only enable conflation if the option is enabled
+		if (!this._options.enableConflation) {
+			this._conflationFactor = 1;
+			return;
+		}
+
+		const threshold = 0.5; // pixels
+		if (this._barSpacing < threshold) {
+			// Calculate how many points should be conflated into one
+			// If bar spacing is 0.25, we want to conflate 2 points (0.5 / 0.25 = 2)
+			// If bar spacing is 0.1, we want to conflate 5 points (0.5 / 0.1 = 5)
+			this._conflationFactor = Math.ceil(threshold / this._barSpacing);
+		} else {
+			this._conflationFactor = 1;
+		}
 	}
 
 	private _correctOffset(): void {

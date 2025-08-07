@@ -44,6 +44,7 @@ export interface SeriesDataAtTypeMap {
 
 export interface ISeries<T extends SeriesType> extends IPriceDataSource {
 	bars(): SeriesPlotList<T>;
+	conflatedBars(): SeriesPlotList<T>;
 	visible(): boolean;
 	options(): Readonly<SeriesOptionsMap[T]>;
 	title(): string;
