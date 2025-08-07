@@ -322,7 +322,7 @@ export class DataLayer<HorzScaleItem> {
 
 	public popSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, count: number): [SeriesPlotRow<SeriesType>[], DataUpdateResponse] {
 		const seriesData = this._seriesRowsBySeries.get(series);
-		const poppedData: SeriesPlotRow<SeriesType>[] = [];
+		let poppedData: SeriesPlotRow<SeriesType>[] = [];
 
 		if (seriesData === undefined) {
 			const dataUpdateResponse: DataUpdateResponse = {
@@ -335,9 +335,7 @@ export class DataLayer<HorzScaleItem> {
 			return [poppedData, dataUpdateResponse];
 		}
 
-		for (let i = 0; i < count && seriesData.length > 0; ++i) {
-			poppedData.push(seriesData.pop() as SeriesPlotRow<SeriesType>);
-		}
+		poppedData = seriesData.splice(-count);
 
 		if (seriesData.length === 0) {
 			this._seriesLastTimePoint.delete(series);
