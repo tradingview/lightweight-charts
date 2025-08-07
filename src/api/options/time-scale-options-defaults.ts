@@ -21,4 +21,5 @@ export const timeScaleOptionsDefaults: HorzScaleOptions = {
 	minimumHeight: 0,
 	allowBoldLabels: true,
 	ignoreWhitespaceIndices: false,
+	enableConflation: false,
 };

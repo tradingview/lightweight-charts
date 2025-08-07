@@ -89,7 +89,7 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
 		this._items = this._series
-			.bars()
+			.conflatedBars()
 			.rows()
 			.map((row: SeriesPlotRow<'Custom'>) => {
 				return {
