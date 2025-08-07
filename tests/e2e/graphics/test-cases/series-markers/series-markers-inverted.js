@@ -38,10 +38,5 @@ function runTestCase(container) {
 		},
 	});
 
-	for (const marker of markers) {
-		marker.position = marker.position === 'aboveBar' ? 'belowBar' : 'aboveBar';
-		marker.shape = marker.shape === 'arrowUp' ? 'arrowDown' : 'arrowUp';
-	}
-
 	markerSeries.setMarkers(markers);
 }
