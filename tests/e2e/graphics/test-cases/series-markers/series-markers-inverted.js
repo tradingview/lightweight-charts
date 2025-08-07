@@ -31,4 +31,5 @@ function runTestCase(container) {
 	});
 
 	markerSeries.setMarkers(markers);
+	chart.timeScale().fitContent();
 }
