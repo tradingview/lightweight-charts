@@ -320,6 +320,38 @@ export class DataLayer<HorzScaleItem> {
 		return this._getUpdateResponse(series, insertIndex, info);
 	}
 
+	public popSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, count: number): [SeriesPlotRow<SeriesType>[], DataUpdateResponse] {
+		const seriesData = this._seriesRowsBySeries.get(series);
+		let poppedData: SeriesPlotRow<SeriesType>[] = [];
+
+		if (seriesData === undefined || count <= 0) {
+			const dataUpdateResponse: DataUpdateResponse = {
+				series: new Map(),
+				timeScale: {
+					baseIndex: this._getBaseIndex(),
+				},
+			};
+
+			return [poppedData, dataUpdateResponse];
+		}
+
+		poppedData = seriesData.splice(-count).reverse();
+
+		if (seriesData.length === 0) {
+			this._seriesLastTimePoint.delete(series);
+		} else {
+			this._seriesLastTimePoint.set(series, seriesData[seriesData.length - 1].time);
+		}
+
+		const info: SeriesUpdateInfo = {
+			historicalUpdate: false,
+			lastBarUpdatedOrNewBarsAddedToTheRight: false,
+			poppedDataCount: poppedData.length,
+		};
+
+		return [poppedData, this._getUpdateResponse(series, seriesData.length - poppedData.length, info)];
+	}
+
 	private _updateLastSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow): void {
 		let seriesData = this._seriesRowsBySeries.get(series);
 		if (seriesData === undefined) {
@@ -454,6 +486,14 @@ export class DataLayer<HorzScaleItem> {
 				baseIndex: this._getBaseIndex(),
 			},
 		};
+
+		if (info?.poppedDataCount) {
+			for (let i = this._sortedTimePoints.length - info.poppedDataCount; i < this._sortedTimePoints.length; i++) {
+				this._pointDataByTimePoint.delete(this._horzScaleBehavior.key(this._sortedTimePoints[i].time));
+			}
+
+			(this._sortedTimePoints as InternalTimeScalePoint[]).splice(-info.poppedDataCount);
+		}
 
 		if (firstChangedPointIndex !== -1) {
 			// TODO: it's possible to make perf improvements by checking what series has data after firstChangedPointIndex

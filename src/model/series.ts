@@ -83,6 +83,7 @@ type CustomDataToPlotRowValueConverter<HorzScaleItem> = (item: CustomData<HorzSc
 export interface SeriesUpdateInfo {
 	lastBarUpdatedOrNewBarsAddedToTheRight: boolean;
 	historicalUpdate: boolean;
+	poppedDataCount?: number;
 }
 
 // note that if would like to use `Omit` here - you can't due https://github.com/microsoft/TypeScript/issues/36981

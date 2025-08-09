@@ -6,6 +6,7 @@ import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
+import { SeriesPlotRow } from '../model/series-data';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
@@ -187,6 +188,8 @@ export interface ISeriesApi<
 	 * ```
 	 */
 	update(bar: TData, historicalUpdate?: boolean): void;
+
+	pop(count: number): SeriesPlotRow<TSeriesType>[];
 
 	/**
 	 * Returns a bar data by provided logical index.
