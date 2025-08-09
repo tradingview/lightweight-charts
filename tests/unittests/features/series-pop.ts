@@ -9,10 +9,10 @@ import { Time, UTCTimestamp } from '../../../src/model/horz-scale-behavior-time/
 import { Series } from '../../../src/model/series';
 import { SeriesType } from '../../../src/model/series-options';
 
-function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Series<T> {
+function createSeriesMock<T extends SeriesType = SeriesType>(seriesType: T): Series<T> {
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	return {
-		seriesType: () => seriesType || 'Line',
+		seriesType: () => seriesType,
 		customSeriesPlotValuesBuilder: () => {},
 		customSeriesWhitespaceCheck: () => {},
 	} as Series<T>;
@@ -57,15 +57,6 @@ describe('Series Popping', () => {
 		expect(updateResponse2.timeScale.baseIndex).to.equal(2);
 		expect(popped2[0].time).to.deep.equal({ timestamp: 5000 });
 		expect(popped2[1].time).to.deep.equal({ timestamp: 4000 });
-
-        // console.log('updateResponse1.timeScale');
-        // console.log(updateResponse2.timeScale);
-
-        // console.log('dataLayer._pointDataByTimePoint');
-        // console.log(dataLayer._pointDataByTimePoint);
-
-        // console.log('dataLayer._sortedTimePoints');
-        // console.log(dataLayer._sortedTimePoints);
 
 		const [popped3, updateResponse3] = dataLayer.popSeriesData(series, 10);
 		expect(popped3).to.have.length(3);
