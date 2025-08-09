@@ -242,7 +242,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 			this._sendUpdateToChart(update);
 		}
 
-		return popppedData as unknown as SeriesPlotRow<TSeriesType>[];
+		return popppedData as SeriesPlotRow<TSeriesType>[];
 	}
 
 	public subscribeClick(handler: MouseEventHandler<HorzScaleItem>): void {

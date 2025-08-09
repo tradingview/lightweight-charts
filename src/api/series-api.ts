@@ -163,7 +163,10 @@ export class SeriesApi<
 
 	public pop(count: number = 1): SeriesPlotRow<TSeriesType>[] {
 		const poppedRows = this._dataUpdatesConsumer.popData(this._series, count);
-		this._onDataChanged('update');
+
+		if (poppedRows.length !== 0) {
+			this._onDataChanged('update');
+		}
 
 		return poppedRows;
 	}
