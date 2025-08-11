@@ -10,6 +10,8 @@ import { LogicalRange } from '../model/time-data';
 import { OffscreenCanvasTarget2D } from './canvas-target';
 import { WorkerEngine } from './engine';
 import { CanvasRenderingTarget2D as FancyTarget } from './fancy-canvas-shim';
+import { WorkerPluginHost } from './plugins/host';
+import type { WorkerRenderContexts, WorkerRenderSizes } from './plugins/types';
 import { deserializeSABToSeriesItems } from './serialization-worker';
 import { PriceAxisWidgetWorker } from './widgets/price-axis-widget-worker';
 import { TimeAxisWidgetWorker } from './widgets/time-axis-widget-worker';
@@ -181,6 +183,27 @@ const engineOptions: EngineOptions = {
 	backgroundBottomColor: '#FFFFFF',
 };
 
+let pluginHost: WorkerPluginHost | null = null;
+
+function currentWorkerSizes(): WorkerRenderSizes {
+    return {
+        paneWidth: Math.max(0, Math.floor(paneLogicalWidth)),
+        paneHeight: Math.max(0, Math.floor(paneLogicalHeight)),
+        timeAxisHeight: Math.max(0, Math.floor(timeAxisLogicalHeight)),
+        rightAxisWidth: Math.max(0, Math.floor(rightAxisLogicalWidth)),
+        devicePixelRatio: dpr || 1,
+    };
+}
+
+function currentWorkerContexts(): WorkerRenderContexts {
+    return {
+        pane: ctx,
+        overlay: overlayCtx,
+        time: timeCtx,
+        right: rightCtx,
+    };
+}
+
 // eslint-disable-next-line complexity
 function render(): void {
 	if (!ctx || !canvas || !engine) {return;}
@@ -307,6 +330,10 @@ function render(): void {
     }
 	renderCount++;
 
+	if (pluginHost) {
+		try { pluginHost.renderPane(); } catch { /* ignore plugin errors */ }
+	}
+
 	// Render time axis (worker widget). Paint in logical pixels
     if (timeCanvas && timeCtx && timeWidget) {
         const desiredW = Math.max(1, Math.floor(paneLogicalWidth * dpr));
@@ -332,6 +359,12 @@ function render(): void {
         }
         rightPriceWidget.paint(dpr);
     }
+
+	// Plugins: axis hooks
+	if (pluginHost) {
+		try { pluginHost.renderTimeAxis(); } catch { /* ignore */ }
+		try { pluginHost.renderRightAxis(); } catch { /* ignore */ }
+	}
 }
 
 // eslint-disable-next-line complexity
@@ -365,6 +398,11 @@ function renderOverlayOnly(): void {
     }
     if (timeCanvas && timeCtx && timeWidget) { timeWidget.paint(dpr); }
     if (rightCanvas && rightCtx && rightPriceWidget) { rightPriceWidget.paint(dpr); }
+	if (pluginHost) {
+		try { pluginHost.renderOverlay(); } catch { /* ignore */ }
+		try { pluginHost.renderTimeAxis(); } catch { /* ignore */ }
+		try { pluginHost.renderRightAxis(); } catch { /* ignore */ }
+	}
 }
 
 function determineWheelSpeedAdjustment(deltaMode: number): number {
@@ -480,6 +518,13 @@ self.onmessage = (ev: MessageEvent) => {
                 engine.invalidateFull();
                 baseTarget = new OffscreenCanvasTarget2D(ctx, canvas.width, canvas.height, 0, 0, dpr);
                 overlayTargetGlobal = overlayCanvas && overlayCtx ? new OffscreenCanvasTarget2D(overlayCtx, overlayCanvas.width, overlayCanvas.height, 0, 0, dpr) : null;
+                // Initialize plugin host after contexts are ready
+                pluginHost = new WorkerPluginHost(
+                    engine.model,
+                    (overlayOnly?: boolean) => scheduleRender(!!overlayOnly),
+                    currentWorkerSizes(),
+                    currentWorkerContexts()
+                );
                 render();
 			}
 			break;
@@ -501,6 +546,13 @@ self.onmessage = (ev: MessageEvent) => {
                 if (rightPriceWidget) { rightPriceWidget.setSize(rightWidth, height); }
                 engine?.setWidth(width);
                 engine?.setHeight(height);
+                if (pluginHost) {
+                    try {
+                        pluginHost.setSizes(currentWorkerSizes());
+                        pluginHost.setContexts(currentWorkerContexts());
+                        pluginHost.onResize();
+                    } catch { /* ignore */ }
+                }
 				render();
 			}
 			break;
@@ -658,6 +710,7 @@ self.onmessage = (ev: MessageEvent) => {
 			ctx = null;
 			canvas = null;
 			engine = null;
+            try { pluginHost = null; } catch { /* ignore */ }
 			break;
 		}
         case 'setData': {
@@ -693,9 +746,8 @@ self.onmessage = (ev: MessageEvent) => {
         case 'applyOptions': {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { options } = ev.data as { options: any };
-            // Apply full chart options to model to keep time/price scales in sync
+            // apply full chart options to model to keep time/price scales in sync
             engine?.model.applyOptions(options as Record<string, unknown>);
-            // If timeScale options include barSpacing or minBarSpacing, apply immediately
             if (options?.timeScale) {
                 const ts = engine?.model.timeScale();
                 if (ts && typeof options.timeScale.barSpacing === 'number') {
@@ -713,6 +765,42 @@ self.onmessage = (ev: MessageEvent) => {
                 }
             }
 			scheduleRender(false);
+            break;
+        }
+        case 'plugin:add': {
+            const { id, moduleUrl, exportName, options } = ev.data as { id: string; moduleUrl: string; exportName?: string; options?: unknown };
+            // dynamic import user-provided module URL and register plugin instance
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            (async () => {
+                try {
+                    const mod: Record<string, unknown> = await import(moduleUrl);
+                    // Prefer default export if available, otherwise named
+                    const factory = (exportName ? mod[exportName] : (mod as { default?: unknown }).default) as ((opts?: unknown) => import('./plugins/types').WorkerPlugin<unknown>) | undefined;
+                    if (typeof factory === 'function') {
+                        const instance = (factory as (opts?: unknown) => import('./plugins/types').WorkerPlugin<unknown>)(options);
+                        pluginHost?.register(id, instance, options);
+                        scheduleRender(false);
+                    } else {
+                        // eslint-disable-next-line no-console
+                        console.warn('[worker] plugin:add invalid factory export from', moduleUrl);
+                    }
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error('[worker] failed to import plugin module', moduleUrl, e);
+                }
+            })();
+            break;
+        }
+        case 'plugin:remove': {
+            const { id } = ev.data as { id: string };
+            pluginHost?.unregister(id);
+            scheduleRender(false);
+            break;
+        }
+        case 'plugin:applyOptions': {
+            const { id, options } = ev.data as { id: string; options: unknown };
+            pluginHost?.applyOptions(id, options);
+            scheduleRender(false);
             break;
         }
         case 'dblClick': {

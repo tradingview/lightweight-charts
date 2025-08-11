@@ -50,6 +50,10 @@
 		<button onclick="zoomOut()">Zoom Out (trigger LOD)</button>
 		<button onclick="zoomIn()">Zoom In (disable LOD)</button>
 		<button onclick="resetChart()">Reset Chart</button>
+		<button onclick="addWorkerPlugin()">Add Worker Plugin</button>
+		<button onclick="updateWorkerPlugin()">Update Plugin Options</button>
+		<button onclick="removeWorkerPlugin()">Remove Worker Plugin</button>
+		<button onclick="addVerticalLinePlugin()">Add Vertical Line</button>
 		<label style="margin-left:16px">Rendering Engine:
 			<select id="renderingEngine" onchange="switchRenderingEngine()">
 				<option value="worker" selected>Worker</option>
@@ -77,6 +81,9 @@
 		let conflationEnabled = true;
 		let transportMode = 'sab';
 		let renderingEngine = 'worker';
+		let pluginHandle = null;
+		let bandsHandle = null;
+		let vertLineHandle = null;
 
 		function generateTestData(count = 10000) {
 			const data = [];
@@ -242,6 +249,59 @@
 			// }
 
 			// chart.subscribeClick(myClickHandler);
+		}
+
+		function addWorkerPlugin() {
+			if (renderingEngine !== 'worker') {
+				console.warn('Worker plugin demo only works in worker rendering mode');
+				return;
+			}
+			if (pluginHandle) {
+				console.warn('Plugin already added');
+				return;
+			}
+			// The plugin file is at /plugin-examples/minimal-worker-plugin.js relative to dev server root
+			pluginHandle = chart.addPlugin({
+				url: '/plugin-examples/minimal-worker-plugin.js',
+				exportName: 'createMinimalWorkerPlugin',
+				options: { text: 'Hello from Worker Plugin', color: '#0066ff' },
+			});
+		}
+
+		function updateWorkerPlugin() {
+			if (!pluginHandle) {
+				console.warn('No plugin to update. Click "Add Worker Plugin" first.');
+				return;
+			}
+			const colors = ['#0066ff', '#ff0066', '#00aa00', '#aa00aa'];
+			const color = colors[(Math.random() * colors.length) | 0];
+			pluginHandle.applyOptions({ color, text: `Worker Plugin (${color})` });
+		}
+
+		function removeWorkerPlugin() {
+			if (!pluginHandle) {
+				console.warn('No plugin to remove.');
+				return;
+			}
+			pluginHandle.remove();
+			pluginHandle = null;
+		}
+		function addVerticalLinePlugin() {
+			if (renderingEngine !== 'worker') {
+				console.warn('Worker plugin demo only works in worker rendering mode');
+				return;
+			}
+			if (vertLineHandle) {
+				vertLineHandle.remove();
+				vertLineHandle = null;
+			}
+
+			const centerTime = lineData[Math.floor(lineData.length / 2)].time;
+			vertLineHandle = chart.addPlugin({
+				url: '/plugin-examples/vertical-line-worker-plugin.js',
+				exportName: 'createVerticalLineWorkerPlugin',
+				options: { time: centerTime, showLabel: true, labelText: 'IT WORKS!!!', color: 'green' },
+			});
 		}
 
 		function zoomOut() {

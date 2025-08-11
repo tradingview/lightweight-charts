@@ -17,6 +17,9 @@ interface SeriesProxy {
 	update: (bar: unknown, historicalUpdate?: boolean) => void;
 }
 
+interface WorkerPluginHandle { id: string; applyOptions: (opts: unknown) => void; remove: () => void }
+interface WorkerPluginDescriptor { url: string; exportName?: string; options?: unknown; id?: string }
+
 interface WorkerChartApi extends Pick<IChartApiBase, 'resize' | 'remove'> {
 	applyOptions: (opts: unknown) => void;
 	timeScale: () => {
@@ -29,12 +32,13 @@ interface WorkerChartApi extends Pick<IChartApiBase, 'resize' | 'remove'> {
 	};
 	addSeries: (definition: { type: SeriesType }, seriesOptions?: unknown) => SeriesProxy;
 	removeSeries: (seriesApi: SeriesProxy) => void;
+	addPlugin: (descriptor: WorkerPluginDescriptor) => WorkerPluginHandle;
 }
 
 // eslint-disable-next-line complexity
 export function createWorkerChart(
-    container: string | HTMLElement,
-    options?: DeepPartial<TimeChartOptions>
+	container: string | HTMLElement,
+	options?: DeepPartial<TimeChartOptions>
 ): WorkerChartApi {
 	const htmlElement = fetchHtmlElement(container);
 
@@ -152,14 +156,10 @@ export function createWorkerChart(
 		rightWidth: (() => { const r = rightAxisTd.getBoundingClientRect(); return Math.max(0, Math.floor(r.width)); })(),
 	});
 	const sizes = measure();
-	// Keep time row right stub equal to price axis width for alignment
 	timeRightStubTd.style.width = `${sizes.rightWidth}px`;
 
 	worker.postMessage({ type: 'init', canvas: offscreen, overlayCanvas: offscreenOverlay, timeCanvas: offscreenTime, rightPriceCanvas: offscreenRight, width: sizes.pane.w, height: sizes.pane.h, timeHeight: sizes.timeHeight, rightWidth: sizes.rightWidth, dpr: (window.devicePixelRatio || 1) }, [offscreen as unknown as Transferable, offscreenOverlay as unknown as Transferable, offscreenTime as unknown as Transferable, offscreenRight as unknown as Transferable]);
 
-	// Axes are painted in worker on offscreen canvases
-
-	// Warn if not cross-origin isolated; SAB operations may fail or be restricted
 	try {
 		const w = window as unknown as { crossOriginIsolated?: boolean };
 		if (w.crossOriginIsolated === false) {
@@ -170,10 +170,9 @@ export function createWorkerChart(
 		// ignore
 	}
 
-	// Resize handling: re-measure table cell sizes and notify worker
+	// resize handling: re-measure table cell sizes and notify worker
 	const ro = new ResizeObserver(() => {
 		const s = measure();
-		// Keep time right stub in sync with price axis width
 		timeRightStubTd.style.width = `${s.rightWidth}px`;
 		if (s.pane.w && s.pane.h) {
 			worker.postMessage({ type: 'resize', width: s.pane.w, height: s.pane.h, timeHeight: s.timeHeight, rightWidth: s.rightWidth, dpr: (window.devicePixelRatio || 1) });
@@ -181,15 +180,12 @@ export function createWorkerChart(
 	});
 	ro.observe(htmlElement);
 
-	// Mouse events → worker (zoom/pan)
 	const mouseProxy = new MouseEventsProxy(htmlElement, worker);
 
-	// Bootstrap worker options after init
 	if (options) {
 		worker.postMessage({ type: 'applyOptions', options });
 	}
 
-  // Handle worker → main UI updates
 	let lastVisibleLogicalRange: { from: number; to: number } | null = null;
 	let lastVisibleTimeRange: { from: unknown; to: unknown } | null = null;
 	const visibleTimeRangeHandlers: ((r: { from: unknown; to: unknown } | null) => void)[] = [];
@@ -201,9 +197,7 @@ export function createWorkerChart(
 			case 'axisWidth': {
 				const { side, width } = ev.data as { side: 'left' | 'right'; width: number };
 				if (side === 'right') {
-					// Fix the right price axis cell width to the worker-suggested width
 					rightAxisTd.style.width = `${Math.max(0, Math.floor(width))}px`;
-					// Keep time row stub equal
 					timeRightStubTd.style.width = `${Math.max(0, Math.floor(width))}px`;
 				}
 				break;
@@ -345,6 +339,15 @@ export function createWorkerChart(
 					break;
 				}
 			}
+		},
+		addPlugin: (descriptor: WorkerPluginDescriptor) => {
+			const id = descriptor.id ?? Math.random().toString(36).slice(2);
+			worker.postMessage({ type: 'plugin:add', id, moduleUrl: descriptor.url, exportName: descriptor.exportName, options: descriptor.options });
+			return {
+				id,
+				applyOptions: (opts: unknown) => worker.postMessage({ type: 'plugin:applyOptions', id, options: opts }),
+				remove: () => worker.postMessage({ type: 'plugin:remove', id }),
+			};
 		},
 		subscribeClick: (h: (p: unknown) => void) => { chartClickHandlers.push(h); },
 		unsubscribeClick: (h: (p: unknown) => void) => { const idx = chartClickHandlers.indexOf(h); if (idx !== -1) { chartClickHandlers.splice(idx, 1); } },
