@@ -175,16 +175,20 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 		}
 
 		const lastValue = this._series.lastValueData(true);
-		if (lastValue.noData || !visibleRange.contains(lastValue.index)) {
+		if (lastValue.noData) {
+			return;
+		}
+		const lastValueWithData = lastValue as unknown as import('../../model/iseries').LastValueDataResultWithData;
+		if (!visibleRange.contains(lastValueWithData.index)) {
 			return;
 		}
 
 		const lastValuePoint: Point = {
-			x: timeScale.indexToCoordinate(lastValue.index),
-			y: this._series.priceScale().priceToCoordinate(lastValue.price, firstValue.value),
+			x: timeScale.indexToCoordinate(lastValueWithData.index),
+			y: this._series.priceScale().priceToCoordinate(lastValueWithData.price, firstValue.value),
 		};
 
-		const seriesLineColor = lastValue.color;
+		const seriesLineColor = lastValueWithData.color;
 		const seriesLineWidth = this._series.options().lineWidth;
 
 		const data = this._animationData(this._duration(), seriesLineColor);

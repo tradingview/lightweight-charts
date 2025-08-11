@@ -90,6 +90,31 @@ modes.forEach(mode => {
 			isStandalone: true,
 		})
 	);
+
+	// Worker bundle: emit our OffscreenCanvas worker for browser consumption
+	// eslint-disable-next-line unicorn/no-array-push-push
+	configs.push({
+		input: './lib/prod/src/worker/chart.worker.js',
+		output: {
+			format: 'esm',
+			file: `./dist/chart.worker.${mode ? 'production' : 'development'}.js`,
+		},
+		plugins: [
+			nodeResolve(),
+			replace({
+				preventAssignment: true,
+				values: {
+					'process.env.NODE_ENV': JSON.stringify(mode ? 'production' : 'development'),
+					'process.env.BUILD_VERSION': JSON.stringify(currentVersion),
+				},
+			}),
+			mode && terser({
+				output: { comments: /@license/, inline_script: true },
+				mangle: { module: true, properties: { regex: /^_(private|internal)_/ } },
+			}),
+		],
+		external: id => /^fancy-canvas(\/.+)?$/.test(id),
+	});
 });
 
 // eslint-disable-next-line no-console

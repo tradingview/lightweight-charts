@@ -97,6 +97,7 @@
     "npm-run-all": "4.1.5",
     "pixelmatch": "7.1.0",
     "pngjs": "7.0.0",
+    "patch-package": "8.0.0",
     "puppeteer": "24.6.1",
     "rimraf": "6.0.1",
     "rollup": "4.40.0",
@@ -114,7 +115,7 @@
     "yargs": "17.7.2"
   },
   "scripts": {
-    "postinstall": "npm run install-hooks",
+    "postinstall": "patch-package && npm run install-hooks",
     "install-hooks": "node scripts/githooks/install.js",
     "clean": "rimraf lib/ dist/",
     "bundle-dts": "dts-bundle-generator --config dts-config.json",

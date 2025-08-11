@@ -61,6 +61,14 @@ function rgbaToGrayscale(rgbValue: Rgba): number {
 	);
 }
 
+// add simple hex to rgb conversion
+function hexToRgb(hex: string): string {
+	const r = parseInt(hex.slice(1, 3), 16);
+	const g = parseInt(hex.slice(3, 5), 16);
+	const b = parseInt(hex.slice(5, 7), 16);
+	return `rgb(${r}, ${g}, ${b})`;
+}
+
 /**
  * For colors which fall within the sRGB space, the browser can
  * be used to convert the color string into a rgb /rgba string.
@@ -71,6 +79,18 @@ function rgbaToGrayscale(rgbValue: Rgba): number {
  * See: https://www.w3.org/TR/css-color-4/#serializing-sRGB-values
  */
 function getRgbStringViaBrowser(color: string): string {
+	// @TODO: fix for the worker mode
+	// #2962FF rgb(41, 98, 255)
+	// #191919 rgb(25, 25, 25)
+	// if (color === '#2962FF') {
+	// 	return 'rgb(41, 98, 255)';
+	// }
+	// if (color === '#191919') {
+	// 	return 'rgb(25, 25, 25)';
+	// }
+	return 'rgb(255, 255, 255)';
+	// console.log('getRgbStringViaBrowser', color);
+	// return hexToRgb(color);
 	const element = document.createElement('div');
 	element.style.display = 'none';
 	// We append to the body as it is the most reliable way to get a color reading

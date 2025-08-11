@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,18 +10,22 @@
 			font-family: Arial, sans-serif;
 			margin: 20px;
 		}
+
 		.info {
 			background: #f0f0f0;
 			padding: 10px;
 			border-radius: 5px;
 			margin-bottom: 20px;
 		}
+
 		#chart {
 			border: 1px solid #ccc;
 		}
+
 		.controls {
 			margin: 20px 0;
 		}
+
 		button {
 			margin: 5px;
 			padding: 8px 16px;
@@ -28,13 +33,15 @@
 		}
 	</style>
 </head>
+
 <body>
-	<h1>Data Conflation Performance Test</h1>
+	<h1>Offscreen Worker Test</h1>
 
 	<div class="info">
 		<p><strong>Instructions:</strong></p>
 		<ul>
-			<li>This test generates large datasets: 300k line points, 300k candlestick points, and 300k sparse points (80% whitespace)</li>
+			<li>This test generates large datasets: 300k line points, 300k candlestick points, and 300k sparse points
+				(80% whitespace)</li>
 			<li><strong>Conflation is enabled in this example (false by default)</strong></li>
 		</ul>
 	</div>
@@ -43,20 +50,33 @@
 		<button onclick="zoomOut()">Zoom Out (trigger LOD)</button>
 		<button onclick="zoomIn()">Zoom In (disable LOD)</button>
 		<button onclick="resetChart()">Reset Chart</button>
-		<button onclick="generateMoreData()">Add More Data (20k points)</button>
-		<button onclick="toggleConflation()">Toggle Conflation (currently: <span id="conflation-status">enabled</span>)</button>
+		<label style="margin-left:16px">Rendering Engine:
+			<select id="renderingEngine" onchange="switchRenderingEngine()">
+				<option value="worker" selected>Worker</option>
+				<option value="main-thread">Main Thread</option>
+			</select>
+		</label>
+		<label style="margin-left:16px">Transport:
+			<select id="transport" onchange="switchTransport()">
+				<option value="sab" selected>SharedArrayBuffer</option>
+				<option value="ab">ArrayBuffer</option>
+				<option value="json">JSON</option>
+			</select>
+		</label>
 	</div>
 
 	<div id="chart"></div>
 
-	<script src="/dist/lightweight-charts.standalone.development.js"></script>
+	<script src="/dist/lightweight-charts.standalone.production.js"></script>
+	<!-- <script src="/dist/lightweight-charts.standalone.development.js"></script> -->
 	<script>
 		let chart;
 		let lineSeries;
 		let candlestickSeries;
 		let whitespaceLineSeries;
 		let conflationEnabled = true;
-
+		let transportMode = 'sab';
+		let renderingEngine = 'worker';
 
 		function generateTestData(count = 10000) {
 			const data = [];
@@ -149,12 +169,14 @@
 			chart = LightweightCharts.createChart(document.getElementById('chart'), {
 				width: 1200,
 				height: 600,
+				renderingEngine: renderingEngine,
+				dataTransport: transportMode,
 				timeScale: {
 					timeVisible: true,
 					secondsVisible: false,
 					barSpacing: 0.2,
-					minBarSpacing: 1200/ window.devicePixelRatio/300000, // make all data visible
-					enableConflation: conflationEnabled
+					minBarSpacing: 1200 / window.devicePixelRatio / 300000 / 2, // make all data visible
+					// enableConflation: conflationEnabled
 				},
 				grid: {
 					vertLines: { color: '#e1e1e1' },
@@ -190,6 +212,36 @@
 			console.timeEnd('setData');
 
 			chart.timeScale().fitContent();
+			// function myVisibleTimeRangeChangeHandler(newVisibleTimeRange) {
+			// 	if (newVisibleTimeRange === null) {
+			// 		// handle null
+			// 	}
+
+			// 	// handle new logical range
+			// 	console.log('newVisibleTimeRange', newVisibleTimeRange);
+			// }
+
+			// chart.timeScale().subscribeVisibleTimeRangeChange(myVisibleTimeRangeChangeHandler);
+			// function myVisibleLogicalRangeChangeHandler(newVisibleLogicalRange) {
+			// 	if (newVisibleLogicalRange === null) {
+			// 		// handle null
+			// 	}
+
+			// 	// handle new logical range
+			// 	console.log('newVisibleLogicalRange', newVisibleLogicalRange);
+			// }
+
+			// chart.timeScale().subscribeVisibleLogicalRangeChange(myVisibleLogicalRangeChangeHandler);
+			// function myClickHandler(param) {
+			// 	console.log('myClickHandler', param);
+			// 	if (!param.point) {
+			// 		return;
+			// 	}
+
+			// 	console.log(`Click at ${param.point.x}, ${param.point.y}. The time is ${param.time}.`);
+			// }
+
+			// chart.subscribeClick(myClickHandler);
 		}
 
 		function zoomOut() {
@@ -227,20 +279,28 @@
 
 			chart.timeScale().fitContent();
 		}
+		function switchRenderingEngine() {
+			const sel = document.getElementById('renderingEngine');
+			renderingEngine = sel.value;
+			if (chart) {
+				chart.remove();
 
-		function toggleConflation() {
-			conflationEnabled = !conflationEnabled;
+				setTimeout(() => {
+					document.getElementById('chart').innerHTML = '';
+					createChart();
+				}, 1000);
+			}
 
-			// Update the status indicator
-			document.getElementById('conflation-status').textContent = conflationEnabled ? 'enabled' : 'disabled';
+		}
 
-			console.log(`Conflation toggled: ${conflationEnabled ? 'enabled' : 'disabled'}`);
-
-			// Recreate the chart with new conflation setting
+		function switchTransport() {
+			const sel = document.getElementById('transport');
+			transportMode = sel.value;
 			if (chart) {
 				chart.remove();
 			}
 			createChart();
+
 		}
 
 		// Initialize chart when page loads
@@ -249,5 +309,7 @@
 			createChart();
 		});
 	</script>
+
 </body>
+
 </html>

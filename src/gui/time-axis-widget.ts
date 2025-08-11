@@ -22,6 +22,7 @@ import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { Pane } from '../model/pane';
 import { TextWidthCache } from '../model/text-width-cache';
+import { drawTimeAxisTicksAndBorder } from '../renderers/axis-base-renderers';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { IAxisView } from '../views/pane/iaxis-view';
@@ -385,24 +386,12 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		const rendererOptions = this._getRendererOptions();
 
 		const options = timeScale.options();
-		if (options.borderVisible && options.ticksVisible) {
-			target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
-				ctx.strokeStyle = this._lineColor();
-				ctx.fillStyle = this._lineColor();
-
-				const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
-				const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
-
-				ctx.beginPath();
-				const tickLen = Math.round(rendererOptions.tickLength * verticalPixelRatio);
-				for (let index = tickMarks.length; index--;) {
-					const x = Math.round(tickMarks[index].coord * horizontalPixelRatio);
-					ctx.rect(x - tickOffset, 0, tickWidth, tickLen);
-				}
-
-				ctx.fill();
-			});
-		}
+		drawTimeAxisTicksAndBorder(
+            target as unknown as import('../renderers/axis-base-renderers').UniversalCanvasTarget2D,
+            { borderVisible: options.borderVisible, borderColor: this._lineColor(), ticksVisible: options.ticksVisible },
+            rendererOptions,
+            tickMarks
+        );
 
 		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
 			const yText = (

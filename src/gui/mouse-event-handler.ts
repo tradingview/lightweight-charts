@@ -833,7 +833,7 @@ export class MouseEventHandler implements IDestroyable {
 }
 
 function getBoundingClientRect(element: HTMLElement): DOMRect {
-	return element.getBoundingClientRect() || { left: 0, top: 0 };
+	return element.getBoundingClientRect() || { left: 0, top: 0 } as unknown as DOMRect;
 }
 
 function getDistance(p1: Touch, p2: Touch): number {

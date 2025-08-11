@@ -27,7 +27,7 @@
  * @param height - Height of the target rectangle
  * @param borderWidth - Width of border to fill, must be less than width and height of the target rectangle
  */
-export function fillRectInnerBorder(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, borderWidth: number): void {
+export function fillRectInnerBorder(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, x: number, y: number, width: number, height: number, borderWidth: number): void {
 	// horizontal (top and bottom) edges
 	ctx.fillRect(x + borderWidth, y, width - borderWidth * 2, borderWidth);
 	ctx.fillRect(x + borderWidth, y + height - borderWidth, width - borderWidth * 2, borderWidth);
@@ -36,7 +36,7 @@ export function fillRectInnerBorder(ctx: CanvasRenderingContext2D, x: number, y:
 	ctx.fillRect(x + width - borderWidth, y, borderWidth, height);
 }
 
-export function clearRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
+export function clearRect(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, x: number, y: number, w: number, h: number, clearColor: string): void {
 	ctx.save();
 	ctx.globalCompositeOperation = 'copy';
 	ctx.fillStyle = clearColor;
@@ -52,7 +52,7 @@ function changeBorderRadius(borderRadius: LeftTopRightTopRightBottomLeftBottomRa
 
 export function drawRoundRect(
 	// eslint:disable-next-line:max-params
-	ctx: CanvasRenderingContext2D,
+	ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 	x: number,
 	y: number,
 	w: number,
@@ -102,7 +102,7 @@ export function drawRoundRect(
  */
 // eslint-disable-next-line max-params
 export function drawRoundRectWithBorder(
-	ctx: CanvasRenderingContext2D,
+	ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 	left: number,
 	top: number,
 	width: number,
@@ -143,7 +143,7 @@ export function drawRoundRectWithBorder(
 }
 
 // eslint-disable-next-line max-params
-export function clearRectWithGradient(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, topColor: string, bottomColor: string): void {
+export function clearRectWithGradient(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, x: number, y: number, w: number, h: number, topColor: string, bottomColor: string): void {
 	ctx.save();
 
 	ctx.globalCompositeOperation = 'copy';

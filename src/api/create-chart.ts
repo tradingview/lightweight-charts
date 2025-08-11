@@ -8,6 +8,7 @@ import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 
 import { ChartApi } from './chart-api';
 import { IChartApiBase } from './ichart-api';
+import { createWorkerChart } from './worker/chart-worker-proxy';
 
 export function fetchHtmlElement(container: string | HTMLElement): HTMLElement {
 	if (isString(container)) {
@@ -66,11 +67,36 @@ export interface IChartApi extends IChartApiBase<Time> {
  * @returns An interface to the created chart
  */
 export function createChart(container: string | HTMLElement, options?: DeepPartial<ChartOptions>): IChartApi {
+	const requestedEngine: 'worker' | 'main-thread' | undefined = (options as unknown as { renderingEngine?: 'worker' | 'main-thread' } | undefined)?.renderingEngine;
+
+	const supportsOffscreen = (window as typeof globalThis).OffscreenCanvas != null;
+	const supportsSab = (window as typeof globalThis).SharedArrayBuffer != null;
+	const workerSupported = (window != null) && supportsOffscreen && supportsSab;
+
+	const shouldUseWorker = requestedEngine === 'worker' && workerSupported;
+	if (process.env.NODE_ENV === 'development') {
+		// eslint-disable-next-line no-console
+		console.debug('[Lightweight Charts] worker mode:', shouldUseWorker);
+	}
+	if (requestedEngine === 'worker' && !workerSupported) {
+        // Graceful fallback without throwing; keep old behavior as default
+        // eslint-disable-next-line no-console
+		console.warn('[Lightweight Charts] Worker mode requested but not supported by this browser. Falling back to main-thread.');
+	}
+
+	if (shouldUseWorker) {
+		// cast to satisfy the public IChartApi type until worker api fully matches
+		return createWorkerChart(
+			container,
+			HorzScaleBehaviorTime.applyDefaults(options)
+		) as unknown as IChartApi;
+	}
+
 	return createChartEx<Time, HorzScaleBehaviorTime>(
-		container,
-		new HorzScaleBehaviorTime(),
-		HorzScaleBehaviorTime.applyDefaults(options)
-	);
+        container,
+        new HorzScaleBehaviorTime(),
+        HorzScaleBehaviorTime.applyDefaults(options)
+    );
 }
 
 /**

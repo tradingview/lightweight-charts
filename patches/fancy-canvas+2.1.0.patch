@@ -1,0 +1,80 @@
+diff --git a/node_modules/fancy-canvas/canvas-rendering-target.mjs b/node_modules/fancy-canvas/canvas-rendering-target.mjs
+index 0000000..0000001 100644
+--- a/node_modules/fancy-canvas/canvas-rendering-target.mjs
++++ b/node_modules/fancy-canvas/canvas-rendering-target.mjs
+@@ -17,9 +17,15 @@ var CanvasRenderingTarget2D = /** @class */ (function () {
+         try {
+             this._context.save();
+             // do not use resetTransform to support old versions of Edge
+-            this._context.setTransform(1, 0, 0, 1, 0, 0);
+-            this._context.scale(this._horizontalPixelRatio, this._verticalPixelRatio);
++            var c = this._context;
++            if (typeof c.resetTransform === 'function') {
++                c.resetTransform();
++            } else {
++                c.setTransform(1, 0, 0, 1, 0, 0);
++            }
++            c.scale(this._horizontalPixelRatio, this._verticalPixelRatio);
+             return f({
+                 context: this._context,
+                 mediaSize: this._mediaSize,
+             });
+         }
+@@ -33,8 +39,14 @@ var CanvasRenderingTarget2D = /** @class */ (function () {
+         try {
+             this._context.save();
+             // do not use resetTransform to support old versions of Edge
+-            this._context.setTransform(1, 0, 0, 1, 0, 0);
++            var c = this._context;
++            if (typeof c.resetTransform === 'function') {
++                c.resetTransform();
++            } else {
++                c.setTransform(1, 0, 0, 1, 0, 0);
++            }
+             return f({
+                 context: this._context,
+                 mediaSize: this._mediaSize,
+                 bitmapSize: this._bitmapSize,
+                 horizontalPixelRatio: this._horizontalPixelRatio,
+                 verticalPixelRatio: this._verticalPixelRatio,
+             });
+         }
+         finally {
+             this._context.restore();
+         }
+     });
+
+diff --git a/node_modules/fancy-canvas/canvas-rendering-target.d.ts b/node_modules/fancy-canvas/canvas-rendering-target.d.ts
+index 0000000..0000001 100644
+--- a/node_modules/fancy-canvas/canvas-rendering-target.d.ts
++++ b/node_modules/fancy-canvas/canvas-rendering-target.d.ts
+@@ -5,13 +5,13 @@ import { Binding as CanvasElementBitmapSizeBinding } from './canvas-element-bitm
+  * @experimental
+  */
+ export interface MediaCoordinatesRenderingScope {
+-    readonly context: CanvasRenderingContext2D;
++    readonly context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+     readonly mediaSize: Size;
+ }
+ /**
+  * @experimental
+  */
+ export interface BitmapCoordinatesRenderingScope {
+-    readonly context: CanvasRenderingContext2D;
++    readonly context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+     readonly mediaSize: Size;
+     readonly bitmapSize: Size;
+     readonly horizontalPixelRatio: number;
+     readonly verticalPixelRatio: number;
+ }
+@@ -24,7 +24,7 @@ export declare class CanvasRenderingTarget2D {
+     private readonly _context;
+     private readonly _mediaSize;
+     private readonly _bitmapSize;
+-    constructor(context: CanvasRenderingContext2D, mediaSize: Size, bitmapSize: Size);
++    constructor(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, mediaSize: Size, bitmapSize: Size);
+     useMediaCoordinateSpace<T>(f: (scope: MediaCoordinatesRenderingScope) => T): T;
+     useBitmapCoordinateSpace<T>(f: (scope: BitmapCoordinatesRenderingScope) => T): T;
+     private get _horizontalPixelRatio();
+     private get _verticalPixelRatio();
+ }
