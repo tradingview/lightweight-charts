@@ -412,7 +412,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 		return {
 			time: param.originalTime as HorzScaleItem,
-			logical: param.index as Logical | undefined,
+			logical: param.index as unknown as Logical | undefined,
 			point: param.point,
 			paneIndex: param.paneIndex,
 			hoveredSeries,

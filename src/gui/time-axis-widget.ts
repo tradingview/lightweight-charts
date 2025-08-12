@@ -12,7 +12,7 @@ import {
 import { clearRect } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
-import { ISubscription } from '../helpers/isubscription';
+import { Callback, ISubscription } from '../helpers/isubscription';
 import { makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
@@ -22,6 +22,7 @@ import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { Pane } from '../model/pane';
 import { TextWidthCache } from '../model/text-width-cache';
+import { drawTimeAxisTicksAndBorder } from '../renderers/axis-base-renderers';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { IAxisView } from '../views/pane/iaxis-view';
@@ -117,7 +118,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		this._element.appendChild(this._rightStubCell);
 
 		this._recreateStubs();
-		this._chart.model().priceScalesOptionsChanged().subscribe(this._recreateStubs.bind(this), this);
+		this._chart.model().priceScalesOptionsChanged().subscribe(this._recreateStubs.bind(this) as Callback, this);
 
 		this._mouseEventHandler = new MouseEventHandler(
 			this._topCanvasBinding.canvasElement,
@@ -385,24 +386,12 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		const rendererOptions = this._getRendererOptions();
 
 		const options = timeScale.options();
-		if (options.borderVisible && options.ticksVisible) {
-			target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
-				ctx.strokeStyle = this._lineColor();
-				ctx.fillStyle = this._lineColor();
-
-				const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
-				const tickOffset = Math.floor(horizontalPixelRatio * 0.5);
-
-				ctx.beginPath();
-				const tickLen = Math.round(rendererOptions.tickLength * verticalPixelRatio);
-				for (let index = tickMarks.length; index--;) {
-					const x = Math.round(tickMarks[index].coord * horizontalPixelRatio);
-					ctx.rect(x - tickOffset, 0, tickWidth, tickLen);
-				}
-
-				ctx.fill();
-			});
-		}
+		drawTimeAxisTicksAndBorder(
+            target as unknown as import('../renderers/axis-base-renderers').UniversalCanvasTarget2D,
+            { borderVisible: options.borderVisible, borderColor: this._lineColor(), ticksVisible: options.ticksVisible },
+            rendererOptions,
+            tickMarks
+        );
 
 		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
 			const yText = (
@@ -436,7 +425,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		});
 	}
 
-	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D, coordinate: number, labelText: string): number {
+	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, coordinate: number, labelText: string): number {
 		const labelWidth = this._widthCache.measureText(ctx, labelText);
 		const labelWidthHalf = labelWidth / 2;
 		const leftTextCoordinate = Math.floor(coordinate - labelWidthHalf) + 0.5;

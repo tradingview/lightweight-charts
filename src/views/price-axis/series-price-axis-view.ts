@@ -36,26 +36,27 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		if (lastValueData.noData) {
 			return;
 		}
+		const lastValueWithData = lastValueData as unknown as LastValueDataResultWithData;
 
 		if (showSeriesLastValue) {
-			axisRendererData.text = this._axisText(lastValueData, showSeriesLastValue, showPriceAndPercentage);
+			axisRendererData.text = this._axisText(lastValueWithData, showSeriesLastValue, showPriceAndPercentage);
 			axisRendererData.visible = axisRendererData.text.length !== 0;
 		}
 
 		if (showSymbolLabel || showPriceAndPercentage) {
-			paneRendererData.text = this._paneText(lastValueData, showSeriesLastValue, showSymbolLabel, showPriceAndPercentage);
+			paneRendererData.text = this._paneText(lastValueWithData, showSeriesLastValue, showSymbolLabel, showPriceAndPercentage);
 			paneRendererData.visible = paneRendererData.text.length > 0;
 		}
 
-		const lastValueColor = source.priceLineColor(lastValueData.color);
+		const lastValueColor = source.priceLineColor(lastValueWithData.color);
 		const colors = this._source
 			.model()
 			.colorParser()
 			.generateContrastColors(lastValueColor);
 
 		commonRendererData.background = colors.background;
-		commonRendererData.coordinate = lastValueData.coordinate;
-		paneRendererData.borderColor = source.model().backgroundColorAtYPercentFromTop(lastValueData.coordinate / source.priceScale().height());
+		commonRendererData.coordinate = lastValueWithData.coordinate;
+		paneRendererData.borderColor = source.model().backgroundColorAtYPercentFromTop(lastValueWithData.coordinate / source.priceScale().height());
 		axisRendererData.borderColor = lastValueColor;
 		axisRendererData.color = colors.foreground;
 		paneRendererData.color = colors.foreground;

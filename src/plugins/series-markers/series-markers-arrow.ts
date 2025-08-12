@@ -6,7 +6,7 @@ import { BitmapShapeItemCoordinates, shapeSize } from './utils';
 
 export function drawArrow(
 	up: boolean,
-	ctx: CanvasRenderingContext2D,
+ ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 	coords: BitmapShapeItemCoordinates,
 	size: number
 ): void {

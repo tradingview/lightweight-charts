@@ -126,7 +126,7 @@ function bitmapShapeItemCoordinates(item: SeriesMarkerRendererDataItem, horizont
 	};
 }
 
-function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, horizontalPixelRatio: number, verticalPixelRatio: number): void {
+function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, horizontalPixelRatio: number, verticalPixelRatio: number): void {
 	ctx.fillStyle = item.color;
 	if (item.text !== undefined) {
 		drawText(ctx, item.text.content, item.text.x, item.text.y, horizontalPixelRatio, verticalPixelRatio);
@@ -135,7 +135,7 @@ function drawItem(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContex
 	drawShape(item, ctx, bitmapShapeItemCoordinates(item, horizontalPixelRatio, verticalPixelRatio));
 }
 
-function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D, coordinates: BitmapShapeItemCoordinates): void {
+function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, coordinates: BitmapShapeItemCoordinates): void {
 	if (item.size === 0) {
 		return;
 	}

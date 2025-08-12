@@ -25,6 +25,7 @@ import { LayoutOptions } from '../model/layout-options';
 import { PriceScalePosition } from '../model/pane';
 import { PriceMark, PriceScale } from '../model/price-scale';
 import { TextWidthCache } from '../model/text-width-cache';
+import { drawPriceAxisTicksAndBorder } from '../renderers/axis-base-renderers';
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
 import { IAxisView } from '../views/pane/iaxis-view';
@@ -538,26 +539,13 @@ export class PriceAxisWidget implements IDestroyable {
 			(this._size.width - rendererOptions.tickLength) :
 			0;
 
-		if (priceScaleOptions.borderVisible && priceScaleOptions.ticksVisible) {
-			target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
-				ctx.fillStyle = priceScaleOptions.borderColor;
-
-				const tickHeight = Math.max(1, Math.floor(verticalPixelRatio));
-				const tickOffset = Math.floor(verticalPixelRatio * 0.5);
-				const tickLength = Math.round(rendererOptions.tickLength * horizontalPixelRatio);
-
-				ctx.beginPath();
-				for (const tickMark of tickMarks) {
-					ctx.rect(
-						Math.floor(tickMarkLeftX * horizontalPixelRatio),
-						Math.round(tickMark.coord * verticalPixelRatio) - tickOffset,
-						tickLength,
-						tickHeight
-					);
-				}
-				ctx.fill();
-			});
-		}
+		drawPriceAxisTicksAndBorder(
+            target as unknown as import('../renderers/axis-base-renderers').UniversalCanvasTarget2D,
+            this._isLeft ? 'left' : 'right',
+            { borderVisible: priceScaleOptions.borderVisible, borderColor: priceScaleOptions.borderColor, ticksVisible: priceScaleOptions.ticksVisible },
+            rendererOptions,
+            tickMarks
+        );
 
 		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
 			ctx.font = this._baseFont();

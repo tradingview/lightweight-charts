@@ -3,7 +3,7 @@ import { Coordinate } from '../../model/coordinate';
 import { BitmapShapeItemCoordinates, shapeSize } from './utils';
 
 export function drawCircle(
-	ctx: CanvasRenderingContext2D,
+	ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 	coords: BitmapShapeItemCoordinates,
 	size: number
 ): void {
@@ -11,7 +11,14 @@ export function drawCircle(
 	const halfSize = (circleSize - 1) / 2;
 
 	ctx.beginPath();
-	ctx.arc(coords.x, coords.y, halfSize * coords.pixelRatio, 0, 2 * Math.PI, false);
+	ctx.arc(
+		coords.x,
+		coords.y,
+		halfSize * coords.pixelRatio,
+		0,
+		2 * Math.PI,
+		false
+	);
 
 	ctx.fill();
 }

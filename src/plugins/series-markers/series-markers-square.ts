@@ -3,7 +3,7 @@ import { Coordinate } from '../../model/coordinate';
 import { BitmapShapeItemCoordinates, shapeSize } from './utils';
 
 export function drawSquare(
-	ctx: CanvasRenderingContext2D,
+	ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 	coords: BitmapShapeItemCoordinates,
 	size: number
 ): void {
@@ -12,7 +12,12 @@ export function drawSquare(
 	const left = coords.x - halfSize;
 	const top = coords.y - halfSize;
 
-	ctx.fillRect(left, top, squareSize * coords.pixelRatio, squareSize * coords.pixelRatio);
+	ctx.fillRect(
+		left,
+		top,
+		squareSize * coords.pixelRatio,
+		squareSize * coords.pixelRatio
+	);
 }
 
 export function hitTestSquare(
@@ -27,6 +32,7 @@ export function hitTestSquare(
 	const left = centerX - halfSize;
 	const top = centerY - halfSize;
 
-	return x >= left && x <= left + squareSize &&
-		y >= top && y <= top + squareSize;
+	return (
+		x >= left && x <= left + squareSize && y >= top && y <= top + squareSize
+	);
 }

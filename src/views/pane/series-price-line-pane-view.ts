@@ -23,9 +23,10 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 			return;
 		}
 
+		const withData = lastValueData as unknown as import('../../model/iseries').LastValueDataResultWithData;
 		data.visible = true;
-		data.y = lastValueData.coordinate;
-		data.color = this._series.priceLineColor(lastValueData.color);
+		data.y = withData.coordinate;
+		data.color = this._series.priceLineColor(withData.color);
 		data.lineWidth = seriesOptions.priceLineWidth;
 		data.lineStyle = seriesOptions.priceLineStyle;
 	}

@@ -180,6 +180,7 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	}
 
 	public static applyDefaults(options?: DeepPartial<TimeChartOptions>): DeepPartial<TimeChartOptions> {
-		return merge({ localization: { dateFormat: 'dd MMM \'yy' } }, options ?? {});
+		const base = { localization: { dateFormat: 'dd MMM \'yy', locale: 'en-US' } } as DeepPartial<TimeChartOptions>;
+		return merge(base, options ?? {});
 	}
 }

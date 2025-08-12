@@ -6,6 +6,7 @@
 		{ "path": "../tsconfig.model.json" }
 	],
 	"include": [
-		"./**/*.ts"
+		"./**/*.ts",
+		"../worker/**/*.ts"
 	]
 }
