@@ -1,7 +1,7 @@
 import { Coordinate } from '../../model/coordinate';
 
 export function drawText(
-	ctx: CanvasRenderingContext2D,
+	ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 	text: string,
 	x: number,
 	y: number,
@@ -24,6 +24,10 @@ export function hitTestText(
 ): boolean {
 	const halfHeight = textHeight / 2;
 
-	return x >= textX && x <= textX + textWidth &&
-		y >= textY - halfHeight && y <= textY + halfHeight;
+	return (
+		x >= textX &&
+		x <= textX + textWidth &&
+		y >= textY - halfHeight &&
+		y <= textY + halfHeight
+	);
 }

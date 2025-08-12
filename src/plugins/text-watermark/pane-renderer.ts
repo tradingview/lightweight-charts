@@ -98,7 +98,7 @@ export class TextWatermarkRenderer implements IPrimitivePaneRenderer {
 		});
 	}
 
-	private _metrics(ctx: CanvasRenderingContext2D, text: string): number {
+	private _metrics(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, text: string): number {
 		const fontCache = this._fontCache(ctx.font);
 		let result = fontCache.get(text);
 		if (result === undefined) {

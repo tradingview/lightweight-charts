@@ -12,7 +12,7 @@ import {
 import { clearRect } from '../helpers/canvas-helpers';
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
-import { ISubscription } from '../helpers/isubscription';
+import { Callback, ISubscription } from '../helpers/isubscription';
 import { makeFont } from '../helpers/make-font';
 
 import { IDataSource } from '../model/idata-source';
@@ -118,7 +118,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		this._element.appendChild(this._rightStubCell);
 
 		this._recreateStubs();
-		this._chart.model().priceScalesOptionsChanged().subscribe(this._recreateStubs.bind(this), this);
+		this._chart.model().priceScalesOptionsChanged().subscribe(this._recreateStubs.bind(this) as Callback, this);
 
 		this._mouseEventHandler = new MouseEventHandler(
 			this._topCanvasBinding.canvasElement,
@@ -425,7 +425,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		});
 	}
 
-	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D, coordinate: number, labelText: string): number {
+	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, coordinate: number, labelText: string): number {
 		const labelWidth = this._widthCache.measureText(ctx, labelText);
 		const labelWidthHalf = labelWidth / 2;
 		const leftTextCoordinate = Math.floor(coordinate - labelWidthHalf) + 0.5;
