@@ -430,12 +430,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 	public base(): number {
 		const priceFormat = this._options.priceFormat;
-		if (priceFormat.base !== undefined) {
-			return priceFormat.base;
-		}
-
-		const result = (1 / priceFormat.minMove);
-		return result > 1 ? Math.round(result) : result;
+		return priceFormat.base ?? (1 / priceFormat.minMove);
 	}
 
 	public formatter(): IPriceFormatter {
