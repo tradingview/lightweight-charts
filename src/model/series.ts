@@ -428,8 +428,9 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return this._autoscaleInfoImpl(startTimePoint, endTimePoint);
 	}
 
-	public minMove(): number {
-		return this._options.priceFormat.minMove;
+	public base(): number {
+		const priceFormat = this._options.priceFormat;
+		return priceFormat.base ?? (1 / priceFormat.minMove);
 	}
 
 	public formatter(): IPriceFormatter {
