@@ -856,7 +856,7 @@ export class PriceScale {
 
 		let base = 100;
 		if (this._formatterSource !== null) {
-			base = this._formatterSource.base();
+			base = Math.round(this._formatterSource.base());
 		}
 
 		this._formatter = defaultPriceFormatter;
