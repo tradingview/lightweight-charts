@@ -27,6 +27,9 @@ import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
+import { WebGLLayerManager, WebGLRenderableSeries } from '../gl/layers';
+import { composeClipFromTimePrice, createClipFromMediaMatrix } from '../gl/matrices';
+import { IWebGLPaneContext, ViewportSize } from '../gl/types';
 import { AttributionLogoWidget } from './attribution-logo-widget';
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IChartWidgetBase } from './chart-widget';
@@ -72,6 +75,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _rightAxisCell: HTMLElement;
 	private readonly _canvasBinding: CanvasElementBitmapSizeBinding;
 	private readonly _topCanvasBinding: CanvasElementBitmapSizeBinding;
+	// WebGL layer
+	private _glCanvas: HTMLCanvasElement | null = null;
+	private _gl: WebGL2RenderingContext | null = null;
+	private _glLayer: WebGLLayerManager | null = null;
 	private readonly _rowElement: HTMLElement;
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
@@ -92,7 +99,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._chart = chart;
 
 		this._state = state;
-		this._state.onDestroyed().subscribe(this._onStateDestroyed.bind(this), this, true);
+		this._state.onDestroyed().subscribe(() => this._onStateDestroyed(), this, true);
 
 		this._paneCell = document.createElement('td');
 		this._paneCell.style.padding = '0';
@@ -124,9 +131,60 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._topCanvasBinding.subscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
 		const topCanvas = this._topCanvasBinding.canvasElement;
 		topCanvas.style.position = 'absolute';
-		topCanvas.style.zIndex = '2';
+		topCanvas.style.zIndex = '3';
 		topCanvas.style.left = '0';
 		topCanvas.style.top = '0';
+
+		// Optional WebGL canvas inserted between base and top
+		if (this._chart.options().webgl !== 'off') {
+			const glCanvas = document.createElement('canvas');
+			glCanvas.style.position = 'absolute';
+			glCanvas.style.zIndex = '2';
+			glCanvas.style.left = '0';
+			glCanvas.style.top = '0';
+			glCanvas.style.width = '100%';
+			glCanvas.style.height = '100%';
+			// Insert after base and before top in DOM order
+			paneWrapper.appendChild(glCanvas);
+			this._glCanvas = glCanvas;
+			// Try to create WebGL2 context; if not available, keep null to noop
+			try {
+				const attrs: WebGLContextAttributes = {
+					alpha: true,
+					premultipliedAlpha: true,
+					antialias: true,
+					preserveDrawingBuffer: false,
+					powerPreference: 'high-performance',
+				};
+				const gl = glCanvas.getContext('webgl2', attrs);
+				this._gl = gl;
+				if (this._gl) {
+					this._gl.disable(this._gl.DEPTH_TEST);
+					this._gl.disable(this._gl.STENCIL_TEST);
+					this._gl.enable(this._gl.BLEND);
+					this._gl.blendFuncSeparate(this._gl.ONE, this._gl.ONE_MINUS_SRC_ALPHA, this._gl.ONE, this._gl.ONE_MINUS_SRC_ALPHA);
+					// Initialize GL layer manager and context factory
+					this._glLayer = new WebGLLayerManager();
+					const updateContextFactory = () => this._createWebGLPaneContext();
+					const viewport = this._currentViewport();
+					this._glLayer.setContext(this._gl, glCanvas, viewport, updateContextFactory);
+					// Context loss/restored guards
+					glCanvas.addEventListener('webglcontextlost', (e: Event) => {
+						// Prevent default to allow restoration
+						e.preventDefault();
+						this._glLayer?.clearAll();
+					});
+					glCanvas.addEventListener('webglcontextrestored', () => {
+						// Re-initialize the layer manager context and request a repaint
+						if (!this._gl) { return; }
+						this._glLayer?.setContext(this._gl, glCanvas, this._currentViewport(), () => this._createWebGLPaneContext());
+						this._model().lightUpdate();
+					});
+				}
+			} catch {
+				this._gl = null;
+			}
+		}
 
 		this._rowElement = document.createElement('tr');
 		this._rowElement.appendChild(this._leftAxisCell);
@@ -167,6 +225,20 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		this._mouseEventHandler.destroy();
+
+		// Cleanup GL resources if present
+		if (this._glLayer) {
+			this._glLayer.clearAll();
+			this._glLayer = null;
+		}
+		if (this._gl) {
+			// No explicit context destroy in WebGL2; release references
+			this._gl = null;
+		}
+		if (this._glCanvas && this._glCanvas.parentElement) {
+			this._glCanvas.parentElement.removeChild(this._glCanvas);
+		}
+		this._glCanvas = null;
 	}
 
 	public state(): Pane {
@@ -181,7 +253,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._state = pane;
 
 		if (this._state !== null) {
-			this._state.onDestroyed().subscribe(PaneWidget.prototype._onStateDestroyed.bind(this), this, true);
+			this._state.onDestroyed().subscribe(() => this._onStateDestroyed(), this, true);
 		}
 
 		this.updatePriceAxisWidgetsStates();
@@ -425,6 +497,38 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._isSettingSize = false;
 		this._paneCell.style.width = newSize.width + 'px';
 		this._paneCell.style.height = newSize.height + 'px';
+
+		// Resize GL canvas bitmap backing store if present
+		if (this._glCanvas) {
+			const dpr = window.devicePixelRatio || 1;
+			const width = Math.max(1, Math.floor(newSize.width * dpr));
+			const height = Math.max(1, Math.floor(newSize.height * dpr));
+			if (this._glCanvas.width !== width || this._glCanvas.height !== height) {
+				this._glCanvas.width = width;
+				this._glCanvas.height = height;
+			}
+			if (this._gl) {
+				this._gl.viewport(0, 0, width, height);
+			}
+			if (this._glLayer) {
+				this._glLayer.setViewport(this._currentViewport());
+			}
+		}
+	}
+
+	public registerWebGLRenderable(renderable: WebGLRenderableSeries): boolean {
+		if (!this._glLayer) { return false; }
+		this._glLayer.register(renderable);
+		return true;
+	}
+
+	public unregisterWebGLRenderable(renderable: WebGLRenderableSeries): void {
+		this._glLayer?.unregister(renderable);
+	}
+
+	public getWebGLPaneContext(): IWebGLPaneContext | null {
+		if (!this._gl || !this._glCanvas) { return null; }
+		return this._createWebGLPaneContext();
 	}
 
 	public recalculatePriceScales(): void {
@@ -497,6 +601,16 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 					this._drawSources(target, sourcePaneViews);
 					this._drawSources(target, sourceLabelPaneViews);
 				}
+			}
+			// Render WebGL layer between base and overlays
+			if (this._gl && this._glCanvas) {
+				const width = this._glCanvas.width;
+				const height = this._glCanvas.height;
+				this._gl.viewport(0, 0, width, height);
+				this._gl.clearColor(0, 0, 0, 0);
+				this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+				// Render registered GL series if any
+				this._glLayer?.render();
 			}
 		}
 
@@ -606,6 +720,76 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		const drawRendererFn = (renderer: IPaneRenderer) => drawFn(renderer, target, isHovered, objecId);
 		drawSourceViews(paneViewsGetter, drawRendererFn, source, state);
+	}
+
+	private _currentViewport(): ViewportSize {
+		return {
+			widthCssPx: this._size.width,
+			heightCssPx: this._size.height,
+			devicePixelRatio: window.devicePixelRatio || 1,
+		};
+	}
+
+	private _createWebGLPaneContext(): IWebGLPaneContext {
+		const viewport = this._currentViewport();
+		const clipFromMedia = createClipFromMediaMatrix(viewport);
+		// Compose mediaFromTimePrice using current time and price scales
+		const timeScale = this._model().timeScale();
+		const barSpacing = timeScale.barSpacing();
+		const visible = timeScale.visibleStrictRange();
+		const dpr = viewport.devicePixelRatio || 1;
+		// Fit linear mapping timeIndex -> CSS px using two samples
+		const i0 = visible ? Math.floor(visible.left() as unknown as number) : 0;
+		const i1 = i0 + 1;
+		const x0Css = this._model().timeScale().indexToCoordinate(i0 as unknown as TimePointIndex) ?? 0;
+		const x1Css = this._model().timeScale().indexToCoordinate(i1 as unknown as TimePointIndex) ?? (x0Css + barSpacing);
+		const scaleXCss = (x1Css - x0Css);
+		const translateXCss = x0Css - scaleXCss * i0;
+		const scaleX = scaleXCss * dpr;
+		const translateX = translateXCss * dpr;
+		// Estimate linear price mapping by sampling two nearby prices
+		const paneLocal = ensureNotNull(this._state);
+		const priceScale = paneLocal.defaultPriceScale();
+		const firstValue = priceScale.firstValue();
+		let scaleY = 1;
+		let translateY = 0;
+		if (firstValue !== null) {
+			const p1 = firstValue;
+			const p2 = p1 + 1;
+			const y1 = priceScale.priceToCoordinate(p1, firstValue) as number;
+			const y2 = priceScale.priceToCoordinate(p2, firstValue) as number;
+			// Convert CSS px to device px for media-space transform
+			scaleY = (y2 - y1) * dpr;
+			translateY = (y1 - (y2 - y1) * p1) * dpr;
+		}
+		const clipFromTimePrice = composeClipFromTimePrice(clipFromMedia, scaleX, translateX, scaleY, translateY);
+		const vis = timeScale.visibleStrictRange();
+		const ctx: IWebGLPaneContext = {
+			gl: ensureNotNull(this._gl),
+			viewport,
+			clipFromMedia,
+			clipFromTimePrice,
+			clipRect: { xMin: 0, yMin: 0, xMax: Math.max(1, Math.floor(viewport.widthCssPx * viewport.devicePixelRatio)), yMax: Math.max(1, Math.floor(viewport.heightCssPx * viewport.devicePixelRatio)) },
+			requestRender: () => this._model().lightUpdate(),
+			priceToY: (price: number) => {
+				const ps = ensureNotNull(this._state).defaultPriceScale();
+				const fv = ps.firstValue();
+				if (fv === null) { return null; }
+				return ps.priceToCoordinate(price, fv);
+			},
+			timeToX: (timeIndex: TimePointIndex) => this._model().timeScale().indexToCoordinate(timeIndex) ?? null,
+			scaleInfo: {
+				barSpacing,
+				rightOffset: timeScale.rightOffset(),
+				firstValue,
+				dpr: viewport.devicePixelRatio,
+				widthCssPx: viewport.widthCssPx,
+				heightCssPx: viewport.heightCssPx,
+				visibleLeft: vis ? (vis.left() as unknown as number) : 0,
+				visibleRight: vis ? (vis.right() as unknown as number) : 0,
+			},
+		};
+		return ctx;
 	}
 
 	private _recreatePriceAxisWidgets(): void {

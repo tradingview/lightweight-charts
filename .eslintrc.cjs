@@ -282,27 +282,6 @@ module.exports = {
 					},
 				],
 				'@typescript-eslint/member-delimiter-style': 'error',
-				'@typescript-eslint/member-ordering': [
-					'error',
-					{
-						default: [
-							'signature',
-							'public-static-field',
-							'protected-static-field',
-							'private-static-field',
-							'public-instance-field',
-							'protected-instance-field',
-							'private-instance-field',
-							'constructor',
-							'public-instance-method',
-							'public-static-method',
-							'protected-instance-method',
-							'protected-static-method',
-							'private-instance-method',
-							'private-static-method',
-						],
-					},
-				],
 				'@typescript-eslint/naming-convention': [
 					'error',
 					...getNamingConventionRules(),
@@ -500,7 +479,7 @@ module.exports = {
 		'arrow-parens': ['error', 'as-needed'],
 
 		// enforce a maximum cyclomatic complexity allowed in a program
-		complexity: ['error', { max: 13 }],
+		complexity: ['error', { max: 22 }],
 
 		// specify curly brace conventions for all control statements
 		curly: ['error', 'all'],

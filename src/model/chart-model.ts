@@ -334,6 +334,15 @@ export interface ChartOptionsBase {
 	 * @defaultValue `true`
 	 */
 	addDefaultPane: boolean;
+
+	/**
+	 * Enable optional WebGL2 layer for GL-accelerated custom series.
+	 * - 'off': disable WebGL even if supported
+	 * - 'auto': enable when supported, otherwise no-op
+	 * - 'on': force enable; if not supported, the GL layer stays inactive
+	 * @defaultValue 'auto'
+	 */
+	webgl?: 'off' | 'auto' | 'on';
 }
 
 /**

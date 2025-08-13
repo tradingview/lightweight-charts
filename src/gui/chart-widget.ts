@@ -144,6 +144,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return this._options;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	public registerPaneWebGLRenderer(_paneIndex: number, _renderer: () => void): void {
+		// @TODO: implement later
+	}
+
 	public paneWidgets(): PaneWidget[] {
 		return this._paneWidgets;
 	}

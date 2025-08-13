@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LOD (Level of Details) Test</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 20px;
+		}
+
+		.info {
+			background: #f0f0f0;
+			padding: 10px;
+			border-radius: 5px;
+			margin-bottom: 20px;
+		}
+
+		#chart {
+			border: 1px solid #ccc;
+		}
+
+		.controls {
+			margin: 20px 0;
+		}
+
+		button {
+			margin: 5px;
+			padding: 8px 16px;
+			cursor: pointer;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Test webgl series</h1>
+
+	<div class="controls">
+		<button onclick="zoomOut()">Zoom Out (fitContent)</button>
+		<button onclick="zoomIn()">Zoom In</button>
+		<button onclick="resetChart()">Reset Chart</button>
+		<button onclick="addLine()">Add Line</button>
+		<button onclick="addCandlestick()">Add Candlestick</button>
+		<button onclick="removeLine()">Remove Line</button>
+		<button onclick="removeCandlestick()">Remove Candlestick</button>
+		<button onclick="addGLLine()">Add GL Line (main-thread)</button>
+		<button onclick="addGLCandlestick()">Add GL Candlestick (main-thread)</button>
+		<button onclick="addGLArea()">Add GL Area (main-thread)</button>
+		<button onclick="addGLBaseline()">Add GL Baseline (main-thread)</button>
+	</div>
+
+	<div id="chart"></div>
+
+	<script src="/dist/lightweight-charts.standalone.production.js"></script>
+	<!-- <script src="/dist/lightweight-charts.standalone.development.js"></script> -->
+	<script>
+		let chart;
+		let lineSeries;
+		let candlestickSeries;
+		let whitespaceLineSeries;
+		let conflationEnabled = true;
+		let transportMode = 'sab';
+		let renderingEngine = 'main-thread';
+		let pluginHandle = null;
+		let bandsHandle = null;
+		let vertLineHandle = null;
+		let glLineHandle = null;
+		let glCandlestickHandle = null;
+		let glAreaHandle = null;
+		let glBaselineHandle = null;
+
+		function generateTestData(count = 10000, startNowSec) {
+			const data = [];
+			const now = (startNowSec ?? (Date.now() / 1000));
+			let price = 100;
+
+			console.log(`Generating ${count} data points...`);
+
+			for (let i = 0; i < count; i++) {
+				// Random walk price generation
+				price += (Math.random() - 0.5) * 2;
+				price = Math.max(50, Math.min(200, price)); // Keep price in reasonable range
+
+				const time = now - (count - i) * 60; // 1 minute intervals going backwards
+				data.push({
+					time: time,
+					value: Math.round(price * 100) / 100
+				});
+			}
+
+			console.log('Data generation complete');
+			return data;
+		}
+
+		function generateCandlestickData(count = 10000, startNowSec) {
+			const data = [];
+			const now = (startNowSec ?? (Date.now() / 1000));
+			let price = 100;
+
+			console.log(`Generating ${count} candlestick data points...`);
+
+			for (let i = 0; i < count; i++) {
+				const open = price;
+				const change = (Math.random() - 0.5) * 4;
+				price += change;
+				price = Math.max(50, Math.min(200, price));
+
+				const high = Math.max(open, price) + Math.random() * 2;
+				const low = Math.min(open, price) - Math.random() * 2;
+
+				const time = now - (count - i) * 60;
+				data.push({
+					time: time,
+					open: Math.round(open * 100) / 100,
+					high: Math.round(high * 100) / 100,
+					low: Math.round(low * 100) / 100,
+					close: Math.round(price * 100) / 100
+				});
+			}
+
+			console.log('Candlestick data generation complete');
+			return data;
+		}
+
+		function generateSparseDataWithWhitespace(count = 100000, startNowSec) {
+			const data = [];
+			const now = (startNowSec ?? (Date.now() / 1000));
+			let price = 150;
+
+			console.log(`Generating ${count} sparse data points with lots of whitespace...`);
+
+			for (let i = 0; i < count; i++) {
+				const time = now - (count - i) * 60;
+
+				if (Math.random() < 0.2) {
+					price += (Math.random() - 0.5) * 3;
+					price = Math.max(80, Math.min(220, price));
+
+					data.push({
+						time: time,
+						value: Math.round(price * 100) / 100
+					});
+				} else {
+					// Whitespace data point (no value)
+					data.push({
+						time: time
+						// No value property = whitespace
+					});
+				}
+			}
+
+			console.log('Sparse data generation complete');
+			return data;
+		}
+
+		const sharedNow = Math.floor(Date.now() / 1000);
+		const lineData = generateTestData(300000);
+		const candlestickData = generateCandlestickData(300000);
+		const whitespaceData = generateSparseDataWithWhitespace(300000);
+		function createChart() {
+			chart = LightweightCharts.createChart(document.getElementById('chart'), {
+				width: 1200,
+				height: 600,
+				renderingEngine: renderingEngine,
+				dataTransport: transportMode,
+				timeScale: {
+					timeVisible: true,
+					secondsVisible: false,
+					barSpacing: 0.2,
+					minBarSpacing: 1200 / window.devicePixelRatio / 300000 / 2, // make all data visible
+					// enableConflation: conflationEnabled
+				},
+				grid: {
+					vertLines: { color: '#e1e1e1' },
+					horzLines: { color: '#e1e1e1' }
+				}
+			});
+
+			// add button
+			chart.timeScale().fitContent();
+			function myCrosshairMoveHandler(param) {
+				console.log(param);
+				if (!param.point) {
+					return;
+				}
+
+				console.log(`Crosshair moved to ${param.point.x}, ${param.point.y}. The time is ${new Date(Math.floor((param.time ?? 0) * 1000)).toISOString()}.`);
+			}
+
+			chart.subscribeCrosshairMove(myCrosshairMoveHandler);
+
+		}
+
+		function addWorkerPlugin() {
+			if (renderingEngine !== 'worker') {
+				console.warn('Worker plugin demo only works in worker rendering mode');
+				return;
+			}
+
+			if (pluginHandle) {
+				console.warn('Plugin already added');
+				return;
+			}
+			// The plugin file is at /plugin-examples/minimal-worker-plugin.js relative to dev server root
+			pluginHandle = chart.addPlugin({
+				url: '/plugin-examples/minimal-worker-plugin.js',
+				exportName: 'createMinimalWorkerPlugin',
+				options: { text: 'Hello from Worker Plugin', color: '#0066ff' },
+			});
+		}
+
+
+		function addLine() {
+			if (lineSeries) {
+				lineSeries.remove();
+				lineSeries = null;
+			}
+			lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
+				color: '#2962FF',
+				title: 'Line Series (10k points)',
+				lineWidth: 1
+			});
+			lineSeries.setData(lineData);
+			chart.timeScale().fitContent();
+		}
+
+		function addCandlestick() {
+			if (candlestickSeries) {
+				chart.removeSeries(candlestickSeries);
+				candlestickSeries = null;
+			}
+			candlestickSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+				upColor: '#26a69a',
+				downColor: '#ef5350',
+				borderVisible: false,
+				wickUpColor: '#000000',
+				wickDownColor: '#000000',
+				title: 'Candlestick Series (300k points)'
+			});
+			candlestickSeries.setData(candlestickData);
+			chart.timeScale().fitContent();
+		}
+
+		function removeLine() {
+			if (lineSeries) {
+				chart.removeSeries(lineSeries);
+				lineSeries = null;
+			}
+		}
+
+		function removeCandlestick() {
+			if (candlestickSeries) {
+				chart.removeSeries(candlestickSeries);
+				candlestickSeries = null;
+			}
+		}
+
+		function addGLLine() {
+			if (renderingEngine !== 'main-thread') {
+				console.warn('GL series demo uses main-thread mode for now. Switch Rendering Engine to "Main Thread".');
+				return;
+			}
+			console.log('Adding GL Line');
+			if (glLineHandle) {
+				console.warn('GL Line already added');
+				return;
+			}
+			const glLine = new LightweightCharts.GLLineSeries({ color: "#2962FF" });
+			glLineHandle = chart.addCustomWebGLSeries(glLine, {}, 0);
+
+			glLineHandle.setData(lineData);
+			chart.timeScale().fitContent();
+		}
+
+		function addGLCandlestick() {
+			if (renderingEngine !== 'main-thread') return;
+			if (glCandlestickHandle) return;
+
+			const glC = new LightweightCharts.GLCandlestickSeries({
+				barWidth: 1,
+				upColor: '#26a69a',
+				downColor: '#ef5350',
+				borderVisible: false,
+				wickUpColor: '#000000',
+				wickDownColor: '#000000',
+			});
+			glCandlestickHandle = chart.addCustomWebGLSeries(glC, {}, 0);
+
+			glCandlestickHandle.setData(candlestickData);
+			chart.timeScale().fitContent();
+		}
+
+		function addGLArea() {
+			if (renderingEngine !== 'main-thread') return;
+			if (glAreaHandle) return;
+			const glArea = new LightweightCharts.GLAreaSeries({
+				lineColor: '#33D778',
+				topColor: '#ff0000',
+				bottomColor: '#ffff00',
+				lineWidthPx: 2,
+				relativeGradient: false,
+			});
+			glAreaHandle = chart.addCustomWebGLSeries(glArea, {}, 0);
+			glAreaHandle.setData(lineData);
+			chart.timeScale().fitContent();
+		}
+
+		function addGLBaseline() {
+			if (renderingEngine !== 'main-thread') return;
+			if (glBaselineHandle) return;
+			const glBase = new LightweightCharts.GLBaselineSeries({
+				baseValue: 120,
+				topLineColor: '#26a69a',
+				bottomLineColor: '#ef5350',
+				topFillColor1: '#ff0000',
+				topFillColor2: '#ffff00',
+				bottomFillColor1: '#ff0000',
+				bottomFillColor2: '#ffff00',
+				lineWidthPx: 2,
+			});
+			glBaselineHandle = chart.addCustomWebGLSeries(glBase, {}, 0);
+			glBaselineHandle.setData(lineData);
+			chart.timeScale().fitContent();
+		}
+
+		function zoomOut() {
+			console.log('Zooming out to trigger LOD...');
+			chart.timeScale().fitContent();
+		}
+
+		function zoomIn() {
+			console.log('Zooming in to disable LOD...');
+			const visibleRange = chart.timeScale().getVisibleLogicalRange();
+			if (visibleRange) {
+				const center = (visibleRange.from + visibleRange.to) / 2;
+				const newRange = 50;
+				chart.timeScale().setVisibleLogicalRange({
+					from: center - newRange / 2,
+					to: center + newRange / 2
+				});
+			}
+		}
+
+		function resetChart() {
+			console.log('Resetting chart...');
+			chart.timeScale().resetTimeScale();
+		}
+
+		function generateMoreData() {
+			console.log('Adding more data to stress test LOD...');
+			const moreLineData = generateTestData(100000);
+			const moreCandlestickData = generateCandlestickData(100000);
+
+			console.time('setData (100k points)');
+			lineSeries.setData(moreLineData);
+			candlestickSeries.setData(moreCandlestickData);
+			console.timeEnd('setData (100k points)');
+
+			chart.timeScale().fitContent();
+		}
+		function switchRenderingEngine() {
+			const sel = document.getElementById('renderingEngine');
+			renderingEngine = sel.value;
+			if (chart) {
+				chart.remove();
+
+				setTimeout(() => {
+					document.getElementById('chart').innerHTML = '';
+					createChart();
+				}, 1000);
+			}
+
+		}
+
+		function switchTransport() {
+			const sel = document.getElementById('transport');
+			transportMode = sel.value;
+			if (chart) {
+				chart.remove();
+			}
+			createChart();
+
+		}
+
+		// Initialize chart when page loads
+		window.addEventListener('load', () => {
+			console.log('Creating chart with LOD implementation...');
+			createChart();
+		});
+	</script>
+
+</body>
+
+</html>
