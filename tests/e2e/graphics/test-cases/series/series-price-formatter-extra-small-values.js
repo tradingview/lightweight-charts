@@ -18,7 +18,7 @@ function runTestCase(container) {
 	const lineSeries = chart.addSeries(LightweightCharts.LineSeries, {
 		priceFormat: {
 			type: 'custom',
-			format: p => `$${p}`,
+			formatter: p => `$${p}`,
 			base: 1e18,
 		},
 	});
