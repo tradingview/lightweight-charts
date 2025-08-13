@@ -19,6 +19,7 @@ function runTestCase(container) {
 		priceFormat: {
 			type: 'custom',
 			formatter: p => `$${p}`,
+			minMove: 1e-18, // should be ignored because base is specified
 			base: 1e18,
 		},
 	});
