@@ -347,7 +347,7 @@ export class DataLayer<HorzScaleItem> {
 		const info: SeriesUpdateInfo = {
 			historicalUpdate: false,
 			lastBarUpdatedOrNewBarsAddedToTheRight: false,
-			poppedDataCount: poppedData.length,
+			poppedData: poppedData,
 		};
 
 		return [poppedData, this._getUpdateResponse(series, seriesData.length - 1, info)];
@@ -488,30 +488,27 @@ export class DataLayer<HorzScaleItem> {
 			},
 		};
 
-		if (info?.poppedDataCount) {
-			// Need to see which time points are no longer needed by any series before we can delete them.
-			let timePointsToDelete = 0;
+		if (info?.poppedData) {
+			for (const poppedData of info.poppedData) {
+				const pointData = this._pointDataByTimePoint.get(this._horzScaleBehavior.key(poppedData.time));
 
-			for (let i = this._sortedTimePoints.length - 1; i >= this._sortedTimePoints.length - info.poppedDataCount; i--) {
-				const timePoint = this._sortedTimePoints[i];
-
-				// If there are multiple series using this point, it can't be deleted.
-				if (timePoint.pointData.mapping.size > 1) {
-					break;
+				if (!pointData) {
+					continue;
 				}
 
-				// If the series is not using this point, it can be deleted.
-				if (!timePoint.pointData.mapping.has(updatedSeries)) {
-					break;
+				pointData.mapping.delete(updatedSeries);
+
+				if (pointData.mapping.size !== 0) {
+					continue;
 				}
 
-				++timePointsToDelete;
-				timePoint.pointData.mapping.delete(updatedSeries);
-				this._pointDataByTimePoint.delete(this._horzScaleBehavior.key(timePoint.time));
-			}
+				this._pointDataByTimePoint.delete(this._horzScaleBehavior.key(pointData.timePoint));
 
-			if (timePointsToDelete > 0) {
-				(this._sortedTimePoints as InternalTimeScalePoint[]).splice(-timePointsToDelete);
+				(this._sortedTimePoints as InternalTimeScalePoint[]).splice(pointData.index, 1);
+
+				for (let index = pointData.index; index < this._sortedTimePoints.length; ++index) {
+					assignIndexToPointData(this._sortedTimePoints[index].pointData, index);
+				}
 			}
 		}
 
