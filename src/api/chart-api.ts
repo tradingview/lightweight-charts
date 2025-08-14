@@ -1,20 +1,17 @@
 /// <reference types="_build-time-constants" />
 import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
-import { lowerBound } from '../helpers/algorithms';
 import { assert, ensure, ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl, ChartOptionsInternal } from '../model/chart-model';
-import { DataUpdatesConsumer, isFulfilledBarData, isFulfilledData, LineData, OhlcData, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
+import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
-import { IPanePrimitiveBase } from '../model/ipane-primitive';
 import { Pane } from '../model/pane';
-import { PlotRowValueIndex } from '../model/plot-data';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
@@ -30,14 +27,14 @@ import {
     SeriesPartialOptionsMap,
     SeriesType,
 } from '../model/series-options';
+import { candlestickSeries } from '../model/series/candlestick-series';
 import { createCustomSeriesDefinition } from '../model/series/custom-series';
 import { lineSeries } from '../model/series/line-series';
 import { isSeriesDefinition, SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 
-import { WebGLRenderableSeries } from '../gl/layers';
+import { GLSeriesBridge } from '../gl/gl-series-bridge';
 import { CustomWebGLSeriesOptions, ICustomWebGLSeriesPaneView, IGLSeriesApi } from '../gl/public';
-import { IWebGLPaneContext } from '../gl/types';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApiBase, MouseEventHandler, MouseEventParams, PaneSize } from './ichart-api';
 import { IPaneApi } from './ipane-api';
@@ -231,237 +228,35 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	>(
 		view: ICustomWebGLSeriesPaneView<TOptions>,
 		options: Partial<TOptions> = {},
+		// eslint-disable-next-line @typescript-eslint/naming-convention
 		paneIndex: number = 0
 	): IGLSeriesApi<TOptions> {
-		const toOhlcArray = (data: unknown): OhlcData<HorzScaleItem>[] | null => {
-			if (!Array.isArray(data) || data.length === 0) { return null; }
-			const first = data[0] as unknown;
-			return isFulfilledBarData(first as SeriesDataItemTypeMap<HorzScaleItem>[SeriesType])
-				? (data as OhlcData<HorzScaleItem>[])
-				: null;
-		};
-
 		while (this._chartWidget.paneWidgets().length <= paneIndex) {
 			this.addPane(false);
 		}
 		const paneWidget = this._chartWidget.paneWidgets()[paneIndex];
 		const baseOptions: TOptions = { ...(options as TOptions) };
-		let mergedOptions: TOptions = baseOptions;
-		let isDisposed = false;
-
-		const renderable: WebGLRenderableSeries = {
-			onInit: (ctx: IWebGLPaneContext): void => {
-				try { view.onInit(ctx, mergedOptions as Readonly<TOptions>); } catch { /* ignore user errors */ }
+		const bridge = new GLSeriesBridge<HorzScaleItem, TOptions>({
+			paneWidget,
+			paneIndex,
+			view,
+			initialOptions: baseOptions,
+			timeScale: () => this.timeScale(),
+			getHiddenInternal: (api: ISeriesApi<SeriesType, HorzScaleItem> | null) => api ? this._seriesMap.get(api as unknown as SeriesApi<SeriesType, HorzScaleItem>) : undefined,
+			addHiddenLineSeed: () => {
+				try { return this._addSeriesImpl<'Line'>(lineSeries, { lineVisible: false }, paneIndex) as unknown as ISeriesApi<'Line', HorzScaleItem>; } catch { return null; }
 			},
-			onRender: (ctx: IWebGLPaneContext): void => {
-				try { view.onRender(ctx); } catch { /* ignore user errors */ }
+			addHiddenCandleSeed: () => {
+				try { return this._addSeriesImpl<'Candlestick'>(candlestickSeries, { visible: true, wickVisible: false, borderVisible: false, upColor: 'rgba(0,0,0,0)', downColor: 'rgba(0,0,0,0)', priceLineVisible: false, lastValueVisible: false }, paneIndex) as unknown as ISeriesApi<'Candlestick', HorzScaleItem>; } catch { return null; }
 			},
-			onDestroy: () => {
-				try { view.onDestroy?.(); } catch { /* ignore user errors */ }
-			},
-			order: (options as { order?: number }).order ?? 0,
-		};
-
-		const registered = paneWidget.registerWebGLRenderable(renderable);
-		if (!registered) {
-			// eslint-disable-next-line no-console
-			console.warn('[Lightweight Charts] WebGL layer is not available on this pane. addCustomWebGLSeries will be inactive.');
-		}
-
-		// Bridge: create a hidden standard Line series on the same pane to plug into scales and enable setData/update API.
-		const hiddenLineApi = this._addSeriesImpl<'Line'>(lineSeries, { lineVisible: false }, paneIndex);
-		const hiddenLineInternal = this._seriesMap.get(hiddenLineApi as unknown as SeriesApi<SeriesType, HorzScaleItem>);
-
-		// OHLC handling when user sets OHLC data
-		let cachedCandles: OhlcData<HorzScaleItem>[] | null = null;
-		let inferredIsCandles: boolean | null = null;
-		let currentLinePoints: { logicalIndex: number; price: number }[] = [];
-		const instanceId = Math.random().toString(36).slice(2);
-
-		const rebuildFromHiddenLine = (): void => {
-			if (!hiddenLineInternal) { return; }
-			const rows: readonly SeriesPlotRow<'Line'>[] = hiddenLineInternal.bars().rows();
-			const points = rows.map((row: SeriesPlotRow<'Line'>) => ({ logicalIndex: (row.index as unknown as number), price: row.value[PlotRowValueIndex.Close] }));
-			currentLinePoints = points;
-			const ctx = paneWidget.getWebGLPaneContext();
-			if (!ctx) { return; }
-			try {
-				if (inferredIsCandles && Array.isArray(cachedCandles) && cachedCandles.length > 0) {
-					// Map cached candles to the hidden line's time indices for consistent unioned time scale
-					const minLen = Math.min(rows.length, cachedCandles.length);
-					const bars: { logicalIndex: number; open: number; high: number; low: number; close: number }[] = [];
-					for (let i = 0; i < minLen; i++) {
-						const c = cachedCandles[i];
-						bars.push({ logicalIndex: (rows[i].index as unknown as number), open: c.open, high: c.high, low: c.low, close: c.close });
-					}
-					view.onUpdate?.(ctx, { bars } as unknown as Readonly<Partial<TOptions>>);
-				} else {
-					view.onUpdate?.(ctx, { points } as unknown as Readonly<Partial<TOptions>>);
-				}
-			} catch { /* ignore */ }
-			ctx.requestRender(false);
-		};
-
-		rebuildFromHiddenLine();
-		// Subscribe to data changes on the hidden line to keep GL in sync
-		hiddenLineApi.subscribeDataChanged(() => rebuildFromHiddenLine());
-		// Resync when time scale points set changes due to data union changes across series
-		const unregisterGlRebuilder = this._registerGLRebuildListener(rebuildFromHiddenLine);
-
-		// WebGL series hit test hack
-		// Attach a lightweight hit-test primitive so hoveredObjectId works with GL series
-		const pane = paneWidget.state();
-		const glHitPrimitive: IPanePrimitiveBase<{ chart: IChartApiBase<HorzScaleItem>; requestUpdate: () => void }> = {
-			attached: () => {},
-			paneViews: () => [],
-			hitTest: (x: number, y: number) => {
-				const ts = this.timeScale();
-				const logical = ts.coordinateToLogical(x as unknown as number);
-				if (logical == null || currentLinePoints.length === 0) { return null; }
-				const target = logical as unknown as number;
-				const idx = lowerBound(currentLinePoints, target, (p: { logicalIndex: number }, val: number) => p.logicalIndex < val);
-				let bestIdx = Math.min(Math.max(0, idx), currentLinePoints.length - 1);
-				if (bestIdx > 0) {
-					const prev = currentLinePoints[bestIdx - 1];
-					if (Math.abs(prev.logicalIndex - target) < Math.abs(currentLinePoints[bestIdx].logicalIndex - target)) {
-						bestIdx = bestIdx - 1;
-					}
-				}
-				const l0 = Math.floor(currentLinePoints[bestIdx].logicalIndex);
-				const c0 = ts.logicalToCoordinate(l0 as unknown as Logical);
-				const c1 = ts.logicalToCoordinate((l0 + 1) as unknown as Logical);
-				const pxPerIndex = (c0 != null && c1 != null) ? Math.abs(c1 - c0) : 10;
-				const dxPx = Math.abs((target - currentLinePoints[bestIdx].logicalIndex) * pxPerIndex);
-				const thresholdPx = 8;
-				if (dxPx <= thresholdPx) {
-					return { externalId: `gl-series:${instanceId}:${bestIdx}`, zOrder: 'normal' };
-				}
-				return null;
-			},
-		};
-		pane.attachPrimitive(glHitPrimitive);
-
-		// Build a result that is compatible with IGLSeriesApi but also exposes a subset of ISeriesApi for parity
-		const apiCompat = {
-			remove: () => {
-				if (isDisposed) { return; }
-				paneWidget.unregisterWebGLRenderable(renderable);
-				try { view.onDestroy?.(); } catch { /* ignore user errors */ }
-				try { this.removeSeries(hiddenLineApi as unknown as SeriesApi<SeriesType, HorzScaleItem>); } catch { /* noop */ }
-				try { unregisterGlRebuilder(); } catch { /* noop */ }
-				isDisposed = true;
-			},
-			applyOptions: (partial: Partial<TOptions>) => {
-				mergedOptions = { ...mergedOptions, ...partial };
-				const ctx = paneWidget.getWebGLPaneContext();
-				if (ctx && view.onUpdate) {
-					try { view.onUpdate(ctx, partial as Readonly<Partial<TOptions>>); } catch { /* ignore user errors */ }
-					ctx.requestRender(false);
-				}
-				// update draw order if provided
-				if (typeof (partial as { order?: number }).order === 'number') {
-					(renderable as { order?: number }).order = (partial as { order?: number }).order;
-				}
-			},
-			// ISeriesApi-compatible subset
-			setData: (data: Parameters<ISeriesApi<'Line', HorzScaleItem>['setData']>[0]) => {
-				const candles: OhlcData<HorzScaleItem>[] | null = toOhlcArray(data as unknown);
-				inferredIsCandles = candles !== null;
-				if (candles) {
-					// seed time scale with close price from OHLC
-					const lineSeed: LineData<HorzScaleItem>[] = candles.map((c: OhlcData<HorzScaleItem>) => ({ time: c.time, value: c.close }));
-					hiddenLineApi.setData(lineSeed as Parameters<ISeriesApi<'Line', HorzScaleItem>['setData']>[0]);
-					cachedCandles = candles;
-					// mirror into GL bars using chart's time->index mapping to tolerate different time bases
-					const bars: { logicalIndex: number; open: number; high: number; low: number; close: number }[] = [];
-					for (let i = 0; i < cachedCandles.length; i++) {
-						const cndl = cachedCandles[i];
-						const idx = this.timeScale().timeToIndex(cndl.time as unknown as HorzScaleItem, true);
-						if (idx != null) {
-							bars.push({ logicalIndex: (idx as unknown as number), open: cndl.open, high: cndl.high, low: cndl.low, close: cndl.close });
-						}
-					}
-					if (bars.length === 0) {
-						// fallback to hidden-line rows order if time->index not yet available
-						try {
-							const rows: readonly SeriesPlotRow<'Line'>[] | undefined = hiddenLineInternal?.bars().rows();
-							if (rows && rows.length > 0) {
-								const minLen = Math.min(rows.length, cachedCandles.length);
-								for (let i = 0; i < minLen; i++) {
-									const row = rows[i];
-									const c = cachedCandles[i];
-									bars.push({ logicalIndex: (row.index as unknown as number), open: c.open, high: c.high, low: c.low, close: c.close });
-								}
-							}
-						} catch { /* ignore mapping errors */ }
-					}
-					const ctx = paneWidget.getWebGLPaneContext();
-					if (ctx && view.onUpdate) {
-						try { view.onUpdate?.(ctx, { bars } as unknown as Readonly<Partial<TOptions>>); } catch { /* ignore */ }
-						ctx.requestRender(false);
-					}
-				} else {
-					cachedCandles = null;
-					hiddenLineApi.setData(data);
-					// let the generic rebuild reflect into GL (for line)
-					rebuildFromHiddenLine();
-				}
-			},
-			update: (bar: Parameters<ISeriesApi<'Line' | 'Candlestick', HorzScaleItem>['update']>[0], historicalUpdate?: boolean) => {
-				if (inferredIsCandles) {
-					const maybeCandle: unknown = bar as unknown;
-					if (!isFulfilledBarData(maybeCandle as SeriesDataItemTypeMap<HorzScaleItem>[SeriesType])) {
-						// fallback to line semantics if the shape doesn't match
-						hiddenLineApi.update(bar as Parameters<ISeriesApi<'Line', HorzScaleItem>['update']>[0], historicalUpdate);
-						rebuildFromHiddenLine();
-						return;
-					}
-					const c: OhlcData<HorzScaleItem> = maybeCandle as OhlcData<HorzScaleItem>;
-					// seed/update time scale with close
-					const linePoint: LineData<HorzScaleItem> = { time: c.time, value: c.close };
-					hiddenLineApi.update(linePoint as Parameters<ISeriesApi<'Line', HorzScaleItem>['update']>[0], historicalUpdate);
-					if (!cachedCandles) { cachedCandles = []; }
-					// append or replace last by time equality
-					if (cachedCandles.length > 0 && cachedCandles[cachedCandles.length - 1].time === c.time) {
-						cachedCandles[cachedCandles.length - 1] = c;
-					} else {
-						cachedCandles.push(c);
-					}
-					const bars: { logicalIndex: number; open: number; high: number; low: number; close: number }[] = [];
-					for (let i = 0; i < cachedCandles.length; i++) {
-						const x = cachedCandles[i];
-						const idx = this.timeScale().timeToIndex(x.time as unknown as HorzScaleItem, true);
-						if (idx != null) {
-							bars.push({ logicalIndex: (idx as unknown as number), open: x.open, high: x.high, low: x.low, close: x.close });
-						}
-					}
-					if (bars.length === 0) {
-						try {
-							const rows: readonly SeriesPlotRow<'Line'>[] | undefined = hiddenLineInternal?.bars().rows();
-							if (rows && rows.length > 0) {
-								const minLen = Math.min(rows.length, cachedCandles.length);
-								for (let i = 0; i < minLen; i++) {
-									const row = rows[i];
-									const y = cachedCandles[i];
-									bars.push({ logicalIndex: (row.index as unknown as number), open: y.open, high: y.high, low: y.low, close: y.close });
-								}
-							}
-						} catch { /* ignore mapping errors */ }
-					}
-					const ctx = paneWidget.getWebGLPaneContext();
-					if (ctx && view.onUpdate) {
-						try { view.onUpdate?.(ctx, { bars } as unknown as Readonly<Partial<TOptions>>); } catch { /* ignore */ }
-						ctx.requestRender(false);
-					}
-				} else {
-					hiddenLineApi.update(bar as Parameters<ISeriesApi<'Line', HorzScaleItem>['update']>[0], historicalUpdate);
-					rebuildFromHiddenLine();
-				}
-			},
-			priceScale: (): IPriceScaleApi => hiddenLineApi.priceScale(),
-			timeScale: (): ITimeScaleApi<HorzScaleItem> => this.timeScale(),
-		};
-		return apiCompat as unknown as IGLSeriesApi<TOptions>;
+			removeSeries: (api: ISeriesApi<SeriesType, HorzScaleItem>) => this.removeSeries(api as unknown as SeriesApi<SeriesType, HorzScaleItem>),
+			registerRebuildListener: (cb: () => void) => this._registerGLRebuildListener(cb),
+			priceScaleFallback: () => this.priceScale('right', paneIndex),
+		});
+		const renderable = bridge.createRenderable();
+		paneWidget.registerWebGLRenderable(renderable);
+		bridge.registerLifecycle(renderable);
+		return bridge.getApiCompat() as unknown as IGLSeriesApi<TOptions>;
 	}
 
 	public removeSeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): void {

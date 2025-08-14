@@ -6,6 +6,12 @@ export interface CustomWebGLSeriesOptions {
 	premultipliedAlpha?: boolean;
 	/** Optional intra-GL-layer draw order. Higher draws later. Default 0 */
 	order?: number;
+	/** Optional CPU hit-test threshold in CSS pixels (default 6) */
+	hitTestThresholdPx?: number;
+	/** Optional z-order priority for hit-test picking */
+	hitTestZOrder?: 'top' | 'normal' | 'bottom';
+	/** Optional cursor style to use when hovered */
+	hitTestCursorStyle?: string;
 }
 
 export interface ICustomWebGLSeriesPaneView<TOptions extends CustomWebGLSeriesOptions = CustomWebGLSeriesOptions> {

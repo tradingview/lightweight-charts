@@ -473,6 +473,18 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return null;
 		}
 
+		// Prefer GL layer hit test if present
+		if (this._glLayer && this._glCanvas) {
+			const glHit = this._glLayer.hitTestAt(x, y);
+			if (glHit) {
+				return {
+					source: state, // minimal source; cursorStyle can still be applied
+					object: glHit.externalId ? { externalId: glHit.externalId } : undefined,
+					cursorStyle: glHit.cursorStyle,
+				};
+			}
+		}
+
 		return hitTestPane(state, x, y);
 	}
 
@@ -608,6 +620,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				const height = this._glCanvas.height;
 				this._gl.viewport(0, 0, width, height);
 				this._gl.clearColor(0, 0, 0, 0);
+				// Leave previous frame until GL layer manager clears to avoid flicker with empty instance counts
 				this._gl.clear(this._gl.COLOR_BUFFER_BIT);
 				// Render registered GL series if any
 				this._glLayer?.render();

@@ -1,3 +1,32 @@
+export interface TimeIndexApi<HorzScaleItem> {
+	timeToIndex(time: HorzScaleItem, extended: boolean): number | null;
+}
+
+import type { OhlcData } from '../model/data-consumer';
+
+export type CandleBarsMapped = { logicalIndex: number; open: number; high: number; low: number; close: number }[];
+
+export function isOhlcRecord<HorzScaleItem>(v: unknown): v is OhlcData<HorzScaleItem> {
+	if (v === null || typeof v !== 'object') { return false; }
+	const o = v as { open?: unknown; high?: unknown; low?: unknown; close?: unknown };
+	return o.open !== undefined && o.high !== undefined && o.low !== undefined && o.close !== undefined;
+}
+
+export function mapCandlesToBars<HorzScaleItem>(
+	candles: readonly OhlcData<HorzScaleItem>[],
+	ts: TimeIndexApi<HorzScaleItem>
+): CandleBarsMapped {
+	const bars: CandleBarsMapped = [];
+	for (let i = 0; i < candles.length; i++) {
+		const c = candles[i];
+		const idx = ts.timeToIndex(c.time as unknown as HorzScaleItem, true);
+		if (idx != null) {
+			bars.push({ logicalIndex: (idx as unknown as number), open: c.open, high: c.high, low: c.low, close: c.close });
+		}
+	}
+	return bars;
+}
+
 export function compileShader(
 	gl: WebGL2RenderingContext,
 	type: number,

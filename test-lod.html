@@ -35,7 +35,7 @@
 </head>
 
 <body>
-	<h1>Test webgl series</h1>
+	<h1>Test webgl series 500k points in series</h1>
 
 	<div class="controls">
 		<button onclick="zoomOut()">Zoom Out (fitContent)</button>
@@ -47,8 +47,6 @@
 		<button onclick="removeCandlestick()">Remove Candlestick</button>
 		<button onclick="addGLLine()">Add GL Line (main-thread)</button>
 		<button onclick="addGLCandlestick()">Add GL Candlestick (main-thread)</button>
-		<button onclick="addGLArea()">Add GL Area (main-thread)</button>
-		<button onclick="addGLBaseline()">Add GL Baseline (main-thread)</button>
 	</div>
 
 	<div id="chart"></div>
@@ -156,9 +154,9 @@
 		}
 
 		const sharedNow = Math.floor(Date.now() / 1000);
-		const lineData = generateTestData(300000);
-		const candlestickData = generateCandlestickData(300000);
-		const whitespaceData = generateSparseDataWithWhitespace(300000);
+		const lineData = generateTestData(500_000);
+		const candlestickData = generateCandlestickData(500_000);
+		const whitespaceData = generateSparseDataWithWhitespace(500_000);
 		function createChart() {
 			chart = LightweightCharts.createChart(document.getElementById('chart'), {
 				width: 1200,
@@ -169,7 +167,7 @@
 					timeVisible: true,
 					secondsVisible: false,
 					barSpacing: 0.2,
-					minBarSpacing: 1200 / window.devicePixelRatio / 300000 / 2, // make all data visible
+					minBarSpacing: 1200 / window.devicePixelRatio / 1000000 / 2, // make all data visible
 					// enableConflation: conflationEnabled
 				},
 				grid: {
@@ -237,7 +235,7 @@
 				borderVisible: false,
 				wickUpColor: '#000000',
 				wickDownColor: '#000000',
-				title: 'Candlestick Series (300k points)'
+				title: 'Candlestick Series'
 			});
 			candlestickSeries.setData(candlestickData);
 			chart.timeScale().fitContent();

@@ -9,6 +9,8 @@ export interface WebGLRenderableSeries {
 	onDestroy?(): void;
 	/** Relative draw order; higher draws later within GL layer */
 	order?: number;
+	/** Optional CPU-side hit test in CSS pixel space */
+	hitTest?(context: IWebGLPaneContext, xCss: number, yCss: number): { externalId?: string; zOrder?: 'top' | 'normal' | 'bottom'; cursorStyle?: string } | null;
 }
 
 export class WebGLLayerManager {
@@ -68,6 +70,19 @@ export class WebGLLayerManager {
 		// Stable order by 'order' value
 		const ordered = Array.from(this._renderables).sort((aSeries: WebGLRenderableSeries, bSeries: WebGLRenderableSeries) => (aSeries.order ?? 0) - (bSeries.order ?? 0));
 		for (const s of ordered) { s.onRender(ctx); }
+	}
+
+	public hitTestAt(xCss: number, yCss: number): { externalId?: string; zOrder?: 'top' | 'normal' | 'bottom'; cursorStyle?: string } | null {
+		if (!this._contextFactory) { return null; }
+		const ctx = this._contextFactory();
+		let best: { externalId?: string; zOrder?: 'top' | 'normal' | 'bottom'; cursorStyle?: string } | null = null;
+		const priority = (z?: 'top' | 'normal' | 'bottom'): number => z === 'top' ? 3 : z === 'normal' ? 2 : 1;
+		for (const s of Array.from(this._renderables)) {
+			const r = s.hitTest?.(ctx, xCss, yCss) ?? null;
+			if (!r) { continue; }
+			if (!best || priority(r.zOrder) > priority(best.zOrder)) { best = r; }
+		}
+		return best;
 	}
 }
 
