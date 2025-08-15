@@ -2,8 +2,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import { BarData } from '../../../src/model/data-consumer';
-import { DataLayer } from '../../../src/model/data-layer';
+import { BarData, LineData } from '../../../src/model/data-consumer';
+import { DataLayer, InternalTimeScalePoint } from '../../../src/model/data-layer';
 import { HorzScaleBehaviorTime } from '../../../src/model/horz-scale-behavior-time/horz-scale-behavior-time';
 import { Time, UTCTimestamp } from '../../../src/model/horz-scale-behavior-time/types';
 import { Series } from '../../../src/model/series';
@@ -22,6 +22,10 @@ function candlestickDataAt(time: Time, open: number, high: number, low: number, 
 	return { time, open, high, low, close };
 }
 
+function lineDataAt(time: Time, value: number): LineData<Time> {
+	return { time, value };
+}
+
 const behavior = new HorzScaleBehaviorTime();
 
 describe('Series Popping', () => {
@@ -29,7 +33,6 @@ describe('Series Popping', () => {
 		const dataLayer = new DataLayer<Time>(behavior);
 		const series = createSeriesMock('Candlestick');
 
-		// Set initial data
 		const testData = [
 			candlestickDataAt(1000 as UTCTimestamp, 75.16, 82.84, 36.16, 45.72),
 			candlestickDataAt(2000 as UTCTimestamp, 45.12, 53.9, 45.12, 48.09),
@@ -75,5 +78,48 @@ describe('Series Popping', () => {
 		expect(popped5).to.have.length(0);
 		expect(updateResponse5.series.has(series)).to.equal(false);
 		expect(updateResponse5.timeScale.baseIndex).to.equal(0);
+	});
+
+	it('popping data when there are multiple series should update the timescale correctly', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series1 = createSeriesMock('Candlestick');
+		const series2 = createSeriesMock('Line');
+
+		const testData1 = [
+			candlestickDataAt(1000 as UTCTimestamp, 75.16, 82.84, 36.16, 45.72),
+			candlestickDataAt(2000 as UTCTimestamp, 45.12, 53.9, 45.12, 48.09),
+		];
+
+		const testData2 = [
+			// Deliberately 1 overlap in times with testData1
+			lineDataAt(2000 as UTCTimestamp, 68.26),
+			lineDataAt(3000 as UTCTimestamp, 60.71),
+		];
+		dataLayer.setSeriesData(series1, testData1);
+		dataLayer.setSeriesData(series2, testData2);
+
+		const [popped1, updateResponse1] = dataLayer.popSeriesData(series1, 1);
+		expect(popped1).to.have.length(1);
+		expect(updateResponse1.timeScale.baseIndex).to.equal(2);
+		expect(updateResponse1.timeScale.points).not.to.be.equal(undefined);
+		expect(updateResponse1.timeScale.points).to.have.length(3);
+		const points1 = updateResponse1.timeScale.points as InternalTimeScalePoint[];
+		expect(points1[0].time).to.deep.equal({ timestamp: 1000 });
+		expect(points1[1].time).to.deep.equal({ timestamp: 2000 });
+		expect(points1[1].pointData.mapping.size).to.equal(1);
+		expect(points1[2].time).to.deep.equal({ timestamp: 3000 });
+
+		const [popped2, updateResponse2] = dataLayer.popSeriesData(series1, 1);
+		expect(popped2).to.have.length(1);
+		expect(updateResponse2.timeScale.baseIndex).to.equal(1);
+		expect(updateResponse2.timeScale.points).not.to.be.equal(undefined);
+		expect(updateResponse2.timeScale.points).to.have.length(2);
+		const points2 = updateResponse2.timeScale.points as InternalTimeScalePoint[];
+		expect(points2[0].time).to.deep.equal({ timestamp: 2000 });
+		expect(points2[1].time).to.deep.equal({ timestamp: 3000 });
+
+		const [popped3, updateResponse3] = dataLayer.popSeriesData(series2, 2);
+		expect(popped3).to.have.length(2);
+		expect(updateResponse3.timeScale.baseIndex).to.equal(0);
 	});
 });

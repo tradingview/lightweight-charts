@@ -350,7 +350,7 @@ export class DataLayer<HorzScaleItem> {
 			poppedData: poppedData,
 		};
 
-		return [poppedData, this._getUpdateResponse(series, seriesData.length - 1, info)];
+		return [poppedData, this._getUpdateResponse(series, 0, info)];
 	}
 
 	private _updateLastSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow): void {
@@ -481,13 +481,6 @@ export class DataLayer<HorzScaleItem> {
 	}
 
 	private _getUpdateResponse(updatedSeries: Series<SeriesType>, firstChangedPointIndex: number, info?: SeriesUpdateInfo): DataUpdateResponse {
-		const dataUpdateResponse: DataUpdateResponse = {
-			series: new Map(),
-			timeScale: {
-				baseIndex: this._getBaseIndex(),
-			},
-		};
-
 		if (info?.poppedData) {
 			for (const poppedData of info.poppedData) {
 				const pointData = this._pointDataByTimePoint.get(this._horzScaleBehavior.key(poppedData.time));
@@ -510,7 +503,18 @@ export class DataLayer<HorzScaleItem> {
 					assignIndexToPointData(this._sortedTimePoints[index].pointData, index);
 				}
 			}
+
+			// This is overridden so that the last timescale point across all series is set properly, which makes sure
+			// the time scale is updated correctly when the last point in one of the series is removed.
+			firstChangedPointIndex = this._sortedTimePoints.length - 1;
 		}
+
+		const dataUpdateResponse: DataUpdateResponse = {
+			series: new Map(),
+			timeScale: {
+				baseIndex: this._getBaseIndex(),
+			},
+		};
 
 		if (firstChangedPointIndex !== -1) {
 			// TODO: it's possible to make perf improvements by checking what series has data after firstChangedPointIndex
