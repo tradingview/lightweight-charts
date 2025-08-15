@@ -347,10 +347,31 @@ export class DataLayer<HorzScaleItem> {
 		const info: SeriesUpdateInfo = {
 			historicalUpdate: false,
 			lastBarUpdatedOrNewBarsAddedToTheRight: false,
-			poppedData: poppedData,
 		};
 
-		return [poppedData, this._getUpdateResponse(series, 0, info)];
+		for (const data of poppedData) {
+			const pointData = this._pointDataByTimePoint.get(this._horzScaleBehavior.key(data.time));
+
+			if (!pointData) {
+				continue;
+			}
+
+			pointData.mapping.delete(series);
+
+			if (pointData.mapping.size !== 0) {
+				continue;
+			}
+
+			this._pointDataByTimePoint.delete(this._horzScaleBehavior.key(pointData.timePoint));
+
+			(this._sortedTimePoints as InternalTimeScalePoint[]).splice(pointData.index, 1);
+
+			for (let index = pointData.index; index < this._sortedTimePoints.length; ++index) {
+				assignIndexToPointData(this._sortedTimePoints[index].pointData, index);
+			}
+		}
+
+		return [poppedData, this._getUpdateResponse(series, this._sortedTimePoints.length - 1, info)];
 	}
 
 	private _updateLastSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow): void {
@@ -481,34 +502,6 @@ export class DataLayer<HorzScaleItem> {
 	}
 
 	private _getUpdateResponse(updatedSeries: Series<SeriesType>, firstChangedPointIndex: number, info?: SeriesUpdateInfo): DataUpdateResponse {
-		if (info?.poppedData) {
-			for (const poppedData of info.poppedData) {
-				const pointData = this._pointDataByTimePoint.get(this._horzScaleBehavior.key(poppedData.time));
-
-				if (!pointData) {
-					continue;
-				}
-
-				pointData.mapping.delete(updatedSeries);
-
-				if (pointData.mapping.size !== 0) {
-					continue;
-				}
-
-				this._pointDataByTimePoint.delete(this._horzScaleBehavior.key(pointData.timePoint));
-
-				(this._sortedTimePoints as InternalTimeScalePoint[]).splice(pointData.index, 1);
-
-				for (let index = pointData.index; index < this._sortedTimePoints.length; ++index) {
-					assignIndexToPointData(this._sortedTimePoints[index].pointData, index);
-				}
-			}
-
-			// This is overridden so that the last timescale point across all series is set properly, which makes sure
-			// the time scale is updated correctly when the last point in one of the series is removed.
-			firstChangedPointIndex = this._sortedTimePoints.length - 1;
-		}
-
 		const dataUpdateResponse: DataUpdateResponse = {
 			series: new Map(),
 			timeScale: {
