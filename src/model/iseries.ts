@@ -22,6 +22,22 @@ export interface LastValueDataResultWithData {
 	index: TimePointIndex;
 }
 
+/** Represents last value data result of a series for plugins */
+export interface LastValueDataResultPlugin {
+	/**
+	 * Indicates if the series has data.
+	 */
+	noData: boolean;
+	/**
+	 * The last price of the series.
+	 */
+	price?: number;
+	/**
+	 * The color of the last value.
+	 */
+	color?: string;
+}
+
 export type LastValueDataResult = LastValueDataResultWithoutData | LastValueDataResultWithData;
 
 export interface MarkerData {

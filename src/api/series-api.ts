@@ -11,6 +11,7 @@ import { CustomPriceLine } from '../model/custom-price-line';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
+import { LastValueDataResultPlugin } from '../model/iseries';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { Pane } from '../model/pane';
 import { MismatchDirection } from '../model/plot-list';
@@ -216,6 +217,21 @@ export class SeriesApi<
 
 	public seriesType(): TSeriesType {
 		return this._series.seriesType();
+	}
+
+	public lastValueData(globalLast: boolean): LastValueDataResultPlugin {
+		const result = this._series.lastValueData(globalLast);
+
+		const resultPlugin: LastValueDataResultPlugin = {
+			noData: result.noData,
+		};
+
+		if (!result.noData) {
+			resultPlugin.price = result.price;
+			resultPlugin.color = result.color;
+		}
+
+		return resultPlugin;
 	}
 
 	public attachPrimitive(primitive: ISeriesPrimitive<HorzScaleItem>): void {
