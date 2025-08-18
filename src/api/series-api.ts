@@ -222,16 +222,17 @@ export class SeriesApi<
 	public lastValueData(globalLast: boolean): LastValueDataResultPlugin {
 		const result = this._series.lastValueData(globalLast);
 
-		const resultPlugin: LastValueDataResultPlugin = {
-			noData: result.noData,
-		};
-
-		if (!result.noData) {
-			resultPlugin.price = result.price;
-			resultPlugin.color = result.color;
+		if (result.noData) {
+			return {
+				noData: true,
+			};
 		}
 
-		return resultPlugin;
+		return {
+			noData: false,
+			price: result.price,
+			color: result.color,
+		};
 	}
 
 	public attachPrimitive(primitive: ISeriesPrimitive<HorzScaleItem>): void {
