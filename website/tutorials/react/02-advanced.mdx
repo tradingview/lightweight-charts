@@ -36,7 +36,7 @@ The pseudocode below shows a potential application structure:
 The components should interact with each other, for example, when more data is loaded to the series or the chart is resized.
 This communication will be implemented with [hooks](https://react.dev/reference/react/hooks) and [composition](https://reactjs.org/docs/composition-vs-inheritance.html).
 
-One drawback of hooks, such as `useEffect`, in a parent–child setup is that hooks run in a bottom-up order during instantiation, but in a top-down order during cleanup.
+One drawback of hooks, such as [`useEffect`](https://react.dev/reference/react/hooks#effect-hooks), in a parent–child setup is that hooks run in a bottom-up order during instantiation, but in a top-down order during cleanup.
 The following skeleton illustrates the mechanism.
 
 ```js
@@ -46,14 +46,14 @@ export const ParentComponent = () => {
     // This effect will be triggered in position 3
     useEffect(() =>
         () => {
-            // This clean up will be triggered in position 1
+            // This cleanup will be triggered in position 1
         }
     , []);
 
     // This effect will be triggered in position 4
     useEffect(() =>
         () => {
-            // This clean up will be triggered in position 2
+            // This cleanup will be triggered in position 2
         }
     , []);
 
@@ -68,14 +68,14 @@ export const ChildComponent = () => {
     // This effect will be triggered in position 1
     useEffect(() =>
         () => {
-            // This clean up will be triggered in position 3
+            // This cleanup will be triggered in position 3
         }
     , []);
 
     // This effect will be triggered in position 2
     useEffect(() =>
         () => {
-            // This clean up will be triggered in position 4
+            // This cleanup will be triggered in position 4
         }
     , []);
 
@@ -104,7 +104,7 @@ Considering this, the component structure and usage remain the same, but under t
 </Chart component>
 ```
 
-In this structure, `ChartContainer` is required to provide a DOM element where the chart will be rendered. `ChartContainer` also creates a reference that stores functions to manage the chart’s lifecycle. This reference is then passed down to each _Series_.
+In this structure, `ChartContainer` is required to provide a DOM element where the chart will be rendered. `ChartContainer` also creates a reference that stores functions to manage the chart's lifecycle. This reference is then passed down to each _Series_.
 
 The _Series_ component uses the same approach to manage the lifecycle of a series: creating, adding data, and cleaning it up.
 
@@ -139,14 +139,14 @@ export const ParentComponent = forwardRef((props, ref) => {
     // This effect will be triggered in position 3
     useEffect(() =>
         () => {
-            // This clean up will be triggered in position 1
+            // This cleanup will be triggered in position 1
         }
     , []);
 
     // This effect will be triggered in position 4
     useEffect(() =>
         () => {
-            // This clean up will be triggered in position 2
+            // This cleanup will be triggered in position 2
         }
     , []);
 
@@ -176,14 +176,14 @@ export const ChildComponent = forwardRef((props, ref) => {
     // This effect will be triggered in position 1
     useEffect(() =>
         () => {
-            // This clean up will be triggered in position 3
+            // This cleanup will be triggered in position 3
         }
     , []);
 
     // This effect will be triggered in position 2
     useEffect(() =>
         () => {
-            // This clean up will be triggered in position 4
+            // This cleanup will be triggered in position 4
         }
     , []);
 
