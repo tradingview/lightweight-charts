@@ -1,10 +1,12 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
+import { setLineStyle } from '../renderers/draw-line';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { Coordinate } from './coordinate';
 import {
+    DrawingUtils,
     IPanePrimitiveBase,
     IPrimitivePaneRenderer,
     IPrimitivePaneView,
@@ -17,17 +19,21 @@ import {
 
 class PrimitiveRendererWrapper implements IPaneRenderer {
 	private readonly _baseRenderer: IPrimitivePaneRenderer;
+	private readonly _utils: DrawingUtils;
 
 	public constructor(baseRenderer: IPrimitivePaneRenderer) {
 		this._baseRenderer = baseRenderer;
+		this._utils = {
+			setLineStyle: setLineStyle,
+		};
 	}
 
 	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-		this._baseRenderer.draw(target);
+		this._baseRenderer.draw(target, this._utils);
 	}
 
 	public drawBackground?(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-		this._baseRenderer.drawBackground?.(target);
+		this._baseRenderer.drawBackground?.(target, this._utils);
 	}
 }
 
