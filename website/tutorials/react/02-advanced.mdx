@@ -1,6 +1,6 @@
 ---
 sidebar_label: 'Advanced example'
-hide_table_of_contents: true
+hide_table_of_contents: false
 ---
 
 # Advanced React example
@@ -25,11 +25,14 @@ The pseudocode below shows a potential application structure:
 ```
 <Chart component>
     <Series component 1>
-        <child component />
+        <Child component />
     </Series component 1>
-    <Series component n>
-        <child component />
-    </Series component n>
+
+    {/* ... */}
+
+    <Series component N>
+        <Child component />
+    </Series component N>
 </Chart component>
 ```
 
@@ -57,7 +60,7 @@ export const ParentComponent = () => {
         }
     , []);
 
-    // The parent will then return Following bit is to propagate all props & internalRef object down to children
+    // All props and internal references will be passed down to the children
     return (
         <ChildComponent />
     );
@@ -86,21 +89,24 @@ export const ChildComponent = () => {
 ChildComponent.displayName = 'ChildComponent';
 ```
 
-In the example above, `ChildComponent` (_Series_) is created first, even though it depends on a `ParentComponent` (_Chart_).
-To make this possible, you should use hooks with [refs](https://react.dev/learn/manipulating-the-dom-with-refs), which allow a parent to share internal references or properties directly with its children.
+In the example above, the `ChildComponent` (_Series_) may be created before the `ParentComponent` (_Chart_), which can lead to unexpected behavior.
+To prevent this, you should use hooks with [refs](https://react.dev/learn/manipulating-the-dom-with-refs) that allow a parent to share internal references or properties directly with its children.
 
-Considering this, the component structure and usage remain the same, but under the hood it works as follows:
+Considering using refs, the component structure and usage remain the same, but under the hood it works as follows:
 
 ```
 <Chart component>
     <ChartContainer>
         <Series component 1>
-            <child component />
+            <Child component />
         </Series component 1>
-        <Series component n>
-            <child component />
-        </Series component n>
-    </ChartContainer>
+
+        {/* ... */}
+
+        <Series component N>
+            <Child component />
+        </Series component N>
+    <ChartContainer>
 </Chart component>
 ```
 
@@ -119,7 +125,7 @@ import React, { useEffect, useImperativeHandle, useRef, createContext, forwardRe
 const Context = createContext();
 
 export const MainComponent = props =>
-    // Creates the first reference and instanciate a ParentComponent
+    // Creates the first reference and instantiates a ParentComponent
     (
         <div ref={chartReference}>
             <ParentComponent {...props} container={container} />
@@ -224,7 +230,7 @@ import styles from '@site/src/pages/chart.module.css';
     <ThemedChart ChartComponent={App} />
 </div>
 
-## What's next
+## What's next?
 
 Consider other community examples on how to wrap Lightweight Charts™ into React components:
 
