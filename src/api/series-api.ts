@@ -161,14 +161,15 @@ export class SeriesApi<
 		this._onDataChanged('update');
 	}
 
-	public pop(count: number = 1): SeriesPlotRow<TSeriesType>[] {
+	public pop(count: number = 1): TData[] {
 		const poppedRows = this._dataUpdatesConsumer.popData(this._series, count);
 
 		if (poppedRows.length !== 0) {
 			this._onDataChanged('update');
 		}
 
-		return poppedRows;
+		const creator = getSeriesDataCreator<TSeriesType, HorzScaleItem>(this.seriesType());
+		return poppedRows.map((row: SeriesPlotRow<TSeriesType>) => creator(row) as TData);
 	}
 
 	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null {

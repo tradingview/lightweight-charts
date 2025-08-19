@@ -236,13 +236,13 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	}
 
 	public popData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, count: number): SeriesPlotRow<TSeriesType>[] {
-		const [popppedData, update] = this._dataLayer.popSeriesData(series, count);
+		const [poppedData, update] = this._dataLayer.popSeriesData(series, count);
 
-		if (popppedData.length !== 0) {
+		if (poppedData.length !== 0) {
 			this._sendUpdateToChart(update);
 		}
 
-		return popppedData as SeriesPlotRow<TSeriesType>[];
+		return poppedData as SeriesPlotRow<TSeriesType>[];
 	}
 
 	public subscribeClick(handler: MouseEventHandler<HorzScaleItem>): void {

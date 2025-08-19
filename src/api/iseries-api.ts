@@ -6,7 +6,6 @@ import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
-import { SeriesPlotRow } from '../model/series-data';
 import {
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
@@ -189,7 +188,18 @@ export interface ISeriesApi<
 	 */
 	update(bar: TData, historicalUpdate?: boolean): void;
 
-	pop(count: number): SeriesPlotRow<TSeriesType>[];
+	/**
+	 * Removes one or more data items from the end of the series.
+	 *
+	 * @param count - The number of data items to remove.
+	 * @returns The removed data items.
+	 * @example Removing one data item from a series
+	 * ```js
+	 * const removedData = lineSeries.pop(1);
+	 * console.log(removedData);
+	 * ```
+	 */
+	pop(count: number): TData[];
 
 	/**
 	 * Returns a bar data by provided logical index.
