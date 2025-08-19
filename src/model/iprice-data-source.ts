@@ -15,7 +15,7 @@ export interface IPriceDataSource extends IDataSource {
 	firstValue(): FirstValue | null;
 	formatter(): IPriceFormatter;
 	priceLineColor(lastBarColor: string): string;
-	minMove(): number;
+	base(): number;
 	autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null;
 	model(): IChartModelBase;
 }

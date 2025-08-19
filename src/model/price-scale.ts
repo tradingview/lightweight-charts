@@ -856,7 +856,7 @@ export class PriceScale {
 
 		let base = 100;
 		if (this._formatterSource !== null) {
-			base = Math.round(1 / this._formatterSource.minMove());
+			base = Math.round(this._formatterSource.base());
 		}
 
 		this._formatter = defaultPriceFormatter;
@@ -1025,7 +1025,7 @@ export class PriceScale {
 			// keep current range is new is empty
 			if (priceRange.minValue() === priceRange.maxValue()) {
 				const formatterSource = this._formatterSource;
-				const minMove = formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : formatterSource.minMove();
+				const minMove = formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : 1 / formatterSource.base();
 
 				// if price range is degenerated to 1 point let's extend it by 10 min move values
 				// to avoid incorrect range and empty (blank) scale (in case of min tick much greater than 1)

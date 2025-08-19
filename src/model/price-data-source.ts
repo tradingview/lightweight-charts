@@ -18,7 +18,7 @@ export abstract class PriceDataSource extends DataSource implements IPriceDataSo
 		return this._model;
 	}
 
-	public abstract minMove(): number;
+	public abstract base(): number;
 
 	public abstract autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null;
 
