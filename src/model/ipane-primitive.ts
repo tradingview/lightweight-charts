@@ -146,6 +146,15 @@ export interface IPanePrimitiveBase<TPaneAttachedParameters = unknown> {
 	hitTest?(x: number, y: number): PrimitiveHoveredItem | null;
 }
 
+/**
+ * Helper drawing utilities exposed by the library to a Primitive (a.k.a plugin).
+ */
 export interface DrawingUtils {
-	setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): void;
+	/**
+ 	* Drawing utility to change the line style on the canvas context to one of the
+ 	* built-in line styles.
+ 	* @param ctx - 2D rending context for the target canvas.
+ 	* @param lineStyle - Built-in {@link LineStyle} to set on the canvas context.
+ 	*/
+	setLineStyle(ctx: CanvasRenderingContext2D, lineStyle: LineStyle): void;
 }
