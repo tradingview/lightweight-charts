@@ -1,4 +1,4 @@
-import { ISeries, LastValueDataResultWithData } from '../../model/iseries';
+import { ISeries, LastValueDataInternalResultWithData } from '../../model/iseries';
 import { PriceAxisLastValueMode, SeriesType } from '../../model/series-options';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../../renderers/iprice-axis-view-renderer';
 
@@ -62,7 +62,7 @@ export class SeriesPriceAxisView extends PriceAxisView {
 	}
 
 	protected _paneText(
-		lastValue: LastValueDataResultWithData,
+		lastValue: LastValueDataInternalResultWithData,
 		showSeriesLastValue: boolean,
 		showSymbolLabel: boolean,
 		showPriceAndPercentage: boolean
@@ -83,7 +83,7 @@ export class SeriesPriceAxisView extends PriceAxisView {
 		return result.trim();
 	}
 
-	protected _axisText(lastValueData: LastValueDataResultWithData, showSeriesLastValue: boolean, showPriceAndPercentage: boolean): string {
+	protected _axisText(lastValueData: LastValueDataInternalResultWithData, showSeriesLastValue: boolean, showPriceAndPercentage: boolean): string {
 		if (!showSeriesLastValue) {
 			return '';
 		}

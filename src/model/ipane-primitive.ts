@@ -156,5 +156,5 @@ export interface DrawingUtils {
  	* @param ctx - 2D rending context for the target canvas.
  	* @param lineStyle - Built-in {@link LineStyle} to set on the canvas context.
  	*/
-	setLineStyle(ctx: CanvasRenderingContext2D, lineStyle: LineStyle): void;
+	readonly setLineStyle: (ctx: CanvasRenderingContext2D, lineStyle: LineStyle) => void;
 }

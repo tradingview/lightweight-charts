@@ -1,6 +1,5 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { setLineStyle } from '../renderers/draw-line';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { PriceAxisViewRendererCommonData, PriceAxisViewRendererData } from '../renderers/iprice-axis-view-renderer';
 import { TimeAxisViewRenderer } from '../renderers/time-axis-view-renderer';
@@ -9,13 +8,14 @@ import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
-import { DrawingUtils, IPrimitivePaneRenderer, IPrimitivePaneView, PrimitivePaneViewZOrder } from './ipane-primitive';
+import { IPrimitivePaneRenderer, IPrimitivePaneView, PrimitivePaneViewZOrder } from './ipane-primitive';
 import {
 	ISeriesPrimitiveAxisView,
 	ISeriesPrimitiveBase,
 } from './iseries-primitive';
 import { PrimitiveWrapper } from './pane-primitive-wrapper';
 import { PriceScale } from './price-scale';
+import { drawingUtils } from './primitive-drawing-utils';
 import { Series } from './series';
 import { AutoscaleInfo, SeriesType } from './series-options';
 import { Logical, TimePointIndex } from './time-data';
@@ -23,21 +23,17 @@ import { ITimeScale } from './time-scale';
 
 class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
 	private readonly _baseRenderer: IPrimitivePaneRenderer;
-	private readonly _utils: DrawingUtils;
 
 	public constructor(baseRenderer: IPrimitivePaneRenderer) {
 		this._baseRenderer = baseRenderer;
-		this._utils = {
-			setLineStyle: setLineStyle,
-		};
 	}
 
 	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-		this._baseRenderer.draw(target, this._utils);
+		this._baseRenderer.draw(target, drawingUtils);
 	}
 
 	public drawBackground?(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-		this._baseRenderer.drawBackground?.(target, this._utils);
+		this._baseRenderer.drawBackground?.(target, drawingUtils);
 	}
 }
 

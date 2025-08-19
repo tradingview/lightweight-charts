@@ -7,10 +7,10 @@ import { SeriesPlotList } from './series-data';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 
-export interface LastValueDataResultWithoutData {
+export interface LastValueDataInternalResultWithoutData {
 	noData: true;
 }
-export interface LastValueDataResultWithData {
+export interface LastValueDataInternalResultWithData {
 	noData: false;
 
 	price: number;
@@ -22,10 +22,10 @@ export interface LastValueDataResultWithData {
 	index: TimePointIndex;
 }
 
-export type LastValueDataResult = LastValueDataResultWithoutData | LastValueDataResultWithData;
+export type LastValueDataInternalResult = LastValueDataInternalResultWithoutData | LastValueDataInternalResultWithData;
 
 /** Represents last value data result of a series for plugins when there is no data */
-export interface LastValueDataResultPluginWithoutData {
+export interface LastValueDataResultWithoutData {
 	/**
 	 * Indicates if the series has data.
 	 */
@@ -33,7 +33,7 @@ export interface LastValueDataResultPluginWithoutData {
 }
 
 /** Represents last value data result of a series for plugins when there is data */
-export interface LastValueDataResultPluginWithData {
+export interface LastValueDataResultWithData {
 	/**
 	 * Indicates if the series has data.
 	 */
@@ -49,7 +49,7 @@ export interface LastValueDataResultPluginWithData {
 }
 
 /** Represents last value data result of a series for plugins */
-export type LastValueDataResultPlugin = LastValueDataResultPluginWithData | LastValueDataResultPluginWithoutData;
+export type LastValueDataResult = LastValueDataResultWithData | LastValueDataResultWithoutData;
 
 export interface MarkerData {
 	price: BarPrice;
@@ -75,7 +75,7 @@ export interface ISeries<T extends SeriesType> extends IPriceDataSource {
 	options(): Readonly<SeriesOptionsMap[T]>;
 	title(): string;
 	priceScale(): PriceScale;
-	lastValueData(globalLast: boolean): LastValueDataResult;
+	lastValueData(globalLast: boolean): LastValueDataInternalResult;
 	barColorer(): ISeriesBarColorer<T>;
 	markerDataAtIndex(index: TimePointIndex): MarkerData | null;
 	dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null;

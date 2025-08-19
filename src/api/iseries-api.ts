@@ -4,7 +4,7 @@ import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
-import { LastValueDataResultPlugin } from '../model/iseries';
+import { LastValueDataResult } from '../model/iseries';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
 import {
@@ -294,7 +294,7 @@ export interface ISeriesApi<
 	/**
 	 * Return the last value data of the series.
 	 *
-	 * @param globalLast - If true, the last value data will be the last value of the series across all series. If false, the last value data will be the last value of the series on the current pane.
+	 * @param globalLast - If false, get the last value in the current visible range. Otherwise, fetch the absolute last value
 	 * @returns The last value data of the series.
 	 * @example
 	 * ```js
@@ -305,7 +305,7 @@ export interface ISeriesApi<
 	 * console.log(candlestickSeries.lastValueData(false)); // { noData: false, price: 145.72, color: '#000000' }
 	 * ```
 	 */
-	lastValueData(globalLast: boolean): LastValueDataResultPlugin;
+	lastValueData(globalLast: boolean): LastValueDataResult;
 
 	/**
 	 * Attaches additional drawing primitive to the series
