@@ -26,6 +26,9 @@ export type LastValueDataResult = LastValueDataResultWithoutData | LastValueData
 
 /** Represents last value data result of a series for plugins when there is no data */
 export interface LastValueDataResultPluginWithoutData {
+	/**
+	 * Indicates if the series has data.
+	 */
 	noData: true;
 }
 
