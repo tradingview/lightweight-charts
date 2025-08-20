@@ -37,7 +37,7 @@ The pseudocode below shows a potential application structure:
 ```
 
 The components should interact with each other, for example, when more data is loaded to the series or the chart is resized.
-This communication will be implemented with [hooks](https://react.dev/reference/react/hooks) and [composition](https://reactjs.org/docs/composition-vs-inheritance.html).
+To implement this interaction, use [hooks](https://react.dev/reference/react/hooks) and [composition](https://reactjs.org/docs/composition-vs-inheritance.html).
 
 One drawback of hooks, such as [`useEffect`](https://react.dev/reference/react/hooks#effect-hooks), in a parent–child setup is that hooks run in a bottom-up order during instantiation, but in a top-down order during cleanup.
 The following skeleton illustrates the mechanism.
