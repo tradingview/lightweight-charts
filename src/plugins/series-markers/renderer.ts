@@ -15,6 +15,7 @@ import { drawSquare, hitTestSquare } from './series-markers-square';
 import { drawText, hitTestText } from './series-markers-text';
 import { SeriesMarkerShape } from './types';
 import { BitmapShapeItemCoordinates } from './utils';
+import { drawTriangle, hitTestTriangle } from './series-markers-triangle';
 
 export interface SeriesMarkerText {
 	content: string;
@@ -153,6 +154,12 @@ function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingConte
 		case 'square':
 			drawSquare(ctx, coordinates, item.size);
 			return;
+		case 'triangleUp':
+			drawTriangle(true, ctx, coordinates, item.size);
+			return;
+		case 'triangleDown':
+			drawTriangle(false, ctx, coordinates, item.size);
+			return;
 	}
 
 	ensureNever(item.shape);
@@ -180,5 +187,9 @@ function hitTestShape(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coor
 			return hitTestCircle(item.x, item.y, item.size, x, y);
 		case 'square':
 			return hitTestSquare(item.x, item.y, item.size, x, y);
+		case 'triangleDown':
+			return hitTestTriangle(true, item.x, item.y, item.size, x, y);
+		case 'triangleUp':
+			return hitTestTriangle(false, item.x, item.y, item.size, x, y);
 	}
 }
