@@ -7,6 +7,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clone, DeepPartial } from '../helpers/strict-type-checks';
 
+import { AxisApi, AxisMouseEventHandler } from '../model/axis-model';
 import { ChartModel } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { IHorzScaleBehavior, InternalHorzScaleItem } from '../model/ihorz-scale-behavior';
@@ -19,11 +20,12 @@ import {
 	SizeChangeEventHandler,
 	TimeRangeChangeEventHandler,
 } from './itime-scale-api';
+
 const enum Constants {
 	AnimationDurationMs = 1000,
 }
 
-export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>, IDestroyable {
+export class TimeScaleApi<HorzScaleItem> extends AxisApi implements ITimeScaleApi<HorzScaleItem>, IDestroyable {
 	private _model: ChartModel<HorzScaleItem>;
 	private _timeScale: TimeScale<HorzScaleItem>;
 	private readonly _timeAxisWidget: TimeAxisWidget<HorzScaleItem>;
@@ -34,6 +36,7 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 
 	public constructor(model: ChartModel<HorzScaleItem>, timeAxisWidget: TimeAxisWidget<HorzScaleItem>, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>) {
+		super();
 		this._model = model;
 		this._timeScale = model.timeScale();
 		this._timeAxisWidget = timeAxisWidget;
@@ -42,15 +45,37 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 		this._timeAxisWidget.sizeChanged().subscribe(this._onSizeChanged.bind(this));
 
 		this._horzScaleBehavior = horzScaleBehavior;
+		this._setupMouseEvents(this._timeAxisWidget);
 	}
 
 	public destroy(): void {
+		this._removeMouseEvents(this._timeAxisWidget);
 		this._timeScale.visibleBarsChanged().unsubscribeAll(this);
 		this._timeScale.logicalRangeChanged().unsubscribeAll(this);
 		this._timeAxisWidget.sizeChanged().unsubscribeAll(this);
 		this._timeRangeChanged.destroy();
 		this._logicalRangeChanged.destroy();
 		this._sizeChanged.destroy();
+	}
+
+	public subscribeClick(handler: AxisMouseEventHandler): void {
+		this._subscribeClick(handler);
+	}
+
+	public unsubscribeClick(handler: AxisMouseEventHandler): void {
+		this._unsubscribeClick(handler);
+	}
+
+	public subscribeMouseMove(handler: AxisMouseEventHandler): void {
+		this._subscribeMouseMove(handler);
+	}
+
+	public unsubscribeMouseMove(handler: AxisMouseEventHandler): void {
+		this._unsubscribeMouseMove(handler);
+	}
+
+	public overrideCursorStyle(cursor: string | undefined): void {
+		this._timeAxisWidget.overrideCursorStyle(cursor);
 	}
 
 	public scrollPosition(): number {
