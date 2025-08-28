@@ -292,6 +292,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._rightOffset = options.rightOffset;
 		this._barSpacing = options.barSpacing;
 		this._model = model;
+		this._checkRightOffsetPixels(options);
 
 		this._horzScaleBehavior = horzScaleBehavior;
 
@@ -332,11 +333,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		if (options.rightOffset !== undefined) {
 			this._model.setRightOffset(options.rightOffset);
 		}
-
-		if (options.rightOffsetPixels !== undefined) {
-			const newOffset = options.rightOffsetPixels / (options.barSpacing || this._barSpacing);
-			this._model.setRightOffset(newOffset);
-		}
+		this._checkRightOffsetPixels(options);
 
 		if (options.minBarSpacing !== undefined || options.maxBarSpacing !== undefined) {
 			// yes, if we apply bar spacing constrains then we need to correct bar spacing
@@ -1106,6 +1103,13 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			}
 		}
 		return x; // fallback to original index
+	}
+
+	private _checkRightOffsetPixels(options: DeepPartial<HorzScaleOptions>): void {
+		if (options.rightOffsetPixels !== undefined) {
+			const newOffset = options.rightOffsetPixels / (options.barSpacing || this._barSpacing);
+			this._model.setRightOffset(newOffset);
+		}
 	}
 }
 
