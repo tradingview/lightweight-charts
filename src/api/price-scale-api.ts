@@ -6,6 +6,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { isDefaultPriceScale } from '../model/default-price-scale';
 import { PriceRangeImpl } from '../model/price-range-impl';
 import { PriceScale, PriceScaleOptions } from '../model/price-scale';
+import { convertPriceRangeFromLog } from '../model/price-scale-conversions';
 import { IRange } from '../model/time-data';
 
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -43,8 +44,17 @@ export class PriceScaleApi implements IPriceScaleApi {
 	}
 
 	public getVisibleRange(): IRange<number> | null {
-		const range = this._priceScale().priceRange();
-		return range === null ? null : {
+		let range = this._priceScale().priceRange();
+
+		if (range === null) {
+			return null;
+		}
+
+		if (this._priceScale().isLog()) {
+			range = convertPriceRangeFromLog(range, this._priceScale().getLogFormula());
+		}
+
+		return {
 			from: range.minValue(),
 			to: range.maxValue(),
 		};
