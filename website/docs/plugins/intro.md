@@ -13,9 +13,10 @@ You can create plugins of the following types:
 - [Primitives](#primitives) — designed to define custom visualizations, drawing tools, and
 chart annotations that can be attached to an existing series ([series primitives](#series-primitives)) or chart pane ([pane primitives](#pane-primitives)).
 
-:::tip
+:::tip[Tips]
 
-Use the [`create-lwc-plugin`](https://www.npmjs.com/package/create-lwc-plugin) npm package to quickly scaffold a project for your custom plugin.
+- Use the [create-lwc-plugin](https://www.npmjs.com/package/create-lwc-plugin) npm package to quickly scaffold a project for your custom plugin.
+- Explore [Plugin Examples Demo](https://tradingview.github.io/lightweight-charts/plugin-examples) page that hosts interactive examples of heatmaps, alerts, watermarks, and tooltips implemented with plugins. You can find the code of these examples in the [`plugin-examples`](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) folder in the Lightweight Charts™ repository.
 
 :::
 
@@ -57,7 +58,7 @@ levels in the visual stack to create complex, layered compositions.
 
 ### Series primitives
 
-Series primitives are attached to a specific series and can be rendered on the main pane, price and
+Series primitives are attached to a specific series and can render on the main pane, price and
 time scales. For implementation details, refer to the [Series Primitives](./series-primitives.mdx) article.
 
 Use the [`attachPrimitive`](../api/interfaces/ISeriesApi.md#attachprimitive) method to add a primitive to the chart and attach it to the series.
@@ -89,7 +90,7 @@ For implementation details, refer to the [Pane Primitives](./pane-primitives.md)
 
 :::caution
 
-Note that pane primitives cannot be rendered on the price or time scale.
+Note that pane primitives cannot render on the price or time scale.
 
 :::
 
@@ -110,8 +111,3 @@ const mainPane = chart.panes()[0];
 // Attach the primitive to the pane
 mainPane.attachPrimitive(myCustomPanePrimitive);
 ```
-
-## Examples
-
-Refer to the [Plugin Examples Demo](https://tradingview.github.io/lightweight-charts/plugin-examples) page to see how to implement heatmaps, alerts, watermarks, and tooltips with plugins.
-You can find the code of these examples in the [`plugin-examples`](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) folder in the Lightweight Charts™ repository.
