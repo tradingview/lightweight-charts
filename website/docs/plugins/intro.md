@@ -16,7 +16,7 @@ chart annotations that can be attached to an existing series ([series primitives
 :::tip[Tips]
 
 - Use the [create-lwc-plugin](https://www.npmjs.com/package/create-lwc-plugin) npm package to quickly scaffold a project for your custom plugin.
-- Explore [Plugin Examples Demo](https://tradingview.github.io/lightweight-charts/plugin-examples) page that hosts interactive examples of heatmaps, alerts, watermarks, and tooltips implemented with plugins. You can find the code of these examples in the [`plugin-examples`](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) folder in the Lightweight Charts™ repository.
+- Explore the [Plugin Examples Demo](https://tradingview.github.io/lightweight-charts/plugin-examples) page that hosts interactive examples of heatmaps, alerts, watermarks, and tooltips implemented with plugins. You can find the code of these examples in the [`plugin-examples`](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) folder in the Lightweight Charts™ repository.
 
 :::
 
