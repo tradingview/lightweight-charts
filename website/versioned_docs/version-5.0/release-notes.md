@@ -331,7 +331,7 @@ Version 4.1 of Lightweight Charts introduces exciting new features, including th
 
 **Plugins**
 
-Developers can now leverage the power of Plugins in Lightweight Charts. Two types of Plugins are supported -  [Custom Series](/plugins/intro.md#custom-series) and [Drawing Primitives](/plugins/intro.md#drawing-primitives), offering the ability to define new series types and create custom visualizations, drawing tools, and annotations.
+Developers can now leverage the power of Plugins in Lightweight Charts. Two types of Plugins are supported -  [Custom Series](/plugins/intro.md#custom-series) and [Drawing Primitives](/plugins/intro.md#primitives), offering the ability to define new series types and create custom visualizations, drawing tools, and annotations.
 
 With the flexibility provided by these plugins, developers can create highly customizable charting applications for their users.
 
