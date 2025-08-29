@@ -586,7 +586,7 @@ Thanks to our contributors:
 
 - Andree Yosua [@SuperPenguin](https://github.com/SuperPenguin)
 - kpaape [@kpaape](https://github.com/kpaape)
-- Matt Conway [@RetWolf](https://github.com/RetWolf)
+- Matt Conway [@mattsre](https://github.com/mattsre)
 
 See [issues assigned to this version’s milestone](https://github.com/tradingview/lightweight-charts/milestone/6?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v1.2.2..v2.0.0).
 
