@@ -7,15 +7,16 @@ import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { Point } from '../model/point';
 import {
-	CustomSeriesOptions,
-	SeriesPartialOptions,
-	SeriesPartialOptionsMap,
-	SeriesType,
+    CustomSeriesOptions,
+    SeriesPartialOptions,
+    SeriesPartialOptionsMap,
+    SeriesType,
 } from '../model/series-options';
 import { SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
+import { CustomWebGLSeriesOptions, ICustomWebGLSeriesPaneView, IGLSeriesApi } from '../gl/public';
 import { IPaneApi } from './ipane-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
@@ -138,6 +139,18 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 		options?: SeriesPartialOptionsMap[T],
 		paneIndex?: number
 	): ISeriesApi<T, HorzScaleItem>;
+
+  /**
+   * Experimental: Add a custom WebGL series to the specified pane (default 0).
+   * The series renders on a transparent WebGL2 canvas layered above the base 2D pane and below overlays.
+   */
+	addCustomWebGLSeries<
+		TOptions extends CustomWebGLSeriesOptions = CustomWebGLSeriesOptions
+	>(
+		view: ICustomWebGLSeriesPaneView<TOptions>,
+		options?: Partial<TOptions>,
+		paneIndex?: number
+	): IGLSeriesApi<TOptions>;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.

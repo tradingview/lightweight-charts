@@ -14,6 +14,7 @@ export function chartOptionsDefaults<HorzScaleItem>(): ChartOptionsInternal<Horz
 		width: 0,
 		height: 0,
 		autoSize: false,
+		webgl: 'auto',
 		layout: layoutOptionsDefaults,
 		crosshair: crosshairOptionsDefaults,
 		grid: gridOptionsDefaults,
