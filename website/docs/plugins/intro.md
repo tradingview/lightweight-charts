@@ -9,8 +9,8 @@ Plugins allow you to extend the library's functionality and render custom elemen
 
 You can create plugins of the following types:
 
-- [Custom series](#custom-series) — designed to define new types of series.
-- [Primitives](#primitives) — designed to define custom visualizations, drawing tools, and
+- [Custom series](#custom-series) — define new types of series.
+- [Primitives](#primitives) — define custom visualizations, drawing tools, and
 chart annotations that can be attached to an existing series ([series primitives](#series-primitives)) or chart pane ([pane primitives](#pane-primitives)).
 
 :::tip[Tips]
@@ -85,7 +85,7 @@ lineSeries.attachPrimitive(myCustomPrimitive);
 
 ### Pane primitives
 
-Pane primitives are are attached to a chart pane rather than a specific series. You can use them to create chart-wide annotations and features like watermarks.
+Pane primitives are attached to a chart pane rather than a specific series. You can use them to create chart-wide annotations and features like watermarks.
 For implementation details, refer to the [Pane Primitives](./pane-primitives.md) article.
 
 :::caution
