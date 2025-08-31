@@ -28,6 +28,7 @@ import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
 import { PaneSeparator, SeparatorConstants } from './pane-separator';
 import { PaneWidget } from './pane-widget';
+import { PriceAxisWidget } from './price-axis-widget';
 import { TimeAxisWidget } from './time-axis-widget';
 
 export interface MouseEventParamsImpl {
@@ -51,6 +52,7 @@ export interface IChartWidgetBase {
 	paneWidgets(): PaneWidget[];
 	options(): ChartOptionsInternalBase;
 	setCursorStyle(style: string | null): void;
+	getPriceAxisWidget(paneIndex: number, priceScaleId: string): PriceAxisWidget;
 }
 
 export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBase {
@@ -324,6 +326,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	public paneSize(paneIndex: number): Size {
 		return ensureDefined(this._paneWidgets[paneIndex]).getSize();
+	}
+
+	public getPriceAxisWidget(paneIndex: number, priceScaleId: string): PriceAxisWidget {
+		const pane = ensureDefined(this._paneWidgets[paneIndex]);
+		return ensureNotNull(priceScaleId === 'left' ? pane.leftPriceAxisWidget() : pane.rightPriceAxisWidget());
 	}
 
 	private _applyPanesOptions(): void {
