@@ -1,4 +1,4 @@
-import { AutoscaleInfo, DeepPartial, HistogramData, SeriesDataItemTypeMap, SingleValueData, Time, WhitespaceData, createChart } from 'lightweight-charts';
+import { AutoscaleInfo, DeepPartial, HistogramData, SeriesDataItemTypeMap, SingleValueData, Time, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { PrettyHistogramSeries } from '../pretty-histogram-series';
 import { PrettyHistogramSeriesOptions } from '../options';
