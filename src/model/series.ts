@@ -26,7 +26,7 @@ import { isDefaultPriceScale } from './default-price-scale';
 import { CustomData, CustomSeriesWhitespaceData, ICustomSeriesPaneView, WhitespaceCheck } from './icustom-series';
 import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from './ipane-primitive';
 import { FirstValue } from './iprice-data-source';
-import { ISeries, LastValueDataResult, LastValueDataResultWithoutData, MarkerData, SeriesDataAtTypeMap } from './iseries';
+import { ISeries, LastValueDataInternalResult, LastValueDataInternalResultWithoutData, MarkerData, SeriesDataAtTypeMap } from './iseries';
 import { ISeriesPrimitiveBase } from './iseries-primitive';
 import { Pane } from './pane';
 import { PlotRowValueIndex } from './plot-data';
@@ -140,8 +140,8 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return this._options.priceLineColor || lastBarColor;
 	}
 
-	public lastValueData(globalLast: boolean): LastValueDataResult {
-		const noDataRes: LastValueDataResultWithoutData = { noData: true };
+	public lastValueData(globalLast: boolean): LastValueDataInternalResult {
+		const noDataRes: LastValueDataInternalResultWithoutData = { noData: true };
 
 		const priceScale = this.priceScale();
 
