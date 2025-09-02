@@ -320,6 +320,53 @@ export class DataLayer<HorzScaleItem> {
 		return this._getUpdateResponse(series, insertIndex, info);
 	}
 
+	public popSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, count: number): [SeriesPlotRow<SeriesType>[], DataUpdateResponse] {
+		const seriesData = this._seriesRowsBySeries.get(series);
+		if (seriesData === undefined || count <= 0) {
+			return [[], this._emptyUpdateResponse()];
+		}
+
+		count = Math.min(count, seriesData.length);
+		const poppedData: SeriesPlotRow<SeriesType>[] = seriesData.splice(-count).reverse();
+
+		if (seriesData.length === 0) {
+			this._seriesLastTimePoint.delete(series);
+		} else {
+			this._seriesLastTimePoint.set(series, seriesData[seriesData.length - 1].time);
+		}
+
+		for (const data of poppedData) {
+			const pointData = this._pointDataByTimePoint.get(this._horzScaleBehavior.key(data.time));
+
+			if (!pointData) {
+				continue;
+			}
+
+			pointData.mapping.delete(series);
+
+			if (pointData.mapping.size !== 0) {
+				continue;
+			}
+
+			// No remaining data at this timepoint therefore we need to remove the internal
+			// timescale point and update the indices.
+			this._pointDataByTimePoint.delete(this._horzScaleBehavior.key(pointData.timePoint));
+
+			(this._sortedTimePoints as InternalTimeScalePoint[]).splice(pointData.index, 1);
+
+			for (let index = pointData.index; index < this._sortedTimePoints.length; ++index) {
+				assignIndexToPointData(this._sortedTimePoints[index].pointData, index);
+			}
+		}
+
+		const info: SeriesUpdateInfo = {
+			historicalUpdate: false,
+			lastBarUpdatedOrNewBarsAddedToTheRight: false,
+		};
+
+		return [poppedData, this._getUpdateResponse(series, this._sortedTimePoints.length - 1, info)];
+	}
+
 	private _updateLastSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow): void {
 		let seriesData = this._seriesRowsBySeries.get(series);
 		if (seriesData === undefined) {
@@ -448,12 +495,7 @@ export class DataLayer<HorzScaleItem> {
 	}
 
 	private _getUpdateResponse(updatedSeries: Series<SeriesType>, firstChangedPointIndex: number, info?: SeriesUpdateInfo): DataUpdateResponse {
-		const dataUpdateResponse: DataUpdateResponse = {
-			series: new Map(),
-			timeScale: {
-				baseIndex: this._getBaseIndex(),
-			},
-		};
+		const dataUpdateResponse: DataUpdateResponse = this._emptyUpdateResponse();
 
 		if (firstChangedPointIndex !== -1) {
 			// TODO: it's possible to make perf improvements by checking what series has data after firstChangedPointIndex
@@ -484,6 +526,15 @@ export class DataLayer<HorzScaleItem> {
 		}
 
 		return dataUpdateResponse;
+	}
+
+	private _emptyUpdateResponse(): DataUpdateResponse {
+		return {
+			series: new Map(),
+			timeScale: {
+				baseIndex: this._getBaseIndex(),
+			},
+		};
 	}
 }
 
