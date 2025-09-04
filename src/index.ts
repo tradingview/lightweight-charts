@@ -38,6 +38,11 @@ export { createImageWatermark } from './plugins/image-watermark/primitive';
 export { createSeriesMarkers } from './plugins/series-markers/wrapper';
 export { createUpDownMarkers } from './plugins/up-down-markers-plugin/wrapper';
 
+export { GLLineSeries } from './plugins/gl-line-series/gl-line-series';
+export type { GLLineSeriesOptions, GLLinePoint } from './plugins/gl-line-series/gl-line-series';
+export { GLCandlestickSeries } from './plugins/gl-candlestick-series/gl-candlestick-series';
+export type { GLCandlestickSeriesOptions, GLCandleBar } from './plugins/gl-candlestick-series/gl-candlestick-series';
+
 /**
  * Returns the current version as a string. For example `'3.3.0'`.
  */

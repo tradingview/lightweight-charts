@@ -15,22 +15,26 @@ import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import {
-	CandlestickStyleOptions,
-	CustomSeriesOptions,
-	CustomSeriesPartialOptions,
-	fillUpDownCandlesticksColors,
-	precisionByMinMove,
-	PriceFormat,
-	PriceFormatBuiltIn,
-	SeriesOptionsMap,
-	SeriesPartialOptions,
-	SeriesPartialOptionsMap,
-	SeriesType,
+    CandlestickStyleOptions,
+    CustomSeriesOptions,
+    CustomSeriesPartialOptions,
+    fillUpDownCandlesticksColors,
+    precisionByMinMove,
+    PriceFormat,
+    PriceFormatBuiltIn,
+    SeriesOptionsMap,
+    SeriesPartialOptions,
+    SeriesPartialOptionsMap,
+    SeriesType,
 } from '../model/series-options';
+import { candlestickSeries } from '../model/series/candlestick-series';
 import { createCustomSeriesDefinition } from '../model/series/custom-series';
+import { lineSeries } from '../model/series/line-series';
 import { isSeriesDefinition, SeriesDefinition } from '../model/series/series-def';
 import { Logical } from '../model/time-data';
 
+import { GLSeriesBridge } from '../gl/gl-series-bridge';
+import { CustomWebGLSeriesOptions, ICustomWebGLSeriesPaneView, IGLSeriesApi } from '../gl/public';
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { IChartApiBase, MouseEventHandler, MouseEventParams, PaneSize } from './ichart-api';
 import { IPaneApi } from './ipane-api';
@@ -118,6 +122,9 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	private readonly _timeScaleApi: TimeScaleApi<HorzScaleItem>;
 	private readonly _panes: WeakMap<Pane, PaneApi<HorzScaleItem>> = new WeakMap();
+	// callbacks to rebuild GL logical indices when time scale points change (data union changes)
+	// @TODO: this is a hack to get GL series to rebuild logical indices when time scale points change (data union changes)
+	private readonly _glRebuildListeners: Set<() => void> = new Set();
 
 	public constructor(container: HTMLElement, horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>, options?: DeepPartial<ChartOptionsImpl<HorzScaleItem>>) {
 		this._dataLayer = new DataLayer<HorzScaleItem>(horzScaleBehavior);
@@ -172,6 +179,8 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		this._dblClickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
 		this._dataLayer.destroy();
+
+		this._glRebuildListeners.clear();
 	}
 
 	public resize(width: number, height: number, forceRepaint?: boolean): void {
@@ -206,12 +215,48 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		definition: SeriesDefinition<T>,
 		options: SeriesPartialOptionsMap[T] = {},
 		paneIndex: number = 0
-	): ISeriesApi<T, HorzScaleItem> {
+    ): ISeriesApi<T, HorzScaleItem> {
 		return this._addSeriesImpl<T>(
 				definition,
 				options,
 				paneIndex
 			);
+	}
+
+	public addCustomWebGLSeries<
+		TOptions extends CustomWebGLSeriesOptions = CustomWebGLSeriesOptions
+	>(
+		view: ICustomWebGLSeriesPaneView<TOptions>,
+		options: Partial<TOptions> = {},
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		paneIndex: number = 0
+	): IGLSeriesApi<TOptions> {
+		while (this._chartWidget.paneWidgets().length <= paneIndex) {
+			this.addPane(false);
+		}
+		const paneWidget = this._chartWidget.paneWidgets()[paneIndex];
+		const baseOptions: TOptions = { ...(options as TOptions) };
+		const bridge = new GLSeriesBridge<HorzScaleItem, TOptions>({
+			paneWidget,
+			paneIndex,
+			view,
+			initialOptions: baseOptions,
+			timeScale: () => this.timeScale(),
+			getHiddenInternal: (api: ISeriesApi<SeriesType, HorzScaleItem> | null) => api ? this._seriesMap.get(api as unknown as SeriesApi<SeriesType, HorzScaleItem>) : undefined,
+			addHiddenLineSeed: () => {
+				try { return this._addSeriesImpl<'Line'>(lineSeries, { lineVisible: false }, paneIndex) as unknown as ISeriesApi<'Line', HorzScaleItem>; } catch { return null; }
+			},
+			addHiddenCandleSeed: () => {
+				try { return this._addSeriesImpl<'Candlestick'>(candlestickSeries, { visible: true, wickVisible: false, borderVisible: false, upColor: 'rgba(0,0,0,0)', downColor: 'rgba(0,0,0,0)', priceLineVisible: false, lastValueVisible: false }, paneIndex) as unknown as ISeriesApi<'Candlestick', HorzScaleItem>; } catch { return null; }
+			},
+			removeSeries: (api: ISeriesApi<SeriesType, HorzScaleItem>) => this.removeSeries(api as unknown as SeriesApi<SeriesType, HorzScaleItem>),
+			registerRebuildListener: (cb: () => void) => this._registerGLRebuildListener(cb),
+			priceScaleFallback: () => this.priceScale('right', paneIndex),
+		});
+		const renderable = bridge.createRenderable();
+		paneWidget.registerWebGLRenderable(renderable);
+		bridge.registerLifecycle(renderable);
+		return bridge.getApiCompat() as unknown as IGLSeriesApi<TOptions>;
 	}
 
 	public removeSeries(seriesApi: SeriesApi<SeriesType, HorzScaleItem>): void {
@@ -384,6 +429,19 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 		model.timeScale().recalculateIndicesWithData();
 		model.recalculateAllPanes();
+
+		// Notify GL series to rebuild logical indices after union of time scale points changes
+		if (update.timeScale.points !== undefined) {
+			for (const cb of this._glRebuildListeners) {
+				try { cb(); } catch { /* ignore */ }
+			}
+		}
+	}
+
+	// Store a rebuild callback and return unregister function
+	private _registerGLRebuildListener(cb: () => void): () => void {
+		this._glRebuildListeners.add(cb);
+		return () => { this._glRebuildListeners.delete(cb); };
 	}
 
 	private _mapSeriesToApi(series: Series<SeriesType>): ISeriesApi<SeriesType, HorzScaleItem> {
@@ -412,7 +470,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 		return {
 			time: param.originalTime as HorzScaleItem,
-			logical: param.index as Logical | undefined,
+			logical: param.index as unknown as Logical | undefined,
 			point: param.point,
 			paneIndex: param.paneIndex,
 			hoveredSeries,

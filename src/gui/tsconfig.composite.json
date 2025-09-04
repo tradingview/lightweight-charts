@@ -1,9 +1,6 @@
 {
 	"extends": "../../tsconfig.composite.base.json",
-	"references": [
-		{ "path": "../tsconfig.model.json" }
-	],
 	"include": [
-		"./**/*.ts",
+		"./**/*.ts"
 	]
 }
