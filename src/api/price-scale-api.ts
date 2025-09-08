@@ -50,13 +50,23 @@ export class PriceScaleApi implements IPriceScaleApi {
 			return null;
 		}
 
+		let from: number;
+		let to: number;
+
 		if (this._priceScale().isLog()) {
 			range = convertPriceRangeFromLog(range, this._priceScale().getLogFormula());
+
+			// Second arg to formatPrice() is unused for log mode
+			from = Number(this._priceScale().formatPrice(range.minValue(), 0));
+			to = Number(this._priceScale().formatPrice(range.maxValue(), 0));
+		} else {
+			from = range.minValue();
+			to = range.maxValue();
 		}
 
 		return {
-			from: range.minValue(),
-			to: range.maxValue(),
+			from,
+			to,
 		};
 	}
 
