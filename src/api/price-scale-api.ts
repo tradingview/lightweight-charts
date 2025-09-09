@@ -7,6 +7,7 @@ import { isDefaultPriceScale } from '../model/default-price-scale';
 import { PriceRangeImpl } from '../model/price-range-impl';
 import { PriceScale, PriceScaleOptions } from '../model/price-scale';
 import { convertPriceRangeFromLog } from '../model/price-scale-conversions';
+import { precisionByMinMove } from '../model/series-options';
 import { IRange } from '../model/time-data';
 
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -54,11 +55,13 @@ export class PriceScaleApi implements IPriceScaleApi {
 		let to: number;
 
 		if (this._priceScale().isLog()) {
+			const minMove = this._priceScale().minMove();
+			const minMovePrecision = precisionByMinMove(minMove);
+
 			range = convertPriceRangeFromLog(range, this._priceScale().getLogFormula());
 
-			// Second arg to formatPrice() is unused for log mode
-			from = Number(this._priceScale().formatPrice(range.minValue(), 0));
-			to = Number(this._priceScale().formatPrice(range.maxValue(), 0));
+			from = Number((Math.round(range.minValue() / minMove) * minMove).toFixed(minMovePrecision));
+			to = Number((Math.round(range.maxValue() / minMove) * minMove).toFixed(minMovePrecision));
 		} else {
 			from = range.minValue();
 			to = range.maxValue();

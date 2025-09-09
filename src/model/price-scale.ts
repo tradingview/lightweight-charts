@@ -887,6 +887,10 @@ export class PriceScale {
 		this._cachedOrderedSources = null;
 	}
 
+	public minMove(): number {
+		return this._formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : this._formatterSource.minMove();
+	}
+
 	public colorParser(): ColorParser {
 		return this._colorParser;
 	}
@@ -1024,12 +1028,9 @@ export class PriceScale {
 		if (priceRange !== null) {
 			// keep current range is new is empty
 			if (priceRange.minValue() === priceRange.maxValue()) {
-				const formatterSource = this._formatterSource;
-				const minMove = formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : formatterSource.minMove();
-
 				// if price range is degenerated to 1 point let's extend it by 10 min move values
 				// to avoid incorrect range and empty (blank) scale (in case of min tick much greater than 1)
-				const extendValue = 5 * minMove;
+				const extendValue = 5 * this.minMove();
 
 				if (this.isLog()) {
 					priceRange = convertPriceRangeFromLog(priceRange, this._logFormula);

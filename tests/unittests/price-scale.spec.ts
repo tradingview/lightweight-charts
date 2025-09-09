@@ -105,7 +105,7 @@ describe('PriceScale', () => {
 		priceScale.setHeight(500);
 
 		const fromPrice = 0;
-		const toPrice = 100;
+		const toPrice = 100000;
 
 		priceScale.setPriceRange(new PriceRangeImpl(fromPrice, toPrice));
 
