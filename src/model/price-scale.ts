@@ -856,7 +856,7 @@ export class PriceScale {
 
 		let base = 100;
 		if (this._formatterSource !== null) {
-			base = Math.round(1 / this._formatterSource.minMove());
+			base = Math.round(this._formatterSource.base());
 		}
 
 		this._formatter = defaultPriceFormatter;
@@ -888,7 +888,7 @@ export class PriceScale {
 	}
 
 	public minMove(): number {
-		return this._formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : this._formatterSource.minMove();
+		return this._formatterSource === null || this.isPercentage() || this.isIndexedTo100() ? 1 : 1 / this._formatterSource.base();
 	}
 
 	public colorParser(): ColorParser {

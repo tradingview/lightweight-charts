@@ -569,6 +569,12 @@ export interface PriceFormatBuiltIn {
 	 * @defaultValue `0.01`
 	 */
 	minMove: number;
+	/**
+	 * The base value for the price format. It should equal to 1 / {@link minMove}.
+	 * If this option is specified, we ignore the {@link minMove} option.
+	 * It can be useful for cases with very small price movements like `1e-18` where we can reach limitations of floating point precision.
+	 */
+	base?: number;
 }
 
 /**
@@ -596,6 +602,12 @@ export interface PriceFormatCustom {
 	 * @defaultValue `0.01`
 	 */
 	minMove: number;
+	/**
+	 * The base value for the price format. It should equal to 1 / {@link minMove}.
+	 * If this option is specified, we ignore the {@link minMove} option.
+	 * It can be useful for cases with very small price movements like `1e-18` where we can reach limitations of floating point precision.
+	 */
+	base?: number;
 }
 
 /**
