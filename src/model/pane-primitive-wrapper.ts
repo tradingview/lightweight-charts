@@ -14,6 +14,7 @@ import {
 import {
 	ISeriesPrimitiveBase,
 } from './iseries-primitive';
+import { drawingUtils } from './primitive-drawing-utils';
 
 class PrimitiveRendererWrapper implements IPaneRenderer {
 	private readonly _baseRenderer: IPrimitivePaneRenderer;
@@ -23,11 +24,11 @@ class PrimitiveRendererWrapper implements IPaneRenderer {
 	}
 
 	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-		this._baseRenderer.draw(target);
+		this._baseRenderer.draw(target, drawingUtils);
 	}
 
 	public drawBackground?(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-		this._baseRenderer.drawBackground?.(target);
+		this._baseRenderer.drawBackground?.(target, drawingUtils);
 	}
 }
 
