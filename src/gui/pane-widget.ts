@@ -453,10 +453,17 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._canvasBinding.bitmapSize;
 	}
 
-	public drawBitmap(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+	public drawBitmap(ctx: CanvasRenderingContext2D, x: number, y: number, addTopLayer?: boolean): void {
 		const bitmapSize = this.getBitmapSize();
 		if (bitmapSize.width > 0 && bitmapSize.height > 0) {
 			ctx.drawImage(this._canvasBinding.canvasElement, x, y);
+
+			if (addTopLayer) {
+				const topLayer = this._topCanvasBinding.canvasElement;
+				if (ctx !== null) {
+					ctx.drawImage(topLayer, x, y);
+				}
+			}
 		}
 	}
 

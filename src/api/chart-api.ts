@@ -7,6 +7,7 @@ import { warn } from '../helpers/logger';
 import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-checks';
 
 import { ChartOptionsImpl, ChartOptionsInternal } from '../model/chart-model';
+import { CrosshairMode } from '../model/crosshair';
 import { DataUpdatesConsumer, isFulfilledData, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from '../model/data-layer';
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
@@ -285,8 +286,29 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		return this._chartWidget.options() as Readonly<ChartOptionsImpl<HorzScaleItem>>;
 	}
 
-	public takeScreenshot(): HTMLCanvasElement {
-		return this._chartWidget.takeScreenshot();
+	public takeScreenshot(addTopLayer: boolean = false, includeCrosshair: boolean = false): HTMLCanvasElement {
+		let crosshairMode: CrosshairMode | undefined;
+		let screenshotCanvas: HTMLCanvasElement;
+		try {
+			if (!includeCrosshair) {
+				crosshairMode = this._chartWidget.model().options().crosshair.mode;
+				this._chartWidget.applyOptions({
+					crosshair: {
+						mode: CrosshairMode.Hidden,
+					},
+				});
+			}
+			screenshotCanvas = this._chartWidget.takeScreenshot(addTopLayer);
+		} finally {
+			if (!includeCrosshair && crosshairMode !== undefined) {
+				this._chartWidget.model().applyOptions({
+					crosshair: {
+						mode: crosshairMode,
+					},
+				});
+			}
+		}
+		return screenshotCanvas;
 	}
 
 	public addPane(preserveEmptyPane: boolean = false): IPaneApi<HorzScaleItem> {

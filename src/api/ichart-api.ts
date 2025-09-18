@@ -272,9 +272,11 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	/**
 	 * Make a screenshot of the chart with all the elements excluding crosshair.
 	 *
+	 * @param addTopLayer - if true, the top layer and primitives will be included in the screenshot (default: false)
+	 * @param includeCrosshair - works only if addTopLayer is enabled. If true, the crosshair will be included in the screenshot (default: false)
 	 * @returns A canvas with the chart drawn on. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
 	 */
-	takeScreenshot(): HTMLCanvasElement;
+	takeScreenshot(addTopLayer?: boolean, includeCrosshair?: boolean): HTMLCanvasElement;
 
 	/**
 	 * Add a pane to the chart
