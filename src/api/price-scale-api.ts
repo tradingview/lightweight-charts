@@ -6,6 +6,8 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { isDefaultPriceScale } from '../model/default-price-scale';
 import { PriceRangeImpl } from '../model/price-range-impl';
 import { PriceScale, PriceScaleOptions } from '../model/price-scale';
+import { convertPriceRangeFromLog } from '../model/price-scale-conversions';
+import { precisionByMinMove } from '../model/series-options';
 import { IRange } from '../model/time-data';
 
 import { IPriceScaleApi } from './iprice-scale-api';
@@ -43,10 +45,31 @@ export class PriceScaleApi implements IPriceScaleApi {
 	}
 
 	public getVisibleRange(): IRange<number> | null {
-		const range = this._priceScale().priceRange();
-		return range === null ? null : {
-			from: range.minValue(),
-			to: range.maxValue(),
+		let range = this._priceScale().priceRange();
+
+		if (range === null) {
+			return null;
+		}
+
+		let from: number;
+		let to: number;
+
+		if (this._priceScale().isLog()) {
+			const minMove = this._priceScale().minMove();
+			const minMovePrecision = precisionByMinMove(minMove);
+
+			range = convertPriceRangeFromLog(range, this._priceScale().getLogFormula());
+
+			from = Number((Math.round(range.minValue() / minMove) * minMove).toFixed(minMovePrecision));
+			to = Number((Math.round(range.maxValue() / minMove) * minMove).toFixed(minMovePrecision));
+		} else {
+			from = range.minValue();
+			to = range.maxValue();
+		}
+
+		return {
+			from,
+			to,
 		};
 	}
 
