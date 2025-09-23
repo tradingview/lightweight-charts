@@ -22,7 +22,7 @@ export interface LineDrawingToolOptions {
 }
 
 export const defaultLineOptions: LineDrawingToolOptions = {
-	lineColor: 'rgba(0 , 0, 0, 1)',
+	lineColor: 'rgba(0, 0, 0, 1)',
 	previewLineColor: 'rgba(0, 0, 0, 0.5)',
 	lineWidth: 2,
 	labelColor: 'rgba(0, 0, 0, 1)',
