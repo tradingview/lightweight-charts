@@ -1,6 +1,7 @@
 import { Time } from './horz-scale-behavior-time/types';
 import { CustomData, CustomSeriesWhitespaceData } from './icustom-series';
 import { Series } from './series';
+import { SeriesPlotRow } from './series-data';
 import { SeriesType } from './series-options';
 
 /**
@@ -238,4 +239,5 @@ export interface SeriesDataItemTypeMap<HorzScaleItem = Time> {
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType, HorzScaleItem = Time> {
 	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType][]): void;
 	updateData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType], historicalUpdate: boolean): void;
+	popData(series: Series<TSeriesType>, count: number): SeriesPlotRow<TSeriesType>[];
 }
