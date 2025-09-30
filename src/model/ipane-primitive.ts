@@ -1,5 +1,7 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
+import { LineStyle } from '../renderers/draw-line';
+
 /**
  * This interface represents rendering some element on the canvas
  */
@@ -8,9 +10,10 @@ export interface IPrimitivePaneRenderer {
 	 * Method to draw main content of the element
 	 *
 	 * @param target - canvas context to draw on, refer to FancyCanvas library for more details about this class
+	 * @param utils - exposes drawing utilities (such as setLineStyle) from the library to plugins
 	 *
 	 */
-	draw(target: CanvasRenderingTarget2D): void;
+	draw(target: CanvasRenderingTarget2D, utils?: DrawingUtils): void;
 
 	/**
 	 * Optional method to draw the background.
@@ -18,8 +21,9 @@ export interface IPrimitivePaneRenderer {
 	 * Usually this is some kind of watermarks or time areas highlighting.
 	 *
 	 * @param target - canvas context to draw on, refer FancyCanvas library for more details about this class
+	 * @param utils - exposes drawing utilities (such as setLineStyle) from the library to plugins
 	 */
-	drawBackground?(target: CanvasRenderingTarget2D): void;
+	drawBackground?(target: CanvasRenderingTarget2D, utils?: DrawingUtils): void;
 }
 
 /**
@@ -140,4 +144,17 @@ export interface IPanePrimitiveBase<TPaneAttachedParameters = unknown> {
 	 * @param y - y Coordinate of mouse event
 	 */
 	hitTest?(x: number, y: number): PrimitiveHoveredItem | null;
+}
+
+/**
+ * Helper drawing utilities exposed by the library to a Primitive (a.k.a plugin).
+ */
+export interface DrawingUtils {
+	/**
+	 * Drawing utility to change the line style on the canvas context to one of the
+	 * built-in line styles.
+	 * @param ctx - 2D rendering context for the target canvas.
+	 * @param lineStyle - Built-in {@link LineStyle} to set on the canvas context.
+	 */
+	readonly setLineStyle: (ctx: CanvasRenderingContext2D, lineStyle: LineStyle) => void;
 }

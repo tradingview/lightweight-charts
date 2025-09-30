@@ -15,6 +15,7 @@ import {
 } from './iseries-primitive';
 import { PrimitiveWrapper } from './pane-primitive-wrapper';
 import { PriceScale } from './price-scale';
+import { drawingUtils } from './primitive-drawing-utils';
 import { Series } from './series';
 import { AutoscaleInfo, SeriesType } from './series-options';
 import { Logical, TimePointIndex } from './time-data';
@@ -28,11 +29,11 @@ class SeriesPrimitiveRendererWrapper implements IPaneRenderer {
 	}
 
 	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-		this._baseRenderer.draw(target);
+		this._baseRenderer.draw(target, drawingUtils);
 	}
 
 	public drawBackground?(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
-		this._baseRenderer.drawBackground?.(target);
+		this._baseRenderer.drawBackground?.(target, drawingUtils);
 	}
 }
 
