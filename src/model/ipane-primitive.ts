@@ -151,10 +151,10 @@ export interface IPanePrimitiveBase<TPaneAttachedParameters = unknown> {
  */
 export interface DrawingUtils {
 	/**
- 	* Drawing utility to change the line style on the canvas context to one of the
- 	* built-in line styles.
- 	* @param ctx - 2D rending context for the target canvas.
- 	* @param lineStyle - Built-in {@link LineStyle} to set on the canvas context.
- 	*/
+	 * Drawing utility to change the line style on the canvas context to one of the
+	 * built-in line styles.
+	 * @param ctx - 2D rendering context for the target canvas.
+	 * @param lineStyle - Built-in {@link LineStyle} to set on the canvas context.
+	 */
 	readonly setLineStyle: (ctx: CanvasRenderingContext2D, lineStyle: LineStyle) => void;
 }
