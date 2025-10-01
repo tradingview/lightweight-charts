@@ -17,11 +17,14 @@ export function shapeSize(shape: SeriesMarkerShape, originalSize: number): numbe
 	switch (shape) {
 		case 'arrowDown':
 		case 'arrowUp':
-			return size(originalSize, 1);
+			return size(originalSize, 0.5);
 		case 'circle':
-			return size(originalSize, 0.8);
+			return size(originalSize, 0.5);
 		case 'square':
-			return size(originalSize, 0.7);
+			return size(originalSize, 0.5);
+		case 'triangleUp':
+		case 'triangleDown':
+			return size(originalSize, 0.5);
 	}
 }
 
