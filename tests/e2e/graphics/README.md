@@ -1,13 +1,13 @@
 # Graphics tests
 
-This tests uses [puppeteer](https://github.com/GoogleChrome/puppeteer) to generate screenshots and then [pixelmatch](https://github.com/mapbox/pixelmatch) to compare them.
+This tests uses [puppeteer](https://github.com/GoogleChrome/puppeteer) to generate screenshots and then [blazediff](https://blazediff.dev) to compare them.
 
 ## How it works
 
 1. If there are local files to serve - run web server.
 1. Run `node:test` with loaded test cases.
 1. Then, for each test case, open webpage by `puppeteer` for golden and test version, take 2 screenshots.
-1. Compare given screenshots by `pixelmatch`, write them in out folder (with HTML pages).
+1. Compare given screenshots by `blazediff`, write them in out folder (with HTML pages).
 
 ## Writing new test case
 

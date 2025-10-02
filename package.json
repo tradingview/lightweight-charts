@@ -55,6 +55,7 @@
     "fancy-canvas": "2.1.0"
   },
   "devDependencies": {
+    "@blazediff/core": "~1.1.0",
     "@juggle/resize-observer": "3.4.0",
     "@rollup/plugin-node-resolve": "16.0.1",
     "@rollup/plugin-replace": "6.0.2",
@@ -65,7 +66,6 @@
     "@types/express": "5.0.1",
     "@types/glob": "8.1.0",
     "@types/node": "22",
-    "@types/pixelmatch": "5.2.6",
     "@types/pngjs": "6.0.5",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/eslint-plugin-tslint": "7.0.2",
@@ -95,7 +95,6 @@
     "markdownlint-cli": "0.44.0",
     "memlab": "1.1.57",
     "npm-run-all": "4.1.5",
-    "pixelmatch": "7.1.0",
     "pngjs": "7.0.0",
     "puppeteer": "24.6.1",
     "rimraf": "6.0.1",
