@@ -1,4 +1,4 @@
-import pixelmatch from 'pixelmatch';
+import blazediff from '@blazediff/core';
 import { PNG } from 'pngjs';
 
 export interface CompareResult {
@@ -20,7 +20,7 @@ export function compareScreenshots(leftImg: PNG, rightImg: PNG): CompareResult {
 		height: rightImg.height,
 	});
 
-	const diffPixelsCount = pixelmatch(
+	const diffPixelsCount = blazediff(
 		leftImg.data, rightImg.data,
 		diffImg.data,
 		leftImg.width, leftImg.height,
