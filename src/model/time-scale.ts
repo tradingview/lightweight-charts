@@ -829,7 +829,10 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			return;
 		}
 
-		this.setVisibleRange(new RangeImpl(first, last), true);
+		// If we are not using rightOffsetPixels then we should include the user defined rightOffset
+		// in the Range so that the bar scaling considers the space required for the offset.
+		const rightOffsetBars = (!this._options.rightOffsetPixels && this._options.rightOffset) || 0;
+		this.setVisibleRange(new RangeImpl(first, last + rightOffsetBars as TimePointIndex), true);
 	}
 
 	public setLogicalRange(range: LogicalRange): void {
