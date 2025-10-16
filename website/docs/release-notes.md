@@ -16,6 +16,42 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.0.9
+
+**Enhancements**
+
+- Added `rightOffsetPixels` option to `HorzScaleOptions`, allowing margin space from the right side of the chart to be set in pixels. This option takes precedence over `rightOffset` and ensures consistent pixel offset when using `fitContent` on charts with different amounts of data. The pixel-based offset remains consistent during zoom operations. (PR [#1957](https://github.com/tradingview/lightweight-charts/pull/1957))
+- Added `pop` method to series API that removes a specified number of data points from the end of the series and returns the removed data. (PR [#1949](https://github.com/tradingview/lightweight-charts/pull/1949), fixes [#1518](https://github.com/tradingview/lightweight-charts/issues/1518), contributed by [@tpunt](https://github.com/tpunt))
+- Enhanced `takeScreenshot` method with two new optional parameters:
+  - `addTopLayer` - includes top layer primitives in the screenshot (default: false)
+  - `includeCrosshair` - includes the crosshair when `addTopLayer` is enabled (default: false)
+  (PR [#1977](https://github.com/tradingview/lightweight-charts/pull/1977))
+- Added `autoScale` option to `SeriesMarkersOptions`, allowing control over whether markers are included in the auto-scaling calculation of the price scale. When enabled (default: true), the chart will adjust its scale to ensure markers are fully visible. (PR [#1940](https://github.com/tradingview/lightweight-charts/pull/1940), contributed by [@zbinlin](https://github.com/zbinlin))
+- Added `base` option to price format configuration as an alternative to `minMove`. This helps avoid floating-point precision limitations when dealing with extremely small price movements. (PR [#1952](https://github.com/tradingview/lightweight-charts/pull/1952))
+- Enhanced plugin API with additional functionality:
+  - Added `lastValueData()` method to the public series API
+  - Exposed `setLineStyle` drawing utility through a new `DrawingUtils` interface
+  (PR [#1956](https://github.com/tradingview/lightweight-charts/pull/1956), contributed by [@tpunt](https://github.com/tpunt))
+
+**Bug Fixes**
+
+- Fixed price scale visible range calculation when in logarithmic scale mode by properly converting the range from log space and handling precision issues with rounding. (PR [#1965](https://github.com/tradingview/lightweight-charts/pull/1965), contributed by [@tpunt](https://github.com/tpunt))
+
+**Plugin & Indicator Examples**
+
+- Added _Dual Range Histogram Series_ custom plugin example that visualizes paired positive and negative value ranges for each time point using a column-based display. (PR [#1934](https://github.com/tradingview/lightweight-charts/pull/1934))
+- Added _Pretty Histogram_ plugin example demonstrating non-standard histogram rendering. (PR [#1930](https://github.com/tradingview/lightweight-charts/pull/1930))
+- Added examples demonstrating how to implement indicators (studies) within Lightweight Charts. See the [Analysis Indicators tutorial](https://tradingview.github.io/lightweight-charts/tutorials#analysis-indicators) for more information. (PR [#1915](https://github.com/tradingview/lightweight-charts/pull/1915))
+
+**Contributors**
+
+We'd like to thank our external contributors for their valuable contributions to this release:
+
+- [@tpunt](https://github.com/tpunt) (Thomas Punt)
+- [@zbinlin](https://github.com/zbinlin) (Colin Cheng)
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.0.8..v5.0.9).
+
 ## 5.0.8
 
 **Enhancements**
@@ -331,7 +367,7 @@ Version 4.1 of Lightweight Charts introduces exciting new features, including th
 
 **Plugins**
 
-Developers can now leverage the power of Plugins in Lightweight Charts. Two types of Plugins are supported -  [Custom Series](/plugins/intro.md#custom-series) and [Drawing Primitives](/plugins/intro.md#drawing-primitives), offering the ability to define new series types and create custom visualizations, drawing tools, and annotations.
+Developers can now leverage the power of Plugins in Lightweight Charts. Two types of Plugins are supported -  [Custom Series](/plugins/intro.md#custom-series) and [Drawing Primitives](/plugins/intro.md#primitives), offering the ability to define new series types and create custom visualizations, drawing tools, and annotations.
 
 With the flexibility provided by these plugins, developers can create highly customizable charting applications for their users.
 
@@ -862,7 +898,7 @@ Thanks to our contributors:
 
 - Andree Yosua [@SuperPenguin](https://github.com/SuperPenguin)
 - kpaape [@kpaape](https://github.com/kpaape)
-- Matt Conway [@RetWolf](https://github.com/RetWolf)
+- Matt Conway [@mattsre](https://github.com/mattsre)
 
 See [issues assigned to this version’s milestone](https://github.com/tradingview/lightweight-charts/milestone/6?closed=1) or [changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v1.2.2..v2.0.0).
 

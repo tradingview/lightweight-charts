@@ -4,6 +4,7 @@ import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { SeriesDataItemTypeMap } from '../model/data-consumer';
 import { Time } from '../model/horz-scale-behavior-time/types';
+import { LastValueDataResult } from '../model/iseries';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
 import {
@@ -189,6 +190,19 @@ export interface ISeriesApi<
 	update(bar: TData, historicalUpdate?: boolean): void;
 
 	/**
+	 * Removes one or more data items from the end of the series.
+	 *
+	 * @param count - The number of data items to remove.
+	 * @returns The removed data items.
+	 * @example Removing one data item from a series
+	 * ```js
+	 * const removedData = lineSeries.pop(1);
+	 * console.log(removedData);
+	 * ```
+	 */
+	pop(count: number): TData[];
+
+	/**
 	 * Returns a bar data by provided logical index.
 	 *
 	 * @param logicalIndex - Logical index
@@ -289,6 +303,22 @@ export interface ISeriesApi<
 	 * ```
 	 */
 	seriesType(): TSeriesType;
+
+	/**
+	 * Return the last value data of the series.
+	 *
+	 * @param globalLast - If false, get the last value in the current visible range. Otherwise, fetch the absolute last value
+	 * @returns The last value data of the series.
+	 * @example
+	 * ```js
+	 * const lineSeries = chart.addSeries(LineSeries);
+	 * console.log(lineSeries.lastValueData(true)); // { noData: false, price: 24.11, color: '#000000' }
+	 *
+	 * const candlestickSeries = chart.addCandlestickSeries();
+	 * console.log(candlestickSeries.lastValueData(false)); // { noData: false, price: 145.72, color: '#000000' }
+	 * ```
+	 */
+	lastValueData(globalLast: boolean): LastValueDataResult;
 
 	/**
 	 * Attaches additional drawing primitive to the series

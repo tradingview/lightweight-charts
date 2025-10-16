@@ -68,6 +68,14 @@ export interface HorzScaleOptions {
 	rightOffset: number;
 
 	/**
+	 * The margin space in pixels from the right side of the chart.
+	 * This option has priority over `rightOffset`.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	rightOffsetPixels?: number;
+
+	/**
 	 * The space between bars in pixels.
 	 *
 	 * @defaultValue `6`
@@ -297,6 +305,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._rightOffset = options.rightOffset;
 		this._barSpacing = options.barSpacing;
 		this._model = model;
+		this._checkRightOffsetPixels(options);
 
 		this._horzScaleBehavior = horzScaleBehavior;
 
@@ -338,6 +347,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		if (options.rightOffset !== undefined) {
 			this._model.setRightOffset(options.rightOffset);
 		}
+		this._checkRightOffsetPixels(options);
 
 		if (options.minBarSpacing !== undefined || options.maxBarSpacing !== undefined) {
 			// yes, if we apply bar spacing constrains then we need to correct bar spacing
@@ -532,7 +542,14 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	public setBarSpacing(newBarSpacing: number): void {
+		const oldBarSpacing = this._barSpacing;
 		this._setBarSpacing(newBarSpacing);
+		if (this._options.rightOffsetPixels !== undefined && oldBarSpacing !== 0) {
+			// when in pixel mode, zooming should keep the pixel offset, so we need to
+			// recalculate the bar offset.
+			const newRightOffset = this._rightOffset * oldBarSpacing / this._barSpacing;
+			this._rightOffset = newRightOffset;
+		}
 
 		// do not allow scroll out of visible bars
 		this._correctOffset();
@@ -631,7 +648,14 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._visibleRangeInvalidated = true;
 
 		this.setBarSpacing(this._options.barSpacing);
-		this.setRightOffset(this._options.rightOffset);
+
+		let newOffset: number;
+		if (this._options.rightOffsetPixels !== undefined) {
+			newOffset = this._options.rightOffsetPixels / this.barSpacing();
+		} else {
+			newOffset = this._options.rightOffset;
+		}
+		this.setRightOffset(newOffset);
 	}
 
 	public setBaseIndex(baseIndex: TimePointIndex | null): void {
@@ -796,10 +820,16 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		return this._baseIndexOrNull || 0 as TimePointIndex;
 	}
 
-	public setVisibleRange(range: RangeImpl<TimePointIndex>): void {
+	public setVisibleRange(range: RangeImpl<TimePointIndex>, applyDefaultOffset?: boolean): void {
 		const length = range.count();
-		this._setBarSpacing(this._width / length);
+		const pixelOffset = (applyDefaultOffset && this._options.rightOffsetPixels) || 0;
+		this._setBarSpacing((this._width - pixelOffset) / length);
 		this._rightOffset = range.right() - this.baseIndex();
+		if (applyDefaultOffset) {
+			this._rightOffset = pixelOffset
+				? pixelOffset / this.barSpacing()
+				: this._options.rightOffset;
+		}
 		this._correctOffset();
 		this._visibleRangeInvalidated = true;
 		this._model.recalculateAllPanes();
@@ -813,7 +843,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			return;
 		}
 
-		this.setVisibleRange(new RangeImpl(first, last + this._options.rightOffset as TimePointIndex));
+		this.setVisibleRange(new RangeImpl(first, last), true);
 	}
 
 	public setLogicalRange(range: LogicalRange): void {
@@ -1119,6 +1149,13 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			}
 		}
 		return x; // fallback to original index
+	}
+
+	private _checkRightOffsetPixels(options: DeepPartial<HorzScaleOptions>): void {
+		if (options.rightOffsetPixels !== undefined) {
+			const newOffset = options.rightOffsetPixels / (options.barSpacing || this._barSpacing);
+			this._model.setRightOffset(newOffset);
+		}
 	}
 }
 

@@ -1,23 +1,15 @@
 ---
-sidebar_label: 'Simple example'
-hide_table_of_contents: true
+sidebar_label: 'Basic example'
+hide_table_of_contents: false
 ---
 
-# React - Simple example
+# Basic React example
 
-:::info
+This example demonstrates how to embed Lightweight Charts™ in a React component. Use it as a starting point and adapt it to your needs by adding properties or additional functionality.
 
-The following only describes a relatively simple example that only renders an [area series](/docs/series-types#area) that could be tweaked to render any other type of [series](/docs/series-types).
+## Prepare your project
 
-For a more complete scenario where you could wrap Lightweight Charts™ into a component having sub components, please consult this [example](./advanced).
-
-:::
-
-On this page you will learn how to easily use Lightweight Charts™ with React.
-
-## Preparing your project
-
-For the example purpose we are using [Parcel starter kit](https://github.com/brandiqa/react-parcel-starter) but feel free to use any other tool or starter kit.
+Clone the [Parcel starter kit](https://github.com/brandiqa/react-parcel-starter) and install dependencies to set up a project. You can use any other tool or starter kit that fits your requirements.
 
 ```console
 git clone git@github.com:brandiqa/react-parcel-starter.git lwc-react
@@ -25,21 +17,14 @@ cd lwc-react
 npm install
 ```
 
-To run your project simply
+## Create a charting component
 
-```console
-npm start
-```
-
-This will create a web page accessible by default on [http://localhost:1234](http://localhost:1234).
-
-## Creating a charting component
-
-The example _React component_ on this page may not fit your requirements completely. Creating a general purpose declarative wrapper for Lightweight Charts™ imperative API is a challenge, but hopefully you can adapt this example to your use case.
+The code below defines a React component that renders a chart with an [area series](/docs/series-types#area). You can change the [series type](/docs/series-types) to any other, such as candlestick or line.
 
 :::info
 
-For this example we are using props to set chart colors based on the current theme (light or dark). In your real code it might be a better idea to use a [Context](https://reactjs.org/docs/context.html#when-to-use-context).
+In this example, chart colors are specified with props depending on the current theme (light or dark). In a real application, consider using [Context](https://react.dev/learn/passing-data-deeply-with-context) instead.
+
 :::
 
 import { ThemedChart } from '@site/src/components/tutorials/themed-chart-colors-wrapper';
@@ -48,9 +33,9 @@ import code from '!!raw-loader!@site/src/components/tutorials/simple-react-examp
 
 <CodeBlock replaceThemeConstants className="language-jsx">{code}</CodeBlock>
 
-and you'll have a reusable component that could then be enhanced, tweaked to meet your needs, adding properties and even functionalities.
+## Result
 
-If you've successfully followed all the steps you should see something similar to
+Execute the `npm start` command in the `lwc-react` folder to run the project locally. Then open `http://localhost:1234` in your web browser to see the result.
 
 import { App } from '@site/src/components/tutorials/simple-react-example';
 import styles from '@site/src/pages/chart.module.css';
@@ -58,3 +43,7 @@ import styles from '@site/src/pages/chart.module.css';
 <div className={styles.ChartContainer}>
     <ThemedChart ChartComponent={App}/>
 </div>
+
+## What's next?
+
+As a next step, consider the [advanced example](./advanced), which shows how to embed Lightweight Charts™ into a component having child components.

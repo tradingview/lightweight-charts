@@ -7,6 +7,11 @@ export function isBaseDecimal(value: number): boolean {
 		return false;
 	}
 
+	// cannot calculate exactly due to rounding error
+	if (value > 1e18) {
+		return true;
+	}
+
 	for (let current = value; current > 1; current /= 10) {
 		if ((current % 10) !== 0) {
 			return false;

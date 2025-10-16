@@ -262,7 +262,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		return this._crosshairMoved;
 	}
 
-	public takeScreenshot(): HTMLCanvasElement {
+	public takeScreenshot(addTopLayer: boolean = false): HTMLCanvasElement {
 		if (this._invalidateMask !== null) {
 			this._drawImpl(this._invalidateMask, performance.now());
 			this._invalidateMask = null;
@@ -274,7 +274,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		screenshotCanvas.height = screeshotBitmapSize.height;
 
 		const ctx = ensureNotNull(screenshotCanvas.getContext('2d'));
-		this._traverseLayout(ctx);
+		this._traverseLayout(ctx, addTopLayer);
 
 		return screenshotCanvas;
 	}
@@ -357,9 +357,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	 * draws the screenshot (if rendering context is passed) and returns the screenshot bitmap size
 	 *
 	 * @param ctx - if passed, used to draw the screenshot of widget
+	 * @param addTopLayer - if true, the top layer with crosshair and primitives will be drawn
 	 * @returns screenshot bitmap size
 	 */
-	private _traverseLayout(ctx: CanvasRenderingContext2D | null): Size {
+	private _traverseLayout(ctx: CanvasRenderingContext2D | null, addTopLayer?: boolean): Size {
 		let totalWidth = 0;
 		let totalHeight = 0;
 
@@ -372,7 +373,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 				const priceAxisWidget = ensureNotNull(position === 'left' ? paneWidget.leftPriceAxisWidget() : paneWidget.rightPriceAxisWidget());
 				const bitmapSize = priceAxisWidget.getBitmapSize();
 				if (ctx !== null) {
-					priceAxisWidget.drawBitmap(ctx, targetX, targetY);
+					priceAxisWidget.drawBitmap(ctx, targetX, targetY, addTopLayer);
 				}
 				targetY += bitmapSize.height;
 				if (paneIndex < this._paneWidgets.length - 1) {
@@ -396,7 +397,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			const paneWidget = this._paneWidgets[paneIndex];
 			const bitmapSize = paneWidget.getBitmapSize();
 			if (ctx !== null) {
-				paneWidget.drawBitmap(ctx, totalWidth, totalHeight);
+				paneWidget.drawBitmap(ctx, totalWidth, totalHeight, addTopLayer);
 			}
 			totalHeight += bitmapSize.height;
 			if (paneIndex < this._paneWidgets.length - 1) {
@@ -434,7 +435,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 					targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getBitmapSize().width;
 				}
 
-				this._timeAxisWidget.drawBitmap(ctx, targetX, totalHeight);
+				this._timeAxisWidget.drawBitmap(ctx, targetX, totalHeight, addTopLayer);
 				targetX += timeAxisBitmapSize.width;
 
 				if (this._isRightAxisVisible()) {

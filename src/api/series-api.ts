@@ -11,6 +11,7 @@ import { CustomPriceLine } from '../model/custom-price-line';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
+import { LastValueDataResult } from '../model/iseries';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { Pane } from '../model/pane';
 import { MismatchDirection } from '../model/plot-list';
@@ -161,6 +162,17 @@ export class SeriesApi<
 		this._onDataChanged('update');
 	}
 
+	public pop(count: number = 1): TData[] {
+		const poppedRows = this._dataUpdatesConsumer.popData(this._series, count);
+
+		if (poppedRows.length !== 0) {
+			this._onDataChanged('update');
+		}
+
+		const creator = getSeriesDataCreator<TSeriesType, HorzScaleItem>(this.seriesType());
+		return poppedRows.map((row: SeriesPlotRow<TSeriesType>) => creator(row) as TData);
+	}
+
 	public dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null {
 		const data = this._series.bars().search(logicalIndex as unknown as TimePointIndex, mismatchDirection);
 		if (data === null) {
@@ -216,6 +228,22 @@ export class SeriesApi<
 
 	public seriesType(): TSeriesType {
 		return this._series.seriesType();
+	}
+
+	public lastValueData(globalLast: boolean): LastValueDataResult {
+		const result = this._series.lastValueData(globalLast);
+
+		if (result.noData) {
+			return {
+				noData: true,
+			};
+		}
+
+		return {
+			noData: false,
+			price: result.price,
+			color: result.color,
+		};
 	}
 
 	public attachPrimitive(primitive: ISeriesPrimitive<HorzScaleItem>): void {
