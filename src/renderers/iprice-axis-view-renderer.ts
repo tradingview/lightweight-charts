@@ -9,6 +9,7 @@ export interface PriceAxisViewRendererCommonData {
 	background: string;
 	coordinate: number;
 	fixedCoordinate?: number;
+	renderCoordinate?: number;
 	additionalPaddingTop: number;
 	additionalPaddingBottom: number;
 }
