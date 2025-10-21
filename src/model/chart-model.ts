@@ -830,6 +830,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			index = Math.min(Math.max(visibleBars.left(), index), visibleBars.right()) as TimePointIndex;
 		}
 
+		index = this._crosshair.snapToVisibleSeriesIfNeeded(index);
+
 		const priceScale = pane.defaultPriceScale();
 		const firstValue = priceScale.firstValue();
 		if (firstValue !== null) {
