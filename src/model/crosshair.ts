@@ -277,11 +277,10 @@ export class Crosshair extends DataSource {
 
 		const model = this._model;
 		const timeScale = model.timeScale();
-		const visibleSeries = model.serieses().filter((series: ISeries<SeriesType>) => series.visible());
 
 		let closestLeftIndex: TimePointIndex | null = null;
 		let closestRightIndex: TimePointIndex | null = null;
-		for (const series of visibleSeries) {
+		for (const series of model.visibleSerieses()) {
 			const leftResult = series.bars().search(index, MismatchDirection.NearestLeft);
 			if (leftResult) {
 				if (leftResult.index === index) {
