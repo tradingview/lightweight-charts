@@ -1,3 +1,4 @@
+import { CustomConflationRules } from '../../model/conflation/types';
 import { HorzScaleOptions } from '../../model/time-scale';
 
 export const timeScaleOptionsDefaults: HorzScaleOptions = {
@@ -22,4 +23,7 @@ export const timeScaleOptionsDefaults: HorzScaleOptions = {
 	allowBoldLabels: true,
 	ignoreWhitespaceIndices: false,
 	enableConflation: false,
+	precomputeConflationOnInit: false,
+	precomputeConflationPriority: 'background',
+	customConflationRules: undefined as CustomConflationRules | undefined,
 };

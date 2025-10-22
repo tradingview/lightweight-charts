@@ -78,6 +78,15 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 		);
 	}
 
+	public getConflationReducer(): ((items: readonly unknown[]) => unknown) | undefined {
+		const reducer = this._paneView.conflationReducer; // eslint-disable-line @typescript-eslint/unbound-method
+		if (!reducer) {
+			return undefined;
+		}
+
+		return reducer as (items: readonly unknown[]) => unknown;
+	}
+
 	public priceValueBuilder(plotRow: CustomData<unknown> | CustomSeriesWhitespaceData<unknown>): CustomSeriesPricePlotValues {
 		return this._paneView.priceValueBuilder(plotRow);
 	}

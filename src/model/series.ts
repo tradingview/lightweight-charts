@@ -20,6 +20,7 @@ import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { BarPrice } from './bar';
 import { IChartModelBase } from './chart-model';
+import { CONFLATION_ERROR_MESSAGES, DEFAULT_CONFLATION_FACTORS } from './conflation/constants';
 import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { DataConflater } from './data-conflater';
@@ -109,6 +110,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private readonly _dataConflater: DataConflater<T> = new DataConflater<T>();
 	private _conflatedDataCache: SeriesPlotList<T> | null = null;
 	private _lastConflationFactor: number = 1;
+	private _customConflationReducer: ((items: readonly unknown[]) => unknown) | null = null;
 
 	public constructor(
 		model: IChartModelBase,
@@ -133,6 +135,25 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this._recreateFormatter();
 
 		this._paneView = createPaneView(this, this.model(), customPaneView);
+
+		if (this._seriesType === 'Custom') {
+			const paneView = this._paneView as ISeriesCustomPaneView;
+			let reducer: ((items: readonly unknown[]) => unknown) | undefined;
+
+			const wrapper = paneView as { getConflationReducer?: () => ((items: readonly unknown[]) => unknown) | undefined };
+			if (typeof wrapper.getConflationReducer === 'function') {
+				reducer = wrapper.getConflationReducer();
+			}
+
+			if (reducer === undefined) {
+				const fallback = paneView as { conflationReducer?: (items: readonly unknown[]) => unknown };
+				reducer = fallback.conflationReducer;
+			}
+
+			if (typeof reducer === 'function') {
+				this.setCustomConflationReducer(reducer);
+			}
+		}
 	}
 
 	public destroy(): void {
@@ -246,8 +267,13 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	public setData(data: readonly SeriesPlotRow<T>[], updateInfo?: SeriesUpdateInfo): void {
 		this._data.setData(data);
 
-		// Invalidate conflated data cache when new data is set
 		this._conflatedDataCache = null;
+
+		const ts = this.model().timeScale();
+		const tsOptions = ts.options();
+		if (tsOptions.enableConflation && tsOptions.precomputeConflationOnInit) {
+			this._schedulePrecomputeCommonLevels();
+		}
 
 		this._paneView.update('data');
 
@@ -315,24 +341,50 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return this._data;
 	}
 
+	public setCustomConflationReducer<TCustomData>(reducer: (items: readonly TCustomData[]) => TCustomData): void {
+		this._customConflationReducer = reducer as unknown as (items: readonly unknown[]) => unknown;
+		// reset cache to respect new reducer
+		this._conflatedDataCache = null;
+	}
+
 	public conflatedBars(): SeriesPlotList<T> {
 		const timeScale = this.model().timeScale();
-		const barSpacing = timeScale.barSpacing();
 		const conflationEnabled = timeScale.options().enableConflation;
+		const factor = conflationEnabled ? timeScale.conflationFactor() : 1;
 
-		// If conflation is disabled or bar spacing is large enough, return original data
-		if (!conflationEnabled || barSpacing >= 0.5) {
+		if (this._seriesType === 'Custom' && this._customConflationReducer === null) {
 			return this._data;
 		}
 
-		// Use bar spacing as the cache key instead of conflation factor
-		const cacheKey = Math.round(barSpacing * 1000);
-		if (this._conflatedDataCache === null || this._lastConflationFactor !== cacheKey) {
-			this._regenerateConflatedDataAdaptive(barSpacing);
-			this._lastConflationFactor = cacheKey;
+		if (!conflationEnabled || factor <= 1) {
+			return this._data;
+		}
+
+		if (this._conflatedDataCache === null || this._lastConflationFactor !== factor) {
+			this._regenerateConflatedDataByFactor(factor);
+			this._lastConflationFactor = factor;
 		}
 
 		return this._conflatedDataCache !== null ? this._conflatedDataCache : this._data;
+	}
+
+	public precomputeConflationLevels(levels: number[], priority: 'background' | 'user-visible' | 'user-blocking'): void {
+		if (this._seriesType === 'Custom' && this._customConflationReducer === null) {
+			return;
+		}
+		const rows = this._data.rows();
+		const uniqueSorted = Array.from(new Set(levels)).sort((a: number, b: number) => a - b);
+		for (const lvl of uniqueSorted) {
+			if (this._seriesType === 'Custom' && this._customConflationReducer !== null) {
+				const priceValueBuilder = this.customSeriesPlotValuesBuilder();
+				if (!priceValueBuilder) {
+					continue;
+				}
+				this._regenerateConflatedDataByFactor(lvl);
+			} else {
+				this._dataConflater.precomputeByFactor(rows, lvl, priority);
+			}
+		}
 	}
 
 	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {
@@ -681,12 +733,45 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return res;
 	}
 
-	private _regenerateConflatedDataAdaptive(barSpacing: number): void {
+	private _regenerateConflatedDataByFactor(factor: number): void {
+		if (process.env.NODE_ENV === 'development') {
+			// eslint-disable-next-line no-console
+			console.time(`series:regenerate:${factor}`);
+		}
 		const originalRows = this._data.rows();
-		const conflatedRows = this._dataConflater.conflateDataAdaptive(originalRows, barSpacing);
 
-		// Create a new plot list with conflated data
+		const customRules = this.model().timeScale().options().customConflationRules;
+		if (customRules) {
+			this._dataConflater.setCustomConflationRules(customRules);
+		}
+
+		let conflatedRows: SeriesPlotRow<T>[];
+		if (this._seriesType === 'Custom' && this._customConflationReducer !== null) {
+			const priceValueBuilder = this.customSeriesPlotValuesBuilder();
+			if (!priceValueBuilder) {
+				throw new Error(CONFLATION_ERROR_MESSAGES.missingPriceValueBuilder);
+			}
+			conflatedRows = this._dataConflater.conflateByFactor(
+				originalRows,
+				factor,
+				this._customConflationReducer as unknown as (items: readonly unknown[]) => unknown,
+				true, // isCustomSeries
+				(item: unknown) => priceValueBuilder(item as CustomData<unknown>) // Wrap the priceValueBuilder
+			) as unknown as SeriesPlotRow<T>[];
+		} else {
+			conflatedRows = this._dataConflater.conflateByFactor(originalRows, factor);
+		}
 		this._conflatedDataCache = createSeriesPlotList<T>();
 		this._conflatedDataCache.setData(conflatedRows);
+		if (process.env.NODE_ENV === 'development') {
+			// eslint-disable-next-line no-console
+			console.timeEnd(`series:regenerate:${factor}`);
+		}
+	}
+
+	private _schedulePrecomputeCommonLevels(): void {
+		const timeScale = this.model().timeScale();
+		const { precomputeConflationPriority } = timeScale.options();
+		this.precomputeConflationLevels(DEFAULT_CONFLATION_FACTORS, precomputeConflationPriority);
 	}
 }

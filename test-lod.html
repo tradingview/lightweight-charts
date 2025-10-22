@@ -154,7 +154,17 @@
 					secondsVisible: false,
 					barSpacing: 0.2,
 					minBarSpacing: 1200/ window.devicePixelRatio/300000, // make all data visible
-					enableConflation: conflationEnabled
+					enableConflation: conflationEnabled,
+					precomputeConflationOnInit: true,
+					customConflationRules: {
+						rules: [
+							{ barsToMerge: 5, forBarSpacingLargerThan: 0.3 },
+							{ barsToMerge: 10, forBarSpacingLargerThan: 0.1 },
+							{ barsToMerge: 200, forBarSpacingLargerThan: 0.005 }
+						],
+						replaceDefaults: true
+					}
+					// precomputeConflationPriority: 'background'
 				},
 				grid: {
 					vertLines: { color: '#e1e1e1' },
