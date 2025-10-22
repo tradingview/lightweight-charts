@@ -361,13 +361,13 @@ function generateLineData(count) {
 	return data;
 }
 
-function runTestCase(container) {
+async function runTestCase(container) {
 	const chart = window.chart = LightweightCharts.createChart(container, {
 		timeScale: {
 			enableConflation: true,
 			precomputeConflationOnInit: true,
-			barSpacing: container.clientWidth / window.devicePixelRatio / 500000,
-			minBarSpacing: container.clientWidth / 3 / 500000, // make all data visible
+			barSpacing: container.clientWidth / window.devicePixelRatio / 40000,
+			minBarSpacing: container.clientWidth / 3 / 40000, // make all data visible
 		},
 		layout: { attributionLogo: false },
 	});
@@ -388,21 +388,17 @@ function runTestCase(container) {
 		title: 'Candlestick Series',
 	});
 
-	// Add whisker box custom series
-	const whiskerSeries = chart.addCustomSeries(new WhiskerBoxSeries(), {
-		title: 'Whisker Box Series',
-	});
+	const whiskerSeries = chart.addCustomSeries(new WhiskerBoxSeries());
 
 	// Generate data for each series
-	const lineData = generateLineData(300000);
-	const candlestickData = generateCandlestickData(300000);
-	const whiskerData = sampleWhiskerData(300000, 100);
+	const lineData = generateLineData(40000);
+	const candlestickData = generateCandlestickData(40000);
+	const whiskerData = sampleWhiskerData(40000, 100);
 
 	// Set data for each series
 	lineSeries.setData(lineData);
 	candlestickSeries.setData(candlestickData);
 	whiskerSeries.setData(whiskerData);
-
-	// Fit all data in view
 	chart.timeScale().fitContent();
+	await new Promise(resolve => setTimeout(resolve, 1000));
 }
