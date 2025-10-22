@@ -88,41 +88,6 @@ export type AnyConflationStrategy<T extends SeriesType> =
 	| CustomConflationStrategy;
 
 /**
- * Built-in conflation strategies for different series types.
- */
-export interface BuiltInConflationStrategies {
-	/**
-	 * Line series conflation - uses the last value
-	 */
-	Line: ConflationStrategy<'Line'>;
-
-	/**
-	 * Area series conflation - uses the last value
-	 */
-	Area: ConflationStrategy<'Area'>;
-
-	/**
-	 * Baseline series conflation - preserves top/bottom values
-	 */
-	Baseline: ConflationStrategy<'Baseline'>;
-
-	/**
-	 * Candlestick series conflation - preserves OHLC
-	 */
-	Candlestick: ConflationStrategy<'Candlestick'>;
-
-	/**
-	 * Bar series conflation - preserves OHLC
-	 */
-	Bar: ConflationStrategy<'Bar'>;
-
-	/**
-	 * Histogram series conflation - uses the maximum value
-	 */
-	Histogram: ConflationStrategy<'Histogram'>;
-}
-
-/**
  * Type-safe conflation configuration for a series.
  */
 export interface ConflationConfig<T extends SeriesType> {
@@ -154,33 +119,4 @@ export interface ConflationCacheEntry<T extends SeriesType> {
 	results: Map<number, ConflationResult<T>>;
 	inflight: Map<number, Promise<void>>;
 	lastAccessed: number;
-}
-
-/**
- * Streaming conflation processor for memory-efficient large dataset processing.
- */
-export interface StreamingConflationProcessor<T extends SeriesType> {
-	/**
-	 * Process a chunk of data and return conflated results.
-	 */
-	process(chunk: readonly SeriesPlotRow<T>[]): SeriesPlotRow<T>[];
-
-	/**
-	 * Reset the processor state.
-	 */
-	reset(): void;
-
-	/**
-	 * Get any remaining data that hasn't been processed.
-	 */
-	flush(): SeriesPlotRow<T>[];
-
-	/**
-	 * Get current processing statistics.
-	 */
-	getStats(): {
-		itemsProcessed: number;
-		chunksGenerated: number;
-		currentBufferSize: number;
-	};
 }
