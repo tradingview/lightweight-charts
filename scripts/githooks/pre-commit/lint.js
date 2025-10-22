@@ -45,6 +45,7 @@ function shellEscape(arg) {
 	}
 
 	return `"${arg
+		.replace(/\\/g, '\\\\')
 		.replace(/"/g, '\\"')
 		.replace(/\$/g, '\\$')
 		.replace(/`/g, '\\`')
