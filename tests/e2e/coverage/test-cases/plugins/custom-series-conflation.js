@@ -382,7 +382,6 @@ function beforeInteractions(container) {
 
 	const data = sampleWhiskerData();
 	data[data.length - 3] = { time: data[data.length - 3].time }; // test whitespace data
-	const lastPoint = data[data.length - 1];
 	myCustomSeries.setData(data.slice(0, -1));
 
 	chart.subscribeClick(p => {
