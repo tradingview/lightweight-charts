@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import rateLimit from 'express-rate-limit';
 
 const currentFilePath = fileURLToPath(import.meta.url);
 
@@ -25,6 +26,14 @@ export function serveLocalFiles(
 	}
 
 	const app = express();
+
+	// Set up rate limiter: maximum 100 requests per 15 minutes per IP
+	const limiter = rateLimit({
+		windowMs: 15 * 60 * 1000, // 15 minutes
+		max: 100, // Limit each IP to 100 requests per windowMs
+	});
+	app.use(limiter);
+
 	app.get('/:filename', (req: Request, res: Response) => {
 		const requestedFile = filesToServe.get(req.params.filename);
 		if (requestedFile === undefined) {
