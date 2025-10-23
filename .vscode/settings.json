@@ -8,5 +8,13 @@
         "website/build/**": true,
         "website/docs/api/**": true,
     },
-    "typescript.tsdk": "node_modules\\typescript\\lib"
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "master"
+    ],
+    "python.testing.pytestArgs": [
+        "debug"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
