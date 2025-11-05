@@ -102,7 +102,7 @@ export class _CLASSNAME_
 		return null;
 	}
 
-	dataUpdated(scope: DataChangedScope): void {
+	dataUpdated(_scope: DataChangedScope): void {
 		//* This method will be called by PluginBase when the data on the
 		//* series has changed.
 	}
