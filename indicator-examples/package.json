@@ -9,7 +9,7 @@
     },
     "devDependencies": {
         "typescript": "5.5.4",
-        "vite": "^6.4.1"
+        "vite": "6.4.1"
     },
     "dependencies": {
         "dts-bundle-generator": "^9.5.1",
