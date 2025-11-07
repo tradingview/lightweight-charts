@@ -1,14 +1,13 @@
-import { DEFAULT_CONFLATION_RULES } from './conflation/constants';
-import { ConflationRule, CustomConflationRules } from './conflation/types';
+import { CONFLATION_LEVELS, DPR_CONFLATION_THRESHOLD, MAX_CONFLATION_LEVEL } from './conflation/constants';
 import { TimePoint } from './horz-scale-behavior-time/types';
-import { CustomConflationContext } from './icustom-series';
+import { CustomConflationContext, CustomConflationReducer, CustomData } from './icustom-series';
 import { PlotRowValueIndex } from './plot-data';
 import { SeriesPlotRow } from './series-data';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 
 /**
- * Represents a conflated chunk of data points.
+ * Represents a conflated chunk of data points with remainder handling.
  */
 export interface ConflatedChunk {
 	startIndex: TimePointIndex;
@@ -22,50 +21,45 @@ export interface ConflatedChunk {
 	originalDataCount: number;
 	// For custom series: the actual conflated data result from custom reducer
 	conflatedData?: unknown;
+	// Whether this chunk is a remainder (couldn't be merged at this level)
+	isRemainder?: boolean;
 }
 
 /**
- * Cache entry for conflation results.
+ * Cache entry for conflation results with recursive building support.
  */
 interface ConflationCacheEntry<T extends SeriesType> {
 	version: number;
 	results: Map<number, SeriesPlotRow<T>[]>;
+	levelResults: Map<number, SeriesPlotRow<T>[]>;
 }
-
-export { DEFAULT_CONFLATION_FACTORS } from './conflation/constants';
 
 export class DataConflater<T extends SeriesType> {
 	private _dataCache: WeakMap<readonly SeriesPlotRow<T>[], ConflationCacheEntry<T>> = new WeakMap();
-	private _customRules: ConflationRule[] | null = null;
 
-	/**
-	 * Conflates data based on adaptive bar spacing rules instead of a fixed factor.
-	 * Uses multiple levels of detail for optimal performance at different zoom levels.
-	 *
-	 * @param data - The original series data
-	 * @param barSpacing - Current bar spacing in pixels
-	 * @returns Conflated data array
-	 */
-	public conflateDataAdaptive(data: readonly SeriesPlotRow<T>[], barSpacing: number): SeriesPlotRow<T>[] {
-		if (data.length === 0) {
-			return [];
-		}
-
-		const rule = this._findConflationRule(barSpacing);
-		if (rule.barsToMerge <= 1) {
-			return data.slice();
-		}
-
-		return this.conflateByFactor(data, rule.barsToMerge);
+	public calculateConflationLevel(barSpacing: number, devicePixelRatio: number): number {
+		return this.calculateConflationLevelWithSmoothing(barSpacing, devicePixelRatio, 1.0);
 	}
 
-	/**
-	 * Conflates data using a fixed bars-to-merge factor. Cached per factor and invalidated on data change.
-	 */
+	public calculateConflationLevelWithSmoothing(barSpacing: number, devicePixelRatio: number, smoothingFactor: number): number {
+		const conflationThreshold = (DPR_CONFLATION_THRESHOLD / devicePixelRatio) * smoothingFactor;
+
+		if (barSpacing >= conflationThreshold) {
+			return 1;
+		}
+
+		// calculate conflation level as power of 2
+		const ratio = conflationThreshold / barSpacing;
+		const conflationLevel = Math.pow(2, Math.floor(Math.log2(ratio)));
+
+		// ensure we don't exceed maximum conflation level
+		return Math.min(conflationLevel, MAX_CONFLATION_LEVEL);
+	}
+
 	public conflateByFactor(
 		data: readonly SeriesPlotRow<T>[],
 		barsToMerge: number,
-		customReducer?: (items: readonly unknown[]) => unknown,
+		customReducer?: CustomConflationReducer<unknown>,
 		isCustomSeries: boolean = false,
 		priceValueBuilder?: (item: unknown) => number[]
 	): SeriesPlotRow<T>[] {
@@ -73,137 +67,99 @@ export class DataConflater<T extends SeriesType> {
 			return data.slice();
 		}
 
+		const conflationLevel = this._normalizeConflationLevel(barsToMerge);
+		if (conflationLevel === 1) {
+			return data.slice();
+		}
+
 		const entry = this._ensureCacheEntry(data);
 		const dataVersion = this._getDataVersion(data);
 
 		if (entry.version !== dataVersion) {
 			entry.results.clear();
+			entry.levelResults.clear();
 			entry.version = dataVersion;
 		}
 
-		const cachedRows = entry.results.get(barsToMerge);
+		let cachedRows = entry.levelResults.get(conflationLevel);
 		if (cachedRows !== undefined) {
 			return cachedRows;
 		}
 
-		const chunks = this._buildChunks(data, barsToMerge, customReducer, isCustomSeries, priceValueBuilder);
-		const rows = this._chunksToSeriesPlotRows(chunks, isCustomSeries);
-
-		entry.results.set(barsToMerge, rows);
-
-		return rows;
-	}
-
-	/**
-	 * Precompute and cache the conflation result for a given factor in background.
-	 */
-	public precomputeByFactor(
-		data: readonly SeriesPlotRow<T>[],
-		barsToMerge: number,
-		priority: 'background' | 'user-visible' | 'user-blocking' = 'background'
-	): void {
-		if (data.length === 0 || barsToMerge <= 1) {
-			return;
-		}
-
-		const entry = this._ensureCacheEntry(data);
-		const dataVersion = this._getDataVersion(data);
-
-		if (entry.version !== dataVersion) {
-			entry.results.clear();
-			entry.version = dataVersion;
-		}
-
-		if (entry.results.has(barsToMerge)) {
-			return;
-		}
-
-		const task = () => {
-			const chunks = this._buildChunks(data, barsToMerge);
-			const rows = this._chunksToSeriesPlotRows(chunks, false);
-			entry.results.set(barsToMerge, rows);
-		};
-
-		// Use Prioritized Task Scheduling API if available
-		const globalObj = ((typeof window === 'object' && window) || (typeof self === 'object' && self)) as unknown as {
-			scheduler?: {
-				postTask?: (cb: () => void, opts: { priority: 'background' | 'user-visible' | 'user-blocking' }) => Promise<void>;
-			};
-		} | undefined;
-
-		if (globalObj?.scheduler?.postTask) {
-			void globalObj.scheduler.postTask(() => { task(); }, { priority });
-		} else {
-			void Promise.resolve().then(() => task());
-		}
-	}
-
-	/**
-	 * Precompute conflation results for multiple factors in parallel.
-	 */
-	public async precomputeConflationLevels(
-		data: readonly SeriesPlotRow<T>[],
-		factors: number[],
-		priority: 'background' | 'user-visible' | 'user-blocking' = 'background'
-	): Promise<void> {
-		if (data.length === 0) {
-			return;
-		}
-
-		const entry = this._ensureCacheEntry(data);
-		const dataVersion = this._getDataVersion(data);
-
-		if (entry.version !== dataVersion) {
-			entry.results.clear();
-			entry.version = dataVersion;
-		}
-
-		// Filter out already computed factors
-		const factorsToCompute = factors.filter((factor: number) =>
-			!entry.results.has(factor)
+		cachedRows = this._buildRecursively(
+			data,
+			conflationLevel,
+			customReducer,
+			isCustomSeries,
+			priceValueBuilder,
+			entry.levelResults
 		);
 
-		if (factorsToCompute.length === 0) {
-			return;
+		entry.levelResults.set(conflationLevel, cachedRows);
+		return cachedRows;
+	}
+
+	/**
+	 * Calculate effective bar spacing for precomputation decisions.
+	 */
+	public calculateEffectiveBarSpacing(
+		minBarSpacing: number,
+		currentBarSpacing: number,
+		width: number,
+		dataLength: number
+	): number {
+		return Math.max(
+			minBarSpacing,
+			Math.min(currentBarSpacing, width / dataLength)
+		);
+	}
+
+	public getMaxNeededConflationLevel(effectiveBarSpacing: number, devicePixelRatio: number): number {
+		return this.calculateConflationLevel(effectiveBarSpacing, devicePixelRatio);
+	}
+
+	/**
+	 * Efficiently update the last conflated chunk when new data arrives.
+	 * This avoids rebuilding all chunks when just the last data point changes.
+	 */
+	public updateLastConflatedChunk(
+		originalData: readonly SeriesPlotRow<T>[],
+		newLastRow: SeriesPlotRow<T>,
+		conflationLevel: number,
+		customReducer?: CustomConflationReducer<unknown>,
+		isCustomSeries: boolean = false,
+		priceValueBuilder?: (item: unknown) => number[]
+	): SeriesPlotRow<T>[] {
+		if (conflationLevel <= 1 || originalData.length === 0) {
+			return originalData.slice();
 		}
 
-		// Create tasks for parallel processing
-		const tasks = factorsToCompute.map((factor: number) => {
-			// eslint-disable-next-line @typescript-eslint/require-await
-			const task = async () => {
-				const startTime = performance.now();
+		const entry = this._ensureCacheEntry(originalData);
+		const dataVersion = this._getDataVersion(originalData);
 
-				try {
-					this.precomputeByFactor(data, factor, priority);
-					const duration = performance.now() - startTime;
-
-					if (process.env.NODE_ENV === 'development') {
-						// eslint-disable-next-line no-console
-						console.log(`Precomputed conflation factor ${factor} in ${duration.toFixed(2)}ms`);
-					}
-				} catch (error) {
-					// eslint-disable-next-line no-console
-					console.error(`Error precomputing conflation factor ${factor}:`, error);
-				}
-			};
-
-			return task;
-		});
-
-		// Use Prioritized Task Scheduling API if available
-		const globalObj = ((typeof window === 'object' && window) || (typeof self === 'object' && self)) as unknown as {
-			scheduler?: { postTask?: (cb: () => void, opts: { priority: string }) => Promise<void> };
-		} | undefined;
-
-		if (globalObj?.scheduler?.postTask) {
-			const promises = tasks.map((task: () => void) =>
-				globalObj.scheduler?.postTask?.(task, { priority }) || Promise.resolve(task())
-			);
-			await Promise.all(promises);
-		} else {
-			// Fallback to regular Promise execution
-			await Promise.all(tasks.map((task: () => void) => task()));
+		if (entry.version !== dataVersion) {
+			entry.results.clear();
+			entry.levelResults.clear();
+			entry.version = dataVersion;
 		}
+
+		const cachedRows = entry.levelResults.get(conflationLevel);
+		if (!cachedRows) {
+			return this.conflateByFactor(originalData, conflationLevel, customReducer, isCustomSeries, priceValueBuilder);
+		}
+
+		const updatedRows = this._updateLastChunkInCache(
+			originalData,
+			newLastRow,
+			conflationLevel,
+			cachedRows,
+			customReducer,
+			isCustomSeries,
+			priceValueBuilder
+		);
+
+		entry.levelResults.set(conflationLevel, updatedRows);
+		return updatedRows;
 	}
 
 	/**
@@ -217,62 +173,13 @@ export class DataConflater<T extends SeriesType> {
 		}
 	}
 
-	/**
-	 * Sets custom conflation rules to override the default ones.
-	 *
-	 * @param customRules - The custom conflation rules configuration
-	 */
-	public setCustomConflationRules(customRules: CustomConflationRules): void {
-		if (customRules.rules && customRules.rules.length > 0) {
-			for (const rule of customRules.rules) {
-				if (rule.barsToMerge < 1) {
-					throw new Error('barsToMerge must be at least 1');
-				}
-				if (rule.forBarSpacingLargerThan < 0) {
-					throw new Error('forBarSpacingLargerThan must be non-negative');
-				}
-			}
-
-			const sortedRules = [...customRules.rules].sort((a: ConflationRule, b: ConflationRule) => b.forBarSpacingLargerThan - a.forBarSpacingLargerThan);
-
-			if (customRules.replaceDefaults) {
-				this._customRules = sortedRules;
-			} else {
-				this._customRules = this._mergeRules(DEFAULT_CONFLATION_RULES, sortedRules);
-			}
-		} else {
-			this._customRules = null;
-		}
-	}
-
-	/**
-	 * Merges default rules with custom rules, giving priority to custom rules.
-	 */
-	private _mergeRules(defaultRules: ConflationRule[], customRules: ConflationRule[]): ConflationRule[] {
-		const mergedRules: ConflationRule[] = [];
-		const customSpacingValues = new Set(customRules.map((r: ConflationRule) => r.forBarSpacingLargerThan));
-
-		// Add default rules that don't conflict with custom rules
-		for (const defaultRule of defaultRules) {
-			if (!customSpacingValues.has(defaultRule.forBarSpacingLargerThan)) {
-				mergedRules.push(defaultRule);
+	private _normalizeConflationLevel(barsToMerge: number): number {
+		for (const level of CONFLATION_LEVELS) {
+			if (barsToMerge <= level) {
+				return level;
 			}
 		}
-
-		mergedRules.push(...customRules);
-
-		return mergedRules.sort((a: ConflationRule, b: ConflationRule) => b.forBarSpacingLargerThan - a.forBarSpacingLargerThan);
-	}
-
-	private _findConflationRule(barSpacing: number): ConflationRule {
-		const rules = this._customRules || DEFAULT_CONFLATION_RULES;
-		for (const rule of rules) {
-			if (barSpacing >= rule.forBarSpacingLargerThan) {
-				return rule;
-			}
-		}
-
-		return { barsToMerge: 1, forBarSpacingLargerThan: 0.5 };
+		return MAX_CONFLATION_LEVEL;
 	}
 
 	private _getDataVersion(data: readonly SeriesPlotRow<T>[]): number {
@@ -286,157 +193,213 @@ export class DataConflater<T extends SeriesType> {
 	}
 
 	/**
-	 * Rebuilds conflated chunks for the given rule.
+	 * Build conflation recursively, reusing previous level results.
 	 */
-	private _buildChunks(
+	private _buildRecursively(
 		data: readonly SeriesPlotRow<T>[],
-		barsToMerge: number,
-		customReducer?: (items: readonly unknown[]) => unknown,
+		targetLevel: number,
+		customReducer?: CustomConflationReducer<unknown>,
+		isCustomSeries: boolean = false,
+		priceValueBuilder?: (item: unknown) => number[],
+		levelResults: Map<number, SeriesPlotRow<T>[]> = new Map()
+	): SeriesPlotRow<T>[] {
+		if (targetLevel === 2) {
+			return this._buildLevelFromOriginal(data, 2, customReducer, isCustomSeries, priceValueBuilder);
+		}
+
+		const prevLevel = targetLevel / 2;
+		let prevData = levelResults.get(prevLevel);
+
+		if (!prevData) {
+			prevData = this._buildRecursively(data, prevLevel, customReducer, isCustomSeries, priceValueBuilder, levelResults);
+			levelResults.set(prevLevel, prevData);
+		}
+
+		return this._buildLevelFromPrevious(prevData, targetLevel, customReducer, isCustomSeries, priceValueBuilder);
+	}
+
+	/**
+	 * Build a conflation level directly from original data (used for level 2).
+	 */
+	private _buildLevelFromOriginal(
+		data: readonly SeriesPlotRow<T>[],
+		level: number,
+		customReducer?: CustomConflationReducer<unknown>,
+		isCustomSeries: boolean = false,
+		priceValueBuilder?: (item: unknown) => number[]
+	): SeriesPlotRow<T>[] {
+		const chunks = this._buildChunksFromData(data, level, customReducer, isCustomSeries, priceValueBuilder);
+		return this._chunksToSeriesPlotRows(chunks, isCustomSeries);
+	}
+
+	/**
+	 * Build a conflation level from the previous level's result.
+	 */
+	private _buildLevelFromPrevious(
+		prevData: SeriesPlotRow<T>[],
+		targetLevel: number,
+		customReducer?: CustomConflationReducer<unknown>,
+		isCustomSeries: boolean = false,
+		priceValueBuilder?: (item: unknown) => number[]
+	): SeriesPlotRow<T>[] {
+		const chunks = this._buildChunksFromData(prevData, 2, customReducer, isCustomSeries, priceValueBuilder);
+
+		for (const chunk of chunks) {
+			chunk.originalDataCount *= (targetLevel / 2);
+		}
+
+		return this._chunksToSeriesPlotRows(chunks, isCustomSeries);
+	}
+
+	/**
+	 * Build chunks by merging items, handling remainders by merging them into previous chunks.
+	 * This eliminates visual gaps by combining remainders with the last full chunk.
+	 */
+	private _buildChunksFromData(
+		data: readonly SeriesPlotRow<T>[],
+		mergeFactor: number,
+		customReducer?: CustomConflationReducer<unknown>,
 		isCustomSeries: boolean = false,
 		priceValueBuilder?: (item: unknown) => number[]
 	): ConflatedChunk[] {
-		const chunks: ConflatedChunk[] = [];
-		let currentChunk: ConflatedChunk | null = null;
-		let dataPointsInChunk = 0;
-		let currentItems: unknown[] = [];
+		const estimatedNumberChunks = Math.max(1, Math.ceil(data.length / mergeFactor));
+		const chunks: ConflatedChunk[] = new Array(estimatedNumberChunks);
+		let chunkWriteIndex = 0;
 
-		for (let i = 0; i < data.length; i++) {
-			const row = data[i];
+		for (let i = 0; i < data.length; i += mergeFactor) {
+			const itemsToMerge = Math.min(mergeFactor, data.length - i);
 
-			if (currentChunk === null || dataPointsInChunk >= barsToMerge) {
-				// Finalize current chunk if it exists
-				if (currentChunk !== null) {
-					chunks.push(currentChunk);
-				}
-
-				// Start a new chunk
-				currentItems = [row as unknown];
-				currentChunk = this._createNewChunk(row);
-				dataPointsInChunk = 1;
+			if (itemsToMerge === mergeFactor) {
+				const chunk = this._mergeItems(
+					data.slice(i, i + mergeFactor),
+					customReducer,
+					isCustomSeries,
+					priceValueBuilder
+				);
+				chunk.isRemainder = false;
+				chunks[chunkWriteIndex++] = chunk;
 			} else {
-				// Add to existing chunk
-				this._updateChunk(currentChunk, row, currentItems, customReducer, isCustomSeries, priceValueBuilder);
-				dataPointsInChunk++;
+				const remainderData = data.slice(i);
+
+				if (chunkWriteIndex === 0) {
+					for (const remainder of remainderData) {
+						const chunk: ConflatedChunk = {
+							startIndex: remainder.index,
+							endIndex: remainder.index,
+							startTime: remainder.time as unknown as TimePoint,
+							endTime: remainder.time as unknown as TimePoint,
+							open: remainder.value[PlotRowValueIndex.Open],
+							high: remainder.value[PlotRowValueIndex.High],
+							low: remainder.value[PlotRowValueIndex.Low],
+							close: remainder.value[PlotRowValueIndex.Close],
+							originalDataCount: 1,
+						};
+						chunk.isRemainder = true;
+						chunks[chunkWriteIndex++] = chunk;
+					}
+				} else {
+					const lastChunkStartIndex = Math.max(0, i - mergeFactor);
+					const lastChunkEndIndex = i;
+					const lastChunkData = data.slice(lastChunkStartIndex, lastChunkEndIndex);
+
+					const combinedData = [...lastChunkData, ...remainderData];
+
+					const mergedChunk = this._mergeItems(
+						combinedData,
+						customReducer,
+						isCustomSeries,
+						priceValueBuilder
+					);
+					mergedChunk.isRemainder = false;
+					chunks[chunkWriteIndex - 1] = mergedChunk;
+				}
 			}
 		}
 
-		// Add the last chunk if it exists
-		if (currentChunk !== null) {
-			chunks.push(currentChunk);
-		}
-		return chunks;
+		return chunks.slice(0, chunkWriteIndex);
 	}
 
-	private _createNewChunk(row: SeriesPlotRow<T>): ConflatedChunk {
-		const seedPrice = this._extractPrice(row);
-		return {
-			startIndex: row.index,
-			endIndex: row.index,
-			startTime: row.time as unknown as TimePoint,
-			endTime: row.time as unknown as TimePoint,
-			open: seedPrice,
-			high: seedPrice,
-			low: seedPrice,
-			close: seedPrice,
-			originalDataCount: 1,
-		};
-	}
-
-	private _updateChunk(
-		chunk: ConflatedChunk,
-		row: SeriesPlotRow<T>,
-		currentItems: unknown[],
-		customReducer?: (items: readonly unknown[]) => unknown,
+	private _mergeItems(
+		items: SeriesPlotRow<T>[],
+		customReducer?: CustomConflationReducer<unknown>,
 		isCustomSeries: boolean = false,
 		priceValueBuilder?: (item: unknown) => number[]
-	): void {
-		chunk.endIndex = row.index;
-		chunk.endTime = row.time as unknown as TimePoint;
-		currentItems.push(row as unknown);
-
-		const price = this._extractPrice(row);
-
-		if (customReducer && currentItems.length > 0) {
-			if (isCustomSeries && priceValueBuilder) {
-				this._handleCustomSeriesConflation(chunk, currentItems, customReducer, priceValueBuilder);
-			} else {
-				this._handleBuiltInSeriesConflation(chunk, currentItems, customReducer);
-			}
-		} else {
-			chunk.high = Math.max(chunk.high, price);
-			chunk.low = Math.min(chunk.low, price);
-			chunk.close = price;
+	): ConflatedChunk {
+		if (items.length < 2) {
+			throw new Error(`Expected at least 2 items to merge, got ${items.length}`);
 		}
 
-		chunk.originalDataCount++;
-	}
+		const firstItem = items[0];
+		const lastItem = items[items.length - 1];
 
-	/**
-	 * Handles conflation for custom series using a custom reducer.
-	 */
-	private _handleCustomSeriesConflation(
-		chunk: ConflatedChunk,
-		currentItems: unknown[],
-		customReducer: (items: readonly unknown[]) => unknown,
-		priceValueBuilder: (item: unknown) => number[]
-	): void {
-		// Convert SeriesPlotRow items to CustomConflationContext for custom series
-		const contextItems = this._convertToContextItems(currentItems, priceValueBuilder);
-		const aggregatedData = customReducer(contextItems);
+		if (!isCustomSeries || !customReducer || !priceValueBuilder) {
+			const high = Math.max(...items.map((item: SeriesPlotRow<T>) => item.value[PlotRowValueIndex.High]));
+			const low = Math.min(...items.map((item: SeriesPlotRow<T>) => item.value[PlotRowValueIndex.Low]));
 
-		// Store the conflated data result on the chunk
-		chunk.conflatedData = aggregatedData;
+			return {
+				startIndex: firstItem.index,
+				endIndex: lastItem.index,
+				startTime: firstItem.time as unknown as TimePoint,
+				endTime: lastItem.time as unknown as TimePoint,
+				open: firstItem.value[PlotRowValueIndex.Open],
+				high,
+				low,
+				close: lastItem.value[PlotRowValueIndex.Close],
+				originalDataCount: items.length,
+			};
+		}
 
-		// Update OHLC values based on the aggregated data
+		const contexts = items.map((item: SeriesPlotRow<T>) => this._convertToContext(item, priceValueBuilder));
+		let aggregatedData = customReducer(contexts[0], contexts[1]);
+
+		for (let i = 2; i < contexts.length; i++) {
+			const tempContext: CustomConflationContext<unknown, CustomData<unknown>> = {
+				data: aggregatedData,
+				index: contexts[0].index,
+				originalTime: contexts[0].originalTime,
+				time: contexts[0].time,
+				priceValues: priceValueBuilder(aggregatedData),
+			};
+			aggregatedData = customReducer(tempContext, contexts[i]);
+		}
+
 		const priceValues = priceValueBuilder(aggregatedData);
 		const aggregatedPrice = priceValues.length > 0 ? priceValues[priceValues.length - 1] : 0;
 
-		chunk.high = Math.max(chunk.high, aggregatedPrice);
-		chunk.low = Math.min(chunk.low, aggregatedPrice);
-		chunk.close = aggregatedPrice;
+		return {
+			startIndex: firstItem.index,
+			endIndex: lastItem.index,
+			startTime: firstItem.time as unknown as TimePoint,
+			endTime: lastItem.time as unknown as TimePoint,
+			open: firstItem.value[PlotRowValueIndex.Open],
+			high: Math.max(firstItem.value[PlotRowValueIndex.High], aggregatedPrice),
+			low: Math.min(firstItem.value[PlotRowValueIndex.Low], aggregatedPrice),
+			close: aggregatedPrice,
+			originalDataCount: items.length,
+			conflatedData: aggregatedData,
+		};
 	}
 
 	/**
-	 * Handles conflation for built-in series using a custom reducer.
+	 * Convert a SeriesPlotRow to CustomConflationContext.
 	 */
-	private _handleBuiltInSeriesConflation(
-		chunk: ConflatedChunk,
-		currentItems: unknown[],
-		customReducer: (items: readonly unknown[]) => unknown
-	): void {
-		const aggregatedRow = customReducer(currentItems) as SeriesPlotRow<T>;
-		const aggregatedPrice = this._extractPrice(aggregatedRow);
-
-		chunk.high = Math.max(chunk.high, aggregatedPrice);
-		chunk.low = Math.min(chunk.low, aggregatedPrice);
-		chunk.close = aggregatedPrice;
-	}
-
-	/**
-	 * Converts SeriesPlotRow items to CustomConflationContext items.
-	 */
-	private _convertToContextItems(
-		items: unknown[],
+	private _convertToContext(
+		item: SeriesPlotRow<T>,
 		priceValueBuilder: (item: unknown) => number[]
-	): CustomConflationContext[] {
-		return items.map((item: unknown) => {
-			const plotRow = item as SeriesPlotRow<T>;
-			const customPlotRow = plotRow as SeriesPlotRow<T> & { data?: Record<string, unknown> };
+	): CustomConflationContext<unknown, CustomData<unknown>> {
+		const itemData = (item as SeriesPlotRow<T> & { data?: Record<string, unknown> }).data || {};
 
-			const itemData = customPlotRow.data || {};
-
-			return {
-				data: itemData,
-				index: plotRow.index,
-				originalTime: plotRow.originalTime,
-				time: plotRow.time,
-				priceValues: priceValueBuilder(itemData),
-			} as unknown as CustomConflationContext;
-		});
+		return {
+			data: itemData as unknown as CustomData<unknown>,
+			index: item.index,
+			originalTime: item.originalTime,
+			time: item.time,
+			priceValues: priceValueBuilder(itemData),
+		} satisfies CustomConflationContext<unknown, CustomData<unknown>>;
 	}
 
 	/**
-	 * Converts conflated chunks back to SeriesPlotRow format.
+	 * Convert conflated chunks back to SeriesPlotRow format.
 	 */
 	private _chunksToSeriesPlotRows(chunks: ConflatedChunk[], isCustomSeries: boolean = false): SeriesPlotRow<T>[] {
 		const result: SeriesPlotRow<T>[] = [];
@@ -448,21 +411,23 @@ export class DataConflater<T extends SeriesType> {
 					// Custom reducer provided conflated data - use it directly
 					const conflatedRow = {
 						index: chunk.startIndex,
-						time: chunk.endTime,
-						originalTime: chunk.endTime,
+						time: chunk.startTime,
+						originalTime: chunk.startTime,
 						value: [chunk.close, chunk.high, chunk.low, chunk.close], // Keep OHLC for compatibility
 						data: conflatedData, // Use the actual conflated data from custom reducer
+						originalDataCount: chunk.originalDataCount,
 					};
 					result.push(conflatedRow as unknown as SeriesPlotRow<T>);
 				} else {
 					const conflatedRow = {
 						index: chunk.startIndex,
-						time: chunk.endTime,
-						originalTime: chunk.endTime,
+						time: chunk.startTime,
+						originalTime: chunk.startTime,
 						value: [chunk.close, chunk.high, chunk.low, chunk.close],
 						data: {
-							time: chunk.endTime,
+							time: chunk.startTime,
 						},
+						originalDataCount: chunk.originalDataCount,
 					};
 					result.push(conflatedRow as unknown as SeriesPlotRow<T>);
 				}
@@ -470,9 +435,10 @@ export class DataConflater<T extends SeriesType> {
 				// built-in series use the standard format
 				const conflatedRow = {
 					index: chunk.startIndex,
-					time: chunk.endTime,
-					originalTime: chunk.endTime,
+					time: chunk.startTime,
+					originalTime: chunk.startTime,
 					value: [chunk.open, chunk.high, chunk.low, chunk.close],
+					originalDataCount: chunk.originalDataCount,
 				};
 				result.push(conflatedRow as unknown as SeriesPlotRow<T>);
 			}
@@ -481,8 +447,72 @@ export class DataConflater<T extends SeriesType> {
 		return result;
 	}
 
-	private _extractPrice(row: SeriesPlotRow<T>): number {
-		return row.value[PlotRowValueIndex.Close];
+	/**
+	 * Update only the last chunk in cached conflated data efficiently.
+	 */
+	// eslint-disable-next-line max-params
+	private _updateLastChunkInCache(
+		originalData: readonly SeriesPlotRow<T>[],
+		newLastRow: SeriesPlotRow<T>,
+		conflationLevel: number,
+		cachedRows: SeriesPlotRow<T>[],
+		customReducer?: CustomConflationReducer<unknown>,
+		isCustomSeries: boolean = false,
+		priceValueBuilder?: (item: unknown) => number[]
+	): SeriesPlotRow<T>[] {
+		if (cachedRows.length === 0) {
+			return cachedRows;
+		}
+
+		const lastOriginalIndex = originalData.length - 1;
+		const chunkStartIndex = Math.floor(lastOriginalIndex / conflationLevel) * conflationLevel;
+		const chunkEndIndex = Math.min(chunkStartIndex + conflationLevel, originalData.length);
+
+		if (chunkEndIndex - chunkStartIndex !== conflationLevel) {
+			// last chunk is incomplete (remainder), need to rebuild from scratch
+			return this.conflateByFactor(originalData, conflationLevel, customReducer, isCustomSeries, priceValueBuilder);
+		}
+
+		const newOriginalData = originalData.slice(0, -1);
+		newOriginalData.push(newLastRow);
+
+		const lastChunkIndex = Math.floor((lastOriginalIndex - 1) / conflationLevel);
+		const newChunkIndex = Math.floor((newOriginalData.length - 1) / conflationLevel);
+
+		if (lastChunkIndex === newChunkIndex && chunkEndIndex - chunkStartIndex === conflationLevel) {
+			const chunkData = newOriginalData.slice(chunkStartIndex, chunkStartIndex + conflationLevel);
+			const updatedChunk = this._mergeItems(chunkData, customReducer, isCustomSeries, priceValueBuilder);
+			const updatedRows = cachedRows.slice(0, -1);
+			updatedRows.push(this._chunkToSeriesPlotRow(updatedChunk, isCustomSeries));
+			return updatedRows;
+		} else {
+			// update affects chunk structure - need full rebuild
+			return this.conflateByFactor(newOriginalData, conflationLevel, customReducer, isCustomSeries, priceValueBuilder);
+		}
+	}
+
+	/**
+	 * Convert a chunk back to SeriesPlotRow format.
+	 */
+	private _chunkToSeriesPlotRow(chunk: ConflatedChunk, isCustomSeries: boolean = false): SeriesPlotRow<T> {
+		if (isCustomSeries && chunk.conflatedData) {
+			return {
+				index: chunk.startIndex,
+				time: chunk.startTime,
+				originalTime: chunk.startTime,
+				value: [chunk.close, chunk.high, chunk.low, chunk.close],
+				data: chunk.conflatedData,
+				originalDataCount: chunk.originalDataCount,
+			} as unknown as SeriesPlotRow<T>;
+		} else {
+			return {
+				index: chunk.startIndex,
+				time: chunk.startTime,
+				originalTime: chunk.startTime,
+				value: [chunk.open, chunk.high, chunk.low, chunk.close],
+				originalDataCount: chunk.originalDataCount,
+			} as unknown as SeriesPlotRow<T>;
+		}
 	}
 
 	private _ensureCacheEntry(data: readonly SeriesPlotRow<T>[]): ConflationCacheEntry<T> {
@@ -491,6 +521,7 @@ export class DataConflater<T extends SeriesType> {
 			entry = {
 				version: this._getDataVersion(data),
 				results: new Map(),
+				levelResults: new Map(),
 			};
 			this._dataCache.set(data, entry);
 		}

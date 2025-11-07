@@ -11,6 +11,6 @@ export interface ISeriesCustomPaneView<
 > extends IUpdatablePaneView {
 	priceValueBuilder(plotRow: TData | CustomSeriesWhitespaceData<HorzScaleItem>): CustomSeriesPricePlotValues;
 	isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem>;
-	conflationReducer?(items: readonly CustomConflationContext<HorzScaleItem, TData>[]): TData;
+	conflationReducer: undefined | ((item1: CustomConflationContext<HorzScaleItem, TData>, item2: CustomConflationContext<HorzScaleItem, TData>) => TData);
 }
 export type BuiltInPaneViewFactory<T extends SeriesType> = (series: ISeries<T>, model: IChartModelBase) => IUpdatablePaneView;

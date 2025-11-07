@@ -8,6 +8,7 @@ import { IChartModelBase } from '../chart-model';
 import { Coordinate } from '../coordinate';
 import {
 	CustomBarItemData,
+	CustomConflationContext,
 	CustomData,
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
@@ -78,13 +79,9 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 		);
 	}
 
-	public getConflationReducer(): ((items: readonly unknown[]) => unknown) | undefined {
-		const reducer = this._paneView.conflationReducer; // eslint-disable-line @typescript-eslint/unbound-method
-		if (!reducer) {
-			return undefined;
-		}
-
-		return reducer as (items: readonly unknown[]) => unknown;
+	public get conflationReducer(): ((item1: CustomConflationContext<unknown, CustomData<unknown>>, item2: CustomConflationContext<unknown, CustomData<unknown>>) => CustomData<unknown>) | undefined {
+		// eslint-disable-next-line @typescript-eslint/unbound-method
+		return this._paneView.conflationReducer;
 	}
 
 	public priceValueBuilder(plotRow: CustomData<unknown> | CustomSeriesWhitespaceData<unknown>): CustomSeriesPricePlotValues {
@@ -126,6 +123,7 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 				bars: this._items.map(unwrapItemData) as CustomBarItemData<unknown>[],
 				barSpacing: this._model.timeScale().barSpacing(),
 				visibleRange: this._itemsVisibleRange,
+				conflationFactor: this._model.timeScale().conflationFactor(),
 			},
 			this._series.options()
 		);

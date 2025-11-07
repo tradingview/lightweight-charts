@@ -42,7 +42,22 @@ export abstract class LinePaneViewBase<
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
 		this._items = this._series.conflatedBars().rows().map((row: SeriesPlotRow<TSeriesType>) => {
-			const value = row.value[PlotRowValueIndex.Close] as BarPrice;
+			const isConflated = (row.originalDataCount ?? 1) > 1;
+			let value: BarPrice;
+
+			if (isConflated) {
+				const high = row.value[PlotRowValueIndex.High];
+				const low = row.value[PlotRowValueIndex.Low];
+				const close = row.value[PlotRowValueIndex.Close];
+
+				const highMove = Math.abs(high - close);
+				const lowMove = Math.abs(low - close);
+
+				value = (highMove > lowMove) ? high as BarPrice : low as BarPrice;
+			} else {
+				value = row.value[PlotRowValueIndex.Close] as BarPrice;
+			}
+
 			return this._createRawItem(row.index, value, colorer);
 		});
 	}

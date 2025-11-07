@@ -83,6 +83,14 @@ export interface PaneRendererCustomData<
 	 * The current visible range of items on the chart.
 	 */
 	visibleRange: IRange<number> | null;
+	/**
+	 * Current conflation factor. The value represents how many data points have been combined
+	 * to form this conflated data point. This can be used to calculate the effective bar spacing
+	 * until the next data point. `effectiveBarSpacing = conflationFactor * barSpacing`. If you
+	 * are rendering a non-continuous series (like a Candlestick instead of Line) then you likely
+	 * would want to use the effectiveBarSpacing value for your width calculations.
+	 */
+	conflationFactor: number;
 }
 
 /**
@@ -161,6 +169,17 @@ export interface CustomConflationContext<
 }
 
 /**
+ * Reducer used for conflation of custom data points.
+ * Given exactly 2 custom data contexts, should return a single aggregated item.
+ * Each context provides access to the original data plus metadata needed for conflation.
+ * This simplified interface makes plugin development easier and ensures consistent performance.
+ */
+export type CustomConflationReducer<
+	HorzScaleItem = Time,
+	TData extends CustomData<HorzScaleItem> = CustomData<HorzScaleItem>
+> = (item1: CustomConflationContext<HorzScaleItem, TData>, item2: CustomConflationContext<HorzScaleItem, TData>) => TData;
+
+/**
  * This interface represents the view for the custom series
  */
 export interface ICustomSeriesPaneView<
@@ -219,8 +238,8 @@ export interface ICustomSeriesPaneView<
 
 	/**
 	 * Optional reducer used for conflation of custom data points.
-	 * Given a chunk of custom data contexts, should return a single aggregated item.
+	 * Given exactly 2 custom data contexts, should return a single aggregated item.
 	 * Each context provides access to the original data plus metadata needed for conflation.
 	 */
-	conflationReducer?(items: readonly CustomConflationContext<HorzScaleItem, TData>[]): TData;
+	conflationReducer?(item1: CustomConflationContext<HorzScaleItem, TData>, item2: CustomConflationContext<HorzScaleItem, TData>): TData;
 }

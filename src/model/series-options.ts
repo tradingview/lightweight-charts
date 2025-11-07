@@ -844,6 +844,22 @@ export interface SeriesOptionsCommon {
 	 * ```
 	 */
 	autoscaleInfoProvider?: AutoscaleInfoProvider;
+
+	/**
+	 * Conflation smoothing factor for this series. Overrides the global time scale option.
+	 * Controls how aggressively conflation is applied specifically to this series.
+	 *
+	 * - 1.0 = conflate only when display can't show detail (default, performance-focused)
+	 * - 2.0 = conflate at 2x the display threshold (moderate smoothing)
+	 * - 4.0 = conflate at 4x the display threshold (strong smoothing)
+	 * - 8.0+ = very aggressive smoothing for very small charts
+	 *
+	 * Higher values result in fewer data points being displayed for this series, creating smoother but less detailed charts.
+	 * This allows different series on the same chart to have different conflation levels.
+	 *
+	 * @defaultValue `undefined` (uses global time scale option)
+	 */
+	conflationSmoothingFactor?: number;
 }
 
 /**

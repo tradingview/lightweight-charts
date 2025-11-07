@@ -11,14 +11,6 @@ function beforeInteractions(container) {
 			barSpacing: 0.004,
 			enableConflation: true,
 			precomputeConflationOnInit: true,
-			customConflationRules: {
-				rules: [
-					{ barsToMerge: 5, forBarSpacingLargerThan: 0.3 },
-					{ barsToMerge: 10, forBarSpacingLargerThan: 0.1 },
-					{ barsToMerge: 200, forBarSpacingLargerThan: 0.005 },
-				],
-				replaceDefaults: true,
-			},
 			precomputeConflationPriority: 'false',
 		},
 	});

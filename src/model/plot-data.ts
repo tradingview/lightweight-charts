@@ -24,4 +24,6 @@ export interface PlotRow {
 	readonly originalTime: unknown;
 	readonly value: PlotRowValue;
 	readonly customValues?: Record<string, unknown>;
+	// For conflated rows: indicates how many original data points were merged into this row
+	readonly originalDataCount?: number;
 }
