@@ -390,6 +390,8 @@ export interface IChartModelBase {
 	options(): Readonly<ChartOptionsInternalBase>;
 	timeScale(): ITimeScale;
 	serieses(): readonly Series<SeriesType>[];
+	visibleSerieses(): readonly Series<SeriesType>[];
+	invalidateVisibleSeries(): void;
 
 	updateSource(source: IPriceDataSource): void;
 	updateCrosshair(): void;
@@ -463,6 +465,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private readonly _magnet: Magnet;
 
 	private _serieses: Series<SeriesType>[] = [];
+	private _visibleSerieses: Series<SeriesType>[] | null = null;
 
 	private _width: number = 0;
 	private _hoveredSource: HoveredSource | null = null;
@@ -820,6 +823,17 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		return this._serieses;
 	}
 
+	public visibleSerieses(): readonly Series<SeriesType>[] {
+		if (this._visibleSerieses === null) {
+			this._visibleSerieses = this._serieses.filter((s: ISeries<SeriesType>) => s.visible());
+		}
+		return this._visibleSerieses;
+	}
+
+	public invalidateVisibleSeries(): void {
+		this._visibleSerieses = null;
+	}
+
 	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane, skipEvent?: boolean): void {
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
@@ -829,6 +843,8 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		if (visibleBars !== null) {
 			index = Math.min(Math.max(visibleBars.left(), index), visibleBars.right()) as TimePointIndex;
 		}
+
+		index = this._crosshair.snapToVisibleSeriesIfNeeded(index);
 
 		const priceScale = pane.defaultPriceScale();
 		const firstValue = priceScale.firstValue();
@@ -960,6 +976,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		this._addSeriesToPane(series, pane);
 
 		this._serieses.push(series);
+		this.invalidateVisibleSeries();
 		if (this._serieses.length === 1) {
 			// call fullUpdate to recalculate chart's parts geometry
 			this.fullUpdate();
@@ -980,6 +997,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			series.destroy();
 		}
 
+		this.invalidateVisibleSeries();
 		this._timeScale.recalculateIndicesWithData();
 
 		this._cleanupIfPaneIsEmpty(paneImpl);

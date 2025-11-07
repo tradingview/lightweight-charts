@@ -41,6 +41,8 @@ describe('PriceScale', () => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
 			timeScale: () => ({} as any),
 			serieses: () => [],
+			visibleSerieses: () => [],
+			invalidateVisibleSeries: () => {},
 			updateSource: () => {},
 			updateCrosshair: () => {},
 			cursorUpdate: () => {},

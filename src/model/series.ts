@@ -211,29 +211,36 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	}
 
 	public applyOptions(options: SeriesPartialOptionsInternal<T>): void {
-		const targetPriceScaleId = options.priceScaleId;
-		if (targetPriceScaleId !== undefined && targetPriceScaleId !== this._options.priceScaleId) {
+		const model = this.model();
+
+		const { priceScaleId, visible, priceFormat } = options;
+
+		if (priceScaleId !== undefined && priceScaleId !== this._options.priceScaleId) {
 			// series cannot do it itself, ask model
-			this.model().moveSeriesToScale(this, targetPriceScaleId);
+			model.moveSeriesToScale(this, priceScaleId);
+		}
+
+		if (visible !== undefined && visible !== this._options.visible) {
+			model.invalidateVisibleSeries();
 		}
 
 		merge(this._options, options);
 
-		if (options.priceFormat !== undefined) {
+		if (priceFormat !== undefined) {
 			this._recreateFormatter();
 
 			// updated formatter might affect rendering  and as a consequence of this the width of price axis might be changed
 			// thus we need to force the chart to do a full update to apply changes correctly
 			// full update is quite heavy operation in terms of performance
 			// but updating formatter looks like quite rare so forcing a full update here shouldn't affect the performance a lot
-			this.model().fullUpdate();
+			model.fullUpdate();
 		}
 
-		this.model().updateSource(this);
+		model.updateSource(this);
 
 		// a series might affect crosshair by some options (like crosshair markers)
 		// that's why we need to update crosshair as well
-		this.model().updateCrosshair();
+		model.updateCrosshair();
 
 		this._paneView.update('options');
 	}
