@@ -105,18 +105,27 @@ class WhiskerBoxSeriesRenderer {
 		this._options = null;
 	}
 
-	draw(target, priceConverter) {
+	draw(
+		target,
+		priceConverter
+	) {
 		target.useMediaCoordinateSpace(scope =>
 			this._drawImpl(scope, priceConverter)
 		);
 	}
 
-	update(data, options) {
+	update(
+		data,
+		options
+	) {
 		this._data = data;
 		this._options = options;
 	}
 
-	_drawImpl(renderingScope, priceToCoordinate) {
+	_drawImpl(
+		renderingScope,
+		priceToCoordinate
+	) {
 		if (
 			this._data === null ||
 			this._data.bars.length === 0 ||
@@ -201,7 +210,12 @@ class WhiskerBoxSeriesRenderer {
 		renderingScope.context.restore();
 	}
 
-	_drawWhisker(ctx, bar, extremeLineWidth, options) {
+	_drawWhisker(
+		ctx,
+		bar,
+		extremeLineWidth,
+		options
+	) {
 		ctx.save();
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = options.whiskerColor;
@@ -219,7 +233,12 @@ class WhiskerBoxSeriesRenderer {
 		ctx.restore();
 	}
 
-	_drawBox(ctx, bar, bodyWidth, options) {
+	_drawBox(
+		ctx,
+		bar,
+		bodyWidth,
+		options
+	) {
 		ctx.save();
 		ctx.fillStyle = options.lowerQuartileFill;
 		ctx.fillRect(
@@ -238,7 +257,12 @@ class WhiskerBoxSeriesRenderer {
 		ctx.restore();
 	}
 
-	_drawMedianLine(ctx, bar, medianLineWidth, options) {
+	_drawMedianLine(
+		ctx,
+		bar,
+		medianLineWidth,
+		options
+	) {
 		ctx.save();
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = options.whiskerColor;
@@ -249,7 +273,12 @@ class WhiskerBoxSeriesRenderer {
 		ctx.restore();
 	}
 
-	_drawOutliers(ctx, bar, extremeLineWidth, options) {
+	_drawOutliers(
+		ctx,
+		bar,
+		extremeLineWidth,
+		options
+	) {
 		ctx.save();
 		ctx.fillStyle = options.outlierColor;
 		ctx.lineWidth = 0;
@@ -264,6 +293,7 @@ class WhiskerBoxSeriesRenderer {
 }
 
 const defaultOptions = {
+	...LightweightCharts.customSeriesDefaultOptions,
 	whiskerColor: '#456599',
 	lowerQuartileFill: '#846ED4',
 	upperQuartileFill: '#C44760',
@@ -301,7 +331,10 @@ class WhiskerBoxSeries {
 		return this._renderer;
 	}
 
-	update(data, options) {
+	update(
+		data,
+		options
+	) {
 		this._renderer.update(data, options);
 	}
 
@@ -309,7 +342,7 @@ class WhiskerBoxSeries {
 		return defaultOptions;
 	}
 
-	// conflation reducer - aggregates exactly 2 whisker boxes using the new 2-item interface
+	// Conflation reducer - aggregates exactly 2 whisker boxes using the new 2-item interface
 	// eslint-disable-next-line complexity
 	conflationReducer(item1, item2) {
 		const data1 = item1.data;
@@ -352,14 +385,11 @@ class WhiskerBoxSeries {
 			Math.max(...allQ4), // Max of maximums
 		];
 
-		// Create result with only the data properties (no time - time is handled separately)
 		const result = {
 			quartiles: Array.from(averagedQuartiles), // Force create plain array
 		};
 
-		// Keep some outliers if there are any
 		if (allOutliers.length > 0) {
-			// Keep a reasonable subset of outliers and ensure it's a plain array
 			result.outliers = Array.from(allOutliers.slice(0, 10));
 		}
 

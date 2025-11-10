@@ -11,14 +11,20 @@ function beforeInteractions(container) {
 			barSpacing: 0.004,
 			enableConflation: true,
 			precomputeConflationOnInit: true,
-			precomputeConflationPriority: 'false',
+			conflationSmoothingFactor: 2,
 		},
 	});
 
 	const mainSeries = chart.addSeries(LightweightCharts.HistogramSeries);
-	mainSeries.setData(generateHistogramData());
+	const data = generateHistogramData();
+	mainSeries.setData(data);
 
 	return new Promise(resolve => {
+		mainSeries.applyOptions({ conflationSmoothingFactor: 4 });
+		mainSeries.update({
+			...data[data.length - 1],
+			value: data[data.length - 1].value + 10,
+		});
 		requestAnimationFrame(resolve);
 	});
 }
