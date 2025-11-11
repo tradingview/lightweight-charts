@@ -18,6 +18,7 @@ export interface ConflatedChunk {
 	high: number;
 	low: number;
 	close: number;
+	data?: unknown;
 	originalDataCount: number;
 	// For custom series: the actual conflated data result from custom reducer
 	conflatedData?: unknown;
@@ -316,14 +317,14 @@ export class DataConflater<T extends SeriesType, HorzScaleItem = unknown> {
 				isRemainder: false,
 			};
 		}
-		const prevAgg = chunk.conflatedData;
+		const prevAgg = chunk.conflatedData as CustomData<HorzScaleItem> | undefined;
 		const ctx = this._convertToContext(row, priceValueBuilder);
 
-		// if prevAgg is missing (e.g., a single-item remainder chunk),
+		// if prevAgg is missing (e.g single-item remainder chunk)
 		// treat the row as the first aggregate seed to avoid calling builder on undefined.
-		const prevCtx = prevAgg
+		const prevCtx: CustomConflationContext<HorzScaleItem, CustomData<HorzScaleItem>> | null = prevAgg
 			? {
-				data: prevAgg as CustomData<HorzScaleItem>,
+				data: prevAgg,
 				index: chunk.startIndex,
 				originalTime: chunk.startTime as unknown as HorzScaleItem,
 				time: chunk.startTime,
@@ -370,12 +371,12 @@ export class DataConflater<T extends SeriesType, HorzScaleItem = unknown> {
 	}
 
 	private _convertToContext(
-		item: SeriesPlotRow<T>,
+		item: SeriesPlotRow<T> & { data?: unknown },
 		priceValueBuilder: (item: unknown) => number[]
 	): CustomConflationContext<HorzScaleItem, CustomData<HorzScaleItem>> {
-		const itemData = (item as SeriesPlotRow<T> & { data?: Record<string, unknown> }).data || {};
+		const itemData = item.data ?? {};
 		return {
-			data: itemData as unknown as CustomData<HorzScaleItem>,
+			data: item.data as CustomData<HorzScaleItem>,
 			index: item.index,
 			originalTime: item.originalTime as HorzScaleItem,
 			time: item.time,
@@ -389,7 +390,7 @@ export class DataConflater<T extends SeriesType, HorzScaleItem = unknown> {
 
 		const base = {
 			index: chunk.startIndex,
-			time: chunk.startTime,
+			time: chunk.startTime as unknown as HorzScaleItem,
 			originalTime: chunk.startTime as unknown as HorzScaleItem,
 			value: [
 				isCustom ? chunk.close : chunk.open,
@@ -407,7 +408,7 @@ export class DataConflater<T extends SeriesType, HorzScaleItem = unknown> {
 
 		return {
 			...base,
-			...(data ? { data } : {}),
+			data,
 		} as unknown as SeriesPlotRow<T>;
 	}
 
