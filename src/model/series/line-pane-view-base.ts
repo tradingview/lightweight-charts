@@ -53,6 +53,8 @@ export abstract class LinePaneViewBase<
 				const highMove = Math.abs(high - close);
 				const lowMove = Math.abs(low - close);
 
+				// in case of conflation we want to show more extreme price to represent the range
+				// and we choose the one which is further from the close price
 				value = (highMove > lowMove) ? high as BarPrice : low as BarPrice;
 			} else {
 				value = row.value[PlotRowValueIndex.Close] as BarPrice;

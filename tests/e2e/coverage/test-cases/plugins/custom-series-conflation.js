@@ -344,10 +344,10 @@ class WhiskerBoxSeries {
 
 		// Validate input data
 		if (!data1 || !data1.quartiles || !Array.isArray(data1.quartiles)) {
-			return data2 || { quartiles: [0, 0, 0, 0, 0] };
+			return (!data2 || !data2.quartiles) ? { quartiles: [0, 0, 0, 0, 0] } : data2;
 		}
 		if (!data2 || !data2.quartiles || !Array.isArray(data2.quartiles)) {
-			return data1 || { quartiles: [0, 0, 0, 0, 0] };
+			return (!data1 || !data1.quartiles) ? { quartiles: [0, 0, 0, 0, 0] } : data1;
 		}
 
 		// Ensure both quartile arrays have at least 5 elements

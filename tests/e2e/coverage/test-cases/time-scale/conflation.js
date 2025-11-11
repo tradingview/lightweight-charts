@@ -11,7 +11,7 @@ function beforeInteractions(container) {
 			barSpacing: 0.004,
 			enableConflation: true,
 			precomputeConflationOnInit: true,
-			conflationSmoothingFactor: 2,
+			conflationThresholdFactor: 2,
 		},
 	});
 
@@ -20,7 +20,7 @@ function beforeInteractions(container) {
 	mainSeries.setData(data);
 
 	return new Promise(resolve => {
-		mainSeries.applyOptions({ conflationSmoothingFactor: 4 });
+		mainSeries.applyOptions({ conflationThresholdFactor: 4 });
 		mainSeries.update({
 			...data[data.length - 1],
 			value: data[data.length - 1].value + 10,

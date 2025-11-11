@@ -859,7 +859,7 @@ export interface SeriesOptionsCommon {
 	 *
 	 * @defaultValue `undefined` (uses global time scale option)
 	 */
-	conflationSmoothingFactor?: number;
+	conflationThresholdFactor?: number;
 }
 
 /**

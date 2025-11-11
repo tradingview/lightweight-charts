@@ -22,7 +22,7 @@ export const timeScaleOptionsDefaults: HorzScaleOptions = {
 	allowBoldLabels: true,
 	ignoreWhitespaceIndices: false,
 	enableConflation: false,
-	conflationSmoothingFactor: 1,
+	conflationThresholdFactor: 1,
 	precomputeConflationOnInit: false,
 	precomputeConflationPriority: 'background',
 };

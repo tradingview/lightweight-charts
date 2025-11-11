@@ -257,7 +257,7 @@ export interface HorzScaleOptions {
 	 *
 	 * @defaultValue 1.0
 	 */
-	conflationSmoothingFactor?: number;
+	conflationThresholdFactor?: number;
 
 	/**
 	 * Precompute conflation chunks for common levels right after data load.
@@ -414,7 +414,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._invalidateTickMarks();
 		this._updateDateTimeFormatter();
 		// Recompute conflation factor when options that may affect it change
-		if (options.enableConflation !== undefined || options.conflationSmoothingFactor !== undefined) {
+		if (options.enableConflation !== undefined || options.conflationThresholdFactor !== undefined) {
 			this._updateConflationFactor();
 		}
 		this._optionsApplied.fire();
@@ -1079,7 +1079,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 
 		// Use DPR-aware threshold calculation with smoothing factor
 		const devicePixelRatio = window.devicePixelRatio || 1;
-		const smoothingFactor = this._options.conflationSmoothingFactor ?? 1;
+		const smoothingFactor = this._options.conflationThresholdFactor ?? 1;
 		const adjustedThreshold = (1.0 / devicePixelRatio) * smoothingFactor;
 
 		if (this._barSpacing >= adjustedThreshold) {
