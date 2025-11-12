@@ -214,7 +214,7 @@ describe('DataConflater', () => {
 
 			const directResult = conflater.conflateByFactor(testData, 8);
 
-			let stepByStepData: SeriesPlotRow<'Line'>[] = testData;
+			let stepByStepData: readonly SeriesPlotRow<'Line'>[] = testData;
 			stepByStepData = conflater.conflateByFactor(stepByStepData, 2);
 			stepByStepData = conflater.conflateByFactor(stepByStepData, 2);
 			stepByStepData = conflater.conflateByFactor(stepByStepData, 2);
@@ -232,7 +232,7 @@ describe('DataConflater', () => {
 
 			const directResult = customConflater.conflateByFactor(testData, 4, mockCustomReducer, true, mockPriceValueBuilder);
 
-			let stepByStepData: SeriesPlotRow<'Custom'>[] = testData;
+			let stepByStepData: readonly SeriesPlotRow<'Custom'>[] = testData;
 			stepByStepData = customConflater.conflateByFactor(stepByStepData, 2, mockCustomReducer, true, mockPriceValueBuilder);
 			stepByStepData = customConflater.conflateByFactor(stepByStepData, 2, mockCustomReducer, true, mockPriceValueBuilder);
 			const recursiveResult = stepByStepData;

@@ -112,9 +112,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private readonly _conflationByFactorCache: Map<number, SeriesPlotList<T>> = new Map();
 	private _customConflationReducer: CustomConflationReducer<unknown> | null = null;
 
-	// Separate cache for precomputed conflation levels to avoid interference with dynamic conflation
-	// private readonly _precomputedConflationCache: Map<number, SeriesPlotList<T>> = new Map();
-
 	public constructor(
 		model: IChartModelBase,
 		seriesType: T,
@@ -411,8 +408,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 			return this._data;
 		}
 
-		const { barSpacing, devicePixelRatio, effectiveSmoothing } = this._getConflationParams();
-		const factor = this._dataConflater.calculateConflationLevelWithSmoothing(barSpacing, devicePixelRatio, effectiveSmoothing);
+		const factor = this._calculateConflationFactor();
 
 		const cached = this._conflationByFactorCache.get(factor);
 		if (cached) {
@@ -792,7 +788,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 	private _buildConflatedListByFactor(factor: number): SeriesPlotList<T> {
 		const originalRows = this._data.rows();
-		let conflatedRows: SeriesPlotRow<T>[];
+		let conflatedRows: readonly SeriesPlotRow<T>[];
 		if (this._seriesType === 'Custom' && this._customConflationReducer !== null) {
 			const priceValueBuilder = this.customSeriesPlotValuesBuilder();
 			if (!priceValueBuilder) {
