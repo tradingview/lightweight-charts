@@ -1,5 +1,6 @@
 import { BarPrice, BarPrices } from './bar';
 import { Coordinate } from './coordinate';
+import { CustomConflationReducer } from './icustom-series';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceScale } from './price-scale';
 import { ISeriesBarColorer } from './series-bar-colorer';
@@ -71,6 +72,8 @@ export interface SeriesDataAtTypeMap {
 
 export interface ISeries<T extends SeriesType> extends IPriceDataSource {
 	bars(): SeriesPlotList<T>;
+	conflatedBars(): SeriesPlotList<T>;
+	setCustomConflationReducer?(reducer: CustomConflationReducer<unknown>): void;
 	visible(): boolean;
 	options(): Readonly<SeriesOptionsMap[T]>;
 	title(): string;
