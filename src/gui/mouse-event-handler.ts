@@ -345,7 +345,7 @@ export class MouseEventHandler implements IDestroyable {
 	}
 
 	/**
-	 * In Firefox mouse events dont't fire if the mouse position is outside of the browser's border.
+	 * In Firefox mouse events don't fire if the mouse position is outside of the browser's border.
 	 * To prevent the mouse from hanging while pressed we're subscribing on the mouseleave event of the document element.
 	 * We're subscribing on mouseleave, but this event is actually fired on mouseup outside of the browser's border.
 	 */
@@ -809,7 +809,7 @@ export class MouseEventHandler implements IDestroyable {
 			screenX: eventLike.screenX as Coordinate,
 			screenY: eventLike.screenY as Coordinate,
 			localX: (eventLike.clientX - box.left) as Coordinate,
-			localY: (eventLike.clientY - box.top) as Coordinate,
+			locally: (eventLike.clientY - box.top) as Coordinate,
 
 			ctrlKey: event.ctrlKey,
 			altKey: event.altKey,
