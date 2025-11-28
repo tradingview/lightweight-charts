@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Gráfica PRO</title>
+
+    <!-- Librería oficial Lightweight Charts -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0d1117;
+            font-family: Arial, sans-serif;
+        }
+        #chart {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chart"></div>
+
+<script>
+    // Crear gráfico
+    const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+        layout: {
+            background: { color: '#0d1117' },
+            textColor: '#d1d4dc',
+        },
+        grid: {
+            vertLines: { color: "#2a2e39" },
+            horzLines: { color: "#2a2e39" },
+        },
+        crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+        },
+        rightPriceScale: {
+            borderColor: "#2a2e39",
+        },
+        timeScale: {
+            borderColor: "#2a2e39",
+        },
+    });
+
+    // Serie de velas
+    const candleSeries = chart.addCandlestickSeries({
+        upColor: "#00ff99",
+        downColor: "#ff4d4d",
+        borderVisible: false,
+        wickUpColor: "#00ff99",
+        wickDownColor: "#ff4d4d",
+    });
+
+    // Datos de ejemplo (después lo cambiamos por datos reales)
+    candleSeries.setData([
+        { time: "2024-01-01", open: 100, high: 110, low: 90, close: 105 },
+        { time: "2024-01-02", open: 105, high: 112, low: 100, close: 108 },
+        { time: "2024-01-03", open: 108, high: 115, low: 101, close: 102 },
+        { time: "2024-01-04", open: 102, high: 109, low: 95, close: 98 },
+        { time: "2024-01-05", open: 98, high: 105, low: 92, close: 103 },
+    ]);
+
+    // EMA 20
+    const emaSeries = chart.addLineSeries({
+        color: "#ffcc00",
+        lineWidth: 2,
+    });
+
+    emaSeries.setData([
+        { time: "2024-01-01", value: 100 },
+        { time: "2024-01-02", value: 103 },
+        { time: "2024-01-03", value: 104 },
+        { time: "2024-01-04", value: 102 },
+        { time: "2024-01-05", value: 101 },
+    ]);
+
+    // SMA 50
+    const smaSeries = chart.addLineSeries({
+        color: "#00aaff",
+        lineWidth: 2,
+    });
+
+    smaSeries.setData([
+        { time: "2024-01-01", value: 101 },
+        { time: "2024-01-02", value: 104 },
+        { time: "2024-01-03", value: 106 },
+        { time: "2024-01-04", value: 103 },
+        { time: "2024-01-05", value: 102 },
+    ]);
+</script>
+
+</body>
+</html>
