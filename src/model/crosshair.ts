@@ -18,6 +18,7 @@ import { DataSource } from './data-source';
 import { InternalHorzScaleItem } from './ihorz-scale-behavior';
 import { ISeries } from './iseries';
 import { Pane } from './pane';
+import { MismatchDirection } from './plot-list';
 import { PriceScale } from './price-scale';
 import { SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
@@ -126,6 +127,13 @@ export interface CrosshairOptions {
 	 * Horizontal line options.
 	 */
 	horzLine: CrosshairLineOptions;
+
+	/**
+	 * If set to `true`, the crosshair will not snap to the data points of hidden series.
+	 *
+	 * @defaultValue `false`
+	 */
+	doNotSnapToHiddenSeriesIndices: boolean;
 }
 
 type RawPriceProvider = () => BarPrice;
@@ -260,6 +268,51 @@ export class Crosshair extends DataSource {
 
 		this.clearOriginCoord();
 		this.updateAllViews();
+	}
+
+	public snapToVisibleSeriesIfNeeded(index: TimePointIndex): TimePointIndex {
+		if (!this._options.doNotSnapToHiddenSeriesIndices) {
+			return index;
+		}
+
+		const model = this._model;
+		const timeScale = model.timeScale();
+
+		let closestLeftIndex: TimePointIndex | null = null;
+		let closestRightIndex: TimePointIndex | null = null;
+		for (const series of model.visibleSerieses()) {
+			const leftResult = series.bars().search(index, MismatchDirection.NearestLeft);
+			if (leftResult) {
+				if (leftResult.index === index) {
+					return index; // already snapped
+				}
+
+				if (closestLeftIndex === null || leftResult.index > closestLeftIndex) {
+					closestLeftIndex = leftResult.index;
+				}
+			}
+
+			const rightResult = series.bars().search(index, MismatchDirection.NearestRight);
+			if (rightResult) {
+				if (rightResult.index === index) {
+					return index; // already snapped
+				}
+
+				if (closestRightIndex === null || rightResult.index < closestRightIndex) {
+					closestRightIndex = rightResult.index;
+				}
+			}
+		}
+
+		const candidates = [closestLeftIndex, closestRightIndex].filter(notNull);
+		if (candidates.length === 0) {
+			return index;
+		}
+
+		const x = timeScale.indexToCoordinate(index);
+		const distances = candidates.map((i: TimePointIndex) => Math.abs(x - timeScale.indexToCoordinate(i)));
+		const minDistanceIndex = distances.indexOf(Math.min(...distances));
+		return candidates[minDistanceIndex];
 	}
 
 	public paneViews(pane: Pane): readonly IPaneView[] {

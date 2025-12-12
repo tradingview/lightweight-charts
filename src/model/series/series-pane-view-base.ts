@@ -18,6 +18,7 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 	protected _itemsVisibleRange: SeriesItemsIndexesRange | null = null;
 	protected readonly abstract _renderer: TRenderer;
 	private readonly _extendedVisibleRange: boolean;
+	private _lastConflationKey: number = -1;
 
 	public constructor(series: ISeries<TSeriesType>, model: IChartModelBase, extendedVisibleRange: boolean) {
 		this._series = series;
@@ -63,6 +64,16 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 	protected abstract _prepareRendererData(): void;
 
 	private _makeValid(): void {
+		// If the conflation setting or factor changed (due to zoom/barSpacing),
+		// we must rebuild raw items from series data.
+		const timeScale = this._model.timeScale();
+		const conflationEnabled = timeScale.options().enableConflation;
+		const currentConflationKey = conflationEnabled ? timeScale.conflationFactor() : 0;
+		if (currentConflationKey !== this._lastConflationKey) {
+			this._dataInvalidated = true;
+			this._lastConflationKey = currentConflationKey;
+		}
+
 		if (this._dataInvalidated) {
 			this._fillRawPoints();
 			this._dataInvalidated = false;

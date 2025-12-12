@@ -647,16 +647,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return event.isTouch && this._longTap || this._startTrackPoint !== null;
 	}
 
-	private _correctXCoord(x: Coordinate): Coordinate {
-		return Math.max(0, Math.min(x, this._size.width - 1)) as Coordinate;
-	}
-
-	private _correctYCoord(y: Coordinate): Coordinate {
-		return Math.max(0, Math.min(y, this._size.height - 1)) as Coordinate;
-	}
-
 	private _setCrosshairPosition(x: Coordinate, y: Coordinate, event: MouseEventHandlerEventBase): void {
-		this._model().setAndSaveCurrentPosition(this._correctXCoord(x), this._correctYCoord(y), event, ensureNotNull(this._state));
+		x = Math.max(0, Math.min(x, this._size.width - 1)) as Coordinate;
+		y = Math.max(0, Math.min(y, this._size.height - 1)) as Coordinate;
+
+		this._model().setAndSaveCurrentPosition(x, y, event, ensureNotNull(this._state));
 	}
 
 	private _clearCrosshairPosition(): void {

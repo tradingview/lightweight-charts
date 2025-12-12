@@ -41,8 +41,25 @@ export abstract class LinePaneViewBase<
 
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
-		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => {
-			const value = row.value[PlotRowValueIndex.Close] as BarPrice;
+		this._items = this._series.conflatedBars().rows().map((row: SeriesPlotRow<TSeriesType>) => {
+			const isConflated = (row.originalDataCount ?? 1) > 1;
+			let value: BarPrice;
+
+			if (isConflated) {
+				const high = row.value[PlotRowValueIndex.High];
+				const low = row.value[PlotRowValueIndex.Low];
+				const close = row.value[PlotRowValueIndex.Close];
+
+				const highMove = Math.abs(high - close);
+				const lowMove = Math.abs(low - close);
+
+				// in case of conflation we want to show more extreme price to represent the range
+				// and we choose the one which is further from the close price
+				value = (highMove > lowMove) ? high as BarPrice : low as BarPrice;
+			} else {
+				value = row.value[PlotRowValueIndex.Close] as BarPrice;
+			}
+
 			return this._createRawItem(row.index, value, colorer);
 		});
 	}

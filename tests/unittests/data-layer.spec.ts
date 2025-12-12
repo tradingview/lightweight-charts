@@ -21,13 +21,20 @@ chai.use(chaiExclude);
 function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Series<T> {
 	const data = new PlotList();
 
-	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	return {
 		bars: () => data,
 		seriesType: () => seriesType || 'Line',
 		customSeriesPlotValuesBuilder: () => {},
 		customSeriesWhitespaceCheck: () => {},
-	} as Series<T>;
+		isConflationEnabled: () => false, // Default to false for tests
+		updateLastConflatedChunk: () => {}, // Empty implementation for tests
+		model: () => ({
+			timeScale: () => ({
+				options: () => ({ enableConflation: false }),
+				conflationFactor: () => 1,
+			}),
+		}),
+	} as unknown as Series<T>;
 }
 
 // just for tests
