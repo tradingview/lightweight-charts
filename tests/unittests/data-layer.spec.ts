@@ -23,6 +23,7 @@ function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Se
 
 	return {
 		bars: () => data,
+		conflatedBars: () => data,
 		seriesType: () => seriesType || 'Line',
 		customSeriesPlotValuesBuilder: () => {},
 		customSeriesWhitespaceCheck: () => {},

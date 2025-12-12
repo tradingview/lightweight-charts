@@ -1,7 +1,7 @@
-function generateData() {
+function generateData(count) {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (let i = 0; i < 1000; ++i) {
+	for (let i = 0; i < count; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
 			value: i,
@@ -28,7 +28,7 @@ function runTestCase(container) {
 		lineWidth: 2,
 	});
 
-	// Generate 400k data points
+	// Generate 40k data points
 	const data = generateData(40000);
 	lineSeries.setData(data);
 
