@@ -243,7 +243,13 @@ export class DataLayer<HorzScaleItem> {
 		return this.setSeriesData(series, []);
 	}
 
+	// eslint-disable-next-line complexity
 	public updateSeriesData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType], historicalUpdate: boolean): DataUpdateResponse {
+		// check if conflation is enabled and this is a historical update
+		if (historicalUpdate && series.isConflationEnabled()) {
+			throw new Error('Historical updates are not supported when conflation is enabled. Conflation requires data to be processed in order.');
+		}
+
 		const extendedData = data as SeriesDataItemWithOriginalTime<TSeriesType, HorzScaleItem>;
 		saveOriginalTime(extendedData);
 		// convertStringToBusinessDay(data);
@@ -279,10 +285,19 @@ export class DataLayer<HorzScaleItem> {
 		const customWhitespaceChecker = series.customSeriesWhitespaceCheck<HorzScaleItem>();
 		const plotRow = createPlotRow(time, pointDataAtTime.index, data, extendedData.originalTime, dataToPlotRow, customWhitespaceChecker);
 
+		// For efficient conflation updates, check if this is just updating the last bar
+		const isLastBarUpdate = !historicalUpdate &&
+			!affectsTimeScale &&
+			lastSeriesTime !== undefined &&
+			this._horzScaleBehavior.key(time) === this._horzScaleBehavior.key(lastSeriesTime);
+
 		pointDataAtTime.mapping.set(series, plotRow);
 
 		if (historicalUpdate) {
 			this._updateHistoricalSeriesRow(series, plotRow, pointDataAtTime.index);
+		} else if (isLastBarUpdate && series.isConflationEnabled() && isSeriesPlotRow(plotRow)) {
+			series.updateLastConflatedChunk(plotRow as SeriesPlotRow<TSeriesType>);
+			this._updateLastSeriesRow(series, plotRow);
 		} else {
 			this._updateLastSeriesRow(series, plotRow);
 		}

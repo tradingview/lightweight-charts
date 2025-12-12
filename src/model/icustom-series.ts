@@ -83,6 +83,14 @@ export interface PaneRendererCustomData<
 	 * The current visible range of items on the chart.
 	 */
 	visibleRange: IRange<number> | null;
+	/**
+	 * Current conflation factor. The value represents how many data points have been combined
+	 * to form this conflated data point. This can be used to calculate the effective bar spacing
+	 * until the next data point. `effectiveBarSpacing = conflationFactor * barSpacing`. If you
+	 * are rendering a non-continuous series (like a Candlestick instead of Line) then you likely
+	 * would want to use the effectiveBarSpacing value for your width calculations.
+	 */
+	conflationFactor: number;
 }
 
 /**
@@ -124,6 +132,52 @@ export interface ICustomSeriesPaneRenderer {
  * - For a candle series, this would contain the high, low, and close values. Where the last value would be the close value.
  */
 export type CustomSeriesPricePlotValues = number[];
+
+/**
+ * Context object provided to custom series conflation reducers.
+ * This wraps the internal SeriesPlotRow data while providing a user-friendly interface.
+ */
+export interface CustomConflationContext<
+	HorzScaleItem = Time,
+	TData extends CustomData<HorzScaleItem> = CustomData<HorzScaleItem>
+> {
+	/**
+	 * The original custom data item provided by the user.
+	 */
+	readonly data: TData;
+
+	/**
+	 * The time index of the data point in the series.
+	 */
+	readonly index: number;
+
+	/**
+	 * The original time value provided by the user.
+	 */
+	readonly originalTime: HorzScaleItem;
+
+	/**
+	 * The internal time point object.
+	 */
+	readonly time: unknown;
+
+	/**
+	 * The computed price values for this data point (as returned by priceValueBuilder).
+	 * The last value in this array is used as the current price.
+	 */
+	readonly priceValues: CustomSeriesPricePlotValues;
+}
+
+/**
+ * Reducer used for conflation of custom data points.
+ * Given exactly 2 custom data contexts, should return a single aggregated item.
+ * Each context provides access to the original data plus metadata needed for conflation.
+ * This simplified interface makes plugin development easier and ensures consistent performance.
+ */
+export type CustomConflationReducer<
+	HorzScaleItem = Time,
+	TData extends CustomData<HorzScaleItem> = CustomData<HorzScaleItem>
+> = (item1: CustomConflationContext<HorzScaleItem, TData>, item2: CustomConflationContext<HorzScaleItem, TData>) => TData;
 
 /**
  * This interface represents the view for the custom series
@@ -181,4 +235,11 @@ export interface ICustomSeriesPaneView<
 	 * to other objects, and resetting any values or properties that were modified during the lifetime of the object.
 	 */
 	destroy?(): void;
+
+	/**
+	 * Optional reducer used for conflation of custom data points.
+	 * Given exactly 2 custom data contexts, should return a single aggregated item.
+	 * Each context provides access to the original data plus metadata needed for conflation.
+	 */
+	conflationReducer?(item1: CustomConflationContext<HorzScaleItem, TData>, item2: CustomConflationContext<HorzScaleItem, TData>): TData;
 }

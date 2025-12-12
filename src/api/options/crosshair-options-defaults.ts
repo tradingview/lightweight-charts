@@ -18,4 +18,5 @@ export const crosshairOptionsDefaults: CrosshairOptions = {
 		labelBackgroundColor: '#131722',
 	},
 	mode: CrosshairMode.Magnet,
+	doNotSnapToHiddenSeriesIndices: false,
 };
