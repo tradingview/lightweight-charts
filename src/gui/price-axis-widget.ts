@@ -82,40 +82,40 @@ function recalculateOverlapping(views: IPriceAxisView[], direction: 1 | -1, scal
 
 	const initLabelHeight = views[0].height(rendererOptions, true);
 	let spaceBeforeCurrentGroup = direction === 1
-		? scaleHeight / 2 - (views[0].getFixedCoordinate() - initLabelHeight / 2)
-		: views[0].getFixedCoordinate() - initLabelHeight / 2 - scaleHeight / 2;
+		? scaleHeight / 2 - (views[0].getRenderCoordinate() - initLabelHeight / 2)
+		: views[0].getRenderCoordinate() - initLabelHeight / 2 - scaleHeight / 2;
 	spaceBeforeCurrentGroup = Math.max(0, spaceBeforeCurrentGroup);
 
 	for (let i = 1; i < views.length; i++) {
 		const view = views[i];
 		const prev = views[i - 1];
 		const height = prev.height(rendererOptions, false);
-		const coordinate = view.getFixedCoordinate();
-		const prevFixedCoordinate = prev.getFixedCoordinate();
+		const coordinate = view.getRenderCoordinate();
+		const prevCoordinate = prev.getRenderCoordinate();
 
 		const overlap = direction === 1
-			? coordinate > prevFixedCoordinate - height
-			: coordinate < prevFixedCoordinate + height;
+			? coordinate > prevCoordinate - height
+			: coordinate < prevCoordinate + height;
 
 		if (overlap) {
-			const fixedCoordinate = prevFixedCoordinate - height * direction;
-			view.setFixedCoordinate(fixedCoordinate);
-			const edgePoint = fixedCoordinate - direction * height / 2;
+			const renderCoordinate = prevCoordinate - height * direction;
+			view.setRenderCoordinate(renderCoordinate);
+			const edgePoint = renderCoordinate - direction * height / 2;
 			const outOfViewport = direction === 1 ? edgePoint < 0 : edgePoint > scaleHeight;
 			if (outOfViewport && spaceBeforeCurrentGroup > 0) {
 				// shift the whole group up or down
 				const desiredGroupShift = direction === 1 ? -1 - edgePoint : edgePoint - scaleHeight;
 				const possibleShift = Math.min(desiredGroupShift, spaceBeforeCurrentGroup);
 				for (let k = currentGroupStart; k < views.length; k++) {
-					views[k].setFixedCoordinate(views[k].getFixedCoordinate() + direction * possibleShift);
+					views[k].setRenderCoordinate(views[k].getRenderCoordinate() + direction * possibleShift);
 				}
 				spaceBeforeCurrentGroup -= possibleShift;
 			}
 		} else {
 			currentGroupStart = i;
 			spaceBeforeCurrentGroup = direction === 1
-				? prevFixedCoordinate - height - coordinate
-				: coordinate - (prevFixedCoordinate + height);
+				? prevCoordinate - height - coordinate
+				: coordinate - (prevCoordinate + height);
 		}
 	}
 }
@@ -615,8 +615,8 @@ export class PriceAxisWidget implements IDestroyable {
 				const sourceViews = source.priceAxisViews(paneState, priceScale);
 				// never align selected sources
 				sourceViews.forEach((view: IPriceAxisView) => {
-					view.setFixedCoordinate(null);
-					if (view.isVisible()) {
+					if (view.isVisible() && view.getFixedCoordinate() === null) {
+						view.setRenderCoordinate(null); // Clear the previous render coordinate
 						views.push(view);
 					}
 				});
@@ -628,8 +628,6 @@ export class PriceAxisWidget implements IDestroyable {
 
 		// crosshair individually
 		updateForSources(orderedSources);
-
-		views.forEach((view: IPriceAxisView) => view.setFixedCoordinate(view.coordinate()));
 
 		const options = this._priceScale.options();
 		if (!options.alignLabels) {
@@ -662,11 +660,11 @@ export class PriceAxisWidget implements IDestroyable {
 			const halfHeight = Math.floor(view.height(rendererOptions) / 2);
 			const coordinate = view.coordinate();
 			if (coordinate > -halfHeight && coordinate < halfHeight) {
-				view.setFixedCoordinate(halfHeight);
+				view.setRenderCoordinate(halfHeight);
 			}
 
 			if (coordinate > (this._size.height - halfHeight) && coordinate < this._size.height + halfHeight) {
-				view.setFixedCoordinate(this._size.height - halfHeight);
+				view.setRenderCoordinate(this._size.height - halfHeight);
 			}
 		}
 

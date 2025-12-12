@@ -70,12 +70,16 @@ export abstract class PriceAxisView implements IPriceAxisView {
 		);
 	}
 
-	public getFixedCoordinate(): number {
-		return this._commonRendererData.fixedCoordinate || 0;
+	public getFixedCoordinate(): number | null {
+		return this._commonRendererData.fixedCoordinate ?? null;
 	}
 
-	public setFixedCoordinate(value: number): void {
-		this._commonRendererData.fixedCoordinate = value;
+	public getRenderCoordinate(): number {
+		return this._commonRendererData.fixedCoordinate ?? this._commonRendererData.renderCoordinate ?? this.coordinate();
+	}
+
+	public setRenderCoordinate(value: number | null): void {
+		this._commonRendererData.renderCoordinate = value ?? undefined;
 	}
 
 	public isVisible(): boolean {

@@ -6,13 +6,14 @@ import {
 
 export interface IPriceAxisView {
 	coordinate(): number;
-	getFixedCoordinate(): number;
+	getFixedCoordinate(): number | null;
+	getRenderCoordinate(): number;
 	height(rendererOptions: PriceAxisViewRendererOptions, useSecondLine?: boolean): number;
 	isVisible(): boolean;
 	isAxisLabelVisible(): boolean;
 	renderer(priceScale: PriceScale): IPriceAxisViewRenderer;
 	paneRenderer(): IPriceAxisViewRenderer;
-	setFixedCoordinate(value: number | null): void;
+	setRenderCoordinate(value: number | null): void;
 	text(): string;
 	update(): void;
 }

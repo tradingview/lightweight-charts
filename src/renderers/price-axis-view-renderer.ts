@@ -171,7 +171,7 @@ export class PriceAxisViewRenderer implements IPriceAxisViewRenderer {
 		// tick overlaps scale border
 		const tickSizeBitmap = Math.round(tickSize * horizontalPixelRatio);
 
-		const yMid = this._commonData.fixedCoordinate ?? this._commonData.coordinate;
+		const yMid = this._commonData.fixedCoordinate ?? this._commonData.renderCoordinate ?? this._commonData.coordinate;
 		const yMidBitmap = Math.round(yMid * verticalPixelRatio) - Math.floor(verticalPixelRatio * 0.5);
 		const yTopBitmap = Math.floor(yMidBitmap + tickHeightBitmap / 2 - totalHeightBitmap / 2);
 		const yBottomBitmap = yTopBitmap + totalHeightBitmap;
