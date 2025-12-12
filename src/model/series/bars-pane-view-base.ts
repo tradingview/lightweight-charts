@@ -45,6 +45,6 @@ export abstract class BarsPaneViewBase<TSeriesType extends 'Bar' | 'Candlestick'
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
 
-		this._items = this._series.bars().rows().map((row: SeriesPlotRow<TSeriesType>) => this._createRawItem(row.index, row, colorer));
+		this._items = this._series.conflatedBars().rows().map((row: SeriesPlotRow<TSeriesType>) => this._createRawItem(row.index, row, colorer));
 	}
 }

@@ -8,6 +8,7 @@ import { IChartModelBase } from '../chart-model';
 import { Coordinate } from '../coordinate';
 import {
 	CustomBarItemData,
+	CustomConflationContext,
 	CustomData,
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
@@ -78,6 +79,11 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 		);
 	}
 
+	public get conflationReducer(): ((item1: CustomConflationContext<unknown, CustomData<unknown>>, item2: CustomConflationContext<unknown, CustomData<unknown>>) => CustomData<unknown>) | undefined {
+		// eslint-disable-next-line @typescript-eslint/unbound-method
+		return this._paneView.conflationReducer;
+	}
+
 	public priceValueBuilder(plotRow: CustomData<unknown> | CustomSeriesWhitespaceData<unknown>): CustomSeriesPricePlotValues {
 		return this._paneView.priceValueBuilder(plotRow);
 	}
@@ -89,7 +95,7 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 	protected _fillRawPoints(): void {
 		const colorer = this._series.barColorer();
 		this._items = this._series
-			.bars()
+			.conflatedBars()
 			.rows()
 			.map((row: SeriesPlotRow<'Custom'>) => {
 				return {
@@ -117,6 +123,7 @@ export class SeriesCustomPaneView extends SeriesPaneViewBase<
 				bars: this._items.map(unwrapItemData) as CustomBarItemData<unknown>[],
 				barSpacing: this._model.timeScale().barSpacing(),
 				visibleRange: this._itemsVisibleRange,
+				conflationFactor: this._model.timeScale().conflationFactor(),
 			},
 			this._series.options()
 		);
