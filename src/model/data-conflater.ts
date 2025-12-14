@@ -445,7 +445,6 @@ export class DataConflater<T extends SeriesType, HorzScaleItem = unknown> {
 		}
 
 		const lastOriginalIndex = originalData.length - 1;
-		const overrideIndex = lastOriginalIndex;
 		const chunkStartIndex = Math.floor(lastOriginalIndex / conflationLevel) * conflationLevel;
 		const chunkEndIndex = Math.min(chunkStartIndex + conflationLevel, originalData.length);
 
@@ -453,11 +452,11 @@ export class DataConflater<T extends SeriesType, HorzScaleItem = unknown> {
 			// we must allocate a new array here to do a full rebuild.
 			const newOriginalData = originalData.slice();
 			newOriginalData[newOriginalData.length - 1] = newLastRow;
-			return this.conflateByFactor(originalData, conflationLevel, customReducer, isCustomSeries, priceValueBuilder);
+			return this.conflateByFactor(newOriginalData, conflationLevel, customReducer, isCustomSeries, priceValueBuilder);
 		}
 
 		const lastChunkIndex = Math.floor((lastOriginalIndex - 1) / conflationLevel);
-		const newChunkIndex = Math.floor(overrideIndex / conflationLevel);
+		const newChunkIndex = Math.floor(lastOriginalIndex / conflationLevel);
 
 		if (lastChunkIndex === newChunkIndex || cachedRows.length === 1) {
 			// Data length is within the same chunk OR it's the only chunk
@@ -469,10 +468,10 @@ export class DataConflater<T extends SeriesType, HorzScaleItem = unknown> {
 			}
 
 			const mergedChunk = count === 1
-				? this._plotRowToChunk((chunkStartIndex === overrideIndex) ? newLastRow : originalData[chunkStartIndex], /* isRemainder*/ true)
+				? this._plotRowToChunk((chunkStartIndex === lastOriginalIndex) ? newLastRow : originalData[chunkStartIndex], /* isRemainder*/ true)
 				: this._mergeRangeWithOverride(
 					originalData, chunkStartIndex, actualEndIndex,
-					overrideIndex, newLastRow,
+					lastOriginalIndex, newLastRow,
 					customReducer, isCustomSeries, priceValueBuilder
 				);
 

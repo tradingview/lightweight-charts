@@ -261,9 +261,9 @@ export interface HorzScaleOptions {
 
 	/**
 	 * Precompute conflation chunks for common levels right after data load.
-	 * When enabled, the system will precompute conflation data for standard factors
-	 * (2, 5, 10, 25, 50, 100, 200, 300) in the background, which improves performance
-	 * when zooming out but increases initial load time and memory usage.
+	 * When enabled, the system will precompute conflation data in the background,
+	 * which improves performance when zooming out but increases initial load time
+	 * and memory usage.
 	 *
 	 * Performance impact:
 	 * - Initial load: +100-500ms depending on dataset size
@@ -271,7 +271,6 @@ export interface HorzScaleOptions {
 	 * - Zoom performance: Significant improvement (10-100x faster)
 	 *
 	 * Recommended for: Large datasets (\>10K points) on machines with sufficient memory
-	 * Precompute conflation chunks for common levels right after data load.
 	 * @defaultValue false
 	 */
 	precomputeConflationOnInit: boolean;
