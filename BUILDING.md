@@ -1,6 +1,6 @@
 # Building Lightweight Charts™
 
-The minimal supported version of [NodeJS](https://nodejs.org/) for development is 16.16.
+The minimal supported version of [NodeJS](https://nodejs.org/) for development is 22.3.
 
 **Note:** you need to run `npm install` in both the root directory and the `website` directory before you can run the lint tests.
 
