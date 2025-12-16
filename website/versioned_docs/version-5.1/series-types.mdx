@@ -1,0 +1,195 @@
+---
+sidebar_position: 1
+---
+
+# Series
+
+This article describes supported series types and ways to [customize](#customization) them.
+
+## Supported types
+
+### Area
+
+- **Series Definition**: [`AreaSeries`](/api/variables/AreaSeries.md)
+- **Data format**: [`SingleValueData`](/api/interfaces/SingleValueData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`AreaStyleOptions`](/api/interfaces/AreaStyleOptions.md)
+
+This series is represented with a colored area between the [time scale](./time-scale.md) and line connecting all data points:
+
+import CodeBlock from '@theme/CodeBlock';
+export const areaExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+const chart = createChart(document.getElementById('container'), chartOptions);
+const areaSeries = chart.addSeries(AreaSeries, { lineColor: LINE_LINE_COLOR, topColor: AREA_TOP_COLOR, bottomColor: AREA_BOTTOM_COLOR });
+
+const data = [{ value: 0, time: 1642425322 }, { value: 8, time: 1642511722 }, { value: 10, time: 1642598122 }, { value: 20, time: 1642684522 }, { value: 3, time: 1642770922 }, { value: 43, time: 1642857322 }, { value: 41, time: 1642943722 }, { value: 43, time: 1643030122 }, { value: 56, time: 1643116522 }, { value: 46, time: 1643202922 }];
+
+areaSeries.setData(data);
+
+chart.timeScale().fitContent();
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{areaExample}</CodeBlock>
+
+### Bar
+
+- **Series Definition**: [`BarSeries`](/api/variables/BarSeries.md)
+- **Data format**: [`BarData`](/api/interfaces/BarData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`BarStyleOptions`](/api/interfaces/BarStyleOptions.md)
+
+This series illustrates price movements with vertical bars.
+The length of each bar corresponds to the range between the highest and lowest price values.
+Open and close values are represented with the tick marks on the left and right side of the bar, respectively:
+
+export const barExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+const chart = createChart(document.getElementById('container'), chartOptions);
+const barSeries = chart.addSeries(BarSeries, { upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR });
+
+const data = [
+  { open: 10, high: 10.63, low: 9.49, close: 9.55, time: 1642427876 },
+  { open: 9.55, high: 10.30, low: 9.42, close: 9.94, time: 1642514276 },
+  { open: 9.94, high: 10.17, low: 9.92, close: 9.78, time: 1642600676 },
+  { open: 9.78, high: 10.59, low: 9.18, close: 9.51, time: 1642687076 },
+  { open: 9.51, high: 10.46, low: 9.10, close: 10.17, time: 1642773476 },
+  { open: 10.17, high: 10.96, low: 10.16, close: 10.47, time: 1642859876 },
+  { open: 10.47, high: 11.39, low: 10.40, close: 10.81, time: 1642946276 },
+  { open: 10.81, high: 11.60, low: 10.30, close: 10.75, time: 1643032676 },
+  { open: 10.75, high: 11.60, low: 10.49, close: 10.93, time: 1643119076 },
+  { open: 10.93, high: 11.53, low: 10.76, close: 10.96, time: 1643205476 },
+  { open: 10.96, high: 11.90, low: 10.80, close: 11.50, time: 1643291876 },
+  { open: 11.50, high: 12.00, low: 11.30, close: 11.80, time: 1643378276 },
+  { open: 11.80, high: 12.20, low: 11.70, close: 12.00, time: 1643464676 },
+  { open: 12.00, high: 12.50, low: 11.90, close: 12.30, time: 1643551076 },
+  { open: 12.30, high: 12.80, low: 12.10, close: 12.60, time: 1643637476 },
+  { open: 12.60, high: 13.00, low: 12.50, close: 12.90, time: 1643723876 },
+  { open: 12.90, high: 13.50, low: 12.70, close: 13.20, time: 1643810276 },
+  { open: 13.20, high: 13.70, low: 13.00, close: 13.50, time: 1643896676 },
+  { open: 13.50, high: 14.00, low: 13.30, close: 13.80, time: 1643983076 },
+  { open: 13.80, high: 14.20, low: 13.60, close: 14.00, time: 1644069476 },
+];
+
+barSeries.setData(data);
+
+chart.timeScale().fitContent();
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{barExample}</CodeBlock>
+
+### Baseline
+
+- **Series Definition**: [`BaselineSeries`](/api/variables/BaselineSeries.md)
+- **Data format**: [`SingleValueData`](/api/interfaces/SingleValueData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`BaselineStyleOptions`](/api/interfaces/BaselineStyleOptions.md)
+
+This series is represented with two colored areas between the [the base value line](/api/interfaces/BaselineStyleOptions.md#basevalue) and line connecting all data points:
+
+export const baselineExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+const chart = createChart(document.getElementById('container'), chartOptions);
+const baselineSeries = chart.addSeries(BaselineSeries, { baseValue: { type: 'price', price: 25 }, topLineColor: BASELINE_TOP_LINE_COLOR, topFillColor1: BASELINE_TOP_FILL_COLOR1, topFillColor2: BASELINE_TOP_FILL_COLOR2, bottomLineColor: BASELINE_BOTTOM_LINE_COLOR, bottomFillColor1: BASELINE_BOTTOM_FILL_COLOR1, bottomFillColor2: BASELINE_BOTTOM_FILL_COLOR2 });
+
+const data = [{ value: 1, time: 1642425322 }, { value: 8, time: 1642511722 }, { value: 10, time: 1642598122 }, { value: 20, time: 1642684522 }, { value: 3, time: 1642770922 }, { value: 43, time: 1642857322 }, { value: 41, time: 1642943722 }, { value: 43, time: 1643030122 }, { value: 56, time: 1643116522 }, { value: 46, time: 1643202922 }];
+
+baselineSeries.setData(data);
+
+chart.timeScale().fitContent();
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{baselineExample}</CodeBlock>
+
+### Candlestick
+
+- **Series Definition**: [`CandlestickSeries`](/api/variables/CandlestickSeries.md)
+- **Data format**: [`CandlestickData`](/api/interfaces/CandlestickData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`CandlestickStyleOptions`](/api/interfaces/CandlestickStyleOptions.md)
+
+This series illustrates price movements with candlesticks.
+The solid body of each candlestick represents the open and close values for the time period. Vertical lines, known as wicks, above and below the candle body represent the high and low values, respectively:
+
+export const candlestickExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+const chart = createChart(document.getElementById('container'), chartOptions);
+const candlestickSeries = chart.addSeries(CandlestickSeries, { upColor: BAR_UP_COLOR, downColor: BAR_DOWN_COLOR, borderVisible: false, wickUpColor: BAR_UP_COLOR, wickDownColor: BAR_DOWN_COLOR });
+
+const data = [{ open: 10, high: 10.63, low: 9.49, close: 9.55, time: 1642427876 }, { open: 9.55, high: 10.30, low: 9.42, close: 9.94, time: 1642514276 }, { open: 9.94, high: 10.17, low: 9.92, close: 9.78, time: 1642600676 }, { open: 9.78, high: 10.59, low: 9.18, close: 9.51, time: 1642687076 }, { open: 9.51, high: 10.46, low: 9.10, close: 10.17, time: 1642773476 }, { open: 10.17, high: 10.96, low: 10.16, close: 10.47, time: 1642859876 }, { open: 10.47, high: 11.39, low: 10.40, close: 10.81, time: 1642946276 }, { open: 10.81, high: 11.60, low: 10.30, close: 10.75, time: 1643032676 }, { open: 10.75, high: 11.60, low: 10.49, close: 10.93, time: 1643119076 }, { open: 10.93, high: 11.53, low: 10.76, close: 10.96, time: 1643205476 }];
+
+candlestickSeries.setData(data);
+
+chart.timeScale().fitContent();
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{candlestickExample}</CodeBlock>
+
+### Histogram
+
+- **Series Definition**: [`HistogramSeries`](/api/variables/HistogramSeries.md)
+- **Data format**: [`HistogramData`](/api/interfaces/HistogramData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`HistogramStyleOptions`](/api/interfaces/HistogramStyleOptions.md)
+
+This series illustrates the distribution of values with columns:
+
+export const histogramExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+const chart = createChart(document.getElementById('container'), chartOptions);
+const histogramSeries = chart.addSeries(HistogramSeries, { color: HISTOGRAM_COLOR });
+
+const data = [{ value: 1, time: 1642425322 }, { value: 8, time: 1642511722 }, { value: 10, time: 1642598122 }, { value: 20, time: 1642684522 }, { value: 3, time: 1642770922, color: 'red' }, { value: 43, time: 1642857322 }, { value: 41, time: 1642943722, color: 'red' }, { value: 43, time: 1643030122 }, { value: 56, time: 1643116522 }, { value: 46, time: 1643202922, color: 'red' }];
+
+histogramSeries.setData(data);
+
+chart.timeScale().fitContent();
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{histogramExample}</CodeBlock>
+
+### Line
+
+- **Series Definition**: [`LineSeries`](/api/variables/LineSeries.md)
+- **Data format**: [`LineData`](/api/interfaces/LineData.md) or [`WhitespaceData`](/api/interfaces/WhitespaceData.md)
+- **Style options**: a mix of [`SeriesOptionsCommon`](/api/interfaces/SeriesOptionsCommon.md) and [`LineStyleOptions`](/api/interfaces/LineStyleOptions.md)
+
+This series is represented with a set of data points connected by straight line segments:
+
+export const lineExample = `const chartOptions = { layout: { textColor: CHART_TEXT_COLOR, background: { type: 'solid', color: CHART_BACKGROUND_COLOR } } };
+const chart = createChart(document.getElementById('container'), chartOptions);
+const lineSeries = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });
+
+const data = [{ value: 0, time: 1642425322 }, { value: 8, time: 1642511722 }, { value: 10, time: 1642598122 }, { value: 20, time: 1642684522 }, { value: 3, time: 1642770922 }, { value: 43, time: 1642857322 }, { value: 41, time: 1642943722 }, { value: 43, time: 1643030122 }, { value: 56, time: 1643116522 }, { value: 46, time: 1643202922 }];
+
+lineSeries.setData(data);
+
+chart.timeScale().fitContent();
+`;
+
+<CodeBlock className="language-js" replaceThemeConstants chart>{lineExample}</CodeBlock>
+
+### Custom series (plugins)
+
+The library enables you to create custom series types, also known as series plugins, to expand its functionality. With this feature, you can add new series types, indicators, and other visualizations.
+
+To define a custom series type, create a class that implements the [`ICustomSeriesPaneView`](/api/interfaces/ICustomSeriesPaneView.md) interface. This class defines the rendering code that Lightweight Charts&trade; uses to draw the series on the chart.
+Once your custom series type is defined, it can be added to any chart instance using the [`addCustomSeries()`](/api/interfaces/IChartApi.md#addcustomseries) method. Custom series types function like any other series.
+
+For more information, refer to the [Plugins](./plugins/intro.md) article.
+
+## Customization
+
+Each series type offers a unique set of customization options listed on the [`SeriesStyleOptionsMap`](/api/interfaces/SeriesStyleOptionsMap.md) page.
+
+You can adjust series options in two ways:
+
+- Specify the default options using the corresponding parameter while creating a series:
+
+    ```js
+    // Change default top & bottom colors of an area series in creating time
+    const series = chart.addSeries(AreaSeries, {
+        topColor: 'red',
+        bottomColor: 'green',
+    });
+    ````
+
+- Use the [`ISeriesApi.applyOptions`](/api/interfaces/ISeriesApi.md#applyoptions) method to apply other options on the fly:
+
+    ```js
+    // Updating candlestick series options on the fly
+    candlestickSeries.applyOptions({
+        upColor: 'red',
+        downColor: 'blue',
+    });
+    ```
