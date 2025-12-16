@@ -144,7 +144,7 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 			createOptionsChart,
 		};
 	},
-	'5.1': async (window: Window) => {
+	5.1: async (window: Window) => {
 		const module = await import('lightweight-charts-5.1');
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
