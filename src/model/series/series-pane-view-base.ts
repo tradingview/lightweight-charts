@@ -19,6 +19,9 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 	protected readonly abstract _renderer: TRenderer;
 	private readonly _extendedVisibleRange: boolean;
 	private _lastConflationKey: number = -1;
+	// OPTIMIZATION: Track data state for incremental updates
+	private _lastDataLength: number = 0;
+	private _incrementalUpdatePossible: boolean = false;
 
 	public constructor(series: ISeries<TSeriesType>, model: IChartModelBase, extendedVisibleRange: boolean) {
 		this._series = series;
@@ -30,6 +33,10 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		this._invalidated = true;
 		if (updateType === 'data') {
 			this._dataInvalidated = true;
+			// OPTIMIZATION: Check if this could be an incremental update (last bar only)
+			const currentLength = this._series.bars().size();
+			this._incrementalUpdatePossible = currentLength === this._lastDataLength ||
+				currentLength === this._lastDataLength + 1;
 		}
 		if (updateType === 'options') {
 			this._optionsInvalidated = true;
@@ -48,7 +55,28 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 
 	protected abstract _fillRawPoints(): void;
 
+	/**
+	 * OPTIMIZATION: Incremental update for last bar only.
+	 * Override in subclasses to provide optimized implementation.
+	 * Returns true if incremental update was performed, false if full rebuild is needed.
+	 */
+	protected _updateLastPoint(): boolean {
+		return false; // Default: not supported, do full rebuild
+	}
+
 	protected _updateOptions(): void {
+		// OPTIMIZATION: For incremental updates, only update the last item
+		if (this._incrementalUpdatePossible && this._items.length > 0) {
+			const lastIndex = this._items.length - 1;
+			const item = this._items[lastIndex];
+			this._items[lastIndex] = {
+				...item,
+				...this._series.barColorer().barStyle(item.time),
+			};
+			return;
+		}
+
+		// Full update path
 		this._items = this._items.map((item: ItemType) => ({
 			...item,
 			...this._series.barColorer().barStyle(item.time),
@@ -71,12 +99,22 @@ export abstract class SeriesPaneViewBase<TSeriesType extends SeriesType, ItemTyp
 		const currentConflationKey = conflationEnabled ? timeScale.conflationFactor() : 0;
 		if (currentConflationKey !== this._lastConflationKey) {
 			this._dataInvalidated = true;
+			this._incrementalUpdatePossible = false; // Force full rebuild on conflation change
 			this._lastConflationKey = currentConflationKey;
 		}
 
 		if (this._dataInvalidated) {
-			this._fillRawPoints();
+			// OPTIMIZATION: Try incremental update first for last-bar-only changes
+			if (this._incrementalUpdatePossible && this._updateLastPoint()) {
+				// Incremental update succeeded
+				this._lastDataLength = this._series.bars().size();
+			} else {
+				// Full rebuild
+				this._fillRawPoints();
+				this._lastDataLength = this._series.bars().size();
+			}
 			this._dataInvalidated = false;
+			this._incrementalUpdatePossible = false;
 		}
 
 		if (this._optionsInvalidated) {

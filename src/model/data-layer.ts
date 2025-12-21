@@ -319,18 +319,36 @@ export class DataLayer<HorzScaleItem> {
 			originalTime: timeScalePointTime(pointDataAtTime.mapping),
 		};
 
-		const insertIndex = lowerBound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint, b: number) => this._horzScaleBehavior.key(a.time) < b);
+		const timeKey = this._horzScaleBehavior.key(newPoint.time);
+		const lastPoint = this._sortedTimePoints.length > 0 ? this._sortedTimePoints[this._sortedTimePoints.length - 1] : null;
+		const isAppendToEnd = lastPoint === null || timeKey > this._horzScaleBehavior.key(lastPoint.time);
 
-		// yes, I know that this array is readonly and this change is intended to make it performative
-		// we marked _sortedTimePoints array as readonly to avoid modifying this array anywhere else
-		// but this place is exceptional case due performance reasons, sorry
-		(this._sortedTimePoints as InternalTimeScalePoint[]).splice(insertIndex, 0, newPoint);
+		let insertIndex: number;
 
-		for (let index = insertIndex; index < this._sortedTimePoints.length; ++index) {
-			assignIndexToPointData(this._sortedTimePoints[index].pointData, index as TimePointIndex);
+		if (isAppendToEnd) {
+			// OPTIMIZATION: Fast path for appending to end (most common case for real-time updates)
+			// Use push instead of splice - O(1) instead of O(n)
+			insertIndex = this._sortedTimePoints.length;
+			(this._sortedTimePoints as InternalTimeScalePoint[]).push(newPoint);
+			// Only need to assign index to the new point
+			assignIndexToPointData(newPoint.pointData, insertIndex as TimePointIndex);
+			// Only calculate weight for the new point
+			this._horzScaleBehavior.fillWeightsForPoints(this._sortedTimePoints, insertIndex);
+		} else {
+			// Original path for insertions in the middle (rare case)
+			insertIndex = lowerBound(this._sortedTimePoints, timeKey, (a: InternalTimeScalePoint, b: number) => this._horzScaleBehavior.key(a.time) < b);
+
+			// yes, I know that this array is readonly and this change is intended to make it performative
+			// we marked _sortedTimePoints array as readonly to avoid modifying this array anywhere else
+			// but this place is exceptional case due performance reasons, sorry
+			(this._sortedTimePoints as InternalTimeScalePoint[]).splice(insertIndex, 0, newPoint);
+
+			for (let index = insertIndex; index < this._sortedTimePoints.length; ++index) {
+				assignIndexToPointData(this._sortedTimePoints[index].pointData, index as TimePointIndex);
+			}
+
+			this._horzScaleBehavior.fillWeightsForPoints(this._sortedTimePoints, insertIndex);
 		}
-
-		this._horzScaleBehavior.fillWeightsForPoints(this._sortedTimePoints, insertIndex);
 
 		return this._getUpdateResponse(series, insertIndex, info);
 	}
@@ -513,23 +531,34 @@ export class DataLayer<HorzScaleItem> {
 		const dataUpdateResponse: DataUpdateResponse = this._emptyUpdateResponse();
 
 		if (firstChangedPointIndex !== -1) {
-			// TODO: it's possible to make perf improvements by checking what series has data after firstChangedPointIndex
-			// but let's skip for now
-			this._seriesRowsBySeries.forEach((data: SeriesPlotRow<SeriesType>[], s: Series<SeriesType>) => {
-				dataUpdateResponse.series.set(
-					s,
-					{
-						data,
-						info: s === updatedSeries ? info : undefined,
-					}
-				);
-			});
+			// OPTIMIZATION: Only include series that actually have data affected by this change
+			// For append-only updates (new bar at the end), only the updated series needs to be included
+			const isAppendOnly = firstChangedPointIndex === this._sortedTimePoints.length - 1;
 
-			// if the series data was set to [] it will have already been removed from _seriesRowBySeries
-			// meaning the forEach above won't add the series to the data update response
-			// so we handle that case here
-			if (!this._seriesRowsBySeries.has(updatedSeries)) {
-				dataUpdateResponse.series.set(updatedSeries, { data: [], info });
+			if (isAppendOnly) {
+				// Fast path: only include the updated series
+				const seriesData = this._seriesRowsBySeries.get(updatedSeries);
+				dataUpdateResponse.series.set(updatedSeries, { data: seriesData || [], info });
+			} else {
+				// Full update path: include all series that might be affected
+				this._seriesRowsBySeries.forEach((data: SeriesPlotRow<SeriesType>[], s: Series<SeriesType>) => {
+					// Only include series that have data at or after the changed index
+					if (data.length > 0 && data[data.length - 1].index >= firstChangedPointIndex) {
+						dataUpdateResponse.series.set(
+							s,
+							{
+								data,
+								info: s === updatedSeries ? info : undefined,
+							}
+						);
+					}
+				});
+
+				// Ensure the updated series is always included
+				if (!dataUpdateResponse.series.has(updatedSeries)) {
+					const seriesData = this._seriesRowsBySeries.get(updatedSeries);
+					dataUpdateResponse.series.set(updatedSeries, { data: seriesData || [], info });
+				}
 			}
 
 			dataUpdateResponse.timeScale.points = this._sortedTimePoints;

@@ -410,11 +410,26 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 
 	private _sendUpdateToChart(update: DataUpdateResponse): void {
 		const model = this._chartWidget.model();
+		const timeScale = model.timeScale();
 
 		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
 		update.series.forEach((value: SeriesChanges, series: Series<SeriesType>) => series.setData(value.data, value.info));
 
-		model.timeScale().recalculateIndicesWithData();
+		// OPTIMIZATION: Use incremental index update for append-only operations
+		const firstChangedIndex = update.timeScale.firstChangedPointIndex;
+		const points = update.timeScale.points;
+		const isAppendOnly = firstChangedIndex !== undefined &&
+			points !== undefined &&
+			firstChangedIndex === points.length - 1;
+
+		if (isAppendOnly && firstChangedIndex !== undefined) {
+			// Fast path: only add the new index
+			timeScale.addIndexWithData(firstChangedIndex);
+		} else {
+			// Full recalculation for other cases
+			timeScale.recalculateIndicesWithData();
+		}
+
 		model.recalculateAllPanes();
 	}
 

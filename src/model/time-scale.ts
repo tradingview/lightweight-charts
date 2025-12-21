@@ -935,6 +935,19 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	/**
+	 * OPTIMIZATION: Incrementally add a single index to the indices with data set.
+	 * Use this for real-time updates instead of full recalculation.
+	 * This is O(1) instead of O(n*m) for the full recalculation.
+	 */
+	public addIndexWithData(index: TimePointIndex): void {
+		if (!this._options.ignoreWhitespaceIndices) {
+			return;
+		}
+		this._indicesWithData.set(index, true);
+		this._indicesWithDataUpdateId++;
+	}
+
+	/**
 	 * Returns the current data conflation factor.
 	 * Factor \> 1 means data points should be conflated for performance.
 	 */
