@@ -1,8 +1,10 @@
 import { IChartWidgetBase } from '../gui/chart-widget';
 
 import { ensureNotNull } from '../helpers/assertions';
+import { warn } from '../helpers/logger';
 import { DeepPartial } from '../helpers/strict-type-checks';
 
+import { AxisMouseEventHandler } from '../model/axis-model';
 import { isDefaultPriceScale } from '../model/default-price-scale';
 import { PriceRangeImpl } from '../model/price-range-impl';
 import { PriceScale, PriceScaleOptions } from '../model/price-scale';
@@ -75,6 +77,44 @@ export class PriceScaleApi implements IPriceScaleApi {
 
 	public setAutoScale(on: boolean): void {
 		this.applyOptions({ autoScale: on });
+	}
+
+	public subscribeClick(handler: AxisMouseEventHandler): void {
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).subscribeClick(handler);
+		}
+	}
+
+	public unsubscribeClick(handler: AxisMouseEventHandler): void {
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).unsubscribeClick(handler);
+		}
+	}
+
+	public subscribeMouseMove(handler: AxisMouseEventHandler): void {
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).subscribeMouseMove(handler);
+		}
+	}
+
+	public unsubscribeMouseMove(handler: AxisMouseEventHandler): void {
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).unsubscribeMouseMove(handler);
+		}
+	}
+
+	public overrideCursorStyle(cursor: string | undefined): void {
+		if (this._checkDefaultPriceScale()) {
+			this._chartWidget.getPriceAxisWidget(this._paneIndex, this._priceScaleId).overrideCursorStyle(cursor);
+		}
+	}
+
+	private _checkDefaultPriceScale(): boolean {
+		if (!isDefaultPriceScale(this._priceScaleId)) {
+			warn('Method only supported on visible price scales');
+			return false;
+		}
+		return true;
 	}
 
 	private _priceScale(): PriceScale {
