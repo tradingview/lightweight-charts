@@ -12,6 +12,7 @@
   [![npm bundle size][bundle-size-img]][bundle-size-link]
   [![Dependencies count][deps-count-img]][bundle-size-link]
   [![Downloads][npm-downloads-img]][npm-link]
+  [![pkg.pr.new][pkg-pr-new-img]][pkg-pr-new-link]
 </div>
 
 <!-- markdownlint-enable no-inline-html -->
@@ -36,6 +37,16 @@ The library provides a rich set of charting capabilities out of the box, but dev
 ```bash
 npm install lightweight-charts
 ```
+
+### Latest master build
+
+To try the latest `master` build without waiting for a release (powered by [pkg.pr.new](https://pkg.pr.new)):
+
+```bash
+npm install https://pkg.pr.new/lightweight-charts@master
+```
+
+The import and usage below applies to both npm installation options:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
@@ -117,5 +128,7 @@ You can use the [`attributionLogo`](https://tradingview.github.io/lightweight-ch
 [npm-link]: https://www.npmjs.com/package/lightweight-charts
 
 [bundle-size-img]: https://badgen.net/bundlephobia/minzip/lightweight-charts
-[deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependecies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
+[deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependencies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
 [bundle-size-link]: https://bundlephobia.com/result?p=lightweight-charts
+[pkg-pr-new-img]: https://pkg.pr.new/badge/tradingview/lightweight-charts
+[pkg-pr-new-link]: https://pkg.pr.new/~/tradingview/lightweight-charts
