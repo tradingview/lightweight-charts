@@ -15,14 +15,13 @@ export function merge(dst: Record<string, any>, ...sources: Record<string, any>[
 		// eslint-disable-next-line no-restricted-syntax
 		for (const i in src) {
 			if (
-				src[i] === undefined ||
 				!Object.prototype.hasOwnProperty.call(src, i) ||
 				['__proto__', 'constructor', 'prototype'].includes(i)
 			) {
 				continue;
 			}
 
-			if ('object' !== typeof src[i] || dst[i] === undefined || Array.isArray(src[i])) {
+			if (src[i] === undefined || 'object' !== typeof src[i] || dst[i] === undefined || Array.isArray(src[i])) {
 				dst[i] = src[i];
 			} else {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
