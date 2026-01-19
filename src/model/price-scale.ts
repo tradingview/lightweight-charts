@@ -202,6 +202,15 @@ export interface PriceScaleOptions {
 	 * @defaultValue false
 	 */
 	ensureEdgeTickMarksVisible: boolean;
+
+	/**
+	 * Tick mark label density on the price scale.
+	 * A higher value results in more spacing between tick marks, and thus fewer tick marks.
+	 * A lower value results in less spacing and more tick marks.
+	 *
+	 * @defaultValue `2.5`
+	 */
+	tickMarkDensity: number;
 }
 
 interface RangeCache {

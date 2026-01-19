@@ -9,8 +9,6 @@ import { PriceTickSpanCalculator } from './price-tick-span-calculator';
 export type CoordinateToLogicalConverter = (x: number, firstValue: number) => number;
 export type LogicalToCoordinateConverter = (x: number, firstValue: number, keepItFloat: boolean) => number;
 
-const TICK_DENSITY = 2.5;
-
 export class PriceTickMarkBuilder {
 	private _marks: PriceMark[] = [];
 	private _base: number;
@@ -120,7 +118,7 @@ export class PriceTickMarkBuilder {
 	}
 
 	private _tickMarkHeight(): number {
-		return Math.ceil(this._fontHeight() * TICK_DENSITY);
+		return Math.ceil(this._fontHeight() * this._priceScale.options().tickMarkDensity);
 	}
 
 	private _updateMarks(firstValue: number, span: number, high: number, low: number, minCoord: number, maxCoord: number): void {
