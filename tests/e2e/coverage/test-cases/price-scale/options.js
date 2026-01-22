@@ -13,6 +13,7 @@ async function beforeInteractions(container) {
 		leftPriceScale: {
 			visible: true,
 			mode: LightweightCharts.PriceScaleMode.Logarithmic,
+			tickMarkDensity: 2,
 		},
 		rightPriceScale: {
 			visible: true,
@@ -50,6 +51,7 @@ async function beforeInteractions(container) {
 		borderVisible: false,
 		ticksVisible: false,
 		mode: LightweightCharts.PriceScaleMode.Logarithmic,
+		tickMarkDensity: 5,
 	});
 
 	await awaitNewFrame();
