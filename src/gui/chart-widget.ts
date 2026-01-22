@@ -202,14 +202,32 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		const heightStr = this._height + 'px';
 		const widthStr = this._width + 'px';
 
-		ensureNotNull(this._element).style.height = heightStr;
-		ensureNotNull(this._element).style.width = widthStr;
+		// When autoSize is enabled, keep outer element at 100%/100% to avoid jitter
+		// from pixel rounding differences between container and chart size
+		if (!this.autoSizeActive()) {
+			ensureNotNull(this._element).style.height = heightStr;
+			ensureNotNull(this._element).style.width = widthStr;
+		}
 
 		this._tableElement.style.height = heightStr;
 		this._tableElement.style.width = widthStr;
 
 		if (forceRepaint) {
-			this._drawImpl(InvalidateMask.full(), performance.now());
+			// Cancel any pending animation frame since we're doing a synchronous paint
+			if (this._drawRafId !== 0) {
+				window.cancelAnimationFrame(this._drawRafId);
+				this._drawRafId = 0;
+			}
+			this._drawPlanned = false;
+
+			// Merge any pending invalidations and clear them
+			const mask = InvalidateMask.full();
+			if (this._invalidateMask !== null) {
+				mask.merge(this._invalidateMask);
+				this._invalidateMask = null;
+			}
+
+			this._drawImpl(mask, performance.now());
 		} else {
 			this._model.fullUpdate();
 		}
@@ -891,7 +909,15 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 					// this may be undefined if the entries array was empty.
 					return;
 				}
-				this.resize(containerEntry.contentRect.width, containerEntry.contentRect.height);
+
+				const newW = containerEntry.contentRect.width;
+				const newH = containerEntry.contentRect.height;
+
+				// Use forceRepaint=true to paint synchronously within this callback,
+				// rather than scheduling to the next animation frame. This prevents
+				// the visual "jitter" that occurs when the container has resized but
+				// the canvas hasn't repainted yet.
+				this.resize(newW, newH, true);
 			});
 			this._observer.observe(this._container, { box: 'border-box' });
 			return true;
