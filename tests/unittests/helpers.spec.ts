@@ -60,7 +60,29 @@ describe('Helpers', () => {
 			const src = { b: undefined, c: 3 };
 
 			const result = merge(dst, src);
-			expect(result).to.deep.equal({ a: 1, b: 2, c: 3 });
+			// When a property is explicitly set to undefined in the source,
+			// it should be set to undefined in the destination
+			expect(result).to.deep.equal({ a: 1, b: undefined, c: 3 });
+		});
+
+		it('should allow resetting function properties to undefined', () => {
+			// This test simulates the priceFormatter reset use case
+			const dst = {
+				localization: {
+					priceFormatter: (price: number) => `$${price}`,
+					percentageFormatter: (percentage: number) => `${percentage}%`,
+				},
+			};
+			const src = {
+				localization: {
+					priceFormatter: undefined,
+					percentageFormatter: undefined,
+				},
+			};
+
+			const result = merge(dst, src);
+			expect(result.localization.priceFormatter).to.be.undefined;
+			expect(result.localization.percentageFormatter).to.be.undefined;
 		});
 
 		it('should protect against prototype pollution', () => {
