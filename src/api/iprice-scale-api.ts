@@ -3,8 +3,10 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { PriceScaleOptions } from '../model/price-scale';
 import { IRange } from '../model/time-data';
 
+import { IAxisApi } from './iaxis-api';
+
 /** Interface to control chart's price scale */
-export interface IPriceScaleApi {
+export interface IPriceScaleApi extends IAxisApi {
 	/**
 	 * Applies new options to the price scale
 	 *
