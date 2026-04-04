@@ -25,6 +25,7 @@ export class SeriesLinePaneView extends LinePaneViewBase<'Line', LineStrokeItem,
 			pointMarkersRadius: options.pointMarkersVisible ? (options.pointMarkersRadius || options.lineWidth / 2 + 2) : undefined,
 			visibleRange: this._itemsVisibleRange,
 			barWidth: this._model.timeScale().barSpacing(),
+			connectGaps: options.connectGaps as boolean,
 		};
 
 		this._renderer.setData(data);

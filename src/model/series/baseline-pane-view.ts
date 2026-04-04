@@ -68,6 +68,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 			invertFilledArea: false,
 			visibleRange: this._itemsVisibleRange,
 			barWidth,
+			connectGaps: options.connectGaps as boolean,
 		});
 
 		this._baselineLineRenderer.setData({
@@ -81,6 +82,7 @@ export class SeriesBaselinePaneView extends LinePaneViewBase<'Baseline', Baselin
 			bottomCoordinate,
 			visibleRange: this._itemsVisibleRange,
 			barWidth,
+			connectGaps: options.connectGaps as boolean,
 		});
 	}
 }
