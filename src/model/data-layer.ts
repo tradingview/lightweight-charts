@@ -400,12 +400,16 @@ export class DataLayer<HorzScaleItem> {
 		if (lastSeriesRow === null || this._horzScaleBehavior.key(plotRow.time) > this._horzScaleBehavior.key(lastSeriesRow.time)) {
 			if (isSeriesPlotRow(plotRow)) {
 				seriesData.push(plotRow);
+			} else {
+				this._appendWhitespaceRow(series, plotRow);
 			}
 		} else {
 			if (isSeriesPlotRow(plotRow)) {
 				seriesData[seriesData.length - 1] = plotRow;
+				this._removeLastWhitespaceRowIfSameTime(series, plotRow);
 			} else {
 				seriesData.splice(-1, 1);
+				this._replaceLastWhitespaceRow(series, plotRow);
 			}
 		}
 
@@ -423,8 +427,68 @@ export class DataLayer<HorzScaleItem> {
 		);
 		if (isSeriesPlotRow(plotRow)) {
 			seriesData[index] = plotRow;
+			this._removeWhitespaceRowAtIndex(series, plotRow.index);
 		} else {
 			seriesData.splice(index, 1);
+			this._upsertWhitespaceRow(series, plotRow);
+		}
+	}
+
+	private _appendWhitespaceRow(series: Series<SeriesType>, row: WhitespacePlotRow): void {
+		let whitespaceData = this._seriesWhitespaceRowsBySeries.get(series);
+		if (whitespaceData === undefined) {
+			whitespaceData = [];
+			this._seriesWhitespaceRowsBySeries.set(series, whitespaceData);
+		}
+		whitespaceData.push(row);
+	}
+
+	private _removeLastWhitespaceRowIfSameTime(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType>): void {
+		const whitespaceData = this._seriesWhitespaceRowsBySeries.get(series);
+		if (whitespaceData === undefined || whitespaceData.length === 0) {
+			return;
+		}
+		const last = whitespaceData[whitespaceData.length - 1];
+		if (last.index === plotRow.index) {
+			whitespaceData.splice(-1, 1);
+		}
+	}
+
+	private _replaceLastWhitespaceRow(series: Series<SeriesType>, row: WhitespacePlotRow): void {
+		let whitespaceData = this._seriesWhitespaceRowsBySeries.get(series);
+		if (whitespaceData === undefined) {
+			whitespaceData = [];
+			this._seriesWhitespaceRowsBySeries.set(series, whitespaceData);
+		}
+		if (whitespaceData.length !== 0) {
+			whitespaceData[whitespaceData.length - 1] = row;
+		} else {
+			whitespaceData.push(row);
+		}
+	}
+
+	private _upsertWhitespaceRow(series: Series<SeriesType>, row: WhitespacePlotRow): void {
+		let whitespaceData = this._seriesWhitespaceRowsBySeries.get(series);
+		if (whitespaceData === undefined) {
+			whitespaceData = [];
+			this._seriesWhitespaceRowsBySeries.set(series, whitespaceData);
+		}
+		const index = lowerBound(whitespaceData, row.index, (r: WhitespacePlotRow, idx: number): boolean => r.index < idx);
+		if (index < whitespaceData.length && whitespaceData[index].index === row.index) {
+			whitespaceData[index] = row;
+		} else {
+			whitespaceData.splice(index, 0, row);
+		}
+	}
+
+	private _removeWhitespaceRowAtIndex(series: Series<SeriesType>, rowIndex: number): void {
+		const whitespaceData = this._seriesWhitespaceRowsBySeries.get(series);
+		if (whitespaceData === undefined) {
+			return;
+		}
+		const index = lowerBound(whitespaceData, rowIndex, (r: WhitespacePlotRow, idx: number): boolean => r.index < idx);
+		if (index < whitespaceData.length && whitespaceData[index].index === rowIndex) {
+			whitespaceData.splice(index, 1);
 		}
 	}
 
