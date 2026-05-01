@@ -41,6 +41,10 @@ export interface SeriesChanges {
 	 */
 	data: readonly SeriesPlotRow<SeriesType>[];
 	/**
+	 * Whitespace rows for this series (items without a value that occupy a time slot)
+	 */
+	whitespaceData: readonly WhitespacePlotRow[];
+	/**
 	 * Additional info about this change
 	 */
 	info?: SeriesUpdateInfo;
@@ -132,6 +136,7 @@ export class DataLayer<HorzScaleItem> {
 	// it's just different kind of maps to make usages/perf better
 	private _pointDataByTimePoint: Map<InternalHorzScaleItemKey, TimePointData> = new Map();
 	private _seriesRowsBySeries: Map<Series<SeriesType>, SeriesPlotRow<SeriesType>[]> = new Map();
+	private _seriesWhitespaceRowsBySeries: Map<Series<SeriesType>, WhitespacePlotRow[]> = new Map();
 	private _seriesLastTimePoint: Map<Series<SeriesType>, InternalHorzScaleItem> = new Map();
 
 	// this is kind of "dest" values (in opposite to "source" ones) - we don't need to modify it manually, the only by calling _updateTimeScalePoints or updateSeriesData methods
@@ -146,6 +151,7 @@ export class DataLayer<HorzScaleItem> {
 	public destroy(): void {
 		this._pointDataByTimePoint.clear();
 		this._seriesRowsBySeries.clear();
+		this._seriesWhitespaceRowsBySeries.clear();
 		this._seriesLastTimePoint.clear();
 		this._sortedTimePoints = [];
 	}
@@ -424,10 +430,14 @@ export class DataLayer<HorzScaleItem> {
 
 	private _setRowsToSeries(series: Series<SeriesType>, seriesRows: (SeriesPlotRow<SeriesType> | WhitespacePlotRow)[]): void {
 		if (seriesRows.length !== 0) {
-			this._seriesRowsBySeries.set(series, seriesRows.filter(isSeriesPlotRow));
+			const nonWhitespaceRows = seriesRows.filter(isSeriesPlotRow);
+			this._seriesRowsBySeries.set(series, nonWhitespaceRows);
 			this._seriesLastTimePoint.set(series, seriesRows[seriesRows.length - 1].time);
+			const whitespaceRows = seriesRows.filter((row: SeriesPlotRow<SeriesType> | WhitespacePlotRow): row is WhitespacePlotRow => !isSeriesPlotRow(row));
+			this._seriesWhitespaceRowsBySeries.set(series, whitespaceRows);
 		} else {
 			this._seriesRowsBySeries.delete(series);
+			this._seriesWhitespaceRowsBySeries.delete(series);
 			this._seriesLastTimePoint.delete(series);
 		}
 	}
@@ -520,6 +530,7 @@ export class DataLayer<HorzScaleItem> {
 					s,
 					{
 						data,
+						whitespaceData: this._seriesWhitespaceRowsBySeries.get(s) ?? [],
 						info: s === updatedSeries ? info : undefined,
 					}
 				);
@@ -529,15 +540,16 @@ export class DataLayer<HorzScaleItem> {
 			// meaning the forEach above won't add the series to the data update response
 			// so we handle that case here
 			if (!this._seriesRowsBySeries.has(updatedSeries)) {
-				dataUpdateResponse.series.set(updatedSeries, { data: [], info });
+				dataUpdateResponse.series.set(updatedSeries, { data: [], whitespaceData: [], info });
 			}
 
 			dataUpdateResponse.timeScale.points = this._sortedTimePoints;
 			dataUpdateResponse.timeScale.firstChangedPointIndex = firstChangedPointIndex as TimePointIndex;
 		} else {
 			const seriesData = this._seriesRowsBySeries.get(updatedSeries);
+			const whitespaceData = this._seriesWhitespaceRowsBySeries.get(updatedSeries) ?? [];
 			// if no seriesData found that means that we just removed the series
-			dataUpdateResponse.series.set(updatedSeries, { data: seriesData || [], info });
+			dataUpdateResponse.series.set(updatedSeries, { data: seriesData || [], whitespaceData, info });
 		}
 
 		return dataUpdateResponse;

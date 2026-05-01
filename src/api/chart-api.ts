@@ -412,7 +412,7 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		const model = this._chartWidget.model();
 
 		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
-		update.series.forEach((value: SeriesChanges, series: Series<SeriesType>) => series.setData(value.data, value.info));
+		update.series.forEach((value: SeriesChanges, series: Series<SeriesType>) => series.setData(value.data, value.info, value.whitespaceData));
 
 		model.timeScale().recalculateIndicesWithData();
 		model.recalculateAllPanes();

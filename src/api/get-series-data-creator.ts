@@ -7,7 +7,9 @@ import {
 	OhlcData,
 	SeriesDataItemTypeMap,
 	SingleValueData,
+	WhitespaceData,
 } from '../model/data-consumer';
+import { WhitespacePlotRow } from '../model/get-series-plot-row-creator';
 import { CustomData } from '../model/icustom-series';
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
 import {
@@ -155,5 +157,17 @@ function customData<HorzScaleItem>(plotRow: CustomPlotRow): CustomData<HorzScale
 	return {
 		...plotRow.data,
 		time,
+	};
+}
+
+export function getWhitespaceDataCreator<HorzScaleItem>(): (plotRow: WhitespacePlotRow) => WhitespaceData<HorzScaleItem> {
+	return (plotRow: WhitespacePlotRow): WhitespaceData<HorzScaleItem> => {
+		const data: WhitespaceData<HorzScaleItem> = {
+			time: plotRow.originalTime as HorzScaleItem,
+		};
+		if (plotRow.customValues !== undefined) {
+			data.customValues = plotRow.customValues;
+		}
+		return data;
 	};
 }

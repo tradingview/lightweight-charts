@@ -2,7 +2,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import { getSeriesDataCreator } from '../../src/api/get-series-data-creator';
+import { getSeriesDataCreator, getWhitespaceDataCreator } from '../../src/api/get-series-data-creator';
+import { WhitespacePlotRow } from '../../src/model/get-series-plot-row-creator';
 import { UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
 import { InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { PlotRow } from '../../src/model/plot-data';
@@ -196,6 +197,33 @@ describe('getSeriesDataCreator', () => {
 			color: '#FF0000',
 			borderColor: '#00FF00',
 			wickColor: '#0000FF',
+		});
+	});
+});
+
+describe('getWhitespaceDataCreator', () => {
+	const whitespaceRowBase: WhitespacePlotRow = {
+		index: 0 as TimePointIndex,
+		time: { timestamp: 1649931070 as UTCTimestamp } as unknown as InternalHorzScaleItem,
+		originalTime: 1649931070 as UTCTimestamp,
+	};
+
+	it('should return only time for a plain whitespace row', () => {
+		const creator = getWhitespaceDataCreator();
+		expect(creator(whitespaceRowBase)).to.deep.equal({
+			time: 1649931070,
+		});
+	});
+
+	it('should include customValues when present', () => {
+		const rowWithCustom: WhitespacePlotRow = {
+			...whitespaceRowBase,
+			customValues: { tag: 'gap' },
+		};
+		const creator = getWhitespaceDataCreator();
+		expect(creator(rowWithCustom)).to.deep.equal({
+			time: 1649931070,
+			customValues: { tag: 'gap' },
 		});
 	});
 });

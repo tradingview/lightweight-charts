@@ -25,6 +25,7 @@ import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { DataConflater } from './data-conflater';
 import { isDefaultPriceScale } from './default-price-scale';
+import { WhitespacePlotRow } from './get-series-plot-row-creator';
 import { CustomConflationReducer, CustomData, CustomSeriesWhitespaceData, ICustomSeriesPaneView, WhitespaceCheck } from './icustom-series';
 import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from './ipane-primitive';
 import { FirstValue } from './iprice-data-source';
@@ -95,6 +96,7 @@ export type SeriesPartialOptionsInternal<T extends SeriesType = SeriesType> = Se
 export class Series<T extends SeriesType> extends PriceDataSource implements IDestroyable, ISeries<SeriesType> {
 	private readonly _seriesType: T;
 	private _data: SeriesPlotList<T> = createSeriesPlotList<T>();
+	private _whitespaceRows: readonly WhitespacePlotRow[] = [];
 	private readonly _priceAxisViews: IPriceAxisView[];
 	private readonly _panePriceAxisView: PanePriceAxisView;
 	private _formatter!: IPriceFormatter;
@@ -268,8 +270,13 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this._paneView.update('options');
 	}
 
-	public setData(data: readonly SeriesPlotRow<T>[], updateInfo?: SeriesUpdateInfo): void {
+	public whitespaceRows(): readonly WhitespacePlotRow[] {
+		return this._whitespaceRows;
+	}
+
+	public setData(data: readonly SeriesPlotRow<T>[], updateInfo?: SeriesUpdateInfo, whitespaceRows?: readonly WhitespacePlotRow[]): void {
 		this._data.setData(data);
+		this._whitespaceRows = whitespaceRows ?? [];
 
 		this._conflationByFactorCache.clear();
 

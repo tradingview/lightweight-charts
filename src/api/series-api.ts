@@ -10,6 +10,7 @@ import { Coordinate } from '../model/coordinate';
 import { CustomPriceLine } from '../model/custom-price-line';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
+import { WhitespacePlotRow } from '../model/get-series-plot-row-creator';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { LastValueDataResult } from '../model/iseries';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
@@ -28,7 +29,7 @@ import { IRange, Logical, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
-import { getSeriesDataCreator } from './get-series-data-creator';
+import { getSeriesDataCreator, getWhitespaceDataCreator } from './get-series-data-creator';
 import { type IChartApiBase } from './ichart-api';
 import { IPaneApi } from './ipane-api';
 import { IPriceLine } from './iprice-line';
@@ -186,8 +187,40 @@ export class SeriesApi<
 
 	public data(): readonly TData[] {
 		const seriesCreator = getSeriesDataCreator(this.seriesType());
+		const whitespaceCreator = getWhitespaceDataCreator<HorzScaleItem>();
+
 		const rows = this._series.bars().rows();
-		return rows.map((row: SeriesPlotRow<TSeriesType>) => seriesCreator(row) as TData);
+		const whitespaceRows = this._series.whitespaceRows();
+
+		if (whitespaceRows.length === 0) {
+			return rows.map((row: SeriesPlotRow<TSeriesType>) => seriesCreator(row) as TData);
+		}
+
+		// Merge non-whitespace and whitespace rows, ordered by their time-scale index
+		const result: TData[] = [];
+		let wi = 0;
+		let ri = 0;
+
+		while (ri < rows.length || wi < whitespaceRows.length) {
+			const wRow: WhitespacePlotRow | undefined = whitespaceRows[wi];
+			const rRow: SeriesPlotRow<TSeriesType> | undefined = rows[ri];
+
+			if (wRow === undefined) {
+				result.push(seriesCreator(rRow) as TData);
+				ri++;
+			} else if (rRow === undefined) {
+				result.push(whitespaceCreator(wRow) as TData);
+				wi++;
+			} else if (rRow.index < wRow.index) {
+				result.push(seriesCreator(rRow) as TData);
+				ri++;
+			} else {
+				result.push(whitespaceCreator(wRow) as TData);
+				wi++;
+			}
+		}
+
+		return result;
 	}
 
 	public subscribeDataChanged(handler: DataChangedHandler): void {
