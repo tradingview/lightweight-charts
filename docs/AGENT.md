@@ -79,11 +79,13 @@ If there is a conflict between a guessed pattern and a canonical example, the ca
 Only read the docs and source needed for the task.
 
 Good:
+
 - Open `SKILL.md` section on time handling.
 - Use `REFERENCE.md` to locate `Time scale`, `Time zones`, `Time`, `BusinessDay`, `UTCTimestamp`, and a relevant demo.
 - Inspect the code that consumes those APIs.
 
 Bad:
+
 - Load the entire API catalog before understanding the question.
 - Guess options from similarly named chart libraries.
 - Refactor unrelated code while debugging one rendering issue.
