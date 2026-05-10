@@ -159,14 +159,14 @@ If code is changed, also verify:
 
 Place all three files in the same directory and use relative links:
 
-- `lightweight-charts.agent.md` links to [`SKILL.md`](./SKILL.md) and [`Lightweight Charts API.md`](./REFERENCE.md)
-- `SKILL.md` links back to [`lightweight-charts.agent.md`](./AGENT.md) and [`Lightweight Charts API.md`](./REFERENCE.md)
-- `Lightweight Charts API.md` should link back to [`lightweight-charts.agent.md`](./AGENT.md) and [`SKILL.md`](./SKILL.md) in a short “How to use this index” note at the top
+- `lightweight-charts.agent.md` links to [`SKILL.md`](../skills/lightweight-charts/SKILL.md) and [`Lightweight Charts API.md`](../references/Lightweight%20Charts%20API.md)
+- `SKILL.md` links back to [`lightweight-charts.agent.md`](../agents/lightweight-charts.agent.md) and [`Lightweight Charts API.md`](../references/Lightweight%20Charts%20API.md)
+- `Lightweight Charts API.md` should link back to [`lightweight-charts.agent.md`](../agents/lightweight-charts.agent.md) and [`SKILL.md`](../skills/lightweight-charts/SKILL.md) in a short “How to use this index” note at the top
 
 Recommended top-of-file pattern for `Lightweight Charts API.md`:
 
 ```md
-> Start with [AGENT.md](./AGENT.md) for repo rules and [SKILL.md](./SKILL.md) for task playbooks. Use this file only as the routing/index layer.
+> Start with [lightweight-charts.agent.md](../github/agents/lightweight-charts.agent.md) for repo rules and [SKILL.md](../github/skills/lightweight-charts/SKILL.md) for task playbooks. Use this file only as the routing/index layer.
 ```
 
 ## Maintainer intent

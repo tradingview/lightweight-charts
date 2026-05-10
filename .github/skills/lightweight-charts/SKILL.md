@@ -2,8 +2,8 @@
 
 This file teaches coding agent how to think about Lightweight Charts tasks.
 
-Read [lightweight-charts.agent.md](../agents/lightweight-charts.agent.md) first for repo-level rules.
-Use [Lightweight Charts API.md](../references/Lightweight%20Charts%20API.md) as the routing/index layer to find the exact canonical docs, examples, and APIs referenced below.
+Read [lightweight-charts.agent.md](../../agents/lightweight-charts.agent.md) first for repo-level rules.
+Use [Lightweight Charts API.md](../../references/Lightweight%20Charts%20API.md) as the routing/index layer to find the exact canonical docs, examples, and APIs referenced below.
 
 ## What this file is for
 
@@ -355,9 +355,9 @@ Good retrieval pattern:
 
 ## How the three files connect
 
-- [`lightweight-charts.agent.md`](./AGENT.md) defines repo-level rules and workflow.
-- [`SKILL.md`](./SKILL.md) defines mental models, task routing, and foot-guns.
-- [`Lightweight Charts API.md`](./REFERENCE.md) provides the searchable map to canonical material.
+- [lightweight-charts.agent.md](../../agents/lightweight-charts.agent.md) defines repo-level rules and workflow.
+- [`SKILL.md`](../../skills/lightweight-charts/SKILL.md) defines mental models, task routing, and foot-guns.
+- [`Lightweight Charts API.md`](../../references/Lightweight%20Charts%20API.md) provides the searchable map to canonical material.
 
 Recommended usage path:
 
