@@ -1,12 +1,12 @@
-# REFERENCE.md
+# Lightweight Charts API.md
 
-> Start with [AGENT.md](./AGENT.md) for repo rules and [SKILL.md](./SKILL.md) for task playbooks.
+> Start with [lightweight-charts.agent.md](../agents/lightweight-charts.agent.md) for repo rules and [SKILL.md](../skills/lightweight-charts/SKILL.md) for task playbooks.
 > This file is a compact index of canonical sources — use it to route to the right folder or file, not to enumerate every page.
 
 ## Repo guidance
 
-- [AGENT.md](./AGENT.md) — repo operating rules
-- [SKILL.md](./SKILL.md) — task playbook, mental model, and foot-guns
+- [lightweight-charts.agent.md](../agents/lightweight-charts.agent.md) — repo operating rules
+- [SKILL.md](../skills/lightweight-charts/SKILL.md) — task playbook, mental model, and foot-guns
 
 ## Docs
 
