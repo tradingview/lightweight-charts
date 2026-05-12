@@ -7,14 +7,14 @@ This file is the entry point for coding agents working in the Lightweight Charts
 
 Use this document to understand how to approach the repo, how to route a task, and when to open the other project context files:
 
-- [SKILL.md](../skills/lightweight-charts/SKILL.md) — task playbook, mental model, canonical workflows, and common mistakes.
-- [Lightweight Charts API.md](../references/Lightweight%20Charts%20API.md) — generated index of docs, examples, APIs, migrations, wrappers, and topics.
+- [`SKILL.md`](../skills/lightweight-charts/SKILL.md) — task playbook, mental model, canonical workflows, and common mistakes.
+- [`lightweight-charts-api.md`](../references/lightweight-charts-api.md) — generated index of docs, examples, APIs, migrations, wrappers, and topics.
 
 Recommended reading order:
 
 1. Read `lightweight-charts.agent.md` first for repo-level operating rules.
 2. Read the relevant part of `SKILL.md` for problem-solving guidance.
-3. Use `Lightweight Charts API.md` to route to the right canonical docs/examples/API pages.
+3. Use `lightweight-charts-api.md` to route to the right canonical docs/examples/API pages.
 4. Read the minimum set of source files and canonical docs needed for the task.
 5. Then propose or implement changes.
 
@@ -32,7 +32,7 @@ This file exists to guide agents in navigating the Lightweight Charts codebase e
 |---|---|---|
 | `lightweight-charts.agent.md` | Repo operating manual | Always start here |
 | `SKILL.md` | Task playbook and foot-guns | When answering questions, writing code, or debugging behavior |
-| `Lightweight Charts API.md` | Search/index layer | When you need the canonical doc/example/API topic to read next |
+| `lightweight-charts-api.md` | Search/index layer | When you need the canonical doc/example/API topic to read next |
 
 ## Agent workflow
 
@@ -55,7 +55,7 @@ Do not load the whole project mentally at once. Route first, then read narrowly.
 
 Use this map:
 
-| Task type | Start with | Then use `Lightweight Charts API.md` to find |
+| Task type | Start with | Then use `lightweight-charts-api.md` to find |
 |---|---|---|
 | “How do I use X?” | `SKILL.md` | `How To`, `Demos`, relevant API interfaces/types |
 | “Why is this chart behaving oddly?” | `SKILL.md` | `Time scale`, `Price scale`, `Series`, `Panes`, `Plugins`, `Migrations` |
@@ -82,7 +82,7 @@ Only read the docs and source needed for the task.
 Good:
 
 - Open `SKILL.md` section on time handling.
-- Use `Lightweight Charts API.md` to locate `Time scale`, `Time zones`, `Time`, `BusinessDay`, `UTCTimestamp`, and a relevant demo.
+- Use `lightweight-charts-api.md` to locate `Time scale`, `Time zones`, `Time`, `BusinessDay`, `UTCTimestamp`, and a relevant demo.
 - Inspect the code that consumes those APIs.
 
 Bad:
@@ -143,7 +143,7 @@ When diagnosing issues, verify whether the problem is actually about:
 Before finalizing an answer, patch, or PR draft, verify:
 
 - The task was routed through the right `SKILL.md` section.
-- The recommendation matches canonical docs/examples from `Lightweight Charts API.md`.
+- The recommendation matches canonical docs/examples from `lightweight-charts-api.md`.
 - Version-sensitive behavior was checked against migrations if relevant.
 - No API names were guessed from memory.
 - The change is scoped to the user’s problem.
@@ -159,11 +159,11 @@ If code is changed, also verify:
 
 Place all three files in the same directory and use relative links:
 
-- `lightweight-charts.agent.md` links to [`SKILL.md`](../skills/lightweight-charts/SKILL.md) and [`Lightweight Charts API.md`](../references/Lightweight%20Charts%20API.md)
-- `SKILL.md` links back to [`lightweight-charts.agent.md`](../agents/lightweight-charts.agent.md) and [`Lightweight Charts API.md`](../references/Lightweight%20Charts%20API.md)
-- `Lightweight Charts API.md` should link back to [`lightweight-charts.agent.md`](../agents/lightweight-charts.agent.md) and [`SKILL.md`](../skills/lightweight-charts/SKILL.md) in a short “How to use this index” note at the top
+- `lightweight-charts.agent.md` links to [`SKILL.md`](../skills/lightweight-charts/SKILL.md) and [`lightweight-charts-api.md`](../references/lightweight-charts-api.md)
+- `SKILL.md` links back to [`lightweight-charts.agent.md`](../agents/lightweight-charts.agent.md) and [`lightweight-charts-api.md`](../references/lightweight-charts-api.md)
+- `lightweight-charts-api.md` should link back to [`lightweight-charts.agent.md`](../agents/lightweight-charts.agent.md) and [`SKILL.md`](../skills/lightweight-charts/SKILL.md) in a short “How to use this index” note at the top
 
-Recommended top-of-file pattern for `Lightweight Charts API.md`:
+Recommended top-of-file pattern for `lightweight-charts-api.md`:
 
 ```md
 > Start with [lightweight-charts.agent.md](../github/agents/lightweight-charts.agent.md) for repo rules and [SKILL.md](../github/skills/lightweight-charts/SKILL.md) for task playbooks. Use this file only as the routing/index layer.
@@ -175,4 +175,4 @@ This setup is optimized for both contributors and AI agents:
 
 - `lightweight-charts.agent.md` keeps repo guidance short and maintainable.
 - `SKILL.md` captures recurring high-value knowledge and foot-guns.
-- `Lightweight Charts API.md` stays generated and searchable, not overloaded with policy.
+- `lightweight-charts-api.md` stays generated and searchable, not overloaded with policy.

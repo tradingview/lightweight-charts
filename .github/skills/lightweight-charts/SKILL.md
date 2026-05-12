@@ -3,7 +3,7 @@
 This file teaches coding agent how to think about Lightweight Charts tasks.
 
 Read [lightweight-charts.agent.md](../../agents/lightweight-charts.agent.md) first for repo-level rules.
-Use [Lightweight Charts API.md](../../references/Lightweight%20Charts%20API.md) as the routing/index layer to find the exact canonical docs, examples, and APIs referenced below.
+Use [lightweight-charts-api.md](../../references/lightweight-charts-api.md) as the routing/index layer to find the exact canonical docs, examples, and APIs referenced below.
 
 ## What this file is for
 
@@ -17,7 +17,7 @@ It exists to provide:
 - common foot-guns,
 - and safe answer-generation rules.
 
-If `Lightweight Charts API.md` tells you **where** to look, `SKILL.md` tells you **how to think**.
+If `lightweight-charts-api.md` tells you **where** to look, `SKILL.md` tells you **how to think**.
 
 ## Mental model
 
@@ -46,7 +46,7 @@ Use when the task is:
 - updating data,
 - or customizing appearance.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `Docs` -> Getting started, Chart types, Series, Series types
 - `Functions` -> `createChart`, related factory functions
@@ -66,7 +66,7 @@ Use when the task mentions:
 - scroll/zoom behavior,
 - or “chart looks offset / cropped / reset”.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `Docs` -> `Time scale`, `Time zones`, `Working with time zones`
 - `Interfaces` / `Type Aliases` -> `ITimeScaleApi`, `Time`, `BusinessDay`, `UTCTimestamp`, range handlers
@@ -89,7 +89,7 @@ Use when the task mentions:
 - currency/percentage formatting,
 - or unexpected axis labels.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `Customization` -> `Price format`, `Chart colors`, related examples
 - `Demos` -> `Custom locale`
@@ -111,7 +111,7 @@ Use when the task mentions:
 - margins,
 - or price/volume composition.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `Docs` -> `Price scale`, `Panes`
 - `How To` -> `Two Price Scales`, `Price and volume on a single chart`, `Inverted Price Scale`
@@ -134,7 +134,7 @@ Use when the task mentions:
 - programmatic positioning,
 - or interaction callbacks.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `How To` -> `Add Series Markers`, `Set crosshair position`, `Legends`, `Tooltips`
 - `Functions` -> markers APIs
@@ -154,7 +154,7 @@ Use when the task mentions:
 - incremental updates,
 - or “data disappears / jumps after update”.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `Demos` -> `Realtime updates`, `Infinite history`, `Whitespace data`
 - `Interfaces` -> series APIs, data-change handlers, range-change handlers
@@ -176,7 +176,7 @@ Use when the task mentions:
 - pixel-perfect rendering,
 - or low-level canvas behavior.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `Plugins` -> introduction, custom series types, pane primitives, series primitives, canvas rendering target, pixel-perfect rendering
 - `Interfaces` -> renderer/view/primitive interfaces
@@ -197,7 +197,7 @@ Use when the task mentions:
 - Android wrapper,
 - iOS wrapper.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `React`, `Vue.js`, `Web Components`, wrapper docs under `Docs`
 - then relevant base chart APIs under `Interfaces` / `Functions`
@@ -216,7 +216,7 @@ Use when the task mentions:
 - changed behavior,
 - or code copied from an older example.
 
-Open from `Lightweight Charts API.md`:
+Open from `lightweight-charts-api.md`:
 
 - `Migrations` -> `From v2 to v3`, `From v3 to v4`, `From v4 to v5`
 - `Release Notes`
@@ -231,7 +231,7 @@ When a user asks a question or requests code, answer in this sequence:
 
 1. Identify the primary layer involved: chart, series, scale, data model, layout, plugin, or wrapper.
 2. Identify the likely foot-gun category.
-3. Use `Lightweight Charts API.md` to open the exact docs/examples/API entities.
+3. Use `lightweight-charts-api.md` to open the exact docs/examples/API entities.
 4. Prefer one canonical example and one canonical API reference over many weak references.
 5. Generate the smallest explanation or code patch that matches the official usage pattern.
 
@@ -357,7 +357,7 @@ Good retrieval pattern:
 
 - [lightweight-charts.agent.md](../../agents/lightweight-charts.agent.md) defines repo-level rules and workflow.
 - [`SKILL.md`](../../skills/lightweight-charts/SKILL.md) defines mental models, task routing, and foot-guns.
-- [`Lightweight Charts API.md`](../../references/Lightweight%20Charts%20API.md) provides the searchable map to canonical material.
+- [`lightweight-charts-api.md`](../../references/lightweight-charts-api.md) provides the searchable map to canonical material.
 
 Recommended usage path:
 
@@ -371,4 +371,4 @@ This split keeps maintenance cost low:
 
 - `lightweight-charts.agent.md` stays short and stable.
 - `SKILL.md` changes only when repeated mistakes or important usage patterns emerge.
-- `Lightweight Charts API.md` can stay generated and broad without becoming the place for policy or instruction.
+- `lightweight-charts-api.md` can stay generated and broad without becoming the place for policy or instruction.
