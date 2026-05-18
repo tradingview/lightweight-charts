@@ -36,7 +36,7 @@ export class SeriesBaselinePaneView extends LineHitTestPaneViewBase<'Baseline', 
 	}
 
 	public paneViewsForHoveredSourceOnTop(): HoveredSourcePaneViews | null {
-		return this._hasVisibleLineLikeContent() ? this._hoveredSourcePaneViews : null;
+		return this._hoveredSourcePaneViews;
 	}
 
 	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: ISeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
