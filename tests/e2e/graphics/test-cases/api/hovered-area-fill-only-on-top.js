@@ -34,9 +34,9 @@ function runTestCase(container) {
 		{ time: '2020-01-03', value: 80 },
 	];
 	const lineData = [
-		{ time: '2020-01-01', value: 50 },
-		{ time: '2020-01-02', value: 50 },
-		{ time: '2020-01-03', value: 50 },
+		{ time: '2020-01-01', value: 65 },
+		{ time: '2020-01-02', value: 65 },
+		{ time: '2020-01-03', value: 65 },
 	];
 
 	areaSeries.setData(areaData);

@@ -39,9 +39,9 @@ function runTestCase(container) {
 		{ time: '2020-01-03', value: 80 },
 	];
 	const lineData = [
-		{ time: '2020-01-01', value: 50 },
-		{ time: '2020-01-02', value: 50 },
-		{ time: '2020-01-03', value: 50 },
+		{ time: '2020-01-01', value: 70 },
+		{ time: '2020-01-02', value: 70 },
+		{ time: '2020-01-03', value: 70 },
 	];
 
 	baselineSeries.setData(baselineData);
