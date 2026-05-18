@@ -4,19 +4,39 @@ import { ISeries } from '../../model/iseries';
 import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { AreaFillItem, PaneRendererArea } from '../../renderers/area-renderer';
-import { CompositeRenderer } from '../../renderers/composite-renderer';
 import { LineStrokeItem, PaneRendererLine } from '../../renderers/line-renderer';
+import { HoveredSourcePaneViews } from '../../views/pane/hovered-source-pane-views';
+import { IPaneView } from '../../views/pane/ipane-view';
 
+import { FillSeriesCompositeRenderer, FillSeriesLinePaneView } from './fill-series-hovered-pane-view';
 import { LineHitTestPaneViewBase } from './line-hit-test-pane-view-base';
 
-export class SeriesAreaPaneView extends LineHitTestPaneViewBase<'Area', AreaFillItem & LineStrokeItem, CompositeRenderer> {
-	protected readonly _renderer: CompositeRenderer = new CompositeRenderer();
+export class SeriesAreaPaneView extends LineHitTestPaneViewBase<'Area', AreaFillItem & LineStrokeItem, FillSeriesCompositeRenderer> {
+	protected readonly _renderer: FillSeriesCompositeRenderer;
 	private readonly _areaRenderer: PaneRendererArea = new PaneRendererArea();
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
+	private readonly _linePaneView: FillSeriesLinePaneView = new FillSeriesLinePaneView(
+		this._lineRenderer,
+		() => this._series.visible() && this._itemsVisibleRange !== null && this._hasVisibleLineLikeContent()
+	);
+	private readonly _normalPaneViews: readonly IPaneView[] = [this];
+	private readonly _topPaneViews: readonly IPaneView[] = [this._linePaneView];
+	private readonly _hoveredSourcePaneViews: HoveredSourcePaneViews = {
+		normalPaneViews: this._normalPaneViews,
+		topPaneViews: this._topPaneViews,
+	};
 
 	public constructor(series: ISeries<'Area'>, model: IChartModelBase) {
 		super(series, model);
-		this._renderer.setRenderers([this._areaRenderer, this._lineRenderer]);
+		this._renderer = new FillSeriesCompositeRenderer(
+			this._areaRenderer,
+			this._lineRenderer,
+			() => this._model.options().hoveredSeriesOnTop
+		);
+	}
+
+	public paneViewsForHoveredSourceOnTop(): HoveredSourcePaneViews | null {
+		return this._hasVisibleLineLikeContent() ? this._hoveredSourcePaneViews : null;
 	}
 
 	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: ISeriesBarColorer<'Area'>): AreaFillItem & LineStrokeItem {
@@ -64,5 +84,10 @@ export class SeriesAreaPaneView extends LineHitTestPaneViewBase<'Area', AreaFill
 			barWidth: this._model.timeScale().barSpacing(),
 			pointMarkersRadius: options.pointMarkersVisible ? (options.pointMarkersRadius || options.lineWidth / 2 + 2) : undefined,
 		});
+	}
+
+	private _hasVisibleLineLikeContent(): boolean {
+		const options = this._series.options();
+		return options.lineVisible || options.pointMarkersVisible;
 	}
 }

@@ -31,7 +31,8 @@ export class HorizontalLineRenderer extends BitmapCoordinatesPaneRenderer {
 		}
 
 		const { y: itemY, lineWidth, externalId } = this._data;
-		// add a fixed area threshold around line (Y + width) for hit test
+		// Price lines and baseline lines use the renderer fallback path, not the
+		// main-series hitTestTolerance option. Keep their legacy grab area stable.
 		if (y >= itemY - lineWidth - Constants.HitTestThreshold && y <= itemY + lineWidth + Constants.HitTestThreshold) {
 			return {
 				hitTestData: this._data,
