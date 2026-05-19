@@ -1,7 +1,10 @@
+---
 description: TypeScript agent with expertise in lightweight charts TS package from TradingView for building financial charts.
 name: LWC Agent
-
 argument-hint: Delegate tasks which require understanding of the Lightweight Charts library, its API, and best practices for implementation and debugging.
+---
+
+# Lightweight Charts Agent
 
 This file is the entry point for coding agents working in the Lightweight Charts repository.
 
@@ -102,7 +105,7 @@ This project exposes many similarly named types and options. Do not assume that:
 - autoscale behavior is implicit,
 - or wrapper APIs expose all web APIs identically.
 
-Confirm using `Lightweight Charts API.md` and the canonical doc/example pages.
+Confirm using [`lightweight-charts-api.md`](../references/lightweight-charts-api.md) and the canonical doc/example pages.
 
 ### Keep answers and patches minimal
 

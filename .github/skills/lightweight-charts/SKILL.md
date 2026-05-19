@@ -1,3 +1,11 @@
+---
+name: lightweight-charts
+description: >-
+  Task playbook for Lightweight Charts agents — mental model, routing maps,
+  canonical patterns, foot-guns, and safe code-gen rules for chart/series/
+  scale/plugin/wrapper tasks.
+---
+
 # SKILL.md
 
 This file teaches coding agent how to think about Lightweight Charts tasks.
