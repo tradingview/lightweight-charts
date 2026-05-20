@@ -17,7 +17,7 @@ export class SeriesAreaPaneView extends LineHitTestPaneViewBase<'Area', AreaFill
 	private readonly _lineRenderer: PaneRendererLine = new PaneRendererLine();
 	private readonly _linePaneView: FillSeriesLinePaneView = new FillSeriesLinePaneView(
 		this._lineRenderer,
-		() => this._series.visible() && this._itemsVisibleRange !== null && this._hasVisibleLineLikeContent()
+		() => this._shouldDrawLine()
 	);
 	private readonly _normalPaneViews: readonly IPaneView[] = [this];
 	private readonly _topPaneViews: readonly IPaneView[] = [this._linePaneView];
@@ -31,6 +31,7 @@ export class SeriesAreaPaneView extends LineHitTestPaneViewBase<'Area', AreaFill
 		this._renderer = new FillSeriesCompositeRenderer(
 			this._areaRenderer,
 			this._lineRenderer,
+			() => this._shouldDrawLine(),
 			() => this._model.options().hoveredSeriesOnTop
 		);
 	}
@@ -84,6 +85,12 @@ export class SeriesAreaPaneView extends LineHitTestPaneViewBase<'Area', AreaFill
 			barWidth: this._model.timeScale().barSpacing(),
 			pointMarkersRadius: options.pointMarkersVisible ? (options.pointMarkersRadius || options.lineWidth / 2 + 2) : undefined,
 		});
+	}
+
+	private _shouldDrawLine(): boolean {
+		return this._series.visible() &&
+			this._itemsVisibleRange !== null &&
+			this._hasVisibleLineLikeContent();
 	}
 
 	private _hasVisibleLineLikeContent(): boolean {

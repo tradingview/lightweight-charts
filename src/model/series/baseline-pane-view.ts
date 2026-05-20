@@ -17,7 +17,7 @@ export class SeriesBaselinePaneView extends LineHitTestPaneViewBase<'Baseline', 
 	private readonly _baselineLineRenderer: PaneRendererBaselineLine = new PaneRendererBaselineLine();
 	private readonly _linePaneView: FillSeriesLinePaneView = new FillSeriesLinePaneView(
 		this._baselineLineRenderer,
-		() => this._series.visible() && this._itemsVisibleRange !== null && this._hasVisibleLineLikeContent()
+		() => this._shouldDrawLine()
 	);
 	private readonly _normalPaneViews: readonly IPaneView[] = [this];
 	private readonly _topPaneViews: readonly IPaneView[] = [this._linePaneView];
@@ -31,6 +31,7 @@ export class SeriesBaselinePaneView extends LineHitTestPaneViewBase<'Baseline', 
 		this._renderer = new FillSeriesCompositeRenderer(
 			this._baselineAreaRenderer,
 			this._baselineLineRenderer,
+			() => this._shouldDrawLine(),
 			() => this._model.options().hoveredSeriesOnTop
 		);
 	}
@@ -102,6 +103,12 @@ export class SeriesBaselinePaneView extends LineHitTestPaneViewBase<'Baseline', 
 			visibleRange: this._itemsVisibleRange,
 			barWidth,
 		});
+	}
+
+	private _shouldDrawLine(): boolean {
+		return this._series.visible() &&
+			this._itemsVisibleRange !== null &&
+			this._hasVisibleLineLikeContent();
 	}
 
 	private _hasVisibleLineLikeContent(): boolean {

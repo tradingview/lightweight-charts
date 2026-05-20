@@ -108,13 +108,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	private readonly _options: SeriesOptionsInternal<T>;
 	private _animationTimeoutId: TimerId | null = null;
 	private _primitives: SeriesPrimitiveWrapper[] = [];
-	private _paneViewsCacheVersion: number = 0;
-	private _hoveredSourcePaneViewsCache: {
-		main: HoveredSourcePaneViews;
-		isOverlay: boolean;
-		version: number;
-		result: HoveredSourcePaneViews;
-	} | null = null;
 
 	private readonly _dataConflater: DataConflater<T> = new DataConflater<T>();
 	private readonly _conflationByFactorCache: Map<number, SeriesPlotList<T>> = new Map();
@@ -307,7 +300,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	public createPriceLine(options: PriceLineOptions): CustomPriceLine {
 		const result = new CustomPriceLine(this, options);
 		this._customPriceLines.push(result);
-		this._invalidateHoveredSourcePaneViewsCache();
 		this.model().updateSource(this);
 		return result;
 	}
@@ -316,7 +308,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		const index = this._customPriceLines.indexOf(line);
 		if (index !== -1) {
 			this._customPriceLines.splice(index, 1);
-			this._invalidateHoveredSourcePaneViewsCache();
 		}
 		this.model().updateSource(this);
 	}
@@ -503,35 +494,22 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		}
 
 		const isOverlay = this._isOverlay();
-		const cache = this._hoveredSourcePaneViewsCache;
-		if (cache !== null && cache.main === main && cache.isOverlay === isOverlay && cache.version === this._paneViewsCacheVersion) {
-			return cache.result;
-		}
-
 		const normalPaneViews: IPaneView[] = [];
 		if (!isOverlay) {
 			normalPaneViews.push(this._baseHorizontalLineView);
 		}
 		normalPaneViews.push(...main.normalPaneViews);
+		extractPrimitivePaneViews(this._primitives, primitivePaneViewsExtractor, 'normal', normalPaneViews);
 
 		const topPaneViews: IPaneView[] = [];
 		topPaneViews.push(...main.topPaneViews, this._priceLineView);
 		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
 		topPaneViews.push(...priceLineViews);
-		extractPrimitivePaneViews(this._primitives, primitivePaneViewsExtractor, 'normal', topPaneViews);
 
-		const result: HoveredSourcePaneViews = {
+		return {
 			normalPaneViews,
 			topPaneViews,
 		};
-		this._hoveredSourcePaneViewsCache = {
-			main,
-			isOverlay,
-			version: this._paneViewsCacheVersion,
-			result,
-		};
-
-		return result;
 	}
 
 	public bottomPaneViews(): readonly IPaneView[] {
@@ -621,9 +599,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this._lastPriceAnimationPaneView?.update();
 
 		this._primitives.forEach((wrapper: SeriesPrimitiveWrapper) => wrapper.updateAllViews());
-		if (this._primitives.length > 0) {
-			this._invalidateHoveredSourcePaneViewsCache();
-		}
 	}
 
 	public override priceScale(): PriceScale {
@@ -659,15 +634,10 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 	public attachPrimitive(primitive: ISeriesPrimitiveBase): void {
 		this._primitives.push(new SeriesPrimitiveWrapper(primitive, this));
-		this._invalidateHoveredSourcePaneViewsCache();
 	}
 
 	public detachPrimitive(source: ISeriesPrimitiveBase): void {
-		const previousLength = this._primitives.length;
 		this._primitives = this._primitives.filter((wrapper: SeriesPrimitiveWrapper) => wrapper.primitive() !== source);
-		if (this._primitives.length !== previousLength) {
-			this._invalidateHoveredSourcePaneViewsCache();
-		}
 	}
 
 	public customSeriesPlotValuesBuilder(): CustomDataToPlotRowValueConverter<unknown> | undefined {
@@ -827,11 +797,6 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		const res: IPaneView[] = [];
 		extractPrimitivePaneViews(this._primitives, extractor, zOrder, res);
 		return res;
-	}
-
-	private _invalidateHoveredSourcePaneViewsCache(): void {
-		this._paneViewsCacheVersion++;
-		this._hoveredSourcePaneViewsCache = null;
 	}
 
 	private _calculateConflationFactor(): number {

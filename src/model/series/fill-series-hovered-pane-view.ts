@@ -6,21 +6,24 @@ import { IPaneView } from '../../views/pane/ipane-view';
 export class FillSeriesCompositeRenderer implements IPaneRenderer {
 	private readonly _fillRenderer: IPaneRenderer;
 	private readonly _lineRenderer: IPaneRenderer;
+	private readonly _shouldDrawLine: () => boolean;
 	private readonly _shouldDrawLineOnTop: () => boolean;
 
 	public constructor(
 		fillRenderer: IPaneRenderer,
 		lineRenderer: IPaneRenderer,
+		shouldDrawLine: () => boolean,
 		shouldDrawLineOnTop: () => boolean
 	) {
 		this._fillRenderer = fillRenderer;
 		this._lineRenderer = lineRenderer;
+		this._shouldDrawLine = shouldDrawLine;
 		this._shouldDrawLineOnTop = shouldDrawLineOnTop;
 	}
 
 	public draw(target: CanvasRenderingTarget2D, isHovered: boolean, hitTestData?: unknown): void {
 		this._fillRenderer.draw(target, isHovered, hitTestData);
-		if (!isHovered || !this._shouldDrawLineOnTop()) {
+		if (this._shouldDrawLine() && (!isHovered || !this._shouldDrawLineOnTop())) {
 			this._lineRenderer.draw(target, isHovered, hitTestData);
 		}
 	}
