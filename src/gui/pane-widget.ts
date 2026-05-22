@@ -25,12 +25,13 @@ import { Point } from '../model/point';
 import { TimePointIndex } from '../model/time-data';
 import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
+import { HoveredSourcePaneViews } from '../views/pane/hovered-source-pane-views';
 import { IPaneView } from '../views/pane/ipane-view';
 
 import { AttributionLogoWidget } from './attribution-logo-widget';
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IChartWidgetBase } from './chart-widget';
-import { drawBackground, drawForeground, DrawFunction, drawSourceViews, ViewsGetter } from './draw-functions';
+import { drawBackground, drawForeground, DrawFunction, drawPaneViews, drawSourceViews, ViewsGetter } from './draw-functions';
 import { MouseEventHandler, MouseEventHandlerEventBase, MouseEventHandlerMouseEvent, MouseEventHandlers, MouseEventHandlerTouchEvent, Position, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisWidget, PriceAxisWidgetSide } from './price-axis-widget';
 
@@ -581,29 +582,87 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _drawSources(target: CanvasRenderingTarget2D, paneViewsGetter: ViewsGetter<IDataSourcePaneViews>): void {
 		const state = ensureNotNull(this._state);
-		const sources = state.orderedSourcesForRendering();
+		const hoveredSplitSource = paneViewsGetter === sourcePaneViews ? this._hoveredSplitSource() : null;
+		const hoveredSplitViews = hoveredSplitSource === null ? null : this._hoveredSplitSourcePaneViews(hoveredSplitSource, state);
 
 		const panePrimitives = state.primitives();
-		for (const panePrimitive of panePrimitives) {
-			this._drawSourceImpl(target, paneViewsGetter, drawBackground, panePrimitive);
-		}
-		for (const source of sources) {
-			this._drawSourceImpl(target, paneViewsGetter, drawBackground, source);
+		if (hoveredSplitViews === null || hoveredSplitSource === null) {
+			const sources = state.orderedSourcesForRendering();
+			this._drawSourceGroup(target, paneViewsGetter, drawBackground, panePrimitives, sources);
+			this._drawSourceGroup(target, paneViewsGetter, drawForeground, panePrimitives, sources);
+
+			return;
 		}
 
+		const sources = state.orderedSources();
+		const sourcePaneViewsOverride = (source: IDataSourcePaneViews): readonly IPaneView[] | undefined =>
+			source === hoveredSplitSource ? hoveredSplitViews.normalPaneViews : undefined;
+		this._drawSourceGroup(target, paneViewsGetter, drawBackground, panePrimitives, sources, sourcePaneViewsOverride);
+		this._drawSourceGroup(target, paneViewsGetter, drawForeground, panePrimitives, sources, sourcePaneViewsOverride);
+
+		this._drawSourceImpl(target, paneViewsGetter, drawBackground, hoveredSplitSource, hoveredSplitViews.topPaneViews);
+		this._drawSourceImpl(target, paneViewsGetter, drawForeground, hoveredSplitSource, hoveredSplitViews.topPaneViews);
+	}
+
+	private _drawSourceGroup(
+		target: CanvasRenderingTarget2D,
+		paneViewsGetter: ViewsGetter<IDataSourcePaneViews>,
+		drawFn: DrawFunction,
+		panePrimitives: readonly IDataSourcePaneViews[],
+		sources: readonly IDataSourcePaneViews[],
+		sourcePaneViewsOverride?: (source: IDataSourcePaneViews) => readonly IPaneView[] | undefined
+	): void {
 		for (const panePrimitive of panePrimitives) {
-			this._drawSourceImpl(target, paneViewsGetter, drawForeground, panePrimitive);
+			this._drawSourceImpl(target, paneViewsGetter, drawFn, panePrimitive);
 		}
+
+		if (sourcePaneViewsOverride === undefined) {
+			for (const source of sources) {
+				this._drawSourceImpl(target, paneViewsGetter, drawFn, source);
+			}
+			return;
+		}
+
 		for (const source of sources) {
-			this._drawSourceImpl(target, paneViewsGetter, drawForeground, source);
+			this._drawSourceImpl(target, paneViewsGetter, drawFn, source, sourcePaneViewsOverride(source));
 		}
+	}
+
+	private _hoveredSplitSource(): IDataSourcePaneViews | null {
+		const state = ensureNotNull(this._state);
+		const hoveredSource = state.model().hoveredSource()?.source;
+
+		if (
+			!state.model().options().hoveredSeriesOnTop ||
+			hoveredSource === undefined
+		) {
+			return null;
+		}
+
+		for (const source of state.orderedSources()) {
+			if (source === hoveredSource) {
+				return source;
+			}
+		}
+
+		return null;
+	}
+
+	private _hoveredSplitSourcePaneViews(source: IDataSourcePaneViews, pane: Pane): HoveredSourcePaneViews | null {
+		const hoveredPaneViews = source.paneViewsForHoveredSourceOnTop?.(pane) ?? null;
+		if (hoveredPaneViews === null || hoveredPaneViews.topPaneViews.length === 0) {
+			return null;
+		}
+
+		return hoveredPaneViews;
 	}
 
 	private _drawSourceImpl(
 		target: CanvasRenderingTarget2D,
 		paneViewsGetter: ViewsGetter<IDataSourcePaneViews>,
 		drawFn: DrawFunction,
-		source: IDataSourcePaneViews
+		source: IDataSourcePaneViews,
+		paneViewsOverride?: readonly IPaneView[]
 	): void {
 		const state = ensureNotNull(this._state);
 		const hoveredSource = state.model().hoveredSource();
@@ -613,7 +672,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			: undefined;
 
 		const drawRendererFn = (renderer: IPaneRenderer) => drawFn(renderer, target, isHovered, objecId);
-		drawSourceViews(paneViewsGetter, drawRendererFn, source, state);
+		if (paneViewsOverride === undefined) {
+			drawSourceViews(paneViewsGetter, drawRendererFn, source, state);
+		} else {
+			drawPaneViews(paneViewsOverride, drawRendererFn, state);
+		}
 	}
 
 	private _recreatePriceAxisWidgets(): void {

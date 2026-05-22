@@ -8,7 +8,7 @@ export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '52.00 KB',
+		limit: '52.20 KB',
 		import: '*',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -48,14 +48,14 @@ export default [
 	{
 		name: 'Standalone-ESM',
 		path: 'dist/lightweight-charts.standalone.production.mjs',
-		limit: '53.50 KB',
+		limit: '53.75 KB',
 		import: '*',
 		brotli: true,
 	},
 	{
 		name: 'Standalone',
 		path: 'dist/lightweight-charts.standalone.production.js',
-		limit: '53.50 KB',
+		limit: '53.75 KB',
 		brotli: true,
 	},
 	{

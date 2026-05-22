@@ -5,18 +5,39 @@ import { ISeriesBarColorer } from '../../model/series-bar-colorer';
 import { TimePointIndex } from '../../model/time-data';
 import { BaselineFillItem, PaneRendererBaselineArea } from '../../renderers/baseline-renderer-area';
 import { BaselineStrokeItem, PaneRendererBaselineLine } from '../../renderers/baseline-renderer-line';
-import { CompositeRenderer } from '../../renderers/composite-renderer';
+import { HoveredSourcePaneViews } from '../../views/pane/hovered-source-pane-views';
+import { IPaneView } from '../../views/pane/ipane-view';
 
+import { FillSeriesCompositeRenderer, FillSeriesLinePaneView } from './fill-series-hovered-pane-view';
 import { LineHitTestPaneViewBase } from './line-hit-test-pane-view-base';
 
-export class SeriesBaselinePaneView extends LineHitTestPaneViewBase<'Baseline', BaselineFillItem & BaselineStrokeItem, CompositeRenderer> {
-	protected readonly _renderer: CompositeRenderer = new CompositeRenderer();
+export class SeriesBaselinePaneView extends LineHitTestPaneViewBase<'Baseline', BaselineFillItem & BaselineStrokeItem, FillSeriesCompositeRenderer> {
+	protected readonly _renderer: FillSeriesCompositeRenderer;
 	private readonly _baselineAreaRenderer: PaneRendererBaselineArea = new PaneRendererBaselineArea();
 	private readonly _baselineLineRenderer: PaneRendererBaselineLine = new PaneRendererBaselineLine();
+	private readonly _linePaneView: FillSeriesLinePaneView = new FillSeriesLinePaneView(
+		this._baselineLineRenderer,
+		() => this._shouldDrawLine()
+	);
+	private readonly _normalPaneViews: readonly IPaneView[] = [this];
+	private readonly _topPaneViews: readonly IPaneView[] = [this._linePaneView];
+	private readonly _hoveredSourcePaneViews: HoveredSourcePaneViews = {
+		normalPaneViews: this._normalPaneViews,
+		topPaneViews: this._topPaneViews,
+	};
 
 	public constructor(series: ISeries<'Baseline'>, model: IChartModelBase) {
 		super(series, model);
-		this._renderer.setRenderers([this._baselineAreaRenderer, this._baselineLineRenderer]);
+		this._renderer = new FillSeriesCompositeRenderer(
+			this._baselineAreaRenderer,
+			this._baselineLineRenderer,
+			() => this._shouldDrawLine(),
+			() => this._model.options().hoveredSeriesOnTop
+		);
+	}
+
+	public paneViewsForHoveredSourceOnTop(): HoveredSourcePaneViews | null {
+		return this._hoveredSourcePaneViews;
 	}
 
 	protected _createRawItem(time: TimePointIndex, price: BarPrice, colorer: ISeriesBarColorer<'Baseline'>): BaselineFillItem & BaselineStrokeItem {
@@ -82,5 +103,16 @@ export class SeriesBaselinePaneView extends LineHitTestPaneViewBase<'Baseline', 
 			visibleRange: this._itemsVisibleRange,
 			barWidth,
 		});
+	}
+
+	private _shouldDrawLine(): boolean {
+		return this._series.visible() &&
+			this._itemsVisibleRange !== null &&
+			this._hasVisibleLineLikeContent();
+	}
+
+	private _hasVisibleLineLikeContent(): boolean {
+		const options = this._series.options();
+		return options.lineVisible || options.pointMarkersVisible;
 	}
 }

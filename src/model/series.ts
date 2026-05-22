@@ -7,6 +7,7 @@ import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { isInteger, merge } from '../helpers/strict-type-checks';
 
+import { HoveredSourcePaneViews } from '../views/pane/hovered-source-pane-views';
 import { IPaneView } from '../views/pane/ipane-view';
 import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
 import { PanePriceAxisView } from '../views/pane/pane-price-axis-view';
@@ -484,6 +485,31 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		extractPrimitivePaneViews(this._primitives, primitivePaneViewsExtractor, 'normal', res);
 
 		return res;
+	}
+
+	public paneViewsForHoveredSourceOnTop(): HoveredSourcePaneViews | null {
+		const main = this._paneView.paneViewsForHoveredSourceOnTop?.() ?? null;
+		if (main === null) {
+			return null;
+		}
+
+		const isOverlay = this._isOverlay();
+		const normalPaneViews: IPaneView[] = [];
+		if (!isOverlay) {
+			normalPaneViews.push(this._baseHorizontalLineView);
+		}
+		normalPaneViews.push(...main.normalPaneViews);
+		extractPrimitivePaneViews(this._primitives, primitivePaneViewsExtractor, 'normal', normalPaneViews);
+
+		const topPaneViews: IPaneView[] = [];
+		topPaneViews.push(...main.topPaneViews, this._priceLineView);
+		const priceLineViews = this._customPriceLines.map((line: CustomPriceLine) => line.paneView());
+		topPaneViews.push(...priceLineViews);
+
+		return {
+			normalPaneViews,
+			topPaneViews,
+		};
 	}
 
 	public bottomPaneViews(): readonly IPaneView[] {

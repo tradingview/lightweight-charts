@@ -51,6 +51,14 @@ export function drawSourceViews<T extends IDataSource | IDataSourcePaneViews>(
 	const views = (
 		paneViewsGetter as (s: T, p: Pane) => readonly (IAxisView | IPaneView)[]
 	)(source, pane);
+	drawPaneViews(views, drawRendererFn, pane);
+}
+
+export function drawPaneViews(
+	views: readonly (IAxisView | IPaneView)[],
+	drawRendererFn: DrawRendererFn,
+	pane: Pane
+): void {
 	for (const view of views) {
 		const renderer = view.renderer(pane);
 		if (renderer !== null) {
