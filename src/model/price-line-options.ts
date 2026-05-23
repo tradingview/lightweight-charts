@@ -63,6 +63,16 @@ export interface PriceLineOptions {
 	 * @defaultValue `''`
 	 */
 	axisLabelTextColor: string;
+	/**
+	 * Hit-test tolerance in pixels, added on each side of the line (in addition to its
+	 * {@link lineWidth}) when determining whether a pointer event hits this price line.
+	 * Lower values require more precise pointing; `0` limits hits to the line itself.
+	 * Useful on desktop where the default tolerance can cause nearby price lines to
+	 * register as the same hit.
+	 *
+	 * @defaultValue `7`
+	 */
+	hitTestTolerance: number;
 }
 
 /**
