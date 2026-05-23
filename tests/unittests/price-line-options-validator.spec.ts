@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { doesNotThrow, throws } from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
