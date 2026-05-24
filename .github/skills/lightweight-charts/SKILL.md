@@ -343,7 +343,7 @@ When generating code:
 - If a task is wrapper-specific, preserve framework lifecycle conventions.
 - If a task is plugin-specific, do not answer with ordinary chart options only.
 
-## How to use `Lightweight Charts API.md` well
+## How to use `lightweight-charts-api.md` well
 
 Do not read it top-to-bottom.
 
