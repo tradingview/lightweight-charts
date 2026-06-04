@@ -11,6 +11,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 		minBarSpacing: 4,
 		barSpacing: 21,
 	},
+	hoveredSeriesOnTop: false,
 }));
 
 const dualRangeHistogramSeriesView = new DualRangeHistogramSeries();
