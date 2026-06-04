@@ -101,6 +101,18 @@ lineSeries.setData([
 |Yes (standalone)|PROD|`lightweight-charts.standalone.production.mjs`|`lightweight-charts.standalone.production.js`|
 |Yes (standalone)|DEV|`lightweight-charts.standalone.development.mjs`|`lightweight-charts.standalone.development.js`|
 
+## AI coding assistants
+
+This repository ships an [Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) that teaches AI coding assistants how to work with Lightweight Charts™ - the v5 API conventions, the mental model, and the common time, scale, marker, plugin, and wrapper foot-guns.
+
+Install it into your project with the `skills` CLI:
+
+```console
+npx skills add https://github.com/tradingview/lightweight-charts
+```
+
+This makes the skill available to compatible assistants (such as Claude Code, Codex, etc.), streamlining your workflow: they scaffold charts, wire up series and data, and answer API questions against the current v5 conventions out of the box - instead of relying on outdated snippets and stumbling into common foot-guns.
+
 ## Development
 
 See [BUILDING.md](./BUILDING.md) for instructions on how to build `lightweight-charts` from source.
