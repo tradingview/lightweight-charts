@@ -35,9 +35,9 @@ const esMessages: PartialAccessibilityMessages = {
 			? 'Use las flechas izquierda y derecha para moverse entre los puntos de datos, y las flechas arriba y abajo para cambiar de serie.'
 			: 'Use las flechas izquierda y derecha para moverse entre los puntos de datos.',
 	help: ({ multiSeries }) =>
-		`Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Re Pág y Av Pág saltan diez puntos. Inicio y Fin saltan al primer y al último punto. Intro o Espacio lee un resumen de la serie.`,
+		`Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Re Pág salta diez puntos adelante, Av Pág diez puntos atrás. Inicio y Fin saltan al primer y al último punto. Intro o Espacio lee un resumen de la serie.`,
 	point: ({ position, total, time, label, values }) =>
-		`Punto ${position} de ${total}. ${time}, ${label} ${values}.`,
+		`${label} ${values}, ${time}. Punto ${position} de ${total}.`,
 	seriesPosition: ({ label, position, total, point }) =>
 		`${label}, serie ${position} de ${total}.${point}`,
 	summary: ({ label, count, scopeNote, firstValue, firstTime, lastValue, lastTime, directionLabel, changeValue, percent, lowValue, lowTime, highValue, highTime }) =>
@@ -57,7 +57,7 @@ const esMessages: PartialAccessibilityMessages = {
 	},
 };
 
-const chart = ((window as unknown as any).chart = createChart('chart', {
+const chart = createChart('chart', {
 	autoSize: true,
 	timeScale: {
 		rightOffset: 10,
@@ -72,7 +72,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 		priceFormatter: (price: number) =>
 			new Intl.NumberFormat('es', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price),
 	},
-}));
+});
 
 // --- Panel 0: dos series de precio (arriba/abajo cambia entre ellas) ---
 const priceSeries = chart.addSeries(AreaSeries, {
@@ -90,7 +90,17 @@ const averageSeries = chart.addSeries(LineSeries, {
 	lineWidth: 2,
 	title: 'Media móvil',
 });
-const averageData = generateLineData();
+// Una media móvil real de la serie de precios: empieza más tarde, así que las
+// dos series no comparten todas las marcas de tiempo (al cambiar de serie se
+// mantiene el *tiempo* enfocado seleccionando el punto más cercano).
+const averagePeriod = 20;
+const averageData = priceData.slice(averagePeriod - 1).map((point, index) => {
+	let sum = 0;
+	for (let i = index; i < index + averagePeriod; i++) {
+		sum += priceData[i].value;
+	}
+	return { time: point.time, value: sum / averagePeriod };
+});
 averageSeries.setData(averageData);
 
 // --- Panel 1: una serie de volumen en su propio panel ---

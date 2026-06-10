@@ -80,7 +80,7 @@ attach to.
 | `Tab` | Move focus between panes / out of the chart |
 | `←` / `→` | Move to the previous / next data point |
 | `↑` / `↓` | Switch to the previous / next series in the pane |
-| `Page Up` / `Page Down` | Jump by `pageStep` points (default 10) |
+| `Page Up` / `Page Down` | Jump by `pageStep` points (default 10): `Page Up` forward in time, `Page Down` back — following the ARIA slider convention that `Page Up` increases the value |
 | `Home` / `End` | Jump to the first / last point |
 | `Enter` / `Space` | Announce a summary of the active series |
 | `H` | Announce the list of keyboard controls |
@@ -186,7 +186,7 @@ addAccessibilityPlugin(chart, {
     messages: {
         ohlc: { close: 'cierre' }, // only some keys — the rest stay English
         point: ({ position, total, time, label, values }) =>
-            `Punto ${position} de ${total}. ${time}, ${label} ${values}.`,
+            `${label} ${values}, ${time}. Punto ${position} de ${total}.`,
         help: ({ multiSeries }) =>
             `Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Intro o Espacio lee un resumen de la serie.`,
     },
@@ -236,9 +236,11 @@ to how often the user scrolls.
   Adding or removing whole **panes**, however, requires re-running
   `addAccessibilityPlugin` (or calling `controller.refresh()`) so the new panes
   get their own layer.
-- Navigation maps the time scale's logical indices onto each series' data, which
-  assumes the series in a pane share the same time scale (the usual case). Series
-  that start at very different times may not line up one-to-one.
+- Series in a pane do not need to share timestamps. Navigation is aligned by
+  *time* on the chart's shared time scale: switching series with the up / down
+  arrows keeps the focused time (the nearest point in the new series is
+  selected and paged into view), and the visible-range scoping follows each
+  series' own data.
 - The plugin provides the semantic layer and keyboard model. Visual contrast and
   font-scaling (covered in the
   [Readability](https://tradingview.github.io/lightweight-charts/tutorials/a11y/readability)

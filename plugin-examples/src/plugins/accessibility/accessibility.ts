@@ -133,7 +133,11 @@ export interface AccessibilityOptions {
 	 * `aria-live` region.
 	 */
 	announceDataUpdates: boolean;
-	/** Number of points to jump when using `PageUp` / `PageDown`. */
+	/**
+	 * Number of points to jump when using `PageUp` / `PageDown`. `PageUp` moves
+	 * forward in time and `PageDown` back, following the ARIA slider convention
+	 * that `PageUp` increases the value.
+	 */
 	pageStep: number;
 	/**
 	 * Controls what the on-demand summary (`Enter` / `Space`) and the data-update
@@ -228,8 +232,14 @@ function defaultTimeFormatter(time: Time, locale?: string): string {
 		// BusinessDay months are 1-12, whereas Date expects 0-11.
 		date = new Date(Date.UTC(time.year, time.month - 1, time.day));
 	} else {
-		// Business-day string, e.g. '2019-05-15'.
-		return time;
+		// Business-day string, e.g. '2019-05-15' – parse it so it is localised
+		// like the other time formats (with a verbatim fallback if it does not
+		// match the expected YYYY-MM-DD shape).
+		const [year, month, day] = time.split('-').map(Number);
+		if (!year || !month || !day) {
+			return time;
+		}
+		date = new Date(Date.UTC(year, month - 1, day));
 	}
 	// `locale || undefined` guards against the empty-string locale used server-side,
 	// which is not a valid Intl locale.
@@ -362,9 +372,11 @@ export const defaultMessages: AccessibilityMessages = {
 			? 'Use the left and right arrow keys to move between data points, and the up and down arrows to switch series.'
 			: 'Use the left and right arrow keys to move between data points.',
 	help: ({ multiSeries }): string =>
-		`Keyboard controls. Left and right arrows move between data points. ${multiSeries ? 'Up and down arrows switch between series. ' : ''}Page Up and Page Down jump ten points. Home and End jump to the first and last points. Enter or Space reads a summary of the series.`,
+		`Keyboard controls. Left and right arrows move between data points. ${multiSeries ? 'Up and down arrows switch between series. ' : ''}Page Up jumps ten points forward, Page Down ten points back. Home and End jump to the first and last points. Enter or Space reads a summary of the series.`,
+	// Most important information first: the value, then the date; the position
+	// counter is context, so it comes last.
 	point: ({ position, total, time, label, values }): string =>
-		`Point ${position} of ${total}. ${time}, ${label} ${values}.`,
+		`${label} ${values}, ${time}. Point ${position} of ${total}.`,
 	seriesPosition: ({ label, position, total, point }): string =>
 		`${label}, series ${position} of ${total}.${point}`,
 	ohlcValues: ({ labels, open, high, low, close }): string => {
@@ -1036,18 +1048,62 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		return { from: 0, to: last };
 	}
 
+	/**
+	 * Logical index of a data point on the chart's shared time scale. A series'
+	 * own data indices need not match the scale (a series can start later or
+	 * skip points), so every viewport comparison goes through this mapping.
+	 */
+	private _logicalIndexOf(point: SeriesDataPoint): number | null {
+		return this._chart?.timeScale().timeToIndex(point.time, true) ?? null;
+	}
+
+	/** Index of the first point whose logical index is >= `target` (`points.length` when none is). */
+	private _lowerBoundByLogical(points: readonly SeriesDataPoint[], target: number): number {
+		let low = 0;
+		let high = points.length;
+		while (low < high) {
+			const mid = (low + high) >> 1;
+			const logical = this._logicalIndexOf(points[mid]);
+			if (logical !== null && logical < target) {
+				low = mid + 1;
+			} else {
+				high = mid;
+			}
+		}
+		return low;
+	}
+
+	/** Index of the point closest (by logical index) to `target`; `points` must be non-empty. */
+	private _nearestIndexByLogical(points: readonly SeriesDataPoint[], target: number): number {
+		const last = points.length - 1;
+		const upper = this._lowerBoundByLogical(points, target);
+		if (upper <= 0) {
+			return 0;
+		}
+		if (upper > last) {
+			return last;
+		}
+		const before = this._logicalIndexOf(points[upper - 1]);
+		const after = this._logicalIndexOf(points[upper]);
+		if (before === null || after === null) {
+			return upper;
+		}
+		return target - before <= after - target ? upper - 1 : upper;
+	}
+
 	private _visibleBounds(points: readonly SeriesDataPoint[]): { from: number; to: number } | null {
 		const range = this._chart?.timeScale().getVisibleLogicalRange();
 		const last = points.length - 1;
 		if (!range || last < 0) {
 			return null;
 		}
-		const from = clamp(Math.ceil(range.from), 0, last);
-		const to = clamp(Math.floor(range.to), 0, last);
+		const from = clamp(this._lowerBoundByLogical(points, Math.ceil(range.from)), 0, last);
+		// Last point whose logical index is <= floor(range.to).
+		const to = this._lowerBoundByLogical(points, Math.floor(range.to) + 1) - 1;
 		if (to < from) {
 			return null;
 		}
-		return { from, to };
+		return { from, to: clamp(to, 0, last) };
 	}
 
 	private _movePoint(delta: number): void {
@@ -1072,11 +1128,18 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		if (next === this._activeSeriesIndex) {
 			return;
 		}
+		// Series in a pane need not share timestamps (e.g. a moving average that
+		// starts later), so carry the focused *time* across, not the raw index:
+		// the nearest point in time is selected in the new series.
+		const previousPoint = this._points[this._activePointIndex];
+		const targetLogical = previousPoint ? this._logicalIndexOf(previousPoint) : null;
 		this._activeSeriesIndex = next;
 		this._refreshActivePoints();
-		// Keep the focused point index, clamped to what is valid for the new series.
-		if (this._activePointIndex >= 0) {
-			this._activePointIndex = clamp(this._activePointIndex, 0, Math.max(0, this._points.length - 1));
+		if (this._activePointIndex >= 0 && this._points.length > 0) {
+			this._activePointIndex = targetLogical !== null
+				? this._nearestIndexByLogical(this._points, targetLogical)
+				: clamp(this._activePointIndex, 0, this._points.length - 1);
+			this._scrollActiveIntoView();
 		}
 		const series = this._activeSeries();
 		const label = series ? this._seriesLabel(series, next) : '';
@@ -1093,10 +1156,14 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 
 	private _firstVisibleIndex(): number {
 		const range = this._chart?.timeScale().getVisibleLogicalRange();
-		if (!range) {
+		if (!range || this._points.length === 0) {
 			return 0;
 		}
-		return clamp(Math.ceil(range.from), 0, this._points.length - 1);
+		return clamp(
+			this._lowerBoundByLogical(this._points, Math.ceil(range.from)),
+			0,
+			this._points.length - 1
+		);
 	}
 
 	private _setActivePoint(index: number): void {
@@ -1123,12 +1190,20 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		if (!range) {
 			return;
 		}
-		const last = this._points.length - 1;
+		const point = this._points[this._activePointIndex];
+		if (!point) {
+			return;
+		}
+		// Compare in the time scale's logical indices, which need not match this
+		// series' own data indices (e.g. a moving average that starts later).
+		const index = this._logicalIndexOf(point);
+		if (index === null) {
+			return;
+		}
 		const span = range.to - range.from;
 		// Keep a one-point margin from the edge (when the window is wide enough) so
 		// the following point is already visible after a step.
 		const margin = span > 4 ? 1 : 0;
-		const index = this._activePointIndex;
 		let from: number;
 		if (index < range.from + margin) {
 			from = index - margin;
@@ -1137,7 +1212,8 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		} else {
 			return; // already comfortably within view
 		}
-		from = clamp(from, 0, Math.max(0, last));
+		const lastLogical = this._logicalIndexOf(this._points[this._points.length - 1]) ?? index;
+		from = clamp(from, 0, Math.max(0, lastLogical));
 		timeScale.setVisibleLogicalRange({ from, to: from + span });
 	}
 

@@ -8,13 +8,13 @@ import {
 import { generateLineData } from '../../../sample-data';
 import { addAccessibilityPlugin } from '../accessibility';
 
-const chart = ((window as unknown as any).chart = createChart('chart', {
+const chart = createChart('chart', {
 	autoSize: true,
 	timeScale: {
 		rightOffset: 10,
 		barSpacing: 8,
 	},
-}));
+});
 
 // --- Pane 0: two price series (so Up/Down can switch between them) ---
 const priceSeries = chart.addSeries(AreaSeries, {
@@ -32,7 +32,15 @@ const averageSeries = chart.addSeries(LineSeries, {
 	lineWidth: 2,
 	title: 'Moving average',
 });
-const averageData = generateLineData();
+
+const averagePeriod = 20;
+const averageData = priceData.slice(averagePeriod - 1).map((point, index) => {
+	let sum = 0;
+	for (let i = index; i < index + averagePeriod; i++) {
+		sum += priceData[i].value;
+	}
+	return { time: point.time, value: sum / averagePeriod };
+});
 averageSeries.setData(averageData);
 
 // --- Pane 1: a volume series in its own pane ---
