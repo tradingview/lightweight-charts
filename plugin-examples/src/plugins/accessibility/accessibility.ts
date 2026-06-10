@@ -22,11 +22,6 @@ type AnySeries = ISeriesApi<SeriesType, Time>;
  */
 type SeriesDataPoint = SeriesDataItemTypeMap<Time>[SeriesType];
 
-interface SeriesSnapshot {
-	series: AnySeries;
-	data: readonly SeriesDataPoint[];
-}
-
 interface PresentationRoleState {
 	count: number;
 	previousValue: string | null;
@@ -198,12 +193,58 @@ const defaultOptions: AccessibilityOptions = {
 	dataScope: 'visible',
 };
 
+/** Elements that can receive keyboard focus and so must be neutralised inside the hidden chart DOM. */
+const FOCUSABLE_SELECTOR =
+	'a[href],button,input,select,textarea,iframe,[tabindex],[contenteditable="true"],audio[controls],video[controls]';
+
 /** CSS applied to elements that should be available to assistive technology but invisible on screen. */
 const VISUALLY_HIDDEN =
 	'position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;';
 
 function clamp(value: number, min: number, max: number): number {
 	return Math.max(min, Math.min(max, value));
+}
+
+/**
+ * Writes messages to an `aria-live` element by clearing it and setting the text
+ * on the next animation frame. Re-setting textContent across a frame boundary
+ * forces assistive technology to re-announce even when the message is identical
+ * to the previous one (e.g. Home pressed twice, or two equal update summaries);
+ * a synchronous clear-and-set does not reliably do that.
+ */
+class LiveRegionWriter {
+	private readonly _region: () => HTMLElement | null;
+	private _frame: ReturnType<typeof requestAnimationFrame> | null = null;
+
+	public constructor(region: () => HTMLElement | null) {
+		this._region = region;
+	}
+
+	public write(message: string): void {
+		const region = this._region();
+		if (!region || message.length === 0) {
+			return;
+		}
+		region.textContent = '';
+		if (this._frame !== null) {
+			cancelAnimationFrame(this._frame);
+		}
+		this._frame = requestAnimationFrame(() => {
+			this._frame = null;
+			const target = this._region();
+			if (target) {
+				target.textContent = message;
+			}
+		});
+	}
+
+	/** Cancels a pending write (used at teardown). */
+	public dispose(): void {
+		if (this._frame !== null) {
+			cancelAnimationFrame(this._frame);
+			this._frame = null;
+		}
+	}
 }
 
 /**
@@ -242,11 +283,14 @@ function defaultTimeFormatter(time: Time, locale?: string): string {
 		date = new Date(Date.UTC(year, month - 1, day));
 	}
 	// `locale || undefined` guards against the empty-string locale used server-side,
-	// which is not a valid Intl locale.
+	// which is not a valid Intl locale. Formatting must be in UTC: the library
+	// renders the time axis in UTC, and the dates built above are UTC-midnight
+	// instants that would otherwise shift a day in timezones west of UTC.
 	return date.toLocaleDateString(locale || undefined, {
 		year: 'numeric',
 		month: 'short',
 		day: 'numeric',
+		timeZone: 'UTC',
 	});
 }
 
@@ -335,8 +379,8 @@ export interface AccessibilityMessages {
 	ohlcValues: (args: OhlcValueArgs) => string;
 	/** The `Enter` / `Space` summary. Bypassed entirely when {@link AccessibilityOptions.describeChart} is set. */
 	summary: (args: SummaryArgs) => string;
-	/** Summary when the active series has no valued points. */
-	noData: (args: { label: string }) => string;
+	/** Summary when the active series has no valued points in scope (`scopeNote` as in {@link summary}). */
+	noData: (args: { label: string; scopeNote: string }) => string;
 	/** One series' contribution to a data-update announcement. */
 	seriesUpdate: (args: { label: string; count: number; scopeNote: string; latest: string }) => string;
 	/** Wraps the per-series update summaries into one announcement (`total` >= 1). */
@@ -371,8 +415,8 @@ export const defaultMessages: AccessibilityMessages = {
 		multiSeries
 			? 'Use the left and right arrow keys to move between data points, and the up and down arrows to switch series.'
 			: 'Use the left and right arrow keys to move between data points.',
-	help: ({ multiSeries }): string =>
-		`Keyboard controls. Left and right arrows move between data points. ${multiSeries ? 'Up and down arrows switch between series. ' : ''}Page Up jumps ten points forward, Page Down ten points back. Home and End jump to the first and last points. Enter or Space reads a summary of the series.`,
+	help: ({ multiSeries, pageStep }): string =>
+		`Keyboard controls. Left and right arrows move between data points. ${multiSeries ? 'Up and down arrows switch between series. ' : ''}Page Up jumps ${pageStep} points forward, Page Down ${pageStep} points back. Home and End jump to the first and last points. Enter or Space reads a summary of the series.`,
 	// Most important information first: the value, then the date; the position
 	// counter is context, so it comes last.
 	point: ({ position, total, time, label, values }): string =>
@@ -395,7 +439,7 @@ export const defaultMessages: AccessibilityMessages = {
 	},
 	summary: ({ label, count, scopeNote, firstValue, firstTime, lastValue, lastTime, directionLabel, changeValue, percent, lowValue, lowTime, highValue, highTime }): string =>
 		`${label} with ${count} data points${scopeNote}. From ${firstValue} on ${firstTime} to ${lastValue} on ${lastTime}. Overall ${directionLabel} by ${changeValue}${percent !== null ? `, ${percent} percent` : ''}. Lowest ${lowValue} on ${lowTime}, highest ${highValue} on ${highTime}.`,
-	noData: ({ label }): string => `${label}: no data available.`,
+	noData: ({ label, scopeNote }): string => `${label}: no data available${scopeNote}.`,
 	seriesUpdate: ({ label, count, scopeNote, latest }): string =>
 		`${label}, ${count} data points${scopeNote}. Latest ${latest}`,
 	dataUpdated: ({ summaries, total, shownMax }): string => {
@@ -501,6 +545,8 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	private _statusRegion: HTMLElement | null = null;
 	private _descriptionRegion: HTMLElement | null = null;
 	private _focusIndicator: HTMLElement | null = null;
+	private _domObserver: MutationObserver | null = null;
+	private _requestUpdate: (() => void) | null = null;
 
 	// Restored on detach so we leave the host DOM exactly as we found it.
 	// Descendants of the pane element whose attributes we changed, paired with
@@ -510,8 +556,10 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	private _neutralised: [HTMLElement, string | null, string | null][] = [];
 
 	private _seriesList: AnySeries[] = [];
-	private _seriesData: SeriesSnapshot[] = [];
 	private _points: readonly SeriesDataPoint[] = [];
+	// Set when the active series changes while the pane is unfocused, so the
+	// (O(n)-copy) re-read of `_points` is deferred until the pane is used again.
+	private _activePointsStale = false;
 	private _activeSeriesIndex = 0;
 	private _activePointIndex = -1;
 	// One `subscribeDataChanged` handler per series, so we react to real data
@@ -519,8 +567,8 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	private _dataChangedHandlers = new Map<AnySeries, () => void>();
 	private _dirtySeries = new Set<AnySeries>();
 	private _announceUpdateHandle: ReturnType<typeof setTimeout> | null = null;
-	private _liveFrame: ReturnType<typeof requestAnimationFrame> | null = null;
-	private _pendingMessage: string | null = null;
+	private readonly _liveWriter = new LiveRegionWriter(() => this._liveRegion);
+	private readonly _statusWriter = new LiveRegionWriter(() => this._statusRegion);
 	// When attached via addAccessibilityPlugin, data-update announcements are
 	// routed through one shared region instead of this pane's own polite region.
 	private _updateAnnouncer: UpdateAnnouncer | null = null;
@@ -547,12 +595,15 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 
 	public attached(param: PaneAttachedParameter<Time>): void {
 		this._chart = param.chart;
+		this._requestUpdate = param.requestUpdate;
 		this._tryInit();
 	}
 
 	/**
-	 * A freshly created pane may not have its HTML element yet, so initialisation
-	 * is retried on subsequent animation frames until the element is available.
+	 * A freshly created pane may not have its HTML element yet. The pane widget
+	 * is built by the next redraw, so request one – the resulting updateAllViews
+	 * retries this init. The animation-frame fallback covers the window in which
+	 * the chart is still processing the invalidation.
 	 */
 	private _tryInit(): void {
 		if (this._built || !this._chart) {
@@ -561,6 +612,7 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		const paneElement = this._pane()?.getHTMLElement() ?? null;
 		const paneContent = paneElement ? this._paneContentElement(paneElement) : null;
 		if (!paneElement || !paneContent) {
+			this._requestUpdate?.();
 			if (this._initAttempts++ < 60) {
 				requestAnimationFrame(() => this._tryInit());
 			}
@@ -581,10 +633,8 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			clearTimeout(this._announceUpdateHandle);
 			this._announceUpdateHandle = null;
 		}
-		if (this._liveFrame !== null) {
-			cancelAnimationFrame(this._liveFrame);
-			this._liveFrame = null;
-		}
+		this._liveWriter.dispose();
+		this._statusWriter.dispose();
 		this._unsubscribeAll();
 		// The announcer itself is owned and disposed by addAccessibilityPlugin;
 		// here we just drop our reference to it.
@@ -596,20 +646,23 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			container.removeEventListener('focusout', this._handleFocusOut);
 			container.remove();
 		}
+		// Stop observing before restoring, so our own restores are not re-swept.
+		this._domObserver?.disconnect();
+		this._domObserver = null;
 		this._restorePresentationRoles();
 		this._restoreHiddenCanvases();
 		this._restoreFocusables();
 
 		this._chart = null;
+		this._requestUpdate = null;
 		this._container = null;
 		this._liveRegion = null;
 		this._statusRegion = null;
 		this._descriptionRegion = null;
 		this._focusIndicator = null;
-		this._pendingMessage = null;
 		this._seriesList = [];
-		this._seriesData = [];
 		this._points = [];
+		this._activePointsStale = false;
 		this._activePointIndex = -1;
 		this._activeSeriesIndex = 0;
 		this._built = false;
@@ -675,7 +728,16 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	// region Pane / series resolution ---------------------------------------------------
 
 	private _pane(): IPaneApi<Time> | null {
-		return this._chart?.panes()[this._options.paneIndex] ?? null;
+		const panes = this._chart?.panes() ?? [];
+		// Pane indices shift when panes are added or removed, so once our DOM is
+		// in place, identify the pane by the row that actually hosts our layer;
+		// the configured index is only the initial (pre-build) lookup. Built but
+		// hosted nowhere means our pane was removed – return null rather than
+		// silently re-binding to whatever pane holds the index now.
+		if (this._container) {
+			return panes.find(pane => pane.getHTMLElement()?.contains(this._container) ?? false) ?? null;
+		}
+		return panes[this._options.paneIndex] ?? null;
 	}
 
 	private _activeSeries(): AnySeries | null {
@@ -720,10 +782,7 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		// focusable descendant (e.g. the attribution link) out of the tab order –
 		// a focusable element inside an aria-hidden subtree is a WCAG failure.
 		const chartTable = paneElement.closest('table') ?? paneElement;
-		chartTable.querySelectorAll<HTMLElement>('canvas').forEach(element => {
-			retainAriaHidden(element);
-			this._hiddenCanvases.push(element);
-		});
+		this._hideCanvases(chartTable);
 		this._neutraliseFocusables(paneElement);
 
 		const semanticLayer = document.createElement('div');
@@ -790,6 +849,7 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		this._focusIndicator = focusIndicator;
 
 		this._applyLang();
+		this._watchForRecreatedElements(paneElement);
 	}
 
 	private _markTableStructurePresentational(paneElement: HTMLElement): void {
@@ -832,9 +892,14 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	}
 
 	private _neutraliseFocusables(root: HTMLElement): void {
-		const selector =
-			'a[href],button,input,select,textarea,iframe,[tabindex],[contenteditable="true"],audio[controls],video[controls]';
-		root.querySelectorAll<HTMLElement>(selector).forEach(element => {
+		const descendants = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+		const targets = root.matches(FOCUSABLE_SELECTOR) ? [root, ...descendants] : descendants;
+		for (const element of targets) {
+			// Idempotent: re-sweeps (from the mutation observer) must not record
+			// our own tabindex="-1" as the value to restore.
+			if (this._neutralised.some(([neutralised]) => neutralised === element)) {
+				continue;
+			}
 			this._neutralised.push([
 				element,
 				element.getAttribute('tabindex'),
@@ -842,7 +907,43 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			]);
 			element.setAttribute('tabindex', '-1');
 			element.setAttribute('aria-hidden', 'true');
+		}
+	}
+
+	private _hideCanvases(root: HTMLElement): void {
+		const targets = root instanceof HTMLCanvasElement
+			? [root]
+			: Array.from(root.querySelectorAll<HTMLElement>('canvas'));
+		for (const element of targets) {
+			if (this._hiddenCanvases.includes(element)) {
+				continue;
+			}
+			retainAriaHidden(element);
+			this._hiddenCanvases.push(element);
+		}
+	}
+
+	/**
+	 * The library re-creates parts of the pane DOM after we attach – e.g. the
+	 * attribution link is rebuilt whenever the layout theme changes – which would
+	 * put a fresh focusable element back into the tab order inside our
+	 * presentational subtree, and fresh canvases back into the accessibility
+	 * tree. Watch this pane's row and re-apply the treatment to anything that
+	 * reappears.
+	 */
+	private _watchForRecreatedElements(paneElement: HTMLElement): void {
+		this._domObserver = new MutationObserver(mutations => {
+			for (const mutation of mutations) {
+				for (const node of Array.from(mutation.addedNodes)) {
+					if (!(node instanceof HTMLElement) || this._container?.contains(node)) {
+						continue;
+					}
+					this._neutraliseFocusables(node);
+					this._hideCanvases(node);
+				}
+			}
 		});
+		this._domObserver.observe(paneElement, { childList: true, subtree: true });
 	}
 
 	private _restoreFocusables(): void {
@@ -944,11 +1045,16 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 
 	private _handleFocusIn = (): void => {
 		this._hasFocus = true;
+		// Data may have streamed in while the pane was unfocused; catch up before
+		// anything reads the navigation cache.
+		if (this._activePointsStale) {
+			this._refreshActivePoints();
+		}
 		this._styleFocusOutline();
 		this._positionIndicator();
 		// Tell the shared announcer this pane is now the active one, so in the
 		// default 'active' mode its data updates are the ones that get announced.
-		this._updateAnnouncer?.setActivePane(this._options.paneIndex);
+		this._updateAnnouncer?.setActivePlugin(this);
 		// No live-region announcement on focus: the accessible name (aria-label) and
 		// the aria-describedby hint are spoken when focus lands. An assertive message
 		// here would interrupt the name (e.g. VoiceOver cuts off the title); the H key
@@ -1037,17 +1143,6 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 
 	// region Navigation -----------------------------------------------------------------
 
-	private _boundsForPoints(points: readonly SeriesDataPoint[]): { from: number; to: number } {
-		const last = points.length - 1;
-		if (this._options.dataScope === 'visible') {
-			const visible = this._visibleBounds(points);
-			if (visible) {
-				return visible;
-			}
-		}
-		return { from: 0, to: last };
-	}
-
 	/**
 	 * Logical index of a data point on the chart's shared time scale. A series'
 	 * own data indices need not match the scale (a series can start later or
@@ -1097,13 +1192,16 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		if (!range || last < 0) {
 			return null;
 		}
-		const from = clamp(this._lowerBoundByLogical(points, Math.ceil(range.from)), 0, last);
+		const from = this._lowerBoundByLogical(points, Math.ceil(range.from));
 		// Last point whose logical index is <= floor(range.to).
 		const to = this._lowerBoundByLogical(points, Math.floor(range.to) + 1) - 1;
-		if (to < from) {
+		// `from > last`: every point is left of the viewport; `to < from`: every
+		// point is right of it. Both mean nothing is visible – do not clamp the
+		// result into a fake one-point range.
+		if (from > last || to < from) {
 			return null;
 		}
-		return { from, to: clamp(to, 0, last) };
+		return { from, to };
 	}
 
 	private _movePoint(delta: number): void {
@@ -1220,25 +1318,7 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	// region Announcements --------------------------------------------------------------
 
 	private _announce(message: string): void {
-		if (!this._liveRegion) {
-			return;
-		}
-		// Clear now, then write on the next frame. Re-setting textContent across a
-		// frame boundary forces assistive technology to re-announce even when the
-		// message is identical to the previous one (e.g. Home pressed twice); a
-		// synchronous clear-and-set does not reliably do that.
-		this._liveRegion.textContent = '';
-		this._pendingMessage = message;
-		if (this._liveFrame !== null) {
-			cancelAnimationFrame(this._liveFrame);
-		}
-		this._liveFrame = requestAnimationFrame(() => {
-			this._liveFrame = null;
-			if (this._liveRegion && this._pendingMessage !== null) {
-				this._liveRegion.textContent = this._pendingMessage;
-				this._pendingMessage = null;
-			}
-		});
+		this._liveWriter.write(message);
 	}
 
 	private _formatValue(value: number | undefined, series: AnySeries | null = this._activeSeries()): string {
@@ -1320,8 +1400,10 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		if (this._options.dataScope !== 'visible') {
 			return points;
 		}
-		const bounds = this._boundsForPoints(points);
-		return points.slice(bounds.from, bounds.to + 1);
+		// A viewport scrolled fully past the data is an empty scope, not the
+		// whole series.
+		const bounds = this._visibleBounds(points);
+		return bounds ? points.slice(bounds.from, bounds.to + 1) : [];
 	}
 
 	private _describe(): string {
@@ -1332,7 +1414,7 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		}
 		const valued = scoped.filter(p => extractValue(p) !== undefined);
 		if (valued.length === 0) {
-			return this._messages.noData({ label });
+			return this._messages.noData({ label, scopeNote: this._scopeNote() });
 		}
 		const first = valued[0];
 		const last = valued[valued.length - 1];
@@ -1410,7 +1492,6 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		if (this._activeSeriesIndex >= this._seriesList.length) {
 			this._activeSeriesIndex = Math.max(0, this._seriesList.length - 1);
 		}
-		this._readAllData();
 		this._refreshActivePoints();
 		this._updatePaneLabel();
 		this._updateDescription();
@@ -1424,24 +1505,24 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		return current.every((series, index) => series === this._seriesList[index]);
 	}
 
-	private _readAllData(): void {
-		this._seriesData = this._seriesList.map(series => ({ series, data: series.data() }));
-	}
-
 	/**
 	 * Fired by the library when a series' data actually changes (set/update) – not
-	 * on scroll or zoom. Re-reads just that series and schedules a single debounced
-	 * polite announcement that coalesces simultaneous updates across series.
+	 * on scroll or zoom. Nothing is read or copied here: the active series'
+	 * navigation cache is refreshed only while the pane is in use, and update
+	 * announcements read the changed series once per debounced flush.
 	 */
 	private _handleSeriesDataChanged(series: AnySeries): void {
 		const index = this._seriesList.indexOf(series);
 		if (index < 0) {
 			return;
 		}
-		this._seriesData[index] = { series, data: series.data() };
 		if (index === this._activeSeriesIndex) {
-			this._refreshActivePoints();
-			this._positionIndicator();
+			if (this._hasFocus) {
+				this._refreshActivePoints();
+				this._positionIndicator();
+			} else {
+				this._activePointsStale = true;
+			}
 		}
 		if (this._options.announceDataUpdates) {
 			this._dirtySeries.add(series);
@@ -1466,15 +1547,10 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	}
 
 	private _flushUpdateAnnouncement(): void {
-		const region = this._statusRegion;
-		if (!region) {
-			this._dirtySeries.clear();
-			return;
-		}
+		// _collectPendingUpdateSummaries always clears the dirty set; the writer
+		// no-ops when the region is gone or the message is empty.
 		const message = formatUpdateMessage(this._collectPendingUpdateSummaries(), this._messages);
-		if (message.length > 0) {
-			region.textContent = message;
-		}
+		this._statusWriter.write(message);
 	}
 
 	/**
@@ -1488,9 +1564,10 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			this._dirtySeries.clear();
 			return [];
 		}
-		const changed = this._seriesData.filter(snapshot => this._dirtySeries.has(snapshot.series));
+		// Iterate _seriesList so the summaries keep the pane's series order.
+		const changed = this._seriesList.filter(series => this._dirtySeries.has(series));
 		this._dirtySeries.clear();
-		return changed.map(snapshot => this._seriesUpdateSummary(snapshot));
+		return changed.map(series => this._seriesUpdateSummary(series));
 	}
 
 	private _unsubscribeAll(): void {
@@ -1501,23 +1578,30 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		this._dirtySeries.clear();
 	}
 
+	/** Re-reads the active series' data into the navigation cache. */
 	private _refreshActivePoints(): void {
-		const snapshot = this._seriesData[this._activeSeriesIndex];
-		this._points = snapshot ? snapshot.data : [];
+		const series = this._activeSeries();
+		this._points = series ? series.data() : [];
+		this._activePointsStale = false;
 		if (this._activePointIndex >= this._points.length) {
 			this._activePointIndex = this._points.length - 1;
 		}
 	}
 
-	private _seriesUpdateSummary(snapshot: SeriesSnapshot): string {
-		const scoped = this._scopedPoints(snapshot.data);
-		const value = extractValue(scoped[scoped.length - 1]);
-		const index = this._seriesData.indexOf(snapshot);
+	private _seriesUpdateSummary(series: AnySeries): string {
+		const data = series.data();
+		const scoped = this._scopedPoints(data);
+		// 'Latest' reports the newest bar – the one the update actually changed –
+		// which can sit outside the visible range; only the count is scoped.
+		let value: number | undefined;
+		for (let i = data.length - 1; i >= 0 && value === undefined; i--) {
+			value = extractValue(data[i]);
+		}
 		return this._messages.seriesUpdate({
-			label: this._seriesLabel(snapshot.series, index),
+			label: this._seriesLabel(series, this._seriesList.indexOf(series)),
 			count: scoped.length,
 			scopeNote: this._scopeNote(),
-			latest: this._formatValue(value, snapshot.series),
+			latest: this._formatValue(value, series),
 		});
 	}
 
@@ -1525,18 +1609,23 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 
 	private _positionIndicator(): void {
 		const indicator = this._focusIndicator;
+		if (!indicator) {
+			return;
+		}
 		const chart = this._chart;
 		const series = this._activeSeries();
-		if (!indicator || !chart || !series) {
-			return;
-		}
-		if (!this._options.showFocusIndicator || !this._hasFocus || this._activePointIndex < 0) {
-			indicator.style.display = 'none';
-			return;
-		}
 		const point = this._points[this._activePointIndex];
 		const value = extractValue(point);
-		if (!point || value === undefined) {
+		// Hide on any missing prerequisite – including "all series were removed"
+		// – so the ring never lingers at stale coordinates.
+		if (
+			!chart ||
+			!series ||
+			!point ||
+			value === undefined ||
+			!this._options.showFocusIndicator ||
+			!this._hasFocus
+		) {
 			indicator.style.display = 'none';
 			return;
 		}
@@ -1576,8 +1665,10 @@ class UpdateAnnouncer {
 	private readonly _plugins: AccessibilityPlugin[] = [];
 	private readonly _dirty = new Set<AccessibilityPlugin>();
 	private _handle: ReturnType<typeof setTimeout> | null = null;
-	private _frame: ReturnType<typeof requestAnimationFrame> | null = null;
-	private _activePaneIndex = 0;
+	private readonly _writer = new LiveRegionWriter(() => this._region);
+	// The plugin whose pane was focused last. Tracked by identity, not by pane
+	// index – indices shift when panes are added or removed.
+	private _activePlugin: AccessibilityPlugin | null = null;
 	private _messages: AccessibilityMessages;
 
 	public constructor(host: HTMLElement, mode: UpdateAnnouncerMode, messages: AccessibilityMessages, lang?: string) {
@@ -1600,8 +1691,8 @@ class UpdateAnnouncer {
 		this._plugins.push(plugin);
 	}
 
-	public setActivePane(paneIndex: number): void {
-		this._activePaneIndex = paneIndex;
+	public setActivePlugin(plugin: AccessibilityPlugin): void {
+		this._activePlugin = plugin;
 	}
 
 	/** Reconfigures the shared region at runtime (mode / messages / lang). */
@@ -1634,18 +1725,18 @@ class UpdateAnnouncer {
 			clearTimeout(this._handle);
 			this._handle = null;
 		}
-		if (this._frame !== null) {
-			cancelAnimationFrame(this._frame);
-			this._frame = null;
-		}
+		this._writer.dispose();
 		this._region?.remove();
 		this._region = null;
 		this._plugins.length = 0;
 		this._dirty.clear();
+		this._activePlugin = null;
 	}
 
 	private _flush(): void {
 		const summaries: string[] = [];
+		// Nothing focused yet falls back to the first registered pane (pane 0).
+		const active = this._activePlugin ?? this._plugins[0];
 		// Iterate in registration (pane) order so the combined message is stable.
 		for (const plugin of this._plugins) {
 			if (!this._dirty.has(plugin)) {
@@ -1654,31 +1745,12 @@ class UpdateAnnouncer {
 			// Always collect (and clear) the plugin's pending summaries; keep them
 			// only when combining or when this is the active pane.
 			const pending = pluginLinks.get(plugin)?.collectPendingUpdateSummaries() ?? [];
-			if (this._mode === 'combine' || plugin.options().paneIndex === this._activePaneIndex) {
+			if (this._mode === 'combine' || plugin === active) {
 				summaries.push(...pending);
 			}
 		}
 		this._dirty.clear();
-		this._write(formatUpdateMessage(summaries, this._messages));
-	}
-
-	private _write(message: string): void {
-		const region = this._region;
-		if (!region || message.length === 0) {
-			return;
-		}
-		// Clear then set on the next frame so identical consecutive messages are
-		// still re-announced (mirrors AccessibilityPlugin._announce).
-		region.textContent = '';
-		if (this._frame !== null) {
-			cancelAnimationFrame(this._frame);
-		}
-		this._frame = requestAnimationFrame(() => {
-			this._frame = null;
-			if (this._region) {
-				this._region.textContent = message;
-			}
-		});
+		this._writer.write(formatUpdateMessage(summaries, this._messages));
 	}
 }
 
