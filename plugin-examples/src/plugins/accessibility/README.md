@@ -124,7 +124,10 @@ By default (`dataScope: 'visible'`) the on-demand summary (`Enter` / `Space`) an
 the background data-update announcements describe only the points within the
 current visible range – for example *"65 data points in view"*. This is the
 recommended setting for charts with large data sets because it keeps those
-summaries focused on what the user is currently inspecting.
+summaries focused on what the user is currently inspecting. The update
+announcement's *"Latest"* value is the one exception: it always reports the
+series' newest bar – the bar the update actually changed – even when that bar
+is outside the visible range.
 
 Use `dataScope: 'all'` when you want the summary and update announcements to
 describe the full data set, even if only part of the history is visible.
@@ -212,18 +215,20 @@ The precedence for the overridable pieces:
 
 The plugin uses an **active-point-only** strategy: it never mirrors every data
 point into the DOM. Regardless of whether a series holds 500 or 50,000 bars each
-pane adds only three DOM nodes (a semantic overlay, an assertive live region and
-a focus ring), plus one polite live region shared across the whole chart for
-data-update announcements.
+pane adds only four DOM nodes (a semantic overlay, a visually-hidden
+description, an assertive live region and a focus ring), plus one polite live
+region shared across the whole chart for data-update announcements.
 
 Data stays in sync through one `subscribeDataChanged` listener per series, so
 scrolling and zooming do no data work at all – the focus ring is repositioned
-with a couple of coordinate look-ups and nothing is read or copied. When a
-series' data actually changes the plugin re-reads only that series
-(`series.data()` returns a cloned array, so this is O(n) in that series' length)
-and coalesces simultaneous updates into a single debounced announcement. The
-work is therefore proportional to how often and how much your data changes, not
-to how often the user scrolls.
+with a couple of coordinate look-ups and nothing is read or copied. Data
+changes are handled lazily too: a change is only noted when it happens. The
+focused pane re-reads its active series right away (`series.data()` returns a
+cloned array, so a read is O(n) in that series' length), an unfocused pane
+defers that read until it is focused again, and update announcements read each
+changed series once per debounced announcement. The work is therefore
+proportional to how much the chart is actually being used, not to how often
+the user scrolls or how often your data ticks.
 
 ## Notes & limitations
 
@@ -235,7 +240,9 @@ to how often the user scrolls.
 - Series added to or removed from a pane at runtime are picked up automatically.
   Adding or removing whole **panes**, however, requires re-running
   `addAccessibilityPlugin` (or calling `controller.refresh()`) so the new panes
-  get their own layer.
+  get their own layer. Beware that removing a pane's **last** series removes the
+  pane itself (the library prunes empty panes), so that seemingly series-level
+  operation also needs a `refresh()`.
 - Series in a pane do not need to share timestamps. Navigation is aligned by
   *time* on the chart's shared time scale: switching series with the up / down
   arrows keeps the focused time (the nearest point in the new series is
