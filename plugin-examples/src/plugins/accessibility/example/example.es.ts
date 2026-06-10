@@ -34,15 +34,15 @@ const esMessages: PartialAccessibilityMessages = {
 		multiSeries
 			? 'Use las flechas izquierda y derecha para moverse entre los puntos de datos, y las flechas arriba y abajo para cambiar de serie.'
 			: 'Use las flechas izquierda y derecha para moverse entre los puntos de datos.',
-	help: ({ multiSeries }) =>
-		`Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Re Pág salta diez puntos adelante, Av Pág diez puntos atrás. Inicio y Fin saltan al primer y al último punto. Intro o Espacio lee un resumen de la serie.`,
+	help: ({ multiSeries, pageStep }) =>
+		`Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Re Pág salta ${pageStep} puntos adelante, Av Pág ${pageStep} puntos atrás. Inicio y Fin saltan al primer y al último punto. Intro o Espacio lee un resumen de la serie.`,
 	point: ({ position, total, time, label, values }) =>
 		`${label} ${values}, ${time}. Punto ${position} de ${total}.`,
 	seriesPosition: ({ label, position, total, point }) =>
 		`${label}, serie ${position} de ${total}.${point}`,
 	summary: ({ label, count, scopeNote, firstValue, firstTime, lastValue, lastTime, directionLabel, changeValue, percent, lowValue, lowTime, highValue, highTime }) =>
 		`${label} con ${count} puntos de datos${scopeNote}. Desde ${firstValue} el ${firstTime} hasta ${lastValue} el ${lastTime}. En conjunto ${directionLabel} ${changeValue}${percent !== null ? `, ${percent} por ciento` : ''}. Mínimo ${lowValue} el ${lowTime}, máximo ${highValue} el ${highTime}.`,
-	noData: ({ label }) => `${label}: no hay datos disponibles.`,
+	noData: ({ label, scopeNote }) => `${label}: no hay datos disponibles${scopeNote}.`,
 	seriesUpdate: ({ label, count, scopeNote, latest }) =>
 		`${label}, ${count} puntos de datos${scopeNote}. Último ${latest}`,
 	dataUpdated: ({ summaries, total, shownMax }) => {
@@ -90,9 +90,7 @@ const averageSeries = chart.addSeries(LineSeries, {
 	lineWidth: 2,
 	title: 'Media móvil',
 });
-// Una media móvil real de la serie de precios: empieza más tarde, así que las
-// dos series no comparten todas las marcas de tiempo (al cambiar de serie se
-// mantiene el *tiempo* enfocado seleccionando el punto más cercano).
+
 const averagePeriod = 20;
 const averageData = priceData.slice(averagePeriod - 1).map((point, index) => {
 	let sum = 0;
