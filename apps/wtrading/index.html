@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="color-scheme" content="dark">
+	<title>WTrading — Difference Quotient Studio</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<div class="mica-backdrop" aria-hidden="true">
+		<div class="blob blob-green"></div>
+		<div class="blob blob-orange"></div>
+		<div class="blob blob-blue"></div>
+	</div>
+
+	<header class="titlebar acrylic">
+		<div class="titlebar-left">
+			<span class="app-dot dot-t0"></span>
+			<span class="app-dot dot-t1"></span>
+			<span class="app-title">WTrading</span>
+			<span class="app-subtitle">Difference Quotient Studio</span>
+		</div>
+		<div class="titlebar-right">
+			<span class="pill pill-blue" id="symbolPill">USDC / EUR · 1D</span>
+			<span class="pill pill-live"><span class="live-dot"></span>Live</span>
+		</div>
+	</header>
+
+	<main class="layout">
+		<nav class="navrail acrylic" aria-label="Navigation">
+			<button class="nav-btn active" title="Chart">📈</button>
+			<button class="nav-btn" title="Signale">🔔</button>
+			<button class="nav-btn" title="Trading">💱</button>
+			<button class="nav-btn" title="Einstellungen">⚙️</button>
+		</nav>
+
+		<section class="chart-card acrylic">
+			<div class="card-header">
+				<h2>Kurschart</h2>
+				<div class="toggles">
+					<label class="win-toggle">
+						<input type="checkbox" id="toggleRay" checked>
+						<span class="track"></span>
+						<span class="toggle-label">Ray t0→t1</span>
+					</label>
+					<label class="win-toggle">
+						<input type="checkbox" id="toggleFib" checked>
+						<span class="track"></span>
+						<span class="toggle-label">Fibonacci</span>
+					</label>
+					<label class="win-toggle">
+						<input type="checkbox" id="toggleDots" checked>
+						<span class="track"></span>
+						<span class="toggle-label">t0 / t1 Punkte</span>
+					</label>
+					<label class="win-toggle">
+						<input type="checkbox" id="toggleExtrema">
+						<span class="track"></span>
+						<span class="toggle-label">Hoch/Tief (f′=0)</span>
+					</label>
+				</div>
+			</div>
+			<div id="chart" class="chart-host"></div>
+		</section>
+
+		<aside class="formula-panel">
+			<div class="formula-card acrylic accent-green">
+				<span class="formula-index">1</span>
+				<div>
+					<h3>Differenzenquotient t0→t1</h3>
+					<output id="f1">–</output>
+				</div>
+			</div>
+			<div class="formula-card acrylic accent-green">
+				<span class="formula-index">2</span>
+				<div>
+					<h3>Differenzenquotient t0</h3>
+					<output id="f2">–</output>
+				</div>
+			</div>
+			<div class="formula-card acrylic accent-blue">
+				<span class="formula-index">3</span>
+				<div>
+					<h3>Differentialquotient MA (live)</h3>
+					<output id="f3">–</output>
+				</div>
+			</div>
+			<div class="formula-card acrylic accent-orange">
+				<span class="formula-index">4</span>
+				<div>
+					<h3>Differentialquotient t1</h3>
+					<output id="f4">–</output>
+				</div>
+			</div>
+			<div class="formula-card acrylic accent-blue">
+				<span class="formula-index">5</span>
+				<div>
+					<h3>Differentialquotient ⅓ Weg</h3>
+					<output id="f5">–</output>
+				</div>
+			</div>
+			<div class="formula-card acrylic accent-orange">
+				<span class="formula-index">6</span>
+				<div>
+					<h3>Differentialquotient 0.09</h3>
+					<output id="f6">–</output>
+				</div>
+			</div>
+			<div class="formula-card acrylic accent-green">
+				<span class="formula-index">7</span>
+				<div>
+					<h3>Hoch/Tief-Marker (f′ = 0)</h3>
+					<output id="f7">–</output>
+				</div>
+			</div>
+			<div class="signal-card acrylic" id="signalCard">
+				<h3>Signal @ t2</h3>
+				<output id="signal">–</output>
+			</div>
+		</aside>
+	</main>
+
+	<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+	<script>
+		// Fallback to a locally built library when the CDN is unreachable
+		// (run `npm run build` or `npm run build:prod` in the repo root first).
+		if (!window.LightweightCharts) {
+			document.write('<script src="../../dist/lightweight-charts.standalone.production.js"><\/script>');
+			document.write('<script>if (!window.LightweightCharts) document.write(\'<script src="../../dist/lightweight-charts.standalone.development.js"><\\/script>\');<\/script>');
+		}
+	</script>
+	<script src="app.js"></script>
+</body>
+</html>
