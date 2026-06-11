@@ -1,0 +1,353 @@
+/*
+ * WTrading — artsy Windows 11 Fluent interface
+ * Palette derived from the t0/t1 dot colors (green & orange)
+ * plus the matching Windows 11 accent blue.
+ */
+
+:root {
+	/* dot colors of the theory markers */
+	--t0-green: #26a69a;
+	--t0-green-bright: #3ddc84;
+	--t1-orange: #ff9800;
+	--t1-orange-bright: #ffb74d;
+
+	/* Windows 11 accent blue (light accent #0078d4, dark accent #4cc2ff) */
+	--win-blue: #0078d4;
+	--win-blue-bright: #4cc2ff;
+
+	/* Windows 11 dark Mica surfaces */
+	--mica-base: #202020;
+	--mica-layer: #2c2c2c;
+	--card-stroke: rgba(255, 255, 255, 0.08);
+	--text-primary: rgba(255, 255, 255, 0.92);
+	--text-secondary: rgba(255, 255, 255, 0.6);
+
+	--radius: 8px;       /* Windows 11 corner radius */
+	--radius-lg: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+	margin: 0;
+	height: 100%;
+	background: var(--mica-base);
+	color: var(--text-primary);
+	font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+	overflow: hidden;
+}
+
+/* ---- artsy Mica backdrop with floating color blobs ---- */
+.mica-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	background:
+		radial-gradient(ellipse at 20% 0%, rgba(0, 120, 212, 0.18), transparent 55%),
+		radial-gradient(ellipse at 85% 100%, rgba(38, 166, 154, 0.14), transparent 55%),
+		var(--mica-base);
+	overflow: hidden;
+}
+
+.blob {
+	position: absolute;
+	width: 44vmax;
+	height: 44vmax;
+	border-radius: 50%;
+	filter: blur(110px);
+	opacity: 0.28;
+	animation: drift 26s ease-in-out infinite alternate;
+}
+
+.blob-green  { background: var(--t0-green);  top: -12vmax; left: -10vmax; }
+.blob-orange { background: var(--t1-orange); bottom: -16vmax; right: -8vmax; animation-delay: -9s; }
+.blob-blue   { background: var(--win-blue-bright); top: 30%; left: 45%; animation-delay: -17s; opacity: 0.18; }
+
+@keyframes drift {
+	from { transform: translate3d(0, 0, 0) scale(1); }
+	to   { transform: translate3d(6vmax, -4vmax, 0) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.blob { animation: none; }
+	.live-dot { animation: none; }
+}
+
+/* ---- acrylic material (Windows 11 translucent layer) ---- */
+.acrylic {
+	background: rgba(44, 44, 44, 0.62);
+	-webkit-backdrop-filter: blur(24px) saturate(125%);
+	backdrop-filter: blur(24px) saturate(125%);
+	border: 1px solid var(--card-stroke);
+	border-radius: var(--radius-lg);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+/* ---- title bar ---- */
+.titlebar {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 10px 12px 0;
+	padding: 10px 18px;
+}
+
+.titlebar-left { display: flex; align-items: center; gap: 10px; }
+
+.app-dot {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	box-shadow: 0 0 10px currentColor;
+}
+
+.dot-t0 { background: var(--t0-green-bright); color: var(--t0-green-bright); }
+.dot-t1 { background: var(--t1-orange); color: var(--t1-orange); margin-left: -4px; }
+
+.app-title {
+	font-weight: 600;
+	font-size: 15px;
+	background: linear-gradient(90deg, var(--t0-green-bright), var(--win-blue-bright), var(--t1-orange-bright));
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.app-subtitle { font-size: 12px; color: var(--text-secondary); }
+
+.titlebar-right { display: flex; align-items: center; gap: 8px; }
+
+.pill {
+	padding: 4px 12px;
+	border-radius: 999px;
+	font-size: 12px;
+	border: 1px solid var(--card-stroke);
+}
+
+.pill-blue {
+	background: rgba(0, 120, 212, 0.22);
+	color: var(--win-blue-bright);
+	border-color: rgba(76, 194, 255, 0.35);
+}
+
+.pill-live {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--t0-green-bright);
+	background: rgba(38, 166, 154, 0.16);
+	border-color: rgba(61, 220, 132, 0.3);
+}
+
+.live-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--t0-green-bright);
+	animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ---- layout ---- */
+.layout {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-template-columns: 56px 1fr 300px;
+	gap: 12px;
+	padding: 12px;
+	height: calc(100vh - 72px);
+}
+
+/* ---- nav rail ---- */
+.navrail {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 0;
+}
+
+.nav-btn {
+	width: 40px;
+	height: 40px;
+	border: none;
+	border-radius: var(--radius);
+	background: transparent;
+	font-size: 17px;
+	cursor: pointer;
+	transition: background 0.15s ease;
+}
+
+.nav-btn:hover { background: rgba(255, 255, 255, 0.07); }
+
+.nav-btn.active {
+	background: rgba(0, 120, 212, 0.28);
+	outline: 1px solid rgba(76, 194, 255, 0.4);
+}
+
+/* ---- chart card ---- */
+.chart-card {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	padding: 14px 16px 16px;
+}
+
+.card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 10px;
+}
+
+.card-header h2 { margin: 0; font-size: 15px; font-weight: 600; }
+
+.chart-host {
+	flex: 1;
+	min-height: 0;
+	border-radius: var(--radius);
+	overflow: hidden;
+	outline: 1px solid var(--card-stroke);
+}
+
+/* ---- Windows 11 toggle switches ---- */
+.toggles { display: flex; flex-wrap: wrap; gap: 14px; }
+
+.win-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	cursor: pointer;
+	font-size: 12px;
+	color: var(--text-secondary);
+	user-select: none;
+}
+
+.win-toggle input { display: none; }
+
+.win-toggle .track {
+	width: 38px;
+	height: 19px;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, 0.45);
+	position: relative;
+	transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.win-toggle .track::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 3px;
+	width: 11px;
+	height: 11px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.75);
+	transform: translateY(-50%);
+	transition: left 0.15s ease, background 0.15s ease;
+}
+
+.win-toggle input:checked + .track {
+	background: var(--win-blue);
+	border-color: var(--win-blue);
+}
+
+.win-toggle input:checked + .track::after {
+	left: 21px;
+	background: #fff;
+}
+
+.win-toggle:hover .track::after { width: 13px; height: 13px; }
+
+/* ---- formula panel ---- */
+.formula-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	overflow-y: auto;
+	padding-right: 2px;
+}
+
+.formula-card {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 12px;
+	border-left: 3px solid transparent;
+}
+
+.formula-card h3 {
+	margin: 0 0 2px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--text-secondary);
+}
+
+.formula-card output {
+	font-size: 16px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.formula-index {
+	flex: none;
+	width: 26px;
+	height: 26px;
+	display: grid;
+	place-items: center;
+	border-radius: 50%;
+	font-size: 12px;
+	font-weight: 700;
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.accent-green  { border-left-color: var(--t0-green-bright); }
+.accent-green  .formula-index { color: var(--t0-green-bright); }
+.accent-green  output { color: var(--t0-green-bright); }
+
+.accent-orange { border-left-color: var(--t1-orange); }
+.accent-orange .formula-index { color: var(--t1-orange-bright); }
+.accent-orange output { color: var(--t1-orange-bright); }
+
+.accent-blue   { border-left-color: var(--win-blue-bright); }
+.accent-blue   .formula-index { color: var(--win-blue-bright); }
+.accent-blue   output { color: var(--win-blue-bright); }
+
+/* ---- signal card ---- */
+.signal-card {
+	padding: 14px;
+	text-align: center;
+	background: linear-gradient(135deg, rgba(0, 120, 212, 0.3), rgba(38, 166, 154, 0.22));
+}
+
+.signal-card h3 {
+	margin: 0 0 6px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+.signal-card output {
+	font-size: 20px;
+	font-weight: 700;
+}
+
+.signal-card.buy output  { color: var(--t0-green-bright); }
+.signal-card.sell output { color: #ef5350; }
+
+/* ---- responsive ---- */
+@media (max-width: 1000px) {
+	.layout { grid-template-columns: 56px 1fr; }
+	.formula-panel { display: none; }
+}
