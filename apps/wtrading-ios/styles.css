@@ -1,0 +1,358 @@
+/*
+ * WTrading — artsy iOS (Cupertino) interface.
+ * Same palette as the Windows 11 version (t0 green & t1 orange dot colors)
+ * plus the iOS system blue accent and frosted-glass materials.
+ */
+
+:root {
+	/* dot colors of the theory markers */
+	--t0-green: #26a69a;
+	--t0-green-bright: #3ddc84;
+	--t1-orange: #ff9800;
+	--t1-orange-bright: #ffb74d;
+
+	/* iOS system colors (dark mode) */
+	--ios-blue: #0a84ff;
+	--ios-blue-bright: #4cc2ff;
+	--ios-green: #30d158;
+
+	/* iOS dark system backgrounds */
+	--ios-bg: #000000;
+	--ios-bg-elevated: #1c1c1e;
+	--card-stroke: rgba(255, 255, 255, 0.1);
+	--text-primary: rgba(255, 255, 255, 0.92);
+	--text-secondary: rgba(255, 255, 255, 0.6);
+
+	--radius: 13px;      /* iOS continuous corner radius */
+	--radius-lg: 20px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+	margin: 0;
+	height: 100%;
+	background: var(--ios-bg);
+	color: var(--text-primary);
+	font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
+	overflow: hidden;
+}
+
+/* ---- artsy iOS backdrop with floating color blobs ---- */
+.ios-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	background:
+		radial-gradient(ellipse at 20% 0%, rgba(10, 132, 255, 0.16), transparent 55%),
+		radial-gradient(ellipse at 85% 100%, rgba(38, 166, 154, 0.13), transparent 55%),
+		var(--ios-bg);
+	overflow: hidden;
+}
+
+.blob {
+	position: absolute;
+	width: 44vmax;
+	height: 44vmax;
+	border-radius: 50%;
+	filter: blur(110px);
+	opacity: 0.26;
+	animation: drift 26s ease-in-out infinite alternate;
+}
+
+.blob-green  { background: var(--t0-green);  top: -12vmax; left: -10vmax; }
+.blob-orange { background: var(--t1-orange); bottom: -16vmax; right: -8vmax; animation-delay: -9s; }
+.blob-blue   { background: var(--ios-blue); top: 30%; left: 45%; animation-delay: -17s; opacity: 0.18; }
+
+@keyframes drift {
+	from { transform: translate3d(0, 0, 0) scale(1); }
+	to   { transform: translate3d(6vmax, -4vmax, 0) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.blob { animation: none; }
+	.live-dot { animation: none; }
+}
+
+/* ---- iOS frosted-glass material ---- */
+.glass {
+	background: rgba(28, 28, 30, 0.62);
+	-webkit-backdrop-filter: blur(28px) saturate(160%);
+	backdrop-filter: blur(28px) saturate(160%);
+	border: 1px solid var(--card-stroke);
+	border-radius: var(--radius-lg);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+}
+
+/* ---- navigation bar (top) ---- */
+.navbar-top {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 10px 12px 0;
+	padding: 10px 18px;
+}
+
+.navbar-left { display: flex; align-items: center; gap: 10px; }
+
+.app-dot {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	box-shadow: 0 0 10px currentColor;
+}
+
+.dot-t0 { background: var(--t0-green-bright); color: var(--t0-green-bright); }
+.dot-t1 { background: var(--t1-orange); color: var(--t1-orange); margin-left: -4px; }
+
+.app-title {
+	font-weight: 700;
+	font-size: 16px;
+	letter-spacing: -0.01em;
+	background: linear-gradient(90deg, var(--t0-green-bright), var(--ios-blue-bright), var(--t1-orange-bright));
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.app-subtitle { font-size: 12px; color: var(--text-secondary); }
+
+.navbar-right { display: flex; align-items: center; gap: 8px; }
+
+.pill {
+	padding: 4px 12px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 500;
+	border: 1px solid var(--card-stroke);
+}
+
+.pill-blue {
+	background: rgba(10, 132, 255, 0.22);
+	color: var(--ios-blue-bright);
+	border-color: rgba(76, 194, 255, 0.35);
+}
+
+.pill-live {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--t0-green-bright);
+	background: rgba(48, 209, 88, 0.14);
+	border-color: rgba(61, 220, 132, 0.3);
+}
+
+.live-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--t0-green-bright);
+	animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ---- layout (tab bar sits at the bottom, iOS style) ---- */
+.layout {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-template-columns: 1fr 300px;
+	gap: 12px;
+	padding: 12px;
+	height: calc(100vh - 148px);
+}
+
+/* ---- iOS tab bar (bottom) ---- */
+.tabbar {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	align-items: stretch;
+	justify-content: space-around;
+	margin: 0 12px 10px;
+	padding: 6px 8px;
+}
+
+.tab-btn {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	border: none;
+	background: transparent;
+	color: var(--text-secondary);
+	font-family: inherit;
+	font-size: 10px;
+	padding: 4px 18px;
+	border-radius: var(--radius);
+	cursor: pointer;
+	transition: background 0.15s ease;
+}
+
+.tab-btn:hover { background: rgba(255, 255, 255, 0.06); }
+
+.tab-btn.active { color: var(--ios-blue-bright); }
+
+.tab-icon { font-size: 17px; }
+
+.tab-label { font-weight: 500; }
+
+/* ---- chart card ---- */
+.chart-card {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	padding: 14px 16px 16px;
+}
+
+.card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 10px;
+}
+
+.card-header h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+
+.chart-host {
+	flex: 1;
+	min-height: 0;
+	border-radius: var(--radius);
+	overflow: hidden;
+	outline: 1px solid var(--card-stroke);
+}
+
+/* ---- iOS switches ---- */
+.toggles { display: flex; flex-wrap: wrap; gap: 14px; }
+
+.ios-switch {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	cursor: pointer;
+	font-size: 12px;
+	color: var(--text-secondary);
+	user-select: none;
+}
+
+.ios-switch input { display: none; }
+
+.ios-switch .track {
+	width: 40px;
+	height: 24px;
+	border-radius: 999px;
+	background: rgba(120, 120, 128, 0.32);
+	position: relative;
+	transition: background 0.2s ease;
+}
+
+.ios-switch .track::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 2px;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+	transform: translateY(-50%);
+	transition: left 0.2s ease;
+}
+
+.ios-switch input:checked + .track { background: var(--ios-green); }
+
+.ios-switch input:checked + .track::after { left: 18px; }
+
+/* ---- formula panel ---- */
+.formula-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	overflow-y: auto;
+	padding-right: 2px;
+}
+
+.formula-card {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 12px;
+	border-radius: var(--radius);
+	border-left: 3px solid transparent;
+}
+
+.formula-card h3 {
+	margin: 0 0 2px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--text-secondary);
+}
+
+.formula-card output {
+	font-size: 16px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.formula-index {
+	flex: none;
+	width: 26px;
+	height: 26px;
+	display: grid;
+	place-items: center;
+	border-radius: 50%;
+	font-size: 12px;
+	font-weight: 700;
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.accent-green  { border-left-color: var(--t0-green-bright); }
+.accent-green  .formula-index { color: var(--t0-green-bright); }
+.accent-green  output { color: var(--t0-green-bright); }
+
+.accent-orange { border-left-color: var(--t1-orange); }
+.accent-orange .formula-index { color: var(--t1-orange-bright); }
+.accent-orange output { color: var(--t1-orange-bright); }
+
+.accent-blue   { border-left-color: var(--ios-blue-bright); }
+.accent-blue   .formula-index { color: var(--ios-blue-bright); }
+.accent-blue   output { color: var(--ios-blue-bright); }
+
+/* ---- signal card ---- */
+.signal-card {
+	padding: 14px;
+	text-align: center;
+	background: linear-gradient(135deg, rgba(10, 132, 255, 0.28), rgba(38, 166, 154, 0.2));
+}
+
+.signal-card h3 {
+	margin: 0 0 6px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+.signal-card output {
+	font-size: 20px;
+	font-weight: 700;
+}
+
+.signal-card.buy output  { color: var(--t0-green-bright); }
+.signal-card.sell output { color: #ef5350; }
+
+/* ---- responsive ---- */
+@media (max-width: 1000px) {
+	.layout { grid-template-columns: 1fr; }
+	.formula-panel { display: none; }
+}
