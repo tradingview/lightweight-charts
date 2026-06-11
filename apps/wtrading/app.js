@@ -77,9 +77,15 @@
 		return slice.reduce((a, p) => a + p.value, 0) / slice.length;
 	}
 
+	// theory threshold: differential quotients staying above/below this value
+	// signal continuation to the next fibonacci level
+	const THRESHOLD = 0.5;
+
 	// ---- theory: find t0 (low, f' crosses 0 upward) and t1 (f' reaches 1) ----
 	function analyze(candles, ma) {
-		const SCALE = 4000; // normalizes price-per-bar slope into the 0..1 regime of the theory
+		// Normalizes the raw price-per-bar slope of this demo data (~0.00025/bar)
+		// into the 0..1 regime of the theory, so "crosses 1" and "0.5" rules apply.
+		const SCALE = 4000;
 		const diff = differential(ma, SCALE);
 		const maOffset = candles.length - ma.length;
 
@@ -257,8 +263,8 @@
 	document.getElementById('f2').textContent = fmt(result.f2);
 	document.getElementById('f3').textContent = fmt(result.f3);
 	document.getElementById('f4').textContent = fmt(result.f4);
-	document.getElementById('f5').textContent = fmt(result.f5) + (Math.abs(result.f5) > 0.5 ? ' → weiter' : '');
-	document.getElementById('f6').textContent = fmt(result.f6) + (Math.abs(result.f6) > 0.5 ? ' → nächstes Fib' : '');
+	document.getElementById('f5').textContent = fmt(result.f5) + (Math.abs(result.f5) > THRESHOLD ? ' → weiter' : '');
+	document.getElementById('f6').textContent = fmt(result.f6) + (Math.abs(result.f6) > THRESHOLD ? ' → nächstes Fib' : '');
 	document.getElementById('f7').textContent = result.extrema.length + ' Extrema';
 
 	const signalCard = document.getElementById('signalCard');
