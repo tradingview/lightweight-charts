@@ -1,5 +1,7 @@
 # Manual Testing Notes for WTrading
 
+This document supplements `.github/copilot-instructions.md` and should be used especially after changes to MA, High-Low, prediction, plotting, or coordinate-mapping logic.
+
 ## Focus areas
 Use this checklist after changes to:
 - moving averages (MA)

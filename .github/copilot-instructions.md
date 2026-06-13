@@ -74,6 +74,7 @@ This repository includes prediction / average / high-low related logic.
 - Prefer explicit validation of both:
   1. calculation correctness
   2. GUI placement correctness
+- See `.github/testing-notes.md` for manual validation guidance after indicator, plotting, or coordinate-mapping changes.
 
 ## Upstream/fork maintenance guidance
 - This repo appears to diverge from upstream `lightweight-charts`.
