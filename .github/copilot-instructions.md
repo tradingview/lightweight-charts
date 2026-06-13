@@ -61,6 +61,20 @@ This repository includes prediction / average / high-low related logic.
   - preserve data ordering assumptions
   - verify boundary behavior at the beginning of datasets
 
+## Validation rules for MA / High-Low / Prediction features
+- Treat all MA, High-Low, and prediction-related changes as both calculation-sensitive and visualization-sensitive.
+- Do not assume a demo graph is sufficient proof of correctness.
+- After changing these features, verify:
+  - whether plotted points/markers appear at the intended candle/time position
+  - whether the plotted price level matches the intended calculated value
+  - whether any off-by-one shift exists in rolling windows or future/past indexing
+  - whether price values and screen coordinates are mapped correctly
+  - whether results remain plausible on more than one dataset
+- If there is uncertainty, preserve current behavior and document the uncertainty clearly.
+- Prefer explicit validation of both:
+  1. calculation correctness
+  2. GUI placement correctness
+
 ## Upstream/fork maintenance guidance
 - This repo appears to diverge from upstream `lightweight-charts`.
 - When editing code that likely came from upstream:
