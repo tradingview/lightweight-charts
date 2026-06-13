@@ -1,33 +1,135 @@
 # Copilot Instructions for WTrading
 
-## Project overview
-- This repository is a fork/customization of `tradingview/lightweight-charts`.
-- Preserve performance characteristics of the charting engine, especially on canvas rendering paths.
-- Prefer minimal, focused changes over broad refactors.
+## Project context
+- This repository is based on `tradingview/lightweight-charts` and contains custom trading/charting extensions.
+- Treat the codebase as **performance-sensitive** and **rendering-sensitive**.
+- Prefer small, isolated changes over broad structural refactors.
+- Preserve upstream-compatible structure where practical so future syncs/diffs remain manageable.
 
-## Tech stack
-- Primary languages are TypeScript and JavaScript.
-- Keep public APIs and type definitions consistent.
-- Avoid introducing heavy dependencies unless explicitly required.
+## Primary goals
+When making changes, optimize for:
+1. Correct chart behavior
+2. Stable rendering performance
+3. Backward compatibility
+4. Minimal diff size
+5. Clear mathematical intent
 
-## Coding guidelines
-- Follow the existing code style and nearby file conventions.
-- Prefer TypeScript-first changes when editing typed modules.
-- Keep rendering code allocation-conscious and avoid unnecessary work in hot paths.
-- Do not rename public symbols unless required.
-- Preserve backward compatibility unless a task explicitly allows breaking changes.
+## Tech expectations
+- Prefer **TypeScript-first** changes where types already exist.
+- Avoid introducing new dependencies unless explicitly required.
+- Reuse existing utilities and patterns before adding new abstractions.
+- Keep public interfaces, exported symbols, and option shapes stable unless the task explicitly requires a breaking change.
+
+## Performance rules
+This repo renders financial charts, so assume hot paths are sensitive.
+
+- Avoid unnecessary allocations inside render loops.
+- Avoid repeated object creation in draw/update paths.
+- Avoid deep cloning, repeated array copying, or repeated sorting in frequently called code.
+- Prefer simple loops over abstraction-heavy helpers in critical rendering/math paths.
+- Do not add logging in hot paths.
+- Be cautious with recalculating derived values on every frame or mouse move.
+- Memoize or cache only when it actually reduces repeated work and does not create stale-state bugs.
+
+## Rendering rules
+- Do not change canvas drawing behavior unless required by the task.
+- Preserve pixel alignment and existing rounding behavior unless a visual bug specifically requires change.
+- Be careful when modifying:
+  - price-to-coordinate transforms
+  - time-to-coordinate transforms
+  - pane scaling
+  - autoscale logic
+  - crosshair behavior
+  - visible range calculations
+- Any rendering change should include a short explanation of expected visual impact.
+
+## Math and indicator rules
+This repository includes prediction / average / high-low related logic.
+
+- Treat all math-related code as correctness-sensitive.
+- Do not “simplify” formulas unless you can explain why the new formula is equivalent.
+- Be careful with:
+  - floating-point precision
+  - divide-by-zero cases
+  - NaN propagation
+  - undefined/null data points
+  - sparse or missing candles
+  - off-by-one indexing in rolling calculations
+- For moving averages, highs/lows, or prediction logic:
+  - prefer explicit variable names
+  - document window assumptions
+  - preserve data ordering assumptions
+  - verify boundary behavior at the beginning of datasets
+
+## Upstream/fork maintenance guidance
+- This repo appears to diverge from upstream `lightweight-charts`.
+- When editing code that likely came from upstream:
+  - preserve the surrounding structure and naming style
+  - avoid unnecessary formatting-only changes
+  - keep diffs easy to compare against upstream
+- If a change is fork-specific, isolate it clearly rather than scattering it across unrelated files.
+
+## Refactoring guidance
+Allowed:
+- small local cleanup
+- extracting tiny helper functions when it improves readability without harming performance
+- tightening types
+- removing obviously dead local code tied to the change
+
+Avoid unless explicitly requested:
+- large renames
+- moving files
+- API redesign
+- cross-module architecture changes
+- stylistic rewrites
+- replacing proven imperative code with abstraction-heavy patterns
 
 ## Testing and validation
-- Run or update the most relevant tests for changed code.
-- For visual/chart behavior changes, describe expected rendering impact clearly in PR notes.
-- Avoid changing unrelated snapshots or fixtures.
+For every change, prefer the smallest relevant validation.
 
-## Repository-specific guidance
-- Treat this repo as performance-sensitive charting software.
-- Be careful with floating-point/math logic used for indicators or prediction-related features.
-- When modifying averages, highs/lows, or derived calculations, prefer small diffs and explain assumptions.
+- Run or update tests closest to the changed behavior.
+- If changing math/indicator behavior, validate with edge cases:
+  - empty input
+  - single-point input
+  - exact window-size input
+  - larger rolling-series input
+  - missing/undefined values if supported
+- If changing rendering behavior, describe:
+  - what should look different
+  - what must remain unchanged
+- Do not modify unrelated snapshots, fixtures, or generated outputs.
+
+## File editing behavior
+- Match the style of the file you are editing.
+- Follow nearby naming conventions before inventing new ones.
+- Keep comments concise and only add them where the intent is non-obvious.
+- Do not add header comments/license changes unless explicitly requested.
 
 ## Pull request expectations
-- Summarize what changed and why.
-- Call out any API, rendering, or performance implications.
-- Mention follow-up work separately instead of bundling it into the same change.
+When preparing a PR or summary, include:
+- what changed
+- why it changed
+- whether rendering behavior changed
+- whether math/calculation behavior changed
+- any API or option-surface impact
+- any performance risk or benefit
+- any follow-up work that should be separate
+
+## Preferred change style
+Prefer:
+- narrow patches
+- explicit logic
+- stable APIs
+- measurable behavior changes
+
+Avoid:
+- speculative optimizations
+- hidden behavioral changes
+- mixing refactors with bug fixes
+- changing multiple subsystems in one patch unless required
+
+## If uncertain
+If the intent is unclear:
+- choose the least invasive implementation
+- preserve existing behavior by default
+- note assumptions clearly in the PR summary or change explanation
