@@ -316,27 +316,31 @@
 	// ---- live polling: update last bar, add new bar on period rollover ----
 	function startLivePolling(candleSeries, initialCandles) {
 		let lastTime = initialCandles[initialCandles.length - 1].time;
-		setInterval(async () => {
+		const poll = async () => {
 			let fresh;
 			try {
 				fresh = await fetchKrakenOHLC(CONFIG.pair, CONFIG.interval);
 			} catch (e) {
-				return; // silent on poll errors — historical data was already loaded
+				setTimeout(poll, CONFIG.pollMs); // retry after interval on error
+				return;
 			}
-			if (!fresh.length) { return; }
-			const newBar = fresh[fresh.length - 1];
-			if (newBar.time !== lastTime) {
-				// period rolled over: commit the now-complete previous bar first
-				const prevBar = fresh[fresh.length - 2];
-				if (prevBar && prevBar.time === lastTime) {
-					candleSeries.update(prevBar);
+			if (fresh.length) {
+				const newBar = fresh[fresh.length - 1];
+				if (newBar.time !== lastTime) {
+					// period rolled over: commit the now-complete previous bar first
+					const prevBar = fresh[fresh.length - 2];
+					if (prevBar && prevBar.time === lastTime) {
+						candleSeries.update(prevBar);
+					}
+					candleSeries.update(newBar);
+					lastTime = newBar.time;
+				} else {
+					candleSeries.update(newBar);
 				}
-				candleSeries.update(newBar);
-				lastTime = newBar.time;
-			} else {
-				candleSeries.update(newBar);
 			}
-		}, CONFIG.pollMs);
+			setTimeout(poll, CONFIG.pollMs);
+		};
+		setTimeout(poll, CONFIG.pollMs);
 	}
 
 	// ---- entry point ----
