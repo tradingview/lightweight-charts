@@ -1,0 +1,1 @@
+import{l as a,g as s,Q as o,y as i,h as l}from"./sample-data-Db9B_lxI.js";import{c as n}from"./weighted-close-calculation-BeWUi6qC.js";const c={autoSize:!0},e=a("chart",c),t=s(150,new Date(2024,0,1)),r=e.addSeries(o,{});r.setData(t);const d=n(t,{}),h=e.addSeries(i,{color:"black",lineWidth:2,lineStyle:l.Solid});h.setData(d);e.timeScale().fitContent();
