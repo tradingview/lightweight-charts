@@ -1774,6 +1774,7 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		this._refreshActivePoints();
 		this._updatePaneLabel();
 		this._updateDescription();
+		this._renderShortcuts();
 		this._positionIndicator();
 	}
 
