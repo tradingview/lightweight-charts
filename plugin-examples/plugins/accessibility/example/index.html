@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Lightweight Charts - Accessibility Plugin Example</title>
+		<style>
+			#chart {
+				height: 450px;
+				position: relative;
+			}
+			/*
+			 * The shared examples stylesheet resets buttons with `all: initial`,
+			 * which also removes their default focus ring.
+			 */
+			#buttons button:focus-visible {
+				outline: 3px solid #2962ff;
+				outline-offset: 2px;
+			}
+			#buttons {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+		</style>
+		<script type="module" crossorigin src="../../../assets/3-BiPnj15j.js"></script>
+		<link rel="modulepreload" crossorigin href="../../../assets/lightweight-charts.production-_eU9SRSD.js">
+		<link rel="modulepreload" crossorigin href="../../../assets/sample-data-x_8-FZm1.js">
+		<link rel="modulepreload" crossorigin href="../../../assets/accessibility-aysWO3od.js">
+		<link rel="stylesheet" crossorigin href="../../../assets/lightweight-charts-CqcgeZSf.css">
+	</head>
+	<body>
+		<div id="buttons" class="column">
+			<button id="focus-button">Focus the chart</button>
+			<button id="live-button">Start live updates</button>
+			<button id="scope-button">Announce: visible range</button>
+			<button id="contrast-button">Enable high contrast</button>
+			<button id="font-button">Large font</button>
+		</div>
+		<div id="chart"></div>
+		<div id="description">
+			<h1>Accessibility Plugin</h1>
+			<p>
+				A drop-in plugin that adds a semantic accessibility layer to a chart.
+				One instance is attached per pane, so each pane becomes its own
+				keyboard-focusable region. This example has a price pane (with two
+				series) and a separate volume pane.
+			</p>
+			<p>
+				Press <kbd>Tab</kbd> to move between the panes (or click
+				<strong>Focus the chart</strong>), then use the keyboard:
+			</p>
+			<ul>
+				<li><kbd>←</kbd> / <kbd>→</kbd> — move between data points</li>
+				<li><kbd>↑</kbd> / <kbd>↓</kbd> — switch between series in the pane</li>
+				<li><kbd>Page Up</kbd> / <kbd>Page Down</kbd> — jump ten points</li>
+				<li><kbd>Home</kbd> / <kbd>End</kbd> — first / last point</li>
+				<li><kbd>+</kbd> / <kbd>−</kbd> — zoom the chart in / out</li>
+				<li><kbd>Enter</kbd> / <kbd>Space</kbd> — read a summary of the series</li>
+				<li><kbd>H</kbd> — show / hide the shortcuts panel (and announce the controls)</li>
+			</ul>
+			<p>
+				A visible focus ring tracks the active point and stays aligned with the
+				canvas as you scroll or zoom. Use a screen reader (VoiceOver, NVDA) to
+				hear each point announced.
+			</p>
+			<p>
+				<strong>Start live updates</strong> streams a new bar into every series
+				every couple of seconds, simulating a real-time feed. Updates are
+				announced through one shared polite <code>aria-live</code> region. By
+				default only the <em>active</em> (last-focused) pane is announced — you
+				hear the price pane until you focus the volume pane — which stops a
+				multi-pane chart talking over itself. Pass
+				<code>announceDataUpdates: true</code> to
+				<code>addAccessibilityPlugin</code> to hear every pane combined into one
+				announcement.
+			</p>
+			<p>
+				Use <strong>Announce: visible range / all data</strong> to switch the
+				<code>dataScope</code> option. The arrow keys always page through the
+				whole series; this option only changes the spoken summaries. In
+				<em>visible range</em> mode the <kbd>Enter</kbd> / <kbd>Space</kbd>
+				summary and the live-update announcements describe only the points
+				currently on screen; in <em>all data</em> mode they describe the full
+				data set.
+			</p>
+			<p>
+				This example also opts into the <strong>visible shortcuts overlay</strong>
+				(<code>showShortcuts: true</code>): focus the chart to see a
+				<em>Press H for keyboard shortcuts</em> hint, then press <kbd>H</kbd> to
+				toggle an on-screen list — for sighted keyboard users. <strong>Enable high contrast</strong> flips the plugin's
+				<code>highContrast</code> option: the plugin restyles its own focus ring
+				and overlay and calls <code>onHighContrastChange</code>, which this
+				example uses to restyle the chart's own series and grid to match.
+				<strong>Large font</strong> increases the chart's text size. By default
+				<code>highContrast</code> is <code>'auto'</code>, following the operating
+				system's contrast setting.
+			</p>
+		</div>
+	</body>
+</html>
