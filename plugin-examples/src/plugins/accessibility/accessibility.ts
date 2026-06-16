@@ -180,6 +180,26 @@ export interface AccessibilityOptions {
 	 * `localization.locale`.
 	 */
 	lang?: string;
+	/**
+	 * Show a visible keyboard-shortcuts overlay for sighted keyboard users: a
+	 * "Press H" hint while the pane is focused, and an `H`-toggled panel listing
+	 * the controls (`Esc` closes it). Screen-reader users always get the spoken
+	 * `H` help regardless of this option. Defaults to `false`.
+	 */
+	showShortcuts: boolean;
+	/**
+	 * High-contrast styling for the plugin's own visuals (focus ring, focus outline
+	 * and the shortcuts overlay). `'auto'` (default) follows the OS
+	 * `prefers-contrast` / `forced-colors`; pass a predicate to wire it to your own
+	 * setting. This does not restyle the chart's series / grid / font — use
+	 * {@link onHighContrastChange} for that.
+	 */
+	highContrast: boolean | 'auto' | (() => boolean);
+	/**
+	 * Called when the resolved high-contrast state changes (and once on attach),
+	 * so the host can restyle the chart's own series / grid / font to match.
+	 */
+	onHighContrastChange?: (enabled: boolean) => void;
 }
 
 const defaultOptions: AccessibilityOptions = {
@@ -191,6 +211,8 @@ const defaultOptions: AccessibilityOptions = {
 	announceDataUpdates: true,
 	pageStep: 10,
 	dataScope: 'visible',
+	showShortcuts: false,
+	highContrast: 'auto',
 };
 
 /** Elements that can receive keyboard focus and so must be neutralised inside the hidden chart DOM. */
@@ -203,6 +225,17 @@ const VISUALLY_HIDDEN =
 
 function clamp(value: number, min: number, max: number): number {
 	return Math.max(min, Math.min(max, value));
+}
+
+/** The media queries whose changes flip the `'auto'` high-contrast state. */
+const HIGH_CONTRAST_QUERIES = ['(prefers-contrast: more)', '(forced-colors: active)'];
+
+/** Whether the OS asks for higher contrast (used by the `'auto'` high-contrast mode). */
+function prefersHighContrast(): boolean {
+	if (typeof window === 'undefined' || !window.matchMedia) {
+		return false;
+	}
+	return HIGH_CONTRAST_QUERIES.some(query => window.matchMedia(query).matches);
 }
 
 /**
@@ -371,6 +404,17 @@ export interface AccessibilityMessages {
 	description: (args: { multiSeries: boolean }) => string;
 	/** Announced on `H`. */
 	help: (args: { multiSeries: boolean; pageStep: number }) => string;
+	/** Hint shown on the visible overlay while the pane is focused (when `showShortcuts`). */
+	shortcutsHint: string;
+	/** Heading of the visible shortcuts panel. */
+	shortcutsTitle: string;
+	/**
+	 * Rows for the *visible* shortcuts panel (for sighted keyboard users), so list
+	 * only keys with an on-screen effect. Screen-reader-only actions — such as the
+	 * Enter / Space summary, which is spoken but produces nothing visible — belong
+	 * in {@link help}, not here.
+	 */
+	shortcuts: (args: { multiSeries: boolean; pageStep: number }) => readonly { keys: string; action: string }[];
 	/** Announced for the focused data point (`position` is 1-based). */
 	point: (args: { position: number; total: number; time: string; label: string; values: string }) => string;
 	/** Announced when switching series (`position` is 1-based; `point` is pre-spaced or `''`). */
@@ -416,7 +460,20 @@ export const defaultMessages: AccessibilityMessages = {
 			? 'Use the left and right arrow keys to move between data points, and the up and down arrows to switch series.'
 			: 'Use the left and right arrow keys to move between data points.',
 	help: ({ multiSeries, pageStep }): string =>
-		`Keyboard controls. Left and right arrows move between data points. ${multiSeries ? 'Up and down arrows switch between series. ' : ''}Page Up jumps ${pageStep} points forward, Page Down ${pageStep} points back. Home and End jump to the first and last points. Enter or Space reads a summary of the series.`,
+		`Keyboard controls. Left and right arrows move between data points. ${multiSeries ? 'Up and down arrows switch between series. ' : ''}Page Up jumps ${pageStep} points forward, Page Down ${pageStep} points back. Home and End jump to the first and last points. Plus and minus zoom the chart in and out. Enter or Space reads a summary of the series.`,
+	shortcutsHint: 'Press H for keyboard shortcuts',
+	shortcutsTitle: 'Keyboard shortcuts',
+	shortcuts: ({ multiSeries, pageStep }) => [
+		{ keys: '← / →', action: 'Move between data points' },
+		...(multiSeries ? [{ keys: '↑ / ↓', action: 'Switch between series' }] : []),
+		{ keys: 'Page Up / Page Down', action: `Jump ${pageStep} points` },
+		{ keys: 'Home / End', action: 'First / last point' },
+		{ keys: '+ / −', action: 'Zoom in / out' },
+		// Enter / Space (the spoken summary) is intentionally omitted: it has no
+		// on-screen effect, so it stays in `help` (for screen readers) only.
+		{ keys: 'H', action: 'Show or hide this panel' },
+		{ keys: 'Esc', action: 'Close this panel' },
+	],
 	// Most important information first: the value, then the date; the position
 	// counter is context, so it comes last.
 	point: ({ position, total, time, label, values }): string =>
@@ -487,6 +544,12 @@ const UPDATE_DEBOUNCE_MS = 150;
 /** Maximum number of changed series listed in a single update announcement. */
 const UPDATE_MAX_SERIES = 3;
 
+/** Fraction the visible range grows / shrinks per `+` / `-` zoom keypress. */
+const ZOOM_STEP = 0.2;
+
+/** Smallest visible logical span (in bars) that zooming-in will produce. */
+const MIN_ZOOM_SPAN = 2;
+
 /**
  * Builds the spoken text for a batch of changed-series summaries. Shared by the
  * standalone per-pane path and the chart-level {@link UpdateAnnouncer}. Returns
@@ -532,9 +595,10 @@ const pluginLinks = new WeakMap<AccessibilityPlugin, PluginLink>();
  * To keep the DOM lightweight regardless of the number of bars, the plugin uses
  * an "active-point-only" strategy: it never mirrors every data point into the
  * DOM, rendering only a small fixed set of nodes per pane (a semantic overlay, a
- * live region, a description and a focus indicator). Keyboard navigation always
- * covers the whole series; the default `dataScope: 'visible'` keeps the spoken
- * summaries scoped to the viewport on large data sets.
+ * live region, a description, a focus indicator and an optional shortcuts
+ * overlay). Keyboard navigation always covers the whole series; the default
+ * `dataScope: 'visible'` keeps the spoken summaries scoped to the viewport on
+ * large data sets.
  */
 export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	private _options: AccessibilityOptions;
@@ -545,6 +609,10 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	private _statusRegion: HTMLElement | null = null;
 	private _descriptionRegion: HTMLElement | null = null;
 	private _focusIndicator: HTMLElement | null = null;
+	// Visible (opt-in) keyboard-shortcuts overlay for sighted keyboard users.
+	private _shortcutsHint: HTMLElement | null = null;
+	private _shortcutsPanel: HTMLElement | null = null;
+	private _shortcutsOpen = false;
 	private _domObserver: MutationObserver | null = null;
 	private _requestUpdate: (() => void) | null = null;
 
@@ -580,6 +648,10 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	// Memoised percent formatter, rebuilt only when the chart's locale changes.
 	private _percentFormatter: Intl.NumberFormat | null = null;
 	private _percentLocale: string | undefined;
+	// Resolved high-contrast state, plus the OS media queries that drive `'auto'`.
+	private _highContrast = false;
+	private _highContrastInitialised = false;
+	private _contrastMedia: MediaQueryList[] = [];
 
 	public constructor(options: Partial<AccessibilityOptions> = {}) {
 		this._options = { ...defaultOptions, ...options };
@@ -649,6 +721,10 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		// Stop observing before restoring, so our own restores are not re-swept.
 		this._domObserver?.disconnect();
 		this._domObserver = null;
+		for (const media of this._contrastMedia) {
+			media.removeEventListener('change', this._onContrastChange);
+		}
+		this._contrastMedia = [];
 		this._restorePresentationRoles();
 		this._restoreHiddenCanvases();
 		this._restoreFocusables();
@@ -660,6 +736,11 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		this._statusRegion = null;
 		this._descriptionRegion = null;
 		this._focusIndicator = null;
+		this._shortcutsHint = null;
+		this._shortcutsPanel = null;
+		this._shortcutsOpen = false;
+		this._highContrast = false;
+		this._highContrastInitialised = false;
 		this._seriesList = [];
 		this._points = [];
 		this._activePointsStale = false;
@@ -701,6 +782,11 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		}
 		this._styleFocusOutline();
 		this._positionIndicator();
+		this._renderShortcuts();
+		// Re-resolve in case `highContrast` changed; always re-style the overlay in
+		// case `showShortcuts` / `messages` did.
+		this._refreshHighContrast();
+		this._styleShortcutsOverlay();
 	}
 
 	public options(): Readonly<AccessibilityOptions> {
@@ -848,8 +934,35 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		semanticLayer.appendChild(focusIndicator);
 		this._focusIndicator = focusIndicator;
 
+		this._buildShortcutsOverlay(semanticLayer);
+		this._setupContrastMedia();
+		// Resolve high contrast last: styles the nodes above and fires the initial
+		// onHighContrastChange so the host can set its matching chart theme.
+		this._refreshHighContrast();
+
 		this._applyLang();
 		this._watchForRecreatedElements(paneElement);
+	}
+
+	/**
+	 * Builds the visible keyboard-shortcuts overlay (a focus hint and an H-toggled
+	 * panel). Always created but only shown when {@link AccessibilityOptions.showShortcuts}
+	 * is set; `aria-hidden` because screen-reader users get the spoken `H` help.
+	 */
+	private _buildShortcutsOverlay(semanticLayer: HTMLElement): void {
+		const hint = document.createElement('div');
+		hint.className = 'lw-chart-a11y-shortcuts-hint';
+		hint.setAttribute('aria-hidden', 'true');
+		semanticLayer.appendChild(hint);
+		this._shortcutsHint = hint;
+
+		const panel = document.createElement('div');
+		panel.className = 'lw-chart-a11y-shortcuts-panel';
+		panel.setAttribute('aria-hidden', 'true');
+		semanticLayer.appendChild(panel);
+		this._shortcutsPanel = panel;
+
+		this._renderShortcuts();
 	}
 
 	private _markTableStructurePresentational(paneElement: HTMLElement): void {
@@ -867,14 +980,20 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 
 	private _styleFocusIndicator(element: HTMLElement): void {
 		const size = this._options.focusIndicatorSize;
+		const color = this._options.focusIndicatorColor;
+		// High contrast: a thicker ring with a white-then-black halo so it stands
+		// out on any background. (box-shadow is dropped in forced-colors mode, where
+		// the border itself still shows.)
+		const ring = this._highContrast
+			? [`border:3px solid ${color}`, 'box-shadow:0 0 0 2px #fff, 0 0 0 4px #000']
+			: [`border:2px solid ${color}`, 'box-shadow:0 0 0 2px rgba(255,255,255,0.9)'];
 		element.style.cssText = [
 			'position:absolute',
 			'box-sizing:border-box',
 			`width:${size}px`,
 			`height:${size}px`,
 			'border-radius:50%',
-			`border:2px solid ${this._options.focusIndicatorColor}`,
-			'box-shadow:0 0 0 2px rgba(255,255,255,0.9)',
+			...ring,
 			'transform:translate(-50%, -50%)',
 			'pointer-events:none',
 			'z-index:4',
@@ -886,9 +1005,119 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		if (!this._container) {
 			return;
 		}
+		const width = this._highContrast ? 4 : 3;
 		this._container.style.outline = this._hasFocus
-			? `3px solid ${this._options.focusIndicatorColor}`
+			? `${width}px solid ${this._options.focusIndicatorColor}`
 			: 'none';
+	}
+
+	// region High contrast & shortcuts overlay ------------------------------------------
+
+	private _setupContrastMedia(): void {
+		if (typeof window === 'undefined' || !window.matchMedia) {
+			return;
+		}
+		this._contrastMedia = HIGH_CONTRAST_QUERIES.map(query => window.matchMedia(query));
+		for (const media of this._contrastMedia) {
+			media.addEventListener('change', this._onContrastChange);
+		}
+	}
+
+	private _onContrastChange = (): void => {
+		this._refreshHighContrast();
+	};
+
+	private _resolveHighContrast(): boolean {
+		const highContrast = this._options.highContrast;
+		if (typeof highContrast === 'function') {
+			return highContrast();
+		}
+		if (highContrast === 'auto') {
+			return prefersHighContrast();
+		}
+		return highContrast;
+	}
+
+	/**
+	 * Recomputes the high-contrast state; on a change (or the first call) restyles
+	 * the plugin's own visuals and notifies the host through onHighContrastChange.
+	 */
+	private _refreshHighContrast(): void {
+		const next = this._resolveHighContrast();
+		if (this._highContrastInitialised && next === this._highContrast) {
+			return;
+		}
+		this._highContrast = next;
+		this._highContrastInitialised = true;
+		if (this._focusIndicator) {
+			this._styleFocusIndicator(this._focusIndicator);
+		}
+		this._styleFocusOutline();
+		this._positionIndicator();
+		this._styleShortcutsOverlay();
+		this._options.onHighContrastChange?.(next);
+	}
+
+	private _hintVisible(): boolean {
+		return this._options.showShortcuts && this._hasFocus && !this._shortcutsOpen;
+	}
+
+	private _setShortcutsOpen(open: boolean): void {
+		this._shortcutsOpen = open && this._options.showShortcuts;
+		this._styleShortcutsOverlay();
+	}
+
+	/** (Re)builds the hint and panel text from the current messages. */
+	private _renderShortcuts(): void {
+		if (this._shortcutsHint) {
+			this._shortcutsHint.textContent = this._messages.shortcutsHint;
+		}
+		const panel = this._shortcutsPanel;
+		if (!panel) {
+			return;
+		}
+		panel.textContent = '';
+		const title = document.createElement('div');
+		title.textContent = this._messages.shortcutsTitle;
+		title.style.cssText = 'font-weight:600;margin-bottom:6px;';
+		panel.appendChild(title);
+		const rows = this._messages.shortcuts({
+			multiSeries: this._seriesList.length > 1,
+			pageStep: this._options.pageStep,
+		});
+		for (const { keys, action } of rows) {
+			const row = document.createElement('div');
+			row.style.cssText = 'display:flex;gap:10px;align-items:baseline;margin-top:3px;';
+			const keyEl = document.createElement('kbd');
+			keyEl.textContent = keys;
+			// `currentColor` keeps the key border in step with the (contrast-aware) text colour.
+			keyEl.style.cssText = 'flex:0 0 auto;border:1px solid currentColor;border-radius:3px;padding:0 5px;font-family:monospace;white-space:nowrap;';
+			const actionEl = document.createElement('span');
+			actionEl.textContent = action;
+			row.appendChild(keyEl);
+			row.appendChild(actionEl);
+			panel.appendChild(row);
+		}
+	}
+
+	/** Positions / shows / hides the overlay and applies the contrast palette. */
+	private _styleShortcutsOverlay(): void {
+		const base = 'position:absolute;z-index:6;color:#fff;font-size:0.8125rem;line-height:1.45;pointer-events:none;';
+		const surface = this._highContrast
+			? 'background:#000;border:2px solid #fff;'
+			: 'background:rgba(20,24,28,0.9);border:1px solid rgba(255,255,255,0.25);';
+		if (this._shortcutsHint) {
+			this._shortcutsHint.style.cssText = base + surface +
+				'left:8px;bottom:8px;padding:3px 8px;border-radius:4px;white-space:nowrap;' +
+				(this._hintVisible() ? '' : 'display:none;');
+		}
+		if (this._shortcutsPanel) {
+			const panelVisible = this._options.showShortcuts && this._shortcutsOpen;
+			this._shortcutsPanel.style.cssText = base + surface +
+				'left:8px;top:8px;max-width:calc(100% - 16px);padding:8px 11px;border-radius:6px;' +
+				(this._highContrast ? '' : 'box-shadow:0 2px 10px rgba(0,0,0,0.45);') +
+				(panelVisible ? '' : 'display:none;');
+		}
 	}
 
 	private _neutraliseFocusables(root: HTMLElement): void {
@@ -1052,6 +1281,7 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		}
 		this._styleFocusOutline();
 		this._positionIndicator();
+		this._styleShortcutsOverlay();
 		// Tell the shared announcer this pane is now the active one, so in the
 		// default 'active' mode its data updates are the ones that get announced.
 		this._updateAnnouncer?.setActivePlugin(this);
@@ -1067,7 +1297,9 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			return;
 		}
 		this._hasFocus = false;
+		this._shortcutsOpen = false;
 		this._styleFocusOutline();
+		this._styleShortcutsOverlay();
 		if (this._focusIndicator) {
 			this._focusIndicator.style.display = 'none';
 		}
@@ -1119,6 +1351,16 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 					this._setActivePoint(this._points.length - 1);
 				}
 				break;
+			case '+':
+			case '=':
+				event.preventDefault();
+				this._zoom(true);
+				break;
+			case '-':
+			case '_':
+				event.preventDefault();
+				this._zoom(false);
+				break;
 			case 'Enter':
 			case ' ':
 				event.preventDefault();
@@ -1128,6 +1370,13 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			case 'H':
 				event.preventDefault();
 				this._announce(this._helpText());
+				this._setShortcutsOpen(!this._shortcutsOpen);
+				break;
+			case 'Escape':
+				if (this._shortcutsOpen) {
+					event.preventDefault();
+					this._setShortcutsOpen(false);
+				}
 				break;
 			default:
 				break;
@@ -1313,6 +1562,36 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		const lastLogical = this._logicalIndexOf(this._points[this._points.length - 1]) ?? index;
 		from = clamp(from, 0, Math.max(0, lastLogical));
 		timeScale.setVisibleLogicalRange({ from, to: from + span });
+	}
+
+	/**
+	 * Zooms the time scale in / out (the `+` / `-` keys), as the keyboard tutorial
+	 * does, by shrinking / growing the visible logical span. The focused point is
+	 * kept at the same position on screen so the user does not lose their place.
+	 */
+	private _zoom(zoomIn: boolean): void {
+		const chart = this._chart;
+		if (!chart) {
+			return;
+		}
+		const timeScale = chart.timeScale();
+		const range = timeScale.getVisibleLogicalRange();
+		if (!range) {
+			return;
+		}
+		const span = range.to - range.from;
+		if (span <= 0) {
+			return;
+		}
+		const newSpan = Math.max(MIN_ZOOM_SPAN, span * (zoomIn ? 1 - ZOOM_STEP : 1 + ZOOM_STEP));
+		// Anchor on the focused point (else the viewport centre) and keep it at the
+		// same relative position, so zooming does not scroll the point off screen.
+		const point = this._points[this._activePointIndex];
+		const anchor = (point ? this._logicalIndexOf(point) : null) ?? (range.from + range.to) / 2;
+		const ratio = (anchor - range.from) / span;
+		const from = anchor - ratio * newSpan;
+		timeScale.setVisibleLogicalRange({ from, to: from + newSpan });
+		this._positionIndicator();
 	}
 
 	// region Announcements --------------------------------------------------------------

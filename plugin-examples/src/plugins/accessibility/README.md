@@ -72,6 +72,12 @@ attach to.
 - **Visible focus indicator.** The focused pane receives an outline, and an
   optional focus ring is drawn over the active point. The point ring stays
   aligned with the canvas as you scroll or zoom.
+- **Visible shortcuts & high contrast (opt-in).** With `showShortcuts: true`,
+  sighted keyboard users get a "Press H" hint on focus and an `H`-toggled
+  on-screen list of the controls. `highContrast` (default `'auto'`, following the
+  OS) restyles the plugin's own focus ring and overlay, and `onHighContrastChange`
+  lets you restyle the chart itself to match — for users who navigate by keyboard
+  or need higher contrast but don't use a screen reader.
 
 ### Keyboard map
 
@@ -82,8 +88,10 @@ attach to.
 | `↑` / `↓` | Switch to the previous / next series in the pane |
 | `Page Up` / `Page Down` | Jump by `pageStep` points (default 10): `Page Up` forward in time, `Page Down` back — following the ARIA slider convention that `Page Up` increases the value |
 | `Home` / `End` | Jump to the first / last point |
+| `+` / `-` | Zoom the chart in / out |
 | `Enter` / `Space` | Announce a summary of the active series |
-| `H` | Announce the list of keyboard controls |
+| `H` | Announce the controls, and — when `showShortcuts` is on — show / hide the visible shortcuts panel |
+| `Esc` | Close the visible shortcuts panel |
 
 ## Options
 
@@ -105,6 +113,9 @@ All options are optional and have sensible defaults.
 | `describeChart` | `(points, seriesLabel) => string` | built-in summary | Generates the `Enter` / `Space` summary. |
 | `messages` | `PartialAccessibilityMessages` | English `defaultMessages` | Overrides for the announced text — translate some or all of it (see Localization). |
 | `lang` | `string` | chart `localization.locale` | BCP-47 `lang` set on the announced regions so screen readers use the right voice. |
+| `showShortcuts` | `boolean` | `false` | Show a visible keyboard-shortcuts overlay (focus hint + `H`-toggled panel) for sighted keyboard users (see below). |
+| `highContrast` | `boolean \| 'auto' \| (() => boolean)` | `'auto'` | High-contrast styling for the plugin's own focus ring / outline / overlay. `'auto'` follows the OS `prefers-contrast` / `forced-colors`. |
+| `onHighContrastChange` | `(enabled: boolean) => void` | — | Called when the resolved high-contrast state changes (and once on attach), so you can restyle the chart's own series / grid / font to match. |
 
 Options can be changed at runtime. Use the controller's
 `accessibility.applyOptions({ ... })` for chart-level changes (`chartTitle`,
@@ -211,13 +222,51 @@ The precedence for the overridable pieces:
 - **summary:** `describeChart` (full override) → `messages.summary`
 - **strings:** your `messages` entry → English `defaultMessages`
 
+## Visible shortcuts and high contrast
+
+These help users who navigate by keyboard, or need higher contrast, but don't use
+a screen reader.
+
+**Shortcuts overlay** — set `showShortcuts: true`. While the pane is focused a
+small *"Press H for keyboard shortcuts"* hint is shown; `H` toggles an on-screen
+panel listing the controls and `Esc` closes it. It is `aria-hidden` (screen-reader
+users already get the spoken `H` help) and its text comes from the `messages`
+bundle (`shortcutsHint`, `shortcutsTitle`, `shortcuts`), so it localises with the
+rest. The overlay text is sized in `rem`, so it scales with the page/browser font.
+
+**High contrast** — `highContrast` (`boolean | 'auto' | (() => boolean)`, default
+`'auto'`) controls the plugin's *own* visuals (focus ring, focus outline, the
+overlay). `'auto'` follows the OS `prefers-contrast` / `forced-colors` and updates
+live; pass a predicate to wire it to your own app setting.
+
+The plugin deliberately does **not** restyle the chart's series, grid or font —
+that's the chart theme's job (see the
+[Readability](https://tradingview.github.io/lightweight-charts/tutorials/a11y/readability)
+tutorial). Instead it calls `onHighContrastChange(enabled)` whenever the state
+changes (and once on attach) so you can apply your own high-contrast chart theme
+in one place:
+
+```js
+addAccessibilityPlugin(chart, {
+    showShortcuts: true,
+    onHighContrastChange: enabled => {
+        chart.applyOptions({ layout: { textColor: enabled ? '#000' : '#222' } });
+        series.applyOptions({ lineWidth: enabled ? 4 : 2 });
+    },
+});
+```
+
+The example wires both of these up (the "Enable high contrast" and "Large font"
+buttons).
+
 ## Performance
 
 The plugin uses an **active-point-only** strategy: it never mirrors every data
 point into the DOM. Regardless of whether a series holds 500 or 50,000 bars each
-pane adds only four DOM nodes (a semantic overlay, a visually-hidden
-description, an assertive live region and a focus ring), plus one polite live
-region shared across the whole chart for data-update announcements.
+pane adds only a small fixed set of nodes (a semantic overlay, a visually-hidden
+description, an assertive live region, a focus ring and — when `showShortcuts` is
+on — the shortcuts hint and panel), plus one polite live region shared across the
+whole chart for data-update announcements.
 
 Data stays in sync through one `subscribeDataChanged` listener per series, so
 scrolling and zooming do no data work at all – the focus ring is repositioned

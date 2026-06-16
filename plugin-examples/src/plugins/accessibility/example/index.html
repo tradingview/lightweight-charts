@@ -31,6 +31,8 @@
 			<button id="focus-button">Focus the chart</button>
 			<button id="live-button">Start live updates</button>
 			<button id="scope-button">Announce: visible range</button>
+			<button id="contrast-button">Enable high contrast</button>
+			<button id="font-button">Large font</button>
 		</div>
 		<div id="chart"></div>
 		<div id="description">
@@ -50,8 +52,9 @@
 				<li><kbd>↑</kbd> / <kbd>↓</kbd> — switch between series in the pane</li>
 				<li><kbd>Page Up</kbd> / <kbd>Page Down</kbd> — jump ten points</li>
 				<li><kbd>Home</kbd> / <kbd>End</kbd> — first / last point</li>
+				<li><kbd>+</kbd> / <kbd>−</kbd> — zoom the chart in / out</li>
 				<li><kbd>Enter</kbd> / <kbd>Space</kbd> — read a summary of the series</li>
-				<li><kbd>H</kbd> — list the keyboard controls</li>
+				<li><kbd>H</kbd> — show / hide the shortcuts panel (and announce the controls)</li>
 			</ul>
 			<p>
 				A visible focus ring tracks the active point and stays aligned with the
@@ -77,6 +80,19 @@
 				summary and the live-update announcements describe only the points
 				currently on screen; in <em>all data</em> mode they describe the full
 				data set.
+			</p>
+			<p>
+				This example also opts into the <strong>visible shortcuts overlay</strong>
+				(<code>showShortcuts: true</code>): focus the chart to see a
+				<em>Press H for keyboard shortcuts</em> hint, then press <kbd>H</kbd> to
+				toggle an on-screen list (<kbd>Esc</kbd> closes it) — for sighted
+				keyboard users. <strong>Enable high contrast</strong> flips the plugin's
+				<code>highContrast</code> option: the plugin restyles its own focus ring
+				and overlay and calls <code>onHighContrastChange</code>, which this
+				example uses to restyle the chart's own series and grid to match.
+				<strong>Large font</strong> increases the chart's text size. By default
+				<code>highContrast</code> is <code>'auto'</code>, following the operating
+				system's contrast setting.
 			</p>
 		</div>
 		<script type="module" src="./example.ts"></script>

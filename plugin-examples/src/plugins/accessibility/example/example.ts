@@ -2,6 +2,7 @@ import {
 	AreaSeries,
 	HistogramSeries,
 	LineSeries,
+	LineWidth,
 	Time,
 	createChart,
 } from 'lightweight-charts';
@@ -53,13 +54,66 @@ volumeSeries.setData(
 	priceData.map(point => ({ time: point.time, value: point.value * 10 }))
 );
 
-// One chart-level call: each pane becomes its own accessible region.
+// Restyles the chart's own series / grid / text for high contrast. The plugin
+// only restyles its own overlay; it tells us via onHighContrastChange so we can
+// match the chart itself (as the Readability tutorial describes).
+function applyChartContrast(highContrast: boolean): void {
+	chart.applyOptions({
+		layout: { textColor: highContrast ? '#000000' : '#222222' },
+		grid: {
+			vertLines: { color: highContrast ? '#5b5b5b' : '#e6e9ec' },
+			horzLines: { color: highContrast ? '#5b5b5b' : '#e6e9ec' },
+		},
+	});
+	priceSeries.applyOptions({
+		lineColor: highContrast ? '#0033cc' : 'rgb(41, 98, 255)',
+		lineWidth: (highContrast ? 4 : 2) as LineWidth,
+		topColor: highContrast ? 'rgba(0, 51, 204, 0.5)' : 'rgba(41, 98, 255, 0.4)',
+		bottomColor: highContrast ? 'rgba(0, 51, 204, 0)' : 'rgba(41, 98, 255, 0)',
+	});
+	averageSeries.applyOptions({
+		color: highContrast ? '#a3000e' : 'rgb(225, 87, 90)',
+		lineWidth: (highContrast ? 4 : 2) as LineWidth,
+	});
+	volumeSeries.applyOptions({ color: highContrast ? '#00524a' : 'rgb(38, 166, 154)' });
+}
+
+// One chart-level call: each pane becomes its own accessible region. The visible
+// shortcuts overlay (showShortcuts) and high-contrast handling help sighted
+// keyboard users and low-vision users who do not use a screen reader.
+let highContrast = false;
+const contrastButton = document.querySelector('#contrast-button');
 const accessibility = addAccessibilityPlugin(chart, {
 	chartTitle: paneIndex => paneIndex === 0 ? 'Sample price chart' : 'Sample volume chart',
+	showShortcuts: true,
+	// highContrast defaults to 'auto' (follows the OS); the button below overrides it.
+	onHighContrastChange: enabled => {
+		highContrast = enabled;
+		applyChartContrast(enabled);
+		if (contrastButton) {
+			contrastButton.textContent = enabled ? 'Disable high contrast' : 'Enable high contrast';
+		}
+	},
 });
 
 document.querySelector('#focus-button')?.addEventListener('click', () => {
 	accessibility.focus(0);
+});
+
+contrastButton?.addEventListener('click', () => {
+	accessibility.applyOptions({ highContrast: !highContrast });
+});
+
+// Larger chart text – the chart's own font is the developer's responsibility (the
+// plugin's overlay already scales with the page font). See the Readability tutorial.
+let largeFont = false;
+const fontButton = document.querySelector('#font-button');
+fontButton?.addEventListener('click', () => {
+	largeFont = !largeFont;
+	chart.applyOptions({ layout: { fontSize: largeFont ? 16 : 12 } });
+	if (fontButton) {
+		fontButton.textContent = largeFont ? 'Normal font' : 'Large font';
+	}
 });
 
 // --- Live data updates ---------------------------------------------------

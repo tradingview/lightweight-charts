@@ -35,7 +35,19 @@ const esMessages: PartialAccessibilityMessages = {
 			? 'Use las flechas izquierda y derecha para moverse entre los puntos de datos, y las flechas arriba y abajo para cambiar de serie.'
 			: 'Use las flechas izquierda y derecha para moverse entre los puntos de datos.',
 	help: ({ multiSeries, pageStep }) =>
-		`Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Re Pág salta ${pageStep} puntos adelante, Av Pág ${pageStep} puntos atrás. Inicio y Fin saltan al primer y al último punto. Intro o Espacio lee un resumen de la serie.`,
+		`Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Re Pág salta ${pageStep} puntos adelante, Av Pág ${pageStep} puntos atrás. Inicio y Fin saltan al primer y al último punto. Más y menos acercan y alejan el gráfico. Intro o Espacio lee un resumen de la serie.`,
+	shortcutsHint: 'Pulse H para ver los atajos de teclado',
+	shortcutsTitle: 'Atajos de teclado',
+	shortcuts: ({ multiSeries, pageStep }) => [
+		{ keys: '← / →', action: 'Moverse entre los puntos de datos' },
+		...(multiSeries ? [{ keys: '↑ / ↓', action: 'Cambiar de serie' }] : []),
+		{ keys: 'Re Pág / Av Pág', action: `Saltar ${pageStep} puntos` },
+		{ keys: 'Inicio / Fin', action: 'Primer / último punto' },
+		{ keys: '+ / −', action: 'Acercar / alejar' },
+		// Intro / Espacio (el resumen hablado) se omite: no tiene efecto visible.
+		{ keys: 'H', action: 'Mostrar u ocultar este panel' },
+		{ keys: 'Esc', action: 'Cerrar este panel' },
+	],
 	point: ({ position, total, time, label, values }) =>
 		`${label} ${values}, ${time}. Punto ${position} de ${total}.`,
 	seriesPosition: ({ label, position, total, point }) =>
@@ -116,6 +128,8 @@ const accessibility = addAccessibilityPlugin(chart, {
 	chartTitle: paneIndex => paneIndex === 0 ? 'Gráfico de precios' : 'Gráfico de volumen',
 	messages: esMessages,
 	lang: 'es',
+	// Show the (translated) visible shortcuts overlay; focus the chart and press H.
+	showShortcuts: true,
 });
 
 document.querySelector('#focus-button')?.addEventListener('click', () => {
