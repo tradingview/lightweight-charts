@@ -244,6 +244,11 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 		merge(this._options, options);
 
+		// merge() skips undefined values, so explicitly reset autoscaleInfoProvider when set to undefined
+		if (Object.prototype.hasOwnProperty.call(options, 'autoscaleInfoProvider') && options.autoscaleInfoProvider === undefined) {
+			this._options.autoscaleInfoProvider = undefined;
+		}
+
 		if (conflationOptionsChanged) {
 			this._conflationByFactorCache.clear();
 
