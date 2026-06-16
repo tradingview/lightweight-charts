@@ -46,6 +46,30 @@ discussed in this tutorial.
 
 :::
 
+:::info Ready-made plugin
+
+If you would rather not wire these techniques up by hand, the
+[Accessibility plugin](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples/src/plugins/accessibility)
+in the plugin examples packages the keyboard navigation and ARIA layer described
+here into a chart-level helper built on pane primitives:
+
+```js
+addAccessibilityPlugin(chart, { chartTitle: 'My chart' });
+```
+
+Keyboard navigation always covers the whole series (the arrow keys page the
+chart as needed). The plugin defaults to `dataScope: 'visible'`, which scopes the
+spoken *summaries* to the current viewport – the recommended mode for charts with
+large data sets. Use `dataScope: 'all'` when you want those summaries to describe
+the full history.
+
+It is also fully translatable: numbers and dates follow the chart's
+`localization.locale`, and every announced string can be overridden through a
+`messages` bundle (with a `lang` attribute so screen readers use the right
+voice). See the plugin's README and its Spanish example.
+
+:::
+
 This tutorial aimed to foster a better understanding of these practices,
 promoting an inclusive web where applications are made with everyone in mind.
 Thank you for following along and continue putting accessibility at the

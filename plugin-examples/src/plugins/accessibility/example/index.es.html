@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Lightweight Charts - Complemento de accesibilidad: demostración de traducción</title>
+		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			#chart {
+				height: 450px;
+				position: relative;
+			}
+			/*
+			 * The shared examples stylesheet resets buttons with `all: initial`,
+			 * which also removes their default focus ring.
+			 */
+			#buttons button:focus-visible {
+				outline: 3px solid #2962ff;
+				outline-offset: 2px;
+			}
+			#buttons {
+				display: flex;
+				gap: 10px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="buttons" class="column">
+			<button id="focus-button">Enfocar el gráfico</button>
+			<button id="live-button">Iniciar actualizaciones en vivo</button>
+			<button id="scope-button">Anunciar: rango visible</button>
+		</div>
+		<div id="chart"></div>
+		<div id="description">
+			<h1>Complemento de accesibilidad: demostración de traducción</h1>
+			<p>
+				Esta página existe únicamente para demostrar que los anuncios del
+				complemento de accesibilidad son <strong>totalmente traducibles</strong>.
+				Es exactamente el mismo ejemplo que la versión en inglés; lo único que
+				cambia es que el complemento recibe un paquete de mensajes en español
+				(<code>messages</code>), <code>lang: 'es'</code> y
+				<code>localization.locale: 'es'</code>, de modo que el lector de pantalla
+				anuncia todo en español y las fechas y los números siguen la
+				configuración regional española. Las traducciones que se muestran aquí
+				son solo ilustrativas.
+			</p>
+			<p>
+				Pulse <kbd>Tab</kbd> para moverse entre los paneles (o haga clic en
+				<strong>Enfocar el gráfico</strong>) y luego use el teclado:
+			</p>
+			<ul>
+				<li><kbd>←</kbd> / <kbd>→</kbd> — moverse entre los puntos de datos</li>
+				<li><kbd>↑</kbd> / <kbd>↓</kbd> — cambiar entre las series del panel</li>
+				<li><kbd>Re Pág</kbd> / <kbd>Av Pág</kbd> — saltar diez puntos</li>
+				<li><kbd>Inicio</kbd> / <kbd>Fin</kbd> — primer / último punto</li>
+				<li><kbd>+</kbd> / <kbd>−</kbd> — acercar / alejar el gráfico</li>
+				<li><kbd>Intro</kbd> / <kbd>Espacio</kbd> — leer un resumen de la serie</li>
+				<li><kbd>H</kbd> — enumerar los controles de teclado</li>
+			</ul>
+			<p>
+				Un anillo de enfoque visible sigue al punto activo y se mantiene
+				alineado con el lienzo al desplazar o ampliar. Use un lector de
+				pantalla (VoiceOver, NVDA) configurado en español para oír cada punto
+				anunciado con una voz española.
+			</p>
+			<p>
+				<strong>Iniciar actualizaciones en vivo</strong> envía una nueva barra
+				a cada serie cada pocos segundos, simulando un flujo en tiempo real.
+				Las actualizaciones se anuncian mediante una única región
+				<code>aria-live</code> educada compartida. De forma predeterminada solo
+				se anuncia el panel <em>activo</em> (el último enfocado): se oye el
+				panel de precios hasta que enfoca el panel de volumen.
+			</p>
+			<p>
+				Use <strong>Anunciar: rango visible / todos los datos</strong> para
+				cambiar la opción <code>dataScope</code>. Las flechas siempre recorren
+				toda la serie; esta opción solo cambia los resúmenes hablados.
+			</p>
+		</div>
+		<script type="module" src="./example.es.ts"></script>
+	</body>
+</html>

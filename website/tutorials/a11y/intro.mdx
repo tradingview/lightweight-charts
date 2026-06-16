@@ -34,6 +34,23 @@ intended to be a comprehensive tutorial.**
 
 :::
 
+:::tip Ready-made plugin
+
+If you would rather not wire these techniques up by hand, the
+[Accessibility plugin](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples/src/plugins/accessibility)
+in the plugin examples packages the keyboard navigation, ARIA markup and
+screen-reader announcements covered in this tutorial into a single chart-level
+helper:
+
+```js
+addAccessibilityPlugin(chart, { chartTitle: 'My chart' });
+```
+
+The tutorial is still the best way to understand what such a layer does under
+the hood, and a guide for building your own integration.
+
+:::
+
 Graphical data representation, although visually appealing and informative, can
 sometimes pose challenges to individuals with varying abilities and needs. In
 line with the principles of inclusivity and universal design, we aim to
