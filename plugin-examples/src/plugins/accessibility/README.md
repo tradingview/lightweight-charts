@@ -91,7 +91,6 @@ attach to.
 | `+` / `-` | Zoom the chart in / out |
 | `Enter` / `Space` | Announce a summary of the active series |
 | `H` | Announce the controls, and — when `showShortcuts` is on — show / hide the visible shortcuts panel |
-| `Esc` | Close the visible shortcuts panel |
 
 ## Options
 
@@ -229,7 +228,7 @@ a screen reader.
 
 **Shortcuts overlay** — set `showShortcuts: true`. While the pane is focused a
 small *"Press H for keyboard shortcuts"* hint is shown; `H` toggles an on-screen
-panel listing the controls and `Esc` closes it. It is `aria-hidden` (screen-reader
+panel listing the controls. It is `aria-hidden` (screen-reader
 users already get the spoken `H` help) and its text comes from the `messages`
 bundle (`shortcutsHint`, `shortcutsTitle`, `shortcuts`), so it localises with the
 rest. The overlay text is sized in `rem`, so it scales with the page/browser font.

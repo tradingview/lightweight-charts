@@ -46,7 +46,6 @@ const esMessages: PartialAccessibilityMessages = {
 		{ keys: '+ / −', action: 'Acercar / alejar' },
 		// Intro / Espacio (el resumen hablado) se omite: no tiene efecto visible.
 		{ keys: 'H', action: 'Mostrar u ocultar este panel' },
-		{ keys: 'Esc', action: 'Cerrar este panel' },
 	],
 	point: ({ position, total, time, label, values }) =>
 		`${label} ${values}, ${time}. Punto ${position} de ${total}.`,

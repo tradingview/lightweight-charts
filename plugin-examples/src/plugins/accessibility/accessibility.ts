@@ -183,8 +183,8 @@ export interface AccessibilityOptions {
 	/**
 	 * Show a visible keyboard-shortcuts overlay for sighted keyboard users: a
 	 * "Press H" hint while the pane is focused, and an `H`-toggled panel listing
-	 * the controls (`Esc` closes it). Screen-reader users always get the spoken
-	 * `H` help regardless of this option. Defaults to `false`.
+	 * the controls. Screen-reader users always get the spoken `H` help regardless
+	 * of this option. Defaults to `false`.
 	 */
 	showShortcuts: boolean;
 	/**
@@ -472,7 +472,6 @@ export const defaultMessages: AccessibilityMessages = {
 		// Enter / Space (the spoken summary) is intentionally omitted: it has no
 		// on-screen effect, so it stays in `help` (for screen readers) only.
 		{ keys: 'H', action: 'Show or hide this panel' },
-		{ keys: 'Esc', action: 'Close this panel' },
 	],
 	// Most important information first: the value, then the date; the position
 	// counter is context, so it comes last.
@@ -1371,12 +1370,6 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 				event.preventDefault();
 				this._announce(this._helpText());
 				this._setShortcutsOpen(!this._shortcutsOpen);
-				break;
-			case 'Escape':
-				if (this._shortcutsOpen) {
-					event.preventDefault();
-					this._setShortcutsOpen(false);
-				}
 				break;
 			default:
 				break;
