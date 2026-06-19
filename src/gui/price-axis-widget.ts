@@ -11,9 +11,13 @@ import {
 
 import { ensureNotNull } from '../helpers/assertions';
 import { clearRect, clearRectWithGradient } from '../helpers/canvas-helpers';
+import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
+import { ISubscription } from '../helpers/isubscription';
 import { makeFont } from '../helpers/make-font';
 
+import { AxisApi, AxisMouseEventHandler } from '../model/axis-model';
+import { AxisMouseEventParamsImplSupplier } from '../model/axis-widget';
 import { ChartOptionsInternalBase } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
 import { CrosshairMode, CrosshairOptions } from '../model/crosshair';
@@ -30,6 +34,7 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 import { IAxisView } from '../views/pane/iaxis-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 
+import { fireMouseDelegate, fireNullMouseDelegate } from './axis-mouse-event-helpers';
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { ViewsGetter } from './draw-functions';
 import { suggestPriceScaleWidth } from './internal-layout-sizes-hints';
@@ -124,7 +129,7 @@ function priceScaleCrosshairLabelVisible(crosshair: CrosshairOptions): boolean {
 	return crosshair.mode !== CrosshairMode.Hidden && crosshair.horzLine.visible && crosshair.horzLine.labelVisible;
 }
 
-export class PriceAxisWidget implements IDestroyable {
+export class PriceAxisWidget extends AxisApi implements IDestroyable {
 	private readonly _pane: PaneWidget;
 	private readonly _options: Readonly<ChartOptionsInternalBase>;
 	private readonly _layoutOptions: Readonly<LayoutOptions>;
@@ -152,7 +157,12 @@ export class PriceAxisWidget implements IDestroyable {
 	private _sourceTopPaneViews: ViewsGetter<IDataSourcePaneViews>;
 	private _sourceBottomPaneViews: ViewsGetter<IDataSourcePaneViews>;
 
+	private _cursorOverride: string | undefined = undefined;
+	private _clicked: Delegate<AxisMouseEventParamsImplSupplier> = new Delegate();
+	private _mouseMoved: Delegate<AxisMouseEventParamsImplSupplier> = new Delegate();
+
 	public constructor(pane: PaneWidget, options: Readonly<ChartOptionsInternalBase>, rendererOptionsProvider: PriceAxisRendererOptionsProvider, side: PriceAxisWidgetSide) {
+		super();
 		this._pane = pane;
 		this._options = options;
 		this._layoutOptions = options['layout'];
@@ -194,7 +204,9 @@ export class PriceAxisWidget implements IDestroyable {
 			mouseDownOutsideEvent: this._mouseDownOutsideEvent.bind(this),
 			mouseUpEvent: this._mouseUpEvent.bind(this),
 			touchEndEvent: this._mouseUpEvent.bind(this),
+			mouseMoveEvent: this._mouseMoveEvent.bind(this),
 			mouseDoubleClickEvent: this._mouseDoubleClickEvent.bind(this),
+			mouseClickEvent: this._mouseClickEvent.bind(this),
 			doubleTapEvent: this._mouseDoubleClickEvent.bind(this),
 			mouseEnterEvent: this._mouseEnterEvent.bind(this),
 			mouseLeaveEvent: this._mouseLeaveEvent.bind(this),
@@ -207,9 +219,13 @@ export class PriceAxisWidget implements IDestroyable {
 				treatHorzTouchDragAsPageScroll: () => true,
 			}
 		);
+		this._setupMouseEvents(this);
 	}
 
 	public destroy(): void {
+		this._removeMouseEvents(this);
+		this._clicked.destroy();
+		this._mouseMoved.destroy();
 		this._mouseEventHandler.destroy();
 
 		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
@@ -225,6 +241,14 @@ export class PriceAxisWidget implements IDestroyable {
 		}
 
 		this._priceScale = null;
+	}
+
+	public clicked(): ISubscription<AxisMouseEventParamsImplSupplier> {
+		return this._clicked;
+	}
+
+	public mouseMoved(): ISubscription<AxisMouseEventParamsImplSupplier> {
+		return this._mouseMoved;
 	}
 
 	public getElement(): HTMLElement {
@@ -409,6 +433,27 @@ export class PriceAxisWidget implements IDestroyable {
 		this._priceScale?.marks();
 	}
 
+	public overrideCursorStyle(cursor: string | undefined): void {
+		this._cursorOverride = cursor;
+		this._setCursor(CursorType.Default);
+	}
+
+	public subscribeClick(handler: AxisMouseEventHandler): void {
+		this._subscribeClick(handler);
+	}
+
+	public unsubscribeClick(handler: AxisMouseEventHandler): void {
+		this._unsubscribeClick(handler);
+	}
+
+	public subscribeMouseMove(handler: AxisMouseEventHandler): void {
+		this._subscribeMouseMove(handler);
+	}
+
+	public unsubscribeMouseMove(handler: AxisMouseEventHandler): void {
+		this._unsubscribeMouseMove(handler);
+	}
+
 	private _mouseDownEvent(e: TouchMouseEvent): void {
 		if (this._priceScale === null || this._priceScale.isEmpty() || !this._options['handleScale'].axisPressedMouseMove.price) {
 			return;
@@ -475,6 +520,15 @@ export class PriceAxisWidget implements IDestroyable {
 
 	private _mouseLeaveEvent(e: TouchMouseEvent): void {
 		this._setCursor(CursorType.Default);
+		fireNullMouseDelegate(this._mouseMoved);
+	}
+
+	private _mouseMoveEvent(e: TouchMouseEvent): void {
+		fireMouseDelegate(this._mouseMoved, e);
+	}
+
+	private _mouseClickEvent(e: TouchMouseEvent): void {
+		fireMouseDelegate(this._clicked, e);
 	}
 
 	private _backLabels(): IPriceAxisView[] {
@@ -716,7 +770,7 @@ export class PriceAxisWidget implements IDestroyable {
 	}
 
 	private _setCursor(type: CursorType): void {
-		this._cell.style.cursor = type === CursorType.NsResize ? 'ns-resize' : 'default';
+		this._cell.style.cursor = this._cursorOverride || (type === CursorType.NsResize ? 'ns-resize' : 'default');
 	}
 
 	private _onMarksChanged(): void {
