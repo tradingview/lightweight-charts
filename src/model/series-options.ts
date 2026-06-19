@@ -231,6 +231,13 @@ export interface LineStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
+
+	/**
+	 * Connect gaps in data.
+	 *
+	 * @defaultValue `true`
+	 */
+	connectGaps?: boolean;
 }
 
 /**
@@ -351,6 +358,13 @@ export interface AreaStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
+
+	/**
+	 * Connect gaps in data.
+	 *
+	 * @defaultValue `true`
+	 */
+	connectGaps?: boolean;
 }
 
 /**
@@ -504,6 +518,13 @@ export interface BaselineStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
+
+	/**
+	 * Connect gaps in data.
+	 *
+	 * @defaultValue `true`
+	 */
+	connectGaps?: boolean;
 }
 
 /**

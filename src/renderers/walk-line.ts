@@ -1,7 +1,7 @@
 import { BitmapCoordinatesRenderingScope } from 'fancy-canvas';
 
 import { Coordinate } from '../model/coordinate';
-import { SeriesItemsIndexesRange } from '../model/time-data';
+import { SeriesItemsIndexesRange, TimePointIndex } from '../model/time-data';
 
 import { LinePoint, LineType } from './draw-line';
 
@@ -10,7 +10,7 @@ function distanceByCoordinates(p1x: number, p1y: number, p2x: number, p2y: numbe
 }
 
 // eslint-disable-next-line max-params, complexity
-export function walkLine<TItem extends LinePoint, TStyle extends CanvasRenderingContext2D['fillStyle' | 'strokeStyle']>(
+export function walkLine<TItem extends LinePoint & { time?: TimePointIndex }, TStyle extends CanvasRenderingContext2D['fillStyle' | 'strokeStyle']>(
 	renderingScope: BitmapCoordinatesRenderingScope,
 	items: readonly TItem[],
 	lineType: LineType,
@@ -20,7 +20,8 @@ export function walkLine<TItem extends LinePoint, TStyle extends CanvasRendering
 	// so if styleGetter returns objects, then styleGetter should return the same object for equal styles
 	styleGetter: (renderingScope: BitmapCoordinatesRenderingScope, item: TItem) => TStyle,
 	finishStyledArea: (renderingScope: BitmapCoordinatesRenderingScope, style: TStyle, areaFirstItem: LinePoint, newAreaFirstItem: LinePoint) => void,
-	dashPatternLength: number = 0
+	dashPatternLength: number = 0,
+	connectGaps: boolean = true
 ): void {
 	if (items.length === 0 || visibleRange.from >= items.length || visibleRange.to <= 0) {
 		return;
@@ -74,11 +75,22 @@ export function walkLine<TItem extends LinePoint, TStyle extends CanvasRendering
 			const currentY = currentItem.y * verticalPixelRatio;
 			const itemStyle = styleGetter(renderingScope, currentItem);
 
+			const prevItem = items[i - 1];
+			const isGap = !connectGaps && currentItem.time !== undefined && prevItem.time !== undefined && currentItem.time - prevItem.time > 1;
+
+			if (isGap) {
+				finishStyledArea(renderingScope, currentStyle, currentStyleFirstItem, prevItem);
+				ctx.beginPath();
+				currentStyle = itemStyle;
+				currentStyleFirstItem = currentItem;
+				ctx.moveTo(currentX, currentY);
+				continue;
+			}
+
 			switch (lineType) {
 				case LineType.Simple: {
 					ctx.lineTo(currentX, currentY);
 					if (shouldTrackDashOffset) {
-						const prevItem = items[i - 1];
 						const prevX = prevItem.x * horizontalPixelRatio;
 						const prevY = prevItem.y * verticalPixelRatio;
 						accumulatedDistance += distanceByCoordinates(prevX, prevY, currentX, currentY);
@@ -86,7 +98,6 @@ export function walkLine<TItem extends LinePoint, TStyle extends CanvasRendering
 					break;
 				}
 				case LineType.WithSteps: {
-					const prevItem = items[i - 1];
 					const prevY = prevItem.y * verticalPixelRatio;
 					ctx.lineTo(currentX, prevY);
 					if (shouldTrackDashOffset) {
@@ -120,7 +131,6 @@ export function walkLine<TItem extends LinePoint, TStyle extends CanvasRendering
 					);
 
 					if (shouldTrackDashOffset) {
-						const prevItem = items[i - 1];
 						const prevX = prevItem.x * horizontalPixelRatio;
 						const prevY = prevItem.y * verticalPixelRatio;
 						const chord = distanceByCoordinates(prevX, prevY, currentX, currentY);
