@@ -15,7 +15,7 @@ function size(barSpacing: number, coeff: number): number {
 
 export function shapeSize(shape: SeriesMarkerShape, originalSize: number): number {
 	const coeff = shape === 'circle' ? 0.8 : (shape === 'square' ? 0.7 : 1);
-	return ceiledOdd(originalSize * coeff);
+	return ceiledOdd(Math.max(originalSize, Constants.MinShapeSize) * coeff);
 }
 
 export function calculateShapeHeight(barSpacing: number): number {
