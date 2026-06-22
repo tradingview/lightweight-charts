@@ -14,15 +14,8 @@ function size(barSpacing: number, coeff: number): number {
 }
 
 export function shapeSize(shape: SeriesMarkerShape, originalSize: number): number {
-	switch (shape) {
-		case 'arrowDown':
-		case 'arrowUp':
-			return size(originalSize, 1);
-		case 'circle':
-			return size(originalSize, 0.8);
-		case 'square':
-			return size(originalSize, 0.7);
-	}
+	const coeff = shape === 'circle' ? 0.8 : (shape === 'square' ? 0.7 : 1);
+	return ceiledOdd(Math.max(originalSize, Constants.MinShapeSize) * coeff);
 }
 
 export function calculateShapeHeight(barSpacing: number): number {
