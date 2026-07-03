@@ -236,12 +236,12 @@ import { createChart, LineSeries, AreaSeries, CandlestickSeries, BaselineSeries,
 
 		set priceScaleOptions(value) {
 			if (!this.chart) {return;}
-			this.chart.priceScale().applyOptions(value);
+			this.chart.priceScale('right').applyOptions(value);
 		}
 
 		get priceScaleOptions() {
 			if (!this.series) {return null;}
-			return this.chart.priceScale().options();
+			return this.chart.priceScale('right').options();
 		}
 
 		set timeScaleOptions(value) {
