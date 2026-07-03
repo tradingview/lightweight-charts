@@ -100,7 +100,7 @@ onMounted(() => {
 	addSeriesAndData(props);
 
 	if (props.priceScaleOptions) {
-		chart.priceScale().applyOptions(props.priceScaleOptions);
+		chart.priceScale('right').applyOptions(props.priceScaleOptions);
 	}
 
 	if (props.timeScaleOptions) {
@@ -185,7 +185,7 @@ watch(
 	() => props.priceScaleOptions,
 	newOptions => {
 		if (!chart) return;
-		chart.priceScale().applyOptions(newOptions);
+		chart.priceScale('right').applyOptions(newOptions);
 	}
 );
 

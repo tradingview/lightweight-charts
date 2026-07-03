@@ -1083,7 +1083,7 @@
         {
           layout: {
             background: { color: "#222" },
-            textColor: "#DDD",
+            textColor: "#C3BCDB",
           },
           grid: {
             vertLines: { color: "#444" },
@@ -1093,13 +1093,28 @@
       );
 
       // Setting the border color for the vertical axis
-      chart.priceScale().applyOptions({
+      chart.priceScale('right').applyOptions({
         borderColor: "#71649C",
       });
 
       // Setting the border color for the horizontal axis
       chart.timeScale().applyOptions({
         borderColor: "#71649C",
+      });
+
+      // Get the current users primary locale
+      const currentLocale = window.navigator.languages[0];
+      // Create a number format using Intl.NumberFormat
+      const myPriceFormatter = Intl.NumberFormat(currentLocale, {
+            style: "currency",
+            currency: "EUR", // Currency for data points
+          }).format;
+
+      // Apply the custom priceFormatter to the chart
+      chart.applyOptions({
+        localization: {
+          priceFormatter: myPriceFormatter,
+        },
       });
 
       // Generate sample data to use within a candlestick series

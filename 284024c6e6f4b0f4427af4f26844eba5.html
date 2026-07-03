@@ -1093,7 +1093,7 @@
       );
 
       // Setting the border color for the vertical axis
-      chart.priceScale().applyOptions({
+      chart.priceScale('right').applyOptions({
         borderColor: "#71649C",
       });
 
@@ -1102,13 +1102,18 @@
         borderColor: "#71649C",
       });
 
+      // Adjust the starting bar width (essentially the horizontal zoom)
+      chart.timeScale().applyOptions({
+        barSpacing: 10,
+      });
+
       // Get the current users primary locale
       const currentLocale = window.navigator.languages[0];
       // Create a number format using Intl.NumberFormat
       const myPriceFormatter = Intl.NumberFormat(currentLocale, {
-            style: "currency",
-            currency: "EUR", // Currency for data points
-          }).format;
+        style: "currency",
+        currency: "EUR", // Currency for data points
+      }).format;
 
       // Apply the custom priceFormatter to the chart
       chart.applyOptions({
@@ -1117,8 +1122,50 @@
         },
       });
 
+      // Customizing the Crosshair
+      chart.applyOptions({
+        crosshair: {
+          // Change mode from default 'magnet' to 'normal'.
+          // Allows the crosshair to move freely without snapping to datapoints
+          mode: LightweightCharts.CrosshairMode.Normal,
+
+          // Vertical crosshair line (showing Date in Label)
+          vertLine: {
+            width: 8,
+            color: "#C3BCDB44",
+            style: LightweightCharts.LineStyle.Solid,
+            labelBackgroundColor: "#9B7DFF",
+          },
+
+          // Horizontal crosshair line (showing Price in Label)
+          horzLine: {
+            color: "#9B7DFF",
+            labelBackgroundColor: "#9B7DFF",
+          },
+        },
+      });
+
       // Generate sample data to use within a candlestick series
       const candleStickData = generateCandlestickData();
+
+      // Convert the candlestick data for use with a line series
+      const lineData = candleStickData.map((datapoint) => ({
+        time: datapoint.time,
+        value: (datapoint.close + datapoint.open) / 2,
+      }));
+
+      // Add an area series to the chart,
+      // Adding this before we add the candlestick chart
+      // so that it will appear beneath the candlesticks
+      const areaSeries = chart.addSeries(LightweightCharts.AreaSeries, {
+        lastValueVisible: false, // hide the last value marker for this series
+        crosshairMarkerVisible: false, // hide the crosshair marker for this series
+        lineColor: "transparent", // hide the line
+        topColor: "rgba(56, 33, 110,0.6)",
+        bottomColor: "rgba(56, 33, 110, 0.1)",
+      });
+      // Set the data for the Area Series
+      areaSeries.setData(lineData);
 
       // Create the Main Series (Candlesticks)
       const mainSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
