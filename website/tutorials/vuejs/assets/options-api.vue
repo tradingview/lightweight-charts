@@ -79,7 +79,7 @@ export default {
 		addSeriesAndData(this.type, this.seriesOptions, this.data);
 
 		if (this.priceScaleOptions) {
-			chart.priceScale().applyOptions(this.priceScaleOptions);
+			chart.priceScale('right').applyOptions(this.priceScaleOptions);
 		}
 
 		if (this.timeScaleOptions) {
@@ -147,7 +147,7 @@ export default {
 		},
 		priceScaleOptions(newOptions) {
 			if (!chart) return;
-			chart.priceScale().applyOptions(newOptions);
+			chart.priceScale('right').applyOptions(newOptions);
 		},
 		timeScaleOptions(newOptions) {
 			if (!chart) return;
