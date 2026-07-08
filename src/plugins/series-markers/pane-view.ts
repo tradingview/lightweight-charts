@@ -229,7 +229,7 @@ export class SeriesMarkersPaneView<HorzScaleItem> implements IPrimitivePaneView 
 			return;
 		}
 		const visibleBarsRange = new RangeImpl(Math.floor(visibleBars.from) as TimePointIndex, Math.ceil(visibleBars.to) as TimePointIndex);
-		const firstValue = this._series.data()[0];
+		const firstValue = this._series.dataByIndex(0);
 		if (firstValue === null) {
 			return;
 		}
