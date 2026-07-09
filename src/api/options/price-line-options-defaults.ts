@@ -6,6 +6,7 @@ export const priceLineOptionsDefaults: PriceLineOptions = {
 	price: 0,
 	lineStyle: LineStyle.Dashed,
 	lineWidth: 1,
+	hitTestTolerance: 7,
 	lineVisible: true,
 	axisLabelVisible: true,
 	title: '',
