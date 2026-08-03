@@ -1,3 +1,13 @@
+// Regression test for https://github.com/tradingview/lightweight-charts/issues/2044.
+//
+// Replacing all series with shorter datasets compacts the time scale's logical
+// indexes. `updateTimeScale` runs before `Series.setData` and, with fixed edges,
+// synchronously recalculates the hovered crosshair — if a pane view still holds
+// items cached against the old indexes, the bar colorer throws `Value is null`.
+//
+// The test hovers a data point, then compacts both series. It passes if no
+// exception reaches the page.
+
 const initialData = [
 	{ time: '2025-01-01', value: 10 },
 	{ time: '2025-01-02', value: 20 },
@@ -56,7 +66,7 @@ function beforeInteractions(container) {
 
 function afterInitialInteractions() {
 	firstSeries.setData(compactedData);
-	firstSeries.applyOptions({});
+	firstSeries.applyOptions({}); // forces a crosshair update that rebuilds the pane-view item cache with pre-compaction indexes. Required for reproducing the #2044 bug.
 	secondSeries.setData(compactedData);
 
 	return new Promise(resolve => requestAnimationFrame(resolve));
