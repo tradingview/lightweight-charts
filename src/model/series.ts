@@ -285,7 +285,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 			this._precomputeConflationLevels(tsOptions.precomputeConflationPriority);
 		}
 
-		this._paneView.update('data');
+		this.invalidatePaneViewData();
 
 		if (this._lastPriceAnimationPaneView !== null) {
 			if (updateInfo && updateInfo.lastBarUpdatedOrNewBarsAddedToTheRight) {
@@ -300,6 +300,10 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		this.model().updateSource(this);
 		this.model().updateCrosshair();
 		this.model().lightUpdate();
+	}
+
+	public invalidatePaneViewData(): void {
+		this._paneView.update('data');
 	}
 
 	public createPriceLine(options: PriceLineOptions): CustomPriceLine {
