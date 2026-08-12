@@ -18,12 +18,6 @@ sidebar_position: 8
 You can find the source code of the Lightweight Charts™ iOS wrapper in [this repository](https://github.com/tradingview/LightweightChartsIOS).
 :::
 
-:::info
-
-This wrapper is currently still using `v3.8.0`. This will be updated to `v4.0.0` in the near future.
-
-:::
-
 You can use Lightweight Charts™ inside an iOS application. To use Lightweight Charts™ in that context, you can use our iOS wrapper, which will allow you to interact with Lightweight Charts™ library, which will be rendered in a web view.
 
 ## Installation
@@ -37,7 +31,7 @@ Requires iOS 10.0+
 [CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. For usage and installation instructions, visit their website. To integrate LightweightCharts into your Xcode project using CocoaPods, specify it in your `Podfile`:
 
 ```ruby
-pod 'LightweightCharts', '~> 3.8.0'
+pod 'LightweightCharts', '~> 5.2.0'
 ```
 
 ### Swift Package Manager

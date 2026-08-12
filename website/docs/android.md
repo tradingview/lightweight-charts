@@ -18,12 +18,6 @@ sidebar_position: 8
 You can find the source code of the Lightweight Charts™ Android wrapper in [this repository](https://github.com/tradingview/lightweight-charts-android).
 :::
 
-:::info
-
-This wrapper is currently still using `v3.8.0`. This will be updated to `v4.0.0` in the near future.
-
-:::
-
 You can use Lightweight Charts™ inside an Android application. To use Lightweight Charts™ in that context, you can use our Android wrapper, which will allow you to interact with Lightweight Charts™ library, which will be rendered in a web view.
 
 ## Installation
@@ -48,7 +42,7 @@ In `/gradle_module/build.gradle`
 ```groovy
 dependencies {
     //...
-    implementation 'com.tradingview:lightweightcharts:3.8.0'
+    implementation 'com.tradingview:lightweightcharts:5.2.0'
 }
 ```
 
