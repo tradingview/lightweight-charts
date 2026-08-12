@@ -16,6 +16,37 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.2.1
+
+**Enhancements**
+
+- Added an [Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) to the repository, which teaches AI coding assistants how to work with Lightweight Charts™. The skill covers v5 API conventions, mental models, and common foot-guns related to time, scales, markers, plugins, and wrappers. See [AI coding assistants](https://tradingview.github.io/lightweight-charts/docs#ai-coding-assistants) for more details. (PR [#2088](https://github.com/tradingview/lightweight-charts/pull/2088))
+- Added "hovered area line lift" when `hoveredSeriesOnTop` is enabled. Hovering an Area or Baseline series now renders its stroke, point markers, and price lines on a top layer while the fill stays at its natural z-order. This keeps the line visible above overlapping series fills. (PR [#2090](https://github.com/tradingview/lightweight-charts/pull/2090))
+
+**Performance Improvements**
+
+- Improved crosshair and hover performance on charts which combine series markers with large datasets. The series markers pane view no longer clones the entire series dataset on every mouse move; the per-move cost is no longer proportional to the total number of data points. (PR [#2105](https://github.com/tradingview/lightweight-charts/pull/2105))
+
+**Bug Fixes**
+
+- Fixed `autoscaleInfoProvider` not being reset when explicitly set back to `undefined` via `applyOptions`, which caused autoscaling to permanently stop working once a custom provider had been used. (PR [#2098](https://github.com/tradingview/lightweight-charts/pull/2098), contributed by [@0007aadil](https://github.com/0007aadil))
+- Fixed arrow marker tips drifting away from the anchor price when the marker `size` is greater than `1`. The resolved marker size is no longer re-clamped to a 30px maximum within the renderer, so the drawn shape scales with `size` and remains aligned with the anchor price. This also fixes large circle and square markers being capped at 30px. Markers using the default size render identically to the previous version. (PR [#2100](https://github.com/tradingview/lightweight-charts/pull/2100))
+- Fixed a `Value is null` error which could be thrown when replacing the data of multiple series with shorter datasets while the crosshair was hovering over data. Affected series pane views are now invalidated before time scale changes are applied, so any synchronous recalculation rebuilds its items against the current row indices. (PR [#2110](https://github.com/tradingview/lightweight-charts/pull/2110), fixes [#2044](https://github.com/tradingview/lightweight-charts/issues/2044), contributed by [@anAirdrop](https://github.com/anAirdrop))
+- Fixed documentation examples (tutorials) which used `priceScale()` on the chart instance without specifying a price scale id. The id is required when calling `priceScale()` on the chart instance, unlike when calling it on `ISeriesApi`. (PR [#2102](https://github.com/tradingview/lightweight-charts/pull/2102))
+
+**Plugin & Indicator Examples**
+
+- Added a drop-in _Accessibility_ plugin which packages the keyboard navigation, ARIA markup, and screen-reader announcements covered in the accessibility tutorial into a single chart-level helper. (PR [#2095](https://github.com/tradingview/lightweight-charts/pull/2095))
+
+**Contributors**
+
+We'd like to thank our external contributors for their valuable contributions to this release:
+
+- [@0007aadil](https://github.com/0007aadil)
+- [@anAirdrop](https://github.com/anAirdrop)
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.2.0..v5.2.1).
+
 ## 5.2.0
 
 **Enhancements**
