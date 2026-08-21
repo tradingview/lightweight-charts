@@ -38,8 +38,6 @@ dependencies: [
 ]
 ```
 
-Alternatively, in Xcode choose **File > Add Package Dependencies** and enter the repository URL.
-
 :::caution
 
 CocoaPods is no longer supported. The podspec was removed in the 5.x releases, so use Swift Package Manager instead.
