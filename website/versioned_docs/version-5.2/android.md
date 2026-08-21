@@ -23,7 +23,9 @@ You can use Lightweight Charts™ inside an Android application. To use Lightwei
 ## Installation
 
 :::info
-Requires minSdkVersion 21, and installed WebView with support of ES6
+
+Requires minSdkVersion 23, and an installed Android System WebView or Chrome WebView provider with ES2020 support. Lightweight Charts™ 5.x is ESM/ES2020-only.
+
 :::
 
 In `/build.gradle`
@@ -72,7 +74,7 @@ Configure the chart layout.
 ```kotlin
 charts_view.api.applyOptions {
     layout = layoutOptions {
-        background = SolidColor(Color.LTGRAY)
+        background = SolidColor(Color.LTGRAY.toIntColor())
         textColor = Color.BLACK.toIntColor()
     }
     localization = localizationOptions {

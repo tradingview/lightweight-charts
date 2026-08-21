@@ -23,28 +23,28 @@ You can use Lightweight Charts™ inside an iOS application. To use Lightweight 
 ## Installation
 
 :::info
-Requires iOS 10.0+
+Requires iOS 15.0+, Xcode 16+, and Swift 6+.
 :::
-
-### CocoaPods
-
-[CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. For usage and installation instructions, visit their website. To integrate LightweightCharts into your Xcode project using CocoaPods, specify it in your `Podfile`:
-
-```ruby
-pod 'LightweightCharts', '~> 5.2.0'
-```
 
 ### Swift Package Manager
 
-The [Swift Package Manager](https://swift.org/package-manager/) is a tool for automating the distribution of Swift code and is integrated into the `swift` compiler.
+The [Swift Package Manager](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/) is a tool for automating the distribution of Swift code and is integrated into the `swift` compiler.
 
 Once you have your Swift package set up, adding LightweightCharts as a dependency is as easy as adding it to the `dependencies` value of your `Package.swift`.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/tradingview/LightweightChartsIOS", .upToNextMajor(from: "4.0.0"))
+    .package(url: "https://github.com/tradingview/LightweightChartsIOS.git", from: "5.2.0")
 ]
 ```
+
+Alternatively, in Xcode choose **File > Add Package Dependencies** and enter the repository URL.
+
+:::caution
+
+CocoaPods is no longer supported. The podspec was removed in the 5.x releases, so use Swift Package Manager instead.
+
+:::
 
 ## Usage
 
@@ -93,8 +93,8 @@ series.setData(data: data)
 
 ## How to run the provided example
 
-The [GitHub repository](https://github.com/tradingview/LightweightChartsIOS) for LightweightChartsIOS contains an example of the library in action. To run the example, start by cloning the repository, go to the _Example_ directory, and then run
+The [GitHub repository](https://github.com/tradingview/LightweightChartsIOS) for LightweightChartsIOS contains an example of the library in action. To run the example, clone the repository and open the Xcode project:
 
 ```sh
-pod install
+open Example/LightweightCharts.xcodeproj
 ```
