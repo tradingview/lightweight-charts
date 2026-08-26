@@ -114,7 +114,7 @@
     "yargs": "17.7.2"
   },
   "scripts": {
-    "postinstall": "npm run install-hooks",
+    "prepare": "npm run install-hooks && npm run build:prod",
     "install-hooks": "node scripts/githooks/install.js",
     "clean": "rimraf lib/ dist/",
     "bundle-dts": "dts-bundle-generator --config dts-config.json",
