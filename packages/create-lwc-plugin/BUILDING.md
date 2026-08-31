@@ -2,16 +2,16 @@
 
 The minimal supported version of [NodeJS](https://nodejs.org/) for development is 18.
 
-1. Install the dependencies
+1. Install the dependencies (the repository is a pnpm workspace — the install can be run from the repository root)
 
     ```shell
-    npm install
+    pnpm install
     ```
 
 2. Create a development stub
 
     ```shell
-    npm run dev
+    pnpm run dev
     ```
 
 3. Running the CLI locally
@@ -22,20 +22,20 @@ The minimal supported version of [NodeJS](https://nodejs.org/) for development i
 
 ## Publishing new version
 
-1. Install the dependencies
+1. Install the dependencies (the repository is a pnpm workspace — the install can be run from the repository root)
 
     ```shell
-    npm install
+    pnpm install
     ```
 
 2. Bump the version number in the `package.json`
 3. Build the package
 
     ```shell
-    npm run prepublishOnly
+    pnpm run prepublishOnly
     ```
 
-4. Run `npx publint@latest` and ensure that there aren't any issues with the generated `package.json`.
+4. Run `pnpm dlx publint@latest` and ensure that there aren't any issues with the generated `package.json`.
 5. Publish the package
 
     ```shell

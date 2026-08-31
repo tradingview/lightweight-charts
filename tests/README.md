@@ -18,9 +18,9 @@ When contributing to the library, please note:
 
 The unit tests can be run using the following command:
 
-- `npm run test`
+- `pnpm run test`
 
-The unit tests form part of the `npm run verify` command which should be run before committing to the repo.
+The unit tests form part of the `pnpm run verify` command which should be run before committing to the repo.
 
 ## End-to-end (e2e) Tests
 
@@ -47,7 +47,7 @@ You can run the coverage test with the following command:
 Alternatively, you can run the test on a specific file like this:
 
 ```bash
-npx esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js
+pnpm exec esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js
 ```
 
 #### Analysing the Coverage test
@@ -75,7 +75,7 @@ You can run the graphics tests with the following command:
 Alternatively, you can run the test on specific files like this:
 
 ```bash
-npx esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
+pnpm exec esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
 ```
 
 The following enviromental variables can be used to adjust the test:
@@ -85,7 +85,7 @@ The following enviromental variables can be used to adjust the test:
 - `CMP_OUT_DIR`: Directory to output the test artifacts. (Defaults to `.gendata`)
 
 ```bash
-PRODUCTION_BUILD=false DEVICE_PIXEL_RATIO=1.5 npx esno ./tests/e2e/graphics/runner.ts ./golden/lightweight-charts.standalone.development.js ./dist/lightweight-charts.standalone.development.js
+PRODUCTION_BUILD=false DEVICE_PIXEL_RATIO=1.5 pnpm exec esno ./tests/e2e/graphics/runner.ts ./golden/lightweight-charts.standalone.development.js ./dist/lightweight-charts.standalone.development.js
 ```
 
 ### Memory Leaks
@@ -103,7 +103,7 @@ You can run the memory leak test with the following command:
 Alternatively, you can run the test on a specific file like this:
 
 ```bash
-npx esno ./tests/e2e/memleaks/runner.ts ./dist/lightweight-charts.standalone.development.js
+pnpm exec esno ./tests/e2e/memleaks/runner.ts ./dist/lightweight-charts.standalone.development.js
 ```
 
 ### Interactions
@@ -121,5 +121,5 @@ You can run the interactions tests with the following command:
 Alternatively, you can run the tests on a specific file like this:
 
 ```bash
-npx esno ./tests/e2e/interactions/runner.ts ./dist/lightweight-charts.standalone.development.js
+pnpm exec esno ./tests/e2e/interactions/runner.ts ./dist/lightweight-charts.standalone.development.js
 ```

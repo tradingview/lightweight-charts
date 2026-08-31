@@ -9,26 +9,28 @@ parameters:
 
 aliases:
   - &restore-node-modules-cache
-      name: Restore node_modules cache
+      name: Restore dependencies cache
       keys:
-        - &cache-key v1-dependencies-{{ checksum "package-lock.json" }}
+        - &cache-key v1-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
 
   - &save-node-modules-cache
-      name: Save node_modules cache
+      name: Save dependencies cache
+      # The whole workspace is installed with a single `pnpm install` at the
+      # root, so one cache covers every project. All jobs run in the same
+      # working directory, and pnpm's virtual store (node_modules/.pnpm) only
+      # uses relative symlinks, so caching the materialized node_modules
+      # trees is safe. Extend the paths when new packages/* projects appear.
       paths:
         - node_modules
-      key: *cache-key
-
-  - &restore-node-modules-cache-website
-      name: Restore node_modules cache for /website
-      keys:
-        - &cache-key-website v1-dependencies-website-{{ checksum "website/package.json" }}
-
-  - &save-node-modules-cache-website
-      name: Save node_modules cache for /website
-      paths:
         - website/node_modules
-      key: *cache-key-website
+        - plugin-examples/node_modules
+        - indicator-examples/node_modules
+        - packages/create-lwc-plugin/node_modules
+        # puppeteer browser cache (see .puppeteerrc.cjs)
+        - .cache
+        # corepack-downloaded pnpm, so restore-only jobs don't re-download it
+        - ~/.cache/node/corepack
+      key: *cache-key
 
   - &default-filters
       tags:
@@ -47,18 +49,24 @@ executors:
   node-executor:
     docker:
       - image: cimg/node:22.14.0
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
 
   node-browsers-executor:
     docker:
       - image: cimg/node:22.14.0-browsers
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
 
 commands:
   checkout-with-deps:
-    description: "Checkout the code with restore npm dependencies"
+    description: "Checkout the code, enable pnpm via corepack and restore the dependencies cache"
     steps:
       - checkout
+      - run:
+          name: Enable corepack (pnpm)
+          command: sudo corepack enable
       - restore_cache: *restore-node-modules-cache
-      - restore_cache: *restore-node-modules-cache-website
 
   run-graphics-tests:
     description: "Run graphics tests with specific devicePixelRatio"
@@ -102,25 +110,18 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm ci
-      - run: npx puppeteer browsers install chrome
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec puppeteer browsers install chrome
       - save_cache: *save-node-modules-cache
-
-  install-deps-website:
-    executor: node-executor
-    steps:
-      - checkout-with-deps
-      - run: cd website && npm install
-      - save_cache: *save-node-modules-cache-website
 
   build:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm run build:prod
+      - run: pnpm run build:prod
       # make sure that the project is compiled successfully with composite projects
       # so we don't have cyclic deps between projects and wrong imports
-      - run: npm run tsc-verify
+      - run: pnpm run tsc-verify
       - persist_to_workspace:
           root: ./
           paths:
@@ -145,7 +146,7 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: npm run lint:eslint
+      - run: pnpm run lint:eslint
 
   lint-dts:
     executor: node-executor
@@ -153,14 +154,14 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: npm run bundle-dts
-      - run: npm run check-dts-docs
+      - run: pnpm run bundle-dts
+      - run: pnpm run check-dts-docs
 
   lint-markdown:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm run lint:md
+      - run: pnpm run lint:md
 
   usable-in-nodejs:
     executor: node-executor
@@ -168,7 +169,7 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: npm run prepare-package-json-for-release
+      - run: pnpm run prepare-package-json-for-release
       - run:
           name: "Installing lightweight-charts package into node_modules"
           # this is hacky way to do something like `npm link lightweight-charts`
@@ -186,7 +187,7 @@ jobs:
       TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
       - checkout-with-deps
-      - run: npm run test
+      - run: pnpm run test
       - store_test_results:
           path: test-results/
 
@@ -194,7 +195,7 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm run type-tests
+      - run: pnpm run type-tests
 
   dts-changes:
     executor: node-executor
@@ -282,24 +283,23 @@ jobs:
       - run:
           name: "Comparing sizes with merge-base"
           command: node scripts/compare-size-with-merge-base.js
-      - run: npm run size-limit
+      - run: pnpm run size-limit
 
   build-docusaurus-website:
     executor: node-executor
     resource_class: medium+
     steps:
       - checkout-with-deps
-      - run: npm run build:prod
+      - run: pnpm run build:prod
       - run:
-          name: "Install dependencies and build website"
+          name: "Build website"
           command: |
             cd website
-            npm install
-            npm run build
+            pnpm run build
       - run:
           # we need to run this check here because only here we have generated md files of the website
           name: "Check website markdown links"
-          command: npm run check-markdown-links -- --check-website-links
+          command: pnpm run check-markdown-links --check-website-links
       - persist_to_workspace:
           root: ./
           paths:
@@ -335,13 +335,10 @@ workflows:
     jobs:
       - install-deps:
           filters: *default-filters
-      - install-deps-website:
-          filters: *default-filters
       - build:
           filters: *default-filters
           requires:
             - install-deps
-            - install-deps-website
 
       - graphics-tests:
           name: branch_specific_graphics-tests-part1-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
@@ -368,8 +365,6 @@ workflows:
     jobs:
       - install-deps:
           filters: *default-filters
-      - install-deps-website:
-          filters: *default-filters
       - no-crlf:
           filters: *default-filters
       - trailing-lf:
@@ -379,7 +374,6 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-            - install-deps-website
       - lint-markdown:
           filters: *default-filters
           requires:
@@ -444,4 +438,3 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-            - install-deps-website

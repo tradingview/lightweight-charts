@@ -40,7 +40,7 @@ function run(file, args) {
 }
 
 // Only use this for static command strings with no dynamic content.
-// This keeps fixed npm commands compatible with Windows shells.
+// This keeps fixed package manager commands compatible with Windows shells.
 function runShell(command) {
 	try {
 		childProcess.execSync(command, { stdio: 'inherit' });
@@ -88,7 +88,7 @@ function lintFiles(files) {
 	const tsFiles = filterByExt(files, '.ts');
 	const tsxFiles = filterByExt(files, '.tsx');
 	if (tsFiles.length !== 0 || tsxFiles.length !== 0) {
-		hasErrors = runShell('npm run tsc-verify') || hasErrors;
+		hasErrors = runShell('pnpm run tsc-verify') || hasErrors;
 		hasErrors = runESLintForFiles(tsFiles) || hasErrors;
 		hasErrors = runESLintForFiles(tsxFiles) || hasErrors;
 	}

@@ -1,6 +1,10 @@
-# nodejs & npm
+# nodejs & package managers
 node_modules/
 npm-debug.log*
+pnpm-debug.log*
+
+# puppeteer browser cache (see .puppeteerrc.cjs)
+/.cache/
 
 /debug/**/*
 !/debug/README.md

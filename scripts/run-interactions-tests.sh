@@ -2,7 +2,7 @@
 set -e
 echo "Preparing"
 
-npm run build
+pnpm run build
 
 echo "Interactions tests"
-npm run e2e:interactions
+pnpm run e2e:interactions

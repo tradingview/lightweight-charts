@@ -2,7 +2,7 @@
 set -e
 echo "Preparing"
 
-npm run build
+pnpm run build
 
 echo "Coverage tests"
-npm run e2e:coverage
+pnpm run e2e:coverage

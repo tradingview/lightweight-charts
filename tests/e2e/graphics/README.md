@@ -28,7 +28,7 @@ This tests runs against 2 versions of the library - "golden" and "test". Golden 
 To run this tests you need use [runner.ts](./runner.ts):
 
 ```bash
-npx esno ./runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
+pnpm exec esno ./runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
 ```
 
 Each path to the standalone module might be either to a local file (relative/absolute path to a file) or remote file (via http/https).
@@ -60,10 +60,10 @@ BRANCH_SPECIFIC_TEST="true" ./scripts/run-graphics-tests.sh
     But if you test with local files, you cannot open that HTML pages in your browser to debug because there is scripts which are loaded from webserver (which a runner up to runs tests).
     In that can you can use the following hack.
 
-    Let's say you run your tests in that way - `npx esno ./runner.ts ./golden/standalone/module.js ./test/standalone/module.js`.
+    Let's say you run your tests in that way - `pnpm exec esno ./runner.ts ./golden/standalone/module.js ./test/standalone/module.js`.
     After that in `.gendata/test-case-name/1.golden.html` you can find a HTML page.
 
-    To open this page properly you can run `npx esno ./tests/e2e/serve-static-files.ts golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
+    To open this page properly you can run `pnpm exec esno ./tests/e2e/serve-static-files.ts golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
 
 1. The following environmental variables can be used to adjust the test:
 
@@ -73,5 +73,5 @@ BRANCH_SPECIFIC_TEST="true" ./scripts/run-graphics-tests.sh
 1. You can set additional options from the command line arguments:
 
 ```bash
-npx esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js --bail --grep "add-series"
+pnpm exec esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js --bail --grep "add-series"
 ```

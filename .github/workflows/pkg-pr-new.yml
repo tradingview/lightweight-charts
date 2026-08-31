@@ -10,25 +10,33 @@ permissions: {}
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           persist-credentials: false
 
+      # pnpm is provided by corepack (see the note in deploy.yml). It has to
+      # be enabled before setup-node, because `cache: 'pnpm'` needs the pnpm
+      # binary to resolve the store path.
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build:prod
+        run: pnpm run build:prod
 
       - name: Prepare release
-        run: npm run prepare-release
+        run: pnpm run prepare-release
 
       - name: Publish preview package
-        run: npx pkg-pr-new publish --compact
+        run: pnpm dlx pkg-pr-new@0.0.88 publish --compact

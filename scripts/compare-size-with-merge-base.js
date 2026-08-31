@@ -5,6 +5,7 @@
  */
 
 import * as childProcess from 'node:child_process';
+import * as fs from 'node:fs';
 import bytes from 'bytes';
 import sizeLimit from 'size-limit';
 import filePlugin from '@size-limit/file';
@@ -63,6 +64,42 @@ function runShellForOutput(command) {
 	return res.output;
 }
 
+function installDepsForCurrentRevision() {
+	// The checked-out revision may predate the pnpm workspace migration and
+	// only have package-lock.json, so the package manager is chosen per
+	// revision, and node_modules is wiped when its layout was created by the
+	// other package manager. The Puppeteer browser cache lives in
+	// ./.cache/puppeteer (see .puppeteerrc.cjs) and survives these wipes.
+	if (fs.existsSync('pnpm-lock.yaml')) {
+		if (fs.existsSync('node_modules') && !fs.existsSync('node_modules/.modules.yaml')) {
+			console.log('Removing npm-created node_modules before pnpm install');
+			fs.rmSync('node_modules', { recursive: true, force: true });
+		}
+		runShellForSuccess('pnpm install --frozen-lockfile');
+	} else {
+		if (fs.existsSync('node_modules/.pnpm')) {
+			console.log('Removing pnpm-created node_modules before npm install');
+			fs.rmSync('node_modules', { recursive: true, force: true });
+		}
+		// This script only builds the library, it never launches a browser,
+		// so skip the browser download in puppeteer's postinstall.
+		process.env.PUPPETEER_SKIP_DOWNLOAD = '1';
+		try {
+			runShellForSuccess('npm install');
+		} finally {
+			delete process.env.PUPPETEER_SKIP_DOWNLOAD;
+		}
+	}
+}
+
+function buildLibraryForCurrentRevision() {
+	if (fs.existsSync('pnpm-lock.yaml')) {
+		runShellForSuccess('pnpm run build:prod');
+	} else {
+		runShellForSuccess('npm run build:prod');
+	}
+}
+
 async function getSizes() {
 	const result = new Map();
 	await Promise.all(sizeLimitConfig.map(async file => {
@@ -105,10 +142,10 @@ async function main() {
 	runForSuccess('git', ['checkout', revToCheck]);
 
 	console.log(`Installing dependencies...`);
-	runShellForSuccess('npm install');
+	installDepsForCurrentRevision();
 
 	console.log(`Building the library...`);
-	runShellForSuccess('npm run build:prod');
+	buildLibraryForCurrentRevision();
 
 	const oldSizes = await getSizes();
 
@@ -116,10 +153,10 @@ async function main() {
 	runForSuccess('git', ['checkout', headRev]);
 
 	console.log(`Installing dependencies...`);
-	runShellForSuccess('npm install');
+	installDepsForCurrentRevision();
 
 	console.log(`Building the library...`);
-	runShellForSuccess('npm run build:prod');
+	buildLibraryForCurrentRevision();
 
 	const newSizes = await getSizes();
 

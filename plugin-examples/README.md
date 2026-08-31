@@ -33,19 +33,18 @@ hesitate to get in touch.
 To run this repo locally, follow these steps:
 
 1. Clone the repo to your local machine
-2. First build the library
+2. First install the dependencies (the repository is a pnpm workspace, so a single install in the root directory covers all the projects) and build the library
 
    ```shell
-   npm install
-   npm run build:prod
+   pnpm install
+   pnpm run build:prod
    ```
 
-3. Switch to the Plugin Examples Folder, install and start the development server
+3. Switch to the Plugin Examples Folder and start the development server
 
    ```shell
    cd plugin-examples
-   npm install
-   npm run dev
+   pnpm run dev
    ```
 
 4. Visit `localhost:5173` in the browser.
@@ -53,7 +52,7 @@ To run this repo locally, follow these steps:
 ## Compiling the Examples
 
 ```shell
-npm run compile
+pnpm run compile
 ```
 
 Check the output in the `compiled` folder.
