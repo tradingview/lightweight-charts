@@ -17,16 +17,19 @@ jobs:
           persist-credentials: false
       # pnpm is provided by corepack (see the note in deploy.yml); the
       # size-limit action shells out to pnpm for install/build.
+      # The action also installs and builds the PR's BASE branch in the same
+      # working tree. A base revision may predate the root `packageManager`
+      # field, in which case the corepack shim would fall back to the latest
+      # pnpm (which fails hard on unreviewed dependency build scripts in CI),
+      # so the project's pinned pnpm is installed as the shim's default.
       - name: Enable Corepack (pnpm)
-        run: corepack enable
+        run: |
+          corepack enable
+          corepack install -g "$(node -p 'require("./package.json").packageManager')"
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
-      # v1.6.1 is the SHA in the repository's allowed-actions list. It
-      # auto-detects the package manager from the lockfile (pnpm support
-      # since v1.6.0). When bumping this action, the allowlist in the repo
-      # Actions settings must be updated with the new SHA at the same time.
       - uses: andresz1/size-limit-action@e7493a72a44b113341c0cf6186ab49c17c4b65c1 # v1.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
