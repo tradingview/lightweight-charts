@@ -291,6 +291,9 @@ importers:
       docusaurus-plugin-typedoc:
         specifier: 1.0.1
         version: 1.0.1(typedoc-plugin-markdown@4.0.3(typedoc@0.25.13(typescript@5.4.5)))
+      file-loader:
+        specifier: 6.2.0
+        version: 6.2.0(webpack@5.110.2(@swc/core@1.16.1)(postcss@8.5.26))
       lightweight-charts:
         specifier: 5.2.1
         version: 5.2.1
