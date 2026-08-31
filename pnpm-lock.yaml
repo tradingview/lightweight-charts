@@ -2211,7 +2211,7 @@ packages:
     os: [win32]
 
   '@rspack/binding-darwin-arm64@1.2.0-alpha.0':
-    resolution: {integrity: sha512-EPprIe6BrkJ9XuWL5HBXJFaH4vvt5C2kBTvyu+t5E3wacyH9A0gIDaMOEmH30Kt3zl4B07OCBC1nCiJ1sTtimw==, tarball: https://artifactory.xtools.tv/artifactory/api/npm/npm-tv/@rspack/binding-darwin-arm64/-/@rspack/binding-darwin-arm64-1.2.0-alpha.0.tgz}
+    resolution: {integrity: sha512-EPprIe6BrkJ9XuWL5HBXJFaH4vvt5C2kBTvyu+t5E3wacyH9A0gIDaMOEmH30Kt3zl4B07OCBC1nCiJ1sTtimw==}
     cpu: [arm64]
     os: [darwin]
 
@@ -2233,13 +2233,13 @@ packages:
     libc: [musl]
 
   '@rspack/binding-linux-x64-gnu@1.2.0-alpha.0':
-    resolution: {integrity: sha512-GNur7VXJ29NtJhY8PYgv3Fv1Zxbx0XZhDUj/+7Wp40CAXRFsLgXScZIRh2U30TECYaihboZ7BD+xugv8MQPDoA==, tarball: https://artifactory.xtools.tv/artifactory/api/npm/npm-tv/@rspack/binding-linux-x64-gnu/-/@rspack/binding-linux-x64-gnu-1.2.0-alpha.0.tgz}
+    resolution: {integrity: sha512-GNur7VXJ29NtJhY8PYgv3Fv1Zxbx0XZhDUj/+7Wp40CAXRFsLgXScZIRh2U30TECYaihboZ7BD+xugv8MQPDoA==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
   '@rspack/binding-linux-x64-musl@1.2.0-alpha.0':
-    resolution: {integrity: sha512-0IdswzpG9+sgxvGu7KTwSeqfV0hvciaHMoZvGklfZa2txpcUqAg4ASp7uxrNaUo+G2a1fTUMOtP9351Cnl8DBg==, tarball: https://artifactory.xtools.tv/artifactory/api/npm/npm-tv/@rspack/binding-linux-x64-musl/-/@rspack/binding-linux-x64-musl-1.2.0-alpha.0.tgz}
+    resolution: {integrity: sha512-0IdswzpG9+sgxvGu7KTwSeqfV0hvciaHMoZvGklfZa2txpcUqAg4ASp7uxrNaUo+G2a1fTUMOtP9351Cnl8DBg==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
