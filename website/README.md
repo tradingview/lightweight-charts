@@ -11,7 +11,7 @@ Handwritten documentation should focus on explaining concepts, tutorials, intera
 ## Local Development
 
 ```console
-npm run start
+pnpm start
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -21,7 +21,7 @@ This command starts a local development server and opens a browser window. Most 
 ## Build
 
 ```console
-npm run build
+pnpm build
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -31,7 +31,7 @@ This command generates static content in the `build` directory.
 ## Serve Build Locally
 
 ```console
-npm run serve
+pnpm serve
 ```
 
 _Note_: Embedded `.html` examples won't display correctly when using this command but will work correctly when hosted online.
@@ -41,7 +41,7 @@ This command serves the built website locally.
 ## Deployment
 
 ```console
-GIT_USER=<Your GitHub username> GITHUB_ORGANIZATION_NAME=<Your Github username or organization name> USE_SSH=true npm deploy
+GIT_USER=<Your GitHub username> GITHUB_ORGANIZATION_NAME=<Your Github username or organization name> USE_SSH=true pnpm run deploy
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -68,13 +68,13 @@ Run the following command replacing $VERSION with the name of a version you woul
 See [the Docusaurus versioning docs](https://docusaurus.io/docs/versioning#tagging-a-new-version) for an explanation of the Docusaurus versioning behaviour.
 
 ```bash
-npm run docusaurus docs:version $VERSION
+pnpm docusaurus docs:version $VERSION
 ```
 
 For example:
 
 ```bash
-npm run docusaurus docs:version 3.7.0
+pnpm docusaurus docs:version 3.7.0
 ```
 
 ## CircleCI

@@ -1,5 +1,6 @@
 {
     "name": "lightweight-charts-indicator-examples",
+    "private": true,
     "type": "module",
     "scripts": {
         "build": "tsc",
@@ -15,6 +16,6 @@
         "dts-bundle-generator": "9.5.1",
         "fancy-canvas": "2.1.0",
         "globby": "14.1.0",
-        "lightweight-charts": "file:.."
+        "lightweight-charts": "workspace:*"
     }
 }

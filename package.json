@@ -56,6 +56,8 @@
   },
   "devDependencies": {
     "@juggle/resize-observer": "3.4.0",
+    "@memlab/api": "1.0.42",
+    "@memlab/core": "1.1.43",
     "@rollup/plugin-node-resolve": "16.0.1",
     "@rollup/plugin-replace": "6.0.2",
     "@rollup/plugin-terser": "0.4.4",
@@ -64,7 +66,7 @@
     "@types/chai": "5.2.1",
     "@types/express": "5.0.1",
     "@types/glob": "8.1.0",
-    "@types/node": "22",
+    "@types/node": "22.13.14",
     "@types/pixelmatch": "5.2.6",
     "@types/pngjs": "6.0.5",
     "@typescript-eslint/eslint-plugin": "7.18.0",
@@ -114,12 +116,12 @@
     "yargs": "17.7.2"
   },
   "scripts": {
-    "postinstall": "npm run install-hooks",
+    "postinstall": "node scripts/githooks/install.js",
     "install-hooks": "node scripts/githooks/install.js",
     "clean": "rimraf lib/ dist/",
     "bundle-dts": "dts-bundle-generator --config dts-config.json",
     "tsc": "tspc -p tsconfig.prod.json",
-    "tsc-watch": "npm run tsc -- --watch --preserveWatchOutput",
+    "tsc-watch": "pnpm tsc --watch --preserveWatchOutput",
     "tsc-verify": "node website/scripts/generate-versions-dts.js && tsc -b tsconfig.composite.json",
     "lint": "npm-run-all -p lint:**",
     "lint:eslint": "eslint --format=unix ./",
@@ -129,12 +131,12 @@
     "check-dts-docs-eslint": "eslint --format=unix ./dist/typings.d.ts --no-ignore",
     "check-markdown-links": "node scripts/check-markdown-links.js",
     "rollup": "rollup -c rollup.config.js",
-    "rollup-watch": "npm run rollup -- --watch",
+    "rollup-watch": "pnpm rollup --watch",
     "build": "npm-run-all tsc rollup bundle-dts",
     "build:watch": "npm-run-all tsc -p tsc-watch rollup-watch",
-    "build:prod": "cross-env NODE_ENV=production npm run build",
-    "build:release": "cross-env BUILD_TAG=release npm run build:prod",
-    "prepare-release": "npm-run-all clean build:release && npm run prepare-package-json-for-release",
+    "build:prod": "cross-env NODE_ENV=production pnpm build",
+    "build:release": "cross-env BUILD_TAG=release pnpm build:prod",
+    "prepare-release": "npm-run-all clean build:release && pnpm prepare-package-json-for-release",
     "prepare-package-json-for-release": "node ./scripts/clean-package-json.js",
     "size-limit": "size-limit",
     "verify": "npm-run-all clean -p build:prod check-markdown-links -p lint check-dts-docs tsc-verify test size-limit -p type-tests",
@@ -143,5 +145,6 @@
     "e2e:coverage": "esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js",
     "e2e:interactions": "esno ./tests/e2e/interactions/runner.ts ./dist/lightweight-charts.standalone.development.js",
     "e2e:memleaks": "esno ./tests/e2e/memleaks/runner.ts ./dist/lightweight-charts.standalone.development.js"
-  }
+  },
+  "packageManager": "pnpm@10.34.5+sha512.a4ee05f2f73658255bd6a89859c065a45c28a57daefae2c893a168ee2b73168c37b91e83e57ea67654ad03f03031746430e8bce38e362e042605fb8abc80192e"
 }

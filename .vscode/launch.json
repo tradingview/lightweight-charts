@@ -5,7 +5,7 @@
             "type": "node-terminal",
             "request": "launch",
             "name": "Unittests",
-            "command": "npm run test",
+            "command": "pnpm test",
             "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
         },
@@ -20,7 +20,7 @@
             "type": "node-terminal",
             "request": "launch",
             "name": "Memleaks tests",
-            "command": "npm run e2e:memleaks ${input:testStandalonePath}",
+            "command": "pnpm e2e:memleaks ${input:testStandalonePath}",
             "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
         },
@@ -28,7 +28,7 @@
             "type": "node-terminal",
             "request": "launch",
             "name": "Coverage tests",
-            "command": "npm run e2e:coverage ${input:testStandalonePath}",
+            "command": "pnpm e2e:coverage ${input:testStandalonePath}",
             "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
         },
@@ -36,7 +36,7 @@
             "type": "node-terminal",
             "request": "launch",
             "name": "Interaction tests",
-            "command": "npm run e2e:interactions ${input:testStandalonePath}",
+            "command": "pnpm e2e:interactions ${input:testStandalonePath}",
             "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
         }
