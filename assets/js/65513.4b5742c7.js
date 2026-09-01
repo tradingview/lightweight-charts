@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklightweight_charts_website=self.webpackChunklightweight_charts_website||[]).push([["65513"],{11883:function(e,t,h){h.r(t),h.d(t,{DocSearchModal:function(){return c.He}});var c=h(52106)}}]);

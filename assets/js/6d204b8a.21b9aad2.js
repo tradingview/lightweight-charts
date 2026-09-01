@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklightweight_charts_website=self.webpackChunklightweight_charts_website||[]).push([["99747"],{60074:function(t){t.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"tutorials"}')}}]);
