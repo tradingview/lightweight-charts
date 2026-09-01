@@ -40,6 +40,9 @@
   },
   "devDependencies": {
     "@tsconfig/docusaurus": "2.0.3",
+    "mdast-util-from-markdown": "2.0.2",
+    "mdast-util-mdx": "3.0.0",
+    "micromark-extension-mdxjs": "3.0.0",
     "typedoc-plugin-frontmatter": "1.0.0"
   }
 }

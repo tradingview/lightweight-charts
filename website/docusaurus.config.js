@@ -9,6 +9,7 @@ import pluginDocusaurus from 'docusaurus-plugin-typedoc';
 import logger from '@docusaurus/logger';
 
 import versions from './versions.json';
+import { docsMarkdownPlugin } from './plugins/docs-markdown/index.js';
 
 /* Configuration Constants */
 const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
@@ -422,6 +423,7 @@ const getConfig = async () => {
 			...versions.map(typedocPluginForVersion),
 			'./plugins/enhanced-codeblock',
 			'./plugins/suppress-resize-observer-error',
+			docsMarkdownPlugin,
 		],
 	};
 
