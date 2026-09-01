@@ -1,0 +1,5 @@
+# Scaffolding templates, not documents: their placeholders are not valid prose.
+# `_DESCRIPTION_` and friends are emphasis as far as markdown is concerned, so
+# rules such as MD036 always fire on them. The README generated from these
+# templates is linted like any other file.
+packages/create-lwc-plugin/template-*/**
