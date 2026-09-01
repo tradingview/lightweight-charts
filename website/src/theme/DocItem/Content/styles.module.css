@@ -1,0 +1,153 @@
+/*
+ * Markdown actions row shown under the page title. Colours come from Infima
+ * theme tokens so the row follows the docs' light/dark themes automatically.
+ * Selectors are compounded (`.actions .action`) so they win over the global
+ * `.markdown a` rules the row is nested inside.
+ */
+
+.actions {
+	/* Resting label colour: a slate that stays crisp on both themes. The tooltip
+	   is a slate chip, grey-ish rather than black. */
+	--md-action-color: #3c4257;
+	--md-tooltip-bg: #3c4453;
+	--md-tooltip-fg: #ffffff;
+
+	display: flex;
+	width: 100%;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 2px;
+	margin: 0 0 1.25rem;
+	padding-bottom: 0.7rem;
+	border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+:global(html[data-theme='dark']) .actions {
+	--md-action-color: #c7ccd6;
+}
+
+.actions .action {
+	display: inline-flex;
+	position: relative;
+	align-items: center;
+	gap: 7px;
+	padding: 5px 12px;
+	border: none;
+	border-radius: 6px;
+	background: none;
+	color: var(--md-action-color);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1;
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.12s ease, background 0.12s ease;
+}
+
+.actions .action:first-child {
+	padding-inline-start: 2px;
+}
+
+.actions .action:hover {
+	color: var(--ifm-color-primary);
+	text-decoration: none;
+}
+
+.actions .action:focus-visible {
+	outline: 2px solid var(--ifm-color-primary);
+	outline-offset: 1px;
+}
+
+.actions .action svg {
+	width: 14px;
+	height: 14px;
+	flex: none;
+}
+
+.actions .action[data-status='copied'] {
+	color: var(--ifm-color-success);
+}
+
+.actions .action[data-status='failed'] {
+	color: var(--ifm-color-danger);
+}
+
+/* The labels are stacked in one grid cell so the button keeps the width of its
+   widest label — only the text crossfades, the row never jumps. */
+.actions .label {
+	display: inline-grid;
+	justify-items: start;
+}
+
+.actions .label > span {
+	grid-area: 1 / 1;
+	white-space: nowrap;
+	opacity: 0;
+	transition: opacity 0.12s ease;
+}
+
+.actions .label > span[data-active='true'] {
+	opacity: 1;
+}
+
+.actions .badge {
+	padding: 1px 3px;
+	border: 1px solid currentColor;
+	border-radius: 3px;
+	font-family: var(--ifm-font-family-monospace);
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	line-height: 1;
+}
+
+.actions .divider {
+	width: 1px;
+	height: 14px;
+	flex: none;
+	align-self: center;
+	background: var(--ifm-color-emphasis-300);
+}
+
+/* Tooltip. The copy link anchors its tooltip to the left edge; the view link,
+   sitting further right, anchors to the right so it never runs off-screen. */
+.actions .action[data-tooltip]::after {
+	content: attr(data-tooltip);
+	position: absolute;
+	bottom: calc(100% + 8px);
+	inset-inline-start: 0;
+	z-index: 10;
+	padding: 5px 9px;
+	border-radius: 6px;
+	background: var(--md-tooltip-bg);
+	color: var(--md-tooltip-fg);
+	font-size: 11px;
+	font-weight: 600;
+	white-space: nowrap;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+	opacity: 0;
+	transform: translateY(3px);
+	pointer-events: none;
+	transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.actions .action.view[data-tooltip]::after {
+	inset-inline: auto 0;
+}
+
+.actions .action[data-tooltip]:hover::after {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Touch devices: no hover, so drop the tooltip and give links a taller tap area. */
+@media (hover: none) {
+	.actions .action[data-tooltip]::after {
+		display: none;
+	}
+
+	.actions .action {
+		padding-top: 9px;
+		padding-bottom: 9px;
+	}
+}
