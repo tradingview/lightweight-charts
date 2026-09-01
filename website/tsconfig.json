@@ -3,11 +3,13 @@
 	"compilerOptions": {
 		"strict": true,
 		"resolveJsonModule": true,
-		"jsx": "react",
-		"moduleResolution": "node"
+		"jsx": "react"
 	},
 	"include": [
 		"./**/*.ts",
 		"./**/*.tsx",
+		// The Markdown export plugin is JavaScript with JSDoc types; its
+		// `// @ts-check` only means anything while it is part of the program.
+		"./plugins/docs-markdown/**/*.js",
 	]
 }
