@@ -1,0 +1,73 @@
+# Conclusion
+
+This tutorial demonstrated a wide array of accessibility improvements that can
+be introduced to line charts, making them usable for a broader spectrum of
+users. The considerations and methods presented illustrate the importance of
+creating inclusive web applications.
+
+Among the discussed topics were:
+
+1. **Keyboard navigation:** The implementation of
+keyboard-only navigation on our chart, allowing for interaction exclusively
+through keystrokes.
+2. **ARIA roles and descriptive content:** The additions of ARIA
+labels, live regions, and the hiding of non-consequential elements to enhance
+the usefulness of assistive technologies and to communicate context better to
+all users.
+3. **High contrast and scalable font size:** The detection of the user's
+preference for higher contrast and the inclusion of customizable text sizes for
+better readability.
+
+The example provided has even more improvements not directly discussed during the
+the tutorial. One such enhancement is an informative tooltip that lists available
+commands, adding another helpful layer of user instruction.
+
+:::tip
+
+The complete example code provides further insights, and reviewing it is
+recommended for a comprehensive understanding of the accessibility improvements
+discussed in this tutorial.
+
+:::
+
+:::info Ready-made plugin
+
+If you would rather not wire these techniques up by hand, the
+[Accessibility plugin](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples/src/plugins/accessibility)
+in the plugin examples packages the keyboard navigation and ARIA layer described
+here into a chart-level helper built on pane primitives:
+
+```js
+addAccessibilityPlugin(chart, { chartTitle: 'My chart' });
+```
+
+Keyboard navigation always covers the whole series (the arrow keys page the
+chart as needed). The plugin defaults to `dataScope: 'visible'`, which scopes the
+spoken *summaries* to the current viewport – the recommended mode for charts with
+large data sets. Use `dataScope: 'all'` when you want those summaries to describe
+the full history.
+
+It is also fully translatable: numbers and dates follow the chart's
+`localization.locale`, and every announced string can be overridden through a
+`messages` bundle (with a `lang` attribute so screen readers use the right
+voice). See the plugin's README and its Spanish example.
+
+:::
+
+This tutorial aimed to foster a better understanding of these practices,
+promoting an inclusive web where applications are made with everyone in mind.
+Thank you for following along and continue putting accessibility at the
+forefront of your web development endeavors.
+
+## Complete example
+
+You can view the example in a new window, or download the source file below:
+
+[View in a new window](https://tradingview.github.io/lightweight-charts/056b6ae28c3a0b8b735f4f7a5f1b0977.html)
+
+---
+
+## Sitemap
+
+- [All documentation pages](https://tradingview.github.io/lightweight-charts/llms.txt)
+- [Full page map with headings](https://tradingview.github.io/lightweight-charts/docs_map.md)
