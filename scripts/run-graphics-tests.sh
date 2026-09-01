@@ -6,6 +6,10 @@ set -e
 # `git checkout`, so the running script never depends on reading more of
 # this file after the tree has changed underneath it.
 
+# TODO(CLL-388): the npm fallbacks in the three helpers below are transitional.
+# Remove them (keeping only the pnpm paths) once every revision this script
+# compares against — master and the merge-bases of open PRs — contains
+# pnpm-lock.yaml.
 install_deps_for_revision() {
 	# The base revision may predate the pnpm workspace migration and only
 	# have package-lock.json, so the package manager is chosen per revision,

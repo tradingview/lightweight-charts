@@ -20,7 +20,7 @@
     "dev": "unbuild --stub && echo 'now run `node index.js`'",
     "build": "unbuild",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm build"
   },
   "engines": {
     "node": "^18.0.0 || >=20.0.0"

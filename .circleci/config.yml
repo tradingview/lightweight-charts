@@ -118,10 +118,10 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: pnpm run build:prod
+      - run: pnpm build:prod
       # make sure that the project is compiled successfully with composite projects
       # so we don't have cyclic deps between projects and wrong imports
-      - run: pnpm run tsc-verify
+      - run: pnpm tsc-verify
       - persist_to_workspace:
           root: ./
           paths:
@@ -146,7 +146,7 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: pnpm run lint:eslint
+      - run: pnpm lint:eslint
 
   lint-dts:
     executor: node-executor
@@ -154,14 +154,14 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: pnpm run bundle-dts
-      - run: pnpm run check-dts-docs
+      - run: pnpm bundle-dts
+      - run: pnpm check-dts-docs
 
   lint-markdown:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: pnpm run lint:md
+      - run: pnpm lint:md
 
   usable-in-nodejs:
     executor: node-executor
@@ -169,7 +169,7 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: pnpm run prepare-package-json-for-release
+      - run: pnpm prepare-package-json-for-release
       - run:
           name: "Installing lightweight-charts package into node_modules"
           # this is hacky way to do something like `npm link lightweight-charts`
@@ -187,7 +187,7 @@ jobs:
       TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
       - checkout-with-deps
-      - run: pnpm run test
+      - run: pnpm test
       - store_test_results:
           path: test-results/
 
@@ -195,7 +195,7 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: pnpm run type-tests
+      - run: pnpm type-tests
 
   dts-changes:
     executor: node-executor
@@ -283,23 +283,23 @@ jobs:
       - run:
           name: "Comparing sizes with merge-base"
           command: node scripts/compare-size-with-merge-base.js
-      - run: pnpm run size-limit
+      - run: pnpm size-limit
 
   build-docusaurus-website:
     executor: node-executor
     resource_class: medium+
     steps:
       - checkout-with-deps
-      - run: pnpm run build:prod
+      - run: pnpm build:prod
       - run:
           name: "Build website"
           command: |
             cd website
-            pnpm run build
+            pnpm build
       - run:
           # we need to run this check here because only here we have generated md files of the website
           name: "Check website markdown links"
-          command: pnpm run check-markdown-links --check-website-links
+          command: pnpm check-markdown-links --check-website-links
       - persist_to_workspace:
           root: ./
           paths:

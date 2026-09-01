@@ -88,7 +88,7 @@ function lintFiles(files) {
 	const tsFiles = filterByExt(files, '.ts');
 	const tsxFiles = filterByExt(files, '.tsx');
 	if (tsFiles.length !== 0 || tsxFiles.length !== 0) {
-		hasErrors = runShell('pnpm run tsc-verify') || hasErrors;
+		hasErrors = runShell('pnpm tsc-verify') || hasErrors;
 		hasErrors = runESLintForFiles(tsFiles) || hasErrors;
 		hasErrors = runESLintForFiles(tsxFiles) || hasErrors;
 	}

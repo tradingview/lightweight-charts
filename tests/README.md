@@ -18,9 +18,9 @@ When contributing to the library, please note:
 
 The unit tests can be run using the following command:
 
-- `pnpm run test`
+- `pnpm test`
 
-The unit tests form part of the `pnpm run verify` command which should be run before committing to the repo.
+The unit tests form part of the `pnpm verify` command which should be run before committing to the repo.
 
 ## End-to-end (e2e) Tests
 

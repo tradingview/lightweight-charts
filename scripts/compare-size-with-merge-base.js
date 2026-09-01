@@ -64,6 +64,10 @@ function runShellForOutput(command) {
 	return res.output;
 }
 
+// TODO(CLL-388): the npm fallbacks in the two helpers below are transitional.
+// Remove them (keeping only the pnpm paths) once every revision this script
+// compares against — master and the merge-bases of open PRs — contains
+// pnpm-lock.yaml.
 function installDepsForCurrentRevision() {
 	// The checked-out revision may predate the pnpm workspace migration and
 	// only have package-lock.json, so the package manager is chosen per

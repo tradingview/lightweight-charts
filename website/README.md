@@ -11,7 +11,7 @@ Handwritten documentation should focus on explaining concepts, tutorials, intera
 ## Local Development
 
 ```console
-pnpm run start
+pnpm start
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -21,7 +21,7 @@ This command starts a local development server and opens a browser window. Most 
 ## Build
 
 ```console
-pnpm run build
+pnpm build
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -31,7 +31,7 @@ This command generates static content in the `build` directory.
 ## Serve Build Locally
 
 ```console
-pnpm run serve
+pnpm serve
 ```
 
 _Note_: Embedded `.html` examples won't display correctly when using this command but will work correctly when hosted online.
@@ -55,13 +55,13 @@ Run the following command replacing $VERSION with the name of a version you woul
 See [the Docusaurus versioning docs](https://docusaurus.io/docs/versioning#tagging-a-new-version) for an explanation of the Docusaurus versioning behaviour.
 
 ```bash
-pnpm run docusaurus docs:version $VERSION
+pnpm docusaurus docs:version $VERSION
 ```
 
 For example:
 
 ```bash
-pnpm run docusaurus docs:version 3.7.0
+pnpm docusaurus docs:version 3.7.0
 ```
 
 ## CircleCI

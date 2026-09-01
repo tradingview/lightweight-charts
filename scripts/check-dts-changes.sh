@@ -17,6 +17,10 @@ function print_step {
   echo "====================" $1 "===================="
 }
 
+# TODO(CLL-388): the npm fallback below (and the pkg_runner selection in
+# generate_dts_for_rev) is transitional. Remove it once every revision this
+# script compares against — master and the merge-bases of open PRs —
+# contains pnpm-lock.yaml.
 function install_deps_for_revision {
   # The checked-out revision may predate the pnpm workspace migration and
   # only have package-lock.json, so the package manager is chosen per

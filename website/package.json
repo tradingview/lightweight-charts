@@ -1,4 +1,5 @@
 {
+  "name": "lightweight-charts-website",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",

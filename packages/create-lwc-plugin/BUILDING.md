@@ -11,7 +11,7 @@ The minimal supported version of [NodeJS](https://nodejs.org/) for development i
 2. Create a development stub
 
     ```shell
-    pnpm run dev
+    pnpm dev
     ```
 
 3. Running the CLI locally
@@ -32,7 +32,7 @@ The minimal supported version of [NodeJS](https://nodejs.org/) for development i
 3. Build the package
 
     ```shell
-    pnpm run prepublishOnly
+    pnpm prepublishOnly
     ```
 
 4. Run `pnpm dlx publint@latest` and ensure that there aren't any issues with the generated `package.json`.

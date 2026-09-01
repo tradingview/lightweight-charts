@@ -15,14 +15,14 @@ To run these examples locally follow these steps:
 
    ```shell
    pnpm install
-   pnpm run build:prod
+   pnpm build:prod
    ```
 
 3. Switch to the Indicator Examples Folder and start the development server
 
    ```shell
    cd indicator-examples
-   pnpm run dev
+   pnpm dev
    ```
 
 4. Visit `localhost:5173` in the browser.
@@ -30,7 +30,7 @@ To run these examples locally follow these steps:
 ## Compiling the Examples
 
 ```shell
-pnpm run compile
+pnpm compile
 ```
 
 Check the output in the `compiled` folder.

@@ -45,17 +45,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Build library
-        run: pnpm run build:prod
-      # The website project deliberately has no "name" field: webpack derives
-      # its uniqueName (and with it every chunk's content hash) from it, so
-      # adding one would needlessly invalidate all cached site assets.
-      # It is addressed by directory instead of by --filter name.
+        run: pnpm build:prod
       - name: Build documentation website
-        run: pnpm --dir website run build
+        run: pnpm --filter lightweight-charts-website build
       - name: Build plugin examples website
-        run: pnpm --filter lightweight-charts-plugin-examples run build:examples:site
+        run: pnpm --filter lightweight-charts-plugin-examples build:examples:site
       - name: Build indicator examples website
-        run: pnpm --filter lightweight-charts-indicator-examples run build:examples:site
+        run: pnpm --filter lightweight-charts-indicator-examples build:examples:site
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4
