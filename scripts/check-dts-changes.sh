@@ -17,32 +17,6 @@ function print_step {
   echo "====================" $1 "===================="
 }
 
-# TODO(CLL-388): the npm fallback below (and the pkg_runner selection in
-# generate_dts_for_rev) is transitional. Remove it once every revision this
-# script compares against — master and the merge-bases of open PRs —
-# contains pnpm-lock.yaml.
-function install_deps_for_revision {
-  # The checked-out revision may predate the pnpm workspace migration and
-  # only have package-lock.json, so the package manager is chosen per
-  # revision, and node_modules is wiped when its layout was created by the
-  # other package manager.
-  if [ -f pnpm-lock.yaml ]; then
-    if [ -d node_modules ] && [ ! -f node_modules/.modules.yaml ]; then
-      echo "Removing npm-created node_modules before pnpm install"
-      rm -rf node_modules
-    fi
-    pnpm install --frozen-lockfile
-  else
-    if [ -d node_modules/.pnpm ]; then
-      echo "Removing pnpm-created node_modules before npm install"
-      rm -rf node_modules
-    fi
-    # This script only builds typings, it never launches a browser,
-    # so skip the browser download in puppeteer's postinstall.
-    PUPPETEER_SKIP_DOWNLOAD=1 npm install
-  fi
-}
-
 function generate_dts_for_rev {
   local git_rev=$1
   local dts_filename=$2
@@ -51,17 +25,12 @@ function generate_dts_for_rev {
   git checkout $git_rev
 
   print_step "Install deps"
-  install_deps_for_revision
-
-  local pkg_runner="npm"
-  if [ -f pnpm-lock.yaml ]; then
-    pkg_runner="pnpm"
-  fi
+  pnpm install --frozen-lockfile
 
   print_step "Generate dts to $dts_filename"
-  $pkg_runner run clean
-  $pkg_runner run tsc
-  $pkg_runner run bundle-dts
+  pnpm clean
+  pnpm tsc
+  pnpm bundle-dts
   mv ./dist/typings.d.ts $dts_filename
 }
 
