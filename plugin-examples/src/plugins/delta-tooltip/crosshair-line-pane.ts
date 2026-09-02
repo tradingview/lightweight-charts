@@ -4,7 +4,7 @@ import {
 	IPrimitivePaneView,
 	PrimitivePaneViewZOrder,
 } from 'lightweight-charts';
-import { positionsLine } from '@tradingview/lwc-toolkit';
+import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
 
 class TooltipCrosshairLinePaneRenderer implements IPrimitivePaneRenderer {
 	_data: TooltipCrosshairLineData[];

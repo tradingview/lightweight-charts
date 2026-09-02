@@ -1,34 +1,96 @@
 {
   "name": "@tradingview/lwc-toolkit",
   "version": "1.0.0",
-  "private": true,
-  "description": "Shared helpers and plugin base class for Lightweight Charts™ plugins. Inlined into plugin bundles at build time, never published.",
+  "description": "Helpers for authoring Lightweight Charts™ plugins: pixel-perfect dimension calculations, a plugin base class, and time conversion.",
   "license": "Apache-2.0",
+  "author": "TradingView, Inc.",
   "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "keywords": [
+    "lightweight-charts",
+    "lwc-plugin",
+    "plugin-development",
+    "charting"
+  ],
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "./assertions": {
+      "types": "./dist/assertions.d.ts",
+      "default": "./dist/assertions.js"
+    },
+    "./closest-index": {
+      "types": "./dist/closest-index.d.ts",
+      "default": "./dist/closest-index.js"
+    },
+    "./delegate": {
+      "types": "./dist/delegate.d.ts",
+      "default": "./dist/delegate.js"
+    },
+    "./dimensions/candles": {
+      "types": "./dist/dimensions/candles.d.ts",
+      "default": "./dist/dimensions/candles.js"
+    },
+    "./dimensions/columns": {
+      "types": "./dist/dimensions/columns.d.ts",
+      "default": "./dist/dimensions/columns.js"
+    },
+    "./dimensions/common": {
+      "types": "./dist/dimensions/common.d.ts",
+      "default": "./dist/dimensions/common.js"
+    },
+    "./dimensions/crosshair-width": {
+      "types": "./dist/dimensions/crosshair-width.d.ts",
+      "default": "./dist/dimensions/crosshair-width.js"
+    },
+    "./dimensions/full-width": {
+      "types": "./dist/dimensions/full-width.d.ts",
+      "default": "./dist/dimensions/full-width.js"
+    },
+    "./dimensions/positions": {
+      "types": "./dist/dimensions/positions.d.ts",
+      "default": "./dist/dimensions/positions.js"
+    },
+    "./min-max-in-range": {
+      "types": "./dist/min-max-in-range.d.ts",
+      "default": "./dist/min-max-in-range.js"
+    },
+    "./plugin-base": {
+      "types": "./dist/plugin-base.d.ts",
+      "default": "./dist/plugin-base.js"
+    },
+    "./simple-clone": {
+      "types": "./dist/simple-clone.d.ts",
+      "default": "./dist/simple-clone.js"
+    },
+    "./time": {
+      "types": "./dist/time.d.ts",
+      "default": "./dist/time.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src",
+    "CHANGELOG.md",
+    "NOTICE"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tradingview/lightweight-charts.git",
     "directory": "packages/lwc-toolkit"
   },
+  "bugs": {
+    "url": "https://github.com/tradingview/lightweight-charts/issues"
+  },
+  "homepage": "https://www.tradingview.com/lightweight-charts/",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "lightweight-charts": "^5.2.0"
+    "lightweight-charts": "^5.0.0"
   },
   "devDependencies": {
     "lightweight-charts": "workspace:*",

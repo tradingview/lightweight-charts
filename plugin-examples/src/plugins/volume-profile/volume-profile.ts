@@ -12,7 +12,7 @@ import {
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
-import { positionsBox } from '@tradingview/lwc-toolkit';
+import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
 
 interface VolumeProfileItem {
 	y: Coordinate | null;

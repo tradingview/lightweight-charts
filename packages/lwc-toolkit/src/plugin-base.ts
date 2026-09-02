@@ -7,7 +7,7 @@ import {
 	SeriesOptionsMap,
 	Time,
 } from 'lightweight-charts';
-import { ensureDefined } from './helpers/assertions.js';
+import { ensureDefined } from './assertions.js';
 
 export abstract class PluginBase implements ISeriesPrimitive<Time> {
 	private _chart: IChartApi | undefined = undefined;

@@ -12,7 +12,9 @@ import {
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
-import { ensureDefined, PluginBase, positionsBox } from '@tradingview/lwc-toolkit';
+import { ensureDefined } from '@tradingview/lwc-toolkit/assertions';
+import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
+import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
 
 class RectanglePaneRenderer implements IPrimitivePaneRenderer {
 	_p1: ViewPoint;

@@ -10,10 +10,7 @@ import {
 } from 'lightweight-charts';
 import { GroupedBarsData } from './data';
 import { GroupedBarsSeriesOptions } from './options';
-import {
-	positionsBox,
-	positionsLine,
-} from '@tradingview/lwc-toolkit';
+import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
 
 /**
  * Proof of Concept WIP.

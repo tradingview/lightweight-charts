@@ -10,12 +10,9 @@ import {
 } from 'lightweight-charts';
 import { WhiskerData } from './sample-data';
 import { WhiskerBoxSeriesOptions } from './options';
-import {
-	positionsBox,
-	positionsLine,
-	gridAndCrosshairMediaWidth,
-	candlestickWidth,
-} from '@tradingview/lwc-toolkit';
+import { candlestickWidth } from '@tradingview/lwc-toolkit/dimensions/candles';
+import { gridAndCrosshairMediaWidth } from '@tradingview/lwc-toolkit/dimensions/crosshair-width';
+import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
 
 interface DesiredWidths {
 	body: number;

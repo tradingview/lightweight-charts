@@ -13,12 +13,9 @@ import {
 	RoundedCandleSeriesOptions,
 } from './rounded-candles-series';
 import { RoundedCandleSeriesData } from './data';
-import {
-	candlestickWidth,
-	gridAndCrosshairMediaWidth,
-	positionsBox,
-	positionsLine,
-} from '@tradingview/lwc-toolkit';
+import { candlestickWidth } from '@tradingview/lwc-toolkit/dimensions/candles';
+import { gridAndCrosshairMediaWidth } from '@tradingview/lwc-toolkit/dimensions/crosshair-width';
+import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
 
 interface BarItem {
 	openY: number;

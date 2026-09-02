@@ -10,11 +10,8 @@ import {
 } from 'lightweight-charts';
 import { StackedBarsData } from './data';
 import { StackedBarsSeriesOptions } from './options';
-import {
-	ColumnPosition,
-	calculateColumnPositionsInPlace,
-	positionsBox,
-} from '@tradingview/lwc-toolkit';
+import { ColumnPosition, calculateColumnPositionsInPlace } from '@tradingview/lwc-toolkit/dimensions/columns';
+import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
 
 interface StackedBarsBarItem {
 	x: number;
