@@ -168,6 +168,11 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
+      # The package compiles against `lightweight-charts`, which resolves to the
+      # repository root, whose `types` points into `dist/`. That does not exist
+      # until the library is built, so this job needs the build's output.
+      - attach_workspace:
+          at: ./
       - run: pnpm --filter @tradingview/lwc-toolkit typecheck
       - run: pnpm --filter @tradingview/lwc-toolkit build
       # Neither tsc nor Vite minds an extensionless relative specifier, so
@@ -432,7 +437,7 @@ workflows:
       - lwc-toolkit:
           filters: *default-filters
           requires:
-            - install-deps
+            - build
 
       - size-limit:
           filters: *default-filters
