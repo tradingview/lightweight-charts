@@ -1,5 +1,5 @@
 import { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts';
-import { Delegate, ISubscription } from '@tradingview/lwc-plugin-utils';
+import { Delegate, ISubscription } from '@tradingview/lwc-toolkit';
 
 export interface MousePosition {
 	x: number;

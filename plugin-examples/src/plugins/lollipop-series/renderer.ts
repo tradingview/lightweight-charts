@@ -14,7 +14,7 @@ import { LollipopSeriesOptions } from './options';
 import {
 	positionsBox,
 	positionsLine,
-} from '@tradingview/lwc-plugin-utils';
+} from '@tradingview/lwc-toolkit';
 
 interface LollipopBarItem {
 	x: number;

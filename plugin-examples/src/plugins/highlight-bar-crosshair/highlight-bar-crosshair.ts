@@ -9,7 +9,7 @@ import {
 	SeriesAttachedParameter,
 	Time,
 } from 'lightweight-charts';
-import { positionsLine } from '@tradingview/lwc-plugin-utils';
+import { positionsLine } from '@tradingview/lwc-toolkit';
 
 class CrosshairHighlightPaneRenderer implements IPrimitivePaneRenderer {
 	_data: CrosshairHighlightData;

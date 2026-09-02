@@ -231,7 +231,7 @@ importers:
         specifier: ^3.5.0
         version: 3.6.1(typescript@5.5.4)
 
-  packages/lwc-plugin-utils:
+  packages/lwc-toolkit:
     devDependencies:
       lightweight-charts:
         specifier: workspace:*
@@ -242,9 +242,9 @@ importers:
 
   plugin-examples:
     dependencies:
-      '@tradingview/lwc-plugin-utils':
+      '@tradingview/lwc-toolkit':
         specifier: workspace:*
-        version: link:../packages/lwc-plugin-utils
+        version: link:../packages/lwc-toolkit
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1

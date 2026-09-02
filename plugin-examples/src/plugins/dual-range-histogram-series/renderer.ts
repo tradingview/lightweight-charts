@@ -14,7 +14,7 @@ import {
 	ColumnPosition,
 	calculateColumnPositionsInPlace,
 	positionsBox,
-} from '@tradingview/lwc-plugin-utils';
+} from '@tradingview/lwc-toolkit';
 import {
 	drawRoundRectWithBorder,
 	LeftTopRightTopRightBottomLeftBottomRadii,

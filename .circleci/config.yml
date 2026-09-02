@@ -26,7 +26,7 @@ aliases:
         - plugin-examples/node_modules
         - indicator-examples/node_modules
         - packages/create-lwc-plugin/node_modules
-        - packages/lwc-plugin-utils/node_modules
+        - packages/lwc-toolkit/node_modules
         # puppeteer browser cache (see .puppeteerrc.cjs)
         - .cache
         # corepack-downloaded pnpm, so restore-only jobs don't re-download it

@@ -1,5 +1,5 @@
 {
-  "name": "@tradingview/lwc-plugin-utils",
+  "name": "@tradingview/lwc-toolkit",
   "version": "1.0.0",
   "private": true,
   "description": "Shared helpers and plugin base class for Lightweight Charts™ plugins. Inlined into plugin bundles at build time, never published.",
@@ -21,7 +21,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tradingview/lightweight-charts.git",
-    "directory": "packages/lwc-plugin-utils"
+    "directory": "packages/lwc-toolkit"
   },
   "scripts": {
     "build": "tsc",

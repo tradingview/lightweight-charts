@@ -18,7 +18,7 @@ import {
 	gridAndCrosshairMediaWidth,
 	positionsBox,
 	positionsLine,
-} from '@tradingview/lwc-plugin-utils';
+} from '@tradingview/lwc-toolkit';
 
 interface BarItem {
 	openY: number;

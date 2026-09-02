@@ -15,7 +15,7 @@ import {
 	positionsLine,
 	gridAndCrosshairMediaWidth,
 	candlestickWidth,
-} from '@tradingview/lwc-plugin-utils';
+} from '@tradingview/lwc-toolkit';
 
 interface DesiredWidths {
 	body: number;

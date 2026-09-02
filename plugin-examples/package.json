@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build:utils": "pnpm --filter @tradingview/lwc-plugin-utils build",
+        "build:utils": "pnpm --filter @tradingview/lwc-toolkit build",
         "build": "pnpm build:utils && tsc",
         "compile": "pnpm build:utils && tsc && node compile.mjs",
         "dev": "pnpm build:utils && vite --config src/vite.config.js",
@@ -14,7 +14,7 @@
         "vite": "7.2.0"
     },
     "dependencies": {
-        "@tradingview/lwc-plugin-utils": "workspace:*",
+        "@tradingview/lwc-toolkit": "workspace:*",
         "dts-bundle-generator": "9.5.1",
         "fancy-canvas": "2.1.0",
         "globby": "14.1.0",

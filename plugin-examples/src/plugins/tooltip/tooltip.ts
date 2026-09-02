@@ -13,7 +13,7 @@ import {
 	Time,
 } from 'lightweight-charts';
 import { TooltipElement, TooltipOptions } from './tooltip-element';
-import { convertTime, formattedDateAndTime, positionsLine } from '@tradingview/lwc-plugin-utils';
+import { convertTime, formattedDateAndTime, positionsLine } from '@tradingview/lwc-toolkit';
 
 class TooltipCrosshairLinePaneRenderer implements IPrimitivePaneRenderer {
 	_data: TooltipCrosshairLineData;

@@ -19,7 +19,7 @@ import {
 	cloneReadonly,
 	ClosestTimeIndexFinder,
 	UpperLowerInRange,
-} from '@tradingview/lwc-plugin-utils';
+} from '@tradingview/lwc-toolkit';
 
 interface BandRendererData {
 	x: Coordinate | number;
