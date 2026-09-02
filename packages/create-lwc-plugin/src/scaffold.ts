@@ -152,10 +152,6 @@ export function scaffold(answers: Answers, baseDir: string): string {
 	}
 
 	const skipCommonFiles = new Set(['package.json']);
-	if (answers.workspace) {
-		// The repository already ignores build output for every package.
-		skipCommonFiles.add('_gitignore');
-	}
 	for (const file of fs.readdirSync(commonTemplateDir)) {
 		if (skipCommonFiles.has(file)) continue;
 		write(commonTemplateDir, file);
