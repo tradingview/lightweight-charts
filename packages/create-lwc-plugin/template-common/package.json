@@ -44,7 +44,7 @@
 		"@tradingview/lwc-toolkit": "~1.0.0",
 		"dts-bundle-generator": "~9.5.1",
 		"lightweight-charts": "_PEERVERSION_",
-		"typescript": "~5.5.4",
+		"typescript": "~5.9.3",
 		"vite": "~8.2.2"
 	},
 	"lwcPlugin": {

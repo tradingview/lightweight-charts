@@ -9,7 +9,7 @@
         "build:examples:site": "vite build --config src/vite.config.js && node build-website.mjs"
     },
     "devDependencies": {
-        "typescript": "5.5.4",
+        "typescript": "5.9.3",
         "vite": "7.2.0"
     },
     "dependencies": {
