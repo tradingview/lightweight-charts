@@ -2,7 +2,7 @@
 sidebar_position: 0
 sidebar_label: Columns
 pagination_title: Histogram Column Widths
-title: Histogram Column Width Calculations
+title: Histogram column width calculations
 description: Describes the calculation for histogram column widths
 keywords:
   - plugins

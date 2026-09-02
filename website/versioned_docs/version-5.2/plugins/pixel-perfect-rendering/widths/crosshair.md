@@ -2,7 +2,7 @@
 sidebar_position: 0
 sidebar_label: Crosshair
 pagination_title: Crosshair Widths
-title: Crosshair and Grid Line Width Calculations
+title: Crosshair and grid line width calculations
 description: Describes the calculation for the crosshair line and grid line widths
 keywords:
   - plugins
