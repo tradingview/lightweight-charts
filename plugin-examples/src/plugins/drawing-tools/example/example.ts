@@ -1,6 +1,6 @@
 import { LineSeries, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
-import { RectangleDrawingTool } from '../rectangle-drawing-tool';
+import { DrawingTools } from '../drawing-tools';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
@@ -10,7 +10,7 @@ const lineSeries = chart.addSeries(LineSeries);
 const data = generateLineData();
 lineSeries.setData(data);
 
-new RectangleDrawingTool(
+new DrawingTools(
 	chart,
 	lineSeries,
 	document.querySelector<HTMLDivElement>('#toolbar')!,
