@@ -126,7 +126,7 @@
     "scaffold-plugin": "pnpm --filter create-lwc-plugin build && node packages/create-lwc-plugin/index.js --workspace",
     "lint": "npm-run-all -p lint:**",
     "lint:eslint": "eslint --format=unix ./",
-    "lint:md": "markdownlint -i \"**/node_modules/**\" -i \"**/website/docs/api/**\" -i \"**/website/versioned_docs/**/api/**\" -i \"**/*.mdx\" \"**/*.md\"",
+    "lint:md": "markdownlint \"**/*.md\"",
     "check-dts-docs": "npm-run-all -p check-dts-docs-duplicates check-dts-docs-eslint",
     "check-dts-docs-duplicates": "node ./scripts/check-typings-for-duplicates.js ./dist/typings.d.ts",
     "check-dts-docs-eslint": "eslint --format=unix ./dist/typings.d.ts --no-ignore",

@@ -1,5 +1,19 @@
+node_modules/
+
+# Generated API reference, and the copies of it kept per docs version.
+website/docs/api/
+website/versioned_docs/*/api/
+
+# Docusaurus build output, present after a local `pnpm --filter …-website build`.
+website/build/
+
 # Scaffolding templates, not documents: their placeholders are not valid prose.
 # `_DESCRIPTION_` and friends are emphasis as far as markdown is concerned, so
 # rules such as MD036 always fire on them. The README generated from these
 # templates is linted like any other file.
-packages/create-lwc-plugin/template-*/**
+packages/create-lwc-plugin/template-*/
+
+# Personal, untracked notes kept alongside the checked-in docs. Not ours to
+# lint, and not present on every checkout, so an ignore file is the only place
+# this can live.
+*.local.md
