@@ -26,6 +26,7 @@ aliases:
         - plugin-examples/node_modules
         - indicator-examples/node_modules
         - packages/create-lwc-plugin/node_modules
+        - packages/lwc-plugin-utils/node_modules
         # puppeteer browser cache (see .puppeteerrc.cjs)
         - .cache
         # corepack-downloaded pnpm, so restore-only jobs don't re-download it
@@ -285,6 +286,20 @@ jobs:
           command: node scripts/compare-size-with-merge-base.js
       - run: pnpm size-limit
 
+  build-plugin-examples:
+    executor: node-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      # builds @tradingview/lwc-plugin-utils first (via the build:utils
+      # pre-step), typechecks all plugin sources against it and compiles
+      # every plugin, including the bundled typings that must inline the
+      # utils package
+      - run:
+          command: pnpm --filter lightweight-charts-plugin-examples compile
+          no_output_timeout: 5m
+
   build-docusaurus-website:
     executor: node-executor
     resource_class: medium+
@@ -431,6 +446,10 @@ workflows:
           requires:
             - build
       - lint-eslint:
+          filters: *default-filters
+          requires:
+            - build
+      - build-plugin-examples:
           filters: *default-filters
           requires:
             - build

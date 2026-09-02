@@ -13,9 +13,9 @@ import { WhiskerBoxSeriesOptions } from './options';
 import {
 	positionsBox,
 	positionsLine,
-} from '../../helpers/dimensions/positions';
-import { gridAndCrosshairMediaWidth } from '../../helpers/dimensions/crosshair-width';
-import { candlestickWidth } from '../../helpers/dimensions/candles';
+	gridAndCrosshairMediaWidth,
+	candlestickWidth,
+} from '@tradingview/lwc-plugin-utils';
 
 interface DesiredWidths {
 	body: number;

@@ -13,7 +13,7 @@ import { GroupedBarsSeriesOptions } from './options';
 import {
 	positionsBox,
 	positionsLine,
-} from '../../helpers/dimensions/positions';
+} from '@tradingview/lwc-plugin-utils';
 
 /**
  * Proof of Concept WIP.

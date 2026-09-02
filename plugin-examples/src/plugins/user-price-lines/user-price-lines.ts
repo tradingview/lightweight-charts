@@ -8,10 +8,13 @@ import {
 	MouseEventParams,
 	SeriesType,
 	PrimitivePaneViewZOrder,
-	LineStyle
+	LineStyle,
 } from 'lightweight-charts';
-import { PluginBase } from '../plugin-base';
-import { positionsBox, positionsLine } from '../../helpers/dimensions/positions';
+import {
+	PluginBase,
+	positionsBox,
+	positionsLine,
+} from '@tradingview/lwc-plugin-utils';
 
 const LABEL_HEIGHT = 21;
 const plusIcon = `M7.5,7.5 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0 M4 7.5H11 M7.5 4V11`;

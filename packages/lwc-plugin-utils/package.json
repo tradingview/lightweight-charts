@@ -1,0 +1,37 @@
+{
+  "name": "@tradingview/lwc-plugin-utils",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared helpers and plugin base class for Lightweight Charts™ plugins. Inlined into plugin bundles at build time, never published.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tradingview/lightweight-charts.git",
+    "directory": "packages/lwc-plugin-utils"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "lightweight-charts": "^5.2.0"
+  },
+  "devDependencies": {
+    "lightweight-charts": "workspace:*",
+    "typescript": "5.5.4"
+  }
+}

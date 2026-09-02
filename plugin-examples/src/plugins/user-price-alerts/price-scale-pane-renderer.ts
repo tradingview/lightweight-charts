@@ -1,7 +1,7 @@
 import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
 import { PaneRendererBase } from './renderer-base';
 import { buttonHeight } from './constants';
-import { positionsLine } from '../../helpers/dimensions/positions';
+import { positionsLine } from '@tradingview/lwc-plugin-utils';
 
 export class PriceScalePaneRenderer extends PaneRendererBase {
 	draw(target: CanvasRenderingTarget2D): void {

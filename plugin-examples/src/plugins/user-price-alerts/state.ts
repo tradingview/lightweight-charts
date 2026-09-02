@@ -1,4 +1,4 @@
-import { Delegate } from '../../helpers/delegate';
+import { Delegate } from '@tradingview/lwc-plugin-utils';
 
 export interface UserAlertInfo {
 	id: string;

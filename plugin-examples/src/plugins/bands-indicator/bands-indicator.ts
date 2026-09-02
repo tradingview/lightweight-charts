@@ -14,10 +14,12 @@ import {
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
-import { PluginBase } from '../plugin-base';
-import { cloneReadonly } from '../../helpers/simple-clone';
-import { ClosestTimeIndexFinder } from '../../helpers/closest-index';
-import { UpperLowerInRange } from '../../helpers/min-max-in-range';
+import {
+	PluginBase,
+	cloneReadonly,
+	ClosestTimeIndexFinder,
+	UpperLowerInRange,
+} from '@tradingview/lwc-plugin-utils';
 
 interface BandRendererData {
 	x: Coordinate | number;

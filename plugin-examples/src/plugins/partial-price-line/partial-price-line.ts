@@ -14,7 +14,7 @@ import {
 	Time,
 	WhitespaceData,
 } from 'lightweight-charts';
-import { positionsLine } from '../../helpers/dimensions/positions';
+import { positionsLine } from '@tradingview/lwc-plugin-utils';
 
 class PartialPriceLineRenderer implements IPrimitivePaneRenderer {
 	_price: number | null = null;

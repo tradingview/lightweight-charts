@@ -1,7 +1,7 @@
 import { CanvasRenderingTarget2D } from "fancy-canvas";
 import { IPrimitivePaneRenderer } from 'lightweight-charts';
 import { iconDimensions } from "./icons";
-import { positionsLine } from "../../helpers/dimensions/positions";
+import { positionsLine } from "@tradingview/lwc-plugin-utils";
 
 export interface RendererDataItem {
 	priceY: number;

@@ -13,8 +13,8 @@ import { StackedBarsSeriesOptions } from './options';
 import {
 	ColumnPosition,
 	calculateColumnPositionsInPlace,
-} from '../../helpers/dimensions/columns';
-import { positionsBox } from '../../helpers/dimensions/positions';
+	positionsBox,
+} from '@tradingview/lwc-plugin-utils';
 
 interface StackedBarsBarItem {
 	x: number;

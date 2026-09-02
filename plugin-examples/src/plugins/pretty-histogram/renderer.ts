@@ -4,7 +4,7 @@ import { CustomBarItemData, ICustomSeriesPaneRenderer, PaneRendererCustomData, P
 
 import { PrettyHistogramSeriesOptions } from './options';
 import { PrettyHistogramData } from './data';
-import { positionsBox } from '../../helpers/dimensions/positions';
+import { positionsBox } from '@tradingview/lwc-plugin-utils';
 
 interface PrettyHistogramBarItem {
 	x: number;

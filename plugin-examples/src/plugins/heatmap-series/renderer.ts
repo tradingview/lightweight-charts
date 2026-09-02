@@ -10,8 +10,7 @@ import {
 } from 'lightweight-charts';
 import { HeatMapData } from './data';
 import { HeatMapSeriesOptions } from './options';
-import { fullBarWidth } from '../../helpers/dimensions/full-width';
-import { positionsBox } from '../../helpers/dimensions/positions';
+import { fullBarWidth, positionsBox } from '@tradingview/lwc-plugin-utils';
 
 interface HeatMapBarItemCell {
 	low: number;

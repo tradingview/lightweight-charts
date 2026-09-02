@@ -11,7 +11,7 @@ import {
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
-import { positionsLine } from '../../helpers/dimensions/positions';
+import { positionsLine } from '@tradingview/lwc-plugin-utils';
 
 class VertLinePaneRenderer implements IPrimitivePaneRenderer {
 	_x: Coordinate | null = null;

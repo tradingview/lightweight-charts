@@ -9,7 +9,7 @@ import {
 	Time,
 } from 'lightweight-charts';
 import { BackgroundShadeSeriesOptions } from './options';
-import { fullBarWidth } from '../../helpers/dimensions/full-width';
+import { fullBarWidth } from '@tradingview/lwc-plugin-utils';
 
 type RGBColor = [number, number, number];
 

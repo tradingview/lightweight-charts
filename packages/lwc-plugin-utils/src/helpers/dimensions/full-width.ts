@@ -1,4 +1,4 @@
-import { BitmapPositionLength } from './common';
+import { BitmapPositionLength } from './common.js';
 
 /**
  * Calculates the position and width which will completely full the space for the bar.

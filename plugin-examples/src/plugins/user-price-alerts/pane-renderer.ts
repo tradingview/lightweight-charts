@@ -18,7 +18,7 @@ import {
 	labelHeight,
 	removeButtonWidth,
 } from './constants';
-import { positionsLine } from '../../helpers/dimensions/positions';
+import { positionsLine } from '@tradingview/lwc-plugin-utils';
 
 export class PaneRenderer extends PaneRendererBase {
 	draw(target: CanvasRenderingTarget2D): void {
