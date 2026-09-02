@@ -3,7 +3,7 @@ import { _CLASSNAME_PaneRenderer } from './pane-renderer';
 import { _CLASSNAME_Options } from './options';
 
 export class _CLASSNAME_PaneView implements IPanePrimitivePaneView {
-	_options: _CLASSNAME_Options;
+	private _options: _CLASSNAME_Options;
 
 	constructor(options: _CLASSNAME_Options) {
 		this._options = options;

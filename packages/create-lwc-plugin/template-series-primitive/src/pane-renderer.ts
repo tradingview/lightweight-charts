@@ -4,9 +4,9 @@ import { ViewPoint } from './pane-view';
 import { positionsBox } from './helpers/dimensions/positions';
 
 export class _CLASSNAME_PaneRenderer implements IPrimitivePaneRenderer {
-	_p1: ViewPoint;
-	_p2: ViewPoint;
-	_fillColor: string;
+	private _p1: ViewPoint;
+	private _p2: ViewPoint;
+	private _fillColor: string;
 
 	constructor(p1: ViewPoint, p2: ViewPoint, fillColor: string) {
 		this._p1 = p1;

@@ -20,8 +20,8 @@ interface _CLASSNAME_Item {
 export class _CLASSNAME_Renderer<TData extends _CLASSNAME_Data>
 	implements ICustomSeriesPaneRenderer
 {
-	_data: PaneRendererCustomData<Time, TData> | null = null;
-	_options: _CLASSNAME_Options | null = null;
+	private _data: PaneRendererCustomData<Time, TData> | null = null;
+	private _options: _CLASSNAME_Options | null = null;
 
 	draw(
 		target: CanvasRenderingTarget2D,
@@ -40,7 +40,7 @@ export class _CLASSNAME_Renderer<TData extends _CLASSNAME_Data>
 		this._options = options;
 	}
 
-	_drawImpl(
+	private _drawImpl(
 		renderingScope: BitmapCoordinatesRenderingScope,
 		priceToCoordinate: PriceToCoordinateConverter
 	): void {

@@ -22,16 +22,16 @@ export function entryNameFor(packageName: string): string {
 		.replace(/^lwc-plugin-/, '');
 }
 
-/**
- * Builds the published manifest from the template, applying the differences
- * between a standalone community project and an in-repo workspace package.
- */
 function sortedByKey(record: Record<string, string>): Record<string, string> {
 	return Object.fromEntries(
 		Object.entries(record).sort(([a], [b]) => a.localeCompare(b))
 	);
 }
 
+/**
+ * Builds the published manifest from the template, applying the differences
+ * between a standalone community project and an in-repo workspace package.
+ */
 function buildPackageJson(template: string, answers: Answers): string {
 	const pkg = JSON.parse(template);
 
@@ -92,7 +92,6 @@ export function scaffold(answers: Answers, baseDir: string): string {
 	const substitutions: [string, string][] = [
 		[ENTRY_PLACEHOLDER, entryName],
 		['_ATTACH_SNIPPET_', snippets.attach],
-		['_CDN_SNIPPET_', snippets.cdnAttach],
 		['_USAGE_SNIPPET_', snippets.usage],
 		['_ENTRYNAME_', entryName],
 		['_PLUGINNAME_', answers.name],
@@ -109,6 +108,17 @@ export function scaffold(answers: Answers, baseDir: string): string {
 	const forJsonString = (value: string): string =>
 		JSON.stringify(value).slice(1, -1);
 
+	/*
+	 Sections marked as external-only cover publishing the package yourself, which
+	 an official in-repo package does not do: it is released by the repository's
+	 own tooling. The markers are dropped either way.
+	 */
+	const applyConditionalSections = (content: string): string =>
+		content.replace(
+			/<!-- EXTERNAL_ONLY -->\n([\s\S]*?)<!-- \/EXTERNAL_ONLY -->\n/g,
+			(_match, section: string) => (answers.workspace ? '' : section)
+		);
+
 	const makeReplacer =
 		(escape: (value: string) => string) =>
 		(content: string): string => {
@@ -117,6 +127,7 @@ export function scaffold(answers: Answers, baseDir: string): string {
 				const replacement = escape(value);
 				result = result.replaceAll(placeholder, () => replacement);
 			}
+			result = applyConditionalSections(result);
 			if (answers.includeHints) {
 				return result;
 			}

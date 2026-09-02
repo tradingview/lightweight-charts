@@ -12,7 +12,7 @@ import { _CLASSNAME_Data } from './data';
 export class _CLASSNAME_<TData extends _CLASSNAME_Data>
 	implements ICustomSeriesPaneView<Time, TData, _CLASSNAME_Options>
 {
-	_renderer: _CLASSNAME_Renderer<TData>;
+	private _renderer: _CLASSNAME_Renderer<TData>;
 
 	constructor() {
 		this._renderer = new _CLASSNAME_Renderer();

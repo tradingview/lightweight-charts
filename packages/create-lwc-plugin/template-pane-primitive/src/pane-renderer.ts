@@ -3,7 +3,7 @@ import { IPrimitivePaneRenderer } from 'lightweight-charts';
 import { _CLASSNAME_Options } from './options';
 
 export class _CLASSNAME_PaneRenderer implements IPrimitivePaneRenderer {
-	_options: _CLASSNAME_Options;
+	private _options: _CLASSNAME_Options;
 
 	constructor(options: _CLASSNAME_Options) {
 		this._options = options;

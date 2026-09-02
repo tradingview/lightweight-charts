@@ -2,9 +2,9 @@ import { Coordinate, ISeriesPrimitiveAxisView } from 'lightweight-charts';
 import { Point, _CLASSNAME_DataSource } from './data-source';
 
 abstract class _CLASSNAME_AxisView implements ISeriesPrimitiveAxisView {
-	_source: _CLASSNAME_DataSource;
-	_p: Point;
-	_pos: Coordinate | null = null;
+	protected _source: _CLASSNAME_DataSource;
+	protected _p: Point;
+	protected _pos: Coordinate | null = null;
 	constructor(source: _CLASSNAME_DataSource, p: Point) {
 		this._source = source;
 		this._p = p;

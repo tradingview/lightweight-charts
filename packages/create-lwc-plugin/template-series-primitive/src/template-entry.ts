@@ -13,14 +13,14 @@ export class _CLASSNAME_
 	extends PluginBase
 	implements _CLASSNAME_DataSource
 {
-	_options: _CLASSNAME_Options;
-	_p1: Point;
-	_p2: Point;
-	_paneViews: _CLASSNAME_PaneView[];
-	_timeAxisViews: _CLASSNAME_TimeAxisView[];
-	_priceAxisViews: _CLASSNAME_PriceAxisView[];
-	_priceAxisPaneViews: _CLASSNAME_PriceAxisPaneView[];
-	_timeAxisPaneViews: _CLASSNAME_TimeAxisPaneView[];
+	private _options: _CLASSNAME_Options;
+	private _p1: Point;
+	private _p2: Point;
+	private _paneViews: _CLASSNAME_PaneView[];
+	private _timeAxisViews: _CLASSNAME_TimeAxisView[];
+	private _priceAxisViews: _CLASSNAME_PriceAxisView[];
+	private _priceAxisPaneViews: _CLASSNAME_PriceAxisPaneView[];
+	private _timeAxisPaneViews: _CLASSNAME_TimeAxisPaneView[];
 
 	constructor(
 		p1: Point,
@@ -107,7 +107,7 @@ export class _CLASSNAME_
 		//* series has changed.
 	}
 
-	_timeCurrentlyVisible(
+	private _timeCurrentlyVisible(
 		time: Time,
 		startTimePoint: Logical,
 		endTimePoint: Logical

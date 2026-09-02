@@ -27,24 +27,25 @@ _ATTACH_SNIPPET_
 
 ### CDN
 
-The plugin is published as ES modules. Add an import map so that its
-`lightweight-charts` import resolves, then import the standalone build:
+The plugin is published as ES modules. Map the library and the plugin to their
+CDN builds with an import map:
 
 ```html
 <script type="importmap">
 {
   "imports": {
-    "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs"
+    "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
+    "_PACKAGENAME_": "https://unpkg.com/_PACKAGENAME_/dist/_ENTRYNAME_.standalone.js"
   }
 }
 </script>
 ```
 
-The plugin itself is imported inside a module script:
+The plugin can then be imported by name, exactly as it is under a bundler:
 
 ```html
 <script type="module">
-_CDN_SNIPPET_
+_ATTACH_SNIPPET_
 </script>
 ```
 
@@ -94,6 +95,7 @@ This produces the package entry point (`dist/_ENTRYNAME_.js`), the standalone
 build used over a CDN (`dist/_ENTRYNAME_.standalone.js`) and the bundled type
 declarations (`dist/_ENTRYNAME_.d.ts`).
 
+<!-- EXTERNAL_ONLY -->
 ## Publishing to npm
 
 The `package.json` in the project root is the published manifest: check the
@@ -111,3 +113,4 @@ Hint: append `--dry-run` to inspect the result without uploading anything.
 Tag the plugin so that others can find it: add the `lightweight-charts-plugin`
 topic to its GitHub repository, and keep the `lightweight-charts-plugin` keyword
 in `package.json`.
+<!-- /EXTERNAL_ONLY -->

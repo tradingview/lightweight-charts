@@ -28,8 +28,15 @@ if (!existsSync(compiledFolder)) {
  - `<name>.js`         the package entry point. Every dependency stays external,
                        so a bundler in the consuming project can deduplicate them.
  - `<name>.standalone.js`  for use straight from a CDN. Everything except
-                       `lightweight-charts` itself is inlined, so the file can be
-                       imported on its own with no install step.
+                       `lightweight-charts` itself is inlined and the result is
+                       minified, so the file can be imported on its own with no
+                       install step. The entry point is left unminified: whatever
+                       bundles it will minify it in turn.
+
+ The bundler's own minifier is used, which mangles names and drops comments and
+ dead code but keeps line breaks. That is deliberate: a dedicated minifier saves
+ only a couple of hundred more bytes over the wire on a bundle this size, and is
+ not worth an extra dependency in every plugin project.
  */
 const buildConfig = ({ filepath, exportName, standalone = false }) => {
 	return defineConfig({
@@ -38,6 +45,7 @@ const buildConfig = ({ filepath, exportName, standalone = false }) => {
 			outDir: 'dist',
 			// Both passes write into the same folder, so only the first may clear it.
 			emptyOutDir: false,
+			minify: standalone,
 			copyPublicDir: false,
 			lib: {
 				entry: filepath,
@@ -68,8 +76,20 @@ for (const file of pluginsToBuild) {
 	const esModuleTyping = generateDtsBundle([
 		{
 			filePath: `./typings/${pluginFileName}.d.ts`,
+			libraries: {
+				importedLibraries: ['lightweight-charts', 'fancy-canvas'],
+			},
 		},
-	]);
+	], {
+		/*
+		 dts-bundle-generator treats a dependency as an external library only when
+		 its resolved path sits in node_modules, and it inlines anything else. A
+		 linked dependency resolves outside node_modules, so without this the
+		 library's entire public typings would be inlined into the bundle instead
+		 of imported from it.
+		 */
+		followSymlinks: false,
+	});
 	const typingFilePath = resolve(compiledFolder, `${file.exportName}.d.ts`);
 	writeFileSync(typingFilePath, esModuleTyping.join('\n'), {
 		encoding: 'utf-8',

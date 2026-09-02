@@ -8,9 +8,9 @@ export interface ViewPoint {
 }
 
 export class _CLASSNAME_PaneView implements IPrimitivePaneView {
-	_source: _CLASSNAME_DataSource;
-	_p1: ViewPoint = { x: null, y: null };
-	_p2: ViewPoint = { x: null, y: null };
+	private _source: _CLASSNAME_DataSource;
+	private _p1: ViewPoint = { x: null, y: null };
+	private _p2: ViewPoint = { x: null, y: null };
 
 	constructor(source: _CLASSNAME_DataSource) {
 		this._source = source;

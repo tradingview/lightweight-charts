@@ -25,7 +25,7 @@ export const categoryTemplates: Record<PluginCategory, string> = {
 
 const WORKSPACE_SCOPE = '@tradingview/';
 const WORKSPACE_LICENSE = 'Apache-2.0';
-const WORKSPACE_AUTHOR = 'TradingView, Inc.';
+const WORKSPACE_AUTHOR = 'TradingView';
 
 export interface Answers {
 	category: PluginCategory;

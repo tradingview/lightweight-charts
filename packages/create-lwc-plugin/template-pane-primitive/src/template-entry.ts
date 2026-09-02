@@ -9,9 +9,9 @@ import { _CLASSNAME_PaneView } from './pane-view';
  * a good fit for pane-level decoration: titles, badges, legends, watermarks.
  */
 export class _CLASSNAME_<T = Time> implements IPanePrimitive<T> {
-	_options: _CLASSNAME_Options;
-	_paneViews: _CLASSNAME_PaneView[];
-	_requestUpdate?: () => void;
+	private _options: _CLASSNAME_Options;
+	private _paneViews: _CLASSNAME_PaneView[];
+	private _requestUpdate?: () => void;
 
 	constructor(options: Partial<_CLASSNAME_Options> = {}) {
 		this._options = {

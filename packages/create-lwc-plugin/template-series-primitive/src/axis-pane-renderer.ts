@@ -3,10 +3,10 @@ import { IPrimitivePaneRenderer } from 'lightweight-charts';
 import { positionsBox } from './helpers/dimensions/positions';
 
 export class _CLASSNAME_AxisPaneRenderer implements IPrimitivePaneRenderer {
-	_p1: number | null;
-	_p2: number | null;
-	_fillColor: string;
-	_vertical: boolean = false;
+	private _p1: number | null;
+	private _p2: number | null;
+	private _fillColor: string;
+	private _vertical: boolean = false;
 
 	constructor(
 		p1: number | null,

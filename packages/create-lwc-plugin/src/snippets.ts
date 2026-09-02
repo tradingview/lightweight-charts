@@ -1,16 +1,18 @@
 import { PluginCategory } from './questions';
 
 export interface ReadmeSnippets {
-	/** Minimal integration snippet, importing the plugin from the package. */
+	/** Minimal integration snippet. */
 	attach: string;
-	/** The same integration, importing the standalone build from a CDN. */
-	cdnAttach: string;
 	/** A fuller snippet showing data and options. */
 	usage: string;
 }
 
-const NPM_IMPORT = `import { _CLASSNAME_ } from '_PACKAGENAME_';`;
-const CDN_IMPORT = `import { _CLASSNAME_ } from 'https://unpkg.com/_PACKAGENAME_/dist/_ENTRYNAME_.standalone.js';`;
+/*
+ The plugin is imported by name in both the npm and the CDN snippet: over a CDN
+ an import map points that name at the standalone build, so the integration code
+ is identical either way.
+ */
+const PLUGIN_IMPORT = `import { _CLASSNAME_ } from '_PACKAGENAME_';`;
 
 function snippets(
 	libraryImports: string,
@@ -20,9 +22,8 @@ function snippets(
 	const chart = `const chart = createChart(document.getElementById('container'));`;
 	const libImport = `import { ${libraryImports} } from 'lightweight-charts';`;
 	return {
-		attach: [libImport, NPM_IMPORT, '', chart, body].join('\n'),
-		cdnAttach: [libImport, CDN_IMPORT, '', chart, body].join('\n'),
-		usage: [libImport, NPM_IMPORT, '', chart, usageBody].join('\n'),
+		attach: [libImport, PLUGIN_IMPORT, '', chart, body].join('\n'),
+		usage: [libImport, PLUGIN_IMPORT, '', chart, usageBody].join('\n'),
 	};
 }
 

@@ -7,10 +7,10 @@ import { _CLASSNAME_AxisPaneRenderer } from './axis-pane-renderer';
 import { _CLASSNAME_DataSource } from './data-source';
 
 abstract class _CLASSNAME_AxisPaneView implements IPrimitivePaneView {
-	_source: _CLASSNAME_DataSource;
-	_p1: number | null = null;
-	_p2: number | null = null;
-	_vertical: boolean = false;
+	protected _source: _CLASSNAME_DataSource;
+	protected _p1: number | null = null;
+	protected _p2: number | null = null;
+	protected _vertical: boolean = false;
 
 	constructor(source: _CLASSNAME_DataSource, vertical: boolean) {
 		this._source = source;
