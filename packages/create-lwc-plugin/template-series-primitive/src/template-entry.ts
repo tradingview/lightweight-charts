@@ -7,7 +7,7 @@ import { _CLASSNAME_PriceAxisView, _CLASSNAME_TimeAxisView } from './axis-view';
 import { Point, _CLASSNAME_DataSource } from './data-source';
 import { _CLASSNAME_Options, defaultOptions } from './options';
 import { _CLASSNAME_PaneView } from './pane-view';
-import { PluginBase } from './plugin-base';
+import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
 
 export class _CLASSNAME_
 	extends PluginBase

@@ -46,9 +46,11 @@ function buildPackageJson(template: string, answers: Answers): string {
 	if (answers.workspace) {
 		pkg.files = ['dist', 'CHANGELOG.md', 'NOTICE'];
 		pkg.lwcPlugin.origin = 'official';
+		// In the monorepo both come from the workspace rather than the registry.
+		// The published peerDependency range is untouched — that is the contract.
 		pkg.devDependencies = sortedByKey({
 			...pkg.devDependencies,
-			'@tradingview/lwc-plugin-utils': 'workspace:*',
+			'@tradingview/lwc-toolkit': 'workspace:*',
 			'lightweight-charts': 'workspace:*',
 		});
 	} else {

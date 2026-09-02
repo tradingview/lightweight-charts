@@ -78,6 +78,16 @@ for (const file of pluginsToBuild) {
 			filePath: `./typings/${pluginFileName}.d.ts`,
 			libraries: {
 				importedLibraries: ['lightweight-charts', 'fancy-canvas'],
+				/*
+				 The toolkit is a devDependency that the bundler inlines into the
+				 plugin's own output, so its types have to be inlined into the
+				 declarations to match. Listing it is not optional: with
+				 `followSymlinks: false` below it counts as an external library, and
+				 an external library in neither list is emitted as neither a
+				 declaration nor an import — leaving a .d.ts that references types it
+				 never declares. `skipLibCheck` hides that from consumers.
+				 */
+				inlinedLibraries: ['@tradingview/lwc-toolkit'],
 			},
 		},
 	], {

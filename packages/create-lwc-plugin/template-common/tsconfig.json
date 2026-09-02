@@ -4,7 +4,9 @@
 		"useDefineForClassFields": true,
 		"module": "ESNext",
 		"lib": ["ESNext", "DOM"],
-		"moduleResolution": "Node",
+		// The toolkit exposes each helper as its own `exports` sub-path, and the
+		// legacy "Node" resolver ignores `exports` altogether.
+		"moduleResolution": "Bundler",
 		"strict": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,

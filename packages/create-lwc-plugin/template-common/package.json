@@ -41,6 +41,7 @@
 		"fancy-canvas": "~2.1.0"
 	},
 	"devDependencies": {
+		"@tradingview/lwc-toolkit": "~1.0.0",
 		"dts-bundle-generator": "~9.5.1",
 		"lightweight-charts": "_PEERVERSION_",
 		"typescript": "~5.5.4",

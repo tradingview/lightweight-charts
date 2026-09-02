@@ -96,6 +96,23 @@ build used over a CDN (`dist/_ENTRYNAME_.standalone.js`) and the bundled type
 declarations (`dist/_ENTRYNAME_.d.ts`).
 
 <!-- EXTERNAL_ONLY -->
+## The plugin toolkit
+
+This project depends on
+[`@tradingview/lwc-toolkit`](https://www.npmjs.com/package/@tradingview/lwc-toolkit),
+a small set of helpers written for plugin authors: pixel-perfect coordinate and
+width calculations for candles, columns and full-width bars, crosshair-aligned
+line widths, time conversion, and a `PluginBase` class that keeps the chart and
+series references wired up for you.
+
+Depending on the starter this project was generated from, the code may already
+use it — check the imports in `src/`. It is a `devDependency`, bundled into
+`dist/` when the plugin is built, so it never becomes a dependency for anyone
+installing the plugin. If none of it is needed, uninstall it; nothing else has
+to change.
+<!-- /EXTERNAL_ONLY -->
+
+<!-- EXTERNAL_ONLY -->
 ## Publishing to npm
 
 The `package.json` in the project root is the published manifest: check the

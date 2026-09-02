@@ -1,7 +1,7 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import { IPrimitivePaneRenderer } from 'lightweight-charts';
 import { ViewPoint } from './pane-view';
-import { positionsBox } from './helpers/dimensions/positions';
+import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
 
 export class _CLASSNAME_PaneRenderer implements IPrimitivePaneRenderer {
 	private _p1: ViewPoint;
