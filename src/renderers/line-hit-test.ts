@@ -52,7 +52,7 @@ function lineSegmentHorizontalBounds(
 ): [number, number] {
 	switch (lineType) {
 		case LineType.Curved: {
-			const [firstControlPoint, secondControlPoint] = getControlPoints(items, toItemIndex - 1, toItemIndex);
+			const [firstControlPoint, secondControlPoint] = getControlPoints(items, toItemIndex);
 			const minX = Math.min(firstItem.x, secondItem.x, firstControlPoint.x, secondControlPoint.x);
 			const maxX = Math.max(firstItem.x, secondItem.x, firstControlPoint.x, secondControlPoint.x);
 			return [minX, maxX];
@@ -87,7 +87,7 @@ function hitTestLineSegment(
 				return minDistance <= radius ? minDistance : null;
 			}
 		case LineType.Curved: {
-			const [firstControlPoint, secondControlPoint] = getControlPoints(items, toItemIndex - 1, toItemIndex);
+			const [firstControlPoint, secondControlPoint] = getControlPoints(items, toItemIndex);
 			const distance = distanceToBezierCurve(x, y, [firstItem, firstControlPoint, secondControlPoint, secondItem]);
 			return distance <= radius ? distance : null;
 		}
