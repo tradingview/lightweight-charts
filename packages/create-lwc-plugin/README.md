@@ -4,18 +4,23 @@
 creating a new plugin for Lightweight Charts™. With this generator, you can
 quickly scaffold a project from a template for either
 
-- a Drawing primitive plugin, or
+- a Series primitive plugin,
+- a Pane primitive plugin, or
 - a Custom series plugin.
 
 By using this wizard-like tool, you can customize the initial setup of their
 plugin project by answering a few questions. This allows for a seamless and
 efficient starting point, saving valuable time and effort.
 
-Whether you are developing a new Drawing primitive plugin or a Custom series
-plugin for Lightweight Charts, this generator provides a structured and
-organized foundation. It ensures that your plugin adheres to the best practices
-and conventions of Lightweight Charts, making it easier to develop, maintain,
-and contribute to the community.
+The scaffolded project is ready to publish: its `package.json` follows the
+conventions used by the Lightweight Charts™ plugin catalogue, so the plugin can
+be listed there once it is published to npm.
+
+Whether you are developing a new primitive plugin or a Custom series plugin for
+Lightweight Charts, this generator provides a structured and organized
+foundation. It ensures that your plugin adheres to the best practices and
+conventions of Lightweight Charts, making it easier to develop, maintain, and
+contribute to the community.
 
 Getting started with your Lightweight Charts plugin development has never been
 easier. Let the Lightweight Charts™ Plugin Scaffold Generator
@@ -46,6 +51,11 @@ With PNPM:
 pnpm create lwc-plugin
 ```
 
+The wizard asks for the plugin's name, description, author, licence, the minimum
+version of Lightweight Charts™ it supports, and the tags to list it under. Those
+answers populate the generated `package.json`, including the `lwcPlugin` block
+read by the plugin catalogue.
+
 ## Using the generated project
 
 ### Running Locally (during development)
@@ -57,26 +67,41 @@ npm run dev
 
 Visit `localhost:5173` in the browser.
 
-### Compiling the Plugin
+### Building the Plugin
 
 ```shell
-npm run compile
+npm run build
 ```
 
-Check the output in the `dist` folder.
+This writes three files into the `dist` folder: the package entry point
+(`<name>.js`), a standalone build for use over a CDN
+(`<name>.standalone.js`) which inlines every dependency except
+Lightweight Charts™ itself, and the bundled type declarations (`<name>.d.ts`).
+Plugins are published as ES modules only.
 
 ### Publishing To NPM
 
-You can configure the contents of the package's `package.json` within the
-`compile.mjs` script.
-
-Once you have compiled the plugin (see above section) then you can publish the
-package to NPM with these commands:
+The `package.json` in the project root is the published manifest. Check its
+`description`, `version`, `license` and `lwcPlugin` fields, then publish from
+the project root:
 
 ```shell
-cd dist
 npm publish
 ```
 
 Hint: append `--dry-run` to the end of the publish command to see the results of
 the publish command without actually uploading the package to NPM.
+
+## Scaffolding an official in-repo plugin
+
+Maintainers working inside the Lightweight Charts™ repository can scaffold a
+workspace package instead of a standalone project:
+
+```shell
+pnpm create lwc-plugin --workspace
+```
+
+Workspace mode targets `packages/`, scopes the package name to `@tradingview/`,
+depends on the library and the shared plugin utilities through `workspace:*`,
+seeds a `CHANGELOG.md`, `LICENSE` and `NOTICE`, and marks the plugin as an
+official catalogue entry.

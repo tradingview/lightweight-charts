@@ -1,17 +1,65 @@
 {
-    "name": "to-be-replaced",
-    "type": "module",
-    "scripts": {
-        "dev": "vite --config src/vite.config.js",
-        "compile": "tsc && node compile.mjs"
-    },
-    "devDependencies": {
-        "typescript": "5.5.4",
-        "vite": "7.2.0"
-    },
-    "dependencies": {
-        "dts-bundle-generator": "^8.0.1",
-        "fancy-canvas": "^2.1.0",
-        "lightweight-charts": "~5.0.0"
-    }
+	"name": "_PACKAGENAME_",
+	"version": "1.0.0",
+	"description": "_DESCRIPTION_",
+	"author": "_AUTHOR_",
+	"license": "_LICENSE_",
+	"type": "module",
+	"types": "./dist/_ENTRYNAME_.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/_ENTRYNAME_.d.ts",
+			"default": "./dist/_ENTRYNAME_.js"
+		},
+		"./standalone": {
+			"types": "./dist/_ENTRYNAME_.d.ts",
+			"default": "./dist/_ENTRYNAME_.standalone.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"keywords": [
+		"lightweight-charts",
+		"lightweight-charts-plugin",
+		"lwc-plugin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"directory": "packages/lwc-plugin-_ENTRYNAME_"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"dev": "vite --config src/vite.config.js",
+		"build": "tsc && node compile.mjs",
+		"typecheck": "tsc --noEmit",
+		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm"
+	},
+	"peerDependencies": {
+		"lightweight-charts": "_PEERVERSION_"
+	},
+	"dependencies": {
+		"fancy-canvas": "~2.1.0"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "~0.18.5",
+		"@tradingview/lwc-toolkit": "~1.0.0",
+		"dts-bundle-generator": "~9.5.1",
+		"lightweight-charts": "_PEERVERSION_",
+		"publint": "~0.3.14",
+		"typescript": "~5.9.3",
+		"vite": "~8.2.2"
+	},
+	"lwcPlugin": {
+		"title": "_PLUGINNAME_",
+		"category": "_CATEGORY_",
+		"lifecycle": "current",
+		"origin": "community",
+		"author": "_AUTHOR_",
+		"demo": "example/index.html",
+		"tags": []
+	}
 }

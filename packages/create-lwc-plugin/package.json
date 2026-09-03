@@ -1,8 +1,8 @@
 {
   "name": "create-lwc-plugin",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "type": "module",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "TradingView, Inc.",
   "description": "Wizard-like CLI tool for scaffolding a new plugin for Lightweight Charts™",
   "keywords": ["lightweight-charts", "lwc-plugin", "plugins"],
@@ -12,8 +12,10 @@
   "files": [
     "index.js",
     "template-common",
-    "template-primitive",
+    "template-pane-primitive",
     "template-series",
+    "template-series-primitive",
+    "template-workspace",
     "dist"
   ],
   "scripts": {
@@ -35,9 +37,9 @@
   },
   "homepage": "https://www.tradingview.com/lightweight-charts/",
   "devDependencies": {
-    "@clack/prompts": "^0.7.0",
-    "@types/node": "^20.5.1",
-    "picocolors": "^1.0.0",
-    "unbuild": "^3.5.0"
+    "@clack/prompts": "0.7.0",
+    "@types/node": "20.19.43",
+    "picocolors": "1.1.1",
+    "unbuild": "3.6.1"
   }
 }

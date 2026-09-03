@@ -10,11 +10,8 @@ import {
 } from 'lightweight-charts';
 import { DualRangeHistogramData } from './data';
 import { DualRangeHistogramSeriesOptions } from './options';
-import {
-	ColumnPosition,
-	calculateColumnPositionsInPlace,
-} from '../../helpers/dimensions/columns';
-import { positionsBox } from '../../helpers/dimensions/positions';
+import { ColumnPosition, calculateColumnPositionsInPlace } from '@tradingview/lwc-toolkit/dimensions/columns';
+import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
 import {
 	drawRoundRectWithBorder,
 	LeftTopRightTopRightBottomLeftBottomRadii,

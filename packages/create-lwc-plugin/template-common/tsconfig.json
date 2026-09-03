@@ -4,7 +4,9 @@
 		"useDefineForClassFields": true,
 		"module": "ESNext",
 		"lib": ["ESNext", "DOM"],
-		"moduleResolution": "Node",
+		// The toolkit exposes each helper as its own `exports` sub-path, and the
+		// legacy "Node" resolver ignores `exports` altogether.
+		"moduleResolution": "Bundler",
 		"strict": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
@@ -13,6 +15,10 @@
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"skipLibCheck": true,
+		// Only the types referenced explicitly by the sources, so that generating
+		// the bundled declarations never picks up unrelated ambient @types
+		// packages that happen to be installed further up the tree.
+		"types": [],
 		"declaration": true,
 		"declarationDir": "typings",
 		"emitDeclarationOnly": true

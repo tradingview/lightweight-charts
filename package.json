@@ -112,7 +112,7 @@
     "tslint-eslint-rules": "5.4.0",
     "tslint-microsoft-contrib": "6.2.0",
     "tsx": "4.19.3",
-    "typescript": "5.5.4",
+    "typescript": "5.9.3",
     "yargs": "17.7.2"
   },
   "scripts": {
@@ -123,9 +123,10 @@
     "tsc": "tspc -p tsconfig.prod.json",
     "tsc-watch": "pnpm tsc --watch --preserveWatchOutput",
     "tsc-verify": "node website/scripts/generate-versions-dts.js && tsc -b tsconfig.composite.json",
+    "scaffold-plugin": "pnpm --filter create-lwc-plugin build && node packages/create-lwc-plugin/index.js --workspace",
     "lint": "npm-run-all -p lint:**",
     "lint:eslint": "eslint --format=unix ./",
-    "lint:md": "markdownlint -i \"**/node_modules/**\" -i \"**/website/docs/api/**\" -i \"**/website/versioned_docs/**/api/**\" -i \"**/*.mdx\" \"**/*.md\"",
+    "lint:md": "markdownlint \"**/*.md\"",
     "check-dts-docs": "npm-run-all -p check-dts-docs-duplicates check-dts-docs-eslint",
     "check-dts-docs-duplicates": "node ./scripts/check-typings-for-duplicates.js ./dist/typings.d.ts",
     "check-dts-docs-eslint": "eslint --format=unix ./dist/typings.d.ts --no-ignore",

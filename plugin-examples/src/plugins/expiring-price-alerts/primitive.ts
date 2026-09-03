@@ -4,7 +4,7 @@ import {
 	Time,
 	AutoscaleInfo,
 } from 'lightweight-charts';
-import { PluginBase } from '../plugin-base';
+import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
 import { ExpiringPriceAlerts } from './expiring-price-alerts';
 import { upArrowIcon, tickIcon, cancelIcon, downArrowIcon } from './icons';
 import { ExpiringPriceAlertsPaneRenderer, RendererDataItem } from './renderer';

@@ -26,6 +26,7 @@ aliases:
         - plugin-examples/node_modules
         - indicator-examples/node_modules
         - packages/create-lwc-plugin/node_modules
+        - packages/lwc-toolkit/node_modules
         # puppeteer browser cache (see .puppeteerrc.cjs)
         - .cache
         # corepack-downloaded pnpm, so restore-only jobs don't re-download it
@@ -163,6 +164,48 @@ jobs:
       - checkout-with-deps
       - run: pnpm lint:md
 
+  lwc-toolkit:
+    executor: node-executor
+    steps:
+      - checkout-with-deps
+      # The package compiles against `lightweight-charts`, which resolves to the
+      # repository root, whose `types` points into `dist/`. That does not exist
+      # until the library is built, so this job needs the build's output.
+      - attach_workspace:
+          at: ./
+      - run: pnpm --filter @tradingview/lwc-toolkit typecheck
+      - run: pnpm --filter @tradingview/lwc-toolkit build
+      # Neither tsc nor Vite minds an extensionless relative specifier, so
+      # nothing else in the repo would notice the package emitting ESM that real
+      # Node cannot resolve. Import every sub-path by specifier, from a
+      # workspace that depends on the package, so the exports map is exercised
+      # the way a consumer without a bundler would.
+      - run:
+          name: "Check every sub-path could be imported in NodeJS"
+          command: |
+            cd plugin-examples
+            node --input-type=module -e "
+              const { createRequire } = await import('node:module');
+              const require = createRequire('$PWD/package.json');
+              const pkg = require('@tradingview/lwc-toolkit/package.json');
+              const subs = Object.keys(pkg.exports).filter((k) => k !== './package.json');
+              for (const sub of subs) {
+                await import('@tradingview/lwc-toolkit/' + sub.slice(2));
+              }
+              console.log('resolved ' + subs.length + ' sub-paths');
+            "
+      - run:
+          name: "Lint the publishable package"
+          command: |
+            cd packages/lwc-toolkit
+            pnpm dlx publint@0.3.14 --strict
+            # node10 ignores `exports` altogether and a `require` of an ESM-only
+            # package is meant to fail, so both are by design here rather than
+            # findings. `node16 (from ESM)` and `bundler` are the modes that
+            # have to stay green.
+            pnpm dlx @arethetypeswrong/cli@0.18.5 --pack . \
+              --ignore-rules no-resolution cjs-resolves-to-esm
+
   usable-in-nodejs:
     executor: node-executor
     steps:
@@ -285,6 +328,19 @@ jobs:
           command: node scripts/compare-size-with-merge-base.js
       - run: pnpm size-limit
 
+  build-plugin-examples:
+    executor: node-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      # builds @tradingview/lwc-toolkit first (via the build:utils pre-step),
+      # typechecks all plugin sources against it and compiles every plugin,
+      # including the bundled typings that must inline the toolkit
+      - run:
+          command: pnpm --filter lightweight-charts-plugin-examples compile
+          no_output_timeout: 5m
+
   build-docusaurus-website:
     executor: node-executor
     resource_class: medium+
@@ -378,6 +434,10 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
+      - lwc-toolkit:
+          filters: *default-filters
+          requires:
+            - build
 
       - size-limit:
           filters: *default-filters
@@ -431,6 +491,10 @@ workflows:
           requires:
             - build
       - lint-eslint:
+          filters: *default-filters
+          requires:
+            - build
+      - build-plugin-examples:
           filters: *default-filters
           requires:
             - build

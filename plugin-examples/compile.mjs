@@ -133,6 +133,7 @@ const compile = async () => {
 		writeFileSync(packagePath, content, { encoding: 'utf-8' });
 	});
 	console.log('Generating the typings files...');
+	let hasTypingErrors = false;
 	filesToBuild.forEach(file => {
 		try {
 			const esModuleTyping = generateDtsBundle([
@@ -153,13 +154,15 @@ const compile = async () => {
 			});
 		} catch (e) {
 			console.error('Error generating typings for: ', file.exportName);
+			hasTypingErrors = true;
 		}
 	});
 	const endTime = Date.now().valueOf();
 	console.log(`🎉 Done (${endTime - startTime}ms)`);
+	return !hasTypingErrors;
 };
 
 (async () => {
-	await compile();
-	process.exit(0);
+	const success = await compile();
+	process.exit(success ? 0 : 1);
 })();
