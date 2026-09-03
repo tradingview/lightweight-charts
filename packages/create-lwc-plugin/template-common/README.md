@@ -117,6 +117,21 @@ to change.
 
 The `package.json` in the project root is the published manifest: check the
 `description`, `version`, `license` and `lwcPlugin` fields before releasing.
+
+Check the packaging before publishing:
+
+```shell
+npm run check-package
+```
+
+That runs [publint](https://publint.dev), which checks the manifest, and
+[arethetypeswrong](https://arethetypeswrong.github.io), which resolves every
+entry point the way a consumer's TypeScript would — the check that catches an
+`exports` entry with no `types` alongside it. Two of its rules are ignored
+because an ESM-only package is meant to fail them: `node10` predates the
+`exports` field entirely, and `require`-ing an ES module is an error rather
+than a mistake in the package.
+
 Publish from the project root once the plugin has been built:
 
 ```shell
