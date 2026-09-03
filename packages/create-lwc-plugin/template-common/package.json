@@ -11,7 +11,10 @@
 			"types": "./dist/_ENTRYNAME_.d.ts",
 			"default": "./dist/_ENTRYNAME_.js"
 		},
-		"./standalone": "./dist/_ENTRYNAME_.standalone.js"
+		"./standalone": {
+			"types": "./dist/_ENTRYNAME_.d.ts",
+			"default": "./dist/_ENTRYNAME_.standalone.js"
+		}
 	},
 	"files": [
 		"dist"
