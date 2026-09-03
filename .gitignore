@@ -49,3 +49,4 @@ tests/e2e/memleaks/.logs/
 
 # fixture build output
 tests/fixtures/**/dist/
+*.tsbuildinfo
