@@ -59,7 +59,7 @@
 		"lifecycle": "current",
 		"origin": "community",
 		"author": "_AUTHOR_",
-		"demo": "example/index.html",
+		"demo": "src/example/index.html",
 		"tags": []
 	}
 }

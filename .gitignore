@@ -46,3 +46,6 @@ tests/e2e/coverage/.gendata
 
 # memleak log output
 tests/e2e/memleaks/.logs/
+
+# fixture build output
+tests/fixtures/**/dist/
