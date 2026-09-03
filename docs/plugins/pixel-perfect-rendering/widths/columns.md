@@ -1,4 +1,4 @@
-# Histogram Column Width Calculations
+# Histogram column width calculations
 
 :::tip
 

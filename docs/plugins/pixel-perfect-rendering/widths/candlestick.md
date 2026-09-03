@@ -1,4 +1,4 @@
-# Candlestick Width Calculations
+# Candlestick width calculations
 
 :::tip
 

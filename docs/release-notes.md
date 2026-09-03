@@ -453,7 +453,7 @@ Version 4.1 of Lightweight Charts introduces exciting new features, including th
 
 **Plugins**
 
-Developers can now leverage the power of Plugins in Lightweight Charts. Two types of Plugins are supported -  [Custom Series](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md#custom-series) and [Drawing Primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md#primitives), offering the ability to define new series types and create custom visualizations, drawing tools, and annotations.
+Developers can now leverage the power of Plugins in Lightweight Charts. Two types of Plugins are supported -  [Custom Series](https://tradingview.github.io/lightweight-charts/docs/plugins/custom_series.md) and [Drawing Primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/series-primitives.md), offering the ability to define new series types and create custom visualizations, drawing tools, and annotations.
 
 With the flexibility provided by these plugins, developers can create highly customizable charting applications for their users.
 

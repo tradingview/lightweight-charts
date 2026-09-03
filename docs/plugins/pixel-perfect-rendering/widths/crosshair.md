@@ -1,4 +1,4 @@
-# Crosshair and Grid Line Width Calculations
+# Crosshair and grid line width calculations
 
 :::tip
 

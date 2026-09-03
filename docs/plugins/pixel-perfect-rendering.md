@@ -1,8 +1,8 @@
-# Best Practices for Pixel Perfect Rendering in Canvas Drawings
+# Best practices for pixel perfect rendering in canvas drawings
 
-To achieve crisp pixel perfect rendering for your plugins, it is recommended that the canvas drawings are created using bitmap coordinates. The difference between media and bitmap coordinate spaces is discussed on the [Canvas Rendering Target](https://tradingview.github.io/lightweight-charts/docs/plugins/canvas-rendering-target.md) page. **Essentially, all drawing actions should use integer positions and dimensions when on the bitmap coordinate space.**
+To achieve crisp pixel perfect rendering for your plugins, it is recommended that the canvas drawings are created using bitmap coordinates. The difference between media and bitmap coordinate spaces is discussed on the [Canvas rendering target](https://tradingview.github.io/lightweight-charts/docs/plugins/canvas-rendering-target.md) page. **Essentially, all drawing actions should use integer positions and dimensions when on the bitmap coordinate space.**
 
-To ensure consistency between your plugins and the library's built-in logic for rendering points on the chart, use of the following calculation functions.
+To ensure consistency between your plugins and the library's built-in logic for rendering points on the chart, use the following calculation functions.
 
 :::info
 
@@ -10,9 +10,9 @@ Variable names containing `media` refer to positions / dimensions specified usin
 
 :::
 
-## Centered Shapes
+## Centered shapes
 
-If you need to draw a shape which is centred on a position (for example a price or x coordinate) and has a desired width then you could use the `positionsLine` function presented below. This can be used for drawing a horizontal line at a specific price, or a vertical line aligned with the centre of series point.
+If you need to draw a shape which is centered on a position (for example a price or x coordinate) and has a desired width then you could use the `positionsLine` function presented below. This can be used for drawing a horizontal line at a specific price, or a vertical line aligned with the center of a series point.
 
 ```typescript
 interface BitmapPositionLength {
@@ -27,7 +27,7 @@ function centreOffset(lineBitmapWidth: number): number {
 }
 
 /**
- * Calculates the bitmap position for an item with a desired length (height or width), and centred according to
+ * Calculates the bitmap position for an item with a desired length (height or width), and centered according to
  * a position coordinate defined in media sizing.
  * @param positionMedia - position coordinate for the bar (in media coordinates)
  * @param pixelRatio - pixel ratio. Either horizontal for x positions, or vertical for y positions
@@ -50,7 +50,7 @@ export function positionsLine(
 }
 ```
 
-## Dual Point Shapes
+## Dual point shapes
 
 If you need to draw a shape between two coordinates (for example, y coordinates for a high and low price) then you can use the `positionsBox` function as presented below.
 
@@ -76,14 +76,14 @@ export function positionsBox(
 }
 ```
 
-## Default Widths
+## Default widths
 
-Please refer to the following pages for functions defining the default widths of shapes drawn by the library:
+Refer to the following pages for functions defining the default widths of shapes drawn by the library:
 
-- [Crosshair and Grid Lines](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/crosshair.md)
+- [Crosshair and grid lines](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/crosshair.md)
 - [Candlesticks](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/candlestick.md)
-- [Columns (Histogram)](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/columns.md)
-- [Full Bar Width](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/full-bar-width.md)
+- [Columns (histogram)](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/columns.md)
+- [Full bar width](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/full-bar-width.md)
 
 ---
 

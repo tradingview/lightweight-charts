@@ -1,4 +1,4 @@
-# Full Bar Width Calculations
+# Full bar width calculations
 
 :::tip
 

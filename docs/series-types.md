@@ -155,7 +155,7 @@ The library enables you to create custom series types, also known as series plug
 To define a custom series type, create a class that implements the [`ICustomSeriesPaneView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ICustomSeriesPaneView) interface. This class defines the rendering code that Lightweight Charts&trade; uses to draw the series on the chart.
 Once your custom series type is defined, it can be added to any chart instance using the [`addCustomSeries()`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#addcustomseries) method. Custom series types function like any other series.
 
-For more information, refer to the [Plugins](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md) article.
+For more information, refer to the [Plugin development](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md) section.
 
 ## Customization
 

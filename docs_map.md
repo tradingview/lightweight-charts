@@ -3,7 +3,7 @@
 A map of all documentation pages with their headings, for navigation by LLMs and tools. Every page is available as Markdown at the linked URL.
 
 > Version: 5.2 (latest released)
-> Last updated: 2026-09-01 15:44:12 UTC
+> Last updated: 2026-09-03 09:25:08 UTC
 
 This map uses a hierarchical structure:
 
@@ -133,58 +133,59 @@ This map uses a hierarchical structure:
   - 1.0.1
   - 1.0.0
 
-### Plugins
+### Plugin development
 
-- [Plugins](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md)
-  - Custom series
-  - Primitives
-    - Series primitives
-    - Pane primitives
-- [Series Primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/series-primitives.md)
+- [Plugin development](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md)
+  - Choosing a plugin type
+  - Development workflow
+- [Series primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/series-primitives.md)
+  - Attaching a primitive
+  - How a primitive works
   - Views
     - IPrimitivePaneView
-      - Interactive Demo of zOrder layers
+      - Interactive demo of zOrder layers
     - ISeriesPrimitiveAxisView
-  - Lifecycle Methods
+  - Lifecycle methods
     - attached
     - detached
-  - Updating Views
-  - Extending the Autoscale Info
-- [Pane Primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/pane-primitives.md)
-  - Key Differences from Series Primitives
-  - Adding a Pane Primitive
-  - Implementing a Pane Primitive
-- [Custom Series Types](https://tradingview.github.io/lightweight-charts/docs/plugins/custom_series.md)
-  - Defining a Custom Series
+  - Updating views
+  - Extending the autoscale info
+- [Pane primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/pane-primitives.md)
+  - Attaching a primitive
+  - Key differences from series primitives
+  - Implementing a pane primitive
+- [Custom series](https://tradingview.github.io/lightweight-charts/docs/plugins/custom_series.md)
+  - Adding a custom series
+  - Defining a custom series
     - Renderer
     - Update
-    - Hit Testing
-    - Price Value Builder
+    - Hit testing
+    - Price value builder
     - Whitespace
-    - Default Options
+    - Default options
     - Destroy
-- [Canvas Rendering Target](https://tradingview.github.io/lightweight-charts/docs/plugins/canvas-rendering-target.md)
+- [Canvas rendering target](https://tradingview.github.io/lightweight-charts/docs/plugins/canvas-rendering-target.md)
   - Using CanvasRenderingTarget2D
-  - Difference between Bitmap and Media
-    - Bitmap Coordinate Space
-      - Bitmap Coordinate Space Usage
-    - Media Coordinate Space
-      - Media Coordinate Space Usage
-  - General Tips
+  - Difference between bitmap and media
+    - Bitmap coordinate space
+      - Bitmap coordinate space usage
+    - Media coordinate space
+      - Media coordinate space usage
+  - General tips
 
-#### Pixel Perfect Rendering
+#### Pixel perfect rendering
 
-- [Best Practices for Pixel Perfect Rendering in Canvas Drawings](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering.md)
-  - Centered Shapes
-  - Dual Point Shapes
-  - Default Widths
+- [Best practices for pixel perfect rendering in canvas drawings](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering.md)
+  - Centered shapes
+  - Dual point shapes
+  - Default widths
 
-##### Default Widths
+##### Default widths
 
-- [Candlestick Width Calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/candlestick.md)
-- [Histogram Column Width Calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/columns.md)
-- [Crosshair and Grid Line Width Calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/crosshair.md)
-- [Full Bar Width Calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/full-bar-width.md)
+- [Candlestick width calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/candlestick.md)
+- [Histogram column width calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/columns.md)
+- [Crosshair and grid line width calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/crosshair.md)
+- [Full bar width calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/full-bar-width.md)
 
 ### Migrations
 

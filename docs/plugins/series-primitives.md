@@ -1,13 +1,60 @@
-# Series Primitives
+# Series primitives
 
-Primitives are extensions to the series which can define views and renderers to
-draw on the chart using
-[CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D).
+**Series primitives** are extensions attached to a specific series.
+They can draw anywhere the series itself can appear: on the main pane, and on the price and time scales.
+Drawing tools, annotations, and custom axis labels are typically built as series primitives.
+For pane-bound primitives, see [Pane primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/pane-primitives.md).
 
-Primitives are defined by implementing the
-[`ISeriesPrimitive`](https://tradingview.github.io/lightweight-charts/docs/api/type-aliases/ISeriesPrimitive) interface. The
-interface defines the basic functionality and structure required for creating
-custom primitives.
+## Attaching a primitive
+
+Series primitives are defined by implementing the [`ISeriesPrimitive`](https://tradingview.github.io/lightweight-charts/docs/api/type-aliases/ISeriesPrimitive) interface.
+The interface defines the views and renderers that draw on the chart with the
+[CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D) API.
+
+Create an instance of your primitive and attach it to a series with the
+[`attachPrimitive`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesApi#attachprimitive) method:
+
+```javascript title='javascript'
+class MyCustomPrimitive {
+    /* Class implementing the ISeriesPrimitive interface */
+}
+
+// Create an instantiated series primitive
+const myCustomPrimitive = new MyCustomPrimitive();
+
+const chart = createChart(document.getElementById('container'));
+const lineSeries = chart.addSeries(LineSeries);
+
+const data = [
+    { time: 1642425322, value: 123 },
+    /* ... more data */
+];
+lineSeries.setData(data);
+
+// Attach the primitive to the series
+lineSeries.attachPrimitive(myCustomPrimitive);
+```
+
+To remove a primitive from a series, use the
+[`detachPrimitive`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesApi#detachprimitive) method:
+
+```javascript title='javascript'
+lineSeries.detachPrimitive(myCustomPrimitive);
+```
+
+## How a primitive works
+
+A primitive is built from three kinds of objects, each with one job:
+
+- the **primitive** itself owns the state — what to draw;
+- its **views** turn that state into coordinates — where to draw;
+- each view's **renderer** puts pixels on the canvas — the drawing itself.
+
+When the chart needs to redraw, the library first lets the views recompute
+their coordinates, then collects them from the primitive and calls each view's
+renderer. This split lets the chart redraw frequently without recomputing, and
+recompute without recreating anything. The sections below describe each part
+of this cycle in detail.
 
 ## Views
 
@@ -15,30 +62,20 @@ The primary purpose of a series primitive is to provide one, or more, views to
 the library which contain the state and logic required to draw on the chart
 panes.
 
-There are two types of views which are supported within `ISeriesPrimitive` which
-are:
+The library invokes the following getter methods (if defined) to collect the
+primitive's views for each area of the chart:
 
-- [`IPrimitivePaneView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneView)
-- [`ISeriesPrimitiveAxisView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveAxisView)
+| Getter | Draws on | View interface |
+| --- | --- | --- |
+| [`paneViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#paneviews) | Main chart pane | [`IPrimitivePaneView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneView) |
+| [`priceAxisPaneViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#priceaxispaneviews) | Price scale pane | [`IPrimitivePaneView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneView) |
+| [`timeAxisPaneViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#timeaxispaneviews) | Time scale pane | [`IPrimitivePaneView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneView) |
+| [`priceAxisViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#priceaxisviews) | Labels on the price scale | [`ISeriesPrimitiveAxisView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveAxisView) |
+| [`timeAxisViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#timeaxisviews) | Labels on the time scale | [`ISeriesPrimitiveAxisView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveAxisView) |
 
-The library will evoke the following getter functions (if defined) to get
-references to the primitive's defined views for the corresponding section of the
-chart:
-
-- [`paneViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#paneviews)
-- [`priceAxisPaneViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#priceaxispaneviews)
-- [`timeAxisPaneViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#timeaxispaneviews)
-- [`priceAxisViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#priceaxisviews)
-- [`timeAxisViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#timeaxisviews)
-
-The first three views allow drawing on the corresponding panes (main chart pane,
-price scale pane, and horizontal time scale pane) using the
+Pane views draw with the
 [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
-and should implement the `ISeriesPrimitivePaneView` interface.
-
-The views returned by the `priceAxisViews` and `timeAxisViews` getter methods
-should implement the `ISeriesPrimitiveAxisView` interface and are used to define
-labels to be drawn on the corresponding scales.
+API; axis views define labels on the corresponding scale.
 
 Below is a visual example showing the various sections of the chart where a
 Primitive can draw.
@@ -250,17 +287,19 @@ lineSeries.attachPrimitive(new SectionsPrimitive());
 
 ### IPrimitivePaneView
 
-The [`IPrimitivePaneView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneView)
-interface can be used to define a view which provides a renderer (implementing
-the
+A pane view implements the
+[`IPrimitivePaneView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneView) interface.
+Its main job is to return a renderer that draws on the chart canvas.
+The renderer is a separate object implementing the
 [`IPrimitivePaneRenderer`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneRenderer)
-interface) for drawing on the corresponding area of the chart using the
-[CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
-API. The view can define a
-[`zOrder`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneView#zorder) to control where
-in the visual stack the drawing will occur (See
+interface.
+
+A view can also define a
+[`zOrder`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneView#zorder) value that controls
+where in the visual stack its drawing appears: below the series, at the same
+level, or on top of everything. See
 [`PrimitivePaneViewZOrder`](https://tradingview.github.io/lightweight-charts/docs/api/type-aliases/PrimitivePaneViewZOrder)
-for more information).
+for the available values.
 
 Renderers should provide a
 [`draw`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneRenderer#draw) method which will
@@ -268,16 +307,12 @@ be given a `CanvasRenderingTarget2D` target on which it can draw. Additionally,
 a renderer can optionally provide a
 [`drawBackground`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPrimitivePaneRenderer#drawbackground)
 method for drawing beneath other elements on the same zOrder.
+See the [Canvas rendering target](https://tradingview.github.io/lightweight-charts/docs/plugins/canvas-rendering-target.md) page for more
+details on `CanvasRenderingTarget2D`.
 
-:::tip
+#### Interactive demo of zOrder layers
 
-`CanvasRenderingTarget2D` is explained in more detail on the [Canvas Rendering Target](https://tradingview.github.io/lightweight-charts/docs/plugins/canvas-rendering-target.md) page.
-
-:::
-
-#### Interactive Demo of zOrder layers
-
-Below is an interactive demo chart illustrating where each zOrder is drawn
+Below is an interactive demo chart illustrating where each `zOrder` is drawn
 relative to the existing chart elements such as the grid, series, and crosshair.
 
 _Source of the interactive example shown on this page:_
@@ -552,7 +587,6 @@ if (layerSelectDiv) {
 
 The [`ISeriesPrimitiveAxisView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveAxisView)
 interface can be used to define a label on the price or time axis.
-
 This interface provides several methods to define the appearance and position of
 the label, such as the
 [`coordinate`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveAxisView#coordinate) method,
@@ -560,22 +594,22 @@ which should return the desired coordinate for the label on the axis. It also
 defines optional methods to set the fixed coordinate, text, text color,
 background color, and visibility of the label.
 
-Please see the
-[`ISeriesPrimitiveAxisView`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveAxisView)
-interface for more details.
+## Lifecycle methods
 
-## Lifecycle Methods
-
-Your primitive can use the
+A primitive can implement two optional lifecycle methods:
 [`attached`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#attached) and
-[`detached`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#detached) lifecycle methods to
-manage the lifecycle of the primitive, such as creating or removing external
-objects and event handlers.
+[`detached`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#detached). They are the
+primitive's side of the attach/detach cycle: when your code calls
+[`attachPrimitive`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesApi#attachprimitive) or
+[`detachPrimitive`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesApi#detachprimitive) on a
+series, the library invokes the corresponding method in response. Use them to
+set up and clean up whatever the primitive needs, such as external objects or
+event handlers.
 
 ### attached
 
 This method is called when the primitive is attached to a chart. The attached
-method is evoked with a
+method is invoked with a
 [single argument](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/SeriesAttachedParameter) containing
 properties for the chart, series, and a callback to request an update. The
 `chart` and `series` properties are references to the chart API and the series
@@ -591,34 +625,34 @@ This method is called when the primitive is detached from a chart. This can be
 used to remove any external objects or event handlers that were created during
 the attached lifecycle method.
 
-## Updating Views
+## Updating views
 
 Your primitive should update the views in the
-[`updateAllViews()`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#updateallviews) method
-such that when the renderers are evoked, they can draw with the latest
+[`updateAllViews`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#updateallviews) method
+such that when the renderers are invoked, they can draw with the latest
 information. The library invokes this method when it wants to update and redraw
 the chart. If you would like to notify the library that it should trigger an
 update then you can use the `requestUpdate` callback provided by the attached
 lifecycle method.
 
-## Extending the Autoscale Info
+## Extending the autoscale info
 
-The [`autoscaleInfo()`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#autoscaleinfo)
+The [`autoscaleInfo`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesPrimitiveBase#autoscaleinfo)
 method can be provided to extend the base autoScale information of the series.
 This can be used to ensure that the chart is automatically scaled correctly to
 include all the graphics drawn by the primitive.
 
 Whenever the chart needs to calculate the vertical visible range of the series
-within the current time range then it will evoke this method. This method can be
+within the current time range then it will invoke this method. This method can be
 omitted and the library will use the normal autoscale information for the
 series. If the method is implemented then the returned values will be merged
 with the base autoscale information to define the vertical visible range.
 
 :::warning
 
-Please note that this method will be evoked very often during
+This method will be invoked very often during
 scrolling and zooming of the chart, thus it is recommended that this method is
-either simple to execute, or makes use of optimisations such as caching to
+either simple to execute, or makes use of optimizations such as caching to
 ensure that the chart remains responsive.
 
 :::

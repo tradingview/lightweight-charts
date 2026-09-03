@@ -3,7 +3,7 @@
 > Official documentation for Lightweight Charts™, a free, open-source library for building interactive financial charts on the web. Every page below is available as Markdown by appending `.md` to its URL.
 > See [docs_map.md](https://tradingview.github.io/lightweight-charts/docs_map.md) for a version that also lists each page's headings.
 > Version: 5.2 (latest released)
-> Last updated: 2026-09-01 15:44:12 UTC
+> Last updated: 2026-09-03 09:25:08 UTC
 
 
 ## Documentation
@@ -19,24 +19,24 @@
 - [Android wrapper](https://tradingview.github.io/lightweight-charts/docs/android.md)
 - [Release Notes](https://tradingview.github.io/lightweight-charts/docs/release-notes.md)
 
-### Plugins
+### Plugin development
 
-- [Plugins](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md)
-- [Series Primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/series-primitives.md)
-- [Pane Primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/pane-primitives.md)
-- [Custom Series Types](https://tradingview.github.io/lightweight-charts/docs/plugins/custom_series.md)
-- [Canvas Rendering Target](https://tradingview.github.io/lightweight-charts/docs/plugins/canvas-rendering-target.md)
+- [Plugin development](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md)
+- [Series primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/series-primitives.md)
+- [Pane primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/pane-primitives.md)
+- [Custom series](https://tradingview.github.io/lightweight-charts/docs/plugins/custom_series.md)
+- [Canvas rendering target](https://tradingview.github.io/lightweight-charts/docs/plugins/canvas-rendering-target.md)
 
-#### Pixel Perfect Rendering
+#### Pixel perfect rendering
 
-- [Best Practices for Pixel Perfect Rendering in Canvas Drawings](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering.md)
+- [Best practices for pixel perfect rendering in canvas drawings](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering.md)
 
-##### Default Widths
+##### Default widths
 
-- [Candlestick Width Calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/candlestick.md)
-- [Histogram Column Width Calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/columns.md)
-- [Crosshair and Grid Line Width Calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/crosshair.md)
-- [Full Bar Width Calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/full-bar-width.md)
+- [Candlestick width calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/candlestick.md)
+- [Histogram column width calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/columns.md)
+- [Crosshair and grid line width calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/crosshair.md)
+- [Full bar width calculations](https://tradingview.github.io/lightweight-charts/docs/plugins/pixel-perfect-rendering/widths/full-bar-width.md)
 
 ### Migrations
 
