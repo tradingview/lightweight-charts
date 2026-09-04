@@ -1,0 +1,147 @@
+name: Plugin packages
+
+# The plugin checks that belong to the release flow rather than to every pull
+# request. The pull-request gates (metadata, compat against the workspace
+# library, changelog) run in CircleCI, see the `plugins` job in
+# .circleci/config.yml; the floor check has its own workflow, plugins-floor.yml.
+#
+# Nothing here publishes. The jobs have no npm credentials, the release script
+# refuses to publish when `CI` is set, and the dry-run job asserts that refusal.
+
+on:
+  push:
+    branches:
+      - master
+      - 'release/**'
+    # Library releases are tagged on master; that tag is the pre-publish moment.
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      check:
+        description: Which check to run
+        type: choice
+        options:
+          - all
+          - release-dry-run
+          - smoke
+        default: all
+      filter:
+        description: Only this plugin package (name, folder or short name); empty for all
+        type: string
+        default: ''
+      library:
+        description: Library the smoke test installs next to each plugin
+        type: choice
+        options:
+          - registry
+          - workspace
+        default: registry
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+  # Passed to the scripts as `--filter`; empty means every package.
+  PLUGIN_FILTER: ${{ inputs.filter }}
+
+jobs:
+  # Version compare, build, pack and content verification of every plugin with
+  # a new version, without publishing. Runs after every merge to master.
+  release-dry-run:
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/master')
+      || (github.event_name == 'workflow_dispatch' && contains(fromJSON('["all", "release-dry-run"]'), inputs.check))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      # pnpm is provided by corepack (see the note in deploy.yml). It has to
+      # be enabled before setup-node, because `cache: 'pnpm'` needs the pnpm
+      # binary to resolve the store path.
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Release dry run
+        run: |
+          args=()
+          if [ -n "$PLUGIN_FILTER" ]; then args+=(--filter "$PLUGIN_FILTER"); fi
+          pnpm plugins:release --dry-run "${args[@]}"
+
+      # The guard the security policy relies on: a real publish must be
+      # impossible from here, whatever else is configured.
+      - name: Assert that publishing from CI is refused
+        run: |
+          set +e
+          output=$(pnpm plugins:release 2>&1)
+          status=$?
+          set -e
+          printf '%s\n' "$output"
+          if [ "$status" -eq 0 ] || ! printf '%s' "$output" | grep -q 'Publishing from CI is not allowed'; then
+            echo '::error::pnpm plugins:release did not refuse to publish under CI'
+            exit 1
+          fi
+
+  # Pack every plugin, install it with the library into a Vite project, compile
+  # the README snippet and check the bundle only contains the plugin. Runs for
+  # library release branches and tags, and by hand before publishing plugins.
+  smoke:
+    if: >-
+      (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/tags/v')))
+      || (github.event_name == 'workflow_dispatch' && contains(fromJSON('["all", "smoke"]'), inputs.check))
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # For a library release branch or tag the plugins are tested against that
+      # build of the library. Started by hand, the published library is the default.
+      LIBRARY_SOURCE: ${{ github.event_name == 'push' && 'workspace' || inputs.library }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The published manifest is the cleaned one: the root package.json's
+      # scripts (a postinstall among them) and devDependencies must not end up
+      # in the tarball the consumer project installs. Same step as pkg-pr-new.yml.
+      - name: Pack the workspace library
+        if: env.LIBRARY_SOURCE == 'workspace'
+        run: |
+          pnpm build:prod
+          pnpm prepare-package-json-for-release
+          mkdir -p "$RUNNER_TEMP/lwc"
+          pnpm pack --pack-destination "$RUNNER_TEMP/lwc"
+          echo "LWC_TARBALL=$(ls "$RUNNER_TEMP"/lwc/*.tgz)" >> "$GITHUB_ENV"
+
+      - name: Smoke-test every plugin
+        run: |
+          args=()
+          if [ -n "$PLUGIN_FILTER" ]; then args+=(--filter "$PLUGIN_FILTER"); fi
+          if [ -n "$LWC_TARBALL" ]; then args+=(--lwc-tarball "$LWC_TARBALL"); fi
+          pnpm plugins:smoke "${args[@]}"

@@ -162,6 +162,9 @@ describe('Plugin Repo Scripts Unit Tests', () => {
 		it('should identify local version as not newer when local < remote', () => {
 			const result = compareVersions('1.0.0', '1.0.1');
 			expect(result.isNewer).to.be.false;
+			expect(result.isBehind).to.be.true;
+			expect(compareVersions('1.0.1', '1.0.1').isBehind).to.be.false;
+			expect(compareVersions('1.0.0', null).isBehind).to.be.false;
 		});
 
 		it('should treat null remote version as a new package and return isNewer = true', () => {
