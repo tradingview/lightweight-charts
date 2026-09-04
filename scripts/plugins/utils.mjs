@@ -83,8 +83,9 @@ export function findWorkspacePlugins(repoRoot, filter) {
 		try {
 			pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
 		} catch (e) {
-			console.warn(`Warning: failed to parse package.json at ${pkgJsonPath}: ${e.message}`);
-			continue;
+			// A manifest that does not parse must never be skipped quietly: every
+			// consumer of this list would then act on an incomplete workspace.
+			throw new Error(`Invalid JSON in ${pkgJsonPath}: ${e.message}`);
 		}
 
 		// Private packages are never published, so the scripts skip them.
@@ -434,6 +435,13 @@ export function validatePackageMetadata(packageDir, { isOfficial = true } = {}) 
 		if (fs.existsSync(filePath)) {
 			errors.push(...placeholderErrors(file, fs.readFileSync(filePath, 'utf-8')));
 		}
+	}
+
+	// A repository.directory that names another folder sends the registry's
+	// "source" link, and anything built from it, to the wrong place.
+	const expectedDirectory = `packages/${path.basename(packageDir)}`;
+	if (pkg.repository?.directory !== undefined && pkg.repository.directory !== expectedDirectory) {
+		errors.push(`'repository.directory' must be '${expectedDirectory}' (got '${pkg.repository.directory}')`);
 	}
 
 	// Demo file existence: strictly checks the declared demo path in lwcPlugin.demo

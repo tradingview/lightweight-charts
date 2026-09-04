@@ -128,6 +128,7 @@
     "plugins:validate": "node scripts/plugins/validate-metadata.mjs",
     "plugins:check-compat": "node scripts/plugins/check-compat.mjs",
     "plugins:check-stale": "node scripts/plugins/check-stale.mjs",
+    "plugins:catalogue": "node scripts/plugins/catalogue.mjs",
     "plugins:release": "node scripts/plugins/release.mjs",
     "plugins:smoke": "node scripts/plugins/smoke-install.mjs",
     "lint": "npm-run-all -p lint:**",
