@@ -218,13 +218,25 @@ jobs:
       # Nothing here publishes: the release script refuses to publish when CI
       # is set, and the job has no npm credentials. Until the first plugin
       # package graduates, every step reports that there is nothing to check.
-      - run: pnpm plugins:validate
+      #
+      # The dependencies cache lists node_modules directories explicitly and a
+      # plugin package's own devDependencies (vite, dts-bundle-generator, ...)
+      # are not among them, so the job completes the install itself. With the
+      # cache restored this only fetches what the cache does not hold.
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      # Every check reports, whatever the previous one found.
       - run:
+          name: "Validate the package contract and catalogue metadata"
+          command: pnpm plugins:validate
+      - run:
+          name: "Typecheck and build every plugin against the workspace library"
           command: pnpm plugins:check-compat
           no_output_timeout: 5m
+          when: always
       - run:
           name: "Check version and changelog consistency against the registry"
           command: pnpm plugins:release --check-only
+          when: always
 
   usable-in-nodejs:
     executor: node-executor

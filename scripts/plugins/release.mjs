@@ -81,7 +81,13 @@ function checkVersionAndChangelog(plugin) {
 
 	console.log(`  - Checking remote version on npm...`);
 	const remoteVersion = getRemoteVersion(pkgName);
-	const { isNewer } = compareVersions(localVersion, remoteVersion);
+	const { isNewer, isBehind } = compareVersions(localVersion, remoteVersion);
+
+	// A repository behind the registry means a publish happened outside this
+	// flow, or a version was lowered; neither is something to skip quietly.
+	if (isBehind) {
+		throw new Error(`Local version ${localVersion} is behind the published ${remoteVersion}`);
+	}
 
 	if (!isNewer) {
 		console.log(`  ⏩ Skipped: Local version ${localVersion} is not newer than remote (${remoteVersion})`);
