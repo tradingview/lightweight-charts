@@ -1,0 +1,49 @@
+{
+	"name": "@tradingview/lwc-plugin-valid-sample",
+	"version": "1.0.0",
+	"description": "A sample valid plugin for verification and tests",
+	"author": "TradingView",
+	"license": "Apache-2.0",
+	"type": "module",
+	"types": "./dist/valid-sample.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/valid-sample.d.ts",
+			"default": "./dist/valid-sample.js"
+		},
+		"./standalone": {
+			"types": "./dist/valid-sample.d.ts",
+			"default": "./dist/valid-sample.standalone.js"
+		}
+	},
+	"files": [
+		"dist",
+		"CHANGELOG.md",
+		"NOTICE"
+	],
+	"keywords": [
+		"lightweight-charts",
+		"lightweight-charts-plugin"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "node compile.mjs"
+	},
+	"peerDependencies": {
+		"lightweight-charts": "^5.0.0"
+	},
+	"lwcPlugin": {
+		"title": "Valid Sample Plugin",
+		"category": "series-primitive",
+		"lifecycle": "current",
+		"origin": "official",
+		"author": "TradingView",
+		"demo": "src/example/index.html",
+		"tags": [
+			"sample",
+			"test"
+		]
+	}
+}

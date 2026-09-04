@@ -1,0 +1,64 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "LwcPluginMetadata",
+	"type": "object",
+	"required": [
+		"title",
+		"category",
+		"lifecycle",
+		"origin",
+		"demo"
+	],
+	"properties": {
+		"title": {
+			"type": "string",
+			"minLength": 1,
+			"description": "Human-readable display name of the plugin"
+		},
+		"category": {
+			"type": "string",
+			"enum": [
+				"custom-series",
+				"series-primitive",
+				"pane-primitive"
+			],
+			"description": "Type or category of the plugin"
+		},
+		"lifecycle": {
+			"type": "string",
+			"enum": [
+				"current",
+				"legacy",
+				"deprecated",
+				"experimental"
+			],
+			"description": "Lifecycle state of the plugin"
+		},
+		"origin": {
+			"type": "string",
+			"enum": [
+				"official",
+				"community"
+			],
+			"description": "Origin of the plugin (official in-repo or community)"
+		},
+		"author": {
+			"type": "string",
+			"minLength": 1,
+			"description": "Author of the plugin"
+		},
+		"demo": {
+			"type": "string",
+			"minLength": 1,
+			"description": "Relative path to the HTML demo page"
+		},
+		"tags": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"description": "Tags for search and indexing in the plugin registry"
+		}
+	},
+	"additionalProperties": false
+}

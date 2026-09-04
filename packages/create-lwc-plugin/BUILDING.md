@@ -1,6 +1,6 @@
 # Local Development of the create-lwc-plugin
 
-The minimal supported version of [NodeJS](https://nodejs.org/) for development is 18.
+The minimal supported version of [NodeJS](https://nodejs.org/) for development is 22.3, the same as for the repository as a whole.
 
 1. Install the dependencies (the repository is a pnpm workspace — the install can be run from the repository root)
 

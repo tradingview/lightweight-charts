@@ -1,0 +1,11 @@
+{
+	"name": "malformed-plugin",
+	"version": "1.0.0",
+	"license": "Apache-2.0",
+	"lwcPlugin": {
+		"title": "Malformed Plugin",
+		"category": "not-a-valid-category",
+		"lifecycle": "unknown-lifecycle",
+		"origin": "invalid-origin"
+	}
+}
