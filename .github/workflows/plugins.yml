@@ -58,21 +58,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           persist-credentials: false
 
-      # pnpm is provided by corepack (see the note in deploy.yml). It has to
-      # be enabled before setup-node, because `cache: 'pnpm'` needs the pnpm
-      # binary to resolve the store path.
+      # pnpm is provided by corepack (see the note in deploy.yml). No dependency
+      # cache here: this workflow runs for release branches and tags, and nothing
+      # another run wrote into the default-branch cache scope may feed those jobs.
       - name: Enable Corepack (pnpm)
         run: corepack enable
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        # zizmor assumes setup-node v5's `package-manager-cache: true` default.
+        # This pin is v4.4.0, which only caches with an explicit `cache` input
+        # (none here). Revisit when bumping: v5+ caches by default because
+        # package.json has a `packageManager` field; add `package-manager-cache: false` then.
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -93,7 +96,7 @@ jobs:
           set -e
           printf '%s\n' "$output"
           if [ "$status" -eq 0 ] || ! printf '%s' "$output" | grep -q 'Publishing from CI is not allowed'; then
-            echo '::error::pnpm plugins:release did not refuse to publish under CI'
+            echo '::error::the release script did not refuse to run under CI'
             exit 1
           fi
 
@@ -111,7 +114,7 @@ jobs:
       # build of the library. Started by hand, the published library is the default.
       LIBRARY_SOURCE: ${{ github.event_name == 'push' && 'workspace' || inputs.library }}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           persist-credentials: false
 
@@ -119,10 +122,13 @@ jobs:
         run: corepack enable
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        # zizmor assumes setup-node v5's `package-manager-cache: true` default.
+        # This pin is v4.4.0, which only caches with an explicit `cache` input
+        # (none here). Revisit when bumping: v5+ caches by default because
+        # package.json has a `packageManager` field; add `package-manager-cache: false` then.
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -137,7 +143,12 @@ jobs:
           pnpm prepare-package-json-for-release
           mkdir -p "$RUNNER_TEMP/lwc"
           pnpm pack --pack-destination "$RUNNER_TEMP/lwc"
-          echo "LWC_TARBALL=$(ls "$RUNNER_TEMP"/lwc/*.tgz)" >> "$GITHUB_ENV"
+          set -- "$RUNNER_TEMP"/lwc/*.tgz
+          if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
+            echo '::error::expected exactly one library tarball'
+            exit 1
+          fi
+          echo "LWC_TARBALL=$1" >> "$GITHUB_ENV"
 
       - name: Smoke-test every plugin
         run: |
