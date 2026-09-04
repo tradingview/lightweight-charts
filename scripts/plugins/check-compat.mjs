@@ -7,21 +7,11 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import semver from 'semver';
-import { loadTargetPlugins } from './utils.mjs';
+import { loadTargetPlugins, buildWorkspaceDependencies } from './utils.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../..');
-
-/**
- * Builds the workspace library and the toolkit the plugins compile against.
- */
-function buildWorkspaceDependencies() {
-	console.log('📦 Step 1: Building workspace library...');
-	execSync('pnpm build', { cwd: repoRoot, stdio: 'inherit' });
-	console.log('📦 Step 2: Building @tradingview/lwc-toolkit...');
-	execSync('pnpm --filter @tradingview/lwc-toolkit build', { cwd: repoRoot, stdio: 'inherit' });
-}
 
 /**
  * Checks forward compatibility for a single plugin: its own typecheck and build
@@ -45,13 +35,13 @@ function checkPluginForwardCompat(plugin) {
  */
 function checkForwardCompat(plugins) {
 	try {
-		buildWorkspaceDependencies();
+		buildWorkspaceDependencies(repoRoot);
 	} catch (err) {
 		console.error(`❌ Failed to build the workspace library: ${err.message}`);
 		process.exit(1);
 	}
 
-	console.log(`\n🔍 Step 3: Typechecking and building ${plugins.length} plugin(s)...`);
+	console.log(`\n🔍 Typechecking and building ${plugins.length} plugin(s)...`);
 	let failedCount = 0;
 
 	for (const plugin of plugins) {

@@ -9,6 +9,7 @@ import { execSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import {
 	loadTargetPlugins,
+	buildWorkspaceDependencies,
 	compareVersions,
 	getRemoteVersion,
 	verifyChangelog,
@@ -34,6 +35,41 @@ function askConfirmation(query) {
 			resolve(/^(y|yes)$/i.test(answer.trim()));
 		});
 	});
+}
+
+let workspaceBuilt = false;
+let workspaceBuildError = null;
+
+/**
+ * Builds the library and the toolkit once per run, right before the first
+ * plugin build needs them, so the script works on a clean checkout. A failed
+ * build fails every remaining candidate without being retried.
+ */
+function ensureWorkspaceBuilt() {
+	if (workspaceBuildError) {
+		throw workspaceBuildError;
+	}
+	if (workspaceBuilt) {
+		return;
+	}
+	try {
+		buildWorkspaceDependencies(repoRoot);
+		workspaceBuilt = true;
+	} catch (err) {
+		workspaceBuildError = new Error(`Workspace build failed: ${err.message}`);
+		throw workspaceBuildError;
+	}
+}
+
+/**
+ * Runs the package contract and metadata checks, failing the package on errors.
+ */
+function validateMetadataOrThrow(plugin) {
+	console.log(`  - Validating package metadata and schema...`);
+	const metaResult = validatePackageMetadata(plugin.dir, { isOfficial: true });
+	if (!metaResult.valid) {
+		throw new Error(`Metadata validation errors: ${metaResult.errors.join('; ')}`);
+	}
 }
 
 /**
@@ -75,12 +111,8 @@ function checkVersionAndChangelog(plugin) {
  * Builds and packages a plugin, verifying tarball contents.
  */
 function buildAndPackPlugin(plugin, tempPackDir) {
-	// Cheap metadata validation before build
-	console.log(`  - Validating package metadata and schema...`);
-	const metaResult = validatePackageMetadata(plugin.dir, { isOfficial: true });
-	if (!metaResult.valid) {
-		throw new Error(`Metadata validation errors: ${metaResult.errors.join('; ')}`);
-	}
+	validateMetadataOrThrow(plugin);
+	ensureWorkspaceBuilt();
 
 	console.log(`  - Running clean build...`);
 	const distDir = path.join(plugin.dir, 'dist');
@@ -142,13 +174,19 @@ async function publishTarball(plugin, tarballPath, isDryRun) {
  * Processes a single plugin for release.
  */
 async function processPlugin(plugin, { isDryRun, isCheckOnly }) {
+	if (isCheckOnly) {
+		// The PR gate: cheap, and every package is checked whether or not it is
+		// about to be released.
+		validateMetadataOrThrow(plugin);
+	}
+
 	const versionResult = checkVersionAndChangelog(plugin);
 	if (!versionResult.isNewer) {
 		return { status: 'skipped', reason: versionResult.reason };
 	}
 
 	if (isCheckOnly) {
-		console.log(`  ✅ Changelog and version check passed for ${plugin.name}@${plugin.version}`);
+		console.log(`  ✅ Metadata, changelog and version checks passed for ${plugin.name}@${plugin.version}`);
 		return { status: 'checked', version: plugin.version };
 	}
 
@@ -217,8 +255,8 @@ Usage: node scripts/plugins/release.mjs [options]
 Releases non-private workspace plugin packages to npm.
 
 Options:
-  --dry-run             Perform pack, validation and content checks without publishing
-  --check-only          Perform only version and CHANGELOG check (fast gate for CI)
+  --dry-run             Build, pack and verify every release candidate without publishing
+  --check-only          Validate metadata and check version/CHANGELOG only, without building or packing
   -f, --filter <name>   Target only packages matching the name
   -p, --path <path>     Target a single package directory directly
   -h, --help            Show this help message

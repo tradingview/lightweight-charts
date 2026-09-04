@@ -21,12 +21,42 @@ import {
 	verifyChangelog,
 	validatePackageMetadata,
 	validateReadmeContent,
+	findPlaceholders,
 	extractReadmeSnippet,
 	verifyPackContent,
+	compareDistDirs,
+	classifyStaleness,
 } from '../../scripts/plugins/utils.mjs';
 
 const validFixtureDir = fileURLToPath(new URL('../fixtures/plugins/valid-plugin', import.meta.url));
 const malformedFixtureDir = fileURLToPath(new URL('../fixtures/plugins/malformed-metadata', import.meta.url));
+
+const minimalValidReadme = [
+	'# Test',
+	'',
+	'Desc',
+	'',
+	'## Installation',
+	'',
+	'### npm',
+	'',
+	'```js',
+	'hi',
+	'```',
+	'',
+	'### CDN',
+	'',
+	'```html',
+	'<script type="importmap">{}</script>',
+	'```',
+	'',
+	'## Usage',
+	'',
+	'```js',
+	'hi',
+	'```',
+	'',
+].join('\n');
 
 describe('Plugin Repo Scripts Unit Tests', () => {
 	describe('Workspace Plugin Discovery (findWorkspacePlugins)', () => {
@@ -232,6 +262,12 @@ npm install @tradingview/lwc-plugin-test
 import { createChart } from 'lightweight-charts';
 \`\`\`
 
+### CDN
+
+\`\`\`html
+<script type="importmap">{ "imports": {} }</script>
+\`\`\`
+
 ## Usage
 
 \`\`\`js
@@ -287,6 +323,84 @@ code
 			expect(result.errors).to.include("README.md missing Installation section ('## Installation')");
 		});
 
+		it('should require the npm and CDN tabs under Installation', () => {
+			const noCdn = `
+# Test Plugin
+
+Description here.
+
+## Installation
+
+### npm
+
+\`\`\`shell
+npm install test
+\`\`\`
+
+## Usage
+
+\`\`\`js
+code
+\`\`\`
+`;
+			const result = validateReadmeContent(noCdn);
+			expect(result.valid).to.be.false;
+			expect(result.errors).to.include("README.md Installation section missing the '### CDN' subsection");
+			expect(result.errors).to.not.include("README.md Installation section missing the '### npm' subsection");
+		});
+
+		it('should ignore heading-like lines inside fenced code blocks', () => {
+			const withFencedComment = `
+# Test Plugin
+
+Description here.
+
+## Installation
+
+### npm
+
+\`\`\`shell
+## not a heading, a shell comment
+npm install test
+\`\`\`
+
+### CDN
+
+\`\`\`html
+<script type="importmap">{}</script>
+\`\`\`
+
+## Usage
+
+\`\`\`js
+code
+\`\`\`
+`;
+			expect(validateReadmeContent(withFencedComment).errors).to.be.empty;
+		});
+
+		it('should not accept an Uninstall heading as the Installation section', () => {
+			const uninstall = `
+# Test Plugin
+
+Description here.
+
+## Uninstall
+
+### npm
+
+### CDN
+
+## Usage
+
+\`\`\`js
+code
+\`\`\`
+`;
+			const result = validateReadmeContent(uninstall);
+			expect(result.errors).to.include("README.md missing Installation section ('## Installation')");
+		});
+
 		it('should fail when Usage code block is missing', () => {
 			const invalid = `
 # Test Plugin
@@ -302,6 +416,14 @@ No code block provided here.
 			const result = validateReadmeContent(invalid);
 			expect(result.valid).to.be.false;
 			expect(result.errors).to.include('README.md missing JavaScript/TypeScript usage code block');
+		});
+	});
+
+	describe('Scaffold placeholders (findPlaceholders)', () => {
+		it('should find wizard placeholders and ignore ordinary identifiers and emphasis', () => {
+			const text = 'Uses _DESCRIPTION_ and _ATTACH_SNIPPET_, but not _NOTE_, MAX_VALUE, SOME_ENV_VAR or __dirname.';
+			expect(findPlaceholders(text)).to.deep.equal(['_DESCRIPTION_', '_ATTACH_SNIPPET_']);
+			expect(findPlaceholders('nothing here')).to.deep.equal([]);
 		});
 	});
 
@@ -380,6 +502,45 @@ const p = new Plugin();
 			expect(allErrors).to.include('lightweight-charts-plugin');
 		});
 
+		it('should require a description, a valid version and no scaffold placeholders', () => {
+			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-contract-test-'));
+			try {
+				const pkg = {
+					name: '@tradingview/lwc-plugin-test',
+					version: 'next',
+					description: '_DESCRIPTION_',
+					license: 'Apache-2.0',
+					publishConfig: { access: 'public' },
+					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					keywords: ['lightweight-charts-plugin'],
+					lwcPlugin: {
+						title: 'Test',
+						category: 'series-primitive',
+						lifecycle: 'current',
+						origin: 'official',
+						demo: 'src/example/index.html',
+					},
+				};
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
+				fs.writeFileSync(path.join(tempDir, 'README.md'), '# _PLUGINNAME_\n\nDesc\n');
+				fs.writeFileSync(path.join(tempDir, 'CHANGELOG.md'), '# Changelog\n\n## 1.0.0\n\n- Initial release of _PLUGINNAME_.\n');
+
+				const result = validatePackageMetadata(tempDir, { isOfficial: true });
+				expect(result.valid).to.be.false;
+				expect(result.errors).to.include("'version' must be a valid semver version (got 'next')");
+				expect(result.errors).to.include('package.json still contains scaffold placeholders: _DESCRIPTION_');
+				expect(result.errors).to.include('README.md still contains scaffold placeholders: _PLUGINNAME_');
+				expect(result.errors).to.include('CHANGELOG.md still contains scaffold placeholders: _PLUGINNAME_');
+
+				delete (pkg as { description?: string }).description;
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
+				expect(validatePackageMetadata(tempDir, { isOfficial: true }).errors)
+					.to.include("Missing or empty 'description' field in package.json");
+			} finally {
+				fs.rmSync(tempDir, { recursive: true, force: true });
+			}
+		});
+
 		it('should fail if declared demo path does not exist', () => {
 			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-demo-test-'));
 			try {
@@ -399,7 +560,7 @@ const p = new Plugin();
 					},
 				};
 				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
-				fs.writeFileSync(path.join(tempDir, 'README.md'), '# Test\n\nDesc\n\n## Installation\n\n```js\nhi\n```\n\n## Usage\n\n```js\nhi\n```');
+				fs.writeFileSync(path.join(tempDir, 'README.md'), minimalValidReadme);
 
 				const result = validatePackageMetadata(tempDir, { isOfficial: true });
 				expect(result.valid).to.be.false;
@@ -429,7 +590,7 @@ const p = new Plugin();
 					},
 				};
 				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
-				fs.writeFileSync(path.join(tempDir, 'README.md'), '# Test\n\nDesc\n\n## Installation\n\n```js\nhi\n```\n\n## Usage\n\n```js\nhi\n```');
+				fs.writeFileSync(path.join(tempDir, 'README.md'), minimalValidReadme);
 				fs.mkdirSync(path.join(tempDir, 'example'));
 				fs.writeFileSync(path.join(tempDir, 'example/index.html'), '<html></html>');
 
@@ -492,6 +653,55 @@ const p = new Plugin();
 			} finally {
 				fs.rmSync(tempDir, { recursive: true, force: true });
 			}
+		});
+	});
+
+	describe('Stale plugin detection (compareDistDirs, classifyStaleness)', () => {
+		it('should report changed, added and removed files between two dist directories', () => {
+			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-dist-diff-'));
+			try {
+				const local = path.join(tempDir, 'local');
+				const published = path.join(tempDir, 'published');
+				for (const dir of [local, published]) {
+					fs.mkdirSync(path.join(dir, 'nested'), { recursive: true });
+					fs.writeFileSync(path.join(dir, 'same.js'), 'export const a = 1;');
+					fs.writeFileSync(path.join(dir, 'nested', 'changed.js'), dir === local ? 'new' : 'old');
+				}
+				fs.writeFileSync(path.join(local, 'added.d.ts'), 'export {};');
+				fs.writeFileSync(path.join(published, 'removed.js'), 'gone');
+
+				const diff = compareDistDirs(local, published);
+				expect(diff.identical).to.be.false;
+				expect(diff.changed).to.deep.equal(['nested/changed.js']);
+				expect(diff.added).to.deep.equal(['added.d.ts']);
+				expect(diff.removed).to.deep.equal(['removed.js']);
+
+				fs.rmSync(path.join(local, 'added.d.ts'));
+				fs.rmSync(path.join(published, 'removed.js'));
+				fs.writeFileSync(path.join(local, 'nested', 'changed.js'), 'old');
+				expect(compareDistDirs(local, published).identical).to.be.true;
+			} finally {
+				fs.rmSync(tempDir, { recursive: true, force: true });
+			}
+		});
+
+		it('should treat a missing published dist as all files added', () => {
+			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-dist-diff-'));
+			try {
+				fs.writeFileSync(path.join(tempDir, 'entry.js'), 'x');
+				const diff = compareDistDirs(tempDir, path.join(tempDir, 'does-not-exist'));
+				expect(diff.identical).to.be.false;
+				expect(diff.added).to.deep.equal(['entry.js']);
+			} finally {
+				fs.rmSync(tempDir, { recursive: true, force: true });
+			}
+		});
+
+		it('should classify output and version changes', () => {
+			expect(classifyStaleness({ outputDiffers: true, versionBumped: false }).status).to.equal('fail');
+			expect(classifyStaleness({ outputDiffers: true, versionBumped: true }).status).to.equal('pass');
+			expect(classifyStaleness({ outputDiffers: false, versionBumped: true }).status).to.equal('warn');
+			expect(classifyStaleness({ outputDiffers: false, versionBumped: false }).status).to.equal('pass');
 		});
 	});
 });

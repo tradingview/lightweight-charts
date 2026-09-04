@@ -16,6 +16,8 @@ export function resolveTargetPlugins(repoRoot: string, options?: TargetOptions):
 
 export function loadTargetPlugins(repoRoot: string, options?: TargetOptions): WorkspacePlugin[];
 
+export function buildWorkspaceDependencies(repoRoot: string): void;
+
 export function compareVersions(
 	localVersion: string,
 	remoteVersion: string | null
@@ -37,9 +39,28 @@ export function validatePackageMetadata(
 
 export function validateReadmeContent(content: string): { valid: boolean; errors: string[] };
 
+export function findPlaceholders(text: string): string[];
+
 export function extractReadmeSnippet(readmePath: string): { code: string; lang: 'ts' | 'js' };
 
 export function verifyPackContent(
 	tarballPath: string,
 	packageJson: Record<string, any>
 ): { valid: boolean; errors: string[] };
+
+export function fetchPublishedPackage(packageName: string, version: string, destDir: string): string;
+
+export interface DistDiff {
+	identical: boolean;
+	added: string[];
+	removed: string[];
+	changed: string[];
+}
+
+export function compareDistDirs(localDir: string, publishedDir: string): DistDiff;
+
+export type StalenessStatus = 'pass' | 'warn' | 'fail';
+
+export function classifyStaleness(
+	input: { outputDiffers: boolean; versionBumped: boolean }
+): { status: StalenessStatus; message: string };

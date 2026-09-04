@@ -127,6 +127,7 @@
     "scaffold-plugin": "pnpm --filter create-lwc-plugin build && node packages/create-lwc-plugin/index.js --workspace",
     "plugins:validate": "node scripts/plugins/validate-metadata.mjs",
     "plugins:check-compat": "node scripts/plugins/check-compat.mjs",
+    "plugins:check-stale": "node scripts/plugins/check-stale.mjs",
     "plugins:release": "node scripts/plugins/release.mjs",
     "plugins:smoke": "node scripts/plugins/smoke-install.mjs",
     "lint": "npm-run-all -p lint:**",

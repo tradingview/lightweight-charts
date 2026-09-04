@@ -206,6 +206,26 @@ jobs:
             pnpm dlx @arethetypeswrong/cli@0.18.5 --pack . \
               --ignore-rules no-resolution cjs-resolves-to-esm
 
+  plugins:
+    executor: node-executor
+    steps:
+      - checkout-with-deps
+      # The official plugin packages under packages/lwc-plugin-*: package
+      # contract and catalogue metadata, typecheck + build against the
+      # workspace library and toolkit, and the changelog entry for a bumped
+      # version. The scripts build the library and the toolkit themselves;
+      # running after `build` only means a broken library fails there, once.
+      # Nothing here publishes: the release script refuses to publish when CI
+      # is set, and the job has no npm credentials. Until the first plugin
+      # package graduates, every step reports that there is nothing to check.
+      - run: pnpm plugins:validate
+      - run:
+          command: pnpm plugins:check-compat
+          no_output_timeout: 5m
+      - run:
+          name: "Check version and changelog consistency against the registry"
+          command: pnpm plugins:release --check-only
+
   usable-in-nodejs:
     executor: node-executor
     steps:
@@ -435,6 +455,10 @@ workflows:
           requires:
             - install-deps
       - lwc-toolkit:
+          filters: *default-filters
+          requires:
+            - build
+      - plugins:
           filters: *default-filters
           requires:
             - build

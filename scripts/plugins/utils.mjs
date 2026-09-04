@@ -1,10 +1,31 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import semver from 'semver';
 import Ajv from 'ajv';
 
 const AjvCtor = Ajv.default ?? Ajv;
+const SCHEMA_PATH = fileURLToPath(new URL('./lwc-plugin-metadata.schema.json', import.meta.url));
+
+/**
+ * The placeholders the create-lwc-plugin wizard substitutes, see
+ * packages/create-lwc-plugin/src/scaffold.ts. Matched literally, so ordinary
+ * `_emphasis_` or `SOME_CONSTANT` text is never mistaken for one.
+ */
+const SCAFFOLD_PLACEHOLDERS = [
+	'_ATTACH_SNIPPET_',
+	'_USAGE_SNIPPET_',
+	'_ENTRYNAME_',
+	'_PLUGINNAME_',
+	'_CLASSNAME_',
+	'_PACKAGENAME_',
+	'_DESCRIPTION_',
+	'_AUTHOR_',
+	'_LICENSE_',
+	'_PEERVERSION_',
+	'_CATEGORY_',
+];
 
 /**
  * Checks whether a package name or folder matches the provided filter.
@@ -140,6 +161,20 @@ export function loadTargetPlugins(repoRoot, options) {
 }
 
 /**
+ * Builds the library and the toolkit from the workspace. Plugin builds resolve
+ * both through workspace links whose entry points live in `dist/`, so nothing
+ * that compiles a plugin can run on a clean checkout before this has.
+ *
+ * @param {string} repoRoot - Absolute path to repository root.
+ */
+export function buildWorkspaceDependencies(repoRoot) {
+	console.log('📦 Building the workspace library...');
+	execSync('pnpm build', { cwd: repoRoot, stdio: 'inherit' });
+	console.log('📦 Building @tradingview/lwc-toolkit...');
+	execSync('pnpm --filter @tradingview/lwc-toolkit build', { cwd: repoRoot, stdio: 'inherit' });
+}
+
+/**
  * Compares a local package version against a remote npm registry version.
  *
  * @param {string} localVersion - Local version string.
@@ -259,7 +294,34 @@ function validateNamingAndLicense(pkg, isOfficial) {
 		errors.push(`Missing or empty 'license' field in package.json`);
 	}
 
+	// The catalogue card shows the root description, so it is part of the contract.
+	if (typeof pkg.description !== 'string' || pkg.description.trim().length === 0) {
+		errors.push(`Missing or empty 'description' field in package.json`);
+	}
+
 	return errors;
+}
+
+/**
+ * Lists the wizard placeholders still present in a file's text, e.g. `_DESCRIPTION_`.
+ *
+ * @param {string} text
+ * @returns {string[]} Placeholders found, in order of first appearance.
+ */
+export function findPlaceholders(text) {
+	return SCAFFOLD_PLACEHOLDERS
+		.map(placeholder => [placeholder, text.indexOf(placeholder)])
+		.filter(([, index]) => index !== -1)
+		.sort((a, b) => a[1] - b[1])
+		.map(([placeholder]) => placeholder);
+}
+
+/**
+ * Error messages for scaffold placeholders left in a package file, if any.
+ */
+function placeholderErrors(fileLabel, text) {
+	const found = findPlaceholders(text);
+	return found.length > 0 ? [`${fileLabel} still contains scaffold placeholders: ${found.join(', ')}`] : [];
 }
 
 /**
@@ -267,6 +329,10 @@ function validateNamingAndLicense(pkg, isOfficial) {
  */
 function validateDependenciesAndKeywords(pkg) {
 	const errors = [];
+
+	if (!semver.valid(pkg.version)) {
+		errors.push(`'version' must be a valid semver version (got '${pkg.version}')`);
+	}
 
 	if (!pkg.publishConfig || pkg.publishConfig.access !== 'public') {
 		errors.push(`'publishConfig.access' must be set to 'public'`);
@@ -296,11 +362,7 @@ function validateLwcPluginBlock(lwcPlugin, isOfficial) {
 		return errors;
 	}
 
-	const schemaPath = path.resolve(
-		path.dirname(new URL(import.meta.url).pathname),
-		'lwc-plugin-metadata.schema.json'
-	);
-	const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
+	const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf-8'));
 	const ajv = new AjvCtor({ allErrors: true });
 	const validate = ajv.compile(schema);
 	const isValid = validate(lwcPlugin);
@@ -333,9 +395,10 @@ export function validatePackageMetadata(packageDir, { isOfficial = true } = {}) 
 		return { valid: false, errors: [`package.json not found in ${packageDir}`] };
 	}
 
+	const pkgJsonText = fs.readFileSync(pkgJsonPath, 'utf-8');
 	let pkg;
 	try {
-		pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+		pkg = JSON.parse(pkgJsonText);
 	} catch (e) {
 		return { valid: false, errors: [`Invalid JSON in package.json: ${e.message}`] };
 	}
@@ -345,6 +408,8 @@ export function validatePackageMetadata(packageDir, { isOfficial = true } = {}) 
 		...validateDependenciesAndKeywords(pkg),
 		...validateLwcPluginBlock(pkg.lwcPlugin, isOfficial),
 	];
+
+	errors.push(...placeholderErrors('package.json', pkgJsonText));
 
 	// README.md validation
 	const readmePath = ['README.md', 'readme.md']
@@ -358,6 +423,15 @@ export function validatePackageMetadata(packageDir, { isOfficial = true } = {}) 
 		const readmeValidation = validateReadmeContent(readmeContent);
 		if (!readmeValidation.valid) {
 			errors.push(...readmeValidation.errors);
+		}
+		errors.push(...placeholderErrors('README.md', readmeContent));
+	}
+
+	// The scaffold fills these two as well.
+	for (const file of ['CHANGELOG.md', 'NOTICE']) {
+		const filePath = path.join(packageDir, file);
+		if (fs.existsSync(filePath)) {
+			errors.push(...placeholderErrors(file, fs.readFileSync(filePath, 'utf-8')));
 		}
 	}
 
@@ -376,10 +450,63 @@ export function validatePackageMetadata(packageDir, { isOfficial = true } = {}) 
 }
 
 /**
- * Validates README structure for required registry sections:
- * - Description at the top (with HTML comments stripped)
- * - Installation section
- * - Usage example code block
+ * Marks the lines that sit inside fenced code blocks, so that a `## comment`
+ * inside a shell snippet is not taken for a heading.
+ *
+ * @param {string[]} lines
+ * @returns {boolean[]}
+ */
+function fencedLines(lines) {
+	let inFence = false;
+	return lines.map(line => {
+		if (/^\s*(```|~~~)/.test(line)) {
+			inFence = !inFence;
+			return true;
+		}
+		return inFence;
+	});
+}
+
+/**
+ * Whether any text follows the top heading before the first level-2 heading.
+ */
+function hasDescriptionParagraph(lines, fenced, topHeadingIndex) {
+	for (let i = topHeadingIndex + 1; i < lines.length; i++) {
+		const line = lines[i].trim();
+		if (!fenced[i] && /^##\s+/.test(line)) {
+			return false;
+		}
+		if (line.length > 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Returns the body of the level-2 section whose heading matches, up to the next
+ * level-2 heading, or null when there is no such section.
+ */
+function sectionBody(lines, fenced, headingPattern) {
+	const start = lines.findIndex((line, i) => !fenced[i] && headingPattern.test(line));
+	if (start === -1) {
+		return null;
+	}
+	let end = lines.length;
+	for (let i = start + 1; i < lines.length; i++) {
+		if (!fenced[i] && /^##\s/.test(lines[i])) {
+			end = i;
+			break;
+		}
+	}
+	return lines.slice(start + 1, end).join('\n');
+}
+
+/**
+ * Validates the README structure the plugin catalogue renders:
+ * - a description paragraph under the top heading (HTML comments ignored)
+ * - an Installation section with the `### npm` and `### CDN` tabs
+ * - a Usage section with a JavaScript/TypeScript example
  *
  * @param {string} content - Markdown content of README.md.
  * @returns {{ valid: boolean, errors: string[] }}
@@ -393,34 +520,30 @@ export function validateReadmeContent(content) {
 	// Strip HTML comments before checking description and sections
 	const stripped = content.replace(/<!--[\s\S]*?-->/g, '');
 	const lines = stripped.split(/\r?\n/);
-	const topHeadingIndex = lines.findIndex(line => /^#\s+/.test(line));
+	const fenced = fencedLines(lines);
+	const topHeadingIndex = lines.findIndex((line, i) => !fenced[i] && /^#\s+/.test(line));
 
 	if (topHeadingIndex === -1) {
 		errors.push(`README.md missing top level heading ('# <Plugin Name>')`);
-	} else {
-		let hasDescription = false;
-		for (let i = topHeadingIndex + 1; i < lines.length; i++) {
-			const line = lines[i].trim();
-			if (/^##\s+/.test(line)) {
-				break;
-			}
-			if (line.length > 0) {
-				hasDescription = true;
-				break;
-			}
-		}
-		if (!hasDescription) {
-			errors.push(`README.md must have a description paragraph at the top`);
-		}
+	} else if (!hasDescriptionParagraph(lines, fenced, topHeadingIndex)) {
+		errors.push(`README.md must have a description paragraph at the top`);
 	}
 
-	if (!/(?:^|\n)##+\s+.*install/i.test(stripped)) {
+	const installation = sectionBody(lines, fenced, /^##\s+Installation\b/i);
+	if (installation === null) {
 		errors.push(`README.md missing Installation section ('## Installation')`);
+	} else {
+		for (const tab of ['npm', 'CDN']) {
+			if (!new RegExp(`^###\\s+${tab}\\b`, 'im').test(installation)) {
+				errors.push(`README.md Installation section missing the '### ${tab}' subsection`);
+			}
+		}
 	}
 
-	if (!/(?:^|\n)##+\s+.*usage/i.test(stripped)) {
+	const usage = sectionBody(lines, fenced, /^##\s+Usage\b/i);
+	if (usage === null) {
 		errors.push(`README.md missing Usage section ('## Usage')`);
-	} else if (!/```(?:js|javascript|ts|typescript)/.test(stripped)) {
+	} else if (!/```(?:js|javascript|ts|typescript)\b/.test(usage)) {
 		errors.push(`README.md missing JavaScript/TypeScript usage code block`);
 	}
 
@@ -559,4 +682,89 @@ export function verifyPackContent(tarballPath, packageJson) {
 		valid: errors.length === 0,
 		errors,
 	};
+}
+
+/**
+ * Downloads the published tarball of a package version and extracts it.
+ *
+ * @param {string} packageName
+ * @param {string} version
+ * @param {string} destDir - Empty directory to download into.
+ * @returns {string} Path of the extracted `package/` directory.
+ */
+export function fetchPublishedPackage(packageName, version, destDir) {
+	execFileSync('npm', ['pack', `${packageName}@${version}`, '--pack-destination', destDir], {
+		stdio: ['pipe', 'pipe', 'pipe'],
+	});
+	const tgz = fs.readdirSync(destDir).find(f => f.endsWith('.tgz'));
+	if (!tgz) {
+		throw new Error(`npm pack produced no tarball for ${packageName}@${version}`);
+	}
+	execFileSync('tar', ['-xzf', path.join(destDir, tgz), '-C', destDir]);
+	return path.join(destDir, 'package');
+}
+
+function listFilesRecursively(dir, prefix = '') {
+	if (!fs.existsSync(dir)) {
+		return [];
+	}
+	const files = [];
+	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+		const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+		if (entry.isDirectory()) {
+			files.push(...listFilesRecursively(path.join(dir, entry.name), relative));
+		} else {
+			files.push(relative);
+		}
+	}
+	return files.sort();
+}
+
+/**
+ * Compares two build output directories file by file.
+ *
+ * @param {string} localDir - Freshly built output.
+ * @param {string} publishedDir - Output extracted from the published tarball.
+ * @returns {{ identical: boolean, added: string[], removed: string[], changed: string[] }}
+ */
+export function compareDistDirs(localDir, publishedDir) {
+	const local = listFilesRecursively(localDir);
+	const published = new Set(listFilesRecursively(publishedDir));
+	const localSet = new Set(local);
+
+	const added = local.filter(f => !published.has(f));
+	const removed = [...published].filter(f => !localSet.has(f));
+	const changed = local.filter(f =>
+		published.has(f) &&
+		!fs.readFileSync(path.join(localDir, f)).equals(fs.readFileSync(path.join(publishedDir, f)))
+	);
+
+	return {
+		identical: added.length === 0 && removed.length === 0 && changed.length === 0,
+		added,
+		removed,
+		changed,
+	};
+}
+
+/**
+ * Decides what a difference between the built and the published output means
+ * for a plugin: changed output needs a release, so it fails unless the version
+ * was bumped; a bump with identical output is legitimate (README or metadata
+ * only) but worth a look.
+ *
+ * @param {{ outputDiffers: boolean, versionBumped: boolean }} input
+ * @returns {{ status: 'pass' | 'warn' | 'fail', message: string }}
+ */
+export function classifyStaleness({ outputDiffers, versionBumped }) {
+	if (outputDiffers && !versionBumped) {
+		return { status: 'fail', message: 'the shipped output changed but the version was not bumped' };
+	}
+	if (outputDiffers) {
+		return { status: 'pass', message: 'the output changed and the version was bumped' };
+	}
+	if (versionBumped) {
+		return { status: 'warn', message: 'the version was bumped but the built output is identical to the published one' };
+	}
+	return { status: 'pass', message: 'up to date with the published version' };
 }
