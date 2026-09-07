@@ -7,8 +7,7 @@
     "description": "Drop-in accessibility layer built on pane primitives: adds semantic markup, keyboard navigation, and screen-reader support to help meet WCAG 2.1 AA.",
     "lwcPlugin": {
         "title": "Accessibility",
-        "type": "pane-primitive",
-        "categories": ["ux & accessibility"],
+        "category": "pane-primitive",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -25,8 +24,7 @@
     "description": "Area series that can style ranges of data differently. Pair it with your own pointer handling to build a brush selection.",
     "lwcPlugin": {
         "title": "Brushable area series",
-        "type": "custom-series",
-        "categories": ["series types"],
+        "category": "custom-series",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -43,8 +41,7 @@
     "description": "Histogram with two nested value ranges above and below a baseline. A compact overlay for buy and sell volumes or net flows.",
     "lwcPlugin": {
         "title": "Dual range histogram series",
-        "type": "custom-series",
-        "categories": ["series types"],
+        "category": "custom-series",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -61,8 +58,7 @@
     "description": "High-low-close series: fills the band between highs and lows and draws the close as a line on top.",
     "lwcPlugin": {
         "title": "HLC area series",
-        "type": "custom-series",
-        "categories": ["series types"],
+        "category": "custom-series",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -79,8 +75,7 @@
     "description": "Image watermark drawn behind the attached series, centered and scaled to fit, with size limits, padding, and opacity controls.",
     "lwcPlugin": {
         "title": "Image watermark",
-        "type": "series-primitive",
-        "categories": ["overlays"],
+        "category": "series-primitive",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -97,8 +92,7 @@
     "description": "Histogram with rounded, evenly spaced columns for a more polished look than the built-in histogram.",
     "lwcPlugin": {
         "title": "Pretty histogram series",
-        "type": "custom-series",
-        "categories": ["series types"],
+        "category": "custom-series",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -115,8 +109,7 @@
     "description": "Candlestick series with rounded corners for a softer visual style. A drop-in replacement for the built-in candlestick series.",
     "lwcPlugin": {
         "title": "Rounded candles series",
-        "type": "custom-series",
-        "categories": ["series types"],
+        "category": "custom-series",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -133,8 +126,7 @@
     "description": "Area series that stacks several values per time point into cumulative bands. Useful for composition-over-time views such as portfolio allocation.",
     "lwcPlugin": {
         "title": "Stacked area series",
-        "type": "custom-series",
-        "categories": ["series types"],
+        "category": "custom-series",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -151,8 +143,7 @@
     "description": "Bar series that draws several values per time point as stacked segments summing to a total.",
     "lwcPlugin": {
         "title": "Stacked bars series",
-        "type": "custom-series",
-        "categories": ["series types"],
+        "category": "custom-series",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
@@ -169,8 +160,7 @@
     "description": "Full-height vertical line at a given time, with an optional label on the time axis, for marking events, trades, and session boundaries.",
     "lwcPlugin": {
         "title": "Vertical line",
-        "type": "series-primitive",
-        "categories": ["drawing tools"],
+        "category": "series-primitive",
         "lifecycle": "current",
         "origin": "official",
         "author": "TradingView",
