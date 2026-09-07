@@ -545,9 +545,9 @@ const p = new Plugin();
 			}
 		});
 
-		it('should require repository.directory, when present, to name the package directory', () => {
+		it('should require repository.directory, when present, to name the package directory inside the repo', () => {
 			const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-repodir-test-'));
-			const tempDir = path.join(tempRoot, 'lwc-plugin-test');
+			const tempDir = path.join(tempRoot, 'packages', 'lwc-plugin-test');
 			try {
 				fs.mkdirSync(path.join(tempDir, 'src', 'example'), { recursive: true });
 				const pkg = {
@@ -565,12 +565,16 @@ const p = new Plugin();
 				fs.writeFileSync(path.join(tempDir, 'README.md'), minimalValidReadme);
 				fs.writeFileSync(path.join(tempDir, 'src', 'example', 'index.html'), '<html></html>');
 
-				expect(validatePackageMetadata(tempDir, { isOfficial: true }).errors)
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: tempRoot }).errors)
 					.to.include("'repository.directory' must be 'packages/lwc-plugin-test' (got 'packages/lwc-plugin-other')");
+
+				// A --path target outside the repository has no location to check against.
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: path.join(tempRoot, 'elsewhere') }).errors)
+					.to.not.include.members([`'repository.directory' must be 'packages/lwc-plugin-test' (got 'packages/lwc-plugin-other')`]);
 
 				pkg.repository.directory = 'packages/lwc-plugin-test';
 				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
-				expect(validatePackageMetadata(tempDir, { isOfficial: true }).valid).to.be.true;
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: tempRoot }).valid).to.be.true;
 			} finally {
 				fs.rmSync(tempRoot, { recursive: true, force: true });
 			}

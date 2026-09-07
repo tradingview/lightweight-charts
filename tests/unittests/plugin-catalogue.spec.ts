@@ -9,11 +9,13 @@ import { describe, it } from 'node:test';
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
+import { execFileSync } from 'node:child_process';
 
 import { findWorkspacePlugins } from '../../scripts/plugins/utils.mjs';
 import {
 	buildCatalogueData,
 	fetchPackument,
+	fetchTarballReadme,
 	publishedRelease,
 	type Packument,
 } from '../../scripts/plugins/catalogue-data.mjs';
@@ -80,6 +82,24 @@ function makeRepo(packages: Record<string, Record<string, unknown> | string>): s
 	return root;
 }
 
+/** A gzipped tarball with the given files under package/, as npm publishes them. */
+function makeTarball(files: Record<string, string>): Buffer {
+	const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-tarball-'));
+	try {
+		for (const [name, content] of Object.entries(files)) {
+			const file = path.join(tempDir, 'package', name);
+			fs.mkdirSync(path.dirname(file), { recursive: true });
+			fs.writeFileSync(file, content);
+		}
+		execFileSync('tar', ['-czf', 'package.tgz', 'package'], { cwd: tempDir });
+		return fs.readFileSync(path.join(tempDir, 'package.tgz'));
+	} finally {
+		fs.rmSync(tempDir, { recursive: true, force: true });
+	}
+}
+
+const TARBALL_URL = 'https://registry.example.test/pkg/-/pkg-1.0.0.tgz';
+
 function packument(latest: string, extra: Partial<Packument> & { manifest?: Record<string, unknown> } = {}): Packument {
 	const { manifest = {}, ...rest } = extra;
 	return {
@@ -90,24 +110,44 @@ function packument(latest: string, extra: Partial<Packument> & { manifest?: Reco
 				license: 'Apache-2.0',
 				keywords: ['lightweight-charts-plugin', 'published'],
 				peerDependencies: { 'lightweight-charts': '^5.1.0' },
+				dist: { tarball: TARBALL_URL },
 				...manifest,
 			},
 		},
 		time: { [latest]: '2026-09-01T10:00:00.000Z' },
-		readme: `# Published README ${latest}`,
+		// What the packument root carries: the README of whatever was published LAST.
+		readme: '# README of some other release',
 		...rest,
 	};
 }
 
 function response(status: number, body: unknown): Response {
-	return { status, ok: status >= 200 && status < 300, json: () => Promise.resolve(body) } as unknown as Response;
+	return {
+		status,
+		ok: status >= 200 && status < 300,
+		json: () => Promise.resolve(body),
+		arrayBuffer: () => Promise.resolve(Buffer.isBuffer(body) ? Uint8Array.from(body).buffer : new ArrayBuffer(0)),
+	} as unknown as Response;
 }
 
-/** A fetch stand-in answering per package name: a packument, 404 for null, a status number, or a thrown error. */
-function fakeFetch(answers: Record<string, Packument | null | number | Error>, calls: string[] = []): typeof fetch {
+const defaultTarball = makeTarball({ 'README.md': '# Published README 1.0.0\n', 'package.json': '{}' });
+
+/**
+ * A fetch stand-in. Packument URLs are answered per package name: a packument,
+ * 404 for null, a status number, or a thrown error. Tarball URLs (.tgz) are
+ * answered with `tarball`, or 404 when it is null.
+ */
+function fakeFetch(
+	answers: Record<string, Packument | null | number | Error>,
+	calls: string[] = [],
+	tarball: Buffer | null = defaultTarball
+): typeof fetch {
 	return ((input: string | URL | Request) => {
 		const url = String(input);
 		calls.push(url);
+		if (url.endsWith('.tgz')) {
+			return Promise.resolve(tarball === null ? response(404, null) : response(200, tarball));
+		}
 		const name = decodeURIComponent(url.slice(url.lastIndexOf('/') + 1));
 		const answer = answers[name];
 		if (answer instanceof Error) {
@@ -136,7 +176,7 @@ async function rejection(promise: Promise<unknown>): Promise<Error> {
 
 describe('Plugin catalogue data', () => {
 	describe('publishedRelease', () => {
-		it('should read the latest version and what the registry knows about it', () => {
+		it('should read the latest version, what the registry knows about it, and where its tarball is', () => {
 			const release = publishedRelease(packument('1.2.0', { manifest: { deprecated: 'use the other one' } }));
 			expect(release).to.deep.equal({
 				version: '1.2.0',
@@ -146,17 +186,17 @@ describe('Plugin catalogue data', () => {
 				license: 'Apache-2.0',
 				keywords: ['lightweight-charts-plugin', 'published'],
 				deprecated: 'use the other one',
-				readme: '# Published README 1.2.0',
+				tarball: TARBALL_URL,
 			});
 		});
 
-		it('should treat missing dist-tags and the no-README sentinel as absent', () => {
+		it('should treat missing dist-tags as unpublished and missing fields as null', () => {
 			expect(publishedRelease(null)).to.be.null;
 			expect(publishedRelease({ time: { unpublished: '2026-01-01T00:00:00.000Z' } })).to.be.null;
-			const release = publishedRelease(packument('1.0.0', { readme: 'ERROR: No README data found!', manifest: { peerDependencies: {} } }));
-			expect(release?.readme).to.be.null;
+			const release = publishedRelease(packument('1.0.0', { manifest: { peerDependencies: {}, dist: {} } }));
 			expect(release?.peerRange).to.be.null;
 			expect(release?.deprecated).to.be.null;
+			expect(release?.tarball).to.be.null;
 		});
 
 		it('should refuse a latest tag without a manifest', () => {
@@ -177,13 +217,14 @@ describe('Plugin catalogue data', () => {
 			expect(await fetchPackument('x', { fetchImpl: fakeFetch({}), retries: 1 })).to.be.null;
 		});
 
-		it('should retry a 5xx but not another 4xx', async () => {
+		it('should retry a 5xx and a 429 but not another 4xx', async () => {
+			for (const status of [503, 429]) {
+				const calls: string[] = [];
+				const error = await rejection(fetchPackument('x', { fetchImpl: fakeFetch({ x: status }, calls), retries: 3 }));
+				expect(error.message).to.match(new RegExp(`responded with ${status}`));
+				expect(calls).to.have.lengthOf(3);
+			}
 			const calls: string[] = [];
-			const error = await rejection(fetchPackument('x', { fetchImpl: fakeFetch({ x: 503 }, calls), retries: 3 }));
-			expect(error.message).to.match(/responded with 503/);
-			expect(calls).to.have.lengthOf(3);
-
-			calls.length = 0;
 			const refused = await rejection(fetchPackument('x', { fetchImpl: fakeFetch({ x: 403 }, calls), retries: 3 }));
 			expect(refused.message).to.match(/responded with 403/);
 			expect(calls).to.have.lengthOf(1);
@@ -193,6 +234,22 @@ describe('Plugin catalogue data', () => {
 			const down = (() => Promise.reject(new Error('ENOTFOUND'))) as typeof fetch;
 			const error = await rejection(fetchPackument('@tradingview/lwc-plugin-a', { fetchImpl: down, retries: 0 }));
 			expect(error.message).to.match(/Could not fetch @tradingview\/lwc-plugin-a from .*ENOTFOUND/);
+		});
+	});
+
+	describe('fetchTarballReadme', () => {
+		it('should read the README out of the tarball, whatever its casing, and return null without one', async () => {
+			const upper = makeTarball({ 'README.md': '# Upper\n' });
+			expect(await fetchTarballReadme(TARBALL_URL, { fetchImpl: fakeFetch({}, [], upper) })).to.equal('# Upper');
+			const lower = makeTarball({ 'readme.markdown': '# Lower\n', 'docs/README.md': '# not the root one\n' });
+			expect(await fetchTarballReadme(TARBALL_URL, { fetchImpl: fakeFetch({}, [], lower) })).to.equal('# Lower');
+			const none = makeTarball({ 'package.json': '{}', 'docs/README.md': '# nested only\n' });
+			expect(await fetchTarballReadme(TARBALL_URL, { fetchImpl: fakeFetch({}, [], none) })).to.be.null;
+		});
+
+		it('should fail when the registry does not serve a tarball it lists', async () => {
+			const error = await rejection(fetchTarballReadme(TARBALL_URL, { fetchImpl: fakeFetch({}, [], null), retries: 1 }));
+			expect(error.message).to.match(/lists .* but does not serve it/);
 		});
 	});
 
@@ -239,16 +296,17 @@ describe('Plugin catalogue data', () => {
 			}
 		});
 
-		it('should describe a published package from the registry and curate it from the workspace', async () => {
+		it('should describe a published package from the registry and its tarball, and curate it from the workspace', async () => {
 			const manifest = validManifest('@tradingview/lwc-plugin-line', '1.0.0');
 			delete (manifest.lwcPlugin as Record<string, unknown>).tags;
 			(manifest.lwcPlugin as Record<string, unknown>).demo = './src/example/index.html';
 			const root = makeRepo({ 'lwc-plugin-line': manifest });
+			const calls: string[] = [];
 			try {
 				const data = await buildCatalogueData({
 					repoRoot: root,
-					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': packument('1.0.0') }),
-					registry: 'https://registry.example.test',
+					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': packument('1.0.0') }, calls),
+					registry: 'https://registry.example.test/',
 					log: silent,
 				});
 				expect(data.registry).to.equal('https://registry.example.test');
@@ -263,9 +321,11 @@ describe('Plugin catalogue data', () => {
 				expect(entry.peerRange).to.equal('^5.1.0');
 				expect(entry.description).to.equal('Published description 1.0.0');
 				expect(entry.keywords).to.deep.equal(['lightweight-charts-plugin', 'published']);
-				expect(entry.readme).to.equal('# Published README 1.0.0');
 				expect(entry.deprecated).to.be.null;
 				expect(entry.pendingVersion).to.be.null;
+				// from the tarball of that release, not from the packument root
+				expect(entry.readme).to.equal('# Published README 1.0.0');
+				expect(calls.filter(url => url.endsWith('.tgz'))).to.deep.equal([TARBALL_URL]);
 				// from the workspace, normalised
 				expect(entry.lwcPlugin.title).to.equal('Title of @tradingview/lwc-plugin-line');
 				expect(entry.lwcPlugin.tags).to.deep.equal([]);
@@ -277,14 +337,15 @@ describe('Plugin catalogue data', () => {
 			}
 		});
 
-		it('should fall back to workspace fields the registry lacks, with a warning for the README', async () => {
+		it('should fall back to workspace fields the registry lacks, warning for the README', async () => {
 			const root = makeRepo({ 'lwc-plugin-line': validManifest('@tradingview/lwc-plugin-line', '1.0.0') });
 			const warnings: string[] = [];
 			try {
-				const bare = packument('1.0.0', { readme: '', manifest: { description: undefined, keywords: [], peerDependencies: {} } });
+				const bare = packument('1.0.0', { manifest: { description: undefined, keywords: [], peerDependencies: {} } });
+				const noReadme = makeTarball({ 'package.json': '{}' });
 				const data = await buildCatalogueData({
 					repoRoot: root,
-					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': bare }),
+					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': bare }, [], noReadme),
 					log: { warn: message => warnings.push(message) },
 				});
 				const [entry] = data.plugins;
@@ -292,7 +353,7 @@ describe('Plugin catalogue data', () => {
 				expect(entry.description).to.equal('Workspace description of @tradingview/lwc-plugin-line');
 				expect(entry.keywords).to.deep.equal(['lightweight-charts-plugin']);
 				expect(entry.peerRange).to.be.null;
-				expect(warnings.join('\n')).to.include('no README');
+				expect(warnings.join('\n')).to.include('has no README');
 				expect(warnings.join('\n')).to.include('no lightweight-charts peer range');
 			} finally {
 				fs.rmSync(root, { recursive: true, force: true });
@@ -326,10 +387,11 @@ describe('Plugin catalogue data', () => {
 		});
 
 		it('should sort entries by title and expose a deprecation notice', async () => {
-			const root = makeRepo({
-				'lwc-plugin-b': { ...validManifest('@tradingview/lwc-plugin-b', '1.0.0'), lwcPlugin: { ...(validManifest('@tradingview/lwc-plugin-b', '1.0.0').lwcPlugin as object), title: 'Alpha' } },
-				'lwc-plugin-a': { ...validManifest('@tradingview/lwc-plugin-a', '1.0.0'), lwcPlugin: { ...(validManifest('@tradingview/lwc-plugin-a', '1.0.0').lwcPlugin as object), title: 'Zulu' } },
-			});
+			const b = validManifest('@tradingview/lwc-plugin-b', '1.0.0');
+			(b.lwcPlugin as Record<string, unknown>).title = 'Alpha';
+			const a = validManifest('@tradingview/lwc-plugin-a', '1.0.0');
+			(a.lwcPlugin as Record<string, unknown>).title = 'Zulu';
+			const root = makeRepo({ 'lwc-plugin-b': b, 'lwc-plugin-a': a });
 			try {
 				const data = await buildCatalogueData({
 					repoRoot: root,

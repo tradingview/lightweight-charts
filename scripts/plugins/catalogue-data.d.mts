@@ -52,7 +52,7 @@ export interface CatalogueEntry {
 	lwcPlugin: LwcPluginMetadata;
 	/** Repo-relative POSIX path of the demo page source, e.g. `packages/lwc-plugin-x/src/example/index.html`. */
 	demoPath: string;
-	/** README of the published version as the registry holds it, Markdown; the workspace README if the registry has none. */
+	/** README taken from the published version's tarball, Markdown; the workspace README if that tarball has none. */
 	readme: string;
 }
 
@@ -84,7 +84,8 @@ export interface PublishedRelease {
 	license: string | null;
 	keywords: string[];
 	deprecated: string | null;
-	readme: string | null;
+	/** `dist.tarball` of the release, where its README is read from. */
+	tarball: string | null;
 }
 
 export interface Packument {
@@ -94,8 +95,8 @@ export interface Packument {
 		license?: string;
 		keywords?: string[];
 		deprecated?: string;
-		readme?: string;
 		peerDependencies?: Record<string, string>;
+		dist?: { tarball?: string };
 	}>;
 	time?: Record<string, string>;
 	readme?: string;
@@ -109,6 +110,11 @@ export function fetchPackument(
 ): Promise<Packument | null>;
 
 export function publishedRelease(packument: Packument | null | undefined): PublishedRelease | null;
+
+export function fetchTarballReadme(
+	tarballUrl: string,
+	options?: { fetchImpl?: typeof fetch; retries?: number; timeoutMs?: number }
+): Promise<string | null>;
 
 export function buildCatalogueData(options: {
 	repoRoot: string;

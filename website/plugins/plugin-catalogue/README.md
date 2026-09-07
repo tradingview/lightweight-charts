@@ -5,11 +5,11 @@ The `lwc-plugin-catalogue` Docusaurus plugin gives the catalogue pages their dat
 The data is produced by `scripts/plugins/catalogue.mjs` (`pnpm plugins:catalogue` prints it), which:
 
 1. enumerates the non-private packages under `packages/lwc-plugin-*` and validates each against the package contract, the same check as `pnpm plugins:validate`. Any problem fails the docs build; a partial catalogue is never shipped.
-2. asks the npm registry for each package, in parallel, with three attempts on network errors, 5xx and 429 answers. A package that has never been published is listed in `unpublished` by name and gets no entry. A published one becomes an entry in `plugins`.
+2. asks the npm registry for each package, in parallel, with three attempts on network errors, 5xx and 429 answers. A package that has never been published is listed in `unpublished` by name and gets no entry. A published one becomes an entry in `plugins`, and its tarball is downloaded to read the README of that exact version: the packument's own `readme` field belongs to whichever version was published last, which is not always the latest release.
 
 Where each field of an entry comes from:
 
-- from the published release on the registry, so that the page describes what `npm install` delivers: `version`, `publishedAt`, `peerRange` (null if the published manifest declares none), `description`, `license`, `keywords`, `deprecated` (the `npm deprecate` message), `readme` (falling back to the workspace README, with a warning, when the registry holds none)
+- from the published release on the registry, so that the page describes what `npm install` delivers: `version`, `publishedAt`, `peerRange` (null if the published manifest declares none), `description`, `license`, `keywords`, `deprecated` (the `npm deprecate` message), `readme` (from the release tarball, falling back to the workspace README, with a warning, when the tarball holds none)
 - from the workspace, because they curate the entry rather than describe the artefact: `lwcPlugin` (title, category, lifecycle, origin, author, demo, tags), `repository.url`
 - derived: `slug` (unique, the URL segment), `npmUrl`, `repository.directory` and `demoPath` (repo-relative POSIX paths of the package and of its demo page source), and `pendingVersion`, set when the workspace version is newer than the published one. Pages should show a pending release rather than hide the entry.
 
