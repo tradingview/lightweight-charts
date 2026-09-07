@@ -66,9 +66,12 @@ function checkForwardCompat(plugins) {
  * Packs @tradingview/lwc-toolkit into a tarball. Installed from a tarball rather
  * than linked, the toolkit's own `lightweight-charts` import resolves to the
  * floor version installed in the temp project instead of the workspace copy.
+ *
+ * The toolkit compiles against the workspace library, whose typings live in
+ * `dist/`, so the library is built first; on a clean checkout there is none.
  */
 function packToolkitTarball(destDir) {
-	execSync('pnpm --filter @tradingview/lwc-toolkit build', { cwd: repoRoot, stdio: 'inherit' });
+	buildWorkspaceDependencies(repoRoot);
 	execSync(`pnpm pack --pack-destination "${destDir}"`, {
 		cwd: path.join(repoRoot, 'packages/lwc-toolkit'),
 		stdio: 'inherit',

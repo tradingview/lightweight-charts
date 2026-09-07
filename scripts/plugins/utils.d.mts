@@ -21,7 +21,7 @@ export function buildWorkspaceDependencies(repoRoot: string): void;
 export function compareVersions(
 	localVersion: string,
 	remoteVersion: string | null
-): { isNewer: boolean; localVersion: string; remoteVersion: string | null };
+): { isNewer: boolean; isBehind: boolean; localVersion: string; remoteVersion: string | null };
 
 export function parseRemoteVersionError(error: any, packageName: string): null;
 

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync, execSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import semver from 'semver';
-import { loadTargetPlugins, extractReadmeSnippet } from './utils.mjs';
+import { loadTargetPlugins, buildWorkspaceDependencies, extractReadmeSnippet } from './utils.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +39,29 @@ function resolveLwcDependency(peerRange, lwcTarballOption) {
 	}
 }
 
+let workspaceBuilt = false;
+let workspaceBuildError = null;
+
+/**
+ * Plugin builds resolve the library and the toolkit through workspace links
+ * whose entry points live in `dist/`; build both once, before the first plugin.
+ */
+function ensureWorkspaceBuilt() {
+	if (workspaceBuildError) {
+		throw workspaceBuildError;
+	}
+	if (workspaceBuilt) {
+		return;
+	}
+	try {
+		buildWorkspaceDependencies(repoRoot);
+		workspaceBuilt = true;
+	} catch (err) {
+		workspaceBuildError = new Error(`Workspace build failed: ${err.message}`);
+		throw workspaceBuildError;
+	}
+}
+
 /**
  * Packs a plugin and ensures its declared dependencies do not leak other plugin packages.
  */
@@ -46,6 +69,7 @@ function packAndCheckPlugin(plugin, pluginTmpDir) {
 	if (!plugin.packageJson.scripts?.build) {
 		throw new Error(`package.json has no 'build' script`);
 	}
+	ensureWorkspaceBuilt();
 	console.log(`  - Building ${plugin.name}...`);
 	execSync('pnpm run build', { cwd: plugin.dir, stdio: 'inherit' });
 
@@ -249,7 +273,9 @@ Smoke tests plugin packaging, Vite integration, and bundle isolation.
 Options:
   -f, --filter <name>     Target only packages matching the name
   -p, --path <path>       Target a specific package directory directly
-  --lwc-tarball <path>    Path to local lightweight-charts .tgz tarball (instead of registry)
+  --lwc-tarball <path>    Install this lightweight-charts .tgz instead of the registry version.
+                          Pack it with "pnpm prepare-package-json-for-release && pnpm pack", so
+                          the consumer install does not run the repository's own scripts.
   -h, --help              Show this help message
 `);
 		process.exit(0);

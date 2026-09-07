@@ -179,7 +179,7 @@ export function buildWorkspaceDependencies(repoRoot) {
  *
  * @param {string} localVersion - Local version string.
  * @param {string | null} remoteVersion - Remote version string from npm, or null if unpublished.
- * @returns {{ isNewer: boolean, localVersion: string, remoteVersion: string | null }}
+ * @returns {{ isNewer: boolean, isBehind: boolean, localVersion: string, remoteVersion: string | null }}
  */
 export function compareVersions(localVersion, remoteVersion) {
 	const validLocal = semver.valid(localVersion);
@@ -187,7 +187,7 @@ export function compareVersions(localVersion, remoteVersion) {
 		throw new Error(`Invalid local version '${localVersion}'`);
 	}
 	if (!remoteVersion) {
-		return { isNewer: true, localVersion: validLocal, remoteVersion: null };
+		return { isNewer: true, isBehind: false, localVersion: validLocal, remoteVersion: null };
 	}
 	const validRemote = semver.valid(remoteVersion);
 	if (!validRemote) {
@@ -195,6 +195,7 @@ export function compareVersions(localVersion, remoteVersion) {
 	}
 	return {
 		isNewer: semver.gt(validLocal, validRemote),
+		isBehind: semver.lt(validLocal, validRemote),
 		localVersion: validLocal,
 		remoteVersion: validRemote,
 	};

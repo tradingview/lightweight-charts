@@ -10,7 +10,7 @@ on:
       - 'website/**'
       - 'plugin-examples/src/**'
       - 'indicator-examples/src/**'
-      - 'packages/lwc-toolkit/**'
+      - 'packages/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
