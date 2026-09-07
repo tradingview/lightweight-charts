@@ -503,6 +503,7 @@ const p = new Plugin();
 			expect(allErrors).to.include('publishConfig.access');
 			expect(allErrors).to.include('peerDependencies.lightweight-charts');
 			expect(allErrors).to.include('lightweight-charts-plugin');
+			expect(allErrors).to.include('lwcPlugin schema error: /category');
 		});
 
 		it('should require a description, a valid version and no scaffold placeholders', () => {

@@ -94,6 +94,7 @@ export interface Packument {
 		license?: string;
 		keywords?: string[];
 		deprecated?: string;
+		readme?: string;
 		peerDependencies?: Record<string, string>;
 	}>;
 	time?: Record<string, string>;

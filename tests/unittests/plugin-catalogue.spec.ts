@@ -208,7 +208,7 @@ describe('Plugin catalogue data', () => {
 				expect(error.message).to.include('Plugin metadata is invalid');
 				expect(error.message).to.include('@tradingview/lwc-plugin-broken');
 				expect(error.message).to.include("'description'");
-				expect(error.message).to.include('allowed values');
+				expect(error.message).to.include('/category should be equal to one of the allowed values');
 				expect(error.message).to.not.include('lwc-plugin-fine');
 				expect(calls).to.be.empty;
 			} finally {

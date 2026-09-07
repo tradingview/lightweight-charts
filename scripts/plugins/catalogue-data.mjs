@@ -5,7 +5,7 @@ import { findWorkspacePlugins, validatePackageMetadata } from './utils.mjs';
 
 export const DEFAULT_REGISTRY = 'https://registry.npmjs.org';
 
-const RETRY_DELAY_MS = 500;
+const RETRY_DELAY_MS = 1000;
 const NO_README_SENTINEL = /^ERROR: No README data found!/i;
 
 function delay(ms) {
@@ -19,9 +19,9 @@ class RegistryRefusal extends Error {}
  * Fetches the full packument of a package from the registry.
  *
  * A 404 means the package has never been published and resolves to null. A
- * network error or a 5xx is retried; anything that still fails after that, and
- * any other status, throws: the published state could not be confirmed, and the
- * caller must not guess it.
+ * network error, a 5xx or a 429 is retried; anything that still fails after
+ * that, and any other status, throws: the published state could not be
+ * confirmed, and the caller must not guess it.
  *
  * @param {string} packageName
  * @param {{ registry?: string, fetchImpl?: typeof fetch, retries?: number, timeoutMs?: number }} [options]
@@ -47,7 +47,7 @@ export async function fetchPackument(packageName, options = {}) {
 			if (response.status === 404) {
 				return null;
 			}
-			if (response.status >= 500) {
+			if (response.status >= 500 || response.status === 429) {
 				throw new Error(`registry responded with ${response.status}`);
 			}
 			if (!response.ok) {
@@ -73,6 +73,21 @@ export async function fetchPackument(packageName, options = {}) {
  *
  * @param {object | null | undefined} packument
  */
+/** The value if it is a non-blank string, else null. */
+function textOrNull(value) {
+	return typeof value === 'string' && value.trim() ? value : null;
+}
+
+/**
+ * The README of the latest release. The packument's root README belongs to
+ * whichever version was published last, which is not always `latest`, so a
+ * README carried by the manifest itself wins.
+ */
+function readmeOf(packument, manifest) {
+	const readme = (textOrNull(manifest.readme) ?? textOrNull(packument.readme) ?? '').trim();
+	return readme && !NO_README_SENTINEL.test(readme) ? readme : null;
+}
+
 export function publishedRelease(packument) {
 	const latest = packument?.['dist-tags']?.latest;
 	if (!latest) {
@@ -82,16 +97,15 @@ export function publishedRelease(packument) {
 	if (!manifest) {
 		throw new Error(`packument tags ${latest} as latest but carries no manifest for it`);
 	}
-	const readme = typeof packument.readme === 'string' ? packument.readme.trim() : '';
 	return {
 		version: latest,
 		publishedAt: packument.time?.[latest] ?? null,
 		peerRange: manifest.peerDependencies?.['lightweight-charts'] ?? null,
-		description: typeof manifest.description === 'string' ? manifest.description : null,
-		license: typeof manifest.license === 'string' ? manifest.license : null,
+		description: textOrNull(manifest.description),
+		license: textOrNull(manifest.license),
 		keywords: Array.isArray(manifest.keywords) ? manifest.keywords : [],
-		deprecated: typeof manifest.deprecated === 'string' && manifest.deprecated.trim() ? manifest.deprecated : null,
-		readme: readme && !NO_README_SENTINEL.test(readme) ? readme : null,
+		deprecated: textOrNull(manifest.deprecated),
+		readme: readmeOf(packument, manifest),
 	};
 }
 
@@ -150,6 +164,9 @@ function toCatalogueEntry(plugin, release, repoRoot, log) {
 		log.warn(`${plugin.name}: the registry has no README for ${release.version}, using the workspace one`);
 		readme = readWorkspaceReadme(plugin);
 	}
+	if (release.description === null) {
+		log.warn(`${plugin.name}: the published manifest has no description, using the workspace one`);
+	}
 
 	return {
 		name: plugin.name,
@@ -203,12 +220,13 @@ function assertUniqueSlugs(entries) {
 export async function buildCatalogueData(options) {
 	const {
 		repoRoot,
-		registry = DEFAULT_REGISTRY,
 		offline = false,
 		fetchImpl,
 		retries,
 		log = console,
 	} = options;
+	// One spelling whether it came from the default, an env var or pnpm's npm_config_registry.
+	const registry = (options.registry ?? DEFAULT_REGISTRY).replace(/\/+$/, '');
 
 	const plugins = findWorkspacePlugins(repoRoot);
 	validateAll(plugins);

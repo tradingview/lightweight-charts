@@ -37,7 +37,8 @@ module.exports = function pluginCatalogue(context) {
 				if (err.stderr) {
 					process.stderr.write(err.stderr);
 				}
-				throw new Error(`The plugin catalogue could not be built (see the errors above): ${err.message}`);
+				// err.message would repeat the stderr the line above already printed.
+				throw new Error('The plugin catalogue could not be built, see the errors above.');
 			}
 			// The script's warnings and summary belong in the build log.
 			if (result.stderr) {

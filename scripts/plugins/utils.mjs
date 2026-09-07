@@ -371,7 +371,7 @@ function validateLwcPluginBlock(lwcPlugin, isOfficial) {
 
 	if (!isValid) {
 		for (const err of validate.errors || []) {
-			errors.push(`lwcPlugin schema error: ${err.instancePath || '/'} ${err.message}`);
+			errors.push(`lwcPlugin schema error: ${err.instancePath || err.dataPath || '/'} ${err.message}`);
 		}
 	}
 
