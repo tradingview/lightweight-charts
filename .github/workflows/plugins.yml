@@ -135,14 +135,18 @@ jobs:
 
       # The published manifest is the cleaned one: the root package.json's
       # scripts (a postinstall among them) and devDependencies must not end up
-      # in the tarball the consumer project installs. Same step as pkg-pr-new.yml.
+      # in the tarball the consumer project installs. Cleaning rewrites the root
+      # package.json in place, scripts and packageManager included, so it is
+      # restored as soon as the tarball exists: the smoke step below needs both.
       - name: Pack the workspace library
         if: env.LIBRARY_SOURCE == 'workspace'
         run: |
           pnpm build:prod
+          trap 'git checkout -- package.json' EXIT
           pnpm prepare-package-json-for-release
           mkdir -p "$RUNNER_TEMP/lwc"
           pnpm pack --pack-destination "$RUNNER_TEMP/lwc"
+          git checkout -- package.json
           set -- "$RUNNER_TEMP"/lwc/*.tgz
           if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
             echo '::error::expected exactly one library tarball'
