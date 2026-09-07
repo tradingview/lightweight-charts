@@ -10,6 +10,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 import { findWorkspacePlugins } from '../../scripts/plugins/utils.mjs';
 import {
@@ -17,6 +18,7 @@ import {
 	fetchPackument,
 	fetchTarballReadme,
 	publishedRelease,
+	verifyIntegrity,
 	type Packument,
 } from '../../scripts/plugins/catalogue-data.mjs';
 
@@ -100,8 +102,15 @@ function makeTarball(files: Record<string, string>): Buffer {
 
 const TARBALL_URL = 'https://registry.example.test/pkg/-/pkg-1.0.0.tgz';
 
-function packument(latest: string, extra: Partial<Packument> & { manifest?: Record<string, unknown> } = {}): Packument {
-	const { manifest = {}, ...rest } = extra;
+/** Subresource Integrity string of a buffer, as npm publishes it. */
+function sri(buffer: Buffer): string {
+	return `sha512-${createHash('sha512').update(buffer).digest('base64')}`;
+}
+
+const defaultTarball = makeTarball({ 'README.md': '# Published README 1.0.0\n', 'package.json': '{}' });
+
+function packument(latest: string, extra: Partial<Packument> & { manifest?: Record<string, unknown>; tarball?: Buffer } = {}): Packument {
+	const { manifest = {}, tarball = defaultTarball, ...rest } = extra;
 	return {
 		'dist-tags': { latest },
 		versions: {
@@ -110,7 +119,7 @@ function packument(latest: string, extra: Partial<Packument> & { manifest?: Reco
 				license: 'Apache-2.0',
 				keywords: ['lightweight-charts-plugin', 'published'],
 				peerDependencies: { 'lightweight-charts': '^5.1.0' },
-				dist: { tarball: TARBALL_URL },
+				dist: { tarball: TARBALL_URL, integrity: sri(tarball) },
 				...manifest,
 			},
 		},
@@ -129,8 +138,6 @@ function response(status: number, body: unknown): Response {
 		arrayBuffer: () => Promise.resolve(Buffer.isBuffer(body) ? Uint8Array.from(body).buffer : new ArrayBuffer(0)),
 	} as unknown as Response;
 }
-
-const defaultTarball = makeTarball({ 'README.md': '# Published README 1.0.0\n', 'package.json': '{}' });
 
 /**
  * A fetch stand-in. Packument URLs are answered per package name: a packument,
@@ -187,6 +194,7 @@ describe('Plugin catalogue data', () => {
 				keywords: ['lightweight-charts-plugin', 'published'],
 				deprecated: 'use the other one',
 				tarball: TARBALL_URL,
+				integrity: sri(defaultTarball),
 			});
 		});
 
@@ -197,6 +205,14 @@ describe('Plugin catalogue data', () => {
 			expect(release?.peerRange).to.be.null;
 			expect(release?.deprecated).to.be.null;
 			expect(release?.tarball).to.be.null;
+			expect(release?.integrity).to.be.null;
+		});
+
+		it('should express a legacy shasum as an SRI string when no integrity is published', () => {
+			const shasum = createHash('sha1').update(defaultTarball).digest('hex');
+			const release = publishedRelease(packument('1.0.0', { manifest: { dist: { tarball: TARBALL_URL, shasum } } }));
+			expect(release?.integrity).to.equal(`sha1-${createHash('sha1').update(defaultTarball).digest('base64')}`);
+			expect(() => verifyIntegrity(defaultTarball, release?.integrity ?? '')).to.not.throw();
 		});
 
 		it('should refuse a latest tag without a manifest', () => {
@@ -211,7 +227,7 @@ describe('Plugin catalogue data', () => {
 				attempts++;
 				return attempts < 3 ? Promise.reject(new Error('ECONNRESET')) : Promise.resolve(response(200, packument('1.0.0')));
 			}) as typeof fetch;
-			expect((await fetchPackument('x', { fetchImpl: flaky, retries: 3 }))?.['dist-tags']?.latest).to.equal('1.0.0');
+			expect((await fetchPackument('x', { fetchImpl: flaky, retries: 3, retryDelayMs: 0 }))?.['dist-tags']?.latest).to.equal('1.0.0');
 			expect(attempts).to.equal(3);
 
 			expect(await fetchPackument('x', { fetchImpl: fakeFetch({}), retries: 1 })).to.be.null;
@@ -220,12 +236,12 @@ describe('Plugin catalogue data', () => {
 		it('should retry a 5xx and a 429 but not another 4xx', async () => {
 			for (const status of [503, 429]) {
 				const calls: string[] = [];
-				const error = await rejection(fetchPackument('x', { fetchImpl: fakeFetch({ x: status }, calls), retries: 3 }));
+				const error = await rejection(fetchPackument('x', { fetchImpl: fakeFetch({ x: status }, calls), retries: 3, retryDelayMs: 0 }));
 				expect(error.message).to.match(new RegExp(`responded with ${status}`));
 				expect(calls).to.have.lengthOf(3);
 			}
 			const calls: string[] = [];
-			const refused = await rejection(fetchPackument('x', { fetchImpl: fakeFetch({ x: 403 }, calls), retries: 3 }));
+			const refused = await rejection(fetchPackument('x', { fetchImpl: fakeFetch({ x: 403 }, calls), retries: 3, retryDelayMs: 0 }));
 			expect(refused.message).to.match(/responded with 403/);
 			expect(calls).to.have.lengthOf(1);
 		});
@@ -245,6 +261,14 @@ describe('Plugin catalogue data', () => {
 			expect(await fetchTarballReadme(TARBALL_URL, { fetchImpl: fakeFetch({}, [], lower) })).to.equal('# Lower');
 			const none = makeTarball({ 'package.json': '{}', 'docs/README.md': '# nested only\n' });
 			expect(await fetchTarballReadme(TARBALL_URL, { fetchImpl: fakeFetch({}, [], none) })).to.be.null;
+		});
+
+		it('should reject a tarball that does not match the published integrity', async () => {
+			const error = await rejection(fetchTarballReadme(TARBALL_URL, { fetchImpl: fakeFetch({}), integrity: sri(Buffer.from('something else')) }));
+			expect(error.message).to.match(/does not match its published integrity/);
+			expect(await fetchTarballReadme(TARBALL_URL, { fetchImpl: fakeFetch({}), integrity: sri(defaultTarball) })).to.equal('# Published README 1.0.0');
+			expect(() => verifyIntegrity(defaultTarball, `md5-nope ${sri(defaultTarball)}`)).to.not.throw();
+			expect(() => verifyIntegrity(defaultTarball, 'md5-nope')).to.throw(/does not match/);
 		});
 
 		it('should fail when the registry does not serve a tarball it lists', async () => {
@@ -268,6 +292,33 @@ describe('Plugin catalogue data', () => {
 				expect(error.message).to.include('/category should be equal to one of the allowed values');
 				expect(error.message).to.not.include('lwc-plugin-fine');
 				expect(calls).to.be.empty;
+			} finally {
+				fs.rmSync(root, { recursive: true, force: true });
+			}
+		});
+
+		it('should reject a repository.directory that names another folder, relative to the given repo root', async () => {
+			const wrong = validManifest('@tradingview/lwc-plugin-line', '1.0.0');
+			(wrong.repository as Record<string, unknown>).directory = 'packages/totally-wrong';
+			const root = makeRepo({ 'lwc-plugin-line': wrong });
+			try {
+				const error = await rejection(buildCatalogueData({ repoRoot: root, fetchImpl: fakeFetch({}), log: silent }));
+				expect(error.message).to.include("'repository.directory' must be 'packages/lwc-plugin-line' (got 'packages/totally-wrong')");
+			} finally {
+				fs.rmSync(root, { recursive: true, force: true });
+			}
+		});
+
+		it('should fail the build when a published tarball does not match its integrity', async () => {
+			const root = makeRepo({ 'lwc-plugin-line': validManifest('@tradingview/lwc-plugin-line', '1.0.0') });
+			try {
+				const tampered = makeTarball({ 'README.md': '# tampered\n' });
+				const error = await rejection(buildCatalogueData({
+					repoRoot: root,
+					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': packument('1.0.0') }, [], tampered),
+					log: silent,
+				}));
+				expect(error.message).to.match(/does not match its published integrity/);
 			} finally {
 				fs.rmSync(root, { recursive: true, force: true });
 			}
@@ -341,8 +392,8 @@ describe('Plugin catalogue data', () => {
 			const root = makeRepo({ 'lwc-plugin-line': validManifest('@tradingview/lwc-plugin-line', '1.0.0') });
 			const warnings: string[] = [];
 			try {
-				const bare = packument('1.0.0', { manifest: { description: undefined, keywords: [], peerDependencies: {} } });
 				const noReadme = makeTarball({ 'package.json': '{}' });
+				const bare = packument('1.0.0', { tarball: noReadme, manifest: { description: undefined, license: undefined, keywords: [], peerDependencies: {} } });
 				const data = await buildCatalogueData({
 					repoRoot: root,
 					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': bare }, [], noReadme),
@@ -351,10 +402,15 @@ describe('Plugin catalogue data', () => {
 				const [entry] = data.plugins;
 				expect(entry.readme).to.equal(validReadme);
 				expect(entry.description).to.equal('Workspace description of @tradingview/lwc-plugin-line');
+				expect(entry.license).to.equal('Apache-2.0');
 				expect(entry.keywords).to.deep.equal(['lightweight-charts-plugin']);
 				expect(entry.peerRange).to.be.null;
-				expect(warnings.join('\n')).to.include('has no README');
-				expect(warnings.join('\n')).to.include('no lightweight-charts peer range');
+				const joined = warnings.join('\n');
+				expect(joined).to.include('has no README');
+				expect(joined).to.include('no lightweight-charts peer range');
+				for (const field of ['description', 'license', 'keywords']) {
+					expect(joined).to.include(`has no ${field}`);
+				}
 			} finally {
 				fs.rmSync(root, { recursive: true, force: true });
 			}

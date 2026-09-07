@@ -86,6 +86,8 @@ export interface PublishedRelease {
 	deprecated: string | null;
 	/** `dist.tarball` of the release, where its README is read from. */
 	tarball: string | null;
+	/** Subresource Integrity of that tarball (`dist.integrity`, or the legacy shasum as SRI). */
+	integrity: string | null;
 }
 
 export interface Packument {
@@ -96,7 +98,7 @@ export interface Packument {
 		keywords?: string[];
 		deprecated?: string;
 		peerDependencies?: Record<string, string>;
-		dist?: { tarball?: string };
+		dist?: { tarball?: string; integrity?: string; shasum?: string };
 	}>;
 	time?: Record<string, string>;
 	readme?: string;
@@ -106,14 +108,16 @@ export const DEFAULT_REGISTRY: string;
 
 export function fetchPackument(
 	packageName: string,
-	options?: { registry?: string; fetchImpl?: typeof fetch; retries?: number; timeoutMs?: number }
+	options?: { registry?: string; fetchImpl?: typeof fetch; retries?: number; timeoutMs?: number; retryDelayMs?: number }
 ): Promise<Packument | null>;
+
+export function verifyIntegrity(buffer: Buffer, integrity: string): void;
 
 export function publishedRelease(packument: Packument | null | undefined): PublishedRelease | null;
 
 export function fetchTarballReadme(
 	tarballUrl: string,
-	options?: { fetchImpl?: typeof fetch; retries?: number; timeoutMs?: number }
+	options?: { integrity?: string | null; fetchImpl?: typeof fetch; retries?: number; timeoutMs?: number; retryDelayMs?: number }
 ): Promise<string | null>;
 
 export function buildCatalogueData(options: {
@@ -122,5 +126,6 @@ export function buildCatalogueData(options: {
 	offline?: boolean;
 	fetchImpl?: typeof fetch;
 	retries?: number;
+	retryDelayMs?: number;
 	log?: { warn: (message: string) => void };
 }): Promise<CatalogueData>;

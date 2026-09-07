@@ -5,7 +5,7 @@ The `lwc-plugin-catalogue` Docusaurus plugin gives the catalogue pages their dat
 The data is produced by `scripts/plugins/catalogue.mjs` (`pnpm plugins:catalogue` prints it), which:
 
 1. enumerates the non-private packages under `packages/lwc-plugin-*` and validates each against the package contract, the same check as `pnpm plugins:validate`. Any problem fails the docs build; a partial catalogue is never shipped.
-2. asks the npm registry for each package, in parallel, with three attempts on network errors, 5xx and 429 answers. A package that has never been published is listed in `unpublished` by name and gets no entry. A published one becomes an entry in `plugins`, and its tarball is downloaded to read the README of that exact version: the packument's own `readme` field belongs to whichever version was published last, which is not always the latest release.
+2. asks the npm registry for each package, in parallel, with three attempts on network errors, 5xx and 429 answers. A package that has never been published is listed in `unpublished` by name and gets no entry. A published one becomes an entry in `plugins`, and its tarball is downloaded, checked against the integrity the registry published for it, and read for the README of that exact version: the packument's own `readme` field belongs to whichever version was published last, which is not always the latest release. Reading the tarball uses the `tar` command, which is available on every supported platform, so it is a build-time dependency of the site.
 
 Where each field of an entry comes from:
 

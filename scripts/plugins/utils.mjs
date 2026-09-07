@@ -372,6 +372,7 @@ function validateLwcPluginBlock(lwcPlugin, isOfficial) {
 
 	if (!isValid) {
 		for (const err of validate.errors || []) {
+			// Ajv 7 (pinned here) reports the failing property as `dataPath`; Ajv 8 renamed it `instancePath`.
 			errors.push(`lwcPlugin schema error: ${err.instancePath || err.dataPath || '/'} ${err.message}`);
 		}
 	}

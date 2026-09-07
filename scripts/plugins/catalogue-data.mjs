@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import semver from 'semver';
 import { findWorkspacePlugins, validatePackageMetadata } from './utils.mjs';
@@ -8,6 +9,7 @@ import { findWorkspacePlugins, validatePackageMetadata } from './utils.mjs';
 export const DEFAULT_REGISTRY = 'https://registry.npmjs.org';
 
 const RETRY_DELAY_MS = 1000;
+const REGISTRY_CONCURRENCY = 4;
 
 function delay(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -21,7 +23,7 @@ class RegistryRefusal extends Error {}
  * network error, a 5xx or a 429 is retried; anything that still fails after
  * that, and any other status, throws the last error.
  */
-async function fetchWithRetry(url, { fetchImpl = fetch, retries = 3, timeoutMs = 15000, accept }) {
+async function fetchWithRetry(url, { fetchImpl = fetch, retries = 3, timeoutMs = 15000, retryDelayMs = RETRY_DELAY_MS, accept }) {
 	const attempts = Math.max(1, retries);
 	let lastError;
 	for (let attempt = 1; attempt <= attempts; attempt++) {
@@ -45,7 +47,7 @@ async function fetchWithRetry(url, { fetchImpl = fetch, retries = 3, timeoutMs =
 			if (err instanceof RegistryRefusal || attempt === attempts) {
 				break;
 			}
-			await delay(RETRY_DELAY_MS * attempt);
+			await delay(retryDelayMs * attempt);
 		}
 	}
 	throw lastError;
@@ -59,7 +61,7 @@ async function fetchWithRetry(url, { fetchImpl = fetch, retries = 3, timeoutMs =
  * caller must not guess it.
  *
  * @param {string} packageName
- * @param {{ registry?: string, fetchImpl?: typeof fetch, retries?: number, timeoutMs?: number }} [options]
+ * @param {{ registry?: string, fetchImpl?: typeof fetch, retries?: number, timeoutMs?: number, retryDelayMs?: number }} [options]
  * @returns {Promise<object | null>}
  */
 export async function fetchPackument(packageName, options = {}) {
@@ -74,18 +76,42 @@ export async function fetchPackument(packageName, options = {}) {
 }
 
 /**
+ * Checks a downloaded tarball against the Subresource Integrity string the
+ * registry published for it (`sha512-<base64>`, possibly several, space separated).
+ */
+export function verifyIntegrity(buffer, integrity) {
+	const matches = integrity.trim().split(/\s+/).some(token => {
+		const dash = token.indexOf('-');
+		if (dash === -1) {
+			return false;
+		}
+		const algorithm = token.slice(0, dash);
+		if (!/^sha(1|256|384|512)$/.test(algorithm)) {
+			return false;
+		}
+		return createHash(algorithm).update(buffer).digest('base64') === token.slice(dash + 1);
+	});
+	if (!matches) {
+		throw new Error(`the downloaded tarball does not match its published integrity ${integrity}`);
+	}
+}
+
+/**
  * Reads the README out of a published tarball. The packument's root `readme`
  * belongs to whichever version was published last, not necessarily `latest`,
  * so the file is taken from the release itself. Null when the tarball has none.
+ * Its content ends up on the public site, so the download is checked against
+ * the integrity the registry published for it when one is given.
  *
  * @param {string} tarballUrl - `dist.tarball` of the release manifest.
- * @param {{ fetchImpl?: typeof fetch, retries?: number, timeoutMs?: number }} [options]
+ * @param {{ integrity?: string | null, fetchImpl?: typeof fetch, retries?: number, timeoutMs?: number, retryDelayMs?: number }} [options]
  * @returns {Promise<string | null>}
  */
 export async function fetchTarballReadme(tarballUrl, options = {}) {
+	const { integrity = null, ...fetchOptions } = options;
 	let response;
 	try {
-		response = await fetchWithRetry(tarballUrl, { timeoutMs: 60000, ...options, accept: 'application/octet-stream' });
+		response = await fetchWithRetry(tarballUrl, { timeoutMs: 60000, ...fetchOptions, accept: 'application/octet-stream' });
 	} catch (err) {
 		throw new Error(`Could not fetch ${tarballUrl}: ${err.message}`);
 	}
@@ -95,8 +121,16 @@ export async function fetchTarballReadme(tarballUrl, options = {}) {
 
 	const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-catalogue-'));
 	try {
+		const buffer = Buffer.from(await response.arrayBuffer());
+		if (integrity !== null) {
+			try {
+				verifyIntegrity(buffer, integrity);
+			} catch (err) {
+				throw new Error(`${tarballUrl}: ${err.message}`);
+			}
+		}
 		const file = path.join(tempDir, 'package.tgz');
-		fs.writeFileSync(file, Buffer.from(await response.arrayBuffer()));
+		fs.writeFileSync(file, buffer);
 		const entry = execFileSync('tar', ['-tzf', file], { encoding: 'utf-8' })
 			.split(/\r?\n/)
 			.map(line => line.trim())
@@ -141,17 +175,47 @@ export function publishedRelease(packument) {
 		keywords: Array.isArray(manifest.keywords) ? manifest.keywords : [],
 		deprecated: textOrNull(manifest.deprecated),
 		tarball: textOrNull(manifest.dist?.tarball),
+		integrity: integrityOf(manifest.dist),
 	};
+}
+
+/** The SRI string for a release: `dist.integrity`, or the legacy sha1 `shasum` expressed as SRI. */
+function integrityOf(dist) {
+	const integrity = textOrNull(dist?.integrity);
+	if (integrity !== null) {
+		return integrity;
+	}
+	const shasum = textOrNull(dist?.shasum);
+	return shasum !== null && /^[0-9a-f]{40}$/i.test(shasum) ? `sha1-${Buffer.from(shasum, 'hex').toString('base64')}` : null;
+}
+
+/** Unscoped name without the `lwc-plugin-` prefix: the catalogue's URL segment. */
+function slugOf(packageName) {
+	return packageName.slice(packageName.indexOf('/') + 1).replace(/^lwc-plugin-/, '');
+}
+
+/** Runs `fn` over `items` with at most `limit` in flight, preserving order. */
+async function mapWithConcurrency(items, limit, fn) {
+	const results = new Array(items.length);
+	let next = 0;
+	const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+		while (next < items.length) {
+			const index = next++;
+			results[index] = await fn(items[index]);
+		}
+	});
+	await Promise.all(workers);
+	return results;
 }
 
 /**
  * Validates every workspace plugin and throws one error listing all problems,
  * so a broken manifest fails the docs build instead of producing a partial entry.
  */
-function validateAll(plugins) {
+function validateAll(plugins, repoRoot) {
 	const problems = [];
 	for (const plugin of plugins) {
-		const result = validatePackageMetadata(plugin.dir, { isOfficial: true });
+		const result = validatePackageMetadata(plugin.dir, { isOfficial: true, repoRoot });
 		if (!result.valid) {
 			problems.push(`${plugin.name}\n  - ${result.errors.join('\n  - ')}`);
 		}
@@ -199,13 +263,15 @@ function toCatalogueEntry(plugin, release, publishedReadme, repoRoot, log) {
 		log.warn(`${plugin.name}: the published ${release.version} has no README, using the workspace one`);
 		readme = readWorkspaceReadme(plugin);
 	}
-	if (release.description === null) {
-		log.warn(`${plugin.name}: the published manifest has no description, using the workspace one`);
+	for (const [field, missing] of [['description', release.description === null], ['license', release.license === null], ['keywords', release.keywords.length === 0]]) {
+		if (missing) {
+			log.warn(`${plugin.name}: the published manifest has no ${field}, using the workspace one`);
+		}
 	}
 
 	return {
 		name: plugin.name,
-		slug: plugin.name.slice(plugin.name.indexOf('/') + 1).replace(/^lwc-plugin-/, ''),
+		slug: slugOf(plugin.name),
 		description: release.description ?? pkg.description,
 		version: release.version,
 		pendingVersion,
@@ -250,6 +316,7 @@ function assertUniqueSlugs(entries) {
  * @param {boolean} [options.offline] - Skip the registry; every package counts as unpublished.
  * @param {typeof fetch} [options.fetchImpl] - Fetch implementation, for tests.
  * @param {number} [options.retries] - Registry attempts per package.
+ * @param {number} [options.retryDelayMs] - Base delay between attempts.
  * @param {{ warn: (message: string) => void }} [options.log] - Sink for warnings.
  */
 export async function buildCatalogueData(options) {
@@ -258,31 +325,37 @@ export async function buildCatalogueData(options) {
 		offline = false,
 		fetchImpl,
 		retries,
+		retryDelayMs,
 		log = console,
 	} = options;
+	const fetchOptions = { fetchImpl, retries, retryDelayMs };
 	// One spelling whether it came from the default, an env var or pnpm's npm_config_registry.
 	const registry = (options.registry ?? DEFAULT_REGISTRY).replace(/\/+$/, '');
 
 	const plugins = findWorkspacePlugins(repoRoot);
-	validateAll(plugins);
+	validateAll(plugins, repoRoot);
+	assertUniqueSlugs(plugins.map(plugin => ({ name: plugin.name, slug: slugOf(plugin.name) })));
 
 	if (offline && plugins.length > 0) {
 		log.warn('Offline mode: the registry is not consulted and no plugin is treated as published.');
 	}
 
-	const releases = await Promise.all(plugins.map(async plugin => {
+	const releases = await mapWithConcurrency(plugins, REGISTRY_CONCURRENCY, async plugin => {
 		if (offline) {
 			return { plugin, release: null, readme: null };
 		}
-		const release = publishedRelease(await fetchPackument(plugin.name, { registry, fetchImpl, retries }));
+		const release = publishedRelease(await fetchPackument(plugin.name, { registry, ...fetchOptions }));
 		let readme = null;
 		if (release !== null && release.tarball !== null) {
-			readme = await fetchTarballReadme(release.tarball, { fetchImpl, retries });
+			if (release.integrity === null) {
+				log.warn(`${plugin.name}: the registry published no integrity for ${release.version}, the tarball is not verified`);
+			}
+			readme = await fetchTarballReadme(release.tarball, { integrity: release.integrity, ...fetchOptions });
 		} else if (release !== null) {
 			log.warn(`${plugin.name}: the published manifest lists no tarball, so its README cannot be read`);
 		}
 		return { plugin, release, readme };
-	}));
+	});
 
 	const entries = [];
 	const unpublished = [];
@@ -294,7 +367,6 @@ export async function buildCatalogueData(options) {
 		}
 	}
 
-	assertUniqueSlugs(entries);
 	entries.sort((a, b) => a.lwcPlugin.title.localeCompare(b.lwcPlugin.title, 'en'));
 	unpublished.sort();
 
