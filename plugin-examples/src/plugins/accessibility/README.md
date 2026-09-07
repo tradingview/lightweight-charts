@@ -1,28 +1,37 @@
-# Accessibility Plugin (a11y)
+# Accessibility
 
-A drop-in accessibility helper built on
-[pane primitives](https://tradingview.github.io/lightweight-charts/docs/next/plugins/intro)
-that adds a semantic accessibility layer to a Lightweight Charts™ chart, helping
-your application meet [WCAG 2.1 Level AA](https://www.w3.org/TR/WCAG21/).
+A drop-in accessibility layer for a Lightweight Charts™ chart. The plugin is
+built on
+[pane primitives](https://tradingview.github.io/lightweight-charts/docs/plugins/pane-primitives)
+and helps your application meet
+[WCAG 2.1 Level AA](https://www.w3.org/TR/WCAG21/).
 
-Canvas-based charts are opaque to assistive technology. This plugin productises
+Canvas-based charts are opaque to assistive technology. This plugin packages
 the techniques from the
-[accessibility tutorial](https://tradingview.github.io/lightweight-charts/tutorials/a11y/intro)
-so you get keyboard navigation, screen-reader announcements and a visible focus
+[accessibility tutorial](https://tradingview.github.io/lightweight-charts/tutorials/a11y/intro).
+You get keyboard navigation, screen-reader announcements, and a visible focus
 indicator without any manual wiring.
 
-Use the chart-level helper for normal integration. It attaches one primitive per
-pane, and each pane gets an independent, labelled, keyboard-focusable semantic
-layer. Within a pane the plugin handles every series, so multi-series and
-multi-pane charts are supported out of the box.
+Use the chart-level helper for normal integration. It attaches one primitive
+per pane. Each pane gets its own labeled, keyboard-focusable semantic layer.
+The plugin handles every series in a pane, so multi-series and multi-pane
+charts work out of the box.
 
-## How to use
+## Installation
+
+```shell
+npm install @tradingview/lwc-plugin-accessibility
+```
+
+Requires Lightweight Charts™ `^5.2.0`.
+
+## Usage
 
 Enable the plugin for every current pane with one chart-level call:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { addAccessibilityPlugin } from './plugins/accessibility/accessibility';
+import { addAccessibilityPlugin } from '@tradingview/lwc-plugin-accessibility';
 
 const chart = createChart(document.getElementById('chart'));
 const series = chart.addSeries(LineSeries);
@@ -54,7 +63,7 @@ attach to.
 
 ## What it does
 
-- **Semantic layer.** Each pane gets a labelled, keyboard-focusable overlay
+- **Semantic layer.** Each pane gets a labeled, keyboard-focusable overlay
   (`role="application"`, `aria-label`, `tabindex="0"`), while the pane's table
   scaffolding is marked presentational and the visual canvases are hidden from
   assistive technology with `aria-hidden`. Focusable chart internals such as the
@@ -101,7 +110,7 @@ All options are optional and have sensible defaults.
 | `chartTitle` | `string` | `'Interactive financial chart'` | Accessible name of the pane region. |
 | `paneIndex` | `number` | `0` | Index of the pane this primitive is attached to. Only needed when manually attaching `AccessibilityPlugin`; `addAccessibilityPlugin` sets it for you. |
 | `showFocusIndicator` | `boolean` | `true` | Draw a visible focus ring on the active point. |
-| `focusIndicatorColor` | `string` | `'#2962FF'` | Colour of the focus ring. |
+| `focusIndicatorColor` | `string` | `'#2962FF'` | Color of the focus ring. |
 | `focusIndicatorSize` | `number` | `14` | Diameter of the focus ring, in CSS pixels. |
 | `announceDataUpdates` | `boolean \| 'active' \| (paneIndex)=>boolean` | `'active'` (helper); `true` (standalone) | Which panes announce data updates, and how they combine (see below). |
 | `pageStep` | `number` | `10` | Points to jump with `Page Up` / `Page Down`. |
@@ -175,7 +184,7 @@ Out of the box the announcements are English, but **numbers and dates follow the
 chart's locale** and **every spoken string is translatable**.
 
 **Numbers and dates** come from the chart's
-[`localization`](https://tradingview.github.io/lightweight-charts/docs/next/api/interfaces/LocalizationOptions):
+[`localization`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/LocalizationOptions):
 dates use `localization.locale`, the summary's percentage uses it via
 `Intl.NumberFormat`, and if you set `localization.priceFormatter` /
 `localization.timeFormatter` the announcements use those too. So a chart you have
@@ -186,12 +195,12 @@ tutorials) gets localized announcements for free. You can still override per
 plugin with `priceFormatter` / `timeFormatter`.
 
 **Strings** are supplied through the `messages` bundle. Every announced sentence
-is a formatter function (so a translation controls word order and pluralisation);
+is a formatter function (so a translation controls word order and pluralization);
 atomic words are plain strings. Pass a partial override — anything you leave out
 stays English:
 
 ```js
-import { addAccessibilityPlugin } from './plugins/accessibility/accessibility';
+import { addAccessibilityPlugin } from '@tradingview/lwc-plugin-accessibility';
 
 addAccessibilityPlugin(chart, {
     chartTitle: 'Gráfico de precios',
@@ -230,7 +239,7 @@ a screen reader.
 small *"Press H for keyboard shortcuts"* hint is shown; `H` toggles an on-screen
 panel listing the controls. It is `aria-hidden` (screen-reader
 users already get the spoken `H` help) and its text comes from the `messages`
-bundle (`shortcutsHint`, `shortcutsTitle`, `shortcuts`), so it localises with the
+bundle (`shortcutsHint`, `shortcutsTitle`, `shortcuts`), so it localizes with the
 rest. The overlay text is sized in `rem`, so it scales with the page/browser font.
 
 **High contrast** — `highContrast` (`boolean | 'auto' | (() => boolean)`, default
@@ -280,8 +289,7 @@ the user scrolls or how often your data ticks.
 
 ## Notes & limitations
 
-- This is an example/starting-point plugin (see the repository disclaimer). It
-  targets line / area / candlestick / histogram series: OHLC series announce
+- The plugin targets line / area / candlestick / histogram series: OHLC series announce
   their open / high / low / close, value series announce their value, and exotic
   custom series may need the value extraction adapted via `priceFormatter` /
   `describeChart`.
