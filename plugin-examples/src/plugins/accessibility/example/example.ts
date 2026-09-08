@@ -167,6 +167,19 @@ const captions = document.querySelector('#captions-text');
 const sonifier = createToneSonifier();
 let sound = false;
 
+const focusButton = document.querySelector('#focus-button');
+const liveButton = document.querySelector('#live-button');
+const scopeButton = document.querySelector('#scope-button');
+const contrastButton = document.querySelector('#contrast-button');
+const fontButton = document.querySelector('#font-button');
+const soundButton = document.querySelector('#sound-button');
+const languageSelect = document.querySelector('#language-select') as HTMLSelectElement | null;
+const captionsLabel = document.querySelector('#captions-label');
+
+let liveTimer: number | undefined;
+let visibleScope = true;
+let largeFont = false;
+
 const accessibility = addAccessibilityPlugin(chart, {
 	chartTitle: paneIndex => (paneIndex === 0 ? text().priceTitle : text().volumeTitle),
 	showShortcuts: true,
@@ -198,19 +211,6 @@ const accessibility = addAccessibilityPlugin(chart, {
 		updateLabels();
 	},
 });
-
-const focusButton = document.querySelector('#focus-button');
-const liveButton = document.querySelector('#live-button');
-const scopeButton = document.querySelector('#scope-button');
-const contrastButton = document.querySelector('#contrast-button');
-const fontButton = document.querySelector('#font-button');
-const soundButton = document.querySelector('#sound-button');
-const languageSelect = document.querySelector('#language-select') as HTMLSelectElement | null;
-const captionsLabel = document.querySelector('#captions-label');
-
-let liveTimer: number | undefined;
-let visibleScope = true;
-let largeFont = false;
 
 function updateLabels(): void {
 	const t = text();
