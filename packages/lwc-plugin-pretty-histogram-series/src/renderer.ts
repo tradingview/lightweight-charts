@@ -1,6 +1,6 @@
 import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
 
-import { CustomBarItemData, ICustomSeriesPaneRenderer, PaneRendererCustomData, PriceToCoordinateConverter } from 'lightweight-charts';
+import { CustomBarItemData, ICustomSeriesPaneRenderer, PaneRendererCustomData, PriceToCoordinateConverter, Time } from 'lightweight-charts';
 
 import { PrettyHistogramSeriesOptions } from './options';
 import { PrettyHistogramData } from './data';
@@ -12,7 +12,10 @@ interface PrettyHistogramBarItem {
 	color: string;
 }
 
-export class PrettyHistogramSeriesRenderer<HorzScaleItem, TData extends PrettyHistogramData<HorzScaleItem>> implements ICustomSeriesPaneRenderer {
+export class PrettyHistogramSeriesRenderer<
+	HorzScaleItem = Time,
+	TData extends PrettyHistogramData<HorzScaleItem> = PrettyHistogramData<HorzScaleItem>
+> implements ICustomSeriesPaneRenderer {
 	private _data: PaneRendererCustomData<HorzScaleItem, TData> | null = null;
 	private _options: PrettyHistogramSeriesOptions | null = null;
 
@@ -49,7 +52,7 @@ export class PrettyHistogramSeriesRenderer<HorzScaleItem, TData extends PrettyHi
 		const bars: PrettyHistogramBarItem[] = this._data.bars.map((bar: CustomBarItemData<HorzScaleItem, TData>) => {
 			return {
 				x: bar.x * renderingScope.horizontalPixelRatio,
-				value: priceToCoordinate(bar.originalData.value!)!,
+				value: priceToCoordinate(bar.originalData.value)!,
 				color: bar.barColor ?? options.color,
 			};
 		});
@@ -73,7 +76,7 @@ export class PrettyHistogramSeriesRenderer<HorzScaleItem, TData extends PrettyHi
 				zeroCoordinate,
 				item.value,
 				renderingScope.verticalPixelRatio
-			)
+			);
 			const actualRadius = Math.floor(Math.min(radius, width / 2, Math.abs(yPositionBox.length)));
 			const left = Math.round(item.x - width / 2);
 			ctx.roundRect(

@@ -1,3 +1,9 @@
-import { SeriesDataItemTypeMap, SingleValueData } from 'lightweight-charts';
+import { CustomData, Time } from 'lightweight-charts';
 
-export type PrettyHistogramData<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>['Histogram'] & SingleValueData<HorzScaleItem>;
+/**
+ * Pretty histogram series data. The optional `color` inherited from
+ * `CustomData` overrides the series `color` for that bar.
+ */
+export interface PrettyHistogramData<HorzScaleItem = Time> extends CustomData<HorzScaleItem> {
+	value: number;
+}
