@@ -18,9 +18,33 @@
 			"types": "./dist/assertions.d.ts",
 			"default": "./dist/assertions.js"
 		},
+		"./axis-label-view": {
+			"types": "./dist/axis-label-view.d.ts",
+			"default": "./dist/axis-label-view.js"
+		},
+		"./canvas/round-rect": {
+			"types": "./dist/canvas/round-rect.d.ts",
+			"default": "./dist/canvas/round-rect.js"
+		},
 		"./closest-index": {
 			"types": "./dist/closest-index.d.ts",
 			"default": "./dist/closest-index.js"
+		},
+		"./custom-series/line-paths": {
+			"types": "./dist/custom-series/line-paths.d.ts",
+			"default": "./dist/custom-series/line-paths.js"
+		},
+		"./custom-series/renderer-base": {
+			"types": "./dist/custom-series/renderer-base.d.ts",
+			"default": "./dist/custom-series/renderer-base.js"
+		},
+		"./custom-series/stacking": {
+			"types": "./dist/custom-series/stacking.d.ts",
+			"default": "./dist/custom-series/stacking.js"
+		},
+		"./custom-series/visible-bars": {
+			"types": "./dist/custom-series/visible-bars.d.ts",
+			"default": "./dist/custom-series/visible-bars.js"
 		},
 		"./delegate": {
 			"types": "./dist/delegate.d.ts",
@@ -50,9 +74,25 @@
 			"types": "./dist/dimensions/positions.d.ts",
 			"default": "./dist/dimensions/positions.js"
 		},
+		"./dom/media-query": {
+			"types": "./dist/dom/media-query.d.ts",
+			"default": "./dist/dom/media-query.js"
+		},
+		"./dom/pane-element": {
+			"types": "./dist/dom/pane-element.d.ts",
+			"default": "./dist/dom/pane-element.js"
+		},
+		"./line-style": {
+			"types": "./dist/line-style.d.ts",
+			"default": "./dist/line-style.js"
+		},
 		"./min-max-in-range": {
 			"types": "./dist/min-max-in-range.d.ts",
 			"default": "./dist/min-max-in-range.js"
+		},
+		"./pane-plugin-base": {
+			"types": "./dist/pane-plugin-base.d.ts",
+			"default": "./dist/pane-plugin-base.js"
 		},
 		"./plugin-base": {
 			"types": "./dist/plugin-base.d.ts",
