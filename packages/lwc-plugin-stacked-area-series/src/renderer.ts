@@ -37,13 +37,15 @@ function cumulativeBuildUp(arr: number[]): number[] {
 	});
 }
 
-export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
-	implements ICustomSeriesPaneRenderer
+export class StackedAreaSeriesRenderer<
+	HorzScaleItem = Time,
+	TData extends StackedAreaData<HorzScaleItem> = StackedAreaData<HorzScaleItem>
+> implements ICustomSeriesPaneRenderer
 {
-	_data: PaneRendererCustomData<Time, TData> | null = null;
-	_options: StackedAreaSeriesOptions | null = null;
+	private _data: PaneRendererCustomData<HorzScaleItem, TData> | null = null;
+	private _options: StackedAreaSeriesOptions | null = null;
 
-	draw(
+	public draw(
 		target: CanvasRenderingTarget2D,
 		priceConverter: PriceToCoordinateConverter
 	): void {
@@ -52,15 +54,15 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 		);
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: StackedAreaSeriesOptions
 	): void {
 		this._data = data;
 		this._options = options;
 	}
 
-	_drawImpl(
+	private _drawImpl(
 		renderingScope: BitmapCoordinatesRenderingScope,
 		priceToCoordinate: PriceToCoordinateConverter
 	): void {
@@ -108,12 +110,12 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 		});
 	}
 
-	_createLinePaths(
+	private _createLinePaths(
 		bars: StackedAreaBarItem[],
 		visibleRange: IRange<number>,
 		renderingScope: BitmapCoordinatesRenderingScope,
 		zeroY: number
-	) {
+	): LinePathData[] {
 		const { horizontalPixelRatio, verticalPixelRatio } = renderingScope;
 		const oddLines: LinePathData[] = [];
 		const evenLines: LinePathData[] = [];
@@ -188,7 +190,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 		return linesMeshed;
 	}
 
-	_createAreas(linesMeshed: LinePathData[]): Path2D[] {
+	private _createAreas(linesMeshed: LinePathData[]): Path2D[] {
 		const areas: Path2D[] = [];
 		for (let i = 1; i < linesMeshed.length; i++) {
 			const areaPath = new Path2D(linesMeshed[i - 1].path);

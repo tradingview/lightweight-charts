@@ -1,5 +1,6 @@
 import {
 	CustomSeriesOptions,
+	LineWidth,
 	customSeriesDefaultOptions,
 } from 'lightweight-charts';
 
@@ -10,7 +11,7 @@ export interface StackedAreaColor {
 
 export interface StackedAreaSeriesOptions extends CustomSeriesOptions {
 	colors: readonly StackedAreaColor[];
-	lineWidth: number;
+	lineWidth: LineWidth;
 }
 
 export const defaultOptions: StackedAreaSeriesOptions = {

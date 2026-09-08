@@ -1,8 +1,8 @@
-import { CustomData } from 'lightweight-charts';
+import { CustomData, Time } from 'lightweight-charts';
 
 /**
- * StackedArea Series Data
+ * Stacked area series data.
  */
-export interface StackedAreaData extends CustomData {
+export interface StackedAreaData<HorzScaleItem = Time> extends CustomData<HorzScaleItem> {
 	values: number[];
 }
