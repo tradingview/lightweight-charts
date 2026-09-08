@@ -108,7 +108,9 @@ loaded; until then nothing is rendered. Any URL the browser can load into an
 
 ## Options
 
-All options are optional. Pass them as the second constructor argument.
+Options are passed as the second constructor argument, which is optional, as
+is every option in it. The type is `ImageWatermarkPluginOptions`, and the
+defaults are exported as `defaultOptions`.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -132,6 +134,11 @@ them, detach the watermark and attach a new one.
   the watermark.
 - The image appears only in the plot area, where the series is drawn. It never
   covers the price scales or the time scale.
+- `ImageWatermarkOptions` is still exported, as a deprecated alias of
+  `ImageWatermarkPluginOptions`. The plugin option type was renamed because
+  the library exports an `ImageWatermarkOptions` of its own, for the built-in
+  `createImageWatermark`. The alias is kept for compatibility and will be
+  removed in a future major version.
 - The image can be loaded from any origin. However, an image served without
   CORS headers marks the canvas as "tainted", and
   [`takeScreenshot`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#takescreenshot)

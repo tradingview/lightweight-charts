@@ -14,7 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repository.
 - The `ImageWatermark` series primitive draws an image centered behind the
   attached series and scaled to fit.
-- Options: `maxWidth`, `maxHeight`, `padding`, and `alpha`.
+- Options: `maxWidth`, `maxHeight`, `padding`, and `alpha`, typed as
+  `ImageWatermarkPluginOptions`. The argument is optional, and the defaults are
+  exported as `defaultOptions`.
+
+### Deprecated
+
+- `ImageWatermarkOptions`, the name used in the `plugin-examples` collection,
+  is exported as an alias of `ImageWatermarkPluginOptions`. The option type was
+  renamed because Lightweight Charts™ exports an `ImageWatermarkOptions` of its
+  own, for the built-in `createImageWatermark`.
 
 ### Fixed
 
