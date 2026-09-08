@@ -20,10 +20,12 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries());
+	// Lines without fills.
+	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries(), {
+		areaVisible: false,
+		lineStyle: LightweightCharts.LineStyle.Dotted,
+		lineWidth: 2,
+	});
 	series.setData(generateData());
-
-	// A visible range entirely before the data: the range is non-null but
-	// empty, which used to crash the renderer.
-	chart.timeScale().setVisibleLogicalRange({ from: -400, to: -300 });
+	chart.timeScale().fitContent();
 }

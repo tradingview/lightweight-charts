@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 
 import {
 	cumulativeSum,
+	stackLevels,
 	stackedPlotValues,
 } from '../../src/custom-series/stacking.js';
 
@@ -78,5 +79,23 @@ void describe('stackedPlotValues', () => {
 		const plotValues = stackedPlotValues([2, 2]);
 		expect(plotValues).to.have.length(3);
 		expect(plotValues[plotValues.length - 1]).to.equal(4);
+	});
+});
+
+void describe('stackLevels', () => {
+	void it('returns the band boundaries of a stack from zero', () => {
+		expect(stackLevels([1, 2, 3])).to.deep.equal([1, 3, 6]);
+	});
+
+	void it('offsets every boundary by the base', () => {
+		expect(stackLevels([1, 2, 3], 10)).to.deep.equal([11, 13, 16]);
+	});
+
+	void it('draws a negative band back down from the previous boundary', () => {
+		expect(stackLevels([10, -4], 0)).to.deep.equal([10, 6]);
+	});
+
+	void it('returns an empty array for no values', () => {
+		expect(stackLevels([], 5)).to.deep.equal([]);
 	});
 });

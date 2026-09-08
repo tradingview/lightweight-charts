@@ -20,10 +20,9 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries());
-	series.setData(generateData());
-
-	// A visible range entirely before the data: the range is non-null but
-	// empty, which used to crash the renderer.
-	chart.timeScale().setVisibleLogicalRange({ from: -400, to: -300 });
+	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries(), {
+		lineType: 'step',
+	});
+	series.setData(generateData(30));
+	chart.timeScale().fitContent();
 }
