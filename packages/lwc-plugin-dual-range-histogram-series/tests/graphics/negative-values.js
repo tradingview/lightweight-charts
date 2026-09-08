@@ -28,9 +28,10 @@ function reserveRoom(chart, series) {
 	series.priceScale().applyOptions({ scaleMargins: { top: margin, bottom: margin } });
 }
 
-// The colours are indexed by position in `values`, not by sign. Here the
-// signs are flipped, so index 0/1 (the teal pair) point downwards and index
-// 2/3 (the red pair) point upwards.
+// The colours are indexed by position in `values`, not by sign. The first
+// half of the data is the default case; in the second half every sign is
+// flipped, so there the teal pair (index 0/1) points down and the red pair
+// (index 2/3) points up.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -42,9 +43,9 @@ function runTestCase(container) {
 		priceLineVisible: false,
 		lastValueVisible: false,
 	});
-	histogram.setData(data.histogram.map(point => ({
+	histogram.setData(data.histogram.map((point, index) => ({
 		time: point.time,
-		values: point.values.map(value => -value),
+		values: index < 20 ? point.values : point.values.map(value => -value),
 	})));
 
 	const baseline = chart.addSeries(LightweightCharts.BaselineSeries, {

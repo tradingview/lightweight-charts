@@ -29,12 +29,6 @@ function reserveRoom(chart, series) {
 }
 
 function runTestCase(container) {
-	// Fixed container size, so the reserved margins are computed once and no
-	// ResizeObserver is needed.
-	container.style.position = 'static';
-	container.style.width = '600px';
-	container.style.height = '400px';
-
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 		timeScale: { barSpacing: 12, minBarSpacing: 4 },
