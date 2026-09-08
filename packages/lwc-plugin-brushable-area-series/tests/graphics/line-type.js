@@ -27,27 +27,31 @@ const greenStyle = {
 	lineWidth: 4,
 };
 
-// The grey line series starts 20 bars EARLIER than the brushable series, so
-// logical index 20 is the brushable series' FIRST point. brushRanges are
-// logical indices of the time scale, so the highlight has to land on logical
-// 30..49 - a quarter of the way in - and not on the brushable series' own
-// array indices 30..49, which would put it 20 bars further right.
+const orangeStyle = {
+	lineColor: 'rgb(245, 124, 0)',
+	topColor: 'rgba(245, 124, 0, 0.4)',
+	bottomColor: 'rgba(245, 124, 0, 0)',
+	lineWidth: 4,
+};
+
+// `lineType` shapes both the line and the fill: stepped on top, curved below.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
+	const data = generateData(40, 0);
 
-	const line = chart.addSeries(LightweightCharts.LineSeries, { color: '#9E9E9E' });
-	line.setData(generateData(80, 0));
-
-	const series = chart.addCustomSeries(new LwcPlugin.BrushableAreaSeries(), Object.assign({
+	const stepped = chart.addCustomSeries(new LwcPlugin.BrushableAreaSeries(), Object.assign({
 		priceLineVisible: false,
-	}, fadeStyle));
-	series.setData(generateData(60, 20));
+		lineType: LightweightCharts.LineType.WithSteps,
+	}, greenStyle));
+	stepped.setData(data);
 
-	// Logical indices 30..49, just left of centre.
-	series.applyOptions({
-		brushRanges: [{ range: { from: 30, to: 50 }, style: greenStyle }],
-	});
+	const curved = chart.addCustomSeries(new LwcPlugin.BrushableAreaSeries(), Object.assign({
+		priceLineVisible: false,
+		lineType: LightweightCharts.LineType.Curved,
+	}, orangeStyle));
+	curved.setData(data.map(point => ({ time: point.time, value: point.value - 40 })));
+
 	chart.timeScale().fitContent();
 }

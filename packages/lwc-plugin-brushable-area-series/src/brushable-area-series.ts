@@ -1,6 +1,7 @@
 import {
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
+	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
 	Time,
@@ -30,7 +31,7 @@ export class BrushableAreaSeries<
 		return (data as Partial<TData>).value === undefined;
 	}
 
-	public renderer(): BrushableAreaSeriesRenderer<HorzScaleItem, TData> {
+	public renderer(): ICustomSeriesPaneRenderer {
 		return this._renderer;
 	}
 
@@ -53,3 +54,11 @@ export type {
 	BrushRange,
 } from './options';
 export { defaultOptions } from './options';
+export type {
+	BrushableAreaInteractionOptions,
+	BrushableAreaRange,
+} from './interaction';
+export {
+	BrushableAreaInteraction,
+	defaultInteractionOptions,
+} from './interaction';

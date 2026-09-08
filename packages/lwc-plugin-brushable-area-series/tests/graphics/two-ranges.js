@@ -42,9 +42,9 @@ function runTestCase(container) {
 		priceLineVisible: false,
 	}, fadeStyle));
 	series.setData(generateData(80, 0));
-	// The first range starts at index 0, i.e. flush with the left edge of the
-	// data. The renderer styles each segment by its right-hand point, so the
-	// leading segment is drawn in the range's style as well.
+	// The first range starts at logical 0, i.e. flush with the left edge of the
+	// data. Each segment is styled by its right-hand point, so the range covers
+	// the segments ending at points 0..19.
 	series.applyOptions({
 		brushRanges: [
 			{ range: { from: 0, to: 20 }, style: greenStyle },
