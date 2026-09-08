@@ -89,8 +89,11 @@ function registerGroup(testCases: TestCase[], screenshoter: Screenshoter, outDir
 	registerTestCases(testCases, screenshoter, outDir, {
 		golden: getGoldenContent,
 		test: (testCase: TestCase) => generatePageContent(testStandalonePath, testCase.caseContent, buildMode),
-		skipMessage: goldenContentDir
-			? 'Unable to loaded golden page content. It is likely this is a new test case.'
-			: undefined,
+		missingGolden: {
+			action: goldenContentDir ? 'skip' : 'fail',
+			message: goldenContentDir
+				? 'Unable to loaded golden page content. It is likely this is a new test case.'
+				: 'Unable to generate page content for golden test case.',
+		},
 	});
 }

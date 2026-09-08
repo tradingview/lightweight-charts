@@ -16,11 +16,15 @@ const TEST_CASE_TIMEOUT = 5000;
 const NUMBER_RETRIES = 3;
 
 export interface TestCasePages {
-	/** Page content for the golden build, or null when there is none and the case is skipped. */
+	/** Page content for the golden build, or null when there is none. */
 	golden: (testCase: TestCase) => string | null;
 	test: (testCase: TestCase) => string;
-	/** Printed when `golden` returns null; when omitted a missing golden page fails the case. */
-	skipMessage?: string;
+	/**
+	 * What a null golden page means. `skip` logs and passes; `fail` still
+	 * screenshots the test page, so the artifacts show what a new case renders,
+	 * then fails with this message.
+	 */
+	missingGolden: { action: 'skip' | 'fail'; message: string };
 }
 
 /**
@@ -50,17 +54,19 @@ export function registerTestCases(
 				}
 
 				const goldenPageContent = pages.golden(testCase);
+				const testPageContent = pages.test(testCase);
 
 				if (goldenPageContent === null) {
-					if (pages.skipMessage !== undefined) {
-						console.log(`SKIPPED: ${testCase.name}. ${pages.skipMessage}`);
-					} else {
-						expect(goldenPageContent, 'Unable to generate page content for golden test case').to.not.equal(null);
+					if (pages.missingGolden.action === 'skip') {
+						console.log(`SKIPPED: ${testCase.name}. ${pages.missingGolden.message}`);
+						return;
 					}
+					writeTestDataItem('2.test.html', testPageContent);
+					const testScreenshot = await withTimeout(screenshoter.generateScreenshot(testPageContent), TEST_CASE_TIMEOUT);
+					writeTestDataItem('2.test.png', PNG.sync.write(testScreenshot));
+					expect(false, `${pages.missingGolden.message} See ${testCaseOutDir} for the test page screenshot.`).to.equal(true);
 					return;
 				}
-
-				const testPageContent = pages.test(testCase);
 
 				writeTestDataItem('1.golden.html', goldenPageContent);
 				writeTestDataItem('2.test.html', testPageContent);
