@@ -274,6 +274,15 @@ importers:
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
+      '@types/chai':
+        specifier: 5.2.1
+        version: 5.2.1
+      '@types/node':
+        specifier: 22.13.14
+        version: 22.13.14
+      chai:
+        specifier: 5.2.0
+        version: 5.2.0
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
@@ -288,7 +297,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: 8.2.2
-        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+        version: 8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-dual-range-histogram-series:
     dependencies:
@@ -414,6 +423,15 @@ importers:
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
+      '@types/chai':
+        specifier: 5.2.1
+        version: 5.2.1
+      '@types/node':
+        specifier: 22.13.14
+        version: 22.13.14
+      chai:
+        specifier: 5.2.0
+        version: 5.2.0
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
@@ -428,7 +446,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: 8.2.2
-        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+        version: 8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-stacked-area-series:
     dependencies:
@@ -20263,6 +20281,21 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.7.0
       lightningcss: 1.33.0
+      terser: 5.39.0
+      tsx: 4.19.3
+      yaml: 2.9.0
+
+  vite@8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0):
+    dependencies:
+      lightningcss: 1.33.0
+      picomatch: 4.0.5
+      postcss: 8.5.26
+      rolldown: 1.2.6
+      tinyglobby: 0.2.17
+    optionalDependencies:
+      '@types/node': 22.13.14
+      fsevents: 2.3.3
+      jiti: 2.7.0
       terser: 5.39.0
       tsx: 4.19.3
       yaml: 2.9.0
