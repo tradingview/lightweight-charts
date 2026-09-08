@@ -30,7 +30,7 @@ class ImageWatermarkPaneRenderer implements IPrimitivePaneRenderer {
 			const ctx = scope.context;
 			const pos = this._view._placement;
 			if (!pos) return;
-			if (!this._source._imgElement) throw new Error(`Image element missing.`);
+			if (!this._source._imgElement) return;
 			ctx.globalAlpha = this._source._options.alpha ?? 1;
 			ctx.drawImage(
 				this._source._imgElement,
@@ -121,7 +121,6 @@ export class ImageWatermark implements ISeriesPrimitive<Time> {
 	_imageHeight = 0; // don't draw until loaded fully
 	_imageWidth = 0;
 	_chart: IChartApi | null = null;
-	_containerElement: HTMLElement | null = null;
 	_requestUpdate?: () => void;
 
 	constructor(imageUrl: string, options: ImageWatermarkOptions) {
@@ -133,19 +132,38 @@ export class ImageWatermark implements ISeriesPrimitive<Time> {
 	attached({ chart, requestUpdate }: SeriesAttachedParameter<Time>) {
 		this._chart = chart;
 		this._requestUpdate = requestUpdate;
-		this._containerElement = chart.chartElement();
-		this._imgElement = new Image();
-		this._imgElement.onload = () => {
-			this._imageHeight = this._imgElement?.naturalHeight ?? 1;
-			this._imageWidth = this._imgElement?.naturalWidth ?? 1;
+		const loaded = this._imgElement;
+		// An image decoded before an earlier detach is reused instead of refetched.
+		if (loaded && loaded.complete && loaded.naturalWidth > 0) {
+			this._paneViews.forEach(pv => pv.update());
+			this.requestUpdate();
+			return;
+		}
+		const img = new Image();
+		this._imgElement = img;
+		img.onload = () => {
+			if (this._imgElement !== img) return;
+			this._imageHeight = img.naturalHeight;
+			this._imageWidth = img.naturalWidth;
 			this._paneViews.forEach(pv => pv.update());
 			this.requestUpdate();
 		};
-		this._imgElement.src = this._imageUrl;
+		img.onerror = () => {
+			if (this._imgElement !== img) return;
+			this._imgElement = null;
+		};
+		img.src = this._imageUrl;
 	}
 
 	detached() {
-		this._imgElement = null;
+		const img = this._imgElement;
+		if (img) {
+			img.onload = img.onerror = null;
+			// A load still in flight is abandoned: nothing of it is kept.
+			if (!img.complete || img.naturalWidth === 0) this._imgElement = null;
+		}
+		this._chart = null;
+		this._requestUpdate = undefined;
 	}
 
 	requestUpdate(): void {
