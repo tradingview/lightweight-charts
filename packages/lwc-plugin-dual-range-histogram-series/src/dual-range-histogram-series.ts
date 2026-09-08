@@ -1,47 +1,55 @@
 import {
 	CustomSeriesPricePlotValues,
+	CustomSeriesWhitespaceData,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
-	WhitespaceData,
 	Time,
 } from 'lightweight-charts';
 import { DualRangeHistogramSeriesOptions, defaultOptions } from './options';
 import { DualRangeHistogramSeriesRenderer } from './renderer';
 import { DualRangeHistogramData } from './data';
 
-export class DualRangeHistogramSeries<TData extends DualRangeHistogramData>
-	implements ICustomSeriesPaneView<Time, TData, DualRangeHistogramSeriesOptions>
+export class DualRangeHistogramSeries<
+	HorzScaleItem = Time,
+	TData extends DualRangeHistogramData<HorzScaleItem> = DualRangeHistogramData<HorzScaleItem>
+> implements
+		ICustomSeriesPaneView<HorzScaleItem, TData, DualRangeHistogramSeriesOptions>
 {
-	_renderer: DualRangeHistogramSeriesRenderer<TData>;
+	private _renderer: DualRangeHistogramSeriesRenderer<HorzScaleItem, TData>;
 
-	constructor() {
+	public constructor() {
 		this._renderer = new DualRangeHistogramSeriesRenderer();
 	}
 
-	priceValueBuilder(): CustomSeriesPricePlotValues {
+	public priceValueBuilder(): CustomSeriesPricePlotValues {
 		return [0]; // keep zero line in view with autoscaling
 	}
 
-	isWhitespace(data: TData | WhitespaceData): data is WhitespaceData {
+	public isWhitespace(
+		data: TData | CustomSeriesWhitespaceData<HorzScaleItem>
+	): data is CustomSeriesWhitespaceData<HorzScaleItem> {
 		return !Boolean((data as Partial<TData>).values?.length);
 	}
 
-	renderer(): DualRangeHistogramSeriesRenderer<TData> {
+	public renderer(): DualRangeHistogramSeriesRenderer<HorzScaleItem, TData> {
 		return this._renderer;
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: DualRangeHistogramSeriesOptions
 	): void {
 		this._renderer.update(data, options);
 	}
 
-	defaultOptions() {
+	public defaultOptions(): DualRangeHistogramSeriesOptions {
 		return defaultOptions;
 	}
 }
 
 export type { DualRangeHistogramData } from './data';
-export type { DualRangeHistogramSeriesOptions } from './options';
+export type {
+	DualRangeHistogramColumns,
+	DualRangeHistogramSeriesOptions,
+} from './options';
 export { defaultOptions } from './options';

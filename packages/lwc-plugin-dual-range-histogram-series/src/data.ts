@@ -1,8 +1,9 @@
-import { CustomData } from 'lightweight-charts';
+import { CustomData, Time } from 'lightweight-charts';
 
 /**
  * DualRangeHistogram Series Data
  */
-export interface DualRangeHistogramData extends CustomData {
+export interface DualRangeHistogramData<HorzScaleItem = Time>
+	extends CustomData<HorzScaleItem> {
 	values: number[];
 }
