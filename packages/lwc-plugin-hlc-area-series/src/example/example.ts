@@ -1,9 +1,7 @@
 import { WhitespaceData, createChart } from 'lightweight-charts';
-import {
-	HLCAreaSeries,
-	HLCAreaData,
-} from '@tradingview/lwc-plugin-hlc-area-series';
-import { generateAlternativeCandleData } from '../../../sample-data';
+import { HLCAreaSeries } from '../hlc-area-series';
+import { HLCAreaData } from '../data';
+import { generateAlternativeCandleData } from './sample-data';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
