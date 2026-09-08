@@ -69,6 +69,8 @@ The scripts in `scripts/plugins/` check and publish the official plugin packages
 
 CI runs three gates on every pull request, in the CircleCI `plugins` job: `plugins:validate`, `plugins:check-compat` and `plugins:release --check-only`. Two GitHub Actions workflows cover the checks that need the npm registry: the release dry run after every push to `master`, the floor check on `master` pushes that touch `packages/` or the scripts, and the smoke test on `release/*` branches and `v*` tags, where it installs that build of the library. Each of the three can also be started by hand from the Actions tab, optionally for a single package. Nothing in CI publishes: no npm credentials exist there, the release script refuses to publish when the `CI` environment variable is set, and the dry-run job asserts that refusal on every run. `plugins:check-stale` is run by hand as part of the toolkit release procedure below.
 
+A graduated plugin keeps a gallery page under `plugin-examples/src/plugins/<name>/example/` that imports the package; the gallery's `build:deps` script builds the toolkit and every `packages/lwc-plugin-*` package before the gallery is typechecked or served.
+
 Plugin and toolkit releases are tagged with their npm identifier, `@tradingview/lwc-plugin-<name>@X.Y.Z` and `@tradingview/lwc-toolkit@X.Y.Z`, next to the library's `vX.Y.Z` tags.
 
 ### Releasing a plugin package
