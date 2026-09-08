@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Time } from 'lightweight-charts';
+import type { Time } from 'lightweight-charts';
 import { describe, it } from 'node:test';
 
 import {
