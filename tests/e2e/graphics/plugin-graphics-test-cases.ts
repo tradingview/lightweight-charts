@@ -82,6 +82,11 @@ function registerGroup(group: PluginTestCasesGroup, screenshoter: Screenshoter, 
 			expect(hasTest, `no standalone build of ${group.packageName} under ${testPluginsDir}; build the package first`).to.equal(true);
 			return generatePluginPageContent(testStandalonePath, group.packageName, servedUrl(`test-${group.folder}.js`), testCase.caseContent, buildMode);
 		},
-		skipMessage: `No golden build of ${group.packageName}. It is likely this is a new package.`,
+		// A new package has no golden build; the case fails so that the reviewer
+		// looks at its screenshot among the job's artifacts, as for any change.
+		missingGolden: {
+			action: 'fail',
+			message: `No golden build of ${group.packageName}: a new package, or a merge-base that predates it.`,
+		},
 	});
 }

@@ -84,7 +84,7 @@ build_plugins() {
 
 # Golden plugin builds: the merge-base revision's packages, kept next to the
 # merge-base library build. A package that does not exist there (a new one)
-# simply has no golden build, and its cases are reported as skipped.
+# simply has no golden build, and its cases fail with their screenshots kept.
 build_plugins_golden() {
 	rm -rf ./merge-base-plugins-dist ./packages/lwc-plugin-*/dist
 	mkdir -p ./merge-base-plugins-dist
