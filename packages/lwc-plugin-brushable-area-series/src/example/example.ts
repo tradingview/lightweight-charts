@@ -1,10 +1,8 @@
 import { Logical, WhitespaceData, createChart } from 'lightweight-charts';
-import { generateLineData } from '../../../sample-data';
-import {
-	BrushableAreaData,
-	BrushableAreaSeries,
-	BrushableAreaStyle,
-} from '@tradingview/lwc-plugin-brushable-area-series';
+import { generateLineData } from './sample-data';
+import { BrushableAreaSeries } from '../brushable-area-series';
+import { BrushableAreaData } from '../data';
+import { BrushableAreaStyle } from '../options';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
