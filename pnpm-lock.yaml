@@ -374,7 +374,7 @@ importers:
         specifier: 8.2.2
         version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
-  packages/lwc-plugin-pretty-histogram:
+  packages/lwc-plugin-pretty-histogram-series:
     dependencies:
       fancy-canvas:
         specifier: ~2.1.0
@@ -540,9 +540,9 @@ importers:
       '@tradingview/lwc-plugin-image-watermark':
         specifier: workspace:*
         version: link:../packages/lwc-plugin-image-watermark
-      '@tradingview/lwc-plugin-pretty-histogram':
+      '@tradingview/lwc-plugin-pretty-histogram-series':
         specifier: workspace:*
-        version: link:../packages/lwc-plugin-pretty-histogram
+        version: link:../packages/lwc-plugin-pretty-histogram-series
       '@tradingview/lwc-plugin-rounded-candles-series':
         specifier: workspace:*
         version: link:../packages/lwc-plugin-rounded-candles-series

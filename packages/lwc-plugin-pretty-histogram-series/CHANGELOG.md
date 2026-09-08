@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- First release as a standalone package, `@tradingview/lwc-plugin-pretty-histogram`.
+- First release as a standalone package, `@tradingview/lwc-plugin-pretty-histogram-series`.
   Graduated from the `plugin-examples` collection of the Lightweight Charts™
   repository.
 - The `PrettyHistogramSeries` custom series draws a histogram with rounded

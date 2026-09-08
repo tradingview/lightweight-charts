@@ -16,14 +16,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-pretty-histogram
+npm install @tradingview/lwc-plugin-pretty-histogram-series
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram';
+import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new PrettyHistogramSeries(), {
@@ -49,7 +49,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-pretty-histogram": "https://unpkg.com/@tradingview/lwc-plugin-pretty-histogram/dist/pretty-histogram.standalone.js"
+    "@tradingview/lwc-plugin-pretty-histogram-series": "https://unpkg.com/@tradingview/lwc-plugin-pretty-histogram-series/dist/pretty-histogram-series.standalone.js"
   }
 }
 </script>
@@ -60,7 +60,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram';
+import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new PrettyHistogramSeries(), {
@@ -83,7 +83,7 @@ Add the series with `addCustomSeries`, then set histogram data:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram';
+import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new PrettyHistogramSeries(), {
