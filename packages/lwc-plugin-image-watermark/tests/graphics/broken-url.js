@@ -1,6 +1,3 @@
-// Parked (not discovered) until the draw-before-load fix lands: on Linux the
-// first paint can run before the image's onerror, and drawImage throws on an
-// HTMLImageElement in the 'broken' state.
 function generateData() {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
@@ -21,11 +18,14 @@ function runTestCase(container) {
 
 	// A data: URL with invalid SVG content: the <img> fails to decode, which
 	// fires onerror without any network request, so nothing is reported as a
-	// console/network error by the screenshoter. The chart should render
-	// normally, just without the watermark.
+	// console/network error by the screenshoter. The chart renders normally,
+	// just without the watermark, and nothing is drawn before the failure.
 	const watermark = new LwcPlugin.ImageWatermark('data:image/svg+xml,broken', {
 		alpha: 0.5,
 		padding: 20,
+		onError: error => {
+			window.watermarkError = error;
+		},
 	});
 	series.attachPrimitive(watermark);
 
