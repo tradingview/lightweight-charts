@@ -1,0 +1,57 @@
+function generateData() {
+	const histogram = [];
+	const line = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < 40; ++i) {
+		const outerUp = 80 + Math.sin(i / 5) * 40;
+		const outerDown = -(70 + Math.cos(i / 4) * 30);
+		histogram.push({
+			time: time.getTime() / 1000,
+			values: [
+				outerUp,
+				outerUp * (0.3 + Math.abs(Math.sin(i / 3)) * 0.4),
+				outerDown,
+				outerDown * (0.3 + Math.abs(Math.cos(i / 6)) * 0.4),
+			],
+		});
+		line.push({ time: time.getTime() / 1000, value: Math.sin(i / 8) * 30 });
+		time.setUTCDate(time.getUTCDate() + 1);
+	}
+	return { histogram, line };
+}
+
+// The series does not report its values to the price scale, so room for the
+// fixed-pixel columns has to be reserved with the scale margins (see README).
+function reserveRoom(chart, series) {
+	const height = chart.paneSize().height;
+	const margin = Math.min(0.3, series.options().maxHeight / 2 / height);
+	series.priceScale().applyOptions({ scaleMargins: { top: margin, bottom: margin } });
+}
+
+function runTestCase(container) {
+	const chart = (window.chart = LightweightCharts.createChart(container, {
+		layout: { attributionLogo: false },
+		timeScale: { barSpacing: 12, minBarSpacing: 4 },
+	}));
+	const data = generateData();
+
+	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
+		priceLineVisible: false,
+		lastValueVisible: false,
+	});
+	// Points 15..23 have no `values`, so they are whitespace: no columns there.
+	histogram.setData(data.histogram.map((point, index) => {
+		if (index >= 15 && index < 24) {
+			return { time: point.time };
+		}
+		return point;
+	}));
+
+	const baseline = chart.addSeries(LightweightCharts.BaselineSeries, {
+		baseValue: { type: 'price', price: 0 },
+	});
+	baseline.setData(data.line);
+
+	chart.timeScale().fitContent();
+	reserveRoom(chart, histogram);
+}
