@@ -13,14 +13,58 @@
 				overflow: hidden;
 				background-color: rgba(248, 249, 253, 1);
 				color: rgba(19, 23, 34, 1);
+				font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS',
+					Roboto, Ubuntu, sans-serif;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+			}
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				padding: 8px 12px;
+				font-size: 13px;
+				align-items: center;
 			}
 			#chart {
-				width: 100%;
-				height: 100%;
+				flex: 1 1 auto;
+				min-height: 0;
 			}
 		</style>
 	</head>
 	<body>
+		<div id="controls">
+			<label>
+				Line style
+				<select id="line-style">
+					<option value="0" selected>Solid</option>
+					<option value="1">Dotted</option>
+					<option value="2">Dashed</option>
+					<option value="3">Large dashed</option>
+					<option value="4">Sparse dotted</option>
+				</select>
+			</label>
+			<label>
+				Line type
+				<select id="line-type">
+					<option value="simple" selected>Simple</option>
+					<option value="step">Step</option>
+				</select>
+			</label>
+			<label>
+				Areas
+				<select id="area">
+					<option value="flat" selected>Flat fills</option>
+					<option value="gradient">Gradient fills</option>
+					<option value="none">Hidden</option>
+				</select>
+			</label>
+			<label>
+				<input id="close-line" type="checkbox" checked /> Close line
+			</label>
+		</div>
 		<div id="chart"></div>
 		<script type="module" src="./example.ts"></script>
 	</body>

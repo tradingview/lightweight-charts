@@ -22,7 +22,8 @@ function runTestCase(container) {
 	}));
 	const series = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries());
 	// Points 25..34 carry a time only, so they are whitespace: no candle is
-	// drawn there and the up/down streak continues across the gap.
+	// drawn there, and the candles around the gap keep their own open/close
+	// colouring.
 	series.setData(generateCandleData().map((point, index) => {
 		if (index >= 25 && index < 35) {
 			return { time: point.time };

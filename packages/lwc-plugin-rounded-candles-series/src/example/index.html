@@ -13,14 +13,55 @@
 				overflow: hidden;
 				background-color: rgba(248, 249, 253, 1);
 				color: rgba(19, 23, 34, 1);
+				font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS',
+					Roboto, Ubuntu, sans-serif;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+			}
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				padding: 8px 12px;
+				font-size: 13px;
+				align-items: center;
 			}
 			#chart {
-				width: 100%;
-				height: 100%;
+				flex: 1 1 auto;
+				min-height: 0;
 			}
 		</style>
 	</head>
 	<body>
+		<div id="controls">
+			<label>
+				Radius
+				<select id="radius">
+					<option value="auto">Auto (bar spacing)</option>
+					<option value="0">0 — square</option>
+					<option value="4">4</option>
+					<option value="10">10</option>
+				</select>
+			</label>
+			<label>
+				Wicks
+				<select id="wick">
+					<option value="butt">Square ends</option>
+					<option value="round">Round ends</option>
+					<option value="hidden">Hidden</option>
+				</select>
+			</label>
+			<label>
+				Borders
+				<select id="border">
+					<option value="matching">Matching the body</option>
+					<option value="contrast">Contrasting</option>
+					<option value="none">None</option>
+				</select>
+			</label>
+		</div>
 		<div id="chart"></div>
 		<script type="module" src="./example.ts"></script>
 	</body>

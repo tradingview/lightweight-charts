@@ -15,21 +15,23 @@ function generateCandleData() {
 	return res;
 }
 
-// The same OHLC data on the built-in candlestick series (pane 0) and on the
-// rounded candle series (pane 1). Both panes must show the same up/down
-// colouring, bar for bar: the plugin decides on `open <= close` like the
-// built-in series does.
+// Borders and wicks: a contrasting border colour on both directions, and wicks
+// with rounded ends.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
+		rightPriceScale: { scaleMargins: { top: 0.1, bottom: 0.1 } },
+		timeScale: { barSpacing: 18 },
 	}));
-	const data = generateCandleData();
-
-	const builtIn = chart.addSeries(LightweightCharts.CandlestickSeries);
-	builtIn.setData(data);
-
-	const rounded = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {}, 1);
-	rounded.setData(data);
-
-	chart.timeScale().fitContent();
+	const series = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {
+		upColor: 'rgba(38, 166, 154, 0.35)',
+		downColor: 'rgba(239, 83, 80, 0.35)',
+		borderVisible: true,
+		borderUpColor: '#00695C',
+		borderDownColor: '#B71C1C',
+		wickColor: '#212121',
+		wickLineCap: 'round',
+		radius: 6,
+	});
+	series.setData(generateCandleData());
 }

@@ -15,9 +15,9 @@ function generateCandleData() {
 	return res;
 }
 
-// Per-point `color` / `borderColor` / `wickColor` fields on the data. The
-// renderer only reads the series options, so these are currently ignored and
-// every bar keeps the option colours - this case documents that.
+// Per-point `color` / `borderColor` / `wickColor` fields on the data. Every
+// fifth bar is black in all three, exactly as the built-in candlestick series
+// resolves its per-item overrides.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },

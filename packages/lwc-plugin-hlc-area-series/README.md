@@ -101,8 +101,8 @@ series.setData([
 ]);
 ```
 
-Each data point is `{ time, high, low, close }`. Points without a `close` are
-treated as whitespace. The series' price line and last-value label follow the
+Each data point is `{ time, high, low, close }`. Points missing any of the three
+values are treated as whitespace, and leave a gap. The series' price line and last-value label follow the
 `close` value.
 
 Options can be changed at runtime with `series.applyOptions({ ... })`.
@@ -123,13 +123,42 @@ In addition to the standard
 | `highLineWidth` | `LineWidth` | `2` | Width of the high line, in CSS pixels (`1`–`4`). |
 | `lowLineWidth` | `LineWidth` | `2` | Width of the low line, in CSS pixels (`1`–`4`). |
 | `closeLineWidth` | `LineWidth` | `2` | Width of the close line, in CSS pixels (`1`–`4`). |
+| `highLineStyle` | `LineStyle` | `LineStyle.Solid` | Dash pattern of the high line. |
+| `lowLineStyle` | `LineStyle` | `LineStyle.Solid` | Dash pattern of the low line. |
+| `closeLineStyle` | `LineStyle` | `LineStyle.Solid` | Dash pattern of the close line. |
+| `highLineVisible` | `boolean` | `true` | Whether the high line is drawn. |
+| `lowLineVisible` | `boolean` | `true` | Whether the low line is drawn. |
+| `closeLineVisible` | `boolean` | `true` | Whether the close line is drawn. |
+| `areaVisible` | `boolean` | `true` | Whether the two fills between the lines are drawn. |
+| `lineType` | `'simple' \| 'step'` | `'simple'` | How the lines and the fills get from one point to the next. `'step'` matches the built-in `LineType.WithSteps`. |
+| `highAreaTopColor` | `string` | `''` | Upper stop of a vertical gradient filling the high–close band. |
+| `highAreaBottomColor` | `string` | `''` | Lower stop of the high–close band gradient. |
+| `lowAreaTopColor` | `string` | `''` | Upper stop of a vertical gradient filling the close–low band. |
+| `lowAreaBottomColor` | `string` | `''` | Lower stop of the close–low band gradient. |
+| `hoverPointRadius` | `number` | `4` | Radius, in CSS pixels, of the dots drawn on the high, low and close of the bar under the cursor while the series is hovered. `0` turns the highlight off. |
 
 `areaTopColor` and `areaBottomColor` are deprecated aliases of `highAreaColor`
 and `lowAreaColor`. They still work, and take precedence when both are set.
+
+A band is filled with a gradient only when both stops of its pair are set; while
+either is an empty string the flat `highAreaColor` / `lowAreaColor` is used. The
+gradient runs down the whole pane, like the built-in Area series' `topColor` and
+`bottomColor` without `relativeGradient`.
 
 ## Notes
 
 - The price scale autoscales to the full `low`–`high` range, so the band is
   never clipped.
-- To hide a line or a fill, use a transparent color. Line widths follow the
-  library's `LineWidth` type, so `0` is not one of them.
+- Points missing any of `high`, `low` and `close` are whitespace. The lines and
+  the fills break at a run of whitespace instead of bridging it, and a point
+  whose price falls off the scale is skipped rather than turned into a NaN
+  coordinate.
+- The lines and the fills continue past the first and the last visible point, so
+  they reach the edges of the pane while panning.
+- Line widths follow the library's `LineWidth` type, so `0` is not one of them.
+  Use `highLineVisible` / `lowLineVisible` / `closeLineVisible` to hide a line
+  and `areaVisible` to hide both fills.
+- On hosts that support them (Lightweight Charts™ 5.1 and later) the series
+  reports the bar under the cursor through `hitTest` and highlights its three
+  values, and conflated points are merged as the highest high, the lowest low
+  and the last close.
