@@ -1,6 +1,6 @@
 import { AutoscaleInfo, DeepPartial, HistogramData, Time, createChart } from 'lightweight-charts';
 import { generateLineData } from './sample-data';
-import { PrettyHistogramSeries } from '../pretty-histogram';
+import { PrettyHistogramSeries } from '../pretty-histogram-series';
 import { PrettyHistogramSeriesOptions } from '../options';
 import { PrettyHistogramData } from '../data';
 

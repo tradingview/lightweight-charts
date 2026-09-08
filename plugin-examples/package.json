@@ -19,7 +19,7 @@
         "@tradingview/lwc-plugin-dual-range-histogram-series": "workspace:*",
         "@tradingview/lwc-plugin-hlc-area-series": "workspace:*",
         "@tradingview/lwc-plugin-image-watermark": "workspace:*",
-        "@tradingview/lwc-plugin-pretty-histogram": "workspace:*",
+        "@tradingview/lwc-plugin-pretty-histogram-series": "workspace:*",
         "@tradingview/lwc-plugin-rounded-candles-series": "workspace:*",
         "@tradingview/lwc-plugin-stacked-area-series": "workspace:*",
         "@tradingview/lwc-plugin-stacked-bars-series": "workspace:*",

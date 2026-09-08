@@ -1,19 +1,19 @@
 {
-	"name": "@tradingview/lwc-plugin-pretty-histogram",
+	"name": "@tradingview/lwc-plugin-pretty-histogram-series",
 	"version": "1.0.0",
 	"description": "Histogram with rounded, evenly spaced columns for a more polished look than the built-in histogram.",
 	"author": "TradingView",
 	"license": "Apache-2.0",
 	"type": "module",
-	"types": "./dist/pretty-histogram.d.ts",
+	"types": "./dist/pretty-histogram-series.d.ts",
 	"exports": {
 		".": {
-			"types": "./dist/pretty-histogram.d.ts",
-			"default": "./dist/pretty-histogram.js"
+			"types": "./dist/pretty-histogram-series.d.ts",
+			"default": "./dist/pretty-histogram-series.js"
 		},
 		"./standalone": {
-			"types": "./dist/pretty-histogram.d.ts",
-			"default": "./dist/pretty-histogram.standalone.js"
+			"types": "./dist/pretty-histogram-series.d.ts",
+			"default": "./dist/pretty-histogram-series.standalone.js"
 		}
 	},
 	"files": [
@@ -29,7 +29,7 @@
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/tradingview/lightweight-charts.git",
-		"directory": "packages/lwc-plugin-pretty-histogram"
+		"directory": "packages/lwc-plugin-pretty-histogram-series"
 	},
 	"publishConfig": {
 		"access": "public"

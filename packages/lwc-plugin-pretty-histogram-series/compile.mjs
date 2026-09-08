@@ -7,13 +7,13 @@ import { generateDtsBundle } from 'dts-bundle-generator';
 const __filename = fileURLToPath(import.meta.url);
 const currentDir = dirname(__filename);
 
-const pluginFileName = 'pretty-histogram';
+const pluginFileName = 'pretty-histogram-series';
 const pluginFile = resolve(currentDir, 'src', `${pluginFileName}.ts`);
 
 const pluginsToBuild = [
 	{
 		filepath: pluginFile,
-		exportName: 'pretty-histogram',
+		exportName: 'pretty-histogram-series',
 	},
 ];
 
