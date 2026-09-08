@@ -30,13 +30,13 @@ Then import the plugin and add it to a chart:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { VertLine } from '@tradingview/lwc-plugin-vertical-line';
+import { VerticalLine } from '@tradingview/lwc-plugin-vertical-line';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
 series.setData(data);
 
-series.attachPrimitive(new VertLine(chart, series, '2024-04-25'));
+series.attachPrimitive(new VerticalLine('2024-04-25'));
 ```
 
 ### CDN
@@ -60,13 +60,13 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart, LineSeries } from 'lightweight-charts';
-import { VertLine } from '@tradingview/lwc-plugin-vertical-line';
+import { VerticalLine } from '@tradingview/lwc-plugin-vertical-line';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
 series.setData(data);
 
-series.attachPrimitive(new VertLine(chart, series, '2024-04-25'));
+series.attachPrimitive(new VerticalLine('2024-04-25'));
 </script>
 ```
 
@@ -76,13 +76,13 @@ Create a line for a time that exists in your series data, then attach it to that
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { VertLine } from '@tradingview/lwc-plugin-vertical-line';
+import { VerticalLine } from '@tradingview/lwc-plugin-vertical-line';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
 series.setData(data);
 
-const earningsLine = new VertLine(chart, series, '2024-04-25', {
+const earningsLine = new VerticalLine('2024-04-25', {
     color: '#2962FF',
     width: 2,
     showLabel: true,
@@ -105,7 +105,7 @@ or a UTC timestamp) — use the same format as your series data.
 
 ## Options
 
-All options are optional. Pass them as the fourth constructor argument.
+All options are optional. Pass them as the second constructor argument.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -115,6 +115,8 @@ All options are optional. Pass them as the fourth constructor argument.
 | `labelText` | `string` | `''` | Text of the time-axis label. |
 | `labelBackgroundColor` | `string` | `'green'` | Background color of the label. |
 | `labelTextColor` | `string` | `'white'` | Text color of the label. |
+
+The defaults are exported as `defaultOptions`.
 
 Options are fixed when the line is created. To change a line, detach it and
 attach a new one with the updated options.
@@ -128,3 +130,8 @@ attach a new one with the updated options.
   time across several panes, attach a line to a series in each pane.
 - The label is rendered by the chart's time axis, so it inherits the axis font
   and is hidden together with the axis if `timeScale.visible` is `false`.
+- `VertLine` and `VertLineOptions` are still exported, as deprecated aliases of
+  `VerticalLine` and `VerticalLineOptions`, and the old
+  `new VertLine(chart, series, time, options)` form of the constructor still
+  works: the chart and the series arguments are ignored. Both are kept for
+  compatibility and will be removed in a future major version.

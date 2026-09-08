@@ -21,12 +21,12 @@ function runTestCase(container) {
 	}, 1);
 	secondPaneSeries.setData(data.map(point => ({ time: point.time, value: 100 - point.value })));
 
-	mainSeries.attachPrimitive(new LwcPlugin.VertLine(chart, mainSeries, data[25].time, {
+	mainSeries.attachPrimitive(new LwcPlugin.VerticalLine(data[25].time, {
 		showLabel: true,
 		labelText: 'Pane 0',
 		color: 'green',
 	}));
-	secondPaneSeries.attachPrimitive(new LwcPlugin.VertLine(chart, secondPaneSeries, data[75].time, {
+	secondPaneSeries.attachPrimitive(new LwcPlugin.VerticalLine(data[75].time, {
 		showLabel: true,
 		labelText: 'Pane 1',
 		color: 'blue',

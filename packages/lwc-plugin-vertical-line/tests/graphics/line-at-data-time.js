@@ -16,11 +16,11 @@ function runTestCase(container) {
 	const data = generateData();
 	series.setData(data);
 
-	series.attachPrimitive(new LwcPlugin.VertLine(chart, series, data[30].time, {
+	series.attachPrimitive(new LwcPlugin.VerticalLine(data[30].time, {
 		showLabel: true,
 		labelText: 'Event',
 	}));
-	series.attachPrimitive(new LwcPlugin.VertLine(chart, series, data[80].time, {
+	series.attachPrimitive(new LwcPlugin.VerticalLine(data[80].time, {
 		color: 'red',
 		width: 1,
 	}));
