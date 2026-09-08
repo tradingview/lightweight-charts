@@ -48,8 +48,14 @@ function buildPackageJson(template: string, answers: Answers): string {
 		pkg.lwcPlugin.origin = 'official';
 		// In the monorepo both come from the workspace rather than the registry.
 		// The published peerDependency range is untouched — that is the contract.
+		// The repository pins its own devDependencies exactly.
+		const pinned = Object.fromEntries(
+			Object.entries(pkg.devDependencies as Record<string, string>).map(
+				([dep, range]) => [dep, range.replace(/^[~^]/, '')]
+			)
+		);
 		pkg.devDependencies = sortedByKey({
-			...pkg.devDependencies,
+			...pinned,
 			'@tradingview/lwc-toolkit': 'workspace:*',
 			'lightweight-charts': 'workspace:*',
 		});
