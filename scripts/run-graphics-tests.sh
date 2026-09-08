@@ -40,6 +40,10 @@ main() {
 	rm -rf ./merge-base-dist
 	mv ./dist ./merge-base-dist
 
+	if [ "$GRAPHICS_TEST_SUITE" = "plugins" ]; then
+		build_plugins_golden
+	fi
+
 	if [ "$BRANCH_SPECIFIC_TEST" = "true" ]; then
 		echo "Using BRANCH_SPECIFIC_TEST"
 		echo "Running generate-golden-content"
@@ -53,9 +57,15 @@ main() {
 	pnpm install --frozen-lockfile
 	pnpm $BUILD_SCRIPT
 
-	echo "Graphics tests"
 	set +e
-	pnpm exec esno ./tests/e2e/graphics/runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
+	if [ "$GRAPHICS_TEST_SUITE" = "plugins" ]; then
+		echo "Plugin graphics tests"
+		build_plugins
+		pnpm exec esno ./tests/e2e/graphics/plugins-runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.mjs ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.mjs --golden-plugins-dir ./merge-base-plugins-dist --test-plugins-dir ./packages
+	else
+		echo "Graphics tests"
+		pnpm exec esno ./tests/e2e/graphics/runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
+	fi
 	EXIT_CODE=$?
 	set -e
 
@@ -65,6 +75,29 @@ main() {
 		mv ./screenshots.tar.gz $CMP_OUT_DIR/screenshots.tar.gz
 		exit $EXIT_CODE
 	fi
+}
+
+# Builds the toolkit and every plugin package of the checked-out revision.
+build_plugins() {
+	pnpm --filter @tradingview/lwc-toolkit --filter "@tradingview/lwc-plugin-*" build
+}
+
+# Golden plugin builds: the merge-base revision's packages, kept next to the
+# merge-base library build. A package that does not exist there (a new one)
+# simply has no golden build, and its cases are reported as skipped.
+build_plugins_golden() {
+	rm -rf ./merge-base-plugins-dist ./packages/lwc-plugin-*/dist
+	mkdir -p ./merge-base-plugins-dist
+	set +e
+	build_plugins
+	set -e
+	for pkg in ./packages/lwc-plugin-*/; do
+		if [ -d "$pkg/dist" ]; then
+			cp -R "$pkg/dist" "./merge-base-plugins-dist/$(basename "$pkg")"
+		fi
+	done
+	# Stale outputs must not survive into the HEAD build.
+	rm -rf ./packages/lwc-plugin-*/dist ./packages/lwc-plugin-*/typings
 }
 
 main "$@"
