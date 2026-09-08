@@ -1,4 +1,4 @@
-import { WhitespaceData, createChart } from 'lightweight-charts';
+import { CustomSeriesWhitespaceData, Time, createChart } from 'lightweight-charts';
 import {
 	HLCAreaSeries,
 	HLCAreaData,
@@ -14,5 +14,5 @@ const myCustomSeries = chart.addCustomSeries(customSeriesView, {
 	/* Options */
 });
 
-const data: (HLCAreaData | WhitespaceData)[] = generateAlternativeCandleData(100);
+const data: (HLCAreaData | CustomSeriesWhitespaceData<Time>)[] = generateAlternativeCandleData(100);
 myCustomSeries.setData(data);
