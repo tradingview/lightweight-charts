@@ -27,6 +27,16 @@ aliases:
         - indicator-examples/node_modules
         - packages/create-lwc-plugin/node_modules
         - packages/lwc-toolkit/node_modules
+        - packages/lwc-plugin-accessibility/node_modules
+        - packages/lwc-plugin-brushable-area-series/node_modules
+        - packages/lwc-plugin-dual-range-histogram-series/node_modules
+        - packages/lwc-plugin-hlc-area-series/node_modules
+        - packages/lwc-plugin-image-watermark/node_modules
+        - packages/lwc-plugin-pretty-histogram/node_modules
+        - packages/lwc-plugin-rounded-candles-series/node_modules
+        - packages/lwc-plugin-stacked-area-series/node_modules
+        - packages/lwc-plugin-stacked-bars-series/node_modules
+        - packages/lwc-plugin-vertical-line/node_modules
         # puppeteer browser cache (see .puppeteerrc.cjs)
         - .cache
         # corepack-downloaded pnpm, so restore-only jobs don't re-download it
@@ -366,9 +376,10 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      # builds @tradingview/lwc-toolkit first (via the build:utils pre-step),
-      # typechecks all plugin sources against it and compiles every plugin,
-      # including the bundled typings that must inline the toolkit
+      # builds @tradingview/lwc-toolkit and the graduated plugin packages first
+      # (via the build:deps pre-step), typechecks all plugin sources against
+      # them and compiles every plugin, including the bundled typings that must
+      # inline the toolkit
       - run:
           command: pnpm --filter lightweight-charts-plugin-examples compile
           no_output_timeout: 5m
