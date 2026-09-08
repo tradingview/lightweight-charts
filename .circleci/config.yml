@@ -276,6 +276,10 @@ jobs:
       TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
       - checkout-with-deps
+      # The package tests import the library at run time through the
+      # workspace link, which resolves to the built dist/.
+      - attach_workspace:
+          at: ./
       - run: pnpm test
       - store_test_results:
           path: test-results/
