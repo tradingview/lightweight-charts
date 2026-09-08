@@ -21,7 +21,7 @@ function runTestCase(container) {
 	// (its visibility does not depend on the line having a valid position),
 	// so it is drawn at coordinate 0 instead of being hidden.
 	const betweenBarsTime = (data[40].time + data[41].time) / 2;
-	series.attachPrimitive(new LwcPlugin.VertLine(chart, series, betweenBarsTime, {
+	series.attachPrimitive(new LwcPlugin.VerticalLine(betweenBarsTime, {
 		showLabel: true,
 		labelText: 'Between bars',
 		color: 'orange',
@@ -29,7 +29,7 @@ function runTestCase(container) {
 
 	// A time well outside the data range: same stray-label behaviour.
 	const outsideRangeTime = data[data.length - 1].time + 86400 * 30;
-	series.attachPrimitive(new LwcPlugin.VertLine(chart, series, outsideRangeTime, {
+	series.attachPrimitive(new LwcPlugin.VerticalLine(outsideRangeTime, {
 		showLabel: true,
 		labelText: 'Outside range',
 		color: 'purple',

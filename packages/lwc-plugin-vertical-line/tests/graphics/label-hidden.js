@@ -16,6 +16,8 @@ function runTestCase(container) {
 	const data = generateData();
 	series.setData(data);
 
+	// Deliberately the deprecated `VertLine` alias and its four-argument
+	// constructor: this case pins that the old form keeps working.
 	series.attachPrimitive(new LwcPlugin.VertLine(chart, series, data[30].time, {
 		showLabel: false,
 		color: '#8B00FF',
