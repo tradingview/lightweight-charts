@@ -70,3 +70,6 @@ export class RoundedCandleSeries<TData extends RoundedCandleSeriesData>
 		return defaultOptions;
 	}
 }
+
+export type { RoundedCandleSeriesData } from './data';
+export { defaultOptions };
