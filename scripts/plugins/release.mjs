@@ -66,7 +66,7 @@ function ensureWorkspaceBuilt() {
  */
 function validateMetadataOrThrow(plugin) {
 	console.log(`  - Validating package metadata and schema...`);
-	const metaResult = validatePackageMetadata(plugin.dir, { isOfficial: true });
+	const metaResult = validatePackageMetadata(plugin.dir, { isOfficial: true, repoRoot });
 	if (!metaResult.valid) {
 		throw new Error(`Metadata validation errors: ${metaResult.errors.join('; ')}`);
 	}

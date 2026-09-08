@@ -34,7 +34,7 @@ export function verifyChangelog(
 
 export function validatePackageMetadata(
 	packageDir: string,
-	options?: { isOfficial?: boolean }
+	options?: { isOfficial?: boolean; repoRoot?: string }
 ): { valid: boolean; errors: string[] };
 
 export function validateReadmeContent(content: string): { valid: boolean; errors: string[] };

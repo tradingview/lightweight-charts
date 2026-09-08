@@ -41,7 +41,7 @@ Options:
 
 	for (const pkg of targetPackages) {
 		console.log(`Checking ${pkg.name}...`);
-		const result = validatePackageMetadata(pkg.dir, { isOfficial: true });
+		const result = validatePackageMetadata(pkg.dir, { isOfficial: true, repoRoot });
 
 		if (result.valid) {
 			console.log(`  ✅ Contract and metadata schema valid\n`);

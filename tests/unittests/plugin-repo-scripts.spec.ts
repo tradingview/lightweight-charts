@@ -503,6 +503,7 @@ const p = new Plugin();
 			expect(allErrors).to.include('publishConfig.access');
 			expect(allErrors).to.include('peerDependencies.lightweight-charts');
 			expect(allErrors).to.include('lightweight-charts-plugin');
+			expect(allErrors).to.include('lwcPlugin schema error: /category');
 		});
 
 		it('should require a description, a valid version and no scaffold placeholders', () => {
@@ -541,6 +542,41 @@ const p = new Plugin();
 					.to.include("Missing or empty 'description' field in package.json");
 			} finally {
 				fs.rmSync(tempDir, { recursive: true, force: true });
+			}
+		});
+
+		it('should require repository.directory, when present, to name the package directory inside the repo', () => {
+			const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-repodir-test-'));
+			const tempDir = path.join(tempRoot, 'packages', 'lwc-plugin-test');
+			try {
+				fs.mkdirSync(path.join(tempDir, 'src', 'example'), { recursive: true });
+				const pkg = {
+					name: '@tradingview/lwc-plugin-test',
+					version: '1.0.0',
+					description: 'Test',
+					license: 'Apache-2.0',
+					repository: { type: 'git', url: 'git+https://example.test/repo.git', directory: 'packages/lwc-plugin-other' },
+					publishConfig: { access: 'public' },
+					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					keywords: ['lightweight-charts-plugin'],
+					lwcPlugin: { title: 'Test', category: 'series-primitive', lifecycle: 'current', origin: 'official', demo: 'src/example/index.html' },
+				};
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
+				fs.writeFileSync(path.join(tempDir, 'README.md'), minimalValidReadme);
+				fs.writeFileSync(path.join(tempDir, 'src', 'example', 'index.html'), '<html></html>');
+
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: tempRoot }).errors)
+					.to.include("'repository.directory' must be 'packages/lwc-plugin-test' (got 'packages/lwc-plugin-other')");
+
+				// A --path target outside the repository has no location to check against.
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: path.join(tempRoot, 'elsewhere') }).errors)
+					.to.not.include.members([`'repository.directory' must be 'packages/lwc-plugin-test' (got 'packages/lwc-plugin-other')`]);
+
+				pkg.repository.directory = 'packages/lwc-plugin-test';
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: tempRoot }).valid).to.be.true;
+			} finally {
+				fs.rmSync(tempRoot, { recursive: true, force: true });
 			}
 		});
 

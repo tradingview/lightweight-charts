@@ -7,6 +7,7 @@ import Ajv from 'ajv';
 
 const AjvCtor = Ajv.default ?? Ajv;
 const SCHEMA_PATH = fileURLToPath(new URL('./lwc-plugin-metadata.schema.json', import.meta.url));
+const DEFAULT_REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
 /**
  * The placeholders the create-lwc-plugin wizard substitutes, see
@@ -83,8 +84,9 @@ export function findWorkspacePlugins(repoRoot, filter) {
 		try {
 			pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
 		} catch (e) {
-			console.warn(`Warning: failed to parse package.json at ${pkgJsonPath}: ${e.message}`);
-			continue;
+			// A manifest that does not parse must never be skipped quietly: every
+			// consumer of this list would then act on an incomplete workspace.
+			throw new Error(`Invalid JSON in ${pkgJsonPath}: ${e.message}`);
 		}
 
 		// Private packages are never published, so the scripts skip them.
@@ -370,7 +372,8 @@ function validateLwcPluginBlock(lwcPlugin, isOfficial) {
 
 	if (!isValid) {
 		for (const err of validate.errors || []) {
-			errors.push(`lwcPlugin schema error: ${err.instancePath || '/'} ${err.message}`);
+			// Ajv 7 (pinned here) reports the failing property as `dataPath`; Ajv 8 renamed it `instancePath`.
+			errors.push(`lwcPlugin schema error: ${err.instancePath || err.dataPath || '/'} ${err.message}`);
 		}
 	}
 
@@ -384,13 +387,34 @@ function validateLwcPluginBlock(lwcPlugin, isOfficial) {
 }
 
 /**
+ * A repository.directory that names another folder sends the registry's
+ * "source" link, and anything built from it, to the wrong place. Only a package
+ * inside this repository has a location to check against; a `--path` target
+ * elsewhere is left alone.
+ */
+function validateRepositoryDirectory(pkg, packageDir, repoRoot) {
+	const declared = pkg.repository?.directory;
+	if (declared === undefined) {
+		return [];
+	}
+	const relativeDir = path.relative(repoRoot, path.resolve(packageDir)).split(path.sep).join('/');
+	const insideRepo = relativeDir !== '' && !relativeDir.startsWith('..') && !path.isAbsolute(relativeDir);
+	if (insideRepo && declared !== relativeDir) {
+		return [`'repository.directory' must be '${relativeDir}' (got '${declared}')`];
+	}
+	return [];
+}
+
+/**
  * Validates package.json contract and lwcPlugin metadata against JSON schema.
  *
  * @param {string} packageDir - Absolute path to package directory.
- * @param {{ isOfficial?: boolean }} [options]
+ * @param {{ isOfficial?: boolean, repoRoot?: string }} [options] - `repoRoot` locates the
+ * package inside the repository for the `repository.directory` check; a package outside it
+ * (a `--path` target elsewhere) has no known location and skips that check.
  * @returns {{ valid: boolean, errors: string[] }}
  */
-export function validatePackageMetadata(packageDir, { isOfficial = true } = {}) {
+export function validatePackageMetadata(packageDir, { isOfficial = true, repoRoot = DEFAULT_REPO_ROOT } = {}) {
 	const pkgJsonPath = path.join(packageDir, 'package.json');
 	if (!fs.existsSync(pkgJsonPath)) {
 		return { valid: false, errors: [`package.json not found in ${packageDir}`] };
@@ -435,6 +459,8 @@ export function validatePackageMetadata(packageDir, { isOfficial = true } = {}) 
 			errors.push(...placeholderErrors(file, fs.readFileSync(filePath, 'utf-8')));
 		}
 	}
+
+	errors.push(...validateRepositoryDirectory(pkg, packageDir, repoRoot));
 
 	// Demo file existence: strictly checks the declared demo path in lwcPlugin.demo
 	if (pkg.lwcPlugin && typeof pkg.lwcPlugin.demo === 'string') {
