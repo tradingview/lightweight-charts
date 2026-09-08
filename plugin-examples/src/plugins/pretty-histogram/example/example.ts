@@ -1,8 +1,6 @@
 import { AutoscaleInfo, DeepPartial, HistogramData, SeriesDataItemTypeMap, SingleValueData, Time, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
-import { PrettyHistogramSeries } from '../pretty-histogram-series';
-import { PrettyHistogramSeriesOptions } from '../options';
-import { PrettyHistogramData } from '../data';
+import { PrettyHistogramSeries, PrettyHistogramSeriesOptions, PrettyHistogramData } from '@tradingview/lwc-plugin-pretty-histogram';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,

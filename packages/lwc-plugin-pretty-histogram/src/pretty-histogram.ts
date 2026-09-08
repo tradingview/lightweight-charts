@@ -43,3 +43,7 @@ export class PrettyHistogramSeries<
 		return defaultOptions;
 	}
 }
+
+export type { PrettyHistogramData } from './data';
+export type { PrettyHistogramSeriesOptions } from './options';
+export { defaultOptions } from './options';
