@@ -38,7 +38,9 @@
 		"dev": "vite --config src/vite.config.js",
 		"build": "tsc && node compile.mjs",
 		"typecheck": "tsc --noEmit",
-		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm"
+		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+		"prepack": "node -e \"require('fs').copyFileSync('../../LICENSE', 'LICENSE')\"",
+		"postpack": "node -e \"require('fs').unlinkSync('LICENSE')\""
 	},
 	"peerDependencies": {
 		"lightweight-charts": "^5.0.0"
