@@ -6,10 +6,9 @@ import {
 	ICustomSeriesPaneRenderer,
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
-	Time,
 } from 'lightweight-charts';
 import { DualRangeHistogramData } from './data';
-import { DualRangeHistogramSeriesOptions } from './options';
+import { DualRangeHistogramSeriesOptions, columnOrder } from './options';
 import { ColumnPosition, calculateColumnPositionsInPlace } from '@tradingview/lwc-toolkit/dimensions/columns';
 import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
 import {
@@ -25,13 +24,14 @@ interface DualRangeHistogramBarItem {
 }
 
 export class DualRangeHistogramSeriesRenderer<
-	TData extends DualRangeHistogramData
+	HorzScaleItem,
+	TData extends DualRangeHistogramData<HorzScaleItem>
 > implements ICustomSeriesPaneRenderer
 {
-	_data: PaneRendererCustomData<Time, TData> | null = null;
-	_options: DualRangeHistogramSeriesOptions | null = null;
+	private _data: PaneRendererCustomData<HorzScaleItem, TData> | null = null;
+	private _options: DualRangeHistogramSeriesOptions | null = null;
 
-	draw(
+	public draw(
 		target: CanvasRenderingTarget2D,
 		priceConverter: PriceToCoordinateConverter
 	): void {
@@ -40,15 +40,15 @@ export class DualRangeHistogramSeriesRenderer<
 		);
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: DualRangeHistogramSeriesOptions
 	): void {
 		this._data = data;
 		this._options = options;
 	}
 
-	_drawImpl(
+	private _drawImpl(
 		renderingScope: BitmapCoordinatesRenderingScope,
 		priceToCoordinate: PriceToCoordinateConverter
 	): void {
@@ -117,14 +117,15 @@ export class DualRangeHistogramSeriesRenderer<
 				this._data.barSpacing * renderingScope.horizontalPixelRatio
 			);
 			group.ys.forEach((y, index) => {
-				const color = options.colors[index % options.colors.length];
+				const columnKey = columnOrder[index % columnOrder.length];
+				const color = options.colors[columnKey];
 				const columnPosition = positionsBox(
 					zeroY,
 					zeroY - y,
 					renderingScope.verticalPixelRatio
 				);
 				const radius =
-					options.borderRadius[index % options.borderRadius.length] *
+					options.borderRadius[columnKey] *
 					renderingScope.verticalPixelRatio;
 				const positive = group.positive[index];
 				const actualRadius = Math.floor(

@@ -28,10 +28,10 @@ function reserveRoom(chart, series) {
 	series.priceScale().applyOptions({ scaleMargins: { top: margin, bottom: margin } });
 }
 
-// The colours are indexed by position in `values`, not by sign. The first
-// half of the data is the default case; in the second half every sign is
-// flipped, so there the teal pair (index 0/1) points down and the red pair
-// (index 2/3) points up.
+// The colours are matched to the columns by position in `values`, not by sign.
+// The first half of the data is the default case; in the second half every
+// sign is flipped, so there the `upOuter`/`upInner` pair (teal) points down
+// and the `downOuter`/`downInner` pair (red) points up.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },

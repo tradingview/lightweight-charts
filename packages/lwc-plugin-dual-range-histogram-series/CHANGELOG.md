@@ -14,4 +14,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repository.
 - The `DualRangeHistogramSeries` custom series draws nested up and down
   columns of a fixed pixel height on the zero line.
-- Styling options: per-index `colors`, `borderRadius`, and `maxHeight`.
+- Styling options: `colors` and `borderRadius`, each keyed by column
+  (`upOuter`, `upInner`, `downOuter`, `downInner`), and `maxHeight`.
