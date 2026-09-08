@@ -45,9 +45,6 @@
 	"peerDependencies": {
 		"lightweight-charts": "^5.0.0"
 	},
-	"dependencies": {
-		"fancy-canvas": "~2.1.0"
-	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.5",
 		"@tradingview/lwc-toolkit": "workspace:*",
