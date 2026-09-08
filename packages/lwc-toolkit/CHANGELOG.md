@@ -25,4 +25,28 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `min-max-in-range` — `UpperLowerInRange`
   - `plugin-base` — `PluginBase`
   - `simple-clone` — `cloneReadonly`
-  - `time` — `convertTime`, `displayTime`, `formattedDateAndTime`
+  - `time` — `convertTime`, `convertTimeUTC`, `displayTime`,
+    `formattedDateAndTime`
+- Custom series infrastructure, extracted from what every custom series
+  plugin repeated:
+  - `custom-series/renderer-base` — `CustomSeriesRendererBase`,
+    `CustomSeriesDrawArgs`
+  - `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`,
+    `extendRange`, `visibleSegments`
+  - `custom-series/stacking` — `cumulativeSum`, `stackedPlotValues`
+  - `custom-series/line-paths` — `buildLinePath`, `areaBetween`,
+    `strokeStyledPolyline`
+  - `canvas/round-rect` — `drawRoundRect`, `drawRoundRectWithBorder`,
+    `clampCornerRadius`, `CornerRadii`
+  - `line-style` — `setLineStyle`, `getDashPattern`, `LineStyle`
+- Primitive infrastructure:
+  - `pane-plugin-base` — `PanePluginBase`
+  - `axis-label-view` — `AxisLabelView`, `AxisLabelSource`,
+    `OFFSCREEN_LABEL_COORDINATE`
+  - `dom/pane-element` — `paneContentElement`, `chartTableElement`
+  - `dom/media-query` — `subscribeMediaQuery`, `mediaQueryMatches`,
+    `HIGH_CONTRAST_QUERIES`, `REDUCED_MOTION_QUERY`
+- `dimensions/columns`: `ColumnPositionItem` accepts an optional `time`
+  (logical index); columns on either side of a whitespace gap are no longer
+  aligned to each other, and `endIndex` is exclusive in every pass.
+- `min-max-in-range` results are now actually cached.
