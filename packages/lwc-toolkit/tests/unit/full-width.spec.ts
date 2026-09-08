@@ -5,7 +5,8 @@ import { fullBarWidth } from '../../src/dimensions/full-width.js';
 
 void describe('fullBarWidth', () => {
 	void it('spans the whole bar slot at DPR 1', () => {
-		// unlike positionsBox, the length here is exclusive: right - left
+		// unlike positionsBox, the length here is exclusive (right - left), which
+		// is what lets neighbouring bars abut without overlapping
 		expect(fullBarWidth(10, 3, 1)).to.deep.equal({ position: 7, length: 6 });
 	});
 

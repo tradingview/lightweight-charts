@@ -22,6 +22,26 @@ export function convertTime(t: Time): number {
 	return new Date(year, month - 1, day).valueOf();
 }
 
+/**
+ * Converts any of the library's time representations to milliseconds since the
+ * epoch, building business days and date strings as UTC midnight.
+ *
+ * Use this rather than {@link convertTime} whenever the result is compared with
+ * a `UTCTimestamp` from the chart, or formatted with the `getUTC*` date getters:
+ * unlike {@link convertTime} it is independent of the machine's time zone, so
+ * the same input always yields the same number.
+ *
+ * @param t - the time to convert.
+ * @returns milliseconds since the epoch.
+ */
+export function convertTimeUTC(t: Time): number {
+	if (isUTCTimestamp(t)) return t * 1000;
+	// `BusinessDay.month` is 1-based; `Date.UTC`'s month is 0-based.
+	if (isBusinessDay(t)) return Date.UTC(t.year, t.month - 1, t.day);
+	const [year, month, day] = t.split('-').map(part => parseInt(part, 10));
+	return Date.UTC(year, month - 1, day);
+}
+
 export function displayTime(time: Time): string {
 	if (typeof time == 'string') return time;
 	const date = isBusinessDay(time)

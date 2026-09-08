@@ -35,28 +35,28 @@ void describe('ClosestTimeIndexFinder', () => {
 		expect(finder().findClosestIndex(1000, 'right')).to.equal(3);
 	});
 
-	void it("direction 'left' returns the index to the RIGHT of the target", () => {
-		// Questionable naming, but current behaviour: for a target between two
-		// entries, 'left' yields the following (greater) index.
+	void it("direction 'left' returns the first entry at or after the target", () => {
+		// 'left' names the side the search comes from, not the side of the
+		// answer: it returns the right-hand bracket of the target.
 		expect(finder().findClosestIndex(5, 'left')).to.equal(1);
 		expect(finder().findClosestIndex(15, 'left')).to.equal(2);
 		expect(finder().findClosestIndex(25, 'left')).to.equal(3);
 	});
 
-	void it("direction 'right' returns the index to the LEFT of the target", () => {
+	void it("direction 'right' returns the last entry at or before the target", () => {
 		expect(finder().findClosestIndex(5, 'right')).to.equal(0);
 		expect(finder().findClosestIndex(15, 'right')).to.equal(1);
 		expect(finder().findClosestIndex(25, 'right')).to.equal(2);
 	});
 
-	void it('does not pick the nearest neighbour by distance, only by side', () => {
+	void it('picks by side, never by distance', () => {
 		// 9 is much closer to index 1 (time 10) than to index 0 (time 0)
 		expect(finder().findClosestIndex(9, 'right')).to.equal(0);
 		// 1 is much closer to index 0 (time 0) than to index 1 (time 10)
 		expect(finder().findClosestIndex(1, 'left')).to.equal(1);
 	});
 
-	void it('caches per target and direction, so later mutations of the array are ignored', () => {
+	void it('caches per target and direction, so the array must not be mutated afterwards', () => {
 		const points: Point[] = [{ time: 0 }, { time: 10 }, { time: 20 }];
 		const instance = new ClosestTimeIndexFinder<Point>(points);
 		expect(instance.findClosestIndex(15, 'right')).to.equal(1);
