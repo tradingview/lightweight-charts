@@ -41,3 +41,7 @@ export class HLCAreaSeries<TData extends HLCAreaData>
 		return defaultOptions;
 	}
 }
+
+export type { HLCAreaData } from './data';
+export type { HLCAreaSeriesOptions } from './options';
+export { defaultOptions } from './options';
