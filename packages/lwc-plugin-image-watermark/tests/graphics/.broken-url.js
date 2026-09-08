@@ -1,3 +1,6 @@
+// Parked (not discovered) until the draw-before-load fix lands: on Linux the
+// first paint can run before the image's onerror, and drawImage throws on an
+// HTMLImageElement in the 'broken' state.
 function generateData() {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));

@@ -2,7 +2,7 @@ function generateCandleData() {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
 	let close = 100;
-	for (let i = 0; i < 60; ++i) {
+	for (let i = 0; i < 20; ++i) {
 		// A deterministic gap between the previous close and this open, so that
 		// `close >= open` and `close >= previous close` disagree on some bars.
 		const open = close + Math.sin(i / 2.5) * 6;
@@ -19,11 +19,13 @@ function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 		rightPriceScale: { scaleMargins: { top: 0.1, bottom: 0.1 } },
+		// Wide bars, so the rounding is visible next to the default case.
+		timeScale: { barSpacing: 28 },
 	}));
 	const series = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {
 		// A fixed, deliberately large radius: bodies become pill shaped.
 		radius: function () {
-			return 6;
+			return 10;
 		},
 		upColor: '#7B1FA2',
 		downColor: '#FBC02D',
@@ -31,5 +33,4 @@ function runTestCase(container) {
 		wickDownColor: '#F57F17',
 	});
 	series.setData(generateCandleData());
-	chart.timeScale().fitContent();
 }
