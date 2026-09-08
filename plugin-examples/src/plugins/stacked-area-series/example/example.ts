@@ -1,4 +1,4 @@
-import { WhitespaceData, createChart } from 'lightweight-charts';
+import { CustomSeriesWhitespaceData, Time, createChart } from 'lightweight-charts';
 import { multipleBarData } from '../../../sample-data';
 import { StackedAreaData, StackedAreaSeries } from '@tradingview/lwc-plugin-stacked-area-series';
 
@@ -17,7 +17,7 @@ const myCustomSeries = chart.addCustomSeries(customSeriesView, {
 	/* Options */
 });
 
-const data: (StackedAreaData | WhitespaceData)[] = multipleBarData(5, 200, 2);
+const data: (StackedAreaData | CustomSeriesWhitespaceData<Time>)[] = multipleBarData(5, 200, 2);
 myCustomSeries.setData(data);
 
 chart.timeScale().fitContent();
