@@ -151,6 +151,7 @@
     "test": "esno --import ./tests/unittests/setup.units.mjs --test './tests/unittests/**/*.spec.ts'",
     "type-tests": "tsc -b ./src/tsconfig.composite.json && tsc -p ./tests/type-checks/tsconfig.composite.json --noEmit",
     "e2e:coverage": "esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js",
+    "e2e:graphics:plugins": "esno ./tests/e2e/graphics/plugins-runner.ts ./dist/lightweight-charts.standalone.development.mjs ./dist/lightweight-charts.standalone.development.mjs --golden-plugins-dir ./packages",
     "e2e:interactions": "esno ./tests/e2e/interactions/runner.ts ./dist/lightweight-charts.standalone.development.js",
     "e2e:memleaks": "esno ./tests/e2e/memleaks/runner.ts ./dist/lightweight-charts.standalone.development.js"
   },

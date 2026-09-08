@@ -92,12 +92,16 @@ commands:
       branchSpecificTest:
         type: boolean
         default: false
+      suite:
+        type: string
+        default: library
     steps:
       - checkout-with-deps
       - run:
           name: "Setup Environment Variables"
           command: |
             echo 'export NO_SANDBOX="true"' >> $BASH_ENV
+            echo 'export GRAPHICS_TEST_SUITE=<< parameters.suite >>' >> $BASH_ENV
             echo 'export CMP_OUT_DIR="./graphics-cmp-data"' >> $BASH_ENV
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
@@ -303,11 +307,15 @@ jobs:
       branchSpecificTest:
         type: boolean
         default: false
+      suite:
+        type: string
+        default: library
     executor: node-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: << parameters.dpr >>
           grep: << parameters.grep >>
+          suite: << parameters.suite >>
           productionBuild: << parameters.productionBuild >>
           branchSpecificTest: << parameters.branchSpecificTest >>
 
@@ -461,6 +469,14 @@ workflows:
           branchSpecificTest: true
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
+      # The plugin packages, rendered through their standalone builds against
+      # the merge-base builds of both the package and the library.
+      - graphics-tests:
+          name: branch_specific_graphics-tests-part4-plugins-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "lwc-plugin-"
+          suite: plugins
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
 
   build-lint-test:
     when:
@@ -523,6 +539,12 @@ workflows:
       - graphics-tests:
           name: graphics-tests-part3-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
           grep: "(series/|time-scale/|degenerative-horizontal-series-with-integer-min-tick/)"
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - graphics-tests:
+          name: graphics-tests-part4-plugins-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "lwc-plugin-"
+          suite: plugins
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
       - memleaks-tests:
