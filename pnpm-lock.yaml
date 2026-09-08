@@ -234,6 +234,258 @@ importers:
         specifier: 3.6.1
         version: 3.6.1(typescript@5.9.3)
 
+  packages/lwc-plugin-accessibility:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
+  packages/lwc-plugin-brushable-area-series:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
+  packages/lwc-plugin-dual-range-histogram-series:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
+  packages/lwc-plugin-hlc-area-series:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
+  packages/lwc-plugin-image-watermark:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
+  packages/lwc-plugin-pretty-histogram:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
+  packages/lwc-plugin-rounded-candles-series:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
+  packages/lwc-plugin-stacked-area-series:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
+  packages/lwc-plugin-stacked-bars-series:
+    dependencies:
+      fancy-canvas:
+        specifier: ~2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.2.2
+        version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
+
   packages/lwc-plugin-vertical-line:
     dependencies:
       fancy-canvas:
@@ -273,6 +525,33 @@ importers:
 
   plugin-examples:
     dependencies:
+      '@tradingview/lwc-plugin-accessibility':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-accessibility
+      '@tradingview/lwc-plugin-brushable-area-series':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-brushable-area-series
+      '@tradingview/lwc-plugin-dual-range-histogram-series':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-dual-range-histogram-series
+      '@tradingview/lwc-plugin-hlc-area-series':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-hlc-area-series
+      '@tradingview/lwc-plugin-image-watermark':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-image-watermark
+      '@tradingview/lwc-plugin-pretty-histogram':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-pretty-histogram
+      '@tradingview/lwc-plugin-rounded-candles-series':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-rounded-candles-series
+      '@tradingview/lwc-plugin-stacked-area-series':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-stacked-area-series
+      '@tradingview/lwc-plugin-stacked-bars-series':
+        specifier: workspace:*
+        version: link:../packages/lwc-plugin-stacked-bars-series
       '@tradingview/lwc-plugin-vertical-line':
         specifier: workspace:*
         version: link:../packages/lwc-plugin-vertical-line

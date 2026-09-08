@@ -14,6 +14,15 @@
         "vite": "7.2.0"
     },
     "dependencies": {
+        "@tradingview/lwc-plugin-accessibility": "workspace:*",
+        "@tradingview/lwc-plugin-brushable-area-series": "workspace:*",
+        "@tradingview/lwc-plugin-dual-range-histogram-series": "workspace:*",
+        "@tradingview/lwc-plugin-hlc-area-series": "workspace:*",
+        "@tradingview/lwc-plugin-image-watermark": "workspace:*",
+        "@tradingview/lwc-plugin-pretty-histogram": "workspace:*",
+        "@tradingview/lwc-plugin-rounded-candles-series": "workspace:*",
+        "@tradingview/lwc-plugin-stacked-area-series": "workspace:*",
+        "@tradingview/lwc-plugin-stacked-bars-series": "workspace:*",
         "@tradingview/lwc-plugin-vertical-line": "workspace:*",
         "@tradingview/lwc-toolkit": "workspace:*",
         "dts-bundle-generator": "9.5.1",
