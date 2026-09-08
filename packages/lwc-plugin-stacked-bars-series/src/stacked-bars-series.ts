@@ -47,3 +47,7 @@ export class StackedBarsSeries<TData extends StackedBarsData>
 		return defaultOptions;
 	}
 }
+
+export type { StackedBarsData } from './data';
+export type { StackedBarsSeriesOptions } from './options';
+export { defaultOptions } from './options';
