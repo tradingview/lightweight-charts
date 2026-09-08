@@ -1,0 +1,72 @@
+{
+	"name": "@tradingview/lwc-plugin-vertical-line",
+	"version": "1.0.0",
+	"description": "Full-height vertical line at a given time, with an optional label on the time axis, for marking events, trades, and session boundaries.",
+	"author": "TradingView",
+	"license": "Apache-2.0",
+	"type": "module",
+	"types": "./dist/vertical-line.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/vertical-line.d.ts",
+			"default": "./dist/vertical-line.js"
+		},
+		"./standalone": {
+			"types": "./dist/vertical-line.d.ts",
+			"default": "./dist/vertical-line.standalone.js"
+		}
+	},
+	"files": [
+		"dist",
+		"CHANGELOG.md",
+		"NOTICE"
+	],
+	"keywords": [
+		"lightweight-charts",
+		"lightweight-charts-plugin",
+		"lwc-plugin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"directory": "packages/lwc-plugin-vertical-line"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"dev": "vite --config src/vite.config.js",
+		"build": "tsc && node compile.mjs",
+		"typecheck": "tsc --noEmit",
+		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm"
+	},
+	"peerDependencies": {
+		"lightweight-charts": "^5.0.0"
+	},
+	"dependencies": {
+		"fancy-canvas": "~2.1.0"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "0.18.5",
+		"@tradingview/lwc-toolkit": "workspace:*",
+		"dts-bundle-generator": "9.5.1",
+		"lightweight-charts": "workspace:*",
+		"publint": "0.3.14",
+		"typescript": "5.9.3",
+		"vite": "8.2.2"
+	},
+	"lwcPlugin": {
+		"title": "Vertical line",
+		"category": "series-primitive",
+		"lifecycle": "current",
+		"origin": "official",
+		"author": "TradingView",
+		"demo": "src/example/index.html",
+		"tags": [
+			"vertical line",
+			"drawing",
+			"marker",
+			"annotation"
+		]
+	}
+}

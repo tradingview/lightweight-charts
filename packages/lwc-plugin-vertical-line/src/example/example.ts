@@ -1,6 +1,6 @@
 import { LineSeries, createChart } from 'lightweight-charts';
-import { generateLineData } from '../../../sample-data';
-import { VertLine } from '@tradingview/lwc-plugin-vertical-line';
+import { generateLineData } from './sample-data';
+import { VertLine } from '../vertical-line';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
