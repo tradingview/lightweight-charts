@@ -5,11 +5,11 @@ import {
 	Time,
 	createChart,
 } from 'lightweight-charts';
-import { generateLineData } from '../../../sample-data';
+import { generateLineData } from './sample-data';
 import {
 	PartialAccessibilityMessages,
 	addAccessibilityPlugin,
-} from '@tradingview/lwc-plugin-accessibility';
+} from '../accessibility';
 
 // Spanish translation of the announced strings. Only the wording lives here –
 // numbers and dates are localised by the chart's `localization.locale` below.
