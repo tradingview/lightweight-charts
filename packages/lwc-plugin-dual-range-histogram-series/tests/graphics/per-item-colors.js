@@ -20,6 +20,8 @@ function generateData() {
 	return { histogram, line };
 }
 
+// Every fifth point carries its own `colors`, overriding the series colors for
+// the columns it names. An `undefined` entry falls back to the series color.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -31,7 +33,11 @@ function runTestCase(container) {
 		priceLineVisible: false,
 		lastValueVisible: false,
 	});
-	histogram.setData(data.histogram);
+	histogram.setData(data.histogram.map((point, index) => (
+		index % 5 === 0
+			? { ...point, colors: ['#131722', '#787B86', undefined, '#2962FF'] }
+			: point
+	)));
 
 	const baseline = chart.addSeries(LightweightCharts.BaselineSeries, {
 		baseValue: { type: 'price', price: 0 },

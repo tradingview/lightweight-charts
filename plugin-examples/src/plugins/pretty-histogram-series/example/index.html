@@ -25,7 +25,8 @@
 		<div id="description">
 			<h1>Pretty Histogram Series</h1>
 			<p>
-				Histogram series with custom rendering. Round corners and customazible column widths.
+				Histogram series with custom rendering: rounded corners, customisable
+				column widths, and two-tone colouring by the sign of the value.
 			</p>
 			<div style="display: flex; flex-direction: row;">
 				<div style="display: flex; flex-direction: column;margin:10px">
@@ -41,16 +42,16 @@
 						Bar 3:
 						<input id="bar_3" type="text">
 					</div>
-					<div class="barEditor" type="text">
+					<div class="barEditor">
 						Bar 4:
 						<input id="bar_4" type="text">
 					</div>
-					<div class="barEditor" type="text">
+					<div class="barEditor">
 						Bar 5:
 						<input id="bar_5" type="text">
 					</div>
-					<div class="barEditor" type="text">
-						Bar 5:
+					<div class="barEditor">
+						Bar 6:
 						<input id="bar_6" type="text">
 					</div>
 				</div>
@@ -64,8 +65,16 @@
 						<input id="width" type="text">
 					</div>
 					<div class="barEditor">
-						<label for="autoscaleToZero">Autoscale to zero</label>
-						<input id="autoscaleToZero" type="checkbox" checked>
+						<label for="twoTone">Two-tone by sign</label>
+						<input id="twoTone" type="checkbox" checked>
+					</div>
+					<div class="barEditor">
+						<label for="upColor">Up color</label>
+						<input id="upColor" type="color" value="#089981">
+					</div>
+					<div class="barEditor">
+						<label for="downColor">Down color</label>
+						<input id="downColor" type="color" value="#F23645">
 					</div>
 				</div>
 			</div>

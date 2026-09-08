@@ -5,6 +5,20 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Lightweight Charts - DualRangeHistogram Series Plugin Example</title>
 		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			.control {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				margin: 10px;
+				white-space: nowrap;
+			}
+			.control input,
+			.control select {
+				margin-left: 15px;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="chart"></div>
@@ -25,6 +39,29 @@
 				backtesting, or any scenario where it is useful to visualise both the
 				magnitude and composition of upward and downward movements over time.
 			</p>
+			<div class="control">
+				<label for="scaleMode">Scale mode</label>
+				<select id="scaleMode">
+					<option value="pixels" selected>pixels</option>
+					<option value="price">price</option>
+				</select>
+			</div>
+			<div class="control">
+				<label for="normalize">Normalize</label>
+				<select id="normalize">
+					<option value="visible" selected>visible</option>
+					<option value="all">all</option>
+					<option value="fixed">fixed (400)</option>
+				</select>
+			</div>
+			<div class="control">
+				<label for="radius">Radius</label>
+				<input id="radius" type="text">
+			</div>
+			<div class="control">
+				<label for="gap">Gap</label>
+				<input id="gap" type="text">
+			</div>
 		</div>
 		<script type="module" src="./example.ts"></script>
 	</body>

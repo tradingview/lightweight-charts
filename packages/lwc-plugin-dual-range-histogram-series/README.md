@@ -4,11 +4,12 @@ A [custom series](https://tradingview.github.io/lightweight-charts/docs/plugins/
 point it can show up to two nested columns in each direction: an outer range
 in a lighter color and an inner range in a darker color.
 
-Unlike a regular histogram, the columns are not sized in price units. The
-series has a fixed height in pixels: the largest visible value gets the full
-height, and the other columns are scaled relative to it. This makes the
-series a compact overlay. It sits on the zero line of another series' price
-scale and does not disturb that scale.
+By default the columns are not sized in price units. The series has a fixed
+height in pixels: the largest value gets the full height, and the other columns
+are scaled relative to it. This makes the series a compact overlay. It sits on
+the zero line of another series' price scale and does not disturb that scale.
+Set `scaleMode: 'price'` to have the values read as prices and autoscale like
+any other series instead.
 
 Use it to show paired values around a center line. Typical examples: buy and
 sell volume with an inner share of "aggressive" orders, bid and ask depth, or
@@ -114,8 +115,10 @@ const baseline = chart.addSeries(BaselineSeries, {
 baseline.setData(mainData);
 ```
 
-Each data point is `{ time, values: number[] }`. Points with an empty or
-missing `values` array are treated as whitespace.
+Each data point is `{ time, values: number[], colors? }`. Points with an empty
+or missing `values` array are treated as whitespace. A `colors` entry overrides
+the series color for the column at the same position; an `undefined` entry
+keeps the series color.
 
 Colors and corner radii are set per column:
 
@@ -128,26 +131,45 @@ histogram.applyOptions({
         downInner: '#EF6C00',
     },
     borderRadius: { upOuter: 8, upInner: 4, downOuter: 8, downInner: 4 },
+    borderColor: '#131722',
+    borderWidth: 1,
 });
 ```
 
 ### Keeping the histogram in view
 
-The histogram is `maxHeight` pixels tall and centered on the zero line. It
-does not report its values to the price scale, so it never distorts the
-scaling of the main series. If the zero line is close to the top or bottom of the pane,
-the columns are clipped. Reserve room with the price scale's margins, and
-recompute them when the chart resizes:
+In the default `pixels` scale mode the histogram is `maxHeight` pixels tall and
+centered on `baseValue`. It does not report its values to the price scale, so
+it never distorts the scaling of the main series — but if the base line is
+close to the top or bottom of the pane, the columns are clipped. Reserve room
+with `keepPixelSeriesInView`, which sets the price scale's margins and keeps
+them correct while the chart is resized:
 
 ```js
-function fitHistogram() {
-    const { height } = chart.paneSize();
-    const margin = Math.min(0.3, histogram.options().maxHeight / 2 / height);
-    histogram.priceScale().applyOptions({ scaleMargins: { top: margin, bottom: margin } });
-}
-new ResizeObserver(fitHistogram).observe(chart.chartElement());
-fitHistogram();
+import { keepPixelSeriesInView } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+
+const stop = keepPixelSeriesInView(chart, histogram);
+// … later, before removing the chart:
+stop();
 ```
+
+Pass a height as the third argument to reserve room for something other than
+the series' own `maxHeight`.
+
+### Scale modes
+
+`scaleMode: 'price'` treats the values as prices measured from `baseValue`, so
+the columns are autoscaled by the price scale like any other series;
+`maxHeight` and `normalize` are then ignored and no margins need reserving.
+
+The plot values reported to the price scale are built when the data is set, so
+`scaleMode` and `baseValue` are read at that point: set them before, or
+together with, `setData`.
+
+In `pixels` mode, `normalize` chooses what the heights are scaled against:
+`'visible'` (the default) rescales the columns as you pan, `'all'` keeps their
+relative heights across the whole data set, and a number fixes the value which
+fills half of `maxHeight`.
 
 Options can be changed at runtime with `series.applyOptions({ ... })`.
 
@@ -159,14 +181,20 @@ In addition to the standard
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `colors` | `{ upOuter, upInner, downOuter, downInner }` of `string` | `{ upOuter: '#ACE5DC', upInner: '#42BDA8', downOuter: '#FCCACD', downInner: '#F77C80' }` | Fill color of each column. |
+| `colors` | `{ upOuter, upInner, downOuter, downInner }` of `string` | `{ upOuter: '#ACE5DC', upInner: '#42BDA8', downOuter: '#FCCACD', downInner: '#F77C80' }` | Fill color of each column. A per-point `colors` entry overrides it. |
 | `borderRadius` | `{ upOuter, upInner, downOuter, downInner }` of `number` | `{ upOuter: 2, upInner: 0, downOuter: 2, downInner: 0 }` | Corner radius of each column, in CSS pixels, applied to the column's outer end. |
-| `maxHeight` | `number` | `130` | Total height of the histogram in CSS pixels; the largest visible value reaches half of it above or below the zero line. |
+| `borderColor` | `string \| null` | `null` | Border color of the columns. `null` for no border. |
+| `borderWidth` | `number` | `1` | Border width in CSS pixels. Only drawn when `borderColor` is set. |
+| `maxHeight` | `number` | `130` | Total height of the histogram in CSS pixels; the largest value reaches half of it above or below the base line. `pixels` scale mode only. |
+| `scaleMode` | `'pixels' \| 'price'` | `'pixels'` | Whether the column heights are a fixed number of pixels or prices measured from `baseValue`. See [Scale modes](#scale-modes). |
+| `normalize` | `'visible' \| 'all' \| number` | `'visible'` | What the heights are scaled against in `pixels` mode: the largest value in the visible range, in the whole data set, or a fixed value. |
+| `gap` | `number` | `0` | Gap between the upward and the downward half, in CSS pixels. |
+| `widthPercent` | `number` | `100` | Column width as a percentage of the bar spacing, `0`–`100`. |
+| `baseValue` | `number` | `0` | Price the columns are centered on. |
+| `highlightHovered` | `boolean` | `false` | Whether hovering the series fades every point except the one under the cursor. Requires Lightweight Charts 5.1 or later. |
 
 ## Notes
 
-- Values are normalized against the largest absolute value in the **visible**
-  range, so column heights change as the user scrolls or zooms.
 - Columns are matched to `colors` and `borderRadius` by their **position** in
   `values`, not by their sign: a negative value in the `upOuter` slot points
   downwards but is still drawn in the `upOuter` color.
@@ -175,4 +203,11 @@ In addition to the standard
   inner values smaller than outer ones for the nested look.
 - A point may carry more than four values; the four columns then repeat, so
   `values[4]` is styled as `upOuter` again.
-- Columns get a hairline border when the bar spacing is 4 pixels or more.
+- Column widths follow the same pixel grid as the built-in histogram series,
+  and the alignment is not carried across a gap of whitespace.
+- Values which are not finite are skipped, and nothing is drawn when there is
+  no value to scale the columns against (an all-zero data set, say).
+- `hitTest` (which reports the hovered point through the crosshair as
+  `bar-<index>`) and `conflationReducer` are used by Lightweight Charts 5.1 and
+  later. On 5.0 they are simply never called, and `highlightHovered` has no
+  effect.

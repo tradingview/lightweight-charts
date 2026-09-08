@@ -20,17 +20,9 @@ function generateData() {
 	return { histogram, line };
 }
 
-// The series does not report its values to the price scale, so room for the
-// fixed-pixel columns has to be reserved with the scale margins (see README).
-function reserveRoom(chart, series) {
-	const height = chart.paneSize().height;
-	const margin = Math.min(0.3, series.options().maxHeight / 2 / height);
-	series.priceScale().applyOptions({ scaleMargins: { top: margin, bottom: margin } });
-}
-
-// Every value is 0, so the largest visible absolute value is 0 and the
-// normalisation divides by zero: the column heights become NaN. This case
-// documents that the series simply draws nothing instead of throwing.
+// Every value is 0, so there is nothing to scale the column heights against.
+// The renderer must draw nothing rather than divide by zero and paint NaN
+// geometry. Only the baseline series is visible.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -53,5 +45,7 @@ function runTestCase(container) {
 	baseline.setData(data.line);
 
 	chart.timeScale().fitContent();
-	reserveRoom(chart, histogram);
+	// The pixel-height columns are not part of the autoscale; the helper
+	// reserves room for them on the price scale.
+	LwcPlugin.keepPixelSeriesInView(chart, histogram);
 }

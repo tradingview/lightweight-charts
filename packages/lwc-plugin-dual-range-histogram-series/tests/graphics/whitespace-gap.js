@@ -20,14 +20,9 @@ function generateData() {
 	return { histogram, line };
 }
 
-// The series does not report its values to the price scale, so room for the
-// fixed-pixel columns has to be reserved with the scale margins (see README).
-function reserveRoom(chart, series) {
-	const height = chart.paneSize().height;
-	const margin = Math.min(0.3, series.options().maxHeight / 2 / height);
-	series.priceScale().applyOptions({ scaleMargins: { top: margin, bottom: margin } });
-}
-
+// Points 15..23 have no `values`, so they are whitespace. The columns on
+// either side of the gap must keep their own width and position: the column
+// alignment is not carried across the gap.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -38,8 +33,8 @@ function runTestCase(container) {
 	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
 		priceLineVisible: false,
 		lastValueVisible: false,
+		borderRadius: { upOuter: 3, upInner: 0, downOuter: 3, downInner: 0 },
 	});
-	// Points 15..23 have no `values`, so they are whitespace: no columns there.
 	histogram.setData(data.histogram.map((point, index) => {
 		if (index >= 15 && index < 24) {
 			return { time: point.time };
@@ -53,5 +48,7 @@ function runTestCase(container) {
 	baseline.setData(data.line);
 
 	chart.timeScale().fitContent();
-	reserveRoom(chart, histogram);
+	// The pixel-height columns are not part of the autoscale; the helper
+	// reserves room for them on the price scale.
+	LwcPlugin.keepPixelSeriesInView(chart, histogram);
 }

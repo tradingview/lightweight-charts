@@ -1,6 +1,6 @@
-import { AutoscaleInfo, DeepPartial, Time, createChart } from 'lightweight-charts';
+import { Time, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
-import { PrettyHistogramSeries, PrettyHistogramSeriesOptions, PrettyHistogramData } from '@tradingview/lwc-plugin-pretty-histogram-series';
+import { PrettyHistogramSeries, PrettyHistogramData } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
@@ -8,31 +8,24 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 
 const customSeriesView = new PrettyHistogramSeries();
 
-let autoscaleToZero = true;
-
-const options: DeepPartial<PrettyHistogramSeriesOptions> = {
-	autoscaleInfoProvider: (baseImplementation: () => AutoscaleInfo | null) => {
-		const baseRes = baseImplementation();
-		if (!autoscaleToZero) {
-			return baseRes;
-		}
-		if (!baseRes?.priceRange) {
-			return { priceRange: { minValue: 0, maxValue: 0 } };
-		}
-		const minValue = Math.min(baseRes.priceRange.minValue, 0);
-		const maxValue = Math.max(baseRes.priceRange.maxValue, 0);
-		return { ...baseRes, priceRange: { minValue, maxValue } };
-	},
+const myCustomSeries = chart.addCustomSeries(customSeriesView, {
 	radius: 6,
 	widthPercent: 50,
-};
-
-const myCustomSeries = chart.addCustomSeries(customSeriesView, options);
-
-const data: PrettyHistogramData<Time>[] = generateLineData(6);
-data.forEach((item: PrettyHistogramData<Time>, i: number) => {
-	item.color = (i % 2) ? '#6438D6' : undefined;
+	upColor: '#089981',
+	downColor: '#F23645',
 });
+
+// Values on both sides of the base line, so that the two-tone colouring is
+// visible. The base is always part of the autoscale, so nothing else is needed
+// to keep the zero line in view.
+const generated = generateLineData(6);
+const values = generated.map((item: { value: number }) => item.value);
+const middle = (Math.min(...values) + Math.max(...values)) / 2;
+const data: PrettyHistogramData<Time>[] = generated.map((item: { time: Time; value: number }) => ({
+	time: item.time,
+	value: item.value - middle,
+}));
+data[1].color = '#6438D6';
 
 myCustomSeries.setData(data);
 
@@ -51,28 +44,34 @@ data.forEach((item: PrettyHistogramData<Time>, i: number) => {
 });
 
 const radiusElement = document.getElementById('radius') as HTMLInputElement;
-radiusElement.value = options.radius!.toString();
+radiusElement.value = myCustomSeries.options().radius.toString();
 radiusElement.onchange = () => {
 	const newRadius = parseFloat(radiusElement.value);
 	if (newRadius >= 0) {
-		options.radius = newRadius;
-		myCustomSeries.applyOptions(options);
+		myCustomSeries.applyOptions({ radius: newRadius });
 	}
-}
+};
 
 const widthElement = document.getElementById('width') as HTMLInputElement;
-widthElement.value = options.widthPercent!.toString();
+widthElement.value = myCustomSeries.options().widthPercent.toString();
 widthElement.onchange = () => {
 	const newWidth = parseFloat(widthElement.value);
 	if (newWidth >= 0 && newWidth <= 100) {
-		options.widthPercent = newWidth;
-		myCustomSeries.applyOptions(options);
+		myCustomSeries.applyOptions({ widthPercent: newWidth });
 	}
 };
 
-const zeroAutoscaleElement = document.getElementById('autoscaleToZero') as HTMLInputElement;
-zeroAutoscaleElement.checked = autoscaleToZero;
-zeroAutoscaleElement.onchange = () => {
-	autoscaleToZero = zeroAutoscaleElement.checked;
-	myCustomSeries.applyOptions(options);
-};
+const upColorElement = document.getElementById('upColor') as HTMLInputElement;
+const downColorElement = document.getElementById('downColor') as HTMLInputElement;
+const twoToneElement = document.getElementById('twoTone') as HTMLInputElement;
+
+function applyColors(): void {
+	myCustomSeries.applyOptions({
+		upColor: twoToneElement.checked ? upColorElement.value : null,
+		downColor: twoToneElement.checked ? downColorElement.value : null,
+	});
+}
+
+upColorElement.oninput = applyColors;
+downColorElement.oninput = applyColors;
+twoToneElement.onchange = applyColors;
