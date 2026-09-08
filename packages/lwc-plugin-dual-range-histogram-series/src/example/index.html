@@ -13,14 +13,59 @@
 				overflow: hidden;
 				background-color: rgba(248, 249, 253, 1);
 				color: rgba(19, 23, 34, 1);
+				font-family: system-ui, -apple-system, sans-serif;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+			}
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				align-items: center;
+				padding: 8px 12px;
+				font-size: 13px;
+			}
+			#controls label {
+				display: flex;
+				gap: 6px;
+				align-items: center;
 			}
 			#chart {
-				width: 100%;
-				height: 100%;
+				flex: 1 1 auto;
+				min-height: 0;
 			}
 		</style>
 	</head>
 	<body>
+		<div id="controls">
+			<label>
+				Scale mode
+				<select id="scale-mode">
+					<option value="pixels" selected>pixels</option>
+					<option value="price">price</option>
+				</select>
+			</label>
+			<label>
+				Normalize
+				<select id="normalize">
+					<option value="visible" selected>visible</option>
+					<option value="all">all</option>
+					<option value="fixed">fixed (400)</option>
+				</select>
+			</label>
+			<label>
+				Radius
+				<input id="radius" type="range" min="0" max="12" step="1" value="2" />
+				<output id="radius-value">2</output>
+			</label>
+			<label>
+				Gap
+				<input id="gap" type="range" min="0" max="20" step="1" value="0" />
+				<output id="gap-value">0</output>
+			</label>
+		</div>
 		<div id="chart"></div>
 		<script type="module" src="./example.ts"></script>
 	</body>

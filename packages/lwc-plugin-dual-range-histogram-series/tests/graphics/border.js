@@ -20,16 +20,23 @@ function generateData() {
 	return { histogram, line };
 }
 
+// A real, configurable border: the fill is inset by half the border width and
+// the border is stroked on top of it. Without `borderColor` no border is drawn
+// and the fill occupies the full rectangle.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
-		timeScale: { barSpacing: 12, minBarSpacing: 4 },
+		timeScale: { barSpacing: 20, minBarSpacing: 4 },
 	}));
 	const data = generateData();
 
 	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
 		priceLineVisible: false,
 		lastValueVisible: false,
+		borderColor: '#131722',
+		borderWidth: 1,
+		borderRadius: { upOuter: 4, upInner: 2, downOuter: 4, downInner: 2 },
+		maxHeight: 200,
 	});
 	histogram.setData(data.histogram);
 

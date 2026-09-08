@@ -20,6 +20,9 @@ function generateData() {
 	return { histogram, line };
 }
 
+// The data is scrolled out of view. The library clamps the scroll, so a couple
+// of points are left at the edge; together with the null/empty visible range
+// guards in the renderer, nothing is drawn off the data and nothing throws.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -42,4 +45,5 @@ function runTestCase(container) {
 	// The pixel-height columns are not part of the autoscale; the helper
 	// reserves room for them on the price scale.
 	LwcPlugin.keepPixelSeriesInView(chart, histogram);
+	chart.timeScale().setVisibleLogicalRange({ from: -500, to: -400 });
 }

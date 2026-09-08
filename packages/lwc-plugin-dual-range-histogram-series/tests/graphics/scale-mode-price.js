@@ -20,6 +20,10 @@ function generateData() {
 	return { histogram, line };
 }
 
+// In `price` scale mode the values are prices measured from `baseValue`, so
+// the columns are autoscaled by the price scale like any other series and both
+// `maxHeight` and `normalize` are ignored. No scale margins are reserved: the
+// price scale already knows how tall the columns are.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -30,8 +34,14 @@ function runTestCase(container) {
 	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
 		priceLineVisible: false,
 		lastValueVisible: false,
+		scaleMode: 'price',
 	});
-	histogram.setData(data.histogram);
+	// Scaled down to the range of the baseline series, since both now share the
+	// price scale.
+	histogram.setData(data.histogram.map(point => ({
+		time: point.time,
+		values: point.values.map(value => value / 4),
+	})));
 
 	const baseline = chart.addSeries(LightweightCharts.BaselineSeries, {
 		baseValue: { type: 'price', price: 0 },
@@ -39,7 +49,4 @@ function runTestCase(container) {
 	baseline.setData(data.line);
 
 	chart.timeScale().fitContent();
-	// The pixel-height columns are not part of the autoscale; the helper
-	// reserves room for them on the price scale.
-	LwcPlugin.keepPixelSeriesInView(chart, histogram);
 }

@@ -20,6 +20,10 @@ function generateData() {
 	return { histogram, line };
 }
 
+// `normalize: 'all'` scales the columns against the largest value in the whole
+// data set rather than the visible one, and `gap` opens a space around the base
+// line. Only the first half of the data is in view, and it holds no value as
+// large as the peak in the second half, so the columns stay short.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -30,8 +34,15 @@ function runTestCase(container) {
 	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
 		priceLineVisible: false,
 		lastValueVisible: false,
+		normalize: 'all',
+		gap: 12,
+		widthPercent: 60,
+		maxHeight: 200,
 	});
-	histogram.setData(data.histogram);
+	histogram.setData(data.histogram.map((point, index) => ({
+		time: point.time,
+		values: index < 20 ? point.values : point.values.map(value => value * 3),
+	})));
 
 	const baseline = chart.addSeries(LightweightCharts.BaselineSeries, {
 		baseValue: { type: 'price', price: 0 },
@@ -42,4 +53,5 @@ function runTestCase(container) {
 	// The pixel-height columns are not part of the autoscale; the helper
 	// reserves room for them on the price scale.
 	LwcPlugin.keepPixelSeriesInView(chart, histogram);
+	chart.timeScale().setVisibleLogicalRange({ from: 0, to: 19 });
 }

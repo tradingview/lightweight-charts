@@ -20,16 +20,20 @@ function generateData() {
 	return { histogram, line };
 }
 
+// The screenshoter leaves the pointer in the middle of the viewport, so one
+// point is hovered: with `highlightHovered` every other point is faded.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
-		timeScale: { barSpacing: 12, minBarSpacing: 4 },
+		timeScale: { barSpacing: 16, minBarSpacing: 4 },
 	}));
 	const data = generateData();
 
 	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
 		priceLineVisible: false,
 		lastValueVisible: false,
+		highlightHovered: true,
+		maxHeight: 220,
 	});
 	histogram.setData(data.histogram);
 
