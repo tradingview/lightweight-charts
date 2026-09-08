@@ -9,16 +9,66 @@
 			#chart {
 				height: 450px;
 			}
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 16px;
+				padding: 8px 0;
+			}
+			#controls label {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
 		</style>
 	</head>
 	<body>
+		<div id="controls">
+			<label>
+				Position
+				<select id="position">
+					<option value="center" selected>center</option>
+					<option value="top-left">top-left</option>
+					<option value="top-right">top-right</option>
+					<option value="bottom-left">bottom-left</option>
+					<option value="bottom-right">bottom-right</option>
+				</select>
+			</label>
+			<label>
+				Object fit
+				<select id="object-fit">
+					<option value="contain" selected>contain</option>
+					<option value="cover">cover</option>
+					<option value="none">none</option>
+				</select>
+			</label>
+			<label>
+				Alpha
+				<input id="alpha" type="range" min="0" max="1" step="0.05" value="0.4" />
+			</label>
+			<label>
+				<input id="left-scale" type="checkbox" />
+				Left price scale
+			</label>
+			<label>
+				<input id="second-pane" type="checkbox" />
+				Second pane
+			</label>
+			<button id="attach" type="button">Detach</button>
+		</div>
 		<div id="chart"></div>
 		<div id="description">
 			<h1>Image Watermark</h1>
 			<p>
 				Image watermark which is responsive to the size of the chart pane.
-				Padding, maximum width, maximum height values can be defined to control
-				the behaviour of the watermark.
+				Position, object fit, padding, maximum width, maximum height and
+				opacity control how the image is drawn, and can all be changed after
+				the watermark has been attached.
+			</p>
+			<p>
+				The second pane is watermarked with the pane primitive
+				(<code>ImageWatermarkPane</code>), which needs no series of its own.
 			</p>
 		</div>
 		<script type="module" src="./example.ts"></script>
