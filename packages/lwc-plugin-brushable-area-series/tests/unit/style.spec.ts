@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
-import { IRange, Logical } from 'lightweight-charts';
+import type { IRange, Logical } from 'lightweight-charts';
 
 import { BrushableAreaSeriesOptions, defaultOptions } from '../../src/options.js';
 import { createStyleResolver } from '../../src/style.js';
