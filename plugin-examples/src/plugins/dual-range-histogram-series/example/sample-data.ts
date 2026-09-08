@@ -1,6 +1,6 @@
 import { LineData, WhitespaceData } from 'lightweight-charts';
 import { multipleBarData } from '../../../sample-data';
-import { DualRangeHistogramData } from '../data';
+import { DualRangeHistogramData } from '@tradingview/lwc-plugin-dual-range-histogram-series';
 
 export function centerLineData(lineData: LineData[]): LineData[] {
 	const lineDataValues = lineData.map(i => i.value);

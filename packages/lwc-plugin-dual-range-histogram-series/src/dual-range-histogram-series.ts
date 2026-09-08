@@ -41,3 +41,7 @@ export class DualRangeHistogramSeries<TData extends DualRangeHistogramData>
 		return defaultOptions;
 	}
 }
+
+export type { DualRangeHistogramData } from './data';
+export type { DualRangeHistogramSeriesOptions } from './options';
+export { defaultOptions } from './options';
