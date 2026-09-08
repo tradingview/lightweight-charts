@@ -11,7 +11,7 @@ aliases:
   - &restore-node-modules-cache
       name: Restore dependencies cache
       keys:
-        - &cache-key v1-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
+        - &cache-key v2-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
 
   - &save-node-modules-cache
       name: Save dependencies cache
@@ -376,6 +376,10 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
+      # The plugin packages' own devDependencies are only in the cache once it
+      # was saved with them listed; installing here keeps the job independent
+      # of the cache contents (with the cache restored this fetches nothing).
+      - run: pnpm install --frozen-lockfile --prefer-offline
       # builds @tradingview/lwc-toolkit and the graduated plugin packages first
       # (via the build:deps pre-step), typechecks all plugin sources against
       # them and compiles every plugin, including the bundled typings that must
