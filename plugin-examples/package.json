@@ -3,11 +3,11 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build:utils": "pnpm --filter @tradingview/lwc-toolkit build",
-        "build": "pnpm build:utils && tsc",
-        "compile": "pnpm build:utils && tsc && node compile.mjs",
-        "dev": "pnpm build:utils && vite --config src/vite.config.js",
-        "build:examples:site": "pnpm build:utils && vite build --config src/vite.config.js && node build-website.mjs"
+        "build:deps": "pnpm --filter @tradingview/lwc-toolkit --filter \"@tradingview/lwc-plugin-*\" build",
+        "build": "pnpm build:deps && tsc",
+        "compile": "pnpm build:deps && tsc && node compile.mjs",
+        "dev": "pnpm build:deps && vite --config src/vite.config.js",
+        "build:examples:site": "pnpm build:deps && vite build --config src/vite.config.js && node build-website.mjs"
     },
     "devDependencies": {
         "typescript": "5.9.3",
