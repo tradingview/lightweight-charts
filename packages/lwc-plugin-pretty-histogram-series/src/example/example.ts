@@ -1,4 +1,4 @@
-import { AutoscaleInfo, DeepPartial, HistogramData, Time, createChart } from 'lightweight-charts';
+import { AutoscaleInfo, DeepPartial, Time, createChart } from 'lightweight-charts';
 import { generateLineData } from './sample-data';
 import { PrettyHistogramSeries } from '../pretty-histogram-series';
 import { PrettyHistogramSeriesOptions } from '../options';
@@ -28,7 +28,7 @@ const myCustomSeries = chart.addCustomSeries(customSeriesView, options);
 
 const data: PrettyHistogramData<Time>[] = generateLineData(6);
 data.forEach((item: PrettyHistogramData<Time>, i: number) => {
-	(item as HistogramData<Time>).color = (i % 2) ? '#6438D6' : undefined;
+	item.color = (i % 2) ? '#6438D6' : undefined;
 });
 
 myCustomSeries.setData(data);
