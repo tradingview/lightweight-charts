@@ -14,5 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repository.
 - The `HLCAreaSeries` custom series draws high, low, and close lines with a
   two-tone fill between them.
-- Styling options: per-line colors and widths, and separate fill colors for
-  the high–close and close–low bands.
+- Styling options: per-line colors and widths (`LineWidth`, `1`–`4`), and
+  separate fill colors for the high–close (`highAreaColor`) and close–low
+  (`lowAreaColor`) bands. `areaTopColor` and `areaBottomColor` are accepted as
+  deprecated aliases of the two fill colors.

@@ -18,13 +18,15 @@ interface HLCAreaBarItem {
 	close: number;
 }
 
-export class HLCAreaSeriesRenderer<TData extends HLCAreaData>
-	implements ICustomSeriesPaneRenderer
+export class HLCAreaSeriesRenderer<
+	HorzScaleItem = Time,
+	TData extends HLCAreaData<HorzScaleItem> = HLCAreaData<HorzScaleItem>
+> implements ICustomSeriesPaneRenderer
 {
-	_data: PaneRendererCustomData<Time, TData> | null = null;
-	_options: HLCAreaSeriesOptions | null = null;
+	private _data: PaneRendererCustomData<HorzScaleItem, TData> | null = null;
+	private _options: HLCAreaSeriesOptions | null = null;
 
-	draw(
+	public draw(
 		target: CanvasRenderingTarget2D,
 		priceConverter: PriceToCoordinateConverter
 	): void {
@@ -33,15 +35,15 @@ export class HLCAreaSeriesRenderer<TData extends HLCAreaData>
 		);
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: HLCAreaSeriesOptions
 	): void {
 		this._data = data;
 		this._options = options;
 	}
 
-	_drawImpl(
+	private _drawImpl(
 		renderingScope: BitmapCoordinatesRenderingScope,
 		priceToCoordinate: PriceToCoordinateConverter
 	): void {
@@ -99,7 +101,7 @@ export class HLCAreaSeriesRenderer<TData extends HLCAreaData>
 		topArea.addPath(closeLine);
 		topArea.lineTo(firstBar.x, firstBar.high);
 		topArea.closePath();
-		ctx.fillStyle = options.areaTopColor;
+		ctx.fillStyle = options.areaTopColor ?? options.highAreaColor;
 		ctx.fill(topArea);
 
 		const bottomArea = new Path2D(lowLine);
@@ -107,7 +109,7 @@ export class HLCAreaSeriesRenderer<TData extends HLCAreaData>
 		bottomArea.addPath(closeLine);
 		bottomArea.lineTo(firstBar.x, firstBar.low);
 		bottomArea.closePath();
-		ctx.fillStyle = options.areaBottomColor;
+		ctx.fillStyle = options.areaBottomColor ?? options.lowAreaColor;
 		ctx.fill(bottomArea);
 
 		ctx.lineJoin = 'round';
