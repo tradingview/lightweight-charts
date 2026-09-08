@@ -93,7 +93,9 @@ const accessibility = addAccessibilityPlugin(chart, {
 });
 ```
 
-For a multi-pane chart, pass a title resolver:
+`chartTitle` is optional; without it every pane is announced with
+`messages.defaultChartTitle` (*"Interactive financial chart"*), distinguished by
+a *"Pane 2 of 2"* suffix. For a multi-pane chart, pass a title resolver instead:
 
 ```js
 addAccessibilityPlugin(chart, {
@@ -109,8 +111,21 @@ accessibility.detach();
 ```
 
 If you need low-level control, you can still attach `AccessibilityPlugin`
-directly as a pane primitive. In that mode `paneIndex` must match the pane you
-attach to.
+directly as a pane primitive. It takes `AccessibilityPaneOptions` and, as a
+second constructor argument, the index of the pane you attach it to (only needed
+for a pane other than the first):
+
+```js
+import { AccessibilityPlugin } from '@tradingview/lwc-plugin-accessibility';
+
+chart.panes()[1].attachPrimitive(
+    new AccessibilityPlugin({ chartTitle: 'Volume' }, 1)
+);
+```
+
+A directly attached primitive keeps its own polite live region and takes a plain
+boolean `announceDataUpdates`; the chart-level `dataUpdates` settings only exist
+on the helper.
 
 ## What it does
 
@@ -128,7 +143,7 @@ attach to.
   summaries are announced through a per-pane assertive live region. Background
   data updates go through a single polite live region shared by the whole chart,
   so simultaneous updates in different panes never talk over each other
-  (`announceDataUpdates`, see below).
+  (`dataUpdates`, see below).
 - **Visible focus indicator.** The focused pane receives an outline, and an
   optional focus ring is drawn over the active point. The point ring stays
   aligned with the canvas as you scroll or zoom.
@@ -154,35 +169,42 @@ attach to.
 
 ## Options
 
-All options are optional and have sensible defaults.
+All options are optional and have sensible defaults. `addAccessibilityPlugin`
+takes `AccessibilityOptions`, a single `AccessibilityPlugin` takes
+`AccessibilityPaneOptions`; the two differ only in the rows marked *chart-level*
+below.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `chartTitle` | `string` | `'Interactive financial chart'` | Accessible name of the pane region. |
-| `paneIndex` | `number` | `0` | Index of the pane this primitive is attached to. Only needed when manually attaching `AccessibilityPlugin`; `addAccessibilityPlugin` sets it for you. |
+| `chartTitle` | `string` — *chart-level:* `string \| (paneIndex) => string` | `messages.defaultChartTitle` | Accessible name of the pane region. |
 | `showFocusIndicator` | `boolean` | `true` | Draw a visible focus ring on the active point. |
 | `focusIndicatorColor` | `string` | `'#2962FF'` | Color of the focus ring. |
 | `focusIndicatorSize` | `number` | `14` | Diameter of the focus ring, in CSS pixels. |
-| `announceDataUpdates` | `boolean \| 'active' \| (paneIndex)=>boolean` | `'active'` (helper); `true` (standalone) | Which panes announce data updates, and how they combine (see below). |
+| `dataUpdates` | *chart-level only:* `{ mode: 'active' \| 'all' \| 'none'; panes?: (paneIndex) => boolean; debounceMs?: number }` | `{ mode: 'active' }` | Which panes announce data updates, and how they combine (see below). |
+| `announceDataUpdates` | *pane-level only:* `boolean` | `true` | Whether this pane announces data updates. Set for you from `dataUpdates`. |
+| `updateDebounceMs` | *pane-level only:* `number` | `1000` | Window over which data changes are coalesced before being announced. Use `dataUpdates.debounceMs` at chart level. |
+| `updateMaxSeries` | `number` | `3` | Maximum number of changed series listed in one update announcement. |
 | `pageStep` | `number` | `10` | Points to jump with `Page Up` / `Page Down`. |
+| `zoomStep` | `number` | `0.2` | Fraction the visible range grows / shrinks per `+` / `-` keypress. |
+| `minZoomSpan` | `number` | `2` | Smallest visible span, in bars, that zooming in will produce. |
 | `dataScope` | `'all' \| 'visible'` | `'visible'` | Whether the on-demand summary and data-update announcements describe the visible range or the full data set (see below). |
 | `priceFormatter` | `(value: number) => string` | chart `localization.priceFormatter`, else the active series price formatter | Formats values for announcements. |
 | `timeFormatter` | `(time: Time) => string` | chart `localization.timeFormatter`, else a locale-aware date | Formats times for announcements (uses the chart's `localization.locale`). |
 | `seriesLabel` | `(series, index) => string` | series `title`, else `Series N` | Accessible label for each series. |
-| `describeChart` | `(points, seriesLabel) => string` | built-in summary | Generates the `Enter` / `Space` summary. |
+| `describeChart` | `(context: DescribeChartContext) => string` | built-in summary | Generates the `Enter` / `Space` summary. The context carries `points` (already narrowed to `dataScope`), `series`, `label` and `scope`. |
 | `messages` | `PartialAccessibilityMessages` | English `defaultMessages` | Overrides for the announced text — translate some or all of it (see Localization). |
 | `lang` | `string` | chart `localization.locale` | BCP-47 `lang` set on the announced regions so screen readers use the right voice. |
 | `showShortcuts` | `boolean` | `false` | Show a visible keyboard-shortcuts overlay (focus hint + `H`-toggled panel) for sighted keyboard users (see below). |
-| `highContrast` | `boolean \| 'auto' \| (() => boolean)` | `'auto'` | High-contrast styling for the plugin's own focus ring / outline / overlay. `'auto'` follows the OS `prefers-contrast` / `forced-colors`. |
+| `highContrast` | `boolean \| 'auto'` | `'auto'` | High-contrast styling for the plugin's own focus ring / outline / overlay. `'auto'` follows the OS `prefers-contrast` / `forced-colors`; pass a boolean to drive it from your own setting. |
 | `onHighContrastChange` | `(enabled: boolean) => void` | — | Called when the resolved high-contrast state changes (and once on attach), so you can restyle the chart's own series / grid / font to match. |
 
 Options can be changed at runtime. Use the controller's
 `accessibility.applyOptions({ ... })` for chart-level changes (`chartTitle`,
-`announceDataUpdates`, `messages`, `lang`, …): it updates every pane **and** the
-shared update region together. A single primitive also has its own
+`dataUpdates`, `messages`, `lang`, `highContrast`, …): it updates every pane
+**and** the shared update region together. A single primitive also has its own
 `plugin.applyOptions({ ... })` for per-pane tweaks (e.g. `dataScope`), but that
 does not reach the chart-level shared update region — use the controller for
-`announceDataUpdates` / `messages` / `lang`.
+`dataUpdates` / `messages` / `lang`.
 
 ### Scoping announcements to the visible range
 
@@ -212,22 +234,33 @@ pane keeps its own assertive region for navigation, but all *data-update*
 announcements go through **one** polite region shared by the whole chart, so the
 updates never talk over each other.
 
-`announceDataUpdates` (on `addAccessibilityPlugin`) chooses which panes speak:
+`dataUpdates` (on `addAccessibilityPlugin`) chooses which panes speak:
 
-- `'active'` (default): only the **last-focused** pane announces (pane 0 until you
-  focus one). Navigating the volume pane, for example, makes its updates the ones
-  you hear; otherwise you hear the main pane.
-- `true`: every pane announces; simultaneous updates are combined into a single
-  message in pane order (*"Chart data updated. 3 series changed. …"*).
-- `false`: no update announcements.
-- `(paneIndex) => boolean`: decide per pane; the enabled panes are combined.
+```js
+addAccessibilityPlugin(chart, {
+    dataUpdates: { mode: 'active', debounceMs: 1500 },
+});
+```
+
+- `mode: 'active'` (the default): only the **last-focused** pane announces (pane 0
+  until you focus one). Navigating the volume pane, for example, makes its updates
+  the ones you hear; otherwise you hear the main pane.
+- `mode: 'all'`: every pane announces; simultaneous updates are combined into a
+  single message in pane order (*"Chart data updated. 3 series changed. …"*).
+- `mode: 'none'`: no update announcements.
+- `panes: (paneIndex) => boolean`: restricts announcements to the panes the
+  predicate accepts, on top of `mode`.
+- `debounceMs`: how long changes are coalesced before being announced (default
+  `1000`). A live feed can tick far faster than a screen reader can speak.
 
 Switch this at runtime through the controller —
-`accessibility.applyOptions({ announceDataUpdates: true })` — which reconfigures
-the shared region's mode; a per-pane `plugin.applyOptions` cannot change it.
+`accessibility.applyOptions({ dataUpdates: { mode: 'all' } })` — which
+reconfigures the shared region's mode; a per-pane `plugin.applyOptions` cannot
+change it.
 
 A directly-attached `AccessibilityPlugin` (without the helper) takes a plain
-`boolean` here and uses its own polite region.
+boolean `announceDataUpdates` with its own `updateDebounceMs`, and uses its own
+polite region.
 
 ## Localization
 
@@ -270,9 +303,23 @@ addAccessibilityPlugin(chart, {
 reader pronounces them with the right voice; it defaults to
 `localization.locale`. `messages`/`lang` are uniform across panes. To switch
 language at runtime, call `accessibility.applyOptions({ messages, lang })` on the
-controller — it updates every pane and the shared update region together. A
-complete, runnable Spanish bundle lives in the example
-(`example/example.es.ts`, rendered by `example/index.es.html`).
+controller — it updates every pane and the shared update region together.
+
+A complete Spanish bundle ships with the package as `esMessages`, both as a
+ready-made translation and as a template for your own:
+
+```js
+import { addAccessibilityPlugin, esMessages } from '@tradingview/lwc-plugin-accessibility';
+
+addAccessibilityPlugin(chart, { messages: esMessages, lang: 'es' });
+```
+
+`defaultMessages` is the English bundle. It is **frozen and read-only** — write a
+translation by passing your own entries through `messages` (they are merged onto
+`defaultMessages`), never by mutating it. `paneLabel` receives `paneIndex` and
+`paneCount` alongside the title, so a translation can keep multi-pane titles
+distinguishable, and `defaultChartTitle` is the fallback used when `chartTitle`
+is unset.
 
 The precedence for the overridable pieces:
 
@@ -293,10 +340,11 @@ users already get the spoken `H` help) and its text comes from the `messages`
 bundle (`shortcutsHint`, `shortcutsTitle`, `shortcuts`), so it localizes with the
 rest. The overlay text is sized in `rem`, so it scales with the page/browser font.
 
-**High contrast** — `highContrast` (`boolean | 'auto' | (() => boolean)`, default
-`'auto'`) controls the plugin's *own* visuals (focus ring, focus outline, the
-overlay). `'auto'` follows the OS `prefers-contrast` / `forced-colors` and updates
-live; pass a predicate to wire it to your own app setting.
+**High contrast** — `highContrast` (`boolean | 'auto'`, default `'auto'`) controls
+the plugin's *own* visuals (focus ring, focus outline, the overlay). `'auto'`
+follows the OS `prefers-contrast` / `forced-colors` and updates live; to wire it
+to your own app setting, pass a boolean and keep it in step with
+`accessibility.applyOptions({ highContrast })`.
 
 The plugin deliberately does **not** restyle the chart's series, grid or font —
 that's the chart theme's job (see the
@@ -338,6 +386,27 @@ changed series once per debounced announcement. The work is therefore
 proportional to how much the chart is actually being used, not to how often
 the user scrolls or how often your data ticks.
 
+## CSS class hooks
+
+Every element the plugin injects carries a stable class name, so you can restyle
+the layer from your own stylesheet. These names are part of the public API and
+will not change without a major version:
+
+| Class | Element |
+| --- | --- |
+| `lw-chart-a11y-layer` | The focusable semantic overlay per pane (`role="application"`). |
+| `lw-chart-a11y-description` | Visually hidden pane description (`aria-describedby` target). |
+| `lw-chart-a11y-live-region` | Per-pane assertive region for navigation announcements. |
+| `lw-chart-a11y-status-region` | Per-pane polite region, only present on a directly attached primitive. |
+| `lw-chart-a11y-shared-status-region` | The single chart-level polite region created by `addAccessibilityPlugin`. |
+| `lw-chart-a11y-focus-ring` | The visible focus ring drawn over the active point. |
+| `lw-chart-a11y-shortcuts-hint` | The "Press H" hint (`showShortcuts`). |
+| `lw-chart-a11y-shortcuts-panel` | The `H`-toggled shortcuts panel (`showShortcuts`). |
+
+The plugin sets its own geometry and colors inline, so an inline style wins over
+a plain rule — use `!important`, or restyle through the options where one exists
+(`focusIndicatorColor`, `focusIndicatorSize`, `highContrast`).
+
 ## Notes & limitations
 
 - The plugin targets line / area / candlestick / histogram series: OHLC series announce
@@ -359,5 +428,9 @@ the user scrolls or how often your data ticks.
   font-scaling (covered in the
   [Readability](https://tradingview.github.io/lightweight-charts/tutorials/a11y/readability)
   part of the tutorial) remain the responsibility of your chart theme.
+- The API is typed for a `Time`-based chart (`IChartApi`), not the generic
+  `IChartApiBase<HorzScaleItem>`. The announcements format UTC timestamps and
+  business days and the navigation maps points through the `Time` scale, so every
+  internal path assumes `Time`; a custom horizontal scale is not supported.
 - Always validate with real assistive technology (VoiceOver, NVDA) as part of
   your own accessibility testing before shipping.
