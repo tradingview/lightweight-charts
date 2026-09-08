@@ -26,3 +26,6 @@ typings
 *.njsproj
 *.sln
 *.sw?
+
+# Copied from the repository root by the prepack script.
+LICENSE

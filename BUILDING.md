@@ -42,7 +42,7 @@ Run it from the repository root, or add `-w` (`pnpm -w scaffold-plugin`) when ru
 
 The script builds the local copy of the tool and runs it, so it always reflects your working tree. Note that `pnpm create lwc-plugin` does download the published package from npm and will not pick up any local changes to the templates or the wizard.
 
-Workspace mode differs from the standalone mode community authors use: it scopes the package name to `@tradingview/`, depends on the library and the shared plugin utilities through `workspace:*`, marks the plugin as an official catalogue entry, pins the devDependencies to exact versions like the rest of the repository, and seeds a `CHANGELOG.md`, `LICENSE` and `NOTICE`. The folder path the wizard asks for is relative to the repository root regardless of where it was started from.
+Workspace mode differs from the standalone mode community authors use: it scopes the package name to `@tradingview/`, depends on the library and the shared plugin utilities through `workspace:*`, marks the plugin as an official catalogue entry, pins the devDependencies to exact versions like the rest of the repository, and seeds a `CHANGELOG.md` and `NOTICE`. The package has no `LICENSE` of its own: the repository's is copied in by a `prepack` script (npm drops symlinks when packing) and removed again by `postpack`, so every tarball carries it. The folder path the wizard asks for is relative to the repository root regardless of where it was started from.
 
 After scaffolding, install the new package's dependencies and check that it builds:
 
