@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { BusinessDay, UTCTimestamp } from 'lightweight-charts';
+import type { BusinessDay, UTCTimestamp } from 'lightweight-charts';
 import { describe, it } from 'node:test';
 
 import { convertTime, displayTime, formattedDateAndTime } from '../../src/time.js';
