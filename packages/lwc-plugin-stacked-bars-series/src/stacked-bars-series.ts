@@ -1,24 +1,26 @@
 import {
 	CustomSeriesPricePlotValues,
+	CustomSeriesWhitespaceData,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
-	WhitespaceData,
 	Time,
 } from 'lightweight-charts';
 import { StackedBarsSeriesOptions, defaultOptions } from './options';
 import { StackedBarsSeriesRenderer } from './renderer';
 import { StackedBarsData } from './data';
 
-export class StackedBarsSeries<TData extends StackedBarsData>
-	implements ICustomSeriesPaneView<Time, TData, StackedBarsSeriesOptions>
+export class StackedBarsSeries<
+	HorzScaleItem = Time,
+	TData extends StackedBarsData<HorzScaleItem> = StackedBarsData<HorzScaleItem>
+> implements ICustomSeriesPaneView<HorzScaleItem, TData, StackedBarsSeriesOptions>
 {
-	_renderer: StackedBarsSeriesRenderer<TData>;
+	private _renderer: StackedBarsSeriesRenderer<HorzScaleItem, TData>;
 
-	constructor() {
+	public constructor() {
 		this._renderer = new StackedBarsSeriesRenderer();
 	}
 
-	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
+	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
 		return [
 			0,
 			plotRow.values.reduce(
@@ -28,22 +30,22 @@ export class StackedBarsSeries<TData extends StackedBarsData>
 		];
 	}
 
-	isWhitespace(data: TData | WhitespaceData): data is WhitespaceData {
+	public isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> {
 		return !Boolean((data as Partial<TData>).values?.length);
 	}
 
-	renderer(): StackedBarsSeriesRenderer<TData> {
+	public renderer(): StackedBarsSeriesRenderer<HorzScaleItem, TData> {
 		return this._renderer;
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: StackedBarsSeriesOptions
 	): void {
 		this._renderer.update(data, options);
 	}
 
-	defaultOptions() {
+	public defaultOptions(): StackedBarsSeriesOptions {
 		return defaultOptions;
 	}
 }
