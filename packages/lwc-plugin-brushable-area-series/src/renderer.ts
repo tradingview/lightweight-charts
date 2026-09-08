@@ -6,27 +6,25 @@ import {
 	ICustomSeriesPaneRenderer,
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
-	Time,
 } from 'lightweight-charts';
 import { BrushableAreaData } from './data';
-import {
-	BrushRange,
-	BrushableAreaSeriesOptions,
-	BrushableAreaStyle,
-} from './options';
+import { BrushableAreaSeriesOptions, BrushableAreaStyle } from './options';
+import { createStyleResolver } from './style';
 
 interface BrushableAreaBarItem {
 	x: number;
 	y: number;
 }
 
-export class BrushableAreaSeriesRenderer<TData extends BrushableAreaData>
-	implements ICustomSeriesPaneRenderer
+export class BrushableAreaSeriesRenderer<
+	HorzScaleItem,
+	TData extends BrushableAreaData<HorzScaleItem>
+> implements ICustomSeriesPaneRenderer
 {
-	_data: PaneRendererCustomData<Time, TData> | null = null;
-	_options: BrushableAreaSeriesOptions | null = null;
+	private _data: PaneRendererCustomData<HorzScaleItem, TData> | null = null;
+	private _options: BrushableAreaSeriesOptions | null = null;
 
-	draw(
+	public draw(
 		target: CanvasRenderingTarget2D,
 		priceConverter: PriceToCoordinateConverter
 	): void {
@@ -35,15 +33,15 @@ export class BrushableAreaSeriesRenderer<TData extends BrushableAreaData>
 		);
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: BrushableAreaSeriesOptions
 	): void {
 		this._data = data;
 		this._options = options;
 	}
 
-	_drawImpl(
+	private _drawImpl(
 		renderingScope: BitmapCoordinatesRenderingScope,
 		priceToCoordinate: PriceToCoordinateConverter
 	): void {
@@ -67,20 +65,22 @@ export class BrushableAreaSeriesRenderer<TData extends BrushableAreaData>
 		});
 
 		const ctx = renderingScope.context;
-		const bottomChartY = renderingScope.bitmapSize.height;
+		const paneBottomY = renderingScope.bitmapSize.height;
+		const baseCoordinate = priceToCoordinate(options.basePrice);
+		// The base price is often outside the visible price range, in which case
+		// the fill simply reaches the edge of the pane.
+		const baseY =
+			baseCoordinate === null
+				? paneBottomY
+				: Math.max(
+						0,
+						Math.min(
+							paneBottomY,
+							baseCoordinate * renderingScope.verticalPixelRatio
+						)
+					);
 
-		const getRangeStyle = (index: number): BrushableAreaStyle => {
-			if (typeof options.brushRanges === 'string') return options;
-			const foundRange = options.brushRanges.findIndex(
-				(brushRange: BrushRange) => {
-					return index >= brushRange.range.from && index < brushRange.range.to;
-				}
-			);
-			if (foundRange >= 0) {
-				return options.brushRanges[foundRange].style;
-			}
-			return options;
-		};
+		const getRangeStyle = createStyleResolver(options);
 
 		const rangeStyles: BrushableAreaStyle[] = new Array(
 			this._data.visibleRange.to
@@ -101,7 +101,7 @@ export class BrushableAreaSeriesRenderer<TData extends BrushableAreaData>
 		function getGradient(bottom: string, top: string): CanvasGradient {
 			const hash = bottom + top;
 			if (gradientMap.has(hash)) return gradientMap.get(hash)!;
-			const gradient = ctx.createLinearGradient(0, bottomChartY, 0, minY);
+			const gradient = ctx.createLinearGradient(0, baseY, 0, minY);
 			gradient.addColorStop(0, bottom);
 			gradient.addColorStop(1, top);
 			gradientMap.set(hash, gradient);
@@ -120,8 +120,8 @@ export class BrushableAreaSeriesRenderer<TData extends BrushableAreaData>
 			ctx.beginPath();
 			ctx.moveTo(previousPosition[0], previousPosition[1]);
 			ctx.lineTo(bar.x, bar.y);
-			ctx.lineTo(bar.x, bottomChartY);
-			ctx.lineTo(previousPosition[0], bottomChartY);
+			ctx.lineTo(bar.x, baseY);
+			ctx.lineTo(previousPosition[0], baseY);
 			ctx.closePath();
 			ctx.fillStyle = getGradient(rangeStyle.bottomColor, rangeStyle.topColor);
 			ctx.fill();

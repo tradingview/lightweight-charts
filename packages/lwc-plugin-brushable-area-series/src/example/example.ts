@@ -77,10 +77,7 @@ function determinePaneXLogical(mouseX: number): Logical | null {
 }
 
 chartElement.addEventListener('mousedown', (event: MouseEvent) => {
-	myCustomSeries.applyOptions({
-		brushRanges: [],
-		...baseStyle,
-	});
+	myCustomSeries.applyOptions({ brushRanges: [] });
 	mouseState.startLogical = determinePaneXLogical(event.clientX);
 	mouseState.drawing = mouseState.startLogical !== null;
 	mouseState.activeRange = false;
@@ -103,7 +100,7 @@ chartElement.addEventListener('mousemove', (event: MouseEvent) => {
 					style: greenStyle,
 				},
 			],
-			...fadeStyle,
+			outsideStyle: fadeStyle,
 		});
 	}
 });
@@ -111,10 +108,7 @@ chartElement.addEventListener('mousemove', (event: MouseEvent) => {
 chartElement.addEventListener('mouseup', () => {
 	mouseState.drawing = false;
 	if (!mouseState.activeRange) {
-		myCustomSeries.applyOptions({
-			brushRanges: [],
-			...baseStyle,
-		});
+		myCustomSeries.applyOptions({ brushRanges: [] });
 	}
 });
 

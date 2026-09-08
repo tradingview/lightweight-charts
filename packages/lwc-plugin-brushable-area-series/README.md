@@ -7,8 +7,8 @@ a span of data points with its own line and fill colors.
 The series itself only draws the styles. Add your own pointer handling to turn
 it into a brush selection: the user drags across the chart, you set a brush
 range for the selected span, and the rest of the series keeps the base style.
-Set a semi-transparent base style to get the classic effect where the
-selection stays vivid and the rest looks faded.
+Give `outsideStyle` a semi-transparent style to get the classic effect where
+the selection stays vivid and the rest looks faded.
 
 Use it for range selection on a sparkline or an overview chart. It also fits
 highlighting a period, such as a trading session, an event window, or a
@@ -33,8 +33,8 @@ import { BrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-seri
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new BrushableAreaSeries(), {
-    lineColor: 'rgba(41, 98, 255, 0.2)',
-    topColor: 'rgba(41, 98, 255, 0.05)',
+    lineColor: 'rgb(41, 98, 255)',
+    topColor: 'rgba(41, 98, 255, 0.4)',
     bottomColor: 'rgba(41, 98, 255, 0)',
     priceLineVisible: false,
 });
@@ -66,8 +66,8 @@ import { BrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-seri
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new BrushableAreaSeries(), {
-    lineColor: 'rgba(41, 98, 255, 0.2)',
-    topColor: 'rgba(41, 98, 255, 0.05)',
+    lineColor: 'rgb(41, 98, 255)',
+    topColor: 'rgba(41, 98, 255, 0.4)',
     bottomColor: 'rgba(41, 98, 255, 0)',
     priceLineVisible: false,
 });
@@ -86,14 +86,14 @@ import { BrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-seri
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new BrushableAreaSeries(), {
-    lineColor: 'rgba(41, 98, 255, 0.2)',
-    topColor: 'rgba(41, 98, 255, 0.05)',
+    lineColor: 'rgb(41, 98, 255)',
+    topColor: 'rgba(41, 98, 255, 0.4)',
     bottomColor: 'rgba(41, 98, 255, 0)',
     priceLineVisible: false,
 });
 series.setData(data); // [{ time, value }, ...]
 
-// Highlight points 40–80 in green; everything else keeps the faded base style.
+// Highlight points 40–80 in green and fade everything else.
 series.applyOptions({
     brushRanges: [
         {
@@ -106,11 +106,18 @@ series.applyOptions({
             },
         },
     ],
+    outsideStyle: {
+        lineColor: 'rgba(41, 98, 255, 0.2)',
+        topColor: 'rgba(41, 98, 255, 0.05)',
+    },
 });
 
-// Clear the selection.
+// Clear the selection: the whole series goes back to the base style.
 series.applyOptions({ brushRanges: [] });
 ```
+
+A range's `style` and `outsideStyle` are both partial: every property left out
+falls back to the base style set on the series.
 
 Ranges are expressed in **logical indices** (the position of a point in the
 data, as used by the time scale's logical range), not in time. To turn a
@@ -137,16 +144,21 @@ In addition to the standard
 | `lineColor` | `string` | `'rgb(40,98,255)'` | Base line color, used outside brush ranges. |
 | `topColor` | `string` | `'rgba(40,98,255, 0.4)'` | Base fill color at the line (top of the gradient). |
 | `bottomColor` | `string` | `'rgba(40,98,255, 0)'` | Base fill color at the base price (bottom of the gradient). |
-| `lineWidth` | `number` | `2` | Base line width, in CSS pixels. |
+| `lineWidth` | `1 \| 2 \| 3 \| 4` | `2` | Base line width, in CSS pixels. |
 | `basePrice` | `number` | `0` | Price the area is filled down to. |
-| `brushRanges` | `{ range: { from: number; to: number }; style: { lineColor; topColor; bottomColor; lineWidth } }[]` | `[]` | Ranges of logical indices rendered in their own style. `from` is inclusive, `to` is exclusive. Pass an empty array to clear. |
+| `brushRanges` | `{ range: { from: number; to: number }; style: Partial<style> }[]` | `[]` | Ranges of logical indices rendered in their own style. `from` is inclusive, `to` is exclusive. Set an empty array to clear. |
+| `outsideStyle` | `Partial<style>` | — | Style of the points outside every brush range. Used only while at least one range is set. |
+
+`style` is `{ lineColor, topColor, bottomColor, lineWidth }` — the same four
+properties as the base style, and each one optional.
 
 ## Notes
 
 - A point inside a brush range is drawn with that range's style; if ranges
   overlap, the first matching range wins.
 - The fill is a vertical gradient from `bottomColor` at `basePrice` to
-  `topColor` at the line, per style.
+  `topColor` at the line, per style. When `basePrice` falls outside the
+  visible price range, the fill reaches the edge of the pane.
 - The example disables chart scrolling and scaling (`handleScroll`,
   `handleScale`) so that dragging brushes instead of panning; decide which
   gesture your chart should own.
