@@ -102,6 +102,20 @@ Each data point is `{ time, values: number[] }`. Points with an empty or
 missing `values` array are treated as whitespace. The series' price line and
 last-value label follow the column total.
 
+Values are stacked from `base` (`0` by default): a positive value continues
+away from the base, a negative one comes back towards it and past it, so a
+mixed point stays contiguous and never overlaps. Values which are not finite
+are skipped without shifting the segments above them.
+
+A point may override the series colours for its own segments:
+
+```js
+series.setData([
+    { time: '2024-04-22', values: [12, 8, 5] },
+    { time: '2024-04-23', values: [14, 7, 6], colors: ['#000000', undefined, '#BBBBBB'] },
+]);
+```
+
 Options can be changed at runtime with `series.applyOptions({ ... })`.
 
 ## Options
@@ -112,17 +126,45 @@ In addition to the standard
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `colors` | `string[]` | `['#2962FF', '#E1575A', '#F28E2C', 'rgb(164, 89, 209)', 'rgb(27, 156, 133)']` | Fill color of each segment, in stacking order. If there are more values than colors, the colors repeat. |
+| `colors` | `string[]` | `['#2962FF', '#E1575A', '#F28E2C', 'rgb(164, 89, 209)', 'rgb(27, 156, 133)']` | Fill color of each segment, in stacking order. If there are more values than colors, the colors repeat. An empty array falls back to this default. |
+| `base` | `number` | `0` | Price the columns are stacked from. |
+| `columnWidthMode` | `'histogram' \| 'percent'` | `'histogram'` | `histogram` uses the width the built-in histogram series uses (as wide as the bar spacing allows, with a one pixel gap); `percent` uses a share of the bar spacing, given by `widthPercent`. |
+| `widthPercent` | `number` | `80` | Column width as a percentage of the bar spacing, `0`–`100`. Only used when `columnWidthMode` is `percent`. |
+| `segmentBorderColor` | `string` | `'#FFFFFF'` | Color of the border drawn inside the edge of every segment. |
+| `segmentBorderWidth` | `number` | `0` | Width of the segment border in pixels. `0` draws no border. |
+| `radius` | `number` | `0` | Corner radius of the two ends of a column, in pixels. |
+| `stackOrder` | `'normal' \| 'reverse'` | `'normal'` | `normal` puts `values[0]` closest to the base; `reverse` puts the last value there. Colors stay with their value. |
+| `percent` | `boolean` | `false` | Scale every point so that its segments total 100 in absolute terms, giving a 100% stacked chart. |
+
+Per-point overrides, on the data item:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `colors` | `(string \| undefined)[]` | Fill color of each segment of this point. A missing or `undefined` entry falls back to the series color for that segment. |
 
 The standard `color` option is not used for the segments; it colors the
 series' price line.
 
 ## Notes
 
-- Column width follows the bar spacing, with a small gap between columns; there
-  is no separate width option. Set `timeScale.minBarSpacing` (as in the example
-  above) to keep columns from collapsing when the user zooms out.
-- The price scale autoscales from `0` to the column total, so the whole column
-  is always in view.
-- Negative values are stacked arithmetically and will overlap the segments
-  below them; the series is designed for non-negative parts of a whole.
+- Column width follows the bar spacing by default, with a small gap between
+  columns. Set `timeScale.minBarSpacing` (as in the example above) to keep
+  columns from collapsing when the user zooms out, or switch to
+  `columnWidthMode: 'percent'` for a fixed share of the slot.
+- The price scale autoscales over the whole run of the stack, not just its
+  total, so a column containing negative values stays fully in view.
+- Autoscaling is computed from the raw `values` measured from zero, because the
+  library asks for those values before the series options are known. With
+  `percent: true`, or a `base` other than `0`, supply the range yourself:
+
+  ```js
+  series.applyOptions({
+      percent: true,
+      autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }),
+  });
+  ```
+
+- On `lightweight-charts` 5.1 and later the series reports the hovered segment
+  through `hitTest` (the `objectId` is the index of the value within the point)
+  and dims the other segments while one is hovered, and conflated points are
+  merged by summing each band. On 5.0.0 those hooks are simply never called.

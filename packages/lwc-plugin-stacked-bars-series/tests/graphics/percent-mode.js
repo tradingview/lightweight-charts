@@ -4,7 +4,13 @@ function generateData() {
 	for (let i = 0; i < 40; ++i) {
 		res.push({
 			time: time.getTime() / 1000,
-			values: [10 + (i % 5), -(4 + (i % 3)), 3 + (i % 4)],
+			// Totals vary a lot; in percent mode every column is the same height
+			// and only the shares change.
+			values: [
+				(10 + (i % 5)) * (1 + (i % 9)),
+				(5 + (i % 7) * 2) * (1 + (i % 9)),
+				(3 + (i % 4) * 3) * (1 + (i % 9)),
+			],
 		});
 		time.setUTCDate(time.getUTCDate() + 1);
 	}
@@ -16,10 +22,12 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		timeScale: { minBarSpacing: 3 },
 	}));
-	// Negative values stack downwards from the base: the second segment is
-	// drawn back down from the top of the first, the third continues up from
-	// there, and the autoscale covers the whole run rather than just the total.
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {});
+	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {
+		percent: true,
+		autoscaleInfoProvider: () => ({
+			priceRange: { minValue: 0, maxValue: 100 },
+		}),
+	});
 	series.setData(generateData());
 	chart.timeScale().fitContent();
 }

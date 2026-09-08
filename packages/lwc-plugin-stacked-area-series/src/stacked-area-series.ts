@@ -1,13 +1,18 @@
 import {
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
+	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
 	Time,
 } from 'lightweight-charts';
+import { stackedPlotValues } from '@tradingview/lwc-toolkit/custom-series/stacking';
+
+import { StackedAreaConflationContext } from './compat';
 import { StackedAreaSeriesOptions, defaultOptions } from './options';
 import { StackedAreaSeriesRenderer } from './renderer';
 import { StackedAreaData } from './data';
+import { paddedValues, sumValues } from './stack';
 
 export class StackedAreaSeries<
 	HorzScaleItem = Time,
@@ -20,22 +25,38 @@ export class StackedAreaSeries<
 		this._renderer = new StackedAreaSeriesRenderer();
 	}
 
+	/**
+	 * Reports the extremes of the stack as well as its total, so that a point
+	 * containing negative values — whose bands are drawn back down towards the
+	 * base — stays fully in view.
+	 */
 	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
-		return [
-			0,
-			plotRow.values.reduce(
-				(previousValue, currentValue) => previousValue + currentValue,
-				0
-			),
-		];
+		return stackedPlotValues(
+			paddedValues(plotRow.values, plotRow.values.length)
+		);
 	}
 
 	public isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> {
 		return !Boolean((data as Partial<TData>).values?.length);
 	}
 
-	public renderer(): StackedAreaSeriesRenderer<HorzScaleItem, TData> {
+	public renderer(): ICustomSeriesPaneRenderer {
 		return this._renderer;
+	}
+
+	/**
+	 * Merges two points into one when the chart conflates the data: each band
+	 * is the sum of the two. Optional on `ICustomSeriesPaneView` from
+	 * `lightweight-charts` 5.1; older hosts simply never call it.
+	 */
+	public conflationReducer(
+		item1: StackedAreaConflationContext<TData>,
+		item2: StackedAreaConflationContext<TData>
+	): TData {
+		return {
+			...item1.data,
+			values: sumValues(item1.data.values, item2.data.values),
+		};
 	}
 
 	public update(
@@ -51,5 +72,11 @@ export class StackedAreaSeries<
 }
 
 export type { StackedAreaData } from './data';
-export type { StackedAreaSeriesOptions } from './options';
+export type {
+	StackedAreaColor,
+	StackedAreaGapHandling,
+	StackedAreaLineType,
+	StackedAreaPointColor,
+	StackedAreaSeriesOptions,
+} from './options';
 export { defaultOptions } from './options';

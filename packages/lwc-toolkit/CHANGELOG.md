@@ -33,9 +33,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `CustomSeriesDrawArgs`
   - `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`,
     `extendRange`, `visibleSegments`
-  - `custom-series/stacking` — `cumulativeSum`, `stackedPlotValues`
-  - `custom-series/line-paths` — `buildLinePath`, `areaBetween`,
-    `strokeStyledPolyline`
+  - `custom-series/stacking` — `cumulativeSum`, `stackLevels`,
+    `stackedPlotValues`
+  - `custom-series/line-paths` — `buildLinePath`, `buildStepLinePath`,
+    `areaBetween`, `strokeStyledPolyline`
   - `canvas/round-rect` — `drawRoundRect`, `drawRoundRectWithBorder`,
     `clampCornerRadius`, `CornerRadii`
   - `line-style` — `setLineStyle`, `getDashPattern`, `LineStyle`

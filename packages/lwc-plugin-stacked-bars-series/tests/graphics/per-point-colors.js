@@ -1,11 +1,17 @@
 function generateData() {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (let i = 0; i < 40; ++i) {
-		res.push({
+	for (let i = 0; i < 20; ++i) {
+		const point = {
 			time: time.getTime() / 1000,
-			values: [10 + (i % 5), -(4 + (i % 3)), 3 + (i % 4)],
-		});
+			values: [10 + (i % 5), 5 + (i % 3) * 2, 3 + (i % 4)],
+		};
+		if (i % 4 === 0) {
+			// Highlight every fourth point: the middle segment keeps the
+			// series colour, the other two are overridden.
+			point.colors = ['#111111', undefined, '#BBBBBB'];
+		}
+		res.push(point);
 		time.setUTCDate(time.getUTCDate() + 1);
 	}
 	return res;
@@ -16,9 +22,6 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		timeScale: { minBarSpacing: 3 },
 	}));
-	// Negative values stack downwards from the base: the second segment is
-	// drawn back down from the top of the first, the third continues up from
-	// there, and the autoscale covers the whole run rather than just the total.
 	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {});
 	series.setData(generateData());
 	chart.timeScale().fitContent();

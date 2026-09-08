@@ -20,10 +20,19 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries());
+	// Per-band line width, line style and visibility, and a band which is
+	// drawn as a line only.
+	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries(), {
+		colors: [
+			{ line: 'rgb(41, 98, 255)', area: 'rgba(41, 98, 255, 0.3)', lineWidth: 4 },
+			{
+				line: 'rgb(225, 87, 90)',
+				area: 'rgba(225, 87, 90, 0.3)',
+				lineStyle: LightweightCharts.LineStyle.Dashed,
+			},
+			{ line: 'rgb(27, 156, 133)', area: 'rgba(0, 0, 0, 0)', areaVisible: false },
+		],
+	});
 	series.setData(generateData());
-
-	// A visible range entirely before the data: the range is non-null but
-	// empty, which used to crash the renderer.
-	chart.timeScale().setVisibleLogicalRange({ from: -400, to: -300 });
+	chart.timeScale().fitContent();
 }

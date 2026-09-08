@@ -116,10 +116,30 @@ series.setData([
 ]);
 ```
 
-Each data point is `{ time, values: number[] }`. Every point should carry the
-same number of values. Points with an empty or missing `values` array are
-treated as whitespace. The series' price line and last-value label follow the
-stack total.
+Each data point is `{ time, values: number[] }`. Points do not have to carry
+the same number of values: a point with fewer values is padded with zeroes, so
+its missing bands collapse onto the one below them. Points with an empty or
+missing `values` array are treated as whitespace. The series' price line and
+last-value label follow the stack total.
+
+Values are stacked from `base` (`0` by default): a positive value continues
+away from the base, a negative one comes back towards it and past it, so each
+band is a single ribbon between two lines and never folds over itself.
+
+A point may override the colours of its own bands:
+
+```js
+series.setData([
+    { time: '2024-04-22', values: [12, 8, 5] },
+    {
+        time: '2024-04-23',
+        values: [14, 7, 6],
+        colors: [{ line: '#000000', area: 'rgba(0, 0, 0, 0.2)' }],
+    },
+]);
+```
+
+An override applies to the piece of the band which starts at that point.
 
 Options can be changed at runtime with `series.applyOptions({ ... })`.
 
@@ -131,14 +151,57 @@ In addition to the standard
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `colors` | `{ line: string; area: string }[]` | five preset pairs (blue, red, orange, purple, teal); in each pair the area is the line color at 20% opacity | Line and fill color for each band, in stacking order. If there are more values than colors, the colors repeat. |
+| `colors` | `StackedAreaColor[]` | five preset pairs (blue, red, orange, purple, teal); in each pair the area is the line color at 20% opacity | Appearance of each band, in stacking order. If there are more values than entries, the entries repeat. An empty array falls back to this default. |
 | `lineWidth` | `LineWidth` | `2` | Width of the band lines, in CSS pixels (`1`–`4`). |
+| `lineStyle` | `LineStyle` | `LineStyle.Solid` | Style of the band lines. |
+| `lineVisible` | `boolean` | `true` | Whether the band lines are drawn. |
+| `areaVisible` | `boolean` | `true` | Whether the bands are filled. |
+| `base` | `number` | `0` | Price the bands are stacked from. |
+| `lineType` | `'simple' \| 'step' \| 'curved'` | `'simple'` | How the points of a band are joined: straight lines, a value held until the next point, or a smooth curve. |
+| `gapHandling` | `'break' \| 'bridge'` | `'break'` | Whether the bands stop at a whitespace gap and start again after it, or are drawn straight across it. |
+| `percent` | `boolean` | `false` | Scale every point so that its bands total 100 in absolute terms, giving a 100% stacked chart. |
+
+Each entry of `colors` is a `StackedAreaColor`, which may also override the
+series-wide line options for that band:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `line` | `string` | Color of the line along the top of the band. |
+| `area` | `string` | Fill color of the band, or the top of its gradient when `areaBottom` is set. |
+| `areaBottom` | `string` (optional) | Bottom color of the band's gradient. |
+| `lineWidth` | `LineWidth` (optional) | Width of this band's line. |
+| `lineStyle` | `LineStyle` (optional) | Style of this band's line. |
+| `lineVisible` | `boolean` (optional) | Whether this band's line is drawn. |
+| `areaVisible` | `boolean` (optional) | Whether this band is filled. |
+
+Per-point overrides, on the data item:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `colors` | `StackedAreaPointColor[]` | `line`, `area` and `areaBottom` for each band at this point. Anything missing falls back to the series color. |
 
 ## Notes
 
-- The price scale autoscales from `0` to the stack total, so the whole stack is
-  always in view. The top line sits exactly on the edge of the range; add a
-  small `scaleMargins.top` on the price scale (as in the example above) if you
-  want breathing room above it.
-- Negative values are stacked arithmetically and will overlap the bands below
-  them; the series is designed for non-negative parts of a whole.
+- The price scale autoscales over the whole run of the stack, not just its
+  total, so a point containing negative values stays fully in view. The
+  outermost line sits exactly on the edge of the range; add a small
+  `scaleMargins` on the price scale (as in the example above) if you want
+  breathing room around it.
+- Autoscaling is computed from the raw `values` measured from zero, because the
+  library asks for those values before the series options are known. With
+  `percent: true`, or a `base` other than `0`, supply the range yourself:
+
+  ```js
+  series.applyOptions({
+      percent: true,
+      autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }),
+  });
+  ```
+
+- Whitespace never reaches a custom series renderer, so a gap is detected from
+  the jump in the logical index of the points either side of it. `gapHandling`
+  decides what happens there.
+- On `lightweight-charts` 5.1 and later the series reports the hovered band
+  through `hitTest` (the `objectId` is the index of the band) and dims the
+  other bands while one is hovered, and conflated points are merged by summing
+  each band. On 5.0.0 those hooks are simply never called.

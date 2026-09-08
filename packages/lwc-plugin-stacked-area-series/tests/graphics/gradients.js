@@ -20,10 +20,26 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries());
+	// A vertical gradient across each band.
+	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries(), {
+		colors: [
+			{
+				line: 'rgb(41, 98, 255)',
+				area: 'rgba(41, 98, 255, 0.6)',
+				areaBottom: 'rgba(41, 98, 255, 0.05)',
+			},
+			{
+				line: 'rgb(225, 87, 90)',
+				area: 'rgba(225, 87, 90, 0.6)',
+				areaBottom: 'rgba(225, 87, 90, 0.05)',
+			},
+			{
+				line: 'rgb(242, 142, 44)',
+				area: 'rgba(242, 142, 44, 0.6)',
+				areaBottom: 'rgba(242, 142, 44, 0.05)',
+			},
+		],
+	});
 	series.setData(generateData());
-
-	// A visible range entirely before the data: the range is non-null but
-	// empty, which used to crash the renderer.
-	chart.timeScale().setVisibleLogicalRange({ from: -400, to: -300 });
+	chart.timeScale().fitContent();
 }

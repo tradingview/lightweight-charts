@@ -5,9 +5,41 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Lightweight Charts - StackedBars Series Plugin Example</title>
 		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				align-items: center;
+				margin-block: 12px;
+				font-size: 14px;
+			}
+			#controls label {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="chart"></div>
+		<div class="column" id="controls">
+			<label>
+				Width
+				<select id="width-mode">
+					<option value="histogram">histogram</option>
+					<option value="percent">percent</option>
+				</select>
+			</label>
+			<label>
+				<input id="percent-mode" type="checkbox" />
+				100% stacked
+			</label>
+			<label>
+				Radius
+				<input id="radius" type="range" min="0" max="8" step="1" value="0" />
+			</label>
+		</div>
 		<div id="description">
 			<h1>Stacked Bars Series</h1>
 			<p>
@@ -16,6 +48,10 @@
 				other. Each segment represents the contribution of a different variable
 				to the total length of the bar, allowing for visual comparison of both
 				the individual and cumulative values.
+			</p>
+			<p class="hint-message">
+				The data has a whitespace gap and a stretch of negative values, which
+				are stacked downwards from the base.
 			</p>
 		</div>
 		<script type="module" src="./example.ts"></script>
