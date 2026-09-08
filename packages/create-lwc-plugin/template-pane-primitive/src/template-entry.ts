@@ -1,4 +1,5 @@
-import { IPanePrimitive, IPanePrimitivePaneView, PaneAttachedParameter, Time } from 'lightweight-charts';
+import { IPanePrimitivePaneView, Time } from 'lightweight-charts';
+import { PanePluginBase } from '@tradingview/lwc-toolkit/pane-plugin-base';
 import { _CLASSNAME_Options, defaultOptions } from './options';
 import { _CLASSNAME_PaneView } from './pane-view';
 
@@ -8,12 +9,16 @@ import { _CLASSNAME_PaneView } from './pane-view';
  * Pane primitives are attached to a pane rather than to a series, so they are
  * a good fit for pane-level decoration: titles, badges, legends, watermarks.
  */
-export class _CLASSNAME_<T = Time> implements IPanePrimitive<T> {
+export class _CLASSNAME_<T = Time> extends PanePluginBase<T> {
 	private _options: _CLASSNAME_Options;
 	private _paneViews: _CLASSNAME_PaneView[];
-	private _requestUpdate?: () => void;
 
 	constructor(options: Partial<_CLASSNAME_Options> = {}) {
+		//* PanePluginBase implements the attached / detached lifecycle hooks: it
+		//* keeps the chart (this.chart) and provides this.requestUpdate(). Override
+		//* attached() / detached() — calling super — if the primitive needs to
+		//* acquire and release anything of its own.
+		super();
 		this._options = {
 			...defaultOptions,
 			...options,
@@ -31,17 +36,6 @@ export class _CLASSNAME_<T = Time> implements IPanePrimitive<T> {
 		return this._paneViews;
 	}
 
-	attached({ requestUpdate }: PaneAttachedParameter<T>): void {
-		//* Attached lifecycle hook. Keep hold of requestUpdate so the primitive
-		//* can ask the chart to redraw when its own state changes.
-		this._requestUpdate = requestUpdate;
-	}
-
-	detached(): void {
-		//* Detached lifecycle hook. Release anything acquired in attached().
-		this._requestUpdate = undefined;
-	}
-
 	public get options(): _CLASSNAME_Options {
 		return this._options;
 	}
@@ -49,6 +43,7 @@ export class _CLASSNAME_<T = Time> implements IPanePrimitive<T> {
 	applyOptions(options: Partial<_CLASSNAME_Options>) {
 		this._options = { ...this._options, ...options };
 		this.updateAllViews();
-		this._requestUpdate?.();
+		//* Ask the chart to redraw. Does nothing while the primitive is detached.
+		this.requestUpdate();
 	}
 }
