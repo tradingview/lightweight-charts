@@ -30,6 +30,13 @@ pnpm install
 
 There are several included e2e tests available which can be run individually. Please have a read through the following document for further information: [/tests/README.md](./tests/README.md)
 
+### Plugin package tests
+
+The plugin packages are tested by the same runners as the library, so there is no per-package test script:
+
+- Unit tests live in `packages/<package>/tests/unit/*.spec.ts` (node:test + chai, importing from `../../src/`), and `pnpm test` runs them together with the library's. A package with unit tests has a `tsconfig.tests.json` that its `typecheck` script runs as well, so `plugins:check-compat` typechecks the tests too.
+- Graphics tests live in `packages/lwc-plugin-<name>/tests/graphics/*.js` and run as a fourth part of the CircleCI graphics matrix, comparing each package's standalone build against its merge-base build. A failing plugin graphics job means the rendering changed; inspect the stored screenshots. See [tests/e2e/graphics/README.md](./tests/e2e/graphics/README.md).
+
 ## Scaffolding a plugin package
 
 Official plugins live in their own workspace package under `packages/lwc-plugin-<name>` and are scaffolded with the same tool we recommend to community authors, `create-lwc-plugin`, in its `--workspace` mode:

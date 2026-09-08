@@ -30,6 +30,8 @@ export function serveLocalFiles(
 		if (requestedFile === undefined) {
 			res.sendStatus(404);
 		} else {
+			// Module scripts are fetched with CORS, unlike classic scripts.
+			res.set('Access-Control-Allow-Origin', '*');
 			res.sendFile(requestedFile);
 		}
 	});
