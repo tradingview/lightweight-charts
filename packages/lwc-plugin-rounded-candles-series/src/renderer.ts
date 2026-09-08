@@ -4,15 +4,15 @@ import {
 } from 'fancy-canvas';
 import {
 	ICustomSeriesPaneRenderer,
+	IRange,
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
-	IRange,
-	Time,
 } from 'lightweight-charts';
 import {
 	RoundedCandleSeriesOptions,
 } from './rounded-candles-series';
-import { RoundedCandleSeriesData } from './data';
+import { RoundedCandleData } from './data';
+import { resolveRadius } from './radius';
 import { candlestickWidth } from '@tradingview/lwc-toolkit/dimensions/candles';
 import { gridAndCrosshairMediaWidth } from '@tradingview/lwc-toolkit/dimensions/crosshair-width';
 import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
@@ -26,13 +26,15 @@ interface BarItem {
 	isUp: boolean;
 }
 
-export class RoundedCandleSeriesRenderer<TData extends RoundedCandleSeriesData>
-	implements ICustomSeriesPaneRenderer
+export class RoundedCandleSeriesRenderer<
+	HorzScaleItem,
+	TData extends RoundedCandleData<HorzScaleItem>
+> implements ICustomSeriesPaneRenderer
 {
-	_data: PaneRendererCustomData<Time, TData> | null = null;
-	_options: RoundedCandleSeriesOptions | null = null;
+	private _data: PaneRendererCustomData<HorzScaleItem, TData> | null = null;
+	private _options: RoundedCandleSeriesOptions | null = null;
 
-	draw(
+	public draw(
 		target: CanvasRenderingTarget2D,
 		priceConverter: PriceToCoordinateConverter
 	): void {
@@ -41,15 +43,15 @@ export class RoundedCandleSeriesRenderer<TData extends RoundedCandleSeriesData>
 		);
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: RoundedCandleSeriesOptions
 	): void {
 		this._data = data;
 		this._options = options;
 	}
 
-	_drawImpl(
+	private _drawImpl(
 		renderingScope: BitmapCoordinatesRenderingScope,
 		priceToCoordinate: PriceToCoordinateConverter
 	): void {
@@ -80,7 +82,7 @@ export class RoundedCandleSeriesRenderer<TData extends RoundedCandleSeriesData>
 			};
 		});
 
-		const radius = this._options.radius(this._data.barSpacing);
+		const radius = resolveRadius(this._options.radius, this._data.barSpacing);
 		this._drawWicks(renderingScope, bars, this._data.visibleRange);
 		this._drawCandles(renderingScope, bars, this._data.visibleRange, radius);
 	}
