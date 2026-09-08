@@ -153,7 +153,11 @@
     "e2e:coverage": "esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js",
     "e2e:graphics:plugins": "esno ./tests/e2e/graphics/plugins-runner.ts ./dist/lightweight-charts.standalone.development.mjs ./dist/lightweight-charts.standalone.development.mjs --golden-plugins-dir ./packages",
     "e2e:interactions": "esno ./tests/e2e/interactions/runner.ts ./dist/lightweight-charts.standalone.development.js",
-    "e2e:memleaks": "esno ./tests/e2e/memleaks/runner.ts ./dist/lightweight-charts.standalone.development.js"
+    "e2e:memleaks": "esno ./tests/e2e/memleaks/runner.ts ./dist/lightweight-charts.standalone.development.js",
+    "plugins:build-tests": "pnpm build:prod && pnpm --filter @tradingview/lwc-toolkit --filter \"@tradingview/lwc-plugin-*\" build",
+    "plugins:type-tests": "node scripts/plugins/type-tests.mjs",
+    "plugins:test-regressions": "node --import tsx scripts/plugins/test-regressions.mjs",
+    "plugins:test-ci": "node --test tests/plugin-regressions/ci.spec.mjs"
   },
   "packageManager": "pnpm@10.34.5+sha512.a4ee05f2f73658255bd6a89859c065a45c28a57daefae2c893a168ee2b73168c37b91e83e57ea67654ad03f03031746430e8bce38e362e042605fb8abc80192e"
 }

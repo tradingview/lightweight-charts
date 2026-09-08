@@ -21,6 +21,7 @@ export function generatePluginPageContent(
 ): string {
 	return pluginPageContent
 		.replace('//RESIZE_OBSERVER_POLYFILL', resizeObserverPolyfill)
+		.replace('//PLUGIN_REGRESSION_HELPERS', fs.readFileSync(path.join(currentDirectory, 'helpers', 'plugin-regression-helpers.js'), 'utf8'))
 		.replace('PATH_TO_STANDALONE_MODULE', libraryModulePath)
 		.split('PLUGIN_PACKAGE_NAME').join(pluginPackageName)
 		.replace('PATH_TO_PLUGIN_MODULE', pluginModulePath)
