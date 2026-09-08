@@ -107,6 +107,12 @@ Each data point is `{ time, open, high, low, close }` — the same shape as the
 built-in candlestick series. Points without a `close` are treated as
 whitespace.
 
+A constant `radius` fixes the corner rounding regardless of zoom:
+
+```js
+series.applyOptions({ radius: 6 });
+```
+
 Options can be changed at runtime with `series.applyOptions({ ... })`.
 
 ## Options
@@ -121,7 +127,7 @@ In addition to the standard
 | `downColor` | `string` | `'#ef5350'` | Body color of down candles. |
 | `wickUpColor` | `string` | `'#26a69a'` | Wick color of up candles. |
 | `wickDownColor` | `string` | `'#ef5350'` | Wick color of down candles. |
-| `radius` | `(barSpacing: number) => number` | `bs => bs < 4 ? 0 : bs / 3` | Corner radius of the candle body, in CSS pixels, computed from the current bar spacing. Return `0` for square candles. |
+| `radius` | `number \| ((barSpacing: number) => number)` | `bs => bs < 4 ? 0 : bs / 3` | Corner radius of the candle body, in CSS pixels. Either a constant, or a function of the current bar spacing. Use `0` for square candles. |
 
 ## Notes
 
@@ -129,5 +135,9 @@ In addition to the standard
   **previous candle's close**, not its own open. This differs from the built-in
   candlestick series, which compares close with open.
 - Wicks are always drawn, one pixel wide, in `wickUpColor` / `wickDownColor`.
+- The series accepts the whole set of built-in candlestick options, but the
+  renderer does not use all of them yet: `borderVisible`, `borderColor`,
+  `borderUpColor` and `borderDownColor` are accepted and no border is drawn,
+  and `wickVisible` and `wickColor` are accepted and ignored.
 - Rounded corners use `CanvasRenderingContext2D.roundRect`; in browsers without
   it the series falls back to square candles.

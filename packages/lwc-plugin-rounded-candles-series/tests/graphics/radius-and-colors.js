@@ -23,10 +23,10 @@ function runTestCase(container) {
 		timeScale: { barSpacing: 28 },
 	}));
 	const series = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {
-		// A fixed, deliberately large radius: bodies become pill shaped.
-		radius: function () {
-			return 10;
-		},
+		// A constant, deliberately large radius: bodies become pill shaped and
+		// stay that way at any bar spacing. The function form is covered by the
+		// default in the other cases.
+		radius: 10,
 		upColor: '#7B1FA2',
 		downColor: '#FBC02D',
 		wickUpColor: '#4A148C',
