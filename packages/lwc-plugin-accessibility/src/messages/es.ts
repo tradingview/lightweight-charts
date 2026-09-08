@@ -33,7 +33,7 @@ export const esMessages: PartialAccessibilityMessages = {
 			? 'Use las flechas izquierda y derecha para moverse entre los puntos de datos, y las flechas arriba y abajo para cambiar de serie.'
 			: 'Use las flechas izquierda y derecha para moverse entre los puntos de datos.',
 	help: ({ multiSeries, pageStep }) =>
-		`Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Re Pág salta ${pageStep} puntos adelante, Av Pág ${pageStep} puntos atrás. Inicio y Fin saltan al primer y al último punto. Más y menos acercan y alejan el gráfico. Intro o Espacio lee un resumen de la serie.`,
+		`Controles de teclado. Las flechas izquierda y derecha se mueven entre los puntos de datos. ${multiSeries ? 'Las flechas arriba y abajo cambian de serie. ' : ''}Re Pág salta ${pageStep} puntos adelante, Av Pág ${pageStep} puntos atrás. Inicio y Fin saltan al primer y al último punto. Más y menos acercan y alejan el gráfico. Intro o Espacio lee un resumen de la serie. T muestra los datos como una tabla y Escape la cierra.`,
 	shortcutsHint: 'Pulse H para ver los atajos de teclado',
 	shortcutsTitle: 'Atajos de teclado',
 	shortcuts: ({ multiSeries, pageStep }) => [
@@ -43,7 +43,9 @@ export const esMessages: PartialAccessibilityMessages = {
 		{ keys: 'Inicio / Fin', action: 'Primer / último punto' },
 		{ keys: '+ / −', action: 'Acercar / alejar' },
 		// Intro / Espacio (el resumen hablado) se omite: no tiene efecto visible.
+		{ keys: 'T', action: 'Ver los datos como tabla' },
 		{ keys: 'H', action: 'Mostrar u ocultar este panel' },
+		{ keys: 'Esc', action: 'Cerrar el panel abierto' },
 	],
 	point: ({ position, total, time, label, values }) =>
 		`${label} ${values}, ${time}. Punto ${position} de ${total}.`,
@@ -64,8 +66,21 @@ export const esMessages: PartialAccessibilityMessages = {
 			: '';
 		return `Datos del gráfico actualizados. ${total} series cambiaron. ${shown.join(' ')}.${remaining}`;
 	},
+	visibleRange: ({ from, to, count }) =>
+		`Mostrando ${count} puntos de datos, desde ${from} hasta ${to}.`,
+	markerNote: ({ texts }) =>
+		texts.length === 0 ? '' : ` ${texts.length === 1 ? 'Marcador' : 'Marcadores'}: ${texts.join('; ')}.`,
+	priceLinesNote: ({ lines }) =>
+		lines.length === 0
+			? ''
+			: ` ${lines.length === 1 ? 'Línea de precio' : 'Líneas de precio'}: ${lines.map(line => `${line.title} en ${line.value}`).join(', ')}.`,
+	tableColumns: { time: 'Hora', value: 'Valor', open: 'Apertura', high: 'Máximo', low: 'Mínimo', close: 'Cierre' },
+	tableCaption: ({ label, count, scopeNote }) => `${label}: ${count} puntos de datos${scopeNote}.`,
+	tableTruncated: ({ shown, total }) => `Mostrando las primeras ${shown} de ${total} filas.`,
+	tableClose: 'Pulse Escape o T para cerrar.',
 };
 
 Object.freeze(esMessages.ohlc);
 Object.freeze(esMessages.directions);
+Object.freeze(esMessages.tableColumns);
 Object.freeze(esMessages);

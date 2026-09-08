@@ -43,6 +43,16 @@ export interface OhlcValueArgs {
 	close: string;
 }
 
+/** Column headers of the "view as table" panel. */
+export interface TableColumnLabels {
+	time: string;
+	value: string;
+	open: string;
+	high: string;
+	low: string;
+	close: string;
+}
+
 /** Fields passed to {@link AccessibilityMessages.paneLabel}. */
 export interface PaneLabelArgs {
 	/** The resolved `chartTitle`, or {@link AccessibilityMessages.defaultChartTitle} when it is unset. */
@@ -114,13 +124,28 @@ export interface AccessibilityMessages {
 	seriesUpdate: (args: { label: string; count: number; scopeNote: string; latest: string }) => string;
 	/** Wraps the per-series update summaries into one announcement (`total` >= 1). */
 	dataUpdated: (args: { summaries: readonly string[]; total: number; shownMax: number }) => string;
+	/** Announced on `+` / `-`, and on focus when `announceOnFocus` is set. */
+	visibleRange: (args: { from: string; to: string; count: number }) => string;
+	/** Appended to a point announcement when markers sit on that point. */
+	markerNote: (args: { texts: readonly string[] }) => string;
+	/** Appended to the summary when the active series has price lines. */
+	priceLinesNote: (args: { lines: readonly { title: string; value: string }[] }) => string;
+	/** Column headers of the "view as table" panel. */
+	tableColumns: TableColumnLabels;
+	/** Caption of the table panel, and the announcement made when it opens. */
+	tableCaption: (args: { label: string; count: number; scopeNote: string }) => string;
+	/** Note appended to the caption when the rows were capped by `tableMaxRows`. */
+	tableTruncated: (args: { shown: number; total: number }) => string;
+	/** Hint shown at the foot of the table panel. */
+	tableClose: string;
 }
 
-/** A partial {@link AccessibilityMessages} override: top-level entries and the two string groups are each optional. */
+/** A partial {@link AccessibilityMessages} override: top-level entries and the string groups are each optional. */
 export type PartialAccessibilityMessages =
-	Partial<Omit<AccessibilityMessages, 'ohlc' | 'directions'>> & {
+	Partial<Omit<AccessibilityMessages, 'ohlc' | 'directions' | 'tableColumns'>> & {
 		ohlc?: Partial<OhlcLabels>;
 		directions?: Partial<DirectionLabels>;
+		tableColumns?: Partial<TableColumnLabels>;
 	};
 
 /**
@@ -155,7 +180,7 @@ export const defaultMessages: AccessibilityMessages = {
 			? 'Use the left and right arrow keys to move between data points, and the up and down arrows to switch series.'
 			: 'Use the left and right arrow keys to move between data points.',
 	help: ({ multiSeries, pageStep }): string =>
-		`Keyboard controls. Left and right arrows move between data points. ${multiSeries ? 'Up and down arrows switch between series. ' : ''}Page Up jumps ${pageStep} points forward, Page Down ${pageStep} points back. Home and End jump to the first and last points. Plus and minus zoom the chart in and out. Enter or Space reads a summary of the series.`,
+		`Keyboard controls. Left and right arrows move between data points. ${multiSeries ? 'Up and down arrows switch between series. ' : ''}Page Up jumps ${pageStep} points forward, Page Down ${pageStep} points back. Home and End jump to the first and last points. Plus and minus zoom the chart in and out. Enter or Space reads a summary of the series. T shows the data as a table, and Escape closes it.`,
 	shortcutsHint: 'Press H for keyboard shortcuts',
 	shortcutsTitle: 'Keyboard shortcuts',
 	shortcuts: ({ multiSeries, pageStep }) => [
@@ -166,7 +191,9 @@ export const defaultMessages: AccessibilityMessages = {
 		{ keys: '+ / −', action: 'Zoom in / out' },
 		// Enter / Space (the spoken summary) is intentionally omitted: it has no
 		// on-screen effect, so it stays in `help` (for screen readers) only.
+		{ keys: 'T', action: 'View the data as a table' },
 		{ keys: 'H', action: 'Show or hide this panel' },
+		{ keys: 'Esc', action: 'Close the open panel' },
 	],
 	// Most important information first: the value, then the date; the position
 	// counter is context, so it comes last.
@@ -203,10 +230,24 @@ export const defaultMessages: AccessibilityMessages = {
 			: '';
 		return `Chart data updated. ${total} series changed. ${shown.join(' ')}.${remaining}`;
 	},
+	visibleRange: ({ from, to, count }): string =>
+		`Showing ${count} data points, from ${from} to ${to}.`,
+	markerNote: ({ texts }): string =>
+		texts.length === 0 ? '' : ` ${texts.length === 1 ? 'Marker' : 'Markers'}: ${texts.join('; ')}.`,
+	priceLinesNote: ({ lines }): string =>
+		lines.length === 0
+			? ''
+			: ` ${lines.length === 1 ? 'Price line' : 'Price lines'}: ${lines.map(line => `${line.title} at ${line.value}`).join(', ')}.`,
+	tableColumns: { time: 'Time', value: 'Value', open: 'Open', high: 'High', low: 'Low', close: 'Close' },
+	tableCaption: ({ label, count, scopeNote }): string =>
+		`${label}: ${count} data points${scopeNote}.`,
+	tableTruncated: ({ shown, total }): string => `Showing the first ${shown} of ${total} rows.`,
+	tableClose: 'Press Escape or T to close.',
 };
 
 Object.freeze(defaultMessages.ohlc);
 Object.freeze(defaultMessages.directions);
+Object.freeze(defaultMessages.tableColumns);
 Object.freeze(defaultMessages);
 
 /**
@@ -223,6 +264,7 @@ export function mergeMessages(base: AccessibilityMessages, override?: PartialAcc
 		...override,
 		ohlc: { ...base.ohlc, ...override.ohlc },
 		directions: { ...base.directions, ...override.directions },
+		tableColumns: { ...base.tableColumns, ...override.tableColumns },
 	};
 	// An explicit `undefined` in the override must not erase a default entry.
 	(Object.keys(merged) as (keyof AccessibilityMessages)[]).forEach(key => {
