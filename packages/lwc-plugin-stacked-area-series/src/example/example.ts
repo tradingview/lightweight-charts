@@ -1,6 +1,7 @@
 import { WhitespaceData, createChart } from 'lightweight-charts';
-import { multipleBarData } from '../../../sample-data';
-import { StackedAreaData, StackedAreaSeries } from '@tradingview/lwc-plugin-stacked-area-series';
+import { StackedAreaData } from '../data';
+import { multipleBarData } from './sample-data';
+import { StackedAreaSeries } from '../stacked-area-series';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,

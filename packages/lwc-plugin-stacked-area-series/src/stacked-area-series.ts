@@ -47,3 +47,7 @@ export class StackedAreaSeries<TData extends StackedAreaData>
 		return defaultOptions;
 	}
 }
+
+export type { StackedAreaData } from './data';
+export type { StackedAreaSeriesOptions } from './options';
+export { defaultOptions } from './options';
