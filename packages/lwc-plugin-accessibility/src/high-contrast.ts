@@ -1,12 +1,8 @@
-/** The media queries whose changes flip the `'auto'` high-contrast state. */
-const HIGH_CONTRAST_QUERIES = ['(prefers-contrast: more)', '(forced-colors: active)'];
+import { HIGH_CONTRAST_QUERIES, mediaQueryMatches, subscribeMediaQuery } from '@tradingview/lwc-toolkit/dom/media-query';
 
 /** Whether the OS asks for higher contrast (used by the `'auto'` high-contrast mode). */
 export function prefersHighContrast(): boolean {
-	if (typeof window === 'undefined' || !window.matchMedia) {
-		return false;
-	}
-	return HIGH_CONTRAST_QUERIES.some(query => window.matchMedia(query).matches);
+	return mediaQueryMatches(HIGH_CONTRAST_QUERIES);
 }
 
 /** Resolves the `highContrast` option to a plain boolean. */
@@ -14,26 +10,20 @@ export function resolveHighContrast(option: boolean | 'auto'): boolean {
 	return option === 'auto' ? prefersHighContrast() : option;
 }
 
-/** Subscribes to the OS contrast queries that drive `highContrast: 'auto'`. */
+/**
+ * Subscribes to the OS contrast queries that drive `highContrast: 'auto'`. The
+ * toolkit shares one `MediaQueryList` per query across every pane and chart, so
+ * this costs one listener per pane rather than one list per pane.
+ */
 export class HighContrastWatcher {
-	private _media: MediaQueryList[] = [];
-	private readonly _onChange: () => void;
+	private _unsubscribe: () => void;
 
 	public constructor(onChange: () => void) {
-		this._onChange = (): void => onChange();
-		if (typeof window === 'undefined' || !window.matchMedia) {
-			return;
-		}
-		this._media = HIGH_CONTRAST_QUERIES.map(query => window.matchMedia(query));
-		for (const media of this._media) {
-			media.addEventListener('change', this._onChange);
-		}
+		this._unsubscribe = subscribeMediaQuery(HIGH_CONTRAST_QUERIES, () => onChange());
 	}
 
 	public dispose(): void {
-		for (const media of this._media) {
-			media.removeEventListener('change', this._onChange);
-		}
-		this._media = [];
+		this._unsubscribe();
+		this._unsubscribe = (): void => {};
 	}
 }

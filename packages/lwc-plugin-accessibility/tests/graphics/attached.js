@@ -33,5 +33,16 @@ function runTestCase(container) {
 		chartTitle: 'Deterministic two-series chart',
 	});
 
-	return waitFrames(4);
+	return waitFrames(4).then(() => {
+		// Every canvas – the panes' and the axes' – must be out of the
+		// accessibility tree while the plugin is attached.
+		const canvases = Array.from(container.querySelectorAll('canvas'));
+		if (canvases.length === 0) {
+			throw new Error('the chart drew no canvases');
+		}
+		const visible = canvases.filter(canvas => canvas.getAttribute('aria-hidden') !== 'true');
+		if (visible.length > 0) {
+			throw new Error(`${visible.length} canvas(es) were left in the accessibility tree`);
+		}
+	});
 }

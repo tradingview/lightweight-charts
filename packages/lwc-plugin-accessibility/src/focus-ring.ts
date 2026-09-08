@@ -1,6 +1,7 @@
 import { IChartApiBase, Time } from 'lightweight-charts';
 
 import { extractValue } from './describe';
+import { ValueAccessor } from './options';
 import { AnySeries, SeriesDataPoint } from './types';
 
 /** How the visible focus indicator and the pane's focus outline are drawn. */
@@ -60,9 +61,11 @@ export function focusRingCoordinate(
 	chart: IChartApiBase<Time> | null,
 	series: AnySeries | null,
 	point: SeriesDataPoint | undefined,
-	visible: boolean
+	visible: boolean,
+	/** The `valueAccessor` option, so a custom series' points can be placed too. */
+	accessor?: ValueAccessor
 ): { x: number; y: number } | null {
-	const value = extractValue(point);
+	const value = extractValue(point, series, accessor);
 	if (!chart || !series || !point || value === undefined || !visible) {
 		return null;
 	}

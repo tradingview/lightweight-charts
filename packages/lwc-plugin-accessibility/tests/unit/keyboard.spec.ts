@@ -1,45 +1,78 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import { commandForKey } from '../../src/keyboard';
+import { AccessibilityCommand, KeyBindings, commandForKey } from '../../src/keyboard';
+
+function press(key: string, extra: { code?: string; shiftKey?: boolean } = {}, bindings?: KeyBindings): AccessibilityCommand | null {
+	return commandForKey({ key, ...extra }, bindings);
+}
 
 void describe('commandForKey', () => {
 	void it('maps the arrow keys to point and series moves', () => {
-		expect(commandForKey('ArrowRight')).to.equal('nextPoint');
-		expect(commandForKey('ArrowLeft')).to.equal('previousPoint');
-		expect(commandForKey('ArrowUp')).to.equal('previousSeries');
-		expect(commandForKey('ArrowDown')).to.equal('nextSeries');
+		expect(press('ArrowRight')).to.equal('nextPoint');
+		expect(press('ArrowLeft')).to.equal('previousPoint');
+		expect(press('ArrowUp')).to.equal('previousSeries');
+		expect(press('ArrowDown')).to.equal('nextSeries');
 	});
 
 	void it('follows the ARIA slider convention for Page Up / Down', () => {
-		expect(commandForKey('PageUp')).to.equal('pageForward');
-		expect(commandForKey('PageDown')).to.equal('pageBack');
+		expect(press('PageUp')).to.equal('pageForward');
+		expect(press('PageDown')).to.equal('pageBack');
 	});
 
 	void it('maps Home and End to the series ends', () => {
-		expect(commandForKey('Home')).to.equal('firstPoint');
-		expect(commandForKey('End')).to.equal('lastPoint');
+		expect(press('Home')).to.equal('firstPoint');
+		expect(press('End')).to.equal('lastPoint');
 	});
 
 	void it('accepts the unshifted zoom aliases', () => {
-		expect(commandForKey('+')).to.equal('zoomIn');
-		expect(commandForKey('=')).to.equal('zoomIn');
-		expect(commandForKey('-')).to.equal('zoomOut');
-		expect(commandForKey('_')).to.equal('zoomOut');
+		expect(press('+')).to.equal('zoomIn');
+		expect(press('=')).to.equal('zoomIn');
+		expect(press('-')).to.equal('zoomOut');
+		expect(press('_')).to.equal('zoomOut');
 	});
 
-	void it('maps Enter, Space and either case of H', () => {
-		expect(commandForKey('Enter')).to.equal('summary');
-		expect(commandForKey(' ')).to.equal('summary');
-		expect(commandForKey('h')).to.equal('help');
-		expect(commandForKey('H')).to.equal('help');
+	void it('maps Enter, Space, either case of H, T and Escape', () => {
+		expect(press('Enter')).to.equal('summary');
+		expect(press(' ')).to.equal('summary');
+		expect(press('h')).to.equal('help');
+		expect(press('H')).to.equal('help');
+		expect(press('t')).to.equal('viewAsTable');
+		expect(press('T')).to.equal('viewAsTable');
+		expect(press('Escape')).to.equal('closePanels');
+	});
+
+	void it('falls back to the physical key on a non-Latin layout', () => {
+		// A Russian layout produces 'р' on the physical H key.
+		expect(press('р', { code: 'KeyH' })).to.equal('help');
+		expect(press('е', { code: 'KeyT' })).to.equal('viewAsTable');
+		// `key` still wins where it maps to something.
+		expect(press('ArrowRight', { code: 'KeyH' })).to.equal('nextPoint');
+	});
+
+	void it('leaves Shift chords to the screen reader, but keeps shifted characters', () => {
+		expect(press('ArrowRight', { shiftKey: true })).to.equal(null);
+		expect(press('Home', { shiftKey: true })).to.equal(null);
+		expect(press('+', { shiftKey: true, code: 'Equal' })).to.equal('zoomIn');
+		expect(press('T', { shiftKey: true, code: 'KeyT' })).to.equal('viewAsTable');
+	});
+
+	void it('lets keyBindings add, replace and remove bindings', () => {
+		const bindings: KeyBindings = { s: 'summary', ArrowRight: 'lastPoint', h: null };
+		expect(press('s', {}, bindings)).to.equal('summary');
+		expect(press('ArrowRight', {}, bindings)).to.equal('lastPoint');
+		expect(press('h', {}, bindings)).to.equal(null);
+		// A code-based binding works too, and does not affect the built-ins.
+		expect(press('ф', { code: 'KeyA' }, { KeyA: 'firstPoint' })).to.equal('firstPoint');
+		expect(press('End', {}, bindings)).to.equal('lastPoint');
 	});
 
 	void it('ignores every other key', () => {
-		expect(commandForKey('Tab')).to.equal(null);
-		expect(commandForKey('a')).to.equal(null);
-		expect(commandForKey('')).to.equal(null);
+		expect(press('Tab')).to.equal(null);
+		expect(press('a')).to.equal(null);
+		expect(press('')).to.equal(null);
 		// Not an inherited Object.prototype member either.
-		expect(commandForKey('toString')).to.equal(null);
+		expect(press('toString')).to.equal(null);
+		expect(press('x', {}, { toString: 'summary' } as unknown as KeyBindings)).to.equal(null);
 	});
 });

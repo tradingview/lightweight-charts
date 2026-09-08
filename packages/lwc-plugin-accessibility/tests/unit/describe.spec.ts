@@ -9,6 +9,7 @@ import {
 	describeSeriesUpdate,
 	describeSummary,
 	describeValues,
+	extractRange,
 	extractValue,
 } from '../../src/describe';
 import { defaultMessages } from '../../src/messages';
@@ -18,8 +19,11 @@ const env: DescribeEnv = {
 	messages: defaultMessages,
 	scopeNote: ' in view',
 	formatValue: (value: number | undefined): string => (value === undefined ? 'no value' : value.toFixed(1)),
+	formatChange: (value: number): string => value.toFixed(1),
 	formatTime: (time: Time): string => `t${String(time)}`,
 	formatPercent: (value: number): string => value.toFixed(2),
+	value: (point: SeriesDataPoint | undefined): number | undefined => extractValue(point),
+	range: (point: SeriesDataPoint | undefined) => extractRange(point),
 };
 
 function valuePoint(time: number, value: number): SeriesDataPoint {
@@ -40,6 +44,25 @@ void describe('extractValue', () => {
 		expect(extractValue({ time: 1 as unknown as Time } as SeriesDataPoint)).to.equal(undefined);
 		expect(extractValue(undefined)).to.equal(undefined);
 	});
+
+	void it('prefers a valueAccessor, ignoring a non-finite result', () => {
+		const custom = { time: 1 as unknown as Time, values: [4, 7] } as unknown as SeriesDataPoint;
+		expect(extractValue(custom, null, point => (point as unknown as { values: number[] }).values[1])).to.equal(7);
+		expect(extractValue(valuePoint(1, 3), null, () => NaN)).to.equal(3);
+	});
+});
+
+void describe('extractRange', () => {
+	void it('reads the high / low band of an OHLC point', () => {
+		const bar = { time: 1 as unknown as Time, open: 1, high: 4, low: 0, close: 3 } as SeriesDataPoint;
+		expect(extractRange(bar)).to.deep.equal({ high: 4, low: 0, open: 1, close: 3 });
+	});
+
+	void it('is undefined for a value point, unless a rangeAccessor supplies one', () => {
+		expect(extractRange(valuePoint(1, 5))).to.equal(undefined);
+		expect(extractRange(valuePoint(1, 5), null, () => ({ high: 9, low: 2 })))
+			.to.deep.equal({ high: 9, low: 2 });
+	});
 });
 
 void describe('defaultTimeFormatter', () => {
@@ -59,6 +82,14 @@ void describe('defaultTimeFormatter', () => {
 
 	void it('passes an unparseable string through verbatim', () => {
 		expect(defaultTimeFormatter('not-a-date' as unknown as Time)).to.equal('not-a-date');
+	});
+
+	void it('adds the time of day for the intraday formats', () => {
+		// 2019-05-15T13:45:30Z
+		const time = 1557927930 as unknown as Time;
+		expect(defaultTimeFormatter(time, 'en-GB', 'dateTime')).to.equal('15 May 2019, 13:45');
+		expect(defaultTimeFormatter(time, 'en-GB', 'seconds')).to.equal('15 May 2019, 13:45:30');
+		expect(defaultTimeFormatter(time, 'en-GB', 'time')).to.equal('13:45');
 	});
 });
 
@@ -103,6 +134,18 @@ void describe('describeSummary', () => {
 			.to.contain('Overall unchanged by 0.0');
 	});
 
+	void it('takes the extremes from the high / low of OHLC points, not the close', () => {
+		const bar = (time: number, low: number, high: number, close: number): SeriesDataPoint =>
+			({ time: time as unknown as Time, open: close, high, low, close } as SeriesDataPoint);
+		const summary = describeSummary(env, [bar(1, 2, 12, 10), bar(2, 5, 9, 8)], 'Price', null);
+		expect(summary).to.contain('Lowest 2.0 on t1, highest 12.0 on t1.');
+	});
+
+	void it('appends the pre-formatted notes', () => {
+		expect(describeSummary(env, [valuePoint(1, 1), valuePoint(2, 2)], 'Price', null, ' Price line: Stop at 3.0.'))
+			.to.contain(' Price line: Stop at 3.0.');
+	});
+
 	void it('ignores whitespace points and falls back to noData', () => {
 		const whitespace = { time: 1 as unknown as Time } as SeriesDataPoint;
 		expect(describeSummary(env, [whitespace], 'Price', null))
@@ -113,24 +156,22 @@ void describe('describeSummary', () => {
 
 void describe('describeSeriesUpdate', () => {
 	void it('reports the scoped count but the newest value', () => {
-		const data = [valuePoint(1, 1), valuePoint(2, 2), valuePoint(3, 99)];
 		const summary = describeSeriesUpdate(env, {
 			label: 'Price',
 			series: null as unknown as AnySeries,
-			data,
+			latest: valuePoint(3, 99),
 			scopedCount: 2,
 		});
 		expect(summary).to.equal('Price, 2 data points in view. Latest 99.0');
 	});
 
-	void it('skips trailing whitespace when looking for the latest value', () => {
-		const data = [valuePoint(1, 5), { time: 2 as unknown as Time } as SeriesDataPoint];
+	void it('says "no value" when the newest point is whitespace', () => {
 		const summary = describeSeriesUpdate(env, {
 			label: 'Price',
 			series: null as unknown as AnySeries,
-			data,
+			latest: { time: 2 as unknown as Time } as SeriesDataPoint,
 			scopedCount: 2,
 		});
-		expect(summary).to.contain('Latest 5.0');
+		expect(summary).to.contain('Latest no value');
 	});
 });
