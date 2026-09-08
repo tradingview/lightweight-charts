@@ -15,21 +15,26 @@ function generateCandleData() {
 	return res;
 }
 
-// The same OHLC data on the built-in candlestick series (pane 0) and on the
-// rounded candle series (pane 1). Both panes must show the same up/down
-// colouring, bar for bar: the plugin decides on `open <= close` like the
-// built-in series does.
+// `hoverDimOpacity`: the screenshoter leaves the pointer in the middle of the
+// pane, so the candle under it stays opaque while the rest of the series is
+// dimmed. Every candle spans the same high/low band, so the pointer is inside
+// one of them wherever the pane is scaled to.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
+		rightPriceScale: { scaleMargins: { top: 0, bottom: 0 } },
 	}));
-	const data = generateCandleData();
-
-	const builtIn = chart.addSeries(LightweightCharts.CandlestickSeries);
-	builtIn.setData(data);
-
-	const rounded = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {}, 1);
-	rounded.setData(data);
-
+	const series = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {
+		hoverDimOpacity: 0.2,
+	});
+	series.setData(generateCandleData().map(point => {
+		return {
+			time: point.time,
+			open: point.open > point.close ? 103 : 97,
+			high: 110,
+			low: 90,
+			close: point.open > point.close ? 97 : 103,
+		};
+	}));
 	chart.timeScale().fitContent();
 }

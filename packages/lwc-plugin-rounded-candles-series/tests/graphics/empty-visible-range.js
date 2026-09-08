@@ -15,21 +15,27 @@ function generateCandleData() {
 	return res;
 }
 
-// The same OHLC data on the built-in candlestick series (pane 0) and on the
-// rounded candle series (pane 1). Both panes must show the same up/down
-// colouring, bar for bar: the plugin decides on `open <= close` like the
-// built-in series does.
+// The candle data sits two years to the left of a second series, and the view
+// is put over that second series, so the candle series' visible range is
+// non-null but empty. The renderer used to read `bars[from]` and throw; the
+// pane must simply come up without candles. `scrollToPosition` and a logical
+// range outside the data are both clamped, so a second series is what makes the
+// range empty.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
 	const data = generateCandleData();
+	const series = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries());
+	series.setData(data);
 
-	const builtIn = chart.addSeries(LightweightCharts.CandlestickSeries);
-	builtIn.setData(data);
+	const later = chart.addSeries(LightweightCharts.LineSeries);
+	later.setData(
+		data.map((point, index) => ({
+			time: point.time + 86400 * 730,
+			value: 100 + index,
+		}))
+	);
 
-	const rounded = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {}, 1);
-	rounded.setData(data);
-
-	chart.timeScale().fitContent();
+	chart.timeScale().setVisibleLogicalRange({ from: 70, to: 110 });
 }

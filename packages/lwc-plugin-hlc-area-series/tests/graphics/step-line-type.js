@@ -12,16 +12,15 @@ function generateData() {
 	return res;
 }
 
-// Zoomed into the middle of the data, so the first and the last visible points
-// are off the pane on either side. The lines and the fills have to run all the
-// way to both edges: the library hands custom series the NON-extended visible
-// range, so a renderer that stops at the outermost visible point leaves a wedge
-// of empty pane at each side.
+// `lineType: 'step'`: the lines and both fills reach each bar horizontally
+// first and then vertically, as the built-in `LineType.WithSteps` does.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.HLCAreaSeries());
+	const series = chart.addCustomSeries(new LwcPlugin.HLCAreaSeries(), {
+		lineType: 'step',
+	});
 	series.setData(generateData());
-	chart.timeScale().setVisibleLogicalRange({ from: 18.5, to: 34.5 });
+	chart.timeScale().fitContent();
 }

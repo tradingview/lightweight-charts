@@ -12,16 +12,18 @@ function generateData() {
 	return res;
 }
 
-// Zoomed into the middle of the data, so the first and the last visible points
-// are off the pane on either side. The lines and the fills have to run all the
-// way to both edges: the library hands custom series the NON-extended visible
-// range, so a renderer that stops at the outermost visible point leaves a wedge
-// of empty pane at each side.
+// Gradient pairs on both fills: each band fades from its top stop at the top of
+// the pane to its bottom stop at the bottom.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.HLCAreaSeries());
+	const series = chart.addCustomSeries(new LwcPlugin.HLCAreaSeries(), {
+		highAreaTopColor: 'rgba(4, 153, 129, 0.8)',
+		highAreaBottomColor: 'rgba(4, 153, 129, 0.05)',
+		lowAreaTopColor: 'rgba(242, 54, 69, 0.05)',
+		lowAreaBottomColor: 'rgba(242, 54, 69, 0.8)',
+	});
 	series.setData(generateData());
-	chart.timeScale().setVisibleLogicalRange({ from: 18.5, to: 34.5 });
+	chart.timeScale().fitContent();
 }

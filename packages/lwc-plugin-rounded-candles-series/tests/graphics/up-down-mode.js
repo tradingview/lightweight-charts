@@ -15,21 +15,26 @@ function generateCandleData() {
 	return res;
 }
 
-// The same OHLC data on the built-in candlestick series (pane 0) and on the
-// rounded candle series (pane 1). Both panes must show the same up/down
-// colouring, bar for bar: the plugin decides on `open <= close` like the
-// built-in series does.
+// The two up/down modes on the same data: `openClose` (pane 0, the default,
+// matching the built-in series) and `previousClose` (pane 1, the behaviour of
+// the plugin before 1.0.0). Individual bars differ between the panes.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
 	const data = generateCandleData();
 
-	const builtIn = chart.addSeries(LightweightCharts.CandlestickSeries);
-	builtIn.setData(data);
+	const openClose = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {
+		upDownMode: 'openClose',
+	});
+	openClose.setData(data);
 
-	const rounded = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), {}, 1);
-	rounded.setData(data);
+	const previousClose = chart.addCustomSeries(
+		new LwcPlugin.RoundedCandleSeries(),
+		{ upDownMode: 'previousClose' },
+		1
+	);
+	previousClose.setData(data);
 
 	chart.timeScale().fitContent();
 }
