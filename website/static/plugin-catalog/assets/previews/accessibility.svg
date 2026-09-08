@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Accessibility plugin preview placeholder">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <rect x="10" y="10" width="300" height="160" rx="10" fill="none"
+        stroke="#7C4DFF" stroke-width="2" stroke-dasharray="8 6" opacity="0.7"/>
+  <polyline points="28,122 70,104 112,114 154,88 196,100 238,74 292,84"
+            fill="none" stroke="#7C4DFF" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="154" cy="88" r="6" fill="#7C4DFF"/>
+  <circle cx="154" cy="88" r="12" fill="none" stroke="#7C4DFF" stroke-width="2.5"/>
+  <g fill="#575757">
+    <rect x="188" y="30" width="70" height="9" rx="4.5" opacity="0.55"/>
+    <rect x="188" y="45" width="46" height="9" rx="4.5" opacity="0.35"/>
+  </g>
+</svg>

@@ -3,7 +3,13 @@
 	"compilerOptions": {
 		"strict": true,
 		"resolveJsonModule": true,
-		"jsx": "react"
+		"jsx": "react",
+		// The preset declares @site/* relative to its own package directory;
+		// redeclare it against the site root so editor and tsc resolve it.
+		"baseUrl": ".",
+		"paths": {
+			"@site/*": ["./*"]
+		}
 	},
 	"include": [
 		"./**/*.ts",

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Stacked Bars Series preview placeholder">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <g>
+    <rect x="36" y="118" width="26" height="36" rx="3" fill="#056656"/>
+    <rect x="36" y="86" width="26" height="28" rx="3" fill="#22ab94"/>
+    <rect x="36" y="62" width="26" height="20" rx="3" fill="#70ccbd"/>
+    <rect x="92" y="106" width="26" height="48" rx="3" fill="#056656"/>
+    <rect x="92" y="70" width="26" height="32" rx="3" fill="#22ab94"/>
+    <rect x="92" y="50" width="26" height="16" rx="3" fill="#70ccbd"/>
+    <rect x="148" y="124" width="26" height="30" rx="3" fill="#056656"/>
+    <rect x="148" y="96" width="26" height="24" rx="3" fill="#22ab94"/>
+    <rect x="148" y="74" width="26" height="18" rx="3" fill="#70ccbd"/>
+    <rect x="204" y="98" width="26" height="56" rx="3" fill="#056656"/>
+    <rect x="204" y="60" width="26" height="34" rx="3" fill="#22ab94"/>
+    <rect x="204" y="38" width="26" height="18" rx="3" fill="#70ccbd"/>
+    <rect x="260" y="112" width="26" height="42" rx="3" fill="#056656"/>
+    <rect x="260" y="82" width="26" height="26" rx="3" fill="#22ab94"/>
+    <rect x="260" y="58" width="26" height="20" rx="3" fill="#70ccbd"/>
+  </g>
+</svg>

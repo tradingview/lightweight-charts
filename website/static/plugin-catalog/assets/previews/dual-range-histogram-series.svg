@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Dual Range Histogram Series preview placeholder">
+  <line x1="16" y1="90" x2="304" y2="90" stroke="#c9c9c9" stroke-width="1.5"/>
+  <g fill="#ff9800">
+    <rect x="36" y="52" width="18" height="34" rx="3"/>
+    <rect x="70" y="38" width="18" height="48" rx="3"/>
+    <rect x="104" y="60" width="18" height="26" rx="3"/>
+    <rect x="138" y="30" width="18" height="56" rx="3"/>
+    <rect x="172" y="48" width="18" height="38" rx="3"/>
+    <rect x="206" y="64" width="18" height="22" rx="3"/>
+    <rect x="240" y="42" width="18" height="44" rx="3"/>
+    <rect x="274" y="56" width="18" height="30" rx="3"/>
+  </g>
+  <g fill="#ffcc80">
+    <rect x="36" y="94" width="18" height="26" rx="3"/>
+    <rect x="70" y="94" width="18" height="40" rx="3"/>
+    <rect x="104" y="94" width="18" height="20" rx="3"/>
+    <rect x="138" y="94" width="18" height="52" rx="3"/>
+    <rect x="172" y="94" width="18" height="30" rx="3"/>
+    <rect x="206" y="94" width="18" height="44" rx="3"/>
+    <rect x="240" y="94" width="18" height="24" rx="3"/>
+    <rect x="274" y="94" width="18" height="36" rx="3"/>
+  </g>
+</svg>
