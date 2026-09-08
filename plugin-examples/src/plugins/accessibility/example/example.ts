@@ -86,6 +86,9 @@ const contrastButton = document.querySelector('#contrast-button');
 const accessibility = addAccessibilityPlugin(chart, {
 	chartTitle: paneIndex => paneIndex === 0 ? 'Sample price chart' : 'Sample volume chart',
 	showShortcuts: true,
+	// 'active' (the default) announces updates only for the pane the user focused
+	// last; the streamed bars below are coalesced over this window.
+	dataUpdates: { mode: 'active', debounceMs: 1500 },
 	// highContrast defaults to 'auto' (follows the OS); the button below overrides it.
 	onHighContrastChange: enabled => {
 		highContrast = enabled;
