@@ -8,6 +8,9 @@ function generateData() {
 	return res;
 }
 
+// `snap: 'nearest'` places a line whose time is not a bar of the chart on the
+// closest bar instead of dropping it: the same two times as
+// `time-not-in-data.js`, which draws nothing at all with the default 'exact'.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -16,19 +19,18 @@ function runTestCase(container) {
 	const data = generateData();
 	series.setData(data);
 
-	// A time between two bars: not a bar of the series, so with the default
-	// `snap: 'exact'` there is no coordinate for the line, and the time-axis
-	// label is hidden with it rather than being drawn at coordinate 0.
 	const betweenBarsTime = (data[40].time + data[41].time) / 2;
 	series.attachPrimitive(new LwcPlugin.VerticalLine(betweenBarsTime, {
+		snap: 'nearest',
 		showLabel: true,
 		labelText: 'Between bars',
 		color: 'orange',
 	}));
 
-	// A time well outside the data range: nothing drawn, no label.
+	// Past the end of the data: the nearest bar is the last one.
 	const outsideRangeTime = data[data.length - 1].time + 86400 * 30;
 	series.attachPrimitive(new LwcPlugin.VerticalLine(outsideRangeTime, {
+		snap: 'nearest',
 		showLabel: true,
 		labelText: 'Outside range',
 		color: 'purple',

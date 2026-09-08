@@ -16,14 +16,15 @@ function mergeStyle(
 		topColor: override.topColor ?? base.topColor,
 		bottomColor: override.bottomColor ?? base.bottomColor,
 		lineWidth: override.lineWidth ?? base.lineWidth,
+		lineStyle: override.lineStyle ?? base.lineStyle,
 	};
 }
 
 /**
- * Builds the index → style lookup for one set of options: the style of the
- * first matching brush range, or `outsideStyle` while any range is set, each
+ * Builds the logical index → style lookup for one set of options: the style of
+ * the last matching brush range, or `outsideStyle` while any range is set, each
  * merged over the base style. Points sharing a source style get the very same
- * object, which the renderer relies on to stroke a run of points at once.
+ * object, which the renderer relies on to draw a run of points at once.
  */
 export function createStyleResolver(
 	options: BrushableAreaSeriesOptions
@@ -33,6 +34,7 @@ export function createStyleResolver(
 		topColor: options.topColor,
 		bottomColor: options.bottomColor,
 		lineWidth: options.lineWidth,
+		lineStyle: options.lineStyle,
 	};
 	const ranges = options.brushRanges;
 	const outside =
@@ -40,10 +42,15 @@ export function createStyleResolver(
 	const resolved: Map<BrushRange, BrushableAreaStyle> = new Map();
 
 	return (index: number): BrushableAreaStyle => {
-		const range = ranges.find(
-			(brushRange: BrushRange) =>
-				index >= brushRange.range.from && index < brushRange.range.to
-		);
+		// Last wins: a range set later covers the ones it overlaps, so a brush
+		// dragged over an existing highlight behaves the way a user expects.
+		let range: BrushRange | undefined;
+		for (let i = ranges.length - 1; i >= 0; i--) {
+			if (index >= ranges[i].range.from && index < ranges[i].range.to) {
+				range = ranges[i];
+				break;
+			}
+		}
 		if (range === undefined) {
 			return outside;
 		}

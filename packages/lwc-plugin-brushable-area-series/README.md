@@ -4,9 +4,10 @@ An area series that can style parts of the data differently. You set a base
 style for the whole series and any number of *brush ranges*. A brush range is
 a span of data points with its own line and fill colors.
 
-The series itself only draws the styles. Add your own pointer handling to turn
-it into a brush selection: the user drags across the chart, you set a brush
-range for the selected span, and the rest of the series keeps the base style.
+The series itself only draws the styles. Attach the optional
+`BrushableAreaInteraction` primitive, or add your own pointer handling, to turn
+it into a brush selection: the user drags across the chart, the brush range for
+the selected span is set, and the rest of the series keeps the base style.
 Give `outsideStyle` a semi-transparent style to get the classic effect where
 the selection stays vivid and the rest looks faded.
 
@@ -119,19 +120,57 @@ series.applyOptions({ brushRanges: [] });
 A range's `style` and `outsideStyle` are both partial: every property left out
 falls back to the base style set on the series.
 
-Ranges are expressed in **logical indices** (the position of a point in the
-data, as used by the time scale's logical range), not in time. To turn a
-pointer position into a logical index, use
-`chart.timeScale().coordinateToLogical(x)`, where `x` is the pointer's
+Ranges are expressed in **logical indices** of the time scale (the position on
+the chart's own index, shared by every series), not in time and not in the
+series' own array positions. To turn a pointer position into a logical index,
+use `chart.timeScale().coordinateToLogical(x)`, where `x` is the pointer's
 horizontal position within the plot area.
 
-The series does not handle pointer events itself: the brush interaction —
-listening to `mousedown` / `mousemove` / `mouseup`, converting coordinates,
-and calling `applyOptions` — belongs to your application. The package's
-example contains a complete implementation you can copy.
-
 Each data point is `{ time, value }`. Points without a `value` are treated as
-whitespace.
+whitespace, and the line breaks at the gap rather than bridging it.
+
+### Brush selection
+
+`BrushableAreaInteraction` is an optional
+[series primitive](https://tradingview.github.io/lightweight-charts/docs/plugins/series-primitives)
+that turns a mouse drag, a one-finger drag or a two-finger gesture into a brush
+range, so the pointer handling does not have to be written again in every
+application:
+
+```js
+import {
+    BrushableAreaInteraction,
+} from '@tradingview/lwc-plugin-brushable-area-series';
+
+const brush = new BrushableAreaInteraction({
+    style: { lineColor: '#089981', topColor: 'rgba(8, 153, 129, 0.4)' },
+    outsideStyle: { lineColor: 'rgba(41, 98, 255, 0.2)' },
+});
+series.attachPrimitive(brush);
+
+brush.activeRange().subscribe(range => {
+    // null once the selection is cleared by a click without a drag
+    if (range !== null) {
+        console.log(range.from, range.to, range.fromTime, range.toTime);
+    }
+});
+```
+
+| Interaction option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `style` | `Partial<style>` | green | Style applied to the brushed range. |
+| `outsideStyle` | `Partial<style>` | faded blue | Style applied outside the brushed range. |
+| `applyToSeries` | `boolean` | `true` | Set the series' `brushRanges` as the user drags. Turn it off to only receive `activeRange` events. |
+| `minimumRangeWidth` | `number` | `1` | Smallest drag, in logical indices, that counts as a range. |
+
+The defaults are exported as `defaultInteractionOptions`. The range reported by
+`activeRange()` carries `from` / `to` as logical indices and `fromTime` /
+`toTime` as the times of the data points at those indices (`null` where the
+series has no point there). `brush.clear()` removes the selection, and
+`brush.range()` returns the current one.
+
+The chart's own drag gesture competes with brushing, so a chart using this
+primitive normally sets `handleScroll: false` and `handleScale: false`.
 
 ## Options
 
@@ -145,20 +184,34 @@ In addition to the standard
 | `topColor` | `string` | `'rgba(40,98,255, 0.4)'` | Base fill color at the line (top of the gradient). |
 | `bottomColor` | `string` | `'rgba(40,98,255, 0)'` | Base fill color at the base price (bottom of the gradient). |
 | `lineWidth` | `1 \| 2 \| 3 \| 4` | `2` | Base line width, in CSS pixels. |
+| `lineStyle` | `LineStyle` | `LineStyle.Solid` | Base dash pattern of the line. |
+| `lineVisible` | `boolean` | `true` | Draw the line itself. Set it to `false` for the fill only. |
+| `lineType` | `LineType` | `LineType.Simple` | Shape of the line between two points: straight, stepped or curved. The fill follows the same shape. |
+| `relativeGradient` | `boolean` | `false` | Anchor the far end of the fill gradient to the outermost point in view rather than to the edge of the pane, as `AreaSeries` does. |
+| `invertFilledArea` | `boolean` | `false` | Fill the area above the line, up to the top of the pane, instead of down to `basePrice`. |
 | `basePrice` | `number` | `0` | Price the area is filled down to. |
 | `brushRanges` | `{ range: { from: number; to: number }; style: Partial<style> }[]` | `[]` | Ranges of logical indices rendered in their own style. `from` is inclusive, `to` is exclusive. Set an empty array to clear. |
 | `outsideStyle` | `Partial<style>` | — | Style of the points outside every brush range. Used only while at least one range is set. |
 
-`style` is `{ lineColor, topColor, bottomColor, lineWidth }` — the same four
-properties as the base style, and each one optional.
+`style` is `{ lineColor, topColor, bottomColor, lineWidth, lineStyle }` — the
+same five properties as the base style, and each one optional.
 
 ## Notes
 
 - A point inside a brush range is drawn with that range's style; if ranges
-  overlap, the first matching range wins.
+  overlap, the **last** matching range wins, so a new selection covers the ones
+  it is dragged over.
+- Each drawn segment takes the style of its right-hand point, and consecutive
+  points sharing a style are drawn as one path, so no seam shows inside a run.
 - The fill is a vertical gradient from `bottomColor` at `basePrice` to
-  `topColor` at the line, per style. When `basePrice` falls outside the
-  visible price range, the fill reaches the edge of the pane.
-- The example disables chart scrolling and scaling (`handleScroll`,
+  `topColor` at the edge of the pane the fill extends towards (or at the
+  outermost point in view with `relativeGradient`). When `basePrice` falls
+  outside the visible price range, the fill reaches the edge of the pane.
+- The line and the fill are drawn one bar past each edge of the visible range,
+  so they leave the pane rather than stopping at the last visible point while
+  the chart is panned.
+- Points whose value falls outside the current price scale, and gaps in the
+  data, break the line rather than being drawn to an invalid coordinate.
+- The examples disable chart scrolling and scaling (`handleScroll`,
   `handleScale`) so that dragging brushes instead of panning; decide which
   gesture your chart should own.

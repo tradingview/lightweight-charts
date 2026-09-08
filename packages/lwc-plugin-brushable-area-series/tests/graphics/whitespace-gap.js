@@ -34,7 +34,9 @@ function runTestCase(container) {
 	const series = chart.addCustomSeries(new LwcPlugin.BrushableAreaSeries(), Object.assign({
 		priceLineVisible: false,
 	}, fadeStyle));
-	// Points 35..44 carry a time only, so they are whitespace.
+	// Points 35..44 carry a time only, so they are whitespace: whitespace never
+	// reaches a custom renderer, so the line has to break at the gap instead of
+	// drawing a straight segment across it.
 	series.setData(generateData(80, 0).map((point, index) => {
 		if (index >= 35 && index < 45) {
 			return { time: point.time };
