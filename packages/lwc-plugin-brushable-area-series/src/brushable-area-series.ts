@@ -41,3 +41,11 @@ export class BrushableAreaSeries<TData extends BrushableAreaData>
 		return defaultOptions;
 	}
 }
+
+export type { BrushableAreaData } from './data';
+export type {
+	BrushableAreaSeriesOptions,
+	BrushableAreaStyle,
+	BrushRange,
+} from './options';
+export { defaultOptions } from './options';
