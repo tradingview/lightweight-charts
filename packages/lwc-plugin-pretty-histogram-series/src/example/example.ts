@@ -1,6 +1,6 @@
 import { Time, WhitespaceData, createChart } from 'lightweight-charts';
 import { generateLineData } from './sample-data';
-import { PrettyHistogramSeries } from '../pretty-histogram-series';
+import { createPrettyHistogramSeries } from '../pretty-histogram-series';
 import { PrettyHistogramData } from '../data';
 
 type Point = PrettyHistogramData<Time> | WhitespaceData<Time>;
@@ -23,7 +23,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const series = chart.addCustomSeries(new PrettyHistogramSeries(), {
+const series = createPrettyHistogramSeries(chart, {
 	radius: 4,
 	widthPercent: 50,
 	upColor: '#089981',

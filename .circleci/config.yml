@@ -280,6 +280,7 @@ jobs:
       # workspace link, which resolves to the built dist/.
       - attach_workspace:
           at: ./
+      - run: pnpm --filter @tradingview/lwc-toolkit build
       - run: pnpm test
       - store_test_results:
           path: test-results/

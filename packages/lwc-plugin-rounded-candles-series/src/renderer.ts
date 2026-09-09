@@ -179,8 +179,8 @@ export class RoundedCandleSeriesRenderer<
 
 			const top = Math.round(Math.min(bar.openY, bar.closeY) * verticalPixelRatio);
 			const bottom = Math.round(Math.max(bar.openY, bar.closeY) * verticalPixelRatio);
-			const high = Math.round(bar.highY * verticalPixelRatio);
-			const low = Math.round(bar.lowY * verticalPixelRatio);
+			const high = Math.round(Math.min(bar.highY, bar.lowY) * verticalPixelRatio);
+			const low = Math.round(Math.max(bar.highY, bar.lowY) * verticalPixelRatio);
 			const line = positionsLine(bar.x, horizontalPixelRatio, wickWidth, true);
 
 			// Above and below the body rather than one bar behind it, so that a

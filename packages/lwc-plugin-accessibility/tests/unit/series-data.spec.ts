@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import type { Time } from 'lightweight-charts';
 import { describe, it } from 'node:test';
 
-import { SeriesStats, applyPointUpdate, timeKey } from '../../src/series-data';
+import { SeriesStats, timeKey } from '../../src/series-data';
 import { AnySeries, SeriesDataPoint } from '../../src/types';
 
 function valuePoint(time: number, value: number): SeriesDataPoint {
@@ -26,34 +26,8 @@ void describe('timeKey', () => {
 	});
 });
 
-void describe('applyPointUpdate', () => {
-	void it('replaces the last point when the time is unchanged', () => {
-		const points = [valuePoint(1, 1), valuePoint(2, 2)];
-		expect(applyPointUpdate(points, valuePoint(2, 42))).to.equal(1);
-		expect(points).to.have.length(2);
-		expect((points[1] as { value: number }).value).to.equal(42);
-	});
-
-	void it('appends a newer point', () => {
-		const points = [valuePoint(1, 1)];
-		expect(applyPointUpdate(points, valuePoint(2, 2))).to.equal(1);
-		expect(points).to.have.length(2);
-	});
-
-	void it('starts an empty cache', () => {
-		const points: SeriesDataPoint[] = [];
-		expect(applyPointUpdate(points, valuePoint(1, 1))).to.equal(0);
-		expect(points).to.have.length(1);
-	});
-
-	void it('asks for a full re-read when the change is not at the end', () => {
-		expect(applyPointUpdate([valuePoint(1, 1), valuePoint(5, 5)], valuePoint(3, 3))).to.equal(-1);
-		expect(applyPointUpdate([valuePoint(1, 1)], null)).to.equal(-1);
-	});
-});
-
 void describe('SeriesStats', () => {
-	void it('tracks the length across appends without re-reading the data', () => {
+	void it('tracks the length across appends and replacements', () => {
 		const points = [valuePoint(1, 1), valuePoint(2, 2)];
 		const series = fakeSeries(points);
 		const stats = new SeriesStats();
@@ -89,5 +63,30 @@ void describe('SeriesStats', () => {
 		stats.forget(series);
 		// Falls back to reading the series directly.
 		expect(stats.length(series)).to.equal(1);
+	});
+});
+
+void describe('SeriesStats corrections', () => {
+	void it('does not count equivalent business-day objects as new points', () => {
+		const points: SeriesDataPoint[] = [{ time: { year: 2024, month: 1, day: 2 }, value: 10 }];
+		const series = fakeSeries(points);
+		const stats = new SeriesStats();
+		stats.update(series, 'full');
+		points[0] = { time: { year: 2024, month: 1, day: 2 }, value: 20 };
+		stats.update(series, 'update');
+		expect(stats.length(series)).to.equal(1);
+	});
+	void it('reconciles multiple removals and an empty series', () => {
+		const points = [valuePoint(1, 1), valuePoint(2, 2), valuePoint(3, 3)];
+		const series = fakeSeries(points);
+		const stats = new SeriesStats();
+		stats.update(series, 'full');
+		points.splice(1);
+		stats.update(series, 'update');
+		expect(stats.length(series)).to.equal(1);
+		points.pop();
+		stats.update(series, 'update');
+		expect(stats.length(series)).to.equal(0);
+		expect(stats.latest(series)).to.equal(null);
 	});
 });

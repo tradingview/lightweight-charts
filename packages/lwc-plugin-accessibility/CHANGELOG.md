@@ -62,6 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep announced counts and keyboard values correct after data replacement, historical updates, and removal.
+
 - `controller.detach()` after `chart.remove()` no longer detaches from a
   destroyed pane (the library raises an asynchronous "Object is disposed" on
   that path).
@@ -72,9 +74,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `Enter` / `Space` summary reports the true extremes of an OHLC series from
   each bar's high / low instead of its close, and formats the change with the
   series formatter rather than an absolute-price one.
-- Streaming data no longer clones a series on every tick: an `update` is applied
-  through `dataByIndex`, and the announced in-view count comes from
-  `barsInLogicalRange`.
+- Data updates reconcile counts and the navigation cache with the actual
+  series, including historical corrections, equivalent business-day objects
+  and removals. The in-view count uses `barsInLogicalRange`.
 - The axes' canvases are hidden from assistive technology by the chart-level
   helper (and re-hidden when the library recreates them) instead of by whichever
   pane happened to attach first.

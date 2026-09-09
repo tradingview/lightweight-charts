@@ -15,7 +15,7 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 
 import { DualRangeHistogramData } from './data';
 import {
@@ -150,7 +150,8 @@ export class DualRangeHistogramSeriesRenderer<
 			effectiveBarSpacing(data),
 			horizontalPixelRatio,
 			0,
-			items.length
+			items.length,
+			getConflationFactor(data)
 		);
 
 		const borderWidth =

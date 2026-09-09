@@ -34,7 +34,7 @@ export function stackedPlotValues(
 	values: readonly number[],
 	base: number = 0
 ): CustomSeriesPricePlotValues {
-	let sum = 0;
+	let sum = base;
 	let min = base;
 	let max = base;
 	for (let i = 0; i < values.length; i++) {

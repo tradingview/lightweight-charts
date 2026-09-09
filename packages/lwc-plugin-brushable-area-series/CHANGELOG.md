@@ -33,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Reconstruct offscreen endpoints so interior viewport fills remain visible.
+- Do not clear a completed mouse selection on an unrelated pointer departure.
+
 - Brush ranges are matched against the time scale's logical index instead of the
   series' own array index, so they land in the right place whenever another
   series starts earlier or the data has gaps. They were documented as logical

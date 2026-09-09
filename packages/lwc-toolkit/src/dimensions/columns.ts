@@ -186,7 +186,7 @@ export interface ColumnPositionItem {
 	 * Logical index of the bar (as provided by the library on each bar item).
 	 * When present, it is used to detect gaps in the data: two columns are only
 	 * aligned against each other when they are consecutive (`time` differs by
-	 * exactly one). Leave it undefined if the items are known to be gapless.
+	 * the conflation factor, or one without conflation). Leave it undefined if the items are known to be gapless.
 	 */
 	time?: number;
 	column?: ColumnPosition;
@@ -200,10 +200,11 @@ export interface ColumnPositionItem {
  */
 function isAdjacentBar(
 	current: ColumnPositionItem,
-	previous: ColumnPositionItem
+	previous: ColumnPositionItem,
+	conflationFactor: number
 ): boolean {
 	if (current.time === undefined || previous.time === undefined) return true;
-	return current.time === previous.time + 1;
+	return current.time === previous.time + conflationFactor;
 }
 
 /**
@@ -220,20 +221,22 @@ function isAdjacentBar(
  * @param horizontalPixelRatio - horizontal pixel ratio
  * @param startIndex - start index for visible bars within the items array (inclusive)
  * @param endIndex - end index for visible bars within the items array (exclusive)
+ * @param conflationFactor - logical stride of one rendered bar (defaults to one)
  */
 export function calculateColumnPositionsInPlace(
 	items: ColumnPositionItem[],
 	barSpacingMedia: number,
 	horizontalPixelRatio: number,
 	startIndex: number,
-	endIndex: number
+	endIndex: number,
+	conflationFactor: number = 1
 ): void {
 	const common = columnCommon(barSpacingMedia, horizontalPixelRatio);
 	const lastIndex = Math.min(endIndex, items.length);
 	let previous: ColumnPosition | undefined = undefined;
 	for (let i = startIndex; i < lastIndex; i++) {
 		const alignAgainst =
-			previous !== undefined && isAdjacentBar(items[i], items[i - 1])
+			previous !== undefined && isAdjacentBar(items[i], items[i - 1], conflationFactor)
 				? previous
 				: undefined;
 		items[i].column = calculateColumnPosition(items[i].x, common, alignAgainst);

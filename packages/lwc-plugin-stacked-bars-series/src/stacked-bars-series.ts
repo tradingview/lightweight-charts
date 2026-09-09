@@ -1,4 +1,7 @@
+import { createOptionsAwareSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
 import {
+	DeepPartial,
+	IChartApiBase,
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
 	ICustomSeriesPaneRenderer,
@@ -12,7 +15,7 @@ import { StackedBarsConflationContext } from './compat';
 import { StackedBarsSeriesOptions, defaultOptions } from './options';
 import { StackedBarsSeriesRenderer } from './renderer';
 import { StackedBarsData } from './data';
-import { finiteValues, sumValues } from './stack';
+import { bandValues, stackBands, sumValues } from './stack';
 
 export class StackedBarsSeries<
 	HorzScaleItem = Time,
@@ -21,7 +24,9 @@ export class StackedBarsSeries<
 {
 	private _renderer: StackedBarsSeriesRenderer<HorzScaleItem, TData>;
 
-	public constructor() {
+	private _options: StackedBarsSeriesOptions = defaultOptions;
+
+	public constructor(private readonly _readOptions?: () => Readonly<StackedBarsSeriesOptions>) {
 		this._renderer = new StackedBarsSeriesRenderer();
 	}
 
@@ -31,7 +36,8 @@ export class StackedBarsSeries<
 	 * stays fully in view.
 	 */
 	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
-		return stackedPlotValues(finiteValues(plotRow.values));
+		const options = this._readOptions?.() ?? this._options;
+		return stackedPlotValues(bandValues(stackBands(plotRow.values, options)), options.base);
 	}
 
 	public isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> {
@@ -62,6 +68,7 @@ export class StackedBarsSeries<
 		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: StackedBarsSeriesOptions
 	): void {
+		this._options = options;
 		this._renderer.update(data, options);
 	}
 
@@ -77,3 +84,16 @@ export type {
 	StackedBarsStackOrder,
 } from './options';
 export { defaultOptions } from './options';
+
+/**
+ * Adds a series with synchronous option access for correct initial autoscaling.
+ * applyOptions automatically rebuilds plot values when scaling options change.
+ * Use this helper in place of chart.addCustomSeries(new StackedBarsSeries(), options).
+ */
+export function createStackedBarsSeries<H = Time, D extends StackedBarsData<H> = StackedBarsData<H>>(
+	chart: IChartApiBase<H>,
+	options: DeepPartial<StackedBarsSeriesOptions> = {},
+	paneIndex: number = 0
+): OptionsAwareSeries<H, D, StackedBarsSeriesOptions> {
+	return createOptionsAwareSeries(chart, readOptions => new StackedBarsSeries<H, D>(readOptions), defaultOptions, options, ['base', 'percent', 'stackOrder'], paneIndex);
+}

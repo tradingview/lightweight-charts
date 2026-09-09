@@ -105,6 +105,10 @@
 		"./time": {
 			"types": "./dist/time.d.ts",
 			"default": "./dist/time.js"
+		},
+		"./custom-series/options-aware-series": {
+			"types": "./dist/custom-series/options-aware-series.d.ts",
+			"default": "./dist/custom-series/options-aware-series.js"
 		}
 	},
 	"files": [

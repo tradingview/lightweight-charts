@@ -9,6 +9,7 @@ import {
 } from 'lightweight-charts';
 
 import {
+	barCoordinate,
 	extendRange,
 	forEachVisibleBar,
 	mapVisibleBars,
@@ -242,5 +243,17 @@ void describe('visibleSegments', () => {
 			{ from: 0, to: 1 },
 			{ from: 1, to: 3 },
 		]);
+	});
+});
+
+void describe('conflated and extended bars', () => {
+	void it('preserves a conflated run and breaks at an actual gap', () => {
+		const bars = makeBars(5, [0, 8, 16, 40, 48]);
+		expect(visibleSegments(bars, { from: 0, to: 5 }, 8)).to.deep.equal([{ from: 0, to: 3 }, { from: 3, to: 5 }]);
+	});
+	void it('reconstructs offscreen coordinates after spacing changes, including stale finite x', () => {
+		const anchor = { time: 16, x: 100 };
+		expect(barCoordinate({ time: 8 }, anchor, 2)).to.equal(84);
+		expect(barCoordinate({ time: 24 }, anchor, 3)).to.equal(124);
 	});
 });

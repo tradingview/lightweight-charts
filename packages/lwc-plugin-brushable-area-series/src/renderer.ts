@@ -5,7 +5,7 @@ import {
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import {
-	extendRange,
+	barCoordinate, getConflationFactor, extendRange,
 	visibleSegments,
 } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import {
@@ -91,7 +91,7 @@ export class BrushableAreaSeriesRenderer<
 		// Whitespace never reaches a custom renderer: a jump in the logical index
 		// is the only sign of a gap, and the line has to break there.
 		const segments: BrushableAreaPoint[][] = [];
-		for (const segment of visibleSegments(data.bars, range)) {
+		for (const segment of visibleSegments(data.bars, range, getConflationFactor(data))) {
 			let points: BrushableAreaPoint[] = [];
 			for (let i = segment.from; i < segment.to; i++) {
 				const bar = data.bars[i];
@@ -105,7 +105,7 @@ export class BrushableAreaSeriesRenderer<
 					continue;
 				}
 				points.push({
-					x: bar.x * scope.horizontalPixelRatio,
+					x: barCoordinate(bar, data.bars[from], data.barSpacing) * scope.horizontalPixelRatio,
 					y: y * scope.verticalPixelRatio,
 					// `bar.time` is the logical index; `i` is the position in the
 					// bars array, and the two differ as soon as another series

@@ -13,7 +13,6 @@ import {
 	zoomRange,
 } from './navigation';
 import { AccessibilityPaneOptions } from './options';
-import { applyPointUpdate, latestDataPoint } from './series-data';
 import { normalizeValue } from './sonification';
 import { AnySeries, SeriesDataPoint } from './types';
 
@@ -129,21 +128,8 @@ export class PaneCursor {
 		}
 	}
 
-	/**
-	 * Applies one data change to the navigation cache. A `'update'` (the shape a
-	 * live feed produces) patches the cached array with a single indexed lookup,
-	 * so a streaming chart does no work proportional to its history; anything
-	 * else re-reads the series.
-	 */
-	public applyDataChange(scope: DataChangedScope): void {
-		const series = this.activeSeries();
-		if (!series) {
-			return;
-		}
-		if (scope === 'update' && applyPointUpdate(this._points, latestDataPoint(series)) >= 0) {
-			this._extremes = null;
-			return;
-		}
+	/** Refreshes the cache: 'update' can also change historical points or remove data. */
+	public applyDataChange(_scope: DataChangedScope): void {
 		this.refreshActivePoints();
 	}
 

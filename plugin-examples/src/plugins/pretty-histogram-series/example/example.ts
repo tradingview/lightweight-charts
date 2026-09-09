@@ -1,14 +1,12 @@
 import { Time, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
-import { PrettyHistogramSeries, PrettyHistogramData } from '@tradingview/lwc-plugin-pretty-histogram-series';
+import { createPrettyHistogramSeries, PrettyHistogramData } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const customSeriesView = new PrettyHistogramSeries();
-
-const myCustomSeries = chart.addCustomSeries(customSeriesView, {
+const myCustomSeries = createPrettyHistogramSeries(chart, {
 	radius: 6,
 	widthPercent: 50,
 	upColor: '#089981',

@@ -16,7 +16,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		timeScale: { minBarSpacing: 3 },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {});
+	const series = LwcPlugin.createStackedBarsSeries(chart, {});
 	series.setData(generateData());
 
 	// A visible range entirely before the data: the range is non-null but

@@ -31,11 +31,11 @@ Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { DualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+import { createDualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
 
-const histogram = chart.addCustomSeries(new DualRangeHistogramSeries(), {
+const histogram = createDualRangeHistogramSeries(chart, {
     priceLineVisible: false,
     lastValueVisible: false,
 });
@@ -67,11 +67,11 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { DualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+import { createDualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
 
-const histogram = chart.addCustomSeries(new DualRangeHistogramSeries(), {
+const histogram = createDualRangeHistogramSeries(chart, {
     priceLineVisible: false,
     lastValueVisible: false,
 });
@@ -92,13 +92,13 @@ options name their columns:
 
 ```js
 import { createChart, BaselineSeries } from 'lightweight-charts';
-import { DualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+import { createDualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
 
 const chart = createChart(document.getElementById('container'), {
     timeScale: { barSpacing: 21, minBarSpacing: 4 },
 });
 
-const histogram = chart.addCustomSeries(new DualRangeHistogramSeries(), {
+const histogram = createDualRangeHistogramSeries(chart, {
     priceLineVisible: false,
     lastValueVisible: false,
 });
@@ -162,9 +162,8 @@ the series' own `maxHeight`.
 the columns are autoscaled by the price scale like any other series;
 `maxHeight` and `normalize` are then ignored and no margins need reserving.
 
-The plot values reported to the price scale are built when the data is set, so
-`scaleMode` and `baseValue` are read at that point: set them before, or
-together with, `setData`.
+`createDualRangeHistogramSeries` keeps the plot values synchronized with
+`scaleMode` and `baseValue`, including changes made through `applyOptions`.
 
 In `pixels` mode, `normalize` chooses what the heights are scaled against:
 `'visible'` (the default) rescales the columns as you pan, `'all'` keeps their
@@ -172,6 +171,22 @@ relative heights across the whole data set, and a number fixes the value which
 fills half of `maxHeight`.
 
 Options can be changed at runtime with `series.applyOptions({ ... })`.
+
+## Creating a series
+
+Use `createDualRangeHistogramSeries(chart, options?, paneIndex?)`. It returns the
+normal series API, with the plugin's data and options types preserved. The helper
+makes scaling options available before the first `setData` and rebuilds plot
+values automatically when those options change through `series.applyOptions`.
+This keeps autoscaling, last-value labels and crosshair values consistent. The
+helper retains a shallow copy of the input data, including whitespace, and
+re-ingests it only when a scaling option changes. Streaming updates remain
+incremental.
+
+The low-level `DualRangeHistogramSeries` pane view remains available for integrations
+that supply their own options getter to its constructor. Passing scaling options
+only to `chart.addCustomSeries(new DualRangeHistogramSeries(), options)` cannot make
+them available before data ingestion on LWC 5.0; use the creation helper instead.
 
 ## Options
 

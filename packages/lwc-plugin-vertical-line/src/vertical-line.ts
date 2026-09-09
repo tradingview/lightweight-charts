@@ -1,3 +1,5 @@
+import { cloneReadonly } from '@tradingview/lwc-toolkit/simple-clone';
+import { paneContentElement } from '@tradingview/lwc-toolkit/dom/pane-element';
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
 	Coordinate,
@@ -121,6 +123,7 @@ export class VerticalLine extends PluginBase {
 	private _time: Time;
 	private _x: Coordinate | null = null;
 	private _dragging: boolean = false;
+	private _pointerId: number | null = null;
 	private _restoreHandlers: (() => void) | null = null;
 	private _unsubscribers: (() => void)[] = [];
 
@@ -322,6 +325,7 @@ export class VerticalLine extends PluginBase {
 	}
 
 	private _unsubscribeDragHandlers(): void {
+		this._endDrag();
 		this._unsubscribers.forEach((unsubscribe: () => void) => unsubscribe());
 		this._unsubscribers = [];
 	}
@@ -340,9 +344,13 @@ export class VerticalLine extends PluginBase {
 	}
 
 	private _onPointerDown = (event: PointerEvent): void => {
-		if (this._x === null) {
+		if (this._x === null || this._dragging || !event.isPrimary || event.button !== 0) {
 			return;
 		}
+		const element = paneContentElement(this.series.getPane());
+		if (element === null) { return; }
+		const box = element.getBoundingClientRect();
+		if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) { return; }
 		const x = this._paneX(event.clientX);
 		const halfWidth = this._options.width / 2;
 		if (
@@ -352,15 +360,18 @@ export class VerticalLine extends PluginBase {
 			return;
 		}
 		this._dragging = true;
+		this._pointerId = event.pointerId;
 		// The chart would otherwise pan under the pointer while the line moves.
 		const chart = this.chart;
-		const { handleScroll, handleScale } = chart.options();
+		const { handleScroll: scroll, handleScale: scale } = chart.options();
+		const handleScroll = typeof scroll === 'boolean' ? scroll : cloneReadonly(scroll);
+		const handleScale = typeof scale === 'boolean' ? scale : cloneReadonly(scale);
 		chart.applyOptions({ handleScroll: false, handleScale: false });
 		this._restoreHandlers = () => chart.applyOptions({ handleScroll, handleScale });
 	};
 
 	private _onPointerMove = (event: PointerEvent): void => {
-		if (!this._dragging) {
+		if (!this._dragging || event.pointerId !== this._pointerId) {
 			return;
 		}
 		const x = this._paneX(event.clientX);
@@ -373,15 +384,17 @@ export class VerticalLine extends PluginBase {
 		}
 	};
 
-	private _onPointerUp = (): void => {
-		this._endDrag();
+	private _onPointerUp = (event: PointerEvent): void => {
+		if (event.pointerId === this._pointerId) { this._endDrag(); }
 	};
 
 	private _endDrag(): void {
 		this._dragging = false;
+		this._pointerId = null;
 		if (this._restoreHandlers !== null) {
-			this._restoreHandlers();
+			const restore = this._restoreHandlers;
 			this._restoreHandlers = null;
+			restore();
 		}
 	}
 }

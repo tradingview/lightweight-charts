@@ -66,8 +66,8 @@ void describe('stackedPlotValues', () => {
 	});
 
 	void it('takes a non-zero baseline', () => {
-		expect(stackedPlotValues([1, 2], 10)).to.deep.equal([1, 10, 3]);
-		expect(stackedPlotValues([-1, -2], -10)).to.deep.equal([-10, -1, -3]);
+		expect(stackedPlotValues([1, 2], 10)).to.deep.equal([10, 13, 13]);
+		expect(stackedPlotValues([-1, -2], -10)).to.deep.equal([-13, -10, -13]);
 	});
 
 	void it('collapses to the baseline for an empty stack', () => {

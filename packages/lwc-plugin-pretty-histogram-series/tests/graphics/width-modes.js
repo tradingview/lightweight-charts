@@ -20,7 +20,7 @@ function runTestCase(container) {
 	}));
 	const data = generateData();
 
-	const series = chart.addCustomSeries(new LwcPlugin.PrettyHistogramSeries(), {
+	const series = LwcPlugin.createPrettyHistogramSeries(chart, {
 		color: '#2962FF',
 		widthMode: 'histogram',
 		radius: 0,
