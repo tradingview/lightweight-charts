@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import type { Time } from 'lightweight-charts';
+import { MismatchDirection, type Time } from 'lightweight-charts';
 import { describe, it } from 'node:test';
 
 import { SeriesStats, timeKey } from '../../src/series-data';
@@ -9,12 +9,16 @@ function valuePoint(time: number, value: number): SeriesDataPoint {
 	return { time: time as unknown as Time, value };
 }
 
-/** The three methods {@link SeriesStats} uses, over a plain array of points. */
-function fakeSeries(points: SeriesDataPoint[], barsBefore: number = 0, barsAfter: number = 0): AnySeries {
+/** A sparse series whose data positions differ from the shared logical indexes. */
+function fakeSeries(points: SeriesDataPoint[], logical: number[] = points.map((_, index) => index)): AnySeries {
 	return {
-		data: () => points,
-		dataByIndex: () => points[points.length - 1] ?? null,
-		barsInLogicalRange: () => ({ barsBefore, barsAfter }),
+		data: () => points.slice(),
+		dataByIndex: (index: number, direction: MismatchDirection) => {
+			const found = direction === MismatchDirection.NearestRight
+				? logical.findIndex(value => value >= index)
+				: logical.findLastIndex(value => value <= index);
+			return points[found] ?? null;
+		},
 	} as unknown as AnySeries;
 }
 
@@ -43,17 +47,31 @@ void describe('SeriesStats', () => {
 		expect((stats.latest(series) as { value: number }).value).to.equal(30);
 	});
 
-	void it('counts the points in a logical range from barsInLogicalRange', () => {
+	void it('counts actual sparse points and excludes fractional viewport edges', () => {
 		const stats = new SeriesStats();
-		const series = fakeSeries([valuePoint(1, 1), valuePoint(2, 2), valuePoint(3, 3)], 1, 1);
-		stats.update(series, 'full');
-		expect(stats.countInRange(series, { from: 1, to: 2 })).to.equal(1);
-		// Negative counts mean the first / last bar is inside the range.
-		const inside = fakeSeries([valuePoint(1, 1), valuePoint(2, 2)], -3, -2);
-		stats.update(inside, 'full');
-		expect(stats.countInRange(inside, { from: -3, to: 9 })).to.equal(2);
-		// An unknown range is the whole series.
-		expect(stats.countInRange(inside, null)).to.equal(2);
+		const series = fakeSeries([valuePoint(1, 1), valuePoint(3, 3), valuePoint(5, 5)], [0, 2, 4]);
+		expect(stats.countInRange(series, { from: 2, to: 4 })).to.equal(2);
+		expect(stats.countInRange(series, { from: 2.2, to: 4.2 })).to.equal(1);
+		expect(stats.countInRange(series, { from: 2.2, to: 3.8 })).to.equal(0);
+		expect(stats.countInRange(series, { from: -5, to: -1 })).to.equal(0);
+		expect(stats.countInRange(series, { from: 5, to: 10 })).to.equal(0);
+		expect(stats.countInRange(series, { from: -3, to: 9 })).to.equal(3);
+		expect(stats.countInRange(series, null)).to.equal(3);
+	});
+
+	void it('coalesces invalidations and shares one snapshot between consumers', () => {
+		const stats = new SeriesStats();
+		const series = fakeSeries([valuePoint(1, 1)]);
+		const data = series.data.bind(series);
+		let reads = 0;
+		series.data = () => { reads++; return data(); };
+		for (let i = 0; i < 100; i++) { stats.update(series, 'update'); }
+		expect(reads).to.equal(0);
+		const snapshot = stats.snapshot(series);
+		expect(stats.latest(series)).to.equal(snapshot[0]);
+		expect(stats.length(series)).to.equal(1);
+		expect(stats.countInRange(series, { from: 0, to: 1 })).to.equal(1);
+		expect(reads).to.equal(1);
 	});
 
 	void it('forgets a series that left the pane', () => {

@@ -1,3 +1,4 @@
+import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
 import { DataChangedScope, IRange, MismatchDirection, Time } from 'lightweight-charts';
 
 import { AnySeries, SeriesDataPoint } from './types';
@@ -21,16 +22,23 @@ export function timeKey(time: Time): string | number {
 	return typeof time === 'object' ? `${time.year}-${time.month}-${time.day}` : time;
 }
 
-/** Facts used by announcements, reconciled against the public series data. */
+/** Facts used by announcements, reconciled lazily against the public series data. */
 export class SeriesStats {
-	private readonly _entries = new Map<AnySeries, { length: number; latest: SeriesDataPoint | null }>();
+	private readonly _entries = new Map<AnySeries, readonly SeriesDataPoint[]>();
 
-	/** Records a data change; call with the scope the library reported. */
+	/** Invalidates the snapshot without reading data on every streaming tick. */
 	public update(series: AnySeries, _scope: DataChangedScope): void {
-		// 'update' also covers historical corrections, whitespace changes and pop.
-		// The scope does not identify the changed index or the number removed.
-		const points = series.data();
-		this._entries.set(series, { length: points.length, latest: points[points.length - 1] ?? null });
+		this._entries.delete(series);
+	}
+
+	/** Shared by announcement statistics and focused navigation. */
+	public snapshot(series: AnySeries): readonly SeriesDataPoint[] {
+		let points = this._entries.get(series);
+		if (points === undefined) {
+			points = series.data();
+			this._entries.set(series, points);
+		}
+		return points;
 	}
 
 	public forget(series: AnySeries): void {
@@ -42,32 +50,35 @@ export class SeriesStats {
 	}
 
 	public latest(series: AnySeries): SeriesDataPoint | null {
-		const known = this._entries.get(series);
-		return known !== undefined ? known.latest : latestDataPoint(series);
+		const points = this.snapshot(series);
+		return points[points.length - 1] ?? null;
 	}
 
 	public length(series: AnySeries): number {
-		const known = this._entries.get(series);
-		return known !== undefined ? known.length : series.data().length;
+		return this.snapshot(series).length;
 	}
 
-	/**
-	 * How many of the series' points lie inside `range`, derived from
-	 * `barsInLogicalRange` and the tracked length. Falls back to the full length
-	 * when the range is unknown.
-	 */
+	/** Counts fulfilled points, rather than slots on the chart's shared time scale. */
 	public countInRange(series: AnySeries, range: IRange<number> | null): number {
-		const total = this.length(series);
-		if (range === null || total === 0) {
-			return range === null ? total : 0;
-		}
-		const bars = series.barsInLogicalRange(range);
-		if (bars === null) {
-			return 0;
-		}
-		// Negative `barsBefore` / `barsAfter` mean the first / last bar is inside
-		// the range, so only positive counts are outside it.
-		const outside = Math.max(0, bars.barsBefore) + Math.max(0, bars.barsAfter);
-		return Math.max(0, Math.round(total - outside));
+		const points = this.snapshot(series);
+		if (range === null) { return points.length; }
+		if (points.length === 0 || Math.ceil(range.from) > Math.floor(range.to)) { return 0; }
+		const first = series.dataByIndex(Math.ceil(range.from), MismatchDirection.NearestRight);
+		const last = series.dataByIndex(Math.floor(range.to), MismatchDirection.NearestLeft);
+		if (first === null || last === null) { return 0; }
+		const from = convertTimeUTC(first.time);
+		const to = convertTimeUTC(last.time);
+		if (from > to) { return 0; }
+		const bound = (time: number, inclusive: boolean): number => {
+			let low = 0;
+			let high = points.length;
+			while (low < high) {
+				const mid = Math.floor((low + high) / 2);
+				const current = convertTimeUTC(points[mid].time);
+				if (current < time || (inclusive && current === time)) { low = mid + 1; } else { high = mid; }
+			}
+			return low;
+		};
+		return bound(to, true) - bound(from, false);
 	}
 }

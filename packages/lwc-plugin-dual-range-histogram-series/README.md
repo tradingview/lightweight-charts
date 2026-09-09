@@ -153,6 +153,10 @@ const stop = keepPixelSeriesInView(chart, histogram);
 stop();
 ```
 
+The helper follows the series' current pane, including pane resizing and moves.
+It uses a sizing primitive attached to the series; call `stop()` before removing
+the chart. Calling `stop()` more than once is safe.
+
 Pass a height as the third argument to reserve room for something other than
 the series' own `maxHeight`.
 

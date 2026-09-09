@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep gradients and outer corners oriented away from the baseline on inverted price scales.
+
 - Include the current baseline in initial and updated plot values.
 
 - Autoscale now includes `base`, so bars are no longer cut off at the edge of

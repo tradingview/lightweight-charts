@@ -40,8 +40,9 @@ pnpm-debug.log*
 
 !/src/typings/**/*.d.ts
 
-# graphics tests out data
+# end-to-end test output
 /tests/e2e/graphics/.gendata/
+/tests/e2e/interactions/.gendata/
 tests/e2e/coverage/.gendata
 
 # memleak log output

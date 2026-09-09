@@ -37,7 +37,7 @@
 	"scripts": {
 		"dev": "vite --config src/vite.config.js",
 		"build": "tsc && node compile.mjs",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit && tsc -p tsconfig.tests.json",
 		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
 		"prepack": "node -e \"require('fs').copyFileSync('../../LICENSE', 'LICENSE')\"",
 		"postpack": "node -e \"require('fs').unlinkSync('LICENSE')\""

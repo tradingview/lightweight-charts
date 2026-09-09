@@ -56,6 +56,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep options-aware series data synchronized when application data listeners throw or perform nested updates.
+
 - Reconstruct extended bar coordinates from a visible anchor and respect conflation when finding gaps or aligning columns.
 - Clamp inset corner radii and cap borders to the rectangle dimensions.
 - Offset stacked plot values consistently from a nonzero baseline.
