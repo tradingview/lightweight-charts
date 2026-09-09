@@ -1,6 +1,6 @@
 // Resolve the built exports map, as an npm consumer does; no src aliases.
 import { createChart, type IChartApiBase, type Time, type CustomSeriesWhitespaceData } from 'lightweight-charts';
-import { createDualRangeHistogramSeries, DualRangeHistogramSeries, type DualRangeHistogramData, type DualRangeHistogramSeriesOptions } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+import { createDualRangeHistogramSeries, keepPixelSeriesInView, DualRangeHistogramSeries, type DualRangeHistogramData, type DualRangeHistogramSeriesOptions } from '@tradingview/lwc-plugin-dual-range-histogram-series';
 import { DualRangeHistogramSeries as Standalone, createDualRangeHistogramSeries as createStandalone } from '@tradingview/lwc-plugin-dual-range-histogram-series/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
@@ -35,3 +35,6 @@ tagged.update({ time: { key: 'A' }, values: [10, -20], tag: 123 });
 series.applyOptions({ baseValue: 50, scaleMode: 'price', borderRadius: { upOuter: 1 }, borderWidth: 4 });
 // @ts-expect-error Invalid plugin-specific option values must be rejected.
 series.applyOptions({ scaleMode: 'screen' });
+
+keepPixelSeriesInView(chart, series)();
+keepPixelSeriesInView(categoryChart, tagged, 100)();

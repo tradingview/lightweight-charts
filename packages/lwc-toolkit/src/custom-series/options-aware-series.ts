@@ -33,14 +33,14 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 	type Point = D | CustomSeriesWhitespaceData<H>;
 	const key = (point: Point): number => chart.horzBehaviour().key(point.time);
 	let input = new Map<number, Point>();
-	let changingData = 0;
+	const operations: { commit: (() => void) | null }[] = [];
 	let refreshPending = false;
 	const setData = api.setData.bind(api);
 	const update = api.update.bind(api);
 	const applyOptions = api.applyOptions.bind(api);
 
 	const refresh = (): void => {
-		if (!refreshPending || changingData !== 0) { return; }
+		if (!refreshPending || operations.length !== 0) { return; }
 		refreshPending = false;
 		if (input.size > 0) {
 			// Sort by the host's time key, including custom horizontal scales.
@@ -49,35 +49,37 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 		}
 	};
 
-	api.setData = (data: Point[]): void => {
-		const previous = input;
-		input = new Map(data.map(point => [key(point), { ...point }]));
-		changingData++;
+	// Registered before consumer listeners: reaching this notification means the
+	// host accepted the mutation, even if a later listener throws. Commit before
+	// those listeners can perform nested writes (including from a pop callback).
+	api.subscribeDataChanged(() => {
+		const operation = operations[operations.length - 1];
+		const commit = operation?.commit;
+		if (commit) {
+			operation.commit = null;
+			commit();
+		}
+	});
+
+	const changeData = <R>(commit: () => void, change: () => R): R => {
+		operations.push({ commit });
 		try {
-			setData(data);
-		} catch (error) {
-			input = previous;
-			throw error;
+			return change();
 		} finally {
-			changingData--;
+			operations.pop();
 			refresh();
 		}
 	};
 
+	api.setData = (data: Point[]): void => {
+		const next = new Map(data.map(point => [key(point), { ...point }]));
+		changeData(() => { input = next; }, () => setData(data));
+	};
+
 	api.update = (point: Point, historicalUpdate?: boolean): void => {
 		const time = key(point);
-		const previous = input.get(time);
-		input.set(time, { ...point });
-		changingData++;
-		try {
-			update(point, historicalUpdate);
-		} catch (error) {
-			if (previous === undefined) { input.delete(time); } else { input.set(time, previous); }
-			throw error;
-		} finally {
-			changingData--;
-			refresh();
-		}
+		const next = { ...point };
+		changeData(() => { input.set(time, next); }, () => update(point, historicalUpdate));
 	};
 
 	// pop was added after the 5.0 peer floor. Preserve it on hosts that have it.
@@ -85,15 +87,11 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 	const pop = withPop.pop?.bind(api);
 	if (pop !== undefined) {
 		withPop.pop = (count: number): Point[] => {
-			changingData++;
-			try {
-				const removed = pop(count);
-				for (const point of removed) { input.delete(key(point)); }
-				return removed;
-			} finally {
-				changingData--;
-				refresh();
-			}
+			// The host removes fulfilled points only; trailing whitespace remains.
+			const removedKeys = count <= 0 ? [] : api.data().slice(-count).map(key);
+			return changeData(() => {
+				for (const time of removedKeys) { input.delete(time); }
+			}, () => pop(count));
 		};
 	}
 

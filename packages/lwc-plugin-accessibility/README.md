@@ -465,13 +465,17 @@ description, an assertive live region, a focus ring and — when `showShortcuts`
 on — the shortcuts hint and panel), plus one polite live region shared across the
 whole chart for data-update announcements.
 
-Data stays in sync through one `subscribeDataChanged` listener per series, so
-scrolling and zooming do no data work at all – the focus ring is repositioned
-with a couple of coordinate look-ups and nothing is read or copied. Data-change events do not distinguish a tail tick from a historical correction
-or `pop()`. Announced counts and the focused navigation cache therefore re-read
-series data when it changes, so they include replacements, removals and corrected
-historical values. This work is proportional to the series length. An unfocused
-pane defers its navigation-cache refresh until it is focused again.
+Data stays in sync through one `subscribeDataChanged` listener per series.
+Scrolling and zooming reposition the focus ring with coordinate lookups; they
+do not copy series data. Data-change events invalidate a shared snapshot because
+they do not distinguish a tail tick from a historical correction or `pop()`.
+
+An unfocused pane reads data only when its debounced announcement is prepared.
+With update announcements disabled, it defers the read until keyboard focus
+returns. Focused navigation refreshes immediately after a data change and shares
+that snapshot with announcement statistics. Each refresh is proportional to the
+series length; visible-point counts use binary searches within the snapshot, so
+whitespace and gaps supplied by other series do not inflate the count.
 
 ## CSS class hooks
 

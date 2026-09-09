@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Open price-mode gaps and orient outer corners correctly on inverted scales; reserve pixel height in the series’ current pane after resizing or moving.
+
 - Use current scale mode and baseline for initial and updated plot values.
 
 - Columns are one pixel wider: the toolkit's column width is inclusive, so

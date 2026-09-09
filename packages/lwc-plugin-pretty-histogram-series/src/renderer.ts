@@ -39,7 +39,7 @@ interface ColumnRect {
 	radii: CornerRadii;
 	fill: string;
 	/** Whether the column grows upwards from the base line. */
-	positive: boolean;
+	growsUp: boolean;
 }
 
 function shrinkRadii(radii: CornerRadii, offset: number): CornerRadii {
@@ -180,11 +180,11 @@ export class PrettyHistogramSeriesRenderer<
 				top: box.position,
 				width,
 				height: box.length,
-				radii: positive
+				radii: coordinate <= baseCoordinate
 					? [outer, outer, inner, inner]
 					: [inner, inner, outer, outer],
 				fill: this._columnColor(item, options, positive),
-				positive,
+				growsUp: coordinate <= baseCoordinate,
 			});
 		}
 
@@ -264,13 +264,12 @@ export class PrettyHistogramSeriesRenderer<
 		rect: ColumnRect,
 		gradientColor: string
 	): CanvasGradient {
-		// The fade starts at the base line, which is the bottom of a positive
-		// column and the top of a negative one.
+		// The fade starts at the base, including on an inverted price scale.
 		const gradient = ctx.createLinearGradient(
 			0,
-			rect.positive ? rect.top + rect.height : rect.top,
+			rect.growsUp ? rect.top + rect.height : rect.top,
 			0,
-			rect.positive ? rect.top : rect.top + rect.height
+			rect.growsUp ? rect.top : rect.top + rect.height
 		);
 		gradient.addColorStop(0, rect.fill);
 		gradient.addColorStop(1, gradientColor);

@@ -30,13 +30,12 @@ export interface SeriesSyncHost {
  * announcement.
  *
  * Everything here is driven by `subscribeDataChanged`, so scrolling and zooming
- * do no data work at all, and a streamed update costs a single indexed look-up
- * rather than a clone of the series.
+ * do no data work at all. Streaming updates invalidate a shared snapshot; data
+ * is read only for focused navigation or a debounced announcement.
  */
 export class SeriesSync {
 	private readonly _host: SeriesSyncHost;
-	// Per-series lengths and newest points, maintained from the data-change scope
-	// so no announcement has to clone a series' data.
+	// Lazy snapshots shared by navigation and announcement statistics.
 	private readonly _stats = new SeriesStats();
 	// One `subscribeDataChanged` handler per series, so we react to real data
 	// changes instead of polling and re-hashing on every redraw.
@@ -84,8 +83,7 @@ export class SeriesSync {
 	/** One changed series' contribution to a data-update announcement. */
 	public describeUpdate(series: AnySeries): string {
 		const cursor = this._host.cursor;
-		// The in-view count comes from `barsInLogicalRange`, so a streaming series
-		// is never read (and cloned) just to be counted.
+		// Latest value and visible count reuse one reconciled snapshot.
 		const range = this._host.options().dataScope === 'visible' ? this._host.visibleRange() : null;
 		return describeSeriesUpdate(this._host.describeEnv(), {
 			label: cursor.seriesLabel(series, cursor.seriesList().indexOf(series)),
@@ -116,7 +114,7 @@ export class SeriesSync {
 		this._stats.update(series, scope);
 		if (index === cursor.activeSeriesIndex()) {
 			if (this._host.hasFocus()) {
-				cursor.applyDataChange(scope);
+				cursor.applyDataChange(scope, this._stats.snapshot(series));
 				this._host.onActiveDataChanged();
 			} else {
 				cursor.markStale();

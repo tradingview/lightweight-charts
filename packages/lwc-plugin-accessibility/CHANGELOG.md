@@ -62,6 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Count actual visible points in sparse series and defer data snapshots until navigation or an announcement needs them.
+
 - Keep announced counts and keyboard values correct after data replacement, historical updates, and removal.
 
 - `controller.detach()` after `chart.remove()` no longer detaches from a
