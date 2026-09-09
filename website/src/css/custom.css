@@ -280,6 +280,11 @@ button.navbar__toggle {
 	border-radius: var(--ifm-code-border-radius);
 }
 
+/* Inline code (e.g. file names) should not wrap mid-word at hyphens/dots. */
+:not(pre) > code {
+	white-space: nowrap;
+}
+
 .standalone-iframe.h400 {
 	height: 400px;
 }

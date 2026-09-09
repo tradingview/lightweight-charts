@@ -4,6 +4,7 @@
 const sidebars = {
 	docsSidebar: [
 		'intro',
+		'ai',
 		'series-types',
 		'chart-types',
 		'price-scale',
