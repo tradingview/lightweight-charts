@@ -93,6 +93,7 @@ export class MultiTouchChartEvents {
 	}
 
 	private _mouseDown = (event: MouseEvent): void => {
+		if (event.button !== 0) { return; }
 		this._mouseState.start = this._point(event.clientX);
 		this._mouseState.dragging = this._mouseState.start !== null;
 	};
@@ -113,13 +114,13 @@ export class MultiTouchChartEvents {
 	};
 
 	private _mouseUp = (): void => {
+		if (!this._mouseState.dragging) { return; }
 		this._mouseState = { dragging: false, start: null };
 		this._end.fire();
 	};
 
 	private _mouseLeave = (): void => {
-		this._mouseState = { dragging: false, start: null };
-		this._end.fire();
+		this._mouseUp();
 	};
 
 	private _touchStart = (event: TouchEvent): void => {

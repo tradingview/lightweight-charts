@@ -10,7 +10,7 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { extendRange, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { barCoordinate, getConflationFactor, extendRange, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { setLineStyle } from '@tradingview/lwc-toolkit/line-style';
 import type { LineStyle as ToolkitLineStyle } from '@tradingview/lwc-toolkit/line-style';
 
@@ -123,15 +123,6 @@ export class HLCAreaSeriesRenderer<
 		// instead of leaving the pane.
 		const range = extendRange({ from, to }, data.bars.length);
 
-		// The chart only converts the bars inside the non-extended visible range
-		// to coordinates, so the two bars `extendRange` adds carry `NaN`. Bars
-		// are evenly spaced by logical index, so their x follows from a visible
-		// neighbour.
-		const anchor = data.bars[from];
-		const barX = (bar: { x: number; time: number }): number =>
-			Number.isFinite(bar.x)
-				? bar.x
-				: anchor.x + (bar.time - anchor.time) * data.barSpacing;
 
 		const bars: HLCAreaBarItem[] = [];
 		for (let i = range.from; i < range.to; i++) {
@@ -145,7 +136,7 @@ export class HLCAreaSeriesRenderer<
 			if (high === null || low === null || close === null) {
 				continue;
 			}
-			bars.push({ x: barX(bar), high, low, close, index: i, time: bar.time });
+			bars.push({ x: barCoordinate(bar, data.bars[from], data.barSpacing), high, low, close, index: i, time: bar.time });
 		}
 
 		const ctx = scope.context;
@@ -154,7 +145,7 @@ export class HLCAreaSeriesRenderer<
 
 		// Whitespace never reaches a renderer, so a jump in the logical index is
 		// the only sign of a gap; each run of consecutive bars is its own path.
-		for (const segment of visibleSegments(bars, { from: 0, to: bars.length })) {
+		for (const segment of visibleSegments(bars, { from: 0, to: bars.length }, getConflationFactor(data))) {
 			this._drawSegment(scope, options, bars, segment.from, segment.to);
 		}
 

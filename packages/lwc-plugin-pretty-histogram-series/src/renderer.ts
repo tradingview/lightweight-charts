@@ -15,7 +15,7 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 
 import { PrettyHistogramData } from './data';
 import { PrettyHistogramSeriesOptions } from './options';
@@ -132,7 +132,8 @@ export class PrettyHistogramSeriesRenderer<
 				barSpacing,
 				horizontalPixelRatio,
 				0,
-				items.length
+				items.length,
+			getConflationFactor(data)
 			);
 		}
 

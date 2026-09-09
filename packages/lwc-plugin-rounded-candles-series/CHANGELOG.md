@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep both wick segments visible on inverted price scales.
+
 - Candles are coloured on `open <= close`, like the built-in candlestick
   series, instead of comparing the close with the previous candle's close
   (which also made the first candle always rising). The old behaviour is

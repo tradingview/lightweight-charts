@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep area fills visible after scrolling or zooming to an interior range and when data is conflated.
+
 - No longer throws when the visible range is empty — every point scrolled off
   one side of the pane.
 - No longer throws when the points do not all carry the same number of values.

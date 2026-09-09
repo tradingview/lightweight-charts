@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `createPrettyHistogramSeries` binds options before data ingestion and keeps plot values
+  synchronized when scaling options change.
 - First release as a standalone package, `@tradingview/lwc-plugin-pretty-histogram-series`.
   Graduated from the `plugin-examples` collection of the Lightweight Charts™
   repository.
@@ -31,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   only called by Lightweight Charts 5.1 and later.
 
 ### Fixed
+
+- Include the current baseline in initial and updated plot values.
 
 - Autoscale now includes `base`, so bars are no longer cut off at the edge of
   the pane and the `autoscaleInfoProvider` workaround the example used is gone.

@@ -312,4 +312,13 @@ void describe('calculateColumnPositionsInPlace', () => {
 		expect(gap(0, 1)).to.equal(1);
 		expect(gap(2, 3)).to.equal(1);
 	});
+	void it('aligns conflated neighbours while retaining real gaps', () => {
+		const indices = [0, 1, 3, 4];
+		const ordinary = indices.map(time => ({ x: time * 6.3, time })) as ColumnPositionItem[];
+		const conflated = indices.map(time => ({ x: time * 6.3, time: time * 8 })) as ColumnPositionItem[];
+		calculateColumnPositionsInPlace(ordinary, 6.3, 1.25, 0, 4);
+		calculateColumnPositionsInPlace(conflated, 6.3, 1.25, 0, 4, 8);
+		expect(conflated.map(bar => bar.column)).to.deep.equal(ordinary.map(bar => bar.column));
+	});
+
 });

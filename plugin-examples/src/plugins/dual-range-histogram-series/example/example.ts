@@ -3,7 +3,7 @@ import {
 	DualRangeHistogramData,
 	DualRangeHistogramNormalize,
 	DualRangeHistogramScaleMode,
-	DualRangeHistogramSeries,
+	createDualRangeHistogramSeries,
 	keepPixelSeriesInView,
 } from '@tradingview/lwc-plugin-dual-range-histogram-series';
 import { generateLineData, shuffleValuesWithLimit } from '../../../sample-data';
@@ -20,8 +20,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	hoveredSeriesOnTop: false,
 }));
 
-const dualRangeHistogramSeries = chart.addCustomSeries(
-	new DualRangeHistogramSeries(),
+const dualRangeHistogramSeries = createDualRangeHistogramSeries(chart,
 	{
 		color: 'black', // for the price line
 		priceLineVisible: false,

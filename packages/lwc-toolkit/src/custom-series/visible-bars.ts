@@ -91,14 +91,15 @@ export function extendRange(
 
 /**
  * Splits a visible range into the runs of consecutive bars, breaking wherever
- * `bars[i].time !== bars[i - 1].time + 1`. Whitespace data never reaches a
+ * the logical index advances by more than `conflationFactor`. Whitespace data never reaches a
  * renderer, so a jump in the logical time index is the only sign of a gap and
  * a line series has to start a new path there instead of bridging it.
  * The returned ranges are absolute `[from, to)` index ranges into `bars`.
  */
 export function visibleSegments(
 	bars: readonly TimeIndexed[],
-	range: IRange<number>
+	range: IRange<number>,
+	conflationFactor: number = 1
 ): IRange<number>[] {
 	const { from, to } = clampedRange(range, bars.length);
 	if (from >= to) {
@@ -107,11 +108,26 @@ export function visibleSegments(
 	const segments: IRange<number>[] = [];
 	let segmentStart = from;
 	for (let i = from + 1; i < to; i++) {
-		if (bars[i].time !== bars[i - 1].time + 1) {
+		const step = bars[i].time - bars[i - 1].time;
+		if (step <= 0 || step > conflationFactor) {
 			segments.push({ from: segmentStart, to: i });
 			segmentStart = i;
 		}
 	}
 	segments.push({ from: segmentStart, to });
 	return segments;
+}
+
+/**
+ * Reconstructs a bar's media x coordinate from a currently visible anchor.
+ * Extended bars may have missing or stale coordinates after scrolling/zooming.
+ * Spacing is per logical index, including when bars have been conflated.
+ */
+export function barCoordinate(bar: TimeIndexed, anchor: TimeIndexed & { x: number }, barSpacing: number): number {
+	return anchor.x + (bar.time - anchor.time) * barSpacing;
+}
+
+/** The logical stride of a rendered bar; hosts before 5.1 omit the factor. */
+export function getConflationFactor(data: { barSpacing: number; conflationFactor?: number }): number {
+	return Math.max(1, data.conflationFactor ?? 1);
 }

@@ -17,7 +17,7 @@ function runTestCase(container) {
 		timeScale: { minBarSpacing: 3 },
 	}));
 	// The last value sits at the base; the colours stay with their value.
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {
+	const series = LwcPlugin.createStackedBarsSeries(chart, {
 		stackOrder: 'reverse',
 	});
 	series.setData(generateData());

@@ -36,6 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Clone nested chart interaction settings before dragging and restore them on release, cancellation, detachment, or disabling dragging.
+- Restrict drags to the attached pane and the active primary pointer.
+
 - A line whose time cannot be placed on the time scale no longer leaves a stray
   time-axis label at the left edge of the axis: the label is hidden with the
   line.

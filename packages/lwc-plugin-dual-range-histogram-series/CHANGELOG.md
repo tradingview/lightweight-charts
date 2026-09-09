@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `createDualRangeHistogramSeries` binds options before data ingestion and keeps plot values
+  synchronized when scaling options change.
 - First release as a standalone package, `@tradingview/lwc-plugin-dual-range-histogram-series`.
   Graduated from the `plugin-examples` collection of the Lightweight Charts™
   repository.
@@ -34,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `conflationFactor` are only used by Lightweight Charts 5.1 and later.
 
 ### Fixed
+
+- Use current scale mode and baseline for initial and updated plot values.
 
 - Columns are one pixel wider: the toolkit's column width is inclusive, so
   `right - left` left a two-pixel gap and columns never abutted.

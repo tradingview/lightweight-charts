@@ -21,7 +21,7 @@ function runTestCase(container) {
 	}));
 	// `histogram` width mode aligns each column against its neighbour; the first
 	// column after the gap must not be widened or shifted by that alignment.
-	const series = chart.addCustomSeries(new LwcPlugin.PrettyHistogramSeries(), {
+	const series = LwcPlugin.createPrettyHistogramSeries(chart, {
 		widthMode: 'histogram',
 		radius: 3,
 	});

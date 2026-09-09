@@ -17,7 +17,7 @@ function runTestCase(container) {
 		timeScale: { minBarSpacing: 3 },
 	}));
 	// Narrow columns with a wide gap, instead of the histogram width.
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {
+	const series = LwcPlugin.createStackedBarsSeries(chart, {
 		columnWidthMode: 'percent',
 		widthPercent: 40,
 	});

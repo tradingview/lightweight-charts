@@ -18,7 +18,7 @@ function runTestCase(container) {
 	}));
 	// Columns stacked from 50 rather than 0. `priceValueBuilder` measures from
 	// zero, so a non-zero base needs an autoscale provider of its own.
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {
+	const series = LwcPlugin.createStackedBarsSeries(chart, {
 		base: 50,
 		autoscaleInfoProvider: () => ({
 			priceRange: { minValue: 40, maxValue: 70 },

@@ -2,7 +2,7 @@
 function runTestCase(container) {
 	window.ignoreMouseMove = true;
 	const chart = LightweightCharts.createChart(container);
-	const series = chart.addCustomSeries(new LwcPlugin.PrettyHistogramSeries(), {
+	const series = LwcPlugin.createPrettyHistogramSeries(chart, {
 		base: 100,
 		priceLineVisible: false, lastValueVisible: false,
 	});

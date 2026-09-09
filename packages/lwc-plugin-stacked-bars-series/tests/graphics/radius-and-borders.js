@@ -17,7 +17,7 @@ function runTestCase(container) {
 		timeScale: { minBarSpacing: 3 },
 	}));
 	// Rounded column ends, and a white border inside every segment.
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {
+	const series = LwcPlugin.createStackedBarsSeries(chart, {
 		columnWidthMode: 'percent',
 		widthPercent: 70,
 		radius: 6,

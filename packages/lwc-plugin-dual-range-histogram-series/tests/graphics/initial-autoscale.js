@@ -2,7 +2,7 @@
 function runTestCase(container) {
 	window.ignoreMouseMove = true;
 	const chart = LightweightCharts.createChart(container);
-	const series = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
+	const series = LwcPlugin.createDualRangeHistogramSeries(chart, {
 		scaleMode: 'price', baseValue: 50,
 		priceLineVisible: false, lastValueVisible: false,
 	});

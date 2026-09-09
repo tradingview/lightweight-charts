@@ -467,14 +467,11 @@ whole chart for data-update announcements.
 
 Data stays in sync through one `subscribeDataChanged` listener per series, so
 scrolling and zooming do no data work at all – the focus ring is repositioned
-with a couple of coordinate look-ups and nothing is read or copied. Data changes
-are handled by their reported scope: a streamed `update()` patches the focused
-series' cache with a single `dataByIndex` look-up, and the update announcements
-take their count from `barsInLogicalRange` and their latest value from that same
-look-up, so **a ticking series is never cloned**. Only a `setData` re-reads the
-series, and an unfocused pane defers even that until it is focused again. The
-work is therefore proportional to how much the chart is actually being used, not
-to how often the user scrolls or how often your data ticks.
+with a couple of coordinate look-ups and nothing is read or copied. Data-change events do not distinguish a tail tick from a historical correction
+or `pop()`. Announced counts and the focused navigation cache therefore re-read
+series data when it changes, so they include replacements, removals and corrected
+historical values. This work is proportional to the series length. An unfocused
+pane defers its navigation-cache refresh until it is focused again.
 
 ## CSS class hooks
 

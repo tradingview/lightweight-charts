@@ -11,7 +11,7 @@ import {
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import { ColumnPosition, ColumnPositionItem, calculateColumnPositionsInPlace } from '@tradingview/lwc-toolkit/dimensions/columns';
 import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
-import { mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { stackLevels } from '@tradingview/lwc-toolkit/custom-series/stacking';
 
 import { StackedBarsHitTestResult, isHitTestData } from './compat';
@@ -187,7 +187,8 @@ export class StackedBarsSeriesRenderer<
 			barSpacing,
 			horizontalPixelRatio,
 			0,
-			items.length
+			items.length,
+			getConflationFactor(data)
 		);
 		const palette = options.colors.length > 0 ? options.colors : defaultOptions.colors;
 		const borderWidth = options.segmentBorderWidth > 0

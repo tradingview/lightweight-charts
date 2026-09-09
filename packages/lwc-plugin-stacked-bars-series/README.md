@@ -24,10 +24,10 @@ Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { StackedBarsSeries } from '@tradingview/lwc-plugin-stacked-bars-series';
+import { createStackedBarsSeries } from '@tradingview/lwc-plugin-stacked-bars-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new StackedBarsSeries(), {
+const series = createStackedBarsSeries(chart, {
     colors: ['#2962FF', '#F23645', '#FF9800'],
 });
 
@@ -59,10 +59,10 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { StackedBarsSeries } from '@tradingview/lwc-plugin-stacked-bars-series';
+import { createStackedBarsSeries } from '@tradingview/lwc-plugin-stacked-bars-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new StackedBarsSeries(), {
+const series = createStackedBarsSeries(chart, {
     colors: ['#2962FF', '#F23645', '#FF9800'],
 });
 
@@ -82,12 +82,12 @@ segment.
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { StackedBarsSeries } from '@tradingview/lwc-plugin-stacked-bars-series';
+import { createStackedBarsSeries } from '@tradingview/lwc-plugin-stacked-bars-series';
 
 const chart = createChart(document.getElementById('container'), {
     timeScale: { minBarSpacing: 3 },
 });
-const series = chart.addCustomSeries(new StackedBarsSeries(), {
+const series = createStackedBarsSeries(chart, {
     colors: ['#2962FF', '#F23645', '#FF9800'],
 });
 
@@ -117,6 +117,22 @@ series.setData([
 ```
 
 Options can be changed at runtime with `series.applyOptions({ ... })`.
+
+## Creating a series
+
+Use `createStackedBarsSeries(chart, options?, paneIndex?)`. It returns the
+normal series API, with the plugin's data and options types preserved. The helper
+makes scaling options available before the first `setData` and rebuilds plot
+values automatically when those options change through `series.applyOptions`.
+This keeps autoscaling, last-value labels and crosshair values consistent. The
+helper retains a shallow copy of the input data, including whitespace, and
+re-ingests it only when a scaling option changes. Streaming updates remain
+incremental.
+
+The low-level `StackedBarsSeries` pane view remains available for integrations
+that supply their own options getter to its constructor. Passing scaling options
+only to `chart.addCustomSeries(new StackedBarsSeries(), options)` cannot make
+them available before data ingestion on LWC 5.0; use the creation helper instead.
 
 ## Options
 
@@ -153,16 +169,9 @@ series' price line.
   `columnWidthMode: 'percent'` for a fixed share of the slot.
 - The price scale autoscales over the whole run of the stack, not just its
   total, so a column containing negative values stays fully in view.
-- Autoscaling is computed from the raw `values` measured from zero, because the
-  library asks for those values before the series options are known. With
-  `percent: true`, or a `base` other than `0`, supply the range yourself:
-
-  ```js
-  series.applyOptions({
-      percent: true,
-      autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }),
-  });
-  ```
+- `createStackedBarsSeries` measures the same ordered, normalized, and offset
+  bands that are drawn. `percent`, nonzero `base`, and `stackOrder: 'reverse'`
+  therefore autoscale without a custom range provider.
 
 - On `lightweight-charts` 5.1 and later the series reports the hovered segment
   through `hitTest` (the `objectId` is the index of the value within the point)

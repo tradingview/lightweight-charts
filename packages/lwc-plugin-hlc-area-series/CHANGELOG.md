@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Preserve filled areas and visible whitespace gaps when data is conflated.
+
 - The series no longer throws when the whole dataset is scrolled out of view and
   the visible range is empty.
 - The lines and the fills continue past the first and the last visible point, so

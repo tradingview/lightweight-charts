@@ -2,7 +2,7 @@ import { CustomSeriesWhitespaceData, Time, createChart } from 'lightweight-chart
 import {
 	StackedBarsColumnWidthMode,
 	StackedBarsData,
-	StackedBarsSeries,
+	createStackedBarsSeries,
 } from '@tradingview/lwc-plugin-stacked-bars-series';
 import { multipleBarData } from '../../../sample-data';
 
@@ -31,7 +31,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	},
 }));
 
-const series = chart.addCustomSeries(new StackedBarsSeries(), {
+const series = createStackedBarsSeries(chart, {
 	color: 'black', // for the price line
 });
 series.setData(demoData());

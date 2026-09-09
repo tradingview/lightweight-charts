@@ -19,7 +19,7 @@ function runTestCase(container) {
 	// Negative values stack downwards from the base: the second segment is
 	// drawn back down from the top of the first, the third continues up from
 	// there, and the autoscale covers the whole run rather than just the total.
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {});
+	const series = LwcPlugin.createStackedBarsSeries(chart, {});
 	series.setData(generateData());
 	chart.timeScale().fitContent();
 }

@@ -11,7 +11,7 @@ import {
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import { Position, areaBetween } from '@tradingview/lwc-toolkit/custom-series/line-paths';
-import { extendRange, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { barCoordinate, getConflationFactor, extendRange, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { LineStyle, setLineStyle } from '@tradingview/lwc-toolkit/line-style';
 import { stackLevels } from '@tradingview/lwc-toolkit/custom-series/stacking';
 
@@ -156,14 +156,14 @@ export class StackedAreaSeriesRenderer<
 			const bar: CustomBarItemData<HorzScaleItem, TData> = data.bars[i];
 			const levels = this._levels(bar.originalData.values, bandCount, options);
 			points[i - range.from] = {
-				x: bar.x,
+				x: barCoordinate(bar, data.bars[from], data.barSpacing),
 				ys: levels.map((level: number): number => priceToCoordinate(level) ?? baseY),
 				colors: bar.originalData.colors,
 			};
 		}
 
 		const segments = options.gapHandling === 'break'
-			? visibleSegments(data.bars, range)
+			? visibleSegments(data.bars, range, getConflationFactor(data))
 			: [range];
 		const hoveredBand = isHovered && isHitTestData(hitTestData)
 			? hitTestData.bandIndex

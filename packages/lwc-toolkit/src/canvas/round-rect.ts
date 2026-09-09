@@ -5,7 +5,7 @@
 export type CornerRadii = [number, number, number, number];
 
 function changeBorderRadius(borderRadius: CornerRadii, offset: number): CornerRadii {
-	return borderRadius.map((x: number) => (x === 0 ? x : x + offset)) as CornerRadii;
+	return borderRadius.map((x: number) => Math.max(0, x + offset)) as CornerRadii;
 }
 
 /**
@@ -82,6 +82,8 @@ export function drawRoundRectWithBorder(
 	outerBorderRadius: CornerRadii = [0, 0, 0, 0],
 	borderColor?: string
 ): void {
+	if (width === 0 || height === 0) { return; }
+	borderWidth = Math.min(Math.max(0, borderWidth), Math.abs(width), Math.abs(height));
 	ctx.save();
 
 	if (borderWidth === 0 || borderColor === undefined || borderColor === backgroundColor) {

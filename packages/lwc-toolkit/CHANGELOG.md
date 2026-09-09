@@ -9,6 +9,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `custom-series/options-aware-series` creates series with synchronous option
+  access and refreshes plot values when scaling options change.
 - Initial release. Helpers extracted from the Lightweight Charts™ plugin
   examples, where they were previously copied into each plugin by hand:
   - `assertions` — `ensureDefined`, `ensureNotNull`
@@ -51,3 +53,9 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (logical index); columns on either side of a whitespace gap are no longer
   aligned to each other, and `endIndex` is exclusive in every pass.
 - `min-max-in-range` results are now actually cached.
+
+### Fixed
+
+- Reconstruct extended bar coordinates from a visible anchor and respect conflation when finding gaps or aligning columns.
+- Clamp inset corner radii and cap borders to the rectangle dimensions.
+- Offset stacked plot values consistently from a nonzero baseline.

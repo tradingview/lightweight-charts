@@ -3,7 +3,7 @@
 function runTestCase(container) {
 	window.ignoreMouseMove = true;
 	const chart = LightweightCharts.createChart(container);
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {
+	const series = LwcPlugin.createStackedBarsSeries(chart, {
 		radius: 1, segmentBorderWidth: 4, segmentBorderColor: '#000000',
 		colors: ['#00ff00'], priceLineVisible: false, lastValueVisible: false,
 	});

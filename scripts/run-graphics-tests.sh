@@ -36,13 +36,12 @@ main() {
 
 	pnpm install --frozen-lockfile
 	pnpm $BUILD_SCRIPT
-	# Remove existing merge-base-dist if it exists
-	rm -rf ./merge-base-dist
-	mv ./dist ./merge-base-dist
-
 	if [ "$GRAPHICS_TEST_SUITE" = "plugins" ]; then
 		build_plugins_golden
 	fi
+	# Plugin workspace imports need dist/typings.d.ts until their build finishes.
+	rm -rf ./merge-base-dist
+	mv ./dist ./merge-base-dist
 
 	if [ "$BRANCH_SPECIFIC_TEST" = "true" ]; then
 		echo "Using BRANCH_SPECIFIC_TEST"
@@ -57,10 +56,12 @@ main() {
 	pnpm install --frozen-lockfile
 	pnpm $BUILD_SCRIPT
 
+	if [ "$GRAPHICS_TEST_SUITE" = "plugins" ]; then
+		build_plugins
+	fi
 	set +e
 	if [ "$GRAPHICS_TEST_SUITE" = "plugins" ]; then
 		echo "Plugin graphics tests"
-		build_plugins
 		pnpm exec esno ./tests/e2e/graphics/plugins-runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.mjs ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.mjs --golden-plugins-dir ./merge-base-plugins-dist --test-plugins-dir ./packages
 	else
 		echo "Graphics tests"
@@ -88,9 +89,7 @@ build_plugins() {
 build_plugins_golden() {
 	rm -rf ./merge-base-plugins-dist ./packages/lwc-plugin-*/dist
 	mkdir -p ./merge-base-plugins-dist
-	set +e
 	build_plugins
-	set -e
 	for pkg in ./packages/lwc-plugin-*/; do
 		if [ -d "$pkg/dist" ]; then
 			cp -R "$pkg/dist" "./merge-base-plugins-dist/$(basename "$pkg")"

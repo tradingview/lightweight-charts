@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `createStackedBarsSeries` binds options before data ingestion and keeps plot values
+  synchronized when scaling options change.
 - First release as a standalone package, `@tradingview/lwc-plugin-stacked-bars-series`.
   Graduated from the `plugin-examples` collection of the Lightweight Charts™
   repository.
@@ -25,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   by `lightweight-charts` 5.1 and later; the package still runs on 5.0.0.
 
 ### Fixed
+
+- Measure the same reversed, percent-normalized, and offset stack that is drawn.
 
 - Columns are one bitmap pixel wider: the toolkit column position is
   inclusive, so the width is `right - left + 1`. Neighbouring columns now
