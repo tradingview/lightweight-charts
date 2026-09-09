@@ -18,7 +18,6 @@
         <div id="container" style="position: absolute; width: 100%; height: 100%;"></div>
 
         <script type="text/javascript">//RESIZE_OBSERVER_POLYFILL</script>
-        <script type="text/javascript">//PLUGIN_REGRESSION_HELPERS</script>
 
         <script type="text/javascript">
             TEST_CASE_SCRIPT
@@ -35,7 +34,7 @@
             window.LightweightCharts = lib;
             window.LwcPlugin = plugin;
             window.BUILD_MODE = '{BUILD_MODE}';
-            window.testCaseReady = Promise.resolve(runTestCase(document.getElementById('container')));
+            window.testCaseReady = Promise.resolve(TEST_CASE_ENTRY_POINT(document.getElementById('container')));
         </script>
     </body>
 </html>

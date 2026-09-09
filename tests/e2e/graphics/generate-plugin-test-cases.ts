@@ -17,14 +17,15 @@ export function generatePluginPageContent(
 	pluginPackageName: string,
 	pluginModulePath: string,
 	testCaseCode: string,
-	buildMode: 'production' | 'development'
+	buildMode: 'production' | 'development',
+	entryPoint: 'runTestCase' | 'beforeInteractions' = 'runTestCase'
 ): string {
 	return pluginPageContent
 		.replace('//RESIZE_OBSERVER_POLYFILL', resizeObserverPolyfill)
-		.replace('//PLUGIN_REGRESSION_HELPERS', fs.readFileSync(path.join(currentDirectory, 'helpers', 'plugin-regression-helpers.js'), 'utf8'))
 		.replace('PATH_TO_STANDALONE_MODULE', libraryModulePath)
 		.split('PLUGIN_PACKAGE_NAME').join(pluginPackageName)
 		.replace('PATH_TO_PLUGIN_MODULE', pluginModulePath)
 		.replace('TEST_CASE_SCRIPT', testCaseCode)
+		.replace('TEST_CASE_ENTRY_POINT', entryPoint)
 		.replace('{BUILD_MODE}', buildMode);
 }

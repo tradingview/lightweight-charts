@@ -36,11 +36,11 @@ function readTestCases(dir: string, folder: string): TestCase[] {
 }
 
 /**
- * Discovers `packages/lwc-plugin-*\/tests/graphics/*.js`. The group name is the
+ * Discovers `packages/lwc-plugin-*\/tests/<suite>/*.js`. The group name is the
  * package folder, so `GREP="lwc-plugin-"` selects the whole suite and
  * `GREP="lwc-plugin-vertical-line/"` one package.
  */
-export function getPluginTestCases(): PluginTestCasesGroup[] {
+export function getPluginTestCases(suite: 'graphics' | 'interactions' = 'graphics'): PluginTestCasesGroup[] {
 	if (!fs.existsSync(packagesDir)) {
 		return [];
 	}
@@ -49,7 +49,7 @@ export function getPluginTestCases(): PluginTestCasesGroup[] {
 		if (!folder.startsWith('lwc-plugin-')) {
 			continue;
 		}
-		const casesDir = path.join(packagesDir, folder, 'tests', 'graphics');
+		const casesDir = path.join(packagesDir, folder, 'tests', suite);
 		const packageJsonPath = path.join(packagesDir, folder, 'package.json');
 		if (!fs.existsSync(casesDir) || !fs.existsSync(packageJsonPath)) {
 			continue;
