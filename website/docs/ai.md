@@ -5,7 +5,7 @@ sidebar_label: Build with AI
 
 ## AI-friendly documentation
 
-This documentation is structured so that AI coding assistants and other LLM-based tools can read it directly, without scraping HTML, following the [llms.txt] convention.
+The Lightweight Charts™ documentation is structured so that AI coding assistants and other LLM-based tools can read it directly, without scraping HTML, following the [llms.txt] convention.
 
 ### llms.txt and the docs map
 
