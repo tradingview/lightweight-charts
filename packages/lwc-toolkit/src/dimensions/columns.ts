@@ -182,56 +182,86 @@ export function calculateColumnPositions(
 
 export interface ColumnPositionItem {
 	x: number;
+	/**
+	 * Logical index of the bar (as provided by the library on each bar item).
+	 * When present, it is used to detect gaps in the data: two columns are only
+	 * aligned against each other when they are consecutive (`time` differs by
+	 * the conflation factor, or one without conflation). Leave it undefined if the items are known to be gapless.
+	 */
+	time?: number;
 	column?: ColumnPosition;
+}
+
+/**
+ * Whether two neighbouring items are adjacent bars, and therefore whether the
+ * second one should have its edge aligned against the first. Items without a
+ * `time` are assumed to be adjacent, which keeps callers that do not populate
+ * `time` behaving exactly as before.
+ */
+function isAdjacentBar(
+	current: ColumnPositionItem,
+	previous: ColumnPositionItem,
+	conflationFactor: number
+): boolean {
+	if (current.time === undefined || previous.time === undefined) return true;
+	return current.time === previous.time + conflationFactor;
 }
 
 /**
  * Calculates the column positions and widths for bars using the existing the
  * array of items.
- * @param items - bar items which include an `x` property, and will be mutated to contain a column property
+ *
+ * Columns are only aligned against their neighbour when the two bars are
+ * consecutive, so the first column after a whitespace gap is neither widened
+ * nor shifted. This requires the items to carry a `time` (logical index); when
+ * they do not, every item is treated as adjacent to the previous one.
+ *
+ * @param items - bar items which include an `x` property (and optionally a `time` property), and will be mutated to contain a column property
  * @param barSpacingMedia - bar spacing in media coordinates
  * @param horizontalPixelRatio - horizontal pixel ratio
- * @param startIndex - start index for visible bars within the items array
- * @param endIndex - end index for visible bars within the items array
+ * @param startIndex - start index for visible bars within the items array (inclusive)
+ * @param endIndex - end index for visible bars within the items array (exclusive)
+ * @param conflationFactor - logical stride of one rendered bar (defaults to one)
  */
 export function calculateColumnPositionsInPlace(
 	items: ColumnPositionItem[],
 	barSpacingMedia: number,
 	horizontalPixelRatio: number,
 	startIndex: number,
-	endIndex: number
+	endIndex: number,
+	conflationFactor: number = 1
 ): void {
 	const common = columnCommon(barSpacingMedia, horizontalPixelRatio);
+	const lastIndex = Math.min(endIndex, items.length);
 	let previous: ColumnPosition | undefined = undefined;
-	for (let i = startIndex; i < Math.min(endIndex, items.length); i++) {
-		items[i].column = calculateColumnPosition(items[i].x, common, previous);
+	for (let i = startIndex; i < lastIndex; i++) {
+		const alignAgainst =
+			previous !== undefined && isAdjacentBar(items[i], items[i - 1], conflationFactor)
+				? previous
+				: undefined;
+		items[i].column = calculateColumnPosition(items[i].x, common, alignAgainst);
 		previous = items[i].column;
 	}
-	const minColumnWidth = (items as ColumnPositionItem[]).reduce(
-		(smallest: number, item: ColumnPositionItem, index: number) => {
-			if (!item.column || index < startIndex || index > endIndex)
-				return smallest;
-			if (item.column.right < item.column.left) {
-				item.column.right = item.column.left;
-			}
-			const width = item.column.right - item.column.left + 1;
-			return Math.min(smallest, width);
-		},
-		Math.ceil(barSpacingMedia * horizontalPixelRatio)
-	);
+	let minColumnWidth = Math.ceil(barSpacingMedia * horizontalPixelRatio);
+	for (let i = startIndex; i < lastIndex; i++) {
+		const column = items[i].column;
+		if (!column) continue;
+		if (column.right < column.left) {
+			column.right = column.left;
+		}
+		minColumnWidth = Math.min(minColumnWidth, column.right - column.left + 1);
+	}
 	if (common.spacing > 0 && minColumnWidth < alignToMinimalWidthLimit) {
-		(items as ColumnPositionItem[]).forEach(
-			(item: ColumnPositionItem, index: number) => {
-				if (!item.column || index < startIndex || index > endIndex) return;
-				const width = item.column.right - item.column.left + 1;
-				if (width <= minColumnWidth) return item;
-				if (item.column.shiftLeft) {
-					item.column.right -= 1;
-				} else {
-					item.column.left += 1;
-				}
-				return item.column;
+		for (let i = startIndex; i < lastIndex; i++) {
+			const column = items[i].column;
+			if (!column) continue;
+			const width = column.right - column.left + 1;
+			if (width <= minColumnWidth) continue;
+			if (column.shiftLeft) {
+				column.right -= 1;
+			} else {
+				column.left += 1;
 			}
-		);
+		}
 	}
 }

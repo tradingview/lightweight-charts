@@ -1,0 +1,78 @@
+{
+	"name": "@tradingview/lwc-plugin-accessibility",
+	"version": "1.0.0",
+	"description": "Drop-in accessibility layer built on pane primitives: adds semantic markup, keyboard navigation, and screen-reader support to help meet WCAG 2.1 AA.",
+	"author": "TradingView",
+	"license": "Apache-2.0",
+	"type": "module",
+	"types": "./dist/accessibility.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/accessibility.d.ts",
+			"default": "./dist/accessibility.js"
+		},
+		"./standalone": {
+			"types": "./dist/accessibility.d.ts",
+			"default": "./dist/accessibility.standalone.js"
+		}
+	},
+	"files": [
+		"dist",
+		"CHANGELOG.md",
+		"NOTICE"
+	],
+	"keywords": [
+		"lightweight-charts",
+		"lightweight-charts-plugin",
+		"lwc-plugin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"directory": "packages/lwc-plugin-accessibility"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"dev": "vite --config src/vite.config.js",
+		"build": "tsc && node compile.mjs",
+		"typecheck": "tsc --noEmit && tsc -p tsconfig.tests.json",
+		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+		"prepack": "node -e \"require('fs').copyFileSync('../../LICENSE', 'LICENSE')\"",
+		"postpack": "node -e \"require('fs').unlinkSync('LICENSE')\""
+	},
+	"peerDependencies": {
+		"lightweight-charts": "^5.0.0"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "0.18.5",
+		"@tradingview/lwc-plugin-preview-kit": "workspace:*",
+		"@tradingview/lwc-toolkit": "workspace:*",
+		"@types/chai": "5.2.1",
+		"@types/node": "22.13.14",
+		"chai": "5.2.0",
+		"dts-bundle-generator": "9.5.1",
+		"lightweight-charts": "workspace:*",
+		"publint": "0.3.14",
+		"typescript": "5.9.3",
+		"vite": "8.2.2"
+	},
+	"lwcPlugin": {
+		"title": "Accessibility",
+		"category": "pane-primitive",
+		"lifecycle": "current",
+		"origin": "official",
+		"author": "TradingView",
+		"demo": "src/example/index.html",
+		"preview": "src/example/preview.html",
+		"previewHeight": 440,
+		"tags": [
+			"a11y",
+			"accessibility",
+			"wcag",
+			"keyboard",
+			"screen reader"
+		]
+	}
+}

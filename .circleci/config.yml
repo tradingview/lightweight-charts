@@ -11,7 +11,7 @@ aliases:
   - &restore-node-modules-cache
       name: Restore dependencies cache
       keys:
-        - &cache-key v1-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
+        - &cache-key v2-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
 
   - &save-node-modules-cache
       name: Save dependencies cache
@@ -27,6 +27,16 @@ aliases:
         - indicator-examples/node_modules
         - packages/create-lwc-plugin/node_modules
         - packages/lwc-toolkit/node_modules
+        - packages/lwc-plugin-accessibility/node_modules
+        - packages/lwc-plugin-brushable-area-series/node_modules
+        - packages/lwc-plugin-dual-range-histogram-series/node_modules
+        - packages/lwc-plugin-hlc-area-series/node_modules
+        - packages/lwc-plugin-image-watermark/node_modules
+        - packages/lwc-plugin-pretty-histogram-series/node_modules
+        - packages/lwc-plugin-rounded-candles-series/node_modules
+        - packages/lwc-plugin-stacked-area-series/node_modules
+        - packages/lwc-plugin-stacked-bars-series/node_modules
+        - packages/lwc-plugin-vertical-line/node_modules
         # puppeteer browser cache (see .puppeteerrc.cjs)
         - .cache
         # corepack-downloaded pnpm, so restore-only jobs don't re-download it
@@ -82,12 +92,16 @@ commands:
       branchSpecificTest:
         type: boolean
         default: false
+      suite:
+        type: string
+        default: library
     steps:
       - checkout-with-deps
       - run:
           name: "Setup Environment Variables"
           command: |
             echo 'export NO_SANDBOX="true"' >> $BASH_ENV
+            echo 'export GRAPHICS_TEST_SUITE=<< parameters.suite >>' >> $BASH_ENV
             echo 'export CMP_OUT_DIR="./graphics-cmp-data"' >> $BASH_ENV
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
@@ -262,6 +276,11 @@ jobs:
       TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
       - checkout-with-deps
+      # The package tests import the library at run time through the
+      # workspace link, which resolves to the built dist/.
+      - attach_workspace:
+          at: ./
+      - run: pnpm --filter @tradingview/lwc-toolkit build
       - run: pnpm test
       - store_test_results:
           path: test-results/
@@ -293,11 +312,15 @@ jobs:
       branchSpecificTest:
         type: boolean
         default: false
+      suite:
+        type: string
+        default: library
     executor: node-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: << parameters.dpr >>
           grep: << parameters.grep >>
+          suite: << parameters.suite >>
           productionBuild: << parameters.productionBuild >>
           branchSpecificTest: << parameters.branchSpecificTest >>
 
@@ -346,6 +369,8 @@ jobs:
       - run: scripts/run-interactions-tests.sh
       - store_test_results:
           path: test-results/
+      - store_artifacts:
+          path: tests/e2e/interactions/.gendata
 
   size-limit:
     executor: node-executor
@@ -366,9 +391,14 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      # builds @tradingview/lwc-toolkit first (via the build:utils pre-step),
-      # typechecks all plugin sources against it and compiles every plugin,
-      # including the bundled typings that must inline the toolkit
+      # The plugin packages' own devDependencies are only in the cache once it
+      # was saved with them listed; installing here keeps the job independent
+      # of the cache contents (with the cache restored this fetches nothing).
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      # builds @tradingview/lwc-toolkit and the graduated plugin packages first
+      # (via the build:deps pre-step), typechecks all plugin sources against
+      # them and compiles every plugin, including the bundled typings that must
+      # inline the toolkit
       - run:
           command: pnpm --filter lightweight-charts-plugin-examples compile
           no_output_timeout: 5m
@@ -446,6 +476,14 @@ workflows:
           branchSpecificTest: true
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
+      # The plugin packages, rendered through their standalone builds against
+      # the merge-base builds of both the package and the library.
+      - graphics-tests:
+          name: branch_specific_graphics-tests-part4-plugins-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "lwc-plugin-"
+          suite: plugins
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
 
   build-lint-test:
     when:
@@ -508,6 +546,12 @@ workflows:
       - graphics-tests:
           name: graphics-tests-part3-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
           grep: "(series/|time-scale/|degenerative-horizontal-series-with-integer-min-tick/)"
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
+      - graphics-tests:
+          name: graphics-tests-part4-plugins-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "lwc-plugin-"
+          suite: plugins
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
       - memleaks-tests:

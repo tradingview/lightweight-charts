@@ -28,7 +28,8 @@ export async function runTests(
 	);
 
 	const hostname = 'localhost';
-	const port = 34567;
+	// Overridable so that two suites can run side by side on one machine.
+	const port = parseInt(process.env.GRAPHICS_SERVER_PORT ?? '', 10) || 34567;
 	const httpServerPrefix = `http://${hostname}:${port}/`;
 
 	const filesToServeLocally = new Map<string, string>();

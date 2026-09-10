@@ -7,6 +7,13 @@ export interface LwcPluginMetadata {
 	author?: string;
 	/** Path of the demo page, relative to the package directory. */
 	demo: string;
+	/**
+	 * Path of the catalogue preview page, relative to the package directory.
+	 * Optional: community packages and packages predating the field have none.
+	 */
+	preview?: string;
+	/** Height in CSS pixels for the preview frame. Only valid with `preview`. */
+	previewHeight?: number;
 	/** Always an array; an absent `tags` in the manifest becomes `[]`. */
 	tags: string[];
 }
@@ -52,6 +59,17 @@ export interface CatalogueEntry {
 	lwcPlugin: LwcPluginMetadata;
 	/** Repo-relative POSIX path of the demo page source, e.g. `packages/lwc-plugin-x/src/example/index.html`. */
 	demoPath: string;
+	/** Repo-relative POSIX path of the preview page source, or null when the package declares none. */
+	previewPath: string | null;
+	/**
+	 * Site-root-relative URL of the built demo page, `/plugin-demos/<slug>/`.
+	 * Produced by `pnpm plugins:build-demos`; pass it through `useBaseUrl`.
+	 */
+	demoUrl: string;
+	/** The same for the preview page, `/plugin-previews/<slug>/`, or null when the package declares none. */
+	previewUrl: string | null;
+	/** Height in CSS pixels for the preview frame; {@link DEFAULT_PREVIEW_HEIGHT} when the package declares none. */
+	previewHeight: number;
 	/** README taken from the published version's tarball, Markdown; the workspace README if that tarball has none. */
 	readme: string;
 }
@@ -105,6 +123,9 @@ export interface Packument {
 }
 
 export const DEFAULT_REGISTRY: string;
+
+/** Frame height used when a package declares no `previewHeight`. */
+export const DEFAULT_PREVIEW_HEIGHT: number;
 
 export function fetchPackument(
 	packageName: string,

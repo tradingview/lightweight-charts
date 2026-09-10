@@ -17,6 +17,7 @@ const DEFAULT_REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const SCAFFOLD_PLACEHOLDERS = [
 	'_ATTACH_SNIPPET_',
 	'_USAGE_SNIPPET_',
+	'_PREVIEW_SNIPPET_',
 	'_ENTRYNAME_',
 	'_PLUGINNAME_',
 	'_CLASSNAME_',
@@ -462,11 +463,11 @@ export function validatePackageMetadata(packageDir, { isOfficial = true, repoRoo
 
 	errors.push(...validateRepositoryDirectory(pkg, packageDir, repoRoot));
 
-	// Demo file existence: strictly checks the declared demo path in lwcPlugin.demo
-	if (pkg.lwcPlugin && typeof pkg.lwcPlugin.demo === 'string') {
-		const demoPath = path.join(packageDir, pkg.lwcPlugin.demo);
-		if (!fs.existsSync(demoPath)) {
-			errors.push(`Declared demo file '${pkg.lwcPlugin.demo}' does not exist in ${packageDir}`);
+	// A declared page that is not there would leave the catalogue framing a 404.
+	for (const field of ['demo', 'preview']) {
+		const declared = pkg.lwcPlugin && pkg.lwcPlugin[field];
+		if (typeof declared === 'string' && !fs.existsSync(path.join(packageDir, declared))) {
+			errors.push(`Declared ${field} file '${declared}' does not exist in ${packageDir}`);
 		}
 	}
 

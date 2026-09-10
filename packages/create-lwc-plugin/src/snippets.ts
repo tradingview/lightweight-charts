@@ -70,3 +70,55 @@ const plugin = new _CLASSNAME_({
 chart.panes()[0].attachPrimitive(plugin);`
 	),
 };
+
+/*
+ The body of the scaffolded catalogue preview page, per category. Unlike the
+ README snippets it imports the plugin by relative path, because it lives in the
+ package next to the source it renders.
+*/
+export const previewSnippets: Record<PluginCategory, string> = {
+	'custom-series': `import { createChart } from 'lightweight-charts';
+import { _CLASSNAME_ } from '../_ENTRYNAME_';
+import { generateSampleData } from '../sample-data';
+
+const chart = createChart('chart', { autoSize: true });
+
+const series = chart.addCustomSeries(new _CLASSNAME_(), {
+	/* Options */
+});
+series.setData(generateSampleData(200, 50));
+chart.timeScale().fitContent();
+`,
+	'series-primitive': `import { LineSeries, createChart } from 'lightweight-charts';
+import { _CLASSNAME_ } from '../_ENTRYNAME_';
+import { generateLineData } from '../sample-data';
+
+const chart = createChart('chart', { autoSize: true });
+
+const series = chart.addSeries(LineSeries, { color: '#2962FF' });
+const data = generateLineData(200);
+series.setData(data);
+
+series.attachPrimitive(
+	new _CLASSNAME_(
+		{ price: 100, time: data[data.length - 50].time },
+		{ price: 500, time: data[data.length - 10].time }
+	)
+);
+chart.timeScale().fitContent();
+`,
+	'pane-primitive': `import { LineSeries, createChart } from 'lightweight-charts';
+import { _CLASSNAME_ } from '../_ENTRYNAME_';
+import { generateLineData } from '../sample-data';
+
+const chart = createChart('chart', { autoSize: true });
+
+const series = chart.addSeries(LineSeries, { color: '#2962FF' });
+series.setData(generateLineData(200));
+
+chart.panes()[0].attachPrimitive(
+	new _CLASSNAME_({ text: '_PLUGINNAME_', corner: 'top-left' })
+);
+chart.timeScale().fitContent();
+`,
+};

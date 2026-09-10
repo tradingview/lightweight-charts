@@ -1,0 +1,76 @@
+{
+	"name": "@tradingview/lwc-plugin-brushable-area-series",
+	"version": "1.0.0",
+	"description": "Area series that can style ranges of data differently. Pair it with your own pointer handling to build a brush selection.",
+	"author": "TradingView",
+	"license": "Apache-2.0",
+	"type": "module",
+	"types": "./dist/brushable-area-series.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/brushable-area-series.d.ts",
+			"default": "./dist/brushable-area-series.js"
+		},
+		"./standalone": {
+			"types": "./dist/brushable-area-series.d.ts",
+			"default": "./dist/brushable-area-series.standalone.js"
+		}
+	},
+	"files": [
+		"dist",
+		"CHANGELOG.md",
+		"NOTICE"
+	],
+	"keywords": [
+		"lightweight-charts",
+		"lightweight-charts-plugin",
+		"lwc-plugin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"directory": "packages/lwc-plugin-brushable-area-series"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"dev": "vite --config src/vite.config.js",
+		"build": "tsc && node compile.mjs",
+		"typecheck": "tsc --noEmit && tsc -p tsconfig.tests.json",
+		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+		"prepack": "node -e \"require('fs').copyFileSync('../../LICENSE', 'LICENSE')\"",
+		"postpack": "node -e \"require('fs').unlinkSync('LICENSE')\""
+	},
+	"peerDependencies": {
+		"lightweight-charts": "^5.0.0"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "0.18.5",
+		"@tradingview/lwc-plugin-preview-kit": "workspace:*",
+		"@tradingview/lwc-toolkit": "workspace:*",
+		"@types/chai": "5.2.1",
+		"@types/node": "22.13.14",
+		"chai": "5.2.0",
+		"dts-bundle-generator": "9.5.1",
+		"lightweight-charts": "workspace:*",
+		"publint": "0.3.14",
+		"typescript": "5.9.3",
+		"vite": "8.2.2"
+	},
+	"lwcPlugin": {
+		"title": "Brushable area series",
+		"category": "custom-series",
+		"lifecycle": "current",
+		"origin": "official",
+		"author": "TradingView",
+		"demo": "src/example/index.html",
+		"preview": "src/example/preview.html",
+		"tags": [
+			"brush",
+			"selection",
+			"area",
+			"custom series"
+		]
+	}
+}
