@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+        <title>Plugin test case page</title>
+        <script type="importmap">
+            {
+                "imports": {
+                    "lightweight-charts": "PATH_TO_STANDALONE_MODULE",
+                    "PLUGIN_PACKAGE_NAME": "PATH_TO_PLUGIN_MODULE"
+                }
+            }
+        </script>
+    </head>
+
+    <body style="padding: 0; margin: 0;">
+        <div id="container" style="position: absolute; width: 100%; height: 100%;"></div>
+
+        <script type="text/javascript">//RESIZE_OBSERVER_POLYFILL</script>
+
+        <script type="text/javascript">
+            TEST_CASE_SCRIPT
+        </script>
+
+        <!--
+            The plugin's standalone build is what a CDN user imports, so the
+            suite exercises the packaging as well as the drawing. Both modules
+            are exposed as globals so that test cases stay plain scripts.
+        -->
+        <script type="module">
+            import * as lib from 'lightweight-charts';
+            import * as plugin from 'PLUGIN_PACKAGE_NAME';
+            window.LightweightCharts = lib;
+            window.LwcPlugin = plugin;
+            window.BUILD_MODE = '{BUILD_MODE}';
+            window.testCaseReady = Promise.resolve(runTestCase(document.getElementById('container')));
+        </script>
+    </body>
+</html>

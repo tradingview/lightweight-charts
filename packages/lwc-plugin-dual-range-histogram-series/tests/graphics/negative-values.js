@@ -1,0 +1,58 @@
+function generateData() {
+	const histogram = [];
+	const line = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < 40; ++i) {
+		const outerUp = 80 + Math.sin(i / 5) * 40;
+		const outerDown = -(70 + Math.cos(i / 4) * 30);
+		histogram.push({
+			time: time.getTime() / 1000,
+			values: [
+				outerUp,
+				outerUp * (0.3 + Math.abs(Math.sin(i / 3)) * 0.4),
+				outerDown,
+				outerDown * (0.3 + Math.abs(Math.cos(i / 6)) * 0.4),
+			],
+		});
+		line.push({ time: time.getTime() / 1000, value: Math.sin(i / 8) * 30 });
+		time.setUTCDate(time.getUTCDate() + 1);
+	}
+	return { histogram, line };
+}
+
+// The series does not report its values to the price scale, so room for the
+// fixed-pixel columns has to be reserved with the scale margins (see README).
+function reserveRoom(chart, series) {
+	const height = chart.paneSize().height;
+	const margin = Math.min(0.3, series.options().maxHeight / 2 / height);
+	series.priceScale().applyOptions({ scaleMargins: { top: margin, bottom: margin } });
+}
+
+// The colours are indexed by position in `values`, not by sign. The first
+// half of the data is the default case; in the second half every sign is
+// flipped, so there the teal pair (index 0/1) points down and the red pair
+// (index 2/3) points up.
+function runTestCase(container) {
+	const chart = (window.chart = LightweightCharts.createChart(container, {
+		layout: { attributionLogo: false },
+		timeScale: { barSpacing: 12, minBarSpacing: 4 },
+	}));
+	const data = generateData();
+
+	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
+		priceLineVisible: false,
+		lastValueVisible: false,
+	});
+	histogram.setData(data.histogram.map((point, index) => ({
+		time: point.time,
+		values: index < 20 ? point.values : point.values.map(value => -value),
+	})));
+
+	const baseline = chart.addSeries(LightweightCharts.BaselineSeries, {
+		baseValue: { type: 'price', price: 0 },
+	});
+	baseline.setData(data.line);
+
+	chart.timeScale().fitContent();
+	reserveRoom(chart, histogram);
+}
