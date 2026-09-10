@@ -10,8 +10,18 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `createWhitespaceSeries` and `whitespaceGapCheck` preserve explicit gaps from
-  accepted input without mistaking other series' timestamps for whitespace.
-- `createOptionsAwareSeries` supplies a lazy input snapshot to its view factory.
+  accepted input without mistaking other series' timestamps for whitespace. A
+  `GapCheck` takes a `minGap`, the shortest contiguous whitespace run that
+  counts as a gap, so a renderer can pass `getConflationFactor(data)` and have a
+  run narrower than one conflation bucket absorbed into the bucket instead of
+  splitting every bar into its own segment. `createWhitespaceSeries` also takes
+  the `priceOptions` of `createOptionsAwareSeries` and hands its options getter
+  to the view factory.
+- `createOptionsAwareSeries` supplies its accepted input to the view factory as
+  an `AcceptedInput`: a live chronological array plus a `revision` that changes
+  on every accepted mutation. The input is kept sorted incrementally, so a
+  streaming `update()` is a binary insert and a read costs nothing, rather than
+  re-sorting the whole series on the next read.
 
 - `custom-series/options-aware-series` creates series with synchronous option
   access and refreshes plot values when scaling options change.

@@ -44,12 +44,9 @@ function applyControls(): void {
 		columnWidthMode: widthMode.value as StackedBarsColumnWidthMode,
 		widthPercent: 60,
 		radius: Number(radius.value),
+		// `priceValueBuilder` runs `stackBands` with the current options, so
+		// percent mode needs no price range of its own.
 		percent: percentMode.checked,
-		// `priceValueBuilder` measures the raw values, so percent mode needs a
-		// price range of its own.
-		autoscaleInfoProvider: percentMode.checked
-			? () => ({ priceRange: { minValue: -100, maxValue: 100 } })
-			: undefined,
 	});
 }
 

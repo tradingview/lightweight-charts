@@ -8,9 +8,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const series = chart.addCustomSeries(new RoundedCandleSeries(), {
-	hoverDimOpacity: 0.25,
-});
+const series = chart.addCustomSeries(new RoundedCandleSeries(), {});
 
 // Every tenth candle carries per-point `color`, `borderColor` and `wickColor`
 // overrides, which win over the option colours.

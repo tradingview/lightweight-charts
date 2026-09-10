@@ -609,6 +609,82 @@ const p = new Plugin();
 			}
 		});
 
+		it('should fail if a declared preview path does not exist', () => {
+			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-preview-test-'));
+			try {
+				const pkg = {
+					name: '@tradingview/lwc-plugin-test',
+					version: '1.0.0',
+					license: 'Apache-2.0',
+					description: 'Test plugin',
+					publishConfig: { access: 'public' },
+					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					keywords: ['lightweight-charts-plugin'],
+					lwcPlugin: {
+						title: 'Test',
+						category: 'series-primitive',
+						lifecycle: 'current',
+						origin: 'official',
+						demo: 'example/index.html',
+						preview: 'example/preview.html',
+					},
+				};
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
+				fs.writeFileSync(path.join(tempDir, 'README.md'), minimalValidReadme);
+				fs.mkdirSync(path.join(tempDir, 'example'));
+				fs.writeFileSync(path.join(tempDir, 'example/index.html'), '<html></html>');
+
+				const result = validatePackageMetadata(tempDir, { isOfficial: true });
+				expect(result.valid).to.be.false;
+				expect(result.errors.some((e: string) => e.includes("Declared preview file 'example/preview.html' does not exist"))).to.be.true;
+
+				fs.writeFileSync(path.join(tempDir, 'example/preview.html'), '<html></html>');
+				expect(validatePackageMetadata(tempDir, { isOfficial: true }).valid).to.be.true;
+			} finally {
+				fs.rmSync(tempDir, { recursive: true, force: true });
+			}
+		});
+
+		it('should fail if previewHeight is declared without a preview page', () => {
+			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-preview-height-test-'));
+			try {
+				const pkg = {
+					name: '@tradingview/lwc-plugin-test',
+					version: '1.0.0',
+					license: 'Apache-2.0',
+					description: 'Test plugin',
+					publishConfig: { access: 'public' },
+					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					keywords: ['lightweight-charts-plugin'],
+					lwcPlugin: {
+						title: 'Test',
+						category: 'series-primitive',
+						lifecycle: 'current',
+						origin: 'official',
+						demo: 'example/index.html',
+						previewHeight: 440,
+					},
+				};
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
+				fs.writeFileSync(path.join(tempDir, 'README.md'), minimalValidReadme);
+				fs.mkdirSync(path.join(tempDir, 'example'));
+				fs.writeFileSync(path.join(tempDir, 'example/index.html'), '<html></html>');
+
+				const result = validatePackageMetadata(tempDir, { isOfficial: true });
+				expect(result.valid).to.be.false;
+				expect(result.errors.some((e: string) => e.includes('preview'))).to.be.true;
+
+				const withHeightOnly = { ...pkg, lwcPlugin: { ...pkg.lwcPlugin, previewHeight: 100, preview: 'example/preview.html' } };
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(withHeightOnly, null, 2));
+				fs.writeFileSync(path.join(tempDir, 'example/preview.html'), '<html></html>');
+				const tooShort = validatePackageMetadata(tempDir, { isOfficial: true });
+				expect(tooShort.valid).to.be.false;
+				expect(tooShort.errors.some((e: string) => e.includes('previewHeight'))).to.be.true;
+			} finally {
+				fs.rmSync(tempDir, { recursive: true, force: true });
+			}
+		});
+
 		it('should fail if lwcPlugin contains unexpected additional properties', () => {
 			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-meta-test-'));
 			try {

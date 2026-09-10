@@ -77,5 +77,5 @@ export function createBrushableAreaSeries<H = Time, D extends BrushableAreaData<
 	options: DeepPartial<BrushableAreaSeriesOptions> = {},
 	paneIndex: number = 0
 ): OptionsAwareSeries<H, D, BrushableAreaSeriesOptions> {
-	return createWhitespaceSeries(chart, isGap => new BrushableAreaSeries<H, D>(isGap), defaultOptions, options, paneIndex);
+	return createWhitespaceSeries(chart, isGap => new BrushableAreaSeries<H, D>(isGap), defaultOptions, options, [], paneIndex);
 }

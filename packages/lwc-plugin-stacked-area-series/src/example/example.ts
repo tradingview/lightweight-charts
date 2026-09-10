@@ -49,12 +49,9 @@ function applyControls(): void {
 	series.applyOptions({
 		lineType: lineType.value as StackedAreaLineType,
 		gapHandling: gapHandling.value as StackedAreaGapHandling,
+		// `priceValueBuilder` scales the values the way the renderer draws them,
+		// so percent mode needs no price range of its own.
 		percent: percentMode.checked,
-		// `priceValueBuilder` measures the raw values, so percent mode needs a
-		// price range of its own.
-		autoscaleInfoProvider: percentMode.checked
-			? () => ({ priceRange: { minValue: -100, maxValue: 100 } })
-			: undefined,
 	});
 }
 

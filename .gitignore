@@ -33,6 +33,9 @@ pnpm-debug.log*
 /website/docs/api/
 /website/versioned_docs/**/api/
 /website/build
+# Plugin demo and preview pages, built by `pnpm plugins:build-demos`.
+/website/static/plugin-demos/
+/website/static/plugin-previews/
 /website/.docusaurus
 /website/.cache-loader
 /website/.previous-typings-cache/*.d.ts

@@ -16,7 +16,7 @@ import { StackedAreaConflationContext } from './compat';
 import { StackedAreaSeriesOptions, defaultOptions } from './options';
 import { StackedAreaSeriesRenderer } from './renderer';
 import { StackedAreaData } from './data';
-import { paddedValues, sumValues } from './stack';
+import { paddedValues, percentValues, sumValues } from './stack';
 
 export class StackedAreaSeries<
 	HorzScaleItem = Time,
@@ -25,19 +25,26 @@ export class StackedAreaSeries<
 {
 	private _renderer: StackedAreaSeriesRenderer<HorzScaleItem, TData>;
 
-	public constructor(isGap?: GapCheck<HorzScaleItem, TData>) {
+	private _options: StackedAreaSeriesOptions = defaultOptions;
+
+	public constructor(
+		isGap?: GapCheck<HorzScaleItem, TData>,
+		private readonly _readOptions?: () => Readonly<StackedAreaSeriesOptions>
+	) {
 		this._renderer = new StackedAreaSeriesRenderer(isGap);
 	}
 
 	/**
 	 * Reports the extremes of the stack as well as its total, so that a point
 	 * containing negative values — whose bands are drawn back down towards the
-	 * base — stays fully in view.
+	 * base — stays fully in view. The values are scaled and offset exactly as
+	 * the renderer draws them, so `percent` autoscales to `base`…`base + 100`
+	 * rather than to the raw totals.
 	 */
 	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
-		return stackedPlotValues(
-			paddedValues(plotRow.values, plotRow.values.length)
-		);
+		const options = this._readOptions?.() ?? this._options;
+		const padded = paddedValues(plotRow.values, plotRow.values.length);
+		return stackedPlotValues(options.percent ? percentValues(padded) : padded, options.base);
 	}
 
 	public isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> {
@@ -67,6 +74,9 @@ export class StackedAreaSeries<
 		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: StackedAreaSeriesOptions
 	): void {
+		// Kept for the price-value builder of a bare pane view, which the host
+		// can call before it has ever handed the options to a renderer.
+		this._options = options;
 		this._renderer.update(data, options);
 	}
 
@@ -95,5 +105,12 @@ export function createStackedAreaSeries<H = Time, D extends StackedAreaData<H> =
 	options: DeepPartial<StackedAreaSeriesOptions> = {},
 	paneIndex: number = 0
 ): OptionsAwareSeries<H, D, StackedAreaSeriesOptions> {
-	return createWhitespaceSeries(chart, isGap => new StackedAreaSeries<H, D>(isGap), defaultOptions, options, paneIndex);
+	return createWhitespaceSeries(
+		chart,
+		(isGap, readOptions) => new StackedAreaSeries<H, D>(isGap, readOptions),
+		defaultOptions,
+		options,
+		['base', 'percent'],
+		paneIndex
+	);
 }

@@ -127,6 +127,12 @@ chart.panes()[1].attachPrimitive(
 );
 ```
 
+That index is only used to find the pane before the layer exists: the first
+time the chart draws the primitive it reports the pane it is really attached to,
+and the plugin follows that pane from then on, by identity, through reordering.
+An index that does not match the pane you attached to therefore costs nothing
+but a frame.
+
 A directly attached primitive keeps its own polite live region and takes a plain
 boolean `announceDataUpdates`; the chart-level `dataUpdates` settings only exist
 on the helper.

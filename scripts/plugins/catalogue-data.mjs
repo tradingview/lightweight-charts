@@ -8,6 +8,9 @@ import { findWorkspacePlugins, validatePackageMetadata } from './utils.mjs';
 
 export const DEFAULT_REGISTRY = 'https://registry.npmjs.org';
 
+/** Frame height the catalogue uses when a package declares no `previewHeight`. */
+export const DEFAULT_PREVIEW_HEIGHT = 330;
+
 const RETRY_DELAY_MS = 1000;
 const REGISTRY_CONCURRENCY = 4;
 
@@ -238,43 +241,56 @@ function readWorkspaceReadme(plugin) {
 }
 
 /**
- * Builds one catalogue entry. What describes the published artefact (version,
- * peer range, description, README, licence, keywords, deprecation) comes from the
- * registry, so the page matches what `npm install` delivers; what curates the
- * entry (the lwcPlugin block, the demo) comes from the workspace.
+ * Reports everything the entry had to fall back to the workspace for. Kept out
+ * of the entry builder so that one function is not both the shape of an entry
+ * and the running commentary on it.
  */
-function toCatalogueEntry(plugin, release, publishedReadme, repoRoot, log) {
-	const pkg = plugin.packageJson;
-	const packageDir = toRepoPath(path.relative(repoRoot, plugin.dir));
-
-	let pendingVersion = null;
-	if (semver.gt(plugin.version, release.version)) {
-		pendingVersion = plugin.version;
-	} else if (semver.lt(plugin.version, release.version)) {
+function warnAboutFallbacks(plugin, release, publishedReadme, log) {
+	if (plugin.packageJson.lwcPlugin.preview === undefined) {
+		log.warn(`${plugin.name}: no lwcPlugin.preview, the catalogue falls back to framing the demo page`);
+	}
+	if (semver.lt(plugin.version, release.version)) {
 		log.warn(`${plugin.name}: the workspace version ${plugin.version} is behind the published ${release.version}`);
 	}
-
 	if (release.peerRange === null) {
 		log.warn(`${plugin.name}: the published manifest declares no lightweight-charts peer range`);
 	}
-
-	let readme = publishedReadme;
-	if (readme === null) {
+	if (publishedReadme === null) {
 		log.warn(`${plugin.name}: the published ${release.version} has no README, using the workspace one`);
-		readme = readWorkspaceReadme(plugin);
 	}
-	for (const [field, missing] of [['description', release.description === null], ['license', release.license === null], ['keywords', release.keywords.length === 0]]) {
+	const fields = [
+		['description', release.description === null],
+		['license', release.license === null],
+		['keywords', release.keywords.length === 0],
+	];
+	for (const [field, missing] of fields) {
 		if (missing) {
 			log.warn(`${plugin.name}: the published manifest has no ${field}, using the workspace one`);
 		}
 	}
+}
+
+/**
+ * Builds one catalogue entry. What describes the published artefact (version,
+ * peer range, description, README, licence, keywords, deprecation) comes from the
+ * registry, so the page matches what `npm install` delivers; what curates the
+ * entry (the lwcPlugin block, the two pages) comes from the workspace.
+ */
+function toCatalogueEntry(plugin, release, publishedReadme, repoRoot, log) {
+	const pkg = plugin.packageJson;
+	const packageDir = toRepoPath(path.relative(repoRoot, plugin.dir));
+	const slug = slugOf(plugin.name);
+	const preview = pkg.lwcPlugin.preview;
+	warnAboutFallbacks(plugin, release, publishedReadme, log);
 
 	return {
 		name: plugin.name,
-		slug: slugOf(plugin.name),
+		slug,
 		description: release.description ?? pkg.description,
 		version: release.version,
-		pendingVersion,
+		// Set between a merged version bump and its publish. A workspace version
+		// behind the registry is warned about above and reported as no pending release.
+		pendingVersion: semver.gt(plugin.version, release.version) ? plugin.version : null,
 		publishedAt: release.publishedAt,
 		peerRange: release.peerRange,
 		deprecated: release.deprecated,
@@ -287,7 +303,13 @@ function toCatalogueEntry(plugin, release, publishedReadme, repoRoot, log) {
 		npmUrl: `https://www.npmjs.com/package/${plugin.name}`,
 		lwcPlugin: { ...pkg.lwcPlugin, tags: pkg.lwcPlugin.tags ?? [] },
 		demoPath: toRepoPath(packageDir, pkg.lwcPlugin.demo),
-		readme,
+		previewPath: preview === undefined ? null : toRepoPath(packageDir, preview),
+		// Site-root relative, so a page has to run them through useBaseUrl.
+		// Both are produced by `pnpm plugins:build-demos` into website/static.
+		demoUrl: `/plugin-demos/${slug}/`,
+		previewUrl: preview === undefined ? null : `/plugin-previews/${slug}/`,
+		previewHeight: pkg.lwcPlugin.previewHeight ?? DEFAULT_PREVIEW_HEIGHT,
+		readme: publishedReadme ?? readWorkspaceReadme(plugin),
 	};
 }
 

@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'node:test';
 import { customSeriesDefaultOptions, CustomData, CustomSeriesOptions, CustomSeriesWhitespaceData, DataChangedHandler, DeepPartial, IChartApiBase, ICustomSeriesPaneView, Time } from 'lightweight-charts';
 import { createOptionsAwareSeries, OptionsAwareSeries } from '../../src/custom-series/options-aware-series.js';
+import { AcceptedInput } from '../../src/custom-series/visible-bars.js';
 import { convertTimeUTC } from '../../src/time.js';
 
 interface Point extends CustomData<Time> { value: number; tag?: string; }
@@ -16,7 +17,7 @@ function fixture() {
 	let plot: number[] = [];
 	let suppliedData: Datum[] = [];
 	let registered: OptionsAwareSeries<Time, Point, Options> | undefined;
-	let readInput: () => readonly Datum[] = () => [];
+	let readInput: () => AcceptedInput<Time, Point> = () => ({ points: [], revision: 0 });
 	const listeners = new Set<DataChangedHandler>();
 	const notify = (scope: 'full' | 'update'): void => { for (const listener of listeners) { listener(scope); } };
 	const chart = {
@@ -60,8 +61,8 @@ function fixture() {
 			return api;
 		},
 	} as unknown as IChartApiBase<Time>;
-	const series = createOptionsAwareSeries<Time, Point, Options>(chart, (readOptions, readData) => {
-		readInput = readData;
+	const series = createOptionsAwareSeries<Time, Point, Options>(chart, (readOptions, readAccepted) => {
+		readInput = readAccepted;
 		return {
 			priceValueBuilder: (item: Point) => [readOptions().base, item.value],
 		} as ICustomSeriesPaneView<Time, Point, Options>;
@@ -142,21 +143,62 @@ void describe('createOptionsAwareSeries', () => {
 });
 
 void describe('retained input snapshots', () => {
-	void it('shares a lazy snapshot and commits before consumer callbacks', () => {
+	void it('shares the accepted input and commits before consumer callbacks', () => {
 		const f = fixture();
 		f.series.setData([point(1), { time: '2024-01-02' }, point(3)]);
-		const first = f.readInput();
-		expect(f.readInput()).to.equal(first);
+		const first = f.readInput().revision;
+		expect(f.readInput().revision).to.equal(first);
 		let observed: readonly Datum[] = [];
-		f.series.subscribeDataChanged(() => { observed = f.readInput(); });
+		let observedRevision = first;
+		f.series.subscribeDataChanged(() => {
+			observed = f.readInput().points.slice();
+			observedRevision = f.readInput().revision;
+		});
 		f.series.update(point(2), true);
 		expect(observed).to.deep.equal([point(1), point(2), point(3)]);
-		expect(observed).to.not.equal(first);
+		expect(observedRevision).to.not.equal(first);
 		f.series.pop(1);
-		expect(f.readInput()).to.deep.equal([point(1), point(2)]);
+		expect(f.readInput().points).to.deep.equal([point(1), point(2)]);
 		expect(() => f.series.setData([point(3), point(2)])).to.throw('Unsorted data');
-		expect(f.readInput()).to.deep.equal([point(1), point(2)]);
+		expect(f.readInput().points).to.deep.equal([point(1), point(2)]);
 		f.series.setData([]);
-		expect(f.readInput()).to.deep.equal([]);
+		expect(f.readInput().points).to.deep.equal([]);
+	});
+
+	void it('keeps the read and every streaming update off the sort path', () => {
+		// A stub whose own update is O(1), so the measurement is of the wrapper.
+		// Re-sorting 100k points on every tick takes minutes; the budget only
+		// has to separate that from an incremental insert.
+		let accepted: Datum[] = [];
+		const listeners = new Set<DataChangedHandler>();
+		let readAccepted: () => AcceptedInput<Time, Point> = () => ({ points: [], revision: 0 });
+		const chart = {
+			horzBehaviour: () => ({ key: convertTimeUTC }),
+			addCustomSeries: () => ({
+				options: () => ({}),
+				applyOptions: () => {},
+				subscribeDataChanged: (handler: DataChangedHandler) => listeners.add(handler),
+				data: () => accepted,
+				setData(next: Datum[]) { accepted = next.slice(); for (const l of listeners) { l('full'); } },
+				update(item: Datum) { accepted[accepted.length - 1] = item; for (const l of listeners) { l('update'); } },
+			}),
+		} as unknown as IChartApiBase<Time>;
+		const series = createOptionsAwareSeries<Time, Point, Options>(chart, (_readOptions, read) => {
+			readAccepted = read;
+			return {} as ICustomSeriesPaneView<Time, Point, Options>;
+		}, { ...customSeriesDefaultOptions, base: 0 }, {}, ['base']);
+
+		const size = 100000;
+		const day = 24 * 60 * 60;
+		const start = Date.UTC(2000, 0, 1) / 1000;
+		const last = (start + (size - 1) * day) as Time;
+		series.setData(Array.from({ length: size }, (_unused, i) => ({ time: (start + i * day) as Time, value: i })));
+		const began = Date.now();
+		for (let i = 0; i < 1000; i++) {
+			series.update({ time: last, value: i });
+			expect(readAccepted().points).to.have.length(size);
+		}
+		expect(Date.now() - began).to.be.lessThan(5000);
+		expect(readAccepted().points[size - 1]).to.deep.include({ value: 999 });
 	});
 });

@@ -2,67 +2,24 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Lightweight Charts - DualRangeHistogram Series Plugin Example</title>
-		<link href="../../../examples-base.css" rel="stylesheet" />
-		<style>
-			.control {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: space-between;
-				margin: 10px;
-				white-space: nowrap;
-			}
-			.control input,
-			.control select {
-				margin-left: 15px;
-			}
-		</style>
+		<!--
+			This page has moved. The demo is now built from the package itself
+			(packages/lwc-plugin-dual-range-histogram-series/src/example/index.html) by
+			`pnpm plugins:build-demos`, so there is only one copy of it. This stub
+			stays behind so that links to the old gallery URL keep working.
+		-->
+		<meta
+			http-equiv="refresh"
+			content="0; url=/lightweight-charts/plugin-demos/dual-range-histogram-series/"
+		/>
+		<title>Dual range histogram series example has moved</title>
 	</head>
 	<body>
-		<div id="chart"></div>
-		<div id="description">
-			<h1>Dual Range Histogram Series</h1>
-			<p>
-				The Dual Range Histogram is a versatile column-based visualisation
-				designed to represent paired positive and negative value ranges for each
-				time point. Each group of columns consists of two positive (upward)
-				bars—typically differentiated by light and dark shades—and two negative
-				(downward) bars, also in contrasting shades. The lighter columns
-				represent the total extent of a metric (such as run-up or drawdown),
-				while the darker columns indicate a subset or related component that
-				must always be less than or equal to the corresponding lighter column.
-				This structure allows for clear comparison between total and partial
-				values within both positive and negative domains. The Dual Range
-				Histogram is well-suited for financial analysis, performance
-				backtesting, or any scenario where it is useful to visualise both the
-				magnitude and composition of upward and downward movements over time.
-			</p>
-			<div class="control">
-				<label for="scaleMode">Scale mode</label>
-				<select id="scaleMode">
-					<option value="pixels" selected>pixels</option>
-					<option value="price">price</option>
-				</select>
-			</div>
-			<div class="control">
-				<label for="normalize">Normalize</label>
-				<select id="normalize">
-					<option value="visible" selected>visible</option>
-					<option value="all">all</option>
-					<option value="fixed">fixed (400)</option>
-				</select>
-			</div>
-			<div class="control">
-				<label for="radius">Radius</label>
-				<input id="radius" type="text">
-			</div>
-			<div class="control">
-				<label for="gap">Gap</label>
-				<input id="gap" type="text">
-			</div>
-		</div>
-		<script type="module" src="./example.ts"></script>
+		<p>
+			The Dual range histogram series example has moved to
+			<a href="/lightweight-charts/plugin-demos/dual-range-histogram-series/"
+				>/plugin-demos/dual-range-histogram-series/</a
+			>.
+		</p>
 	</body>
 </html>

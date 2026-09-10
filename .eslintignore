@@ -12,6 +12,8 @@
 /website/docs/api/**
 /website/versioned_docs/**/api/**
 /website/build/**
+/website/static/plugin-demos/**
+/website/static/plugin-previews/**
 /website/src/theme/**/*.js
 
 /plugin-examples

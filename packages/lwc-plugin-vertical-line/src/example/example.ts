@@ -25,6 +25,7 @@ secondPaneSeries.setData(
 const onBar = new VerticalLine(data[60].time, {
 	showLabel: true,
 	color: '#089981',
+	labelBackgroundColor: '#089981',
 	width: 2,
 	lineStyle: LineStyle.Dashed,
 	snap: 'nearest',
@@ -40,6 +41,7 @@ const betweenBars = new VerticalLine(
 	{
 		showLabel: true,
 		color: '#2962FF',
+		labelBackgroundColor: '#2962FF',
 		width: 2,
 		lineStyle: LineStyle.Dashed,
 		snap: 'nearest',
@@ -56,6 +58,7 @@ const outsideData = new VerticalLine(
 	{
 		showLabel: true,
 		color: '#9C27B0',
+		labelBackgroundColor: '#9C27B0',
 		width: 2,
 		lineStyle: LineStyle.Dashed,
 		snap: 'nearest',
@@ -67,6 +70,7 @@ lineSeries.attachPrimitive(outsideData);
 const secondPaneLine = new VerticalLine(data[160].time, {
 	showLabel: true,
 	color: '#FF9800',
+	labelBackgroundColor: '#FF9800',
 	width: 2,
 	lineStyle: LineStyle.Dashed,
 	snap: 'nearest',

@@ -2,6 +2,25 @@ import { LiveRegionWriter, createLiveRegion } from './dom/live-region';
 import { AccessibilityMessages, formatUpdateMessage } from './messages';
 import { AnySeries } from './types';
 
+/**
+ * Mirrors an announcement to the host's `onAnnounce`. The live region is always
+ * written first, and an exception from application code must not abort the
+ * announcer's own bookkeeping, so a throwing callback is ignored here.
+ */
+export function mirrorAnnouncement(
+	onAnnounce: ((message: string) => void) | undefined,
+	message: string
+): void {
+	if (onAnnounce === undefined) {
+		return;
+	}
+	try {
+		onAnnounce(message);
+	} catch {
+		// Left to the application's own error handling.
+	}
+}
+
 /** How the shared region combines the panes that reported a data change. */
 export type UpdateAnnouncerMode = 'active' | 'combine';
 
@@ -140,8 +159,10 @@ export class UpdateAnnouncer {
 		this._dirty.clear();
 		const message = formatUpdateMessage(summaries, this._config.messages, this._config.maxSeries);
 		if (this._region !== null && message.length > 0) {
-			this._config.onAnnounce?.(message);
+			// The live region first: a host callback that throws must not cost
+			// the screen-reader announcement this region exists for.
 			this._writer.write(message);
+			mirrorAnnouncement(this._config.onAnnounce, message);
 		}
 	}
 }
