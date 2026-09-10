@@ -1,5 +1,5 @@
 import { BaselineSeries, createChart } from 'lightweight-charts';
-import { DualRangeHistogramSeries } from '../dual-range-histogram-series';
+import { DualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
 import { generateLineData, shuffleValuesWithLimit } from '../../../sample-data';
 import { centerLineData, generateDualRangeHistogramData } from './sample-data';
 

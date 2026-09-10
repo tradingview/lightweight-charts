@@ -9,7 +9,7 @@ import { generateLineData } from '../../../sample-data';
 import {
 	PartialAccessibilityMessages,
 	addAccessibilityPlugin,
-} from '../accessibility';
+} from '@tradingview/lwc-plugin-accessibility';
 
 // Spanish translation of the announced strings. Only the wording lives here –
 // numbers and dates are localised by the chart's `localization.locale` below.

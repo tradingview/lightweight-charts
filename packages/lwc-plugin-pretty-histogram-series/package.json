@@ -1,0 +1,74 @@
+{
+	"name": "@tradingview/lwc-plugin-pretty-histogram-series",
+	"version": "1.0.0",
+	"description": "Histogram with rounded, evenly spaced columns for a more polished look than the built-in histogram.",
+	"author": "TradingView",
+	"license": "Apache-2.0",
+	"type": "module",
+	"types": "./dist/pretty-histogram-series.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/pretty-histogram-series.d.ts",
+			"default": "./dist/pretty-histogram-series.js"
+		},
+		"./standalone": {
+			"types": "./dist/pretty-histogram-series.d.ts",
+			"default": "./dist/pretty-histogram-series.standalone.js"
+		}
+	},
+	"files": [
+		"dist",
+		"CHANGELOG.md",
+		"NOTICE"
+	],
+	"keywords": [
+		"lightweight-charts",
+		"lightweight-charts-plugin",
+		"lwc-plugin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"directory": "packages/lwc-plugin-pretty-histogram-series"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"dev": "vite --config src/vite.config.js",
+		"build": "tsc && node compile.mjs",
+		"typecheck": "tsc --noEmit",
+		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+		"prepack": "node -e \"require('fs').copyFileSync('../../LICENSE', 'LICENSE')\"",
+		"postpack": "node -e \"require('fs').unlinkSync('LICENSE')\""
+	},
+	"peerDependencies": {
+		"lightweight-charts": "^5.0.0"
+	},
+	"dependencies": {
+		"fancy-canvas": "~2.1.0"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "0.18.5",
+		"@tradingview/lwc-toolkit": "workspace:*",
+		"dts-bundle-generator": "9.5.1",
+		"lightweight-charts": "workspace:*",
+		"publint": "0.3.14",
+		"typescript": "5.9.3",
+		"vite": "8.2.2"
+	},
+	"lwcPlugin": {
+		"title": "Pretty histogram series",
+		"category": "custom-series",
+		"lifecycle": "current",
+		"origin": "official",
+		"author": "TradingView",
+		"demo": "src/example/index.html",
+		"tags": [
+			"histogram",
+			"rounded",
+			"custom series",
+			"styling"
+		]
+	}
+}

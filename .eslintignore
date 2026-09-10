@@ -18,6 +18,7 @@
 /indicator-examples
 /packages/create-lwc-plugin
 /packages/lwc-toolkit
+/packages/lwc-plugin-*
 
 /debug
 /tests/fixtures

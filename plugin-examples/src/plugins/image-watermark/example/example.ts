@@ -2,7 +2,7 @@ import { LineSeries, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 
 import imgUrl from './image.svg';
-import { ImageWatermark } from '../image-watermark';
+import { ImageWatermark } from '@tradingview/lwc-plugin-image-watermark';
 
 const container = document.querySelector<HTMLDivElement>('#chart');
 if (!container) throw new Error('Unable to located container div element');

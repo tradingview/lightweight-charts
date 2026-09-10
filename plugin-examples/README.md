@@ -17,6 +17,11 @@ create in this readme document.
 ✨ If you have something cool to share or if you need assistance, please don't
 hesitate to get in touch.
 
+📦 Some plugins have graduated to published packages under
+[`packages/lwc-plugin-*`](../packages) and are released to npm as
+`@tradingview/lwc-plugin-<name>`. Their folders here keep only the gallery
+page, which imports the published package; the source lives in the package.
+
 🚀 Need a starting point for your plugin idea? Check out
 [create-lwc-plugin](https://www.npmjs.com/package/create-lwc-plugin) package.
 

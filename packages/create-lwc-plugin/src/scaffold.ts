@@ -48,11 +48,20 @@ function buildPackageJson(template: string, answers: Answers): string {
 		pkg.lwcPlugin.origin = 'official';
 		// In the monorepo both come from the workspace rather than the registry.
 		// The published peerDependency range is untouched — that is the contract.
+		// The repository pins its own devDependencies exactly.
+		const pinned = Object.fromEntries(
+			Object.entries(pkg.devDependencies as Record<string, string>).map(
+				([dep, range]) => [dep, range.replace(/^[~^]/, '')]
+			)
+		);
 		pkg.devDependencies = sortedByKey({
-			...pkg.devDependencies,
+			...pinned,
 			'@tradingview/lwc-toolkit': 'workspace:*',
 			'lightweight-charts': 'workspace:*',
 		});
+		// One LICENSE for the repository; npm drops symlinks, so it is copied in at pack time.
+		pkg.scripts.prepack = `node -e "require('fs').copyFileSync('../../LICENSE', 'LICENSE')"`;
+		pkg.scripts.postpack = `node -e "require('fs').unlinkSync('LICENSE')"`;
 	} else {
 		// The author fills this in once the project has a home of its own.
 		delete pkg.repository;
@@ -158,11 +167,16 @@ export function scaffold(answers: Answers, baseDir: string): string {
 	}
 
 	if (answers.workspace) {
-		// Official packages ship a changelog, licence and notice of their own.
+		// Official packages ship a changelog and notice of their own, and build
+		// through the repository's shared compile script.
 		const workspaceTemplateDir = templatePath('template-workspace');
 		for (const file of fs.readdirSync(workspaceTemplateDir)) {
 			write(workspaceTemplateDir, file);
 		}
+		fs.appendFileSync(
+			path.join(root, '.gitignore'),
+			'\n# Copied from the repository root by the prepack script.\nLICENSE\n'
+		);
 	}
 
 	const packageTemplate = jsonContentsReplacer(

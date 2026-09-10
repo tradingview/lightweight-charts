@@ -1,6 +1,5 @@
 import { WhitespaceData, createChart } from 'lightweight-charts';
-import { StackedBarsSeries } from '../stacked-bars-series';
-import { StackedBarsData } from '../data';
+import { StackedBarsSeries, StackedBarsData } from '@tradingview/lwc-plugin-stacked-bars-series';
 import { multipleBarData } from '../../../sample-data';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {

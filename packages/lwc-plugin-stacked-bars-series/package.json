@@ -1,0 +1,74 @@
+{
+	"name": "@tradingview/lwc-plugin-stacked-bars-series",
+	"version": "1.0.0",
+	"description": "Bar series that draws several values per time point as stacked segments summing to a total.",
+	"author": "TradingView",
+	"license": "Apache-2.0",
+	"type": "module",
+	"types": "./dist/stacked-bars-series.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/stacked-bars-series.d.ts",
+			"default": "./dist/stacked-bars-series.js"
+		},
+		"./standalone": {
+			"types": "./dist/stacked-bars-series.d.ts",
+			"default": "./dist/stacked-bars-series.standalone.js"
+		}
+	},
+	"files": [
+		"dist",
+		"CHANGELOG.md",
+		"NOTICE"
+	],
+	"keywords": [
+		"lightweight-charts",
+		"lightweight-charts-plugin",
+		"lwc-plugin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"directory": "packages/lwc-plugin-stacked-bars-series"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"dev": "vite --config src/vite.config.js",
+		"build": "tsc && node compile.mjs",
+		"typecheck": "tsc --noEmit",
+		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+		"prepack": "node -e \"require('fs').copyFileSync('../../LICENSE', 'LICENSE')\"",
+		"postpack": "node -e \"require('fs').unlinkSync('LICENSE')\""
+	},
+	"peerDependencies": {
+		"lightweight-charts": "^5.0.0"
+	},
+	"dependencies": {
+		"fancy-canvas": "~2.1.0"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "0.18.5",
+		"@tradingview/lwc-toolkit": "workspace:*",
+		"dts-bundle-generator": "9.5.1",
+		"lightweight-charts": "workspace:*",
+		"publint": "0.3.14",
+		"typescript": "5.9.3",
+		"vite": "8.2.2"
+	},
+	"lwcPlugin": {
+		"title": "Stacked bars series",
+		"category": "custom-series",
+		"lifecycle": "current",
+		"origin": "official",
+		"author": "TradingView",
+		"demo": "src/example/index.html",
+		"tags": [
+			"stacked",
+			"bars",
+			"custom series",
+			"composition"
+		]
+	}
+}

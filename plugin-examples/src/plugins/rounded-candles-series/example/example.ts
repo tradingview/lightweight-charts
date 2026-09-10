@@ -1,6 +1,6 @@
 import { WhitespaceData, createChart } from 'lightweight-charts';
 import { CandleData, generateAlternativeCandleData } from '../../../sample-data';
-import { RoundedCandleSeries } from '../rounded-candles-series';
+import { RoundedCandleSeries } from '@tradingview/lwc-plugin-rounded-candles-series';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
