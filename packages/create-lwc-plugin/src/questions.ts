@@ -45,6 +45,46 @@ export interface Answers {
 }
 
 /**
+ * What the user wants to do about the plugin-authoring Agent Skill:
+ * - `skip` — carry on without it;
+ * - `continue` — install it into the new project once it is written;
+ * - `quit` — install it here and stop, so an AI assistant with the skill can
+ *   take over, including running this wizard.
+ */
+export type SkillChoice = 'skip' | 'continue' | 'quit';
+
+/**
+ * Asked first, before anything about the plugin itself: someone who wants to
+ * build with an assistant should be able to install the skill and hand over
+ * right away, rather than answer eight questions and then find out. The skill
+ * teaches the assistant how to build on the toolkit, which official plugin to
+ * read for the idea in hand, where the docs are, and the autoscale, whitespace
+ * and hit-test traps a first plugin runs into.
+ */
+export async function askSkillInstall(): Promise<SkillChoice> {
+	const install = await confirm({
+		message: `Install the plugin-authoring skill for AI coding assistants? ${color.dim(
+			'(Claude Code, Codex, Cursor, … via `npx skills add`)'
+		)}`,
+	});
+	if (isCancel(install)) throw new Error('Operation cancelled');
+	if (!install) return 'skip';
+
+	log.info(
+		`With the skill installed, your assistant can take it from here: decide the
+plugin type with you, run this wizard, and build on the toolkit and the
+official plugins. Or keep answering and it is installed into the new project.`
+	);
+	const carryOn = await confirm({
+		message: 'Continue with the wizard now?',
+		active: 'Continue',
+		inactive: 'Quit and hand over to my assistant',
+	});
+	if (isCancel(carryOn)) throw new Error('Operation cancelled');
+	return carryOn ? 'continue' : 'quit';
+}
+
+/**
  * @param workspace - whether an in-repo workspace package is being scaffolded.
  * @param baseDir - directory the target folder path is resolved against. Must be
  * the same base the project is written to, or the "folder is not empty" check
