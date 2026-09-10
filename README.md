@@ -21,14 +21,12 @@
 
 TradingView Lightweight Charts™ are one of the smallest and fastest financial HTML5 charts.
 
-The Lightweight Charts™ library is the best choice for you if you want to display financial data as an interactive chart on your web page without affecting your web page loading speed and performance.
-
-It is the best choice for you if you want to replace static image charts with interactive ones.
+The Lightweight Charts™ library is the best choice for you if you want to display financial data as an interactive chart on your web page, or replace static image charts with interactive ones. It does this without affecting your web page's loading speed and performance.
 The size of the library is close to static images but if you have dozens of image charts on a web page then using this library can make the size of your web page smaller.
 
-Take a look at [awesome-tradingview](https://github.com/tradingview/awesome-tradingview?tab=readme-ov-file#lightweight-charts) for related projects created by our community members.
+The library provides a rich set of charting capabilities out of the box, but you can also extend its functionality by building custom plugins. Browse the [plugin catalog](https://tradingview.github.io/lightweight-charts/plugins) for ready-made plugins, or see the [interactive plugin examples](https://tradingview.github.io/lightweight-charts/plugin-examples/) and [plugin-examples/README.md](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) to build your own.
 
-The library provides a rich set of charting capabilities out of the box, but developers can also extend its functionality by building custom plugins. See the [interactive plugin examples here](https://tradingview.github.io/lightweight-charts/plugin-examples/), or check out [plugin-examples/README.md](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) for more details.
+Take a look at [awesome-tradingview](https://github.com/tradingview/awesome-tradingview?tab=readme-ov-file#lightweight-charts) for related projects created by our community members.
 
 ## Installing
 
@@ -92,7 +90,7 @@ lineSeries.setData([
 ]);
 ```
 
-### Build Variants
+### Build variants
 
 |Dependencies included|Mode|ES module|IIFE (`window.LightweightCharts`)|
 |-|-|-|-|
@@ -103,7 +101,7 @@ lineSeries.setData([
 
 ## AI coding assistants
 
-This repository ships an [Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) that teaches AI coding assistants how to work with Lightweight Charts™ - the v5 API conventions, the mental model, and the common time, scale, marker, plugin, and wrapper foot-guns.
+This repository ships an [Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) for AI coding assistants. It covers the Lightweight Charts™ v5 API conventions, the mental model, and common time, scale, marker, plugin, and wrapper foot-guns.
 
 Install it into your project with the `skills` CLI:
 
@@ -111,7 +109,7 @@ Install it into your project with the `skills` CLI:
 npx skills add https://github.com/tradingview/lightweight-charts
 ```
 
-This makes the skill available to compatible assistants (such as Claude Code, Codex, etc.), streamlining your workflow: they scaffold charts, wire up series and data, and answer API questions against the current v5 conventions out of the box - instead of relying on outdated snippets and stumbling into common foot-guns.
+This makes the skill available to compatible assistants, such as Claude Code and Codex. They scaffold charts, wire up series and data, and answer API questions against current v5 conventions out of the box instead of relying on outdated snippets and stumbling into common foot-guns.
 
 ## Development
 
@@ -120,7 +118,7 @@ See [BUILDING.md](./BUILDING.md) for instructions on how to build `lightweight-c
 ## License
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this software except in compliance with the License.
-You may obtain a copy of the License at LICENSE file.
+You may obtain a copy of the License in the [LICENSE](./LICENSE) file.
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 This software incorporates several parts of tslib (<https://github.com/Microsoft/tslib>, (c) Microsoft Corporation) that are covered by BSD Zero Clause License.
