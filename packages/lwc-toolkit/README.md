@@ -34,7 +34,13 @@ setting ignores the `exports` field and will report the imports as unresolved.
 | Sub-path | Provides |
 | --- | --- |
 | `assertions` | `ensureDefined`, `ensureNotNull` — narrow a value or throw |
-| `closest-index` | `ClosestTimeIndexFinder` — cached binary search for the nearest time in sorted data |
+| `axis-label-view` | `AxisLabelView`, `AxisLabelSource` — a price- or time-axis label over a source that may have no coordinate yet |
+| `canvas/round-rect` | `drawRoundRect`, `drawRoundRectWithBorder`, `clampCornerRadius`, `CornerRadii` — rounded rectangles with an inset border |
+| `closest-index` | `ClosestTimeIndexFinder` — cached binary search for the first index at or after (or last at or before) a time |
+| `custom-series/line-paths` | `buildLinePath`, `areaBetween`, `strokeStyledPolyline` — polylines, the band between two lines, and a line whose style changes along its length |
+| `custom-series/renderer-base` | `CustomSeriesRendererBase`, `CustomSeriesDrawArgs` — a custom series renderer with the data and visible-range guards done, leaving `drawImpl` |
+| `custom-series/stacking` | `cumulativeSum`, `stackedPlotValues` — running totals and the autoscale values of a stack that may contain negatives |
+| `custom-series/visible-bars` | `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `visibleSegments` — iterate the visible bars only, reach the pane edge, split at whitespace gaps |
 | `delegate` | `Delegate`, `ISubscription` — a small subscribe/fire event primitive |
 | `dimensions/candles` | `candlestickWidth` — the body width the chart itself would use at a given bar spacing |
 | `dimensions/columns` | `calculateColumnPositions`, `calculateColumnPositionsInPlace` — evenly spaced column bars with consistent gaps |
@@ -42,10 +48,14 @@ setting ignores the `exports` field and will report the imports as unresolved.
 | `dimensions/crosshair-width` | `gridAndCrosshairMediaWidth`, `gridAndCrosshairBitmapWidth` — line widths matching the grid and crosshair |
 | `dimensions/full-width` | `fullBarWidth` — a bar spanning the whole slot, with no gap |
 | `dimensions/positions` | `positionsBox`, `positionsLine` — pixel-perfect boxes and lines from two coordinates |
+| `dom/media-query` | `subscribeMediaQuery`, `mediaQueryMatches`, `HIGH_CONTRAST_QUERIES`, `REDUCED_MOTION_QUERY` — shared, SSR-safe media query subscriptions |
+| `dom/pane-element` | `paneContentElement`, `chartTableElement` — the pane's canvas wrapper to append DOM overlays to, and the chart table |
+| `line-style` | `setLineStyle`, `getDashPattern`, `LineStyle` — the chart's dash patterns for renderers that receive no drawing utils |
 | `min-max-in-range` | `UpperLowerInRange` — cached upper/lower bounds over a range, for autoscaling |
-| `plugin-base` | `PluginBase` — a primitive base class holding the chart and series references and a `requestUpdate` hook |
+| `pane-plugin-base` | `PanePluginBase` — the pane-primitive counterpart of `PluginBase`: chart reference and `requestUpdate` hook |
+| `plugin-base` | `PluginBase` — a series-primitive base class holding the chart and series references and a `requestUpdate` hook |
 | `simple-clone` | `cloneReadonly` — deep clone that drops readonly-ness |
-| `time` | `convertTime`, `displayTime`, `formattedDateAndTime` — `Time` to timestamp and display strings |
+| `time` | `convertTime`, `convertTimeUTC`, `displayTime`, `formattedDateAndTime` — `Time` to local or UTC timestamps and display strings |
 
 The dimension helpers exist because canvas drawing has to land on whole device
 pixels to look sharp at every device pixel ratio. See

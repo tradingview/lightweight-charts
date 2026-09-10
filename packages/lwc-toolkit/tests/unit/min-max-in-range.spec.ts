@@ -59,14 +59,35 @@ void describe('UpperLowerInRange', () => {
 		expect(instance.getMinMax(0, 0)).to.deep.equal({ lower: -9, upper: 9 });
 	});
 
-	void it('re-reads the array on every call: the range cache never hits', () => {
-		// Questionable: `getMinMax` looks up its cache with `cacheKey in this._cache`
-		// on a Map, which is always false, so results are recomputed each time.
+	void it('caches the result for a range, so later mutations of the array are ignored', () => {
 		const data = ramp(10);
 		const instance = new UpperLowerInRange<Band>(data, 10);
 		expect(instance.getMinMax(0, 9)).to.deep.equal({ lower: -9, upper: 9 });
 		data[0].upper = 100;
-		expect(instance.getMinMax(0, 9)).to.deep.equal({ lower: -9, upper: 100 });
+		expect(instance.getMinMax(0, 9)).to.deep.equal({ lower: -9, upper: 9 });
+	});
+
+	void it('reuses a cached chunk for a different range over the same chunk', () => {
+		const data = ramp(20);
+		const instance = new UpperLowerInRange<Band>(data, 10);
+		expect(instance.getMinMax(0, 5)).to.deep.equal({ lower: -9, upper: 9 });
+		data[1].upper = 100;
+		// chunk 0 is already cached, so the mutation is not picked up...
+		expect(instance.getMinMax(3, 7)).to.deep.equal({ lower: -9, upper: 9 });
+		// ...and chunk 1 is still computed correctly alongside it
+		expect(instance.getMinMax(0, 19)).to.deep.equal({ lower: -19, upper: 19 });
+	});
+
+	void it('gives the same answer whether or not the cache is warm', () => {
+		const cold = new UpperLowerInRange<Band>(ramp(25), 10);
+		const warm = new UpperLowerInRange<Band>(ramp(25), 10);
+		warm.getMinMax(0, 9);
+		warm.getMinMax(10, 19);
+		for (const [start, end] of [[0, 2], [5, 12], [20, 24], [0, 40]]) {
+			expect(warm.getMinMax(start, end)).to.deep.equal(
+				cold.getMinMax(start, end)
+			);
+		}
 	});
 
 	void it('returns an infinite range for an empty array', () => {

@@ -209,16 +209,15 @@ void describe('calculateColumnPositionsInPlace', () => {
 		).to.deep.equal([false, true, false, true]);
 	});
 
-	void it('narrow-column pass treats endIndex as INCLUSIVE, so it can touch a stale column at endIndex', () => {
-		// Questionable: the position loop stops before endIndex, but the
-		// min-width / narrow-column passes guard with `index > endIndex`, so a
-		// column left over from an earlier call at exactly endIndex is both
-		// measured and mutated.
+	void it('every pass treats endIndex as exclusive, leaving a stale column at endIndex alone', () => {
+		// The min-width and narrow-column passes use the same range as the
+		// position loop, so a column left over from an earlier call at exactly
+		// endIndex is neither measured nor mutated.
 		const bars = items(4, 2.6);
 		bars[2].column = { left: 100, right: 105, shiftLeft: false };
 		calculateColumnPositionsInPlace(bars, 2.6, 1, 0, 2);
 		expect(bars[2].column).to.deep.equal({
-			left: 101,
+			left: 100,
 			right: 105,
 			shiftLeft: false,
 		});
@@ -235,16 +234,82 @@ void describe('calculateColumnPositionsInPlace', () => {
 		});
 	});
 
-	void it('collapses right onto left rather than allowing a negative width', () => {
+	void it('does nothing at all when endIndex is not above startIndex', () => {
 		const bars: ColumnPositionItem[] = [{ x: 10 }];
 		bars[0].column = { left: 20, right: 5, shiftLeft: false };
-		// startIndex above the item keeps the position loop from overwriting it,
-		// but the fixing pass still runs over index 0.
 		calculateColumnPositionsInPlace(bars, 6, 1, 0, 0);
 		expect(bars[0].column).to.deep.equal({
 			left: 20,
-			right: 20,
+			right: 5,
 			shiftLeft: false,
 		});
+	});
+
+	void it('collapses right onto left rather than allowing a negative width', () => {
+		// sub-pixel bar spacing can produce right < left before the fixing pass
+		const bars = items(4, 0.5);
+		calculateColumnPositionsInPlace(bars, 0.5, 1, 0, 4);
+		for (const item of bars) {
+			expect(item.column?.right).to.be.at.least(item.column?.left as number);
+		}
+	});
+
+	void it('is unaffected by a time on every item when there are no gaps', () => {
+		const withoutTime = items(6, 6.3);
+		calculateColumnPositionsInPlace(withoutTime, 6.3, 1.25, 0, 6);
+		const withTime = items(6, 6.3).map(
+			(item: ColumnPositionItem, index: number) => ({ ...item, time: index })
+		);
+		calculateColumnPositionsInPlace(withTime, 6.3, 1.25, 0, 6);
+		expect(withTime.map((item: ColumnPositionItem) => item.column)).to.deep.equal(
+			withoutTime.map((item: ColumnPositionItem) => item.column)
+		);
+	});
+
+	void it('does not align the first column after a whitespace gap', () => {
+		// bar 2 sits two logical bars after bar 1, so it must keep the position
+		// it would have if it were the first bar drawn.
+		const bars: ColumnPositionItem[] = [
+			{ x: 0, time: 0 },
+			{ x: 6.3, time: 1 },
+			{ x: 18.9, time: 3 },
+		];
+		calculateColumnPositionsInPlace(bars, 6.3, 1.25, 0, 3);
+		expect(bars[2].column).to.deep.equal(
+			calculateColumnPositions([18.9], 6.3, 1.25)[0]
+		);
+	});
+
+	void it('does not widen the last column before a whitespace gap', () => {
+		const gapped: ColumnPositionItem[] = [
+			{ x: 0, time: 0 },
+			{ x: 6.3, time: 1 },
+			{ x: 18.9, time: 3 },
+		];
+		calculateColumnPositionsInPlace(gapped, 6.3, 1.25, 0, 3);
+		const consecutive: ColumnPositionItem[] = [
+			{ x: 0, time: 0 },
+			{ x: 6.3, time: 1 },
+		];
+		calculateColumnPositionsInPlace(consecutive, 6.3, 1.25, 0, 2);
+		// the bar before the gap is positioned as if nothing followed it
+		expect(gapped[1].column).to.deep.equal(consecutive[1].column);
+	});
+
+	void it('keeps aligning the columns on each side of a gap to their own neighbours', () => {
+		const bars: ColumnPositionItem[] = [
+			{ x: 0, time: 0 },
+			{ x: 6.3, time: 1 },
+			{ x: 18.9, time: 3 },
+			{ x: 25.2, time: 4 },
+		];
+		calculateColumnPositionsInPlace(bars, 6.3, 1.25, 0, 4);
+		const gap = (a: number, b: number): number =>
+			(bars[b].column as ColumnPosition).left -
+			(bars[a].column as ColumnPosition).right -
+			1;
+		// consecutive pairs keep the reserved one-pixel gap
+		expect(gap(0, 1)).to.equal(1);
+		expect(gap(2, 3)).to.equal(1);
 	});
 });

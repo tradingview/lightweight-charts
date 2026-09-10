@@ -2,7 +2,12 @@ import { expect } from 'chai';
 import type { BusinessDay, UTCTimestamp } from 'lightweight-charts';
 import { describe, it } from 'node:test';
 
-import { convertTime, displayTime, formattedDateAndTime } from '../../src/time.js';
+import {
+	convertTime,
+	convertTimeUTC,
+	displayTime,
+	formattedDateAndTime,
+} from '../../src/time.js';
 
 void describe('convertTime', () => {
 	void it('multiplies a UTCTimestamp by 1000', () => {
@@ -54,6 +59,68 @@ void describe('convertTime', () => {
 		expect(convertTime('2021-05-12T12:34:56Z')).to.equal(
 			convertTime('2021-05-12')
 		);
+	});
+});
+
+void describe('convertTimeUTC', () => {
+	void it('multiplies a UTCTimestamp by 1000, exactly like convertTime', () => {
+		expect(convertTimeUTC(1745480000 as UTCTimestamp)).to.equal(1745480000000);
+		expect(convertTimeUTC(0 as UTCTimestamp)).to.equal(0);
+		expect(convertTimeUTC(-1 as UTCTimestamp)).to.equal(-1000);
+	});
+
+	void it('builds a BusinessDay as UTC midnight', () => {
+		const converted = convertTimeUTC({
+			year: 2021,
+			month: 5,
+			day: 12,
+		} as BusinessDay);
+		// `BusinessDay.month` is 1-based, `Date.UTC`'s is 0-based
+		expect(converted).to.equal(Date.UTC(2021, 4, 12));
+		const asDate = new Date(converted);
+		expect(asDate.getUTCFullYear()).to.equal(2021);
+		expect(asDate.getUTCMonth()).to.equal(4);
+		expect(asDate.getUTCDate()).to.equal(12);
+		expect(asDate.getUTCHours()).to.equal(0);
+		expect(asDate.getUTCMinutes()).to.equal(0);
+	});
+
+	void it('builds a date string the same way as the equivalent BusinessDay', () => {
+		expect(convertTimeUTC('2021-05-12')).to.equal(
+			convertTimeUTC({ year: 2021, month: 5, day: 12 } as BusinessDay)
+		);
+		expect(convertTimeUTC('2021-05-12')).to.equal(Date.UTC(2021, 4, 12));
+	});
+
+	void it('is a whole number of days from the epoch for a calendar day', () => {
+		const dayMs = 86_400_000;
+		expect(convertTimeUTC('2021-05-12') % dayMs).to.equal(0);
+		expect(convertTimeUTC('1970-01-01')).to.equal(0);
+		expect(convertTimeUTC('1970-01-02')).to.equal(dayMs);
+	});
+
+	void it('differs from convertTime by exactly the local UTC offset', () => {
+		const offsetMinutes = new Date(2021, 4, 12).getTimezoneOffset();
+		expect(convertTime('2021-05-12')).to.equal(
+			convertTimeUTC('2021-05-12') + offsetMinutes * 60_000
+		);
+	});
+
+	void it('accepts a zero-padded or unpadded date string', () => {
+		expect(convertTimeUTC('2021-5-2')).to.equal(convertTimeUTC('2021-05-02'));
+	});
+
+	void it('ignores anything after the day in a date string', () => {
+		expect(convertTimeUTC('2021-05-12T12:34:56Z')).to.equal(
+			convertTimeUTC('2021-05-12')
+		);
+	});
+
+	void it('round-trips through the UTC date getters', () => {
+		const asDate = new Date(convertTimeUTC('2021-12-25'));
+		expect(
+			`${asDate.getUTCFullYear()}-${asDate.getUTCMonth() + 1}-${asDate.getUTCDate()}`
+		).to.equal('2021-12-25');
 	});
 });
 
