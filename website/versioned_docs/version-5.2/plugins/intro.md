@@ -10,6 +10,13 @@ series types, drawing tools, indicators, watermarks, and other custom elements
 rendered as part of the chart. This section explains how plugins work and how
 to build your own.
 
+:::tip
+
+Looking for a ready-made plugin instead of building one? Browse the
+[plugin catalog](/plugins).
+
+:::
+
 ## Choosing a plugin type
 
 | You want to build | Plugin type | Attach with |
