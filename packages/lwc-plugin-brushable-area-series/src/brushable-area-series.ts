@@ -1,6 +1,10 @@
+import { createWhitespaceSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
+import { GapCheck } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import {
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
+	DeepPartial,
+	IChartApiBase,
 	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
@@ -17,8 +21,8 @@ export class BrushableAreaSeries<
 {
 	private _renderer: BrushableAreaSeriesRenderer<HorzScaleItem, TData>;
 
-	public constructor() {
-		this._renderer = new BrushableAreaSeriesRenderer();
+	public constructor(isGap?: GapCheck<HorzScaleItem, TData>) {
+		this._renderer = new BrushableAreaSeriesRenderer(isGap);
 	}
 
 	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
@@ -62,3 +66,16 @@ export {
 	BrushableAreaInteraction,
 	defaultInteractionOptions,
 } from './interaction';
+
+/**
+ * Adds an area series that preserves explicit whitespace without treating
+ * timestamps contributed by other series as gaps. Prefer this helper over
+ * chart.addCustomSeries(new BrushableAreaSeries(), options).
+ */
+export function createBrushableAreaSeries<H = Time, D extends BrushableAreaData<H> = BrushableAreaData<H>>(
+	chart: IChartApiBase<H>,
+	options: DeepPartial<BrushableAreaSeriesOptions> = {},
+	paneIndex: number = 0
+): OptionsAwareSeries<H, D, BrushableAreaSeriesOptions> {
+	return createWhitespaceSeries(chart, isGap => new BrushableAreaSeries<H, D>(isGap), defaultOptions, options, paneIndex);
+}

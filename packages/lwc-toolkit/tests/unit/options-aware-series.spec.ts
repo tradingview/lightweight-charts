@@ -16,6 +16,7 @@ function fixture() {
 	let plot: number[] = [];
 	let suppliedData: Datum[] = [];
 	let registered: OptionsAwareSeries<Time, Point, Options> | undefined;
+	let readInput: () => readonly Datum[] = () => [];
 	const listeners = new Set<DataChangedHandler>();
 	const notify = (scope: 'full' | 'update'): void => { for (const listener of listeners) { listener(scope); } };
 	const chart = {
@@ -59,10 +60,13 @@ function fixture() {
 			return api;
 		},
 	} as unknown as IChartApiBase<Time>;
-	const series = createOptionsAwareSeries<Time, Point, Options>(chart, readOptions => ({
-		priceValueBuilder: (item: Point) => [readOptions().base, item.value],
-	}) as ICustomSeriesPaneView<Time, Point, Options>, defaults, { base: 100 }, ['base']);
-	return { series, registered, get builds() { return builds; }, get plot() { return plot; }, get input() { return suppliedData; } };
+	const series = createOptionsAwareSeries<Time, Point, Options>(chart, (readOptions, readData) => {
+		readInput = readData;
+		return {
+			priceValueBuilder: (item: Point) => [readOptions().base, item.value],
+		} as ICustomSeriesPaneView<Time, Point, Options>;
+	}, defaults, { base: 100 }, ['base']);
+	return { series, registered, readInput: () => readInput(), get builds() { return builds; }, get plot() { return plot; }, get input() { return suppliedData; } };
 }
 
 void describe('createOptionsAwareSeries', () => {
@@ -134,5 +138,25 @@ void describe('createOptionsAwareSeries', () => {
 		series.subscribeDataChanged(replace);
 		series.pop(1);
 		expect(series.data()).to.deep.equal([point(1), point(2, 200)]);
+	});
+});
+
+void describe('retained input snapshots', () => {
+	void it('shares a lazy snapshot and commits before consumer callbacks', () => {
+		const f = fixture();
+		f.series.setData([point(1), { time: '2024-01-02' }, point(3)]);
+		const first = f.readInput();
+		expect(f.readInput()).to.equal(first);
+		let observed: readonly Datum[] = [];
+		f.series.subscribeDataChanged(() => { observed = f.readInput(); });
+		f.series.update(point(2), true);
+		expect(observed).to.deep.equal([point(1), point(2), point(3)]);
+		expect(observed).to.not.equal(first);
+		f.series.pop(1);
+		expect(f.readInput()).to.deep.equal([point(1), point(2)]);
+		expect(() => f.series.setData([point(3), point(2)])).to.throw('Unsorted data');
+		expect(f.readInput()).to.deep.equal([point(1), point(2)]);
+		f.series.setData([]);
+		expect(f.readInput()).to.deep.equal([]);
 	});
 });

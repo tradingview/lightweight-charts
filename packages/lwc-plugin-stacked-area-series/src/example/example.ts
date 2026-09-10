@@ -1,7 +1,7 @@
 import { CustomSeriesWhitespaceData, Time, createChart } from 'lightweight-charts';
 import { StackedAreaGapHandling, StackedAreaLineType } from '../options';
 import { StackedAreaData } from '../data';
-import { StackedAreaSeries } from '../stacked-area-series';
+import { createStackedAreaSeries } from '../stacked-area-series';
 import { multipleBarData } from './sample-data';
 
 type DemoData = StackedAreaData | CustomSeriesWhitespaceData<Time>;
@@ -37,7 +37,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	},
 }));
 
-const series = chart.addCustomSeries(new StackedAreaSeries());
+const series = createStackedAreaSeries(chart);
 series.setData(demoData());
 chart.timeScale().fitContent();
 

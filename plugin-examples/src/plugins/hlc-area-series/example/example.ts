@@ -7,7 +7,7 @@ import {
 import {
 	HLCAreaData,
 	HLCAreaLineType,
-	HLCAreaSeries,
+	createHLCAreaSeries,
 } from '@tradingview/lwc-plugin-hlc-area-series';
 import { generateAlternativeCandleData } from '../../../sample-data';
 
@@ -15,7 +15,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const series = chart.addCustomSeries(new HLCAreaSeries(), {});
+const series = createHLCAreaSeries(chart, {});
 
 const data: (HLCAreaData | CustomSeriesWhitespaceData<Time>)[] =
 	generateAlternativeCandleData(80);

@@ -54,9 +54,9 @@ const MAX_INIT_ATTEMPTS = 60;
 export class AccessibilityPlugin extends PanePluginBase<Time> {
 	private _options: AccessibilityPaneOptions;
 	private _messages: AccessibilityMessages;
-	// Only used to find the pane before the layer exists; afterwards the pane is
-	// identified by the row that actually hosts the layer.
+	// Capture the pane's API on attach: widgets reuse DOM rows after moveTo().
 	private readonly _initialPaneIndex: number;
+	private _attachedPane: IPaneApi<Time> | null = null;
 	private _isAttached = false;
 	private _layer: PaneLayer | null = null;
 
@@ -164,6 +164,7 @@ export class AccessibilityPlugin extends PanePluginBase<Time> {
 	public attached(param: PaneAttachedParameter<Time>): void {
 		super.attached(param);
 		this._isAttached = true;
+		this._attachedPane = this.chart.panes()[this._initialPaneIndex] ?? null;
 		this._tryInit();
 	}
 
@@ -190,6 +191,7 @@ export class AccessibilityPlugin extends PanePluginBase<Time> {
 		this._cursor.reset();
 
 		this._isAttached = false;
+		this._attachedPane = null;
 		this._layer = null;
 		this._shortcutsOpen = false;
 		this._highContrast = false;
@@ -220,6 +222,7 @@ export class AccessibilityPlugin extends PanePluginBase<Time> {
 			this._tryInit();
 			return;
 		}
+		this._moveLayer();
 		this._positionIndicator();
 		this._series.sync();
 	}
@@ -307,16 +310,20 @@ export class AccessibilityPlugin extends PanePluginBase<Time> {
 
 	private _pane(): IPaneApi<Time> | null {
 		const panes = this._chartOrNull()?.panes() ?? [];
-		// Pane indices shift when panes are added or removed, so once our DOM is
-		// in place, identify the pane by the row that actually hosts our layer;
-		// the constructor index is only the initial (pre-build) lookup. Built but
-		// hosted nowhere means our pane was removed – return null rather than
-		// silently re-binding to whatever pane holds the index now.
-		const container = this._layer?.container;
-		if (container) {
-			return panes.find((pane: IPaneApi<Time>) => pane.getHTMLElement()?.contains(container) ?? false) ?? null;
-		}
-		return panes[this._initialPaneIndex] ?? null;
+		return this._attachedPane !== null && panes.includes(this._attachedPane) ? this._attachedPane : null;
+	}
+
+	/** Moves the existing semantic layer with its pane, preserving cursor and table state. */
+	private _moveLayer(): void {
+		const pane = this._pane();
+		const element = pane?.getHTMLElement();
+		const content = pane ? paneContentElement(pane) : null;
+		const layer = this._layer;
+		if (!element || !content || !layer || layer.host === content) { return; }
+		layer.host.removeEventListener('pointerdown', this._handlePointerDown);
+		layer.moveTo(element, content);
+		layer.host.addEventListener('pointerdown', this._handlePointerDown);
+		this._render();
 	}
 
 	/** The pane's current index, which changes when panes are added, removed or moved. */

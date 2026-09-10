@@ -4,7 +4,7 @@ import {
 	Time,
 	createChart,
 } from 'lightweight-charts';
-import { HLCAreaSeries } from '../hlc-area-series';
+import { createHLCAreaSeries } from '../hlc-area-series';
 import { HLCAreaData } from '../data';
 import { HLCAreaLineType } from '../options';
 import { generateAlternativeCandleData } from './sample-data';
@@ -13,7 +13,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const series = chart.addCustomSeries(new HLCAreaSeries(), {});
+const series = createHLCAreaSeries(chart, {});
 
 const data: (HLCAreaData | CustomSeriesWhitespaceData<Time>)[] =
 	generateAlternativeCandleData(80);

@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `createBrushableAreaSeries` retains explicit whitespace across data updates,
+  independently of the shared timeline. Prefer it over the low-level pane view.
+
 - First release as a standalone package, `@tradingview/lwc-plugin-brushable-area-series`.
   Graduated from the `plugin-examples` collection of the Lightweight Charts™
   repository.
@@ -32,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   matching the built-in `AreaSeries` where they share a name.
 
 ### Fixed
+
+- Keep sparse areas visible when other series contribute interleaved timestamps.
 
 - Reconstruct offscreen endpoints so interior viewport fills remain visible.
 - Do not clear a completed mouse selection on an unrelated pointer departure.

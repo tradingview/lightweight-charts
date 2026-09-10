@@ -6,7 +6,7 @@ import {
 	createChart,
 } from 'lightweight-charts';
 import { generateLineData } from './sample-data';
-import { BrushableAreaSeries } from '../brushable-area-series';
+import { createBrushableAreaSeries } from '../brushable-area-series';
 import { BrushableAreaInteraction } from '../interaction';
 import { BrushableAreaData } from '../data';
 import { BrushableAreaStyle } from '../options';
@@ -58,7 +58,7 @@ const referenceSeries = chart.addSeries(LineSeries, {
 });
 referenceSeries.setData(allData);
 
-const brushableSeries = chart.addCustomSeries(new BrushableAreaSeries(), {
+const brushableSeries = createBrushableAreaSeries(chart, {
 	priceLineVisible: false,
 	lineColor: 'rgb(40,98,255)',
 	topColor: 'rgba(40,98,255, 0.4)',

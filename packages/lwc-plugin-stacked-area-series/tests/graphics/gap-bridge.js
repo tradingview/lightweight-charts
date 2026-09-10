@@ -26,7 +26,7 @@ function runTestCase(container) {
 	}));
 	// The opposite of the whitespace-gap case: the bands are drawn straight
 	// across the gap instead of stopping at it.
-	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries(), {
+	const series = LwcPlugin.createStackedAreaSeries(chart, {
 		gapHandling: 'bridge',
 	});
 	series.setData(generateData());

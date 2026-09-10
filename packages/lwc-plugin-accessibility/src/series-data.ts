@@ -15,11 +15,11 @@ export function latestDataPoint(series: AnySeries): SeriesDataPoint | null {
 }
 
 /**
- * A comparable, equality-safe key for a `Time`: business-day objects are
- * distinct objects for the same day, so they are flattened to a string.
+ * A UTC seconds key shared by timestamps, date strings and business days.
+ * Equivalent representations of a day must match the same chart annotation.
  */
-export function timeKey(time: Time): string | number {
-	return typeof time === 'object' ? `${time.year}-${time.month}-${time.day}` : time;
+export function timeKey(time: Time): number {
+	return convertTimeUTC(time) / 1000;
 }
 
 /** Facts used by announcements, reconciled lazily against the public series data. */

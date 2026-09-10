@@ -1,6 +1,7 @@
 import {
 	CustomBarItemData,
 	CustomData,
+	CustomSeriesWhitespaceData,
 	IRange,
 	PaneRendererCustomData,
 } from 'lightweight-charts';
@@ -13,6 +14,9 @@ export interface TimeIndexed {
 	/** Time scale index (logical index) of the item. */
 	readonly time: number;
 }
+
+/** Whether two rendered bars are separated by whitespace in their own series. */
+export type GapCheck<H, D extends CustomData<H>> = (left: CustomBarItemData<H, D>, right: CustomBarItemData<H, D>) => boolean;
 
 function clampedRange(
 	range: IRange<number> | null,
@@ -90,16 +94,15 @@ export function extendRange(
 }
 
 /**
- * Splits a visible range into the runs of consecutive bars, breaking wherever
- * the logical index advances by more than `conflationFactor`. Whitespace data never reaches a
- * renderer, so a jump in the logical time index is the only sign of a gap and
- * a line series has to start a new path there instead of bridging it.
+ * Splits a visible range at explicit series gaps. A jump in logical index can
+ * also come from another series' timestamps, so it must not imply whitespace.
+ * Without a gap predicate, increasing indices form one continuous run.
  * The returned ranges are absolute `[from, to)` index ranges into `bars`.
  */
-export function visibleSegments(
-	bars: readonly TimeIndexed[],
+export function visibleSegments<T extends TimeIndexed>(
+	bars: readonly T[],
 	range: IRange<number>,
-	conflationFactor: number = 1
+	isGap?: (left: T, right: T) => boolean
 ): IRange<number>[] {
 	const { from, to } = clampedRange(range, bars.length);
 	if (from >= to) {
@@ -109,13 +112,45 @@ export function visibleSegments(
 	let segmentStart = from;
 	for (let i = from + 1; i < to; i++) {
 		const step = bars[i].time - bars[i - 1].time;
-		if (step <= 0 || step > conflationFactor) {
+		if (step <= 0 || isGap?.(bars[i - 1], bars[i])) {
 			segments.push({ from: segmentStart, to: i });
 			segmentStart = i;
 		}
 	}
 	segments.push({ from: segmentStart, to });
 	return segments;
+}
+
+/**
+ * Detects whitespace from the series' accepted input, including on hosts whose
+ * renderer data omits it. The input getter returns a chronological snapshot
+ * with stable identity until data changes. Resolve logical indices at lookup
+ * time because other series can change the shared timeline independently.
+ */
+export function whitespaceGapCheck<H, D extends CustomData<H>>(
+	readData: () => readonly (D | CustomSeriesWhitespaceData<H>)[],
+	logicalIndex: (time: H) => number | null,
+	isWhitespace: (point: D | CustomSeriesWhitespaceData<H>) => boolean
+): GapCheck<H, D> {
+	let previous: ReturnType<typeof readData> | null = null;
+	let times: H[] = [];
+	return (left, right): boolean => {
+		const data = readData();
+		if (data !== previous) {
+			previous = data;
+			times = data.filter(isWhitespace).map(point => point.time);
+		}
+		if (times.length === 0) { return false; }
+		let low = 0;
+		let high = times.length;
+		while (low < high) {
+			const mid = Math.floor((low + high) / 2);
+			const index = logicalIndex(times[mid]);
+			if (index === null || index <= left.time) { low = mid + 1; } else { high = mid; }
+		}
+		const index = low < times.length ? logicalIndex(times[low]) : null;
+		return index !== null && index < right.time;
+	};
 }
 
 /**

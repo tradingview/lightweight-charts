@@ -10,7 +10,7 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { barCoordinate, getConflationFactor, extendRange, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { GapCheck, barCoordinate, extendRange, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { setLineStyle } from '@tradingview/lwc-toolkit/line-style';
 import type { LineStyle as ToolkitLineStyle } from '@tradingview/lwc-toolkit/line-style';
 
@@ -67,6 +67,10 @@ export class HLCAreaSeriesRenderer<
 	TData,
 	HLCAreaSeriesOptions
 > {
+	public constructor(private readonly _isGap?: GapCheck<HorzScaleItem, TData>) {
+		super();
+	}
+
 	/**
 	 * Reports the bar under the cursor, so that the chart can identify it in the
 	 * crosshair event and hand it back to `draw` as the hovered item.
@@ -143,9 +147,10 @@ export class HLCAreaSeriesRenderer<
 		ctx.save();
 		ctx.lineJoin = 'round';
 
-		// Whitespace never reaches a renderer, so a jump in the logical index is
-		// the only sign of a gap; each run of consecutive bars is its own path.
-		for (const segment of visibleSegments(bars, { from: 0, to: bars.length }, getConflationFactor(data))) {
+		// Break at explicit whitespace or a point that could not be converted.
+		for (const segment of visibleSegments(bars, { from: 0, to: bars.length }, (left, right) =>
+			right.index !== left.index + 1 || (this._isGap?.(data.bars[left.index], data.bars[right.index]) ?? false)
+		)) {
 			this._drawSegment(scope, options, bars, segment.from, segment.to);
 		}
 
