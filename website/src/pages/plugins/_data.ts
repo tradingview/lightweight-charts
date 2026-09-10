@@ -31,6 +31,20 @@ export interface Plugin {
 	deprecatedMessage: string | null; // the npm deprecate message
 	status: PluginStatus;
 	previewImage: string; // docs-side curated SVG, by slug convention
+	/**
+	 * Site-root-relative URL of the package's catalogue preview page, or null
+	 * when it declares none. Built by `pnpm plugins:build-demos`; run it through
+	 * `useBaseUrl` before using it.
+	 */
+	previewUrl: string | null;
+	/**
+	 * The same for the package's full demo page. Null only for an entry with no
+	 * workspace package behind it, which the catalogue does not produce today
+	 * but the detail page still has to render.
+	 */
+	demoUrl: string | null;
+	/** Height in CSS pixels the preview frame is given. */
+	previewHeight: number;
 }
 
 // The user-facing browse taxonomy deliberately lives here, not in the
@@ -124,6 +138,9 @@ export function normalise(entry: CatalogueEntrySummary, now: number): Plugin {
 		deprecatedMessage: entry.deprecated,
 		status: deriveStatus(entry, now),
 		previewImage: `assets/previews/${entry.slug}.svg`,
+		previewUrl: entry.previewUrl,
+		demoUrl: entry.demoUrl,
+		previewHeight: entry.previewHeight,
 	};
 }
 

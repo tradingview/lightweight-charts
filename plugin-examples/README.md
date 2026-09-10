@@ -5,7 +5,7 @@ split into two kinds of content:
 
 - **Official plugins** — maintained, published npm packages, listed in the
   [plugin catalog](https://tradingview.github.io/lightweight-charts/plugins).
-  Their demo here just imports the published package; the source lives under
+  Their page here redirects to the package's demo; the source lives under
   [`packages/lwc-plugin-*`](https://github.com/tradingview/lightweight-charts/tree/master/packages)
   instead of in this folder.
 - **Example plugins** — proof-of-concept starting points that live entirely in

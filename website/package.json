@@ -9,7 +9,7 @@
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
-    "serve": "docusaurus serve",
+    "serve": "node ../scripts/serve-website.mjs",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids"
   },
@@ -27,6 +27,7 @@
     "cross-env": "7.0.3",
     "docusaurus-plugin-typedoc": "1.0.1",
     "file-loader": "6.2.0",
+    "github-slugger": "1.5.0",
     "lightweight-charts": "5.2.1",
     "lightweight-charts-3.8": "npm:lightweight-charts@~3.8.0",
     "lightweight-charts-4.0": "npm:lightweight-charts@~4.0.1",
