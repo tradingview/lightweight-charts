@@ -1,18 +1,17 @@
 import {
-    CustomSeriesPricePlotValues,
-    ICustomSeriesPaneView,
-    PaneRendererCustomData,
-    SeriesDataItemTypeMap,
-    SingleValueData,
-    Time,
-    WhitespaceData
+	CustomSeriesPricePlotValues,
+	CustomSeriesWhitespaceData,
+	ICustomSeriesPaneView,
+	PaneRendererCustomData,
+	Time
 } from 'lightweight-charts';
 import { defaultOptions, PrettyHistogramSeriesOptions } from './options';
 import { PrettyHistogramSeriesRenderer } from './renderer';
+import { PrettyHistogramData } from './data';
 
 export class PrettyHistogramSeries<
-    HorzScaleItem = Time,
-    TData extends (SeriesDataItemTypeMap<HorzScaleItem>['Custom'] & SingleValueData<HorzScaleItem>) = SeriesDataItemTypeMap<HorzScaleItem>['Custom'] & SingleValueData<HorzScaleItem>
+	HorzScaleItem = Time,
+	TData extends PrettyHistogramData<HorzScaleItem> = PrettyHistogramData<HorzScaleItem>
 > implements ICustomSeriesPaneView<HorzScaleItem, TData, PrettyHistogramSeriesOptions> {
 	private _renderer: PrettyHistogramSeriesRenderer<HorzScaleItem, TData>;
 
@@ -24,7 +23,7 @@ export class PrettyHistogramSeries<
 		return [plotRow.value];
 	}
 
-	public isWhitespace(data: TData | WhitespaceData<HorzScaleItem>): data is WhitespaceData<HorzScaleItem> {
+	public isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> {
 		return (data as Partial<TData>).value === undefined;
 	}
 

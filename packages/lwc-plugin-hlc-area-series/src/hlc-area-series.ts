@@ -1,43 +1,45 @@
 import {
 	CustomSeriesPricePlotValues,
+	CustomSeriesWhitespaceData,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
-	WhitespaceData,
 	Time,
 } from 'lightweight-charts';
 import { HLCAreaSeriesOptions, defaultOptions } from './options';
 import { HLCAreaSeriesRenderer } from './renderer';
 import { HLCAreaData } from './data';
 
-export class HLCAreaSeries<TData extends HLCAreaData>
-	implements ICustomSeriesPaneView<Time, TData, HLCAreaSeriesOptions>
+export class HLCAreaSeries<
+	HorzScaleItem = Time,
+	TData extends HLCAreaData<HorzScaleItem> = HLCAreaData<HorzScaleItem>
+> implements ICustomSeriesPaneView<HorzScaleItem, TData, HLCAreaSeriesOptions>
 {
-	_renderer: HLCAreaSeriesRenderer<TData>;
+	private _renderer: HLCAreaSeriesRenderer<HorzScaleItem, TData>;
 
-	constructor() {
+	public constructor() {
 		this._renderer = new HLCAreaSeriesRenderer();
 	}
 
-	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
+	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
 		return [plotRow.low, plotRow.high, plotRow.close];
 	}
 
-	isWhitespace(data: TData | WhitespaceData): data is WhitespaceData {
+	public isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> {
 		return (data as Partial<TData>).close === undefined;
 	}
 
-	renderer(): HLCAreaSeriesRenderer<TData> {
+	public renderer(): HLCAreaSeriesRenderer<HorzScaleItem, TData> {
 		return this._renderer;
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: HLCAreaSeriesOptions
 	): void {
 		this._renderer.update(data, options);
 	}
 
-	defaultOptions() {
+	public defaultOptions(): HLCAreaSeriesOptions {
 		return defaultOptions;
 	}
 }

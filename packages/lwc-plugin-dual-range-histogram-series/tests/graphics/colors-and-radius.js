@@ -38,8 +38,13 @@ function runTestCase(container) {
 	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
 		priceLineVisible: false,
 		lastValueVisible: false,
-		colors: ['#BBDEFB', '#1565C0', '#FFE0B2', '#EF6C00'],
-		borderRadius: [8, 4, 8, 4],
+		colors: {
+			upOuter: '#BBDEFB',
+			upInner: '#1565C0',
+			downOuter: '#FFE0B2',
+			downInner: '#EF6C00',
+		},
+		borderRadius: { upOuter: 8, upInner: 4, downOuter: 8, downInner: 4 },
 		maxHeight: 200,
 	});
 	histogram.setData(data.histogram);

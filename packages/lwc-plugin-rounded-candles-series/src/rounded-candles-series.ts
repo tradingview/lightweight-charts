@@ -1,23 +1,21 @@
 import {
+	CandlestickSeriesOptions,
 	CustomSeriesOptions,
 	CustomSeriesPricePlotValues,
+	CustomSeriesWhitespaceData,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
-	customSeriesDefaultOptions,
-	CandlestickSeriesOptions,
-	WhitespaceData,
 	Time,
+	customSeriesDefaultOptions,
 } from 'lightweight-charts';
-import { RoundedCandleSeriesData, /* isRoundedCandleData */ } from './data';
+import { RoundedCandleData } from './data';
+import { RoundedCandleRadius } from './radius';
 import { RoundedCandleSeriesRenderer } from './renderer';
 
 export interface RoundedCandleSeriesOptions
 	extends CustomSeriesOptions,
-		Exclude<
-			CandlestickSeriesOptions,
-			'borderVisible' | 'borderColor' | 'borderUpColor' | 'borderDownColor'
-		> {
-	radius: (barSpacing: number) => number;
+		CandlestickSeriesOptions {
+	radius: RoundedCandleRadius;
 }
 
 const defaultOptions: RoundedCandleSeriesOptions = {
@@ -32,44 +30,49 @@ const defaultOptions: RoundedCandleSeriesOptions = {
 	wickColor: '#737375',
 	wickUpColor: '#26a69a',
 	wickDownColor: '#ef5350',
-	radius: function (bs: number) {
+	radius: function (bs: number): number {
 		if (bs < 4) return 0;
 		return bs / 3;
 	},
 } as const;
 
-export class RoundedCandleSeries<TData extends RoundedCandleSeriesData>
-	implements ICustomSeriesPaneView<Time, TData, RoundedCandleSeriesOptions>
+export class RoundedCandleSeries<
+	HorzScaleItem = Time,
+	TData extends RoundedCandleData<HorzScaleItem> = RoundedCandleData<HorzScaleItem>
+> implements ICustomSeriesPaneView<HorzScaleItem, TData, RoundedCandleSeriesOptions>
 {
-	_renderer: RoundedCandleSeriesRenderer<TData>;
+	private _renderer: RoundedCandleSeriesRenderer<HorzScaleItem, TData>;
 
-	constructor() {
+	public constructor() {
 		this._renderer = new RoundedCandleSeriesRenderer();
 	}
 
-	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
+	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
 		return [plotRow.high, plotRow.low, plotRow.close];
 	}
 
-	renderer(): RoundedCandleSeriesRenderer<TData> {
+	public renderer(): RoundedCandleSeriesRenderer<HorzScaleItem, TData> {
 		return this._renderer;
 	}
 
-	isWhitespace(data: TData | WhitespaceData): data is WhitespaceData {
+	public isWhitespace(
+		data: TData | CustomSeriesWhitespaceData<HorzScaleItem>
+	): data is CustomSeriesWhitespaceData<HorzScaleItem> {
 		return (data as Partial<TData>).close === undefined;
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: RoundedCandleSeriesOptions
 	): void {
 		this._renderer.update(data, options);
 	}
 
-	defaultOptions() {
+	public defaultOptions(): RoundedCandleSeriesOptions {
 		return defaultOptions;
 	}
 }
 
-export type { RoundedCandleSeriesData } from './data';
+export type { RoundedCandleData, RoundedCandleSeriesData } from './data';
+export type { RoundedCandleRadius } from './radius';
 export { defaultOptions };

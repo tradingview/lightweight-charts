@@ -132,7 +132,7 @@ In addition to the standard
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `colors` | `{ line: string; area: string }[]` | five preset pairs (blue, red, orange, purple, teal); in each pair the area is the line color at 20% opacity | Line and fill color for each band, in stacking order. If there are more values than colors, the colors repeat. |
-| `lineWidth` | `number` | `2` | Width of the band lines, in CSS pixels. |
+| `lineWidth` | `LineWidth` | `2` | Width of the band lines, in CSS pixels (`1`–`4`). |
 
 ## Notes
 

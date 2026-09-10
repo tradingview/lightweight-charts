@@ -1,4 +1,4 @@
-import { AutoscaleInfo, DeepPartial, HistogramData, SeriesDataItemTypeMap, SingleValueData, Time, createChart } from 'lightweight-charts';
+import { AutoscaleInfo, DeepPartial, Time, createChart } from 'lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { PrettyHistogramSeries, PrettyHistogramSeriesOptions, PrettyHistogramData } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
@@ -31,14 +31,14 @@ const myCustomSeries = chart.addCustomSeries(customSeriesView, options);
 
 const data: PrettyHistogramData<Time>[] = generateLineData(6);
 data.forEach((item: PrettyHistogramData<Time>, i: number) => {
-	(item as HistogramData<Time>).color = (i % 2) ? '#6438D6' : undefined;
+	item.color = (i % 2) ? '#6438D6' : undefined;
 });
 
 myCustomSeries.setData(data);
 
 chart.timeScale().fitContent();
 
-data.forEach((item: (SeriesDataItemTypeMap<Time>['Custom'] & SingleValueData<Time>), i: number) => {
+data.forEach((item: PrettyHistogramData<Time>, i: number) => {
 	const element = document.getElementById(`bar_${i + 1}`) as HTMLInputElement;
 	element.value = item.value.toFixed(2);
 	element.onchange = () => {

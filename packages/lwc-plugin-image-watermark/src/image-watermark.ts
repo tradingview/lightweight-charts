@@ -9,38 +9,43 @@ import {
 	Time,
 } from 'lightweight-charts';
 
-export interface ImageWatermarkOptions {
+export interface ImageWatermarkPluginOptions {
 	maxWidth?: number;
 	maxHeight?: number;
 	padding?: number;
 	alpha?: number;
 }
 
-class ImageWatermarkPaneRenderer implements IPrimitivePaneRenderer {
-	_source: ImageWatermark;
-	_view: ImageWatermarkPaneView;
+/** @deprecated Use ImageWatermarkPluginOptions. */
+export type ImageWatermarkOptions = ImageWatermarkPluginOptions;
 
-	constructor(source: ImageWatermark, view: ImageWatermarkPaneView) {
-		this._source = source;
-		this._view = view;
-	}
+/** The same options, with every value filled in. */
+interface ResolvedOptions {
+	maxWidth: number | undefined;
+	maxHeight: number | undefined;
+	padding: number;
+	alpha: number;
+}
 
-	draw(target: CanvasRenderingTarget2D) {
-		target.useMediaCoordinateSpace(scope => {
-			const ctx = scope.context;
-			const pos = this._view._placement;
-			if (!pos) return;
-			if (!this._source._imgElement) return;
-			ctx.globalAlpha = this._source._options.alpha ?? 1;
-			ctx.drawImage(
-				this._source._imgElement,
-				pos.x,
-				pos.y,
-				pos.width,
-				pos.height
-			);
-		});
-	}
+const defaults: ResolvedOptions = {
+	maxWidth: undefined,
+	maxHeight: undefined,
+	padding: 0,
+	alpha: 1,
+};
+
+/** Values used for any option not passed to the constructor. */
+export const defaultOptions: ImageWatermarkPluginOptions = defaults;
+
+function resolveOptions(
+	options: ImageWatermarkPluginOptions = {}
+): ResolvedOptions {
+	return {
+		maxWidth: options.maxWidth ?? defaults.maxWidth,
+		maxHeight: options.maxHeight ?? defaults.maxHeight,
+		padding: options.padding ?? defaults.padding,
+		alpha: options.alpha ?? defaults.alpha,
+	};
 }
 
 interface Placement {
@@ -50,56 +55,86 @@ interface Placement {
 	width: number;
 }
 
-class ImageWatermarkPaneView implements IPrimitivePaneView {
-	_source: ImageWatermark;
-	_placement: Placement | null = null;
+/** Everything a pane view needs from the watermark to place and draw the image. */
+interface WatermarkState {
+	chart: IChartApi | null;
+	image: HTMLImageElement | null;
+	imageWidth: number;
+	imageHeight: number;
+	options: ResolvedOptions;
+}
 
-	constructor(source: ImageWatermark) {
-		this._source = source;
+class ImageWatermarkPaneRenderer implements IPrimitivePaneRenderer {
+	private readonly _state: WatermarkState;
+	private readonly _placement: Placement | null;
+
+	public constructor(state: WatermarkState, placement: Placement | null) {
+		this._state = state;
+		this._placement = placement;
 	}
 
-	zOrder(): PrimitivePaneViewZOrder {
+	public draw(target: CanvasRenderingTarget2D) {
+		target.useMediaCoordinateSpace(scope => {
+			const ctx = scope.context;
+			const pos = this._placement;
+			if (!pos) return;
+			const image = this._state.image;
+			if (!image) return;
+			ctx.globalAlpha = this._state.options.alpha;
+			ctx.drawImage(image, pos.x, pos.y, pos.width, pos.height);
+		});
+	}
+}
+
+class ImageWatermarkPaneView implements IPrimitivePaneView {
+	private _state: WatermarkState;
+	private _placement: Placement | null = null;
+
+	public constructor(state: WatermarkState) {
+		this._state = state;
+	}
+
+	public zOrder(): PrimitivePaneViewZOrder {
 		return 'bottom';
 	}
 
-	update() {
+	public update(state: WatermarkState) {
+		this._state = state;
 		this._placement = this._determinePlacement();
 	}
 
-	renderer() {
-		return new ImageWatermarkPaneRenderer(this._source, this);
+	public renderer() {
+		return new ImageWatermarkPaneRenderer(this._state, this._placement);
 	}
 
 	private _determinePlacement(): Placement | null {
-		if (!this._source._chart) return null;
-		const leftPriceScaleWidth = this._source._chart.priceScale('left').width();
-		const plotAreaWidth = this._source._chart.timeScale().width();
+		const chart = this._state.chart;
+		if (!chart) return null;
+		const leftPriceScaleWidth = chart.priceScale('left').width();
+		const plotAreaWidth = chart.timeScale().width();
 		const startX = leftPriceScaleWidth;
 		const plotAreaHeight =
-			this._source._chart.chartElement().clientHeight -
-			this._source._chart.timeScale().height();
+			chart.chartElement().clientHeight - chart.timeScale().height();
 
 		const plotCentreX = Math.round(plotAreaWidth / 2) + startX;
 		const plotCentreY = Math.round(plotAreaHeight / 2) + 0;
 
-		const padding = this._source._options.padding ?? 0;
+		const options = this._state.options;
+		const padding = options.padding;
 		let availableWidth = plotAreaWidth - 2 * padding;
 		let availableHeight = plotAreaHeight - 2 * padding;
 
-		if (this._source._options.maxHeight)
-			availableHeight = Math.min(
-				availableHeight,
-				this._source._options.maxHeight
-			);
-		if (this._source._options.maxWidth)
-			availableWidth = Math.min(availableWidth, this._source._options.maxWidth);
+		if (options.maxHeight)
+			availableHeight = Math.min(availableHeight, options.maxHeight);
+		if (options.maxWidth)
+			availableWidth = Math.min(availableWidth, options.maxWidth);
 
-		const scaleX = availableWidth / this._source._imageWidth;
-		const scaleY = availableHeight / this._source._imageHeight;
+		const scaleX = availableWidth / this._state.imageWidth;
+		const scaleY = availableHeight / this._state.imageHeight;
 		const scaleToUse = Math.min(scaleX, scaleY);
 
-		const drawWidth = this._source._imageWidth * scaleToUse;
-		const drawHeight = this._source._imageHeight * scaleToUse;
+		const drawWidth = this._state.imageWidth * scaleToUse;
+		const drawHeight = this._state.imageHeight * scaleToUse;
 
 		const x = plotCentreX - 0.5 * drawWidth;
 		const y = plotCentreY - 0.5 * drawHeight;
@@ -114,29 +149,29 @@ class ImageWatermarkPaneView implements IPrimitivePaneView {
 }
 
 export class ImageWatermark implements ISeriesPrimitive<Time> {
-	_paneViews: ImageWatermarkPaneView[];
-	_imgElement: HTMLImageElement | null = null;
-	_imageUrl: string;
-	_options: ImageWatermarkOptions;
-	_imageHeight = 0; // don't draw until loaded fully
-	_imageWidth = 0;
-	_chart: IChartApi | null = null;
-	_requestUpdate?: () => void;
+	private readonly _paneViews: ImageWatermarkPaneView[];
+	private readonly _imageUrl: string;
+	private readonly _options: ResolvedOptions;
+	private _imgElement: HTMLImageElement | null = null;
+	private _imageHeight = 0; // don't draw until loaded fully
+	private _imageWidth = 0;
+	private _chart: IChartApi | null = null;
+	private _requestUpdate?: () => void;
 
-	constructor(imageUrl: string, options: ImageWatermarkOptions) {
+	public constructor(imageUrl: string, options?: ImageWatermarkPluginOptions) {
 		this._imageUrl = imageUrl;
-		this._options = options;
-		this._paneViews = [new ImageWatermarkPaneView(this)];
+		this._options = resolveOptions(options);
+		this._paneViews = [new ImageWatermarkPaneView(this._state())];
 	}
 
-	attached({ chart, requestUpdate }: SeriesAttachedParameter<Time>) {
+	public attached({ chart, requestUpdate }: SeriesAttachedParameter<Time>) {
 		this._chart = chart;
 		this._requestUpdate = requestUpdate;
 		const loaded = this._imgElement;
 		// An image decoded before an earlier detach is reused instead of refetched.
 		if (loaded && loaded.complete && loaded.naturalWidth > 0) {
-			this._paneViews.forEach(pv => pv.update());
-			this.requestUpdate();
+			this.updateAllViews();
+			this._fireRequestUpdate();
 			return;
 		}
 		const img = new Image();
@@ -145,8 +180,8 @@ export class ImageWatermark implements ISeriesPrimitive<Time> {
 			if (this._imgElement !== img) return;
 			this._imageHeight = img.naturalHeight;
 			this._imageWidth = img.naturalWidth;
-			this._paneViews.forEach(pv => pv.update());
-			this.requestUpdate();
+			this.updateAllViews();
+			this._fireRequestUpdate();
 		};
 		img.onerror = () => {
 			if (this._imgElement !== img) return;
@@ -155,7 +190,7 @@ export class ImageWatermark implements ISeriesPrimitive<Time> {
 		img.src = this._imageUrl;
 	}
 
-	detached() {
+	public detached() {
 		const img = this._imgElement;
 		if (img) {
 			img.onload = img.onerror = null;
@@ -166,14 +201,26 @@ export class ImageWatermark implements ISeriesPrimitive<Time> {
 		this._requestUpdate = undefined;
 	}
 
-	requestUpdate(): void {
-		if (this._requestUpdate) this._requestUpdate();
+	public updateAllViews() {
+		const state = this._state();
+		this._paneViews.forEach(pv => pv.update(state));
 	}
 
-	updateAllViews() {
-		this._paneViews.forEach(pv => pv.update());
-	}
-	paneViews() {
+	public paneViews(): IPrimitivePaneView[] {
 		return this._paneViews;
+	}
+
+	private _state(): WatermarkState {
+		return {
+			chart: this._chart,
+			image: this._imgElement,
+			imageWidth: this._imageWidth,
+			imageHeight: this._imageHeight,
+			options: this._options,
+		};
+	}
+
+	private _fireRequestUpdate(): void {
+		if (this._requestUpdate) this._requestUpdate();
 	}
 }

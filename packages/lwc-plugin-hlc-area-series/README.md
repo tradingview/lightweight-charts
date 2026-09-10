@@ -118,14 +118,18 @@ In addition to the standard
 | `highLineColor` | `string` | `'#049981'` | Color of the high line. |
 | `lowLineColor` | `string` | `'#F23645'` | Color of the low line. |
 | `closeLineColor` | `string` | `'#878993'` | Color of the close line. |
-| `areaTopColor` | `string` | `'rgba(4, 153, 129, 0.2)'` | Fill color between the high line and the close line. |
-| `areaBottomColor` | `string` | `'rgba(242, 54, 69, 0.2)'` | Fill color between the close line and the low line. |
-| `highLineWidth` | `number` | `2` | Width of the high line, in CSS pixels. |
-| `lowLineWidth` | `number` | `2` | Width of the low line, in CSS pixels. |
-| `closeLineWidth` | `number` | `2` | Width of the close line, in CSS pixels. |
+| `highAreaColor` | `string` | `'rgba(4, 153, 129, 0.2)'` | Fill color between the high line and the close line. |
+| `lowAreaColor` | `string` | `'rgba(242, 54, 69, 0.2)'` | Fill color between the close line and the low line. |
+| `highLineWidth` | `LineWidth` | `2` | Width of the high line, in CSS pixels (`1`–`4`). |
+| `lowLineWidth` | `LineWidth` | `2` | Width of the low line, in CSS pixels (`1`–`4`). |
+| `closeLineWidth` | `LineWidth` | `2` | Width of the close line, in CSS pixels (`1`–`4`). |
+
+`areaTopColor` and `areaBottomColor` are deprecated aliases of `highAreaColor`
+and `lowAreaColor`. They still work, and take precedence when both are set.
 
 ## Notes
 
 - The price scale autoscales to the full `low`–`high` range, so the band is
   never clipped.
-- To hide a line, set its width to `0`; to hide a fill, use a transparent color.
+- To hide a line or a fill, use a transparent color. Line widths follow the
+  library's `LineWidth` type, so `0` is not one of them.

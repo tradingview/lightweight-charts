@@ -28,13 +28,15 @@ function cumulativeBuildUp(arr: number[]): number[] {
 	});
 }
 
-export class StackedBarsSeriesRenderer<TData extends StackedBarsData>
-	implements ICustomSeriesPaneRenderer
+export class StackedBarsSeriesRenderer<
+	HorzScaleItem = Time,
+	TData extends StackedBarsData<HorzScaleItem> = StackedBarsData<HorzScaleItem>
+> implements ICustomSeriesPaneRenderer
 {
-	_data: PaneRendererCustomData<Time, TData> | null = null;
-	_options: StackedBarsSeriesOptions | null = null;
+	private _data: PaneRendererCustomData<HorzScaleItem, TData> | null = null;
+	private _options: StackedBarsSeriesOptions | null = null;
 
-	draw(
+	public draw(
 		target: CanvasRenderingTarget2D,
 		priceConverter: PriceToCoordinateConverter
 	): void {
@@ -43,15 +45,15 @@ export class StackedBarsSeriesRenderer<TData extends StackedBarsData>
 		);
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
 		options: StackedBarsSeriesOptions
 	): void {
 		this._data = data;
 		this._options = options;
 	}
 
-	_drawImpl(
+	private _drawImpl(
 		renderingScope: BitmapCoordinatesRenderingScope,
 		priceToCoordinate: PriceToCoordinateConverter
 	): void {

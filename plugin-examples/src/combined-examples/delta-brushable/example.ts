@@ -73,10 +73,7 @@ chart.timeScale().fitContent();
 
 tooltipPrimitive.activeRange().subscribe(activeRange => {
 	if (activeRange === null) {
-		brushAreaSeries.applyOptions({
-			brushRanges: [],
-			...baseStyle,
-		});
+		brushAreaSeries.applyOptions({ brushRanges: [] });
 		return;
 	}
 	brushAreaSeries.applyOptions({
@@ -89,7 +86,7 @@ tooltipPrimitive.activeRange().subscribe(activeRange => {
 				style: activeRange.positive ? greenStyle : redStyle,
 			},
 		],
-		...fadeStyle,
+		outsideStyle: fadeStyle,
 	});
 });
 

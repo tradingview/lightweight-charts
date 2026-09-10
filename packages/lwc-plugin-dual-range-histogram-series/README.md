@@ -85,8 +85,9 @@ histogram.setData([
 ## Usage
 
 Add the series with `addCustomSeries`, then set data with a `values` array per
-point — positive values draw upward, negative values downward. The conventional
-layout is `[outerUp, innerUp, outerDown, innerDown]`:
+point — positive values draw upward, negative values downward. The array is
+`[upOuter, upInner, downOuter, downInner]`, which is also how the styling
+options name their columns:
 
 ```js
 import { createChart, BaselineSeries } from 'lightweight-charts';
@@ -116,6 +117,20 @@ baseline.setData(mainData);
 Each data point is `{ time, values: number[] }`. Points with an empty or
 missing `values` array are treated as whitespace.
 
+Colors and corner radii are set per column:
+
+```js
+histogram.applyOptions({
+    colors: {
+        upOuter: '#BBDEFB',
+        upInner: '#1565C0',
+        downOuter: '#FFE0B2',
+        downInner: '#EF6C00',
+    },
+    borderRadius: { upOuter: 8, upInner: 4, downOuter: 8, downInner: 4 },
+});
+```
+
 ### Keeping the histogram in view
 
 The histogram is `maxHeight` pixels tall and centered on the zero line. It
@@ -144,15 +159,20 @@ In addition to the standard
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `colors` | `string[]` | `['#ACE5DC', '#42BDA8', '#FCCACD', '#F77C80']` | Fill color for each value by index (outer up, inner up, outer down, inner down). If there are more values than colors, the colors repeat. |
-| `borderRadius` | `number[]` | `[2, 0, 2, 0]` | Corner radius for each value by index, in CSS pixels, applied to the column's outer end. |
+| `colors` | `{ upOuter, upInner, downOuter, downInner }` of `string` | `{ upOuter: '#ACE5DC', upInner: '#42BDA8', downOuter: '#FCCACD', downInner: '#F77C80' }` | Fill color of each column. |
+| `borderRadius` | `{ upOuter, upInner, downOuter, downInner }` of `number` | `{ upOuter: 2, upInner: 0, downOuter: 2, downInner: 0 }` | Corner radius of each column, in CSS pixels, applied to the column's outer end. |
 | `maxHeight` | `number` | `130` | Total height of the histogram in CSS pixels; the largest visible value reaches half of it above or below the zero line. |
 
 ## Notes
 
 - Values are normalized against the largest absolute value in the **visible**
   range, so column heights change as the user scrolls or zooms.
+- Columns are matched to `colors` and `borderRadius` by their **position** in
+  `values`, not by their sign: a negative value in the `upOuter` slot points
+  downwards but is still drawn in the `upOuter` color.
 - Columns for the same point share one width and position; values are drawn in
   array order, so later (inner) values paint over earlier (outer) ones. Keep
   inner values smaller than outer ones for the nested look.
+- A point may carry more than four values; the four columns then repeat, so
+  `values[4]` is styled as `upOuter` again.
 - Columns get a hairline border when the bar spacing is 4 pixels or more.

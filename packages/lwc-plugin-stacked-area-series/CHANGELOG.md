@@ -14,4 +14,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repository.
 - The `StackedAreaSeries` custom series stacks the `values` array of each
   point into cumulative bands.
-- Styling options: per-band line and area `colors`, and a shared `lineWidth`.
+- Styling options: per-band line and area `colors`, and a shared `lineWidth`
+  (`LineWidth`, `1`–`4`).

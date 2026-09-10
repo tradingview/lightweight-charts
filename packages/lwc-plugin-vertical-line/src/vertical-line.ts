@@ -3,24 +3,25 @@ import {
 	Coordinate,
 	IChartApi,
 	ISeriesApi,
-	ISeriesPrimitive,
 	ISeriesPrimitiveAxisView,
 	IPrimitivePaneRenderer,
 	IPrimitivePaneView,
-	SeriesOptionsMap,
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
 import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
 
-class VertLinePaneRenderer implements IPrimitivePaneRenderer {
-	_x: Coordinate | null = null;
-	_options: VertLineOptions;
-	constructor(x: Coordinate | null, options: VertLineOptions) {
+class VerticalLinePaneRenderer implements IPrimitivePaneRenderer {
+	private readonly _x: Coordinate | null;
+	private readonly _options: VerticalLineOptions;
+
+	public constructor(x: Coordinate | null, options: VerticalLineOptions) {
 		this._x = x;
 		this._options = options;
 	}
-	draw(target: CanvasRenderingTarget2D) {
+
+	public draw(target: CanvasRenderingTarget2D) {
 		target.useBitmapCoordinateSpace(scope => {
 			if (this._x === null) return;
 			const ctx = scope.context;
@@ -40,58 +41,79 @@ class VertLinePaneRenderer implements IPrimitivePaneRenderer {
 	}
 }
 
-class VertLinePaneView implements IPrimitivePaneView {
-	_source: VertLine;
-	_x: Coordinate | null = null;
-	_options: VertLineOptions;
+class VerticalLinePaneView implements IPrimitivePaneView {
+	private readonly _source: VerticalLine;
+	private readonly _time: Time;
+	private readonly _options: VerticalLineOptions;
+	private _x: Coordinate | null = null;
 
-	constructor(source: VertLine, options: VertLineOptions) {
+	public constructor(
+		source: VerticalLine,
+		time: Time,
+		options: VerticalLineOptions
+	) {
 		this._source = source;
+		this._time = time;
 		this._options = options;
 	}
-	update() {
-		const timeScale = this._source._chart.timeScale();
-		this._x = timeScale.timeToCoordinate(this._source._time);
+
+	public update() {
+		const timeScale = this._source.chart.timeScale();
+		this._x = timeScale.timeToCoordinate(this._time);
 	}
-	renderer() {
-		return new VertLinePaneRenderer(this._x, this._options);
+
+	public renderer() {
+		return new VerticalLinePaneRenderer(this._x, this._options);
 	}
 }
 
-class VertLineTimeAxisView implements ISeriesPrimitiveAxisView {
-	_source: VertLine;
-	_x: Coordinate | null = null;
-	_options: VertLineOptions;
+class VerticalLineTimeAxisView implements ISeriesPrimitiveAxisView {
+	private readonly _source: VerticalLine;
+	private readonly _time: Time;
+	private readonly _options: VerticalLineOptions;
+	private _x: Coordinate | null = null;
 
-	constructor(source: VertLine, options: VertLineOptions) {
+	public constructor(
+		source: VerticalLine,
+		time: Time,
+		options: VerticalLineOptions
+	) {
 		this._source = source;
+		this._time = time;
 		this._options = options;
 	}
-	update() {
-		const timeScale = this._source._chart.timeScale();
-		this._x = timeScale.timeToCoordinate(this._source._time);
+
+	public update() {
+		const timeScale = this._source.chart.timeScale();
+		this._x = timeScale.timeToCoordinate(this._time);
 	}
-	visible() {
+
+	public visible() {
 		return this._options.showLabel;
 	}
-	tickVisible() {
+
+	public tickVisible() {
 		return this._options.showLabel;
 	}
-	coordinate() {
+
+	public coordinate() {
 		return this._x ?? 0;
 	}
-	text() {
+
+	public text() {
 		return this._options.labelText;
 	}
-	textColor() {
+
+	public textColor() {
 		return this._options.labelTextColor;
 	}
-	backColor() {
+
+	public backColor() {
 		return this._options.labelBackgroundColor;
 	}
 }
 
-export interface VertLineOptions {
+export interface VerticalLineOptions {
 	color: string;
 	labelText: string;
 	width: number;
@@ -100,7 +122,11 @@ export interface VertLineOptions {
 	showLabel: boolean;
 }
 
-const defaultOptions: VertLineOptions = {
+/** @deprecated Use VerticalLineOptions. */
+export type VertLineOptions = VerticalLineOptions;
+
+/** Values used for any option not passed to the constructor. */
+export const defaultOptions: VerticalLineOptions = {
 	color: 'green',
 	labelText: '',
 	width: 3,
@@ -109,37 +135,67 @@ const defaultOptions: VertLineOptions = {
 	showLabel: false,
 };
 
-export class VertLine implements ISeriesPrimitive<Time> {
-	_chart: IChartApi;
-	_series: ISeriesApi<keyof SeriesOptionsMap>;
-	_time: Time;
-	_paneViews: VertLinePaneView[];
-	_timeAxisViews: VertLineTimeAxisView[];
+function isChartApi(value: unknown): value is IChartApi {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		typeof (value as IChartApi).timeScale === 'function'
+	);
+}
 
-	constructor(
+export class VerticalLine extends PluginBase {
+	private readonly _paneViews: VerticalLinePaneView[];
+	private readonly _timeAxisViews: VerticalLineTimeAxisView[];
+
+	/**
+	 * Creates a vertical line at the given time. Attach it to a series with
+	 * `series.attachPrimitive(line)`.
+	 */
+	public constructor(time: Time, options?: Partial<VerticalLineOptions>);
+	/**
+	 * @deprecated Pass the time and the options only: `new VerticalLine(time, options)`.
+	 * The chart and the series are taken from the series the line is attached to.
+	 */
+	public constructor(
 		chart: IChartApi,
 		series: ISeriesApi<SeriesType>,
 		time: Time,
-		options?: Partial<VertLineOptions>
-	) {
-		const vertLineOptions: VertLineOptions = {
+		options?: Partial<VerticalLineOptions>
+	);
+	public constructor(...args: unknown[]) {
+		super();
+		// The deprecated form passes the chart and the series first, and both are
+		// ignored: PluginBase provides them once the line has been attached.
+		const legacyForm = args.length > 2 || isChartApi(args[0]);
+		const time = (legacyForm ? args[2] : args[0]) as Time;
+		const options = (legacyForm ? args[3] : args[1]) as
+			| Partial<VerticalLineOptions>
+			| undefined;
+		const lineOptions: VerticalLineOptions = {
 			...defaultOptions,
 			...options,
 		};
-		this._chart = chart;
-		this._series = series;
-		this._time = time;
-		this._paneViews = [new VertLinePaneView(this, vertLineOptions)];
-		this._timeAxisViews = [new VertLineTimeAxisView(this, vertLineOptions)];
+		this._paneViews = [new VerticalLinePaneView(this, time, lineOptions)];
+		this._timeAxisViews = [
+			new VerticalLineTimeAxisView(this, time, lineOptions),
+		];
 	}
-	updateAllViews() {
+
+	public updateAllViews() {
 		this._paneViews.forEach(pw => pw.update());
 		this._timeAxisViews.forEach(tw => tw.update());
 	}
-	timeAxisViews() {
+
+	public timeAxisViews(): ISeriesPrimitiveAxisView[] {
 		return this._timeAxisViews;
 	}
-	paneViews() {
+
+	public paneViews(): IPrimitivePaneView[] {
 		return this._paneViews;
 	}
 }
+
+/** @deprecated Use VerticalLine. */
+export const VertLine = VerticalLine;
+/** @deprecated Use VerticalLine. */
+export type VertLine = VerticalLine;

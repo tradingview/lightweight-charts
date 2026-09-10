@@ -1,9 +1,9 @@
-import { CustomData } from 'lightweight-charts';
+import { CustomData, Time } from 'lightweight-charts';
 
 /**
- * HLCArea Series Data
+ * HLC area series data.
  */
-export interface HLCAreaData extends CustomData {
+export interface HLCAreaData<HorzScaleItem = Time> extends CustomData<HorzScaleItem> {
 	high: number;
 	low: number;
 	close: number;
