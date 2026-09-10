@@ -9,15 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `createBrushableAreaSeries` retains explicit whitespace across data updates,
-  independently of the shared timeline. Prefer it over the low-level pane view.
-
 - First release as a standalone package, `@tradingview/lwc-plugin-brushable-area-series`.
   Graduated from the `plugin-examples` collection of the Lightweight Charts™
   repository.
 - The `BrushableAreaSeries` custom series draws an area with a base style and
   any number of `brushRanges`, each with its own line and fill colors. A
   range's `style` is partial: properties left out fall back to the base style.
+- `createBrushableAreaSeries` is the supported way to add the series. It
+  retains the whitespace passed through `setData`, `update` and historical
+  corrections, so a gap breaks the line and the fill while timestamps
+  contributed by other series never do. Under time-scale conflation a
+  whitespace run narrower than one bucket is absorbed into the bucket, since it
+  cannot be resolved at that bar spacing.
+- The `BrushableAreaSeries` pane view stays exported, for
+  `chart.addCustomSeries` and for composing the renderer into another series.
+  On its own it draws continuously: the host hands no whitespace to custom
+  renderers, so gaps need the factory.
 - The `outsideStyle` option styles the points outside every brush range, so a
   selection can be highlighted without swapping the series' base style.
 - The `basePrice` option is the price the area is filled down to, clamped to
@@ -36,17 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Keep sparse areas visible when other series contribute interleaved timestamps.
-
 - Reconstruct offscreen endpoints so interior viewport fills remain visible.
 - Do not clear a completed mouse selection on an unrelated pointer departure.
-
 - Brush ranges are matched against the time scale's logical index instead of the
   series' own array index, so they land in the right place whenever another
   series starts earlier or the data has gaps. They were documented as logical
   indices but only worked for the first series with data from logical 0.
-- Gaps in the data break the line instead of being bridged by a straight
-  segment across the whitespace.
 - The line and the fill are drawn one bar past each edge of the visible range,
   so they leave the pane instead of stopping at the last visible point while the
   chart is panned.

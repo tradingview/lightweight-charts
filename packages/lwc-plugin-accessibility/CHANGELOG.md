@@ -62,14 +62,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Keep pane identity, focus and per-pane options aligned after reordering.
-- Mirror shared background updates through `onAnnounce`.
+- Keep pane identity, focus and per-pane options aligned after reordering. The
+  pane is resolved from the first draw, which the library only performs on the
+  pane the primitive is attached to, so a `paneIndex` argument that disagrees
+  with `panes()[i].attachPrimitive(...)` no longer binds the layer to the wrong
+  pane: the constructor index is a pre-build hint, not the source of truth.
+- Mirror shared background updates through `onAnnounce`. The live region is
+  written before the callback runs and an exception thrown by it is ignored, so
+  a failing host callback costs the mirror and not the announcement.
 - Match annotation times across strings, business days and UTC timestamps.
-
 - Count actual visible points in sparse series and defer data snapshots until navigation or an announcement needs them.
-
 - Keep announced counts and keyboard values correct after data replacement, historical updates, and removal.
-
 - `controller.detach()` after `chart.remove()` no longer detaches from a
   destroyed pane (the library raises an asynchronous "Object is disposed" on
   that path).

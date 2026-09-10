@@ -174,7 +174,12 @@ line.timeChanged().subscribe(time => console.log(time));
 ```
 
 Dragging suspends the chart's own scroll and scale handling for the duration of
-the gesture, so the chart does not pan under the pointer.
+the gesture, so the chart does not pan under the pointer. Only one line per
+chart holds that suspension at a time: where two draggable lines overlap, the
+one attached first takes the gesture and the other ignores it, so the chart's
+options are restored exactly once. Ownership is tracked per loaded copy of this
+module, so two bundles of the plugin on the same page each track their own
+owner; load it once per page if you attach overlapping draggable lines.
 
 ## Notes
 

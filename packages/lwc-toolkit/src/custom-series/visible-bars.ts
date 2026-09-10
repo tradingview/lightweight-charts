@@ -15,8 +15,32 @@ export interface TimeIndexed {
 	readonly time: number;
 }
 
-/** Whether two rendered bars are separated by whitespace in their own series. */
-export type GapCheck<H, D extends CustomData<H>> = (left: CustomBarItemData<H, D>, right: CustomBarItemData<H, D>) => boolean;
+/**
+ * Whether two rendered bars are separated by whitespace in their own series.
+ * `minGap` is the shortest contiguous whitespace run, in logical indices, that
+ * counts as a gap; renderers pass {@link getConflationFactor} so that a run
+ * narrower than one conflation bucket is absorbed into the bucket instead of
+ * splitting every bar into its own segment. Defaults to 1, which breaks at any
+ * whitespace.
+ */
+export type GapCheck<H, D extends CustomData<H>> = (
+	left: CustomBarItemData<H, D>,
+	right: CustomBarItemData<H, D>,
+	minGap?: number
+) => boolean;
+
+/**
+ * A chronological view of the data a series has accepted, whitespace included.
+ * `points` is a live array whose identity is stable across mutations, so
+ * consumers cache on `revision`, which changes whenever a point was added,
+ * replaced or removed.
+ */
+export interface AcceptedInput<H, D extends CustomData<H>> {
+	/** Accepted points in chronological order. */
+	readonly points: readonly (D | CustomSeriesWhitespaceData<H>)[];
+	/** Changes on every accepted data mutation. */
+	readonly revision: number;
+}
 
 function clampedRange(
 	range: IRange<number> | null,
@@ -124,32 +148,60 @@ export function visibleSegments<T extends TimeIndexed>(
 /**
  * Detects whitespace from the series' accepted input, including on hosts whose
  * renderer data omits it. The input getter returns a chronological snapshot
- * with stable identity until data changes. Resolve logical indices at lookup
+ * whose revision changes when data changes. Resolve logical indices at lookup
  * time because other series can change the shared timeline independently.
+ * A contiguous run shorter than the caller's `minGap` is not reported as a gap.
  */
 export function whitespaceGapCheck<H, D extends CustomData<H>>(
-	readData: () => readonly (D | CustomSeriesWhitespaceData<H>)[],
+	readInput: () => AcceptedInput<H, D>,
 	logicalIndex: (time: H) => number | null,
 	isWhitespace: (point: D | CustomSeriesWhitespaceData<H>) => boolean
 ): GapCheck<H, D> {
-	let previous: ReturnType<typeof readData> | null = null;
+	let revision: number | null = null;
 	let times: H[] = [];
-	return (left, right): boolean => {
-		const data = readData();
-		if (data !== previous) {
-			previous = data;
-			times = data.filter(isWhitespace).map(point => point.time);
+	return (left, right, minGap = 1): boolean => {
+		const input = readInput();
+		if (input.revision !== revision) {
+			revision = input.revision;
+			times = input.points.filter(isWhitespace).map(point => point.time);
 		}
 		if (times.length === 0) { return false; }
-		let low = 0;
-		let high = times.length;
-		while (low < high) {
-			const mid = Math.floor((low + high) / 2);
-			const index = logicalIndex(times[mid]);
-			if (index === null || index <= left.time) { low = mid + 1; } else { high = mid; }
+		// A time that is no longer on the scale sorts with the entries before
+		// it, which keeps both searches monotonic over the same ordering.
+		const lowerBound = (isBefore: (index: number | null) => boolean): number => {
+			let low = 0;
+			let high = times.length;
+			while (low < high) {
+				const mid = Math.floor((low + high) / 2);
+				if (isBefore(logicalIndex(times[mid]))) { low = mid + 1; } else { high = mid; }
+			}
+			return low;
+		};
+		// The whitespace strictly between the two bars occupies the positions
+		// [first, after). Their count bounds the longest run, so the common
+		// case — scattered holidays inside one conflation bucket — costs two
+		// binary searches and nothing else.
+		const first = lowerBound(index => index === null || index <= left.time);
+		if (first >= times.length) { return false; }
+		const after = lowerBound(index => index === null || index < right.time);
+		const threshold = Math.max(1, minGap);
+		if (after - first < threshold) { return false; }
+		// Only a contiguous run leaves a hole wide enough to see: whitespace
+		// interleaved with drawn indices is below the resolution of a bucket.
+		let run = 0;
+		let previous: number | null = null;
+		for (let position = first; position < after; position++) {
+			const index = logicalIndex(times[position]);
+			if (index === null) {
+				// No longer on the scale, so it holds no logical index to fill.
+				run = 0;
+			} else {
+				run = previous !== null && index === previous + 1 ? run + 1 : 1;
+			}
+			previous = index;
+			if (run >= threshold) { return true; }
 		}
-		const index = low < times.length ? logicalIndex(times[low]) : null;
-		return index !== null && index < right.time;
+		return false;
 	};
 }
 

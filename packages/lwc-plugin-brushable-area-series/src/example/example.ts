@@ -77,14 +77,14 @@ brushableSeries.setData(brushableData);
 const brush = new BrushableAreaInteraction({ style: brushStyles.green });
 brushableSeries.attachPrimitive(brush);
 
-const rangeLabel = document.getElementById('range') as HTMLElement;
+// The selection is reported as logical indices and as the times at each end.
+// Logged rather than shown: text in the control row reflows it while brushing.
 brush.activeRange().subscribe(range => {
-	rangeLabel.textContent =
+	console.log(
 		range === null
 			? 'no selection'
-			: `logical ${range.from}…${range.to} (${String(range.fromTime)} → ${String(
-					range.toTime
-				)})`;
+			: `logical ${range.from}…${range.to} (${String(range.fromTime)} → ${String(range.toTime)})`
+	);
 });
 
 const brushStyleSelect = document.getElementById(

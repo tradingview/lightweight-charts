@@ -223,3 +223,8 @@ Use `createBrushableAreaSeries` to retain whitespace passed through `setData` an
 break the area. The low-level `BrushableAreaSeries` view remains available, but
 without the factory's gap predicate it draws continuously: the host does not
 provide whitespace to custom renderers.
+
+Under time-scale conflation the area is drawn from buckets of several bars, and
+a whitespace run narrower than one bucket cannot be resolved at that bar
+spacing: it is absorbed into the bucket rather than breaking the area at every
+bar. Zooming in past the conflation threshold shows the gap again.

@@ -10,7 +10,7 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { GapCheck, barCoordinate, extendRange, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { GapCheck, barCoordinate, extendRange, getConflationFactor, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { setLineStyle } from '@tradingview/lwc-toolkit/line-style';
 import type { LineStyle as ToolkitLineStyle } from '@tradingview/lwc-toolkit/line-style';
 
@@ -148,8 +148,11 @@ export class HLCAreaSeriesRenderer<
 		ctx.lineJoin = 'round';
 
 		// Break at explicit whitespace or a point that could not be converted.
+		// Under conflation a run shorter than one bucket is absorbed into it,
+		// since a conflated chunk spans more logical indices than it has rows.
+		const minGap = getConflationFactor(data);
 		for (const segment of visibleSegments(bars, { from: 0, to: bars.length }, (left, right) =>
-			right.index !== left.index + 1 || (this._isGap?.(data.bars[left.index], data.bars[right.index]) ?? false)
+			right.index !== left.index + 1 || (this._isGap?.(data.bars[left.index], data.bars[right.index], minGap) ?? false)
 		)) {
 			this._drawSegment(scope, options, bars, segment.from, segment.to);
 		}

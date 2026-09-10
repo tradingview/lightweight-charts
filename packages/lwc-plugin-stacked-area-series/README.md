@@ -187,17 +187,13 @@ Per-point overrides, on the data item:
   outermost line sits exactly on the edge of the range; add a small
   `scaleMargins` on the price scale (as in the example above) if you want
   breathing room around it.
-- Autoscaling is computed from the raw `values` measured from zero, because the
-  library asks for those values before the series options are known. With
-  `percent: true`, or a `base` other than `0`, supply the range yourself:
-
-  ```js
-  series.applyOptions({
-      percent: true,
-      autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }),
-  });
-  ```
-
+- Autoscaling follows `percent` and `base`, so a 100% stack scales to
+  `base`…`base + 100` and not to the raw totals, and changing either option
+  rescales the series. This needs the current options at the moment the library
+  asks for the plot values, which only `createStackedAreaSeries` can provide: a
+  bare `new StackedAreaSeries()` added with `chart.addCustomSeries` autoscales
+  from the raw `values` measured from zero, and needs an
+  `autoscaleInfoProvider` of its own for `percent` or a non-zero `base`.
 - The factory retains explicit whitespace, and `gapHandling` decides whether
   to break or bridge it. Timestamps from other series do not create gaps.
 - On `lightweight-charts` 5.1 and later the series reports the hovered band
@@ -212,3 +208,8 @@ Use `createStackedAreaSeries` to retain whitespace passed through `setData` and
 break the area. The low-level `StackedAreaSeries` view remains available, but
 without the factory's gap predicate it draws continuously: the host does not
 provide whitespace to custom renderers.
+
+Under time-scale conflation the area is drawn from buckets of several bars, and
+a whitespace run narrower than one bucket cannot be resolved at that bar
+spacing: it is absorbed into the bucket rather than breaking the area at every
+bar. Zooming in past the conflation threshold shows the gap again.

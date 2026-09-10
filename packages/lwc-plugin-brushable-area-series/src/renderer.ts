@@ -5,7 +5,7 @@ import {
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import {
-	GapCheck, barCoordinate, extendRange,
+	GapCheck, barCoordinate, extendRange, getConflationFactor,
 	visibleSegments,
 } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import {
@@ -95,7 +95,11 @@ export class BrushableAreaSeriesRenderer<
 		// Only explicit whitespace breaks the line; other series may fill the
 		// logical indices between these bars.
 		const segments: BrushableAreaPoint[][] = [];
-		for (const segment of visibleSegments(data.bars, range, this._isGap)) {
+		const isGap = this._isGap;
+		// A whitespace run shorter than one conflation bucket is absorbed into
+		// the bucket: conflated chunks span more logical indices than rows.
+		const minGap = getConflationFactor(data);
+		for (const segment of visibleSegments(data.bars, range, isGap && ((left, right): boolean => isGap(left, right, minGap)))) {
 			let points: BrushableAreaPoint[] = [];
 			for (let i = segment.from; i < segment.to; i++) {
 				const bar = data.bars[i];

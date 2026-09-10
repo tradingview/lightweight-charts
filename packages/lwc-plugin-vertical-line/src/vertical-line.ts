@@ -297,6 +297,10 @@ export class VerticalLine extends PluginBase {
 			const rightX = timeScale.logicalToCoordinate(index as unknown as Logical);
 			const left = leftX === null ? null : timeScale.coordinateToTime(leftX);
 			const right = rightX === null ? null : timeScale.coordinateToTime(rightX);
+			// A zero-width time scale (a hidden container, for one) converts no
+			// coordinates, so the nearest comparison is skipped and the line
+			// keeps findNearest's following bar. The next updateAllViews runs
+			// this again once the scale has a width.
 			if (left !== null && right !== null) {
 				const time = convertTimeUTC(this._time);
 				if (Math.abs(time - convertTimeUTC(left)) < Math.abs(convertTimeUTC(right) - time)) {

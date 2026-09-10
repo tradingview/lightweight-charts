@@ -239,6 +239,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -272,6 +275,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -305,6 +311,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -329,6 +338,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -357,6 +369,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -390,6 +405,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -409,11 +427,20 @@ importers:
         specifier: 8.2.2
         version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
+  packages/lwc-plugin-preview-kit:
+    devDependencies:
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   packages/lwc-plugin-rounded-candles-series:
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -447,6 +474,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -480,6 +510,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -517,6 +550,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
@@ -556,36 +592,9 @@ importers:
 
   plugin-examples:
     dependencies:
-      '@tradingview/lwc-plugin-accessibility':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-accessibility
       '@tradingview/lwc-plugin-brushable-area-series':
         specifier: workspace:*
         version: link:../packages/lwc-plugin-brushable-area-series
-      '@tradingview/lwc-plugin-dual-range-histogram-series':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-dual-range-histogram-series
-      '@tradingview/lwc-plugin-hlc-area-series':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-hlc-area-series
-      '@tradingview/lwc-plugin-image-watermark':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-image-watermark
-      '@tradingview/lwc-plugin-pretty-histogram-series':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-pretty-histogram-series
-      '@tradingview/lwc-plugin-rounded-candles-series':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-rounded-candles-series
-      '@tradingview/lwc-plugin-stacked-area-series':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-stacked-area-series
-      '@tradingview/lwc-plugin-stacked-bars-series':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-stacked-bars-series
-      '@tradingview/lwc-plugin-vertical-line':
-        specifier: workspace:*
-        version: link:../packages/lwc-plugin-vertical-line
       '@tradingview/lwc-toolkit':
         specifier: workspace:*
         version: link:../packages/lwc-toolkit

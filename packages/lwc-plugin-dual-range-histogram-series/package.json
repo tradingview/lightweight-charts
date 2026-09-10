@@ -47,6 +47,7 @@
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.5",
+		"@tradingview/lwc-plugin-preview-kit": "workspace:*",
 		"@tradingview/lwc-toolkit": "workspace:*",
 		"dts-bundle-generator": "9.5.1",
 		"lightweight-charts": "workspace:*",
@@ -61,6 +62,7 @@
 		"origin": "official",
 		"author": "TradingView",
 		"demo": "src/example/index.html",
+		"preview": "src/example/preview.html",
 		"tags": [
 			"histogram",
 			"dual range",

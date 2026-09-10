@@ -95,5 +95,5 @@ export function createHLCAreaSeries<H = Time, D extends HLCAreaData<H> = HLCArea
 	options: DeepPartial<HLCAreaSeriesOptions> = {},
 	paneIndex: number = 0
 ): OptionsAwareSeries<H, D, HLCAreaSeriesOptions> {
-	return createWhitespaceSeries(chart, isGap => new HLCAreaSeries<H, D>(isGap), defaultOptions, options, paneIndex);
+	return createWhitespaceSeries(chart, isGap => new HLCAreaSeries<H, D>(isGap), defaultOptions, options, [], paneIndex);
 }
