@@ -1,6 +1,10 @@
+import { createWhitespaceSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
+import { GapCheck } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import {
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
+	DeepPartial,
+	IChartApiBase,
 	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
@@ -21,8 +25,8 @@ export class StackedAreaSeries<
 {
 	private _renderer: StackedAreaSeriesRenderer<HorzScaleItem, TData>;
 
-	public constructor() {
-		this._renderer = new StackedAreaSeriesRenderer();
+	public constructor(isGap?: GapCheck<HorzScaleItem, TData>) {
+		this._renderer = new StackedAreaSeriesRenderer(isGap);
 	}
 
 	/**
@@ -80,3 +84,16 @@ export type {
 	StackedAreaSeriesOptions,
 } from './options';
 export { defaultOptions } from './options';
+
+/**
+ * Adds an area series that preserves explicit whitespace without treating
+ * timestamps contributed by other series as gaps. Prefer this helper over
+ * chart.addCustomSeries(new StackedAreaSeries(), options).
+ */
+export function createStackedAreaSeries<H = Time, D extends StackedAreaData<H> = StackedAreaData<H>>(
+	chart: IChartApiBase<H>,
+	options: DeepPartial<StackedAreaSeriesOptions> = {},
+	paneIndex: number = 0
+): OptionsAwareSeries<H, D, StackedAreaSeriesOptions> {
+	return createWhitespaceSeries(chart, isGap => new StackedAreaSeries<H, D>(isGap), defaultOptions, options, paneIndex);
+}

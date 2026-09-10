@@ -3,6 +3,8 @@ import {
 	IChartApiBase, ICustomSeriesPaneView, ISeriesApi,
 } from 'lightweight-charts';
 
+import { GapCheck, whitespaceGapCheck } from './visible-bars.js';
+
 /** A custom series API with the plugin's data and options preserved. */
 export type OptionsAwareSeries<H, D extends CustomData<H>, O extends CustomSeriesOptions> =
 	ISeriesApi<'Custom', H, D | CustomSeriesWhitespaceData<H>, O, DeepPartial<O>>;
@@ -17,22 +19,36 @@ export type OptionsAwareSeries<H, D extends CustomData<H>, O extends CustomSerie
  * original data, whitespace, and custom fields. Other option changes do not
  * re-ingest data. A shallow copy of the input is retained because the host
  * data() API only exposes fulfilled points.
+ * The view factory can read a lazy snapshot of that accepted input, including
+ * whitespace, through its second argument.
  */
 export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends CustomSeriesOptions>(
 	chart: IChartApiBase<H>,
-	createView: (readOptions: () => Readonly<O>) => ICustomSeriesPaneView<H, D, O>,
+	createView: (
+		readOptions: () => Readonly<O>,
+		readData: () => readonly (D | CustomSeriesWhitespaceData<H>)[]
+	) => ICustomSeriesPaneView<H, D, O>,
 	defaults: O,
 	options: DeepPartial<O>,
 	priceOptions: readonly (keyof O)[],
 	paneIndex: number = 0
 ): OptionsAwareSeries<H, D, O> {
+	type Point = D | CustomSeriesWhitespaceData<H>;
+	let input = new Map<number, Point>();
+	let snapshot: readonly Point[] | null = null;
+	// Lazily shared by renderers that need explicit whitespace. Invalidate only
+	// after an accepted data mutation, before consumer data-change callbacks.
+	const readData = (): readonly Point[] => {
+		if (snapshot === null) {
+			snapshot = [...input.entries()].sort(([a], [b]) => a - b).map(([, point]) => point);
+		}
+		return snapshot;
+	};
 	let series: OptionsAwareSeries<H, D, O> | undefined;
-	const view = createView(() => series?.options() ?? defaults);
+	const view = createView(() => series?.options() ?? defaults, readData);
 	series = chart.addCustomSeries(view, options, paneIndex);
 	const api = series;
-	type Point = D | CustomSeriesWhitespaceData<H>;
 	const key = (point: Point): number => chart.horzBehaviour().key(point.time);
-	let input = new Map<number, Point>();
 	const operations: { commit: (() => void) | null }[] = [];
 	let refreshPending = false;
 	const setData = api.setData.bind(api);
@@ -58,6 +74,7 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 		if (commit) {
 			operation.commit = null;
 			commit();
+			snapshot = null;
 		}
 	});
 
@@ -104,4 +121,20 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 		}
 	};
 	return api;
+}
+
+/** Adds a series whose renderer can distinguish its whitespace from other series' timestamps. */
+export function createWhitespaceSeries<H, D extends CustomData<H>, O extends CustomSeriesOptions>(
+	chart: IChartApiBase<H>,
+	createView: (isGap: GapCheck<H, D>) => ICustomSeriesPaneView<H, D, O>,
+	defaults: O,
+	options: DeepPartial<O>,
+	paneIndex: number = 0
+): OptionsAwareSeries<H, D, O> {
+	return createOptionsAwareSeries(chart, (_readOptions, readData) => {
+		let view: ICustomSeriesPaneView<H, D, O>;
+		const isGap = whitespaceGapCheck(readData, time => chart.timeScale().timeToIndex(time, false), point => view.isWhitespace(point));
+		view = createView(isGap);
+		return view;
+	}, defaults, options, [], paneIndex);
 }

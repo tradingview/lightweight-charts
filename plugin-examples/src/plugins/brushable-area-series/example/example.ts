@@ -9,7 +9,7 @@ import { generateLineData } from '../../../sample-data';
 import {
 	BrushableAreaData,
 	BrushableAreaInteraction,
-	BrushableAreaSeries,
+	createBrushableAreaSeries,
 	BrushableAreaStyle,
 } from '@tradingview/lwc-plugin-brushable-area-series';
 
@@ -60,7 +60,7 @@ const referenceSeries = chart.addSeries(LineSeries, {
 });
 referenceSeries.setData(allData);
 
-const brushableSeries = chart.addCustomSeries(new BrushableAreaSeries(), {
+const brushableSeries = createBrushableAreaSeries(chart, {
 	priceLineVisible: false,
 	lineColor: 'rgb(40,98,255)',
 	topColor: 'rgba(40,98,255, 0.4)',

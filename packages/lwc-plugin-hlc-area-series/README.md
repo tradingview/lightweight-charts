@@ -24,10 +24,10 @@ Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { HLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
+import { createHLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new HLCAreaSeries(), {
+const series = createHLCAreaSeries(chart, {
     highLineColor: '#089981',
     lowLineColor: '#F23645',
     closeLineColor: '#787B86',
@@ -61,10 +61,10 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { HLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
+import { createHLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new HLCAreaSeries(), {
+const series = createHLCAreaSeries(chart, {
     highLineColor: '#089981',
     lowLineColor: '#F23645',
     closeLineColor: '#787B86',
@@ -80,15 +80,15 @@ series.setData([
 
 ## Usage
 
-Add the series with `addCustomSeries`, then set data with `high`, `low`, and
+Add the series with `createHLCAreaSeries`, then set data with `high`, `low`, and
 `close` values:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { HLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
+import { createHLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new HLCAreaSeries(), {
+const series = createHLCAreaSeries(chart, {
     highLineColor: '#089981',
     lowLineColor: '#F23645',
     closeLineColor: '#787B86',
@@ -162,3 +162,11 @@ gradient runs down the whole pane, like the built-in Area series' `topColor` and
   reports the bar under the cursor through `hitTest` and highlights its three
   values, and conflated points are merged as the highest high, the lowest low
   and the last close.
+
+### Explicit whitespace
+
+Use `createHLCAreaSeries` to retain whitespace passed through `setData` and
+`update`, including historical corrections. Other series' timestamps do not
+break the area. The low-level `HLCAreaSeries` view remains available, but
+without the factory's gap predicate it draws continuously: the host does not
+provide whitespace to custom renderers.

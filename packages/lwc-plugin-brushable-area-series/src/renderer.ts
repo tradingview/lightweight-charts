@@ -5,7 +5,7 @@ import {
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import {
-	barCoordinate, getConflationFactor, extendRange,
+	GapCheck, barCoordinate, extendRange,
 	visibleSegments,
 } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import {
@@ -74,6 +74,10 @@ export class BrushableAreaSeriesRenderer<
 	TData,
 	BrushableAreaSeriesOptions
 > {
+	public constructor(private readonly _isGap?: GapCheck<HorzScaleItem, TData>) {
+		super();
+	}
+
 	protected drawImpl(
 		scope: BitmapCoordinatesRenderingScope,
 		args: CustomSeriesDrawArgs<HorzScaleItem, TData, BrushableAreaSeriesOptions>
@@ -88,10 +92,10 @@ export class BrushableAreaSeriesRenderer<
 		// instead of leaving the pane.
 		const range = extendRange({ from, to }, data.bars.length);
 
-		// Whitespace never reaches a custom renderer: a jump in the logical index
-		// is the only sign of a gap, and the line has to break there.
+		// Only explicit whitespace breaks the line; other series may fill the
+		// logical indices between these bars.
 		const segments: BrushableAreaPoint[][] = [];
-		for (const segment of visibleSegments(data.bars, range, getConflationFactor(data))) {
+		for (const segment of visibleSegments(data.bars, range, this._isGap)) {
 			let points: BrushableAreaPoint[] = [];
 			for (let i = segment.from; i < segment.to; i++) {
 				const bar = data.bars[i];

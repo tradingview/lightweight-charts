@@ -36,6 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Allow only one overlapping line to own a drag and restore chart controls.
+- Compare both neighbouring times when snapping to the nearest bar.
+
 - Clone nested chart interaction settings before dragging and restore them on release, cancellation, detachment, or disabling dragging.
 - Restrict drags to the attached pane and the active primary pointer.
 

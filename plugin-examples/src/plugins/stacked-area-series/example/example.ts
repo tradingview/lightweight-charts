@@ -3,7 +3,7 @@ import {
 	StackedAreaData,
 	StackedAreaGapHandling,
 	StackedAreaLineType,
-	StackedAreaSeries,
+	createStackedAreaSeries,
 } from '@tradingview/lwc-plugin-stacked-area-series';
 import { multipleBarData } from '../../../sample-data';
 
@@ -40,7 +40,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	},
 }));
 
-const series = chart.addCustomSeries(new StackedAreaSeries());
+const series = createStackedAreaSeries(chart);
 series.setData(demoData());
 chart.timeScale().fitContent();
 

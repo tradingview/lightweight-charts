@@ -1,6 +1,10 @@
+import { createWhitespaceSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
+import { GapCheck } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import {
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
+	DeepPartial,
+	IChartApiBase,
 	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
@@ -26,8 +30,8 @@ export class HLCAreaSeries<
 {
 	private _renderer: HLCAreaSeriesRenderer<HorzScaleItem, TData>;
 
-	public constructor() {
-		this._renderer = new HLCAreaSeriesRenderer();
+	public constructor(isGap?: GapCheck<HorzScaleItem, TData>) {
+		this._renderer = new HLCAreaSeriesRenderer(isGap);
 	}
 
 	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
@@ -80,3 +84,16 @@ export class HLCAreaSeries<
 export type { HLCAreaData } from './data';
 export type { HLCAreaLineType, HLCAreaSeriesOptions } from './options';
 export { defaultOptions } from './options';
+
+/**
+ * Adds an area series that preserves explicit whitespace without treating
+ * timestamps contributed by other series as gaps. Prefer this helper over
+ * chart.addCustomSeries(new HLCAreaSeries(), options).
+ */
+export function createHLCAreaSeries<H = Time, D extends HLCAreaData<H> = HLCAreaData<H>>(
+	chart: IChartApiBase<H>,
+	options: DeepPartial<HLCAreaSeriesOptions> = {},
+	paneIndex: number = 0
+): OptionsAwareSeries<H, D, HLCAreaSeriesOptions> {
+	return createWhitespaceSeries(chart, isGap => new HLCAreaSeries<H, D>(isGap), defaultOptions, options, paneIndex);
+}

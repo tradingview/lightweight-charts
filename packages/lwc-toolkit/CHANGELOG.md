@@ -9,6 +9,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `createWhitespaceSeries` and `whitespaceGapCheck` preserve explicit gaps from
+  accepted input without mistaking other series' timestamps for whitespace.
+- `createOptionsAwareSeries` supplies a lazy input snapshot to its view factory.
+
 - `custom-series/options-aware-series` creates series with synchronous option
   access and refreshes plot values when scaling options change.
 - Initial release. Helpers extracted from the Lightweight Charts™ plugin
@@ -55,6 +59,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `min-max-in-range` results are now actually cached.
 
 ### Fixed
+
+- `visibleSegments` uses an explicit gap predicate instead of logical index strides.
 
 - Keep options-aware series data synchronized when application data listeners throw or perform nested updates.
 

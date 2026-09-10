@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `createStackedAreaSeries` retains explicit whitespace across data updates,
+  independently of the shared timeline. Prefer it over the low-level pane view.
+
 - First release as a standalone package, `@tradingview/lwc-plugin-stacked-area-series`.
   Graduated from the `plugin-examples` collection of the Lightweight Charts™
   repository.
@@ -28,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   later; the package still runs on 5.0.0.
 
 ### Fixed
+
+- Keep sparse areas visible when other series contribute interleaved timestamps.
+- Reject hover hits in whitespace gaps and outside the painted horizontal extent.
 
 - Keep area fills visible after scrolling or zooming to an interior range and when data is conflated.
 

@@ -1,12 +1,12 @@
 // Resolve the built exports map, as an npm consumer does; no src aliases.
 import { createChart, type IChartApiBase, type Time, type Logical, type CustomSeriesWhitespaceData } from 'lightweight-charts';
-import { BrushableAreaSeries, BrushableAreaInteraction, type BrushableAreaData, type BrushableAreaSeriesOptions } from '@tradingview/lwc-plugin-brushable-area-series';
+import { createBrushableAreaSeries, BrushableAreaSeries, BrushableAreaInteraction, type BrushableAreaData, type BrushableAreaSeriesOptions } from '@tradingview/lwc-plugin-brushable-area-series';
 import { BrushableAreaSeries as Standalone } from '@tradingview/lwc-plugin-brushable-area-series/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof BrushableAreaSeries, typeof Standalone>>();
 const chart = createChart(document.createElement('div'));
-const series = chart.addCustomSeries(new BrushableAreaSeries());
+const series = createBrushableAreaSeries(chart);
 series.setData([{ time: '2024-01-01', value: 10 }, { time: '2024-01-02' }]);
 series.update({ time: { year: 2024, month: 1, day: 3 }, value: 10 });
 series.applyOptions({ priceLineVisible: false });
@@ -21,7 +21,7 @@ series.update({ time: { key: 'A' }, value: 10 });
 type Category = { key: string };
 declare const categoryChart: IChartApiBase<Category>;
 interface TaggedPoint extends BrushableAreaData<Category> { tag: string; }
-const tagged = categoryChart.addCustomSeries(new BrushableAreaSeries<Category, TaggedPoint>());
+const tagged = createBrushableAreaSeries<Category, TaggedPoint>(categoryChart, {}, 1);
 tagged.setData([{ time: { key: 'A' }, value: 10, tag: 'first' }]);
 tagged.update({ time: { key: 'B' }, value: 10, tag: 'second' });
 expectTrue<Equal<ReturnType<typeof tagged.data>[number], TaggedPoint | CustomSeriesWhitespaceData<Category>>>();
@@ -43,3 +43,6 @@ brush.activeRange().subscribe(range => {
 		expectTrue<Equal<typeof range.fromTime, Time | null>>();
 	}
 });
+
+// The low-level pane view remains available.
+chart.addCustomSeries(new BrushableAreaSeries());

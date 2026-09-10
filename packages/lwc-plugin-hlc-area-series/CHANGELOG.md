@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `createHLCAreaSeries` retains explicit whitespace across data updates,
+  independently of the shared timeline. Prefer it over the low-level pane view.
+
 - First release as a standalone package, `@tradingview/lwc-plugin-hlc-area-series`.
   Graduated from the `plugin-examples` collection of the Lightweight Charts™
   repository.
@@ -34,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   low and the last close.
 
 ### Fixed
+
+- Keep sparse areas visible when other series contribute interleaved timestamps.
 
 - Preserve filled areas and visible whitespace gaps when data is conflated.
 

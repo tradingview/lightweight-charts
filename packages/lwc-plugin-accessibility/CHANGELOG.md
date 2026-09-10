@@ -62,6 +62,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep pane identity, focus and per-pane options aligned after reordering.
+- Mirror shared background updates through `onAnnounce`.
+- Match annotation times across strings, business days and UTC timestamps.
+
 - Count actual visible points in sparse series and defer data snapshots until navigation or an announcement needs them.
 
 - Keep announced counts and keyboard values correct after data replacement, historical updates, and removal.

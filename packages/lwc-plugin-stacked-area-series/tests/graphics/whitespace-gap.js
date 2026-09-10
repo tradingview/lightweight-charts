@@ -24,7 +24,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries());
+	const series = LwcPlugin.createStackedAreaSeries(chart);
 	series.setData(generateData());
 	chart.timeScale().fitContent();
 }

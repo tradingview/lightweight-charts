@@ -23,6 +23,11 @@ function fakeSeries(points: SeriesDataPoint[], logical: number[] = points.map((_
 }
 
 void describe('timeKey', () => {
+	void it('matches equivalent strings, business days and UTC timestamps', () => {
+		expect(timeKey('2024-01-01')).to.equal(timeKey({ year: 2024, month: 1, day: 1 }));
+		expect(timeKey('2024-01-01')).to.equal(timeKey(1704067200 as Time));
+		expect(timeKey('2024-01-01')).to.not.equal(timeKey('2024-01-02'));
+	});
 	void it('flattens business days so equal days compare equal', () => {
 		expect(timeKey({ year: 2019, month: 5, day: 15 } as unknown as Time))
 			.to.equal(timeKey({ year: 2019, month: 5, day: 15 } as unknown as Time));

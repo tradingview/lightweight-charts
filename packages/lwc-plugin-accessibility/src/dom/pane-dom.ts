@@ -61,7 +61,7 @@ export interface PaneLayerView {
 export class PaneLayer {
 	public readonly container: HTMLElement;
 	/** The pane's canvas wrapper the layer lives in – the pointer target for the pane. */
-	public readonly host: HTMLElement;
+	public host: HTMLElement;
 	public readonly liveWriter: LiveRegionWriter;
 	public readonly statusWriter: LiveRegionWriter;
 	public readonly table: DataTable;
@@ -179,6 +179,20 @@ export class PaneLayer {
 	public dropStatusRegion(): void {
 		this._statusRegion?.remove();
 		this._statusRegion = null;
+	}
+
+	/** Rehosts the layer after a pane move without rebuilding its semantic content. */
+	public moveTo(paneElement: HTMLElement, paneContent: HTMLElement): void {
+		const focused = this.container.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
+		this._observer?.disconnect();
+		this._hostAttributes.restore();
+		this._hostAttributes.markStructurePresentational(paneElement);
+		this._hostAttributes.hideCanvases(paneElement);
+		this._hostAttributes.neutraliseFocusables(paneElement);
+		this.host = paneContent;
+		paneContent.appendChild(this.container);
+		this._watchForRecreatedElements(paneElement);
+		focused?.focus({ preventScroll: true });
 	}
 
 	/** Removes the injected DOM and restores every host attribute we changed. */

@@ -31,7 +31,7 @@ function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.BrushableAreaSeries(), Object.assign({
+	const series = LwcPlugin.createBrushableAreaSeries(chart, Object.assign({
 		priceLineVisible: false,
 	}, fadeStyle));
 	// Points 35..44 carry a time only, so they are whitespace: whitespace never

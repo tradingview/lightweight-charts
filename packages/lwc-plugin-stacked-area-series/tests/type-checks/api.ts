@@ -1,12 +1,12 @@
 // Resolve the built exports map, as an npm consumer does; no src aliases.
 import { createChart, type IChartApiBase, type Time, type CustomSeriesWhitespaceData } from 'lightweight-charts';
-import { StackedAreaSeries, type StackedAreaData, type StackedAreaSeriesOptions } from '@tradingview/lwc-plugin-stacked-area-series';
+import { createStackedAreaSeries, StackedAreaSeries, type StackedAreaData, type StackedAreaSeriesOptions } from '@tradingview/lwc-plugin-stacked-area-series';
 import { StackedAreaSeries as Standalone } from '@tradingview/lwc-plugin-stacked-area-series/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof StackedAreaSeries, typeof Standalone>>();
 const chart = createChart(document.createElement('div'));
-const series = chart.addCustomSeries(new StackedAreaSeries());
+const series = createStackedAreaSeries(chart);
 series.setData([{ time: '2024-01-01', values: [10, -20] }, { time: '2024-01-02' }]);
 series.update({ time: { year: 2024, month: 1, day: 3 }, values: [10, -20] });
 series.applyOptions({ priceLineVisible: false });
@@ -21,7 +21,7 @@ series.update({ time: { key: 'A' }, values: [10, -20] });
 type Category = { key: string };
 declare const categoryChart: IChartApiBase<Category>;
 interface TaggedPoint extends StackedAreaData<Category> { tag: string; }
-const tagged = categoryChart.addCustomSeries(new StackedAreaSeries<Category, TaggedPoint>());
+const tagged = createStackedAreaSeries<Category, TaggedPoint>(categoryChart, {}, 1);
 tagged.setData([{ time: { key: 'A' }, values: [10, -20], tag: 'first' }]);
 tagged.update({ time: { key: 'B' }, values: [10, -20], tag: 'second' });
 expectTrue<Equal<ReturnType<typeof tagged.data>[number], TaggedPoint | CustomSeriesWhitespaceData<Category>>>();
@@ -34,3 +34,6 @@ tagged.update({ time: { key: 'A' }, values: [10, -20], tag: 123 });
 series.applyOptions({ colors: [{ line: 'red', area: 'green' }], lineVisible: false });
 // @ts-expect-error Invalid plugin-specific option values must be rejected.
 series.applyOptions({ colors: [42] });
+
+// The low-level pane view remains available.
+chart.addCustomSeries(new StackedAreaSeries());

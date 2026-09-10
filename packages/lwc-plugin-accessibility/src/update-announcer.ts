@@ -17,6 +17,7 @@ export interface UpdateAnnouncerConfig {
 	debounceMs: number;
 	maxSeries: number;
 	lang?: string;
+	onAnnounce?: (message: string) => void;
 }
 
 /**
@@ -56,6 +57,11 @@ export class UpdateAnnouncer {
 	/** Registers a pane; registration order is pane order. */
 	public register(source: UpdateSource): void {
 		this._sources.push(source);
+	}
+
+	/** Keeps fallback selection and combined summaries in the current pane order. */
+	public reorder(sources: readonly UpdateSource[]): void {
+		this._sources.splice(0, this._sources.length, ...sources);
 	}
 
 	/**
@@ -132,7 +138,11 @@ export class UpdateAnnouncer {
 			}
 		}
 		this._dirty.clear();
-		this._writer.write(formatUpdateMessage(summaries, this._config.messages, this._config.maxSeries));
+		const message = formatUpdateMessage(summaries, this._config.messages, this._config.maxSeries);
+		if (this._region !== null && message.length > 0) {
+			this._config.onAnnounce?.(message);
+			this._writer.write(message);
+		}
 	}
 }
 
