@@ -19,6 +19,7 @@ function runTestCase(container) {
 	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {});
 	series.setData(generateData());
 
-	// Scroll the visible range far past the data so no bars are visible.
-	chart.timeScale().scrollToPosition(500, false);
+	// A visible range entirely before the data: the range is non-null but
+	// empty, which used to be the crash case for custom renderers.
+	chart.timeScale().setVisibleLogicalRange({ from: -400, to: -300 });
 }

@@ -1,10 +1,35 @@
-import { Time } from 'lightweight-charts';
+import { SeriesMarker, Time } from 'lightweight-charts';
 
+import { KeyBindings } from './keyboard';
 import { PartialAccessibilityMessages } from './messages';
+import { SonificationNote } from './sonification';
 import { AnySeries, SeriesDataPoint } from './types';
 
 /** What the summary describes: the whole data set or only the visible range. */
 export type AccessibilityDataScope = 'all' | 'visible';
+
+/**
+ * How times are spoken by the built-in formatter.
+ *
+ * `'auto'` (the default) follows the chart's `timeScale.timeVisible` /
+ * `secondsVisible`, so an intraday chart announces the time of day instead of
+ * repeating the same date for every bar.
+ */
+export type AccessibilityTimeFormat = 'auto' | 'date' | 'dateTime' | 'seconds' | 'time';
+
+/** A point's high / low band, and its open / close when it has them. */
+export interface PointRange {
+	high: number;
+	low: number;
+	open?: number;
+	close?: number;
+}
+
+/** Reads the announced value out of a data point (see {@link AccessibilityPaneOptions.valueAccessor}). */
+export type ValueAccessor = (point: SeriesDataPoint, series: AnySeries | null) => number | undefined;
+
+/** Reads a point's high / low band (see {@link AccessibilityPaneOptions.rangeAccessor}). */
+export type RangeAccessor = (point: SeriesDataPoint, series: AnySeries | null) => PointRange | undefined;
 
 /** The context passed to {@link AccessibilityPaneOptions.describeChart}. */
 export interface DescribeChartContext {
@@ -16,6 +41,22 @@ export interface DescribeChartContext {
 	label: string;
 	/** The scope `points` was narrowed with, so a custom summary can word itself accordingly. */
 	scope: AccessibilityDataScope;
+}
+
+/** Where the keyboard is, reported by {@link AccessibilityPaneOptions.onFocusChange}. */
+export interface AccessibilityFocusEvent {
+	/** Index of the pane the focus is in. */
+	paneIndex: number;
+	/** The active series, or `null` when the pane has none. */
+	series: AnySeries | null;
+	/** Index of the active series within the pane. */
+	seriesIndex: number;
+	/** The focused point, or `undefined` when nothing is focused yet. */
+	point: SeriesDataPoint | undefined;
+	/** Index of the focused point in the active series, or `-1`. */
+	pointIndex: number;
+	/** The focused point's value, or `undefined` when it has none. */
+	value: number | undefined;
 }
 
 /**
@@ -87,9 +128,31 @@ export interface AccessibilityPaneOptions {
 	priceFormatter?: (value: number) => string;
 	/**
 	 * Formats a {@link Time} value for screen reader announcements. Defaults to the
-	 * chart's `localization.timeFormatter` if set, otherwise a locale-aware date.
+	 * chart's `localization.timeFormatter` if set, otherwise a locale-aware date
+	 * built according to {@link timeFormat}.
 	 */
 	timeFormatter?: (time: Time) => string;
+	/**
+	 * How much of a time the built-in formatter speaks. `'auto'` (default)
+	 * follows the chart's `timeScale.timeVisible` / `secondsVisible`, so intraday
+	 * bars are distinguishable instead of all announcing the same date. Ignored
+	 * when {@link timeFormatter} or the chart's `localization.timeFormatter` is set.
+	 */
+	timeFormat: AccessibilityTimeFormat;
+	/**
+	 * Reads the announced value out of a data point. Needed for custom series,
+	 * whose data shape the plugin cannot know: without it every point of a custom
+	 * series announces "no value" and the focus ring stays hidden. Return
+	 * `undefined` to fall back to the built-in extraction (`value`, then `close`).
+	 */
+	valueAccessor?: ValueAccessor;
+	/**
+	 * Reads a point's high / low band (and optionally its open / close), so a
+	 * custom series can be announced like an OHLC one and the summary can report
+	 * true extremes. Return `undefined` to fall back to the point's own
+	 * `high` / `low` fields.
+	 */
+	rangeAccessor?: RangeAccessor;
 	/**
 	 * Produces the accessible label for a series, used when announcing data
 	 * points and when switching series. Defaults to the series' `title` option,
@@ -114,6 +177,60 @@ export interface AccessibilityPaneOptions {
 	 * `localization.locale`.
 	 */
 	lang?: string;
+	/**
+	 * Custom key → command bindings, merged onto the built-in map. A key is
+	 * either a `KeyboardEvent.key` (`'ArrowRight'`, `'t'`) or a
+	 * `KeyboardEvent.code` (`'KeyT'`); map one to `null` to remove a built-in
+	 * binding.
+	 */
+	keyBindings?: KeyBindings;
+	/**
+	 * Announce the visible range when the pane receives focus. Off by default:
+	 * the accessible name and description are already spoken on focus, and an
+	 * assertive message interrupts them on some screen readers.
+	 */
+	announceOnFocus: boolean;
+	/**
+	 * Move keyboard focus into the pane's semantic layer when the user presses a
+	 * pointer on it, so mouse and keyboard users share one notion of "the focused
+	 * chart". Off by default because it changes where `Tab` continues from.
+	 */
+	focusOnPointerDown: boolean;
+	/**
+	 * Called with every string the plugin announces, in the order it is spoken.
+	 * Use it to mirror the announcements into captions, a transcript, or a test.
+	 */
+	onAnnounce?: (message: string) => void;
+	/** Called whenever the active point or series changes. */
+	onFocusChange?: (event: AccessibilityFocusEvent) => void;
+	/**
+	 * Move the chart's crosshair to the focused point (`chart.setCrosshairPosition`),
+	 * so sighted users following along see the same point the keyboard is on.
+	 */
+	syncCrosshair: boolean;
+	/**
+	 * Maximum number of rows rendered by the "view as table" command (`T`). The
+	 * scoped points are truncated to this many, with a spoken note saying so.
+	 */
+	tableMaxRows: number;
+	/**
+	 * The markers of a series, announced when the focus lands on a point that has
+	 * one. The library does not expose the markers attached to a series, so pass
+	 * the array you handed to `createSeriesMarkers` (or its `markers()`).
+	 */
+	markers?: (series: AnySeries) => readonly SeriesMarker<Time>[];
+	/**
+	 * Append the active series' price lines (`series.priceLines()`) to the
+	 * `Enter` / `Space` summary. Defaults to `true`; costs nothing on a series
+	 * without any.
+	 */
+	announcePriceLines: boolean;
+	/**
+	 * Called for every focused point with the data a sonification needs (the
+	 * value, its position within the scoped range, and the index). See
+	 * {@link createToneSonifier} for a ready-made Web Audio implementation.
+	 */
+	onSonify?: (note: SonificationNote) => void;
 	/**
 	 * Show a visible keyboard-shortcuts overlay for sighted keyboard users: a
 	 * "Press H" hint while the pane is focused, and an `H`-toggled panel listing
@@ -147,6 +264,12 @@ export const defaultPaneOptions: AccessibilityPaneOptions = {
 	minZoomSpan: 2,
 	pageStep: 10,
 	dataScope: 'visible',
+	timeFormat: 'auto',
+	announceOnFocus: false,
+	focusOnPointerDown: false,
+	syncCrosshair: false,
+	tableMaxRows: 200,
+	announcePriceLines: true,
 	showShortcuts: false,
 	highContrast: 'auto',
 };
@@ -189,3 +312,18 @@ export type AccessibilityOptions = Omit<
 
 /** @deprecated Use {@link AccessibilityOptions}. */
 export type AccessibilityChartOptions = AccessibilityOptions;
+
+/**
+ * Drops the keys whose value is an explicit `undefined`, so
+ * `applyOptions({ chartTitle: undefined })` leaves the current title alone
+ * instead of erasing it (spreading would otherwise overwrite with `undefined`).
+ */
+export function definedOptions<T extends object>(options: T): Partial<T> {
+	const result: Partial<T> = {};
+	for (const key of Object.keys(options) as (keyof T)[]) {
+		if (options[key] !== undefined) {
+			result[key] = options[key];
+		}
+	}
+	return result;
+}

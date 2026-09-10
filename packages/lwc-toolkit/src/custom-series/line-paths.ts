@@ -74,6 +74,59 @@ export function buildLinePath<TBar extends XPositioned>(
 }
 
 /**
+ * Builds a stepped polyline through the bars in `[from, to)`: each bar is
+ * reached by a horizontal segment at the previous bar's level followed by a
+ * vertical one, which is what the chart's own `LineType.WithSteps` draws.
+ *
+ * The arguments are those of {@link buildLinePath}, and `reverse` produces the
+ * mirror image of the forward path — the same corners in the opposite order —
+ * so a forward and a reverse stepped path can be closed into a band with
+ * {@link areaBetween} without the two edges crossing.
+ */
+export function buildStepLinePath<TBar extends XPositioned>(
+	bars: readonly TBar[],
+	from: number,
+	to: number,
+	getY: (bar: TBar, index: number) => number,
+	scope: BitmapCoordinatesRenderingScope,
+	reverse: boolean = false
+): LinePathData {
+	const { horizontalPixelRatio, verticalPixelRatio } = scope;
+	const path = new Path2D();
+	const first: Position = { x: 0, y: 0 };
+	const last: Position = { x: 0, y: 0 };
+	if (from >= to) {
+		return { path, first, last };
+	}
+	const start = reverse ? to - 1 : from;
+	const end = reverse ? from - 1 : to;
+	const step = reverse ? -1 : 1;
+	let previousX = 0;
+	let previousY = 0;
+	for (let i = start; i !== end; i += step) {
+		const bar = bars[i];
+		const x = bar.x * horizontalPixelRatio;
+		const y = getY(bar, i) * verticalPixelRatio;
+		if (i === start) {
+			path.moveTo(x, y);
+			first.x = x;
+			first.y = y;
+		} else {
+			// Walking forwards the corner sits above or below the new bar;
+			// walking backwards it sits above or below the previous one, which
+			// retraces the very same outline.
+			path.lineTo(reverse ? previousX : x, reverse ? y : previousY);
+			path.lineTo(x, y);
+		}
+		previousX = x;
+		previousY = y;
+		last.x = x;
+		last.y = y;
+	}
+	return { path, first, last };
+}
+
+/**
  * Closes the band between two line paths into a fillable path: the `upper`
  * path, a straight edge across to the start of the `lower` path, the `lower`
  * path, and a straight edge back to where `upper` began.

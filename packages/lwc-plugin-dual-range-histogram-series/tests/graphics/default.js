@@ -20,14 +20,6 @@ function generateData() {
 	return { histogram, line };
 }
 
-// The series does not report its values to the price scale, so room for the
-// fixed-pixel columns has to be reserved with the scale margins (see README).
-function reserveRoom(chart, series) {
-	const height = chart.paneSize().height;
-	const margin = Math.min(0.3, series.options().maxHeight / 2 / height);
-	series.priceScale().applyOptions({ scaleMargins: { top: margin, bottom: margin } });
-}
-
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -47,5 +39,7 @@ function runTestCase(container) {
 	baseline.setData(data.line);
 
 	chart.timeScale().fitContent();
-	reserveRoom(chart, histogram);
+	// The pixel-height columns are not part of the autoscale; the helper
+	// reserves room for them on the price scale.
+	LwcPlugin.keepPixelSeriesInView(chart, histogram);
 }

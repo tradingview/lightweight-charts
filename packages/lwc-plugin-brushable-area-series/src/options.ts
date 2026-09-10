@@ -2,6 +2,8 @@ import {
 	CustomSeriesOptions,
 	customSeriesDefaultOptions,
 	IRange,
+	LineStyle,
+	LineType,
 	LineWidth,
 	Logical,
 } from 'lightweight-charts';
@@ -19,6 +21,8 @@ export interface BrushableAreaStyle {
 	topColor: string;
 	bottomColor: string;
 	lineWidth: LineWidth;
+	/** Dash pattern of the line. */
+	lineStyle: LineStyle;
 }
 
 export interface BrushableAreaSeriesOptions
@@ -38,6 +42,25 @@ export interface BrushableAreaSeriesOptions
 	 * one brush range is set. Merged over the base style.
 	 */
 	outsideStyle?: Partial<BrushableAreaStyle>;
+	/** Draw the line itself. Set it to `false` for the fill only. */
+	lineVisible: boolean;
+	/**
+	 * Shape of the line between two points: straight, stepped or curved. The
+	 * fill follows the same shape.
+	 */
+	lineType: LineType;
+	/**
+	 * Anchor the far end of the fill gradient to the outermost point in view
+	 * rather than to the edge of the pane, as `AreaSeries` does. A relative
+	 * gradient keeps its full colour range whatever the price scale shows, at
+	 * the cost of changing as the chart is panned.
+	 */
+	relativeGradient: boolean;
+	/**
+	 * Fill the area above the line, up to the top of the pane, instead of down
+	 * to {@link BrushableAreaSeriesOptions.basePrice}.
+	 */
+	invertFilledArea: boolean;
 }
 
 export const defaultOptions: BrushableAreaSeriesOptions = {
@@ -46,6 +69,11 @@ export const defaultOptions: BrushableAreaSeriesOptions = {
 	topColor: 'rgba(40,98,255, 0.4)',
 	bottomColor: 'rgba(40,98,255, 0)',
 	lineWidth: 2,
+	lineStyle: LineStyle.Solid,
 	basePrice: 0,
 	brushRanges: [],
+	lineVisible: true,
+	lineType: LineType.Simple,
+	relativeGradient: false,
+	invertFilledArea: false,
 } as const;

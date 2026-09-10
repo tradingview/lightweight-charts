@@ -19,7 +19,12 @@ function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.PrettyHistogramSeries());
+	// `histogram` width mode aligns each column against its neighbour; the first
+	// column after the gap must not be widened or shifted by that alignment.
+	const series = chart.addCustomSeries(new LwcPlugin.PrettyHistogramSeries(), {
+		widthMode: 'histogram',
+		radius: 3,
+	});
 	series.setData(generateData());
 	chart.timeScale().fitContent();
 }

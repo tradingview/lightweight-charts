@@ -5,14 +5,64 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Lightweight Charts - Vertical Line Plugin Example</title>
 		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				align-items: center;
+				padding-block: 12px;
+				font-size: 13px;
+			}
+			#controls label {
+				display: inline-flex;
+				gap: 6px;
+				align-items: center;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="chart"></div>
+		<div class="column" id="controls">
+			<label
+				>Line style
+				<select id="line-style">
+					<option value="0">Solid</option>
+					<option value="1">Dotted</option>
+					<option value="2" selected>Dashed</option>
+					<option value="3">Large dashed</option>
+					<option value="4">Sparse dotted</option>
+				</select>
+			</label>
+			<label
+				>Snap
+				<select id="snap">
+					<option value="exact">exact</option>
+					<option value="nearest" selected>nearest</option>
+				</select>
+			</label>
+			<label
+				>Label
+				<select id="label">
+					<option value="none">hidden</option>
+					<option value="time" selected>chart time format</option>
+					<option value="text">custom text</option>
+				</select>
+			</label>
+			<label
+				><input id="draggable" type="checkbox" checked /> Draggable (green
+				line)</label
+			>
+		</div>
 		<div id="description">
 			<h1>Vertical Line</h1>
+			<p class="hint-message">
+				HINT: Drag the green line along the time scale.
+			</p>
 			<p>
-				Vertical Line draw at specified time values with a corresponding label
-				on the time scale.
+				Vertical lines drawn at specified time values, with a corresponding
+				label on the time scale, an optional text badge, and a choice of how a
+				time between bars is snapped.
 			</p>
 		</div>
 		<script type="module" src="./example.ts"></script>

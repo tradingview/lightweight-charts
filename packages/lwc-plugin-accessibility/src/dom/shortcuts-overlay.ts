@@ -37,11 +37,11 @@ export class ShortcutsOverlay {
 		this._panel.textContent = '';
 		const title = document.createElement('div');
 		title.textContent = messages.shortcutsTitle;
-		title.style.cssText = 'font-weight:600;margin-bottom:6px;';
+		title.style.cssText = 'font-weight:600;margin-block-end:6px;';
 		this._panel.appendChild(title);
 		for (const { keys, action } of messages.shortcuts(args)) {
 			const row = document.createElement('div');
-			row.style.cssText = 'display:flex;gap:10px;align-items:baseline;margin-top:3px;';
+			row.style.cssText = 'display:flex;gap:10px;align-items:baseline;margin-block-start:3px;';
 			const keyEl = document.createElement('kbd');
 			keyEl.textContent = keys;
 			// `currentColor` keeps the key border in step with the (contrast-aware) text colour.
@@ -60,13 +60,15 @@ export class ShortcutsOverlay {
 		const surface = state.highContrast
 			? 'background:#000;border:2px solid #fff;'
 			: 'background:rgba(20,24,28,0.9);border:1px solid rgba(255,255,255,0.25);';
+		// Logical properties, so the overlay sits on the leading side of a
+		// right-to-left page instead of over the price scale.
 		const hintVisible = state.enabled && state.hasFocus && !state.open;
 		this._hint.style.cssText = base + surface +
-			'left:8px;bottom:8px;padding:3px 8px;border-radius:4px;white-space:nowrap;' +
+			'inset-inline-start:8px;inset-block-end:8px;padding:3px 8px;border-radius:4px;white-space:nowrap;' +
 			(hintVisible ? '' : 'display:none;');
 		const panelVisible = state.enabled && state.open;
 		this._panel.style.cssText = base + surface +
-			'left:8px;top:8px;max-width:calc(100% - 16px);padding:8px 11px;border-radius:6px;' +
+			'inset-inline-start:8px;inset-block-start:8px;max-inline-size:calc(100% - 16px);padding:8px 11px;border-radius:6px;' +
 			(state.highContrast ? '' : 'box-shadow:0 2px 10px rgba(0,0,0,0.45);') +
 			(panelVisible ? '' : 'display:none;');
 	}

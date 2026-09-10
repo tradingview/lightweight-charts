@@ -1,32 +1,70 @@
 import { WhitespaceData, createChart } from 'lightweight-charts';
 import { CandleData, generateAlternativeCandleData } from './sample-data';
 import { RoundedCandleSeries } from '../rounded-candles-series';
+import { RoundedCandleRadius } from '../radius';
+import { RoundedCandleWickLineCap } from '../options';
 
 const chart = ((window as unknown as any).chart = createChart('chart', {
 	autoSize: true,
 }));
 
-const customSeriesView = new RoundedCandleSeries();
-const myCustomSeries = chart.addCustomSeries(customSeriesView, {
-	color: '#FF00FF', // TESTING: shouldn't see this because we are coloring each bar later
+const series = chart.addCustomSeries(new RoundedCandleSeries(), {
+	hoverDimOpacity: 0.25,
 });
 
-const { upColor, downColor } = myCustomSeries.options();
+// Every tenth candle carries per-point `color`, `borderColor` and `wickColor`
+// overrides, which win over the option colours.
+const data: (CandleData | WhitespaceData)[] = generateAlternativeCandleData(60).map(
+	(point: CandleData, index: number) => {
+		if (index % 10 !== 0) {
+			return point;
+		}
+		return {
+			...point,
+			color: 'rgba(41, 98, 255, 0.5)',
+			borderColor: '#2962FF',
+			wickColor: '#2962FF',
+		};
+	}
+);
+// A run of whitespace: those points have a time only, so no candle is drawn
+// there and the candles on either side keep their own colouring.
+for (let i = 40; i < 48; i++) {
+	data[i] = { time: data[i].time };
+}
+series.setData(data);
 
-let lastValue = -Infinity;
-const data: (CandleData | WhitespaceData)[] = generateAlternativeCandleData().map(d => {
-	// we add the item colors here instead of providing an
-	// API to do it internally.
-	const color = d.close >= lastValue ? upColor : downColor;
-	lastValue = d.close;
-	return { ...d, color };
+const radiusSelect = document.getElementById('radius') as HTMLSelectElement;
+const wickSelect = document.getElementById('wick') as HTMLSelectElement;
+const borderSelect = document.getElementById('border') as HTMLSelectElement;
+
+const autoRadius: RoundedCandleRadius = (barSpacing: number) =>
+	barSpacing < 4 ? 0 : barSpacing / 3;
+
+radiusSelect.addEventListener('change', () => {
+	const value = radiusSelect.value;
+	series.applyOptions({
+		radius: value === 'auto' ? autoRadius : Number(value),
+	});
 });
-data[data.length -2] = { time: data[data.length -2].time }; // test whitespace data
-myCustomSeries.setData(data);
 
-// Should be an error...
-// myCustomSeries.update({
-// 	time: 123456 as Time,
-// 	close: 1234,
-// 	open: 1234,
-// });
+wickSelect.addEventListener('change', () => {
+	const value = wickSelect.value;
+	series.applyOptions({
+		wickVisible: value !== 'hidden',
+		wickLineCap: (value === 'hidden'
+			? 'butt'
+			: value) as RoundedCandleWickLineCap,
+	});
+});
+
+borderSelect.addEventListener('change', () => {
+	const value = borderSelect.value;
+	series.applyOptions({
+		borderVisible: value !== 'none',
+		borderUpColor: value === 'contrast' ? '#00695C' : '#26a69a',
+		borderDownColor: value === 'contrast' ? '#B71C1C' : '#ef5350',
+	});
+});
+
+chart.timeScale().fitContent();

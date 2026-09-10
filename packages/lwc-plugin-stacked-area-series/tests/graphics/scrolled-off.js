@@ -1,7 +1,7 @@
-function generateData() {
+function generateData(count) {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
-	for (let i = 0; i < 60; ++i) {
+	for (let i = 0; i < (count || 60); ++i) {
 		res.push({
 			time: time.getTime() / 1000,
 			values: [
@@ -22,6 +22,8 @@ function runTestCase(container) {
 	}));
 	const series = chart.addCustomSeries(new LwcPlugin.StackedAreaSeries());
 	series.setData(generateData());
-	chart.timeScale().fitContent();
-	chart.timeScale().scrollToPosition(200, false);
+
+	// A visible range entirely before the data: the range is non-null but
+	// empty, which used to crash the renderer.
+	chart.timeScale().setVisibleLogicalRange({ from: -400, to: -300 });
 }

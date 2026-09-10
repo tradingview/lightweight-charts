@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import {
 	areaBetween,
 	buildLinePath,
+	buildStepLinePath,
 	LinePathData,
 	PolylineStroke,
 	Position,
@@ -151,6 +152,72 @@ void describe('buildLinePath', () => {
 		expect(ops(line)).to.deep.equal([]);
 		expect(line.first).to.deep.equal({ x: 0, y: 0 });
 		expect(line.last).to.deep.equal({ x: 0, y: 0 });
+	});
+});
+
+void describe('buildStepLinePath', () => {
+	void it('reaches each bar horizontally first, then vertically', () => {
+		const line = buildStepLinePath(bars([0, 10, 20]), 0, 3, value, scope(1, 1));
+		expect(ops(line)).to.deep.equal([
+			'moveTo(0,0)',
+			'lineTo(10,0)',
+			'lineTo(10,1)',
+			'lineTo(20,1)',
+			'lineTo(20,2)',
+		]);
+	});
+
+	void it('scales x by the horizontal and y by the vertical pixel ratio', () => {
+		const line = buildStepLinePath(bars([0, 10]), 0, 2, value, scope(2, 3));
+		expect(ops(line)).to.deep.equal([
+			'moveTo(0,0)',
+			'lineTo(20,0)',
+			'lineTo(20,3)',
+		]);
+	});
+
+	void it('retraces the same outline when reversed', () => {
+		const line = buildStepLinePath(
+			bars([0, 10, 20]),
+			0,
+			3,
+			value,
+			scope(1, 1),
+			true
+		);
+		expect(ops(line)).to.deep.equal([
+			'moveTo(20,2)',
+			'lineTo(20,1)',
+			'lineTo(10,1)',
+			'lineTo(10,0)',
+			'lineTo(0,0)',
+		]);
+	});
+
+	void it('reports the first and last points of the path', () => {
+		const line = buildStepLinePath(bars([0, 10, 20]), 0, 3, value, scope(2, 2));
+		expect(line.first).to.deep.equal({ x: 0, y: 0 });
+		expect(line.last).to.deep.equal({ x: 40, y: 4 });
+	});
+
+	void it('draws nothing for an empty range', () => {
+		const line = buildStepLinePath(bars([0, 10]), 1, 1, value, scope(1, 1));
+		expect(ops(line)).to.deep.equal([]);
+	});
+
+	void it('hands the absolute bar index to getY', () => {
+		const indices: number[] = [];
+		buildStepLinePath(
+			bars([0, 10, 20, 30]),
+			2,
+			4,
+			(_: TestBar, index: number) => {
+				indices.push(index);
+				return 0;
+			},
+			scope(1, 1)
+		);
+		expect(indices).to.deep.equal([2, 3]);
 	});
 });
 

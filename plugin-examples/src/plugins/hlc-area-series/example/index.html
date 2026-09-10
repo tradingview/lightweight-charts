@@ -5,15 +5,62 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Lightweight Charts - HLCArea Series Plugin Example</title>
 		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				align-items: center;
+				padding-block: 12px;
+				font-size: 13px;
+			}
+			#controls label {
+				display: inline-flex;
+				gap: 6px;
+				align-items: center;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="chart"></div>
+		<div class="column" id="controls">
+			<label
+				>Line style
+				<select id="line-style">
+					<option value="0" selected>Solid</option>
+					<option value="1">Dotted</option>
+					<option value="2">Dashed</option>
+					<option value="3">Large dashed</option>
+					<option value="4">Sparse dotted</option>
+				</select>
+			</label>
+			<label
+				>Line type
+				<select id="line-type">
+					<option value="simple" selected>Simple</option>
+					<option value="step">Step</option>
+				</select>
+			</label>
+			<label
+				>Areas
+				<select id="area">
+					<option value="flat" selected>Flat fills</option>
+					<option value="gradient">Gradient fills</option>
+					<option value="none">Hidden</option>
+				</select>
+			</label>
+			<label
+				><input id="close-line" type="checkbox" checked /> Close line</label
+			>
+		</div>
 		<div id="description">
 			<h1>HLC Area Series</h1>
 			<p>
 				HLC (High Low Close) Area Series. A line for each of the high, low, and
 				close values is plotted whilst the areas are filled between the close
-				value and the high and low values.
+				value and the high and low values. The run of whitespace in the middle
+				of the data breaks the lines, and the view starts zoomed into the middle
+				so the band runs to both edges of the pane.
 			</p>
 		</div>
 		<script type="module" src="./example.ts"></script>

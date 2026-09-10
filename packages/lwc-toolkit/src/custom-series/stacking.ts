@@ -48,3 +48,25 @@ export function stackedPlotValues(
 	}
 	return [min, max, values.length === 0 ? base : sum];
 }
+
+/**
+ * Boundaries of the bands of a stack drawn from `base`: entry `i` is the far
+ * edge of band `i`, whose near edge is entry `i - 1` (or `base` for the first
+ * band). A negative value therefore draws its band back down from where the
+ * previous one ended, so a mixed stack stays contiguous and never overlaps.
+ *
+ * @param values - the band values of the item, in stacking order
+ * @param base - price the stack starts from, usually zero
+ */
+export function stackLevels(
+	values: readonly number[],
+	base: number = 0
+): number[] {
+	let level = base;
+	const result = new Array<number>(values.length);
+	for (let i = 0; i < values.length; i++) {
+		level += values[i];
+		result[i] = level;
+	}
+	return result;
+}

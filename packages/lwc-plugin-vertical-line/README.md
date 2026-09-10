@@ -103,6 +103,13 @@ The `time` argument accepts any [`Time`](https://tradingview.github.io/lightweig
 value supported by the chart (a business day string, a `BusinessDay` object,
 or a UTC timestamp) — use the same format as your series data.
 
+Change a line after it has been created with `applyOptions` and `setTime`:
+
+```js
+earningsLine.applyOptions({ color: '#F23645', labelText: 'Moved' });
+earningsLine.setTime('2024-05-02');
+```
+
 ## Options
 
 All options are optional. Pass them as the second constructor argument.
@@ -111,21 +118,70 @@ All options are optional. Pass them as the second constructor argument.
 | --- | --- | --- | --- |
 | `color` | `string` | `'green'` | Color of the line. |
 | `width` | `number` | `3` | Width of the line, in CSS pixels. |
+| `lineStyle` | `LineStyle` | `LineStyle.Solid` | Dash pattern of the line. |
+| `lineVisible` | `boolean` | `true` | Draw the line itself. Set it to `false` for a time-axis label with no line. |
 | `showLabel` | `boolean` | `false` | Show a label at the line's position on the time axis. |
-| `labelText` | `string` | `''` | Text of the time-axis label. |
+| `tickVisible` | `boolean` | `true` | Draw the tick mark of the time-axis label. |
+| `labelText` | `string` | `''` | Text of the time-axis label. Overrides `labelFormatter` when set. |
+| `labelFormatter` | `(time) => string` | — | Builds the label text from the line's time. Used only while `labelText` is empty; the default formats the time the way the chart's own time axis does. |
 | `labelBackgroundColor` | `string` | `'green'` | Background color of the label. |
 | `labelTextColor` | `string` | `'white'` | Text color of the label. |
+| `zOrder` | `'bottom' \| 'normal' \| 'top'` | `'normal'` | Layer the line is drawn in. |
+| `snap` | `'exact' \| 'nearest'` | `'exact'` | `'exact'` draws the line only at a time which is a bar of the chart; `'nearest'` places it on the closest bar instead. |
+| `draggable` | `boolean` | `false` | Lets the user drag the line along the time scale. |
+| `hitTestTolerance` | `number` | `4` | Distance from the line, in CSS pixels, still counted as a hit. |
+| `id` | `string` | `'vertical-line'` | Reported as `externalId` for a hit on this line. |
+| `badge` | `Partial<VerticalLineBadgeOptions> & { text }` | — | Text badge drawn on the line. Omit it for no badge. |
 
 The defaults are exported as `defaultOptions`.
 
-Options are fixed when the line is created. To change a line, detach it and
-attach a new one with the updated options.
+### Badge
+
+A badge is a short caption drawn on the line itself, for text that should stay
+next to the line rather than sit on the time axis:
+
+```js
+series.attachPrimitive(new VerticalLine('2024-04-25', {
+    badge: { text: 'Earnings', backgroundColor: '#2962FF' },
+}));
+```
+
+| Badge option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `text` | `string` | `''` | Text of the badge. An empty string hides it. |
+| `color` | `string` | `'white'` | Text color. |
+| `backgroundColor` | `string` | `'green'` | Background color. |
+| `borderColor` | `string` | — | Border color. Leave it out for no border. |
+| `borderWidth` | `number` | `0` | Border width, in CSS pixels. |
+| `borderRadius` | `number` | `4` | Corner radius of the background, in CSS pixels. |
+| `font` | `string` | system sans-serif, 12px | Font, as a CSS `font` shorthand. |
+| `padding` | `number` | `4` | Space between the text and the edge of the background. |
+| `margin` | `number` | `4` | Distance from the line and from the pane edge. |
+| `verticalAlign` | `'top' \| 'middle' \| 'bottom'` | `'top'` | Where along the line the badge sits. |
+| `horizontalAlign` | `'left' \| 'right'` | `'right'` | Which side of the line the badge sits on. |
+
+The badge defaults are exported as `defaultBadgeOptions`.
+
+### Dragging
+
+With `draggable: true` the line can be moved along the time scale with the
+pointer, and `timeChanged()` reports every new time:
+
+```js
+const line = new VerticalLine('2024-04-25', { draggable: true });
+series.attachPrimitive(line);
+line.timeChanged().subscribe(time => console.log(time));
+```
+
+Dragging suspends the chart's own scroll and scale handling for the duration of
+the gesture, so the chart does not pan under the pointer.
 
 ## Notes
 
-- The line is drawn only when its time is on the chart's time scale: if the
-  time does not match any bar of the attached series (or of any other series
-  sharing the time scale), nothing is rendered.
+- With the default `snap: 'exact'` the line is drawn only when its time is a
+  bar of the chart's time scale; a time between bars or outside the data draws
+  nothing, and its time-axis label is hidden with it. Use `snap: 'nearest'` to
+  place the line on the closest bar instead.
 - The line spans the full height of the pane the series belongs to. To mark a
   time across several panes, attach a line to a series in each pane.
 - The label is rendered by the chart's time axis, so it inherits the axis font

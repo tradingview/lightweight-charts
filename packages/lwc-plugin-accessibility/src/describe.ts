@@ -1,6 +1,8 @@
-import { Time, isBusinessDay, isUTCTimestamp } from 'lightweight-charts';
+import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
+import { Time } from 'lightweight-charts';
 
 import { AccessibilityMessages } from './messages';
+import { AccessibilityTimeFormat, PointRange, RangeAccessor, ValueAccessor } from './options';
 import { AnySeries, SeriesDataPoint } from './types';
 
 /**
@@ -12,18 +14,35 @@ export interface DescribeEnv {
 	/** Localised, leading-spaced scope note for summaries, or `''` when not scoped. */
 	scopeNote: string;
 	formatValue: (value: number | undefined, series: AnySeries | null) => string;
+	/** Formats a difference between two values (see {@link Formatters.change}). */
+	formatChange: (value: number, series: AnySeries | null) => string;
 	formatTime: (time: Time) => string;
 	formatPercent: (value: number) => string;
+	/** Reads the announced value of a point, honouring the `valueAccessor` option. */
+	value: (point: SeriesDataPoint | undefined, series: AnySeries | null) => number | undefined;
+	/** Reads a point's high / low (and open / close), honouring `rangeAccessor`. */
+	range: (point: SeriesDataPoint | undefined, series: AnySeries | null) => PointRange | undefined;
 }
 
 /**
  * Extracts the representative numeric value from a data point, if it has one.
  * Value-based series (line, area, …) carry `value`; OHLC series (bar,
- * candlestick) carry `close`; whitespace points carry neither.
+ * candlestick) carry `close`; whitespace points carry neither. Custom series
+ * carry whatever their author chose, hence the {@link ValueAccessor} option.
  */
-export function extractValue(point: SeriesDataPoint | undefined): number | undefined {
+export function extractValue(
+	point: SeriesDataPoint | undefined,
+	series: AnySeries | null = null,
+	accessor?: ValueAccessor
+): number | undefined {
 	if (!point) {
 		return undefined;
+	}
+	if (accessor) {
+		const custom = accessor(point, series);
+		if (typeof custom === 'number' && Number.isFinite(custom)) {
+			return custom;
+		}
 	}
 	if ('value' in point && typeof point.value === 'number') {
 		return point.value;
@@ -34,56 +53,82 @@ export function extractValue(point: SeriesDataPoint | undefined): number | undef
 	return undefined;
 }
 
-/** The plugin's fallback time formatter: a locale-aware, UTC-based short date. */
-export function defaultTimeFormatter(time: Time, locale?: string): string {
-	let date: Date;
-	if (isUTCTimestamp(time)) {
-		date = new Date(time * 1000);
-	} else if (isBusinessDay(time)) {
-		// BusinessDay months are 1-12, whereas Date expects 0-11.
-		date = new Date(Date.UTC(time.year, time.month - 1, time.day));
-	} else {
-		// Business-day string, e.g. '2019-05-15' – parse it so it is localised
-		// like the other time formats (with a verbatim fallback if it does not
-		// match the expected YYYY-MM-DD shape).
-		const [year, month, day] = time.split('-').map(Number);
-		if (!year || !month || !day) {
-			return time;
-		}
-		date = new Date(Date.UTC(year, month - 1, day));
+/**
+ * The point's high / low band (with open / close when it has them), used both
+ * for the spoken OHLC values and for the summary's extremes – a candle's high
+ * is a real high, not its close.
+ */
+export function extractRange(
+	point: SeriesDataPoint | undefined,
+	series: AnySeries | null = null,
+	accessor?: RangeAccessor
+): PointRange | undefined {
+	if (!point) {
+		return undefined;
 	}
+	if (accessor) {
+		const custom = accessor(point, series);
+		if (custom && Number.isFinite(custom.high) && Number.isFinite(custom.low)) {
+			return custom;
+		}
+	}
+	if ('high' in point && typeof point.high === 'number' && 'low' in point && typeof point.low === 'number') {
+		const open = 'open' in point && typeof point.open === 'number' ? point.open : undefined;
+		const close = 'close' in point && typeof point.close === 'number' ? point.close : undefined;
+		return { high: point.high, low: point.low, open, close };
+	}
+	return undefined;
+}
+
+/** The plugin's fallback time formatter: a locale-aware, UTC-based date (and time). */
+export function defaultTimeFormatter(
+	time: Time,
+	locale?: string,
+	format: AccessibilityTimeFormat = 'date'
+): string {
+	const timestamp = convertTimeUTC(time);
+	if (!Number.isFinite(timestamp)) {
+		// A business-day string that does not match `YYYY-MM-DD`: speak it verbatim.
+		return typeof time === 'string' ? time : String(time);
+	}
+	const date = new Date(timestamp);
+	const dateParts: Intl.DateTimeFormatOptions =
+		format === 'time' ? {} : { year: 'numeric', month: 'short', day: 'numeric' };
+	const timeParts: Intl.DateTimeFormatOptions =
+		format === 'date'
+			? {}
+			: format === 'seconds'
+				? { hour: '2-digit', minute: '2-digit', second: '2-digit' }
+				: { hour: '2-digit', minute: '2-digit' };
 	// `locale || undefined` guards against the empty-string locale used server-side,
 	// which is not a valid Intl locale. Formatting must be in UTC: the library
-	// renders the time axis in UTC, and the dates built above are UTC-midnight
+	// renders the time axis in UTC, and business days convert to UTC-midnight
 	// instants that would otherwise shift a day in timezones west of UTC.
-	return date.toLocaleDateString(locale || undefined, {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric',
-		timeZone: 'UTC',
-	});
+	return date.toLocaleString(locale || undefined, { ...dateParts, ...timeParts, timeZone: 'UTC' });
 }
 
 /**
  * Spoken value(s) for a point: the full open / high / low / close for OHLC
- * series (bar, candlestick), otherwise the single value. The OHLC assembly
- * (order, separators) is delegated to {@link AccessibilityMessages.ohlcValues}
- * so it is fully localisable.
+ * series (bar, candlestick, or a custom series with a `rangeAccessor`),
+ * otherwise the single value. The OHLC assembly (order, separators) is
+ * delegated to {@link AccessibilityMessages.ohlcValues} so it is fully
+ * localisable.
  */
 export function describeValues(env: DescribeEnv, point: SeriesDataPoint, series: AnySeries | null): string {
-	if ('close' in point && typeof point.close === 'number') {
-		// `'close' in point` narrows to the OHLC data types (bar / candlestick).
-		const field = (value: number | undefined): string | null =>
-			typeof value === 'number' ? env.formatValue(value, series) : null;
+	const range = env.range(point, series);
+	const value = env.value(point, series);
+	if (range && (range.close !== undefined || value !== undefined)) {
+		const field = (field: number | undefined): string | null =>
+			typeof field === 'number' ? env.formatValue(field, series) : null;
 		return env.messages.ohlcValues({
 			labels: env.messages.ohlc,
-			open: field(point.open),
-			high: field(point.high),
-			low: field(point.low),
-			close: env.formatValue(point.close, series),
+			open: field(range.open),
+			high: field(range.high),
+			low: field(range.low),
+			close: env.formatValue(range.close ?? value, series),
 		});
 	}
-	return env.formatValue(extractValue(point), series);
+	return env.formatValue(value, series);
 }
 
 /** The announcement for the point at `index`, or `''` when there is no such point. */
@@ -92,7 +137,9 @@ export function describePoint(
 	points: readonly SeriesDataPoint[],
 	index: number,
 	label: string,
-	series: AnySeries | null
+	series: AnySeries | null,
+	/** Pre-formatted extras (markers) appended to the announcement, or `''`. */
+	notes: string = ''
 ): string {
 	const point = points[index];
 	if (!point) {
@@ -106,7 +153,7 @@ export function describePoint(
 		time: env.formatTime(point.time),
 		label,
 		values: describeValues(env, point, series),
-	});
+	}) + notes;
 }
 
 /** The built-in `Enter` / `Space` summary of `points` (already narrowed to the data scope). */
@@ -114,27 +161,35 @@ export function describeSummary(
 	env: DescribeEnv,
 	points: readonly SeriesDataPoint[],
 	label: string,
-	series: AnySeries | null
+	series: AnySeries | null,
+	/** Pre-formatted extras (price lines) appended to the summary, or `''`. */
+	notes: string = ''
 ): string {
-	const valued = points.filter(point => extractValue(point) !== undefined);
+	const valued = points.filter((point: SeriesDataPoint) => env.value(point, series) !== undefined);
 	if (valued.length === 0) {
 		return env.messages.noData({ label, scopeNote: env.scopeNote });
 	}
 	const first = valued[0];
 	const last = valued[valued.length - 1];
+	// The extremes come from each point's high / low where it has them, so a
+	// candlestick summary reports the real high of the range, not the highest
+	// close.
+	const highOf = (point: SeriesDataPoint): number =>
+		env.range(point, series)?.high ?? (env.value(point, series) as number);
+	const lowOf = (point: SeriesDataPoint): number =>
+		env.range(point, series)?.low ?? (env.value(point, series) as number);
 	let low = first;
 	let high = first;
 	for (const point of valued) {
-		const value = extractValue(point) as number;
-		if (value < (extractValue(low) as number)) {
+		if (lowOf(point) < lowOf(low)) {
 			low = point;
 		}
-		if (value > (extractValue(high) as number)) {
+		if (highOf(point) > highOf(high)) {
 			high = point;
 		}
 	}
-	const firstValue = extractValue(first) as number;
-	const lastValue = extractValue(last) as number;
+	const firstValue = env.value(first, series) as number;
+	const lastValue = env.value(last, series) as number;
 	const change = lastValue - firstValue;
 	// Percent is undefined when the series starts at zero (avoids a misleading
 	// "up by 12, 0 percent"); the summary drops the clause in that case.
@@ -151,30 +206,26 @@ export function describeSummary(
 		lastTime: env.formatTime(last.time),
 		direction,
 		directionLabel: env.messages.directions[direction],
-		changeValue: env.formatValue(Math.abs(change), series),
+		changeValue: env.formatChange(Math.abs(change), series),
 		percent: percent !== null ? env.formatPercent(Math.abs(percent)) : null,
-		lowValue: env.formatValue(extractValue(low), series),
+		lowValue: env.formatValue(lowOf(low), series),
 		lowTime: env.formatTime(low.time),
-		highValue: env.formatValue(extractValue(high), series),
+		highValue: env.formatValue(highOf(high), series),
 		highTime: env.formatTime(high.time),
-	});
+	}) + notes;
 }
 
 /** One changed series' contribution to a data-update announcement. */
 export function describeSeriesUpdate(
 	env: DescribeEnv,
-	args: { label: string; series: AnySeries; data: readonly SeriesDataPoint[]; scopedCount: number }
+	args: { label: string; series: AnySeries; latest: SeriesDataPoint | null; scopedCount: number }
 ): string {
 	// 'Latest' reports the newest bar – the one the update actually changed –
 	// which can sit outside the visible range; only the count is scoped.
-	let value: number | undefined;
-	for (let i = args.data.length - 1; i >= 0 && value === undefined; i--) {
-		value = extractValue(args.data[i]);
-	}
 	return env.messages.seriesUpdate({
 		label: args.label,
 		count: args.scopedCount,
 		scopeNote: env.scopeNote,
-		latest: env.formatValue(value, args.series),
+		latest: env.formatValue(env.value(args.latest ?? undefined, args.series), args.series),
 	});
 }

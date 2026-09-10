@@ -13,14 +13,62 @@
 				overflow: hidden;
 				background-color: rgba(248, 249, 253, 1);
 				color: rgba(19, 23, 34, 1);
+				font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS',
+					Roboto, Ubuntu, sans-serif;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+			}
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				align-items: center;
+				padding: 8px 12px;
+				font-size: 13px;
+			}
+			#controls label {
+				display: inline-flex;
+				gap: 6px;
+				align-items: center;
+			}
+			#range {
+				color: rgba(120, 123, 134, 1);
 			}
 			#chart {
-				width: 100%;
-				height: 100%;
+				flex: 1 1 auto;
+				min-height: 0;
 			}
 		</style>
 	</head>
 	<body>
+		<div id="controls">
+			<label
+				>Brush style
+				<select id="brush-style">
+					<option value="green" selected>Green</option>
+					<option value="orange">Orange</option>
+					<option value="red">Red</option>
+				</select>
+			</label>
+			<label
+				>Line style
+				<select id="line-style">
+					<option value="0" selected>Solid</option>
+					<option value="1">Dotted</option>
+					<option value="2">Dashed</option>
+					<option value="3">Large dashed</option>
+					<option value="4">Sparse dotted</option>
+				</select>
+			</label>
+			<label
+				>Base price
+				<input id="base-price" type="range" min="0" max="600" step="10" value="0" />
+				<span id="base-price-value">0</span>
+			</label>
+			<span id="range">drag across the chart to brush</span>
+		</div>
 		<div id="chart"></div>
 		<script type="module" src="./example.ts"></script>
 	</body>

@@ -5,9 +5,53 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Lightweight Charts - Brushable Area Series Plugin Example</title>
 		<link href="../../../examples-base.css" rel="stylesheet" />
+		<style>
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				align-items: center;
+				padding-block: 12px;
+				font-size: 13px;
+			}
+			#controls label {
+				display: inline-flex;
+				gap: 6px;
+				align-items: center;
+			}
+			#range {
+				opacity: 0.6;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="chart"></div>
+		<div class="column" id="controls">
+			<label
+				>Brush style
+				<select id="brush-style">
+					<option value="green" selected>Green</option>
+					<option value="orange">Orange</option>
+					<option value="red">Red</option>
+				</select>
+			</label>
+			<label
+				>Line style
+				<select id="line-style">
+					<option value="0" selected>Solid</option>
+					<option value="1">Dotted</option>
+					<option value="2">Dashed</option>
+					<option value="3">Large dashed</option>
+					<option value="4">Sparse dotted</option>
+				</select>
+			</label>
+			<label
+				>Base price
+				<input id="base-price" type="range" min="0" max="600" step="10" value="0" />
+				<span id="base-price-value">0</span>
+			</label>
+			<span id="range">drag across the chart to brush</span>
+		</div>
 		<div id="description">
 			<h1>Brushable Area Series</h1>
 			<p class="hint-message">
@@ -15,7 +59,9 @@
 			</p>
 			<p>
 				An area series plot where the styling of individual points can be
-				changed dynamically without needing to set new data.
+				changed dynamically without needing to set new data. The
+				<code>BrushableAreaInteraction</code> primitive turns a mouse drag or a
+				touch gesture into the selected range.
 			</p>
 		</div>
 		<script type="module" src="./example.ts"></script>

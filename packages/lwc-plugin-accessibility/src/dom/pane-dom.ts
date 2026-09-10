@@ -1,3 +1,4 @@
+import { DataTable } from '../data-table';
 import {
 	FocusRingStyle,
 	createFocusRing,
@@ -14,31 +15,6 @@ import { ShortcutsOverlay } from './shortcuts-overlay';
 
 /** Source of unique ids for the per-pane `aria-describedby` target. */
 let descriptionIdCounter = 0;
-
-/**
- * The element inside the pane row that the semantic layer is appended to (the
- * pane's canvas wrapper, so the layer shares the canvas' coordinate space).
- */
-export function findPaneContentElement(paneElement: HTMLElement): HTMLElement | null {
-	const cells = Array.from(paneElement.children).filter(
-		(cell): cell is HTMLElement => cell instanceof HTMLElement
-	);
-	// The pane row holds the (optional) left price-axis cell, the main pane
-	// cell and the (optional) right price-axis cell. Every one of them can
-	// contain a canvas, so "first cell with a canvas" would wrongly pick the
-	// left axis when it is visible. The library only sets `position:relative`
-	// on the main pane cell, so we key off that and fall back to the first
-	// canvas-bearing cell for forward compatibility.
-	const paneCell =
-		cells.find(cell => cell.style.position === 'relative' && cell.querySelector('canvas')) ??
-		cells.find(cell => cell.querySelector('canvas'));
-	if (!paneCell) {
-		return null;
-	}
-	return paneCell.firstElementChild instanceof HTMLElement
-		? paneCell.firstElementChild
-		: paneCell;
-}
 
 /** Sets (or clears) the BCP-47 `lang` attribute on an announced region. */
 function applyLang(element: HTMLElement | null, lang: string | undefined): void {
@@ -61,6 +37,12 @@ export interface PaneLayerView {
 	description: string;
 	/** BCP-47 tag for the announced regions, or `undefined` to clear it. */
 	lang: string | undefined;
+	/**
+	 * Writing direction of the host page. The library forces `direction: ltr` on
+	 * the chart element, so the layer has to opt back in for the plugin's panels
+	 * to sit on the leading side of a right-to-left page.
+	 */
+	direction: 'ltr' | 'rtl';
 	focusRing: FocusRingStyle;
 	hasFocus: boolean;
 	shortcutsEnabled: boolean;
@@ -78,8 +60,11 @@ export interface PaneLayerView {
  */
 export class PaneLayer {
 	public readonly container: HTMLElement;
+	/** The pane's canvas wrapper the layer lives in – the pointer target for the pane. */
+	public readonly host: HTMLElement;
 	public readonly liveWriter: LiveRegionWriter;
 	public readonly statusWriter: LiveRegionWriter;
+	public readonly table: DataTable;
 
 	private readonly _description: HTMLElement;
 	private readonly _liveRegion: HTMLElement;
@@ -102,11 +87,14 @@ export class PaneLayer {
 		withStatusRegion: boolean
 	) {
 		this._hostAttributes.markStructurePresentational(paneElement);
-		// Hide the visual canvas(es) from assistive technology and take any
+		// Hide this pane's canvas(es) from assistive technology and take any
 		// focusable descendant (e.g. the attribution link) out of the tab order –
 		// a focusable element inside an aria-hidden subtree is a WCAG failure.
-		this._hostAttributes.hideCanvases(paneElement.closest('table') ?? paneElement);
+		// Canvases outside the pane (the axes, other panes) are the controller's
+		// job: a single pane primitive must not reach across the whole chart.
+		this._hostAttributes.hideCanvases(paneElement);
 		this._hostAttributes.neutraliseFocusables(paneElement);
+		this.host = paneContent;
 
 		const layer = document.createElement('div');
 		layer.className = 'lw-chart-a11y-layer';
@@ -148,6 +136,7 @@ export class PaneLayer {
 		this._focusRing = createFocusRing();
 		layer.appendChild(this._focusRing);
 		this._shortcuts = new ShortcutsOverlay(layer);
+		this.table = new DataTable(layer);
 
 		this.liveWriter = new LiveRegionWriter(() => this._liveRegion);
 		this.statusWriter = new LiveRegionWriter(() => this._statusRegion);
@@ -158,6 +147,7 @@ export class PaneLayer {
 
 	/** Applies the current view to every node: text, `lang`, focus styling, overlay. */
 	public render(view: PaneLayerView): void {
+		this.container.style.direction = view.direction;
 		this.container.setAttribute('aria-roledescription', view.roleDescription);
 		this.container.setAttribute('aria-label', view.label);
 		this._description.textContent = view.description;
@@ -173,6 +163,7 @@ export class PaneLayer {
 			open: view.shortcutsOpen,
 			highContrast: view.focusRing.highContrast,
 		});
+		this.table.restyle(view.focusRing.highContrast);
 	}
 
 	/** Places the focus ring at a coordinate local to the pane's canvas wrapper. */
@@ -194,6 +185,7 @@ export class PaneLayer {
 	public remove(): void {
 		this.liveWriter.dispose();
 		this.statusWriter.dispose();
+		this.table.remove();
 		this.container.remove();
 		// Stop observing before restoring, so our own restores are not re-swept.
 		this._observer?.disconnect();

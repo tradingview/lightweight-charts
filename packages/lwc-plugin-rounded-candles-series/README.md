@@ -104,8 +104,8 @@ series.setData([
 ```
 
 Each data point is `{ time, open, high, low, close }` — the same shape as the
-built-in candlestick series. Points without a `close` are treated as
-whitespace.
+built-in candlestick series. Points missing any of the four values are treated
+as whitespace, and leave a gap.
 
 A constant `radius` fixes the corner rounding regardless of zoom:
 
@@ -123,21 +123,39 @@ In addition to the standard
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `upColor` | `string` | `'#26a69a'` | Body color of up candles. |
-| `downColor` | `string` | `'#ef5350'` | Body color of down candles. |
-| `wickUpColor` | `string` | `'#26a69a'` | Wick color of up candles. |
-| `wickDownColor` | `string` | `'#ef5350'` | Wick color of down candles. |
+| `upColor` | `string` | `'#26a69a'` | Body color of rising candles. |
+| `downColor` | `string` | `'#ef5350'` | Body color of falling candles. |
+| `borderVisible` | `boolean` | `true` | Whether a border is drawn around the body. |
+| `borderUpColor` | `string` | `'#26a69a'` | Border color of rising candles. |
+| `borderDownColor` | `string` | `'#ef5350'` | Border color of falling candles. |
+| `borderColor` | `string` | — | Border color of both directions. Wins over `borderUpColor` / `borderDownColor` while it is set to a non-empty string. |
+| `wickVisible` | `boolean` | `true` | Whether wicks are drawn. |
+| `wickUpColor` | `string` | `'#26a69a'` | Wick color of rising candles. |
+| `wickDownColor` | `string` | `'#ef5350'` | Wick color of falling candles. |
+| `wickColor` | `string` | — | Wick color of both directions. Wins over `wickUpColor` / `wickDownColor` while it is set to a non-empty string. |
+| `wickLineCap` | `'butt' \| 'round'` | `'butt'` | Shape of the two wick ends. |
 | `radius` | `number \| ((barSpacing: number) => number)` | `bs => bs < 4 ? 0 : bs / 3` | Corner radius of the candle body, in CSS pixels. Either a constant, or a function of the current bar spacing. Use `0` for square candles. |
+| `upDownMode` | `'openClose' \| 'previousClose'` | `'openClose'` | How a candle is decided to be rising or falling. `'openClose'` compares `open <= close`, exactly as the built-in candlestick series does. `'previousClose'` compares the close with the previous candle's close and treats the first candle as rising. |
+| `hoverDimOpacity` | `number` | `1` | Opacity of the candles other than the hovered one while the series is hovered. `1` leaves the series unchanged. |
+
+Each data point may also carry `color`, `borderColor` and `wickColor`, which
+override the corresponding options for that candle only — the same per-item
+overrides the built-in candlestick series supports.
 
 ## Notes
 
-- A candle counts as *up* when its close is greater than or equal to the
-  **previous candle's close**, not its own open. This differs from the built-in
-  candlestick series, which compares close with open.
-- Wicks are always drawn, one pixel wide, in `wickUpColor` / `wickDownColor`.
-- The series accepts the whole set of built-in candlestick options, but the
-  renderer does not use all of them yet: `borderVisible`, `borderColor`,
-  `borderUpColor` and `borderDownColor` are accepted and no border is drawn,
-  and `wickVisible` and `wickColor` are accepted and ignored.
-- Rounded corners use `CanvasRenderingContext2D.roundRect`; in browsers without
-  it the series falls back to square candles.
+- A candle counts as *rising* when `open <= close`, exactly as the built-in
+  candlestick series decides it. `upDownMode: 'previousClose'` restores the
+  behaviour this plugin had while it was an example (close compared with the
+  previous close, the first candle always rising).
+- `borderColor` and `wickColor` are resolved at draw time, so clearing them
+  (setting them to an empty string) brings the up/down pair back. The built-in
+  series copies them into the pair once, in `applyOptions`, and cannot be
+  reverted that way.
+- Wicks are drawn above and below the body rather than as one bar behind it, so
+  a translucent body does not show its own wick through itself.
+- On hosts that support them (Lightweight Charts™ 5.1 and later) the series
+  reports the candle under the cursor through `hitTest`, and conflated candles
+  are merged open-first, close-last with the extremes of both.
+- Rounded corners use `CanvasRenderingContext2D.roundRect`, which every browser
+  the library supports provides.

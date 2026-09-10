@@ -1,5 +1,7 @@
-import { IChartApiBase, IRange, Time } from 'lightweight-charts';
+import { DataChangedScope, IChartApiBase, IRange, Time } from 'lightweight-charts';
 
+import { markerNote, priceLineNote } from './annotations';
+import { DataTableModel, buildTableModel } from './data-table';
 import { DescribeEnv, describePoint, describeSummary } from './describe';
 import { AccessibilityMessages } from './messages';
 import {
@@ -11,6 +13,8 @@ import {
 	zoomRange,
 } from './navigation';
 import { AccessibilityPaneOptions } from './options';
+import { applyPointUpdate, latestDataPoint } from './series-data';
+import { normalizeValue } from './sonification';
 import { AnySeries, SeriesDataPoint } from './types';
 
 /** What the cursor reads from, and calls back into, on the owning primitive. */
@@ -20,6 +24,8 @@ export interface CursorHost {
 	messages: () => AccessibilityMessages;
 	describeEnv: () => DescribeEnv;
 	announce: (message: string) => void;
+	/** Index of the pane the cursor lives in, reported by `onFocusChange`. */
+	paneIndex: () => number;
 	/** Called after the active point or series moved, so the focus ring follows. */
 	onMoved: () => void;
 }
@@ -30,17 +36,21 @@ export interface CursorHost {
  *
  * The active series' data is cached in `_points` because `series.data()` returns
  * a clone; the cache is refreshed only when the pane is actually in use (see
- * {@link markStale}).
+ * {@link markStale}) and a streamed `'update'` patches it in place instead of
+ * re-reading the whole series.
  */
 export class PaneCursor {
 	private readonly _host: CursorHost;
 	private _seriesList: AnySeries[] = [];
-	private _points: readonly SeriesDataPoint[] = [];
+	private _points: SeriesDataPoint[] = [];
 	// Set when the active series changes while the pane is unfocused, so the
 	// (O(n)-copy) re-read of `_points` is deferred until the pane is used again.
 	private _stale = false;
 	private _seriesIndex = 0;
 	private _pointIndex = -1;
+	// Value extremes of the active series, computed on demand for the
+	// sonification hook and invalidated whenever `_points` changes.
+	private _extremes: { min: number; max: number } | null = null;
 
 	public constructor(host: CursorHost) {
 		this._host = host;
@@ -64,6 +74,10 @@ export class PaneCursor {
 
 	public activePoint(): SeriesDataPoint | undefined {
 		return this._points[this._pointIndex];
+	}
+
+	public activePointIndex(): number {
+		return this._pointIndex;
 	}
 
 	public pointCount(): number {
@@ -93,29 +107,51 @@ export class PaneCursor {
 		return series ? this.seriesLabel(series, this._seriesIndex) : '';
 	}
 
-	/** Adopts the pane's current series, keeping the active index in range. */
+	/** Adopts the pane's current series, keeping the *same* series active if it is still there. */
 	public setSeriesList(current: readonly AnySeries[]): void {
+		// By identity, not by index: removing a series before the active one
+		// would otherwise silently move the focus to a different series.
+		const active = this.activeSeries();
 		this._seriesList = current.slice();
-		if (this._seriesIndex >= this._seriesList.length) {
-			this._seriesIndex = Math.max(0, this._seriesList.length - 1);
-		}
+		const kept = active ? this._seriesList.indexOf(active) : -1;
+		this._seriesIndex = kept >= 0 ? kept : clamp(this._seriesIndex, 0, Math.max(0, this._seriesList.length - 1));
 		this.refreshActivePoints();
 	}
 
 	/** Re-reads the active series' data into the navigation cache. */
 	public refreshActivePoints(): void {
 		const series = this.activeSeries();
-		this._points = series ? series.data() : [];
+		this._points = series ? series.data().slice() : [];
 		this._stale = false;
+		this._extremes = null;
 		if (this._pointIndex >= this._points.length) {
 			this._pointIndex = this._points.length - 1;
 		}
+	}
+
+	/**
+	 * Applies one data change to the navigation cache. A `'update'` (the shape a
+	 * live feed produces) patches the cached array with a single indexed lookup,
+	 * so a streaming chart does no work proportional to its history; anything
+	 * else re-reads the series.
+	 */
+	public applyDataChange(scope: DataChangedScope): void {
+		const series = this.activeSeries();
+		if (!series) {
+			return;
+		}
+		if (scope === 'update' && applyPointUpdate(this._points, latestDataPoint(series)) >= 0) {
+			this._extremes = null;
+			return;
+		}
+		this.refreshActivePoints();
 	}
 
 	public reset(): void {
 		this._seriesList = [];
 		this._points = [];
 		this._stale = false;
+		this._extremes = null;
 		this._seriesIndex = 0;
 		this._pointIndex = -1;
 	}
@@ -128,7 +164,7 @@ export class PaneCursor {
 		}
 		const base =
 			this._pointIndex < 0
-				? firstVisibleIndex(this._points, this._visibleRange(), this._logicalIndexOf)
+				? firstVisibleIndex(this._points, this._visibleRange(), this._logicalIndexOf) + (delta > 0 ? 0 : delta)
 				: this._pointIndex + delta;
 		// Navigation spans the whole series; setActivePoint pages the viewport so
 		// the target stays on screen, giving keyboard users access to every point.
@@ -139,6 +175,9 @@ export class PaneCursor {
 		this._pointIndex = index;
 		this._scrollActiveIntoView();
 		this._host.onMoved();
+		this._syncCrosshair();
+		this._sonify();
+		this._notifyFocusChange();
 		this._host.announce(this._describePoint(index));
 	}
 
@@ -176,6 +215,8 @@ export class PaneCursor {
 			this._scrollActiveIntoView();
 		}
 		this._host.onMoved();
+		this._syncCrosshair();
+		this._notifyFocusChange();
 		this._host.announce(this._host.messages().seriesPosition({
 			label: this.activeSeriesLabel(),
 			position: next + 1,
@@ -186,7 +227,8 @@ export class PaneCursor {
 
 	/**
 	 * Zooms the time scale in / out (the `+` / `-` keys) by shrinking / growing the
-	 * visible logical span, keeping the focused point where it is on screen.
+	 * visible logical span, keeping the focused point where it is on screen. The
+	 * new range is announced, so a screen-reader user knows what the key did.
 	 */
 	public zoom(zoomIn: boolean): void {
 		const timeScale = this._host.chart()?.timeScale();
@@ -207,6 +249,34 @@ export class PaneCursor {
 		}
 		timeScale.setVisibleLogicalRange(range);
 		this._host.onMoved();
+		this.announceVisibleRange();
+	}
+
+	/** Announces what is currently on screen (`+` / `-`, and pane entry when opted in). */
+	public announceVisibleRange(): void {
+		const message = this.visibleRangeMessage();
+		if (message.length > 0) {
+			this._host.announce(message);
+		}
+	}
+
+	/**
+	 * The "showing N points, from … to …" message for the current viewport, or
+	 * `''` when the active series has nothing on screen. Derived from the cached
+	 * points rather than `timeScale.getVisibleRange()`, which only catches up on
+	 * the next redraw.
+	 */
+	public visibleRangeMessage(): string {
+		const bounds = visibleBounds(this._points, this._visibleRange(), this._logicalIndexOf);
+		if (!bounds) {
+			return '';
+		}
+		const env = this._host.describeEnv();
+		return this._host.messages().visibleRange({
+			from: env.formatTime(this._points[bounds.from].time),
+			to: env.formatTime(this._points[bounds.to].time),
+			count: bounds.to - bounds.from + 1,
+		});
 	}
 
 	// region Descriptions ---------------------------------------------------------------
@@ -231,7 +301,21 @@ export class PaneCursor {
 		if (options.describeChart) {
 			return options.describeChart({ points, series, label, scope: options.dataScope });
 		}
-		return describeSummary(this._host.describeEnv(), points, label, series);
+		const env = this._host.describeEnv();
+		const notes = options.announcePriceLines
+			? priceLineNote(env.messages, series, (value: number) => env.formatValue(value, series))
+			: '';
+		return describeSummary(env, points, label, series, notes);
+	}
+
+	/** The "view as table" model for the active series' scoped points. */
+	public tableModel(): DataTableModel {
+		return buildTableModel(this._host.describeEnv(), {
+			points: this.scopedPoints(),
+			series: this.activeSeries(),
+			label: this.activeSeriesLabel(),
+			maxRows: this._host.options().tableMaxRows,
+		});
 	}
 
 	/**
@@ -246,12 +330,17 @@ export class PaneCursor {
 	}
 
 	private _describePoint(index: number): string {
+		const env = this._host.describeEnv();
+		const series = this.activeSeries();
+		const point = this._points[index];
+		const markers = series && point ? this._host.options().markers?.(series) : undefined;
 		return describePoint(
-			this._host.describeEnv(),
+			env,
 			this._points,
 			index,
 			this.activeSeriesLabel(),
-			this.activeSeries()
+			series,
+			markers && point ? markerNote(env.messages, markers, point.time) : ''
 		);
 	}
 
@@ -274,5 +363,77 @@ export class PaneCursor {
 		if (range) {
 			timeScale.setVisibleLogicalRange(range);
 		}
+	}
+
+	/** Moves the chart's crosshair onto the focused point (opt-in `syncCrosshair`). */
+	private _syncCrosshair(): void {
+		const chart = this._host.chart();
+		const series = this.activeSeries();
+		const point = this.activePoint();
+		if (!this._host.options().syncCrosshair || !chart || !series || !point) {
+			return;
+		}
+		const value = this._host.describeEnv().value(point, series);
+		if (value !== undefined) {
+			chart.setCrosshairPosition(value, point.time, series);
+		}
+	}
+
+	private _notifyFocusChange(): void {
+		const onFocusChange = this._host.options().onFocusChange;
+		if (!onFocusChange) {
+			return;
+		}
+		const series = this.activeSeries();
+		const point = this.activePoint();
+		onFocusChange({
+			paneIndex: this._host.paneIndex(),
+			series,
+			seriesIndex: this._seriesIndex,
+			point,
+			pointIndex: this._pointIndex,
+			value: this._host.describeEnv().value(point, series),
+		});
+	}
+
+	/** Hands the focused point to the sonification hook (opt-in `onSonify`). */
+	private _sonify(): void {
+		const onSonify = this._host.options().onSonify;
+		const point = this.activePoint();
+		if (!onSonify || !point) {
+			return;
+		}
+		const series = this.activeSeries();
+		const value = this._host.describeEnv().value(point, series);
+		const { min, max } = this._valueExtremes();
+		onSonify({
+			value,
+			min,
+			max,
+			normalized: value === undefined ? 0.5 : normalizeValue(value, min, max),
+			index: this._pointIndex,
+			total: this._points.length,
+			time: point.time,
+		});
+	}
+
+	/** Value extremes of the whole active series, cached until its data changes. */
+	private _valueExtremes(): { min: number; max: number } {
+		if (this._extremes === null) {
+			const series = this.activeSeries();
+			const value = this._host.describeEnv().value;
+			let min = Number.POSITIVE_INFINITY;
+			let max = Number.NEGATIVE_INFINITY;
+			for (const point of this._points) {
+				const current = value(point, series);
+				if (current === undefined) {
+					continue;
+				}
+				min = Math.min(min, current);
+				max = Math.max(max, current);
+			}
+			this._extremes = Number.isFinite(min) ? { min, max } : { min: 0, max: 0 };
+		}
+		return this._extremes;
 	}
 }

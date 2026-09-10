@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
+import { LineStyle } from 'lightweight-charts';
 import type { IRange, Logical } from 'lightweight-charts';
 
 import { BrushableAreaSeriesOptions, defaultOptions } from '../../src/options.js';
@@ -20,6 +21,7 @@ const green = {
 	topColor: 'rgba(4,153,129, 0.4)',
 	bottomColor: 'rgba(4,153,129, 0)',
 	lineWidth: 3,
+	lineStyle: LineStyle.Dashed,
 } as const;
 
 void describe('createStyleResolver', () => {
@@ -30,6 +32,7 @@ void describe('createStyleResolver', () => {
 			topColor: defaultOptions.topColor,
 			bottomColor: defaultOptions.bottomColor,
 			lineWidth: defaultOptions.lineWidth,
+			lineStyle: defaultOptions.lineStyle,
 		});
 	});
 
@@ -54,6 +57,7 @@ void describe('createStyleResolver', () => {
 			topColor: defaultOptions.topColor,
 			bottomColor: defaultOptions.bottomColor,
 			lineWidth: 4,
+			lineStyle: defaultOptions.lineStyle,
 		});
 	});
 
@@ -67,7 +71,7 @@ void describe('createStyleResolver', () => {
 		expect(resolve(4).lineColor).to.equal(defaultOptions.lineColor);
 	});
 
-	void it('lets the first matching range win when ranges overlap', () => {
+	void it('lets the last matching range win when ranges overlap', () => {
 		const resolve = createStyleResolver(
 			options({
 				brushRanges: [
@@ -76,7 +80,8 @@ void describe('createStyleResolver', () => {
 				],
 			})
 		);
-		expect(resolve(6).lineColor).to.equal(green.lineColor);
+		expect(resolve(2).lineColor).to.equal(green.lineColor);
+		expect(resolve(6).lineColor).to.equal('#F23645');
 		expect(resolve(12).lineColor).to.equal('#F23645');
 	});
 
@@ -96,6 +101,7 @@ void describe('createStyleResolver', () => {
 			topColor: defaultOptions.topColor,
 			bottomColor: defaultOptions.bottomColor,
 			lineWidth: defaultOptions.lineWidth,
+			lineStyle: defaultOptions.lineStyle,
 		});
 		expect(resolve(2).lineColor).to.equal(green.lineColor);
 	});

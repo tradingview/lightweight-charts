@@ -1,22 +1,29 @@
+import { paneContentElement } from '@tradingview/lwc-toolkit/dom/pane-element';
+import { PanePluginBase } from '@tradingview/lwc-toolkit/pane-plugin-base';
 import {
 	IChartApiBase,
 	IPaneApi,
-	IPanePrimitive,
+	IRange,
 	PaneAttachedParameter,
 	Time,
 } from 'lightweight-charts';
 
-import { DescribeEnv, describeSeriesUpdate } from './describe';
-import { PaneLayer, PaneLayerView, findPaneContentElement } from './dom/pane-dom';
+import { DescribeEnv, extractRange, extractValue } from './describe';
+import { PaneLayer, PaneLayerView } from './dom/pane-dom';
 import { Formatters } from './format';
 import { FocusRingStyle, focusRingCoordinate } from './focus-ring';
 import { HighContrastWatcher, resolveHighContrast } from './high-contrast';
 import { AccessibilityCommand, commandForKey } from './keyboard';
 import { AccessibilityMessages, defaultMessages, mergeMessages } from './messages';
-import { AccessibilityPaneOptions, defaultPaneOptions } from './options';
+import { AccessibilityPaneOptions, PointRange, defaultPaneOptions, definedOptions } from './options';
+import { createCommands } from './pane-commands';
 import { PaneCursor } from './pane-cursor';
-import { AnySeries } from './types';
-import { PaneUpdates, UpdateAnnouncer, paneLinks } from './update-announcer';
+import { SeriesSync } from './series-sync';
+import { AnySeries, SeriesDataPoint } from './types';
+import { ControllerHooks, PaneUpdates, UpdateAnnouncer, paneLinks } from './update-announcer';
+
+/** How many animation frames the layer waits for its pane widget to appear. */
+const MAX_INIT_ATTEMPTS = 60;
 
 /**
  * AccessibilityPlugin – a pane primitive that adds a semantic accessibility
@@ -32,6 +39,7 @@ import { PaneUpdates, UpdateAnnouncer, paneLinks } from './update-announcer';
  *   the up/down arrows switch between the series in the pane.
  * - `aria-live` announcements of the focused point, series changes, on-demand
  *   summaries and background data updates.
+ * - A "view as table" panel (`T`), the WCAG text alternative for the chart.
  * - An optional visible focus indicator that stays synchronised with the canvas
  *   as the user scrolls or zooms.
  *
@@ -43,34 +51,38 @@ import { PaneUpdates, UpdateAnnouncer, paneLinks } from './update-announcer';
  * `dataScope: 'visible'` keeps the spoken summaries scoped to the viewport on
  * large data sets.
  */
-export class AccessibilityPlugin implements IPanePrimitive<Time> {
+export class AccessibilityPlugin extends PanePluginBase<Time> {
 	private _options: AccessibilityPaneOptions;
 	private _messages: AccessibilityMessages;
 	// Only used to find the pane before the layer exists; afterwards the pane is
 	// identified by the row that actually hosts the layer.
 	private readonly _initialPaneIndex: number;
-	private _chart: IChartApiBase<Time> | null = null;
+	private _isAttached = false;
 	private _layer: PaneLayer | null = null;
-	private _requestUpdate: (() => void) | null = null;
 
 	private readonly _formatters: Formatters;
 	private readonly _cursor: PaneCursor;
 	private readonly _updates: PaneUpdates;
-	// One `subscribeDataChanged` handler per series, so we react to real data
-	// changes instead of polling and re-hashing on every redraw.
-	private readonly _dataChangedHandlers = new Map<AnySeries, () => void>();
+	private readonly _series: SeriesSync;
+	/** What each key does; built once the cursor and the option accessors exist. */
+	private readonly _commands: Record<AccessibilityCommand, () => void>;
 	// When attached via addAccessibilityPlugin, data-update announcements are
 	// routed through one shared region instead of this pane's own polite region.
 	private _updateAnnouncer: UpdateAnnouncer | null = null;
+	private _controller: ControllerHooks | null = null;
 
 	private _shortcutsOpen = false;
 	private _hasFocus = false;
 	private _built = false;
 	private _initAttempts = 0;
+	private _initHandle: ReturnType<typeof requestAnimationFrame> | null = null;
 	// Resolved high-contrast state, plus the OS media queries that drive `'auto'`.
 	private _highContrast = false;
 	private _highContrastInitialised = false;
 	private _contrastWatcher: HighContrastWatcher | null = null;
+	// The last handler notified, so a newly supplied one is called with the
+	// current state instead of waiting for the next change.
+	private _contrastListener: ((enabled: boolean) => void) | undefined = undefined;
 
 	/**
 	 * @param options - per-pane options; see {@link AccessibilityPaneOptions}.
@@ -79,20 +91,22 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	 * {@link addAccessibilityPlugin} passes it automatically.
 	 */
 	public constructor(options: Partial<AccessibilityPaneOptions> = {}, paneIndex: number = 0) {
-		this._options = { ...defaultPaneOptions, ...options };
+		super();
+		this._options = { ...defaultPaneOptions, ...definedOptions(options) };
 		this._messages = mergeMessages(defaultMessages, this._options.messages);
 		this._initialPaneIndex = paneIndex;
 		this._formatters = new Formatters(() => ({
-			chart: this._chart,
+			chart: this._chartOrNull(),
 			options: this._options,
 			messages: this._messages,
 		}));
 		this._cursor = new PaneCursor({
-			chart: (): IChartApiBase<Time> | null => this._chart,
+			chart: (): IChartApiBase<Time> | null => this._chartOrNull(),
 			options: (): AccessibilityPaneOptions => this._options,
 			messages: (): AccessibilityMessages => this._messages,
 			describeEnv: (): DescribeEnv => this._describeEnv(),
-			announce: (message: string): void => this._layer?.liveWriter.write(message),
+			announce: (message: string): void => this._announce(message),
+			paneIndex: (): number => this._paneIndex(),
 			onMoved: (): void => this._positionIndicator(),
 		});
 		this._updates = new PaneUpdates({
@@ -103,12 +117,44 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 				messages: this._messages,
 			}),
 			seriesOrder: (): readonly AnySeries[] => this._cursor.seriesList(),
-			describe: (series: AnySeries): string => this._describeSeriesUpdate(series),
-			write: (message: string): void => this._layer?.statusWriter.write(message),
+			describe: (series: AnySeries): string => this._series.describeUpdate(series),
+			write: (message: string): void => this._announceStatus(message),
+		});
+		this._series = new SeriesSync({
+			pane: (): IPaneApi<Time> | null => this._pane(),
+			options: (): AccessibilityPaneOptions => this._options,
+			describeEnv: (): DescribeEnv => this._describeEnv(),
+			visibleRange: (): IRange<number> | null =>
+				this._chartOrNull()?.timeScale().getVisibleLogicalRange() ?? null,
+			hasFocus: (): boolean => this._hasFocus,
+			cursor: this._cursor,
+			updates: this._updates,
+			announcer: (): UpdateAnnouncer | null => this._updateAnnouncer,
+			onSeriesChanged: (): void => {
+				this._render();
+				this._positionIndicator();
+			},
+			onActiveDataChanged: (): void => this._positionIndicator(),
+		});
+		this._commands = createCommands({
+			cursor: this._cursor,
+			layer: (): PaneLayer | null => this._layer,
+			options: (): AccessibilityPaneOptions => this._options,
+			messages: (): AccessibilityMessages => this._messages,
+			announce: (message: string): void => this._announce(message),
+			highContrast: (): boolean => this._highContrast,
+			shortcutsOpen: (): boolean => this._shortcutsOpen,
+			setShortcutsOpen: (open: boolean): void => {
+				this._shortcutsOpen = open;
+			},
+			render: (): void => this._render(),
 		});
 		// Internal coordination is registered off the public surface (see PaneLink).
 		paneLinks.set(this, {
 			attachAnnouncer: (announcer: UpdateAnnouncer | null): void => this._attachAnnouncer(announcer),
+			attachController: (hooks: ControllerHooks | null): void => {
+				this._controller = hooks;
+			},
 			source: this._updates,
 		});
 	}
@@ -116,36 +162,47 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	// region IPanePrimitive lifecycle ---------------------------------------------------
 
 	public attached(param: PaneAttachedParameter<Time>): void {
-		this._chart = param.chart;
-		this._requestUpdate = param.requestUpdate;
+		super.attached(param);
+		this._isAttached = true;
 		this._tryInit();
 	}
 
 	public detached(): void {
 		this._updates.dispose();
-		this._unsubscribeAll();
+		this._series.dispose();
 		// The announcer itself is owned and disposed by addAccessibilityPlugin;
 		// here we just drop our reference to it.
 		this._updateAnnouncer = null;
+		if (this._initHandle !== null) {
+			cancelAnimationFrame(this._initHandle);
+			this._initHandle = null;
+		}
 		const layer = this._layer;
 		if (layer) {
 			layer.container.removeEventListener('keydown', this._handleKeyDown);
 			layer.container.removeEventListener('focusin', this._handleFocusIn);
 			layer.container.removeEventListener('focusout', this._handleFocusOut);
+			layer.host.removeEventListener('pointerdown', this._handlePointerDown);
 			layer.remove();
 		}
 		this._contrastWatcher?.dispose();
 		this._contrastWatcher = null;
 		this._cursor.reset();
 
-		this._chart = null;
-		this._requestUpdate = null;
+		this._isAttached = false;
 		this._layer = null;
 		this._shortcutsOpen = false;
 		this._highContrast = false;
 		this._highContrastInitialised = false;
+		this._contrastListener = undefined;
 		this._built = false;
 		this._initAttempts = 0;
+		// Tell the controller (if any) before releasing the chart, so it can drop
+		// this pane from its list when the library detached us.
+		const controller = this._controller;
+		this._controller = null;
+		super.detached();
+		controller?.detached();
 	}
 
 	/**
@@ -156,18 +213,22 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	 * hashes bar data and stays cheap during scrolling and zooming.
 	 */
 	public updateAllViews(): void {
+		// A cheap pane-count check, so panes added or removed at runtime are picked
+		// up by the controller without a full teardown.
+		this._controller?.sync();
 		if (!this._built) {
 			this._tryInit();
 			return;
 		}
 		this._positionIndicator();
-		this._syncSeries();
+		this._series.sync();
 	}
 
 	// region Options --------------------------------------------------------------------
 
 	public applyOptions(options: Partial<AccessibilityPaneOptions>): void {
-		this._options = { ...this._options, ...options };
+		// An explicit `undefined` must not erase the current value.
+		this._options = { ...this._options, ...definedOptions(options) };
 		// Re-merge from defaultMessages so repeated partial overrides compose
 		// against English rather than each other.
 		this._messages = mergeMessages(defaultMessages, this._options.messages);
@@ -190,18 +251,20 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 	 * A freshly created pane may not have its HTML element yet. The pane widget
 	 * is built by the next redraw, so request one – the resulting updateAllViews
 	 * retries this init. The animation-frame fallback covers the window in which
-	 * the chart is still processing the invalidation.
+	 * the chart is still processing the invalidation, and is cancelled on detach.
 	 */
 	private _tryInit(): void {
-		if (this._built || !this._chart) {
+		this._initHandle = null;
+		if (this._built || !this._isAttached) {
 			return;
 		}
-		const paneElement = this._pane()?.getHTMLElement() ?? null;
-		const paneContent = paneElement ? findPaneContentElement(paneElement) : null;
+		const pane = this._pane();
+		const paneElement = pane?.getHTMLElement() ?? null;
+		const paneContent = pane ? paneContentElement(pane) : null;
 		if (!paneElement || !paneContent) {
-			this._requestUpdate?.();
-			if (this._initAttempts++ < 60) {
-				requestAnimationFrame(() => this._tryInit());
+			this.requestUpdate();
+			if (this._initAttempts++ < MAX_INIT_ATTEMPTS) {
+				this._initHandle = requestAnimationFrame(() => this._tryInit());
 			}
 			return;
 		}
@@ -214,11 +277,12 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		// Resolve high contrast last: restyles the nodes above and fires the initial
 		// onHighContrastChange so the host can set its matching chart theme.
 		this._refreshHighContrast();
-		this._syncSeries();
+		this._series.sync();
 
 		this._layer.container.addEventListener('keydown', this._handleKeyDown);
 		this._layer.container.addEventListener('focusin', this._handleFocusIn);
 		this._layer.container.addEventListener('focusout', this._handleFocusOut);
+		this._layer.host.addEventListener('pointerdown', this._handlePointerDown);
 	}
 
 	/**
@@ -236,8 +300,13 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 
 	// region Rendering ------------------------------------------------------------------
 
+	/** The chart while attached, `null` otherwise – the base class getter throws. */
+	private _chartOrNull(): IChartApiBase<Time> | null {
+		return this._isAttached ? this.chart : null;
+	}
+
 	private _pane(): IPaneApi<Time> | null {
-		const panes = this._chart?.panes() ?? [];
+		const panes = this._chartOrNull()?.panes() ?? [];
 		// Pane indices shift when panes are added or removed, so once our DOM is
 		// in place, identify the pane by the row that actually hosts our layer;
 		// the constructor index is only the initial (pre-build) lookup. Built but
@@ -245,9 +314,14 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		// silently re-binding to whatever pane holds the index now.
 		const container = this._layer?.container;
 		if (container) {
-			return panes.find(pane => pane.getHTMLElement()?.contains(container) ?? false) ?? null;
+			return panes.find((pane: IPaneApi<Time>) => pane.getHTMLElement()?.contains(container) ?? false) ?? null;
 		}
 		return panes[this._initialPaneIndex] ?? null;
+	}
+
+	/** The pane's current index, which changes when panes are added, removed or moved. */
+	private _paneIndex(): number {
+		return this._pane()?.paneIndex() ?? this._initialPaneIndex;
 	}
 
 	private _focusRingStyle(): FocusRingStyle {
@@ -265,13 +339,14 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			roleDescription: this._messages.roleDescription,
 			label: this._messages.paneLabel({
 				title: this._options.chartTitle ?? this._messages.defaultChartTitle,
-				paneIndex: this._pane()?.paneIndex() ?? this._initialPaneIndex,
-				paneCount: this._chart?.panes().length ?? 1,
+				paneIndex: this._paneIndex(),
+				paneCount: this._chartOrNull()?.panes().length ?? 1,
 				seriesCount,
 				seriesLabel: series ? this._cursor.seriesLabel(series, this._cursor.activeSeriesIndex()) : null,
 			}),
 			description: this._messages.description({ multiSeries: seriesCount > 1 }),
 			lang: this._options.lang ?? this._formatters.locale(),
+			direction: this._direction(),
 			focusRing: this._focusRingStyle(),
 			hasFocus: this._hasFocus,
 			shortcutsEnabled: this._options.showShortcuts,
@@ -282,24 +357,41 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		};
 	}
 
+	/**
+	 * The host page's writing direction, read from the element the chart was
+	 * created in: the library forces `direction: ltr` on the chart element itself,
+	 * so the plugin's own panels would otherwise stay on the left of a
+	 * right-to-left page.
+	 */
+	private _direction(): 'ltr' | 'rtl' {
+		const host = this._chartOrNull()?.chartElement().parentElement ?? null;
+		return host && window.getComputedStyle(host).direction === 'rtl' ? 'rtl' : 'ltr';
+	}
+
 	private _render(): void {
 		this._layer?.render(this._view());
 	}
 
 	/**
-	 * Recomputes the high-contrast state; on a change (or the first call) restyles
-	 * the plugin's own visuals and notifies the host through onHighContrastChange.
+	 * Recomputes the high-contrast state; on a change (or when a new listener was
+	 * supplied) restyles the plugin's own visuals and notifies the host through
+	 * onHighContrastChange.
 	 */
 	private _refreshHighContrast(): void {
 		const next = resolveHighContrast(this._options.highContrast);
-		if (this._highContrastInitialised && next === this._highContrast) {
+		const listener = this._options.onHighContrastChange;
+		const changed = !this._highContrastInitialised || next !== this._highContrast;
+		if (!changed && listener === this._contrastListener) {
 			return;
 		}
 		this._highContrast = next;
 		this._highContrastInitialised = true;
-		this._render();
-		this._positionIndicator();
-		this._options.onHighContrastChange?.(next);
+		this._contrastListener = listener;
+		if (changed) {
+			this._render();
+			this._positionIndicator();
+		}
+		listener?.(next);
 	}
 
 	private _describeEnv(): DescribeEnv {
@@ -309,9 +401,35 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			scopeNote: this._options.dataScope === 'visible' && inView ? ` ${inView}` : '',
 			formatValue: (value: number | undefined, series: AnySeries | null): string =>
 				this._formatters.value(value, series),
+			formatChange: (value: number, series: AnySeries | null): string =>
+				this._formatters.change(value, series),
 			formatTime: (time: Time): string => this._formatters.time(time),
 			formatPercent: (value: number): string => this._formatters.percent(value),
+			value: (point: SeriesDataPoint | undefined, series: AnySeries | null): number | undefined =>
+				extractValue(point, series, this._options.valueAccessor),
+			range: (point: SeriesDataPoint | undefined, series: AnySeries | null): PointRange | undefined =>
+				extractRange(point, series, this._options.rangeAccessor),
 		};
+	}
+
+	// region Announcements --------------------------------------------------------------
+
+	/** Speaks through this pane's assertive region, mirroring to `onAnnounce`. */
+	private _announce(message: string): void {
+		if (message.length === 0) {
+			return;
+		}
+		this._options.onAnnounce?.(message);
+		this._layer?.liveWriter.write(message);
+	}
+
+	/** Speaks through this pane's own polite region (no shared region in place). */
+	private _announceStatus(message: string): void {
+		if (message.length === 0) {
+			return;
+		}
+		this._options.onAnnounce?.(message);
+		this._layer?.statusWriter.write(message);
 	}
 
 	// region Focus and keyboard ---------------------------------------------------------
@@ -328,10 +446,13 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		// Tell the shared announcer this pane is now the active one, so in the
 		// default 'active' mode its data updates are the ones that get announced.
 		this._updateAnnouncer?.setActiveSource(this._updates);
-		// No live-region announcement on focus: the accessible name (aria-label) and
-		// the aria-describedby hint are spoken when focus lands. An assertive message
-		// here would interrupt the name (e.g. VoiceOver cuts off the title); the H key
-		// gives the full controls.
+		// By default nothing is announced on focus: the accessible name (aria-label)
+		// and the aria-describedby hint are spoken when focus lands, and an
+		// assertive message here would interrupt the name (e.g. VoiceOver cuts off
+		// the title). `announceOnFocus` opts into "what is on screen" instead.
+		if (this._options.announceOnFocus) {
+			this._cursor.announceVisibleRange();
+		}
 	};
 
 	private _handleFocusOut = (event: FocusEvent): void => {
@@ -341,135 +462,43 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 		}
 		this._hasFocus = false;
 		this._shortcutsOpen = false;
+		this._layer?.table.close();
 		this._render();
 		this._layer?.hideRing();
 	};
 
-	private _handleKeyDown = (event: KeyboardEvent): void => {
-		if (this._cursor.pointCount() === 0 && this._cursor.seriesCount() === 0) {
-			return;
+	/**
+	 * Pointer users cannot reach the semantic layer (it is `pointer-events: none`
+	 * so the chart stays interactive), so `focusOnPointerDown` opts into moving
+	 * the keyboard focus there when the pane is pressed – mouse and keyboard then
+	 * share one notion of "the focused chart".
+	 */
+	private _handlePointerDown = (): void => {
+		if (this._options.focusOnPointerDown) {
+			this.focus();
 		}
+	};
+
+	private _handleKeyDown = (event: KeyboardEvent): void => {
 		// Leave shortcut combinations (e.g. browser or screen-reader commands such
 		// as Ctrl+Home, or VoiceOver's modifier chords) to the platform.
 		if (event.altKey || event.ctrlKey || event.metaKey) {
 			return;
 		}
-		const command = commandForKey(event.key);
+		const command = commandForKey(
+			{ key: event.key, code: event.code, shiftKey: event.shiftKey },
+			this._options.keyBindings
+		);
 		if (command === null) {
+			return;
+		}
+		// An empty pane still closes an open panel; everything else needs data.
+		if (command !== 'closePanels' && this._cursor.pointCount() === 0 && this._cursor.seriesCount() === 0) {
 			return;
 		}
 		event.preventDefault();
 		this._commands[command]();
 	};
-
-	private readonly _commands: Record<AccessibilityCommand, () => void> = {
-		nextPoint: (): void => this._cursor.movePoint(1),
-		previousPoint: (): void => this._cursor.movePoint(-1),
-		previousSeries: (): void => this._cursor.moveSeries(-1),
-		nextSeries: (): void => this._cursor.moveSeries(1),
-		pageForward: (): void => this._cursor.movePoint(this._options.pageStep),
-		pageBack: (): void => this._cursor.movePoint(-this._options.pageStep),
-		firstPoint: (): void => this._cursor.setFirstPoint(),
-		lastPoint: (): void => this._cursor.setLastPoint(),
-		zoomIn: (): void => this._cursor.zoom(true),
-		zoomOut: (): void => this._cursor.zoom(false),
-		summary: (): void => this._layer?.liveWriter.write(this._cursor.describe()),
-		// H both speaks the controls and toggles the visible panel.
-		help: (): void => {
-			this._layer?.liveWriter.write(this._messages.help({
-				multiSeries: this._cursor.seriesCount() > 1,
-				pageStep: this._options.pageStep,
-			}));
-			this._shortcutsOpen = !this._shortcutsOpen && this._options.showShortcuts;
-			this._render();
-		},
-	};
-
-	// region Data synchronisation -------------------------------------------------------
-
-	/**
-	 * Reconciles our per-series `subscribeDataChanged` subscriptions with the
-	 * series currently in the pane. Cheap to call on every redraw: it only reads
-	 * the already-allocated series handles and returns early unless the set of
-	 * series changed, so scrolling and zooming never re-read or re-hash bar data.
-	 * Actual data-content changes are delivered by the subscriptions instead.
-	 */
-	private _syncSeries(): void {
-		const pane = this._pane();
-		if (!pane) {
-			return;
-		}
-		const current = pane.getSeries();
-		const known = this._cursor.seriesList();
-		if (current.length === known.length && current.every((series: AnySeries, index: number) => series === known[index])) {
-			return;
-		}
-		for (const [series, handler] of this._dataChangedHandlers) {
-			if (!current.includes(series)) {
-				series.unsubscribeDataChanged(handler);
-				this._dataChangedHandlers.delete(series);
-				this._updates.forget(series);
-			}
-		}
-		for (const series of current) {
-			if (!this._dataChangedHandlers.has(series)) {
-				const handler = (): void => this._handleSeriesDataChanged(series);
-				series.subscribeDataChanged(handler);
-				this._dataChangedHandlers.set(series, handler);
-			}
-		}
-		this._cursor.setSeriesList(current);
-		this._render();
-		this._positionIndicator();
-	}
-
-	/**
-	 * Fired by the library when a series' data actually changes (set/update) – not
-	 * on scroll or zoom. Nothing is read or copied here: the active series'
-	 * navigation cache is refreshed only while the pane is in use, and update
-	 * announcements read the changed series once per debounced flush.
-	 */
-	private _handleSeriesDataChanged(series: AnySeries): void {
-		const index = this._cursor.seriesList().indexOf(series);
-		if (index < 0) {
-			return;
-		}
-		if (index === this._cursor.activeSeriesIndex()) {
-			if (this._hasFocus) {
-				this._cursor.refreshActivePoints();
-				this._positionIndicator();
-			} else {
-				this._cursor.markStale();
-			}
-		}
-		if (this._options.announceDataUpdates) {
-			this._updates.markDirty(series);
-			if (this._updateAnnouncer) {
-				// Shared region: the announcer owns the single debounce timer and
-				// pulls our summaries at flush time via the internal PaneLink.
-				this._updateAnnouncer.notifyDirty(this._updates);
-			} else {
-				this._updates.schedule();
-			}
-		}
-	}
-
-	private _describeSeriesUpdate(series: AnySeries): string {
-		const data = series.data();
-		return describeSeriesUpdate(this._describeEnv(), {
-			label: this._cursor.seriesLabel(series, this._cursor.seriesList().indexOf(series)),
-			series,
-			data,
-			scopedCount: this._cursor.scopedPoints(data).length,
-		});
-	}
-
-	private _unsubscribeAll(): void {
-		for (const [series, handler] of this._dataChangedHandlers) {
-			series.unsubscribeDataChanged(handler);
-		}
-		this._dataChangedHandlers.clear();
-	}
 
 	// region Visible focus indicator ----------------------------------------------------
 
@@ -479,10 +508,11 @@ export class AccessibilityPlugin implements IPanePrimitive<Time> {
 			return;
 		}
 		const coordinate = focusRingCoordinate(
-			this._chart,
+			this._chartOrNull(),
 			this._cursor.activeSeries(),
 			this._cursor.activePoint(),
-			this._options.showFocusIndicator && this._hasFocus
+			this._options.showFocusIndicator && this._hasFocus,
+			this._options.valueAccessor
 		);
 		if (coordinate === null) {
 			layer.hideRing();

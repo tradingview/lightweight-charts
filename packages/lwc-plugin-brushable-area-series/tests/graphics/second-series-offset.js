@@ -29,9 +29,9 @@ const greenStyle = {
 
 // The grey line series starts 20 bars EARLIER than the brushable series, so
 // logical index 20 is the brushable series' FIRST point. brushRanges are
-// documented as logical indices, but the renderer matches them against the
-// index into its own bars array, so the highlight lands 20 bars to the right
-// of the requested logical range - this case documents that bug.
+// logical indices of the time scale, so the highlight has to land on logical
+// 30..49 - a quarter of the way in - and not on the brushable series' own
+// array indices 30..49, which would put it 20 bars further right.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
@@ -45,8 +45,7 @@ function runTestCase(container) {
 	}, fadeStyle));
 	series.setData(generateData(60, 20));
 
-	// Requested logical indices 30..49 (just left of centre); rendered at
-	// logical 50..69 instead.
+	// Logical indices 30..49, just left of centre.
 	series.applyOptions({
 		brushRanges: [{ range: { from: 30, to: 50 }, style: greenStyle }],
 	});

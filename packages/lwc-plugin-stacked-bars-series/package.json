@@ -37,7 +37,7 @@
 	"scripts": {
 		"dev": "vite --config src/vite.config.js",
 		"build": "tsc && node compile.mjs",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit && tsc -p tsconfig.tests.json",
 		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
 		"prepack": "node -e \"require('fs').copyFileSync('../../LICENSE', 'LICENSE')\"",
 		"postpack": "node -e \"require('fs').unlinkSync('LICENSE')\""
@@ -45,12 +45,12 @@
 	"peerDependencies": {
 		"lightweight-charts": "^5.0.0"
 	},
-	"dependencies": {
-		"fancy-canvas": "~2.1.0"
-	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.5",
 		"@tradingview/lwc-toolkit": "workspace:*",
+		"@types/chai": "5.2.1",
+		"@types/node": "22.13.14",
+		"chai": "5.2.0",
 		"dts-bundle-generator": "9.5.1",
 		"lightweight-charts": "workspace:*",
 		"publint": "0.3.14",

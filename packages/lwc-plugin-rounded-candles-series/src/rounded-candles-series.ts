@@ -1,40 +1,23 @@
 import {
-	CandlestickSeriesOptions,
-	CustomSeriesOptions,
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
+	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
 	Time,
-	customSeriesDefaultOptions,
 } from 'lightweight-charts';
 import { RoundedCandleData } from './data';
-import { RoundedCandleRadius } from './radius';
+import { RoundedCandleSeriesOptions, defaultOptions } from './options';
 import { RoundedCandleSeriesRenderer } from './renderer';
 
-export interface RoundedCandleSeriesOptions
-	extends CustomSeriesOptions,
-		CandlestickSeriesOptions {
-	radius: RoundedCandleRadius;
+/**
+ * One of the two data points a conflation reducer is handed. Declared here
+ * rather than imported so that the package still typechecks against
+ * `lightweight-charts` 5.0.0, which has no conflation.
+ */
+export interface RoundedCandleConflationContext<TData> {
+	readonly data: TData;
 }
-
-const defaultOptions: RoundedCandleSeriesOptions = {
-	...customSeriesDefaultOptions,
-	upColor: '#26a69a',
-	downColor: '#ef5350',
-	wickVisible: true,
-	borderVisible: true,
-	borderColor: '#378658',
-	borderUpColor: '#26a69a',
-	borderDownColor: '#ef5350',
-	wickColor: '#737375',
-	wickUpColor: '#26a69a',
-	wickDownColor: '#ef5350',
-	radius: function (bs: number): number {
-		if (bs < 4) return 0;
-		return bs / 3;
-	},
-} as const;
 
 export class RoundedCandleSeries<
 	HorzScaleItem = Time,
@@ -51,14 +34,20 @@ export class RoundedCandleSeries<
 		return [plotRow.high, plotRow.low, plotRow.close];
 	}
 
-	public renderer(): RoundedCandleSeriesRenderer<HorzScaleItem, TData> {
+	public renderer(): ICustomSeriesPaneRenderer {
 		return this._renderer;
 	}
 
 	public isWhitespace(
 		data: TData | CustomSeriesWhitespaceData<HorzScaleItem>
 	): data is CustomSeriesWhitespaceData<HorzScaleItem> {
-		return (data as Partial<TData>).close === undefined;
+		const point = data as Partial<TData>;
+		return (
+			point.open === undefined ||
+			point.high === undefined ||
+			point.low === undefined ||
+			point.close === undefined
+		);
 	}
 
 	public update(
@@ -68,6 +57,25 @@ export class RoundedCandleSeries<
 		this._renderer.update(data, options);
 	}
 
+	/**
+	 * Merges two candles into one while the chart conflates data: the open of
+	 * the first, the close of the second, and the extremes of both. The per-item
+	 * color overrides of the first candle are kept.
+	 */
+	public conflationReducer(
+		item1: RoundedCandleConflationContext<TData>,
+		item2: RoundedCandleConflationContext<TData>
+	): TData {
+		const first = item1.data;
+		const second = item2.data;
+		return {
+			...first,
+			high: Math.max(first.high, second.high),
+			low: Math.min(first.low, second.low),
+			close: second.close,
+		} as TData;
+	}
+
 	public defaultOptions(): RoundedCandleSeriesOptions {
 		return defaultOptions;
 	}
@@ -75,4 +83,10 @@ export class RoundedCandleSeries<
 
 export type { RoundedCandleData, RoundedCandleSeriesData } from './data';
 export type { RoundedCandleRadius } from './radius';
+export type {
+	RoundedCandleSeriesOptions,
+	RoundedCandleUpDownMode,
+	RoundedCandleWickLineCap,
+} from './options';
+export type { CandleColorSource, ResolvedCandleColors } from './colors';
 export { defaultOptions };

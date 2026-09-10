@@ -110,6 +110,10 @@ the state it found it in:
 accessibility.detach();
 ```
 
+Call `accessibility.refresh()` to attach it again (it re-attaches whatever panes
+the chart has at that moment). Detach before `chart.remove()` where you can; the
+other order is safe too — `detach()` skips panes that are already gone.
+
 If you need low-level control, you can still attach `AccessibilityPlugin`
 directly as a pane primitive. It takes `AccessibilityPaneOptions` and, as a
 second constructor argument, the index of the pane you attach it to (only needed
@@ -139,14 +143,19 @@ on the helper.
   arrows and switch between the series in the pane with the up/down arrows. The
   focused point is always paged into view, so the whole series is reachable by
   keyboard even when only part of it is on screen.
-- **ARIA-live announcements.** The focused point, series changes and on-demand
-  summaries are announced through a per-pane assertive live region. Background
+- **ARIA-live announcements.** The focused point, series changes, on-demand
+  summaries, the visible range after a zoom, markers on the focused point and
+  the active series' price lines are announced through a per-pane assertive live
+  region. Background
   data updates go through a single polite live region shared by the whole chart,
   so simultaneous updates in different panes never talk over each other
   (`dataUpdates`, see below).
+- **A text alternative.** `T` renders the active series as a real `<table>` over
+  the pane, on demand (see below).
 - **Visible focus indicator.** The focused pane receives an outline, and an
   optional focus ring is drawn over the active point. The point ring stays
-  aligned with the canvas as you scroll or zoom.
+  aligned with the canvas as you scroll or zoom, and `syncCrosshair` moves the
+  chart's crosshair with it.
 - **Visible shortcuts & high contrast (opt-in).** With `showShortcuts: true`,
   sighted keyboard users get a "Press H" hint on focus and an `H`-toggled
   on-screen list of the controls. `highContrast` (default `'auto'`, following the
@@ -165,7 +174,22 @@ on the helper.
 | `Home` / `End` | Jump to the first / last point |
 | `+` / `-` | Zoom the chart in / out |
 | `Enter` / `Space` | Announce a summary of the active series |
+| `T` | Show / hide the data as a table (see below) |
+| `Esc` | Close the open panel (table or shortcuts) |
 | `H` | Announce the controls, and — when `showShortcuts` is on — show / hide the visible shortcuts panel |
+
+The letter keys are matched by physical key as well as by character, so `H` and
+`T` also work on non-Latin keyboard layouts. Remap anything with `keyBindings`:
+
+```js
+addAccessibilityPlugin(chart, {
+    keyBindings: {
+        s: 'summary',   // add a key
+        KeyD: 'viewAsTable', // by physical key
+        h: null,        // remove a built-in binding
+    },
+});
+```
 
 ## Options
 
@@ -190,7 +214,20 @@ below.
 | `dataScope` | `'all' \| 'visible'` | `'visible'` | Whether the on-demand summary and data-update announcements describe the visible range or the full data set (see below). |
 | `priceFormatter` | `(value: number) => string` | chart `localization.priceFormatter`, else the active series price formatter | Formats values for announcements. |
 | `timeFormatter` | `(time: Time) => string` | chart `localization.timeFormatter`, else a locale-aware date | Formats times for announcements (uses the chart's `localization.locale`). |
+| `timeFormat` | `'auto' \| 'date' \| 'dateTime' \| 'seconds' \| 'time'` | `'auto'` | How much of a time the built-in formatter speaks. `'auto'` follows the chart's `timeScale.timeVisible` / `secondsVisible`, so intraday bars are distinguishable. Ignored when a `timeFormatter` is set. |
+| `valueAccessor` | `(point, series) => number \| undefined` | `value`, else `close` | Reads the announced value out of a data point — needed for custom series (see below). |
+| `rangeAccessor` | `(point, series) => { high, low, open?, close? } \| undefined` | the point's own `high` / `low` | Reads a point's high / low band, so a custom series is announced like an OHLC one. |
 | `seriesLabel` | `(series, index) => string` | series `title`, else `Series N` | Accessible label for each series. |
+| `keyBindings` | `Record<string, AccessibilityCommand \| null>` | — | Key → command overrides, merged onto the built-in map. The key is a `KeyboardEvent.key` or `.code`; `null` removes a binding. |
+| `announceOnFocus` | `boolean` | `false` | Announce the visible range when the pane receives focus (an assertive message can interrupt the accessible name, hence off by default). |
+| `focusOnPointerDown` | `boolean` | `false` | Move the keyboard focus into the pane when the user presses a pointer on it. |
+| `syncCrosshair` | `boolean` | `false` | Move the chart's crosshair to the focused point (`chart.setCrosshairPosition`). |
+| `tableMaxRows` | `number` | `200` | Maximum number of rows rendered by the `T` table; the cap is spoken with the caption. |
+| `markers` | `(series) => readonly SeriesMarker<Time>[]` | — | The markers of a series, announced with the point they sit on. The library does not expose a series' markers, so pass the array you gave `createSeriesMarkers`. |
+| `announcePriceLines` | `boolean` | `true` | Append the active series' `priceLines()` to the `Enter` / `Space` summary. |
+| `onAnnounce` | `(message: string) => void` | — | Called with every string this pane announces — for captions, a transcript, or a test. |
+| `onFocusChange` | `(event: AccessibilityFocusEvent) => void` | — | Called whenever the active point or series changes, with the pane, series, point and value. |
+| `onSonify` | `(note: SonificationNote) => void` | — | Called for every focused point with the data a sonification needs. `createToneSonifier()` is a ready-made handler (see below). |
 | `describeChart` | `(context: DescribeChartContext) => string` | built-in summary | Generates the `Enter` / `Space` summary. The context carries `points` (already narrowed to `dataScope`), `series`, `label` and `scope`. |
 | `messages` | `PartialAccessibilityMessages` | English `defaultMessages` | Overrides for the announced text — translate some or all of it (see Localization). |
 | `lang` | `string` | chart `localization.locale` | BCP-47 `lang` set on the announced regions so screen readers use the right voice. |
@@ -261,6 +298,59 @@ change it.
 A directly-attached `AccessibilityPlugin` (without the helper) takes a plain
 boolean `announceDataUpdates` with its own `updateDebounceMs`, and uses its own
 polite region.
+
+## View as table
+
+Pressing `T` renders the active series into a real `<table>` over the pane —
+the text alternative WCAG asks for, and the most requested way to read a chart
+without navigating it point by point. The rows follow `dataScope`, are capped at
+`tableMaxRows` (the cap is announced), and use OHLC columns whenever the points
+carry a high / low band. `Esc` (or `T` again) closes it. The table is built only
+while it is open, so a 50,000-bar series costs nothing until it is asked for.
+Its column headers and caption come from the `messages` bundle
+(`tableColumns`, `tableCaption`, `tableTruncated`, `tableClose`).
+
+## Custom series
+
+A custom series' data shape is only known to its author, so the plugin cannot
+guess where the value is. Without help every point of a custom series announces
+*"no value"* and the focus ring has nowhere to go. Point the plugin at the right
+field:
+
+```js
+addAccessibilityPlugin(chart, {
+    valueAccessor: point => (point.high + point.low) / 2,
+    // Optional: announce it like an OHLC series and report true extremes.
+    rangeAccessor: point => ({ high: point.high, low: point.low }),
+});
+```
+
+Both are called for every series in the pane; return `undefined` to fall back to
+the built-in extraction (`value`, then `close`), so a chart mixing built-in and
+custom series needs only the custom branch.
+
+## Following along: crosshair, captions and sound
+
+- `syncCrosshair: true` moves the chart's crosshair with the keyboard, so a
+  sighted user can follow a screen-reader user point by point.
+- `onAnnounce` receives every string this pane speaks, in order — mirror it into
+  captions, a transcript, or an assertion in a test.
+- `onFocusChange` reports the pane, series, point index and value whenever the
+  focus moves, for your own status bar or analytics.
+- `onSonify` receives each focused point with its position in the series' value
+  range. `createToneSonifier()` is a ready-made handler that plays a short tone
+  whose pitch follows the value, so holding `→` plays the series:
+
+```js
+import { addAccessibilityPlugin, createToneSonifier } from '@tradingview/lwc-plugin-accessibility';
+
+const sonifier = createToneSonifier();
+addAccessibilityPlugin(chart, { onSonify: sonifier });
+// sonifier.dispose() releases the AudioContext.
+```
+
+The `AudioContext` is created on the first note (after a key press, so the
+browser's autoplay policy is satisfied) and reused afterwards.
 
 ## Localization
 
@@ -377,14 +467,14 @@ whole chart for data-update announcements.
 
 Data stays in sync through one `subscribeDataChanged` listener per series, so
 scrolling and zooming do no data work at all – the focus ring is repositioned
-with a couple of coordinate look-ups and nothing is read or copied. Data
-changes are handled lazily too: a change is only noted when it happens. The
-focused pane re-reads its active series right away (`series.data()` returns a
-cloned array, so a read is O(n) in that series' length), an unfocused pane
-defers that read until it is focused again, and update announcements read each
-changed series once per debounced announcement. The work is therefore
-proportional to how much the chart is actually being used, not to how often
-the user scrolls or how often your data ticks.
+with a couple of coordinate look-ups and nothing is read or copied. Data changes
+are handled by their reported scope: a streamed `update()` patches the focused
+series' cache with a single `dataByIndex` look-up, and the update announcements
+take their count from `barsInLogicalRange` and their latest value from that same
+look-up, so **a ticking series is never cloned**. Only a `setData` re-reads the
+series, and an unfocused pane defers even that until it is focused again. The
+work is therefore proportional to how much the chart is actually being used, not
+to how often the user scrolls or how often your data ticks.
 
 ## CSS class hooks
 
@@ -402,6 +492,7 @@ will not change without a major version:
 | `lw-chart-a11y-focus-ring` | The visible focus ring drawn over the active point. |
 | `lw-chart-a11y-shortcuts-hint` | The "Press H" hint (`showShortcuts`). |
 | `lw-chart-a11y-shortcuts-panel` | The `H`-toggled shortcuts panel (`showShortcuts`). |
+| `lw-chart-a11y-data-table` | The `T`-toggled table panel. |
 
 The plugin sets its own geometry and colors inline, so an inline style wins over
 a plain rule — use `!important`, or restyle through the options where one exists
@@ -409,16 +500,18 @@ a plain rule — use `!important`, or restyle through the options where one exis
 
 ## Notes & limitations
 
-- The plugin targets line / area / candlestick / histogram series: OHLC series announce
-  their open / high / low / close, value series announce their value, and exotic
-  custom series may need the value extraction adapted via `priceFormatter` /
-  `describeChart`.
-- Series added to or removed from a pane at runtime are picked up automatically.
-  Adding or removing whole **panes**, however, requires re-running
-  `addAccessibilityPlugin` (or calling `controller.refresh()`) so the new panes
-  get their own layer. Beware that removing a pane's **last** series removes the
-  pane itself (the library prunes empty panes), so that seemingly series-level
-  operation also needs a `refresh()`.
+- Built-in series work out of the box: OHLC series announce their open / high /
+  low / close, value series announce their value. A **custom series** needs
+  `valueAccessor` (and optionally `rangeAccessor`), because only its author knows
+  where its value lives.
+- Series **and panes** added or removed at runtime are picked up automatically:
+  the controller reconciles its layers with `chart.panes()` on the next redraw
+  and attaches or detaches only the difference, so the focus of the panes that
+  were already there is never disturbed. `controller.refresh()` forces that check
+  immediately and is rarely needed.
+- The library forces `direction: ltr` on the chart element, so the plugin reads
+  the writing direction from the element you created the chart in: on a
+  right-to-left page its panels sit on the leading (right) side.
 - Series in a pane do not need to share timestamps. Navigation is aligned by
   *time* on the chart's shared time scale: switching series with the up / down
   arrows keeps the focused time (the nearest point in the new series is

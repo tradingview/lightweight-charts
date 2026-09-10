@@ -16,10 +16,9 @@ function runTestCase(container) {
 	const data = generateData();
 	series.setData(data);
 
-	// A time between two bars: not a bar of the series, so no coordinate is
-	// found for the line itself. The time-axis label is shown regardless
-	// (its visibility does not depend on the line having a valid position),
-	// so it is drawn at coordinate 0 instead of being hidden.
+	// A time between two bars: not a bar of the series, so with the default
+	// `snap: 'exact'` there is no coordinate for the line, and the time-axis
+	// label is hidden with it rather than being drawn at coordinate 0.
 	const betweenBarsTime = (data[40].time + data[41].time) / 2;
 	series.attachPrimitive(new LwcPlugin.VerticalLine(betweenBarsTime, {
 		showLabel: true,
@@ -27,7 +26,7 @@ function runTestCase(container) {
 		color: 'orange',
 	}));
 
-	// A time well outside the data range: same stray-label behaviour.
+	// A time well outside the data range: nothing drawn, no label.
 	const outsideRangeTime = data[data.length - 1].time + 86400 * 30;
 	series.attachPrimitive(new LwcPlugin.VerticalLine(outsideRangeTime, {
 		showLabel: true,

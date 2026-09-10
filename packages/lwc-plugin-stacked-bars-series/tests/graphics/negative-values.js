@@ -16,9 +16,9 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		timeScale: { minBarSpacing: 3 },
 	}));
-	// Values are stacked arithmetically; the series is designed for
-	// non-negative parts of a whole, so a negative segment overlaps the ones
-	// below it. This case documents that current behaviour.
+	// Negative values stack downwards from the base: the second segment is
+	// drawn back down from the top of the first, the third continues up from
+	// there, and the autoscale covers the whole run rather than just the total.
 	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {});
 	series.setData(generateData());
 	chart.timeScale().fitContent();

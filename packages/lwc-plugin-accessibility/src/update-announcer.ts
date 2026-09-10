@@ -58,6 +58,22 @@ export class UpdateAnnouncer {
 		this._sources.push(source);
 	}
 
+	/**
+	 * Drops a pane that is gone (its pane was removed from the chart). Clearing
+	 * `_active` matters: in `'active'` mode a detached pane would otherwise stay
+	 * the one being listened to and no pane would announce anything.
+	 */
+	public unregister(source: UpdateSource): void {
+		const index = this._sources.indexOf(source);
+		if (index >= 0) {
+			this._sources.splice(index, 1);
+		}
+		this._dirty.delete(source);
+		if (this._active === source) {
+			this._active = null;
+		}
+	}
+
 	public setActiveSource(source: UpdateSource): void {
 		this._active = source;
 	}
@@ -200,7 +216,16 @@ export class PaneUpdates implements UpdateSource {
  */
 export interface PaneLink {
 	attachAnnouncer(announcer: UpdateAnnouncer | null): void;
+	attachController(hooks: ControllerHooks | null): void;
 	readonly source: UpdateSource;
+}
+
+/** What a pane primitive reports back to {@link addAccessibilityPlugin}. */
+export interface ControllerHooks {
+	/** Called on every redraw: the controller checks the chart's panes cheaply. */
+	sync: () => void;
+	/** Called when the library detached this primitive (its pane was removed). */
+	detached: () => void;
 }
 
 export const paneLinks = new WeakMap<object, PaneLink>();

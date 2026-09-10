@@ -1,8 +1,8 @@
-// Skipped (leading dot, so discovery ignores this file) until the fix lands:
-// detaching a pane primitive after `chart.remove()` throws an asynchronous
-// `Object is disposed` (fancy-canvas) error. Reproduced with a bare
-// `{ attached, detached, updateAllViews }` primitive too, so the cause is the
-// library's detachPrimitive path on a disposed chart, not this plugin.
+// Detaching a pane primitive after `chart.remove()` raises an asynchronous
+// `Object is disposed` (fancy-canvas) error in the library – reproduced with a
+// bare primitive too, so the fix belongs there. Until it lands the controller
+// guards itself: `detach()` skips `pane.detachPrimitive` when the pane is gone,
+// which is what this case checks (a page error fails it).
 
 function generateLineData(phase) {
 	const res = [];

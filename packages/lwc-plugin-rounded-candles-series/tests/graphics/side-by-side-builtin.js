@@ -16,9 +16,9 @@ function generateCandleData() {
 }
 
 // The same OHLC data on the built-in candlestick series (pane 0) and on the
-// rounded candle series (pane 1). The colouring differs on purpose: the
-// built-in series compares close with open, the plugin compares close with the
-// PREVIOUS close, so individual bars are up/down in one pane and not the other.
+// rounded candle series (pane 1). Both panes must show the same up/down
+// colouring, bar for bar: the plugin decides on `open <= close` like the
+// built-in series does.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
