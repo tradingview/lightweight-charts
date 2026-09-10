@@ -103,15 +103,18 @@ lineSeries.setData([
 
 ## AI coding assistants
 
-This repository ships an [Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) that teaches AI coding assistants how to work with Lightweight Charts™ - the v5 API conventions, the mental model, and the common time, scale, marker, plugin, and wrapper foot-guns.
+This repository ships two [Agent Skills](https://github.com/tradingview/lightweight-charts/tree/master/.github/skills) for AI coding assistants:
 
-Install it into your project with the `skills` CLI:
+- [`lightweight-charts`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) teaches an assistant how to work with the library - the v5 API conventions, the mental model, and the common time, scale, marker, plugin, and wrapper foot-guns.
+- [`lightweight-charts-plugin-authoring`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md) teaches it how to write a plugin - choosing between a custom series and a primitive, building on `@tradingview/lwc-toolkit`, reading the official plugin packages as reference implementations, and the autoscale, whitespace and hit-test traps. The `create-lwc-plugin` wizard offers to install this one into a new plugin project.
+
+Install either or both into your project with the `skills` CLI:
 
 ```console
-npx skills add https://github.com/tradingview/lightweight-charts
+npx skills add tradingview/lightweight-charts
 ```
 
-This makes the skill available to compatible assistants (such as Claude Code, Codex, etc.), streamlining your workflow: they scaffold charts, wire up series and data, and answer API questions against the current v5 conventions out of the box - instead of relying on outdated snippets and stumbling into common foot-guns.
+Add `--skill <name>` to pick one. This makes the skills available to compatible assistants (such as Claude Code, Codex, etc.), streamlining your workflow: they scaffold charts, wire up series and data, and answer API questions against the current v5 conventions out of the box - instead of relying on outdated snippets and stumbling into common foot-guns.
 
 ## Development
 
