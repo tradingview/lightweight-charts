@@ -100,7 +100,7 @@ export class HostAttributes {
 		for (const element of targets) {
 			// Idempotent: re-sweeps (from the mutation observer) must not record
 			// our own tabindex="-1" as the value to restore.
-			if (this._neutralised.some(([neutralised]) => neutralised === element)) {
+			if (element.closest('.lw-chart-a11y-layer') || this._neutralised.some(([neutralised]) => neutralised === element)) {
 				continue;
 			}
 			this._neutralised.push([

@@ -107,6 +107,13 @@ void describe('drawRoundRect', () => {
 });
 
 void describe('drawRoundRectWithBorder', () => {
+	void it('clamps inset radii to zero when the border is thicker than the corner radius', () => {
+		const ctx = fakeContext();
+		drawRoundRectWithBorder(ctx, 0, 0, 20, 20, '#f00', 4, [1, 0, 3, 1], '#00f');
+		// Canvas roundRect throws a RangeError for any negative radius.
+		expect(call(ctx, 'roundRect').args[4]).to.deep.equal([0, 0, 1, 0]);
+	});
+
 	void it('fills the whole rect and skips the border when the border width is 0', () => {
 		const ctx = fakeContext();
 		drawRoundRectWithBorder(ctx, 10, 20, 30, 40, '#f00', 0, [2, 2, 2, 2], '#00f');
@@ -200,4 +207,17 @@ void describe('drawRoundRectWithBorder', () => {
 			expect(methods(ctx).filter((m: string) => m === 'restore')).to.have.length(1);
 		}
 	});
+	void it('caps a thick border at the size of a narrow rectangle', () => {
+		const ctx = fakeContext();
+		drawRoundRectWithBorder(ctx, 0, 0, 1, 3, '#f00', 4, [1, 1, 1, 1], '#00f');
+		expect(call(ctx, 'roundRect').args).to.deep.equal([0.5, 0.5, 0, 2, [0.5, 0.5, 0.5, 0.5]]);
+		expect(call(ctx, 'stroke').args).to.deep.equal(['#00f', 1]);
+	});
+
+	void it('does not stroke zero-sized rectangles with a stale line width', () => {
+		const ctx = fakeContext();
+		drawRoundRectWithBorder(ctx, 0, 0, 0, 3, '#f00', 4, [1, 1, 1, 1], '#00f');
+		expect(methods(ctx)).to.deep.equal([]);
+	});
+
 });

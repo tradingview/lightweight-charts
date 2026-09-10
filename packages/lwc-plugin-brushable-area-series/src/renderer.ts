@@ -5,7 +5,7 @@ import {
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import {
-	extendRange,
+	GapCheck, barCoordinate, extendRange, getConflationFactor,
 	visibleSegments,
 } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import {
@@ -74,6 +74,10 @@ export class BrushableAreaSeriesRenderer<
 	TData,
 	BrushableAreaSeriesOptions
 > {
+	public constructor(private readonly _isGap?: GapCheck<HorzScaleItem, TData>) {
+		super();
+	}
+
 	protected drawImpl(
 		scope: BitmapCoordinatesRenderingScope,
 		args: CustomSeriesDrawArgs<HorzScaleItem, TData, BrushableAreaSeriesOptions>
@@ -88,10 +92,14 @@ export class BrushableAreaSeriesRenderer<
 		// instead of leaving the pane.
 		const range = extendRange({ from, to }, data.bars.length);
 
-		// Whitespace never reaches a custom renderer: a jump in the logical index
-		// is the only sign of a gap, and the line has to break there.
+		// Only explicit whitespace breaks the line; other series may fill the
+		// logical indices between these bars.
 		const segments: BrushableAreaPoint[][] = [];
-		for (const segment of visibleSegments(data.bars, range)) {
+		const isGap = this._isGap;
+		// A whitespace run shorter than one conflation bucket is absorbed into
+		// the bucket: conflated chunks span more logical indices than rows.
+		const minGap = getConflationFactor(data);
+		for (const segment of visibleSegments(data.bars, range, isGap && ((left, right): boolean => isGap(left, right, minGap)))) {
 			let points: BrushableAreaPoint[] = [];
 			for (let i = segment.from; i < segment.to; i++) {
 				const bar = data.bars[i];
@@ -105,7 +113,7 @@ export class BrushableAreaSeriesRenderer<
 					continue;
 				}
 				points.push({
-					x: bar.x * scope.horizontalPixelRatio,
+					x: barCoordinate(bar, data.bars[from], data.barSpacing) * scope.horizontalPixelRatio,
 					y: y * scope.verticalPixelRatio,
 					// `bar.time` is the logical index; `i` is the position in the
 					// bars array, and the two differ as soon as another series

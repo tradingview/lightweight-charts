@@ -16,7 +16,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 		timeScale: { minBarSpacing: 3 },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.StackedBarsSeries(), {
+	const series = LwcPlugin.createStackedBarsSeries(chart, {
 		colors: ['#8B00FF', '#00C853', '#FFD600'],
 	});
 	series.setData(generateData());

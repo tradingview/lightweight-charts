@@ -1,3 +1,4 @@
+import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
 import { DataChangedScope, IRange, MismatchDirection, Time } from 'lightweight-charts';
 
 import { AnySeries, SeriesDataPoint } from './types';
@@ -14,73 +15,30 @@ export function latestDataPoint(series: AnySeries): SeriesDataPoint | null {
 }
 
 /**
- * Applies one `'update'` data change to an owned copy of a series' points:
- * `series.update()` either replaces the newest bar or appends one, so the
- * cached array can be patched in place instead of being re-read (and cloned)
- * on every tick.
- *
- * Returns the index of the changed point, or `-1` when the change could not be
- * applied incrementally and a full re-read is needed.
+ * A UTC seconds key shared by timestamps, date strings and business days.
+ * Equivalent representations of a day must match the same chart annotation.
  */
-export function applyPointUpdate(points: SeriesDataPoint[], latest: SeriesDataPoint | null): number {
-	if (latest === null) {
-		return -1;
-	}
-	const last = points[points.length - 1];
-	if (last === undefined) {
-		points.push(latest);
-		return 0;
-	}
-	if (last.time === latest.time) {
-		points[points.length - 1] = latest;
-		return points.length - 1;
-	}
-	// An update can only touch the last bar or add a new one; anything else
-	// (a bar inserted before the end) is not an `update`, so re-read.
-	if (compareTimes(latest.time, last.time) > 0) {
-		points.push(latest);
-		return points.length - 1;
-	}
-	return -1;
+export function timeKey(time: Time): number {
+	return convertTimeUTC(time) / 1000;
 }
 
-/**
- * A comparable, equality-safe key for a `Time`: business-day objects are
- * distinct objects for the same day, so they are flattened to a string.
- */
-export function timeKey(time: Time): string | number {
-	return typeof time === 'object' ? `${time.year}-${time.month}-${time.day}` : time;
-}
-
-/** Orders two `Time` values without converting business days to dates. */
-function compareTimes(a: Time, b: Time): number {
-	const left = timeKey(a);
-	const right = timeKey(b);
-	return left === right ? 0 : left > right ? 1 : -1;
-}
-
-/**
- * The per-series facts the update announcements need – how many points a series
- * holds and which is the newest – kept up to date from the `subscribeDataChanged`
- * scope instead of cloning `series.data()` on every tick.
- *
- * A `'full'` change (`setData`) re-reads the length once; an `'update'` costs a
- * single indexed lookup, and the in-view count comes from `barsInLogicalRange`,
- * so a streaming chart does no work proportional to its history.
- */
+/** Facts used by announcements, reconciled lazily against the public series data. */
 export class SeriesStats {
-	private readonly _entries = new Map<AnySeries, { length: number; latest: SeriesDataPoint | null }>();
+	private readonly _entries = new Map<AnySeries, readonly SeriesDataPoint[]>();
 
-	/** Records a data change; call with the scope the library reported. */
-	public update(series: AnySeries, scope: DataChangedScope): void {
-		const latest = latestDataPoint(series);
-		const known = this._entries.get(series);
-		if (scope === 'full' || known === undefined) {
-			this._entries.set(series, { length: series.data().length, latest });
-			return;
+	/** Invalidates the snapshot without reading data on every streaming tick. */
+	public update(series: AnySeries, _scope: DataChangedScope): void {
+		this._entries.delete(series);
+	}
+
+	/** Shared by announcement statistics and focused navigation. */
+	public snapshot(series: AnySeries): readonly SeriesDataPoint[] {
+		let points = this._entries.get(series);
+		if (points === undefined) {
+			points = series.data();
+			this._entries.set(series, points);
 		}
-		const appended = latest !== null && (known.latest === null || known.latest.time !== latest.time);
-		this._entries.set(series, { length: known.length + (appended ? 1 : 0), latest });
+		return points;
 	}
 
 	public forget(series: AnySeries): void {
@@ -92,32 +50,35 @@ export class SeriesStats {
 	}
 
 	public latest(series: AnySeries): SeriesDataPoint | null {
-		const known = this._entries.get(series);
-		return known !== undefined ? known.latest : latestDataPoint(series);
+		const points = this.snapshot(series);
+		return points[points.length - 1] ?? null;
 	}
 
 	public length(series: AnySeries): number {
-		const known = this._entries.get(series);
-		return known !== undefined ? known.length : series.data().length;
+		return this.snapshot(series).length;
 	}
 
-	/**
-	 * How many of the series' points lie inside `range`, derived from
-	 * `barsInLogicalRange` and the tracked length. Falls back to the full length
-	 * when the range is unknown.
-	 */
+	/** Counts fulfilled points, rather than slots on the chart's shared time scale. */
 	public countInRange(series: AnySeries, range: IRange<number> | null): number {
-		const total = this.length(series);
-		if (range === null || total === 0) {
-			return range === null ? total : 0;
-		}
-		const bars = series.barsInLogicalRange(range);
-		if (bars === null) {
-			return 0;
-		}
-		// Negative `barsBefore` / `barsAfter` mean the first / last bar is inside
-		// the range, so only positive counts are outside it.
-		const outside = Math.max(0, bars.barsBefore) + Math.max(0, bars.barsAfter);
-		return Math.max(0, Math.round(total - outside));
+		const points = this.snapshot(series);
+		if (range === null) { return points.length; }
+		if (points.length === 0 || Math.ceil(range.from) > Math.floor(range.to)) { return 0; }
+		const first = series.dataByIndex(Math.ceil(range.from), MismatchDirection.NearestRight);
+		const last = series.dataByIndex(Math.floor(range.to), MismatchDirection.NearestLeft);
+		if (first === null || last === null) { return 0; }
+		const from = convertTimeUTC(first.time);
+		const to = convertTimeUTC(last.time);
+		if (from > to) { return 0; }
+		const bound = (time: number, inclusive: boolean): number => {
+			let low = 0;
+			let high = points.length;
+			while (low < high) {
+				const mid = Math.floor((low + high) / 2);
+				const current = convertTimeUTC(points[mid].time);
+				if (current < time || (inclusive && current === time)) { low = mid + 1; } else { high = mid; }
+			}
+			return low;
+		};
+		return bound(to, true) - bound(from, false);
 	}
 }

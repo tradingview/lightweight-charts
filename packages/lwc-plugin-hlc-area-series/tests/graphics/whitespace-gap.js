@@ -27,7 +27,7 @@ function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.HLCAreaSeries());
+	const series = LwcPlugin.createHLCAreaSeries(chart);
 	series.setData(generateData());
 	chart.timeScale().fitContent();
 }

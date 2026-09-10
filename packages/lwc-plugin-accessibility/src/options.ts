@@ -199,6 +199,8 @@ export interface AccessibilityPaneOptions {
 	/**
 	 * Called with every string the plugin announces, in the order it is spoken.
 	 * Use it to mirror the announcements into captions, a transcript, or a test.
+	 * The live region is written before this runs and an exception thrown here
+	 * is ignored, so a failing callback never costs an announcement.
 	 */
 	onAnnounce?: (message: string) => void;
 	/** Called whenever the active point or series changes. */

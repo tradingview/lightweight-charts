@@ -34,7 +34,7 @@
             window.LightweightCharts = lib;
             window.LwcPlugin = plugin;
             window.BUILD_MODE = '{BUILD_MODE}';
-            window.testCaseReady = Promise.resolve(runTestCase(document.getElementById('container')));
+            window.testCaseReady = Promise.resolve(TEST_CASE_ENTRY_POINT(document.getElementById('container')));
         </script>
     </body>
 </html>

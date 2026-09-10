@@ -17,7 +17,7 @@ function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },
 	}));
-	const series = chart.addCustomSeries(new LwcPlugin.PrettyHistogramSeries(), {
+	const series = LwcPlugin.createPrettyHistogramSeries(chart, {
 		base: 20,
 		upColor: '#089981',
 		downColor: '#F23645',

@@ -127,6 +127,12 @@ chart.panes()[1].attachPrimitive(
 );
 ```
 
+That index is only used to find the pane before the layer exists: the first
+time the chart draws the primitive it reports the pane it is really attached to,
+and the plugin follows that pane from then on, by identity, through reordering.
+An index that does not match the pane you attached to therefore costs nothing
+but a frame.
+
 A directly attached primitive keeps its own polite live region and takes a plain
 boolean `announceDataUpdates`; the chart-level `dataUpdates` settings only exist
 on the helper.
@@ -465,16 +471,17 @@ description, an assertive live region, a focus ring and — when `showShortcuts`
 on — the shortcuts hint and panel), plus one polite live region shared across the
 whole chart for data-update announcements.
 
-Data stays in sync through one `subscribeDataChanged` listener per series, so
-scrolling and zooming do no data work at all – the focus ring is repositioned
-with a couple of coordinate look-ups and nothing is read or copied. Data changes
-are handled by their reported scope: a streamed `update()` patches the focused
-series' cache with a single `dataByIndex` look-up, and the update announcements
-take their count from `barsInLogicalRange` and their latest value from that same
-look-up, so **a ticking series is never cloned**. Only a `setData` re-reads the
-series, and an unfocused pane defers even that until it is focused again. The
-work is therefore proportional to how much the chart is actually being used, not
-to how often the user scrolls or how often your data ticks.
+Data stays in sync through one `subscribeDataChanged` listener per series.
+Scrolling and zooming reposition the focus ring with coordinate lookups; they
+do not copy series data. Data-change events invalidate a shared snapshot because
+they do not distinguish a tail tick from a historical correction or `pop()`.
+
+An unfocused pane reads data only when its debounced announcement is prepared.
+With update announcements disabled, it defers the read until keyboard focus
+returns. Focused navigation refreshes immediately after a data change and shares
+that snapshot with announcement statistics. Each refresh is proportional to the
+series length; visible-point counts use binary searches within the snapshot, so
+whitespace and gaps supplied by other series do not inflate the count.
 
 ## CSS class hooks
 

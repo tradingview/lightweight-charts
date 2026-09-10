@@ -15,7 +15,7 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 
 import { DualRangeHistogramData } from './data';
 import {
@@ -150,7 +150,8 @@ export class DualRangeHistogramSeriesRenderer<
 			effectiveBarSpacing(data),
 			horizontalPixelRatio,
 			0,
-			items.length
+			items.length,
+			getConflationFactor(data)
 		);
 
 		const borderWidth =
@@ -235,15 +236,12 @@ export class DualRangeHistogramSeriesRenderer<
 			if (!Number.isFinite(value)) {
 				continue;
 			}
-			// The gap opens around the base line: the upward half starts above it,
-			// the downward half below it.
-			const positive = value >= 0;
-			const start =
-				geometry.baseCoordinate + (positive ? -geometry.halfGap : geometry.halfGap);
-			const end = this._columnEnd(value, start, options, geometry);
-			if (end === null) {
-				continue;
-			}
+			const endpoint = this._columnEnd(value, geometry.baseCoordinate, options, geometry);
+			if (endpoint === null) { continue; }
+			const growsUp = endpoint <= geometry.baseCoordinate;
+			const shift = growsUp ? -geometry.halfGap : geometry.halfGap;
+			const start = geometry.baseCoordinate + shift;
+			const end = endpoint + shift;
 			const box = positionsBox(start, end, verticalPixelRatio);
 			const key = columnKey(index);
 			const radius = clampCornerRadius(
@@ -251,7 +249,7 @@ export class DualRangeHistogramSeriesRenderer<
 				width,
 				box.length
 			);
-			const radii: CornerRadii = positive
+			const radii: CornerRadii = growsUp
 				? [radius, radius, 0, 0]
 				: [0, 0, radius, radius];
 			drawRoundRectWithBorder(
@@ -296,9 +294,7 @@ export class DualRangeHistogramSeriesRenderer<
 			if (coordinate === null) {
 				return null;
 			}
-			// The gap shifts the whole column, so its length stays the length the
-			// price scale asks for.
-			return coordinate + (value >= 0 ? -geometry.halfGap : geometry.halfGap);
+			return coordinate;
 		}
 		const height =
 			(Math.abs(value) / (geometry.scale as number)) * (options.maxHeight / 2);

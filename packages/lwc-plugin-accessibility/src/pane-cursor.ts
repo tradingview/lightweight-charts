@@ -13,7 +13,6 @@ import {
 	zoomRange,
 } from './navigation';
 import { AccessibilityPaneOptions } from './options';
-import { applyPointUpdate, latestDataPoint } from './series-data';
 import { normalizeValue } from './sonification';
 import { AnySeries, SeriesDataPoint } from './types';
 
@@ -36,13 +35,13 @@ export interface CursorHost {
  *
  * The active series' data is cached in `_points` because `series.data()` returns
  * a clone; the cache is refreshed only when the pane is actually in use (see
- * {@link markStale}) and a streamed `'update'` patches it in place instead of
- * re-reading the whole series.
+ * {@link markStale}). Focused data updates reuse the snapshot held by the
+ * announcement statistics.
  */
 export class PaneCursor {
 	private readonly _host: CursorHost;
 	private _seriesList: AnySeries[] = [];
-	private _points: SeriesDataPoint[] = [];
+	private _points: readonly SeriesDataPoint[] = [];
 	// Set when the active series changes while the pane is unfocused, so the
 	// (O(n)-copy) re-read of `_points` is deferred until the pane is used again.
 	private _stale = false;
@@ -119,9 +118,9 @@ export class PaneCursor {
 	}
 
 	/** Re-reads the active series' data into the navigation cache. */
-	public refreshActivePoints(): void {
+	public refreshActivePoints(points?: readonly SeriesDataPoint[]): void {
 		const series = this.activeSeries();
-		this._points = series ? series.data().slice() : [];
+		this._points = points ?? (series ? series.data() : []);
 		this._stale = false;
 		this._extremes = null;
 		if (this._pointIndex >= this._points.length) {
@@ -129,22 +128,9 @@ export class PaneCursor {
 		}
 	}
 
-	/**
-	 * Applies one data change to the navigation cache. A `'update'` (the shape a
-	 * live feed produces) patches the cached array with a single indexed lookup,
-	 * so a streaming chart does no work proportional to its history; anything
-	 * else re-reads the series.
-	 */
-	public applyDataChange(scope: DataChangedScope): void {
-		const series = this.activeSeries();
-		if (!series) {
-			return;
-		}
-		if (scope === 'update' && applyPointUpdate(this._points, latestDataPoint(series)) >= 0) {
-			this._extremes = null;
-			return;
-		}
-		this.refreshActivePoints();
+	/** Refreshes the cache: 'update' can also change historical points or remove data. */
+	public applyDataChange(_scope: DataChangedScope, points?: readonly SeriesDataPoint[]): void {
+		this.refreshActivePoints(points);
 	}
 
 	public reset(): void {

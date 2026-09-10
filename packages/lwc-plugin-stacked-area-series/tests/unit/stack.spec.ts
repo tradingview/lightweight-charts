@@ -1,7 +1,11 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
+import type { Time } from 'lightweight-charts';
+
 import { paddedValues, percentValues, styleRuns, sumValues } from '../../src/stack.js';
+import { StackedAreaSeries } from '../../src/stacked-area-series.js';
+import { StackedAreaSeriesOptions, defaultOptions } from '../../src/options.js';
 
 void describe('paddedValues', () => {
 	void it('pads a short point with zeroes', () => {
@@ -64,5 +68,30 @@ void describe('styleRuns', () => {
 	void it('ignores a change on the last bar, which styles no piece', () => {
 		const key = (index: number): string => (index >= 4 ? 'b' : 'a');
 		expect(styleRuns(0, 5, key)).to.deep.equal([{ from: 0, to: 5 }]);
+	});
+});
+
+void describe('StackedAreaSeries price values', () => {
+	const series = (options: Partial<StackedAreaSeriesOptions>): StackedAreaSeries =>
+		new StackedAreaSeries(undefined, () => ({ ...defaultOptions, ...options }));
+
+	void it('autoscales a percent stack to the 0..100 the renderer draws', () => {
+		expect(series({ percent: true }).priceValueBuilder({ time: 1 as Time, values: [10, 5, 5] }))
+			.to.deep.equal([0, 100, 100]);
+		// A mixed point spends part of the 100% below the base.
+		expect(series({ percent: true }).priceValueBuilder({ time: 1 as Time, values: [30, -10] }))
+			.to.deep.equal([0, 75, 50]);
+	});
+
+	void it('offsets the stack by the base', () => {
+		expect(series({ base: 20 }).priceValueBuilder({ time: 1 as Time, values: [10, 5] }))
+			.to.deep.equal([20, 35, 35]);
+		expect(series({ percent: true, base: 20 }).priceValueBuilder({ time: 1 as Time, values: [1, 1] }))
+			.to.deep.equal([20, 120, 120]);
+	});
+
+	void it('reports the raw totals with the default options', () => {
+		expect(series({}).priceValueBuilder({ time: 1 as Time, values: [10, 5] }))
+			.to.deep.equal([0, 15, 15]);
 	});
 });

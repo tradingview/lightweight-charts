@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Answers, categoryTemplates } from './questions';
 import { copy } from './helpers/io';
-import { readmeSnippets } from './snippets';
+import { previewSnippets, readmeSnippets } from './snippets';
 
 const renameFiles: Record<string, string | undefined> = {
 	_gitignore: '.gitignore',
@@ -46,6 +46,20 @@ function buildPackageJson(template: string, answers: Answers): string {
 	if (answers.workspace) {
 		pkg.files = ['dist', 'CHANGELOG.md', 'NOTICE'];
 		pkg.lwcPlugin.origin = 'official';
+		// Every official package owns the page the catalogue frames. Rebuilt
+		// rather than assigned, so `preview` sits next to `demo` in the manifest.
+		pkg.lwcPlugin = Object.fromEntries(
+			Object.entries(pkg.lwcPlugin as Record<string, unknown>).flatMap(
+				([key, value]) =>
+					key === 'demo'
+						? [
+								[key, value],
+								['preview', 'src/example/preview.html'],
+								['previewHeight', 330],
+							]
+						: [[key, value]]
+			)
+		);
 		// In the monorepo both come from the workspace rather than the registry.
 		// The published peerDependency range is untouched — that is the contract.
 		// The repository pins its own devDependencies exactly.
@@ -56,6 +70,8 @@ function buildPackageJson(template: string, answers: Answers): string {
 		);
 		pkg.devDependencies = sortedByKey({
 			...pinned,
+			// Private, so it is only available to a package inside the repository.
+			'@tradingview/lwc-plugin-preview-kit': 'workspace:*',
 			'@tradingview/lwc-toolkit': 'workspace:*',
 			'lightweight-charts': 'workspace:*',
 		});
@@ -104,6 +120,7 @@ export function scaffold(answers: Answers, baseDir: string): string {
 		[ENTRY_PLACEHOLDER, entryName],
 		['_ATTACH_SNIPPET_', snippets.attach],
 		['_USAGE_SNIPPET_', snippets.usage],
+		['_PREVIEW_SNIPPET_', previewSnippets[answers.category]],
 		['_ENTRYNAME_', entryName],
 		['_PLUGINNAME_', answers.name],
 		['_CLASSNAME_', answers.typeName],
@@ -167,8 +184,10 @@ export function scaffold(answers: Answers, baseDir: string): string {
 	}
 
 	if (answers.workspace) {
-		// Official packages ship a changelog and notice of their own, and build
-		// through the repository's shared compile script.
+		// Official packages ship a changelog and notice of their own, build
+		// through the repository's shared compile script, and carry the catalogue
+		// preview page under src/example/ (which needs the private preview kit,
+		// so a standalone project gets none).
 		const workspaceTemplateDir = templatePath('template-workspace');
 		for (const file of fs.readdirSync(workspaceTemplateDir)) {
 			write(workspaceTemplateDir, file);

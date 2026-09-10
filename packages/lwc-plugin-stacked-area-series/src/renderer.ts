@@ -11,7 +11,7 @@ import {
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import { Position, areaBetween } from '@tradingview/lwc-toolkit/custom-series/line-paths';
-import { extendRange, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { GapCheck, barCoordinate, extendRange, getConflationFactor, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { LineStyle, setLineStyle } from '@tradingview/lwc-toolkit/line-style';
 import { stackLevels } from '@tradingview/lwc-toolkit/custom-series/stacking';
 
@@ -80,6 +80,10 @@ export class StackedAreaSeriesRenderer<
 	TData extends StackedAreaData<HorzScaleItem> = StackedAreaData<HorzScaleItem>
 > extends CustomSeriesRendererBase<HorzScaleItem, TData, StackedAreaSeriesOptions>
 {
+	public constructor(private readonly _isGap?: GapCheck<HorzScaleItem, TData>) {
+		super();
+	}
+
 	/**
 	 * Reports the band under the cursor. Optional on
 	 * `ICustomSeriesPaneRenderer` from `lightweight-charts` 5.1; on 5.0.0 it is
@@ -96,10 +100,18 @@ export class StackedAreaSeriesRenderer<
 			return null;
 		}
 		const { from, to } = data.visibleRange;
+		if (from >= to) { return null; }
+		const range = extendRange({ from, to }, data.bars.length);
+		const coordinate = (index: number): number => barCoordinate(data.bars[index], data.bars[from], data.barSpacing);
+		const segments = options.gapHandling === 'break' ? visibleSegments(data.bars, range, this._gapCheck(data)) : [range];
+		// A nearest bar can be arbitrarily far away across an unpainted gap.
+		// Only consider the run whose drawn horizontal extent contains the cursor.
+		const segment = segments.find(run => run.to - run.from > 1 && x >= coordinate(run.from) && x <= coordinate(run.to - 1));
+		if (segment === undefined) { return null; }
 		let hitIndex = -1;
 		let hitDistance = Number.POSITIVE_INFINITY;
-		for (let i = from; i < to; i++) {
-			const distance = Math.abs(data.bars[i].x - x);
+		for (let i = segment.from; i < segment.to; i++) {
+			const distance = Math.abs(coordinate(i) - x);
 			if (distance < hitDistance) {
 				hitDistance = distance;
 				hitIndex = i;
@@ -156,14 +168,14 @@ export class StackedAreaSeriesRenderer<
 			const bar: CustomBarItemData<HorzScaleItem, TData> = data.bars[i];
 			const levels = this._levels(bar.originalData.values, bandCount, options);
 			points[i - range.from] = {
-				x: bar.x,
+				x: barCoordinate(bar, data.bars[from], data.barSpacing),
 				ys: levels.map((level: number): number => priceToCoordinate(level) ?? baseY),
 				colors: bar.originalData.colors,
 			};
 		}
 
 		const segments = options.gapHandling === 'break'
-			? visibleSegments(data.bars, range)
+			? visibleSegments(data.bars, range, this._gapCheck(data))
 			: [range];
 		const hoveredBand = isHovered && isHitTestData(hitTestData)
 			? hitTestData.bandIndex
@@ -178,6 +190,23 @@ export class StackedAreaSeriesRenderer<
 			scope.context.fillStyle = hoverScrimColor;
 			scope.context.fill(scrim);
 		}
+	}
+
+	/**
+	 * Whitespace shorter than one conflation bucket cannot be resolved at this
+	 * bar spacing: a chunk of conflated rows spans one more logical index than
+	 * it has rows as soon as a holiday falls inside it, and breaking there would
+	 * leave every bucket its own single-point segment.
+	 */
+	private _gapCheck(
+		data: { barSpacing: number; conflationFactor?: number }
+	): ((left: CustomBarItemData<HorzScaleItem, TData>, right: CustomBarItemData<HorzScaleItem, TData>) => boolean) | undefined {
+		const isGap = this._isGap;
+		if (isGap === undefined) {
+			return undefined;
+		}
+		const minGap = getConflationFactor(data);
+		return (left, right): boolean => isGap(left, right, minGap);
 	}
 
 	/** Price of the top of each band of one point, in stacking order. */

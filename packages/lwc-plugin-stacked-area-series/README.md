@@ -24,12 +24,12 @@ Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { StackedAreaSeries } from '@tradingview/lwc-plugin-stacked-area-series';
+import { createStackedAreaSeries } from '@tradingview/lwc-plugin-stacked-area-series';
 
 const chart = createChart(document.getElementById('container'), {
     rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 });
-const series = chart.addCustomSeries(new StackedAreaSeries(), {
+const series = createStackedAreaSeries(chart, {
     colors: [
         { line: '#2962FF', area: 'rgba(41, 98, 255, 0.2)' },
         { line: '#F23645', area: 'rgba(242, 54, 69, 0.2)' },
@@ -66,12 +66,12 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { StackedAreaSeries } from '@tradingview/lwc-plugin-stacked-area-series';
+import { createStackedAreaSeries } from '@tradingview/lwc-plugin-stacked-area-series';
 
 const chart = createChart(document.getElementById('container'), {
     rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 });
-const series = chart.addCustomSeries(new StackedAreaSeries(), {
+const series = createStackedAreaSeries(chart, {
     colors: [
         { line: '#2962FF', area: 'rgba(41, 98, 255, 0.2)' },
         { line: '#F23645', area: 'rgba(242, 54, 69, 0.2)' },
@@ -90,17 +90,17 @@ series.setData([
 
 ## Usage
 
-Add the series with `addCustomSeries`, then set data with a `values` array per
+Add the series with `createStackedAreaSeries`, then set data with a `values` array per
 point. The array order is the stacking order: `values[0]` is the bottom band.
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { StackedAreaSeries } from '@tradingview/lwc-plugin-stacked-area-series';
+import { createStackedAreaSeries } from '@tradingview/lwc-plugin-stacked-area-series';
 
 const chart = createChart(document.getElementById('container'), {
     rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 });
-const series = chart.addCustomSeries(new StackedAreaSeries(), {
+const series = createStackedAreaSeries(chart, {
     colors: [
         { line: '#2962FF', area: 'rgba(41, 98, 255, 0.2)' },
         { line: '#F23645', area: 'rgba(242, 54, 69, 0.2)' },
@@ -187,21 +187,29 @@ Per-point overrides, on the data item:
   outermost line sits exactly on the edge of the range; add a small
   `scaleMargins` on the price scale (as in the example above) if you want
   breathing room around it.
-- Autoscaling is computed from the raw `values` measured from zero, because the
-  library asks for those values before the series options are known. With
-  `percent: true`, or a `base` other than `0`, supply the range yourself:
-
-  ```js
-  series.applyOptions({
-      percent: true,
-      autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }),
-  });
-  ```
-
-- Whitespace never reaches a custom series renderer, so a gap is detected from
-  the jump in the logical index of the points either side of it. `gapHandling`
-  decides what happens there.
+- Autoscaling follows `percent` and `base`, so a 100% stack scales to
+  `base`…`base + 100` and not to the raw totals, and changing either option
+  rescales the series. This needs the current options at the moment the library
+  asks for the plot values, which only `createStackedAreaSeries` can provide: a
+  bare `new StackedAreaSeries()` added with `chart.addCustomSeries` autoscales
+  from the raw `values` measured from zero, and needs an
+  `autoscaleInfoProvider` of its own for `percent` or a non-zero `base`.
+- The factory retains explicit whitespace, and `gapHandling` decides whether
+  to break or bridge it. Timestamps from other series do not create gaps.
 - On `lightweight-charts` 5.1 and later the series reports the hovered band
   through `hitTest` (the `objectId` is the index of the band) and dims the
   other bands while one is hovered, and conflated points are merged by summing
   each band. On 5.0.0 those hooks are simply never called.
+
+### Explicit whitespace
+
+Use `createStackedAreaSeries` to retain whitespace passed through `setData` and
+`update`, including historical corrections. Other series' timestamps do not
+break the area. The low-level `StackedAreaSeries` view remains available, but
+without the factory's gap predicate it draws continuously: the host does not
+provide whitespace to custom renderers.
+
+Under time-scale conflation the area is drawn from buckets of several bars, and
+a whitespace run narrower than one bucket cannot be resolved at that bar
+spacing: it is absorbed into the bucket rather than breaking the area at every
+bar. Zooming in past the conflation threshold shows the gap again.

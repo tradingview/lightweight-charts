@@ -1,5 +1,5 @@
 import { CustomSeriesWhitespaceData, Time, createChart } from 'lightweight-charts';
-import { StackedBarsSeries } from '../stacked-bars-series';
+import { createStackedBarsSeries } from '../stacked-bars-series';
 import { StackedBarsColumnWidthMode } from '../options';
 import { StackedBarsData } from '../data';
 import { multipleBarData } from './sample-data';
@@ -29,7 +29,7 @@ const chart = ((window as unknown as any).chart = createChart('chart', {
 	},
 }));
 
-const series = chart.addCustomSeries(new StackedBarsSeries(), {
+const series = createStackedBarsSeries(chart, {
 	color: 'black', // for the price line
 });
 series.setData(demoData());
@@ -44,12 +44,9 @@ function applyControls(): void {
 		columnWidthMode: widthMode.value as StackedBarsColumnWidthMode,
 		widthPercent: 60,
 		radius: Number(radius.value),
+		// `priceValueBuilder` runs `stackBands` with the current options, so
+		// percent mode needs no price range of its own.
 		percent: percentMode.checked,
-		// `priceValueBuilder` measures the raw values, so percent mode needs a
-		// price range of its own.
-		autoscaleInfoProvider: percentMode.checked
-			? () => ({ priceRange: { minValue: -100, maxValue: 100 } })
-			: undefined,
 	});
 }
 

@@ -83,6 +83,7 @@ export function addAccessibilityPlugin(
 		debounceMs: debounceMs(),
 		maxSeries: current.updateMaxSeries ?? defaultPaneOptions.updateMaxSeries,
 		lang: resolveLang(),
+		onAnnounce: current.onAnnounce,
 	});
 
 	const resolveOptions = (paneIndex: number): Partial<AccessibilityPaneOptions> => {
@@ -193,6 +194,11 @@ export function addAccessibilityPlugin(
 		// Keep the entries – and therefore `plugins` and `focus(i)` – in pane order
 		// even after a pane was moved with `pane.moveTo()`.
 		entries.sort((a: PaneEntry, b: PaneEntry) => panes.indexOf(a.pane) - panes.indexOf(b.pane));
+		entries.forEach(({ plugin }: PaneEntry, paneIndex: number) => plugin.applyOptions(resolveOptions(paneIndex)));
+		announcer.reorder(entries.flatMap(({ plugin }: PaneEntry) => {
+			const link = paneLinks.get(plugin);
+			return link ? [link.source] : [];
+		}));
 		if (canvases === null) {
 			const table = chartTableElement(chart);
 			if (table) {

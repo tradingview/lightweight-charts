@@ -30,10 +30,10 @@ Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { BrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
+import { createBrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new BrushableAreaSeries(), {
+const series = createBrushableAreaSeries(chart, {
     lineColor: 'rgb(41, 98, 255)',
     topColor: 'rgba(41, 98, 255, 0.4)',
     bottomColor: 'rgba(41, 98, 255, 0)',
@@ -63,10 +63,10 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { BrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
+import { createBrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new BrushableAreaSeries(), {
+const series = createBrushableAreaSeries(chart, {
     lineColor: 'rgb(41, 98, 255)',
     topColor: 'rgba(41, 98, 255, 0.4)',
     bottomColor: 'rgba(41, 98, 255, 0)',
@@ -78,15 +78,15 @@ series.setData(data); // [{ time, value }, ...]
 
 ## Usage
 
-Add the [custom series](https://tradingview.github.io/lightweight-charts/docs/plugins/custom_series) with `addCustomSeries`, set single-value data, then set
+Add the [custom series](https://tradingview.github.io/lightweight-charts/docs/plugins/custom_series) with `createBrushableAreaSeries`, set single-value data, then set
 `brushRanges` whenever the selection changes:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { BrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
+import { createBrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new BrushableAreaSeries(), {
+const series = createBrushableAreaSeries(chart, {
     lineColor: 'rgb(41, 98, 255)',
     topColor: 'rgba(41, 98, 255, 0.4)',
     bottomColor: 'rgba(41, 98, 255, 0)',
@@ -215,3 +215,16 @@ same five properties as the base style, and each one optional.
 - The examples disable chart scrolling and scaling (`handleScroll`,
   `handleScale`) so that dragging brushes instead of panning; decide which
   gesture your chart should own.
+
+### Explicit whitespace
+
+Use `createBrushableAreaSeries` to retain whitespace passed through `setData` and
+`update`, including historical corrections. Other series' timestamps do not
+break the area. The low-level `BrushableAreaSeries` view remains available, but
+without the factory's gap predicate it draws continuously: the host does not
+provide whitespace to custom renderers.
+
+Under time-scale conflation the area is drawn from buckets of several bars, and
+a whitespace run narrower than one bucket cannot be resolved at that bar
+spacing: it is absorbed into the bucket rather than breaking the area at every
+bar. Zooming in past the conflation threshold shows the gap again.

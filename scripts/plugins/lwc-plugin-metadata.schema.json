@@ -52,6 +52,16 @@
 			"minLength": 1,
 			"description": "Relative path to the HTML demo page"
 		},
+		"preview": {
+			"type": "string",
+			"minLength": 1,
+			"description": "Relative path to a self-contained HTML preview page for the catalogue embed"
+		},
+		"previewHeight": {
+			"type": "integer",
+			"minimum": 200,
+			"description": "Height in CSS pixels the catalogue gives the preview frame; defaults to 330"
+		},
 		"tags": {
 			"type": "array",
 			"items": {
@@ -59,6 +69,11 @@
 			},
 			"description": "Tags for search and indexing in the plugin registry"
 		}
+	},
+	"dependencies": {
+		"previewHeight": [
+			"preview"
+		]
 	},
 	"additionalProperties": false
 }

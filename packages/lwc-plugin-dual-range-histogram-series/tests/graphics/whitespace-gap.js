@@ -30,7 +30,7 @@ function runTestCase(container) {
 	}));
 	const data = generateData();
 
-	const histogram = chart.addCustomSeries(new LwcPlugin.DualRangeHistogramSeries(), {
+	const histogram = LwcPlugin.createDualRangeHistogramSeries(chart, {
 		priceLineVisible: false,
 		lastValueVisible: false,
 		borderRadius: { upOuter: 3, upInner: 0, downOuter: 3, downInner: 0 },

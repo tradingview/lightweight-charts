@@ -38,9 +38,10 @@ setting ignores the `exports` field and will report the imports as unresolved.
 | `canvas/round-rect` | `drawRoundRect`, `drawRoundRectWithBorder`, `clampCornerRadius`, `CornerRadii` — rounded rectangles with an inset border |
 | `closest-index` | `ClosestTimeIndexFinder` — cached binary search for the first index at or after (or last at or before) a time |
 | `custom-series/line-paths` | `buildLinePath`, `buildStepLinePath`, `areaBetween`, `strokeStyledPolyline` — polylines (straight or stepped), the band between two lines, and a line whose style changes along its length |
+| `custom-series/options-aware-series` | `createOptionsAwareSeries`, `createWhitespaceSeries`, `OptionsAwareSeries` — retain accepted input, bind price-value builders to current options and refresh stored values when scaling options change |
 | `custom-series/renderer-base` | `CustomSeriesRendererBase`, `CustomSeriesDrawArgs` — a custom series renderer with the data and visible-range guards done, leaving `drawImpl` |
 | `custom-series/stacking` | `cumulativeSum`, `stackLevels`, `stackedPlotValues` — running totals, the band boundaries of a stack drawn from a base, and the autoscale values of a stack that may contain negatives |
-| `custom-series/visible-bars` | `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `visibleSegments` — iterate the visible bars only, reach the pane edge, split at whitespace gaps |
+| `custom-series/visible-bars` | `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `visibleSegments`, `whitespaceGapCheck`, `AcceptedInput`, `barCoordinate`, `getConflationFactor` — iterate the visible bars only, reach the pane edge, split at whitespace gaps wide enough to see at the current bar spacing |
 | `delegate` | `Delegate`, `ISubscription` — a small subscribe/fire event primitive |
 | `dimensions/candles` | `candlestickWidth` — the body width the chart itself would use at a given bar spacing |
 | `dimensions/columns` | `calculateColumnPositions`, `calculateColumnPositionsInPlace` — evenly spaced column bars with consistent gaps |

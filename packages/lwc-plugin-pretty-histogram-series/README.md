@@ -24,10 +24,10 @@ Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
+import { createPrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new PrettyHistogramSeries(), {
+const series = createPrettyHistogramSeries(chart, {
     color: '#2962FF',
     widthPercent: 60,
     radius: 6,
@@ -61,10 +61,10 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
+import { createPrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new PrettyHistogramSeries(), {
+const series = createPrettyHistogramSeries(chart, {
     color: '#2962FF',
     widthPercent: 60,
     radius: 6,
@@ -84,10 +84,10 @@ Add the series with `addCustomSeries`, then set histogram data:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { PrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
+import { createPrettyHistogramSeries } from '@tradingview/lwc-plugin-pretty-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
-const series = chart.addCustomSeries(new PrettyHistogramSeries(), {
+const series = createPrettyHistogramSeries(chart, {
     color: '#2962FF',
     widthPercent: 60,
     radius: 6,
@@ -130,6 +130,22 @@ Bars are therefore never cut off at the edge of the pane, and no custom
 
 `base` is read when the data is set, so change it before or together with
 `setData` if you also rely on the autoscale following it.
+
+## Creating a series
+
+Use `createPrettyHistogramSeries(chart, options?, paneIndex?)`. It returns the
+normal series API, with the plugin's data and options types preserved. The helper
+makes scaling options available before the first `setData` and rebuilds plot
+values automatically when those options change through `series.applyOptions`.
+This keeps autoscaling, last-value labels and crosshair values consistent. The
+helper retains a shallow copy of the input data, including whitespace, and
+re-ingests it only when a scaling option changes. Streaming updates remain
+incremental.
+
+The low-level `PrettyHistogramSeries` pane view remains available for integrations
+that supply their own options getter to its constructor. Passing scaling options
+only to `chart.addCustomSeries(new PrettyHistogramSeries(), options)` cannot make
+them available before data ingestion on LWC 5.0; use the creation helper instead.
 
 ## Options
 

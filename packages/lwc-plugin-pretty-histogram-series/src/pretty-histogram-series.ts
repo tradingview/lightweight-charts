@@ -1,4 +1,7 @@
+import { createOptionsAwareSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
 import {
+	DeepPartial,
+	IChartApiBase,
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
 	ICustomSeriesPaneRenderer,
@@ -18,7 +21,7 @@ export class PrettyHistogramSeries<
 	private _renderer: PrettyHistogramSeriesRenderer<HorzScaleItem, TData>;
 	private _options: PrettyHistogramSeriesOptions = defaultOptions;
 
-	public constructor() {
+	public constructor(private readonly _readOptions?: () => Readonly<PrettyHistogramSeriesOptions>) {
 		this._renderer = new PrettyHistogramSeriesRenderer();
 	}
 
@@ -27,7 +30,7 @@ export class PrettyHistogramSeries<
 	 * line the columns grow from in view — the same as the built-in histogram.
 	 */
 	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
-		return [this._options.base, plotRow.value];
+		return [(this._readOptions?.() ?? this._options).base, plotRow.value];
 	}
 
 	public isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> {
@@ -68,3 +71,16 @@ export type {
 	PrettyHistogramWidthMode,
 } from './options';
 export { defaultOptions } from './options';
+
+/**
+ * Adds a series with synchronous option access for correct initial autoscaling.
+ * applyOptions automatically rebuilds plot values when scaling options change.
+ * Use this helper in place of chart.addCustomSeries(new PrettyHistogramSeries(), options).
+ */
+export function createPrettyHistogramSeries<H = Time, D extends PrettyHistogramData<H> = PrettyHistogramData<H>>(
+	chart: IChartApiBase<H>,
+	options: DeepPartial<PrettyHistogramSeriesOptions> = {},
+	paneIndex: number = 0
+): OptionsAwareSeries<H, D, PrettyHistogramSeriesOptions> {
+	return createOptionsAwareSeries(chart, readOptions => new PrettyHistogramSeries<H, D>(readOptions), defaultOptions, options, ['base'], paneIndex);
+}

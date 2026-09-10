@@ -47,6 +47,7 @@
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.5",
+		"@tradingview/lwc-plugin-preview-kit": "workspace:*",
 		"@tradingview/lwc-toolkit": "workspace:*",
 		"@types/chai": "5.2.1",
 		"@types/node": "22.13.14",
@@ -64,6 +65,7 @@
 		"origin": "official",
 		"author": "TradingView",
 		"demo": "src/example/index.html",
+		"preview": "src/example/preview.html",
 		"tags": [
 			"stacked",
 			"bars",

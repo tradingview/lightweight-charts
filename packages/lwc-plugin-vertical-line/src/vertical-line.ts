@@ -1,3 +1,6 @@
+import { cloneReadonly } from '@tradingview/lwc-toolkit/simple-clone';
+import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
+import { paneContentElement } from '@tradingview/lwc-toolkit/dom/pane-element';
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
 	Coordinate,
@@ -28,6 +31,9 @@ import {
 	defaultOptions,
 } from './options';
 import { drawTextBadge } from './text-badge';
+
+/** Only one line may suspend a chart's controls for a pointer gesture. */
+const dragOwners = new WeakMap<IChartApi, VerticalLine>();
 
 class VerticalLinePaneRenderer implements IPrimitivePaneRenderer {
 	private _source: VerticalLine;
@@ -121,6 +127,7 @@ export class VerticalLine extends PluginBase {
 	private _time: Time;
 	private _x: Coordinate | null = null;
 	private _dragging: boolean = false;
+	private _pointerId: number | null = null;
 	private _restoreHandlers: (() => void) | null = null;
 	private _unsubscribers: (() => void)[] = [];
 
@@ -282,7 +289,25 @@ export class VerticalLine extends PluginBase {
 			this._x = timeScale.timeToCoordinate(this._time);
 			return;
 		}
-		const index = timeScale.timeToIndex(this._time, true);
+		let index = timeScale.timeToIndex(this._time, true);
+		// findNearest returns the following bar between two times. Compare both
+		// neighbours to place the line at the closest time instead.
+		if (index !== null && index > 0) {
+			const leftX = timeScale.logicalToCoordinate((index - 1) as Logical);
+			const rightX = timeScale.logicalToCoordinate(index as unknown as Logical);
+			const left = leftX === null ? null : timeScale.coordinateToTime(leftX);
+			const right = rightX === null ? null : timeScale.coordinateToTime(rightX);
+			// A zero-width time scale (a hidden container, for one) converts no
+			// coordinates, so the nearest comparison is skipped and the line
+			// keeps findNearest's following bar. The next updateAllViews runs
+			// this again once the scale has a width.
+			if (left !== null && right !== null) {
+				const time = convertTimeUTC(this._time);
+				if (Math.abs(time - convertTimeUTC(left)) < Math.abs(convertTimeUTC(right) - time)) {
+					index = (index - 1) as typeof index;
+				}
+			}
+		}
 		this._x =
 			index === null
 				? null
@@ -322,6 +347,7 @@ export class VerticalLine extends PluginBase {
 	}
 
 	private _unsubscribeDragHandlers(): void {
+		this._endDrag();
 		this._unsubscribers.forEach((unsubscribe: () => void) => unsubscribe());
 		this._unsubscribers = [];
 	}
@@ -340,9 +366,14 @@ export class VerticalLine extends PluginBase {
 	}
 
 	private _onPointerDown = (event: PointerEvent): void => {
-		if (this._x === null) {
+		if (this._x === null || this._dragging || !event.isPrimary || event.button !== 0) {
 			return;
 		}
+		if (dragOwners.has(this.chart)) { return; }
+		const element = paneContentElement(this.series.getPane());
+		if (element === null) { return; }
+		const box = element.getBoundingClientRect();
+		if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) { return; }
 		const x = this._paneX(event.clientX);
 		const halfWidth = this._options.width / 2;
 		if (
@@ -352,15 +383,19 @@ export class VerticalLine extends PluginBase {
 			return;
 		}
 		this._dragging = true;
+		this._pointerId = event.pointerId;
 		// The chart would otherwise pan under the pointer while the line moves.
 		const chart = this.chart;
-		const { handleScroll, handleScale } = chart.options();
+		dragOwners.set(chart, this);
+		const { handleScroll: scroll, handleScale: scale } = chart.options();
+		const handleScroll = typeof scroll === 'boolean' ? scroll : cloneReadonly(scroll);
+		const handleScale = typeof scale === 'boolean' ? scale : cloneReadonly(scale);
 		chart.applyOptions({ handleScroll: false, handleScale: false });
 		this._restoreHandlers = () => chart.applyOptions({ handleScroll, handleScale });
 	};
 
 	private _onPointerMove = (event: PointerEvent): void => {
-		if (!this._dragging) {
+		if (!this._dragging || event.pointerId !== this._pointerId) {
 			return;
 		}
 		const x = this._paneX(event.clientX);
@@ -373,15 +408,21 @@ export class VerticalLine extends PluginBase {
 		}
 	};
 
-	private _onPointerUp = (): void => {
-		this._endDrag();
+	private _onPointerUp = (event: PointerEvent): void => {
+		if (event.pointerId === this._pointerId) { this._endDrag(); }
 	};
 
 	private _endDrag(): void {
 		this._dragging = false;
+		this._pointerId = null;
+		const chart = this._chartOrNull();
+		if (chart !== null && dragOwners.get(chart) === this) {
+			dragOwners.delete(chart);
+		}
 		if (this._restoreHandlers !== null) {
-			this._restoreHandlers();
+			const restore = this._restoreHandlers;
 			this._restoreHandlers = null;
+			restore();
 		}
 	}
 }
