@@ -632,6 +632,13 @@ function rewriteTarget(target, ctx) {
 	if (/^(mailto:|tel:|#)/.test(target)) {
 		return null;
 	}
+	if (/^pathname:\/\//.test(target)) {
+		// Docusaurus's own escape hatch for linking to a same-site path that
+		// isn't a content route it can validate (e.g. a file another plugin
+		// emits in postBuild, like llms.txt). Unwrap it and resolve the
+		// remaining path the same way as any other site-relative link.
+		target = target.slice('pathname://'.length);
+	}
 	if (/^https?:/i.test(target)) {
 		// A link written as a full URL to this very site still has to become a
 		// Markdown link when it points at an exported page.

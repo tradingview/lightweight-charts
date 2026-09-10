@@ -75,6 +75,13 @@ function extractLinks(filePath, tokens, parentLineNumber) {
 			continue;
 		}
 
+		// Docusaurus's escape hatch for a same-site path it can't validate as a
+		// content route (e.g. a file another plugin emits at build time, like
+		// llms.txt) - left unchecked here too, same as an external link.
+		if (/^pathname:\/\//.test(urlPrefix)) {
+			continue;
+		}
+
 		let linkToFilePath;
 
 		// if a link is inside website docs then we should treat links started from `/` a bit differently
