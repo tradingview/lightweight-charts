@@ -3,7 +3,7 @@
 A map of all documentation pages with their headings, for navigation by LLMs and tools. Every page is available as Markdown at the linked URL.
 
 > Version: 5.2 (latest released)
-> Last updated: 2026-09-08 12:06:25 UTC
+> Last updated: 2026-09-10 10:42:51 UTC
 
 This map uses a hierarchical structure:
 
@@ -24,6 +24,13 @@ This map uses a hierarchical structure:
   - Setting and updating a data
     - Setting the data to a series
     - Updating the data in a series
+- [Build with AI](https://tradingview.github.io/lightweight-charts/docs/ai.md)
+  - AI-friendly documentation
+    - llms.txt and the docs map
+    - Per-page Markdown
+    - TypeScript definition files
+    - How to use this with AI tools
+  - AI coding assistants
 - [Series](https://tradingview.github.io/lightweight-charts/docs/series-types.md)
   - Supported types
     - Area

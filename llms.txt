@@ -3,12 +3,13 @@
 > Official documentation for Lightweight Charts™, a free, open-source library for building interactive financial charts on the web. Every page below is available as Markdown by appending `.md` to its URL.
 > See [docs_map.md](https://tradingview.github.io/lightweight-charts/docs_map.md) for a version that also lists each page's headings.
 > Version: 5.2 (latest released)
-> Last updated: 2026-09-08 12:06:25 UTC
+> Last updated: 2026-09-10 10:42:51 UTC
 
 
 ## Documentation
 
 - [Getting started](https://tradingview.github.io/lightweight-charts/docs.md)
+- [Build with AI](https://tradingview.github.io/lightweight-charts/docs/ai.md)
 - [Series](https://tradingview.github.io/lightweight-charts/docs/series-types.md)
 - [Chart types](https://tradingview.github.io/lightweight-charts/docs/chart-types.md)
 - [Price scale](https://tradingview.github.io/lightweight-charts/docs/price-scale.md)
