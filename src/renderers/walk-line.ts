@@ -105,7 +105,7 @@ export function walkLine<TItem extends LinePoint, TStyle extends CanvasRendering
 					break;
 				}
 				case LineType.Curved: {
-					const [cp1, cp2] = getControlPoints(items, i - 1, i);
+					const [cp1, cp2] = getControlPoints(items, i);
 					const cp1x = cp1.x * horizontalPixelRatio;
 					const cp1y = cp1.y * verticalPixelRatio;
 					const cp2x = cp2.x * horizontalPixelRatio;
@@ -149,28 +149,83 @@ export function walkLine<TItem extends LinePoint, TStyle extends CanvasRendering
 	}
 }
 
-const curveTension = 6;
-
-function subtract(p1: LinePoint, p2: LinePoint): LinePoint {
-	return { x: p1.x - p2.x as Coordinate, y: p1.y - p2.y as Coordinate };
-}
-
-function add(p1: LinePoint, p2: LinePoint): LinePoint {
-	return { x: p1.x + p2.x as Coordinate, y: p1.y + p2.y as Coordinate };
-}
-
-function divide(p1: LinePoint, n: number): LinePoint {
-	return { x: p1.x / n as Coordinate, y: p1.y / n as Coordinate };
+function segmentSlope(p1: LinePoint, p2: LinePoint): number {
+	const width = p2.x - p1.x;
+	return width !== 0 ? (p2.y - p1.y) / width : 0;
 }
 
 /**
- * @returns Two control points that can be used as arguments to {@link CanvasRenderingContext2D.bezierCurveTo} to draw a curved line between `points[fromPointIndex]` and `points[toPointIndex]`.
+ * This is the Fritsch-Carlson formula for monotone interpolation.
+ * https://en.wikipedia.org/wiki/Monotone_cubic_interpolation
  */
-export function getControlPoints(points: readonly LinePoint[], fromPointIndex: number, toPointIndex: number): [LinePoint, LinePoint] {
-	const beforeFromPointIndex = Math.max(0, fromPointIndex - 1);
-	const afterToPointIndex = Math.min(points.length - 1, toPointIndex + 1);
-	const cp1 = add(points[fromPointIndex], divide(subtract(points[toPointIndex], points[beforeFromPointIndex]), curveTension));
-	const cp2 = subtract(points[toPointIndex], divide(subtract(points[afterToPointIndex], points[fromPointIndex]), curveTension));
+function monotoneSlope(
+	leftWidth: number,
+	leftSlope: number,
+	rightWidth: number,
+	rightSlope: number
+): number {
+	// Points on a line always have increasing x coordinates, so segments always have a width that is greater than zero.
+	// If the input does not obey this rule a slope calculation is not possible so we make the curve horizontal at the shared point.
+	if (leftWidth <= 0 || rightWidth <= 0) {
+		return 0;
+	}
+
+	// The slope of a segment is a good estimate of the slope of the curve at the center of that
+	// segment. Thus the two segment slopes give the slope of the curve at two known positions.
+	// A linear interpolation between the two known slopes gives the slope at the shared point.
+	// The center of the narrow segment is nearer to the shared point than the center of the wide
+	// segment. Thus the slope of the narrow segment must get the larger weight. This is the
+	// reason that each slope is multiplied by the width of the other segment.
+	const weightedSlope =
+		(leftSlope * rightWidth + rightSlope * leftWidth) /
+		(leftWidth + rightWidth);
+	// `Math.sign(left) + Math.sign(right)` is +2 or -2 when the slopes are in the same up/down direction, and 0 when they don't.
+	return (
+		(Math.sign(leftSlope) + Math.sign(rightSlope)) *
+		Math.min(Math.abs(leftSlope), Math.abs(rightSlope), 0.5 * Math.abs(weightedSlope))
+	);
+}
+
+/**
+ * Calculates the control points needed to draw the curve between the point at `endPointIndex - 1` and the point at `endPointIndex`.
+ *
+ * @returns Two control points that can be used as arguments to {@link CanvasRenderingContext2D.bezierCurveTo} to draw the curve segment.
+ */
+export function getControlPoints(
+	points: readonly LinePoint[],
+	endPointIndex: number
+): [LinePoint, LinePoint] {
+	// The segment (line between two points) being drawn...
+	const startPoint = points[endPointIndex - 1];
+	const endPoint = points[endPointIndex];
+	const width = endPoint.x - startPoint.x;
+	const slope = segmentSlope(startPoint, endPoint);
+
+	// ...and its neighbouring points. Where the line begins or ends there is no neighbouring segment so
+	// we pretend the line continues with a copy of the drawn segment, which makes `monotoneSlope` return
+	// the drawn segment's slope, so the curve enters/leaves the line pointing straight along its first/last
+	// segment (and a two point series is a straight line).
+	const pointBeforeStart = endPointIndex > 1 ? points[endPointIndex - 2] : null;
+	const pointAfterEnd = endPointIndex < points.length - 1 ? points[endPointIndex + 1] : null;
+	const widthBefore = pointBeforeStart !== null ? startPoint.x - pointBeforeStart.x : width;
+	const slopeBefore = pointBeforeStart !== null ? segmentSlope(pointBeforeStart, startPoint) : slope;
+	const widthAfter = pointAfterEnd !== null ? pointAfterEnd.x - endPoint.x : width;
+	const slopeAfter = pointAfterEnd !== null ? segmentSlope(endPoint, pointAfterEnd) : slope;
+
+	// The slope the curve has as it passes through each end of the segment.
+	const startPointSlope = monotoneSlope(widthBefore, slopeBefore, width, slope);
+	const endPointSlope = monotoneSlope(width, slope, widthAfter, slopeAfter);
+
+	// Each control point sits a third of the way into the segment, shifted vertically so that the
+	// curve leaves `startPoint` and arrives at `endPoint` with the slopes chosen above.
+	const cp1: LinePoint = {
+		x: (startPoint.x + width / 3) as Coordinate,
+		y: (startPoint.y + (startPointSlope * width) / 3) as Coordinate,
+	};
+	const cp2: LinePoint = {
+		x: (endPoint.x - width / 3) as Coordinate,
+		y: (endPoint.y - (endPointSlope * width) / 3) as Coordinate,
+	};
 
 	return [cp1, cp2];
 }
