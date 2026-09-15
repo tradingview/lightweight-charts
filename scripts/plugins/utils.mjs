@@ -164,17 +164,22 @@ export function loadTargetPlugins(repoRoot, options) {
 }
 
 /**
- * Builds the library and the toolkit from the workspace. Plugin builds resolve
- * both through workspace links whose entry points live in `dist/`, so nothing
- * that compiles a plugin can run on a clean checkout before this has.
+ * Builds the library and the workspace helper packages a plugin compiles
+ * against: @tradingview/lwc-toolkit, and @tradingview/lwc-plugin-preview-kit,
+ * which the catalogue preview page of every package imports. Plugin builds
+ * resolve all three through workspace links whose entry points live in `dist/`,
+ * so nothing that compiles a plugin can run on a clean checkout before this has.
  *
  * @param {string} repoRoot - Absolute path to repository root.
  */
 export function buildWorkspaceDependencies(repoRoot) {
 	console.log('📦 Building the workspace library...');
 	execSync('pnpm build', { cwd: repoRoot, stdio: 'inherit' });
-	console.log('📦 Building @tradingview/lwc-toolkit...');
-	execSync('pnpm --filter @tradingview/lwc-toolkit build', { cwd: repoRoot, stdio: 'inherit' });
+	console.log('📦 Building @tradingview/lwc-toolkit and @tradingview/lwc-plugin-preview-kit...');
+	execSync(
+		'pnpm --filter @tradingview/lwc-toolkit --filter @tradingview/lwc-plugin-preview-kit build',
+		{ cwd: repoRoot, stdio: 'inherit' }
+	);
 }
 
 /**
