@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Pretty histogram series Plugin Example</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				overflow: hidden;
+				background-color: rgba(248, 249, 253, 1);
+				color: rgba(19, 23, 34, 1);
+				font-family: system-ui, -apple-system, sans-serif;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+			}
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				align-items: center;
+				padding: 8px 12px;
+				font-size: 13px;
+			}
+			#controls label {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+			#chart {
+				flex: 1 1 auto;
+				min-height: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="controls">
+			<label>
+				Radius
+				<input id="radius" type="range" min="0" max="12" step="1" value="4" />
+				<output id="radius-value">4</output>
+			</label>
+			<label>
+				Width %
+				<input id="width" type="range" min="10" max="100" step="5" value="50" />
+				<output id="width-value">50</output>
+			</label>
+			<label>
+				Up color
+				<input id="up-color" type="color" value="#089981" />
+			</label>
+			<label>
+				Down color
+				<input id="down-color" type="color" value="#f23645" />
+			</label>
+			<label>
+				<input id="two-tone" type="checkbox" checked />
+				Two-tone by sign
+			</label>
+		</div>
+		<div id="chart"></div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>

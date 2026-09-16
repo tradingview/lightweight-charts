@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Vertical line Plugin Example</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				overflow: hidden;
+				background-color: rgba(248, 249, 253, 1);
+				color: rgba(19, 23, 34, 1);
+				font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS',
+					Roboto, Ubuntu, sans-serif;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+			}
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 16px;
+				align-items: center;
+				padding: 8px 12px;
+				font-size: 13px;
+			}
+			#controls label {
+				display: inline-flex;
+				gap: 6px;
+				align-items: center;
+			}
+			#chart {
+				flex: 1 1 auto;
+				min-height: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="controls">
+			<label
+				>Line style
+				<select id="line-style">
+					<option value="0">Solid</option>
+					<option value="1">Dotted</option>
+					<option value="2" selected>Dashed</option>
+					<option value="3">Large dashed</option>
+					<option value="4">Sparse dotted</option>
+				</select>
+			</label>
+			<label
+				>Snap
+				<select id="snap">
+					<option value="exact">exact</option>
+					<option value="nearest" selected>nearest</option>
+				</select>
+			</label>
+			<label
+				>Label
+				<select id="label">
+					<option value="none">hidden</option>
+					<option value="time" selected>chart time format</option>
+					<option value="text">custom text</option>
+				</select>
+			</label>
+			<label
+				><input id="draggable" type="checkbox" checked /> Draggable (green
+				line)</label
+			>
+		</div>
+		<div id="chart"></div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>

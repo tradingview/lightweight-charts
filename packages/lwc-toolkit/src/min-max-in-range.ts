@@ -2,6 +2,17 @@ interface UpperLowerData {
 	upper: number;
 	lower: number;
 }
+
+/**
+ * Finds the lowest `lower` and highest `upper` over a range of items, which is
+ * what an autoscale provider needs for a band-style series.
+ *
+ * The array is scanned in fixed-size chunks whose extremes are cached, so the
+ * requested range is widened to whole chunks and repeated queries are cheap.
+ * The items are read lazily and the results are cached: the array passed to the
+ * constructor must not be mutated afterwards - build a new instance instead.
+ * The returned object is the cached one, so callers must not mutate it either.
+ */
 export class UpperLowerInRange<T extends UpperLowerData> {
 	private _arr: T[];
 	private _chunkSize: number;
@@ -13,10 +24,17 @@ export class UpperLowerInRange<T extends UpperLowerData> {
 		this._cache = new Map();
 	}
 
+	/**
+	 * @param startIndex - first item of the range (inclusive).
+	 * @param endIndex - last item of the range (inclusive). It is rounded up to
+	 * the end of the chunk it falls in, and clamped to the end of the array.
+	 * @returns the lowest `lower` and the highest `upper` over the range.
+	 */
 	public getMinMax(startIndex: number, endIndex: number): UpperLowerData {
 		const cacheKey = `${startIndex}:${endIndex}`;
-		if (cacheKey in this._cache) {
-			return this._cache.get(cacheKey) as T;
+		const cached = this._cache.get(cacheKey);
+		if (cached !== undefined) {
+			return cached;
 		}
 
 		const result: UpperLowerData = {
@@ -38,9 +56,9 @@ export class UpperLowerInRange<T extends UpperLowerData> {
 			);
 			const chunkCacheKey = `${chunkStart}:${chunkEnd}`;
 
-			if (chunkCacheKey in this._cache.keys()) {
-				const item = this._cache.get(cacheKey) as T;
-				this._check(item, result);
+			const cachedChunk = this._cache.get(chunkCacheKey);
+			if (cachedChunk !== undefined) {
+				this._check(cachedChunk, result);
 			} else {
 				const chunkResult: UpperLowerData = {
 					lower: Infinity,

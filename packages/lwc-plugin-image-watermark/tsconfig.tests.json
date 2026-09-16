@@ -1,0 +1,11 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"declaration": false,
+		"declarationDir": null,
+		"types": ["node"]
+	},
+	"include": ["src", "tests/unit"]
+}

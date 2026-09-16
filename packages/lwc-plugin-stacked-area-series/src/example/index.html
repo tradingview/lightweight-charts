@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Stacked area series Plugin Example</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				overflow: hidden;
+				background-color: rgba(248, 249, 253, 1);
+				color: rgba(19, 23, 34, 1);
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+					sans-serif;
+			}
+			#chart {
+				width: 100%;
+				height: 100%;
+			}
+			#controls {
+				position: absolute;
+				top: 12px;
+				left: 12px;
+				z-index: 2;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 12px;
+				align-items: center;
+				padding: 8px 12px;
+				border-radius: 6px;
+				background-color: rgba(255, 255, 255, 0.9);
+				box-shadow: 0 1px 4px rgba(19, 23, 34, 0.2);
+				font-size: 13px;
+			}
+			#controls label {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="controls">
+			<label>
+				Line type
+				<select id="line-type">
+					<option value="simple">simple</option>
+					<option value="step">step</option>
+					<option value="curved">curved</option>
+				</select>
+			</label>
+			<label>
+				Gaps
+				<select id="gap-handling">
+					<option value="break">break</option>
+					<option value="bridge">bridge</option>
+				</select>
+			</label>
+			<label>
+				<input id="percent-mode" type="checkbox" />
+				100% stacked
+			</label>
+		</div>
+		<div id="chart"></div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>

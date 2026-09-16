@@ -17,6 +17,7 @@ const DEFAULT_REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const SCAFFOLD_PLACEHOLDERS = [
 	'_ATTACH_SNIPPET_',
 	'_USAGE_SNIPPET_',
+	'_PREVIEW_SNIPPET_',
 	'_ENTRYNAME_',
 	'_PLUGINNAME_',
 	'_CLASSNAME_',
@@ -163,17 +164,22 @@ export function loadTargetPlugins(repoRoot, options) {
 }
 
 /**
- * Builds the library and the toolkit from the workspace. Plugin builds resolve
- * both through workspace links whose entry points live in `dist/`, so nothing
- * that compiles a plugin can run on a clean checkout before this has.
+ * Builds the library and the workspace helper packages a plugin compiles
+ * against: @tradingview/lwc-toolkit, and @tradingview/lwc-plugin-preview-kit,
+ * which the catalogue preview page of every package imports. Plugin builds
+ * resolve all three through workspace links whose entry points live in `dist/`,
+ * so nothing that compiles a plugin can run on a clean checkout before this has.
  *
  * @param {string} repoRoot - Absolute path to repository root.
  */
 export function buildWorkspaceDependencies(repoRoot) {
 	console.log('📦 Building the workspace library...');
 	execSync('pnpm build', { cwd: repoRoot, stdio: 'inherit' });
-	console.log('📦 Building @tradingview/lwc-toolkit...');
-	execSync('pnpm --filter @tradingview/lwc-toolkit build', { cwd: repoRoot, stdio: 'inherit' });
+	console.log('📦 Building @tradingview/lwc-toolkit and @tradingview/lwc-plugin-preview-kit...');
+	execSync(
+		'pnpm --filter @tradingview/lwc-toolkit --filter @tradingview/lwc-plugin-preview-kit build',
+		{ cwd: repoRoot, stdio: 'inherit' }
+	);
 }
 
 /**
@@ -462,11 +468,11 @@ export function validatePackageMetadata(packageDir, { isOfficial = true, repoRoo
 
 	errors.push(...validateRepositoryDirectory(pkg, packageDir, repoRoot));
 
-	// Demo file existence: strictly checks the declared demo path in lwcPlugin.demo
-	if (pkg.lwcPlugin && typeof pkg.lwcPlugin.demo === 'string') {
-		const demoPath = path.join(packageDir, pkg.lwcPlugin.demo);
-		if (!fs.existsSync(demoPath)) {
-			errors.push(`Declared demo file '${pkg.lwcPlugin.demo}' does not exist in ${packageDir}`);
+	// A declared page that is not there would leave the catalogue framing a 404.
+	for (const field of ['demo', 'preview']) {
+		const declared = pkg.lwcPlugin && pkg.lwcPlugin[field];
+		if (typeof declared === 'string' && !fs.existsSync(path.join(packageDir, declared))) {
+			errors.push(`Declared ${field} file '${declared}' does not exist in ${packageDir}`);
 		}
 	}
 

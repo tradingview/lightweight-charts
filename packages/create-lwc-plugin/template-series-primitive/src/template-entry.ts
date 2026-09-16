@@ -3,10 +3,14 @@ import {
 	_CLASSNAME_PriceAxisPaneView,
 	_CLASSNAME_TimeAxisPaneView,
 } from './axis-pane-view';
-import { _CLASSNAME_PriceAxisView, _CLASSNAME_TimeAxisView } from './axis-view';
+import {
+	_CLASSNAME_PriceAxisLabelSource,
+	_CLASSNAME_TimeAxisLabelSource,
+} from './axis-view';
 import { Point, _CLASSNAME_DataSource } from './data-source';
 import { _CLASSNAME_Options, defaultOptions } from './options';
 import { _CLASSNAME_PaneView } from './pane-view';
+import { AxisLabelView } from '@tradingview/lwc-toolkit/axis-label-view';
 import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
 
 export class _CLASSNAME_
@@ -17,8 +21,8 @@ export class _CLASSNAME_
 	private _p1: Point;
 	private _p2: Point;
 	private _paneViews: _CLASSNAME_PaneView[];
-	private _timeAxisViews: _CLASSNAME_TimeAxisView[];
-	private _priceAxisViews: _CLASSNAME_PriceAxisView[];
+	private _timeAxisViews: AxisLabelView[];
+	private _priceAxisViews: AxisLabelView[];
 	private _priceAxisPaneViews: _CLASSNAME_PriceAxisPaneView[];
 	private _timeAxisPaneViews: _CLASSNAME_TimeAxisPaneView[];
 
@@ -35,13 +39,15 @@ export class _CLASSNAME_
 			...options,
 		};
 		this._paneViews = [new _CLASSNAME_PaneView(this)];
+		//* AxisLabelView renders each label from its source, and hides it while
+		//* the point cannot be placed on the axis.
 		this._timeAxisViews = [
-			new _CLASSNAME_TimeAxisView(this, p1),
-			new _CLASSNAME_TimeAxisView(this, p2),
+			new AxisLabelView(new _CLASSNAME_TimeAxisLabelSource(this, p1)),
+			new AxisLabelView(new _CLASSNAME_TimeAxisLabelSource(this, p2)),
 		];
 		this._priceAxisViews = [
-			new _CLASSNAME_PriceAxisView(this, p1),
-			new _CLASSNAME_PriceAxisView(this, p2),
+			new AxisLabelView(new _CLASSNAME_PriceAxisLabelSource(this, p1)),
+			new AxisLabelView(new _CLASSNAME_PriceAxisLabelSource(this, p2)),
 		];
 		this._priceAxisPaneViews = [new _CLASSNAME_PriceAxisPaneView(this, true)];
 		this._timeAxisPaneViews = [new _CLASSNAME_TimeAxisPaneView(this, false)];
@@ -50,9 +56,9 @@ export class _CLASSNAME_
 	updateAllViews() {
 		//* Use this method to update any data required by the
 		//* views to draw.
+		//* The axis labels read their coordinates from the chart on demand, so
+		//* only the pane views need updating here.
 		this._paneViews.forEach(pw => pw.update());
-		this._timeAxisViews.forEach(pw => pw.update());
-		this._priceAxisViews.forEach(pw => pw.update());
 		this._priceAxisPaneViews.forEach(pw => pw.update());
 		this._timeAxisPaneViews.forEach(pw => pw.update());
 	}

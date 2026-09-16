@@ -56,6 +56,23 @@ version of Lightweight Charts™ it supports, and the tags to list it under. Tho
 answers populate the generated `package.json`, including the `lwcPlugin` block
 read by the plugin catalogue.
 
+Before any of that, the wizard offers to install the
+[plugin-authoring Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md)
+for AI coding assistants such as Claude Code, Codex and Cursor. The skill
+covers choosing the plugin type, building on `@tradingview/lwc-toolkit`, which
+official plugin to read as the reference for your idea, where the docs are, and
+the autoscale, whitespace and hit-test mistakes a first plugin tends to make.
+Say yes and you can either carry on — the skill is installed into the new
+project when the wizard finishes — or quit right there: the skill is installed
+into the current directory and you hand the rest over to your assistant, which
+knows how to run this wizard with you. It is installed with the
+[`skills` CLI](https://github.com/vercel-labs/skills), which asks which
+assistants to set it up for; you can also run it yourself at any time:
+
+```bash
+npx skills add tradingview/lightweight-charts --skill lightweight-charts-plugin-authoring
+```
+
 ## Using the generated project
 
 ### Running Locally (during development)

@@ -1,6 +1,7 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { findPluginStandalone, getPluginTestCases, packagesDir } from '../graphics/helpers/get-plugin-test-cases';
 import { FileToServe, runTests } from '../runner';
 
 const currentFilePath = fileURLToPath(import.meta.url);
@@ -27,5 +28,21 @@ const filesToServe: FileToServe[] = [
 		envVar: 'TEST_STANDALONE_PATH',
 	},
 ];
+
+const plugins = getPluginTestCases('interactions');
+if (plugins.length > 0) {
+	filesToServe.push({
+		name: 'test.mjs',
+		filePath: resolve(testStandalonePath.replace(/\.js$/, '.mjs')),
+		envVar: 'TEST_STANDALONE_ESM_PATH',
+	});
+	for (const plugin of plugins) {
+		const build = findPluginStandalone(packagesDir, plugin);
+		if (build === null) {
+			throw new Error(`Build ${plugin.packageName} before running interaction tests`);
+		}
+		filesToServe.push({ name: `${plugin.folder}.js`, filePath: build });
+	}
+}
 
 void runTests(testFiles, filesToServe, 3 * 60 * 1000);

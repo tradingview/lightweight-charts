@@ -94,7 +94,14 @@ function setupFloorProject(tempDir, plugin, floorVersion, toolkitTarballPath) {
 		throw new Error('a tsconfig.json and a typescript devDependency are required to typecheck the package');
 	}
 	fs.cpSync(path.join(plugin.dir, 'src'), path.join(tempDir, 'src'), { recursive: true });
-	fs.copyFileSync(tsconfigPath, path.join(tempDir, 'tsconfig.json'));
+	// The floor describes the plugin, not its demo page, which may use newer
+	// chart options that the floor version ignores at runtime. The package
+	// tsconfig may contain comments, so it is extended rather than parsed.
+	fs.copyFileSync(tsconfigPath, path.join(tempDir, 'tsconfig.package.json'));
+	fs.writeFileSync(
+		path.join(tempDir, 'tsconfig.json'),
+		JSON.stringify({ extends: './tsconfig.package.json', exclude: ['src/example'] }, null, '\t')
+	);
 
 	const dependencies = { 'lightweight-charts': floorVersion };
 	for (const [dep, ver] of Object.entries(plugin.packageJson.dependencies || {})) {

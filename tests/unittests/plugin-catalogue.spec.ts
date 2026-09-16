@@ -14,6 +14,7 @@ import { createHash } from 'node:crypto';
 
 import { findWorkspacePlugins } from '../../scripts/plugins/utils.mjs';
 import {
+	DEFAULT_PREVIEW_HEIGHT,
 	buildCatalogueData,
 	fetchPackument,
 	fetchTarballReadme,
@@ -66,6 +67,8 @@ function validManifest(name: string, version: string): Record<string, unknown> {
 			lifecycle: 'current',
 			origin: 'official',
 			demo: 'src/example/index.html',
+			preview: 'src/example/preview.html',
+			previewHeight: 440,
 			tags: ['sample'],
 		},
 	};
@@ -80,6 +83,7 @@ function makeRepo(packages: Record<string, Record<string, unknown> | string>): s
 		fs.writeFileSync(path.join(dir, 'package.json'), typeof manifest === 'string' ? manifest : JSON.stringify(manifest, null, 2));
 		fs.writeFileSync(path.join(dir, 'README.md'), validReadme);
 		fs.writeFileSync(path.join(dir, 'src', 'example', 'index.html'), '<!doctype html>');
+		fs.writeFileSync(path.join(dir, 'src', 'example', 'preview.html'), '<!doctype html>');
 	}
 	return root;
 }
@@ -382,7 +386,34 @@ describe('Plugin catalogue data', () => {
 				expect(entry.lwcPlugin.tags).to.deep.equal([]);
 				expect(entry.repository.directory).to.equal('packages/lwc-plugin-line');
 				expect(entry.demoPath).to.equal('packages/lwc-plugin-line/src/example/index.html');
+				expect(entry.previewPath).to.equal('packages/lwc-plugin-line/src/example/preview.html');
+				expect(entry.demoUrl).to.equal('/plugin-demos/line/');
+				expect(entry.previewUrl).to.equal('/plugin-previews/line/');
+				expect(entry.previewHeight).to.equal(440);
 				expect(entry.npmUrl).to.equal('https://www.npmjs.com/package/@tradingview/lwc-plugin-line');
+			} finally {
+				fs.rmSync(root, { recursive: true, force: true });
+			}
+		});
+
+		it('should fall back to framing the demo, with a warning, for a package declaring no preview', async () => {
+			const manifest = validManifest('@tradingview/lwc-plugin-line', '1.0.0');
+			delete (manifest.lwcPlugin as Record<string, unknown>).preview;
+			delete (manifest.lwcPlugin as Record<string, unknown>).previewHeight;
+			const root = makeRepo({ 'lwc-plugin-line': manifest });
+			const warnings: string[] = [];
+			try {
+				const data = await buildCatalogueData({
+					repoRoot: root,
+					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': packument('1.0.0') }),
+					log: { warn: message => warnings.push(message) },
+				});
+				const [entry] = data.plugins;
+				expect(entry.previewPath).to.be.null;
+				expect(entry.previewUrl).to.be.null;
+				expect(entry.demoUrl).to.equal('/plugin-demos/line/');
+				expect(entry.previewHeight).to.equal(DEFAULT_PREVIEW_HEIGHT);
+				expect(warnings.join('\n')).to.include('no lwcPlugin.preview');
 			} finally {
 				fs.rmSync(root, { recursive: true, force: true });
 			}

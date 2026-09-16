@@ -30,7 +30,11 @@ export function serveLocalFiles(
 		if (requestedFile === undefined) {
 			res.sendStatus(404);
 		} else {
-			res.sendFile(requestedFile);
+			// Module scripts are fetched with CORS, unlike classic scripts.
+			res.set('Access-Control-Allow-Origin', '*');
+			// The explicit file map is the allowlist; a checkout may live under
+			// a hidden directory (for example .codex/worktrees).
+			res.sendFile(requestedFile, { dotfiles: 'allow' });
 		}
 	});
 

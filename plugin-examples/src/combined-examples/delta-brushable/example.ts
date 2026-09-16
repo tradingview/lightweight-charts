@@ -1,7 +1,9 @@
 import { WhitespaceData, createChart } from 'lightweight-charts';
-import { BrushableAreaSeries } from '../../plugins/brushable-area-series/brushable-area-series';
-import { BrushableAreaData } from '../../plugins/brushable-area-series/data';
-import { BrushableAreaStyle } from '../../plugins/brushable-area-series/options';
+import {
+	BrushableAreaData,
+	BrushableAreaSeries,
+	BrushableAreaStyle,
+} from '@tradingview/lwc-plugin-brushable-area-series';
 import { DeltaTooltipPrimitive } from '../../plugins/delta-tooltip/delta-tooltip';
 import { generateLineData } from '../../sample-data';
 
@@ -71,10 +73,7 @@ chart.timeScale().fitContent();
 
 tooltipPrimitive.activeRange().subscribe(activeRange => {
 	if (activeRange === null) {
-		brushAreaSeries.applyOptions({
-			brushRanges: [],
-			...baseStyle,
-		});
+		brushAreaSeries.applyOptions({ brushRanges: [] });
 		return;
 	}
 	brushAreaSeries.applyOptions({
@@ -87,7 +86,7 @@ tooltipPrimitive.activeRange().subscribe(activeRange => {
 				style: activeRange.positive ? greenStyle : redStyle,
 			},
 		],
-		...fadeStyle,
+		outsideStyle: fadeStyle,
 	});
 });
 
