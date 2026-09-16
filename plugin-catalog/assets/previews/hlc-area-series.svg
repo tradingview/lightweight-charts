@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="HLC Area Series preview placeholder">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <polygon fill="#3179f5" opacity="0.15"
+           points="20,96 70,72 120,86 170,52 220,68 300,40 300,84 220,110 170,96 120,128 70,116 20,140"/>
+  <polyline points="20,96 70,72 120,86 170,52 220,68 300,40"
+            fill="none" stroke="#90BFF9" stroke-width="1.5"/>
+  <polyline points="20,140 70,116 120,128 170,96 220,110 300,84"
+            fill="none" stroke="#90BFF9" stroke-width="1.5"/>
+  <polyline points="20,118 70,94 120,108 170,74 220,90 300,62"
+            fill="none" stroke="#3179f5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>
