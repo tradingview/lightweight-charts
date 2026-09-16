@@ -1,8 +1,21 @@
 # Build with AI
 
+## AI coding assistants
+
+The Lightweight Charts™ repository ships two [Agent Skills](https://github.com/tradingview/lightweight-charts/tree/master/.github/skills) for AI coding assistants, such as Claude Code and Codex. The skills give the assistant current v5 knowledge to work from, instead of outdated snippets it may remember from training:
+
+- [`lightweight-charts`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) is about *using* the library. It covers the v5 API conventions, the mental model, and common time, scale, marker, plugin, and wrapper foot-guns.
+- [`lightweight-charts-plugin-authoring`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md) is about *writing* a [plugin](https://tradingview.github.io/lightweight-charts/docs/plugins/intro.md). The skill helps choose between a custom series and a primitive, build on `@tradingview/lwc-toolkit`, and learn from the official plugin packages. It also warns about the common autoscale, whitespace, and hit-test traps. The `create-lwc-plugin` wizard offers to install this skill into a new plugin project.
+
+Install either or both with the `skills` CLI; add `--skill <name>` to pick one of the two:
+
+```console
+npx skills add tradingview/lightweight-charts
+```
+
 ## AI-friendly documentation
 
-This documentation is structured so that AI coding assistants and other LLM-based tools can read it directly, without scraping HTML, following the [llms.txt] convention.
+The Lightweight Charts™ documentation is structured so that AI coding assistants and other LLM-based tools can read it directly, without scraping HTML, following the [llms.txt] convention.
 
 ### llms.txt and the docs map
 
@@ -28,18 +41,6 @@ The TypeScript declaration file always matches the latest version and is hosted 
 
 - Point an AI coding assistant or IDE at [`llms.txt`](https://tradingview.github.io/lightweight-charts/llms.txt) so it knows which pages exist, or at a specific page's `.md` URL for detailed content.
 - Use the **Copy as Markdown** button to paste a page straight into a chat.
-
-## AI coding assistants
-
-This repository ships an [Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) for AI coding assistants. It covers the Lightweight Charts™ v5 API conventions, the mental model, and common time, scale, marker, plugin, and wrapper foot-guns.
-
-Install it into your project with the `skills` CLI:
-
-```console
-npx skills add https://github.com/tradingview/lightweight-charts
-```
-
-This makes the skill available to compatible assistants, such as Claude Code and Codex. They scaffold charts, wire up series and data, and answer API questions against current v5 conventions out of the box instead of relying on outdated snippets and stumbling into common foot-guns.
 
 [llms.txt]: https://llmstxt.org/
 
