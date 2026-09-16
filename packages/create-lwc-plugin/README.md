@@ -9,7 +9,7 @@ template for one of the three plugin types:
 - a custom series
 
 The scaffolded project is ready to publish: its `package.json` follows the
-conventions used by the Lightweight Charts™ plugin catalogue, so the plugin can
+conventions used by the Lightweight Charts™ plugin catalog, so the plugin can
 be listed there once it is published to npm.
 
 ✨ Need some examples for inspiration? Check out the
@@ -39,7 +39,7 @@ pnpm create lwc-plugin
 The wizard asks for the plugin's name, description, author, license, the minimum
 version of Lightweight Charts™ it supports, and the tags to list it under. Those
 answers populate the generated `package.json`, including the `lwcPlugin` block
-read by the plugin catalogue.
+read by the plugin catalog.
 
 Before any of that, the wizard offers to install the
 [plugin-authoring Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md)
@@ -110,4 +110,4 @@ pnpm create lwc-plugin --workspace
 Workspace mode targets `packages/`, scopes the package name to `@tradingview/`,
 depends on the library and the shared plugin utilities through `workspace:*`,
 seeds a `CHANGELOG.md`, `LICENSE` and `NOTICE`, and marks the plugin as an
-official catalogue entry.
+official catalog entry.

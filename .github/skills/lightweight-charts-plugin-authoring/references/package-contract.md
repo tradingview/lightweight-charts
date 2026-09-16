@@ -1,27 +1,27 @@
 # The plugin package contract
 
-What makes a plugin package publishable and catalogue-ready. Upstream,
+What makes a plugin package publishable and catalog-ready. Upstream,
 `pnpm plugins:validate` (`scripts/plugins/validate-metadata.mjs`) enforces all
 of it and fails CI otherwise; a project scaffolded by `create-lwc-plugin`
 already satisfies every item, so this is mostly a list of what not to break.
-The catalogue on the docs site lists the official packages today; the same
+The catalog on the docs site lists the official packages today; the same
 contract is what any plugin would need to be listed.
 
 ## `package.json`
 
 | Field | Rule | Why |
 | --- | --- | --- |
-| `name` | starts with `lwc-plugin-` (unscoped), or `@tradingview/lwc-plugin-` for an official package | the unscoped remainder is the catalogue's URL segment and the entry file name |
+| `name` | starts with `lwc-plugin-` (unscoped), or `@tradingview/lwc-plugin-` for an official package | the unscoped remainder is the catalog's URL segment and the entry file name |
 | `version` | valid semver | the release script compares it with npm |
-| `description` | non-empty | shown on the catalogue card |
+| `description` | non-empty | shown on the catalog card |
 | `license` | non-empty SPDX id | shown on the detail page |
 | `publishConfig.access` | `"public"` | scoped packages default to restricted |
-| `peerDependencies.lightweight-charts` | a valid range, `^5.0.0` unless a 5.1 hook is required | the catalogue shows "works with"; consumers install the library themselves |
+| `peerDependencies.lightweight-charts` | a valid range, `^5.0.0` unless a 5.1 hook is required | the catalog shows "works with"; consumers install the library themselves |
 | `keywords` | includes `lightweight-charts-plugin` | how npm search and the registry find plugins |
 | `files` | `dist` (+ `CHANGELOG.md`, `NOTICE` for official) | ship built output only |
 | `exports` | `.` and `./standalone`, each with `types` + `default` | the standalone build inlines everything but the library, for CDN import maps |
-| `lwcPlugin` | see below | the catalogue's curated metadata |
-| `repository.directory` | must equal the package's real path in the repo | the "source" link and the catalogue read it |
+| `lwcPlugin` | see below | the catalog's curated metadata |
+| `repository.directory` | must equal the package's real path in the repo | the "source" link and the catalog read it |
 
 ## The `lwcPlugin` block
 
@@ -36,7 +36,7 @@ unknown keys are errors.
 | `origin` | yes | `official` \| `community` (workspace packages must be `official`) |
 | `demo` | yes | package-relative path of the dev demo page; the file must exist |
 | `author` | no | display name |
-| `preview` | no | package-relative path of the catalogue preview page; must exist if declared |
+| `preview` | no | package-relative path of the catalog preview page; must exist if declared |
 | `previewHeight` | no | integer ≥ 200, CSS px for the preview frame (default 330); only with `preview` |
 | `tags` | no | search terms |
 
@@ -47,7 +47,7 @@ unknown keys are errors.
   runs, negatives, every option as a control. `pnpm dev` serves it; upstream,
   `pnpm plugins:build-demos` builds it to `/plugin-demos/<slug>/` on the site.
 - **Preview** (`src/example/preview.html` + `preview.ts`, `lwcPlugin.preview`):
-  what the catalogue frames next to the README, in a frame ~330 px tall. Show
+  what the catalog frames next to the README, in a frame ~330 px tall. Show
   the plugin at its best: clean data, two or three controls, no explanatory
   text. Official packages build it with the private
   `@tradingview/lwc-plugin-preview-kit` (layout + `mountControls` /
@@ -57,7 +57,7 @@ Neither page is the plugin's tests. Keep them free of assertions.
 
 ## README shape
 
-The catalogue renders the README as the page body (its H1 dropped, since the
+The catalog renders the README as the page body (its H1 dropped, since the
 page header shows the title), with the Installation subsections lifted into
 an npm/CDN tab switcher. So:
 

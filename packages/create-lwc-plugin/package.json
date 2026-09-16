@@ -16,7 +16,8 @@
     "template-series",
     "template-series-primitive",
     "template-workspace",
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "dev": "unbuild --stub && echo 'now run `node index.js`'",

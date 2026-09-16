@@ -15,11 +15,30 @@ import { generateLineData } from './sample-data';
 // next door carries the full write-up, the caption line, the high-contrast and
 // data-scope switches and the marker/price-line annotations.
 const titles = {
-	en: { price: 'Sample price chart', volume: 'Sample volume chart', focus: 'Focus the chart', start: 'Start live updates', stop: 'Stop live updates' },
-	es: { price: 'Gráfico de precios', volume: 'Gráfico de volumen', focus: 'Enfocar el gráfico', start: 'Iniciar actualizaciones', stop: 'Detener actualizaciones' },
+	en: {
+		price: 'Price',
+		average: 'Moving average',
+		volume: 'Volume',
+		priceTitle: 'Sample price chart',
+		volumeTitle: 'Sample volume chart',
+		focus: 'Focus the chart',
+		start: 'Start live updates',
+		stop: 'Stop live updates',
+	},
+	es: {
+		price: 'Precio',
+		average: 'Media móvil',
+		volume: 'Volumen',
+		priceTitle: 'Gráfico de precios',
+		volumeTitle: 'Gráfico de volumen',
+		focus: 'Enfocar el gráfico',
+		start: 'Iniciar actualizaciones',
+		stop: 'Detener actualizaciones',
+	},
 };
 type Language = keyof typeof titles;
 let language: Language = 'en';
+const text = (): (typeof titles)['en'] => titles[language];
 
 const chart = createChart('chart', {
 	autoSize: true,
@@ -33,14 +52,14 @@ const priceSeries = chart.addSeries(AreaSeries, {
 	topColor: 'rgba(41, 98, 255, 0.4)',
 	bottomColor: 'rgba(41, 98, 255, 0)',
 	lineWidth: 2,
-	title: 'Price',
+	title: text().price,
 });
 priceSeries.setData(priceData);
 
 const averageSeries = chart.addSeries(LineSeries, {
 	color: 'rgb(225, 87, 90)',
 	lineWidth: 2,
-	title: 'Moving average',
+	title: text().average,
 });
 const period = 20;
 averageSeries.setData(priceData.slice(period - 1).map((point, index) => {
@@ -52,14 +71,14 @@ averageSeries.setData(priceData.slice(period - 1).map((point, index) => {
 }));
 
 // A second pane, so Tab moves between two independent accessible regions.
-const volumeSeries = chart.addSeries(HistogramSeries, { color: 'rgb(38, 166, 154)', title: 'Volume' }, 1);
+const volumeSeries = chart.addSeries(HistogramSeries, { color: 'rgb(38, 166, 154)', title: text().volume }, 1);
 volumeSeries.setData(priceData.map(point => ({ time: point.time, value: point.value * 10 })));
 
 const sonifier = createToneSonifier();
 let sound = false;
 
 const accessibility = addAccessibilityPlugin(chart, {
-	chartTitle: paneIndex => (paneIndex === 0 ? titles[language].price : titles[language].volume),
+	chartTitle: paneIndex => (paneIndex === 0 ? text().priceTitle : text().volumeTitle),
 	showShortcuts: true,
 	focusOnPointerDown: true,
 	syncCrosshair: true,
@@ -85,7 +104,38 @@ function streamNextPoint(): void {
 	volumeSeries.update({ time, value: lastPrice * 10 });
 }
 
-mountControls([
+// The two buttons whose wording follows the language; assigned once the
+// controls are mounted below.
+let focusButton: HTMLButtonElement;
+let liveButton: HTMLButtonElement;
+
+function updateButtonLabels(): void {
+	focusButton.textContent = text().focus;
+	liveButton.textContent = liveTimer === undefined ? text().start : text().stop;
+}
+
+/**
+ * The runtime language switch: one `applyOptions` call swaps the announced
+ * strings, the `lang` of the regions and the pane titles. The series titles
+ * and the page's own buttons are plain chart options and DOM text, so the
+ * demo translates those itself.
+ */
+function applyLanguage(next: Language): void {
+	language = next;
+	document.documentElement.lang = language;
+	chart.applyOptions({ localization: { locale: language } });
+	priceSeries.applyOptions({ title: text().price });
+	averageSeries.applyOptions({ title: text().average });
+	volumeSeries.applyOptions({ title: text().volume });
+	accessibility.applyOptions({
+		messages: language === 'es' ? esMessages : {},
+		lang: language,
+		chartTitle: paneIndex => (paneIndex === 0 ? text().priceTitle : text().volumeTitle),
+	});
+	updateButtonLabels();
+}
+
+const controls = mountControls([
 	{
 		kind: 'select',
 		label: 'Language',
@@ -93,38 +143,24 @@ mountControls([
 			{ value: 'en', label: 'English' },
 			{ value: 'es', label: 'Español' },
 		],
-		// The runtime language switch: one applyOptions call swaps the announced
-		// strings, the `lang` of the regions and the pane titles.
-		onChange: value => {
-			language = value as Language;
-			document.documentElement.lang = language;
-			chart.applyOptions({ localization: { locale: language } });
-			accessibility.applyOptions({
-				messages: language === 'es' ? esMessages : {},
-				lang: language,
-				chartTitle: paneIndex => (paneIndex === 0 ? titles[language].price : titles[language].volume),
-			});
-		},
+		onChange: value => applyLanguage(value as Language),
 	},
 	{
 		kind: 'button',
-		label: titles.en.focus,
-		onClick: button => {
-			accessibility.focus(0);
-			button.textContent = titles[language].focus;
-		},
+		label: text().focus,
+		onClick: () => accessibility.focus(0),
 	},
 	{
 		kind: 'button',
-		label: titles.en.start,
-		onClick: button => {
+		label: text().start,
+		onClick: () => {
 			if (liveTimer === undefined) {
 				liveTimer = window.setInterval(streamNextPoint, 3000);
 			} else {
 				window.clearInterval(liveTimer);
 				liveTimer = undefined;
 			}
-			button.textContent = liveTimer === undefined ? titles[language].start : titles[language].stop;
+			updateButtonLabels();
 		},
 	},
 	{
@@ -135,3 +171,4 @@ mountControls([
 		},
 	},
 ]);
+[focusButton, liveButton] = Array.from(controls.querySelectorAll('button'));
