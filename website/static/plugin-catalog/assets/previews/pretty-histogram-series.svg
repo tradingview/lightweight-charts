@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Pretty Histogram preview placeholder">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <g fill="#00c853">
+    <rect x="26" y="112" width="12" height="42" rx="6"/>
+    <rect x="50" y="92" width="12" height="62" rx="6"/>
+    <rect x="74" y="102" width="12" height="52" rx="6"/>
+    <rect x="98" y="70" width="12" height="84" rx="6"/>
+    <rect x="122" y="84" width="12" height="70" rx="6"/>
+    <rect x="146" y="48" width="12" height="106" rx="6"/>
+    <rect x="170" y="62" width="12" height="92" rx="6"/>
+    <rect x="194" y="78" width="12" height="76" rx="6"/>
+    <rect x="218" y="56" width="12" height="98" rx="6"/>
+    <rect x="242" y="88" width="12" height="66" rx="6"/>
+    <rect x="266" y="72" width="12" height="82" rx="6"/>
+    <rect x="290" y="98" width="12" height="56" rx="6"/>
+  </g>
+</svg>

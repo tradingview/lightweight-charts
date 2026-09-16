@@ -21,14 +21,12 @@
 
 TradingView Lightweight Charts™ are one of the smallest and fastest financial HTML5 charts.
 
-The Lightweight Charts™ library is the best choice for you if you want to display financial data as an interactive chart on your web page without affecting your web page loading speed and performance.
-
-It is the best choice for you if you want to replace static image charts with interactive ones.
+The Lightweight Charts™ library is the best choice for you if you want to display financial data as an interactive chart on your web page, or replace static image charts with interactive ones. It does this without affecting your web page's loading speed and performance.
 The size of the library is close to static images but if you have dozens of image charts on a web page then using this library can make the size of your web page smaller.
 
-Take a look at [awesome-tradingview](https://github.com/tradingview/awesome-tradingview?tab=readme-ov-file#lightweight-charts) for related projects created by our community members.
+The library provides a rich set of charting capabilities out of the box, but you can also extend its functionality by building custom plugins. Browse the [plugin catalog](https://tradingview.github.io/lightweight-charts/plugins) for ready-made plugins, or see the [interactive plugin examples](https://tradingview.github.io/lightweight-charts/plugin-examples/) and [plugin-examples/README.md](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) to build your own.
 
-The library provides a rich set of charting capabilities out of the box, but developers can also extend its functionality by building custom plugins. See the [interactive plugin examples here](https://tradingview.github.io/lightweight-charts/plugin-examples/), or check out [plugin-examples/README.md](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) for more details.
+Take a look at [awesome-tradingview](https://github.com/tradingview/awesome-tradingview?tab=readme-ov-file#lightweight-charts) for related projects created by our community members.
 
 ## Installing
 
@@ -92,7 +90,7 @@ lineSeries.setData([
 ]);
 ```
 
-### Build Variants
+### Build variants
 
 |Dependencies included|Mode|ES module|IIFE (`window.LightweightCharts`)|
 |-|-|-|-|
@@ -121,7 +119,7 @@ See [BUILDING.md](./BUILDING.md) for instructions on how to build `lightweight-c
 ## License
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this software except in compliance with the License.
-You may obtain a copy of the License at LICENSE file.
+You may obtain a copy of the License in the [LICENSE](./LICENSE) file.
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 This software incorporates several parts of tslib (<https://github.com/Microsoft/tslib>, (c) Microsoft Corporation) that are covered by BSD Zero Clause License.

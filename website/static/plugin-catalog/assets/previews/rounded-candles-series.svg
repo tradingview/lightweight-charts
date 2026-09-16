@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Rounded Candles Series preview placeholder">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <g stroke="#089981" stroke-width="2">
+    <line x1="36" y1="70" x2="36" y2="134"/>
+    <line x1="116" y1="78" x2="116" y2="140"/>
+    <line x1="196" y1="40" x2="196" y2="108"/>
+    <line x1="236" y1="32" x2="236" y2="84"/>
+  </g>
+  <g stroke="#f23645" stroke-width="2">
+    <line x1="76" y1="60" x2="76" y2="114"/>
+    <line x1="156" y1="50" x2="156" y2="106"/>
+    <line x1="276" y1="44" x2="276" y2="110"/>
+  </g>
+  <g fill="#089981">
+    <rect x="27" y="84" width="18" height="42" rx="5"/>
+    <rect x="107" y="92" width="18" height="40" rx="5"/>
+    <rect x="187" y="52" width="18" height="48" rx="5"/>
+    <rect x="227" y="44" width="18" height="32" rx="5"/>
+  </g>
+  <g fill="#f23645">
+    <rect x="67" y="72" width="18" height="34" rx="5"/>
+    <rect x="147" y="62" width="18" height="36" rx="5"/>
+    <rect x="267" y="56" width="18" height="44" rx="5"/>
+  </g>
+</svg>

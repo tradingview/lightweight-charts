@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Brushable Area Series preview placeholder">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <polygon fill="#c9c9c9" opacity="0.25"
+           points="20,118 60,100 100,112 140,80 180,94 220,64 260,80 300,58 300,170 20,170"/>
+  <polyline points="20,118 60,100 100,112 140,80 180,94 220,64 260,80 300,58"
+            fill="none" stroke="#8c8c8c" stroke-width="2"/>
+  <clipPath id="brush"><rect x="110" y="0" width="110" height="180"/></clipPath>
+  <g clip-path="url(#brush)">
+    <polygon fill="#26c6da" opacity="0.25"
+             points="20,118 60,100 100,112 140,80 180,94 220,64 260,80 300,58 300,170 20,170"/>
+    <polyline points="20,118 60,100 100,112 140,80 180,94 220,64 260,80 300,58"
+              fill="none" stroke="#26c6da" stroke-width="2.5"/>
+  </g>
+  <line x1="110" y1="16" x2="110" y2="168" stroke="#26c6da" stroke-width="2"/>
+  <line x1="220" y1="16" x2="220" y2="168" stroke="#26c6da" stroke-width="2"/>
+  <rect x="103" y="82" width="14" height="22" rx="4" fill="#ffffff" stroke="#26c6da" stroke-width="2"/>
+  <rect x="213" y="82" width="14" height="22" rx="4" fill="#ffffff" stroke="#26c6da" stroke-width="2"/>
+</svg>

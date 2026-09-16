@@ -268,7 +268,11 @@ const getConfig = async () => {
 			],
 		],
 
-		customFields: {},
+		customFields: {
+			// Frozen at build time so the server-rendered markup and the
+			// hydrated client derive the same "New" badge (no Date.now() in render).
+			catalogueBuildTime: Date.now(),
+		},
 
 		themeConfig: {
 			navbar: {
@@ -294,6 +298,11 @@ const getConfig = async () => {
 						docId: 'api/index',
 						position: 'left',
 						label: 'API Reference',
+					},
+					{
+						to: '/plugins',
+						position: 'left',
+						label: 'Plugins',
 					},
 					{
 						type: 'docsVersionDropdown',

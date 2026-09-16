@@ -49,9 +49,18 @@ module.exports = function pluginCatalogue(context) {
 
 		async contentLoaded({ content, actions }) {
 			// Global data is loaded on every page, so it carries everything but the
-			// READMEs. Each full entry is written as its own JSON module for the
-			// per-plugin pages to load through their route (createData + addRoute).
-			await Promise.all(content.plugins.map(entry => actions.createData(`${entry.slug}.json`, JSON.stringify(entry))));
+			// READMEs. Each full entry is written as its own JSON module and handed
+			// to its own route as the `entry` prop (addRoute does not prepend the
+			// site baseUrl itself).
+			await Promise.all(content.plugins.map(async entry => {
+				const entryPath = await actions.createData(`${entry.slug}.json`, JSON.stringify(entry));
+				actions.addRoute({
+					path: `${context.baseUrl}plugins/${entry.slug}`,
+					component: '@site/src/components/PluginDetails/index.tsx',
+					exact: true,
+					modules: { entry: entryPath },
+				});
+			}));
 			actions.setGlobalData({
 				registry: content.registry,
 				unpublished: content.unpublished,
