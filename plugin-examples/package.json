@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build:deps": "pnpm --filter @tradingview/lwc-toolkit --filter @tradingview/lwc-plugin-brushable-area-series build",
+        "build:deps": "pnpm --filter @tradingview/lwc-toolkit --filter @tradingview/lwc-plugin-preview-kit --filter @tradingview/lwc-plugin-brushable-area-series build",
         "build": "pnpm build:deps && tsc",
         "compile": "pnpm build:deps && tsc && node compile.mjs",
         "dev": "pnpm build:deps && vite --config src/vite.config.js",

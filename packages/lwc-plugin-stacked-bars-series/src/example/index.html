@@ -24,7 +24,8 @@
 				position: absolute;
 				top: 12px;
 				left: 12px;
-				z-index: 2;
+				/* above the chart's own canvases, which sit at z-index 2 */
+				z-index: 10;
 				display: flex;
 				flex-wrap: wrap;
 				gap: 12px;

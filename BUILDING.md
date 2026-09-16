@@ -82,6 +82,8 @@ Each package's `compile.mjs` is a few lines that hand the package's own Vite and
 
 Plugin and toolkit releases are tagged with their npm identifier, `@tradingview/lwc-plugin-<name>@X.Y.Z` and `@tradingview/lwc-toolkit@X.Y.Z`, next to the library's `vX.Y.Z` tags.
 
+The GitHub Releases page stays focused on the library. Package releases do not get an entry each; instead every publishing round, whatever mix of toolkit and plugins it ships, gets one grouped release on a lightweight `plugins-YYYY-MM-DD` tag on the published commit. Create it with "Set as the latest release" unticked, so the library's `vX.Y.Z` release keeps the Latest label, the `/releases/latest` URL and the sidebar. The body is a sentence on what the round was, then a table of package and version with each row linking to that package's `CHANGELOG.md` at its own tag (`blob/@tradingview/lwc-toolkit@X.Y.Z/packages/lwc-toolkit/CHANGELOG.md`), not on `master`, so the link still describes that version after the next bump. For a toolkit-driven round, say that the plugins were rebuilt for the toolkit change.
+
 ### Releasing a plugin package
 
 1. Prerequisites: Node 22 or later, publish rights for the `@tradingview` scope (`npm whoami` shows the account), and a clean checkout of `master`. `pnpm publish` refuses to run from another branch or with uncommitted changes.
@@ -97,7 +99,7 @@ Plugin and toolkit releases are tagged with their npm identifier, `@tradingview/
     git push origin --tags
     ```
 
-    A GitHub release is optional; the changelog entry is the release note.
+    The changelog entry is the release note. Once every package of the round is published, add the grouped GitHub release described under "Plugin packages": tag the commit `plugins-YYYY-MM-DD`, push it, and create the release on that tag with "Set as the latest release" unticked.
 
 ### Releasing the toolkit
 
@@ -110,7 +112,7 @@ Plugins bundle `@tradingview/lwc-toolkit` into their own `dist/` when they are b
 1. Check the package the way CI does, in `packages/lwc-toolkit`: `pnpm dlx publint@0.3.14 --strict` and `pnpm dlx @arethetypeswrong/cli@0.18.5 --pack . --ignore-rules no-resolution cjs-resolves-to-esm`.
 1. Dry run, then publish: `pnpm --filter @tradingview/lwc-toolkit publish --access public --dry-run`, then the same command without `--dry-run`.
 1. Tag it, `git tag @tradingview/lwc-toolkit@X.Y.Z`, and push the tags.
-1. Release the plugins bumped in step 2 by following "Releasing a plugin package" from its build step onward. Their bundled toolkit changed, so the checks step applies to them in full.
+1. Release the plugins bumped in step 2 by following "Releasing a plugin package" from its build step onward. Their bundled toolkit changed, so the checks step applies to them in full. The toolkit and those plugins share one grouped GitHub release, created at the end of that procedure.
 
 ## Tips
 
