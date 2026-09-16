@@ -723,6 +723,9 @@ importers:
       '@docusaurus/logger':
         specifier: 3.7.0
         version: 3.7.0
+      '@docusaurus/mdx-loader':
+        specifier: 3.7.0
+        version: 3.7.0(@swc/core@1.16.1)(postcss@8.5.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@docusaurus/types':
         specifier: 3.7.0
         version: 3.7.0(@swc/core@1.16.1)(postcss@8.5.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

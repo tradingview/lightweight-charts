@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@docusaurus/logger": "3.7.0",
+    "@docusaurus/mdx-loader": "3.7.0",
     "@docusaurus/types": "3.7.0",
     "@tsconfig/docusaurus": "2.0.3",
     "mdast-util-from-markdown": "2.0.2",
