@@ -103,18 +103,16 @@ lineSeries.setData([
 
 ## AI coding assistants
 
-This repository ships two [Agent Skills](https://github.com/tradingview/lightweight-charts/tree/master/.github/skills) for AI coding assistants:
+This repository ships two [Agent Skills](https://github.com/tradingview/lightweight-charts/tree/master/.github/skills) for AI coding assistants, such as Claude Code and Codex. The skills give the assistant current v5 knowledge to work from, instead of outdated snippets it may remember from training:
 
-- [`lightweight-charts`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) teaches an assistant how to work with the library - the v5 API conventions, the mental model, and the common time, scale, marker, plugin, and wrapper foot-guns.
-- [`lightweight-charts-plugin-authoring`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md) teaches it how to write a plugin - choosing between a custom series and a primitive, building on `@tradingview/lwc-toolkit`, reading the official plugin packages as reference implementations, and the autoscale, whitespace and hit-test traps. The `create-lwc-plugin` wizard offers to install this one into a new plugin project.
+- [`lightweight-charts`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) is about *using* the library. It covers the v5 API conventions, the mental model, and common time, scale, marker, plugin, and wrapper foot-guns.
+- [`lightweight-charts-plugin-authoring`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md) is about *writing* a [plugin](https://tradingview.github.io/lightweight-charts/docs/plugins/intro). The skill helps choose between a custom series and a primitive, build on `@tradingview/lwc-toolkit`, and learn from the official plugin packages. It also warns about the common autoscale, whitespace, and hit-test traps. The `create-lwc-plugin` wizard offers to install this skill into a new plugin project.
 
-Install either or both into your project with the `skills` CLI:
+Install either or both with the `skills` CLI; add `--skill <name>` to pick one of the two:
 
 ```console
 npx skills add tradingview/lightweight-charts
 ```
-
-Add `--skill <name>` to pick one. This makes the skills available to compatible assistants (such as Claude Code, Codex, etc.), streamlining your workflow: they scaffold charts, wire up series and data, and answer API questions against the current v5 conventions out of the box - instead of relying on outdated snippets and stumbling into common foot-guns.
 
 ## Development
 
