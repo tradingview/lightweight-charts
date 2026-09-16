@@ -118,7 +118,7 @@ Options can be changed at runtime with `series.applyOptions({ ... })`.
 ## Options
 
 In addition to the standard
-[custom series options](https://tradingview.github.io/lightweight-charts/docs/api/type-aliases/CustomSeriesOptions)
+[series options](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/SeriesOptionsCommon)
 (`priceLineVisible`, `lastValueVisible`, `priceFormat`, `autoscaleInfoProvider`, …):
 
 | Option | Type | Default | Description |

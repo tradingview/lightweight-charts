@@ -7,9 +7,9 @@ a repository that is not the upstream checkout, read the source on GitHub —
 or the raw file URL under `raw.githubusercontent.com/tradingview/lightweight-charts/master/…` —
 or clone once: `git clone --depth 1 https://github.com/tradingview/lightweight-charts /tmp/lightweight-charts`.
 
-Each package has `src/`, a dev demo (`src/example/index.html`), a catalogue
+Each package has `src/`, a dev demo (`src/example/index.html`), a catalog
 preview (`src/example/preview.html`), `tests/{unit,graphics,interactions}`, a
-README in the catalogue's shape and a CHANGELOG. Read the whole `src/` of the
+README in the catalog's shape and a CHANGELOG. Read the whole `src/` of the
 nearest one before designing; they are small.
 
 Every custom series below ships a `create<Name>Series(chart, options?,

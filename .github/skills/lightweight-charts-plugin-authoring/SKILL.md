@@ -10,7 +10,7 @@ description: >-
   where the docs are, and the autoscale, whitespace, visible-range, hit-test
   and conflation mistakes every plugin author makes once. Reach for it whenever
   the user mentions a custom series, primitive, renderer, drawing on the chart
-  canvas, lwc-plugin, plugin-examples, the toolkit, or the plugin catalogue —
+  canvas, lwc-plugin, plugin-examples, the toolkit, or the plugin catalog —
   even if they never say the word "plugin".
 ---
 
@@ -128,8 +128,8 @@ TTY to answer the prompts yourself. It writes a Vite project with:
 - `src/example/index.html` + `example.ts` — the dev demo, `pnpm dev` serves it
 - `package.json` with `dev`, `build`, `typecheck` and `check-package` scripts,
   a `lightweight-charts` peer range, `@tradingview/lwc-toolkit` as a
-  devDependency, and an `lwcPlugin` block for the catalogue
-- a README already in the shape the catalogue renders
+  devDependency, and an `lwcPlugin` block for the catalog
+- a README already in the shape the catalog renders
 
 Answer yes to "hint comments": they are `//*` lines that explain each part of
 the template and are stripped by the wizard otherwise. Read them, then delete
@@ -326,14 +326,14 @@ Run upstream with `pnpm test`, `pnpm e2e:graphics:plugins` and
 `GREP="lwc-plugin-<name>/" pnpm e2e:interactions`, after `pnpm build:prod`
 and `pnpm --filter "@tradingview/lwc-plugin-*" build`.
 
-## Publishing and the catalogue
+## Publishing and the catalog
 
 A plugin is publishable when `pnpm plugins:validate` passes upstream, or the
 equivalent by hand: an `lwc-plugin-*` name, `publishConfig.access: public`, a
 `lightweight-charts` peer range, the `lightweight-charts-plugin` keyword, a
 complete `lwcPlugin` block, a README with `## Installation` (`### npm` and
 `### CDN` tabs) and `## Usage`, and the demo page it declares. The scaffold
-meets all of it. The docs site's plugin catalogue renders the README and
+meets all of it. The docs site's plugin catalog renders the README and
 frames a preview page built from the package; `references/package-contract.md`
 has the fields, the pages and the first-release changelog convention (short:
 an `Added` list, no `Fixed` — there is nothing to have fixed yet).
