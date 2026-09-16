@@ -1,6 +1,6 @@
 # Preview kit
 
-Private, never published. Shared layout and controls for the catalogue preview
+Private, never published. Shared layout and controls for the catalog preview
 pages of the plugin packages: `src/example/preview.html` and `preview.ts` of
 every `packages/lwc-plugin-*`, declared as `lwcPlugin.preview` and built to
 `/plugin-previews/<slug>/` by `pnpm plugins:build-demos`.
@@ -8,7 +8,7 @@ every `packages/lwc-plugin-*`, declared as `lwcPlugin.preview` and built to
 A preview page is not the plugin's demo. The demo (`lwcPlugin.demo`) is the
 page a developer opens on its own: it carries edge cases, whitespace runs,
 negative values and every option the plugin has. A preview is what the
-catalogue frames next to the README, so it shows the plugin at its best in a
+catalog frames next to the README, so it shows the plugin at its best in a
 short frame and nothing else.
 
 Two entry points:
