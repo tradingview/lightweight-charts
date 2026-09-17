@@ -374,6 +374,23 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	public applyLocalizationOptions(localizationOptions: DeepPartial<LocalizationOptions<HorzScaleItem>>): void {
 		merge(this._localizationOptions, localizationOptions);
 
+		// merge() skips undefined values, so explicitly reset localization formatters when set to undefined
+		if (Object.prototype.hasOwnProperty.call(localizationOptions, 'priceFormatter') && localizationOptions.priceFormatter === undefined) {
+			this._localizationOptions.priceFormatter = undefined;
+		}
+		if (Object.prototype.hasOwnProperty.call(localizationOptions, 'percentageFormatter') && localizationOptions.percentageFormatter === undefined) {
+			this._localizationOptions.percentageFormatter = undefined;
+		}
+		if (Object.prototype.hasOwnProperty.call(localizationOptions, 'tickmarksPriceFormatter') && localizationOptions.tickmarksPriceFormatter === undefined) {
+			this._localizationOptions.tickmarksPriceFormatter = undefined;
+		}
+		if (Object.prototype.hasOwnProperty.call(localizationOptions, 'tickmarksPercentageFormatter') && localizationOptions.tickmarksPercentageFormatter === undefined) {
+			this._localizationOptions.tickmarksPercentageFormatter = undefined;
+		}
+		if (Object.prototype.hasOwnProperty.call(localizationOptions, 'timeFormatter') && localizationOptions.timeFormatter === undefined) {
+			this._localizationOptions.timeFormatter = undefined;
+		}
+
 		this._invalidateTickMarks();
 		this._updateDateTimeFormatter();
 	}
