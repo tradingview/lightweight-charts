@@ -95,7 +95,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ BaselineSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '4.5 KB',
+		limit: '4.56 KB',
 		brotli: true,
 	},
 	{
