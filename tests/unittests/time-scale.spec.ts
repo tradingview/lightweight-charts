@@ -68,6 +68,31 @@ describe('TimeScale', () => {
 		}
 	});
 
+	it('keeps visible bars in place when new bars arrive during a drag', () => {
+		const ts = new TimeScale<Time>(chartModelMock(), { ...timeScaleOptionsDefaults, barSpacing: 5, rightOffset: 0 }, fakeLocalizationOptions, behavior);
+		ts.setWidth(500);
+		ts.update(...tsUpdate(499));
+		ts.setBaseIndex(499 as TimePointIndex);
+		ts.setRightOffset(-100);
+
+		ts.startScroll(250 as Coordinate);
+		ts.scrollTo(260 as Coordinate);
+		const coordinateBeforeUpdate = ts.indexToCoordinate(400 as TimePointIndex);
+
+		// Appending bars moves the base index; preserving the visible range shifts the offset back.
+		ts.update(...tsUpdate(549));
+		ts.setRightOffset(ts.rightOffset() - 50);
+		ts.setBaseIndex(549 as TimePointIndex);
+		expect(ts.indexToCoordinate(400 as TimePointIndex)).to.equal(coordinateBeforeUpdate);
+
+		// Another mouse move at the same position must not undo that compensation.
+		ts.scrollTo(260 as Coordinate);
+		expect(ts.indexToCoordinate(400 as TimePointIndex)).to.equal(coordinateBeforeUpdate);
+
+		ts.scrollTo(270 as Coordinate);
+		expect(ts.indexToCoordinate(400 as TimePointIndex)).to.equal(coordinateBeforeUpdate + 10);
+	});
+
 	describe('timeToIndex', () => {
 		it('should return index for time on scale', () => {
 			const ts = new TimeScale<Time>(chartModelMock(), timeScaleOptionsDefaults, fakeLocalizationOptions, behavior);
