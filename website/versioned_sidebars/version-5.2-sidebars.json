@@ -34,7 +34,8 @@
       "id": "android",
       "label": "Android"
     },
-    "release-notes"
+    "release-notes",
+    "product-comparison"
   ],
   "typedocSidebar": [
     {
