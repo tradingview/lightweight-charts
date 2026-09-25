@@ -38,6 +38,7 @@ const sidebars = {
 			label: 'Android',
 		},
 		'release-notes',
+		'product-comparison',
 	],
 	typedocSidebar: [
 		{
