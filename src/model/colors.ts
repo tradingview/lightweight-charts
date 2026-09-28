@@ -187,7 +187,11 @@ export class ColorParser {
 			(match[4] ? parseFloat(match[4]) : 1) as AlphaComponent,
 		];
 
-		this._rgbaCache.set(color, rgba);
+		// During document loading, computed styles can temporarily resolve to an
+		// inherited color. Allow subsequent reads to recover instead of caching it.
+		if (document.readyState === 'complete') {
+			this._rgbaCache.set(color, rgba);
+		}
 
 		return rgba;
 	}
