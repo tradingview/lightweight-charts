@@ -23,6 +23,7 @@ module.exports = function pluginCatalogue(context) {
 		getPathsToWatch: () => [
 			path.join(repoRoot, 'packages/lwc-plugin-*/package.json'),
 			path.join(repoRoot, 'packages/lwc-plugin-*/README.md'),
+			`!${path.relative(context.siteDir, path.join(repoRoot, 'packages/lwc-plugin-*/node_modules/**'))}`,
 		],
 
 		async loadContent() {
