@@ -23,6 +23,12 @@ module.exports = function pluginCatalogue(context) {
 		getPathsToWatch: () => [
 			path.join(repoRoot, 'packages/lwc-plugin-*/package.json'),
 			path.join(repoRoot, 'packages/lwc-plugin-*/README.md'),
+			// Excludes each plugin's node_modules: pnpm links lightweight-charts back
+			// to the repo root and chokidar follows it forever. This entry must be
+			// relative: Docusaurus only relativises absolute paths, and chokidar joins
+			// a relative "!" path onto siteDir. It must also repeat the globs' own
+			// prefix; a generic `!**/node_modules/**` matches nothing under `..`.
+			`!${path.relative(context.siteDir, path.join(repoRoot, 'packages/lwc-plugin-*/node_modules/**'))}`,
 		],
 
 		async loadContent() {
