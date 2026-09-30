@@ -5,7 +5,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { isDefaultPriceScale } from '../model/default-price-scale';
 import { PriceRangeImpl } from '../model/price-range-impl';
-import { PriceScale, PriceScaleOptions } from '../model/price-scale';
+import { createPriceScaleOptions, PriceScale, PriceScaleOptions } from '../model/price-scale';
 import { convertPriceRangeFromLog } from '../model/price-scale-conversions';
 import { precisionByMinMove } from '../model/series-options';
 import { IRange } from '../model/time-data';
@@ -28,7 +28,13 @@ export class PriceScaleApi implements IPriceScaleApi {
 	}
 
 	public options(): Readonly<PriceScaleOptions> {
-		return this._priceScale().options();
+		const model = this._chartWidget.model();
+		const scale = model.findPriceScale(this._priceScaleId, this._paneIndex);
+		if (scale == null) {
+			return createPriceScaleOptions(model.options().overlayPriceScales);
+		}
+
+		return scale.priceScale.options();
 	}
 
 	public width(): number {
