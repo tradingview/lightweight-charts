@@ -415,7 +415,7 @@ function beforeInteractions(container) {
 			barSpacing: 0.004,
 			enableConflation: true,
 			precomputeConflationOnInit: true,
-			precomputeConflationPriority: 'false',
+			precomputeConflationPriority: 'user-visible',
 		},
 	});
 
