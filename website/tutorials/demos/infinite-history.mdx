@@ -13,6 +13,13 @@ an ever-expanding dataset, resembling a live feed that loads older data when the
 user scrolls back in time. The example depicts a chart that initially loads a
 limited amount of data, but later fetches additional data as required.
 
+The initial amount of data is estimated from the time scale width divided by
+`barSpacing`, so that the loaded bars fill the visible area. The example loads
+50 extra bars, so that the user can scroll back before additional data is
+requested. Refer to the
+[Number of visible bars](/docs/time-scale#number-of-visible-bars) section for
+more information.
+
 Key to this functionality is the
 [`subscribeVisibleLogicalRangeChange`](/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange)
 method. This function is triggered when the visible data range changes, in this
