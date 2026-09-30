@@ -43,30 +43,6 @@ function distanceToBezierCurve(x: number, y: number, points: [LinePoint, LinePoi
 	return minDistance;
 }
 
-function lineSegmentHorizontalBounds(
-	firstItem: LinePoint,
-	secondItem: LinePoint,
-	lineType: LineType,
-	items: readonly LinePoint[],
-	toItemIndex: number
-): [number, number] {
-	switch (lineType) {
-		case LineType.Curved: {
-			const [firstControlPoint, secondControlPoint] = getControlPoints(items, toItemIndex);
-			const minX = Math.min(firstItem.x, secondItem.x, firstControlPoint.x, secondControlPoint.x);
-			const maxX = Math.max(firstItem.x, secondItem.x, firstControlPoint.x, secondControlPoint.x);
-			return [minX, maxX];
-		}
-		case LineType.WithSteps:
-		case LineType.Simple:
-		default: {
-			const minX = Math.min(firstItem.x, secondItem.x);
-			const maxX = Math.max(firstItem.x, secondItem.x);
-			return [minX, maxX];
-		}
-	}
-}
-
 // eslint-disable-next-line max-params
 function hitTestLineSegment(
 	x: Coordinate,
@@ -155,8 +131,9 @@ export function hitTestLineSeries(
 	for (let itemIndex = segmentFrom; itemIndex < segmentTo; itemIndex++) {
 		const previousItem = items[itemIndex - 1];
 		const currentItem = items[itemIndex];
-		const [leftX, rightX] = lineSegmentHorizontalBounds(previousItem, currentItem, lineType, items, itemIndex);
-		if (!isWithinHorizontalSweep(x, leftX, rightX, radius)) {
+		// Items are sorted by x, and every line type (including curved - its control points always
+		// lie within the segment) stays within its segment horizontally, so the item xs bound the segment.
+		if (!isWithinHorizontalSweep(x, previousItem.x, currentItem.x, radius)) {
 			continue;
 		}
 		const distance = hitTestLineSegment(x, y, previousItem, currentItem, lineType, items, itemIndex, radius);

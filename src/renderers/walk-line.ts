@@ -155,8 +155,8 @@ function segmentSlope(p1: LinePoint, p2: LinePoint): number {
 }
 
 /**
- * This is the Fritsch-Carlson formula for monotone interpolation.
- * https://en.wikipedia.org/wiki/Monotone_cubic_interpolation
+ * This is the slope limiter from Steffen's method for monotone interpolation.
+ * Steffen, M. (1990), "A simple method for monotonic interpolation in one dimension", Astron. Astrophys. 239, 443.
  */
 function monotoneSlope(
 	leftWidth: number,
@@ -187,6 +187,31 @@ function monotoneSlope(
 }
 
 /**
+ * Calculates the slope the curve has as it passes through `point`, one end of the segment described
+ * by `width` and `slope`. `neighbour` is the point on the far side of `point` from that segment, or
+ * `null` where the line begins or ends. Without a neighbouring segment we pretend the line continues
+ * with a copy of the drawn segment, so the curve enters/leaves the line pointing straight along its
+ * first/last segment (and a two point series is a straight line). Note that `monotoneSlope` is
+ * symmetric in its two (width, slope) pairs, so the same helper serves both ends of the segment.
+ */
+function slopeThroughPoint(point: LinePoint, neighbour: LinePoint | null, width: number, slope: number): number {
+	return neighbour === null
+		? slope
+		: monotoneSlope(Math.abs(neighbour.x - point.x), segmentSlope(point, neighbour), width, slope);
+}
+
+/**
+ * A control point `offset` into the segment horizontally, shifted vertically so that the curve
+ * passes through `point` with slope `slope`.
+ */
+function controlPoint(point: LinePoint, offset: number, slope: number): LinePoint {
+	return {
+		x: point.x + offset as Coordinate,
+		y: point.y + offset * slope as Coordinate,
+	};
+}
+
+/**
  * Calculates the control points needed to draw the curve between the point at `endPointIndex - 1` and the point at `endPointIndex`.
  *
  * @returns Two control points that can be used as arguments to {@link CanvasRenderingContext2D.bezierCurveTo} to draw the curve segment.
@@ -201,31 +226,14 @@ export function getControlPoints(
 	const width = endPoint.x - startPoint.x;
 	const slope = segmentSlope(startPoint, endPoint);
 
-	// ...and its neighbouring points. Where the line begins or ends there is no neighbouring segment so
-	// we pretend the line continues with a copy of the drawn segment, which makes `monotoneSlope` return
-	// the drawn segment's slope, so the curve enters/leaves the line pointing straight along its first/last
-	// segment (and a two point series is a straight line).
+	// ...and its neighbouring points, absent where the line begins or ends.
 	const pointBeforeStart = endPointIndex > 1 ? points[endPointIndex - 2] : null;
 	const pointAfterEnd = endPointIndex < points.length - 1 ? points[endPointIndex + 1] : null;
-	const widthBefore = pointBeforeStart !== null ? startPoint.x - pointBeforeStart.x : width;
-	const slopeBefore = pointBeforeStart !== null ? segmentSlope(pointBeforeStart, startPoint) : slope;
-	const widthAfter = pointAfterEnd !== null ? pointAfterEnd.x - endPoint.x : width;
-	const slopeAfter = pointAfterEnd !== null ? segmentSlope(endPoint, pointAfterEnd) : slope;
 
-	// The slope the curve has as it passes through each end of the segment.
-	const startPointSlope = monotoneSlope(widthBefore, slopeBefore, width, slope);
-	const endPointSlope = monotoneSlope(width, slope, widthAfter, slopeAfter);
-
-	// Each control point sits a third of the way into the segment, shifted vertically so that the
-	// curve leaves `startPoint` and arrives at `endPoint` with the slopes chosen above.
-	const cp1: LinePoint = {
-		x: (startPoint.x + width / 3) as Coordinate,
-		y: (startPoint.y + (startPointSlope * width) / 3) as Coordinate,
-	};
-	const cp2: LinePoint = {
-		x: (endPoint.x - width / 3) as Coordinate,
-		y: (endPoint.y - (endPointSlope * width) / 3) as Coordinate,
-	};
-
-	return [cp1, cp2];
+	// Each control point sits a third of the way into the segment.
+	const offset = width / 3;
+	return [
+		controlPoint(startPoint, offset, slopeThroughPoint(startPoint, pointBeforeStart, width, slope)),
+		controlPoint(endPoint, -offset, slopeThroughPoint(endPoint, pointAfterEnd, width, slope)),
+	];
 }
