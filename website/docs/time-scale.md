@@ -62,6 +62,25 @@ In the library, the logical range is represented with the [`LogicalRange`](/api/
 
 The [`setVisibleLogicalRange`] method allows you to specify the visible range beyond the bounds of the available data. This can be useful for setting a [chart margin](#chart-margin) or aligning series visually.
 
+## Number of visible bars
+
+The number of bars that fit in the visible area depends on the time scale width and the [`barSpacing`](/api/interfaces/TimeScaleOptions.md#barspacing) option. The time scale width is the chart width without the price scales. To get it, call the [`width`](/api/interfaces/ITimeScaleApi.md#width) method.
+Use this estimate to determine how much data to load before you set the data, for example, to fill the whole viewport with data from a remote API:
+
+```javascript
+const timeScale = chart.timeScale();
+const visibleBars = Math.ceil(timeScale.width() / timeScale.options().barSpacing);
+```
+
+Note the following:
+
+- `barSpacing` returned by [`options`](/api/interfaces/ITimeScaleApi.md#options) is the current bar spacing, which changes when the user zooms the chart. It can differ from the value you passed in the options.
+- If both [`fixLeftEdge`](/api/interfaces/TimeScaleOptions.md#fixleftedge) and [`fixRightEdge`](/api/interfaces/TimeScaleOptions.md#fixrightedge) are enabled, the library increases `barSpacing` as needed so that all loaded bars always fill the visible area.
+
+After the data is set, use the [`getVisibleLogicalRange`] method to get the size of the visible logical range as the difference between `to` and `from`.
+To load more data while the user scrolls, subscribe to range changes with [`subscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi.md#subscribevisiblelogicalrangechange) as shown in the [Infinite history](/tutorials/demos/infinite-history) tutorial.
+To check how many bars of a series are outside the visible range, use [`barsInLogicalRange`](/api/interfaces/ISeriesApi.md#barsinlogicalrange).
+
 ## Chart margin
 
 Margin is the space between the chart's borders and the series. It depends on the following time scale options:
