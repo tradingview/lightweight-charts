@@ -5,7 +5,7 @@ import { PriceFormatter } from '../formatters/price-formatter';
 import { ensureDefined, ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { ISubscription } from '../helpers/isubscription';
-import { DeepPartial, merge } from '../helpers/strict-type-checks';
+import { clone, DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { BarCoordinates, BarPrice, BarPrices } from './bar';
 import { ColorParser } from './colors';
@@ -227,6 +227,14 @@ const defaultPriceFormatter = new PriceFormatter(100, 1);
 interface MarksCache {
 	marks: PriceMark[];
 	firstValueIsNull: boolean;
+}
+
+/**
+ * Builds the full set of options a price scale is created with from chart-level scale options.
+ * Overlay scale options omit `visible` and `autoScale`, so both default to `true` here.
+ */
+export function createPriceScaleOptions(options: Omit<PriceScaleOptions, 'visible' | 'autoScale'> | PriceScaleOptions): PriceScaleOptions {
+	return { visible: true, autoScale: true, ...clone(options) };
 }
 
 export class PriceScale {

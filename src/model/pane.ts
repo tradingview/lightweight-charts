@@ -3,7 +3,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { clamp } from '../helpers/mathex';
-import { clone, DeepPartial } from '../helpers/strict-type-checks';
+import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { ChartOptionsBase, IChartModelBase, OverlayPriceScaleOptions, VisiblePriceScaleOptions } from './chart-model';
 import { Coordinate } from './coordinate';
@@ -15,7 +15,7 @@ import { IPanePrimitiveBase, PrimitiveHoveredItem } from './ipane-primitive';
 import { IPriceDataSource } from './iprice-data-source';
 import { ISeries } from './iseries';
 import { PanePrimitiveWrapper } from './pane-primitive-wrapper';
-import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
+import { createPriceScaleOptions, PriceScale, PriceScaleState } from './price-scale';
 import { Series } from './series';
 import { SeriesType } from './series-options';
 import { sortSources } from './sort-sources';
@@ -512,10 +512,9 @@ export class Pane implements IDestroyable, IPrimitiveHitTestSource {
 	}
 
 	private _createPriceScale(id: string, options: OverlayPriceScaleOptions | VisiblePriceScaleOptions): PriceScale {
-		const actualOptions: PriceScaleOptions = { visible: true, autoScale: true, ...clone(options) };
 		const priceScale = new PriceScale(
 			id,
-			actualOptions,
+			createPriceScaleOptions(options),
 			this._model.options()['layout'],
 			this._model.options().localization,
 			this._model.colorParser()
