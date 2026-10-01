@@ -5,7 +5,7 @@ import { VolumeFormatter } from '../formatters/volume-formatter';
 
 import { ensureNotNull } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
-import { isInteger, merge } from '../helpers/strict-type-checks';
+import { isInteger, merge, resetExplicitUndefined } from '../helpers/strict-type-checks';
 
 import { HoveredSourcePaneViews } from '../views/pane/hovered-source-pane-views';
 import { IPaneView } from '../views/pane/ipane-view';
@@ -244,10 +244,8 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 		merge(this._options, options);
 
-		// merge() skips undefined values, so explicitly reset autoscaleInfoProvider when set to undefined
-		if (Object.prototype.hasOwnProperty.call(options, 'autoscaleInfoProvider') && options.autoscaleInfoProvider === undefined) {
-			this._options.autoscaleInfoProvider = undefined;
-		}
+		// merge() skips undefined values, so an explicit undefined autoscaleInfoProvider is applied here as a reset
+		resetExplicitUndefined(this._options, options, ['autoscaleInfoProvider']);
 
 		if (conflationOptionsChanged) {
 			this._conflationByFactorCache.clear();

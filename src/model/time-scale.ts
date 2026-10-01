@@ -3,7 +3,7 @@ import { ensureNotNull } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
 import { ISubscription } from '../helpers/isubscription';
 import { clamp } from '../helpers/mathex';
-import { DeepPartial, isInteger, merge } from '../helpers/strict-type-checks';
+import { DeepPartial, isInteger, merge, resetExplicitUndefined } from '../helpers/strict-type-checks';
 
 import { ChartModel } from './chart-model';
 import { Coordinate } from './coordinate';
@@ -373,12 +373,13 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 
 	public applyLocalizationOptions(localizationOptions: DeepPartial<LocalizationOptions<HorzScaleItem>>): void {
 		merge(this._localizationOptions, localizationOptions);
+		resetExplicitUndefined(this._localizationOptions, localizationOptions);
 
 		this._invalidateTickMarks();
 		this._updateDateTimeFormatter();
 	}
 
-	public applyOptions(options: DeepPartial<HorzScaleOptions>, localizationOptions?: DeepPartial<LocalizationOptions<HorzScaleItem>>): void {
+	public applyOptions(options: DeepPartial<HorzScaleOptions>): void {
 		merge(this._options, options);
 
 		if (this._options.fixLeftEdge) {
