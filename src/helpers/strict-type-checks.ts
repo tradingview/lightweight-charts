@@ -22,28 +22,12 @@ export function merge(dst: Record<string, any>, ...sources: Record<string, any>[
 				continue;
 			}
 
-			if ('object' !== typeof src[i] || dst[i] === undefined || Array.isArray(src[i])) {
+			if ('object' !== typeof src[i] || src[i] === null || dst[i] === undefined || Array.isArray(src[i])) {
 				dst[i] = src[i];
 			} else {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				merge(dst[i], src[i]);
 			}
-		}
-	}
-
-	return dst;
-}
-
-/**
- * merge() skips `undefined` values so that partial options leave untouched keys as they are.
- * For a small set of nullable options an explicit `undefined` is meant as a reset, which this helper applies.
- */
-export function resetExplicitUndefined<T extends object>(dst: T, src: T, keys?: (keyof T)[]): Partial<T> {
-	const walkKeys = keys ?? Object.keys(dst) as (keyof T)[];
-
-	for (const key of walkKeys) {
-		if (Object.prototype.hasOwnProperty.call(src, key) && src[key] === undefined) {
-			dst[key] = src[key];
 		}
 	}
 

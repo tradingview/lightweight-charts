@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import { clone, merge, resetExplicitUndefined } from '../../src/helpers/strict-type-checks';
+import { clone, merge } from '../../src/helpers/strict-type-checks';
 
 describe('Helpers', () => {
 	/* eslint-disable
@@ -107,6 +107,21 @@ describe('Helpers', () => {
 			expect((Object.prototype as any).polluted).to.be.undefined;
 		});
 
+		it('should assign null as a leaf value over a primitive', () => {
+			const result = merge({ a: 'str', b: 1 }, { a: null });
+			expect(result).to.deep.equal({ a: null, b: 1 });
+		});
+
+		it('should assign null as a leaf value over an object', () => {
+			const result = merge({ a: { b: 1 } }, { a: null });
+			expect(result).to.deep.equal({ a: null });
+		});
+
+		it('should assign null when the destination key is absent', () => {
+			const result = merge({}, { a: null });
+			expect(result).to.deep.equal({ a: null });
+		});
+
 		it('should handle circular references safely', () => {
 			const dst: Record<string, unknown> = { a: 1 };
 			dst.circular = dst;
@@ -163,69 +178,6 @@ describe('Helpers', () => {
 			expect(({} as any).polluted).to.be.undefined;
 			expect((Object.prototype as any).polluted).to.be.undefined;
 			expect(Object.prototype.toString).to.equal(originalProto);
-		});
-	});
-
-	describe('resetExplicitUndefined', () => {
-		it('should clear a listed key that is explicitly undefined in the source', () => {
-			const dst: Record<string, unknown> = { formatter: () => 'x', other: 1 };
-			const src: Record<string, unknown> = { formatter: undefined };
-
-			resetExplicitUndefined(dst, src, ['formatter']);
-
-			expect(Object.prototype.hasOwnProperty.call(dst, 'formatter')).to.equal(true);
-			expect(dst.formatter).to.be.undefined;
-			expect(dst.other).to.equal(1);
-		});
-
-		it('should leave a listed key untouched when the source does not mention it', () => {
-			const formatter = () => 'x';
-			const dst: Record<string, unknown> = { formatter };
-			const src: Record<string, unknown> = { other: 2 };
-
-			resetExplicitUndefined(dst, src, ['formatter']);
-
-			expect(dst.formatter).to.equal(formatter);
-		});
-
-		it('should leave a listed key untouched when the source sets it to a value', () => {
-			const next = () => 'y';
-			const dst: Record<string, unknown> = { formatter: () => 'x' };
-			const src: Record<string, unknown> = { formatter: next };
-
-			resetExplicitUndefined(dst, src, ['formatter']);
-
-			expect(dst.formatter).to.not.be.undefined;
-		});
-
-		it('should ignore an explicitly undefined key that is not listed', () => {
-			const dst: Record<string, unknown> = { locale: 'en-US', formatter: () => 'x' };
-			const src: Record<string, unknown> = { locale: undefined, formatter: undefined };
-
-			resetExplicitUndefined(dst, src, ['formatter']);
-
-			expect(dst.locale).to.equal('en-US');
-			expect(dst.formatter).to.be.undefined;
-		});
-
-		it('should walk every key of the destination when no keys are given', () => {
-			const dst: Record<string, unknown> = { a: 1, b: 2, c: 3 };
-			const src: Record<string, unknown> = { a: undefined, c: undefined };
-
-			resetExplicitUndefined(dst, src);
-
-			expect(dst).to.deep.equal({ a: undefined, b: 2, c: undefined });
-		});
-
-		it('should ignore inherited undefined keys on the source', () => {
-			const proto = { formatter: undefined };
-			const src = Object.create(proto) as Record<string, unknown>;
-			const formatter = () => 'x';
-			const dst: Record<string, unknown> = { formatter };
-
-			resetExplicitUndefined(dst, src, ['formatter']);
-
-			expect(dst.formatter).to.equal(formatter);
 		});
 	});
 	/* eslint-enable

@@ -175,6 +175,7 @@ If these repo paths do not exist in the user's project, do not ask them to creat
 - **Create the chart once** in `useEffect` / `onMounted` and destroy it in cleanup with `chart.remove()`. Recreating on every render duplicates DOM and leaks listeners.
 - **Resize can be automatic in v5** with `autoSize: true` when `ResizeObserver` is available. If you need manual control, subscribe a `ResizeObserver` to the container and call `chart.resize(width, height)` (or `applyOptions({ width, height })`).
 - **Don't drive `setData` from props on every render.** Use `series.update(...)` for incremental changes; only call `setData` when the dataset truly replaces.
+- **`undefined` in `applyOptions` means "not specified", not "reset".** `{ priceFormatter: custom ? fmt : undefined }` leaves the current formatter in place. To clear a `localization` formatter or `autoscaleInfoProvider`, pass `null`. Other options have no reset value: pass the default explicitly.
 - **Next.js/SSR must be client-only.** Put chart code in a `'use client'` component, create it in `useEffect`, and import that component with `next/dynamic(..., { ssr: false })` from server-rendered pages when needed.
 - **Plain HTML is not npm resolution.** The standalone `.js` build exposes `window.LightweightCharts`; ESM in the browser must import an actual `.mjs` URL or use an import map. `import { createChart } from 'lightweight-charts'` only works when a bundler/runtime resolves the package name.
 
@@ -453,6 +454,8 @@ chart.applyOptions({
 ```
 
 For per-series formatting, set `priceFormat: { type: 'custom', formatter, minMove }` in the series options — the chart-level `priceFormatter` is the fallback.
+
+To go back to the built-in formatting, pass `null`: `chart.applyOptions({ localization: { priceFormatter: null } })`. Passing `undefined` leaves the current formatter in place.
 
 ### Minimal pane primitive
 

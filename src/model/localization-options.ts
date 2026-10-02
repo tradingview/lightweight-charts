@@ -26,31 +26,36 @@ export interface LocalizationOptionsBase {
 	/**
 	 * Override formatting of the price scale tick marks, labels and crosshair labels. Can be used for cases that can't be covered with built-in price formats.
 	 *
+	 * Set to `null` to reset previous formatting.
+	 *
 	 * @see {@link PriceFormatCustom}
 	 * @defaultValue `undefined`
 	 */
-	priceFormatter?: PriceFormatterFn;
+	priceFormatter?: PriceFormatterFn | null;
 
 	/**
 	 * Overrides the formatting of price scale tick marks. Use this to define formatting rules based on all provided price values.
+	 * Set to `null` to reset previous formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */
-	tickmarksPriceFormatter?: TickmarksPriceFormatterFn;
+	tickmarksPriceFormatter?: TickmarksPriceFormatterFn | null;
 
 	/**
 	 * Overrides the formatting of percentage scale tick marks.
+	 * Set to `null` to reset previous formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */
-	percentageFormatter?: PercentageFormatterFn;
+	percentageFormatter?: PercentageFormatterFn | null;
 
 	/**
 	 * Override formatting of the percentage scale tick marks. Can be used if formatting should be adjusted based on all the values being formatted
+	 * Set to `null` to reset previous formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */
-	tickmarksPercentageFormatter?: TickmarksPercentageFormatterFn;
+	tickmarksPercentageFormatter?: TickmarksPercentageFormatterFn | null;
 
 }
 
@@ -61,10 +66,11 @@ export interface LocalizationOptions<HorzScaleItem> extends LocalizationOptionsB
 
 	/**
 	 * Override formatting of the time scale crosshair label.
+	 * Set to `null` to reset previous formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */
-	timeFormatter?: TimeFormatterFn<HorzScaleItem>;
+	timeFormatter?: TimeFormatterFn<HorzScaleItem> | null;
 
 	/**
 	 * Date formatting string.

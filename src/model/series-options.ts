@@ -849,8 +849,10 @@ export interface SeriesOptionsCommon {
 	 *     },
 	 * });
 	 * ```
+	 *
+	 * Set to `null` to reset previous provider.
 	 */
-	autoscaleInfoProvider?: AutoscaleInfoProvider;
+	autoscaleInfoProvider?: AutoscaleInfoProvider | null;
 
 	/**
 	 * Conflation smoothing factor for this series. Overrides the global time scale option.

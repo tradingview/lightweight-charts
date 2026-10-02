@@ -1095,8 +1095,8 @@ export class PriceScale {
 		return null;
 	}
 
-	private _formatValue(value: BarPrice | number, formatter: PriceFormatterFn | undefined, fallbackFormatter?: IPriceFormatter): string {
-		if (formatter === undefined) {
+	private _formatValue(value: BarPrice | number, formatter: PriceFormatterFn | null | undefined, fallbackFormatter?: IPriceFormatter): string {
+		if (formatter == null) {
 			if (fallbackFormatter === undefined) {
 				fallbackFormatter = this.formatter();
 			}
@@ -1106,8 +1106,8 @@ export class PriceScale {
 		return formatter(value as BarPrice);
 	}
 
-	private _formatValues(values: readonly (BarPrice | number)[], formatter: TickmarksPriceFormatterFn | undefined, fallbackFormatter?: IPriceFormatter): string[] {
-		if (formatter === undefined) {
+	private _formatValues(values: readonly (BarPrice | number)[], formatter: TickmarksPriceFormatterFn | null | undefined, fallbackFormatter?: IPriceFormatter): string[] {
+		if (formatter == null) {
 			if (fallbackFormatter === undefined) {
 				fallbackFormatter = this.formatter();
 			}
