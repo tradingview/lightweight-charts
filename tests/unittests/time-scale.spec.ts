@@ -9,7 +9,7 @@ import { HorzScaleBehaviorTime } from '../../src/model/horz-scale-behavior-time/
 import { Time, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
 import { InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { LocalizationOptions } from '../../src/model/localization-options';
-import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from '../../src/model/time-data';
+import { Logical, TickMarkWeightValue, TimePointIndex, TimeScalePoint } from '../../src/model/time-data';
 import { TimeScale } from '../../src/model/time-scale';
 
 function chartModelMock(): ChartModel<Time> {
@@ -66,6 +66,44 @@ describe('TimeScale', () => {
 			ts.indexesToCoordinates(indexes);
 			expect(indexes[0].x).to.be.equal(expectedValue, 'indexesToCoordinates');
 		}
+	});
+
+	it('setLogicalRange should apply the requested range even if there are less visible bars than the minimal visible bars count', () => {
+		const ts = new TimeScale<Time>(
+			chartModelMock(),
+			{ ...timeScaleOptionsDefaults, minBarSpacing: 0, maxBarSpacing: 100000 },
+			fakeLocalizationOptions,
+			behavior
+		);
+		ts.setWidth(400);
+		ts.update(...tsUpdate(1));
+		ts.setBaseIndex(1 as TimePointIndex);
+
+		ts.setLogicalRange({ from: 0.49 as Logical, to: 0.51 as Logical });
+
+		const logicalRange = ts.visibleLogicalRange();
+		expect(logicalRange).to.be.not.equal(null);
+		expect(logicalRange?.left()).to.be.closeTo(0.49, 1e-6);
+		expect(logicalRange?.right()).to.be.closeTo(0.51, 1e-6);
+	});
+
+	it('fitContent should still work with a large maxBarSpacing and a few bars', () => {
+		const ts = new TimeScale<Time>(
+			chartModelMock(),
+			{ ...timeScaleOptionsDefaults, minBarSpacing: 0, maxBarSpacing: 100000 },
+			fakeLocalizationOptions,
+			behavior
+		);
+		ts.setWidth(400);
+		ts.update(...tsUpdate(1));
+		ts.setBaseIndex(1 as TimePointIndex);
+
+		ts.fitContent();
+
+		const logicalRange = ts.visibleLogicalRange();
+		expect(logicalRange).to.be.not.equal(null);
+		expect(logicalRange?.left()).to.be.equal(0);
+		expect(logicalRange?.right()).to.be.equal(1);
 	});
 
 	describe('timeToIndex', () => {
