@@ -378,7 +378,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._updateDateTimeFormatter();
 	}
 
-	public applyOptions(options: DeepPartial<HorzScaleOptions>, localizationOptions?: DeepPartial<LocalizationOptions<HorzScaleItem>>): void {
+	public applyOptions(options: DeepPartial<HorzScaleOptions>): void {
 		merge(this._options, options);
 
 		if (this._options.fixLeftEdge) {
@@ -913,7 +913,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	public formatDateTime(timeScalePoint: TimeScalePoint): string {
-		if (this._localizationOptions.timeFormatter !== undefined) {
+		if (this._localizationOptions.timeFormatter != null) {
 			return this._localizationOptions.timeFormatter(timeScalePoint.originalTime as HorzScaleItem);
 		}
 

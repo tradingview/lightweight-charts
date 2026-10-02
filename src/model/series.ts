@@ -572,7 +572,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
-		if (this._options.autoscaleInfoProvider !== undefined) {
+		if (this._options.autoscaleInfoProvider != null) {
 			const autoscaleInfo = this._options.autoscaleInfoProvider(() => {
 				const res = this._autoscaleInfoImpl(startTimePoint, endTimePoint);
 				return (res === null) ? null : res.toRaw();

@@ -142,3 +142,12 @@ const horizontalScaleBehaviourMock = new HorzScaleBehaviorPrice();
 const nonDefaultChart = createChartEx<HorizontalScaleType, HorzScaleBehaviorPrice>('anything', horizontalScaleBehaviourMock);
 const lineSeries2 = nonDefaultChart.addSeries(LineSeries);
 lineSeries2.setData([]);
+
+// null resets autoscaleInfoProvider; undefined does too, as released in 5.2.1
+lineSeries.applyOptions({ autoscaleInfoProvider: null });
+lineSeries.applyOptions({ autoscaleInfoProvider: undefined });
+
+lineSeries.applyOptions({
+	// @ts-expect-error other series options do not accept null
+	color: null,
+});
