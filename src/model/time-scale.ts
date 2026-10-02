@@ -592,6 +592,18 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._model.lightUpdate();
 	}
 
+	/**
+	 * Shifts the right offset to compensate for bars being appended or replace to the right
+	 * so that the visible range stays in place.
+	 */
+	public setCompensateRightOffset(compensat: number): void {
+		if (this._commonTransitionStartState !== null) {
+			this._commonTransitionStartState.rightOffset -= compensat;
+		}
+
+		this.setRightOffset(this._rightOffset - compensat);
+	}
+
 	public barSpacing(): number {
 		return this._barSpacing;
 	}
