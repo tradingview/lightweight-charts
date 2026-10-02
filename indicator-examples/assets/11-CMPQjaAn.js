@@ -1,0 +1,1 @@
+import{o as a,g as o,Q as s,y as n,h as c}from"./sample-data-BBY9y8pd.js";import{c as i}from"./percent-change-calculation-D2Kn2o6n.js";const r={autoSize:!0},e=a("chart",r),t=o(150,new Date(2024,0,1)),l=e.addSeries(s,{});l.setData(t);const d=i(t,{}),S=e.addSeries(n,{color:"blue",lineWidth:2,lineStyle:c.Solid},1);S.setData(d);e.timeScale().fitContent();
