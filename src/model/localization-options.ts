@@ -26,7 +26,7 @@ export interface LocalizationOptionsBase {
 	/**
 	 * Override formatting of the price scale tick marks, labels and crosshair labels. Can be used for cases that can't be covered with built-in price formats.
 	 *
-	 * Set to `null` to reset previous formatting.
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
 	 *
 	 * @see {@link PriceFormatCustom}
 	 * @defaultValue `undefined`
@@ -35,7 +35,8 @@ export interface LocalizationOptionsBase {
 
 	/**
 	 * Overrides the formatting of price scale tick marks. Use this to define formatting rules based on all provided price values.
-	 * Set to `null` to reset previous formatting.
+	 *
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */
@@ -43,7 +44,8 @@ export interface LocalizationOptionsBase {
 
 	/**
 	 * Overrides the formatting of percentage scale tick marks.
-	 * Set to `null` to reset previous formatting.
+	 *
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */
@@ -51,7 +53,8 @@ export interface LocalizationOptionsBase {
 
 	/**
 	 * Override formatting of the percentage scale tick marks. Can be used if formatting should be adjusted based on all the values being formatted
-	 * Set to `null` to reset previous formatting.
+	 *
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */
@@ -66,7 +69,8 @@ export interface LocalizationOptions<HorzScaleItem> extends LocalizationOptionsB
 
 	/**
 	 * Override formatting of the time scale crosshair label.
-	 * Set to `null` to reset previous formatting.
+	 *
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */

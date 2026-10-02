@@ -850,7 +850,7 @@ export interface SeriesOptionsCommon {
 	 * });
 	 * ```
 	 *
-	 * Set to `null` to reset previous provider.
+	 * Set to `null` to remove a previously set provider and fall back to the built-in autoscaling.
 	 */
 	autoscaleInfoProvider?: AutoscaleInfoProvider | null;
 
